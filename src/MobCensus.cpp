@@ -19,8 +19,8 @@ void cMobCensus::CollectMob(cMonster & a_Monster, cChunk & a_Chunk, double a_Dis
 
 bool cMobCensus::IsCapped(cMonster::eFamily a_MobFamily)
 {
-	const int ratio = 319;  // This should be 256 as we are only supposed to take account from chunks that are in 17x17 from a player
-	// but for now, we use all chunks loaded by players. that means 19 x 19 chunks. That's why we use 256 * (19*19) / (17*17) = 319
+	const int ratio = 319;  // This should be 256 as we are only supposed to take account from chunks that are in 17 x 17 from a player
+	// but for now, we use all chunks loaded by players. that means 19 x 19 chunks. That's why we use 256 * (19 * 19) / (17 * 17) = 319
 	// MG TODO : code the correct count
 	if ((GetCapMultiplier(a_MobFamily) * GetNumChunks()) / ratio >= m_MobFamilyCollecter.GetNumberOfCollectedMobs(a_MobFamily))
 	{

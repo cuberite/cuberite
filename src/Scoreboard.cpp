@@ -286,7 +286,7 @@ cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 
 
 
-cObjective* cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
+cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
 {
 	cObjective Objective(a_Name, a_DisplayName, a_Type, m_World);
 
@@ -471,7 +471,7 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 
 
-bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback)
+bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback & a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -493,7 +493,7 @@ bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallb
 
 
 
-bool cScoreboard::ForEachObjective(cObjectiveCallback& a_Callback)
+bool cScoreboard::ForEachObjective(cObjectiveCallback & a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -512,7 +512,7 @@ bool cScoreboard::ForEachObjective(cObjectiveCallback& a_Callback)
 
 
 
-bool cScoreboard::ForEachTeam(cTeamCallback& a_Callback)
+bool cScoreboard::ForEachTeam(cTeamCallback & a_Callback)
 {
 	cCSLock Lock(m_CSTeams);
 

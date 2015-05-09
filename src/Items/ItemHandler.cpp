@@ -362,7 +362,7 @@ bool cItemHandler::OnPlayerPlace(
 			!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(&a_Player, PlaceMeta)
 			)
 		{
-			// Tried to place a block *into* another?
+			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 			return false;
 		}

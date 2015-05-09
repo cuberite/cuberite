@@ -229,7 +229,7 @@ inline const char * ClickActionToString(eClickAction a_ClickAction)
 
 
 
-/** Returns a blockface mirrored around the Y axis (doesn't change up/down). */
+/** Returns a blockface mirrored around the Y axis (doesn't change up / down). */
 inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
 {
 	switch (a_BlockFace)

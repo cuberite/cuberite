@@ -168,9 +168,9 @@ public:
 
 
 protected:
-	// Parser callback enable/disable methods:
+	// Parser callback enable / disable methods:
 
-	// @cmember Enable/Disable the start element handler
+	// @cmember Enable / Disable the start element handler
 
 	void EnableStartElementHandler (bool fEnable = true)
 	{
@@ -178,7 +178,7 @@ protected:
 		XML_SetStartElementHandler (m_p, fEnable ? StartElementHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the end element handler
+	// @cmember Enable / Disable the end element handler
 
 	void EnableEndElementHandler (bool fEnable = true)
 	{
@@ -186,7 +186,7 @@ protected:
 		XML_SetEndElementHandler (m_p, fEnable ? EndElementHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the element handlers
+	// @cmember Enable / Disable the element handlers
 
 	void EnableElementHandler (bool fEnable = true)
 	{
@@ -195,7 +195,7 @@ protected:
 		EnableEndElementHandler (fEnable);
 	}
 
-	// @cmember Enable/Disable the character data handler
+	// @cmember Enable / Disable the character data handler
 
 	void EnableCharacterDataHandler (bool fEnable = true)
 	{
@@ -203,7 +203,7 @@ protected:
 		XML_SetCharacterDataHandler (m_p, fEnable ? CharacterDataHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the processing instruction handler
+	// @cmember Enable / Disable the processing instruction handler
 
 	void EnableProcessingInstructionHandler (bool fEnable = true)
 	{
@@ -211,7 +211,7 @@ protected:
 		XML_SetProcessingInstructionHandler (m_p, fEnable ? ProcessingInstructionHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the comment handler
+	// @cmember Enable / Disable the comment handler
 
 	void EnableCommentHandler (bool fEnable = true)
 	{
@@ -219,7 +219,7 @@ protected:
 		XML_SetCommentHandler (m_p, fEnable ? CommentHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the start CDATA section handler
+	// @cmember Enable / Disable the start CDATA section handler
 
 	void EnableStartCdataSectionHandler (bool fEnable = true)
 	{
@@ -227,7 +227,7 @@ protected:
 		XML_SetStartCdataSectionHandler (m_p, fEnable ? StartCdataSectionHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the end CDATA section handler
+	// @cmember Enable / Disable the end CDATA section handler
 
 	void EnableEndCdataSectionHandler (bool fEnable = true)
 	{
@@ -235,7 +235,7 @@ protected:
 		XML_SetEndCdataSectionHandler (m_p, fEnable ? EndCdataSectionHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the CDATA section handlers
+	// @cmember Enable / Disable the CDATA section handlers
 
 	void EnableCdataSectionHandler (bool fEnable = true)
 	{
@@ -244,7 +244,7 @@ protected:
 		EnableEndCdataSectionHandler (fEnable);
 	}
 
-	// @cmember Enable/Disable default handler
+	// @cmember Enable / Disable default handler
 	
 	void EnableDefaultHandler (bool fEnable = true, bool fExpand = true)
 	{
@@ -259,7 +259,7 @@ protected:
 		}
 	}
 	
-	// @cmember Enable/Disable external entity ref handler
+	// @cmember Enable / Disable external entity ref handler
 	
 	void EnableExternalEntityRefHandler (bool fEnable = true)
 	{
@@ -267,7 +267,7 @@ protected:
 		XML_SetExternalEntityRefHandler (m_p, fEnable ? ExternalEntityRefHandler : nullptr);
 	}
 	
-	// @cmember Enable/Disable unknown encoding handler
+	// @cmember Enable / Disable unknown encoding handler
 	
 	void EnableUnknownEncodingHandler (bool fEnable = true)
 	{
@@ -275,7 +275,7 @@ protected:
 		XML_SetUnknownEncodingHandler (m_p, fEnable ? UnknownEncodingHandler : nullptr);
 	}
 	
-	// @cmember Enable/Disable start namespace handler
+	// @cmember Enable / Disable start namespace handler
 	
 	void EnableStartNamespaceDeclHandler (bool fEnable = true)
 	{
@@ -283,7 +283,7 @@ protected:
 		XML_SetStartNamespaceDeclHandler (m_p, fEnable ? StartNamespaceDeclHandler : nullptr);
 	}
 	
-	// @cmember Enable/Disable end namespace handler
+	// @cmember Enable / Disable end namespace handler
 	
 	void EnableEndNamespaceDeclHandler (bool fEnable = true)
 	{
@@ -291,7 +291,7 @@ protected:
 		XML_SetEndNamespaceDeclHandler (m_p, fEnable ? EndNamespaceDeclHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable namespace handlers
+	// @cmember Enable / Disable namespace handlers
 
 	void EnableNamespaceDeclHandler (bool fEnable = true)
 	{
@@ -299,7 +299,7 @@ protected:
 		EnableEndNamespaceDeclHandler (fEnable);
 	}
 	
-	// @cmember Enable/Disable the XML declaration handler
+	// @cmember Enable / Disable the XML declaration handler
 
 	void EnableXmlDeclHandler (bool fEnable = true)
 	{
@@ -307,7 +307,7 @@ protected:
 		XML_SetXmlDeclHandler (m_p, fEnable ? XmlDeclHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the start DOCTYPE declaration handler
+	// @cmember Enable / Disable the start DOCTYPE declaration handler
 
 	void EnableStartDoctypeDeclHandler (bool fEnable = true)
 	{
@@ -315,7 +315,7 @@ protected:
 		XML_SetStartDoctypeDeclHandler (m_p, fEnable ? StartDoctypeDeclHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the end DOCTYPE declaration handler
+	// @cmember Enable / Disable the end DOCTYPE declaration handler
 
 	void EnableEndDoctypeDeclHandler (bool fEnable = true)
 	{
@@ -324,7 +324,7 @@ protected:
 			fEnable ? EndDoctypeDeclHandler : nullptr);
 	}
 
-	// @cmember Enable/Disable the DOCTYPE declaration handler
+	// @cmember Enable / Disable the DOCTYPE declaration handler
 
 	void EnableDoctypeDeclHandler (bool fEnable = true)
 	{

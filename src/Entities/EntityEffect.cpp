@@ -102,11 +102,11 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 	// If potion is level II, half the duration. If not, stays the same
 	TierCoeff = (GetPotionEffectIntensity(a_ItemDamage) > 0) ? 0.5 : 1;
 	
-	// If potion is extended, multiply duration by 8/3. If not, stays the same
+	// If potion is extended, multiply duration by 8 / 3. If not, stays the same
 	// Extended potion if sixth lowest bit is set
 	ExtCoeff = (a_ItemDamage & 0x40) ? (8.0 / 3.0) : 1;
 	
-	// If potion is splash potion, multiply duration by 3/4. If not, stays the same
+	// If potion is splash potion, multiply duration by 3 / 4. If not, stays the same
 	SplashCoeff = IsPotionDrinkable(a_ItemDamage) ? 1 : 0.75;
 	
 	// Ref.:

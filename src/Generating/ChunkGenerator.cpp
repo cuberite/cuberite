@@ -209,7 +209,7 @@ void cChunkGenerator::Execute(void)
 		{
 			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
 			{
-				LOG("Chunk generator performance: %.2f ch/s (%d ch total)",
+				LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
 					(double)NumChunksGenerated * CLOCKS_PER_SEC/ (clock() - GenerationStart),
 					NumChunksGenerated
 				);
@@ -241,7 +241,7 @@ void cChunkGenerator::Execute(void)
 		// Display perf info once in a while:
 		if ((NumChunksGenerated > 16) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
 		{
-			LOG("Chunk generator performance: %.2f ch/s (%d ch total)",
+			LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
 				(double)NumChunksGenerated * CLOCKS_PER_SEC / (clock() - GenerationStart),
 				NumChunksGenerated
 			);

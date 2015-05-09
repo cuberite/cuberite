@@ -152,10 +152,10 @@ public:
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 
-	/** Is the daylight cyclus enabled? */
+	/** Is the daylight cycle enabled? */
 	virtual bool IsDaylightCycleEnabled(void) const { return m_IsDaylightCycleEnabled; }
 
-	/** Sets the daylight cyclus to true/false. */
+	/** Sets the daylight cycle to true / false. */
 	virtual void SetDaylightCycleEnabled(bool a_IsDaylightCycleEnabled)
 	{
 		m_IsDaylightCycleEnabled = a_IsDaylightCycleEnabled;
@@ -1067,7 +1067,7 @@ private:
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
 	
-	/** Handles the mob spawning/moving/destroying each tick */
+	/** Handles the mob spawning / moving / destroying each tick */
 	void TickMobs(std::chrono::milliseconds a_Dt);
 	
 	/** Executes all tasks queued onto the tick thread */
