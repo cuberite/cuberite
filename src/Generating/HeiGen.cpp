@@ -667,7 +667,7 @@ public:
 
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 	{
-		// Generate the biomes for the 3*3 neighbors:
+		// Generate the biomes for the 3 * 3 neighbors:
 		cChunkDef::BiomeMap neighborBiomes[3][3];
 		for (int z = 0; z < 3; z++) for (int x = 0; x < 3; x++)
 		{

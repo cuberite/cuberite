@@ -176,7 +176,7 @@ protected:
 		{
 			float PercentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
 			float ChunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / std::chrono::duration_cast<std::chrono::milliseconds>(Now - m_LastReportTime).count();
-			LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks/s)",
+			LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks / sec)",
 				m_World.GetName().c_str(), PercentDone, m_NumPrepared, m_MaxIdx, ChunkSpeed
 			);
 			m_LastReportTime = Now;
@@ -767,7 +767,7 @@ eWeather cWorld::ChooseNewWeather()
 			
 		case eWeather_Rain:
 		{
-			// 1/8 chance of turning into a thunderstorm
+			// 1 / 8 chance of turning into a thunderstorm
 			return ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}

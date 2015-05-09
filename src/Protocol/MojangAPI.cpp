@@ -659,7 +659,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		a_NamesToQuery.erase(a_NamesToQuery.begin(), itr);
 		Json::FastWriter Writer;
 		AString RequestBody = Writer.write(root);
-	
+
 		// Create the HTTP request:
 		AString Request;
 		Request += "POST " + m_NameToUUIDAddress + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
@@ -667,7 +667,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		Request += "User-Agent: MCServer\r\n";
 		Request += "Connection: close\r\n";
 		Request += "Content-Type: application/json\r\n";
-		Request += Printf("Content-Length: %u\r\n", (unsigned)RequestBody.length());
+		Request += Printf("Content-Length: %u\r\n", static_cast<unsigned>(RequestBody.length()));
 		Request += "\r\n";
 		Request += RequestBody;
 

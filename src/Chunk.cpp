@@ -737,7 +737,7 @@ void cChunk::ProcessQueuedSetBlocks(void)
 			{
 				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
 				{
-					// Current world age is bigger than/equal to target world age - delay time reached AND
+					// Current world age is bigger than / equal to target world age - delay time reached AND
 					// Previous block type was the same as current block type (to prevent duplication)
 					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);  // SetMeta doesn't send to client
 					itr = m_SetBlockQueue.erase(itr);
@@ -751,7 +751,7 @@ void cChunk::ProcessQueuedSetBlocks(void)
 			}
 			else
 			{
-				// Current world age is bigger than/equal to target world age - delay time reached
+				// Current world age is bigger than / equal to target world age - delay time reached
 				SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
 				itr = m_SetBlockQueue.erase(itr);
 				LOGD("Successfully set queued block - previous type ignored");
@@ -1026,7 +1026,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		case E_BLOCK_FARMLAND:
 		{
 			// DEBUG: This is here to catch FS #349 - melons growing over other crops.
-			LOG("Growing melon/pumpkin overwriting %s, growing on %s",
+			LOG("Growing melon / pumpkin overwriting %s, growing on %s",
 				ItemTypeToString(BlockType[CheckType]).c_str(),
 				ItemTypeToString(Soil).c_str()
 			);

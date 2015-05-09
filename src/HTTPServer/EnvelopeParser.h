@@ -61,7 +61,7 @@ public:
 	AString m_LastValue;
 
 
-	/** Notifies the callback of the key/value stored in m_LastKey/m_LastValue, then erases them */
+	/** Notifies the callback of the key / value stored in m_LastKey / m_LastValue, then erases them */
 	void NotifyLast(void);
 	
 	/** Parses one line of header data. Returns true if successful */

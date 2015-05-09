@@ -14,7 +14,7 @@
 
 
 
-// fwd: WorldStorage/FastNBT.h
+// fwd: "WorldStorage/FastNBT.h"
 class cFastNBTWriter;
 class cParsedNBT;
 

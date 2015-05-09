@@ -1,6 +1,6 @@
 // MobHeadEntity.h
 
-// Declares the cMobHeadEntity class representing a single skull/head in the world
+// Declares the cMobHeadEntity class representing a single skull / head in the world
 
 
 

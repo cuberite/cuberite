@@ -391,7 +391,7 @@ private:
 
 	cPlayer * m_Player;
 	
-	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
+	bool m_HasSentDC;  ///< True if a Disconnect packet has been sent in either direction
 
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;
@@ -416,7 +416,7 @@ private:
 	int m_BlockDigAnimY;
 	int m_BlockDigAnimZ;
 
-	// To avoid dig/aim bug in the client, store the last position given in a DIG_START packet and compare to that when processing the DIG_FINISH packet:
+	// To avoid dig / aim bug in the client, store the last position given in a DIG_START packet and compare to that when processing the DIG_FINISH packet:
 	bool m_HasStartedDigging;
 	int m_LastDigBlockX;
 	int m_LastDigBlockY;

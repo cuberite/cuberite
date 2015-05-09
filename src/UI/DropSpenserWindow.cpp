@@ -1,7 +1,7 @@
 
 // DropSpenserWindow.cpp
 
-// Representing the UI window for the dropper/dispenser block
+// Representing the UI window for the dropper / dispenser block
 
 #include "Globals.h"
 #include "DropSpenserWindow.h"

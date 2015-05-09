@@ -224,7 +224,7 @@ protected:
 	Calls ResetPathFinding and sets m_IsFollowingPath to false */
 	void StopMovingToPosition();
 
-	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
+	/** Sets the body yaw and head yaw / pitch based on next / ultimate destinations */
 	void SetPitchAndYawFromDestination(void);
 
 	virtual void HandleFalling(void);

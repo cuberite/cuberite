@@ -237,7 +237,7 @@ bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints &
 		return true;
 	}
 
-	// Smoothing: for each line segment, add points on its 1/4 lengths
+	// Smoothing: for each line segment, add points on its 1 / 4 lengths
 	bool res = false;
 	size_t Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
@@ -488,7 +488,7 @@ void cCaveTunnel::ProcessChunk(
 			continue;
 		}
 
-		// Carve out a sphere around the xyz point, m_Radius in diameter; skip 3/7 off the top and bottom:
+		// Carve out a sphere around the xyz point, m_Radius in diameter; skip 3 / 7 off the top and bottom:
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc

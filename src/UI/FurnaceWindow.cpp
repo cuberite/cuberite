@@ -41,7 +41,7 @@ void cFurnaceWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & 
 		}
 		else
 		{
-			// Furnace Input/Fuel Slot
+			// Furnace Input / Fuel Slot
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);

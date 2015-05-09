@@ -95,7 +95,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
 	AString fnam;
-	Printf(fnam, "%s/level.dat", a_World->GetName().c_str());
+	Printf(fnam, "%s%clevel.dat", a_World->GetName().c_str(), cFile::PathSeparator);
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
@@ -251,7 +251,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	
 	// Load it anew:
 	AString FileName;
-	Printf(FileName, "%s/region", m_World->GetName().c_str());
+	Printf(FileName, "%s%cregion", m_World->GetName().c_str(), cFile::PathSeparator);
 	cFile::CreateFolder(FILE_IO_PREFIX + FileName);
 	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(FileName, RegionX, RegionZ);
@@ -323,7 +323,7 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT)
 {
-	// The data arrays, in MCA-native y/z/x ordering (will be reordered for the final chunk data)
+	// The data arrays, in MCA-native y / z / x ordering (will be reordered for the final chunk data)
 	cChunkDef::BlockTypes   BlockTypes;
 	cChunkDef::BlockNibbles MetaData;
 	cChunkDef::BlockNibbles BlockLight;
@@ -879,7 +879,7 @@ cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagI
 		Beacon->SetSecondaryEffect((cEntityEffect::eType)a_NBT.GetInt(CurrentLine));
 	}
 
-	// We are better than mojang, we load/save the beacon inventory!
+	// We are better than mojang, we load / save the beacon inventory!
 	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
 	if ((Items >= 0) && (a_NBT.GetType(Items) == TAG_List))
 	{

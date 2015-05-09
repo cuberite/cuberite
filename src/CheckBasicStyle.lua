@@ -149,6 +149,27 @@ local g_ViolationPatterns =
 	
 	-- No space before a closing parenthesis:
 	{" %)", "Remove the space before \")\""},
+	
+	-- Check spaces around "+":
+	{"^[a-zA-Z0-9]+%+[a-zA-Z0-9]+",                      "Add space around +"},
+	{"[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%+[a-zA-Z0-9]+",  "Add space around +"},
+	--[[
+	-- Cannot check these because of text such as "X+" and "+2" appearing in some comments.
+	{"^[a-zA-Z0-9]+ %+[a-zA-Z0-9]+",                     "Add space after +"},
+	{"[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+ %+[a-zA-Z0-9]+", "Add space after +"},
+	{"^[a-zA-Z0-9]+%+ [a-zA-Z0-9]+",                     "Add space before +"},
+	{"[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%+ [a-zA-Z0-9]+", "Add space before +"},
+	--]]
+	
+	-- Cannot check spaces around "-", because the minus is sometimes used as a hyphen between-words
+
+	-- Check spaces around "*":
+	{"^[a-zA-Z0-9]+%*[a-zA-Z0-9]+",                            "Add space around *"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%*[a-zA-Z0-9]+", "Add space around *"},
+
+	-- Check spaces around "/":
+	{"^[a-zA-Z0-9]+%/[a-zA-Z0-9]+",                            "Add space around /"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%/[a-zA-Z0-9]+", "Add space around /"},
 }
 
 

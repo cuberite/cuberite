@@ -71,7 +71,7 @@ public:
 						cBlockInfo::FullyOccupiesVoxel(a_CBBlockType)
 						)
 					{
-						// Can't place lilypad on air/in another block!
+						// Can't place lilypad on air / in another block!
 						return true;
 					}
 					m_HasHitFluid = true;

@@ -31,10 +31,10 @@ protected:
 	/** The noise used for generating random numbers */
 	cNoise m_Noise;
 	
-	/** Maximum depth of the generator tree*/
+	/** Maximum depth of the generator tree */
 	int m_MaxDepth;
 	
-	/** Maximum size, in X/Z blocks, of the base (radius from the origin) */
+	/** Maximum size, in X / Z blocks, of the structure (radius from the origin) */
 	int m_MaxSize;
 
 

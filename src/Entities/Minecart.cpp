@@ -905,7 +905,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			}
 
 			/* Check to which side the minecart is to be pushed.
-			Let's consider a z-x-coordinate system where the minecart is the center (0/0).
+			Let's consider a z-x-coordinate system where the minecart is the center (0, 0).
 			The minecart moves along the line x = -z, the perpendicular line to this is x = z.
 			In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located. */
 			if (
@@ -954,7 +954,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			}
 
 			/* Check to which side the minecart is to be pushed.
-			Let's consider a z-x-coordinate system where the minecart is the center (0/0).
+			Let's consider a z-x-coordinate system where the minecart is the center (0, 0).
 			The minecart moves along the line x = z, the perpendicular line to this is x = -z.
 			In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located. */
 			if (

@@ -19,13 +19,13 @@ extern "C"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 
-// fwd: SQLite/lsqlite3.c
+// fwd: "SQLite/lsqlite3.c"
 extern "C"
 {
 	int luaopen_lsqlite3(lua_State * L);
 }
 
-// fwd: LuaExpat/lxplib.c:
+// fwd: "LuaExpat/lxplib.c":
 extern "C"
 {
 	int luaopen_lxp(lua_State * L);

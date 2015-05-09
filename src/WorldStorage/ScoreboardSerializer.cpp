@@ -18,7 +18,7 @@ cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScore
 	: m_ScoreBoard(a_ScoreBoard)
 {
 	AString DataPath;
-	Printf(DataPath, "%s/data", a_WorldName.c_str());
+	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator);
 
 	m_Path = DataPath + "/scoreboard.dat";
 
