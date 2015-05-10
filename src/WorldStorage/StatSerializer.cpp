@@ -18,7 +18,7 @@ cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_
 	// inside the folder of the default world.
 
 	AString StatsPath;
-	Printf(StatsPath, "%s/stats", a_WorldName.c_str());
+	Printf(StatsPath, "%s%cstats", a_WorldName.c_str(), cFile::PathSeparator);
 
 	m_Path = StatsPath + "/" + a_PlayerName + ".json";
 

@@ -680,7 +680,7 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 
 void cBiomalNoise3DComposable::CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint)
 {
-	// Generate the 3*3 chunks of biomes around this chunk:
+	// Generate the 3 * 3 chunks of biomes around this chunk:
 	cChunkDef::BiomeMap neighborBiomes[3 * 3];
 	for (int z = 0; z < 3; z++)
 	{

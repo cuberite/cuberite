@@ -644,7 +644,7 @@ protected:
 
 	virtual void Destroyed(void);
 
-	/** Filters out damage for creative mode/friendly fire */
+	/** Filters out damage for creative mode / friendly fire */
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 
 	/** Stops players from burning in creative mode */

@@ -313,8 +313,8 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 			continue;
 		}
 		FoundAdditionalWorlds = true;
-		cWorld* NewWorld = new cWorld( WorldName.c_str());
-		m_WorldsByName[ WorldName ] = NewWorld;
+		cWorld * NewWorld = new cWorld(WorldName.c_str());
+		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds
 
 	if (!FoundAdditionalWorlds)

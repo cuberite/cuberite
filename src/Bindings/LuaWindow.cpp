@@ -159,7 +159,7 @@ void cLuaWindow::Destroy(void)
 		m_Plugin->Unreference(m_LuaRef);
 	}
 	
-	// Lua will take care of this object, it will garbage-collect it, so we *must not* delete it!
+	// Lua will take care of this object, it will garbage-collect it, so we must not delete it!
 	m_IsDestroyed = false;
 }
 
@@ -167,10 +167,10 @@ void cLuaWindow::Destroy(void)
 
 
 
-void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer& a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
 	cSlotAreas Areas;
-	for (auto Area : m_SlotAreas)
+	for (auto && Area : m_SlotAreas)
 	{
 		if (Area != a_ClickedArea)
 		{

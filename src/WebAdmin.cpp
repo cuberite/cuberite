@@ -531,7 +531,7 @@ AString cWebAdmin::GetDefaultPage(void)
 
 
 
-AString cWebAdmin::GetBaseURL( const AString& a_URL)
+AString cWebAdmin::GetBaseURL(const AString & a_URL)
 {
 	return GetBaseURL(StringSplit(a_URL, "/"));
 }

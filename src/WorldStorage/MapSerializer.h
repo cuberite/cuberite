@@ -26,7 +26,7 @@ class cMapSerializer
 {
 public:
 
-	cMapSerializer(const AString& a_WorldName, cMap * a_Map);
+	cMapSerializer(const AString & a_WorldName, cMap * a_Map);
 
 	/** Try to load the map */
 	bool Load(void);

@@ -591,7 +591,7 @@ void cMap::SendTo(cClientHandle & a_Client)
 
 	for (unsigned int i = 0; i < m_Width; ++i)
 	{
-		const Byte* Colors = &m_Data[i * m_Height];
+		const Byte * Colors = &m_Data[i * m_Height];
 
 		a_Client.SendMapColumn(m_ID, i, 0, Colors, m_Height, m_Scale);
 	}

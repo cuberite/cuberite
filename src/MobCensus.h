@@ -32,8 +32,8 @@ public:
 	// MG TODO : code the correct rule (not loaded chunk but short distant from players)
 	void CollectSpawnableChunk(cChunk & a_Chunk);
 	
-	/// Collect a mob - it's distance to player, it's family ...
-	void CollectMob(cMonster& a_Monster, cChunk& a_Chunk, double a_Distance);
+	/// Collect a mob - its distance to player, its family ...
+	void CollectMob(cMonster & a_Monster, cChunk & a_Chunk, double a_Distance);
 
 	/// Returns true if the family is capped (i.e. there are more mobs of this family than max)
 	bool IsCapped(cMonster::eFamily a_MobFamily);

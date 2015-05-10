@@ -195,7 +195,7 @@ void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)
 		// The maximum size for a string of glowstone can get 3 - 5 blocks long
 		int Size = 3 + m_Noise.IntNoise3DInt(ChunkX, i, ChunkZ) % 3;
 
-		// Generate X/Z coordinates.
+		// Generate X / Z coordinates.
 		int X = Size + (m_Noise.IntNoise2DInt(i, Size) % (cChunkDef::Width - Size * 2));
 		int Z = Size + (m_Noise.IntNoise2DInt(X, i)    % (cChunkDef::Width - Size * 2));
 		

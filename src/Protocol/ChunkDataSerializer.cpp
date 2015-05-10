@@ -68,7 +68,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 
 void cChunkDataSerializer::Serialize29(AString & a_Data)
 {
-	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib *can* stream)
+	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib can stream)
 
 	const int BiomeDataSize    = cChunkDef::Width * cChunkDef::Width;
 	const int MetadataOffset   = sizeof(m_BlockTypes);
@@ -126,7 +126,7 @@ void cChunkDataSerializer::Serialize29(AString & a_Data)
 
 void cChunkDataSerializer::Serialize39(AString & a_Data)
 {
-	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib *can* stream)
+	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib can stream)
 
 	const int BiomeDataSize    = cChunkDef::Width * cChunkDef::Width;
 	const int MetadataOffset   = sizeof(m_BlockTypes);

@@ -229,7 +229,7 @@ public:
 			}
 		}
 
-		// Copy from Cache into a_Values; take into account the even/odd offsets in a_Min:
+		// Copy from Cache into a_Values; take into account the even / odd offsets in a_Min:
 		for (int z = 0; z < a_SizeZ; ++z)
 		{
 			memcpy(a_Values + z * a_SizeX, cache + (z + (a_MinZ & 1)) * lowStepX + (a_MinX & 1), a_SizeX * sizeof(int));

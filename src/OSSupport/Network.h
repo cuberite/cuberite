@@ -162,7 +162,7 @@ public:
 	/** Returns the local port to which the underlying socket is bound. */
 	virtual UInt16 GetPort(void) const = 0;
 
-	/** Sends the specified payload in a single UDP datagram to the specified host+port combination.
+	/** Sends the specified payload in a single UDP datagram to the specified host + port combination.
 	Note that in order to send to a broadcast address, you need to call EnableBroadcasts() first. */
 	virtual bool Send(const AString & a_Payload, const AString & a_Host, UInt16 a_Port) = 0;
 

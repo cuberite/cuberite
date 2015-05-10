@@ -21,7 +21,7 @@ inline UInt64 HostToNetwork8(const void * a_Value)
 
 
 
-inline UInt32 HostToNetwork4(const void* a_Value)
+inline UInt32 HostToNetwork4(const void * a_Value)
 {
 	UInt32 buf;
 	memcpy( &buf, a_Value, sizeof( buf));

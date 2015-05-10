@@ -59,7 +59,7 @@ protected:
 	cNoise m_Noise2;
 	cNoise m_Noise3;
 	
-	/** Size of the Voronoi cells (avg X/Y distance between the seeds). Expected to be at least 2. */
+	/** Size of the Voronoi cells (avg X / Y distance between the seeds). Expected to be at least 2. */
 	int m_CellSize;
 
 	/** The amount that the cell seeds may be offset from the grid.

@@ -33,7 +33,7 @@ public:
 		a_ChestCart->GetWorld()->BroadcastSoundEffect("random.chestopen", a_ChestCart->GetPosX(), a_ChestCart->GetPosY(), a_ChestCart->GetPosZ(), 1, 1);
 	}
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea* a_ClickedArea, bool a_ShouldApply) override
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
 	{
 		cSlotAreas AreasInOrder;
 

@@ -61,7 +61,7 @@ protected:
 	/** The noise used as a pseudo-random generator */
 	cNoise m_Noise;
 	
-	/** Maximum size, in X/Z blocks, of the village (radius from the origin) */
+	/** Maximum size, in X / Z blocks, of the village (radius from the origin) */
 	int m_MaxSize;
 	
 	/** Borders of the vilalge - no item may reach out of this cuboid. */

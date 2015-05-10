@@ -474,7 +474,7 @@ protected:
 	static cCriticalSection m_CSCount;
 	static UInt32 m_EntityCount;
 	
-	/** Measured in meter/second (m/s) */
+	/** Measured in meters / second (m / s) */
 	Vector3d m_Speed;
 
 	/** The ID of the entity that is guaranteed to be unique within a single run of the server.
@@ -494,7 +494,7 @@ protected:
 	/** Stores whether head yaw has been set manually */
 	bool m_bDirtyHead;
 	
-	/** Stores whether our yaw/pitch/roll (body orientation) has been set manually */
+	/** Stores whether our yaw / pitch / roll (body orientation) has been set manually */
 	bool m_bDirtyOrientation;
 	
 	/** Stores whether we have sent a Velocity packet with a speed of zero (no speed) to the client

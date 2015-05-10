@@ -43,7 +43,7 @@ protected:
 
 private:
 
-	cStatManager* m_Manager;
+	cStatManager * m_Manager;
 
 	AString m_Path;
 
