@@ -502,11 +502,11 @@ public:
 			//  Save powered rail flag.
 			NIBBLETYPE OtherMeta = a_Meta & 0x08;
 			// Rotates according to table; 0x07 == 0111.
-			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
-				case 0x00: return 0x01 + OtherMeta;  // North/South -> East/West
-				case 0x01: return 0x00 + OtherMeta;  // East/West   -> North/South
+				case 0x00: return 0x01 + OtherMeta;  // North / South -> East / West
+				case 0x01: return 0x00 + OtherMeta;  // East / West   -> North / South
 
 				case 0x02: return 0x04 + OtherMeta;  // Asc. East   -> Asc. North
 				case 0x04: return 0x03 + OtherMeta;  // Asc. North  -> Asc. West
@@ -538,11 +538,11 @@ public:
 			//  Save powered rail flag.
 			NIBBLETYPE OtherMeta = a_Meta & 0x08;
 			// Rotates according to table; 0x07 == 0111.
-			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
-				case 0x00: return 0x01 + OtherMeta;  // North/South -> East/West
-				case 0x01: return 0x00 + OtherMeta;  // East/West   -> North/South
+				case 0x00: return 0x01 + OtherMeta;  // North / South -> East / West
+				case 0x01: return 0x00 + OtherMeta;  // East / West   -> North / South
 
 				case 0x02: return 0x05 + OtherMeta;  // Asc. East   -> Asc. South
 				case 0x05: return 0x03 + OtherMeta;  // Asc. South  -> Asc. West
@@ -574,7 +574,7 @@ public:
 			//  Save powered rail flag.
 			NIBBLETYPE OtherMeta = a_Meta & 0x08;
 			// Mirrors according to table; 0x07 == 0111.
-			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
 				case 0x05: return 0x04 + OtherMeta;  // Asc. South  -> Asc. North
@@ -605,7 +605,7 @@ public:
 			//  Save powered rail flag.
 			NIBBLETYPE OtherMeta = a_Meta & 0x08;
 			// Mirrors according to table; 0x07 == 0111.
-			// Rails can either be flat (North/South) or Ascending (Asc. East)
+			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
 				case 0x02: return 0x03 + OtherMeta;  // Asc. East   -> Asc. West

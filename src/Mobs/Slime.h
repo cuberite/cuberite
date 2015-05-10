@@ -27,7 +27,7 @@ public:
 	
 	/** Returns the text describing the slime's size, as used by the client's resource subsystem for sounds.
 	Returns either "big" or "small". */
-	const AString GetSizeName(int a_Size) const;
+	static AString GetSizeName(int a_Size);
 	
 protected:
 

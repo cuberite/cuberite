@@ -2557,8 +2557,8 @@ static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string,
 
 	for (std::map<std::string, std::string>::iterator it = a_StringStringMap.begin(); it != a_StringStringMap.end(); ++it)
 	{
-		const char* key = it->first.c_str();
-		const char* value = it->second.c_str();
+		const char * key = it->first.c_str();
+		const char * value = it->second.c_str();
 		lua_pushstring(tolua_S, key);
 		lua_pushstring(tolua_S, value);
 		lua_settable(tolua_S, top);
@@ -2573,7 +2573,7 @@ static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string,
 
 static int tolua_get_HTTPRequest_Params(lua_State* tolua_S)
 {
-	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S, 1, nullptr);
+	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
 	return tolua_push_StringStringMap(tolua_S, self->Params);
 }
 
@@ -2583,7 +2583,7 @@ static int tolua_get_HTTPRequest_Params(lua_State* tolua_S)
 
 static int tolua_get_HTTPRequest_PostParams(lua_State* tolua_S)
 {
-	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S, 1, nullptr);
+	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
 	return tolua_push_StringStringMap(tolua_S, self->PostParams);
 }
 
@@ -2593,8 +2593,8 @@ static int tolua_get_HTTPRequest_PostParams(lua_State* tolua_S)
 
 static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 {
-	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S, 1, nullptr);
-	std::map< std::string, HTTPFormData >& FormData = self->FormData;
+	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
+	std::map<std::string, HTTPFormData> & FormData = self->FormData;
 
 	lua_newtable(tolua_S);
 	int top = lua_gettop(tolua_S);

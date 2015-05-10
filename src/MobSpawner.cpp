@@ -321,9 +321,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 
 
-cMonster* cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int& a_MaxPackSize)
+cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize)
 {
-	cMonster* toReturn = nullptr;
+	cMonster * toReturn = nullptr;
 	if (m_NewPack)
 	{
 		m_MobType = ChooseMobType(a_Biome);

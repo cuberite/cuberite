@@ -23,7 +23,7 @@ public:
 private:
 	struct sAttributesStruct;
 	struct sMonsterConfigState;
-	sMonsterConfigState* m_pState;
+	sMonsterConfigState * m_pState;
 	void Initialize();
 } ;
 

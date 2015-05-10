@@ -311,7 +311,7 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 		rnd /= cChunkDef::Width;
 		int BaseY = rnd % a_MaxHeight;
 		rnd /= a_MaxHeight;
-		int NestSize = a_NestSize + (rnd % (a_NestSize / 4));  // The actual nest size may be up to 1/4 larger
+		int NestSize = a_NestSize + (rnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
 		int Num = 0;
 		while (Num < NestSize)
 		{

@@ -75,7 +75,7 @@ extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_expo
 /** Case-insensitive string comparison that returns a rating of equal-ness between [0 - s1.length()]. */
 extern size_t RateCompareString(const AString & s1, const AString & s2);
 
-/** Replaces *each* occurence of iNeedle in iHayStack with iReplaceWith */
+/** Replaces each occurence of iNeedle in iHayStack with iReplaceWith */
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
 
 /** Converts a stream of BE shorts into UTF-8 string; returns a_UTF8. */

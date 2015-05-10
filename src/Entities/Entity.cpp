@@ -1309,7 +1309,8 @@ bool cEntity::DetectPortal()
 
 					if (IsPlayer())
 					{
-						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
+						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);
 					}
 					
 					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
@@ -1688,8 +1689,8 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 				{
 					m_World->BroadcastEntityRelMove(*this, (char)DiffX, (char)DiffY, (char)DiffZ, a_Exclude);
 				}
-				// Clients seem to store two positions, one for the velocity packet and one for the teleport/relmove packet
-				// The latter is only changed with a relmove/teleport, and m_LastPos stores this position
+				// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
+				// The latter is only changed with a relmove / teleport, and m_LastPos stores this position
 				m_LastPos = GetPosition();
 			}
 			else

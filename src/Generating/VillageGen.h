@@ -32,7 +32,7 @@ protected:
 	/** Maximum depth of the generator tree*/
 	int m_MaxDepth;
 	
-	/** Maximum size, in X/Z blocks, of the village (radius from the origin) */
+	/** Maximum size, in X / Z blocks, of the village (radius from the origin) */
 	int m_MaxSize;
 	
 	/** Minimum density - percentage of allowed house connections. Range [0, 100] */

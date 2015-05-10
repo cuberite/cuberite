@@ -366,7 +366,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 			if (i + 1 < ARRAYCOUNT(gCrossCoords))  // Sides of torch, not top (top is last)
 			{
 				if (
-					IsMechanism(Type) &&  // Is it a mechanism? Not block/other torch etc.
+					IsMechanism(Type) &&  // Is it a mechanism? Not block / other torch etc.
 					(!Vector3i(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY + gCrossCoords[i].y, a_RelBlockZ + gCrossCoords[i].z).Equals(Vector3i(X, Y, Z)))  // CAN'T power block is that it is on
 					)
 				{
@@ -1600,7 +1600,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 				if ((OtherRepeaterDir & 0x03) == 0x3)
 				{
 					return true;
-				}  // If so, I am latched/locked
+				}  // If so, I am latched / locked
 			}
 
 			// Check if western(left) neighbor is a powered on repeater who is facing us
@@ -1612,7 +1612,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 				if ((OtherRepeaterDir & 0x03) == 0x1)
 				{
 					return true;
-				}  // If so, I am latched/locked
+				}  // If so, I am latched / locked
 			}
 
 			break;
@@ -1634,7 +1634,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 				if ((OtherRepeaterDir & 0x30) == 0x00)
 				{
 					return true;
-				}  // If so,  am latched/locked
+				}  // If so, I am latched / locked
 			}
 
 			// Check if northern(up) neighbor is a powered on repeater who is facing us
@@ -1646,7 +1646,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 				if ((OtherRepeaterDir & 0x03) == 0x02)
 				{
 					return true;
-				}  // If so, I am latched/locked
+				}  // If so, I am latched / locked
 			}
 
 			break;

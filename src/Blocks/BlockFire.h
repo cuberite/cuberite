@@ -106,7 +106,7 @@ public:
 	void FindAndSetPortalFrame(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
 	{
 		int MaxY = FindObsidianCeiling(X, Y, Z, a_ChunkInterface);  // Get topmost obsidian block as reference for all other checks
-		int X1 = X + 1, Z1 = Z + 1, X2 = X - 1, Z2 = Z - 1;  // Duplicate XZ values, add/subtract one as we've checked the original already the line above
+		int X1 = X + 1, Z1 = Z + 1, X2 = X - 1, Z2 = Z - 1;  // Duplicate XZ values, add / subtract one as we've checked the original already the line above
 
 		if (MaxY == 0)  // Oh noes! Not a portal coordinate :(
 		{
@@ -139,7 +139,7 @@ public:
 		return;
 	}
 
-	/** Evaluates if coordinates are a portal going XP/XM; returns true if so, and writes boundaries to variable
+	/** Evaluates if coordinates are a portal going XP / XM; returns true if so, and writes boundaries to variable
 	Takes coordinates of base block and Y coord of target obsidian ceiling */
 	bool FindPortalSliceX(int X1, int X2, int Y, int Z, int MaxY, cChunkInterface & a_ChunkInterface)
 	{
@@ -179,7 +179,7 @@ public:
 		return (FoundFrameXP && FoundFrameXM);
 	}
 
-	/// Evaluates if coords are a portal going ZP/ZM; returns true if so, and writes boundaries to variable
+	/// Evaluates if coords are a portal going ZP / ZM; returns true if so, and writes boundaries to variable
 	bool FindPortalSliceZ(int X, int Y, int Z1, int Z2, int MaxY, cChunkInterface & a_ChunkInterface)
 	{
 		Dir = 2;

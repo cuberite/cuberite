@@ -13,7 +13,7 @@ And once they do, it requests the chunk data and sends it all away, either
 	sends to a specific client (QueueSendChunkTo)
 Chunk data is queried using the cChunkDataCallback interface.
 It is cached inside the ChunkSender object during the query and then processed after the query ends.
-Note that the data needs to be compressed only *after* the query finishes,
+Note that the data needs to be compressed only after the query finishes,
 because the query callbacks run with ChunkMap's CS locked.
 
 A client may remove itself from all direct requests(QueueSendChunkTo()) by calling RemoveClient();

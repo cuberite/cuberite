@@ -264,12 +264,14 @@ bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
 	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(m_FinalDestination.x), FloorC(m_FinalDestination.z));
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	int RelX = FloorC(m_FinalDestination.x) - Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = FloorC(m_FinalDestination.z) - Chunk->GetPosZ() * cChunkDef::Width;
+
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return false;
 	}
+	
+	int RelX = FloorC(m_FinalDestination.x) - Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = FloorC(m_FinalDestination.z) - Chunk->GetPosZ() * cChunkDef::Width;
 
 	// If destination in the air, go down to the lowest air block.
 	while (m_FinalDestination.y > 0)
@@ -958,7 +960,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			toReturn = new cMagmaCube(Random.NextInt(2) + 1);
+			toReturn = new cMagmaCube(1 << Random.NextInt(3));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSlime:
