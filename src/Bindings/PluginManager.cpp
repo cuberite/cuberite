@@ -525,14 +525,14 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
-bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand)
+bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnExecuteCommand(a_Player, a_Split, a_EntireCommand))
+		if ((*itr)->OnExecuteCommand(a_Player, a_Split, a_EntireCommand, a_Result))
 		{
 			return true;
 		}
@@ -1449,10 +1449,14 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	}
 
 	// Ask plugins first if a command is okay to execute the command:
-	if (CallHookExecuteCommand(&a_Player, Split, a_Command))
+	CommandResult Result = crBlocked;
+	if (CallHookExecuteCommand(&a_Player, Split, a_Command, Result))
 	{
-		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player.GetName().c_str(), Split[0].c_str());
-		return crBlocked;
+		if (Result == crBlocked)
+		{
+			LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player.GetName().c_str(), Split[0].c_str());
+		}
+		return Result;
 	}
 
 	if (
@@ -1750,9 +1754,10 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	if (cmd == m_ConsoleCommands.end())
 	{
 		// Command not found
-		// Still notify the plugins (so that plugins such as Aliases can intercept unknown commands):
-		CallHookExecuteCommand(nullptr, a_Split, a_Command);
-		return false;
+		// Still notify the plugins (so that plugins such as Aliases can intercept unknown commands).
+		CommandResult res = crBlocked;
+		CallHookExecuteCommand(nullptr, a_Split, a_Command, res);
+		return (res == crExecuted);
 	}
 
 	if (cmd->second.m_Plugin == nullptr)
@@ -1762,10 +1767,10 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	}
 
 	// Ask plugins first if a command is okay to execute the console command:
-	if (CallHookExecuteCommand(nullptr, a_Split, a_Command))
+	CommandResult res = crBlocked;
+	if (CallHookExecuteCommand(nullptr, a_Split, a_Command, res))
 	{
-		a_Output.Out("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
-		return false;
+		return (res == crExecuted);
 	}
 
 	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output, a_Command);

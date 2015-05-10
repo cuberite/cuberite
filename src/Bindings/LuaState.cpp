@@ -958,6 +958,18 @@ void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_Result = static_cast<cPluginManager::CommandResult>(static_cast<int>((tolua_tonumber(m_LuaState, a_StackPos, a_Result))));
+	}
+}
+
+
+
+
+
 void cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
 {
 	a_Ref.RefStack(*this, a_StackPos);

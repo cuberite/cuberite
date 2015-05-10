@@ -200,7 +200,7 @@ public:
 	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
 	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
 	bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
-	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand);  // If a_Player == nullptr, it is a console cmd
+	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result);  // If a_Player == nullptr, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username);

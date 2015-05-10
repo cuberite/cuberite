@@ -32,6 +32,7 @@ extern "C"
 
 #include "../Vector3.h"
 #include "../Defines.h"
+#include "PluginManager.h"
 
 
 
@@ -57,7 +58,6 @@ class cPickup;
 class cPlayer;
 class cPlugin;
 class cPluginLua;
-class cPluginManager;
 class cProjectileEntity;
 class cRoot;
 class cScoreboard;
@@ -249,6 +249,7 @@ public:
 	void GetStackValue(int a_StackPos, AString & a_Value);
 	void GetStackValue(int a_StackPos, BLOCKTYPE & a_Value);
 	void GetStackValue(int a_StackPos, bool & a_Value);
+	void GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
 	void GetStackValue(int a_StackPos, cRef & a_Ref);
 	void GetStackValue(int a_StackPos, double & a_Value);
 	void GetStackValue(int a_StackPos, float & a_ReturnedVal);
