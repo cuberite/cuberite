@@ -1750,6 +1750,8 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	if (cmd == m_ConsoleCommands.end())
 	{
 		// Command not found
+		// Still notify the plugins (so that plugins such as Aliases can intercept unknown commands):
+		CallHookExecuteCommand(nullptr, a_Split, a_Command);
 		return false;
 	}
 

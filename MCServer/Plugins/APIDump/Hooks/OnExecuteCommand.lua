@@ -2,7 +2,10 @@ return
 {
 	HOOK_EXECUTE_COMMAND =
 	{
-		CalledWhen = "A player executes an in-game command, or the admin issues a console command. Note that built-in console commands are exempt to this hook - they are always performed and the hook is not called.",
+		CalledWhen = [[
+			A player executes an in-game command, or the admin issues a console command. Note that built-in
+			console commands are exempt to this hook - they are always performed and the hook is not called.
+		]],
 		DefaultFnName = "OnExecuteCommand",  -- also used as pagename
 		Desc = [[
 			A plugin may implement a callback for this hook to intercept both in-game commands executed by the
@@ -11,7 +14,12 @@ return
 			server.</p>
 			<p>
 			If the command is in-game, the first parameter to the hook function is the {{cPlayer|player}} who's
-			executing the command. If the command comes from the server console, the first parameter is nil.
+			executing the command. If the command comes from the server console, the first parameter is nil.</p>
+			<p>
+			The server calls this hook even for unregistered (unknown) console commands. However, it doesn't call
+			the hook for unregistered in-game commands, simply because there's no way to distinguish between a
+			command and a chat message. If a plugin needs to intercept unknown in-game commands, it should use the
+			{{OnChat|HOOK_CHAT}} hook.
 		]],
 		Params =
 		{
