@@ -115,7 +115,7 @@ public:
 	virtual bool OnCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) override;
 	virtual bool OnDisconnect               (cClientHandle & a_Client, const AString & a_Reason) override;
 	virtual bool OnEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier) override;
-	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split) override;
+	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand) override;
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
 	virtual bool OnHandshake                (cClientHandle & a_Client, const AString & a_Username) override;

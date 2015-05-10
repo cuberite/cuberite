@@ -16,7 +16,8 @@ return
 		Params =
 		{
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "For in-game commands, the player who has sent the message. For console commands, nil" },
-			{ Name = "Command", Type = "table of strings", Notes = "The command and its parameters, broken into a table by spaces" },
+			{ Name = "CommandSplit", Type = "array-table of strings", Notes = "The command and its parameters, broken into a table by spaces" },
+			{ Name = "EntireCommand", Type = "string", Notes = "The entire command as a single string" },
 		},
 		Returns = [[
 			If the plugin returns true, the command will be blocked and none of the remaining hook handlers will

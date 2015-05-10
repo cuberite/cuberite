@@ -525,14 +525,14 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
-bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnExecuteCommand(a_Player, a_Split))
+		if ((*itr)->OnExecuteCommand(a_Player, a_Split, a_EntireCommand))
 		{
 			return true;
 		}
@@ -1449,7 +1449,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	}
 
 	// Ask plugins first if a command is okay to execute the command:
-	if (CallHookExecuteCommand(&a_Player, Split))
+	if (CallHookExecuteCommand(&a_Player, Split, a_Command))
 	{
 		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player.GetName().c_str(), Split[0].c_str());
 		return crBlocked;
@@ -1760,7 +1760,7 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	}
 
 	// Ask plugins first if a command is okay to execute the console command:
-	if (CallHookExecuteCommand(nullptr, a_Split))
+	if (CallHookExecuteCommand(nullptr, a_Split, a_Command))
 	{
 		a_Output.Out("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
 		return false;
