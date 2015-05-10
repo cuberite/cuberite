@@ -306,7 +306,7 @@ public:
 	void UpdateResult(cPlayer & a_Player);
 
 protected:
-	/** The maximum cost of repairing/renaming in the anvil. */
+	/** The maximum cost of repairing / renaming in the anvil. */
 	int m_MaximumCost;
 
 	/** The stack size of the second item where was used for repair */

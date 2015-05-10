@@ -89,7 +89,7 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
-const AString cSlime::GetSizeName(int a_Size) const
+AString cSlime::GetSizeName(int a_Size)
 {
 	if (a_Size > 1)
 	{

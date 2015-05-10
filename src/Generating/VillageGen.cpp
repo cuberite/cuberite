@@ -162,7 +162,7 @@ protected:
 	/** The noise used as a pseudo-random generator */
 	cNoise m_Noise;
 	
-	/** Maximum size, in X/Z blocks, of the village (radius from the origin) */
+	/** Maximum size, in X / Z blocks, of the village (radius from the origin) */
 	int m_MaxSize;
 	
 	/** The density for this village. Used to refrain from populating all house connectors. Range [0, 100] */

@@ -29,7 +29,7 @@ public:
 	enum ePayload
 	{
 		mpNone    = 0,  // Empty minecart, ridable by player or mobs
-		mpChest   = 1,  // Minecart-with-chest, can store a grid of 3*8 items
+		mpChest   = 1,  // Minecart-with-chest, can store a grid of 3 * 8 items
 		mpFurnace = 2,  // Minecart-with-furnace, can be powered
 		mpTNT     = 3,  // Minecart-with-TNT, can be blown up with activator rail
 		mpHopper  = 5,  // Minecart-with-hopper, can be hopper
@@ -54,8 +54,7 @@ protected:
 	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
 
 	/** Handles physics on normal rails
-		For each tick, slow down on flat rails, speed up or slow down on ascending/descending rails (depending on direction), and turn on curved rails
-	*/
+	For each tick, slow down on flat rails, speed up or slow down on ascending / descending rails (depending on direction), and turn on curved rails. */
 	void HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
 	/** Handles powered rail physics

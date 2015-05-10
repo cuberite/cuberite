@@ -5,7 +5,7 @@
 
 /*
 The integers generated may be interpreted in several ways:
-- land/see designators
+- land / sea designators
 	- 0 = ocean
 	- >0 = land
 - biome group
@@ -310,7 +310,7 @@ public:
 			}
 		}
 
-		// Copy from Cache into a_Values; take into account the even/odd offsets in a_Min:
+		// Copy from Cache into a_Values; take into account the even / odd offsets in a_Min:
 		for (int z = 0; z < SizeZ; ++z)
 		{
 			memcpy(a_Values + z * SizeX, cache + (z + (a_MinZ & 1)) * lowStepX + (a_MinX & 1), SizeX * sizeof(int));

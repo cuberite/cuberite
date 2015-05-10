@@ -362,7 +362,7 @@ bool cItemHandler::OnPlayerPlace(
 			!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(&a_Player, PlaceMeta)
 			)
 		{
-			// Tried to place a block *into* another?
+			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 			return false;
 		}
@@ -543,8 +543,9 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_COMPASS:              return 64;
 		case E_ITEM_COOKED_CHICKEN:       return 64;
 		case E_ITEM_COOKED_FISH:          return 64;
-		case E_ITEM_COOKED_PORKCHOP:      return 64;
 		case E_ITEM_COOKED_MUTTON:        return 64;
+		case E_ITEM_COOKED_PORKCHOP:      return 64;
+		case E_ITEM_COOKED_RABBIT:        return 64;
 		case E_ITEM_COOKIE:               return 64;
 		case E_ITEM_DARK_OAK_DOOR:        return 64;
 		case E_ITEM_DIAMOND:              return 64;
@@ -579,6 +580,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_MELON_SEEDS:          return 64;
 		case E_ITEM_MELON_SLICE:          return 64;
 		case E_ITEM_NETHER_BRICK:         return 64;
+		case E_ITEM_NETHER_QUARTZ:        return 64;
 		case E_ITEM_NETHER_WART:          return 64;
 		case E_ITEM_PAINTING:             return 64;
 		case E_ITEM_PAPER:                return 64;
@@ -595,6 +597,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_RAW_FISH:             return 64;
 		case E_ITEM_RAW_MUTTON:           return 64;
 		case E_ITEM_RAW_PORKCHOP:         return 64;
+		case E_ITEM_RAW_RABBIT:           return 64;
 		case E_ITEM_RED_APPLE:            return 64;
 		case E_ITEM_REDSTONE_DUST:        return 64;
 		case E_ITEM_REDSTONE_REPEATER:    return 64;

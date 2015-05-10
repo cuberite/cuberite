@@ -1,7 +1,7 @@
 
 // DropSpenserWindow.h
 
-// Representing the UI window for the dropper/dispenser block
+// Representing the UI window for the dropper / dispenser block
 
 
 

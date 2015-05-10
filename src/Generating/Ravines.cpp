@@ -124,7 +124,7 @@ cStructGenRavines::cRavine::cRavine(int a_GridX, int a_GridZ, int a_OriginX, int
 
 void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise)
 {
-	// Modify the size slightly to have different-sized ravines (1/2 to 1/1 of a_Size):
+	// Modify the size slightly to have different-sized ravines (1 / 2 to 1 / 1 of a_Size):
 	a_Size = (512 + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 11 * a_BlockZ, a_BlockX + a_BlockZ) / 17) % 512)) * a_Size / 1024;
 	
 	// The complete offset of the ravine from its cellpoint, up to 2 * a_Size in each direction
@@ -177,7 +177,7 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cR
 		return;
 	}
 
-	// Smoothing: for each line segment, add points on its 1/4 lengths
+	// Smoothing: for each line segment, add points on its 1 / 4 lengths
 	size_t Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);

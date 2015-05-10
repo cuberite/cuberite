@@ -1,3 +1,4 @@
+
 #pragma once
 
 /* Wanna use the pathfinder? Put this in your header file:
@@ -11,7 +12,7 @@ Put this in your .cpp:
 */
 
 #ifdef COMPILING_PATHFIND_DEBUGGER
-	/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native/WiseOldMan95 to debug
+	/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native / WiseOldMan95 to debug
 	this class outside of MCServer. This preprocessor flag is never set when compiling MCServer. */
 	#include "PathFinderIrrlicht_Head.h"
 #endif

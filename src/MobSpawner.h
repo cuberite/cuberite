@@ -39,7 +39,7 @@ public :
 	// if this is the first of a Pack : determine the type of monster
 	// BlockType & BlockMeta are used to decide what kind of Mob can Spawn here
 	// MaxPackSize is set to the maximal size for a pack this type of mob
-	cMonster * TryToSpawnHere(cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int& a_MaxPackSize);
+	cMonster * TryToSpawnHere(cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize);
 
 	// mark the beginning of a new Pack
 	// all mobs of the same Pack are the same type

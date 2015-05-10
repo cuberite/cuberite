@@ -2153,7 +2153,7 @@ void cRankManager::ClearPlayerRanks(void)
 	}
 	catch (SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to remove/clear all players: %s", __FUNCTION__, ex.what());
+		LOGWARNING("%s: Failed to remove / clear all players: %s", __FUNCTION__, ex.what());
 	}
 }
 

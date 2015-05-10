@@ -1,7 +1,7 @@
 
 // MobHeadEntity.cpp
 
-// Implements the cMobHeadEntity class representing a single skull/head in the world
+// Implements the cMobHeadEntity class representing a single skull / head in the world
 
 #include "Globals.h"
 #include "MobHeadEntity.h"

@@ -16,19 +16,19 @@ protected :
 	// structs used for later maps (see m_MonsterToDistance and m_DistanceToMonster)
 	struct sDistanceAndChunk
 	{
-		sDistanceAndChunk(double a_Distance, cChunk& a_Chunk) : m_Distance(a_Distance), m_Chunk(&a_Chunk) {}
+		sDistanceAndChunk(double a_Distance, cChunk & a_Chunk) : m_Distance(a_Distance), m_Chunk(&a_Chunk) {}
 		double m_Distance;
-		cChunk* m_Chunk;
+		cChunk * m_Chunk;
 	};
 	struct sMonsterAndChunk
 	{
-		sMonsterAndChunk(cEntity& a_Monster, cChunk& a_Chunk) : m_Monster(a_Monster), m_Chunk(a_Chunk) {}
-		cEntity& m_Monster;
-		cChunk& m_Chunk;
+		sMonsterAndChunk(cEntity & a_Monster, cChunk & a_Chunk) : m_Monster(a_Monster), m_Chunk(a_Chunk) {}
+		cEntity & m_Monster;
+		cChunk & m_Chunk;
 	};
 
 public :
-	typedef std::map<cEntity*, sDistanceAndChunk> tMonsterToDistance;
+	typedef std::map<cEntity *, sDistanceAndChunk> tMonsterToDistance;
 	typedef std::multimap<double, sMonsterAndChunk> tDistanceToMonster;
 
 protected :
@@ -50,7 +50,7 @@ public :
 	// count a mob on a specified chunk with specified distance to an unkown player
 	// if the distance is shortest than the one collected, this become the new closest
 	// distance and the chunk become the "hosting" chunk (that is the one that will perform the action)
-	void CollectMob(cEntity& a_Monster, cChunk& a_Chunk, double a_Distance);
+	void CollectMob(cEntity & a_Monster, cChunk & a_Chunk, double a_Distance);
 
 	// return the mobs that are within the range of distance of the closest player they are
 	// that means that if a mob is 30 m from a player and 150 m from another one. It will be

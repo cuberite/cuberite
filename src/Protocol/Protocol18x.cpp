@@ -479,7 +479,7 @@ void cProtocol180::SendEntityVelocity(const cEntity & a_Entity)
 	
 	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// 400 = 8000 / 20 ... Conversion from our speed in m/s to 8000 m/tick
+	// 400 = 8000 / 20 ... Conversion from our speed in m / s to 8000 m / tick
 	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedY() * 400));
 	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedZ() * 400));
@@ -2754,7 +2754,7 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent/backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 							}
 
 							a_Item.m_Lore = Lore;
