@@ -979,6 +979,18 @@ void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
+	}
+}
+
+
+
+
+
 void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 {
 	if (!lua_isnumber(m_LuaState, a_StackPos))
@@ -1415,7 +1427,7 @@ bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 bool cLuaState::CheckParamEnd(int a_Param)
 {
 	tolua_Error tolua_err;
-	if (tolua_isnoobj(m_LuaState, a_Param, &tolua_err))
+	if (tolua_isnoobj(m_LuaState, a_Param, &tolua_err) == 1)
 	{
 		return true;
 	}
@@ -1437,7 +1449,7 @@ bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
 	ASSERT(IsValid());
 	
 	tolua_Error tolua_err;
-	return tolua_isusertype(m_LuaState, a_Param, a_UserType.c_str(), 0, &tolua_err);
+	return (tolua_isusertype(m_LuaState, a_Param, a_UserType.c_str(), 0, &tolua_err) == 1);
 }
 
 
@@ -1449,7 +1461,7 @@ bool cLuaState::IsParamNumber(int a_Param)
 	ASSERT(IsValid());
 	
 	tolua_Error tolua_err;
-	return tolua_isnumber(m_LuaState, a_Param, 0, &tolua_err);
+	return (tolua_isnumber(m_LuaState, a_Param, 0, &tolua_err) == 1);
 }
 
 

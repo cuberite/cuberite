@@ -56,13 +56,13 @@ int cTracer::SigNum(float a_Num)
 {
 	if (a_Num < 0.f)
 	{
-		return -1.f;
+		return -1;
 	}
 	if (a_Num > 0.f)
 	{
-		return 1.f;
+		return 1;
 	}
-	return 0.f;
+	return 0;
 }
 
 

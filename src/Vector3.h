@@ -81,14 +81,14 @@ public:
 	inline bool HasNonZeroLength(void) const
 	{
 		#ifdef __clang__
-		#pragma clang diagnostic push
-		#pragma clang diagnostic ignored "-Wfloat-equal"
+			#pragma clang diagnostic push
+			#pragma clang diagnostic ignored "-Wfloat-equal"
 		#endif
 
 		return ((x != 0) || (y != 0) || (z != 0));
 
 		#ifdef __clang__
-		#pragma clang diagnostic pop
+			#pragma clang diagnostic pop
 		#endif
 	}
 
@@ -137,14 +137,14 @@ public:
 		// To perform EPS-based comparison, use the EqualsEps() function
 
 		#ifdef __clang__
-		#pragma clang diagnostic push
-		#pragma clang diagnostic ignored "-Wfloat-equal"
+			#pragma clang diagnostic push
+			#pragma clang diagnostic ignored "-Wfloat-equal"
 		#endif
 
 		return !((x != a_Rhs.x) || (y != a_Rhs.y) || (z != a_Rhs.z));
 
 		#ifdef __clang__
-		#pragma clang diagnostic pop
+			#pragma clang diagnostic pop
 		#endif
 	}
 	
