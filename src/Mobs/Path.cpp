@@ -7,7 +7,7 @@
 
 #define DISTANCE_MANHATTAN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
-#define CALCULATIONS_PER_STEP 60  // Higher means more CPU load but faster path calculations.
+#define CALCULATIONS_PER_STEP 5  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
 enum class eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
