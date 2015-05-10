@@ -299,7 +299,9 @@ public:
 	/** Returns true if the console command is in the command map */
 	bool IsConsoleCommandBound(const AString & a_Command);  // tolua_export
 	
-	/** Executes the command split into a_Split, as if it was given on the console. Returns true if executed. Output is sent to the a_Output callback */
+	/** Executes the command split into a_Split, as if it was given on the console.
+	Returns true if executed. Output is sent to the a_Output callback
+	Exported in ManualBindings.cpp with a different signature. */
 	bool ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_Command);
 	
 	/** Appends all commands beginning with a_Text (case-insensitive) into a_Results.

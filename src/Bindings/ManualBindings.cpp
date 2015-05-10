@@ -5,6 +5,7 @@
 #undef TOLUA_TEMPLATE_BIND
 #include <sstream>
 #include <iomanip>
+#include <array>
 #include "tolua++/include/tolua++.h"
 #include "polarssl/md5.h"
 #include "polarssl/sha1.h"
@@ -33,9 +34,10 @@
 #include "../CompositeChat.h"
 #include "../StringCompression.h"
 #include "../Broadcaster.h"
+#include "../CommandOutput.h"
 
 
-#include <array>
+
 
 
 // Better error reporting for Lua
@@ -2000,6 +2002,40 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 
 
 
+static int tolua_cPluginManager_ExecuteConsoleCommand(lua_State * tolua_S)
+{
+	/*
+	Function signature:
+	cPluginManager:ExecuteConsoleCommand(EntireCommandStr) -> OutputString
+	*/
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cPluginManager") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	AString Command;
+	L.GetStackValues(2, Command);
+	auto Split = StringSplit(Command, " ");
+
+	// Store the command output in a string:
+	cStringAccumCommandOutputCallback CommandOutput;
+	L.Push(cPluginManager::Get()->ExecuteConsoleCommand(Split, CommandOutput, Command));
+	L.Push(CommandOutput.GetAccum());
+	return 2;
+}
+
+
+
+
+
 static int tolua_cPluginManager_FindPlugins(lua_State * tolua_S)
 {
 	// API function no longer exists:
@@ -3906,6 +3942,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "BindConsoleCommand",    tolua_cPluginManager_BindConsoleCommand);
 			tolua_function(tolua_S, "CallPlugin",            tolua_cPluginManager_CallPlugin);
 			tolua_function(tolua_S, "DoWithPlugin",          tolua_StaticDoWith<cPluginManager, cPlugin, &cPluginManager::DoWithPlugin>);
+			tolua_function(tolua_S, "ExecuteConsoleCommand", tolua_cPluginManager_ExecuteConsoleCommand);
 			tolua_function(tolua_S, "FindPlugins",           tolua_cPluginManager_FindPlugins);
 			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
