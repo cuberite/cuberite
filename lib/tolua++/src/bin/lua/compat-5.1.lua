@@ -54,3 +54,11 @@ string.repl = ogsub
 
 
 
+-- Lua 5.2+ and LuaJit don't have string.gfind(). Use string.gmatch() instead:
+if not(string.gfind) then
+	string.gfind = string.gmatch
+end
+
+
+
+
