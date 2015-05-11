@@ -285,7 +285,7 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 	for _, param in ipairs(a_Hook.Params) do
 		f:write("<tr><td>", param.Name, "</td><td>", LinkifyString(param.Type, HookName), "</td><td>", LinkifyString(param.Notes, HookName), "</td></tr>\n");
 	end
-	f:write("</table>\n<p>" .. (a_Hook.Returns or "") .. "</p>\n\n");
+	f:write("</table>\n<p>" .. LinkifyString(a_Hook.Returns or "", HookName) .. "</p>\n\n");
 	f:write([[<hr /><h1>Code examples</h1><h2>Registering the callback</h2>]]);
 	f:write("<pre class=\"prettyprint lang-lua\">\n");
 	f:write([[cPluginManager:AddHook(cPluginManager.]] .. a_Hook.Name .. ", My" .. a_Hook.DefaultFnName .. [[);]]);

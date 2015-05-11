@@ -7,7 +7,8 @@ return
 		Desc = [[
 			A plugin may implement an OnChat() function and register it as a Hook to process chat messages from
 			the players. The function is then called for every in-game message sent from any player. Note that
-			commands are handled separately using a command framework API.
+			registered in-game commands are not sent through this hook. Use the
+			{{OnExecuteCommand|HOOK_EXECUTE_COMMAND}} to intercept registered in-game commands.
 		]],
 		Params = {
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who sent the message" },

@@ -150,6 +150,13 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 
 	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
 	{
+		if (cutAt == Prev)
+		{
+			// Empty string due to multiple whitespace / whitespace at the beginning of the input
+			// Just skip it
+			Prev = Prev + 1;
+			continue;
+		}
 		AString current = str.substr(Prev, cutAt - Prev);
 		if ((current.front() == '"') || (current.front() == '\''))
 		{

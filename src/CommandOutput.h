@@ -47,18 +47,36 @@ class cNullCommandOutputCallback :
 
 
 
-/// Sends all command output to a log, line by line, when the command finishes processing
-class cLogCommandOutputCallback :
+/** Accumulates all command output into a string. */
+class cStringAccumCommandOutputCallback:
 	public cCommandOutputCallback
 {
+	typedef cCommandOutputCallback super;
+
 public:
 	// cCommandOutputCallback overrides:
 	virtual void Out(const AString & a_Text) override;
-	virtual void Finished(void) override;
-	
+	virtual void Finished(void) override {}
+
+	/** Returns the accumulated command output in a string. */
+	const AString & GetAccum(void) const { return m_Accum; }
+
 protected:
-	/// Output is stored here until the command finishes processing
-	AString m_Buffer;
+	/** Output is stored here until the command finishes processing */
+	AString m_Accum;
+} ;
+
+
+
+
+
+/// Sends all command output to a log, line by line, when the command finishes processing
+class cLogCommandOutputCallback :
+	public cStringAccumCommandOutputCallback
+{
+public:
+	// cStringAccumCommandOutputCallback overrides:
+	virtual void Finished(void) override;
 } ;
 
 
