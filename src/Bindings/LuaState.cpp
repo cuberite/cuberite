@@ -530,42 +530,6 @@ void cLuaState::Push(bool a_Value)
 
 
 
-void cLuaState::Push(cBlockEntity * a_BlockEntity)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_BlockEntity, (a_BlockEntity == nullptr) ? "cBlockEntity" : a_BlockEntity->GetClass());
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cChunkDesc * a_ChunkDesc)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_ChunkDesc, "cChunkDesc");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cClientHandle * a_Client)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
@@ -632,42 +596,6 @@ void cLuaState::Push(cEntity * a_Entity)
 
 
 
-void cLuaState::Push(cHopperEntity * a_Hopper)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Hopper, "cHopperEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cItem * a_Item)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Item, "cItem");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cItems * a_Items)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Items, "cItems");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(cLuaServerHandle * a_ServerHandle)
 {
 	ASSERT(IsValid());
@@ -704,126 +632,6 @@ void cLuaState::Push(cLuaUDPEndpoint * a_UDPEndpoint)
 
 
 
-void cLuaState::Push(cMonster * a_Monster)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Monster, "cMonster");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPickup * a_Pickup)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPlayer * a_Player)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPlugin * a_Plugin)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Plugin, "cPlugin");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPluginLua * a_Plugin)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Plugin, "cPluginLua");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cTNTEntity * a_TNTEntity)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_TNTEntity, "cTNTEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWebAdmin * a_WebAdmin)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_WebAdmin, "cWebAdmin");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWindow * a_Window)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Window, "cWindow");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWorld * a_World)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(double a_Value)
 {
 	ASSERT(IsValid());
@@ -848,42 +656,6 @@ void cLuaState::Push(int a_Value)
 
 
 
-void cLuaState::Push(TakeDamageInfo * a_TDI)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_TDI, "TakeDamageInfo");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(Vector3d * a_Vector)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<double>");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(Vector3i * a_Vector)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<int>");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(void * a_Ptr)
 {
 	UNUSED(a_Ptr);
@@ -899,6 +671,10 @@ void cLuaState::Push(void * a_Ptr)
 	m_NumCurrentFunctionArgs += 1;
 }
 
+
+
+
+
 void cLuaState::Push(std::chrono::milliseconds a_Value)
 {
 	ASSERT(IsValid());
@@ -911,6 +687,7 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 
 
 
+/*
 void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 {
 	ASSERT(IsValid());
@@ -918,6 +695,7 @@ void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 	tolua_pushusertype(m_LuaState, a_Object, a_Type);
 	m_NumCurrentFunctionArgs += 1;
 }
+*/
 
 
 
@@ -1027,149 +805,6 @@ void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
 	}
 }
 
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pBlockArea & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cBlockArea", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cBlockArea **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cBoundingBox", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cBoundingBox **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pMapManager & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cMapManager", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cMapManager **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pPluginManager & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cPluginManager", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cPluginManager **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pRoot & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cRoot", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cRoot **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pScoreboard & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cScoreboard", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cScoreboard **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cWorld", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cWorld **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pClientHandle & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cClientHandle", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cClientHandle **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
 
 
 

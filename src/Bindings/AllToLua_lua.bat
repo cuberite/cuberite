@@ -13,7 +13,7 @@
 
 :: Regenerate the files:
 echo Regenerating LUA bindings . . .
-lua ..\..\lib\tolua++\src\bin\lua\_driver.lua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+lua ..\..\lib\tolua++\src\bin\lua\_driver.lua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
 
 
 

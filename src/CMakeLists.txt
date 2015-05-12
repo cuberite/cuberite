@@ -278,7 +278,7 @@ if (MSVC)
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/MCServer/lua51.dll ./lua51.dll
 
 		# Regenerate bindings:
-		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here

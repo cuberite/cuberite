@@ -43,6 +43,7 @@ local g_IgnoredFiles =
 {
 	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
+	"Bindings/LuaState_Implementation.cpp",
 	"LeakFinder.cpp",
 	"LeakFinder.h",
 	"MersenneTwister.h",
