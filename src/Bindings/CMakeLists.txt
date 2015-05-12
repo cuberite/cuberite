@@ -11,6 +11,7 @@ SET (SRCS
 	LuaNameLookup.cpp
 	LuaServerHandle.cpp
 	LuaState.cpp
+	LuaState_Implementation.cpp
 	LuaTCPLink.cpp
 	LuaUDPEndpoint.cpp
 	LuaWindow.cpp
@@ -31,6 +32,8 @@ SET (HDRS
 	LuaNameLookup.h
 	LuaServerHandle.h
 	LuaState.h
+	LuaState_Declaration.inc
+	LuaState_Typedefs.inc
 	LuaTCPLink.h
 	LuaUDPEndpoint.h
 	LuaWindow.h
@@ -46,12 +49,15 @@ SET (HDRS
 set (BINDING_OUTPUTS
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings.h
+	${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Declaration.inc
+	${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Implementation.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Typedefs.inc
 )
 
 set(BINDING_DEPENDENCIES
 	tolua
-	../Bindings/virtual_method_hooks.lua
 	../Bindings/AllToLua.pkg
+	../Bindings/BindingsProcessor.lua
 	../Bindings/LuaFunctions.h
 	../Bindings/LuaWindow.h
 	../Bindings/Plugin.h
@@ -126,7 +132,7 @@ if (NOT MSVC)
 		OUTPUT ${BINDING_OUTPUTS}
 
 		# Regenerate bindings:
-		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 
 		# add any new generation dependencies here
@@ -134,8 +140,7 @@ if (NOT MSVC)
 	)
 endif ()
 
-set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
-set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.h PROPERTIES GENERATED TRUE)
+set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
 
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
 
