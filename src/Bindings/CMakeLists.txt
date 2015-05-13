@@ -18,6 +18,7 @@ SET (SRCS
 	ManualBindings.cpp
 	ManualBindings_Network.cpp
 	ManualBindings_RankManager.cpp
+	ManualBindings_World.cpp
 	Plugin.cpp
 	PluginLua.cpp
 	PluginManager.cpp
