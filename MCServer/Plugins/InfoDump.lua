@@ -600,7 +600,10 @@ local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 	DumpCommandsForum(a_PluginInfo, f)
 	DumpPermissionsForum(a_PluginInfo, f)
 	if (a_PluginInfo.SourceLocation ~= nil) then
-		f:write("[b][color=blue]Source:[/color] [url=", a_PluginInfo.SourceLocation, "]Link[/url][/b]")
+		f:write("\n[b]Source[/b]: ", a_PluginInfo.SourceLocation, "\n")
+	end
+	if (a_PluginInfo.DownloadLocation ~= nil) then
+		f:write("[b]Download[/b]: ", a_PluginInfo.DownloadLocation)
 	end
 	f:close()
 	return true
