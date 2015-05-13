@@ -1445,6 +1445,13 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	if (cmd == m_Commands.end())
 	{
 		// Command not found
+		// If it started with a slash, ask the plugins if they still want to handle it:
+		if (!a_Command.empty() && (a_Command[0] == '/'))
+		{
+			CommandResult Result = crUnknownCommand;
+			CallHookExecuteCommand(&a_Player, Split, a_Command, Result);
+			return Result;
+		}
 		return crUnknownCommand;
 	}
 

@@ -16,10 +16,9 @@ return
 			If the command is in-game, the first parameter to the hook function is the {{cPlayer|player}} who's
 			executing the command. If the command comes from the server console, the first parameter is nil.</p>
 			<p>
-			The server calls this hook even for unregistered (unknown) console commands. However, it doesn't call
-			the hook for unregistered in-game commands, simply because there's no way to distinguish between a
-			command and a chat message. If a plugin needs to intercept unknown in-game commands, it should use the
-			{{OnChat|HOOK_CHAT}} hook.
+			The server calls this hook even for unregistered (unknown) console commands. It also calls the hook
+			for unknown in-game commands, as long as they begin with a slash ('/'). If a plugin needs to intercept
+			in-game chat messages not beginning with a slash, it should use the {{OnChat|HOOK_CHAT}} hook.
 		]],
 		Params =
 		{
