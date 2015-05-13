@@ -1473,7 +1473,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
-	Msg.ParseText(a_Message);
+	Msg.ParseText(Message);
 	Msg.UnderlineUrls();
 	m_Player->GetWorld()->BroadcastChat(Msg);
 }
