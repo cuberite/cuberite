@@ -65,8 +65,12 @@ local function ForumizeString(a_Str)
 	a_Str = a_Str:gsub("{%%p}", "\n\n")
 	a_Str = a_Str:gsub("{%%b}", "[b]"):gsub("{%%/b}", "[/b]")
 	a_Str = a_Str:gsub("{%%i}", "[i]"):gsub("{%%/i}", "[/i]")
-	a_Str = a_Str:gsub("{%%list}", "[list]"):gsub("{%%/list}", "[/list]")
-	a_Str = a_Str:gsub("{%%li}", "[*]"):gsub("{%%/li}", "")
+	a_Str = a_Str:gsub("{%%list}", "\n[list]"):gsub("{%%/list}", "[/list]")
+	a_Str = a_Str:gsub("{%%li}", "\n[*]"):gsub("{%%/li}", "\n")
+	
+	-- Process links: {%a LinkDestination}LinkText{%/a}
+	a_Str = a_Str:gsub("{%%a%s([^}]*)}([^{]*){%%/a}", "[url=%1]%2[/url]")
+	
 	-- TODO: Other formatting
 	
 	return a_Str
@@ -106,8 +110,12 @@ local function GithubizeString(a_Str)
 	a_Str = a_Str:gsub("{%%p}", "\n\n")
 	a_Str = a_Str:gsub("{%%b}", "**"):gsub("{%%/b}", "**")
 	a_Str = a_Str:gsub("{%%i}", "*"):gsub("{%%/i}", "*")
-	a_Str = a_Str:gsub("{%%list}", ""):gsub("{%%/list}", "")
-	a_Str = a_Str:gsub("{%%li}", " - "):gsub("{%%/li}", "")
+	a_Str = a_Str:gsub("{%%list}", "\n"):gsub("{%%/list}", "\n")
+	a_Str = a_Str:gsub("{%%li}", "\n - "):gsub("{%%/li}", "")
+
+	-- Process links: {%a LinkDestination}LinkText{%/a}
+	a_Str = a_Str:gsub("{%%a%s([^}]*)}([^{]*){%%/a}", "[%2](%1)")
+	
 	-- TODO: Other formatting
 	
 	return a_Str
