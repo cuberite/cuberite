@@ -747,39 +747,38 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 
 static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 {
-	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if (NumArgs != 1)
+	/*
+	Function signature:
+	cPluginManager:Get():ForEachCommand(a_CallbackFn) -> bool
+	*/
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cPluginManager") ||
+		!L.CheckParamFunction(2) ||
+		!L.CheckParamEnd(3)
+	)
 	{
-		LOGWARN("Error in function call 'ForEachCommand': Requires 1 argument, got %i", NumArgs);
 		return 0;
 	}
 
-	cPluginManager * self = (cPluginManager *)tolua_tousertype(tolua_S, 1, nullptr);
-	if (self == nullptr)
-	{
-		LOGWARN("Error in function call 'ForEachCommand': Not called on an object instance");
-		return 0;
-	}
-
-	if (!lua_isfunction(tolua_S, 2))
-	{
-		LOGWARN("Error in function call 'ForEachCommand': Expected a function for parameter #1");
-		return 0;
-	}
-
-	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-	if (FuncRef == LUA_REFNIL)
+	// Get the params:
+	cLuaState::cRef FnRef;
+	L.GetStackValues(2, FnRef);
+	if (!FnRef.IsValid())
 	{
 		LOGWARN("Error in function call 'ForEachCommand': Could not get function reference of parameter #1");
 		return 0;
 	}
 
+	// Callback for enumerating all commands:
 	class cLuaCallback : public cPluginManager::cCommandEnumCallback
 	{
 	public:
-		cLuaCallback(lua_State * a_LuaState, int a_FuncRef):
-			LuaState(a_LuaState),
-			FuncRef(a_FuncRef)
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FnRef)
 		{
 		}
 
@@ -787,35 +786,16 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
 			UNUSED(a_Plugin);
-			
-			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
-			tolua_pushcppstring(LuaState, a_Command);
-			tolua_pushcppstring(LuaState, a_Permission);
-			tolua_pushcppstring(LuaState, a_HelpString);
-
-			int s = lua_pcall(LuaState, 3, 1, 0);
-			if (cLuaState::ReportErrors(LuaState, s))
-			{
-				return true;  /* Abort enumeration */
-			}
-
-			if (lua_isboolean(LuaState, -1))
-			{
-				return (tolua_toboolean(LuaState, -1, 0) > 0);
-			}
-			return false;  /* Continue enumeration */
+			bool ret = false;
+			m_LuaState.Call(m_FnRef, a_Command, a_Permission, a_HelpString, cLuaState::Return, ret);
+			return ret;
 		}
-		lua_State * LuaState;
-		int FuncRef;
-	} Callback(tolua_S, FuncRef);
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+	} Callback(L, FnRef);
 
-	bool bRetVal = self->ForEachCommand(Callback);
-
-	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef);
-
-	/* Push return value on stack */
-	tolua_pushboolean(tolua_S, bRetVal);
+	// Execute and push the returned value:
+	L.Push(cPluginManager::Get()->ForEachCommand(Callback));
 	return 1;
 }
 
@@ -825,39 +805,38 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 
 static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 {
-	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if (NumArgs != 1)
+	/*
+	Function signature:
+	cPluginManager:Get():ForEachConsoleCommand(a_CallbackFn) -> bool
+	*/
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cPluginManager") ||
+		!L.CheckParamFunction(2) ||
+		!L.CheckParamEnd(3)
+	)
 	{
-		LOGWARN("Error in function call 'ForEachConsoleCommand': Requires 1 argument, got %i", NumArgs);
 		return 0;
 	}
 
-	cPluginManager * self = (cPluginManager *)tolua_tousertype(tolua_S, 1, nullptr);
-	if (self == nullptr)
-	{
-		LOGWARN("Error in function call 'ForEachConsoleCommand': Not called on an object instance");
-		return 0;
-	}
-
-	if (!lua_isfunction(tolua_S, 2))
-	{
-		LOGWARN("Error in function call 'ForEachConsoleCommand': Expected a function for parameter #1");
-		return 0;
-	}
-
-	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-	if (FuncRef == LUA_REFNIL)
+	// Get the params:
+	cLuaState::cRef FnRef;
+	L.GetStackValues(2, FnRef);
+	if (!FnRef.IsValid())
 	{
 		LOGWARN("Error in function call 'ForEachConsoleCommand': Could not get function reference of parameter #1");
 		return 0;
 	}
 
+	// Callback for enumerating all commands:
 	class cLuaCallback : public cPluginManager::cCommandEnumCallback
 	{
 	public:
-		cLuaCallback(lua_State * a_LuaState, int a_FuncRef):
-			LuaState(a_LuaState),
-			FuncRef(a_FuncRef)
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FnRef)
 		{
 		}
 
@@ -866,34 +845,16 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 		{
 			UNUSED(a_Plugin);
 			UNUSED(a_Permission);
-			
-			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
-			tolua_pushcppstring(LuaState, a_Command);
-			tolua_pushcppstring(LuaState, a_HelpString);
-
-			int s = lua_pcall(LuaState, 2, 1, 0);
-			if (cLuaState::ReportErrors(LuaState, s))
-			{
-				return true;  /* Abort enumeration */
-			}
-
-			if (lua_isboolean(LuaState, -1))
-			{
-				return (tolua_toboolean(LuaState, -1, 0) > 0);
-			}
-			return false;  /* Continue enumeration */
+			bool ret = false;
+			m_LuaState.Call(m_FnRef, a_Command, a_HelpString, cLuaState::Return, ret);
+			return ret;
 		}
-		lua_State * LuaState;
-		int FuncRef;
-	} Callback(tolua_S, FuncRef);
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+	} Callback(L, FnRef);
 
-	bool bRetVal = self->ForEachConsoleCommand(Callback);
-
-	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef);
-
-	/* Push return value on stack */
-	tolua_pushboolean(tolua_S, bRetVal);
+	// Execute and push the returned value:
+	L.Push(cPluginManager::Get()->ForEachConsoleCommand(Callback));
 	return 1;
 }
 
