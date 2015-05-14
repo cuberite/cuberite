@@ -1019,7 +1019,7 @@ void cWorld::TickWeather(float a_Dt)
 		// 0.5% chance per tick of thunderbolt
 		if (m_TickRand.randInt() % 199 == 0)
 		{
-			CastThunderbolt(0, 0, 0);  // TODO: find random possitions near players to cast thunderbolts.
+			CastThunderbolt(0, 0, 0);  // TODO: find random positions near players to cast thunderbolts.
 		}
 	}
 }
@@ -1119,7 +1119,7 @@ void cWorld::TickScheduledTasks(void)
 		auto WorldAge = m_WorldAge;
 
 		// Move all the due tasks from m_ScheduledTasks into Tasks:
-		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-basd for, we're modifying the container
+		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-based for, we're modifying the container
 		{
 			if ((*itr)->m_TargetTick < std::chrono::duration_cast<cTickTimeLong>(WorldAge).count())
 			{
