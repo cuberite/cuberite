@@ -39,7 +39,7 @@ static int tolua_cNetwork_Connect(lua_State * L)
 	}
 	
 	// Get the plugin instance:
-	cPluginLua * Plugin = GetLuaPlugin(L);
+	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
 	{
 		// An error message has been already printed in GetLuaPlugin()
@@ -92,7 +92,7 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 	}
 	
 	// Get the plugin instance:
-	cPluginLua * Plugin = GetLuaPlugin(L);
+	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
 	{
 		// An error message has been already printed in GetLuaPlugin()
@@ -171,7 +171,7 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 	}
 	
 	// Get the plugin instance:
-	cPluginLua * Plugin = GetLuaPlugin(L);
+	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
 	{
 		// An error message has been already printed in GetLuaPlugin()
@@ -212,7 +212,7 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 	}
 	
 	// Get the plugin instance:
-	cPluginLua * Plugin = GetLuaPlugin(L);
+	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
 	{
 		// An error message has been already printed in GetLuaPlugin()
@@ -253,7 +253,7 @@ static int tolua_cNetwork_Listen(lua_State * L)
 	}
 	
 	// Get the plugin instance:
-	cPluginLua * Plugin = GetLuaPlugin(L);
+	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
 	{
 		// An error message has been already printed in GetLuaPlugin()
@@ -913,17 +913,17 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 ////////////////////////////////////////////////////////////////////////////////
 // Register the bindings:
 
-void ManualBindings::BindNetwork(lua_State * tolua_S)
+void cManualBindings::BindNetwork(lua_State * tolua_S)
 {
 	// Create the cNetwork API classes:
 	tolua_usertype(tolua_S, "cNetwork");
-	tolua_cclass(tolua_S, "cNetwork", "cNetwork", "", nullptr);
-	tolua_usertype(tolua_S, "cTCPLink");
-	tolua_cclass(tolua_S, "cTCPLink", "cTCPLink", "", nullptr);
 	tolua_usertype(tolua_S, "cServerHandle");
-	tolua_cclass(tolua_S, "cServerHandle", "cServerHandle", "", tolua_collect_cServerHandle);
+	tolua_usertype(tolua_S, "cTCPLink");
 	tolua_usertype(tolua_S, "cUDPEndpoint");
-	tolua_cclass(tolua_S, "cUDPEndpoint", "cUDPEndpoint", "", tolua_collect_cUDPEndpoint);
+	tolua_cclass(tolua_S, "cNetwork",      "cNetwork",      "", nullptr);
+	tolua_cclass(tolua_S, "cServerHandle", "cServerHandle", "", tolua_collect_cServerHandle);
+	tolua_cclass(tolua_S, "cTCPLink",      "cTCPLink",      "", nullptr);
+	tolua_cclass(tolua_S, "cUDPEndpoint",  "cUDPEndpoint",  "", tolua_collect_cUDPEndpoint);
 	
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cNetwork");
