@@ -185,12 +185,12 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 
 
 
-bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
+bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth)
 {
-	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!");
-	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
-	m_bIsHardcore = a_SettingsIni.GetValueSetB("Server", "HardcoreEnabled", false);
-	m_bAllowMultiLogin = a_SettingsIni.GetValueSetB("Server", "AllowMultiLogin", false);
+	m_Description = a_Settings.GetValueSet("Server", "Description", "MCServer - in C++!");
+	m_MaxPlayers  = a_Settings.GetValueSetI("Server", "MaxPlayers", 100);
+	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
+	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
@@ -205,9 +205,9 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
 	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
-	m_Ports = ReadUpgradeIniPorts(a_SettingsIni, "Server", "Ports", "Port", "PortsIPv6", "25565");
+	m_Ports = ReadUpgradeIniPorts(a_Settings, "Server", "Ports", "Port", "PortsIPv6", "25565");
 
-	m_RCONServer.Initialize(a_SettingsIni);
+	m_RCONServer.Initialize(a_Settings);
 
 	m_bIsConnected = true;
 
@@ -226,16 +226,16 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 	}
 
 	// Check if both BungeeCord and online mode are on, if so, warn the admin:
-	m_ShouldAllowBungeeCord = a_SettingsIni.GetValueSetB("Authentication", "AllowBungeeCord", false);
+	m_ShouldAllowBungeeCord = a_Settings.GetValueSetB("Authentication", "AllowBungeeCord", false);
 	if (m_ShouldAllowBungeeCord && m_ShouldAuthenticate)
 	{
 		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
 	}
 
-	m_ShouldLoadOfflinePlayerData = a_SettingsIni.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
-	m_ShouldLoadNamedPlayerData   = a_SettingsIni.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
+	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
+	m_ShouldLoadNamedPlayerData   = a_Settings.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 
-	m_ClientViewDistance = a_SettingsIni.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
+	m_ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
 	if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;

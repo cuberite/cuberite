@@ -18,7 +18,7 @@
 #pragma once
 
 
-
+#include "SettingsRepositoryInterface.h"
 
 #define MAX_KEYNAME    128
 #define MAX_VALUENAME  128
@@ -30,10 +30,12 @@
 
 // tolua_begin
 
-class cIniFile
+class cIniFile : public cSettingsRepositoryInterface
 {
 private:
 	bool m_IsCaseInsensitive;
+
+	AString m_Filename;
 	
 	struct key
 	{
@@ -53,14 +55,18 @@ private:
 	void RemoveBom(AString & a_line) const;
 	
 public:
-
-	enum errors
-	{
-		noID = -1,
-	};
 	
 	/// Creates a new instance with no data
 	cIniFile(void);
+
+// tolua_end
+	virtual ~cIniFile() = default;
+
+	virtual std::vector<std::pair<AString, AString>> GetValues(AString a_keyName) override;
+
+	virtual bool KeyExists(const AString a_keyName) const override;
+
+// tolua_begin
 
 	// Sets whether or not keynames and valuenames should be case sensitive.
 	// The default is case insensitive.
@@ -77,11 +83,13 @@ public:
 	/// Writes data stored in class to the specified ini file
 	bool WriteFile(const AString & a_FileName) const;
 
+	virtual bool Flush() override { return WriteFile(m_Filename); }
+
 	/// Deletes all stored ini data (but doesn't touch the file)
 	void Clear(void);
 	
 	/** Returns true iff the specified value exists. */
-	bool HasValue(const AString & a_KeyName, const AString & a_ValueName);
+	bool HasValue(const AString & a_KeyName, const AString & a_ValueName) const;
 
 	/// Returns index of specified key, or noID if not found
 	int FindKey(const AString & keyname) const;
@@ -222,7 +230,7 @@ Reads the list of ports from a_PortsValueName. If that value doesn't exist or is
 in a_OldIPv4ValueName and a_OldIPv6ValueName; in this case the old values are removed from the INI file.
 If there is none of the three values or they are all empty, the default is used and stored in the Ports value. */
 AStringVector ReadUpgradeIniPorts(
-	cIniFile & a_IniFile,
+	cSettingsRepositoryInterface & a_Settings,
 	const AString & a_KeyName,
 	const AString & a_PortsValueName,
 	const AString & a_OldIPv4ValueName,

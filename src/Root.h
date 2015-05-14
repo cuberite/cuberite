@@ -24,6 +24,7 @@ class cWorld;
 class cPlayer;
 class cCommandOutputCallback;
 class cCompositeChat;
+class cSettingsRepositoryInterface;
 
 typedef cItemCallback<cPlayer> cPlayerListCallback;
 typedef cItemCallback<cWorld>  cWorldListCallback;
@@ -53,7 +54,7 @@ public:
 	cRoot(void);
 	~cRoot();
 
-	void Start(void);
+	void Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo);
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
@@ -204,7 +205,7 @@ private:
 	void LoadGlobalSettings();
 
 	/// Loads the worlds from settings.ini, creates the worldmap
-	void LoadWorlds(cIniFile & IniFile);
+	void LoadWorlds(cSettingsRepositoryInterface & a_Settings);
 	
 	/// Starts each world's life
 	void StartWorlds(void);
