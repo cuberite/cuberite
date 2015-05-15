@@ -215,6 +215,11 @@ bool cPath::Step_Internal()
 
 void cPath::FinishCalculation()
 {
+	for (auto && pair : m_Map)
+	{
+		delete pair.second;
+	}
+
 	m_Map.clear();
 	m_OpenList = std::priority_queue<cPathCell *, std::vector<cPathCell *>, compareHeuristics>{};
 }
@@ -343,7 +348,7 @@ cPathCell * cPath::GetCell(const Vector3i & a_Location)
 	{
 		Cell = new cPathCell();
 		Cell->m_Location = a_Location;
-		m_Map[a_Location] = UniquePtr<cPathCell>(Cell);
+		m_Map[a_Location] = Cell;
 		Cell->m_IsSolid = IsSolid(a_Location);
 		Cell->m_Status = eCellStatus::NOLIST;
 		#ifdef COMPILING_PATHFIND_DEBUGGER
@@ -355,6 +360,6 @@ cPathCell * cPath::GetCell(const Vector3i & a_Location)
 	}
 	else
 	{
-		return m_Map[a_Location].get();
+		return m_Map[a_Location];
 	}
 }
