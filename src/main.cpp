@@ -258,7 +258,7 @@ DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
 	UNREFERENCED_PARAMETER(lpParam);
 
 	// Do the normal startup
-	universalMain();
+	universalMain(cpp14::make_unique<cMemorySettingsRepository>());
 
 	return ERROR_SUCCESS;
 }
