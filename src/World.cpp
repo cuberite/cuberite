@@ -621,18 +621,18 @@ void cWorld::Start(void)
 	InitialiseAndLoadMobSpawningValues(IniFile);
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
 
-	m_ChunkMap = make_unique<cChunkMap>(this);
+	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
 	
 	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager  = make_unique<cSimulatorManager>(*this);
+	m_SimulatorManager  = cpp14::make_unique<cSimulatorManager>(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = make_unique<cSandSimulator>(*this, IniFile);
-	m_FireSimulator     = make_unique<cFireSimulator>(*this, IniFile);
+	m_SandSimulator     = cpp14::make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = cpp14::make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
 	// Water, Lava and Redstone simulators get registered in their initialize function.
@@ -2680,7 +2680,7 @@ void cWorld::UnloadUnusedChunks(void)
 
 void cWorld::QueueUnloadUnusedChunks(void)
 {
-	QueueTask(make_unique<cWorld::cTaskUnloadUnusedChunks>());
+	QueueTask(cpp14::make_unique<cWorld::cTaskUnloadUnusedChunks>());
 }
 
 

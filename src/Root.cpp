@@ -133,7 +133,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 
 		LOG("Reading server config...");
 
-		auto IniFile = make_unique<cIniFile>();
+		auto IniFile = cpp14::make_unique<cIniFile>();
 		if (!IniFile->ReadFile("settings.ini"))
 		{
 			LOGWARN("Regenerating settings.ini, all settings will be reset");
@@ -141,7 +141,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 			IniFile->AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
 			IniFile->AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
 		}
-		auto settingsRepo = make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(overridesRepo));
+		auto settingsRepo = cpp14::make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(overridesRepo));
 
 		LOG("Starting server...");
 		m_MojangAPI = new cMojangAPI;

@@ -376,7 +376,7 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 		
 		int slots = slotsArg.getValue();
 
-		auto repo = make_unique<cMemorySettingsRepository>();
+		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
 
 		repo->SetValueI("Server", "MaxPlayers", slots);
 
