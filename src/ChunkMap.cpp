@@ -409,22 +409,6 @@ void cChunkMap::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cChunkMap::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return;
-	}
-	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastChunkData(a_Serializer, a_Exclude);
-}
-
-
-
-
-
 void cChunkMap::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
@@ -791,26 +775,35 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callb
 }
 
 
+
+
+
+bool cChunkMap::DoWithChunk(Vector2i a_Chunk, std::function<bool(cChunk &)> a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_Chunk.x, a_Chunk.z);
+	if (Chunk == nullptr)
+	{
+		return false;
+	}
+	return a_Callback(*Chunk);
+}
+
+
+
+
+
 bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
-	struct cCallBackWrapper : cChunkCallback
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
+	if (Chunk == nullptr)
 	{
-		cCallBackWrapper(std::function<bool(cChunk &)> a_InnerCallback) :
-			m_Callback(a_InnerCallback)
-		{
-		}
-		
-		virtual bool Item(cChunk * a_Chunk)
-		{
-			return m_Callback(*a_Chunk);
-		}
-
-	private:
-		std::function<bool(cChunk &)> m_Callback;
-	} callback(a_Callback);
-	return DoWithChunk(ChunkX, ChunkZ, callback);
+		return false;
+	}
+	return a_Callback(*Chunk);
 }
 
 
