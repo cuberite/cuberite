@@ -389,6 +389,9 @@ protected:
 	
 	/** Used as the error reporting function for function calls */
 	static int ReportFnCallErrors(lua_State * a_LuaState);
+
+	/** Tries to break into the MobDebug debugger, if it is installed. */
+	static int BreakIntoDebugger(lua_State * a_LuaState);
 } ;
 
 
