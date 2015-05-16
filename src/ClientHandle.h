@@ -20,6 +20,7 @@
 #include "UI/SlotArea.h"
 #include "json/json.h"
 #include "ChunkSender.h"
+#include "Vector2.h"
 
 
 #include <array>
@@ -150,7 +151,7 @@ public:  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                       (const cCompositeChat & a_Message);
-	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
+	void SendChunkData                  (Vector2i a_Chunk, cChunkDataSerializer & a_Serializer);
 	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDisconnect                 (const AString & a_Reason);

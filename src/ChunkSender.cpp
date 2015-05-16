@@ -13,7 +13,7 @@
 #include "BlockEntities/BlockEntity.h"
 #include "Protocol/ChunkDataSerializer.h"
 #include "ClientHandle.h"
-
+#include "Broadcaster.h"
 
 
 
@@ -290,11 +290,11 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 	// Send:
 	if (a_Client == nullptr)
 	{
-		m_World->BroadcastChunkData(a_ChunkX, a_ChunkZ, Data);
+		m_World->GetBroadcaster().BroadcastChunkData(Vector2i{a_ChunkX, a_ChunkZ}, Data);
 	}
 	else
 	{
-		a_Client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
+		a_Client->SendChunkData(Vector2i{a_ChunkX, a_ChunkZ}, Data);
 	}
 
 	// Send block-entity packets:

@@ -49,6 +49,7 @@ local g_IgnoredFiles =
 	"MersenneTwister.h",
 	"StackWalker.cpp",
 	"StackWalker.h",
+	"BroadcasterForwards.cpp"
 }
 
 --- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles
