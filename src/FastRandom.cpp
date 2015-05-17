@@ -10,7 +10,7 @@
 
 #ifdef _WIN32
 	#define thread_local static __declspec(thread)
-#elseif __OSX__
+#elif __APPLE__
 	#define thread_local static __thread
 #endif
 
