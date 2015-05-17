@@ -29,14 +29,17 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!ReachedFinalDestination() && !m_BurnedWithFlintAndSteel)
 	{
+		printf("Distance: %g\n", (m_FinalDestination - GetPosition()).Length());
 		m_ExplodingTimer = 0;
 		m_bIsBlowing = false;
 		m_World->BroadcastEntityMetadata(*this);
 	}
 	else
 	{
+		printf("---CRITICAL DISTANCE %g\n", (m_FinalDestination - GetPosition()).Length());
 		if (m_bIsBlowing)
 		{
+			printf("Blowing\n");
 			m_ExplodingTimer += 1;
 		}
 

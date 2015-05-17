@@ -79,7 +79,14 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	cTracer LineOfSight(GetWorld());
 	Vector3d AttackDirection(m_Target->GetPosition() - GetPosition());
 
-	if (ReachedFinalDestination() && !LineOfSight.Trace(GetPosition(), AttackDirection, (int)AttackDirection.Length()))
+	// TODO fix line of sight, or come to the conclusion that it isn't really needed here.
+	// By temporarily disabling it we're fixing non exploding creepers.
+	// Also, it isn't always detecting the wall and cMonster can attack through walls, I decreased their range in pull #2037 to resolve this temporarily.
+	// My guess is that the line of sight trace fails when the zombie is partially in the wall.
+	// Regarding creeper explosions: My guess is that the creeper's line of sight hits the block it's standing on.
+	// Also, is LineOfSight.Trace inefficient? We're not feeding it our cChunk so it's probably getting one in some inefficient way.
+	// if (ReachedFinalDestination() && !LineOfSight.Trace(GetPosition(), AttackDirection, (int)AttackDirection.Length()))
+	if (ReachedFinalDestination())
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
 		Attack(a_Dt);
