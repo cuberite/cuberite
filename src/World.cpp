@@ -800,7 +800,7 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
 			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "RoughRavines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, TallGrass, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
 			break;
 		}
 		case dimNether:
