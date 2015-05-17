@@ -6,12 +6,28 @@
 #include "Globals.h"
 #include "FastRandom.h"
 
+#include <random>
+
 #ifdef _WIN32
-	#define thread_local __declspec(thread)
+	#define thread_local static __declspec(thread)
+#elseif __OSX__
+	#define thread_local static __thread
 #endif
 
-thread_local unsigned int m_Counter = 0;
-
+static unsigned int GetRandomSeed()
+{
+	thread_local bool SeedCounterInitialized = 0;
+	thread_local unsigned int SeedCounter = 0;
+	
+	if (!SeedCounterInitialized)
+	{
+		std::random_device rd;
+		std::uniform_int_distribution<unsigned int> dist;
+		SeedCounter = dist(rd);
+		SeedCounterInitialized = true;
+	}
+	return ++SeedCounter;
+}
 
 
 
@@ -92,7 +108,7 @@ public:
 
 
 cFastRandom::cFastRandom(void) :
-	m_LinearRand(m_Counter++)
+	m_LinearRand(GetRandomSeed())
 {
 }
 
@@ -136,7 +152,7 @@ int cFastRandom::GenerateRandomInteger(int a_Begin, int a_End)
 // MTRand:
 
 MTRand::MTRand() :
-	m_MersenneRand(m_Counter++)
+	m_MersenneRand(GetRandomSeed())
 {
 }
 
