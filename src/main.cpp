@@ -380,6 +380,8 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 		
 		TCLAP::SwitchArg commLogOutArg("", "log-comm-out", "Log outbound server client communications to file", cmd);
 
+		TCLAP::SwitchArg noBufArg("", "no-output-buffering", "Disable output buffering", cmd);
+
 		cmd.parse(argc, argv);
 
 		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
@@ -411,6 +413,11 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 		{
 			g_ShouldLogCommIn = commLogInArg.getValue();
 			g_ShouldLogCommOut = commLogOutArg.getValue();
+		}
+
+		if (noBufArg.getValue())
+		{
+			setvbuf(stdout, nullptr, _IONBF, 0);
 		}
 
 		repo->SetReadOnly();
@@ -490,11 +497,7 @@ int main(int argc, char **argv)
 	for (int i = 0; i < argc; i++)
 	{
 		AString Arg(argv[i]);
-	if (NoCaseCompare(Arg, "nooutbuf") == 0)
-		{
-			setvbuf(stdout, nullptr, _IONBF, 0);
-		}
-		else if (NoCaseCompare(Arg, "/service") == 0)
+		if (NoCaseCompare(Arg, "/service") == 0)
 		{
 			cRoot::m_RunAsService = true;
 		}
