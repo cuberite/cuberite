@@ -1459,6 +1459,15 @@ bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback
 
 
 
+bool cWorld::DoWithChunk(Vector2i a_Chunk, std::function<bool(cChunk &)> a_Callback)
+{
+	return m_ChunkMap->DoWithChunk(a_Chunk, a_Callback);
+}
+
+
+
+
+
 bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)>  a_Callback)
 {
 	return m_ChunkMap->DoWithChunkAt(a_BlockPos, a_Callback);
@@ -2130,14 +2139,6 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 	}
 }
 
-
-
-
-
-void cWorld::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastChunkData(a_ChunkX, a_ChunkZ, a_Serializer, a_Exclude);
-}
 
 
 

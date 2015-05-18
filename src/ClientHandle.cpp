@@ -2114,7 +2114,7 @@ void cClientHandle::SendChat(const cCompositeChat & a_Message)
 
 
 
-void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+void cClientHandle::SendChunkData(Vector2i a_Chunk, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_Player != nullptr);
 	
@@ -2124,7 +2124,7 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 		cCSLock Lock(m_CSChunkLists);
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
 		{
-			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
+			if ((itr->m_ChunkX == a_Chunk.x) && (itr->m_ChunkZ == a_Chunk.z))
 			{
 				m_ChunksToSend.erase(itr);
 				Found = true;
@@ -2140,18 +2140,18 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 		return;
 	}
 	
-	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+	m_Protocol->SendChunkData(a_Chunk.x, a_Chunk.z, a_Serializer);
 
 	// Add the chunk to the list of chunks sent to the player:
 	{
 		cCSLock Lock(m_CSChunkLists);
-		m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+		m_SentChunks.push_back(cChunkCoords(a_Chunk.x, a_Chunk.z));
 	}
 
 	// If it is the chunk the player's in, make them spawn (in the tick thread):
 	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
 	{
-		if ((a_ChunkX == m_Player->GetChunkX()) && (a_ChunkZ == m_Player->GetChunkZ()))
+		if ((a_Chunk.x == m_Player->GetChunkX()) && (a_Chunk.z == m_Player->GetChunkZ()))
 		{
 			m_HasSentPlayerChunk = true;
 		}

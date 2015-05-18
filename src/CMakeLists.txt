@@ -18,7 +18,8 @@ SET (SRCS
 	BlockArea.cpp
 	BlockID.cpp
 	BlockInfo.cpp
-	Broadcaster.cpp
+	Broadcaster.cpp	
+	${CMAKE_CURRENT_BINARY_DIR}/BroadcasterForwards.cpp
 	BoundingBox.cpp
 	ByteBuffer.cpp
 	ChatColor.cpp
@@ -142,8 +143,19 @@ SET (HDRS
 include_directories(".")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
+
+
+ADD_CUSTOM_COMMAND(
+	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Broadcasts.inc" "${CMAKE_CURRENT_BINARY_DIR}/BroadcasterForwards.cpp"
+
+	# Regenerate bindings:
+	COMMAND lua ${CMAKE_CURRENT_SOURCE_DIR}/BroadcastGenerator.lua
+	COMMENT "Regenerating broadcasts"
+	DEPENDS BroadcastGenerator.lua
+)
 
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead
