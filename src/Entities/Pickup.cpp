@@ -228,6 +228,7 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 
 		m_Item.m_ItemCount -= NumAdded;
 		m_World->BroadcastCollectEntity(*this, a_Dest);
+
 		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
 		m_World->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		if (m_Item.m_ItemCount <= 0)
