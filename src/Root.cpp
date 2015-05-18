@@ -20,6 +20,8 @@
 #include "BuildInfo.h"
 #include "IniFile.h"
 
+#include <iostream>
+
 #ifdef _WIN32
 	#include <conio.h>
 	#include <psapi.h>

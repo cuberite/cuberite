@@ -6,7 +6,7 @@
 #ifdef XML_TOK_IMPL_C
 
 #ifndef IS_INVALID_CHAR
-#define IS_INVALID_CHAR(enc, ptr, n) ((int)(enc) & 0)
+#define IS_INVALID_CHAR(enc, ptr, n) (0)
 #endif
 
 #define INVALID_LEAD_CASE(n, ptr, nextTokPtr) \
@@ -179,9 +179,6 @@ PREFIX(checkPiTarget)(const ENCODING *enc, const char *ptr,
                       const char *end, int *tokPtr)
 {
   int upper = 0;
-
-  (void)enc;
-
   *tokPtr = XML_TOK_PI;
   if (end - ptr != MINBPC(enc)*3)
     return 1;
@@ -291,9 +288,6 @@ PREFIX(scanCdataSection)(const ENCODING *enc, const char *ptr,
   static const char CDATA_LSQB[] = { ASCII_C, ASCII_D, ASCII_A,
                                      ASCII_T, ASCII_A, ASCII_LSQB };
   int i;
-
-  (void)enc;
-
   /* CDATA[ */
   if (end - ptr < 6 * MINBPC(enc))
     return XML_TOK_PARTIAL;
@@ -891,7 +885,7 @@ PREFIX(scanPercent)(const ENCODING *enc, const char *ptr, const char *end,
                     const char **nextTokPtr)
 {
   if (ptr == end)
-    return -XML_TOK_PERCENT;
+    return XML_TOK_PARTIAL;
   switch (BYTE_TYPE(enc, ptr)) {
   CHECK_NMSTRT_CASES(enc, ptr, end, nextTokPtr)
   case BT_S: case BT_LF: case BT_CR: case BT_PERCNT:
@@ -1530,9 +1524,6 @@ static int PTRFASTCALL
 PREFIX(charRefNumber)(const ENCODING *enc, const char *ptr)
 {
   int result = 0;
-
-  (void)enc;
-
   /* skip &# */
   ptr += 2*MINBPC(enc);
   if (CHAR_MATCHES(enc, ptr, ASCII_x)) {
@@ -1577,8 +1568,6 @@ static int PTRCALL
 PREFIX(predefinedEntityName)(const ENCODING *enc, const char *ptr,
                              const char *end)
 {
-  (void)enc;
-
   switch ((end - ptr)/MINBPC(enc)) {
   case 2:
     if (CHAR_MATCHES(enc, ptr + MINBPC(enc), ASCII_t)) {
@@ -1697,8 +1686,6 @@ static int PTRCALL
 PREFIX(nameMatchesAscii)(const ENCODING *enc, const char *ptr1,
                          const char *end1, const char *ptr2)
 {
-  (void)enc;
-
   for (; *ptr2; ptr1 += MINBPC(enc), ptr2++) {
     if (ptr1 == end1)
       return 0;
@@ -1757,7 +1744,7 @@ PREFIX(updatePosition)(const ENCODING *enc,
                        const char *end,
                        POSITION *pos)
 {
-  while (ptr != end) {
+  while (ptr < end) {
     switch (BYTE_TYPE(enc, ptr)) {
 #define LEAD_CASE(n) \
     case BT_LEAD ## n: \
@@ -1792,9 +1779,5 @@ PREFIX(updatePosition)(const ENCODING *enc,
 #undef CHECK_NAME_CASES
 #undef CHECK_NMSTRT_CASE
 #undef CHECK_NMSTRT_CASES
-
-#else /* XML_TOK_IMPL_C */
-
-int xml_tok_impl_c;
 
 #endif /* XML_TOK_IMPL_C */

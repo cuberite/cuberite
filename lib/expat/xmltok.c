@@ -8,7 +8,7 @@
 #include "winconfig.h"
 #elif defined(MACOS_CLASSIC)
 #include "macconfig.h"
-#elif defined(__amigaos4__)
+#elif defined(__amigaos__)
 #include "amigaconfig.h"
 #elif defined(__WATCOMC__)
 #include "watcomconfig.h"
@@ -124,25 +124,18 @@
 static int PTRFASTCALL
 isNever(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-  (void)p;
-
   return 0;
 }
 
 static int PTRFASTCALL
 utf8_isName2(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-
   return UTF8_GET_NAMING2(namePages, (const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isName3(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-
   return UTF8_GET_NAMING3(namePages, (const unsigned char *)p);
 }
 
@@ -151,16 +144,12 @@ utf8_isName3(const ENCODING *enc, const char *p)
 static int PTRFASTCALL
 utf8_isNmstrt2(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-
   return UTF8_GET_NAMING2(nmstrtPages, (const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isNmstrt3(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-
   return UTF8_GET_NAMING3(nmstrtPages, (const unsigned char *)p);
 }
 
@@ -169,24 +158,18 @@ utf8_isNmstrt3(const ENCODING *enc, const char *p)
 static int PTRFASTCALL
 utf8_isInvalid2(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-
   return UTF8_INVALID2((const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isInvalid3(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-
   return UTF8_INVALID3((const unsigned char *)p);
 }
 
 static int PTRFASTCALL
 utf8_isInvalid4(const ENCODING *enc, const char *p)
 {
-  (void)enc;
-
   return UTF8_INVALID4((const unsigned char *)p);
 }
 
@@ -253,7 +236,7 @@ static int FASTCALL checkCharRefNumber(int);
 #define MINBPC(enc) ((enc)->minBytesPerChar)
 #else
 /* minimum bytes per character */
-#define MINBPC(enc) (((int)(enc) & 0) + 1)
+#define MINBPC(enc) 1
 #endif
 
 #define SB_BYTE_TYPE(enc, p) \
@@ -296,8 +279,8 @@ sb_byteToAscii(const ENCODING *enc, const char *p)
 #define IS_NMSTRT_CHAR_MINBPC(enc, p) \
  (AS_NORMAL_ENCODING(enc)->isNmstrtMin(enc, p))
 #else
-#define IS_NAME_CHAR_MINBPC(enc, p) ((int)(enc) & 0)
-#define IS_NMSTRT_CHAR_MINBPC(enc, p) ((int)(enc) & 0)
+#define IS_NAME_CHAR_MINBPC(enc, p) (0)
+#define IS_NMSTRT_CHAR_MINBPC(enc, p) (0)
 #endif
 
 #ifdef XML_MIN_SIZE
@@ -342,9 +325,6 @@ utf8_toUtf8(const ENCODING *enc,
 {
   char *to;
   const char *from;
-
-  (void)enc;
-
   if (fromLim - *fromP > toLim - *toP) {
     /* Avoid copying partial characters. */
     for (fromLim = *fromP + (toLim - *toP); fromLim > *fromP; fromLim--)
@@ -450,8 +430,6 @@ latin1_toUtf8(const ENCODING *enc,
               const char **fromP, const char *fromLim,
               char **toP, const char *toLim)
 {
-  (void)enc;
-
   for (;;) {
     unsigned char c;
     if (*fromP == fromLim)
@@ -477,8 +455,6 @@ latin1_toUtf16(const ENCODING *enc,
                const char **fromP, const char *fromLim,
                unsigned short **toP, const unsigned short *toLim)
 {
-  (void)enc;
-
   while (*fromP != fromLim && *toP != toLim)
     *(*toP)++ = (unsigned char)*(*fromP)++;
 }
@@ -512,8 +488,6 @@ ascii_toUtf8(const ENCODING *enc,
              const char **fromP, const char *fromLim,
              char **toP, const char *toLim)
 {
-  (void)enc;
-
   while (*fromP != fromLim && *toP != toLim)
     *(*toP)++ = *(*fromP)++;
 }
@@ -568,9 +542,6 @@ E ## toUtf8(const ENCODING *enc, \
             char **toP, const char *toLim) \
 { \
   const char *from; \
- \
-  (void)enc; \
- \
   for (from = *fromP; from != fromLim; from += 2) { \
     int plane; \
     unsigned char lo2; \
@@ -612,7 +583,7 @@ E ## toUtf8(const ENCODING *enc, \
         return; \
       } \
       plane = (((hi & 0x3) << 2) | ((lo >> 6) & 0x3)) + 1; \
-      *(*toP)++ = (((char)((plane >> 2) & 0xff)) | UTF8_cval4); \
+      *(*toP)++ = ((plane >> 2) | UTF8_cval4); \
       *(*toP)++ = (((lo >> 2) & 0xF) | ((plane & 0x3) << 4) | 0x80); \
       from += 2; \
       lo2 = GET_LO(from); \
@@ -633,8 +604,6 @@ E ## toUtf16(const ENCODING *enc, \
              const char **fromP, const char *fromLim, \
              unsigned short **toP, const unsigned short *toLim) \
 { \
-  (void)enc; \
- \
   /* Avoid copying first half only of surrogate */ \
   if (fromLim - *fromP > ((toLim - *toP) << 1) \
       && (GET_HI(fromLim - 2) & 0xF8) == 0xD8) \
@@ -717,14 +686,14 @@ little2_isNmstrtMin(const ENCODING *enc, const char *p)
 
 #undef PREFIX
 #define PREFIX(ident) little2_ ## ident
-#define MINBPC(enc) (((int)(enc) & 0) + 2)
+#define MINBPC(enc) 2
 /* CHAR_MATCHES is guaranteed to have MINBPC bytes available. */
 #define BYTE_TYPE(enc, p) LITTLE2_BYTE_TYPE(enc, p)
 #define BYTE_TO_ASCII(enc, p) LITTLE2_BYTE_TO_ASCII(enc, p)
 #define CHAR_MATCHES(enc, p, c) LITTLE2_CHAR_MATCHES(enc, p, c)
-#define IS_NAME_CHAR(enc, p, n) ((int)(enc) & 0)
+#define IS_NAME_CHAR(enc, p, n) 0
 #define IS_NAME_CHAR_MINBPC(enc, p) LITTLE2_IS_NAME_CHAR_MINBPC(enc, p)
-#define IS_NMSTRT_CHAR(enc, p, n) ((int)(enc) & 0)
+#define IS_NMSTRT_CHAR(enc, p, n) (0)
 #define IS_NMSTRT_CHAR_MINBPC(enc, p) LITTLE2_IS_NMSTRT_CHAR_MINBPC(enc, p)
 
 #define XML_TOK_IMPL_C
@@ -858,14 +827,14 @@ big2_isNmstrtMin(const ENCODING *enc, const char *p)
 
 #undef PREFIX
 #define PREFIX(ident) big2_ ## ident
-#define MINBPC(enc) (((int)(enc) & 0) + 2)
+#define MINBPC(enc) 2
 /* CHAR_MATCHES is guaranteed to have MINBPC bytes available. */
 #define BYTE_TYPE(enc, p) BIG2_BYTE_TYPE(enc, p)
 #define BYTE_TO_ASCII(enc, p) BIG2_BYTE_TO_ASCII(enc, p)
 #define CHAR_MATCHES(enc, p, c) BIG2_CHAR_MATCHES(enc, p, c)
-#define IS_NAME_CHAR(enc, p, n) ((int)(enc) & 0)
+#define IS_NAME_CHAR(enc, p, n) 0
 #define IS_NAME_CHAR_MINBPC(enc, p) BIG2_IS_NAME_CHAR_MINBPC(enc, p)
-#define IS_NMSTRT_CHAR(enc, p, n) ((int)(enc) & 0)
+#define IS_NMSTRT_CHAR(enc, p, n) (0)
 #define IS_NMSTRT_CHAR_MINBPC(enc, p) BIG2_IS_NMSTRT_CHAR_MINBPC(enc, p)
 
 #define XML_TOK_IMPL_C
@@ -972,8 +941,6 @@ static void PTRCALL
 initUpdatePosition(const ENCODING *enc, const char *ptr,
                    const char *end, POSITION *pos)
 {
-  (void)enc;
-
   normal_updatePosition(&utf8_encoding.enc, ptr, end, pos);
 }
 
@@ -1378,7 +1345,7 @@ unknown_toUtf16(const ENCODING *enc,
 ENCODING *
 XmlInitUnknownEncoding(void *mem,
                        int *table,
-                       CONVERTER convert, 
+                       CONVERTER convert,
                        void *userData)
 {
   int i;
@@ -1672,7 +1639,7 @@ initScan(const ENCODING * const *encodingTable,
 ENCODING *
 XmlInitUnknownEncodingNS(void *mem,
                          int *table,
-                         CONVERTER convert, 
+                         CONVERTER convert,
                          void *userData)
 {
   ENCODING *enc = XmlInitUnknownEncoding(mem, table, convert, userData);
