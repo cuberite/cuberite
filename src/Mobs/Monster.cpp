@@ -89,7 +89,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_SoundDeath(a_SoundDeath)
 	, m_AttackRate(3)
 	, m_AttackDamage(1)
-	, m_AttackRange(2)
+	, m_AttackRange(1)
 	, m_AttackInterval(0)
 	, m_SightDistance(25)
 	, m_DropChanceWeapon(0.085f)
@@ -147,10 +147,15 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		(Recalculate lots when close, calculate rarely when far) */
 		if (
 			((GetPosition() - m_PathFinderDestination).Length() < 0.25) ||
-			((m_TicksSinceLastPathReset > 10) && (m_TicksSinceLastPathReset > (0.15 * (m_FinalDestination - GetPosition()).SqrLength())))
+			((m_TicksSinceLastPathReset > 10) && (m_TicksSinceLastPathReset > (0.4 * (m_FinalDestination - GetPosition()).SqrLength())))
 		)
 		{
-			ResetPathFinding();
+			/* Re-calculating is expensive when there's no path to target, and it results in mobs freezing very often as a result of always recalculating.
+			This is a workaround till we get better path recalculation. */
+			if (!m_NoPathToTarget)
+			{
+				ResetPathFinding();
+			}
 		}
 	}
 
@@ -161,12 +166,21 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 			StopMovingToPosition();  // Invalid chunks, probably world is loading or something, cancel movement.
 			return false;
 		}
+		m_NoPathToTarget = false;
+		m_NoMoreWayPoints = false;
 		m_PathFinderDestination = m_FinalDestination;
 		m_Path = new cPath(a_Chunk, GetPosition().Floor(), m_PathFinderDestination.Floor(), 20);
 	}
 
 	switch (m_Path->Step(a_Chunk))
 	{
+		case ePathFinderStatus::NEARBY_FOUND:
+		{
+			m_NoPathToTarget = true;
+			m_Path->AcceptNearbyPath();
+			break;
+		}
+
 		case ePathFinderStatus::PATH_NOT_FOUND:
 		{
 			StopMovingToPosition();  // Give up pathfinding to that destination.
@@ -179,15 +193,22 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		}
 		case ePathFinderStatus::PATH_FOUND:
 		{
-			if (--m_GiveUpCounter == 0)
+			if (m_NoMoreWayPoints || (--m_GiveUpCounter == 0))
 			{
 				ResetPathFinding();  // Try to calculate a path again.
 				return false;
 			}
-			else if (!m_Path->IsLastPoint() && (m_Path->IsFirstPoint() || ReachedNextWaypoint()))  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
+			else if (!m_Path->IsLastPoint())  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
 			{
-				m_NextWayPointPosition = Vector3d(0.5, 0, 0.5) + m_Path->GetNextPoint();
-				m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
+				if ((m_Path->IsFirstPoint() || ReachedNextWaypoint()))
+				{
+					m_NextWayPointPosition = Vector3d(0.5, 0, 0.5) + m_Path->GetNextPoint();
+					m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
+				}
+			}
+			else
+			{
+				m_NoMoreWayPoints = true;
 			}
 			return true;
 		}
@@ -269,21 +290,59 @@ bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
 	{
 		return false;
 	}
-	
+
 	int RelX = FloorC(m_FinalDestination.x) - Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = FloorC(m_FinalDestination.z) - Chunk->GetPosZ() * cChunkDef::Width;
 
-	// If destination in the air, go down to the lowest air block.
-	while (m_FinalDestination.y > 0)
+	// If destination in the air, first try to go 1 block north, or east, or west.
+	// This fixes the player leaning issue.
+	// If that failed, we instead go down to the lowest air block.
+	Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
+	if (!cBlockInfo::IsSolid(BlockType))
 	{
-		Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
-		if (cBlockInfo::IsSolid(BlockType))
+		bool InTheAir = true;
+		int x, z;
+		for (z = -1; z <= 1; ++z)
 		{
-			break;
+			for (x = -1; x <= 1; ++x)
+			{
+				if ((x==0) && (z==0))
+				{
+					continue;
+				}
+				Chunk = a_Chunk.GetNeighborChunk(FloorC(m_FinalDestination.x+x), FloorC(m_FinalDestination.z+z));
+				if ((Chunk == nullptr) || !Chunk->IsValid())
+				{
+					return false;
+				}
+				RelX = FloorC(m_FinalDestination.x+x) - Chunk->GetPosX() * cChunkDef::Width;
+				RelZ = FloorC(m_FinalDestination.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
+				Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
+				if (cBlockInfo::IsSolid(BlockType))
+				{
+					m_FinalDestination.x += x;
+					m_FinalDestination.z += z;
+					InTheAir = false;
+					goto breakBothLoops;
+				}
+			}
 		}
-		m_FinalDestination.y -= 1;
-	}
+		breakBothLoops:
 
+		// Go down to the lowest air block.
+		if (InTheAir)
+		{
+			while (m_FinalDestination.y > 0)
+			{
+				Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
+				if (cBlockInfo::IsSolid(BlockType))
+				{
+					break;
+				}
+				m_FinalDestination.y -= 1;
+			}
+		}
+	}
 
 	// If destination in water, go up to the highest water block.
 	// If destination in solid, go up to first air block.
@@ -447,21 +506,29 @@ void cMonster::SetPitchAndYawFromDestination()
 		}
 	}
 
+
+
+	Vector3d BodyDistance = m_NextWayPointPosition - GetPosition();
+	double BodyRotation, BodyPitch;
+	BodyDistance.Normalize();
+	VectorToEuler(BodyDistance.x, BodyDistance.y, BodyDistance.z, BodyRotation, BodyPitch);
+	SetYaw(BodyRotation);
+
 	Vector3d Distance = FinalDestination - GetPosition();
 	{
-		double Rotation, Pitch;
+		double HeadRotation, HeadPitch;
 		Distance.Normalize();
-		VectorToEuler(Distance.x, Distance.y, Distance.z, Rotation, Pitch);
-		SetHeadYaw(Rotation);
-		SetPitch(-Pitch);
-	}
-
-	{
-		Vector3d BodyDistance = m_NextWayPointPosition - GetPosition();
-		double Rotation, Pitch;
-		BodyDistance.Normalize();
-		VectorToEuler(BodyDistance.x, BodyDistance.y, BodyDistance.z, Rotation, Pitch);
-		SetYaw(Rotation);
+		VectorToEuler(Distance.x, Distance.y, Distance.z, HeadRotation, HeadPitch);
+		if (abs(BodyRotation - HeadRotation) < 120)
+		{
+			SetHeadYaw(HeadRotation);
+			SetPitch(-HeadPitch);
+		}
+		else  // We're not an owl. If it's more than 120, don't look behind and instead look at where you're walking.
+		{
+			SetHeadYaw(BodyRotation);
+			SetPitch(-BodyPitch);
+		}
 	}
 }
 

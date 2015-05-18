@@ -51,7 +51,7 @@ Implements the 1.8.x protocol classes:
 
 
 /** The slot number that the client uses to indicate "outside the window". */
-static const Int16 SLOT_NUM_OUTSIDE = -1;
+static const Int16 SLOT_NUM_OUTSIDE = -999;
 
 
 
@@ -2265,7 +2265,7 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 	{
 		return;
 	}
-	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutside : caLeftClick);
+	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick);
 }
 
 

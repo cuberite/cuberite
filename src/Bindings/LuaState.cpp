@@ -927,6 +927,9 @@ bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
 		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
+
+		BreakIntoDebugger(m_LuaState);
+
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1366,7 +1369,30 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 {
 	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
 	LogStackTrace(a_LuaState, 1);
+	BreakIntoDebugger(a_LuaState);
 	return 1;  // We left the error message on the stack as the return value
+}
+
+
+
+
+
+int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
+{
+	// Call the BreakIntoDebugger function, if available:
+	lua_getglobal(a_LuaState, "BreakIntoDebugger");
+	if (!lua_isfunction(a_LuaState, -1))
+	{
+		LOGD("LUA: BreakIntoDebugger() not found / not a function");
+		lua_pop(a_LuaState, 1);
+		return 1;
+	}
+	lua_insert(a_LuaState, -2);  // Copy the string that has been passed to us
+	LOGD("Calling BreakIntoDebugger()...");
+	lua_call(a_LuaState, 1, 0);
+	LOGD("Returned from BreakIntoDebugger().");
+
+	return 0;
 }
 
 
