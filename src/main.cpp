@@ -372,6 +372,8 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 
 		TCLAP::ValueArg<int> slotsArg("s", "max-players", "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
 
+		TCLAP::MultiArg<int> portsArg("p", "port", "The port number the server should listen to", false, "port", cmd);
+
 		cmd.parse(argc, argv);
 
 		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
@@ -381,8 +383,17 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 
 			int slots = slotsArg.getValue();
 
-			repo->SetValueI("Server", "MaxPlayers", slots);
+			repo->AddValue("Server", "MaxPlayers", static_cast<Int64>(slots));
 
+		}
+
+		if (portsArg.isSet())
+		{
+			std::vector<int> ports = portsArg.getValue();
+			for (auto port : ports)
+			{
+				repo->AddValue("Server", "Port", static_cast<Int64>(port));
+			}
 		}
 
 		repo->SetReadOnly();

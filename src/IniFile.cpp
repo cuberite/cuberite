@@ -931,7 +931,18 @@ AStringVector ReadUpgradeIniPorts(
 )
 {
 	// Read the regular value, but don't use the default (in order to detect missing value for upgrade):
-	AStringVector Ports = StringSplitAndTrim(a_Settings.GetValue(a_KeyName, a_PortsValueName), ";,");
+
+	AStringVector Ports;
+
+	for (auto pair : a_Settings.GetValues(a_KeyName))
+	{
+		if (pair.first != a_PortsValueName)
+		{
+			continue;
+		}
+		AStringVector temp = StringSplitAndTrim(pair.second, ";,");
+		Ports.insert(Ports.end(), temp.begin(), temp.end());
+	}
 
 	if (Ports.empty())
 	{
