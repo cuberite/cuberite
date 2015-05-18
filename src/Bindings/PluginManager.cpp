@@ -525,6 +525,42 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
+bool cPluginManager::CallHookEntityChangeWorld(cEntity & a_Entity, cWorld & a_World)
+{
+	FIND_HOOK(HOOK_ENTITY_CHANGE_WORLD);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityChangeWorld(a_Entity, a_World))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_World)
+{
+	FIND_HOOK(HOOK_ENTITY_CHANGED_WORLD);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityChangedWorld(a_Entity, a_World))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
 bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
