@@ -1394,7 +1394,7 @@ void cSlotAreaBeacon::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 // cSlotAreaEnchanting:
 
 cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ) :
-	cSlotAreaTemporary(1, a_ParentWindow),
+	cSlotAreaTemporary(2, a_ParentWindow),
 	m_BlockX(a_BlockX),
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
