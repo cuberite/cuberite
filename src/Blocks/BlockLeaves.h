@@ -41,7 +41,7 @@ public:
 		cFastRandom rand;
 
 		// Old leaves - 3 bits contain display; new leaves - 1st bit, shifted left two for saplings to understand
-		if (rand.NextInt(6) == 0)
+		if (rand.NextInt(20) == 0)
 		{
 			a_Pickups.push_back(
 				cItem(
