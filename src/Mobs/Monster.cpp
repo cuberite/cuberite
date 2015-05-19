@@ -519,7 +519,7 @@ void cMonster::SetPitchAndYawFromDestination()
 		double HeadRotation, HeadPitch;
 		Distance.Normalize();
 		VectorToEuler(Distance.x, Distance.y, Distance.z, HeadRotation, HeadPitch);
-		if (fabs(BodyRotation - HeadRotation) < 120)
+        if (std::abs(BodyRotation - HeadRotation) < 120)
 		{
 			SetHeadYaw(HeadRotation);
 			SetPitch(-HeadPitch);
