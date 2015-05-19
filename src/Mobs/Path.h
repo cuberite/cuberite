@@ -24,7 +24,15 @@ class cChunk;
 
 /* Various little structs and classes */
 enum class ePathFinderStatus {CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND, NEARBY_FOUND};
-struct cPathCell;  // Defined inside Path.cpp
+enum class eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
+struct cPathCell
+{
+	Vector3i m_Location;   // Location of the cell in the world.
+	int m_F, m_G, m_H;  // F, G, H as defined in regular A*.
+	eCellStatus m_Status;  // Which list is the cell in? Either non, open, or closed.
+	cPathCell * m_Parent;  // Cell's parent, as defined in regular A*.
+	bool m_IsSolid;	   // Is the cell an air or a solid? Partial solids are currently considered solids.
+};
 class compareHeuristics
 {
 public:
@@ -144,7 +152,7 @@ private:
 
 	/* Pathfinding fields */
 	std::priority_queue<cPathCell *,  std::vector<cPathCell *>,  compareHeuristics> m_OpenList;
-	std::unordered_map<Vector3i,  UniquePtr<cPathCell>, VectorHasher> m_Map;
+	std::unordered_map<Vector3i, cPathCell, VectorHasher> m_Map;
 	Vector3i m_Destination;
 	Vector3i m_Source;
 	int m_StepsLeft;
