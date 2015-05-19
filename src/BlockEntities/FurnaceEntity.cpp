@@ -189,6 +189,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 	// Is the input and output ready for cooking?
 	if (!CanCookInputToOutput())
 	{
+		SetBurnTimes(0, 0);
 		return;
 	}
 
