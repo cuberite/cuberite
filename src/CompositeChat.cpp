@@ -345,6 +345,10 @@ AString cCompositeChat::ExtractText(void) const
 				Msg.append(((cUrlPart *)(*itr))->m_Url);
 				break;
 			}
+			case ptShowAchievement:
+			{
+				break;
+			}
 		}  // switch (PartType)
 	}  // for itr - m_Parts[]
 	return Msg;

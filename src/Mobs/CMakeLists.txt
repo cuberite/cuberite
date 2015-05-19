@@ -80,6 +80,10 @@ SET (HDRS
 	Zombie.h
 	ZombiePigman.h)
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set_source_files_properties(Monster.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch -Wno-error=switch-enum -Wno-error=float-equal")
+endif()
+
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})
 endif()

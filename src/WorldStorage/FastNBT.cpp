@@ -257,7 +257,7 @@ bool cParsedNBT::ReadTag(void)
 			return true;
 		}
 		
-		default:
+		case TAG_Min:
 		{
 			ASSERT(!"Unhandled NBT tag type");
 			return false;
@@ -503,7 +503,7 @@ void cFastNBTWriter::AddString(const AString & a_Name, const AString & a_Value)
 void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_ByteArray);
-	u_long len = htonl(static_cast<u_long>(a_NumElements));
+	u_int len = htonl(static_cast<u_int>(a_NumElements));
 	m_Result.append(reinterpret_cast<const char *>(&len), 4);
 	m_Result.append(a_Value, a_NumElements);
 }
@@ -515,7 +515,7 @@ void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, 
 void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_IntArray);
-	u_long len = htonl(static_cast<u_long>(a_NumElements));
+	u_int len = htonl(static_cast<u_int>(a_NumElements));
 	size_t cap = m_Result.capacity();
 	size_t size = m_Result.length();
 	if ((cap - size) < (4 + a_NumElements * 4))

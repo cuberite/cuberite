@@ -89,7 +89,9 @@ protected:
 			case BLOCK_FACE_ZM: Dir = 2; break;
 			case BLOCK_FACE_XM: Dir = 1; break;
 			case BLOCK_FACE_XP: Dir = 3; break;
-			default:
+			case BLOCK_FACE_YP:
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_NONE:
 			{
 				// Uncomment when entities are initialised with their real data, instead of dummy values:
 				// LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_BlockFace);

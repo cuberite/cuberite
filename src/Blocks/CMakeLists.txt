@@ -95,6 +95,7 @@ SET (HDRS
 	MetaRotator.h
 	WorldInterface.h)
 
+
 if(NOT MSVC)
 	add_library(Blocks ${SRCS} ${HDRS})
 endif()

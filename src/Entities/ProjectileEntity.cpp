@@ -281,6 +281,7 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, *a_Item);
 		}
+		case pkFishingFloat: break;
 	}
 	
 	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);

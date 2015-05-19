@@ -36,7 +36,7 @@ public:
 	cMap * GetMapData(unsigned int a_ID);
 
 	/** Creates a new map. Returns nullptr on error */
-	cMap * CreateMap(int a_CenterX, int a_CenterY, int a_Scale = 3);
+	cMap * CreateMap(int a_CenterX, int a_CenterY, unsigned int a_Scale = 3);
 
 	/** Calls the callback for the map with the specified ID.
 	Returns true if the map was found and the callback called, false if map not found.

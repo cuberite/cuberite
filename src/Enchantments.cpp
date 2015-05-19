@@ -69,8 +69,8 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 			LOG("%s: Failed to parse enchantment \"%s\", skipping.", __FUNCTION__, Split[0].c_str());
 			continue;
 		}
-		int lvl = atoi(Split[1].c_str());
-		if ((lvl == 0) && (Split[1] != "0"))
+		unsigned int lvl;
+		if (!StringToInteger(Split[1], lvl))
 		{
 			// Level failed to parse
 			LOG("%s: Failed to parse enchantment level \"%s\", skipping.", __FUNCTION__, Split[1].c_str());
@@ -108,7 +108,7 @@ AString cEnchantments::ToString(void) const
 
 
 
-int cEnchantments::GetLevel(int a_EnchantmentID) const
+unsigned int cEnchantments::GetLevel(int a_EnchantmentID) const
 {
 	// Return the level for the specified enchantment; 0 if not stored
 	cMap::const_iterator itr = m_Enchantments.find(a_EnchantmentID);
@@ -125,7 +125,7 @@ int cEnchantments::GetLevel(int a_EnchantmentID) const
 
 
 
-void cEnchantments::SetLevel(int a_EnchantmentID, int a_Level)
+void cEnchantments::SetLevel(int a_EnchantmentID, unsigned int a_Level)
 {
 	// Sets the level for the specified enchantment, adding it if not stored before or removing it if level <= 0
 	if (a_Level == 0)
@@ -908,7 +908,7 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 
 
 
-void cEnchantments::AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel)
+void cEnchantments::AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, unsigned int a_EnchantmentLevel)
 {
 	cWeightedEnchantment weightedenchantment;
 	weightedenchantment.m_Weight = a_Weight;

@@ -117,7 +117,7 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks, bool a_tryT
 	}
 
 	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks, a_tryToFillEquippedFirst ? m_EquippedSlotNum : -1);
-	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;
+	ToAdd.m_ItemCount = a_Item.m_ItemCount - static_cast<char>(res);
 	if (ToAdd.m_ItemCount == 0)
 	{
 		return res;

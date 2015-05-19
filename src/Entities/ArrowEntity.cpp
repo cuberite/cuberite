@@ -108,7 +108,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
 	}
 
-	int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
+	unsigned int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
 	if (PowerLevel > 0)
 	{
 		int ExtraDamage = (int)ceil(0.25 * (PowerLevel + 1));
@@ -116,7 +116,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	}
 
 	int KnockbackAmount = 1;
-	int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
+	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
 	if (PunchLevel > 0)
 	{
 		Vector3d LookVector = GetLookVector();

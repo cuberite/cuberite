@@ -72,6 +72,20 @@ SET (HDRS
 	VillageGen.h
 )
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set_source_files_properties(CompoGenBiomal.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(BioGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
+	set_source_files_properties(ComposableGenerator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
+	set_source_files_properties(FinishGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(NetherFortGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(RainbowRoadsGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(RoughRavines.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=float-equal")
+	set_source_files_properties(StructGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(TestRailsGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(UnderwaterBaseGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=switch-enum")
+	set_source_files_properties(VillageGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=switch-enum")
+endif()
+
 if(NOT MSVC)
 	add_library(Generating ${SRCS} ${HDRS})
 

@@ -39,8 +39,8 @@ class cListAllocationPool : public cAllocationPool<T>
 {
 	public:
 		
-		cListAllocationPool(std::auto_ptr<typename cAllocationPool<T>::cStarvationCallbacks> a_Callbacks) :
-			m_Callbacks(a_Callbacks)
+		cListAllocationPool(std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> a_Callbacks) :
+			m_Callbacks(std::move(a_Callbacks))
 		{
 			for (size_t i = 0; i < NumElementsInReserve; i++)
 			{
@@ -105,7 +105,7 @@ class cListAllocationPool : public cAllocationPool<T>
 		
 	private:
 		std::list<void *> m_FreeList;
-		std::auto_ptr<typename cAllocationPool<T>::cStarvationCallbacks> m_Callbacks;
+		std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> m_Callbacks;
 };
 
 

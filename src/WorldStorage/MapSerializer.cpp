@@ -102,11 +102,11 @@ void cMapSerializer::SaveMapToNBT(cFastNBTWriter & a_Writer)
 {
 	a_Writer.BeginCompound("data");
 
-	a_Writer.AddByte("scale", m_Map->GetScale());
-	a_Writer.AddByte("dimension", (int) m_Map->GetDimension());
+	a_Writer.AddByte("scale", static_cast<Byte>(m_Map->GetScale()));
+	a_Writer.AddByte("dimension", static_cast<Byte>(m_Map->GetDimension()));
 
-	a_Writer.AddShort("width",  m_Map->GetWidth());
-	a_Writer.AddShort("height", m_Map->GetHeight());
+	a_Writer.AddShort("width",  static_cast<Int16>(m_Map->GetWidth()));
+	a_Writer.AddShort("height", static_cast<Int16>(m_Map->GetHeight()));
 
 	a_Writer.AddInt("xCenter", m_Map->GetCenterX());
 	a_Writer.AddInt("zCenter", m_Map->GetCenterZ());
@@ -235,7 +235,7 @@ bool cIDCountSerializer::Load(void)
 	int CurrLine = NBT.FindChildByName(0, "map");
 	if (CurrLine >= 0)
 	{
-		m_MapCount = (int)NBT.GetShort(CurrLine) + 1;
+		m_MapCount = static_cast<unsigned int>(NBT.GetShort(CurrLine) + 1);
 	}
 	else
 	{
@@ -255,7 +255,7 @@ bool cIDCountSerializer::Save(void)
 
 	if (m_MapCount > 0)
 	{
-		Writer.AddShort("map", m_MapCount - 1);
+		Writer.AddShort("map", static_cast<Int16>(m_MapCount - 1));
 	}
 
 	Writer.Finish();

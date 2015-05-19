@@ -99,7 +99,7 @@ public:
 		return m_PathPoints[m_PathPoints.size() - 1 - a_index];
 	}
 	/** Returns the total number of points this path has. */
-	inline int GetPointCount()
+	inline size_t GetPointCount()
 	{
 		if (m_Status != ePathFinderStatus::PATH_FOUND)
 		{

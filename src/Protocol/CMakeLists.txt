@@ -25,6 +25,11 @@ SET (HDRS
 	ProtocolRecognizer.h
 )
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set_source_files_properties(Protocol18x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(Protocol17x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
+endif()
+
 if (NOT MSVC)
 	add_library(Protocol ${SRCS} ${HDRS})
 endif()

@@ -714,8 +714,8 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 		cEntity * m_Entity;
 
 	public:
-		cMover(cEntity * a_Entity) :
-			m_Entity(a_Entity)
+		cMover(cEntity * a_CallbackEntity) :
+			m_Entity(a_CallbackEntity)
 		{}
 	} Mover(a_Entity);
 	

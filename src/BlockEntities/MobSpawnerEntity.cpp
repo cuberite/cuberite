@@ -246,9 +246,9 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 	class cCallback : public cChunkDataCallback
 	{
 	public:
-		cCallback(Vector3d a_SpawnerPos, eMonsterType a_EntityType, int & a_NumEntities) :
+		cCallback(Vector3d a_SpawnerPos, eMonsterType a_CallbackEntityType, int & a_NumEntities) :
 			m_SpawnerPos(a_SpawnerPos),
-			m_EntityType(a_EntityType),
+			m_EntityType(a_CallbackEntityType),
 			m_NumEntities(a_NumEntities)
 		{
 		}

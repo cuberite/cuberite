@@ -125,10 +125,6 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 				m_SendChunksHighPriority.push_back(Chunk);
 				break;
 			}
-			default:
-			{
-				ASSERT(!"Unknown chunk priority!");
-			}
 		}
 	}
 	m_evtQueue.Set();

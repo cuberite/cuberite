@@ -1137,10 +1137,10 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 
 
 
-void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel)
+void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel)
 {
 	MTRand r1;
-	int Count = r1.randInt() % 200;
+	unsigned int Count = r1.randInt() % 200;
 	if (Count < (5 + a_LootingLevel))
 	{
 		int Rare = r1.randInt() % a_Items.Size();
@@ -1152,7 +1152,7 @@ void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a
 
 
 
-void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
+void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceHelmet * 200) + (a_LootingLevel * 2)))
@@ -1192,7 +1192,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
 
 
 
-void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
+void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceWeapon * 200) + (a_LootingLevel * 2)))

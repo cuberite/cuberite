@@ -76,7 +76,7 @@ cMap * cMapManager::GetMapData(unsigned int a_ID)
 
 
 
-cMap * cMapManager::CreateMap(int a_CenterX, int a_CenterY, int a_Scale)
+cMap * cMapManager::CreateMap(int a_CenterX, int a_CenterY, unsigned int a_Scale)
 {
 	cCSLock Lock(m_CS);
 

@@ -1051,11 +1051,6 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 				Drops.push_back(cItem(E_ITEM_MINECART_WITH_HOPPER, 1, 0));
 				break;
 			}
-			default:
-			{
-				ASSERT(!"Unhandled minecart type when spawning pickup!");
-				return true;
-			}
 		}
 		
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
