@@ -256,13 +256,13 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 		return -1;
 	}
 	
-	ssize_t TotalSize = GetSize();
+	long TotalSize = GetSize();
 	if (TotalSize < 0)
 	{
 		return -1;
 	}
 
-	ssize_t Position = Tell();
+	long Position = Tell();
 	if (Position < 0)
 	{
 		return -1;
