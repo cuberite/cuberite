@@ -36,9 +36,7 @@ Check out the [CONTRIBUTING.md](https://github.com/mc-server/MCServer/blob/maste
 Other Stuff
 -----------
 
-For other stuff, including plugins and discussion, check the [forums](http://forum.mc-server.org) and [Plugin API](http://mc-server.xoft.cz/LuaAPI/).
-
-Earn bitcoins for commits or donate to reward the MCServer developers: [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
+For other stuff, including plugins and discussion, check out the [forums](http://forum.mc-server.org) and [Plugin API](http://mc-server.xoft.cz/LuaAPI/).
 
 Support Us on Gratipay: [![Support via Gratipay](http://img.shields.io/gittip/cuberite_team.svg)](https://www.gratipay.com/cuberite_team)
 

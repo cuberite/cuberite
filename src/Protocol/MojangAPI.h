@@ -25,7 +25,7 @@ namespace Json
 
 
 
-
+class cSettingsRepositoryInterface;
 
 // tolua_begin
 class cMojangAPI
@@ -38,7 +38,7 @@ public:
 	
 	/** Initializes the API; reads the settings from the specified ini file.
 	Loads cached results from disk. */
-	void Start(cIniFile & a_SettingsIni, bool a_ShouldAuth);
+	void Start(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth);
 	
 	/** Connects to the specified server using SSL, sends the given request and receives the response.
 	Checks Mojang certificates using the hard-coded Starfield root CA certificate.

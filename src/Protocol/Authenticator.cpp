@@ -40,11 +40,11 @@ cAuthenticator::~cAuthenticator()
 
 
 
-void cAuthenticator::ReadINI(cIniFile & IniFile)
+void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 {
-	m_Server             = IniFile.GetValueSet ("Authentication", "Server", DEFAULT_AUTH_SERVER);
-	m_Address            = IniFile.GetValueSet ("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
-	m_ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
+	m_Server             = a_Settings.GetValueSet ("Authentication", "Server", DEFAULT_AUTH_SERVER);
+	m_Address            = a_Settings.GetValueSet ("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
+	m_ShouldAuthenticate = a_Settings.GetValueSetB("Authentication", "Authenticate", true);
 }
 
 
@@ -69,9 +69,9 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 
 
 
-void cAuthenticator::Start(cIniFile & IniFile)
+void cAuthenticator::Start(cSettingsRepositoryInterface & a_Settings)
 {
-	ReadINI(IniFile);
+	ReadSettings(a_Settings);
 	m_ShouldTerminate = false;
 	super::Start();
 }

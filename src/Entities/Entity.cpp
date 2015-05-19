@@ -1403,13 +1403,24 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		return false;
 	}
 
+	//  Ask the plugins if the entity is allowed to change the world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangeWorld(*this, *a_World))
+	{
+		// A Plugin doesn't allow the entity to change the world
+		return false;
+	}
+
 	// Remove all links to the old world
 	SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	// Queue add to new world
 	a_World->AddEntity(this);
+	cWorld * OldWorld = cRoot::Get()->GetWorld(GetWorld()->GetName());  // Required for the hook HOOK_ENTITY_CHANGED_WORLD
 	SetWorld(a_World);
+
+	// Entity changed the world, call the hook
+	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *OldWorld);
 
 	return true;
 }

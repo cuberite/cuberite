@@ -1606,6 +1606,12 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		return false;
 	}
 	
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangeWorld(*this, *a_World))
+	{
+		// A Plugin doesn't allow the player to change the world
+		return false;
+	}
+
 	// Send the respawn packet:
 	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
 	{
@@ -1621,6 +1627,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	a_World->AddPlayer(this);
+	cWorld * OldWorld = cRoot::Get()->GetWorld(GetWorld()->GetName());  // Required for the hook HOOK_ENTITY_CHANGED_WORLD
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
 	// Update the view distance.
@@ -1635,6 +1642,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	// Broadcast the player into the new world.
 	a_World->BroadcastSpawnEntity(*this);
 	
+	// Player changed the world, call the hook
+	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *OldWorld);
+
 	return true;
 }
 

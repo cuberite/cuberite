@@ -38,8 +38,8 @@ class cClientHandle;
 typedef SharedPtr<cClientHandle> cClientHandlePtr;
 typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
-class cIniFile;
 class cCommandOutputCallback;
+class cSettingsRepositoryInterface;
 
 
 namespace Json
@@ -58,7 +58,7 @@ public:
 	// tolua_end
 
 	virtual ~cServer() {}
-	bool InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth);
+	bool InitServer(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth);
 
 	// tolua_begin
 	
