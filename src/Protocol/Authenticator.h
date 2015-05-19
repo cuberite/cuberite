@@ -14,7 +14,7 @@
 
 #include "../OSSupport/IsThread.h"
 
-
+class cSettingsRepositoryInterface;
 
 
 
@@ -40,13 +40,13 @@ public:
 	~cAuthenticator();
 
 	/** (Re-)read server and address from INI: */
-	void ReadINI(cIniFile & IniFile);
+	void ReadSettings(cSettingsRepositoryInterface & a_Settings);
 
 	/** Queues a request for authenticating a user. If the auth fails, the user will be kicked */
 	void Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash);
 
 	/** Starts the authenticator thread. The thread may be started and stopped repeatedly */
-	void Start(cIniFile & IniFile);
+	void Start(cSettingsRepositoryInterface & a_Settings);
 
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);

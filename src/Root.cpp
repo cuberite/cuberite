@@ -19,6 +19,8 @@
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
 #include "IniFile.h"
+#include "SettingsRepositoryInterface.h"
+#include "OverridesSettingsRepository.h"
 
 #ifdef _WIN32
 	#include <conio.h>
@@ -96,7 +98,7 @@ void cRoot::InputThread(cRoot & a_Params)
 
 
 
-void cRoot::Start(void)
+void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 {
 	#ifdef _WIN32
 	HWND hwnd = GetConsoleWindow();
@@ -130,22 +132,24 @@ void cRoot::Start(void)
 		m_Server = new cServer();
 
 		LOG("Reading server config...");
-		cIniFile IniFile;
-		if (!IniFile.ReadFile("settings.ini"))
+
+		auto IniFile = cpp14::make_unique<cIniFile>();
+		if (!IniFile->ReadFile("settings.ini"))
 		{
 			LOGWARN("Regenerating settings.ini, all settings will be reset");
-			IniFile.AddHeaderComment(" This is the main server configuration");
-			IniFile.AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
-			IniFile.AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
+			IniFile->AddHeaderComment(" This is the main server configuration");
+			IniFile->AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
+			IniFile->AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
 		}
+		auto settingsRepo = cpp14::make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(overridesRepo));
 
 		LOG("Starting server...");
 		m_MojangAPI = new cMojangAPI;
-		bool ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
-		m_MojangAPI->Start(IniFile, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
-		if (!m_Server->InitServer(IniFile, ShouldAuthenticate))
+		bool ShouldAuthenticate = settingsRepo->GetValueSetB("Authentication", "Authenticate", true);
+		m_MojangAPI->Start(*settingsRepo, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
+		if (!m_Server->InitServer(*settingsRepo, ShouldAuthenticate))
 		{
-			IniFile.WriteFile("settings.ini");
+			settingsRepo->Flush();
 			LOGERROR("Failure starting server, aborting...");
 			return;
 		}
@@ -160,29 +164,29 @@ void cRoot::Start(void)
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
 		LOGD("Loading worlds...");
-		LoadWorlds(IniFile);
+		LoadWorlds(*settingsRepo);
 
 		LOGD("Loading plugin manager...");
 		m_PluginManager = new cPluginManager();
-		m_PluginManager->ReloadPluginsNow(IniFile);
+		m_PluginManager->ReloadPluginsNow(*settingsRepo);
 		
 		LOGD("Loading MonsterConfig...");
 		m_MonsterConfig = new cMonsterConfig;
 
 		// This sets stuff in motion
 		LOGD("Starting Authenticator...");
-		m_Authenticator.Start(IniFile);
+		m_Authenticator.Start(*settingsRepo);
 		
 		LOGD("Starting worlds...");
 		StartWorlds();
 		
-		if (IniFile.GetValueSetB("DeadlockDetect", "Enabled", true))
+		if (settingsRepo->GetValueSetB("DeadlockDetect", "Enabled", true))
 		{
 			LOGD("Starting deadlock detector...");
-			dd.Start(IniFile.GetValueSetI("DeadlockDetect", "IntervalSec", 20));
+			dd.Start(settingsRepo->GetValueSetI("DeadlockDetect", "IntervalSec", 20));
 		}
 		
-		IniFile.WriteFile("settings.ini");
+		settingsRepo->Flush();
 
 		LOGD("Finalising startup...");
 		if (m_Server->Start())
@@ -282,45 +286,44 @@ void cRoot::LoadGlobalSettings()
 
 
 
-void cRoot::LoadWorlds(cIniFile & IniFile)
+void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings)
 {
 	// First get the default world
-	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
+	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
 	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
-	int KeyNum = IniFile.FindKey("Worlds");
-	int NumWorlds = IniFile.GetNumValues(KeyNum);
-	if (NumWorlds <= 0)
+	auto Worlds = a_Settings.GetValues("Worlds");
+	if (Worlds.size() <= 0)
 	{
 		return;
 	}
 	
 	bool FoundAdditionalWorlds = false;
-	for (int i = 0; i < NumWorlds; i++)
+	for (auto WorldNameValue : Worlds)
 	{
-		AString ValueName = IniFile.GetValueName(KeyNum, i);
+		AString ValueName = WorldNameValue.first;
 		if (ValueName.compare("World") != 0)
 		{
 			continue;
 		}
-		AString WorldName = IniFile.GetValue(KeyNum, i);
+		AString WorldName = WorldNameValue.second;
 		if (WorldName.empty())
 		{
 			continue;
 		}
 		FoundAdditionalWorlds = true;
-		cWorld* NewWorld = new cWorld( WorldName.c_str());
-		m_WorldsByName[ WorldName ] = NewWorld;
+		cWorld * NewWorld = new cWorld(WorldName.c_str());
+		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds
 
 	if (!FoundAdditionalWorlds)
 	{
-		if (IniFile.GetKeyComment("Worlds", 0) != " World=secondworld")
+		if (a_Settings.GetKeyComment("Worlds", 0) != " World=secondworld")
 		{
-			IniFile.DeleteKeyComment("Worlds", 0);
-			IniFile.AddKeyComment("Worlds", " World=secondworld");
+			a_Settings.DeleteKeyComment("Worlds", 0);
+			a_Settings.AddKeyComment("Worlds", " World=secondworld");
 		}
 	}
 }

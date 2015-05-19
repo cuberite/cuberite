@@ -74,7 +74,7 @@ protected:
 	bool MoveItemsFromGrid(cBlockEntityWithItems & a_Entity);
 	
 	/// Moves one piece from the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
-	bool MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SrcSlotNum, bool a_AllowNewStacks);
+	bool MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SrcSlotNum);
 	
 	/// Moves items to the chest at the specified coords. Returns true if contents have changed
 	bool MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ);

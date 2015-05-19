@@ -108,7 +108,7 @@ private:
 			case E_BLOCK_ENCHANTMENT_TABLE:
 			case E_BLOCK_END_PORTAL:
 			case E_BLOCK_END_PORTAL_FRAME:
-			// Notice the lack of an E_BLOCK_ENDER_CHEST here; its because ender chests can totally be pushed/pulled in MCS :)
+			// Notice the lack of an E_BLOCK_ENDER_CHEST here; its because ender chests can totally be pushed / pulled in MCS :)
 			case E_BLOCK_FURNACE:
 			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:

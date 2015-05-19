@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Root.h"
+#include "tclap/CmdLine.h"
 
 #include <exception>
 #include <csignal>
@@ -14,7 +15,7 @@
 #include "OSSupport/NetworkSingleton.h"
 #include "BuildInfo.h"
 
-
+#include "MemorySettingsRepository.h"
 
 
 
@@ -206,7 +207,7 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 ////////////////////////////////////////////////////////////////////////////////
 // universalMain - Main startup logic for both standard running and as a service
 
-void universalMain()
+void universalMain(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 {
 	#ifdef _WIN32
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
@@ -226,7 +227,7 @@ void universalMain()
 	#endif
 	{
 		cRoot Root;
-		Root.Start();
+		Root.Start(std::move(overridesRepo));
 	}
 	#if !defined(ANDROID_NDK)
 	catch (std::exception & e)
@@ -257,7 +258,7 @@ DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
 	UNREFERENCED_PARAMETER(lpParam);
 
 	// Do the normal startup
-	universalMain();
+	universalMain(cpp14::make_unique<cMemorySettingsRepository>());
 
 	return ERROR_SUCCESS;
 }
@@ -363,14 +364,55 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 
 
 
+std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
+{
+	try
+	{
+		TCLAP::CmdLine cmd("MCServer");
+
+		TCLAP::ValueArg<int> slotsArg("s", "max-players", "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
+
+		TCLAP::MultiArg<int> portsArg("p", "port", "The port number the server should listen to", false, "port", cmd);
+
+		cmd.parse(argc, argv);
+
+		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
+
+		if (slotsArg.isSet())
+		{
+
+			int slots = slotsArg.getValue();
+
+			repo->AddValue("Server", "MaxPlayers", static_cast<Int64>(slots));
+
+		}
+
+		if (portsArg.isSet())
+		{
+			std::vector<int> ports = portsArg.getValue();
+			for (auto port : ports)
+			{
+				repo->AddValue("Server", "Port", static_cast<Int64>(port));
+			}
+		}
+
+		repo->SetReadOnly();
+
+		return repo;
+	}
+	catch (TCLAP::ArgException &e)
+	{
+		printf("error reading command line %s for arg %s", e.error().c_str(), e.argId().c_str());
+		return cpp14::make_unique<cMemorySettingsRepository>();
+	}
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // main:
 
-int main( int argc, char **argv)
+int main(int argc, char **argv)
 {
-	UNUSED(argc);
-	UNUSED(argv);
 	
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	InitLeakFinder();
@@ -424,6 +466,8 @@ int main( int argc, char **argv)
 
 	// DEBUG: test the dumpfile creation:
 	// *((int *)0) = 0;
+	
+	auto argsRepo = parseArguments(argc, argv);
 	
 	// Check if comm logging is to be enabled:
 	for (int i = 0; i < argc; i++)
@@ -483,7 +527,7 @@ int main( int argc, char **argv)
 	#endif
 	{
 		// Not running as a service, do normal startup
-		universalMain();
+		universalMain(std::move(argsRepo));
 	}
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)

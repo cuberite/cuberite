@@ -36,7 +36,6 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 				return;
 			}
 		}
-
 		MoveToPosition(m_Target->GetPosition());
 	}
 }

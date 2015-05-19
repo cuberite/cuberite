@@ -57,7 +57,7 @@
 	#include <stdlib.h>
 #endif
 
-
+#include "Broadcaster.h"
 
 
 
@@ -176,7 +176,7 @@ protected:
 		{
 			float PercentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
 			float ChunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / std::chrono::duration_cast<std::chrono::milliseconds>(Now - m_LastReportTime).count();
-			LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks/s)",
+			LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks / sec)",
 				m_World.GetName().c_str(), PercentDone, m_NumPrepared, m_MaxIdx, ChunkSpeed
 			);
 			m_LastReportTime = Now;
@@ -621,18 +621,18 @@ void cWorld::Start(void)
 	InitialiseAndLoadMobSpawningValues(IniFile);
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
 
-	m_ChunkMap = make_unique<cChunkMap>(this);
+	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
 	
 	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager  = make_unique<cSimulatorManager>(*this);
+	m_SimulatorManager  = cpp14::make_unique<cSimulatorManager>(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = make_unique<cSandSimulator>(*this, IniFile);
-	m_FireSimulator     = make_unique<cFireSimulator>(*this, IniFile);
+	m_SandSimulator     = cpp14::make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = cpp14::make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
 	// Water, Lava and Redstone simulators get registered in their initialize function.
@@ -767,7 +767,7 @@ eWeather cWorld::ChooseNewWeather()
 			
 		case eWeather_Rain:
 		{
-			// 1/8 chance of turning into a thunderstorm
+			// 1 / 8 chance of turning into a thunderstorm
 			return ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}
@@ -800,7 +800,7 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
 			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "RoughRavines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, TallGrass, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
 			break;
 		}
 		case dimNether:
@@ -1019,7 +1019,7 @@ void cWorld::TickWeather(float a_Dt)
 		// 0.5% chance per tick of thunderbolt
 		if (m_TickRand.randInt() % 199 == 0)
 		{
-			CastThunderbolt(0, 0, 0);  // TODO: find random possitions near players to cast thunderbolts.
+			CastThunderbolt(0, 0, 0);  // TODO: find random positions near players to cast thunderbolts.
 		}
 	}
 }
@@ -1119,7 +1119,7 @@ void cWorld::TickScheduledTasks(void)
 		auto WorldAge = m_WorldAge;
 
 		// Move all the due tasks from m_ScheduledTasks into Tasks:
-		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-basd for, we're modifying the container
+		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-based for, we're modifying the container
 		{
 			if ((*itr)->m_TargetTick < std::chrono::duration_cast<cTickTimeLong>(WorldAge).count())
 			{
@@ -1351,7 +1351,7 @@ bool cWorld::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 
 
-bool cWorld::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback& a_Callback)
+bool cWorld::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithBeaconAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1453,6 +1453,15 @@ bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithChunk(a_ChunkX, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)>  a_Callback)
+{
+	return m_ChunkMap->DoWithChunkAt(a_BlockPos, a_Callback);
 }
 
 
@@ -2241,14 +2250,6 @@ void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation
 
 
 
-void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount, a_Exclude);
-}
-
-
-
-
 
 void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
@@ -2679,7 +2680,7 @@ void cWorld::UnloadUnusedChunks(void)
 
 void cWorld::QueueUnloadUnusedChunks(void)
 {
-	QueueTask(make_unique<cWorld::cTaskUnloadUnusedChunks>());
+	QueueTask(cpp14::make_unique<cWorld::cTaskUnloadUnusedChunks>());
 }
 
 
@@ -3769,6 +3770,11 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 }
 
 
+
+cBroadcaster cWorld::GetBroadcaster()
+{
+	return cBroadcaster(this);
+}
 
 
 

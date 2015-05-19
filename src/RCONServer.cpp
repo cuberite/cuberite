@@ -134,15 +134,15 @@ cRCONServer::~cRCONServer()
 
 
 
-void cRCONServer::Initialize(cIniFile & a_IniFile)
+void cRCONServer::Initialize(cSettingsRepositoryInterface & a_Settings)
 {
-	if (!a_IniFile.GetValueSetB("RCON", "Enabled", false))
+	if (!a_Settings.GetValueSetB("RCON", "Enabled", false))
 	{
 		return;
 	}
 
 	// Read the password, don't allow an empty one:
-	m_Password = a_IniFile.GetValueSet("RCON", "Password", "");
+	m_Password = a_Settings.GetValueSet("RCON", "Password", "");
 	if (m_Password.empty())
 	{
 		LOGWARNING("RCON is requested, but the password is not set. RCON is now disabled.");
@@ -150,7 +150,7 @@ void cRCONServer::Initialize(cIniFile & a_IniFile)
 	}
 	
 	// Read the listening ports for RCON from config:
-	AStringVector Ports = ReadUpgradeIniPorts(a_IniFile, "RCON", "Ports", "PortsIPv4", "PortsIPv6", "25575");
+	AStringVector Ports = ReadUpgradeIniPorts(a_Settings, "RCON", "Ports", "PortsIPv4", "PortsIPv6", "25575");
 
 	// Start listening on each specified port:
 	for (auto port: Ports)

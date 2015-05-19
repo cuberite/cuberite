@@ -534,7 +534,55 @@ bool cPluginLua::OnEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_E
 
 
 
-bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+bool cPluginLua::OnEntityChangeWorld(cEntity & a_Entity, cWorld & a_World)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!m_LuaState.IsValid())
+	{
+		return false;
+	}
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_CHANGE_WORLD];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Entity, &a_World, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnEntityChangedWorld(cEntity & a_Entity, cWorld & a_World)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!m_LuaState.IsValid())
+	{
+		return false;
+	}
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_CHANGED_WORLD];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Entity, &a_World, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, cPluginManager::CommandResult & a_Result)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -545,7 +593,7 @@ bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Sp
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_EXECUTE_COMMAND];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Player, a_Split, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), a_Player, a_Split, a_EntireCommand, cLuaState::Return, res, a_Result);
 		if (res)
 		{
 			return true;
@@ -1884,6 +1932,8 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_DISCONNECT:                   return "OnDisconnect";
 		case cPluginManager::HOOK_PLAYER_ANIMATION:             return "OnPlayerAnimation";
 		case cPluginManager::HOOK_ENTITY_ADD_EFFECT:            return "OnEntityAddEffect";
+		case cPluginManager::HOOK_ENTITY_CHANGE_WORLD:          return "OnEntityChangeWorld";
+		case cPluginManager::HOOK_ENTITY_CHANGED_WORLD:         return "OnEntityChangedWorld";
 		case cPluginManager::HOOK_ENTITY_TELEPORT:              return "OnEntityTeleport";
 		case cPluginManager::HOOK_EXECUTE_COMMAND:              return "OnExecuteCommand";
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";

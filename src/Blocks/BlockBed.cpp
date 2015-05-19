@@ -14,7 +14,7 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	Vector3i ThisPos( a_BlockX, a_BlockY, a_BlockZ);
-	Vector3i Direction = MetaDataToDirection( OldMeta & 0x7);
+	Vector3i Direction = MetaDataToDirection( OldMeta & 0x3);
 	if (OldMeta & 0x8)
 	{
 		// Was pillow
@@ -111,7 +111,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					// Is foot end
 					VERIFY((Meta & 0x4) != 0x4);  // Occupied flag should never be set, else our compilator (intended) is broken
 
-					PillowDirection = MetaDataToDirection(Meta & 0x7);
+					PillowDirection = MetaDataToDirection(Meta & 0x3);
 					if (a_ChunkInterface.GetBlock(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 					{
 						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z);

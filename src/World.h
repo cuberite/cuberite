@@ -55,6 +55,7 @@ class cMobHeadEntity;
 class cCompositeChat;
 class cCuboid;
 class cSetChunkData;
+class cBroadcaster;
 
 
 typedef std::list< cPlayer * > cPlayerList;
@@ -151,10 +152,10 @@ public:
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 
-	/** Is the daylight cyclus enabled? */
+	/** Is the daylight cycle enabled? */
 	virtual bool IsDaylightCycleEnabled(void) const { return m_IsDaylightCycleEnabled; }
 
-	/** Sets the daylight cyclus to true/false. */
+	/** Sets the daylight cycle to true / false. */
 	virtual void SetDaylightCycleEnabled(bool a_IsDaylightCycleEnabled)
 	{
 		m_IsDaylightCycleEnabled = a_IsDaylightCycleEnabled;
@@ -243,7 +244,6 @@ public:
 	void BroadcastEntityStatus               (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
 	virtual void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
-	void BroadcastParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude = nullptr);  // tolua_export
 	void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
@@ -610,6 +610,9 @@ public:
 	/** Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
 
+	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback **/
+	bool DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback);
+
 	void GrowTreeImage(const sSetBlockVector & a_Blocks);
 	
 	// tolua_begin
@@ -828,6 +831,8 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
+
+	cBroadcaster GetBroadcaster();
 	
 private:
 
@@ -1062,7 +1067,7 @@ private:
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
 	
-	/** Handles the mob spawning/moving/destroying each tick */
+	/** Handles the mob spawning / moving / destroying each tick */
 	void TickMobs(std::chrono::milliseconds a_Dt);
 	
 	/** Executes all tasks queued onto the tick thread */

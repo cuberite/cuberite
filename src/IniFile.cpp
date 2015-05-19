@@ -1,11 +1,11 @@
 // IniFile.cpp:  Implementation of the CIniFile class.
 // Written by:   Adam Clauss
 // Email: cabadam@houston.rr.com
-// You may use this class/code as you wish in your programs.  Feel free to distribute it, and
+// You may use this class / code as you wish in your programs.  Feel free to distribute it, and
 // email suggested changes to me.
 //
 // Rewritten by: Shane Hill
-// Date:         21/08/2001
+// Date:         2001-08-21
 // Email:        Shane.Hill@dsto.defence.gov.au
 // Reason:       Remove dependancy on MFC. Code should compile on any
 //               platform.
@@ -49,6 +49,9 @@ cIniFile::cIniFile(void) :
 
 bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 {
+
+	m_Filename = a_FileName;
+
 	// Normally you would use ifstream, but the SGI CC compiler has
 	// a few bugs with ifstream. So ... fstream used.
 	fstream f;
@@ -56,7 +59,8 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 	AString   keyname, valuename, value;
 	AString::size_type pLeft, pRight;
 	bool IsFromExampleRedirect = false;
-	
+
+
 	f.open((FILE_IO_PREFIX + a_FileName).c_str(), ios::in);
 	if (f.fail())
 	{
@@ -650,7 +654,7 @@ void cIniFile::Clear(void)
 
 
 
-bool cIniFile::HasValue(const AString & a_KeyName, const AString & a_ValueName)
+bool cIniFile::HasValue(const AString & a_KeyName, const AString & a_ValueName) const
 {
 	// Find the key:
 	int keyID = FindKey(a_KeyName);
@@ -889,8 +893,36 @@ void cIniFile::RemoveBom(AString & a_line) const
 
 
 
+bool cIniFile::KeyExists(AString a_keyname) const
+{
+	return FindKey(a_keyname) != noID;
+}
+
+
+
+
+
+std::vector<std::pair<AString, AString>> cIniFile::GetValues(AString a_keyName)
+{
+	std::vector<std::pair<AString, AString>> ret;
+	int keyID = FindKey(a_keyName);
+	if (keyID == noID)
+	{
+		return ret;
+	}
+	for (size_t valueID = 0; valueID < keys[keyID].names.size(); ++valueID)
+	{
+		ret.emplace_back(keys[keyID].names[valueID], keys[keyID].values[valueID]);
+	}
+	return ret;
+}
+
+
+
+
+
 AStringVector ReadUpgradeIniPorts(
-	cIniFile & a_IniFile,
+	cSettingsRepositoryInterface & a_Settings,
 	const AString & a_KeyName,
 	const AString & a_PortsValueName,
 	const AString & a_OldIPv4ValueName,
@@ -899,28 +931,38 @@ AStringVector ReadUpgradeIniPorts(
 )
 {
 	// Read the regular value, but don't use the default (in order to detect missing value for upgrade):
-	AStringVector Ports = StringSplitAndTrim(a_IniFile.GetValue(a_KeyName, a_PortsValueName), ";,");
+
+	AStringVector Ports;
+
+	for (auto pair : a_Settings.GetValues(a_KeyName))
+	{
+		if (pair.first != a_PortsValueName)
+		{
+			continue;
+		}
+		AStringVector temp = StringSplitAndTrim(pair.second, ";,");
+		Ports.insert(Ports.end(), temp.begin(), temp.end());
+	}
 
 	if (Ports.empty())
 	{
 		// Historically there were two separate entries for IPv4 and IPv6, merge them and migrate:
-		AString Ports4 = a_IniFile.GetValue(a_KeyName, a_OldIPv4ValueName, a_DefaultValue);
-		AString Ports6 = a_IniFile.GetValue(a_KeyName, a_OldIPv6ValueName);
+		AString Ports4 = a_Settings.GetValue(a_KeyName, a_OldIPv4ValueName, a_DefaultValue);
+		AString Ports6 = a_Settings.GetValue(a_KeyName, a_OldIPv6ValueName);
 		Ports = MergeStringVectors(StringSplitAndTrim(Ports4, ";,"), StringSplitAndTrim(Ports6, ";,"));
-		a_IniFile.DeleteValue(a_KeyName, a_OldIPv4ValueName);
-		a_IniFile.DeleteValue(a_KeyName, a_OldIPv6ValueName);
+		a_Settings.DeleteValue(a_KeyName, a_OldIPv4ValueName);
+		a_Settings.DeleteValue(a_KeyName, a_OldIPv6ValueName);
 
 		// If those weren't present or were empty, use the default:"
 		if (Ports.empty())
 		{
 			Ports = StringSplitAndTrim(a_DefaultValue, ";,");
 		}
-		a_IniFile.SetValue(a_KeyName, a_PortsValueName, StringsConcat(Ports, ','));
+		a_Settings.SetValue(a_KeyName, a_PortsValueName, StringsConcat(Ports, ','));
 	}
 
 	return Ports;
 }
-
 
 
 

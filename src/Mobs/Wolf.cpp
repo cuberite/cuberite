@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
+#include "Broadcaster.h"
 
 
 
@@ -83,13 +84,13 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				SetIsTame(true);
 				SetOwner(a_Player.GetName(), a_Player.GetUUID());
 				m_World->BroadcastEntityStatus(*this, esWolfTamed);
-				m_World->BroadcastParticleEffect("heart", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
+				m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 			}
 			else
 			{
 				// Taming failed
 				m_World->BroadcastEntityStatus(*this, esWolfTaming);
-				m_World->BroadcastParticleEffect("smoke", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
+				m_World->GetBroadcaster().BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 			}
 		}
 	}

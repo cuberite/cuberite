@@ -1,14 +1,14 @@
 // IniFile.cpp:  Implementation of the CIniFile class.
 // Written by:   Adam Clauss
 // Email: cabadam@tamu.edu
-// You may use this class/code as you wish in your programs.  Feel free to distribute it, and
+// You may use this class / code as you wish in your programs.  Feel free to distribute it, and
 // email suggested changes to me.
 //
 // Rewritten by: Shane Hill
-// Date:         21/08/2001
+// Date:         2001-08-21
 // Email:        Shane.Hill@dsto.defence.gov.au
 // Reason:       Remove dependancy on MFC. Code should compile on any
-//               platform. Tested on Windows/Linux/Irix
+//               platform. Tested on Windows / Linux / Irix
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -18,7 +18,7 @@
 #pragma once
 
 
-
+#include "SettingsRepositoryInterface.h"
 
 #define MAX_KEYNAME    128
 #define MAX_VALUENAME  128
@@ -30,10 +30,12 @@
 
 // tolua_begin
 
-class cIniFile
+class cIniFile : public cSettingsRepositoryInterface
 {
 private:
 	bool m_IsCaseInsensitive;
+
+	AString m_Filename;
 	
 	struct key
 	{
@@ -53,14 +55,18 @@ private:
 	void RemoveBom(AString & a_line) const;
 	
 public:
-
-	enum errors
-	{
-		noID = -1,
-	};
 	
 	/// Creates a new instance with no data
 	cIniFile(void);
+
+// tolua_end
+	virtual ~cIniFile() = default;
+
+	virtual std::vector<std::pair<AString, AString>> GetValues(AString a_keyName) override;
+
+	virtual bool KeyExists(const AString a_keyName) const override;
+
+// tolua_begin
 
 	// Sets whether or not keynames and valuenames should be case sensitive.
 	// The default is case insensitive.
@@ -77,11 +83,13 @@ public:
 	/// Writes data stored in class to the specified ini file
 	bool WriteFile(const AString & a_FileName) const;
 
+	virtual bool Flush() override { return WriteFile(m_Filename); }
+
 	/// Deletes all stored ini data (but doesn't touch the file)
 	void Clear(void);
 	
 	/** Returns true iff the specified value exists. */
-	bool HasValue(const AString & a_KeyName, const AString & a_ValueName);
+	bool HasValue(const AString & a_KeyName, const AString & a_ValueName) const;
 
 	/// Returns index of specified key, or noID if not found
 	int FindKey(const AString & keyname) const;
@@ -108,7 +116,7 @@ public:
 
 	// Gets value of [keyname] valuename =.
 	// Overloaded to return string, int, and double.
-	// Returns defValue if key/value not found.
+	// Returns defValue if key / value not found.
 	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const;
 	AString GetValue (const int keyID,    const int valueID,    const AString & defValue = "")    const;
 	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;
@@ -217,12 +225,12 @@ public:
 
 
 
-/** Reads the list of ports from the INI file, possibly upgrading from IPv4/IPv6-specific values into new version-agnostic value.
+/** Reads the list of ports from the INI file, possibly upgrading from IPv4 / IPv6-specific values into new version-agnostic value.
 Reads the list of ports from a_PortsValueName. If that value doesn't exist or is empty, the list is combined from values
 in a_OldIPv4ValueName and a_OldIPv6ValueName; in this case the old values are removed from the INI file.
 If there is none of the three values or they are all empty, the default is used and stored in the Ports value. */
 AStringVector ReadUpgradeIniPorts(
-	cIniFile & a_IniFile,
+	cSettingsRepositoryInterface & a_Settings,
 	const AString & a_KeyName,
 	const AString & a_PortsValueName,
 	const AString & a_OldIPv4ValueName,

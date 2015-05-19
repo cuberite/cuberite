@@ -1280,7 +1280,7 @@ static int tolua_cRankManager_SetRankVisuals(lua_State * L)
 
 
 
-void ManualBindings::BindRankManager(lua_State * tolua_S)
+void cManualBindings::BindRankManager(lua_State * tolua_S)
 {
 	// Create the cRankManager class in the API:
 	tolua_usertype(tolua_S, "cRankManager");

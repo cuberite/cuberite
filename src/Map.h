@@ -140,7 +140,7 @@ public:
 	/** Update a circular region around the specified player. */
 	void UpdateRadius(cPlayer & a_Player, unsigned int a_Radius);
 
-	/** Send next update packet to the specified player and remove invalid decorators/clients. */
+	/** Send next update packet to the specified player and remove invalid decorators / clients. */
 	void UpdateClient(cPlayer * a_Player);
 
 	// tolua_begin

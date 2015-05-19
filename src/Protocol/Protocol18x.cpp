@@ -479,7 +479,7 @@ void cProtocol180::SendEntityVelocity(const cEntity & a_Entity)
 	
 	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// 400 = 8000 / 20 ... Conversion from our speed in m/s to 8000 m/tick
+	// 400 = 8000 / 20 ... Conversion from our speed in m / s to 8000 m / tick
 	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedY() * 400));
 	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedZ() * 400));
@@ -796,6 +796,50 @@ void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	Pkt.WriteBEFloat(a_OffsetZ);
 	Pkt.WriteBEFloat(a_ParticleData);
 	Pkt.WriteBEInt32(a_ParticleAmount);
+}
+
+
+
+
+
+void cProtocol180::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	int ParticleID = GetParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, 0x2A);
+	Pkt.WriteBEInt32(ParticleID);
+	Pkt.WriteBool(false);
+	Pkt.WriteBEFloat(a_Src.x);
+	Pkt.WriteBEFloat(a_Src.y);
+	Pkt.WriteBEFloat(a_Src.z);
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+	switch (ParticleID)
+	{
+		// iconcrack
+		case 36:
+		{
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[1]));
+			break;
+		}
+		// blockcrack
+		// blockdust
+		case 37:
+		case 38:
+		{
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
 }
 
 
@@ -2221,7 +2265,7 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 	{
 		return;
 	}
-	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutside : caLeftClick);
+	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick);
 }
 
 
@@ -2710,7 +2754,7 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent/backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 							}
 
 							a_Item.m_Lore = Lore;

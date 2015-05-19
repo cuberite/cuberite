@@ -19,13 +19,13 @@ extern "C"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 
-// fwd: SQLite/lsqlite3.c
+// fwd: "SQLite/lsqlite3.c"
 extern "C"
 {
 	int luaopen_lsqlite3(lua_State * L);
 }
 
-// fwd: LuaExpat/lxplib.c:
+// fwd: "LuaExpat/lxplib.c":
 extern "C"
 {
 	int luaopen_lxp(lua_State * L);
@@ -107,7 +107,7 @@ void cLuaState::Create(void)
 void cLuaState::RegisterAPILibs(void)
 {
 	tolua_AllToLua_open(m_LuaState);
-	ManualBindings::Bind(m_LuaState);
+	cManualBindings::Bind(m_LuaState);
 	DeprecatedBindings::Bind(m_LuaState);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
@@ -530,42 +530,6 @@ void cLuaState::Push(bool a_Value)
 
 
 
-void cLuaState::Push(cBlockEntity * a_BlockEntity)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_BlockEntity, (a_BlockEntity == nullptr) ? "cBlockEntity" : a_BlockEntity->GetClass());
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cChunkDesc * a_ChunkDesc)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_ChunkDesc, "cChunkDesc");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cClientHandle * a_Client)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
@@ -632,42 +596,6 @@ void cLuaState::Push(cEntity * a_Entity)
 
 
 
-void cLuaState::Push(cHopperEntity * a_Hopper)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Hopper, "cHopperEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cItem * a_Item)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Item, "cItem");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cItems * a_Items)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Items, "cItems");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(cLuaServerHandle * a_ServerHandle)
 {
 	ASSERT(IsValid());
@@ -704,126 +632,6 @@ void cLuaState::Push(cLuaUDPEndpoint * a_UDPEndpoint)
 
 
 
-void cLuaState::Push(cMonster * a_Monster)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Monster, "cMonster");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPickup * a_Pickup)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPlayer * a_Player)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPlugin * a_Plugin)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Plugin, "cPlugin");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPluginLua * a_Plugin)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Plugin, "cPluginLua");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cTNTEntity * a_TNTEntity)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_TNTEntity, "cTNTEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWebAdmin * a_WebAdmin)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_WebAdmin, "cWebAdmin");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWindow * a_Window)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Window, "cWindow");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWorld * a_World)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(double a_Value)
 {
 	ASSERT(IsValid());
@@ -848,42 +656,6 @@ void cLuaState::Push(int a_Value)
 
 
 
-void cLuaState::Push(TakeDamageInfo * a_TDI)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_TDI, "TakeDamageInfo");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(Vector3d * a_Vector)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<double>");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(Vector3i * a_Vector)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<int>");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(void * a_Ptr)
 {
 	UNUSED(a_Ptr);
@@ -899,6 +671,10 @@ void cLuaState::Push(void * a_Ptr)
 	m_NumCurrentFunctionArgs += 1;
 }
 
+
+
+
+
 void cLuaState::Push(std::chrono::milliseconds a_Value)
 {
 	ASSERT(IsValid());
@@ -911,6 +687,7 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 
 
 
+/*
 void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 {
 	ASSERT(IsValid());
@@ -918,6 +695,7 @@ void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 	tolua_pushusertype(m_LuaState, a_Object, a_Type);
 	m_NumCurrentFunctionArgs += 1;
 }
+*/
 
 
 
@@ -958,6 +736,18 @@ void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_Result = static_cast<cPluginManager::CommandResult>(static_cast<int>((tolua_tonumber(m_LuaState, a_StackPos, a_Result))));
+	}
+}
+
+
+
+
+
 void cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
 {
 	a_Ref.RefStack(*this, a_StackPos);
@@ -972,6 +762,18 @@ void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
 		a_ReturnedVal = tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
+	}
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
 	}
 }
 
@@ -1000,132 +802,6 @@ void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
 		a_ReturnedVal = static_cast<int>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pBlockArea & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cBlockArea", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cBlockArea **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cBoundingBox", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cBoundingBox **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pMapManager & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cMapManager", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cMapManager **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pPluginManager & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cPluginManager", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cPluginManager **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pRoot & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cRoot", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cRoot **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pScoreboard & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cScoreboard", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cScoreboard **>(lua_touserdata(m_LuaState, a_StackPos)));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
-{
-	if (lua_isnil(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = nullptr;
-		return;
-	}
-	tolua_Error err;
-	if (tolua_isusertype(m_LuaState, a_StackPos, "cWorld", false, &err))
-	{
-		a_ReturnedVal = *(reinterpret_cast<cWorld **>(lua_touserdata(m_LuaState, a_StackPos)));
 	}
 }
 
@@ -1251,6 +927,9 @@ bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
 		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
+
+		BreakIntoDebugger(m_LuaState);
+
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1398,7 +1077,7 @@ bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 bool cLuaState::CheckParamEnd(int a_Param)
 {
 	tolua_Error tolua_err;
-	if (tolua_isnoobj(m_LuaState, a_Param, &tolua_err))
+	if (tolua_isnoobj(m_LuaState, a_Param, &tolua_err) == 1)
 	{
 		return true;
 	}
@@ -1409,6 +1088,30 @@ bool cLuaState::CheckParamEnd(int a_Param)
 	AString ErrMsg = Printf("#ferror in function '%s': Too many arguments.", (entry.name != nullptr) ? entry.name : "?");
 	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 	return false;
+}
+
+
+
+
+
+bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
+{
+	ASSERT(IsValid());
+	
+	tolua_Error tolua_err;
+	return (tolua_isusertype(m_LuaState, a_Param, a_UserType.c_str(), 0, &tolua_err) == 1);
+}
+
+
+
+
+
+bool cLuaState::IsParamNumber(int a_Param)
+{
+	ASSERT(IsValid());
+	
+	tolua_Error tolua_err;
+	return (tolua_isnumber(m_LuaState, a_Param, 0, &tolua_err) == 1);
 }
 
 
@@ -1494,7 +1197,7 @@ int cLuaState::CallFunctionWithForeignParams(
 	if (!PushFunction(a_FunctionName.c_str()))
 	{
 		LOGWARNING("Function '%s' not found", a_FunctionName.c_str());
-		lua_pop(m_LuaState, 2);
+		lua_settop(m_LuaState, OldTop);
 		return -1;
 	}
 
@@ -1502,7 +1205,7 @@ int cLuaState::CallFunctionWithForeignParams(
 	if (CopyStackFrom(a_SrcLuaState, a_SrcParamStart, a_SrcParamEnd) < 0)
 	{
 		// Something went wrong, fix the stack and exit
-		lua_pop(m_LuaState, 2);
+		lua_settop(m_LuaState, OldTop);
 		m_NumCurrentFunctionArgs = -1;
 		m_CurrentFunctionName.clear();
 		return -1;
@@ -1513,13 +1216,8 @@ int cLuaState::CallFunctionWithForeignParams(
 	if (ReportErrors(s))
 	{
 		LOGWARN("Error while calling function '%s' in '%s'", a_FunctionName.c_str(), m_SubsystemName.c_str());
-		// Fix the stack.
-		// We don't know how many values have been pushed, so just get rid of any that weren't there initially
-		int CurTop = lua_gettop(m_LuaState);
-		if (CurTop > OldTop)
-		{
-			lua_pop(m_LuaState, CurTop - OldTop);
-		}
+		// Reset the stack:
+		lua_settop(m_LuaState, OldTop);
 		
 		// Reset the internal checking mechanisms:
 		m_NumCurrentFunctionArgs = -1;
@@ -1671,7 +1369,30 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 {
 	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
 	LogStackTrace(a_LuaState, 1);
+	BreakIntoDebugger(a_LuaState);
 	return 1;  // We left the error message on the stack as the return value
+}
+
+
+
+
+
+int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
+{
+	// Call the BreakIntoDebugger function, if available:
+	lua_getglobal(a_LuaState, "BreakIntoDebugger");
+	if (!lua_isfunction(a_LuaState, -1))
+	{
+		LOGD("LUA: BreakIntoDebugger() not found / not a function");
+		lua_pop(a_LuaState, 1);
+		return 1;
+	}
+	lua_insert(a_LuaState, -2);  // Copy the string that has been passed to us
+	LOGD("Calling BreakIntoDebugger()...");
+	lua_call(a_LuaState, 1, 0);
+	LOGD("Returned from BreakIntoDebugger().");
+
+	return 0;
 }
 
 

@@ -18,6 +18,7 @@ SET (SRCS
 	BlockArea.cpp
 	BlockID.cpp
 	BlockInfo.cpp
+	Broadcaster.cpp
 	BoundingBox.cpp
 	ByteBuffer.cpp
 	ChatColor.cpp
@@ -47,11 +48,13 @@ SET (SRCS
 	Logger.cpp
 	Map.cpp
 	MapManager.cpp
+	MemorySettingsRepository.cpp
 	MobCensus.cpp
 	MobFamilyCollecter.cpp
 	MobProximityCounter.cpp
 	MobSpawner.cpp
 	MonsterConfig.cpp
+	OverridesSettingsRepository.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
 	RCONServer.cpp
@@ -77,6 +80,7 @@ SET (HDRS
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockTracer.h
+	Broadcaster.h
 	BoundingBox.h
 	BuildInfo.h.cmake
 	ByteBuffer.h
@@ -114,11 +118,13 @@ SET (HDRS
 	Map.h
 	MapManager.h
 	Matrix4.h
+	MemorySettingsRepository.h
 	MobCensus.h
 	MobFamilyCollecter.h
 	MobProximityCounter.h
 	MobSpawner.h
 	MonsterConfig.h
+	OverridesSettingsRepository.h
 	ProbabDistrib.h
 	RankManager.h
 	RCONServer.h
@@ -126,6 +132,7 @@ SET (HDRS
 	Scoreboard.h
 	Server.h
 	SetChunkData.h
+	SettingsRepositoryInterface.h
 	Statistics.h
 	StringCompression.h
 	StringUtils.h
@@ -140,6 +147,7 @@ SET (HDRS
 include_directories(".")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
 
 configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
 
@@ -276,7 +284,7 @@ if (MSVC)
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/MCServer/lua51.dll ./lua51.dll
 
 		# Regenerate bindings:
-		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here

@@ -164,7 +164,7 @@ public:
 	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
 	int FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLength = 0) const;
 
-	/** Returns the child tag of the specified path (Name1/Name2/Name3...), or -1 if no such tag. */
+	/** Returns the child tag of the specified path (Name1 / Name2 / Name3...), or -1 if no such tag. */
 	int FindTagByPath(int a_Tag, const AString & a_Path) const;
 	
 	eTagType GetType(int a_Tag) const { return m_Tags[(size_t)a_Tag].m_Type; }

@@ -118,7 +118,7 @@ void cPluginManager::ReloadPluginsNow(void)
 
 
 
-void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
+void cPluginManager::ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings)
 {
 	LOG("-- Loading Plugins --");
 
@@ -130,7 +130,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	RefreshPluginList();
 
 	// Load the plugins:
-	AStringVector ToLoad = GetFoldersToLoad(a_SettingsIni);
+	AStringVector ToLoad = GetFoldersToLoad(a_Settings);
 	for (auto & pluginFolder: ToLoad)
 	{
 		LoadPlugin(pluginFolder);
@@ -157,16 +157,16 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 
 
 
-void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
+void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings)
 {
-	a_SettingsIni.AddKeyName("Plugins");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=Debuggers");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=APIDump");
-	a_SettingsIni.AddValue("Plugins", "Plugin", "Core");
-	a_SettingsIni.AddValue("Plugins", "Plugin", "TransAPI");
-	a_SettingsIni.AddValue("Plugins", "Plugin", "ChatLog");
+	a_Settings.AddKeyName("Plugins");
+	a_Settings.AddKeyComment("Plugins", " Plugin=Debuggers");
+	a_Settings.AddKeyComment("Plugins", " Plugin=HookNotify");
+	a_Settings.AddKeyComment("Plugins", " Plugin=ChunkWorx");
+	a_Settings.AddKeyComment("Plugins", " Plugin=APIDump");
+	a_Settings.AddValue("Plugins", "Plugin", "Core");
+	a_Settings.AddValue("Plugins", "Plugin", "TransAPI");
+	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
 }
 
 
@@ -525,14 +525,50 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
-bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+bool cPluginManager::CallHookEntityChangeWorld(cEntity & a_Entity, cWorld & a_World)
+{
+	FIND_HOOK(HOOK_ENTITY_CHANGE_WORLD);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityChangeWorld(a_Entity, a_World))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_World)
+{
+	FIND_HOOK(HOOK_ENTITY_CHANGED_WORLD);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityChangedWorld(a_Entity, a_World))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnExecuteCommand(a_Player, a_Split))
+		if ((*itr)->OnExecuteCommand(a_Player, a_Split, a_EntireCommand, a_Result))
 		{
 			return true;
 		}
@@ -1445,14 +1481,25 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	if (cmd == m_Commands.end())
 	{
 		// Command not found
+		// If it started with a slash, ask the plugins if they still want to handle it:
+		if (!a_Command.empty() && (a_Command[0] == '/'))
+		{
+			CommandResult Result = crUnknownCommand;
+			CallHookExecuteCommand(&a_Player, Split, a_Command, Result);
+			return Result;
+		}
 		return crUnknownCommand;
 	}
 
 	// Ask plugins first if a command is okay to execute the command:
-	if (CallHookExecuteCommand(&a_Player, Split))
+	CommandResult Result = crBlocked;
+	if (CallHookExecuteCommand(&a_Player, Split, a_Command, Result))
 	{
-		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player.GetName().c_str(), Split[0].c_str());
-		return crBlocked;
+		if (Result == crBlocked)
+		{
+			LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player.GetName().c_str(), Split[0].c_str());
+		}
+		return Result;
 	}
 
 	if (
@@ -1750,7 +1797,10 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	if (cmd == m_ConsoleCommands.end())
 	{
 		// Command not found
-		return false;
+		// Still notify the plugins (so that plugins such as Aliases can intercept unknown commands).
+		CommandResult res = crBlocked;
+		CallHookExecuteCommand(nullptr, a_Split, a_Command, res);
+		return (res == crExecuted);
 	}
 
 	if (cmd->second.m_Plugin == nullptr)
@@ -1760,10 +1810,10 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	}
 
 	// Ask plugins first if a command is okay to execute the console command:
-	if (CallHookExecuteCommand(nullptr, a_Split))
+	CommandResult res = crBlocked;
+	if (CallHookExecuteCommand(nullptr, a_Split, a_Command, res))
 	{
-		a_Output.Out("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
-		return false;
+		return (res == crExecuted);
 	}
 
 	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output, a_Command);
@@ -1882,25 +1932,23 @@ size_t cPluginManager::GetNumLoadedPlugins(void) const
 
 
 
-AStringVector cPluginManager::GetFoldersToLoad(cIniFile & a_SettingsIni)
+AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_Settings)
 {
 	// Check if the Plugins section exists.
-	int KeyNum = a_SettingsIni.FindKey("Plugins");
-	if (KeyNum == -1)
+	if (a_Settings.KeyExists("Plugins"))
 	{
-		InsertDefaultPlugins(a_SettingsIni);
-		KeyNum = a_SettingsIni.FindKey("Plugins");
+		InsertDefaultPlugins(a_Settings);
 	}
 
 	// Get the list of plugins to load:
 	AStringVector res;
-	int NumPlugins = a_SettingsIni.GetNumValues(KeyNum);
-	for (int i = 0; i < NumPlugins; i++)
+	auto Values = a_Settings.GetValues("Plugins");
+	for (auto NameValue : Values)
 	{
-		AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
+		AString ValueName = NameValue.first;
 		if (ValueName.compare("Plugin") == 0)
 		{
-			AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
+			AString PluginFile = NameValue.second;
 			if (!PluginFile.empty())
 			{
 				res.push_back(PluginFile);

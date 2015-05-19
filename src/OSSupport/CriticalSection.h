@@ -13,7 +13,7 @@ public:
 	void Lock(void);
 	void Unlock(void);
 	
-	// IsLocked/IsLockedByCurrentThread are only used in ASSERT statements, but because of the changes with ASSERT they must always be defined
+	// IsLocked / IsLockedByCurrentThread are only used in ASSERT statements, but because of the changes with ASSERT they must always be defined
 	// The fake versions (in Release) will not effect the program in any way
 	#ifdef _DEBUG
 		cCriticalSection(void);

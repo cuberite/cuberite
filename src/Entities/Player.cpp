@@ -355,7 +355,7 @@ float cPlayer::GetXpPercentage()
 	int currentLevel_XpBase = XpForLevel(currentLevel);
 
 	return static_cast<float>(m_CurrentXp - currentLevel_XpBase) /
-		static_cast<float>(XpForLevel(1+currentLevel) - currentLevel_XpBase);
+		static_cast<float>(XpForLevel(1 + currentLevel) - currentLevel_XpBase);
 }
 
 
@@ -364,7 +364,7 @@ float cPlayer::GetXpPercentage()
 
 bool cPlayer::SetCurrentExperience(int a_CurrentXp)
 {
-	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<int>().max() - m_LifetimeTotalXp)))
+	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<int>::max() - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false;  // oops, they gave us a dodgey number
@@ -403,7 +403,7 @@ int cPlayer::DeltaExperience(int a_Xp_delta)
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", GetName().c_str(), a_Xp_delta, m_CurrentXp);
+	LOGD("Player \"%s\" gained / lost %d experience, total is now: %d", GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
 	m_bDirtyExperience = true;
@@ -1606,6 +1606,12 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		return false;
 	}
 	
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangeWorld(*this, *a_World))
+	{
+		// A Plugin doesn't allow the player to change the world
+		return false;
+	}
+
 	// Send the respawn packet:
 	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
 	{
@@ -1621,6 +1627,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	a_World->AddPlayer(this);
+	cWorld * OldWorld = cRoot::Get()->GetWorld(GetWorld()->GetName());  // Required for the hook HOOK_ENTITY_CHANGED_WORLD
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
 	// Update the view distance.
@@ -1635,6 +1642,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	// Broadcast the player into the new world.
 	a_World->BroadcastSpawnEntity(*this);
 	
+	// Player changed the world, call the hook
+	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *OldWorld);
+
 	return true;
 }
 
@@ -1771,7 +1781,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_LastBedPos.z = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
 
 	// Load the player stats.
-	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
+	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	StatSerializer.Load();
 	
@@ -1868,7 +1878,7 @@ bool cPlayer::SaveToDisk()
 	}
 
 	// Save the player stats.
-	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
+	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
@@ -2076,7 +2086,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		}
 		else
 		{
-			if (Value >= 25)  // Ignore small/slow movement
+			if (Value >= 25)  // Ignore small / slow movement
 			{
 				m_Stats.AddValue(statDistFlown, Value);
 			}

@@ -472,26 +472,26 @@ void cChunk::Stay(bool a_Stay)
 
 
 
-void cChunk::CollectMobCensus(cMobCensus& toFill)
+void cChunk::CollectMobCensus(cMobCensus & toFill)
 {
 	toFill.CollectSpawnableChunk(*this);
-	std::list<const Vector3d*> playerPositions;
-	cPlayer* currentPlayer;
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+	std::list<const Vector3d *> playerPositions;
+	cPlayer * currentPlayer;
+	for (auto itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
 	{
 		currentPlayer = (*itr)->GetPlayer();
 		playerPositions.push_back(&(currentPlayer->GetPosition()));
 	}
 
 	Vector3d currentPosition;
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (auto itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if ((*itr)->IsMob())
 		{
-			cMonster& Monster = (cMonster&)(**itr);
+			auto & Monster = reinterpret_cast<cMonster &>(**itr);
 			currentPosition = Monster.GetPosition();
-			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
+			for (auto itr2 = playerPositions.cbegin(); itr2 != playerPositions.cend(); ++itr2)
 			{
 				toFill.CollectMob(Monster, *this, (currentPosition - **itr2).SqrLength());
 			}
@@ -531,7 +531,7 @@ void cChunk::GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z)
 
 
 
-void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
+void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 {
 	int CenterX, CenterY, CenterZ;
 	GetRandomBlockCoords(CenterX, CenterY, CenterZ);
@@ -737,7 +737,7 @@ void cChunk::ProcessQueuedSetBlocks(void)
 			{
 				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
 				{
-					// Current world age is bigger than/equal to target world age - delay time reached AND
+					// Current world age is bigger than / equal to target world age - delay time reached AND
 					// Previous block type was the same as current block type (to prevent duplication)
 					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);  // SetMeta doesn't send to client
 					itr = m_SetBlockQueue.erase(itr);
@@ -751,7 +751,7 @@ void cChunk::ProcessQueuedSetBlocks(void)
 			}
 			else
 			{
-				// Current world age is bigger than/equal to target world age - delay time reached
+				// Current world age is bigger than / equal to target world age - delay time reached
 				SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
 				itr = m_SetBlockQueue.erase(itr);
 				LOGD("Successfully set queued block - previous type ignored");
@@ -1026,7 +1026,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		case E_BLOCK_FARMLAND:
 		{
 			// DEBUG: This is here to catch FS #349 - melons growing over other crops.
-			LOG("Growing melon/pumpkin overwriting %s, growing on %s",
+			LOG("Growing melon / pumpkin overwriting %s, growing on %s",
 				ItemTypeToString(BlockType[CheckType]).c_str(),
 				ItemTypeToString(Soil).c_str()
 			);
@@ -1827,7 +1827,7 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 		)
 		{
 			MarkDirty();
-			(reinterpret_cast<cSignEntity *>(*itr))->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
+			reinterpret_cast<cSignEntity *>(*itr)->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
 			m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
 			return true;
 		}
@@ -1839,7 +1839,7 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 
 
 
-void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity)
+void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
 	m_BlockEntities.remove(a_BlockEntity);

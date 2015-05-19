@@ -499,7 +499,7 @@ void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 	PushCornerBlocks(a_BlockX, h, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 1, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
 	h--;
 	
-	// Third and fourth layers - BigO2 and maybe 2*Corners:
+	// Third and fourth layers - BigO2 and maybe 2 * Corners:
 	for (int Row = 0; Row < 2; Row++)
 	{
 		PushCoordBlocks (a_BlockX, h, a_BlockZ, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
@@ -673,7 +673,7 @@ void GetTallBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_
 	PushCornerBlocks(a_BlockX, h, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 1, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
 	h--;
 	
-	// Third and fourth layers - BigO2 and maybe 2*Corners:
+	// Third and fourth layers - BigO2 and maybe 2 * Corners:
 	for (int Row = 0; Row < 2; Row++)
 	{
 		PushCoordBlocks (a_BlockX, h, a_BlockZ, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);

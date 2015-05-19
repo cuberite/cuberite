@@ -1309,7 +1309,8 @@ bool cEntity::DetectPortal()
 
 					if (IsPlayer())
 					{
-						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
+						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);
 					}
 					
 					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
@@ -1402,13 +1403,24 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		return false;
 	}
 
+	//  Ask the plugins if the entity is allowed to change the world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangeWorld(*this, *a_World))
+	{
+		// A Plugin doesn't allow the entity to change the world
+		return false;
+	}
+
 	// Remove all links to the old world
 	SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	// Queue add to new world
 	a_World->AddEntity(this);
+	cWorld * OldWorld = cRoot::Get()->GetWorld(GetWorld()->GetName());  // Required for the hook HOOK_ENTITY_CHANGED_WORLD
 	SetWorld(a_World);
+
+	// Entity changed the world, call the hook
+	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *OldWorld);
 
 	return true;
 }
@@ -1688,8 +1700,8 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 				{
 					m_World->BroadcastEntityRelMove(*this, (char)DiffX, (char)DiffY, (char)DiffZ, a_Exclude);
 				}
-				// Clients seem to store two positions, one for the velocity packet and one for the teleport/relmove packet
-				// The latter is only changed with a relmove/teleport, and m_LastPos stores this position
+				// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
+				// The latter is only changed with a relmove / teleport, and m_LastPos stores this position
 				m_LastPos = GetPosition();
 			}
 			else

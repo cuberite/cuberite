@@ -180,6 +180,13 @@ protected:
 	/** Coordinates for the ultimate, final destination last given to the pathfinder. */
 	Vector3d m_PathFinderDestination;
 
+	/** True if there's no path to target and we're walking to an approximated location. */
+	bool m_NoPathToTarget;
+
+	/** Whether The mob has finished their path, note that this does not imply reaching the destination,
+	the destination may sometimes differ from the current path. */
+	bool m_NoMoreWayPoints;
+
 	/** Finds the lowest non-air block position (not the highest, as cWorld::GetHeight does)
 	If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
 	If current Y is solid, goes up to find first nonsolid block, and returns that.
@@ -203,7 +210,17 @@ protected:
 	Returns if a path is ready, and therefore if the mob should move to m_NextWayPointPosition
 	*/
 	bool TickPathFinding(cChunk & a_Chunk);
+
+	/** Move in a straight line to the next waypoint in the path, will jump if needed. */
 	void MoveToWayPoint(cChunk & a_Chunk);
+
+	/** Ensures the destination is not buried underground or under water. Also ensures the destination is not in the air.
+	Only the Y coordinate of m_FinalDestination might be changed.
+	1. If m_FinalDestination is the position of a water block, m_FinalDestination's Y will be modified to point to the heighest water block in the pool in the current column.
+	2. If m_FinalDestination is the position of a solid, m_FinalDestination's Y will be modified to point to the first airblock above the solid in the current column.
+	3. If m_FinalDestination is the position of an air block, Y will keep decreasing until hitting either a solid or water.
+	Now either 1 or 2 is performed. */
+	bool EnsureProperDestination(cChunk & a_Chunk);
 
 	/** Resets a pathfinding task, be it due to failure or something else
 	Resets the pathfinder. If m_IsFollowingPath is true, TickPathFinding starts a brand new path.
@@ -214,7 +231,7 @@ protected:
 	Calls ResetPathFinding and sets m_IsFollowingPath to false */
 	void StopMovingToPosition();
 
-	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
+	/** Sets the body yaw and head yaw / pitch based on next / ultimate destinations */
 	void SetPitchAndYawFromDestination(void);
 
 	virtual void HandleFalling(void);

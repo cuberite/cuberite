@@ -32,50 +32,13 @@ extern "C"
 
 #include "../Vector3.h"
 #include "../Defines.h"
+#include "PluginManager.h"
+#include "LuaState_Typedefs.inc"
 
-
-
-
-
-class cBlockArea;
-class cBlockEntity;
-class cBoundingBox;
-class cChunkDesc;
-class cClientHandle;
-class cCraftingGrid;
-class cCraftingRecipe;
-class cEntity;
-class cHopperEntity;
-class cItem;
-class cItems;
+// fwd:
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
-class cMapManager;
-class cMonster;
-class cPickup;
-class cPlayer;
-class cPlugin;
-class cPluginLua;
-class cPluginManager;
-class cProjectileEntity;
-class cRoot;
-class cScoreboard;
-class cTNTEntity;
-class cWebAdmin;
-class cWindow;
-class cWorld;
-struct HTTPRequest;
-struct HTTPTemplateRequest;
-struct TakeDamageInfo;
-
-typedef cBlockArea *     pBlockArea;
-typedef cBoundingBox *   pBoundingBox;
-typedef cMapManager *    pMapManager;
-typedef cPluginManager * pPluginManager;
-typedef cRoot *          pRoot;
-typedef cScoreboard *    pScoreboard;
-typedef cWorld *         pWorld;
 
 
 
@@ -213,52 +176,30 @@ public:
 	void Push(const Vector3i & a_Vector);
 	void Push(const Vector3i * a_Vector);
 
-	// Push a value onto the stack (keep alpha-sorted):
+	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
-	void Push(cBlockEntity * a_BlockEntity);
-	void Push(cChunkDesc * a_ChunkDesc);
-	void Push(cClientHandle * a_ClientHandle);
-	void Push(cEntity * a_Entity);
-	void Push(cHopperEntity * a_Hopper);
-	void Push(cItem * a_Item);
-	void Push(cItems * a_Items);
+	void Push(double a_Value);
+	void Push(int a_Value);
+	void Push(void * a_Ptr);
+	void Push(std::chrono::milliseconds a_time);
 	void Push(cLuaServerHandle * a_ServerHandle);
 	void Push(cLuaTCPLink * a_TCPLink);
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
-	void Push(cMonster * a_Monster);
-	void Push(cPickup * a_Pickup);
-	void Push(cPlayer * a_Player);
-	void Push(cPlugin * a_Plugin);
-	void Push(cPluginLua * a_Plugin);
-	void Push(cProjectileEntity * a_ProjectileEntity);
-	void Push(cTNTEntity * a_TNTEntity);
-	void Push(cWebAdmin * a_WebAdmin);
-	void Push(cWindow * a_Window);
-	void Push(cWorld * a_World);
-	void Push(double a_Value);
-	void Push(int a_Value);
-	void Push(TakeDamageInfo * a_TDI);
-	void Push(Vector3d * a_Vector);
-	void Push(Vector3i * a_Vector);
-	void Push(void * a_Ptr);
-	void Push(std::chrono::milliseconds a_time);
 	
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
 	// Enum values are clamped to their allowed range.
 	void GetStackValue(int a_StackPos, AString & a_Value);
 	void GetStackValue(int a_StackPos, BLOCKTYPE & a_Value);
 	void GetStackValue(int a_StackPos, bool & a_Value);
+	void GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
 	void GetStackValue(int a_StackPos, cRef & a_Ref);
 	void GetStackValue(int a_StackPos, double & a_Value);
 	void GetStackValue(int a_StackPos, eWeather & a_Value);
+	void GetStackValue(int a_StackPos, float & a_ReturnedVal);
 	void GetStackValue(int a_StackPos, int & a_Value);
-	void GetStackValue(int a_StackPos, pBlockArea & a_Value);
-	void GetStackValue(int a_StackPos, pBoundingBox & a_Value);
-	void GetStackValue(int a_StackPos, pMapManager & a_Value);
-	void GetStackValue(int a_StackPos, pPluginManager & a_Value);
-	void GetStackValue(int a_StackPos, pRoot & a_Value);
-	void GetStackValue(int a_StackPos, pScoreboard & a_Value);
-	void GetStackValue(int a_StackPos, pWorld & a_Value);
+
+	// Include the auto-generated Push and GetStackValue() functions:
+	#include "LuaState_Declaration.inc"
 	
 	/** Call the specified Lua function.
 	Returns true if call succeeded, false if there was an error.
@@ -307,6 +248,10 @@ public:
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);
 	
+	bool IsParamUserType(int a_Param, AString a_UserType);
+
+	bool IsParamNumber(int a_Param);
+
 	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
 	bool ReportErrors(int status);
 	
@@ -433,7 +378,7 @@ protected:
 	bool PushFunction(const cTableRef & a_TableRef);
 	
 	/** Pushes a usertype of the specified class type onto the stack */
-	void PushUserType(void * a_Object, const char * a_Type);
+	// void PushUserType(void * a_Object, const char * a_Type);
 
 	/**
 	Calls the function that has been pushed onto the stack by PushFunction(),
@@ -444,6 +389,9 @@ protected:
 	
 	/** Used as the error reporting function for function calls */
 	static int ReportFnCallErrors(lua_State * a_LuaState);
+
+	/** Tries to break into the MobDebug debugger, if it is installed. */
+	static int BreakIntoDebugger(lua_State * a_LuaState);
 } ;
 
 

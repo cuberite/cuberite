@@ -29,29 +29,32 @@ void cCommandOutputCallback::Out(const char * a_Fmt, ...)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cLogCommandOutputCallback:
+// cStringAccumCommandOutputCallback:
 
-void cLogCommandOutputCallback::Out(const AString & a_Text)
+void cStringAccumCommandOutputCallback::Out(const AString & a_Text)
 {
-	m_Buffer.append(a_Text);
+	m_Accum.append(a_Text);
 }
 
 
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// cLogCommandOutputCallback:
+
 void cLogCommandOutputCallback::Finished(void)
 {
 	// Log each line separately:
-	size_t len = m_Buffer.length();
+	size_t len = m_Accum.length();
 	size_t last = 0;
 	for (size_t i = 0; i < len; i++)
 	{
-		switch (m_Buffer[i])
+		switch (m_Accum[i])
 		{
 			case '\n':
 			{
-				LOG("%s", m_Buffer.substr(last, i - last).c_str());
+				LOG("%s", m_Accum.substr(last, i - last).c_str());
 				last = i + 1;
 				break;
 			}
@@ -59,11 +62,11 @@ void cLogCommandOutputCallback::Finished(void)
 	}  // for i - m_Buffer[]
 	if (last < len)
 	{
-		LOG("%s", m_Buffer.substr(last).c_str());
+		LOG("%s", m_Accum.substr(last).c_str());
 	}
 	
 	// Clear the buffer for the next command output:
-	m_Buffer.clear();
+	m_Accum.clear();
 }
 
 

@@ -40,29 +40,41 @@ public:
 	{
 		cFastRandom rand;
 
-		// Old leaves - 3 bits contain display; new leaves - 1st bit, shifted left two for saplings to understand
-		if (rand.NextInt(6) == 0)
+		// There is a chance to drop a sapling that varies depending on the type of leaf broken.
+		// TODO: Take into account fortune for sapling drops.
+		int chance;
+		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_JUNGLE))
+		{
+			// Jungle leaves have a 2.5% chance of dropping a sapling.
+			chance = rand.NextInt(40);
+		}
+		else
+		{
+			// Other leaves have a 5% chance of dropping a sapling.
+			chance = rand.NextInt(20);
+		}
+		if (chance == 0)
 		{
 			a_Pickups.push_back(
 				cItem(
 					E_BLOCK_SAPLING,
 					1,
-					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : (2 << (a_BlockMeta & 0x01))
+					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : (4 + (a_BlockMeta & 0x01))
 				)
 			);
 		}
-		
-		// 1 % chance of dropping an apple, if the leaves' type is Apple Leaves
+
+		// 0.5 % chance of dropping an apple, if the leaves' type is Apple Leaves
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
-			if (rand.NextInt(101) == 0)
+			if (rand.NextInt(200) == 0)
 			{
 				a_Pickups.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
 			}
 		}
 	}
-	
-	
+
+
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);

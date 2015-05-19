@@ -1,3 +1,4 @@
+
 #include "Globals.h"
 
 #include <cmath>
@@ -7,7 +8,7 @@
 
 #define DISTANCE_MANHATTAN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
-#define CALCULATIONS_PER_STEP 60  // Higher means more CPU load but faster path calculations.
+#define CALCULATIONS_PER_STEP 10  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
 enum class eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
@@ -43,7 +44,8 @@ cPath::cPath(
 	m_Destination(a_EndingPoint.Floor()),
 	m_Source(a_StartingPoint.Floor()),
 	m_CurrentPoint(0),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
-	m_Chunk(&a_Chunk)
+	m_Chunk(&a_Chunk),
+	m_BadChunkFound(false)
 {
 	// TODO: if src not walkable OR dest not walkable, then abort.
 	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
@@ -54,31 +56,7 @@ cPath::cPath(
 		return;
 	}
 
-	// If destination in water, set water surface as destination.
-	cChunk * Chunk = m_Chunk->GetNeighborChunk(m_Destination.x, m_Destination.z);
-	if ((Chunk != nullptr) && Chunk->IsValid())
-	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		int RelX = m_Destination.x - Chunk->GetPosX() * cChunkDef::Width;
-		int RelZ = m_Destination.z - Chunk->GetPosZ() * cChunkDef::Width;
-		bool inwater = false;
-		for (;;)
-		{
-			Chunk->GetBlockTypeMeta(RelX, m_Destination.y, RelZ, BlockType, BlockMeta);
-			if (BlockType != E_BLOCK_STATIONARY_WATER)
-			{
-				break;
-			}
-			inwater = true;
-			m_Destination+=Vector3d(0, 1, 0);
-		}
-		if (inwater)
-		{
-			m_Destination+=Vector3d(0, -1, 0);
-		}
-	}
-
+	m_NearestPointToTarget = GetCell(m_Source);
 	m_Status = ePathFinderStatus::CALCULATING;
 	m_StepsLeft = a_MaxSteps;
 
@@ -105,15 +83,20 @@ cPath::~cPath()
 ePathFinderStatus cPath::Step(cChunk & a_Chunk)
 {
 	m_Chunk = &a_Chunk;
-
 	if (m_Status != ePathFinderStatus::CALCULATING)
 	{
 		return m_Status;
 	}
 
-	if (m_StepsLeft == 0)
+	if (m_BadChunkFound)
 	{
 		FinishCalculation(ePathFinderStatus::PATH_NOT_FOUND);
+		return m_Status;
+	}
+
+	if (m_StepsLeft == 0)
+	{
+		AttemptToFindAlternative();
 	}
 	else
 	{
@@ -126,10 +109,21 @@ ePathFinderStatus cPath::Step(cChunk & a_Chunk)
 				break;  // if we're here, m_Status must have changed either to PATH_FOUND or PATH_NOT_FOUND.
 			}
 		}
-	}
 
-	m_Chunk = nullptr;
+		m_Chunk = nullptr;
+	}
 	return m_Status;
+}
+
+
+
+
+
+Vector3i cPath::AcceptNearbyPath()
+{
+	ASSERT(m_Status == ePathFinderStatus::NEARBY_FOUND);
+	m_Status = ePathFinderStatus::PATH_FOUND;
+	return m_Destination;
 }
 
 
@@ -143,6 +137,7 @@ bool cPath::IsSolid(const Vector3i & a_Location)
 	auto Chunk = m_Chunk->GetNeighborChunk(a_Location.x, a_Location.z);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
+		m_BadChunkFound = true;
 		return true;
 	}
 	m_Chunk = Chunk;
@@ -173,34 +168,29 @@ bool cPath::Step_Internal()
 {
 	cPathCell * CurrentCell = OpenListPop();
 
-	// Path not reachable, open list exauhsted.
+	// Path not reachable.
 	if (CurrentCell == nullptr)
 	{
-		FinishCalculation(ePathFinderStatus::PATH_NOT_FOUND);
-		ASSERT(m_Status == ePathFinderStatus::PATH_NOT_FOUND);
+		AttemptToFindAlternative();
 		return true;
 	}
 
 	// Path found.
-	if (
-			(CurrentCell->m_Location == m_Destination + Vector3i(0, 0, 1)) ||
-			(CurrentCell->m_Location == m_Destination + Vector3i(1, 0, 0)) ||
-			(CurrentCell->m_Location == m_Destination + Vector3i(-1, 0, 0)) ||
-			(CurrentCell->m_Location == m_Destination + Vector3i(0, 0, -1)) ||
-			(CurrentCell->m_Location == m_Destination + Vector3i(0, -1, 0))
-	)
+	if (CurrentCell->m_Location == m_Destination)
 	{
-		do
-		{
-			m_PathPoints.push_back(CurrentCell->m_Location);  // Populate the cPath with points.
-			CurrentCell = CurrentCell->m_Parent;
-		} while (CurrentCell != nullptr);
-
+		BuildPath();
 		FinishCalculation(ePathFinderStatus::PATH_FOUND);
 		return true;
 	}
 
-	// Calculation not finished yet, process a currentCell by inspecting all neighbors.
+	// Calculation not finished yet.
+	// Check if we have a new NearestPoint.
+	if (CurrentCell->m_H < m_NearestPointToTarget->m_H)
+	{
+		m_NearestPointToTarget = CurrentCell;
+	}
+
+	// process a currentCell by inspecting all neighbors.
 
 	// Check North, South, East, West on all 3 different heights.
 	int i;
@@ -237,15 +227,42 @@ bool cPath::Step_Internal()
 
 
 
+void cPath::AttemptToFindAlternative()
+{
+	if (m_NearestPointToTarget == GetCell(m_Source))
+	{
+		FinishCalculation(ePathFinderStatus::PATH_NOT_FOUND);
+	}
+	else
+	{
+		m_Destination = m_NearestPointToTarget->m_Location;
+		BuildPath();
+		FinishCalculation(ePathFinderStatus::NEARBY_FOUND);
+	}
+}
+
+
+
+
+
+void cPath::BuildPath()
+{
+	cPathCell * CurrentCell = GetCell(m_Destination);
+	do
+	{
+		m_PathPoints.push_back(CurrentCell->m_Location);  // Populate the cPath with points.
+		CurrentCell = CurrentCell->m_Parent;
+	} while (CurrentCell != nullptr);
+}
+
+
+
+
+
 void cPath::FinishCalculation()
 {
-	for (auto && pair : m_Map)
-	{
-		delete pair.second;
-	}
-
 	m_Map.clear();
-	m_OpenList.empty();
+	m_OpenList = std::priority_queue<cPathCell *, std::vector<cPathCell *>, compareHeuristics>{};
 }
 
 
@@ -254,6 +271,10 @@ void cPath::FinishCalculation()
 
 void cPath::FinishCalculation(ePathFinderStatus a_NewStatus)
 {
+	if (m_BadChunkFound)
+	{
+		a_NewStatus = ePathFinderStatus::PATH_NOT_FOUND;
+	}
 	m_Status = a_NewStatus;
 	FinishCalculation();
 }
@@ -279,7 +300,7 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 {
 	if (m_OpenList.size() == 0)
 	{
-		return nullptr;  // We've exhausted the search space and nothing was found, this will trigger a PATH_NOT_FOUND status.
+		return nullptr;  // We've exhausted the search space and nothing was found, this will trigger a PATH_NOT_FOUND or NEARBY_FOUND status.
 	}
 
 	cPathCell * Ret = m_OpenList.top();
@@ -372,7 +393,7 @@ cPathCell * cPath::GetCell(const Vector3i & a_Location)
 	{
 		Cell = new cPathCell();
 		Cell->m_Location = a_Location;
-		m_Map[a_Location] = Cell;
+		m_Map[a_Location] = UniquePtr<cPathCell>(Cell);
 		Cell->m_IsSolid = IsSolid(a_Location);
 		Cell->m_Status = eCellStatus::NOLIST;
 		#ifdef COMPILING_PATHFIND_DEBUGGER
@@ -384,6 +405,6 @@ cPathCell * cPath::GetCell(const Vector3i & a_Location)
 	}
 	else
 	{
-		return m_Map[a_Location];
+		return m_Map[a_Location].get();
 	}
 }

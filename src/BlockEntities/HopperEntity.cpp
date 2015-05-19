@@ -430,7 +430,7 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 	}
 
 	// Try move from the output slot:
-	if (MoveItemsFromSlot(*Furnace, cFurnaceEntity::fsOutput, true))
+	if (MoveItemsFromSlot(*Furnace, cFurnaceEntity::fsOutput))
 	{
 		cItem NewOutput(Furnace->GetOutputSlot());
 		Furnace->SetOutputSlot(NewOutput.AddCount(-1));
@@ -440,7 +440,7 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 	// No output moved, check if we can move an empty bucket out of the fuel slot:
 	if (Furnace->GetFuelSlot().m_ItemType == E_ITEM_BUCKET)
 	{
-		if (MoveItemsFromSlot(*Furnace, cFurnaceEntity::fsFuel, true))
+		if (MoveItemsFromSlot(*Furnace, cFurnaceEntity::fsFuel))
 		{
 			Furnace->SetFuelSlot(cItem());
 			return true;
@@ -460,28 +460,13 @@ bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 	cItemGrid & Grid = a_Entity.GetContents();
 	int NumSlots = Grid.GetNumSlots();
 
-	// First try adding items of types already in the hopper:
 	for (int i = 0; i < NumSlots; i++)
 	{
 		if (Grid.IsSlotEmpty(i))
 		{
 			continue;
 		}
-		if (MoveItemsFromSlot(a_Entity, i, false))
-		{
-			Grid.ChangeSlotCount(i, -1);
-			return true;
-		}
-	}
-
-	// No already existing stack can be topped up, try again with allowing new stacks:
-	for (int i = 0; i < NumSlots; i++)
-	{
-		if (Grid.IsSlotEmpty(i))
-		{
-			continue;
-		}
-		if (MoveItemsFromSlot(a_Entity, i, true))
+		if (MoveItemsFromSlot(a_Entity, i))
 		{
 			Grid.ChangeSlotCount(i, -1);
 			return true;
@@ -495,21 +480,19 @@ bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 
 
 /// Moves one piece of the specified a_Entity's slot itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
-bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SlotNum, bool a_AllowNewStacks)
+bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SlotNum)
 {
 	cItem One(a_Entity.GetSlot(a_SlotNum).CopyOne());
 	for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
 	{
 		if (m_Contents.IsSlotEmpty(i))
 		{
-			if (a_AllowNewStacks)
+			if (cPluginManager::Get()->CallHookHopperPullingItem(*m_World, *this, i, a_Entity, a_SlotNum))
 			{
-				if (cPluginManager::Get()->CallHookHopperPullingItem(*m_World, *this, i, a_Entity, a_SlotNum))
-				{
-					// Plugin disagrees with the move
-					continue;
-				}
+				// Plugin disagrees with the move
+				continue;
 			}
+
 			m_Contents.SetSlot(i, One);
 			return true;
 		}
@@ -521,8 +504,14 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 				continue;
 			}
 
+			auto PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
 			m_Contents.ChangeSlotCount(i, 1);
-			return true;
+
+			if (PreviousCount == m_Contents.GetSlot(i).m_ItemCount + 1)
+			{
+				// Successfully added a new item. (Failure condition consistutes: stack full)
+				return true;
+			}
 		}
 	}
 	return false;

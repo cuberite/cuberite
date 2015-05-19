@@ -65,7 +65,7 @@ cChunkMap::~cChunkMap()
 
 
 
-void cChunkMap::RemoveLayer( cChunkLayer* a_Layer)
+void cChunkMap::RemoveLayer(cChunkLayer * a_Layer)
 {
 	cCSLock Lock(m_CSLayers);
 	m_Layers.remove(a_Layer);
@@ -790,6 +790,28 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callb
 	return a_Callback.Item(Chunk);
 }
 
+
+bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
+	struct cCallBackWrapper : cChunkCallback
+	{
+		cCallBackWrapper(std::function<bool(cChunk &)> a_InnerCallback) :
+			m_Callback(a_InnerCallback)
+		{
+		}
+		
+		virtual bool Item(cChunk * a_Chunk)
+		{
+			return m_Callback(*a_Chunk);
+		}
+
+	private:
+		std::function<bool(cChunk &)> m_Callback;
+	} callback(a_Callback);
+	return DoWithChunk(ChunkX, ChunkZ, callback);
+}
 
 
 
@@ -2694,12 +2716,12 @@ void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cChunkMap::CollectMobCensus(cMobCensus& a_ToFill)
+void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto && layer: m_Layers)
 	{
-		(*itr)->CollectMobCensus(a_ToFill);
+		layer->CollectMobCensus(a_ToFill);
 	}  // for itr - m_Layers
 }
 
@@ -2708,12 +2730,12 @@ void cChunkMap::CollectMobCensus(cMobCensus& a_ToFill)
 
 
 
-void cChunkMap::SpawnMobs(cMobSpawner& a_MobSpawner)
+void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto && layer: m_Layers)
 	{
-		(*itr)->SpawnMobs(a_MobSpawner);
+		layer->SpawnMobs(a_MobSpawner);
 	}  // for itr - m_Layers
 }
 
@@ -2914,7 +2936,7 @@ cChunk * cChunkMap::cChunkLayer::FindChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus& a_ToFill)
+void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus & a_ToFill)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
@@ -2933,7 +2955,7 @@ void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus& a_ToFill)
 
 
 
-void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner& a_MobSpawner)
+void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner & a_MobSpawner)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{

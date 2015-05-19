@@ -436,7 +436,7 @@ bool cClientHandle::StreamNextChunk(void)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
-		// Get the chunk from the x/z coords.
+		// Get the chunk from the x / z coords.
 		int RangeX, RangeZ = 0;
 		cChunkDef::BlockToChunk(FloorC(Vector.x), FloorC(Vector.z), RangeX, RangeZ);
 
@@ -454,7 +454,7 @@ bool cClientHandle::StreamNextChunk(void)
 					continue;
 				}
 
-				// If the chunk already loading/loaded -> skip
+				// If the chunk already loading / loaded -> skip
 				if (
 					(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
 					(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
@@ -492,7 +492,7 @@ bool cClientHandle::StreamNextChunk(void)
 		{
 			cChunkCoords Coords = *itr;
 
-			// If the chunk already loading/loaded -> skip
+			// If the chunk already loading / loaded -> skip
 			if (
 				(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
 				(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
@@ -1154,7 +1154,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 
-	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig/aim bug in the client:
+	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig / aim bug in the client:
 	m_HasStartedDigging = true;
 	m_LastDigBlockX = a_BlockX;
 	m_LastDigBlockY = a_BlockY;
@@ -1201,7 +1201,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		(m_LastDigBlockZ != a_BlockZ)
 	)
 	{
-		LOGD("Prevented a dig/aim bug in the client (finish {%d, %d, %d} vs start {%d, %d, %d}, HSD: %s)",
+		LOGD("Prevented a dig / aim bug in the client (finish {%d, %d, %d} vs start {%d, %d, %d}, HSD: %s)",
 			a_BlockX, a_BlockY, a_BlockZ,
 			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
 			(m_HasStartedDigging ? "True" : "False")
@@ -1359,7 +1359,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	if (!CheckBlockInteractionsRate())
 	{
-		Kick("Too many blocks were placed/interacted with per unit time - hacked client?");
+		Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
 		return;
 	}
 	
@@ -1473,7 +1473,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
-	Msg.ParseText(a_Message);
+	Msg.ParseText(Message);
 	Msg.UnderlineUrls();
 	m_Player->GetWorld()->BroadcastChat(Msg);
 }
@@ -2368,6 +2368,15 @@ void cClientHandle::SendMapInfo(int a_ID, unsigned int a_Scale)
 void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
+}
+
+
+
+
+
+void cClientHandle::SendParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	m_Protocol->SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
 }
 
 

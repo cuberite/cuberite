@@ -492,7 +492,7 @@ void cProtocol172::SendEntityVelocity(const cEntity & a_Entity)
 	
 	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
 	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	// 400 = 8000 / 20 ... Conversion from our speed in m/s to 8000 m/tick
+	// 400 = 8000 / 20 ... Conversion from our speed in m / s to 8000 m / tick
 	Pkt.WriteBEInt16(static_cast<short>(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<short>(a_Entity.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<short>(a_Entity.GetSpeedZ() * 400));
@@ -798,6 +798,16 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	Pkt.WriteBEFloat(a_OffsetZ);
 	Pkt.WriteBEFloat(a_ParticleData);
 	Pkt.WriteBEInt32(a_ParticleAmount);
+}
+
+
+
+
+
+void cProtocol172::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	// 1.72 doesn't support extra data
+	this->SendParticleEffect(a_ParticleName, a_Src.x, a_Src.y, a_Src.z, a_Offset.x, a_Offset.y, a_Offset.z, a_ParticleData, a_ParticleAmount);
 }
 
 
@@ -2504,7 +2514,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent/backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 							}
 
 							a_Item.m_Lore = Lore;

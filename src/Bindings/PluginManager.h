@@ -24,6 +24,7 @@ class cPlayer;
 class cPlugin;
 class cProjectileEntity;
 class cWorld;
+class cSettingsRepositoryInterface;
 struct TakeDamageInfo;
 
 typedef SharedPtr<cPlugin> cPluginPtr;
@@ -85,6 +86,8 @@ public:
 		HOOK_DISCONNECT,
 		HOOK_PLAYER_ANIMATION,
 		HOOK_ENTITY_ADD_EFFECT,
+		HOOK_ENTITY_CHANGE_WORLD,
+		HOOK_ENTITY_CHANGED_WORLD,
 		HOOK_EXECUTE_COMMAND,
 		HOOK_EXPLODED,
 		HOOK_EXPLODING,
@@ -200,7 +203,9 @@ public:
 	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
 	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
 	bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
-	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == nullptr, it is a console cmd
+	bool CallHookEntityChangeWorld        (cEntity & a_Entity, cWorld & a_World);
+	bool CallHookEntityChangedWorld       (cEntity & a_Entity, cWorld & a_World);
+	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result);  // If a_Player == nullptr, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username);
@@ -299,7 +304,9 @@ public:
 	/** Returns true if the console command is in the command map */
 	bool IsConsoleCommandBound(const AString & a_Command);  // tolua_export
 	
-	/** Executes the command split into a_Split, as if it was given on the console. Returns true if executed. Output is sent to the a_Output callback */
+	/** Executes the command split into a_Split, as if it was given on the console.
+	Returns true if executed. Output is sent to the a_Output callback
+	Exported in ManualBindings.cpp with a different signature. */
 	bool ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_Command);
 	
 	/** Appends all commands beginning with a_Text (case-insensitive) into a_Results.
@@ -362,20 +369,20 @@ private:
 	/** Reloads all plugins, defaulting to settings.ini for settings location */
 	void ReloadPluginsNow(void);
 
-	/** Reloads all plugins with a cIniFile object expected to be initialised to settings.ini */
-	void ReloadPluginsNow(cIniFile & a_SettingsIni);
+	/** Reloads all plugins with a settings repo expected to be initialised to settings.ini */
+	void ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings);
 
 	/** Unloads all plugins */
 	void UnloadPluginsNow(void);
 
-	/** Handles writing default plugins if 'Plugins' key not found using a cIniFile object expected to be intialised to settings.ini */
-	void InsertDefaultPlugins(cIniFile & a_SettingsIni);
+	/** Handles writing default plugins if 'Plugins' key not found using a settings repo expected to be intialised to settings.ini */
+	void InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings);
 
 	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
 	CommandResult HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);
 
 	/** Returns the folders that are specified in the settings ini to load plugins from. */
-	AStringVector GetFoldersToLoad(cIniFile & a_SettingsIni);
+	AStringVector GetFoldersToLoad(cSettingsRepositoryInterface & a_Settings);
 } ;  // tolua_export
 
 

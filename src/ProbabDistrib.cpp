@@ -133,6 +133,7 @@ int cProbabDistrib::MapValue(int a_OrigValue) const
 	
 	// Linearly interpolate between Lo and Hi:
 	int ProbDif  = m_Cumulative[Hi].m_Probability - m_Cumulative[Lo].m_Probability;
+	ProbDif = (ProbDif != 0) ? ProbDif : 1;
 	int ValueDif = m_Cumulative[Hi].m_Value - m_Cumulative[Lo].m_Value;
 	return m_Cumulative[Lo].m_Value + (a_OrigValue - m_Cumulative[Lo].m_Probability) * ValueDif / ProbDif;
 }

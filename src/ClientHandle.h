@@ -22,6 +22,7 @@
 #include "ChunkSender.h"
 
 
+#include <array>
 
 
 
@@ -177,6 +178,7 @@ public:  // tolua_export
 	void SendMapInfo                    (int a_ID, unsigned int a_Scale);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
+	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
 	void SendPickupSpawn                (const cPickup & a_Pickup);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
@@ -389,7 +391,7 @@ private:
 
 	cPlayer * m_Player;
 	
-	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
+	bool m_HasSentDC;  ///< True if a Disconnect packet has been sent in either direction
 
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;
@@ -414,7 +416,7 @@ private:
 	int m_BlockDigAnimY;
 	int m_BlockDigAnimZ;
 
-	// To avoid dig/aim bug in the client, store the last position given in a DIG_START packet and compare to that when processing the DIG_FINISH packet:
+	// To avoid dig / aim bug in the client, store the last position given in a DIG_START packet and compare to that when processing the DIG_FINISH packet:
 	bool m_HasStartedDigging;
 	int m_LastDigBlockX;
 	int m_LastDigBlockY;

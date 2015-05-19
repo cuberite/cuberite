@@ -43,6 +43,7 @@ local g_IgnoredFiles =
 {
 	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
+	"Bindings/LuaState_Implementation.cpp",
 	"LeakFinder.cpp",
 	"LeakFinder.h",
 	"MersenneTwister.h",
@@ -149,6 +150,39 @@ local g_ViolationPatterns =
 	
 	-- No space before a closing parenthesis:
 	{" %)", "Remove the space before \")\""},
+	
+	-- Check spaces around "+":
+	{"^[a-zA-Z0-9]+%+[a-zA-Z0-9]+",                      "Add space around +"},
+	{"[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%+[a-zA-Z0-9]+",  "Add space around +"},
+	--[[
+	-- Cannot check these because of text such as "X+" and "+2" appearing in some comments.
+	{"^[a-zA-Z0-9]+ %+[a-zA-Z0-9]+",                     "Add space after +"},
+	{"[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+ %+[a-zA-Z0-9]+", "Add space after +"},
+	{"^[a-zA-Z0-9]+%+ [a-zA-Z0-9]+",                     "Add space before +"},
+	{"[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%+ [a-zA-Z0-9]+", "Add space before +"},
+	--]]
+	
+	-- Cannot check spaces around "-", because the minus is sometimes used as a hyphen between-words
+
+	-- Check spaces around "*":
+	{"^[a-zA-Z0-9]+%*[a-zA-Z0-9]+",                             "Add space around *"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%*[a-zA-Z0-9]+",  "Add space around *"},
+	{"^[a-zB-Z0-9]+%* [a-zA-Z0-9]+",                            "Add space before *"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zB-Z0-9]+%* [a-zA-Z0-9]+", "Add space before *"},
+
+	-- Check spaces around "/":
+	{"^[a-zA-Z0-9]+%/[a-zA-Z0-9]+",                            "Add space around /"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%/[a-zA-Z0-9]+", "Add space around /"},
+
+	-- Check spaces around "&":
+	{"^[a-zA-Z0-9]+%&[a-zA-Z0-9]+",                             "Add space around /"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%&[a-zA-Z0-9]+",  "Add space around /"},
+	{"^[a-zA-Z0-9]+%& [a-zA-Z0-9]+",                            "Add space before &"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%& [a-zA-Z0-9]+", "Add space before &"},
+	
+	-- We don't like "Type const *" and "Type const &". Use "const Type *" and "const Type &" instead:
+	{"const %&", "Use 'const Type &' instead of 'Type const &'"},
+	{"const %*", "Use 'const Type *' instead of 'Type const *'"},
 }
 
 

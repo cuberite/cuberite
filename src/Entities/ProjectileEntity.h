@@ -109,7 +109,7 @@ protected:
 	eKind m_ProjectileKind;
 	
 	/** The structure for containing the entity ID and name who has created this projectile
-	The ID and/or name may be nullptr (e.g. for dispensers/mobs). */
+	The ID and / or name may be nullptr (e.g. for dispensers / mobs). */
 	CreatorData m_CreatorData;
 	
 	/** True if the projectile has hit the ground and is stuck there */

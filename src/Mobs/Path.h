@@ -1,3 +1,4 @@
+
 #pragma once
 
 /* Wanna use the pathfinder? Put this in your header file:
@@ -11,7 +12,7 @@ Put this in your .cpp:
 */
 
 #ifdef COMPILING_PATHFIND_DEBUGGER
-	/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native/WiseOldMan95 to debug
+	/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native / WiseOldMan95 to debug
 	this class outside of MCServer. This preprocessor flag is never set when compiling MCServer. */
 	#include "PathFinderIrrlicht_Head.h"
 #endif
@@ -22,7 +23,7 @@ Put this in your .cpp:
 class cChunk;
 
 /* Various little structs and classes */
-enum class ePathFinderStatus {CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND};
+enum class ePathFinderStatus {CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND, NEARBY_FOUND};
 struct cPathCell;  // Defined inside Path.cpp
 class compareHeuristics
 {
@@ -61,8 +62,16 @@ public:
 	/** Destroys the path and frees its memory. */
 	~cPath();
 
-	/** Performs part of the path calculation and returns true if the path computation has finished. */
+	/** Performs part of the path calculation and returns the appropriate status.
+	If NEARBY_FOUND is returned, it means that the destination is not reachable, but a nearby destination
+	is reachable. If the user likes the alternative destination, they can call AcceptNearbyPath to treat the path as found,
+	and to make consequent calls to step return PATH_FOUND*/
 	ePathFinderStatus Step(cChunk & a_Chunk);
+
+	/** Called after the PathFinder's step returns NEARBY_FOUND.
+	Changes the PathFinder status from NEARBY_FOUND to PATH_FOUND, returns the nearby destination that
+	the PathFinder found a path to. */
+	Vector3i AcceptNearbyPath();
 
 	/* Point retrieval functions, inlined for performance. */
 	/** Returns the next point in the path. */
@@ -92,7 +101,10 @@ public:
 	/** Returns the total number of points this path has. */
 	inline int GetPointCount()
 	{
-		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
+		if (m_Status != ePathFinderStatus::PATH_FOUND)
+		{
+			return 0;
+		}
 		return m_PathPoints.size();
 	}
 
@@ -118,6 +130,8 @@ private:
 	bool Step_Internal();  // The public version just calls this version * CALCULATIONS_PER_CALL times.
 	void FinishCalculation();  // Clears the memory used for calculating the path.
 	void FinishCalculation(ePathFinderStatus a_NewStatus);  // Clears the memory used for calculating the path and changes the status.
+	void AttemptToFindAlternative();
+	void BuildPath();
 
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);
@@ -130,10 +144,11 @@ private:
 
 	/* Pathfinding fields */
 	std::priority_queue<cPathCell *,  std::vector<cPathCell *>,  compareHeuristics> m_OpenList;
-	std::unordered_map<Vector3i,  cPathCell *, VectorHasher> m_Map;
+	std::unordered_map<Vector3i,  UniquePtr<cPathCell>, VectorHasher> m_Map;
 	Vector3i m_Destination;
 	Vector3i m_Source;
 	int m_StepsLeft;
+	cPathCell * m_NearestPointToTarget;
 
 	/* Control fields */
 	ePathFinderStatus m_Status;
@@ -144,6 +159,7 @@ private:
 
 	/* Interfacing with the world */
 	cChunk * m_Chunk;  // Only valid inside Step()!
+	bool m_BadChunkFound;
 	#ifdef COMPILING_PATHFIND_DEBUGGER
 	#include "../path_irrlicht.cpp"
 	#endif
