@@ -133,6 +133,31 @@ public:
 	/** Checks if the internal state is valid (read and write positions in the correct bounds) using ASSERTs */
 	void CheckValid(void) const;
 
+	/** Calculates the number of bytes required to fit the supplied int (0-5) */
+	static size_t GetVarInt32Size(UInt32 a_Integer)
+	{
+		if ((a_Integer & 0xFFFFFF80) == 0)
+		{
+			return 1;
+		}
+		else if ((a_Integer & 0xFFFFFFC000) == 0)
+		{
+			return 2;
+		}
+		else if ((a_Integer & 0xFFFFFFE00000) == 0)
+		{
+			return 3;
+		}
+		else if ((a_Integer & 0xFFFFFF0000000) == 0)
+		{
+			return 4;
+		}
+		else
+		{
+			return 5;
+		}
+	}
+
 protected:
 	char * m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer

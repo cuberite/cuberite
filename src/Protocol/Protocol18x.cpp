@@ -266,8 +266,8 @@ void cProtocol180::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
-	// This contains the flags and bitmasks, too
+	/* Serialize first, before creating the Packetizer (the packetizer locks a CS)
+	This contains the flags and bitmasks, too */
 	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0, a_ChunkX, a_ChunkZ);
 
 	cCSLock Lock(m_CSPacket);
@@ -1570,43 +1570,31 @@ void cProtocol180::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
+uLongf cProtocol180::CompressData(const AString & a_Data, AString & a_CompressedData)
 {
 	// Compress the data:
 	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
 
-	uLongf CompressedSize = compressBound(a_Packet.size());
+	uLongf CompressedSize = compressBound(a_Data.size());
 	if (CompressedSize >= MAX_COMPRESSED_PACKET_LEN)
 	{
 		ASSERT(!"Too high packet size.");
-		return false;
+		return 0;
 	}
 
 	int Status = compress2(
 		reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
-		reinterpret_cast<const Bytef *>(a_Packet.data()), a_Packet.size(), Z_DEFAULT_COMPRESSION
+		reinterpret_cast<const Bytef *>(a_Data.data()), a_Data.size(), Z_DEFAULT_COMPRESSION
 	);
 	if (Status != Z_OK)
 	{
-		return false;
+		return 0;
 	}
 
-	AString LengthData;
-	cByteBuffer Buffer(20);
-	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
-	Buffer.ReadAll(LengthData);
-	Buffer.CommitRead();
-
-	Buffer.WriteVarInt32(CompressedSize + LengthData.size());
-	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
-	Buffer.ReadAll(LengthData);
-	Buffer.CommitRead();
-
 	a_CompressedData.clear();
-	a_CompressedData.reserve(LengthData.size() + CompressedSize);
-	a_CompressedData.append(LengthData.data(), LengthData.size());
+	a_CompressedData.reserve(CompressedSize);
 	a_CompressedData.append(CompressedData, CompressedSize);
-	return true;
+	return CompressedSize;
 }
 
 
@@ -2831,46 +2819,11 @@ eBlockFace cProtocol180::FaceIntToBlockFace(Int8 a_BlockFace)
 void cProtocol180::SendPacket(cPacketizer & a_Pkt)
 {
 	UInt32 PacketLen = static_cast<UInt32>(m_OutPacketBuffer.GetUsedSpace());
-	AString PacketData, CompressedPacket;
+
+	// Read packet data from the outgoing buffer
+	AString PacketData;
 	m_OutPacketBuffer.ReadAll(PacketData);
 	m_OutPacketBuffer.CommitRead();
-
-	if ((m_State == 3) && (PacketLen >= 256))
-	{
-		// Compress the packet payload:
-		if (!cProtocol180::CompressPacket(PacketData, CompressedPacket))
-		{
-			return;
-		}
-	}
-	else if (m_State == 3)
-	{
-		// The packet is not compressed, indicate this in the packet header:
-		m_OutPacketLenBuffer.WriteVarInt32(PacketLen + 1);
-		m_OutPacketLenBuffer.WriteVarInt32(0);
-		AString LengthData;
-		m_OutPacketLenBuffer.ReadAll(LengthData);
-		SendData(LengthData.data(), LengthData.size());
-	}
-	else
-	{
-		// Compression doesn't apply to this state, send raw data:
-		m_OutPacketLenBuffer.WriteVarInt32(PacketLen);
-		AString LengthData;
-		m_OutPacketLenBuffer.ReadAll(LengthData);
-		SendData(LengthData.data(), LengthData.size());
-	}
-
-	// Send the packet's payload, either direct or compressed:
-	if (CompressedPacket.empty())
-	{
-		m_OutPacketLenBuffer.CommitRead();
-		SendData(PacketData.data(), PacketData.size());
-	}
-	else
-	{
-		SendData(CompressedPacket.data(), CompressedPacket.size());
-	}
 
 	// Log the comm into logfile:
 	if (g_ShouldLogCommOut && m_CommLogFile.IsOpen())
@@ -2882,6 +2835,47 @@ void cProtocol180::SendPacket(cPacketizer & a_Pkt)
 			a_Pkt.GetPacketType(), a_Pkt.GetPacketType(), PacketLen, PacketLen, m_State, Hex.c_str()
 		);
 	}
+
+	if ((m_State == 3) && (PacketLen >= 256))
+	{
+		// Compress packet and send.
+		AString CompressedData;
+		uLongf CompressedDataLen = cProtocol180::CompressData(PacketData, CompressedData);
+
+		if (CompressedDataLen == 0)
+		{
+			// Compression fails
+			ASSERT(!"Packet compression failed.");
+			return;
+		}
+
+		UInt32 PacketLenSize = static_cast<UInt32>(cByteBuffer::GetVarInt32Size(PacketLen));
+		m_OutPacketLenBuffer.WriteVarInt32(PacketLenSize + static_cast<UInt32>(CompressedDataLen));
+		m_OutPacketLenBuffer.WriteVarInt32(PacketLen);
+		PacketData = CompressedData;
+		PacketLen = static_cast<UInt32>(CompressedDataLen);
+	}
+	else if (m_State == 3)
+	{
+		// The packet is not compressed, indicate this in the packet header:
+		m_OutPacketLenBuffer.WriteVarInt32(PacketLen + 1);
+		m_OutPacketLenBuffer.WriteVarInt32(0);
+	}
+	else
+	{
+		// Compression doesn't apply to this state, send raw data:
+		m_OutPacketLenBuffer.WriteVarInt32(PacketLen);
+	}
+
+	// Create the outgoing data
+	AString OutgoingData;
+	OutgoingData.reserve(m_OutPacketLenBuffer.GetUsedSpace() + PacketLen);
+	m_OutPacketLenBuffer.ReadAll(OutgoingData);
+	m_OutPacketLenBuffer.CommitRead();
+	OutgoingData.append(PacketData.c_str(), PacketLen);
+
+	// Sends data
+	SendData(OutgoingData.c_str(), OutgoingData.size());
 }
 
 
