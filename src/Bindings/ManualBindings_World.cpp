@@ -50,7 +50,7 @@ static int tolua_cWorld_BroadcastParticleEffect(lua_State * tolua_S)
 	std::array<int, 2> data;
 	for (int i = 0; (i < 2) && L.IsParamNumber(11 + i); i++)
 	{
-		L.GetStackValue(11 + i, data[i]);
+		L.GetStackValue(11 + i, data[static_cast<size_t>(i)]);
 	}
 
 	World->GetBroadcaster().BroadcastParticleEffect(Name, Vector3f(PosX, PosY, PosZ), Vector3f(OffX, OffY, OffZ), ParticleData, ParticleAmmount, ExcludeClient);

@@ -701,108 +701,95 @@ void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
+bool cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 {
 	size_t len = 0;
 	const char * data = lua_tolstring(m_LuaState, a_StackPos, &len);
 	if (data != nullptr)
 	{
 		a_Value.assign(data, len);
+		return true;
 	}
+	return false;
 }
 
 
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, BLOCKTYPE & a_ReturnedVal)
-{
-	if (lua_isnumber(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = static_cast<BLOCKTYPE>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
-	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
+bool cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
+	return true;
 }
 
 
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result)
+bool cLuaState::GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
 		a_Result = static_cast<cPluginManager::CommandResult>(static_cast<int>((tolua_tonumber(m_LuaState, a_StackPos, a_Result))));
+		return true;
 	}
+	return false;
 }
 
 
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
+bool cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
 {
 	a_Ref.RefStack(*this, a_StackPos);
+	return true;
 }
 
 
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
+bool cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
 		a_ReturnedVal = tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
+		return true;
 	}
+	return false;
 }
 
 
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
+bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
 		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
+		return true;
 	}
+	return false;
 }
 
 
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
+bool cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 {
 	if (!lua_isnumber(m_LuaState, a_StackPos))
 	{
-		return;
+		return false;
 	}
 	a_ReturnedVal = static_cast<eWeather>(Clamp(
 		static_cast<int>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal)),
 		static_cast<int>(wSunny), static_cast<int>(wThunderstorm))
 	);
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
-{
-	if (lua_isnumber(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = static_cast<int>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
-	}
+	return true;
 }
 
 
