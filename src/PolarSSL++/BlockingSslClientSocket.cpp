@@ -200,7 +200,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 		else
 		{
 			Data += res;
-			NumBytes -= res;
+			NumBytes -= static_cast<size_t>(res);
 			if (NumBytes == 0)
 			{
 				return true;

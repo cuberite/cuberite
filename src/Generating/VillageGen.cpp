@@ -389,8 +389,8 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	BLOCKTYPE RoadBlock = E_BLOCK_GRAVEL;
 	BLOCKTYPE WaterRoadBlock = E_BLOCK_PLANKS;
 	int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 11;
-	cVillagePiecePool * PlainsVillage = g_PlainsVillagePools[rnd % ARRAYCOUNT(g_PlainsVillagePools)];
-	cVillagePiecePool * DesertVillage = g_DesertVillagePools[rnd % ARRAYCOUNT(g_DesertVillagePools)];
+	cVillagePiecePool * PlainsVillage = g_PlainsVillagePools[static_cast<size_t>(rnd) % ARRAYCOUNT(g_PlainsVillagePools)];
+	cVillagePiecePool * DesertVillage = g_DesertVillagePools[static_cast<size_t>(rnd) % ARRAYCOUNT(g_DesertVillagePools)];
 	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 	{
 		switch (Biomes[i])
