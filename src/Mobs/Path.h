@@ -33,11 +33,20 @@ struct cPathCell
 	cPathCell * m_Parent;  // Cell's parent, as defined in regular A*.
 	bool m_IsSolid;	   // Is the cell an air or a solid? Partial solids are currently considered solids.
 };
+
+
+
+
+
 class compareHeuristics
 {
 public:
 	bool operator()(cPathCell * & a_V1,  cPathCell * &  a_V2);
 };
+
+
+
+
 
 class cPath
 {
