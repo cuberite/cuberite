@@ -385,7 +385,7 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 	else
 	{
 		// All pieces returned zero weight, but we need one to start. Choose with equal chance:
-		StartingPiece = StartingPieces[rnd % StartingPieces.size()];
+		StartingPiece = StartingPieces[static_cast<size_t>(rnd) % StartingPieces.size()];
 	}
 	rnd = rnd >> 16;
 	
@@ -561,7 +561,10 @@ void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors 
 {
 	printf("  Connector pool: " SIZE_T_FMT " items\n", a_ConnectorPool.size() - a_NumProcessed);
 	size_t idx = 0;
-	for (cPieceGenerator::cFreeConnectors::const_iterator itr = a_ConnectorPool.begin() + a_NumProcessed, end = a_ConnectorPool.end(); itr != end; ++itr, ++idx)
+
+	typedef cPieceGenerator::cFreeConnectors::difference_type difType;
+
+	for (auto itr = a_ConnectorPool.cbegin() + static_cast<difType>(a_NumProcessed), end = a_ConnectorPool.cend(); itr != end; ++itr, ++idx)
 	{
 		printf("    " SIZE_T_FMT ": {%d, %d, %d}, type %d, direction %s, depth %d\n",
 			idx,
@@ -672,7 +675,10 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, i
 		NumProcessed++;
 		if (NumProcessed > 1000)
 		{
-			ConnectorPool.erase(ConnectorPool.begin(), ConnectorPool.begin() + NumProcessed);
+
+			typedef cPieceGenerator::cFreeConnectors::difference_type difType;
+
+			ConnectorPool.erase(ConnectorPool.begin(), ConnectorPool.begin() + static_cast<difType>(NumProcessed));
 			NumProcessed = 0;
 		}
 	}

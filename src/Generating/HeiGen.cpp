@@ -801,7 +801,10 @@ protected:
 			case biTaiga:                a_Min = 63; a_Max = 75; break;
 			case biTaigaHills:           a_Min = 63; a_Max = 90; break;
 			case biTaigaM:               a_Min = 63; a_Max = 80; break;
-			default:
+			case biInvalidBiome:
+			case biNumBiomes:
+			case biVariant:
+			case biNumVariantBiomes:
 			{
 				ASSERT(!"Unknown biome");
 				a_Min = 10;
