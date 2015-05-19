@@ -17,7 +17,7 @@
 
 // fwd:
 class cServer;
-class cIniFile;
+class cSettingsRepositoryInterface;
 
 
 
@@ -29,7 +29,7 @@ public:
 	cRCONServer(cServer & a_Server);
 	virtual ~cRCONServer();
 	
-	void Initialize(cIniFile & a_IniFile);
+	void Initialize(cSettingsRepositoryInterface & a_Settings);
 	
 protected:
 	friend class cRCONCommandOutput;

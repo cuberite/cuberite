@@ -118,7 +118,7 @@ void cPluginManager::ReloadPluginsNow(void)
 
 
 
-void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
+void cPluginManager::ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings)
 {
 	LOG("-- Loading Plugins --");
 
@@ -130,7 +130,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	RefreshPluginList();
 
 	// Load the plugins:
-	AStringVector ToLoad = GetFoldersToLoad(a_SettingsIni);
+	AStringVector ToLoad = GetFoldersToLoad(a_Settings);
 	for (auto & pluginFolder: ToLoad)
 	{
 		LoadPlugin(pluginFolder);
@@ -157,16 +157,16 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 
 
 
-void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
+void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings)
 {
-	a_SettingsIni.AddKeyName("Plugins");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=Debuggers");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=HookNotify");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=ChunkWorx");
-	a_SettingsIni.AddKeyComment("Plugins", " Plugin=APIDump");
-	a_SettingsIni.AddValue("Plugins", "Plugin", "Core");
-	a_SettingsIni.AddValue("Plugins", "Plugin", "TransAPI");
-	a_SettingsIni.AddValue("Plugins", "Plugin", "ChatLog");
+	a_Settings.AddKeyName("Plugins");
+	a_Settings.AddKeyComment("Plugins", " Plugin=Debuggers");
+	a_Settings.AddKeyComment("Plugins", " Plugin=HookNotify");
+	a_Settings.AddKeyComment("Plugins", " Plugin=ChunkWorx");
+	a_Settings.AddKeyComment("Plugins", " Plugin=APIDump");
+	a_Settings.AddValue("Plugins", "Plugin", "Core");
+	a_Settings.AddValue("Plugins", "Plugin", "TransAPI");
+	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
 }
 
 
@@ -1932,25 +1932,23 @@ size_t cPluginManager::GetNumLoadedPlugins(void) const
 
 
 
-AStringVector cPluginManager::GetFoldersToLoad(cIniFile & a_SettingsIni)
+AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_Settings)
 {
 	// Check if the Plugins section exists.
-	int KeyNum = a_SettingsIni.FindKey("Plugins");
-	if (KeyNum == -1)
+	if (a_Settings.KeyExists("Plugins"))
 	{
-		InsertDefaultPlugins(a_SettingsIni);
-		KeyNum = a_SettingsIni.FindKey("Plugins");
+		InsertDefaultPlugins(a_Settings);
 	}
 
 	// Get the list of plugins to load:
 	AStringVector res;
-	int NumPlugins = a_SettingsIni.GetNumValues(KeyNum);
-	for (int i = 0; i < NumPlugins; i++)
+	auto Values = a_Settings.GetValues("Plugins");
+	for (auto NameValue : Values)
 	{
-		AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
+		AString ValueName = NameValue.first;
 		if (ValueName.compare("Plugin") == 0)
 		{
-			AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
+			AString PluginFile = NameValue.second;
 			if (!PluginFile.empty())
 			{
 				res.push_back(PluginFile);
