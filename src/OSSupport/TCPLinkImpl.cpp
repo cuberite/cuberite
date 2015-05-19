@@ -179,6 +179,11 @@ void cTCPLinkImpl::ReadCallback(bufferevent * a_BufferEvent, void * a_Self)
 	cTCPLinkImpl * Self = static_cast<cTCPLinkImpl *>(a_Self);
 	ASSERT(Self->m_Callbacks != nullptr);
 
+	if (Self->m_ShouldShutdown)
+	{
+		return;
+	}
+
 	// Read all the incoming data, in 1024-byte chunks:
 	char data[1024];
 	size_t length;
