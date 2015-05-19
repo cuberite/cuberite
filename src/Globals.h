@@ -433,10 +433,14 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 
 
 //temporary replacement for std::make_unique until we get c++14
-template <class T, class... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
+
+namespace cpp14
 {
-	return std::unique_ptr<T>(new T(args...));
+	template <class T, class... Args>
+	std::unique_ptr<T> make_unique(Args&&... args)
+	{
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	}
 }
 
 // a tick is 50 ms
