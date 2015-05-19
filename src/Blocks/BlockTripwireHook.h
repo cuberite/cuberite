@@ -37,7 +37,13 @@ public:
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_ZM: return 0x2;
 			case BLOCK_FACE_ZP: return 0x0;
-			default: ASSERT(!"Unhandled tripwire hook direction!"); return 0x0;
+			case BLOCK_FACE_NONE:
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			{
+				ASSERT(!"Unhandled tripwire hook direction!");
+				return 0x0;
+			}
 		}
 	}
 

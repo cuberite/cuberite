@@ -414,7 +414,12 @@ protected:
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
 				return;
 			}
-			default:
+			case biInvalidBiome:
+			case biHell:
+			case biSky:
+			case biNumBiomes:
+			case biVariant:
+			case biNumVariantBiomes:
 			{
 				ASSERT(!"Unhandled biome");
 				return;

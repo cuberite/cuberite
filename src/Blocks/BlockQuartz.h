@@ -58,7 +58,7 @@ public:
 				return 0x3;  // East or west
 			}
 
-			default:
+			case BLOCK_FACE_NONE:
 			{
 				ASSERT(!"Unhandled block face!");
 				return a_QuartzMeta;  // No idea, give a special meta (all sides the same)
