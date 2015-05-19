@@ -87,13 +87,13 @@ public:
 	int Write(const void * iBuffer, size_t iNumBytes);
 	
 	/** Seeks to iPosition bytes from file start, returns old position or -1 for failure; asserts if not open */
-	int Seek (int iPosition);
+	long Seek (int iPosition);
 	
 	/** Returns the current position (bytes from file start) or -1 for failure; asserts if not open */
-	ssize_t Tell (void) const;
+	long Tell (void) const;
 	
 	/** Returns the size of file, in bytes, or -1 for failure; asserts if not open */
-	ssize_t GetSize(void) const;
+	long GetSize(void) const;
 	
 	/** Reads the file from current position till EOF into an AString; returns the number of bytes read or -1 for error */
 	int ReadRestOfFile(AString & a_Contents);
@@ -119,7 +119,7 @@ public:
 	static bool IsFile(const AString & a_Path);
 	
 	/** Returns the size of the file, or a negative number on error */
-	static ssize_t GetSize(const AString & a_FileName);
+	static long GetSize(const AString & a_FileName);
 	
 	/** Creates a new folder with the specified name. Returns true if successful. Path may be relative or absolute */
 	static bool CreateFolder(const AString & a_FolderPath);
