@@ -67,7 +67,7 @@ public:
 			case BLOCK_FACE_XM: return 0x2;
 			case BLOCK_FACE_XP: return 0x1;
 			case BLOCK_FACE_YM: return 0x0;
-			default:
+			case BLOCK_FACE_NONE:
 			{
 				ASSERT(!"Unhandled block face!");
 				return 0x0;

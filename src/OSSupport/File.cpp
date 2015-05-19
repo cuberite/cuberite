@@ -201,7 +201,7 @@ int cFile::Seek (int iPosition)
 
 
 
-int cFile::Tell (void) const
+ssize_t cFile::Tell (void) const
 {
 	ASSERT(IsOpen());
 	
@@ -210,14 +210,14 @@ int cFile::Tell (void) const
 		return -1;
 	}
 	
-	return (int)ftell(m_File);
+	return ftell(m_File);
 }
 
 
 
 
 
-int cFile::GetSize(void) const
+ssize_t cFile::GetSize(void) const
 {
 	ASSERT(IsOpen());
 	
@@ -226,7 +226,7 @@ int cFile::GetSize(void) const
 		return -1;
 	}
 	
-	int CurPos = Tell();
+	ssize_t CurPos = Tell();
 	if (CurPos < 0)
 	{
 		return -1;
@@ -235,7 +235,7 @@ int cFile::GetSize(void) const
 	{
 		return -1;
 	}
-	int res = Tell();
+	ssize_t res = Tell();
 	if (fseek(m_File, (long)CurPos, SEEK_SET) != 0)
 	{
 		return -1;
@@ -256,7 +256,19 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 		return -1;
 	}
 	
-	size_t DataSize = GetSize() - Tell();
+	ssize_t TotalSize = GetSize();
+	if (TotalSize < 0)
+	{
+		return -1;
+	}
+
+	ssize_t Position = Tell();
+	if (Position < 0)
+	{
+		return -1;
+	}
+
+	auto DataSize = static_cast<size_t>(TotalSize - Position);
 	
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
 	a_Contents.assign(DataSize, '\0');
@@ -349,7 +361,7 @@ bool cFile::IsFile(const AString & a_Path)
 
 
 
-int cFile::GetSize(const AString & a_FileName)
+ssize_t cFile::GetSize(const AString & a_FileName)
 {
 	struct stat st;
 	if (stat(a_FileName.c_str(), &st) == 0)

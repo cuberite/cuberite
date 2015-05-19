@@ -65,8 +65,8 @@ public:
 
 	// These operate on the heightmap, so they could get out of sync with the data
 	// Use UpdateHeightmap() to re-calculate heightmap from the block data
-	void       SetHeight(int a_RelX, int a_RelZ, int a_Height);
-	int        GetHeight(int a_RelX, int a_RelZ);
+	void       SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height);
+	HEIGHTTYPE       GetHeight(int a_RelX, int a_RelZ);
 
 	// tolua_end
 

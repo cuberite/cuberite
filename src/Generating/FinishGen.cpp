@@ -260,13 +260,13 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 
 		for (int j = 0; j < a_Size; j++)
 		{
-			Vector3i Direction = AvailableDirections[m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i, CurrentPos.z) % ARRAYCOUNT(AvailableDirections)];
+			Vector3i Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i, CurrentPos.z)) % ARRAYCOUNT(AvailableDirections)];
 			int Attempts = 2;  // multiply by 1 would make no difference, so multiply by 2 instead
 
 			while (Direction.Equals(PreviousDirection))
 			{
 				// To make the glowstone branches look better we want to make the direction change every time.
-				Direction = AvailableDirections[m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i * Attempts, CurrentPos.z) % ARRAYCOUNT(AvailableDirections)];
+				Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i * Attempts, CurrentPos.z)) % ARRAYCOUNT(AvailableDirections)];
 				Attempts++;
 			}
 
@@ -438,7 +438,7 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				NIBBLETYPE Meta = Places[m_Noise.IntNoise3DInt(xx, y, zz) % Places.size()];
+				NIBBLETYPE Meta = Places[static_cast<size_t>(m_Noise.IntNoise3DInt(xx, y, zz)) % Places.size()];
 				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_VINES, Meta);
 			}
 		}
@@ -515,7 +515,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			{
 				continue;
 			}
-			int Top = a_ChunkDesc.GetHeight(x, z);
+			HEIGHTTYPE Top = a_ChunkDesc.GetHeight(x, z);
 			if (Top > 250)
 			{
 				// Nothing grows above Y=250
@@ -676,7 +676,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Height = a_ChunkDesc.GetHeight(x, z);
+			HEIGHTTYPE Height = a_ChunkDesc.GetHeight(x, z);
 			if (GetSnowStartHeight(a_ChunkDesc.GetBiome(x, z)) > Height)
 			{
 				// Height isn't high enough for snow to start forming.
@@ -775,7 +775,7 @@ void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 			continue;
 		}
 
-		int Height = a_ChunkDesc.GetHeight(x, z);
+		HEIGHTTYPE Height = a_ChunkDesc.GetHeight(x, z);
 		if (Height >= cChunkDef::Height - 1)
 		{
 			// Too high up
@@ -918,7 +918,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 					}
 				}  // switch (GetBlock)
 			}  // for y
-			cChunkDef::SetHeight(a_HeightMap, x, z, HeightY);
+			cChunkDef::SetHeight(a_HeightMap, x, z, static_cast<HEIGHTTYPE>(HeightY));
 		}  // for x
 	}  // for z
 }
@@ -1374,7 +1374,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		return mtInvalidType;
 	}
 
-	int RandMob = (m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size();
+	size_t RandMob = static_cast<size_t>((m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7)) % ListOfSpawnables.size();
 	auto MobIter = ListOfSpawnables.begin();
 	std::advance(MobIter, RandMob);
 

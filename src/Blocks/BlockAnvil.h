@@ -46,10 +46,10 @@ public:
 
 		switch (Direction)
 		{
-			case 0: a_BlockMeta = 0x2 | Meta << 2; break;
-			case 1: a_BlockMeta = 0x3 | Meta << 2; break;
-			case 2: a_BlockMeta = 0x0 | Meta << 2; break;
-			case 3: a_BlockMeta = 0x1 | Meta << 2; break;
+			case 0: a_BlockMeta = static_cast<NIBBLETYPE>(0x2 | Meta << 2); break;
+			case 1: a_BlockMeta = static_cast<NIBBLETYPE>(0x3 | Meta << 2); break;
+			case 2: a_BlockMeta = static_cast<NIBBLETYPE>(0x0 | Meta << 2); break;
+			case 3: a_BlockMeta = static_cast<NIBBLETYPE>(0x1 | Meta << 2); break;
 			default:
 			{
 				return false;

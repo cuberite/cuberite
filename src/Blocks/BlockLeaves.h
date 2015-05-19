@@ -47,7 +47,7 @@ public:
 				cItem(
 					E_BLOCK_SAPLING,
 					1,
-					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : (2 << (a_BlockMeta & 0x01))
+					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : static_cast<short>(2 << (a_BlockMeta & 0x01))
 				)
 			);
 		}

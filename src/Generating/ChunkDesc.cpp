@@ -134,7 +134,7 @@ EMCSBiome cChunkDesc::GetBiome(int a_RelX, int a_RelZ)
 
 
 
-void cChunkDesc::SetHeight(int a_RelX, int a_RelZ, int a_Height)
+void cChunkDesc::SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height)
 {
 	cChunkDef::SetHeight(m_HeightMap, a_RelX, a_RelZ, a_Height);
 }
@@ -143,7 +143,7 @@ void cChunkDesc::SetHeight(int a_RelX, int a_RelZ, int a_Height)
 
 
 
-int cChunkDesc::GetHeight(int a_RelX, int a_RelZ)
+HEIGHTTYPE cChunkDesc::GetHeight(int a_RelX, int a_RelZ)
 {
 	return cChunkDef::GetHeight(m_HeightMap, a_RelX, a_RelZ);
 }
@@ -158,7 +158,7 @@ void cChunkDesc::SetHeightFromShape(const Shape & a_Shape)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			for (unsigned char y = cChunkDef::Height - 1; y > 0; y--)
 			{
 				if (a_Shape[y + x * 256 + z * 16 * 256] != 0)
 				{
@@ -612,8 +612,8 @@ void cChunkDesc::UpdateHeightmap(void)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			int Height = 0;
-			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			HEIGHTTYPE Height = 0;
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
 			{
 				BLOCKTYPE BlockType = GetBlockType(x, y, z);
 				if (BlockType != E_BLOCK_AIR)
@@ -636,7 +636,7 @@ void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();
 	for (size_t i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
 	{
-		a_DestMetas[i] = AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4);
+		a_DestMetas[i] = static_cast<NIBBLETYPE>(AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4));
 	}
 }
 

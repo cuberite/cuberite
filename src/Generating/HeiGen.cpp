@@ -58,7 +58,7 @@ public:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override
 	{
 		int heights[cChunkDef::Width * cChunkDef::Width];
-		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, cChunkDef::Width, cChunkDef::Width, heights);
+		m_Gen->GetInts(static_cast<size_t>(a_ChunkX * cChunkDef::Width), static_cast<size_t>(a_ChunkZ * cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), heights);
 		for (size_t i = 0; i < ARRAYCOUNT(heights); i++)
 		{
 			a_HeightMap[i] = static_cast<HEIGHTTYPE>(std::max(std::min(60 + heights[i], cChunkDef::Height - 60), 40));
@@ -92,7 +92,7 @@ void cHeiGenFlat::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap 
 
 void cHeiGenFlat::InitializeHeightGen(cIniFile & a_IniFile)
 {
-	m_Height = a_IniFile.GetValueSetI("Generator", "FlatHeight", m_Height);
+	m_Height = static_cast<HEIGHTTYPE>(a_IniFile.GetValueSetI("Generator", "FlatHeight", m_Height));
 }
 
 
@@ -300,15 +300,7 @@ void cHeiGenClassic::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightM
 		{
 			const float xx = (float)(a_ChunkX * cChunkDef::Width + x);
 			
-			int hei = 64 + (int)(GetNoise(xx * 0.05f, zz * 0.05f) * 16);
-			if (hei < 10)
-			{
-				hei = 10;
-			}
-			if (hei > 250)
-			{
-				hei = 250;
-			}
+			HEIGHTTYPE hei = static_cast<HEIGHTTYPE>(Clamp(static_cast<int>(64 + (GetNoise(xx * 0.05f, zz * 0.05f) * 16)), 10, 250));
 			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
@@ -366,15 +358,7 @@ void cHeiGenMountains::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Heigh
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int idx = IdxZ + x;
-			int hei = 100 - (int)((MountainNoise[idx] - DitchNoise[idx] + PerlinNoise[idx]) * 15);
-			if (hei < 10)
-			{
-				hei = 10;
-			}
-			if (hei > 250)
-			{
-				hei = 250;
-			}
+			HEIGHTTYPE hei = static_cast<HEIGHTTYPE>(Clamp(100 - static_cast<int>((MountainNoise[idx] - DitchNoise[idx] + PerlinNoise[idx]) * 15), 10, 250));
 			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
@@ -536,7 +520,7 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			cChunkDef::SetHeight(a_HeightMap, x, z, (int)Height[x + 17 * z]);
+			cChunkDef::SetHeight(a_HeightMap, x, z, static_cast<HEIGHTTYPE>(Height[x + 17 * z]));
 		}
 	}
 	//*/

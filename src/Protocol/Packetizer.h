@@ -58,7 +58,7 @@ public:
 	}
 
 
-	inline void WriteBEUInt16(short a_Value)
+	inline void WriteBEUInt16(UInt16 a_Value)
 	{
 		VERIFY(m_Out.WriteBEUInt16(a_Value));
 	}

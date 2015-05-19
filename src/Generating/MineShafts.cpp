@@ -781,7 +781,6 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 
 		case dirZM:
 		case dirZP:
-		default:
 		{
 			x = m_BoundingBox.p1.x - BlockX;
 			z = m_BoundingBox.p1.z + m_ChestPosition - BlockZ;

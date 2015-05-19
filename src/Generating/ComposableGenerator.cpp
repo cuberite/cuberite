@@ -221,11 +221,11 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	if (MultiCacheLength > 0)
 	{
 		LOGD("Enabling multicache for biomegen of length %d.", MultiCacheLength);
-		m_BiomeGen = cBiomeGenPtr(new cBioGenMulticache(m_BiomeGen, CacheSize, MultiCacheLength));
+		m_BiomeGen = cBiomeGenPtr(new cBioGenMulticache(m_BiomeGen, static_cast<size_t>(CacheSize), static_cast<size_t>(MultiCacheLength)));
 	}
 	else
 	{
-		m_BiomeGen = cBiomeGenPtr(new cBioGenCache(m_BiomeGen, CacheSize));
+		m_BiomeGen = cBiomeGenPtr(new cBioGenCache(m_BiomeGen, static_cast<size_t>(CacheSize)));
 	}
 }
 

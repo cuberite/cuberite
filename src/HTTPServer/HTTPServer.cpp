@@ -112,7 +112,9 @@ class cDebugCallbacks :
 			// TODO
 		}
 		
-} g_DebugCallbacks;
+};
+
+static cDebugCallbacks g_DebugCallbacks;
 
 
 
