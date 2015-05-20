@@ -9,16 +9,16 @@
 
 #pragma once
 
-#include "OSSupport/Network.h"
 #include "Defines.h"
-#include "Scoreboard.h"
-#include "UI/SlotArea.h"
-#include "json/json.h"
-#include "ChunkSender.h"
 #include "EffectID.h"
+#include "OSSupport/Network.h"
+#include "Protocol/ChunkSender.h"
 #include "Protocol/ForgeHandshake.h"
 #include "Protocol/ProtocolRecognizer.h"
+#include "Scoreboard.h"
+#include "UI/SlotArea.h"
 #include "UUID.h"
+#include "json/json.h"
 
 
 

@@ -19,7 +19,6 @@ target_sources(
 	ChunkData.cpp
 	ChunkGeneratorThread.cpp
 	ChunkMap.cpp
-	ChunkSender.cpp
 	ChunkStay.cpp
 	ClientHandle.cpp
 	Color.cpp
@@ -92,7 +91,6 @@ target_sources(
 	ChunkDef.h
 	ChunkGeneratorThread.h
 	ChunkMap.h
-	ChunkSender.h
 	ChunkStay.h
 	ClientHandle.h
 	Color.h

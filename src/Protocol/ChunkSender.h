@@ -27,7 +27,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #include "OSSupport/IsThread.h"
 #include "ChunkDataCallback.h"
-#include "Protocol/ChunkDataSerializer.h"
+#include "ChunkDataSerializer.h"
 
 
 
@@ -35,13 +35,6 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 class cWorld;
 class cClientHandle;
-
-
-
-
-
-// fwd:
-class cChunkSender;
 
 
 

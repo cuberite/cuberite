@@ -2,6 +2,7 @@ target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
 	Authenticator.cpp
+	ChunkSender.cpp
 	ChunkDataSerializer.cpp
 	ForgeHandshake.cpp
 	MojangAPI.cpp
@@ -17,6 +18,7 @@ target_sources(
 	RecipeMapper.cpp
 
 	Authenticator.h
+	ChunkSender.h
 	ChunkDataSerializer.h
 	ForgeHandshake.h
 	MojangAPI.h

@@ -6,7 +6,9 @@
 
 class cBedEntity;
 class cBlockEntity;
+class cBoundingBox;
 class cBroadcastInterface;
+class cItem;
 class cItems;
 class cPlayer;
 

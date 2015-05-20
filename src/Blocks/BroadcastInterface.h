@@ -7,6 +7,8 @@
 // fwd:
 class cClientHandle;
 class cCompositeChat;
+class cEntity;
+class cItem;
 class cPlayer;
 class cWorld;
 enum class EffectID : Int32;
