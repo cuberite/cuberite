@@ -11,15 +11,8 @@
 #define CALCULATIONS_PER_STEP 10  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
-enum class eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
-struct cPathCell
-{
-	Vector3i m_Location;   // Location of the cell in the world.
-	int m_F, m_G, m_H;  // F, G, H as defined in regular A*.
-	eCellStatus m_Status;  // Which list is the cell in? Either non, open, or closed.
-	cPathCell * m_Parent;  // Cell's parent, as defined in regular A*.
-	bool m_IsSolid;	   // Is the cell an air or a solid? Partial solids are currently considered solids.
-};
+
+
 
 
 
@@ -388,23 +381,20 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 cPathCell * cPath::GetCell(const Vector3i & a_Location)
 {
 	// Create the cell in the hash table if it's not already there.
-	cPathCell * Cell;
 	if (m_Map.count(a_Location) == 0)  // Case 1: Cell is not on any list. We've never checked this cell before.
 	{
-		Cell = new cPathCell();
-		Cell->m_Location = a_Location;
-		m_Map[a_Location] = UniquePtr<cPathCell>(Cell);
-		Cell->m_IsSolid = IsSolid(a_Location);
-		Cell->m_Status = eCellStatus::NOLIST;
+		m_Map[a_Location].m_Location = a_Location;
+		m_Map[a_Location].m_IsSolid = IsSolid(a_Location);
+		m_Map[a_Location].m_Status = eCellStatus::NOLIST;
 		#ifdef COMPILING_PATHFIND_DEBUGGER
 			#ifdef COMPILING_PATHFIND_DEBUGGER_MARK_UNCHECKED
 				si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, Cell->m_IsSolid ? NORMAL : MINI);
 			#endif
 		#endif
-		return Cell;
+		return &m_Map[a_Location];
 	}
 	else
 	{
-		return m_Map[a_Location].get();
+		return &m_Map[a_Location];
 	}
 }
