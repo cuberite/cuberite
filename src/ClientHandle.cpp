@@ -1953,7 +1953,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_BlockDigAnimStage > -1)
 	{
 		int lastAnimVal = m_BlockDigAnimStage;
-		m_BlockDigAnimStage += (int) (m_BlockDigAnimSpeed * a_Dt);
+		m_BlockDigAnimStage += static_cast<int>(m_BlockDigAnimSpeed * a_Dt);
 		if (m_BlockDigAnimStage > 9000)
 		{
 			m_BlockDigAnimStage = 9000;
@@ -2202,10 +2202,9 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 		m_HasSentDC = true;
 
 		NetworkTick();
-		cTCPLinkPtr Link(m_Link);  // Grab a copy of the link in a multithread-safe way
-		if (Link != nullptr)
+		if (m_Link != nullptr)
 		{
-			Link->Shutdown();
+			m_Link->Shutdown();
 		}
 	}
 }

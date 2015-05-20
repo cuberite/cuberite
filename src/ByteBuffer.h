@@ -136,19 +136,19 @@ public:
 	/** Calculates the number of bytes required to fit the supplied int (0-5) */
 	static size_t GetVarInt32Size(UInt32 a_Integer)
 	{
-		if ((a_Integer & 0xFFFFFF80) == 0)
+		if (a_Integer < 128)
 		{
 			return 1;
 		}
-		else if ((a_Integer & 0xFFFFFFC000) == 0)
+		else if (a_Integer < 16384)
 		{
 			return 2;
 		}
-		else if ((a_Integer & 0xFFFFFFE00000) == 0)
+		else if (a_Integer < 2097152)
 		{
 			return 3;
 		}
-		else if ((a_Integer & 0xFFFFFF0000000) == 0)
+		else if (a_Integer < 268435456)
 		{
 			return 4;
 		}

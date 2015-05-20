@@ -1570,7 +1570,7 @@ void cProtocol180::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-uLongf cProtocol180::CompressData(const AString & a_Data, AString & a_CompressedData)
+UInt32 cProtocol180::CompressData(const AString & a_Data, AString & a_CompressedData)
 {
 	// Compress the data:
 	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
@@ -1594,7 +1594,7 @@ uLongf cProtocol180::CompressData(const AString & a_Data, AString & a_Compressed
 	a_CompressedData.clear();
 	a_CompressedData.reserve(CompressedSize);
 	a_CompressedData.append(CompressedData, CompressedSize);
-	return CompressedSize;
+	return static_cast<UInt32>(CompressedSize);
 }
 
 

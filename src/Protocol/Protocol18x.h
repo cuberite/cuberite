@@ -139,7 +139,7 @@ public:
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
 	/** Compress the data with zlib. Returns the compressed data length or returns 0 if compression fails. */
-	static ulong CompressData(const AString & a_Data, AString & a_Compressed);
+	static UInt32 CompressData(const AString & a_Data, AString & a_Compressed);
 
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
