@@ -6,6 +6,7 @@
 #include "Path.h"
 #include "../Chunk.h"
 
+
 #define DISTANCE_MANHATTAN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
 #define CALCULATIONS_PER_STEP 10  // Higher means more CPU load but faster path calculations.
@@ -178,11 +179,18 @@ bool cPath::Step_Internal()
 
 	// Calculation not finished yet.
 	// Check if we have a new NearestPoint.
-	if (CurrentCell->m_H < m_NearestPointToTarget->m_H)
+
+	if ((m_Destination - CurrentCell->m_Location).Length() < 5)
+	{
+		if (m_Rand.NextInt(4) == 0)
+		{
+			m_NearestPointToTarget = CurrentCell;
+		}
+	}
+	else if (CurrentCell->m_H < m_NearestPointToTarget->m_H)
 	{
 		m_NearestPointToTarget = CurrentCell;
 	}
-
 	// process a currentCell by inspecting all neighbors.
 
 	// Check North, South, East, West on all 3 different heights.

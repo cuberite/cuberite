@@ -1,16 +1,13 @@
 
 #pragma once
 
-/* Wanna use the pathfinder? Put this in your header file:
-
-// Fwd: cPath
+/*
+// Needed Fwds: cPath
 enum class ePathFinderStatus;
 class cPath;
-
-Put this in your .cpp:
-#include "...Path.h"
 */
 
+#include "../FastRandom.h"
 #ifdef COMPILING_PATHFIND_DEBUGGER
 	/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native / WiseOldMan95 to debug
 	this class outside of MCServer. This preprocessor flag is never set when compiling MCServer. */
@@ -166,6 +163,7 @@ private:
 	Vector3i m_Source;
 	int m_StepsLeft;
 	cPathCell * m_NearestPointToTarget;
+	cFastRandom m_Rand;
 
 	/* Control fields */
 	ePathFinderStatus m_Status;
