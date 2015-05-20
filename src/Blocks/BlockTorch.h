@@ -103,6 +103,11 @@ public:
 			case E_BLOCK_STAINED_GLASS:
 			case E_BLOCK_FENCE:
 			case E_BLOCK_NETHER_BRICK_FENCE:
+			case E_BLOCK_SPRUCE_FENCE:
+			case E_BLOCK_BIRCH_FENCE:
+			case E_BLOCK_JUNGLE_FENCE:
+			case E_BLOCK_DARK_OAK_FENCE:
+			case E_BLOCK_ACACIA_FENCE:
 			case E_BLOCK_COBBLESTONE_WALL:
 			{
 				// Torches can only be placed on top of these blocks
