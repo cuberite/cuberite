@@ -362,6 +362,7 @@ cWorld::~cWorld()
 void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+	BroadcastSoundEffect("ambient.weather.thunder", a_BlockX, a_BlockY, a_BlockZ, 50, 1);
 }
 
 
