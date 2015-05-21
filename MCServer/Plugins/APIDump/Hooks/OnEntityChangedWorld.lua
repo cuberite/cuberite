@@ -7,7 +7,7 @@ return
 		Desc = [[
 			This hook is called after the server has moved the {{cEntity|entity}} to the given world. This is an information-only
 			callback, the entity is already in the new world.<p>
-			See also the {{OnEntityChangeWorld|HOOK_ENTITY_CHANGE_WORLD}} hook for a similar hook called before the
+			See also the {{OnEntityChangingWorld|HOOK_ENTITY_CHANGING_WORLD}} hook for a similar hook called before the
 			entity is moved to the new world.
 		]],
 		Params =
