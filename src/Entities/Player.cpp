@@ -1606,9 +1606,10 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		return false;
 	}
 	
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangeWorld(*this, *a_World))
+	//  Ask the plugins if the player is allowed to changing the world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
 	{
-		// A Plugin doesn't allow the player to change the world
+		// A Plugin doesn't allow the player to changing the world
 		return false;
 	}
 

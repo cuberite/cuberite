@@ -86,7 +86,7 @@ public:
 		HOOK_DISCONNECT,
 		HOOK_PLAYER_ANIMATION,
 		HOOK_ENTITY_ADD_EFFECT,
-		HOOK_ENTITY_CHANGE_WORLD,
+		HOOK_ENTITY_CHANGING_WORLD,
 		HOOK_ENTITY_CHANGED_WORLD,
 		HOOK_EXECUTE_COMMAND,
 		HOOK_EXPLODED,
@@ -203,7 +203,7 @@ public:
 	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
 	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
 	bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
-	bool CallHookEntityChangeWorld        (cEntity & a_Entity, cWorld & a_World);
+	bool CallHookEntityChangingWorld      (cEntity & a_Entity, cWorld & a_World);
 	bool CallHookEntityChangedWorld       (cEntity & a_Entity, cWorld & a_World);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result);  // If a_Player == nullptr, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);

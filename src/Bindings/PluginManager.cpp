@@ -525,14 +525,14 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
-bool cPluginManager::CallHookEntityChangeWorld(cEntity & a_Entity, cWorld & a_World)
+bool cPluginManager::CallHookEntityChangingWorld(cEntity & a_Entity, cWorld & a_World)
 {
-	FIND_HOOK(HOOK_ENTITY_CHANGE_WORLD);
+	FIND_HOOK(HOOK_ENTITY_CHANGING_WORLD);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnEntityChangeWorld(a_Entity, a_World))
+		if ((*itr)->OnEntityChangingWorld(a_Entity, a_World))
 		{
 			return true;
 		}
