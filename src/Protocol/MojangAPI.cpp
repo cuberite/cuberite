@@ -459,7 +459,6 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 		a_Response.append((const char *)buf, (size_t)ret);
 	}
 
-	Socket.Disconnect();
 	return true;
 }
 
