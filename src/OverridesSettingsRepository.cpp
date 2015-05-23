@@ -260,7 +260,7 @@ bool cOverridesSettingsRepository::DeleteValue(const AString & a_KeyName, const 
 	}
 	else
 	{
-		return m_Overrides->DeleteValue(a_KeyName, a_ValueName);
+		return m_Main->DeleteValue(a_KeyName, a_ValueName);
 	}
 }
 
