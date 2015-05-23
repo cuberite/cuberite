@@ -26,7 +26,7 @@ public:
 	bool IsEating       (void) const  {return m_bIsEating; }
 	bool IsRearing      (void) const  {return m_bIsRearing; }
 	bool IsMthOpen      (void) const  {return m_bIsMouthOpen; }
-	bool IsTame         (void) const  {return m_bIsTame; }
+	bool IsTame         (void) const override {return m_bIsTame; }
 	int  GetHorseType   (void) const  {return m_Type; }
 	int  GetHorseColor  (void) const  {return m_Color; }
 	int  GetHorseStyle  (void) const  {return m_Style; }

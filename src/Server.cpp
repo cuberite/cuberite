@@ -72,7 +72,7 @@ class cServerListenCallbacks:
 
 	virtual void OnAccepted(cTCPLink & a_Link) override {}
 
-	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg)
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
 		LOGWARNING("Cannot listen on port %d: %d (%s).", m_Port, a_ErrorCode, a_ErrorMsg.c_str());
 	}

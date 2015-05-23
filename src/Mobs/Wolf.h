@@ -25,8 +25,8 @@ public:
 	virtual void Attack(std::chrono::milliseconds a_Dt) override;
 
 	// Get functions
-	bool    IsSitting     (void) const { return m_IsSitting; }
-	bool    IsTame        (void) const { return m_IsTame; }
+	bool    IsSitting     (void) const override { return m_IsSitting; }
+	bool    IsTame        (void) const override { return m_IsTame; }
 	bool    IsBegging     (void) const { return m_IsBegging; }
 	bool    IsAngry       (void) const { return m_IsAngry; }
 	AString GetOwnerName  (void) const { return m_OwnerName; }

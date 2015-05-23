@@ -179,7 +179,7 @@ public:
 	bool CanAddOldStyleHook(int a_HookType);
 	
 	// cWebPlugin overrides
-	virtual const AString GetWebTitle(void) const {return GetName(); }
+	virtual const AString GetWebTitle(void) const override {return GetName(); }
 	virtual AString HandleWebRequest(const HTTPRequest & a_Request) override;
 
 	/** Adds a new web tab to webadmin.
