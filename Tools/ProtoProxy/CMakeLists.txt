@@ -14,7 +14,9 @@ include_directories("../../lib")
 include_directories("../../lib/polarssl/include")
 include_directories("../../src")
 
-
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	add_flags_cxx("-Wno-error=conversion")
+endif()
 
 function(flatten_files arg1)
 	set(res "")

@@ -11,8 +11,9 @@ set_flags()
 set_lib_flags()
 enable_profile()
 
-
-
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=shorten-64-to-32")
+endif()
 
 # Set include paths to the used libraries:
 include_directories("../../lib")
