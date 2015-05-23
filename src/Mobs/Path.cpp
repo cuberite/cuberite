@@ -6,6 +6,7 @@
 #include "Path.h"
 #include "../Chunk.h"
 
+#define JUMP_G_COST 20
 
 #define DISTANCE_MANHATTAN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
@@ -31,18 +32,32 @@ bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
 /* cPath implementation */
 cPath::cPath(
 	cChunk & a_Chunk,
-	const Vector3i & a_StartingPoint, const Vector3i & a_EndingPoint, int a_MaxSteps,
+	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
 	double a_BoundingBoxWidth, double a_BoundingBoxHeight,
 	int a_MaxUp, int a_MaxDown
 ) :
-	m_Destination(a_EndingPoint.Floor()),
-	m_Source(a_StartingPoint.Floor()),
+
 	m_CurrentPoint(0),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
 	m_Chunk(&a_Chunk),
 	m_BadChunkFound(false)
 {
 	// TODO: if src not walkable OR dest not walkable, then abort.
 	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
+
+	a_BoundingBoxWidth = 1;  // Until we improve physics, if ever.
+
+	m_BoundingBoxWidth = ceil(a_BoundingBoxWidth);
+	m_BoundingBoxHeight = ceil(a_BoundingBoxHeight);
+	m_HalfWidth = a_BoundingBoxWidth / 2;
+
+	int HalfWidthInt = a_BoundingBoxWidth / 2;
+	m_Source.x = floor(a_StartingPoint.x - HalfWidthInt);
+	m_Source.y = floor(a_StartingPoint.y);
+	m_Source.z = floor(a_StartingPoint.z - HalfWidthInt);
+
+	m_Destination.x = floor(a_EndingPoint.x - HalfWidthInt);
+	m_Destination.y = floor(a_EndingPoint.y);
+	m_Destination.z = floor(a_EndingPoint.z - HalfWidthInt);
 
 	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
 	{
@@ -148,7 +163,7 @@ bool cPath::IsSolid(const Vector3i & a_Location)
 	}
 	if (BlockType == E_BLOCK_STATIONARY_WATER)
 	{
-		GetCell(a_Location + Vector3i(0, -1, 0))->m_IsSolid = true;  // Mobs will always think that the fence is 2 blocks high and therefore won't jump over.
+		GetCell(a_Location + Vector3i(0, -1, 0))->m_IsSolid = true;
 	}
 
 	return cBlockInfo::IsSolid(BlockType);
@@ -179,7 +194,7 @@ bool cPath::Step_Internal()
 
 	// Calculation not finished yet.
 	// Check if we have a new NearestPoint.
-
+	// TODO I don't like this that much, there should be a smarter way.
 	if ((m_Destination - CurrentCell->m_Location).Length() < 5)
 	{
 		if (m_Rand.NextInt(4) == 0)
@@ -193,21 +208,43 @@ bool cPath::Step_Internal()
 	}
 	// process a currentCell by inspecting all neighbors.
 
-	// Check North, South, East, West on all 3 different heights.
-	int i;
-	for (i = -1; i <= 1; ++i)
+
+	// Check North, South, East, West on our height.
+	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(1, 0, 0),  CurrentCell, 10);
+	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(-1, 0, 0), CurrentCell, 10);
+	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 0, 1),  CurrentCell, 10);
+	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 0, -1), CurrentCell, 10);
+
+	// Check diagonals on XY plane.
+	for (int x = -1; x <= 1; x += 2)
 	{
-		ProcessIfWalkable(CurrentCell->m_Location + Vector3i(1, i, 0),  CurrentCell, 10);
-		ProcessIfWalkable(CurrentCell->m_Location + Vector3i(-1, i, 0), CurrentCell, 10);
-		ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, i, 1),  CurrentCell, 10);
-		ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, i, -1), CurrentCell, 10);
+		if (GetCell(CurrentCell->m_Location + Vector3i(x, 0, 0))->m_IsSolid)  // If there's a solid our east / west.
+		{
+			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, 1, 0), CurrentCell, JUMP_G_COST);  // Check east / west-up.
+		}
+		else
+		{
+			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, -1, 0), CurrentCell, 14);  // Else check east / west-down.
+		}
 	}
 
-	// Check diagonals on mob's height only.
-	int x, z;
-	for (x = -1; x <= 1; x += 2)
+	// Check diagonals on the YZ plane.
+	for (int z = -1; z <= 1; z += 2)
 	{
-		for (z = -1; z <= 1; z += 2)
+		if (GetCell(CurrentCell->m_Location + Vector3i(0, 0, z))->m_IsSolid)  // If there's a solid our east / west.
+		{
+			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 1, z), CurrentCell, JUMP_G_COST);  // Check east / west-up.
+		}
+		else
+		{
+			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, -1, z), CurrentCell, 14);  // Else check east / west-down.
+		}
+	}
+
+	// Check diagonals on the XZ plane. (Normal diagonals, this plane is special because of gravity, etc)
+	for (int x = -1; x <= 1; x += 2)
+	{
+		for (int z = -1; z <= 1; z += 2)
 		{
 			// This condition prevents diagonal corner cutting.
 			if (!GetCell(CurrentCell->m_Location + Vector3i(x, 0, 0))->m_IsSolid && !GetCell(CurrentCell->m_Location + Vector3i(0, 0, z))->m_IsSolid)
@@ -320,7 +357,53 @@ si::setBlock((Ret)->m_Location.x, (Ret)->m_Location.y, (Ret)->m_Location.z, debu
 void cPath::ProcessIfWalkable(const Vector3i & a_Location, cPathCell * a_Parent, int a_Cost)
 {
 	cPathCell * cell = GetCell(a_Location);
-	if (!cell->m_IsSolid && GetCell(a_Location + Vector3i(0, -1, 0))->m_IsSolid && !GetCell(a_Location + Vector3i(0, 1, 0))->m_IsSolid)
+	int x, y, z;
+
+	// Make sure we fit in the position.
+	for (y = 0; y < m_BoundingBoxHeight; ++y)
+	{
+		for (x = 0; x < m_BoundingBoxWidth; ++x)
+		{
+			for (z = 0; z < m_BoundingBoxWidth; ++z)
+			{
+				if (GetCell(a_Location + Vector3i(x, y, z))->m_IsSolid)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+	/*y =-1;
+	for (x = 0; x < m_BoundingBoxWidth; ++x)
+	{
+		for (z = 0; z < m_BoundingBoxWidth; ++z)
+		{
+			if (!GetCell(a_Location + Vector3i(x, y, z))->m_IsSolid)
+			{
+				return;
+			}
+		}
+	}
+	ProcessCell(cell, a_Parent, a_Cost);*/
+
+	// Make sure there's at least 1 piece of solid below us.
+
+	bool GroundFlag = false;
+	y =-1;
+	for (x = 0; x < m_BoundingBoxWidth; ++x)
+	{
+		for (z = 0; z < m_BoundingBoxWidth; ++z)
+		{
+			if (GetCell(a_Location + Vector3i(x, y, z))->m_IsSolid)
+			{
+				GroundFlag = true;
+				break;
+			}
+		}
+	}
+
+	if (GroundFlag)
 	{
 		ProcessCell(cell, a_Parent, a_Cost);
 	}
