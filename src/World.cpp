@@ -150,7 +150,7 @@ protected:
 	int m_LastReportChunkCount;
 
 	// cChunkCoordCallback override:
-	virtual void Call(int a_ChunkX, int a_ChunkZ)
+	virtual void Call(int a_ChunkX, int a_ChunkZ) override
 	{
 		// Check if this was the last chunk:
 		m_NumPrepared += 1;
