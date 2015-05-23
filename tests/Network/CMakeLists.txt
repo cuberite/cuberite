@@ -41,8 +41,9 @@ if (MSVC)
 	target_link_libraries(Network ws2_32.lib)
 endif()
 
-
-
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	add_flags_cxx("-Wno-error=conversion")
+endif()
 
 # Define individual tests:
 
