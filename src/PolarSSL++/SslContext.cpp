@@ -152,7 +152,7 @@ void cSslContext::SetCACerts(const cX509CertPtr & a_CACert, const AString & a_Ex
 	m_CACerts = a_CACert;
 	
 	// Set the trusted CA root cert store:
-	ssl_set_authmode(&m_Ssl, SSL_VERIFY_OPTIONAL);
+	ssl_set_authmode(&m_Ssl, SSL_VERIFY_REQUIRED);
 	ssl_set_ca_chain(&m_Ssl, m_CACerts->GetInternal(), nullptr, m_ExpectedPeerName.empty() ? nullptr : m_ExpectedPeerName.c_str());
 }
 

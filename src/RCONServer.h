@@ -61,7 +61,7 @@ protected:
 		
 
 		// cTCPLink::cCallbacks overrides:
-		virtual void OnLinkCreated(cTCPLinkPtr a_Link);
+		virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;
 		virtual void OnReceivedData(const char * a_Data, size_t a_Length) override;
 		virtual void OnRemoteClosed(void) override;
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;

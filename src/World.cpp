@@ -150,7 +150,7 @@ protected:
 	int m_LastReportChunkCount;
 
 	// cChunkCoordCallback override:
-	virtual void Call(int a_ChunkX, int a_ChunkZ)
+	virtual void Call(int a_ChunkX, int a_ChunkZ) override
 	{
 		// Check if this was the last chunk:
 		m_NumPrepared += 1;
@@ -362,6 +362,7 @@ cWorld::~cWorld()
 void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+	BroadcastSoundEffect("ambient.weather.thunder", a_BlockX, a_BlockY, a_BlockZ, 50, 1);
 }
 
 

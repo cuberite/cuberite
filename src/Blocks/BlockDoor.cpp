@@ -50,10 +50,24 @@ void cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 	UNUSED(a_CursorY);
 	UNUSED(a_CursorZ);
 
-	if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_DOOR)
+	switch (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ))
 	{
-		ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-		a_Player->GetWorld()->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+		default:
+		{
+			ASSERT(!"Unhandled door block type");
+		}
+		case E_BLOCK_ACACIA_DOOR:
+		case E_BLOCK_BIRCH_DOOR:
+		case E_BLOCK_DARK_OAK_DOOR:
+		case E_BLOCK_JUNGLE_DOOR:
+		case E_BLOCK_SPRUCE_DOOR:
+		case E_BLOCK_IRON_DOOR:
+		case E_BLOCK_WOODEN_DOOR:
+		{
+			ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+			a_Player->GetWorld()->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+			break;
+		}
 	}
 }
 

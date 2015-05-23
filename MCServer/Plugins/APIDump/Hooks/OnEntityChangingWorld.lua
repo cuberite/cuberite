@@ -1,9 +1,9 @@
 return
 {
-	HOOK_ENTITY_CHANGE_WORLD =
+	HOOK_ENTITY_CHANGING_WORLD =
 	{
 		CalledWhen = "Before a entity is changing the world.",
-		DefaultFnName = "OnEntityChangeWorld",  -- also used as pagename
+		DefaultFnName = "OnEntityChangingWorld",  -- also used as pagename
 		Desc = [[
 			This hook is called before the server moves the {{cEntity|entity}} to the given world. Plugins may
 			refuse the changing of the entity to the new world.<p>
@@ -20,7 +20,7 @@ return
 			returns true, no other callback is called for this event and the change of the entity to the world is
 			cancelled.
 		]],
-	},  -- HOOK_ENTITY_CHANGE_WORLD
+	},  -- HOOK_ENTITY_CHANGING_WORLD
 }
 
 

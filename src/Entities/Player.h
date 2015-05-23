@@ -483,11 +483,11 @@ public:
 	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
 
 	// cEntity overrides:
-	virtual bool IsCrouched (void) const { return m_IsCrouched; }
-	virtual bool IsSprinting(void) const { return m_IsSprinting; }
-	virtual bool IsRclking  (void) const { return IsEating() || IsChargingBow(); }
+	virtual bool IsCrouched (void) const override { return m_IsCrouched; }
+	virtual bool IsSprinting(void) const override { return m_IsSprinting; }
+	virtual bool IsRclking  (void) const override { return IsEating() || IsChargingBow(); }
 
-	virtual void Detach(void);
+	virtual void Detach(void) override;
 
 	/** Called by cClientHandle when the client is being destroyed.
 	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
@@ -642,7 +642,7 @@ protected:
 	void ResolvePermissions(void);
 	void ResolveGroups(void);
 
-	virtual void Destroyed(void);
+	virtual void Destroyed(void) override;
 
 	/** Filters out damage for creative mode / friendly fire */
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;

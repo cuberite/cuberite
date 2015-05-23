@@ -374,6 +374,14 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 
 		TCLAP::MultiArg<int> portsArg("p", "port", "The port number the server should listen to", false, "port", cmd);
 
+		TCLAP::SwitchArg commLogArg("", "log-comm", "Log server client communications to file", cmd);
+
+		TCLAP::SwitchArg commLogInArg("", "log-comm-in", "Log inbound server client communications to file", cmd);
+		
+		TCLAP::SwitchArg commLogOutArg("", "log-comm-out", "Log outbound server client communications to file", cmd);
+
+		TCLAP::SwitchArg noBufArg("", "no-output-buffering", "Disable output buffering", cmd);
+
 		cmd.parse(argc, argv);
 
 		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
@@ -394,6 +402,22 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 			{
 				repo->AddValue("Server", "Port", static_cast<Int64>(port));
 			}
+		}
+
+		if (commLogArg.getValue())
+		{
+			g_ShouldLogCommIn = true;
+			g_ShouldLogCommOut = true;
+		}
+		else
+		{
+			g_ShouldLogCommIn = commLogInArg.getValue();
+			g_ShouldLogCommOut = commLogOutArg.getValue();
+		}
+
+		if (noBufArg.getValue())
+		{
+			setvbuf(stdout, nullptr, _IONBF, 0);
 		}
 
 		repo->SetReadOnly();
@@ -473,35 +497,7 @@ int main(int argc, char **argv)
 	for (int i = 0; i < argc; i++)
 	{
 		AString Arg(argv[i]);
-		if (
-			(NoCaseCompare(Arg, "/commlog") == 0) ||
-			(NoCaseCompare(Arg, "/logcomm") == 0)
-		)
-		{
-			g_ShouldLogCommIn = true;
-			g_ShouldLogCommOut = true;
-		}
-		else if (
-			(NoCaseCompare(Arg, "/commlogin") == 0) ||
-			(NoCaseCompare(Arg, "/comminlog") == 0) ||
-			(NoCaseCompare(Arg, "/logcommin") == 0)
-		)
-		{
-			g_ShouldLogCommIn = true;
-		}
-		else if (
-			(NoCaseCompare(Arg, "/commlogout") == 0) ||
-			(NoCaseCompare(Arg, "/commoutlog") == 0) ||
-			(NoCaseCompare(Arg, "/logcommout") == 0)
-		)
-		{
-			g_ShouldLogCommOut = true;
-		}
-		else if (NoCaseCompare(Arg, "nooutbuf") == 0)
-		{
-			setvbuf(stdout, nullptr, _IONBF, 0);
-		}
-		else if (NoCaseCompare(Arg, "/service") == 0)
+		if (NoCaseCompare(Arg, "/service") == 0)
 		{
 			cRoot::m_RunAsService = true;
 		}

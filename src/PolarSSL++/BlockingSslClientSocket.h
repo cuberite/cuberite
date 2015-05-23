@@ -21,6 +21,11 @@ class cBlockingSslClientSocket :
 {
 public:
 	cBlockingSslClientSocket(void);
+
+	~cBlockingSslClientSocket(void)
+	{
+		Disconnect();
+	}
 	
 	/** Connects to the specified server and performs SSL handshake.
 	Returns true if successful, false on failure. Sets internal error text on failure. */

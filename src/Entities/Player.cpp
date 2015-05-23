@@ -128,6 +128,13 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 			m_IsFlying = true;
 		}
 	}
+
+	if (m_GameMode == gmSpectator)  // If player is reconnecting to the server in spectator mode
+	{
+		m_CanFly = true;
+		m_IsFlying = true;
+		m_bVisible = false;
+	}
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
@@ -1205,6 +1212,15 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 		SetCanFly(false);
 	}
 
+	if (IsGameModeSpectator() && IsVisible())
+	{
+		SetVisible(false);
+	}
+	else if (!IsVisible())
+	{
+		SetVisible(true);
+	}
+
 	m_World->BroadcastPlayerListUpdateGameMode(*this);
 }
 
@@ -1606,9 +1622,10 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		return false;
 	}
 	
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangeWorld(*this, *a_World))
+	//  Ask the plugins if the player is allowed to changing the world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
 	{
-		// A Plugin doesn't allow the player to change the world
+		// A Plugin doesn't allow the player to changing the world
 		return false;
 	}
 
