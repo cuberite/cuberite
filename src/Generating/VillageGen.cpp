@@ -259,13 +259,13 @@ protected:
 	
 	
 	// cPiecePool overrides:
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType)
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override
 	{
 		return m_Prefabs.GetPiecesWithConnector(a_ConnectorType);
 	}
 	
 	
-	virtual cPieces GetStartingPieces(void)
+	virtual cPieces GetStartingPieces(void) override
 	{
 		return m_Prefabs.GetStartingPieces();
 	}

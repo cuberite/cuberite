@@ -69,7 +69,7 @@ public:
 	}
 
 
-	virtual void InitializeShapeGen(cIniFile & a_IniFile)
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override
 	{
 		m_FrequencyX = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "TwoHeightsFrequencyX", 40));
 		m_FrequencyY = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "TwoHeightsFrequencyY", 40));

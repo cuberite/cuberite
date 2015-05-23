@@ -54,19 +54,19 @@ class cBlockingSslClientSocketLinkCallbacks:
 	}
 
 
-	virtual void OnReceivedData(const char * a_Data, size_t a_Length)
+	virtual void OnReceivedData(const char * a_Data, size_t a_Length) override
 	{
 		m_Socket.OnReceivedData(a_Data, a_Length);
 	}
 
 
-	virtual void OnRemoteClosed(void)
+	virtual void OnRemoteClosed(void) override
 	{
 		m_Socket.OnDisconnected();
 	}
 
 
-	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg)
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
 		m_Socket.OnDisconnected();
 	}

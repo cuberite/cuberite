@@ -25,7 +25,7 @@ public:
 		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ
-	)
+	) override
 	{
 		// If the regular placement doesn't work, do no further processing:
 		if (!super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))

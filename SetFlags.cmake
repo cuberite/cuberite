@@ -258,6 +258,10 @@ macro(set_exe_flags)
 				# flags introduced in 3.2
 				add_flags_cxx("-Wno-documentation")
 			endif()
+			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+				# Use this flag to ignore error for a reserved macro problem in sqlite 3
+				add_flags_cxx("-Wno-reserved-id-macro")
+			endif()
 		endif()
 	endif()
 

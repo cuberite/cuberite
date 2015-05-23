@@ -203,10 +203,10 @@ public:
 	
 	bool VillagersShouldHarvestCrops(void) const { return m_VillagersShouldHarvestCrops; }
 
-	virtual eDimension GetDimension(void) const { return m_Dimension; }
+	virtual eDimension GetDimension(void) const override { return m_Dimension; }
 
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
-	virtual int GetHeight(int a_BlockX, int a_BlockZ);
+	virtual int GetHeight(int a_BlockX, int a_BlockZ) override;
 	
 	// tolua_end
 
@@ -253,7 +253,7 @@ public:
 	void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void BroadcastSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr);   // tolua_export
+	void BroadcastSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
 	void BroadcastSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = nullptr);  // tolua_export
 	void BroadcastSpawnEntity                (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastTeleportEntity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
@@ -788,7 +788,7 @@ public:
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 	
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
-	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override
 	{
 		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}

@@ -89,7 +89,7 @@ public:
 	void Clear(void);
 	
 	/** Returns true iff the specified value exists. */
-	bool HasValue(const AString & a_KeyName, const AString & a_ValueName) const;
+	bool HasValue(const AString & a_KeyName, const AString & a_ValueName) const override;
 
 	/// Returns index of specified key, or noID if not found
 	int FindKey(const AString & keyname) const;
@@ -101,7 +101,7 @@ public:
 	int GetNumKeys(void) const { return (int)keys.size(); }
 
 	/// Add a key name
-	int AddKeyName(const AString & keyname);
+	int AddKeyName(const AString & keyname) override;
 
 	// Returns key names by index.
 	AString GetKeyName(const int keyID) const;
@@ -117,7 +117,7 @@ public:
 	// Gets value of [keyname] valuename =.
 	// Overloaded to return string, int, and double.
 	// Returns defValue if key / value not found.
-	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const;
+	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const override;
 	AString GetValue (const int keyID,    const int valueID,    const AString & defValue = "")    const;
 	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;
 	int     GetValueI(const AString & keyname, const AString & valuename, const int       defValue = 0)     const;
@@ -127,18 +127,18 @@ public:
 	}
 	
 	// Gets the value; if not found, write the default to the INI file
-	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "");
+	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "") override;
 	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);
-	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0);
-	Int64   GetValueSetI(const AString & keyname, const AString & valuename, const Int64     defValue = 0);
-	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false)
+	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0) override;
+	Int64   GetValueSetI(const AString & keyname, const AString & valuename, const Int64     defValue = 0) override;
+	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false) override
 	{
 		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) != 0);
 	}
 
 	// Adds a new value to the specified key.
 	// If a value of the same name already exists, creates another one (non-standard INI file)
-	void AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value);
+	void AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value) override;
 	void AddValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value);
 	void AddValueB(const AString & a_KeyName, const AString & a_ValueName, const bool a_Value)
 	{
@@ -151,8 +151,8 @@ public:
 	// Returns true if value set, false otherwise.
 	// Overloaded to accept string, int, and double.
 	bool SetValue (const int keyID, const int valueID, const AString & value);
-	bool SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists = true);
-	bool SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists = true);
+	bool SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists = true) override;
+	bool SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists = true) override;
 	bool SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists = true);
 	bool SetValueB(const AString & a_KeyName, const AString & a_ValueName, const bool a_Value, const bool a_CreateIfNotExists = true)
 	{
@@ -163,7 +163,7 @@ public:
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.
 	bool DeleteValueByID(const int keyID, const int valueID);
-	bool DeleteValue(const AString & keyname, const AString & valuename);
+	bool DeleteValue(const AString & keyname, const AString & valuename) override;
 
 	// Deletes specified key and all values contained within.
 	// Returns true if key existed and deleted, false otherwise.
@@ -204,15 +204,15 @@ public:
 	bool AddKeyComment(const int keyID, const AString & comment);
 
 	/// Add a key comment
-	bool AddKeyComment(const AString & keyname, const AString & comment);
+	bool AddKeyComment(const AString & keyname, const AString & comment) override;
 	
 	/// Return a key comment
 	AString GetKeyComment(const int keyID, const int commentID) const;
-	AString GetKeyComment(const AString & keyname, const int commentID) const;
+	AString GetKeyComment(const AString & keyname, const int commentID) const override;
 	
 	// Delete a key comment.
 	bool DeleteKeyComment(const int keyID, const int commentID);
-	bool DeleteKeyComment(const AString & keyname, const int commentID);
+	bool DeleteKeyComment(const AString & keyname, const int commentID) override;
 	
 	// Delete all comments for a key.
 	bool DeleteKeyComments(const int keyID);
