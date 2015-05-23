@@ -19,6 +19,10 @@
 #define DEFAULT_AUTH_SERVER "sessionserver.mojang.com"
 #define DEFAULT_AUTH_ADDRESS "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%"
 
+
+
+
+
 cAuthenticator::cAuthenticator(void) :
 	super("cAuthenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
@@ -267,3 +271,7 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	return true;
 }
 */
+
+
+
+

@@ -534,7 +534,7 @@ bool cPluginLua::OnEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_E
 
 
 
-bool cPluginLua::OnEntityChangeWorld(cEntity & a_Entity, cWorld & a_World)
+bool cPluginLua::OnEntityChangingWorld(cEntity & a_Entity, cWorld & a_World)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -542,7 +542,7 @@ bool cPluginLua::OnEntityChangeWorld(cEntity & a_Entity, cWorld & a_World)
 		return false;
 	}
 	bool res = false;
-	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_CHANGE_WORLD];
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_CHANGING_WORLD];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
 		m_LuaState.Call((int)(**itr), &a_Entity, &a_World, cLuaState::Return, res);
@@ -1922,7 +1922,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_DISCONNECT:                   return "OnDisconnect";
 		case cPluginManager::HOOK_PLAYER_ANIMATION:             return "OnPlayerAnimation";
 		case cPluginManager::HOOK_ENTITY_ADD_EFFECT:            return "OnEntityAddEffect";
-		case cPluginManager::HOOK_ENTITY_CHANGE_WORLD:          return "OnEntityChangeWorld";
+		case cPluginManager::HOOK_ENTITY_CHANGING_WORLD:        return "OnEntityChangingWorld";
 		case cPluginManager::HOOK_ENTITY_CHANGED_WORLD:         return "OnEntityChangedWorld";
 		case cPluginManager::HOOK_ENTITY_TELEPORT:              return "OnEntityTeleport";
 		case cPluginManager::HOOK_EXECUTE_COMMAND:              return "OnExecuteCommand";

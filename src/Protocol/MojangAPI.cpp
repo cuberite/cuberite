@@ -38,12 +38,36 @@ const int MAX_PER_QUERY = 100;
 
 
 
-/** This is the data of the root certs for Starfield Technologies, the CA that signed sessionserver.mojang.com's cert:
-Downloaded from http://certs.starfieldtech.com/repository/ */
-static const AString & StarfieldCACert(void)
+/** Returns the CA certificates that should be trusted for Mojang-related connections. */
+static const AString & GetCACerts(void)
 {
 	static const AString Cert(
-		// G2 cert
+		// Equifax root CA cert
+		// Currently used for signing *.mojang.com's cert
+		// Exported from Mozilla Firefox's built-in CA repository
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIDIDCCAomgAwIBAgIENd70zzANBgkqhkiG9w0BAQUFADBOMQswCQYDVQQGEwJV\n"
+		"UzEQMA4GA1UEChMHRXF1aWZheDEtMCsGA1UECxMkRXF1aWZheCBTZWN1cmUgQ2Vy\n"
+		"dGlmaWNhdGUgQXV0aG9yaXR5MB4XDTk4MDgyMjE2NDE1MVoXDTE4MDgyMjE2NDE1\n"
+		"MVowTjELMAkGA1UEBhMCVVMxEDAOBgNVBAoTB0VxdWlmYXgxLTArBgNVBAsTJEVx\n"
+		"dWlmYXggU2VjdXJlIENlcnRpZmljYXRlIEF1dGhvcml0eTCBnzANBgkqhkiG9w0B\n"
+		"AQEFAAOBjQAwgYkCgYEAwV2xWGcIYu6gmi0fCG2RFGiYCh7+2gRvE4RiIcPRfM6f\n"
+		"BeC4AfBONOziipUEZKzxa1NfBbPLZ4C/QgKO/t0BCezhABRP/PvwDN1Dulsr4R+A\n"
+		"cJkVV5MW8Q+XarfCaCMczE1ZMKxRHjuvK9buY0V7xdlfUNLjUA86iOe/FP3gx7kC\n"
+		"AwEAAaOCAQkwggEFMHAGA1UdHwRpMGcwZaBjoGGkXzBdMQswCQYDVQQGEwJVUzEQ\n"
+		"MA4GA1UEChMHRXF1aWZheDEtMCsGA1UECxMkRXF1aWZheCBTZWN1cmUgQ2VydGlm\n"
+		"aWNhdGUgQXV0aG9yaXR5MQ0wCwYDVQQDEwRDUkwxMBoGA1UdEAQTMBGBDzIwMTgw\n"
+		"ODIyMTY0MTUxWjALBgNVHQ8EBAMCAQYwHwYDVR0jBBgwFoAUSOZo+SvSspXXR9gj\n"
+		"IBBPM5iQn9QwHQYDVR0OBBYEFEjmaPkr0rKV10fYIyAQTzOYkJ/UMAwGA1UdEwQF\n"
+		"MAMBAf8wGgYJKoZIhvZ9B0EABA0wCxsFVjMuMGMDAgbAMA0GCSqGSIb3DQEBBQUA\n"
+		"A4GBAFjOKer89961zgK5F7WF0bnj4JXMJTENAKaSbn+2kmOeUJXRmm/kEd5jhW6Y\n"
+		"7qj/WsjTVbJmcVfewCHrPSqnI0kBBIZCe/zuf6IWUrVnZ9NA2zsmWLIodz2uFHdh\n"
+		"1voqZiegDfqnc1zqcPGUIWVEX/r87yloqaKHee9570+sB3c4\n"
+		"-----END CERTIFICATE-----\n\n"
+
+		// Starfield G2 cert
+		// This is the data of the root certs for Starfield Technologies, the CA that used to sign sessionserver.mojang.com's cert
+		// Downloaded from http://certs.starfieldtech.com/repository/
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIID3TCCAsWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBjzELMAkGA1UEBhMCVVMx\n"
 		"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT\n"
@@ -67,7 +91,8 @@ static const AString & StarfieldCACert(void)
 		"pL/QlwVKvOoYKAKQvVR4CSFx09F9HdkWsKlhPdAKACL8x3vLCWRFCztAgfd9fDL1\n"
 		"mMpYjn0q7pBZc2T5NnReJaH1ZgUufzkVqSr7UIuOhWn0\n"
 		"-----END CERTIFICATE-----\n\n"
-		// Original (G1) cert:
+
+		// Starfield original (G1) cert:
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl\n"
 		"MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp\n"
@@ -390,7 +415,7 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 {
 	// Connect the socket:
 	cBlockingSslClientSocket Socket;
-	Socket.SetTrustedRootCertsFromString(StarfieldCACert(), a_ServerName);
+	Socket.SetTrustedRootCertsFromString(GetCACerts(), a_ServerName);
 	if (!Socket.Connect(a_ServerName, 443))
 	{
 		LOGWARNING("%s: Can't connect to %s: %s", __FUNCTION__, a_ServerName.c_str(), Socket.GetLastErrorText().c_str());
@@ -434,7 +459,6 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 		a_Response.append((const char *)buf, (size_t)ret);
 	}
 
-	Socket.Disconnect();
 	return true;
 }
 

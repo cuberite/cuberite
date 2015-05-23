@@ -177,13 +177,14 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		case ePathFinderStatus::NEARBY_FOUND:
 		{
 			m_NoPathToTarget = true;
-			m_Path->AcceptNearbyPath();
+			m_PathFinderDestination = m_Path->AcceptNearbyPath();
 			break;
 		}
 
 		case ePathFinderStatus::PATH_NOT_FOUND:
 		{
-			StopMovingToPosition();  // Give up pathfinding to that destination.
+			ResetPathFinding();  // Try to calculate a path again.
+			// Note that the next time may succeed, e.g. if a player breaks a barrier.
 			break;
 		}
 		case ePathFinderStatus::CALCULATING:

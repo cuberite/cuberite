@@ -530,7 +530,7 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 	// Call the implementation:
 	int Height = 0;
 	bool res = self->TryGetHeight(BlockX, BlockZ, Height);
-	L.Push(res ? 1 : 0);
+	L.Push(res);
 	if (res)
 	{
 		L.Push(Height);

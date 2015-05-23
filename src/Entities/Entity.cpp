@@ -1403,10 +1403,10 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	//  Ask the plugins if the entity is allowed to change the world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangeWorld(*this, *a_World))
+	//  Ask the plugins if the entity is allowed to changing the world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
 	{
-		// A Plugin doesn't allow the entity to change the world
+		// A Plugin doesn't allow the entity to changing the world
 		return false;
 	}
 
