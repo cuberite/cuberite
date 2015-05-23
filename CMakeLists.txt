@@ -52,6 +52,9 @@ if(MSVC OR MSVC_IDE)
   endif()
 endif()
 
+set(BUILD_TOOLS OFF CACHE BOOL "")
+set(SELF_TEST OFF CACHE BOOL "")
+
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	message("Building tools")
