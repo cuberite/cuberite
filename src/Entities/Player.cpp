@@ -1212,6 +1212,15 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 		SetCanFly(false);
 	}
 
+	if (IsGameModeSpectator() && IsVisible())
+	{
+		SetVisible(false);
+	}
+	else if (!IsVisible())
+	{
+		SetVisible(true);
+	}
+
 	m_World->BroadcastPlayerListUpdateGameMode(*this);
 }
 
