@@ -80,8 +80,9 @@ macro(set_flags)
 
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
-		if (UNIX)
+		if (${UNIX})
 			add_flags_cxx("-pthread")
+			add_flags_lnk("-pthread")
 		endif()
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
