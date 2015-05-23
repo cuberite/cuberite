@@ -128,6 +128,13 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 			m_IsFlying = true;
 		}
 	}
+
+	if (m_GameMode == gmSpectator)  // If player is reconnecting to the server in spectator mode
+	{
+		m_CanFly = true;
+		m_IsFlying = true;
+		m_bVisible = false;
+	}
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
