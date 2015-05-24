@@ -65,7 +65,7 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
 		}
 	}
-	m_TotalBlocks -= (int)ChunkData.size();
+	m_TotalBlocks -= static_cast<int>(ChunkData.size());
 	ChunkData.clear();
 }
 
@@ -265,8 +265,12 @@ void cSandSimulator::FinishFalling(
 	
 	// Create a pickup instead:
 	cItems Pickups;
-	Pickups.Add((ENUM_ITEM_ID)a_FallingBlockType, 1, a_FallingBlockMeta);
-	a_World->SpawnItemPickups(Pickups, (double)a_BlockX + 0.5, (double)a_BlockY + 0.5, (double)a_BlockZ + 0.5);
+	Pickups.Add(static_cast<ENUM_ITEM_ID>(a_FallingBlockType), 1, a_FallingBlockMeta);
+	a_World->SpawnItemPickups(
+			Pickups,
+			static_cast<double>(a_BlockX) + 0.5,
+			static_cast<double>(a_BlockY) + 0.5,
+			static_cast<double>(a_BlockZ) + 0.5);
 }
 
 

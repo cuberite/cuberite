@@ -9,7 +9,7 @@
 
 
 /// Converts an angle in radians into a byte representation used by the network protocol
-#define ANGLE_TO_PROTO(X) (Byte)(X * 255 / 360)
+#define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
 
 ////////////////////////////////////////////////////////////////////////////////
 // cSplashPotionEntityCallback:
@@ -51,7 +51,7 @@ public:
 		double Reduction = -0.25 * SplashDistance + 1.0;
 		Reduction = std::max(Reduction, 0.0);
 		
-		((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.GetDuration(), m_EntityEffect.GetIntensity(), Reduction);
+		static_cast<cPawn *>(a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.GetDuration(), m_EntityEffect.GetIntensity(), Reduction);
 		return false;
 	}
 
@@ -116,7 +116,12 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);
 	
-	m_World->BroadcastSoundParticleEffect(2002, (int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z), m_PotionColor);
+	m_World->BroadcastSoundParticleEffect(
+			2002,
+			static_cast<int>(floor(a_HitPos.x)),
+			static_cast<int>(floor(a_HitPos.y)),
+			static_cast<int>(floor(a_HitPos.z)),
+			m_PotionColor);
 }
 
 

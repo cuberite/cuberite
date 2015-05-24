@@ -43,8 +43,8 @@ class cReader :
 	{
 		// Copy the entire heightmap, distribute it into the 3x3 chunk blob:
 		typedef struct {HEIGHTTYPE m_Row[16]; } ROW;
-		ROW * InputRows  = (ROW *)a_Heightmap;
-		ROW * OutputRows = (ROW *)m_HeightMap;
+		const ROW * InputRows  = reinterpret_cast<const ROW *>(a_Heightmap);
+		ROW * OutputRows = reinterpret_cast<ROW *>(m_HeightMap);
 		int InputIdx = 0;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
 		for (int z = 0; z < cChunkDef::Width; z++)
@@ -217,7 +217,7 @@ void cLightingThread::Execute(void)
 			{
 				continue;
 			}
-			Item = (cLightingChunkStay *)m_Queue.front();
+			Item = static_cast<cLightingChunkStay *>(m_Queue.front());
 			m_Queue.pop_front();
 			if (m_Queue.empty())
 			{

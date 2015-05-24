@@ -32,7 +32,7 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & 
 	int TotalDamage = 0;
 	if (a_EntityHit.IsMob())
 	{
-		eMonsterType MobType = ((cMonster &) a_EntityHit).GetMobType();
+		eMonsterType MobType = static_cast<cMonster &>(a_EntityHit).GetMobType();
 		if (MobType == mtBlaze)
 		{
 			TotalDamage = 3;

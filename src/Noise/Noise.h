@@ -185,7 +185,7 @@ typedef cOctavedNoise<cRidgedNoise<cCubicNoise>> cRidgedMultiNoise;
 NOISE_DATATYPE cNoise::IntNoise1D(int a_X) const
 {
 	int x = ((a_X * m_Seed) << 13) ^ a_X;
-	return (1 - (NOISE_DATATYPE)((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
+	return (1 - static_cast<NOISE_DATATYPE>((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
 	// returns a float number in the range of [-1, 1]
 }
 
@@ -197,7 +197,7 @@ NOISE_DATATYPE cNoise::IntNoise2D(int a_X, int a_Y) const
 {
 	int n = a_X + a_Y * 57 + m_Seed * 57 * 57;
 	n = (n << 13) ^ n;
-	return (1 - (NOISE_DATATYPE)((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
+	return (1 - static_cast<NOISE_DATATYPE>((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
 	// returns a float number in the range of [-1, 1]
 }
 
@@ -209,7 +209,8 @@ NOISE_DATATYPE cNoise::IntNoise3D(int a_X, int a_Y, int a_Z) const
 {
 	int n = a_X + a_Y * 57 + a_Z * 57 * 57 + m_Seed * 57 * 57 * 57;
 	n = (n << 13) ^ n;
-	return ((NOISE_DATATYPE)1 - (NOISE_DATATYPE)((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
+	return (static_cast<NOISE_DATATYPE>(1) -
+			static_cast<NOISE_DATATYPE>((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
 	// returns a float number in the range of [-1, 1]
 }
 
@@ -265,8 +266,8 @@ NOISE_DATATYPE cNoise::CubicInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, 
 
 NOISE_DATATYPE cNoise::CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct)
 {
-	const NOISE_DATATYPE ft = a_Pct * (NOISE_DATATYPE)3.1415927;
-	const NOISE_DATATYPE f = (NOISE_DATATYPE)((NOISE_DATATYPE)(1 - cos(ft)) * (NOISE_DATATYPE)0.5);
+	const NOISE_DATATYPE ft = a_Pct * static_cast<NOISE_DATATYPE>(3.1415927);
+	const NOISE_DATATYPE f = static_cast<NOISE_DATATYPE>(static_cast<NOISE_DATATYPE>(1 - cos(ft)) * static_cast<NOISE_DATATYPE>(0.5));
 	return  a_A * (1 - f) + a_B * f;
 }
 

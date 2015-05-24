@@ -33,7 +33,7 @@ void cPainting::SpawnOn(cClientHandle & a_Client)
 
 void cPainting::GetDrops(cItems & a_Items, cEntity * a_Killer)
 {
-	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !((cPlayer *)a_Killer)->IsGameModeCreative())
+	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !static_cast<cPlayer *>(a_Killer)->IsGameModeCreative())
 	{
 		a_Items.push_back(cItem(E_ITEM_PAINTING));
 	}

@@ -236,7 +236,7 @@ public:
 					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
 					if (!cFluidSimulator::CanWashAway(a_CBBlockType) && !IsBlockLiquid(a_CBBlockType))
 					{
-						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, (eBlockFace)a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
+						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, static_cast<eBlockFace>(a_CBEntryFace));  // Was an unwashawayable block, can't overwrite it!
 					}
 					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);  // (Block could be washed away, replace it)
 					return true;  // Abort tracing

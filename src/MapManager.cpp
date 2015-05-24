@@ -86,7 +86,7 @@ cMap * cMapManager::CreateMap(int a_CenterX, int a_CenterY, unsigned int a_Scale
 		return nullptr;
 	}
 
-	cMap Map((unsigned)m_MapData.size(), a_CenterX, a_CenterY, m_World, a_Scale);
+	cMap Map(static_cast<unsigned>(m_MapData.size()), a_CenterX, a_CenterY, m_World, a_Scale);
 
 	m_MapData.push_back(Map);
 
@@ -151,7 +151,7 @@ void cMapManager::SaveMapData(void)
 
 	cIDCountSerializer IDSerializer(m_World->GetName());
 
-	IDSerializer.SetMapCount((unsigned)m_MapData.size());
+	IDSerializer.SetMapCount(static_cast<unsigned>(m_MapData.size()));
 
 	if (!IDSerializer.Save())
 	{

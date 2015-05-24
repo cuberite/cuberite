@@ -55,10 +55,10 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_World->GetTickRandomNumber(50) == 25)
 			{
-				m_World->BroadcastSoundParticleEffect(2000, (int)GetPosX(), (int)GetPosY(), (int)GetPosZ(), 0);
-				m_World->BroadcastSoundParticleEffect(2000, (int)GetPosX(), (int)GetPosY(), (int)GetPosZ(), 2);
-				m_World->BroadcastSoundParticleEffect(2000, (int)GetPosX(), (int)GetPosY(), (int)GetPosZ(), 6);
-				m_World->BroadcastSoundParticleEffect(2000, (int)GetPosX(), (int)GetPosY(), (int)GetPosZ(), 8);
+				m_World->BroadcastSoundParticleEffect(2000, static_cast<int>(GetPosX()), static_cast<int>(GetPosY()), static_cast<int>(GetPosZ()), 0);
+				m_World->BroadcastSoundParticleEffect(2000, static_cast<int>(GetPosX()), static_cast<int>(GetPosY()), static_cast<int>(GetPosZ()), 2);
+				m_World->BroadcastSoundParticleEffect(2000, static_cast<int>(GetPosX()), static_cast<int>(GetPosY()), static_cast<int>(GetPosZ()), 6);
+				m_World->BroadcastSoundParticleEffect(2000, static_cast<int>(GetPosX()), static_cast<int>(GetPosY()), static_cast<int>(GetPosZ()), 8);
 
 				m_Attachee->Detach();
 				m_bIsRearing = true;

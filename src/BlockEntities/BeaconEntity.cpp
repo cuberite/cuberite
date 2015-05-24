@@ -77,7 +77,7 @@ bool cBeaconEntity::IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLe
 
 		default:
 		{
-			LOGD("%s: Invalid beacon effect: %d", __FUNCTION__, (int)a_Effect);
+			LOGD("%s: Invalid beacon effect: %d", __FUNCTION__, static_cast<int>(a_Effect));
 			return false;
 		}
 	}
@@ -228,9 +228,9 @@ void cBeaconEntity::GiveEffects(void)
 		virtual bool Item(cPlayer * a_Player)
 		{
 			Vector3d PlayerPosition = Vector3d(a_Player->GetPosition());
-			if (PlayerPosition.y > (double)m_PosY)
+			if (PlayerPosition.y > static_cast<double>(m_PosY))
 			{
-				PlayerPosition.y = (double)m_PosY;
+				PlayerPosition.y = static_cast<double>(m_PosY);
 			}
 
 			// TODO: Vanilla minecraft uses an AABB check instead of a radius one

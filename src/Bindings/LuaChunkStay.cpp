@@ -41,7 +41,7 @@ bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
 	
 	// Add each set of coords:
 	int NumChunks = luaL_getn(L, a_ChunkCoordTableStackPos);
-	m_Chunks.reserve((size_t)NumChunks);
+	m_Chunks.reserve(static_cast<size_t>(NumChunks));
 	for (int idx = 1; idx <= NumChunks; idx++)
 	{
 		// Push the idx-th element of the array onto stack top, check that it's a table:
@@ -133,7 +133,7 @@ void cLuaChunkStay::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 	if (m_OnChunkAvailable.IsValid())
 	{
 		cPluginLua::cOperation Op(m_Plugin);
-		Op().Call((int)m_OnChunkAvailable, a_ChunkX, a_ChunkZ);
+		Op().Call(static_cast<int>(m_OnChunkAvailable), a_ChunkX, a_ChunkZ);
 	}
 }
 
@@ -147,7 +147,7 @@ bool cLuaChunkStay::OnAllChunksAvailable(void)
 	{
 		// Call the callback:
 		cPluginLua::cOperation Op(m_Plugin);
-		Op().Call((int)m_OnAllChunksAvailable);
+		Op().Call(static_cast<int>(m_OnAllChunksAvailable));
 		
 		// Remove the callback references - they won't be needed anymore
 		m_OnChunkAvailable.UnRef();

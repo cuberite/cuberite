@@ -56,12 +56,12 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 			a_ClosestPlayer->DeltaExperience(m_Reward);
 			
-			m_World->BroadcastSoundEffect("random.orb", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+			m_World->BroadcastSoundEffect("random.orb", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 			
 			Destroy();
 		}
 		a_Distance.Normalize();
-		a_Distance *= ((float) (5.5 - Distance));
+		a_Distance *= (static_cast<float>(5.5 - Distance));
 		SetSpeedX( a_Distance.x);
 		SetSpeedY( a_Distance.y);
 		SetSpeedZ( a_Distance.z);

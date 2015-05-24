@@ -32,7 +32,7 @@ public:
 	
 	
 	/** Imprints the piece in the specified chunk. Assumes they intersect. */
-	void ImprintInChunk(cChunkDesc & a_ChunkDesc, const Vector3i & a_Pos, int a_NumCCWRotations)
+	void ImprintInChunk(cChunkDesc & a_ChunkDesc, const Vector3i & a_Pos, int a_NumCCWRotations) const
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -227,7 +227,7 @@ void cPOCPieceGenerator::GenFinish(cChunkDesc & a_ChunkDesc)
 			continue;
 		}
 			
-		((cPOCPiece &)(*itr)->GetPiece()).ImprintInChunk(a_ChunkDesc, Pos, (*itr)->GetNumCCWRotations());
+		(static_cast<const cPOCPiece &>((*itr)->GetPiece())).ImprintInChunk(a_ChunkDesc, Pos, (*itr)->GetNumCCWRotations());
 	}  // for itr - m_Pieces[]
 	a_ChunkDesc.UpdateHeightmap();
 }

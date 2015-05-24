@@ -393,7 +393,7 @@ protected:
 	*/
 	bool PushFunction(const cRef & a_FnRef)
 	{
-		return PushFunction((int)a_FnRef);
+		return PushFunction(static_cast<int>(a_FnRef));
 	}
 	
 	/** Pushes a function that is stored in a referenced table by name

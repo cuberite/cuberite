@@ -542,7 +542,7 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 {
 	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
 	BoundingBox.p2.y += 3;
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + static_cast<int>(a_ParentSystem.m_MineShafts.size()), a_PivotZ) / 7;
 	int NumSegments = 2 + (rnd) % (MAX_SEGMENTS - 1);  // 2 .. MAX_SEGMENTS
 	switch (a_Direction)
 	{
@@ -795,7 +795,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 	)
 	{
 		a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p1.y + 1, z, E_BLOCK_CHEST, Meta);
-		cChestEntity * ChestEntity = (cChestEntity *)a_ChunkDesc.GetBlockEntity(x, m_BoundingBox.p1.y + 1, z);
+		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(x, m_BoundingBox.p1.y + 1, z));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
@@ -985,7 +985,7 @@ cMineShaft * cMineShaftCrossing::CreateAndFit(
 )
 {
 	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + static_cast<int>(a_ParentSystem.m_MineShafts.size()), a_PivotZ) / 7;
 	BoundingBox.p2.y += 3;
 	if ((rnd % 4) < 2)
 	{
@@ -1126,7 +1126,7 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 	cNoise & a_Noise
 )
 {
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + static_cast<int>(a_ParentSystem.m_MineShafts.size()), a_PivotZ) / 7;
 	cCuboid Box;
 	switch (a_Direction)
 	{

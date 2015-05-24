@@ -76,7 +76,7 @@ protected:
 	{
 		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
-			cPrefab & Prefab = (cPrefab &)((*itr)->GetPiece());
+			const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
 			Prefab.Draw(a_Chunk, *itr);
 		}  // for itr - m_PlacedPieces[]
 	}

@@ -100,7 +100,7 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	}
 
 	void * ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
-	cDelayedFluidSimulatorChunkData * ChunkData = (cDelayedFluidSimulatorChunkData *)ChunkDataRaw;
+	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
 	
 	// Add, if not already present:
@@ -133,7 +133,7 @@ void cDelayedFluidSimulator::Simulate(float a_Dt)
 void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	void * ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
-	cDelayedFluidSimulatorChunkData * ChunkData = (cDelayedFluidSimulatorChunkData *)ChunkDataRaw;
+	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 	
 	// Simulate all the blocks in the scheduled slot:
@@ -148,7 +148,7 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 		{
 			SimulateBlock(a_Chunk, itr->x, itr->y, itr->z);
 		}
-		m_TotalBlocks -= (int)Blocks.size();
+		m_TotalBlocks -= static_cast<int>(Blocks.size());
 		Blocks.clear();
 	}
 }

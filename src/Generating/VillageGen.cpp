@@ -93,7 +93,7 @@ public:
 			return 0;
 		}
 		
-		return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+		return static_cast<const cPrefab &>(a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 	}
 };
 
@@ -141,7 +141,7 @@ public:
 		
 		// If the central piece should be moved to ground, move it, and
 		// check all of its dependents and move those that are strictly connector-driven based on its new Y coord:
-		if (((cPrefab &)m_Pieces[0]->GetPiece()).ShouldMoveToGround())
+		if (static_cast<const cPrefab &>(m_Pieces[0]->GetPiece()).ShouldMoveToGround())
 		{
 			int OrigPosY = m_Pieces[0]->GetCoords().y;
 			PlacePieceOnGround(*m_Pieces[0]);
@@ -197,7 +197,7 @@ protected:
 		m_HeightGen->GenHeightMap(a_Chunk.GetChunkX(), a_Chunk.GetChunkZ(), HeightMap);
 		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
-			cPrefab & Prefab = (cPrefab &)((*itr)->GetPiece());
+			const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
 			if ((*itr)->GetPiece().GetSize().y == 1)
 			{
 				// It's a road, special handling (change top terrain blocks to m_RoadBlock)
@@ -319,7 +319,7 @@ protected:
 		{
 			if (
 				(a_PlacedPieces[i]->GetParent() == Pivot) &&  // It is a direct dependant of the pivot
-				!((const cPrefab &)a_PlacedPieces[i]->GetPiece()).ShouldMoveToGround()  // It attaches strictly by connectors
+				!(static_cast<const cPrefab &>(a_PlacedPieces[i]->GetPiece())).ShouldMoveToGround()  // It attaches strictly by connectors
 			)
 			{
 				a_PlacedPieces[i]->MoveToGroundBy(a_HeightDifference);

@@ -98,7 +98,7 @@ public:
 	int FindValue(const int keyID, const AString & valuename) const;
 
 	/// Returns number of keys currently in the ini
-	int GetNumKeys(void) const { return (int)keys.size(); }
+	int GetNumKeys(void) const { return static_cast<int>(keys.size()); }
 
 	/// Add a key name
 	int AddKeyName(const AString & keyname) override;
@@ -173,7 +173,7 @@ public:
 	// Header comments are those comments before the first key.
 
 	/// Returns the number of header comments
-	int GetNumHeaderComments(void) {return (int)comments.size();}
+	int GetNumHeaderComments(void) {return static_cast<int>(comments.size());}
 	
 	/// Adds a header comment
 	void AddHeaderComment(const AString & comment);

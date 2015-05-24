@@ -342,7 +342,7 @@ AString cCompositeChat::ExtractText(void) const
 			}
 			case ptUrl:
 			{
-				Msg.append(((cUrlPart *)(*itr))->m_Url);
+				Msg.append((static_cast<cUrlPart *>(*itr))->m_Url);
 				break;
 			}
 			case ptShowAchievement:
@@ -423,7 +423,7 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 			
 			case cCompositeChat::ptClientTranslated:
 			{
-				const cCompositeChat::cClientTranslatedPart & p = (const cCompositeChat::cClientTranslatedPart &)**itr;
+				const cCompositeChat::cClientTranslatedPart & p = static_cast<const cCompositeChat::cClientTranslatedPart &>(**itr);
 				Part["translate"] = p.m_Text;
 				Json::Value With;
 				for (AStringVector::const_iterator itrW = p.m_Parameters.begin(), endW = p.m_Parameters.end(); itrW != endW; ++itr)
@@ -440,7 +440,7 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 			
 			case cCompositeChat::ptUrl:
 			{
-				const cCompositeChat::cUrlPart & p = (const cCompositeChat::cUrlPart &)**itr;
+				const cCompositeChat::cUrlPart & p = static_cast<const cCompositeChat::cUrlPart &>(**itr);
 				Part["text"] = p.m_Text;
 				Json::Value Url;
 				Url["action"] = "open_url";
@@ -453,7 +453,7 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 			case cCompositeChat::ptSuggestCommand:
 			case cCompositeChat::ptRunCommand:
 			{
-				const cCompositeChat::cCommandPart & p = (const cCompositeChat::cCommandPart &)**itr;
+				const cCompositeChat::cCommandPart & p = static_cast<const cCompositeChat::cCommandPart &>(**itr);
 				Part["text"] = p.m_Text;
 				Json::Value Cmd;
 				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
@@ -465,7 +465,7 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 
 			case cCompositeChat::ptShowAchievement:
 			{
-				const cCompositeChat::cShowAchievementPart & p = (const cCompositeChat::cShowAchievementPart &)**itr;
+				const cCompositeChat::cShowAchievementPart & p = static_cast<const cCompositeChat::cShowAchievementPart &>(**itr);
 				Part["translate"] = "chat.type.achievement";
 
 				Json::Value Ach;

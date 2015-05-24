@@ -213,7 +213,7 @@ void cHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 			ASSERT(m_CurrentRequest != nullptr);
 			if (m_CurrentRequestBodyRemaining > 0)
 			{
-				size_t BytesToConsume = std::min(m_CurrentRequestBodyRemaining, (size_t)a_Size);
+				size_t BytesToConsume = std::min(m_CurrentRequestBodyRemaining, static_cast<size_t>(a_Size));
 				m_HTTPServer.RequestBody(*this, *m_CurrentRequest, a_Data, BytesToConsume);
 				m_CurrentRequestBodyRemaining -= BytesToConsume;
 			}

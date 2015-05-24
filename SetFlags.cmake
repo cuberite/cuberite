@@ -248,7 +248,7 @@ macro(set_exe_flags)
 			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
-			add_flags_cxx("-Werror -Weverything -Wno-c++98-compat-pedantic -Wno-string-conversion")
+			add_flags_cxx("-Weverything -Werror -Wno-c++98-compat-pedantic -Wno-string-conversion")
 			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables")
 			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
 				# flags that are not present in 3.0

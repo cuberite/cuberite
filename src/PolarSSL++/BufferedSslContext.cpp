@@ -66,7 +66,7 @@ int cBufferedSslContext::ReceiveEncrypted(unsigned char * a_Buffer, size_t a_Num
 		return POLARSSL_ERR_NET_RECV_FAILED;
 	}
 	m_IncomingData.CommitRead();
-	return (int)NumBytes;
+	return static_cast<int>(NumBytes);
 }
 
 
@@ -81,11 +81,11 @@ int cBufferedSslContext::SendEncrypted(const unsigned char * a_Buffer, size_t a_
 	{
 		return POLARSSL_ERR_NET_WANT_WRITE;
 	}
-	if (!m_OutgoingData.Write((const char *)a_Buffer, a_NumBytes))
+	if (!m_OutgoingData.Write(reinterpret_cast<const char *>(a_Buffer), a_NumBytes))
 	{
 		return POLARSSL_ERR_NET_SEND_FAILED;
 	}
-	return (int)a_NumBytes;
+	return static_cast<int>(a_NumBytes);
 }
 
 

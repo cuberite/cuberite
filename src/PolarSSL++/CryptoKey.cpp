@@ -77,7 +77,7 @@ int cCryptoKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, 
 	{
 		return res;
 	}
-	return (int)DecryptedLen;
+	return static_cast<int>(DecryptedLen);
 }
 
 
@@ -97,7 +97,7 @@ int cCryptoKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a
 	{
 		return res;
 	}
-	return (int)EncryptedLength;
+	return static_cast<int>(EncryptedLength);
 }
 
 
@@ -109,7 +109,7 @@ int cCryptoKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 	
-	return pk_parse_public_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes);
+	return pk_parse_public_key(&m_Pk, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes);
 }
 
 
@@ -123,14 +123,14 @@ int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 	
 	if (a_Password.empty())
 	{
-		return pk_parse_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes, nullptr, 0);
+		return pk_parse_key(&m_Pk, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes, nullptr, 0);
 	}
 	else
 	{
 		return pk_parse_key(
 			&m_Pk,
-			(const unsigned char *)a_Data, a_NumBytes,
-			(const unsigned char *)a_Password.c_str(), a_Password.size()
+			reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes,
+			reinterpret_cast<const unsigned char *>(a_Password.c_str()), a_Password.size()
 		);
 	}
 }

@@ -338,7 +338,7 @@ void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 		if ((*a_BiomeMap)[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_BiomeMap[i] = (unsigned char)((*a_BiomeMap)[i]);
+			m_BiomeMap[i] = static_cast<unsigned char>((*a_BiomeMap)[i]);
 		}
 		else
 		{

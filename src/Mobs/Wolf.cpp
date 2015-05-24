@@ -50,7 +50,7 @@ void cWolf::Attack(std::chrono::milliseconds a_Dt)
 
 	if ((m_Target != nullptr) && (m_Target->IsPlayer()))
 	{
-		if (((cPlayer *)m_Target)->GetName() != m_OwnerName)
+		if (static_cast<cPlayer *>(m_Target)->GetName() != m_OwnerName)
 		{
 			super::Attack(a_Dt);
 		}
@@ -157,7 +157,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		super::Tick(a_Dt, a_Chunk);
 	}
 
-	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
 	if (a_Closest_Player != nullptr)
 	{
 		switch (a_Closest_Player->GetEquippedItem().m_ItemType)

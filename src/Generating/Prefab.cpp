@@ -348,13 +348,13 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 			LOGWARNING("Bad prefab CharMap definition line: \"%s\", skipping.", itr->c_str());
 			continue;
 		}
-		unsigned char Src = (unsigned char)CharDef[0][0];
+		unsigned char Src = static_cast<unsigned char>(CharDef[0][0]);
 		ASSERT(a_CharMapOut[Src].m_BlockMeta == 16);  // This letter has not been assigned yet?
-		a_CharMapOut[Src].m_BlockType = (BLOCKTYPE)atoi(CharDef[1].c_str());
+		a_CharMapOut[Src].m_BlockType = static_cast<BLOCKTYPE>(atoi(CharDef[1].c_str()));
 		NIBBLETYPE BlockMeta = 0;
 		if ((NumElements >= 3) && !CharDef[2].empty())
 		{
-			BlockMeta = (NIBBLETYPE)atoi(CharDef[2].c_str());
+			BlockMeta = static_cast<NIBBLETYPE>(atoi(CharDef[2].c_str()));
 			ASSERT((BlockMeta <= 15));
 		}
 		a_CharMapOut[Src].m_BlockMeta = BlockMeta;
@@ -372,7 +372,7 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
-			const unsigned char * BlockImage = (const unsigned char *)a_BlockImage + y * m_Size.x * m_Size.z + z * m_Size.x;
+			const unsigned char * BlockImage = reinterpret_cast<const unsigned char *>(a_BlockImage + y * m_Size.x * m_Size.z + z * m_Size.x);
 			for (int x = 0; x < m_Size.x; x++)
 			{
 				const sBlockTypeDef & MappedValue = a_CharMap[BlockImage[x]];
@@ -424,7 +424,7 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 		m_Connectors.push_back(cPiece::cConnector(
 			atoi(Coords[0].c_str()), atoi(Coords[1].c_str()), atoi(Coords[2].c_str()),  // Connector pos
 			atoi(Defs[0].c_str()),  // Connector type
-			(eBlockFace)BlockFace
+			static_cast<eBlockFace>(BlockFace)
 		));
 	}  // for itr - Lines[]
 }

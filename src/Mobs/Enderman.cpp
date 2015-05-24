@@ -55,7 +55,7 @@ public:
 		}
 		
 		cTracer LineOfSight(a_Player->GetWorld());
-		if (LineOfSight.Trace(m_EndermanPos, Direction, (int)Direction.Length()))
+		if (LineOfSight.Trace(m_EndermanPos, Direction, static_cast<int>(Direction.Length())))
 		{
 			// No direct line of sight
 			return false;

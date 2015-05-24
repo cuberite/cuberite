@@ -243,7 +243,7 @@ int cIniFile::FindKey(const AString & a_KeyName) const
 	{
 		if (CheckCase(names[keyID]) == CaseKeyName)
 		{
-			return (int)keyID;
+			return static_cast<int>(keyID);
 		}
 	}
 	return noID;

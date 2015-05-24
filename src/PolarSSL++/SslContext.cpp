@@ -172,7 +172,7 @@ int cSslContext::WritePlain(const void * a_Data, size_t a_NumBytes)
 		}
 	}
 	
-	return ssl_write(&m_Ssl, (const unsigned char *)a_Data, a_NumBytes);
+	return ssl_write(&m_Ssl, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes);
 }
 
 
@@ -191,7 +191,7 @@ int cSslContext::ReadPlain(void * a_Data, size_t a_MaxBytes)
 		}
 	}
 	
-	return ssl_read(&m_Ssl, (unsigned char *)a_Data, a_MaxBytes);
+	return ssl_read(&m_Ssl, reinterpret_cast<unsigned char *>(a_Data), a_MaxBytes);
 }
 
 

@@ -90,8 +90,13 @@ void cNoteEntity::MakeSound(void)
 	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, instrument, m_Pitch, E_BLOCK_NOTE_BLOCK);
 	
 	// TODO: instead of calculating the power function over and over, make a precalculated table - there's only 24 pitches after all
-	float calcPitch = pow(2.0f, ((float)m_Pitch - 12.0f) / 12.0f);
-	m_World->BroadcastSoundEffect(sampleName, (double)m_PosX, (double)m_PosY, (double)m_PosZ, 3.0f, calcPitch);
+	float calcPitch = pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f);
+	m_World->BroadcastSoundEffect(
+			sampleName,
+			static_cast<double>(m_PosX),
+			static_cast<double>(m_PosY),
+			static_cast<double>(m_PosZ),
+			3.0f, calcPitch);
 }
 
 

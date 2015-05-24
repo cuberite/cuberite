@@ -42,7 +42,7 @@ SET (HDRS
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=global-constructors")
+	add_flags_cxx("-Wno-error=global-constructors -Wno-error=old-style-cast")
 endif()
 
 if(NOT MSVC)

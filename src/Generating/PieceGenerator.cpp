@@ -394,9 +394,9 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 	int NumRotations = 1;
 	for (size_t i = 1; i < ARRAYCOUNT(Rotations); i++)
 	{
-		if (StartingPiece->CanRotateCCW((int)i))
+		if (StartingPiece->CanRotateCCW(static_cast<int>(i)))
 		{
-			Rotations[NumRotations] = (int)i;
+			Rotations[NumRotations] = static_cast<int>(i);
 			NumRotations += 1;
 		}
 	}

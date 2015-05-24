@@ -69,7 +69,7 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		}
 
 		// Choose what block to use.
-		NOISE_DATATYPE BlockType = m_Noise.IntNoise3D((int) ChunkX, y, (int) ChunkZ);
+		NOISE_DATATYPE BlockType = m_Noise.IntNoise3D(static_cast<int>(ChunkX), y, static_cast<int>(ChunkZ));
 		if (BlockType < -0.7)
 		{
 			TryPlaceClump(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_BROWN_MUSHROOM);
@@ -507,7 +507,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
-		const float zz = (float)BlockZ;
+		const float zz = static_cast<float>(BlockZ);
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width + x;
@@ -528,7 +528,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 
-			const float xx = (float)BlockX;
+			const float xx = static_cast<float>(BlockX);
 			float val1 = m_Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f);
 			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f);
 			switch (a_ChunkDesc.GetBlockType(x, Top, z))
@@ -563,7 +563,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					else if ((val1 > 0.5) && (val2 < -0.5))
 					{
-						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_PUMPKIN, (int)(val3 * 8) % 4);
+						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_PUMPKIN, static_cast<int>(val3 * 8) % 4);
 					}
 					break;
 				}  // case E_BLOCK_GRASS
@@ -650,9 +650,9 @@ void cFinishGenSoulsandRims::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(xx)) / 32;
-				NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(zz)) / 32;
-				NOISE_DATATYPE CompBlock = m_Noise.CubicNoise3D(NoiseX, (float) (y) / 4, NoiseY);
+				NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(xx)) / 32;
+				NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(zz)) / 32;
+				NOISE_DATATYPE CompBlock = m_Noise.CubicNoise3D(NoiseX, static_cast<float>(y) / 4, NoiseY);
 				if (CompBlock < 0)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SOULSAND);

@@ -145,9 +145,9 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					break;
 				}
 
-				int RelX = (int) (m_RelX + (double)(Random.NextFloat() - Random.NextFloat()) * 4.0);
+				int RelX = static_cast<int>(m_RelX + static_cast<double>(Random.NextFloat() - Random.NextFloat()) * 4.0);
 				int RelY = m_RelY + Random.NextInt(3) - 1;
-				int RelZ = (int) (m_RelZ + (double)(Random.NextFloat() - Random.NextFloat()) * 4.0);
+				int RelZ = static_cast<int>(m_RelZ + static_cast<double>(Random.NextFloat() - Random.NextFloat()) * 4.0);
 
 				cChunk * Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelX, RelZ);
 				if ((Chunk == nullptr) || !Chunk->IsValid())
@@ -172,7 +172,12 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != cEntity::INVALID_ID)
 					{
 						EntitiesSpawned = true;
-						Chunk->BroadcastSoundParticleEffect(2004, (int)(PosX * 8.0), (int)(RelY * 8.0), (int)(PosZ * 8.0), 0);
+						Chunk->BroadcastSoundParticleEffect(
+							2004,
+							static_cast<int>(PosX * 8.0),
+							static_cast<int>(RelY * 8.0),
+							static_cast<int>(PosZ * 8.0),
+							0);
 						m_NearbyEntitiesNum++;
 					}
 				}
@@ -260,7 +265,7 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 				return;
 			}
 
-			cMonster * Mob = (cMonster *)a_Entity;
+			cMonster * Mob = static_cast<cMonster *>(a_Entity);
 			if (Mob->GetMobType() != m_EntityType)
 			{
 				return;

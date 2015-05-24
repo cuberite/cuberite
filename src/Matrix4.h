@@ -76,8 +76,8 @@ public:
 
 	inline void RotateX(T a_RX)
 	{
-		T sx = (T) sin(a_RX * M_PI / 180);
-		T cx = (T) cos(a_RX * M_PI / 180);
+		T sx = static_cast<T>(sin(a_RX * M_PI / 180));
+		T cx = static_cast<T>(cos(a_RX * M_PI / 180));
 
 		Identity();
 
@@ -87,8 +87,8 @@ public:
 
 	inline void RotateY(T a_RY)
 	{
-		T sy = (T) sin(a_RY * M_PI / 180);
-		T cy = (T) cos(a_RY * M_PI / 180);
+		T sy = static_cast<T>(sin(a_RY * M_PI / 180));
+		T cy = static_cast<T>(cos(a_RY * M_PI / 180));
 
 		Identity();
 
