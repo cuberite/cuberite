@@ -1,4 +1,4 @@
-Hello! Thanks for wanting to work on this project :smile:, and I hope that this file will help you somewhat in getting all set up and running. I'll go through the basics of getting the projet environment set up, the code organization and style, and general development practices. I'll also show you some good issues to start off working on to get yourself familiarised with the code.
+Hello! Thanks for wanting to work on this project :smile:, and I hope that this file will help you somewhat in getting all set up and running. I'll go through the basics of getting the project environment set up, the code organization and style, and general development practices. I'll also show you some good issues to start off working on to get yourself familiarised with the code.
 
 Minecraft Basics
 ----------------
