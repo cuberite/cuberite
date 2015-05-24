@@ -169,7 +169,7 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		m_NoPathToTarget = false;
 		m_NoMoreWayPoints = false;
 		m_PathFinderDestination = m_FinalDestination;
-		m_Path = new cPath(a_Chunk, GetPosition().Floor(), m_PathFinderDestination.Floor(), 20);
+		m_Path = new cPath(a_Chunk, GetPosition(), m_PathFinderDestination, 20, GetWidth(), GetHeight());
 	}
 
 	switch (m_Path->Step(a_Chunk))
@@ -183,7 +183,7 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 
 		case ePathFinderStatus::PATH_NOT_FOUND:
 		{
-			ResetPathFinding();  // Try to calculate a path again.
+			StopMovingToPosition();  // Try to calculate a path again.
 			// Note that the next time may succeed, e.g. if a player breaks a barrier.
 			break;
 		}
@@ -203,7 +203,7 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 			{
 				if ((m_Path->IsFirstPoint() || ReachedNextWaypoint()))
 				{
-					m_NextWayPointPosition = Vector3d(0.5, 0, 0.5) + m_Path->GetNextPoint();
+					m_NextWayPointPosition = m_Path->GetNextPoint();
 					m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
 				}
 			}

@@ -80,6 +80,13 @@ public:
 			return false;
 		}
 		
+		// Check to see if destination block is too far away
+		// Reach Distance Multiplayer = 5 Blocks
+		if ((BlockPos.x - a_Player->GetPosX() > 5) || (BlockPos.z - a_Player->GetPosZ() > 5))
+		{
+			return false;
+		}
+
 		// Remove water / lava block (unless plugins disagree)
 		if (!a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0))
 		{
@@ -123,6 +130,13 @@ public:
 		eBlockFace EntryFace;
 		Vector3i BlockPos;
 		if (!GetPlacementCoordsFromTrace(a_World, a_Player, BlockPos, CurrentBlockType, CurrentBlockMeta, EntryFace))
+		{
+			return false;
+		}
+
+		// Check to see if destination block is too far away
+		// Reach Distance Multiplayer = 5 Blocks
+		if ((BlockPos.x - a_Player->GetPosX() > 5) || (BlockPos.z - a_Player->GetPosZ() > 5))
 		{
 			return false;
 		}
