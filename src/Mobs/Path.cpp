@@ -159,11 +159,13 @@ bool cPath::IsSolid(const Vector3i & a_Location)
 	m_Chunk->GetBlockTypeMeta(RelX, a_Location.y, RelZ, BlockType, BlockMeta);
 	if ((BlockType == E_BLOCK_FENCE) || (BlockType == E_BLOCK_FENCE_GATE))
 	{
-		GetCell(a_Location + Vector3i(0, 1, 0))->m_IsSolid = true;  // Mobs will always think that the fence is 2 blocks high and therefore won't jump over.
+		a_Location.y += 1;
+		GetCell(a_Location)->m_IsSolid = true;  // Mobs will always think that the fence is 2 blocks high and therefore won't jump over.
 	}
-	if (BlockType == E_BLOCK_STATIONARY_WATER)
+	else if (BlockType == E_BLOCK_STATIONARY_WATER)
 	{
-		GetCell(a_Location + Vector3i(0, -1, 0))->m_IsSolid = true;
+		a_Location.y -= 1;
+		GetCell(a_Location)->m_IsSolid = true;
 	}
 
 	return cBlockInfo::IsSolid(BlockType);
@@ -210,35 +212,55 @@ bool cPath::Step_Internal()
 
 
 	// Check North, South, East, West on our height.
-	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(1, 0, 0),  CurrentCell, 10);
-	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(-1, 0, 0), CurrentCell, 10);
-	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 0, 1),  CurrentCell, 10);
-	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 0, -1), CurrentCell, 10);
+	Vector3i Location = CurrentCell->m_Location;
+	Location.x += 1;
+	ProcessIfWalkable(Location,  CurrentCell, 10);  // m_Location + (1, 0, 0)
+	Location.x -= 2;
+	ProcessIfWalkable(Location,  CurrentCell, 10);  // m_Location + (-1, 0, 0)
+	Location.x += 1;  // Location now equal CurrentCell->m_Location.
+
+	Location.z += 1;
+	ProcessIfWalkable(Location,  CurrentCell, 10);  // m_Location + (0, 0, 1)
+	Location.z -= 2;
+	ProcessIfWalkable(Location,  CurrentCell, 10);  // m_Location + (0, 0, -1)
+	Location.z += 1;  // Location now equal CurrentCell->m_Location.
 
 	// Check diagonals on XY plane.
 	for (int x = -1; x <= 1; x += 2)
 	{
-		if (GetCell(CurrentCell->m_Location + Vector3i(x, 0, 0))->m_IsSolid)  // If there's a solid our east / west.
+		Location.x += x;
+		if (GetCell(Location)->m_IsSolid)  // If there's a solid our east / west.
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, 1, 0), CurrentCell, JUMP_G_COST);  // Check east / west-up.
+			Location.y += 1;
+			ProcessIfWalkable(Location, CurrentCell, JUMP_G_COST);  // Check east / west-up.
+			Location.y -= 1;
 		}
 		else
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, -1, 0), CurrentCell, 14);  // Else check east / west-down.
+			Location.y -= 1;
+			ProcessIfWalkable(Location, CurrentCell, 14);  // Else check east / west-down.
+			Location.y += 1;
 		}
+		Location.x -= x;
 	}
 
 	// Check diagonals on the YZ plane.
 	for (int z = -1; z <= 1; z += 2)
 	{
-		if (GetCell(CurrentCell->m_Location + Vector3i(0, 0, z))->m_IsSolid)  // If there's a solid our east / west.
+		Location.z += z;
+		if (GetCell(Location)->m_IsSolid)  // If there's a solid our north / south.
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 1, z), CurrentCell, JUMP_G_COST);  // Check east / west-up.
+			Location.y += 1;
+			ProcessIfWalkable(Location, CurrentCell, JUMP_G_COST);  // Check north / south-up.
+			Location.y -= 1;
 		}
 		else
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, -1, z), CurrentCell, 14);  // Else check east / west-down.
+			Location.y -= 1;
+			ProcessIfWalkable(Location, CurrentCell, 14);  // Else check north / south-down.
+			Location.y += 1;
 		}
+		Location.z -= z;
 	}
 
 	// Check diagonals on the XZ plane. (Normal diagonals, this plane is special because of gravity, etc)
@@ -257,6 +279,29 @@ bool cPath::Step_Internal()
 			}
 		}
 	}
+
+	/* INCOMPLETE NEW VERSION OF THE ABOVE
+	for (int x = -1; x <= 1; x += 2)
+	{
+		Location.x += x;
+		if ((!GetCell(Location)->m_IsSolid)
+		{
+			for (int z = -1; z <= 1; z += 2)
+			{
+				Location.z += z;
+				if (!GetCell(Location)->m_IsSolid)
+				{
+					// This prevents falling of "sharp turns" e.g. a 1x1x20 rectangle in the air which breaks in a right angle suddenly.
+					if (GetCell(CurrentCell->m_Location + Vector3i(x, -1, 0))->m_IsSolid && GetCell(CurrentCell->m_Location + Vector3i(0, -1, z))->m_IsSolid)
+					{
+						ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, 0, z), CurrentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
+					}
+				}
+				Location.z -= z;
+			}
+		}
+		Location.x -= x;
+	}*/
 
 	return false;
 }
@@ -359,19 +404,28 @@ void cPath::ProcessIfWalkable(const Vector3i & a_Location, cPathCell * a_Parent,
 	cPathCell * cell = GetCell(a_Location);
 	int x, y, z;
 
+	Vector3i Location = a_Location;
+
+
 	// Make sure we fit in the position.
 	for (y = 0; y < m_BoundingBoxHeight; ++y)
 	{
+		Location.y += y;
 		for (x = 0; x < m_BoundingBoxWidth; ++x)
 		{
+			Location.x += x;
 			for (z = 0; z < m_BoundingBoxWidth; ++z)
 			{
-				if (GetCell(a_Location + Vector3i(x, y, z))->m_IsSolid)
+				Location += z;
+				if (GetCell(a_Location)->m_IsSolid)
 				{
 					return;
 				}
+				Location.z -= z;
 			}
+			Location.x -= x;
 		}
+		Location.y -= y;
 	}
 
 	/*y =-1;
