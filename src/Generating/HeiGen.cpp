@@ -58,7 +58,7 @@ public:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override
 	{
 		int heights[cChunkDef::Width * cChunkDef::Width];
-		m_Gen->GetInts(static_cast<size_t>(a_ChunkX * cChunkDef::Width), static_cast<size_t>(a_ChunkZ * cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), heights);
+		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, static_cast<size_t>(cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), heights);
 		for (size_t i = 0; i < ARRAYCOUNT(heights); i++)
 		{
 			a_HeightMap[i] = static_cast<HEIGHTTYPE>(std::max(std::min(60 + heights[i], cChunkDef::Height - 60), 40));

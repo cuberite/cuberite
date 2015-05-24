@@ -104,7 +104,7 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 	UInt16 Port;
 
 	// Check validity:
-	if (S.GetStackValues(2, Port))
+	if (!S.GetStackValues(2, Port))
 	{
 		LOGWARNING("cNetwork:CreateUDPEndpoint() called with invalid port, failing the request.");
 		S.Push(false);

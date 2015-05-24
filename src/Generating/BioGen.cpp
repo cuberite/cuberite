@@ -60,7 +60,7 @@ cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize) :
 {
 	for (size_t i = 0; i < m_CacheSize; i++)
 	{
-		m_CacheOrder[i] = static_cast<size_t>(i);
+		m_CacheOrder[i] = i;
 		m_CacheData[i].m_ChunkX = 0x7fffffff;
 		m_CacheData[i].m_ChunkZ = 0x7fffffff;
 	}
@@ -1121,7 +1121,7 @@ public:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_Biomes) override
 	{
 		int vals[16 * 16];
-		m_Gen->GetInts(static_cast<size_t>(a_ChunkX * cChunkDef::Width), static_cast<size_t>(a_ChunkZ * cChunkDef::Width), 16, 16, vals);
+		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, 16, 16, vals);
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
