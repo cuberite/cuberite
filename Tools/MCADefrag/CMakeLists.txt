@@ -12,8 +12,11 @@ set_lib_flags()
 enable_profile()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=shorten-64-to-32 -Wno-error=keyword-macro")
+	add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=shorten-64-to-32")
 	add_flags_cxx("-Wno-error=old-style-cast")
+	if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+		add_flags_cxx("-Wno-error=keyword-macro")
+	endif()
 endif()
 
 # Set include paths to the used libraries:
