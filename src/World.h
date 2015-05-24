@@ -261,6 +261,7 @@ public:
 	void BroadcastTimeUpdate                 (const cClientHandle * a_Exclude = nullptr);
 	virtual void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	void BroadcastWeather                    (eWeather a_Weather, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastRainDensity(float a_RainDensity, const cClientHandle * a_Exclude = nullptr);
 	
 	virtual cBroadcastInterface & GetBroadcastManager(void) override
 	{
@@ -750,8 +751,11 @@ public:
 	
 	/** Sets the specified weather; resets weather interval; asks and notifies plugins of the change */
 	void SetWeather(eWeather a_NewWeather);
-	
-	/** Forces a weather change in the next game tick */
+
+	/** Update weather - change density to smooth change */
+	void UpdateWeather(void);
+
+	/** Forces a weather change in the next game tick*/
 	void ChangeWeather(void);
 	
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
@@ -965,6 +969,9 @@ private:
 	eWeather m_Weather;
 	int m_WeatherInterval;
 	
+	/** Weather features - rainDensity - to smooth change */
+	float m_RainDensity;
+
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
 	bool m_IsCactusBonemealable;

@@ -1476,11 +1476,20 @@ void cProtocol180::SendWeather(eWeather a_Weather)
 		Pkt.WriteBEUInt8((a_Weather == wSunny) ? 1 : 2);  // End rain / begin rain
 		Pkt.WriteBEFloat(0);  // Unused for weather
 	}
-
-	// TODO: Fade effect, somehow
 }
 
 
+
+void cProtocol180::SendRainDensity(float a_RainDensity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	{
+		cPacketizer Pkt(*this, 0x2b);  // Change Game State packet
+		Pkt.WriteByte(7);  // RainDensity
+		Pkt.WriteFloat(a_RainDensity);
+	}
+}
 
 
 
