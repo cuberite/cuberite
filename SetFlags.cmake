@@ -27,6 +27,16 @@ macro(add_flags_cxx FLAGS)
 endmacro()
 
 
+#this is a hack because we can't use cmake 2.8.10 because of travis
+macro(get_clang_version)
+	execute_process(
+		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
+		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
+	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
+	set(CLANG_VERSION ${CMAKE_MATCH_1})
+endmacro()
+
+
 macro(set_flags)
 	# Add coverage processing, if requested:
 	if (NOT MSVC)
@@ -112,6 +122,10 @@ macro(set_flags)
 	if(LINUX AND NOT CROSSCOMPILE)
 		add_flags_cxx("-march=native")
 	endif()
+
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        get_clang_version()
+    endif()
 
 
 	# Use static CRT in MSVC builds:
@@ -215,15 +229,6 @@ macro(enable_profile)
 	endif()
 endmacro()
 
-#this is a hack because we can't use cmake 2.8.10 because of travis
-macro(get_clang_version)
-	execute_process(
-		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
-		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
-	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
-	set(CLANG_VERSION ${CMAKE_MATCH_1})
-endmacro()
-
 macro(set_exe_flags)
 	# Remove disabling the maximum warning level:
 	# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
@@ -242,7 +247,6 @@ macro(set_exe_flags)
 		add_flags_cxx("-ffast-math")
 
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			get_clang_version()
 			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
 				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION}")
 			endif()

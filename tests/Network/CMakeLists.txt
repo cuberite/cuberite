@@ -42,7 +42,10 @@ if (MSVC)
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast -Wno-error=inconsistent-missing-override")
+	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast")
+	if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+		add_flags_cxx("-Wno-error=inconsistent-missing-override")
+	endif()
 endif()
 
 # Define individual tests:
