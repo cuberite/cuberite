@@ -42,7 +42,7 @@ if (MSVC)
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=conversion")
+	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast -Wno-error=inconsistent-missing-override")
 endif()
 
 # Define individual tests:
