@@ -25,7 +25,7 @@ endif()
 
 # FreeBSD requires us to define this to get POSIX 2001 standard
 if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
-	add_flags_cxx(-D__POSIX_VISIBLE=200112)
+	add_flags_cxx("-D_XOPEN_SOURCE=600")
 endif()
 
 add_library(sqlite ${SOURCE})

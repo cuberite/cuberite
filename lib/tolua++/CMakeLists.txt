@@ -53,4 +53,8 @@ if(UNIX)
 target_link_libraries(tolua m ${DYNAMIC_LOADER})
 endif()
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+	add_flags_lnk(-L/usr/local/lib)
+endif()
+
 target_link_libraries(tolua tolualib lua)
