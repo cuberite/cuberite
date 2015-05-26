@@ -214,10 +214,10 @@ private:
 	bool QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
 
 	/** Removes a block from the Powered and LinkedPowered lists
-	Used for variable sources such as tripwire hooks, daylight sensors, and trapped chests
+	Recursively removes all blocks powered by the given one
 	*/
 	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk);
-	void SetInvalidMiddleBlock(int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
+	void SetInvalidMiddleBlock(int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, cChunk * a_Chunk);
 
 	/** Returns if a coordinate is powered or linked powered */
 	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk); }
@@ -414,35 +414,7 @@ private:
 
 	inline static Vector3i AdjustRelativeCoords(const Vector3i & a_RelPosition)
 	{
-		if (
-			(a_RelPosition.x >= 0) && (a_RelPosition.x < cChunkDef::Width) &&
-			(a_RelPosition.z >= 0) && (a_RelPosition.z < cChunkDef::Width)
-			)
-		{
-			return a_RelPosition;
-		}
-
-		Vector3i RelPos = a_RelPosition;
-
-		// Request for a different chunk, calculate chunk offset:
-		while (RelPos.x >= cChunkDef::Width)
-		{
-			RelPos.x -= cChunkDef::Width;
-		}
-		while (RelPos.x < 0)
-		{
-			RelPos.x += cChunkDef::Width;
-		}
-		while (RelPos.z >= cChunkDef::Width)
-		{
-			RelPos.z -= cChunkDef::Width;
-		}
-		while (RelPos.z < 0)
-		{
-			RelPos.z += cChunkDef::Width;
-		}
-
-		return RelPos;
+		return Vector3i((a_RelPosition.x % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width, a_RelPosition.y, (a_RelPosition.z % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width);
 	}
 };
 
