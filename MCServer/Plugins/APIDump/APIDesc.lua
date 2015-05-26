@@ -29,7 +29,7 @@ g_APIDesc =
 			{
 				ConstantName = { Notes = "Notes about the constant" },
 			} ,
-			
+
 			ConstantGroups =
 			{
 				GroupName1 =  -- GroupName1 is used as the HTML anchor name
@@ -270,7 +270,7 @@ g_APIDesc =
 
 						<h3>Special strategies</h3>
 						<p>For each strategy, evaluate the table rows from top downwards, the first match wins.</p>
-						
+
 						<p>
 						<strong>msDifference</strong> - changes all the blocks which are the same to air. Otherwise the source block gets placed.
 						</p>
@@ -282,8 +282,8 @@ g_APIDesc =
 						<td> B </td><td> B </td><td> Air </td><td> The blocks are the same so we get air. </td>
 						</tr>
 						</tbody></table>
-						
-						
+
+
 						<p>
 						<strong>msLake</strong> - used for merging areas with lava and water lakes, in the appropriate generator.
 						</p>
@@ -363,7 +363,7 @@ g_APIDesc =
 						<td> A </td><td> non-A </td><td> A </td><td> Differing blocks are kept from 'self' </td>
 						</tr>
 						</tbody></table>
-						
+
 						<p>
 						<strong>msSimpleCompare</strong> - the blocks that are the same in both areas are replaced with air, all the
 						differing blocks are replaced with stone. Meta is used in the comparison, too, two blocks of the
@@ -535,7 +535,7 @@ g_APIDesc =
 function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	-- Get the topmost block coord:
 	local Height = a_ChunkDesc:GetHeight(0, 0);
-	
+
 	-- Create a sign there:
 	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
 	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
@@ -666,7 +666,7 @@ end</pre>
 				},
 			},  -- AdditionalInfo
 		},  -- cCompositeChat
-		
+
 		cCraftingGrid =
 		{
 			Desc = [[
@@ -738,7 +738,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 </pre></p>
 				<p>Each cryptographic hash has two variants, one returns the hash as a raw binary string, the other returns the hash as a hex-encoded string twice as long as the binary string.
 			]],
-			
+
 			Functions =
 			{
 				md5 = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the md5 hash of the data, returns it as a raw (binary) string of 16 characters." },
@@ -747,7 +747,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				sha1HexString = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the sha1 hash of the data, returns it as a hex-encoded string of 40 characters." },
 			},
 		},  -- cCryptoHash
-		
+
 		cEnchantments =
 		{
 			Desc = [[
@@ -1038,7 +1038,7 @@ cFile:Delete("/usr/bin/virus.exe");
 			},
 			Inherits = "cEntity",
 		},
-		
+
 		cIniFile =
 		{
 			Desc = [[
@@ -1073,7 +1073,7 @@ ValueName0=SomeOtherValue
 			{
 				constructor = { Params = "", Return = "cIniFile", Notes = "Creates a new empty cIniFile object." },
 				AddHeaderComment = { Params = "Comment", Return = "", Notes = "Adds a comment to be stored in the file header." },
-				AddKeyComment = 
+				AddKeyComment =
 				{
 					{ Params = "KeyID, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
 					{ Params = "KeyName, Comment", Return = "", Notes = "Adds a comment to be stored in the file under the specified key" },
@@ -1117,12 +1117,12 @@ ValueName0=SomeOtherValue
 					{ Params = "KeyName", Return = "number", Notes = "Returns the number of comments under the specified key" },
 				},
 				GetNumKeys = { Params = "", Return = "number", Notes = "Returns the total number of keys. This is the range for the KeyID (0 .. GetNumKeys() - 1)" },
-				GetNumValues = 
+				GetNumValues =
 				{
 					{ Params = "KeyID", Return = "number", Notes = "Returns the number of values stored under the specified key." },
 					{ Params = "KeyName", Return = "number", Notes = "Returns the number of values stored under the specified key." },
 				},
-				GetValue = 
+				GetValue =
 				{
 					{ Params = "KeyName, ValueName", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
 					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the value of the specified name under the specified key. Returns an empty string if the value doesn't exist." },
@@ -1130,7 +1130,7 @@ ValueName0=SomeOtherValue
 				GetValueB = { Params = "KeyName, ValueName", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. Returns false if the value doesn't exist." },
 				GetValueF = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. Returns zero if the value doesn't exist." },
 				GetValueI = { Params = "KeyName, ValueName", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. Returns zero if the value doesn't exist." },
-				GetValueName = 
+				GetValueName =
 				{
 					{ Params = "KeyID, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
 					{ Params = "KeyName, ValueID", Return = "string", Notes = "Returns the name of the specified value Inverse for FindValue()." },
@@ -1141,7 +1141,7 @@ ValueName0=SomeOtherValue
 				GetValueSetI = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. If the value doesn't exist, creates it with the specified default." },
 				HasValue = { Params = "KeyName, ValueName", Return = "bool", Notes = "Returns true if the specified value is present." },
 				ReadFile = { Params = "FileName, [AllowExampleFallback]", Return = "bool", Notes = "Reads the values from the specified file. Previous in-memory contents are lost. If the file cannot be opened, and AllowExample is true, another file, \"filename.example.ini\", is loaded and then saved as \"filename.ini\". Returns true if successful, false if not." },
-				SetValue = 
+				SetValue =
 				{
 					{ Params = "KeyID, ValueID, NewValue", Return = "bool", Notes = "Overwrites the specified value with a new value. If the specified value doesn't exist, returns false (doesn't add)." },
 					{ Params = "KeyName, ValueName, NewValue, [CreateIfNotExists]", Return = "bool", Notes = "Overwrites the specified value with a new value. If CreateIfNotExists is true (default) and the value doesn't exist, it is first created. Returns true if the value was successfully set, false if not (didn't exists, CreateIfNotExists false)." },
@@ -2061,6 +2061,7 @@ a_Player:OpenWindow(Window);
 				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },
 				GetProtocolVersionTextFromInt = { Params = "Protocol Version", Return = "string", Notes = "Returns the Minecraft version from the given Protocol. If there is no version found, it returns 'Unknown protocol(Parameter)'" },
 				GetServer = { Params = "", Return = "{{cServer|cServer}}", Notes = "Returns the cServer object." },
+				GetServerUpTime = { Params = "", Return = "number", Notes = "Returns the uptime of the server in seconds." },
 				GetTotalChunkCount = { Params = "", Return = "number", Notes = "Returns the amount of loaded chunks." },
 				GetVirtualRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of virtual RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetWebAdmin = { Params = "", Return = "{{cWebAdmin|cWebAdmin}}", Notes = "Returns the cWebAdmin object." },
@@ -2146,7 +2147,7 @@ end
 				ShouldAuthenticate = { Params = "", Return = "bool", Notes = "Returns true iff the server is set to authenticate players (\"online mode\")." },
 			},
 		},  -- cServer
-		
+
 		cStringCompression =
 		{
 			Desc = [[
@@ -2157,7 +2158,7 @@ end
 local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 </pre>
 			]],
-			
+
 			Functions =
 			{
 				CompressStringGZIP   = {Params = "string", Return = "string", Notes = "Compress a string using GZIP"},
@@ -2205,7 +2206,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 			},
 			Inherits = "cEntity",
 		},
-		
+
 		cWebPlugin =
 		{
 			Desc = "",
@@ -2361,7 +2362,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				GetGeneratorQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks that are queued in the chunk generator." },
 				GetHeight = { Params = "BlockX, BlockZ", Return = "number", Notes = "Returns the maximum height of the particula block column in the world. If the chunk is not loaded, it waits for it to load / generate. <b>WARNING</b>: Do not use, Use TryGetHeight() instead for a non-waiting version, otherwise you run the risk of a deadlock!" },
 				GetIniFileName = { Params = "", Return = "string", Notes = "Returns the name of the world.ini file that the world uses to store the information." },
-				GetLightingQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks in the lighting thread's queue." },				
+				GetLightingQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks in the lighting thread's queue." },
 				GetLinkedEndWorldName = { Params = "", Return = "string", Notes = "Returns the name of the end world this world is linked to." },
 				GetLinkedNetherWorldName = { Params = "", Return = "string", Notes = "Returns the name of the Netherworld linked to this world." },
 				GetLinkedOverworldName = { Params = "", Return = "string", Notes = "Returns the name of the world this world is linked to." },
@@ -2514,7 +2515,7 @@ World:ForEachEntity(
 		if not(a_Entity:IsMob()) then
 			return;
 		end
-		
+
 		-- Get the cMonster out of cEntity, now that we know the entity represents one.
 		local Monster = tolua.cast(a_Entity, "cMonster");
 		if (Monster:GetMobType() == mtSpider) then
@@ -2565,7 +2566,7 @@ end
 				}
 			},
 		},  -- ItemCategory
-		
+
 		lxp =
 		{
 			Desc = [[
@@ -2635,7 +2636,7 @@ local Callbacks = {
 	CharacterData = function(a_Parser, a_String)
 		LOG(string.rep(" ", Depth) .. "* " .. a_String);
 	end
-	
+
 	EndElement = function(a_Parser, a_ElementName)
 		Depth = Depth - 1;
 		LOG(string.rep(" ", Depth) .. "- " .. a_ElementName);
@@ -2671,12 +2672,12 @@ Parser:close();
 				},
 			},  -- AdditionalInfo
 		},  -- lxp
-		
+
 		sqlite3 =
 		{
 			Desc = [[
 			]],
-			
+
 			Functions =
 			{
 				complete = { Params = "string", Return = "bool", Notes = "Returns true if the string sql comprises one or more complete SQL statements and false otherwise." },
@@ -2700,7 +2701,7 @@ myDB:close()
 				version = { Return = "string", Notes = "Returns a string with SQLite version information, in the form 'x.y[.z]'." },
 			},
 		},
-		
+
 		TakeDamageInfo =
 		{
 			Desc = [[
@@ -2994,7 +2995,7 @@ end
 		"WriteHtmlHook",
 		"WriteStats",
 	},
-	
+
 	IgnoreConstants =
 	{
 		"cChestEntity.__cBlockEntityWindowOwner__",
@@ -3003,12 +3004,12 @@ end
 		"cHopperEntity.__cBlockEntityWindowOwner__",
 		"cLuaWindow.__cItemGrid__cListener__",
 	},
-	
+
 	IgnoreVariables =
 	{
 		"__.*__",  -- tolua exports multiple inheritance this way
 	} ,
-	
+
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
@@ -3020,7 +3021,3 @@ end
 		{ FileName = "WebWorldThreads.html",           Title = "Webserver vs World threads" },
 	}
 } ;
-
-
-
-

@@ -72,7 +72,7 @@ cRoot::~cRoot()
 void cRoot::InputThread(cRoot & a_Params)
 {
 	cLogCommandOutputCallback Output;
-	
+
 	while (!cRoot::m_ShouldStop && !a_Params.m_bRestart && !m_TerminateEventRaised && std::cin.good())
 	{
 		AString Command;
@@ -105,12 +105,12 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
 	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
-	
+
 	cLogger::cListener * consoleLogListener = MakeConsoleListener();
 	cLogger::cListener * fileLogListener = new cFileListener();
 	cLogger::GetInstance().AttachListener(consoleLogListener);
 	cLogger::GetInstance().AttachListener(fileLogListener);
-	
+
 	LOG("--- Started Log ---\n");
 
 	#ifdef BUILD_ID
@@ -162,30 +162,30 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 		m_RankManager->Initialize(*m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
-		
+
 		LOGD("Loading worlds...");
 		LoadWorlds(*settingsRepo);
 
 		LOGD("Loading plugin manager...");
 		m_PluginManager = new cPluginManager();
 		m_PluginManager->ReloadPluginsNow(*settingsRepo);
-		
+
 		LOGD("Loading MonsterConfig...");
 		m_MonsterConfig = new cMonsterConfig;
 
 		// This sets stuff in motion
 		LOGD("Starting Authenticator...");
 		m_Authenticator.Start(*settingsRepo);
-		
+
 		LOGD("Starting worlds...");
 		StartWorlds();
-		
+
 		if (settingsRepo->GetValueSetB("DeadlockDetect", "Enabled", true))
 		{
 			LOGD("Starting deadlock detector...");
 			dd.Start(settingsRepo->GetValueSetI("DeadlockDetect", "IntervalSec", 20));
 		}
-		
+
 		settingsRepo->Flush();
 
 		LOGD("Finalising startup...");
@@ -207,6 +207,10 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 			#endif
 
 			LOG("Startup complete, took %ldms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
+
+			// Save the current time
+			m_StartTime = std::chrono::steady_clock::now();
+
 			#ifdef _WIN32
 			EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 			#endif
@@ -253,7 +257,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
-		
+
 		LOGD("Stopping plugin manager...");
 		delete m_PluginManager; m_PluginManager = nullptr;
 
@@ -264,9 +268,9 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 
 		LOG("Shutdown successful!");
 	}
-	
+
 	LOG("--- Stopped Log ---");
-	
+
 	cLogger::GetInstance().DetachListener(consoleLogListener);
 	delete consoleLogListener;
 	cLogger::GetInstance().DetachListener(fileLogListener);
@@ -299,7 +303,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings)
 	{
 		return;
 	}
-	
+
 	bool FoundAdditionalWorlds = false;
 	for (auto WorldNameValue : Worlds)
 	{
@@ -850,7 +854,3 @@ int cRoot::GetFurnaceFuelBurnTime(const cItem & a_Fuel)
 	cFurnaceRecipe * FR = Get()->GetFurnaceRecipe();
 	return FR->GetBurnTime(a_Fuel);
 }
-
-
-
-
