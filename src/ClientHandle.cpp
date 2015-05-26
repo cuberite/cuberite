@@ -2957,13 +2957,20 @@ void cClientHandle::PacketError(UInt32 a_PacketType)
 void cClientHandle::SocketClosed(void)
 {
 	// The socket has been closed for any reason
-	
+
 	if (!m_Username.empty())  // Ignore client pings
 	{
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
-
+	if (m_State < csDestroying)
+	{
+		cWorld * World = m_Player->GetWorld();
+		if (World != nullptr)
+		{
+			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
+		}
+	}
 	Destroy();
 }
 
