@@ -135,6 +135,8 @@ public:  // tolua_export
 	/** Called while the client is being ticked from the cServer object */
 	void ServerTick(float a_Dt);
 
+	void NetworkTick();
+
 	void Destroy(void);
 	
 	bool IsPlaying   (void) const { return (m_State == csPlaying); }

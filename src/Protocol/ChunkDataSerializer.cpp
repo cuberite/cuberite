@@ -217,33 +217,43 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	Packet.WriteBuf(m_BlockSkyLight, sizeof(m_BlockSkyLight));
 	Packet.WriteBuf(m_BiomeData,     BiomeDataSize);
 
+	UInt32 PacketLen = static_cast<UInt32>(Packet.GetUsedSpace());
 	AString PacketData;
 	Packet.ReadAll(PacketData);
 	Packet.CommitRead();
 
-	cByteBuffer Buffer(20);
+	cByteBuffer LenBuffer(20);
 	if (PacketData.size() >= 256)
 	{
-		if (!cProtocol180::CompressPacket(PacketData, a_Data))
+		// Compress packet
+		AString CompressedData;
+		uLongf CompressedDataLen = cProtocol180::CompressData(PacketData, CompressedData);
+
+		if (CompressedDataLen == 0)
 		{
 			ASSERT(!"Packet compression failed.");
-			a_Data.clear();
 			return;
 		}
+
+		LenBuffer.WriteVarInt32(static_cast<UInt32>(CompressedDataLen) + static_cast<UInt32>(cByteBuffer::GetVarInt32Size(PacketLen)));
+		LenBuffer.WriteVarInt32(PacketLen);
+		PacketData = CompressedData;
 	}
 	else
 	{
-		AString PostData;
-		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
-		Buffer.WriteVarInt32(0);
-		Buffer.ReadAll(PostData);
-		Buffer.CommitRead();
-
-		a_Data.clear();
-		a_Data.reserve(PostData.size() + PacketData.size());
-		a_Data.append(PostData.data(), PostData.size());
-		a_Data.append(PacketData.data(), PacketData.size());
+		LenBuffer.WriteVarInt32(PacketLen + 1);
+		LenBuffer.WriteVarInt32(0);
 	}
+	PacketLen = static_cast<UInt32>(PacketData.size());  // Update packet length
+
+	AString HeaderData;
+	LenBuffer.ReadAll(HeaderData);
+	LenBuffer.CommitRead();
+
+	a_Data.clear();
+	a_Data.reserve(HeaderData.size() + PacketLen);
+	a_Data.append(HeaderData.c_str(), HeaderData.size());
+	a_Data.append(PacketData.c_str(), PacketLen);
 }
 
 

@@ -1892,17 +1892,18 @@ void cClientHandle::Tick(float a_Dt)
 	if (!OutgoingData.empty())
 	{
 		cTCPLinkPtr Link(m_Link);  // Grab a copy of the link in a multithread-safe way
-		if ((Link != nullptr))
+		if (Link != nullptr)
 		{
 			Link->Send(OutgoingData.data(), OutgoingData.size());
 		}
 	}
-	
+
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		Destroy();
+		return;
 	}
 	
 	if (m_Player == nullptr)
@@ -1952,7 +1953,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_BlockDigAnimStage > -1)
 	{
 		int lastAnimVal = m_BlockDigAnimStage;
-		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
+		m_BlockDigAnimStage += static_cast<int>(m_BlockDigAnimSpeed * a_Dt);
 		if (m_BlockDigAnimStage > 9000)
 		{
 			m_BlockDigAnimStage = 9000;
@@ -1974,27 +1975,7 @@ void cClientHandle::Tick(float a_Dt)
 
 void cClientHandle::ServerTick(float a_Dt)
 {
-	// Process received network data:
-	AString IncomingData;
-	{
-		cCSLock Lock(m_CSIncomingData);
-		std::swap(IncomingData, m_IncomingData);
-	}
-	if (!IncomingData.empty())
-	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
-	}
-	
-	// Send any queued outgoing data:
-	AString OutgoingData;
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		std::swap(OutgoingData, m_OutgoingData);
-	}
-	if ((m_Link != nullptr) && !OutgoingData.empty())
-	{
-		m_Link->Send(OutgoingData.data(), OutgoingData.size());
-	}
+	NetworkTick();
 	
 	if (m_State == csAuthenticated)
 	{
@@ -2014,6 +1995,38 @@ void cClientHandle::ServerTick(float a_Dt)
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		Destroy();
+	}
+}
+
+
+
+
+
+void cClientHandle::NetworkTick()
+{
+	// Process received network data:
+	if (!m_HasSentDC)
+	{
+		AString IncomingData;
+		{
+			cCSLock Lock(m_CSIncomingData);
+			std::swap(IncomingData, m_IncomingData);
+		}
+		if (!IncomingData.empty())
+		{
+			m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+		}
+	}
+
+	// Send any queued outgoing data:
+	AString OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+	if ((m_Link != nullptr) && !OutgoingData.empty())
+	{
+		m_Link->Send(OutgoingData.data(), OutgoingData.size());
 	}
 }
 
@@ -2187,6 +2200,12 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
 		m_Protocol->SendDisconnect(a_Reason);
 		m_HasSentDC = true;
+
+		NetworkTick();
+		if (m_Link != nullptr)
+		{
+			m_Link->Shutdown();
+		}
 	}
 }
 
