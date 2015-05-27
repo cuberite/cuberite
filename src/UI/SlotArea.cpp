@@ -1394,7 +1394,7 @@ void cSlotAreaBeacon::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 // cSlotAreaEnchanting:
 
 cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ) :
-	cSlotAreaTemporary(1, a_ParentWindow),
+	cSlotAreaTemporary(2, a_ParentWindow),
 	m_BlockX(a_BlockX),
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
@@ -2154,10 +2154,10 @@ bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 {
 	switch (a_SlotNum)
 	{
-		case 0:  return ItemCategory::IsHelmet    (a_Item.m_ItemType);
+		case 0:  return (ItemCategory::IsHelmet(a_Item.m_ItemType) || (a_Item.m_ItemType == E_BLOCK_PUMPKIN));
 		case 1:  return ItemCategory::IsChestPlate(a_Item.m_ItemType);
-		case 2:  return ItemCategory::IsLeggings  (a_Item.m_ItemType);
-		case 3:  return ItemCategory::IsBoots     (a_Item.m_ItemType);
+		case 2:  return ItemCategory::IsLeggings(a_Item.m_ItemType);
+		case 3:  return ItemCategory::IsBoots(a_Item.m_ItemType);
 	}
 	return false;
 }
