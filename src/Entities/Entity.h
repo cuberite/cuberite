@@ -392,15 +392,20 @@ public:
 	/// Teleports to the coordinates specified
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
+	/// Schedules a MoveToWorld call to occur on the next Tick of the entity
+	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition);
+
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) { return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition); }
+
 	/** Moves entity to specified world, taking a world pointer */
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) { return DoMoveToWorld(a_World, a_ShouldSendRespawn); }
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) { return MoveToWorld(a_World, a_ShouldSendRespawn, GetPosition()); }
 
 	/** Moves entity to specified world, taking a world name */
 	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 	
 	// tolua_end
 
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn);
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
 	/** Returns if the entity is travelling away from a specified world */
 	bool IsWorldTravellingFrom(cWorld * a_World) const { return (m_WorldTravellingFrom == a_World); }
@@ -530,23 +535,28 @@ protected:
 	eEntityType m_EntityType;
 	
 	cWorld * m_World;
+
+	/** State variables for ScheduleMoveToWorld. */
+	bool m_IsWorldChangeScheduled;
+	cWorld * m_NewWorld;
+	Vector3d m_NewWorldPosition;
 	
-	/// Whether the entity is capable of taking fire or lava damage.
+	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;
 
-	/// Time, in ticks, since the last damage dealt by being on fire. Valid only if on fire (IsOnFire())
+	/** Time, in ticks, since the last damage dealt by being on fire. Valid only if on fire (IsOnFire()) */
 	int m_TicksSinceLastBurnDamage;
 	
-	/// Time, in ticks, since the last damage dealt by standing in lava. Reset to zero when moving out of lava.
+	/** Time, in ticks, since the last damage dealt by standing in lava. Reset to zero when moving out of lava. */
 	int m_TicksSinceLastLavaDamage;
 	
-	/// Time, in ticks, since the last damage dealt by standing in fire. Reset to zero when moving out of fire.
+	/** Time, in ticks, since the last damage dealt by standing in fire. Reset to zero when moving out of fire. */
 	int m_TicksSinceLastFireDamage;
 	
-	/// Time, in ticks, until the entity extinguishes its fire
+	/** Time, in ticks, until the entity extinguishes its fire */
 	int m_TicksLeftBurning;
 	
-	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
+	/** Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void. */
 	int m_TicksSinceLastVoidDamage;
 	
 	/** Does the actual speed-setting. The default implementation just sets the member variable value;
