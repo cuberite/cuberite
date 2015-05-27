@@ -196,7 +196,15 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		{
 			if (m_NoMoreWayPoints || (--m_GiveUpCounter == 0))
 			{
-				ResetPathFinding();  // Try to calculate a path again.
+				if (m_EMState == ATTACKING)
+				{
+					ResetPathFinding();  // Try to calculate a path again.
+					// This results in mobs hanging around an unreachable target (player).
+				}
+				else
+				{
+					StopMovingToPosition();  // Find a different place to go to.
+				}
 				return false;
 			}
 			else if (!m_Path->IsLastPoint())  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
@@ -391,6 +399,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 void cMonster::StopMovingToPosition()
 {
 	m_IsFollowingPath = false;
+	ResetPathFinding();
 }
 
 
@@ -520,7 +529,7 @@ void cMonster::SetPitchAndYawFromDestination()
 		double HeadRotation, HeadPitch;
 		Distance.Normalize();
 		VectorToEuler(Distance.x, Distance.y, Distance.z, HeadRotation, HeadPitch);
-		if (std::abs(BodyRotation - HeadRotation) < 120)
+		if (std::abs(BodyRotation - HeadRotation) < 90)
 		{
 			SetHeadYaw(HeadRotation);
 			SetPitch(-HeadPitch);
