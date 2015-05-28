@@ -85,7 +85,6 @@ if [[ $MISSING_PROGRAMS != "" ]]; then
 	missingDepsExit
 fi
 
-exit
 # Echo: Branch choice.
 echo
 echo "You can choose between 2 branches:"
