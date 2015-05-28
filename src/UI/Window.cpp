@@ -92,9 +92,9 @@ const AString cWindow::GetWindowTypeName(void) const
 int cWindow::GetNumSlots(void) const
 {
 	int res = 0;
-	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	for (const auto & itr : m_SlotAreas)
 	{
-		res += (*itr)->GetNumSlots();
+		res += itr->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
 	return res;
 }
@@ -261,16 +261,14 @@ void cWindow::Clicked(
 	}
 
 	int LocalSlotNum = a_SlotNum;
-	int idx = 0;
-	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	for (const auto & itr : m_SlotAreas)
 	{
-		if (LocalSlotNum < (*itr)->GetNumSlots())
+		if (LocalSlotNum < itr->GetNumSlots())
 		{
-			(*itr)->Clicked(a_Player, LocalSlotNum, a_ClickAction, a_ClickedItem);
+			itr->Clicked(a_Player, LocalSlotNum, a_ClickAction, a_ClickedItem);
 			return;
 		}
-		LocalSlotNum -= (*itr)->GetNumSlots();
-		idx++;
+		LocalSlotNum -= itr->GetNumSlots();
 	}
 	
 	LOGWARNING("Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",

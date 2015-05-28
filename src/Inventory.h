@@ -70,23 +70,17 @@ public:
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_tryToFillEquippedFirst is set to true, the currently equipped slot will be used first (if empty or
-	compatible with added items)
-	if a_tryToFillEquippedFirst is set to false, the regular order applies.
 	Returns the number of items that fit.
 	*/
-	int AddItem(const cItem & a_ItemStack, bool a_AllowNewStacks = true, bool a_tryToFillEquippedFirst = false);
+	int AddItem(const cItem & a_ItemStack, bool a_AllowNewStacks = true);
 
 	/** Same as AddItem, but works on an entire list of item stacks.
 	The a_ItemStackList is modified to reflect the leftover items.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_tryToFillEquippedFirst is set to true, the currently equipped slot will be used first (if empty or
-	compatible with added items)
-	if a_tryToFillEquippedFirst is set to false, the regular order applies.
 	Returns the total number of items that fit.
 	*/
-	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a_tryToFillEquippedFirst);
+	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks);
 
 	/** Removes the specified item from the inventory, as many as possible, up to a_ItemStack.m_ItemCount.
 	Returns the number of items that were removed. */

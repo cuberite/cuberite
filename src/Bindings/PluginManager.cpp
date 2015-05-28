@@ -1935,7 +1935,7 @@ size_t cPluginManager::GetNumLoadedPlugins(void) const
 AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_Settings)
 {
 	// Check if the Plugins section exists.
-	if (a_Settings.KeyExists("Plugins"))
+	if (!a_Settings.KeyExists("Plugins"))
 	{
 		InsertDefaultPlugins(a_Settings);
 	}

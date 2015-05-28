@@ -98,7 +98,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 
 
 
-int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks, bool a_tryToFillEquippedFirst)
+int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 {
 	cItem ToAdd(a_Item);
 	int res = 0;
@@ -116,8 +116,29 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks, bool a_tryT
 		}
 	}
 
-	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks, a_tryToFillEquippedFirst ? m_EquippedSlotNum : -1);
-	ToAdd.m_ItemCount = a_Item.m_ItemCount - static_cast<char>(res);
+	for (int SlotIdx = 0; SlotIdx < m_InventorySlots.GetNumSlots(); ++SlotIdx)
+	{
+		auto & Slot = m_InventorySlots.GetSlot(SlotIdx);
+		if (Slot.IsEqual(a_Item))
+		{
+			cItemHandler Handler(Slot.m_ItemType);
+			int AmountToAdd = std::min(static_cast<char>(Handler.GetMaxStackSize() - Slot.m_ItemCount), ToAdd.m_ItemCount);
+			res += AmountToAdd;
+
+			cItem SlotAdjusted(Slot);
+			SlotAdjusted.m_ItemCount += AmountToAdd;
+			m_InventorySlots.SetSlot(SlotIdx, SlotAdjusted);
+
+			ToAdd.m_ItemCount -= AmountToAdd;
+			if (ToAdd.m_ItemCount == 0)
+			{
+				return res;
+			}
+		}
+	}
+
+	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks);
+	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;
 	if (ToAdd.m_ItemCount == 0)
 	{
 		return res;
@@ -131,12 +152,12 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks, bool a_tryT
 
 
 
-int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a_tryToFillEquippedFirst)
+int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 {
 	int TotalAdded = 0;
 	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		int NumAdded = AddItem(*itr, a_AllowNewStacks, a_tryToFillEquippedFirst);
+		int NumAdded = AddItem(*itr, a_AllowNewStacks);
 		if (itr->m_ItemCount == NumAdded)
 		{
 			itr = a_ItemStackList.erase(itr);

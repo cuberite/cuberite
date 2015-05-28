@@ -350,6 +350,16 @@ void cProtocolRecognizer::SendHealth(void)
 
 
 
+void cProtocolRecognizer::SendHideTitle(void)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendHideTitle();
+}
+
+
+
+
+
 void cProtocolRecognizer::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
 	ASSERT(m_Protocol != nullptr);
@@ -599,6 +609,16 @@ void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a
 
 
 
+void cProtocolRecognizer::SendResetTitle(void)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendResetTitle();
+}
+
+
+
+
+
 void cProtocolRecognizer::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	ASSERT(m_Protocol != nullptr);
@@ -653,6 +673,46 @@ void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cSco
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendSetSubTitle(const cCompositeChat & a_SubTitle)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendSetSubTitle(a_SubTitle);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendSetRawSubTitle(const AString & a_SubTitle)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendSetRawSubTitle(a_SubTitle);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendSetTitle(const cCompositeChat & a_Title)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendSetTitle(a_Title);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendSetRawTitle(const AString & a_Title)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendSetRawTitle(a_Title);
 }
 
 
@@ -753,6 +813,16 @@ void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_Bloc
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendTitleTimes(a_FadeInTicks, a_DisplayTicks, a_FadeOutTicks);
 }
 
 

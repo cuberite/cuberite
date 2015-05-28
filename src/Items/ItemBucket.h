@@ -103,7 +103,7 @@ public:
 				ASSERT(!"Inventory bucket mismatch");
 				return true;
 			}
-			if (a_Player->GetInventory().AddItem(cItem(NewItem), true, true) != 1)
+			if (a_Player->GetInventory().AddItem(cItem(NewItem)) != 1)
 			{
 				// The bucket didn't fit, toss it as a pickup:
 				a_Player->TossPickup(cItem(NewItem));
@@ -151,7 +151,7 @@ public:
 				return false;
 			}
 			cItem Item(E_ITEM_BUCKET, 1);
-			if (!a_Player->GetInventory().AddItem(Item, true, true))
+			if (!a_Player->GetInventory().AddItem(Item))
 			{
 				return false;
 			}

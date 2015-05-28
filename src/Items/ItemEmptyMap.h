@@ -60,7 +60,7 @@ public:
 			return true;
 		}
 
-		a_Player->GetInventory().AddItem(cItem(E_ITEM_MAP, 1, (short)(NewMap->GetID() & 0x7fff)), true, true);
+		a_Player->GetInventory().AddItem(cItem(E_ITEM_MAP, 1, (short)(NewMap->GetID() & 0x7fff)));
 
 		return true;
 	}

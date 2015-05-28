@@ -246,6 +246,11 @@ macro(set_exe_flags)
 		# we support non-IEEE 754 fpus so can make no guarentees about error
 		add_flags_cxx("-ffast-math")
 
+		if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+			# backtrace() and friends are in libexecinfo
+			add_flags_lnk("-lexecinfo")
+		endif()
+
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
 				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION}")
