@@ -96,17 +96,17 @@ bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, 
 		m_Callbacks->OnIntoWorld(m_StartX, m_StartY, m_StartZ);
 	}
 
-	m_CurrentX = static_cast<int>(floor(m_StartX));
-	m_CurrentY = static_cast<int>(floor(m_StartY));
-	m_CurrentZ = static_cast<int>(floor(m_StartZ));
+	m_CurrentX = FloorC(m_StartX);
+	m_CurrentY = FloorC(m_StartY);
+	m_CurrentZ = FloorC(m_StartZ);
 	
 	m_DiffX = m_EndX - m_StartX;
 	m_DiffY = m_EndY - m_StartY;
 	m_DiffZ = m_EndZ - m_StartZ;
 	
 	// The actual trace is handled with ChunkMapCS locked by calling our Item() for the specified chunk
-	int BlockX = static_cast<int>(floor(m_StartX));
-	int BlockZ = static_cast<int>(floor(m_StartZ));
+	int BlockX = FloorC(m_StartX);
+	int BlockZ = FloorC(m_StartZ);
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 	return m_World->DoWithChunk(ChunkX, ChunkZ, *this);

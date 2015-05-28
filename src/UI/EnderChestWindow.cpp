@@ -29,7 +29,9 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 		static_cast<double>(m_BlockX),
 		static_cast<double>(m_BlockY),
 		static_cast<double>(m_BlockZ),
-		1, 1);
+		1,
+		1
+	);
 
 	// Send out the chest-open packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_ENDER_CHEST);
@@ -46,11 +48,12 @@ cEnderChestWindow::~cEnderChestWindow()
 
 	// Play the closing sound
 	m_World->BroadcastSoundEffect(
-			"random.chestclosed",
-			static_cast<double>(m_BlockX),
-			static_cast<double>(m_BlockY),
-			static_cast<double>(m_BlockZ),
-			1, 1);
+		"random.chestclosed",
+		static_cast<double>(m_BlockX),
+		static_cast<double>(m_BlockY),
+		static_cast<double>(m_BlockZ),
+		1, 1
+	);
 }
 
 

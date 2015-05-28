@@ -283,8 +283,12 @@ cFileListener::cFileListener(void)
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
 	AString FileName;
 	auto time = std::chrono::system_clock::now();
-	FileName = Printf("%s%sLOG_%d.txt", FILE_IO_PREFIX, "logs/",
-			std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(time.time_since_epoch()).count());
+	FileName = Printf(
+		"%s%sLOG_%d.txt",
+		FILE_IO_PREFIX,
+		"logs/",
+		std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(time.time_since_epoch()).count()
+	);
 	m_File.Open(FileName, cFile::fmAppend);
 }
 

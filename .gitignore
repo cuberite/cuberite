@@ -75,7 +75,6 @@ src/MCServer
 lib/tolua++/tolua
 src/Bindings/Bindings.*
 src/Bindings/BindingDependencies.txt
-src/Bindings/LuaState_Call.inc
 MCServer.dir/
 src/AllFiles.lst
 

@@ -158,7 +158,7 @@ void cChunkDesc::SetHeightFromShape(const Shape & a_Shape)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (unsigned char y = cChunkDef::Height - 1; y > 0; y--)
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
 			{
 				if (a_Shape[y + x * 256 + z * 16 * 256] != 0)
 				{

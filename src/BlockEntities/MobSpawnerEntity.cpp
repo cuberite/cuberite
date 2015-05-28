@@ -177,7 +177,8 @@ void cMobSpawnerEntity::SpawnEntity(void)
 							static_cast<int>(PosX * 8.0),
 							static_cast<int>(RelY * 8.0),
 							static_cast<int>(PosZ * 8.0),
-							0);
+							0
+						);
 						m_NearbyEntitiesNum++;
 					}
 				}

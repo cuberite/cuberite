@@ -648,7 +648,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
-	cRequestData * Data = static_cast<cRequestData *>(a_Request.GetUserData());
+	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
 	if (Data == nullptr)
 	{
 		return;
@@ -681,7 +681,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	}
 
 	// Delete any request data assigned to the request:
-	cRequestData * Data = static_cast<cRequestData *>(a_Request.GetUserData());
+	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
 	delete Data;
 	Data = nullptr;
 }

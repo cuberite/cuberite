@@ -40,7 +40,9 @@ void cVaporizeFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ,
 			static_cast<double>(a_BlockX),
 			static_cast<double>(a_BlockY),
 			static_cast<double>(a_BlockZ),
-			1.0f, 0.6f);
+			1.0f,
+			0.6f
+		);
 	}
 }
 

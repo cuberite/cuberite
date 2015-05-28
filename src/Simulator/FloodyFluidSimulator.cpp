@@ -260,7 +260,9 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				static_cast<double>(BlockX),
 				static_cast<double>(a_RelY),
 				static_cast<double>(BlockZ),
-				0.5f, 1.5f);
+				0.5f,
+				1.5f
+			);
 			return;
 		}
 	}
@@ -280,7 +282,9 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				static_cast<double>(BlockX),
 				static_cast<double>(a_RelY),
 				static_cast<double>(BlockZ),
-				0.5f, 1.5f);
+				0.5f,
+				1.5f
+			);
 			return;
 		}
 	}

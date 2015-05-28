@@ -267,10 +267,11 @@ void cSandSimulator::FinishFalling(
 	cItems Pickups;
 	Pickups.Add(static_cast<ENUM_ITEM_ID>(a_FallingBlockType), 1, a_FallingBlockMeta);
 	a_World->SpawnItemPickups(
-			Pickups,
-			static_cast<double>(a_BlockX) + 0.5,
-			static_cast<double>(a_BlockY) + 0.5,
-			static_cast<double>(a_BlockZ) + 0.5);
+		Pickups,
+		static_cast<double>(a_BlockX) + 0.5,
+		static_cast<double>(a_BlockY) + 0.5,
+		static_cast<double>(a_BlockZ) + 0.5
+	);
 }
 
 

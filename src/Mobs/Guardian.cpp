@@ -43,13 +43,13 @@ void cGuardian::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Vector3d Pos = GetPosition();
 
 	// TODO: Not a real behavior, but cool :D
-	int RelY = static_cast<int>(floor(Pos.y));
+	int RelY = FloorC(Pos.y);
 	if ((RelY < 0) || (RelY >= cChunkDef::Height))
 	{
 		return;
 	}
-	int RelX = static_cast<int>(floor(Pos.x)) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelZ = static_cast<int>(floor(Pos.z)) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int RelX = FloorC(Pos.x) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = FloorC(Pos.z) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	BLOCKTYPE BlockType;
 	if (a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockType) && !IsBlockWater(BlockType) && !IsOnFire())
 	{

@@ -117,11 +117,12 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 	m_World->ForEachEntity(Callback);
 	
 	m_World->BroadcastSoundParticleEffect(
-			2002,
-			static_cast<int>(floor(a_HitPos.x)),
-			static_cast<int>(floor(a_HitPos.y)),
-			static_cast<int>(floor(a_HitPos.z)),
-			m_PotionColor);
+		2002,
+		FloorC(a_HitPos.x),
+		FloorC(a_HitPos.y),
+		FloorC(a_HitPos.z),
+		m_PotionColor
+	);
 }
 
 
