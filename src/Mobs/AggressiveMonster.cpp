@@ -80,9 +80,10 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Vector3d AttackDirection(m_Target->GetPosition() + Vector3d(0, m_Target->GetHeight(), 0) - MyHeadPosition);
 
 
-	if (ReachedFinalDestination() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())))
+	if (TargetIsInRange() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())))
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
+		StopMovingToPosition();
 		Attack(a_Dt);
 	}
 }

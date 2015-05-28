@@ -517,8 +517,15 @@ void cMonster::SetPitchAndYawFromDestination()
 	}
 
 
-
-	Vector3d BodyDistance = m_NextWayPointPosition - GetPosition();
+	Vector3d BodyDistance;
+	if (!m_IsFollowingPath && (m_Target != nullptr))
+	{
+		BodyDistance = m_Target->GetPosition() - GetPosition();
+	}
+	else
+	{
+		BodyDistance = m_NextWayPointPosition - GetPosition();
+	}
 	double BodyRotation, BodyPitch;
 	BodyDistance.Normalize();
 	VectorToEuler(BodyDistance.x, BodyDistance.y, BodyDistance.z, BodyRotation, BodyPitch);
