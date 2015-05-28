@@ -558,6 +558,14 @@ void cRoot::SaveAllChunks(void)
 
 
 
+void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
+{
+	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	{
+		itr->second->SendPlayerList(a_DestPlayer);
+	}  // for itr - m_WorldsByName[]
+}
+
 
 
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
@@ -579,8 +587,6 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 		itr->second->BroadcastChat(a_Message);
 	}  // for itr - m_WorldsByName[]
 }
-
-
 
 
 
