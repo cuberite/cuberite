@@ -193,13 +193,16 @@ protected:
 	If no suitable position is found, returns cChunkDef::Height. */
 	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
 
-	/** Returns if the ultimate, final destination has been reached */
-	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
+	/** Returns if the ultimate, final destination has been reached. */
+	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).Length() < GetWidth()/2); }
+
+	/** Returns whether or not the target is close enough for attack. */
+	bool TargetIsInRange(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
 
 	/** Returns if the intermediate waypoint of m_NextWayPointPosition has been reached */
 	bool ReachedNextWaypoint(void) { return ((m_NextWayPointPosition - GetPosition()).SqrLength() < 0.25); }
 
-	/** Returns if a monster can reach a given height by jumping */
+	/** Returns if a monster can reach a given height by jumping. */
 	inline bool DoesPosYRequireJump(int a_PosY)
 	{
 		return ((a_PosY > POSY_TOINT) && (a_PosY == POSY_TOINT + 1));
