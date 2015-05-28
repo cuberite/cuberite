@@ -84,7 +84,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 	int X = BlockHit.x, Y = BlockHit.y, Z = BlockHit.z;
 	m_HitBlockPos = Vector3i(X, Y, Z);
-	
+
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("random.bowhit", (double)X, (double)Y, (double)Z, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 
@@ -115,7 +115,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		Damage += ExtraDamage;
 	}
 
-	int KnockbackAmount = 1;
+	// int KnockbackAmount = 1;
 	int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
 	if (PunchLevel > 0)
 	{
@@ -130,8 +130,9 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		a_EntityHit.SetSpeed(FinalSpeed);
 	}
 
-	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);
-	
+	// a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);  // TODO fix knockback.
+	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 0);  // Until knockback is fixed.
+
 	if (IsOnFire() && !a_EntityHit.IsSubmerged() && !a_EntityHit.IsSwimming())
 	{
 		a_EntityHit.StartBurning(100);
@@ -139,7 +140,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 
 	// Broadcast successful hit sound
 	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-	
+
 	Destroy();
 }
 
@@ -176,7 +177,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	m_Timer += a_Dt;
-	
+
 	if (m_bIsCollected)
 	{
 		if (m_Timer > std::chrono::milliseconds(500))
@@ -190,7 +191,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy();
 		return;
 	}
-	
+
 	if (m_IsInGround)
 	{
 		if (!m_HasTeleported)  // Sent a teleport already, don't do again
@@ -205,17 +206,17 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_HitGroundTimer += a_Dt;
 			}
 		}
-		
+
 		int RelPosX = m_HitBlockPos.x - a_Chunk.GetPosX() * cChunkDef::Width;
 		int RelPosZ = m_HitBlockPos.z - a_Chunk.GetPosZ() * cChunkDef::Width;
 		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
-		
+
 		if (Chunk == nullptr)
 		{
 			// Inside an unloaded chunk, abort
 			return;
 		}
-		
+
 		if (Chunk->GetBlock(RelPosX, m_HitBlockPos.y, RelPosZ) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
