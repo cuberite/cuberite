@@ -20,6 +20,7 @@ cWolf::cWolf(void) :
 	m_OwnerName(""),
 	m_CollarColor(14)
 {
+	m_RelativeWalkSpeed = 2;
 }
 
 
@@ -230,7 +231,7 @@ void cWolf::TickFollowPlayer()
 	{
 		// The player is present in the world, follow him:
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
-		if (Distance > 30)
+		if (Distance > 20)
 		{
 			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
 			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
