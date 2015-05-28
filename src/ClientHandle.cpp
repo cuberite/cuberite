@@ -1902,7 +1902,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-		Destroy();
+		return;
 	}
 	
 	if (m_Player == nullptr)
@@ -2013,7 +2013,6 @@ void cClientHandle::ServerTick(float a_Dt)
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-		Destroy();
 	}
 }
 
@@ -2186,6 +2185,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 	{
 		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
 		m_Protocol->SendDisconnect(a_Reason);
+		Destroy();
 		m_HasSentDC = true;
 	}
 }
@@ -2922,7 +2922,6 @@ void cClientHandle::PacketBufferFull(void)
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
 	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_IPString.c_str());
 	SendDisconnect("Server busy");
-	Destroy();
 }
 
 
@@ -2936,7 +2935,6 @@ void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 	AString Reason;
 	Printf(Reason, "Unknown [C->S] PacketType: 0x%x", a_PacketType);
 	SendDisconnect(Reason);
-	Destroy();
 }
 
 
@@ -2947,7 +2945,6 @@ void cClientHandle::PacketError(UInt32 a_PacketType)
 {
 	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username.c_str());
 	SendDisconnect("Protocol error");
-	Destroy();
 }
 
 
@@ -2963,7 +2960,7 @@ void cClientHandle::SocketClosed(void)
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
-	if (m_State < csDestroying)
+	if ((m_State < csDestroying) && (m_Player != nullptr))
 	{
 		cWorld * World = m_Player->GetWorld();
 		if (World != nullptr)
