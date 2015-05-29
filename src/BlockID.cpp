@@ -295,7 +295,7 @@ eDimension StringToDimension(const AString & a_DimensionString)
 {
 	// First try decoding as a number
 	int res;
-	if (!StringToInteger(a_DimensionString, res))
+	if (StringToInteger(a_DimensionString, res))
 	{
 		// It was a valid number
 		return static_cast<eDimension>(res);
