@@ -145,6 +145,12 @@ public:
 	/** Finds the player using it's complete username and calls the callback */
 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);
 
+	/** Send playerlist of all worlds to player */
+	void SendPlayerLists(cPlayer * a_DestPlayer);
+
+	/** Broadcast Player through all worlds */
+	void BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
+
 	// tolua_begin
 
 	/// Sends a chat message to all connected clients (in all worlds)

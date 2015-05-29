@@ -381,8 +381,8 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Send player list items
 	SendPlayerListAddPlayer(*m_Player);
-	World->BroadcastPlayerListAddPlayer(*m_Player);
-	World->SendPlayerList(m_Player);
+	cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
+	cRoot::Get()->SendPlayerLists(m_Player);
 
 	m_Player->Initialize(*World);
 	m_State = csAuthenticated;
@@ -1475,7 +1475,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
 	Msg.ParseText(Message);
 	Msg.UnderlineUrls();
-	m_Player->GetWorld()->BroadcastChat(Msg);
+	cRoot::Get()->BroadcastChat(Msg);
 }
 
 
