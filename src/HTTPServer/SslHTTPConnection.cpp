@@ -55,7 +55,7 @@ void cSslHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 		int NumRead = m_Ssl.ReadPlain(Buffer, sizeof(Buffer));
 		if (NumRead > 0)
 		{
-			super::OnReceivedData(Buffer, (size_t)NumRead);
+			super::OnReceivedData(Buffer, static_cast<size_t>(NumRead));
 		}
 		else if (NumRead == POLARSSL_ERR_NET_WANT_READ)
 		{

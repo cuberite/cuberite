@@ -110,7 +110,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 	if (allowedMobsSize > 0)
 	{
 		std::set<eMonsterType>::iterator itr = allowedMobs.begin();
-		int iRandom = m_Random.NextInt((int)allowedMobsSize);
+		int iRandom = m_Random.NextInt(static_cast<int>(allowedMobsSize));
 
 		for (int i = 0; i < iRandom; i++)
 		{

@@ -79,13 +79,13 @@ bool cStatSerializer::Save(void)
 
 void cStatSerializer::SaveStatToJSON(Json::Value & a_Out)
 {
-	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
+	for (unsigned int i = 0; i < static_cast<unsigned int>(statCount); ++i)
 	{
-		StatValue Value = m_Manager->GetValue((eStatistic) i);
+		StatValue Value = m_Manager->GetValue(static_cast<eStatistic>(i));
 
 		if (Value != 0)
 		{
-			const AString & StatName = cStatInfo::GetName((eStatistic) i);
+			const AString & StatName = cStatInfo::GetName(static_cast<eStatistic>(i));
 
 			a_Out[StatName] = Value;
 		}

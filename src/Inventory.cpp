@@ -139,7 +139,6 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 
 	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks);
 	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;
-
 	if (ToAdd.m_ItemCount == 0)
 	{
 		return res;

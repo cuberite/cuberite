@@ -276,7 +276,7 @@ size_t cTeam::GetNumPlayers(void) const
 
 cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 {
-	for (int i = 0; i < (int) dsCount; ++i)
+	for (int i = 0; i < static_cast<int>(dsCount); ++i)
 	{
 		m_Display[i] = nullptr;
 	}
@@ -323,11 +323,11 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 	ASSERT(m_World != nullptr);
 	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
 
-	for (unsigned int i = 0; i < (unsigned int) dsCount; ++i)
+	for (unsigned int i = 0; i < static_cast<unsigned int>(dsCount); ++i)
 	{
 		if (m_Display[i] == &it->second)
 		{
-			SetDisplay(nullptr, (eDisplaySlot) i);
+			SetDisplay(nullptr, static_cast<eDisplaySlot>(i));
 		}
 	}
 
@@ -557,14 +557,14 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 		it->second.SendTo(a_Client);
 	}
 
-	for (int i = 0; i < (int) dsCount; ++i)
+	for (int i = 0; i < static_cast<int>(dsCount); ++i)
 	{
 		// Avoid race conditions
 		cObjective * Objective = m_Display[i];
 
 		if (Objective)
 		{
-			a_Client.SendDisplayObjective(Objective->GetName(), (eDisplaySlot) i);
+			a_Client.SendDisplayObjective(Objective->GetName(), static_cast<eDisplaySlot>(i));
 		}
 	}
 }

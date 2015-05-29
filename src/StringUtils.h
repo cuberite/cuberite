@@ -158,7 +158,7 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 				return false;
 			}
 			result *= 10;
-			T digit = a_str[i] - '0';
+			T digit = static_cast<T>(a_str[i] - '0');
 			if (std::numeric_limits<T>::max() - digit < result)
 			{
 				return false;
@@ -179,7 +179,7 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 				return false;
 			}
 			result *= 10;
-			T digit = a_str[i] - '0';
+			T digit = static_cast<T>(a_str[i] - '0');
 			if (std::numeric_limits<T>::min() + digit > result)
 			{
 				return false;

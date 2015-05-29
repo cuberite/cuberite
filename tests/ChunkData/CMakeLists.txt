@@ -3,6 +3,12 @@ cmake_minimum_required (VERSION 2.6)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	add_flags_cxx("-Wno-error=old-style-cast")
+	set_source_files_properties(${CMAKE_SOURCE_DIR}/src/ChunkData.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
+	set_source_files_properties(${CMAKE_SOURCE_DIR}/src/StringUtils.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion")
+endif()
+
 
 add_definitions(-DTEST_GLOBALS=1)
 add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp)

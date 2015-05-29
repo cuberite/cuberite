@@ -34,7 +34,7 @@ void cCaveSpider::Attack(std::chrono::milliseconds a_Dt)
 	if (m_Target->IsPawn())
 	{
 		// TODO: Easy = no poison, Medium = 7 seconds, Hard = 15 seconds
-		((cPawn *) m_Target)->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
+		static_cast<cPawn *>(m_Target)->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
 	}
 }
 
@@ -44,7 +44,7 @@ void cCaveSpider::Attack(std::chrono::milliseconds a_Dt)
 
 void cCaveSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	int LootingLevel = 0;
+	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);

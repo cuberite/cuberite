@@ -77,7 +77,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 		size_t FirstCommentSymbol = ParsingLine.find('#');
 		if ((FirstCommentSymbol != AString::npos) && (FirstCommentSymbol != 0))
 		{
-			ParsingLine.erase(ParsingLine.begin() + (const long)FirstCommentSymbol, ParsingLine.end());
+			ParsingLine.erase(ParsingLine.begin() + static_cast<const long>(FirstCommentSymbol), ParsingLine.end());
 		}
 
 		switch (ParsingLine[0])
@@ -121,7 +121,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, unsigned int a_Line
 	const AStringVector & Sides = StringSplit(Line, "=");
 	if (Sides.size() != 2)
 	{
-		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got %d", a_LineNum, (int)Sides.size() - 1);
+		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got " SIZE_T_FMT, a_LineNum, Sides.size() - 1);
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
@@ -163,7 +163,7 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 	const AStringVector & Sides = StringSplit(Line, "=");
 	if (Sides.size() != 2)
 	{
-		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got %d", a_LineNum, (int)Sides.size() - 1);
+		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got " SIZE_T_FMT, a_LineNum, Sides.size() - 1);
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}

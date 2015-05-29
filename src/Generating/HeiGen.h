@@ -103,7 +103,7 @@ public:
 	
 protected:
 
-	int m_Height;
+	HEIGHTTYPE m_Height;
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;

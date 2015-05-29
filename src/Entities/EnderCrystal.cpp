@@ -22,7 +22,7 @@ cEnderCrystal::cEnderCrystal(double a_X, double a_Y, double a_Z)
 
 void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnObject(*this, 51, 0, (Byte)GetYaw(), (Byte)GetPitch());
+	a_ClientHandle.SendSpawnObject(*this, 51, 0, static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 }
 
 

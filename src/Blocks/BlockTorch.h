@@ -59,7 +59,7 @@ public:
 			case BLOCK_FACE_WEST:   return E_META_TORCH_WEST;
 			case BLOCK_FACE_NORTH:  return E_META_TORCH_NORTH;
 			case BLOCK_FACE_SOUTH:  return E_META_TORCH_SOUTH;
-			default:
+			case BLOCK_FACE_NONE:
 			{
 				ASSERT(!"Unhandled torch direction!");
 				break;

@@ -16,14 +16,24 @@ macro (add_flags_lnk FLAGS)
 endmacro()
 
 macro(add_flags_cxx FLAGS)
-	set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          ${FLAGS}")
-	set(CMAKE_C_FLAGS            "${CMAKE_C_FLAGS}            ${FLAGS}")
+	#set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          ${FLAGS}")
+	#set(CMAKE_C_FLAGS            "${CMAKE_C_FLAGS}            ${FLAGS}")
 	set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    ${FLAGS}")
 	set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      ${FLAGS}")
 	set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} ${FLAGS}")
 	set(CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}   ${FLAGS}")
 	set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  ${FLAGS}")
 	set(CMAKE_C_FLAGS_RELEASE    "${CMAKE_C_FLAGS_RELEASE}    ${FLAGS}")
+endmacro()
+
+
+#this is a hack because we can't use cmake 2.8.10 because of travis
+macro(get_clang_version)
+	execute_process(
+		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
+		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
+	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
+	set(CLANG_VERSION ${CMAKE_MATCH_1})
 endmacro()
 
 
@@ -80,8 +90,9 @@ macro(set_flags)
 
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
-		if (UNIX)
+		if (${UNIX})
 			add_flags_cxx("-pthread")
+			add_flags_lnk("-pthread")
 		endif()
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -111,6 +122,10 @@ macro(set_flags)
 	if(LINUX AND NOT CROSSCOMPILE)
 		add_flags_cxx("-march=native")
 	endif()
+
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        get_clang_version()
+    endif()
 
 
 	# Use static CRT in MSVC builds:
@@ -214,15 +229,6 @@ macro(enable_profile)
 	endif()
 endmacro()
 
-#this is a hack because we can't use cmake 2.8.10 because of travis
-macro(get_clang_version)
-	execute_process(
-		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
-		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
-	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
-	set(CLANG_VERSION ${CMAKE_MATCH_1})
-endmacro()
-
 macro(set_exe_flags)
 	# Remove disabling the maximum warning level:
 	# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
@@ -235,7 +241,7 @@ macro(set_exe_flags)
 		string(REPLACE "-w" "" CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}")
 		string(REPLACE "-w" "" CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE}")
 		string(REPLACE "-w" "" CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}")
-		add_flags_cxx("-Wall -Wextra -Wno-unused-parameter -Wno-error=switch")
+		add_flags_cxx("-Wall -Wextra -Wno-unused-parameter")
 
 		# we support non-IEEE 754 fpus so can make no guarentees about error
 		add_flags_cxx("-ffast-math")
@@ -246,23 +252,16 @@ macro(set_exe_flags)
 		endif()
 
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			get_clang_version()
 			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
 				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION}")
 			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
-			add_flags_cxx("-Werror -Weverything -Wno-c++98-compat-pedantic -Wno-string-conversion")
-			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded")
-			add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=deprecated")
-			add_flags_cxx("-Wno-error=missing-prototypes")
-			add_flags_cxx("-Wno-error=shadow -Wno-error=old-style-cast -Wno-error=global-constructors")
-			add_flags_cxx("-Wno-error=float-equal")
-			add_flags_cxx("-Wno-weak-vtables -Wno-switch-enum")
+			add_flags_cxx("-Weverything -Werror -Wno-c++98-compat-pedantic -Wno-string-conversion")
+			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables")
 			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
 				# flags that are not present in 3.0
-				add_flags_cxx("-Wno-error=covered-switch-default -Wno-error=missing-variable-declarations")
-				add_flags_cxx("-Wno-implicit-fallthrough -Wno-error=extra-semi")
+				add_flags_cxx("-Wno-implicit-fallthrough")
 			endif()
 			if ("${CLANG_VERSION}" VERSION_GREATER 3.1)
 				# flags introduced in 3.2
@@ -276,3 +275,21 @@ macro(set_exe_flags)
 	endif()
 
 endmacro()
+
+#	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+#		foreach(FILENAME ${ARGN})
+#			message("downgrade_warnings for ${FILENAME}")
+#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion")
+#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=missing-prototypes -Wno-error=deprecated")
+#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=shadow -Wno-error=old-style-cast  -Wno-error=switch-enum -Wno-error=switch")
+#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=float-equal -Wno-error=global-constructors")
+			
+#			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
+#				# flags that are not present in 3.0
+#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=covered-switch-default ")
+#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-error=extra-semi")
+#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=missing-variable-declarations")
+#			endif()
+#		endforeach()
+#	endif()
+

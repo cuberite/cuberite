@@ -62,7 +62,7 @@ void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
 		return;
 	}
 
-	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer() && !((cPlayer *)a_TDI.Attacker)->IsGameModeCreative())
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer() && !static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative())
 	{
 		cItems Item;
 		Item.push_back(m_Item);
@@ -83,7 +83,7 @@ void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
 
 void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
 {
-	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !((cPlayer *)a_Killer)->IsGameModeCreative())
+	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !static_cast<cPlayer *>(a_Killer)->IsGameModeCreative())
 	{
 		a_Items.push_back(cItem(E_ITEM_ITEM_FRAME));
 	}
@@ -96,7 +96,7 @@ void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
 void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	super::SpawnOn(a_ClientHandle);
-	a_ClientHandle.SendSpawnObject(*this, 71, GetProtocolFacing(), (Byte)GetYaw(), (Byte)GetPitch());
+	a_ClientHandle.SendSpawnObject(*this, 71, GetProtocolFacing(), static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 	a_ClientHandle.SendEntityMetadata(*this);
 }
 

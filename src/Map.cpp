@@ -224,7 +224,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 				return false;
 			}
 
-			unsigned int PixelWidth = m_Map->GetPixelWidth();
+			unsigned int CallbackPixelWidth = m_Map->GetPixelWidth();
 
 			if (m_Map->GetDimension() == dimNether)
 			{
@@ -237,9 +237,9 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			ColorCountMap ColorCounts;
 
 			// Count surface blocks
-			for (unsigned int X = m_RelX; X < m_RelX + PixelWidth; ++X)
+			for (unsigned int X = m_RelX; X < m_RelX + CallbackPixelWidth; ++X)
 			{
-				for (unsigned int Z = m_RelZ; Z < m_RelZ + PixelWidth; ++Z)
+				for (unsigned int Z = m_RelZ; Z < m_RelZ + CallbackPixelWidth; ++Z)
 				{
 					// unsigned int WaterDepth = 0;
 

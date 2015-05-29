@@ -305,7 +305,7 @@ void cNoise3DGenerator::UpdateHeightmap(cChunkDesc & a_ChunkDesc)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
 			{
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
 				{
@@ -790,7 +790,10 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 		case biTaiga:                a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
 		case biTaigaM:               a_HeightAmp = 0.1f;   a_MidPoint =  70; break;
 		case biTaigaHills:           a_HeightAmp = 0.075f; a_MidPoint =  68; break;
-		default:
+		case biInvalidBiome:
+		case biNumBiomes:
+		case biVariant:
+		case biNumVariantBiomes:
 		{
 			// Make a crazy terrain so that it stands out
 			a_HeightAmp = 0.001f;

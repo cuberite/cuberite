@@ -90,11 +90,6 @@ void cHTTPFormParser::Parse(const char * a_Data, size_t a_Size)
 			m_MultipartParser->Parse(a_Data, a_Size);
 			break;
 		}
-		default:
-		{
-			ASSERT(!"Unhandled form kind");
-			break;
-		}
 	}
 }
 
@@ -113,7 +108,7 @@ bool cHTTPFormParser::Finish(void)
 			ParseFormUrlEncoded();
 			break;
 		}
-		default:
+		case fpkMultipart:
 		{
 			// Nothing needed for other formats
 			break;

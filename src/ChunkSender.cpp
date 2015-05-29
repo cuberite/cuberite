@@ -125,10 +125,6 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 				m_SendChunksHighPriority.push_back(Chunk);
 				break;
 			}
-			default:
-			{
-				ASSERT(!"Unknown chunk priority!");
-			}
 		}
 	}
 	m_evtQueue.Set();
@@ -342,7 +338,7 @@ void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 		if ((*a_BiomeMap)[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_BiomeMap[i] = (unsigned char)((*a_BiomeMap)[i]);
+			m_BiomeMap[i] = static_cast<unsigned char>((*a_BiomeMap)[i]);
 		}
 		else
 		{

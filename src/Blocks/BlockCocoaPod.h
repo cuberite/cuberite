@@ -81,7 +81,9 @@ public:
 			case BLOCK_FACE_XM: return 3;
 			case BLOCK_FACE_XP: return 1;
 			case BLOCK_FACE_ZP: return 2;
-			default:
+			case BLOCK_FACE_NONE:
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
 			{
 				ASSERT(!"Unknown face");
 				return 0;

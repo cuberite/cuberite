@@ -30,7 +30,7 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 	{
 		if (m_Target->IsPlayer())
 		{
-			if (((cPlayer *)m_Target)->IsGameModeCreative())
+			if (static_cast<cPlayer *>(m_Target)->IsGameModeCreative())
 			{
 				m_EMState = IDLE;
 				return;
@@ -46,7 +46,7 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 
 void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity)
 {
-	if (!((cPlayer *)a_Entity)->IsGameModeCreative())
+	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative())
 	{
 		super::EventSeePlayer(a_Entity);
 		m_EMState = CHASING;
@@ -111,12 +111,12 @@ void cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 bool cAggressiveMonster::IsMovingToTargetPosition()
 {
 	// Difference between destination x and target x is negligible (to 10^-12 precision)
-	if (fabsf((float)m_FinalDestination.x - (float)m_Target->GetPosX()) < std::numeric_limits<float>::epsilon())
+	if (fabsf(static_cast<float>(m_FinalDestination.x) - static_cast<float>(m_Target->GetPosX())) < std::numeric_limits<float>::epsilon())
 	{
 		return false;
 	}
 	// Difference between destination z and target z is negligible (to 10^-12 precision)
-	else if (fabsf((float)m_FinalDestination.z - (float)m_Target->GetPosZ()) > std::numeric_limits<float>::epsilon())
+	else if (fabsf(static_cast<float>(m_FinalDestination.z) - static_cast<float>(m_Target->GetPosZ())) > std::numeric_limits<float>::epsilon())
 	{
 		return false;
 	}

@@ -85,7 +85,7 @@ void cPrefabPiecePool::AddStartingPieceDefs(const cPrefab::sDef * a_StartingPiec
 
 void cPrefabPiecePool::AddToPerConnectorMap(cPrefab * a_Prefab)
 {
-	cPiece::cConnectors Connectors = ((const cPiece *)a_Prefab)->GetConnectors();
+	cPiece::cConnectors Connectors = (static_cast<const cPiece *>(a_Prefab))->GetConnectors();
 	for (cPiece::cConnectors::const_iterator itr = Connectors.begin(), end = Connectors.end(); itr != end; ++itr)
 	{
 		m_PiecesByConnector[itr->m_Type].push_back(a_Prefab);
@@ -122,7 +122,7 @@ cPieces cPrefabPiecePool::GetStartingPieces(void)
 
 int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
 {
-	return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+	return (static_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 }
 
 
@@ -131,7 +131,7 @@ int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const c
 
 int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece)
 {
-	return ((const cPrefab &)a_NewPiece).GetDefaultWeight();
+	return (static_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
 }
 
 

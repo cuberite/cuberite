@@ -321,7 +321,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	int MemUsageKiB = cRoot::GetPhysicalRAMUsage();
 	if (MemUsageKiB > 0)
 	{
-		ReplaceString(Template, "{MEM}",       Printf("%.02f", (double)MemUsageKiB / 1024));
+		ReplaceString(Template, "{MEM}",       Printf("%.02f", static_cast<double>(MemUsageKiB) / 1024));
 		ReplaceString(Template, "{MEMKIB}",    Printf("%d", MemUsageKiB));
 	}
 	else
@@ -648,7 +648,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
-	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
+	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
 	if (Data == nullptr)
 	{
 		return;
@@ -681,7 +681,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	}
 
 	// Delete any request data assigned to the request:
-	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
+	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
 	delete Data;
 	Data = nullptr;
 }

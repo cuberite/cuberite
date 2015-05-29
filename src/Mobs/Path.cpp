@@ -46,18 +46,18 @@ cPath::cPath(
 
 	a_BoundingBoxWidth = 1;  // Until we improve physics, if ever.
 
-	m_BoundingBoxWidth = ceil(a_BoundingBoxWidth);
-	m_BoundingBoxHeight = ceil(a_BoundingBoxHeight);
+	m_BoundingBoxWidth = CeilC(a_BoundingBoxWidth);
+	m_BoundingBoxHeight = CeilC(a_BoundingBoxHeight);
 	m_HalfWidth = a_BoundingBoxWidth / 2;
 
-	int HalfWidthInt = a_BoundingBoxWidth / 2;
-	m_Source.x = floor(a_StartingPoint.x - HalfWidthInt);
-	m_Source.y = floor(a_StartingPoint.y);
-	m_Source.z = floor(a_StartingPoint.z - HalfWidthInt);
+	int HalfWidthInt = FloorC(a_BoundingBoxWidth / 2);
+	m_Source.x = FloorC(a_StartingPoint.x - HalfWidthInt);
+	m_Source.y = FloorC(a_StartingPoint.y);
+	m_Source.z = FloorC(a_StartingPoint.z - HalfWidthInt);
 
-	m_Destination.x = floor(a_EndingPoint.x - HalfWidthInt);
-	m_Destination.y = floor(a_EndingPoint.y);
-	m_Destination.z = floor(a_EndingPoint.z - HalfWidthInt);
+	m_Destination.x = FloorC(a_EndingPoint.x - HalfWidthInt);
+	m_Destination.y = FloorC(a_EndingPoint.y);
+	m_Destination.z = FloorC(a_EndingPoint.z - HalfWidthInt);
 
 	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
 	{

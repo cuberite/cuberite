@@ -158,7 +158,7 @@ static int tolua_UncompressStringZLIB(lua_State * tolua_S)
 
 	// Get the params:
 	AString ToUncompress;
-	int UncompressedSize;
+	size_t UncompressedSize;
 	S.GetStackValues(1, ToUncompress, UncompressedSize);
 
 	// Compress the string:
@@ -1801,7 +1801,7 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 	// Convert the input table into AStringVector:
 	AStringVector PlayerNames;
 	int NumNames = luaL_getn(L, 2);
-	PlayerNames.reserve(NumNames);
+	PlayerNames.reserve(static_cast<size_t>(NumNames));
 	for (int i = 1; i <= NumNames; i++)
 	{
 		lua_rawgeti(L, 2, i);

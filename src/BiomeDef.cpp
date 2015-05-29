@@ -98,11 +98,11 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 	{
 		if ((res >= biFirstBiome) && (res < biNumBiomes))
 		{
-			return (EMCSBiome)res;
+			return static_cast<EMCSBiome>(res);
 		}
 		else if ((res >= biFirstVariantBiome) && (res < biNumVariantBiomes))
 		{
-			return (EMCSBiome)res;
+			return static_cast<EMCSBiome>(res);
 		}
 		// It was an invalid number
 		return biInvalidBiome;

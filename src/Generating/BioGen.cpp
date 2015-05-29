@@ -49,16 +49,16 @@ void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenCache:
 
-cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, int a_CacheSize) :
+cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize) :
 	m_BioGenToCache(a_BioGenToCache),
 	m_CacheSize(a_CacheSize),
-	m_CacheOrder(new int[a_CacheSize]),
+	m_CacheOrder(new size_t[a_CacheSize]),
 	m_CacheData(new sCacheData[a_CacheSize]),
 	m_NumHits(0),
 	m_NumMisses(0),
 	m_TotalChain(0)
 {
-	for (int i = 0; i < m_CacheSize; i++)
+	for (size_t i = 0; i < m_CacheSize; i++)
 	{
 		m_CacheOrder[i] = i;
 		m_CacheData[i].m_ChunkX = 0x7fffffff;
@@ -90,7 +90,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 		LOGD("BioGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
 	}
 
-	for (int i = 0; i < m_CacheSize; i++)
+	for (size_t i = 0; i < m_CacheSize; i++)
 	{
 		if (
 			(m_CacheData[m_CacheOrder[i]].m_ChunkX != a_ChunkX) ||
@@ -100,10 +100,10 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 			continue;
 		}
 		// Found it in the cache
-		int Idx = m_CacheOrder[i];
+		size_t Idx = m_CacheOrder[i];
 		
 		// Move to front:
-		for (int j = i; j > 0; j--)
+		for (size_t j = i; j > 0; j--)
 		{
 			m_CacheOrder[j] = m_CacheOrder[j - 1];
 		}
@@ -122,8 +122,8 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 	m_BioGenToCache->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 	
 	// Insert it as the first item in the MRU order:
-	int Idx = m_CacheOrder[m_CacheSize - 1];
-	for (int i = m_CacheSize - 1; i > 0; i--)
+	size_t Idx = m_CacheOrder[m_CacheSize - 1];
+	for (size_t i = m_CacheSize - 1; i > 0; i--)
 	{
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]
@@ -278,7 +278,7 @@ void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int Add = cChunkDef::Width * a_ChunkX + x;
-			int BiomeIdx = (((Base + Add / m_BiomeSize) % m_BiomesCount) + m_BiomesCount) % m_BiomesCount;  // Need to add and modulo twice because of negative numbers
+			size_t BiomeIdx = static_cast<size_t>((((Base + Add / m_BiomeSize) % m_BiomesCount) + m_BiomesCount) % m_BiomesCount);  // Need to add and modulo twice because of negative numbers
 			a_BiomeMap[x + cChunkDef::Width * z] = m_Biomes[BiomeIdx];
 		}
 	}
@@ -314,7 +314,7 @@ void cBioGenVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap &
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int VoronoiCellValue = m_Voronoi.GetValueAt(BaseX + x, AbsoluteZ) / 8;
-			cChunkDef::SetBiome(a_BiomeMap, x, z, m_Biomes[VoronoiCellValue % m_BiomesCount]);
+			cChunkDef::SetBiome(a_BiomeMap, x, z, m_Biomes[static_cast<size_t>(VoronoiCellValue % m_BiomesCount)]);
 		}  // for x
 	}  // for z
 }
@@ -363,7 +363,7 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int VoronoiCellValue = m_Voronoi.GetValueAt(DistortX[x][z], DistortZ[x][z]) / 8;
-			cChunkDef::SetBiome(a_BiomeMap, x, z, m_Biomes[VoronoiCellValue % m_BiomesCount]);
+			cChunkDef::SetBiome(a_BiomeMap, x, z, m_Biomes[static_cast<size_t>(VoronoiCellValue % m_BiomesCount)]);
 		}  // for x
 	}  // for z
 }
@@ -785,7 +785,7 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 		{
 			int SeedX, SeedZ, MinDist2;
 			int BiomeGroup = m_VoronoiLarge.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 7;
-			int BiomeIdx   = m_VoronoiSmall.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 11;
+			size_t BiomeIdx   = static_cast<size_t>(m_VoronoiSmall.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 11);
 			int MinDist1 = (DistortX[x][z] - SeedX) * (DistortX[x][z] - SeedX) + (DistortZ[x][z] - SeedZ) * (DistortZ[x][z] - SeedZ);
 			cChunkDef::SetBiome(a_BiomeMap, x, z, SelectBiome(BiomeGroup, BiomeIdx, (MinDist1 < MinDist2 / 4) ? 1 : 0));
 		}
@@ -796,7 +796,7 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 
 
 
-EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, int a_BiomeIdx, int a_DistLevel)
+EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int a_DistLevel)
 {
 	// TODO: Move this into settings
 	struct BiomeLevels
@@ -900,7 +900,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, int a_BiomeIdx, int a_D
 		{ bgMesa,       ARRAYCOUNT(bgMesa), },
 		{ bgDenseTrees, ARRAYCOUNT(bgDenseTrees), },
 	} ;
-	size_t Group = a_BiomeGroup % ARRAYCOUNT(BiomeGroups);
+	size_t Group = static_cast<size_t>(a_BiomeGroup) % ARRAYCOUNT(BiomeGroups);
 	size_t Index = a_BiomeIdx % BiomeGroups[Group].Count;
 	return (a_DistLevel > 0) ? BiomeGroups[Group].Biomes[Index].InnerBiome : BiomeGroups[Group].Biomes[Index].OuterBiome;
 }

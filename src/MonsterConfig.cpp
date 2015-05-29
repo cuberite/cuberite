@@ -64,7 +64,7 @@ void cMonsterConfig::Initialize()
 		return;
 	}
 	
-	for (int i = (int)MonstersIniFile.GetNumKeys(); i >= 0; i--)
+	for (int i = static_cast<int>(MonstersIniFile.GetNumKeys()); i >= 0; i--)
 	{
 		sAttributesStruct Attributes;
 		AString Name = MonstersIniFile.GetKeyName(i);
@@ -93,7 +93,7 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 			a_Monster->SetAttackDamage (itr->m_AttackDamage);
 			a_Monster->SetAttackRange  (itr->m_AttackRange);
 			a_Monster->SetSightDistance(itr->m_SightDistance);
-			a_Monster->SetAttackRate   ((float)itr->m_AttackRate);
+			a_Monster->SetAttackRate   (static_cast<float>(itr->m_AttackRate));
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
 			a_Monster->SetIsFireproof  (itr->m_IsFireproof);
 			return;

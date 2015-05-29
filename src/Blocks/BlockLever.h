@@ -59,13 +59,13 @@ public:
 		// Determine lever direction:
 		switch (a_Dir)
 		{
-			case BLOCK_FACE_YP: return 0x6;
-			case BLOCK_FACE_XP: return 0x1;
-			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_ZP: return 0x3;
-			case BLOCK_FACE_ZM: return 0x4;
-			case BLOCK_FACE_YM: return 0x0;
-			default:            return 0x6;
+			case BLOCK_FACE_YP:   return 0x6;
+			case BLOCK_FACE_XP:   return 0x1;
+			case BLOCK_FACE_XM:   return 0x2;
+			case BLOCK_FACE_ZP:   return 0x3;
+			case BLOCK_FACE_ZM:   return 0x4;
+			case BLOCK_FACE_YM:   return 0x0;
+			case BLOCK_FACE_NONE: return 0x6;
 		}
 	}
 

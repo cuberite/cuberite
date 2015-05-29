@@ -53,7 +53,7 @@ public:
 		ASSERT(a_Player != nullptr);
 
 		int BowCharge = a_Player->FinishChargingBow();
-		double Force = (double)BowCharge / 20.0;
+		double Force = static_cast<double>(BowCharge) / 20.0;
 		Force = (Force * Force + 2.0 * Force) / 3.0;  // This formula is used by the 1.6.2 client
 		if (Force < 0.1)
 		{
@@ -80,7 +80,14 @@ public:
 			Arrow = nullptr;
 			return;
 		}
-		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), 0.5, (float)Force);
+		a_Player->GetWorld()->BroadcastSoundEffect(
+			"random.bow",
+			a_Player->GetPosX(),
+			a_Player->GetPosY(),
+			a_Player->GetPosZ(),
+			0.5,
+			static_cast<float>(Force)
+		);
 		if (!a_Player->IsGameModeCreative())
 		{
 			if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchInfinity) == 0)

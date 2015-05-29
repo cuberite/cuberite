@@ -487,7 +487,12 @@ public:
 				}
 				break;
 			}
-			default: break;
+			case BLOCK_FACE_NONE:
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			{
+				break;
+			}
 		}
 		return true;
 	}

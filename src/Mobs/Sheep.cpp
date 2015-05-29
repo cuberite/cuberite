@@ -37,10 +37,10 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	if (!m_IsSheared)
 	{
-		a_Drops.push_back(cItem(E_BLOCK_WOOL, 1, m_WoolColor));
+		a_Drops.push_back(cItem(E_BLOCK_WOOL, 1, static_cast<short>(m_WoolColor)));
 	}
 
-	int LootingLevel = 0;
+	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
@@ -65,7 +65,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 		cItems Drops;
 		int NumDrops = m_World->GetTickRandomNumber(2) + 1;
-		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
+		Drops.push_back(cItem(E_BLOCK_WOOL, static_cast<char>(NumDrops), static_cast<short>(m_WoolColor)));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 		m_World->BroadcastSoundEffect("mob.sheep.shear", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 1.0f);
 	}

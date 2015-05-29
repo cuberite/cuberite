@@ -108,7 +108,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
 	}
 
-	int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
+	unsigned int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
 	if (PowerLevel > 0)
 	{
 		int ExtraDamage = (int)ceil(0.25 * (PowerLevel + 1));
@@ -116,7 +116,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	}
 
 	// int KnockbackAmount = 1;
-	int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
+	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
 	if (PunchLevel > 0)
 	{
 		Vector3d LookVector = GetLookVector();
@@ -140,7 +140,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 
 	// Broadcast successful hit sound
 	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-
+	
 	Destroy();
 }
 
@@ -177,7 +177,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	m_Timer += a_Dt;
-
+	
 	if (m_bIsCollected)
 	{
 		if (m_Timer > std::chrono::milliseconds(500))
@@ -191,7 +191,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy();
 		return;
 	}
-
+	
 	if (m_IsInGround)
 	{
 		if (!m_HasTeleported)  // Sent a teleport already, don't do again
@@ -206,17 +206,17 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_HitGroundTimer += a_Dt;
 			}
 		}
-
+		
 		int RelPosX = m_HitBlockPos.x - a_Chunk.GetPosX() * cChunkDef::Width;
 		int RelPosZ = m_HitBlockPos.z - a_Chunk.GetPosZ() * cChunkDef::Width;
 		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
-
+		
 		if (Chunk == nullptr)
 		{
 			// Inside an unloaded chunk, abort
 			return;
 		}
-
+		
 		if (Chunk->GetBlock(RelPosX, m_HitBlockPos.y, RelPosZ) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again

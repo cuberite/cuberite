@@ -30,7 +30,7 @@
 
 
 /// Converts an angle in radians into a byte representation used by the network protocol
-#define ANGLE_TO_PROTO(X) (Byte)(X * 255 / 360)
+#define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
 
 
 
@@ -222,7 +222,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
 		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : cEntity::INVALID_ID),
-		((a_Creator != nullptr) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : ""),
+		((a_Creator != nullptr) ? (a_Creator->IsPlayer() ? static_cast<cPlayer *>(a_Creator)->GetName() : "") : ""),
 		((a_Creator != nullptr) ? a_Creator->GetEquippedWeapon().m_Enchantments : cEnchantments())
 	),
 	m_IsInGround(false)
@@ -238,7 +238,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height) :
 	super(etProjectile, a_Pos.x, a_Pos.y, a_Pos.z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
-	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "", a_Creator->GetEquippedWeapon().m_Enchantments),
+	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? static_cast<cPlayer *>(a_Creator)->GetName() : "", a_Creator->GetEquippedWeapon().m_Enchantments),
 	m_IsInGround(false)
 {
 	SetSpeed(a_Speed);
@@ -281,6 +281,7 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, *a_Item);
 		}
+		case pkFishingFloat: break;
 	}
 	
 	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);

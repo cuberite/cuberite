@@ -190,7 +190,7 @@ public:
 	}
 
 
-	inline static int GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
+	inline static HEIGHTTYPE GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
@@ -198,7 +198,7 @@ public:
 	}
 
 
-	inline static void SetHeight(HeightMap & a_HeightMap, int a_X, int a_Z, unsigned char a_Height)
+	inline static void SetHeight(HeightMap & a_HeightMap, int a_X, int a_Z, HEIGHTTYPE a_Height)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));

@@ -245,10 +245,10 @@ public:
 			if (a_BlockX > 0)
 			{
 				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
-				return (NIBBLETYPE) ((DownMeta & 0x07) | 0x08 | (Meta << 4));
+				return static_cast<NIBBLETYPE>((DownMeta & 0x07) | 0x08 | (Meta << 4));
 			}
 			// This is the top part of the door at the bottommost layer of the world, there's no bottom:
-			return (NIBBLETYPE) (0x08 | (Meta << 4));
+			return static_cast<NIBBLETYPE>(0x08 | (Meta << 4));
 		}
 		else
 		{
@@ -256,7 +256,7 @@ public:
 			if (a_BlockY < cChunkDef::Height - 1)
 			{
 				NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
-				return (NIBBLETYPE) (Meta | (UpMeta << 4));
+				return static_cast<NIBBLETYPE>(Meta | (UpMeta << 4));
 			}
 			// This is the bottom part of the door at the topmost layer of the world, there's no top:
 			return Meta;

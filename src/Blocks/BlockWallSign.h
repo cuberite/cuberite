@@ -55,11 +55,13 @@ public:
 	{
 		switch (a_Direction)
 		{
-			case 0x2: return 0x2;
-			case 0x3: return 0x3;
-			case 0x4: return 0x4;
-			case 0x5: return 0x5;
-			default:
+			case BLOCK_FACE_ZM: return 0x2;
+			case BLOCK_FACE_ZP: return 0x3;
+			case BLOCK_FACE_XM: return 0x4;
+			case BLOCK_FACE_XP: return 0x5;
+			case BLOCK_FACE_NONE:
+			case BLOCK_FACE_YP:
+			case BLOCK_FACE_YM:
 			{
 				break;
 			}

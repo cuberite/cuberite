@@ -48,7 +48,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		return;
 	}
-	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
 	if (a_Closest_Player != nullptr)
 	{
 		if (a_Closest_Player->GetEquippedItem().IsEqual(FollowedItem))

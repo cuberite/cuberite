@@ -21,7 +21,7 @@ class cRoughRavine :
 	
 public:
 	cRoughRavine(
-		int a_Seed, int a_Size,
+		int a_Seed, size_t a_Size,
 		float a_CenterWidth, float a_Roughness,
 		float a_FloorHeightEdge1,   float a_FloorHeightEdge2,   float a_FloorHeightCenter,
 		float a_CeilingHeightEdge1, float a_CeilingHeightEdge2, float a_CeilingHeightCenter,
@@ -33,14 +33,14 @@ public:
 		m_Roughness(a_Roughness)
 	{
 		// Create the basic structure - 2 lines meeting at the centerpoint:
-		int Max = 2 * a_Size;
-		int Half = a_Size;  // m_DefPoints[Half] will be the centerpoint
+		size_t Max = 2 * a_Size;
+		size_t Half = a_Size;  // m_DefPoints[Half] will be the centerpoint
 		m_DefPoints.resize(Max + 1);
 		int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 7;
 		float Len = (float)a_Size;
 		float Angle = (float)rnd;  // Angle is in radians, will be wrapped in the "sin" and "cos" operations
-		float OfsX = sin(Angle) * Len;
-		float OfsZ = cos(Angle) * Len;
+		float OfsX = sinf(Angle) * Len;
+		float OfsZ = cosf(Angle) * Len;
 		m_DefPoints[0].Set   (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,             a_CeilingHeightEdge1,  a_FloorHeightEdge1);
 		m_DefPoints[Half].Set((float)a_OriginX, (float)a_OriginZ, a_CenterWidth, a_CeilingHeightCenter, a_FloorHeightCenter);
 		m_DefPoints[Max].Set (a_OriginX + OfsX, a_OriginZ + OfsZ, 1,             a_CeilingHeightEdge2,  a_FloorHeightEdge2);
@@ -90,7 +90,7 @@ protected:
 	/** Recursively subdivides the line between the points of the specified index.
 	Sets the midpoint to the center of the line plus or minus a random offset, then calls itself for each half
 	of the new line. */
-	void SubdivideLine(int a_Idx1, int a_Idx2)
+	void SubdivideLine(size_t a_Idx1, size_t a_Idx2)
 	{
 		// Calculate the midpoint:
 		const sRavineDefPoint & p1 = m_DefPoints[a_Idx1];
@@ -114,7 +114,7 @@ protected:
 			MidX -= dz * m_Roughness;
 			MidZ += dx * m_Roughness;
 		}
-		int MidIdx = (a_Idx1 + a_Idx2) / 2;
+		size_t MidIdx = (a_Idx1 + a_Idx2) / 2;
 		m_DefPoints[MidIdx].Set(MidX, MidZ, MidR, MidT, MidB);
 		
 		// Recurse the two halves, if they are worth recursing:
@@ -275,7 +275,7 @@ cRoughRavines::cRoughRavines(
 cGridStructGen::cStructurePtr cRoughRavines::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
 	// Pick a random value for each of the ravine's parameters:
-	int Size = m_MinSize + (m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 7) % (m_MaxSize - m_MinSize);  // Random int from m_MinSize to m_MaxSize
+	size_t Size = static_cast<size_t>(m_MinSize + (m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 7) % (m_MaxSize - m_MinSize));  // Random int from m_MinSize to m_MaxSize
 	float CenterWidth         = m_Noise.IntNoise2DInRange(a_GridX + 10, a_GridZ, m_MinCenterWidth,         m_MaxCenterWidth);
 	float Roughness           = m_Noise.IntNoise2DInRange(a_GridX + 20, a_GridZ, m_MinRoughness,           m_MaxRoughness);
 	float FloorHeightEdge1    = m_Noise.IntNoise2DInRange(a_GridX + 30, a_GridZ, m_MinFloorHeightEdge,     m_MaxFloorHeightEdge);

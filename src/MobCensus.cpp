@@ -41,7 +41,8 @@ int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
 		case cMonster::mfPassive: return 11;
 		case cMonster::mfAmbient: return 16;
 		case cMonster::mfWater:   return 5;
-		default:
+		case cMonster::mfNoSpawn:
+		case cMonster::mfUnhandled:
 		{
 			ASSERT(!"Unhandled mob family");
 			return -1;
@@ -64,7 +65,7 @@ void cMobCensus::CollectSpawnableChunk(cChunk & a_Chunk)
 
 int cMobCensus::GetNumChunks(void)
 {
-	return (int)m_EligibleForSpawnChunks.size();
+	return static_cast<int>(m_EligibleForSpawnChunks.size());
 }
 
 

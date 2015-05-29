@@ -277,7 +277,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 
 
 // return 1 = hit, other is not hit
-int LinesCross(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
+static int LinesCross(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
 {
 	// float linx, liny;
 

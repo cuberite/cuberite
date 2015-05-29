@@ -396,7 +396,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		int ThornsLevel = 0;
+		unsigned int ThornsLevel = 0;
 		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{

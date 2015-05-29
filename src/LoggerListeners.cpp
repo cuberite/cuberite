@@ -3,6 +3,8 @@
 
 #include "LoggerListeners.h"
 
+#include <chrono>
+
 #if defined(_WIN32)
 	#include <io.h>  // Needed for _isatty(), not available on Linux
 	#include <time.h>
@@ -280,7 +282,13 @@ cFileListener::cFileListener(void)
 {
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
 	AString FileName;
-	FileName = Printf("%s%sLOG_%d.txt", FILE_IO_PREFIX, "logs/", (int)time(nullptr));
+	auto time = std::chrono::system_clock::now();
+	FileName = Printf(
+		"%s%sLOG_%d.txt",
+		FILE_IO_PREFIX,
+		"logs/",
+		std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(time.time_since_epoch()).count()
+	);
 	m_File.Open(FileName, cFile::fmAppend);
 }
 

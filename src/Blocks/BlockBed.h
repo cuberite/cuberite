@@ -53,7 +53,7 @@ public:
 
 		a_Rotation = (a_Rotation / 360) * 4;
 
-		return ((char)a_Rotation + 2) % 4;
+		return (static_cast<NIBBLETYPE>(a_Rotation + 2)) % 4;
 	}
 
 	static Vector3i MetaDataToDirection(NIBBLETYPE a_MetaData)

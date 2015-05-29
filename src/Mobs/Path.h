@@ -115,7 +115,7 @@ public:
 		return Vector3d(Point.x + m_HalfWidth, Point.y, Point.z + m_HalfWidth);
 	}
 	/** Returns the total number of points this path has. */
-	inline int GetPointCount()
+	inline size_t GetPointCount()
 	{
 		if (m_Status != ePathFinderStatus::PATH_FOUND)
 		{
@@ -130,13 +130,13 @@ public:
 		{
 			// Guaranteed to have no hash collisions for any 128x128x128 area. Suitable for pathfinding.
 			int32_t t = 0;
-			t += (int8_t)a_Vector.x;
+			t += static_cast<int8_t>(a_Vector.x);
 			t = t << 8;
-			t += (int8_t)a_Vector.y;
+			t += static_cast<int8_t>(a_Vector.y);
 			t = t << 8;
-			t += (int8_t)a_Vector.z;
+			t += static_cast<int8_t>(a_Vector.z);
 			t = t << 8;
-			return (size_t)t;
+			return static_cast<size_t>(t);
 		}
 	};
 private:
