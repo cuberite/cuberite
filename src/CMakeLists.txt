@@ -62,6 +62,7 @@ SET (SRCS
 	Scoreboard.cpp
 	Server.cpp
 	SetChunkData.cpp
+	SpawnPrepare.cpp
 	Statistics.cpp
 	StringCompression.cpp
 	StringUtils.cpp
@@ -133,6 +134,7 @@ SET (HDRS
 	Server.h
 	SetChunkData.h
 	SettingsRepositoryInterface.h
+	SpawnPrepare.h
 	Statistics.h
 	StringCompression.h
 	StringUtils.h
