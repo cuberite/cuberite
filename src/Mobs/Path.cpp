@@ -161,6 +161,7 @@ bool cPath::IsSolid(const Vector3i & a_Location)
 			(BlockType == E_BLOCK_FENCE) ||
 			(BlockType == E_BLOCK_FENCE_GATE) ||
 			(BlockType == E_BLOCK_NETHER_BRICK_FENCE) ||
+			(BlockType == E_BLOCK_IRON_BARS) ||
 			((BlockType >= E_BLOCK_SPRUCE_FENCE_GATE) && (BlockType <= E_BLOCK_ACACIA_FENCE))
 	)
 	{
