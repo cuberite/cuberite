@@ -12,6 +12,13 @@
 	#include <unistd.h>
 #endif
 
+// FreeBSD uses size_t for the return type of backtrace()
+#if defined(__FreeBSD__) && (__FreeBSD__ >= 10)
+	#define btsize size_t
+#else
+	#define btsize int
+#endif
+
 
 
 
@@ -34,7 +41,7 @@ void PrintStackTrace(void)
 		// Use the backtrace() function to get and output the stackTrace:
 		// Code adapted from http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
 		void * stackTrace[30];
-		int numItems = backtrace(stackTrace, ARRAYCOUNT(stackTrace));
+		btsize numItems = backtrace(stackTrace, ARRAYCOUNT(stackTrace));
 		backtrace_symbols_fd(stackTrace, numItems, STDERR_FILENO);
 	#endif
 }

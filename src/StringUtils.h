@@ -168,6 +168,12 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 	}
 	else
 	{
+		// Unsigned result cannot be signed!
+		if (!std::numeric_limits<T>::is_signed)
+		{
+			return false;
+		}
+
 		for (size_t size = a_str.size(); i < size; i++)
 		{
 			if ((a_str[i] < '0') || (a_str[i] > '9'))
