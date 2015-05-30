@@ -216,28 +216,35 @@ bool cPath::Step_Internal()
 	ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 0, -1), CurrentCell, 10);
 
 	// Check diagonals on XY plane.
+	// x = -1: west, x = 1: east.
 	for (int x = -1; x <= 1; x += 2)
 	{
 		if (GetCell(CurrentCell->m_Location + Vector3i(x, 0, 0))->m_IsSolid)  // If there's a solid our east / west.
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, 1, 0), CurrentCell, JUMP_G_COST);  // Check east / west-up.
+			if (!GetCell(CurrentCell->m_Location + Vector3i(0, 1, 0))->m_IsSolid)  // If there isn't a solid above.
+			{
+				ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, 1, 0), CurrentCell, JUMP_G_COST);  // Check east-up / west-up.
+			}
 		}
 		else
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, -1, 0), CurrentCell, 14);  // Else check east / west-down.
+			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(x, -1, 0), CurrentCell, 14);  // Else check east-down / west-down.
 		}
 	}
 
 	// Check diagonals on the YZ plane.
 	for (int z = -1; z <= 1; z += 2)
 	{
-		if (GetCell(CurrentCell->m_Location + Vector3i(0, 0, z))->m_IsSolid)  // If there's a solid our east / west.
+		if (GetCell(CurrentCell->m_Location + Vector3i(0, 0, z))->m_IsSolid)  // If there's a solid our north / south.
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 1, z), CurrentCell, JUMP_G_COST);  // Check east / west-up.
+			if (!GetCell(CurrentCell->m_Location + Vector3i(0, 1, 0))->m_IsSolid)  // If there isn't a solid above.
+			{
+				ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, 1, z), CurrentCell, JUMP_G_COST);  // Check north-up / south-up.
+			}
 		}
 		else
 		{
-			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, -1, z), CurrentCell, 14);  // Else check east / west-down.
+			ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, -1, z), CurrentCell, 14);  // Else check north-down / south-down.
 		}
 	}
 
