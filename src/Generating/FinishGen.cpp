@@ -1375,8 +1375,12 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		return mtInvalidType;
 	}
 
-	size_t RandMob = static_cast<size_t>((m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7)) % ListOfSpawnables.size();
 	auto MobIter = ListOfSpawnables.begin();
+	using diff_type =
+		std::iterator_traits<decltype(MobIter)>::difference_type;
+	diff_type RandMob = static_cast<diff_type>
+		((unsigned long)(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7)
+		% ListOfSpawnables.size());
 	std::advance(MobIter, RandMob);
 
 	return *MobIter;
