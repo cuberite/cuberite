@@ -35,9 +35,10 @@ void cSquid::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSquid::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	m_IsFollowingPath = false;  // Disable Pathfinding until it's fixed. TODO
+
 	// We must first process current location, and only then tick, otherwise we risk processing a location in a chunk
 	// that is not where the entity currently resides (FS #411)
-	
 	Vector3d Pos = GetPosition();
 
 	// TODO: Not a real behavior, but cool :D
