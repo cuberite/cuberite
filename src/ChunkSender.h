@@ -53,7 +53,7 @@ class cChunkSender:
 {
 	typedef cIsThread super;
 public:
-	cChunkSender(void);
+	cChunkSender(cWorld & a_World);
 	~cChunkSender();
 
 	enum eChunkPriority
@@ -61,17 +61,16 @@ public:
 		E_CHUNK_PRIORITY_HIGH   = 0,
 		E_CHUNK_PRIORITY_MEDIUM = 1,
 		E_CHUNK_PRIORITY_LOW    = 2,
+		PRIORITY_BROADCAST
 	};
 	
-	bool Start(cWorld * a_World);
+	bool Start();
 	
 	void Stop(void);
 	
-	/// Notifies that a chunk has become ready and it should be sent to all its clients
-	void ChunkReady(int a_ChunkX, int a_ChunkZ);
-	
 	/// Queues a chunk to be sent to a specific client
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Client);
 	
 	/// Removes the a_Client from all waiting chunk send operations
 	void RemoveClient(cClientHandle * a_Client);
@@ -119,17 +118,16 @@ protected:
 
 	typedef std::vector<sBlockCoord> sBlockCoords;
 	
-	cWorld * m_World;
+	cWorld & m_World;
 	
 	cCriticalSection  m_CS;
-	cChunkCoordsList  m_ChunksReady;
 	sSendChunkList    m_SendChunksLowPriority;
 	sSendChunkList    m_SendChunksMediumPriority;
+	sSendChunkList    m_SendChunksBroadcastPriority;
 	sSendChunkList    m_SendChunksHighPriority;
 	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
 	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
 	int               m_RemoveCount;  // Number of threads waiting for a client removal (m_evtRemoved needs to be set this many times)
-	
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];

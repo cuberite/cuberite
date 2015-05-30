@@ -409,22 +409,6 @@ void cChunkMap::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cChunkMap::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return;
-	}
-	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastChunkData(a_Serializer, a_Exclude);
-}
-
-
-
-
-
 void cChunkMap::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
