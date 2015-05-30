@@ -16,14 +16,8 @@ macro (add_flags_lnk FLAGS)
 endmacro()
 
 macro(add_flags_cxx FLAGS)
-	#set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          ${FLAGS}")
-	#set(CMAKE_C_FLAGS            "${CMAKE_C_FLAGS}            ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    ${FLAGS}")
-	set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} ${FLAGS}")
-	set(CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}   ${FLAGS}")
-	set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  ${FLAGS}")
-	set(CMAKE_C_FLAGS_RELEASE    "${CMAKE_C_FLAGS_RELEASE}    ${FLAGS}")
+	set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS} ${FLAGS}")
+	set(CMAKE_C_FLAGS            "${CMAKE_C_FLAGS}   ${FLAGS}")
 endmacro()
 
 
