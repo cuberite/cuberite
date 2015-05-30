@@ -6,8 +6,7 @@ class cWorld;
 
 
 /** Generates and lights the spawn area of the world. Runs as a separate thread. */
-class cSpawnPrepare:
-	public cChunkCoordCallback
+class cSpawnPrepare
 {
 
 public:
@@ -39,9 +38,12 @@ protected:
 
 	cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance, int a_FirstIdx);
 
-	virtual void Call(int a_ChunkX, int a_ChunkZ) override;
+	void PreparedChunkCallback(int a_ChunkX, int a_ChunkZ);
 
 	/** Decodes the index into chunk coords. Provides the specific chunk ordering. */
 	void DecodeChunkCoords(int a_Idx, int & a_ChunkX, int & a_ChunkZ);
+
+	friend class cSpawnPrepareCallback;
+
 };
 

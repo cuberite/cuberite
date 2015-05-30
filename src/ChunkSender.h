@@ -47,26 +47,6 @@ class cChunkSender;
 
 
 
-/// Callback that can be used to notify chunk sender upon another chunkcoord notification
-class cNotifyChunkSender :
-	public cChunkCoordCallback
-{
-	virtual void Call(int a_ChunkX, int a_ChunkZ) override;
-
-	cChunkSender * m_ChunkSender;
-public:
-	cNotifyChunkSender(cChunkSender * a_ChunkSender) : m_ChunkSender(a_ChunkSender) {}
-	
-	void SetChunkSender(cChunkSender * a_ChunkSender)
-	{
-		m_ChunkSender = a_ChunkSender;
-	}
-} ;
-
-
-
-
-
 class cChunkSender:
 	public cIsThread,
 	public cChunkDataSeparateCollector
@@ -149,8 +129,6 @@ protected:
 	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
 	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
 	int               m_RemoveCount;  // Number of threads waiting for a client removal (m_evtRemoved needs to be set this many times)
-	
-	cNotifyChunkSender m_Notify;  // Used for chunks that don't have a valid lighting - they will be re-queued after lightcalc
 	
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector

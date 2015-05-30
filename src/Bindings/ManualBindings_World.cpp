@@ -303,10 +303,9 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 		cLuaState m_LuaState;
 		cLuaState::cRef m_Callback;
 	};
-	cCallback * callback = new cCallback(tolua_S);
 
 	// Call the chunk preparation:
-	world->PrepareChunk(chunkX, chunkZ, callback);
+	world->PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cCallback>(tolua_S));
 	return 0;
 }
 

@@ -8,6 +8,26 @@
 
 
 
+class cSpawnPrepareCallback :
+	public cChunkCoordCallback
+{
+public:
+	cSpawnPrepareCallback(cSpawnPrepare & a_SpawnPrepare) :
+		m_SpawnPrepare(a_SpawnPrepare)
+	{
+	}
+protected:
+
+	cSpawnPrepare & m_SpawnPrepare;
+	
+	virtual void Call(int a_ChunkX, int a_ChunkZ) override
+	{
+		m_SpawnPrepare.PreparedChunkCallback(a_ChunkX, a_ChunkZ);
+	}
+};
+
+
+
 
 
 cSpawnPrepare::cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance, int a_FirstIdx):
@@ -40,7 +60,7 @@ void cSpawnPrepare::PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_Spa
 	{
 		int chunkX, chunkZ;
 		prep.DecodeChunkCoords(i, chunkX, chunkZ);
-		a_World.PrepareChunk(chunkX, chunkZ, &prep);
+		a_World.PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(prep));
 	}  // for i
 
 	// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
@@ -69,7 +89,7 @@ void cSpawnPrepare::DecodeChunkCoords(int a_Idx, int & a_ChunkX, int & a_ChunkZ)
 
 
 
-void cSpawnPrepare::Call(int a_ChunkX, int a_ChunkZ)
+void cSpawnPrepare::PreparedChunkCallback(int a_ChunkX, int a_ChunkZ)
 {
 	// Check if this was the last chunk:
 	m_NumPrepared += 1;
@@ -85,7 +105,7 @@ void cSpawnPrepare::Call(int a_ChunkX, int a_ChunkZ)
 	{
 		int chunkX, chunkZ;
 		DecodeChunkCoords(m_NextIdx, chunkX, chunkZ);
-		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
+		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(*this));
 		m_NextIdx += 1;
 	}
 

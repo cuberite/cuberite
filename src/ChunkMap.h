@@ -322,7 +322,7 @@ public:
 	The specified chunk is queued to be loaded or generated, and lit if needed.
 	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
 	It is legal to call without the callback. */
-	void PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);  // Lua-accessible
+	void PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter = {});  // Lua-accessible
 
 	/** Queues the chunk for generating.
 	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating.

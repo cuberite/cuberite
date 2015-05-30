@@ -385,7 +385,7 @@ public:
 	The specified chunk is queued to be loaded or generated, and lit if needed.
 	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
 	It is legal to call with no callback. */
-	void PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);
+	void PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter = {});
 	
 	/** Marks the chunk as failed-to-load: */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
@@ -409,7 +409,7 @@ public:
 	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */
-	void QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
+	void QueueLightChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_Callback = {});
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
 	
