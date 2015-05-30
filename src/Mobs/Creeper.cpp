@@ -27,7 +27,7 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (!ReachedFinalDestination() && !m_BurnedWithFlintAndSteel)
+	if (!TargetIsInRange() && !m_BurnedWithFlintAndSteel)
 	{
 		m_ExplodingTimer = 0;
 		m_bIsBlowing = false;
