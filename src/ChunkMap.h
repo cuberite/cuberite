@@ -302,7 +302,7 @@ public:
 	Returns false if there's no command block at those coords or callback returns true, returns true if found. */
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the mob head block at the specified coords.chu
+	/** Calls the callback for the mob head block at the specified coords.
 	Returns false if there's no mob head block at those coords or callback returns true, returns true if found. */
 	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback);  // Lua-accessible
 

@@ -18,6 +18,7 @@
 
 
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // cNotifyChunkSender:
 
@@ -93,41 +94,25 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 {
 	ASSERT(a_Client != nullptr);
 	{
-		sSendChunk Chunk(a_ChunkX, a_ChunkZ, a_Client);
-
+		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
 		cCSLock Lock(m_CS);
-		if (
-			std::find(m_SendChunksLowPriority.begin(), m_SendChunksLowPriority.end(), Chunk) != m_SendChunksLowPriority.end() ||
-			std::find(m_SendChunksMediumPriority.begin(), m_SendChunksMediumPriority.end(), Chunk) != m_SendChunksMediumPriority.end() ||
-			std::find(m_SendChunksHighPriority.begin(), m_SendChunksHighPriority.end(), Chunk) != m_SendChunksHighPriority.end()
-		)
+		auto iter = m_ChunkInfo.find(Chunk);
+		if (iter != m_ChunkInfo.end())
 		{
-			// Already queued, bail out
-			return;
+			auto & info = iter->second;
+			if (info.m_Priority > a_Priority)
+			{
+				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
+				info.m_Priority = a_Priority;
+			}
+			info.m_Clients.insert(a_Client);
 		}
-
-		switch (a_Priority)
+		else
 		{
-			case E_CHUNK_PRIORITY_LOW:
-			{
-				m_SendChunksLowPriority.push_back(Chunk);
-				break;
-			}
-			case E_CHUNK_PRIORITY_MEDIUM:
-			{
-				m_SendChunksMediumPriority.push_back(Chunk);
-				break;
-			}
-			case E_CHUNK_PRIORITY_HIGH:
-			{
-				m_SendChunksHighPriority.push_back(Chunk);
-				break;
-			}
-			case PRIORITY_BROADCAST:
-			{
-				m_SendChunksBroadcastPriority.push_back(Chunk);
-				break;
-			}
+			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
+			auto info = sSendChunk{Chunk, a_Priority};
+			info.m_Clients.insert(a_Client);
+			m_ChunkInfo.emplace(Chunk, info);
 		}
 	}
 	m_evtQueue.Set();
@@ -141,43 +126,25 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Clients)
 {
 	{
+		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
 		cCSLock Lock(m_CS);
-		for (auto client : a_Clients)
+		auto iter = m_ChunkInfo.find(Chunk);
+		if (iter != m_ChunkInfo.end())
 		{
-			sSendChunk Chunk(a_ChunkX, a_ChunkZ, client);
-			if (
-				std::find(m_SendChunksLowPriority.begin(), m_SendChunksLowPriority.end(), Chunk) != m_SendChunksLowPriority.end() ||
-				std::find(m_SendChunksMediumPriority.begin(), m_SendChunksMediumPriority.end(), Chunk) != m_SendChunksMediumPriority.end() ||
-				std::find(m_SendChunksHighPriority.begin(), m_SendChunksHighPriority.end(), Chunk) != m_SendChunksHighPriority.end()
-			)
+			auto & info = iter->second;
+			if (info.m_Priority > a_Priority)
 			{
-				// Already queued, bail out
-				continue;
+				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
+				info.m_Priority = a_Priority;
 			}
-
-			switch (a_Priority)
-			{
-				case E_CHUNK_PRIORITY_LOW:
-				{
-					m_SendChunksLowPriority.push_back(Chunk);
-					break;
-				}
-				case E_CHUNK_PRIORITY_MEDIUM:
-				{
-					m_SendChunksMediumPriority.push_back(Chunk);
-					break;
-				}
-				case E_CHUNK_PRIORITY_HIGH:
-				{
-					m_SendChunksHighPriority.push_back(Chunk);
-					break;
-				}
-				case PRIORITY_BROADCAST:
-				{
-					m_SendChunksBroadcastPriority.push_back(Chunk);
-					break;
-				}
-			}
+			info.m_Clients.insert(a_Clients.begin(), a_Clients.end());
+		}
+		else
+		{
+			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
+			auto info = sSendChunk{Chunk, a_Priority};
+			info.m_Clients.insert(a_Clients.begin(), a_Clients.end());
+			m_ChunkInfo.emplace(Chunk, info);
 		}
 	}
 	m_evtQueue.Set();
@@ -191,33 +158,12 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 {
 	{
 		cCSLock Lock(m_CS);
-		for (sSendChunkList::iterator itr = m_SendChunksLowPriority.begin(); itr != m_SendChunksLowPriority.end();)
+		for (auto && pair : m_ChunkInfo)
 		{
-			if (itr->m_Client == a_Client)
-			{
-				itr = m_SendChunksLowPriority.erase(itr);
-				continue;
-			}
-			++itr;
-		}  // for itr - m_SendChunksLowPriority[]
-		for (sSendChunkList::iterator itr = m_SendChunksMediumPriority.begin(); itr != m_SendChunksMediumPriority.end();)
-		{
-			if (itr->m_Client == a_Client)
-			{
-				itr = m_SendChunksMediumPriority.erase(itr);
-				continue;
-			}
-			++itr;
-		}  // for itr - m_SendChunksMediumPriority[]
-		for (sSendChunkList::iterator itr = m_SendChunksHighPriority.begin(); itr != m_SendChunksHighPriority.end();)
-		{
-			if (itr->m_Client == a_Client)
-			{
-				itr = m_SendChunksHighPriority.erase(itr);
-				continue;
-			}
-			++itr;
-		}  // for itr - m_SendChunksHighPriority[]
+			auto && clients = pair.second.m_Clients;
+			clients.erase(a_Client); // nop for sets that do not contain a_Client
+		}
+
 		m_RemoveCount++;
 	}
 	m_evtQueue.Set();
@@ -233,7 +179,7 @@ void cChunkSender::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
-		while (m_SendChunksBroadcastPriority.empty() && m_SendChunksLowPriority.empty() && m_SendChunksMediumPriority.empty() && m_SendChunksHighPriority.empty())
+		do
 		{
 			int RemoveCount = m_RemoveCount;
 			m_RemoveCount = 0;
@@ -247,52 +193,24 @@ void cChunkSender::Execute(void)
 			{
 				return;
 			}
-		}  // while (empty)
+		} while (m_SendChunks.empty());
 
-		if (!m_SendChunksHighPriority.empty())
+		// Take one from the queue:
+		auto Chunk = m_SendChunks.top().m_Chunk;
+		m_SendChunks.pop();
+		auto itr = m_ChunkInfo.find(Chunk);
+		if (itr == m_ChunkInfo.end())
 		{
-			// Take one from the queue:
-			sSendChunk Chunk(m_SendChunksHighPriority.front());
-			m_SendChunksHighPriority.pop_front();
-			Lock.Unlock();
-
-			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
+			continue;
 		}
-		else if (!m_SendChunksBroadcastPriority.empty())
-		{
-			// Take one from the queue:
-			sSendChunk Chunk(m_SendChunksBroadcastPriority.front());
-			m_SendChunksBroadcastPriority.pop_front();
-			Lock.Unlock();
+		
+		std::unordered_set<cClientHandle *> clients;
+		std::swap(itr->second.m_Clients, clients);
+		m_ChunkInfo.erase(itr);
 
-			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
-		}
-		else if (!m_SendChunksMediumPriority.empty())
-		{
-			// Take one from the queue:
-			sSendChunk Chunk(m_SendChunksMediumPriority.front());
-			m_SendChunksMediumPriority.pop_front();
-			Lock.Unlock();
-
-			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
-		}
-		else
-		{
-			// Take one from the queue:
-			sSendChunk Chunk(m_SendChunksLowPriority.front());
-			m_SendChunksLowPriority.pop_front();
-			Lock.Unlock();
-
-			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
-		}
-		Lock.Lock();
-		int RemoveCount = m_RemoveCount;
-		m_RemoveCount = 0;
 		Lock.Unlock();
-		for (int i = 0; i < RemoveCount; i++)
-		{
-			m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
-		}
+
+		SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
 	}  // while (!mShouldTerminate)
 }
 
@@ -300,13 +218,22 @@ void cChunkSender::Execute(void)
 
 
 
-void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients)
 {
 	
 	// Ask the client if it still wants the chunk:
-	if (!a_Client->WantsSendChunk(a_ChunkX, a_ChunkZ))
+	for(auto itr = a_Clients.begin(); itr != a_Clients.end();)
 	{
-		return;
+		if(!(*itr)->WantsSendChunk(a_ChunkX, a_ChunkZ))
+		{
+			auto toremove = itr;
+			itr++;
+			a_Clients.erase(toremove);
+		}
+		else
+		{
+			itr++;
+		}
 	}
 
 	// If the chunk has no clients, no need to packetize it:
@@ -335,14 +262,18 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 	}
 	cChunkDataSerializer Data(m_BlockTypes, m_BlockMetas, m_BlockLight, m_BlockSkyLight, m_BiomeMap);
 
-	// Send:
-	a_Client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
-
-	// Send block-entity packets:
-	for (sBlockCoords::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto client : a_Clients)
 	{
-		m_World.SendBlockEntity(itr->m_BlockX, itr->m_BlockY, itr->m_BlockZ, *a_Client);
-	}  // for itr - m_Packets[]
+		// Send:
+		client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
+
+		// Send block-entity packets:
+		for (auto Pos : m_BlockEntities)
+		{
+			m_World.SendBlockEntity(Pos.x, Pos.y, Pos.z, *client);
+		}  // for itr - m_Packets[]
+
+	}
 	m_BlockEntities.clear();
 
 	// TODO: Send entity spawn packets
@@ -354,7 +285,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 
 void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
-	m_BlockEntities.push_back(sBlockCoord(a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ()));
+	m_BlockEntities.push_back(a_Entity->GetPos());
 }
 
 
