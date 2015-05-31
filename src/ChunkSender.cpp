@@ -31,7 +31,7 @@ class cNotifyChunkSender :
 	{
 		cChunkSender & ChunkSender = m_ChunkSender;
 		m_World.DoWithChunk(
-			a_ChunkX, a_ChunkZ, 
+			a_ChunkX, a_ChunkZ,
 			[&ChunkSender] (cChunk & a_Chunk) -> bool
 			{
 				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::PRIORITY_BROADCAST, a_Chunk.GetAllClients());
@@ -161,7 +161,7 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 		for (auto && pair : m_ChunkInfo)
 		{
 			auto && clients = pair.second.m_Clients;
-			clients.erase(a_Client); // nop for sets that do not contain a_Client
+			clients.erase(a_Client);  // nop for sets that do not contain a_Client
 		}
 
 		m_RemoveCount++;
@@ -222,9 +222,9 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 {
 	
 	// Ask the client if it still wants the chunk:
-	for(auto itr = a_Clients.begin(); itr != a_Clients.end();)
+	for (auto itr = a_Clients.begin(); itr != a_Clients.end();)
 	{
-		if(!(*itr)->WantsSendChunk(a_ChunkX, a_ChunkZ))
+		if (!(*itr)->WantsSendChunk(a_ChunkX, a_ChunkZ))
 		{
 			auto toremove = itr;
 			itr++;

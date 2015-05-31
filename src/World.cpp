@@ -2479,13 +2479,13 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	int ChunkZ = a_SetChunkData.GetChunkZ();
 	cChunkSender & ChunkSender = m_ChunkSender;
 	DoWithChunk(
-		ChunkX, ChunkZ, 
+		ChunkX, ChunkZ,
 		[&ChunkSender] (cChunk & a_Chunk) -> bool
 		{
 			if (a_Chunk.HasAnyClients())
 			{
 				ChunkSender.QueueSendChunkTo(
-					a_Chunk.GetPosX(), 
+					a_Chunk.GetPosX(),
 					a_Chunk.GetPosZ(),
 					cChunkSender::PRIORITY_BROADCAST,
 					a_Chunk.GetAllClients()
