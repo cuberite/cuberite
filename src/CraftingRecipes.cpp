@@ -771,9 +771,12 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 			continue;
 		}
 		Recipe->m_Ingredients.push_back(*itrS);
+		Recipe->m_Ingredients.back().x += a_OffsetX;
+		Recipe->m_Ingredients.back().y += a_OffsetY;
 	}
 	Recipe->m_Ingredients.insert(Recipe->m_Ingredients.end(), MatchedSlots.begin(), MatchedSlots.end());
 
+	// Handle the fireworks-related effects:
 	// We use Recipe instead of a_Recipe because we want the wildcard ingredients' slot numbers as well, which was just added previously
 	HandleFireworks(a_CraftingGrid, Recipe.get(), a_GridStride, a_OffsetX, a_OffsetY);
 
