@@ -382,6 +382,10 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 
 		TCLAP::SwitchArg noBufArg("", "no-output-buffering", "Disable output buffering", cmd);
 
+		TCLAP::SwitchArg runAsServiceArg("d", "run-as-service", "Run as a service on Windows", cmd);
+
+		cmd.ignoreUnmatched(true);
+
 		cmd.parse(argc, argv);
 
 		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
@@ -418,6 +422,11 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 		if (noBufArg.getValue())
 		{
 			setvbuf(stdout, nullptr, _IONBF, 0);
+		}
+
+		if (runAsServiceArg.getValue())
+		{
+			cRoot::m_RunAsService = true;
 		}
 
 		repo->SetReadOnly();
@@ -493,16 +502,6 @@ int main(int argc, char **argv)
 	
 	auto argsRepo = parseArguments(argc, argv);
 	
-	// Check if comm logging is to be enabled:
-	for (int i = 0; i < argc; i++)
-	{
-		AString Arg(argv[i]);
-		if (NoCaseCompare(Arg, "/service") == 0)
-		{
-			cRoot::m_RunAsService = true;
-		}
-	}  // for i - argv[]
-
 	#if defined(_WIN32)
 	// Attempt to run as a service
 	if (cRoot::m_RunAsService)
