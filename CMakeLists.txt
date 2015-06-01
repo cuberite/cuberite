@@ -72,6 +72,7 @@ if(${BUILD_UNSTABLE_TOOLS})
 	add_subdirectory(Tools/GeneratorPerformanceTest/)
 endif()
 
+include(CheckCXXCompilerFlag)
 include(SetFlags.cmake)
 set_flags()
 set_lib_flags()
@@ -174,3 +175,4 @@ if (MSVC)
 		set_target_properties(arraystocoords-exe coordinates-exe copies-exe copyblocks-exe creatable-exe EchoServer Google-exe ChunkBuffer NameLookup PROPERTIES FOLDER Tests)
 	endif()
 endif()
+

@@ -15,7 +15,6 @@ SET (SRCS
 	IsThread.cpp
 	NetworkInterfaceEnum.cpp
 	NetworkSingleton.cpp
-	Semaphore.cpp
 	ServerHandleImpl.cpp
 	StackTrace.cpp
 	TCPLinkImpl.cpp
@@ -34,7 +33,6 @@ SET (HDRS
 	Network.h
 	NetworkSingleton.h
 	Queue.h
-	Semaphore.h
 	ServerHandleImpl.h
 	StackTrace.h
 	TCPLinkImpl.h
