@@ -1054,7 +1054,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	cItem SecondInput(*GetSlot(1, a_Player));
 	cItem Output(*GetSlot(2, a_Player));
 	
-	if (Input.IsEmpty() || Output.IsEmpty())
+	if (Input.IsEmpty() || SecondInput.IsEmpty())
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
