@@ -2401,7 +2401,7 @@ void cChunkMap::TouchChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
@@ -2409,7 +2409,7 @@ void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a
 	// If the chunk is not prepared, queue it in the lighting thread, that will do all the needed processing:
 	if ((Chunk == nullptr) || !Chunk->IsValid() || !Chunk->IsLightValid())
 	{
-		m_World->GetLightingThread().QueueChunk(a_ChunkX, a_ChunkZ, a_Callback);
+		m_World->GetLightingThread().QueueChunk(a_ChunkX, a_ChunkZ, std::move(a_Callback));
 		return;
 	}
 

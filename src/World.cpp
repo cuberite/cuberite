@@ -2872,9 +2872,9 @@ void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorld::PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter)
+void cWorld::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter)
 {
-	m_ChunkMap->PrepareChunk(a_ChunkX, a_ChunkZ, a_CallAfter);
+	m_ChunkMap->PrepareChunk(a_ChunkX, a_ChunkZ, std::move(a_CallAfter));
 }
 
 
@@ -2998,9 +2998,9 @@ void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorld::QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+void cWorld::QueueLightChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_Callback)
 {
-	m_Lighting.QueueChunk(a_ChunkX, a_ChunkZ, a_Callback);
+	m_Lighting.QueueChunk(a_ChunkX, a_ChunkZ, std::move(a_Callback));
 }
 
 
