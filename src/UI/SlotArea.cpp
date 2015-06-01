@@ -1139,41 +1139,41 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			int CurrentLevel = SecondInput.m_Enchantments.GetLevel(CurrentEnchantment);
 
 			// The enchantment could be illegal (Example: Sharpness II on an iron helmet) - Should happen only with Books
-			if (((Input.m_ItemType == 298 || Input.m_ItemType == 302 || Input.m_ItemType == 306 || Input.m_ItemType == 310 || Input.m_ItemType == 314)
-				&& (CurrentEnchantment != 0 && CurrentEnchantment != 1 && CurrentEnchantment != 3 && CurrentEnchantment != 4 && CurrentEnchantment != 5 && CurrentEnchantment != 6 && CurrentEnchantment != 7 && CurrentEnchantment != 34))
+			if ((((Input.m_ItemType == 298) || (Input.m_ItemType == 302) || (Input.m_ItemType == 306) || (Input.m_ItemType == 310) || (Input.m_ItemType == 314))
+				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) &&( CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 5) && (CurrentEnchantment != 6) && (CurrentEnchantment != 7) && (CurrentEnchantment != 34)))
 				/* Helmet */
-				|| ((Input.m_ItemType == 299 || Input.m_ItemType == 303 || Input.m_ItemType == 307 || Input.m_ItemType == 311 || Input.m_ItemType == 315)
-				&& (CurrentEnchantment != 0 && CurrentEnchantment != 1 && CurrentEnchantment != 3 && CurrentEnchantment != 4 && CurrentEnchantment != 7 && CurrentEnchantment != 34))
+				|| (((Input.m_ItemType == 299) || (Input.m_ItemType == 303) || (Input.m_ItemType == 307) || (Input.m_ItemType == 311) || (Input.m_ItemType == 315))
+				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) && (CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 7) && (CurrentEnchantment != 34)))
 				/* Chestplate */
-				|| ((Input.m_ItemType == 300 || Input.m_ItemType == 304 || Input.m_ItemType == 308 || Input.m_ItemType == 312 || Input.m_ItemType == 316)
-				&& (CurrentEnchantment != 0 && CurrentEnchantment != 1 && CurrentEnchantment != 3 && CurrentEnchantment != 4 && CurrentEnchantment != 7 && CurrentEnchantment != 34))
+				|| (((Input.m_ItemType == 300) || (Input.m_ItemType == 304) || (Input.m_ItemType == 308) || (Input.m_ItemType == 312) || (Input.m_ItemType == 316))
+				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) && (CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 7) && (CurrentEnchantment != 34)))
 				/* Leggings */
-				|| ((Input.m_ItemType == 301 || Input.m_ItemType == 305 || Input.m_ItemType == 309 || Input.m_ItemType == 313 || Input.m_ItemType == 317)
-				&& (CurrentEnchantment != 0 && CurrentEnchantment != 1 && CurrentEnchantment != 2 && CurrentEnchantment != 3 && CurrentEnchantment != 4 && CurrentEnchantment != 7 && CurrentEnchantment != 8 && CurrentEnchantment != 34))
+				|| (((Input.m_ItemType == 301) || (Input.m_ItemType == 305) || (Input.m_ItemType == 309) || (Input.m_ItemType == 313) || (Input.m_ItemType == 317))
+				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) && (CurrentEnchantment != 2) && (CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 7) && (CurrentEnchantment != 8) && (CurrentEnchantment != 34)))
 				/* Boots */
-				|| ((Input.m_ItemType == 268 || Input.m_ItemType == 272 || Input.m_ItemType == 267 || Input.m_ItemType == 276 || Input.m_ItemType == 283)
-				&& (CurrentEnchantment != 16 && CurrentEnchantment != 17 && CurrentEnchantment != 18 && CurrentEnchantment != 19 && CurrentEnchantment != 20 && CurrentEnchantment != 21 && CurrentEnchantment != 34))
+				|| (((Input.m_ItemType == 268) || (Input.m_ItemType == 272) || (Input.m_ItemType == 267) || (Input.m_ItemType == 276)|| (Input.m_ItemType == 283))
+				&& ((CurrentEnchantment != 16) && (CurrentEnchantment != 17) && (CurrentEnchantment != 18) && (CurrentEnchantment != 19) && (CurrentEnchantment != 20) && (CurrentEnchantment != 21) && (CurrentEnchantment != 34)))
 				/* Swords */
-				|| ((Input.m_ItemType == 271 || Input.m_ItemType == 275 || Input.m_ItemType == 258 || Input.m_ItemType == 279 || Input.m_ItemType == 286)
-				&& (CurrentEnchantment != 16 && CurrentEnchantment != 17 && CurrentEnchantment != 18 && CurrentEnchantment != 32 && CurrentEnchantment != 33 && CurrentEnchantment != 34 && CurrentEnchantment != 35))
+				|| (((Input.m_ItemType == 271) || (Input.m_ItemType == 275) || (Input.m_ItemType == 258) || (Input.m_ItemType == 279) || (Input.m_ItemType == 286))
+				&& ((CurrentEnchantment != 16) && (CurrentEnchantment != 17) && (CurrentEnchantment != 18) && (CurrentEnchantment != 32) && (CurrentEnchantment != 33) && (CurrentEnchantment != 34) && (CurrentEnchantment != 35)))
 				/* Axe */
-				|| ((Input.m_ItemType == 269 || Input.m_ItemType == 273 || Input.m_ItemType == 256 || Input.m_ItemType == 277 || Input.m_ItemType == 284)
-				&& (CurrentEnchantment != 32 && CurrentEnchantment != 33 && CurrentEnchantment != 34 && CurrentEnchantment != 35))
+				|| (((Input.m_ItemType == 269) || (Input.m_ItemType == 273) || (Input.m_ItemType == 256) || (Input.m_ItemType == 277) || (Input.m_ItemType == 284))
+				&& ((CurrentEnchantment != 32) && (CurrentEnchantment != 33) && (CurrentEnchantment != 34) && (CurrentEnchantment != 35)))
 				/* Shovels */
-				|| ((Input.m_ItemType == 290 || Input.m_ItemType == 291 || Input.m_ItemType == 292 || Input.m_ItemType == 293 || Input.m_ItemType == 294)
+				|| (((Input.m_ItemType == 290) || (Input.m_ItemType == 291) || (Input.m_ItemType == 292) || (Input.m_ItemType == 293) || (Input.m_ItemType == 294))
 				&& (CurrentEnchantment != 34))
 				/* Hoes */
 				|| ((Input.m_ItemType == 261)
-				&& (CurrentEnchantment != 48 && CurrentEnchantment != 49 && CurrentEnchantment != 50 && CurrentEnchantment != 51 && CurrentEnchantment != 34))
+				&& ((CurrentEnchantment != 48) && (CurrentEnchantment != 49) && (CurrentEnchantment != 50) && (CurrentEnchantment != 51) && (CurrentEnchantment != 34)))
 				/* Bow */
 				|| ((Input.m_ItemType == 346)
-				&& (CurrentEnchantment != 34 && CurrentEnchantment != 61 && CurrentEnchantment != 62))
+				&& ((CurrentEnchantment != 34) && (CurrentEnchantment != 61) && (CurrentEnchantment != 62)))
 				/* Fishing Rod */
 				|| ((Input.m_ItemType == 398)
 				&& (CurrentEnchantment != 34))
 				/* Carrot on a Stick */
 				|| ((Input.m_ItemType == 359)
-				&& (CurrentEnchantment != 34 && CurrentEnchantment != 32 && CurrentEnchantment != 33))
+				&& ((CurrentEnchantment != 34) && (CurrentEnchantment != 32) && (CurrentEnchantment != 33)))
 				/* Shears */
 				|| ((Input.m_ItemType == 259)
 				&& (CurrentEnchantment != 34))
@@ -1194,11 +1194,11 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				}
 			}
 
-			if (CurrentLevel == Input.m_Enchantments.GetLevel(CurrentEnchantment) && CurrentEnchantment != 0)
+			if ((CurrentLevel == Input.m_Enchantments.GetLevel(CurrentEnchantment)) && (CurrentEnchantment != 0))
 			{
 				// Increment enchantment level
 				int OldLevel = static_cast<int>(itr.at(itr.size() - 1));
-				itr.pop_back(); // Note: pop_back() works in this case as vanilla enchantments are never >=10 // will cause bugs if changed
+				itr.pop_back();  // Note: pop_back() works in this case as vanilla enchantments are never >=10 ; will cause bugs if changed
 
 				// Add new level to string
 				itr.push_back(OldLevel + 1);
@@ -1210,19 +1210,19 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 
 			// Could be an illegal fusion (Example: Sharpness V book with Sharpness V book to get Sharpness VI book)
-			if ((CurrentEnchantment == 0 && CurrentLevel > 4) || (CurrentEnchantment == 1 && CurrentLevel > 4)
-				|| (CurrentEnchantment == 2 && CurrentLevel > 4) || (CurrentEnchantment == 3 && CurrentLevel > 4)
-				|| (CurrentEnchantment == 4 && CurrentLevel > 4) || (CurrentEnchantment == 5 && CurrentLevel > 3)
-				|| (CurrentEnchantment == 6 && CurrentLevel > 1) || (CurrentEnchantment == 7 && CurrentLevel > 3)
-				|| (CurrentEnchantment == 8 && CurrentLevel > 3) || (CurrentEnchantment == 16 && CurrentLevel > 5)
-				|| (CurrentEnchantment == 17 && CurrentLevel > 5) || (CurrentEnchantment == 18 && CurrentLevel > 5)
-				|| (CurrentEnchantment == 19 && CurrentLevel > 2) || (CurrentEnchantment == 20 && CurrentLevel > 2)
-				|| (CurrentEnchantment == 21 && CurrentLevel > 3) || (CurrentEnchantment == 32 && CurrentLevel > 5)
-				|| (CurrentEnchantment == 33 && CurrentLevel > 1) || (CurrentEnchantment == 34 && CurrentLevel > 3)
-				|| (CurrentEnchantment == 35 && CurrentLevel > 3) || (CurrentEnchantment == 48 && CurrentLevel > 5)
-				|| (CurrentEnchantment == 49 && CurrentLevel > 2) || (CurrentEnchantment == 50 && CurrentLevel > 1)
-				|| (CurrentEnchantment == 51 && CurrentLevel > 1) || (CurrentEnchantment == 61 && CurrentLevel > 3)
-				|| (CurrentEnchantment == 62 && CurrentLevel > 3))
+			if (((CurrentEnchantment == 0) && (CurrentLevel > 4)) || ((CurrentEnchantment == 1) && (CurrentLevel > 4))
+				|| ((CurrentEnchantment == 2) && (CurrentLevel > 4)) || ((CurrentEnchantment == 3) && (CurrentLevel > 4))
+				|| ((CurrentEnchantment == 4) && (CurrentLevel > 4)) || ((CurrentEnchantment == 5) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 6) && (CurrentLevel > 1)) || ((CurrentEnchantment == 7) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 8) && (CurrentLevel > 3)) || ((CurrentEnchantment == 16) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 17) && (CurrentLevel > 5)) || ((CurrentEnchantment == 18) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 19) && (CurrentLevel > 2)) || ((CurrentEnchantment == 20) && (CurrentLevel > 2))
+				|| ((CurrentEnchantment == 21) && (CurrentLevel > 3)) || ((CurrentEnchantment == 32) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 33) && (CurrentLevel > 1)) || ((CurrentEnchantment == 34) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 35) && (CurrentLevel > 3)) || ((CurrentEnchantment == 48) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 49) && (CurrentLevel > 2)) || ((CurrentEnchantment == 50) && (CurrentLevel > 1))
+				|| ((CurrentEnchantment == 51) && (CurrentLevel > 1)) || ((CurrentEnchantment == 61) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 62) && (CurrentLevel > 3)))
 			{
 				if (Enchantments.size() > 1)
 				{
@@ -1241,22 +1241,22 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			Input.m_Enchantments.AddFromString(itr);
 
 			// Increase cost
-			// Note // Multiplier: CostWithoutBook/CostWithBook
-			if (CurrentEnchantment == 0 || CurrentEnchantment == 16 || CurrentEnchantment == 32 || CurrentEnchantment == 48)
+			// Note: CostWithoutBook / CostWithBook
+			if ((CurrentEnchantment == 0) || (CurrentEnchantment == 16) || (CurrentEnchantment == 32) || (CurrentEnchantment == 48))
 			{
-				EnchantmentCost += CurrentLevel;  // Multiplier: 1/1
+				EnchantmentCost += CurrentLevel;  // Multiplier: 1 / 1
 			}
-			else if (CurrentEnchantment == 1 || CurrentEnchantment == 2 || CurrentEnchantment == 4 || CurrentEnchantment == 17 || CurrentEnchantment == 18 || CurrentEnchantment == 19 || CurrentEnchantment == 34)
+			else if ((CurrentEnchantment == 1) || (CurrentEnchantment == 2) || (CurrentEnchantment == 4) || (CurrentEnchantment == 17) || (CurrentEnchantment == 18) || (CurrentEnchantment == 19) || (CurrentEnchantment == 34))
 			{
-				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 1 : 2);  // Multiplier: 2/1
+				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 1 : 2);  // Multiplier: 2 / 1
 			}
-			else if (CurrentEnchantment == 3 || CurrentEnchantment == 5 || CurrentEnchantment == 6 || CurrentEnchantment == 8 || CurrentEnchantment == 20 || CurrentEnchantment == 21 || CurrentEnchantment == 35 || CurrentEnchantment == 49 || CurrentEnchantment == 50 || CurrentEnchantment == 61 || CurrentEnchantment == 62)
+			else if ((CurrentEnchantment == 3) || (CurrentEnchantment == 5) || (CurrentEnchantment == 6) || (CurrentEnchantment == 8) || (CurrentEnchantment == 20) || (CurrentEnchantment == 21) || (CurrentEnchantment == 35) || (CurrentEnchantment == 49) || (CurrentEnchantment == 50) || (CurrentEnchantment == 61) || (CurrentEnchantment == 62))
 			{
-				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 2 : 4);  // Multiplier: 4/2
+				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 2 : 4);  // Multiplier: 4 / 2
 			}
-			else if (CurrentEnchantment == 7 || CurrentEnchantment == 33 || CurrentEnchantment == 51)
+			else if ((CurrentEnchantment == 7) || (CurrentEnchantment == 33) || (CurrentEnchantment == 51))
 			{
-				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 4 : 8);  // Multiplier: 8/4
+				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 4 : 8);  // Multiplier: 8 / 4
 			}
 		}
 	}
