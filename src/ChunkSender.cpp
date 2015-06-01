@@ -226,9 +226,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	{
 		if (!(*itr)->WantsSendChunk(a_ChunkX, a_ChunkZ))
 		{
-			auto toremove = itr;
-			itr++;
-			a_Clients.erase(toremove);
+			itr = a_Clients.erase(itr);
 		}
 		else
 		{
