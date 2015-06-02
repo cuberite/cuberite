@@ -47,7 +47,7 @@ public:
 	virtual ~cProtIntGen() {}
 
 	/** Generates the array of specified size into a_Values, based on given min coords. */
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) = 0;
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) = 0;
 };
 
 
@@ -109,14 +109,14 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int BaseZ = a_MinZ + z;
-			for (int x = 0; x < a_SizeX; x++)
+			int BaseZ = a_MinZ + static_cast<int>(z);
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				a_Values[x + a_SizeX * z] = (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7) % m_Range;
+				a_Values[x + a_SizeX * z] = (super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), BaseZ) / 7) % m_Range;
 			}
 		}  // for z
 	}
@@ -146,22 +146,22 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int BaseZ = a_MinZ + z;
-			for (int x = 0; x < a_SizeX; x++)
+			int BaseZ = a_MinZ + static_cast<int>(z);
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int rnd = (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7);
+				int rnd = (super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), BaseZ) / 7);
 				a_Values[x + a_SizeX * z] = ((rnd % 100) < m_Threshold) ? ((rnd / 101) % bgLandOceanMax + 1) : 0;
 			}
 		}
 
 		// If the centerpoint of the world is within the area, set it to bgTemperate, always:
-		if ((a_MinX <= 0) && (a_MinZ <= 0) && (a_MinX + a_SizeX > 0) && (a_MinZ + a_SizeZ > 0))
+		if ((a_MinX <= 0) && (a_MinZ <= 0) && (a_MinX + static_cast<int>(a_SizeX) > 0) && (a_MinZ + static_cast<int>(a_SizeZ) > 0))
 		{
-			a_Values[-a_MinX - a_MinZ * a_SizeX] = bgTemperate;
+			a_Values[static_cast<size_t>(-a_MinX) - static_cast<size_t>(a_MinZ) * a_SizeX] = bgTemperate;
 		}
 	}
 
@@ -189,13 +189,13 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Get the coords for the lower generator:
 		int lowerMinX = a_MinX >> 1;
 		int lowerMinZ = a_MinZ >> 1;
-		int lowerSizeX = a_SizeX / 2 + 2;
-		int lowerSizeZ = a_SizeZ / 2 + 2;
+		size_t lowerSizeX = a_SizeX / 2 + 2;
+		size_t lowerSizeZ = a_SizeZ / 2 + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		ASSERT(lowerSizeX > 0);
 		ASSERT(lowerSizeZ > 0);
@@ -203,22 +203,22 @@ public:
 		// Generate the underlying data with half the resolution:
 		int lowerData[m_BufferSize];
 		m_UnderlyingGen->GetInts(lowerMinX, lowerMinZ, lowerSizeX, lowerSizeZ, lowerData);
-		const int lowStepX = (lowerSizeX - 1) * 2;
+		const size_t lowStepX = (lowerSizeX - 1) * 2;
 		int cache[m_BufferSize];
 
 		// Discreet-interpolate the values into twice the size:
-		for (int z = 0; z < lowerSizeZ - 1; ++z)
+		for (size_t z = 0; z < lowerSizeZ - 1; ++z)
 		{
-			int idx = (z * 2) * lowStepX;
+			size_t idx = (z * 2) * lowStepX;
 			int PrevZ0 = lowerData[z * lowerSizeX];
 			int PrevZ1 = lowerData[(z + 1) * lowerSizeX];
 
-			for (int x = 0; x < lowerSizeX - 1; ++x)
+			for (size_t x = 0; x < lowerSizeX - 1; ++x)
 			{
 				int ValX1Z0 = lowerData[x + 1 + z * lowerSizeX];
 				int ValX1Z1 = lowerData[x + 1 + (z + 1) * lowerSizeX];
-				int RndX = (x + lowerMinX) * 2;
-				int RndZ = (z + lowerMinZ) * 2;
+				int RndX = (static_cast<int>(x) + lowerMinX) * 2;
+				int RndZ = (static_cast<int>(z) + lowerMinZ) * 2;
 				cache[idx] = PrevZ0;
 				cache[idx + lowStepX] = super::chooseRandomOne(RndX, RndZ + 1, PrevZ0, PrevZ1);
 				cache[idx + 1]        = super::chooseRandomOne(RndX, RndZ - 1, PrevZ0, ValX1Z0);
@@ -230,7 +230,7 @@ public:
 		}
 
 		// Copy from Cache into a_Values; take into account the even / odd offsets in a_Min:
-		for (int z = 0; z < a_SizeZ; ++z)
+		for (size_t z = 0; z < a_SizeZ; ++z)
 		{
 			memcpy(a_Values + z * a_SizeX, cache + (z + (a_MinZ & 1)) * lowStepX + (a_MinX & 1), a_SizeX * sizeof(int));
 		}
@@ -259,21 +259,21 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerData[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
 
 		// Smooth - for each square check if the surroundings are the same, if so, expand them diagonally.
 		// Also get rid of single-pixel irregularities (A-B-A):
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int NoiseZ = a_MinZ + z;
-			for (int x = 0; x < a_SizeX; x++)
+			int NoiseZ = a_MinZ + static_cast<int>(z);
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				int val   = lowerData[x + 1 + (z + 1) * lowerSizeX];
 				int above = lowerData[x + 1 +  z      * lowerSizeX];
@@ -283,7 +283,7 @@ public:
 
 				if ((left == right) && (above == below))
 				{
-					if (((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % 2) == 0)
+					if (((super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), NoiseZ) / 7) % 2) == 0)
 					{
 						val = left;
 					}
@@ -331,21 +331,21 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
-		int lowerSizeX = a_SizeX + 1;
-		int lowerSizeZ = a_SizeZ + 1;
+		size_t lowerSizeX = a_SizeX + 1;
+		size_t lowerSizeZ = a_SizeZ + 1;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerData[m_BufferSize];
 		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
 
 		// Average - add all 4 "neighbors" and divide by 4:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int idxLower = x + lowerSizeX * z;
+				size_t idxLower = x + lowerSizeX * z;
 				a_Values[x + a_SizeX * z] = (
 					lowerData[idxLower] + lowerData[idxLower + 1] +
 					lowerData[idxLower + lowerSizeX] + lowerData[idxLower + lowerSizeX + 1]
@@ -375,24 +375,24 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
-		int lowerSizeX = a_SizeX + 4;
-		int lowerSizeZ = a_SizeZ + 4;
+		size_t lowerSizeX = a_SizeX + 4;
+		size_t lowerSizeZ = a_SizeZ + 4;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerData[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
 
 		// Calculate the weighted average of all 16 "neighbors":
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int idxLower1 = x + lowerSizeX * z;
-				int idxLower2 = idxLower1 + lowerSizeX;
-				int idxLower3 = idxLower1 + 2 * lowerSizeX;
-				int idxLower4 = idxLower1 + 3 * lowerSizeX;
+				size_t idxLower1 = x + lowerSizeX * z;
+				size_t idxLower2 = idxLower1 + lowerSizeX;
+				size_t idxLower3 = idxLower1 + 2 * lowerSizeX;
+				size_t idxLower4 = idxLower1 + 3 * lowerSizeX;
 				a_Values[x + a_SizeX * z] = (
 					1 * lowerData[idxLower1] + 2 * lowerData[idxLower1 + 1] + 2 * lowerData[idxLower1 + 2] + 1 * lowerData[idxLower1 + 3] +
 					2 * lowerData[idxLower2] + 32 * lowerData[idxLower2 + 1] + 32 * lowerData[idxLower2 + 2] + 2 * lowerData[idxLower2 + 3] +
@@ -425,23 +425,23 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
-		int lowerSizeX = a_SizeX + 3;
-		int lowerSizeZ = a_SizeZ + 3;
+		size_t lowerSizeX = a_SizeX + 3;
+		size_t lowerSizeZ = a_SizeZ + 3;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerData[m_BufferSize];
 		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
 
 		// Calculate the weighted average the neighbors:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int idxLower1 = x + lowerSizeX * z;
-				int idxLower2 = idxLower1 + lowerSizeX;
-				int idxLower3 = idxLower1 + 2 * lowerSizeX;
+				size_t idxLower1 = x + lowerSizeX * z;
+				size_t idxLower2 = idxLower1 + lowerSizeX;
+				size_t idxLower3 = idxLower1 + 2 * lowerSizeX;
 				a_Values[x + a_SizeX * z] = (
 					WeightDiagonal * lowerData[idxLower1] + WeightCardinal * lowerData[idxLower1 + 1] + WeightDiagonal * lowerData[idxLower1 + 2] +
 					WeightCardinal * lowerData[idxLower2] + WeightCenter   * lowerData[idxLower2 + 1] + WeightCardinal * lowerData[idxLower2 + 2] +
@@ -476,20 +476,20 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
 
 		// Replace random values:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int BaseZ = a_MinZ + z;
-			for (int x = 0; x < a_SizeX; x++)
+			int BaseZ = a_MinZ + static_cast<int>(z);
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				if (((super::m_Noise.IntNoise2DInt(BaseZ, a_MinX + x) / 13) % 101) < m_ChancePct)
+				if (((super::m_Noise.IntNoise2DInt(BaseZ, a_MinX + static_cast<int>(x)) / 13) % 101) < m_ChancePct)
 				{
-					a_Values[x + a_SizeX * z] = m_Min + (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7) % m_Range;
+					a_Values[x + a_SizeX * z] = m_Min + (super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), BaseZ) / 7) % m_Range;
 				}
 			}  // for x
 		}  // for z
@@ -522,18 +522,18 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
 
 		// Add the random values:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int NoiseZ = a_MinZ + z;
-			for (int x = 0; x < a_SizeX; x++)
+			int NoiseZ = a_MinZ + static_cast<int>(z);
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int noiseVal = ((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % m_Range) - m_HalfRange;
+				int noiseVal = ((super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), NoiseZ) / 7) % m_Range) - m_HalfRange;
 				a_Values[x + z * a_SizeX] += noiseVal;
 			}
 		}
@@ -564,23 +564,23 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerData[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
 
 		// Average random values:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int NoiseZ = a_MinZ + z;
-			for (int x = 0; x < a_SizeX; x++)
+			int NoiseZ = a_MinZ + static_cast<int>(z);
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int idxLower = x + 1 + lowerSizeX * (z + 1);
-				if (((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % 100) > m_AvgChancePct)
+				size_t idxLower = x + 1 + lowerSizeX * (z + 1);
+				if (((super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), NoiseZ) / 7) % 100) > m_AvgChancePct)
 				{
 					// Average the 4 neighbors:
 					a_Values[x + z * a_SizeX] = (
@@ -621,28 +621,28 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerData[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
 
 		// Average random values:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int NoiseZ = a_MinZ + z;
-			for (int x = 0; x < a_SizeX; x++)
+			int NoiseZ = a_MinZ + static_cast<int>(z);
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int idxLower = x + 1 + lowerSizeX * (z + 1);
-				if (((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % 100) > m_AvgChancePct)
+				size_t idxLower = x + 1 + lowerSizeX * (z + 1);
+				if (((super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), NoiseZ) / 7) % 100) > m_AvgChancePct)
 				{
 					// Chose a value in between the min and max neighbor:
 					int min = std::min(std::min(lowerData[idxLower - 1], lowerData[idxLower + 1]), std::min(lowerData[idxLower - lowerSizeX], lowerData[idxLower + lowerSizeX]));
 					int max = std::max(std::max(lowerData[idxLower - 1], lowerData[idxLower + 1]), std::max(lowerData[idxLower - lowerSizeX], lowerData[idxLower + lowerSizeX]));
-					a_Values[x + z * a_SizeX] = min + ((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ + 10) / 7) % (max - min + 1));
+					a_Values[x + z * a_SizeX] = min + ((super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), NoiseZ + 10) / 7) % (max - min + 1));
 				}
 				else
 				{
@@ -675,7 +675,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Map for biome -> its beach:
 		static const int ToBeach[] =
@@ -723,16 +723,16 @@ public:
 		};
 
 		// Generate the underlying values:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerValues[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
 
 		// Add beaches between ocean and biomes:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				int val   = lowerValues[x + 1 + (z + 1) * lowerSizeX];
 				int above = lowerValues[x + 1 + z       * lowerSizeX];
@@ -779,16 +779,16 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				if (a_Values[x + z * a_SizeX] == bgOcean)
 				{
-					int rnd = super::m_Noise.IntNoise2DInt(a_MinX + x, a_MinZ + z) / 7;
+					int rnd = super::m_Noise.IntNoise2DInt(a_MinX + static_cast<int>(x), a_MinZ + static_cast<int>(z)) / 7;
 					if (rnd % 1000 < m_Chance)
 					{
 						a_Values[x + z * a_SizeX] = (rnd / 1003) % bgLandOceanMax;
@@ -822,19 +822,19 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values)
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values)
 	{
 		// Generate the underlying biome groups:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerValues[m_BufferSize];
 		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerValues);
 
 		// Change the biomes on incompatible edges into an edge biome:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				int val   = lowerValues[x + 1 + (z + 1) * lowerSizeX];
 				int Above = lowerValues[x + 1 + z       * lowerSizeX];
@@ -920,7 +920,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Define the per-biome-group biomes:
 		static const int oceanBiomes[] =
@@ -998,16 +998,16 @@ public:
 
 		// Overwrite each biome group with a random biome from that group:
 		// Take care of the bgfRare flag
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int IdxZ = z * a_SizeX;
-			for (int x = 0; x < a_SizeX; x++)
+			size_t IdxZ = z * a_SizeX;
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				int val = a_Values[x + IdxZ];
 				const cBiomesInGroups & Biomes = (val > bgfRare) ?
 					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
-					biomesInGroups[val % ARRAYCOUNT(biomesInGroups)];
-				int rnd = (super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7);
+					biomesInGroups[static_cast<size_t>(val) % ARRAYCOUNT(biomesInGroups)];
+				int rnd = (super::m_Noise.IntNoise2DInt(static_cast<int>(x) + a_MinX, static_cast<int>(z) + a_MinZ) / 7);
 				a_Values[x + IdxZ] = Biomes.Biomes[rnd % Biomes.Count];
 			}
 		}
@@ -1050,21 +1050,21 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying values:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
 
 		// Replace some of the values:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int idxZ = z * a_SizeX;
-			for (int x = 0; x < a_SizeX; x++)
+			size_t idxZ = z * a_SizeX;
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int idx = x + idxZ;
+				size_t idx = x + idxZ;
 				if (a_Values[idx] == m_From)
 				{
-					int rnd = super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7;
+					int rnd = super::m_Noise.IntNoise2DInt(static_cast<int>(x) + a_MinX, static_cast<int>(z) + a_MinZ) / 7;
 					if (rnd % 1000 < m_Chance)
 					{
 						a_Values[idx] = m_To;
@@ -1109,7 +1109,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying data:
 		ASSERT(a_SizeX * a_SizeZ <= m_BufferSize);
@@ -1118,12 +1118,12 @@ public:
 		m_Rivers->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, riverData);
 
 		// Mix the values:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			int idxZ = z * a_SizeX;
-			for (int x = 0; x < a_SizeX; x++)
+			size_t idxZ = z * a_SizeX;
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int idx = x + idxZ;
+				size_t idx = x + idxZ;
 				if (IsBiomeOcean(a_Values[idx]))
 				{
 					// Oceans are kept without any changes
@@ -1136,7 +1136,7 @@ public:
 				}
 
 				// There's a river, change the output to a river or a frozen river, based on the original biome:
-				if (IsBiomeVeryCold((EMCSBiome)a_Values[idx]))
+				if (IsBiomeVeryCold(static_cast<EMCSBiome>(a_Values[idx])))
 				{
 					a_Values[idx] = biFrozenRiver;
 				}
@@ -1173,19 +1173,19 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying data:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerValues[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
 
 		// Detect the edges:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				int Above = lowerValues[x + 1 + z       * lowerSizeX];
 				int Below = lowerValues[x + 1 + (z + 2) * lowerSizeX];
@@ -1231,19 +1231,19 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying data:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerValues[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
 
 		// Add the mushroom islands:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				int val = lowerValues[x + 1 + (z + 1) * lowerSizeX];
 				if (!IsBiomeOcean(val))
@@ -1278,7 +1278,7 @@ public:
 				// If at least 3 ocean neighbors and the chance is right, change:
 				if (
 					(NumOceanNeighbors >= 3) &&
-					((super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7) % 1000 < m_Chance)
+					((super::m_Noise.IntNoise2DInt(static_cast<int>(x) + a_MinX, static_cast<int>(z) + a_MinZ) / 7) % 1000 < m_Chance)
 				)
 				{
 					a_Values[x + z * a_SizeX] = m_ToValue;
@@ -1321,17 +1321,17 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying data:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
 
 		// Change random pixels to bgOcean:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int rnd = super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7;
+				int rnd = super::m_Noise.IntNoise2DInt(static_cast<int>(x) + a_MinX, static_cast<int>(z) + a_MinZ) / 7;
 				if (rnd % 1000 < m_Chance)
 				{
 					a_Values[x + z * a_SizeX] = m_ToValue;
@@ -1370,20 +1370,20 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying data:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
 
 		// Change some of the biome groups into rare biome groups:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				int rnd = super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7;
+				int rnd = super::m_Noise.IntNoise2DInt(static_cast<int>(x) + a_MinX, static_cast<int>(z) + a_MinZ) / 7;
 				if (rnd % 1000 < m_Chance)
 				{
-					int idx = x + a_SizeX * z;
+					size_t idx = x + a_SizeX * z;
 					a_Values[idx] = a_Values[idx] | bgfRare;
 				}
 			}
@@ -1418,7 +1418,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the base biomes and the alterations:
 		m_BaseBiomes->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -1426,8 +1426,8 @@ public:
 		m_Alterations->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
 
 		// Change the biomes into their alternate versions:
-		int len = a_SizeX * a_SizeZ;
-		for (int idx = 0; idx < len; ++idx)
+		size_t len = a_SizeX * a_SizeZ;
+		for (size_t idx = 0; idx < len; ++idx)
 		{
 			if (alterations[idx] == 0)
 			{
@@ -1482,19 +1482,19 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying biomes:
-		int lowerSizeX = a_SizeX + 2;
-		int lowerSizeZ = a_SizeZ + 2;
+		size_t lowerSizeX = a_SizeX + 2;
+		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
 		int lowerValues[m_BufferSize];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
 
 		// Convert incompatible edges into neutral biomes:
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				int biome = lowerValues[x + 1 + (z + 1) * lowerSizeX];
 				int above = lowerValues[x + 1 + z *       lowerSizeX];
@@ -1642,7 +1642,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Generate the underlying biomes and the alterations:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -1650,8 +1650,8 @@ public:
 		m_Alteration->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
 
 		// Wherever alterations are nonzero, change into alternate biome, if available:
-		int len = a_SizeX * a_SizeZ;
-		for (int idx = 0; idx < len; ++idx)
+		size_t len = a_SizeX * a_SizeZ;
+		for (size_t idx = 0; idx < len; ++idx)
 		{
 			if (alterations[idx] == 0)
 			{

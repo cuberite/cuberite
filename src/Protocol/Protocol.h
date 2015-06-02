@@ -88,6 +88,7 @@ public:
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
+	virtual void SendHideTitle                  (void) = 0;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive                  (int a_PingID) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
@@ -112,12 +113,17 @@ public:
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) = 0;
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) = 0;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) = 0;
+	virtual void SendResetTitle                 (void) = 0;
 	virtual void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) = 0;
 	virtual void SendExperience                 (void) = 0;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) = 0;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) = 0;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) = 0;
+	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) = 0;
+	virtual void SendSetRawSubTitle             (const AString & a_SubTitle) = 0;
+	virtual void SendSetTitle                   (const cCompositeChat & a_Title) = 0;
+	virtual void SendSetRawTitle                (const AString & a_Title) = 0;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) = 0;
 	virtual void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) = 0;
@@ -128,6 +134,7 @@ public:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) = 0;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;
 	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) = 0;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) = 0;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) = 0;

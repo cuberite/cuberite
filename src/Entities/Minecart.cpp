@@ -106,7 +106,7 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnVehicle(*this, 10, (char)m_Payload);  // 10 = Minecarts
+	a_ClientHandle.SendSpawnVehicle(*this, 10, static_cast<char>(m_Payload));  // 10 = Minecarts
 	a_ClientHandle.SendEntityMetadata(*this);
 }
 
@@ -725,11 +725,11 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (GetSpeedZ() > 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, (int)ceil(GetPosZ()));
+				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, static_cast<int>(ceil(GetPosZ())));
 				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
 					// We could try to detect a block in front based purely on coordinates, but xoft made a bounding box system - why not use? :P
-					cBoundingBox bbBlock(Vector3d(POSX_TOINT, POSY_TOINT, (int)ceil(GetPosZ())), 0.5, 1);
+					cBoundingBox bbBlock(Vector3d(POSX_TOINT, POSY_TOINT, static_cast<int>(ceil(GetPosZ()))), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
 
 					if (bbBlock.DoesIntersect(bbMinecart))
@@ -762,10 +762,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (GetSpeedX() > 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock((int)ceil(GetPosX()), POSY_TOINT, POSZ_TOINT);
+				BLOCKTYPE Block = m_World->GetBlock(static_cast<int>(ceil(GetPosX())), POSY_TOINT, POSZ_TOINT);
 				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
 				{
-					cBoundingBox bbBlock(Vector3d((int)ceil(GetPosX()), POSY_TOINT, POSZ_TOINT), 0.5, 1);
+					cBoundingBox bbBlock(Vector3d(static_cast<int>(ceil(GetPosX())), POSY_TOINT, POSZ_TOINT), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
 
 					if (bbBlock.DoesIntersect(bbMinecart))
@@ -1003,7 +1003,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 
 bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 {
-	if ((TDI.Attacker != nullptr) && TDI.Attacker->IsPlayer() && ((cPlayer *)TDI.Attacker)->IsGameModeCreative())
+	if ((TDI.Attacker != nullptr) && TDI.Attacker->IsPlayer() && static_cast<cPlayer *>(TDI.Attacker)->IsGameModeCreative())
 	{
 		Destroy();
 		TDI.FinalDamage = GetMaxHealth();  // Instant hit for creative
@@ -1050,11 +1050,6 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 			{
 				Drops.push_back(cItem(E_ITEM_MINECART_WITH_HOPPER, 1, 0));
 				break;
-			}
-			default:
-			{
-				ASSERT(!"Unhandled minecart type when spawning pickup!");
-				return true;
 			}
 		}
 		

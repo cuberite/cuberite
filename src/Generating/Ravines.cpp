@@ -135,17 +135,17 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 	
 	// Get the base angle in which the ravine "axis" goes:
 	float Angle = (float)(((float)((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI);
-	float xc = sin(Angle);
-	float zc = cos(Angle);
+	float xc = sinf(Angle);
+	float zc = cosf(Angle);
 	
 	// Calculate the definition points and radii:
 	int MaxRadius = (int)(sqrt(12.0 + ((a_Noise.IntNoise2DInt(61 * a_BlockX, 97 * a_BlockZ) / 13) % a_Size) / 16));
 	int Top       = 32 + ((a_Noise.IntNoise2DInt(13 * a_BlockX, 17 * a_BlockZ) / 23) % 32);
 	int Bottom    = 5 + ((a_Noise.IntNoise2DInt(17 * a_BlockX, 29 * a_BlockZ) / 13) % 32);
 	int Mid = (Top + Bottom) / 2;
-	int PointX = CenterX - (int)(xc * a_Size / 2);
-	int PointZ = CenterZ - (int)(zc * a_Size / 2);
-	m_Points.push_back(cRavDefPoint(PointX, PointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
+	int DefinitionPointX = CenterX - (int)(xc * a_Size / 2);
+	int DefinitionPointZ = CenterZ - (int)(zc * a_Size / 2);
+	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
 	for (int i = 1; i < NUM_RAVINE_POINTS - 1; i++)
 	{
 		int LineX = CenterX + (int)(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
@@ -160,9 +160,9 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 *  a_BlockZ, i * 31) / 13) % 8) - 4;
 		m_Points.push_back(cRavDefPoint(PointX, PointZ, Radius, ThisTop, ThisBottom));
 	}  // for i - m_Points[]
-	PointX = CenterX + (int)(xc * a_Size / 2);
-	PointZ = CenterZ + (int)(zc * a_Size / 2);
-	m_Points.push_back(cRavDefPoint(PointX, PointZ, 0, Mid, Mid));
+	DefinitionPointX = CenterX + (int)(xc * a_Size / 2);
+	DefinitionPointZ = CenterZ + (int)(zc * a_Size / 2);
+	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, Mid, Mid));
 }
 
 

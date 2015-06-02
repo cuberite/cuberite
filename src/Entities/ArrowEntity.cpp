@@ -84,7 +84,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 	int X = BlockHit.x, Y = BlockHit.y, Z = BlockHit.z;
 	m_HitBlockPos = Vector3i(X, Y, Z);
-	
+
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("random.bowhit", (double)X, (double)Y, (double)Z, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 
@@ -108,15 +108,15 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
 	}
 
-	int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
+	unsigned int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
 	if (PowerLevel > 0)
 	{
 		int ExtraDamage = (int)ceil(0.25 * (PowerLevel + 1));
 		Damage += ExtraDamage;
 	}
 
-	int KnockbackAmount = 1;
-	int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
+	// int KnockbackAmount = 1;
+	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
 	if (PunchLevel > 0)
 	{
 		Vector3d LookVector = GetLookVector();
@@ -130,8 +130,9 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		a_EntityHit.SetSpeed(FinalSpeed);
 	}
 
-	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);
-	
+	// a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);  // TODO fix knockback.
+	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 0);  // Until knockback is fixed.
+
 	if (IsOnFire() && !a_EntityHit.IsSubmerged() && !a_EntityHit.IsSwimming())
 	{
 		a_EntityHit.StartBurning(100);

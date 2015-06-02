@@ -14,8 +14,8 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 	for (cEnchantments::cMap::const_iterator itr = a_Enchantments.m_Enchantments.begin(), end = a_Enchantments.m_Enchantments.end(); itr != end; ++itr)
 	{
 		a_Writer.BeginCompound("");
-			a_Writer.AddShort("id",  itr->first);
-			a_Writer.AddShort("lvl", itr->second);
+			a_Writer.AddShort("id",  static_cast<Int16>(itr->first));
+			a_Writer.AddShort("lvl", static_cast<Int16>(itr->second));
 		a_Writer.EndCompound();
 	}  // for itr - m_Enchantments[]
 	a_Writer.EndList();
@@ -82,7 +82,7 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 		}
 		
 		// Store the enchantment:
-		a_Enchantments.m_Enchantments[id] = lvl;
+		a_Enchantments.m_Enchantments[id] = static_cast<unsigned int>(lvl);
 	}  // for tag - children of the ench list tag
 }
 

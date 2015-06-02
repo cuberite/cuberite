@@ -41,7 +41,7 @@ public:
 		// Return a bowl to the inventory
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().AddItem(cItem(E_ITEM_BOWL), true, true);
+			a_Player->GetInventory().AddItem(cItem(E_ITEM_BOWL));
 		}
 		return true;
 	}

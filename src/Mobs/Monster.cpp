@@ -169,7 +169,7 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		m_NoPathToTarget = false;
 		m_NoMoreWayPoints = false;
 		m_PathFinderDestination = m_FinalDestination;
-		m_Path = new cPath(a_Chunk, GetPosition().Floor(), m_PathFinderDestination.Floor(), 20);
+		m_Path = new cPath(a_Chunk, GetPosition(), m_PathFinderDestination, 20, GetWidth(), GetHeight());
 	}
 
 	switch (m_Path->Step(a_Chunk))
@@ -183,7 +183,7 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 
 		case ePathFinderStatus::PATH_NOT_FOUND:
 		{
-			ResetPathFinding();  // Try to calculate a path again.
+			StopMovingToPosition();  // Try to calculate a path again.
 			// Note that the next time may succeed, e.g. if a player breaks a barrier.
 			break;
 		}
@@ -196,14 +196,22 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		{
 			if (m_NoMoreWayPoints || (--m_GiveUpCounter == 0))
 			{
-				ResetPathFinding();  // Try to calculate a path again.
+				if (m_EMState == ATTACKING)
+				{
+					ResetPathFinding();  // Try to calculate a path again.
+					// This results in mobs hanging around an unreachable target (player).
+				}
+				else
+				{
+					StopMovingToPosition();  // Find a different place to go to.
+				}
 				return false;
 			}
 			else if (!m_Path->IsLastPoint())  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
 			{
 				if ((m_Path->IsFirstPoint() || ReachedNextWaypoint()))
 				{
-					m_NextWayPointPosition = Vector3d(0.5, 0, 0.5) + m_Path->GetNextPoint();
+					m_NextWayPointPosition = m_Path->GetNextPoint();
 					m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
 				}
 			}
@@ -391,6 +399,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 void cMonster::StopMovingToPosition()
 {
 	m_IsFollowingPath = false;
+	ResetPathFinding();
 }
 
 
@@ -508,8 +517,15 @@ void cMonster::SetPitchAndYawFromDestination()
 	}
 
 
-
-	Vector3d BodyDistance = m_NextWayPointPosition - GetPosition();
+	Vector3d BodyDistance;
+	if (!m_IsFollowingPath && (m_Target != nullptr))
+	{
+		BodyDistance = m_Target->GetPosition() - GetPosition();
+	}
+	else
+	{
+		BodyDistance = m_NextWayPointPosition - GetPosition();
+	}
 	double BodyRotation, BodyPitch;
 	BodyDistance.Normalize();
 	VectorToEuler(BodyDistance.x, BodyDistance.y, BodyDistance.z, BodyRotation, BodyPitch);
@@ -520,7 +536,7 @@ void cMonster::SetPitchAndYawFromDestination()
 		double HeadRotation, HeadPitch;
 		Distance.Normalize();
 		VectorToEuler(Distance.x, Distance.y, Distance.z, HeadRotation, HeadPitch);
-		if (std::abs(BodyRotation - HeadRotation) < 120)
+		if (std::abs(BodyRotation - HeadRotation) < 90)
 		{
 			SetHeadYaw(HeadRotation);
 			SetPitch(-HeadPitch);
@@ -1138,10 +1154,10 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 
 
 
-void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel)
+void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel)
 {
 	MTRand r1;
-	int Count = r1.randInt() % 200;
+	unsigned int Count = r1.randInt() % 200;
 	if (Count < (5 + a_LootingLevel))
 	{
 		int Rare = r1.randInt() % a_Items.Size();
@@ -1153,7 +1169,7 @@ void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a
 
 
 
-void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
+void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceHelmet * 200) + (a_LootingLevel * 2)))
@@ -1193,7 +1209,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
 
 
 
-void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
+void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceWeapon * 200) + (a_LootingLevel * 2)))

@@ -187,16 +187,37 @@ public:
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
+	// Returns whether value was changed
 	// Enum values are clamped to their allowed range.
-	void GetStackValue(int a_StackPos, AString & a_Value);
-	void GetStackValue(int a_StackPos, BLOCKTYPE & a_Value);
-	void GetStackValue(int a_StackPos, bool & a_Value);
-	void GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
-	void GetStackValue(int a_StackPos, cRef & a_Ref);
-	void GetStackValue(int a_StackPos, double & a_Value);
-	void GetStackValue(int a_StackPos, eWeather & a_Value);
-	void GetStackValue(int a_StackPos, float & a_ReturnedVal);
-	void GetStackValue(int a_StackPos, int & a_Value);
+	bool GetStackValue(int a_StackPos, AString & a_Value);
+	bool GetStackValue(int a_StackPos, bool & a_Value);
+	bool GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
+	bool GetStackValue(int a_StackPos, cRef & a_Ref);
+	bool GetStackValue(int a_StackPos, double & a_Value);
+	bool GetStackValue(int a_StackPos, eWeather & a_Value);
+	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
+
+	// template to catch all of the various c++ integral types without overload conflicts
+	template <class T>
+	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * unused = nullptr)
+	{
+		UNUSED(unused);
+		if (lua_isnumber(m_LuaState, a_StackPos))
+		{
+			lua_Number Val = tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
+			if (Val > std::numeric_limits<T>::max())
+			{
+				return false;
+			}
+			if (Val < std::numeric_limits<T>::min())
+			{
+				return false;
+			}
+			a_ReturnedVal = static_cast<T>(Val);
+			return true;
+		}
+		return false;
+	}
 
 	// Include the auto-generated Push and GetStackValue() functions:
 	#include "LuaState_Declaration.inc"
@@ -218,10 +239,13 @@ public:
 
 	/** Retrieves a list of values from the Lua stack, starting at the specified index. */
 	template <typename T, typename... Args>
-	inline void GetStackValues(int a_StartStackPos, T & a_Ret, Args &&... args)
+	inline bool GetStackValues(int a_StartStackPos, T & a_Ret, Args &&... args)
 	{
-		GetStackValue(a_StartStackPos, a_Ret);
-		GetStackValues(a_StartStackPos + 1, args...);
+		if (!GetStackValue(a_StartStackPos, a_Ret))
+		{
+			return false;
+		}
+		return GetStackValues(a_StartStackPos + 1, args...);
 	}
 
 	/** Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions */
@@ -349,9 +373,9 @@ protected:
 	/** Variadic template terminator: If there are no more values to get, bail out.
 	This function is not available in the public API, because it's an error to request no values directly; only internal functions can do that.
 	If you get a compile error saying this function is not accessible, check your calling code, you aren't reading any stack values. */
-	void GetStackValues(int a_StartingStackPos)
+	bool GetStackValues(int a_StartingStackPos)
 	{
-		// Do nothing
+		return true;
 	}
 
 	/** Pushes the function of the specified name onto the stack.
@@ -369,7 +393,7 @@ protected:
 	*/
 	bool PushFunction(const cRef & a_FnRef)
 	{
-		return PushFunction((int)a_FnRef);
+		return PushFunction(static_cast<int>(a_FnRef));
 	}
 	
 	/** Pushes a function that is stored in a referenced table by name

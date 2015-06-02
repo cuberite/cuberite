@@ -96,17 +96,17 @@ bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, 
 		m_Callbacks->OnIntoWorld(m_StartX, m_StartY, m_StartZ);
 	}
 
-	m_CurrentX = (int)floor(m_StartX);
-	m_CurrentY = (int)floor(m_StartY);
-	m_CurrentZ = (int)floor(m_StartZ);
+	m_CurrentX = FloorC(m_StartX);
+	m_CurrentY = FloorC(m_StartY);
+	m_CurrentZ = FloorC(m_StartZ);
 	
 	m_DiffX = m_EndX - m_StartX;
 	m_DiffY = m_EndY - m_StartY;
 	m_DiffZ = m_EndZ - m_StartZ;
 	
 	// The actual trace is handled with ChunkMapCS locked by calling our Item() for the specified chunk
-	int BlockX = (int)floor(m_StartX);
-	int BlockZ = (int)floor(m_StartZ);
+	int BlockX = FloorC(m_StartX);
+	int BlockZ = FloorC(m_StartZ);
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 	return m_World->DoWithChunk(ChunkX, ChunkZ, *this);
@@ -120,7 +120,7 @@ void cLineBlockTracer::FixStartAboveWorld(void)
 {
 	// We must set the start Y to less than cChunkDef::Height so that it is considered inside the world later on
 	// Therefore we use an EPS-offset from the height, as small as reasonably possible.
-	const double Height = (double)cChunkDef::Height - 0.00001;
+	const double Height = static_cast<double>(cChunkDef::Height) - 0.00001;
 	CalcXZIntersection(Height, m_StartX, m_StartZ);
 	m_StartY = Height;
 }

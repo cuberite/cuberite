@@ -14,7 +14,7 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 		case E_ITEM_FIREWORK_ROCKET:
 		{
 			a_Writer.BeginCompound("Fireworks");
-			a_Writer.AddByte("Flight", a_FireworkItem.m_FlightTimeInTicks / 20);
+			a_Writer.AddByte("Flight", static_cast<Byte>(a_FireworkItem.m_FlightTimeInTicks / 20));
 			a_Writer.BeginList("Explosions", TAG_Compound);
 			a_Writer.BeginCompound("");
 			a_Writer.AddByte("Flicker", a_FireworkItem.m_HasFlicker);

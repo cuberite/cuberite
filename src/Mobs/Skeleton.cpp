@@ -22,7 +22,7 @@ cSkeleton::cSkeleton(bool IsWither) :
 
 void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	int LootingLevel = 0;
+	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
@@ -50,12 +50,13 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
+	cFastRandom Random;
 	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
 	if ((m_Target != nullptr) && (m_AttackInterval > 3.0))
 	{
-		// Setting this higher gives us more wiggle room for attackrate
-		Vector3d Speed = GetLookVector() * 20;
-		Speed.y = Speed.y + 1;
+		Vector3d Inaccuracy = Vector3d(Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25);
+		Vector3d Speed = (m_Target->GetPosition() + Inaccuracy - GetPosition()) * 5;
+		Speed.y = Speed.y - 1 + Random.NextInt(3);
 		cArrowEntity * Arrow = new cArrowEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
 		if (Arrow == nullptr)
 		{

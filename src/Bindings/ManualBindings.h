@@ -199,7 +199,7 @@ public:
 
 		// Get parameters:
 		Ty1 * Self = nullptr;
-		int ItemID;
+		UInt32 ItemID;
 		cLuaState::cRef FnRef;
 		L.GetStackValues(1, Self, ItemID, FnRef);
 		if (Self == nullptr)
@@ -253,8 +253,9 @@ public:
 		// Check params:
 		cLuaState L(tolua_S);
 		if (
-			!L.CheckParamNumber(2, 5) ||
-			!L.CheckParamFunction(6)
+			!L.CheckParamNumber(2, 4) ||
+			!L.CheckParamFunction(5) ||
+			!L.CheckParamEnd(6)
 		)
 		{
 			return 0;
@@ -316,8 +317,9 @@ public:
 		// Check params:
 		cLuaState L(tolua_S);
 		if (
-			!L.CheckParamNumber(2, 4) ||
-			!L.CheckParamFunction(5)
+			!L.CheckParamNumber(2, 3) ||
+			!L.CheckParamFunction(4) ||
+			!L.CheckParamEnd(5)
 		)
 		{
 			return 0;

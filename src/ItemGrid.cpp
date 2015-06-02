@@ -358,7 +358,7 @@ int cItemGrid::RemoveItem(const cItem & a_ItemStack)
 
 		if (m_Slots[i].IsEqual(a_ItemStack))
 		{
-			int NumToRemove = std::min(NumLeft, (int)m_Slots[i].m_ItemCount);
+			int NumToRemove = std::min(NumLeft, static_cast<int>(m_Slots[i].m_ItemCount));
 			NumLeft -= NumToRemove;
 			m_Slots[i].m_ItemCount -= NumToRemove;
 

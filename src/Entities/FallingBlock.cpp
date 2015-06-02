@@ -38,7 +38,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
 	
 	int BlockX = POSX_TOINT;
-	int BlockY = (int)(GetPosY() - 0.5);
+	int BlockY = static_cast<int>(GetPosY() - 0.5);
 	int BlockZ = POSZ_TOINT;
 	
 	if (BlockY < 0)

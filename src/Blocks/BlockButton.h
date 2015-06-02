@@ -67,13 +67,18 @@ public:
 			case BLOCK_FACE_XM: return 0x2;
 			case BLOCK_FACE_XP: return 0x1;
 			case BLOCK_FACE_YM: return 0x0;
-			default:
+			case BLOCK_FACE_NONE:
 			{
 				ASSERT(!"Unhandled block face!");
 				return 0x0;
 			}
 		}
+		#if !defined(__clang__)
+			ASSERT(!"Unknown BLOCK_FACE");
+			return 0;
+		#endif
 	}
+
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
@@ -92,6 +97,7 @@ public:
 			}
 		}
 	}
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{

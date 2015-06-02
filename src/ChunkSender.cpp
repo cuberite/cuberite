@@ -21,10 +21,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cNotifyChunkSender:
 
-void cNotifyChunkSender::Call(int a_ChunkX, int a_ChunkZ)
+
+/// Callback that can be used to notify chunk sender upon another chunkcoord notification
+class cNotifyChunkSender :
+	public cChunkCoordCallback
 {
-	m_ChunkSender->ChunkReady(a_ChunkX, a_ChunkZ);
-}
+	virtual void Call(int a_ChunkX, int a_ChunkZ) override
+	{
+		m_ChunkSender->ChunkReady(a_ChunkX, a_ChunkZ);
+	}
+
+	cChunkSender * m_ChunkSender;
+public:
+	cNotifyChunkSender(cChunkSender * a_ChunkSender) : m_ChunkSender(a_ChunkSender) {}
+};
+
 
 
 
@@ -36,10 +47,8 @@ void cNotifyChunkSender::Call(int a_ChunkX, int a_ChunkZ)
 cChunkSender::cChunkSender(void) :
 	super("ChunkSender"),
 	m_World(nullptr),
-	m_RemoveCount(0),
-	m_Notify(nullptr)
+	m_RemoveCount(0)
 {
-	m_Notify.SetChunkSender(this);
 }
 
 
@@ -124,10 +133,6 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 			{
 				m_SendChunksHighPriority.push_back(Chunk);
 				break;
-			}
-			default:
-			{
-				ASSERT(!"Unknown chunk priority!");
 			}
 		}
 	}
@@ -276,7 +281,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 	// If the chunk is not lighted, queue it for relighting and get notified when it's ready:
 	if (!m_World->IsChunkLighted(a_ChunkX, a_ChunkZ))
 	{
-		m_World->QueueLightChunk(a_ChunkX, a_ChunkZ, &m_Notify);
+		m_World->QueueLightChunk(a_ChunkX, a_ChunkZ, cpp14::make_unique<cNotifyChunkSender>(this));
 		return;
 	}
 
@@ -342,7 +347,7 @@ void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 		if ((*a_BiomeMap)[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_BiomeMap[i] = (unsigned char)((*a_BiomeMap)[i]);
+			m_BiomeMap[i] = static_cast<unsigned char>((*a_BiomeMap)[i]);
 		}
 		else
 		{

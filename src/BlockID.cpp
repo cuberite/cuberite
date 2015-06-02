@@ -96,8 +96,7 @@ public:
 		else
 		{
 			// Not a resolvable string, try pure numbers: "45:6", "45^6" etc.
-			a_Item.m_ItemType = (short)atoi(Split[0].c_str());
-			if ((a_Item.m_ItemType == 0) && (Split[0] != "0"))
+			if (!StringToInteger(Split[0], a_Item.m_ItemType))
 			{
 				// Parsing the number failed
 				return false;
@@ -111,9 +110,8 @@ public:
 			a_Item.m_ItemCount = 1;
 			return true;
 		}
-		
-		a_Item.m_ItemDamage = (short)atoi(Split[1].c_str());
-		if ((a_Item.m_ItemDamage == 0) && (Split[1] != "0"))
+
+		if (!StringToInteger(Split[1], a_Item.m_ItemDamage))
 		{
 			// Parsing the number failed
 			return false;
@@ -175,8 +173,16 @@ protected:
 		{
 			return;
 		}
-		short ItemType = (short)atoi(Split[0].c_str());
-		short ItemDamage = (Split.size() > 1) ? (short)atoi(Split[1].c_str()) : -1;
+		short ItemType;
+		if (!StringToInteger(Split[0], ItemType))
+		{
+			ASSERT(!"Invalid item type");
+		}
+		short ItemDamage = -1;
+		if (Split.size() > 1 && !StringToInteger(Split[1], ItemDamage))
+		{
+			ASSERT(!"Invalid item damage");
+		}
 		m_Map[a_Name] = std::make_pair(ItemType, ItemDamage);
 	}
 } ;
@@ -288,11 +294,11 @@ AString ItemToFullString(const cItem & a_Item)
 eDimension StringToDimension(const AString & a_DimensionString)
 {
 	// First try decoding as a number
-	int res = atoi(a_DimensionString.c_str());
-	if ((res != 0) || (a_DimensionString == "0"))
+	int res;
+	if (StringToInteger(a_DimensionString, res))
 	{
 		// It was a valid number
-		return (eDimension)res;
+		return static_cast<eDimension>(res);
 	}
 	
 	// Decode using a built-in map:
@@ -350,7 +356,7 @@ AString DimensionToString(eDimension a_Dimension)
 	}  // for i - DimensionMap[]
 
 	// Not found
-	LOGWARNING("Unknown dimension: \"%i\". Setting to Overworld", (int)a_Dimension);
+	LOGWARNING("Unknown dimension: \"%i\". Setting to Overworld", static_cast<int>(a_Dimension));
 	return "Overworld";
 }
 
@@ -386,7 +392,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 	
 	// Unknown damage type:
 	ASSERT(!"Unknown DamageType");
-	return Printf("dtUnknown_%d", (int)a_DamageType);
+	return Printf("dtUnknown_%d", static_cast<int>(a_DamageType));
 }
 
 
@@ -397,11 +403,11 @@ AString DamageTypeToString(eDamageType a_DamageType)
 eDamageType StringToDamageType(const AString & a_DamageTypeString)
 {
 	// First try decoding as a number:
-	int res = atoi(a_DamageTypeString.c_str());
-	if ((res != 0) || (a_DamageTypeString == "0"))
+	int res;
+	if (!StringToInteger(a_DamageTypeString, res))
 	{
 		// It was a valid number
-		return (eDamageType)res;
+		return static_cast<eDamageType>(res);
 	}
 	
 	// Decode using a built-in map:
@@ -462,7 +468,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 	}  // for i - DamageTypeMap[]
 	
 	// Not found:
-	return (eDamageType)-1;
+	return static_cast<eDamageType>(-1);
 }
 
 

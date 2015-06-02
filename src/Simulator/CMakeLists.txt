@@ -31,6 +31,13 @@ SET (HDRS
 	VanillaFluidSimulator.h
 	VaporizeFluidSimulator.h)
 
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set_source_files_properties(FireSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
+	set_source_files_properties(FluidSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=shadow")
+	set_source_files_properties(IncrementalRedstoneSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
+endif()
+
 if(NOT MSVC)
 	add_library(Simulator ${SRCS} ${HDRS})
 endif()

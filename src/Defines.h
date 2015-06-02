@@ -238,8 +238,17 @@ inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
 		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
 		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
 		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
-		default: return a_BlockFace;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		};
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
 
 
@@ -255,8 +264,17 @@ inline eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
 		case BLOCK_FACE_XP: return BLOCK_FACE_ZM;
 		case BLOCK_FACE_ZM: return BLOCK_FACE_XM;
 		case BLOCK_FACE_ZP: return BLOCK_FACE_XP;
-		default: return a_BlockFace;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		}
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
 
 
@@ -271,23 +289,43 @@ inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
 		case BLOCK_FACE_XP: return BLOCK_FACE_ZP;
 		case BLOCK_FACE_ZM: return BLOCK_FACE_XP;
 		case BLOCK_FACE_ZP: return BLOCK_FACE_XM;
-		default: return a_BlockFace;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		};
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
+
+
+
+
 
 inline eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace)
 {
 	switch (a_BlockFace)
 	{
-		case BLOCK_FACE_YP: return BLOCK_FACE_YM;
-		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
-		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
-		case BLOCK_FACE_YM: return BLOCK_FACE_YP;
-		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
-		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
-		default: return a_BlockFace;
+		case BLOCK_FACE_YP:   return BLOCK_FACE_YM;
+		case BLOCK_FACE_XP:   return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZP:   return BLOCK_FACE_ZM;
+		case BLOCK_FACE_YM:   return BLOCK_FACE_YP;
+		case BLOCK_FACE_XM:   return BLOCK_FACE_XP;
+		case BLOCK_FACE_ZM:   return BLOCK_FACE_ZP;
+		case BLOCK_FACE_NONE: return a_BlockFace;
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
+
+
+
 
 
 /** Returns the textual representation of the BlockFace constant. */
@@ -305,7 +343,7 @@ inline AString BlockFaceToString(eBlockFace a_BlockFace)
 	}
 	// clang optimisises this line away then warns that it has done so.
 	#if !defined(__clang__)
-	return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
+		return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
 	#endif
 }
 
@@ -436,7 +474,7 @@ inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBl
 			case BLOCK_FACE_ZP: a_BlockZ++; break;
 			case BLOCK_FACE_XP: a_BlockX++; break;
 			case BLOCK_FACE_XM: a_BlockX--; break;
-			default:
+			case BLOCK_FACE_NONE:
 			{
 				LOGWARNING("%s: Unknown face: %d", __FUNCTION__, a_BlockFace);
 				ASSERT(!"AddFaceDirection(): Unknown face");
@@ -454,7 +492,7 @@ inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBl
 			case BLOCK_FACE_ZP: a_BlockZ--; break;
 			case BLOCK_FACE_XP: a_BlockX--; break;
 			case BLOCK_FACE_XM: a_BlockX++; break;
-			default:
+			case BLOCK_FACE_NONE:
 			{
 				LOGWARNING("%s: Unknown inv face: %d", __FUNCTION__, a_BlockFace);
 				ASSERT(!"AddFaceDirection(): Unknown face");

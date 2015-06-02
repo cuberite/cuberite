@@ -112,22 +112,22 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_SizeZ, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
+void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY, size_t a_SizeZ, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
 	
 	// Save in XY cuts:
 	cFile f1;
-	if (f1.Open(Printf("%s_XY (%d).grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
+	if (f1.Open(Printf("%s_XY (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
 	{
-		for (int z = 0; z < a_SizeZ; z++)
+		for (size_t z = 0; z < a_SizeZ; z++)
 		{
-			for (int y = 0; y < a_SizeY; y++)
+			for (size_t y = 0; y < a_SizeY; y++)
 			{
-				int idx = y * a_SizeX + z * a_SizeX * a_SizeY;
+				size_t idx = y * a_SizeX + z * a_SizeX * a_SizeY;
 				unsigned char buf[BUF_SIZE];
-				for (int x = 0; x < a_SizeX; x++)
+				for (size_t x = 0; x < a_SizeX; x++)
 				{
 					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
@@ -140,15 +140,15 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 	}  // if (XY file open)
 
 	cFile f2;
-	if (f2.Open(Printf("%s_XZ (%d).grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
+	if (f2.Open(Printf("%s_XZ (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
 	{
-		for (int y = 0; y < a_SizeY; y++)
+		for (size_t y = 0; y < a_SizeY; y++)
 		{
-			for (int z = 0; z < a_SizeZ; z++)
+			for (size_t z = 0; z < a_SizeZ; z++)
 			{
-				int idx = y * a_SizeX + z * a_SizeX * a_SizeY;
+				size_t idx = y * a_SizeX + z * a_SizeX * a_SizeY;
 				unsigned char buf[BUF_SIZE];
-				for (int x = 0; x < a_SizeX; x++)
+				for (size_t x = 0; x < a_SizeX; x++)
 				{
 					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
@@ -165,19 +165,19 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 
 
 
-void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
+void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
 	
 	cFile f1;
-	if (f1.Open(Printf("%s (%d).grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
+	if (f1.Open(Printf("%s (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
 	{
-		for (int y = 0; y < a_SizeY; y++)
+		for (size_t y = 0; y < a_SizeY; y++)
 		{
-			int idx = y * a_SizeX;
+			size_t idx = y * a_SizeX;
 			unsigned char buf[BUF_SIZE];
-			for (int x = 0; x < a_SizeX; x++)
+			for (size_t x = 0; x < a_SizeX; x++)
 			{
 				buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 			}

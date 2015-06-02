@@ -30,7 +30,7 @@ cX509Cert::~cX509Cert()
 
 int cX509Cert::Parse(const void * a_CertContents, size_t a_Size)
 {
-	return x509_crt_parse(&m_Cert, (const unsigned char *)a_CertContents, a_Size);
+	return x509_crt_parse(&m_Cert, reinterpret_cast<const unsigned char *>(a_CertContents), a_Size);
 }
 
 

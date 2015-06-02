@@ -39,7 +39,7 @@ int cCtrDrbgContext::Initialize(const void * a_Custom, size_t a_CustomSize)
 		return 0;
 	}
 	
-	int res = ctr_drbg_init(&m_CtrDrbg, entropy_func, &(m_EntropyContext->m_Entropy), (const unsigned char *)a_Custom, a_CustomSize);
+	int res = ctr_drbg_init(&m_CtrDrbg, entropy_func, &(m_EntropyContext->m_Entropy), reinterpret_cast<const unsigned char *>(a_Custom), a_CustomSize);
 	m_IsValid = (res == 0);
 	return res;
 }

@@ -64,13 +64,13 @@ cGridStructGen::cGridStructGen(
 		LOG("Grid Size cannot be zero, setting to 1");
 		m_GridSizeZ = 1;
 	}
-	size_t NumStructuresPerQuery = (size_t)(((m_MaxStructureSizeX + m_MaxOffsetX) / m_GridSizeX + 1) * ((m_MaxStructureSizeZ + m_MaxOffsetZ) / m_GridSizeZ + 1));
+	size_t NumStructuresPerQuery = static_cast<size_t>(((m_MaxStructureSizeX + m_MaxOffsetX) / m_GridSizeX + 1) * ((m_MaxStructureSizeZ + m_MaxOffsetZ) / m_GridSizeZ + 1));
 	if (NumStructuresPerQuery > m_MaxCacheSize)
 	{
 		m_MaxCacheSize = NumStructuresPerQuery * 4;
 		LOGINFO(
 			"cGridStructGen: The cache size is too small (%u), increasing the cache size to %u to avoid inefficiency.",
-			(unsigned)a_MaxCacheSize, (unsigned)m_MaxCacheSize
+			static_cast<unsigned>(a_MaxCacheSize), static_cast<unsigned>(m_MaxCacheSize)
 		);
 	}
 }

@@ -92,10 +92,10 @@ public:
 	AString ToString(void) const;
 	
 	/** Returns the level for the specified enchantment; 0 if not stored */
-	int GetLevel(int a_EnchantmentID) const;
+	unsigned int GetLevel(int a_EnchantmentID) const;
 	
 	/** Sets the level for the specified enchantment, adding it if not stored before or removing it if level <= 0 */
-	void SetLevel(int a_EnchantmentID, int a_Level);
+	void SetLevel(int a_EnchantmentID, unsigned int a_Level);
 	
 	/** Removes all enchantments */
 	void Clear(void);
@@ -115,7 +115,7 @@ public:
 	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
 
 	/** Add a enchantment with weight to the vector */
-	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel);
+	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, unsigned int a_EnchantmentLevel);
 	
 	/** Remove the entire enchantment (with weight) from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID);
@@ -145,7 +145,7 @@ public:
 
 protected:
 	/** Maps enchantment ID -> enchantment level */
-	typedef std::map<int, int> cMap;
+	typedef std::map<int, unsigned int> cMap;
 	
 	/** Currently stored enchantments */
 	cMap m_Enchantments;

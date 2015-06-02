@@ -41,7 +41,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = (NIBBLETYPE) a_Player->GetEquippedItem().m_ItemDamage;
+		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player->GetEquippedItem().m_ItemDamage);
 		
 		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
 		switch (a_BlockFace)
@@ -104,7 +104,7 @@ public:
 
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
-		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player->GetEquippedItem().m_ItemType != (short)m_BlockType))
+		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player->GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType)))
 		{
 			return;
 		}

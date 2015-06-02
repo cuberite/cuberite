@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 {
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
- 	{
+	{
 		virtual cChunkData::sChunkSection * Allocate()
 		{
 			return new cChunkData::sChunkSection();
@@ -138,17 +138,7 @@ int main(int argc, char** argv)
 		cChunkData buffer(Pool);
 		buffer.SetBlock(0, 0, 0, 0x42);
 		cChunkData copy(Pool);
-		#if __cplusplus < 201103L
-		copy = buffer;
-		#else
 		copy = std::move(buffer);
-		#endif
-		testassert(copy.GetBlock(0, 0, 0) == 0x42);
-		#if __cplusplus < 201103L
-		copy = copy;
-		#else
-		copy = std::move(copy);
-		#endif
 		testassert(copy.GetBlock(0, 0, 0) == 0x42);
 	}
 	

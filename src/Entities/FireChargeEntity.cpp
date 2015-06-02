@@ -19,11 +19,11 @@ cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, double a_X, double a_Y
 
 
 
-void cFireChargeEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cFireChargeEntity::Explode(Vector3i a_Block)
 {
-	if (m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+	if (m_World->GetBlock(a_Block) == E_BLOCK_AIR)
 	{
-		m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 1);
+		m_World->SetBlock(a_Block.x, a_Block.y, a_Block.z, E_BLOCK_FIRE, 1);
 	}
 }
 
@@ -34,7 +34,7 @@ void cFireChargeEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	Destroy();
-	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+	Explode(a_HitPos.Floor());
 }
 
 
@@ -44,7 +44,7 @@ void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
 	Destroy();
-	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+	Explode(a_HitPos.Floor());
 	
 	// TODO: Some entities are immune to hits
 	a_EntityHit.StartBurning(5 * 20);  // 5 seconds of burning

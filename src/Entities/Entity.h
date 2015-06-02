@@ -205,8 +205,8 @@ public:
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
 	double           GetWidth     (void) const { return m_Width;   }
 	
-	int GetChunkX(void) const {return (int)floor(m_Pos.x / cChunkDef::Width); }
-	int GetChunkZ(void) const {return (int)floor(m_Pos.z / cChunkDef::Width); }
+	int GetChunkX(void) const {return static_cast<int>(floor(m_Pos.x / cChunkDef::Width)); }
+	int GetChunkZ(void) const {return static_cast<int>(floor(m_Pos.z / cChunkDef::Width)); }
 
 	void SetHeadYaw (double a_HeadYaw);
 	void SetHeight  (double a_Height);

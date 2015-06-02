@@ -158,7 +158,7 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 				return false;
 			}
 			result *= 10;
-			T digit = a_str[i] - '0';
+			T digit = static_cast<T>(a_str[i] - '0');
 			if (std::numeric_limits<T>::max() - digit < result)
 			{
 				return false;
@@ -168,6 +168,12 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 	}
 	else
 	{
+		// Unsigned result cannot be signed!
+		if (!std::numeric_limits<T>::is_signed)
+		{
+			return false;
+		}
+
 		for (size_t size = a_str.size(); i < size; i++)
 		{
 			if ((a_str[i] < '0') || (a_str[i] > '9'))
@@ -179,7 +185,7 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 				return false;
 			}
 			result *= 10;
-			T digit = a_str[i] - '0';
+			T digit = static_cast<T>(a_str[i] - '0');
 			if (std::numeric_limits<T>::min() + digit > result)
 			{
 				return false;

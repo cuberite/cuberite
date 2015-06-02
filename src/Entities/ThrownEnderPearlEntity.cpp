@@ -77,9 +77,9 @@ void cThrownEnderPearlEntity::TeleportCreator(const Vector3d & a_HitPos)
 	class cProjectileCreatorCallbackForPlayers : public cPlayerListCallback
 	{
 	public:
-		cProjectileCreatorCallbackForPlayers(cEntity * a_Attacker, Vector3i a_HitPos) :
+		cProjectileCreatorCallbackForPlayers(cEntity * a_Attacker, Vector3i a_CallbackHitPos) :
 			m_Attacker(a_Attacker),
-			m_HitPos(a_HitPos)
+			m_HitPos(a_CallbackHitPos)
 		{
 		}
 

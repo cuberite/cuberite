@@ -19,9 +19,9 @@ cGhastFireballEntity::cGhastFireballEntity(cEntity * a_Creator, double a_X, doub
 
 
 
-void cGhastFireballEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cGhastFireballEntity::Explode(Vector3i a_Block)
 {
-	m_World->DoExplosionAt(1, a_BlockX, a_BlockY, a_BlockZ, true, esGhastFireball, this);
+	m_World->DoExplosionAt(1, a_Block.x, a_Block.y, a_Block.z, true, esGhastFireball, this);
 }
 
 
@@ -31,7 +31,7 @@ void cGhastFireballEntity::Explode(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cGhastFireballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	Destroy();
-	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+	Explode(a_HitPos.Floor());
 }
 
 
@@ -41,5 +41,5 @@ void cGhastFireballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace
 void cGhastFireballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
 	Destroy();
-	Explode((int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z));
+	Explode(a_HitPos.Floor());
 }

@@ -36,7 +36,7 @@ public:
 		int BlockY = 64;
 		
 		// Generate pieces:
-		for (int i = 0; m_Pieces.size() < (size_t)(a_MaxDepth * a_MaxDepth / 8 + a_MaxDepth); i++)
+		for (int i = 0; m_Pieces.size() < static_cast<size_t>(a_MaxDepth * a_MaxDepth / 8 + a_MaxDepth); i++)
 		{
 			cBFSPieceGenerator pg(cNetherFortGen::m_PiecePool, a_Seed + i);
 			pg.PlacePieces(a_OriginX, BlockY, a_OriginZ, a_MaxDepth, m_Pieces);
@@ -55,7 +55,7 @@ public:
 	{
 		for (cPlacedPieces::const_iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
-			const cPrefab & Prefab = (const cPrefab &)((*itr)->GetPiece());
+			const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
 			Prefab.Draw(a_Chunk, *itr);
 		}  // for itr - m_PlacedPieces[]
 	}

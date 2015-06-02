@@ -19,7 +19,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	{
 		if (a_Info[i].m_Handler == nullptr)
 		{
-			a_Info[i].m_Handler = cBlockHandler::CreateBlockHandler((BLOCKTYPE) i);
+			a_Info[i].m_Handler = cBlockHandler::CreateBlockHandler(static_cast<BLOCKTYPE>(i));
 		}
 	}
 

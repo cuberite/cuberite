@@ -57,8 +57,17 @@ public:
 			case BLOCK_FACE_ZP: return 0x3;
 			case BLOCK_FACE_XM: return 0x4;
 			case BLOCK_FACE_XP: return 0x5;
-			default:            return 0x2;
+			case BLOCK_FACE_NONE:
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			{
+				return 0x2;
+			}
 		}
+		#if !defined(__clang__)
+			ASSERT(!"Unknown BLOCK_FACE");
+			return 0;
+		#endif
 	}
 
 

@@ -72,7 +72,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			for (int y = cChunkDef::Height - 1; y >= 0; y--)
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; y >= 0; y--)
 			{
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
 				{
@@ -304,14 +304,14 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 	
 	for (int i = 0; i < a_NumNests; i++)
 	{
-		int rnd = m_Noise.IntNoise3DInt(a_ChunkX + i, a_Seq, a_ChunkZ + 64 * i) / 8;
-		int BaseX = rnd % cChunkDef::Width;
-		rnd /= cChunkDef::Width;
-		int BaseZ = rnd % cChunkDef::Width;
-		rnd /= cChunkDef::Width;
-		int BaseY = rnd % a_MaxHeight;
-		rnd /= a_MaxHeight;
-		int NestSize = a_NestSize + (rnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
+		int Nestrnd = m_Noise.IntNoise3DInt(a_ChunkX + i, a_Seq, a_ChunkZ + 64 * i) / 8;
+		int BaseX = Nestrnd % cChunkDef::Width;
+		Nestrnd /= cChunkDef::Width;
+		int BaseZ = Nestrnd % cChunkDef::Width;
+		Nestrnd /= cChunkDef::Width;
+		int BaseY = Nestrnd % a_MaxHeight;
+		Nestrnd /= a_MaxHeight;
+		int NestSize = a_NestSize + (Nestrnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
 		int Num = 0;
 		while (Num < NestSize)
 		{
@@ -436,14 +436,14 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 	BLOCKTYPE * BlockTypes = a_Lake.GetBlockTypes();
 	for (int i = 0; i < NumBubbles; i++)
 	{
-		int Rnd = m_Noise.IntNoise3DInt(a_ChunkX, i, a_ChunkZ) / 13;
-		const int BubbleR = 2 + (Rnd & 0x03);  // 2 .. 5
+		int BubbleRnd = m_Noise.IntNoise3DInt(a_ChunkX, i, a_ChunkZ) / 13;
+		const int BubbleR = 2 + (BubbleRnd & 0x03);  // 2 .. 5
 		const int Range = 16 - 2 * BubbleR;
-		const int BubbleX = BubbleR + (Rnd % Range);
+		const int BubbleX = BubbleR + (BubbleRnd % Range);
 		Rnd >>= 4;
-		const int BubbleY = 4 + (Rnd & 0x01);  // 4 .. 5
+		const int BubbleY = 4 + (BubbleRnd & 0x01);  // 4 .. 5
 		Rnd >>= 1;
-		const int BubbleZ = BubbleR + (Rnd % Range);
+		const int BubbleZ = BubbleR + (BubbleRnd % Range);
 		const int HalfR = BubbleR / 2;  // 1 .. 2
 		const int RSquared = BubbleR * BubbleR;
 		for (int y = -HalfR; y <= HalfR; y++)

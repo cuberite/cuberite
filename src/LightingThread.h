@@ -61,7 +61,7 @@ public:
 	void Stop(void);
 	
 	/** Queues the entire chunk for lighting */
-	void QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter = nullptr);
+	void QueueChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter);
 	
 	/** Blocks until the queue is empty or the thread is terminated */
 	void WaitForQueueEmpty(void);
@@ -77,9 +77,9 @@ protected:
 		cLightingThread & m_LightingThread;
 		int m_ChunkX;
 		int m_ChunkZ;
-		cChunkCoordCallback * m_CallbackAfter;
+		std::unique_ptr<cChunkCoordCallback> m_CallbackAfter;
 		
-		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter);
+		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter);
 		
 	protected:
 		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override

@@ -542,7 +542,7 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 {
 	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
 	BoundingBox.p2.y += 3;
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + static_cast<int>(a_ParentSystem.m_MineShafts.size()), a_PivotZ) / 7;
 	int NumSegments = 2 + (rnd) % (MAX_SEGMENTS - 1);  // 2 .. MAX_SEGMENTS
 	switch (a_Direction)
 	{
@@ -564,14 +564,14 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 
 void cMineShaftCorridor::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 {
-	int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 7;
+	int Outerrnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 7;
 	// Prefer the same height, but allow for up to one block height displacement:
-	int Height = m_BoundingBox.p1.y + ((rnd % 4) + ((rnd >> 3) % 3)) / 2;
+	int OuterHeight = m_BoundingBox.p1.y + ((Outerrnd % 4) + ((Outerrnd >> 3) % 3)) / 2;
 	switch (m_Direction)
 	{
 		case dirXM:
 		{
-			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x - 1, Height, m_BoundingBox.p1.z + 1, dirXM, a_Noise, a_RecursionLevel);
+			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x - 1, OuterHeight, m_BoundingBox.p1.z + 1, dirXM, a_Noise, a_RecursionLevel);
 			for (int i = m_NumSegments; i >= 0; i--)
 			{
 				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
@@ -586,7 +586,7 @@ void cMineShaftCorridor::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 
 		case dirXP:
 		{
-			m_ParentSystem.AppendBranch(m_BoundingBox.p2.x + 1, Height, m_BoundingBox.p1.z + 1, dirXP, a_Noise, a_RecursionLevel);
+			m_ParentSystem.AppendBranch(m_BoundingBox.p2.x + 1, OuterHeight, m_BoundingBox.p1.z + 1, dirXP, a_Noise, a_RecursionLevel);
 			for (int i = m_NumSegments; i >= 0; i--)
 			{
 				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
@@ -601,7 +601,7 @@ void cMineShaftCorridor::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 
 		case dirZM:
 		{
-			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, Height, m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel);
+			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, OuterHeight, m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel);
 			for (int i = m_NumSegments; i >= 0; i--)
 			{
 				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
@@ -616,7 +616,7 @@ void cMineShaftCorridor::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 
 		case dirZP:
 		{
-			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, Height, m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel);
+			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, OuterHeight, m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel);
 			for (int i = m_NumSegments; i >= 0; i--)
 			{
 				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
@@ -781,13 +781,19 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 
 		case dirZM:
 		case dirZP:
-		default:
 		{
 			x = m_BoundingBox.p1.x - BlockX;
 			z = m_BoundingBox.p1.z + m_ChestPosition - BlockZ;
 			Meta = E_META_CHEST_FACING_XP;
 			break;
 		}
+		#if !defined(__clang__)
+		default:
+		{
+			ASSERT(!"Unknown direction");
+			return;
+		}
+		#endif
 	}  // switch (Dir)
 
 	if (
@@ -796,7 +802,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 	)
 	{
 		a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p1.y + 1, z, E_BLOCK_CHEST, Meta);
-		cChestEntity * ChestEntity = (cChestEntity *)a_ChunkDesc.GetBlockEntity(x, m_BoundingBox.p1.y + 1, z);
+		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(x, m_BoundingBox.p1.y + 1, z));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
@@ -986,7 +992,7 @@ cMineShaft * cMineShaftCrossing::CreateAndFit(
 )
 {
 	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + static_cast<int>(a_ParentSystem.m_MineShafts.size()), a_PivotZ) / 7;
 	BoundingBox.p2.y += 3;
 	if ((rnd % 4) < 2)
 	{
@@ -1127,7 +1133,7 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 	cNoise & a_Noise
 )
 {
-	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + (int)a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + static_cast<int>(a_ParentSystem.m_MineShafts.size()), a_PivotZ) / 7;
 	cCuboid Box;
 	switch (a_Direction)
 	{

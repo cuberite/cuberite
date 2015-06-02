@@ -33,15 +33,17 @@ function HandleDumpPluginRequest(a_Request)
 	</tr>]]
 
 	-- Loop through each plugin that is found.
-	for PluginName, k in pairs(cPluginManager:Get():GetAllPlugins()) do
-		-- Check if there is a file called 'Info.lua' or 'info.lua'
-		if (cFile:Exists("Plugins/" .. PluginName .. "/Info.lua")) then
-			Content = Content .. "\n<tr>\n"
-			Content = Content .. "\t<td>" .. PluginName .. "</td>\n"
-			Content = Content .. "\t<td><form method='POST'> <input type='hidden' value='" .. PluginName .. "' name='DumpInfo'> <input type='submit' value='DumpInfo'></form></td>\n"
-			Content = Content .. "</tr>\n"
+	cPluginManager:Get():ForEachPlugin(
+		function(a_Plugin)
+			-- Check if there is a file called 'Info.lua'
+			if (cFile:Exists("Plugins/" .. a_Plugin:GetName() .. "/Info.lua")) then
+				Content = Content .. "\n<tr>\n"
+				Content = Content .. "\t<td>" .. a_Plugin:GetName() .. "</td>\n"
+				Content = Content .. "\t<td><form method='POST'> <input type='hidden' value='" .. a_Plugin:GetName() .. "' name='DumpInfo'> <input type='submit' value='DumpInfo'></form></td>\n"
+				Content = Content .. "</tr>\n"
+			end
 		end
-	end
+	)
 	
 	Content = Content .. [[
 </table>]]

@@ -80,6 +80,13 @@ public:
 			return false;
 		}
 		
+		// Check to see if destination block is too far away
+		// Reach Distance Multiplayer = 5 Blocks
+		if ((BlockPos.x - a_Player->GetPosX() > 5) || (BlockPos.z - a_Player->GetPosZ() > 5))
+		{
+			return false;
+		}
+
 		// Remove water / lava block (unless plugins disagree)
 		if (!a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0))
 		{
@@ -96,7 +103,7 @@ public:
 				ASSERT(!"Inventory bucket mismatch");
 				return true;
 			}
-			if (a_Player->GetInventory().AddItem(cItem(NewItem), true, true) != 1)
+			if (a_Player->GetInventory().AddItem(cItem(NewItem)) != 1)
 			{
 				// The bucket didn't fit, toss it as a pickup:
 				a_Player->TossPickup(cItem(NewItem));
@@ -126,6 +133,13 @@ public:
 		{
 			return false;
 		}
+
+		// Check to see if destination block is too far away
+		// Reach Distance Multiplayer = 5 Blocks
+		if ((BlockPos.x - a_Player->GetPosX() > 5) || (BlockPos.z - a_Player->GetPosZ() > 5))
+		{
+			return false;
+		}
 		
 		if (a_Player->GetGameMode() != gmCreative)
 		{
@@ -137,7 +151,7 @@ public:
 				return false;
 			}
 			cItem Item(E_ITEM_BUCKET, 1);
-			if (!a_Player->GetInventory().AddItem(Item, true, true))
+			if (!a_Player->GetInventory().AddItem(Item))
 			{
 				return false;
 			}
@@ -236,7 +250,7 @@ public:
 					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
 					if (!cFluidSimulator::CanWashAway(a_CBBlockType) && !IsBlockLiquid(a_CBBlockType))
 					{
-						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, (eBlockFace)a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
+						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, static_cast<eBlockFace>(a_CBEntryFace));  // Was an unwashawayable block, can't overwrite it!
 					}
 					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);  // (Block could be washed away, replace it)
 					return true;  // Abort tracing

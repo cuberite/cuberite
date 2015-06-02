@@ -4,6 +4,9 @@
 // Implements the cCompoGenBiomal class representing the biome-aware composition generator
 
 #include "Globals.h"
+
+#include "CompoGenBiomal.h"
+
 #include "ComposableGenerator.h"
 #include "../IniFile.h"
 #include "../Noise/Noise.h"
@@ -192,7 +195,7 @@ public:
 	
 protected:
 	/** The block height at which water is generated instead of air. */
-	int m_SeaLevel;
+	HEIGHTTYPE m_SeaLevel;
 
 	/** The pattern used for mesa biomes. Initialized by seed on generator creation. */
 	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::Height];
@@ -221,7 +224,7 @@ protected:
 
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) override
 	{
-		m_SeaLevel = a_IniFile.GetValueSetI("Generator", "SeaLevel", m_SeaLevel);
+		m_SeaLevel = static_cast<HEIGHTTYPE>(a_IniFile.GetValueSetI("Generator", "SeaLevel", m_SeaLevel));
 	}
 	
 
@@ -231,7 +234,7 @@ protected:
 	{
 		// In a loop, choose whether to use one, two or three layers of stained clay, then choose a color and width for each layer
 		// Separate each group with another layer of hardened clay
-		cNoise patternNoise((unsigned)a_Seed);
+		cNoise patternNoise(a_Seed);
 		static NIBBLETYPE allowedColors[] =
 		{
 			E_META_STAINED_CLAY_YELLOW,
@@ -265,8 +268,8 @@ protected:
 			rnd /= 2;
 			for (int lay = 0; lay < numLayers; lay++)
 			{
-				int numBlocks = layerSizes[(rnd % ARRAYCOUNT(layerSizes))];
-				NIBBLETYPE Color = allowedColors[(rnd / 4) % ARRAYCOUNT(allowedColors)];
+				int numBlocks = layerSizes[(static_cast<size_t>(rnd) % ARRAYCOUNT(layerSizes))];
+				NIBBLETYPE Color = allowedColors[static_cast<size_t>(rnd / 4) % ARRAYCOUNT(allowedColors)];
 				if (
 					((numBlocks == 3) && (numLayers == 2)) ||  // In two-layer mode disallow the 3-high layers:
 					(Color == E_META_STAINED_CLAY_WHITE))      // White stained clay can ever be only 1 block high
@@ -411,7 +414,12 @@ protected:
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
 				return;
 			}
-			default:
+			case biInvalidBiome:
+			case biHell:
+			case biSky:
+			case biNumBiomes:
+			case biVariant:
+			case biNumVariantBiomes:
 			{
 				ASSERT(!"Unhandled biome");
 				return;
@@ -427,7 +435,7 @@ protected:
 	{
 		bool HasHadWater = false;
 		int PatternIdx = 0;
-		int top = std::max(m_SeaLevel, a_ChunkDesc.GetHeight(a_RelX, a_RelZ));
+		HEIGHTTYPE top = std::max(m_SeaLevel, a_ChunkDesc.GetHeight(a_RelX, a_RelZ));
 		for (int y = top; y > 0; y--)
 		{
 			if (a_ShapeColumn[y] > 0)

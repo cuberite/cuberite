@@ -16,6 +16,7 @@ public:
 	{
 	}
 
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -29,6 +30,7 @@ public:
 		return true;
 	}
 
+
 	inline static NIBBLETYPE DirectionToMetadata(eBlockFace a_Direction)
 	{
 		switch (a_Direction)
@@ -37,9 +39,20 @@ public:
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_ZM: return 0x2;
 			case BLOCK_FACE_ZP: return 0x0;
-			default: ASSERT(!"Unhandled tripwire hook direction!"); return 0x0;
+			case BLOCK_FACE_NONE:
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			{
+				ASSERT(!"Unhandled tripwire hook direction!");
+				return 0x0;
+			}
 		}
+		#if !defined(__clang__)
+			ASSERT(!"Unknown BLOCK_FACE");
+			return 0;
+		#endif
 	}
+
 
 	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)
 	{
@@ -52,6 +65,7 @@ public:
 			default: ASSERT(!"Unhandled tripwire hook metadata!"); return BLOCK_FACE_NONE;
 		}
 	}
+
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{

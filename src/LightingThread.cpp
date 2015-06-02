@@ -43,8 +43,8 @@ class cReader :
 	{
 		// Copy the entire heightmap, distribute it into the 3x3 chunk blob:
 		typedef struct {HEIGHTTYPE m_Row[16]; } ROW;
-		ROW * InputRows  = (ROW *)a_Heightmap;
-		ROW * OutputRows = (ROW *)m_HeightMap;
+		const ROW * InputRows  = reinterpret_cast<const ROW *>(a_Heightmap);
+		ROW * OutputRows = reinterpret_cast<ROW *>(m_HeightMap);
 		int InputIdx = 0;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
 		for (int z = 0; z < cChunkDef::Width; z++)
@@ -149,11 +149,11 @@ void cLightingThread::Stop(void)
 
 
 
-void cLightingThread::QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter)
+void cLightingThread::QueueChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter)
 {
 	ASSERT(m_World != nullptr);  // Did you call Start() properly?
 	
-	cChunkStay * ChunkStay = new cLightingChunkStay(*this, a_ChunkX, a_ChunkZ, a_CallbackAfter);
+	cChunkStay * ChunkStay = new cLightingChunkStay(*this, a_ChunkX, a_ChunkZ, std::move(a_CallbackAfter));
 	{
 		// The ChunkStay will enqueue itself using the QueueChunkStay() once it is fully loaded
 		// In the meantime, put it into the PendingQueue so that it can be removed when stopping the thread
@@ -217,7 +217,7 @@ void cLightingThread::Execute(void)
 			{
 				continue;
 			}
-			Item = (cLightingChunkStay *)m_Queue.front();
+			Item = static_cast<cLightingChunkStay *>(m_Queue.front());
 			m_Queue.pop_front();
 			if (m_Queue.empty())
 			{
@@ -599,11 +599,11 @@ void cLightingThread::QueueChunkStay(cLightingChunkStay & a_ChunkStay)
 ////////////////////////////////////////////////////////////////////////////////
 // cLightingThread::cLightingChunkStay:
 
-cLightingThread::cLightingChunkStay::cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter) :
+cLightingThread::cLightingChunkStay::cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter) :
 	m_LightingThread(a_LightingThread),
 	m_ChunkX(a_ChunkX),
 	m_ChunkZ(a_ChunkZ),
-	m_CallbackAfter(a_CallbackAfter)
+	m_CallbackAfter(std::move(a_CallbackAfter))
 {
 	Add(a_ChunkX + 1, a_ChunkZ + 1);
 	Add(a_ChunkX + 1, a_ChunkZ);

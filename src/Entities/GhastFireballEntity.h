@@ -32,7 +32,7 @@ public:
 	
 protected:
 	
-	void Explode(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void Explode(Vector3i a_Block);
 	
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;

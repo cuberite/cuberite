@@ -130,7 +130,7 @@ inline void PushSomeColumns(int a_BlockX, int a_Height, int a_BlockZ, int a_Colu
 	{
 		int x = a_BlockX + a_Coords[i].x;
 		int z = a_BlockZ + a_Coords[i].z;
-		if (a_Noise.IntNoise3DInt(x + 64 * a_Seq, a_Height + (int)i, z + 64 * a_Seq) <= a_Chance)
+		if (a_Noise.IntNoise3DInt(x + 64 * a_Seq, a_Height + static_cast<int>(i), z + 64 * a_Seq) <= a_Chance)
 		{
 			for (int j = 0; j < a_ColumnHeight; j++)
 			{
@@ -321,12 +321,12 @@ void GetSmallAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 	
 	int Random = a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) >> 3;
 	
-	int Heights[] = {1, 2, 2, 3} ;
-	int Height = 1 + Heights[Random & 3];
+	HEIGHTTYPE Heights[] = {1, 2, 2, 3} ;
+	HEIGHTTYPE Height = 1 + Heights[Random & 3];
 	Random >>= 2;
 	
 	// Pre-alloc so that we don't realloc too often later:
-	a_LogBlocks.reserve(Height + 5);
+	a_LogBlocks.reserve(static_cast<size_t>(Height + 5));
 	a_OtherBlocks.reserve(ARRAYCOUNT(BigO2) * 2 + ARRAYCOUNT(BigO1) + ARRAYCOUNT(Corners) * 3 + 3 + 5);
 	
 	// Trunk:
@@ -396,8 +396,8 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 	for (int i = 4; i < Height; i++)
 	{
 		// Get a direction for the trunk to go to.
-		Vector3d BranchStartDirection = AvailableDirections[a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ) % ARRAYCOUNT(AvailableDirections)];
-		Vector3d BranchDirection = AvailableDirections[a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ) % ARRAYCOUNT(AvailableDirections)] / 3;
+		Vector3d BranchStartDirection = AvailableDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ)) % ARRAYCOUNT(AvailableDirections)];
+		Vector3d BranchDirection = AvailableDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ)) % ARRAYCOUNT(AvailableDirections)] / 3;
 
 		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq, a_BlockZ * a_Seq) % 3;
 		GetLargeAppleTreeBranch(a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_Noise, a_LogBlocks);
@@ -476,10 +476,10 @@ NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction)
 
 void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	int Height = 5 + (a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) % 3);
+	HEIGHTTYPE Height = 5 + (a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) % 3);
 	
 	// Prealloc, so that we don't realloc too often later:
-	a_LogBlocks.reserve(Height);
+	a_LogBlocks.reserve(static_cast<size_t>(Height));
 	a_OtherBlocks.reserve(80);
 	
 	// The entire trunk, out of logs:
@@ -650,10 +650,10 @@ void GetDarkoakTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 
 void GetTallBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	int Height = 9 + (a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) % 3);
+	HEIGHTTYPE Height = 9 + (a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) % 3);
 	
 	// Prealloc, so that we don't realloc too often later:
-	a_LogBlocks.reserve(Height);
+	a_LogBlocks.reserve(static_cast<size_t>(Height));
 	a_OtherBlocks.reserve(80);
 	
 	// The entire trunk, out of logs:
@@ -713,12 +713,12 @@ void GetSpruceTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 	// (each of the mod8 remainders has a very different chance of occurrence) - that's why we divide by 8
 	int MyRandom = a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY + 32 * a_Seq, a_BlockZ) / 8;
 	
-	static const int  sHeights[] = {1, 2, 2, 3};
-	int Height = sHeights[MyRandom & 3];
+	static const HEIGHTTYPE  sHeights[] = {1, 2, 2, 3};
+	HEIGHTTYPE Height = sHeights[MyRandom & 3];
 	MyRandom >>= 2;
 
 	// Prealloc, so that we don't realloc too often later:
-	a_LogBlocks.reserve(Height);
+	a_LogBlocks.reserve(static_cast<size_t>(Height));
 	a_OtherBlocks.reserve(180);
 	
 	// Clear trunk blocks:
@@ -816,8 +816,8 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 	}
 	
 	// Pre-allocate the vector:
-	a_LogBlocks.reserve(TrunkHeight);
-	a_OtherBlocks.reserve(NumLeavesLayers * 25);
+	a_LogBlocks.reserve(static_cast<size_t>(TrunkHeight));
+	a_OtherBlocks.reserve(static_cast<size_t>(NumLeavesLayers * 25));
 
 	// The entire trunk, out of logs:
 	for (int i = TrunkHeight; i >= 0; --i)
@@ -843,7 +843,7 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 		{
 			break;
 		}
-		ASSERT((size_t)LayerSize < ARRAYCOUNT(BigOs));
+		ASSERT(static_cast<size_t>(LayerSize) < ARRAYCOUNT(BigOs));
 		PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigOs[LayerSize].Coords, BigOs[LayerSize].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 		h--;
 	}
@@ -866,8 +866,8 @@ void GetSwampTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 
 	int Height = 3 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 8) % 3;
 	
-	a_LogBlocks.reserve(Height);
-	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO2) + 2 * ARRAYCOUNT(BigO3) + Height * ARRAYCOUNT(Vines) + 20);
+	a_LogBlocks.reserve(static_cast<size_t>(Height));
+	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO2) + 2 * ARRAYCOUNT(BigO3) + static_cast<size_t>(Height) * ARRAYCOUNT(Vines) + 20);
 	
 	for (int i = 0; i < Height; i++)
 	{
@@ -952,8 +952,8 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 	
 	int Height = 24 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 11) % 24;
 	
-	a_LogBlocks.reserve(Height * 4);
-	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO4) + ARRAYCOUNT(BigO3) + Height * ARRAYCOUNT(Vines) + 50);
+	a_LogBlocks.reserve(static_cast<size_t>(Height) * 4);
+	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO4) + ARRAYCOUNT(BigO3) + static_cast<size_t>(Height) * ARRAYCOUNT(Vines) + 50);
 	
 	for (int i = 0; i < Height; i++)
 	{
@@ -999,12 +999,12 @@ void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 
 	int Height = 7 + (a_Noise.IntNoise3DInt(a_BlockX + 5 * a_Seq, a_BlockY, a_BlockZ + 5 * a_Seq) / 5) % 3;
 	
-	a_LogBlocks.reserve(Height);
+	a_LogBlocks.reserve(static_cast<size_t>(Height));
 	a_OtherBlocks.reserve(
 		2 * ARRAYCOUNT(BigO3) +       // O3 layer, 2x
 		2 * ARRAYCOUNT(BigO2) +       // O2 layer, 2x
 		ARRAYCOUNT(BigO1) + 1 +       // Plus on the top
-		Height * ARRAYCOUNT(Vines) +  // Vines
+		static_cast<size_t>(Height) * ARRAYCOUNT(Vines) +  // Vines
 		50  // some safety
 	);
 	

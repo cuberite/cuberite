@@ -185,7 +185,7 @@ StatValue cStatManager::AddValue(const eStatistic a_Stat, const StatValue a_Delt
 
 void cStatManager::Reset(void)
 {
-	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
+	for (unsigned int i = 0; i < static_cast<unsigned int>(statCount); ++i)
 	{
 		m_MainStats[i] = 0;
 	}

@@ -75,10 +75,10 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 	{
 		return;
 	}
-	a_Duration = (int)(a_Duration * a_DistanceModifier);
+	a_Duration = static_cast<int>(a_Duration * a_DistanceModifier);
 	
 	m_EntityEffects[a_EffectType] = cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier);
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, a_Duration);
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, static_cast<short>(a_Duration));
 	m_EntityEffects[a_EffectType]->OnActivate(*this);
 }
 

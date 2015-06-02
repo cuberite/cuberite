@@ -26,42 +26,42 @@ class cPlayer :
 	public cPawn
 {
 	typedef cPawn super;
-	
+
 public:
 	static const int MAX_HEALTH;
-	
+
 	static const int MAX_FOOD_LEVEL;
-	
+
 	/** Number of ticks it takes to eat an item */
 	static const int EATING_TICKS;
-	
+
 	// tolua_end
-	
+
 	CLASS_PROTODEF(cPlayer)
-	
+
 
 	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
-	
+
 	virtual ~cPlayer();
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
-	
+
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the curently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
-	
+
 	/** Returns the currently equipped helmet; empty item if none */
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
-	
+
 	/** Returns the currently equipped chestplate; empty item if none */
 	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
 
 	/** Returns the currently equipped leggings; empty item if none */
 	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
-	
+
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
@@ -104,16 +104,16 @@ public:
 	static int CalcLevelFromXp(int a_CurrentXp);
 
 	// tolua_end
-	
+
 	/** Starts charging the equipped bow */
 	void StartChargingBow(void);
-	
+
 	/** Finishes charging the current bow. Returns the number of ticks for which the bow has been charged */
 	int FinishChargingBow(void);
-	
+
 	/** Cancels the current bow charging */
 	void CancelChargingBow(void);
-	
+
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
@@ -128,7 +128,7 @@ public:
 
 	/** Gets the contents of the player's associated enderchest */
 	cItemGrid & GetEnderChestContents(void) { return m_EnderChestContents; }
-	
+
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
 	/** Returns whether the player is climbing (ladders, vines etc.) */
@@ -137,43 +137,49 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
 	// tolua_begin
-	
+
 	/** Sends the "look" packet to the player, forcing them to set their rotation to the specified values.
 	a_YawDegrees is clipped to range [-180, +180),
 	a_PitchDegrees is clipped to range [-180, +180) but the client only uses [-90, +90]
 	*/
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
-	
+
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
-	
+
 	/** Returns the initial speed vector of a throw, with a 3D length of a_SpeedCoeff. */
 	Vector3d GetThrowSpeed(double a_SpeedCoeff) const;
-	
+
 	/** Returns the current gamemode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable */
 	eGameMode GetGameMode(void) const { return m_GameMode; }
-	
+
 	/** Returns the current effective gamemode (inherited gamemode is resolved before returning) */
 	eGameMode GetEffectiveGameMode(void) const { return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode; }
-	
+
 	/** Sets the gamemode for the player.
 	The gamemode may be gmNotSet, in that case the player inherits the world's gamemode.
 	Updates the gamemode on the client (sends the packet)
 	*/
 	void SetGameMode(eGameMode a_GameMode);
 
+	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
+	void LoginSetGameMode(eGameMode a_GameMode);
+
+	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
+	void SetCapabilities();
+
 	/** Returns true if the player is in Creative mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeCreative(void) const;
-	
+
 	/** Returns true if the player is in Survival mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeSurvival(void) const;
-	
+
 	/** Returns true if the player is in Adventure mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeAdventure(void) const;
-	
+
 	/** Returns true if the player is in Spectator mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeSpectator(void) const;
-	
+
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
 	/** Returns the associated team, nullptr if none */
@@ -195,11 +201,8 @@ public:
 	If the achievement has been already awarded to the player, this method will just increment the stat counter.
 	Returns the _new_ stat value. (0 = Could not award achievement) */
 	unsigned int AwardAchievement(const eStatistic a_Ach);
-	
+
 	void SetIP(const AString & a_IP);
-	
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
 
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
@@ -210,15 +213,15 @@ public:
 
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
-	
+
 	/** Opens the specified window; closes the current one first using CloseWindow() */
 	void OpenWindow(cWindow * a_Window);  // Exported in ManualBindings.cpp
-	
+
 	// tolua_begin
-	
+
 	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true */
 	void CloseWindow(bool a_CanRefuse = true);
-	
+
 	/** Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow */
 	void CloseWindowIfID(char a_WindowID, bool a_CanRefuse = true);
 
@@ -243,7 +246,7 @@ public:
 
 	const AString & GetName(void) const { return m_PlayerName; }
 	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }
-	
+
 	// tolua_end
 
 	bool HasPermission(const AString & a_Permission);  // tolua_export
@@ -260,7 +263,7 @@ public:
 	const AStringVector & GetRestrictions(void) const { return m_Restrictions; }  // Exported in ManualBindings.cpp
 
 	// tolua_begin
-	
+
 	/** Returns the full color code to use for this player, based on their rank.
 	The returned value either is empty, or includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
@@ -279,15 +282,15 @@ public:
 
 	/** Heals the player by the specified amount of HPs (positive only); sends health update */
 	virtual void Heal(int a_Health) override;
-	
+
 	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
 	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
 	int    GetFoodTickTimer             (void) const { return m_FoodTickTimer; }
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
-	
+
 	/** Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore */
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
-	
+
 	void SetFoodLevel                 (int a_FoodLevel);
 	void SetFoodSaturationLevel       (double a_FoodSaturationLevel);
 	void SetFoodTickTimer             (int a_FoodTickTimer);
@@ -298,10 +301,10 @@ public:
 
 	/** Adds the specified exhaustion to m_FoodExhaustion. Expects only positive values. */
 	void AddFoodExhaustion(double a_Exhaustion);
-	
+
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
 	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
-	
+
 	/** Returns true if the player is currently flying. */
 	bool IsFlying(void) const { return m_IsFlying; }
 
@@ -329,16 +332,16 @@ public:
 			GetWorld()->BroadcastEntityAnimation(*this, 2);
 		}
 	}
-	
+
 	/** Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet */
 	void StartEating(void);
-	
+
 	/** Finishes eating the currently equipped item. Consumes the item, updates health and broadcasts the packets */
 	void FinishEating(void);
-	
+
 	/** Aborts the current eating operation */
 	void AbortEating(void);
-	
+
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual void Killed(cEntity * a_Victim) override;
@@ -356,69 +359,69 @@ public:
 	bool SaveToDisk(void);
 
 	typedef cWorld * cWorldPtr;
-	
+
 	/** Loads the player data from the disk file
 	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile()
 	Returns true on success, false on failure
 	*/
 	bool LoadFromDisk(cWorldPtr & a_World);
-	
+
 	/** Loads the player data from the specified file
 	Sets a_World to the world where the player will spawn, based on the stored world name or the default world
 	Returns true on success, false on failure
 	*/
 	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
-	
+
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
 	void UseEquippedItem(int a_Amount = 1);
-	
+
 	void SendHealth(void);
 
 	void SendExperience(void);
-	
+
 	/** In UI windows, get the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }
-	
+
 	// In UI windows, when inventory-painting:
 	/** Clears the list of slots that are being inventory-painted. To be used by cWindow only */
 	void ClearInventoryPaintSlots(void);
-	
+
 	/** Adds a slot to the list for inventory painting. To be used by cWindow only */
 	void AddInventoryPaintSlot(int a_SlotNum);
-	
+
 	/** Returns the list of slots currently stored for inventory painting. To be used by cWindow only */
 	const cSlotNums & GetInventoryPaintSlots(void) const;
-	
+
 	// tolua_begin
-	
+
 	/** Returns the current relative maximum speed (takes current sprinting / flying state into account) */
 	double GetMaxSpeed(void) const;
-	
+
 	/** Gets the normal relative maximum speed */
 	double GetNormalMaxSpeed(void) const { return m_NormalMaxSpeed; }
-	
+
 	/** Gets the sprinting relative maximum speed */
 	double GetSprintingMaxSpeed(void) const { return m_SprintingMaxSpeed; }
-	
+
 	/** Gets the flying relative maximum speed */
 	double GetFlyingMaxSpeed(void) const { return m_FlyingMaxSpeed; }
-	
+
 	/** Sets the normal relative maximum speed. Sends the update to player, if needed. */
 	void SetNormalMaxSpeed(double a_Speed);
-	
+
 	/** Sets the sprinting relative maximum speed. Sends the update to player, if needed. */
 	void SetSprintingMaxSpeed(double a_Speed);
-	
+
 	/** Sets the flying relative maximum speed. Sends the update to player, if needed. */
 	void SetFlyingMaxSpeed(double a_Speed);
-	
+
 	/** Sets the crouch status, broadcasts to all visible players */
 	void SetCrouch(bool a_IsCrouched);
-	
+
 	/** Starts or stops sprinting, sends the max speed update to the client, if needed */
 	void SetSprint(bool a_IsSprinting);
-	
+
 	/** Flags the player as flying */
 	void SetFlying(bool a_IsFlying);
 
@@ -442,17 +445,17 @@ public:
 
 	/** Sets the player's bed (home) position */
 	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
-	
+
 	// tolua_end
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos);
-	
+
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
-	
+
 	/** Returns the UUID (short format) that has been read from the client, or empty string if not available. */
 	const AString & GetUUID(void) const { return m_UUID; }
 
@@ -492,7 +495,7 @@ public:
 	/** Called by cClientHandle when the client is being destroyed.
 	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
 	void RemoveClientHandle(void);
-	
+
 protected:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
@@ -535,16 +538,16 @@ protected:
 	// Food-related variables:
 	/** Represents the food bar, one point equals half a "drumstick" */
 	int m_FoodLevel;
-	
+
 	/** "Overcharge" for the m_FoodLevel; is depleted before m_FoodLevel */
 	double m_FoodSaturationLevel;
-	
+
 	/** Count-up to the healing or damaging action, based on m_FoodLevel */
 	int m_FoodTickTimer;
-	
+
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
-	
+
 	float m_LastJumpHeight;
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
@@ -564,31 +567,31 @@ protected:
 
 	eGameMode m_GameMode;
 	AString m_IP;
-	
+
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
 
 	std::chrono::steady_clock::time_point m_LastPlayerListTime;
 
 	cClientHandlePtr m_ClientHandle;
-	
+
 	cSlotNums m_InventoryPaintSlots;
-	
+
 	/** Max speed, relative to the game default.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
 	Default value is 1. */
 	double m_NormalMaxSpeed;
-	
+
 	/** Max speed, relative to the game default max speed, when sprinting.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
 	Default value is 1.3. */
 	double m_SprintingMaxSpeed;
-	
+
 	/** Max speed, relative to the game default flying max speed, when flying.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
 	Default value is 1. */
 	double m_FlyingMaxSpeed;
-	
+
 	bool m_IsCrouched;
 	bool m_IsSprinting;
 	bool m_IsFlying;
@@ -629,7 +632,7 @@ protected:
 	Will not apply food penalties if found to be true; will set to false after processing
 	*/
 	bool m_bIsTeleporting;
-	
+
 	/** The short UUID (no dashes) of the player, as read from the ClientHandle.
 	If no ClientHandle is given, the UUID is initialized to empty. */
 	AString m_UUID;
@@ -649,7 +652,7 @@ protected:
 
 	/** Stops players from burning in creative mode */
 	virtual void TickBurning(cChunk & a_Chunk) override;
-	
+
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);
 
@@ -666,7 +669,3 @@ protected:
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
 } ;  // tolua_export
-
-
-
-

@@ -36,6 +36,7 @@ public:
 		return true;
 	}
 
+
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace, NIBBLETYPE a_QuartzMeta)
 	{
 		switch (a_BlockFace)
@@ -58,11 +59,15 @@ public:
 				return 0x3;  // East or west
 			}
 
-			default:
+			case BLOCK_FACE_NONE:
 			{
 				ASSERT(!"Unhandled block face!");
 				return a_QuartzMeta;  // No idea, give a special meta (all sides the same)
 			}
 		}
+		#if !defined(__clang__)
+			ASSERT(!"Unknown BLOCK_FACE");
+			return 0;
+		#endif
 	}
 } ;

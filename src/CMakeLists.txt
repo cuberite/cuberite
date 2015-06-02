@@ -62,6 +62,7 @@ SET (SRCS
 	Scoreboard.cpp
 	Server.cpp
 	SetChunkData.cpp
+	SpawnPrepare.cpp
 	Statistics.cpp
 	StringCompression.cpp
 	StringUtils.cpp
@@ -133,6 +134,7 @@ SET (HDRS
 	Server.h
 	SetChunkData.h
 	SettingsRepositoryInterface.h
+	SpawnPrepare.h
 	Statistics.h
 	StringCompression.h
 	StringUtils.h
@@ -150,6 +152,38 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
 
 configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set_source_files_properties(BiomeDef.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
+	set_source_files_properties(BlockArea.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
+	set_source_files_properties(BlockID.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(BoundingBox.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=float-equal")
+	set_source_files_properties(ByteBuffer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast -Wno-error=global-constructors")
+	set_source_files_properties(Chunk.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(ChunkData.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast")
+	set_source_files_properties(ChunkMap.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=shadow -Wno-error=sign-conversion -Wno-error=old-style-cast")
+	set_source_files_properties(ClientHandle.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=sign-conversion -Wno-error=global-constructors -Wno-error=old-style-cast")
+	set_source_files_properties(CompositeChat.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=missing-variable-declarations")
+	set_source_files_properties(Enchantments.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(IniFile.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast")
+	set_source_files_properties(Inventory.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion")
+	set_source_files_properties(Item.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
+	set_source_files_properties(ItemGrid.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion")
+	set_source_files_properties(LightingThread.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=sign-conversion")
+	set_source_files_properties(LinearInterpolation.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(Map.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
+	set_source_files_properties(MobProximityCounter.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=float-equal")
+	set_source_files_properties(MobSpawner.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
+	set_source_files_properties(RCONServer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
+	set_source_files_properties(Root.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=shadow -Wno-error=old-style-cast")
+	set_source_files_properties(Server.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(Statistics.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(StringCompression.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(StringUtils.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
+	set_source_files_properties(Tracer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
+	set_source_files_properties(World.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast")
+	set_source_files_properties(main.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=missing-variable-declarations -Wno-error=missing-prototypes")
+endif()
 
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead
@@ -332,4 +366,9 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+	add_flags_lnk(-L/usr/local/lib)
+endif()
+
 target_link_libraries(${EXECUTABLE} luaexpat jsoncpp mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)

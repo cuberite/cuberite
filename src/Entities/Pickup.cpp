@@ -38,7 +38,7 @@ public:
 		Vector3d EntityPos = a_Entity->GetPosition();
 		double Distance = (EntityPos - m_Position).Length();
 
-		cItem & Item = ((cPickup *)a_Entity)->GetItem();
+		cItem & Item = static_cast<cPickup *>(a_Entity)->GetItem();
 		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()))
 		{
 			short CombineCount = Item.m_ItemCount;
@@ -52,7 +52,7 @@ public:
 				return false;
 			}
 
-			m_Pickup->GetItem().AddCount((char)CombineCount);
+			m_Pickup->GetItem().AddCount(static_cast<char>(CombineCount));
 			Item.m_ItemCount -= CombineCount;
 
 			if (Item.m_ItemCount <= 0)
@@ -228,8 +228,9 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 
 		m_Item.m_ItemCount -= NumAdded;
 		m_World->BroadcastCollectEntity(*this, a_Dest);
+
 		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-		m_World->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		if (m_Item.m_ItemCount <= 0)
 		{
 			// All of the pickup has been collected, schedule the pickup for destroying

@@ -629,11 +629,6 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 			case esWitherSkullBlue:  m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
 			case esWitherBirth:      m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
 			case esPlugin:           m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-			default:
-			{
-				ASSERT(!"Unhandled ExplosionSource");
-				return false;
-			}
 		}
 		if (res)
 		{
@@ -670,11 +665,6 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 			case esWitherSkullBlue:  m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esWitherBirth:      m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPlugin:           m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			default:
-			{
-				ASSERT(!"Unhandled ExplosionSource");
-				return false;
-			}
 		}
 		if (res)
 		{

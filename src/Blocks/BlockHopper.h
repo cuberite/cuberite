@@ -35,7 +35,7 @@ public:
 			case BLOCK_FACE_NORTH:  a_BlockMeta = E_META_HOPPER_FACING_ZP;  break;
 			case BLOCK_FACE_SOUTH:  a_BlockMeta = E_META_HOPPER_FACING_ZM;  break;
 			case BLOCK_FACE_WEST:   a_BlockMeta = E_META_HOPPER_FACING_XP;  break;
-			default:                a_BlockMeta = E_META_HOPPER_UNATTACHED; break;
+			case BLOCK_FACE_NONE:   a_BlockMeta = E_META_HOPPER_UNATTACHED; break;
 		}
 		return true;
 	}

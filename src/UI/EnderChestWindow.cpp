@@ -24,7 +24,14 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("random.chestopen", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
+	m_World->BroadcastSoundEffect(
+		"random.chestopen",
+		static_cast<double>(m_BlockX),
+		static_cast<double>(m_BlockY),
+		static_cast<double>(m_BlockZ),
+		1,
+		1
+	);
 
 	// Send out the chest-open packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_ENDER_CHEST);
@@ -40,7 +47,13 @@ cEnderChestWindow::~cEnderChestWindow()
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_ENDER_CHEST);
 
 	// Play the closing sound
-	m_World->BroadcastSoundEffect("random.chestclosed", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
+	m_World->BroadcastSoundEffect(
+		"random.chestclosed",
+		static_cast<double>(m_BlockX),
+		static_cast<double>(m_BlockY),
+		static_cast<double>(m_BlockZ),
+		1, 1
+	);
 }
 
 

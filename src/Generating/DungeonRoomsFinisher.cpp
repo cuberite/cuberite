@@ -194,7 +194,7 @@ protected:
 		{
 			return;
 		}
-		a_ChunkDesc.SetBlockTypeMeta(RelX, m_FloorHeight + 1, RelZ, E_BLOCK_CHEST, (NIBBLETYPE)a_Chest.y);
+		a_ChunkDesc.SetBlockTypeMeta(RelX, m_FloorHeight + 1, RelZ, E_BLOCK_CHEST, static_cast<NIBBLETYPE>(a_Chest.y));
 
 		// Fill the chest with random loot
 		static const cLootProbab LootProbab[] =
@@ -217,7 +217,7 @@ protected:
 			{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
 		} ;
 
-		cChestEntity * ChestEntity = (cChestEntity *)a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ);
+		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);

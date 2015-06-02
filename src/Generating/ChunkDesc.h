@@ -65,8 +65,8 @@ public:
 
 	// These operate on the heightmap, so they could get out of sync with the data
 	// Use UpdateHeightmap() to re-calculate heightmap from the block data
-	void       SetHeight(int a_RelX, int a_RelZ, int a_Height);
-	int        GetHeight(int a_RelX, int a_RelZ);
+	void       SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height);
+	HEIGHTTYPE GetHeight(int a_RelX, int a_RelZ);
 
 	// tolua_end
 
@@ -204,10 +204,10 @@ public:
 	
 	// Accessors used by cChunkGenerator::Generator descendants:
 	inline cChunkDef::BiomeMap &     GetBiomeMap              (void) { return m_BiomeMap; }
-	inline cChunkDef::BlockTypes &   GetBlockTypes            (void) { return *((cChunkDef::BlockTypes *)m_BlockArea.GetBlockTypes()); }
+	inline cChunkDef::BlockTypes &   GetBlockTypes            (void) { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
 	// CANNOT, different compression!
 	// inline cChunkDef::BlockNibbles & GetBlockMetas            (void) { return *((cChunkDef::BlockNibbles *)m_BlockArea.GetBlockMetas()); }
-	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *((BlockNibbleBytes *)m_BlockArea.GetBlockMetas()); }
+	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *(reinterpret_cast<BlockNibbleBytes *>(m_BlockArea.GetBlockMetas())); }
 	inline cChunkDef::HeightMap &    GetHeightMap             (void) { return m_HeightMap; }
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
 	inline cBlockEntityList &        GetBlockEntities         (void) { return m_BlockEntities; }

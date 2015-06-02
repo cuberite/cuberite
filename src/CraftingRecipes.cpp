@@ -373,7 +373,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	AStringVector Sides = StringSplit(RecipeLine, "=");
 	if (Sides.size() != 2)
 	{
-		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got %d", a_LineNum, (int)Sides.size() - 1);
+		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got " SIZE_T_FMT, a_LineNum, Sides.size() - 1);
 		LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 		return;
 	}
@@ -771,9 +771,12 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 			continue;
 		}
 		Recipe->m_Ingredients.push_back(*itrS);
+		Recipe->m_Ingredients.back().x += a_OffsetX;
+		Recipe->m_Ingredients.back().y += a_OffsetY;
 	}
 	Recipe->m_Ingredients.insert(Recipe->m_Ingredients.end(), MatchedSlots.begin(), MatchedSlots.end());
 
+	// Handle the fireworks-related effects:
 	// We use Recipe instead of a_Recipe because we want the wildcard ingredients' slot numbers as well, which was just added previously
 	HandleFireworks(a_CraftingGrid, Recipe.get(), a_GridStride, a_OffsetX, a_OffsetY);
 
@@ -833,7 +836,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_DYE:
 				{
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye((NIBBLETYPE)(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
+					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<NIBBLETYPE>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
 				case E_ITEM_GUNPOWDER: break;
