@@ -245,6 +245,10 @@ inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
 			return a_BlockFace;
 		};
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
 
 
@@ -267,6 +271,10 @@ inline eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
 			return a_BlockFace;
 		}
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
 
 
@@ -288,7 +296,15 @@ inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
 			return a_BlockFace;
 		};
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
+
+
+
+
 
 inline eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace)
 {
@@ -302,7 +318,14 @@ inline eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace)
 		case BLOCK_FACE_ZM:   return BLOCK_FACE_ZP;
 		case BLOCK_FACE_NONE: return a_BlockFace;
 	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown BLOCK_FACE");
+		return a_BlockFace;
+	#endif
 }
+
+
+
 
 
 /** Returns the textual representation of the BlockFace constant. */
@@ -320,7 +343,7 @@ inline AString BlockFaceToString(eBlockFace a_BlockFace)
 	}
 	// clang optimisises this line away then warns that it has done so.
 	#if !defined(__clang__)
-	return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
+		return Printf("Unknown BLOCK_FACE: %d", a_BlockFace);
 	#endif
 }
 

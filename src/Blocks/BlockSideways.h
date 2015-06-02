@@ -64,6 +64,10 @@ public:
 				return a_Meta | 0xC;  // No idea, give a special meta
 			}
 		}
+		#if !defined(__clang__)
+			ASSERT(!"Unknown BLOCK_FACE");
+			return 0;
+		#endif
 	}
 } ;
 

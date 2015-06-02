@@ -257,6 +257,9 @@ bool cParsedNBT::ReadTag(void)
 			return true;
 		}
 		
+		#if !defined(__clang__)
+		default:
+		#endif
 		case TAG_Min:
 		{
 			ASSERT(!"Unhandled NBT tag type");
