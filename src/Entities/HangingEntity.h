@@ -46,12 +46,16 @@ public:
 
 protected:
 
+	Byte m_Facing;
+
+
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
 	{
 		UNUSED(a_Dt);
 		UNUSED(a_Chunk);
 	}
+
 
 	/** Converts protocol hanging item facing to eBlockFace values */
 	inline static eBlockFace ProtocolFaceToBlockFace(Byte a_ProtocolFace)
@@ -77,6 +81,7 @@ protected:
 		return Dir;
 	}
 
+
 	/** Converts eBlockFace values to protocol hanging item faces */
 	inline static Byte BlockFaceToProtocolFace(eBlockFace a_BlockFace)
 	{
@@ -99,13 +104,17 @@ protected:
 
 				Dir = cHangingEntity::BlockFaceToProtocolFace(BLOCK_FACE_XP);
 			}
+			#if !defined(__clang__)
+			default:
+			{
+				ASSERT(!"Unknown BLOCK_FACE");
+				return 0;
+			}
+			#endif
 		}
 
 		return Dir;
 	}
-
-	Byte m_Facing;
-
 };  // tolua_export
 
 

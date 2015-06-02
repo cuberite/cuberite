@@ -67,6 +67,10 @@ public:
 			case BLOCK_FACE_YM:   return 0x0;
 			case BLOCK_FACE_NONE: return 0x6;
 		}
+		#if !defined(__clang__)
+			ASSERT(!"Unknown BLOCK_FACE");
+			return 0;
+		#endif
 	}
 
 
