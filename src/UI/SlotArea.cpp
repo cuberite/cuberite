@@ -1139,44 +1139,44 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			int CurrentLevel = SecondInput.m_Enchantments.GetLevel(CurrentEnchantment);
 
 			// The enchantment could be illegal (Example: Sharpness II on an iron helmet) - Should happen only with Books
-			if ((((Input.m_ItemType == 298) || (Input.m_ItemType == 302) || (Input.m_ItemType == 306) || (Input.m_ItemType == 310) || (Input.m_ItemType == 314))
-				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) &&( CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 5) && (CurrentEnchantment != 6) && (CurrentEnchantment != 7) && (CurrentEnchantment != 34)))
+			if ((((Input.m_ItemType == E_ITEM_LEATHER_CAP) || (Input.m_ItemType == E_ITEM_CHAIN_HELMET) || (Input.m_ItemType == E_ITEM_IRON_HELMET) || (Input.m_ItemType == E_ITEM_DIAMOND_HELMET) || (Input.m_ItemType == E_ITEM_GOLD_HELMET))
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) &&( CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchRespiration) && (CurrentEnchantment != cEnchantments::enchAquaAffinity) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Helmet */
-				|| (((Input.m_ItemType == 299) || (Input.m_ItemType == 303) || (Input.m_ItemType == 307) || (Input.m_ItemType == 311) || (Input.m_ItemType == 315))
-				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) && (CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 7) && (CurrentEnchantment != 34)))
+				|| (((Input.m_ItemType == E_ITEM_LEATHER_TUNIC) || (Input.m_ItemType == E_ITEM_CHAIN_CHESTPLATE) || (Input.m_ItemType == E_ITEM_IRON_CHESTPLATE) || (Input.m_ItemType == E_ITEM_DIAMOND_HELMET) || (Input.m_ItemType == E_ITEM_GOLD_HELMET))
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Chestplate */
-				|| (((Input.m_ItemType == 300) || (Input.m_ItemType == 304) || (Input.m_ItemType == 308) || (Input.m_ItemType == 312) || (Input.m_ItemType == 316))
-				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) && (CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 7) && (CurrentEnchantment != 34)))
+				|| (((Input.m_ItemType == E_ITEM_LEATHER_PANTS) || (Input.m_ItemType == E_ITEM_CHAIN_LEGGINGS) || (Input.m_ItemType == E_ITEM_IRON_CHESTPLATE) || (Input.m_ItemType == E_ITEM_DIAMOND_CHESTPLATE) || (Input.m_ItemType == E_ITEM_GOLD_CHESTPLATE))
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Leggings */
-				|| (((Input.m_ItemType == 301) || (Input.m_ItemType == 305) || (Input.m_ItemType == 309) || (Input.m_ItemType == 313) || (Input.m_ItemType == 317))
-				&& ((CurrentEnchantment != 0) && (CurrentEnchantment != 1) && (CurrentEnchantment != 2) && (CurrentEnchantment != 3) && (CurrentEnchantment != 4) && (CurrentEnchantment != 7) && (CurrentEnchantment != 8) && (CurrentEnchantment != 34)))
+				|| (((Input.m_ItemType == E_ITEM_LEATHER_BOOTS) || (Input.m_ItemType == E_ITEM_CHAIN_BOOTS) || (Input.m_ItemType == E_ITEM_IRON_BOOTS) || (Input.m_ItemType == E_ITEM_DIAMOND_BOOTS) || (Input.m_ItemType == E_ITEM_GOLD_BOOTS))
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchFeatherFalling) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchDepthStrider) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Boots */
-				|| (((Input.m_ItemType == 268) || (Input.m_ItemType == 272) || (Input.m_ItemType == 267) || (Input.m_ItemType == 276)|| (Input.m_ItemType == 283))
-				&& ((CurrentEnchantment != 16) && (CurrentEnchantment != 17) && (CurrentEnchantment != 18) && (CurrentEnchantment != 19) && (CurrentEnchantment != 20) && (CurrentEnchantment != 21) && (CurrentEnchantment != 34)))
+				|| (((Input.m_ItemType == E_ITEM_WOODEN_SWORD) || (Input.m_ItemType == E_ITEM_STONE_SWORD) || (Input.m_ItemType == E_ITEM_IRON_SWORD) || (Input.m_ItemType == E_ITEM_DIAMOND_SWORD)|| (Input.m_ItemType == E_ITEM_GOLD_SWORD))
+				&& ((CurrentEnchantment != cEnchantments::enchSharpness) && (CurrentEnchantment != cEnchantments::enchSmite) && (CurrentEnchantment != cEnchantments::enchBaneOfArthropods) && (CurrentEnchantment != cEnchantments::enchKnockback) && (CurrentEnchantment != cEnchantments::enchFireAspect) && (CurrentEnchantment != cEnchantments::enchLooting) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Swords */
-				|| (((Input.m_ItemType == 271) || (Input.m_ItemType == 275) || (Input.m_ItemType == 258) || (Input.m_ItemType == 279) || (Input.m_ItemType == 286))
-				&& ((CurrentEnchantment != 16) && (CurrentEnchantment != 17) && (CurrentEnchantment != 18) && (CurrentEnchantment != 32) && (CurrentEnchantment != 33) && (CurrentEnchantment != 34) && (CurrentEnchantment != 35)))
+				|| (((Input.m_ItemType == E_ITEM_WOODEN_AXE) || (Input.m_ItemType == E_ITEM_STONE_AXE) || (Input.m_ItemType == E_ITEM_IRON_AXE) || (Input.m_ItemType == E_ITEM_DIAMOND_AXE) || (Input.m_ItemType == E_ITEM_GOLD_AXE))
+				&& ((CurrentEnchantment != cEnchantments::enchSharpness) && (CurrentEnchantment != cEnchantments::enchSmite) && (CurrentEnchantment != cEnchantments::enchBaneOfArthropods) && (CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
 				/* Axe */
-				|| (((Input.m_ItemType == 269) || (Input.m_ItemType == 273) || (Input.m_ItemType == 256) || (Input.m_ItemType == 277) || (Input.m_ItemType == 284))
-				&& ((CurrentEnchantment != 32) && (CurrentEnchantment != 33) && (CurrentEnchantment != 34) && (CurrentEnchantment != 35)))
+				|| (((Input.m_ItemType == E_ITEM_WOODEN_SHOVEL) || (Input.m_ItemType == E_ITEM_STONE_SHOVEL) || (Input.m_ItemType == E_ITEM_IRON_SHOVEL) || (Input.m_ItemType == E_ITEM_DIAMOND_SHOVEL) || (Input.m_ItemType == E_ITEM_GOLD_SHOVEL))
+				&& ((CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
 				/* Shovels */
-				|| (((Input.m_ItemType == 290) || (Input.m_ItemType == 291) || (Input.m_ItemType == 292) || (Input.m_ItemType == 293) || (Input.m_ItemType == 294))
-				&& (CurrentEnchantment != 34))
+				|| (((Input.m_ItemType == E_ITEM_WOODEN_HOE) || (Input.m_ItemType == E_ITEM_STONE_HOE) || (Input.m_ItemType == E_ITEM_IRON_HOE) || (Input.m_ItemType == E_ITEM_DIAMOND_HOE) || (Input.m_ItemType == E_ITEM_GOLD_HOE))
+				&& (CurrentEnchantment != cEnchantments::enchUnbreaking))
 				/* Hoes */
-				|| ((Input.m_ItemType == 261)
-				&& ((CurrentEnchantment != 48) && (CurrentEnchantment != 49) && (CurrentEnchantment != 50) && (CurrentEnchantment != 51) && (CurrentEnchantment != 34)))
+				|| ((Input.m_ItemType == E_ITEM_BOW)
+				&& ((CurrentEnchantment != cEnchantments::enchPower) && (CurrentEnchantment != cEnchantments::enchPunch) && (CurrentEnchantment != cEnchantments::enchFlame) && (CurrentEnchantment != cEnchantments::enchInfinity) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Bow */
-				|| ((Input.m_ItemType == 346)
-				&& ((CurrentEnchantment != 34) && (CurrentEnchantment != 61) && (CurrentEnchantment != 62)))
+				|| ((Input.m_ItemType == E_ITEM_FISHING_ROD)
+				&& ((CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchLuckOfTheSea) && (CurrentEnchantment != cEnchantments::enchLure)))
 				/* Fishing Rod */
-				|| ((Input.m_ItemType == 398)
-				&& (CurrentEnchantment != 34))
+				|| ((Input.m_ItemType == E_ITEM_CARROT_ON_STICK)
+				&& (CurrentEnchantment != cEnchantments::enchUnbreaking))
 				/* Carrot on a Stick */
-				|| ((Input.m_ItemType == 359)
-				&& ((CurrentEnchantment != 34) && (CurrentEnchantment != 32) && (CurrentEnchantment != 33)))
+				|| ((Input.m_ItemType == E_ITEM_SHEARS)
+				&& ((CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch)))
 				/* Shears */
-				|| ((Input.m_ItemType == 259)
-				&& (CurrentEnchantment != 34))
+				|| ((Input.m_ItemType == E_ITEM_FLINT_AND_STEEL)
+				&& (CurrentEnchantment != cEnchantments::enchUnbreaking))
 				/* Flint and Steel */
 				)
 			{
@@ -1193,7 +1193,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 					return;
 				}
 			}
-
+			
 			if ((CurrentLevel == Input.m_Enchantments.GetLevel(CurrentEnchantment)) && (CurrentEnchantment != 0))
 			{
 				// Increment enchantment level
