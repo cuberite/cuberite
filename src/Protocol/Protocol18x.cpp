@@ -2548,10 +2548,32 @@ void cProtocol180::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
+	std::unordered_map<AString, AString> SpecialCharacters;
+	SpecialCharacters["\\u0026"] = "&";
+	SpecialCharacters["\\u0027"] = "'";
+	SpecialCharacters["\\\""] = "\"";
+	SpecialCharacters["\\u003c"] = "<";
+	SpecialCharacters["\\u003e"] = ">";
+	SpecialCharacters["\\u003d"] = "=";
+
 	AString Lines[4];
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
+
+		// Buffer receives special characters in JSON code for sign messages, use SpecialCharacters map to parse them
+		for (const auto & itr : SpecialCharacters)
+		{
+			size_t Index = 0;
+			while (Index < Line.length())
+			{
+				if ((Index = Line.find(itr.first)) != AString::npos)
+				{
+					Line.replace(Index, itr.first.length(), itr.second);
+				}
+			}
+		}
+
 		Lines[i] = Line.substr(1, Line.length() - 2);  // Remove ""
 	}
 

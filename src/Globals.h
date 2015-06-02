@@ -251,6 +251,7 @@ template class SizeChecker<UInt8,  1>;
 #include <deque>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <algorithm>
 #include <memory>
 #include <set>
