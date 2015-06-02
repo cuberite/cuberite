@@ -92,67 +92,45 @@ void cIncrementalRedstoneSimulator::AddBlock(const Vector3i & a_RelBlockPosition
 	}
 
 	auto & SimulatedPlayerToggleableBlocks = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_SimulatedPlayerToggleableBlocks;
-	if (
-		DoesIgnorePlayerToggle(Block) &&
-		std::find_if(SimulatedPlayerToggleableBlocks.begin(), SimulatedPlayerToggleableBlocks.end(),
-			[a_RelBlockPosition](const sSimulatedPlayerToggleableList & itr){ return itr.a_RelBlockPos == a_RelBlockPosition; }) == SimulatedPlayerToggleableBlocks.end()
-		)
+	if (DoesIgnorePlayerToggle(Block))
 	{
-		// We have arrived here; no block must be in list - add one
-		sSimulatedPlayerToggleableList RC;
-		RC.a_RelBlockPos = a_RelBlockPosition;
-		RC.WasLastStatePowered = AreCoordsDirectlyPowered(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, a_OriginalChunk) || AreCoordsLinkedPowered(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, a_OriginalChunk);
-
 		// Initialise the toggleable blocks list so that trapdoors etc. aren't reset on restart (#1887)
-		SimulatedPlayerToggleableBlocks.emplace_back(RC);
+		SimulatedPlayerToggleableBlocks.emplace(
+			a_RelBlockPosition,
+			AreCoordsDirectlyPowered(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, a_OriginalChunk) || AreCoordsLinkedPowered(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, a_OriginalChunk)
+			);  // This map won't insert if key already present, so no need to check
+	}
+	else
+	{
+		SimulatedPlayerToggleableBlocks.erase(a_RelBlockPosition);
 	}
 
-	SimulatedPlayerToggleableBlocks.erase(std::remove_if(SimulatedPlayerToggleableBlocks.begin(), SimulatedPlayerToggleableBlocks.end(), [a_RelBlockPosition, Block, this](const sSimulatedPlayerToggleableList & itr)
-		{
-			return (itr.a_RelBlockPos == a_RelBlockPosition) && !DoesIgnorePlayerToggle(Block);
-		}
-	), SimulatedPlayerToggleableBlocks.end());
-	
-	auto & RepeatersDelayList = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_RepeatersDelayList;
-	RepeatersDelayList.erase(std::remove_if(RepeatersDelayList.begin(), RepeatersDelayList.end(), [a_RelBlockPosition, Block](const sRepeatersDelayList & itr)
-		{
-			return (itr.a_RelBlockPos == a_RelBlockPosition) && (Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF);
-		}
-	), RepeatersDelayList.end());
+	if ((Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF))
+	{
+		static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_RepeatersDelayList.erase(a_RelBlockPosition);
+	}
 
 	auto & RedstoneSimulatorChunkData = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_ChunkData;
-	for (auto & itr : RedstoneSimulatorChunkData)
-	{
-		if (a_RelBlockPosition == Vector3i(itr.x, itr.y, itr.z))  // We are at an entry matching the current (changed) block
-		{
-			if (!IsAllowedBlock(Block))
-			{
-				itr.DataTwo = true;  // The new blocktype is not redstone; it must be queued to be removed from this list
-			}
-			else
-			{
-				itr.DataTwo = false;
-				itr.Data = Block;  // Update block information
-			}
-			return;
-		}
-	}
-
+	auto Iterator = RedstoneSimulatorChunkData.find(a_RelBlockPosition);
 	if (!IsAllowedBlock(Block))
 	{
+		if (Iterator != RedstoneSimulatorChunkData.end())
+		{
+			Iterator->second.second = true;  // The new blocktype is not redstone; it must be queued to be removed from this list
+		}
 		return;
 	}
-
-	auto & QueuedData = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_QueuedChunkData;
-	for (const auto & itr : QueuedData)
+	else
 	{
-		if (a_RelBlockPosition == Vector3i(itr.x, itr.y, itr.z))
+		if (Iterator != RedstoneSimulatorChunkData.end())
 		{
-			// Can't have duplicates in here either, in case something adds the block again before the structure can written to the main chunk data
+			Iterator->second.second = false;
+			Iterator->second.first = Block;  // Update block information
 			return;
 		}
 	}
-	QueuedData.emplace_back(cCoordWithBlockAndBool(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, Block, false));
+
+	RedstoneSimulatorChunkData.emplace(a_RelBlockPosition, std::make_pair(Block, false));
 }
 
 
@@ -167,18 +145,10 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 		m_RedstoneSimulatorChunkData = new cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData();
 		a_Chunk->SetRedstoneSimulatorData(m_RedstoneSimulatorChunkData);
 	}
-	if (m_RedstoneSimulatorChunkData->m_ChunkData.empty() && static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData())->m_QueuedChunkData.empty())
+	if (m_RedstoneSimulatorChunkData->m_ChunkData.empty())
 	{
 		return;
 	}
-
-	m_RedstoneSimulatorChunkData->m_ChunkData.insert(
-		m_RedstoneSimulatorChunkData->m_ChunkData.end(),
-		m_RedstoneSimulatorChunkData->m_QueuedChunkData.begin(),
-		m_RedstoneSimulatorChunkData->m_QueuedChunkData.end()
-	);
-
-	m_RedstoneSimulatorChunkData->m_QueuedChunkData.clear();
 
 	m_PoweredBlocks = &m_RedstoneSimulatorChunkData->m_PoweredBlocks;
 	m_RepeatersDelayList = &m_RedstoneSimulatorChunkData->m_RepeatersDelayList;
@@ -199,24 +169,24 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 
 	for (auto dataitr = m_RedstoneSimulatorChunkData->m_ChunkData.begin(); dataitr != m_RedstoneSimulatorChunkData->m_ChunkData.end();)
 	{
-		if (dataitr->DataTwo)
+		if (dataitr->second.second)
 		{
 			dataitr = m_RedstoneSimulatorChunkData->m_ChunkData.erase(dataitr);
 			continue;
 		}
 
-		switch (dataitr->Data)
+		switch (dataitr->second.first)
 		{
-			case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
-			case E_BLOCK_TRIPWIRE:        HandleTripwire(dataitr->x, dataitr->y, dataitr->z);       break;
-			case E_BLOCK_TRIPWIRE_HOOK:   HandleTripwireHook(dataitr->x, dataitr->y, dataitr->z);   break;
+			case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->first.x, dataitr->first.y, dataitr->first.z); break;
+			case E_BLOCK_TRIPWIRE:        HandleTripwire(dataitr->first.x, dataitr->first.y, dataitr->first.z);       break;
+			case E_BLOCK_TRIPWIRE_HOOK:   HandleTripwireHook(dataitr->first.x, dataitr->first.y, dataitr->first.z);   break;
 
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			{
-				HandlePressurePlate(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+				HandlePressurePlate(dataitr->first.x, dataitr->first.y, dataitr->first.z, dataitr->second.first);
 				break;
 			}
 			default: break;
@@ -224,23 +194,23 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 
 		if (ShouldUpdateSimulateOnceBlocks)
 		{
-			switch (dataitr->Data)
+			switch (dataitr->second.first)
 			{
-				case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->x, dataitr->y, dataitr->z);	  break;
-				case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->x, dataitr->y, dataitr->z);   break;
-				case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
-				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);  break;
-				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);  break;
-				case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
-				case E_BLOCK_IRON_TRAPDOOR:         HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
-				case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
-				case E_BLOCK_TRAPPED_CHEST:         HandleTrappedChest(dataitr->x, dataitr->y, dataitr->z);   break;
+				case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->first.x, dataitr->first.y, dataitr->first.z);	  break;
+				case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->first.x, dataitr->first.y, dataitr->first.z);   break;
+				case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->first.x, dataitr->first.y, dataitr->first.z);      break;
+				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->first.x, dataitr->first.y, dataitr->first.z);  break;
+				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->first.x, dataitr->first.y, dataitr->first.z);  break;
+				case E_BLOCK_TNT:                   HandleTNT(dataitr->first.x, dataitr->first.y, dataitr->first.z);            break;
+				case E_BLOCK_IRON_TRAPDOOR:         HandleTrapdoor(dataitr->first.x, dataitr->first.y, dataitr->first.z);       break;
+				case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->first.x, dataitr->first.y, dataitr->first.z);       break;
+				case E_BLOCK_TRAPPED_CHEST:         HandleTrappedChest(dataitr->first.x, dataitr->first.y, dataitr->first.z);   break;
 
 				case E_BLOCK_ACTIVATOR_RAIL:
 				case E_BLOCK_DETECTOR_RAIL:
 				case E_BLOCK_POWERED_RAIL:
 				{
-					HandleRail(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					HandleRail(dataitr->first.x, dataitr->first.y, dataitr->first.z, dataitr->second.first);
 					break;
 				}
 				case E_BLOCK_ACACIA_DOOR:
@@ -251,7 +221,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 				case E_BLOCK_WOODEN_DOOR:
 				case E_BLOCK_IRON_DOOR:
 				{
-					HandleDoor(dataitr->x, dataitr->y, dataitr->z);
+					HandleDoor(dataitr->first.x, dataitr->first.y, dataitr->first.z);
 					break;
 				}
 				case E_BLOCK_ACACIA_FENCE_GATE:
@@ -261,49 +231,49 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 				case E_BLOCK_JUNGLE_FENCE_GATE:
 				case E_BLOCK_SPRUCE_FENCE_GATE:
 				{
-					HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);
+					HandleFenceGate(dataitr->first.x, dataitr->first.y, dataitr->first.z);
 					break;
 				}
 				case E_BLOCK_REDSTONE_LAMP_OFF:
 				case E_BLOCK_REDSTONE_LAMP_ON:
 				{
-					HandleRedstoneLamp(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					HandleRedstoneLamp(dataitr->first.x, dataitr->first.y, dataitr->first.z, dataitr->second.first);
 					break;
 				}
 				case E_BLOCK_DISPENSER:
 				case E_BLOCK_DROPPER:
 				{
-					HandleDropSpenser(dataitr->x, dataitr->y, dataitr->z);
+					HandleDropSpenser(dataitr->first.x, dataitr->first.y, dataitr->first.z);
 					break;
 				}
 				case E_BLOCK_PISTON:
 				case E_BLOCK_STICKY_PISTON:
 				{
-					HandlePiston(dataitr->x, dataitr->y, dataitr->z);
+					HandlePiston(dataitr->first.x, dataitr->first.y, dataitr->first.z);
 					break;
 				}
 				case E_BLOCK_REDSTONE_REPEATER_OFF:
 				case E_BLOCK_REDSTONE_REPEATER_ON:
 				{
-					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					HandleRedstoneRepeater(dataitr->first.x, dataitr->first.y, dataitr->first.z, dataitr->second.first);
 					break;
 				}
 				case E_BLOCK_REDSTONE_TORCH_OFF:
 				case E_BLOCK_REDSTONE_TORCH_ON:
 				{
-					HandleRedstoneTorch(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					HandleRedstoneTorch(dataitr->first.x, dataitr->first.y, dataitr->first.z, dataitr->second.first);
 					break;
 				}
 				case E_BLOCK_STONE_BUTTON:
 				case E_BLOCK_WOODEN_BUTTON:
 				{
-					HandleRedstoneButton(dataitr->x, dataitr->y, dataitr->z);
+					HandleRedstoneButton(dataitr->first.x, dataitr->first.y, dataitr->first.z);
 					break;
 				}
 				case E_BLOCK_ACTIVE_COMPARATOR:
 				case E_BLOCK_INACTIVE_COMPARATOR:
 				{
-					HandleRedstoneComparator(dataitr->x, dataitr->y, dataitr->z);
+					HandleRedstoneComparator(dataitr->first.x, dataitr->first.y, dataitr->first.z);
 					break;
 				}
 				default: break;
@@ -872,32 +842,29 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 {
 	for (auto itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end();)
 	{
-		if (itr->a_ElapsedTicks >= itr->a_DelayTicks)  // Has the elapsed ticks reached the target ticks?
+		if (itr->second.a_ElapsedTicks >= itr->second.a_DelayTicks)  // Has the elapsed ticks reached the target ticks?
 		{
-			int RelBlockX = itr->a_RelBlockPos.x;
-			int RelBlockY = itr->a_RelBlockPos.y;
-			int RelBlockZ = itr->a_RelBlockPos.z;
 			BLOCKTYPE Block;
 			NIBBLETYPE Meta;
-			m_Chunk->GetBlockTypeMeta(RelBlockX, RelBlockY, RelBlockZ, Block, Meta);
-			if (itr->ShouldPowerOn)
+			m_Chunk->GetBlockTypeMeta(itr->first.x, itr->first.y, itr->first.z, Block, Meta);
+			if (itr->second.ShouldPowerOn)
 			{
 				if (Block != E_BLOCK_REDSTONE_REPEATER_ON)  // For performance
 				{
-					m_Chunk->SetBlock(itr->a_RelBlockPos, E_BLOCK_REDSTONE_REPEATER_ON, Meta);
+					m_Chunk->SetBlock(itr->first, E_BLOCK_REDSTONE_REPEATER_ON, Meta);
 				}
 			}
 			else if (Block != E_BLOCK_REDSTONE_REPEATER_OFF)
 			{
-				m_Chunk->SetBlock(RelBlockX, RelBlockY, RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, Meta);
+				m_Chunk->SetBlock(itr->first.x, itr->first.y, itr->first.z, E_BLOCK_REDSTONE_REPEATER_OFF, Meta);
 			}
 			itr = m_RepeatersDelayList->erase(itr);
 		}
 		else
 		{
-			LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", itr->a_RelBlockPos.x, itr->a_RelBlockPos.y, itr->a_RelBlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
-			itr->a_ElapsedTicks++;
-			itr++;
+			LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", itr->first.x, itr->first.y, itr->first.z, itr->second.a_ElapsedTicks, itr->second.a_DelayTicks);
+			itr->second.a_ElapsedTicks++;
+			++itr;
 		}
 	}
 }
@@ -1871,9 +1838,9 @@ bool cIncrementalRedstoneSimulator::AreCoordsSimulated(int a_RelBlockX, int a_Re
 {
 	for (const auto & itr : *m_SimulatedPlayerToggleableBlocks)
 	{
-		if (itr.a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		if (itr.first.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
-			if (itr.WasLastStatePowered != IsCurrentStatePowered)  // Was the last power state different to the current?
+			if (itr.second != IsCurrentStatePowered)  // Was the last power state different to the current?
 			{
 				return false;  // It was, coordinates are no longer simulated
 			}
@@ -2116,60 +2083,37 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 
 void cIncrementalRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, bool a_WasLastStatePowered)
 {
-	for (auto & itr : *m_SimulatedPlayerToggleableBlocks)
-	{
-		if (!itr.a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
-		{
-			continue;
-		}
-
-		// Update listing
-		itr.WasLastStatePowered = a_WasLastStatePowered;
-		return;
-	}
-
-	// We have arrived here; no block must be in list - add one
-	sSimulatedPlayerToggleableList RC;
-	RC.a_RelBlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-	RC.WasLastStatePowered = a_WasLastStatePowered;
-	m_SimulatedPlayerToggleableBlocks->emplace_back(RC);
+	m_SimulatedPlayerToggleableBlocks->operator[](Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)) = a_WasLastStatePowered;
 }
 
 
 
 
 
-bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn)
+void cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool a_ShouldPowerOn)
 {
-	for (auto itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
-	{
-		if (itr->a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
-		{
-			if (ShouldPowerOn == itr->ShouldPowerOn)  // We are queued already for the same thing, don't replace entry
-			{
-				return false;
-			}
-
-			// Already in here (normal to allow repeater to continue on powering and updating blocks in front) - just update info and quit
-			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;  // See below for description
-			itr->a_ElapsedTicks = 0;
-			itr->ShouldPowerOn = ShouldPowerOn;
-			return false;
-		}
-	}
-
-	// Self not in list, add self to list
 	sRepeatersDelayList RC;
-	RC.a_RelBlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 
 	// Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
 	// Multiply by 2 because in MCS, 1 redstone tick = 1 world tick, but in Vanilla, 1 redstone tick = 2 world ticks, and we need to maintain compatibility
 	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;
-
 	RC.a_ElapsedTicks = 0;
-	RC.ShouldPowerOn = ShouldPowerOn;
-	m_RepeatersDelayList->emplace_back(RC);
-	return true;
+	RC.ShouldPowerOn = a_ShouldPowerOn;
+
+	auto Result = m_RepeatersDelayList->emplace(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ), RC);
+	if (!Result.second)
+	{
+		// Key exists
+		if (a_ShouldPowerOn == Result.first->second.ShouldPowerOn)
+		{
+			// We are queued already for the same thing, don't replace entry
+			return;
+		}
+
+		Result.first->second.a_DelayTicks = RC.a_DelayTicks;
+		Result.first->second.a_ElapsedTicks = 0;
+		Result.first->second.ShouldPowerOn = a_ShouldPowerOn;
+	}
 }
 
 

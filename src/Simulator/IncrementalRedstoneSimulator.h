@@ -3,7 +3,7 @@
 
 #include "RedstoneSimulator.h"
 #include "BlockEntities/RedstonePoweredEntity.h"
-#include <bitset>
+#include <unordered_map>
 
 class cWorld;
 class cChunk;
@@ -38,15 +38,6 @@ public:
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override { return IsRedstone(a_BlockType); }
 	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 
-	enum eRedstoneWireDirectionBitfieldPositions
-	{
-		eWbpXP = 0,
-		eWbpXN = 1,
-		eWbpZP = 2,
-		eWbpZN = 3,
-	};
-	std::bitset<4> GetWireDirection(int a_BlockX, int a_BlockY, int a_BlockZ);
-
 private:
 
 #define MAX_POWER_LEVEL 15
@@ -66,15 +57,8 @@ private:
 		unsigned char a_PowerLevel;
 	};
 
-	struct sSimulatedPlayerToggleableList  // Define structure of the list containing simulate-on-update blocks (such as trapdoors that respond once to a block update, and can be toggled by a player)
-	{
-		Vector3i a_RelBlockPos;
-		bool WasLastStatePowered;  // Was the last state powered or not? Determines whether a source update has happened and if I should resimulate
-	};
-
 	struct sRepeatersDelayList  // Define structure of list containing repeaters' delay states
 	{
-		Vector3i a_RelBlockPos;
 		unsigned char a_DelayTicks;  // For how many ticks should the repeater delay
 		unsigned char a_ElapsedTicks;  // How much of the previous has been elapsed?
 		bool ShouldPowerOn;  // What happens when the delay time is fulfilled?
@@ -85,20 +69,19 @@ private:
 	{
 	public:
 		/// Per-chunk data for the simulator, specified individual chunks to simulate
-		cCoordWithBlockAndBoolVector m_ChunkData;
-		cCoordWithBlockAndBoolVector m_QueuedChunkData;
+		std::unordered_map<Vector3i, std::pair<BLOCKTYPE, bool>, Vector3i> m_ChunkData;
 		std::vector<sPoweredBlocks> m_PoweredBlocks;
 		std::vector<sLinkedPoweredBlocks> m_LinkedBlocks;
-		std::vector<sSimulatedPlayerToggleableList> m_SimulatedPlayerToggleableBlocks;
-		std::vector<sRepeatersDelayList> m_RepeatersDelayList;
+		std::unordered_map<Vector3i, bool, Vector3i> m_SimulatedPlayerToggleableBlocks;
+		std::unordered_map<Vector3i, sRepeatersDelayList, Vector3i> m_RepeatersDelayList;
 	};
 
 public:
 
 	typedef std::vector <sPoweredBlocks> PoweredBlocksList;
 	typedef std::vector <sLinkedPoweredBlocks> LinkedBlocksList;
-	typedef std::vector <sSimulatedPlayerToggleableList> SimulatedPlayerToggleableList;
-	typedef std::vector <sRepeatersDelayList> RepeatersDelayList;
+	typedef std::unordered_map<Vector3i, bool, Vector3i> SimulatedPlayerToggleableList;
+	typedef std::unordered_map<Vector3i, sRepeatersDelayList, Vector3i> RepeatersDelayList;
 
 private:
 
@@ -211,7 +194,7 @@ private:
 	void SetAllDirsAsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 
 	/** Queues a repeater to be powered or unpowered and returns if the m_RepeatersDelayList iterators were invalidated */
-	bool QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
+	void QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
 
 	/** Removes a block from the Powered and LinkedPowered lists
 	Recursively removes all blocks powered by the given one

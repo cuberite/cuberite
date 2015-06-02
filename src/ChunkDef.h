@@ -514,32 +514,3 @@ typedef cCoordWithData<BLOCKTYPE>  cCoordWithBlock;
 
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;
-
-
-
-
-
-/** Generic template that can store two types of any kind of data together with a triplet of 3 coords */
-template <typename X, typename Z> class cCoordWithDoubleData
-{
-public:
-	int x;
-	int y;
-	int z;
-	X   Data;
-	Z   DataTwo;
-
-	cCoordWithDoubleData(int a_X, int a_Y, int a_Z) :
-		x(a_X), y(a_Y), z(a_Z)
-	{
-	}
-
-	cCoordWithDoubleData(int a_X, int a_Y, int a_Z, const X & a_Data, const Z & a_DataTwo) :
-		x(a_X), y(a_Y), z(a_Z), Data(a_Data), DataTwo(a_DataTwo)
-	{
-	}
-};
-
-typedef cCoordWithDoubleData <BLOCKTYPE, bool> cCoordWithBlockAndBool;
-
-typedef std::vector<cCoordWithBlockAndBool> cCoordWithBlockAndBoolVector;

@@ -235,6 +235,12 @@ public:
 		return *this;
 	}
 
+	/** Provides a hash of a vector's contents */
+	size_t operator()(const Vector3<T> & a_Vector) const
+	{
+		return ((std::hash<T>()(a_Vector.x) ^ (std::hash<T>()(a_Vector.y) << 1)) ^ std::hash<T>()(a_Vector.z));
+	}
+
 	// tolua_begin
 	
 	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
