@@ -7,11 +7,7 @@ return
 		Desc = [[
 			This hook is called whenever a {{cPawn|pawn}}'s (a player's or a mob's) health reaches zero. This
 			means that the pawn is about to be killed, unless a plugin "revives" them by setting their health
-			back to a positive value.</p>
-			<p>
-			FIXME: There is no HOOK_KILLED notification hook yet; this is deliberate because HOOK_KILLED has
-			been recently renamed to HOOK_KILLING, and plugins need to be updated. Once updated, the HOOK_KILLED
-			notification will be implemented.
+			back to a positive value.
 		]],
 		Params =
 		{

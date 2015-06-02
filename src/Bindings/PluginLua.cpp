@@ -750,6 +750,30 @@ bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 
 
 
+bool cPluginLua::OnKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!m_LuaState.IsValid())
+	{
+		return false;
+	}
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_KILLED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Victim, &a_TDI, a_DeathMessage, cLuaState::Return, res, a_DeathMessage);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);

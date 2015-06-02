@@ -920,11 +920,11 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
-
 	m_Stats.AddValue(statItemsDropped, (StatValue)Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
+	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
 
 	if ((a_TDI.Attacker == nullptr) && m_World->ShouldBroadcastDeathMessages())
 	{
@@ -950,7 +950,12 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			case dtExplosion: DamageText = "blew up"; break;
 			default: DamageText = "died, somehow; we've no idea how though"; break;
 		}
-		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
+		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
+		}
 	}
 	else if (a_TDI.Attacker == nullptr)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
 	{
@@ -959,15 +964,23 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	else if (a_TDI.Attacker->IsPlayer())
 	{
 		cPlayer * Killer = (cPlayer *)a_TDI.Attacker;
-
-		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str()));
+		AString DeathMessage = Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
+		}
 	}
 	else
 	{
 		AString KillerClass = a_TDI.Attacker->GetClass();
 		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-
-		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
+		AString DeathMessage = Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
+		}
 	}
 
 	m_Stats.AddValue(statDeaths);

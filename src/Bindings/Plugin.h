@@ -64,6 +64,7 @@ public:
 	virtual bool OnHandshake                (cClientHandle & a_Client, const AString & a_Username) = 0;
 	virtual bool OnHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum) = 0;
 	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) = 0;
+	virtual bool OnKilled                   (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage) = 0;
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) = 0;
 	virtual bool OnLogin                    (cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username) = 0;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) = 0;

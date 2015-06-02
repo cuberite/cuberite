@@ -744,6 +744,13 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 		return;
 	}
 
+	// If the victim is a player the hook is handled by the cPlayer class
+	if (!IsPlayer())
+	{
+		AString emptystring = AString("");
+		cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_TDI, emptystring);
+	}
+
 	// Drop loot:
 	cItems Drops;
 	GetDrops(Drops, a_TDI.Attacker);
