@@ -234,11 +234,7 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 
 void cProtocol180::SendChat(const AString & a_Message)
 {
-	ASSERT(m_State == 3);  // In game mode?
-	
-	cPacketizer Pkt(*this, 0x02);  // Chat Message packet
-	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
-	Pkt.WriteBEInt8(0);
+	this->SendChatType(a_Message, ctChatBox);
 }
 
 
@@ -246,6 +242,64 @@ void cProtocol180::SendChat(const AString & a_Message)
 
 
 void cProtocol180::SendChat(const cCompositeChat & a_Message)
+{
+	this->SendChatType(a_Message, ctChatBox);
+}
+
+
+
+
+
+void cProtocol180::SendChatSystem(const AString & a_Message)
+{
+	this->SendChatType(a_Message, ctSystem);
+}
+
+
+
+
+
+void cProtocol180::SendChatSystem(const cCompositeChat & a_Message)
+{
+	this->SendChatType(a_Message, ctSystem);
+}
+
+
+
+
+
+void cProtocol180::SendChatAboveActionBar(const AString & a_Message)
+{
+	this->SendChatType(a_Message, ctAboveActionBar);
+}
+
+
+
+
+
+void cProtocol180::SendChatAboveActionBar(const cCompositeChat & a_Message)
+{
+	this->SendChatType(a_Message, ctAboveActionBar);
+}
+
+
+
+
+
+void cProtocol180::SendChatType(const AString & a_Message, eChatType type)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x02);  // Chat Message packet
+	Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
+	Pkt.WriteBEInt8(type);
+}
+
+
+
+
+
+void cProtocol180::SendChatType(const cCompositeChat & a_Message, eChatType type)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -255,7 +309,7 @@ void cProtocol180::SendChat(const cCompositeChat & a_Message)
 	// Send the message to the client:
 	cPacketizer Pkt(*this, 0x02);
 	Pkt.WriteString(a_Message.CreateJsonString(ShouldUseChatPrefixes));
-	Pkt.WriteBEInt8(0);
+	Pkt.WriteBEInt8(type);
 }
 
 

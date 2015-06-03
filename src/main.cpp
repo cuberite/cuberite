@@ -39,7 +39,7 @@ bool cRoot::m_RunAsService = false;
 
 
 #if defined(_WIN32)
-	SERVICE_STATUS_HANDLE g_StatusHandle  = NULL;
+	SERVICE_STATUS_HANDLE g_StatusHandle  = nullptr;
 	HANDLE                g_ServiceThread = INVALID_HANDLE_VALUE;
 	#define               SERVICE_NAME      "MCServerService"
 #endif
@@ -145,7 +145,7 @@ Its purpose is to create the crashdump using the dbghlp DLLs
 */
 LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_ExceptionInfo)
 {
-	char * newStack = &g_ExceptionStack[sizeof(g_ExceptionStack)];
+	char * newStack = &g_ExceptionStack[sizeof(g_ExceptionStack) - 1];
 	char * oldStack;
 
 	// Use the substitute stack:
@@ -249,6 +249,7 @@ void universalMain(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 
 
 
+
 #if defined(_WIN32)
 ////////////////////////////////////////////////////////////////////////////////
 // serviceWorkerThread: Keep the service alive
@@ -262,6 +263,7 @@ DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
 
 	return ERROR_SUCCESS;
 }
+
 
 
 
@@ -319,14 +321,10 @@ void WINAPI serviceCtrlHandler(DWORD CtrlCode)
 
 void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 {
-	#if defined(_DEBUG) && defined(DEBUG_SERVICE_STARTUP)
-	Sleep(10000);
-	#endif
-	
 	char applicationFilename[MAX_PATH];
 	char applicationDirectory[MAX_PATH];
 
-	GetModuleFileName(NULL, applicationFilename, sizeof(applicationFilename));  // This binary's file path.
+	GetModuleFileName(nullptr, applicationFilename, sizeof(applicationFilename));  // This binary's file path.
 
 	// Strip off the filename, keep only the path:
 	strncpy_s(applicationDirectory, sizeof(applicationDirectory), applicationFilename, (strrchr(applicationFilename, '\\') - applicationFilename));
@@ -337,8 +335,7 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 	SetCurrentDirectory(applicationDirectory);
 
 	g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, serviceCtrlHandler);
-	
-	if (g_StatusHandle == NULL)
+	if (g_StatusHandle == nullptr)
 	{
 		OutputDebugStringA("RegisterServiceCtrlHandler() failed\n");
 		serviceSetState(0, SERVICE_STOPPED, GetLastError());
@@ -347,8 +344,9 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 	
 	serviceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
 	
-	g_ServiceThread = CreateThread(NULL, 0, serviceWorkerThread, NULL, 0, NULL);
-	if (g_ServiceThread == NULL)
+	DWORD ThreadID;
+	g_ServiceThread = CreateThread(nullptr, 0, serviceWorkerThread, nullptr, 0, &ThreadID);
+	if (g_ServiceThread == nullptr)
 	{
 		OutputDebugStringA("CreateThread() failed\n");
 		serviceSetState(0, SERVICE_STOPPED, GetLastError());
@@ -364,50 +362,39 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 
 
 
+
+
 std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 {
 	try
 	{
+		// Parse the comand line args:
 		TCLAP::CmdLine cmd("MCServer");
-
-		TCLAP::ValueArg<int> slotsArg("s", "max-players", "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
-
-		TCLAP::MultiArg<int> portsArg("p", "port", "The port number the server should listen to", false, "port", cmd);
-
-		TCLAP::SwitchArg commLogArg("", "log-comm", "Log server client communications to file", cmd);
-
-		TCLAP::SwitchArg commLogInArg("", "log-comm-in", "Log inbound server client communications to file", cmd);
-		
-		TCLAP::SwitchArg commLogOutArg("", "log-comm-out", "Log outbound server client communications to file", cmd);
-
-		TCLAP::SwitchArg noBufArg("", "no-output-buffering", "Disable output buffering", cmd);
-
-		TCLAP::SwitchArg runAsServiceArg("d", "run-as-service", "Run as a service on Windows", cmd);
-
-		cmd.ignoreUnmatched(true);
-
+		TCLAP::ValueArg<int> slotsArg    ("s", "max-players",         "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
+		TCLAP::MultiArg<int> portsArg    ("p", "port",                "The port number the server should listen to", false, "port", cmd);
+		TCLAP::SwitchArg commLogArg      ("",  "log-comm",            "Log server client communications to file", cmd);
+		TCLAP::SwitchArg commLogInArg    ("",  "log-comm-in",         "Log inbound server client communications to file", cmd);
+		TCLAP::SwitchArg commLogOutArg   ("",  "log-comm-out",        "Log outbound server client communications to file", cmd);
+		TCLAP::SwitchArg crashDumpFull   ("",  "crash-dump-full",     "Crashdumps created by the server will contain full server memory", cmd);
+		TCLAP::SwitchArg crashDumpGlobals("",  "crash-dump-globals",  "Crashdumps created by the server will contain the global variables' values", cmd);
+		TCLAP::SwitchArg noBufArg        ("",  "no-output-buffering", "Disable output buffering", cmd);
+		TCLAP::SwitchArg runAsServiceArg ("d", "run-as-service",      "Run as a service on Windows", cmd);
 		cmd.parse(argc, argv);
 
+		// Copy the parsed args' values into a settings repository:
 		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
-
 		if (slotsArg.isSet())
 		{
-
 			int slots = slotsArg.getValue();
-
 			repo->AddValue("Server", "MaxPlayers", static_cast<Int64>(slots));
-
 		}
-
 		if (portsArg.isSet())
 		{
-			std::vector<int> ports = portsArg.getValue();
-			for (auto port : ports)
+			for (auto port: portsArg.getValue())
 			{
 				repo->AddValue("Server", "Port", static_cast<Int64>(port));
 			}
 		}
-
 		if (commLogArg.getValue())
 		{
 			g_ShouldLogCommIn = true;
@@ -418,27 +405,41 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 			g_ShouldLogCommIn = commLogInArg.getValue();
 			g_ShouldLogCommOut = commLogOutArg.getValue();
 		}
-
 		if (noBufArg.getValue())
 		{
 			setvbuf(stdout, nullptr, _IONBF, 0);
 		}
+		repo->SetReadOnly();
 
+		// Set the service flag directly to cRoot:
 		if (runAsServiceArg.getValue())
 		{
 			cRoot::m_RunAsService = true;
 		}
 
-		repo->SetReadOnly();
+		// Apply the CrashDump flags for platforms that support them:
+		#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)  // 32-bit Windows app compiled in MSVC
+			if (crashDumpGlobals.getValue())
+			{
+				g_DumpFlags = static_cast<MINIDUMP_TYPE>(g_DumpFlags | MiniDumpWithDataSegs);
+			}
+			if (crashDumpFull.getValue())
+			{
+				g_DumpFlags = static_cast<MINIDUMP_TYPE>(g_DumpFlags | MiniDumpWithFullMemory);
+			}
+		#endif  // 32-bit Windows app compiled in MSVC
 
 		return repo;
 	}
-	catch (TCLAP::ArgException &e)
+	catch (const TCLAP::ArgException & exc)
 	{
-		printf("error reading command line %s for arg %s", e.error().c_str(), e.argId().c_str());
+		printf("Error reading command line %s for arg %s", exc.error().c_str(), exc.argId().c_str());
 		return cpp14::make_unique<cMemorySettingsRepository>();
 	}
 }
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -446,87 +447,69 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-	
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	InitLeakFinder();
+		InitLeakFinder();
 	#endif
 
 	// Magic code to produce dump-files on Windows if the server crashes:
-	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)
-	HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");
-	g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
-	if (g_WriteMiniDump != nullptr)
-	{
-		_snprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, "crash_mcs_%x.dmp", GetCurrentProcessId());
-		SetUnhandledExceptionFilter(LastChanceExceptionFilter);
-		
-		// Parse arguments for minidump flags:
-		for (int i = 0; i < argc; i++)
+	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)  // 32-bit Windows app compiled in MSVC
+		HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");
+		g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
+		if (g_WriteMiniDump != nullptr)
 		{
-			if (_stricmp(argv[i], "/cdg") == 0)
-			{
-				// Add globals to the dump
-				g_DumpFlags = (MINIDUMP_TYPE)(g_DumpFlags | MiniDumpWithDataSegs);
-			}
-			else if (_stricmp(argv[i], "/cdf") == 0)
-			{
-				// Add full memory to the dump (HUUUGE file)
-				g_DumpFlags = (MINIDUMP_TYPE)(g_DumpFlags | MiniDumpWithFullMemory);
-			}
-		}  // for i - argv[]
-	}
-	#endif  // _WIN32 && !_WIN64
+			_snprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, "crash_mcs_%x.dmp", GetCurrentProcessId());
+			SetUnhandledExceptionFilter(LastChanceExceptionFilter);
+		}
+	#endif  // 32-bit Windows app compiled in MSVC
 	// End of dump-file magic
 
+
 	#if defined(_DEBUG) && defined(_MSC_VER)
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+		_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	
-	// _X: The simple built-in CRT leak finder - simply break when allocating the Nth block ({N} is listed in the leak output)
-	// Only useful when the leak is in the same sequence all the time
-	// _CrtSetBreakAlloc(85950);
+		// _X: The simple built-in CRT leak finder - simply break when allocating the Nth block ({N} is listed in the leak output)
+		// Only useful when the leak is in the same sequence all the time
+		// _CrtSetBreakAlloc(85950);
 	
 	#endif  // _DEBUG && _MSC_VER
 
 	#ifndef _DEBUG
-	std::signal(SIGSEGV, NonCtrlHandler);
-	std::signal(SIGTERM, NonCtrlHandler);
-	std::signal(SIGINT,  NonCtrlHandler);
-	std::signal(SIGABRT, NonCtrlHandler);
-	#ifdef SIGABRT_COMPAT
-	std::signal(SIGABRT_COMPAT, NonCtrlHandler);
-	#endif  // SIGABRT_COMPAT
+		std::signal(SIGSEGV, NonCtrlHandler);
+		std::signal(SIGTERM, NonCtrlHandler);
+		std::signal(SIGINT,  NonCtrlHandler);
+		std::signal(SIGABRT, NonCtrlHandler);
+		#ifdef SIGABRT_COMPAT
+			std::signal(SIGABRT_COMPAT, NonCtrlHandler);
+		#endif  // SIGABRT_COMPAT
 	#endif
 
-	// DEBUG: test the dumpfile creation:
-	// *((int *)0) = 0;
-	
 	auto argsRepo = parseArguments(argc, argv);
 	
 	#if defined(_WIN32)
-	// Attempt to run as a service
-	if (cRoot::m_RunAsService)
-	{
-		SERVICE_TABLE_ENTRY ServiceTable[] =
+		// Attempt to run as a service
+		if (cRoot::m_RunAsService)
 		{
-			{ SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)serviceMain },
-			{ NULL, NULL }
-		};
+			SERVICE_TABLE_ENTRY ServiceTable[] =
+			{
+				{ SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)serviceMain },
+				{ nullptr, nullptr }
+			};
 
-		if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
-		{
-			LOGERROR("Attempted, but failed, service startup.");
-			return GetLastError();
+			if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
+			{
+				LOGERROR("Attempted, but failed, service startup.");
+				return GetLastError();
+			}
 		}
-	}
-	else
+		else
 	#endif
 	{
-		// Not running as a service, do normal startup
+		// Not running as a Windows service, do normal startup
 		universalMain(std::move(argsRepo));
 	}
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	DeinitLeakFinder();
+		DeinitLeakFinder();
 	#endif
 
 	return EXIT_SUCCESS;

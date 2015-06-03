@@ -133,6 +133,17 @@ enum eGameMode
 
 
 
+enum eChatType
+{
+	ctChatBox        = 0,
+	ctSystem         = 1,
+	ctAboveActionBar = 2,
+} ;
+
+
+
+
+
 enum eWeather
 {
 	eWeather_Sunny        = 0,
