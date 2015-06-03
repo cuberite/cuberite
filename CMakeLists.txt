@@ -3,6 +3,11 @@ cmake_minimum_required (VERSION 2.8.7)
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
+# Enable the support for solution folders in MSVC
+if (MSVC)
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif()
+
 # These env variables are used for configuring Travis CI builds.
 # See https://github.com/mc-server/MCServer/pull/767
 if(DEFINED ENV{TRAVIS_MCSERVER_BUILD_TYPE})
@@ -160,3 +165,12 @@ if(${SELF_TEST})
 	add_subdirectory (tests)
 endif()
 
+# Put project into solution folders in MSVC:
+if (MSVC)
+	set_target_properties(event_core event_extra expat jsoncpp lua luaexpat mbedtls sqlite SQLiteCpp tolualib zlib PROPERTIES FOLDER Lib)
+	set_target_properties(luaproxy tolua PROPERTIES FOLDER Support)
+	if (${SELF_TEST})
+		set_target_properties(Network PROPERTIES FOLDER Lib)
+		set_target_properties(arraystocoords-exe coordinates-exe copies-exe copyblocks-exe creatable-exe EchoServer Google-exe ChunkBuffer NameLookup PROPERTIES FOLDER Tests)
+	endif()
+endif()
