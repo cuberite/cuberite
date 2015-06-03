@@ -158,6 +158,66 @@ void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
 
 
 
+void cProtocolRecognizer::SendChatAboveActionBar(const AString & a_Message)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendChatAboveActionBar(a_Message);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendChatAboveActionBar(const cCompositeChat & a_Message)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendChatAboveActionBar(a_Message);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendChatSystem(const AString & a_Message)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendChatSystem(a_Message);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendChatSystem(const cCompositeChat & a_Message)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendChatSystem(a_Message);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendChatType(const AString & a_Message, eChatType type)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendChatType(a_Message, type);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendChatType(const cCompositeChat & a_Message, eChatType type)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendChatType(a_Message, type);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_Protocol != nullptr);

@@ -2113,6 +2113,64 @@ void cClientHandle::SendChat(const cCompositeChat & a_Message)
 
 
 
+void cClientHandle::SendChatAboveActionBar(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
+{
+	cWorld * World = GetPlayer()->GetWorld();
+	if (World == nullptr)
+	{
+		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		if (World == nullptr)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+	}
+
+	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
+	m_Protocol->SendChatAboveActionBar(Message.append(a_Message));
+}
+
+
+
+
+
+void cClientHandle::SendChatAboveActionBar(const cCompositeChat & a_Message)
+{
+	m_Protocol->SendChatAboveActionBar(a_Message);
+}
+
+
+
+
+
+void cClientHandle::SendChatSystem(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
+{
+	cWorld * World = GetPlayer()->GetWorld();
+	if (World == nullptr)
+	{
+		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		if (World == nullptr)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+	}
+
+	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
+	m_Protocol->SendChatSystem(Message.append(a_Message));
+}
+
+
+
+
+
+void cClientHandle::SendChatSystem(const cCompositeChat & a_Message)
+{
+	m_Protocol->SendChatSystem(a_Message);
+}
+
+
+
+
+
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_Player != nullptr);

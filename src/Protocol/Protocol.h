@@ -70,6 +70,12 @@ public:
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendChat                       (const AString & a_Message) = 0;
 	virtual void SendChat                       (const cCompositeChat & a_Message) = 0;
+	virtual void SendChatAboveActionBar         (const AString & a_Message) = 0;
+	virtual void SendChatAboveActionBar         (const cCompositeChat & a_Message) = 0;
+	virtual void SendChatSystem                 (const AString & a_Message) = 0;
+	virtual void SendChatSystem                 (const cCompositeChat & a_Message) = 0;
+	virtual void SendChatType                   (const AString & a_Message, eChatType type) = 0;
+	virtual void SendChatType                   (const cCompositeChat & a_Message, eChatType type) = 0;
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
 	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
