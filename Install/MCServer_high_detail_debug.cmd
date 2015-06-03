@@ -1,1 +1,1 @@
-MCServer /cdf
+MCServer --crash-dump-full

@@ -1,1 +1,1 @@
-MCServer /cdg
+MCServer --crash-dump-globals
