@@ -2128,47 +2128,47 @@ void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_RelSourceX, int a_R
 	}
 	std::vector<std::pair<Vector3i, cChunk *>> BlocksPotentiallyUnpowered = { std::make_pair(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ), a_Chunk) };
 
-	auto UnpoweringFunction = [&BlocksPotentiallyUnpowered](cChunk * a_Chunk, const Vector3i & a_RelSource)
+	auto UnpoweringFunction = [&BlocksPotentiallyUnpowered](cChunk * a_LambdaChunk, const Vector3i & a_RelSource)
 	{
 		BLOCKTYPE RepeaterType;
-		if (a_Chunk->UnboundedRelGetBlockType(a_RelSource.x, a_RelSource.y, a_RelSource.z, RepeaterType) && (RepeaterType == E_BLOCK_REDSTONE_REPEATER_ON))
+		if (a_LambdaChunk->UnboundedRelGetBlockType(a_RelSource.x, a_RelSource.y, a_RelSource.z, RepeaterType) && (RepeaterType == E_BLOCK_REDSTONE_REPEATER_ON))
 		{
 			return;
 		}
 
-		auto Data = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
-		Data->m_PoweredBlocks.erase(std::remove_if(Data->m_PoweredBlocks.begin(), Data->m_PoweredBlocks.end(), [&BlocksPotentiallyUnpowered, a_Chunk, a_RelSource](const sPoweredBlocks & itr)
+		auto Data = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_LambdaChunk->GetRedstoneSimulatorData());
+		Data->m_PoweredBlocks.erase(std::remove_if(Data->m_PoweredBlocks.begin(), Data->m_PoweredBlocks.end(), [&BlocksPotentiallyUnpowered, a_LambdaChunk, a_RelSource](const sPoweredBlocks & itr)
 			{
 				if (itr.a_SourcePos != a_RelSource)
 				{
 					return false;
 				}
 
-				BlocksPotentiallyUnpowered.emplace_back(std::make_pair(itr.a_BlockPos, a_Chunk));
-				a_Chunk->SetIsRedstoneDirty(true);
+				BlocksPotentiallyUnpowered.emplace_back(std::make_pair(itr.a_BlockPos, a_LambdaChunk));
+				a_LambdaChunk->SetIsRedstoneDirty(true);
 				return true;
 			}
 		), Data->m_PoweredBlocks.end());
 		
-		Data->m_LinkedBlocks.erase(std::remove_if(Data->m_LinkedBlocks.begin(), Data->m_LinkedBlocks.end(), [&BlocksPotentiallyUnpowered, a_Chunk, a_RelSource](const sLinkedPoweredBlocks & itr)
+		Data->m_LinkedBlocks.erase(std::remove_if(Data->m_LinkedBlocks.begin(), Data->m_LinkedBlocks.end(), [&BlocksPotentiallyUnpowered, a_LambdaChunk, a_RelSource](const sLinkedPoweredBlocks & itr)
 			{
 				if (itr.a_SourcePos != a_RelSource)
 				{
 					return false;
 				}
 
-				BlocksPotentiallyUnpowered.emplace_back(std::make_pair(itr.a_BlockPos, a_Chunk));
-				a_Chunk->SetIsRedstoneDirty(true);
+				BlocksPotentiallyUnpowered.emplace_back(std::make_pair(itr.a_BlockPos, a_LambdaChunk));
+				a_LambdaChunk->SetIsRedstoneDirty(true);
 				return true;
 			}
 		), Data->m_LinkedBlocks.end());
 
-		for (const auto & BoundaryChunk : GetAdjacentChunks(a_RelSource, a_Chunk))
+		for (const auto & BoundaryChunk : GetAdjacentChunks(a_RelSource, a_LambdaChunk))
 		{
 			auto BoundaryData = static_cast<cIncrementalRedstoneSimulatorChunkData *>(BoundaryChunk->GetRedstoneSimulatorData());
 			Vector3i ChunkAdjustedSource = a_RelSource;
-			ChunkAdjustedSource.x += (a_Chunk->GetPosX() - BoundaryChunk->GetPosX()) * cChunkDef::Width;
-			ChunkAdjustedSource.z += (a_Chunk->GetPosZ() - BoundaryChunk->GetPosZ()) * cChunkDef::Width;
+			ChunkAdjustedSource.x += (a_LambdaChunk->GetPosX() - BoundaryChunk->GetPosX()) * cChunkDef::Width;
+			ChunkAdjustedSource.z += (a_LambdaChunk->GetPosZ() - BoundaryChunk->GetPosZ()) * cChunkDef::Width;
 
 			if (
 				(std::find_if(BoundaryData->m_PoweredBlocks.begin(), BoundaryData->m_PoweredBlocks.end(), [ChunkAdjustedSource](const sPoweredBlocks & itr) { return (itr.a_SourcePos == ChunkAdjustedSource); }) != BoundaryData->m_PoweredBlocks.end()) ||
@@ -2197,45 +2197,38 @@ void cIncrementalRedstoneSimulator::SetInvalidMiddleBlock(int a_RelMiddleX, int 
 	std::vector<std::pair<Vector3i, cChunk *>> BlocksPotentiallyUnpowered;
 	auto Data = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
 
-	Data->m_LinkedBlocks.erase(std::remove_if(Data->m_LinkedBlocks.begin(), Data->m_LinkedBlocks.end(), [&BlocksPotentiallyUnpowered, a_Chunk, a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ](const sLinkedPoweredBlocks & itr)
-		{
-			if (!itr.a_MiddlePos.Equals(Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ)))
+	BLOCKTYPE RepeaterType;
+	if (a_Chunk->UnboundedRelGetBlockType(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ, RepeaterType) && (RepeaterType == E_BLOCK_REDSTONE_REPEATER_ON))
+	{
+		return;
+	}
+
+	auto MiddleBlockUnpoweringFunction = [&BlocksPotentiallyUnpowered](cChunk * a_LambdaChunk, const Vector3i & a_RelMiddle)
+	{
+		auto Data = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_LambdaChunk->GetRedstoneSimulatorData());
+		Data->m_LinkedBlocks.erase(std::remove_if(Data->m_LinkedBlocks.begin(), Data->m_LinkedBlocks.end(), [&BlocksPotentiallyUnpowered, a_LambdaChunk, a_RelMiddle](const sLinkedPoweredBlocks & itr)
 			{
-				return false;
+				if (itr.a_MiddlePos != a_RelMiddle)
+				{
+					return false;
+				}
+
+				BlocksPotentiallyUnpowered.emplace_back(std::make_pair(itr.a_BlockPos, a_LambdaChunk));
+				a_LambdaChunk->SetIsRedstoneDirty(true);
+				return true;
 			}
+		), Data->m_LinkedBlocks.end());
+	};
 
-			for (const auto & BoundaryChunk : GetAdjacentChunks(Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ), a_Chunk))
-			{
-				Vector3i ChunkAdjustedMiddlePos = Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ);
-				ChunkAdjustedMiddlePos.x += (a_Chunk->GetPosX() - BoundaryChunk->GetPosX()) * cChunkDef::Width;
-				ChunkAdjustedMiddlePos.z += (a_Chunk->GetPosZ() - BoundaryChunk->GetPosZ()) * cChunkDef::Width;
+	MiddleBlockUnpoweringFunction(a_Chunk, Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ));
+	for (const auto & BoundaryChunk : GetAdjacentChunks(Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ), a_Chunk))
+	{
+		Vector3i ChunkAdjustedMiddlePos = Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ);
+		ChunkAdjustedMiddlePos.x += (a_Chunk->GetPosX() - BoundaryChunk->GetPosX()) * cChunkDef::Width;
+		ChunkAdjustedMiddlePos.z += (a_Chunk->GetPosZ() - BoundaryChunk->GetPosZ()) * cChunkDef::Width;
 
-				auto BoundaryData = static_cast<cIncrementalRedstoneSimulatorChunkData *>(BoundaryChunk->GetRedstoneSimulatorData());
-				BoundaryData->m_LinkedBlocks.erase(std::remove_if(BoundaryData->m_LinkedBlocks.begin(), BoundaryData->m_LinkedBlocks.end(), [&BlocksPotentiallyUnpowered, BoundaryChunk, ChunkAdjustedMiddlePos](const sLinkedPoweredBlocks & itr)
-					{
-						if (itr.a_MiddlePos != ChunkAdjustedMiddlePos)
-						{
-							return false;
-						}
-
-						BlocksPotentiallyUnpowered.emplace_back(std::make_pair(itr.a_BlockPos, BoundaryChunk));
-						BoundaryChunk->SetIsRedstoneDirty(true);
-						return true;
-					}
-				), BoundaryData->m_LinkedBlocks.end());
-			}
-
-			BLOCKTYPE RepeaterType;
-			if (a_Chunk->UnboundedRelGetBlockType(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ, RepeaterType) && (RepeaterType == E_BLOCK_REDSTONE_REPEATER_ON))
-			{
-				return false;
-			}
-
-			BlocksPotentiallyUnpowered.emplace_back(std::make_pair(itr.a_BlockPos, a_Chunk));
-			a_Chunk->SetIsRedstoneDirty(true);
-			return true;
-		}
-	), Data->m_LinkedBlocks.end());
+		MiddleBlockUnpoweringFunction(a_Chunk, Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ));
+	}
 
 	for (const auto & itr : BlocksPotentiallyUnpowered)
 	{
@@ -2265,11 +2258,11 @@ std::vector<cChunk *> cIncrementalRedstoneSimulator::GetAdjacentChunks(const Vec
 	std::vector<cChunk *> AdjacentChunks;
 	AdjacentChunks.reserve(2);  // At most bordering two chunks; reserve that many
 
-	auto CheckAndEmplace = [&AdjacentChunks](cChunk * a_Chunk)
+	auto CheckAndEmplace = [&AdjacentChunks](cChunk * a_LambdaChunk)
 	{
-		if ((a_Chunk != nullptr) && a_Chunk->IsValid())
+		if ((a_LambdaChunk != nullptr) && a_LambdaChunk->IsValid())
 		{
-			AdjacentChunks.emplace_back(a_Chunk);
+			AdjacentChunks.emplace_back(a_LambdaChunk);
 		}
 	};
 
