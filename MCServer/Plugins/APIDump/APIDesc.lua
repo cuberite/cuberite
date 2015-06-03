@@ -1917,6 +1917,8 @@ a_Player:OpenWindow(Window);
 				SendMessagePrivateMsg = { Params = "Message, SenderName", Return = "", Notes = "Prepends Light Blue [MSG: *SenderName*] / prepends SenderName and colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For private messaging." },
 				SendMessageSuccess = { Params = "Message", Return = "", Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Success notification." },
 				SendMessageWarning = { Params = "Message, Sender", Return = "", Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. Denotes that something concerning, such as plugin reload, is about to happen." },
+				SendAboveActionBarMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player (shows above action bar, doesn't show for < 1.8 clients)." },
+				SendSystemMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player (doesn't show for < 1.8 clients)." },
 				SendRotation = { Params = "YawDegrees, PitchDegrees", Return = "", Notes = "Sends the specified rotation to the player, forcing them to look that way" },
 				SetBedPos = { Params = "{{Vector3i|Position}}", Return = "", Notes = "Sets the internal representation of the last bed position the player has slept in. The player will respawn at this position if they die." },
 				SetCanFly = { Params = "CanFly", Notes = "Sets if the player can fly or not." },
