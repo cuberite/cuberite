@@ -32,7 +32,8 @@ cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
 	m_FuelBurnTime(0),
-	m_TimeBurned(0)
+	m_TimeBurned(0),
+	m_IsLoading(false)
 {
 	m_Contents.AddListener(*this);
 }
@@ -178,18 +179,12 @@ void cFurnaceEntity::BurnNewFuel(void)
 {
 	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
 	int NewTime = FR->GetBurnTime(m_Contents.GetSlot(fsFuel));
-	if (NewTime == 0)
+	if ((NewTime == 0) || !CanCookInputToOutput())
 	{
 		// The item in the fuel slot is not suitable
+		// or the input and output isn't available for cooking
 		SetBurnTimes(0, 0);
 		SetIsCooking(false);
-		return;
-	}
-
-	// Is the input and output ready for cooking?
-	if (!CanCookInputToOutput())
-	{
-		SetBurnTimes(0, 0);
 		return;
 	}
 
@@ -219,6 +214,11 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		return;
 	}
 
+	if (m_IsLoading)
+	{
+		return;
+	}
+
 	ASSERT(a_ItemGrid == &m_Contents);
 	switch (a_SlotNum)
 	{
@@ -239,7 +239,10 @@ void cFurnaceEntity::UpdateInput(void)
 	if (!m_Contents.GetSlot(fsInput).IsEqual(m_LastInput))
 	{
 		// The input is different from what we had before, reset the cooking time
-		m_TimeCooked = 0;
+		if (!m_IsLoading)
+		{
+			m_TimeCooked = 0;
+		}
 	}
 	m_LastInput = m_Contents.GetSlot(fsInput);
 
@@ -254,12 +257,16 @@ void cFurnaceEntity::UpdateInput(void)
 	else
 	{
 		m_NeedCookTime = m_CurrentRecipe->CookTime;
-		SetIsCooking(true);
 
 		// Start burning new fuel if there's no flame now:
 		if (GetFuelBurnTimeLeft() <= 0)
 		{
 			BurnNewFuel();
+		}
+		// Already burning, set cooking to ensure that cooking is occuring
+		else
+		{
+			SetIsCooking(true);
 		}
 	}
 }
@@ -294,11 +301,19 @@ void cFurnaceEntity::UpdateOutput(void)
 		return;
 	}
 
-	// No need to burn new fuel, the Tick() function will take care of that
-
 	// Can cook, start cooking if not already underway:
 	m_NeedCookTime = m_CurrentRecipe->CookTime;
-	SetIsCooking(m_FuelBurnTime > 0);
+
+	// Check if fuel needs to start a burn
+	if (GetFuelBurnTimeLeft() <= 0)
+	{
+		BurnNewFuel();
+	}
+	// Already burning, set cooking to ensure that cooking is occuring
+	else
+	{
+		SetIsCooking(true);
+	}
 }
 
 
