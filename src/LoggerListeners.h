@@ -25,7 +25,7 @@ private:
 
 
 
-cLogger::cListener * MakeConsoleListener();
+cLogger::cListener * MakeConsoleListener(bool a_IsService);
 
 
 
