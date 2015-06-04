@@ -1195,7 +1195,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				}
 			}
 			
-			if ((CurrentLevel == FirstLevel && (CurrentEnchantment != 0))
+			if ((CurrentLevel == FirstLevel) && (CurrentEnchantment != 0))
 			{
 				// Increment enchantment level
 				int OldLevel = static_cast<int>(itr.at(itr.size() - 1));
