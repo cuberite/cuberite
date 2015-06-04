@@ -61,7 +61,7 @@ footer
 	font-family: Segoe UI Light, Helvetica;
 }
 
-#content
+#content, #timestamp
 {
 	padding: 0px 25px 25px 25px;
 }
