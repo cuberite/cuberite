@@ -1140,30 +1140,33 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			int FirstLevel = Input.m_Enchantments.GetLevel(CurrentEnchantment);
 
 			// The enchantment could be illegal (Example: Sharpness II on an iron helmet) - Should happen only with Books
-			if ((((Input.m_ItemType == E_ITEM_LEATHER_CAP) || (Input.m_ItemType == E_ITEM_CHAIN_HELMET) || (Input.m_ItemType == E_ITEM_IRON_HELMET) || (Input.m_ItemType == E_ITEM_DIAMOND_HELMET) || (Input.m_ItemType == E_ITEM_GOLD_HELMET))
+			if ((ItemCategory::IsHelmet(Input.m_ItemType)
 				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) &&( CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchRespiration) && (CurrentEnchantment != cEnchantments::enchAquaAffinity) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Helmet */
-				|| (((Input.m_ItemType == E_ITEM_LEATHER_TUNIC) || (Input.m_ItemType == E_ITEM_CHAIN_CHESTPLATE) || (Input.m_ItemType == E_ITEM_IRON_CHESTPLATE) || (Input.m_ItemType == E_ITEM_DIAMOND_HELMET) || (Input.m_ItemType == E_ITEM_GOLD_HELMET))
+				|| (ItemCategory::IsChestPlate(Input.m_ItemType)
 				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Chestplate */
-				|| (((Input.m_ItemType == E_ITEM_LEATHER_PANTS) || (Input.m_ItemType == E_ITEM_CHAIN_LEGGINGS) || (Input.m_ItemType == E_ITEM_IRON_CHESTPLATE) || (Input.m_ItemType == E_ITEM_DIAMOND_CHESTPLATE) || (Input.m_ItemType == E_ITEM_GOLD_CHESTPLATE))
+				|| (ItemCategory::IsLeggings(Input.m_ItemType)
 				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Leggings */
-				|| (((Input.m_ItemType == E_ITEM_LEATHER_BOOTS) || (Input.m_ItemType == E_ITEM_CHAIN_BOOTS) || (Input.m_ItemType == E_ITEM_IRON_BOOTS) || (Input.m_ItemType == E_ITEM_DIAMOND_BOOTS) || (Input.m_ItemType == E_ITEM_GOLD_BOOTS))
+				|| (ItemCategory::IsBoots(Input.m_ItemType)
 				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchFeatherFalling) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchDepthStrider) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Boots */
-				|| (((Input.m_ItemType == E_ITEM_WOODEN_SWORD) || (Input.m_ItemType == E_ITEM_STONE_SWORD) || (Input.m_ItemType == E_ITEM_IRON_SWORD) || (Input.m_ItemType == E_ITEM_DIAMOND_SWORD)|| (Input.m_ItemType == E_ITEM_GOLD_SWORD))
+				|| (ItemCategory::IsSword(Input.m_ItemType)
 				&& ((CurrentEnchantment != cEnchantments::enchSharpness) && (CurrentEnchantment != cEnchantments::enchSmite) && (CurrentEnchantment != cEnchantments::enchBaneOfArthropods) && (CurrentEnchantment != cEnchantments::enchKnockback) && (CurrentEnchantment != cEnchantments::enchFireAspect) && (CurrentEnchantment != cEnchantments::enchLooting) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Swords */
-				|| (((Input.m_ItemType == E_ITEM_WOODEN_AXE) || (Input.m_ItemType == E_ITEM_STONE_AXE) || (Input.m_ItemType == E_ITEM_IRON_AXE) || (Input.m_ItemType == E_ITEM_DIAMOND_AXE) || (Input.m_ItemType == E_ITEM_GOLD_AXE))
+				|| (ItemCategory::IsAxe(Input.m_ItemType)
 				&& ((CurrentEnchantment != cEnchantments::enchSharpness) && (CurrentEnchantment != cEnchantments::enchSmite) && (CurrentEnchantment != cEnchantments::enchBaneOfArthropods) && (CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
 				/* Axe */
-				|| (((Input.m_ItemType == E_ITEM_WOODEN_SHOVEL) || (Input.m_ItemType == E_ITEM_STONE_SHOVEL) || (Input.m_ItemType == E_ITEM_IRON_SHOVEL) || (Input.m_ItemType == E_ITEM_DIAMOND_SHOVEL) || (Input.m_ItemType == E_ITEM_GOLD_SHOVEL))
+				|| (ItemCategory::IsShovel(Input.m_ItemType)
 				&& ((CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
 				/* Shovels */
-				|| (((Input.m_ItemType == E_ITEM_WOODEN_HOE) || (Input.m_ItemType == E_ITEM_STONE_HOE) || (Input.m_ItemType == E_ITEM_IRON_HOE) || (Input.m_ItemType == E_ITEM_DIAMOND_HOE) || (Input.m_ItemType == E_ITEM_GOLD_HOE))
+				|| (ItemCategory::IsHoe(Input.m_ItemType)
 				&& (CurrentEnchantment != cEnchantments::enchUnbreaking))
 				/* Hoes */
+				|| (ItemCategory::IsPickaxe(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
+				/* Pickaxes */
 				|| ((Input.m_ItemType == E_ITEM_BOW)
 				&& ((CurrentEnchantment != cEnchantments::enchPower) && (CurrentEnchantment != cEnchantments::enchPunch) && (CurrentEnchantment != cEnchantments::enchFlame) && (CurrentEnchantment != cEnchantments::enchInfinity) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
 				/* Bow */
