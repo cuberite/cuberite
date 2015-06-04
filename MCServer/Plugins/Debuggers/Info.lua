@@ -235,6 +235,12 @@ g_PluginInfo =
 			Handler = HandleConsoleSchedule,
 			HelpString = "Tests the world scheduling",
 		},
+		
+		["testtracer"] =
+		{
+			Handler = HandleConsoleTestTracer,
+			HelpString = "Tests the cLineBlockTracer",
+		}
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
 

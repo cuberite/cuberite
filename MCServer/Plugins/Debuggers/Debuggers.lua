@@ -1880,6 +1880,117 @@ end
 
 
 
+--- Returns the square of the distance from the specified point to the specified line
+local function SqDistPtFromLine(x, y, x1, y1, x2, y2)
+	local dx = x - x1
+	local dy = y - y1
+	local px = x2 - x1
+	local py = y2 - y1
+	local ss = px * dx + py * dy
+	local ds = px * px + py * py
+
+	if (ss < 0) then
+		-- Return sqdistance from point 1
+		return dx * dx + dy * dy
+	end
+	if (ss > ds) then
+		-- Return sqdistance from point 2
+		return ((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y))
+	end
+
+	-- Return sqdistance from the line
+	if ((px * px + py * py) == 0) then
+		return dx * dx + dy * dy
+	else
+		return (py * dx - px * dy) * (py * dx - px * dy) / (px * px + py * py)
+	end
+end
+
+
+
+
+
+function HandleConsoleTestTracer(a_Split, a_EntireCmd)
+	-- Check required params:
+	if not(a_Split[7]) then
+		return true, "Usage: " .. a_Split[1] .. " <x1> <y1> <z1> <x2> <y2> <z2> [<WorldName>]"
+	end
+	local Coords = {}
+	for i = 1, 6 do
+		local v = tonumber(a_Split[i + 1])
+		if not(v) then
+			return true, "Parameter " .. (i + 1) .. " (" .. tostring(a_Split[i + 1]) .. ") not a number "
+		end
+		Coords[i] = v
+	end
+	
+	-- Get the world in which to test:
+	local World
+	if (a_Split[8]) then
+		World = cRoot:GetWorld(a_Split[2])
+	else
+		World = cRoot:Get():GetDefaultWorld()
+	end
+	if not(World) then
+		return true, "No such world"
+	end
+	
+	-- Define the callbacks to use for tracing:
+	local Callbacks =
+	{
+		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_EntryFace)
+			LOG(string.format("{%d, %d, %d}: %s", a_BlockX, a_BlockY, a_BlockZ, ItemToString(cItem(a_BlockType, 1, a_BlockMeta))))
+		end,
+		OnNextBlockNoData = function(a_BlockX, a_BlockY, a_BlockZ, a_EntryFace)
+			LOG(string.format("{%d, %d, %d} (no data)", a_BlockX, a_BlockY, a_BlockZ))
+		end,
+		OnNoChunk = function()
+			LOG("Chunk not loaded")
+		end,
+		OnNoMoreHits = function()
+			LOG("Trace finished")
+		end,
+		OnOutOfWorld = function()
+			LOG("Out of world")
+		end,
+		OnIntoWorld = function()
+			LOG("Into world")
+		end,
+	}
+
+	-- Approximate the chunks needed for the trace by iterating over all chunks and measuring their center's distance from the traced line
+	local Chunks = {}
+	local sx = math.floor(Coords[1] / 16)
+	local sz = math.floor(Coords[3] / 16)
+	local ex = math.floor(Coords[4] / 16)
+	local ez = math.floor(Coords[6] / 16)
+	local sgnx = (sx < ex) and 1 or -1
+	local sgnz = (sz < ez) and 1 or -1
+	for z = sz, ez, sgnz do
+		local ChunkCenterZ = z * 16 + 8
+		for x = sx, ex, sgnx do
+			local ChunkCenterX = x * 16 + 8
+			local sqdist = SqDistPtFromLine(ChunkCenterX, ChunkCenterZ, Coords[1], Coords[3], Coords[4], Coords[6])
+			if (sqdist <= 128) then
+				table.insert(Chunks, {x, z})
+			end
+		end
+	end
+	
+	-- Load the chunks and do the trace once loaded:
+	World:ChunkStay(Chunks,
+		nil,
+		function()
+			cLineBlockTracer:Trace(World, Callbacks, Coords[1], Coords[2], Coords[3], Coords[4], Coords[5], Coords[6])
+		end
+	)
+	return true
+end
+
+
+
+
+
 function HandleConsoleBBox(a_Split)
 	local bbox = cBoundingBox(0, 10, 0, 10, 0, 10)
 	local v1 = Vector3d(1, 1, 1)
