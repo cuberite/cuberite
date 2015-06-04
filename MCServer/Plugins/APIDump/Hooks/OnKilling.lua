@@ -17,6 +17,7 @@ return
 		{
 			{ Name = "Victim", Type = "{{cPawn}}", Notes = "The player or mob that is about to be killed" },
 			{ Name = "Killer", Type = "{{cEntity}}", Notes = "The entity that has caused the victim to lose the last point of health. May be nil for environment damage" },
+			{ Name = "TDI", Type = "{{TakeDamageInfo}}", Notes = "The damage type, cause and effects." },
 		},
 		Returns = [[
 			If the function returns false or no value, MCServer calls other plugins with this event. If the
