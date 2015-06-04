@@ -1137,6 +1137,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		{
 			int CurrentEnchantment = cEnchantments::StringToEnchantmentID(StringSplit(itr, "=").at(0));
 			int CurrentLevel = SecondInput.m_Enchantments.GetLevel(CurrentEnchantment);
+			int FirstLevel = Input.m_Enchantments.GetLevel(CurrentEnchantment);
 
 			// The enchantment could be illegal (Example: Sharpness II on an iron helmet) - Should happen only with Books
 			if ((((Input.m_ItemType == E_ITEM_LEATHER_CAP) || (Input.m_ItemType == E_ITEM_CHAIN_HELMET) || (Input.m_ItemType == E_ITEM_IRON_HELMET) || (Input.m_ItemType == E_ITEM_DIAMOND_HELMET) || (Input.m_ItemType == E_ITEM_GOLD_HELMET))
@@ -1194,7 +1195,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				}
 			}
 			
-			if ((CurrentLevel == Input.m_Enchantments.GetLevel(CurrentEnchantment)) && (CurrentEnchantment != 0))
+			if ((CurrentLevel == FirstLevel && (CurrentEnchantment != 0))
 			{
 				// Increment enchantment level
 				int OldLevel = static_cast<int>(itr.at(itr.size() - 1));
@@ -1204,7 +1205,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				itr.push_back(OldLevel + 1);
 				CurrentLevel++;
 			}
-			else if (CurrentLevel < Input.m_Enchantments.GetLevel(CurrentEnchantment))
+			else if (CurrentLevel < FirstLevel)
 			{
 				CurrentLevel = Input.m_Enchantments.GetLevel(CurrentEnchantment);
 			}
