@@ -51,11 +51,18 @@ else()
 		RESULT_VARIABLE GIT_EXECUTED
 		OUTPUT_VARIABLE BUILD_COMMIT_ID
 	)
+	if (NOT(GIT_EXECUTED EQUAL 0))
+		set(BUILD_COMMIT_ID "Unknown")
+	endif()
 	string(STRIP ${BUILD_COMMIT_ID} BUILD_COMMIT_ID)
 	execute_process(
 		COMMAND git log -1 --date=iso --pretty=format:%ai
+		RESULT_VARIABLE GIT_EXECUTED
 		OUTPUT_VARIABLE BUILD_DATETIME
 	)
+	if (NOT(GIT_EXECUTED EQUAL 0))
+		set(BUILD_DATETIME "Unknown")
+	endif()
 	string(STRIP ${BUILD_DATETIME} BUILD_DATETIME)
 
 	# The BUILD_COMMIT_ID and BUILD_DATETIME aren't updated on each repo pull
