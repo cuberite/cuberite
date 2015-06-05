@@ -83,6 +83,7 @@ SET (HDRS
 	BlockTracer.h
 	Broadcaster.h
 	BoundingBox.h
+	BuildInfo.h
 	BuildInfo.h.cmake
 	ByteBuffer.h
 	ChatColor.h
