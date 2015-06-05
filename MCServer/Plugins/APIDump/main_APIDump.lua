@@ -153,6 +153,19 @@ end
 
 
 
+--- Returns the timestamp in HTML format
+-- The timestamp will be inserted to all generated HTML files
+local function GetHtmlTimestamp()
+	return string.format("<div id='timestamp'>Generated on %s, Build ID %s, Commit %s</div>",
+		os.date("%Y-%m-%d %H:%M:%S"),
+		cRoot:GetBuildID(), cRoot:GetBuildCommitID()
+	)
+end
+
+
+
+
+
 local function WriteArticles(f)
 	f:write([[
 		<a name="articles"><h2>Articles</h2></a>
@@ -296,7 +309,9 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 		f:write("<p>", (example.Desc or "<i>missing Desc</i>"), "</p>\n");
 		f:write("<pre class=\"prettyprint lang-lua\">", (example.Code or "<i>missing Code</i>"), "\n</pre>\n\n");
 	end
-	f:write([[</td></tr></table></div><script>prettyPrint();</script></body></html>]]);
+	f:write([[</td></tr></table></div><script>prettyPrint();</script>]])
+	f:write(GetHtmlTimestamp())
+	f:write([[</body></html>]])
 	f:close();
 end
 
@@ -941,8 +956,10 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		end
 	end
 
-	cf:write([[</td></tr></table></div><script>prettyPrint();</script></body></html>]]);
-	cf:close();
+	cf:write([[</td></tr></table></div><script>prettyPrint();</script>]])
+	cf:write(GetHtmlTimestamp())
+	cf:write([[</body></html>]])
+	cf:close()
 end
 
 
@@ -1320,11 +1337,10 @@ local function DumpAPIHtml(a_API)
 
 	WriteStats(f);
 	
-	f:write([[			</ul>
-		</div>
-	</body>
-</html>]]);
-	f:close();
+	f:write([[</ul></div>]])
+	f:write(GetHtmlTimestamp())
+	f:write([[</body></html>]])
+	f:close()
 	
 	LOG("API subfolder written");
 end
