@@ -156,7 +156,10 @@ end
 --- Returns the timestamp in HTML format
 -- The timestamp will be inserted to all generated HTML files
 local function GetHtmlTimestamp()
-	return string.format("<div id='timestamp'>Generated on %s</div>", os.date("%Y-%m-%d %H:%M:%S"))
+	return string.format("<div id='timestamp'>Generated on %s, Build ID %s, Commit %s</div>",
+		os.date("%Y-%m-%d %H:%M:%S"),
+		cRoot:GetBuildID(), cRoot:GetBuildCommitID()
+	)
 end
 
 

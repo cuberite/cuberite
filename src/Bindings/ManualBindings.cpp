@@ -34,6 +34,7 @@
 #include "../CompositeChat.h"
 #include "../StringCompression.h"
 #include "../CommandOutput.h"
+#include "../BuildInfo.h"
 
 
 
@@ -2079,6 +2080,50 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 
 
+static int tolua_cRoot_GetBuildCommitID(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	L.Push(BUILD_COMMIT_ID);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cRoot_GetBuildDateTime(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	L.Push(BUILD_DATETIME);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cRoot_GetBuildID(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	L.Push(BUILD_ID);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cRoot_GetBuildSeriesName(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	L.Push(BUILD_SERIES_NAME);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -2092,7 +2137,8 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	}
 	
 	// Check the input param:
-	cItem * Input = (cItem *)tolua_tousertype(L, 2, nullptr);
+	cItem * Input = nullptr;
+	L.GetStackValue(2, Input);
 	if (Input == nullptr)
 	{
 		LOGWARNING("cRoot:GetFurnaceRecipe: the Input parameter is nil or missing.");
@@ -2109,9 +2155,9 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	}
 	
 	// Push the output, number of ticks and input as the three return values:
-	tolua_pushusertype(L, Recipe->Out, "const cItem");
-	tolua_pushnumber  (L, (lua_Number)(Recipe->CookTime));
-	tolua_pushusertype(L, Recipe->In, "const cItem");
+	L.Push(Recipe->Out);
+	L.Push(Recipe->CookTime);
+	L.Push(Recipe->In);
 	return 3;
 }
 
@@ -2868,6 +2914,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithPlayerByUUID",  DoWith <cRoot, cPlayer, &cRoot::DoWithPlayerByUUID>);
 			tolua_function(tolua_S, "ForEachPlayer",       ForEach<cRoot, cPlayer, &cRoot::ForEachPlayer>);
 			tolua_function(tolua_S, "ForEachWorld",        ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
+			tolua_function(tolua_S, "GetBuildCommitID",    tolua_cRoot_GetBuildCommitID);
+			tolua_function(tolua_S, "GetBuildDateTime",    tolua_cRoot_GetBuildDateTime);
+			tolua_function(tolua_S, "GetBuildID",          tolua_cRoot_GetBuildID);
+			tolua_function(tolua_S, "GetBuildSeriesName",  tolua_cRoot_GetBuildSeriesName);
 			tolua_function(tolua_S, "GetFurnaceRecipe",    tolua_cRoot_GetFurnaceRecipe);
 		tolua_endmodule(tolua_S);
 
