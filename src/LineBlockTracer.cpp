@@ -154,38 +154,45 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 {
 	// Find out which of the current block's walls gets hit by the path:
 	static const double EPS = 0.00001;
-	double Coeff = 1;
-	enum eDirection
+	enum
 	{
 		dirNONE,
 		dirX,
 		dirY,
 		dirZ,
 	} Direction = dirNONE;
+
+	// Calculate the next YZ wall hit:
+	double Coeff = 1;
 	if (std::abs(m_DiffX) > EPS)
 	{
 		double DestX = (m_DirX > 0) ? (m_CurrentX + 1) : m_CurrentX;
-		Coeff = (DestX - m_StartX) / m_DiffX;
-		if (Coeff <= 1)
+		double CoeffX = (DestX - m_StartX) / m_DiffX;
+		if (CoeffX <= 1)  // We need to include equality for the last block in the trace
 		{
+			Coeff = CoeffX;
 			Direction = dirX;
 		}
 	}
+
+	// If the next XZ wall hit is closer, use it instead:
 	if (std::abs(m_DiffY) > EPS)
 	{
 		double DestY = (m_DirY > 0) ? (m_CurrentY + 1) : m_CurrentY;
 		double CoeffY = (DestY - m_StartY) / m_DiffY;
-		if (CoeffY < Coeff)
+		if (CoeffY <= Coeff)  // We need to include equality for the last block in the trace
 		{
 			Coeff = CoeffY;
 			Direction = dirY;
 		}
 	}
+
+	// If the next XY wall hit is closer, use it instead:
 	if (std::abs(m_DiffZ) > EPS)
 	{
 		double DestZ = (m_DirZ > 0) ? (m_CurrentZ + 1) : m_CurrentZ;
 		double CoeffZ = (DestZ - m_StartZ) / m_DiffZ;
-		if (CoeffZ < Coeff)
+		if (CoeffZ <= Coeff)  // We need to include equality for the last block in the trace
 		{
 			Direction = dirZ;
 		}
