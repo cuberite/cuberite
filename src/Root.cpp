@@ -106,7 +106,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
 
-	cLogger::cListener * consoleLogListener = MakeConsoleListener();
+	cLogger::cListener * consoleLogListener = MakeConsoleListener(m_RunAsService);
 	cLogger::cListener * fileLogListener = new cFileListener();
 	cLogger::GetInstance().AttachListener(consoleLogListener);
 	cLogger::GetInstance().AttachListener(fileLogListener);

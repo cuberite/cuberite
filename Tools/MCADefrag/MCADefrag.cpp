@@ -22,7 +22,7 @@ static const Byte g_Zeroes[4096] = {0};
 
 int main(int argc, char ** argv)
 {
-	cLogger::cListener * consoleLogListener = MakeConsoleListener();
+	cLogger::cListener * consoleLogListener = MakeConsoleListener(false);
 	cLogger::cListener * fileLogListener = new cFileListener();
 	cLogger::GetInstance().AttachListener(consoleLogListener);
 	cLogger::GetInstance().AttachListener(fileLogListener);

@@ -238,8 +238,26 @@ public:
 
 
 
-cLogger::cListener * MakeConsoleListener(void)
+// Listener for when stdout is closed, i.e. When running as a daemon.
+class cNullConsoleListener
+	: public cLogger::cListener
 {
+	virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
+	{
+	}
+};
+
+
+
+
+
+cLogger::cListener * MakeConsoleListener(bool a_IsService)
+{
+	if (a_IsService)
+	{
+		return new cNullConsoleListener;
+	}
+
 	#ifdef _WIN32
 		// See whether we are writing to a console the default console attrib:
 		bool ShouldColorOutput = (_isatty(_fileno(stdin)) != 0);

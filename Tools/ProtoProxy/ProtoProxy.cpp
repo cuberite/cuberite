@@ -16,7 +16,7 @@ int main(int argc, char ** argv)
 {
 	// Initialize logging subsystem:
 	cLogger::InitiateMultithreading();
-	auto consoleLogListener = MakeConsoleListener();
+	auto consoleLogListener = MakeConsoleListener(false);
 	auto fileLogListener = new cFileListener();
 	cLogger::GetInstance().AttachListener(consoleLogListener);
 	cLogger::GetInstance().AttachListener(fileLogListener);

@@ -250,7 +250,7 @@ void universalMain(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 
 
 
-#if defined(_WIN32)
+#if defined(_WIN32)  // Windows service support.
 ////////////////////////////////////////////////////////////////////////////////
 // serviceWorkerThread: Keep the service alive
 
@@ -358,7 +358,7 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 	
 	serviceSetState(0, SERVICE_STOPPED, 0);
 }
-#endif
+#endif  // Windows service support.
 
 
 
@@ -378,7 +378,7 @@ std::unique_ptr<cMemorySettingsRepository> parseArguments(int argc, char **argv)
 		TCLAP::SwitchArg crashDumpFull   ("",  "crash-dump-full",     "Crashdumps created by the server will contain full server memory", cmd);
 		TCLAP::SwitchArg crashDumpGlobals("",  "crash-dump-globals",  "Crashdumps created by the server will contain the global variables' values", cmd);
 		TCLAP::SwitchArg noBufArg        ("",  "no-output-buffering", "Disable output buffering", cmd);
-		TCLAP::SwitchArg runAsServiceArg ("d", "run-as-service",      "Run as a service on Windows", cmd);
+		TCLAP::SwitchArg runAsServiceArg ("d", "service",             "Run as a service on Windows, or daemon on UNIX like systems", cmd);
 		cmd.parse(argc, argv);
 
 		// Copy the parsed args' values into a settings repository:
@@ -484,11 +484,11 @@ int main(int argc, char **argv)
 	#endif
 
 	auto argsRepo = parseArguments(argc, argv);
-	
-	#if defined(_WIN32)
-		// Attempt to run as a service
-		if (cRoot::m_RunAsService)
-		{
+
+	// Attempt to run as a service
+	if (cRoot::m_RunAsService)
+	{
+		#if defined(_WIN32)  // Windows service.
 			SERVICE_TABLE_ENTRY ServiceTable[] =
 			{
 				{ SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)serviceMain },
@@ -500,11 +500,33 @@ int main(int argc, char **argv)
 				LOGERROR("Attempted, but failed, service startup.");
 				return GetLastError();
 			}
-		}
-		else
-	#endif
+		#else  // UNIX daemon.
+			pid_t pid = fork();
+
+			// fork() returns a negative value on error.
+			if (pid < 0)
+			{
+				LOGERROR("Could not fork process.");
+				return EXIT_FAILURE;
+			}
+
+			// Check if we are the parent or child process. Parent stops here.
+			if (pid > 0)
+			{
+				return EXIT_SUCCESS;
+			}
+
+			//  Child process now goes quiet, running in the background.
+			close(STDIN_FILENO);
+			close(STDOUT_FILENO);
+			close(STDERR_FILENO);
+
+			universalMain(std::move(argsRepo));
+		#endif
+	}
+	else
 	{
-		// Not running as a Windows service, do normal startup
+		// Not running as a service, do normal startup
 		universalMain(std::move(argsRepo));
 	}
 
