@@ -1052,7 +1052,8 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	}
 	
 	std::unique_ptr<cFurnaceEntity> Furnace(new cFurnaceEntity(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, m_World));
-	
+	Furnace->SetLoading(true);
+
 	// Load slots:
 	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
@@ -1085,9 +1086,9 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds (200 ticks)
 		Furnace->SetCookTimes(200, ct);
 	}
-	
 	// Restart cooking:
 	Furnace->ContinueCooking();
+	Furnace->SetLoading(false);
 	return Furnace.release();
 }
 

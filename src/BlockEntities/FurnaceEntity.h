@@ -101,6 +101,11 @@ public:
 		m_TimeCooked = a_TimeCooked;
 	}
 	
+	void SetLoading(bool a_IsLoading)
+	{
+		m_IsLoading = a_IsLoading;
+	}
+
 protected:
 	
 	/** Block meta of the block currently represented by this entity */
@@ -129,6 +134,9 @@ protected:
 
 	/** Amount of ticks that the current fuel has been burning */
 	int m_TimeBurned;
+
+	/** Is the block currently being loaded into the world? */
+	bool m_IsLoading;
 	
 	/** Sends the specified progressbar value to all clients of the window */
 	void BroadcastProgress(short a_ProgressbarID, short a_Value);
