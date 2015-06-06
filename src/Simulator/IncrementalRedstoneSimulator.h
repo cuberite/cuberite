@@ -44,9 +44,16 @@ private:
 
 	struct sPoweredBlocks  // Define structure of the directly powered blocks list
 	{
-		Vector3i a_BlockPos;  // Position of powered block
-		Vector3i a_SourcePos;  // Position of source powering the block at a_BlockPos
-		unsigned char a_PowerLevel;
+		sPoweredBlocks(Vector3i a_BlockPos, Vector3i a_SourcePos, unsigned char a_PowerLevel) :
+			m_BlockPos(a_BlockPos),
+			m_SourcePos(a_SourcePos),
+			m_PowerLevel(a_PowerLevel)
+		{
+		}
+
+		Vector3i m_BlockPos;  // Position of powered block
+		Vector3i m_SourcePos;  // Position of source powering the block at a_BlockPos
+		unsigned char m_PowerLevel;
 	};
 
 	struct sLinkedPoweredBlocks  // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
@@ -177,9 +184,14 @@ private:
 	void SetBlockPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, unsigned char a_PowerLevel = MAX_POWER_LEVEL) { SetBlockPowered(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ), Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ), a_PowerLevel); }
 
 	/** Recursively searches for a wire path and powers everything that should be powered */
-	void FindAndPowerBorderingWires(std::vector<std::pair<Vector3i, cChunk *>> & a_PotentialWireList, const std::pair<Vector3i, cChunk *> & a_Entry);
+	void FindAndPowerBorderingWires(std::vector<std::pair<Vector3i, cChunk *>> & a_PotentialWireList, const Vector3i & a_EntryRelBlockPosition, cChunk * a_EntryChunk);
 
-	void PowerBorderingWires(std::vector<std::pair<Vector3i, cChunk *>> & a_PotentialWireList, const std::pair<Vector3i, cChunk *> & a_Entry, const Vector3i & a_AdjustedPos, cChunk * a_NeighbourChunk, unsigned char a_MyPower);
+	/** Powers a specified wire block position with the specified source wire position
+	Checks are performed to ensure one wire does not power the same location more than once
+	a_EntryChunk will be the chunk which the source resides, and a_NeighbourChunk will be that which the to-be-powered wire resides
+	a_PotentialWireList is updated to include the new powered wire so that FindAndPowerBorderingWires can continue the redstone wire line tracing process
+	*/
+	void PowerBorderingWires(std::vector<std::pair<Vector3i, cChunk *>> & a_PotentialWireList, const Vector3i & a_EntryRelSourcePosition, cChunk * a_EntryChunk, const Vector3i & a_AdjustedPos, cChunk * a_NeighbourChunk, unsigned char a_MyPower);
 
 	/** Marks a block as being powered through another block */
 	void SetBlockLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
@@ -397,7 +409,11 @@ private:
 
 	inline static Vector3i AdjustRelativeCoords(const Vector3i & a_RelPosition)
 	{
-		return Vector3i((a_RelPosition.x % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width, a_RelPosition.y, (a_RelPosition.z % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width);
+		return {
+			(a_RelPosition.x % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width,
+			a_RelPosition.y,
+			(a_RelPosition.z % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width
+		};
 	}
 };
 
