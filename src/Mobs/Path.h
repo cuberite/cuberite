@@ -145,7 +145,7 @@ private:
 
 	/* Pathfinding fields */
 	std::priority_queue<cPathCell *,  std::vector<cPathCell *>,  compareHeuristics> m_OpenList;
-	std::unordered_map<Vector3i, cPathCell, Vector3i> m_Map;
+	std::unordered_map<Vector3i, cPathCell, VectorHasher<int>> m_Map;
 	Vector3i m_Destination;
 	Vector3i m_Source;
 	int m_BoundingBoxWidth;

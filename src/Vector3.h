@@ -235,12 +235,6 @@ public:
 		return *this;
 	}
 
-	/** Provides a hash of a vector's contents */
-	size_t operator()(const Vector3<T> & a_Vector) const
-	{
-		return ((std::hash<T>()(a_Vector.x) ^ (std::hash<T>()(a_Vector.y) << 1)) ^ std::hash<T>()(a_Vector.z));
-	}
-
 	// tolua_begin
 	
 	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
@@ -385,6 +379,28 @@ template <> inline Vector3<int> Vector3<int>::Floor(void) const
 {
 	return *this;
 }
+
+
+
+
+
+template <typename What>
+class VectorHasher
+{
+public:
+	/** Provides a hash of a vector's contents */
+	size_t operator()(const Vector3<What> & a_Vector) const
+	{
+		// Guaranteed to have no hash collisions for any 128x128x128 area
+		size_t Hash = 0;
+		Hash ^= static_cast<size_t>(a_Vector.x);
+		Hash <<= 8;
+		Hash ^= static_cast<size_t>(a_Vector.y);
+		Hash <<= 8;
+		Hash ^= static_cast<size_t>(a_Vector.z);
+		return Hash;
+	}
+};
 
 
 

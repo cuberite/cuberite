@@ -76,19 +76,21 @@ private:
 	{
 	public:
 		/// Per-chunk data for the simulator, specified individual chunks to simulate
-		std::unordered_map<Vector3i, std::pair<BLOCKTYPE, bool>, Vector3i> m_ChunkData;
+
+		/** test */
+		std::unordered_map<Vector3i, std::pair<BLOCKTYPE, bool>, VectorHasher<int>> m_ChunkData;
 		std::vector<sPoweredBlocks> m_PoweredBlocks;
 		std::vector<sLinkedPoweredBlocks> m_LinkedBlocks;
-		std::unordered_map<Vector3i, bool, Vector3i> m_SimulatedPlayerToggleableBlocks;
-		std::unordered_map<Vector3i, sRepeatersDelayList, Vector3i> m_RepeatersDelayList;
+		std::unordered_map<Vector3i, bool, VectorHasher<int>> m_SimulatedPlayerToggleableBlocks;
+		std::unordered_map<Vector3i, sRepeatersDelayList, VectorHasher<int>> m_RepeatersDelayList;
 	};
 
 public:
 
 	typedef std::vector <sPoweredBlocks> PoweredBlocksList;
 	typedef std::vector <sLinkedPoweredBlocks> LinkedBlocksList;
-	typedef std::unordered_map<Vector3i, bool, Vector3i> SimulatedPlayerToggleableList;
-	typedef std::unordered_map<Vector3i, sRepeatersDelayList, Vector3i> RepeatersDelayList;
+	typedef std::unordered_map<Vector3i, bool, VectorHasher<int>> SimulatedPlayerToggleableList;
+	typedef std::unordered_map<Vector3i, sRepeatersDelayList, VectorHasher<int>> RepeatersDelayList;
 
 private:
 
