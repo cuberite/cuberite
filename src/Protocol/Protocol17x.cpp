@@ -1105,8 +1105,8 @@ void cProtocol172::SendExperience (void)
 	cPacketizer Pkt(*this, 0x1f);  // Experience Packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEFloat(Player->GetXpPercentage());
-	Pkt.WriteBEInt16(static_cast<Int16>(std::max<int>(Player->GetXpLevel(), std::numeric_limits<Int16>::max())));
-	Pkt.WriteBEInt16(static_cast<Int16>(std::max<int>(Player->GetCurrentXp(), std::numeric_limits<Int16>::max())));
+	Pkt.WriteBEInt16(static_cast<Int16>(std::min<int>(Player->GetXpLevel(), std::numeric_limits<Int16>::max())));
+	Pkt.WriteBEInt16(static_cast<Int16>(std::min<int>(Player->GetCurrentXp(), std::numeric_limits<Int16>::max())));
 }
 
 
