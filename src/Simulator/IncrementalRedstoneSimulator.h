@@ -411,11 +411,7 @@ private:
 
 	inline static Vector3i AdjustRelativeCoords(const Vector3i & a_RelPosition)
 	{
-		return {
-			(a_RelPosition.x % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width,
-			a_RelPosition.y,
-			(a_RelPosition.z % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width
-		};
+		return { (a_RelPosition.x % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width, a_RelPosition.y, (a_RelPosition.z % cChunkDef::Width + cChunkDef::Width) % cChunkDef::Width };
 	}
 };
 

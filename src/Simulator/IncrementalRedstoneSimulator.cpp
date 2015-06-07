@@ -90,15 +90,16 @@ void cIncrementalRedstoneSimulator::AddBlock(const Vector3i & a_RelBlockPosition
 		// DO NOT touch our chunk's data structure if we are being called with coordinates from another chunk - this one caused me massive grief :P
 		return;
 	}
+	auto RedstoneSimulatorData = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData());
 
-	auto & SimulatedPlayerToggleableBlocks = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_SimulatedPlayerToggleableBlocks;
+	auto & SimulatedPlayerToggleableBlocks = RedstoneSimulatorData->m_SimulatedPlayerToggleableBlocks;
 	if (DoesIgnorePlayerToggle(Block))
 	{
 		// Initialise the toggleable blocks list so that trapdoors etc. aren't reset on restart (#1887)
 		SimulatedPlayerToggleableBlocks.emplace(
 			a_RelBlockPosition,
 			AreCoordsDirectlyPowered(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, a_OriginalChunk) || AreCoordsLinkedPowered(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, a_OriginalChunk)
-			);  // This map won't insert if key already present, so no need to check
+		);  // This map won't insert if key already present, so no need to check
 	}
 	else
 	{
@@ -107,10 +108,10 @@ void cIncrementalRedstoneSimulator::AddBlock(const Vector3i & a_RelBlockPosition
 
 	if ((Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF))
 	{
-		static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_RepeatersDelayList.erase(a_RelBlockPosition);
+		RedstoneSimulatorData->m_RepeatersDelayList.erase(a_RelBlockPosition);
 	}
 
-	auto & RedstoneSimulatorChunkData = static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_OriginalChunk->GetRedstoneSimulatorData())->m_ChunkData;
+	auto & RedstoneSimulatorChunkData = RedstoneSimulatorData->m_ChunkData;
 	auto Iterator = RedstoneSimulatorChunkData.find(a_RelBlockPosition);
 	if (!IsAllowedBlock(Block))
 	{
@@ -124,7 +125,7 @@ void cIncrementalRedstoneSimulator::AddBlock(const Vector3i & a_RelBlockPosition
 	{
 		if (Iterator != RedstoneSimulatorChunkData.end())
 		{
-			Iterator->second.second = false;
+			Iterator->second.second = false;  // De-schedule removal from list
 			Iterator->second.first = Block;  // Update block information
 			return;
 		}
@@ -171,11 +172,12 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 	{
 		if (dataitr->second.second)
 		{
+			// Removal was scheduled - do so
 			dataitr = m_RedstoneSimulatorChunkData->m_ChunkData.erase(dataitr);
 			continue;
 		}
 
-		switch (dataitr->second.first)
+		switch (dataitr->second.first)  // Call the appropriate simulator for the entry's block type
 		{
 			case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->first.x, dataitr->first.y, dataitr->first.z); break;
 			case E_BLOCK_TRIPWIRE:        HandleTripwire(dataitr->first.x, dataitr->first.y, dataitr->first.z);       break;
@@ -737,11 +739,13 @@ void cIncrementalRedstoneSimulator::HandleRedstoneComparator(int a_RelBlockX, in
 	auto RearPower = std::max(CCB.m_SignalStrength, IsWirePowered(AdjustRelativeCoords(cBlockComparatorHandler::GetRearCoordinate(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Meta & 0x3)), m_Chunk));
 
 	if ((Meta & 0x4) == 0x4)
-	{  // Subtraction mode
+	{
+		// Subtraction mode
 		Power = std::max(static_cast<unsigned char>(RearPower - HighestSidePower), std::numeric_limits<unsigned char>::min());
 	}
 	else
-	{  // Comparison mode
+	{
+		// Comparison mode
 		Power = (std::max(HighestSidePower, RearPower) == HighestSidePower) ? 0 : RearPower;
 	}
 
