@@ -168,7 +168,7 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 		m_Items[ThisIdx].m_ItemCount -= NumWantedItems;
 		if (m_Items[ThisIdx].m_ItemCount == 0)
 		{
-			if (m_Items[ThisIdx].m_ItemType == E_ITEM_MILK || m_Items[ThisIdx].m_ItemType == E_ITEM_WATER_BUCKET || m_Items[ThisIdx].m_ItemType == E_ITEM_LAVA_BUCKET)
+			if ((m_Items[ThisIdx].m_ItemType == E_ITEM_MILK) || (m_Items[ThisIdx].m_ItemType == E_ITEM_WATER_BUCKET) || (m_Items[ThisIdx].m_ItemType == E_ITEM_LAVA_BUCKET))
 			{
 				m_Items[ThisIdx] = cItem(E_ITEM_BUCKET, m_Items[ThisIdx].m_ItemCount);
 			}
