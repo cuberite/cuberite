@@ -83,7 +83,7 @@ class cDebugCallbacks :
 			{
 				if (!a_Request.HasAuth() || (a_Request.GetAuthUsername() != "a") || (a_Request.GetAuthPassword() != "b"))
 				{
-					a_Connection.SendNeedAuth("MCServer WebAdmin");
+					a_Connection.SendNeedAuth("Cuberite WebAdmin");
 					return;
 				}
 			}

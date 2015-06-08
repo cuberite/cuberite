@@ -50,7 +50,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 	if (m_CtrDrbg.get() == nullptr)
 	{
 		m_CtrDrbg.reset(new cCtrDrbgContext);
-		m_CtrDrbg->Initialize("MCServer", 8);
+		m_CtrDrbg->Initialize("Cuberite", 8);
 	}
 	
 	// Initialize PolarSSL's structures:

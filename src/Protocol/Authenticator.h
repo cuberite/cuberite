@@ -1,7 +1,7 @@
 
 // cAuthenticator.h
 
-// Interfaces to the cAuthenticator class representing the thread that authenticates users against the official MC server
+// Interfaces to the cAuthenticator class representing the thread that authenticates users against the official Cuberite
 // Authentication prevents "hackers" from joining with an arbitrary username (possibly impersonating the server admins)
 // For more info, see http://wiki.vg/Session#Server_operation
 // In MCS, authentication is implemented as a single thread that receives queued auth requests and dispatches them one by one.

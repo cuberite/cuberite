@@ -688,7 +688,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		AString Request;
 		Request += "POST " + m_NameToUUIDAddress + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
 		Request += "Host: " + m_NameToUUIDServer + "\r\n";
-		Request += "User-Agent: MCServer\r\n";
+		Request += "User-Agent: Cuberite\r\n";
 		Request += "Connection: close\r\n";
 		Request += "Content-Type: application/json\r\n";
 		Request += Printf("Content-Length: %u\r\n", static_cast<unsigned>(RequestBody.length()));
@@ -802,7 +802,7 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 	AString Request;
 	Request += "GET " + Address + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
 	Request += "Host: " + m_UUIDToProfileServer + "\r\n";
-	Request += "User-Agent: MCServer\r\n";
+	Request += "User-Agent: Cuberite\r\n";
 	Request += "Connection: close\r\n";
 	Request += "Content-Length: 0\r\n";
 	Request += "\r\n";
