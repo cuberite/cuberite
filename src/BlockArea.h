@@ -308,6 +308,15 @@ public:
 	Returns 0 if blocktypes not available. Block metas are ignored (if present, air with any meta is still considered air). */
 	size_t CountNonAirBlocks(void) const;
 
+	/** Returns how many times the specified block is contained in the area.
+	The blocks' meta values are ignored, only the blocktype is compared. */
+	size_t CountSpecificBlocks(BLOCKTYPE a_BlockType) const;
+
+	/** Returns how many times the specified block is contained in the area.
+	Both the block's type and meta must match in order to be counted in.
+	If the block metas aren't present in the area, logs a warning and ignores the meta specification. */
+	size_t CountSpecificBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const;
+
 	// tolua_end
 
 	/** Returns the minimum and maximum coords in each direction for the first non-ignored block in each direction.

@@ -1665,6 +1665,65 @@ size_t cBlockArea::CountNonAirBlocks(void) const
 
 
 
+size_t cBlockArea::CountSpecificBlocks(BLOCKTYPE a_BlockType) const
+{
+	// If blocktypes are not valid, log a warning and return zero occurences:
+	if (m_BlockTypes == nullptr)
+	{
+		LOGWARNING("%s: BlockTypes not available!", __FUNCTION__);
+		return 0;
+	}
+
+	// Count the blocks:
+	size_t num = GetBlockCount();
+	size_t res = 0;
+	for (size_t i = 0; i < num; i++)
+	{
+		if (m_BlockTypes[i] == a_BlockType)
+		{
+			res++;
+		}
+	}
+	return res;
+}
+
+
+
+
+
+size_t cBlockArea::CountSpecificBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const
+{
+	// If blocktypes are not valid, log a warning and return zero occurences:
+	if (m_BlockTypes == nullptr)
+	{
+		LOGWARNING("%s: BlockTypes not available!", __FUNCTION__);
+		return 0;
+	}
+
+	// If blockmetas are not valid, log a warning and count only blocktypes:
+	if (m_BlockMetas == nullptr)
+	{
+		LOGWARNING("%s: BlockMetas not available, comparing blocktypes only!", __FUNCTION__);
+		return CountSpecificBlocks(a_BlockType);
+	}
+
+	// Count the blocks:
+	size_t num = GetBlockCount();
+	size_t res = 0;
+	for (size_t i = 0; i < num; i++)
+	{
+		if ((m_BlockTypes[i] == a_BlockType) && (m_BlockMetas[i] == a_BlockMeta))
+		{
+			res++;
+		}
+	}
+	return res;
+}
+
+
+
+
+
 void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType)
 {
 	// Check if blocktypes are valid:
