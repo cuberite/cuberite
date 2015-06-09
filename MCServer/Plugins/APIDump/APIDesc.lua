@@ -2683,7 +2683,7 @@ Parser:close();
 				},
 			},  -- AdditionalInfo
 		},  -- lxp
-		
+
 		sqlite3 =
 		{
 			Desc = [[
