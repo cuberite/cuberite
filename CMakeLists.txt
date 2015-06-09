@@ -203,7 +203,7 @@ if (MSVC)
 	set_target_properties(luaproxy tolua PROPERTIES FOLDER Support)
 	if (${SELF_TEST})
 		set_target_properties(Network PROPERTIES FOLDER Lib)
-		set_target_properties(arraystocoords-exe coordinates-exe copies-exe copyblocks-exe creatable-exe EchoServer Google-exe ChunkBuffer NameLookup PROPERTIES FOLDER Tests)
+		set_target_properties(arraystocoords-exe coordinates-exe copies-exe copyblocks-exe creatable-exe EchoServer Google-exe ChunkBuffer NameLookup NoiseTest PROPERTIES FOLDER Tests)
 	endif()
 endif()
 
