@@ -384,6 +384,28 @@ template <> inline Vector3<int> Vector3<int>::Floor(void) const
 
 
 
+template <typename What>
+class VectorHasher
+{
+public:
+	/** Provides a hash of a vector's contents */
+	size_t operator()(const Vector3<What> & a_Vector) const
+	{
+		// Guaranteed to have no hash collisions for any 128x128x128 area
+		size_t Hash = 0;
+		Hash ^= static_cast<size_t>(a_Vector.x);
+		Hash <<= 8;
+		Hash ^= static_cast<size_t>(a_Vector.y);
+		Hash <<= 8;
+		Hash ^= static_cast<size_t>(a_Vector.z);
+		return Hash;
+	}
+};
+
+
+
+
+
 template <typename T>
 const double Vector3<T>::EPS = 0.000001;
 

@@ -91,7 +91,7 @@ public:
 
 	BLOCKTYPE GetBlockType(void) const { return m_BlockType; }
 	
-	cWorld * GetWorld(void) const {return m_World; }
+	cWorld * GetWorld(void) const { return m_World; }
 	
 	int GetChunkX(void) const { return FAST_FLOOR_DIV(m_PosX, cChunkDef::Width); }
 	int GetChunkZ(void) const { return FAST_FLOOR_DIV(m_PosZ, cChunkDef::Width); }

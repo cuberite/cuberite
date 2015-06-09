@@ -96,6 +96,25 @@ public:
 		a_Z = a_Z - a_ChunkZ * Width;
 	}
 
+	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition)
+	{
+		int ChunkX, ChunkZ;
+		BlockToChunk(a_BlockPosition.x, a_BlockPosition.z, ChunkX, ChunkZ);
+
+		return {a_BlockPosition.x - ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - ChunkZ * Width};
+	}
+
+	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition, int a_ChunkX, int a_ChunkZ)
+	{
+		return {a_BlockPosition.x - a_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkZ * Width};
+	}
+
+	/** Converts relative block coordinates into absolute coordinates with a known chunk location */
+	inline static Vector3i RelativeToAbsolute(const Vector3i & a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
+	{
+		return Vector3i(a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width);
+	}
+
 
 	/// Converts absolute block coords to chunk coords:
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
@@ -495,32 +514,3 @@ typedef cCoordWithData<BLOCKTYPE>  cCoordWithBlock;
 
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;
-
-
-
-
-
-/** Generic template that can store two types of any kind of data together with a triplet of 3 coords */
-template <typename X, typename Z> class cCoordWithDoubleData
-{
-public:
-	int x;
-	int y;
-	int z;
-	X   Data;
-	Z   DataTwo;
-
-	cCoordWithDoubleData(int a_X, int a_Y, int a_Z) :
-		x(a_X), y(a_Y), z(a_Z)
-	{
-	}
-
-	cCoordWithDoubleData(int a_X, int a_Y, int a_Z, const X & a_Data, const Z & a_DataTwo) :
-		x(a_X), y(a_Y), z(a_Z), Data(a_Data), DataTwo(a_DataTwo)
-	{
-	}
-};
-
-typedef cCoordWithDoubleData <BLOCKTYPE, bool> cCoordWithBlockAndBool;
-
-typedef std::vector<cCoordWithBlockAndBool> cCoordWithBlockAndBoolVector;

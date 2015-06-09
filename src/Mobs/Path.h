@@ -124,21 +124,6 @@ public:
 		return m_PathPoints.size();
 	}
 
-	struct VectorHasher
-	{
-		std::size_t operator()(const Vector3i & a_Vector) const
-		{
-			// Guaranteed to have no hash collisions for any 128x128x128 area. Suitable for pathfinding.
-			int32_t t = 0;
-			t += static_cast<int8_t>(a_Vector.x);
-			t = t << 8;
-			t += static_cast<int8_t>(a_Vector.y);
-			t = t << 8;
-			t += static_cast<int8_t>(a_Vector.z);
-			t = t << 8;
-			return static_cast<size_t>(t);
-		}
-	};
 private:
 
 	/* General */
@@ -160,7 +145,7 @@ private:
 
 	/* Pathfinding fields */
 	std::priority_queue<cPathCell *,  std::vector<cPathCell *>,  compareHeuristics> m_OpenList;
-	std::unordered_map<Vector3i, cPathCell, VectorHasher> m_Map;
+	std::unordered_map<Vector3i, cPathCell, VectorHasher<int>> m_Map;
 	Vector3i m_Destination;
 	Vector3i m_Source;
 	int m_BoundingBoxWidth;
