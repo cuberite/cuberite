@@ -15,7 +15,7 @@
 # Macros
 #
 
-CC = /usr/bin/g++
+CC = gcc-4.8
 
 
 all: NoiseTest
@@ -40,8 +40,8 @@ ifeq ($(debug),1)
 # debug build - fully traceable by gdb in C++ code, slowest
 # Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
 ################
-CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
-CXX_OPTIONS = -s -ggdb -g -D_DEBUG
+CC_OPTIONS =  -ggdb -g -D_DEBUG -O3
+CXX_OPTIONS = -ggdb -g -D_DEBUG -std=c++11
 LNK_OPTIONS = -pthread -g -ggdb
 BUILDDIR = build/debug/
 
@@ -50,8 +50,8 @@ ifeq ($(profile),1)
 ################
 # profile build - a release build with symbols and profiling engine built in
 ################
-CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+CC_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG
+CXX_OPTIONS = -g -ggdb -O3 -pg -DNDEBUG
 LNK_OPTIONS = -pthread -ggdb -O3 -pg
 BUILDDIR = build/profile/
 
@@ -60,8 +60,8 @@ ifeq ($(pedantic),1)
 ################
 # pedantic build - basically a debug build with lots of warnings
 ################
-CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
+CC_OPTIONS = -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
+CXX_OPTIONS = -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
 LNK_OPTIONS = -pthread -ggdb
 BUILDDIR = build/pedantic/
 
@@ -69,8 +69,8 @@ else
 ################
 # release build - fastest run-time, no gdb support
 ################
-CC_OPTIONS = -s -g -O3 -DNDEBUG
-CXX_OPTIONS = -s -g -O3 -DNDEBUG
+CC_OPTIONS =  -g -O3 -DNDEBUG
+CXX_OPTIONS = -g -O3 -DNDEBUG -std=c++11 -march=native
 LNK_OPTIONS = -pthread -O3
 BUILDDIR = build/release/
 endif
@@ -86,7 +86,7 @@ endif
 #
 
 INCLUDE = -I.\
-		-I../../source\
+		-I../../src\
 
 
 
@@ -96,17 +96,17 @@ INCLUDE = -I.\
 # Build NoiseTest
 #
 
-SOURCES = NoiseTest.cpp
+SOURCES = NoiseTest.cpp OldNoise.cpp \
 
+#	src/Log.cpp
+#	src/MCLogger.cpp 
 SHAREDSOURCES = \
-	source/Log.cpp \
-	source/MCLogger.cpp \
-	source/Noise.cpp \
-	source/StringUtils.cpp \
-	source/OSSupport/CriticalSection.cpp \
-	source/OSSupport/File.cpp \
-	source/OSSupport/IsThread.cpp \
-	source/OSSupport/MakeDir.cpp \
+	src/Noise/Noise.cpp \
+	src/StringUtils.cpp \
+	src/Logger.cpp \
+	src/OSSupport/CriticalSection.cpp \
+	src/OSSupport/File.cpp 
+#	src/OSSupport/IsThread.cpp
 
 OBJECTS := $(patsubst %.c,$(BUILDDIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))
@@ -153,7 +153,7 @@ $(BUILDDIR)%.o: %.cpp
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
-$(BUILDDIR)source/%.o: ../../source/%.cpp
+$(BUILDDIR)src/%.o: ../../src/%.cpp
 	@mkdir -p $(dir $@)
 	$(CC) $(CXX_OPTIONS) -c $(INCLUDE) $< -o $@
 	@$(CC) $(CXX_OPTIONS) -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
