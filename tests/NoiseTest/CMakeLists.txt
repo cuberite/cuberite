@@ -29,4 +29,12 @@ if (MSVC)
 	list (APPEND HDRS ${CMAKE_SOURCE_DIR}/src/StackWalker.h)
 endif()
 
+# Disable warnings-as-errors in Clang:
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast")
+	if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+		add_flags_cxx("-Wno-error=inconsistent-missing-override")
+	endif()
+endif()
+
 add_executable(NoiseTest ${SRCS} ${HDRS})
