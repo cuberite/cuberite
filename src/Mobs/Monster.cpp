@@ -13,7 +13,7 @@
 #include "../Chunk.h"
 #include "../FastRandom.h"
 
-#include "Path.h"
+#include "PathFinder.h"
 
 
 
@@ -74,10 +74,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
 	, m_Target(nullptr)
-	, m_Path(nullptr)
 	, m_IsFollowingPath(false)
-	, m_GiveUpCounter(0)
-	, m_TicksSinceLastPathReset(1000)
 	, m_LastGroundHeight(POSY_TOINT)
 	, m_JumpCoolDown(0)
 	, m_IdleInterval(0)
@@ -106,6 +103,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	{
 		GetMonsterConfig(a_ConfigName);
 	}
+	m_PathFinder = new cPathFinder(GetWidth(), GetHeight());
 }
 
 
@@ -121,132 +119,23 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 
 
-bool cMonster::TickPathFinding(cChunk & a_Chunk)
-{
-	if (!m_IsFollowingPath)
-	{
-		return false;
-	}
-	if (m_TicksSinceLastPathReset < 1000)
-	{
-		// No need to count beyond 1000. 1000 is arbitary here.
-		++m_TicksSinceLastPathReset;
-	}
-
-	if (ReachedFinalDestination())
-	{
-		StopMovingToPosition();
-		return false;
-	}
-
-	if ((m_FinalDestination - m_PathFinderDestination).Length() > 0.25)  // if the distance between where we're going and where we should go is too big.
-	{
-		/* If we reached the last path waypoint,
-		Or if we haven't re-calculated for too long.
-		Interval is proportional to distance squared, and its minimum is 10.
-		(Recalculate lots when close, calculate rarely when far) */
-		if (
-			((GetPosition() - m_PathFinderDestination).Length() < 0.25) ||
-			((m_TicksSinceLastPathReset > 10) && (m_TicksSinceLastPathReset > (0.4 * (m_FinalDestination - GetPosition()).SqrLength())))
-		)
-		{
-			/* Re-calculating is expensive when there's no path to target, and it results in mobs freezing very often as a result of always recalculating.
-			This is a workaround till we get better path recalculation. */
-			if (!m_NoPathToTarget)
-			{
-				ResetPathFinding();
-			}
-		}
-	}
-
-	if (m_Path == nullptr)
-	{
-		if (!EnsureProperDestination(a_Chunk))
-		{
-			StopMovingToPosition();  // Invalid chunks, probably world is loading or something, cancel movement.
-			return false;
-		}
-		m_NoPathToTarget = false;
-		m_NoMoreWayPoints = false;
-		m_PathFinderDestination = m_FinalDestination;
-		m_Path = new cPath(a_Chunk, GetPosition(), m_PathFinderDestination, 20, GetWidth(), GetHeight());
-	}
-
-	switch (m_Path->Step(a_Chunk))
-	{
-		case ePathFinderStatus::NEARBY_FOUND:
-		{
-			m_NoPathToTarget = true;
-			m_PathFinderDestination = m_Path->AcceptNearbyPath();
-			break;
-		}
-
-		case ePathFinderStatus::PATH_NOT_FOUND:
-		{
-			StopMovingToPosition();  // Try to calculate a path again.
-			// Note that the next time may succeed, e.g. if a player breaks a barrier.
-			break;
-		}
-		case ePathFinderStatus::CALCULATING:
-		{
-			// Pathfinder needs more time
-			break;
-		}
-		case ePathFinderStatus::PATH_FOUND:
-		{
-			if (m_NoMoreWayPoints || (--m_GiveUpCounter == 0))
-			{
-				if (m_EMState == ATTACKING)
-				{
-					ResetPathFinding();  // Try to calculate a path again.
-					// This results in mobs hanging around an unreachable target (player).
-				}
-				else
-				{
-					StopMovingToPosition();  // Find a different place to go to.
-				}
-				return false;
-			}
-			else if (!m_Path->IsLastPoint())  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
-			{
-				if ((m_Path->IsFirstPoint() || ReachedNextWaypoint()))
-				{
-					m_NextWayPointPosition = m_Path->GetNextPoint();
-					m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
-				}
-			}
-			else
-			{
-				m_NoMoreWayPoints = true;
-			}
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-
-
-
-void cMonster::MoveToWayPoint(cChunk & a_Chunk)
+void cMonster::MoveToWayPoint(cChunk & a_Chunk, const Vector3d a_WayPoint)
 {
 	if (m_JumpCoolDown == 0)
 	{
-		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
+		if (DoesPosYRequireJump(FloorC(a_WayPoint.y)))
 		{
 			if (
 				(IsOnGround() && (GetSpeedX() == 0) && (GetSpeedY() == 0)) ||
-				(IsSwimming() && (m_GiveUpCounter < 15))
+				(IsSwimming())
 			)
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
 				// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
 				AddPosY(1.6);  // Jump!!
-				SetSpeedX(3.2 * (m_NextWayPointPosition.x - GetPosition().x));  // Move forward in a preset speed.
-				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error and 1.6 and 3.2 are perfect.
+				SetSpeedX(3.2 * (a_WayPoint.x - GetPosition().x));  // Move forward in a preset speed.
+				SetSpeedZ(3.2 * (a_WayPoint.z - GetPosition().z));  // The numbers were picked based on trial and error and 1.6 and 3.2 are perfect.
 			}
 		}
 	}
@@ -255,7 +144,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		--m_JumpCoolDown;
 	}
 
-	Vector3d Distance = m_NextWayPointPosition - GetPosition();
+	Vector3d Distance = a_WayPoint - GetPosition();
 	if ((Distance.x != 0) || (Distance.z != 0))
 	{
 		Distance.y = 0;
@@ -289,98 +178,6 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 
 
 
-bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
-{
-	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(m_FinalDestination.x), FloorC(m_FinalDestination.z));
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-
-	int RelX = FloorC(m_FinalDestination.x) - Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = FloorC(m_FinalDestination.z) - Chunk->GetPosZ() * cChunkDef::Width;
-
-	// If destination in the air, first try to go 1 block north, or east, or west.
-	// This fixes the player leaning issue.
-	// If that failed, we instead go down to the lowest air block.
-	Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
-	if (!cBlockInfo::IsSolid(BlockType))
-	{
-		bool InTheAir = true;
-		int x, z;
-		for (z = -1; z <= 1; ++z)
-		{
-			for (x = -1; x <= 1; ++x)
-			{
-				if ((x==0) && (z==0))
-				{
-					continue;
-				}
-				Chunk = a_Chunk.GetNeighborChunk(FloorC(m_FinalDestination.x+x), FloorC(m_FinalDestination.z+z));
-				if ((Chunk == nullptr) || !Chunk->IsValid())
-				{
-					return false;
-				}
-				RelX = FloorC(m_FinalDestination.x+x) - Chunk->GetPosX() * cChunkDef::Width;
-				RelZ = FloorC(m_FinalDestination.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
-				Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
-				if (cBlockInfo::IsSolid(BlockType))
-				{
-					m_FinalDestination.x += x;
-					m_FinalDestination.z += z;
-					InTheAir = false;
-					goto breakBothLoops;
-				}
-			}
-		}
-		breakBothLoops:
-
-		// Go down to the lowest air block.
-		if (InTheAir)
-		{
-			while (m_FinalDestination.y > 0)
-			{
-				Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
-				if (cBlockInfo::IsSolid(BlockType))
-				{
-					break;
-				}
-				m_FinalDestination.y -= 1;
-			}
-		}
-	}
-
-	// If destination in water, go up to the highest water block.
-	// If destination in solid, go up to first air block.
-	bool InWater = false;
-	while (m_FinalDestination.y < cChunkDef::Height)
-	{
-		Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y), RelZ, BlockType, BlockMeta);
-		if (BlockType == E_BLOCK_STATIONARY_WATER)
-		{
-			InWater = true;
-		}
-		else if (cBlockInfo::IsSolid(BlockType))
-		{
-			InWater = false;
-		}
-		else
-		{
-			break;
-		}
-		m_FinalDestination.y += 1;
-	}
-	if (InWater)
-	{
-		m_FinalDestination.y -= 1;
-	}
-
-
-	return true;
-}
 
 
 
@@ -399,21 +196,6 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 void cMonster::StopMovingToPosition()
 {
 	m_IsFollowingPath = false;
-	ResetPathFinding();
-}
-
-
-
-
-
-void cMonster::ResetPathFinding(void)
-{
-	m_TicksSinceLastPathReset = 0;
-	if (m_Path != nullptr)
-	{
-		delete m_Path;
-		m_Path = nullptr;
-	}
 }
 
 
@@ -447,29 +229,28 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	// Process the undead burning in daylight.
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
-	if (TickPathFinding(*Chunk))
+	if (m_IsFollowingPath)
 	{
 		/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
 		1. I am idle
 		2. I was not hurt by a player recently.
 		Then STOP. */
+		Vector3d NextWayPoint = m_PathFinder->GetWayPoint(a_Chunk, GetPosition(), m_FinalDestination);
 		if (
 			m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
-			WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
+			WouldBurnAt(NextWayPoint, *Chunk) &&
 			!WouldBurnAt(GetPosition(), *Chunk)
 		)
 		{
 			// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
 			StopMovingToPosition();
-			m_GiveUpCounter = 40;  // This doesn't count as giving up, keep the giveup timer as is.
 		}
 		else
 		{
-			MoveToWayPoint(*Chunk);
+			MoveToWayPoint(*Chunk, NextWayPoint);
+			SetPitchAndYawFromDestination(NextWayPoint);
 		}
 	}
-
-	SetPitchAndYawFromDestination();
 	HandleFalling();
 
 	switch (m_EMState)
@@ -501,7 +282,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cMonster::SetPitchAndYawFromDestination()
+void cMonster::SetPitchAndYawFromDestination(const Vector3d & a_WayPoint)
 {
 	Vector3d FinalDestination = m_FinalDestination;
 	if (m_Target != nullptr)
@@ -524,7 +305,7 @@ void cMonster::SetPitchAndYawFromDestination()
 	}
 	else
 	{
-		BodyDistance = m_NextWayPointPosition - GetPosition();
+		BodyDistance = a_WayPoint - GetPosition();
 	}
 	double BodyRotation, BodyPitch;
 	BodyDistance.Normalize();
@@ -787,8 +568,18 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt)
 {
 	if (m_IsFollowingPath)
 	{
-		return;  // Still getting there
+		if (ReachedFinalDestination())
+		{
+			printf("1\n");
+			StopMovingToPosition();
+		}
+		else
+		{
+			printf("2\n");
+			return;  // Still getting there
+		}
 	}
+	printf("3\n");
 
 	m_IdleInterval += a_Dt;
 
