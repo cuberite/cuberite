@@ -377,10 +377,10 @@ private:
 	AString m_Password;
 	Json::Value m_Properties;
 
-	cCriticalSection m_CSChunkLists;
-	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
-	cChunkCoordsList m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
-	cChunkCoordsList m_SentChunks;    // Chunks that are currently sent to the client
+	cCriticalSection                                   m_CSChunkLists;
+	cChunkCoordsList                                   m_LoadedChunks;  // Chunks that the player belongs to
+	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
+	cChunkCoordsList                                   m_SentChunks;    // Chunks that are currently sent to the client
 
 	cProtocol * m_Protocol;
 
