@@ -1620,10 +1620,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 }
 
 
-
-
-
-bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	ASSERT(a_World != nullptr);
 
@@ -1652,6 +1649,8 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	// Remove player from the old world
 	SetWorldTravellingFrom(GetWorld());  // cChunk handles entity removal
 	GetWorld()->RemovePlayer(this, false);
+
+	SetPosition(a_NewPosition);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	a_World->AddPlayer(this);

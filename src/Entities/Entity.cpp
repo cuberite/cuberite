@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "Items/ItemHandler.h"
 #include "../FastRandom.h"
+#include "../NetherPortalScanner.h"
 
 
 
@@ -42,6 +43,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_WorldTravellingFrom(nullptr),
 	m_EntityType(a_EntityType),
 	m_World(nullptr),
+	m_IsWorldChangeScheduled(false),
 	m_IsFireproof(false),
 	m_TicksSinceLastBurnDamage(0),
 	m_TicksSinceLastLavaDamage(0),
@@ -1260,9 +1262,26 @@ void cEntity::DetectCacti(void)
 
 
 
+void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition)
+{
+	m_NewWorld = a_World;
+	m_NewWorldPosition = a_NewPosition;
+	m_IsWorldChangeScheduled = true;
+}
+
+
+
 
 bool cEntity::DetectPortal()
 {
+	// If somebody scheduled a world change with ScheduleMoveToWorld, change worlds now.
+	if (m_IsWorldChangeScheduled)
+	{
+		m_IsWorldChangeScheduled = false;
+		MoveToWorld(m_NewWorld, false, m_NewWorldPosition);
+		return true;
+	}
+
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
 		if (GetWorld()->GetLinkedNetherWorldName().empty() && GetWorld()->GetLinkedEndWorldName().empty())
@@ -1312,8 +1331,15 @@ bool cEntity::DetectPortal()
 						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
 						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);
 					}
-					
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+
+					Vector3d TargetPos = GetPosition();
+					TargetPos.x *= 8.0;
+					TargetPos.z *= 8.0;
+
+					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName(), dimNether, GetWorld()->GetName());
+					LOGD("Jumping nether -> overworld");
+					new cNetherPortalScanner(this, TargetWorld, TargetPos, 256);
+					return false;
 				}
 				else
 				{
@@ -1329,8 +1355,15 @@ bool cEntity::DetectPortal()
 						((cPlayer *)this)->AwardAchievement(achEnterPortal);
 						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
 					}
-					
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+
+					Vector3d TargetPos = GetPosition();
+					TargetPos.x /= 8.0;
+					TargetPos.z /= 8.0;
+
+					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName());
+					LOGD("Jumping overworld -> nether");
+					new cNetherPortalScanner(this, TargetWorld, TargetPos, 128);
+					return false;
 				}
 			}
 			case E_BLOCK_END_PORTAL:
@@ -1392,7 +1425,7 @@ bool cEntity::DetectPortal()
 
 
 
-bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	UNUSED(a_ShouldSendRespawn);
 	ASSERT(a_World != nullptr);
@@ -1413,6 +1446,8 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	// Remove all links to the old world
 	SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
 	GetWorld()->BroadcastDestroyEntity(*this);
+
+	SetPosition(a_NewPosition);
 
 	// Queue add to new world
 	a_World->AddEntity(this);
@@ -1438,7 +1473,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return DoMoveToWorld(World, a_ShouldSendRespawn);
+	return DoMoveToWorld(World, a_ShouldSendRespawn, GetPosition());
 }
 
 

@@ -54,6 +54,7 @@ SET (SRCS
 	MobProximityCounter.cpp
 	MobSpawner.cpp
 	MonsterConfig.cpp
+	NetherPortalScanner.cpp
 	OverridesSettingsRepository.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
@@ -126,6 +127,7 @@ SET (HDRS
 	MobProximityCounter.h
 	MobSpawner.h
 	MonsterConfig.h
+	NetherPortalScanner.h
 	OverridesSettingsRepository.h
 	ProbabDistrib.h
 	RankManager.h

@@ -640,6 +640,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		else if ((*itr)->IsWorldTravellingFrom(m_World))
 		{
 			// Remove all entities that are travelling to another world
+			LOGD("Removing entity from [%d, %d] that's travelling between worlds.", m_PosX, m_PosZ);
 			MarkDirty();
 			(*itr)->SetWorldTravellingFrom(nullptr);
 			itr = m_Entities.erase(itr);
@@ -695,7 +696,6 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	}
 
 	ASSERT(Neighbor != this);  // Moving into the same chunk? wtf?
-	
 	Neighbor->AddEntity(a_Entity);
 
 	class cMover :
