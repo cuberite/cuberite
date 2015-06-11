@@ -6,6 +6,8 @@
 #include "Globals.h"
 #include "Network.h"
 #include "event2/util.h"
+#include "../SelfTests.h"
+
 #ifdef _WIN32
 	#include <IPHlpApi.h>
 	#pragma comment(lib, "IPHLPAPI.lib")
@@ -27,13 +29,18 @@ static class cEnumIPAddressTest
 public:
 	cEnumIPAddressTest(void)
 	{
-		printf("Enumerating all IP addresses...\n");
+		cSelfTests::Get().Register(std::function<void(void)>(&Test), "Network IP enumeration");
+	}
+
+	static void Test(void)
+	{
+		LOG("Enumerating all IP addresses...");
 		auto IPs = cNetwork::EnumLocalIPAddresses();
 		for (auto & ip: IPs)
 		{
-			printf("  %s\n", ip.c_str());
+			LOG("  %s", ip.c_str());
 		}
-		printf("Done.\n");
+		LOG("Done.");
 	}
 } g_EnumIPAddressTest;
 
