@@ -1,4 +1,4 @@
-MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer/master.svg?style=flat)](https://travis-ci.org/mc-server/MCServer) [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/1930.svg)](https://scan.coverity.com/projects/1930) [![weekly tips](http://img.shields.io/gratipay/cuberite_team.svg?style=flat)](http://gratipay.com/cuberite_team)
+MCServer [![Build Status](http://img.shields.io/travis/cuberite/cuberite/master.svg?style=flat)](https://travis-ci.org/cuberite/cuberite) [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/1930.svg)](https://scan.coverity.com/projects/1930) [![weekly tips](http://img.shields.io/gratipay/cuberite_team.svg?style=flat)](http://gratipay.com/cuberite_team)
 ========
 
 MCServer is a Minecraft-compatible multiplayer game server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API. MCServer is compatible with the vanilla Minecraft client.
