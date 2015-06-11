@@ -5,5 +5,5 @@ config:
   packages:
     - git
   runcmd:
-    - cd /tmp && git clone https://github.com/cuberite/mcserver-ocean.git
-    - cd /tmp/mcserver-ocean && ./initialinstall.sh
+    - cd /tmp && git clone https://github.com/cuberite/cuberite-ocean.git
+    - cd /tmp/cuberite-ocean && ./initialinstall.sh
