@@ -190,7 +190,7 @@
 					break;
 				}
 			}
-			__android_log_print(AndroidLogLevel, "MCServer", "%s", a_Message.c_str());
+			__android_log_print(AndroidLogLevel, "Cuberite", "%s", a_Message.c_str());
 		}
 	};
 	

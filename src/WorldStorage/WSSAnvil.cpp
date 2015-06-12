@@ -898,7 +898,7 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 	// Check if the data has a proper type:
 	// TODO: Does vanilla use "TrappedChest" or not? MCWiki says no, but previous code says yes
 	// Ref.: http://minecraft.gamepedia.com/Trapped_Chest
-	//       https://github.com/mc-server/MCServer/blob/d0551e2e0a98a28f31a88d489d17b408e4a7d38d/src/WorldStorage/WSSAnvil.cpp#L637
+	//       https://github.com/mc-server/Cuberite/blob/d0551e2e0a98a28f31a88d489d17b408e4a7d38d/src/WorldStorage/WSSAnvil.cpp#L637
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Chest") && !CheckBlockEntityType(a_NBT, a_TagIdx, "TrappedChest"))
 	{
 		return nullptr;
@@ -1106,7 +1106,7 @@ cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_
 
 	std::unique_ptr<cMobSpawnerEntity> MobSpawner(new cMobSpawnerEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
 
-	// Load entity (MCServer worlds):
+	// Load entity (Cuberite worlds):
 	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
 	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_Short))
 	{
