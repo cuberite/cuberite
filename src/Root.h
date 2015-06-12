@@ -38,7 +38,7 @@ namespace Json
 
 
 
-/// The root of the object hierarchy
+/** The root of the object hierarchy */
 // tolua_begin
 class cRoot
 {
@@ -217,6 +217,7 @@ private:
 
 	bool m_bRestart;
 
+
 	void LoadGlobalSettings();
 
 	/// Loads the worlds from settings.ini, creates the worldmap
@@ -238,3 +239,8 @@ private:
 
 	static void InputThread(cRoot & a_Params);
 };  // tolua_export
+
+
+
+
+

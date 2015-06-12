@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "BoundingBox.h"
 #include "Defines.h"
+#include "SelfTests.h"
 
 
 
@@ -17,6 +18,11 @@ static class SelfTest_BoundingBox
 {
 public:
 	SelfTest_BoundingBox(void)
+	{
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&Test), "Bounding box intersections");
+	}
+
+	static void Test(void)
 	{
 		Vector3d Min(1, 1, 1);
 		Vector3d Max(2, 2, 2);
@@ -41,7 +47,7 @@ public:
 			bool res = cBoundingBox::CalcLineIntersection(Min, Max, Line1, Line2, LineCoeff, Face);
 			if (res != Results[i])
 			{
-				fprintf(stderr, "LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
+				LOGERROR("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d",
 					Line1.x, Line1.y, Line1.z,
 					Line2.x, Line2.y, Line2.z,
 					res ? 1 : 0, LineCoeff, Face
@@ -52,7 +58,7 @@ public:
 			{
 				if (LineCoeff != LineCoeffs[i])
 				{
-					fprintf(stderr, "LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d\n",
+					LOGERROR("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d",
 						Line1.x, Line1.y, Line1.z,
 						Line2.x, Line2.y, Line2.z,
 						res ? 1 : 0, LineCoeff, Face
@@ -61,9 +67,8 @@ public:
 				}
 			}
 		}  // for i - LineDefs[]
-		fprintf(stderr, "BoundingBox selftest complete.\n");
 	}
-} gTest;
+} g_BoundingBoxTest;
 
 #endif
 

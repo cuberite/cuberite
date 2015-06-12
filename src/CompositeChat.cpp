@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "CompositeChat.h"
 #include "ClientHandle.h"
+#include "SelfTests.h"
 
 
 
@@ -19,16 +20,14 @@ class SelfTest_CompositeChat
 public:
 	SelfTest_CompositeChat(void)
 	{
-		fprintf(stderr, "cCompositeChat self test...\n");
-		TestParser1();
-		TestParser2();
-		TestParser3();
-		TestParser4();
-		TestParser5();
-		fprintf(stderr, "cCompositeChat self test finished.\n");
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestParser1), "CompositeChat parser test 1");
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestParser2), "CompositeChat parser test 2");
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestParser3), "CompositeChat parser test 3");
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestParser4), "CompositeChat parser test 4");
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestParser5), "CompositeChat parser test 5");
 	}
 	
-	void TestParser1(void)
+	static void TestParser1(void)
 	{
 		cCompositeChat Msg;
 		Msg.ParseText("Testing @2color codes and http://links parser");
@@ -44,7 +43,7 @@ public:
 		assert_test(Parts[3]->m_Style == "@2");
 	}
 	
-	void TestParser2(void)
+	static void TestParser2(void)
 	{
 		cCompositeChat Msg;
 		Msg.ParseText("@3Advanced stuff: @5overriding color codes and http://links.with/@4color-in-them handling");
@@ -60,7 +59,7 @@ public:
 		assert_test(Parts[3]->m_Style == "@5");
 	}
 	
-	void TestParser3(void)
+	static void TestParser3(void)
 	{
 		cCompositeChat Msg;
 		Msg.ParseText("http://links.starting the text");
@@ -72,7 +71,7 @@ public:
 		assert_test(Parts[1]->m_Style == "");
 	}
 	
-	void TestParser4(void)
+	static void TestParser4(void)
 	{
 		cCompositeChat Msg;
 		Msg.ParseText("links finishing the text: http://some.server");
@@ -84,7 +83,7 @@ public:
 		assert_test(Parts[1]->m_Style == "");
 	}
 	
-	void TestParser5(void)
+	static void TestParser5(void)
 	{
 		cCompositeChat Msg;
 		Msg.ParseText("http://only.links");

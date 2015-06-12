@@ -6,6 +6,7 @@
 
 #include "Globals.h"
 #include "PieceGenerator.h"
+#include "../SelfTests.h"
 
 
 
@@ -22,6 +23,11 @@ static class cPieceGeneratorSelfTest :
 public:
 	cPieceGeneratorSelfTest(void)
 	{
+		cSelfTests::Get().Register(std::bind(&cPieceGeneratorSelfTest::Test, this), "PieceGenerator");
+	}
+
+	void Test(void)
+	{
 		// Prepare the internal state:
 		InitializePieces();
 		
@@ -31,14 +37,14 @@ public:
 		Gen.PlacePieces(500, 50, 500, 3, OutPieces);
 		
 		// Print out the pieces:
-		printf("OutPieces.size() = " SIZE_T_FMT "\n", OutPieces.size());
+		LOG("OutPieces.size() = " SIZE_T_FMT, OutPieces.size());
 		size_t idx = 0;
 		for (cPlacedPieces::const_iterator itr = OutPieces.begin(), end = OutPieces.end(); itr != end; ++itr, ++idx)
 		{
 			const Vector3i & Coords = (*itr)->GetCoords();
 			cCuboid Hitbox = (*itr)->GetHitBox();
 			Hitbox.Sort();
-			printf(SIZE_T_FMT ": {%d, %d, %d}, rot %d, hitbox {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n", idx,
+			LOG(SIZE_T_FMT ": {%d, %d, %d}, rot %d, hitbox {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)", idx,
 				Coords.x, Coords.y, Coords.z,
 				(*itr)->GetNumCCWRotations(),
 				Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
@@ -46,7 +52,7 @@ public:
 				Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
 			);
 		}  // itr - OutPieces[]
-		printf("Done.\n");
+		LOG("Done.");
 		
 		// Free the placed pieces properly:
 		Gen.FreePieces(OutPieces);

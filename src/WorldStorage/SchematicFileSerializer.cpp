@@ -9,6 +9,7 @@
 #include "FastNBT.h"
 #include "SchematicFileSerializer.h"
 #include "../StringCompression.h"
+#include "../SelfTests.h"
 
 
 
@@ -20,6 +21,11 @@ static class cSchematicStringSelfTest
 {
 public:
 	cSchematicStringSelfTest(void)
+	{
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&Test), "Schematic-to-string serialization");
+	}
+
+	static void Test(void)
 	{
 		cBlockArea ba;
 		ba.Create(21, 256, 21);

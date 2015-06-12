@@ -8,6 +8,7 @@
 #include "ByteBuffer.h"
 #include "Endianness.h"
 #include "OSSupport/IsThread.h"
+#include "SelfTests.h"
 
 
 
@@ -55,18 +56,18 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 
 #ifdef SELF_TEST
 
-/// Self-test of the VarInt-reading and writing code
+/** Self-test of the VarInt-reading and writing code */
 static class cByteBufferSelfTest
 {
 public:
 	cByteBufferSelfTest(void)
 	{
-		TestRead();
-		TestWrite();
-		TestWrap();
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestRead),  "ByteBuffer read");
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestWrite), "ByteBuffer write");
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestWrap),  "ByteBuffer wraparound");
 	}
 	
-	void TestRead(void)
+	static void TestRead(void)
 	{
 		cByteBuffer buf(50);
 		buf.Write("\x05\xac\x02\x00", 4);
@@ -78,7 +79,7 @@ public:
 		assert_test(buf.ReadVarInt(v3) && (v3 == 0));
 	}
 	
-	void TestWrite(void)
+	static void TestWrite(void)
 	{
 		cByteBuffer buf(50);
 		buf.WriteVarInt32(5);
@@ -90,7 +91,7 @@ public:
 		assert_test(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
 	}
 	
-	void TestWrap(void)
+	static void TestWrap(void)
 	{
 		cByteBuffer buf(3);
 		for (int i = 0; i < 1000; i++)
