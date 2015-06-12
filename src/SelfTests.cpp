@@ -11,7 +11,7 @@
 
 
 
-#if SELF_TEST
+#ifdef SELF_TEST
 	cSelfTests::cSelfTests(void):
 		m_AllowRegistering(true)
 	{
