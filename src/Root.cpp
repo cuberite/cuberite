@@ -120,7 +120,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 	#endif
 
 	// Run the self-tests registered previously via cSelfTests::Register():
-	#if SELF_TEST
+	#ifdef SELF_TEST
 		cSelfTests::ExecuteAll();
 	#endif
 
