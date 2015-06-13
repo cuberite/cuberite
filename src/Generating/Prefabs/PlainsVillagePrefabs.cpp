@@ -34,9 +34,10 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 17: 0\n"  /* tree */
 		"e: 60: 7\n"  /* tilleddirt */
 		"f:  8: 0\n"  /* water */
-		"g: 85: 0\n"  /* fence */
-		"h: 59: 7\n"  /* crops */
-		"i: 50: 5\n"  /* torch */
+		"g: 60: 6\n"  /* tilleddirt */
+		"h: 85: 0\n"  /* fence */
+		"i: 59: 7\n"  /* crops */
+		"j: 50: 5\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -79,35 +80,35 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  1 */ "deefeefeefeed"
 		/*  2 */ "deefeefeefeed"
 		/*  3 */ "deefeefeefeed"
-		/*  4 */ "deefeefeefeed"
+		/*  4 */ "deefegfeefeed"
 		/*  5 */ "deefeefeefeed"
 		/*  6 */ "deefeefeefeed"
 		/*  7 */ "deefeefeefeed"
 		/*  8 */ "deefeefeefeed"
-		/*  9 */ "deefeefeefeed"
+		/*  9 */ "deefgefeefeed"
 		/* 10 */ "deefeefeefeed"
 		/* 11 */ "ddddddddddddd"
 
 		// Level 3
 		/* z\x*             111 */
 		/*    *   0123456789012 */
-		/*  0 */ "g..g..g..g..g"
-		/*  1 */ "ghh.h..hh.hhg"
-		/*  2 */ "ghh..h.hh.hhg"
-		/*  3 */ "ghh.h..h..hhg"
-		/*  4 */ "ghh.hh.h..hhg"
-		/*  5 */ "ghh.h..hh.hhg"
-		/*  6 */ "ghh.hh.hh.hhg"
-		/*  7 */ "ghh....h..hhg"
-		/*  8 */ "ghh..h....hhg"
-		/*  9 */ "ghh.....h.hhg"
-		/* 10 */ "ghh.hh.h..hhg"
-		/* 11 */ "g..g..g..g..g"
+		/*  0 */ "h..h..h..h..h"
+		/*  1 */ "hii.i..ii.iih"
+		/*  2 */ "hii..i.ii.iih"
+		/*  3 */ "hii.i..i..iih"
+		/*  4 */ "hii.ii.i..iih"
+		/*  5 */ "hii.i..ii.iih"
+		/*  6 */ "hii.ii.ii.iih"
+		/*  7 */ "hii....i..iih"
+		/*  8 */ "hii..i....iih"
+		/*  9 */ "hii.....i.iih"
+		/* 10 */ "hii.ii.i..iih"
+		/* 11 */ "h..h..h..h..h"
 
 		// Level 4
 		/* z\x*             111 */
 		/*    *   0123456789012 */
-		/*  0 */ "i..i..i..i..i"
+		/*  0 */ "j..j..j..j..j"
 		/*  1 */ "............."
 		/*  2 */ "............."
 		/*  3 */ "............."
@@ -118,7 +119,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  8 */ "............."
 		/*  9 */ "............."
 		/* 10 */ "............."
-		/* 11 */ "i..i..i..i..i"
+		/* 11 */ "j..j..j..j..j"
 
 		// Level 5
 		/* z\x*             111 */
@@ -212,14 +213,14 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"b: 67: 0\n"  /* stairs */
 		"c: 67: 2\n"  /* stairs */
 		"d: 67: 1\n"  /* stairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f: 53: 3\n"  /* woodstairs */
 		"g: 53: 1\n"  /* woodstairs */
 		"h: 85: 0\n"  /* fence */
 		"i: 53: 0\n"  /* woodstairs */
 		"j: 53: 2\n"  /* woodstairs */
 		"k:102: 0\n"  /* glasspane */
-		"l: 64:12\n"  /* wooddoorblock */
+		"l: 64: 9\n"  /* wooddoorblock */
 		"m: 19: 0\n"  /* sponge */
 		"n: 50: 3\n"  /* torch */
 		"o: 72: 0\n"  /* woodplate */
@@ -356,8 +357,6 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"e:  8: 0\n"  /* water */
 		"f: 50: 5\n"  /* torch */
 		"g: 59: 7\n"  /* crops */
-		"h: 59: 3\n"  /* crops */
-		"i: 59: 5\n"  /* crops */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -365,9 +364,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
 		/*  0 */ "aaaaaaabaaaaaaa"
-		/*  1 */ "aaaaaaaaaaaaaaa"
-		/*  2 */ "aaaaaaaaaaaaaaa"
-		/*  3 */ "aaaaaaaaaaaaaaa"
+		/*  1 */ "aaaaaaabaaaaaaa"
+		/*  2 */ "aaaaaaabaaaaaaa"
+		/*  3 */ "aaaaaaabaaaaaaa"
 		/*  4 */ "aaaaaaabaaaaaaa"
 		/*  5 */ "aaaaaaabaaaaaaa"
 		/*  6 */ "aaaaaaabaaaaaaa"
@@ -405,8 +404,8 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*    *   012345678901234 */
 		/*  0 */ "f.....f.f.....f"
 		/*  1 */ ".gg.gg...gg.gg."
-		/*  2 */ ".gg.hg...gg.gg."
-		/*  3 */ ".gg.gi...gg.gg."
+		/*  2 */ ".gg.gg...gg.gg."
+		/*  3 */ ".gg.gg...gg.gg."
 		/*  4 */ ".gg.gg...gg.gg."
 		/*  5 */ ".gg.gg...gg.gg."
 		/*  6 */ ".gg.gg...gg.gg."
@@ -511,12 +510,12 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 2\n"  /* wooddoorblock */
+		"g: 64: 0\n"  /* wooddoorblock */
 		"h: 10: 0\n"  /* lava */
 		"i: 54: 2\n"  /* chest */
 		"j: 61: 2\n"  /* furnace */
 		"k:102: 0\n"  /* glasspane */
-		"l: 64: 8\n"  /* wooddoorblock */
+		"l: 64: 9\n"  /* wooddoorblock */
 		"m: 19: 0\n"  /* sponge */
 		"n:139: 0\n"  /* cobblestonewall */
 		"o:101: 0\n"  /* ironbars */
@@ -666,7 +665,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* 10 */ "............",
 
 		// Connectors:
-		"-1: 7, 1, -1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 7, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1999,8 +1998,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"a:  3: 0\n"  /* dirt */
 		"b: 17: 0\n"  /* tree */
 		"c: 60: 7\n"  /* tilleddirt */
-		"d:  8: 0\n"  /* water */
-		"e: 59: 7\n"  /* crops */
+		"d: 60: 6\n"  /* tilleddirt */
+		"e:  8: 0\n"  /* water */
+		"f: 59: 7\n"  /* crops */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -2020,8 +2020,8 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*    *   0123456789 */
 		/*  0 */ "bbbbbbbbbb"
 		/*  1 */ "bccccccccb"
-		/*  2 */ "bccccccccb"
-		/*  3 */ "bddddddddb"
+		/*  2 */ "bcccccdccb"
+		/*  3 */ "beeeeeeeeb"
 		/*  4 */ "bccccccccb"
 		/*  5 */ "bccccccccb"
 		/*  6 */ "bbbbbbbbbb"
@@ -2030,11 +2030,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* z\x*              */
 		/*    *   0123456789 */
 		/*  0 */ ".........."
-		/*  1 */ ".eeeeeeee."
-		/*  2 */ ".eeeeeeee."
+		/*  1 */ ".ffffffff."
+		/*  2 */ ".ffffffff."
 		/*  3 */ ".........."
-		/*  4 */ ".eeeeeeee."
-		/*  5 */ ".eeeeeeee."
+		/*  4 */ ".ffffffff."
+		/*  5 */ ".ffffffff."
 		/*  6 */ ".........."
 
 		// Level 3
@@ -2116,7 +2116,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		7, 15, 13,  // SizeX = 7, SizeY = 15, SizeZ = 13
 
 		// Hitbox (relative to bounding box):
-		-1, -1, 0,  // MinX, MinY, MinZ
+		-1, 0, 0,  // MinX, MinY, MinZ
 		7, 14, 13,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
@@ -2129,11 +2129,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 1\n"  /* wooddoorblock */
 		"h: 65: 3\n"  /* ladder */
 		"i: 53: 3\n"  /* woodstairs */
 		"j: 53: 7\n"  /* woodstairs */
-		"k: 64:12\n"  /* wooddoorblock */
+		"k: 64: 9\n"  /* wooddoorblock */
 		"l:102: 0\n"  /* glasspane */
 		"m: 19: 0\n"  /* sponge */
 		"n: 50: 1\n"  /* torch */
@@ -2579,16 +2579,16 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 7\n"  /* wooddoorblock */
-		"h: 64: 5\n"  /* wooddoorblock */
-		"i: 53: 3\n"  /* woodstairs */
-		"j: 85: 0\n"  /* fence */
-		"k: 53: 2\n"  /* woodstairs */
-		"l: 53: 1\n"  /* woodstairs */
+		"g: 64: 3\n"  /* wooddoorblock */
+		"h: 53: 3\n"  /* woodstairs */
+		"i: 85: 0\n"  /* fence */
+		"j: 53: 2\n"  /* woodstairs */
+		"k: 53: 1\n"  /* woodstairs */
+		"l: 53: 0\n"  /* woodstairs */
 		"m: 19: 0\n"  /* sponge */
-		"n: 53: 0\n"  /* woodstairs */
-		"o:102: 0\n"  /* glasspane */
-		"p: 64:12\n"  /* wooddoorblock */
+		"n:102: 0\n"  /* glasspane */
+		"o: 64: 8\n"  /* wooddoorblock */
+		"p: 64: 9\n"  /* wooddoorblock */
 		"q: 50: 3\n"  /* torch */
 		"r: 72: 0\n"  /* woodplate */
 		"s: 53: 7\n"  /* woodstairs */
@@ -2628,12 +2628,12 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* z\x*             11 */
 		/*    *   012345678901 */
 		/*  0 */ "............"
-		/*  1 */ ".efffghfffe."
+		/*  1 */ ".efffggfffe."
 		/*  2 */ ".f........f."
-		/*  3 */ ".fi......if."
-		/*  4 */ ".fj......jf."
-		/*  5 */ ".fk......kf."
-		/*  6 */ ".f.ljnljn.f."
+		/*  3 */ ".fh......hf."
+		/*  4 */ ".fi......if."
+		/*  5 */ ".fj......jf."
+		/*  6 */ ".f.kilkil.f."
 		/*  7 */ ".effffffffe."
 		/*  8 */ "............"
 
@@ -2641,19 +2641,19 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* z\x*             11 */
 		/*    *   012345678901 */
 		/*  0 */ "............"
-		/*  1 */ ".eoofppfooe."
-		/*  2 */ ".o..q..q..o."
-		/*  3 */ ".o........o."
+		/*  1 */ ".ennfopfnne."
+		/*  2 */ ".n..q..q..n."
+		/*  3 */ ".n........n."
 		/*  4 */ ".fr......rf."
-		/*  5 */ ".o........o."
-		/*  6 */ ".o..r..r..o."
-		/*  7 */ ".eoofoofooe."
+		/*  5 */ ".n........n."
+		/*  6 */ ".n..r..r..n."
+		/*  7 */ ".ennfnnfnne."
 		/*  8 */ "............"
 
 		// Level 4
 		/* z\x*             11 */
 		/*    *   012345678901 */
-		/*  0 */ "kkkkkkkkkkkk"
+		/*  0 */ "jjjjjjjjjjjj"
 		/*  1 */ "sffffffffffs"
 		/*  2 */ ".fttttttttf."
 		/*  3 */ ".f........f."
@@ -2661,19 +2661,19 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  5 */ ".f........f."
 		/*  6 */ ".fttttttttf."
 		/*  7 */ "wffffffffffw"
-		/*  8 */ "iiiiiiiiiiii"
+		/*  8 */ "hhhhhhhhhhhh"
 
 		// Level 5
 		/* z\x*             11 */
 		/*    *   012345678901 */
 		/*  0 */ "............"
-		/*  1 */ "kkkkkkkkkkkk"
+		/*  1 */ "jjjjjjjjjjjj"
 		/*  2 */ "sffffffffffs"
 		/*  3 */ ".fttttttttf."
 		/*  4 */ ".f........f."
 		/*  5 */ ".fttttttttf."
 		/*  6 */ "wffffffffffw"
-		/*  7 */ "iiiiiiiiiiii"
+		/*  7 */ "hhhhhhhhhhhh"
 		/*  8 */ "............"
 
 		// Level 6
@@ -2681,11 +2681,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*    *   012345678901 */
 		/*  0 */ "............"
 		/*  1 */ "............"
-		/*  2 */ "kkkkkkkkkkkk"
+		/*  2 */ "jjjjjjjjjjjj"
 		/*  3 */ "sffffffffffs"
 		/*  4 */ ".f........f."
 		/*  5 */ "wffffffffffw"
-		/*  6 */ "iiiiiiiiiiii"
+		/*  6 */ "hhhhhhhhhhhh"
 		/*  7 */ "............"
 		/*  8 */ "............"
 
@@ -2695,9 +2695,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  0 */ "............"
 		/*  1 */ "............"
 		/*  2 */ "............"
-		/*  3 */ "kkkkkkkkkkkk"
+		/*  3 */ "jjjjjjjjjjjj"
 		/*  4 */ "ffffffffffff"
-		/*  5 */ "iiiiiiiiiiii"
+		/*  5 */ "hhhhhhhhhhhh"
 		/*  6 */ "............"
 		/*  7 */ "............"
 		/*  8 */ "............",
@@ -2749,7 +2749,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
 		"g: 64: 3\n"  /* wooddoorblock */
-		"h: 64: 8\n"  /* wooddoorblock */
+		"h: 64: 9\n"  /* wooddoorblock */
 		"i:102: 0\n"  /* glasspane */
 		"j: 53: 2\n"  /* woodstairs */
 		"k: 53: 7\n"  /* woodstairs */
@@ -2875,9 +2875,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 3\n"  /* wooddoorblock */
 		"h:102: 0\n"  /* glasspane */
-		"i: 64:12\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 53: 2\n"  /* woodstairs */
 		"k: 53: 7\n"  /* woodstairs */
 		"l: 50: 3\n"  /* torch */
@@ -3004,7 +3004,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"f:  5: 0\n"  /* wood */
 		"g: 64: 3\n"  /* wooddoorblock */
 		"h:102: 0\n"  /* glasspane */
-		"i: 64: 8\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 53: 2\n"  /* woodstairs */
 		"k: 53: 7\n"  /* woodstairs */
 		"l: 50: 3\n"  /* torch */
@@ -3144,15 +3144,14 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"l: 53: 0\n"  /* woodstairs */
 		"m: 19: 0\n"  /* sponge */
 		"n: 64: 2\n"  /* wooddoorblock */
-		"o: 64: 4\n"  /* wooddoorblock */
+		"o: 64: 0\n"  /* wooddoorblock */
 		"p:102: 0\n"  /* glasspane */
 		"q: 72: 0\n"  /* woodplate */
-		"r: 64: 8\n"  /* wooddoorblock */
-		"s: 64:12\n"  /* wooddoorblock */
-		"t: 53: 5\n"  /* woodstairs */
-		"u: 53: 4\n"  /* woodstairs */
-		"v: 50: 1\n"  /* torch */
-		"w: 50: 2\n"  /* torch */,
+		"r: 64: 9\n"  /* wooddoorblock */
+		"s: 53: 5\n"  /* woodstairs */
+		"t: 53: 4\n"  /* woodstairs */
+		"u: 50: 1\n"  /* torch */
+		"v: 50: 2\n"  /* torch */,
 
 		// Block data:
 		// Level 0
@@ -3208,7 +3207,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  2 */ ".p.q.pmmmm"
 		/*  3 */ ".p...p...."
 		/*  4 */ ".c...c...."
-		/*  5 */ ".r...s...."
+		/*  5 */ ".r...r...."
 		/*  6 */ ".c...c...."
 		/*  7 */ ".p...p...."
 		/*  8 */ ".p...p...."
@@ -3218,22 +3217,22 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Level 4
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ "lt...ujmmm"
+		/*  0 */ "ls...tjmmm"
 		/*  1 */ "licccijmmm"
 		/*  2 */ "lc...cjmmm"
 		/*  3 */ "lc...cj..."
-		/*  4 */ "lcv.wcj..."
+		/*  4 */ "lcu.vcj..."
 		/*  5 */ "lc...cj..."
-		/*  6 */ "lcv.wcj..."
+		/*  6 */ "lcu.vcj..."
 		/*  7 */ "lc...cj..."
 		/*  8 */ "lc...cj..."
 		/*  9 */ "licccijmmm"
-		/* 10 */ "lt...ujmmm"
+		/* 10 */ "ls...tjmmm"
 
 		// Level 5
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ ".lt.uj.mmm"
+		/*  0 */ ".ls.tj.mmm"
 		/*  1 */ ".lcccj.mmm"
 		/*  2 */ ".lc.cj.mmm"
 		/*  3 */ ".lc.cj...."
@@ -3243,7 +3242,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  7 */ ".lc.cj...."
 		/*  8 */ ".lc.cj...."
 		/*  9 */ ".lcccj.mmm"
-		/* 10 */ ".lt.uj.mmm"
+		/* 10 */ ".ls.tj.mmm"
 
 		// Level 6
 		/* z\x*              */
@@ -3306,7 +3305,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 3\n"  /* wooddoorblock */
 		"h: 53: 3\n"  /* woodstairs */
 		"i: 85: 0\n"  /* fence */
 		"j: 53: 2\n"  /* woodstairs */
@@ -3314,7 +3313,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"l: 53: 0\n"  /* woodstairs */
 		"m: 19: 0\n"  /* sponge */
 		"n:102: 0\n"  /* glasspane */
-		"o: 64:12\n"  /* wooddoorblock */
+		"o: 64: 9\n"  /* wooddoorblock */
 		"p: 50: 3\n"  /* torch */
 		"q: 72: 0\n"  /* woodplate */
 		"r: 53: 7\n"  /* woodstairs */
@@ -3447,9 +3446,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 3\n"  /* wooddoorblock */
 		"h:102: 0\n"  /* glasspane */
-		"i: 64:12\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 53: 2\n"  /* woodstairs */
 		"k: 53: 7\n"  /* woodstairs */
 		"l: 50: 3\n"  /* torch */
@@ -3595,117 +3594,118 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 	// The data has been exported from the gallery Plains, area index 48, ID 99, created by Aloe_vera
 	{
 		// Size:
-		11, 9, 13,  // SizeX = 11, SizeY = 9, SizeZ = 13
+		11, 8, 13,  // SizeX = 11, SizeY = 8, SizeZ = 13
 
 		// Hitbox (relative to bounding box):
 		-1, 0, 0,  // MinX, MinY, MinZ
-		11, 8, 13,  // MaxX, MaxY, MaxZ
+		11, 7, 13,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:  3: 0\n"  /* dirt */
-		"b:  2: 0\n"  /* grass */
-		"c:  4: 0\n"  /* cobblestone */
-		"d: 67: 0\n"  /* stairs */
-		"e: 67: 2\n"  /* stairs */
-		"f: 67: 1\n"  /* stairs */
-		"g: 43: 0\n"  /* doubleslab */
+		"a:  4: 0\n"  /* cobblestone */
+		"b:  3: 0\n"  /* dirt */
+		"c: 67: 0\n"  /* stairs */
+		"d: 67: 2\n"  /* stairs */
+		"e: 67: 1\n"  /* stairs */
+		"f: 43: 0\n"  /* doubleslab */
+		"g:  2: 0\n"  /* grass */
 		"h: 17: 0\n"  /* tree */
 		"i:  5: 0\n"  /* wood */
-		"j: 64: 7\n"  /* wooddoorblock */
+		"j: 64: 3\n"  /* wooddoorblock */
 		"k: 53: 3\n"  /* woodstairs */
 		"l: 85: 0\n"  /* fence */
 		"m: 19: 0\n"  /* sponge */
 		"n: 53: 2\n"  /* woodstairs */
-		"o:102: 0\n"  /* glasspane */
-		"p: 64:12\n"  /* wooddoorblock */
-		"q: 72: 0\n"  /* woodplate */
-		"r: 53: 7\n"  /* woodstairs */
-		"s: 50: 1\n"  /* torch */
-		"t: 50: 2\n"  /* torch */
-		"u: 53: 6\n"  /* woodstairs */,
+		"o: 64: 1\n"  /* wooddoorblock */
+		"p:102: 0\n"  /* glasspane */
+		"q: 64: 9\n"  /* wooddoorblock */
+		"r: 72: 0\n"  /* woodplate */
+		"s: 53: 7\n"  /* woodstairs */
+		"t: 50: 1\n"  /* torch */
+		"u: 50: 2\n"  /* torch */
+		"v: 53: 6\n"  /* woodstairs */,
 
 		// Block data:
 		// Level 0
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ "aaaaaaaaaaa"
-		/*  1 */ "aaaaaaaaaaa"
-		/*  2 */ "aaaaaaaaaaa"
-		/*  3 */ "aaaaaaaaaaa"
-		/*  4 */ "aaaaaaaaaab"
-		/*  5 */ "baaaaaaaaab"
-		/*  6 */ "aaaaaaaaaaa"
-		/*  7 */ "baaaaaaaaaa"
-		/*  8 */ "baaaaaaaaaa"
-		/*  9 */ "baaaaaaaaab"
-		/* 10 */ "aaaaaaaaaaa"
-		/* 11 */ "aaaaaaaaaba"
-		/* 12 */ "aaaaaaaaaba"
-
-		// Level 1
-		/* z\x*             1 */
-		/*    *   01234567890 */
-		/*  0 */ "mmmmcccmmmm"
-		/*  1 */ "mcccccccccm"
-		/*  2 */ "mcccccccccm"
-		/*  3 */ "mcccccccccm"
-		/*  4 */ "mcccccccccm"
-		/*  5 */ "mcccccccccm"
-		/*  6 */ "mcccccccccm"
-		/*  7 */ "mcccccccccm"
-		/*  8 */ "mmaaaaaaamm"
-		/*  9 */ "mmaaaaaaamm"
-		/* 10 */ "mmaaaaaaamm"
-		/* 11 */ "mmaaaaaaamm"
-		/* 12 */ "mmaaaaaaamm"
-
-		// Level 2
-		/* z\x*             1 */
-		/*    *   01234567890 */
-		/*  0 */ "....def...."
-		/*  1 */ ".ccccccccc."
-		/*  2 */ ".cggggcccc."
-		/*  3 */ ".cggggcccc."
-		/*  4 */ ".cggggcccc."
-		/*  5 */ ".cggggcccc."
-		/*  6 */ ".cggggcccc."
-		/*  7 */ ".ccccccccc."
-		/*  8 */ "..bbbbbbb.."
+		/*  0 */ "mmmmaaammmm"
+		/*  1 */ "maaaaaaaaam"
+		/*  2 */ "maaaaaaaaam"
+		/*  3 */ "maaaaaaaaam"
+		/*  4 */ "maaaaaaaaam"
+		/*  5 */ "maaaaaaaaam"
+		/*  6 */ "maaaaaaaaam"
+		/*  7 */ "maaaaaaaaam"
+		/*  8 */ "mmbbbbbbbmm"
 		/*  9 */ "mmbbbbbbbmm"
 		/* 10 */ "mmbbbbbbbmm"
 		/* 11 */ "mmbbbbbbbmm"
 		/* 12 */ "mmbbbbbbbmm"
 
-		// Level 3
+		// Level 1
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "....cde...."
+		/*  1 */ ".aaaaaaaaa."
+		/*  2 */ ".affffaaaa."
+		/*  3 */ ".affffaaaa."
+		/*  4 */ ".affffaaaa."
+		/*  5 */ ".affffaaaa."
+		/*  6 */ ".affffaaaa."
+		/*  7 */ ".aaaaaaaaa."
+		/*  8 */ "..ggggggg.."
+		/*  9 */ "mmgggggggmm"
+		/* 10 */ "mmgggggggmm"
+		/* 11 */ "mmgggggggmm"
+		/* 12 */ "mmgggggggmm"
+
+		// Level 2
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
 		/*  1 */ ".hiiijiiih."
-		/*  2 */ ".i.g....ki."
-		/*  3 */ ".i.g....li."
-		/*  4 */ ".i.g....ni."
+		/*  2 */ ".i.f....ki."
+		/*  3 */ ".i.f....li."
+		/*  4 */ ".i.f....ni."
 		/*  5 */ ".i.......i."
 		/*  6 */ ".i.......i."
-		/*  7 */ ".hiiijiiih."
+		/*  7 */ ".hiiioiiih."
 		/*  8 */ "..l.....l.."
 		/*  9 */ "mml.....lmm"
 		/* 10 */ "mml.....lmm"
 		/* 11 */ "mml.....lmm"
 		/* 12 */ "mmlllllllmm"
 
-		// Level 4
+		// Level 3
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ ".hooipiooh."
-		/*  2 */ ".o.......o."
-		/*  3 */ ".o......qo."
+		/*  1 */ ".hppiqipph."
+		/*  2 */ ".p.......p."
+		/*  3 */ ".p......rp."
 		/*  4 */ ".i.......i."
-		/*  5 */ ".o.......o."
-		/*  6 */ ".o.......o."
-		/*  7 */ ".hooipiooh."
+		/*  5 */ ".p.......p."
+		/*  6 */ ".p.......p."
+		/*  7 */ ".hppiqipph."
 		/*  8 */ "..........."
+		/*  9 */ "mm.......mm"
+		/* 10 */ "mm.......mm"
+		/* 11 */ "mm.......mm"
+		/* 12 */ "mm.......mm"
+
+		// Level 4
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "nnnnnnnnnnn"
+		/*  1 */ "siiiiiiiiis"
+		/*  2 */ ".i.......i."
+		/*  3 */ ".i.......i."
+		/*  4 */ ".it.....ui."
+		/*  5 */ ".i.......i."
+		/*  6 */ ".i.......i."
+		/*  7 */ "viiiiiiiiiv"
+		/*  8 */ "kkkkkkkkkkk"
 		/*  9 */ "mm.......mm"
 		/* 10 */ "mm.......mm"
 		/* 11 */ "mm.......mm"
@@ -3714,15 +3714,15 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Level 5
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ "nnnnnnnnnnn"
-		/*  1 */ "riiiiiiiiir"
-		/*  2 */ ".i.......i."
+		/*  0 */ "..........."
+		/*  1 */ "nnnnnnnnnnn"
+		/*  2 */ "siiiiiiiiis"
 		/*  3 */ ".i.......i."
-		/*  4 */ ".is.....ti."
+		/*  4 */ ".i.......i."
 		/*  5 */ ".i.......i."
-		/*  6 */ ".i.......i."
-		/*  7 */ "uiiiiiiiiiu"
-		/*  8 */ "kkkkkkkkkkk"
+		/*  6 */ "viiiiiiiiiv"
+		/*  7 */ "kkkkkkkkkkk"
+		/*  8 */ "..........."
 		/*  9 */ "mm.......mm"
 		/* 10 */ "mm.......mm"
 		/* 11 */ "mm.......mm"
@@ -3732,28 +3732,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ "nnnnnnnnnnn"
-		/*  2 */ "riiiiiiiiir"
-		/*  3 */ ".i.......i."
-		/*  4 */ ".i.......i."
-		/*  5 */ ".i.......i."
-		/*  6 */ "uiiiiiiiiiu"
-		/*  7 */ "kkkkkkkkkkk"
-		/*  8 */ "..........."
-		/*  9 */ "mm.......mm"
-		/* 10 */ "mm.......mm"
-		/* 11 */ "mm.......mm"
-		/* 12 */ "mm.......mm"
-
-		// Level 7
-		/* z\x*             1 */
-		/*    *   01234567890 */
-		/*  0 */ "..........."
 		/*  1 */ "..........."
 		/*  2 */ "nnnnnnnnnnn"
-		/*  3 */ "riiiiiiiiir"
+		/*  3 */ "siiiiiiiiis"
 		/*  4 */ ".i.......i."
-		/*  5 */ "uiiiiiiiiiu"
+		/*  5 */ "viiiiiiiiiv"
 		/*  6 */ "kkkkkkkkkkk"
 		/*  7 */ "..........."
 		/*  8 */ "..........."
@@ -3762,7 +3745,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* 11 */ "mm.......mm"
 		/* 12 */ "mm.......mm"
 
-		// Level 8
+		// Level 7
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
@@ -3780,7 +3763,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* 12 */ "mm.......mm",
 
 		// Connectors:
-		"-1: 5, 2, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 5, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -3826,18 +3809,19 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"e: 67: 3\n"  /* stairs */
 		"f: 17: 0\n"  /* tree */
 		"g:  5: 0\n"  /* wood */
-		"h: 64: 7\n"  /* wooddoorblock */
-		"i:102: 0\n"  /* glasspane */
-		"j: 64:12\n"  /* wooddoorblock */
-		"k: 53: 2\n"  /* woodstairs */
-		"l: 53: 7\n"  /* woodstairs */
+		"h: 64: 3\n"  /* wooddoorblock */
+		"i: 64: 1\n"  /* wooddoorblock */
+		"j:102: 0\n"  /* glasspane */
+		"k: 64: 9\n"  /* wooddoorblock */
+		"l: 53: 2\n"  /* woodstairs */
 		"m: 19: 0\n"  /* sponge */
-		"n: 17: 4\n"  /* tree */
-		"o: 17: 8\n"  /* tree */
-		"p: 50: 3\n"  /* torch */
-		"q: 50: 4\n"  /* torch */
-		"r: 53: 6\n"  /* woodstairs */
-		"s: 53: 3\n"  /* woodstairs */,
+		"n: 53: 7\n"  /* woodstairs */
+		"o: 17: 4\n"  /* tree */
+		"p: 17: 8\n"  /* tree */
+		"q: 50: 3\n"  /* torch */
+		"r: 50: 4\n"  /* torch */
+		"s: 53: 6\n"  /* woodstairs */
+		"t: 53: 3\n"  /* woodstairs */,
 
 		// Block data:
 		// Level 0
@@ -3876,46 +3860,46 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  4 */ ".f.......f."
 		/*  5 */ ".g.......g."
 		/*  6 */ ".g.......g."
-		/*  7 */ ".fggfhfggf."
+		/*  7 */ ".fggfifggf."
 		/*  8 */ "..........."
 
 		// Level 3
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ ".fiifjfiif."
-		/*  2 */ ".i.......i."
-		/*  3 */ ".i.......i."
+		/*  1 */ ".fjjfkfjjf."
+		/*  2 */ ".j.......j."
+		/*  3 */ ".j.......j."
 		/*  4 */ ".f.......f."
-		/*  5 */ ".i.......i."
-		/*  6 */ ".i.......i."
-		/*  7 */ ".fiifjfiif."
+		/*  5 */ ".j.......j."
+		/*  6 */ ".j.......j."
+		/*  7 */ ".fjjfkfjjf."
 		/*  8 */ "..........."
 
 		// Level 4
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ "kkkkkkkkkkk"
-		/*  1 */ "lfnnnnnnnfl"
-		/*  2 */ ".o..p.p..o."
-		/*  3 */ ".o.......o."
-		/*  4 */ ".o.......o."
-		/*  5 */ ".o.......o."
-		/*  6 */ ".o..q.q..o."
-		/*  7 */ "rfnnnnnnnfr"
-		/*  8 */ "sssssssssss"
+		/*  0 */ "lllllllllll"
+		/*  1 */ "nfooooooofn"
+		/*  2 */ ".p..q.q..p."
+		/*  3 */ ".p.......p."
+		/*  4 */ ".p.......p."
+		/*  5 */ ".p.......p."
+		/*  6 */ ".p..r.r..p."
+		/*  7 */ "sfooooooofs"
+		/*  8 */ "ttttttttttt"
 
 		// Level 5
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ "kkkkkkkkkkk"
-		/*  2 */ "lgggggggggl"
+		/*  1 */ "lllllllllll"
+		/*  2 */ "ngggggggggn"
 		/*  3 */ ".g.......g."
 		/*  4 */ ".g.......g."
 		/*  5 */ ".g.......g."
-		/*  6 */ "rgggggggggr"
-		/*  7 */ "sssssssssss"
+		/*  6 */ "sgggggggggs"
+		/*  7 */ "ttttttttttt"
 		/*  8 */ "..........."
 
 		// Level 6
@@ -3923,11 +3907,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*    *   01234567890 */
 		/*  0 */ "..........."
 		/*  1 */ "..........."
-		/*  2 */ "kkkkkkkkkkk"
-		/*  3 */ "lgggggggggl"
+		/*  2 */ "lllllllllll"
+		/*  3 */ "ngggggggggn"
 		/*  4 */ ".g.......g."
-		/*  5 */ "rgggggggggr"
-		/*  6 */ "sssssssssss"
+		/*  5 */ "sgggggggggs"
+		/*  6 */ "ttttttttttt"
 		/*  7 */ "..........."
 		/*  8 */ "..........."
 
@@ -3937,9 +3921,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  0 */ "..........."
 		/*  1 */ "..........."
 		/*  2 */ "..........."
-		/*  3 */ "kkkkkkkkkkk"
+		/*  3 */ "lllllllllll"
 		/*  4 */ "ggggggggggg"
-		/*  5 */ "sssssssssss"
+		/*  5 */ "ttttttttttt"
 		/*  6 */ "..........."
 		/*  7 */ "..........."
 		/*  8 */ "...........",
@@ -3995,7 +3979,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"e: 43: 0\n"  /* doubleslab */
 		"f: 17: 0\n"  /* tree */
 		"g:  5: 0\n"  /* wood */
-		"h: 64: 7\n"  /* wooddoorblock */
+		"h: 64: 3\n"  /* wooddoorblock */
 		"i: 96: 8\n"  /* trapdoor */
 		"j: 61: 2\n"  /* furnace */
 		"k: 53: 3\n"  /* woodstairs */
@@ -4006,7 +3990,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"p: 53: 0\n"  /* woodstairs */
 		"q: 47: 0\n"  /* bookshelf */
 		"r:102: 0\n"  /* glasspane */
-		"s: 64:12\n"  /* wooddoorblock */
+		"s: 64: 9\n"  /* wooddoorblock */
 		"t: 72: 0\n"  /* woodplate */
 		"u: 17: 4\n"  /* tree */
 		"v: 17: 8\n"  /* tree */
@@ -4243,10 +4227,10 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"e:  5: 0\n"  /* wood */
 		"f: 67: 3\n"  /* stairs */
 		"g: 17: 0\n"  /* tree */
-		"h: 64: 7\n"  /* wooddoorblock */
-		"i: 64: 5\n"  /* wooddoorblock */
+		"h: 64: 3\n"  /* wooddoorblock */
+		"i: 64: 1\n"  /* wooddoorblock */
 		"j:102: 0\n"  /* glasspane */
-		"k: 64:12\n"  /* wooddoorblock */
+		"k: 64: 9\n"  /* wooddoorblock */
 		"l: 53: 2\n"  /* woodstairs */
 		"m: 19: 0\n"  /* sponge */
 		"n: 53: 1\n"  /* woodstairs */
@@ -4468,9 +4452,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 3\n"  /* wooddoorblock */
 		"h:102: 0\n"  /* glasspane */
-		"i: 64:12\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 53: 2\n"  /* woodstairs */
 		"k: 53: 7\n"  /* woodstairs */
 		"l: 53: 1\n"  /* woodstairs */
@@ -4637,9 +4621,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"d: 67: 1\n"  /* stairs */
 		"e: 17: 0\n"  /* tree */
 		"f:  5: 0\n"  /* wood */
-		"g: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 3\n"  /* wooddoorblock */
 		"h:102: 0\n"  /* glasspane */
-		"i: 64:12\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 53: 2\n"  /* woodstairs */
 		"k: 53: 0\n"  /* woodstairs */
 		"l: 53: 1\n"  /* woodstairs */
@@ -4806,10 +4790,10 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"f:  5: 0\n"  /* wood */
 		"g: 54: 4\n"  /* chest */
 		"h:154: 4\n"  /* hopper */
-		"i: 64: 4\n"  /* wooddoorblock */
+		"i: 64: 0\n"  /* wooddoorblock */
 		"j:102: 0\n"  /* glasspane */
 		"k: 85: 0\n"  /* fence */
-		"l: 64:12\n"  /* wooddoorblock */
+		"l: 64: 9\n"  /* wooddoorblock */
 		"m: 19: 0\n"  /* sponge */
 		"n: 50: 2\n"  /* torch */
 		"o: 35: 0\n"  /* wool */

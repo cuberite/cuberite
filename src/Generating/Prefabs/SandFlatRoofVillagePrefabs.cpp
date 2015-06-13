@@ -34,7 +34,7 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"d:128: 1\n"  /* sandstonestairs */
 		"e:128: 3\n"  /* sandstonestairs */
 		"f:171:15\n"  /* carpet */
-		"g: 64: 6\n"  /* wooddoorblock */
+		"g: 64: 2\n"  /* wooddoorblock */
 		"h:171: 0\n"  /* carpet */
 		"i:171:14\n"  /* carpet */
 		"j: 61: 2\n"  /* furnace */
@@ -42,7 +42,7 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"l: 54: 2\n"  /* chest */
 		"m: 19: 0\n"  /* sponge */
 		"n: 24: 2\n"  /* sandstone */
-		"o: 64:12\n"  /* wooddoorblock */
+		"o: 64: 9\n"  /* wooddoorblock */
 		"p: 50: 1\n"  /* torch */
 		"q:101: 0\n"  /* ironbars */
 		"r:128: 4\n"  /* sandstonestairs */
@@ -179,12 +179,12 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"b:128: 0\n"  /* sandstonestairs */
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:15\n"  /* carpet */
 		"h:171:14\n"  /* carpet */
 		"i: 24: 2\n"  /* sandstone */
-		"j: 64:12\n"  /* wooddoorblock */
+		"j: 64: 9\n"  /* wooddoorblock */
 		"k: 50: 3\n"  /* torch */
 		"l: 50: 1\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */
@@ -318,11 +318,11 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"b:128: 0\n"  /* sandstonestairs */
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:14\n"  /* carpet */
 		"h: 24: 2\n"  /* sandstone */
-		"i: 64:12\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 50: 3\n"  /* torch */
 		"k:128: 4\n"  /* sandstonestairs */
 		"l:128: 6\n"  /* sandstonestairs */
@@ -429,12 +429,12 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"b:128: 0\n"  /* sandstonestairs */
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:15\n"  /* carpet */
 		"h:171:14\n"  /* carpet */
 		"i: 24: 2\n"  /* sandstone */
-		"j: 64:12\n"  /* wooddoorblock */
+		"j: 64: 9\n"  /* wooddoorblock */
 		"k: 50: 3\n"  /* torch */
 		"l:128: 4\n"  /* sandstonestairs */
 		"m: 19: 0\n"  /* sponge */
@@ -547,12 +547,12 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"b:128: 0\n"  /* sandstonestairs */
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171:14\n"  /* carpet */
 		"g:171: 0\n"  /* carpet */
 		"h:171:15\n"  /* carpet */
 		"i: 24: 2\n"  /* sandstone */
-		"j: 64:12\n"  /* wooddoorblock */
+		"j: 64: 9\n"  /* wooddoorblock */
 		"k: 50: 3\n"  /* torch */
 		"l:128: 4\n"  /* sandstonestairs */
 		"m: 19: 0\n"  /* sponge */
@@ -665,12 +665,12 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"b:128: 0\n"  /* sandstonestairs */
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:14\n"  /* carpet */
 		"h:171:15\n"  /* carpet */
 		"i: 24: 2\n"  /* sandstone */
-		"j: 64:12\n"  /* wooddoorblock */
+		"j: 64: 9\n"  /* wooddoorblock */
 		"k: 50: 3\n"  /* torch */
 		"l:128: 4\n"  /* sandstonestairs */
 		"m: 19: 0\n"  /* sponge */
@@ -789,12 +789,12 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"b:128: 0\n"  /* sandstonestairs */
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:14\n"  /* carpet */
 		"h:171:15\n"  /* carpet */
 		"i: 24: 2\n"  /* sandstone */
-		"j: 64:12\n"  /* wooddoorblock */
+		"j: 64: 9\n"  /* wooddoorblock */
 		"k: 50: 3\n"  /* torch */
 		"l: 50: 1\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */
@@ -927,12 +927,12 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"b:128: 0\n"  /* sandstonestairs */
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:15\n"  /* carpet */
 		"h:171:14\n"  /* carpet */
 		"i: 24: 2\n"  /* sandstone */
-		"j: 64:12\n"  /* wooddoorblock */
+		"j: 64: 9\n"  /* wooddoorblock */
 		"k: 50: 3\n"  /* torch */
 		"l: 50: 1\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */
@@ -1067,13 +1067,13 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		"c:128: 2\n"  /* sandstonestairs */
 		"d:128: 1\n"  /* sandstonestairs */
 		"e: 43: 1\n"  /* doubleslab */
-		"f: 64: 7\n"  /* wooddoorblock */
+		"f: 64: 3\n"  /* wooddoorblock */
 		"g:171: 0\n"  /* carpet */
 		"h:171:15\n"  /* carpet */
 		"i:171:14\n"  /* carpet */
 		"j: 58: 0\n"  /* workbench */
 		"k: 24: 2\n"  /* sandstone */
-		"l: 64:12\n"  /* wooddoorblock */
+		"l: 64: 9\n"  /* wooddoorblock */
 		"m: 19: 0\n"  /* sponge */
 		"n: 50: 3\n"  /* torch */
 		"o: 50: 1\n"  /* torch */
