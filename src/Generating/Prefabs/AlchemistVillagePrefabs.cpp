@@ -32,7 +32,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"B: 50: 3\n"  /* torch */
 		"C:171: 8\n"  /* carpet */
 		"D:101: 0\n"  /* ironbars */
-		"E: 64: 8\n"  /* wooddoorblock */
+		"E: 64: 9\n"  /* wooddoorblock */
 		"F:128: 2\n"  /* sandstonestairs */
 		"G: 24: 1\n"  /* sandstone */
 		"H: 44: 9\n"  /* step */
@@ -65,7 +65,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"v:134: 3\n"  /* 134 */
 		"w: 85: 0\n"  /* fence */
 		"x:134: 7\n"  /* 134 */
-		"y:107: 5\n"  /* fencegate */
+		"y:107: 1\n"  /* fencegate */
 		"z: 64: 1\n"  /* wooddoorblock */,
 
 		// Block data:
@@ -288,7 +288,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"d: 13: 0\n"  /* gravel */
 		"e:  5: 0\n"  /* wood */
 		"f:128: 5\n"  /* sandstonestairs */
-		"g:107: 2\n"  /* fencegate */
+		"g:107: 0\n"  /* fencegate */
 		"h:128: 4\n"  /* sandstonestairs */
 		"i:134: 1\n"  /* 134 */
 		"j:134: 3\n"  /* 134 */
@@ -298,13 +298,13 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"n:134: 5\n"  /* 134 */
 		"o:134: 7\n"  /* 134 */
 		"p:134: 4\n"  /* 134 */
-		"q:107: 1\n"  /* fencegate */
+		"q:107: 3\n"  /* fencegate */
 		"r: 64: 1\n"  /* wooddoorblock */
 		"s: 65: 3\n"  /* ladder */
 		"t: 50: 3\n"  /* torch */
 		"u:171: 8\n"  /* carpet */
 		"v:101: 0\n"  /* ironbars */
-		"w: 64: 8\n"  /* wooddoorblock */
+		"w: 64: 9\n"  /* wooddoorblock */
 		"x:128: 2\n"  /* sandstonestairs */
 		"y: 24: 1\n"  /* sandstone */
 		"z: 44: 9\n"  /* step */,
@@ -489,7 +489,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"k: 10: 0\n"  /* lava */
 		"l: 54: 5\n"  /* chest */
 		"m: 19: 0\n"  /* sponge */
-		"n: 64: 8\n"  /* wooddoorblock */
+		"n: 64: 9\n"  /* wooddoorblock */
 		"o: 50: 3\n"  /* torch */
 		"p:101: 0\n"  /* ironbars */
 		"q: 50: 1\n"  /* torch */
@@ -675,7 +675,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"p:101: 0\n"  /* ironbars */
 		"q: 50: 1\n"  /* torch */
 		"r:140: 0\n"  /* flowerpotblock */
-		"s: 64: 8\n"  /* wooddoorblock */
+		"s: 64: 9\n"  /* wooddoorblock */
 		"t: 50: 3\n"  /* torch */
 		"u: 69:12\n"  /* lever */
 		"v: 50: 4\n"  /* torch */
@@ -948,7 +948,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"k:128: 3\n"  /* sandstonestairs */
 		"l: 77: 4\n"  /* stonebutton */
 		"m: 19: 0\n"  /* sponge */
-		"n: 71: 8\n"  /* irondoorblock */
+		"n: 71: 9\n"  /* irondoorblock */
 		"o: 77: 3\n"  /* stonebutton */
 		"p:128: 6\n"  /* sandstonestairs */
 		"q:128: 4\n"  /* sandstonestairs */
@@ -1129,7 +1129,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"f: 64: 3\n"  /* wooddoorblock */
 		"g: 61: 2\n"  /* furnace */
 		"h: 65: 2\n"  /* ladder */
-		"i: 64: 8\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j:101: 0\n"  /* ironbars */
 		"k: 50: 4\n"  /* torch */
 		"l:128: 2\n"  /* sandstonestairs */
@@ -1252,7 +1252,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"h: 65: 5\n"  /* ladder */
 		"i: 85: 0\n"  /* fence */
 		"j:101: 0\n"  /* ironbars */
-		"k: 64: 8\n"  /* wooddoorblock */
+		"k: 64: 9\n"  /* wooddoorblock */
 		"l: 50: 3\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */
 		"n:128: 2\n"  /* sandstonestairs */
@@ -1396,7 +1396,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"e:  5: 0\n"  /* wood */
 		"f: 64: 3\n"  /* wooddoorblock */
 		"g: 65: 2\n"  /* ladder */
-		"h: 64: 8\n"  /* wooddoorblock */
+		"h: 64: 9\n"  /* wooddoorblock */
 		"i:101: 0\n"  /* ironbars */
 		"j: 50: 4\n"  /* torch */
 		"k:128: 2\n"  /* sandstonestairs */
@@ -1523,7 +1523,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"l:134: 6\n"  /* 134 */
 		"m: 19: 0\n"  /* sponge */
 		"n:134: 4\n"  /* 134 */
-		"o: 64: 8\n"  /* wooddoorblock */
+		"o: 64: 9\n"  /* wooddoorblock */
 		"p: 50: 2\n"  /* torch */
 		"q:101: 0\n"  /* ironbars */
 		"r:171: 8\n"  /* carpet */
@@ -1667,7 +1667,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"e:  5: 0\n"  /* wood */
 		"f: 64: 3\n"  /* wooddoorblock */
 		"g: 65: 2\n"  /* ladder */
-		"h: 64: 8\n"  /* wooddoorblock */
+		"h: 64: 9\n"  /* wooddoorblock */
 		"i:101: 0\n"  /* ironbars */
 		"j: 50: 1\n"  /* torch */
 		"k: 50: 4\n"  /* torch */
@@ -1810,7 +1810,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"m: 19: 0\n"  /* sponge */
 		"n: 38: 5\n"  /* rose */
 		"o: 65: 2\n"  /* ladder */
-		"p: 64: 8\n"  /* wooddoorblock */
+		"p: 64: 9\n"  /* wooddoorblock */
 		"q:101: 0\n"  /* ironbars */
 		"r: 50: 1\n"  /* torch */
 		"s: 50: 4\n"  /* torch */
@@ -1943,7 +1943,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"f: 64: 3\n"  /* wooddoorblock */
 		"g: 65: 2\n"  /* ladder */
 		"h:101: 0\n"  /* ironbars */
-		"i: 64: 8\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 50: 1\n"  /* torch */
 		"k: 50: 2\n"  /* torch */
 		"l:128: 2\n"  /* sandstonestairs */
@@ -2089,7 +2089,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"f: 64: 2\n"  /* wooddoorblock */
 		"g: 65: 2\n"  /* ladder */
 		"h:101: 0\n"  /* ironbars */
-		"i: 64: 8\n"  /* wooddoorblock */
+		"i: 64: 9\n"  /* wooddoorblock */
 		"j: 50: 1\n"  /* torch */
 		"k:128: 6\n"  /* sandstonestairs */
 		"l:126: 8\n"  /* woodenslab */
@@ -2220,7 +2220,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"e:  5: 0\n"  /* wood */
 		"f: 64: 3\n"  /* wooddoorblock */
 		"g: 65: 5\n"  /* ladder */
-		"h: 64: 8\n"  /* wooddoorblock */
+		"h: 64: 9\n"  /* wooddoorblock */
 		"i:101: 0\n"  /* ironbars */
 		"j: 50: 4\n"  /* torch */
 		"k:128: 2\n"  /* sandstonestairs */
@@ -2374,17 +2374,18 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"h: 85: 0\n"  /* fence */
 		"i: 64: 0\n"  /* wooddoorblock */
 		"j: 65: 5\n"  /* ladder */
-		"k: 64: 8\n"  /* wooddoorblock */
+		"k: 64: 9\n"  /* wooddoorblock */
 		"l:101: 0\n"  /* ironbars */
 		"m: 19: 0\n"  /* sponge */
-		"n: 50: 4\n"  /* torch */
-		"o:128: 2\n"  /* sandstonestairs */
-		"p:126: 8\n"  /* woodenslab */
-		"q:128: 4\n"  /* sandstonestairs */
-		"r:128: 7\n"  /* sandstonestairs */
-		"s: 44: 1\n"  /* step */
-		"t: 50: 3\n"  /* torch */
-		"u:128: 6\n"  /* sandstonestairs */,
+		"n: 64: 8\n"  /* wooddoorblock */
+		"o: 50: 4\n"  /* torch */
+		"p:128: 2\n"  /* sandstonestairs */
+		"q:126: 8\n"  /* woodenslab */
+		"r:128: 4\n"  /* sandstonestairs */
+		"s:128: 7\n"  /* sandstonestairs */
+		"t: 44: 1\n"  /* step */
+		"u: 50: 3\n"  /* torch */
+		"v:128: 6\n"  /* sandstonestairs */,
 
 		// Block data:
 		// Level 0
@@ -2434,36 +2435,36 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*  2 */ "acccckcccca...."
 		/*  3 */ "c.........c...."
 		/*  4 */ "l.........c...."
-		/*  5 */ "l.........k...."
+		/*  5 */ "l.........n...."
 		/*  6 */ "l.........c...."
-		/*  7 */ "c..n...n..cj..."
+		/*  7 */ "c..o...o..cj..."
 		/*  8 */ "accclllccca...."
 
 		// Level 4
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
-		/*  0 */ "mmmo...ommmmmmm"
+		/*  0 */ "mmmp...pmmmmmmm"
 		/*  1 */ "mmmc...cmmmmmmm"
 		/*  2 */ "accccccccca...."
-		/*  3 */ "cpppppppppc...."
-		/*  4 */ "qpppppppppc...."
-		/*  5 */ "qpppppppppc...."
-		/*  6 */ "qpppppppppc...."
-		/*  7 */ "cpppppppppcj..."
-		/*  8 */ "acccrrrccca...."
+		/*  3 */ "cqqqqqqqqqc...."
+		/*  4 */ "rqqqqqqqqqc...."
+		/*  5 */ "rqqqqqqqqqc...."
+		/*  6 */ "rqqqqqqqqqc...."
+		/*  7 */ "cqqqqqqqqqcj..."
+		/*  8 */ "acccsssccca...."
 
 		// Level 5
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
 		/*  0 */ "mmm.....mmmmmmm"
 		/*  1 */ "mmm.....mmmmmmm"
-		/*  2 */ "csssscssssc...."
-		/*  3 */ "s..accca..s...."
-		/*  4 */ "s..c...c..s...."
+		/*  2 */ "cttttcttttc...."
+		/*  3 */ "t..accca..t...."
+		/*  4 */ "t..c...c..t...."
 		/*  5 */ "c.........c...."
-		/*  6 */ "s..c...c..s...."
-		/*  7 */ "s..accca..s...."
-		/*  8 */ "csssscssssc...."
+		/*  6 */ "t..c...c..t...."
+		/*  7 */ "t..accca..t...."
+		/*  8 */ "cttttcttttc...."
 
 		// Level 6
 		/* z\x*             11111 */
@@ -2472,7 +2473,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*  1 */ "..............."
 		/*  2 */ "..............."
 		/*  3 */ "...aclca......."
-		/*  4 */ "...ct..c......."
+		/*  4 */ "...cu..c......."
 		/*  5 */ "..............."
 		/*  6 */ "...c...c......."
 		/*  7 */ "...aclca......."
@@ -2484,11 +2485,11 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*  0 */ "..............."
 		/*  1 */ "..............."
 		/*  2 */ "..............."
-		/*  3 */ "...acuca......."
-		/*  4 */ "...cpppc......."
-		/*  5 */ "...cpppc......."
-		/*  6 */ "...cpppc......."
-		/*  7 */ "...acrca......."
+		/*  3 */ "...acvca......."
+		/*  4 */ "...cqqqc......."
+		/*  5 */ "...cqqqc......."
+		/*  6 */ "...cqqqc......."
+		/*  7 */ "...acsca......."
 		/*  8 */ "..............."
 
 		// Level 8
@@ -2497,11 +2498,11 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*  0 */ "..............."
 		/*  1 */ "..............."
 		/*  2 */ "..............."
-		/*  3 */ "...cscsc......."
-		/*  4 */ "...s...s......."
+		/*  3 */ "...ctctc......."
+		/*  4 */ "...t...t......."
 		/*  5 */ "...c...c......."
-		/*  6 */ "...s...s......."
-		/*  7 */ "...cscsc......."
+		/*  6 */ "...t...t......."
+		/*  7 */ "...ctctc......."
 		/*  8 */ "...............",
 
 		// Connectors:
@@ -2574,7 +2575,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"q:101: 0\n"  /* ironbars */
 		"r: 50: 2\n"  /* torch */
 		"s: 47: 0\n"  /* bookshelf */
-		"t: 64: 8\n"  /* wooddoorblock */
+		"t: 64: 9\n"  /* wooddoorblock */
 		"u: 50: 3\n"  /* torch */
 		"v:171: 8\n"  /* carpet */
 		"w:128: 6\n"  /* sandstonestairs */
@@ -2769,7 +2770,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"n: 50: 1\n"  /* torch */
 		"o: 50: 2\n"  /* torch */
 		"p:101: 0\n"  /* ironbars */
-		"q: 64: 8\n"  /* wooddoorblock */
+		"q: 64: 9\n"  /* wooddoorblock */
 		"r:128: 2\n"  /* sandstonestairs */
 		"s:128: 6\n"  /* sandstonestairs */
 		"t:126: 8\n"  /* woodenslab */
@@ -2978,7 +2979,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"e:  5: 0\n"  /* wood */
 		"f: 64: 3\n"  /* wooddoorblock */
 		"g: 65: 2\n"  /* ladder */
-		"h: 64: 8\n"  /* wooddoorblock */
+		"h: 64: 9\n"  /* wooddoorblock */
 		"i:101: 0\n"  /* ironbars */
 		"j: 50: 2\n"  /* torch */
 		"k: 50: 1\n"  /* torch */
@@ -3133,7 +3134,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"l:118: 3\n"  /* cauldronblock */
 		"m: 19: 0\n"  /* sponge */
 		"n:155: 1\n"  /* quartzblock */
-		"o: 64: 8\n"  /* wooddoorblock */
+		"o: 64: 9\n"  /* wooddoorblock */
 		"p: 50: 3\n"  /* torch */
 		"q:101: 0\n"  /* ironbars */
 		"r:140: 0\n"  /* flowerpotblock */

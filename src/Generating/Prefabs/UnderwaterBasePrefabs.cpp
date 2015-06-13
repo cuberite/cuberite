@@ -32,9 +32,9 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		"b: 20: 0\n"  /* glass */
 		"c:  5: 5\n"  /* wood */
 		"d:  8: 0\n"  /* water */
-		"e: 64: 4\n"  /* wooddoorblock */
-		"f: 64:12\n"  /* wooddoorblock */
-		"g: 64:13\n"  /* wooddoorblock */
+		"e: 64: 0\n"  /* wooddoorblock */
+		"f: 64: 8\n"  /* wooddoorblock */
+		"g: 64: 9\n"  /* wooddoorblock */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -280,18 +280,16 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		".:  0: 0\n"  /* air */
 		"a:  5: 5\n"  /* wood */
 		"b:  5: 0\n"  /* wood */
-		"c: 64: 5\n"  /* wooddoorblock */
-		"d: 64: 2\n"  /* wooddoorblock */
-		"e: 64: 4\n"  /* wooddoorblock */
-		"f: 64: 1\n"  /* wooddoorblock */
-		"g: 20: 0\n"  /* glass */
-		"h: 64:12\n"  /* wooddoorblock */
-		"i: 76: 3\n"  /* redstonetorchon */
-		"j: 64: 8\n"  /* wooddoorblock */
-		"k: 76: 4\n"  /* redstonetorchon */
-		"l: 76: 2\n"  /* redstonetorchon */
-		"m: 19: 0\n"  /* sponge */
-		"n: 76: 1\n"  /* redstonetorchon */,
+		"c: 64: 2\n"  /* wooddoorblock */
+		"d: 64: 1\n"  /* wooddoorblock */
+		"e: 20: 0\n"  /* glass */
+		"f: 64: 9\n"  /* wooddoorblock */
+		"g: 76: 3\n"  /* redstonetorchon */
+		"h: 64: 8\n"  /* wooddoorblock */
+		"i: 76: 4\n"  /* redstonetorchon */
+		"j: 76: 2\n"  /* redstonetorchon */
+		"k: 76: 1\n"  /* redstonetorchon */
+		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
 		// Level 0
@@ -313,28 +311,28 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*    *   0123456789 */
 		/*  0 */ "abbbbbmmmm"
 		/*  1 */ "c.....bbmm"
-		/*  2 */ "d.......bm"
+		/*  2 */ "c.......bm"
 		/*  3 */ "abb.....bm"
 		/*  4 */ "mmmbb....b"
 		/*  5 */ "mmmmmb...b"
 		/*  6 */ "mmmmmb...b"
 		/*  7 */ "mmmmmmb..b"
 		/*  8 */ "mmmmmmb..b"
-		/*  9 */ "mmmmmmaefa"
+		/*  9 */ "mmmmmmadda"
 
 		// Level 2
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ "abggbbmmmm"
-		/*  1 */ "h...i.bbmm"
-		/*  2 */ "j.......bm"
-		/*  3 */ "abbk....bm"
+		/*  0 */ "abeebbmmmm"
+		/*  1 */ "f...g.bbmm"
+		/*  2 */ "h.......bm"
+		/*  3 */ "abbi....bm"
 		/*  4 */ "mmmbb....b"
-		/*  5 */ "mmmmmb..lb"
-		/*  6 */ "mmmmmbn..g"
-		/*  7 */ "mmmmmmb..g"
+		/*  5 */ "mmmmmb..jb"
+		/*  6 */ "mmmmmbk..e"
+		/*  7 */ "mmmmmmb..e"
 		/*  8 */ "mmmmmmb..b"
-		/*  9 */ "mmmmmmahja"
+		/*  9 */ "mmmmmmafha"
 
 		// Level 3
 		/* z\x*              */
@@ -396,20 +394,17 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		"a:  5: 5\n"  /* wood */
 		"b:  5: 0\n"  /* wood */
 		"c: 64: 3\n"  /* wooddoorblock */
-		"d: 64: 6\n"  /* wooddoorblock */
-		"e: 64: 5\n"  /* wooddoorblock */
-		"f: 64: 0\n"  /* wooddoorblock */
-		"g: 64: 2\n"  /* wooddoorblock */
-		"h: 64: 1\n"  /* wooddoorblock */
-		"i: 64: 8\n"  /* wooddoorblock */
-		"j: 64:12\n"  /* wooddoorblock */
-		"k: 20: 0\n"  /* glass */
-		"l: 76: 1\n"  /* redstonetorchon */
+		"d: 64: 2\n"  /* wooddoorblock */
+		"e: 64: 0\n"  /* wooddoorblock */
+		"f: 64: 1\n"  /* wooddoorblock */
+		"g: 64: 8\n"  /* wooddoorblock */
+		"h: 64: 9\n"  /* wooddoorblock */
+		"i: 20: 0\n"  /* glass */
+		"j: 76: 1\n"  /* redstonetorchon */
+		"k: 76: 2\n"  /* redstonetorchon */
+		"l: 76: 3\n"  /* redstonetorchon */
 		"m: 19: 0\n"  /* sponge */
-		"n: 76: 2\n"  /* redstonetorchon */
-		"o: 76: 3\n"  /* redstonetorchon */
-		"p: 76: 4\n"  /* redstonetorchon */
-		"q: 64: 9\n"  /* wooddoorblock */,
+		"n: 76: 4\n"  /* redstonetorchon */,
 
 		// Block data:
 		// Level 0
@@ -435,42 +430,42 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		// Level 1
 		/* z\x*             111111 */
 		/*    *   0123456789012345 */
-		/*  0 */ "mmmmmmacdammmmmm"
+		/*  0 */ "mmmmmmaccammmmmm"
 		/*  1 */ "mmmmmmb..bmmmmmm"
 		/*  2 */ "mmmmmmb..bmmmmmm"
 		/*  3 */ "mmmmmmb..bmmmmmm"
 		/*  4 */ "mmmmmmb..bmmmmmm"
 		/*  5 */ "mmmmmmb..bmmmmmm"
 		/*  6 */ "abbbbbb..bbbbbba"
-		/*  7 */ "e..............f"
-		/*  8 */ "g..............f"
+		/*  7 */ "d..............e"
+		/*  8 */ "d..............e"
 		/*  9 */ "abbbbbb..bbbbbba"
 		/* 10 */ "mmmmmmb..bmmmmmm"
 		/* 11 */ "mmmmmmb..bmmmmmm"
 		/* 12 */ "mmmmmmb..bmmmmmm"
 		/* 13 */ "mmmmmmb..bmmmmmm"
 		/* 14 */ "mmmmmmb..bmmmmmm"
-		/* 15 */ "mmmmmmahhammmmmm"
+		/* 15 */ "mmmmmmaffammmmmm"
 
 		// Level 2
 		/* z\x*             111111 */
 		/*    *   0123456789012345 */
-		/*  0 */ "mmmmmmaijammmmmm"
+		/*  0 */ "mmmmmmaghammmmmm"
 		/*  1 */ "mmmmmmb..bmmmmmm"
-		/*  2 */ "mmmmmmk..kmmmmmm"
-		/*  3 */ "mmmmmmk..kmmmmmm"
-		/*  4 */ "mmmmmmblnbmmmmmm"
+		/*  2 */ "mmmmmmi..immmmmm"
+		/*  3 */ "mmmmmmi..immmmmm"
+		/*  4 */ "mmmmmmbjkbmmmmmm"
 		/*  5 */ "mmmmmmb..bmmmmmm"
-		/*  6 */ "abkkbbb..bbbkkba"
-		/*  7 */ "j...o......o...i"
-		/*  8 */ "i...p......p...q"
-		/*  9 */ "abkkbbb..bbbkkba"
+		/*  6 */ "abiibbb..bbbiiba"
+		/*  7 */ "h...l......l...g"
+		/*  8 */ "g...n......n...h"
+		/*  9 */ "abiibbb..bbbiiba"
 		/* 10 */ "mmmmmmb..bmmmmmm"
-		/* 11 */ "mmmmmmblnbmmmmmm"
-		/* 12 */ "mmmmmmk..kmmmmmm"
-		/* 13 */ "mmmmmmk..kmmmmmm"
+		/* 11 */ "mmmmmmbjkbmmmmmm"
+		/* 12 */ "mmmmmmi..immmmmm"
+		/* 13 */ "mmmmmmi..immmmmm"
 		/* 14 */ "mmmmmmb..bmmmmmm"
-		/* 15 */ "mmmmmmaqiammmmmm"
+		/* 15 */ "mmmmmmahgammmmmm"
 
 		// Level 3
 		/* z\x*             111111 */
@@ -549,8 +544,6 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		"h: 64: 8\n"  /* wooddoorblock */
 		"i: 76: 4\n"  /* redstonetorchon */
 		"j: 64: 0\n"  /* wooddoorblock */
-		"k: 64: 7\n"  /* wooddoorblock */
-		"l: 64:12\n"  /* wooddoorblock */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -607,7 +600,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*    *   0123456789012345 */
 		/*  0 */ "mmmmmmmbbbbbbbba"
 		/*  1 */ "mmmmmmmb.......j"
-		/*  2 */ "mmmmmmmb.......k"
+		/*  2 */ "mmmmmmmb.......j"
 		/*  3 */ "mmmmmmmbbbbbbbba"
 
 		// Level 7
@@ -615,7 +608,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*    *   0123456789012345 */
 		/*  0 */ "mmmmmmmmbbbeebba"
 		/*  1 */ "mmmmmmmmb.g....h"
-		/*  2 */ "mmmmmmmmb.i....l"
+		/*  2 */ "mmmmmmmmb.i....f"
 		/*  3 */ "mmmmmmmmbbbeebba"
 
 		// Level 8
@@ -672,19 +665,16 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		"a:  5: 5\n"  /* wood */
 		"b:  5: 0\n"  /* wood */
 		"c: 64: 3\n"  /* wooddoorblock */
-		"d: 64: 6\n"  /* wooddoorblock */
-		"e: 64: 5\n"  /* wooddoorblock */
-		"f: 64: 0\n"  /* wooddoorblock */
-		"g: 64: 2\n"  /* wooddoorblock */
-		"h: 64: 8\n"  /* wooddoorblock */
-		"i: 64:12\n"  /* wooddoorblock */
-		"j: 20: 0\n"  /* glass */
-		"k: 76: 1\n"  /* redstonetorchon */
-		"l: 76: 2\n"  /* redstonetorchon */
-		"m: 19: 0\n"  /* sponge */
-		"n: 76: 3\n"  /* redstonetorchon */
-		"o: 76: 4\n"  /* redstonetorchon */
-		"p: 64: 9\n"  /* wooddoorblock */,
+		"d: 64: 2\n"  /* wooddoorblock */
+		"e: 64: 0\n"  /* wooddoorblock */
+		"f: 64: 8\n"  /* wooddoorblock */
+		"g: 64: 9\n"  /* wooddoorblock */
+		"h: 20: 0\n"  /* glass */
+		"i: 76: 1\n"  /* redstonetorchon */
+		"j: 76: 2\n"  /* redstonetorchon */
+		"k: 76: 3\n"  /* redstonetorchon */
+		"l: 76: 4\n"  /* redstonetorchon */
+		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
 		// Level 0
@@ -704,30 +694,30 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		// Level 1
 		/* z\x*             111111 */
 		/*    *   0123456789012345 */
-		/*  0 */ "mmmmmmacdammmmmm"
+		/*  0 */ "mmmmmmaccammmmmm"
 		/*  1 */ "mmmmmmb..bmmmmmm"
 		/*  2 */ "mmmmmmb..bmmmmmm"
 		/*  3 */ "mmmmmmb..bmmmmmm"
 		/*  4 */ "mmmmmmb..bmmmmmm"
 		/*  5 */ "mmmmmmb..bmmmmmm"
 		/*  6 */ "abbbbbb..bbbbbba"
-		/*  7 */ "e..............f"
-		/*  8 */ "g..............f"
+		/*  7 */ "d..............e"
+		/*  8 */ "d..............e"
 		/*  9 */ "abbbbbbbbbbbbbba"
 
 		// Level 2
 		/* z\x*             111111 */
 		/*    *   0123456789012345 */
-		/*  0 */ "mmmmmmahiammmmmm"
+		/*  0 */ "mmmmmmafgammmmmm"
 		/*  1 */ "mmmmmmb..bmmmmmm"
-		/*  2 */ "mmmmmmj..jmmmmmm"
-		/*  3 */ "mmmmmmj..jmmmmmm"
-		/*  4 */ "mmmmmmbklbmmmmmm"
+		/*  2 */ "mmmmmmh..hmmmmmm"
+		/*  3 */ "mmmmmmh..hmmmmmm"
+		/*  4 */ "mmmmmmbijbmmmmmm"
 		/*  5 */ "mmmmmmb..bmmmmmm"
-		/*  6 */ "abjjbbb..bbbjjba"
-		/*  7 */ "i...n......n...h"
-		/*  8 */ "h...o......o...p"
-		/*  9 */ "abjjbbbjjbbbjjba"
+		/*  6 */ "abhhbbb..bbbhhba"
+		/*  7 */ "g...k......k...f"
+		/*  8 */ "f...l......l...g"
+		/*  9 */ "abhhbbbhhbbbhhba"
 
 		// Level 3
 		/* z\x*             111111 */
@@ -974,14 +964,12 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		"a:  5: 0\n"  /* wood */
 		"b:  5: 5\n"  /* wood */
 		"c: 20: 0\n"  /* glass */
-		"d: 64: 5\n"  /* wooddoorblock */
+		"d: 64: 2\n"  /* wooddoorblock */
 		"e: 64: 0\n"  /* wooddoorblock */
-		"f: 64: 2\n"  /* wooddoorblock */
-		"g: 76: 3\n"  /* redstonetorchon */
-		"h: 64:12\n"  /* wooddoorblock */
-		"i: 64: 8\n"  /* wooddoorblock */
-		"j: 64: 9\n"  /* wooddoorblock */
-		"k: 76: 4\n"  /* redstonetorchon */
+		"f: 76: 3\n"  /* redstonetorchon */
+		"g: 64: 9\n"  /* wooddoorblock */
+		"h: 64: 8\n"  /* wooddoorblock */
+		"i: 76: 4\n"  /* redstonetorchon */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -1001,7 +989,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  0 */ "mmaccccccccccamm"
 		/*  1 */ "ba............ab"
 		/*  2 */ "d..............e"
-		/*  3 */ "f..............e"
+		/*  3 */ "d..............e"
 		/*  4 */ "ba............ab"
 		/*  5 */ "mmaccccccccccamm"
 
@@ -1009,10 +997,10 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/* z\x*             111111 */
 		/*    *   0123456789012345 */
 		/*  0 */ "mmaccccccccccamm"
-		/*  1 */ "bag..........gab"
-		/*  2 */ "h..............i"
-		/*  3 */ "i..............j"
-		/*  4 */ "bak..........kab"
+		/*  1 */ "baf..........fab"
+		/*  2 */ "g..............h"
+		/*  3 */ "h..............g"
+		/*  4 */ "bai..........iab"
 		/*  5 */ "mmaccccccccccamm"
 
 		// Level 3
@@ -1673,7 +1661,8 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		"j: 76: 4\n"  /* redstonetorchon */
 		"k: 64: 1\n"  /* wooddoorblock */
 		"l: 64: 8\n"  /* wooddoorblock */
-		"m: 19: 0\n"  /* sponge */,
+		"m: 19: 0\n"  /* sponge */
+		"n: 64: 9\n"  /* wooddoorblock */,
 
 		// Block data:
 		// Level 0
@@ -1721,7 +1710,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		// Level 2
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
-		/*  0 */ "mmmmallammmmmm"
+		/*  0 */ "mmmmalnammmmmm"
 		/*  1 */ "mmmmb..bmmmmmm"
 		/*  2 */ "mmmmc..cmmmmmm"
 		/*  3 */ "mmmcc..ccmmmmm"
@@ -1729,14 +1718,14 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  5 */ "mcc......ccmmm"
 		/*  6 */ "mc........ccba"
 		/*  7 */ "c............l"
-		/*  8 */ "c............l"
+		/*  8 */ "c............n"
 		/*  9 */ "mc........ccba"
 		/* 10 */ "mcc......ccmmm"
 		/* 11 */ "mmcc....ccmmmm"
 		/* 12 */ "mmmcc..ccmmmmm"
 		/* 13 */ "mmmmc..cmmmmmm"
 		/* 14 */ "mmmmb..bmmmmmm"
-		/* 15 */ "mmmmallammmmmm"
+		/* 15 */ "mmmmanlammmmmm"
 		/* 16 */ "dddddddddddddd"
 
 		// Level 3

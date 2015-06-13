@@ -145,12 +145,14 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		"a:  3: 0\n"  /* dirt */
 		"b: 60: 7\n"  /* tilleddirt */
 		"c:  8: 0\n"  /* water */
-		"d: 43: 0\n"  /* doubleslab */
-		"e: 44: 0\n"  /* step */
-		"f: 59: 7\n"  /* crops */
-		"g: 83: 0\n"  /* reedblock */
-		"h:113: 0\n"  /* netherbrickfence */
-		"i: 50: 5\n"  /* torch */
+		"d: 60: 5\n"  /* tilleddirt */
+		"e: 60: 6\n"  /* tilleddirt */
+		"f: 43: 0\n"  /* doubleslab */
+		"g: 44: 0\n"  /* step */
+		"h: 59: 7\n"  /* crops */
+		"i: 83: 0\n"  /* reedblock */
+		"j:113: 0\n"  /* netherbrickfence */
+		"k: 50: 5\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -181,8 +183,8 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/*  4 */ "mabbbbbbbam"
 		/*  5 */ "mabbbbbbbam"
 		/*  6 */ "mabcccccaam"
-		/*  7 */ "mabbbbbbbam"
-		/*  8 */ "mabbbbbbbam"
+		/*  7 */ "mabdbbebbam"
+		/*  8 */ "mabbbbbbeam"
 		/*  9 */ "mabbbbbbbam"
 		/* 10 */ "mabbbbbbbam"
 		/* 11 */ "maaaaaaaaam"
@@ -192,58 +194,58 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ ".deeeeeeed."
-		/*  2 */ ".efffffffe."
-		/*  3 */ ".efffffffe."
-		/*  4 */ ".efffffffe."
-		/*  5 */ ".efgggggfe."
-		/*  6 */ ".eg.....ge."
-		/*  7 */ ".efgggggfe."
-		/*  8 */ ".efffffffe."
-		/*  9 */ ".efffffffe."
-		/* 10 */ ".efffffffe."
-		/* 11 */ ".deeeeeeed."
+		/*  1 */ ".fgggggggf."
+		/*  2 */ ".ghhhhhhhg."
+		/*  3 */ ".ghhhhhhhg."
+		/*  4 */ ".ghhhhhhhg."
+		/*  5 */ ".ghiiiiihg."
+		/*  6 */ ".gi.....ig."
+		/*  7 */ ".ghiiiiihg."
+		/*  8 */ ".ghhhhhhhg."
+		/*  9 */ ".ghhhhhhhg."
+		/* 10 */ ".ghhhhhhhg."
+		/* 11 */ ".fgggggggf."
 		/* 12 */ "..........."
 
 		// Level 3
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ ".h.......h."
+		/*  1 */ ".j.......j."
 		/*  2 */ "..........."
 		/*  3 */ "..........."
 		/*  4 */ "..........."
-		/*  5 */ "...ggggg..."
-		/*  6 */ "..g.....g.."
-		/*  7 */ "...ggggg..."
+		/*  5 */ "...iiiii..."
+		/*  6 */ "..i.....i.."
+		/*  7 */ "...iiiii..."
 		/*  8 */ "..........."
 		/*  9 */ "..........."
 		/* 10 */ "..........."
-		/* 11 */ ".h.......h."
+		/* 11 */ ".j.......j."
 		/* 12 */ "..........."
 
 		// Level 4
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ ".h.......h."
+		/*  1 */ ".j.......j."
 		/*  2 */ "..........."
 		/*  3 */ "..........."
 		/*  4 */ "..........."
-		/*  5 */ "...ggggg..."
-		/*  6 */ "..g.....g.."
-		/*  7 */ "...ggggg..."
+		/*  5 */ "...iiiii..."
+		/*  6 */ "..i.....i.."
+		/*  7 */ "...iiiii..."
 		/*  8 */ "..........."
 		/*  9 */ "..........."
 		/* 10 */ "..........."
-		/* 11 */ ".h.......h."
+		/* 11 */ ".j.......j."
 		/* 12 */ "..........."
 
 		// Level 5
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
-		/*  1 */ ".h.......h."
+		/*  1 */ ".j.......j."
 		/*  2 */ "..........."
 		/*  3 */ "..........."
 		/*  4 */ "..........."
@@ -253,15 +255,15 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/*  8 */ "..........."
 		/*  9 */ "..........."
 		/* 10 */ "..........."
-		/* 11 */ ".h.......h."
+		/* 11 */ ".j.......j."
 		/* 12 */ "..........."
 
 		// Level 6
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ ".h.......h."
-		/*  1 */ "hhh.....hhh"
-		/*  2 */ ".h.......h."
+		/*  0 */ ".j.......j."
+		/*  1 */ "jjj.....jjj"
+		/*  2 */ ".j.......j."
 		/*  3 */ "..........."
 		/*  4 */ "..........."
 		/*  5 */ "..........."
@@ -269,16 +271,16 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/*  7 */ "..........."
 		/*  8 */ "..........."
 		/*  9 */ "..........."
-		/* 10 */ ".h.......h."
-		/* 11 */ "hhh.....hhh"
-		/* 12 */ ".h.......h."
+		/* 10 */ ".j.......j."
+		/* 11 */ "jjj.....jjj"
+		/* 12 */ ".j.......j."
 
 		// Level 7
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ ".i.......i."
-		/*  1 */ "i.i.....i.i"
-		/*  2 */ ".i.......i."
+		/*  0 */ ".k.......k."
+		/*  1 */ "k.k.....k.k"
+		/*  2 */ ".k.......k."
 		/*  3 */ "..........."
 		/*  4 */ "..........."
 		/*  5 */ "..........."
@@ -286,9 +288,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/*  7 */ "..........."
 		/*  8 */ "..........."
 		/*  9 */ "..........."
-		/* 10 */ ".i.......i."
-		/* 11 */ "i.i.....i.i"
-		/* 12 */ ".i.......i.",
+		/* 10 */ ".k.......k."
+		/* 11 */ "k.k.....k.k"
+		/* 12 */ ".k.......k.",
 
 		// Connectors:
 		"-1: 10, 2, 6: 5\n"  /* Type -1, direction X+ */,
@@ -1039,13 +1041,13 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		"b: 17: 9\n"  /* tree */
 		"c: 17: 1\n"  /* tree */
 		"d: 35: 0\n"  /* wool */
-		"e: 64: 7\n"  /* wooddoorblock */
+		"e: 64: 3\n"  /* wooddoorblock */
 		"f:171:12\n"  /* carpet */
 		"g:135: 1\n"  /* 135 */
 		"h:126: 2\n"  /* woodenslab */
 		"i:135: 2\n"  /* 135 */
 		"j: 50: 4\n"  /* torch */
-		"k: 64:12\n"  /* wooddoorblock */
+		"k: 64: 9\n"  /* wooddoorblock */
 		"l: 85: 0\n"  /* fence */
 		"m: 19: 0\n"  /* sponge */
 		"n: 44: 8\n"  /* step */
@@ -1283,9 +1285,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		"a:  5: 2\n"  /* wood */
 		"b: 17: 1\n"  /* tree */
 		"c: 35: 0\n"  /* wool */
-		"d: 64: 7\n"  /* wooddoorblock */
+		"d: 64: 3\n"  /* wooddoorblock */
 		"e: 50: 4\n"  /* torch */
-		"f: 64:12\n"  /* wooddoorblock */
+		"f: 64: 9\n"  /* wooddoorblock */
 		"g: 85: 0\n"  /* fence */
 		"h: 44: 8\n"  /* step */
 		"i: 43: 0\n"  /* doubleslab */
@@ -1398,11 +1400,11 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		"c: 35: 0\n"  /* wool */
 		"d:171: 0\n"  /* carpet */
 		"e:126: 1\n"  /* woodenslab */
-		"f: 64: 5\n"  /* wooddoorblock */
+		"f: 64: 1\n"  /* wooddoorblock */
 		"g: 85: 0\n"  /* fence */
 		"h: 50: 1\n"  /* torch */
 		"i: 50: 2\n"  /* torch */
-		"j: 64:12\n"  /* wooddoorblock */
+		"j: 64: 9\n"  /* wooddoorblock */
 		"k:126:11\n"  /* woodenslab */
 		"l: 17: 5\n"  /* tree */
 		"m: 19: 0\n"  /* sponge */
