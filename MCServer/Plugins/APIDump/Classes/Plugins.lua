@@ -1,15 +1,14 @@
 return
 {
-	cPlugin =
+	cPluginLua =
 	{
-		Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own Plugin object.
+		Desc = [[cPluginLua describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own cPluginLua object.
 ]],
 		Functions =
 		{
-			GetDirectory = { Return = "string", Notes = "<b>OBSOLETE</b>, use GetFolderName() instead!" },
+			AddWebTab = { Params = "", Return = "", Notes = "Adds a new webadmin tab" },
 			GetFolderName = { Params = "", Return = "string", Notes = "Returns the name of the folder where the plugin's files are. (APIDump)" },
 			GetLoadError = { Params = "", Return = "string", Notes = "If the plugin failed to load, returns the error message for the failure." },
-			GetLocalDirectory = { Notes = "<b>OBSOLETE</b>, use GetLocalFolder instead." },
 			GetLocalFolder = { Return = "string", Notes = "Returns the path where the plugin's files are. (Plugins/APIDump)" },
 			GetName = { Return = "string", Notes = "Returns the name of the plugin." },
 			GetStatus = { Params = "", Return = "{{cPluginManager#PluginStatus|PluginStatus}}", Notes = "Returns the status of the plugin (loaded, disabled, unloaded, error, not found)" },
@@ -18,16 +17,6 @@ return
 			SetName = { Params = "string", Notes = "Sets the name of the Plugin." },
 			SetVersion = { Params = "number", Notes = "Sets the version of the plugin." },
 		},
-	},  -- cPlugin
-
-	cPluginLua =
-	{
-		Desc = "",
-		Functions =
-		{
-			AddWebTab = { Params = "", Return = "", Notes = "Adds a new webadmin tab" },
-		},
-		Inherits = "cPlugin",
 	},  -- cPluginLua
 
 	cPluginManager =

@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "PluginManager.h"
-#include "Plugin.h"
 #include "PluginLua.h"
 #include "../Item.h"
 #include "../Root.h"
@@ -65,7 +64,7 @@ void cPluginManager::RefreshPluginList(void)
 	AString PluginsPath = GetPluginsPath() + "/";
 	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
 	AStringVector Folders;
-	for (auto & item: Contents)
+	for (const auto & item : Contents)
 	{
 		if ((item == ".") || (item == "..") || (!cFile::IsFolder(PluginsPath + item)))
 		{
@@ -76,27 +75,27 @@ void cPluginManager::RefreshPluginList(void)
 	}  // for item - Contents[]
 
 	// Set all plugins with invalid folders as psNotFound:
-	for (auto & plugin: m_Plugins)
+	for (const auto & plugin : m_Plugins)
 	{
 		if (std::find(Folders.cbegin(), Folders.cend(), plugin->GetFolderName()) == Folders.end())
 		{
-			plugin->m_Status = psNotFound;
+			plugin->SetStatus(psNotFound);
 		}
 	}  // for plugin - m_Plugins[]
 
 	// Add all newly discovered plugins:
-	for (auto & folder: Folders)
+	for (const auto & folder : Folders)
 	{
-		bool hasFound = false;
-		for (auto & plugin: m_Plugins)
+		bool HasFound = false;
+		for (const auto & plugin : m_Plugins)
 		{
-			if (plugin->GetFolderName() == folder)
+			if (plugin->GetLocalFolder() == folder)
 			{
-				hasFound = true;
+				HasFound = true;
 				break;
 			}
 		}  // for plugin - m_Plugins[]
-		if (!hasFound)
+		if (!HasFound)
 		{
 			m_Plugins.push_back(std::make_shared<cPluginLua>(folder));
 		}
@@ -187,7 +186,7 @@ void cPluginManager::Tick(float a_Dt)
 		bool HasFound = false;
 		for (auto & plugin: m_Plugins)
 		{
-			if (plugin->GetFolderName() == folder)
+			if (plugin->GetLocalFolder() == folder)
 			{
 				HasFound = true;
 				if (plugin->IsLoaded())
@@ -1583,7 +1582,7 @@ bool cPluginManager::LoadPlugin(const AString & a_FolderName)
 
 
 
-void cPluginManager::RemoveHooks(cPlugin * a_Plugin)
+void cPluginManager::RemoveHooks(cPluginLua * a_Plugin)
 {
 	for (HookMap::iterator itr = m_Hooks.begin(), end = m_Hooks.end(); itr != end; ++itr)
 	{
@@ -1595,7 +1594,7 @@ void cPluginManager::RemoveHooks(cPlugin * a_Plugin)
 
 
 
-void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
+void cPluginManager::RemovePluginCommands(cPluginLua * a_Plugin)
 {
 	if (a_Plugin != nullptr)
 	{
@@ -1637,7 +1636,7 @@ bool cPluginManager::IsPluginLoaded(const AString & a_PluginName)
 
 
 
-bool cPluginManager::BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString)
+bool cPluginManager::BindCommand(const AString & a_Command, cPluginLua * a_Plugin, const AString & a_Permission, const AString & a_HelpString)
 {
 	CommandMap::iterator cmd = m_Commands.find(a_Command);
 	if (cmd != m_Commands.end())
@@ -1709,7 +1708,7 @@ cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer & a_Pl
 
 
 
-void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
+void cPluginManager::RemovePluginConsoleCommands(cPluginLua * a_Plugin)
 {
 	if (a_Plugin != nullptr)
 	{
@@ -1735,7 +1734,7 @@ void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
 
 
 
-bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString)
+bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPluginLua * a_Plugin, const AString & a_HelpString)
 {
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Command);
 	if (cmd != m_ConsoleCommands.end())
@@ -1854,7 +1853,7 @@ bool cPluginManager::IsValidHookType(int a_HookType)
 
 
 
-bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback)
+bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginLuaCallback & a_Callback)
 {
 	// TODO: Implement locking for plugins
 	for (auto & plugin: m_Plugins)
@@ -1871,7 +1870,7 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 
 
 
-bool cPluginManager::ForEachPlugin(cPluginCallback & a_Callback)
+bool cPluginManager::ForEachPlugin(cPluginLuaCallback & a_Callback)
 {
 	// TODO: Implement locking for plugins
 	for (auto & plugin: m_Plugins)
@@ -1888,7 +1887,7 @@ bool cPluginManager::ForEachPlugin(cPluginCallback & a_Callback)
 
 
 
-void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
+void cPluginManager::AddHook(cPluginLua * a_Plugin, int a_Hook)
 {
 	if (a_Plugin == nullptr)
 	{

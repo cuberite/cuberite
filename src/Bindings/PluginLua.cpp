@@ -32,8 +32,9 @@ extern "C"
 // cPluginLua:
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
-	cPlugin(a_PluginDirectory),
-	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str()))
+	m_Status(cPluginManager::psDisabled),
+	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str())),
+	m_Directory(a_PluginDirectory)
 {
 }
 
@@ -206,7 +207,15 @@ bool cPluginLua::Load(void)
 void cPluginLua::Unload(void)
 {
 	ClearTabs();
-	super::Unload();
+
+	auto pm = cPluginManager::Get();
+	pm->RemovePluginCommands(this);
+	pm->RemovePluginConsoleCommands(this);
+	pm->RemoveHooks(this);
+	OnDisable();
+	m_Status = cPluginManager::psUnloaded;
+	m_LoadError.clear();
+
 	Close();
 }
 
@@ -1796,7 +1805,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
 	if (cmd == m_Commands.end())
 	{
-		LOGWARNING("Command handler is registered in cPluginManager but not in cPlugin, wtf? Command \"%s\".", a_Split[0].c_str());
+		LOGWARNING("Command handler is registered in cPluginManager but not in cPluginLua, wtf? Command \"%s\".", a_Split[0].c_str());
 		return false;
 	}
 	
@@ -1816,7 +1825,7 @@ bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOut
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
 	if (cmd == m_ConsoleCommands.end())
 	{
-		LOGWARNING("Console command handler is registered in cPluginManager but not in cPlugin, wtf? Console command \"%s\", plugin \"%s\".",
+		LOGWARNING("Console command handler is registered in cPluginManager but not in cPluginLua, wtf? Console command \"%s\", plugin \"%s\".",
 			a_Split[0].c_str(), GetName().c_str()
 		);
 		return false;
@@ -1869,36 +1878,6 @@ void cPluginLua::ClearConsoleCommands(void)
 		}
 	}
 	m_ConsoleCommands.clear();
-}
-
-
-
-
-
-bool cPluginLua::CanAddOldStyleHook(int a_HookType)
-{
-	const char * FnName = GetHookFnName(a_HookType);
-	if (FnName == nullptr)
-	{
-		// Unknown hook ID
-		LOGWARNING("Plugin %s wants to add an unknown hook ID (%d). The plugin need not work properly.",
-			GetName().c_str(), a_HookType
-		);
-		m_LuaState.LogStackTrace();
-		return false;
-	}
-	
-	// Check if the function is available
-	if (m_LuaState.HasFunction(FnName))
-	{
-		return true;
-	}
-	
-	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.",
-		GetName().c_str(), a_HookType, FnName
-	);
-	m_LuaState.LogStackTrace();
-	return false;
 }
 
 
@@ -2141,6 +2120,16 @@ void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int 
 	
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Call(a_FnRef, &a_Window, a_SlotNum);
+}
+
+
+
+
+
+void cPluginLua::SetLoadError(const AString & a_LoadError)
+{
+	m_Status = cPluginManager::psError;
+	m_LoadError = a_LoadError;
 }
 
 

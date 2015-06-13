@@ -19,7 +19,6 @@ SET (SRCS
 	ManualBindings_Network.cpp
 	ManualBindings_RankManager.cpp
 	ManualBindings_World.cpp
-	Plugin.cpp
 	PluginLua.cpp
 	PluginManager.cpp
 	WebPlugin.cpp
@@ -39,7 +38,6 @@ SET (HDRS
 	LuaUDPEndpoint.h
 	LuaWindow.h
 	ManualBindings.h
-	Plugin.h
 	PluginLua.h
 	PluginManager.h
 	WebPlugin.h
@@ -61,7 +59,6 @@ set(BINDING_DEPENDENCIES
 	../Bindings/BindingsProcessor.lua
 	../Bindings/LuaFunctions.h
 	../Bindings/LuaWindow.h
-	../Bindings/Plugin.h
 	../Bindings/PluginLua.h
 	../Bindings/PluginManager.h
 	../Bindings/WebPlugin.h

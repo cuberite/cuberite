@@ -3,9 +3,8 @@
 
 #include "WebAdmin.h"
 #include "Bindings/WebPlugin.h"
-
+#include "Bindings/PluginLua.h"
 #include "Bindings/PluginManager.h"
-#include "Bindings/Plugin.h"
 
 #include "World.h"
 #include "Entities/Player.h"
@@ -493,7 +492,7 @@ AString cWebAdmin::GetDefaultPage(void)
 	// Display a list of all plugins:
 	Content += "<h4>Plugins:</h4><ul>";
 	struct cPluginCallback:
-		public cPluginManager::cPluginCallback
+		public cPluginManager::cPluginLuaCallback
 	{
 		AString & m_Content;
 
@@ -502,7 +501,7 @@ AString cWebAdmin::GetDefaultPage(void)
 		{
 		}
 
-		virtual bool Item(cPlugin * a_Plugin) override
+		virtual bool Item(cPluginLua * a_Plugin) override
 		{
 			if (a_Plugin->IsLoaded())
 			{

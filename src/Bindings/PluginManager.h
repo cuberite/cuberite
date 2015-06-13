@@ -21,13 +21,13 @@ class cItems;
 class cMonster;
 class cPickup;
 class cPlayer;
-class cPlugin;
+class cPluginLua;
 class cProjectileEntity;
 class cWorld;
 class cSettingsRepositoryInterface;
 struct TakeDamageInfo;
 
-typedef SharedPtr<cPlugin> cPluginPtr;
+typedef SharedPtr<cPluginLua> cPluginPtr;
 typedef std::vector<cPluginPtr> cPluginPtrs;
 
 
@@ -140,8 +140,7 @@ public:
 
 		// tolua_end
 		
-		// Note that if a hook type is added, it may need processing in cPlugin::CanAddHook() descendants,
-		//   and it definitely needs adding in cPluginLua::GetHookFnName() !
+		// Note that if a hook type is added it definitely needs adding in cPluginLua::GetHookFnName()!
 		
 		// Keep these two as the last items, they are used for validity checking and get their values automagically
 		HOOK_NUM_HOOKS,
@@ -157,13 +156,13 @@ public:
 		/** Called for each command; return true to abort enumeration
 		For console commands, a_Permission is not used (set to empty string)
 		*/
-		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) = 0;
+		virtual bool Command(const AString & a_Command, const cPluginLua * a_Plugin, const AString & a_Permission, const AString & a_HelpString) = 0;
 	} ;
 	
 	/** The interface used for enumerating and extern-calling plugins */
-	typedef cItemCallback<cPlugin> cPluginCallback;
+	typedef cItemCallback<cPluginLua> cPluginLuaCallback;
 	
-	typedef std::list<cPlugin *> PluginList;
+	typedef std::list<cPluginLua *> PluginList;
 
 
 	/** Called each tick, calls the plugins' OnTick hook, as well as processes plugin events (addition, removal) */
@@ -181,7 +180,6 @@ public:
 	
 	/** Adds the plugin to the list of plugins called for the specified hook type.
 	If a plugin adds multiple handlers for a single hook, it is added only once (ignore-duplicates). */
-	void AddHook(cPlugin * a_Plugin, int a_HookType);
 
 	/** Returns the number of all plugins in m_Plugins (includes disabled, unloaded and errored plugins). */
 	size_t GetNumPlugins() const;  // tolua_export
@@ -263,19 +261,19 @@ public:
 	bool LoadPlugin(const AString & a_PluginFolder);  // tolua_export
 
 	/** Removes all hooks the specified plugin has registered */
-	void RemoveHooks(cPlugin * a_Plugin);
+	void RemoveHooks(cPluginLua * a_Plugin);
 	
 	/** Removes the plugin of the specified name from the internal structures and deletes its object. */
 	void RemovePlugin(const AString & a_PluginName);
 	
 	/** Removes all command bindings that the specified plugin has made */
-	void RemovePluginCommands(cPlugin * a_Plugin);
+	void RemovePluginCommands(cPluginLua * a_Plugin);
 
 	/** Returns true if the specified plugin is loaded. */
 	bool IsPluginLoaded(const AString & a_PluginName);  // tolua_export
 
 	/** Binds a command to the specified plugin. Returns true if successful, false if command already bound. */
-	bool BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
+	bool BindCommand(const AString & a_Command, cPluginLua * a_Plugin, const AString & a_Permission, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
 	
 	/** Calls a_Callback for each bound command, returns true if all commands were enumerated */
 	bool ForEachCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -293,10 +291,10 @@ public:
 	CommandResult ForceExecuteCommand(cPlayer & a_Player, const AString & a_Command);  // tolua_export
 	
 	/** Removes all console command bindings that the specified plugin has made */
-	void RemovePluginConsoleCommands(cPlugin * a_Plugin);
+	void RemovePluginConsoleCommands(cPluginLua * a_Plugin);
 	
 	/** Binds a console command to the specified plugin. Returns true if successful, false if command already bound. */
-	bool BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
+	bool BindConsoleCommand(const AString & a_Command, cPluginLua * a_Plugin, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
 	
 	/** Calls a_Callback for each bound console command, returns true if all commands were enumerated */
 	bool ForEachConsoleCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -319,11 +317,15 @@ public:
 	
 	/** Calls the specified callback with the plugin object of the specified plugin.
 	Returns false if plugin not found, otherwise returns the value that the callback has returned. */
-	bool DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback);
+	bool DoWithPlugin(const AString & a_PluginName, cPluginLuaCallback & a_Callback);
 
 	/** Calls the specified callback for each plugin in m_Plugins.
 	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true. */
-	bool ForEachPlugin(cPluginCallback & a_Callback);
+	bool ForEachPlugin(cPluginLuaCallback & a_Callback);
+
+	/** Adds the plugin to the list of plugins called for the specified hook type.
+	If a plugin adds multiple handlers for a single hook, it is added only once (ignore-duplicates). */
+	void AddHook(cPluginLua * a_Plugin, int a_HookType);
 	
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
@@ -335,7 +337,7 @@ private:
 	class cCommandReg
 	{
 	public:
-		cPlugin * m_Plugin;
+		cPluginLua * m_Plugin;
 		AString   m_Permission;  // Not used for console commands
 		AString   m_HelpString;
 	} ;
