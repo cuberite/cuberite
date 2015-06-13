@@ -217,6 +217,11 @@ public:
 
 		return (FoundFrameZP && FoundFrameZM);
 	}
+
+	virtual bool DoesIgnoreBuildCollision(void) override
+	{
+		return true;
+	}
 };
 
 
