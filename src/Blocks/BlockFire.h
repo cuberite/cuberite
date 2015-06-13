@@ -121,6 +121,20 @@ public:
 			}
 		}
 
+		int PortalHeight = MaxY - Y - 1;
+		int PortalWidth = XZP - XZM + 1;
+		if ((PortalHeight < 3) || (PortalHeight > 23))
+		{
+			// The portal isn't high enough, or is too high
+			return;
+		}
+
+		if ((PortalWidth < 2) || (PortalWidth > 23))
+		{
+			// The portal isn't wide enough, or is too wide
+			return;
+		}
+
 		for (int Height = Y + 1; Height <= MaxY - 1; Height++)  // Loop through boundary to set portal blocks
 		{
 			for (int Width = XZM; Width <= XZP; Width++)
