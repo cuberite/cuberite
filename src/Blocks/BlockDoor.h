@@ -242,7 +242,7 @@ public:
 		if ((Meta & 0x08) != 0)
 		{
 			// The coords are pointing at the top part of the door
-			if (a_BlockX > 0)
+			if (a_BlockY > 0)
 			{
 				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
 				return static_cast<NIBBLETYPE>((DownMeta & 0x07) | 0x08 | (Meta << 4));
