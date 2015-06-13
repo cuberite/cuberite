@@ -713,6 +713,18 @@ public:
 	AString GetLinkedOverworldName(void) const { return m_LinkedOverworldName; }
 	void SetLinkedOverworldName(const AString & a_Name) { m_LinkedOverworldName = a_Name; }
 	
+	/** Returns or sets the minumim or maximum netherportal width */
+	virtual int GetMinNetherPortalWidth(void) const override { return m_MinNetherPortalWidth; }
+	virtual int GetMaxNetherPortalWidth(void) const override { return m_MaxNetherPortalWidth; }
+	virtual void SetMinNetherPortalWidth(int a_NewMinWidth) override { m_MinNetherPortalWidth = a_NewMinWidth; }
+	virtual void SetMaxNetherPortalWidth(int a_NewMaxWidth) override { m_MaxNetherPortalWidth = a_NewMaxWidth; }
+
+	/** Returns or sets the minumim or maximum netherportal height */
+	virtual int GetMinNetherPortalHeight(void) const override { return m_MinNetherPortalHeight; }
+	virtual int GetMaxNetherPortalHeight(void) const override { return m_MaxNetherPortalHeight; }
+	virtual void SetMinNetherPortalHeight(int a_NewMinHeight) override { m_MinNetherPortalHeight = a_NewMinHeight; }
+	virtual void SetMaxNetherPortalHeight(int a_NewMaxHeight) override { m_MaxNetherPortalHeight = a_NewMaxHeight; }
+
 	// tolua_end
 	
 	/** Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead */
@@ -941,6 +953,12 @@ private:
 	double m_SpawnX;
 	double m_SpawnY;
 	double m_SpawnZ;
+
+	// Variables defining the minimum and maximum size for a nether portal
+	int m_MinNetherPortalWidth;
+	int m_MaxNetherPortalWidth;
+	int m_MinNetherPortalHeight;
+	int m_MaxNetherPortalHeight;
 
 	bool m_BroadcastDeathMessages;
 	bool m_BroadcastAchievementMessages;

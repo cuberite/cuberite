@@ -121,6 +121,20 @@ public:
 			}
 		}
 
+		int PortalHeight = MaxY - Y - 1;
+		int PortalWidth = XZP - XZM + 1;
+		if ((PortalHeight < a_WorldInterface.GetMinNetherPortalHeight()) || (PortalHeight > a_WorldInterface.GetMaxNetherPortalHeight()))
+		{
+			// The portal isn't high enough, or is too high
+			return;
+		}
+
+		if ((PortalWidth < a_WorldInterface.GetMinNetherPortalWidth()) || (PortalWidth > a_WorldInterface.GetMaxNetherPortalWidth()))
+		{
+			// The portal isn't wide enough, or is too wide
+			return;
+		}
+
 		for (int Height = Y + 1; Height <= MaxY - 1; Height++)  // Loop through boundary to set portal blocks
 		{
 			for (int Width = XZM; Width <= XZP; Width++)
