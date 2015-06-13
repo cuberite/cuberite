@@ -40,7 +40,7 @@ private:
 	static const int SearchSolidBaseWidth = 3;
 
 	/** Where to place the player out from the face and across the face */
-	const double OutOffset = 1.5;
+	const double OutOffset = 0.5;
 	const double AcrossOffset = 0.5;
 
 	/** Builds a portal. */

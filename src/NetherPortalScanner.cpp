@@ -49,6 +49,12 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 		if (blocks[i] == E_BLOCK_NETHER_PORTAL)
 		{
 			Vector3i Coordinate = cChunkDef::IndexToCoordinate(i);
+			if (Coordinate.y >= m_MaxY)
+			{
+				// This is above the map, don't consider it.
+				continue;
+			}
+
 			Vector3d PortalLoc = Vector3d(Coordinate.x + a_ChunkX * cChunkDef::Width, Coordinate.y, Coordinate.z + a_ChunkZ * cChunkDef::Width);
 			if (!m_FoundPortal)
 			{
@@ -284,7 +290,7 @@ void cNetherPortalScanner::OnDisabled(void)
 	}
 
 	LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
-	m_Entity->ScheduleMoveToWorld(m_World, Position);
+	m_Entity->ScheduleMoveToWorld(m_World, Position, true);
 	delete this;
 }
 

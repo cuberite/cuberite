@@ -342,7 +342,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings)
 
 
 
-cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName)
+cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName, bool a_InitSpawn)
 {
 	cWorld * World = m_WorldsByName[a_WorldName];
 	if (World != nullptr)
@@ -353,7 +353,10 @@ cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension
 	cWorld * NewWorld = new cWorld(a_WorldName.c_str(), a_Dimension, a_OverworldName);
 	m_WorldsByName[a_WorldName] = NewWorld;
 	NewWorld->Start();
-	NewWorld->InitializeSpawn();
+	if (a_InitSpawn)
+	{
+		NewWorld->InitializeSpawn();
+	}
 	m_PluginManager->CallHookWorldStarted(*NewWorld);
 	return NewWorld;
 }
