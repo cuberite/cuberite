@@ -109,9 +109,9 @@ bool cNetherPortalScanner::OnAllChunksAvailable(void)
 		// Find the bottom of this portal
 		while (m_World->GetBlock(m_PortalLoc.x, m_PortalLoc.y, m_PortalLoc.z) == E_BLOCK_NETHER_PORTAL)
 		{
-			m_PortalLoc.y -= 1.0;
+			m_PortalLoc.y -= 1;
 		}
-		m_PortalLoc.y += 1.0;
+		m_PortalLoc.y += 1;
 
 		// Figure out which way the portal is facing
 		int BXP = m_World->GetBlock(m_PortalLoc.x + 1, m_PortalLoc.y, m_PortalLoc.z);
