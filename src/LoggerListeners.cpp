@@ -301,8 +301,8 @@ cFileListener::cFileListener(void)
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
 	m_File.Open(
 		FILE_IO_PREFIX + Printf(
-			"logs/LOG_%lld.txt",
-			std::chrono::duration_cast<std::chrono::seconds>(
+			"logs/LOG_%d.txt",
+			std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1>>>(
 				std::chrono::system_clock::now().time_since_epoch()
 			).count()
 		),
