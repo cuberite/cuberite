@@ -5,6 +5,7 @@
 #include "Server.h"
 #include "World.h"
 #include "WebAdmin.h"
+#include "BrewingRecipe.h"
 #include "FurnaceRecipe.h"
 #include "CraftingRecipes.h"
 #include "Bindings/PluginManager.h"
@@ -49,6 +50,7 @@ cRoot::cRoot(void) :
 	m_MonsterConfig(nullptr),
 	m_CraftingRecipes(nullptr),
 	m_FurnaceRecipe(nullptr),
+	m_BrewingRecipe(nullptr),
 	m_WebAdmin(nullptr),
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr),
@@ -168,6 +170,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 		m_RankManager->Initialize(*m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
+		m_BrewingRecipe   = new cBrewingRecipe();
 
 		LOGD("Loading worlds...");
 		LoadWorlds(*settingsRepo);
@@ -260,6 +263,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 		LOGD("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
 		delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
+		delete m_BrewingRecipe;   m_BrewingRecipe = nullptr;
 
 		LOG("Unloading worlds...");
 		UnloadWorlds();

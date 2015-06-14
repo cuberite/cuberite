@@ -20,6 +20,7 @@ class cChunkStay;
 class cChunk;
 class cPlayer;
 class cBeaconEntity;
+class cBrewingstandEntity;
 class cChestEntity;
 class cDispenserEntity;
 class cDropperEntity;
@@ -43,6 +44,7 @@ typedef cChunk *                           cChunkPtr;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBlockEntity>        cBlockEntityCallback;
 typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
+typedef cItemCallback<cBrewingstandEntity> cBrewingstandCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
 typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cDropperEntity>      cDropperCallback;
@@ -247,6 +249,10 @@ public:
 	Returns true if all block entities processed, false if the callback aborted by returning true. */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Lua-accessible
 
+	/** Calls the callback for brewingstand in the specified chunk.
+	Returns true if all brewingstands processed, false if the callback aborted by returning true. */
+	bool ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback & a_Callback);  // Lua-accessible
+
 	/** Calls the callback for each chest in the specified chunk.
 	Returns true if all chests processed, false if the callback aborted by returning true. */
 	bool ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback & a_Callback);  // Lua-accessible
@@ -274,6 +280,9 @@ public:
 	/** Calls the callback for the beacon at the specified coords.
 	Returns false if there's no beacon at those coords, true if found. */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
+	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the chest at the specified coords.
 	Returns false if there's no chest at those coords, true if found. */

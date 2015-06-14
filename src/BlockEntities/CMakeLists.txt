@@ -7,6 +7,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 SET (SRCS
 	BeaconEntity.cpp
 	BlockEntity.cpp
+	BrewingstandEntity.cpp
 	ChestEntity.cpp
 	CommandBlockEntity.cpp
 	DispenserEntity.cpp
@@ -26,6 +27,7 @@ SET (HDRS
 	BeaconEntity.h
 	BlockEntity.h
 	BlockEntityWithItems.h
+	BrewingstandEntity.h
 	ChestEntity.h
 	CommandBlockEntity.h
 	DispenserEntity.h

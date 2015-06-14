@@ -21,6 +21,7 @@ SET (SRCS
 	Broadcaster.cpp
 	BoundingBox.cpp
 	ByteBuffer.cpp
+	BrewingRecipe.cpp
 	ChatColor.cpp
 	Chunk.cpp
 	ChunkData.cpp
@@ -87,6 +88,7 @@ SET (HDRS
 	BoundingBox.h
 	BuildInfo.h
 	BuildInfo.h.cmake
+	BrewingRecipe.h
 	ByteBuffer.h
 	ChatColor.h
 	Chunk.h
