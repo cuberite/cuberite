@@ -3027,7 +3027,7 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 bool cWorld::ForEachLoadedChunk(cChunkDataCallback & a_Callback)
 {
-    return m_ChunkMap->ForEachLoadedChunk(a_Callback);
+	return m_ChunkMap->ForEachLoadedChunk(a_Callback);
 }
 
 
