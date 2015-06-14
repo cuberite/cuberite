@@ -217,6 +217,11 @@ public:
 
 		return (FoundFrameZP && FoundFrameZM);
 	}
+
+	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
+	{
+		return true;
+	}
 };
 
 
