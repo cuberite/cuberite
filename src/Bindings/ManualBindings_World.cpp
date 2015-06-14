@@ -110,6 +110,73 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
+{
+    // Exported manually, because i don't know what i'm doing...
+    // Function signature: ForEachLoadedChunk(callback)
+
+    cLuaState L(tolua_S);
+    if (
+        !L.CheckParamUserType(1, "cWorld") ||
+        !L.CheckParamFunction(2)
+        )
+    {
+        return 0;
+    }
+
+    cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
+    if (Plugin == nullptr)
+    {
+        return 0;
+    }
+
+    // Read the params:
+    cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, nullptr);
+    if (World == nullptr)
+    {
+        LOGWARNING("World:ForEachLoadedChunk(): invalid world parameter");
+        L.LogStackTrace();
+        return 0;
+    }
+    cLuaState::cRef FnRef;
+    L.GetStackValues(2, FnRef);
+    if (!FnRef.IsValid())
+    {
+        return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #2");
+    }
+
+    class cLuaCallback :public cChunkDataCallback
+    {
+    public:
+        cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef) :
+            m_LuaState(a_LuaState),
+            m_FnRef(a_FnRef)
+        {
+        }
+
+    private:
+        cLuaState & m_LuaState;
+        cLuaState::cRef & m_FnRef;
+
+        virtual bool Coords(int a_ChunkX, int a_ChunkZ) override
+        {
+            bool res = false;  // By default continue the enumeration
+            m_LuaState.Call(m_FnRef, a_ChunkX,a_ChunkZ, cLuaState::Return, res);
+            return res;
+        }
+    } Callback(L, FnRef);
+
+    // Call the enumeration:
+    bool res = World->ForEachLoadedChunk(Callback);
+
+    // Push the return value:
+    L.Push(res);
+    return 1;
+}
+
+
+
+
 
 static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 {
@@ -570,6 +637,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachEntityInChunk",      ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk",     ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "ForEachPlayer",             ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
+            tolua_function(tolua_S, "ForEachLoadedChunk",        tolua_cWorld_ForEachLoadedChunk);
 			tolua_function(tolua_S, "GetBlockInfo",              tolua_cWorld_GetBlockInfo);
 			tolua_function(tolua_S, "GetBlockTypeMeta",          tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetSignLines",              tolua_cWorld_GetSignLines);
