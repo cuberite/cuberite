@@ -299,15 +299,15 @@ cLogger::cListener * MakeConsoleListener(bool a_IsService)
 cFileListener::cFileListener(void)
 {
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
-	AString FileName;
-	auto time = std::chrono::system_clock::now();
-	FileName = Printf(
-		"%s%sLOG_%d.txt",
-		FILE_IO_PREFIX,
-		"logs/",
-		std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(time.time_since_epoch()).count()
+	m_File.Open(
+		FILE_IO_PREFIX + Printf(
+			"logs/LOG_%lld.txt",
+			std::chrono::duration_cast<std::chrono::seconds>(
+				std::chrono::system_clock::now().time_since_epoch()
+			).count()
+		),
+		cFile::fmAppend
 	);
-	m_File.Open(FileName, cFile::fmAppend);
 }
 
 
@@ -326,7 +326,7 @@ void cFileListener::Log(AString a_Message, cLogger::eLogLevel a_LogLevel)
 		}
 		case cLogger::llInfo:
 		{
-			LogLevelPrefix = "info ";
+			LogLevelPrefix = "Info ";
 			break;
 		}
 		case cLogger::llWarning:

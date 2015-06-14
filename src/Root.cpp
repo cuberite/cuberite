@@ -261,7 +261,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
 		delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
 
-		LOGD("Unloading worlds...");
+		LOG("Unloading worlds...");
 		UnloadWorlds();
 
 		LOGD("Stopping plugin manager...");
