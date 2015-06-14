@@ -2599,12 +2599,13 @@ bool cChunkMap::ForEachLoadedChunk(cChunkDataCallback & a_Callback)
 	cCSLock Lock(m_CSLayers);
 	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)  // iterate over ALL loaded layers
 	{
-		cChunkLayer* layer = *itr;
+		cChunkLayer * layer = *itr;
 		for (int x = 0; x < LAYER_SIZE; x++)
+		{
 			for (int z = 0; z < LAYER_SIZE; z++)
 			{
 				cChunkPtr p = layer->FindChunk(layer->GetX()*LAYER_SIZE + x, layer->GetZ()*LAYER_SIZE + z);  // A bit stupid to have local->global->local chain...
-				if (p && p->IsValid()) //if chunk is loaded
+				if (p && p->IsValid())  // if chunk is loaded
 				{
 					if (a_Callback.Coords(p->GetPosX(), p->GetPosZ()))
 					{
@@ -2612,6 +2613,7 @@ bool cChunkMap::ForEachLoadedChunk(cChunkDataCallback & a_Callback)
 					}
 				}
 			}
+		}
 	}
 	return Result;
 }
