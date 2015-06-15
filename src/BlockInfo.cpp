@@ -86,7 +86,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ENDER_CHEST         ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_END_PORTAL          ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_END_PORTAL_FRAME    ].m_SpreadLightFalloff = 1;
-	a_Info[E_BLOCK_FARMLAND            ].m_SpreadLightFalloff = 15;
+	a_Info[E_BLOCK_FARMLAND            ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_FENCE               ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_FENCE_GATE          ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_FIRE                ].m_SpreadLightFalloff = 1;
@@ -204,7 +204,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ENDER_CHEST         ].m_Transparent = true;
 	a_Info[E_BLOCK_END_PORTAL          ].m_Transparent = true;
 	a_Info[E_BLOCK_END_PORTAL_FRAME    ].m_Transparent = true;
-	a_Info[E_BLOCK_FARMLAND            ].m_Transparent = true;
 	a_Info[E_BLOCK_FENCE               ].m_Transparent = true;
 	a_Info[E_BLOCK_FENCE_GATE          ].m_Transparent = true;
 	a_Info[E_BLOCK_FIRE                ].m_Transparent = true;
