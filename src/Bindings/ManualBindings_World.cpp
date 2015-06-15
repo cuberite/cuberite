@@ -112,7 +112,7 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 {
-	// Exported manually, because i don't know what i'm doing...
+	// Exported manually, because tolua doesn't support converting functions to functor types.
 	// Function signature: ForEachLoadedChunk(callback)
 
 	cLuaState L(tolua_S);
@@ -167,11 +167,9 @@ static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 	} Callback(L, FnRef);
 
 	// Call the enumeration:
-	bool res = World->ForEachLoadedChunk(Callback);
+	World->ForEachLoadedChunk(Callback);
 
-	// Push the return value:
-	L.Push(res);
-	return 1;
+	return 0;
 }
 
 

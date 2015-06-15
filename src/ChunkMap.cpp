@@ -2593,9 +2593,8 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 
 
 
-bool cChunkMap::ForEachLoadedChunk(cChunkDataCallback & a_Callback)
+void cChunkMap::ForEachLoadedChunk(cChunkDataCallback & a_Callback)
 {
-	bool Result = true;
 	cCSLock Lock(m_CSLayers);
 	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)  // iterate over ALL loaded layers
 	{
@@ -2609,13 +2608,12 @@ bool cChunkMap::ForEachLoadedChunk(cChunkDataCallback & a_Callback)
 				{
 					if (a_Callback.Coords(p->GetPosX(), p->GetPosZ()))
 					{
-						return Result;
+						return;
 					}
 				}
 			}
 		}
 	}
-	return Result;
 }
 
 
