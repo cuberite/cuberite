@@ -27,7 +27,7 @@
 #include "Blocks/BroadcastInterface.h"
 #include "FastRandom.h"
 #include "ClientHandle.h"
-
+#include <functional>
 
 
 
@@ -417,7 +417,7 @@ public:
 	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) override;
 
 	/** Calls the callback for each loaded chunk. */
-	virtual void ForEachLoadedChunk(cChunkDataCallback & a_Callback);
+	virtual void ForEachLoadedChunk(std::function<bool(int, int)> a_Callback);
 	
 	// tolua_begin
 	

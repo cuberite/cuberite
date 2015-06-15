@@ -145,29 +145,15 @@ static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #2");
 	}
 
-	class cLuaCallback :public cChunkDataCallback
-	{
-	public:
-		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef) :
-			m_LuaState(a_LuaState),
-			m_FnRef(a_FnRef)
-		{
-		}
-
-	private:
-		cLuaState & m_LuaState;
-		cLuaState::cRef & m_FnRef;
-
-		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override
+	// Call the enumeration:
+	World->ForEachLoadedChunk(
+		[&L, &FnRef](int a_ChunkX, int a_ChunkZ) -> bool
 		{
 			bool res = false;  // By default continue the enumeration
-			m_LuaState.Call(m_FnRef, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+			L.Call(FnRef, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
 			return res;
 		}
-	} Callback(L, FnRef);
-
-	// Call the enumeration:
-	World->ForEachLoadedChunk(Callback);
+	);
 
 	return 0;
 }
