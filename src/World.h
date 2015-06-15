@@ -418,6 +418,7 @@ public:
 
 	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
 	virtual bool ForEachLoadedChunk(cChunkDataCallback & a_Callback);
+	
 	// tolua_begin
 	
 	/** Sets the block at the specified coords to the specified value.
