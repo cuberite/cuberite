@@ -507,7 +507,7 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 			auto PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
 			m_Contents.ChangeSlotCount(i, 1);
 
-			if (PreviousCount == m_Contents.GetSlot(i).m_ItemCount + 1)
+			if (PreviousCount + 1 == m_Contents.GetSlot(i).m_ItemCount)
 			{
 				// Successfully added a new item. (Failure condition consistutes: stack full)
 				return true;
