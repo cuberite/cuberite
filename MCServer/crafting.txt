@@ -85,6 +85,7 @@ BrickBlock              = Brick,     1:1, 1:2, 2:1, 2:2
 PolishedGranite, 4      = Granite,   1:1, 1:2, 2:1, 2:2
 PolishedDiorite, 4      = Diorite,   1:1, 1:2, 2:1, 2:2
 PolishedAndesite, 4     = Andesite,  1:1, 1:2, 2:1, 2:2
+Andesite, 2             = Diorite, * | Cobblestone, *
 StoneBrick, 4           = Stone,     1:1, 1:2, 2:1, 2:2
 BookShelf               = Planks^-1, 1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2:2, 3:2
 Sandstone, 4            = Sand,      1:1, 1:2, 2:1, 2:2
