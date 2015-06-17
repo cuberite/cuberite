@@ -5,6 +5,81 @@
 
 #include "Globals.h"
 #include "PrefabPiecePool.h"
+#include "../Bindings/LuaState.h"
+#include "SelfTests.h"
+#include "WorldStorage/SchematicFileSerializer.h"
+
+
+
+
+
+// Conditionally log a warning
+#define CONDWARNING(ShouldLog, ...) \
+	if (ShouldLog) \
+	{ \
+		LOGWARNING(__VA_ARGS__); \
+	}
+
+
+
+
+
+#if SELF_TEST
+static class cPrefabPiecePoolTest
+{
+public:
+	cPrefabPiecePoolTest(void)
+	{
+		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(cPrefabPiecePoolTest::TestLoading), "PrefabPiecePool loading test");
+	}
+
+	static void TestLoading(void)
+	{
+		cPrefabPiecePool test;
+		auto res = test.LoadFromFile("test.cubeset", true);
+		if (!res)
+		{
+			LOGWARNING("Loading from file \"test.cubeset\" failed.");
+			return;
+		}
+		LOG("Loaded %u pieces and %u starting pieces", static_cast<unsigned>(test.GetAllPiecesCount()), static_cast<unsigned>(test.GetStartingPiecesCount()));
+	}
+} g_Test;
+#endif
+
+
+
+
+
+/** Returns the map of string => eMergeStrategy used when translating cubeset file merge strategies. */
+static std::map<AString, cBlockArea::eMergeStrategy> & GetMergeStrategyMap(void)
+{
+	static std::map<AString, cBlockArea::eMergeStrategy> msmap;
+	if (msmap.empty())
+	{
+		// This is the first use, initialize the map:
+		msmap["msOverwrite"]     = cBlockArea::msOverwrite;
+		msmap["msFillAir"]       = cBlockArea::msFillAir;
+		msmap["msImprint"]       = cBlockArea::msImprint;
+		msmap["msLake"]          = cBlockArea::msLake;
+		msmap["msSpongePrint"]   = cBlockArea::msSpongePrint;
+		msmap["msDifference"]    = cBlockArea::msDifference;
+		msmap["msSimpleCompare"] = cBlockArea::msSimpleCompare;
+		msmap["msMask"]          = cBlockArea::msMask;
+	}
+	return msmap;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cPrefabPiecePool:
+
+cPrefabPiecePool::cPrefabPiecePool(void)
+{
+}
 
 
 
@@ -20,6 +95,15 @@ cPrefabPiecePool::cPrefabPiecePool(
 	{
 		AddStartingPieceDefs(a_StartingPieceDefs, a_NumStartingPieceDefs);
 	}
+}
+
+
+
+
+
+cPrefabPiecePool::cPrefabPiecePool(const AString & a_FileName, bool a_LogWarnings)
+{
+	LoadFromFile(a_FileName, a_LogWarnings);
 }
 
 
@@ -83,6 +167,64 @@ void cPrefabPiecePool::AddStartingPieceDefs(const cPrefab::sDef * a_StartingPiec
 
 
 
+bool cPrefabPiecePool::LoadFromFile(const AString & a_FileName, bool a_LogWarnings)
+{
+	// Read the first 4 KiB of the file in order to auto-detect format:
+	cFile f;
+	if (!f.Open(a_FileName, cFile::fmRead))
+	{
+		return false;
+	}
+	char buf[4096];
+	auto len = f.Read(buf, sizeof(buf));
+	f.Close();
+	AString Header(buf, static_cast<size_t>(len));
+
+	if (Header.find("CubesetFormatVersion =") != AString::npos)
+	{
+		return LoadFromCubesetFile(a_FileName, a_LogWarnings);
+	}
+	return false;
+}
+
+
+
+
+
+bool cPrefabPiecePool::LoadFromCubesetFile(const AString & a_FileName, bool a_LogWarnings)
+{
+	// Load the file in the Lua interpreter:
+	cLuaState Lua(Printf("LoadablePiecePool %s", a_FileName.c_str()));
+	Lua.Create();
+	if (!Lua.LoadFile(a_FileName, a_LogWarnings))
+	{
+		// Reason for failure has already been logged in LoadFile()
+		return false;
+	}
+
+	// Check the version:
+	int Version = 0;
+	if (!Lua.GetNamedGlobal("Cubeset.Metadata.CubesetFormatVersion", Version))
+	{
+		CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, it doesn't contain version information.", a_FileName.c_str());
+		return false;
+	}
+
+	// Load the data, using the correct version loader:
+	if (Version == 1)
+	{
+		return LoadFromCubesetFileVer1(a_FileName, Lua, a_LogWarnings);
+	}
+
+	// Unknown version:
+	CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, version (%d) not supported.", a_FileName.c_str(), Version);
+	return false;
+}
+
+
+
+
+
 void cPrefabPiecePool::AddToPerConnectorMap(cPrefab * a_Prefab)
 {
 	cPiece::cConnectors Connectors = (static_cast<const cPiece *>(a_Prefab))->GetConnectors();
@@ -91,6 +233,303 @@ void cPrefabPiecePool::AddToPerConnectorMap(cPrefab * a_Prefab)
 		m_PiecesByConnector[itr->m_Type].push_back(a_Prefab);
 	}
 }
+
+
+
+
+
+bool cPrefabPiecePool::LoadFromCubesetFileVer1(const AString & a_FileName, cLuaState & a_LuaState, bool a_LogWarnings)
+{
+	// Push the Cubeset.Pieces global value on the stack:
+	lua_getglobal(a_LuaState, "_G");
+	cLuaState::cStackValue stk(a_LuaState);
+	auto pieces = a_LuaState.WalkToValue("Cubeset.Pieces");
+	if (!pieces.IsValid() || !lua_istable(a_LuaState, -1))
+	{
+		CONDWARNING(a_LogWarnings, "The cubeset file %s doesn't contain any pieces", a_FileName.c_str());
+		return false;
+	}
+
+	// Iterate over all items in the Cubeset.Pieces value:
+	int idx = 1;
+	bool res = true;
+	while (true)
+	{
+		lua_pushinteger(a_LuaState, idx);  // stk: [Pieces] [idx]
+		lua_gettable(a_LuaState, -2);      // stk: [Pieces] [PieceItem]
+		if (!lua_istable(a_LuaState, -1))
+		{
+			// The PieceItem is not present, we've iterated over all items
+			lua_pop(a_LuaState, 1);  // stk: [Pieces]
+			break;
+		}
+		if (!LoadCubesetPieceVer1(a_FileName, a_LuaState, idx, a_LogWarnings))
+		{
+			res = false;
+		}
+		lua_pop(a_LuaState, 1);  // stk: [Pieces]
+		idx += 1;
+	}
+	return res;
+}
+
+
+
+
+
+bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaState & a_LuaState, int a_PieceIndex, bool a_LogWarnings)
+{
+	ASSERT(lua_istable(a_LuaState, -1));
+
+	// The piece name is optional, but useful for debugging messages:
+	AString PieceName;
+	if (!a_LuaState.GetNamedValue("OriginData.ExportName", PieceName))
+	{
+		Printf(PieceName, "Piece #%d", a_PieceIndex);
+	}
+
+	// Read the hitbox dimensions:
+	cCuboid Hitbox;
+	if (
+		!a_LuaState.GetNamedValue("Hitbox.MinX", Hitbox.p1.x) ||
+		!a_LuaState.GetNamedValue("Hitbox.MinY", Hitbox.p1.y) ||
+		!a_LuaState.GetNamedValue("Hitbox.MinZ", Hitbox.p1.z) ||
+		!a_LuaState.GetNamedValue("Hitbox.MaxX", Hitbox.p2.x) ||
+		!a_LuaState.GetNamedValue("Hitbox.MaxY", Hitbox.p2.y) ||
+		!a_LuaState.GetNamedValue("Hitbox.MaxZ", Hitbox.p2.z)
+	)
+	{
+		CONDWARNING(a_LogWarnings, "Cannot load piece %s from file %s, it's missing hitbox information", PieceName.c_str(), a_FileName.c_str());
+		return false;
+	}
+
+	// Load the prefab data:
+	auto prefab = LoadPrefabFromCubesetVer1(a_FileName, a_LuaState, PieceName, a_LogWarnings);
+	if (prefab == nullptr)
+	{
+		return false;
+	}
+
+	// Read the connectors
+	if (!ReadConnectorsCubesetVer1(a_FileName, a_LuaState, PieceName, prefab.get(), a_LogWarnings))
+	{
+		return false;
+	}
+
+	// Read the allowed rotations. It is an optional metadata value, default to 0:
+	int AllowedRotations = 0;
+	a_LuaState.GetNamedValue("Metadata.AllowedRotations", AllowedRotations);
+	prefab->SetAllowedRotations(AllowedRotations);
+
+	// Apply the relevant metadata:
+	if (!ApplyMetadataCubesetVer1(a_FileName, a_LuaState, PieceName, prefab.get(), a_LogWarnings))
+	{
+		return false;
+	}
+
+	// Add the prefab into the list of pieces:
+	int IsStartingPiece = 0;
+	a_LuaState.GetNamedValue("Metadata.IsStarting", IsStartingPiece);
+	if (IsStartingPiece != 0)
+	{
+		m_StartingPieces.push_back(prefab.release());
+	}
+	else
+	{
+		auto p = prefab.release();
+		m_AllPieces.push_back(p);
+		AddToPerConnectorMap(p);
+	}
+	return true;
+}
+
+
+
+
+
+UniquePtr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
+	const AString & a_FileName,
+	cLuaState & a_LuaState,
+	const AString & a_PieceName,
+	bool a_LogWarnings
+)
+{
+	// First try loading a referenced schematic file, if any:
+	AString SchematicFileName;
+	if (a_LuaState.GetNamedValue("SchematicFileName", SchematicFileName))
+	{
+		auto PathEnd = a_FileName.find_last_of("/\\");  // Find the last path separator
+		if (PathEnd != AString::npos)
+		{
+			SchematicFileName = a_FileName.substr(0, PathEnd) + SchematicFileName;
+		}
+		cBlockArea area;
+		if (!cSchematicFileSerializer::LoadFromSchematicFile(area, SchematicFileName))
+		{
+			CONDWARNING(a_LogWarnings, "Cannot load schematic file \"%s\" for piece %s in cubeset %s.",
+				SchematicFileName.c_str(), a_PieceName.c_str(), a_FileName.c_str()
+			);
+			return nullptr;
+		}
+		return cpp14::make_unique<cPrefab>(area);
+	}  // if (SchematicFileName)
+
+	// There's no referenced schematic file, load from BlockDefinitions / BlockData.
+	// Get references to the data and the table.concat function:
+	cLuaState::cRef TableConcat, BlockDefinitions, BlockData;
+	if (
+		!a_LuaState.GetNamedGlobal("table.concat", TableConcat) ||
+		!a_LuaState.GetNamedValue("BlockDefinitions", BlockDefinitions) ||
+		!a_LuaState.GetNamedValue("BlockData", BlockData)
+	)
+	{
+		CONDWARNING(a_LogWarnings, "Cannot parse block data for piece %s in cubeset %s", a_PieceName.c_str(), a_FileName.c_str());
+		return nullptr;
+	}
+
+	// Call table.concat() on the BlockDefinitions:
+	AString BlockDefStr;
+	if (!a_LuaState.Call(TableConcat, BlockDefinitions, "\n", cLuaState::Return, BlockDefStr))
+	{
+		CONDWARNING(a_LogWarnings, "Cannot concat block definitions for piece %s in cubeset %s", a_PieceName.c_str(), a_FileName.c_str());
+		return nullptr;
+	}
+
+	// Call table.concat() on the BlockData:
+	AString BlockDataStr;
+	if (!a_LuaState.Call(TableConcat, BlockData, "", cLuaState::Return, BlockDataStr))
+	{
+		CONDWARNING(a_LogWarnings, "Cannot concat block data for piece %s in cubeset %s", a_PieceName.c_str(), a_FileName.c_str());
+		return nullptr;
+	}
+
+	// Read the size:
+	int SizeX = 0, SizeY = 0, SizeZ = 0;
+	if (
+		!a_LuaState.GetNamedValue("Size.x", SizeX) ||
+		!a_LuaState.GetNamedValue("Size.y", SizeY) ||
+		!a_LuaState.GetNamedValue("Size.z", SizeZ)
+	)
+	{
+		CONDWARNING(a_LogWarnings, "Cannot load piece %s from file %s, its size information is missing", a_PieceName.c_str(), a_FileName.c_str());
+		return nullptr;
+	}
+
+	// Check that the size matches the data length:
+	if (static_cast<size_t>(SizeX * SizeY * SizeZ) != BlockDataStr.size())
+	{
+		CONDWARNING(a_LogWarnings, "Cannot create piece %s from file %s, its size (%d) doesn't match the blockdata length (%u)",
+			a_PieceName.c_str(), a_FileName.c_str(),
+			SizeX * SizeY * SizeZ, static_cast<unsigned>(BlockDataStr.size())
+		);
+		return nullptr;
+	}
+
+	return cpp14::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
+}
+
+
+
+
+
+bool cPrefabPiecePool::ReadConnectorsCubesetVer1(
+	const AString & a_FileName,
+	cLuaState & a_LuaState,
+	const AString & a_PieceName,
+	cPrefab * a_Prefab,
+	bool a_LogWarnings
+)
+{
+	// Get the Connectors subtable:
+	auto conns = a_LuaState.WalkToValue("Connectors");
+	if (!conns.IsValid())
+	{
+		CONDWARNING(a_LogWarnings, "Cannot load piece %s from file %s, it has no connectors definition.", a_PieceName.c_str(), a_FileName.c_str());
+		return false;
+	}
+
+	// Iterate over all items in the Connectors table:
+	int idx = 1;
+	bool res = true;
+	while (true)
+	{
+		lua_pushinteger(a_LuaState, idx);  // stk: [Connectors] [idx]
+		lua_gettable(a_LuaState, -2);      // stk: [Connectors] [conn]
+		if (!lua_istable(a_LuaState, -1))
+		{
+			// The connector is not present, we've iterated over all items
+			lua_pop(a_LuaState, 1);  // stk: [Connectors]
+			break;
+		}
+		int Type = 0, RelX = 0, RelY = 0, RelZ = 0;
+		eBlockFace Direction = BLOCK_FACE_NONE;
+		if (
+			!a_LuaState.GetNamedValue("Type",      Type) ||
+			!a_LuaState.GetNamedValue("RelX",      RelX) ||
+			!a_LuaState.GetNamedValue("RelY",      RelY) ||
+			!a_LuaState.GetNamedValue("RelZ",      RelZ) ||
+			!a_LuaState.GetNamedValue("Direction", Direction)
+		)
+		{
+			CONDWARNING(a_LogWarnings, "Piece %s in file %s has a malformed Connector at index %d. Skipping the connector.", a_PieceName.c_str(), a_FileName.c_str(), idx);
+			res = false;
+			continue;
+		}
+		a_Prefab->AddConnector(RelX, RelY, RelZ, Direction, Type);
+		lua_pop(a_LuaState, 1);  // stk: [Connectors]
+		idx += 1;
+	}
+	return res;
+}
+
+
+
+
+
+bool cPrefabPiecePool::ApplyMetadataCubesetVer1(
+	const AString & a_FileName,
+	cLuaState & a_LuaState,
+	const AString & a_PieceName,
+	cPrefab * a_Prefab,
+	bool a_LogWarnings
+)
+{
+	// Push the Metadata table on top of the Lua stack:
+	auto md = a_LuaState.WalkToValue("Metadata");
+	if (!md.IsValid())
+	{
+		return false;
+	}
+
+	// Get the values:
+	int AddWeightIfSame = 0, DefaultWeight = 100, MoveToGround = 0, ShouldExpandFloor = 0;
+	AString DepthWeight, MergeStrategy;
+	a_LuaState.GetNamedValue("AddWeightIfSame",   AddWeightIfSame);
+	a_LuaState.GetNamedValue("DefaultWeight",     DefaultWeight);
+	a_LuaState.GetNamedValue("DepthWeight",       DepthWeight);
+	a_LuaState.GetNamedValue("MergeStrategy",     MergeStrategy);
+	a_LuaState.GetNamedValue("MoveToGround",      MoveToGround);
+	a_LuaState.GetNamedValue("ShouldExpandFloor", ShouldExpandFloor);
+
+	// Apply the values:
+	a_Prefab->SetAddWeightIfSame(AddWeightIfSame);
+	a_Prefab->SetDefaultWeight(DefaultWeight);
+	a_Prefab->ParseDepthWeight(DepthWeight.c_str());
+	auto msmap = GetMergeStrategyMap();
+	auto strategy = msmap.find(MergeStrategy);
+	if (strategy == msmap.end())
+	{
+		CONDWARNING(a_LogWarnings, "Unknown merge strategy (\"%s\") specified for piece %s in file %s. Using msSpongePrint instead.",
+			MergeStrategy.c_str(), a_PieceName.c_str(), a_FileName.c_str()
+		);
+		a_Prefab->SetMergeStrategy(cBlockArea::msSpongePrint);
+	}
+	a_Prefab->SetMoveToGround(MoveToGround != 0);
+	a_Prefab->SetExtendFloor(ShouldExpandFloor != 0);
+
+	return true;
+}
+
 
 
 

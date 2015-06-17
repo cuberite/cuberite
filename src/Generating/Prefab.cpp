@@ -166,6 +166,45 @@ cPrefab::cPrefab(const cBlockArea & a_Image, int a_AllowedRotations) :
 
 
 
+cPrefab::cPrefab(const cBlockArea & a_Image) :
+	m_Size(a_Image.GetSize()),
+	m_AllowedRotations(0),
+	m_MergeStrategy(cBlockArea::msOverwrite),
+	m_ShouldExtendFloor(false),
+	m_DefaultWeight(1),
+	m_AddWeightIfSame(0),
+	m_MoveToGround(false)
+{
+	m_HitBox.p1.Set(0, 0, 0);
+	m_HitBox.p2.Set(m_Size.x - 1, m_Size.y - 1, m_Size.z - 1);
+	m_BlockArea[0].CopyFrom(a_Image);
+}
+
+
+
+
+
+cPrefab::cPrefab(const AString & a_BlockDefinitions, const AString & a_BlockData, int a_SizeX, int a_SizeY, int a_SizeZ) :
+	m_Size(a_SizeX, a_SizeY, a_SizeZ),
+	m_AllowedRotations(0),
+	m_MergeStrategy(cBlockArea::msOverwrite),
+	m_ShouldExtendFloor(false),
+	m_DefaultWeight(1),
+	m_AddWeightIfSame(0),
+	m_MoveToGround(false)
+{
+	m_HitBox.p1.Set(0, 0, 0);
+	m_HitBox.p2.Set(m_Size.x - 1, m_Size.y - 1, m_Size.z - 1);
+	m_BlockArea[0].Create(m_Size);
+	CharMap cm;
+	ParseCharMap(cm, a_BlockDefinitions.c_str());
+	ParseBlockImage(cm, a_BlockData.c_str());
+}
+
+
+
+
+
 void cPrefab::AddRotatedBlockAreas(void)
 {
 	// 1 CCW rotation:
@@ -320,6 +359,16 @@ void cPrefab::SetDefaultWeight(int a_DefaultWeight)
 void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type)
 {
 	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));
+}
+
+
+
+
+
+void cPrefab::SetAllowedRotations(int a_AllowedRotations)
+{
+	m_AllowedRotations = a_AllowedRotations;
+	AddRotatedBlockAreas();
 }
 
 
