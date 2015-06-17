@@ -2593,7 +2593,7 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 
 
 
-void cChunkMap::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
+bool cChunkMap::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
 	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)  // iterate over ALL loaded layers
@@ -2603,17 +2603,18 @@ void cChunkMap::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 		{
 			for (int z = 0; z < LAYER_SIZE; z++)
 			{
-				cChunkPtr p = layer->FindChunk(layer->GetX()*LAYER_SIZE + x, layer->GetZ()*LAYER_SIZE + z);  // A bit stupid to have local->global->local chain...
-				if (p && p->IsValid())  // if chunk is loaded
+				cChunkPtr p = layer->FindChunk(layer->GetX() * LAYER_SIZE + x, layer->GetZ() * LAYER_SIZE + z);
+				if ((p != nullptr) && p->IsValid())  // if chunk is loaded
 				{
 					if (a_Callback(p->GetPosX(), p->GetPosZ()))
 					{
-						return;
+						return false;
 					}
 				}
 			}
 		}
 	}
+	return true;
 }
 
 

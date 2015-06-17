@@ -416,8 +416,8 @@ public:
 	/** Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully */
 	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) override;
 
-	/** Calls the callback for each loaded chunk. */
-	virtual void ForEachLoadedChunk(std::function<bool(int, int)> a_Callback);
+	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
+	bool ForEachLoadedChunk(std::function<bool(int, int)> a_Callback);
 	
 	// tolua_begin
 	
