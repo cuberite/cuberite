@@ -7,6 +7,7 @@
 #include "Defines.h"
 #include "RankManager.h"
 #include <thread>
+#include <atomic>
 
 
 
@@ -48,13 +49,12 @@ public:
 
 	static bool m_TerminateEventRaised;
 	static bool m_RunAsService;
-	static bool m_ShouldStop;
 
 
 	cRoot(void);
 	~cRoot();
 
-	void Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo);
+	void Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo);
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
@@ -200,6 +200,8 @@ private:
 	cCommandQueue    m_PendingCommands;
 
 	std::thread m_InputThread;
+	cEvent m_StopEvent;
+	std::atomic_flag m_InputThreadRunFlag;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -213,9 +215,7 @@ private:
 
 	std::unique_ptr<cRankManager> m_RankManager;
 
-	cHTTPServer        m_HTTPServer;
-
-	bool m_bRestart;
+	cHTTPServer m_HTTPServer;
 
 
 	void LoadGlobalSettings();
