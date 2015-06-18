@@ -94,10 +94,9 @@ public:
 				continue;
 			}
 
-			BLOCKTYPE AboveDest;
-			NIBBLETYPE AboveMeta;
-			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
-			if (cBlockInfo::GetHandler(AboveDest)->CanDirtGrowGrass(AboveMeta))
+			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(BlockX, BlockY + 1, BlockZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(BlockX, BlockY + 1, BlockZ)));
+			// Grass does not spread to blocks with a light level less than 5
+			if (light > 4)
 			{
 				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
 				{
