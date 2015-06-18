@@ -24,33 +24,6 @@
 
 
 
-#if SELF_TEST
-static class cPrefabPiecePoolTest
-{
-public:
-	cPrefabPiecePoolTest(void)
-	{
-		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(cPrefabPiecePoolTest::TestLoading), "PrefabPiecePool loading test");
-	}
-
-	static void TestLoading(void)
-	{
-		cPrefabPiecePool test;
-		auto res = test.LoadFromFile("test.cubeset", true);
-		if (!res)
-		{
-			LOGWARNING("Loading from file \"test.cubeset\" failed.");
-			return;
-		}
-		LOG("Loaded %u pieces and %u starting pieces", static_cast<unsigned>(test.GetAllPiecesCount()), static_cast<unsigned>(test.GetStartingPiecesCount()));
-	}
-} g_Test;
-#endif
-
-
-
-
-
 /** Returns the map of string => eMergeStrategy used when translating cubeset file merge strategies. */
 static std::map<AString, cBlockArea::eMergeStrategy> & GetMergeStrategyMap(void)
 {
@@ -173,6 +146,7 @@ bool cPrefabPiecePool::LoadFromFile(const AString & a_FileName, bool a_LogWarnin
 	cFile f;
 	if (!f.Open(a_FileName, cFile::fmRead))
 	{
+		CONDWARNING(a_LogWarnings, "Cannot open file %s for reading", a_FileName.c_str());
 		return false;
 	}
 	char buf[4096];
@@ -184,6 +158,7 @@ bool cPrefabPiecePool::LoadFromFile(const AString & a_FileName, bool a_LogWarnin
 	{
 		return LoadFromCubesetFile(a_FileName, a_LogWarnings);
 	}
+	CONDWARNING(a_LogWarnings, "Cannot load prefabs from file %s, unknown file format", a_FileName.c_str());
 	return false;
 }
 

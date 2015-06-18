@@ -98,7 +98,9 @@ local function OutputLuaStateHelpers(a_Package)
 		f:write("// This file expects to be included form inside the cLuaState class definition\n")
 		f:write("\n\n\n\n\n")
 		for _, item in ipairs(types) do
-			f:write("void Push(" .. item.name .. " * a_Value);\n")
+			if not(g_HasCustomPushImplementation[item.name]) then
+				f:write("void Push(" .. item.name .. " * a_Value);\n")
+			end
 		end
 		for _, item in ipairs(types) do
 			f:write("bool GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal);\n")

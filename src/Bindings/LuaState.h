@@ -242,13 +242,14 @@ public:
 
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
+	void Push(cEntity * a_Entity);
+	void Push(cLuaServerHandle * a_ServerHandle);
+	void Push(cLuaTCPLink * a_TCPLink);
+	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	void Push(double a_Value);
 	void Push(int a_Value);
 	void Push(void * a_Ptr);
 	void Push(std::chrono::milliseconds a_time);
-	void Push(cLuaServerHandle * a_ServerHandle);
-	void Push(cLuaTCPLink * a_TCPLink);
-	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
 	// Returns whether value was changed

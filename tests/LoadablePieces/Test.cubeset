@@ -1,0 +1,154 @@
+
+-- Test.cubeset
+
+-- This simple cubeset file is used for testing the cPrefabPiecePool loader.
+
+
+
+
+
+Cubeset =
+{
+	Metadata =
+	{
+		CubesetFormatVersion = 1,
+	},
+
+	Pieces =
+	{
+		-- One piece with inline definition:
+		{
+			Size =
+			{
+				x = 4,
+				y = 4,
+				z = 4,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 3,
+				MaxY = 3,
+				MaxZ = 3,
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a:  1: 0",  -- stone
+				"b: 24: 0",  -- sandstone
+				"c:  8: 0",  -- water
+				"d: 85: 0",  -- fence
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaa",  --  0
+				"aaaa",  --  1
+				"aaaa",  --  2
+				"aaaa",  --  3
+
+				-- Level 1
+				"bbbb",  --  0
+				"bccb",  --  1
+				"bccb",  --  2
+				"bbbb",  --  3
+
+				-- Level 2
+				"bbbb",  --  0
+				"bccb",  --  1
+				"bccb",  --  2
+				"bbbb",  --  3
+
+				-- Level 3
+				"bbbb",  --  0
+				"bccb",  --  1
+				"bccb",  --  2
+				"bbbb",  --  3
+			},
+			Connectors =
+			{
+				{
+					Type = 2,
+					RelX = 2,
+					RelY = 2,
+					RelZ = 0,
+					Direction = 2,  -- Z-
+				},
+				{
+					Type = 2,
+					RelX = 0,
+					RelY = 2,
+					RelZ = 1,
+					Direction = 4,  -- X-
+				},
+				{
+					Type = 2,
+					RelX = 1,
+					RelY = 2,
+					RelZ = 3,
+					Direction = 3,  -- Z+
+				},
+				{
+					Type = 2,
+					RelX = 3,
+					RelY = 2,
+					RelZ = 2,
+					Direction = 5,  -- X+
+				},
+			},
+			Metadata =
+			{
+				["DefaultWeight"] = "100",
+				["AllowedRotations"] = "7",
+				["MergeStrategy"] = "msSpongePrint",
+				["IsStarting"] = "1",
+				["DepthWeight"] = "",
+				["ShouldExpandFloor"] = "1",
+				["MoveToGround"] = "1",
+				["AddWeightIfSame"] = "0",
+			},
+		},
+
+		-- One piece with external definition:
+		{
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 3,
+				MaxY = 3,
+				MaxZ = 3,
+			},
+			SchematicFileName = "Test1.schematic",
+			Connectors =
+			{
+				{
+					Type = 2,
+					RelX = 2,
+					RelY = 2,
+					RelZ = 0,
+					Direction = 2,  -- Z-
+				},
+			},
+			Metadata =
+			{
+				["DefaultWeight"] = "100",
+				["AllowedRotations"] = "7",
+				["MergeStrategy"] = "msSpongePrint",
+				["IsStarting"] = "0",
+				["DepthWeight"] = "",
+				["ShouldExpandFloor"] = "1",
+				["MoveToGround"] = "0",
+				["AddWeightIfSame"] = "0",
+			},
+		},
+	},  -- Pieces
+}
+
+
+
+

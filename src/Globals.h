@@ -261,14 +261,15 @@ template class SizeChecker<UInt8,  1>;
 
 
 
+// Common headers (part 1, without macros):
+#include "StringUtils.h"
+#include "OSSupport/CriticalSection.h"
+#include "OSSupport/Event.h"
+#include "OSSupport/File.h"
+#include "OSSupport/StackTrace.h"
+
 #ifndef TEST_GLOBALS
-	// Common headers (part 1, without macros):
-	#include "StringUtils.h"
-	#include "OSSupport/CriticalSection.h"
-	#include "OSSupport/Event.h"
-	#include "OSSupport/File.h"
 	#include "Logger.h"
-	#include "OSSupport/StackTrace.h"
 #else
 	// Logging functions
 void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
@@ -314,6 +315,9 @@ void inline LOG(const char * a_Format, ...)
 	putchar('\n');
 	va_end(argList);
 }
+
+#define LOGINFO LOG
+#define LOGWARN LOGWARNING
 
 #endif
 
