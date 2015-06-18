@@ -1921,12 +1921,11 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			{
 				// Decompress the data:
 				AString CompressedData;
-				if (!m_ReceivedData.ReadString(CompressedData, CompressedSize))
+				if (!m_ReceivedData.ReadString(CompressedData, CompressedSize) || (InflateString(CompressedData.data(), CompressedSize, UncompressedData) != Z_OK))
 				{
 					m_Client->Kick("Compression failure");
 					return;
 				}
-				InflateString(CompressedData.data(), CompressedSize, UncompressedData);
 				PacketLen = UncompressedData.size();
 			}
 			else
