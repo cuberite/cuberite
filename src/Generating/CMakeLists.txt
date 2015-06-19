@@ -101,5 +101,5 @@ endif()
 if(NOT MSVC)
 	add_library(Generating ${SRCS} ${HDRS})
 
-	target_link_libraries(Generating OSSupport Blocks)
+	target_link_libraries(Generating OSSupport Blocks Bindings)
 endif()

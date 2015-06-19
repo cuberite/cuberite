@@ -95,6 +95,13 @@ public:
 	/** Creates a prefab based on the given BlockArea and allowed rotations. */
 	cPrefab(const cBlockArea & a_Image, int a_AllowedRotations);
 	
+	/** Creates a prefab based on the given BlockArea. Allowed rotations can be added later on using SetAllowedRotations(). */
+	cPrefab(const cBlockArea & a_Image);
+	
+	/** Creates a prefab based on the specified block data, using the char-to-block map in a_BlockDefinitions.
+	Allowed rotations can be added later on using SetAllowedRotations(). */
+	cPrefab(const AString & a_BlockDefinitions, const AString & a_BlockData, int a_SizeX, int a_SizeY, int a_SizeZ);
+	
 	/** Draws the prefab into the specified chunk, according to the placement stored in the PlacedPiece. */
 	void Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const;
 	
@@ -123,6 +130,21 @@ public:
 	/** Returns whether the prefab should be moved Y-wise to ground before drawing, rather than staying
 	at the coords governed by the connectors. */
 	bool ShouldMoveToGround(void) const { return m_MoveToGround; }
+
+	/** Sets the m_AllowedRotations bitmask and fills the m_BlockArea[] with rotated versions of m_BlockArea[0]. */
+	void SetAllowedRotations(int a_AllowedRotations);
+
+	/** Parses the per-depth weight into m_DepthWeight member. */
+	void ParseDepthWeight(const char * a_DepthWeightDef);
+
+	/** Sets the merge strategy to be used when drawing the piece. */
+	void SetMergeStrategy(cBlockArea::eMergeStrategy a_MergeStrategy) { m_MergeStrategy = a_MergeStrategy; }
+
+	/** Sets the flag whether the prefab should be moved to ground level before being drawn. */
+	void SetMoveToGround(bool a_MoveToGround) { m_MoveToGround = a_MoveToGround; }
+
+	/** Sets the flag whether the lowest layer of the prefab should be repeated downwards until it hits a solid block. */
+	void SetExtendFloor(bool a_ShouldExtendFloor) { m_ShouldExtendFloor = a_ShouldExtendFloor; }
 
 protected:
 	/** Packs complete definition of a single block, for per-letter assignment. */
@@ -201,9 +223,6 @@ protected:
 	
 	/** Parses the connectors definition text into m_Connectors member. */
 	void ParseConnectors(const char * a_ConnectorsDef);
-	
-	/** Parses the per-depth weight into m_DepthWeight member. */
-	void ParseDepthWeight(const char * a_DepthWeightDef);
 };
 
 

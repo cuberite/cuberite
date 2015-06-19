@@ -78,11 +78,14 @@ public:
 		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
 		
 		/** Allows to use this class wherever an int (i. e. ref) is to be used */
-		operator int(void) const { return m_Ref; }
-		
+		explicit operator int(void) const { return m_Ref; }
+
 	protected:
 		cLuaState * m_LuaState;
 		int m_Ref;
+
+		// Remove the copy-constructor:
+		cRef(const cRef &) = delete;
 	} ;
 	
 	
@@ -98,6 +101,12 @@ public:
 		{
 		}
 		
+		cTableRef(const cRef & a_TableRef, const char * a_FnName) :
+			m_TableRef(static_cast<int>(a_TableRef)),
+			m_FnName(a_FnName)
+		{
+		}
+
 		int GetTableRef(void) const { return m_TableRef; }
 		const char * GetFnName(void) const { return m_FnName; }
 	} ;
@@ -109,6 +118,61 @@ public:
 	} ;
 	
 	static const cRet Return;  // Use this constant to delimit function args from return values for cLuaState::Call()
+
+
+	/** A RAII class for values pushed onto the Lua stack.
+	Will pop the value off the stack in the destructor. */
+	class cStackValue
+	{
+	public:
+		cStackValue(void):
+			m_LuaState(nullptr)
+		{
+		}
+
+		cStackValue(cLuaState & a_LuaState):
+			m_LuaState(a_LuaState)
+		{
+			m_StackLen = lua_gettop(a_LuaState);
+		}
+
+		cStackValue(cStackValue && a_Src):
+			m_LuaState(nullptr),
+			m_StackLen(-1)
+		{
+			std::swap(m_LuaState, a_Src.m_LuaState);
+			std::swap(m_StackLen, a_Src.m_StackLen);
+		}
+
+		~cStackValue()
+		{
+			if (m_LuaState != nullptr)
+			{
+				auto top = lua_gettop(m_LuaState);
+				ASSERT(m_StackLen == top);
+				lua_pop(m_LuaState, 1);
+			}
+		}
+
+		void Set(cLuaState & a_LuaState)
+		{
+			m_LuaState = a_LuaState;
+			m_StackLen = lua_gettop(a_LuaState);
+		}
+
+		bool IsValid(void) const
+		{
+			return (m_LuaState != nullptr);
+		}
+
+	protected:
+		lua_State * m_LuaState;
+
+		int m_StackLen;
+
+		// Remove the copy-constructor:
+		cStackValue(const cStackValue &) = delete;
+	};
 
 
 	/** Creates a new instance. The LuaState is not initialized.
@@ -151,10 +215,9 @@ public:
 	void AddPackagePath(const AString & a_PathVariable, const AString & a_Path);
 	
 	/** Loads the specified file
-	Returns false and logs a warning to the console if not successful (but the LuaState is kept open).
-	m_SubsystemName is displayed in the warning log message.
-	*/
-	bool LoadFile(const AString & a_FileName);
+	Returns false and optionally logs a warning to the console if not successful (but the LuaState is kept open).
+	m_SubsystemName is displayed in the warning log message. */
+	bool LoadFile(const AString & a_FileName, bool a_LogWarnings = true);
 	
 	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
@@ -169,6 +232,7 @@ public:
 	void Push(const char * a_Value);
 	void Push(const cItems & a_Items);
 	void Push(const cPlayer * a_Player);
+	void Push(const cRef & a_Ref);
 	void Push(const HTTPRequest * a_Request);
 	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(const Vector3d & a_Vector);
@@ -178,22 +242,24 @@ public:
 
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
+	void Push(cEntity * a_Entity);
+	void Push(cLuaServerHandle * a_ServerHandle);
+	void Push(cLuaTCPLink * a_TCPLink);
+	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	void Push(double a_Value);
 	void Push(int a_Value);
 	void Push(void * a_Ptr);
 	void Push(std::chrono::milliseconds a_time);
-	void Push(cLuaServerHandle * a_ServerHandle);
-	void Push(cLuaTCPLink * a_TCPLink);
-	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
 	// Returns whether value was changed
-	// Enum values are clamped to their allowed range.
+	// Enum values are checked for their allowed values and fail if the value is not assigned.
 	bool GetStackValue(int a_StackPos, AString & a_Value);
 	bool GetStackValue(int a_StackPos, bool & a_Value);
 	bool GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
 	bool GetStackValue(int a_StackPos, cRef & a_Ref);
 	bool GetStackValue(int a_StackPos, double & a_Value);
+	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);
 	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
 
@@ -202,21 +268,53 @@ public:
 	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * unused = nullptr)
 	{
 		UNUSED(unused);
-		if (lua_isnumber(m_LuaState, a_StackPos))
+		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: http://pgl.yoyo.org/luai/i/lua_isnumber
 		{
-			lua_Number Val = tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
-			if (Val > std::numeric_limits<T>::max())
-			{
-				return false;
-			}
-			if (Val < std::numeric_limits<T>::min())
-			{
-				return false;
-			}
-			a_ReturnedVal = static_cast<T>(Val);
-			return true;
+			return false;
 		}
-		return false;
+		lua_Number Val = lua_tonumber(m_LuaState, a_StackPos);
+		if (Val > std::numeric_limits<T>::max())
+		{
+			return false;
+		}
+		if (Val < std::numeric_limits<T>::min())
+		{
+			return false;
+		}
+		a_ReturnedVal = static_cast<T>(Val);
+		return true;
+	}
+
+	/** Pushes the named value in the table at the top of the stack.
+	a_Name may be a path containing multiple table levels, such as "_G.cChatColor.Blue".
+	If the value is found, it is pushed on top of the stack and the returned cStackValue is valid.
+	If the value is not found, the stack is unchanged and the returned cStackValue is invalid. */
+	cStackValue WalkToValue(const AString & a_Name);
+
+	/** Retrieves the named value in the table at the top of the Lua stack.
+	a_Name may be a path containing multiple table levels, such as "_G.cChatColor.Blue".
+	Returns true if the value was successfully retrieved, false on error. */
+	template <typename T> bool GetNamedValue(const AString & a_Name, T & a_Value)
+	{
+		auto stk = WalkToValue(a_Name);
+		if (!stk.IsValid())
+		{
+			// Name not found
+			return false;
+		}
+		return GetStackValue(-1, a_Value);
+	}
+
+	/** Retrieves the named global value. a_Name may be a path containing multiple table levels, such as "_G.cChatColor.Blue".
+	Returns true if the value was successfully retrieved, false on error. */
+	template <typename T> bool GetNamedGlobal(const AString & a_Name, T & a_Value)
+	{
+		// Push the globals table onto the stack and make it RAII-removed:
+		lua_getglobal(m_LuaState, "_G");
+		cStackValue stk(*this);
+
+		// Get the named global:
+		return GetNamedValue(a_Name, a_Value);
 	}
 
 	// Include the auto-generated Push and GetStackValue() functions:
@@ -229,12 +327,12 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
-		if (!PushFunction(a_Function))
+		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{
 			// Pushing the function failed
 			return false;
 		}
-		return PushCallPop(args...);
+		return PushCallPop(std::forward<Args>(args)...);
 	}
 
 	/** Retrieves a list of values from the Lua stack, starting at the specified index. */
@@ -343,10 +441,10 @@ protected:
 
 	/** Variadic template recursor: More params to push. Push them and recurse. */
 	template <typename T, typename... Args>
-	inline bool PushCallPop(T a_Param, Args &&... args)
+	inline bool PushCallPop(T && a_Param, Args &&... args)
 	{
-		Push(a_Param);
-		return PushCallPop(args...);
+		Push(std::forward<T>(a_Param));
+		return PushCallPop(std::forward<Args>(args)...);
 	}
 
 	/** Variadic template terminator: If there's nothing more to push, but return values to collect, call the function and collect the returns. */
@@ -363,7 +461,7 @@ protected:
 		}
 
 		// Collect the return values:
-		GetStackValues(-NumReturns, args...);
+		GetStackValues(-NumReturns, std::forward<Args>(args)...);
 		lua_pop(m_LuaState, NumReturns);
 
 		// All successful:

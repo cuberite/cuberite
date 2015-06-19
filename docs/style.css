@@ -1,0 +1,12 @@
+table
+{
+	border: 1px outset;
+	border-spacing: 0px;
+	border-collapse: separate;
+}
+
+td, th
+{
+	border: 1px inset
+}
+

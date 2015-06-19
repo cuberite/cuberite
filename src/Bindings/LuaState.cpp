@@ -211,23 +211,31 @@ void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a
 
 
 
-bool cLuaState::LoadFile(const AString & a_FileName)
+bool cLuaState::LoadFile(const AString & a_FileName, bool a_LogWarnings)
 {
 	ASSERT(IsValid());
 	
 	// Load the file:
 	int s = luaL_loadfile(m_LuaState, a_FileName.c_str());
-	if (ReportErrors(s))
+	if (s != 0)
 	{
-		LOGWARNING("Can't load %s because of an error in file %s", m_SubsystemName.c_str(), a_FileName.c_str());
+		if (a_LogWarnings)
+		{
+			LOGWARNING("Can't load %s because of a load error in file %s: %d (%s)", m_SubsystemName.c_str(), a_FileName.c_str(), s, lua_tostring(m_LuaState, -1));
+		}
+		lua_pop(m_LuaState, 1);
 		return false;
 	}
 
 	// Execute the globals:
 	s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
-	if (ReportErrors(s))
+	if (s != 0)
 	{
-		LOGWARNING("Error in %s in file %s", m_SubsystemName.c_str(), a_FileName.c_str());
+		if (a_LogWarnings)
+		{
+			LOGWARNING("Can't load %s because of an initialization error in file %s: %d (%s)", m_SubsystemName.c_str(), a_FileName.c_str(), s, lua_tostring(m_LuaState, -1));
+		}
+		lua_pop(m_LuaState, 1);
 		return false;
 	}
 	
@@ -439,6 +447,18 @@ void cLuaState::Push(const cPlayer * a_Player)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const cLuaState::cRef & a_Ref)
+{
+	ASSERT(IsValid());
+
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, static_cast<int>(a_Ref));
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -765,14 +785,17 @@ bool cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 
 
 
-bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
+bool cLuaState::GetStackValue(int a_StackPos, eBlockFace & a_ReturnedVal)
 {
-	if (lua_isnumber(m_LuaState, a_StackPos))
+	if (!lua_isnumber(m_LuaState, a_StackPos))
 	{
-		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
-		return true;
+		return false;
 	}
-	return false;
+	a_ReturnedVal = static_cast<eBlockFace>(Clamp(
+		static_cast<int>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal)),
+		static_cast<int>(BLOCK_FACE_MIN), static_cast<int>(BLOCK_FACE_MAX))
+	);
+	return true;
 }
 
 
@@ -790,6 +813,46 @@ bool cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 		static_cast<int>(wSunny), static_cast<int>(wThunderstorm))
 	);
 	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+cLuaState::cStackValue cLuaState::WalkToValue(const AString & a_Name)
+{
+	auto path = StringSplit(a_Name, ".");
+	lua_pushvalue(m_LuaState, -1);  // Copy the stack value into the "working area"
+	for (const auto & elem: path)
+	{
+		// If the value is not a table, bail out (error):
+		if (!lua_istable(m_LuaState, -1))
+		{
+			lua_pop(m_LuaState, 1);
+			return cStackValue();
+		}
+
+		// Get the next part of the path:
+		lua_getfield(m_LuaState, -1, elem.c_str());
+
+		// Remove the previous value from the stack (keep only the new one):
+		lua_remove(m_LuaState, -2);
+	}  // for elem - path[]
+	return std::move(cStackValue(*this));
 }
 
 

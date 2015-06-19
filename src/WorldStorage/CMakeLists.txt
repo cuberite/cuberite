@@ -14,7 +14,8 @@ SET (SRCS
 	ScoreboardSerializer.cpp
 	StatSerializer.cpp
 	WSSAnvil.cpp
-	WorldStorage.cpp)
+	WorldStorage.cpp
+)
 
 SET (HDRS
 	EnchantmentSerializer.h
@@ -26,7 +27,8 @@ SET (HDRS
 	ScoreboardSerializer.h
 	StatSerializer.h
 	WSSAnvil.h
-	WorldStorage.h)
+	WorldStorage.h
+)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set_source_files_properties(EnchantmentSerializer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")

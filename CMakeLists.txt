@@ -197,13 +197,53 @@ if(${SELF_TEST})
 	add_subdirectory (tests)
 endif()
 
-# Put project into solution folders in MSVC:
+# Put projects into solution folders in MSVC:
 if (MSVC)
-	set_target_properties(event_core event_extra expat jsoncpp lua luaexpat mbedtls sqlite SQLiteCpp tolualib zlib PROPERTIES FOLDER Lib)
-	set_target_properties(luaproxy tolua PROPERTIES FOLDER Support)
+	set_target_properties(
+		event_core
+		event_extra
+		expat
+		jsoncpp
+		lua
+		luaexpat
+		mbedtls
+		sqlite
+		SQLiteCpp
+		tolualib
+		zlib
+		PROPERTIES FOLDER Lib
+	)
+	set_target_properties(
+		luaproxy
+		tolua
+		PROPERTIES FOLDER Support
+	)
 	if (${SELF_TEST})
-		set_target_properties(Network PROPERTIES FOLDER Lib)
-		set_target_properties(arraystocoords-exe coordinates-exe copies-exe copyblocks-exe creatable-exe EchoServer Google-exe ChunkBuffer NameLookup PROPERTIES FOLDER Tests)
+		set_target_properties(
+			Network
+			PROPERTIES FOLDER Lib
+		)
+		set_target_properties(
+			arraystocoords-exe
+			ChunkBuffer
+			coordinates-exe
+			copies-exe
+			copyblocks-exe
+			creatable-exe
+			EchoServer
+			Google-exe
+			LoadablePieces
+			NameLookup
+			PROPERTIES FOLDER Tests
+		)
+	endif()
+
+	if(${BUILD_TOOLS})
+		set_target_properties(
+			MCADefrag
+			ProtoProxy
+			PROPERTIES FOLDER Tools
+		)
 	endif()
 endif()
 

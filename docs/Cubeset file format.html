@@ -1,0 +1,296 @@
+<html>
+<head>
+<title>Cubeset file format</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<h2>Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract - what and why</a></li>
+<li><a href="#details">Detailed description of the format</a>
+<ul>
+<li><a href="#csmeta">Cubeset metadata</a></li>
+<li><a href="#piece">Individual piece</a></li>
+<li><a href="#piecemeta">Piece metadata</a></li>
+</ul>
+</li>
+<li><a href="#example">Example</a></li>
+</ul>
+<hr>
+<a name="abstract"><h2>Abstract - what and why</h2></a>
+<p>We're seeing an increased need to store "prefabs" - little areas with predefined block contents, such as village houses or fortress rooms - in collections. We have one collection of village houses for the plains village, one collection for the desert village, one collection for the nether fortress... And there are plans in the future to use even more collections - trees, overworld fortresses, more village types and even custom structures. The point that they have in common is that they need to store not only the prefabs, but also metadata for those prefabs - how often they generate, how they connect together. There's even need for metadata for the entire collection, such as what the accepted biomes are, what block should village roads use, and various other generator parameters. So we need a file format that could store all this information together.</p>
+<p>There are some existing formats available to consider first:
+<ul>
+<li><a href="http://minecraft.gamepedia.com/Schematic_file_format"><b>schematic</b></a> - file format native to MCEdit / Bukkit / WorldEdit communities. Can store the prefab, the block entities and regular entities, and any metadata. Cannot store multiple prefabs. No effort to read or write, there's already code to do that (except for the entities) in the server.</li>
+<li><a href="http://dev.bukkit.org/bukkit-plugins/terrain-control/"><b>bob / bo2 / bo3</b></a> - file format created for prefabs in the Terrain Control mod. Can store the prefab and any metadata. Support for block entities and regular entities is unknown. Cannot store multiple prefabs. Medium difficulty for reading and writing, would need new parser and serializer. Unknown (but assumed true) whether the format truly supports any metadata.</li>
+<li><a href="https://github.com/cuberite/cuberite/tree/master/src/Generating/Prefabs"><b>cpp</b></a> - export from our Gallery server directly into C++ source files. Can store the prefab and any metadata, block entities and regular entities currently not implemented but could be added. Very difficult for reading, writing already implemented. Only usable when compiling directly into the server. Can store multiple prefabs and metadata for the entire set.</li>
+</ul>
+Obviously none of these fully satisfy our needs, so we'll need to either extend one of them or create yet another one. Extending the .schematic file would mean that the exporter plugin would need to change most of the export code, which was deemed too unmaintainable. Because the bob format is not implemented at all, it wasn't even considered. The cpp format would have been a great candidate if it weren't so difficult to parse. However, it sparked an idea - something similar in form to the cpp format, but easily parsed. Since we already have the Lua interpreter, why not base the new format in Lua?</p>
+<p>
+With Lua, we could store any metadata for the prefabs, any additional information related to the entire set of prefabs. There's nothing stopping us from adding more items in a backward- and forward-compatible way. The prefabs can be stored very similar to the cpp format, an array of strings plus a charmap, or they can be stored externally in individual .schematic files and the Lua file would provide just the metadata. The server has already vast amounts of Lua-related support code that can be used for accessing the data. In the end this became the chosen solution. The format has been named "Cubeset" - a set of cube-based prefabs.</p>
+
+<hr/>
+
+<a name="details"><h2>Detailed description of the format</h2></a>
+<p>
+The Cubeset file has a .cubeset extension. Internally it is a Lua source file that provides a global value, Cubeset, which is a table containing the structured data. The loader checks the file's first 4 KiB to see if there is a "CubesetFormatVersion =" string in it, and if it is, the file is considered a Cubeset file and further loading is attempted. It is therefore crucial that tools producing this file format include this string as early as possible in the file.</p>
+<p>
+The top-level Cubeset table must contain at least two sub-tables: Metadata and Pieces. The Metadata table contains the metadata relevant to the entire set of prefabs in the file, the Pieces table contains the definitions and metadata for the individual prefabs. It is advised to make the Metadata table the first one, because it contains the signature used to identify the file ("CubesetFormatVersion ="). Apart from these two subtables the server ignores everything else.</p>
+
+<a name="csmeta"><h3>Cubeset metadata</h3></a>
+<p>
+The Cubeset.Metadata table is used to store metadata for the entire set of prefabs, and also for the format and version identification. It is a regular dictionary-style Lua table; the following elements are recognized:
+<table>
+<tr><th>Name</th><th>Type</th><th>Content</th></tr>
+<tr><td>CubesetFormatVersion</td><td>number</td><td>This is the format identification and at the same time it specifies the version of the file. Currently the file version is 1.</td></tr>
+<tr><td>ExportDate</td><td>string</td><td>The date when this file was exported, in the ISO format ("2015-06-16 13:34:03"). Inserted by <a href="https://github.com/madmaxoft/GalExport">GalExport</a> for versioning purposes. Ignored elsewhere.</td></tr>
+<tr><td>ExternalSchematic</td><td>boolean</td><td>Flag inserted by <a href="https://github.com/madmaxoft/GalExport">GalExport</a> to indicate that the individual prefabs are stored in separate .schematic files. Ignored elsewhere.</td></tr>
+</table>
+We expect that the set of values recognized by the server will grow when the format is used for some time. All values are optional, except for the CubesetFormatVersion value which is strictly checked by the server. </p>
+
+<a name="piece"><h3>Individual piece</h3></a>
+<p>
+The Cubeset.Pieces table is an array containing individual prefabs. Each element describes a single prefab and its associated metadata. The following values are recognized:
+<table>
+<tr><th>Name</th><th>Type</th><th>Content</th></tr>
+<tr><td>OriginData</td><td>table</td><td>Inserted by <a href="https://github.com/madmaxoft/GalExport">GalExport</a> to identify the gallery area from which the prefab is exported. Ignored elsewhere.</td></tr>
+<tr><td>Hitbox</td><td>table</td><td>The relative coords of the prefab's hitbox (where the prefab is not allowed to overlap another prefab when generating). Members: MinX, MinY, MinZ, MaxX, MaxY, MaxZ, all numbers.</td></tr>
+<tr><td>Connectors</td><td>table</td><td>Array of <a href="#conndef">connector definitions</a>. The table must be present for each prefab, even if the prefab doesn't have any connectors (use an empty table, then).</td></tr>
+<tr><td>SchematicFileName</td><td>string</td><td>Name of the .schematic file that contains the block data for the prefab.</td></tr>
+<tr><td>Size</td><td>table</td><td>Table containing the dimensions of the prefab, if it is inlined into the BlockData element. Contains three members, x, y, z, each is a number.</td></tr>
+<tr><td>BlockData</td><td>table</td><td>Array of strings that are processed to produce the block data for the prefab. Each letter in the string corresponds to one block, the type of the block is translated through the BlockDefinitions table. The blocks are ordered YZX, that is, the X coord varies the most.</td></tr>
+<tr><td>BlockDefinitions</td><td>table</td><td>Array of strings that defines the mapping of each letter in BlockData to a specific blocktype. Each string should have the format "Letter: BlockType: BlockMeta".</td></tr>
+<tr><td>Metadata</td><td>table</td><td>Dictionary-style table of various per-prefab <a href="#piecemeta">metadata values</a>.</td></tr>
+</table>
+The prefab can either have the SchematicFileName element, in which case the specified schematic file is loaded as the block data, or it can have the Size, BlockData and BlockDefinitions elements, then the server parses the block data from those. If both data members are included, the SchematicFileName takes precedence and the server loads the data from the schematic file (note that this behavior may change, having both definitions is considered "undefined behavior").</p>
+<a name="conndef"><p>
+The connector definitions table is an array of tables, each element describing one connector. The following values are recognized:
+<table>
+<tr><th>Name</th><th>type</th><th>Content</th></tr>
+<tr><td>Type</td><td>number</td><td>The connector's type. The piece generator will only connect the connectors of inverse types ('1'-type connector will connect only to '-1'-type connector).</td></tr>
+<tr><td>RelX</td><td>number</td><td>X coord of the connector, relative to the prefab's zero point ({0, 0, 0} - the first block in the image).</td></tr>
+<tr><td>RelY</td><td>number</td><td>Y coord of the connector, relative to the prefab's zero point ({0, 0, 0} - the first block in the image).</td></tr>
+<tr><td>RelZ</td><td>number</td><td>Z coord of the connector, relative to the prefab's zero point ({0, 0, 0} - the first block in the image).</td></tr>
+<tr><td>Direction</td><td>number</td><td>The direction in which the connector is facing. Corresponds to the eBlockFace constants:
+	<table>
+	<tr><th>Value</th><th>Direction</th></tr>
+	<tr><td>0</td><td>Y-</td></tr>
+	<tr><td>1</td><td>Y+</td></tr>
+	<tr><td>2</td><td>Z-</td></tr>
+	<tr><td>3</td><td>Z+</td></tr>
+	<tr><td>4</td><td>X-</td></tr>
+	<tr><td>5</td><td>X+</td></tr>
+	</table>
+</td></tr>
+</table>
+If a connector definition is missing any of the fields, the server will not add the connector to the prefab upon loading. If a prefab doesn't have any connectors, it still needs to provide an empty Connectors table.</p></a>
+
+<a name="piecemeta"><h3>Piece metadata</h3></a>
+<p>
+Each piece contains additional metadata describing its properties. The server ignores metadata that it doesn't understand. The following values are recognized:
+<table>
+<tr><th>Name</th><th>Type</th><th>IsRequired</th><th>Contents</th></tr>
+<tr><td>IsStarting</td><td>number</td><td>Yes</td><td>Zero means that the piece is a regular piece, nonzero means that the piece is a starting piece (the "seed" of the structure). Required even for cubesets that don't represent a piece-generator data (such as trees). </td></tr>
+<tr><td>AllowedRotations</td><td>number</td><td>&nbsp;</td><td>Number representing a bitmask for which rotations the piece supports. Defaults to 0 (no rotations). Bit 0 (value 1) represents whether 1 counter-clockwise rotation is allowed, bit 1 (value 2) represents whether 2 rotations (180 degrees) are allowed, bit 2 (value 4) represents whether 1 clockwise rotation is allowed.</td></tr>
+<tr><td>AddWeightIfSame</td><td>number</td><td>&nbsp;</td><td>How much weight (chance to generate) should the piece generator add to this piece when the parent piece is the same. It is possible to have negative values, meaning that the piece doesn't like repeating itself. Defaults to 0.</td></tr>
+<tr><td>DefaultWeight</td><td>number</td><td>&nbsp;</td><td>How much weight (chance to generate) does the piece have by default, without any modifiers (AddWeightIfSame, DepthWeight). Defaults to 0.</td></tr>
+<tr><td>DepthWeight</td><td>string</td><td>&nbsp;</td><td>Override for DefaultWeight for specific depth (in the tree used by the piece generator). String in the format "Depth1:Weight1|Depth2:Weight2|...". Each unlisted depth gets the DefaultWeight. Defaults to empty string (no override).</td></tr>
+<tr><td>MergeStrategy</td><td>string</td><td>&nbsp;</td><td>Which merge strategy should be used when drawing the prefab into the world. String representation of one of the cBlockArea:eMergeStrategy constants: "msOverwrite", "msFillAir", "msImprint", "msLake", "msSpongePrint", "msDifference", "msSimpleCompare", "msMask". Defaults to "msSpongePrint".</td></tr>
+<tr><td>MoveToGround</td><td>number</td><td>&nbsp;</td><td>Zero means that the piece will stay where generated by the piece generator, nonzero means that the piece will be moved Y-wise so that its first connector will be on the top block of the existing terrain. Useful for village houses. Defaults to 0.</td></tr>
+<tr><td>ShouldExpandFloor</td><td>number</td><td>&nbsp;</td><td>Nonzero means that the prefab's lowest slice will be repeated downwards until it hits a solid block, effectively creating a foundation for the piece. Useful for nether fortresses and village houses. Defaults to 0.</td></tr>
+</table>
+Each value that should be a number also allows a string that represents a number. This makes it easier for automated exporters - they can export all values as strings.</p>
+
+<hr/>
+
+<a name="example"><h2>Example</h2></a>
+<p>
+The following example defines a cubeset with two pieces. The first piece is inlined into the cubeset file, the second piece uses an external schematic file.</p>
+<pre>
+Cubeset =
+{
+	Metadata =
+	{
+		CubesetFormatVersion = 1,
+	},
+
+	Pieces =
+	{
+		-- The following piece was exported from the Gallery server by the GalExport plugin in the "cubeset" format:
+		{
+			OriginData =
+			{
+				ExportName   = "DarkCorridor",
+				Name         = "Nether 3",
+				GalleryName  = "Nether",
+				GalleryIndex = "3",
+				ID           = "30",
+				CreatorName  = "STR_Warrior",
+			},
+			Size =
+			{
+				x = 14,
+				y = 6,
+				z = 5,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 13,
+				MaxY = 5,
+				MaxZ = 4,
+			},
+			Connectors =
+			{
+				{
+					Type = 1,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 2,
+					Direction = 4,  -- X-
+				},
+				{
+					Type = 1,
+					RelX = 13,
+					RelY = 1,
+					RelZ = 2,
+					Direction = 5,  -- X+
+				},
+				{
+					Type = -1,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 2,
+					Direction = 4,  -- X-
+				},
+				{
+					Type = -1,
+					RelX = 13,
+					RelY = 1,
+					RelZ = 2,
+					Direction = 5,  -- X+
+				},
+			},
+			Metadata =
+			{
+				["DefaultWeight"] = "100",
+				["IsStarting"] = "0",
+				["AllowedRotations"] = "7",
+				["MergeStrategy"] = "msSpongePrint",
+				["DepthWeight"] = "",
+				["ShouldExpandFloor"] = "1",
+				["MoveToGround"] = "0",
+				["AddWeightIfSame"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a:112: 0",  -- netherbrick
+				"b:113: 0",  -- netherbrickfence
+				"c:114: 2",  -- netherbrickstairs
+				"d:114: 3",  -- netherbrickstairs
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaa",  --  4
+
+				-- Level 1
+				"aaaaaaaaaaaaaa",  --  0
+				"..............",  --  1
+				"..............",  --  2
+				"..............",  --  3
+				"aaaaaaaaaaaaaa",  --  4
+
+				-- Level 2
+				"aabaaaaaaaabaa",  --  0
+				"..............",  --  1
+				"..............",  --  2
+				"..............",  --  3
+				"aabaaaaaaaabaa",  --  4
+
+				-- Level 3
+				"aabaaaaaaaabaa",  --  0
+				"..............",  --  1
+				"..............",  --  2
+				"..............",  --  3
+				"aabaaaaaaaabaa",  --  4
+
+				-- Level 4
+				"aabaaaaaaaabaa",  --  0
+				"..............",  --  1
+				"..............",  --  2
+				"..............",  --  3
+				"aabaaaaaaaabaa",  --  4
+
+				-- Level 5
+				"cccccccccccccc",  --  0
+				"aaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaa",  --  3
+				"dddddddddddddd",  --  4
+			},
+		},  -- DarkCorridor
+
+		-- The following piece was exported from the Gallery server by the GalExport plugin in the "cubesetext" format:
+		{
+			OriginData =
+			{
+				ExportName   = "DoublePlantBed",
+				Name         = "Plains 5",
+				GalleryName  = "Plains",
+				GalleryIndex = "5",
+				ID           = "20",
+				CreatorName  = "tonibm1999",
+			},
+			Size =
+			{
+				x = 15,
+				y = 8,
+				z = 9,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 14,
+				MaxY = 7,
+				MaxZ = 8,
+			},
+			Connectors =
+			{
+				{
+					Type = -1,
+					RelX = 7,
+					RelY = 2,
+					RelZ = 8,
+					Direction = 3,  -- Z+
+				},
+			},
+			Metadata =
+			{
+				["DefaultWeight"] = "100",
+				["IsStarting"] = "0",
+				["AllowedRotations"] = "7",
+				["MergeStrategy"] = "msSpongePrint",
+				["DepthWeight"] = "",
+				["ShouldExpandFloor"] = "1",
+				["MoveToGround"] = "1",
+				["AddWeightIfSame"] = "0",
+			},
+			SchematicFile = "PlainsVillage/20.schematic",
+		},  -- DoublePlantBed
+	}
+}
+</pre>
+
+</body>
+</html>
