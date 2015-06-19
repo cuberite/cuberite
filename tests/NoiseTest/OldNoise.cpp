@@ -1,109 +1,17 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "Noise.h"
+#include "OldNoise.h"
 
 #define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
 
 
-
-
-
-#if 0
-/** cImprovedPerlin noise test suite:
-- Generate a rather large 2D and 3D noise array and output it to a file
-- Compare performance of cCubicNoise and cImprovedNoise, both in single-value and 3D-array usages */
-static class cImprovedPerlinNoiseTest
+/** Linearly interpolates between two values.
+Assumes that a_Ratio is in range [0, 1]. */
+inline NOISE_DATATYPE Lerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
 {
-public:
-	cImprovedPerlinNoiseTest(void)
-	{
-		printf("Performing Improved Perlin Noise tests...\n");
-		TestImage();
-		TestSpeed();
-		TestSpeedArr();
-		printf("Improved Perlin Noise tests complete.\n");
-	}
-
-
-	/** Tests the noise by generating 2D and 3D images and dumping them to files. */
-	void TestImage(void)
-	{
-		static const int SIZE_X = 256;
-		static const int SIZE_Y = 256;
-		static const int SIZE_Z = 16;
-
-		cImprovedNoise noise(1);
-		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
-		noise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
-		Debug3DNoise(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, "ImprovedPerlinNoiseTest3D", 128);
-		noise.Generate2D(arr.get(), SIZE_X, SIZE_Y, 0, 14, 15, 28);
-		Debug2DNoise(arr.get(), SIZE_X, SIZE_Y, "ImprovedPerlinNoiseTest2D", 128);
-	}
-
-
-	/** Tests the speeds of cImprovedPerlin and cCubicNoise when generating individual values. */
-	void TestSpeed(void)
-	{
-		cImprovedNoise improvedNoise(1);
-		cNoise         noise(1);
-		cTimer timer;
-
-		// Measure the improvedNoise:
-		NOISE_DATATYPE sum = 0;
-		long long start = timer.GetNowTime();
-		for (int i = 0; i < 100000000; i++)
-		{
-			sum += improvedNoise.GetValueAt(i, 0, -i);
-		}
-		long long finish = timer.GetNowTime();
-		printf("cImprovedNoise took %.2f seconds; total is %f.\n", static_cast<float>(finish - start) / 1000.0f, sum);
-
-		// Measure the cubicNoise:
-		sum = 0;
-		start = timer.GetNowTime();
-		for (int i = 0; i < 100000000; i++)
-		{
-			sum += noise.IntNoise3D(i, 0, -i);
-		}
-		finish = timer.GetNowTime();
-		printf("cCubicNoise took %.2f seconds; total is %f.\n", static_cast<float>(finish - start) / 1000.0f, sum);
-	}
-
-
-	/** Tests the speeds of cImprovedPerlin and cCubicNoise when generating arrays. */
-	void TestSpeedArr(void)
-	{
-		static const int SIZE_X = 256;
-		static const int SIZE_Y = 256;
-		static const int SIZE_Z = 16;
-
-		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
-		cTimer timer;
-		cImprovedNoise improvedNoise(1);
-		cCubicNoise    cubicNoise(1);
-
-		// Measure the improvedNoise:
-		long long start = timer.GetNowTime();
-		for (int i = 0; i < 40; i++)
-		{
-			improvedNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
-		}
-		long long finish = timer.GetNowTime();
-		printf("cImprovedNoise(arr) took %.2f seconds.\n", static_cast<float>(finish - start) / 1000.0f);
-
-		// Measure the cubicNoise:
-		start = timer.GetNowTime();
-		for (int i = 0; i < 40; i++)
-		{
-			cubicNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
-		}
-		finish = timer.GetNowTime();
-		printf("cCubicNoise(arr) took %.2f seconds.\n", static_cast<float>(finish - start) / 1000.0f);
-	}
-} g_Test;
-
-#endif
+	return a_Val1 + (a_Val2 - a_Val1) * a_Ratio;
+}
 
 
 
@@ -112,92 +20,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY, size_t a_SizeZ, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
-{
-	const int BUF_SIZE = 512;
-	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
-	
-	// Save in XY cuts:
-	cFile f1;
-	if (f1.Open(Printf("%s_XY (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
-	{
-		for (size_t z = 0; z < a_SizeZ; z++)
-		{
-			for (size_t y = 0; y < a_SizeY; y++)
-			{
-				size_t idx = y * a_SizeX + z * a_SizeX * a_SizeY;
-				unsigned char buf[BUF_SIZE];
-				for (size_t x = 0; x < a_SizeX; x++)
-				{
-					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
-				}
-				f1.Write(buf, a_SizeX);
-			}  // for y
-			unsigned char buf[BUF_SIZE];
-			memset(buf, 0, a_SizeX);
-			f1.Write(buf, a_SizeX);
-		}  // for z
-	}  // if (XY file open)
-
-	cFile f2;
-	if (f2.Open(Printf("%s_XZ (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
-	{
-		for (size_t y = 0; y < a_SizeY; y++)
-		{
-			for (size_t z = 0; z < a_SizeZ; z++)
-			{
-				size_t idx = y * a_SizeX + z * a_SizeX * a_SizeY;
-				unsigned char buf[BUF_SIZE];
-				for (size_t x = 0; x < a_SizeX; x++)
-				{
-					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
-				}
-				f2.Write(buf, a_SizeX);
-			}  // for z
-			unsigned char buf[BUF_SIZE];
-			memset(buf, 0, a_SizeX);
-			f2.Write(buf, a_SizeX);
-		}  // for y
-	}  // if (XZ file open)
-}
-
-
-
-
-
-void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
-{
-	const int BUF_SIZE = 512;
-	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
-	
-	cFile f1;
-	if (f1.Open(Printf("%s (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
-	{
-		for (size_t y = 0; y < a_SizeY; y++)
-		{
-			size_t idx = y * a_SizeX;
-			unsigned char buf[BUF_SIZE];
-			for (size_t x = 0; x < a_SizeX; x++)
-			{
-				buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
-			}
-			f1.Write(buf, a_SizeX);
-		}  // for y
-	}  // if (file open)
-}
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // cCubicCell2D:
 
-class cCubicCell2D
+class cOldCubicCell2D
 {
 public:
-	cCubicCell2D(
-		const cNoise & a_Noise,    ///< Noise to use for generating the random values
+	cOldCubicCell2D(
+		const cOldNoise & a_Noise,    ///< Noise to use for generating the random values
 		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
 		int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
 		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
@@ -219,7 +51,7 @@ public:
 protected:
 	typedef NOISE_DATATYPE Workspace[4][4];
 	
-	const cNoise & m_Noise;
+	const cOldNoise & m_Noise;
 	
 	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
 	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
@@ -237,8 +69,8 @@ protected:
 
 
 
-cCubicCell2D::cCubicCell2D(
-	const cNoise & a_Noise,    ///< Noise to use for generating the random values
+cOldCubicCell2D::cOldCubicCell2D(
+	const cOldNoise & a_Noise,    ///< Noise to use for generating the random values
 	NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
 	int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
 	const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
@@ -260,7 +92,7 @@ cCubicCell2D::cCubicCell2D(
 
 
 
-void cCubicCell2D::Generate(
+void cOldCubicCell2D::Generate(
 	int a_FromX, int a_ToX,
 	int a_FromY, int a_ToY
 )
@@ -269,14 +101,14 @@ void cCubicCell2D::Generate(
 	{
 		NOISE_DATATYPE Interp[4];
 		NOISE_DATATYPE FracY = m_FracY[y];
-		Interp[0] = cNoise::CubicInterpolate((*m_WorkRnds)[0][0], (*m_WorkRnds)[0][1], (*m_WorkRnds)[0][2], (*m_WorkRnds)[0][3], FracY);
-		Interp[1] = cNoise::CubicInterpolate((*m_WorkRnds)[1][0], (*m_WorkRnds)[1][1], (*m_WorkRnds)[1][2], (*m_WorkRnds)[1][3], FracY);
-		Interp[2] = cNoise::CubicInterpolate((*m_WorkRnds)[2][0], (*m_WorkRnds)[2][1], (*m_WorkRnds)[2][2], (*m_WorkRnds)[2][3], FracY);
-		Interp[3] = cNoise::CubicInterpolate((*m_WorkRnds)[3][0], (*m_WorkRnds)[3][1], (*m_WorkRnds)[3][2], (*m_WorkRnds)[3][3], FracY);
+		Interp[0] = cOldNoise::CubicInterpolate((*m_WorkRnds)[0][0], (*m_WorkRnds)[0][1], (*m_WorkRnds)[0][2], (*m_WorkRnds)[0][3], FracY);
+		Interp[1] = cOldNoise::CubicInterpolate((*m_WorkRnds)[1][0], (*m_WorkRnds)[1][1], (*m_WorkRnds)[1][2], (*m_WorkRnds)[1][3], FracY);
+		Interp[2] = cOldNoise::CubicInterpolate((*m_WorkRnds)[2][0], (*m_WorkRnds)[2][1], (*m_WorkRnds)[2][2], (*m_WorkRnds)[2][3], FracY);
+		Interp[3] = cOldNoise::CubicInterpolate((*m_WorkRnds)[3][0], (*m_WorkRnds)[3][1], (*m_WorkRnds)[3][2], (*m_WorkRnds)[3][3], FracY);
 		int idx = y * m_SizeX + a_FromX;
 		for (int x = a_FromX; x < a_ToX; x++)
 		{
-			m_Array[idx++] = cNoise::CubicInterpolate(Interp[0], Interp[1], Interp[2], Interp[3], m_FracX[x]);
+			m_Array[idx++] = cOldNoise::CubicInterpolate(Interp[0], Interp[1], Interp[2], Interp[3], m_FracX[x]);
 		}  // for x
 	}  // for y
 }
@@ -285,7 +117,7 @@ void cCubicCell2D::Generate(
 
 
 
-void cCubicCell2D::InitWorkRnds(int a_FloorX, int a_FloorY)
+void cOldCubicCell2D::InitWorkRnds(int a_FloorX, int a_FloorY)
 {
 	m_CurFloorX = a_FloorX;
 	m_CurFloorY = a_FloorY;
@@ -304,7 +136,7 @@ void cCubicCell2D::InitWorkRnds(int a_FloorX, int a_FloorY)
 
 
 
-void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
+void cOldCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 {
 	// Swap the doublebuffer:
 	int OldFloorX = m_CurFloorX;
@@ -344,11 +176,11 @@ void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 ////////////////////////////////////////////////////////////////////////////////
 // cCubicCell3D:
 
-class cCubicCell3D
+class cOldCubicCell3D
 {
 public:
-	cCubicCell3D(
-		const cNoise & a_Noise,                 ///< Noise to use for generating the random values
+	cOldCubicCell3D(
+		const cOldNoise & a_Noise,                 ///< Noise to use for generating the random values
 		NOISE_DATATYPE * a_Array,               ///< Array to generate into [x + a_SizeX * y]
 		int a_SizeX, int a_SizeY, int a_SizeZ,  ///< Count of the array, in each direction
 		const NOISE_DATATYPE * a_FracX,         ///< Pointer to the array that stores the X fractional values
@@ -372,7 +204,7 @@ public:
 protected:
 	typedef NOISE_DATATYPE Workspace[4][4][4];
 	
-	const cNoise & m_Noise;
+	const cOldNoise & m_Noise;
 	
 	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
 	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
@@ -392,8 +224,8 @@ protected:
 
 
 
-cCubicCell3D::cCubicCell3D(
-	const cNoise & a_Noise,                 ///< Noise to use for generating the random values
+cOldCubicCell3D::cOldCubicCell3D(
+	const cOldNoise & a_Noise,                 ///< Noise to use for generating the random values
 	NOISE_DATATYPE * a_Array,               ///< Array to generate into [x + a_SizeX * y]
 	int a_SizeX, int a_SizeY, int a_SizeZ,  ///< Count of the array, in each direction
 	const NOISE_DATATYPE * a_FracX,         ///< Pointer to the array that stores the X fractional values
@@ -419,7 +251,7 @@ cCubicCell3D::cCubicCell3D(
 
 
 
-void cCubicCell3D::Generate(
+void cOldCubicCell3D::Generate(
 	int a_FromX, int a_ToX,
 	int a_FromY, int a_ToY,
 	int a_FromZ, int a_ToZ
@@ -434,21 +266,21 @@ void cCubicCell3D::Generate(
 		{
 			for (int y = 0; y < 4; y++)
 			{
-				Interp2[x][y] = cNoise::CubicInterpolate((*m_WorkRnds)[x][y][0], (*m_WorkRnds)[x][y][1], (*m_WorkRnds)[x][y][2], (*m_WorkRnds)[x][y][3], FracZ);
+				Interp2[x][y] = cOldNoise::CubicInterpolate((*m_WorkRnds)[x][y][0], (*m_WorkRnds)[x][y][1], (*m_WorkRnds)[x][y][2], (*m_WorkRnds)[x][y][3], FracZ);
 			}
 		}
 		for (int y = a_FromY; y < a_ToY; y++)
 		{
 			NOISE_DATATYPE Interp[4];
 			NOISE_DATATYPE FracY = m_FracY[y];
-			Interp[0] = cNoise::CubicInterpolate(Interp2[0][0], Interp2[0][1], Interp2[0][2], Interp2[0][3], FracY);
-			Interp[1] = cNoise::CubicInterpolate(Interp2[1][0], Interp2[1][1], Interp2[1][2], Interp2[1][3], FracY);
-			Interp[2] = cNoise::CubicInterpolate(Interp2[2][0], Interp2[2][1], Interp2[2][2], Interp2[2][3], FracY);
-			Interp[3] = cNoise::CubicInterpolate(Interp2[3][0], Interp2[3][1], Interp2[3][2], Interp2[3][3], FracY);
+			Interp[0] = cOldNoise::CubicInterpolate(Interp2[0][0], Interp2[0][1], Interp2[0][2], Interp2[0][3], FracY);
+			Interp[1] = cOldNoise::CubicInterpolate(Interp2[1][0], Interp2[1][1], Interp2[1][2], Interp2[1][3], FracY);
+			Interp[2] = cOldNoise::CubicInterpolate(Interp2[2][0], Interp2[2][1], Interp2[2][2], Interp2[2][3], FracY);
+			Interp[3] = cOldNoise::CubicInterpolate(Interp2[3][0], Interp2[3][1], Interp2[3][2], Interp2[3][3], FracY);
 			int idx = idxZ + y * m_SizeX + a_FromX;
 			for (int x = a_FromX; x < a_ToX; x++)
 			{
-				m_Array[idx++] = cNoise::CubicInterpolate(Interp[0], Interp[1], Interp[2], Interp[3], m_FracX[x]);
+				m_Array[idx++] = cOldNoise::CubicInterpolate(Interp[0], Interp[1], Interp[2], Interp[3], m_FracX[x]);
 			}  // for x
 		}  // for y
 	}  // for z
@@ -458,7 +290,7 @@ void cCubicCell3D::Generate(
 
 
 
-void cCubicCell3D::InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ)
+void cOldCubicCell3D::InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ)
 {
 	m_CurFloorX = a_FloorX;
 	m_CurFloorY = a_FloorY;
@@ -482,7 +314,7 @@ void cCubicCell3D::InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ)
 
 
 
-void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
+void cOldCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
 {
 	// Swap the doublebuffer:
 	int OldFloorX = m_CurFloorX;
@@ -528,9 +360,9 @@ void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cNoise:
+// cOldNoise:
 
-cNoise::cNoise(int a_Seed) :
+cOldNoise::cOldNoise(int a_Seed) :
 	m_Seed(a_Seed)
 {
 }
@@ -539,7 +371,7 @@ cNoise::cNoise(int a_Seed) :
 
 
 
-cNoise::cNoise(const cNoise & a_Noise) :
+cOldNoise::cOldNoise(const cOldNoise & a_Noise) :
 	m_Seed(a_Noise.m_Seed)
 {
 }
@@ -548,7 +380,7 @@ cNoise::cNoise(const cNoise & a_Noise) :
 
 
 
-NOISE_DATATYPE cNoise::LinearNoise1D(NOISE_DATATYPE a_X) const
+NOISE_DATATYPE cOldNoise::LinearNoise1D(NOISE_DATATYPE a_X) const
 {
 	int BaseX = FAST_FLOOR(a_X);
 	NOISE_DATATYPE FracX = a_X - BaseX;
@@ -559,7 +391,7 @@ NOISE_DATATYPE cNoise::LinearNoise1D(NOISE_DATATYPE a_X) const
 
 
 
-NOISE_DATATYPE cNoise::CosineNoise1D(NOISE_DATATYPE a_X) const
+NOISE_DATATYPE cOldNoise::CosineNoise1D(NOISE_DATATYPE a_X) const
 {
 	int BaseX = FAST_FLOOR(a_X);
 	NOISE_DATATYPE FracX = a_X - BaseX;
@@ -570,7 +402,7 @@ NOISE_DATATYPE cNoise::CosineNoise1D(NOISE_DATATYPE a_X) const
 
 
 
-NOISE_DATATYPE cNoise::CubicNoise1D(NOISE_DATATYPE a_X) const
+NOISE_DATATYPE cOldNoise::CubicOldNoise1D(NOISE_DATATYPE a_X) const
 {
 	int BaseX = FAST_FLOOR(a_X);
 	NOISE_DATATYPE FracX = a_X - BaseX;
@@ -581,7 +413,7 @@ NOISE_DATATYPE cNoise::CubicNoise1D(NOISE_DATATYPE a_X) const
 
 
 
-NOISE_DATATYPE cNoise::SmoothNoise1D(int a_X) const
+NOISE_DATATYPE cOldNoise::SmoothNoise1D(int a_X) const
 {
 	return IntNoise1D(a_X) / 2 + IntNoise1D(a_X - 1) / 4 + IntNoise1D(a_X + 1) / 4;
 }
@@ -590,7 +422,7 @@ NOISE_DATATYPE cNoise::SmoothNoise1D(int a_X) const
 
 
 
-NOISE_DATATYPE cNoise::CubicNoise2D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) const
+NOISE_DATATYPE cOldNoise::CubicOldNoise2D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) const
 {
 	const int BaseX = FAST_FLOOR(a_X);
 	const int BaseY = FAST_FLOOR(a_Y);
@@ -618,7 +450,7 @@ NOISE_DATATYPE cNoise::CubicNoise2D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) cons
 
 
 
-NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const
+NOISE_DATATYPE cOldNoise::CubicOldNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const
 {
 	const int BaseX = FAST_FLOOR(a_X);
 	const int BaseY = FAST_FLOOR(a_Y);
@@ -633,10 +465,10 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 	};
 
 	const NOISE_DATATYPE FracX = (a_X) - BaseX;
-	const NOISE_DATATYPE x1interp1 = CubicInterpolate(points1[0][0], points1[0][1], points1[0][2], points1[0][3], FracX);
-	const NOISE_DATATYPE x1interp2 = CubicInterpolate(points1[1][0], points1[1][1], points1[1][2], points1[1][3], FracX);
-	const NOISE_DATATYPE x1interp3 = CubicInterpolate(points1[2][0], points1[2][1], points1[2][2], points1[2][3], FracX);
-	const NOISE_DATATYPE x1interp4 = CubicInterpolate(points1[3][0], points1[3][1], points1[3][2], points1[3][3], FracX);
+	const NOISE_DATATYPE x1interp1 = CubicInterpolate( points1[0][0], points1[0][1], points1[0][2], points1[0][3], FracX);
+	const NOISE_DATATYPE x1interp2 = CubicInterpolate( points1[1][0], points1[1][1], points1[1][2], points1[1][3], FracX);
+	const NOISE_DATATYPE x1interp3 = CubicInterpolate( points1[2][0], points1[2][1], points1[2][2], points1[2][3], FracX);
+	const NOISE_DATATYPE x1interp4 = CubicInterpolate( points1[3][0], points1[3][1], points1[3][2], points1[3][3], FracX);
 
 	const NOISE_DATATYPE points2[4][4] =
 	{
@@ -646,45 +478,45 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ), IntNoise3D(BaseX, BaseY + 2, BaseZ), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ), },
 	};
 
-	const NOISE_DATATYPE x2interp1 = CubicInterpolate(points2[0][0], points2[0][1], points2[0][2], points2[0][3], FracX);
-	const NOISE_DATATYPE x2interp2 = CubicInterpolate(points2[1][0], points2[1][1], points2[1][2], points2[1][3], FracX);
-	const NOISE_DATATYPE x2interp3 = CubicInterpolate(points2[2][0], points2[2][1], points2[2][2], points2[2][3], FracX);
-	const NOISE_DATATYPE x2interp4 = CubicInterpolate(points2[3][0], points2[3][1], points2[3][2], points2[3][3], FracX);
+	const NOISE_DATATYPE x2interp1 = CubicInterpolate( points2[0][0], points2[0][1], points2[0][2], points2[0][3], FracX);
+	const NOISE_DATATYPE x2interp2 = CubicInterpolate( points2[1][0], points2[1][1], points2[1][2], points2[1][3], FracX);
+	const NOISE_DATATYPE x2interp3 = CubicInterpolate( points2[2][0], points2[2][1], points2[2][2], points2[2][3], FracX);
+	const NOISE_DATATYPE x2interp4 = CubicInterpolate( points2[3][0], points2[3][1], points2[3][2], points2[3][3], FracX);
 
 	const NOISE_DATATYPE points3[4][4] =
 	{
-		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ + 1), IntNoise3D(BaseX, BaseY - 1, BaseZ + 1), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ + 1), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ + 1), },
-		{ IntNoise3D(BaseX - 1, BaseY,	   BaseZ + 1), IntNoise3D(BaseX, BaseY,     BaseZ + 1), IntNoise3D(BaseX + 1, BaseY,     BaseZ + 1), IntNoise3D(BaseX + 2, BaseY,     BaseZ + 1), },
-		{ IntNoise3D(BaseX - 1, BaseY + 1, BaseZ + 1), IntNoise3D(BaseX, BaseY + 1, BaseZ + 1), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ + 1), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ + 1), },
-		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ + 1), IntNoise3D(BaseX, BaseY + 2, BaseZ + 1), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ + 1), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ + 1), },
+		{ IntNoise3D( BaseX-1, BaseY-1, BaseZ+1), IntNoise3D( BaseX, BaseY-1, BaseZ+1), IntNoise3D( BaseX+1, BaseY-1, BaseZ+1), IntNoise3D( BaseX+2, BaseY-1, BaseZ + 1), },
+		{ IntNoise3D( BaseX-1, BaseY,	  BaseZ+1), IntNoise3D( BaseX, BaseY,   BaseZ+1), IntNoise3D( BaseX+1, BaseY,   BaseZ+1), IntNoise3D( BaseX+2, BaseY,   BaseZ + 1), },
+		{ IntNoise3D( BaseX-1, BaseY+1, BaseZ+1), IntNoise3D( BaseX, BaseY+1, BaseZ+1), IntNoise3D( BaseX+1, BaseY+1, BaseZ+1), IntNoise3D( BaseX+2, BaseY+1, BaseZ + 1), },
+		{ IntNoise3D( BaseX-1, BaseY+2, BaseZ+1), IntNoise3D( BaseX, BaseY+2, BaseZ+1), IntNoise3D( BaseX+1, BaseY+2, BaseZ+1), IntNoise3D( BaseX+2, BaseY+2, BaseZ + 1), },
 	};
 
-	const NOISE_DATATYPE x3interp1 = CubicInterpolate(points3[0][0], points3[0][1], points3[0][2], points3[0][3], FracX);
-	const NOISE_DATATYPE x3interp2 = CubicInterpolate(points3[1][0], points3[1][1], points3[1][2], points3[1][3], FracX);
-	const NOISE_DATATYPE x3interp3 = CubicInterpolate(points3[2][0], points3[2][1], points3[2][2], points3[2][3], FracX);
-	const NOISE_DATATYPE x3interp4 = CubicInterpolate(points3[3][0], points3[3][1], points3[3][2], points3[3][3], FracX);
+	const NOISE_DATATYPE x3interp1 = CubicInterpolate( points3[0][0], points3[0][1], points3[0][2], points3[0][3], FracX);
+	const NOISE_DATATYPE x3interp2 = CubicInterpolate( points3[1][0], points3[1][1], points3[1][2], points3[1][3], FracX);
+	const NOISE_DATATYPE x3interp3 = CubicInterpolate( points3[2][0], points3[2][1], points3[2][2], points3[2][3], FracX);
+	const NOISE_DATATYPE x3interp4 = CubicInterpolate( points3[3][0], points3[3][1], points3[3][2], points3[3][3], FracX);
 
 	const NOISE_DATATYPE points4[4][4] =
 	{
-		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ + 2), IntNoise3D(BaseX, BaseY - 1, BaseZ + 2), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ + 2), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ + 2), },
-		{ IntNoise3D(BaseX - 1, BaseY,	   BaseZ + 2), IntNoise3D(BaseX, BaseY,     BaseZ + 2), IntNoise3D(BaseX + 1, BaseY,     BaseZ + 2), IntNoise3D(BaseX + 2, BaseY,     BaseZ + 2), },
-		{ IntNoise3D(BaseX - 1, BaseY + 1, BaseZ + 2), IntNoise3D(BaseX, BaseY + 1, BaseZ + 2), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ + 2), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ + 2), },
-		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ + 2), IntNoise3D(BaseX, BaseY + 2, BaseZ + 2), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ + 2), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ + 2), },
+		{ IntNoise3D( BaseX-1, BaseY-1, BaseZ+2), IntNoise3D( BaseX, BaseY-1, BaseZ+2), IntNoise3D( BaseX+1, BaseY-1, BaseZ+2), IntNoise3D( BaseX+2, BaseY-1, BaseZ+2), },
+		{ IntNoise3D( BaseX-1, BaseY,	  BaseZ+2), IntNoise3D( BaseX, BaseY,   BaseZ+2), IntNoise3D( BaseX+1, BaseY,   BaseZ+2), IntNoise3D( BaseX+2, BaseY,   BaseZ+2), },
+		{ IntNoise3D( BaseX-1, BaseY+1, BaseZ+2), IntNoise3D( BaseX, BaseY+1, BaseZ+2), IntNoise3D( BaseX+1, BaseY+1, BaseZ+2), IntNoise3D( BaseX+2, BaseY+1, BaseZ+2), },
+		{ IntNoise3D( BaseX-1, BaseY+2, BaseZ+2), IntNoise3D( BaseX, BaseY+2, BaseZ+2), IntNoise3D( BaseX+1, BaseY+2, BaseZ+2), IntNoise3D( BaseX+2, BaseY+2, BaseZ+2), },
 	};
 
-	const NOISE_DATATYPE x4interp1 = CubicInterpolate(points4[0][0], points4[0][1], points4[0][2], points4[0][3], FracX);
-	const NOISE_DATATYPE x4interp2 = CubicInterpolate(points4[1][0], points4[1][1], points4[1][2], points4[1][3], FracX);
-	const NOISE_DATATYPE x4interp3 = CubicInterpolate(points4[2][0], points4[2][1], points4[2][2], points4[2][3], FracX);
-	const NOISE_DATATYPE x4interp4 = CubicInterpolate(points4[3][0], points4[3][1], points4[3][2], points4[3][3], FracX);
+	const NOISE_DATATYPE x4interp1 = CubicInterpolate( points4[0][0], points4[0][1], points4[0][2], points4[0][3], FracX);
+	const NOISE_DATATYPE x4interp2 = CubicInterpolate( points4[1][0], points4[1][1], points4[1][2], points4[1][3], FracX);
+	const NOISE_DATATYPE x4interp3 = CubicInterpolate( points4[2][0], points4[2][1], points4[2][2], points4[2][3], FracX);
+	const NOISE_DATATYPE x4interp4 = CubicInterpolate( points4[3][0], points4[3][1], points4[3][2], points4[3][3], FracX);
 
 	const NOISE_DATATYPE FracY = (a_Y) - BaseY;
-	const NOISE_DATATYPE yinterp1 = CubicInterpolate(x1interp1, x1interp2, x1interp3, x1interp4, FracY);
-	const NOISE_DATATYPE yinterp2 = CubicInterpolate(x2interp1, x2interp2, x2interp3, x2interp4, FracY);
-	const NOISE_DATATYPE yinterp3 = CubicInterpolate(x3interp1, x3interp2, x3interp3, x3interp4, FracY);
-	const NOISE_DATATYPE yinterp4 = CubicInterpolate(x4interp1, x4interp2, x4interp3, x4interp4, FracY);
+	const NOISE_DATATYPE yinterp1 = CubicInterpolate( x1interp1, x1interp2, x1interp3, x1interp4, FracY);
+	const NOISE_DATATYPE yinterp2 = CubicInterpolate( x2interp1, x2interp2, x2interp3, x2interp4, FracY);
+	const NOISE_DATATYPE yinterp3 = CubicInterpolate( x3interp1, x3interp2, x3interp3, x3interp4, FracY);
+	const NOISE_DATATYPE yinterp4 = CubicInterpolate( x4interp1, x4interp2, x4interp3, x4interp4, FracY);
 
 	const NOISE_DATATYPE FracZ = (a_Z) - BaseZ;
-	return CubicInterpolate(yinterp1, yinterp2, yinterp3, yinterp4, FracZ);
+	return CubicInterpolate( yinterp1, yinterp2, yinterp3, yinterp4, FracZ);
 }
 
 
@@ -692,9 +524,9 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cCubicNoise:
+// cOldCubicNoise:
 
-cCubicNoise::cCubicNoise(int a_Seed) :
+cOldCubicNoise::cOldCubicNoise(int a_Seed) :
 	m_Noise(a_Seed)
 {
 }
@@ -703,7 +535,7 @@ cCubicNoise::cCubicNoise(int a_Seed) :
 
 
 
-void cCubicNoise::Generate2D(
+void cOldCubicNoise::Generate2D(
 	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
 	int a_SizeX, int a_SizeY,                        ///< Size of the array (num doubles), in each direction
 	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
@@ -722,23 +554,26 @@ void cCubicNoise::Generate2D(
 	int FloorY[MAX_SIZE];
 	NOISE_DATATYPE FracX[MAX_SIZE];
 	NOISE_DATATYPE FracY[MAX_SIZE];
-	CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX);
-	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY);
+	int SameX[MAX_SIZE];
+	int SameY[MAX_SIZE];
+	int NumSameX, NumSameY;
+	CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
+	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
 	
-	cCubicCell2D Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
+	cOldCubicCell2D Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
 	
 	Cell.InitWorkRnds(FloorX[0], FloorY[0]);
 	
 	// Calculate query values using Cell:
 	int FromY = 0;
-	for (int y = 0; y < a_EndY - a_StartY; y++)
+	for (int y = 0; y < NumSameY; y++)
 	{
-		int ToY = FromY + 1;
+		int ToY = FromY + SameY[y];
 		int FromX = 0;
 		int CurFloorY = FloorY[FromY];
-		for (int x = 0; x < a_EndX - a_StartX; x++)
+		for (int x = 0; x < NumSameX; x++)
 		{
-			int ToX = FromX + 1;
+			int ToX = FromX + SameX[x];
 			Cell.Generate(FromX, ToX, FromY, ToY);
 			Cell.Move(FloorX[ToX], CurFloorY);
 			FromX = ToX;
@@ -752,7 +587,7 @@ void cCubicNoise::Generate2D(
 
 
 
-void cCubicNoise::Generate3D(
+void cOldCubicNoise::Generate3D(
 	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
 	int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Size of the array (num doubles), in each direction
 	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
@@ -774,11 +609,15 @@ void cCubicNoise::Generate3D(
 	NOISE_DATATYPE FracX[MAX_SIZE];
 	NOISE_DATATYPE FracY[MAX_SIZE];
 	NOISE_DATATYPE FracZ[MAX_SIZE];
-	CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX);
-	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY);
-	CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ);
+	int SameX[MAX_SIZE];
+	int SameY[MAX_SIZE];
+	int SameZ[MAX_SIZE];
+	int NumSameX, NumSameY, NumSameZ;
+	CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
+	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
+	CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ, SameZ, NumSameZ);
 	
-	cCubicCell3D Cell(
+	cOldCubicCell3D Cell(
 		m_Noise, a_Array,
 		a_SizeX, a_SizeY, a_SizeZ,
 		FracX, FracY, FracZ
@@ -788,19 +627,19 @@ void cCubicNoise::Generate3D(
 	
 	// Calculate query values using Cell:
 	int FromZ = 0;
-	for (int z = 0; z < a_EndZ - a_StartZ; z++)
+	for (int z = 0; z < NumSameZ; z++)
 	{
-		int ToZ = FromZ + 1;
+		int ToZ = FromZ + SameZ[z];
 		int CurFloorZ = FloorZ[FromZ];
 		int FromY = 0;
-		for (int y = 0; y < a_EndY - a_StartY; y++)
+		for (int y = 0; y < NumSameY; y++)
 		{
-			int ToY = FromY + 1;
+			int ToY = FromY + SameY[y];
 			int CurFloorY = FloorY[FromY];
 			int FromX = 0;
-			for (int x = 0; x < a_EndX - a_StartX; x++)
+			for (int x = 0; x < NumSameX; x++)
 			{
-				int ToX = FromX + 1;
+				int ToX = FromX + SameX[x];
 				Cell.Generate(FromX, ToX, FromY, ToY, FromZ, ToZ);
 				Cell.Move(FloorX[ToX], CurFloorY, CurFloorZ);
 				FromX = ToX;
@@ -817,10 +656,11 @@ void cCubicNoise::Generate3D(
 
 
 
-void cCubicNoise::CalcFloorFrac(
+void cOldCubicNoise::CalcFloorFrac(
 	int a_Size,
 	NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
-	int * a_Floor, NOISE_DATATYPE * a_Frac
+	int * a_Floor, NOISE_DATATYPE * a_Frac,
+	int * a_Same, int & a_NumSame
 ) const
 {
 	ASSERT(a_Size > 0);
@@ -833,6 +673,26 @@ void cCubicNoise::CalcFloorFrac(
 		a_Frac[i] = val - a_Floor[i];
 		val += dif;
 	}
+	
+	// Mark up the same floor values into a_Same / a_NumSame:
+	int CurFloor = a_Floor[0];
+	int LastSame = 0;
+	a_NumSame = 0;
+	for (int i = 1; i < a_Size; i++)
+	{
+		if (a_Floor[i] != CurFloor)
+		{
+			a_Same[a_NumSame] = i - LastSame;
+			LastSame = i;
+			a_NumSame += 1;
+			CurFloor = a_Floor[i];
+		}
+	}  // for i - a_Floor[]
+	if (LastSame < a_Size)
+	{
+		a_Same[a_NumSame] = a_Size - LastSame;
+		a_NumSame += 1;
+	}
 }
 
 
@@ -840,9 +700,9 @@ void cCubicNoise::CalcFloorFrac(
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cImprovedNoise:
+// cOldImprovedNoise:
 
-cImprovedNoise::cImprovedNoise(int a_Seed)
+cOldImprovedNoise::cOldImprovedNoise(int a_Seed)
 {
 	// Initialize the permutations with identity:
 	for (int i = 0; i < 256; i++)
@@ -851,7 +711,7 @@ cImprovedNoise::cImprovedNoise(int a_Seed)
 	}
 
 	// Randomize the permutation table - swap each element with a random other element:
-	cNoise noise(a_Seed);
+	cOldNoise noise(a_Seed);
 	for (int i = 0; i < 256; i++)
 	{
 		int rnd = (noise.IntNoise1DInt(i) / 7) % 256;
@@ -869,7 +729,7 @@ cImprovedNoise::cImprovedNoise(int a_Seed)
 
 
 
-void cImprovedNoise::Generate2D(
+void cOldImprovedNoise::Generate2D(
 	NOISE_DATATYPE * a_Array,
 	int a_SizeX, int a_SizeY,
 	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
@@ -916,7 +776,7 @@ void cImprovedNoise::Generate2D(
 
 
 
-void cImprovedNoise::Generate3D(
+void cOldImprovedNoise::Generate3D(
 	NOISE_DATATYPE * a_Array,
 	int a_SizeX, int a_SizeY, int a_SizeZ,
 	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
@@ -982,7 +842,7 @@ void cImprovedNoise::Generate3D(
 
 
 
-NOISE_DATATYPE cImprovedNoise::GetValueAt(int a_X, int a_Y, int a_Z)
+NOISE_DATATYPE cOldImprovedNoise::GetValueAt(int a_X, int a_Y, int a_Z)
 {
 	// Hash the coordinates:
 	a_X = a_X & 255;
