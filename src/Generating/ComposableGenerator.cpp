@@ -618,7 +618,9 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int MaxSize    = a_IniFile.GetValueSetI("Generator", "VillageMaxSize",   128);
 			int MinDensity = a_IniFile.GetValueSetI("Generator", "VillageMinDensity", 50);
 			int MaxDensity = a_IniFile.GetValueSetI("Generator", "VillageMaxDensity", 80);
-			m_FinishGens.push_back(std::make_shared<cVillageGen>(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, m_BiomeGen, m_CompositedHeightCache));
+			AString PrefabList = a_IniFile.GetValueSet("Generator", "VillagePrefabs", "PlainsVillage, SandVillage");
+			auto Prefabs = StringSplitAndTrim(PrefabList, ",");
+			m_FinishGens.push_back(std::make_shared<cVillageGen>(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, m_BiomeGen, m_CompositedHeightCache, Prefabs));
 		}
 		else if (NoCaseCompare(*itr, "Vines") == 0)
 		{

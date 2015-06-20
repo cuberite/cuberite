@@ -9,6 +9,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DTEST_GLOBALS=1)
 
 set (SHARED_SRCS
+	${CMAKE_SOURCE_DIR}/src/BiomeDef.cpp
 	${CMAKE_SOURCE_DIR}/src/BlockArea.cpp
 	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
 	${CMAKE_SOURCE_DIR}/src/ChunkData.cpp
@@ -35,6 +36,7 @@ set (SHARED_SRCS
 )
 
 set (SHARED_HDRS
+	${CMAKE_SOURCE_DIR}/src/BiomeDef.h
 	${CMAKE_SOURCE_DIR}/src/BlockArea.h
 	${CMAKE_SOURCE_DIR}/src/Cuboid.h
 	${CMAKE_SOURCE_DIR}/src/ChunkData.h
@@ -73,6 +75,7 @@ set (SRCS
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast")
 	add_flags_cxx("-Wno-error=global-constructors")
+	add_flags_cxx("-Wno-error=switch-enum")
 endif()
 
 

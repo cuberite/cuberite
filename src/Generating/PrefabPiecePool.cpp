@@ -215,6 +215,9 @@ void cPrefabPiecePool::AddToPerConnectorMap(cPrefab * a_Prefab)
 
 bool cPrefabPiecePool::LoadFromCubesetFileVer1(const AString & a_FileName, cLuaState & a_LuaState, bool a_LogWarnings)
 {
+	// Load the metadata:
+	ApplyPoolMetadataCubesetVer1(a_FileName, a_LuaState, a_LogWarnings);
+
 	// Push the Cubeset.Pieces global value on the stack:
 	lua_getglobal(a_LuaState, "_G");
 	cLuaState::cStackValue stk(a_LuaState);
@@ -297,7 +300,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 	prefab->SetAllowedRotations(AllowedRotations);
 
 	// Apply the relevant metadata:
-	if (!ApplyMetadataCubesetVer1(a_FileName, a_LuaState, PieceName, prefab.get(), a_LogWarnings))
+	if (!ApplyPieceMetadataCubesetVer1(a_FileName, a_LuaState, PieceName, prefab.get(), a_LogWarnings))
 	{
 		return false;
 	}
@@ -461,7 +464,7 @@ bool cPrefabPiecePool::ReadConnectorsCubesetVer1(
 
 
 
-bool cPrefabPiecePool::ApplyMetadataCubesetVer1(
+bool cPrefabPiecePool::ApplyPieceMetadataCubesetVer1(
 	const AString & a_FileName,
 	cLuaState & a_LuaState,
 	const AString & a_PieceName,
@@ -499,9 +502,80 @@ bool cPrefabPiecePool::ApplyMetadataCubesetVer1(
 		);
 		a_Prefab->SetMergeStrategy(cBlockArea::msSpongePrint);
 	}
+	else
+	{
+		a_Prefab->SetMergeStrategy(strategy->second);
+	}
 	a_Prefab->SetMoveToGround(MoveToGround != 0);
 	a_Prefab->SetExtendFloor(ShouldExpandFloor != 0);
 
+	return true;
+}
+
+
+
+
+
+bool cPrefabPiecePool::ApplyPoolMetadataCubesetVer1(
+	const AString & a_FileName,
+	cLuaState & a_LuaState,
+	bool a_LogWarnings
+)
+{
+	// Push the Cubeset.Metadata table on top of the Lua stack:
+	lua_getglobal(a_LuaState, "_G");
+	auto md = a_LuaState.WalkToValue("Cubeset.Metadata");
+	if (!md.IsValid())
+	{
+		CONDWARNING(a_LogWarnings, "Cannot load cubeset from file %s: Cubeset.Metadata table is missing", a_FileName.c_str());
+		return false;
+	}
+
+	// Set the metadata values to defaults:
+	m_MinDensity = 100;
+	m_MaxDensity = 100;
+	m_VillageRoadBlockType = E_BLOCK_GRAVEL;
+	m_VillageRoadBlockMeta = 0;
+	m_VillageWaterRoadBlockType = E_BLOCK_PLANKS;
+	m_VillageWaterRoadBlockMeta = 0;
+
+	// Read the metadata values:
+	a_LuaState.GetNamedValue("IntendedUse",               m_IntendedUse);
+	a_LuaState.GetNamedValue("MaxDensity",                m_MaxDensity);
+	a_LuaState.GetNamedValue("MinDensity",                m_MinDensity);
+	a_LuaState.GetNamedValue("VillageRoadBlockType",      m_VillageRoadBlockType);
+	a_LuaState.GetNamedValue("VillageRoadBlockMeta",      m_VillageRoadBlockMeta);
+	a_LuaState.GetNamedValue("VillageWaterRoadBlockType", m_VillageWaterRoadBlockType);
+	a_LuaState.GetNamedValue("VillageWaterRoadBlockMeta", m_VillageWaterRoadBlockMeta);
+	AString allowedBiomes;
+	if (a_LuaState.GetNamedValue("AllowedBiomes", allowedBiomes))
+	{
+		auto biomes = StringSplitAndTrim(allowedBiomes, ",");
+		for (const auto & biome: biomes)
+		{
+			EMCSBiome b = StringToBiome(biome);
+			if (b == biInvalidBiome)
+			{
+				CONDWARNING(a_LogWarnings, "Invalid biome (\"%s\") specified in AllowedBiomes in cubeset file %s. Skipping the biome.",
+					biome.c_str(), a_FileName.c_str()
+				);
+				continue;
+			}
+			m_AllowedBiomes.insert(b);
+		}
+	}
+	else
+	{
+		// All biomes are allowed:
+		for (int b = biFirstBiome; b <= biMaxBiome; b++)
+		{
+			m_AllowedBiomes.insert(static_cast<EMCSBiome>(b));
+		}
+		for (int b = biFirstVariantBiome; b <= biMaxVariantBiome; b++)
+		{
+			m_AllowedBiomes.insert(static_cast<EMCSBiome>(b));
+		}
+	}
 	return true;
 }
 
