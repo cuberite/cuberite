@@ -142,6 +142,30 @@ public:
 		std::vector<Vector3i> m_SendQueue;
 	};
 
+	class cTaskPlaySound :
+		public cTask
+	{
+		double m_PosX, m_PosY, m_PosZ;
+		float m_Volume, m_Pitch;
+		AString m_SoundName;
+	public:
+
+		cTaskPlaySound(const AString & a_SoundName, double a_PosX, double a_PosY, double a_PosZ, float a_Volume, float a_Pitch) :
+			m_SoundName(a_SoundName),
+			m_PosX(a_PosX),
+			m_PosY(a_PosY),
+			m_PosZ(a_PosZ),
+			m_Volume(a_Volume),
+			m_Pitch(a_Pitch)
+		{
+		}
+
+	protected:
+		virtual void Run(cWorld & aWorld) override
+		{
+			aWorld.BroadcastSoundEffect(m_SoundName, m_PosX, m_PosY, m_PosZ, m_Volume, m_Pitch);
+		}
+	};
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
