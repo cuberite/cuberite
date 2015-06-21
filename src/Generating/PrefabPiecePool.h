@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <unordered_set>
 #include "PieceGenerator.h"
 #include "Prefab.h"
 
@@ -75,6 +76,26 @@ public:
 	/** Returns the number of starting pieces. */
 	size_t GetStartingPiecesCount(void) const { return m_StartingPieces.size(); }
 
+	// Metadata accessors:
+	const AString & GetIntendedUse(void) const { return m_IntendedUse; }
+	int GetMinDensity(void) const { return m_MinDensity; }
+	int GetMaxDensity(void) const { return m_MaxDensity; }
+	BLOCKTYPE  GetVillageRoadBlockType     (void) const { return m_VillageRoadBlockType; }
+	NIBBLETYPE GetVillageRoadBlockMeta     (void) const { return m_VillageRoadBlockMeta; }
+	BLOCKTYPE  GetVillageWaterRoadBlockType(void) const { return m_VillageWaterRoadBlockType; }
+	NIBBLETYPE GetVillageWaterRoadBlockMeta(void) const { return m_VillageWaterRoadBlockMeta; }
+
+	/** Returns true if a_Biome is among the accepted biomes in the m_AcceptedBiomes metadata member. */
+	bool IsBiomeAllowed(EMCSBiome a_Biome) const { return (m_AllowedBiomes.find(a_Biome) != m_AllowedBiomes.end()); }
+
+	// cPiecePool overrides:
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
+	virtual cPieces GetStartingPieces(void) override;
+	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override;
+	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override;
+	virtual void PiecePlaced(const cPiece & a_Piece) override;
+	virtual void Reset(void) override;
+
 protected:
 
 	/** The type used to map a connector type to the list of pieces with that connector */
@@ -91,6 +112,30 @@ protected:
 	/** The map that has all pieces by their connector types
 	The pieces are copies out of m_AllPieces and shouldn't be ever delete-d. */
 	cPiecesMap m_PiecesByConnector;
+
+	/** The intended use of this piece pool, as specified by the pool's metadata. */
+	AString m_IntendedUse;
+
+	/** The minimum density, as read from the metadata. */
+	int m_MinDensity;
+
+	/** The maximum density, as read from the metadata. */
+	int m_MaxDensity;
+
+	/** The block type to use for the village roads. */
+	BLOCKTYPE m_VillageRoadBlockType;
+
+	/** The block meta to use for the village roads. */
+	NIBBLETYPE m_VillageRoadBlockMeta;
+
+	/** The block type used for the village roads if the road is on water. */
+	BLOCKTYPE m_VillageWaterRoadBlockType;
+	
+	/** The block meta used for the village roads if the road is on water. */
+	NIBBLETYPE m_VillageWaterRoadBlockMeta;
+
+	/** A set of allowed  biomes for the pool. The pool will only be used within the specified biomes. */
+	std::unordered_set<EMCSBiome, BiomeHasher> m_AllowedBiomes;
 
 
 	/** Adds the prefab to the m_PiecesByConnector map for all its connectors. */
@@ -142,7 +187,7 @@ protected:
 	The metadata is applied into the a_Prefab object.
 	a_PieceName is the identification of the piece, used for logging only.
 	If a_LogWarnings is true, logs a warning to console when loading fails. */
-	bool ApplyMetadataCubesetVer1(
+	bool ApplyPieceMetadataCubesetVer1(
 		const AString & a_FileName,
 		cLuaState & a_LuaState,
 		const AString & a_PieceName,
@@ -150,13 +195,15 @@ protected:
 		bool a_LogWarnings
 	);
 
-	// cPiecePool overrides:
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
-	virtual cPieces GetStartingPieces(void) override;
-	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override;
-	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override;
-	virtual void PiecePlaced(const cPiece & a_Piece) override;
-	virtual void Reset(void) override;
+	/** Reads the metadata for the entire pool from the cubeset file parsed into the specified Lua state.
+	Returns true on success, false on failure.
+	The metadata is applied into "this".
+	If a_LogWarnings is true, logs a warning to console when loading fails. */
+	bool ApplyPoolMetadataCubesetVer1(
+		const AString & a_FileName,
+		cLuaState & a_LuaState,
+		bool a_LogWarnings
+	);
 } ;
 
 

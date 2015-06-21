@@ -835,8 +835,12 @@ bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
 
 cLuaState::cStackValue cLuaState::WalkToValue(const AString & a_Name)
 {
-	auto path = StringSplit(a_Name, ".");
+	// There needs to be at least one value on the stack:
+	ASSERT(lua_gettop(m_LuaState) > 0);
+
+	// Iterate over path and replace the top of the stack with the walked element
 	lua_pushvalue(m_LuaState, -1);  // Copy the stack value into the "working area"
+	auto path = StringSplit(a_Name, ".");
 	for (const auto & elem: path)
 	{
 		// If the value is not a table, bail out (error):
