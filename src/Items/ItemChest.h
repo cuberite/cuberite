@@ -27,6 +27,8 @@ public:
 	}
 
 
+	/** We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
+	the parent class cannot do that. */
 	virtual bool OnPlayerPlace(
 		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -118,34 +120,32 @@ public:
 			}  // for j
 		}  // for i
 
-		// If there's no chest neighbor, place the single block chest and bail out:
+		// Get the meta of the placed chest; take existing neighbors into account:
 		BLOCKTYPE ChestBlockType = static_cast<BLOCKTYPE>(m_ItemType);
-		if (NeighborIdx < 0)
+		NIBBLETYPE Meta;
+		auto yaw = a_Player.GetYaw();
+		switch (NeighborIdx)
 		{
-			NIBBLETYPE Meta = cBlockChestHandler::PlayerYawToMetaData(a_Player.GetYaw());
-			return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, ChestBlockType, Meta);
-		}
-
-		// There is a neighbor to which we need to adjust
-		double yaw = a_Player.GetYaw();
-		if ((NeighborIdx == 0) || (NeighborIdx == 2))
-		{
-			// The neighbor is in the X axis, form a X-axis-aligned dblchest:
-			NIBBLETYPE Meta = ((yaw >= -90) && (yaw < 90)) ? E_META_CHEST_FACING_ZM : E_META_CHEST_FACING_ZP;
-
-			// Place the new chest:
-			if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, ChestBlockType, Meta))
+			case 0:
+			case 2:
 			{
-				return false;
+				// The neighbor is in the X axis, form a X-axis-aligned dblchest:
+				Meta = ((yaw >= -90) && (yaw < 90)) ? E_META_CHEST_FACING_ZM : E_META_CHEST_FACING_ZP;
+				break;
 			}
-
-			// Adjust the existing chest:
-			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
-			return true;
-		}
-
-		// The neighbor is in the Z axis, form a Z-axis-aligned dblchest:
-		NIBBLETYPE Meta = (yaw < 0) ? E_META_CHEST_FACING_XM : E_META_CHEST_FACING_XP;
+			case 1:
+			case 3:
+			{
+				// The neighbor is in the Z axis, form a Z-axis-aligned dblchest:
+				Meta = (yaw < 0) ? E_META_CHEST_FACING_XM : E_META_CHEST_FACING_XP;
+				break;
+			}
+			default:
+			{
+				Meta = cBlockChestHandler::PlayerYawToMetaData(yaw);
+				break;
+			}
+		}  // switch (NeighborIdx)
 
 		// Place the new chest:
 		if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, ChestBlockType, Meta))
@@ -153,8 +153,31 @@ public:
 			return false;
 		}
 
-		// Adjust the existing chest:
-		a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
+		// Adjust the existing chest, if any:
+		if (NeighborIdx > 0)
+		{
+			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
+		}
+
+		// Play the placement sound:
+		AString PlaceSound = cBlockInfo::GetPlaceSound(ChestBlockType);
+		float Volume = 1.0f, Pitch = 0.8f;
+		if (PlaceSound == "dig.metal")
+		{
+			Pitch = 1.2f;
+			PlaceSound = "dig.stone";
+		}
+		else if (PlaceSound == "random.anvil_land")
+		{
+			Volume = 0.65f;
+		}
+		a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
+
+		// Remove the "placed" item:
+		if (a_Player.IsGameModeSurvival())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
 		return true;
 	}
 

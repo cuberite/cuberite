@@ -25,10 +25,11 @@ public:
 	}
 
 
-	virtual bool OnPlayerPlace(
+	virtual bool GetBlocksToPlace(
 		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		sSetBlockVector & a_BlocksToPlace
 	) override
 	{
 		// Can only be placed on the floor:
@@ -36,12 +37,10 @@ public:
 		{
 			return false;
 		}
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
 		// The "foot" block:
-		sSetBlockVector blks;
 		NIBBLETYPE BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player.GetYaw());
-		blks.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BED, BlockMeta);
+		a_BlocksToPlace.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BED, BlockMeta);
 		
 		// Check if there is empty space for the "head" block:
 		// (Vanilla only allows beds to be placed into air)
@@ -50,10 +49,8 @@ public:
 		{
 			return false;
 		}
-		blks.emplace_back(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, BlockMeta | 0x08);
-
-		// Place both bed blocks:
-		return a_Player.PlaceBlocks(blks);
+		a_BlocksToPlace.emplace_back(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, BlockMeta | 0x08);
+		return true;
 	}
 } ;
 

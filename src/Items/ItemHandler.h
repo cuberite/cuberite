@@ -35,8 +35,9 @@ public:
 
 
 	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
-	The default handler uses GetPlacementBlockTypeMeta and places the returned block.
-	Override this function for advanced behavior such as placing multiple blocks.
+	The block coords are for the block that has been clicked.
+	The default handler uses GetBlocksToPlace() and places the returned blocks.
+	Override if the item needs advanced processing, such as spawning a mob based on the blocks being placed.
 	If the block placement is refused inside this call, it will automatically revert the client-side changes.
 	Returns true if the placement succeeded, false if the placement was aborted for any reason. */
 	virtual bool OnPlayerPlace(
@@ -46,7 +47,20 @@ public:
 	);
 	
 
-	/** Called when the player right-clicks with this item and IsPlaceable() == true, and OnPlace() is not overridden.
+	/** Called from OnPlayerPlace() to determine the blocks that the current placement operation should set.
+	The block coords are where the new (main) block should be placed.
+	The default handler uses GetPlacementBlockTypeMeta() and provides that as the single block at the specified coords.
+	Returns true if the placement succeeded, false if the placement was aborted for any reason.
+	If aborted, the server then sends all original blocks in the coords provided in a_BlocksToSet to the client. */
+	virtual bool GetBlocksToPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		sSetBlockVector & a_BlocksToSet
+	);
+
+
+	/** Called when the player right-clicks with this item and IsPlaceable() == true, and OnPlayerPlace() is not overridden.
 	This function should provide the block type and meta for the placed block, or refuse the placement.
 	Returns true to allow placement, false to refuse. */
 	virtual bool GetPlacementBlockTypeMeta(
