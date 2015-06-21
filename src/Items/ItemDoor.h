@@ -20,10 +20,11 @@ public:
 	}
 
 
-	virtual bool OnPlayerPlace(
+	virtual bool GetBlocksToPlace(
 		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		sSetBlockVector & a_BlocksToSet
 	) override
 	{
 		// Vanilla only allows door placement while clicking on the top face of the block below the door:
@@ -107,10 +108,9 @@ public:
 		}
 
 		// Set the blocks:
-		sSetBlockVector blks;
-		blks.emplace_back(a_BlockX, a_BlockY, a_BlockZ, BlockType, LowerBlockMeta);
-		blks.emplace_back(a_BlockX, a_BlockY + 1, a_BlockZ, BlockType, UpperBlockMeta);
-		return a_Player.PlaceBlocks(blks);
+		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, BlockType, LowerBlockMeta);
+		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY + 1, a_BlockZ, BlockType, UpperBlockMeta);
+		return true;
 	}
 
 

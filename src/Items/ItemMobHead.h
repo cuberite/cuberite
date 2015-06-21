@@ -12,9 +12,11 @@
 class cItemMobHeadHandler :
 	public cItemHandler
 {
+	typedef cItemHandler super;
+
 public:
 	cItemMobHeadHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+		super(a_ItemType)
 	{
 	}
 
@@ -30,34 +32,36 @@ public:
 		{
 			return true;
 		}
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		auto placedX = a_BlockX, placedY = a_BlockY, placedZ = a_BlockZ;
+		AddFaceDirection(placedY, placedY, placedZ, a_BlockFace);
 
 		// If the placed head is a wither, try to spawn the wither first:
 		if (a_EquippedItem.m_ItemDamage == E_META_HEAD_WITHER)
 		{
-			if (TrySpawnWitherAround(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ))
+			if (TrySpawnWitherAround(a_World, a_Player, placedX, placedY, placedZ))
 			{
 				return true;
 			}
 			// Wither not created, proceed with regular head placement
 		}
 
-		return PlaceRegularHead(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		cItem itemCopy(a_EquippedItem);  // Make a copy in case this is the player's last head item and OnPlayerPlace removes it
+		if (!super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		{
+			return false;
+		}
+		RegularHeadPlaced(a_World, a_Player, itemCopy, placedX, placedY, placedZ, a_BlockFace);
+		return true;
 	}
 
 
-	/** Places a regular head block with no mob spawning checking. */
-	bool PlaceRegularHead(
+	/** Called after placing a regular head block with no mob spawning.
+	Adjusts the mob head entity based on the equipped item's data. */
+	void RegularHeadPlaced(
 		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
 	)
 	{
-		// Place the block:
-		if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_HEAD, BlockFaceToBlockMeta(a_BlockFace)))
-		{
-			return false;
-		}
-
 		// Use a callback to set the properties of the mob head block entity:
 		class cCallback : public cBlockEntityCallback
 		{
@@ -71,7 +75,7 @@ public:
 				{
 					return false;
 				}
-				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity *>(a_BlockEntity);
+				auto MobHeadEntity = static_cast<cMobHeadEntity *>(a_BlockEntity);
 
 				int Rotation = 0;
 				if (m_BlockMeta == 1)
@@ -94,7 +98,6 @@ public:
 		};
 		cCallback Callback(a_Player, static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage), static_cast<NIBBLETYPE>(a_BlockFace));
 		a_World.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
-		return true;
 	}
 
 
@@ -340,7 +343,7 @@ public:
 	) override
 	{
 		a_BlockType = E_BLOCK_HEAD;
-		a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x0f);
+		a_BlockMeta = BlockFaceToBlockMeta(a_BlockFace);
 		return true;
 	}
 } ;
