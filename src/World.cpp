@@ -2487,7 +2487,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 				ChunkSender.QueueSendChunkTo(
 					a_Chunk.GetPosX(),
 					a_Chunk.GetPosZ(),
-					cChunkSender::PRIORITY_BROADCAST,
+					cChunkSender::E_CHUNK_PRIORITY_MEDIUM,
 					a_Chunk.GetAllClients()
 				);
 			}

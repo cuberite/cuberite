@@ -1,4 +1,4 @@
-
+﻿
 // ChunkSender.h
 
 // Interfaces to the cChunkSender class representing the thread that waits for chunks becoming ready (loaded / generated) and sends them to clients
@@ -61,8 +61,8 @@ public:
 
 	enum eChunkPriority
 	{
-		E_CHUNK_PRIORITY_HIGH   = 0,
-		PRIORITY_BROADCAST,
+		E_CHUNK_PRIORITY_HIGH = 0,
+		E_CHUNK_PRIORITY_MIDHIGH,
 		E_CHUNK_PRIORITY_MEDIUM,
 		E_CHUNK_PRIORITY_LOW,
 		
@@ -86,7 +86,16 @@ protected:
 		eChunkPriority m_Priority;
 		cChunkCoords m_Chunk;
 
-		bool operator <(const sChunkQueue & a_Other) const { return this->m_Priority < a_Other.m_Priority; }
+		bool operator <(const sChunkQueue & a_Other) const
+		{
+			/* The Standard Priority Queue sorts from biggest to smallest
+			return true here means you are smaller than the other object, and you get pushed down.
+
+			The priorities go from HIGH (0) to LOW (2), so a smaller priority should mean further up the list
+			therefore, return true (affirm we're "smaller", and get pushed down) only if our priority is bigger than theirs (they're more urgent)
+			*/
+			return this->m_Priority > a_Other.m_Priority;
+		}
 	};
 
 	/// Used for sending chunks to specific clients
@@ -107,9 +116,9 @@ protected:
 	cCriticalSection  m_CS;
 	std::priority_queue<sChunkQueue> m_SendChunks;
 	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
-	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
-	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
-	int               m_RemoveCount;  // Number of threads waiting for a client removal (m_evtRemoved needs to be set this many times)
+	cEvent m_evtQueue;  // Set when anything is added to m_ChunksReady
+	cEvent m_evtRemoved;  // Set when removed clients are safe to be deleted
+
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];

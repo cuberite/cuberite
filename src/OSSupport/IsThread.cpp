@@ -134,9 +134,9 @@ bool cIsThread::Wait(void)
 			m_Thread.join();
 			return true;
 		}
-		catch (std::system_error & a_Exception)
+		catch (const std::system_error & a_Exception)
 		{
-			LOGERROR("cIsThread::Wait error %i: could not join thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.code().message().c_str());
+			LOGERROR("%s error %i: could not join thread %s; %s", __FUNCTION__, a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.code().message().c_str());
 			return false;
 		}
 	}
