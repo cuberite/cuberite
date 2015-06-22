@@ -88,12 +88,6 @@ public:
 		return true;
 	}
 
-
-	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
-	{
-		return ((a_Meta & 0x8) != 0);
-	}
-
 	
 	/// Returns true if the specified blocktype is one of the slabs handled by this handler
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
