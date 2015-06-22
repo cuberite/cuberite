@@ -39,19 +39,6 @@ public:
 		{
 			return;
 		}
-		
-		// Grass becomes dirt if there is something on top of it:
-		if (a_RelY < cChunkDef::Height - 1)
-		{
-			BLOCKTYPE Above;
-			NIBBLETYPE AboveMeta;
-			a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY + 1, a_RelZ, Above, AboveMeta);
-			if (!cBlockInfo::GetHandler(Above)->CanDirtGrowGrass(AboveMeta))
-			{
-				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
-				return;
-			}
-		}
 
 		// Make sure that there is enough light at the source block to spread
 		if (!a_Chunk.GetWorld()->IsChunkLighted(a_Chunk.GetPosX(), a_Chunk.GetPosZ()))
@@ -59,10 +46,21 @@ public:
 			a_Chunk.GetWorld()->QueueLightChunk(a_Chunk.GetPosX(), a_Chunk.GetPosZ());
 			return;
 		}
-		else if ((a_RelY < cChunkDef::Height - 1) && std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ))) < 9)
+		else if ((a_RelY < cChunkDef::Height - 1))
 		{
+			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ)));
+			// Grass turns back to dirt when light levels are below 5
+			if (light < 5)
+			{
+				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+				return;
+			}
 			// Source block is not bright enough to spread
-			return;
+			if (light < 9)
+			{
+				return;
+			}
+			
 		}
 
 		// Grass spreads to adjacent dirt blocks:
@@ -96,10 +94,9 @@ public:
 				continue;
 			}
 
-			BLOCKTYPE AboveDest;
-			NIBBLETYPE AboveMeta;
-			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
-			if (cBlockInfo::GetHandler(AboveDest)->CanDirtGrowGrass(AboveMeta))
+			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(BlockX, BlockY + 1, BlockZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(BlockX, BlockY + 1, BlockZ)));
+			// Grass does not spread to blocks with a light level less than 5
+			if (light > 4)
 			{
 				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
 				{
