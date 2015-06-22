@@ -62,12 +62,6 @@ public:
 	}
 
 
-	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
-	{
-		return true;
-	}
-
-
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45;  // So its not aligned with axis

@@ -36,11 +36,6 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_BED, 1, 0));
 	}
 
-	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
-	{
-		return true;
-	}
-
 
 	// Bed specific helper functions
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
