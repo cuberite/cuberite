@@ -103,8 +103,12 @@ public:
 	class cTask
 	{
 	public:
+		cTask(const cTask & other) = default;
 		virtual ~cTask() {}
 		virtual void Run(cWorld & a_World) = 0;
+
+	protected:
+		cTask() {}
 	} ;
 	
 	typedef SharedPtr<cTask> cTaskPtr;
@@ -140,6 +144,21 @@ public:
 		virtual void Run(cWorld & a_World) override;
 
 		std::vector<Vector3i> m_SendQueue;
+	};
+
+	class cTaskLambda :
+		public cTask
+	{
+
+	public:
+		cTaskLambda(std::function<void(cWorld&)> a_Func) :
+			m_func(a_Func)
+		{ }
+
+	protected:
+		virtual void Run(cWorld & a_World) override;
+
+		std::function<void(cWorld&)> m_func;
 	};
 
 
@@ -705,6 +724,9 @@ public:
 	/** Queues a task onto the tick thread. The task object will be deleted once the task is finished */
 	void QueueTask(cTaskPtr a_Task);  // Exported in ManualBindings.cpp
 	
+	/** Queues a lambda task onto the tick thread, with the specified delay. */
+	void ScheduleTask(int a_DelayTicks, std::function<void(cWorld&)> a_Func);
+
 	/** Queues a task onto the tick thread, with the specified delay. */
 	void ScheduleTask(int a_DelayTicks, cTaskPtr a_Task);
 

@@ -19,15 +19,35 @@ public:
 	
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		
+		double x(a_BlockX);
+		double y(a_BlockY);
+		double z(a_BlockZ);
+
+		// If button is already on do nothing
+		if (Meta & 0x08)
+		{
+			return;
+		}
+
 		// Set p the ON bit to on
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) | 0x08);
+		Meta |= 0x08;
 
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
-		a_ChunkInterface.QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07), m_BlockType == E_BLOCK_STONE_BUTTON ? 20 : 30, m_BlockType, a_WorldInterface);
+		int delay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+
+		a_ChunkInterface.QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07), delay, m_BlockType, a_WorldInterface);
+
+		a_Player->GetWorld()->ScheduleTask(delay, [x, y, z](cWorld & a_World)
+		{
+			a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
+		});
+	
 	}
 
 	
