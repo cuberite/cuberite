@@ -27,7 +27,7 @@ public:
 	) override
 	{
 		// Handle growing the plants:
-		if (a_Item.m_ItemDamage == E_META_DYE_WHITE)
+		if ((a_Item.m_ItemDamage == E_META_DYE_WHITE) && (a_BlockFace != BLOCK_FACE_NONE))
 		{
 			if (a_World->GrowRipePlant(a_BlockX, a_BlockY, a_BlockZ, true))
 			{
