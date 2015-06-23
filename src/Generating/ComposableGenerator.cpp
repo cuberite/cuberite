@@ -274,7 +274,7 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 
 	// Create a cache of the composited heightmaps, so that finishers may use it:
-	m_CompositedHeightCache = std::make_shared<cHeiGenMultiCache>(std::make_shared<cCompositedHeiGen>(m_ShapeGen, m_CompositionGen), 16, 24);
+	m_CompositedHeightCache = std::make_shared<cHeiGenMultiCache>(std::make_shared<cCompositedHeiGen>(m_BiomeGen, m_ShapeGen, m_CompositionGen), 16, 24);
 	// 24 subcaches of depth 16 each = 96 KiB of RAM. Acceptable, for the amount of work this saves.
 }
 
