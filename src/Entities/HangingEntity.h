@@ -103,6 +103,7 @@ protected:
 				// ASSERT(!"Tried to convert a bad facing!");
 
 				Dir = cHangingEntity::BlockFaceToProtocolFace(BLOCK_FACE_XP);
+				break;
 			}
 			#if !defined(__clang__)
 			default:
