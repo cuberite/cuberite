@@ -109,11 +109,11 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.AddByte("thundering", a_World->IsWeatherStorm() ? 1 : 0);
 		Writer.AddInt("GameType", static_cast<int>(a_World->GetGameMode()));
 		Writer.AddInt("generatorVersion", 1);
-		Writer.AddInt("SpawnX", static_cast<int>(a_World->GetSpawnX()));
-		Writer.AddInt("SpawnY", static_cast<int>(a_World->GetSpawnY()));
-		Writer.AddInt("SpawnZ", static_cast<int>(a_World->GetSpawnZ()));
+		Writer.AddInt("SpawnX", FloorC(a_World->GetSpawnX()));
+		Writer.AddInt("SpawnY", FloorC(a_World->GetSpawnY()));
+		Writer.AddInt("SpawnZ", FloorC(a_World->GetSpawnZ()));
 		Writer.AddInt("version", 19133);
-		Writer.AddLong("DayTime", static_cast<Int64>(a_World->GetTimeOfDay()));
+		Writer.AddLong("DayTime", a_World->GetTimeOfDay());
 		Writer.AddLong("Time", a_World->GetWorldAge());
 		Writer.AddLong("SizeOnDisk", 0);
 		Writer.AddString("generatorName", "default");
@@ -121,11 +121,6 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.AddString("LevelName", a_World->GetName());
 		Writer.EndCompound();
 		Writer.Finish();
-		
-		#ifdef _DEBUG
-		cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
-		ASSERT(TestParse.IsValid());
-		#endif  // _DEBUG
 		
 		gzFile gz = gzopen((FILE_IO_PREFIX + fnam).c_str(), "wb");
 		if (gz != nullptr)
@@ -1888,7 +1883,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 				case TAG_Short:
 				{
 					// Vanilla uses this
-					Arrow->SetBlockHit(Vector3i(static_cast<int>(a_NBT.GetShort(InBlockXIdx)), static_cast<int>(a_NBT.GetShort(InBlockYIdx)), static_cast<int>(a_NBT.GetShort(InBlockZIdx))));
+					Arrow->SetBlockHit(Vector3i(a_NBT.GetShort(InBlockXIdx), a_NBT.GetShort(InBlockYIdx), a_NBT.GetShort(InBlockZIdx)));
 					break;
 				}
 				default:
@@ -3138,15 +3133,22 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 		return false;
 	}
 	
-	m_File.Seek(static_cast<int>(ChunkOffset) * 4096);
+	m_File.Seek(static_cast<int>(ChunkOffset * 4096));
 	
-	int ChunkSize = 0;
+	UInt32 ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
 		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
-	ChunkSize = ntohl(static_cast<u_long>(ChunkSize));
+	ChunkSize = ntohl(ChunkSize);
+	if (ChunkSize < 1)
+	{
+		// Chunk size too small
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		return false;
+	}
+
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{
@@ -3161,9 +3163,8 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	}
 	ChunkSize--;
 	
-	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
-	a_Data.assign(static_cast<size_t>(ChunkSize), '\0');
-	if (static_cast<size_t>(m_File.Read(static_cast<void *>(const_cast<char*>(a_Data.data())), static_cast<size_t>(ChunkSize))) == static_cast<size_t>(ChunkSize))
+	a_Data = m_File.Read(ChunkSize);
+	if (a_Data.size() == ChunkSize)
 	{
 		return true;
 	}

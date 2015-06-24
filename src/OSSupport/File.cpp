@@ -147,7 +147,7 @@ bool cFile::IsEOF(void) const
 
 
 
-int cFile::Read (void * iBuffer, size_t iNumBytes)
+int cFile::Read (void * a_Buffer, size_t a_NumBytes)
 {
 	ASSERT(IsOpen());
 	
@@ -156,14 +156,35 @@ int cFile::Read (void * iBuffer, size_t iNumBytes)
 		return -1;
 	}
 	
-	return static_cast<int>(fread(iBuffer, 1, static_cast<size_t>(iNumBytes), m_File));  // fread() returns the portion of Count parameter actually read, so we need to send iNumBytes as Count
+	return static_cast<int>(fread(a_Buffer, 1, a_NumBytes, m_File));  // fread() returns the portion of Count parameter actually read, so we need to send a_a_NumBytes as Count
 }
 
 
 
 
 
-int cFile::Write(const void * iBuffer, size_t iNumBytes)
+AString cFile::Read(size_t a_NumBytes)
+{
+	ASSERT(IsOpen());
+	
+	if (!IsOpen())
+	{
+		return AString();
+	}
+
+	// HACK: This depends on the knowledge that AString::data() returns the internal buffer, rather than a copy of it.
+	AString res;
+	res.resize(a_NumBytes);
+	auto newSize = fread(const_cast<char *>(res.data()), 1, a_NumBytes, m_File);
+	res.resize(newSize);
+	return res;
+}
+
+
+
+
+
+int cFile::Write(const void * a_Buffer, size_t a_NumBytes)
 {
 	ASSERT(IsOpen());
 	
@@ -172,7 +193,7 @@ int cFile::Write(const void * iBuffer, size_t iNumBytes)
 		return -1;
 	}
 
-	int res = static_cast<int>(fwrite(iBuffer, 1, static_cast<size_t>(iNumBytes), m_File));  // fwrite() returns the portion of Count parameter actually written, so we need to send iNumBytes as Count
+	int res = static_cast<int>(fwrite(a_Buffer, 1, a_NumBytes, m_File));  // fwrite() returns the portion of Count parameter actually written, so we need to send a_NumBytes as Count
 	return res;
 }
 
