@@ -69,14 +69,14 @@ Since only the header is actually in the memory, this number can be high, but st
 */
 #define MAX_MCA_FILES 32
 
-#define LOAD_FAILED(CHX, CHZ) \
+#define LOAD_FAILED(CHX, CHZ, REASON) \
 	{ \
 		const int RegionX = FAST_FLOOR_DIV(CHX, 32); \
 		const int RegionZ = FAST_FLOOR_DIV(CHZ, 32); \
-		LOGERROR("%s (%d): Loading chunk [%d, %d] from file r.%d.%d.mca failed. " \
+		LOGERROR("%s (%d): Loading chunk [%d, %d] from file r.%d.%d.mca failed: %s. " \
 			"The server will now abort in order to avoid further data loss. " \
 			"Please add the reported file and this message to the issue report.", \
-			__FUNCTION__, __LINE__, CHX, CHZ, RegionX, RegionZ \
+			__FUNCTION__, __LINE__, CHX, CHZ, RegionX, RegionZ, REASON \
 		); \
 		*(reinterpret_cast<volatile int *>(0)) = 0;  /* Crash intentionally */ \
 	}
@@ -277,7 +277,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	if (res != Z_OK)
 	{
 		LOGWARNING("Uncompressing chunk [%d, %d] failed: %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, res);
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "InflateString() failed");
 		return false;
 	}
 	
@@ -286,7 +286,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT parsing failed");
 		return false;
 	}
 
@@ -333,19 +333,19 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	int Level = a_NBT.FindChildByName(0, "Level");
 	if (Level < 0)
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Level");
 		return false;
 	}
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
 	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Sections");
 		return false;
 	}
 	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
 	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag has wrong type: Sections");
 		return false;
 	}
 	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
@@ -3138,27 +3138,27 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	UInt32 ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size");
 		return false;
 	}
 	ChunkSize = ntohl(ChunkSize);
 	if (ChunkSize < 1)
 	{
 		// Chunk size too small
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small");
 		return false;
 	}
 
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression");
 		return false;
 	}
 	if (CompressionType != 2)
 	{
 		// Chunk is in an unknown compression
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType).c_str());
 		return false;
 	}
 	ChunkSize--;
@@ -3168,7 +3168,7 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	{
 		return true;
 	}
-	LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+	LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read entire chunk data");
 	return false;
 }
 
