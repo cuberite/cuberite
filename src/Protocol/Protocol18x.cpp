@@ -2692,7 +2692,7 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		case 0x0206: Action = caNumber7;         break;
 		case 0x0207: Action = caNumber8;         break;
 		case 0x0208: Action = caNumber9;         break;
-		case 0x0300: Action = caMiddleClick;     break;
+		case 0x0302: Action = caMiddleClick;     break;
 		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
 		case 0x0401: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
 		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin               : caUnknown;     break;
