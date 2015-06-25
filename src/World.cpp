@@ -3051,7 +3051,11 @@ void cWorld::QueueTask(cTaskPtr a_Task)
 }
 
 
-
+void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld&)> a_Func)
+{
+	cTaskLambda task(a_Func);
+	ScheduleTask(a_DelayTicks, static_cast<cTaskPtr>(std::make_shared<cTaskLambda>(task)));
+}
 
 
 void cWorld::ScheduleTask(int a_DelayTicks, cTaskPtr a_Task)
@@ -3554,8 +3558,10 @@ void cWorld::cTaskSendBlockToAllPlayers::Run(cWorld & a_World)
 	a_World.ForEachPlayer(PlayerCallback);
 }
 
-
-
+void cWorld::cTaskLambda::Run(cWorld & a_World)
+{
+	m_func(a_World);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -490,7 +490,7 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 
 	auto task = std::make_shared<cLuaScheduledWorldTask>(*Plugin, FnRef);
 	Plugin->AddResettable(task);
-	World->ScheduleTask(DelayTicks, task);
+	World->ScheduleTask(DelayTicks, static_cast<cWorld::cTaskPtr>(task));
 	return 0;
 }
 
