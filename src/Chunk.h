@@ -7,7 +7,7 @@
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/IncrementalRedstoneSimulator.h"
+#include "Simulator/Redstone/RedstoneSimulator.h"
 
 #include "Blocks/GetHandlerCompileTimeTemplate.h"
 
