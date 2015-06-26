@@ -1073,9 +1073,9 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtHorse:
 		{
 			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
-			int HorseType = Random.NextInt(7);
-			int HorseColor = Random.NextInt(6);
-			int HorseStyle = Random.NextInt(6);
+			int HorseType = Random.NextInt(8);
+			int HorseColor = Random.NextInt(7);
+			int HorseStyle = Random.NextInt(5);
 			int HorseTameTimes = Random.NextInt(6) + 1;
 
 			if ((HorseType == 5) || (HorseType == 6) || (HorseType == 7))
