@@ -34,8 +34,8 @@
 #include "Simulator/FireSimulator.h"
 #include "Simulator/NoopFluidSimulator.h"
 #include "Simulator/NoopRedstoneSimulator.h"
+#include "Simulator/IncrementalRedstoneSimulator/IncrementalRedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/IncrementalRedstoneSimulator.h"
 #include "Simulator/VanillaFluidSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
 
@@ -990,8 +990,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
 
 	TickWeather(static_cast<float>(a_Dt.count()));
-
-	m_ChunkMap->FastSetQueuedBlocks();
 
 	if (m_WorldAge - m_LastSave > std::chrono::minutes(5))  // Save each 5 minutes
 	{
@@ -3626,7 +3624,7 @@ cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 		res = new cRedstoneNoopSimulator(*this);
 	}
 	
-	m_SimulatorManager->RegisterSimulator(res, 1);
+	m_SimulatorManager->RegisterSimulator(res, 2 /* Two game ticks is a redstone tick */);
 	
 	return res;
 }

@@ -72,16 +72,6 @@ void cChunkInterface::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIB
 
 
 
-void cChunkInterface::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay, BLOCKTYPE a_PreviousBlockType, cWorldInterface &  a_WorldInterface)
-{
-	m_ChunkMap->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_WorldInterface.GetWorldAge() + a_TickDelay, a_PreviousBlockType);
-}
-
-
-
-
-
-
 /** Sets the block at the specified coords to the specified value.
 The replacement doesn't trigger block updates.
 The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block)

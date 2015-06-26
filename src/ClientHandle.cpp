@@ -927,6 +927,12 @@ void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEf
 
 void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_NewCommand)
 {
+	if (a_NewCommand.empty())
+	{
+		Kick("Command block string unexpectedly empty - hacked client?");
+		return;
+	}
+
 	cWorld * World = m_Player->GetWorld();
 	if (World->AreCommandBlocksEnabled())
 	{

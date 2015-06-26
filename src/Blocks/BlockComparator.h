@@ -60,16 +60,17 @@ public:
 		return true;
 	}
 
-	inline static Vector3i GetSideCoordinate(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, bool a_bInverse)
+	inline static Vector3i GetSideCoordinate(const Vector3i & a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
 	{
+		auto Position = a_Position;
 		if (!a_bInverse)
 		{
 			switch (a_Meta)
 			{
-				case 0x0: a_BlockX++; break;
-				case 0x1: a_BlockZ--; break;
-				case 0x2: a_BlockX--; break;
-				case 0x3: a_BlockZ++; break;
+				case 0x0: Position.x++; break;
+				case 0x1: Position.z--; break;
+				case 0x2: Position.x--; break;
+				case 0x3: Position.z++; break;
 				default:
 				{
 					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -82,10 +83,10 @@ public:
 		{
 			switch (a_Meta)
 			{
-				case 0x0: a_BlockX--; break;
-				case 0x1: a_BlockZ++; break;
-				case 0x2: a_BlockX++; break;
-				case 0x3: a_BlockZ--; break;
+				case 0x0: Position.x--; break;
+				case 0x1: Position.z++; break;
+				case 0x2: Position.x++; break;
+				case 0x3: Position.z--; break;
 				default:
 				{
 					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -95,17 +96,18 @@ public:
 			}
 		}
 
-		return Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+		return Position;
 	}
 
-	inline static Vector3i GetRearCoordinate(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+	inline static Vector3i GetRearCoordinate(const Vector3i & a_Position, NIBBLETYPE a_Meta)
 	{
+		auto Position = a_Position;
 		switch (a_Meta)
 		{
-			case 0x0: a_BlockZ++; break;
-			case 0x1: a_BlockX--; break;
-			case 0x2: a_BlockZ--; break;
-			case 0x3: a_BlockX++; break;
+			case 0x0: Position.z++; break;
+			case 0x1: Position.x--; break;
+			case 0x2: Position.z--; break;
+			case 0x3: Position.x++; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -114,17 +116,18 @@ public:
 			}
 		}
 
-		return Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+		return Position;
 	}
 
-	inline static Vector3i GetFrontCoordinate(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+	inline static Vector3i GetFrontCoordinate(const Vector3i & a_Position, NIBBLETYPE a_Meta)
 	{
+		auto Position = a_Position;
 		switch (a_Meta)
 		{
-			case 0x0: a_BlockZ--; break;
-			case 0x1: a_BlockX++; break;
-			case 0x2: a_BlockZ++; break;
-			case 0x3: a_BlockX--; break;
+			case 0x0: Position.z--; break;
+			case 0x1: Position.x++; break;
+			case 0x2: Position.z++; break;
+			case 0x3: Position.x--; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -133,7 +136,7 @@ public:
 			}
 		}
 
-		return Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+		return Position;
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

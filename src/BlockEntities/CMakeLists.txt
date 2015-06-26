@@ -42,7 +42,6 @@ SET (HDRS
 	MobHeadEntity.h
 	MobSpawnerEntity.h
 	NoteEntity.h
-	RedstonePoweredEntity.h
 	SignEntity.h
 )
 

@@ -65,7 +65,7 @@ public:
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
-		switch (a_MetaData)
+		switch (a_MetaData & 0x7)  // We only want the bottom three bits (4th controls extended-ness))
 		{
 			case 0x0: return BLOCK_FACE_YM;
 			case 0x1: return BLOCK_FACE_YP;
