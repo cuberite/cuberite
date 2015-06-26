@@ -69,7 +69,7 @@ public:
 	The dimension parameter is used to create a world with a specific dimension
 	a_OverworldName should be set for non-overworld dimensions if one wishes that world to link back to an overworld via portals
 	*/
-	cWorld * CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
+	cWorld * CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "", bool a_InitSpawn = true);
 
 	/** Returns the up time of the server in seconds */
 	int GetServerUpTime(void)

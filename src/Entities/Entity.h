@@ -350,31 +350,31 @@ public:
 	*/
 	virtual bool DetectPortal(void);
 	
-	/// Handles when the entity is in the void
+	/** Handles when the entity is in the void */
 	virtual void TickInVoid(cChunk & a_Chunk);
 
-	/// Called when the entity starts burning
+	/** Called when the entity starts burning */
 	virtual void OnStartedBurning(void);
 	
-	/// Called when the entity finishes burning
+	/** Called when the entity finishes burning */
 	virtual void OnFinishedBurning(void);
 	
 	// tolua_begin
 	
-	/// Sets the maximum value for the health
+	/** Sets the maximum value for the health */
 	void SetMaxHealth(int a_MaxHealth);
 
 	int GetMaxHealth(void) const { return m_MaxHealth; }
 	
-	/// Sets whether the entity is fireproof
+	/** Sets whether the entity is fireproof */
 	void SetIsFireproof(bool a_IsFireproof);
 	
 	bool IsFireproof(void) const { return m_IsFireproof; }
 	
-	/// Puts the entity on fire for the specified amount of ticks
+	/** Puts the entity on fire for the specified amount of ticks */
 	void StartBurning(int a_TicksLeftBurning);
 	
-	/// Stops the entity from burning, resets all burning timers
+	/** Stops the entity from burning, resets all burning timers */
 	void StopBurning(void);
 	
 	// tolua_end
@@ -386,14 +386,14 @@ public:
 
 	// tolua_begin
 	
-	/// Teleports to the entity specified
+	/** Teleports to the entity specified */
 	virtual void TeleportToEntity(cEntity & a_Entity);
 	
-	/// Teleports to the coordinates specified
+	/** Teleports to the coordinates specified */
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
-	/// Schedules a MoveToWorld call to occur on the next Tick of the entity
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition);
+	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
+	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown = false);
 
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) { return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition); }
 
@@ -538,6 +538,7 @@ protected:
 
 	/** State variables for ScheduleMoveToWorld. */
 	bool m_IsWorldChangeScheduled;
+	bool m_WorldChangeSetPortalCooldown;
 	cWorld * m_NewWorld;
 	Vector3d m_NewWorldPosition;
 	

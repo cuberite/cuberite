@@ -1269,11 +1269,12 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition)
+void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown)
 {
 	m_NewWorld = a_World;
 	m_NewWorldPosition = a_NewPosition;
 	m_IsWorldChangeScheduled = true;
+	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
 }
 
 
@@ -1285,6 +1286,14 @@ bool cEntity::DetectPortal()
 	if (m_IsWorldChangeScheduled)
 	{
 		m_IsWorldChangeScheduled = false;
+
+		if (m_WorldChangeSetPortalCooldown)
+		{
+			// Delay the portal check.
+			m_PortalCooldownData.m_TicksDelayed = 0;
+			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+		}
+
 		MoveToWorld(m_NewWorld, false, m_NewWorldPosition);
 		return true;
 	}
@@ -1343,10 +1352,10 @@ bool cEntity::DetectPortal()
 					TargetPos.x *= 8.0;
 					TargetPos.z *= 8.0;
 
-					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName(), dimNether, GetWorld()->GetName());
+					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName(), dimNether, GetWorld()->GetName(), false);
 					LOGD("Jumping nether -> overworld");
 					new cNetherPortalScanner(this, TargetWorld, TargetPos, 256);
-					return false;
+					return true;
 				}
 				else
 				{
@@ -1367,10 +1376,10 @@ bool cEntity::DetectPortal()
 					TargetPos.x /= 8.0;
 					TargetPos.z /= 8.0;
 
-					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName());
+					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName(), false);
 					LOGD("Jumping overworld -> nether");
 					new cNetherPortalScanner(this, TargetWorld, TargetPos, 128);
-					return false;
+					return true;
 				}
 			}
 			case E_BLOCK_END_PORTAL:
