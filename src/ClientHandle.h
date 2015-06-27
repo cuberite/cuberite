@@ -23,7 +23,7 @@
 
 
 #include <array>
-
+#include <atomic>
 
 
 // fwd:
@@ -447,7 +447,7 @@ private:
 		// TODO: Add Kicking here as well
 	} ;
 	
-	eState m_State;
+	std::atomic<eState> m_State;
 	
 	/** m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads */
 	cCriticalSection m_CSDestroyingState;
