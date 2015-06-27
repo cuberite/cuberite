@@ -31,7 +31,7 @@ public:
 
 	// cEntity overrides
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-	virtual void Tick        (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick        (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) REQUIRES(WorldTick) override;
 
 	// cVillager functions
 	/** return true if the given blocktype are: crops, potatoes or carrots. */

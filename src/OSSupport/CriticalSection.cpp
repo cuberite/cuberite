@@ -130,7 +130,7 @@ void cCSLock::Unlock(void)
 
 ////////////////////////////////////////////////////////////////////////////////
 // cCSUnlock:
-
+/*
 cCSUnlock::cCSUnlock(cCSLock & a_Lock) :
 	m_Lock(a_Lock)
 {
@@ -145,7 +145,7 @@ cCSUnlock::~cCSUnlock()
 {
 	m_Lock.Lock();
 }
-
+*/
 
 
 

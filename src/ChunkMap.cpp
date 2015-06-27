@@ -1071,7 +1071,7 @@ int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 		}
 
 		// The chunk is not valid, wait for it to become valid:
-		cCSUnlock Unlock(Lock);
+		m_CSLayers.Unlock();
 		m_evtChunkValid.Wait();
 	}  // while (true)
 }

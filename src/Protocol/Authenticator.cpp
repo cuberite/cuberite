@@ -102,8 +102,9 @@ void cAuthenticator::Execute(void)
 		cCSLock Lock(m_CS);
 		while (!m_ShouldTerminate && (m_Queue.size() == 0))
 		{
-			cCSUnlock Unlock(Lock);
+			m_CS.Unlock();
 			m_QueueNonempty.Wait();
+			m_CS.Lock();
 		}
 		if (m_ShouldTerminate)
 		{
@@ -116,7 +117,7 @@ void cAuthenticator::Execute(void)
 		AString UserName = User.m_Name;
 		AString ServerID = User.m_ServerID;
 		m_Queue.pop_front();
-		Lock.Unlock();
+		m_CS.Unlock();
 
 		AString NewUserName = UserName;
 		AString UUID;

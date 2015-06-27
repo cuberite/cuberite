@@ -102,8 +102,9 @@ public:
 		cCSLock Lock(m_CS);
 		while (m_Contents.empty())
 		{
-			cCSUnlock Unlock(Lock);
+			m_CS.Unlock();
 			m_evtAdded.Wait();
+			m_CS.Lock();
 		}
 		ItemType item = m_Contents.front();
 		m_Contents.pop_front();
@@ -118,8 +119,9 @@ public:
 		cCSLock Lock(m_CS);
 		while (!m_Contents.empty())
 		{
-			cCSUnlock Unlock(Lock);
+			m_CS.Unlock();
 			m_evtRemoved.Wait();
+			m_CS.Lock();
 		}
 	}
 

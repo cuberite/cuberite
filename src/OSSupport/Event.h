@@ -24,7 +24,7 @@ public:
 
 	/** Waits until the event has been set.
 	If the event has been set before it has been waited for, Wait() returns immediately. */
-	void Wait(void);
+	void Wait(void) noexcept;
 
 	/** Sets the event - releases one thread that has been waiting in Wait().
 	If there was no thread waiting, the next call to Wait() will not block. */

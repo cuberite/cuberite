@@ -21,7 +21,7 @@ cEvent::cEvent(void) :
 
 
 
-void cEvent::Wait(void)
+void cEvent::Wait(void) noexcept
 {
 	{
 		std::unique_lock<std::mutex> Lock(m_Mutex);
