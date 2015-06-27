@@ -196,7 +196,14 @@ typedef unsigned char Byte;
 
 
 
+#ifdef CLANG_THREAD_ANALYSIS
+typedef int __attribute__((capability("role"))) ThreadRole;
+extern ThreadRole WorldTick;
 
+void acquire(ThreadRole R) __attribute__((acquire_capability(R))) __attribute__((no_thread_safety_analysis));
+void release(ThreadRole R) __attribute__((release_capability(R))) __attribute__((no_thread_safety_analysis));
+inline void acquire(ThreadRole R) {}
+inline void release(ThreadRole R) {}
 
 #define THREAD_ANNOTATION_ATTRIBUTE__(x)   __attribute__((x))
 
