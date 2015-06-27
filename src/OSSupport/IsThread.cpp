@@ -70,8 +70,14 @@ cIsThread::~cIsThread()
 
 void cIsThread::DoExecute(void)
 {
+#ifdef __clang__
+	AquireOnThread();
+#endif
 	m_evtStart.Wait();
 	Execute();
+#ifdef __clang__
+	ReleaseOnThread();
+#endif
 }
 
 

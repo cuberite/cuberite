@@ -172,8 +172,9 @@ void cLightingThread::WaitForQueueEmpty(void)
 	cCSLock Lock(m_CS);
 	while (!m_ShouldTerminate && (!m_Queue.empty() || !m_PendingQueue.empty()))
 	{
-		cCSUnlock Unlock(Lock);
+		m_CS.Unlock();
 		m_evtQueueEmpty.Wait();
+		m_CS.Lock();
 	}
 }
 
@@ -199,8 +200,9 @@ void cLightingThread::Execute(void)
 			cCSLock Lock(m_CS);
 			if (m_Queue.empty())
 			{
-				cCSUnlock Unlock(Lock);
+				m_CS.Unlock();
 				m_evtItemAdded.Wait();
+				m_CS.Lock();
 			}
 		}
 		

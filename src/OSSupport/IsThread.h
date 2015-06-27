@@ -22,12 +22,12 @@ In the descending class' constructor call the Start() method to start the thread
 
 
 
-class cIsThread
+class CAPABILITY("role") cIsThread
 {
 protected:
 	/** This is the main thread entrypoint.
 	This function, overloaded by the descendants, is called in the new thread. */
-	virtual void Execute(void) = 0;
+	virtual void Execute(void) REQUIRES(this) = 0;
 
 	/** The overriden Execute() method should check this value periodically and terminate if this is true. */
 	volatile bool m_ShouldTerminate;
@@ -59,6 +59,11 @@ protected:
 	/** The event that is used to wait with the thread's execution until the thread object is fully initialized.
 	This prevents the IsCurrentThread() call to fail because of a race-condition. */
 	cEvent m_evtStart;
+
+	#ifdef __clang__
+		void AquireOnThread() ACQUIRE() {}
+		void ReleaseOnThread() RELEASE() {}
+	#endif
 } ;
 
 

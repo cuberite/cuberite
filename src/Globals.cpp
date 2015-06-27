@@ -5,6 +5,8 @@
 
 #include "Globals.h"
 
-
+#ifdef CLANG_THREAD_ANALYSIS
+ThreadRole WorldTick;
+#endif
 
 

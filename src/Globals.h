@@ -261,6 +261,41 @@ template class SizeChecker<UInt8,  1>;
 
 
 
+#ifdef CLANG_THREAD_ANALYSIS
+typedef int __attribute__((capability("role"))) ThreadRole;
+extern ThreadRole WorldTick;
+
+void acquire(ThreadRole R) __attribute__((acquire_capability(R))) __attribute__((no_thread_safety_analysis));
+void release(ThreadRole R) __attribute__((release_capability(R))) __attribute__((no_thread_safety_analysis));
+inline void acquire(ThreadRole R) {}
+inline void release(ThreadRole R) {}
+
+#define THREAD_ANNOTATION_ATTRIBUTE__(x)   __attribute__((x))
+
+#define ACQUIRE_ROLE(x) acquire(x)
+#define RELEASE_ROLE(x) release(x)
+#else
+
+#define THREAD_ANNOTATION_ATTRIBUTE__(x)   // no-op
+
+#define ACQUIRE_ROLE(x)
+#define RELEASE_ROLE(x)
+
+#endif
+
+#define CAPABILITY(x) THREAD_ANNOTATION_ATTRIBUTE__(capability(x))
+
+#define REQUIRES(...) THREAD_ANNOTATION_ATTRIBUTE__(requires_capability(__VA_ARGS__))
+
+#define ACQUIRE(...) THREAD_ANNOTATION_ATTRIBUTE__(acquire_capability(__VA_ARGS__))
+
+#define RELEASE(...) THREAD_ANNOTATION_ATTRIBUTE__(release_capability(__VA_ARGS__))
+
+#define EXCLUDES(...) THREAD_ANNOTATION_ATTRIBUTE__(locks_excluded(__VA_ARGS__))
+
+#define NO_THREAD_SAFETY_ANALYSIS THREAD_ANNOTATION_ATTRIBUTE__(no_thread_safety_analysis)
+
+
 // Common headers (part 1, without macros):
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"

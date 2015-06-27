@@ -15,7 +15,7 @@ class cGuardian :
 public:
 	cGuardian();
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) REQUIRES(WorldTick) override;
 
 	CLASS_PROTODEF(cGuardian)
 	
