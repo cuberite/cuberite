@@ -55,6 +55,18 @@ public:
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
 
+	/** Returns or sets the minumim or maximum netherportal width */
+	virtual int GetMinNetherPortalWidth(void) const = 0;
+	virtual int GetMaxNetherPortalWidth(void) const = 0;
+	virtual void SetMinNetherPortalWidth(int a_NewMinWidth) = 0;
+	virtual void SetMaxNetherPortalWidth(int a_NewMaxWidth) = 0;
+
+	/** Returns or sets the minumim or maximum netherportal height */
+	virtual int GetMinNetherPortalHeight(void) const = 0;
+	virtual int GetMaxNetherPortalHeight(void) const = 0;
+	virtual void SetMinNetherPortalHeight(int a_NewMinHeight) = 0;
+	virtual void SetMaxNetherPortalHeight(int a_NewMaxHeight) = 0;
+
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
 	virtual int GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
