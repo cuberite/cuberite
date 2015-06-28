@@ -1056,7 +1056,7 @@ int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 {
 	for (;;)
 	{
-		cCSLock Lock(m_CSLayers);
+		m_CSLayers.Lock();
 		int ChunkX, ChunkZ, BlockY = 0;
 		cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
 		cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
