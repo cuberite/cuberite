@@ -411,7 +411,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	int OffZ = BlockStartZ - m_PosZ * cChunkDef::Width;
 	int BaseX = BlockStartX - a_MinBlockX;
 	int BaseZ = BlockStartZ - a_MinBlockZ;
-	int SizeY = a_Area.GetSizeY();
+	int SizeY = std::min(a_Area.GetSizeY(), cChunkDef::Height - a_MinBlockY);
 
 	// TODO: Improve this by not calling FastSetBlock() and doing the processing here
 	// so that the heightmap is touched only once for each column.
