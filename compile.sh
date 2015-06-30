@@ -1,7 +1,7 @@
 #|| goto :windows_detected
 
 # Do we already have a repo?
-if [[ -d .git && -f easyinstall.sh && -f MakeLuaAPI.cmd ]]; then # A good enough indicator that we're in the MCServer git repo.
+if [[ -d .git && -f easyinstall.sh && -f src/BlockArea.cpp ]]; then # A good enough indicator that we're in the MCServer git repo.
 cd ../
 echo "MCServer repository detected. This should make the process faster, especially if you compiled before."
 fi
