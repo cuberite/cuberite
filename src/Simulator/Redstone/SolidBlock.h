@@ -14,21 +14,27 @@ namespace Redstone
 		SolidBlock(Vector3i location) :
 			Component(location, SOLIDBLOCK, true), isStrongPowered(false), power(0)
 		{
-			LOGD("SolidBlock const {%d %d %d}", location.x, location.y, location.z);
+			LOGD("SolidBlock created {%d %d %d}", location.x, location.y, location.z);
 		}
 
-		virtual int CanStrongPower(Vector3i location)
+		virtual int CanStrongPower(Component * component)
 		{
 			return isStrongPowered ? power : 0;
 		}
 
-		virtual int CanWeakPower(Vector3i location)
+		virtual int CanWeakPower(Component * component)
 		{
 			return power;
 		}
 
-		virtual cVector3iArray Update(ComponentFactory & factory, BLOCKTYPE & block, NIBBLETYPE & meta)
+		virtual bool GetState(BLOCKTYPE & block, NIBBLETYPE & meta)
 		{
+			return false;
+		}
+
+		virtual cVector3iArray Update(ComponentFactory & factory, int ticks)
+		{
+			UNUSED(ticks);
 			LOGD("Evaluating SolidBlock (%d %d %d)", Location.x, Location.y, Location.z);
 			// calculated value for power
 			int cp = 0;
@@ -41,16 +47,16 @@ namespace Redstone
 				if (comp == nullptr) continue;
 				if (!comp->IsFullBlock)
 				{
-					int p = comp->CanStrongPower(Location);
+					int p = comp->CanStrongPower(this);
 					if (p > 0)
 					{
 						cSp = true;
 					}
 					else
 					{
-						p = comp->CanWeakPower(Location);
+						p = comp->CanWeakPower(this);
 					}
-					cp = (power < p) ? p : cp;
+					cp = (cp < p) ? p : cp;
 				}
 			}
 

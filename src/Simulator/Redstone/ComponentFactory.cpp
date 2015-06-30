@@ -1,11 +1,11 @@
 
-
 #include "Globals.h"
 #include "ComponentFactory.h"
 
 // Block types
 #include "Torch.h"
 #include "SolidBlock.h"
+
 
 namespace Redstone
 {
@@ -20,7 +20,6 @@ namespace Redstone
 		// first attempt to grab the component from chunk's cache
 		// then create the component based on block type
 
-		
 		ComponentPtr component(m_Data->GetComponent(location));
 
 		BLOCKTYPE blockType;
@@ -70,9 +69,9 @@ namespace Redstone
 		switch (type)
 		{
 			case TORCH:
-				return ComponentPtr(new Torch(location, blockType, meta));
+				return ComponentPtr(std::make_shared<Torch>(location, blockType, meta));
 			case SOLIDBLOCK:
-				return ComponentPtr(new SolidBlock(location));
+				return ComponentPtr(std::make_shared<SolidBlock>(location));
 			default:
 				return nullptr;
 		}

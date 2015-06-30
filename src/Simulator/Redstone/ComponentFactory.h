@@ -19,12 +19,6 @@ namespace Redstone
 
 		ComponentPtr GetComponent(Vector3i location);
 
-	private:
-		cWorld & m_World;
-		cRedstoneSimulatorChunkData * m_Data;
-		ComponentPtr CreateComponent(RedstoneType type, Vector3i location, BLOCKTYPE blockType, NIBBLETYPE meta);
-		RedstoneType GetType(Vector3i location, BLOCKTYPE & blockType, NIBBLETYPE & meta);
-
 		inline static bool IsSolidBlock(BLOCKTYPE blockType)
 		{
 			switch (blockType)
@@ -94,6 +88,14 @@ namespace Redstone
 				default: return false;
 			}
 		}
+
+	private:
+		cWorld & m_World;
+		cRedstoneSimulatorChunkData * m_Data;
+		ComponentPtr CreateComponent(RedstoneType type, Vector3i location, BLOCKTYPE blockType, NIBBLETYPE meta);
+		RedstoneType GetType(Vector3i location, BLOCKTYPE & blockType, NIBBLETYPE & meta);
+
+		
 	};
 
 }

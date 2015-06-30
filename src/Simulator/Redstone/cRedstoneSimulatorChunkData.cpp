@@ -11,8 +11,7 @@ void cRedstoneSimulatorChunkData::WakeUp(Vector3i location)
 	}
 	else
 	{
-		auto result = find(m_ActiveBlocks.begin(), m_ActiveBlocks.end(), location);
-		if (result != m_ActiveBlocks.end())
+		if (find(m_ActiveBlocks.begin(), m_ActiveBlocks.end(), location) == m_ActiveBlocks.end())
 		{
 			m_ActiveBlocks.push_back(location);
 		}
@@ -30,7 +29,25 @@ ComponentPtr cRedstoneSimulatorChunkData::GetComponent(Vector3i location)
 
 void cRedstoneSimulatorChunkData::RemoveComponent(Vector3i location)
 {
-	m_ChunkData.erase(location);
+	if (!m_ChunkData.erase(location))
+	{
+		return;
+	}
+
+	//// not sure if this is the best place, but update surounding blocks when one changes
+	cVector3iList adjacents = {
+		{ location.x + 1, location.y, location.z },
+		{ location.x - 1, location.y, location.z },
+		{ location.x, location.y + 1, location.z },
+		{ location.x, location.y - 1, location.z },
+		{ location.x, location.y, location.z + 1 },
+		{ location.x, location.y, location.z - 1 },
+	};
+
+	for (Vector3i item : adjacents)
+	{
+		WakeUp(item);
+	}
 }
 
 void cRedstoneSimulatorChunkData::SetComponent(ComponentPtr component)

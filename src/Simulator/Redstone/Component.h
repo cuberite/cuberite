@@ -18,13 +18,19 @@ namespace Redstone
 		Component(Vector3i location, RedstoneType type, bool isSolidBlock = false) : 
 			Location(location), IsFullBlock(isSolidBlock), Type(type) {}
 
-		virtual int CanStrongPower(Vector3i location) = 0;
-		virtual int CanWeakPower(Vector3i location) = 0;
-		virtual cVector3iArray Update(ComponentFactory & factory, BLOCKTYPE & block, NIBBLETYPE & meta) = 0;
+		// disable the copy constructor and assignment operator
+		Component(const Component &) = delete;
+		Component * operator = (const Component &) = delete;
+
+		virtual cVector3iArray Update(ComponentFactory & factory, int tick) = 0;
+		virtual bool GetState(BLOCKTYPE & block, NIBBLETYPE & meta) = 0;
+		virtual int CanStrongPower(Component * component) = 0;
+		virtual int CanWeakPower(Component * component) = 0;
 
 		~Component() {}
 
 	protected:
+
 		Vector3i Up()
 		{
 			return Vector3i(Location.x, Location.y + 1, Location.z);
@@ -35,14 +41,28 @@ namespace Redstone
 			return Vector3i(Location.x, Location.y - 1, Location.z);
 		}
 
-		bool IsAdjacent(Vector3i location)
+		bool IsAdjacent(const Vector3i & location)
 		{
 			double len = (location - Location).SqrLength();
 			return len == -1 || len == 1;
 		}
 
-		cVector3iArray GetAdjacent()
+		cVector3iArray GetAdjacent(bool includeSelf = false)
 		{
+			if (includeSelf)
+			{
+				return
+				{
+					{ Location.x, Location.y, Location.z },
+					{ Location.x + 1, Location.y, Location.z },
+					{ Location.x - 1, Location.y, Location.z },
+					{ Location.x, Location.y + 1, Location.z },
+					{ Location.x, Location.y - 1, Location.z },
+					{ Location.x, Location.y, Location.z + 1 },
+					{ Location.x, Location.y, Location.z - 1 },
+				};
+			}
+
 			return 
 			{ 
 				{ Location.x+1, Location.y, Location.z },

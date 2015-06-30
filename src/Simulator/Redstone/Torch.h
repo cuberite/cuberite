@@ -11,50 +11,72 @@ namespace Redstone
 
 	public:
 
-		Torch(Vector3i location, BLOCKTYPE blockType, NIBBLETYPE meta) : 
-			Component(location, TORCH), isBurntOut(false), heat(0)
+		Torch(Vector3i location, BLOCKTYPE blockType, NIBBLETYPE meta) :
+			Component(location, TORCH), m_Meta(meta), ticks(-1), pushUpdate(false) //, isBurntOut(false), heat(0)
 		{
-			LOGD("Torch const: %d %d %d", location.x, location.y, location.z);
+			LOGD("Torch created: %d %d %d", location.x, location.y, location.z);
 			isOn = (blockType == E_BLOCK_REDSTONE_TORCH_ON);
 
 			switch (meta)
 			{
-				case E_META_TORCH_FLOOR: attachedTo = Vector3i(Location.x, Location.y - 1, Location.z);
-				case E_META_TORCH_EAST: attachedTo = Vector3i(Location.x + 1, Location.y, Location.z);
-				case E_META_TORCH_WEST: attachedTo = Vector3i(Location.x - 1, Location.y, Location.z);
-				case E_META_TORCH_NORTH: attachedTo = Vector3i(Location.x, Location.y, Location.z - 1);
-				case E_META_TORCH_SOUTH: attachedTo = Vector3i(Location.x, Location.y, Location.z + 1);
-
+				case E_META_TORCH_FLOOR: 
+					attachedTo = Vector3i(Location.x, Location.y - 1, Location.z);
+					break;
+				case E_META_TORCH_EAST: 
+					attachedTo = Vector3i(Location.x - 1, Location.y, Location.z);
+					break;
+				case E_META_TORCH_WEST: 
+					attachedTo = Vector3i(Location.x + 1, Location.y, Location.z);
+					break;
+				case E_META_TORCH_NORTH: 
+					attachedTo = Vector3i(Location.x, Location.y, Location.z + 1);
+					break;
+				case E_META_TORCH_SOUTH: 
+					attachedTo = Vector3i(Location.x, Location.y, Location.z - 1);
+					break;
 			}
 		}
 
-		virtual int CanStrongPower(Vector3i location)
+
+		virtual int CanStrongPower(Component * component)
 		{
-			if (isOn && location == Up())
+			if (isOn && component->Type == SOLIDBLOCK && component->Location == Up())
 			{
 				return 15;
 			}
 			return 0;
 		}
 
-		virtual int CanWeakPower(Vector3i location)
+		virtual int CanWeakPower(Component * component)
 		{
-			if (location == attachedTo)
+			if (!isOn || component->Location == attachedTo || component->Type == SOLIDBLOCK)
 			{
 				return 0;
 			}
-			else if (isOn && IsAdjacent(location))
+			else if (IsAdjacent(component->Location))
 			{
 				return 15;
 			}
 			return 0;
 		}
 
-		virtual cVector3iArray Update(ComponentFactory & factory, BLOCKTYPE & block, NIBBLETYPE & meta)
+		virtual bool GetState(BLOCKTYPE & block, NIBBLETYPE & meta)
+		{
+			if (!pushUpdate)
+			{
+				return false;
+			}
+			pushUpdate = false;
+			block = isOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF;
+			meta = m_Meta;
+			return true;
+		}
+
+		virtual cVector3iArray Update(ComponentFactory & factory, int ticks)
 		{
 			LOGD("Evaluating torch (%d %d %d)", Location.x, Location.y, Location.z);
+		
 
-			cVector3iArray result;
 			ComponentPtr attachedBlock = factory.GetComponent(attachedTo);
 
 			// this should never happen
@@ -63,50 +85,31 @@ namespace Redstone
 				return{};
 			}
 
-			bool state = (attachedBlock->CanWeakPower(Location) > 0);
-			bool updateBlocks = false;
+			bool state = !(attachedBlock->CanWeakPower(this) > 0);
+			
 			if (isOn != state)
 			{
-				result.push_back(Location);
-				if (state)
+				if (ticks <= this->ticks)
 				{
-					heat += 5;
-					if (heat > 15)
-					{
-						isBurntOut = true;
-					}
-					else
-					{
-						block = E_BLOCK_REDSTONE_TORCH_ON;
-						isOn = state;
-						updateBlocks = true;
-					}
+					isOn = state;
+					pushUpdate = true;
+					return GetAdjacent(true);
 				}
 				else
 				{
-					block = E_BLOCK_REDSTONE_TORCH_OFF;
-					isOn = state;
-					updateBlocks = true;
+					this->ticks = ticks + 2;
+					return{ Location };
 				}
 			}
 
-			heat -= 1;
-			if (heat > 0)
+			if (this->ticks < 0)
 			{
-				updateBlocks = true;
-			}
-			else
-			{
-				isBurntOut = false;
+				this->ticks = ticks;
+				return GetAdjacent(true);
 			}
 
-			if (updateBlocks)
-			{
-				auto adjacents = GetAdjacent();
-				result.insert(result.end(), adjacents.begin(), adjacents.end());
-			}
 
-			return result;
+			return{};
 		}
 
 		~Torch()
@@ -115,9 +118,10 @@ namespace Redstone
 		}
 
 	private:
+		NIBBLETYPE m_Meta;
 		bool isOn;
-		bool isBurntOut;
-		int heat;
+		int ticks;
+		bool pushUpdate;
 		Vector3i attachedTo;
 	};
 }

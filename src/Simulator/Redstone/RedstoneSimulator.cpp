@@ -38,6 +38,7 @@ void cRedstoneSimulator::Simulate(float a_dt)
 	blocks.clear();
 
 	// process the work queue
+	std::vector<ComponentPtr> updated;
 	while (!work.empty())
 	{
 		// grab the first element and remove it from the list
@@ -50,9 +51,7 @@ void cRedstoneSimulator::Simulate(float a_dt)
 		}
 
 		// the actual component processes
-		BLOCKTYPE blockTypeUpdated;
-		NIBBLETYPE metaDataUpdated;
-		cVector3iArray updates(component->Update(factory, blockTypeUpdated, metaDataUpdated));
+		cVector3iArray updates(component->Update(factory, m_ticks));
 
 		// queue blocks for update
 		for (Vector3i item : updates)
@@ -60,33 +59,48 @@ void cRedstoneSimulator::Simulate(float a_dt)
 			if (item == location)
 			{
 				// if the update returned itself, queue for update next tick
-				data.WakeUp(location);
-				m_World.FastSetBlock(location, blockTypeUpdated, metaDataUpdated);
+				updated.push_back(component);
 			}
 			else if (std::find(work.begin(), work.end(), item) == work.end())
 			{
+				LOGD("Queueing block for update (%d %d %d)", item.x, item.y, item.z);
 				work.push_back(item);
 			}
 		}
-
 		work.pop_front();
+	}
+
+	for (ComponentPtr item : updated)
+	{
+		data.WakeUp(item->Location);
+		BLOCKTYPE blockTypeUpdated;
+		NIBBLETYPE metaDataUpdated;
+		if (item->GetState(blockTypeUpdated, metaDataUpdated))
+		{
+			m_World.SetBlock(item->Location.x, item->Location.y, item->Location.z, blockTypeUpdated, metaDataUpdated, true);
+		}
 	}
 
 }
 
 void cRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	//if (!a_Chunk->IsValid())
-	//{
-	//	return;
-	//}
+	if (!a_Chunk->IsValid())
+	{
+		return;
+	}
 
-	//Vector3i relative = cChunkDef::AbsoluteToRelative({ a_BlockX, a_BlockY, a_BlockZ }, a_Chunk->GetPosX(), a_Chunk->GetPosZ());
+	Vector3i relative = cChunkDef::AbsoluteToRelative({ a_BlockX, a_BlockY, a_BlockZ }, a_Chunk->GetPosX(), a_Chunk->GetPosZ());
 
-	//if (relative.y < 0)
-	//{
-	//	return;
-	//}
+	if (relative.y < 0)
+	{
+		return;
+	}
+
+	if (ComponentFactory::IsSolidBlock(a_Chunk->GetBlock(relative)))
+	{
+		return;
+	}
 
 	//auto data = a_Chunk->GetRedstoneSimulatorData();
 	//if (data == nullptr)
