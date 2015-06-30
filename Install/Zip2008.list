@@ -1,6 +1,7 @@
 ..\MCServer\MCServer.exe
 ..\MCServer\*.dll
 ..\MCServer\Plugins
+..\MCServer\Prefabs
 ..\MCServer\webadmin
 ..\MCServer\crafting.txt
 ..\MCServer\furnace.txt
