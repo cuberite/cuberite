@@ -11,7 +11,7 @@ Subscribe to [the newsletter](http://newsletter.cuberite.org/subscribe.htm) for 
 
 Installation
 ------------
-Hosted Curbeite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamososm](https://gamocosm.com) also offers Cuberite support.
+Hosted Cuberite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamocosm](https://gamocosm.com) also offers Cuberite support.
 
 For Linux there is an easy installation method, just run this in your terminal:
 
