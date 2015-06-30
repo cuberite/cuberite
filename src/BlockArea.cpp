@@ -336,6 +336,12 @@ void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 		);
 		return;
 	}
+
+	// Warn if the height is too much, but proceed with the creation:
+	if (a_SizeY > cChunkDef::Height)
+	{
+		LOGWARNING("Creating a cBlockArea with height larger than world height (%d). Continuing, but the area may misbehave.", a_SizeY);
+	}
 	
 	Clear();
 	int BlockCount = a_SizeX * a_SizeY * a_SizeZ;
@@ -540,7 +546,7 @@ bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_Min
 	else if (a_MinBlockY > cChunkDef::Height - m_Size.y)
 	{
 		LOGWARNING("%s: MinBlockY + m_SizeY more than chunk height, adjusting to chunk height", __FUNCTION__);
-		a_MinBlockY = cChunkDef::Height - m_Size.y;
+		a_MinBlockY = std::max(cChunkDef::Height - m_Size.y, 0);
 	}
 
 	return a_ForEachChunkProvider->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
