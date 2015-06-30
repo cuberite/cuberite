@@ -56,7 +56,7 @@ namespace Redstone
 					{
 						p = comp->CanWeakPower(this);
 					}
-					cp = (cp < p) ? p : cp;
+					cp = std::max(cp, p);
 				}
 			}
 

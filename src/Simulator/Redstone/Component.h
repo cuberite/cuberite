@@ -15,8 +15,8 @@ namespace Redstone
 		const bool IsFullBlock;
 		const RedstoneType Type;
 
-		Component(Vector3i location, RedstoneType type, bool isSolidBlock = false) : 
-			Location(location), IsFullBlock(isSolidBlock), Type(type) {}
+		Component(Vector3i location, RedstoneType type, bool isFullBlock = false) :
+			Location(location), IsFullBlock(isFullBlock), Type(type) {}
 
 		// disable the copy constructor and assignment operator
 		Component(const Component &) = delete;
@@ -47,7 +47,7 @@ namespace Redstone
 			return len == -1 || len == 1;
 		}
 
-		cVector3iArray GetAdjacent(bool includeSelf = false)
+		inline cVector3iArray GetAdjacent(bool includeSelf = false)
 		{
 			if (includeSelf)
 			{
@@ -73,6 +73,17 @@ namespace Redstone
 				{ Location.x, Location.y, Location.z-1 },
 			};
 		}
+
+		inline cVector3iArray GetLaterals()
+		{
+			return
+			{
+				{ Location.x + 1, Location.y, Location.z },
+				{ Location.x - 1, Location.y, Location.z },
+				{ Location.x, Location.y, Location.z + 1 },
+				{ Location.x, Location.y, Location.z - 1 },
+			};
+		}
 	};
 
 	typedef std::shared_ptr<Component> ComponentPtr;
@@ -82,5 +93,6 @@ namespace Redstone
 		UNKNOWN,
 		SOLIDBLOCK,
 		TORCH,
+		WIRE,
 	};
 }

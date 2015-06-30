@@ -5,6 +5,7 @@
 // Block types
 #include "Torch.h"
 #include "SolidBlock.h"
+#include "Wire.h"
 
 
 namespace Redstone
@@ -57,7 +58,8 @@ namespace Redstone
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
 				return TORCH;
-
+			case E_BLOCK_REDSTONE_WIRE:
+				return WIRE;
 				// everything else is not understood by redstone simulator
 			default:
 				return UNKNOWN;
@@ -72,6 +74,8 @@ namespace Redstone
 				return ComponentPtr(std::make_shared<Torch>(location, blockType, meta));
 			case SOLIDBLOCK:
 				return ComponentPtr(std::make_shared<SolidBlock>(location));
+			case WIRE:
+				return ComponentPtr(std::make_shared<Wire>(location));
 			default:
 				return nullptr;
 		}

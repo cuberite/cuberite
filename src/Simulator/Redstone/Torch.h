@@ -40,7 +40,7 @@ namespace Redstone
 
 		virtual int CanStrongPower(Component * component)
 		{
-			if (isOn && component->Type == SOLIDBLOCK && component->Location == Up())
+			if (isOn && component->IsFullBlock && component->Location == Up())
 			{
 				return 15;
 			}
