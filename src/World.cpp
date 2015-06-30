@@ -838,6 +838,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	AddQueuedPlayers();
 
 	m_ChunkMap->Tick(a_Dt);
+	m_MapManager.TickMaps();
 
 	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
@@ -855,7 +856,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		SaveAllChunks();
 	}
 
-	if (m_WorldAge - m_LastUnload > std::chrono::minutes(5))  // Unload every 10 seconds
+	if (m_WorldAge - m_LastUnload > std::chrono::seconds(10))  // Unload every 10 seconds
 	{
 		UnloadUnusedChunks();
 	}

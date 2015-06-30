@@ -9,7 +9,9 @@
 
 
 
-/// Handler used for both dirt and grass
+
+
+/** Handler used for all types of dirt and grass */
 class cBlockDirtHandler :
 	public cBlockHandler
 {
@@ -18,7 +20,6 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
@@ -32,7 +33,6 @@ public:
 			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
 		}
 	}
-	
 	
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -108,6 +108,21 @@ public:
 				}
 			}
 		}  // for i - repeat twice
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		switch (m_BlockType)
+		{
+			case E_BLOCK_DIRT: return 10;
+			case E_BLOCK_GRASS: return 1;
+			default:
+			{
+				ASSERT(!"Unhandled blocktype in dirt handler!");
+				return 0;
+			}
+		}
 	}
 } ;
 

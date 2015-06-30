@@ -16,7 +16,6 @@ public:
 	{
 	}
 
-
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -29,7 +28,6 @@ public:
 
 		return true;
 	}
-
 
 	inline static NIBBLETYPE DirectionToMetadata(eBlockFace a_Direction)
 	{
@@ -53,7 +51,6 @@ public:
 		#endif
 	}
 
-
 	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x03)
@@ -65,7 +62,6 @@ public:
 			default: ASSERT(!"Unhandled tripwire hook metadata!"); return BLOCK_FACE_NONE;
 		}
 	}
-
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
@@ -83,6 +79,12 @@ public:
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
 		return ((a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 0;
 	}
 };
 

@@ -143,6 +143,7 @@ typedef unsigned short     UInt16;
 typedef unsigned char      UInt8;
 
 typedef unsigned char Byte;
+typedef Byte ColourID;
 
 
 // If you get an error about specialization check the size of integral types
@@ -245,6 +246,7 @@ template class SizeChecker<UInt8,  1>;
 
 
 // STL stuff:
+#include <array>
 #include <chrono>
 #include <vector>
 #include <list>

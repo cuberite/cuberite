@@ -99,9 +99,7 @@ public:
 	virtual void SendKeepAlive                  (int a_PingID) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
 	virtual void SendLoginSuccess               (void) = 0;
-	virtual void SendMapColumn                  (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale) = 0;
-	virtual void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale) = 0;
-	virtual void SendMapInfo                    (int a_ID, unsigned int a_Scale) = 0;
+	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) = 0;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) = 0;
 	virtual void SendPickupSpawn                (const cPickup & a_Pickup) = 0;
 	virtual void SendPlayerAbilities            (void) = 0;

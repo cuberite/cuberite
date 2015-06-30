@@ -15,7 +15,6 @@ public:
 	{
 	}
 
-
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -35,7 +34,6 @@ public:
 		a_BlockMeta = BlockFaceToMetaData(a_BlockFace, Meta);
 		return true;
 	}
-
 
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace, NIBBLETYPE a_QuartzMeta)
 	{
@@ -69,5 +67,11 @@ public:
 			ASSERT(!"Unknown BLOCK_FACE");
 			return 0;
 		#endif
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 8;
 	}
 } ;

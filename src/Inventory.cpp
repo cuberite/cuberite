@@ -580,21 +580,9 @@ bool cInventory::AddToBar(cItem & a_Item, const int a_Offset, const int a_Size, 
 void cInventory::UpdateItems(void)
 {
 	const cItem & Slot = GetEquippedItem();
-
-	if (Slot.IsEmpty())
+	if (!Slot.IsEmpty())
 	{
-		return;
-	}
-
-	switch (Slot.m_ItemType)
-	{
-		case E_ITEM_MAP:
-		{
-			ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
-			break;
-		}
-
-		default: break;
+		ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
 	}
 }
 

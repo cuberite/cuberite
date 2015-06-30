@@ -21,6 +21,12 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_ITEM_FLOWER_POT, 1, 0));
 	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 0;
+	}
 } ;
 
 

@@ -723,64 +723,55 @@ void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol172::SendMapColumn(int a_MapID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
+void cProtocol172::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	ASSERT(a_Length + 3 <= USHRT_MAX);
-	ASSERT((a_X >= 0) && (a_X < 256));
-	ASSERT((a_Y >= 0) && (a_Y < 256));
-	
-	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_MapID));
-	Pkt.WriteBEUInt16(static_cast<UInt16>(3 + a_Length));
 
-	Pkt.WriteBEUInt8(0);
-	Pkt.WriteBEUInt8(static_cast<Byte>(a_X));
-	Pkt.WriteBEUInt8(static_cast<Byte>(a_Y));
-	
-	Pkt.WriteBuf(reinterpret_cast<const char *>(a_Colors), a_Length);
-}
-
-
-
-
-
-void cProtocol172::SendMapDecorators(int a_MapID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
-{
-	ASSERT(m_State == 3);  // In game mode?
-	ASSERT(1 + 3 * a_Decorators.size() < USHRT_MAX);
-	
-	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_MapID));
-	Pkt.WriteBEUInt16(static_cast<UInt16>(1 + (3 * a_Decorators.size())));
-
-	Pkt.WriteBEUInt8(1);
-	
-	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
 	{
-		ASSERT(it->GetPixelX() < 256);
-		ASSERT(it->GetPixelZ() < 256);
-		Pkt.WriteBEUInt8(static_cast<Byte>((it->GetType() << 4) | static_cast<Byte>(it->GetRot() & 0xf)));
-		Pkt.WriteBEUInt8(static_cast<Byte>(it->GetPixelX()));
-		Pkt.WriteBEUInt8(static_cast<Byte>(it->GetPixelZ()));
+		ASSERT(a_Map.GetScale() < 256);
+
+		cPacketizer Pkt(*this, 0x34);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetID()));
+		Pkt.WriteBEUInt16(2);
+
+		Pkt.WriteBEUInt8(2);
+		Pkt.WriteBEUInt8(static_cast<Byte>(a_Map.GetScale()));
 	}
-}
 
+	{
+		ASSERT(a_Map.GetData().size() + 3 <= USHRT_MAX);
+		ASSERT((a_DataStartX >= 0) && (a_DataStartX < 256));
+		ASSERT((a_DataStartY >= 0) && (a_DataStartY < 256));
 
+		cPacketizer Pkt(*this, 0x34);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetID()));
+		Pkt.WriteBEUInt16(static_cast<UInt16>(3 + a_Map.GetData().size()));
 
+		Pkt.WriteBEUInt8(0);
+		Pkt.WriteBEUInt8(static_cast<Byte>(a_DataStartX));
+		Pkt.WriteBEUInt8(static_cast<Byte>(a_DataStartX));
 
+		Pkt.WriteBuf(reinterpret_cast<const char *>(a_Map.GetData().data()), a_Map.GetData().size());
+	}
 
-void cProtocol172::SendMapInfo(int a_MapID, unsigned int a_Scale)
-{
-	ASSERT(m_State == 3);  // In game mode?
-	ASSERT(a_Scale < 256);
-	
-	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_MapID));
-	Pkt.WriteBEUInt16(2);
+	{
+		ASSERT(1 + 3 * a_Map.GetDecorators().size() < USHRT_MAX);
 
-	Pkt.WriteBEUInt8(2);
-	Pkt.WriteBEUInt8(static_cast<Byte>(a_Scale));
+		cPacketizer Pkt(*this, 0x34);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetID()));
+		Pkt.WriteBEUInt16(static_cast<UInt16>(1 + (3 * a_Map.GetDecorators().size())));
+
+		Pkt.WriteBEUInt8(1);
+
+		for (const auto & Decorator : a_Map.GetDecorators())
+		{
+			ASSERT(Decorator.GetPixelX() < 256);
+			ASSERT(Decorator.GetPixelZ() < 256);
+			Pkt.WriteBEUInt8(static_cast<Byte>((Decorator.GetRot() << 4) | static_cast<int>(Decorator.GetType())));
+			Pkt.WriteBEUInt8(static_cast<Byte>(Decorator.GetPixelX()));
+			Pkt.WriteBEUInt8(static_cast<Byte>(Decorator.GetPixelZ()));
+		}
+	}
 }
 
 

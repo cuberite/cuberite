@@ -19,19 +19,16 @@ public:
 	{
 	}
 	
-	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));
 	}
-
 
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		cWindow * Window = new cAnvilWindow(a_BlockX, a_BlockY, a_BlockZ);
 		a_Player->OpenWindow(Window);
 	}
-	
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
@@ -58,10 +55,15 @@ public:
 		return true;
 	}
 
-
 	virtual bool IsUseable() override
 	{
 		return true;
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 6;
 	}
 } ;
 

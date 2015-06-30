@@ -88,7 +88,7 @@ public:
 		UNUSED(a_BlockFace);
 	}
 
-	/** Called every tick while the item is on the player's inventory (Used by maps) - For now, called only for equipped items */
+	/** Called every tick while the item is on the player's inventory (used by maps, for example) - For now, called only for equipped items */
 	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item)
 	{
 		UNUSED(a_World);

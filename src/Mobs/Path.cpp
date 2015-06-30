@@ -159,7 +159,7 @@ bool cPath::IsSolid(const Vector3i & a_Location)
 	m_Chunk->GetBlockTypeMeta(RelX, a_Location.y, RelZ, BlockType, BlockMeta);
 	if (
 			(BlockType == E_BLOCK_FENCE) ||
-			(BlockType == E_BLOCK_FENCE_GATE) ||
+			(BlockType == E_BLOCK_OAK_FENCE_GATE) ||
 			(BlockType == E_BLOCK_NETHER_BRICK_FENCE) ||
 			((BlockType >= E_BLOCK_SPRUCE_FENCE_GATE) && (BlockType <= E_BLOCK_ACACIA_FENCE))
 	)

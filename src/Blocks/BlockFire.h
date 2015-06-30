@@ -17,7 +17,7 @@ public:
 	{
 	}
 
-	/// Portal boundary and direction variables
+	/** Portal boundary and direction variables */
 	// 2014_03_30 _X: What are these used for? Why do we need extra variables?
 	int XZP, XZM;
 	NIBBLETYPE Dir;
@@ -102,7 +102,7 @@ public:
 		return true;
 	}
 
-	/// Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE)
+	/** Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE) */
 	void FindAndSetPortalFrame(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
 	{
 		int MaxY = FindObsidianCeiling(X, Y, Z, a_ChunkInterface);  // Get topmost obsidian block as reference for all other checks
@@ -193,7 +193,7 @@ public:
 		return (FoundFrameXP && FoundFrameXM);
 	}
 
-	/// Evaluates if coords are a portal going ZP / ZM; returns true if so, and writes boundaries to variable
+	/** Evaluates if coords are a portal going ZP / ZM; returns true if so, and writes boundaries to variable */
 	bool FindPortalSliceZ(int X, int Y, int Z1, int Z2, int MaxY, cChunkInterface & a_ChunkInterface)
 	{
 		Dir = 2;
@@ -235,6 +235,12 @@ public:
 	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
 	{
 		return true;
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 15;
 	}
 };
 

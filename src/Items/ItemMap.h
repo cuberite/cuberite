@@ -37,7 +37,6 @@ public:
 		}
 
 		Map->UpdateRadius(*a_Player, DEFAULT_RADIUS);
-
 		Map->UpdateClient(a_Player);
 	}
 } ;

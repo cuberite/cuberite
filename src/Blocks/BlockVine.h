@@ -15,7 +15,6 @@ public:
 	{
 	}
 	
-	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -39,13 +38,11 @@ public:
 		return true;
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_BLOCK_VINES, 1, 0));
 	}
-
 
 	static NIBBLETYPE DirectionToMetaData(char a_BlockFace)
 	{
@@ -59,7 +56,6 @@ public:
 		}
 	}
 
-
 	static char MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
 		switch (a_MetaData)
@@ -72,8 +68,7 @@ public:
 		}
 	}
 
-
-	/// Returns true if the specified block type is good for vines to attach to
+	/** Returns true if the specified block type is good for vines to attach to */
 	static bool IsBlockAttachable(BLOCKTYPE a_BlockType)
 	{
 		switch (a_BlockType)
@@ -93,8 +88,7 @@ public:
 		}
 	}
 
-
-	/// Returns the meta that has the maximum allowable sides of the vine, given the surroundings
+	/** Returns the meta that has the maximum allowable sides of the vine, given the surroundings */
 	NIBBLETYPE GetMaxMeta(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 	{
 		static const struct
@@ -123,7 +117,6 @@ public:
 		}
 		return res;
 	}
-	
 	
 	void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
@@ -164,18 +157,15 @@ public:
 		}
 	}
 
-
 	virtual bool DoesIgnoreBuildCollision(void) override
 	{
 		return true;
 	}
 
-
 	virtual bool DoesDropOnUnsuitable(void) override
 	{
 		return false;
 	}
-	
 
 	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -199,19 +189,16 @@ public:
 			}
 		}
 	}
-	
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		return ((a_Meta >> 1) | (a_Meta << 3)) & 0x0f;  // Rotate bits to the right
 	}
 
-
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		return ((a_Meta << 1) | (a_Meta >> 3)) & 0x0f;  // Rotate bits to the left
 	}
-
 
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
@@ -219,11 +206,16 @@ public:
 		return (NIBBLETYPE)((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
 	}
 
-
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
 		// Bits 1 and 3 stay, bits 2 and 4 swap
 		return (NIBBLETYPE)((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 7;
 	}
 
 } ;

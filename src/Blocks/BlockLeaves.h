@@ -35,7 +35,6 @@ public:
 	{
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		cFastRandom rand;
@@ -74,7 +73,6 @@ public:
 		}
 	}
 
-
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
 	{
 		// Unset 0x8 bit so this block gets checked for decay:
@@ -84,7 +82,6 @@ public:
 			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);
 		}
 	}
-	
 	
 	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -127,6 +124,12 @@ public:
 		// Decay the leaves:
 		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
 		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 7;
 	}
 } ;
 

@@ -205,6 +205,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if (m_ClientHandle->IsDestroyed())
 		{
 			// This should not happen, because destroying a client will remove it from the world, but just in case
+			ASSERT(!"Player ticked whilst in the process of destruction!");
 			m_ClientHandle = nullptr;
 			return;
 		}
@@ -214,6 +215,10 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// We're not yet in the game, ignore everything
 			return;
 		}
+	}
+	else
+	{
+		ASSERT(!"Player ticked whilst in the process of destruction!");
 	}
 
 	m_Stats.AddValue(statMinutesPlayed, 1);

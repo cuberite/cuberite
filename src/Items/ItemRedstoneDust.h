@@ -61,7 +61,7 @@ public:
 
 		switch (a_BlockType)
 		{
-			case E_BLOCK_NEW_STONE_SLAB:
+			case E_BLOCK_RED_SANDSTONE_SLAB:
 			case E_BLOCK_WOODEN_SLAB:
 			case E_BLOCK_STONE_SLAB:
 			{

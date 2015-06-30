@@ -15,7 +15,6 @@ public:
 		super(a_BlockType)
 	{
 	}
-
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
@@ -56,6 +55,11 @@ public:
 		}
 	}
 
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 15;
+	}
 } ;
 
 
