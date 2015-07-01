@@ -65,13 +65,22 @@ public:
 		}
 	}
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
 	{
+		// Don't care about any neighbor but the one above us (fix recursion loop in #2213):
+		if (a_WhichNeighbor != BLOCK_FACE_YP)
+		{
+			return;
+		}
+
+		// Don't care about anything if we're at the top of the world:
 		if (a_BlockY >= cChunkDef::Height)
 		{
 			return;
 		}
 
+		// Check whether we should revert to dirt:
 		BLOCKTYPE UpperBlock = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
 		if (cBlockInfo::FullyOccupiesVoxel(UpperBlock))
 		{
@@ -79,10 +88,12 @@ public:
 		}
 	}
 
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.Add(E_BLOCK_DIRT, 1, 0);  // Reset meta
 	}
+
 
 	bool IsWaterInNear(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 	{

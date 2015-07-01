@@ -47,15 +47,14 @@ public:
 		super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
 		// Alert diagonal rails
-		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY + 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY + 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ + 1);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ - 1);
-
-		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY - 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY - 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ + 1);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ - 1);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ + 1, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ - 1, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ + 1, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ - 1, BLOCK_FACE_NONE);
 	}
 
 
@@ -64,19 +63,18 @@ public:
 		super::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 
 		// Alert diagonal rails
-		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY + 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY + 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ + 1);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ - 1);
-
-		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY - 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY - 1, a_BlockZ);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ + 1);
-		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ - 1);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ + 1, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ - 1, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ + 1, BLOCK_FACE_NONE);
+		OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ - 1, BLOCK_FACE_NONE);
 	}
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ) && (Meta != FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ)))

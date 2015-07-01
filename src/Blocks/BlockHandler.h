@@ -56,13 +56,19 @@ public:
 	/// Called before a block gets destroyed / replaced with air
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
-	/// Called when a direct neighbor of this block has been changed (The position is the own position, not the neighbor position)
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) {}
+	/** Called when a direct neighbor of this block has been changed (The position is the block's own position, not the changing neighbor's position)
+	a_WhichNeighbor indicates which neighbor has changed. For example, BLOCK_FACE_YP meant the neighbor above has changed.
+	BLOCK_FACE_NONE means that it is a neighbor not directly adjacent (diagonal, etc.) */
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) {}
 	
-	/// Notifies all neighbors of the given block about a change
-	static void NeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Notifies the specified neighbor that the current block has changed.
+	a_NeighborXYZ coords are the coords of the neighbor
+	a_WhichNeighbor specifies which neighbor (relative to a_NeighborXYZ) has changed.
+	For example BLOCK_FACE_YP means that the block at {a_NeighborX, a_NeighborY + 1, a_NeighborZ} has changed.
+	BLOCK_FACE_NONE means that it is a neighbor not directly adjacent (diagonal, etc.) */
+	static void NeighborChanged(cChunkInterface & a_ChunkInterface, int a_NeighborX, int a_NeighborY, int a_NeighborZ, eBlockFace a_WhichNeighbor);
 	
-	/// Called while the player diggs the block.
+	/** Called when the player starts digging the block. */
 	virtual void OnDigging(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {}
 	
 	/// Called if the user right clicks the block and the block is useable
