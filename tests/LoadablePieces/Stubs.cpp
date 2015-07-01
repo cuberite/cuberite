@@ -160,7 +160,7 @@ void cBlockHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterf
 
 
 
-void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor)
 {
 }
 

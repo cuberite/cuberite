@@ -1037,7 +1037,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 			VERIFY(UnboundedRelFastSetBlock(a_RelX + x, a_RelY, a_RelZ + z, ProduceType, Meta));
 			auto Absolute = RelativeToAbsolute(Vector3i{a_RelX + x, a_RelY, a_RelZ + z}, m_PosX, m_PosZ);
 			cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
-			cBlockHandler::NeighborChanged(ChunkInterface, Absolute.x, Absolute.y, Absolute.z);
+			cBlockHandler::NeighborChanged(ChunkInterface, Absolute.x, Absolute.y - 1, Absolute.z, BLOCK_FACE_YP);
 			break;
 		}
 	}
