@@ -94,5 +94,7 @@ namespace Redstone
 		SOLIDBLOCK,
 		TORCH,
 		WIRE,
+		REPEATER,
+		COMPARATOR,
 	};
 }

@@ -6,6 +6,7 @@
 #include "Torch.h"
 #include "SolidBlock.h"
 #include "Wire.h"
+#include "Repeater.h"
 
 
 namespace Redstone
@@ -69,6 +70,9 @@ namespace Redstone
 				return TORCH;
 			case E_BLOCK_REDSTONE_WIRE:
 				return WIRE;
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+				return REPEATER;
 				// everything else is not understood by redstone simulator
 			default:
 				return UNKNOWN;
@@ -85,6 +89,8 @@ namespace Redstone
 				return ComponentPtr(std::make_shared<SolidBlock>(location));
 			case WIRE:
 				return ComponentPtr(std::make_shared<Wire>(location));
+			case REPEATER:
+				return ComponentPtr(std::make_shared<Repeater>(location, blockType, meta));
 			default:
 				return nullptr;
 		}
