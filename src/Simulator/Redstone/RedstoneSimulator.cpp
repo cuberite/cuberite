@@ -59,7 +59,10 @@ void cRedstoneSimulator::Simulate(float a_dt)
 			if (item == location)
 			{
 				// if the update returned itself, queue for update next tick
-				updated.push_back(component);
+				if (std::find(updated.begin(), updated.end(), component) == updated.end())
+				{
+					updated.push_back(component);
+				}
 			}
 			else if (std::find(work.begin(), work.end(), item) == work.end())
 			{

@@ -15,6 +15,15 @@ namespace Redstone
 		m_World(a_World), m_Data(a_data)
 	{ }
 
+	void ComponentFactory::PlaySound(std::string name, Vector3i location, float pitch)
+	{
+		m_World.GetBroadcastManager().BroadcastSoundEffect(name, 
+			static_cast<double>(location.x),
+			static_cast<double>(location.y),
+			static_cast<double>(location.z),
+			0.5f, pitch);
+	}
+
 
 	ComponentPtr ComponentFactory::GetComponent(Vector3i location)
 	{

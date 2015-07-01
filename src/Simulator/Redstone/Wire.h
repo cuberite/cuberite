@@ -69,6 +69,7 @@ namespace Redstone
 			}
 
 			// re calculate connections
+			// TODO: possible perf gains if we dont have to calculate this on every update
 			Connections.clear();
 			
 			for (auto side : GetLaterals())

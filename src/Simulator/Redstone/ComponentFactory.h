@@ -18,6 +18,7 @@ namespace Redstone
 		ComponentFactory(cWorld & a_World, cRedstoneSimulatorChunkData * a_data);
 
 		ComponentPtr GetComponent(Vector3i location);
+		void PlaySound(std::string name, Vector3i location, float pitch);
 
 		inline static bool IsSolidBlock(BLOCKTYPE blockType)
 		{
