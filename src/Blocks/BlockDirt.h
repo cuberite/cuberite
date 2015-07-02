@@ -99,7 +99,7 @@ public:
 			BLOCKTYPE above = a_Chunk.GetBlock(BlockX, BlockY + 1, BlockZ);
 			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(BlockX, BlockY + 1, BlockZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(BlockX, BlockY + 1, BlockZ)));
 			// Grass does not spread to blocks with a light level less than 5
-			if (light > 4  && cBlockInfo::IsTransparent(above))
+			if ((light > 4)  && cBlockInfo::IsTransparent(above))
 			{
 				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
 				{
