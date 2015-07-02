@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "../FastRandom.h"
+#include "../BlockInfo.h"
 #include "Root.h"
 #include "Bindings/PluginManager.h"
 
@@ -48,13 +49,15 @@ public:
 		}
 		else if ((a_RelY < cChunkDef::Height - 1))
 		{
+			BLOCKTYPE above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
 			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ)));
-			// Grass turns back to dirt when light levels are below 5
-			if (light < 5)
+			// Grass turns back to dirt when light levels are below 5 and the block above is not transparent
+			if (!cBlockInfo::IsTransparent(above))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
 			}
+
 			// Source block is not bright enough to spread
 			if (light < 9)
 			{
@@ -93,10 +96,10 @@ public:
 				// Not a regular dirt block
 				continue;
 			}
-
+			BLOCKTYPE above = a_Chunk.GetBlock(BlockX, BlockY + 1, BlockZ);
 			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(BlockX, BlockY + 1, BlockZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(BlockX, BlockY + 1, BlockZ)));
 			// Grass does not spread to blocks with a light level less than 5
-			if (light > 4)
+			if (light > 4  && cBlockInfo::IsTransparent(above))
 			{
 				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
 				{
