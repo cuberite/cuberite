@@ -23,6 +23,7 @@ namespace Redstone
 		Component * operator = (const Component &) = delete;
 
 		virtual cVector3iArray Update(ComponentFactory & factory, int tick) = 0;
+		virtual void SetState(BLOCKTYPE & block, NIBBLETYPE & meta) {}
 		virtual bool GetState(BLOCKTYPE & block, NIBBLETYPE & meta) = 0;
 		virtual int CanStrongPower(Component * component) = 0;
 		virtual int CanWeakPower(Component * component) = 0;

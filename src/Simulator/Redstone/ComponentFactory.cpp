@@ -47,6 +47,10 @@ namespace Redstone
 			}
 			m_Data->SetComponent(component);
 		}
+		else
+		{
+			component->SetState(blockType, meta);
+		}
 
 		return component;
 	}

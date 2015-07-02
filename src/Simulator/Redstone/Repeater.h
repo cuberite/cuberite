@@ -11,19 +11,23 @@ namespace Redstone
 
 	public:
 		Repeater(Vector3i location, BLOCKTYPE blockType, NIBBLETYPE meta) :
-			Component(location, REPEATER), meta(meta), pushUpdate(false)
+			Component(location, REPEATER), meta(meta), pushUpdate(false), isOn(false), targetTicks(0), lastUpdate(-1)
 		{
 			Vector3i arrow; // point me in the right direction
 			switch (meta & 0x3)
 			{
 				case 0: // z -1
 					arrow = { 0, 0, -1 };
+					break;
 				case 1: // x +1
 					arrow = { 1, 0, 0 };
+					break;
 				case 2: // z +1
 					arrow = { 0, 0, 1 };
+					break;
 				case 3: // x -1
 					arrow = { -1, 0, 0 };
+					break;
 			}
 
 			front = location + arrow;
@@ -39,7 +43,7 @@ namespace Redstone
 
 		virtual int CanStrongPower(Component * component)
 		{
-			if (isProvidingPower && component->Location == front)
+			if (isOn && component->Location == front)
 			{
 				return 15;
 			}
@@ -50,7 +54,11 @@ namespace Redstone
 		{
 			return CanStrongPower(component);
 		}
-
+		virtual void SetState(BLOCKTYPE & block, NIBBLETYPE & meta)
+		{
+			delay = ((meta & 0xC) >> 0x2) + 1;
+			this->meta = meta;
+		}
 		virtual bool GetState(BLOCKTYPE & block, NIBBLETYPE & meta)
 		{
 			if (!pushUpdate)
@@ -58,14 +66,17 @@ namespace Redstone
 				return false;
 			}
 			pushUpdate = false;
-			block = (isOn || isProvidingPower) ? 
-				E_BLOCK_REDSTONE_REPEATER_ON : E_BLOCK_REDSTONE_REPEATER_OFF;
+			// i have no idea why this is backwards...
+			block = (isOn) ? E_BLOCK_REDSTONE_REPEATER_ON : E_BLOCK_REDSTONE_REPEATER_OFF;
+
 			meta = this->meta;
 			return true;
 		}
 
 		virtual cVector3iArray Update(ComponentFactory & factory, int ticks)
 		{
+		/*	if (lastUpdate == ticks) return{};
+			lastUpdate = ticks;*/
 
 			// check if locked
 			if (CheckIsPoweredByDiode(factory.GetComponent(right)) ||
@@ -75,34 +86,35 @@ namespace Redstone
 				targetTicks = ticks - 1;
 				return{};
 			}
-
+			
 			// check state
-			bool state = (factory.GetComponent(back)->CanWeakPower(this) > 0);
-			if (isProvidingPower != state || isOn != state)
+			
+			ComponentPtr b = factory.GetComponent(back);
+			bool state = (b != nullptr && (b->CanWeakPower(this) > 0));
+
+			if (isOn != state)
 			{
 				// we are changing set intial delay
-				if (isOn != state && targetTicks < ticks)
+				if (targetTicks < ticks)
 				{
+					lastUpdate = ticks;
 					targetTicks = ticks + (delay * 2);
 					return{ Location };
 				}
-				else if (targetTicks >= ticks)
-				{
-					isProvidingPower = state;
-					isOn = state;
-					pushUpdate = true;
-					return GetAdjacent();
-				}
-				// only occurs if delay is > 1, turn the repeater 'on' but don't power forward block yet.
-				else if (isOn != state)
+				else if (targetTicks == ticks)
 				{
 					isOn = state;
 					pushUpdate = true;
-					return{ Location };
+					return GetAdjacent(true);
 				}
+				return{ Location };
 			}
 
-			targetTicks = ticks - 1;
+			if (targetTicks > ticks)
+			{
+				lastUpdate = ticks;
+				targetTicks = ticks;
+			}
 
 			return{};
 		}
@@ -115,7 +127,7 @@ namespace Redstone
 				(comp->Type == REPEATER || comp->Type == COMPARATOR) &&
 				(comp->CanStrongPower(this) > 0);
 		}
-
+		int lastUpdate;
 		int targetTicks;
 		NIBBLETYPE meta;
 		Vector3i front;
@@ -123,7 +135,6 @@ namespace Redstone
 		Vector3i left;
 		Vector3i right;
 		int delay;
-		bool isProvidingPower;
 		bool isOn;
 		bool pushUpdate;
 	};
