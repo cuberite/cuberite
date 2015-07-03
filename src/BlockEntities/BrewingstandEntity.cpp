@@ -99,17 +99,10 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				continue;
 			}
 
-			// Update bottles to the new potion
-			cBrewingRecipe * BR = cRoot::Get()->GetBrewingRecipe();
-			const cBrewingRecipe::cRecipe * Recipe = BR->GetRecipeFrom(m_Contents.GetSlot(i), m_Contents.GetSlot(3));
-
-			if (Recipe == nullptr)
+			if (m_BrewingRecipes[i] != nullptr)
 			{
-				// It's allowed to have items in the slots, that result not into a recipe
-				continue;
+				m_Contents.SetSlot(i, (*m_BrewingRecipes[i])->Output->CopyOne());
 			}
-
-			m_Contents.SetSlot(i, (*Recipe).Output->CopyOne());
 		}
 		return true;
 	}
@@ -179,15 +172,29 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	{
 		if (GetSlot(i).IsEmpty())
 		{
+			m_BrewingRecipes[i] = nullptr;
 			continue;
+		}
+
+		if (m_BrewingRecipes[i] != nullptr)
+		{
+			// Check if recipe for the current slot, needs to be updated
+			const cBrewingRecipe::cRecipe * Recipe = *m_BrewingRecipes[i];
+			if (
+				(Recipe->Ingredient->m_ItemType == GetSlot(3).m_ItemType) &&
+				(Recipe->Input->m_ItemDamage == GetSlot(i).m_ItemDamage)
+			)
+			{
+				continue;
+			}
 		}
 
 		const cBrewingRecipe::cRecipe * Recipe = BR->GetRecipeFrom(m_Contents.GetSlot(i), m_Contents.GetSlot(3));
 		if (Recipe != nullptr)
 		{
 			// Found a brewing recipe for the items
+			m_BrewingRecipes[i] = &Recipe;
 			Stop = false;
-			break;  // If one has been found, no need to check the others
 		}
 	}
 

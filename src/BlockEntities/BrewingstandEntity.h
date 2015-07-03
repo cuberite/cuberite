@@ -103,6 +103,8 @@ protected:
 	/** Block meta of the block currently represented by this entity */
 	NIBBLETYPE m_BlockMeta;
 
+	const cBrewingRecipe::cRecipe ** m_BrewingRecipes[3];
+
 	/** Set to true when the brewing stand entity has been destroyed to prevent the block being set again */
 	bool m_IsDestroyed;
 
@@ -118,7 +120,7 @@ protected:
 	/** Sends the specified progressbar value to all clients of the window */
 	void BroadcastProgress(short a_ProgressbarID, short a_Value);
 
-	// /** Broadcasts progressbar updates, if needed */
+	/** Broadcasts progressbar updates, if needed */
 	void UpdateProgressBars(bool a_ForceUpdate = false);
 
 	// cItemGrid::cListener overrides:
