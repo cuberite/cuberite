@@ -50,14 +50,15 @@ public:
 		else if ((a_RelY < cChunkDef::Height - 1))
 		{
 			BLOCKTYPE above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
-			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ)));
-			// Grass turns back to dirt when light levels are below 5 and the block above is not transparent
+			
+			// Grass turns back to dirt when the block above is not transparent
 			if (!cBlockInfo::IsTransparent(above))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
 			}
-
+			
+			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ)));
 			// Source block is not bright enough to spread
 			if (light < 9)
 			{
