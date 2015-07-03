@@ -4,14 +4,14 @@
 #include <thread>
 
 
+#define SCOPED_CAPABILITY THREAD_ANNOTATION_ATTRIBUTE__(scoped_lockable)
 
 
-
-class cCriticalSection
+class CAPABILITY("mutex") cCriticalSection
 {
 public:
-	void Lock(void);
-	void Unlock(void);
+	void Lock(void) ACQUIRE();
+	void Unlock(void) RELEASE();
 	
 	// IsLocked / IsLockedByCurrentThread are only used in ASSERT statements, but because of the changes with ASSERT they must always be defined
 	// The fake versions (in Release) will not effect the program in any way
@@ -23,7 +23,7 @@ public:
 		bool IsLocked(void) { return false; }
 		bool IsLockedByCurrentThread(void) { return false; }
 	#endif  // _DEBUG
-	
+
 private:
 
 	#ifdef _DEBUG
@@ -38,7 +38,7 @@ private:
 
 
 /// RAII for cCriticalSection - locks the CS on creation, unlocks on destruction
-class cCSLock
+class SCOPED_CAPABILITY cCSLock
 {
 	cCriticalSection * m_CS;
 
@@ -48,32 +48,18 @@ class cCSLock
 	bool m_IsLocked;
 	
 public:
-	cCSLock(cCriticalSection * a_CS);
-	cCSLock(cCriticalSection & a_CS);
-	~cCSLock();
+	cCSLock(cCriticalSection * a_CS) ACQUIRE(*a_CS);
+	cCSLock(cCriticalSection & a_CS) ACQUIRE(a_CS);
+	~cCSLock() RELEASE();
 	
+private:
 	// Temporarily unlock or re-lock:
 	void Lock(void);
 	void Unlock(void);
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(cCSLock);
-} ;
-
-
-
-
-
-/// Temporary RAII unlock for a cCSLock. Useful for unlock-wait-relock scenarios
-class cCSUnlock
-{
-	cCSLock & m_Lock;
-public:
-	cCSUnlock(cCSLock & a_Lock);
-	~cCSUnlock();
-	
-private:
-	DISALLOW_COPY_AND_ASSIGN(cCSUnlock);
+	friend class cCSUnlock;
 } ;
 
 

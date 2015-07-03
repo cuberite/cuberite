@@ -20,7 +20,7 @@ public:
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) REQUIRES(WorldTick) override;
 	virtual void TickFollowPlayer();
 	virtual void Attack(std::chrono::milliseconds a_Dt) override;
 

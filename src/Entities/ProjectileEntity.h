@@ -116,7 +116,7 @@ protected:
 	bool m_IsInGround;
 		
 	// cEntity overrides:
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) REQUIRES(WorldTick) override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	

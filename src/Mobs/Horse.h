@@ -18,7 +18,7 @@ public:
 	CLASS_PROTODEF(cHorse)
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) REQUIRES(WorldTick) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
 	bool IsSaddled      (void) const  {return m_bIsSaddled; }

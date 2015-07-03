@@ -1073,22 +1073,22 @@ int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 {
 	for (;;)
 	{
-		cCSLock Lock(m_CSLayers);
-		int ChunkX, ChunkZ, BlockY = 0;
-		cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
-		cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
-		if (Chunk == nullptr)
 		{
-			return 0;
+			cCSLock Lock (m_CSLayers);
+			int ChunkX, ChunkZ, BlockY = 0;
+			cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+			cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
+			if (Chunk == nullptr)
+			{
+				return 0;
+			}
+			
+			if (Chunk->IsValid())
+			{
+				return Chunk->GetHeight(a_BlockX, a_BlockZ);
+			}
 		}
-		
-		if (Chunk->IsValid())
-		{
-			return Chunk->GetHeight(a_BlockX, a_BlockZ);
-		}
-
 		// The chunk is not valid, wait for it to become valid:
-		cCSUnlock Unlock(Lock);
 		m_evtChunkValid.Wait();
 	}  // while (true)
 }

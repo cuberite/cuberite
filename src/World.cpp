@@ -99,6 +99,7 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 void cWorld::cTickThread::Execute(void)
 {
+	ACQUIRE_ROLE(WorldTick);
 	auto LastTime = std::chrono::steady_clock::now();
 	auto TickTime = std::chrono::duration_cast<std::chrono::milliseconds>(cTickTime(1));
 
@@ -117,6 +118,7 @@ void cWorld::cTickThread::Execute(void)
 
 		LastTime = NowTime;
 	}
+	RELEASE_ROLE(WorldTick);
 }
 
 
@@ -3309,7 +3311,7 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 
 		UsernamesByWeight.push_back(std::make_pair(Found, PlayerName));  // Match! Store it with the position of the match as a weight
 	}
-	Lock.Unlock();
+	m_CSPlayers.Unlock();
 
 	std::sort(UsernamesByWeight.begin(), UsernamesByWeight.end());  // Sort lexicographically (by the first value, then second), so higher weights (usernames with match closer to start) come first (#1274)
 

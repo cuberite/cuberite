@@ -464,7 +464,7 @@ bool cClientHandle::StreamNextChunk(void)
 				}
 
 				// Unloaded chunk found -> Send it to the client.
-				Lock.Unlock();
+				m_CSChunkLists.Unlock();
 				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::E_CHUNK_PRIORITY_HIGH : cChunkSender::E_CHUNK_PRIORITY_MEDIUM));
 				return false;
 			}
@@ -502,7 +502,7 @@ bool cClientHandle::StreamNextChunk(void)
 			}
 
 			// Unloaded chunk found -> Send it to the client.
-			Lock.Unlock();
+			m_CSChunkLists.Unlock();
 			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::E_CHUNK_PRIORITY_LOW);
 			return false;
 		}
@@ -2057,7 +2057,7 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 	cCSLock Lock(m_CSChunkLists);
 	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
-		Lock.Unlock();
+		m_CSChunkLists.Unlock();
 		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 	}
 }
@@ -2075,7 +2075,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 	cCSLock Lock(m_CSChunkLists);
 	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
-		Lock.Unlock();
+		m_CSChunkLists.Unlock();
 		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 	}
 }

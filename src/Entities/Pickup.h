@@ -34,7 +34,7 @@ public:
 
 	bool CollectedBy(cPlayer & a_Dest);  // tolua_export
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) REQUIRES(WorldTick) override;
 
 	/** Returns the number of ticks that this entity has existed */
 	int GetAge(void) const { return std::chrono::duration_cast<cTickTime>(m_Timer).count(); }     // tolua_export

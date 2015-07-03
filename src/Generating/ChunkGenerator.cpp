@@ -149,8 +149,9 @@ void cChunkGenerator::WaitForQueueEmpty(void)
 	cCSLock Lock(m_CS);
 	while (!m_ShouldTerminate && !m_Queue.empty())
 	{
-		cCSUnlock Unlock(Lock);
+		m_CS.Unlock();
 		m_evtRemoved.Wait();
+		m_CS.Lock();
 	}
 }
 
@@ -214,7 +215,7 @@ void cChunkGenerator::Execute(void)
 					NumChunksGenerated
 				);
 			}
-			cCSUnlock Unlock(Lock);
+			m_CS.Unlock();;
 			m_Event.Wait();
 			if (m_ShouldTerminate)
 			{
@@ -223,6 +224,7 @@ void cChunkGenerator::Execute(void)
 			NumChunksGenerated = 0;
 			GenerationStart = clock();
 			LastReportTick = clock();
+			m_CS.Lock();
 		}
 
 		if (m_Queue.empty())
@@ -235,7 +237,7 @@ void cChunkGenerator::Execute(void)
 		cQueueItem item = m_Queue.front();  // Get next chunk from the queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
 		m_Queue.erase(m_Queue.begin());  // Remove the item from the queue
-		Lock.Unlock();  // Unlock ASAP
+		m_CS.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();
 
 		// Display perf info once in a while:
