@@ -85,6 +85,7 @@ public:
 	// tolua_begin
 	
 	// Position, in absolute block coordinates:
+	Vector3i GetPos(void) const { return Vector3i{m_PosX, m_PosY, m_PosZ}; }
 	int GetPosX(void) const { return m_PosX; }
 	int GetPosY(void) const { return m_PosY; }
 	int GetPosZ(void) const { return m_PosZ; }

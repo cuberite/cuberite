@@ -186,6 +186,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
+	m_ChunkSender(*this),
 	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
@@ -513,7 +514,7 @@ void cWorld::Start(void)
 	m_Lighting.Start(this);
 	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor);
 	m_Generator.Start(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
-	m_ChunkSender.Start(this);
+	m_ChunkSender.Start();
 	m_TickThread.Start();
 
 	// Init of the spawn monster time (as they are supposed to have different spawn rate)
@@ -1330,6 +1331,30 @@ bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback
 
 
 
+bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, std::function<bool(cChunk &)>  a_Callback)
+{
+	struct cCallBackWrapper : cChunkCallback
+	{
+		cCallBackWrapper(std::function<bool(cChunk &)> a_InnerCallback) :
+			m_Callback(a_InnerCallback)
+		{
+		}
+		
+		virtual bool Item(cChunk * a_Chunk)
+		{
+			return m_Callback(*a_Chunk);
+		}
+
+	private:
+		std::function<bool(cChunk &)> m_Callback;
+	} callback(a_Callback);
+	return m_ChunkMap->DoWithChunk(a_ChunkX, a_ChunkZ, callback);
+}
+
+
+
+
+
 bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)>  a_Callback)
 {
 	return m_ChunkMap->DoWithChunkAt(a_BlockPos, a_Callback);
@@ -2005,15 +2030,6 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 
 
 
-void cWorld::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastChunkData(a_ChunkX, a_ChunkZ, a_Serializer, a_Exclude);
-}
-
-
-
-
-
 void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastCollectEntity(a_Entity, a_Player, a_Exclude);
@@ -2465,10 +2481,23 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	// If a client is requesting this chunk, send it to them:
 	int ChunkX = a_SetChunkData.GetChunkX();
 	int ChunkZ = a_SetChunkData.GetChunkZ();
-	if (m_ChunkMap->HasChunkAnyClients(ChunkX, ChunkZ))
-	{
-		m_ChunkSender.ChunkReady(ChunkX, ChunkZ);
-	}
+	cChunkSender & ChunkSender = m_ChunkSender;
+	DoWithChunk(
+		ChunkX, ChunkZ,
+		[&ChunkSender] (cChunk & a_Chunk) -> bool
+		{
+			if (a_Chunk.HasAnyClients())
+			{
+				ChunkSender.QueueSendChunkTo(
+					a_Chunk.GetPosX(),
+					a_Chunk.GetPosZ(),
+					cChunkSender::E_CHUNK_PRIORITY_MEDIUM,
+					a_Chunk.GetAllClients()
+				);
+			}
+			return true;
+		}
+	);
 
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
 	if (a_SetChunkData.ShouldMarkDirty())

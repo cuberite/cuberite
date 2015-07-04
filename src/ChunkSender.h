@@ -1,4 +1,4 @@
-
+﻿
 // ChunkSender.h
 
 // Interfaces to the cChunkSender class representing the thread that waits for chunks becoming ready (loaded / generated) and sends them to clients
@@ -29,6 +29,9 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 #include "ChunkDef.h"
 #include "ChunkDataCallback.h"
 
+#include <unordered_set>
+#include <unordered_map>
+
 
 
 
@@ -53,87 +56,73 @@ class cChunkSender:
 {
 	typedef cIsThread super;
 public:
-	cChunkSender(void);
+	cChunkSender(cWorld & a_World);
 	~cChunkSender();
 
 	enum eChunkPriority
 	{
-		E_CHUNK_PRIORITY_HIGH   = 0,
-		E_CHUNK_PRIORITY_MEDIUM = 1,
-		E_CHUNK_PRIORITY_LOW    = 2,
+		E_CHUNK_PRIORITY_HIGH = 0,
+		E_CHUNK_PRIORITY_MIDHIGH,
+		E_CHUNK_PRIORITY_MEDIUM,
+		E_CHUNK_PRIORITY_LOW,
+		
 	};
 	
-	bool Start(cWorld * a_World);
+	bool Start();
 	
 	void Stop(void);
 	
-	/// Notifies that a chunk has become ready and it should be sent to all its clients
-	void ChunkReady(int a_ChunkX, int a_ChunkZ);
-	
 	/// Queues a chunk to be sent to a specific client
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Client);
 	
 	/// Removes the a_Client from all waiting chunk send operations
 	void RemoveClient(cClientHandle * a_Client);
 	
 protected:
+	
+	struct sChunkQueue
+	{
+		eChunkPriority m_Priority;
+		cChunkCoords m_Chunk;
+
+		bool operator <(const sChunkQueue & a_Other) const
+		{
+			/* The Standard Priority Queue sorts from biggest to smallest
+			return true here means you are smaller than the other object, and you get pushed down.
+
+			The priorities go from HIGH (0) to LOW (2), so a smaller priority should mean further up the list
+			therefore, return true (affirm we're "smaller", and get pushed down) only if our priority is bigger than theirs (they're more urgent)
+			*/
+			return this->m_Priority > a_Other.m_Priority;
+		}
+	};
 
 	/// Used for sending chunks to specific clients
 	struct sSendChunk
 	{
-		int m_ChunkX;
-		int m_ChunkZ;
-		cClientHandle * m_Client;
-		
-		sSendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client) :
-			m_ChunkX(a_ChunkX),
-			m_ChunkZ(a_ChunkZ),
-			m_Client(a_Client)
+		cChunkCoords m_Chunk;
+		std::unordered_set<cClientHandle *> m_Clients;
+		eChunkPriority m_Priority;
+		sSendChunk(cChunkCoords a_Chunk, eChunkPriority a_Priority) :
+			m_Chunk(a_Chunk),
+			m_Priority(a_Priority)
 		{
 		}
-		
-		bool operator ==(const sSendChunk & a_Other)
-		{
-			return (
-				(a_Other.m_ChunkX == m_ChunkX) &&
-				(a_Other.m_ChunkZ == m_ChunkZ) &&
-				(a_Other.m_Client == m_Client)
-			);
-		}
-	} ;
-	typedef std::list<sSendChunk> sSendChunkList;
-
-	struct sBlockCoord
-	{
-		int m_BlockX;
-		int m_BlockY;
-		int m_BlockZ;
-		
-		sBlockCoord(int a_BlockX, int a_BlockY, int a_BlockZ) :
-			m_BlockX(a_BlockX),
-			m_BlockY(a_BlockY),
-			m_BlockZ(a_BlockZ)
-		{
-		}
-	} ;
-
-	typedef std::vector<sBlockCoord> sBlockCoords;
+	};
 	
-	cWorld * m_World;
+	cWorld & m_World;
 	
 	cCriticalSection  m_CS;
-	cChunkCoordsList  m_ChunksReady;
-	sSendChunkList    m_SendChunksLowPriority;
-	sSendChunkList    m_SendChunksMediumPriority;
-	sSendChunkList    m_SendChunksHighPriority;
-	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
-	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
-	int               m_RemoveCount;  // Number of threads waiting for a client removal (m_evtRemoved needs to be set this many times)
-	
+	std::priority_queue<sChunkQueue> m_SendChunks;
+	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
+	cEvent m_evtQueue;  // Set when anything is added to m_ChunksReady
+	cEvent m_evtRemoved;  // Set when removed clients are safe to be deleted
+
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
-	sBlockCoords  m_BlockEntities;  // Coords of the block entities to send
+	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
 	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
 	
 	// cIsThread override:
@@ -146,9 +135,8 @@ protected:
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
 	/// Sends the specified chunk to a_Client, or to all chunk clients if a_Client == nullptr
-	void SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
+	void SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients);
 } ;
-
 
 
 

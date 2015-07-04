@@ -456,7 +456,7 @@ bool cClientHandle::StreamNextChunk(void)
 
 				// If the chunk already loading / loaded -> skip
 				if (
-					(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+					(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
 					(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
 				)
 				{
@@ -494,7 +494,7 @@ bool cClientHandle::StreamNextChunk(void)
 
 			// If the chunk already loading / loaded -> skip
 			if (
-				(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+				(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
 				(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
 			)
 			{
@@ -541,7 +541,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 			}
 		}
 
-		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
+		for (auto itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
 		{
 			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
 			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
@@ -583,7 +583,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunk
 		{
 			cCSLock Lock(m_CSChunkLists);
 			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
-			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+			m_ChunksToSend.emplace(a_ChunkX, a_ChunkZ);
 		}
 		World->SendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, this);
 	}
@@ -2179,15 +2179,12 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	bool Found = false;
 	{
 		cCSLock Lock(m_CSChunkLists);
-		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
+		auto itr = m_ChunksToSend.find(cChunkCoords{a_ChunkX, a_ChunkZ});
+		if (itr != m_ChunksToSend.end())
 		{
-			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
-			{
-				m_ChunksToSend.erase(itr);
-				Found = true;
-				break;
-			}
-		}  // for itr - m_ChunksToSend[]
+			m_ChunksToSend.erase(itr);
+			Found = true;
+		}
 	}
 	if (!Found)
 	{
@@ -2950,7 +2947,7 @@ bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkZ)
 	}
 	
 	cCSLock Lock(m_CSChunkLists);
-	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) != m_ChunksToSend.end());
+	return m_ChunksToSend.find(cChunkCoords(a_ChunkX, a_ChunkZ)) != m_ChunksToSend.end();
 }
 
 
@@ -2966,9 +2963,9 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 	
 	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, this);
 	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) == m_ChunksToSend.end())
+	if (m_ChunksToSend.find(cChunkCoords(a_ChunkX, a_ChunkZ)) == m_ChunksToSend.end())
 	{
-		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+		m_ChunksToSend.emplace(a_ChunkX, a_ChunkZ);
 	}
 }
 

@@ -13,7 +13,7 @@
 
 
 cEvent::cEvent(void) :
-	m_ShouldWait(true)
+	m_ShouldContinue(false)
 {
 }
 
@@ -23,12 +23,11 @@ cEvent::cEvent(void) :
 
 void cEvent::Wait(void)
 {
-	std::unique_lock<std::mutex> Lock(m_Mutex);
-	while (m_ShouldWait)
 	{
-		m_CondVar.wait(Lock);
+		std::unique_lock<std::mutex> Lock(m_Mutex);
+		m_CondVar.wait(Lock, [this](){ return m_ShouldContinue.load(); });
 	}
-	m_ShouldWait = true;
+	m_ShouldContinue = false;
 }
 
 
@@ -38,33 +37,13 @@ void cEvent::Wait(void)
 bool cEvent::Wait(unsigned a_TimeoutMSec)
 {
 	auto dst = std::chrono::system_clock::now() + std::chrono::milliseconds(a_TimeoutMSec);
-	std::unique_lock<std::mutex> Lock(m_Mutex);  // We assume that this lock is acquired without much delay - we are the only user of the mutex
-	while (m_ShouldWait && (std::chrono::system_clock::now() <= dst))
+	bool Result;
 	{
-		switch (m_CondVar.wait_until(Lock, dst))
-		{
-			case std::cv_status::no_timeout:
-			{
-				// The wait was successful, check for spurious wakeup:
-				if (!m_ShouldWait)
-				{
-					m_ShouldWait = true;
-					return true;
-				}
-				// This was a spurious wakeup, wait again:
-				continue;
-			}
-			
-			case std::cv_status::timeout:
-			{
-				// The wait timed out, return failure:
-				return false;
-			}
-		}  // switch (wait_until())
-	}  // while (m_ShouldWait && not timeout)
-
-	// The wait timed out in the while condition:
-	return false;
+		std::unique_lock<std::mutex> Lock(m_Mutex);  // We assume that this lock is acquired without much delay - we are the only user of the mutex
+		Result = m_CondVar.wait_until(Lock, dst, [this](){ return m_ShouldContinue.load(); });
+	}
+	m_ShouldContinue = false;
+	return Result;
 }
 
 
@@ -73,12 +52,19 @@ bool cEvent::Wait(unsigned a_TimeoutMSec)
 
 void cEvent::Set(void)
 {
-	{
-		std::unique_lock<std::mutex> Lock(m_Mutex);
-		m_ShouldWait = false;
-	}
+	m_ShouldContinue = true;
 	m_CondVar.notify_one();
 }
+
+
+
+
+void cEvent::SetAll(void)
+{
+	m_ShouldContinue = true;
+	m_CondVar.notify_all();
+}
+
 
 
 
