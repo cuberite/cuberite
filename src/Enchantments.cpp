@@ -428,13 +428,13 @@ int cEnchantments::Merge(const cEnchantments & a_Other, short a_ItemType, short 
 	int EnchantmentCost = 0;
 	bool WithBook = (a_MergeItemType == E_ITEM_ENCHANTED_BOOK);
 
-	for (cEnchantments::cMap::const_iterator itr = a_Other.m_Enchantments.begin(), end = a_Other.m_Enchantments.end(); itr != end; ++itr)
+	for (auto& Enchantment : a_Other.m_Enchantments)
 	{
-		if (IsValidEnchantment(a_ItemType, itr->first))
+		if (IsValidEnchantment(a_ItemType, Enchantment.first))
 		{
 			// Check if we need to adjust the level when merging
-			unsigned int CurrentLevel = GetLevel(itr->first);
-			unsigned int MergeLevel = itr->second;
+			unsigned int CurrentLevel = GetLevel(Enchantment.first);
+			unsigned int MergeLevel = Enchantment.second;
 			unsigned int NewLevel = CurrentLevel;
 
 			// Only increase level if merging with same level
@@ -450,7 +450,7 @@ int cEnchantments::Merge(const cEnchantments & a_Other, short a_ItemType, short 
 			}
 
 			// check level cap for enchantment
-			unsigned int LevelCap = GetLevelCap(itr->first, NewLevel);
+			unsigned int LevelCap = GetLevelCap(Enchantment.first, NewLevel);
 			if (NewLevel > LevelCap)
 			{
 				// Over cap, set to cap
@@ -458,46 +458,46 @@ int cEnchantments::Merge(const cEnchantments & a_Other, short a_ItemType, short 
 			}
 
 			// Calculate enchantment cost
-			if ((itr->first == cEnchantments::enchProtection) ||
-				(itr->first == cEnchantments::enchSharpness) ||
-				(itr->first == cEnchantments::enchEfficiency) ||
-				(itr->first == cEnchantments::enchPower))
+			if ((Enchantment.first == cEnchantments::enchProtection) ||
+				(Enchantment.first == cEnchantments::enchSharpness) ||
+				(Enchantment.first == cEnchantments::enchEfficiency) ||
+				(Enchantment.first == cEnchantments::enchPower))
 			{
 				EnchantmentCost += NewLevel;  // Multiplier: 1 / 1
 			}
-			else if ((itr->first == cEnchantments::enchFireProtection) ||
-				(itr->first == cEnchantments::enchFeatherFalling) ||
-				(itr->first == cEnchantments::enchProjectileProtection) ||
-				(itr->first == cEnchantments::enchSmite) ||
-				(itr->first == cEnchantments::enchBaneOfArthropods) ||
-				(itr->first == cEnchantments::enchKnockback) ||
-				(itr->first == cEnchantments::enchUnbreaking))
+			else if ((Enchantment.first == cEnchantments::enchFireProtection) ||
+				(Enchantment.first == cEnchantments::enchFeatherFalling) ||
+				(Enchantment.first == cEnchantments::enchProjectileProtection) ||
+				(Enchantment.first == cEnchantments::enchSmite) ||
+				(Enchantment.first == cEnchantments::enchBaneOfArthropods) ||
+				(Enchantment.first == cEnchantments::enchKnockback) ||
+				(Enchantment.first == cEnchantments::enchUnbreaking))
 			{
 				EnchantmentCost += NewLevel * (WithBook ? 1 : 2);  // Multiplier: 2 / 1
 			}
-			else if ((itr->first == cEnchantments::enchBlastProtection) ||
-				(itr->first == cEnchantments::enchRespiration) ||
-				(itr->first == cEnchantments::enchAquaAffinity) ||
-				(itr->first == cEnchantments::enchDepthStrider) ||
-				(itr->first == cEnchantments::enchFireAspect) ||
-				(itr->first == cEnchantments::enchLooting) ||
-				(itr->first == cEnchantments::enchFortune) ||
-				(itr->first == cEnchantments::enchPunch) ||
-				(itr->first == cEnchantments::enchFlame) ||
-				(itr->first == cEnchantments::enchLuckOfTheSea) ||
-				(itr->first == cEnchantments::enchLure))
+			else if ((Enchantment.first == cEnchantments::enchBlastProtection) ||
+				(Enchantment.first == cEnchantments::enchRespiration) ||
+				(Enchantment.first == cEnchantments::enchAquaAffinity) ||
+				(Enchantment.first == cEnchantments::enchDepthStrider) ||
+				(Enchantment.first == cEnchantments::enchFireAspect) ||
+				(Enchantment.first == cEnchantments::enchLooting) ||
+				(Enchantment.first == cEnchantments::enchFortune) ||
+				(Enchantment.first == cEnchantments::enchPunch) ||
+				(Enchantment.first == cEnchantments::enchFlame) ||
+				(Enchantment.first == cEnchantments::enchLuckOfTheSea) ||
+				(Enchantment.first == cEnchantments::enchLure))
 			{
 				EnchantmentCost += NewLevel * (WithBook ? 2 : 4);  // Multiplier: 4 / 2
 			}
-			else if ((itr->first == cEnchantments::enchThorns) ||
-				(itr->first == cEnchantments::enchSilkTouch) ||
-				(itr->first == cEnchantments::enchInfinity))
+			else if ((Enchantment.first == cEnchantments::enchThorns) ||
+				(Enchantment.first == cEnchantments::enchSilkTouch) ||
+				(Enchantment.first == cEnchantments::enchInfinity))
 			{
 				EnchantmentCost += NewLevel * (WithBook ? 4 : 8);  // Multiplier: 8 / 4
 			}
 
 			// Add or update enchantment on item
-			SetLevel(itr->first, NewLevel);
+			SetLevel(Enchantment.first, NewLevel);
 		}
 	}  // for itr - a_Other.m_Enchantments[]
 
