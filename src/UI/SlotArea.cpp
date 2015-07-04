@@ -1053,7 +1053,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	cItem Input(*GetSlot(0, a_Player));
 	cItem SecondInput(*GetSlot(1, a_Player));
 	cItem Output(*GetSlot(2, a_Player));
-	
+
 	if (Input.IsEmpty())
 	{
 		Output.Empty();
@@ -1066,12 +1066,14 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
 	int RepairCost = Input.m_RepairCost;
+	int EnchantmentCost = 0;
 	int NeedExp = 0;
 	bool IsEnchantBook = false;
+
 	if (!SecondInput.IsEmpty())
 	{
 		IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
-		
+
 		RepairCost += SecondInput.m_RepairCost;
 
 		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
@@ -1133,7 +1135,8 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 		}
 
-		// TODO: add enchantments here
+		// Merge enchantments and calculate cost
+		EnchantmentCost = Input.m_Enchantments.Merge(SecondInput.m_Enchantments, Input.m_ItemType, SecondInput.m_ItemType);
 	}
 
 	int NameChangeExp = 0;
@@ -1169,9 +1172,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		return;
 	}
 
-	// TODO: Add enchantment exp cost.
-
-	m_MaximumCost = RepairCost + NeedExp;
+	m_MaximumCost = RepairCost + EnchantmentCost + NeedExp;
 
 	if (NeedExp < 0)
 	{

@@ -175,32 +175,32 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 		const char * m_Name;
 	} EnchantmentNames[] =
 	{
-		{ enchProtection,           "Protection"},
-		{ enchFireProtection,       "FireProtection"},
-		{ enchFeatherFalling,       "FeatherFalling"},
-		{ enchBlastProtection,      "BlastProtection"},
-		{ enchProjectileProtection, "ProjectileProtection"},
-		{ enchRespiration,          "Respiration"},
-		{ enchAquaAffinity,         "AquaAffinity"},
-		{ enchThorns,               "Thorns"},
-		{ enchDepthStrider,         "DepthStrider"},
-		{ enchSharpness,            "Sharpness"},
-		{ enchSmite,                "Smite"},
-		{ enchBaneOfArthropods,     "BaneOfArthropods"},
-		{ enchKnockback,            "Knockback"},
-		{ enchFireAspect,           "FireAspect"},
-		{ enchLooting,              "Looting"},
-		{ enchEfficiency,           "Efficiency"},
-		{ enchSilkTouch,            "SilkTouch"},
-		{ enchUnbreaking,           "Unbreaking"},
-		{ enchFortune,              "Fortune"},
-		{ enchPower,                "Power"},
-		{ enchPunch,                "Punch"},
-		{ enchFlame,                "Flame"},
-		{ enchInfinity,             "Infinity"},
-		{ enchLuckOfTheSea,         "LuckOfTheSea"},
-		{ enchLure,                 "Lure"},
-	} ;
+		{ enchProtection, "Protection" },
+		{ enchFireProtection, "FireProtection" },
+		{ enchFeatherFalling, "FeatherFalling" },
+		{ enchBlastProtection, "BlastProtection" },
+		{ enchProjectileProtection, "ProjectileProtection" },
+		{ enchRespiration, "Respiration" },
+		{ enchAquaAffinity, "AquaAffinity" },
+		{ enchThorns, "Thorns" },
+		{ enchDepthStrider, "DepthStrider" },
+		{ enchSharpness, "Sharpness" },
+		{ enchSmite, "Smite" },
+		{ enchBaneOfArthropods, "BaneOfArthropods" },
+		{ enchKnockback, "Knockback" },
+		{ enchFireAspect, "FireAspect" },
+		{ enchLooting, "Looting" },
+		{ enchEfficiency, "Efficiency" },
+		{ enchSilkTouch, "SilkTouch" },
+		{ enchUnbreaking, "Unbreaking" },
+		{ enchFortune, "Fortune" },
+		{ enchPower, "Power" },
+		{ enchPunch, "Punch" },
+		{ enchFlame, "Flame" },
+		{ enchInfinity, "Infinity" },
+		{ enchLuckOfTheSea, "LuckOfTheSea" },
+		{ enchLure, "Lure" },
+	};
 
 	// First try to parse as a number:
 	int id = atoi(a_EnchantmentName.c_str());
@@ -236,6 +236,323 @@ bool cEnchantments::operator ==(const cEnchantments & a_Other) const
 bool cEnchantments::operator !=(const cEnchantments & a_Other) const
 {
 	return m_Enchantments != a_Other.m_Enchantments;
+}
+
+
+
+
+
+bool cEnchantments::IsValidEnchantment(int a_ItemType, int a_EnchantmentID)
+{
+	bool valid = true;
+
+	if (ItemCategory::IsTool(a_ItemType))
+	{
+		if (ItemCategory::IsSword(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchSharpness) &&
+				(a_EnchantmentID != cEnchantments::enchSmite) &&
+				(a_EnchantmentID != cEnchantments::enchBaneOfArthropods) &&
+				(a_EnchantmentID != cEnchantments::enchKnockback) &&
+				(a_EnchantmentID != cEnchantments::enchFireAspect) &&
+				(a_EnchantmentID != cEnchantments::enchLooting) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+
+		else if (ItemCategory::IsAxe(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchSharpness) &&
+				(a_EnchantmentID != cEnchantments::enchSmite) &&
+				(a_EnchantmentID != cEnchantments::enchBaneOfArthropods) &&
+				(a_EnchantmentID != cEnchantments::enchEfficiency) &&
+				(a_EnchantmentID != cEnchantments::enchSilkTouch) &&
+				(a_EnchantmentID != cEnchantments::enchFortune) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+
+		else if (ItemCategory::IsShovel(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchEfficiency) &&
+				(a_EnchantmentID != cEnchantments::enchSilkTouch) &&
+				(a_EnchantmentID != cEnchantments::enchFortune) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+
+		else if (ItemCategory::IsPickaxe(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchEfficiency) &&
+				(a_EnchantmentID != cEnchantments::enchSilkTouch) &&
+				(a_EnchantmentID != cEnchantments::enchFortune) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+
+		else if (ItemCategory::IsHoe(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+	}
+
+	else if (ItemCategory::IsArmor(a_ItemType))
+	{
+		if (ItemCategory::IsHelmet(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
+				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
+				(a_EnchantmentID != cEnchantments::enchBlastProtection) &&
+				(a_EnchantmentID != cEnchantments::enchProjectileProtection) &&
+				(a_EnchantmentID != cEnchantments::enchRespiration) &&
+				(a_EnchantmentID != cEnchantments::enchAquaAffinity) &&
+				(a_EnchantmentID != cEnchantments::enchThorns) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+
+		else if (ItemCategory::IsChestPlate(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
+				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
+				(a_EnchantmentID != cEnchantments::enchBlastProtection) &&
+				(a_EnchantmentID != cEnchantments::enchProjectileProtection) &&
+				(a_EnchantmentID != cEnchantments::enchThorns) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+
+		else if (ItemCategory::IsLeggings(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
+				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
+				(a_EnchantmentID != cEnchantments::enchBlastProtection) &&
+				(a_EnchantmentID != cEnchantments::enchProjectileProtection) &&
+				(a_EnchantmentID != cEnchantments::enchThorns) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+
+		else if (ItemCategory::IsBoots(a_ItemType))
+		{
+			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
+				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
+				(a_EnchantmentID != cEnchantments::enchFeatherFalling) &&
+				(a_EnchantmentID != cEnchantments::enchBlastProtection) &&
+				(a_EnchantmentID != cEnchantments::enchProjectileProtection) &&
+				(a_EnchantmentID != cEnchantments::enchThorns) &&
+				(a_EnchantmentID != cEnchantments::enchDepthStrider) &&
+				(a_EnchantmentID != cEnchantments::enchUnbreaking))
+			{
+				valid = false;
+			}
+		}
+	}
+
+	else if (a_ItemType == E_ITEM_BOW)
+	{
+		if ((a_EnchantmentID != cEnchantments::enchPower) &&
+			(a_EnchantmentID != cEnchantments::enchPunch) &&
+			(a_EnchantmentID != cEnchantments::enchFlame) &&
+			(a_EnchantmentID != cEnchantments::enchInfinity) &&
+			(a_EnchantmentID != cEnchantments::enchUnbreaking))
+		{
+			valid = false;
+		}
+	}
+
+	else if (a_ItemType == E_ITEM_FISHING_ROD)
+	{
+		if ((a_EnchantmentID != cEnchantments::enchUnbreaking) &&
+			(a_EnchantmentID != cEnchantments::enchLuckOfTheSea) &&
+			(a_EnchantmentID != cEnchantments::enchLure))
+		{
+			valid = false;
+		}
+	}
+
+	else if (a_ItemType == E_ITEM_CARROT_ON_STICK)
+	{
+		if (a_EnchantmentID != cEnchantments::enchUnbreaking)
+		{
+			valid = false;
+		}
+	}
+
+	else if (a_ItemType == E_ITEM_SHEARS)
+	{
+		if ((a_EnchantmentID != cEnchantments::enchUnbreaking) &&
+			(a_EnchantmentID != cEnchantments::enchEfficiency) &&
+			(a_EnchantmentID != cEnchantments::enchSilkTouch))
+		{
+			valid = false;
+		}
+	}
+
+	else if (a_ItemType == E_ITEM_FLINT_AND_STEEL)
+	{
+		if (a_EnchantmentID != cEnchantments::enchUnbreaking)
+		{
+			valid = false;
+		}
+	}
+
+	// NOTE: books can have any enchantment
+
+	return valid;
+}
+
+
+
+
+
+int cEnchantments::Merge(const cEnchantments & a_Other, int a_ItemType, int a_MergeItemType)
+{
+	int EnchantmentCost = 0;
+	bool WithBook = (a_MergeItemType == E_ITEM_ENCHANTED_BOOK);
+
+	for (cEnchantments::cMap::const_iterator itr = a_Other.m_Enchantments.begin(), end = a_Other.m_Enchantments.end(); itr != end; ++itr)
+	{
+		if (IsValidEnchantment(a_ItemType, itr->first))
+		{
+			// Check if we need to adjust the level when merging
+			unsigned int CurrentLevel = GetLevel(itr->first);
+			unsigned int MergeLevel = itr->second;
+			unsigned int NewLevel = CurrentLevel;
+
+			// Only increase level if merging with same level
+			if (CurrentLevel == MergeLevel)
+			{
+				// Increment the level
+				NewLevel++;
+			}
+			else if (CurrentLevel < MergeLevel)
+			{
+				// If merged item is higher level, then up the level
+				NewLevel = MergeLevel;
+			}
+
+			// check level cap for enchantment
+			unsigned int LevelCap = GetLevelCap(itr->first, NewLevel);
+			if (NewLevel > LevelCap)
+			{
+				// Over cap, set to cap
+				NewLevel = LevelCap;
+			}
+
+			// Calculate enchantment cost
+			if ((itr->first == cEnchantments::enchProtection) ||
+				(itr->first == cEnchantments::enchSharpness) ||
+				(itr->first == cEnchantments::enchEfficiency) ||
+				(itr->first == cEnchantments::enchPower))
+			{
+				EnchantmentCost += NewLevel;  // Multiplier: 1 / 1
+			}
+			else if ((itr->first == cEnchantments::enchFireProtection) ||
+				(itr->first == cEnchantments::enchFeatherFalling) ||
+				(itr->first == cEnchantments::enchProjectileProtection) ||
+				(itr->first == cEnchantments::enchSmite) ||
+				(itr->first == cEnchantments::enchBaneOfArthropods) ||
+				(itr->first == cEnchantments::enchKnockback) ||
+				(itr->first == cEnchantments::enchUnbreaking))
+			{
+				EnchantmentCost += NewLevel * (WithBook ? 1 : 2);  // Multiplier: 2 / 1
+			}
+			else if ((itr->first == cEnchantments::enchBlastProtection) ||
+				(itr->first == cEnchantments::enchRespiration) ||
+				(itr->first == cEnchantments::enchAquaAffinity) ||
+				(itr->first == cEnchantments::enchDepthStrider) ||
+				(itr->first == cEnchantments::enchFireAspect) ||
+				(itr->first == cEnchantments::enchLooting) ||
+				(itr->first == cEnchantments::enchFortune) ||
+				(itr->first == cEnchantments::enchPunch) ||
+				(itr->first == cEnchantments::enchFlame) ||
+				(itr->first == cEnchantments::enchLuckOfTheSea) ||
+				(itr->first == cEnchantments::enchLure))
+			{
+				EnchantmentCost += NewLevel * (WithBook ? 2 : 4);  // Multiplier: 4 / 2
+			}
+			else if ((itr->first == cEnchantments::enchThorns) ||
+				(itr->first == cEnchantments::enchSilkTouch) ||
+				(itr->first == cEnchantments::enchInfinity))
+			{
+				EnchantmentCost += NewLevel * (WithBook ? 4 : 8);  // Multiplier: 8 / 4
+			}
+
+			// Add or update enchantment on item
+			SetLevel(itr->first, NewLevel);
+		}
+	}  // for itr - a_Other.m_Enchantments[]
+
+	return EnchantmentCost;
+}
+
+
+
+
+
+int cEnchantments::GetLevelCap(int a_EnchantmentID, unsigned int a_EnchantmentLevel)
+{
+	int LevelCap = a_EnchantmentLevel;
+
+	// Check based on enchantment
+	switch (a_EnchantmentID)
+	{
+		case cEnchantments::enchSharpness:
+		case cEnchantments::enchSmite:
+		case cEnchantments::enchBaneOfArthropods:
+		case cEnchantments::enchEfficiency:
+		case cEnchantments::enchPower:
+			LevelCap = 5;
+			break;
+		case cEnchantments::enchProtection:
+		case cEnchantments::enchFireProtection:
+		case cEnchantments::enchFeatherFalling:
+		case cEnchantments::enchBlastProtection:
+		case cEnchantments::enchProjectileProtection:
+			LevelCap = 4;
+			break;
+		case cEnchantments::enchRespiration:
+		case cEnchantments::enchThorns:
+		case cEnchantments::enchDepthStrider:
+		case cEnchantments::enchLooting:
+		case cEnchantments::enchUnbreaking:
+		case cEnchantments::enchFortune:
+		case cEnchantments::enchLuckOfTheSea:
+		case cEnchantments::enchLure:
+			LevelCap = 3;
+			break;
+		case cEnchantments::enchKnockback:
+		case cEnchantments::enchFireAspect:
+		case cEnchantments::enchPunch:
+			LevelCap = 2;
+			break;
+		case cEnchantments::enchAquaAffinity:
+		case cEnchantments::enchSilkTouch:
+		case cEnchantments::enchFlame:
+		case cEnchantments::enchInfinity:
+			LevelCap = 1;
+			break;
+	}
+
+	return LevelCap;
 }
 
 
