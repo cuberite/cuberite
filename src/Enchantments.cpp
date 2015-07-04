@@ -242,7 +242,7 @@ bool cEnchantments::operator !=(const cEnchantments & a_Other) const
 
 
 
-bool cEnchantments::IsValidEnchantment(int a_ItemType, int a_EnchantmentID)
+bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 {
 	bool valid = true;
 
@@ -423,7 +423,7 @@ bool cEnchantments::IsValidEnchantment(int a_ItemType, int a_EnchantmentID)
 
 
 
-int cEnchantments::Merge(const cEnchantments & a_Other, int a_ItemType, int a_MergeItemType)
+int cEnchantments::Merge(const cEnchantments & a_Other, short a_ItemType, short a_MergeItemType)
 {
 	int EnchantmentCost = 0;
 	bool WithBook = (a_MergeItemType == E_ITEM_ENCHANTED_BOOK);
@@ -508,9 +508,9 @@ int cEnchantments::Merge(const cEnchantments & a_Other, int a_ItemType, int a_Me
 
 
 
-int cEnchantments::GetLevelCap(int a_EnchantmentID, unsigned int a_EnchantmentLevel)
+unsigned int cEnchantments::GetLevelCap(int a_EnchantmentID, unsigned int a_EnchantmentLevel)
 {
-	int LevelCap = a_EnchantmentLevel;
+	unsigned int LevelCap = a_EnchantmentLevel;
 
 	// Check based on enchantment
 	switch (a_EnchantmentID)
