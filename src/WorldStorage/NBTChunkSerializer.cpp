@@ -11,6 +11,7 @@
 #include "FastNBT.h"
 
 #include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/BrewingstandEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -189,6 +190,21 @@ void cNBTChunkSerializer::AddBeaconEntity(cBeaconEntity * a_Entity)
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddBrewingstandEntity(cBrewingstandEntity * a_Brewingstand)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Brewingstand, "Brewingstand");
+		m_Writer.BeginList("Items", TAG_Compound);
+			AddItemGrid(a_Brewingstand->GetContents());
+		m_Writer.EndList();
+		m_Writer.AddShort("BrewTime", a_Brewingstand->GetTimeBrewed());
 	m_Writer.EndCompound();
 }
 
@@ -909,23 +925,24 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	// Add tile-entity into NBT:
 	switch (a_Entity->GetBlockType())
 	{
-		case E_BLOCK_BEACON:        AddBeaconEntity      ((cBeaconEntity *)      a_Entity); break;
-		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)       a_Entity, a_Entity->GetBlockType()); break;
-		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *)a_Entity); break;
-		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)   a_Entity); break;
-		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)     a_Entity); break;
-		case E_BLOCK_ENDER_CHEST:   /* No data to be saved */                               break;
-		case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   ((cFlowerPotEntity *)   a_Entity); break;
-		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)     a_Entity); break;
-		case E_BLOCK_HEAD:          AddMobHeadEntity     ((cMobHeadEntity *)     a_Entity); break;
-		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)      a_Entity); break;
-		case E_BLOCK_JUKEBOX:       AddJukeboxEntity     ((cJukeboxEntity *)     a_Entity); break;
-		case E_BLOCK_LIT_FURNACE:   AddFurnaceEntity     ((cFurnaceEntity *)     a_Entity); break;
-		case E_BLOCK_MOB_SPAWNER:   AddMobSpawnerEntity  ((cMobSpawnerEntity *)  a_Entity); break;
-		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        ((cNoteEntity *)        a_Entity); break;
-		case E_BLOCK_SIGN_POST:     AddSignEntity        ((cSignEntity *)        a_Entity); break;
-		case E_BLOCK_TRAPPED_CHEST: AddChestEntity       ((cChestEntity *)       a_Entity, a_Entity->GetBlockType()); break;
-		case E_BLOCK_WALLSIGN:      AddSignEntity        ((cSignEntity *)        a_Entity); break;
+		case E_BLOCK_BEACON:        AddBeaconEntity      ((cBeaconEntity *)       a_Entity); break;
+		case E_BLOCK_BREWING_STAND: AddBrewingstandEntity((cBrewingstandEntity *) a_Entity); break;
+		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)        a_Entity, a_Entity->GetBlockType()); break;
+		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *) a_Entity); break;
+		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)    a_Entity); break;
+		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)      a_Entity); break;
+		case E_BLOCK_ENDER_CHEST:   /* No data to be saved */                                break;
+		case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   ((cFlowerPotEntity *)    a_Entity); break;
+		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)      a_Entity); break;
+		case E_BLOCK_HEAD:          AddMobHeadEntity     ((cMobHeadEntity *)      a_Entity); break;
+		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)       a_Entity); break;
+		case E_BLOCK_JUKEBOX:       AddJukeboxEntity     ((cJukeboxEntity *)      a_Entity); break;
+		case E_BLOCK_LIT_FURNACE:   AddFurnaceEntity     ((cFurnaceEntity *)      a_Entity); break;
+		case E_BLOCK_MOB_SPAWNER:   AddMobSpawnerEntity  ((cMobSpawnerEntity *)   a_Entity); break;
+		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        ((cNoteEntity *)         a_Entity); break;
+		case E_BLOCK_SIGN_POST:     AddSignEntity        ((cSignEntity *)         a_Entity); break;
+		case E_BLOCK_TRAPPED_CHEST: AddChestEntity       ((cChestEntity *)        a_Entity, a_Entity->GetBlockType()); break;
+		case E_BLOCK_WALLSIGN:      AddSignEntity        ((cSignEntity *)         a_Entity); break;
 
 		default:
 		{

@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "BeaconEntity.h"
 #include "BlockEntity.h"
+#include "BrewingstandEntity.h"
 #include "ChestEntity.h"
 #include "CommandBlockEntity.h"
 #include "DispenserEntity.h"
@@ -36,6 +37,7 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 		case E_BLOCK_ENDER_CHEST:   return new cEnderChestEntity  (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_FLOWER_POT:    return new cFlowerPotEntity   (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_FURNACE:       return new cFurnaceEntity     (a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_World);
+		case E_BLOCK_BREWING_STAND: return new cBrewingstandEntity(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_World);
 		case E_BLOCK_HEAD:          return new cMobHeadEntity     (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_HOPPER:        return new cHopperEntity      (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_MOB_SPAWNER:   return new cMobSpawnerEntity  (a_BlockX, a_BlockY, a_BlockZ, a_World);
