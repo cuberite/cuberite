@@ -33,9 +33,10 @@
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
 #include "Simulator/NoopFluidSimulator.h"
-#include "Simulator/NoopRedstoneSimulator.h"
+//#include "Simulator/NoopRedstoneSimulator.h"
+//#include "Simulator/IncrementalRedstoneSimulator.h"
+#include "Simulator/Redstone/RedstoneSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/IncrementalRedstoneSimulator.h"
 #include "Simulator/VanillaFluidSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
 
@@ -3356,11 +3357,12 @@ cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 
 	if (NoCaseCompare(SimulatorName, "Incremental") == 0)
 	{
-		res = new cIncrementalRedstoneSimulator(*this);
+		// res = new cIncrementalRedstoneSimulator(*this);
+		res = new cRedstoneSimulator(*this);
 	}
 	else if (NoCaseCompare(SimulatorName, "noop") == 0)
 	{
-		res = new cRedstoneNoopSimulator(*this);
+		res = new cRedstoneSimulator(*this);
 	}
 	
 	m_SimulatorManager->RegisterSimulator(res, 1);

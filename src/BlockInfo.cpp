@@ -633,7 +633,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_MOB_SPAWNER         ].m_PlaceSound = "dig.metal";
 	a_Info[E_BLOCK_WOODEN_STAIRS       ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_CHEST               ].m_PlaceSound = "dig.wood";
-	a_Info[E_BLOCK_REDSTONE_WIRE       ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_REDSTONE_WIRE       ].m_PlaceSound = "";
 	a_Info[E_BLOCK_DIAMOND_ORE         ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_DIAMOND_BLOCK       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_CRAFTING_TABLE      ].m_PlaceSound = "dig.wood";

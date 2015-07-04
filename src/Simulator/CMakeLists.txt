@@ -9,7 +9,6 @@ SET (SRCS
 	FireSimulator.cpp
 	FloodyFluidSimulator.cpp
 	FluidSimulator.cpp
-	IncrementalRedstoneSimulator.cpp
 	SandSimulator.cpp
 	Simulator.cpp
 	SimulatorManager.cpp
@@ -21,10 +20,8 @@ SET (HDRS
 	FireSimulator.h
 	FloodyFluidSimulator.h
 	FluidSimulator.h
-	IncrementalRedstoneSimulator.h
 	NoopFluidSimulator.h
 	NoopRedstoneSimulator.h
-	RedstoneSimulator.h
 	SandSimulator.h
 	Simulator.h
 	SimulatorManager.h
