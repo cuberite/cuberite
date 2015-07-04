@@ -428,7 +428,7 @@ int cEnchantments::Merge(const cEnchantments & a_Other, short a_ItemType, short 
 	int EnchantmentCost = 0;
 	bool WithBook = (a_MergeItemType == E_ITEM_ENCHANTED_BOOK);
 
-	for (auto& Enchantment : a_Other.m_Enchantments)
+	for (auto & Enchantment : a_Other.m_Enchantments)
 	{
 		if (IsValidEnchantment(a_ItemType, Enchantment.first))
 		{
