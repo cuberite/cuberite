@@ -79,7 +79,6 @@ namespace Redstone
 			if (lastHeatTick != ticks)
 			{
 				lastHeatTick = ticks;
-				heat = std::max(heat - 1, 0);
 				if (isBurntOut)
 				{
 					if (heat == 0)
@@ -89,9 +88,11 @@ namespace Redstone
 					}
 					else
 					{
+						heat = std::max(heat - 2, 0);
 						return{ Location };
 					}
 				}
+				heat = std::max(heat - 1, 0);
 			}
 
 
@@ -112,7 +113,7 @@ namespace Redstone
 					this->ticks = ticks + 2;
 					return{ Location };
 				}
-				else if (heat > 15 && state)
+				else if (heat > 22 && state)
 				{
 					isBurntOut = true;
 					// ok this is aweful, how else can I get sounds out?
@@ -126,7 +127,7 @@ namespace Redstone
 					pushUpdate = true;
 					if (isOn)
 					{
-						heat += 4;
+						heat += 5;
 					}
 					return GetAdjacent(true);
 				}

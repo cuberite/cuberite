@@ -42,11 +42,11 @@ void cRedstoneSimulator::Simulate(float a_dt)
 	while (!work.empty())
 	{
 		// grab the first element and remove it from the list
-		Vector3i location = work.front();
+		Vector3i location = work.back();
+		work.pop_back();
 		ComponentPtr component(factory.GetComponent(location));
 		if (component == nullptr)
 		{
-			work.pop_front();
 			continue;
 		}
 
@@ -70,7 +70,6 @@ void cRedstoneSimulator::Simulate(float a_dt)
 				work.push_back(item);
 			}
 		}
-		work.pop_front();
 	}
 
 	for (ComponentPtr item : updated)
