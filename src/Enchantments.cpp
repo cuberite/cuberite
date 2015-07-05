@@ -469,7 +469,7 @@ int cEnchantments::Merge(const cEnchantments & a_Other, short a_ItemType, short 
 				NewLevel = LevelCap;
 			}
 
-			// Calculate enchantment cost, With Book/Without Book
+			// Calculate enchantment cost, With Book / Without Book
 			switch (Enchantment.first)
 			{
 				case cEnchantments::enchProtection:
