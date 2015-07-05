@@ -244,12 +244,11 @@ bool cEnchantments::operator !=(const cEnchantments & a_Other) const
 
 bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 {
-	bool valid = true;
-
 	if (ItemCategory::IsTool(a_ItemType))
 	{
 		if (ItemCategory::IsSword(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchSharpness) &&
 				(a_EnchantmentID != cEnchantments::enchSmite) &&
 				(a_EnchantmentID != cEnchantments::enchBaneOfArthropods) &&
@@ -258,12 +257,13 @@ bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 				(a_EnchantmentID != cEnchantments::enchLooting) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 
 		else if (ItemCategory::IsAxe(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchSharpness) &&
 				(a_EnchantmentID != cEnchantments::enchSmite) &&
 				(a_EnchantmentID != cEnchantments::enchBaneOfArthropods) &&
@@ -272,37 +272,40 @@ bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 				(a_EnchantmentID != cEnchantments::enchFortune) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 
 		else if (ItemCategory::IsShovel(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchEfficiency) &&
 				(a_EnchantmentID != cEnchantments::enchSilkTouch) &&
 				(a_EnchantmentID != cEnchantments::enchFortune) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 
 		else if (ItemCategory::IsPickaxe(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchEfficiency) &&
 				(a_EnchantmentID != cEnchantments::enchSilkTouch) &&
 				(a_EnchantmentID != cEnchantments::enchFortune) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 
 		else if (ItemCategory::IsHoe(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 	}
@@ -311,6 +314,7 @@ bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 	{
 		if (ItemCategory::IsHelmet(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
 				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
 				(a_EnchantmentID != cEnchantments::enchBlastProtection) &&
@@ -320,12 +324,13 @@ bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 				(a_EnchantmentID != cEnchantments::enchThorns) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 
 		else if (ItemCategory::IsChestPlate(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
 				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
 				(a_EnchantmentID != cEnchantments::enchBlastProtection) &&
@@ -333,12 +338,13 @@ bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 				(a_EnchantmentID != cEnchantments::enchThorns) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 
 		else if (ItemCategory::IsLeggings(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
 				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
 				(a_EnchantmentID != cEnchantments::enchBlastProtection) &&
@@ -346,12 +352,13 @@ bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 				(a_EnchantmentID != cEnchantments::enchThorns) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 
 		else if (ItemCategory::IsBoots(a_ItemType))
 		{
+			// Check if valid enchantment for this item
 			if ((a_EnchantmentID != cEnchantments::enchProtection) &&
 				(a_EnchantmentID != cEnchantments::enchFireProtection) &&
 				(a_EnchantmentID != cEnchantments::enchFeatherFalling) &&
@@ -361,62 +368,67 @@ bool cEnchantments::IsValidEnchantment(short a_ItemType, int a_EnchantmentID)
 				(a_EnchantmentID != cEnchantments::enchDepthStrider) &&
 				(a_EnchantmentID != cEnchantments::enchUnbreaking))
 			{
-				valid = false;
+				return false;
 			}
 		}
 	}
 
 	else if (a_ItemType == E_ITEM_BOW)
 	{
+		// Check if valid enchantment for this item
 		if ((a_EnchantmentID != cEnchantments::enchPower) &&
 			(a_EnchantmentID != cEnchantments::enchPunch) &&
 			(a_EnchantmentID != cEnchantments::enchFlame) &&
 			(a_EnchantmentID != cEnchantments::enchInfinity) &&
 			(a_EnchantmentID != cEnchantments::enchUnbreaking))
 		{
-			valid = false;
+			return false;
 		}
 	}
 
 	else if (a_ItemType == E_ITEM_FISHING_ROD)
 	{
+		// Check if valid enchantment for this item
 		if ((a_EnchantmentID != cEnchantments::enchUnbreaking) &&
 			(a_EnchantmentID != cEnchantments::enchLuckOfTheSea) &&
 			(a_EnchantmentID != cEnchantments::enchLure))
 		{
-			valid = false;
+			return false;
 		}
 	}
 
 	else if (a_ItemType == E_ITEM_CARROT_ON_STICK)
 	{
+		// Check if valid enchantment for this item
 		if (a_EnchantmentID != cEnchantments::enchUnbreaking)
 		{
-			valid = false;
+			return false;
 		}
 	}
 
 	else if (a_ItemType == E_ITEM_SHEARS)
 	{
+		// Check if valid enchantment for this item
 		if ((a_EnchantmentID != cEnchantments::enchUnbreaking) &&
 			(a_EnchantmentID != cEnchantments::enchEfficiency) &&
 			(a_EnchantmentID != cEnchantments::enchSilkTouch))
 		{
-			valid = false;
+			return false;
 		}
 	}
 
 	else if (a_ItemType == E_ITEM_FLINT_AND_STEEL)
 	{
+		// Check if valid enchantment for this item
 		if (a_EnchantmentID != cEnchantments::enchUnbreaking)
 		{
-			valid = false;
+			return false;
 		}
 	}
 
 	// NOTE: books can have any enchantment
 
-	return valid;
+	return true;
 }
 
 
@@ -520,15 +532,19 @@ unsigned int cEnchantments::GetLevelCap(int a_EnchantmentID, unsigned int a_Ench
 		case cEnchantments::enchBaneOfArthropods:
 		case cEnchantments::enchEfficiency:
 		case cEnchantments::enchPower:
+		{
 			LevelCap = 5;
 			break;
+		}
 		case cEnchantments::enchProtection:
 		case cEnchantments::enchFireProtection:
 		case cEnchantments::enchFeatherFalling:
 		case cEnchantments::enchBlastProtection:
 		case cEnchantments::enchProjectileProtection:
+		{
 			LevelCap = 4;
 			break;
+		}
 		case cEnchantments::enchRespiration:
 		case cEnchantments::enchThorns:
 		case cEnchantments::enchDepthStrider:
@@ -537,19 +553,25 @@ unsigned int cEnchantments::GetLevelCap(int a_EnchantmentID, unsigned int a_Ench
 		case cEnchantments::enchFortune:
 		case cEnchantments::enchLuckOfTheSea:
 		case cEnchantments::enchLure:
+		{
 			LevelCap = 3;
 			break;
+		}
 		case cEnchantments::enchKnockback:
 		case cEnchantments::enchFireAspect:
 		case cEnchantments::enchPunch:
+		{
 			LevelCap = 2;
 			break;
+		}
 		case cEnchantments::enchAquaAffinity:
 		case cEnchantments::enchSilkTouch:
 		case cEnchantments::enchFlame:
 		case cEnchantments::enchInfinity:
+		{
 			LevelCap = 1;
 			break;
+		}
 	}
 
 	return LevelCap;
