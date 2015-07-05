@@ -469,43 +469,50 @@ int cEnchantments::Merge(const cEnchantments & a_Other, short a_ItemType, short 
 				NewLevel = LevelCap;
 			}
 
-			// Calculate enchantment cost
-			if ((Enchantment.first == cEnchantments::enchProtection) ||
-				(Enchantment.first == cEnchantments::enchSharpness) ||
-				(Enchantment.first == cEnchantments::enchEfficiency) ||
-				(Enchantment.first == cEnchantments::enchPower))
+			// Calculate enchantment cost, With Book/Without Book
+			switch (Enchantment.first)
 			{
-				EnchantmentCost += NewLevel;  // Multiplier: 1 / 1
-			}
-			else if ((Enchantment.first == cEnchantments::enchFireProtection) ||
-				(Enchantment.first == cEnchantments::enchFeatherFalling) ||
-				(Enchantment.first == cEnchantments::enchProjectileProtection) ||
-				(Enchantment.first == cEnchantments::enchSmite) ||
-				(Enchantment.first == cEnchantments::enchBaneOfArthropods) ||
-				(Enchantment.first == cEnchantments::enchKnockback) ||
-				(Enchantment.first == cEnchantments::enchUnbreaking))
-			{
-				EnchantmentCost += NewLevel * (WithBook ? 1 : 2);  // Multiplier: 2 / 1
-			}
-			else if ((Enchantment.first == cEnchantments::enchBlastProtection) ||
-				(Enchantment.first == cEnchantments::enchRespiration) ||
-				(Enchantment.first == cEnchantments::enchAquaAffinity) ||
-				(Enchantment.first == cEnchantments::enchDepthStrider) ||
-				(Enchantment.first == cEnchantments::enchFireAspect) ||
-				(Enchantment.first == cEnchantments::enchLooting) ||
-				(Enchantment.first == cEnchantments::enchFortune) ||
-				(Enchantment.first == cEnchantments::enchPunch) ||
-				(Enchantment.first == cEnchantments::enchFlame) ||
-				(Enchantment.first == cEnchantments::enchLuckOfTheSea) ||
-				(Enchantment.first == cEnchantments::enchLure))
-			{
-				EnchantmentCost += NewLevel * (WithBook ? 2 : 4);  // Multiplier: 4 / 2
-			}
-			else if ((Enchantment.first == cEnchantments::enchThorns) ||
-				(Enchantment.first == cEnchantments::enchSilkTouch) ||
-				(Enchantment.first == cEnchantments::enchInfinity))
-			{
-				EnchantmentCost += NewLevel * (WithBook ? 4 : 8);  // Multiplier: 8 / 4
+				case cEnchantments::enchProtection:
+				case cEnchantments::enchSharpness:
+				case cEnchantments::enchEfficiency:
+				case cEnchantments::enchPower:
+				{
+					EnchantmentCost += NewLevel;  // Multiplier: 1 / 1
+					break;
+				}
+				case cEnchantments::enchFireProtection:
+				case cEnchantments::enchFeatherFalling:
+				case cEnchantments::enchProjectileProtection:
+				case cEnchantments::enchSmite:
+				case cEnchantments::enchBaneOfArthropods:
+				case cEnchantments::enchKnockback:
+				case cEnchantments::enchUnbreaking:
+				{
+					EnchantmentCost += NewLevel * (WithBook ? 1 : 2);  // Multiplier: 2 / 1
+					break;
+				}
+				case cEnchantments::enchBlastProtection:
+				case cEnchantments::enchRespiration:
+				case cEnchantments::enchAquaAffinity:
+				case cEnchantments::enchDepthStrider:
+				case cEnchantments::enchFireAspect:
+				case cEnchantments::enchLooting:
+				case cEnchantments::enchFortune:
+				case cEnchantments::enchPunch:
+				case cEnchantments::enchFlame:
+				case cEnchantments::enchLuckOfTheSea:
+				case cEnchantments::enchLure:
+				{
+					EnchantmentCost += NewLevel * (WithBook ? 2 : 4);  // Multiplier: 4 / 2
+					break;
+				}
+				case cEnchantments::enchThorns:
+				case cEnchantments::enchSilkTouch:
+				case cEnchantments::enchInfinity:
+				{
+					EnchantmentCost += NewLevel * (WithBook ? 4 : 8);  // Multiplier: 8 / 4
+					break;
+				}
 			}
 
 			// Add or update enchantment on item
