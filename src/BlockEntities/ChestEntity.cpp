@@ -37,7 +37,7 @@ void cChestEntity::SendTo(cClientHandle & a_Client)
 {
 	// The chest entity doesn't need anything sent to the client when it's created / gets in the viewdistance
 	// All the actual handling is in the cWindow UI code that gets called when the chest is rclked
-	
+
 	UNUSED(a_Client);
 }
 
@@ -54,7 +54,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 		OpenNewWindow();
 		Window = GetWindow();
 	}
-	
+
 	// Open the window for the player:
 	if (Window != nullptr)
 	{
@@ -80,7 +80,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 void cChestEntity::OpenNewWindow(void)
 {
 	// TODO: cats are an obstruction
-	if ((GetPosY() < cChunkDef::Height - 1) && cBlockInfo::IsSolid(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
+	if ((GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
 	{
 		// Obstruction, don't open
 		return;
@@ -96,10 +96,10 @@ void cChestEntity::OpenNewWindow(void)
 			m_ThisChest(a_ThisChest)
 		{
 		}
-		
+
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
-			if ((a_Chest->GetPosY() < cChunkDef::Height - 1) && cBlockInfo::IsSolid(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
+			if ((a_Chest->GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
 			{
 				// Obstruction, don't open
 				return false;
@@ -119,7 +119,7 @@ void cChestEntity::OpenNewWindow(void)
 			return false;
 		}
 	} ;
-	
+
 	// Scan neighbors for adjacent chests:
 	cOpenDouble OpenDbl(this);
 	if (
@@ -136,7 +136,3 @@ void cChestEntity::OpenNewWindow(void)
 	// There is no chest neighbor, open a single-chest window:
 	OpenWindow(new cChestWindow(this));
 }
-
-
-
-
