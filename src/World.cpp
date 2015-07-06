@@ -1455,9 +1455,12 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			if (BlockMeta < 7)
 			{
-				if (!a_IsByBonemeal) {
+				if (!a_IsByBonemeal)
+				{
 					++BlockMeta;
-				} else {
+				}
+				else
+				{
 					BlockMeta += random.NextInt(4) + 2;
 					BlockMeta = std::min(BlockMeta, 7);
 				}
@@ -1489,9 +1492,12 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			if (BlockMeta < 7)
 			{
-				if (!a_IsByBonemeal) {
+				if (!a_IsByBonemeal)
+				{
 					++BlockMeta;
-				} else {
+				}
+				else
+				{
 					BlockMeta += random.NextInt(4) + 2;
 					BlockMeta = std::min(BlockMeta, 7);
 				}
@@ -1510,9 +1516,12 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 
-				if (!a_IsByBonemeal) {
+				if (!a_IsByBonemeal)
+				{
 					++BlockMeta;
-				} else {
+				}
+				else
+				{
 					BlockMeta += random.NextInt(4) + 2;
 					BlockMeta = std::min(BlockMeta, 7);
 				}
@@ -1538,9 +1547,12 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			if (BlockMeta < 7)
 			{
-				if (!a_IsByBonemeal) {
+				if (!a_IsByBonemeal)
+				{
 					++BlockMeta;
-				} else {
+				}
+				else
+				{
 					BlockMeta += random.NextInt(4) + 2;
 					BlockMeta = std::min(BlockMeta, 7);
 				}
@@ -1559,9 +1571,12 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 
-				if (!a_IsByBonemeal) {
+				if (!a_IsByBonemeal)
+				{
 					++BlockMeta;
-				} else {
+				}
+				else
+				{
 					BlockMeta += random.NextInt(4) + 2;
 					BlockMeta = std::min(BlockMeta, 7);
 				}
@@ -1587,7 +1602,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			NIBBLETYPE TypeMeta = BlockMeta & 0x07;
 			int GrowState = BlockMeta >> 3;
-			
+
 			if (GrowState < 1)
 			{
 				// Non-bonemeal forces a growth, while bonemeal only has a chance of growing it
