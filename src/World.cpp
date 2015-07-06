@@ -1462,7 +1462,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				else
 				{
 					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, 7);
+					BlockMeta = std::min(BlockMeta, (NIBBLETYPE)7);
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
@@ -1499,7 +1499,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				else
 				{
 					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, 7);
+					BlockMeta = std::min(BlockMeta, (NIBBLETYPE)7);
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
@@ -1523,7 +1523,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				else
 				{
 					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, 7);
+					BlockMeta = std::min(BlockMeta, (NIBBLETYPE)7);
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
@@ -1554,7 +1554,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				else
 				{
 					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, 7);
+					BlockMeta = std::min(BlockMeta, (NIBBLETYPE)7);
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
@@ -1578,7 +1578,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				else
 				{
 					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, 7);
+					BlockMeta = std::min(BlockMeta, (NIBBLETYPE)7);
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
