@@ -86,8 +86,8 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 {
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
-		LOGD("BioGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
-		LOGD("BioGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
+		LOGD("BioGenCache: %u hits, %u misses, saved %.2f %%", static_cast<unsigned>(m_NumHits), static_cast<unsigned>(m_NumMisses), 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
+		LOGD("BioGenCache: Avg cache chain length: %.2f", static_cast<double>(m_TotalChain) / m_NumHits);
 	}
 
 	for (size_t i = 0; i < m_CacheSize; i++)

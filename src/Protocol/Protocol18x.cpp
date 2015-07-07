@@ -747,7 +747,7 @@ void cProtocol180::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 	cPacketizer Pkt(*this, 0x34);
 	Pkt.WriteVarInt32(a_ID);
 	Pkt.WriteBEUInt8(m_Scale);
-	Pkt.WriteVarInt32(a_Decorators.size());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Decorators.size()));
 
 	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
 	{
@@ -1715,7 +1715,7 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 	// Compress the data:
 	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
 
-	uLongf CompressedSize = compressBound(a_Packet.size());
+	uLongf CompressedSize = compressBound(static_cast<uLongf>(a_Packet.size()));
 	if (CompressedSize >= MAX_COMPRESSED_PACKET_LEN)
 	{
 		ASSERT(!"Too high packet size.");
@@ -1724,7 +1724,7 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 
 	int Status = compress2(
 		reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
-		reinterpret_cast<const Bytef *>(a_Packet.data()), a_Packet.size(), Z_DEFAULT_COMPRESSION
+		reinterpret_cast<const Bytef *>(a_Packet.data()), static_cast<uLongf>(a_Packet.size()), Z_DEFAULT_COMPRESSION
 	);
 	if (Status != Z_OK)
 	{
@@ -1737,7 +1737,7 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 	Buffer.ReadAll(LengthData);
 	Buffer.CommitRead();
 
-	Buffer.WriteVarInt32(CompressedSize + LengthData.size());
+	Buffer.WriteVarInt32(static_cast<UInt32>(CompressedSize + LengthData.size()));
 	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
 	Buffer.ReadAll(LengthData);
 	Buffer.CommitRead();
@@ -1910,7 +1910,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		AString UncompressedData;
 		if (m_State == 3)
 		{
-			UInt32 NumBytesRead = m_ReceivedData.GetReadableSpace();
+			UInt32 NumBytesRead = static_cast<UInt32>(m_ReceivedData.GetReadableSpace());
 			m_ReceivedData.ReadVarInt(CompressedSize);
 			if (CompressedSize > PacketLen)
 			{
@@ -1926,11 +1926,11 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 					m_Client->Kick("Compression failure");
 					return;
 				}
-				PacketLen = UncompressedData.size();
+				PacketLen = static_cast<UInt32>(UncompressedData.size());
 			}
 			else
 			{
-				NumBytesRead -= m_ReceivedData.GetReadableSpace();  // How many bytes has the CompressedSize taken up?
+				NumBytesRead -= static_cast<UInt32>(m_ReceivedData.GetReadableSpace());  // How many bytes has the CompressedSize taken up?
 				ASSERT(PacketLen > NumBytesRead);
 				PacketLen -= NumBytesRead;
 			}

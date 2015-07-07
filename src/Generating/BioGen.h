@@ -68,9 +68,9 @@ protected:
 	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
 	
 	// Cache statistics
-	int m_NumHits;
-	int m_NumMisses;
-	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
+	size_t m_NumHits;
+	size_t m_NumMisses;
+	size_t m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
 	
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;

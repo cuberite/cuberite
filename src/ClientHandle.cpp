@@ -440,9 +440,9 @@ bool cClientHandle::StreamNextChunk(void)
 		int RangeX, RangeZ = 0;
 		cChunkDef::BlockToChunk(FloorC(Vector.x), FloorC(Vector.z), RangeX, RangeZ);
 
-		for (size_t X = 0; X < 7; X++)
+		for (int X = 0; X < 7; X++)
 		{
-			for (size_t Z = 0; Z < 7; Z++)
+			for (int Z = 0; Z < 7; Z++)
 			{
 				int ChunkX = RangeX + ((X >= 4) ? (3 - X) : X);
 				int ChunkZ = RangeZ + ((Z >= 4) ? (3 - Z) : Z);
