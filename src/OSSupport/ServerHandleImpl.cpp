@@ -294,14 +294,14 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 		case AF_INET:
 		{
 			sockaddr_in * sin = reinterpret_cast<sockaddr_in *>(a_Addr);
-			evutil_inet_ntop(AF_INET, sin, IPAddress, ARRAYCOUNT(IPAddress));
+			evutil_inet_ntop(AF_INET, &(sin->sin_addr), IPAddress, ARRAYCOUNT(IPAddress));
 			Port = ntohs(sin->sin_port);
 			break;
 		}
 		case AF_INET6:
 		{
 			sockaddr_in6 * sin6 = reinterpret_cast<sockaddr_in6 *>(a_Addr);
-			evutil_inet_ntop(AF_INET, sin6, IPAddress, ARRAYCOUNT(IPAddress));
+			evutil_inet_ntop(AF_INET6, &(sin6->sin6_addr), IPAddress, ARRAYCOUNT(IPAddress));
 			Port = ntohs(sin6->sin6_port);
 			break;
 		}
