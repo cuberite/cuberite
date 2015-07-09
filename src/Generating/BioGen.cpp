@@ -554,7 +554,7 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		float NoiseCoordZ = static_cast<float>(a_ChunkZ * cChunkDef::Width + z / m_RiverCellSize);
+		float NoiseCoordZ = static_cast<float>(a_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biInvalidBiome)
@@ -563,7 +563,7 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 				continue;
 			}
 			
-			float NoiseCoordX = static_cast<float>(a_ChunkX * cChunkDef::Width + x / m_RiverCellSize);
+			float NoiseCoordX = static_cast<float>(a_ChunkX * cChunkDef::Width + x) / m_RiverCellSize;
 		
 			double Noise = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
 			Noise += 0.5 * m_Noise3.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
