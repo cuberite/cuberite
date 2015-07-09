@@ -523,7 +523,7 @@ namespace Json {
    class ValueAllocator
    {
    public:
-      enum { unknown = (unsigned)-1 };
+      enum { unknown = -1 };
 
       virtual ~ValueAllocator();
 
