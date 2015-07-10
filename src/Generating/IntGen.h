@@ -754,7 +754,7 @@ public:
 			int IdxZ = z * SizeX;
 			for (int x = 0; x < SizeX; x++)
 			{
-				size_t val = (size_t)a_Values[x + IdxZ];
+				size_t val = static_cast<size_t>(a_Values[x + IdxZ]);
 				const cBiomesInGroups & Biomes = (val > bgfRare) ?
 					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
 					biomesInGroups[val % ARRAYCOUNT(biomesInGroups)];
@@ -891,7 +891,7 @@ public:
 				}
 
 				// There's a river, change the output to a river or a frozen river, based on the original biome:
-				if (IsBiomeVeryCold((EMCSBiome)a_Values[idx]))
+				if (IsBiomeVeryCold(static_cast<EMCSBiome>(a_Values[idx])))
 				{
 					a_Values[idx] = biFrozenRiver;
 				}

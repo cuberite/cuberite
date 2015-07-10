@@ -2,7 +2,7 @@
 #pragma once
 
 #undef  ntohll
-#define ntohll(x) ((((UInt64)ntohl((UInt32)x)) << 32) + ntohl(x >> 32))
+#define ntohll(x) (((static_cast<UInt64>(ntohl(static_cast<UInt32>(x)))) << 32) + ntohl(x >> 32))
 
 
 
@@ -13,7 +13,7 @@ inline UInt64 HostToNetwork8(const void * a_Value)
 {
 	UInt64 buf;
 	memcpy( &buf, a_Value, sizeof( buf));
-	buf = (( ( (UInt64)htonl((UInt32)buf)) << 32) + htonl(buf >> 32));
+	buf = (( ( static_cast<UInt64>(htonl(static_cast<UInt32>(buf)))) << 32) + htonl(buf >> 32));
 	return buf;
 }
 

@@ -166,7 +166,7 @@ cBioGenMulticache::cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubC
 void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	const size_t coefficient = 3;
-	const size_t cacheIdx = ((size_t)a_ChunkX + coefficient * (size_t)a_ChunkZ) % m_NumSubCaches;
+	const size_t cacheIdx = (static_cast<size_t>(a_ChunkX) + coefficient * static_cast<size_t>(a_ChunkZ)) % m_NumSubCaches;
 
 	m_Caches[cacheIdx]->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 }
@@ -226,7 +226,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 	}  // for itr - Split[]
 	if (!m_Biomes.empty())
 	{
-		m_BiomesCount = (int)m_Biomes.size();
+		m_BiomesCount = static_cast<int>(m_Biomes.size());
 		return;
 	}
 
@@ -260,7 +260,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 	{
 		m_Biomes.push_back(Biomes[i]);
 	}
-	m_BiomesCount = (int)m_Biomes.size();
+	m_BiomesCount = static_cast<int>(m_Biomes.size());
 }
 
 
@@ -385,15 +385,15 @@ void cBioGenDistortedVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 
 void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ)
 {
-	double NoiseX = m_Noise.CubicNoise3D((float)a_BlockX / m_CellSize, (float)a_BlockZ / m_CellSize, 1000);
-	NoiseX += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / m_CellSize, 2 *  (float)a_BlockZ / m_CellSize, 2000);
-	NoiseX += 0.08 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / m_CellSize, 16 * (float)a_BlockZ / m_CellSize, 3000);
-	double NoiseZ = m_Noise.CubicNoise3D((float)a_BlockX / m_CellSize, (float)a_BlockZ / m_CellSize, 4000);
-	NoiseZ += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / m_CellSize, 2 *  (float)a_BlockZ / m_CellSize, 5000);
-	NoiseZ += 0.08 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / m_CellSize, 16 * (float)a_BlockZ / m_CellSize, 6000);
+	double NoiseX = m_Noise.CubicNoise3D(static_cast<float>(a_BlockX / m_CellSize), static_cast<float>(a_BlockZ / m_CellSize), 1000);
+	NoiseX += 0.5 * m_Noise.CubicNoise3D(2 *  static_cast<float>(a_BlockX / m_CellSize), 2 *  static_cast<float>(a_BlockZ / m_CellSize), 2000);
+	NoiseX += 0.08 * m_Noise.CubicNoise3D(16 * static_cast<float>(a_BlockX / m_CellSize), 16 * static_cast<float>(a_BlockZ / m_CellSize), 3000);
+	double NoiseZ = m_Noise.CubicNoise3D(static_cast<float>(a_BlockX / m_CellSize), static_cast<float>(a_BlockZ / m_CellSize), 4000);
+	NoiseZ += 0.5 * m_Noise.CubicNoise3D(2 *  static_cast<float>(a_BlockX / m_CellSize), 2 *  static_cast<float>(a_BlockZ / m_CellSize), 5000);
+	NoiseZ += 0.08 * m_Noise.CubicNoise3D(16 * static_cast<float>(a_BlockX / m_CellSize), 16 * static_cast<float>(a_BlockZ / m_CellSize), 6000);
 	
-	a_DistortedX = a_BlockX + (int)(m_CellSize * 0.5 * NoiseX);
-	a_DistortedZ = a_BlockZ + (int)(m_CellSize * 0.5 * NoiseZ);
+	a_DistortedX = a_BlockX + static_cast<int>(m_CellSize * 0.5 * NoiseX);
+	a_DistortedZ = a_BlockZ + static_cast<int>(m_CellSize * 0.5 * NoiseZ);
 }
 
 
@@ -429,7 +429,7 @@ void cBioGenMultiStepMap::InitializeBiomeGen(cIniFile & a_IniFile)
 	m_MushroomIslandSize  =        a_IniFile.GetValueSetI("Generator", "MultiStepMapMushroomIslandSize", m_MushroomIslandSize);
 	m_RiverCellSize       =        a_IniFile.GetValueSetI("Generator", "MultiStepMapRiverCellSize",      m_RiverCellSize);
 	m_RiverWidthThreshold =        a_IniFile.GetValueSetF("Generator", "MultiStepMapRiverWidth",         m_RiverWidthThreshold);
-	m_LandBiomesSize      = (float)a_IniFile.GetValueSetI("Generator", "MultiStepMapLandBiomeSize",      (int)m_LandBiomesSize);
+	m_LandBiomesSize      = static_cast<float>(a_IniFile.GetValueSetI("Generator", "MultiStepMapLandBiomeSize",      static_cast<int>(m_LandBiomesSize)));
 }
 
 
@@ -554,7 +554,7 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
+		float NoiseCoordZ = static_cast<float>(a_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biInvalidBiome)
@@ -563,7 +563,7 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 				continue;
 			}
 			
-			float NoiseCoordX = (float)(a_ChunkX * cChunkDef::Width + x) / m_RiverCellSize;
+			float NoiseCoordX = static_cast<float>(a_ChunkX * cChunkDef::Width + x) / m_RiverCellSize;
 		
 			double Noise = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
 			Noise += 0.5 * m_Noise3.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
@@ -597,15 +597,15 @@ void cBioGenMultiStepMap::ApplyTemperatureHumidity(int a_ChunkX, int a_ChunkZ, c
 
 void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize)
 {
-	double NoiseX = m_Noise3.CubicNoise2D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize);
-	NoiseX += 0.5 * m_Noise2.CubicNoise2D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize);
-	NoiseX += 0.1 * m_Noise1.CubicNoise2D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize);
-	double NoiseZ = m_Noise6.CubicNoise2D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize);
-	NoiseZ += 0.5 * m_Noise5.CubicNoise2D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize);
-	NoiseZ += 0.1 * m_Noise4.CubicNoise2D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize);
+	double NoiseX = m_Noise3.CubicNoise2D(     static_cast<float>(a_BlockX / a_CellSize),      static_cast<float>(a_BlockZ / a_CellSize));
+	NoiseX += 0.5 * m_Noise2.CubicNoise2D(2 *  static_cast<float>(a_BlockX / a_CellSize), 2 *  static_cast<float>(a_BlockZ / a_CellSize));
+	NoiseX += 0.1 * m_Noise1.CubicNoise2D(16 * static_cast<float>(a_BlockX / a_CellSize), 16 * static_cast<float>(a_BlockZ / a_CellSize));
+	double NoiseZ = m_Noise6.CubicNoise2D(     static_cast<float>(a_BlockX / a_CellSize),      static_cast<float>(a_BlockZ / a_CellSize));
+	NoiseZ += 0.5 * m_Noise5.CubicNoise2D(2 *  static_cast<float>(a_BlockX / a_CellSize), 2 *  static_cast<float>(a_BlockZ / a_CellSize));
+	NoiseZ += 0.1 * m_Noise4.CubicNoise2D(16 * static_cast<float>(a_BlockX / a_CellSize), 16 * static_cast<float>(a_BlockZ / a_CellSize));
 	
-	a_DistortedX = a_BlockX + (int)(a_CellSize * 0.5 * NoiseX);
-	a_DistortedZ = a_BlockZ + (int)(a_CellSize * 0.5 * NoiseZ);
+	a_DistortedX = a_BlockX + static_cast<int>(a_CellSize * 0.5 * NoiseX);
+	a_DistortedZ = a_BlockZ + static_cast<int>(a_CellSize * 0.5 * NoiseZ);
 }
 
 
@@ -619,10 +619,10 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 	DblMap HumidityMap;
 	for (int z = 0; z < 17; z += 8)
 	{
-		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_LandBiomesSize;
+		float NoiseCoordZ = static_cast<float>(a_ChunkZ * cChunkDef::Width + z) / m_LandBiomesSize;
 		for (int x = 0; x < 17; x += 8)
 		{
-			float NoiseCoordX = (float)(a_ChunkX * cChunkDef::Width + x) / m_LandBiomesSize;
+			float NoiseCoordX = static_cast<float>(a_ChunkX * cChunkDef::Width + x) / m_LandBiomesSize;
 		
 			double NoiseT = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
 			NoiseT += 0.5 * m_Noise2.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
@@ -641,8 +641,8 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 	// Re-map into integral values in [0 .. 255] range:
 	for (size_t idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
 	{
-		a_TemperatureMap[idx] = std::max(0, std::min(255, (int)(128 + TemperatureMap[idx] * 128)));
-		a_HumidityMap[idx]    = std::max(0, std::min(255, (int)(128 + HumidityMap[idx]    * 128)));
+		a_TemperatureMap[idx] = std::max(0, std::min(255, static_cast<int>(128 + TemperatureMap[idx] * 128)));
+		a_HumidityMap[idx]    = std::max(0, std::min(255, static_cast<int>(128 + HumidityMap[idx]    * 128)));
 	}
 }
 
@@ -771,8 +771,8 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 		NoiseZ       += m_AmpZ2 * m_Noise5.CubicNoise2D(BlockX * m_FreqZ2, BlockZ * m_FreqZ2);
 		NoiseZ       += m_AmpZ3 * m_Noise6.CubicNoise2D(BlockX * m_FreqZ3, BlockZ * m_FreqZ3);
 		
-		DistortX[4 * x][4 * z] = (int)(BlockX + NoiseX);
-		DistortZ[4 * x][4 * z] = (int)(BlockZ + NoiseZ);
+		DistortX[4 * x][4 * z] = static_cast<int>(BlockX + NoiseX);
+		DistortZ[4 * x][4 * z] = static_cast<int>(BlockZ + NoiseZ);
 	}
 	
 	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
@@ -913,18 +913,18 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	m_VoronoiLarge.SetCellSize(a_IniFile.GetValueSetI("Generator", "TwoLevelLargeCellSize", 1024));
 	m_VoronoiSmall.SetCellSize(a_IniFile.GetValueSetI("Generator", "TwoLevelSmallCellSize", 128));
-	m_FreqX1 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Freq", 0.01);
-	m_AmpX1  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Amp",  80);
-	m_FreqX2 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Freq", 0.05);
-	m_AmpX2  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Amp",  20);
-	m_FreqX3 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Freq", 0.1),
-	m_AmpX3  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Amp",  8);
-	m_FreqZ1 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Freq", 0.01);
-	m_AmpZ1  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Amp",  80);
-	m_FreqZ2 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Freq", 0.05);
-	m_AmpZ2  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Amp",  20);
-	m_FreqZ3 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Freq", 0.1);
-	m_AmpZ3  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Amp",  8);
+	m_FreqX1 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Freq", 0.01));
+	m_AmpX1  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Amp",  80));
+	m_FreqX2 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Freq", 0.05));
+	m_AmpX2  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Amp",  20));
+	m_FreqX3 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Freq", 0.1)),
+	m_AmpX3  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Amp",  8));
+	m_FreqZ1 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Freq", 0.01));
+	m_AmpZ1  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Amp",  80));
+	m_FreqZ2 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Freq", 0.05));
+	m_AmpZ2  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Amp",  20));
+	m_FreqZ3 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Freq", 0.1));
+	m_AmpZ3  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Amp",  8));
 }
 
 
@@ -1022,7 +1022,7 @@ public:
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				cChunkDef::SetBiome(a_Biomes, x, z, (EMCSBiome)vals[x + cChunkDef::Width * z]);
+				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[x + cChunkDef::Width * z]));
 			}
 		}
 	}
@@ -1126,7 +1126,7 @@ public:
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				cChunkDef::SetBiome(a_Biomes, x, z, (EMCSBiome)vals[x + cChunkDef::Width * z]);
+				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[x + cChunkDef::Width * z]));
 			}
 		}
 	}

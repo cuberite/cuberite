@@ -126,33 +126,33 @@ public:
 	int GetRoot(void) const {return 0; }
 
 	/** Returns the first child of the specified tag, or -1 if none / not applicable. */
-	int GetFirstChild (int a_Tag) const { return m_Tags[(size_t)a_Tag].m_FirstChild; }
+	int GetFirstChild (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; }
 	
 	/** Returns the last child of the specified tag, or -1 if none / not applicable. */
-	int GetLastChild  (int a_Tag) const { return m_Tags[(size_t)a_Tag].m_LastChild; }
+	int GetLastChild  (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_LastChild; }
 	
 	/** Returns the next sibling of the specified tag, or -1 if none. */
-	int GetNextSibling(int a_Tag) const { return m_Tags[(size_t)a_Tag].m_NextSibling; }
+	int GetNextSibling(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_NextSibling; }
 	
 	/** Returns the previous sibling of the specified tag, or -1 if none. */
-	int GetPrevSibling(int a_Tag) const { return m_Tags[(size_t)a_Tag].m_PrevSibling; }
+	int GetPrevSibling(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_PrevSibling; }
 	
 	/** Returns the length of the tag's data, in bytes.
 	Not valid for Compound or List tags! */
 	size_t GetDataLength (int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_List);
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_Compound);
-		return m_Tags[(size_t)a_Tag].m_DataLength;
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_List);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound);
+		return m_Tags[static_cast<size_t>(a_Tag)].m_DataLength;
 	}
 
 	/** Returns the data stored in this tag.
 	Not valid for Compound or List tags! */
 	const char * GetData(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_List);
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_Compound);
-		return m_Data + m_Tags[(size_t)a_Tag].m_DataStart;
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_List);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound);
+		return m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart;
 	}
 	
 	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
@@ -167,47 +167,47 @@ public:
 	/** Returns the child tag of the specified path (Name1 / Name2 / Name3...), or -1 if no such tag. */
 	int FindTagByPath(int a_Tag, const AString & a_Path) const;
 	
-	eTagType GetType(int a_Tag) const { return m_Tags[(size_t)a_Tag].m_Type; }
+	eTagType GetType(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_Type; }
 	
 	/** Returns the children type for a List tag; undefined on other tags. If list empty, returns TAG_End. */
 	eTagType GetChildrenType(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_List);
-		return (m_Tags[(size_t)a_Tag].m_FirstChild < 0) ? TAG_End : m_Tags[(size_t)m_Tags[(size_t)a_Tag].m_FirstChild].m_Type;
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_List);
+		return (m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild < 0) ? TAG_End : m_Tags[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild)].m_Type;
 	}
 	
 	/** Returns the value stored in a Byte tag. Not valid for any other tag type. */
 	inline unsigned char GetByte(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Byte);
-		return (unsigned char)(m_Data[(size_t)m_Tags[(size_t)a_Tag].m_DataStart]);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Byte);
+		return static_cast<unsigned char>(m_Data[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_DataStart)]);
 	}
 	
 	/** Returns the value stored in a Short tag. Not valid for any other tag type. */
 	inline Int16 GetShort(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Short);
-		return GetBEShort(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Short);
+		return GetBEShort(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
 	}
 
 	/** Returns the value stored in an Int tag. Not valid for any other tag type. */
 	inline Int32 GetInt(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Int);
-		return GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Int);
+		return GetBEInt(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
 	}
 
 	/** Returns the value stored in a Long tag. Not valid for any other tag type. */
 	inline Int64 GetLong(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Long);
-		return NetworkToHostLong8(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Long);
+		return NetworkToHostLong8(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
 	}
 
 	/** Returns the value stored in a Float tag. Not valid for any other tag type. */
 	inline float GetFloat(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Float);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Float);
 		
 		// Cause a compile-time error if sizeof(float) != 4
 		// If your platform produces a compiler error here, you'll need to add code that manually decodes 32-bit floats
@@ -216,7 +216,7 @@ public:
 		UNUSED_VAR(Check1);
 		UNUSED_VAR(Check2);
 		
-		Int32 i = GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
+		Int32 i = GetBEInt(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
 		float f;
 		memcpy(&f, &i, sizeof(f));
 		return f;
@@ -232,16 +232,16 @@ public:
 		UNUSED_VAR(Check1);
 		UNUSED_VAR(Check2);
 
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Double);
-		return NetworkToHostDouble8(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Double);
+		return NetworkToHostDouble8(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
 	}
 	
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
 	inline AString GetString(int a_Tag) const
 	{
-		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_String);
+		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_String);
 		AString res;
-		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_DataStart, (size_t)m_Tags[(size_t)a_Tag].m_DataLength);
+		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_DataLength));
 		return res;
 	}
 	
@@ -249,7 +249,7 @@ public:
 	inline AString GetName(int a_Tag) const
 	{
 		AString res;
-		res.assign(m_Data + m_Tags[(size_t)a_Tag].m_NameStart, (size_t)m_Tags[(size_t)a_Tag].m_NameLength);
+		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_NameStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_NameLength));
 		return res;
 	}
 	
@@ -333,8 +333,8 @@ protected:
 		if (IsStackTopCompound())
 		{
 			// Compound: add the type and name:
-			m_Result.push_back((char)a_Type);
-			WriteString(a_Name.c_str(), (UInt16)a_Name.length());
+			m_Result.push_back(static_cast<char>(a_Type));
+			WriteString(a_Name.c_str(), static_cast<UInt16>(a_Name.length()));
 		}
 		else
 		{

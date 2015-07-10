@@ -109,11 +109,11 @@ template <typename TYPE> void LinearUpscale2DArray(
 	TYPE RatioY[MAX_UPSCALE_Y];
 	for (int x = 0; x <= a_UpscaleX; x++)
 	{
-		RatioX[x] = (TYPE)x / a_UpscaleX;
+		RatioX[x] = static_cast<TYPE>(x) / a_UpscaleX;
 	}
 	for (int y = 0; y <= a_UpscaleY; y++)
 	{
-		RatioY[y] = (TYPE)y / a_UpscaleY;
+		RatioY[y] = static_cast<TYPE>(y) / a_UpscaleY;
 	}
 
 	// Interpolate each XY cell:
@@ -184,15 +184,15 @@ template <typename TYPE> void LinearUpscale3DArray(
 	TYPE RatioZ[MAX_UPSCALE_Z];
 	for (int x = 0; x <= a_UpscaleX; x++)
 	{
-		RatioX[x] = (TYPE)x / a_UpscaleX;
+		RatioX[x] = static_cast<TYPE>(x) / a_UpscaleX;
 	}
 	for (int y = 0; y <= a_UpscaleY; y++)
 	{
-		RatioY[y] = (TYPE)y / a_UpscaleY;
+		RatioY[y] = static_cast<TYPE>(y) / a_UpscaleY;
 	}
 	for (int z = 0; z <= a_UpscaleZ; z++)
 	{
-		RatioZ[z] = (TYPE)z / a_UpscaleZ;
+		RatioZ[z] = static_cast<TYPE>(z) / a_UpscaleZ;
 	}
 
 	// Interpolate each XYZ cell:
