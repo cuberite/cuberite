@@ -73,6 +73,7 @@ SET (HDRS
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set(CMAKE_CXX_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(BioGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
 	set_source_files_properties(Caves.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(ChunkGenerator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
