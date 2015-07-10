@@ -2,13 +2,14 @@
 #pragma once
 
 #include "PassiveMonster.h"
+#include "Ageable.h"
 
 
 
 
 
 class cPig :
-	public cPassiveMonster
+	public cPassiveMonster, public Ageable
 {
 	typedef cPassiveMonster super;
 	

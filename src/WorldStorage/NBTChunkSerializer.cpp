@@ -554,6 +554,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddInt ("Style",          Horse.GetHorseStyle());
 				m_Writer.AddInt ("ArmorType",      Horse.GetHorseArmour());
 				m_Writer.AddByte("Saddle",         Horse.IsSaddled());
+                m_Writer.AddByte("Age",            Horse.GetAge());
 				break;
 			}
 			case mtMagmaCube:
@@ -565,6 +566,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			{
 				m_Writer.AddByte("Sheared", ((const cSheep *)a_Monster)->IsSheared());
 				m_Writer.AddByte("Color",   ((const cSheep *)a_Monster)->GetFurColor());
+                m_Writer.AddByte("Age", ((const cSheep *)a_Monster)->GetAge());
 				break;
 			}
 			case mtSlime:
@@ -580,6 +582,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case mtVillager:
 			{
 				m_Writer.AddInt("Profession", ((const cVillager *)a_Monster)->GetVilType());
+                m_Writer.AddByte("Age", ((const cVillager *)a_Monster)->GetAge());
 				break;
 			}
 			case mtWither:
@@ -601,15 +604,39 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddByte("Sitting",     Wolf.IsSitting() ? 1 : 0);
 				m_Writer.AddByte("Angry",       Wolf.IsAngry() ? 1 : 0);
 				m_Writer.AddByte("CollarColor", (unsigned char)Wolf.GetCollarColor());
+                m_Writer.AddByte("Age", Wolf.GetAge());
 				break;
 			}
 			case mtZombie:
 			{
 				m_Writer.AddByte("IsVillager",   (((const cZombie *)a_Monster)->IsVillagerZombie() ? 1 : 0));
-				m_Writer.AddByte("IsBaby",       (((const cZombie *)a_Monster)->IsBaby() ? 1 : 0));
 				m_Writer.AddByte("IsConverting", (((const cZombie *)a_Monster)->IsConverting() ? 1 : 0));
+                m_Writer.AddByte("Age",          (((const cZombie *)a_Monster)->GetAge()));
 				break;
 			}
+            case mtZombiePigman:
+            {
+                m_Writer.AddByte("Age",          (((const cZombiePigman *)a_Monster)->GetAge()));
+                break;
+            }
+            case mtOcelot:
+            {
+                const cOcelot & Ocelot = *((cOcelot *)a_Monster);
+                m_Writer.AddByte("Age", Ocelot.GetAge());
+                break;
+            }
+            case mtPig:
+            {
+                const cPig & Pig = *((cPig *)a_Monster);
+                m_Writer.AddByte("Age", Pig.GetAge());
+                break;
+            }
+            case mtRabbit:
+            {
+                const cRabbit & Rabbit = *((cRabbit *)a_Monster);
+                m_Writer.AddByte("Age", Rabbit.GetAge());
+                break;
+            }
 			case mtInvalidType:
 			case mtBlaze:
 			case mtCaveSpider:
@@ -621,15 +648,11 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case mtGuardian:
 			case mtIronGolem:
 			case mtMooshroom:
-			case mtOcelot:
-			case mtPig:
-			case mtRabbit:
 			case mtSilverfish:
 			case mtSnowGolem:
 			case mtSpider:
 			case mtSquid:
 			case mtWitch:
-			case mtZombiePigman:
 			{
 				// Other mobs have no special tags.
 				break;

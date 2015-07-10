@@ -2257,6 +2257,13 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
+    
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2346,6 +2353,13 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
+    
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2366,6 +2380,13 @@ void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		return;
 	}
 
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
+    
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2385,6 +2406,13 @@ void cWSSAnvil::LoadRabbitFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		return;
 	}
+    
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
 
 	a_Entities.push_back(Monster.release());
 }
@@ -2419,6 +2447,13 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		Monster->SetSheared(a_NBT.GetByte(ShearedIdx) != 0);
 	}
 
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
+    
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2583,6 +2618,14 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	{
 		return;
 	}
+    
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
+    
 
 	a_Entities.push_back(Monster.release());
 }
@@ -2683,6 +2726,14 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 			}
 		}
 	}
+    
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
+    
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2711,6 +2762,13 @@ void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
+    
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2730,6 +2788,13 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	{
 		return;
 	}
+    
+    int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+    if (AgeableIdx > 0)
+    {
+        Byte Age = a_NBT.GetByte(AgeableIdx);
+        Monster->SetAge(Age);
+    }
 
 	a_Entities.push_back(Monster.release());
 }

@@ -41,6 +41,7 @@ SET (SRCS
 	ZombiePigman.cpp)
 	
 SET (HDRS
+	Ageable.h
 	AggressiveMonster.h
 	Bat.h
 	Blaze.h

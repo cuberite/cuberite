@@ -112,7 +112,6 @@ public:
 	void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
 
 	// Overridables to handle ageable mobs
-	virtual bool IsBaby    (void) const { return false; }
 	virtual bool IsTame    (void) const { return false; }
 	virtual bool IsSitting (void) const { return false; }
 

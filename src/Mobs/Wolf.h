@@ -3,13 +3,13 @@
 
 #include "PassiveAggressiveMonster.h"
 #include "../Entities/Entity.h"
-
+#include "Ageable.h"
 
 
 
 
 class cWolf :
-	public cPassiveAggressiveMonster
+	public cPassiveAggressiveMonster, public Ageable
 {
 	typedef cPassiveAggressiveMonster super;
 	

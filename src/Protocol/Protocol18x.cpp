@@ -3388,10 +3388,6 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			{
 				Flags |= 0x08;
 			}
-			if (Horse.IsBaby())
-			{
-				Flags |= 0x10;
-			}
 			if (Horse.IsEating())
 			{
 				Flags |= 0x20;
@@ -3415,6 +3411,9 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEInt32(Appearance);
 			a_Pkt.WriteBEUInt8(0x56);  // Int at index 22
 			a_Pkt.WriteBEInt32(Horse.GetHorseArmour());
+            
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(Horse.GetAge());
 			break;
 		}  // case mtHorse
 
@@ -3426,17 +3425,38 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			break;
 		}  // case mtMagmaCube
 
+        case mtOcelot:
+        {
+            auto & Ocelot = reinterpret_cast<const cOcelot &>(a_Mob);
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(Ocelot.GetAge());
+            break;
+        } // case mtOcelot
+            
 		case mtPig:
 		{
 			auto & Pig = reinterpret_cast<const cPig &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(Pig.GetAge());
+            a_Pkt.WriteBEUInt8(0x10);
 			a_Pkt.WriteBEUInt8(Pig.IsSaddled() ? 1 : 0);
 			break;
 		}  // case mtPig
 		
+        case mtRabbit:
+        {
+            auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(Rabbit.GetAge());
+            break;
+        } // case mtRabbit
+            
 		case mtSheep:
 		{
 			auto & Sheep = reinterpret_cast<const cSheep &>(a_Mob);
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(Sheep.GetAge());
+            
 			a_Pkt.WriteBEUInt8(0x10);
 			Byte SheepMetadata = 0;
 			SheepMetadata = Sheep.GetFurColor();
@@ -3469,6 +3489,8 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			auto & Villager = reinterpret_cast<const cVillager &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x50);
 			a_Pkt.WriteBEInt32(Villager.GetVilType());
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(Villager.GetAge());
 			break;
 		}  // case mtVillager
 		
@@ -3515,6 +3537,9 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(Wolf.IsBegging() ? 1 : 0);
 			a_Pkt.WriteBEUInt8(0x14);
 			a_Pkt.WriteBEUInt8(Wolf.GetCollarColor());
+            
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(Wolf.GetAge());
 			break;
 		}  // case mtWolf
 		
@@ -3522,13 +3547,21 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Zombie = reinterpret_cast<const cZombie &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEUInt8(Zombie.IsBaby() ? 1 : 0);
+            a_Pkt.WriteBEInt8(Zombie.IsBaby() ? 1 : -1);
 			a_Pkt.WriteBEUInt8(0x0d);
 			a_Pkt.WriteBEUInt8(Zombie.IsVillagerZombie() ? 1 : 0);
 			a_Pkt.WriteBEUInt8(0x0e);
 			a_Pkt.WriteBEUInt8(Zombie.IsConverting() ? 1 : 0);
 			break;
 		}  // case mtZombie
+            
+        case mtZombiePigman:
+        {
+            auto & ZombiePigman = reinterpret_cast<const cZombiePigman &>(a_Mob);
+            a_Pkt.WriteBEUInt8(0x0c);
+            a_Pkt.WriteBEInt8(ZombiePigman.IsBaby() ? 1 : -1);
+            break;
+        }  // case mtZombiePigman
 	}  // switch (a_Mob.GetType())
 }
 

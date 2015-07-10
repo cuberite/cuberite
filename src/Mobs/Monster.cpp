@@ -696,7 +696,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 			break;
 		}
 	}
-	if ((a_TDI.Attacker != nullptr) && (!IsBaby()))
+	if (a_TDI.Attacker != nullptr)
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}

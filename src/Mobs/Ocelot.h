@@ -2,18 +2,18 @@
 #pragma once
 
 #include "PassiveMonster.h"
-
+#include "Ageable.h"
 
 
 
 
 class cOcelot :
-	public cPassiveMonster
+	public cPassiveMonster, public Ageable
 {
 	typedef cPassiveMonster super;
 	
 public:
-	cOcelot(void) :
+	cOcelot() :
 		super("Ocelot", mtOcelot, "mob.cat.hitt", "mob.cat.hitt", 0.6, 0.8)
 	{
 	}

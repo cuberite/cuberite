@@ -3,12 +3,12 @@
 
 #include "PassiveMonster.h"
 #include "Blocks/ChunkInterface.h"
-
+#include "Ageable.h"
 
 
 
 class cVillager :
-	public cPassiveMonster
+	public cPassiveMonster, public Ageable
 {
 	typedef cPassiveMonster super;
 	

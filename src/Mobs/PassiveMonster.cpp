@@ -43,6 +43,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		CheckEventLostPlayer();
 	}
+    
 	cItem FollowedItem = GetFollowedItem();
 	if (FollowedItem.IsEmpty())
 	{
