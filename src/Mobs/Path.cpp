@@ -17,9 +17,6 @@
 
 
 
-
-
-
 bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
 {
 	return a_Cell1->m_F > a_Cell2->m_F;
@@ -36,7 +33,7 @@ cPath::cPath(
 	double a_BoundingBoxWidth, double a_BoundingBoxHeight,
 	int a_MaxUp, int a_MaxDown
 ) :
-
+	m_StepsLeft(a_MaxSteps),
 	m_CurrentPoint(0),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
 	m_Chunk(&a_Chunk),
 	m_BadChunkFound(false)
@@ -67,22 +64,8 @@ cPath::cPath(
 
 	m_NearestPointToTarget = GetCell(m_Source);
 	m_Status = ePathFinderStatus::CALCULATING;
-	m_StepsLeft = a_MaxSteps;
 
-	ProcessCell(GetCell(a_StartingPoint), nullptr, 0);
-	m_Chunk = nullptr;
-}
-
-
-
-
-
-cPath::~cPath()
-{
-	if (m_Status == ePathFinderStatus::CALCULATING)
-	{
-		FinishCalculation();
-	}
+	ProcessCell(GetCell(m_Source), nullptr, 0);
 }
 
 
@@ -113,7 +96,7 @@ ePathFinderStatus cPath::Step(cChunk & a_Chunk)
 		int i;
 		for (i = 0; i < CALCULATIONS_PER_STEP; ++i)
 		{
-			if (Step_Internal())  // Step_Internal returns true when no more calculation is needed.
+			if (StepOnce())  // StepOnce returns true when no more calculation is needed.
 			{
 				break;  // if we're here, m_Status must have changed either to PATH_FOUND or PATH_NOT_FOUND.
 			}
@@ -179,7 +162,7 @@ bool cPath::IsSolid(const Vector3i & a_Location)
 
 
 
-bool cPath::Step_Internal()
+bool cPath::StepOnce()
 {
 	cPathCell * CurrentCell = OpenListPop();
 
