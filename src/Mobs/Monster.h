@@ -112,10 +112,14 @@ public:
 	void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
 
 	// Overridables to handle ageable mobs
-	virtual bool IsBaby    (void) const { return false; }
 	virtual bool IsTame    (void) const { return false; }
 	virtual bool IsSitting (void) const { return false; }
 
+	bool IsBaby (void) const { return m_Age < 0; }
+	char GetAge (void) const { return m_Age; }
+	void SetAge(char a_Age)  { m_Age = a_Age; }
+	
+	
 	// tolua_begin
 
 	/** Returns true if the monster has a custom name. */
@@ -269,6 +273,8 @@ protected:
 	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;
+
+	char m_Age;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops*/
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
