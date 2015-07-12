@@ -115,7 +115,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, unsigned int a_Line
 	Line.erase(Line.begin());  // Remove the beginning "!"
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
 
-	std::unique_ptr<cItem> Item(new cItem);
+	std::unique_ptr<cItem> Item = cpp14::make_unique<cItem>();
 	int BurnTime;
 
 	const AStringVector & Sides = StringSplit(Line, "=");
@@ -157,8 +157,8 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
 
 	int CookTime = 200;
-	std::unique_ptr<cItem> InputItem(new cItem());
-	std::unique_ptr<cItem> OutputItem(new cItem());
+	std::unique_ptr<cItem> InputItem = cpp14::make_unique<cItem>();
+	std::unique_ptr<cItem> OutputItem = cpp14::make_unique<cItem>();
 
 	const AStringVector & Sides = StringSplit(Line, "=");
 	if (Sides.size() != 2)
