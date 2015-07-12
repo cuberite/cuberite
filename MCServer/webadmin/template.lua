@@ -180,7 +180,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 				<li><a href="http://cuberite.org" target="_blank">Cuberite</a></li>
 				<li><a href="http://forum.mc-server.org" target="_blank">Forums</a></li>
 				<li><a href="http://builds.cuberite.org" target="_blank">Buildserver</a></li>
-				<li><a href="http://mc-server.xoft.cz/LuaAPI" target="_blank">API Documentation</a></li>
+				<li><a href="http://api-docs.cuberite.org" target="_blank">API Documentation</a></li>
 				<li><a href="http://book.cuberite.org/" target="_blank">User's Manual</a></li>
 			</ul>
 		</div>
