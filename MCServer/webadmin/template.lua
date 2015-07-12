@@ -187,7 +187,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	</div>
 	<div class="lower">
 		<div class="wrapper">
-			<span id="copyright">Copyright © <a href="http://www.cuberite.org" target="_blank">Cuberite Team</a> 2015.</span>
+			<span id="copyright">Copyright © <a href="http://www.cuberite.org" target="_blank">Cuberite Team</a>.</span>
 		</div>
 	</div>
 </div>
