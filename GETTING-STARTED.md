@@ -1,9 +1,9 @@
-Hello! Thanks for wanting to work on this project :smile:, and I hope that this file will help you somewhat in getting all set up and running. I'll go through the basics of getting the projet environment set up, the code organization and style, and general development practices. I'll also show you some good issues to start off working on to get yourself familiarised with the code.
+Hello! Thanks for wanting to work on this project :smile:, and I hope that this file will help you somewhat in getting all set up and running. I'll go through the basics of getting the project environment set up, the code organization and style, and general development practices. I'll also show you some good issues to start off working on to get yourself familiarised with the code.
 
 Minecraft Basics
 ----------------
 
-If you don't play Minecraft or don't have a great knowledge of the basic systems, you should get to know them. The [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki) is quite useful for this task, although some youtubers are also fairly good at teaching the basics and just playing is quite good too. It is possible to contribute without knowing minecraft in detail though.
+If you don't play Minecraft or don't have a great knowledge of the basic systems, you should get to know them. The [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki) is quite useful for this task, although some youtubers are also fairly good at teaching the basics and just playing is quite good too. It is possible to contribute without knowing minecraft in detail though, or even owning a license.
 
 I'd say that the important topics are:
 
