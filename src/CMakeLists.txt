@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.2)
-project (MCServer)
+project (Cuberite)
 
 
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
@@ -305,12 +305,12 @@ endforeach()
 FILE(WRITE "AllFiles.lst" "${ALLFILESLINES}")
 
 
-set(EXECUTABLE MCServer)
+set(EXECUTABLE Cuberite)
 
 if (MSVC)
 	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
-	
+
 	# The paths in BINDING_DEPENDENCIES are relative to the Bindings folder, convert them relative to this folder:
 	foreach (dep ${BINDING_DEPENDENCIES})
 		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
@@ -320,7 +320,7 @@ if (MSVC)
 		OUTPUT ${BINDING_OUTPUTS}
 
 		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/MCServer/lua51.dll ./lua51.dll
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/out/lua51.dll ./lua51.dll
 
 		# Regenerate bindings:
 		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
@@ -334,13 +334,13 @@ endif()
 add_executable(${EXECUTABLE} ${SOURCE})
 
 
-# Output the executable into the $/MCServer folder, so that it has access to external resources:
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
+# Output the executable into the $/out folder, so that it has access to external resources:
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/out)
 SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/MCServer
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_SOURCE_DIR}/MCServer
-	RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_SOURCE_DIR}/MCServer
-	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_SOURCE_DIR}/MCServer
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/out
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_SOURCE_DIR}/out
+	RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_SOURCE_DIR}/out
+	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_SOURCE_DIR}/out
 )
 
 

@@ -16,7 +16,7 @@ cd ..
 echo "Building..."
 make -j 2;
 make -j 2 test ARGS="-V";
-cd MCServer/;
+cd out/;
 if [ "$TRAVIS_MCSERVER_BUILD_TYPE" != "COVERAGE" ]
 	then echo stop | $MCSERVER_PATH;
 fi
