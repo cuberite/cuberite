@@ -75,7 +75,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	if (SlotsCnt == 0)
 	{
 		// Nothing in the dropspenser, play the click sound
-		m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.2f);
+		m_World->BroadcastSoundEffect("random.click", static_cast<double>(m_PosX), static_cast<double>(m_PosY), static_cast<double>(m_PosZ), 1.0f, 1.2f);
 		return;
 	}
 	
@@ -97,7 +97,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = 7; break;
 	}
 	m_World->BroadcastSoundParticleEffect(2000, m_PosX, m_PosY, m_PosZ, SmokeDir);
-	m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);
+	m_World->BroadcastSoundEffect("random.click", static_cast<double>(m_PosX), static_cast<double>(m_PosY), static_cast<double>(m_PosZ), 1.0f, 1.0f);
 }
 
 
