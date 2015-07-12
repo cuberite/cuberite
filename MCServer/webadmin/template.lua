@@ -56,7 +56,7 @@ end
 function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
 	local BaseURL = WebAdmin:GetBaseURL(TemplateRequest.Request.Path)
-	local Title = "MCServer WebAdmin"
+	local Title = "Cuberite WebAdmin"
 	local NumPlayers = cRoot:Get():GetServer():GetNumPlayers()
 	local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
 	local NumChunks = cRoot:Get():GetTotalChunkCount()
@@ -177,7 +177,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<div class="upper">
 		<div class="wrapper">
 			<ul class="menu bottom_links">
-				<li><a href="http://www.mc-server.org" target="_blank">MCServer</a></li>
+				<li><a href="http://cuberite.org" target="_blank">Cuberite</a></li>
 				<li><a href="http://forum.mc-server.org" target="_blank">Forums</a></li>
 				<li><a href="http://builds.cuberite.org" target="_blank">Buildserver</a></li>
 				<li><a href="http://mc-server.xoft.cz/LuaAPI" target="_blank">API Documentation</a></li>
@@ -187,7 +187,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	</div>
 	<div class="lower">
 		<div class="wrapper">
-			<span id="copyright">Copyright © <a href="http://www.mc-server.org" target="_blank">MCServer Team</a> 2014.</span>
+			<span id="copyright">Copyright © <a href="http://www.cuberite.org" target="_blank">Cuberite Team</a> 2015.</span>
 		</div>
 	</div>
 </div>
