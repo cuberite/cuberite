@@ -22,12 +22,21 @@
 [submodule "lib/polarssl"]
 	path = lib/polarssl
 	url = https://github.com/mc-server/polarssl.git
+	ignore = dirty
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
 	url = https://github.com/mc-server/SQLiteCpp.git
+	ignore = dirty
 [submodule "lib/libevent"]
 	path = lib/libevent
 	url = https://github.com/mc-server/libevent.git
+	ignore = dirty
+[submodule "lib/jsoncpp"]
+	path = lib/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git
+	ignore = dirty
 [submodule "lib/TCLAP"]
 	path = lib/TCLAP
 	url = https://github.com/mc-server/TCLAP.git
+	ignore = dirty
+

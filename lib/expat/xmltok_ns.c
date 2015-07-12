@@ -112,8 +112,4 @@ NS(XmlParseXmlDecl)(int isGeneralTextEntity,
                         standalone);
 }
 
-#else /* XML_TOK_NS_C */
-
-int xml_tok_ns_c;
-
 #endif /* XML_TOK_NS_C */
