@@ -87,7 +87,7 @@ void MainWindow::newGenerator()
 
 	// Set the chunk source:
 	cIniFilePtr iniFile = m_GeneratorSetup->getIniFile();
-	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(iniFile)));
+	m_BiomeView->setChunkSource(std::make_shared<BioGenSource>(iniFile));
 	m_BiomeView->redraw();
 }
 
@@ -108,7 +108,7 @@ void MainWindow::openGenerator()
 	openGeneratorSetup(worldIni.toStdString());
 
 	// Set the chunk source:
-	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(m_GeneratorSetup->getIniFile())));
+	m_BiomeView->setChunkSource(std::make_shared<BioGenSource>(m_GeneratorSetup->getIniFile()));
 	m_BiomeView->redraw();
 }
 
@@ -129,7 +129,7 @@ void MainWindow::openWorld()
 	closeGeneratorSetup();
 
 	// Set the chunk source:
-	m_BiomeView->setChunkSource(std::shared_ptr<AnvilSource>(new AnvilSource(regionFolder)));
+	m_BiomeView->setChunkSource(std::make_shared<AnvilSource>(regionFolder));
 	m_BiomeView->redraw();
 }
 
@@ -150,7 +150,7 @@ void MainWindow::openVanillaWorld()
 	closeGeneratorSetup();
 
 	// Set the chunk source:
-	m_BiomeView->setChunkSource(std::shared_ptr<AnvilSource>(new AnvilSource(action->data().toString())));
+	m_BiomeView->setChunkSource(std::make_shared<AnvilSource>(action->data().toString()));
 	m_BiomeView->redraw();
 }
 
