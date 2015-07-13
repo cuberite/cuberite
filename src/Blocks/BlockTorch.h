@@ -119,6 +119,22 @@ public:
 				// Toches can be placed on the top of these slabs only if the occupy the top half of the voxel
 				return ((a_BlockFace == BLOCK_FACE_YP) && ((a_BlockMeta & 0x08) == 0x08));
 			}
+			case E_BLOCK_WOODEN_STAIRS:
+			case E_BLOCK_COBBLESTONE_STAIRS:
+			case E_BLOCK_BRICK_STAIRS:
+			case E_BLOCK_STONE_BRICK_STAIRS:
+			case E_BLOCK_NETHER_BRICK_STAIRS:
+			case E_BLOCK_SANDSTONE_STAIRS:
+			case E_BLOCK_SPRUCE_WOOD_STAIRS:
+			case E_BLOCK_BIRCH_WOOD_STAIRS:
+			case E_BLOCK_JUNGLE_WOOD_STAIRS:
+			case E_BLOCK_QUARTZ_STAIRS:
+			case E_BLOCK_ACACIA_WOOD_STAIRS:
+			case E_BLOCK_DARK_OAK_WOOD_STAIRS:
+			case E_BLOCK_RED_SANDSTONE_STAIRS:
+			{
+				return (a_BlockFace == BLOCK_FACE_TOP) && (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+			}
 			default:
 			{
 				if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
