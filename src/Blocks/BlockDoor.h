@@ -55,6 +55,10 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
+		if ((a_BlockMeta & 0x08) != 0)  // is top part of door
+		{
+			return;
+		}
 		switch (m_BlockType)
 		{
 			case E_BLOCK_WOODEN_DOOR:
