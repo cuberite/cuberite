@@ -641,8 +641,8 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 	// Re-map into integral values in [0 .. 255] range:
 	for (size_t idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
 	{
-		a_TemperatureMap[idx] = std::max(0, std::min(255, static_cast<int>(128 + TemperatureMap[idx] * 128)));
-		a_HumidityMap[idx]    = std::max(0, std::min(255, static_cast<int>(128 + HumidityMap[idx]    * 128)));
+		a_TemperatureMap[idx] = Clamp(static_cast<int>(128 + TemperatureMap[idx] * 128), 0, 255);
+		a_HumidityMap[idx]    = Clamp(static_cast<int>(128 + HumidityMap[idx]    * 128), 0, 255);
 	}
 }
 
