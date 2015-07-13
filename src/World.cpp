@@ -1393,9 +1393,23 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_CONIFER:  GetConiferTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_JUNGLE:   GetJungleTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_DARK_OAK: GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_JUNGLE:
+		{
+			bool IsLarge = GetLargeTreeAdjustment(*this, a_X, a_Y, a_Z, a_SaplingMeta);
+			GetJungleTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other, IsLarge);
+			break;
+		}
+		case E_META_SAPLING_DARK_OAK:
+		{
+			if (!GetLargeTreeAdjustment(*this, a_X, a_Y, a_Z, a_SaplingMeta))
+			{
+				return;
+			}
+
+			GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other);
+			break;
+		}
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();

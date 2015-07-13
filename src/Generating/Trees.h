@@ -20,6 +20,8 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 #include "../ChunkDef.h"
 #include "../Noise/Noise.h"
 
+class cWorld;
+
 
 
 
@@ -96,7 +98,7 @@ void GetSwampTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 void GetAppleBushImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
 /// Generates an image of a random jungle tree
-void GetJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+void GetJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large);
 
 /// Generates an image of a large jungle tree (2x2 trunk)
 void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
@@ -104,7 +106,7 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 /// Generates an image of a small jungle tree (1x1 trunk)
 void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-
+bool GetLargeTreeAdjustment(cWorld & a_World, int & a_X, int & a_Y, int & a_Z, NIBBLETYPE a_Meta);
 
 
 
