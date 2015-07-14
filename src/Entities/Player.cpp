@@ -16,6 +16,7 @@
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
 #include "../FastRandom.h"
+#include <cmath>
 
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
@@ -2178,20 +2179,18 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 		return;
 	}
 
-	// Process exhaustion every two ticks as that is how frequently m_LastPos is updated
-	// Otherwise, we apply exhaustion for a 'movement' every tick, one of which is an already processed value
-	if (GetWorld()->GetWorldAge() % 2 != 0)
-	{
-		return;
-	}
-
 	// Calculate the distance travelled, update the last pos:
-	Vector3d Movement(GetPosition() - m_LastPos);
-	Movement.y = 0;  // Only take XZ movement into account
+	double SpeedX = m_Speed.x;
+	double SpeedZ = m_Speed.z;
+	double BaseExhaustion(sqrt((SpeedX * SpeedX) + (SpeedZ * SpeedZ)));
 
 	// Apply the exhaustion based on distance travelled:
-	double BaseExhaustion = Movement.Length();
-	if (IsSprinting())
+	if (IsFlying() || IsClimbing())
+	{
+		// Apply no exhaustion when flying or climbing.
+		BaseExhaustion = 0;
+	}
+	else if (IsSprinting())
 	{
 		// 0.1 pt per meter sprinted
 		BaseExhaustion = BaseExhaustion * 0.1;
