@@ -787,6 +787,9 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	// We use Recipe instead of a_Recipe because we want the wildcard ingredients' slot numbers as well, which was just added previously
 	HandleFireworks(a_CraftingGrid, Recipe.get(), a_GridStride, a_OffsetX, a_OffsetY);
 
+	// Handle Dyed Leather
+	HandleDyedLeather(a_CraftingGrid, Recipe.get(), a_GridStride, a_GridWidth, a_GridHeight);
+
 	return Recipe.release();
 }
 
@@ -868,6 +871,195 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 			// Only dye? Normal colours.
 			a_Recipe->m_Result.m_FireworkItem.m_Colours = DyeColours;
 		}
+	}
+}
+
+
+
+
+
+void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight)
+{
+	short result_type = a_Recipe->m_Result.m_ItemType;
+	if ((result_type == E_ITEM_LEATHER_CAP) || (result_type == E_ITEM_LEATHER_TUNIC) || (result_type == E_ITEM_LEATHER_PANTS) || (result_type == E_ITEM_LEATHER_BOOTS))
+	{
+		bool found = false;
+		cItem temp;
+
+		float red = 0;
+		float green = 0;
+		float blue = 0;
+		float dye_count = 0;
+
+		for (int x = 0; x < a_GridWidth; ++x)
+		{
+			for (int y = 0; y < a_GridHeight; ++y)
+			{
+				int GridIdx = x + a_GridStride * y;
+				if ((a_CraftingGrid[GridIdx].m_ItemType == result_type) && (found == false))
+				{
+					found = true;
+					temp = a_CraftingGrid[GridIdx].CopyOne();
+					// The original color of the item affects the result
+					if (temp.m_ItemColor.IsValid())
+					{
+						red += temp.m_ItemColor.GetRed();
+						green += temp.m_ItemColor.GetGreen();
+						blue += temp.m_ItemColor.GetBlue();
+						++dye_count;
+					}
+				}
+				else if (a_CraftingGrid[GridIdx].m_ItemType == E_ITEM_DYE)
+				{
+					switch (a_CraftingGrid[GridIdx].m_ItemDamage)
+					{
+						case E_META_DYE_BLACK:
+						{
+							red += 23;
+							green += 23;
+							blue += 23;
+							break;
+						}
+						case E_META_DYE_RED:
+						{
+							red += 142;
+							green += 47;
+							blue += 47;
+							break;
+						}
+						case E_META_DYE_GREEN:
+						{
+							red += 95;
+							green += 118;
+							blue += 47;
+							break;
+						}
+						case E_META_DYE_BROWN:
+						{
+							red += 95;
+							green += 71;
+							blue += 47;
+							break;
+						}
+						case E_META_DYE_BLUE:
+						{
+							red += 47;
+							green += 71;
+							blue += 165;
+							break;
+						}
+						case E_META_DYE_PURPLE:
+						{
+							red += 118;
+							green += 59;
+							blue += 165;
+							break;
+						}
+						case E_META_DYE_CYAN:
+						{
+							red += 71;
+							green += 118;
+							blue += 142;
+							break;
+						}
+						case E_META_DYE_LIGHTGRAY:
+						{
+							red += 142;
+							green += 142;
+							blue += 142;
+							break;
+						}
+						case E_META_DYE_GRAY:
+						{
+							red += 71;
+							green += 71;
+							blue += 71;
+							break;
+						}
+						case E_META_DYE_PINK:
+						{
+							red += 225;
+							green += 118;
+							blue += 153;
+							break;
+						}
+						case E_META_DYE_LIGHTGREEN:
+						{
+							red += 118;
+							green += 190;
+							blue += 23;
+							break;
+						}
+						case E_META_DYE_YELLOW:
+						{
+							red += 213;
+							green += 213;
+							blue += 47;
+							break;
+						}
+						case E_META_DYE_LIGHTBLUE:
+						{
+							red += 95;
+							green += 142;
+							blue += 201;
+							break;
+						}
+						case E_META_DYE_MAGENTA:
+						{
+							red += 165;
+							green += 71;
+							blue += 201;
+							break;
+						}
+						case E_META_DYE_ORANGE:
+						{
+							red += 201;
+							green += 118;
+							blue += 47;
+							break;
+						}
+						case E_META_DYE_WHITE:
+						{
+							red += 237;
+							green += 237;
+							blue += 237;
+							break;
+						}
+					}
+					++dye_count;
+				}
+				else if (a_CraftingGrid[GridIdx].m_ItemType != E_ITEM_EMPTY)
+				{
+					return;
+				}
+			}
+		}
+
+		if (!found)
+		{
+			return;
+		}
+
+		// Calculate the rgb values
+		double maximum = static_cast<double>(std::max({red, green, blue}));
+
+		double average_red = red / dye_count;
+		double average_green = green / dye_count;
+		double average_blue = blue / dye_count;
+		double average_max = maximum / dye_count;
+
+		double max_average = std::max({average_red, average_green, average_blue});
+
+		double gain_factor = average_max / max_average;
+
+
+		unsigned char result_red = static_cast<unsigned char>(average_red * gain_factor);
+		unsigned char result_green = static_cast<unsigned char>(average_green * gain_factor);
+		unsigned char result_blue = static_cast<unsigned char>(average_blue * gain_factor);
+
+		// Set the results values
+		a_Recipe->m_Result = temp;
+		a_Recipe->m_Result.m_ItemColor.SetColor(result_red, result_green, result_blue);
 	}
 }
 

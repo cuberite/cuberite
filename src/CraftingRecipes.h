@@ -168,6 +168,9 @@ protected:
 
 	/** Searches for anything firework related, and does the data setting if appropriate */
 	void HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_OffsetX, int a_OffsetY);
+
+	/// Searches for anything dye related for leather, calculates the appropriate color value, and sets the resulting value.
+	void HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight);
 } ;
 
 

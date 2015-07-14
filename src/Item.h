@@ -12,6 +12,7 @@
 #include "Defines.h"
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
+#include "Color.h"
 
 
 
@@ -19,6 +20,7 @@
 
 // fwd:
 class cItemHandler;
+class cColor;
 
 namespace Json
 {
@@ -41,7 +43,8 @@ public:
 		m_CustomName(""),
 		m_Lore(""),
 		m_RepairCost(0),
-		m_FireworkItem()
+		m_FireworkItem(),
+		m_ItemColor()
 	{
 	}
 	
@@ -62,7 +65,8 @@ public:
 		m_CustomName  (a_CustomName),
 		m_Lore        (a_Lore),
 		m_RepairCost  (0),
-		m_FireworkItem()
+		m_FireworkItem(),
+		m_ItemColor()
 	{
 		if (!IsValidItem(m_ItemType))
 		{
@@ -105,6 +109,7 @@ public:
 		m_Lore = "";
 		m_RepairCost = 0;
 		m_FireworkItem.EmptyData();
+		m_ItemColor.Clear();
 	}
 	
 	
@@ -114,6 +119,7 @@ public:
 		m_ItemCount = 0;
 		m_ItemDamage = 0;
 		m_RepairCost = 0;
+		m_ItemColor.Clear();
 	}
 	
 	
@@ -206,6 +212,7 @@ public:
 
 	int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;
+	cColor         m_ItemColor;
 };
 // tolua_end
 
