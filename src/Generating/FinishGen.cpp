@@ -322,6 +322,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			if (
 				(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
 				((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_GRASS) && (a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_DIRT))
+
 				)
 			{
 				continue;
@@ -337,7 +338,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			{
 				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 2);
 			}
-			else
+			else if (!IsBiomeVeryCold(a_ChunkDesc.GetBiome(x, z)))
 			{
 				// If double long grass we have to choose what type we should use:
 				if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
@@ -346,6 +347,11 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
 					a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, 8);
 				}
+			}
+			else
+			{
+				NIBBLETYPE meta = (m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 2) + 1;
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, meta);
 			}
 		}
 	}
