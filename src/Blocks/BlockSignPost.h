@@ -71,7 +71,7 @@ public:
 
 		// There are 16 meta values which correspond to different directions.
 		// These values are equated to angles on a circle; 0x08 = 180 degrees.
-		return (a_Meta < 0x08) ? (0x08 + a_Meta) : (0x08 - a_Meta);
+		return (a_Meta < 0x08) ? (0x08 - a_Meta) : (0x18 - a_Meta);
 	}
 
 
@@ -81,7 +81,7 @@ public:
 
 		// There are 16 meta values which correspond to different directions.
 		// These values are equated to angles on a circle; 0x10 = 360 degrees.
-		return 0x10 - a_Meta;
+		return 0x0f - a_Meta;
 	}
 } ;
 
