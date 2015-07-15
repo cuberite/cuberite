@@ -142,6 +142,13 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 			a_OutValue["Lore"] = m_Lore;
 		}
 
+		if (m_ItemColor.IsValid())
+		{
+			a_OutValue["Color_Red"] = m_ItemColor.GetRed();
+			a_OutValue["Color_Green"] = m_ItemColor.GetGreen();
+			a_OutValue["Color_Blue"] = m_ItemColor.GetBlue();
+		}
+
 		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
 		{
 			a_OutValue["Flicker"] = m_FireworkItem.m_HasFlicker;
@@ -171,6 +178,18 @@ void cItem::FromJson(const Json::Value & a_Value)
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
 		m_CustomName = a_Value.get("Name", "").asString();
 		m_Lore = a_Value.get("Lore", "").asString();
+
+		int red = a_Value.get("Color_Red", -1).asInt();
+		int green = a_Value.get("Color_Green", -1).asInt();
+		int blue = a_Value.get("Color_Blue", -1).asInt();
+		if ((red > -1) && (red < static_cast<int>(cColor::COLOR_LIMIT)) && (green > -1) && (green < static_cast<int>(cColor::COLOR_LIMIT)) && (blue > -1) && (blue < static_cast<int>(cColor::COLOR_LIMIT)))
+		{
+			m_ItemColor.SetColor(static_cast<unsigned char>(red), static_cast<unsigned char>(green), static_cast<unsigned char>(blue));
+		}
+		else if ((red != -1) || (blue != -1) || (green != -1))
+		{
+			LOGWARNING("Item with invalid red, green, and blue values read in from json file.");
+		}
 
 		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
 		{

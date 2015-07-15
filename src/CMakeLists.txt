@@ -28,6 +28,7 @@ SET (SRCS
 	ChunkSender.cpp
 	ChunkStay.cpp
 	ClientHandle.cpp
+	Color.cpp
 	CommandOutput.cpp
 	CompositeChat.cpp
 	CraftingRecipes.cpp

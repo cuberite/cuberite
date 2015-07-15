@@ -2869,6 +2869,10 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 							a_Item.m_Lore = Lore;
 						}
+						else if ((NBT.GetType(displaytag) == TAG_Int) && (NBT.GetName(displaytag) == "color"))
+						{
+							a_Item.m_ItemColor.m_Color = static_cast<unsigned int>(NBT.GetInt(displaytag));
+						}
 					}
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
@@ -3018,11 +3022,12 @@ void cProtocol180::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 	
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR))
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
 	}
+
 
 	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
@@ -3035,9 +3040,14 @@ void cProtocol180::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
 		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	}
-	if (!a_Item.IsBothNameAndLoreEmpty())
+	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{
 		Writer.BeginCompound("display");
+		if (a_Item.m_ItemColor.IsValid())
+		{
+			Writer.AddInt("color", static_cast<int>(a_Item.m_ItemColor.m_Color));
+		}
+
 		if (!a_Item.IsCustomNameEmpty())
 		{
 			Writer.AddString("Name", a_Item.m_CustomName.c_str());

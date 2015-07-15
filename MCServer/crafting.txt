@@ -552,6 +552,44 @@ GlisteringMelon    = MelonSlice, 2:2  | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1
 GoldNugget, 9      = GoldIngot, *
 EnchantmentTable   = Obsidian, 1:3, 2:3, 3:3, 2:2 | Diamond, 1:2, 3:2 | Book, 2:1
 
+#******************************************************#
+# Dyed Armor 
+# Do not modify
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, *
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, *
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+
+LeatherPants		= LeatherPants^-1, * | Dye^-1, *
+LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, *
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
 
 #******************************************************#
 # Fireworks & Co.
