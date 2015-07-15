@@ -76,6 +76,12 @@ public:
 			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta + 1);
 		}
 	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 21;
+	}
 } ;
 
 

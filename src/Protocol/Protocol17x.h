@@ -101,9 +101,7 @@ public:
 	virtual void SendKeepAlive                  (int a_PingID) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendLoginSuccess               (void) override;
-	virtual void SendMapColumn                  (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale) override;
-	virtual void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale) override;
-	virtual void SendMapInfo                    (int a_ID, unsigned int a_Scale) override;
+	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;

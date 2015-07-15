@@ -16,12 +16,10 @@ public:
 	{
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SUGARCANE, 1, 0));
 	}
-
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
@@ -73,10 +71,15 @@ public:
 		return false;
 	}
 	
-	
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		a_Chunk.GetWorld()->GrowSugarcane(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 7;
 	}
 } ;
 

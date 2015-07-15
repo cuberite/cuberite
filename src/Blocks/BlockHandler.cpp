@@ -215,7 +215,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_DIRT:                  return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_DISPENSER:             return new cBlockDropSpenserHandler     (a_BlockType);
-		case E_BLOCK_DOUBLE_NEW_STONE_SLAB: return new cBlockDoubleSlabHandler      (a_BlockType);
+		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB: return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DOUBLE_STONE_SLAB:     return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DROPPER:               return new cBlockDropSpenserHandler     (a_BlockType);
@@ -223,7 +223,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_ENCHANTMENT_TABLE:     return new cBlockEnchantmentTableHandler(a_BlockType);
 		case E_BLOCK_ENDER_CHEST:           return new cBlockEnderchestHandler      (a_BlockType);
 		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler        (a_BlockType);
-		case E_BLOCK_FENCE_GATE:            return new cBlockFenceGateHandler       (a_BlockType);
+		case E_BLOCK_OAK_FENCE_GATE:            return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_FIRE:                  return new cBlockFireHandler            (a_BlockType);
 		case E_BLOCK_FLOWER_POT:            return new cBlockFlowerPotHandler       (a_BlockType);
 		case E_BLOCK_FURNACE:               return new cBlockFurnaceHandler         (a_BlockType);
@@ -266,7 +266,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NETHER_QUARTZ_ORE:     return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_NEW_LEAVES:            return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
-		case E_BLOCK_NEW_STONE_SLAB:        return new cBlockSlabHandler            (a_BlockType);
+		case E_BLOCK_RED_SANDSTONE_SLAB:    return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler;
@@ -320,10 +320,10 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_WALLSIGN:              return new cBlockWallSignHandler        (a_BlockType);
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_WOODEN_BUTTON:         return new cBlockButtonHandler          (a_BlockType);
-		case E_BLOCK_WOODEN_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_OAK_DOOR:              return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_WOODEN_PRESSURE_PLATE: return new cBlockPressurePlateHandler   (a_BlockType);
 		case E_BLOCK_WOODEN_SLAB:           return new cBlockSlabHandler            (a_BlockType);
-		case E_BLOCK_WOODEN_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_OAK_WOOD_STAIRS:       return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_WOOL:                  return new cBlockClothHandler           (a_BlockType);
 		case E_BLOCK_WORKBENCH:             return new cBlockWorkbenchHandler       (a_BlockType);
 		case E_BLOCK_YELLOW_FLOWER:         return new cBlockFlowerHandler          (a_BlockType);
@@ -569,6 +569,16 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterf
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(BlockX, a_RelY, BlockZ, &a_Chunk);
 	}
+}
+
+
+
+
+
+ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
+{
+	// Zero for transparent
+	return 0;
 }
 
 

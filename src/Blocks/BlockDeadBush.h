@@ -16,7 +16,6 @@ public:
 	{
 	}
 
-
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
@@ -36,6 +35,12 @@ public:
 			}
 			default: return false;
 		}
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 0;
 	}
 } ;
 

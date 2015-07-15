@@ -715,60 +715,31 @@ void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol180::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
+void cProtocol180::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt32(a_ID);
-	Pkt.WriteBEUInt8(m_Scale);
+	Pkt.WriteVarInt32(a_Map.GetID());
+	Pkt.WriteBEUInt8(a_Map.GetScale());
 
-	Pkt.WriteVarInt32(0);
-	Pkt.WriteBEUInt8(1);
-	Pkt.WriteBEUInt8(a_Length);
-	Pkt.WriteBEUInt8(a_X);
-	Pkt.WriteBEUInt8(a_Y);
-
-	Pkt.WriteVarInt32(a_Length);
-	for (unsigned int i = 0; i < a_Length; ++i)
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
+	for (const auto Decorator : a_Map.GetDecorators())
 	{
-		Pkt.WriteBEUInt8(a_Colors[i]);
-	}
-}
-
-
-
-
-
-void cProtocol180::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
-{
-	ASSERT(m_State == 3);  // In game mode?
-	
-	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt32(a_ID);
-	Pkt.WriteBEUInt8(m_Scale);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Decorators.size()));
-
-	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
-	{
-		Pkt.WriteBEUInt8((it->GetType() << 4) | (it->GetRot() & 0xf));
-		Pkt.WriteBEUInt8(it->GetPixelX());
-		Pkt.WriteBEUInt8(it->GetPixelZ());
+		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<int>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF)));
+		Pkt.WriteBEUInt8(Decorator.GetPixelX());
+		Pkt.WriteBEUInt8(Decorator.GetPixelZ());
 	}
 
-	Pkt.WriteBEUInt8(0);
-}
-
-
-
-
-
-void cProtocol180::SendMapInfo(int a_ID, unsigned int a_Scale)
-{
-	UNUSED(a_ID);
-	UNUSED(a_Scale);
-
-	// This packet was removed in 1.8
+	Pkt.WriteBEUInt8(128);
+	Pkt.WriteBEUInt8(128);
+	Pkt.WriteBEUInt8(a_DataStartX);
+	Pkt.WriteBEUInt8(a_DataStartY);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetData().size()));
+	for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
+	{
+		Pkt.WriteBEUInt8(*itr);
+	}
 }
 
 

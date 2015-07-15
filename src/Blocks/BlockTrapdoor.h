@@ -65,7 +65,6 @@ public:
 		}
 		return true;
 	}
-	
 
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
@@ -89,7 +88,6 @@ public:
 		#endif
 	}
 
-
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x3)
@@ -106,7 +104,6 @@ public:
 		}
 	}
 
-
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		NIBBLETYPE Meta;
@@ -117,6 +114,21 @@ public:
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
 		return ((a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn));
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		switch (m_BlockType)
+		{
+			case E_BLOCK_TRAPDOOR: return 13;
+			case E_BLOCK_IRON_TRAPDOOR: return 6;
+			default:
+			{
+				ASSERT(!"Unhandled blocktype in trapdoor handler!");
+				return 0;
+			}
+		}
 	}
 };
 

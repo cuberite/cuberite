@@ -11,7 +11,6 @@
 
 #include "BlockHandler.h"
 #include "../Items/ItemHandler.h"
-#include "Root.h"
 #include "ChunkInterface.h"
 #include "../Entities/Player.h"
 
@@ -26,12 +25,10 @@ public:
 	{
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta & 0x7));
 	}
-
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
@@ -87,14 +84,12 @@ public:
 
 		return true;
 	}
-
 	
-	/// Returns true if the specified blocktype is one of the slabs handled by this handler
+	/** Returns true if the specified blocktype is one of the slabs handled by this handler */
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
 	{
-		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB) || (a_BlockType == E_BLOCK_NEW_STONE_SLAB));
+		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB) || (a_BlockType == E_BLOCK_RED_SANDSTONE_SLAB));
 	}
-
 
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
@@ -103,29 +98,81 @@ public:
 			return;
 		}
 
-		// Sends the slab back to the client. It's to refuse a doubleslab placement.
+		// Sends the slab back to the client. It's to refuse a doubleslab placement. */
 		a_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 	
-	
-	/// Converts the single-slab blocktype to its equivalent double-slab blocktype
+	/** Converts the single-slab blocktype to its equivalent double-slab blocktype */
 	static BLOCKTYPE GetDoubleSlabType(BLOCKTYPE a_SingleSlabBlockType)
 	{
 		switch (a_SingleSlabBlockType)
 		{
-			case E_BLOCK_STONE_SLAB:  return E_BLOCK_DOUBLE_STONE_SLAB;
+			case E_BLOCK_STONE_SLAB: return E_BLOCK_DOUBLE_STONE_SLAB;
 			case E_BLOCK_WOODEN_SLAB: return E_BLOCK_DOUBLE_WOODEN_SLAB;
-			case E_BLOCK_NEW_STONE_SLAB: return E_BLOCK_DOUBLE_NEW_STONE_SLAB;
+			case E_BLOCK_RED_SANDSTONE_SLAB: return E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB;
 		}
 		ASSERT(!"Unhandled slab type!");
 		return E_BLOCK_AIR;
 	}
 	
-	
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Toggle the 4th bit - up / down:
 		return (a_Meta ^ 0x08);
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		a_Meta &= 0x7;
+
+		switch (m_BlockType)
+		{
+			case E_BLOCK_STONE_SLAB:
+			{
+				switch (a_Meta)
+				{
+					case E_META_STONE_SLAB_SANDSTONE: return 2;
+					case E_META_STONE_SLAB_PLANKS: return 13;
+					case E_META_STONE_SLAB_STONE_BRICK:
+					case E_META_STONE_SLAB_STONE:
+					case E_META_STONE_SLAB_COBBLESTONE: return 11;
+					case E_META_STONE_SLAB_BRICK: return 28;
+					case E_META_STONE_SLAB_NETHER_BRICK: return 35;
+					case E_META_STONE_SLAB_QUARTZ: return 8;
+					default:
+					{
+						ASSERT(!"Unhandled meta in slab handler!");
+						return 0;
+					}
+				}
+			}
+			case E_BLOCK_WOODEN_SLAB:
+			{
+				switch (a_Meta)
+				{
+					case E_META_WOODEN_SLAB_BIRCH: return 2;
+					case E_META_WOODEN_SLAB_JUNGLE: return 10;
+					case E_META_WOODEN_SLAB_OAK: return 13;
+					case E_META_WOODEN_SLAB_ACACIA: return 15;
+					case E_META_WOODEN_SLAB_DARK_OAK: return 26;
+					case E_META_WOODEN_SLAB_SPRUCE: return 34;
+					default:
+					{
+						ASSERT(!"Unhandled meta in slab handler!");
+						return 0;
+					}
+				}
+			}
+			case E_BLOCK_RED_SANDSTONE_SLAB:
+			{
+				return 10;
+			}
+			default:
+			{
+				ASSERT(!"Unhandled blocktype in slab handler!");
+				return 0;
+			}
+		}
 	}
 } ;
 
@@ -142,7 +189,6 @@ public:
 	{
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
@@ -153,12 +199,18 @@ public:
 	{
 		switch (a_BlockType)
 		{
-			case E_BLOCK_DOUBLE_STONE_SLAB:  return E_BLOCK_STONE_SLAB;
+			case E_BLOCK_DOUBLE_STONE_SLAB: return E_BLOCK_STONE_SLAB;
 			case E_BLOCK_DOUBLE_WOODEN_SLAB: return E_BLOCK_WOODEN_SLAB;
-			case E_BLOCK_DOUBLE_NEW_STONE_SLAB: return E_BLOCK_NEW_STONE_SLAB;
+			case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB: return E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB;
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return a_BlockType;
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		// For doule slabs, the meta values are the same. Only the meaning of the 4th bit changes, but that's ignored in the below handler
+		return BlockHandler(GetSingleSlabType(m_BlockType))->GetMapBaseColourID(a_Meta);
 	}
 } ;
 

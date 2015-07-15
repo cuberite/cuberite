@@ -33,7 +33,6 @@ public:
 		return true;
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// No pickups
@@ -64,21 +63,20 @@ public:
 		{
 			case 0x1:
 			{
-				static const struct
+				static const std::array<Vector3i, 4> PortalCheck
 				{
-					int x, y, z;
-				} PortalCheck[] =
-				{
-					{ 0, 1,  0},
-					{ 0, -1,  0},
-					{ 1, 0,  0},
-					{-1, 0,  0},
-				} ;
+					{
+						{ 0, 1, 0 },
+						{ 0, -1, 0 },
+						{ 1, 0, 0 },
+						{ -1, 0, 0 },
+					}
+				};
 
-				for (size_t i = 0; i < ARRAYCOUNT(PortalCheck); i++)
+				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);
+					a_Chunk.UnboundedRelGetBlockType(a_RelX + Direction.x, a_RelY + Direction.y, a_RelZ + Direction.z, Block);
 
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
@@ -89,21 +87,20 @@ public:
 			}
 			case 0x2:
 			{
-				static const struct
+				static const std::array<Vector3i, 4> PortalCheck
 				{
-					int x, y, z;
-				} PortalCheck[] =
-				{
-					{ 0, 1,  0},
-					{ 0, -1,  0},
-					{ 0, 0, -1},
-					{ 0, 0,  1},
-				} ;
+					{
+						{ 0, 1, 0 },
+						{ 0, -1, 0 },
+						{ 0, 0, -1 },
+						{ 0, 0, 1 },
+					}
+				};
 
-				for (size_t i = 0; i < ARRAYCOUNT(PortalCheck); i++)
+				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelX + PortalCheck[i].x, a_RelY + PortalCheck[i].y, a_RelZ + PortalCheck[i].z, Block);
+					a_Chunk.UnboundedRelGetBlockType(a_RelX + Direction.x, a_RelY + Direction.y, a_RelZ + Direction.z, Block);
 
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
@@ -114,6 +111,12 @@ public:
 			}
 		}
 		return true;
+	}
+	
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 24;
 	}
 } ;
 

@@ -43,11 +43,8 @@ public:
 	Callback return value is ignored. */
 	bool DoWithMap(UInt32 a_ID, cMapCallback & a_Callback);  // Exported in ManualBindings.cpp
 
-	/** Calls the callback for each map.
-	Returns true if all maps processed, false if the callback aborted by returning true. */
-	bool ForEachMap(cMapCallback & a_Callback);
-
-	size_t GetNumMaps(void) const;  // tolua_export
+	/** Ticks each registered map */
+	void TickMaps(void);
 
 	/** Loads the map data from the disk */
 	void LoadMapData(void);

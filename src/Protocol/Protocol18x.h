@@ -96,9 +96,7 @@ public:
 	virtual void SendKeepAlive                  (int a_PingID) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendLoginSuccess               (void) override;
-	virtual void SendMapColumn                  (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale) override;
-	virtual void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale) override;
-	virtual void SendMapInfo                    (int a_ID, unsigned int a_Scale) override;
+	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendPickupSpawn                (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities            (void) override;

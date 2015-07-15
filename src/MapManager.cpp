@@ -42,18 +42,13 @@ bool cMapManager::DoWithMap(UInt32 a_ID, cMapCallback & a_Callback)
 
 
 
-bool cMapManager::ForEachMap(cMapCallback & a_Callback)
+void cMapManager::TickMaps()
 {
 	cCSLock Lock(m_CS);
-	for (cMapList::iterator itr = m_MapData.begin(); itr != m_MapData.end(); ++itr)
+	for (auto & Map : m_MapData)
 	{
-		cMap * Map = &(*itr);
-		if (a_Callback.Item(Map))
-		{
-			return false;
-		}
-	}  // for itr - m_MapData[]
-	return true;
+		Map.Tick();
+	}
 }
 
 
@@ -91,15 +86,6 @@ cMap * cMapManager::CreateMap(int a_CenterX, int a_CenterY, unsigned int a_Scale
 	m_MapData.push_back(Map);
 
 	return &m_MapData[Map.GetID()];
-}
-
-
-
-
-
-size_t cMapManager::GetNumMaps(void) const
-{
-	return m_MapData.size();
 }
 
 

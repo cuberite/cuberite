@@ -82,6 +82,12 @@ public:
 	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 11;
+	}
+
 private:
 
 	/// Returns true if the piston (specified by blocktype) is a sticky piston

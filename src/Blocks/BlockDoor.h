@@ -52,7 +52,6 @@ public:
 		return true;
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		if ((a_BlockMeta & 0x08) != 0)  // is top part of door
@@ -61,7 +60,7 @@ public:
 		}
 		switch (m_BlockType)
 		{
-			case E_BLOCK_WOODEN_DOOR:
+			case E_BLOCK_OAK_DOOR:
 			{
 				a_Pickups.Add(E_ITEM_WOODEN_DOOR);
 				break;
@@ -104,18 +103,15 @@ public:
 		}
 	}
 
-
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
 
-
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		return ((a_RelY > 0) && CanBeOn(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ), a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ)));
 	}
-
 
 	/** Returns true if door can be placed on the specified block type. */
 	static bool CanBeOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
@@ -140,7 +136,6 @@ public:
 		}
 	}
 
-
 	static bool CanReplaceBlock(BLOCKTYPE a_BlockType)
 	{
 		switch (a_BlockType)
@@ -159,7 +154,6 @@ public:
 		}
 		return false;
 	}
-
 
 	/** Converts the player's yaw to placed door's blockmeta */
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
@@ -189,7 +183,6 @@ public:
 		}
 	}
 
-
 	/** Returns a vector pointing one block in the direction the door is facing (where the outside is). */
 	inline static Vector3i GetRelativeDirectionToOutside(NIBBLETYPE a_BlockMeta)
 	{
@@ -202,7 +195,6 @@ public:
 		}
 	}
 
-
 	/** Returns true if the specified blocktype is any kind of door */
 	inline static bool IsDoorBlockType(BLOCKTYPE a_Block)
 	{
@@ -214,7 +206,7 @@ public:
 			case E_BLOCK_IRON_DOOR:
 			case E_BLOCK_JUNGLE_DOOR:
 			case E_BLOCK_SPRUCE_DOOR:
-			case E_BLOCK_WOODEN_DOOR:
+			case E_BLOCK_OAK_DOOR:
 			{
 				return true;
 			}
@@ -225,7 +217,6 @@ public:
 		}
 	}
 
-
 	/** Returns true iff the door at the specified coords is open.
 	The coords may point to either the top part or the bottom part of the door. */
 	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
@@ -233,7 +224,6 @@ public:
 		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 		return ((Meta & 0x04) != 0);
 	}
-
 
 	/** Returns the complete meta composed from the both parts of the door as (TopMeta << 4) | BottomMeta
 	The coords may point to either part of the door.
@@ -266,7 +256,6 @@ public:
 			return Meta;
 		}
 	}
-
 
 	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
@@ -301,11 +290,30 @@ public:
 		}
 	}
 
-
 	/** Changes the door at the specified coords from open to close or vice versa */
 	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		SetOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, !IsOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		switch (m_BlockType)
+		{
+			case E_BLOCK_OAK_DOOR: return 13;
+			case E_BLOCK_SPRUCE_DOOR: return 34;
+			case E_BLOCK_BIRCH_DOOR: return 2;
+			case E_BLOCK_JUNGLE_DOOR: return 10;
+			case E_BLOCK_DARK_OAK_DOOR: return 26;
+			case E_BLOCK_ACACIA_DOOR: return 15;
+			case E_BLOCK_IRON_DOOR: return 6;
+			default:
+			{
+				ASSERT(!"Unhandled blocktype in door handler!");
+				return 0;
+			}
+		}
 	}
 } ;
 

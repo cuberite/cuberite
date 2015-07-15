@@ -27,19 +27,16 @@ public:
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0
 		a_Pickups.push_back(cItem(E_BLOCK_LEVER, 1, 0));
 	}
 
-
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
-	
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
@@ -52,7 +49,6 @@ public:
 		a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
 		return true;
 	}
-
 
 	inline static NIBBLETYPE LeverDirectionToMetaData(eBlockFace a_Dir)
 	{
@@ -73,7 +69,6 @@ public:
 		#endif
 	}
 
-
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
@@ -93,7 +88,6 @@ public:
 			}
 		}
 	}
-
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
@@ -128,7 +122,6 @@ public:
 		return false;
 	}
 
-
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		switch (a_Meta)
@@ -143,7 +136,6 @@ public:
 		}
 	}
 
-
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		switch (a_Meta)
@@ -156,6 +148,12 @@ public:
 
 			default:  return super::MetaRotateCW(a_Meta);  // Wall Rotation
 		}
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 0;
 	}
 } ;
 

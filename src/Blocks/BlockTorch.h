@@ -17,7 +17,6 @@ public:
 	{
 	}
 	
-	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -47,7 +46,6 @@ public:
 		a_BlockMeta = DirectionToMetaData(a_BlockFace);
 		return true;
 	}
-	
 
 	inline static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
 	{
@@ -67,7 +65,6 @@ public:
 		};
 		return 0x0;
 	}
-	
 
 	inline static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
@@ -87,7 +84,6 @@ public:
 		}
 		return BLOCK_FACE_TOP;
 	}
-
 
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
 	{
@@ -119,7 +115,7 @@ public:
 				// Toches can be placed on the top of these slabs only if the occupy the top half of the voxel
 				return ((a_BlockFace == BLOCK_FACE_YP) && ((a_BlockMeta & 0x08) == 0x08));
 			}
-			case E_BLOCK_WOODEN_STAIRS:
+			case E_BLOCK_OAK_WOOD_STAIRS:
 			case E_BLOCK_COBBLESTONE_STAIRS:
 			case E_BLOCK_BRICK_STAIRS:
 			case E_BLOCK_STONE_BRICK_STAIRS:
@@ -147,7 +143,6 @@ public:
 		}
 	}
 	
-	
 	/** Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure */
 	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
@@ -172,7 +167,6 @@ public:
 		return BLOCK_FACE_NONE;
 	}
 
-
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		eBlockFace Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
@@ -188,11 +182,16 @@ public:
 		return CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face);
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Always drop meta = 0
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 0;
 	}
 } ;
 

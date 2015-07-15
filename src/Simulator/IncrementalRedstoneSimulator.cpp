@@ -220,7 +220,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 				case E_BLOCK_DARK_OAK_DOOR:
 				case E_BLOCK_JUNGLE_DOOR:
 				case E_BLOCK_SPRUCE_DOOR:
-				case E_BLOCK_WOODEN_DOOR:
+				case E_BLOCK_OAK_DOOR:
 				case E_BLOCK_IRON_DOOR:
 				{
 					HandleDoor(dataitr->first.x, dataitr->first.y, dataitr->first.z);
@@ -229,7 +229,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 				case E_BLOCK_ACACIA_FENCE_GATE:
 				case E_BLOCK_BIRCH_FENCE_GATE:
 				case E_BLOCK_DARK_OAK_FENCE_GATE:
-				case E_BLOCK_FENCE_GATE:
+				case E_BLOCK_OAK_FENCE_GATE:
 				case E_BLOCK_JUNGLE_FENCE_GATE:
 				case E_BLOCK_SPRUCE_FENCE_GATE:
 				{
@@ -961,7 +961,7 @@ void cIncrementalRedstoneSimulator::HandleDoor(int a_RelBlockX, int a_RelBlockY,
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
-	typedef GetHandlerCompileTime<E_BLOCK_WOODEN_DOOR>::type DoorHandler;
+	typedef GetHandlerCompileTime<E_BLOCK_OAK_DOOR>::type DoorHandler;
 
 	if (AreCoordsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
 	{

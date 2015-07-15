@@ -36,7 +36,6 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_BED, 1, 0));
 	}
 
-
 	// Bed specific helper functions
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
@@ -76,6 +75,12 @@ public:
 		}
 
 		a_ChunkInterface.SetBlockMeta(a_BedPosition.x, a_BedPosition.y, a_BedPosition.z, Meta);
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 28;
 	}
 } ;
 

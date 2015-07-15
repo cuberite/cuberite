@@ -17,7 +17,6 @@ public:
 
 	}
 
-
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -54,13 +53,11 @@ public:
 		return true;
 	}
 
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to zero
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
-
 
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
@@ -91,6 +88,32 @@ public:
 	{
 		// Toggle bit 3:
 		return (a_Meta & 0x0b) | ((~a_Meta) & 0x04);
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		switch (m_BlockType)
+		{
+			case E_BLOCK_SANDSTONE_STAIRS:
+			case E_BLOCK_BIRCH_WOOD_STAIRS: return 2;
+			case E_BLOCK_QUARTZ_STAIRS: return 8;
+			case E_BLOCK_JUNGLE_WOOD_STAIRS:
+			case E_BLOCK_RED_SANDSTONE_STAIRS: return 10;
+			case E_BLOCK_COBBLESTONE_STAIRS:
+			case E_BLOCK_STONE_BRICK_STAIRS: return 11;
+			case E_BLOCK_OAK_WOOD_STAIRS: return 13;
+			case E_BLOCK_ACACIA_WOOD_STAIRS: return 15;
+			case E_BLOCK_DARK_OAK_WOOD_STAIRS: return 26;
+			case E_BLOCK_BRICK_STAIRS: return 28;
+			case E_BLOCK_NETHER_BRICK_STAIRS: return 35;
+			case E_BLOCK_SPRUCE_WOOD_STAIRS: return 34;
+			default:
+			{
+				ASSERT(!"Unhandled blocktype in stairs handler!");
+				return 0;
+			}
+		}
 	}
 } ;
 

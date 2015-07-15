@@ -43,8 +43,8 @@ public:
 
 		const int RegionWidth = cChunkDef::Width * 8;
 
-		int CenterX = (int)(floor(a_Player->GetPosX() / (float) RegionWidth) * RegionWidth);
-		int CenterZ = (int)(floor(a_Player->GetPosZ() / (float) RegionWidth) * RegionWidth);
+		int CenterX = FloorC(a_Player->GetPosX() / RegionWidth) * RegionWidth + (RegionWidth / 2);
+		int CenterZ = FloorC(a_Player->GetPosZ() / RegionWidth) * RegionWidth + (RegionWidth / 2);
 
 		cMap * NewMap = a_World->GetMapManager().CreateMap(CenterX, CenterZ, DEFAULT_SCALE);
 

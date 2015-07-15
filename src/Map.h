@@ -22,6 +22,7 @@
 class cClientHandle;
 class cWorld;
 class cPlayer;
+class cItemFrame;
 class cMap;
 
 
@@ -35,11 +36,11 @@ A map decorator represents an object drawn on the map that can move freely.
 Excluding manually placed decorators,
 decorators are automatically managed (allocated and freed) by their parent cMap instance.
 */
-class cMapDecorator
+struct cMapDecorator
 {
 public:
 
-	enum eType
+	enum class eType
 	{
 		E_TYPE_PLAYER         = 0x00,
 		E_TYPE_ITEM_FRAME     = 0x01,
@@ -48,44 +49,33 @@ public:
 		E_TYPE_PLAYER_OUTSIDE = 0x06
 	};
 
+	cMapDecorator(eType a_Type, unsigned int a_X, unsigned int a_Z, int a_Rot) :
+		m_Type(a_Type),
+		m_PixelX(a_X),
+		m_PixelZ(a_Z),
+		m_Rot(a_Rot)
+	{
+	}
 
 public:
-
-	/** Constructs a map decorator fixed at the specified pixel coordinates. (DEBUG) */
-	cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, int a_Rot);
-
-	/** Constructs a map decorator that tracks a player. */
-	cMapDecorator(cMap * a_Map, cPlayer * a_Player);
-
-	/** Updates the decorator. */
-	void Update(void);
 
 	unsigned int GetPixelX(void) const { return m_PixelX; }
 	unsigned int GetPixelZ(void) const { return m_PixelZ; }
 
-	unsigned int GetRot(void) const { return m_Rot; }
+	int GetRot(void) const { return m_Rot; }
 
 	eType GetType(void) const { return m_Type; }
 
-	cPlayer * GetPlayer(void) { return m_Player; }
-
-
-protected:
-
-	cMap * m_Map;
+private:
 
 	eType m_Type;
 
 	unsigned int m_PixelX;
 	unsigned int m_PixelZ;
 
-	unsigned int m_Rot;
-
-	cPlayer * m_Player;
+	int m_Rot;
 
 };
-
-typedef std::list<cMapDecorator> cMapDecoratorList;
 
 
 
@@ -102,6 +92,7 @@ public:
 	{
 		E_BASE_COLOR_TRANSPARENT = 0,  /* Air     */
 		E_BASE_COLOR_LIGHT_GREEN = 4,  /* Grass   */
+		E_BASE_COLOR_LIGHT_BLUE = 5,
 		E_BASE_COLOR_LIGHT_BROWN = 8,  /* Sand    */
 		E_BASE_COLOR_GRAY_1      = 12, /* Cloth   */
 		E_BASE_COLOR_RED         = 16, /* TNT     */
@@ -121,9 +112,8 @@ public:
 	// tolua_end
 
 	typedef std::vector<ColorID> cColorList;
-
-
-public:
+	typedef std::vector<cClientHandle *> cMapClientList;
+	typedef std::vector<cMapDecorator> cMapDecoratorList;
 
 	/** Construct an empty map. */
 	cMap(unsigned int a_ID, cWorld * a_World);
@@ -131,8 +121,9 @@ public:
 	/** Construct an empty map at the specified coordinates. */
 	cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale = 3);
 
-	/** Send this map to the specified client. WARNING: Slow */
-	void SendTo(cClientHandle & a_Client);
+	/** Sends a map update to all registered clients
+	Clears the list holding registered clients and decorators */
+	void Tick();
 
 	/** Update a circular region with the specified radius and center (in pixels). */
 	void UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius);
@@ -145,14 +136,11 @@ public:
 
 	// tolua_begin
 
-	/** Erase pixel data */
-	void EraseData(void);
-
 	void Resize(unsigned int a_Width, unsigned int a_Height);
 
 	void SetPosition(int a_CenterX, int a_CenterZ);
 
-	void SetScale(unsigned int a_Scale);
+	void SetScale(unsigned int a_Scale) { m_Scale = a_Scale; }
 
 	bool SetPixel(unsigned int a_X, unsigned int a_Z, ColorID a_Data);
 
@@ -180,7 +168,9 @@ public:
 
 	// tolua_end
 
-	size_t GetNumDecorators(void) const;
+	const cMapDecorator CreateDecorator(const cEntity * a_TrackedEntity);
+
+	const cMapDecoratorList GetDecorators(void) const { return m_Decorators; }
 
 	const cColorList & GetData(void) const { return m_Data; }
 
@@ -195,47 +185,10 @@ public:
 	}
 
 
-protected:
-
-	/** Encapsulates the state of a map client.
-	In order to enhance performace, maps are streamed column-by-column to each client.
-	This structure stores the state of the stream.
-	*/
-	struct cMapClient
-	{
-		cClientHandle * m_Handle;
-
-		/** Whether the map scale was modified and needs to be resent. */
-		bool m_SendInfo;
-
-		/** Ticks since last decorator update. */
-		unsigned int m_NextDecoratorUpdate;
-
-		/** Number of pixel data updates. */
-		Int64 m_DataUpdate;
-
-		Int64 m_LastUpdate;
-	};
-
-	typedef std::list<cMapClient> cMapClientList;
-
-
 private:
-
-	/** Update the associated decorators. */
-	void UpdateDecorators(void);
 
 	/** Update the specified pixel. */
 	bool UpdatePixel(unsigned int a_X, unsigned int a_Z);
-
-	/** Add a new map client. */
-	void AddPlayer(cPlayer * a_Player, Int64 a_WorldAge);
-
-	/** Remove inactive or invalid clients. */
-	void RemoveInactiveClients(Int64 a_WorldAge);
-
-	/** Send next update packet to the specified client. */
-	void StreamNext(cMapClient & a_Client);
 
 	unsigned int m_ID;
 
@@ -253,9 +206,9 @@ private:
 
 	cWorld * m_World;
 
-	cMapDecoratorList m_Decorators;
+	cMapClientList m_ClientsInCurrentTick;
 
-	cMapClientList m_Clients;
+	cMapDecoratorList m_Decorators;
 
 	AString m_Name;
 

@@ -237,6 +237,15 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterf
 
 
 
+ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
+{
+	return 0;
+}
+
+
+
+
+
 cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
 {
 	return nullptr;

@@ -20,7 +20,6 @@ public:
 		cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}
-	
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
@@ -48,6 +47,12 @@ public:
 		}
 		// Not Facing Up or Down; No change.
 		return a_Meta;
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 11;
 	}
 } ;
 

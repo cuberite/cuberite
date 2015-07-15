@@ -470,30 +470,10 @@ void cProtocolRecognizer::SendLoginSuccess(void)
 
 
 
-void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
+void cProtocolRecognizer::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length, m_Scale);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendMapDecorators(a_ID, a_Decorators, m_Scale);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendMapInfo(a_ID, a_Scale);
+	m_Protocol->SendMapData(a_Map, a_DataStartX, a_DataStartY);
 }
 
 

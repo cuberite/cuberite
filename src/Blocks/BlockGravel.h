@@ -28,6 +28,12 @@ public:
 			a_Pickups.Add(E_BLOCK_GRAVEL, 1, 0);
 		}
 	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 11;
+	}
 } ;
 
 

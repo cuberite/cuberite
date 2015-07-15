@@ -8,7 +8,7 @@
 
 
 
-/// Common class that takes care of carrots, potatoes and wheat
+/** Common class that takes care of carrots, potatoes and wheat */
 class cBlockCropsHandler :
 	public cBlockHandler
 {
@@ -17,7 +17,6 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
 	{
@@ -73,7 +72,6 @@ public:
 		}
 	}
 	
-	
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		NIBBLETYPE Meta     = a_Chunk.GetMeta      (a_RelX, a_RelY, a_RelZ);
@@ -95,10 +93,15 @@ public:
 		}
 	}
 
-
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) == E_BLOCK_FARMLAND));
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 7;
 	}
 } ;
 
