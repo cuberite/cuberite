@@ -111,9 +111,12 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		
 		// If source creation is on, check for it here:
 		if (
-			(m_NumNeighborsForSource > 0) &&  // Source creation is on
-			(MyMeta == m_Falloff) &&          // Only exactly one block away from a source (fast bail-out)
-			!IsPassableForFluid(Below) &&     // Only exactly 1 block deep
+			(m_NumNeighborsForSource > 0) &&    // Source creation is on
+			(MyMeta == m_Falloff) &&            // Only exactly one block away from a source (fast bail-out)
+			(
+				!IsPassableForFluid(Below) ||  // Only exactly 1 block deep
+				(Below == m_StationaryFluidBlock)  // Or a source block underneath
+			) &&
 			CheckNeighborsForSource(a_Chunk, a_RelX, a_RelY, a_RelZ)  // Did we create a source?
 		)
 		{
