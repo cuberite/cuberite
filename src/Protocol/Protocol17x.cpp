@@ -3016,6 +3016,19 @@ void cProtocol172::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 
 void cProtocol172::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
+	// Living Enitiy Metadata
+	if (a_Mob.HasCustomName())
+	{
+		a_Pkt.WriteBEUInt8(0x8a);
+		a_Pkt.WriteString(a_Mob.GetCustomName());
+
+		a_Pkt.WriteBEUInt8(0x0b);
+		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
+	}
+
+	a_Pkt.WriteBEUInt8(0x66);
+	a_Pkt.WriteBEFloat(a_Mob.GetHealth());
+
 	switch (a_Mob.GetMobType())
 	{
 		case mtBat:
@@ -3209,15 +3222,6 @@ void cProtocol172::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			break;
 		}
 	}  // switch (a_Mob.GetType())
-
-	// Custom name:
-	if (a_Mob.HasCustomName())
-	{
-		a_Pkt.WriteBEUInt8(0x8a);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-		a_Pkt.WriteBEUInt8(0x0b);
-		a_Pkt.WriteBEUInt8(a_Mob.IsCustomNameAlwaysVisible() ? 1 : 0);
-	}
 }
 
 

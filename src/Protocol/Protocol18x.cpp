@@ -3207,7 +3207,7 @@ void cProtocol180::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 	}
 	a_Pkt.WriteBEUInt8(0);  // Byte(0) + index 0
 	a_Pkt.WriteBEUInt8(Flags);
-	
+
 	switch (a_Entity.GetEntityType())
 	{
 		case cEntity::etPlayer: break;  // TODO?
@@ -3313,6 +3313,19 @@ void cProtocol180::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 
 void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
+	// Living Enitiy Metadata
+	if (a_Mob.HasCustomName())
+	{
+		a_Pkt.WriteBEUInt8(0x82);
+		a_Pkt.WriteString(a_Mob.GetCustomName());
+
+		a_Pkt.WriteBEUInt8(0x03);
+		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
+	}
+
+	a_Pkt.WriteBEUInt8(0x66);
+	a_Pkt.WriteBEFloat(a_Mob.GetHealth());
+
 	switch (a_Mob.GetMobType())
 	{
 		case mtBat:
