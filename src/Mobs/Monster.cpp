@@ -101,6 +101,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_TicksSinceLastDamaged(100)
 	, m_BurnsInDaylight(false)
 	, m_RelativeWalkSpeed(1)
+	, m_Age(1)
 {
 	if (!a_ConfigName.empty())
 	{
