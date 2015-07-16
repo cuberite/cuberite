@@ -2396,7 +2396,18 @@ void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadRabbitFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cRabbit> Monster = cpp14::make_unique<cRabbit>();
+	int TypeIdx  = a_NBT.FindChildByName(a_TagIdx, "RabbitType");
+	int MoreCarrotTicksIdx = a_NBT.FindChildByName(a_TagIdx, "MoreCarrotTicks");
+
+	if ((TypeIdx < 0) || (MoreCarrotTicksIdx < 0))
+	{
+		return;
+	}
+
+	int Type = a_NBT.GetInt(TypeIdx);
+	int MoreCarrotTicks = a_NBT.GetInt(MoreCarrotTicksIdx);
+
+	std::unique_ptr<cRabbit> Monster = cpp14::make_unique<cRabbit>(static_cast<eRabbitType>(Type), MoreCarrotTicks);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;

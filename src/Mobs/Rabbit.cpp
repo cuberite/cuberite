@@ -10,7 +10,20 @@
 
 
 cRabbit::cRabbit(void) :
-	super("Rabbit", mtRabbit, "mob.rabbit.idle", "mob.rabbit.death", 0.82, 0.68)
+	cRabbit(static_cast<eRabbitType>(cFastRandom().NextInt(
+		static_cast<UInt8>(eRabbitType::SaltAndPepper) + 1  // Max possible Rabbit-Type
+	)), 0)
+{
+}
+
+
+
+
+
+cRabbit::cRabbit(eRabbitType Type, int MoreCarrotTicks) :
+	super("Rabbit", mtRabbit, "mob.rabbit.idle", "mob.rabbit.death", 0.82, 0.68),
+	m_Type(Type),
+	m_MoreCarrotTicks(MoreCarrotTicks)
 {
 }
 
