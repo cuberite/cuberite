@@ -278,7 +278,7 @@ public:
 		// Spawn the wither:
 		int BlockX = a_PlacedHeadX + a_OffsetX;
 		int BlockZ = a_PlacedHeadZ + a_OffsetZ;
-		a_World.SpawnMob(static_cast<double>(BlockX) + 0.5, a_PlacedHeadY - 2, static_cast<double>(BlockZ) + 0.5, mtWither);
+		a_World.SpawnMob(static_cast<double>(BlockX) + 0.5, a_PlacedHeadY - 2, static_cast<double>(BlockZ) + 0.5, mtWither, false);
 		AwardSpawnWitherAchievement(a_World, BlockX, a_PlacedHeadY - 2, BlockZ);
 		return true;
 	}

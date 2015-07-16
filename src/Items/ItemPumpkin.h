@@ -96,7 +96,7 @@ public:
 		}
 
 		// Spawn the golem:
-		a_World.SpawnMob(static_cast<double>(a_BlockX) + 0.5, a_BlockY - 2, static_cast<double>(a_BlockZ) + 0.5, mtSnowGolem);
+		a_World.SpawnMob(static_cast<double>(a_BlockX) + 0.5, a_BlockY - 2, static_cast<double>(a_BlockZ) + 0.5, mtSnowGolem, false);
 		return true;
 	}
 
@@ -142,7 +142,7 @@ public:
 			}
 
 			// Spawn the golem:
-			a_World.SpawnMob(static_cast<double>(a_BlockX) + 0.5, a_BlockY - 2, static_cast<double>(a_BlockZ) + 0.5, mtIronGolem);
+			a_World.SpawnMob(static_cast<double>(a_BlockX) + 0.5, a_BlockY - 2, static_cast<double>(a_BlockZ) + 0.5, mtIronGolem, false);
 			return true;
 		}  // for i - ArmOffsets[]
 

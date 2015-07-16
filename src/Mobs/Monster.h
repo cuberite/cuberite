@@ -115,9 +115,11 @@ public:
 	virtual bool IsTame    (void) const { return false; }
 	virtual bool IsSitting (void) const { return false; }
 
+	// tolua_begin
 	bool IsBaby (void) const { return m_Age < 0; }
 	char GetAge (void) const { return m_Age; }
 	void SetAge(char a_Age)  { m_Age = a_Age; }
+	// tolua_end
 	
 	
 	// tolua_begin

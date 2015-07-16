@@ -40,7 +40,7 @@ public:
 		eMonsterType MonsterType = ItemDamageToMonsterType(a_Item.m_ItemDamage);
 		if (
 			(MonsterType != mtInvalidType) &&  // Valid monster type
-			(a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, MonsterType) != cEntity::INVALID_ID))  // Spawning succeeded
+			(a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
 		{
 			if (!a_Player->IsGameModeCreative())
 			{
