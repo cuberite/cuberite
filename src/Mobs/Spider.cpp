@@ -3,7 +3,8 @@
 
 #include "Spider.h"
 
-
+#include "../World.h"
+#include "../Entities/Player.h"
 
 
 
@@ -33,3 +34,42 @@ void cSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
+void cSpider::EventSeePlayer(cEntity * a_Entity)
+{
+	if (!GetWorld()->IsChunkLighted(GetChunkX(), GetChunkZ()))
+	{
+		GetWorld()->QueueLightChunk(GetChunkX(), GetChunkZ());
+		return;
+	}
+
+	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative() && (GetWorld()->GetBlockBlockLight(this->GetPosition()) <= 9))
+	{
+		super::EventSeePlayer(a_Entity);
+	}
+}
+
+
+
+
+
+bool cSpider::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
+	// If the source of the damage is not from an pawn entity, switch to idle
+	if ((a_TDI.Attacker == nullptr) || !a_TDI.Attacker->IsPawn())
+	{
+		m_EMState = IDLE;
+	}
+	else
+	{
+		// If the source of the damage is from a pawn entity, chase that entity
+		m_EMState = CHASING;
+	}
+
+	return true;
+}
