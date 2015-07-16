@@ -484,6 +484,7 @@ public:
 	BLOCKTYPE  GetBlock    (const Vector3i & a_Pos) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z); }
 	NIBBLETYPE GetBlockMeta(const Vector3i & a_Pos) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z); }
 	void       SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData); }
+	NIBBLETYPE GetBlockBlockLight(const Vector3i & a_Pos) { return GetBlockBlockLight( a_Pos.x, a_Pos.y, a_Pos.z); }
 	// tolua_end
 	
 	/** Writes the block area into the specified coords.
