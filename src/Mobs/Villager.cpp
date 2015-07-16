@@ -41,7 +41,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 	if (a_TDI.DamageType == dtLightning)
 	{
 		Destroy();
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtWitch);
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtWitch, false);
 		return true;
 	}
 	return true;

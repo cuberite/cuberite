@@ -3326,7 +3326,7 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
+UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby)
 {
 	cMonster * Monster = nullptr;
 
@@ -3337,6 +3337,11 @@ UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterTyp
 	}
 	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	
+	if (a_Baby)
+	{
+		Monster->SetAge(-1);
+	}
+
 	return SpawnMobFinalize(Monster);
 }
 

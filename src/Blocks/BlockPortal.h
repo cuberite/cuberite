@@ -49,7 +49,7 @@ public:
 		int PosX = a_Chunk.GetPosX() * cChunkDef::Width + a_RelX;
 		int PosZ = a_Chunk.GetPosZ() * cChunkDef::Width + a_RelZ;
 
-		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, mtZombiePigman);
+		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, mtZombiePigman, false);
 	}
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override

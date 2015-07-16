@@ -108,7 +108,7 @@ bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 	if (a_TDI.DamageType == dtLightning)
 	{
 		Destroy();
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtZombiePigman);
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtZombiePigman, false);
 		return true;
 	}
 	return true;
