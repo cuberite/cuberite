@@ -645,7 +645,8 @@ void cIncrementalRedstoneSimulator::FindAndPowerBorderingWires(std::vector<std::
 
 		if (
 			(Neighbour->GetBlock(AdjustedPos) == E_BLOCK_REDSTONE_WIRE) &&
-			(!cBlockInfo::FullyOccupiesVoxel(a_EntryChunk->GetBlock(a_EntryRelBlockPosition.x, a_EntryRelBlockPosition.y + 1, a_EntryRelBlockPosition.z))) &&
+			(!cBlockInfo::FullyOccupiesVoxel(a_EntryChunk->GetBlock(a_EntryRelBlockPosition.x, a_EntryRelBlockPosition.y + 1, a_EntryRelBlockPosition.z)) ||
+			(a_EntryChunk->GetBlock(a_EntryRelBlockPosition.x, a_EntryRelBlockPosition.y + 1, a_EntryRelBlockPosition.z) == E_BLOCK_GLOWSTONE)) &&
 			(MyPower > 1) && (MyPower > IsWirePowered(AdjustedPos, Neighbour)))
 		{
 			PowerBorderingWires(a_PotentialWireList, a_EntryRelBlockPosition, a_EntryChunk, AdjustedPos, Neighbour, MyPower);
@@ -665,7 +666,8 @@ void cIncrementalRedstoneSimulator::FindAndPowerBorderingWires(std::vector<std::
 
 		if (
 			(Neighbour->GetBlock(AdjustedPos) == E_BLOCK_REDSTONE_WIRE) &&
-			(!cBlockInfo::FullyOccupiesVoxel(Neighbour->GetBlock(AdjustedPos.x, AdjustedPos.y + 1, AdjustedPos.z))) &&
+			(!cBlockInfo::FullyOccupiesVoxel(Neighbour->GetBlock(AdjustedPos.x, AdjustedPos.y + 1, AdjustedPos.z)) ||
+			(Neighbour->GetBlock(AdjustedPos.x, AdjustedPos.y + 1, AdjustedPos.z) == E_BLOCK_GLOWSTONE)) &&
 			(MyPower > 1) && (MyPower > IsWirePowered(AdjustedPos, Neighbour)))
 		{
 			PowerBorderingWires(a_PotentialWireList, a_EntryRelBlockPosition, a_EntryChunk, AdjustedPos, Neighbour, MyPower);
