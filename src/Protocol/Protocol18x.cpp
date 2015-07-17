@@ -3437,14 +3437,6 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			break;
 		}  // case mtPig
 
-		case mtRabbit:
-		{
-			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Rabbit.GetAge());
-			break;
-		}  // case mtRabbit
-
 		case mtSheep:
 		{
 			auto & Sheep = reinterpret_cast<const cSheep &>(a_Mob);
@@ -3461,6 +3453,17 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
+
+		case mtRabbit:
+		{
+			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
+			a_Pkt.WriteBEUInt8(0x12);
+			a_Pkt.WriteBEUInt8(Rabbit.GetRabbitTypeAsNumber());
+
+			a_Pkt.WriteBEUInt8(0x0c);
+			a_Pkt.WriteBEInt8(Rabbit.GetAge());
+			break;
+		}  // case mtRabbit
 
 		case mtSkeleton:
 		{

@@ -528,113 +528,118 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 		{
 			case mtBat:
 			{
-				m_Writer.AddByte("BatFlags", ((const cBat *)a_Monster)->IsHanging());
+				m_Writer.AddByte("BatFlags", reinterpret_cast<const cBat *>(a_Monster)->IsHanging());
 				break;
 			}
 			case mtCreeper:
 			{
-				m_Writer.AddByte("powered", ((const cCreeper *)a_Monster)->IsCharged());
-				m_Writer.AddByte("ignited", ((const cCreeper *)a_Monster)->IsBlowing());
+				const cCreeper *Creeper = reinterpret_cast<const cCreeper *>(a_Monster);
+				m_Writer.AddByte("powered", Creeper->IsCharged());
+				m_Writer.AddByte("ignited", Creeper->IsBlowing());
 				break;
 			}
 			case mtEnderman:
 			{
-				m_Writer.AddShort("carried",     (Int16)((const cEnderman *)a_Monster)->GetCarriedBlock());
-				m_Writer.AddShort("carriedData", (Int16)((const cEnderman *)a_Monster)->GetCarriedMeta());
+				const cEnderman *Enderman = reinterpret_cast<const cEnderman *>(a_Monster);
+				m_Writer.AddShort("carried",     (Int16) Enderman->GetCarriedBlock());
+				m_Writer.AddShort("carriedData", (Int16) Enderman->GetCarriedMeta());
 				break;
 			}
 			case mtHorse:
 			{
-				const cHorse & Horse = *((const cHorse *)a_Monster);
-				m_Writer.AddByte("ChestedHorse",   Horse.IsChested());
-				m_Writer.AddByte("EatingHaystack", Horse.IsEating());
-				m_Writer.AddByte("Tame",           Horse.IsTame());
-				m_Writer.AddInt ("Type",           Horse.GetHorseType());
-				m_Writer.AddInt ("Color",          Horse.GetHorseColor());
-				m_Writer.AddInt ("Style",          Horse.GetHorseStyle());
-				m_Writer.AddInt ("ArmorType",      Horse.GetHorseArmour());
-				m_Writer.AddByte("Saddle",         Horse.IsSaddled());
-				m_Writer.AddByte("Age",            Horse.GetAge());
+				const cHorse *Horse = reinterpret_cast<const cHorse *>(a_Monster);
+				m_Writer.AddByte("ChestedHorse",   Horse->IsChested());
+				m_Writer.AddByte("EatingHaystack", Horse->IsEating());
+				m_Writer.AddByte("Tame",           Horse->IsTame());
+				m_Writer.AddInt ("Type",           Horse->GetHorseType());
+				m_Writer.AddInt ("Color",          Horse->GetHorseColor());
+				m_Writer.AddInt ("Style",          Horse->GetHorseStyle());
+				m_Writer.AddInt ("ArmorType",      Horse->GetHorseArmour());
+				m_Writer.AddByte("Saddle",         Horse->IsSaddled());
+				m_Writer.AddByte("Age",            Horse->GetAge());
 				break;
 			}
 			case mtMagmaCube:
 			{
-				m_Writer.AddInt("Size", ((const cMagmaCube *)a_Monster)->GetSize());
+				m_Writer.AddInt("Size", reinterpret_cast<const cMagmaCube *>(a_Monster)->GetSize());
 				break;
 			}
 			case mtSheep:
 			{
-				m_Writer.AddByte("Sheared", ((const cSheep *)a_Monster)->IsSheared());
-				m_Writer.AddByte("Color",   ((const cSheep *)a_Monster)->GetFurColor());
-				m_Writer.AddByte("Age",     ((const cSheep *)a_Monster)->GetAge());
+				const cSheep *Sheep = reinterpret_cast<const cSheep *>(a_Monster);
+				m_Writer.AddByte("Sheared", Sheep->IsSheared());
+				m_Writer.AddByte("Color",   Sheep->GetFurColor());
+				m_Writer.AddByte("Age",     Sheep->GetAge());
 				break;
 			}
 			case mtSlime:
 			{
-				m_Writer.AddInt("Size", ((const cSlime *)a_Monster)->GetSize());
+				m_Writer.AddInt("Size", reinterpret_cast<const cSlime *>(a_Monster)->GetSize());
 				break;
 			}
 			case mtSkeleton:
 			{
-				m_Writer.AddByte("SkeletonType", (((const cSkeleton *)a_Monster)->IsWither() ? 1 : 0));
+				m_Writer.AddByte("SkeletonType", (reinterpret_cast<const cSkeleton *>(a_Monster)->IsWither() ? 1 : 0));
 				break;
 			}
 			case mtVillager:
 			{
-				m_Writer.AddInt("Profession", ((const cVillager *)a_Monster)->GetVilType());
-				m_Writer.AddByte("Age",       ((const cVillager *)a_Monster)->GetAge());
+				const cVillager *Villager = reinterpret_cast<const cVillager *>(a_Monster);
+				m_Writer.AddInt("Profession", Villager->GetVilType());
+				m_Writer.AddByte("Age",       Villager->GetAge());
 				break;
 			}
 			case mtWither:
 			{
-				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetWitherInvulnerableTicks());
+				m_Writer.AddInt("Invul", reinterpret_cast<const cWither *>(a_Monster)->GetWitherInvulnerableTicks());
 				break;
 			}
 			case mtWolf:
 			{
-				const cWolf & Wolf = *((cWolf *)a_Monster);
-				if (!Wolf.GetOwnerName().empty())
+				const cWolf *Wolf = reinterpret_cast<const cWolf *>(a_Monster);
+				if (!Wolf->GetOwnerName().empty())
 				{
-					m_Writer.AddString("Owner", Wolf.GetOwnerName());
+					m_Writer.AddString("Owner", Wolf->GetOwnerName());
 				}
-				if (!Wolf.GetOwnerUUID().empty())
+				if (!Wolf->GetOwnerUUID().empty())
 				{
-					m_Writer.AddString("OwnerUUID", Wolf.GetOwnerUUID());
+					m_Writer.AddString("OwnerUUID", Wolf->GetOwnerUUID());
 				}
-				m_Writer.AddByte("Sitting",     Wolf.IsSitting() ? 1 : 0);
-				m_Writer.AddByte("Angry",       Wolf.IsAngry() ? 1 : 0);
-				m_Writer.AddByte("CollarColor", (unsigned char)Wolf.GetCollarColor());
-				m_Writer.AddByte("Age",         Wolf.GetAge());
+				m_Writer.AddByte("Sitting",     Wolf->IsSitting() ? 1 : 0);
+				m_Writer.AddByte("Angry",       Wolf->IsAngry() ? 1 : 0);
+				m_Writer.AddByte("CollarColor", (unsigned char) Wolf->GetCollarColor());
+				m_Writer.AddByte("Age",         Wolf->GetAge());
 				break;
 			}
 			case mtZombie:
 			{
-				m_Writer.AddByte("IsVillager",   (((const cZombie *)a_Monster)->IsVillagerZombie() ? 1 : 0));
-				m_Writer.AddByte("IsConverting", (((const cZombie *)a_Monster)->IsConverting() ? 1 : 0));
-				m_Writer.AddByte("Age",          (((const cZombie *)a_Monster)->GetAge()));
+				const cZombie *Zombie = reinterpret_cast<const cZombie *>(a_Monster);
+				m_Writer.AddByte("IsVillager",   Zombie->IsVillagerZombie() ? 1 : 0);
+				m_Writer.AddByte("IsConverting", Zombie->IsConverting() ? 1 : 0);
+				m_Writer.AddByte("Age",          Zombie->GetAge());
 				break;
 			}
 			case mtZombiePigman:
 			{
-				m_Writer.AddByte("Age", (((const cZombiePigman *)a_Monster)->GetAge()));
+				m_Writer.AddByte("Age", reinterpret_cast<const cZombiePigman *>(a_Monster)->GetAge());
 				break;
 			}
 			case mtOcelot:
 			{
-				const cOcelot & Ocelot = *((cOcelot *)a_Monster);
-				m_Writer.AddByte("Age", Ocelot.GetAge());
+				m_Writer.AddByte("Age", reinterpret_cast<const cOcelot *>(a_Monster)->GetAge());
 				break;
 			}
 			case mtPig:
 			{
-				const cPig & Pig = *((cPig *)a_Monster);
-				m_Writer.AddByte("Age", Pig.GetAge());
+				m_Writer.AddByte("Age", reinterpret_cast<const cPig *>(a_Monster)->GetAge());
 				break;
 			}
 			case mtRabbit:
 			{
-				const cRabbit & Rabbit = *((cRabbit *)a_Monster);
-				m_Writer.AddByte("Age", Rabbit.GetAge());
+				const cRabbit *Rabbit = reinterpret_cast<const cRabbit *>(a_Monster);
+				m_Writer.AddInt("RabbitType", Rabbit->GetRabbitTypeAsNumber());
+				m_Writer.AddInt("MoreCarrotTicks", Rabbit->GetMoreCarrotTicks());
+				m_Writer.AddByte("Age", Rabbit->GetAge());
 				break;
 			}
 			case mtInvalidType:
