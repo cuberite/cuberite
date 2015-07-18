@@ -86,7 +86,7 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType, short a_ItemDamage)
 		CreateItemHandler(a_ItemType);
 	}
 
-	if(a_ItemDamage >= static_cast<int>(m_ItemHandler[a_ItemType].size()))  // Meta value is irrelevant/not implemented
+	if (a_ItemDamage >= static_cast<int>(m_ItemHandler[a_ItemType].size()))  // Meta value is irrelevant or not implemented
 	{
 		a_ItemDamage = 0;  // So set it back to 0
 	}
@@ -103,55 +103,55 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 
 	switch (a_ItemType)
 	{
-		default:                       handler.push_back(cpp14::make_unique<cItemHandler>(a_ItemType));
+		default:                       handler.push_back(cpp14::make_unique<cItemHandler>(a_ItemType)); break;
 		
 		// Single item per handler, alphabetically sorted:
-		case E_BLOCK_BIG_FLOWER:         handler.push_back(cpp14::make_unique<cItemBigFlowerHandler>());
-		case E_BLOCK_CHEST:              handler.push_back(cpp14::make_unique<cItemChestHandler>(a_ItemType));
-		case E_BLOCK_LEAVES:             handler.push_back(cpp14::make_unique<cItemLeavesHandler>(a_ItemType));
-		case E_BLOCK_LILY_PAD:           handler.push_back(cpp14::make_unique<cItemLilypadHandler>(a_ItemType));
-		case E_BLOCK_HEAD:               handler.push_back(cpp14::make_unique<cItemMobHeadHandler>(a_ItemType));
-		case E_BLOCK_NEW_LEAVES:         handler.push_back(cpp14::make_unique<cItemLeavesHandler>(a_ItemType));
-		case E_BLOCK_PUMPKIN:            handler.push_back(cpp14::make_unique<cItemPumpkinHandler>());
-		case E_BLOCK_SAPLING:            handler.push_back(cpp14::make_unique<cItemSaplingHandler>(a_ItemType));
-		case E_BLOCK_STONE_SLAB:         handler.push_back(cpp14::make_unique<cItemSlabHandler>(E_BLOCK_STONE_SLAB,  E_BLOCK_DOUBLE_STONE_SLAB));
-		case E_BLOCK_TRAPPED_CHEST:      handler.push_back(cpp14::make_unique<cItemChestHandler>(a_ItemType));
-		case E_BLOCK_WOODEN_SLAB:        handler.push_back(cpp14::make_unique<cItemSlabHandler>(E_BLOCK_WOODEN_SLAB, E_BLOCK_DOUBLE_WOODEN_SLAB));
-		case E_BLOCK_WOOL:               handler.push_back(cpp14::make_unique<cItemClothHandler>(a_ItemType));
-		case E_ITEM_BED:                 handler.push_back(cpp14::make_unique<cItemBedHandler>(a_ItemType));
-		case E_ITEM_BOAT:                handler.push_back(cpp14::make_unique<cItemBoatHandler>(a_ItemType));
-		case E_ITEM_BOTTLE_O_ENCHANTING: handler.push_back(cpp14::make_unique<cItemBottleOEnchantingHandler>());
-		case E_ITEM_BOW:                 handler.push_back(cpp14::make_unique<cItemBowHandler>());
-		case E_ITEM_BREWING_STAND:       handler.push_back(cpp14::make_unique<cItemBrewingStandHandler>(a_ItemType));
-		case E_ITEM_CAKE:                handler.push_back(cpp14::make_unique<cItemCakeHandler>(a_ItemType));
-		case E_ITEM_CAULDRON:            handler.push_back(cpp14::make_unique<cItemCauldronHandler>(a_ItemType));
-		case E_ITEM_COMPARATOR:          handler.push_back(cpp14::make_unique<cItemComparatorHandler>(a_ItemType));
-		case E_ITEM_DYE:                 handler.push_back(cpp14::make_unique<cItemDyeHandler>(a_ItemType));
-		case E_ITEM_EGG:                 handler.push_back(cpp14::make_unique<cItemEggHandler>());
-		case E_ITEM_EMPTY_MAP:           handler.push_back(cpp14::make_unique<cItemEmptyMapHandler>());
-		case E_ITEM_ENDER_PEARL:         handler.push_back(cpp14::make_unique<cItemEnderPearlHandler>());
-		case E_ITEM_FIRE_CHARGE:         handler.push_back(cpp14::make_unique<cItemLighterHandler>(a_ItemType));
-		case E_ITEM_FIREWORK_ROCKET:     handler.push_back(cpp14::make_unique<cItemFireworkHandler>());
-		case E_ITEM_FISHING_ROD:         handler.push_back(cpp14::make_unique<cItemFishingRodHandler>(a_ItemType));
-		case E_ITEM_FLINT_AND_STEEL:     handler.push_back(cpp14::make_unique<cItemLighterHandler>(a_ItemType));
-		case E_ITEM_FLOWER_POT:          handler.push_back(cpp14::make_unique<cItemFlowerPotHandler>(a_ItemType));
-		case E_ITEM_GOLDEN_APPLE:        handler.push_back(cpp14::make_unique<cItemGoldenAppleHandler>());
-		case E_ITEM_MAP:                 handler.push_back(cpp14::make_unique<cItemMapHandler>());
-		case E_ITEM_MILK:                handler.push_back(cpp14::make_unique<cItemMilkHandler>());
-		case E_ITEM_MUSHROOM_SOUP:       handler.push_back(cpp14::make_unique<cItemMushroomSoupHandler>(a_ItemType));
-		case E_ITEM_ITEM_FRAME:          handler.push_back(cpp14::make_unique<cItemItemFrameHandler>(a_ItemType));
-		case E_ITEM_NETHER_WART:         handler.push_back(cpp14::make_unique<cItemNetherWartHandler>(a_ItemType));
-		case E_ITEM_PAINTING:            handler.push_back(cpp14::make_unique<cItemPaintingHandler>(a_ItemType));
-		case E_ITEM_POTIONS:             handler.push_back(cpp14::make_unique<cItemPotionHandler>());
-		case E_ITEM_REDSTONE_DUST:       handler.push_back(cpp14::make_unique<cItemRedstoneDustHandler>(a_ItemType));
-		case E_ITEM_REDSTONE_REPEATER:   handler.push_back(cpp14::make_unique<cItemRedstoneRepeaterHandler>(a_ItemType));
-		case E_ITEM_SHEARS:              handler.push_back(cpp14::make_unique<cItemShearsHandler>(a_ItemType));
-		case E_ITEM_SIGN:                handler.push_back(cpp14::make_unique<cItemSignHandler>(a_ItemType));
-		case E_ITEM_HEAD:                handler.push_back(cpp14::make_unique<cItemMobHeadHandler>(a_ItemType));
-		case E_ITEM_SNOWBALL:            handler.push_back(cpp14::make_unique<cItemSnowballHandler>());
-		case E_ITEM_SPAWN_EGG:           handler.push_back(cpp14::make_unique<cItemSpawnEggHandler>(a_ItemType));
-		case E_ITEM_STRING:              handler.push_back(cpp14::make_unique<cItemStringHandler>(a_ItemType));
-		case E_ITEM_SUGARCANE:           handler.push_back(cpp14::make_unique<cItemSugarcaneHandler>(a_ItemType));
+		case E_BLOCK_BIG_FLOWER:         handler.push_back(cpp14::make_unique<cItemBigFlowerHandler>()); break;
+		case E_BLOCK_CHEST:              handler.push_back(cpp14::make_unique<cItemChestHandler>(a_ItemType)); break;
+		case E_BLOCK_LEAVES:             handler.push_back(cpp14::make_unique<cItemLeavesHandler>(a_ItemType)); break;
+		case E_BLOCK_LILY_PAD:           handler.push_back(cpp14::make_unique<cItemLilypadHandler>(a_ItemType)); break;
+		case E_BLOCK_HEAD:               handler.push_back(cpp14::make_unique<cItemMobHeadHandler>(a_ItemType)); break;
+		case E_BLOCK_NEW_LEAVES:         handler.push_back(cpp14::make_unique<cItemLeavesHandler>(a_ItemType)); break;
+		case E_BLOCK_PUMPKIN:            handler.push_back(cpp14::make_unique<cItemPumpkinHandler>()); break;
+		case E_BLOCK_SAPLING:            handler.push_back(cpp14::make_unique<cItemSaplingHandler>(a_ItemType)); break;
+		case E_BLOCK_STONE_SLAB:         handler.push_back(cpp14::make_unique<cItemSlabHandler>(E_BLOCK_STONE_SLAB,  E_BLOCK_DOUBLE_STONE_SLAB)); break;
+		case E_BLOCK_TRAPPED_CHEST:      handler.push_back(cpp14::make_unique<cItemChestHandler>(a_ItemType)); break;
+		case E_BLOCK_WOODEN_SLAB:        handler.push_back(cpp14::make_unique<cItemSlabHandler>(E_BLOCK_WOODEN_SLAB, E_BLOCK_DOUBLE_WOODEN_SLAB)); break;
+		case E_BLOCK_WOOL:               handler.push_back(cpp14::make_unique<cItemClothHandler>(a_ItemType)); break;
+		case E_ITEM_BED:                 handler.push_back(cpp14::make_unique<cItemBedHandler>(a_ItemType)); break;
+		case E_ITEM_BOAT:                handler.push_back(cpp14::make_unique<cItemBoatHandler>(a_ItemType)); break;
+		case E_ITEM_BOTTLE_O_ENCHANTING: handler.push_back(cpp14::make_unique<cItemBottleOEnchantingHandler>()); break;
+		case E_ITEM_BOW:                 handler.push_back(cpp14::make_unique<cItemBowHandler>()); break;
+		case E_ITEM_BREWING_STAND:       handler.push_back(cpp14::make_unique<cItemBrewingStandHandler>(a_ItemType)); break;
+		case E_ITEM_CAKE:                handler.push_back(cpp14::make_unique<cItemCakeHandler>(a_ItemType)); break;
+		case E_ITEM_CAULDRON:            handler.push_back(cpp14::make_unique<cItemCauldronHandler>(a_ItemType)); break;
+		case E_ITEM_COMPARATOR:          handler.push_back(cpp14::make_unique<cItemComparatorHandler>(a_ItemType)); break;
+		case E_ITEM_DYE:                 handler.push_back(cpp14::make_unique<cItemDyeHandler>(a_ItemType)); break;
+		case E_ITEM_EGG:                 handler.push_back(cpp14::make_unique<cItemEggHandler>()); break;
+		case E_ITEM_EMPTY_MAP:           handler.push_back(cpp14::make_unique<cItemEmptyMapHandler>()); break;
+		case E_ITEM_ENDER_PEARL:         handler.push_back(cpp14::make_unique<cItemEnderPearlHandler>()); break;
+		case E_ITEM_FIRE_CHARGE:         handler.push_back(cpp14::make_unique<cItemLighterHandler>(a_ItemType)); break;
+		case E_ITEM_FIREWORK_ROCKET:     handler.push_back(cpp14::make_unique<cItemFireworkHandler>()); break;
+		case E_ITEM_FISHING_ROD:         handler.push_back(cpp14::make_unique<cItemFishingRodHandler>(a_ItemType)); break;
+		case E_ITEM_FLINT_AND_STEEL:     handler.push_back(cpp14::make_unique<cItemLighterHandler>(a_ItemType)); break;
+		case E_ITEM_FLOWER_POT:          handler.push_back(cpp14::make_unique<cItemFlowerPotHandler>(a_ItemType)); break;
+		case E_ITEM_GOLDEN_APPLE:        handler.push_back(cpp14::make_unique<cItemGoldenAppleHandler>()); break;
+		case E_ITEM_MAP:                 handler.push_back(cpp14::make_unique<cItemMapHandler>()); break;
+		case E_ITEM_MILK:                handler.push_back(cpp14::make_unique<cItemMilkHandler>()); break;
+		case E_ITEM_MUSHROOM_SOUP:       handler.push_back(cpp14::make_unique<cItemMushroomSoupHandler>(a_ItemType)); break;
+		case E_ITEM_ITEM_FRAME:          handler.push_back(cpp14::make_unique<cItemItemFrameHandler>(a_ItemType)); break;
+		case E_ITEM_NETHER_WART:         handler.push_back(cpp14::make_unique<cItemNetherWartHandler>(a_ItemType)); break;
+		case E_ITEM_PAINTING:            handler.push_back(cpp14::make_unique<cItemPaintingHandler>(a_ItemType)); break;
+		case E_ITEM_POTIONS:             handler.push_back(cpp14::make_unique<cItemPotionHandler>()); break;
+		case E_ITEM_REDSTONE_DUST:       handler.push_back(cpp14::make_unique<cItemRedstoneDustHandler>(a_ItemType)); break;
+		case E_ITEM_REDSTONE_REPEATER:   handler.push_back(cpp14::make_unique<cItemRedstoneRepeaterHandler>(a_ItemType)); break;
+		case E_ITEM_SHEARS:              handler.push_back(cpp14::make_unique<cItemShearsHandler>(a_ItemType)); break;
+		case E_ITEM_SIGN:                handler.push_back(cpp14::make_unique<cItemSignHandler>(a_ItemType)); break;
+		case E_ITEM_HEAD:                handler.push_back(cpp14::make_unique<cItemMobHeadHandler>(a_ItemType)); break;
+		case E_ITEM_SNOWBALL:            handler.push_back(cpp14::make_unique<cItemSnowballHandler>()); break;
+		case E_ITEM_SPAWN_EGG:           handler.push_back(cpp14::make_unique<cItemSpawnEggHandler>(a_ItemType)); break;
+		case E_ITEM_STRING:              handler.push_back(cpp14::make_unique<cItemStringHandler>(a_ItemType)); break;
+		case E_ITEM_SUGARCANE:           handler.push_back(cpp14::make_unique<cItemSugarcaneHandler>(a_ItemType)); break;
 		
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
@@ -160,6 +160,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_HOE:
 		{
 			handler.push_back(cpp14::make_unique<cItemHoeHandler>(a_ItemType));
+			break;
 		}
 		
 		case E_ITEM_WOODEN_PICKAXE:
@@ -169,6 +170,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_PICKAXE:
 		{
 			handler.push_back(cpp14::make_unique<cItemPickaxeHandler>(a_ItemType));
+			break;
 		}
 		
 		case E_ITEM_WOODEN_SHOVEL:
@@ -178,6 +180,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_SHOVEL:
 		{
 			handler.push_back(cpp14::make_unique<cItemShovelHandler>(a_ItemType));
+			break;
 		}
 		
 		case E_ITEM_WOODEN_SWORD:
@@ -187,6 +190,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_SWORD:
 		{
 			handler.push_back(cpp14::make_unique<cItemSwordHandler>(a_ItemType));
+			break;
 		}
 		
 		case E_ITEM_BUCKET:
@@ -194,6 +198,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_LAVA_BUCKET:
 		{
 			handler.push_back(cpp14::make_unique<cItemBucketHandler>(a_ItemType));
+			break;
 		}
 		
 		case E_ITEM_CARROT:
@@ -203,6 +208,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_SEEDS:
 		{
 			handler.push_back(cpp14::make_unique<cItemSeedsHandler>(a_ItemType));
+			break;
 		}
 		
 		case E_ITEM_ACACIA_DOOR:
@@ -214,6 +220,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_WOODEN_DOOR:
 		{
 			handler.push_back(cpp14::make_unique<cItemDoorHandler>(a_ItemType));
+			break;
 		}
 		
 		case E_ITEM_MINECART:
@@ -223,6 +230,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_MINECART_WITH_HOPPER:
 		{
 			handler.push_back(cpp14::make_unique<cItemMinecartHandler>(a_ItemType));
+			break;
 		}
 		
 		// Food (please keep alpha-sorted):
@@ -230,7 +238,6 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BAKED_POTATO:
 		case E_ITEM_BREAD:
 		case E_ITEM_COOKED_CHICKEN:
-		case E_ITEM_COOKED_FISH:
 		case E_ITEM_COOKED_MUTTON:
 		case E_ITEM_COOKED_PORKCHOP:
 		case E_ITEM_COOKED_RABBIT:
@@ -242,7 +249,6 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_RABBIT_STEW:
 		case E_ITEM_RAW_BEEF:
 		case E_ITEM_RAW_CHICKEN:
-		case E_ITEM_RAW_FISH:
 		case E_ITEM_RAW_MUTTON:
 		case E_ITEM_RAW_PORKCHOP:
 		case E_ITEM_RAW_RABBIT:
@@ -252,6 +258,23 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_STEAK:
 		{
 			handler.push_back(cpp14::make_unique<cItemFoodHandler>(a_ItemType));
+			break;
+		}
+
+		case E_ITEM_COOKED_FISH:
+		{
+			handler.push_back(cpp14::make_unique<cItemFoodHandler>(a_ItemType, E_META_COOKED_FISH_FISH));
+			handler.push_back(cpp14::make_unique<cItemFoodHandler>(a_ItemType, E_META_COOKED_FISH_SALMON));
+			break;
+		}
+
+		case E_ITEM_RAW_FISH:
+		{
+			handler.push_back(cpp14::make_unique<cItemFoodHandler>(a_ItemType, E_META_RAW_FISH_FISH));
+			handler.push_back(cpp14::make_unique<cItemFoodHandler>(a_ItemType, E_META_RAW_FISH_SALMON));
+			handler.push_back(cpp14::make_unique<cItemFoodHandler>(a_ItemType, E_META_RAW_FISH_CLOWNFISH));
+			handler.push_back(cpp14::make_unique<cItemFoodHandler>(a_ItemType, E_META_RAW_FISH_PUFFERFISH));
+			break;
 		}
 
 		// Armor:
@@ -277,6 +300,7 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_BOOTS:
 		{
 			handler.push_back(cpp14::make_unique<cItemArmorHandler>(a_ItemType));
+			break;
 		}
 	}
 }

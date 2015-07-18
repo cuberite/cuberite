@@ -161,7 +161,7 @@ public:
 
 protected:
 	int m_ItemType;
-	static void CreateItemHandler(int m_ItemType);
+	static void CreateItemHandler(int a_ItemType);
 
 	static std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> m_ItemHandler;
 };
