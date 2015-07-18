@@ -1,6 +1,9 @@
 
 #pragma once
 
+#include <vector>
+#include <memory>
+#include <array>
 #include "../Defines.h"
 #include "../Item.h"
 #include "../Entities/EntityEffect.h"
@@ -29,7 +32,7 @@ public:
 	};
 
 	cItemHandler(int a_ItemType);
-	
+
 	/** Force virtual destructor */
 	virtual ~cItemHandler() {}
 
@@ -154,18 +157,15 @@ public:
 	Defaults to false unless overridden. */
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
-	static cItemHandler * GetItemHandler(int a_ItemType);
-	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType); }
-
-	static void Deinit();
+	static cItemHandler * GetItemHandler(int a_ItemType, short a_ItemDamage = 0);
+	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType, a_Item.m_ItemDamage); }
 	
 protected:
 	int m_ItemType;
-	static cItemHandler * CreateItemHandler(int m_ItemType);
+	static void CreateItemHandler(int m_ItemType);
 
-	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
-	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized
+	static std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> m_ItemHandler;
 };
 
 // Short function
-inline cItemHandler *ItemHandler(int a_ItemType) { return cItemHandler::GetItemHandler(a_ItemType); }
+inline cItemHandler *ItemHandler(int a_ItemType, short a_ItemDamage = 0) { return cItemHandler::GetItemHandler(a_ItemType, a_ItemDamage); }

@@ -269,8 +269,6 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> overridesRepo)
 		LOGD("Stopping plugin manager...");
 		delete m_PluginManager; m_PluginManager = nullptr;
 
-		cItemHandler::Deinit();
-
 		LOG("Cleaning up...");
 		delete m_Server; m_Server = nullptr;
 
