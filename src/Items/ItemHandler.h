@@ -25,6 +25,10 @@ class cItemHandler
 {
 public:
 
+	// The ItemHandler is an array for each item. The vector is used as an dynamic array for the different meta-values
+	// of the item. e.g. x[ItemNr][MetaVal]->Eat
+	typedef std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> ItemHandlerType;
+
 	enum eDurabilityLostAction
 	{
 		dlaBreakBlock,
@@ -158,10 +162,12 @@ public:
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
 	static cItemHandler * GetItemHandler(int a_ItemType, short a_ItemDamage);
+	static void Deinit();
 
 protected:
 	int m_ItemType;
 	static void CreateItemHandler(int a_ItemType);
 
-	static std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> m_ItemHandler;
+	// Pointer to make sure that the initialisation of the Object doesn't slow down the startup. It will be lazy loaded.
+	static ItemHandlerType *m_ItemHandler;
 };

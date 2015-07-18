@@ -40,7 +40,8 @@ public:
 				if (m_ItemDamage == E_META_COOKED_FISH_SALMON)
 				{
 					return FoodInfo(6, 9.6);
-				} else
+				}
+				else
 				{
 					return FoodInfo(5, 6);
 				}

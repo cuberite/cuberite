@@ -63,7 +63,7 @@
 
 
 
-std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> cItemHandler::m_ItemHandler;
+cItemHandler::ItemHandlerType *cItemHandler::m_ItemHandler = nullptr;
 
 
 
@@ -71,7 +71,12 @@ std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> cItemHan
 
 cItemHandler * cItemHandler::GetItemHandler(int a_ItemType, short a_ItemDamage)
 {
-	if ((a_ItemType < 0) || (static_cast<size_t>(a_ItemType) >= m_ItemHandler.size()))
+	if (m_ItemHandler == nullptr)
+	{
+		m_ItemHandler = new cItemHandler::ItemHandlerType;
+	}
+
+	if ((a_ItemType < 0) || (static_cast<size_t>(a_ItemType) >= m_ItemHandler->size()))
 	{
 		// Either nothing (-1), or bad value, both cases should return the air handler
 		if (a_ItemType < -1)
@@ -81,16 +86,16 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType, short a_ItemDamage)
 		a_ItemType = 0;
 	}
 
-	if (m_ItemHandler[a_ItemType].empty())
+	if ((*m_ItemHandler)[a_ItemType].empty())
 	{
 		CreateItemHandler(a_ItemType);
 	}
 
-	if (a_ItemDamage >= static_cast<int>(m_ItemHandler[a_ItemType].size()))  // Meta value is irrelevant or not implemented
+	if (a_ItemDamage >= static_cast<int>((*m_ItemHandler)[a_ItemType].size()))  // Meta value is irrelevant or not implemented
 	{
 		a_ItemDamage = 0;  // So set it back to 0
 	}
-	return m_ItemHandler[a_ItemType][a_ItemDamage].get();
+	return (*m_ItemHandler)[a_ItemType][a_ItemDamage].get();
 }
 
 
@@ -99,7 +104,7 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType, short a_ItemDamage)
 
 void cItemHandler::CreateItemHandler(int a_ItemType)
 {
-	std::vector<std::unique_ptr<cItemHandler>> &handler = m_ItemHandler[a_ItemType];
+	std::vector<std::unique_ptr<cItemHandler>> & handler = (*m_ItemHandler)[a_ItemType];
 
 	switch (a_ItemType)
 	{
@@ -302,6 +307,18 @@ void cItemHandler::CreateItemHandler(int a_ItemType)
 			handler.push_back(cpp14::make_unique<cItemArmorHandler>(a_ItemType));
 			break;
 		}
+	}
+}
+
+
+
+
+void cItemHandler::Deinit()
+{
+	if (m_ItemHandler != nullptr)
+	{
+		delete m_ItemHandler;
+		m_ItemHandler = nullptr;
 	}
 }
 
