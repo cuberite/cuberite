@@ -133,7 +133,7 @@ public:
 	virtual FoodInfo GetFoodInfo();
 
 	/** If this function returns true, it sets the arguments to a effect who will be activated when you eat the item. */
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance);
+	virtual bool AddEatEffects(cPlayer & a_Player);
 
 	/** Lets the player eat a selected item. Returns true if the player ate the item */
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item);

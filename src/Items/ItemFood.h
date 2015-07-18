@@ -80,47 +80,46 @@ public:
 		return FoodInfo(0, 0.f);
 	}
 
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) override
+	virtual bool AddEatEffects(cPlayer & a_Player) override
 	{
+		float Chance = cFastRandom().NextFloat();
 		switch (m_ItemType)
 		{
 			case E_ITEM_RAW_CHICKEN:
 			{
-				a_EffectType = cEntityEffect::effHunger;
-				a_EffectDurationTicks = 600;
-				a_EffectIntensity = 0;
-				a_Chance = 0.3f;
-				return true;
+				if (0.3f <= Chance)
+				{
+					return true;  // Not apply effect
+				}
 			}
 			case E_ITEM_ROTTEN_FLESH:
 			{
-				a_EffectType = cEntityEffect::effHunger;
-				a_EffectDurationTicks = 600;
-				a_EffectIntensity = 0;
-				a_Chance = 0.8f;
-				return true;
-			}
-			case E_ITEM_SPIDER_EYE:
-			{
-				a_EffectType = cEntityEffect::effPoison;
-				a_EffectDurationTicks = 100;
-				a_EffectIntensity = 0;
-				a_Chance = 1.0f;
+				if (0.8f > Chance)
+				{
+					a_Player.AddEntityEffect(cEntityEffect::effHunger, 30 * 20, 0);
+				}
 				return true;
 			}
 			case E_ITEM_POISONOUS_POTATO:
 			{
-				a_EffectType = cEntityEffect::effPoison;
-				a_EffectDurationTicks = 100;
-				a_EffectIntensity = 0;
-				a_Chance = 0.6f;
+				if (0.6f <= Chance)
+				{
+					return true;  // Not apply effect
+				}
+			}
+			case E_ITEM_SPIDER_EYE:
+			{
+				a_Player.AddEntityEffect(cEntityEffect::effPoison, 4 * 20, 0);
 				return true;
 			}
 			case E_ITEM_RAW_FISH:
 			{
 				if (m_ItemDamage == E_META_RAW_FISH_PUFFERFISH)
 				{
-					// TODO Add Pufferfish effects
+					a_Player.AddEntityEffect(cEntityEffect::effNausea, 15 * 20, 1);
+					a_Player.AddEntityEffect(cEntityEffect::effPoison, 60 * 20, 3);
+					a_Player.AddEntityEffect(cEntityEffect::effHunger, 15 * 20, 2);
+					return true;
 				}
 			}
 		}

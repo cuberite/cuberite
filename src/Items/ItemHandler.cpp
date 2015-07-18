@@ -818,7 +818,7 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 
 
-bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance)
+bool cItemHandler::AddEatEffects(cPlayer &a_Player)
 {
 	return false;
 }
@@ -841,17 +841,9 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 		bool Success = a_Player->Feed(Info.FoodLevel, Info.Saturation);
 
 		// Give effects
-		cEntityEffect::eType EffectType;
-		int EffectDurationTicks;
-		short EffectIntensity;
-		float Chance;
-		if (Success && GetEatEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance))
+		if (Success)
 		{
-			cFastRandom r1;
-			if (r1.NextFloat() < Chance)
-			{
-				a_Player->AddEntityEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance);
-			}
+			AddEatEffects(*a_Player);
 		}
 		return Success;
 	}
