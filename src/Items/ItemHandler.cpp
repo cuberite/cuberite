@@ -85,6 +85,11 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType, short a_ItemDamage)
 	{
 		CreateItemHandler(a_ItemType);
 	}
+
+	if(a_ItemDamage >= static_cast<int>(m_ItemHandler[a_ItemType].size()))  // Meta value is irrelevant/not implemented
+	{
+		a_ItemDamage = 0;  // So set it back to 0
+	}
 	return m_ItemHandler[a_ItemType][a_ItemDamage].get();
 }
 

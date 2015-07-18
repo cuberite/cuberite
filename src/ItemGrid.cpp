@@ -217,7 +217,7 @@ void cItemGrid::Clear(void)
 int cItemGrid::HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks)
 {
 	char NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	int MaxStack = a_ItemStack.GetHandler()->GetMaxStackSize();
 	for (int i = m_NumSlots - 1; i >= 0; i--)
 	{
 		if (m_Slots[i].IsEmpty())
@@ -388,30 +388,31 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 		return -1;
 	}
 
-	if (m_Slots[a_SlotNum].IsEmpty())
+	cItem & Slot = m_Slots[a_SlotNum];
+
+	if (Slot.IsEmpty())
 	{
 		// The item is empty, it's not gonna change
 		return 0;
 	}
 	
-	if (m_Slots[a_SlotNum].m_ItemCount <= -a_AddToCount)
+	if (Slot.m_ItemCount <= -a_AddToCount)
 	{
 		// Trying to remove more items than there already are, make the item empty
-		m_Slots[a_SlotNum].Empty();
+		Slot.Empty();
 		TriggerListeners(a_SlotNum);
 		return 0;
 	}
 	
-	m_Slots[a_SlotNum].m_ItemCount += a_AddToCount;
+	Slot.m_ItemCount += a_AddToCount;
 
-	cItemHandler * Handler = cItemHandler::GetItemHandler(m_Slots[a_SlotNum].m_ItemType);
-	if (m_Slots[a_SlotNum].m_ItemCount > Handler->GetMaxStackSize())
+	if (Slot.IsFullStack())
 	{
-		m_Slots[a_SlotNum].m_ItemCount = Handler->GetMaxStackSize();
+		Slot.m_ItemCount = Slot.GetMaxStackSize();
 	}
 
 	TriggerListeners(a_SlotNum);
-	return m_Slots[a_SlotNum].m_ItemCount;
+	return Slot.m_ItemCount;
 }
 
 

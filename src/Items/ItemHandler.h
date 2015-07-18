@@ -157,15 +157,11 @@ public:
 	Defaults to false unless overridden. */
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
-	static cItemHandler * GetItemHandler(int a_ItemType, short a_ItemDamage = 0);
-	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType, a_Item.m_ItemDamage); }
-	
+	static cItemHandler * GetItemHandler(int a_ItemType, short a_ItemDamage);
+
 protected:
 	int m_ItemType;
 	static void CreateItemHandler(int m_ItemType);
 
 	static std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> m_ItemHandler;
 };
-
-// Short function
-inline cItemHandler *ItemHandler(int a_ItemType, short a_ItemDamage = 0) { return cItemHandler::GetItemHandler(a_ItemType, a_ItemDamage); }
