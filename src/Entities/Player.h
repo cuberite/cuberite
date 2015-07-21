@@ -117,8 +117,8 @@ public:
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
-	void SetTouchGround( bool a_bTouchGround);
-	inline void SetStance( const double a_Stance) { m_Stance = a_Stance; }
+	void SetTouchGround(bool a_bTouchGround);
+	inline void SetStance(const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
 	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
@@ -207,9 +207,6 @@ public:
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
 	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
-
-	/** Tries to move to a new position, with attachment-related checks (y == -999) */
-	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
 
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
@@ -454,7 +451,7 @@ public:
 	// tolua_end
 
 	/** Update movement-related statistics. */
-	void UpdateMovementStats(const Vector3d & a_DeltaPos);
+	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 
 	// tolua_begin
 
@@ -553,8 +550,7 @@ protected:
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
 
-	float m_LastJumpHeight;
-	float m_LastGroundHeight;
+	double m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;
 
@@ -666,9 +662,6 @@ protected:
 
 	/** Tosses a list of items. */
 	void TossItems(const cItems & a_Items);
-
-	/** Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block) */
-	void ApplyFoodExhaustionFromMovement();
 
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */

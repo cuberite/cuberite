@@ -1028,10 +1028,7 @@ void cProtocol180::SendPlayerMoveLook(void)
 	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEDouble(Player->GetPosX());
-	
-	// The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
-	Pkt.WriteBEDouble(Player->GetPosY() + 0.001);
-	
+	Pkt.WriteBEDouble(Player->GetPosY());
 	Pkt.WriteBEDouble(Player->GetPosZ());
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));

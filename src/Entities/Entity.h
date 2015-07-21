@@ -30,7 +30,7 @@
 #define POSX_TOINT FloorC(GetPosX())
 #define POSY_TOINT FloorC(GetPosY())
 #define POSZ_TOINT FloorC(GetPosZ())
-#define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
+#define POS_TOINT  GetPosition().Floor()
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) { return; }
 
@@ -190,11 +190,10 @@ public:
 	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
 	double           GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
-	const Vector3d & GetPosition  (void) const { return m_Pos;     }
-	double           GetPosX      (void) const { return m_Pos.x;   }
-	double           GetPosY      (void) const { return m_Pos.y;   }
-	double           GetPosZ      (void) const { return m_Pos.z;   }
-	const Vector3d & GetRot       (void) const { return m_Rot;     }  // OBSOLETE, use individual GetYaw(), GetPitch, GetRoll() components
+	const Vector3d & GetPosition  (void) const { return m_Position; }
+	double           GetPosX      (void) const { return m_Position.x; }
+	double           GetPosY      (void) const { return m_Position.y; }
+	double           GetPosZ      (void) const { return m_Position.z; }
 	double           GetYaw       (void) const { return m_Rot.x;   }  // In degrees, [-180, +180)
 	double           GetPitch     (void) const { return m_Rot.y;   }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
 	double           GetRoll      (void) const { return m_Rot.z;   }  // In degrees, unused in current client
@@ -205,18 +204,17 @@ public:
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
 	double           GetWidth     (void) const { return m_Width;   }
 	
-	int GetChunkX(void) const {return static_cast<int>(floor(m_Pos.x / cChunkDef::Width)); }
-	int GetChunkZ(void) const {return static_cast<int>(floor(m_Pos.z / cChunkDef::Width)); }
+	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
+	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
 
 	void SetHeadYaw (double a_HeadYaw);
 	void SetHeight  (double a_Height);
 	void SetMass    (double a_Mass);
-	void SetPosX    (double a_PosX);
-	void SetPosY    (double a_PosY);
-	void SetPosZ    (double a_PosZ);
-	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
-	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
-	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
+	void SetPosX    (double a_PosX) { SetPosition({a_PosX, m_Position.y, m_Position.z}); }
+	void SetPosY    (double a_PosY) { SetPosition({m_Position.x, a_PosY, m_Position.z}); }
+	void SetPosZ    (double a_PosZ) { SetPosition({m_Position.x, m_Position.y, a_PosZ}); }
+	void SetPosition(double a_PosX, double a_PosY, double a_PosZ) { SetPosition({a_PosX, a_PosY, a_PosZ}); }
+	void SetPosition(const Vector3d & a_Position);
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
@@ -238,10 +236,10 @@ public:
 	
 	void SetWidth   (double a_Width);
 	
-	void AddPosX    (double a_AddPosX);
-	void AddPosY    (double a_AddPosY);
-	void AddPosZ    (double a_AddPosZ);
-	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ);
+	void AddPosX    (double a_AddPosX) { AddPosition(a_AddPosX, 0, 0); }
+	void AddPosY    (double a_AddPosY) { AddPosition(0, a_AddPosY, 0); }
+	void AddPosZ    (double a_AddPosZ) { AddPosition(0, 0, a_AddPosZ); }
+	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ) { SetPosition(m_Position + Vector3d(a_AddPosX, a_AddPosY, a_AddPosZ)); }
 	void AddPosition(const Vector3d & a_AddPos) { AddPosition(a_AddPos.x, a_AddPos.y, a_AddPos.z); }
 	void AddSpeed   (double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ);
 	void AddSpeed   (const Vector3d & a_AddSpeed) { AddSpeed(a_AddSpeed.x, a_AddSpeed.y, a_AddSpeed.z); }
@@ -531,9 +529,7 @@ protected:
 	Data: http://minecraft.gamepedia.com/Entity#Motion_of_entities */
 	float m_AirDrag;
 
-	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
-	Only updated if cEntity::BroadcastMovementUpdate() is called! */
-	Vector3d m_LastPos;
+	Vector3d m_LastPosition;
 
 	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
 	bool m_IsInitialized;
@@ -610,7 +606,11 @@ private:
 	Vector3d m_Rot;
 	
 	/** Position of the entity's XZ center and Y bottom */
-	Vector3d m_Pos;
+	Vector3d m_Position;
+
+	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
+	Only updated if cEntity::BroadcastMovementUpdate() is called! */
+	Vector3d m_LastSentPosition;
 	
 	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;

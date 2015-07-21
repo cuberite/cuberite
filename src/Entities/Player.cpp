@@ -55,7 +55,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_FoodSaturationLevel(5.0),
 	m_FoodTickTimer(0),
 	m_FoodExhaustionLevel(0.0),
-	m_LastJumpHeight(0),
 	m_LastGroundHeight(0),
 	m_bTouchGround(false),
 	m_Stance(0.0),
@@ -113,7 +112,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		);
 	}
 
-	m_LastJumpHeight = static_cast<float>(GetPosY());
 	m_LastGroundHeight = static_cast<float>(GetPosY());
 	m_Stance = GetPosY() + 1.62;
 
@@ -244,23 +242,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	bool CanMove = true;
-	if (!GetPosition().EqualsEps(m_LastPos, 0.02))  // Non negligible change in position from last tick? 0.02 tp prevent continous calling while floating sometimes.
-	{
-		// Apply food exhaustion from movement:
-		ApplyFoodExhaustionFromMovement();
-
-		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
-		{
-			CanMove = false;
-			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
-		}
-	}
-
-	if (CanMove)
-	{
-		BroadcastMovementUpdate(m_ClientHandle.get());
-	}
+	BroadcastMovementUpdate(m_ClientHandle.get());
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -287,11 +269,6 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		m_World->BroadcastPlayerListUpdatePing(*this);
 		m_LastPlayerListTime = std::chrono::steady_clock::now();
-	}
-
-	if (IsFlying())
-	{
-		m_LastGroundHeight = static_cast<float>(GetPosY());
 	}
 
 	if (m_TicksUntilNextSave == 0)
@@ -474,61 +451,88 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		return;
 	}
 
-	m_bTouchGround = a_bTouchGround;
+	/* Not pretty looking, and is more suited to wherever server-sided collision detection is implemented.
+	The following condition sets on-ground-ness if
+		The player isn't swimming or flying (client hardcoded conditions) and
+		they're on a block (Y is exact) - ensure any they could be standing on (including on the edges) is solid or
+		they're on a slab (Y significand is 0.5) - ditto with slab check
+		they're on a snow layer (Y divisible by 0.125) - ditto with snow layer check
+	*/
 
-	if (!m_bTouchGround)
-	{
-		if (GetPosY() > m_LastJumpHeight)
-		{
-			m_LastJumpHeight = static_cast<float>(GetPosY());
-		}
-		cWorld * World = GetWorld();
-		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
-		{
-			BLOCKTYPE BlockType = World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
-			if (BlockType != E_BLOCK_AIR)
-			{
-				m_bTouchGround = true;
-			}
-			if (
-				(BlockType == E_BLOCK_WATER) ||
-				(BlockType == E_BLOCK_STATIONARY_WATER) ||
-				(BlockType == E_BLOCK_LADDER) ||
-				(BlockType == E_BLOCK_VINES)
+	static const auto HalfWidth = GetWidth() / 2;
+	static const auto EPS = 0.0001;
+	if (
+		!IsSwimming() && !IsFlying() &&
+		(
+			(
+				((GetPosY() >= 1) && ((GetPosY() - POSY_TOINT) <= EPS)) &&
+				(
+					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(0, -1, 0)).Floor())) ||
+					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, -1, 0)).Floor())) ||
+					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(-HalfWidth, -1, 0)).Floor())) ||
+					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(0, -1, HalfWidth)).Floor())) ||
+					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(0, -1, -HalfWidth)).Floor()))
+				)
+			) ||
+			(
+			((GetPosY() >= POSY_TOINT) && ((GetPosY() - (POSY_TOINT + 0.5)) <= EPS)) &&
+				(
+					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, 0)).Floor())) ||
+					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, 0, 0)).Floor())) ||
+					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(-HalfWidth, 0, 0)).Floor())) ||
+					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, HalfWidth)).Floor())) ||
+					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, -HalfWidth)).Floor()))
+				)
+			) ||
+			(
+				(fmod(GetPosY(), 0.125) <= EPS) &&
+				(
+					(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, 0)).Floor()) == E_BLOCK_SNOW) ||
+					(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, 0, 0)).Floor()) == E_BLOCK_SNOW) ||
+					(GetWorld()->GetBlock((GetPosition() + Vector3d(-HalfWidth, 0, 0)).Floor()) == E_BLOCK_SNOW) ||
+					(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, HalfWidth)).Floor()) == E_BLOCK_SNOW) ||
+					(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, -HalfWidth)).Floor()) == E_BLOCK_SNOW)
+				)
 			)
-			{
-				m_LastGroundHeight = static_cast<float>(GetPosY());
-			}
-		}
-	}
-	else
+		)
+	)
 	{
-		float Dist = static_cast<float>(m_LastGroundHeight - floor(GetPosY()));
-
-		if (Dist >= 2.0)  // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
-		{
-			// Increment statistic
-			m_Stats.AddValue(statDistFallen, FloorC<StatValue>(Dist * 100 + 0.5));
-		}
-
-		int Damage = static_cast<int>(Dist - 3.f);
-		if (m_LastJumpHeight > m_LastGroundHeight)
-		{
-			Damage++;
-		}
-		m_LastJumpHeight = static_cast<float>(GetPosY());
-
+		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if (Damage > 0)
 		{
 			// cPlayer makes sure damage isn't applied in creative, no need to check here
 			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 
 			// Fall particles
-			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, static_cast<int>(GetPosY()) - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
+			Damage = std::min(15, Damage);
+			GetClientHandle()->SendParticleEffect(
+				"blockdust",
+				GetPosition(),
+				{ 0, 0, 0 },
+				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
+				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
+				{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
+			);
 		}
 
-		m_LastGroundHeight = static_cast<float>(GetPosY());
+		m_bTouchGround = true;
+		m_LastGroundHeight = GetPosY();
 	}
+	else
+	{
+		m_bTouchGround = false;
+	}
+
+	if (IsFlying() || IsSwimming() || IsClimbing())
+	{
+		m_LastGroundHeight = GetPosY();
+	}
+
+	UNUSED(a_bTouchGround);
+	/* Unfortunately whatever the reason, there are still desyncs in on-ground status between the client and server. For example:
+		1. Walking off a ledge (whatever height)
+		2. Initial login
+	Thus, it is too risky to compare their value against ours and kick them for hacking */
 }
 
 
@@ -1322,11 +1326,10 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	//  ask plugins to allow teleport to the new position.
-	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		SetPosition(a_PosX, a_PosY, a_PosZ);
 		m_LastGroundHeight = static_cast<float>(a_PosY);
-		m_LastJumpHeight = static_cast<float>(a_PosY);
 		m_bIsTeleporting = true;
 
 		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
@@ -1394,37 +1397,6 @@ void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
-}
-
-
-
-
-
-void cPlayer::MoveTo( const Vector3d & a_NewPos)
-{
-	if ((a_NewPos.y < -990) && (GetPosY() > -100))
-	{
-		// When attached to an entity, the client sends position packets with weird coords:
-		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
-		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while
-		// the client may still send more of these nonsensical packets.
-		if (m_AttachedTo != nullptr)
-		{
-			Vector3d AddSpeed(a_NewPos);
-			AddSpeed.y = 0;
-			m_AttachedTo->AddSpeed(AddSpeed);
-		}
-		return;
-	}
-
-	// TODO: should do some checks to see if player is not moving through terrain
-	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
-
-	Vector3d DeltaPos = a_NewPos - GetPosition();
-	UpdateMovementStats(DeltaPos);
-
-	SetPosition( a_NewPos);
-	SetStance(a_NewPos.y + 1.62);
 }
 
 
@@ -1784,7 +1756,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		SetPosX(JSON_PlayerPosition[0].asDouble());
 		SetPosY(JSON_PlayerPosition[1].asDouble());
 		SetPosZ(JSON_PlayerPosition[2].asDouble());
-		m_LastPos = GetPosition();
+		m_LastPosition = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
@@ -2102,12 +2074,23 @@ bool cPlayer::IsClimbing(void) const
 
 
 
-void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
+void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround)
 {
-	StatValue Value = FloorC<StatValue>(a_DeltaPos.Length() * 100 + 0.5);
+	if (m_bIsTeleporting)
+	{
+		m_bIsTeleporting = false;
+		return;
+	}
 
+	StatValue Value = FloorC<StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 	if (m_AttachedTo == nullptr)
 	{
+		if (IsFlying())
+		{
+			m_Stats.AddValue(statDistFlown, Value);
+			// May be flying and doing any of the following:
+		}
+
 		if (IsClimbing())
 		{
 			if (a_DeltaPos.y > 0.0)  // Going up
@@ -2128,14 +2111,22 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		else if (IsOnGround())
 		{
 			m_Stats.AddValue(statDistWalked, Value);
-			AddFoodExhaustion((m_IsSprinting ? 0.001 : 0.0001) * static_cast<double>(Value));
+			AddFoodExhaustion((IsSprinting() ? 0.001 : 0.0001) * static_cast<double>(Value));
 		}
 		else
 		{
-			if (Value >= 25)  // Ignore small / slow movement
+			// If a jump just started, process food exhaustion:
+			if ((a_DeltaPos.y > 0.0) && a_PreviousIsOnGround)
 			{
-				m_Stats.AddValue(statDistFlown, Value);
+				m_Stats.AddValue(statJumps, 1);
+				AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
 			}
+			else if (a_DeltaPos.y < 0.0)
+			{
+				// Increment statistic
+				m_Stats.AddValue(statDistFallen, (StatValue)(abs(a_DeltaPos.y) * 100 + 0.5));
+			}
+			// TODO: good opportunity to detect illegal flight (check for falling tho)
 		}
 	}
 	else
@@ -2158,59 +2149,6 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 			default: break;
 		}
 	}
-}
-
-
-
-
-
-void cPlayer::ApplyFoodExhaustionFromMovement()
-{
-	if (IsGameModeCreative() || IsGameModeSpectator())
-	{
-		return;
-	}
-
-	// If we have just teleported, apply no exhaustion
-	if (m_bIsTeleporting)
-	{
-		m_bIsTeleporting = false;
-		return;
-	}
-
-	// If riding anything, apply no food exhaustion
-	if (m_AttachedTo != nullptr)
-	{
-		return;
-	}
-
-	// Calculate the distance travelled, update the last pos:
-	double SpeedX = m_Speed.x;
-	double SpeedZ = m_Speed.z;
-	double BaseExhaustion(sqrt((SpeedX * SpeedX) + (SpeedZ * SpeedZ)));
-
-	// Apply the exhaustion based on distance travelled:
-	if (IsFlying() || IsClimbing())
-	{
-		// Apply no exhaustion when flying or climbing.
-		BaseExhaustion = 0;
-	}
-	else if (IsSprinting())
-	{
-		// 0.1 pt per meter sprinted
-		BaseExhaustion = BaseExhaustion * 0.1;
-	}
-	else if (IsSwimming())
-	{
-		// 0.015 pt per meter swum
-		BaseExhaustion = BaseExhaustion * 0.015;
-	}
-	else
-	{
-		// 0.01 pt per meter walked / sneaked
-		BaseExhaustion = BaseExhaustion * 0.01;
-	}
-	m_FoodExhaustionLevel += BaseExhaustion;
 }
 
 
