@@ -868,7 +868,7 @@ cLuaState::cStackValue cLuaState::WalkToValue(const AString & a_Name)
 		// Remove the previous value from the stack (keep only the new one):
 		lua_remove(m_LuaState, -2);
 	}  // for elem - path[]
-	return std::move(cStackValue(*this));
+	return cStackValue(*this);
 }
 
 
