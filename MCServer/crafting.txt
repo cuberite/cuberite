@@ -475,7 +475,7 @@ PurpleCarpet, 3    = PurpleWool, 1:1, 2:1
 BlueCarpet, 3      = BlueWool, 1:1, 2:1
 BrownCarpet, 3     = BrownWool, 1:1, 2:1
 GreenCarpet, 3     = GreenWool, 1:1, 2:1
-RedCarpet, 3       = RedWool, 1:1, 2:2
+RedCarpet, 3       = RedWool, 1:1, 2:1
 BlackCarpet, 3     = BlackWool, 1:1, 2:1
 WhiteCarpet, 3     = WhiteWool, 1:1, 2:1
 
