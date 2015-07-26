@@ -147,9 +147,13 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPER
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(DeprecatedBindings.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(LuaChunkStay.cpp COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(LuaServerHandle.cpp COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(LuaState.cpp COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(LuaTCPLink.cpp COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(LuaWindow.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
 	set_source_files_properties(ManualBindings.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(ManualBindings_Network.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(ManualBindings_World.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(PluginLua.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 endif()

@@ -34,6 +34,10 @@ set(HDRS
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set_source_files_properties(CallbackSslContext.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(BufferedSslContext.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(SslContext.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(BlockingSslClientSocket.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(RsaPrivateKey.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 endif()
 
