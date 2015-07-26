@@ -605,6 +605,10 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 	}
 	
 	SendWholeWindow(*a_Player.GetClientHandle());
+
+	// To fix #2345 (custom recipes don't work when inventory-painting), we send the result slot explicitly once again
+	// This is a fix for what seems like a client-side bug
+	a_Player.GetClientHandle()->SendInventorySlot(m_WindowID, 0, *GetSlot(a_Player, 0));
 }
 
 
@@ -629,6 +633,10 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 	}
 	
 	SendWholeWindow(*a_Player.GetClientHandle());
+
+	// To fix #2345 (custom recipes don't work when inventory-painting), we send the result slot explicitly once again
+	// This is a fix for what seems like a client-side bug
+	a_Player.GetClientHandle()->SendInventorySlot(m_WindowID, 0, *GetSlot(a_Player, 0));
 }
 
 
