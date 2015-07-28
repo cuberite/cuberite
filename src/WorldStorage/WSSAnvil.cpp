@@ -69,18 +69,6 @@ Since only the header is actually in the memory, this number can be high, but st
 */
 #define MAX_MCA_FILES 32
 
-#define LOAD_FAILED(CHX, CHZ, REASON) \
-	{ \
-		const int RegionX = FAST_FLOOR_DIV(CHX, 32); \
-		const int RegionZ = FAST_FLOOR_DIV(CHZ, 32); \
-		LOGERROR("%s (%d): Loading chunk [%d, %d] from file r.%d.%d.mca failed: %s. " \
-			"The server will now abort in order to avoid further data loss. " \
-			"Please add the reported file and this message to the issue report.", \
-			__FUNCTION__, __LINE__, CHX, CHZ, RegionX, RegionZ, REASON \
-		); \
-		*(reinterpret_cast<volatile int *>(0)) = 0;  /* Crash intentionally */ \
-	}
-
 
 
 
@@ -186,6 +174,56 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 
 
 
+void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const AString & a_ChunkDataToSave)
+{
+	// Construct the filename for offloading:
+	AString OffloadFileName;
+	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetName().c_str(), cFile::PathSeparator, cFile::PathSeparator);
+	cFile::CreateFolder(FILE_IO_PREFIX + OffloadFileName);
+	auto t = time(nullptr);
+	struct tm stm;
+	#ifdef _MSC_VER
+		localtime_s(&stm, &t);
+	#else
+		localtime_r(&t, &stm);
+	#endif
+	AppendPrintf(OffloadFileName, "%cch.%d.%d.%d-%02d-%02d-%02d-%02d-%02d.dat",
+		cFile::PathSeparator, a_ChunkX, a_ChunkZ,
+		stm.tm_year + 1900, stm.tm_mon + 1, stm.tm_mday, stm.tm_hour, stm.tm_min, stm.tm_sec
+	);
+
+	// Log the warning to console:
+	const int RegionX = FAST_FLOOR_DIV(a_ChunkX, 32);
+	const int RegionZ = FAST_FLOOR_DIV(a_ChunkZ, 32);
+	AString Info = Printf("Loading chunk [%d, %d] for world %s from file r.%d.%d.mca failed: %s. Offloading old chunk data to file %s and regenerating chunk.",
+		a_ChunkX, a_ChunkZ, m_World->GetName().c_str(), RegionX, RegionZ, a_Reason.c_str(), OffloadFileName.c_str()
+	);
+	LOGWARNING("%s", Info.c_str());
+
+	// Write the data:
+	cFile f;
+	if (!f.Open(OffloadFileName, cFile::fmWrite))
+	{
+		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName.c_str());
+		return;
+	}
+	f.Write(a_ChunkDataToSave.data(), a_ChunkDataToSave.size());
+	f.Close();
+
+	// Write a description file:
+	if (!f.Open(OffloadFileName + ".info", cFile::fmWrite))
+	{
+		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName.c_str());
+		return;
+	}
+	f.Write(Info.c_str(), Info.size());
+	f.Close();
+}
+
+
+
+
+
 bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data)
 {
 	cCSLock Lock(m_CS);
@@ -249,7 +287,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	Printf(FileName, "%s%cregion", m_World->GetName().c_str(), cFile::PathSeparator);
 	cFile::CreateFolder(FILE_IO_PREFIX + FileName);
 	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
-	cMCAFile * f = new cMCAFile(FileName, RegionX, RegionZ);
+	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
 	if (f == nullptr)
 	{
 		return nullptr;
@@ -277,7 +315,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	if (res != Z_OK)
 	{
 		LOGWARNING("Uncompressing chunk [%d, %d] failed: %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, res);
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "InflateString() failed");
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "InflateString() failed", a_Data);
 		return false;
 	}
 	
@@ -286,12 +324,12 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT parsing failed");
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT parsing failed", a_Data);
 		return false;
 	}
 
 	// Load the data from NBT:
-	return LoadChunkFromNBT(a_Chunk, NBT);
+	return LoadChunkFromNBT(a_Chunk, NBT, a_Data);
 }
 
 
@@ -316,7 +354,7 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 
 
 
-bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT)
+bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const AString & a_RawChunkData)
 {
 	// The data arrays, in MCA-native y / z / x ordering (will be reordered for the final chunk data)
 	cChunkDef::BlockTypes   BlockTypes;
@@ -333,19 +371,19 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	int Level = a_NBT.FindChildByName(0, "Level");
 	if (Level < 0)
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Level");
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Level", a_RawChunkData);
 		return false;
 	}
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
 	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Sections");
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Sections", a_RawChunkData);
 		return false;
 	}
 	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
 	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag has wrong type: Sections");
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag has wrong type: Sections", a_RawChunkData);
 		return false;
 	}
 	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
@@ -3035,7 +3073,8 @@ bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int
 ////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil::cMCAFile:
 
-cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_RegionZ) :
+cWSSAnvil::cMCAFile::cMCAFile(cWSSAnvil & a_ParentSchema, const AString & a_FileName, int a_RegionX, int a_RegionZ) :
+	m_ParentSchema(a_ParentSchema),
 	m_RegionX(a_RegionX),
 	m_RegionZ(a_RegionZ),
 	m_FileName(a_FileName)
@@ -3138,39 +3177,40 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	UInt32 ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size");
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size", "");
 		return false;
 	}
 	ChunkSize = ntohl(ChunkSize);
 	if (ChunkSize < 1)
 	{
 		// Chunk size too small
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small");
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small", "");
 		return false;
 	}
 
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression");
-		return false;
-	}
-	if (CompressionType != 2)
-	{
-		// Chunk is in an unknown compression
-		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType).c_str());
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression", "");
 		return false;
 	}
 	ChunkSize--;
 	
 	a_Data = m_File.Read(ChunkSize);
-	if (a_Data.size() == ChunkSize)
+	if (a_Data.size() != ChunkSize)
 	{
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read entire chunk data", a_Data);
+		return false;
+	}
+
+	if (CompressionType != 2)
+	{
+		// Chunk is in an unknown compression
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType).c_str(), a_Data);
+		return false;
+	}
 		return true;
 	}
-	LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read entire chunk data");
-	return false;
-}
 
 
 
