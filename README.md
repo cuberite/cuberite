@@ -24,7 +24,9 @@ For Windows, you just need to download a file and extract it:
 
 For other operating systems you need to download and compile yourself. This can be done either manually, or with this automatic script:
 
-    bash -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
+This script doesn't seem to work properly at the moment. 
+Pls use this short manual until further notice: http://46.101.242.74/index.php/How_to_Build_Cuberite_From_Source
+#    bash -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
 
 There is also an archive of binary builds on the buildserver: http://builds.cuberite.org
 
