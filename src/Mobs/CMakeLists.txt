@@ -81,9 +81,7 @@ SET (HDRS
 	ZombiePigman.h)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(Monster.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch -Wno-error=switch-enum -Wno-error=float-equal -Wno-error=old-style-cast")
-	set_source_files_properties(SnowGolem.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-	set_source_files_properties(Villager.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(Monster.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch -Wno-error=switch-enum -Wno-error=float-equal ")
 endif()
 
 if(NOT MSVC)

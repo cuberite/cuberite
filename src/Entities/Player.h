@@ -319,9 +319,9 @@ public:
 	/** returns true if the player has thrown out a floater. */
 	bool IsFishing(void) const { return m_IsFishing; }
 
-	void SetIsFishing(bool a_IsFishing, int a_FloaterID = -1) { m_IsFishing = a_IsFishing; m_FloaterID = a_FloaterID; }
+	void SetIsFishing(bool a_IsFishing, UInt32 a_FloaterID = cEntity::INVALID_ID) { m_IsFishing = a_IsFishing; m_FloaterID = a_FloaterID; }
 
-	int GetFloaterID(void) const { return m_FloaterID; }
+	UInt32 GetFloaterID(void) const { return m_FloaterID; }
 
 	// tolua_end
 
@@ -619,7 +619,7 @@ protected:
 	bool m_IsChargingBow;
 	int  m_BowCharge;
 
-	int m_FloaterID;
+	UInt32 m_FloaterID;
 
 	cTeam * m_Team;
 

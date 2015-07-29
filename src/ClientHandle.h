@@ -341,7 +341,7 @@ public:  // tolua_export
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.
 	*/
-	bool HandleLogin(int a_ProtocolVersion, const AString & a_Username);
+	bool HandleLogin(UInt32 a_ProtocolVersion, const AString & a_Username);
 	
 	void SendData(const char * a_Data, size_t a_Size);
 	

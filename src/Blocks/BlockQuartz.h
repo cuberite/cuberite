@@ -23,7 +23,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
+		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player->GetEquippedItem().m_ItemDamage);
 
 		if (Meta != E_META_QUARTZ_PILLAR)  // Check if the block is a pillar block.
 		{

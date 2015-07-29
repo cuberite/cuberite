@@ -21,7 +21,7 @@ public:
 	{
 		// Reset meta to 0
 		cFastRandom Random;
-		a_Pickups.push_back(cItem(E_ITEM_PRISMARINE_CRYSTALS, (char)(2 + Random.NextInt(2)), 0));
+		a_Pickups.push_back(cItem(E_ITEM_PRISMARINE_CRYSTALS, static_cast<char>(2 + Random.NextInt(2)), 0));
 	}
 } ;
 

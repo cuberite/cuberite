@@ -95,7 +95,7 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	// Run-time check that our compile-time guess about CompressedMaxSize was enough:
 	ASSERT(CompressedSize <= CompressedMaxSize);
 	
-	compress2((Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)AllData, sizeof(AllData), Z_DEFAULT_COMPRESSION);
+	compress2(reinterpret_cast<Bytef*>(CompressedBlockData), &CompressedSize, reinterpret_cast<const Bytef*>(AllData), sizeof(AllData), Z_DEFAULT_COMPRESSION);
 
 	// Now put all those data into a_Data:
 	
@@ -106,11 +106,11 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	// Also, no endian flipping is needed because of the const values
 	unsigned short BitMap1 = 0xffff;
 	unsigned short BitMap2 = 0;
-	a_Data.append((const char *)&BitMap1, sizeof(short));
-	a_Data.append((const char *)&BitMap2, sizeof(short));
+	a_Data.append(reinterpret_cast<const char *>(&BitMap1), sizeof(short));
+	a_Data.append(reinterpret_cast<const char *>(&BitMap2), sizeof(short));
 	
-	UInt32 CompressedSizeBE = htonl((UInt32)CompressedSize);
-	a_Data.append((const char *)&CompressedSizeBE, sizeof(CompressedSizeBE));
+	UInt32 CompressedSizeBE = htonl(static_cast<UInt32>(CompressedSize));
+	a_Data.append(reinterpret_cast<const char *>(&CompressedSizeBE), sizeof(CompressedSizeBE));
 	
 	// Unlike 29, 39 doesn't have the "unused" int
 	

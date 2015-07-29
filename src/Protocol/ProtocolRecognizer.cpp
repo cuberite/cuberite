@@ -258,11 +258,11 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	{
 		// This is used when the client sends a server-ping, respond with the default packet:
 		static const int Packet = 0xff;  // PACKET_DISCONNECT
-		SendData((const char *)&Packet, 1);  // WriteByte()
+		SendData(reinterpret_cast<const char *>(&Packet), 1);  // WriteByte()
 
 		AString UTF16 = UTF8ToRawBEUTF16(a_Reason.c_str(), a_Reason.length());
-		static const u_short Size = htons((u_short)(UTF16.size() / 2));
-		SendData((const char *)&Size, 2);      // WriteShort()
+		static const u_short Size = htons(static_cast<u_short>(UTF16.size() / 2));
+		SendData(reinterpret_cast<const char *>(&Size), 2);      // WriteShort()
 		SendData(UTF16.data(), UTF16.size());  // WriteString()
 	}
 }
@@ -440,7 +440,7 @@ void cProtocolRecognizer::SendInventorySlot(char a_WindowID, short a_SlotNum, co
 
 
 
-void cProtocolRecognizer::SendKeepAlive(int a_PingID)
+void cProtocolRecognizer::SendKeepAlive(UInt32 a_PingID)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendKeepAlive(a_PingID);
@@ -986,13 +986,13 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 
 	// Lengthed protocol, try if it has the entire initial handshake packet:
 	UInt32 PacketLen;
-	UInt32 ReadSoFar = (UInt32)m_Buffer.GetReadableSpace();
+	UInt32 ReadSoFar = static_cast<UInt32>(m_Buffer.GetReadableSpace());
 	if (!m_Buffer.ReadVarInt(PacketLen))
 	{
 		// Not enough bytes for the packet length, keep waiting
 		return false;
 	}
-	ReadSoFar -= (UInt32)m_Buffer.GetReadableSpace();
+	ReadSoFar -= static_cast<UInt32>(m_Buffer.GetReadableSpace());
 	if (!m_Buffer.CanReadBytes(PacketLen))
 	{
 		// Not enough bytes for the packet, keep waiting

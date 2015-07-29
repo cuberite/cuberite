@@ -760,7 +760,7 @@ int cRoot::GetVirtualRAMUsage(void)
 			&t_info_count
 		))
 		{
-			return (int)(t_info.virtual_size / 1024);
+			return static_cast<int>(t_info.virtual_size / 1024);
 		}
 		return -1;
 	#else
@@ -812,7 +812,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 			&t_info_count
 		))
 		{
-			return (int)(t_info.resident_size / 1024);
+			return static_cast<int>(t_info.resident_size / 1024);
 		}
 		return -1;
 	#else
@@ -836,8 +836,8 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	{
 		cWorld * World = itr->second;
 		int NumInGenerator = World->GetGeneratorQueueLength();
-		int NumInSaveQueue = (int)World->GetStorageSaveQueueLength();
-		int NumInLoadQueue = (int)World->GetStorageLoadQueueLength();
+		int NumInSaveQueue = static_cast<int>(World->GetStorageSaveQueueLength());
+		int NumInLoadQueue = static_cast<int>(World->GetStorageLoadQueueLength());
 		int NumValid = 0;
 		int NumDirty = 0;
 		int NumInLighting = 0;
@@ -849,7 +849,7 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		a_Output.Out("  Num chunks in generator queue: %d", NumInGenerator);
 		a_Output.Out("  Num chunks in storage load queue: %d", NumInLoadQueue);
 		a_Output.Out("  Num chunks in storage save queue: %d", NumInSaveQueue);
-		int Mem = NumValid * sizeof(cChunk);
+		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
 		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
 		a_Output.Out("  Per-chunk memory size breakdown:");
 		a_Output.Out("    block types:    " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);

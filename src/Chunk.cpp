@@ -1441,7 +1441,7 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 				int index = MakeIndex( x, y, z);
 				if (a_BlockTypes[index] != E_BLOCK_AIR)
 				{
-					m_HeightMap[x + z * Width] = (HEIGHTTYPE)y;
+					m_HeightMap[x + z * Width] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y
@@ -1615,7 +1615,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_RelX + a_RelZ * Width] = (HEIGHTTYPE)a_RelY;
+			m_HeightMap[a_RelX + a_RelZ * Width] = static_cast<HEIGHTTYPE>(a_RelY);
 		}
 		else
 		{
@@ -1623,7 +1623,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 			{
 				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_RelX + a_RelZ * Width] = (HEIGHTTYPE)y;
+					m_HeightMap[a_RelX + a_RelZ * Width] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -1781,9 +1781,9 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 		{
 			continue;  // Only pickups and projectiles can be picked up
 		}
-		float DiffX = (float)((*itr)->GetPosX() - PosX);
-		float DiffY = (float)((*itr)->GetPosY() - PosY);
-		float DiffZ = (float)((*itr)->GetPosZ() - PosZ);
+		float DiffX = static_cast<float>((*itr)->GetPosX() - PosX);
+		float DiffY = static_cast<float>((*itr)->GetPosY() - PosY);
+		float DiffZ = static_cast<float>((*itr)->GetPosZ() - PosZ);
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
 		{
@@ -2079,7 +2079,7 @@ bool cChunk::ForEachChest(cChestCallback & a_Callback)
 		{
 			continue;
 		}
-		if (a_Callback.Item((cChestEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cChestEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2101,7 +2101,7 @@ bool cChunk::ForEachDispenser(cDispenserCallback & a_Callback)
 		{
 			continue;
 		}
-		if (a_Callback.Item((cDispenserEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cDispenserEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2123,7 +2123,7 @@ bool cChunk::ForEachDropper(cDropperCallback & a_Callback)
 		{
 			continue;
 		}
-		if (a_Callback.Item((cDropperEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cDropperEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2145,7 +2145,7 @@ bool cChunk::ForEachDropSpenser(cDropSpenserCallback & a_Callback)
 		{
 			continue;
 		}
-		if (a_Callback.Item((cDropSpenserEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cDropSpenserEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2175,7 +2175,7 @@ bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 				continue;
 			}
 		}
-		if (a_Callback.Item((cFurnaceEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cFurnaceEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2269,7 +2269,7 @@ bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 		}
 		
 		// The correct block entity is here
-		if (a_Callback.Item((cBeaconEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cBeaconEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2301,7 +2301,7 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 		}
 		
 		// The correct block entity is here
-		if (a_Callback.Item((cChestEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cChestEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2333,7 +2333,7 @@ bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispen
 		}
 		
 		// The correct block entity is here
-		if (a_Callback.Item((cDispenserEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cDispenserEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2365,7 +2365,7 @@ bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperC
 		}
 		
 		// The correct block entity is here
-		if (a_Callback.Item((cDropperEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cDropperEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2397,7 +2397,7 @@ bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDrop
 		}
 		
 		// The correct block entity is here
-		if (a_Callback.Item((cDropSpenserEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cDropSpenserEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2437,7 +2437,7 @@ bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 		}  // switch (BlockType)
 		
 		// The correct block entity is here,
-		if (a_Callback.Item((cFurnaceEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cFurnaceEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2469,7 +2469,7 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 		}
 		
 		// The correct block entity is here
-		if (a_Callback.Item((cNoteEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cNoteEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2501,7 +2501,7 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 		}
 		
 		// The correct block entity is here,
-		if (a_Callback.Item((cCommandBlockEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cCommandBlockEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2533,7 +2533,7 @@ bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 		}
 		
 		// The correct block entity is here,
-		if (a_Callback.Item((cMobHeadEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cMobHeadEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2565,7 +2565,7 @@ bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlower
 		}
 		
 		// The correct block entity is here
-		if (a_Callback.Item((cFlowerPotEntity *)*itr))
+		if (a_Callback.Item(reinterpret_cast<cFlowerPotEntity *>(*itr)))
 		{
 			return false;
 		}
@@ -2594,10 +2594,10 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 			case E_BLOCK_WALLSIGN:
 			case E_BLOCK_SIGN_POST:
 			{
-				a_Line1 = ((cSignEntity *)*itr)->GetLine(0);
-				a_Line2 = ((cSignEntity *)*itr)->GetLine(1);
-				a_Line3 = ((cSignEntity *)*itr)->GetLine(2);
-				a_Line4 = ((cSignEntity *)*itr)->GetLine(3);
+				a_Line1 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(0);
+				a_Line2 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(1);
+				a_Line3 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(2);
+				a_Line4 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(3);
 				return true;
 			}
 		}  // switch (BlockType)

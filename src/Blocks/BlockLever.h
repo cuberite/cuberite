@@ -24,7 +24,7 @@ public:
 
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override

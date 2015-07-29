@@ -14,12 +14,7 @@ SET (HDRS
 	RidgedNoise.h
 )
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(Noise.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-endif()
-
 if(NOT MSVC)
 	add_library(Noise ${SRCS} ${HDRS})
-
 	target_link_libraries(Noise OSSupport)
 endif()

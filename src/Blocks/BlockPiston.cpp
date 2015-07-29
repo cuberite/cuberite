@@ -135,7 +135,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 	}
 
 	a_World->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, 0, pistonMeta, pistonBlock);
-	a_World->BroadcastSoundEffect("tile.piston.out", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 0.5f, 0.7f);
+	a_World->BroadcastSoundEffect("tile.piston.out", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 0.5f, 0.7f);
 
 	// Drop the breakable block in the line, if appropriate:
 	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, dist + 1);  // "a_Block" now at the breakable / empty block
@@ -209,7 +209,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, -1);
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta & ~(8));
 	a_World->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, 1, pistonMeta & ~(8), pistonBlock);
-	a_World->BroadcastSoundEffect("tile.piston.in", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 0.5f, 0.7f);
+	a_World->BroadcastSoundEffect("tile.piston.in", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 0.5f, 0.7f);
 	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, 1);
 
 	// Retract the extension, pull block if appropriate

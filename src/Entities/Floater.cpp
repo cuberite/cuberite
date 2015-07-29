@@ -101,13 +101,13 @@ protected:
 
 
 
-cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID, int a_CountDownTime) :
+cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
 	cEntity(etFloater, a_X, a_Y, a_Z, 0.2, 0.2),
 	m_CanPickupItem(false),
 	m_PickupCountDown(0),
 	m_CountDownTime(a_CountDownTime),
 	m_PlayerID(a_PlayerID),
-	m_AttachedMobID(-1)
+	m_AttachedMobID(cEntity::INVALID_ID)
 {
 	SetSpeed(a_Speed);
 }
@@ -118,7 +118,7 @@ cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_P
 
 void cFloater::SpawnOn(cClientHandle & a_Client)
 {
-	a_Client.SendSpawnObject(*this, 90, m_PlayerID, 0, 0);
+	a_Client.SendSpawnObject(*this, 90, static_cast<int>(m_PlayerID), 0, 0);
 }
 
 
@@ -128,9 +128,10 @@ void cFloater::SpawnOn(cClientHandle & a_Client)
 void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	HandlePhysics(a_Dt, a_Chunk);
-	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())) && m_World->GetBlockMeta((int) GetPosX(), (int) GetPosY(), (int) GetPosZ()) == 0)
+	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT))
+		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSX_TOINT) == 0))
 	{
-		if ((!m_CanPickupItem) && (m_AttachedMobID == -1))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
+		if ((!m_CanPickupItem) && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
 			if (m_CountDownTime <= 0)
 			{
@@ -154,7 +155,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 			
 			m_CountDownTime--;
-			if (m_World->GetHeight((int) GetPosX(), (int) GetPosZ()) == (int) GetPosY())
+			if (m_World->GetHeight(POSX_TOINT, POSY_TOINT) == POSZ_TOINT)
 			{
 				if (m_World->IsWeatherWet() && m_World->GetTickRandomNumber(3) == 0)  // 25% chance of an extra countdown when being rained on.
 				{
@@ -182,7 +183,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if ((GetSpeed().Length() > 4) && (m_AttachedMobID == -1))
+	if ((GetSpeed().Length() > 4) && (m_AttachedMobID == cEntity::INVALID_ID))
 	{
 		cFloaterEntityCollisionCallback Callback(this, GetPosition(), GetPosition() + GetSpeed() / 20);
 		
@@ -202,12 +203,12 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy(true);
 	}
 
-	if (m_AttachedMobID != -1)
+	if (m_AttachedMobID != cEntity::INVALID_ID)
 	{
 		m_World->DoWithEntityByID(m_AttachedMobID, EntityCallback);  // The mob the floater was attached to doesn't exist anymore.
 		if (!EntityCallback.DoesExist())
 		{
-			m_AttachedMobID = -1;
+			m_AttachedMobID = cEntity::INVALID_ID;
 		}
 	}
 

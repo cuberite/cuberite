@@ -138,7 +138,7 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 	}
 
 	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks);
-	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;
+	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
 	if (ToAdd.m_ItemCount == 0)
 	{
 		return res;
@@ -459,7 +459,7 @@ void cInventory::SendSlot(int a_SlotNum)
 		// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
 		Item.Empty();
 	}
-	m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum + 5, Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
+	m_Owner.GetClientHandle()->SendInventorySlot(0, static_cast<short>(a_SlotNum + 5), Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
 }
 
 
@@ -724,7 +724,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	if ((a_ItemGrid == &m_ArmorSlots) && (World != nullptr))
 	{
 		World->BroadcastEntityEquipment(
-			m_Owner, ArmorSlotNumToEntityEquipmentID(a_SlotNum),
+			m_Owner, static_cast<short>(ArmorSlotNumToEntityEquipmentID(a_SlotNum)),
 			m_ArmorSlots.GetSlot(a_SlotNum), m_Owner.GetClientHandle()
 		);
 	}

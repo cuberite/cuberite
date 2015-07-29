@@ -256,7 +256,7 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 	{
 		PrevCount = m_Slots[a_Slot].m_ItemCount;
 	}
-	m_Slots[a_Slot].m_ItemCount = std::min(a_MaxStack, PrevCount + a_Num);
+	m_Slots[a_Slot].m_ItemCount = static_cast<char>(std::min(a_MaxStack, PrevCount + a_Num));
 	int toReturn = m_Slots[a_Slot].m_ItemCount - PrevCount;
 	TriggerListeners(a_Slot);
 	return toReturn;
@@ -660,11 +660,11 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 				CurrentLoot = a_LootProbabs[j].m_Item;
 				if ((a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount) > 0)
 				{
-					CurrentLoot.m_ItemCount = a_LootProbabs[j].m_MinAmount + (Rnd % (a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount));
+					CurrentLoot.m_ItemCount = static_cast<char>(a_LootProbabs[j].m_MinAmount + (Rnd % (a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount)));
 				}
 				else
 				{
-					CurrentLoot.m_ItemCount = a_LootProbabs[j].m_MinAmount;
+					CurrentLoot.m_ItemCount = static_cast<char>(a_LootProbabs[j].m_MinAmount);
 				}
 				Rnd >>= 8;
 				break;

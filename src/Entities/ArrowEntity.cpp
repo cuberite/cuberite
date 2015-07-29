@@ -86,7 +86,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	m_HitBlockPos = Vector3i(X, Y, Z);
 
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("random.bowhit", (double)X, (double)Y, (double)Z, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("random.bowhit", static_cast<double>(X), static_cast<double>(Y), static_cast<double>(Z), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
 	if ((m_World->GetBlock(Hit) == E_BLOCK_TNT) && IsOnFire())
 	{
@@ -102,7 +102,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
-	int Damage = (int)(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
+	int Damage = static_cast<int>(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
 	if (m_IsCritical)
 	{
 		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
@@ -111,7 +111,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	unsigned int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
 	if (PowerLevel > 0)
 	{
-		int ExtraDamage = (int)ceil(0.25 * (PowerLevel + 1));
+		int ExtraDamage = static_cast<int>(ceil(0.25 * (PowerLevel + 1)));
 		Damage += ExtraDamage;
 	}
 
@@ -139,7 +139,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	}
 
 	// Broadcast successful hit sound
-	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	
 	Destroy();
 }
@@ -164,7 +164,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		}
 
 		GetWorld()->BroadcastCollectEntity(*this, a_Dest);
-		GetWorld()->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		GetWorld()->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
 }

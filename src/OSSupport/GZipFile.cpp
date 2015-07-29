@@ -78,7 +78,7 @@ int cGZipFile::ReadRestOfFile(AString & a_Contents)
 	while ((NumBytesRead = gzread(m_File, Buffer, sizeof(Buffer))) > 0)
 	{
 		TotalBytes += NumBytesRead;
-		a_Contents.append(Buffer, (size_t)NumBytesRead);
+		a_Contents.append(Buffer, static_cast<size_t>(NumBytesRead));
 	}
 	// NumBytesRead is < 0 on error
 	return (NumBytesRead >= 0) ? TotalBytes : NumBytesRead;
@@ -102,7 +102,7 @@ bool cGZipFile::Write(const char * a_Contents, int a_Size)
 		return false;
 	}
 
-	return (gzwrite(m_File, a_Contents, (unsigned int)a_Size) != 0);
+	return (gzwrite(m_File, a_Contents, static_cast<unsigned int>(a_Size)) != 0);
 }
 
 

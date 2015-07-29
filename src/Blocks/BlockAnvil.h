@@ -38,8 +38,8 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = (NIBBLETYPE)a_Player->GetEquippedItem().m_ItemDamage;
-		int Direction = (int)floor(a_Player->GetYaw() * 4.0 / 360.0 + 1.5) & 0x3;
+		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player->GetEquippedItem().m_ItemDamage);
+		int Direction = static_cast<int>(floor(a_Player->GetYaw() * 4.0 / 360.0 + 1.5)) & 0x3;
 
 		switch (Direction)
 		{

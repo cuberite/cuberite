@@ -30,17 +30,17 @@ void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	if (IsBiomeNoDownfall(m_World->GetBiomeAt((int) floor(GetPosX()), (int) floor(GetPosZ()))))
+	if (IsBiomeNoDownfall(m_World->GetBiomeAt(POSX_TOINT, POSZ_TOINT)))
 	{
 		TakeDamage(*this);
 	}
 	else
 	{
-		BLOCKTYPE BlockBelow = m_World->GetBlock((int) floor(GetPosX()), (int) floor(GetPosY()) - 1, (int) floor(GetPosZ()));
-		BLOCKTYPE Block = m_World->GetBlock((int) floor(GetPosX()), (int) floor(GetPosY()), (int) floor(GetPosZ()));
+		BLOCKTYPE BlockBelow = m_World->GetBlock(POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT);
+		BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 		if ((Block == E_BLOCK_AIR) && cBlockInfo::IsSolid(BlockBelow))
 		{
-			m_World->SetBlock((int) floor(GetPosX()), (int) floor(GetPosY()), (int) floor(GetPosZ()), E_BLOCK_SNOW, 0);
+			m_World->SetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT, E_BLOCK_SNOW, 0);
 		}
 	}
 }

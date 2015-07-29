@@ -271,13 +271,13 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
 {
 	cFastNBTWriter Writer("Schematic");
-	Writer.AddShort("Width",  a_BlockArea.m_Size.x);
-	Writer.AddShort("Height", a_BlockArea.m_Size.y);
-	Writer.AddShort("Length", a_BlockArea.m_Size.z);
+	Writer.AddShort("Width",  static_cast<Int16>(a_BlockArea.m_Size.x));
+	Writer.AddShort("Height", static_cast<Int16>(a_BlockArea.m_Size.y));
+	Writer.AddShort("Length", static_cast<Int16>(a_BlockArea.m_Size.z));
 	Writer.AddString("Materials", "Alpha");
 	if (a_BlockArea.HasBlockTypes())
 	{
-		Writer.AddByteArray("Blocks", (const char *)a_BlockArea.m_BlockTypes, a_BlockArea.GetBlockCount());
+		Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(a_BlockArea.m_BlockTypes), a_BlockArea.GetBlockCount());
 	}
 	else
 	{
@@ -286,7 +286,7 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 	}
 	if (a_BlockArea.HasBlockMetas())
 	{
-		Writer.AddByteArray("Data", (const char *)a_BlockArea.m_BlockMetas, a_BlockArea.GetBlockCount());
+		Writer.AddByteArray("Data", reinterpret_cast<const char *>(a_BlockArea.m_BlockMetas), a_BlockArea.GetBlockCount());
 	}
 	else
 	{

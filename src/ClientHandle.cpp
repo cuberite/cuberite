@@ -255,7 +255,7 @@ AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 
 	// Generate an md5 checksum, and use it as base for the ID:
 	unsigned char MD5[16];
-	md5((const unsigned char *)lcUsername.c_str(), lcUsername.length(), MD5);
+	md5(reinterpret_cast<const unsigned char *>(lcUsername.c_str()), lcUsername.length(), MD5);
 	MD5[6] &= 0x0f;  // Need to trim to 4 bits only...
 	MD5[8] &= 0x0f;  // ... otherwise %01x overflows into two chars
 	return Printf("%02x%02x%02x%02x%02x%02x3%01x%02x8%01x%02x%02x%02x%02x%02x%02x%02x",
@@ -520,8 +520,8 @@ bool cClientHandle::StreamNextChunk(void)
 
 void cClientHandle::UnloadOutOfRangeChunks(void)
 {
-	int ChunkPosX = FAST_FLOOR_DIV((int)m_Player->GetPosX(), cChunkDef::Width);
-	int ChunkPosZ = FAST_FLOOR_DIV((int)m_Player->GetPosZ(), cChunkDef::Width);
+	int ChunkPosX = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosX()), cChunkDef::Width);
+	int ChunkPosZ = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosZ()), cChunkDef::Width);
 
 	cChunkCoordsList ChunksToRemove;
 	{
@@ -650,7 +650,7 @@ void cClientHandle::HandlePing(void)
 
 
 
-bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Username)
+bool cClientHandle::HandleLogin(UInt32 a_ProtocolVersion, const AString & a_Username)
 {
 	// If the protocol version hasn't been set yet, set it now:
 	if (m_ProtocolVersion == 0)
@@ -892,7 +892,7 @@ void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEf
 	{
 		return;
 	}
-	cBeaconWindow * BeaconWindow = (cBeaconWindow *) Window;
+	cBeaconWindow * BeaconWindow = reinterpret_cast<cBeaconWindow *>(Window);
 
 	if (Window->GetSlot(*m_Player, 0)->IsEmpty())
 	{
@@ -900,14 +900,14 @@ void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEf
 	}
 
 	cEntityEffect::eType PrimaryEffect = cEntityEffect::effNoEffect;
-	if ((a_PrimaryEffect >= 0) && (a_PrimaryEffect <= (int)cEntityEffect::effSaturation))
+	if ((a_PrimaryEffect >= 0) && (a_PrimaryEffect <= static_cast<int>(cEntityEffect::effSaturation)))
 	{
-		PrimaryEffect = (cEntityEffect::eType)a_PrimaryEffect;
+		PrimaryEffect = static_cast<cEntityEffect::eType>(a_PrimaryEffect);
 	}
 	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
-	if ((a_SecondaryEffect >= 0) && (a_SecondaryEffect <= (int)cEntityEffect::effSaturation))
+	if ((a_SecondaryEffect >= 0) && (a_SecondaryEffect <= static_cast<int>(cEntityEffect::effSaturation)))
 	{
-		SecondaryEffect = (cEntityEffect::eType)a_SecondaryEffect;
+		SecondaryEffect = static_cast<cEntityEffect::eType>(a_SecondaryEffect);
 	}
 
 	Window->SetSlot(*m_Player, 0, cItem());
@@ -971,7 +971,7 @@ void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 
 	if (a_ItemName.length() <= 30)
 	{
-		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(a_ItemName, m_Player);
+		reinterpret_cast<cAnvilWindow *>(m_Player->GetWindow())->SetRepairedItemName(a_ItemName, m_Player);
 	}
 }
 
@@ -1021,9 +1021,9 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		}
 
 		if (
-			((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
+			((Diff(m_Player->GetPosX(), static_cast<double>(a_BlockX)) > 6) ||
+			(Diff(m_Player->GetPosY(), static_cast<double>(a_BlockY)) > 6) ||
+			(Diff(m_Player->GetPosZ(), static_cast<double>(a_BlockZ)) > 6))
 		)
 		{
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -1032,7 +1032,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
+	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, static_cast<char>(a_Status)))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -1145,9 +1145,9 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	}
 
 	if (
-		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+		(Diff(m_Player->GetPosX(), static_cast<double>(a_BlockX)) > 6) ||
+		(Diff(m_Player->GetPosY(), static_cast<double>(a_BlockY)) > 6) ||
+		(Diff(m_Player->GetPosZ(), static_cast<double>(a_BlockZ)) > 6)
 	)
 	{
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -1177,7 +1177,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_BlockDigAnimY = a_BlockY;
 	m_BlockDigAnimZ = a_BlockZ;
 	m_BlockDigAnimStage = 0;
-	m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 0, this);
+	m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 0, this);
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -1269,7 +1269,7 @@ void cClientHandle::FinishDigAnimation()
 		// End dig animation
 		m_BlockDigAnimStage = -1;
 		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ, 10, this);
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ, 10, this);
 	}
 
 	m_BlockDigAnimX = -1;
@@ -1517,7 +1517,7 @@ void cClientHandle::HandleAnimation(int a_Animation)
 		return;
 	}
 
-	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_Animation, this);
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, static_cast<char>(a_Animation), this);
 }
 
 
@@ -1545,7 +1545,7 @@ void cClientHandle::HandleSteerVehicle(float a_Forward, float a_Sideways)
 
 void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 {
-	m_Player->CloseWindowIfID(a_WindowID);
+	m_Player->CloseWindowIfID(static_cast<char>(a_WindowID));
 }
 
 
@@ -1952,14 +1952,14 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_BlockDigAnimStage > -1)
 	{
 		int lastAnimVal = m_BlockDigAnimStage;
-		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
+		m_BlockDigAnimStage += static_cast<int>(m_BlockDigAnimSpeed * a_Dt);
 		if (m_BlockDigAnimStage > 9000)
 		{
 			m_BlockDigAnimStage = 9000;
 		}
 		if (m_BlockDigAnimStage / 1000 != lastAnimVal / 1000)
 		{
-			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, (char)(m_BlockDigAnimStage / 1000), this);
+			m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, static_cast<char>(m_BlockDigAnimStage / 1000), this);
 		}
 	}
 	

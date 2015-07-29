@@ -713,7 +713,7 @@ bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer, Tak
 
 
 
-bool cPluginManager::CallHookLogin(cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username)
+bool cPluginManager::CallHookLogin(cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username)
 {
 	FIND_HOOK(HOOK_LOGIN);
 	VERIFY_HOOK;

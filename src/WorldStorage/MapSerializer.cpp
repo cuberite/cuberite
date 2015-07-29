@@ -112,7 +112,7 @@ void cMapSerializer::SaveMapToNBT(cFastNBTWriter & a_Writer)
 	a_Writer.AddInt("zCenter", m_Map->GetCenterZ());
 
 	const cMap::cColorList & Data = m_Map->GetData();
-	a_Writer.AddByteArray("colors", (char *)Data.data(), Data.size());
+	a_Writer.AddByteArray("colors", reinterpret_cast<const char *>(Data.data()), Data.size());
 
 	a_Writer.EndCompound();
 }
@@ -132,14 +132,14 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	int CurrLine = a_NBT.FindChildByName(Data, "scale");
 	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Byte))
 	{
-		unsigned int Scale = (unsigned int)a_NBT.GetByte(CurrLine);
+		unsigned int Scale = static_cast<unsigned int>(a_NBT.GetByte(CurrLine));
 		m_Map->SetScale(Scale);
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "dimension");
 	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Byte))
 	{
-		eDimension Dimension = (eDimension) a_NBT.GetByte(CurrLine);
+		eDimension Dimension = static_cast<eDimension>(a_NBT.GetByte(CurrLine));
 		
 		if (Dimension != m_Map->m_World->GetDimension())
 		{
@@ -151,7 +151,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	CurrLine = a_NBT.FindChildByName(Data, "width");
 	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Short))
 	{
-		unsigned int Width = (unsigned int)a_NBT.GetShort(CurrLine);
+		unsigned int Width = static_cast<unsigned int>(a_NBT.GetShort(CurrLine));
 		if (Width != 128)
 		{
 			return false;
@@ -162,7 +162,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	CurrLine = a_NBT.FindChildByName(Data, "height");
 	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Short))
 	{
-		unsigned int Height = (unsigned int)a_NBT.GetShort(CurrLine);
+		unsigned int Height = static_cast<unsigned int>(a_NBT.GetShort(CurrLine));
 		if (Height >= 256)
 		{
 			return false;

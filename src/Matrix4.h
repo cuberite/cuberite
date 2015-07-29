@@ -98,8 +98,8 @@ public:
 
 	inline void RotateZ(T a_RZ)
 	{
-		T sz = (T) sin(a_RZ * M_PI / 180);
-		T cz = (T) cos(a_RZ * M_PI / 180);
+		T sz = static_cast<T>(sin(a_RZ * M_PI / 180));
+		T cz = static_cast<T>(cos(a_RZ * M_PI / 180));
 
 		Identity();
 

@@ -40,7 +40,7 @@ public:
 	) override
 	{
 		// Prepare sound effect
-		AString PlaceSound = cBlockInfo::GetPlaceSound(m_ItemType);
+		AString PlaceSound = cBlockInfo::GetPlaceSound(static_cast<BLOCKTYPE>(m_ItemType));
 		float Volume = 1.0f, Pitch = 0.8f;
 
 		// Special slab handling - placing a slab onto another slab produces a dblslab instead:

@@ -3,7 +3,7 @@
 
 #include "Noise.h"
 
-#define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
+#define FAST_FLOOR(x) (((x) < 0) ? ((static_cast<int>(x)) - 1) : (static_cast<int>(x)))
 
 
 
@@ -129,7 +129,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 				unsigned char buf[BUF_SIZE];
 				for (size_t x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+					buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f1.Write(buf, a_SizeX);
 			}  // for y
@@ -150,7 +150,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 				unsigned char buf[BUF_SIZE];
 				for (size_t x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+					buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f2.Write(buf, a_SizeX);
 			}  // for z
@@ -179,7 +179,7 @@ void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 			unsigned char buf[BUF_SIZE];
 			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+				buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 			}
 			f1.Write(buf, a_SizeX);
 		}  // for y
@@ -295,7 +295,7 @@ void cCubicCell2D::InitWorkRnds(int a_FloorX, int a_FloorY)
 		for (int y = 0; y < 4; y++)
 		{
 			int cy = a_FloorY + y - 1;
-			(*m_WorkRnds)[x][y] = (NOISE_DATATYPE)m_Noise.IntNoise2D(cx, cy);
+			(*m_WorkRnds)[x][y] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise2D(cx, cy));
 		}
 	}
 }
@@ -329,7 +329,7 @@ void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 			}
 			else
 			{
-				(*m_WorkRnds)[x][y] = (NOISE_DATATYPE)m_Noise.IntNoise2D(cx, cy);
+				(*m_WorkRnds)[x][y] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise2D(cx, cy));
 			}
 		}
 	}
@@ -472,7 +472,7 @@ void cCubicCell3D::InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ)
 			for (int z = 0; z < 4; z++)
 			{
 				int cz = a_FloorZ + z - 1;
-				(*m_WorkRnds)[x][y][z] = (NOISE_DATATYPE)m_Noise.IntNoise3D(cx, cy, cz);
+				(*m_WorkRnds)[x][y][z] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(cx, cy, cz));
 			}
 		}
 	}
@@ -513,7 +513,7 @@ void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
 				}
 				else
 				{
-					(*m_WorkRnds)[x][y][z] = (NOISE_DATATYPE)m_Noise.IntNoise3D(cx, cy, cz);
+					(*m_WorkRnds)[x][y][z] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(cx, cy, cz));
 				}
 			}  // for z
 		}  // for y

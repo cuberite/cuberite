@@ -203,13 +203,13 @@ public:
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
 		// Bits 2 and 4 stay, bits 1 and 3 swap
-		return (NIBBLETYPE)((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
+		return static_cast<NIBBLETYPE>((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
 	}
 
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
 		// Bits 1 and 3 stay, bits 2 and 4 swap
-		return (NIBBLETYPE)((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
+		return static_cast<NIBBLETYPE>((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

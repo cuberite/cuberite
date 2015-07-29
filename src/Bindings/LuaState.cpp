@@ -379,7 +379,7 @@ void cLuaState::Push(const AStringVector & a_Vector)
 {
 	ASSERT(IsValid());
 
-	lua_createtable(m_LuaState, (int)a_Vector.size(), 0);
+	lua_createtable(m_LuaState, static_cast<int>(a_Vector.size()), 0);
 	int newTable = lua_gettop(m_LuaState);
 	int index = 1;
 	for (AStringVector::const_iterator itr = a_Vector.begin(), end = a_Vector.end(); itr != end; ++itr, ++index)
@@ -398,7 +398,7 @@ void cLuaState::Push(const cCraftingGrid * a_Grid)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Grid, "cCraftingGrid");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cCraftingGrid *>(a_Grid)), "cCraftingGrid");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -410,7 +410,7 @@ void cLuaState::Push(const cCraftingRecipe * a_Recipe)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cCraftingRecipe *>(a_Recipe)), "cCraftingRecipe");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -434,7 +434,7 @@ void cLuaState::Push(const cItems & a_Items)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)&a_Items, "cItems");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cItems *>(&a_Items)), "cItems");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -446,7 +446,7 @@ void cLuaState::Push(const cPlayer * a_Player)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cPlayer *>(a_Player)), "cPlayer");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -470,7 +470,7 @@ void cLuaState::Push(const HTTPRequest * a_Request)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Request, "HTTPRequest");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<HTTPRequest *>(a_Request)), "HTTPRequest");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -482,7 +482,7 @@ void cLuaState::Push(const HTTPTemplateRequest * a_Request)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Request, "HTTPTemplateRequest");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<HTTPTemplateRequest *>(a_Request)), "HTTPTemplateRequest");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -494,7 +494,7 @@ void cLuaState::Push(const Vector3d & a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)&a_Vector, "Vector3<double>");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3d *>(&a_Vector)), "Vector3<double>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -506,7 +506,7 @@ void cLuaState::Push(const Vector3d * a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Vector, "Vector3<double>");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3d *>(a_Vector)), "Vector3<double>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -518,7 +518,7 @@ void cLuaState::Push(const Vector3i & a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)&a_Vector, "Vector3<int>");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3i *>(&a_Vector)), "Vector3<int>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -530,7 +530,7 @@ void cLuaState::Push(const Vector3i * a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Vector, "Vector3<int>");
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3i *>(a_Vector)), "Vector3<int>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -665,6 +665,18 @@ void cLuaState::Push(double a_Value)
 
 
 void cLuaState::Push(int a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(UInt32 a_Value)
 {
 	ASSERT(IsValid());
 
@@ -1406,7 +1418,7 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 		{
 			case LUA_TBOOLEAN: Value.assign((lua_toboolean(a_LuaState, i) != 0) ? "true" : "false"); break;
 			case LUA_TLIGHTUSERDATA: Printf(Value, "%p", lua_touserdata(a_LuaState, i)); break;
-			case LUA_TNUMBER:        Printf(Value, "%f", (double)lua_tonumber(a_LuaState, i)); break;
+			case LUA_TNUMBER:        Printf(Value, "%f", static_cast<double>(lua_tonumber(a_LuaState, i))); break;
 			case LUA_TSTRING:        Printf(Value, "%s", lua_tostring(a_LuaState, i)); break;
 			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
 			default: break;

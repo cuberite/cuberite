@@ -173,7 +173,7 @@ bool cWindow::IsSlotInPlayerInventory(int a_SlotNum) const
 void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 {
 	a_Slots.clear();
-	a_Slots.reserve(GetNumSlots());
+	a_Slots.reserve(static_cast<size_t>(GetNumSlots()));
 	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
 	{
 		int NumSlots = (*itr)->GetNumSlots();
@@ -482,7 +482,7 @@ void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_Relativ
 	}
 	
 	a_Player.GetClientHandle()->SendInventorySlot(
-		m_WindowID, a_RelativeSlotNum + SlotBase, *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
+		m_WindowID, static_cast<short>(a_RelativeSlotNum + SlotBase), *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
 	);
 }
 
@@ -593,7 +593,7 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 	
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	int ToEachSlot = (int)ToDistribute.m_ItemCount / (int)SlotNums.size();
+	int ToEachSlot = static_cast<int>(ToDistribute.m_ItemCount) / static_cast<int>(SlotNums.size());
 	
 	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
 	
@@ -645,9 +645,9 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 
 int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums)
 {
-	if ((size_t)(a_Item.m_ItemCount) < a_SlotNums.size())
+	if (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size())
 	{
-		LOGWARNING("%s: Distributing less items (%d) than slots (" SIZE_T_FMT  ")", __FUNCTION__, (int)a_Item.m_ItemCount, a_SlotNums.size());
+		LOGWARNING("%s: Distributing less items (%d) than slots (" SIZE_T_FMT  ")", __FUNCTION__, static_cast<int>(a_Item.m_ItemCount), a_SlotNums.size());
 		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now
 		return 0;
 	}
@@ -671,14 +671,14 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 		{
 			// Empty, just move all of it there:
 			cItem ToStore(a_Item);
-			ToStore.m_ItemCount = std::min(a_NumToEachSlot, (int)MaxStack);
+			ToStore.m_ItemCount = static_cast<char>(std::min(a_NumToEachSlot, static_cast<int>(MaxStack)));
 			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
 			NumDistributed += ToStore.m_ItemCount;
 		}
 		else if (AtSlot.IsEqual(a_Item))
 		{
 			// Occupied, add and cap at MaxStack:
-			int CanStore = std::min(a_NumToEachSlot, (int)MaxStack - AtSlot.m_ItemCount);
+			int CanStore = std::min(a_NumToEachSlot, static_cast<int>(MaxStack) - AtSlot.m_ItemCount);
 			AtSlot.m_ItemCount += CanStore;
 			Area->SetSlot(LocalSlotNum, a_Player, AtSlot);
 			NumDistributed += CanStore;
@@ -717,7 +717,7 @@ void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
 	{
-		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, SlotNum, *a_Area->GetSlot(a_LocalSlotNum, **itr));
+		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
 	}  // for itr - m_OpenedBy[]
 }
 

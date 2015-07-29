@@ -24,7 +24,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
+		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player->GetEquippedItem().m_ItemDamage);
 		a_BlockMeta = BlockFaceToMetaData(a_BlockFace, Meta);
 		return true;
 	}

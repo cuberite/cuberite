@@ -56,9 +56,9 @@ public:
 			}
 		}
 		
-		double x = (double)a_BlockX + 0.5;
-		double y = (double)a_BlockY + 0.5;
-		double z = (double)a_BlockZ + 0.5;
+		double x = static_cast<double>(a_BlockX) + 0.5;
+		double y = static_cast<double>(a_BlockY) + 0.5;
+		double z = static_cast<double>(a_BlockZ) + 0.5;
 		cMinecart * Minecart = nullptr;
 		switch (m_ItemType)
 		{

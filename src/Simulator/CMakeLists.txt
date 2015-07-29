@@ -35,7 +35,7 @@ SET (HDRS
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(FireSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
 	set_source_files_properties(FluidSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=shadow")
-	set_source_files_properties(IncrementalRedstoneSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
+	set_source_files_properties(IncrementalRedstoneSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion ")
 endif()
 
 if(NOT MSVC)

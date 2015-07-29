@@ -47,6 +47,6 @@ public:
 
 		cFastRandom Random;
 		int Reward = 15 + Random.NextInt(15) + Random.NextInt(15);
-		a_WorldInterface.SpawnExperienceOrb((double)a_BlockX, (double)a_BlockY + 1, (double)a_BlockZ, Reward);
+		a_WorldInterface.SpawnExperienceOrb(static_cast<double>(a_BlockX), static_cast<double>(a_BlockY + 1), static_cast<double>(a_BlockZ), Reward);
 	}
 } ;

@@ -116,7 +116,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			{
 				DraggingItem = Slot.CopyOne();  // Obtain copy of slot to preserve lore, enchantments, etc.
 
-				DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
+				DraggingItem.m_ItemCount = static_cast<char>(static_cast<float>(Slot.m_ItemCount) / 2.f + 0.5f);
 				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
 
 				if (Slot.m_ItemCount <= 0)
@@ -173,10 +173,10 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
 					FreeSlots = 0;
 				}
-				int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
+				char Filling = static_cast<char>((FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots);
 
-				Slot.m_ItemCount += (char)Filling;
-				DraggingItem.m_ItemCount -= (char)Filling;
+				Slot.m_ItemCount += Filling;
+				DraggingItem.m_ItemCount -= Filling;
 				if (DraggingItem.m_ItemCount <= 0)
 				{
 					DraggingItem.Empty();
@@ -306,7 +306,7 @@ void cSlotArea::NumberClicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 		return;
 	}
 
-	int HotbarSlot = (int)a_ClickAction - (int)caNumber1;
+	int HotbarSlot = static_cast<int>(a_ClickAction - caNumber1);
 	cItem ItemInHotbar(a_Player.GetInventory().GetHotbarSlot(HotbarSlot));
 	cItem ItemInSlot(*GetSlot(a_SlotNum, a_Player));
 
@@ -980,13 +980,13 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	{
 		SetSlot(1, a_Player, cItem());
 	}
-	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
+	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost), a_Player);
 
 	m_MaximumCost = 0;
-	((cAnvilWindow*)&m_ParentWindow)->SetRepairedItemName("", nullptr);
+	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
 
 	int PosX, PosY, PosZ;
-	((cAnvilWindow*)&m_ParentWindow)->GetBlockPos(PosX, PosY, PosZ);
+	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
 
 	BLOCKTYPE Block;
 	NIBBLETYPE BlockMeta;
@@ -1002,13 +1002,13 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		if (AnvilDamage > 2)
 		{
 			// Anvil will break
-			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, (NIBBLETYPE)0);
+			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(1020, PosX, PosY, PosZ, 0);
 			a_Player.CloseWindow(false);
 		}
 		else
 		{
-			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, Orientation | (AnvilDamage << 2));
+			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
 		}
 	}
@@ -1075,7 +1075,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			int DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
+			int DamageDiff = std::min(static_cast<int>(Input.m_ItemDamage), static_cast<int>(Input.GetMaxDamage()) / 4);
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
@@ -1089,12 +1089,12 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			while ((DamageDiff > 0) && (x < SecondInput.m_ItemCount))
 			{
 				Input.m_ItemDamage -= DamageDiff;
-				NeedExp += std::max(1, DamageDiff / 100) + (int)Input.m_Enchantments.Count();
-				DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
+				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Input.m_Enchantments.Count());
+				DamageDiff = std::min(static_cast<int>(Input.m_ItemDamage), static_cast<int>(Input.GetMaxDamage()) / 4);
 
 				++x;
 			}
-			m_StackSizeToBeUsedInRepair = x;
+			m_StackSizeToBeUsedInRepair = static_cast<char>(x);
 		}
 		else
 		{
@@ -1122,7 +1122,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 				if (NewItemDamage < Input.m_ItemDamage)
 				{
-					Input.m_ItemDamage = NewItemDamage;
+					Input.m_ItemDamage = static_cast<short>(NewItemDamage);
 					NeedExp += std::max(1, Damage / 100);
 				}
 			}
@@ -1132,7 +1132,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	int NameChangeExp = 0;
-	const AString & RepairedItemName = ((cAnvilWindow*)&m_ParentWindow)->GetRepairedItemName();
+	const AString & RepairedItemName = reinterpret_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name
@@ -1188,7 +1188,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	SetSlot(2, a_Player, Input);
-	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
+	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost), a_Player);
 }
 
 
@@ -1569,14 +1569,14 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		int Bookshelves = std::min(GetBookshelvesCount(a_Player.GetWorld()), 15);
 
 		cFastRandom Random;
-		int Base = (Random.GenerateRandomInteger(1, 8) + (int)floor((float)Bookshelves / 2) + Random.GenerateRandomInteger(0, Bookshelves));
+		int Base = (Random.GenerateRandomInteger(1, 8) + static_cast<int>(floor(static_cast<float>(Bookshelves / 2)) + Random.GenerateRandomInteger(0, Bookshelves)));
 		int TopSlot = std::max(Base / 3, 1);
 		int MiddleSlot = (Base * 2) / 3 + 1;
 		int BottomSlot = std::max(Base, Bookshelves * 2);
 
-		m_ParentWindow.SetProperty(0, TopSlot, a_Player);
-		m_ParentWindow.SetProperty(1, MiddleSlot, a_Player);
-		m_ParentWindow.SetProperty(2, BottomSlot, a_Player);
+		m_ParentWindow.SetProperty(0, static_cast<short>(TopSlot), a_Player);
+		m_ParentWindow.SetProperty(1, static_cast<short>(MiddleSlot), a_Player);
+		m_ParentWindow.SetProperty(2, static_cast<short>(BottomSlot), a_Player);
 	}
 	else
 	{
@@ -1803,7 +1803,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 				case caRightClick:
 				{
 					DraggingItem = Slot.CopyOne();
-					DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
+					DraggingItem.m_ItemCount = static_cast<char>(static_cast<float>(Slot.m_ItemCount) / 2.f + 0.5f);
 					Slot.m_ItemCount -= DraggingItem.m_ItemCount;
 
 					if (Slot.m_ItemCount <= 0)
@@ -2241,14 +2241,14 @@ const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player) con
 		return nullptr;
 	}
 	
-	if (a_SlotNum >= (int)(itr->second.size()))
+	if (a_SlotNum >= static_cast<int>(itr->second.size()))
 	{
 		LOGERROR("cSlotAreaTemporary: asking for more slots than actually stored!");
 		ASSERT(!"cSlotAreaTemporary: asking for more slots than actually stored!");
 		return nullptr;
 	}
 	
-	return &(itr->second[a_SlotNum]);
+	return &(itr->second[static_cast<size_t>(a_SlotNum)]);
 }
 
 
@@ -2265,13 +2265,13 @@ void cSlotAreaTemporary::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem 
 		return;
 	}
 	
-	if (a_SlotNum >= (int)(itr->second.size()))
+	if (a_SlotNum >= static_cast<int>(itr->second.size()))
 	{
 		LOGERROR("cSlotAreaTemporary: asking for more slots than actually stored!");
 		return;
 	}
 	
-	itr->second[a_SlotNum] = a_Item;
+	itr->second[static_cast<size_t>(a_SlotNum)] = a_Item;
 }
 
 
@@ -2281,7 +2281,7 @@ void cSlotAreaTemporary::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem 
 void cSlotAreaTemporary::OnPlayerAdded(cPlayer & a_Player)
 {
 	ASSERT(m_Items.find(a_Player.GetUniqueID()) == m_Items.end());  // The player shouldn't be in the itemmap, otherwise we probably have a leak
-	m_Items[a_Player.GetUniqueID()].resize(m_NumSlots);  // Make the vector the specified size of empty items
+	m_Items[a_Player.GetUniqueID()].resize(static_cast<size_t>(m_NumSlots));  // Make the vector the specified size of empty items
 }
 
 
@@ -2311,7 +2311,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 	cItems Drops;
 	for (int i = a_Begin; i < a_End; i++)
 	{
-		cItem & Item = itr->second[i];
+		cItem & Item = itr->second[static_cast<size_t>(i)];
 		if (!Item.IsEmpty())
 		{
 			Drops.push_back(Item);

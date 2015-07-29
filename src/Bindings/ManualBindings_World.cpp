@@ -86,7 +86,7 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	}
 	
 	// Read the params:
-	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, nullptr);
+	cWorld * World = reinterpret_cast<cWorld *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (World == nullptr)
 	{
 		LOGWARNING("World:ChunkStay(): invalid world parameter");
@@ -356,7 +356,7 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 	}
 
 	// Retrieve the args:
-	cWorld * self = (cWorld *)tolua_tousertype(tolua_S, 1, nullptr);
+	cWorld * self = reinterpret_cast<cWorld *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
@@ -473,7 +473,7 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, nullptr);
+	cWorld * World = reinterpret_cast<cWorld *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (World == nullptr)
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
@@ -486,7 +486,7 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
 	
-	int DelayTicks = (int)tolua_tonumber(tolua_S, 2, 0);
+	int DelayTicks = static_cast<int>(tolua_tonumber(tolua_S, 2, 0));
 
 	auto task = std::make_shared<cLuaScheduledWorldTask>(*Plugin, FnRef);
 	Plugin->AddResettable(task);

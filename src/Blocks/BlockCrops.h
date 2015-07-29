@@ -30,17 +30,17 @@ public:
 				case E_BLOCK_CROPS:
 				{
 					a_Pickups.push_back(cItem(E_ITEM_WHEAT, 1, 0));
-					a_Pickups.push_back(cItem(E_ITEM_SEEDS, (char)(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
+					a_Pickups.push_back(cItem(E_ITEM_SEEDS, static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
 					break;
 				}
 				case E_BLOCK_CARROTS:
 				{
-					a_Pickups.push_back(cItem(E_ITEM_CARROT, (char)(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
+					a_Pickups.push_back(cItem(E_ITEM_CARROT, static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
 					break;
 				}
 				case E_BLOCK_POTATOES:
 				{
-					a_Pickups.push_back(cItem(E_ITEM_POTATO, (char)(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
+					a_Pickups.push_back(cItem(E_ITEM_POTATO, static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2), 0));  // [1 .. 3] with high preference of 2
 					if (rand.NextInt(21) == 0)
 					{
 						// With a 5% chance, drop a poisonous potato as well

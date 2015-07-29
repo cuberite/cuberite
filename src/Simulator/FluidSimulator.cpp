@@ -160,10 +160,10 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	for (std::vector<Vector3i *>::iterator it = Points.begin(); it < Points.end(); ++it)
 	{
 		Vector3i *Pos = (*it);
-		char BlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
+		BLOCKTYPE BlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
 		if (IsAllowedBlock(BlockID))
 		{
-			char Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
+			NIBBLETYPE Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
 
 			if (Meta > LowestPoint)
 			{

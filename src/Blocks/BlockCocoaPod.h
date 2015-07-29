@@ -41,7 +41,7 @@ public:
 			if (GrowState < 2)
 			{
 				++GrowState;
-				a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, (NIBBLETYPE) (GrowState << 2 | TypeMeta));
+				a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, static_cast<NIBBLETYPE>(GrowState << 2 | TypeMeta));
 			}
 		}
 	}
