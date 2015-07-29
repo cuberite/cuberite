@@ -53,7 +53,7 @@ void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDe
 
 void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
 {
-	m_BlockType = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "SameBlockType", "stone").m_ItemType);
+	m_BlockType = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "SameBlockType", "stone").m_ItemType);
 	m_IsBedrocked = (a_IniFile.GetValueSetI("Generator", "SameBlockBedrocked", 1) != 0);
 }
 
@@ -200,12 +200,12 @@ void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 	m_SeaLevel         = a_IniFile.GetValueSetI("Generator", "SeaLevel",           m_SeaLevel);
 	m_BeachHeight      = a_IniFile.GetValueSetI("Generator", "ClassicBeachHeight", m_BeachHeight);
 	m_BeachDepth       = a_IniFile.GetValueSetI("Generator", "ClassicBeachDepth",  m_BeachDepth);
-	m_BlockTop         = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockTop",         "grass").m_ItemType);
-	m_BlockMiddle      = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt").m_ItemType);
-	m_BlockBottom      = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBottom",      "stone").m_ItemType);
-	m_BlockBeach       = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeach",       "sand").m_ItemType);
-	m_BlockBeachBottom = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone").m_ItemType);
-	m_BlockSea         = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater").m_ItemType);
+	m_BlockTop         = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockTop",         "grass").m_ItemType);
+	m_BlockMiddle      = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt").m_ItemType);
+	m_BlockBottom      = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBottom",      "stone").m_ItemType);
+	m_BlockBeach       = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeach",       "sand").m_ItemType);
+	m_BlockBeachBottom = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone").m_ItemType);
+	m_BlockSea         = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater").m_ItemType);
 }
 
 
@@ -307,7 +307,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 		int Height = a_ChunkDesc.GetHeight(x, z);
 		a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_BEDROCK);
 
-		NOISE_DATATYPE CeilingDisguise = (m_Noise1.CubicNoise2D((float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10, (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10));
+		NOISE_DATATYPE CeilingDisguise = (m_Noise1.CubicNoise2D(static_cast<float>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10, static_cast<float>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10));
 		if (CeilingDisguise < 0)
 		{
 			CeilingDisguise = -CeilingDisguise;

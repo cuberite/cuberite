@@ -206,7 +206,7 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 			int len = (PrevX - itr->m_BlockX) * (PrevX - itr->m_BlockX);
 			len += (PrevY - itr->m_BlockY) * (PrevY - itr->m_BlockY);
 			len += (PrevZ - itr->m_BlockZ) * (PrevZ - itr->m_BlockZ);
-			len = 3 * (int)sqrt((double)len) / 4;
+			len = 3 * static_cast<int>(sqrt(static_cast<double>(len))) / 4;
 			int Rad = std::min(MAX_RADIUS, std::max(MIN_RADIUS, (PrevR + itr->m_Radius) / 2 + (Random % 3) - 1));
 			Random /= 4;
 			int x = (itr->m_BlockX + PrevX) / 2 + (Random % (len + 1) - len / 2);
@@ -493,7 +493,7 @@ void cCaveTunnel::ProcessChunk(
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		int Bottom = std::max(itr->m_BlockY - 3 * itr->m_Radius / 7, 1);
-		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, (int)(cChunkDef::Height));
+		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, static_cast<int>(cChunkDef::Height));
 		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
@@ -732,10 +732,10 @@ void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 	cNoise Noise(m_Seed);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		const float zz = (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z);
+		const float zz = static_cast<float>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z);
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			const float xx = (float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x);
+			const float xx = static_cast<float>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x);
 
 			int Top = a_ChunkDesc.GetHeight(x, z);
 			for (int y = 1; y < Top; ++y)
@@ -745,7 +745,7 @@ void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				const float yy = (float)y;
+				const float yy = static_cast<float>(y);
 				const float WaveNoise = 1;
 				if (cosf(GetMarbleNoise(xx, yy * 0.5f, zz, Noise)) * fabs(cosf(yy * 0.2f + WaveNoise * 2) * 0.75f + WaveNoise) > 0.0005f)
 				{
@@ -767,15 +767,15 @@ void cStructGenDualRidgeCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		const float zz = (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10;
+		const float zz = static_cast<float>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			const float xx = (float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10;
+			const float xx = static_cast<float>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10;
 
 			int Top = a_ChunkDesc.GetHeight(x, z);
 			for (int y = 1; y <= Top; ++y)
 			{
-				const float yy = (float)y / 10;
+				const float yy = static_cast<float>(y / 10);
 				float n1 = m_Noise1.CubicNoise3D(xx, yy, zz);
 				float n2 = m_Noise2.CubicNoise3D(xx, yy, zz);
 				float n3 = m_Noise1.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;

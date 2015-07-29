@@ -114,7 +114,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 	//   http://minecraft.gamepedia.com/Data_values#.22Extended_duration.22_bit
 	//   http://minecraft.gamepedia.com/Data_values#.22Splash_potion.22_bit
 	
-	return (int)(base * TierCoeff * ExtCoeff * SplashCoeff);
+	return static_cast<int>(base * TierCoeff * ExtCoeff * SplashCoeff);
 }
 
 
@@ -240,12 +240,12 @@ void cEntityEffectSpeed::OnActivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = (cMonster*) &a_Target;
+		cMonster * Mob = reinterpret_cast<cMonster*>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = (cPlayer*) &a_Target;
+		cPlayer * Player = reinterpret_cast<cPlayer*>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.2 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.26 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.2 * m_Intensity);
@@ -260,12 +260,12 @@ void cEntityEffectSpeed::OnDeactivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = (cMonster*) &a_Target;
+		cMonster * Mob = reinterpret_cast<cMonster*>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = (cPlayer*) &a_Target;
+		cPlayer * Player = reinterpret_cast<cPlayer*>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.2 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.26 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.2 * m_Intensity);
@@ -283,12 +283,12 @@ void cEntityEffectSlowness::OnActivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = (cMonster*) &a_Target;
+		cMonster * Mob = static_cast<cMonster*>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.15 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = (cPlayer*) &a_Target;
+		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.15 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.195 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.15 * m_Intensity);
@@ -303,12 +303,12 @@ void cEntityEffectSlowness::OnDeactivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = (cMonster*) &a_Target;
+		cMonster * Mob = static_cast<cMonster*>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.15 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = (cPlayer*) &a_Target;
+		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.15 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.195 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.15 * m_Intensity);
@@ -325,9 +325,9 @@ void cEntityEffectSlowness::OnDeactivate(cPawn & a_Target)
 void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
-	int amount = (int)(6 * (1 << m_Intensity) * m_DistanceModifier);
+	int amount = static_cast<int>(6 * (1 << m_Intensity) * m_DistanceModifier);
 	
-	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
+	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
 	{
 		a_Target.TakeDamage(dtPotionOfHarming, nullptr, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 		return;
@@ -345,9 +345,9 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
-	int amount = (int)(6 * (1 << m_Intensity) * m_DistanceModifier);
+	int amount = static_cast<int>(6 * (1 << m_Intensity) * m_DistanceModifier);
 	
-	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
+	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
 	{
 		a_Target.Heal(amount);
 		return;
@@ -366,13 +366,13 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
 
-	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
+	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
 	{
 		return;
 	}
 	
 	// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
-	int frequency = (int) std::floor(50.0 / (double)(m_Intensity + 1));
+	int frequency = FloorC(50.0 / static_cast<double>(m_Intensity + 1));
 	
 	if ((m_Ticks % frequency) != 0)
 	{
@@ -395,8 +395,8 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 	
 	if (a_Target.IsPlayer())
 	{
-		cPlayer & Target = (cPlayer &) a_Target;
-		Target.AddFoodExhaustion(0.025 * ((double)GetIntensity() + 1.0));  // 0.5 per second = 0.025 per tick
+		cPlayer & Target = reinterpret_cast<cPlayer &>(a_Target);
+		Target.AddFoodExhaustion(0.025 * (static_cast<double>(GetIntensity()) + 1.0));  // 0.5 per second = 0.025 per tick
 	}
 }
 
@@ -431,7 +431,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 	
 	if (a_Target.IsMob())
 	{
-		cMonster & Target = (cMonster &) a_Target;
+		cMonster & Target = reinterpret_cast<cMonster &>(a_Target);
 		
 		// Doesn't effect undead mobs, spiders
 		if (
@@ -445,7 +445,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 	}
 	
 	// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
-	int frequency = (int) std::floor(25.0 / (double)(m_Intensity + 1));
+	int frequency = FloorC(25.0 / static_cast<double>(m_Intensity + 1));
 	
 	if ((m_Ticks % frequency) == 0)
 	{
@@ -469,7 +469,7 @@ void cEntityEffectWither::OnTick(cPawn & a_Target)
 	super::OnTick(a_Target);
 	
 	// Damage frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
-	int frequency = (int) std::floor(25.0 / (double)(m_Intensity + 1));
+	int frequency = FloorC(25.0 / static_cast<double>(m_Intensity + 1));
 
 	if ((m_Ticks % frequency) == 0)
 	{
@@ -488,7 +488,7 @@ void cEntityEffectSaturation::OnTick(cPawn & a_Target)
 {
 	if (a_Target.IsPlayer())
 	{
-		cPlayer & Target = (cPlayer &) a_Target;
+		cPlayer & Target = reinterpret_cast<cPlayer &>(a_Target);
 		Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }

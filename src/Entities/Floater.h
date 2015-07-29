@@ -18,15 +18,15 @@ public:
 
 	CLASS_PROTODEF(cFloater)
 
-	cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID, int a_CountDownTime);
+	cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	
 	// tolua_begin
 	bool CanPickup(void)       const { return m_CanPickupItem; }
-	int GetOwnerID(void)       const { return m_PlayerID; }
-	int GetAttachedMobID(void) const { return m_AttachedMobID; }
+	UInt32 GetOwnerID(void)       const { return m_PlayerID; }
+	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
 	// tolua_end
 
 protected:
@@ -41,6 +41,6 @@ protected:
 	int m_CountDownTime;
 
 	// Entity IDs
-	int m_PlayerID;
-	int m_AttachedMobID;
+	UInt32 m_PlayerID;
+	UInt32 m_AttachedMobID;
 } ;  // tolua_export

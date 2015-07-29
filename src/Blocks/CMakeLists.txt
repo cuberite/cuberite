@@ -95,11 +95,6 @@ SET (HDRS
 	MetaRotator.h
 	WorldInterface.h)
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(BlockHandler.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-	set_source_files_properties(BlockPiston.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-endif()
-
 if(NOT MSVC)
 	add_library(Blocks ${SRCS} ${HDRS})
 endif()

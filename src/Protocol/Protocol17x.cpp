@@ -127,7 +127,7 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	{
 		static int sCounter = 0;
 		cFile::CreateFolder("CommLogs");
-		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(nullptr), sCounter++, a_Client->GetIPString().c_str());
+		AString FileName = Printf("CommLogs/%x_%d__%s.log", static_cast<unsigned>(time(nullptr)), sCounter++, a_Client->GetIPString().c_str());
 		m_CommLogFile.Open(FileName, cFile::fmWrite);
 	}
 }
@@ -144,8 +144,8 @@ void cProtocol172::DataReceived(const char * a_Data, size_t a_Size)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
-			AddReceivedData((const char *)Decrypted, NumBytes);
+			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
+			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -642,7 +642,7 @@ void cProtocol172::SendInventorySlot(char a_WindowID, short a_SlotNum, const cIt
 
 
 
-void cProtocol172::SendKeepAlive(int a_PingID)
+void cProtocol172::SendKeepAlive(UInt32 a_PingID)
 {
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
@@ -652,7 +652,7 @@ void cProtocol172::SendKeepAlive(int a_PingID)
 	}
 	
 	cPacketizer Pkt(*this, 0x00);  // Keep Alive packet
-	Pkt.WriteBEInt32(a_PingID);
+	Pkt.WriteBEInt32(static_cast<Int32>(a_PingID));
 }
 
 
@@ -1078,9 +1078,9 @@ void cProtocol172::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimens
 
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEInt32((int)a_Dimension);
+	Pkt.WriteBEInt32(static_cast<int>(a_Dimension));
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-	Pkt.WriteBEUInt8((Byte)Player->GetEffectiveGameMode());
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
 	Pkt.WriteString("default");
 	m_LastSentDimension = a_Dimension;
 }
@@ -1146,7 +1146,7 @@ void cProtocol172::SendScoreUpdate(const AString & a_Objective, const AString & 
 	if (a_Mode != 1)
 	{
 		Pkt.WriteString(a_Objective);
-		Pkt.WriteBEInt32((int) a_Score);
+		Pkt.WriteBEInt32(static_cast<int>(a_Score));
 	}
 }
 
@@ -1266,7 +1266,7 @@ void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
 	
 	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8((Byte)a_Mob.GetMobType());
+	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
 	Pkt.WriteFPInt(a_Mob.GetPosX());
 	Pkt.WriteFPInt(a_Mob.GetPosY());
 	Pkt.WriteFPInt(a_Mob.GetPosZ());
@@ -1341,10 +1341,11 @@ void cProtocol172::SendStatistics(const cStatManager & a_Manager)
 	cPacketizer Pkt(*this, 0x37);
 	Pkt.WriteVarInt32(statCount);  // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
 
-	for (size_t i = 0; i < (size_t)statCount; ++i)
+	size_t Count = static_cast<size_t>(statCount);
+	for (size_t i = 0; i < Count; ++i)
 	{
-		StatValue Value = a_Manager.GetValue((eStatistic) i);
-		const AString & StatName = cStatInfo::GetName((eStatistic) i);
+		StatValue Value = a_Manager.GetValue(static_cast<eStatistic>(i));
+		const AString & StatName = cStatInfo::GetName(static_cast<eStatistic>(i));
 
 		Pkt.WriteString(StatName);
 		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
@@ -1621,8 +1622,8 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		}
 		AString Hex;
 		CreateHexDump(Hex, a_Data, a_Size, 16);
-		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
-			(unsigned)a_Size, (unsigned)a_Size, Hex.c_str()
+		m_CommLogFile.Printf("Incoming data: %u (0x%x) bytes: \n%s\n",
+			static_cast<unsigned>(a_Size), static_cast<unsigned>(a_Size), Hex.c_str()
 		);
 		m_CommLogFile.Flush();
 	}
@@ -2495,8 +2496,8 @@ void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
-			m_Client->SendData((const char *)Encrypted, NumBytes);
+			m_Encryptor.ProcessData(Encrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
+			m_Client->SendData(reinterpret_cast<const char *>(Encrypted), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -2645,7 +2646,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, (ENUM_ITEM_ID)a_Item.m_ItemType);
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
 				}
 				break;
 			}
@@ -2675,9 +2676,9 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 	cSha1Checksum Checksum;
 	cServer * Server = cRoot::Get()->GetServer();
 	const AString & ServerID = Server->GetServerID();
-	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update(reinterpret_cast<const Byte *>(ServerID.c_str()), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
+	Checksum.Update(reinterpret_cast<const Byte *>(Server->GetPublicKeyDER().data()), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
@@ -2778,7 +2779,7 @@ void cProtocol172::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	}
 	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
 	}
 	Writer.Finish();
 
@@ -2851,8 +2852,8 @@ void cProtocol172::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_
 			Writer.AddInt("x", FlowerPotEntity.GetPosX());
 			Writer.AddInt("y", FlowerPotEntity.GetPosY());
 			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", (Int32) FlowerPotEntity.GetItem().m_ItemType);
-			Writer.AddInt("Data", (Int32) FlowerPotEntity.GetItem().m_ItemDamage);
+			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
+			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
 			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
@@ -3027,7 +3028,7 @@ void cProtocol172::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 	}
 
 	a_Pkt.WriteBEUInt8(0x66);
-	a_Pkt.WriteBEFloat(a_Mob.GetHealth());
+	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
 
 	switch (a_Mob.GetMobType())
 	{
@@ -3051,9 +3052,9 @@ void cProtocol172::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Enderman = reinterpret_cast<const cEnderman &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8((Byte)(Enderman.GetCarriedBlock()));
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Enderman.GetCarriedBlock()));
 			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8((Byte)(Enderman.GetCarriedMeta()));
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Enderman.GetCarriedMeta()));
 			a_Pkt.WriteBEUInt8(0x12);
 			a_Pkt.WriteBEUInt8(Enderman.IsScreaming() ? 1 : 0);
 			break;
@@ -3280,9 +3281,9 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 
 	for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
 	{
-		Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
-		Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
-		Pkt.WriteString(((Json::Value)*itr).get("signature", "").asString());
+		Pkt.WriteString(itr->get("name", "").asString());
+		Pkt.WriteString(itr->get("value", "").asString());
+		Pkt.WriteString(itr->get("signature", "").asString());
 	}
 
 	Pkt.WriteFPInt(a_Player.GetPosX());

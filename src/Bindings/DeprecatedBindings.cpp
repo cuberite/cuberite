@@ -19,7 +19,7 @@
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockLightValue
 static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -29,12 +29,12 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushnumber(tolua_S, (lua_Number)cBlockInfo::GetLightValue((BLOCKTYPE)BlockType));
+	tolua_pushnumber(tolua_S, static_cast<lua_Number>(cBlockInfo::GetLightValue(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -47,7 +47,7 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockSpreadLightFalloff
 static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -57,12 +57,12 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushnumber(tolua_S, (lua_Number)cBlockInfo::GetSpreadLightFalloff((BLOCKTYPE)BlockType));
+	tolua_pushnumber(tolua_S, static_cast<lua_Number>(cBlockInfo::GetSpreadLightFalloff(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -75,7 +75,7 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockTransparent
 static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -85,12 +85,12 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsTransparent((BLOCKTYPE)BlockType));
+	tolua_pushboolean(tolua_S, cBlockInfo::IsTransparent(BlockType));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -103,7 +103,7 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockOneHitDig
 static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -113,12 +113,12 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsOneHitDig((BLOCKTYPE)BlockType));
+	tolua_pushboolean(tolua_S, cBlockInfo::IsOneHitDig(BlockType));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -131,7 +131,7 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockPistonBreakable
 static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -141,12 +141,12 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsPistonBreakable((BLOCKTYPE)BlockType));
+	tolua_pushboolean(tolua_S, cBlockInfo::IsPistonBreakable(BlockType));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -159,7 +159,7 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSnowable
 static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -169,12 +169,12 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsSnowable((BLOCKTYPE)BlockType));
+	tolua_pushboolean(tolua_S, cBlockInfo::IsSnowable(BlockType));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -187,7 +187,7 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSolid
 static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -197,12 +197,12 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, (bool)cBlockInfo::IsSolid((BLOCKTYPE)BlockType));
+	tolua_pushboolean(tolua_S, static_cast<bool>(cBlockInfo::IsSolid(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -215,7 +215,7 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockFullyOccupiesVoxel
 static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 {
-	int BlockType;
+	BLOCKTYPE BlockType;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -225,12 +225,12 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	BlockType = static_cast<BLOCKTYPE>(tolua_tonumber(tolua_S, 2, 0));
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, (bool)cBlockInfo::FullyOccupiesVoxel((BLOCKTYPE)BlockType));
+	tolua_pushboolean(tolua_S, static_cast<bool>(cBlockInfo::FullyOccupiesVoxel(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -256,8 +256,8 @@ static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
 	{
 		const AString a_MobString = tolua_tocppstring(LuaState, 1, 0);
 		eMonsterType MobType = cMonster::StringToMobType(a_MobString);
-		tolua_pushnumber(LuaState, (lua_Number) MobType);
-		tolua_pushcppstring(LuaState, (const char *) a_MobString);
+		tolua_pushnumber(LuaState, static_cast<lua_Number>(MobType));
+		tolua_pushcppstring(LuaState, a_MobString);
 	}
 
 	LOGWARNING("Warning in function call 'StringToMobType': StringToMobType() is deprecated. Please use cMonster:StringToMobType()");
@@ -298,15 +298,15 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	else
 	#endif
 	{
-		cWorld * self       = (cWorld *) tolua_tousertype (LuaState, 1, nullptr);
-		int BlockX          = (int)      tolua_tonumber   (LuaState, 2, 0);
-		int BlockY          = (int)      tolua_tonumber   (LuaState, 3, 0);
-		int BlockZ          = (int)      tolua_tonumber   (LuaState, 4, 0);
-		const AString Line1 =            tolua_tocppstring(LuaState, 5, 0);
-		const AString Line2 =            tolua_tocppstring(LuaState, 6, 0);
-		const AString Line3 =            tolua_tocppstring(LuaState, 7, 0);
-		const AString Line4 =            tolua_tocppstring(LuaState, 8, 0);
-		cPlayer * Player    = (cPlayer *)tolua_tousertype (LuaState, 9, nullptr);
+		cWorld * self       = reinterpret_cast<cWorld *>(tolua_tousertype (LuaState, 1, nullptr));
+		cPlayer * Player    = reinterpret_cast<cPlayer*>(tolua_tousertype (LuaState, 9, nullptr));
+		int BlockX          = static_cast<int>(tolua_tonumber(LuaState, 2, 0));
+		int BlockY          = static_cast<int>(tolua_tonumber(LuaState, 3, 0));
+		int BlockZ          = static_cast<int>(tolua_tonumber(LuaState, 4, 0));
+		const AString Line1 = tolua_tocppstring(LuaState, 5, 0);
+		const AString Line2 = tolua_tocppstring(LuaState, 6, 0);
+		const AString Line3 = tolua_tocppstring(LuaState, 7, 0);
+		const AString Line4 = tolua_tocppstring(LuaState, 8, 0);
 		#ifndef TOLUA_RELEASE
 		if (self == nullptr)
 		{

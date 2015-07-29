@@ -27,27 +27,27 @@ class cFloaterCallback :
 public:
 	cFloaterCallback(void) :
 		m_CanPickup(false),
-		m_AttachedMobID(-1)
+		m_AttachedMobID(cEntity::INVALID_ID)
 	{
 	}
 
 	virtual bool Item(cEntity * a_Entity) override
 	{
-		m_CanPickup = ((cFloater *)a_Entity)->CanPickup();
+		m_CanPickup = reinterpret_cast<cFloater *>(a_Entity)->CanPickup();
 		m_Pos = Vector3d(a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ());
-		m_AttachedMobID = ((cFloater *)a_Entity)->GetAttachedMobID();
+		m_AttachedMobID = reinterpret_cast<cFloater *>(a_Entity)->GetAttachedMobID();
 		a_Entity->Destroy(true);
 		return true;
 	}
 
 	bool CanPickup(void)       const { return m_CanPickup; }
-	bool IsAttached(void)      const { return (m_AttachedMobID != -1); }
-	int GetAttachedMobID(void) const { return m_AttachedMobID; }
+	bool IsAttached(void)      const { return (m_AttachedMobID != cEntity::INVALID_ID); }
+	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
 	Vector3d GetPos(void)      const { return m_Pos; }
 
 protected:
 	bool m_CanPickup;
-	int m_AttachedMobID;
+	UInt32 m_AttachedMobID;
 	Vector3d m_Pos;
 } ;
 
@@ -137,7 +137,7 @@ public:
 						}
 						case 2:
 						{
-							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, (short)a_World->GetTickRandomNumber(50)));  // Fishing rod with durability. TODO: Enchantments on it
+							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, static_cast<short>(a_World->GetTickRandomNumber(50))));  // Fishing rod with durability. TODO: Enchantments on it
 							break;
 						}
 						case 3:
@@ -168,7 +168,7 @@ public:
 					}
 					else if (Junk <= 4)
 					{
-						Drops.Add(cItem(E_ITEM_BOW, 1, (short)a_World->GetTickRandomNumber(64)));
+						Drops.Add(cItem(E_ITEM_BOW, 1, static_cast<short>(a_World->GetTickRandomNumber(64))));
 					}
 					else if (Junk <= 9)
 					{
@@ -244,7 +244,7 @@ public:
 		}
 		else
 		{
-			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), 100 + a_World->GetTickRandomNumber(800) - (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100));
+			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), static_cast<int>(100 + static_cast<unsigned int>(a_World->GetTickRandomNumber(800)) - (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
 			Floater->Initialize(*a_World);
 			a_Player->SetIsFishing(true, Floater->GetUniqueID());
 		}

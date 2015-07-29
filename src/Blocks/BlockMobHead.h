@@ -41,7 +41,7 @@ public:
 				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
 				
 				cItems Pickups;
-				Pickups.Add(E_ITEM_HEAD, 1, (short) MobHeadEntity->GetType());
+				Pickups.Add(E_ITEM_HEAD, 1, static_cast<short>(MobHeadEntity->GetType()));
 				MTRand r1;
 
 				// Mid-block position first

@@ -46,12 +46,15 @@ public:
 
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
-		switch ((int)a_Action)
+		switch (a_Action)
 		{
 			case dlaAttackEntity: return 1;
 			case dlaBreakBlock:   return 2;
 		}
+	
+		#ifndef __clang__
 		return 0;
+		#endif
 	}
 } ;
 

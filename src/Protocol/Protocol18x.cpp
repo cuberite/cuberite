@@ -140,8 +140,8 @@ void cProtocol180::DataReceived(const char * a_Data, size_t a_Size)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
-			AddReceivedData((const char *)Decrypted, NumBytes);
+			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
+			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -205,7 +205,7 @@ void cProtocol180::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 
 	cPacketizer Pkt(*this, 0x23);  // Block Change packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt32(((UInt32)a_BlockType << 4) | ((UInt32)a_BlockMeta & 15));
+	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
 }
 
 
@@ -219,12 +219,12 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	cPacketizer Pkt(*this, 0x22);  // Multi Block Change packet
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
-	Pkt.WriteVarInt32((UInt32)a_Changes.size());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
 		Int16 Coords = static_cast<Int16>(itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32((itr->m_BlockType & 0xFFF) << 4 | (itr->m_BlockMeta & 0xF));
+		Pkt.WriteVarInt32(static_cast<UInt32>(itr->m_BlockType & 0xFFF) << 4 | (itr->m_BlockMeta & 0xF));
 	}  // for itr - a_Changes[]
 }
 
@@ -403,7 +403,7 @@ void cProtocol180::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, in
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Amplifier));
-	Pkt.WriteVarInt32((UInt32)a_Duration);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Duration));
 	Pkt.WriteBool(false);  // Hide particles
 }
 
@@ -534,9 +534,9 @@ void cProtocol180::SendEntityVelocity(const cEntity & a_Entity)
 	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// 400 = 8000 / 20 ... Conversion from our speed in m / s to 8000 m / tick
-	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedX() * 400));
-	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedY() * 400));
-	Pkt.WriteBEInt16((short)(a_Entity.GetSpeedZ() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 }
 
 
@@ -588,7 +588,7 @@ void cProtocol180::SendHealth(void)
 	cPacketizer Pkt(*this, 0x06);  // Update Health packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetHealth()));
-	Pkt.WriteVarInt32((UInt32)Player->GetFoodLevel());
+	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetFoodLevel()));
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetFoodSaturationLevel()));
 }
 
@@ -622,7 +622,7 @@ void cProtocol180::SendInventorySlot(char a_WindowID, short a_SlotNum, const cIt
 
 
 
-void cProtocol180::SendKeepAlive(int a_PingID)
+void cProtocol180::SendKeepAlive(UInt32 a_PingID)
 {
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
@@ -646,10 +646,10 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
-		Pkt.WriteBEUInt8((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
-		Pkt.WriteBEInt8((char)a_World.GetDimension());
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
+		Pkt.WriteBEInt8(static_cast<Int8>(a_World.GetDimension()));
 		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteBEUInt8(Server->GetMaxPlayers());
+		Pkt.WriteBEUInt8(Clamp<UInt8>(Server->GetMaxPlayers(), 0, 255));
 		Pkt.WriteString("default");  // Level type - wtf?
 		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
 	}
@@ -658,7 +658,7 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, 0x05);  // Spawn Position packet
-		Pkt.WritePosition64((int)a_World.GetSpawnX(), (int)a_World.GetSpawnY(), (int)a_World.GetSpawnZ());
+		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
@@ -707,8 +707,8 @@ void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
 	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
 	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName().c_str());
-	Pkt.WritePosition64((int)PosX, (int)PosY, (int)PosZ);
-	Pkt.WriteBEInt8(a_Painting.GetProtocolFacing());
+	Pkt.WritePosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
+	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
 }
 
 
@@ -721,20 +721,20 @@ void cProtocol180::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataS
 	
 	cPacketizer Pkt(*this, 0x34);
 	Pkt.WriteVarInt32(a_Map.GetID());
-	Pkt.WriteBEUInt8(a_Map.GetScale());
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
 
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
 	for (const auto Decorator : a_Map.GetDecorators())
 	{
-		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<int>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF)));
-		Pkt.WriteBEUInt8(Decorator.GetPixelX());
-		Pkt.WriteBEUInt8(Decorator.GetPixelZ());
+		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF)));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
 	}
 
 	Pkt.WriteBEUInt8(128);
 	Pkt.WriteBEUInt8(128);
-	Pkt.WriteBEUInt8(a_DataStartX);
-	Pkt.WriteBEUInt8(a_DataStartY);
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartX));
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartY));
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetData().size()));
 	for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
 	{
@@ -897,9 +897,9 @@ void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(Properties.size());
 	for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
 	{
-		Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
-		Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
-		AString Signature = ((Json::Value)*itr).get("signature", "").asString();
+		Pkt.WriteString(static_cast<Json::Value>(*itr).get("name", "").asString());
+		Pkt.WriteString(static_cast<Json::Value>(*itr).get("value", "").asString());
+		AString Signature = static_cast<Json::Value>(*itr).get("signature", "").asString();
 		if (Signature.empty())
 		{
 			Pkt.WriteBool(false);
@@ -911,8 +911,8 @@ void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 		}
 	}
 
-	Pkt.WriteVarInt32((UInt32)a_Player.GetGameMode());
-	Pkt.WriteVarInt32((UInt32)a_Player.GetClientHandle()->GetPing());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetGameMode()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 	Pkt.WriteBool(false);
 }
 
@@ -942,7 +942,7 @@ void cProtocol180::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt32((UInt32)a_Player.GetGameMode());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetGameMode()));
 }
 
 
@@ -1095,7 +1095,7 @@ void cProtocol180::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 	
 	cPacketizer Pkt(*this, 0x1e);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEUInt8(a_EffectID);
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
 }
 
 
@@ -1124,9 +1124,9 @@ void cProtocol180::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimens
 
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEInt32((int)a_Dimension);
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Dimension));
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-	Pkt.WriteBEUInt8((Byte)Player->GetEffectiveGameMode());
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
 	Pkt.WriteString("default");
 	m_LastSentDimension = a_Dimension;
 }
@@ -1142,8 +1142,8 @@ void cProtocol180::SendExperience(void)
 	cPacketizer Pkt(*this, 0x1f);  // Experience Packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEFloat(Player->GetXpPercentage());
-	Pkt.WriteVarInt32((UInt32)Player->GetXpLevel());
-	Pkt.WriteVarInt32((UInt32)Player->GetCurrentXp());
+	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetXpLevel()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetCurrentXp()));
 }
 
 
@@ -1159,7 +1159,7 @@ void cProtocol180::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
 	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
 	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
-	Pkt.WriteBEInt16(a_ExpOrb.GetReward());
+	Pkt.WriteBEInt16(static_cast<Int16>(a_ExpOrb.GetReward()));
 }
 
 
@@ -1195,7 +1195,7 @@ void cProtocol180::SendScoreUpdate(const AString & a_Objective, const AString & 
 
 	if (a_Mode != 1)
 	{
-		Pkt.WriteVarInt32((UInt32) a_Score);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Score));
 	}
 }
 
@@ -1208,7 +1208,7 @@ void cProtocol180::SendDisplayObjective(const AString & a_Objective, cScoreboard
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x3d);
-	Pkt.WriteBEUInt8((int) a_Display);
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Display));
 	Pkt.WriteString(a_Objective);
 }
 
@@ -1268,11 +1268,11 @@ void cProtocol180::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 
 	cPacketizer Pkt(*this, 0x29);  // Sound Effect packet
 	Pkt.WriteString(a_SoundName);
-	Pkt.WriteBEInt32((int)(a_X * 8.0));
-	Pkt.WriteBEInt32((int)(a_Y * 8.0));
-	Pkt.WriteBEInt32((int)(a_Z * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Y * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
-	Pkt.WriteBEUInt8((Byte)(a_Pitch * 63));
+	Pkt.WriteBEUInt8(static_cast<Byte>(a_Pitch * 63));
 }
 
 
@@ -1306,10 +1306,10 @@ void cProtocol180::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteBEInt32(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 12));
-	Pkt.WriteBEInt16((short)(a_FallingBlock.GetSpeedX() * 400));
-	Pkt.WriteBEInt16((short)(a_FallingBlock.GetSpeedY() * 400));
-	Pkt.WriteBEInt16((short)(a_FallingBlock.GetSpeedZ() * 400));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_FallingBlock.GetBlockType()) | (static_cast<Int32>(a_FallingBlock.GetBlockMeta()) << 12));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedZ() * 400));
 }
 
 
@@ -1322,16 +1322,16 @@ void cProtocol180::SendSpawnMob(const cMonster & a_Mob)
 	
 	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8((Byte)a_Mob.GetMobType());
+	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
 	Pkt.WriteFPInt(a_Mob.GetPosX());
 	Pkt.WriteFPInt(a_Mob.GetPosY());
 	Pkt.WriteFPInt(a_Mob.GetPosZ());
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
-	Pkt.WriteBEInt16((short)(a_Mob.GetSpeedX() * 400));
-	Pkt.WriteBEInt16((short)(a_Mob.GetSpeedY() * 400));
-	Pkt.WriteBEInt16((short)(a_Mob.GetSpeedZ() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
 	Pkt.WriteBEUInt8(0x7f);  // Metadata terminator
 }
@@ -1353,7 +1353,7 @@ void cProtocol180::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 
 	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEUInt8(a_ObjectType);
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_ObjectType));
 	Pkt.WriteFPInt(PosX);
 	Pkt.WriteFPInt(a_Entity.GetPosY());
 	Pkt.WriteFPInt(PosZ);
@@ -1362,9 +1362,9 @@ void cProtocol180::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	Pkt.WriteBEInt32(a_ObjectData);
 	if (a_ObjectData != 0)
 	{
-		Pkt.WriteBEInt16((short)(a_Entity.GetSpeedX() * 400));
-		Pkt.WriteBEInt16((short)(a_Entity.GetSpeedY() * 400));
-		Pkt.WriteBEInt16((short)(a_Entity.GetSpeedZ() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 	}
 }
 
@@ -1378,7 +1378,7 @@ void cProtocol180::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	
 	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
-	Pkt.WriteBEUInt8(a_VehicleType);
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
 	Pkt.WriteFPInt(a_Vehicle.GetPosX());
 	Pkt.WriteFPInt(a_Vehicle.GetPosY());
 	Pkt.WriteFPInt(a_Vehicle.GetPosZ());
@@ -1387,9 +1387,9 @@ void cProtocol180::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	Pkt.WriteBEInt32(a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{
-		Pkt.WriteBEInt16((short)(a_Vehicle.GetSpeedX() * 400));
-		Pkt.WriteBEInt16((short)(a_Vehicle.GetSpeedY() * 400));
-		Pkt.WriteBEInt16((short)(a_Vehicle.GetSpeedZ() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedX() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedY() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedZ() * 400));
 	}
 }
 
@@ -1404,13 +1404,14 @@ void cProtocol180::SendStatistics(const cStatManager & a_Manager)
 	cPacketizer Pkt(*this, 0x37);
 	Pkt.WriteVarInt32(statCount);  // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
 
-	for (size_t i = 0; i < (size_t)statCount; ++i)
+	size_t Count = static_cast<size_t>(statCount);
+	for (size_t i = 0; i < Count; ++i)
 	{
-		StatValue Value = a_Manager.GetValue((eStatistic) i);
-		const AString & StatName = cStatInfo::GetName((eStatistic) i);
+		StatValue Value = a_Manager.GetValue(static_cast<eStatistic>(i));
+		const AString & StatName = cStatInfo::GetName(static_cast<eStatistic>(i));
 
 		Pkt.WriteString(StatName);
-		Pkt.WriteVarInt32(Value);
+		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
 	}
 }
 
@@ -1423,7 +1424,7 @@ void cProtocol180::SendTabCompletionResults(const AStringVector & a_Results)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x3a);  // Tab-Complete packet
-	Pkt.WriteVarInt32((int)a_Results.size());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Results.size()));
 
 	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
 	{
@@ -1601,7 +1602,7 @@ void cProtocol180::SendWholeInventory(const cWindow & a_Window)
 	
 	cPacketizer Pkt(*this, 0x30);  // Window Items packet
 	Pkt.WriteBEInt8(a_Window.GetWindowID());
-	Pkt.WriteBEInt16(a_Window.GetNumSlots());
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Window.GetNumSlots()));
 	cItems Slots;
 	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
 	for (cItems::const_iterator itr = Slots.begin(), end = Slots.end(); itr != end; ++itr)
@@ -1652,7 +1653,7 @@ void cProtocol180::SendWindowOpen(const cWindow & a_Window)
 		}
 		default:
 		{
-			Pkt.WriteBEInt8(a_Window.GetNumNonInventorySlots());
+			Pkt.WriteBEInt8(static_cast<Int8>(a_Window.GetNumNonInventorySlots()));
 			break;
 		}
 	}
@@ -1846,8 +1847,8 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		}
 		AString Hex;
 		CreateHexDump(Hex, a_Data, a_Size, 16);
-		m_CommLogFile.Printf("Incoming data: %d (0x%x) bytes: \n%s\n",
-			(unsigned)a_Size, (unsigned)a_Size, Hex.c_str()
+		m_CommLogFile.Printf("Incoming data: %u (0x%x) bytes: \n%s\n",
+			static_cast<unsigned>(a_Size), static_cast<unsigned>(a_Size), Hex.c_str()
 		);
 		m_CommLogFile.Flush();
 	}
@@ -1912,7 +1913,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		if (CompressedSize == 0)
 		{
 			// No compression was used, move directly
-			VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
+			VERIFY(m_ReceivedData.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
 		}
 		else
 		{
@@ -2189,14 +2190,14 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	// Decrypt EncNonce using privkey
 	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
-	int res = rsaDecryptor.Decrypt((const Byte *)EncNonce.data(), EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
+	int res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncNonce.data()), EncNonce.size(), reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
 	if (res != 4)
 	{
 		LOGD("Bad nonce length: got %d, exp %d", res, 4);
 		m_Client->Kick("Hacked client");
 		return;
 	}
-	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)
+	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)  // Cannot convert to c++ casts
 	{
 		LOGD("Bad nonce value");
 		m_Client->Kick("Hacked client");
@@ -2205,7 +2206,7 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	
 	// Decrypt the symmetric encryption key using privkey:
 	Byte DecryptedKey[MAX_ENC_LEN];
-	res = rsaDecryptor.Decrypt((const Byte *)EncKey.data(), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncKey.data()), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
 	if (res != 16)
 	{
 		LOGD("Bad key length");
@@ -2243,10 +2244,10 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		cPacketizer Pkt(*this, 0x01);
 		Pkt.WriteString(Server->GetServerID());
 		const AString & PubKeyDer = Server->GetPublicKeyDER();
-		Pkt.WriteVarInt32((short)PubKeyDer.size());
+		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
 		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
 		Pkt.WriteVarInt32(4);
-		Pkt.WriteBEInt32((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+		Pkt.WriteBEInt32((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :) Cannot convert to c++ casts
 		m_Client->SetUsername(Username);
 		return;
 	}
@@ -2405,7 +2406,7 @@ void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, KeepAliveID);
-	m_Client->HandleKeepAlive(static_cast<int>(KeepAliveID));
+	m_Client->HandleKeepAlive(static_cast<Int32>(KeepAliveID));
 }
 
 
@@ -2771,8 +2772,8 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
-			m_Client->SendData((const char *)Encrypted, NumBytes);
+			m_Encryptor.ProcessData(Encrypted, reinterpret_cast<Byte *>(const_cast<char*>(a_Data)), NumBytes);
+			m_Client->SendData(reinterpret_cast<const char *>(Encrypted), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -2877,7 +2878,7 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, (ENUM_ITEM_ID)a_Item.m_ItemType);
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
 				}
 				break;
 			}
@@ -2907,9 +2908,9 @@ void cProtocol180::StartEncryption(const Byte * a_Key)
 	cSha1Checksum Checksum;
 	cServer * Server = cRoot::Get()->GetServer();
 	const AString & ServerID = Server->GetServerID();
-	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update(reinterpret_cast<const Byte *>(ServerID.c_str()), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
+	Checksum.Update(reinterpret_cast<const Byte *>(Server->GetPublicKeyDER().data()), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
@@ -3045,7 +3046,7 @@ void cProtocol180::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		Writer.BeginCompound("display");
 		if (a_Item.m_ItemColor.IsValid())
 		{
-			Writer.AddInt("color", static_cast<int>(a_Item.m_ItemColor.m_Color));
+			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
 		}
 
 		if (!a_Item.IsCustomNameEmpty())
@@ -3149,8 +3150,8 @@ void cProtocol180::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_
 			Writer.AddInt("x", FlowerPotEntity.GetPosX());
 			Writer.AddInt("y", FlowerPotEntity.GetPosY());
 			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", (Int32) FlowerPotEntity.GetItem().m_ItemType);
-			Writer.AddInt("Data", (Int32) FlowerPotEntity.GetItem().m_ItemDamage);
+			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
+			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
 			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
@@ -3324,7 +3325,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 	}
 
 	a_Pkt.WriteBEUInt8(0x66);
-	a_Pkt.WriteBEFloat(a_Mob.GetHealth());
+	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
 
 	switch (a_Mob.GetMobType())
 	{
@@ -3340,7 +3341,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Creeper = reinterpret_cast<const cCreeper &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Creeper.IsBlowing() ? 1 : -1);
+			a_Pkt.WriteBEUInt8(Creeper.IsBlowing() ? 1 : 0);
 			a_Pkt.WriteBEUInt8(0x11);
 			a_Pkt.WriteBEUInt8(Creeper.IsCharged() ? 1 : 0);
 			break;
@@ -3397,7 +3398,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(0x50);  // Int at index 16
 			a_Pkt.WriteBEInt32(Flags);
 			a_Pkt.WriteBEUInt8(0x13);  // Byte at index 19
-			a_Pkt.WriteBEUInt8(Horse.GetHorseType());
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Horse.GetHorseType()));
 			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
 			int Appearance = 0;
 			Appearance = Horse.GetHorseColor();
@@ -3415,7 +3416,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & MagmaCube = reinterpret_cast<const cMagmaCube &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(MagmaCube.GetSize());
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(MagmaCube.GetSize()));
 			break;
 		}  // case mtMagmaCube
 
@@ -3445,7 +3446,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			
 			a_Pkt.WriteBEUInt8(0x10);
 			Byte SheepMetadata = 0;
-			SheepMetadata = Sheep.GetFurColor();
+			SheepMetadata = static_cast<Byte>(Sheep.GetFurColor());
 			if (Sheep.IsSheared())
 			{
 				SheepMetadata |= 0x10;
@@ -3477,7 +3478,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Slime = reinterpret_cast<const cSlime &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Slime.GetSize());
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
 
@@ -3503,7 +3504,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Wither = reinterpret_cast<const cWither &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
-			a_Pkt.WriteBEInt32(Wither.GetWitherInvulnerableTicks());
+			a_Pkt.WriteBEInt32(static_cast<Int32>(Wither.GetWitherInvulnerableTicks()));
 			a_Pkt.WriteBEUInt8(0x66);  // Float at index 6
 			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
 			break;
@@ -3533,7 +3534,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(0x13);
 			a_Pkt.WriteBEUInt8(Wolf.IsBegging() ? 1 : 0);
 			a_Pkt.WriteBEUInt8(0x14);
-			a_Pkt.WriteBEUInt8(Wolf.GetCollarColor());
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Wolf.GetCollarColor()));
 
 			a_Pkt.WriteBEUInt8(0x0c);
 			a_Pkt.WriteBEInt8(Wolf.GetAge());

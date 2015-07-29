@@ -25,7 +25,7 @@ public:
 		if (a_Meta == 0x7)
 		{
 			// Fully grown, drop the entire produce:
-			a_Pickups.push_back(cItem(E_ITEM_NETHER_WART, (char)(1 + (rand.NextInt(3) + rand.NextInt(3))) / 2, 0));
+			a_Pickups.push_back(cItem(E_ITEM_NETHER_WART, static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3))) / 2, 0));
 		}
 		else
 		{

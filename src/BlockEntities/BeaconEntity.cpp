@@ -49,14 +49,14 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 			{
 				if (!IsMineralBlock(Area.GetRelBlockType(X, Y, Z)))
 				{
-					return (Layer - 1);
+					return static_cast<char>(Layer - 1);
 				}
 			}
 		}
 		Layer++;
 	}
 
-	return (Layer - 1);
+	return static_cast<char>(Layer - 1);
 }
 
 

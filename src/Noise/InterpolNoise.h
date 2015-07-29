@@ -11,7 +11,7 @@
 
 #include "Noise.h"
 
-#define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
+#define FAST_FLOOR(x) (((x) < 0) ? ((static_cast<int>(x)) - 1) : (static_cast<int>(x)))
 
 
 
@@ -104,7 +104,7 @@ public:
 				}
 				else
 				{
-					(*m_WorkRnds)[x][y] = (NOISE_DATATYPE)m_Noise.IntNoise2D(cx, cy);
+					(*m_WorkRnds)[x][y] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise2D(cx, cy));
 				}
 			}
 		}
@@ -221,14 +221,14 @@ public:
 		m_CurFloorX = a_FloorX;
 		m_CurFloorY = a_FloorY;
 		m_CurFloorZ = a_FloorZ;
-		(*m_WorkRnds)[0][0][0] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY,     m_CurFloorZ);
-		(*m_WorkRnds)[0][0][1] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY,     m_CurFloorZ + 1);
-		(*m_WorkRnds)[0][1][0] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY + 1, m_CurFloorZ);
-		(*m_WorkRnds)[0][1][1] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY + 1, m_CurFloorZ + 1);
-		(*m_WorkRnds)[1][0][0] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY,     m_CurFloorZ);
-		(*m_WorkRnds)[1][0][1] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY,     m_CurFloorZ + 1);
-		(*m_WorkRnds)[1][1][0] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ);
-		(*m_WorkRnds)[1][1][1] = (NOISE_DATATYPE)m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ + 1);
+		(*m_WorkRnds)[0][0][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY,     m_CurFloorZ));
+		(*m_WorkRnds)[0][0][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY,     m_CurFloorZ + 1));
+		(*m_WorkRnds)[0][1][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY + 1, m_CurFloorZ));
+		(*m_WorkRnds)[0][1][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY + 1, m_CurFloorZ + 1));
+		(*m_WorkRnds)[1][0][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY,     m_CurFloorZ));
+		(*m_WorkRnds)[1][0][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY,     m_CurFloorZ + 1));
+		(*m_WorkRnds)[1][1][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ));
+		(*m_WorkRnds)[1][1][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ + 1));
 	}
 
 
@@ -265,7 +265,7 @@ public:
 					}
 					else
 					{
-						(*m_WorkRnds)[x][y][z] = (NOISE_DATATYPE)m_Noise.IntNoise3D(cx, cy, cz);
+						(*m_WorkRnds)[x][y][z] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(cx, cy, cz));
 					}
 				}  // for z
 			}  // for y

@@ -161,7 +161,7 @@ void cChunkGenerator::WaitForQueueEmpty(void)
 int cChunkGenerator::GetQueueLength(void)
 {
 	cCSLock Lock(m_CS);
-	return (int)m_Queue.size();
+	return static_cast<int>(m_Queue.size());
 }
 
 
@@ -210,7 +210,7 @@ void cChunkGenerator::Execute(void)
 			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
 			{
 				LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-					(double)NumChunksGenerated * CLOCKS_PER_SEC/ (clock() - GenerationStart),
+					static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC/ (clock() - GenerationStart),
 					NumChunksGenerated
 				);
 			}
@@ -242,7 +242,7 @@ void cChunkGenerator::Execute(void)
 		if ((NumChunksGenerated > 16) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
 		{
 			LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-				(double)NumChunksGenerated * CLOCKS_PER_SEC / (clock() - GenerationStart),
+				static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart),
 				NumChunksGenerated
 			);
 			LastReportTick = clock();

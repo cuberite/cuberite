@@ -36,7 +36,7 @@ static const int MAX_LIST_ITEMS = 10000;
 // cParsedNBT:
 
 #define NEEDBYTES(N) \
-	if (m_Length - m_Pos < (size_t)N) \
+	if (m_Length - m_Pos < static_cast<size_t>(N)) \
 	{ \
 		return false; \
 	}
@@ -90,7 +90,7 @@ bool cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringLen)
 {
 	NEEDBYTES(2);
 	a_StringStart = m_Pos + 2;
-	a_StringLen = (size_t)GetBEShort(m_Data + m_Pos);
+	a_StringLen = static_cast<size_t>(GetBEShort(m_Data + m_Pos));
 	if (a_StringLen > 0xffff)
 	{
 		// Suspicious string length
@@ -114,7 +114,7 @@ bool cParsedNBT::ReadCompound(void)
 	for (;;)
 	{
 		NEEDBYTES(1);
-		eTagType TagType = (eTagType)(m_Data[m_Pos]);
+		eTagType TagType = static_cast<eTagType>(m_Data[m_Pos]);
 		m_Pos++;
 		if (TagType == TAG_End)
 		{
@@ -123,13 +123,13 @@ bool cParsedNBT::ReadCompound(void)
 		m_Tags.push_back(cFastNBTTag(TagType, static_cast<int>(ParentIdx), PrevSibling));
 		if (PrevSibling >= 0)
 		{
-			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = (int)m_Tags.size() - 1;
+			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = static_cast<int>(m_Tags.size()) - 1;
 		}
 		else
 		{
-			m_Tags[ParentIdx].m_FirstChild = (int)m_Tags.size() - 1;
+			m_Tags[ParentIdx].m_FirstChild = static_cast<int>(m_Tags.size()) - 1;
 		}
-		PrevSibling = (int)m_Tags.size() - 1;
+		PrevSibling = static_cast<int>(m_Tags.size()) - 1;
 		RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
 		RETURN_FALSE_IF_FALSE(ReadTag());
 	}  // while (true)
@@ -349,7 +349,7 @@ cFastNBTWriter::cFastNBTWriter(const AString & a_RootTagName) :
 	m_Stack[0].m_Type = TAG_Compound;
 	m_Result.reserve(100 * 1024);
 	m_Result.push_back(TAG_Compound);
-	WriteString(a_RootTagName.data(), (UInt16)a_RootTagName.size());
+	WriteString(a_RootTagName.data(), static_cast<UInt16>(a_RootTagName.size()));
 }
 
 
@@ -397,12 +397,12 @@ void cFastNBTWriter::BeginList(const AString & a_Name, eTagType a_ChildrenType)
 	
 	TagCommon(a_Name, TAG_List);
 		
-	m_Result.push_back((char)a_ChildrenType);
-	m_Result.append(4, (char)0);
+	m_Result.push_back(static_cast<char>(a_ChildrenType));
+	m_Result.append(4, static_cast<char>(0));
 	
 	++m_CurrentStack;
 	m_Stack[m_CurrentStack].m_Type     = TAG_List;
-	m_Stack[m_CurrentStack].m_Pos      = (int)m_Result.size() - 4;
+	m_Stack[m_CurrentStack].m_Pos      = static_cast<int>(m_Result.size()) - 4;
 	m_Stack[m_CurrentStack].m_Count    = 0;
 	m_Stack[m_CurrentStack].m_ItemType = a_ChildrenType;
 }

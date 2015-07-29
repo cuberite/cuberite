@@ -132,7 +132,7 @@ protected:
 	unsigned int  m_SeedIdx1[BlocksPerYLayer * cChunkDef::Height];
 	unsigned char m_IsSeed2 [BlocksPerYLayer * cChunkDef::Height];
 	unsigned int  m_SeedIdx2[BlocksPerYLayer * cChunkDef::Height];
-	int m_NumSeeds;
+	size_t m_NumSeeds;
 
 	virtual void Execute(void) override;
 
@@ -158,8 +158,8 @@ protected:
 	/** Does one step in the light calculation - one seed propagation and seed recalculation */
 	void CalcLightStep(
 		NIBBLETYPE * a_Light,
-		int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
-		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
+		size_t a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
+		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
 	
 	/** Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage): */
@@ -168,7 +168,7 @@ protected:
 	inline void PropagateLight(
 		NIBBLETYPE * a_Light,
 		unsigned int a_SrcIdx, unsigned int a_DstIdx,
-		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
+		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	)
 	{
 		ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));

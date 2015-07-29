@@ -28,7 +28,7 @@ class cReader :
 		{
 			for (int z = 0; z < cChunkDef::Width; z++)
 			{
-				a_ChunkBuffer.CopyBlockTypes(OutputRows + OutputIdx * 16, InputIdx * 16, 16);
+				a_ChunkBuffer.CopyBlockTypes(OutputRows + OutputIdx * 16, static_cast<size_t>(InputIdx * 16), 16);
 				InputIdx++;
 				OutputIdx += 3;
 			}  // for z
@@ -386,14 +386,14 @@ void cLightingThread::PrepareSkyLight(void)
 			{
 				int CurrentIdx = idx + Current * BlocksPerYLayer;
 				m_IsSeed1[CurrentIdx] = true;
-				m_SeedIdx1[m_NumSeeds++] = CurrentIdx;
+				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(CurrentIdx);
 			}
 			
 			// Add seed from Current up to the highest neighbor:
 			for (int y = Current + 1, Index = idx + y * BlocksPerYLayer; y < MaxNeighbor; y++, Index += BlocksPerYLayer)
 			{
 				m_IsSeed1[Index] = true;
-				m_SeedIdx1[m_NumSeeds++] = Index;
+				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(Index);
 			}
 		}
 	}
@@ -426,7 +426,7 @@ void cLightingThread::PrepareBlockLight(void)
 				
 				// Add current block as a seed:
 				m_IsSeed1[Index] = true;
-				m_SeedIdx1[m_NumSeeds++] = Index;
+				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(Index);
 
 				// Light it up:
 				m_BlockLight[Index] = cBlockInfo::GetLightValue(m_BlockTypes[Index]);
@@ -470,7 +470,7 @@ void cLightingThread::PrepareBlockLight2(void)
 				
 				// Add current block as a seed:
 				m_IsSeed1[idx] = true;
-				m_SeedIdx1[m_NumSeeds++] = idx;
+				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(idx);
 
 				// Light it up:
 				m_BlockLight[idx] = cBlockInfo::GetLightValue(m_BlockTypes[idx]);
@@ -485,7 +485,7 @@ void cLightingThread::PrepareBlockLight2(void)
 
 void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 {
-	int NumSeeds2 = 0;
+	size_t NumSeeds2 = 0;
 	while (m_NumSeeds > 0)
 	{
 		// Buffer 1 -> buffer 2
@@ -510,15 +510,15 @@ void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 
 void cLightingThread::CalcLightStep(
 	NIBBLETYPE * a_Light,
-	int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
-	int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
+	size_t a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
+	size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 )
 {
 	UNUSED(a_IsSeedIn);
-	int NumSeedsOut = 0;
-	for (int i = 0; i < a_NumSeedsIn; i++)
+	size_t NumSeedsOut = 0;
+	for (size_t i = 0; i < a_NumSeedsIn; i++)
 	{
-		int SeedIdx = a_SeedIdxIn[i];
+		UInt32 SeedIdx = static_cast<UInt32>(a_SeedIdxIn[i]);
 		int SeedX = SeedIdx % (cChunkDef::Width * 3);
 		int SeedZ = (SeedIdx / (cChunkDef::Width * 3)) % (cChunkDef::Width * 3);
 		int SeedY = SeedIdx / BlocksPerYLayer;
@@ -566,7 +566,7 @@ void cLightingThread::CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_Ch
 		{
 			for (int x = 0; x < cChunkDef::Width; x += 2)
 			{
-				a_ChunkLight[OutIdx++] = (a_LightArray[InIdx + 1] << 4) | a_LightArray[InIdx];
+				a_ChunkLight[OutIdx++] = static_cast<NIBBLETYPE>(a_LightArray[InIdx + 1] << 4) | a_LightArray[InIdx];
 				InIdx += 2;
 			}
 			InIdx += cChunkDef::Width * 2;

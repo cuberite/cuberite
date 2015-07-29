@@ -29,7 +29,7 @@ class cChunkData
 {
 private:
 
-	static const size_t SectionHeight = 16;
+	static const int SectionHeight = 16;
 	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
 	static const size_t SectionBlockCount = SectionHeight * cChunkDef::Width * cChunkDef::Width;
 

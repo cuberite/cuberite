@@ -210,7 +210,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	}
 	ASSERT(m_BufferSize >= m_WritePos);
 	size_t TillEnd = m_BufferSize - m_WritePos;
-	const char * Bytes = (const char *)a_Bytes;
+	const char * Bytes = reinterpret_cast<const char *>(a_Bytes);
 	if (TillEnd <= a_Count)
 	{
 		// Need to wrap around the ringbuffer end
@@ -548,7 +548,7 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 	{
 		LOGWARNING("%s: String too large: %u (%u KiB)", __FUNCTION__, Size, Size / 1024);
 	}
-	return ReadString(a_Value, (size_t)Size);
+	return ReadString(a_Value, static_cast<size_t>(Size));
 }
 
 
@@ -589,9 +589,9 @@ bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 	UInt32 BlockZRaw = (Value & 0x03ffffff);        // Bottom 26 bits
 	
 	// If the highest bit in the number's range is set, convert the number into negative:
-	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? BlockXRaw : -(0x04000000 - (int)BlockXRaw);
-	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? BlockYRaw : -(0x0800     - (int)BlockYRaw);
-	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? BlockZRaw : -(0x04000000 - (int)BlockZRaw);
+	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : -(0x04000000 - static_cast<int>(BlockXRaw));
+	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? static_cast<int>(BlockYRaw) : -(0x0800     - static_cast<int>(BlockYRaw));
+	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : -(0x04000000 - static_cast<int>(BlockZRaw));
 	return true;
 }
 
@@ -839,7 +839,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(a_Count);
-	char * Dst = (char *)a_Buffer;  // So that we can do byte math
+	char * Dst = reinterpret_cast<char *>(a_Buffer);  // So that we can do byte math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
 	if (BytesToEndOfBuffer <= a_Count)
@@ -872,7 +872,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Count);
-	char * Src = (char *)a_Buffer;  // So that we can do byte math
+	char * Src = reinterpret_cast<char *>(const_cast<void*>(a_Buffer));  // So that we can do byte math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_WritePos;
 	if (BytesToEndOfBuffer <= a_Count)

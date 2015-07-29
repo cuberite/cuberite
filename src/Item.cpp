@@ -169,11 +169,11 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 
 void cItem::FromJson(const Json::Value & a_Value)
 {
-	m_ItemType = (ENUM_ITEM_ID)a_Value.get("ID", -1).asInt();
+	m_ItemType = static_cast<ENUM_ITEM_ID>(a_Value.get("ID", -1).asInt());
 	if (m_ItemType > 0)
 	{
-		m_ItemCount = (char)a_Value.get("Count", -1).asInt();
-		m_ItemDamage = (short)a_Value.get("Health", -1).asInt();
+		m_ItemCount = static_cast<char>(a_Value.get("Count", -1).asInt());
+		m_ItemDamage = static_cast<short>(a_Value.get("Health", -1).asInt());
 		m_Enchantments.Clear();
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
 		m_CustomName = a_Value.get("Name", "").asString();
@@ -195,8 +195,8 @@ void cItem::FromJson(const Json::Value & a_Value)
 		{
 			m_FireworkItem.m_HasFlicker = a_Value.get("Flicker", false).asBool();
 			m_FireworkItem.m_HasTrail = a_Value.get("Trail", false).asBool();
-			m_FireworkItem.m_Type = (NIBBLETYPE)a_Value.get("Type", 0).asInt();
-			m_FireworkItem.m_FlightTimeInTicks = (short)a_Value.get("FlightTimeInTicks", 0).asInt();
+			m_FireworkItem.m_Type = static_cast<NIBBLETYPE>(a_Value.get("Type", 0).asInt());
+			m_FireworkItem.m_FlightTimeInTicks = static_cast<short>(a_Value.get("FlightTimeInTicks", 0).asInt());
 			m_FireworkItem.ColoursFromString(a_Value.get("Colours", "").asString(), m_FireworkItem);
 			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
 		}
@@ -334,9 +334,9 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	}
 
 	cFastRandom Random;
-	int ModifiedEnchantmentLevel = a_NumXPLevels + (int)Random.NextFloat((float)Enchantability / 4) + (int)Random.NextFloat((float)Enchantability / 4) + 1;
+	int ModifiedEnchantmentLevel = a_NumXPLevels + static_cast<int>(Random.NextFloat(static_cast<float>(Enchantability / 4))) + static_cast<int>(Random.NextFloat(static_cast<float>(Enchantability / 4))) + 1;
 	float RandomBonus = 1.0F + (Random.NextFloat(1) + Random.NextFloat(1) - 1.0F) * 0.15F;
-	int FinalEnchantmentLevel = (int)(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
+	int FinalEnchantmentLevel = static_cast<int>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments Enchantments;
 	cEnchantments::AddItemEnchantmentWeights(Enchantments, m_ItemType, FinalEnchantmentLevel);
@@ -353,7 +353,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Checking for conflicting enchantments
 	cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment1);
 
-	float NewEnchantmentLevel = (float)a_NumXPLevels;
+	float NewEnchantmentLevel = static_cast<float>(a_NumXPLevels);
 
 	// Next Enchantment (Second)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2;
@@ -407,12 +407,12 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 
 cItem * cItems::Get(int a_Idx)
 {
-	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
 		LOGWARNING("cItems: Attempt to get an out-of-bounds item at index %d; there are currently " SIZE_T_FMT " items. Returning a nil.", a_Idx, size());
 		return nullptr;
 	}
-	return &at(a_Idx);
+	return &at(static_cast<size_t>(a_Idx));
 }
 
 
@@ -421,12 +421,12 @@ cItem * cItems::Get(int a_Idx)
 
 void cItems::Set(int a_Idx, const cItem & a_Item)
 {
-	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
 		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently " SIZE_T_FMT " items. Not setting.", a_Idx, size());
 		return;
 	}
-	at(a_Idx) = a_Item;
+	at(static_cast<size_t>(a_Idx)) = a_Item;
 }
 
 
@@ -435,7 +435,7 @@ void cItems::Set(int a_Idx, const cItem & a_Item)
 
 void cItems::Delete(int a_Idx)
 {
-	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
 		LOGWARNING("cItems: Attempt to delete an item at an out-of-bounds index %d; there are currently " SIZE_T_FMT " items. Ignoring.", a_Idx, size());
 		return;
@@ -449,12 +449,12 @@ void cItems::Delete(int a_Idx)
 
 void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage)
 {
-	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
 		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently " SIZE_T_FMT " items. Not setting.", a_Idx, size());
 		return;
 	}
-	at(a_Idx) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);
+	at(static_cast<size_t>(a_Idx)) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);
 }
 
 

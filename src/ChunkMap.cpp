@@ -606,7 +606,7 @@ void cChunkMap::BroadcastParticleEffect(const AString & a_ParticleName, float a_
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk((int) a_SrcX, (int) a_SrcZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(FloorC(a_SrcX), FloorC(a_SrcZ), ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
 	{
@@ -642,7 +642,7 @@ void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, double a_X, do
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk((int)std::floor(a_X), (int)std::floor(a_Z), ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(FloorC(std::floor(a_X)), FloorC(std::floor(a_Z)), ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
 	{
@@ -1182,9 +1182,9 @@ void cChunkMap::SetBlocks(const sSetBlockVector & a_Blocks)
 
 void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 {
-	int BlockX = (int)(a_Player.GetPosX());  // Truncating doesn't matter much; we're scanning entire chunks anyway
-	int BlockY = (int)(a_Player.GetPosY());
-	int BlockZ = (int)(a_Player.GetPosZ());
+	int BlockX = static_cast<int>(a_Player.GetPosX());  // Truncating doesn't matter much; we're scanning entire chunks anyway
+	int BlockY = static_cast<int>(a_Player.GetPosY());
+	int BlockZ = static_cast<int>(a_Player.GetPosZ());
 	int ChunkX = 0, ChunkZ = 0;
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	int OtherChunkX = ChunkX + ((BlockX > 8) ? 1 : -1);
@@ -1828,10 +1828,10 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
 {
 	// Calculate the chunk range for the box:
-	int MinChunkX = (int)floor(a_Box.GetMinX() / cChunkDef::Width);
-	int MinChunkZ = (int)floor(a_Box.GetMinZ() / cChunkDef::Width);
-	int MaxChunkX = (int)floor((a_Box.GetMaxX() + cChunkDef::Width) / cChunkDef::Width);
-	int MaxChunkZ = (int)floor((a_Box.GetMaxZ() + cChunkDef::Width) / cChunkDef::Width);
+	int MinChunkX = FloorC(a_Box.GetMinX() / cChunkDef::Width);
+	int MinChunkZ = FloorC(a_Box.GetMinZ() / cChunkDef::Width);
+	int MaxChunkX = FloorC((a_Box.GetMaxX() + cChunkDef::Width) / cChunkDef::Width);
+	int MaxChunkZ = FloorC((a_Box.GetMaxZ() + cChunkDef::Width) / cChunkDef::Width);
 	
 	// Iterate over each chunk in the range:
 	cCSLock Lock(m_CSLayers);
@@ -1868,26 +1868,26 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	bool ShouldDestroyBlocks = true;
 
 	// Don't explode if the explosion center is inside a liquid block:
-	if (IsBlockLiquid(m_World->GetBlock((int)floor(a_BlockX), (int)floor(a_BlockY), (int)floor(a_BlockZ))))
+	if (IsBlockLiquid(m_World->GetBlock(FloorC(a_BlockX), FloorC(a_BlockY), FloorC(a_BlockZ))))
 	{
 		ShouldDestroyBlocks = false;
 	}
 
-	int ExplosionSizeInt = (int)ceil(a_ExplosionSize);
+	int ExplosionSizeInt = CeilC(a_ExplosionSize);
 	int ExplosionSizeSq = ExplosionSizeInt * ExplosionSizeInt;
 
-	int bx = (int)floor(a_BlockX);
-	int by = (int)floor(a_BlockY);
-	int bz = (int)floor(a_BlockZ);
+	int bx = FloorC(a_BlockX);
+	int by = FloorC(a_BlockY);
+	int bz = FloorC(a_BlockZ);
 
-	int MinY = std::max((int)floor(a_BlockY - ExplosionSizeInt), 0);
-	int MaxY = std::min((int)ceil(a_BlockY + ExplosionSizeInt), cChunkDef::Height - 1);
+	int MinY = std::max(FloorC(a_BlockY - ExplosionSizeInt), 0);
+	int MaxY = std::min(CeilC(a_BlockY + ExplosionSizeInt), cChunkDef::Height - 1);
 
 	if (ShouldDestroyBlocks)
 	{
 		cBlockArea area;
-		a_BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
-		if (!area.Read(m_World, bx - ExplosionSizeInt, (int)ceil(a_BlockX + ExplosionSizeInt), MinY, MaxY, bz - ExplosionSizeInt, (int)ceil(a_BlockZ + ExplosionSizeInt)))
+		a_BlocksAffected.reserve(8 * static_cast<size_t>(ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt));
+		if (!area.Read(m_World, bx - ExplosionSizeInt, static_cast<int>(ceil(a_BlockX + ExplosionSizeInt)), MinY, MaxY, bz - ExplosionSizeInt, static_cast<int>(ceil(a_BlockZ + ExplosionSizeInt))))
 		{
 			return;
 		}
@@ -2017,7 +2017,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				}
 
 				// Ensure that the damage dealt is inversely proportional to the distance to the TNT centre - the closer a player is, the harder they are hit
-				a_Entity->TakeDamage(dtExplosion, nullptr, (int)((1 / DistanceFromExplosion.Length()) * 6 * m_ExplosionSize), 0);
+				a_Entity->TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / DistanceFromExplosion.Length()) * 6 * m_ExplosionSize), 0);
 			}
 
 			// Apply force to entities around the explosion - code modified from World.cpp DoExplosionAt()

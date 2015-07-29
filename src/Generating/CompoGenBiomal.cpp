@@ -365,8 +365,8 @@ protected:
 			case biMegaSpruceTaigaHills:
 			{
 				// Select the pattern to use - podzol, grass or grassless dirt:
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
-				NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
+				NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
+				NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 				NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
 				const cPattern::BlockInfo * Pattern = (Val < -0.9) ? patGrassLess.Get() : ((Val > 0) ? patPodzol.Get() : patGrass.Get());
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
@@ -407,8 +407,8 @@ protected:
 			case biExtremeHillsM:
 			{
 				// Select the pattern to use - gravel, stone or grass:
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
-				NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
+				NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
+				NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 				NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
 				const cPattern::BlockInfo * Pattern = (Val < 0.0) ? patStone.Get() : patGrass.Get();
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
@@ -493,9 +493,9 @@ protected:
 			return;
 		}
 
-		NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
-		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
-		int ClayFloor = m_SeaLevel - 6 + (int)(4.f * m_MesaFloor.CubicNoise2D(NoiseX, NoiseY));
+		NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
+		NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
+		int ClayFloor = m_SeaLevel - 6 + static_cast<int>(4.f * m_MesaFloor.CubicNoise2D(NoiseX, NoiseY));
 		if (ClayFloor >= Top)
 		{
 			ClayFloor = Top - 1;
@@ -577,8 +577,8 @@ protected:
 		const NOISE_DATATYPE FrequencyZ = 3;
 
 		// Select the ocean-floor pattern to use:
-		NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
-		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
+		NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
+		NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 		NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
 		if (Val < -0.95)
 		{

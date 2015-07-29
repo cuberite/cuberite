@@ -21,7 +21,7 @@ public:
 		cFastRandom Random;
 
 		// Add more than one dust
-		a_Pickups.push_back(cItem(E_ITEM_GLOWSTONE_DUST, (char)(2 + Random.NextInt(3)), 0));
+		a_Pickups.push_back(cItem(E_ITEM_GLOWSTONE_DUST, static_cast<char>(2 + Random.NextInt(3)), 0));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

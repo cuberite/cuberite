@@ -456,7 +456,7 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 			break;
 		}
 
-		a_Response.append((const char *)buf, (size_t)ret);
+		a_Response.append(reinterpret_cast<const char *>(buf), static_cast<size_t>(ret));
 	}
 
 	return true;
@@ -919,7 +919,7 @@ void cMojangAPI::Update(void)
 	}
 	if (!PlayerNames.empty())
 	{
-		LOG("cMojangAPI: Updating name-to-uuid cache for %u names", (unsigned)PlayerNames.size());
+		LOG("cMojangAPI: Updating name-to-uuid cache for %u names", static_cast<unsigned>(PlayerNames.size()));
 		QueryNamesToUUIDs(PlayerNames);
 	}
 
@@ -937,7 +937,7 @@ void cMojangAPI::Update(void)
 	}
 	if (!ProfileUUIDs.empty())
 	{
-		LOG("cMojangAPI: Updating uuid-to-profile cache for %u uuids", (unsigned)ProfileUUIDs.size());
+		LOG("cMojangAPI: Updating uuid-to-profile cache for %u uuids", static_cast<unsigned>(ProfileUUIDs.size()));
 		for (AStringVector::const_iterator itr = ProfileUUIDs.begin(), end = ProfileUUIDs.end(); itr != end; ++itr)
 		{
 			QueryUUIDToProfile(*itr);

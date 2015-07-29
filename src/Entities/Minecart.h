@@ -127,7 +127,7 @@ public:
 	};
 	
 	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
-	void SetSlot(size_t a_Idx, const cItem & a_Item) { m_Contents.SetSlot(static_cast<int>(a_Idx), a_Item); }
+	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
 protected:
 	cItemGrid m_Contents;

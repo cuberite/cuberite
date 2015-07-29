@@ -70,8 +70,8 @@ cFireSimulator::cFireSimulator(cWorld & a_World, cIniFile & a_IniFile) :
 	cSimulator(a_World)
 {
 	// Read params from the ini file:
-	m_BurnStepTimeFuel    = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel",     500);
-	m_BurnStepTimeNonfuel = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100);
+	m_BurnStepTimeFuel    = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel",     500));
+	m_BurnStepTimeNonfuel = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100));
 	m_Flammability        = a_IniFile.GetValueSetI("FireSimulator", "Flammability",          50);
 	m_ReplaceFuelChance   = a_IniFile.GetValueSetI("FireSimulator", "ReplaceFuelChance",  50000);
 }
@@ -265,7 +265,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		}
 		if (IsFuel(BlockBelow))
 		{
-			return m_BurnStepTimeFuel;
+			return static_cast<int>(m_BurnStepTimeFuel);
 		}
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
@@ -278,7 +278,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		{
 			if (IsFuel(BlockType))
 			{
-				return m_BurnStepTimeFuel;
+				return static_cast<int>(m_BurnStepTimeFuel);
 			}
 		}
 	}  // for i - gCrossCoords[]
@@ -291,7 +291,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 		return 0;
 	}
-	return m_BurnStepTimeNonfuel;
+	return static_cast<int>(m_BurnStepTimeNonfuel);
 }
 
 

@@ -82,7 +82,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_bDirtyExperience(false),
 	m_IsChargingBow(false),
 	m_BowCharge(0),
-	m_FloaterID(-1),
+	m_FloaterID(cEntity::INVALID_ID),
 	m_Team(nullptr),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
@@ -508,7 +508,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		if (Dist >= 2.0)  // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
 		{
 			// Increment statistic
-			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
+			m_Stats.AddValue(statDistFallen, FloorC<StatValue>(Dist * 100 + 0.5));
 		}
 
 		int Damage = static_cast<int>(Dist - 3.f);
@@ -878,7 +878,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
-		cPlayer * Attacker = (cPlayer *)a_TDI.Attacker;
+		cPlayer * Attacker = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
 
 		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
 		{
@@ -896,7 +896,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		AddFoodExhaustion(0.3f);
 		SendHealth();
 
-		m_Stats.AddValue(statDamageTaken, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
+		m_Stats.AddValue(statDamageTaken, FloorC<StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
 	}
 	return false;
@@ -926,7 +926,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
-	m_Stats.AddValue(statItemsDropped, (StatValue)Pickups.Size());
+	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(Pickups.Size()));
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -969,7 +969,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{
-		cPlayer * Killer = (cPlayer *)a_TDI.Attacker;
+		cPlayer * Killer = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
 		AString DeathMessage = Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
@@ -1010,7 +1010,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 	}
 	else if (a_Victim->IsMob())
 	{
-		if (((cMonster *)a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		if (reinterpret_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
 			AwardAchievement(achKillMonster);
 		}
@@ -1293,7 +1293,7 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 
 	if (Old > 0)
 	{
-		return m_Stats.AddValue(a_Ach);
+		return static_cast<unsigned int>(m_Stats.AddValue(a_Ach));
 	}
 	else
 	{
@@ -1311,7 +1311,7 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 		// Achievement Get!
 		m_ClientHandle->SendStatistics(m_Stats);
 
-		return New;
+		return static_cast<unsigned int>(New);
 	}
 }
 
@@ -1630,7 +1630,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 		return;
 	}
 
-	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
+	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(a_Items.Size()));
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
@@ -1781,18 +1781,18 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if (JSON_PlayerPosition.size() == 3)
 	{
-		SetPosX(JSON_PlayerPosition[(unsigned)0].asDouble());
-		SetPosY(JSON_PlayerPosition[(unsigned)1].asDouble());
-		SetPosZ(JSON_PlayerPosition[(unsigned)2].asDouble());
+		SetPosX(JSON_PlayerPosition[0].asDouble());
+		SetPosY(JSON_PlayerPosition[1].asDouble());
+		SetPosZ(JSON_PlayerPosition[2].asDouble());
 		m_LastPos = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		SetYaw      (static_cast<float>(JSON_PlayerRotation[(unsigned)0].asDouble()));
-		SetPitch    (static_cast<float>(JSON_PlayerRotation[(unsigned)1].asDouble()));
-		SetRoll     (static_cast<float>(JSON_PlayerRotation[(unsigned)2].asDouble()));
+		SetYaw      (static_cast<float>(JSON_PlayerRotation[0].asDouble()));
+		SetPitch    (static_cast<float>(JSON_PlayerRotation[1].asDouble()));
+		SetRoll     (static_cast<float>(JSON_PlayerRotation[2].asDouble()));
 	}
 
 	m_Health              = root.get("health",         0).asInt();
@@ -1805,7 +1805,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_CurrentXp           = root.get("xpCurrent",      0).asInt();
 	m_IsFlying            = root.get("isflying",       0).asBool();
 
-	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
+	m_GameMode = static_cast<eGameMode>(root.get("gamemode", eGameMode_NotSet).asInt());
 
 	if (m_GameMode == eGameMode_Creative)
 	{
@@ -1948,7 +1948,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 
 	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
 	cItem Item = GetEquippedItem();
-	int UnbreakingLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
+	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
 	if (UnbreakingLevel > 0)
 	{
 		int chance;
@@ -1968,7 +1968,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 		}
 	}
 
-	if (GetInventory().DamageEquippedItem(a_Amount))
+	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
 	{
 		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}
@@ -2104,7 +2104,7 @@ bool cPlayer::IsClimbing(void) const
 
 void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 {
-	StatValue Value = (StatValue)floor(a_DeltaPos.Length() * 100 + 0.5);
+	StatValue Value = FloorC<StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 
 	if (m_AttachedTo == nullptr)
 	{
@@ -2112,7 +2112,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		{
 			if (a_DeltaPos.y > 0.0)  // Going up
 			{
-				m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
+				m_Stats.AddValue(statDistClimbed, FloorC<StatValue>(a_DeltaPos.y * 100 + 0.5));
 			}
 		}
 		else if (IsSubmerged())
@@ -2146,7 +2146,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 			case cEntity::etBoat:     m_Stats.AddValue(statDistBoat,     Value); break;
 			case cEntity::etMonster:
 			{
-				cMonster * Monster = (cMonster *)m_AttachedTo;
+				cMonster * Monster = reinterpret_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
 					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;

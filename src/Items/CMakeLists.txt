@@ -57,7 +57,7 @@ SET (HDRS
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(ItemHandler.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=old-style-cast -Wno-error=switch-enum")
+	set_source_files_properties(ItemHandler.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch-enum")
 endif()
 
 if(NOT MSVC)

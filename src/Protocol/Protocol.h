@@ -96,7 +96,7 @@ public:
 	virtual void SendHealth                     (void) = 0;
 	virtual void SendHideTitle                  (void) = 0;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
-	virtual void SendKeepAlive                  (int a_PingID) = 0;
+	virtual void SendKeepAlive                  (UInt32 a_PingID) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
 	virtual void SendLoginSuccess               (void) = 0;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) = 0;

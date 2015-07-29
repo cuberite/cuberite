@@ -115,12 +115,12 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 	/// Read a 11x7x11 area.
 	Surrounding.Read(
 		m_World,
-		(int) GetPosX() - 5,
-		(int) GetPosX() + 6,
-		(int) GetPosY() - 3,
-		(int) GetPosY() + 4,
-		(int) GetPosZ() - 5,
-		(int) GetPosZ() + 6
+		static_cast<int>(GetPosX()) - 5,
+		static_cast<int>(GetPosX()) + 6,
+		static_cast<int>(GetPosY()) - 3,
+		static_cast<int>(GetPosY()) + 4,
+		static_cast<int>(GetPosZ()) - 5,
+		static_cast<int>(GetPosZ()) + 6
 	);
 
 	for (int I = 0; I < 5; I++)
@@ -142,8 +142,8 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			}
 
 			m_VillagerAction = true;
-			m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
-			MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) m_CropsPos.y, (float) (m_CropsPos.z + 0.5)));
+			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - 5, static_cast<int>(GetPosY()) + Y - 3, static_cast<int>(GetPosZ()) + Z - 5);
+			MoveToPosition(Vector3f(static_cast<float>(m_CropsPos.x + 0.5), static_cast<float>(m_CropsPos.y), static_cast<float>(m_CropsPos.z + 0.5)));
 			return;
 		}  // for Y loop.
 	}  // Repeat the procces 5 times.

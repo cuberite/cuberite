@@ -238,7 +238,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
 			if (
-				(IsOnGround() && (GetSpeedX() == 0) && (GetSpeedY() == 0)) ||
+				(IsOnGround() && (GetSpeedX() == 0.0f) && (GetSpeedY() == 0.0f)) ||
 				(IsSwimming() && (m_GiveUpCounter < 15))
 			)
 			{
@@ -257,7 +257,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 	}
 
 	Vector3d Distance = m_NextWayPointPosition - GetPosition();
-	if ((Distance.x != 0) || (Distance.z != 0))
+	if ((Distance.x != 0.0f) || (Distance.z != 0.0f))
 	{
 		Distance.y = 0;
 		Distance.Normalize();
@@ -581,9 +581,9 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	int PosY = POSY_TOINT;
 	PosY = Clamp(PosY, 0, cChunkDef::Height);
 
-	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
+	if (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))))
 	{
-		while (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))) && (PosY > 0))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))) && (PosY > 0))
 		{
 			PosY--;
 		}
@@ -592,7 +592,7 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	}
 	else
 	{
-		while ((PosY < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
+		while ((PosY < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(static_cast<int>(floor(a_PosX)), PosY, static_cast<int>(floor(a_PosZ)))))
 		{
 			PosY++;
 		}
@@ -732,7 +732,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 void cMonster::CheckEventSeePlayer(void)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance, false);
+	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), false);
 
 	if (Closest != nullptr)
 	{
@@ -800,8 +800,8 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt)
 		m_IdleInterval -= std::chrono::seconds(1);  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
-		Dist.x = (double)m_World->GetTickRandomNumber(10) - 5;
-		Dist.z = (double)m_World->GetTickRandomNumber(10) - 5;
+		Dist.x = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
+		Dist.z = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
 
 		if ((Dist.SqrLength() > 2)  && (rem >= 3))
 		{
@@ -1068,7 +1068,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				VillagerType = 0;
 			}
 
-			toReturn = new cVillager((cVillager::eVillagerType)VillagerType);
+			toReturn = new cVillager(static_cast<cVillager::eVillagerType>(VillagerType));
 			break;
 		}
 		case mtHorse:
@@ -1130,10 +1130,10 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
 	MTRand r1;
-	int Count = r1.randInt() % (a_Max + 1 - a_Min) + a_Min;
+	int Count = static_cast<int>(static_cast<unsigned int>(r1.randInt()) % (a_Max + 1 - a_Min) + a_Min);
 	if (Count > 0)
 	{
-		a_Drops.push_back(cItem(a_Item, Count, a_ItemHealth));
+		a_Drops.push_back(cItem(a_Item, static_cast<char>(Count), a_ItemHealth));
 	}
 }
 
@@ -1158,10 +1158,10 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel)
 {
 	MTRand r1;
-	unsigned int Count = r1.randInt() % 200;
+	unsigned int Count = static_cast<unsigned int>(static_cast<unsigned long>(r1.randInt()) % 200);
 	if (Count < (5 + a_LootingLevel))
 	{
-		int Rare = r1.randInt() % a_Items.Size();
+		size_t Rare = static_cast<size_t>(r1.randInt()) % a_Items.Size();
 		a_Drops.push_back(a_Items.at(Rare));
 	}
 }

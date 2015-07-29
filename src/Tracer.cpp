@@ -264,7 +264,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			int Normal = GetHitNormal(a_Start, End, pos);
 			if (Normal > 0)
 			{
-				HitNormal = m_NormalTable()[Normal - 1];
+				HitNormal = m_NormalTable()[static_cast<size_t>(Normal - 1)];
 			}
 			return true;
 		}
@@ -349,7 +349,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Vector3i & a_BlockPos)
 {
 	Vector3i SmallBlockPos = a_BlockPos;
-	char BlockID = m_World->GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+	BLOCKTYPE BlockID = static_cast<BLOCKTYPE>(m_World->GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z));
 
 	if ((BlockID == E_BLOCK_AIR) || IsBlockWater(BlockID))
 	{

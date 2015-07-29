@@ -216,7 +216,7 @@ public:
 	void TossItems(cPlayer & a_Player, int a_Begin, int a_End);
 	
 protected:
-	typedef std::map<int, std::vector<cItem> > cItemMap;  // Maps EntityID -> items
+	typedef std::map<UInt32, std::vector<cItem> > cItemMap;  // Maps EntityID -> items
 	
 	cItemMap m_Items;
 	
