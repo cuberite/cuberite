@@ -111,6 +111,9 @@ public:
 
 	// tolua_end
 
+	/** Merge enchantments, check for valid enchantments on item type */
+	int Merge(const cEnchantments & a_Other, short a_ItemType, short a_MergeItemType);
+
 	/** Add enchantment weights from item to the vector */
 	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
 
@@ -125,6 +128,12 @@ public:
 
 	/** Check enchantment conflicts from enchantments from the vector */
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
+
+	/** Check if enchantment is valid for item type */
+	static bool IsValidEnchantment(short a_ItemType, int a_EnchantmentID);
+
+	/** Check level caps on enchantment */
+	static unsigned int GetLevelCap(int a_EnchantmentID, unsigned int a_EnchantmentLevel);
 
 	/** Gets random enchantment from Vector and returns it */
 	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);

@@ -1053,25 +1053,29 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	cItem Input(*GetSlot(0, a_Player));
 	cItem SecondInput(*GetSlot(1, a_Player));
 	cItem Output(*GetSlot(2, a_Player));
-	
+
 	if (Input.IsEmpty())
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
 		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SendSlot(a_Player, this, 2);
 		return;
 	}
 
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
 	int RepairCost = Input.m_RepairCost;
+	int EnchantmentCost = 0;
 	int NeedExp = 0;
 	bool IsEnchantBook = false;
+
 	if (!SecondInput.IsEmpty())
 	{
 		IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
-		
+
 		RepairCost += SecondInput.m_RepairCost;
+
 		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
@@ -1082,6 +1086,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SendSlot(a_Player, this, 2);
 				return;
 			}
 
@@ -1096,19 +1101,21 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 			m_StackSizeToBeUsedInRepair = x;
 		}
-		else
+		else if (!IsEnchantBook)
 		{
 			// Tool and armor repair with two tools / armors
-			if (!IsEnchantBook && (!Input.IsSameType(SecondInput) || !Input.IsDamageable()))
+			if ((!Input.IsSameType(SecondInput) || !Input.IsDamageable()))
 			{
 				// No enchantment
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SendSlot(a_Player, this, 2);
 				return;
 			}
 
-			if ((Input.GetMaxDamage() > 0) && !IsEnchantBook)
+			// Check if item has damage to repair
+			if (Input.GetMaxDamage() > 0)
 			{
 				int FirstDamageDiff = Input.GetMaxDamage() - Input.m_ItemDamage;
 				int SecondDamageDiff = SecondInput.GetMaxDamage() - SecondInput.m_ItemDamage;
@@ -1126,26 +1133,25 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 					NeedExp += std::max(1, Damage / 100);
 				}
 			}
-
-			// TODO: Add enchantments.
 		}
+
+		// Merge enchantments and calculate cost
+		EnchantmentCost = Input.m_Enchantments.Merge(SecondInput.m_Enchantments, Input.m_ItemType, SecondInput.m_ItemType);
 	}
 
 	int NameChangeExp = 0;
 	const AString & RepairedItemName = ((cAnvilWindow*)&m_ParentWindow)->GetRepairedItemName();
-	if (RepairedItemName.empty())
+
+	if (RepairedItemName.empty() && !Input.IsCustomNameEmpty())
 	{
-		// Remove custom name
-		if (!Input.m_CustomName.empty())
-		{
-			NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
-			NeedExp += NameChangeExp;
-			Input.m_CustomName = "";
-		}
+		// Remove custom name, if had a previous custom name
+		NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
+		NeedExp += NameChangeExp;
+		Input.m_CustomName = "";
 	}
 	else if (RepairedItemName != Input.m_CustomName)
 	{
-		// Change custom name
+		// Change custom name, if not same as current custom name
 		NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
 		NeedExp += NameChangeExp;
 
@@ -1156,10 +1162,17 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 		Input.m_CustomName = RepairedItemName;
 	}
+	else if (RepairedItemName.empty() && Input.IsCustomNameEmpty() && SecondInput.IsEmpty())
+	{
+		// Not Repairing or Enchanting and not changing name, so don't set Output
+		Output.Empty();
+		SetSlot(2, a_Player, Output);
+		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SendSlot(a_Player, this, 2);
+		return;
+	}
 
-	// TODO: Add enchantment exp cost.
-
-	m_MaximumCost = RepairCost + NeedExp;
+	m_MaximumCost = RepairCost + EnchantmentCost + NeedExp;
 
 	if (NeedExp < 0)
 	{
@@ -1189,6 +1202,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	SetSlot(2, a_Player, Input);
 	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
+	m_ParentWindow.SendSlot(a_Player, this, 2);
 }
 
 
