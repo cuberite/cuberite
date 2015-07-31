@@ -982,7 +982,7 @@ enum
 
 
 
-/// Dimension of a world
+/** Dimension of a world */
 enum eDimension
 {
 	dimNether    = -1,
@@ -995,7 +995,7 @@ enum eDimension
 
 
 
-/// Damage type, used in the TakeDamageInfo structure and related functions
+/** Damage type, used in the TakeDamageInfo structure and related functions */
 enum eDamageType
 {
 	// Canonical names for the types (as documented in the plugin wiki):
@@ -1099,36 +1099,35 @@ class cIniFile;
 
 // tolua_begin
 
-/// Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure.
+/** Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure. */
 extern int BlockStringToType(const AString & a_BlockTypeString);
 
-/// Translates an itemtype string into an item. Takes either a number, number^number, number:number or an items.ini alias as input. Returns true if successful.
+/** Translates an itemtype string into an item. Takes either a number, number^number, number:number or an items.ini alias as input. Returns true if successful. */
 extern bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item);
 
-/// Translates a full item into a string. If the ItemType is not recognized, the ItemType number is output into the string.
+/** Translates a full item into a string. If the ItemType is not recognized, the ItemType number is output into the string. */
 extern AString ItemToString(const cItem & a_Item);
 
-/// Translates itemtype into a string. If the type is not recognized, the itemtype number is output into the string.
+/** Translates itemtype into a string. If the type is not recognized, the itemtype number is output into the string. */
 extern AString ItemTypeToString(short a_ItemType);
 
-/// Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string.
+/** Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string. */
 extern AString ItemToFullString(const cItem & a_Item);
 
-/// Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure
+/** Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure */
 extern eDimension StringToDimension(const AString & a_DimensionString);
 
 /** Translates a dimension enum to dimension string.
-Takes an eDimension enum value and returns "Overworld" on failure
-*/
+Takes an eDimension enum value and returns "Overworld" on failure. */
 extern AString DimensionToString(eDimension a_Dimension);
 
-/// Translates damage type constant to a string representation (built-in).
+/** Translates damage type constant to a string representation (built-in). */
 extern AString DamageTypeToString(eDamageType a_DamageType);
 
-/// Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure
+/** Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure */
 extern eDamageType StringToDamageType(const AString & a_DamageString);
 
-/// Returns a cItem representing the item described in an IniFile's value; if the value doesn't exist, creates it with the provided default.
+/** Returns a cItem representing the item described in an IniFile's value; if the value doesn't exist, creates it with the provided default. */
 extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const char * a_Key, const char * a_Default);
 
 // tolua_end

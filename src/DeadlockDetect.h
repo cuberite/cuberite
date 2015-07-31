@@ -34,32 +34,32 @@ public:
 protected:
 	struct sWorldAge
 	{
-		/// Last m_WorldAge that has been detected in this world
+		/** Last m_WorldAge that has been detected in this world */
 		Int64 m_Age;
 		
-		/// Number of cycles for which the age has been the same
+		/** Number of cycles for which the age has been the same */
 		int m_NumCyclesSame;
 	} ;
 	
-	/// Maps world name -> sWorldAge
+	/** Maps world name -> sWorldAge */
 	typedef std::map<AString, sWorldAge> WorldAges;
 	
 	WorldAges m_WorldAges;
 	
-	/// Number of secods for which the ages must be the same for the detection to trigger
+	/** Number of secods for which the ages must be the same for the detection to trigger */
 	int m_IntervalSec;
 	
 	
 	// cIsThread overrides:
 	virtual void Execute(void) override;
 	
-	/// Sets the initial world age
+	/** Sets the initial world age */
 	void SetWorldAge(const AString & a_WorldName, Int64 a_Age);
 	
-	/// Checks if the world's age has changed, updates the world's stats; calls DeadlockDetected() if deadlock detected
+	/** Checks if the world's age has changed, updates the world's stats; calls DeadlockDetected() if deadlock detected */
 	void CheckWorldAge(const AString & a_WorldName, Int64 a_Age);
 	
-	/// Called when a deadlock is detected. Aborts the server.
+	/** Called when a deadlock is detected. Aborts the server. */
 	NORETURN void DeadlockDetected(void);
 } ;
 

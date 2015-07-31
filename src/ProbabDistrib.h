@@ -48,25 +48,29 @@ public:
 	
 	cProbabDistrib(int a_MaxValue);
 	
-	/// Sets the distribution curve using an array of [value, probability] points, linearly interpolated. a_Points must not be empty.
+	/** Sets the distribution curve using an array of [value, probability] points, linearly interpolated. a_Points must not be empty. */
 	void SetPoints(const cPoints & a_Points);
 	
-	/// Sets the distribution curve using a definition string; returns true on successful parse
+	/** Sets the distribution curve using a definition string; returns true on successful parse */
 	bool SetDefString(const AString & a_DefString);
 	
-	/// Gets a random value from a_Rand, shapes it into the distribution curve and returns the value.
+	/** Gets a random value from a_Rand, shapes it into the distribution curve and returns the value. */
 	int Random(MTRand & a_Rand) const;
 	
-	/// Maps value in range [0, m_Sum] into the range [0, m_MaxValue] using the stored probability
+	/** Maps value in range [0, m_Sum] into the range [0, m_MaxValue] using the stored probability */
 	int MapValue(int a_OrigValue) const;
 	
 	int GetSum(void) const { return m_Sum; }
 	
 protected:
 
-	int     m_MaxValue;
-	cPoints m_Cumulative;  ///< Cumulative probability of the values, sorted, for fast bsearch lookup
-	int     m_Sum;  ///< Sum of all the probabilities across all values in the domain; -1 if not set
+	int m_MaxValue;
+
+	/** Cumulative probability of the values, sorted, for fast bsearch lookup */
+	cPoints m_Cumulative;
+
+	/** Sum of all the probabilities across all values in the domain; -1 if not set */
+	int m_Sum;
 } ;
 
 

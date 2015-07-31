@@ -22,10 +22,10 @@ public:
 	class cSlot
 	{
 	public:
-		/// Returns true if the specified block is stored
+		/** Returns true if the specified block is stored */
 		bool HasBlock(int a_RelX, int a_RelY, int a_RelZ);
 		
-		/// Adds the specified block unless already present; returns true if added, false if the block was already present
+		/** Adds the specified block unless already present; returns true if added, false if the block was already present */
 		bool Add(int a_RelX, int a_RelY, int a_RelZ);
 		
 		/** Array of block containers, each item stores blocks for one Z coord
@@ -37,7 +37,7 @@ public:
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
 	virtual ~cDelayedFluidSimulatorChunkData();
 	
-	/// Slots, one for each delay tick, each containing the blocks to simulate
+	/** Slots, one for each delay tick, each containing the blocks to simulate */
 	cSlot * m_Slots;
 } ;
 
@@ -67,13 +67,11 @@ protected:
 	
 	int m_TotalBlocks;  // Statistics only: the total number of blocks currently queued
 
-	/*
-	Slots:
+	/* Slots:
 	| 0 | 1 | ... | m_AddSlotNum | m_SimSlotNum | ... | m_TickDelay - 1 |
-	|       adding blocks here ^ | ^ simulating here
-	*/
+	|       adding blocks here ^ | ^ simulating here */
 	
-	/// Called from SimulateChunk() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation.
+	/** Called from SimulateChunk() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation. */
 	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) = 0;
 } ;
 

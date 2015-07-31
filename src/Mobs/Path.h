@@ -79,7 +79,7 @@ public:
 	/** Performs part of the path calculation and returns the appropriate status.
 	If NEARBY_FOUND is returned, it means that the destination is not reachable, but a nearby destination
 	is reachable. If the user likes the alternative destination, they can call AcceptNearbyPath to treat the path as found,
-	and to make consequent calls to step return PATH_FOUND*/
+	and to make consequent calls to step return PATH_FOUND */
 	ePathFinderStatus Step(cChunk & a_Chunk);
 
 	/** Called after the PathFinder's step returns NEARBY_FOUND.
@@ -87,7 +87,8 @@ public:
 	the PathFinder found a path to. */
 	Vector3i AcceptNearbyPath();
 
-	/* Point retrieval functions, inlined for performance. */
+	// Point retrieval functions, inlined for performance:
+
 	/** Returns the next point in the path. */
 	inline Vector3d GetNextPoint()
 	{
@@ -95,17 +96,23 @@ public:
 		Vector3i Point = m_PathPoints[m_PathPoints.size() - 1 - (++m_CurrentPoint)];
 		return Vector3d(Point.x + m_HalfWidth, Point.y, Point.z + m_HalfWidth);
 	}
+
+
 	/** Checks whether this is the last point or not. Never call getnextPoint when this is true. */
 	inline bool IsLastPoint()
 	{
 		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		return (m_CurrentPoint == m_PathPoints.size() - 1);
 	}
+
+
 	inline bool IsFirstPoint()
 	{
 		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		return (m_CurrentPoint == 0);
 	}
+
+
 	/** Get the point at a_index. Remark: Internally, the indexes are reversed. */
 	inline Vector3d GetPoint(size_t a_index)
 	{
@@ -114,6 +121,8 @@ public:
 		Vector3i Point = m_PathPoints[m_PathPoints.size() - 1 - a_index];
 		return Vector3d(Point.x + m_HalfWidth, Point.y, Point.z + m_HalfWidth);
 	}
+
+
 	/** Returns the total number of points this path has. */
 	inline size_t GetPointCount()
 	{

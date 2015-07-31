@@ -64,12 +64,12 @@ public:
 	void SetSlot(int a_SlotNum,    const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
 
-	/// Returns the ItemGrid used for storing the contents
+	/** Returns the ItemGrid used for storing the contents */
 	cItemGrid & GetContents(void) { return m_Contents; }
 
 	// tolua_end
 	
-	/// Const version of the GetContents() function for C++ type-safety
+	/** Const version of the GetContents() function for C++ type-safety */
 	const cItemGrid & GetContents(void) const { return m_Contents; }
 
 protected:

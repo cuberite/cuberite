@@ -17,8 +17,7 @@
 
 /** Interface class used for getting data out of a chunk using the GetAllData() function.
 Implementation must use the pointers immediately and NOT store any of them for later use
-The virtual methods are called in the same order as they're declared here.
-*/
+The virtual methods are called in the same order as they're declared here. */
 class cChunkDataCallback abstract
 {
 public:
@@ -27,26 +26,25 @@ public:
 
 	/** Called before any other callbacks to inform of the current coords
 	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()).
-	If false is returned, the chunk is skipped.
-	*/
+	If false is returned, the chunk is skipped. */
 	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; }
 	
-	/// Called once to provide heightmap data
+	/** Called once to provide heightmap data */
 	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) { UNUSED(a_HeightMap); }
 	
-	/// Called once to provide biome data
+	/** Called once to provide biome data */
 	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) { UNUSED(a_BiomeMap); }
 	
-	/// Called once to let know if the chunk lighting is valid. Return value is ignored
+	/** Called once to let know if the chunk lighting is valid. Return value is ignored */
 	virtual void LightIsValid(bool a_IsLightValid) { UNUSED(a_IsLightValid); }
 	
-	/// Called once to export block info
+	/** Called once to export block info */
 	virtual void ChunkData(const cChunkData & a_Buffer) { UNUSED(a_Buffer); }
 	
-	/// Called for each entity in the chunk
+	/** Called for each entity in the chunk */
 	virtual void Entity(cEntity * a_Entity) { UNUSED(a_Entity); }
 	
-	/// Called for each blockentity in the chunk
+	/** Called for each blockentity in the chunk */
 	virtual void BlockEntity(cBlockEntity * a_Entity) { UNUSED(a_Entity); }
 } ;
 
@@ -54,8 +52,7 @@ public:
 
 
 
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a buffer
-*/
+/** A simple implementation of the cChunkDataCallback interface that collects all block data into a buffer */
 class cChunkDataCollector :
 	public cChunkDataCallback
 {
@@ -75,8 +72,7 @@ protected:
 
 
 
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer
-*/
+/** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer */
 class cChunkDataArrayCollector :
 	public cChunkDataCallback
 {

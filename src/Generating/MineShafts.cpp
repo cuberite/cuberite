@@ -67,18 +67,17 @@ public:
 	
 	virtual ~cMineShaft() {}
 
-	/// Returns true if this mineshaft intersects the specified cuboid
+	/** Returns true if this mineshaft intersects the specified cuboid */
 	bool DoesIntersect(const cCuboid & a_Other)
 	{
 		return m_BoundingBox.DoesIntersect(a_Other);
 	}
 
 	/** If recursion level is not too large, appends more branches to the parent system,
-	using exit points specific to this class.
-	*/
+	using exit points specific to this class. */
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) = 0;
 
-	/// Imprints this shape into the specified chunk's data
+	/** Imprints this shape into the specified chunk's data */
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
@@ -141,16 +140,16 @@ protected:
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
 
-	/// Places a chest, if the corridor has one
+	/** Places a chest, if the corridor has one */
 	void PlaceChest(cChunkDesc & a_ChunkDesc);
 
-	/// If this corridor has tracks, places them randomly
+	/** If this corridor has tracks, places them randomly */
 	void PlaceTracks(cChunkDesc & a_ChunkDesc);
 
-	/// If this corridor has a spawner, places the spawner
+	/** If this corridor has a spawner, places the spawner */
 	void PlaceSpawner(cChunkDesc & a_ChunkDesc);
 
-	/// Randomly places torches around the central beam block
+	/** Randomly places torches around the central beam block */
 	void PlaceTorches(cChunkDesc & a_ChunkDesc);
 } ;
 

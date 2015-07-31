@@ -29,7 +29,7 @@
 
 
 
-/// Converts an angle in radians into a byte representation used by the network protocol
+/** Converts an angle in radians into a byte representation used by the network protocol */
 #define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
 
 
@@ -190,13 +190,13 @@ public:
 		return false;
 	}
 	
-	/// Returns the nearest entity that was hit, after the enumeration has been completed
+	/** Returns the nearest entity that was hit, after the enumeration has been completed */
 	cEntity * GetHitEntity(void) const { return m_HitEntity; }
 	
-	/// Returns the line coeff where the hit was encountered, after the enumeration has been completed
+	/** Returns the line coeff where the hit was encountered, after the enumeration has been completed */
 	double GetMinCoeff(void) const { return m_MinCoeff; }
 	
-	/// Returns true if the callback has encountered a true hit
+	/** Returns true if the callback has encountered a true hit */
 	bool HasHit(void) const { return (m_MinCoeff < 1); }
 	
 protected:

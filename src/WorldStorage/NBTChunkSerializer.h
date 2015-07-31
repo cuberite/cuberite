@@ -67,7 +67,7 @@ public:
 
 	cNBTChunkSerializer(cFastNBTWriter & a_Writer);
 
-	/// Close NBT tags that we've opened
+	/** Close NBT tags that we've opened */
 	void Finish(void);
 	
 	bool IsLightValid(void) const {return m_IsLightValid; }
@@ -78,8 +78,7 @@ protected:
 	- m_BlockTypes[]
 	- m_BlockMetas[]
 	- m_BlockLight[]
-	- m_BlockSkyLight[]
-	*/
+	- m_BlockSkyLight[] */
 	
 	cFastNBTWriter & m_Writer;
 	
@@ -89,10 +88,10 @@ protected:
 	bool m_IsLightValid;  // True if the chunk lighting is valid
 
 
-	/// Writes an item into the writer, if slot >= 0, adds the Slot tag. The compound is named as requested.
+	/** Writes an item into the writer, if slot >= 0, adds the Slot tag. The compound is named as requested. */
 	void AddItem(const cItem & a_Item, int a_Slot, const AString & a_CompoundName = "");
 	
-	/// Writes an item grid into the writer; begins the stored slot numbers with a_BeginSlotNum. Note that it doesn't begin nor end the list tag
+	/** Writes an item grid into the writer; begins the stored slot numbers with a_BeginSlotNum. Note that it doesn't begin nor end the list tag */
 	void AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotNum = 0);
 	
 	// Block entities:

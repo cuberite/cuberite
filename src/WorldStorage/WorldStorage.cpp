@@ -16,7 +16,7 @@
 
 
 
-/// Example storage schema - forgets all chunks ;)
+/** Example storage schema - forgets all chunks */
 class cWSSForgetful :
 	public cWSSchema
 {

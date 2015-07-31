@@ -63,9 +63,9 @@ public:
 		m_World = a_World;
 	}
 	
-	/// Creates a new block entity for the specified block type
-	/// If a_World is valid, then the entity is created bound to that world
-	/// Returns nullptr for unknown block types
+	/** Creates a new block entity for the specified block type
+	If a_World is valid, then the entity is created bound to that world
+	Returns nullptr for unknown block types. */
 	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = nullptr);
 	
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
@@ -102,15 +102,14 @@ public:
 	
 	// tolua_end
 	
-	/// Called when a player uses this entity; should open the UI window
+	/** Called when a player uses this entity; should open the UI window */
 	virtual void UsedBy( cPlayer * a_Player) = 0;
 	
 	/** Sends the packet defining the block entity to the client specified.
-	To send to all eligible clients, use cWorld::BroadcastBlockEntity()
-	*/
+	To send to all eligible clients, use cWorld::BroadcastBlockEntity() */
 	virtual void SendTo(cClientHandle & a_Client) = 0;
 	
-	/// Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing.
+	/** Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing. */
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		UNUSED(a_Dt);
@@ -118,10 +117,10 @@ public:
 	}
 
 protected:
-	/// Position in absolute block coordinates
+	/** Position in absolute block coordinates */
 	int m_PosX, m_PosY, m_PosZ;
 	
-	/// Position relative to the chunk, used to speed up ticking
+	/** Position relative to the chunk, used to speed up ticking */
 	int m_RelX, m_RelZ;
 
 	BLOCKTYPE m_BlockType;

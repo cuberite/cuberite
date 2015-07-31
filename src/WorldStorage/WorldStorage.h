@@ -31,7 +31,7 @@ typedef cQueue<cChunkCoordsWithCallback> cChunkCoordsQueue;
 
 
 
-/// Interface that all the world storage schemas need to implement
+/** Interface that all the world storage schemas need to implement */
 class cWSSchema abstract
 {
 public:
@@ -53,7 +53,7 @@ typedef std::list<cWSSchema *> cWSSchemaList;
 
 
 
-/// The actual world storage class
+/** The actual world storage class */
 class cWorldStorage :
 	public cIsThread
 {
@@ -87,26 +87,27 @@ protected:
 	cChunkCoordsQueue  m_LoadQueue;
 	cChunkCoordsQueue m_SaveQueue;
 	
-	/// All the storage schemas (all used for loading)
+	/** All the storage schemas (all used for loading) */
 	cWSSchemaList m_Schemas;
 	
-	/// The one storage schema used for saving
-	cWSSchema *   m_SaveSchema;
+	/** The one storage schema used for saving */
+	cWSSchema * m_SaveSchema;
+
+	/** Set when there's any addition to the queues */
+	cEvent m_Event;
 
 	
-	/// Loads the chunk specified; returns true on success, false on failure
+	/** Loads the chunk specified; returns true on success, false on failure */
 	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
 
 	void InitSchemas(int a_StorageCompressionFactor);
 	
 	virtual void Execute(void) override;
 	
-	cEvent m_Event;       // Set when there's any addition to the queues
-
-	/// Loads one chunk from the queue (if any queued); returns true if there are more chunks in the load queue
+	/** Loads one chunk from the queue (if any queued); returns true if there are more chunks in the load queue */
 	bool LoadOneChunk(void);
 	
-	/// Saves one chunk from the queue (if any queued); returns true if there are more chunks in the save queue
+	/** Saves one chunk from the queue (if any queued); returns true if there are more chunks in the save queue */
 	bool SaveOneChunk(void);
 } ;
 

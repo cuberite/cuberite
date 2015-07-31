@@ -1603,7 +1603,6 @@ void cEntity::HandleAir(void)
 
 
 
-/// Called when the entity starts burning
 void cEntity::OnStartedBurning(void)
 {
 	// Broadcast the change:
@@ -1614,7 +1613,6 @@ void cEntity::OnStartedBurning(void)
 
 
 
-/// Called when the entity finishes burning
 void cEntity::OnFinishedBurning(void)
 {
 	// Broadcast the change:
@@ -1625,7 +1623,6 @@ void cEntity::OnFinishedBurning(void)
 
 
 
-/// Sets the maximum value for the health
 void cEntity::SetMaxHealth(int a_MaxHealth)
 {
 	m_MaxHealth = a_MaxHealth;
@@ -1638,7 +1635,6 @@ void cEntity::SetMaxHealth(int a_MaxHealth)
 
 
 
-/// Sets whether the entity is fireproof
 void cEntity::SetIsFireproof(bool a_IsFireproof)
 {
 	m_IsFireproof = a_IsFireproof;
@@ -1648,7 +1644,6 @@ void cEntity::SetIsFireproof(bool a_IsFireproof)
 
 
 
-/// Puts the entity on fire for the specified amount of ticks
 void cEntity::StartBurning(int a_TicksLeftBurning)
 {
 	if (m_TicksLeftBurning > 0)
@@ -1666,7 +1661,6 @@ void cEntity::StartBurning(int a_TicksLeftBurning)
 
 
 
-/// Stops the entity from burning, resets all burning timers
 void cEntity::StopBurning(void)
 {
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);

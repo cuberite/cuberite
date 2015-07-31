@@ -71,12 +71,11 @@ private:
 		bool ShouldPowerOn;  // What happens when the delay time is fulfilled?
 	};
 
+	/** Per-chunk data for the simulator, specified individual chunks to simulate */
 	class cIncrementalRedstoneSimulatorChunkData :
 		public cRedstoneSimulatorChunkData
 	{
 	public:
-		/// Per-chunk data for the simulator, specified individual chunks to simulate
-
 		/** test */
 		std::unordered_map<Vector3i, std::pair<BLOCKTYPE, bool>, VectorHasher<int>> m_ChunkData;
 		std::vector<sPoweredBlocks> m_PoweredBlocks;
@@ -241,7 +240,7 @@ private:
 	The only diffence between this and a normal AreCoordsPowered is that this function checks for a wire powering another wire */
 	static unsigned char IsWirePowered(Vector3i a_RelBlockPosition, cChunk * a_Chunk);
 
-	/** Handles delayed updates to repeaters **/
+	/** Handles delayed updates to repeaters */
 	void HandleRedstoneRepeaterDelays(void);
 
 	/** Returns if lever metadata marks it as emitting power */

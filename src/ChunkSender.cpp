@@ -23,7 +23,7 @@
 // cNotifyChunkSender:
 
 
-/// Callback that can be used to notify chunk sender upon another chunkcoord notification
+/** Callback that can be used to notify chunk sender upon another chunkcoord notification */
 class cNotifyChunkSender :
 	public cChunkCoordCallback
 {
@@ -43,11 +43,22 @@ class cNotifyChunkSender :
 	cChunkSender & m_ChunkSender;
 
 	cWorld & m_World;
+
 public:
-	cNotifyChunkSender(cChunkSender & a_ChunkSender, cWorld & a_World) : m_ChunkSender(a_ChunkSender), m_World(a_World) {}
-
-
+	cNotifyChunkSender(cChunkSender & a_ChunkSender, cWorld & a_World):
+		m_ChunkSender(a_ChunkSender),
+		m_World(a_World)
+	{
+	}
 };
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cChunkSender:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
 	super("ChunkSender"),

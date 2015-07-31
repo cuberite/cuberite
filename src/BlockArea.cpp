@@ -26,8 +26,8 @@
 
 typedef void (CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta);
 
-// This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
-/// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
+/** Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
+This wild construct allows us to pass a function argument and still have it inlined by the compiler. */
 template <bool MetasValid, CombinatorFunc Combinator>
 void InternalMergeBlocks(
 	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
@@ -73,7 +73,7 @@ void InternalMergeBlocks(
 
 
 
-/// Combinator used for cBlockArea::msOverwrite merging
+/** Combinator used for cBlockArea::msOverwrite merging */
 template <bool MetaValid>
 void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
@@ -88,7 +88,7 @@ void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLE
 
 
 
-/// Combinator used for cBlockArea::msFillAir merging
+/** Combinator used for cBlockArea::msFillAir merging */
 template <bool MetaValid>
 void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
@@ -107,7 +107,7 @@ void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 
-/// Combinator used for cBlockArea::msImprint merging
+/** Combinator used for cBlockArea::msImprint merging */
 template <bool MetaValid>
 void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
@@ -126,7 +126,7 @@ void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 
-/// Combinator used for cBlockArea::msLake merging
+/** Combinator used for cBlockArea::msLake merging */
 template <bool MetaValid>
 void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {

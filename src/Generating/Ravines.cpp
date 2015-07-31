@@ -64,7 +64,7 @@ public:
 	cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise);
 	
 	#ifdef _DEBUG
-	/// Exports itself as a SVG line definition
+	/** Exports itself as a SVG line definition */
 	AString ExportAsSVG(int a_Color, int a_OffsetX = 0, int a_OffsetZ = 0) const;
 	#endif  // _DEBUG
 

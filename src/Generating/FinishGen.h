@@ -192,7 +192,7 @@ protected:
 	cNoise m_Noise;
 	int    m_Seed;
 
-	/// Tries to place sugarcane at the coords specified, returns true if successful
+	/** Tries to place sugarcane at the coords specified, returns true if successful */
 	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ);
 
 	// Returns true is the specified biome is a desert or its variant
@@ -209,8 +209,7 @@ protected:
 /** This class adds a single top block in random positions in the specified biome on top of specified allowed blocks.
 Used for:
 - Lilypads finisher
-- DeadBushes finisher
-*/
+- DeadBushes finisher */
 class cFinishGenSingleTopBlock :
 	public cFinishGen
 {
@@ -258,17 +257,20 @@ public:
 protected:
 	cNoise m_Noise;
 	BLOCKTYPE m_BlockType;
-	int       m_Amount;         ///< Relative amount of blocks to try adding. 1 = one block per 256 biome columns.
+
+	/** Relative amount of blocks to try adding. 1 = one block per 256 biome columns. */
+	int m_Amount;
+
 
 	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
 
-	// Returns true if the given biome is a biome that is allowed.
+	/** Returns true if the given biome is a biome that is allowed. */
 	inline bool IsAllowedBiome(EMCSBiome a_Biome)
 	{
 		return m_IsBiomeAllowed[a_Biome];
 	}
 
-	// Returns true if the given blocktype may be below m_BlockType
+	/** Returns true if the given blocktype may be below m_BlockType */
 	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
 	{
 		return m_IsAllowedBelow[a_BlockBelow];
@@ -316,7 +318,7 @@ protected:
 	bool m_PreSimulateWater;
 	bool m_PreSimulateLava;
 
-	// Drops hanging sand and gravel down to the ground, recalculates heightmap
+	/** Drops hanging sand and gravel down to the ground, recalculates heightmap */
 	void CollapseSandGravel(
 		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
 		cChunkDef::HeightMap & a_HeightMap       // Height map to update by the current data
@@ -324,8 +326,7 @@ protected:
 
 	/** For each fluid block:
 	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)
-	- all fluid on the chunk's edge is made flowing
-	*/
+	- all fluid on the chunk's edge is made flowing */
 	void StationarizeFluid(
 		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
 		cChunkDef::HeightMap & a_HeightMap,      // Height map to read

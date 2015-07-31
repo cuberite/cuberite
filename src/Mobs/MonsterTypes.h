@@ -1,9 +1,12 @@
 
 #pragma once
 
-/// This identifies individual monster type, as well as their network type-ID
+
+
+
 
 // tolua_begin
+/** Identifies individual monster type, as well as their network type-ID. */
 enum eMonsterType
 {
 	mtInvalidType = -1,

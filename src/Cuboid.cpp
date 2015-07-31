@@ -7,7 +7,7 @@
 
 
 
-/// Returns true if the two specified intervals have a non-empty union
+/** Returns true if the two specified intervals have a non-empty union */
 static bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int a_Max2)
 {
 	return (

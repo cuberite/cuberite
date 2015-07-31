@@ -690,7 +690,7 @@ protected:
 
 	XML_Parser m_p;
 	
-	/// Returns the value of the specified attribute, if found; nullptr otherwise
+	/** Returns the value of the specified attribute, if found; nullptr otherwise */
 	static const XML_Char * FindAttr(const XML_Char ** iAttrs, const XML_Char * iAttrToFind)
 	{
 		for (const XML_Char ** Attr = iAttrs; *Attr != nullptr; Attr += 2)

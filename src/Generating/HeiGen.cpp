@@ -390,7 +390,7 @@ void cHeiGenMountains::InitializeHeightGen(cIniFile & a_IniFile)
 
 const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[256] =
 {
-	/*                        Fast-changing | Middle-changing | Slow-changing |*/
+	/*                        Fast-changing | Middle-changing | Slow-changing | */
 	/* Biome               |  Freq1  | Amp1 | Freq2   | Amp2  | Freq3  | Amp3 | BaseHeight */
 	/* biOcean               */ { 0.1f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  50},
 	/* biPlains              */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},

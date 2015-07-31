@@ -95,7 +95,7 @@ static const sCoordsArr BigOs[] =
 
 
 
-/// Pushes a specified layer of blocks of the same type around (x, h, z) into a_Blocks
+/** Pushes a specified layer of blocks of the same type around (x, h, z) into a_Blocks */
 inline void PushCoordBlocks(int a_BlockX, int a_Height, int a_BlockZ, sSetBlockVector & a_Blocks, const sCoords * a_Coords, size_t a_NumCoords, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
 	for (size_t i = 0; i < a_NumCoords; i++)

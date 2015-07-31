@@ -48,7 +48,7 @@ protected:
 	/** The noise used for generating random numbers */
 	cNoise m_Noise;
 	
-	/** Maximum depth of the generator tree*/
+	/** Maximum depth of the generator tree */
 	int m_MaxDepth;
 	
 	/** Maximum size, in X / Z blocks, of the village (radius from the origin) */

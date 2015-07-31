@@ -37,7 +37,7 @@ private:
 
 
 
-/// RAII for cCriticalSection - locks the CS on creation, unlocks on destruction
+/** RAII for cCriticalSection - locks the CS on creation, unlocks on destruction */
 class cCSLock
 {
 	cCriticalSection * m_CS;
@@ -64,7 +64,7 @@ private:
 
 
 
-/// Temporary RAII unlock for a cCSLock. Useful for unlock-wait-relock scenarios
+/** Temporary RAII unlock for a cCSLock. Useful for unlock-wait-relock scenarios */
 class cCSUnlock
 {
 	cCSLock & m_Lock;

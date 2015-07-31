@@ -151,7 +151,6 @@ void LinearInterpolate2DArray(
 
 
 
-/// Puts linearly interpolated values from one array into another array. 3D version
 void LinearInterpolate3DArray(
 	float * a_Src,
 	int a_SrcSizeX, int a_SrcSizeY, int a_SrcSizeZ,

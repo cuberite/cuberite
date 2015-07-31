@@ -8,7 +8,7 @@
 
 
 
-/// List of slot numbers, used for inventory-painting
+/** List of slot numbers, used for inventory-painting */
 typedef std::vector<int> cSlotNums;
 
 
@@ -18,7 +18,7 @@ typedef std::vector<int> cSlotNums;
 
 // tolua_begin
 
-/// Experience Orb setup
+/** Experience Orb setup */
 enum
 {
 	// Open to suggestion on naming convention here :)
@@ -57,7 +57,7 @@ enum eBlockFace
 
 
 
-/// PlayerDigging status constants
+/** PlayerDigging status constants */
 enum
 {
 	DIG_STATUS_STARTED   = 0,
@@ -72,7 +72,7 @@ enum
 
 
 
-/// Individual actions sent in the WindowClick packet
+/** Individual actions sent in the WindowClick packet */
 enum eClickAction
 {
 	// Sorted by occurrence in the 1.5 protocol

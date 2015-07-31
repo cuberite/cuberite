@@ -64,7 +64,7 @@ typedef std::vector<cCaveDefPoint> cCaveDefPoints;
 
 
 
-/// A single non-branching tunnel of a WormNestCave
+/** A single non-branching tunnel of a WormNestCave */
 class cCaveTunnel
 {
 	// The bounding box, including the radii around defpoints:
@@ -72,19 +72,19 @@ class cCaveTunnel
 	int m_MinBlockY, m_MaxBlockY;
 	int m_MinBlockZ, m_MaxBlockZ;
 
-	/// Generates the shaping defpoints for the ravine, based on the ravine block coords and noise
+	/** Generates the shaping defpoints for the cave, based on the cave block coords and noise */
 	void Randomize(cNoise & a_Noise);
 
-	/// Refines (adds and smooths) defpoints from a_Src into a_Dst; returns false if no refinement possible (segments too short)
+	/** Refines (adds and smooths) defpoints from a_Src into a_Dst; returns false if no refinement possible (segments too short) */
 	bool RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints & a_Dst);
 
-	/// Does rounds of smoothing, two passes of RefineDefPoints(), as long as they return true
+	/** Does rounds of smoothing, two passes of RefineDefPoints(), as long as they return true */
 	void Smooth(void);
 
-	/// Linearly interpolates the points so that the maximum distance between two neighbors is max 1 block
+	/** Linearly interpolates the points so that the maximum distance between two neighbors is max 1 block */
 	void FinishLinear(void);
 
-	/// Calculates the bounding box of the points present
+	/** Calculates the bounding box of the points present */
 	void CalcBoundingBox(void);
 
 public:
@@ -96,7 +96,7 @@ public:
 		cNoise & a_Noise
 	);
 
-	/// Carves the tunnel into the chunk specified
+	/** Carves the tunnel into the chunk specified */
 	void ProcessChunk(
 		int a_ChunkX, int a_ChunkZ,
 		cChunkDef::BlockTypes & a_BlockTypes,
@@ -115,7 +115,7 @@ typedef std::vector<cCaveTunnel *> cCaveTunnels;
 
 
 
-/// A collection of connected tunnels, possibly branching.
+/** A collection of connected tunnels, possibly branching. */
 class cStructGenWormNestCaves::cCaveSystem :
 	public cGridStructGen::cStructure
 {
@@ -135,13 +135,13 @@ protected:
 
 	void Clear(void);
 
-	/// Generates a_Segment successive tunnels, with possible branches. Generates the same output for the same [x, y, z, a_Segments]
+	/** Generates a_Segment successive tunnels, with possible branches. Generates the same output for the same [x, y, z, a_Segments] */
 	void GenerateTunnelsFromPoint(
 		int a_OriginX, int a_OriginY, int a_OriginZ,
 		cNoise & a_Noise, int a_Segments
 	);
 
-	/// Returns a radius based on the location provided.
+	/** Returns a radius based on the location provided. */
 	int GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ);
 
 	// cGridStructGen::cStructure overrides:

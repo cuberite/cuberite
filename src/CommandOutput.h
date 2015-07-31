@@ -9,20 +9,19 @@
 
 /** Interface for a callback that receives command output
 The Out() function is called for any output the command has produced.
-Descendants override that function to provide specific processing of the output.
-*/
+Descendants override that function to provide specific processing of the output. */
 class cCommandOutputCallback
 {
 public:
 	virtual ~cCommandOutputCallback() {}  // Force a virtual destructor in subclasses
 	
-	/// Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline"
+	/** Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline" */
 	void Out(const char * a_Fmt, ...) FORMATSTRING(2, 3);
 	
-	/// Called when the command wants to output anything; may be called multiple times
+	/** Called when the command wants to output anything; may be called multiple times */
 	virtual void Out(const AString & a_Text) = 0;
 	
-	/// Called when the command processing has been finished
+	/** Called when the command processing has been finished */
 	virtual void Finished(void) {}
 } ;
 
@@ -30,7 +29,7 @@ public:
 
 
 
-/// Class that discards all command output
+/** Class that discards all command output */
 class cNullCommandOutputCallback :
 	public cCommandOutputCallback
 {
@@ -70,7 +69,7 @@ protected:
 
 
 
-/// Sends all command output to a log, line by line, when the command finishes processing
+/** Sends all command output to a log, line by line, when the command finishes processing */
 class cLogCommandOutputCallback :
 	public cStringAccumCommandOutputCallback
 {
@@ -83,7 +82,7 @@ public:
 
 
 
-/// Sends all command output to a log, line by line; deletes self when command finishes processing
+/** Sends all command output to a log, line by line; deletes self when command finishes processing */
 class cLogCommandDeleteSelfOutputCallback :
 	public cLogCommandOutputCallback
 {

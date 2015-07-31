@@ -127,6 +127,18 @@ local g_ViolationPatterns =
 	-- Check that all "//"-style comments have at least one spaces after:
 	{"%s//[^%s/*<]", "Needs a space after a \"//\"-style comment"},
 	
+	-- Check that doxy-comments are used only in the double-asterisk form:
+	{"/// ", "Use doxycomments in the form /** Comment */"},
+	
+	-- Check that /* */ comments have whitespace around the insides:
+	{"%*%*/",        "Wrong comment termination, use */"},
+	{"/%*[^%s*/\"]", "Needs a space after /*"},  -- Need to take care of the special "//*/" comment ends
+	{"/%*%*[^%s*<]", "Needs a space after /**"},
+	{"[^%s/*]%*/",   "Needs a space before */"},
+	
+	-- Check against MS XML doxycomments:
+	{"/%*%* <", "Remove the MS XML markers from comment"},
+
 	-- Check that all commas have spaces after them and not in front of them:
 	{" ,", "Extra space before a \",\""},
 	{",[^%s\"%%\']", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting

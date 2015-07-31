@@ -94,25 +94,25 @@ extern AString EscapeString(const AString & a_Message);  // tolua_export
 /** Removes all control codes used by MC for colors and styles. */
 extern AString StripColorCodes(const AString & a_Message);  // tolua_export
 
-/// URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact
+/** URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact */
 extern AString URLDecode(const AString & a_String);  // Cannot export to Lua automatically - would generated an extra return value
 
-/// Replaces all occurrences of char a_From inside a_String with char a_To.
+/** Replaces all occurrences of char a_From inside a_String with char a_To. */
 extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
 
-/// Decodes a Base64-encoded string into the raw data
+/** Decodes a Base64-encoded string into the raw data */
 extern AString Base64Decode(const AString & a_Base64String);  // Exported manually due to embedded NULs and extra parameter
 
-/// Encodes a string into Base64
+/** Encodes a string into Base64 */
 extern AString Base64Encode(const AString & a_Input);  // Exported manually due to embedded NULs and extra parameter
 
-/// Reads two bytes from the specified memory location and interprets them as BigEndian short
+/** Reads two bytes from the specified memory location and interprets them as BigEndian short */
 extern short GetBEShort(const char * a_Mem);
 
-/// Reads four bytes from the specified memory location and interprets them as BigEndian int
+/** Reads four bytes from the specified memory location and interprets them as BigEndian int */
 extern int GetBEInt(const char * a_Mem);
 
-/// Writes four bytes to the specified memory location so that they interpret as BigEndian int
+/** Writes four bytes to the specified memory location so that they interpret as BigEndian int */
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
 /** Splits a string that has embedded \0 characters, on those characters.

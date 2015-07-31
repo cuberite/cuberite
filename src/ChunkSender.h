@@ -72,11 +72,11 @@ public:
 	
 	void Stop(void);
 	
-	/// Queues a chunk to be sent to a specific client
+	/** Queues a chunk to be sent to a specific client */
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client);
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Client);
 	
-	/// Removes the a_Client from all waiting chunk send operations
+	/** Removes the a_Client from all waiting chunk send operations */
 	void RemoveClient(cClientHandle * a_Client);
 	
 protected:
@@ -98,7 +98,7 @@ protected:
 		}
 	};
 
-	/// Used for sending chunks to specific clients
+	/** Used for sending chunks to specific clients */
 	struct sSendChunk
 	{
 		cChunkCoords m_Chunk;
@@ -134,7 +134,7 @@ protected:
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
-	/// Sends the specified chunk to a_Client, or to all chunk clients if a_Client == nullptr
+	/** Sends the specified chunk to all the specified clients */
 	void SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients);
 } ;
 

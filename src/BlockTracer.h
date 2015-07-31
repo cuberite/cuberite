@@ -88,7 +88,7 @@ public:
 	} ;
 	
 	
-	/// Creates the BlockTracer parent with the specified callbacks
+	/** Creates the BlockTracer parent with the specified callbacks */
 	cBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
 		m_World(&a_World),
 		m_Callbacks(&a_Callbacks)
@@ -96,7 +96,7 @@ public:
 	}
 	
 	
-	/// Sets new world, returns the old one. Note that both need to be valid
+	/** Sets new world, returns the old one. Note that both need to be valid */
 	cWorld & SetWorld(cWorld & a_World)
 	{
 		cWorld & Old = *m_World;
@@ -105,7 +105,7 @@ public:
 	}
 	
 	
-	/// Sets new callbacks, returns the old ones. Note that both need to be valid
+	/** Sets new callbacks, returns the old ones. Note that both need to be valid */
 	cCallbacks & SetCallbacks(cCallbacks & a_NewCallbacks)
 	{
 		cCallbacks & Old = *m_Callbacks;
@@ -114,10 +114,10 @@ public:
 	}
 	
 protected:
-	/// The world upon which to operate
+	/** The world upon which to operate */
 	cWorld * m_World;
 	
-	/// The callback to use for reporting
+	/** The callback to use for reporting */
 	cCallbacks * m_Callbacks;
 } ;
 

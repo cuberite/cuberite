@@ -111,7 +111,6 @@ char cItem::GetMaxStackSize(void) const
 
 
 
-/// Returns the cItemHandler responsible for this item type
 cItemHandler * cItem::GetHandler(void) const
 {
 	return ItemHandler(m_ItemType);

@@ -4,20 +4,16 @@
 #include "../Entities/Entity.h"
 #include "Window.h"
 
-/*
-Being a descendant of cWindowOwner means that the class can own one window. That window can be
+/* Being a descendant of cWindowOwner means that the class can own one window. That window can be
 queried, opened by other players, closed by players and finally destroyed.
 Also, a cWindowOwner can be queried for the block coords where the window is displayed. That will be used
-for entities / players in motion to close their windows when they get too far away from the window "source".
-*/
+for entities / players in motion to close their windows when they get too far away from the window "source". */
 
 
 
 
 
-/**
-Base class for the window owning
-*/
+/** Base class for the window owning */
 class cWindowOwner
 {
 public:
@@ -46,7 +42,7 @@ public:
 		return m_Window;
 	}
 
-	/// Returns the block position at which the element owning the window is
+	/** Returns the block position at which the element owning the window is */
 	virtual Vector3i GetBlockPos(void) = 0;
 
 private:
@@ -57,9 +53,7 @@ private:
 
 
 
-/**
-Window owner that is associated with a block entity (chest, furnace, ...)
-*/
+/** Window owner that is associated with a block entity (chest, furnace, ...) */
 class cBlockEntityWindowOwner :
 	public cWindowOwner
 {
@@ -82,9 +76,7 @@ private:
 
 
 
-/**
-Window owner that is associated with an entity (chest minecart)
-*/
+/** Window owner that is associated with an entity (chest minecart etc.) */
 class cEntityWindowOwner :
 	public cWindowOwner
 {

@@ -316,7 +316,7 @@ public:
 
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
-	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
+	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading. */
 	void QueueUnloadUnusedChunks(void);  // tolua_export
 	
 	void CollectPickupsByPlayer(cPlayer & a_Player);
@@ -630,7 +630,8 @@ public:
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, std::function<bool(cChunk &)> a_Callback);
 
-	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback **/
+	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked.
+	Returns false if the chunk isn't loaded, otherwise returns the same value as the callback */
 	bool DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback);
 
 	void GrowTreeImage(const sSetBlockVector & a_Blocks);
@@ -1120,24 +1121,24 @@ private:
 	/** Ticks all clients that are in this world */
 	void TickClients(float a_Dt);
 
-	/** Unloads all chunks immediately.*/
+	/** Unloads all chunks immediately. */
 	void UnloadUnusedChunks(void);
 
 	void UpdateSkyDarkness(void);
 
-	/** <summary>Generates a random spawnpoint on solid land by walking chunks and finding their biomes</summary> */
+	/** Generates a random spawnpoint on solid land by walking chunks and finding their biomes */
 	void GenerateRandomSpawn(void);
 
-	/** Check if player starting point is acceptable **/
+	/** Check if player starting point is acceptable */
 	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
 
-	/** Chooses a reasonable transition from the current weather to a new weather **/
+	/** Chooses a reasonable transition from the current weather to a new weather */
 	eWeather ChooseNewWeather(void);
 
 	/** Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section) */
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
 
-	/** Creates a new redstone simulator.*/
+	/** Creates a new redstone simulator. */
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
 
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.

@@ -77,7 +77,6 @@ void cEndGen::InitializeCompoGen(cIniFile & a_IniFile)
 
 
 
-/// Unless the LastChunk coords are equal to coords given, prepares the internal state (noise array)
 void cEndGen::PrepareState(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(!IsChunkOutsideRange(a_ChunkX, a_ChunkZ));  // Should be filtered before calling this function
@@ -97,7 +96,6 @@ void cEndGen::PrepareState(int a_ChunkX, int a_ChunkZ)
 
 
 
-/// Generates the m_NoiseArray array for the current chunk
 void cEndGen::GenerateNoiseArray(void)
 {
 	NOISE_DATATYPE NoiseData[DIM_X * DIM_Y * DIM_Z];  // [x + DIM_X * z + DIM_X * DIM_Z * y]
@@ -140,7 +138,6 @@ void cEndGen::GenerateNoiseArray(void)
 
 
 
-/// Returns true if the chunk is outside of the island's dimensions
 bool cEndGen::IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ)
 {
 	return (

@@ -364,7 +364,7 @@ AString DimensionToString(eDimension a_Dimension)
 
 
 
-/// Translates damage type constant to a string representation (built-in).
+/** Translates damage type constant to a string representation (built-in) */
 AString DamageTypeToString(eDamageType a_DamageType)
 {
 	// Make sure to keep this alpha-sorted.
@@ -399,7 +399,8 @@ AString DamageTypeToString(eDamageType a_DamageType)
 
 
 
-/// Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure
+/** Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in).
+Returns -1 on failure. */
 eDamageType StringToDamageType(const AString & a_DamageTypeString)
 {
 	// First try decoding as a number:

@@ -41,7 +41,7 @@ protected:
 
 
 
-/// A simple cache that stores N most recently generated chunks' biomes; N being settable upon creation
+/** A simple cache that stores N most recently generated chunks' biomes; N being settable upon creation */
 class cBioGenCache :
 	public cBiomeGen
 {
@@ -112,7 +112,7 @@ protected:
 
 
 
-/// Base class for generators that use a list of available biomes. This class takes care of the list.
+/** Base class for generators that use a list of available biomes. This class takes care of the list. */
 class cBiomeGenList :
 	public cBiomeGen
 {
@@ -124,7 +124,7 @@ protected:
 	EMCSBiomes m_Biomes;
 	int        m_BiomesCount;  // Pulled out of m_Biomes for faster access
 	
-	/// Parses the INI file setting string into m_Biomes.
+	/** Parses the INI file setting string into m_Biomes. */
 	void InitializeBiomes(const AString & a_Biomes);
 } ;
 
@@ -188,20 +188,20 @@ public:
 	}
 
 protected:
-	/// Noise used for the distortion
+	/** Noise used for the distortion */
 	cNoise m_Noise;
 	
-	/// The underlying Voronoi map of the biomes
+	/** The underlying Voronoi map of the biomes */
 	cVoronoiMap m_Voronoi;
 	
-	/// Size of the Voronoi cells, also used for distortion amplitude
+	/** Size of the Voronoi cells, also used for distortion amplitude */
 	int m_CellSize;
 	
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
-	/// Distorts the coords using a Perlin-like noise
+	/** Distorts the coords using a Perlin-like noise */
 	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ);
 } ;
 
@@ -241,30 +241,27 @@ protected:
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
 	/** Step 1: Decides between ocean, land and mushroom, using a DistVoronoi with special conditions and post-processing for mushroom islands
-	Sets biomes to biOcean, -1 (i.e. land), biMushroomIsland or biMushroomShore
-	*/
+	Sets biomes to biOcean, -1 (i.e. land), biMushroomIsland or biMushroomShore. */
 	void DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
 	
 	/** Step 2: Add rivers to the land
-	Flips some "-1" biomes into biRiver
-	*/
+	Flips some "-1" biomes into biRiver. */
 	void AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
 	
 	/** Step 3: Decide land biomes using a temperature / humidity map; freeze ocean / river in low temperatures.
-	Flips all remaining "-1" biomes into land biomes. Also flips some biOcean and biRiver into biFrozenOcean, biFrozenRiver, based on temp map.
-	*/
+	Flips all remaining "-1" biomes into land biomes. Also flips some biOcean and biRiver into biFrozenOcean, biFrozenRiver, based on temp map. */
 	void ApplyTemperatureHumidity(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
 	
-	/// Distorts the coords using a Perlin-like noise, with a specified cell-size
+	/** Distorts the coords using a Perlin-like noise, with a specified cell-size */
 	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize);
 	
-	/// Builds two Perlin-noise maps, one for temperature, the other for humidity. Trims both into [0..255] range
+	/** Builds two Perlin-noise maps, one for temperature, the other for humidity. Trims both into [0..255] range */
 	void BuildTemperatureHumidityMaps(int a_ChunkX, int a_ChunkZ, IntMap & a_TemperatureMap, IntMap & a_HumidityMap);
 	
-	/// Flips all remaining "-1" biomes into land biomes using the two maps
+	/** Flips all remaining "-1" biomes into land biomes using the two maps */
 	void DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap, const IntMap & a_HumidityMap);
 	
-	/// Flips biOcean and biRiver into biFrozenOcean and biFrozenRiver if the temperature is too low
+	/** Flips biOcean and biRiver into biFrozenOcean and biFrozenRiver if the temperature is too low */
 	void FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap);
 } ;
 
@@ -281,10 +278,10 @@ public:
 	cBioGenTwoLevel(int a_Seed);
 	
 protected:
-	/// The Voronoi map that decides the groups of biomes
+	/** The Voronoi map that decides the groups of biomes */
 	cVoronoiMap m_VoronoiLarge;
 	
-	/// The Voronoi map that decides biomes inside individual biome groups
+	/** The Voronoi map that decides biomes inside individual biome groups */
 	cVoronoiMap m_VoronoiSmall;
 	
 	// The noises used for the distortion:
@@ -308,9 +305,9 @@ protected:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 
-	/// Selects biome from the specified biome group, based on the specified index.
-	/// Note that both params may overflow
-	/// a_DistLevel is either 0 or 1; zero when it is at the edge of the small Voronoi cell, 1 near the center
+	/** Selects biome from the specified biome group, based on the specified index.
+	Note that both params may overflow
+	a_DistLevel is either 0 or 1; zero when it is at the edge of the small Voronoi cell, 1 near the center */
 	EMCSBiome SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int a_DistLevel);
 } ;
 

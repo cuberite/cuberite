@@ -10,7 +10,6 @@
 
 
 
-/// Compresses a_Data into a_Compressed; returns Z_XXX error constants same as zlib's compress2()
 int CompressString(const char * a_Data, size_t a_Length, AString & a_Compressed, int a_Factor)
 {
 	uLongf CompressedSize = compressBound(static_cast<uLong>(a_Length));
@@ -32,7 +31,6 @@ int CompressString(const char * a_Data, size_t a_Length, AString & a_Compressed,
 
 
 
-/// Uncompresses a_Data into a_Decompressed; returns Z_XXX error constants same as zlib's uncompress()
 int UncompressString(const char * a_Data, size_t a_Length, AString & a_Uncompressed, size_t a_UncompressedSize)
 {
 	// HACK: We're assuming that AString returns its internal buffer in its data() call and we're overwriting that buffer!

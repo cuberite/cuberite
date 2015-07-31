@@ -48,25 +48,25 @@ private:
 	std::vector<AString> names;
 	std::vector<AString> comments;
 	
-	/// If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is
+	/** If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is */
 	AString CheckCase(const AString & s) const;
 
-	/// Removes the UTF-8 BOMs (Byte order makers), if present.
+	/** Removes the UTF-8 BOMs (Byte order makers), if present. */
 	void RemoveBom(AString & a_line) const;
 	
 public:
 	
-	/// Creates a new instance with no data
+	/** Creates a new instance with no data */
 	cIniFile(void);
 
-// tolua_end
+	// tolua_end
 	virtual ~cIniFile() = default;
 
 	virtual std::vector<std::pair<AString, AString>> GetValues(AString a_keyName) override;
 
 	virtual bool KeyExists(const AString a_keyName) const override;
 
-// tolua_begin
+	// tolua_begin
 
 	// Sets whether or not keynames and valuenames should be case sensitive.
 	// The default is case insensitive.
@@ -76,31 +76,30 @@ public:
 	/** Reads the contents of the specified ini file
 	If the file doesn't exist and a_AllowExampleRedirect is true, tries to read <basename>.example.ini, and
 	writes its contents as <basename>.ini, if successful.
-	Returns true if successful, false otherwise.
-	*/
+	Returns true if successful, false otherwise. */
 	bool ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect = true);
 
-	/// Writes data stored in class to the specified ini file
+	/** Writes data stored in class to the specified ini file */
 	bool WriteFile(const AString & a_FileName) const;
 
 	virtual bool Flush() override { return WriteFile(m_Filename); }
 
-	/// Deletes all stored ini data (but doesn't touch the file)
+	/** Deletes all stored ini data (but doesn't touch the file) */
 	void Clear(void);
 	
 	/** Returns true iff the specified value exists. */
 	bool HasValue(const AString & a_KeyName, const AString & a_ValueName) const override;
 
-	/// Returns index of specified key, or noID if not found
+	/** Returns index of specified key, or noID if not found */
 	int FindKey(const AString & keyname) const;
 
-	/// Returns index of specified value, in the specified key, or noID if not found
+	/** Returns index of specified value, in the specified key, or noID if not found */
 	int FindValue(const int keyID, const AString & valuename) const;
 
-	/// Returns number of keys currently in the ini
+	/** Returns number of keys currently in the ini */
 	int GetNumKeys(void) const { return static_cast<int>(keys.size()); }
 
-	/// Add a key name
+	/** Add a key name */
 	int AddKeyName(const AString & keyname) override;
 
 	// Returns key names by index.
@@ -172,19 +171,19 @@ public:
 	// Header comment functions.
 	// Header comments are those comments before the first key.
 
-	/// Returns the number of header comments
+	/** Returns the number of header comments */
 	int GetNumHeaderComments(void) {return static_cast<int>(comments.size());}
 	
-	/// Adds a header comment
+	/** Adds a header comment */
 	void AddHeaderComment(const AString & comment);
 	
-	/// Returns a header comment, or empty string if out of range
+	/** Returns a header comment, or empty string if out of range */
 	AString GetHeaderComment(const int commentID) const;
 	
-	/// Deletes a header comment. Returns true if successful
+	/** Deletes a header comment. Returns true if successful */
 	bool DeleteHeaderComment(int commentID);
 	
-	/// Deletes all header comments
+	/** Deletes all header comments */
 	void DeleteHeaderComments(void) {comments.clear();}
 
 
@@ -194,19 +193,19 @@ public:
 	// these comments will be moved to the top of the key definition when
 	// the CIniFile::WriteFile() is called.
 
-	/// Get number of key comments
+	/** Get number of key comments */
 	int GetNumKeyComments(const int keyID) const;
 
-	/// Get number of key comments
+	/** Get number of key comments */
 	int GetNumKeyComments(const AString & keyname) const;
 	
-	/// Add a key comment
+	/** Add a key comment */
 	bool AddKeyComment(const int keyID, const AString & comment);
 
-	/// Add a key comment
+	/** Add a key comment */
 	bool AddKeyComment(const AString & keyname, const AString & comment) override;
 	
-	/// Return a key comment
+	/** Return a key comment */
 	AString GetKeyComment(const int keyID, const int commentID) const;
 	AString GetKeyComment(const AString & keyname, const int commentID) const override;
 	
