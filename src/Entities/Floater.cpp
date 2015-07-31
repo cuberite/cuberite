@@ -54,10 +54,10 @@ public:
 		return false;
 	}
 
-	/// Returns the nearest entity that was hit, after the enumeration has been completed
+	/** Returns the nearest entity that was hit, after the enumeration has been completed */
 	cEntity * GetHitEntity(void) const { return m_HitEntity; }
 
-	/// Returns true if the callback has encountered a true hit
+	/** Returns true if the callback has encountered a true hit */
 	bool HasHit(void) const { return (m_MinCoeff < 1); }
 
 protected:

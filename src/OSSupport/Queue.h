@@ -16,19 +16,18 @@ To create a queue of type T, instantiate a cQueue<T> object. You can also
 modify the behavior of the queue when deleting items and when adding items
 that are already in the queue by providing a second parameter, a class that
 implements the functions Delete() and Combine(). An example is given in
-cQueueFuncs and is used as the default behavior.
-*/
+cQueueFuncs and is used as the default behavior. */
 
-/// This empty struct allows for the callback functions to be inlined
+/** This empty struct allows for the callback functions to be inlined */
 template <class T>
 struct cQueueFuncs
 {
 public:
 
-	/// Called when an Item is deleted from the queue without being returned
+	/** Called when an Item is deleted from the queue without being returned */
 	static void Delete(T) {}
 	
-	/// Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted
+	/** Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted */
 	static void Combine(T & a_existing, const T & a_new)
 	{
 		UNUSED(a_existing);
@@ -54,7 +53,7 @@ public:
 	~cQueue() {}
 
 
-	/// Enqueues an item to the queue, may block if other threads are accessing the queue.
+	/** Enqueues an item to the queue, may block if other threads are accessing the queue. */
 	void EnqueueItem(ItemType a_Item)
 	{
 		cCSLock Lock(m_CS);
@@ -63,7 +62,7 @@ public:
 	}
 
 
-	/// Enqueues an item in the queue if not already present (as determined by operator ==). Blocks other threads from accessing the queue.
+	/** Enqueues an item in the queue if not already present (as determined by operator ==). Blocks other threads from accessing the queue. */
 	void EnqueueItemIfNotPresent(ItemType a_Item)
 	{
 		cCSLock Lock(m_CS);
@@ -81,8 +80,8 @@ public:
 	}
 
 
-	/// Dequeues an item from the queue if any are present.
-	/// Returns true if successful. Value of item is undefined if dequeuing was unsuccessful.
+	/** Dequeues an item from the queue if any are present.
+	Returns true if successful. Value of item is undefined if dequeuing was unsuccessful. */
 	bool TryDequeueItem(ItemType & item)
 	{
 		cCSLock Lock(m_CS);
@@ -97,7 +96,7 @@ public:
 	}
 
 
-	/// Dequeues an item from the queue, blocking until an item is available.
+	/** Dequeues an item from the queue, blocking until an item is available. */
 	ItemType DequeueItem(void)
 	{
 		cCSLock Lock(m_CS);
@@ -113,7 +112,7 @@ public:
 	}
 
 
-	/// Blocks until the queue is empty.
+	/** Blocks until the queue is empty. */
 	void BlockTillEmpty(void)
 	{
 		cCSLock Lock(m_CS);
@@ -125,7 +124,7 @@ public:
 	}
 
 
-	/// Removes all Items from the Queue, calling Delete on each of them.
+	/** Removes all Items from the Queue, calling Delete on each of them. */
 	void Clear(void)
 	{
 		cCSLock Lock(m_CS);
@@ -137,8 +136,8 @@ public:
 	}
 
 
-	/// Returns the size at time of being called.
-	/// Do not use to determine whether to call DequeueItem(), use TryDequeueItem() instead
+	/** Returns the size at time of being called.
+	Do not use to determine whether to call DequeueItem(), use TryDequeueItem() instead */
 	size_t Size(void)
 	{
 		cCSLock Lock(m_CS);
@@ -146,8 +145,8 @@ public:
 	}
 
 
-	/// Removes the item from the queue. If there are multiple such items, only the first one is removed.
-	/// Returns true if the item has been removed, false if no such item found.
+	/** Removes the item from the queue. If there are multiple such items, only the first one is removed.
+	Returns true if the item has been removed, false if no such item found. */
 	bool Remove(ItemType a_Item)
 	{
 		cCSLock Lock(m_CS);
@@ -187,16 +186,16 @@ public:
 	}
 
 private:
-	/// The contents of the queue
+	/** The contents of the queue */
 	QueueType m_Contents;
 	
-	/// Mutex that protects access to the queue contents
+	/** Mutex that protects access to the queue contents */
 	cCriticalSection m_CS;
 	
-	/// Event that is signalled when an item is added
+	/** Event that is signalled when an item is added */
 	cEvent m_evtAdded;
 	
-	/// Event that is signalled when an item is removed (both dequeued or erased)
+	/** Event that is signalled when an item is removed (both dequeued or erased) */
 	cEvent m_evtRemoved;
 };
 

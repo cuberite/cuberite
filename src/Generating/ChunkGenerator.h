@@ -46,16 +46,16 @@ public:
 		cGenerator(cChunkGenerator & a_ChunkGenerator);
 		virtual ~cGenerator() {}  // Force a virtual destructor
 
-		/// Called to initialize the generator on server startup.
+		/** Called to initialize the generator on server startup. */
 		virtual void Initialize(cIniFile & a_IniFile);
 		
-		/// Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading.
+		/** Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading. */
 		virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) = 0;
 
-		/// Returns the biome at the specified coords. Used by ChunkMap if an invalid chunk is queried for biome. Default implementation uses GenerateBiomes().
+		/** Returns the biome at the specified coords. Used by ChunkMap if an invalid chunk is queried for biome. Default implementation uses GenerateBiomes(). */
 		virtual EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
 
-		/// Called in a separate thread to do the actual chunk generation. Generator should generate into a_ChunkDesc.
+		/** Called in a separate thread to do the actual chunk generation. Generator should generate into a_ChunkDesc. */
 		virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) = 0;
 		
 	protected:
@@ -71,13 +71,11 @@ public:
 		virtual ~cPluginInterface() {}
 		
 		/** Called when the chunk is about to be generated.
-		The generator may be partly or fully overriden by the implementation
-		*/
+		The generator may be partly or fully overriden by the implementation. */
 		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) = 0;
 		
 		/** Called after the chunk is generated, before it is handed to the chunk sink.
-		a_ChunkDesc contains the generated chunk data. Implementation may modify this data.
-		*/
+		a_ChunkDesc contains the generated chunk data. Implementation may modify this data. */
 		virtual void CallHookChunkGenerated(cChunkDesc & a_ChunkDesc) = 0;
 	} ;
 	
@@ -92,19 +90,16 @@ public:
 		/** Called after the chunk has been generated
 		The interface may store the chunk, send it over network, whatever.
 		The chunk is not expected to be modified, but the generator will survive if the implementation
-		changes the data within. All changes are ignored, though.
-		*/
+		changes the data within. All changes are ignored, though. */
 		virtual void OnChunkGenerated(cChunkDesc & a_ChunkDesc) = 0;
 		
 		/** Called just before the chunk generation is started,
 		to verify that it hasn't been generated in the meantime.
-		If this callback returns true, the chunk is not generated.
-		*/
+		If this callback returns true, the chunk is not generated. */
 		virtual bool IsChunkValid(int a_ChunkX, int a_ChunkZ) = 0;
 		
 		/** Called when the generator is overloaded to skip chunks that are no longer needed.
-		If this callback returns false, the chunk is not generated.
-		*/
+		If this callback returns false, the chunk is not generated. */
 		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) = 0;
 
 		/** Called to check whether the specified chunk is in the queued state.
@@ -126,7 +121,7 @@ public:
 	If the generator becomes overloaded and skips this chunk, the callback is still called. */
 	void QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate, cChunkCoordCallback * a_Callback = nullptr);
 	
-	/// Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading.
+	/** Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading. */
 	void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
 	
 	void WaitForQueueEmpty(void);
@@ -151,7 +146,7 @@ private:
 		/** Force the regeneration of an already existing chunk */
 		bool m_ForceGenerate;
 
-		/** Callback to call after generating.*/
+		/** Callback to call after generating. */
 		cChunkCoordCallback * m_Callback;
 	};
 

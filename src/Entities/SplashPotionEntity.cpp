@@ -8,8 +8,12 @@
 
 
 
-/// Converts an angle in radians into a byte representation used by the network protocol
+/** Converts an angle in radians into a byte representation used by the network protocol */
 #define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // cSplashPotionEntityCallback:

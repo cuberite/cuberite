@@ -25,10 +25,10 @@ public:
 	
 protected:
 
-	/// Seed for the noise
+	/** Seed for the noise */
 	int m_Seed;
 	
-	/// The Perlin noise used for generating
+	/** The Perlin noise used for generating */
 	cPerlinNoise m_Perlin;
 
 	// XYZ size of the "island", in blocks:
@@ -49,18 +49,21 @@ protected:
 	int m_LastChunkX;
 	int m_LastChunkZ;
 	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
-	
-	/// Unless the LastChunk coords are equal to coords given, prepares the internal state (noise array)
+
+
+	/** Unless the LastChunk coords are equal to coords given, prepares the internal state (noise array) */
 	void PrepareState(int a_ChunkX, int a_ChunkZ);
 	
-	/// Generates the m_NoiseArray array for the current chunk
+	/** Generates the m_NoiseArray array for the current chunk */
 	void GenerateNoiseArray(void);
 	
-	/// Returns true if the chunk is outside of the island's dimensions
+	/** Returns true if the chunk is outside of the island's dimensions */
 	bool IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ);
-		
+
+
 	// cTerrainShapeGen overrides:
 	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;

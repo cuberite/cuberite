@@ -56,8 +56,7 @@ public:
 	All the contained chunks are queued for loading / generating. */
 	void Enable (cChunkMap & a_ChunkMap);
 	
-	/** Disables the ChunkStay, the chunks are released and the ChunkStay
-	object can be edited with Add() and Remove() again*/
+	/** Disables the ChunkStay, the chunks are released and the ChunkStay object can be edited with Add() and Remove() again */
 	virtual void Disable(void);
 	
 	/** Returns all the chunks that should be kept */

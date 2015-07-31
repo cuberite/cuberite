@@ -262,7 +262,6 @@ size_t cByteBuffer::GetFreeSpace(void) const
 
 
 
-/// Returns the number of bytes that are currently in the ringbuffer. Note GetReadableBytes()
 size_t cByteBuffer::GetUsedSpace(void) const
 {
 	CHECK_THREAD
@@ -276,7 +275,6 @@ size_t cByteBuffer::GetUsedSpace(void) const
 
 
 
-/// Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already)
 size_t cByteBuffer::GetReadableSpace(void) const
 {
 	CHECK_THREAD

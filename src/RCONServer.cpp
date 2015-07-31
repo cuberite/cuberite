@@ -336,7 +336,6 @@ void cRCONServer::cConnection::UIntToBuffer(UInt32 a_Value, char * a_Buffer)
 
 
 
-/// Sends a RCON packet back to the client
 void cRCONServer::cConnection::SendResponse(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload)
 {
 	ASSERT((a_PayloadLength == 0) || (a_Payload != nullptr));  // Either zero data to send, or a valid payload ptr

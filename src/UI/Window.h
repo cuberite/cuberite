@@ -81,35 +81,35 @@ public:
 	cWindowOwner * GetOwner(void) { return m_Owner; }
 	void SetOwner( cWindowOwner * a_Owner) { m_Owner = a_Owner; }
 	
-	/// Returns the total number of slots
+	/** Returns the total number of slots */
 	int GetNumSlots(void) const;
 	
-	/// Returns the number of slots, excluding the player's inventory (used for network protocols)
+	/** Returns the number of slots, excluding the player's inventory (used for network protocols) */
 	int GetNumNonInventorySlots(void) const { return GetNumSlots() - c_NumInventorySlots; }
 	
 	// tolua_begin
 	
-	/// Returns the item at the specified slot for the specified player. Returns nullptr if invalid SlotNum requested
+	/** Returns the item at the specified slot for the specified player. Returns nullptr if invalid SlotNum requested */
 	const cItem * GetSlot(cPlayer & a_Player, int a_SlotNum) const;
 	
-	/// Sets the item to the specified slot for the specified player
+	/** Sets the item to the specified slot for the specified player */
 	void SetSlot(cPlayer & a_Player, int a_SlotNum, const cItem & a_Item);
 	
-	/// Returns true if the specified slot is in the Player Main Inventory slotarea
+	/** Returns true if the specified slot is in the Player Main Inventory slotarea */
 	bool IsSlotInPlayerMainInventory(int a_SlotNum) const;
 	
-	/// Returns true if the specified slot is in the Player Hotbar slotarea
+	/** Returns true if the specified slot is in the Player Hotbar slotarea */
 	bool IsSlotInPlayerHotbar(int a_SlotNum) const;
 	
-	/// Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false for Armor.
+	/** Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false for Armor. */
 	bool IsSlotInPlayerInventory(int a_SlotNum) const;
 	
 	// tolua_end
 	
-	/// Fills a_Slots with the slots read from m_SlotAreas[], for the specified player
+	/** Fills a_Slots with the slots read from m_SlotAreas[], for the specified player */
 	void GetSlots(cPlayer & a_Player, cItems & a_Slots) const;
 
-	/// Handles a click event from a player
+	/** Handles a click event from a player */
 	void Clicked(
 		cPlayer & a_Player, int a_WindowID,
 		short a_SlotNum, eClickAction a_ClickAction,
@@ -118,16 +118,16 @@ public:
 
 	virtual void OpenedByPlayer(cPlayer & a_Player);
 	
-	/// Called when a player closes this window; notifies all slot areas. Returns true if close accepted
+	/** Called when a player closes this window; notifies all slot areas. Returns true if close accepted */
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse);
 
-	/// Sends the specified slot's contents to all clients of this window; the slot is specified as local in an area
+	/** Sends the specified slot's contents to all clients of this window; the slot is specified as local in an area */
 	void BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum);
 	
-	/// Sends the contents of the whole window to the specified client
+	/** Sends the contents of the whole window to the specified client */
 	void SendWholeWindow(cClientHandle & a_Client);
 	
-	/// Sends the contents of the whole window to all clients of this window.
+	/** Sends the contents of the whole window to all clients of this window. */
 	void BroadcastWholeWindow(void);
 
 	// tolua_begin
@@ -135,20 +135,20 @@ public:
 	const AString & GetWindowTitle() const { return m_WindowTitle; }
 	void SetWindowTitle(const AString & a_WindowTitle) { m_WindowTitle = a_WindowTitle; }
 	
-	/// Sends the UpdateWindowProperty (0x69) packet to all clients of the window
+	/** Sends the UpdateWindowProperty (0x69) packet to all clients of the window */
 	virtual void SetProperty(short a_Property, short a_Value);
 	
-	/// Sends the UpdateWindowPropert(0x69) packet to the specified player
+	/** Sends the UpdateWindowPropert(0x69) packet to the specified player */
 	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player);
 
 	// tolua_end
 
 	void OwnerDestroyed(void);
 	
-	/// Calls the callback safely for each player that has this window open; returns true if all players have been enumerated
+	/** Calls the callback safely for each player that has this window open; returns true if all players have been enumerated */
 	bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback);
 
-	/// Calls the callback safely for each client that has this window open; returns true if all clients have been enumerated
+	/** Calls the callback safely for each client that has this window open; returns true if all clients have been enumerated */
 	bool ForEachClient(cItemCallback<cClientHandle> & a_Callback);
 	
 	/** Called on shift-clicking to distribute the stack into other areas; Modifies a_ItemStack as it is distributed!
@@ -168,7 +168,7 @@ public:
 	Returns true if full stack has been collected, false if there's space remaining to fill. */
 	bool CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer & a_Player, bool a_CollectFullStacks);
 	
-	/// Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea
+	/** Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea */
 	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
 
 protected:
@@ -187,35 +187,33 @@ protected:
 	
 	static Byte m_WindowIDCounter;
 
-	/// Sets the internal flag as "destroyed"; notifies the owner that the window is destroying
+	/** Sets the internal flag as "destroyed"; notifies the owner that the window is destroying */
 	virtual void Destroy(void);
 	
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
-	If the global SlotNum is out of range, returns nullptr
-	*/
+	If the global SlotNum is out of range, returns nullptr */
 	cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum);
 	
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
 	If the global SlotNum is out of range, returns nullptr.
-	Const version.
-	*/
+	Const version. */
 	const cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum) const;
 	
-	/// Prepares the internal structures for inventory painting from the specified player
+	/** Prepares the internal structures for inventory painting from the specified player */
 	void OnPaintBegin(cPlayer & a_Player);
 	
-	/// Adds the slot to the internal structures for inventory painting by the specified player
+	/** Adds the slot to the internal structures for inventory painting by the specified player */
 	void OnPaintProgress(cPlayer & a_Player, int a_SlotNum);
 	
-	/// Processes the entire action stored in the internal structures for inventory painting; distributes as many items as possible
+	/** Processes the entire action stored in the internal structures for inventory painting; distributes as many items as possible */
 	void OnLeftPaintEnd(cPlayer & a_Player);
 
-	/// Processes the entire action stored in the internal structures for inventory painting; distributes one item into each slot
+	/** Processes the entire action stored in the internal structures for inventory painting; distributes one item into each slot */
 	void OnRightPaintEnd(cPlayer & a_Player);
 	
-	/// Distributes a_NumToEachSlot items into the slots specified in a_SlotNums; returns the total number of items distributed
+	/** Distributes a_NumToEachSlot items into the slots specified in a_SlotNums; returns the total number of items distributed */
 	int DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums);
 } ;  // tolua_export
 

@@ -204,16 +204,16 @@ public:
 		const NOISE_DATATYPE * a_FracY   ///< Pointer to the attay that stores the Y fractional values
 	);
 	
-	/// Uses current m_WorkRnds[] to generate part of the array
+	/** Uses current m_WorkRnds[] to generate part of the array */
 	void Generate(
 		int a_FromX, int a_ToX,
 		int a_FromY, int a_ToY
 	);
 	
-	/// Initializes m_WorkRnds[] with the specified Floor values
+	/** Initializes m_WorkRnds[] with the specified Floor values */
 	void InitWorkRnds(int a_FloorX, int a_FloorY);
 	
-	/// Updates m_WorkRnds[] for the new Floor values.
+	/** Updates m_WorkRnds[] for the new Floor values. */
 	void Move(int a_NewFloorX, int a_NewFloorY);
 
 protected:
@@ -356,17 +356,17 @@ public:
 		const NOISE_DATATYPE * a_FracZ          ///< Pointer to the array that stores the Z fractional values
 	);
 	
-	/// Uses current m_WorkRnds[] to generate part of the array
+	/** Uses current m_WorkRnds[] to generate part of the array */
 	void Generate(
 		int a_FromX, int a_ToX,
 		int a_FromY, int a_ToY,
 		int a_FromZ, int a_ToZ
 	);
 	
-	/// Initializes m_WorkRnds[] with the specified Floor values
+	/** Initializes m_WorkRnds[] with the specified Floor values */
 	void InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ);
 	
-	/// Updates m_WorkRnds[] for the new Floor values.
+	/** Updates m_WorkRnds[] for the new Floor values. */
 	void Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ);
 
 protected:

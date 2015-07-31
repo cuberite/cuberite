@@ -42,7 +42,7 @@ public:
 	// Called each tick
 	virtual void Tick(float a_Dt) = 0;
 
-	/** Calls the specified hook with the params given. Returns the bool that the hook callback returns.*/
+	/** Calls the specified hook with the params given. Returns the bool that the hook callback returns. */
 	virtual bool OnBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) = 0;
 	virtual bool OnBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) = 0;
 	virtual bool OnChat                     (cPlayer & a_Player, AString & a_Message) = 0;

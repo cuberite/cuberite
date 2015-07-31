@@ -108,7 +108,7 @@ public:  // tolua_export
 	If the string given is not a valid UUID, returns false. */
 	static bool IsUUIDOnline(const AString & a_UUID);  // tolua_export
 	
-	/** Formats the type of message with the proper color and prefix for sending to the client. **/
+	/** Formats the type of message with the proper color and prefix for sending to the client. */
 	static AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 	
 	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);

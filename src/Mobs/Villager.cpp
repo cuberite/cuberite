@@ -103,7 +103,8 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Farmer functions.
+// Farmer functions:
+
 void cVillager::HandleFarmerPrepareFarmCrops()
 {
 	if (!m_World->VillagersShouldHarvestCrops())
@@ -112,15 +113,16 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 	}
 
 	cBlockArea Surrounding;
-	/// Read a 11x7x11 area.
+
+	// Read a 11x7x11 area:
 	Surrounding.Read(
 		m_World,
-		static_cast<int>(GetPosX()) - 5,
-		static_cast<int>(GetPosX()) + 6,
-		static_cast<int>(GetPosY()) - 3,
-		static_cast<int>(GetPosY()) + 4,
-		static_cast<int>(GetPosZ()) - 5,
-		static_cast<int>(GetPosZ()) + 6
+		FloorC(GetPosX()) - 5,
+		FloorC(GetPosX()) + 6,
+		FloorC(GetPosY()) - 3,
+		FloorC(GetPosY()) + 4,
+		FloorC(GetPosZ()) - 5,
+		FloorC(GetPosZ()) + 6
 	);
 
 	for (int I = 0; I < 5; I++)

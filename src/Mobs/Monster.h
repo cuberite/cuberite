@@ -73,7 +73,7 @@ public:
 	virtual void CheckEventSeePlayer(void);
 	virtual void EventSeePlayer(cEntity * a_Player);
 
-	/// Reads the monster configuration for the specified monster name and assigns it to this object.
+	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
 
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
@@ -105,7 +105,7 @@ public:
 	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; }
 	void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
 
-	/// Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick
+	/** Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick */
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
 
 	double GetRelativeWalkSpeed(void) const { return m_RelativeWalkSpeed; }  // tolua_export
@@ -278,19 +278,19 @@ protected:
 
 	char m_Age;
 
-	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops*/
+	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
 
-	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops*/
+	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops */
 	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);
 
-	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops*/
+	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops */
 	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel);
 
-	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
+	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
-	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
+	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
 

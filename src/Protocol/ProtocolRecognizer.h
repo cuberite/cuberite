@@ -41,13 +41,13 @@ public:
 	cProtocolRecognizer(cClientHandle * a_Client);
 	virtual ~cProtocolRecognizer();
 	
-	/// Translates protocol version number into protocol version text: 49 -> "1.4.4"
+	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
 	
-	/// Called when client sends some data:
+	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 	
-	/// Sending stuff to clients (alphabetically sorted):
+	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
@@ -140,15 +140,19 @@ public:
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 protected:
-	cProtocol * m_Protocol;  ///< The recognized protocol
-	cByteBuffer m_Buffer;    ///< Buffer for the incoming data until we recognize the protocol
+	/** The recognized protocol */
+	cProtocol * m_Protocol;
+
+	/** Buffer for the incoming data until we recognize the protocol */
+	cByteBuffer m_Buffer;
 	
-	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
+
+	/** Tries to recognize protocol based on m_Buffer contents; returns true if recognized */
 	bool TryRecognizeProtocol(void);
 	
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
 	The packet length and type have already been read, type is 0
-	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining. **/
+	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining. */
 	bool TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining);
 
 	/** Sends a single packet contained within the cPacketizer class.

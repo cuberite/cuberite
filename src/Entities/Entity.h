@@ -173,7 +173,7 @@ public:
 	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
 	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
 	
-	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
+	/** Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true) */
 	virtual bool IsA(const char * a_ClassName) const;
 	
 	/** Returns the class name of this class */
@@ -255,16 +255,16 @@ public:
 	inline UInt32 GetUniqueID(void) const { return m_UniqueID; }
 	inline bool IsDestroyed(void) const { return !m_IsInitialized; }
 
-	/// Schedules the entity for destroying; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet
+	/** Schedules the entity for destroying; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet */
 	void Destroy(bool a_ShouldBroadcast = true);
 
-	/// Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called
+	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
 	void TakeDamage(cEntity & a_Attacker);
 	
-	/// Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called
+	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called */
 	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
-	/// Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage()
+	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
 	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
 	
 	float GetGravity(void) const { return m_Gravity; }
@@ -275,10 +275,10 @@ public:
 
 	void SetAirDrag(float a_AirDrag) { m_AirDrag = a_AirDrag; }
 	
-	/// Sets the rotation to match the speed vector (entity goes "face-forward")
+	/** Sets the rotation to match the speed vector (entity goes "face-forward") */
 	void SetYawFromSpeed(void);
 	
-	/// Sets the pitch to match the speed vector (entity gies "face-forward")
+	/** Sets the pitch to match the speed vector (entity gies "face-forward") */
 	void SetPitchFromSpeed(void);
 	
 	// tolua_end
@@ -290,56 +290,56 @@ public:
 	
 	// tolua_begin
 
-	/// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
+	/** Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items */
 	virtual int GetRawDamageAgainst(const cEntity & a_Receiver);
 	
-	/** Returns whether armor will protect against the passed damage type **/
+	/** Returns whether armor will protect against the passed damage type */
 	virtual bool ArmorCoversAgainst(eDamageType a_DamageType);
 	
-	/// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
+	/** Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover */
 	virtual int GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
 	
-	/// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
+	/** Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit */
 	virtual double GetKnockbackAmountAgainst(const cEntity & a_Receiver);
 	
-	/// Returns the curently equipped weapon; empty item if none
+	/** Returns the curently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const { return cItem(); }
 	
-	/// Returns the currently equipped helmet; empty item if none
+	/** Returns the currently equipped helmet; empty item if none */
 	virtual cItem GetEquippedHelmet(void) const { return cItem(); }
 	
-	/// Returns the currently equipped chestplate; empty item if none
+	/** Returns the currently equipped chestplate; empty item if none */
 	virtual cItem GetEquippedChestplate(void) const { return cItem(); }
 
-	/// Returns the currently equipped leggings; empty item if none
+	/** Returns the currently equipped leggings; empty item if none */
 	virtual cItem GetEquippedLeggings(void) const { return cItem(); }
 	
-	/// Returns the currently equipped boots; empty item if none
+	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
-	/// Called when the health drops below zero. a_Killer may be nullptr (environmental damage)
+	/** Called when the health drops below zero. a_Killer may be nullptr (environmental damage) */
 	virtual void KilledBy(TakeDamageInfo & a_TDI);
 
-	/// Called when the entity kills another entity
+	/** Called when the entity kills another entity */
 	virtual void Killed(cEntity * a_Victim) {}
 
-	/// Heals the specified amount of HPs
+	/** Heals the specified amount of HPs */
 	virtual void Heal(int a_HitPoints);
 	
-	/// Returns the health of this entity
+	/** Returns the health of this entity */
 	int GetHealth(void) const { return m_Health; }
 	
-	/// Sets the health of this entity; doesn't broadcast any hurt animation
+	/** Sets the health of this entity; doesn't broadcast any hurt animation */
 	void SetHealth(int a_Health);
 	
 	// tolua_end
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	
-	/// Handles the physics of the entity - updates position based on speed, updates speed based on environment
+	/** Handles the physics of the entity - updates position based on speed, updates speed based on environment */
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	
-	/// Updates the state related to this entity being on fire
+	/** Updates the state related to this entity being on fire */
 	virtual void TickBurning(cChunk & a_Chunk);
 
 	/** Detects the time for application of cacti damage */
@@ -380,8 +380,7 @@ public:
 	// tolua_end
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
-	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
-	*/
+	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity() */
 	virtual void SpawnOn(cClientHandle & a_Client) = 0;
 
 	// tolua_begin
@@ -413,22 +412,22 @@ public:
 	/** Sets the world the entity will be leaving */
 	void SetWorldTravellingFrom(cWorld * a_World) { m_WorldTravellingFrom = a_World; }
 	
-	/// Updates clients of changes in the entity.
+	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
 	
-	/// Attaches to the specified entity; detaches from any previous one first
+	/** Attaches to the specified entity; detaches from any previous one first */
 	void AttachTo(cEntity * a_AttachTo);
 	
-	/// Detaches from the currently attached entity, if any
+	/** Detaches from the currently attached entity, if any */
 	virtual void Detach(void);
 	
-	/// Makes sure head yaw is not over the specified range.
+	/** Makes sure head yaw is not over the specified range. */
 	void WrapHeadYaw();
 
-	/// Makes sure rotation is not over the specified range.
+	/** Makes sure rotation is not over the specified range. */
 	void WrapRotation();
 
-	/// Makes speed is not over 20. Max speed is 20 blocks / second
+	/** Makes speed is not over 20. Max speed is 20 blocks / second */
 	void WrapSpeed();
 	
 	// tolua_begin
@@ -443,8 +442,10 @@ public:
 
 	/** Returns whether the player is swimming or not */
 	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+
 	/** Return whether the player is under water or not */
 	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
 
@@ -462,10 +463,10 @@ public:
 	
 	// tolua_end
 	
-	/// Called when the specified player right-clicks this entity
+	/** Called when the specified player right-clicks this entity */
 	virtual void OnRightClicked(cPlayer & a_Player) {}
 
-	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
+	/** Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy(). */
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr)
 	{
 		UNUSED(a_Drops);
@@ -476,6 +477,17 @@ public:
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
 protected:
+	/** Structure storing the portal delay timer and cooldown boolean */
+	struct sPortalCooldownData
+	{
+		/** Ticks since entry of portal, used to delay teleportation */
+		unsigned short m_TicksDelayed;
+
+		/** Whether the entity has just exited the portal, and should therefore not be teleported again.
+		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
+		bool m_ShouldPreventTeleportation;
+	};
+
 	static cCriticalSection m_CSCount;
 	static UInt32 m_EntityCount;
 	
@@ -490,10 +502,10 @@ protected:
 	int m_Health;
 	int m_MaxHealth;
 	
-	/// The entity to which this entity is attached (vehicle), nullptr if none
+	/** The entity to which this entity is attached (vehicle), nullptr if none */
 	cEntity * m_AttachedTo;
 	
-	/// The entity which is attached to this entity (rider), nullptr if none
+	/** The entity which is attached to this entity (rider), nullptr if none */
 	cEntity * m_Attachee;
 
 	/** Stores whether head yaw has been set manually */
@@ -526,10 +538,9 @@ protected:
 	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
 	bool m_IsInitialized;
 
-	/** World entity is travelling from
-	Set to a valid world pointer by MoveToWorld; reset to nullptr when the entity is removed from the old world
-	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it
-	*/
+	/** World entity is travelling from (such as when using portals).
+	Set to a valid world pointer by MoveToWorld; reset to nullptr when the entity is removed from the old world.
+	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it. */
 	cWorld * m_WorldTravellingFrom;
 
 	eEntityType m_EntityType;
@@ -560,6 +571,20 @@ protected:
 	/** Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void. */
 	int m_TicksSinceLastVoidDamage;
 	
+	/** If an entity is currently swimming in or submerged under water */
+	bool m_IsSwimming, m_IsSubmerged;
+
+	/** Air level of a mobile */
+	int m_AirLevel;
+	int m_AirTickTimer;
+
+	/** Portal delay timer and cooldown boolean data */
+	sPortalCooldownData m_PortalCooldownData;
+	
+	/** The number of ticks this entity has been alive for */
+	long int m_TicksAlive;
+
+
 	/** Does the actual speed-setting. The default implementation just sets the member variable value;
 	overrides can provide further processing, such as forcing players to move at the given speed. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
@@ -568,8 +593,7 @@ protected:
 
 	/** Applies friction to an entity
 	@param a_Speed The speed vector to apply changes to
-	@param a_SlowdownMultiplier The factor to reduce the speed by
-	*/
+	@param a_SlowdownMultiplier The factor to reduce the speed by */
 	static void ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, float a_Dt);
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
@@ -578,31 +602,6 @@ protected:
 	/** Called once per tick to set IsSwimming and IsSubmerged */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
-	/** If an entity is currently swimming in or submerged under water */
-	bool m_IsSwimming, m_IsSubmerged;
-
-	/** Air level of a mobile */
-	int m_AirLevel;
-	int m_AirTickTimer;
-
-	/** Structure storing the portal delay timer and cooldown boolean */
-	struct sPortalCooldownData
-	{
-		/** Ticks since entry of portal, used to delay teleportation */
-		unsigned short m_TicksDelayed;
-
-		/** Whether the entity has just exited the portal, and should therefore not be teleported again
-		This prevents teleportation loops, and is reset when the entity has moved out of the portal
-		*/
-		bool m_ShouldPreventTeleportation;
-	};
-
-	/** Portal delay timer and cooldown boolean data */
-	sPortalCooldownData m_PortalCooldownData;
-	
-	/** The number of ticks this entity has been alive for */
-	long int m_TicksAlive;
-	
 private:
 	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;

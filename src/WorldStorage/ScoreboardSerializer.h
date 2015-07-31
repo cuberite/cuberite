@@ -27,10 +27,10 @@ public:
 
 	cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard);
 
-	/// Try to load the scoreboard
+	/** Try to load the scoreboard */
 	bool Load(void);
 
-	/// Try to save the scoreboard
+	/** Try to save the scoreboard */
 	bool Save(void);
 
 

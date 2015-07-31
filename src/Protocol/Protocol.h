@@ -59,7 +59,7 @@ public:
 
 	virtual ~cProtocol() {}
 	
-	/// Called when client sends some data
+	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 	
 	// Sending stuff to clients (alphabetically sorted):
@@ -150,7 +150,7 @@ public:
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
 	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) = 0;
 
-	/// Returns the ServerID used for authentication through session.minecraft.net
+	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
 protected:

@@ -37,17 +37,17 @@ public:
 	void    SetItem  (int x, int y, const cItem & a_Item);
 	void    Clear    (void);
 	
-	/// Removes items in a_Grid from m_Items[] (used by cCraftingRecipe::ConsumeIngredients())
+	/** Removes items in a_Grid from m_Items[] (used by cCraftingRecipe::ConsumeIngredients()) */
 	void ConsumeGrid(const cCraftingGrid & a_Grid);
 
-	/// Dumps the entire crafting grid using LOGD()
+	/** Dumps the entire crafting grid using LOGD() */
 	void Dump(void);
 	
 	// tolua_end
 	
 	cItem * GetItems(void) const {return m_Items; }
 	
-	/// Copies internal contents into the item array specified. Assumes that the array has the same dimensions as self
+	/** Copies internal contents into the item array specified. Assumes that the array has the same dimensions as self */
 	void  CopyToItems(cItem * a_Items) const;
 	
 protected:
@@ -88,10 +88,10 @@ public:
 		m_Ingredients.SetItem(x, y, a_Item);
 	}
 	
-	/// Consumes ingredients from the crafting grid specified
+	/** Consumes ingredients from the crafting grid specified */
 	void ConsumeIngredients(cCraftingGrid & a_CraftingGrid);
 
-	/// Dumps the entire recipe using LOGD()
+	/** Dumps the entire recipe using LOGD() */
 	void Dump(void);
 	// tolua_end
 	
@@ -114,7 +114,7 @@ public:
 	cCraftingRecipes(void);
 	~cCraftingRecipes();
 	
-	/// Returns the recipe for current crafting grid. Doesn't modify the grid. Clears a_Recipe if no recipe found.
+	/** Returns the recipe for current crafting grid. Doesn't modify the grid. Clears a_Recipe if no recipe found. */
 	void GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
 	
 protected:
@@ -127,8 +127,7 @@ protected:
 	typedef std::vector<cRecipeSlot> cRecipeSlots;
 	
 	/** A single recipe, stored. Each recipe is normalized right after parsing (NormalizeIngredients())
-	A normalized recipe starts at (0, 0)
-	*/
+	A normalized recipe starts at (0, 0) */
 	struct cRecipe
 	{
 		cRecipeSlots m_Ingredients;
@@ -145,31 +144,31 @@ protected:
 	void LoadRecipes(void);
 	void ClearRecipes(void);
 	
-	/// Parses the recipe line and adds it into m_Recipes. a_LineNum is used for diagnostic warnings only
+	/** Parses the recipe line and adds it into m_Recipes. a_LineNum is used for diagnostic warnings only */
 	void AddRecipeLine(int a_LineNum, const AString & a_RecipeLine);
 	
-	/// Parses an item string in the format "<ItemType>[^<Damage>]", returns true if successful.
+	/** Parses an item string in the format "<ItemType>[^<Damage>]", returns true if successful. */
 	bool ParseItem(const AString & a_String, cItem & a_Item);
 	
-	/// Parses one ingredient and adds it to the specified recipe. Returns true if successful.
+	/** Parses one ingredient and adds it to the specified recipe. Returns true if successful. */
 	bool ParseIngredient(const AString & a_String, cRecipe * a_Recipe);
 	
-	/// Moves the recipe to top-left corner, sets its MinWidth / MinHeight
+	/** Moves the recipe to top-left corner, sets its MinWidth / MinHeight */
 	void NormalizeIngredients(cRecipe * a_Recipe);
 	
-	/// Finds a recipe matching the crafting grid. Returns a newly allocated recipe (with all its coords set) or nullptr if not found. Caller must delete return value!
+	/** Finds a recipe matching the crafting grid. Returns a newly allocated recipe (with all its coords set) or nullptr if not found. Caller must delete return value! */
 	cRecipe * FindRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight);
 	
-	/// Same as FindRecipe, but the grid is guaranteed to be of minimal dimensions needed
+	/** Same as FindRecipe, but the grid is guaranteed to be of minimal dimensions needed */
 	cRecipe * FindRecipeCropped(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride);
 	
-	/// Checks if the grid matches the specified recipe, offset by the specified offsets. Returns a matched cRecipe * if so, or nullptr if not matching. Caller must delete the return value!
+	/** Checks if the grid matches the specified recipe, offset by the specified offsets. Returns a matched cRecipe * if so, or nullptr if not matching. Caller must delete the return value! */
 	cRecipe * MatchRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride, const cRecipe * a_Recipe, int a_OffsetX, int a_OffsetY);
 
 	/** Searches for anything firework related, and does the data setting if appropriate */
 	void HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_OffsetX, int a_OffsetY);
 
-	/// Searches for anything dye related for leather, calculates the appropriate color value, and sets the resulting value.
+	/** Searches for anything dye related for leather, calculates the appropriate color value, and sets the resulting value. */
 	void HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight);
 } ;
 

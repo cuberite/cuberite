@@ -782,7 +782,7 @@ AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_
 
 
 
-/// Converts one Hex character in a Base64 encoding into the data value
+/** Converts one Hex character in a Base64 encoding into the data value */
 static inline int UnBase64(char c)
 {
 	if ((c >='A') && (c <= 'Z'))

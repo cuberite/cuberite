@@ -54,7 +54,7 @@ public:
 	);
 
 protected:
-	/// The noise used for generating Voronoi seeds
+	/** The noise used for generating Voronoi seeds */
 	cNoise m_Noise1;
 	cNoise m_Noise2;
 	cNoise m_Noise3;

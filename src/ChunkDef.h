@@ -39,13 +39,13 @@ typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 // tolua_begin
 
-/// The datatype used by blockdata
+/** The datatype used by blockdata */
 typedef unsigned char BLOCKTYPE;
 
-/// The datatype used by nibbledata (meta, light, skylight)
+/** The datatype used by nibbledata (meta, light, skylight) */
 typedef unsigned char NIBBLETYPE;
 
-/// The type used by the heightmap
+/** The type used by the heightmap */
 typedef unsigned char HEIGHTTYPE;
 
 // tolua_end
@@ -53,7 +53,7 @@ typedef unsigned char HEIGHTTYPE;
 
 
 
-/// Constants used throughout the code, useful typedefs and utility functions
+/** Constants used throughout the code, useful typedefs and utility functions */
 class cChunkDef
 {
 public:
@@ -61,22 +61,22 @@ public:
 	static const int Width = 16;
 	static const int Height = 256;
 	static const int NumBlocks = Width * Height * Width;
-	/// If the data is collected into a single buffer, how large it needs to be:
+
+	/** If the data is collected into a single buffer, how large it needs to be: */
 	static const int BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2);  // 2.5 * numblocks
 
-	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
+	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
 	typedef HEIGHTTYPE HeightMap[Width * Width];
 
 	/** The type used for any biomemap operations and storage inside MCServer,
 	using MCServer biomes (need not correspond to client representation!)
-	idx = x + Width * z  // Need to verify this with the protocol spec, currently unknown!
-	*/
+	idx = x + Width * z */
 	typedef EMCSBiome BiomeMap[Width * Width];
 
-	/// The type used for block type operations and storage, AXIS_ORDER ordering
+	/** The type used for block type operations and storage, AXIS_ORDER ordering */
 	typedef BLOCKTYPE BlockTypes[NumBlocks];
 
-	/// The type used for block data in nibble format, AXIS_ORDER ordering
+	/** The type used for block data in nibble format, AXIS_ORDER ordering */
 	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
 
 	/** The storage wrapper used for compressed blockdata residing in RAMz */
@@ -86,7 +86,7 @@ public:
 	typedef std::vector<NIBBLETYPE> COMPRESSED_NIBBLETYPE;
 
 
-	/// Converts absolute block coords into relative (chunk + block) coords:
+	/** Converts absolute block coords into relative (chunk + block) coords: */
 	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ)
 	{
 		UNUSED(a_Y);
@@ -116,7 +116,7 @@ public:
 	}
 
 
-	/// Converts absolute block coords to chunk coords:
+	/** Converts absolute block coords to chunk coords: */
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
 	{
 		a_ChunkX = a_X / Width;
@@ -345,18 +345,17 @@ private:
 
 
 /** Interface class used for comparing clients of two chunks.
-Used primarily for entity moving while both chunks are locked.
-*/
+Used primarily for entity moving while both chunks are locked. */
 class cClientDiffCallback
 {
 public:
 
 	virtual ~cClientDiffCallback() {}
 
-	/// Called for clients that are in Chunk1 and not in Chunk2,
+	/** Called for clients that are in Chunk1 and not in Chunk2, */
 	virtual void Removed(cClientHandle * a_Client) = 0;
 
-	/// Called for clients that are in Chunk2 and not in Chunk1.
+	/** Called for clients that are in Chunk2 and not in Chunk1. */
 	virtual void Added(cClientHandle * a_Client) = 0;
 } ;
 
@@ -417,6 +416,10 @@ public:
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
 typedef std::vector<cChunkCoords> cChunkCoordsVector;
+
+
+
+
 
 /** A simple hash function for chunk coords, we assume that chunk coords won't use more than 16 bits, so the hash is almost an identity.
 Used for std::unordered_map<cChunkCoords, ...> */
@@ -489,7 +492,7 @@ public:
 
 
 
-/** Generic template that can store any kind of data together with a triplet of 3 coords*/
+/** Generic template that can store any kind of data together with a triplet of 3 coords */
 template <typename X> class cCoordWithData
 {
 public:

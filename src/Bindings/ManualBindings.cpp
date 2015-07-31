@@ -1945,7 +1945,7 @@ tolua_lerror:
 
 
 
-/// Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks
+/** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks */
 class cLuaBlockTracerCallbacks :
 	public cBlockTracer::cCallbacks
 {

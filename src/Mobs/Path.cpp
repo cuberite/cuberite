@@ -387,7 +387,8 @@ void cPath::ProcessIfWalkable(const Vector3i & a_Location, cPathCell * a_Parent,
 		}
 	}
 
-	/*y =-1;
+	/*
+	y = -1;
 	for (x = 0; x < m_BoundingBoxWidth; ++x)
 	{
 		for (z = 0; z < m_BoundingBoxWidth; ++z)
@@ -398,7 +399,8 @@ void cPath::ProcessIfWalkable(const Vector3i & a_Location, cPathCell * a_Parent,
 			}
 		}
 	}
-	ProcessCell(cell, a_Parent, a_Cost);*/
+	ProcessCell(cell, a_Parent, a_Cost);
+	*/
 
 	// Make sure there's at least 1 piece of solid below us.
 
