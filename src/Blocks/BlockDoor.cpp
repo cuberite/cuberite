@@ -61,11 +61,16 @@ void cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		case E_BLOCK_DARK_OAK_DOOR:
 		case E_BLOCK_JUNGLE_DOOR:
 		case E_BLOCK_SPRUCE_DOOR:
-		case E_BLOCK_IRON_DOOR:
 		case E_BLOCK_OAK_DOOR:
 		{
 			ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 			a_Player->GetWorld()->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+			break;
+		}
+		// Prevent iron door from opening on player click
+		case E_BLOCK_IRON_DOOR:
+		{
+			OnCancelRightClick(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			break;
 		}
 	}
