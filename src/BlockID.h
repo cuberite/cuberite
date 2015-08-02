@@ -1017,7 +1017,11 @@ enum eDamageType
 	dtEnderPearl,       // Thrown an ender pearl, teleported by it
 	dtAdmin,            // Damage applied by an admin command
 	dtExplosion,        // Damage applied by an explosion
+<<<<<<< HEAD
 	dtAnvil,		    // Damage by falling anvil
+=======
+	dtAnvil,	    // Damage by falling anvil
+>>>>>>> 798ecb4d8571cb6ce7ebfec4e25ef72889aa60dc
 	
 	// Some common synonyms:
 	dtPawnAttack   = dtAttack,
