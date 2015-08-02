@@ -937,24 +937,25 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		AString DamageText;
 		switch (a_TDI.DamageType)
 		{
-			case dtRangedAttack: DamageText = "was shot"; break;
-			case dtLightning: DamageText = "was plasmified by lightining"; break;
-			case dtFalling: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "fell to death" : "hit the ground too hard"; break;
-			case dtDrowning: DamageText = "drowned"; break;
-			case dtSuffocating: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "git merge'd into a block" : "fused with a block"; break;
-			case dtStarving: DamageText = "forgot the importance of food"; break;
-			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
-			case dtLavaContact: DamageText = "was melted by lava"; break;
-			case dtPoisoning: DamageText = "died from septicaemia"; break;
-			case dtWithering: DamageText = "is a husk of their former selves"; break;
-			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
-			case dtFireContact: DamageText = "burnt themselves to death"; break;
-			case dtInVoid: DamageText = "somehow fell out of the world"; break;
+			case dtRangedAttack:	DamageText = "was shot"; break;
+			case dtLightning:		DamageText = "was plasmified by lightining"; break;
+			case dtFalling:			DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "fell to death" : "hit the ground too hard"; break;
+			case dtDrowning:		DamageText = "drowned"; break;
+			case dtSuffocating:		DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "git merge'd into a block" : "fused with a block"; break;
+			case dtStarving:		DamageText = "forgot the importance of food"; break;
+			case dtCactusContact:	DamageText = "was impaled on a cactus"; break;
+			case dtLavaContact:		DamageText = "was melted by lava"; break;
+			case dtPoisoning:		DamageText = "died from septicaemia"; break;
+			case dtWithering:		DamageText = "is a husk of their former selves"; break;
+			case dtOnFire:			DamageText = "forgot to stop, drop, and roll"; break;
+			case dtFireContact:		DamageText = "burnt themselves to death"; break;
+			case dtInVoid:			DamageText = "somehow fell out of the world"; break;
 			case dtPotionOfHarming: DamageText = "was magicked to death"; break;
-			case dtEnderPearl: DamageText = "misused an ender pearl"; break;
-			case dtAdmin: DamageText = "was administrator'd"; break;
-			case dtExplosion: DamageText = "blew up"; break;
-			default: DamageText = "died, somehow; we've no idea how though"; break;
+			case dtEnderPearl:		DamageText = "misused an ender pearl"; break;
+			case dtAdmin:			DamageText = "was administrator'd"; break;
+			case dtExplosion:		DamageText = "blew up"; break;
+			case dtAnvil:			DamageText = "was squashed by an anvil, that's all folks!"; break;
+			default:				DamageText = "died, somehow; we've no idea how though"; break;
 		}
 		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);

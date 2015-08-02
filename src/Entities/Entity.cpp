@@ -651,6 +651,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtFireContact:
 		case dtEnderPearl:
 		case dtExplosion:
+		case dtAnvil:
 		{
 			return true;
 		}
