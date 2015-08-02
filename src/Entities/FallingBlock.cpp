@@ -5,6 +5,32 @@
 #include "../ClientHandle.h"
 #include "../Simulator/SandSimulator.h"
 #include "../Chunk.h"
+#include "BoundingBox.h"
+#include "FastRandom.h"
+
+////////////////////////////////////////////////////////////////////////////////
+// cFallingBlockCallback:
+
+class cFallingBlockCallback :
+	public cEntityCallback
+{
+public:
+	cFallingBlockCallback(cFallingBlock * a_FallingBlock, int a_damage) :
+		m_FallingBlock(a_FallingBlock),
+		m_damage(a_damage)
+	{
+	}
+
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		a_Entity->TakeDamage(eDamageType::dtAnvil, nullptr, m_damage, 0.0);
+		return true;
+	}
+
+protected:
+	cFallingBlock * m_FallingBlock;
+	int m_damage;
+};
 
 
 
@@ -16,6 +42,7 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 	m_BlockMeta(a_BlockMeta),
 	m_OriginalPosition(a_BlockPosition)
 {
+	m_HurtEntities = (m_BlockType == E_BLOCK_ANVIL);
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
 }
@@ -41,6 +68,11 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	int BlockY = static_cast<int>(GetPosY() - 0.5);
 	int BlockZ = POSZ_TOINT;
 	
+	if (BlockY > m_HighestPoint)
+	{
+		m_HighestPoint = BlockY;
+	}
+
 	if (BlockY < 0)
 	{
 		// Fallen out of this world, just continue falling until out of sight, then destroy:
@@ -81,6 +113,27 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (BlockY < cChunkDef::Height - 1)
 		{
+			int damage = 2 * (m_HighestPoint - BlockY) - 4; // Damage data from minecraftwiki
+			if (m_HurtEntities && damage > 0)
+			{
+				cFallingBlockCallback callback(this, (damage > m_FallHurtMax ? m_FallHurtMax : damage));
+				cBoundingBox box(this->GetPosition(), 0.5, 1.0);
+				m_World->ForEachEntityInBox(box, callback);
+				
+				cFastRandom Random;
+				if ((m_BlockType == E_BLOCK_ANVIL) && ((double)Random.NextFloat() < 0.05000000074505806 + (double)damage * 0.05)) // Randomization data taken from Forge
+				{
+					if (m_BlockMeta < E_BLOCK_ANVIL_HIGH_DAMAGE)
+					{
+						m_BlockMeta += 4;
+					}
+					else
+					{
+						m_BlockType = E_BLOCK_AIR;
+					}
+				}
+				
+			}
 			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 		}
 		Destroy(true);
@@ -97,7 +150,5 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate();
 	}
 }
-
-
 
 

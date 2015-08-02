@@ -36,6 +36,9 @@ private:
 	BLOCKTYPE  m_BlockType;
 	NIBBLETYPE m_BlockMeta;
 	Vector3i   m_OriginalPosition;  // Position where the falling block has started, in world coords
+	bool m_HurtEntities;
+	int m_FallHurtMax = 40;
+	int m_HighestPoint;
 } ;
 
 
