@@ -371,7 +371,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 	switch (a_DamageType)
 	{
 		case dtAdmin:           return "dtAdmin";
-		case dtAnvil:			return "dtAnvil";
+		case dtAnvil:		return "dtAnvil";
 		case dtAttack:          return "dtAttack";
 		case dtCactusContact:   return "dtCactusContact";
 		case dtDrowning:        return "dtDrowning";
