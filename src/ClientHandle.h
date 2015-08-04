@@ -246,11 +246,12 @@ public:  // tolua_export
 	int GetUniqueID(void) const { return m_UniqueID; }
 	// tolua_end
 	
-	/// Adds a channel to the handle's collection of registerd channels
+	/** Adds a channel to the handle's collection of registered channels */
 	void RegisterChannel(const AString & a_PluginChannel);
 	
-	/// Removes a channel to the handle's collection of registerd channels
+	/** Removes a channel to the handle's collection of registered channels */
 	void RemoveChannel(const AString & a_PluginChannel);
+
 	// tolua_begin
 	
 	/// Checks if a handle can recieve messages on the channel
