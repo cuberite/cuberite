@@ -1,3 +1,7 @@
+// ChannelCallback.cpp
+
+// Implements the cChannelCallback class representing the callbacks used for plugin channel management
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ChannelCallback.h"
