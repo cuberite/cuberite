@@ -17,6 +17,7 @@ Implements the 1.7.x protocol classes:
 #include "Packetizer.h"
 
 #include "../ClientHandle.h"
+#include "../ChannelManager.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
@@ -2253,7 +2254,15 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	{
 		return;
 	}
-	m_Client->HandlePluginMessage(Channel, Data);
+	// Register the client on the requested channels
+	if (Channel == "REGISTER")
+	{
+
+		cRoot::Get()->GetServer()->GetChannelManager().AddClientToChannels(*m_Client, BreakApartChannels(Data));
+	}
+
+	// Call the channel message handler
+	cRoot::Get()->GetServer()->GetChannelManager().HandleChannelMessage(*m_Client, Channel, Data);
 }
 
 
@@ -2481,7 +2490,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	// Read the payload and send it through to the clienthandle:
 	AString Message;
 	VERIFY(a_ByteBuffer.ReadString(Message, a_PayloadLength));
-	m_Client->HandlePluginMessage(a_Channel, Message);
+	cRoot::Get()->GetServer()->GetChannelManager().HandleChannelMessage(*m_Client, a_Channel, Message);
 }
 
 

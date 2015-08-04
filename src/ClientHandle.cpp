@@ -1,6 +1,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ClientHandle.h"
+#include "ChannelManager.h"
 #include "Server.h"
 #include "World.h"
 #include "Entities/Pickup.h"
@@ -794,37 +795,6 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	m_Player->MoveTo(Pos);
 	m_Player->SetStance(a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
-}
-
-
-
-
-
-void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
-{
-	if (a_Channel == "REGISTER")
-	{
-		if (HasPluginChannel(a_Channel))
-		{
-			SendPluginMessage("UNREGISTER", a_Channel);
-			return;  // Can't register again if already taken - kinda defeats the point of plugin messaging!
-		}
-
-		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
-	}
-	else if (a_Channel == "UNREGISTER")
-	{
-		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
-	}
-	else if (!HasPluginChannel(a_Channel))
-	{
-		// Ignore if client sent something but didn't register the channel first
-		LOGD("Player %s sent a plugin message on channel \"%s\", but didn't REGISTER it first", GetUsername().c_str(), a_Channel.c_str());
-		SendPluginMessage("UNREGISTER", a_Channel);
-		return;
-	}
-
-	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
 }
 
 
@@ -2905,6 +2875,32 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 	if (world != nullptr)
 	{
 		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
+	}
+}
+
+
+
+
+
+void cClientHandle::RegisterChannel(const AString & a_Channel)
+{
+	auto channel = m_PluginChannels.find(a_Channel);
+	if (channel == m_PluginChannels.end())
+	{
+		m_PluginChannels.insert(a_Channel);
+	}
+}
+
+
+
+
+
+void cClientHandle::RemoveChannel(const AString & a_Channel)
+{
+	auto channel = m_PluginChannels.find(a_Channel);
+	if (channel != m_PluginChannels.end())
+	{
+		m_PluginChannels.erase(channel);
 	}
 }
 

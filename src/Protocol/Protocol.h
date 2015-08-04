@@ -175,6 +175,8 @@ protected:
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
 	virtual void SendPacket(cPacketizer & a_Packet) = 0;
+
+	virtual AStringVector BreakApartChannels(const AString & a_Channels);
 } ;
 
 

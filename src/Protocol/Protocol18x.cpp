@@ -16,6 +16,7 @@ Implements the 1.8.x protocol classes:
 #include "Packetizer.h"
 
 #include "../ClientHandle.h"
+#include "../ChannelManager.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
@@ -2511,7 +2512,14 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	// Read the plugin message and relay to clienthandle:
 	AString Data;
 	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
-	m_Client->HandlePluginMessage(Channel, Data);
+	// Register the client on the requested channels
+	if (Channel == "REGISTER")
+	{
+		cRoot::Get()->GetServer()->GetChannelManager().AddClientToChannels(*m_Client, BreakApartChannels(Data));
+	}
+
+	// Call the channel message handler
+	cRoot::Get()->GetServer()->GetChannelManager().HandleChannelMessage(*m_Client, Channel, Data);
 }
 
 
@@ -2757,7 +2765,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	// Read the payload and send it through to the clienthandle:
 	AString Message;
 	VERIFY(a_ByteBuffer.ReadString(Message, a_ByteBuffer.GetReadableSpace() - 1));
-	m_Client->HandlePluginMessage(a_Channel, Message);
+	cRoot::Get()->GetServer()->GetChannelManager().HandleChannelMessage(*m_Client, a_Channel, Message);
 }
 
 
