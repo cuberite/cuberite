@@ -254,7 +254,7 @@ public:  // tolua_export
 
 	// tolua_begin
 	
-	/// Checks if a handle can recieve messages on the channel
+	/** Checks if a handle can recieve messages on the channel */
 	bool HasPluginChannel(const AString & a_PluginChannel);
 	
 	/** Called by the protocol when it receives the MC|Brand plugin message. Also callable by plugins.
