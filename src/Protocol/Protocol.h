@@ -176,6 +176,7 @@ protected:
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
 	virtual void SendPacket(cPacketizer & a_Packet) = 0;
 
+	/** Splits a string of null-separated channel names into a vector of channel names */
 	virtual AStringVector BreakApartChannels(const AString & a_Channels);
 } ;
 
