@@ -1668,7 +1668,7 @@ void cClientHandle::HandleRespawn(void)
 
 
 
-void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
+void cClientHandle::HandleKeepAlive(UInt32 a_KeepAliveID)
 {
 	if (a_KeepAliveID == m_PingID)
 	{

@@ -129,13 +129,13 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 	m_HeightGen(m_UnderlyingHeiGen, 64),
 	m_IsInitialized(false)
 {
-	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)1,    (NOISE_DATATYPE)0.5);
-	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
-	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)0.25, (NOISE_DATATYPE)2);
+	m_NoiseDistortX.AddOctave(static_cast<NOISE_DATATYPE>(1),    static_cast<NOISE_DATATYPE>(0.5));
+	m_NoiseDistortX.AddOctave(static_cast<NOISE_DATATYPE>(0.5),  static_cast<NOISE_DATATYPE>(1));
+	m_NoiseDistortX.AddOctave(static_cast<NOISE_DATATYPE>(0.25), static_cast<NOISE_DATATYPE>(2));
 
-	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)1,    (NOISE_DATATYPE)0.5);
-	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
-	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.25, (NOISE_DATATYPE)2);
+	m_NoiseDistortZ.AddOctave(static_cast<NOISE_DATATYPE>(1),    static_cast<NOISE_DATATYPE>(0.5));
+	m_NoiseDistortZ.AddOctave(static_cast<NOISE_DATATYPE>(0.5),  static_cast<NOISE_DATATYPE>(1));
+	m_NoiseDistortZ.AddOctave(static_cast<NOISE_DATATYPE>(0.25), static_cast<NOISE_DATATYPE>(2));
 }
 
 
@@ -151,9 +151,9 @@ void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 
 	// Read the params from the INI file:
 	m_SeaLevel   =                 a_IniFile.GetValueSetI("Generator", "SeaLevel",                     62);
-	m_FrequencyX = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyX", 10);
-	m_FrequencyY = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyY", 10);
-	m_FrequencyZ = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyZ", 10);
+	m_FrequencyX = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyX", 10));
+	m_FrequencyY = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyY", 10));
+	m_FrequencyZ = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyZ", 10));
 
 	m_IsInitialized = true;
 }
@@ -187,12 +187,12 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 	NOISE_DATATYPE DistortNoiseX[DIM_X * DIM_Y * DIM_Z];
 	NOISE_DATATYPE DistortNoiseZ[DIM_X * DIM_Y * DIM_Z];
 	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];
-	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width)) / m_FrequencyX;
-	NOISE_DATATYPE EndX   = ((NOISE_DATATYPE)((m_CurChunkX + 1) * cChunkDef::Width - 1)) / m_FrequencyX;
+	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_CurChunkX * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_CurChunkX + 1) * cChunkDef::Width - 1) / m_FrequencyX;
 	NOISE_DATATYPE StartY = 0;
-	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)(257)) / m_FrequencyY;
-	NOISE_DATATYPE StartZ = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width)) / m_FrequencyZ;
-	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((m_CurChunkZ + 1) * cChunkDef::Width - 1)) / m_FrequencyZ;
+	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(257) / m_FrequencyY;
+	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_CurChunkZ * cChunkDef::Width) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_CurChunkZ + 1) * cChunkDef::Width - 1) / m_FrequencyZ;
 
 	m_NoiseDistortX.Generate3D(DistortNoiseX, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
 	m_NoiseDistortZ.Generate3D(DistortNoiseZ, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
@@ -211,10 +211,10 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 			{
 				NOISE_DATATYPE DistX = DistortNoiseX[NoiseArrayIdx + x] * m_DistortAmpX[AmpIdx + x];
 				NOISE_DATATYPE DistZ = DistortNoiseZ[NoiseArrayIdx + x] * m_DistortAmpZ[AmpIdx + x];
-				DistX += (NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + x * INTERPOL_X);
-				DistZ += (NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + z * INTERPOL_Z);
+				DistX += static_cast<NOISE_DATATYPE>(m_CurChunkX * cChunkDef::Width + x * INTERPOL_X);
+				DistZ += static_cast<NOISE_DATATYPE>(m_CurChunkZ * cChunkDef::Width + z * INTERPOL_Z);
 				// Adding 0.5 helps alleviate the interpolation artifacts
-				DistHei[NoiseArrayIdx + x] = (NOISE_DATATYPE)GetHeightmapAt(DistX, DistZ) + (NOISE_DATATYPE)0.5;
+				DistHei[NoiseArrayIdx + x] = static_cast<NOISE_DATATYPE>(GetHeightmapAt(DistX, DistZ)) + static_cast<NOISE_DATATYPE>(0.5);
 			}
 		}
 	}
@@ -263,9 +263,9 @@ void cDistortedHeightmap::InitializeShapeGen(cIniFile & a_IniFile)
 
 int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 {
-	int RelX = (int)std::floor(a_X);
+	int RelX = FloorC(a_X);
 	int RelY = 0;
-	int RelZ = (int)std::floor(a_Z);
+	int RelZ = FloorC(a_Z);
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
 

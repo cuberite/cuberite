@@ -756,7 +756,7 @@ int cRoot::GetVirtualRAMUsage(void)
 		if (KERN_SUCCESS == task_info(
 			mach_task_self(),
 			TASK_BASIC_INFO,
-			(task_info_t)&t_info,
+			reinterpret_cast<task_info_t>(&t_info),
 			&t_info_count
 		))
 		{
@@ -808,7 +808,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 		if (KERN_SUCCESS == task_info(
 			mach_task_self(),
 			TASK_BASIC_INFO,
-			(task_info_t)&t_info,
+			reinterpret_cast<task_info_t>(&t_info),
 			&t_info_count
 		))
 		{

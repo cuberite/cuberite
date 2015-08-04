@@ -624,23 +624,23 @@ cStructGenDistortedMembraneOverhangs::cStructGenDistortedMembraneOverhangs(int a
 
 void cStructGenDistortedMembraneOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	const NOISE_DATATYPE Frequency = (NOISE_DATATYPE)16;
-	const NOISE_DATATYPE Amount = (NOISE_DATATYPE)1;
+	const NOISE_DATATYPE Frequency = static_cast<NOISE_DATATYPE>(16);
+	const NOISE_DATATYPE Amount = static_cast<NOISE_DATATYPE>(1);
 	for (int y = 50; y < 128; y++)
 	{
-		NOISE_DATATYPE NoiseY = (NOISE_DATATYPE)y / 32;
+		NOISE_DATATYPE NoiseY = static_cast<NOISE_DATATYPE>(y) / 32;
 		// TODO: proper water level - where to get?
 		BLOCKTYPE ReplacementBlock = (y > 62) ? E_BLOCK_AIR : E_BLOCK_STATIONARY_WATER;
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z)) / Frequency;
+			NOISE_DATATYPE NoiseZ = static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / Frequency;
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x)) / Frequency;
+				NOISE_DATATYPE NoiseX = static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / Frequency;
 				NOISE_DATATYPE DistortX = m_NoiseX.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * Amount;
 				NOISE_DATATYPE DistortY = m_NoiseY.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * Amount;
 				NOISE_DATATYPE DistortZ = m_NoiseZ.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * Amount;
-				int MembraneHeight = 96 - (int)((DistortY + m_NoiseH.CubicNoise2D(NoiseX + DistortX, NoiseZ + DistortZ)) * 30);
+				int MembraneHeight = 96 - static_cast<int>((DistortY + m_NoiseH.CubicNoise2D(NoiseX + DistortX, NoiseZ + DistortZ)) * 30);
 				if (MembraneHeight < y)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, ReplacementBlock);

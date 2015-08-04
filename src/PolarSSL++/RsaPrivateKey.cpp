@@ -100,7 +100,7 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 	{
 		return AString();
 	}
-	return AString((const char *)(buf + sizeof(buf) - res), (size_t)res);
+	return AString(reinterpret_cast<const char *>(buf + sizeof(buf) - res), static_cast<size_t>(res));
 }
 
 
@@ -134,7 +134,7 @@ int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 	{
 		return -1;
 	}
-	return (int)DecryptedLength;
+	return static_cast<int>(DecryptedLength);
 }
 
 
@@ -167,7 +167,7 @@ int cRsaPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 	{
 		return -1;
 	}
-	return (int)m_Rsa.len;
+	return static_cast<int>(m_Rsa.len);
 }
 
 

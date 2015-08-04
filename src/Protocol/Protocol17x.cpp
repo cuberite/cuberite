@@ -652,7 +652,7 @@ void cProtocol172::SendKeepAlive(UInt32 a_PingID)
 	}
 	
 	cPacketizer Pkt(*this, 0x00);  // Keep Alive packet
-	Pkt.WriteBEInt32(static_cast<Int32>(a_PingID));
+	Pkt.WriteBEUInt32(a_PingID);
 }
 
 
@@ -2144,7 +2144,7 @@ void cProtocol172::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, KeepAliveID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, KeepAliveID);
 	m_Client->HandleKeepAlive(KeepAliveID);
 }
 

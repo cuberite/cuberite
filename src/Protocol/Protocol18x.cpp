@@ -649,7 +649,7 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteBEInt8(static_cast<Int8>(a_World.GetDimension()));
 		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteBEUInt8(Clamp<UInt8>(Server->GetMaxPlayers(), 0, 255));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<int>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");  // Level type - wtf?
 		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
 	}
@@ -2197,7 +2197,7 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 		m_Client->Kick("Hacked client");
 		return;
 	}
-	if (ntohl(DecryptedNonce[0]) != (unsigned)(uintptr_t)this)  // Cannot convert to c++ casts
+	if (ntohl(DecryptedNonce[0]) != static_cast<unsigned>(reinterpret_cast<uintptr_t>(this)))
 	{
 		LOGD("Bad nonce value");
 		m_Client->Kick("Hacked client");
@@ -2247,7 +2247,7 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
 		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
 		Pkt.WriteVarInt32(4);
-		Pkt.WriteBEInt32((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :) Cannot convert to c++ casts
+		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 		m_Client->SetUsername(Username);
 		return;
 	}
@@ -2406,7 +2406,7 @@ void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, KeepAliveID);
-	m_Client->HandleKeepAlive(static_cast<Int32>(KeepAliveID));
+	m_Client->HandleKeepAlive(KeepAliveID);
 }
 
 

@@ -724,7 +724,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	if ((a_ItemGrid == &m_ArmorSlots) && (World != nullptr))
 	{
 		World->BroadcastEntityEquipment(
-			m_Owner, static_cast<short>(ArmorSlotNumToEntityEquipmentID(a_SlotNum)),
+			m_Owner, static_cast<short>(ArmorSlotNumToEntityEquipmentID(static_cast<short>(a_SlotNum))),
 			m_ArmorSlots.GetSlot(a_SlotNum), m_Owner.GetClientHandle()
 		);
 	}

@@ -67,20 +67,20 @@ void cMap::Tick()
 
 void cMap::UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius)
 {
-	int PixelRadius = a_Radius / GetPixelWidth();
+	int PixelRadius = static_cast<int>(a_Radius / GetPixelWidth());
 
-	unsigned int StartX = Clamp(a_PixelX - PixelRadius, 0, (int)m_Width);
-	unsigned int StartZ = Clamp(a_PixelZ - PixelRadius, 0, (int)m_Height);
+	unsigned int StartX = static_cast<unsigned int>(Clamp(a_PixelX - PixelRadius, 0, static_cast<int>(m_Width)));
+	unsigned int StartZ = static_cast<unsigned int>(Clamp(a_PixelZ - PixelRadius, 0, static_cast<int>(m_Height)));
 
-	unsigned int EndX   = Clamp(a_PixelX + PixelRadius, 0, (int)m_Width);
-	unsigned int EndZ   = Clamp(a_PixelZ + PixelRadius, 0, (int)m_Height);
+	unsigned int EndX   = static_cast<unsigned int>(Clamp(a_PixelX + PixelRadius, 0, static_cast<int>(m_Width)));
+	unsigned int EndZ   = static_cast<unsigned int>(Clamp(a_PixelZ + PixelRadius, 0, static_cast<int>(m_Height)));
 
 	for (unsigned int X = StartX; X < EndX; ++X)
 	{
 		for (unsigned int Z = StartZ; Z < EndZ; ++Z)
 		{
-			int dX = X - a_PixelX;
-			int dZ = Z - a_PixelZ;
+			int dX = static_cast<int>(X) - a_PixelX;
+			int dZ = static_cast<int>(Z) - a_PixelZ;
 
 			if ((dX * dX) + (dZ * dZ) < (PixelRadius * PixelRadius))
 			{
@@ -96,10 +96,10 @@ void cMap::UpdateRadius(int a_PixelX, int a_PixelZ, unsigned int a_Radius)
 
 void cMap::UpdateRadius(cPlayer & a_Player, unsigned int a_Radius)
 {
-	unsigned int PixelWidth = GetPixelWidth();
+	int PixelWidth = static_cast<int>(GetPixelWidth());
 
-	int PixelX = (int) (a_Player.GetPosX() - m_CenterX) / PixelWidth + (m_Width  / 2);
-	int PixelZ = (int) (a_Player.GetPosZ() - m_CenterZ) / PixelWidth + (m_Height / 2);
+	int PixelX = static_cast<int>(a_Player.GetPosX() - m_CenterX) / PixelWidth + static_cast<int>(m_Width  / 2);
+	int PixelZ = static_cast<int>(a_Player.GetPosZ() - m_CenterZ) / PixelWidth + static_cast<int>(m_Height / 2);
 
 	UpdateRadius(PixelX, PixelZ, a_Radius);
 }
@@ -110,10 +110,8 @@ void cMap::UpdateRadius(cPlayer & a_Player, unsigned int a_Radius)
 
 bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 {
-	unsigned int PixelWidth = GetPixelWidth();
-
-	int BlockX = m_CenterX + ((a_X - (m_Width  / 2)) * PixelWidth);
-	int BlockZ = m_CenterZ + ((a_Z - (m_Height / 2)) * PixelWidth);
+	int BlockX = m_CenterX + static_cast<int>((a_X - m_Width  / 2) * GetPixelWidth());
+	int BlockZ = m_CenterZ + static_cast<int>((a_Z - m_Height / 2) * GetPixelWidth());
 
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
@@ -174,7 +172,8 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			}
 
 			// Multiply base color ID by 4 and add brightness ID
-			m_PixelData = ColourID * 4 + BrightnessID[Clamp<size_t>(static_cast<size_t>(Height / (ChunkHeight / BrightnessID.size())), 0, BrightnessID.size() - 1)];
+			const int BrightnessIDSize = static_cast<int>(BrightnessID.size());
+			m_PixelData = ColourID * 4 + BrightnessID[static_cast<size_t>(Clamp<int>((BrightnessIDSize * Height) / ChunkHeight, 0, BrightnessIDSize - 1))];
 			return false;
 		}
 
@@ -294,8 +293,8 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 	int InsideHeight = (GetHeight() / 2) - 1;
 	
 	// Center of pixel
-	int PixelX = (int)(a_TrackedEntity->GetPosX() - GetCenterX()) / GetPixelWidth();
-	int PixelZ = (int)(a_TrackedEntity->GetPosZ() - GetCenterZ()) / GetPixelWidth();
+	int PixelX = static_cast<int>(a_TrackedEntity->GetPosX() - GetCenterX()) / static_cast<int>(GetPixelWidth());
+	int PixelZ = static_cast<int>(a_TrackedEntity->GetPosZ() - GetCenterZ()) / static_cast<int>(GetPixelWidth());
 
 	cMapDecorator::eType Type;
 	int Rot;
@@ -347,7 +346,7 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 		}
 	}
 
-	return {Type, (unsigned)(2 * PixelX + 1), (unsigned)(2 * PixelZ + 1), Rot};
+	return {Type, static_cast<unsigned>(2 * PixelX + 1), static_cast<unsigned>(2 * PixelZ + 1), Rot};
 }
 
 
@@ -355,7 +354,7 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 
 unsigned int cMap::GetPixelWidth(void) const
 {
-	return (int) pow(2.0, (double) m_Scale);
+	return static_cast<unsigned int>(pow(2.0, static_cast<double>(m_Scale)));
 }
 
 
