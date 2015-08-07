@@ -1313,23 +1313,27 @@ static int tolua_SetObjectCallback(lua_State * tolua_S)
 
 static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 {
-	cPluginLua * self = reinterpret_cast<cPluginLua *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cLuaState LuaState(tolua_S);
+	cPluginLua * self = nullptr;
 
+	if (!LuaState.GetStackValue(1, self))
+	{
+		LOGWARNING("cPluginLua:AddWebTab: invalid self as first argument");
+		return 0;
+	}
+	
 	tolua_Error tolua_err;
 	tolua_err.array = 0;
 	tolua_err.index = 3;
 	tolua_err.type = "function";
 
-	std::string Title = "";
+	std::string Title;
 	int Reference = LUA_REFNIL;
 
-	if (
-		tolua_isstring(tolua_S, 2, 0, &tolua_err) &&
-		lua_isfunction(tolua_S, 3)
-	)
+	if (LuaState.CheckParamString(2) && LuaState.CheckParamFunction(3))
 	{
 		Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		Title = (static_cast<std::string>(tolua_tocppstring(tolua_S, 2, 0)));
+		LuaState.GetStackValue(2, Title);
 	}
 	else
 	{
