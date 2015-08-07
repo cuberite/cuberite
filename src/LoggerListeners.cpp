@@ -317,6 +317,7 @@ cFileListener::cFileListener(void)
 void cFileListener::Log(AString a_Message, cLogger::eLogLevel a_LogLevel)
 {
 	const char * LogLevelPrefix = "Unkn ";
+	bool ShouldFlush = false;
 	switch (a_LogLevel)
 	{
 		case cLogger::llRegular:
@@ -332,15 +333,21 @@ void cFileListener::Log(AString a_Message, cLogger::eLogLevel a_LogLevel)
 		case cLogger::llWarning:
 		{
 			LogLevelPrefix = "Warn ";
+			ShouldFlush = true;
 			break;
 		}
 		case cLogger::llError:
 		{
 			LogLevelPrefix = "Err  ";
+			ShouldFlush = true;
 			break;
 		}
 	}
 	m_File.Printf("%s%s", LogLevelPrefix, a_Message.c_str());
+	if (ShouldFlush)
+	{
+		m_File.Flush();
+	}
 }
 
 
