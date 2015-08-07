@@ -281,32 +281,29 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	cLuaState LuaState(tolua_S);
 
 	#ifndef TOLUA_RELEASE
-	tolua_Error tolua_err;
 	if (
-		!tolua_isusertype (LuaState, 1, "cWorld", 0, &tolua_err) ||
-		!tolua_isnumber   (LuaState, 2, 0, &tolua_err) ||
-		!tolua_isnumber   (LuaState, 3, 0, &tolua_err) ||
-		!tolua_isnumber   (LuaState, 4, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 5, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 6, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 7, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 8, 0, &tolua_err) ||
-		!tolua_isusertype (LuaState, 9, "cPlayer", 1, &tolua_err) ||
-		!tolua_isnoobj    (LuaState, 10, &tolua_err)
+		!LuaState.CheckParamUserType(1, "cWorld") ||
+		!LuaState.CheckParamNumber(2, 4) ||
+		!LuaState.CheckParamString(5, 8) ||
+		!LuaState.CheckParamUserType(9, "cPlayer") ||
+		!LuaState.CheckParamEnd(10)
 		)
-		goto tolua_lerror;
+		return 0;
 	else
 	#endif
 	{
-		cWorld * self       = reinterpret_cast<cWorld *>(tolua_tousertype (LuaState, 1, nullptr));
-		cPlayer * Player    = reinterpret_cast<cPlayer*>(tolua_tousertype (LuaState, 9, nullptr));
-		int BlockX          = static_cast<int>(tolua_tonumber(LuaState, 2, 0));
-		int BlockY          = static_cast<int>(tolua_tonumber(LuaState, 3, 0));
-		int BlockZ          = static_cast<int>(tolua_tonumber(LuaState, 4, 0));
-		const AString Line1 = tolua_tocppstring(LuaState, 5, 0);
-		const AString Line2 = tolua_tocppstring(LuaState, 6, 0);
-		const AString Line3 = tolua_tocppstring(LuaState, 7, 0);
-		const AString Line4 = tolua_tocppstring(LuaState, 8, 0);
+		cWorld * self = nullptr;
+		cPlayer * Player = nullptr;
+		int BlockX = 0;
+		int BlockY = 0;
+		int BlockZ = 0;
+		AString Line1;
+		AString Line2;
+		AString Line3;
+		AString Line4;
+
+		LuaState.GetStackValues(1, self, BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+
 		#ifndef TOLUA_RELEASE
 		if (self == nullptr)
 		{
@@ -321,12 +318,6 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	LOGWARNING("Warning in function call 'UpdateSign': UpdateSign() is deprecated. Please use SetSignLines()");
 	LuaState.LogStackTrace(0);
 	return 1;
-	
-	#ifndef TOLUA_RELEASE
-tolua_lerror:
-	tolua_error(LuaState, "#ferror in function 'UpdateSign'.", &tolua_err);
-	return 0;
-	#endif
 }
 
 
