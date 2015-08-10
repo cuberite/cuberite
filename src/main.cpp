@@ -48,9 +48,10 @@ bool cRoot::m_RunAsService = false;
 
 
 
-/** If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window */
-// _X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
-// and we haven't had a memory leak for over a year anyway.
+/** If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window
+_X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
+and we haven't had a memory leak for over a year anyway.
+Synchronize this with Server.cpp to enable the "dumpmem" console command. */
 // #define ENABLE_LEAK_FINDER
 
 
