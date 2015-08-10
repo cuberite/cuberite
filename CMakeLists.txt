@@ -164,6 +164,9 @@ endif()
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/libevent/CMakeLists.txt)
 	message(FATAL_ERROR "LibEvent is missing in folder lib/libevent. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/jsoncpp/CMakeLists.txt)
+	message(FATAL_ERROR "JsonCPP is missing in folder lib/jsoncpp. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
 
 # Include all the libraries:
 add_subdirectory(lib/jsoncpp/)
