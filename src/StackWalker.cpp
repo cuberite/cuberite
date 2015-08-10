@@ -79,6 +79,7 @@
 #include <tchar.h>
 #pragma comment(lib, "version.lib")  // for "VerQueryValue"
 #pragma warning(disable:4826)
+#pragma warning(disable:4996)  // "GetVersionEx" was declared deprecated
 
 #include "StackWalker.h"
 
