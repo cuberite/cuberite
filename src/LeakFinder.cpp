@@ -103,9 +103,9 @@
 
 #include "LeakFinder.h"
 
-// Currently only tested with MS VC++ 5 to 10
-#if (_MSC_VER < 1100) || (_MSC_VER > 1800)
-#error Only MS VC++ 5/6/7/7.1/8/9/10/11/12 supported. Check if the '_CrtMemBlockHeader' has not changed with this compiler!
+// Currently only tested with MS VC++ 5 to 2015
+#if (_MSC_VER < 1100) || (_MSC_VER > 1900)
+	#error Only MS VC++ 5/6/7/7.1/8/9/10/11/12 supported. Check if the '_CrtMemBlockHeader' has not changed with this compiler!
 #endif
 
 
