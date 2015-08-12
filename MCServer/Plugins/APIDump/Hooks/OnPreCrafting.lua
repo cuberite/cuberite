@@ -19,13 +19,13 @@ return
 		{
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has changed their crafting grid contents" },
 			{ Name = "Grid", Type = "{{cCraftingGrid}}", Notes = "The new crafting grid contents" },
-			{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that MCServer will use. Modify this object to change the recipe" },
+			{ Name = "Recipe", Type = "{{cCraftingRecipe}}", Notes = "The recipe that Cuberite will use. Modify this object to change the recipe" },
 		},
 		Returns = [[
 			If the function returns false or no value, other plugins' callbacks are called and then MCServer
 			searches the built-in recipes. The Recipe output parameter is ignored in this case.</p>
 			<p>
-			If the function returns true, no other callbacks are called for this event and MCServer uses the
+			If the function returns true, no other callbacks are called for this event and Cuberite uses the
 			recipe stored in the Recipe output parameter.
 		]],
 	},  -- HOOK_PRE_CRAFTING

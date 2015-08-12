@@ -6,7 +6,7 @@ return
 		DefaultFnName = "OnPlayerUsingBlock",  -- also used as pagename
 		Desc = [[
 			This hook is called when a {{cPlayer|player}} has right-clicked a block that can be used, such as a
-			{{cChestEntity|chest}} or a lever. It is called before MCServer processes the usage (sends the UI
+			{{cChestEntity|chest}} or a lever. It is called before Cuberite processes the usage (sends the UI
 			handling packets / toggles redstone). Plugins may refuse the interaction by returning true.</p>
 			<p>
 			Note that the block coords given in this callback are for the (solid) block that is being clicked,
