@@ -336,7 +336,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "DualRidgeCaves") == 0)
 		{
-			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
+			float Threshold = static_cast<float>(a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3));
 			m_FinishGens.push_back(cFinishGenPtr(new cStructGenDualRidgeCaves(Seed, Threshold)));
 		}
 		else if (NoCaseCompare(*itr, "DungeonRooms") == 0)
@@ -569,12 +569,18 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			double MinCeilingHeightCenter = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCeilingHeightCenter", 36);
 			m_FinishGens.push_back(cFinishGenPtr(new cRoughRavines(
 				Seed, MaxSize, MinSize,
-				(float)MaxCenterWidth,         (float)MinCenterWidth,
-				(float)MaxRoughness,           (float)MinRoughness,
-				(float)MaxFloorHeightEdge,     (float)MinFloorHeightEdge,
-				(float)MaxFloorHeightCenter,   (float)MinFloorHeightCenter,
-				(float)MaxCeilingHeightEdge,   (float)MinCeilingHeightEdge,
-				(float)MaxCeilingHeightCenter, (float)MinCeilingHeightCenter,
+				static_cast<float>(MaxCenterWidth),
+				static_cast<float>(MinCenterWidth),
+				static_cast<float>(MaxRoughness),
+				static_cast<float>(MinRoughness),
+				static_cast<float>(MaxFloorHeightEdge),
+				static_cast<float>(MinFloorHeightEdge),
+				static_cast<float>(MaxFloorHeightCenter),
+				static_cast<float>(MinFloorHeightCenter),
+				static_cast<float>(MaxCeilingHeightEdge),
+				static_cast<float>(MinCeilingHeightEdge),
+				static_cast<float>(MaxCeilingHeightCenter),
+				static_cast<float>(MinCeilingHeightCenter),
 				GridSize, MaxOffset
 			)));
 		}

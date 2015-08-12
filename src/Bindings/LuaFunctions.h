@@ -2,11 +2,13 @@
 
 #include "Logger.h"
 #include <time.h>
+#include <chrono>
 // tolua_begin
 
 inline unsigned int GetTime()
 {
-	return (unsigned int)time(0);
+	// NB: For caveats, please see http://stackoverflow.com/a/14505248
+	return static_cast<unsigned int>(std::chrono::seconds(time(0)).count());
 }
 
 inline std::string GetChar( std::string & a_Str, unsigned int a_Idx)

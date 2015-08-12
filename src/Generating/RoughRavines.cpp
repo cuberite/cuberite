@@ -37,12 +37,12 @@ public:
 		size_t Half = a_Size;  // m_DefPoints[Half] will be the centerpoint
 		m_DefPoints.resize(Max + 1);
 		int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 7;
-		float Len = (float)a_Size;
-		float Angle = (float)rnd;  // Angle is in radians, will be wrapped in the "sin" and "cos" operations
+		float Len = static_cast<float>(a_Size);
+		float Angle = static_cast<float>(rnd);  // Angle is in radians, will be wrapped in the "sin" and "cos" operations
 		float OfsX = sinf(Angle) * Len;
 		float OfsZ = cosf(Angle) * Len;
 		m_DefPoints[0].Set   (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,             a_CeilingHeightEdge1,  a_FloorHeightEdge1);
-		m_DefPoints[Half].Set((float)a_OriginX, (float)a_OriginZ, a_CenterWidth, a_CeilingHeightCenter, a_FloorHeightCenter);
+		m_DefPoints[Half].Set(static_cast<float>(a_OriginX), static_cast<float>(a_OriginZ), a_CenterWidth, a_CeilingHeightCenter, a_FloorHeightCenter);
 		m_DefPoints[Max].Set (a_OriginX + OfsX, a_OriginZ + OfsZ, 1,             a_CeilingHeightEdge2,  a_FloorHeightEdge2);
 		
 		// Calculate the points in between, recursively:
@@ -104,7 +104,7 @@ protected:
 		// Adjust the midpoint by a small amount of perpendicular vector in a random one of its two directions:
 		float dx = p2.m_X - p1.m_X;
 		float dz = p2.m_Z - p1.m_Z;
-		if ((m_Noise.IntNoise2DInt((int)MidX, (int)MidZ) / 11) % 2 == 0)
+		if ((m_Noise.IntNoise2DInt(static_cast<int>(MidX), static_cast<int>(MidZ)) / 11) % 2 == 0)
 		{
 			MidX += dz * m_Roughness;
 			MidZ -= dx * m_Roughness;
@@ -138,7 +138,7 @@ protected:
 			int rnd = m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 13;
 			int NumBlocks = (rnd % 3) + 2;
 			rnd = rnd / 4;
-			float Val = (float)(rnd % 256) / 128 - 1;  // Random float in range [-1, +1]
+			float Val = static_cast<float>(rnd % 256) / 128.0f - 1.0f;  // Random float in range [-1, +1]
 			if (h + NumBlocks > cChunkDef::Height)
 			{
 				NumBlocks = cChunkDef::Height - h;
@@ -194,8 +194,8 @@ protected:
 					continue;
 				}
 				
-				int Top = std::min((int)ceilf(itr->m_Top), +cChunkDef::Height);
-				for (int y = std::max((int)floorf(itr->m_Bottom), 1); y <= Top; y++)
+				int Top = std::min(static_cast<int>(ceilf(itr->m_Top)), +cChunkDef::Height);
+				for (int y = std::max(static_cast<int>(floorf(itr->m_Bottom)), 1); y <= Top; y++)
 				{
 					if ((itr->m_Radius + m_PerHeightRadius[y]) * (itr->m_Radius + m_PerHeightRadius[y]) < DistSq)
 					{

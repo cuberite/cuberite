@@ -134,34 +134,34 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 	int CenterZ = a_BlockZ + OffsetZ;
 	
 	// Get the base angle in which the ravine "axis" goes:
-	float Angle = (float)(((float)((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI);
+	float Angle = static_cast<float>((static_cast<float>((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI);
 	float xc = sinf(Angle);
 	float zc = cosf(Angle);
 	
 	// Calculate the definition points and radii:
-	int MaxRadius = (int)(sqrt(12.0 + ((a_Noise.IntNoise2DInt(61 * a_BlockX, 97 * a_BlockZ) / 13) % a_Size) / 16));
+	int MaxRadius = static_cast<int>(sqrt(12.0 + ((a_Noise.IntNoise2DInt(61 * a_BlockX, 97 * a_BlockZ) / 13) % a_Size) / 16));
 	int Top       = 32 + ((a_Noise.IntNoise2DInt(13 * a_BlockX, 17 * a_BlockZ) / 23) % 32);
 	int Bottom    = 5 + ((a_Noise.IntNoise2DInt(17 * a_BlockX, 29 * a_BlockZ) / 13) % 32);
 	int Mid = (Top + Bottom) / 2;
-	int DefinitionPointX = CenterX - (int)(xc * a_Size / 2);
-	int DefinitionPointZ = CenterZ - (int)(zc * a_Size / 2);
+	int DefinitionPointX = CenterX - static_cast<int>(xc * a_Size / 2);
+	int DefinitionPointZ = CenterZ - static_cast<int>(zc * a_Size / 2);
 	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
 	for (int i = 1; i < NUM_RAVINE_POINTS - 1; i++)
 	{
-		int LineX = CenterX + (int)(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
-		int LineZ = CenterZ + (int)(zc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
+		int LineX = CenterX + static_cast<int>(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
+		int LineZ = CenterZ + static_cast<int>(zc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
 		// Amplitude is the amount of blocks that this point is away from the ravine "axis"
 		int Amplitude = (a_Noise.IntNoise3DInt(70 * a_BlockX, 20 * a_BlockZ + 31 * i, 10000 * i) / 9) % a_Size;
 		Amplitude = Amplitude / 4 - a_Size / 8;  // Amplitude is in interval [-a_Size / 4, a_Size / 4]
-		int PointX = LineX + (int)(zc * Amplitude);
-		int PointZ = LineZ - (int)(xc * Amplitude);
+		int PointX = LineX + static_cast<int>(zc * Amplitude);
+		int PointZ = LineZ - static_cast<int>(xc * Amplitude);
 		int Radius = MaxRadius - abs(i - NUM_RAVINE_POINTS / 2);  // TODO: better radius function
 		int ThisTop    = Top    + ((a_Noise.IntNoise3DInt(7 *  a_BlockX, 19 * a_BlockZ, i * 31) / 13) % 8) - 4;
 		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 *  a_BlockZ, i * 31) / 13) % 8) - 4;
 		m_Points.push_back(cRavDefPoint(PointX, PointZ, Radius, ThisTop, ThisBottom));
 	}  // for i - m_Points[]
-	DefinitionPointX = CenterX + (int)(xc * a_Size / 2);
-	DefinitionPointZ = CenterZ + (int)(zc * a_Size / 2);
+	DefinitionPointX = CenterX + static_cast<int>(xc * a_Size / 2);
+	DefinitionPointZ = CenterZ + static_cast<int>(zc * a_Size / 2);
 	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, Mid, Mid));
 }
 
@@ -362,7 +362,7 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)
 			{
-				int Top = std::min(itr->m_Top, (int)(cChunkDef::Height));  // Stupid gcc needs int cast
+				int Top = std::min(itr->m_Top, static_cast<int>(cChunkDef::Height));  // Stupid gcc needs int cast
 				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
 				{
 					switch (a_ChunkDesc.GetBlockType(x, y, z))
