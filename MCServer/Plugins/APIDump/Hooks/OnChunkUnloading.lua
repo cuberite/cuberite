@@ -18,7 +18,7 @@ return
 			{ Name = "ChunkZ", Type = "number", Notes = "Z-coord of the chunk" },
 		},
 		Returns = [[
-			If the function returns false or no value, the next plugin's callback is called and finally MCServer
+			If the function returns false or no value, the next plugin's callback is called and finally Cuberite
 			unloads the chunk. If the function returns true, no other callback is called for this event and the
 			chunk is left in the memory.
 		]],

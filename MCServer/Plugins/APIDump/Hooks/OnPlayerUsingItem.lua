@@ -34,7 +34,7 @@ return
 			{ Name = "BlockMeta", Type = "number", Notes = "Block meta of the clicked block" },
 		},
 		Returns = [[
-			If the function returns false or no value, other plugins' callbacks are called and then MCServer
+			If the function returns false or no value, other plugins' callbacks are called and then Cuberite
 			processes the interaction. If the function returns true, no other callbacks are called for this
 			event and the interaction is silently dropped.
 		]],

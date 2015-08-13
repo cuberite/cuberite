@@ -39,7 +39,7 @@ return
 			Plugins can be identified by either the PluginFolder or PluginName. Note that these two can differ,
 			refer to <a href="http://forum.mc-server.org/showthread.php?tid=1877">the forum</a> for detailed discussion.
 			<p>
-			There is one instance of cPluginManager in MCServer, to get it, call either
+			There is one instance of cPluginManager in Cuberite, to get it, call either
 			{{cRoot|cRoot}}:Get():GetPluginManager() or cPluginManager:Get() function.</p>
 			<p>
 			Note that some functions are "static", that means that they are called using a dot operator instead

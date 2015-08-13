@@ -1332,7 +1332,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						Note that the object contained in a cItem class is quite complex and quite often new Minecraft
 						versions add more stuff. Therefore it is recommended to copy cItem objects using the
 						copy-constructor ("local copy = cItem(original);"), this is the only way that guarantees that
-						the object will be copied at full, even with future versions of MCServer.
+						the object will be copied at full, even with future versions of Cuberite.
 					]],
 				},
 				{
@@ -2033,7 +2033,7 @@ a_Player:OpenWindow(Window);
 		cRoot =
 		{
 			Desc = [[
-				This class represents the root of MCServer's object hierarchy. There is always only one cRoot
+				This class represents the root of Cuberite's object hierarchy. There is always only one cRoot
 				object. It manages and allows querying all the other objects, such as {{cServer}},
 				{{cPluginManager}}, individual {{cWorld|worlds}} etc.</p>
 				<p>
@@ -2230,7 +2230,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 		cWindow =
 		{
 			Desc = [[
-				This class is the common ancestor for all window classes used by MCServer. It is inherited by the
+				This class is the common ancestor for all window classes used by Cuberite. It is inherited by the
 				{{cLuaWindow|cLuaWindow}} class that plugins use for opening custom windows. It is planned to be
 				used for window-related hooks in the future. It implements the basic functionality of any
 				window.</p>
@@ -2763,7 +2763,7 @@ end
 		tolua =
 		{
 			Desc = [[
-				This class represents the tolua bridge between the Lua API and MCServer. It supports some low
+				This class represents the tolua bridge between the Lua API and Cuberite. It supports some low
 				level operations and queries on the objects. See also the tolua++'s documentation at
 				{{http://www.codenix.com/~tolua/tolua++.html#utilities}}. Normally you shouldn't use any of these
 				functions except for type()
@@ -2905,7 +2905,7 @@ end
 				{
 					Include = "^dim.*",
 					TextBefore = [[
-						These constants represent dimension of a world. In MCServer, the dimension is only reflected in
+						These constants represent dimension of a world. In Cuberite, the dimension is only reflected in
 						the world's overall tint - overworld gets sky-like colors and dark shades, the nether gets
 						reddish haze and the end gets dark haze. World generator is not directly affected by the
 						dimension, same as fluid simulators; those only default to the expected values if not set
@@ -3035,7 +3035,7 @@ end
 	ExtraPages =
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
-		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a Cuberite plugin" },
+		{ FileName = "Writing-a-Cuberite-plugin.html", Title = "Writing a Cuberite plugin" },
 		{ FileName = "InfoFile.html",                  Title = "Using the Info.lua file" },
 		{ FileName = "SettingUpDecoda.html",           Title = "Setting up the Decoda Lua IDE" },
 		{ FileName = "SettingUpZeroBrane.html",        Title = "Setting up the ZeroBrane Studio Lua IDE" },
