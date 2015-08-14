@@ -123,7 +123,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	// Set up the main socket:
 	// It should listen on IPv6 with IPv4 fallback, when available; IPv4 when IPv6 is not available.
 	bool NeedsTwoSockets = false;
-	int err;
+	int err = 0;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	if (!IsValidSocket(MainSock))
@@ -270,6 +270,8 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		evutil_closesocket(SecondSock);
 		return true;  // Report as success, the primary socket is working
 	}
+
+	UNUSED(err);
 
 	m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
 	return true;

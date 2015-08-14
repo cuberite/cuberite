@@ -49,7 +49,7 @@ static int tolua_cNetwork_Connect(lua_State * L)
 
 	// Read the params:
 	AString Host;
-	int Port;
+	int Port = 0;
 	S.GetStackValues(2, Host, Port);
 
 	// Check validity:
@@ -888,7 +888,7 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 
 	// Get the data to send:
 	AString Data, RemotePeer;
-	int RemotePort;
+	int RemotePort = 0;
 	S.GetStackValues(2, Data, RemotePeer, RemotePort);
 
 	// Check the port:

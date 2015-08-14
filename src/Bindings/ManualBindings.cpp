@@ -159,7 +159,7 @@ static int tolua_UncompressStringZLIB(lua_State * tolua_S)
 
 	// Get the params:
 	AString ToUncompress;
-	size_t UncompressedSize;
+	size_t UncompressedSize = 0;
 	S.GetStackValues(1, ToUncompress, UncompressedSize);
 
 	// Compress the string:
