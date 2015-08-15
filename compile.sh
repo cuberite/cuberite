@@ -1,11 +1,11 @@
 #|| goto :windows_detected
 
 # Do we already have a repo?
-if [[ -d .git && -f easyinstall.sh && -f src/BlockArea.cpp ]]; then # A good enough indicator that we're in the MCServer git repo.
+if [[ -d .git && -f easyinstall.sh && -f src/BlockArea.cpp ]]; then # A good enough indicator that we're in the Cuberite git repo.
 cd ../
-echo "MCServer repository detected. This should make the process faster, especially if you compiled before."
+echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
 fi
- 
+
 # Error functions.
 function error
 {
@@ -27,14 +27,13 @@ function missingDepsExit
 
 # Echo: Greetings.
 echo
-echo "Hello, this script will download and compile Cuberite/MCServer."
-echo "On subsequent runs, it will update your MCServer."
+echo "Hello, this script will download and compile Cuberite."
+echo "On subsequent runs, it will update your Cuberite."
 echo "The compilation and download will occur in the current directory."
-echo "If you're updating, you should run <Path to MCServer>/MCServer/compile.sh"
+echo "If you're updating, you should run <Path to Cuberite>/cuberite/compile.sh"
 echo "Compiling from source takes time, but it usually generates better executables."
 echo "If you prefer ready-to-use binaries or if you want more info, please visit:"
 echo "http://cuberite.org/"
-echo "http://mc-server.org/"
 
 MISSING_PROGRAMS=""
 
@@ -140,18 +139,18 @@ fi
 
 # Echo: Downloading began.
 echo
-echo " --- Downloading MCServer's source code from the $BRANCH branch..."
+echo " --- Downloading Cuberite's source code from the $BRANCH branch..."
 
 
 # Git: Clone.
-if [ ! -d MCServer ]; then
+if [ ! -d Cuberite ]; then
 	echo " --- Looks like your first run, cloning the whole code..."
-	git clone https://github.com/mc-server/MCServer.git
+	git clone https://github.com/cuberite/cuberite.git
 fi
 
 
 # Git: Fetch.
-pushd MCServer
+pushd cuberite
 echo " --- Updating the $BRANCH branch..."
 git fetch origin $BRANCH || error "git fetch failed"
 git checkout $BRANCH || error "git checkout failed"
@@ -167,9 +166,9 @@ git submodule update
 # Cmake.
 echo " --- Running cmake..."
 popd
-if [ ! -d build-mcserver ]; then mkdir build-mcserver; fi
-pushd build-mcserver
-cmake ../MCServer/ -DCMAKE_BUILD_TYPE=$BUILDTYPE || error "cmake failed"
+if [ ! -d build-cuberite ]; then mkdir build-cuberite; fi
+pushd build-cuberite
+cmake ../cuberite/ -DCMAKE_BUILD_TYPE=$BUILDTYPE || error "cmake failed"
 
 
 # Make.
@@ -180,7 +179,7 @@ echo
 
 # Echo: Compilation complete.
 popd
-pushd MCServer/MCServer
+pushd cuberite/cuberite
 echo
 echo "-----------------"
 echo "Compilation done!"
@@ -194,5 +193,4 @@ exit 0
 
 :windows_detected
 echo "This script is not available for Windows yet, sorry."
-echo "You can still download the Windows binaries from: http://mc-server.org"
-
+echo "You can still download the Windows binaries from: http://cuberite.org"
