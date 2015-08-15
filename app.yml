@@ -1,4 +1,4 @@
-name: MCServer
+name: Cuberite
 image: ubuntu-15-04-x64
 config:
   #cloud-config
