@@ -3,7 +3,7 @@
 # Do we already have a repo?
 if [[ -d .git && -f easyinstall.sh && -f src/BlockArea.cpp ]]; then # A good enough indicator that we're in the MCServer git repo.
 cd ../
-echo "MCServer repository detected. This should make the process faster, especially if you compiled before."
+echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
 fi
  
 # Error functions.
@@ -28,13 +28,12 @@ function missingDepsExit
 # Echo: Greetings.
 echo
 echo "Hello, this script will download and compile Cuberite/MCServer."
-echo "On subsequent runs, it will update your MCServer."
+echo "On subsequent runs, it will update your Cuberite."
 echo "The compilation and download will occur in the current directory."
-echo "If you're updating, you should run <Path to MCServer>/MCServer/compile.sh"
+echo "If you're updating, you should run <Path to Cuberite>/MCServer/compile.sh"
 echo "Compiling from source takes time, but it usually generates better executables."
 echo "If you prefer ready-to-use binaries or if you want more info, please visit:"
 echo "http://cuberite.org/"
-echo "http://mc-server.org/"
 
 MISSING_PROGRAMS=""
 
@@ -194,5 +193,5 @@ exit 0
 
 :windows_detected
 echo "This script is not available for Windows yet, sorry."
-echo "You can still download the Windows binaries from: http://mc-server.org"
+echo "You can still download the Windows binaries from: http://cuberite.org"
 
