@@ -1,0 +1,14 @@
+version: 1.0.{build}
+os: Previous Windows Server 2012 R2
+configuration: Debug
+clone_depth: 50
+before_build:
+- echo %TIME%
+- git submodule update --init
+- echo %TIME%
+- cmake -G "Visual Studio 12" .
+- echo %TIME%
+build:
+  project: MCServer.sln
+  parallel: true
+  verbosity: minimal
