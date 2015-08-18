@@ -45,7 +45,7 @@ public:
 		}
 
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		BLOCKTYPE UpperBlock = (a_RelY >= cChunkDef::Height - 1) ? E_BLOCK_AIR : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
+		BLOCKTYPE UpperBlock = (a_RelY >= cChunkDef::Height - 1) ? static_cast<BLOCKTYPE>(E_BLOCK_AIR) : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
 		switch (UpperBlock)
 		{
 			case E_BLOCK_CROPS:

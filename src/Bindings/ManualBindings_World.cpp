@@ -129,7 +129,9 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 
 	// Get params:
 	cWorld * Self = nullptr;
-	int BlockX, BlockY, BlockZ;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
 	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ);
 	if (Self == nullptr)
 	{
@@ -176,7 +178,9 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 
 	// Get params:
 	cWorld * Self = nullptr;
-	int BlockX, BlockY, BlockZ;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
 	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ);
 	if (Self == nullptr)
 	{
@@ -220,7 +224,9 @@ static int tolua_cWorld_GetSignLines(lua_State * tolua_S)
 
 	// Get params:
 	cWorld * Self = nullptr;
-	int BlockX, BlockY, BlockZ;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
 	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ);
 	if (Self == nullptr)
 	{
@@ -267,7 +273,8 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 	
 	// Read the params:
 	cWorld * world = nullptr;
-	int chunkX = 0, chunkZ = 0;
+	int chunkX = 0;
+	int chunkZ = 0;
 	L.GetStackValues(1, world, chunkX, chunkZ);
 	if (world == nullptr)
 	{
@@ -401,7 +408,9 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 	// Get params:
 	cWorld * Self = nullptr;
-	int BlockX, BlockY, BlockZ;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
 	AString Line1, Line2, Line3, Line4;
 	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
 	if (Self == nullptr)
@@ -518,7 +527,8 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 
 	// Get params:
 	cWorld * self = nullptr;
-	int BlockX, BlockZ;
+	int BlockX = 0;
+	int BlockZ = 0;
 	L.GetStackValues(1, self, BlockX, BlockZ);
 	if (self == nullptr)
 	{

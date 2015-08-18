@@ -263,7 +263,9 @@ public:
 
 		// Get parameters:
 		Ty1 * Self = nullptr;
-		int BlockX, BlockY, BlockZ;
+		int BlockX = 0;
+		int BlockY = 0;
+		int BlockZ = 0;
 		cLuaState::cRef FnRef;
 		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
 		if (Self == nullptr)
@@ -327,7 +329,8 @@ public:
 
 		// Get parameters:
 		Ty1 * Self = nullptr;
-		int ChunkX, ChunkZ;
+		int ChunkX = 0;
+		int ChunkZ = 0;
 		cLuaState::cRef FnRef;
 		L.GetStackValues(1, Self, ChunkX, ChunkZ, FnRef);
 		if (Self == nullptr)
