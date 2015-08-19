@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "BlockHandler.h"
+#include "BlockPlant.h"
 #include "../World.h"
 
 
@@ -9,11 +9,12 @@
 
 
 class cBlockStemsHandler :
-	public cBlockHandler
+	public cBlockPlant
 {
+	typedef cBlockPlant Super;
 public:
 	cBlockStemsHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: Super(a_BlockType, true)
 	{
 	}
 
@@ -25,18 +26,26 @@ public:
 	
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		if (Meta >= 7)
+		auto Action = CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
+		if (Action == paGrowth)
 		{
-			// Grow the produce:
-			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-			a_Chunk.GetWorld()->GrowMelonPumpkin(BlockX, a_RelY, BlockZ, m_BlockType);
+			NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+			if (Meta >= 7)
+			{
+				// Grow the produce:
+				int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+				int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+				a_Chunk.GetWorld()->GrowMelonPumpkin(BlockX, a_RelY, BlockZ, m_BlockType);
+			}
+			else
+			{
+				// Grow the stem:
+				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, Meta + 1);
+			}
 		}
-		else
+		else if (Action == paDeath)
 		{
-			// Grow the stem:
-			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, Meta + 1);
+			a_Chunk.GetWorld()->DigBlock(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width);
 		}
 	}
 

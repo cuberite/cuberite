@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "BlockHandler.h"
+#include "BlockPlant.h"
 #include "../FastRandom.h"
 
 
@@ -10,11 +10,12 @@
 
 /** Common class that takes care of carrots, potatoes and wheat */
 class cBlockCropsHandler :
-	public cBlockHandler
+	public cBlockPlant
 {
+	typedef cBlockPlant Super;
 public:
 	cBlockCropsHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: Super(a_BlockType, true)
 	{
 	}
 
@@ -82,12 +83,17 @@ public:
 		{
 			Light = SkyLight;
 		}
-		
-		if ((Meta < 7) && (Light > 8))
+
+		// Check to see if the plant can grow
+		auto Action = CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
+
+		// If there is still room to grow and the plant can grow, then grow.
+		// Otherwise if the plant needs to die, then dig it up
+		if ((Meta < 7) && (Action == paGrowth))
 		{
 			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, ++Meta);
 		}
-		else if (Light < 9)
+		else if (Action == paDeath)
 		{
 			a_Chunk.GetWorld()->DigBlock(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width);
 		}

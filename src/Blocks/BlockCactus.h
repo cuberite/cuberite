@@ -1,18 +1,19 @@
 
 #pragma once
 
-#include "BlockHandler.h"
+#include "BlockPlant.h"
 
 
 
 
 
 class cBlockCactusHandler :
-	public cBlockHandler
+	public cBlockPlant
 {
+	typedef cBlockPlant Super;
 public:
 	cBlockCactusHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: Super(a_BlockType, false)
 	{
 	}
 
@@ -64,13 +65,29 @@ public:
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		a_Chunk.GetWorld()->GrowCactus(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
+		if (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth)
+		{
+			a_Chunk.GetWorld()->GrowCactus(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
+		}
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_Meta);
 		return 7;
+	}
+
+protected:
+
+	virtual PlantAction CanGrow(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	{
+		auto Action = paStay;
+		if (((a_RelY + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR))
+		{
+			Action = Super::CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
+		}
+
+		return Action;
 	}
 } ;
 
