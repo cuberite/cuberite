@@ -127,6 +127,17 @@ public:
 
 		return false;
 	}
+
+	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) override
+	{
+		return (
+			(a_Plant == E_BLOCK_CROPS) ||
+			(a_Plant == E_BLOCK_CARROTS) ||
+			(a_Plant == E_BLOCK_POTATOES) ||
+			(a_Plant == E_BLOCK_MELON_STEM) ||
+			(a_Plant == E_BLOCK_PUMPKIN_STEM)
+		);
+	}
 } ;
 
 

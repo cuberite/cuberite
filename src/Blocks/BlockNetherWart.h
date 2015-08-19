@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "BlockHandler.h"
+#include "BlockPlant.h"
 #include "../FastRandom.h"
 #include "../World.h"
 
@@ -10,11 +10,12 @@
 
 
 class cBlockNetherWartHandler :
-	public cBlockHandler
+	public cBlockPlant
 {
+	typedef cBlockPlant Super;
 public:
 	cBlockNetherWartHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: Super(a_BlockType, false)
 	{
 	}
 	
@@ -36,7 +37,7 @@ public:
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		if (Meta < 7)
+		if ((Meta < 7) && (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth))
 		{
 			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_NETHER_WART, ++Meta);
 		}
