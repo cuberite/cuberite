@@ -1040,7 +1040,7 @@ cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantm
 {
 	// Sum up all the enchantments' weights:
 	int AllWeights = 0;
-	for (const auto Enchantment : a_Enchantments)
+	for (const auto & Enchantment : a_Enchantments)
 	{
 		AllWeights += Enchantment.m_Weight;
 	}
@@ -1054,7 +1054,7 @@ cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantm
 	// Pick a random enchantment:
 	cNoise Noise(a_Seed);
 	int RandomNumber = Noise.IntNoise1DInt(AllWeights) / 7 % AllWeights;
-	for (const auto Enchantment : a_Enchantments)
+	for (const auto & Enchantment : a_Enchantments)
 	{
 		RandomNumber -= Enchantment.m_Weight;
 		if (RandomNumber <= 0)

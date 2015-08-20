@@ -724,7 +724,7 @@ void cProtocol180::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataS
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
 
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
-	for (const auto Decorator : a_Map.GetDecorators())
+	for (const auto & Decorator : a_Map.GetDecorators())
 	{
 		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF)));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
