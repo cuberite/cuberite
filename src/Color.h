@@ -15,7 +15,7 @@ class cColor
 {
 public:
 
-	enum
+	enum : unsigned int
 	{
 		COLOR_MIN = 0,
 		COLOR_MAX = 255,

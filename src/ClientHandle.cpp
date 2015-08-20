@@ -20,7 +20,6 @@
 #include "ChatColor.h"
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
-#include "Blocks/BlockSlab.h"
 #include "Blocks/BlockBed.h"
 #include "Blocks/ChunkInterface.h"
 #include "BlockInServerPluginInterface.h"
@@ -760,40 +759,31 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		return;
 	}
 
-	/*
-	// TODO: Invalid stance check
-	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
-	{
-		LOGD("Invalid stance");
-		SendPlayerMoveLook();
-		return;
-	}
-	*/
+	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
+	Vector3d OldPosition = GetPlayer()->GetPosition();
+	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 	
 	// If the player has moved too far, "repair" them:
-	Vector3d Pos(a_PosX, a_PosY, a_PosZ);
-	if ((m_Player->GetPosition() - Pos).SqrLength() > 100 * 100)
+	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
 	{
-		LOGD("Too far away (%0.2f), \"repairing\" the client", (m_Player->GetPosition() - Pos).Length());
+		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - NewPosition).Length());
 		SendPlayerMoveLook();
 		return;
 	}
-	
-	// If a jump just started, process food exhaustion:
-	if ((a_PosY > m_Player->GetPosY()) && !a_IsOnGround && m_Player->IsOnGround())
-	{
-		// we only add this exhaustion if the player is not swimming - otherwise we end up with both jump + swim exhaustion
 
-		if (!m_Player->IsSwimming())
-		{
-			m_Player->GetStatManager().AddValue(statJumps, 1);
-			m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
-		}
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition))
+	{
+		SendPlayerMoveLook();
+		return;
 	}
+
+	// TODO: should do some checks to see if player is not moving through terrain
+	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
 	
-	m_Player->MoveTo(Pos);
+	m_Player->SetPosition(NewPosition);
 	m_Player->SetStance(a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
+	m_Player->UpdateMovementStats(NewPosition - OldPosition, PreviousIsOnGround);
 }
 
 
@@ -1501,8 +1491,8 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
 	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_Stance, a_IsOnGround);
+	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
 }
 
 

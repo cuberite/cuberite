@@ -38,7 +38,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_bOnGround(false),
 	m_Gravity(-9.81f),
 	m_AirDrag(0.02f),
-	m_LastPos(a_X, a_Y, a_Z),
+	m_LastPosition(a_X, a_Y, a_Z),
 	m_IsInitialized(false),
 	m_WorldTravellingFrom(nullptr),
 	m_EntityType(a_EntityType),
@@ -57,7 +57,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_TicksAlive(0),
 	m_HeadYaw(0.0),
 	m_Rot(0.0, 0.0, 0.0),
-	m_Pos(a_X, a_Y, a_Z),
+	m_Position(a_X, a_Y, a_Z),
+	m_LastSentPosition(a_X, a_Y, a_Z),
 	m_WaterSpeed(0, 0, 0),
 	m_Mass (0.001),  // Default 1g
 	m_Width(a_Width),
@@ -793,17 +794,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_AttachedTo != nullptr)
 	{
-		Vector3d DeltaPos = m_Pos - m_AttachedTo->GetPosition();
-		if (DeltaPos.Length() > 0.5)
-		{
-			SetPosition(m_AttachedTo->GetPosition());
-
-			if (IsPlayer())
-			{
-				cPlayer * Player = reinterpret_cast<cPlayer *>(this);
-				Player->UpdateMovementStats(DeltaPos);
-			}
-		}
+		SetPosition(m_AttachedTo->GetPosition());
 	}
 	else
 	{
@@ -1692,7 +1683,7 @@ void cEntity::TeleportToEntity(cEntity & a_Entity)
 void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	//  ask the plugins to allow teleport to the new position.
-	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		SetPosition(a_PosX, a_PosY, a_PosZ);
 		m_World->BroadcastTeleportEntity(*this);
@@ -1727,9 +1718,9 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		}
 		
 		// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-		int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastPos.x * 32.0);
-		int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastPos.y * 32.0);
-		int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastPos.z * 32.0);
+		int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
+		int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
+		int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
 
 		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 		{
@@ -1746,14 +1737,14 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 					m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
 				}
 				// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
-				// The latter is only changed with a relmove / teleport, and m_LastPos stores this position
-				m_LastPos = GetPosition();
+				// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
+				m_LastSentPosition = GetPosition();
 			}
 			else
 			{
 				// Too big a movement, do a teleport
 				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_LastPos = GetPosition();  // See above
+				m_LastSentPosition = GetPosition();  // See above
 				m_bDirtyOrientation = false;
 			}
 		}
@@ -1818,16 +1809,6 @@ void cEntity::Detach(void)
 bool cEntity::IsA(const char * a_ClassName) const
 {
 	return (strcmp(a_ClassName, "cEntity") == 0);
-}
-
-
-
-
-
-void cEntity::SetRot(const Vector3f & a_Rot)
-{
-	m_Rot = a_Rot;
-	m_bDirtyOrientation = true;
 }
 
 
@@ -1939,41 +1920,6 @@ void cEntity::SetWidth(double a_Width)
 
 
 
-
-void cEntity::AddPosX(double a_AddPosX)
-{
-	m_Pos.x += a_AddPosX;
-}
-
-
-
-
-void cEntity::AddPosY(double a_AddPosY)
-{
-	m_Pos.y += a_AddPosY;
-}
-
-
-
-
-void cEntity::AddPosZ(double a_AddPosZ)
-{
-	m_Pos.z += a_AddPosZ;
-}
-
-
-
-
-void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
-{
-	m_Pos.x += a_AddPosX;
-	m_Pos.y += a_AddPosY;
-	m_Pos.z += a_AddPosZ;
-}
-
-
-
-
 void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ)
 {
 	DoSetSpeed(m_Speed.x + a_AddSpeedX, m_Speed.y + a_AddSpeedY, m_Speed.z + a_AddSpeedZ);
@@ -2055,36 +2001,10 @@ Vector3d cEntity::GetLookVector(void) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set position
-void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
+void cEntity::SetPosition(const Vector3d & a_Position)
 {
-	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
-}
-
-
-
-
-
-void cEntity::SetPosX(double a_PosX)
-{
-	m_Pos.x = a_PosX;
-}
-
-
-
-
-
-void cEntity::SetPosY(double a_PosY)
-{
-	m_Pos.y = a_PosY;
-}
-
-
-
-
-
-void cEntity::SetPosZ(double a_PosZ)
-{
-	m_Pos.z = a_PosZ;
+	m_LastPosition = m_Position;
+	m_Position = a_Position;
 }
 
 
