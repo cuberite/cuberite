@@ -2124,7 +2124,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 			else if (a_DeltaPos.y < 0.0)
 			{
 				// Increment statistic
-				m_Stats.AddValue(statDistFallen, (StatValue)(abs(a_DeltaPos.y) * 100 + 0.5));
+				m_Stats.AddValue(statDistFallen, static_cast<StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
 			}
 			// TODO: good opportunity to detect illegal flight (check for falling tho)
 		}
