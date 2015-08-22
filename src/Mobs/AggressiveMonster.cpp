@@ -110,13 +110,13 @@ void cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 
 bool cAggressiveMonster::IsMovingToTargetPosition()
 {
-	// Difference between destination x and target x is negligible (to 10^-12 precision)
-	if (fabsf(static_cast<float>(m_FinalDestination.x) - static_cast<float>(m_Target->GetPosX())) < std::numeric_limits<float>::epsilon())
+	// Difference between destination x and target x is within half a block
+	if (std::abs(m_FinalDestination.x - m_Target->GetPosX()) < 0.5)
 	{
 		return false;
 	}
-	// Difference between destination z and target z is negligible (to 10^-12 precision)
-	else if (fabsf(static_cast<float>(m_FinalDestination.z) - static_cast<float>(m_Target->GetPosZ())) > std::numeric_limits<float>::epsilon())
+	// Difference between destination z and target z is within half a block
+	else if (std::abs(m_FinalDestination.z - m_Target->GetPosZ()) < 0.5)
 	{
 		return false;
 	}
