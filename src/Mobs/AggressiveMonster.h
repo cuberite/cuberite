@@ -21,11 +21,6 @@ public:
 	
 	virtual void EventSeePlayer(cEntity *) override;
 	virtual void Attack(std::chrono::milliseconds a_Dt);
-
-protected:
-	/** Whether this mob's destination is the same as its target's position. */
-	bool IsMovingToTargetPosition();
-
 } ;
 
 
