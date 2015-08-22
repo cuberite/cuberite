@@ -101,9 +101,8 @@ void cRoot::InputThread(cRoot & a_Params)
 void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 {
 	#ifdef _WIN32
-		HWND hwnd = GetConsoleWindow();
-		HMENU hmenu = GetSystemMenu(hwnd, FALSE);
-		EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
+		HMENU ConsoleMenu = GetSystemMenu(GetConsoleWindow(), FALSE);
+		EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
 
 	cLogger::cListener * consoleLogListener = MakeConsoleListener(m_RunAsService);
@@ -212,7 +211,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		m_StartTime = std::chrono::steady_clock::now();
 
 		#ifdef _WIN32
-			EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
+			EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
 
 		for (;;)
@@ -272,13 +271,13 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		DWORD Length;
 		INPUT_RECORD Record
 		{
-			static_cast<WORD>(KEY_EVENT),
+			KEY_EVENT,
 			{
 				{
 					TRUE,
 					1,
 					VK_RETURN,
-					MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC),
+					static_cast<WORD>(MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC)),
 					{ { VK_RETURN } },
 					0
 				}
