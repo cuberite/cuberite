@@ -277,7 +277,6 @@ macro(set_exe_flags)
 					# Ignore another problem in sqlite
 					add_flags_cxx("-Wno-documentation-unknown-command")
 				endif()
-				add_flags_cxx("-Wno-format-pedantic")
 			endif()
 		endif()
 	endif()
