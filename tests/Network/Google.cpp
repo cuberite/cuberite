@@ -118,6 +118,7 @@ static void DoTest(void)
 
 int main()
 {
+	cNetworkSingleton::Get().Initialise();
 	DoTest();
 
 	cNetworkSingleton::Get().Terminate();

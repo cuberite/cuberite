@@ -18,8 +18,36 @@
 
 
 
-cNetworkSingleton::cNetworkSingleton(void):
-	m_HasTerminated(false)
+cNetworkSingleton::cNetworkSingleton() :
+	m_HasTerminated(true)
+{
+}
+
+
+
+
+
+cNetworkSingleton::~cNetworkSingleton()
+{
+	// Check that Terminate has been called already:
+	ASSERT(m_HasTerminated);
+}
+
+
+
+
+
+cNetworkSingleton & cNetworkSingleton::Get(void)
+{
+	static cNetworkSingleton Instance;
+	return Instance;
+}
+
+
+
+
+
+void cNetworkSingleton::Initialise(void)
 {
 	// Windows: initialize networking:
 	#ifdef _WIN32
@@ -64,26 +92,7 @@ cNetworkSingleton::cNetworkSingleton(void):
 
 	// Create the event loop thread:
 	m_EventLoopThread = std::thread(RunEventLoop, this);
-}
-
-
-
-
-
-cNetworkSingleton::~cNetworkSingleton()
-{
-	// Check that Terminate has been called already:
-	ASSERT(m_HasTerminated);
-}
-
-
-
-
-
-cNetworkSingleton & cNetworkSingleton::Get(void)
-{
-	static cNetworkSingleton Instance;
-	return Instance;
+	m_HasTerminated = false;
 }
 
 
