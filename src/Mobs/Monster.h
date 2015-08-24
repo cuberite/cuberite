@@ -117,8 +117,8 @@ public:
 
 	// tolua_begin
 	bool IsBaby (void) const { return m_Age < 0; }
-	char GetAge (void) const { return m_Age; }
-	void SetAge(char a_Age)  { m_Age = a_Age; }
+	int GetAge (void) const { return m_Age; }
+	void SetAge(int a_Age)  { m_Age = a_Age; }
 	// tolua_end
 
 
@@ -279,7 +279,7 @@ protected:
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;
 
-	char m_Age;
+	int m_Age;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
