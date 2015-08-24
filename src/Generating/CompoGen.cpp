@@ -377,7 +377,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
 		LOGD("CompoGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
-		LOGD("CompoGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
+		LOGD("CompoGenCache: Avg cache chain length: %.2f", static_cast<float>(m_TotalChain) / m_NumHits);
 	}
 	#endif  // _DEBUG
 	
