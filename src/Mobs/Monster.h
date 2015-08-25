@@ -276,7 +276,7 @@ protected:
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;
 
-	char m_Age;
+	int m_Age;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
