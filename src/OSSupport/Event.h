@@ -12,7 +12,6 @@
 
 #include <mutex>
 #include <condition_variable>
-#include <atomic>
 
 
 
@@ -42,7 +41,7 @@ public:
 private:
 
 	/** Used for checking for spurious wakeups. */
-	std::atomic<bool> m_ShouldContinue;
+	bool m_ShouldContinue;
 
 	/** Mutex protecting m_ShouldContinue from multithreaded access. */
 	std::mutex m_Mutex;
