@@ -1,23 +1,23 @@
 [submodule "MCServer/Plugins/Core"]
-	path = MCServer/Plugins/Core
+	path = Server/Plugins/Core
 	url = https://github.com/mc-server/Core.git
 [submodule "MCServer/Plugins/ProtectionAreas"]
-	path = MCServer/Plugins/ProtectionAreas
+	path = Server/Plugins/ProtectionAreas
 	url = https://github.com/mc-server/ProtectionAreas.git
 [submodule "MCServer/Plugins/TransAPI"]
-	path = MCServer/Plugins/TransAPI
+	path = Server/Plugins/TransAPI
 	url = https://github.com/bearbin/transapi.git
 [submodule "MCServer/Plugins/ChunkWorx"]
-	path = MCServer/Plugins/ChunkWorx
+	path = Server/Plugins/ChunkWorx
 	url = https://github.com/mc-server/ChunkWorx.git
 [submodule "MCServer/Plugins/ChatLog"]
-	path = MCServer/Plugins/ChatLog
+	path = Server/Plugins/ChatLog
 	url = https://github.com/mc-server/ChatLog.git
 [submodule "MCServer/Plugins/Handy"]
-	path = MCServer/Plugins/Handy
+	path = Server/Plugins/Handy
 	url = https://github.com/mc-server/Handy.git
 [submodule "MCServer/Plugins/MagicCarpet"]
-	path = MCServer/Plugins/MagicCarpet
+	path = Server/Plugins/MagicCarpet
 	url = https://github.com/mc-server/MagicCarpet.git
 [submodule "lib/polarssl"]
 	path = lib/polarssl

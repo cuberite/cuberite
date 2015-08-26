@@ -10,9 +10,9 @@ endif()
 
 # These env variables are used for configuring Travis CI builds.
 # See https://github.com/mc-server/MCServer/pull/767
-if(DEFINED ENV{TRAVIS_MCSERVER_BUILD_TYPE})
-	message("Setting build type to $ENV{TRAVIS_MCSERVER_BUILD_TYPE}")
-	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_MCSERVER_BUILD_TYPE})
+if(DEFINED ENV{TRAVIS_CUBERITE_BUILD_TYPE})
+	message("Setting build type to $ENV{TRAVIS_CUBERITE_BUILD_TYPE}")
+	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_CUBERITE_BUILD_TYPE})
 endif()
 
 if(DEFINED ENV{TRAVIS_MCSERVER_FORCE32})
@@ -23,13 +23,13 @@ if(DEFINED ENV{TRAVIS_BUILD_WITH_COVERAGE})
 	set(BUILD_WITH_COVERAGE $ENV{TRAVIS_BUILD_WITH_COVERAGE})
 endif()
 
-if(DEFINED ENV{MCSERVER_BUILD_ID})
+if(DEFINED ENV{CUBERITE_BUILD_ID})
 	# The build info is defined by the build system (Travis / Jenkins)
-	set(BUILD_ID $ENV{MCSERVER_BUILD_ID})
-	set(BUILD_SERIES_NAME $ENV{MCSERVER_BUILD_SERIES_NAME})
-	set(BUILD_DATETIME $ENV{MCSERVER_BUILD_DATETIME})
-	if(DEFINED ENV{MCSERVER_BUILD_COMMIT_ID})
-		set(BUILD_COMMIT_ID $ENV{MCSERVER_BUILD_COMMIT_ID})
+	set(BUILD_ID $ENV{CUBERITE_BUILD_ID})
+	set(BUILD_SERIES_NAME $ENV{CUBERITE_BUILD_SERIES_NAME})
+	set(BUILD_DATETIME $ENV{CUBERITE_BUILD_DATETIME})
+	if(DEFINED ENV{CUBERITE_BUILD_COMMIT_ID})
+		set(BUILD_COMMIT_ID $ENV{CUBERITE_BUILD_COMMIT_ID})
 	else()
 		message("Commit id not set, attempting to determine id from git")
 		execute_process(
@@ -75,16 +75,16 @@ endif()
 # We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
 # Adapted from http://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
 if(MSVC OR MSVC_IDE)
-  if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
-    message(FATAL_ERROR "The project requires C++11 features. "
-      "You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
-      "with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
-  elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
-    message( "VC11: using Microsoft Visual Studio 2012 "
-      "with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
-    set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
-  else() # VC12+, assuming C++11 supported.
-  endif()
+	if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
+		message(FATAL_ERROR "The project requires C++11 features. "
+		"You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
+		"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
+	elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
+		message( "VC11: using Microsoft Visual Studio 2012 "
+		"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
+		set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
+	else() # VC12+, assuming C++11 supported.
+	endif()
 endif()
 
 set(BUILD_TOOLS OFF CACHE BOOL "")
@@ -129,7 +129,7 @@ endif()
 
 
 
-project (MCServer)
+project (Cuberite)
 
 # Set options for SQLiteCpp, disable all their tests and lints:
 set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide."  FORCE)
@@ -259,4 +259,3 @@ if (MSVC)
 		)
 	endif()
 endif()
-

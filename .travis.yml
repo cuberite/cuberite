@@ -1,7 +1,7 @@
 language: cpp
 sudo: false
 
-compiler: 
+compiler:
 - clang
 - gcc
 
@@ -16,8 +16,8 @@ addons:
 script: ./CIbuild.sh
 
 env:
-  - TRAVIS_MCSERVER_BUILD_TYPE=RELEASE MCSERVER_PATH=./MCServer
-  - TRAVIS_MCSERVER_BUILD_TYPE=DEBUG   MCSERVER_PATH=./MCServer_debug
+  - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
+  - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG   CUBERITE_PATH=./Cuberite_debug
 
 notifications:
   email:
