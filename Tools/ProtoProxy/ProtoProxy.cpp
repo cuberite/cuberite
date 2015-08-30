@@ -15,11 +15,17 @@
 int main(int argc, char ** argv)
 {
 	// Initialize logging subsystem:
-	cLogger::InitiateMultithreading();
 	auto consoleLogListener = MakeConsoleListener(false);
-	auto fileLogListener = new cFileListener();
-	cLogger::GetInstance().AttachListener(consoleLogListener);
-	cLogger::GetInstance().AttachListener(fileLogListener);
+	auto consoleAttachment = cLogger::GetInstance().AttachListener(std::move(consoleLogListener));
+	auto fileLogListenerRet = MakeFileListener();
+	if (!fileLogListenerRet.first)
+	{
+		LOGERROR("Failed to open log file, aborting");
+		return EXIT_FAILURE;
+	}
+	auto fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
+
+	cLogger::InitiateMultithreading();
 
 	int ListenPort  = (argc > 1) ? atoi(argv[1]) : 25564;
 	int ConnectPort = (argc > 2) ? atoi(argv[2]) : 25565;

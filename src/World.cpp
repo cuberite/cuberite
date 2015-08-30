@@ -255,8 +255,6 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 			return 2400 + (m_TickRand.randInt() % 4800);   // 2 - 6 minutes
 		}
 	}
-	LOGWARNING("%s: Missing default weather interval for weather %d.", __FUNCTION__, a_Weather);
-	return -1;
 }
 
 
@@ -646,10 +644,6 @@ eWeather cWorld::ChooseNewWeather()
 			return ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}
-	
-	LOGWARNING("Unknown current weather: %d. Setting sunny.", m_Weather);
-	ASSERT(!"Unknown weather");
-	return eWeather_Sunny;
 }
 
 
