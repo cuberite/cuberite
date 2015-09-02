@@ -25,13 +25,15 @@
 
 #include <iostream>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 	#include <psapi.h>
-#elif defined(__linux__)
-	#include <fstream>
+#elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 	#include <signal.h>
-#elif defined(__APPLE__)
-	#include <mach/mach.h>
+	#if defined(__linux__)
+		#include <fstream>
+	#elif defined(__APPLE__)
+		#include <mach/mach.h>
+	#endif
 #endif
 
 
