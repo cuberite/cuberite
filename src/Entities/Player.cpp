@@ -1046,12 +1046,21 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(GetWorld()->GetDimension(), true);
+	m_ClientHandle->SendRespawn(dimOverworld, true);
 
 	// Extinguish the fire:
 	StopBurning();
 
-	TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+	cWorld *world = GetWorld();
+	if (world->GetDimension() != dimOverworld)
+	{
+		world = cRoot::Get()->CreateAndInitializeWorld(world->GetLinkedOverworldName(), dimOverworld, world->GetLinkedOverworldName(), false);
+		MoveToWorld(world, false, GetLastBedPos());
+	}
+	else
+	{
+		TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+	}
 
 	SetVisible(true);
 }
