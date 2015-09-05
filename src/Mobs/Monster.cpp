@@ -451,27 +451,30 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_Target = nullptr;
 	}
 
-	// Process the undead burning in daylight.
-	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
-	if (TickPathFinding(*Chunk))
+	if (GetPosY() >= 0)
 	{
-		/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
-		1. I am idle
-		2. I was not hurt by a player recently.
-		Then STOP. */
-		if (
-			m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
-			WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
-			!WouldBurnAt(GetPosition(), *Chunk)
-		)
+		// Process the undead burning in daylight.
+		HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
+		if (TickPathFinding(*Chunk))
 		{
-			// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
-			StopMovingToPosition();
-			m_GiveUpCounter = 40;  // This doesn't count as giving up, keep the giveup timer as is.
-		}
-		else
-		{
-			MoveToWayPoint(*Chunk);
+			/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
+			1. I am idle
+			2. I was not hurt by a player recently.
+			Then STOP. */
+			if (
+				m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
+				WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
+				!WouldBurnAt(GetPosition(), *Chunk)
+			)
+			{
+				// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
+				StopMovingToPosition();
+				m_GiveUpCounter = 40;  // This doesn't count as giving up, keep the giveup timer as is.
+			}
+			else
+			{
+				MoveToWayPoint(*Chunk);
+			}
 		}
 	}
 
