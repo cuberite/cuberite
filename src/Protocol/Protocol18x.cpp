@@ -109,6 +109,20 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_IsEncrypted(false),
 	m_LastSentDimension(dimNotSet)
 {
+
+	// BungeeCord handling:
+	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+	// hostname\00ip-address\00uuid\00profile-properties-as-json
+	AStringVector Params;
+	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	{
+		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+		m_ServerAddress = Params[0];
+		m_Client->SetIPString(Params[1]);
+		m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
+		m_Client->SetProperties(Params[3]);
+	}
+
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
 	{
