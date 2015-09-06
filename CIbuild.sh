@@ -2,9 +2,9 @@
 
 set -e
 
-export MCSERVER_BUILD_SERIES_NAME="Travis $CC $TRAVIS_MCSERVER_BUILD_TYPE"
-export MCSERVER_BUILD_ID=$TRAVIS_JOB_NUMBER
-export MCSERVER_BUILD_DATETIME=`date`
+export CUBERITE_BUILD_SERIES_NAME="Travis $CC $TRAVIS_CUBERITE_BUILD_TYPE"
+export CUBERITE_BUILD_ID=$TRAVIS_JOB_NUMBER
+export CUBERITE_BUILD_DATETIME=`date`
 
 if [ "$CXX" == "g++" ]; then
 	# This is a temporary workaround to allow the identification of GCC-4.8 by CMake, required for C++11 features
@@ -21,8 +21,8 @@ cd ..
 echo "Building..."
 make -j 2;
 make -j 2 test ARGS="-V";
-cd MCServer/;
-if [ "$TRAVIS_MCSERVER_BUILD_TYPE" != "COVERAGE" ]; then
-	echo restart | $MCSERVER_PATH;
-	echo stop | $MCSERVER_PATH;
+cd Server/;
+if [ "$TRAVIS_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
+	echo restart | $CUBERITE_PATH;
+	echo stop | $CUBERITE_PATH;
 fi

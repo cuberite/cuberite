@@ -9,6 +9,6 @@ before_build:
 - cmake -G "Visual Studio 12" .
 - echo %TIME%
 build:
-  project: MCServer.sln
+  project: Cuberite.sln
   parallel: true
   verbosity: minimal

@@ -2,12 +2,13 @@ build/
 nbproject/
 ipch/
 Win32/
-MCServer/MCServer
-MCServer/buildinfo
-MCServer/CONTRIBUTORS
-MCServer/LICENSE
-MCServer/Licenses
-MCServer/itemblacklist
+MCServer
+Server/Cuberite
+Server/buildinfo
+Server/CONTRIBUTORS
+Server/LICENSE
+Server/Licenses
+Server/itemblacklist
 Testing/
 ChunkWorxSave.ini
 doxy/
@@ -71,11 +72,11 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 install_mainfest.txt
-src/MCServer
+src/Cuberite
 lib/tolua++/tolua
 src/Bindings/Bindings.*
 src/Bindings/BindingDependencies.txt
-MCServer.dir/
+Cuberite.dir/
 src/AllFiles.lst
 
 #win32 cmake stuff
