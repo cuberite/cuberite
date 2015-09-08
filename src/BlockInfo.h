@@ -57,6 +57,8 @@ public:
 
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
+	/** Does this block fully occupy its top voxel - can things be placed on top? */
+	bool m_FullyOccupiesTopVoxel;
 
 	/** Can a finisher change it? */
 	bool m_CanBeTerraformed;
@@ -71,20 +73,21 @@ public:
 
 	// tolua_begin
 
-	inline static NIBBLETYPE GetLightValue        (BLOCKTYPE a_Type) { return Get(a_Type).m_LightValue;          }
-	inline static NIBBLETYPE GetSpreadLightFalloff(BLOCKTYPE a_Type) { return Get(a_Type).m_SpreadLightFalloff;  }
-	inline static bool IsTransparent              (BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;         }
-	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
-	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
-	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
-	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
-	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
-	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
-	inline static AString GetPlaceSound           (BLOCKTYPE a_Type) { return Get(a_Type).m_PlaceSound;          }
+	inline static NIBBLETYPE GetLightValue        (BLOCKTYPE a_Type) { return Get(a_Type).m_LightValue;             }
+	inline static NIBBLETYPE GetSpreadLightFalloff(BLOCKTYPE a_Type) { return Get(a_Type).m_SpreadLightFalloff;     }
+	inline static bool IsTransparent              (BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;            }
+	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;              }
+	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;        }
+	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;             }
+	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;                }
+	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;     }
+	inline static bool FullyOccupiesTopVoxel      (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesTopVoxel;  }
+	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;       }
+	inline static AString GetPlaceSound           (BLOCKTYPE a_Type) { return Get(a_Type).m_PlaceSound;             }
 
 	// tolua_end
 
-	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler;             }
+	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler;                }
 
 protected:
 	/** Storage for all the BlockInfo structures. */
@@ -100,6 +103,7 @@ protected:
 		, m_IsSnowable(false)
 		, m_IsSolid(true)
 		, m_FullyOccupiesVoxel(false)
+		, m_FullyOccupiesTopVoxel(false)
 		, m_CanBeTerraformed(false)
 		, m_PlaceSound("")
 		, m_Handler(nullptr)

@@ -28,7 +28,8 @@ public:
 			return false;
 		}
 
-		return (cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
+		return (cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))  ||
+				cBlockInfo::FullyOccupiesTopVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)) );
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

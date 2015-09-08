@@ -560,6 +560,16 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_STONE               ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_STONE_BRICKS        ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_WOOL                ].m_FullyOccupiesVoxel = true;
+	
+	
+	// Blocks that can have things placed on top of them
+	a_Info[E_BLOCK_FENCE			   ].m_FullyOccupiesTopVoxel = true;
+	a_Info[E_BLOCK_NETHER_BRICK_FENCE  ].m_FullyOccupiesTopVoxel = true;
+	a_Info[E_BLOCK_SPRUCE_FENCE		   ].m_FullyOccupiesTopVoxel = true;
+	a_Info[E_BLOCK_BIRCH_FENCE		   ].m_FullyOccupiesTopVoxel = true;
+	a_Info[E_BLOCK_JUNGLE_FENCE		   ].m_FullyOccupiesTopVoxel = true;
+	a_Info[E_BLOCK_DARK_OAK_FENCE	   ].m_FullyOccupiesTopVoxel = true;
+	a_Info[E_BLOCK_ACACIA_FENCE		   ].m_FullyOccupiesTopVoxel = true;
 
 
 	// Blocks that can be terraformed
