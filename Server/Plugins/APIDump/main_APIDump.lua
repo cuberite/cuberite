@@ -1432,9 +1432,9 @@ end
 --- Dumps the entire API table into a file in the ZBS format
 local function DumpAPIZBS(a_API)
 	LOG("Dumping ZBS API description...")
-	local f, err = io.open("mcserver_api.lua", "w")
+	local f, err = io.open("cuberite_api.lua", "w")
 	if (f == nil) then
-		LOG("Cannot open mcserver_lua.lua for writing, ZBS API will not be dumped. " .. err)
+		LOG("Cannot open cuberite_api.lua for writing, ZBS API will not be dumped. " .. err)
 		return
 	end
 
