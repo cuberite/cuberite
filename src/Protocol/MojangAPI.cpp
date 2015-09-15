@@ -525,9 +525,12 @@ AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 			res.append(a_UUID, 20, 12);
 			return StrToLower(res);
 		}
+		default:
+		{
+			LOGWARNING("%s: Not an UUID: \"%s\".", __FUNCTION__, a_UUID.c_str());
+			return "";
+		}
 	}
-	LOGWARNING("%s: Not an UUID: \"%s\".", __FUNCTION__, a_UUID.c_str());
-	return "";
 }
 
 

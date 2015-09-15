@@ -100,7 +100,7 @@ public:
 		
 		/** Called when the generator is overloaded to skip chunks that are no longer needed.
 		If this callback returns false, the chunk is not generated. */
-		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) = 0;
+		virtual bool IsNeeded(int a_ChunkX, int a_ChunkZ) = 0;
 
 		/** Called to check whether the specified chunk is in the queued state.
 		Currently used only in Debug-mode asserts. */

@@ -144,6 +144,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 
 cPlayer::~cPlayer(void)
 {
+	ASSERT((m_World == nullptr) || m_World->HasEntity(m_UniqueID));
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
 	{
 		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
@@ -163,6 +164,8 @@ cPlayer::~cPlayer(void)
 	m_InventoryWindow = nullptr;
 
 	LOGD("Player %p deleted", static_cast<void *>(this));
+
+	ASSERT((m_World == nullptr) || m_World->HasEntity(m_UniqueID));
 }
 
 
@@ -1278,7 +1281,6 @@ void cPlayer::SetCapabilities()
 	if (IsGameModeSpectator())
 	{
 		SetVisible(false);
-		SetCanFly(true);
 	}
 	else
 	{

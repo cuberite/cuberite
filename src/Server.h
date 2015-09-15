@@ -69,9 +69,9 @@ public:
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
-	/** Check if the player is queued to be transferred to a World.
-	Returns true is Player is found in queue. */
-	bool IsPlayerInQueue(AString a_Username);
+	/** Check if the client is on the server.
+	Returns true is client is found in any world, or in the queue. */
+	bool IsClientOnServer(AString a_Username);
 	
 	/** Can login more than once with same username.
 	Returns false if it is not allowed, true otherwise. */
@@ -107,9 +107,6 @@ public:
 	/** Called by cClientHandle's destructor; stop m_SocketThreads from calling back into a_Client */
 	void ClientDestroying(const cClientHandle * a_Client);
 	
-	/** Don't tick a_Client anymore, it will be ticked from its cPlayer instead */
-	void ClientMovedToWorld(const cClientHandle * a_Client);
-	
 	/** Notifies the server that a player was created; the server uses this to adjust the number of players */
 	void PlayerCreated(const cPlayer * a_Player);
 	
@@ -138,6 +135,9 @@ public:
 	Read from settings, admins should set this to true only when they chain to BungeeCord,
 	it makes the server vulnerable to identity theft through direct connections. */
 	bool ShouldAllowBungeeCord(void) const { return m_ShouldAllowBungeeCord; }
+
+
+	void QueueRemoveAndDestroyClient(cClientHandle * a_Client);
 	
 private:
 

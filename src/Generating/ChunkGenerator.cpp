@@ -260,7 +260,7 @@ void cChunkGenerator::Execute(void)
 		}
 
 		// Skip the chunk if the generator is overloaded:
-		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(item.m_ChunkX, item.m_ChunkZ))
+		if (SkipEnabled && !m_ChunkSink->IsNeeded(item.m_ChunkX, item.m_ChunkZ))
 		{
 			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
 			if (item.m_Callback != nullptr)

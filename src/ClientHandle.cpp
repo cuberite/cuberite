@@ -175,6 +175,7 @@ void cClientHandle::Destroy(void)
 	{
 		m_Player->RemoveClientHandle();
 	}
+	m_Player = nullptr;
 	m_State = csDestroyed;
 }
 
@@ -1679,27 +1680,12 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 	}
 	
 	// Check if the player is waiting to be transferred to the World.
-	if (cRoot::Get()->GetServer()->IsPlayerInQueue(a_Username))
+	if (cRoot::Get()->GetServer()->IsClientOnServer(a_Username))
 	{
 		Kick("A player of the username is already logged in");
 		return false;
 	}
 
-	class cCallback :
-		public cPlayerListCallback
-	{
-		virtual bool Item(cPlayer * a_Player) override
-		{
-			return true;
-		}
-	} Callback;
-
-	// Check if the player is in any World.
-	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))
-	{
-		Kick("A player of the username is already logged in");
-		return false;
-	}
 	return true;
 }
 
@@ -1887,6 +1873,17 @@ void cClientHandle::Tick(float a_Dt)
 			Link->Send(OutgoingData.data(), OutgoingData.size());
 		}
 	}
+
+
+	if (m_State == csAuthenticated)
+	{
+		StreamNextChunk();
+		
+		// Add the player to the world (start ticking from there):
+		m_State = csDownloadingWorld;
+		m_Player->GetWorld()->AddPlayer(m_Player);
+		return;
+	}
 	
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
@@ -1956,54 +1953,6 @@ void cClientHandle::Tick(float a_Dt)
 	// Reset explosion & block change counters:
 	m_NumExplosionsThisTick = 0;
 	m_NumBlockChangeInteractionsThisTick = 0;
-}
-
-
-
-
-
-void cClientHandle::ServerTick(float a_Dt)
-{
-	// Process received network data:
-	AString IncomingData;
-	{
-		cCSLock Lock(m_CSIncomingData);
-		std::swap(IncomingData, m_IncomingData);
-	}
-	if (!IncomingData.empty())
-	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
-	}
-	
-	// Send any queued outgoing data:
-	AString OutgoingData;
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		std::swap(OutgoingData, m_OutgoingData);
-	}
-	if ((m_Link != nullptr) && !OutgoingData.empty())
-	{
-		m_Link->Send(OutgoingData.data(), OutgoingData.size());
-	}
-	
-	if (m_State == csAuthenticated)
-	{
-		StreamNextChunk();
-
-		// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
-		cRoot::Get()->GetServer()->ClientMovedToWorld(this);
-		
-		// Add the player to the world (start ticking from there):
-		m_State = csDownloadingWorld;
-		m_Player->GetWorld()->AddPlayer(m_Player);
-		return;
-	}
-	
-	m_TicksSinceLastPacket += 1;
-	if (m_TicksSinceLastPacket > 600)  // 30 seconds
-	{
-		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-	}
 }
 
 
@@ -2176,7 +2125,7 @@ void cClientHandle::SendChatSystem(const cCompositeChat & a_Message)
 
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
-	ASSERT(m_Player != nullptr);
+	if (m_Player != nullptr) return;
 	
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	bool Found = false;
@@ -3007,15 +2956,10 @@ void cClientHandle::SocketClosed(void)
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
-	if ((m_State < csDestroying) && (m_Player != nullptr))
-	{
-		cWorld * World = m_Player->GetWorld();
-		if (World != nullptr)
-		{
-			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
-		}
-	}
-	Destroy();
+
+	// This must be the last thing this method does, as it may destroy the this pointer.
+	cRoot::Get()->GetServer()->QueueRemoveAndDestroyClient(this);
+	
 }
 
 

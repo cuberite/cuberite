@@ -251,8 +251,6 @@ public:
 
 	/** Returns true iff the chunk is present and valid. */
 	bool IsChunkValid(int a_ChunkX, int a_ChunkZ) const;
-
-	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
 	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading. */
 	void QueueUnloadUnusedChunks(void);  // tolua_export
@@ -310,9 +308,6 @@ public:
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
 	bool DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Compares clients of two chunks, calls the callback accordingly */
-	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
 	
 	/** Adds client to a chunk, if not already present; returns true if added, false if present */
 	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
@@ -843,7 +838,7 @@ private:
 		// cChunkSink overrides:
 		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
 		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) override;
-		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
+		virtual bool IsNeeded(int a_ChunkX, int a_ChunkZ) override;
 		virtual bool IsChunkQueued     (int a_ChunkX, int a_ChunkZ) override;
 		
 		// cPluginInterface overrides:
@@ -988,17 +983,6 @@ private:
 	/** Tasks that have been queued onto the tick thread, possibly to be executed at target tick in the future; guarded by m_CSTasks */
 	std::vector<std::pair<Int64, std::function<void(cWorld &)>>> m_Tasks;
 	
-	/** Guards m_Clients */
-	cCriticalSection  m_CSClients;
-	
-	/** List of clients in this world, these will be ticked by this world */
-	cClientHandlePtrs m_Clients;
-	
-	/** Clients that are scheduled for removal (ticked in another world), waiting for TickClients() to remove them */
-	cClientHandles m_ClientsToRemove;
-	
-	/** Clients that are scheduled for adding, waiting for TickClients to add them */
-	cClientHandlePtrs m_ClientsToAdd;
 
 	/** Guards m_EntitiesToAdd */
 	cCriticalSection m_CSEntitiesToAdd;
@@ -1032,9 +1016,6 @@ private:
 	
 	/** Executes all tasks queued onto the tick thread */
 	void TickQueuedTasks(void);
-	
-	/** Ticks all clients that are in this world */
-	void TickClients(float a_Dt);
 
 	/** Unloads all chunks immediately. */
 	void UnloadUnusedChunks(void);
