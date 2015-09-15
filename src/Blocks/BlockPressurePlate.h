@@ -28,10 +28,12 @@ public:
 		{
 			return false;
 		}
-
+		
+		BLOCKTYPE blockUnder = a_Chunk.GetBlock(a_RelX, a_RelY-2, a_RelZ);
+		
 		return (
-			cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)) ||
-			cBlockFenceHandler::IsFenceBlockType(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))
+			cBlockInfo::FullyOccupiesVoxel(blockUnder) ||
+			cBlockFenceHandler::IsFenceBlockType(blockUnder)
 		);
 	}
 
