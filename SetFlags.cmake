@@ -65,9 +65,11 @@ macro(set_flags)
 	elseif(APPLE)
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-                		OUTPUT_VARIABLE GCC_VERSION)
-                endif()
+			execute_process(
+				COMMAND ${CMAKE_C_COMPILER} -dumpversion
+				OUTPUT_VARIABLE GCC_VERSION
+			)
+		endif()
 
 		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
 		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
@@ -90,12 +92,14 @@ macro(set_flags)
 		endif()
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-                		OUTPUT_VARIABLE GCC_VERSION)
-                endif()
+			execute_process(
+				COMMAND ${CMAKE_C_COMPILER} -dumpversion
+				OUTPUT_VARIABLE GCC_VERSION
+			)
+		endif()
 
 		if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
-				set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}" "-fomit-frame-pointer")
+			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fomit-frame-pointer")
 		endif()
 
 		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
@@ -122,8 +126,8 @@ macro(set_flags)
 	endif()
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        get_clang_version()
-    endif()
+		get_clang_version()
+	endif()
 
 
 	# Use static CRT in MSVC builds:
