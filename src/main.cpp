@@ -14,6 +14,7 @@
 
 #include "OSSupport/NetworkSingleton.h"
 #include "BuildInfo.h"
+#include "Logger.h"
 
 #include "MemorySettingsRepository.h"
 

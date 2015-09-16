@@ -5,6 +5,7 @@
 
 #include "Defines.h"
 #include "json/json.h"
+#include "Logger.h"
 
 
 

@@ -271,7 +271,25 @@ template class SizeChecker<UInt8,  1>;
 #include "OSSupport/StackTrace.h"
 
 #ifndef TEST_GLOBALS
-	#include "Logger.h"
+
+// These fiunctions are defined in Logger.cpp, but are declared here to avoid including all of logger.h
+extern void LOG       (const char * a_Format, ...) FORMATSTRING(1, 2);
+extern void LOGINFO   (const char * a_Format, ...) FORMATSTRING(1, 2);
+extern void LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
+extern void LOGERROR  (const char * a_Format, ...) FORMATSTRING(1, 2);
+
+
+
+
+
+// In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
+#ifdef _DEBUG
+	#define LOGD LOG
+#else
+	#define LOGD(...)
+#endif  // _DEBUG
+
+#define LOGWARN LOGWARNING
 #else
 	// Logging functions
 void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
