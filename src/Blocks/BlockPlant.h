@@ -49,13 +49,12 @@ protected:
 				Light = Blocklight;
 			}
 
-			// Return true if there is enough light
-			// Set m_ShouldDie if the base light amounts are not enough to sustain a plant
+			// Based on light levels, decide between growth, stay and death:
 			if (Light > 8)
 			{
 				return paGrowth;
 			}
-			else if (Blocklight < 9 && SkyLight < 9)
+			else if ((Blocklight < 9) && (SkyLight < 9))
 			{
 				return paDeath;
 			}

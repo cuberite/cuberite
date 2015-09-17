@@ -98,6 +98,7 @@ SET (HDRS
 	ChunkSender.h
 	ChunkStay.h
 	ClientHandle.h
+	Color.h
 	CommandOutput.h
 	CompositeChat.h
 	CraftingRecipes.h
