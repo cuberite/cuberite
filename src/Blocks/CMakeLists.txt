@@ -9,7 +9,8 @@ SET (SRCS
 	BlockDoor.cpp
 	BlockHandler.cpp
 	BlockPiston.cpp
-	ChunkInterface.cpp)
+	ChunkInterface.cpp
+)
 
 SET (HDRS
 	BlockAnvil.h
@@ -54,12 +55,15 @@ SET (HDRS
 	BlockLilypad.h
 	BlockMelon.h
 	BlockMobHead.h
+	BlockMobSpawner.h
 	BlockMushroom.h
 	BlockMycelium.h
+	BlockNetherrack.h
 	BlockNetherWart.h
 	BlockOre.h
 	BlockPiston.h
 	BlockPlanks.h
+	BlockPlant.h
 	BlockPluginInterface.h
 	BlockPortal.h
 	BlockPressurePlate.h
@@ -72,6 +76,7 @@ SET (HDRS
 	BlockRedstoneTorch.h
 	BlockSand.h
 	BlockSapling.h
+	BlockSeaLantern.h
 	BlockSideways.h
 	BlockSignPost.h
 	BlockSlab.h
@@ -80,8 +85,8 @@ SET (HDRS
 	BlockStems.h
 	BlockStone.h
 	BlockSugarcane.h
-	BlockTNT.h
 	BlockTallGrass.h
+	BlockTNT.h
 	BlockTorch.h
 	BlockTrapdoor.h
 	BlockTripwire.h
@@ -92,8 +97,10 @@ SET (HDRS
 	BroadcastInterface.h
 	ChunkInterface.h
 	ClearMetaOnDrop.h
+	GetHandlerCompileTimeTemplate.h
 	MetaRotator.h
-	WorldInterface.h)
+	WorldInterface.h
+)
 
 if(NOT MSVC)
 	add_library(Blocks ${SRCS} ${HDRS})

@@ -5,7 +5,8 @@ project (MCServer)
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
-	ItemHandler.cpp)
+	ItemHandler.cpp
+)
 
 SET (HDRS
 	ItemArmor.h
@@ -26,6 +27,7 @@ SET (HDRS
 	ItemFishingRod.h
 	ItemFlowerPot.h
 	ItemFood.h
+	ItemGoldenApple.h
 	ItemHandler.h
 	ItemHoe.h
 	ItemItemFrame.h
@@ -36,6 +38,7 @@ SET (HDRS
 	ItemMilk.h
 	ItemMinecart.h
 	ItemMobHead.h
+	ItemMushroomSoup.h
 	ItemNetherWart.h
 	ItemPainting.h
 	ItemPickaxe.h
@@ -47,8 +50,8 @@ SET (HDRS
 	ItemSeeds.h
 	ItemShears.h
 	ItemShovel.h
-	ItemSlab.h
 	ItemSign.h
+	ItemSlab.h
 	ItemSpawnEgg.h
 	ItemString.h
 	ItemSugarcane.h
