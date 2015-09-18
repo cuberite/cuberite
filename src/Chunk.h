@@ -439,7 +439,12 @@ public:
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
 	// Makes a copy of the list
-	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
+	cClientHandleList GetAllClients(void) const
+	{
+		cClientHandleList copy;
+		std::copy(m_LoadedByClient.begin(), m_LoadedByClient.end(), std::back_inserter(copy));
+		return copy;
+	}
 
 private:
 
@@ -479,9 +484,9 @@ private:
 	sSetBlockQueueVector m_SetBlockQueue;  ///< Block changes that are queued to a specific tick
 	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
-	cClientHandleList  m_LoadedByClient;
-	cEntityList        m_Entities;
-	cBlockEntityList   m_BlockEntities;
+	std::vector<cClientHandle *> m_LoadedByClient;
+	cEntityList                  m_Entities;
+	cBlockEntityList             m_BlockEntities;
 	
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
 	int m_StayCount;
