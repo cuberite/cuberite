@@ -1885,7 +1885,7 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 
 void cChunk::RemoveClient(cClientHandle * a_Client)
 {
-	std::remove(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client);
+	m_LoadedByClient.erase(std::remove(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client));
 
 	if (!a_Client->IsDestroyed())
 	{
