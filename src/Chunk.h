@@ -441,9 +441,7 @@ public:
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const
 	{
-		cClientHandleList copy;
-		std::copy(m_LoadedByClient.begin(), m_LoadedByClient.end(), std::back_inserter(copy));
-		return copy;
+		return cClientHandleList(m_LoadedByClient.begin(), m_LoadedByClient.end());
 	}
 
 private:

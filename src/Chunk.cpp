@@ -1885,7 +1885,11 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 
 void cChunk::RemoveClient(cClientHandle * a_Client)
 {
-	m_LoadedByClient.erase(std::remove(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client));
+	auto itr = std::remove(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client);
+	// We should always remove at most one client.
+	ASSERT(std::distance(itr, m_LoadedByClient.end()) <= 1);
+	// Note: itr can equal m_LoadedByClient.end()
+	m_LoadedByClient.erase(itr, m_LoadedByClient.end());
 
 	if (!a_Client->IsDestroyed())
 	{
