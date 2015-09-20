@@ -42,6 +42,8 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	
+	#define WARN_UNUSED
+
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
@@ -68,6 +70,8 @@
 
 	#define ALIGN_8 __attribute__((aligned(8)))
 	#define ALIGN_16 __attribute__((aligned(16)))
+
+	#define WARN_UNUSED __attribute__((warn_unused_result))
 
 	// Some portability macros :)
 	#define stricmp strcasecmp

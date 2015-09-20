@@ -2968,6 +2968,7 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 
 void cClientHandle::PacketBufferFull(void)
 {
+	#error
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
 	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_IPString.c_str());
 	SendDisconnect("Server busy");

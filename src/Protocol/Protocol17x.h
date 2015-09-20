@@ -31,9 +31,6 @@ Declares the 1.7.x protocol classes:
 	#pragma warning(pop)
 #endif
 
-#include "PolarSSL++/AesCfb128Decryptor.h"
-#include "PolarSSL++/AesCfb128Encryptor.h"
-
 
 
 
@@ -56,9 +53,6 @@ class cProtocol172 :
 public:
 
 	cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-	
-	/** Called when client sends some data: */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
@@ -154,25 +148,10 @@ protected:
 	
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
-
-	/** Buffer for the received data */
-	cByteBuffer m_ReceivedData;
-	
-	bool m_IsEncrypted;
-	
-	cAesCfb128Decryptor m_Decryptor;
-	cAesCfb128Encryptor m_Encryptor;
-
-	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
-	cFile m_CommLogFile;
 	
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
-	
-	
-	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	void AddReceivedData(const char * a_Data, size_t a_Size);
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
@@ -250,6 +229,8 @@ protected:
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
+
+	virtual cProtocolError OnDataAddedToBuffer(cByteBuffer & a_Buffer, std::vector<std::unique_ptr<cClientAction>> & a_Action) override WARN_UNUSED;
 } ;
 
 

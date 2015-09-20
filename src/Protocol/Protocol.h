@@ -16,6 +16,11 @@
 #include "../Map.h"
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
+#include "../ClientAction.h"
+
+
+#include "PolarSSL++/AesCfb128Decryptor.h"
+#include "PolarSSL++/AesCfb128Encryptor.h"
 
 #include <array>
 
@@ -45,23 +50,45 @@ class cPacketizer;
 typedef unsigned char Byte;
 
 
+// fwd: main.cpp:
+extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
+
+
 
 
 
 class cProtocol
 {
 public:
-	cProtocol(cClientHandle * a_Client) :
+
+	enum class cProtocolError
+	{
+		Success,
+		BufferFull,
+		PacketError
+	};
+
+	cProtocol(cClientHandle * a_Client, AString a_LogID) :
 		m_Client(a_Client),
 		m_OutPacketBuffer(64 KiB),
-		m_OutPacketLenBuffer(20)  // 20 bytes is more than enough for one VarInt
-	{
+		m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
+		m_IsEncrypted(false),
+		m_ReceivedData(32 KiB)
+	{	
+		// Create the comm log file, if so requested:
+		if (g_ShouldLogCommIn || g_ShouldLogCommOut)
+		{
+			static int sCounter = 0;
+			cFile::CreateFolder("CommLogs");
+			AString FileName = Printf("CommLogs/%x_%d__%s.log", static_cast<unsigned>(time(nullptr)), sCounter++, a_LogID.c_str());
+			m_CommLogFile.Open(FileName, cFile::fmWrite);
+		}
 	}
 
 	virtual ~cProtocol() {}
 	
-	/** Called when client sends some data */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
+	/** Called when client sends some data, a_Actions is cleared before being filled */
+	cProtocolError DataReceived(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions)  WARN_UNUSED;
 	
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) = 0;
@@ -163,6 +190,12 @@ protected:
 	
 	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
 	cByteBuffer m_OutPacketLenBuffer;
+
+	bool m_IsEncrypted;
+	
+	cAesCfb128Decryptor m_Decryptor;
+	cAesCfb128Encryptor m_Encryptor;
+
 	
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
@@ -170,6 +203,20 @@ protected:
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
 	virtual void SendPacket(cPacketizer & a_Packet) = 0;
+
+	/** This method should append the actions from incoming packets to a_Action */
+	virtual cProtocolError OnDataAddedToBuffer(cByteBuffer & a_Buffer, std::vector<std::unique_ptr<cClientAction>> & a_Action) WARN_UNUSED = 0;
+
+	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
+	cFile m_CommLogFile;
+
+private:
+
+	/** Buffer for the received data */
+	cByteBuffer m_ReceivedData;
+
+	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets, appends to a_Actions */
+	cProtocolError AddReceivedData(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions) WARN_UNUSED;
 } ;
 
 

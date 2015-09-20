@@ -55,9 +55,6 @@ class cProtocol180 :
 public:
 
 	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-	
-	/** Called when client sends some data: */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
@@ -179,10 +176,6 @@ protected:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
-	
-	
-	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	void AddReceivedData(const char * a_Data, size_t a_Size);
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet

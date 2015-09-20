@@ -101,12 +101,10 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 // cProtocol172:
 
 cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client),
+	super(a_Client, a_Client->GetIPString()),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
-	m_ReceivedData(32 KiB),
-	m_IsEncrypted(false),
 	m_LastSentDimension(dimNotSet)
 {
 	// BungeeCord handling:
@@ -121,40 +119,8 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 		m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
 		m_Client->SetProperties(Params[3]);
 	}
-	
-	// Create the comm log file, if so requested:
-	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
-	{
-		static int sCounter = 0;
-		cFile::CreateFolder("CommLogs");
-		AString FileName = Printf("CommLogs/%x_%d__%s.log", static_cast<unsigned>(time(nullptr)), sCounter++, a_Client->GetIPString().c_str());
-		m_CommLogFile.Open(FileName, cFile::fmWrite);
-	}
 }
 
-
-
-
-
-void cProtocol172::DataReceived(const char * a_Data, size_t a_Size)
-{
-	if (m_IsEncrypted)
-	{
-		Byte Decrypted[512];
-		while (a_Size > 0)
-		{
-			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
-			a_Size -= NumBytes;
-			a_Data += NumBytes;
-		}
-	}
-	else
-	{
-		AddReceivedData(a_Data, a_Size);
-	}
-}
 
 
 
@@ -1544,59 +1510,27 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
+cProtocol::cProtocolError cProtocol172::OnDataAddedToBuffer(cByteBuffer & a_Buffer, std::vector<std::unique_ptr<cClientAction>> & a_Action)
 {
-	// Write the incoming data into the comm log file:
-	if (g_ShouldLogCommIn)
-	{
-		if (m_ReceivedData.GetReadableSpace() > 0)
-		{
-			AString AllData;
-			size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
-			m_ReceivedData.ReadAll(AllData);
-			m_ReceivedData.ResetRead();
-			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
-			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
-			AString Hex;
-			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") unparsed bytes already present in buffer:\n%s\n",
-				AllData.size(), AllData.size(), Hex.c_str()
-			);
-		}
-		AString Hex;
-		CreateHexDump(Hex, a_Data, a_Size, 16);
-		m_CommLogFile.Printf("Incoming data: %u (0x%x) bytes: \n%s\n",
-			static_cast<unsigned>(a_Size), static_cast<unsigned>(a_Size), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
-	}
-
-	if (!m_ReceivedData.Write(a_Data, a_Size))
-	{
-		// Too much data in the incoming queue, report to caller:
-		m_Client->PacketBufferFull();
-		return;
-	}
-
 	// Handle all complete packets:
 	for (;;)
 	{
 		UInt32 PacketLen;
-		if (!m_ReceivedData.ReadVarInt(PacketLen))
+		if (!a_Buffer.ReadVarInt(PacketLen))
 		{
 			// Not enough data
-			m_ReceivedData.ResetRead();
+			a_Buffer.ResetRead();
 			break;
 		}
-		if (!m_ReceivedData.CanReadBytes(PacketLen))
+		if (!a_Buffer.CanReadBytes(PacketLen))
 		{
 			// The full packet hasn't been received yet
-			m_ReceivedData.ResetRead();
+			a_Buffer.ResetRead();
 			break;
 		}
 		cByteBuffer bb(PacketLen + 1);
-		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
-		m_ReceivedData.CommitRead();
+		VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
+		a_Buffer.CommitRead();
 
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))
@@ -1646,7 +1580,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
 			}
 			
-			return;
+			return cProtocolError::PacketError;
 		}
 
 		if (bb.GetReadableSpace() != 1)
@@ -1666,26 +1600,10 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			}
 
 			ASSERT(!"Read wrong number of bytes!");
-			m_Client->PacketError(PacketType);
+			return cProtocolError::PacketError;
 		}
 	}  // for (ever)
-
-	// Log any leftover bytes into the logfile:
-	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
-	{
-		AString AllData;
-		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
-		m_ReceivedData.ReadAll(AllData);
-		m_ReceivedData.ResetRead();
-		m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
-		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
-		AString Hex;
-		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-		m_CommLogFile.Printf("There are " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") bytes of non-parse-able data left in the buffer:\n%s",
-			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
-	}
+	return cProtocolError::Success;
 }
 
 
