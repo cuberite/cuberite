@@ -2086,8 +2086,9 @@ void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefi
 		}
 	}
 
-	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
-	m_Protocol->SendChat(Message.append(a_Message));
+	bool ShouldUsePrefixes = World->ShouldUseChatPrefixes();
+	AString Message = FormatMessageType(ShouldUsePrefixes, a_ChatPrefix, a_AdditionalData);
+	m_Protocol->SendChat(Message.append(a_Message), ctChatBox, ShouldUsePrefixes);
 }
 
 
@@ -2096,7 +2097,7 @@ void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefi
 
 void cClientHandle::SendChat(const cCompositeChat & a_Message)
 {
-	m_Protocol->SendChat(a_Message);
+	m_Protocol->SendChat(a_Message, ctChatBox, GetPlayer()->GetWorld()->ShouldUseChatPrefixes());
 }
 
 
@@ -2116,7 +2117,7 @@ void cClientHandle::SendChatAboveActionBar(const AString & a_Message, eMessageTy
 	}
 
 	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
-	m_Protocol->SendChatAboveActionBar(Message.append(a_Message));
+	m_Protocol->SendChat(Message.append(a_Message), ctAboveActionBar);
 }
 
 
@@ -2125,7 +2126,7 @@ void cClientHandle::SendChatAboveActionBar(const AString & a_Message, eMessageTy
 
 void cClientHandle::SendChatAboveActionBar(const cCompositeChat & a_Message)
 {
-	m_Protocol->SendChatAboveActionBar(a_Message);
+	m_Protocol->SendChat(a_Message, ctAboveActionBar, GetPlayer()->GetWorld()->ShouldUseChatPrefixes());
 }
 
 
@@ -2144,8 +2145,9 @@ void cClientHandle::SendChatSystem(const AString & a_Message, eMessageType a_Cha
 		}
 	}
 
-	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
-	m_Protocol->SendChatSystem(Message.append(a_Message));
+	auto ShouldUsePrefixes = World->ShouldUseChatPrefixes();
+	AString Message = FormatMessageType(ShouldUsePrefixes, a_ChatPrefix, a_AdditionalData);
+	m_Protocol->SendChat(Message.append(a_Message), ctSystem, ShouldUsePrefixes);
 }
 
 
@@ -2154,7 +2156,7 @@ void cClientHandle::SendChatSystem(const AString & a_Message, eMessageType a_Cha
 
 void cClientHandle::SendChatSystem(const cCompositeChat & a_Message)
 {
-	m_Protocol->SendChatSystem(a_Message);
+	m_Protocol->SendChat(a_Message, ctSystem, GetPlayer()->GetWorld()->ShouldUseChatPrefixes());
 }
 
 

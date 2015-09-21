@@ -138,80 +138,20 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 
 
-void cProtocolRecognizer::SendChat(const AString & a_Message)
+void cProtocolRecognizer::SendChat(const AString & a_Message, eChatType a_Type)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChat(a_Message);
+	m_Protocol->SendChat(a_Message, a_Type);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
+void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChat(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatAboveActionBar(const AString & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatAboveActionBar(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatAboveActionBar(const cCompositeChat & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatAboveActionBar(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatSystem(const AString & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatSystem(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatSystem(const cCompositeChat & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatSystem(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatType(const AString & a_Message, eChatType type)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatType(a_Message, type);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatType(const cCompositeChat & a_Message, eChatType type)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatType(a_Message, type);
+	m_Protocol->SendChat(a_Message, a_Type, a_ShouldUseChatPrefixes);
 }
 
 
