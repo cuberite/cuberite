@@ -412,6 +412,12 @@ end
 
 -- Process the files in the list:
 for _, fnam in ipairs(ToProcess) do
+
+	-- Remove the optional "./" prefix:
+	if (fnam:sub(1, 2) == "./") then
+		fnam = fnam:sub(3)
+	end
+	
 	ProcessItem(fnam)
 end
 

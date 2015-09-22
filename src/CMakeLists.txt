@@ -98,6 +98,7 @@ SET (HDRS
 	ChunkSender.h
 	ChunkStay.h
 	ClientHandle.h
+	Color.h
 	CommandOutput.h
 	CompositeChat.h
 	CraftingRecipes.h
@@ -316,7 +317,7 @@ if (MSVC)
 		OUTPUT ${BINDING_OUTPUTS}
 
 		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/MCServer/lua51.dll ./lua51.dll
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/Server/lua51.dll ./lua51.dll
 
 		# Regenerate bindings:
 		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
@@ -330,7 +331,7 @@ endif()
 add_executable(${EXECUTABLE} ${SOURCE})
 
 
-# Output the executable into the $/MCServer folder, so that it has access to external resources:
+# Output the executable into the $/Server folder, so that it has access to external resources:
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/Server)
 SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/Server

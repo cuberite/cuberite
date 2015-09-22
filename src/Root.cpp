@@ -22,6 +22,7 @@
 #include "SettingsRepositoryInterface.h"
 #include "OverridesSettingsRepository.h"
 #include "SelfTests.h"
+#include "Logger.h"
 
 #include <iostream>
 
@@ -107,10 +108,15 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
 
-	cLogger::cListener * consoleLogListener = MakeConsoleListener(m_RunAsService);
-	cLogger::cListener * fileLogListener = new cFileListener();
-	cLogger::GetInstance().AttachListener(consoleLogListener);
-	cLogger::GetInstance().AttachListener(fileLogListener);
+	auto consoleLogListener = MakeConsoleListener(m_RunAsService);
+	auto consoleAttachment = cLogger::GetInstance().AttachListener(std::move(consoleLogListener));
+	auto fileLogListenerRet = MakeFileListener();
+	if (!fileLogListenerRet.first)
+	{
+		LOGERROR("Failed to open log file, aborting");
+		return;
+	}
+	auto fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
 
 	LOG("--- Started Log ---");
 
@@ -317,11 +323,6 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		LOG("Shutdown successful - restarting...");
 	}
 	LOG("--- Stopped Log ---");
-
-	cLogger::GetInstance().DetachListener(consoleLogListener);
-	delete consoleLogListener;
-	cLogger::GetInstance().DetachListener(fileLogListener);
-	delete fileLogListener;
 }
 
 

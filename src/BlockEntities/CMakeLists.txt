@@ -20,7 +20,8 @@ SET (SRCS
 	MobHeadEntity.cpp
 	MobSpawnerEntity.cpp
 	NoteEntity.cpp
-	SignEntity.cpp)
+	SignEntity.cpp
+)
 
 SET (HDRS
 	BeaconEntity.h
@@ -39,7 +40,9 @@ SET (HDRS
 	MobHeadEntity.h
 	MobSpawnerEntity.h
 	NoteEntity.h
-	SignEntity.h)
+	RedstonePoweredEntity.h
+	SignEntity.h
+)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(BeaconEntity.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=switch-enum")

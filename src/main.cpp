@@ -14,6 +14,7 @@
 
 #include "OSSupport/NetworkSingleton.h"
 #include "BuildInfo.h"
+#include "Logger.h"
 
 #include "MemorySettingsRepository.h"
 
@@ -471,6 +472,10 @@ int main(int argc, char **argv)
 		#endif  // SIGABRT_COMPAT
 	#endif
 
+
+	#ifdef __unix__
+		std::signal(SIGPIPE, SIG_IGN);
+	#endif
 	
 	#ifdef _WIN32
 		if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
