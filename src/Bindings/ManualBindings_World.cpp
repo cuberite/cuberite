@@ -110,6 +110,59 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
+{
+	// Exported manually, because tolua doesn't support converting functions to functor types.
+	// Function signature: ForEachLoadedChunk(callback) -> bool
+
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamFunction(2)
+		)
+	{
+		return 0;
+	}
+
+	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
+	if (Plugin == nullptr)
+	{
+		return 0;
+	}
+
+	// Read the params:
+	cWorld * World = (cWorld *)tolua_tousertype(tolua_S, 1, nullptr);
+	if (World == nullptr)
+	{
+		LOGWARNING("World:ForEachLoadedChunk(): invalid world parameter");
+		L.LogStackTrace();
+		return 0;
+	}
+	cLuaState::cRef FnRef;
+	L.GetStackValues(2, FnRef);
+	if (!FnRef.IsValid())
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #2");
+	}
+
+	// Call the enumeration:
+	bool ret = World->ForEachLoadedChunk(
+		[&L, &FnRef](int a_ChunkX, int a_ChunkZ) -> bool
+		{
+			bool res = false;  // By default continue the enumeration
+			L.Call(FnRef, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+			return res;
+		}
+	);
+
+	// Push the return value:
+	L.Push(ret);
+	return 1;
+}
+
+
+
+
 
 static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 {
@@ -580,6 +633,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachEntityInChunk",      ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk",     ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "ForEachPlayer",             ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
+			tolua_function(tolua_S, "ForEachLoadedChunk",        tolua_cWorld_ForEachLoadedChunk);
 			tolua_function(tolua_S, "GetBlockInfo",              tolua_cWorld_GetBlockInfo);
 			tolua_function(tolua_S, "GetBlockTypeMeta",          tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetSignLines",              tolua_cWorld_GetSignLines);
