@@ -3140,6 +3140,15 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 
 
+bool cWorld::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
+{
+	return m_ChunkMap->ForEachLoadedChunk(a_Callback);
+}
+
+
+
+
+
 void cWorld::SaveAllChunks(void)
 {
 	m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
