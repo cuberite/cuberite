@@ -110,6 +110,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			crUnknownCommand = { Notes = "When the given command doesn't exist." },
 			HOOK_BLOCK_SPREAD = { Notes = "Called when a block spreads based on world conditions" },
 			HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
+			HOOK_BREWING_COMPLETING = { "Called before a brewing stand completes a brewing process." },
+			HOOK_BREWING_COMPLETED = { "Called when a brewing stand completed a brewing process." },
 			HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
 			HOOK_CHUNK_AVAILABLE = { Notes = "Called when a chunk is loaded or generated and becomes available in the {{cWorld|world}}." },
 			HOOK_CHUNK_GENERATED = { Notes = "Called after a chunk is generated. A plugin may do last modifications on the generated chunk before it is handed of to the {{cWorld|world}}." },

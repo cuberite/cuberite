@@ -10,6 +10,7 @@
 
 // fwd:
 class cBlockEntityWithItems;
+class cBrewingstandEntity;
 class cChunkDesc;
 class cClientHandle;
 class cCommandOutputCallback;
@@ -75,6 +76,8 @@ public:
 	{
 		HOOK_BLOCK_SPREAD,
 		HOOK_BLOCK_TO_PICKUPS,
+		HOOK_BREWING_COMPLETING,
+		HOOK_BREWING_COMPLETED,
 		HOOK_CHAT,
 		HOOK_CHUNK_AVAILABLE,
 		HOOK_CHUNK_GENERATED,
@@ -193,6 +196,8 @@ public:
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
 	bool CallHookBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
+	bool CallHookBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
+	bool CallHookBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
 	bool CallHookChat                     (cPlayer & a_Player, AString & a_Message);
 	bool CallHookChunkAvailable           (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);

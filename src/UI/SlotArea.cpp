@@ -7,6 +7,7 @@
 #include "SlotArea.h"
 #include "../Entities/Player.h"
 #include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/BrewingstandEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
@@ -1935,6 +1936,242 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaBrewingstand:
+cSlotAreaBrewingstand::cSlotAreaBrewingstand(cBrewingstandEntity * a_Brewingstand, cWindow & a_ParentWindow) :
+	cSlotArea(4, a_ParentWindow),
+	m_Brewingstand(a_Brewingstand)
+{
+	m_Brewingstand->GetContents().AddListener(*this);
+}
+
+
+
+
+
+cSlotAreaBrewingstand::~cSlotAreaBrewingstand()
+{
+	m_Brewingstand->GetContents().RemoveListener(*this);
+}
+
+
+
+
+
+void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	if (m_Brewingstand == nullptr)
+	{
+		LOGERROR("cSlotAreaBrewingstand::Clicked(): m_Brewingstand == nullptr");
+		ASSERT(!"cSlotAreaBrewingstand::Clicked(): m_Brewingstand == nullptr");
+		return;
+	}
+
+	if ((a_SlotNum >= 0) && (a_SlotNum < 3))
+	{
+		bool bAsync = false;
+		if (GetSlot(a_SlotNum, a_Player) == nullptr)
+		{
+			LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
+			return;
+		}
+
+		cItem Slot(*GetSlot(a_SlotNum, a_Player));
+		if (!Slot.IsSameType(a_ClickedItem))
+		{
+			LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+			LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+			LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+			bAsync = true;
+		}
+
+		switch (a_ClickAction)
+		{
+			case caShiftLeftClick:
+			case caShiftRightClick:
+			{
+				HandleBrewedItem(a_Player);
+				ShiftClicked(a_Player, a_SlotNum, Slot);
+				return;
+			}
+			case caMiddleClick:
+			{
+				MiddleClicked(a_Player, a_SlotNum);
+				return;
+			}
+			case caDropKey:
+			case caCtrlDropKey:
+			{
+				DropClicked(a_Player, a_SlotNum, (a_SlotNum == caCtrlDropKey));
+				Slot.m_ItemCount = Slot.m_ItemCount - GetSlot(a_SlotNum, a_Player)->m_ItemCount;
+				HandleBrewedItem(a_Player);
+				return;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+		if (!DraggingItem.IsEmpty())
+		{
+			super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+			return;
+		}
+		else
+		{
+			switch (a_ClickAction)
+			{
+				case caDblClick:
+				{
+					DblClicked(a_Player, a_SlotNum);
+					return;
+				}
+				case caLeftClick:
+				{
+					DraggingItem = Slot;
+					HandleBrewedItem(a_Player);
+					Slot.Empty();
+					break;
+				}
+				case caRightClick:
+				{
+					DraggingItem = Slot.CopyOne();
+					DraggingItem.m_ItemCount = static_cast<char>(static_cast<float>(Slot.m_ItemCount) / 2.f + 0.5f);
+					Slot.m_ItemCount -= DraggingItem.m_ItemCount;
+
+					if (Slot.m_ItemCount <= 0)
+					{
+						Slot.Empty();
+					}
+					HandleBrewedItem(a_Player);
+					break;
+				}
+				default:
+				{
+					ASSERT(!"Unhandled click type!");
+				}
+			}
+		}
+
+		SetSlot(a_SlotNum, a_Player, Slot);
+		if (bAsync)
+		{
+			m_ParentWindow.BroadcastWholeWindow();
+		}
+		return;
+	}
+
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+}
+
+
+
+
+
+void cSlotAreaBrewingstand::HandleBrewedItem(cPlayer & a_Player)
+{
+	a_Player.AwardAchievement(achBrewPotion);
+}
+
+
+
+
+
+void cSlotAreaBrewingstand::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
+{
+	int SlotNum = -1;
+	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
+	if (BR->IsBottle(a_ItemStack))
+	{
+		for (int i = 0;i < 3;i++)
+		{
+			if (GetSlot(i, a_Player)->IsEmpty())
+			{
+				SlotNum = i;
+				break;
+			}
+		}
+
+		if (SlotNum == -1)
+		{
+			// All slots are full
+			return;
+		}
+	}
+	else if (BR->IsIngredient(a_ItemStack))
+	{
+		SlotNum = 3;
+	}
+	else
+	{
+		return;
+	}
+
+	const cItem * Slot = GetSlot(SlotNum, a_Player);
+	if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+	{
+		// Different items
+		return;
+	}
+
+	char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+	if (NumFit <= 0)
+	{
+		// Full stack already
+		return;
+	}
+	NumFit = std::min(NumFit, a_ItemStack.m_ItemCount);
+
+	if (a_ShouldApply)
+	{
+		cItem NewSlot(a_ItemStack);
+		NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+		SetSlot(SlotNum, a_Player, NewSlot);
+	}
+	a_ItemStack.m_ItemCount -= NumFit;
+	if (a_ItemStack.IsEmpty())
+	{
+		return;
+	}
+}
+
+
+
+
+
+const cItem * cSlotAreaBrewingstand::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+{
+	UNUSED(a_Player);
+	// a_SlotNum ranges from 0 to 3, query the items from the underlying brewing stand:
+	return &(m_Brewingstand->GetSlot(a_SlotNum));
+}
+
+
+
+
+
+void cSlotAreaBrewingstand::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	UNUSED(a_Player);
+	m_Brewingstand->SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+void cSlotAreaBrewingstand::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+{
+	UNUSED(a_SlotNum);
+	// Something has changed in the window, broadcast the entire window to all clients
+	ASSERT(a_ItemGrid == &(m_Brewingstand->GetContents()));
+
+	m_ParentWindow.BroadcastWholeWindow();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaMinecartWithChest:
 
 cSlotAreaMinecartWithChest::cSlotAreaMinecartWithChest(cMinecartWithChest * a_Chest, cWindow & a_ParentWindow) :
@@ -2338,6 +2575,7 @@ cItem * cSlotAreaTemporary::GetPlayerSlots(cPlayer & a_Player)
 	}
 	return itr->second.data();
 }
+
 
 
 

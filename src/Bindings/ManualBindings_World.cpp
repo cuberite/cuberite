@@ -580,6 +580,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ChunkStay",                 tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoWithBlockEntityAt",       DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
 			tolua_function(tolua_S, "DoWithBeaconAt",            DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);
+			tolua_function(tolua_S, "DoWithBrewingstandAt",      DoWithXYZ<cWorld, cBrewingstandEntity, &cWorld::DoWithBrewingstandAt>);
 			tolua_function(tolua_S, "DoWithChestAt",             DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);
 			tolua_function(tolua_S, "DoWithDispenserAt",         DoWithXYZ<cWorld, cDispenserEntity,    &cWorld::DoWithDispenserAt>);
 			tolua_function(tolua_S, "DoWithDropSpenserAt",       DoWithXYZ<cWorld, cDropSpenserEntity,  &cWorld::DoWithDropSpenserAt>);
@@ -594,6 +595,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "FindAndDoWithPlayer",       DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "DoWithPlayerByUUID",        DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayerByUUID>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
+			tolua_function(tolua_S, "ForEachBrewingstandInChunk", ForEachInChunk<cWorld, cBrewingstandEntity, &cWorld::ForEachBrewingstandInChunk>);
 			tolua_function(tolua_S, "ForEachChestInChunk",       ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
 			tolua_function(tolua_S, "ForEachEntity",             ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
 			tolua_function(tolua_S, "ForEachEntityInBox",        ForEachInBox<  cWorld, cEntity,        &cWorld::ForEachEntityInBox>);

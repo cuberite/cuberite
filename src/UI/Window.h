@@ -18,6 +18,7 @@
 class cPlayer;
 class cWindowOwner;
 class cClientHandle;
+class cBrewingstandEntity;
 class cChestEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
