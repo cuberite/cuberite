@@ -150,7 +150,7 @@ cPlayer::~cPlayer(void)
 		LOGINFO("Player %s has left the game", GetName().c_str());
 	}
 
-	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), this, GetUniqueID());
+	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
 
 	// Notify the server that the player is being destroyed
 	cRoot::Get()->GetServer()->PlayerDestroying(this);
@@ -162,7 +162,7 @@ cPlayer::~cPlayer(void)
 	delete m_InventoryWindow;
 	m_InventoryWindow = nullptr;
 
-	LOGD("Player %p deleted", this);
+	LOGD("Player %p deleted", static_cast<void *>(this));
 }
 
 

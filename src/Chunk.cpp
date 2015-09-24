@@ -490,7 +490,7 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 		{
 			auto & Monster = reinterpret_cast<cMonster &>(*entity);
 			currentPosition = Monster.GetPosition();
-			for (const auto PlayerPos : PlayerPositions)
+			for (const auto & PlayerPos : PlayerPositions)
 			{
 				toFill.CollectMob(Monster, *this, (currentPosition - PlayerPos).SqrLength());
 			}

@@ -1723,7 +1723,7 @@ void cChunkMap::AddEntity(cEntity * a_Entity)
 	)
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			a_Entity, a_Entity->GetClass(), a_Entity->GetUniqueID()
+			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
 		return;
 	}
@@ -1744,7 +1744,7 @@ void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
 	)
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			a_Entity, a_Entity->GetClass(), a_Entity->GetUniqueID()
+			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
 		return;
 	}
