@@ -1139,7 +1139,7 @@ cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_
 
 	std::unique_ptr<cMobSpawnerEntity> MobSpawner = cpp14::make_unique<cMobSpawnerEntity>(a_BlockX, a_BlockY, a_BlockZ, m_World);
 
-	// Load entity (MCServer worlds):
+	// Load entity (Cuberite worlds):
 	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
 	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_Short))
 	{

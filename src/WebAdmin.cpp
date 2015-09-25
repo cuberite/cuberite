@@ -96,7 +96,7 @@ bool cWebAdmin::Init(void)
 	if (!m_IniFile.ReadFile("webadmin.ini"))
 	{
 		LOGWARN("Regenerating webadmin.ini, all settings will be reset");
-		m_IniFile.AddHeaderComment(" This file controls the webadmin feature of MCServer");
+		m_IniFile.AddHeaderComment(" This file controls the webadmin feature of Cuberite");
 		m_IniFile.AddHeaderComment(" Username format: [User:*username*]");
 		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
 		m_IniFile.AddHeaderComment(" [User:admin]");
@@ -131,7 +131,7 @@ bool cWebAdmin::Init(void)
 
 		// Sets the fallback template:
 		m_LoginTemplate = \
-		"<h1>MCServer WebAdmin</h1>" \
+		"<h1>Cuberite WebAdmin</h1>" \
 		"<center>" \
 		"<form method='get' action='webadmin/'>" \
 		"<input type='submit' value='Log in'>" \
@@ -216,7 +216,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 {
 	if (!a_Request.HasAuth())
 	{
-		a_Connection.SendNeedAuth("MCServer WebAdmin");
+		a_Connection.SendNeedAuth("Cuberite WebAdmin");
 		return;
 	}
 
@@ -224,7 +224,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	AString UserPassword = m_IniFile.GetValue("User:" + a_Request.GetAuthUsername(), "Password", "");
 	if ((UserPassword == "") || (a_Request.GetAuthPassword() != UserPassword))
 	{
-		a_Connection.SendNeedAuth("MCServer WebAdmin - bad username or password");
+		a_Connection.SendNeedAuth("Cuberite WebAdmin - bad username or password");
 		return;
 	}
 
@@ -333,7 +333,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	ReplaceString(Template, "{MENU}",        Menu);
 	ReplaceString(Template, "{PLUGIN_NAME}", FoundPlugin);
 	ReplaceString(Template, "{CONTENT}",     Content);
-	ReplaceString(Template, "{TITLE}",       "MCServer");
+	ReplaceString(Template, "{TITLE}",       "Cuberite");
 
 	AString NumChunks;
 	Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());

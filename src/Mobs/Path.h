@@ -10,7 +10,7 @@ class cPath;
 #include "../FastRandom.h"
 #ifdef COMPILING_PATHFIND_DEBUGGER
 	/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native / WiseOldMan95 to debug
-	this class outside of MCServer. This preprocessor flag is never set when compiling MCServer. */
+	this class outside of Cuberite. This preprocessor flag is never set when compiling Cuberite. */
 	#include "PathFinderIrrlicht_Head.h"
 #endif
 

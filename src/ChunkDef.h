@@ -68,8 +68,8 @@ public:
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
 	typedef HEIGHTTYPE HeightMap[Width * Width];
 
-	/** The type used for any biomemap operations and storage inside MCServer,
-	using MCServer biomes (need not correspond to client representation!)
+	/** The type used for any biomemap operations and storage inside Cuberite,
+	using Cuberite biomes (need not correspond to client representation!)
 	idx = x + Width * z */
 	typedef EMCSBiome BiomeMap[Width * Width];
 

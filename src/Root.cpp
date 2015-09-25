@@ -121,7 +121,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	LOG("--- Started Log ---");
 
 	#ifdef BUILD_ID
-		LOG("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID);
+		LOG("Cuberite " BUILD_SERIES_NAME " build id: " BUILD_ID);
 		LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
 	#endif
 
