@@ -374,7 +374,6 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 
 
 class cLuaWorldTask :
-	public cWorld::cTask,
 	public cPluginLua::cResettable
 {
 public:
@@ -384,11 +383,7 @@ public:
 	{
 	}
 
-protected:
-	int m_FnRef;
-	
-	// cWorld::cTask overrides:
-	virtual void Run(cWorld & a_World) override
+	void Run(cWorld & a_World)
 	{
 		cCSLock Lock(m_CSPlugin);
 		if (m_Plugin != nullptr)
@@ -396,7 +391,10 @@ protected:
 			m_Plugin->Call(m_FnRef, &a_World);
 		}
 	}
-} ;
+
+protected:
+	int m_FnRef;
+};
 
 
 
@@ -433,9 +431,9 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
 
-	auto task = std::make_shared<cLuaWorldTask>(*Plugin, FnRef);
-	Plugin->AddResettable(task);
-	self->QueueTask(task);
+	auto ResettableTask = std::make_shared<cLuaWorldTask>(*Plugin, FnRef);
+	Plugin->AddResettable(ResettableTask);
+	self->QueueTask(std::bind(&cLuaWorldTask::Run, ResettableTask, std::placeholders::_1));
 	return 0;
 }
 
@@ -483,35 +481,6 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 
 
-class cLuaScheduledWorldTask :
-	public cWorld::cTask,
-	public cPluginLua::cResettable
-{
-public:
-	cLuaScheduledWorldTask(cPluginLua & a_Plugin, int a_FnRef) :
-		cPluginLua::cResettable(a_Plugin),
-		m_FnRef(a_FnRef)
-	{
-	}
-
-protected:
-	int m_FnRef;
-	
-	// cWorld::cTask overrides:
-	virtual void Run(cWorld & a_World) override
-	{
-		cCSLock Lock(m_CSPlugin);
-		if (m_Plugin != nullptr)
-		{
-			m_Plugin->Call(m_FnRef, &a_World);
-		}
-	}
-};
-
-
-
-
-
 static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 {
 	// Binding for cWorld::ScheduleTask
@@ -548,11 +517,9 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
 	
-	int DelayTicks = static_cast<int>(tolua_tonumber(tolua_S, 2, 0));
-
-	auto task = std::make_shared<cLuaScheduledWorldTask>(*Plugin, FnRef);
-	Plugin->AddResettable(task);
-	World->ScheduleTask(DelayTicks, static_cast<cWorld::cTaskPtr>(task));
+	auto ResettableTask = std::make_shared<cLuaWorldTask>(*Plugin, FnRef);
+	Plugin->AddResettable(ResettableTask);
+	World->ScheduleTask(static_cast<int>(tolua_tonumber(tolua_S, 2, 0)), std::bind(&cLuaWorldTask::Run, ResettableTask, std::placeholders::_1));
 	return 0;
 }
 
