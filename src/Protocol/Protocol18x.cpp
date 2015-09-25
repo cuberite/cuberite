@@ -2066,7 +2066,7 @@ void cProtocol180::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Version:
 	Json::Value Version;
-	Version["name"] = "MCServer 1.8";
+	Version["name"] = "Cuberite 1.8";
 	Version["protocol"] = 47;
 
 	// Players:
@@ -2671,7 +2671,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
 		m_Client->SetClientBrand(Brand);
 		// Send back our brand, including the length:
-		SendPluginMessage("MC|Brand", "\x08MCServer");
+		SendPluginMessage("MC|Brand", "\x08Cuberite");
 		return;
 	}
 	else if (a_Channel == "MC|Beacon")

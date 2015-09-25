@@ -177,17 +177,21 @@ echo
 
 
 # Echo: Compilation complete.
-popd
-pushd cuberite/MCServer
+popd > /dev/null
+pushd cuberite/Server > /dev/null
 echo
 echo "-----------------"
 echo "Compilation done!"
 echo
 echo "Cuberite awaits you at:"
-echo "`pwd`/MCServer"
+if [[ $BUILDTYPE == "Debug" ]]; then
+echo "`pwd`/Cuberite_debug"
+else
+echo "`pwd`/Cuberite"
+fi
 echo
 echo "Enjoy :)"
-popd
+popd > /dev/null
 exit 0
 
 :windows_detected

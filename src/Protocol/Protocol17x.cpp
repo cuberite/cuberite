@@ -1800,7 +1800,7 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Version:
 	Json::Value Version;
-	Version["name"] = "MCServer 1.7.2";
+	Version["name"] = "Cuberite 1.7.2";
 	Version["protocol"] = 4;
 
 	// Players:
@@ -2394,7 +2394,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 		}
 		
 		// Send back our brand:
-		SendPluginMessage("MC|Brand", "MCServer");
+		SendPluginMessage("MC|Brand", "Cuberite");
 		return;
 	}
 	else if (a_Channel == "MC|Beacon")
@@ -3256,7 +3256,7 @@ void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Version:
 	Json::Value Version;
-	Version["name"] = "MCServer 1.7.6";
+	Version["name"] = "Cuberite 1.7.6";
 	Version["protocol"] = 5;
 
 	// Players:

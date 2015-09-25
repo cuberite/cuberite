@@ -912,7 +912,7 @@ eMonsterType cMonster::StringToMobType(const AString & a_Name)
 {
 	AString lcName = StrToLower(a_Name);
 
-	// Search MCServer name:
+	// Search Cuberite name:
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
 	{
 		if (strcmp(g_MobTypeNames[i].m_lcName, lcName.c_str()) == 0)

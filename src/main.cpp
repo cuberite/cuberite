@@ -39,7 +39,7 @@ bool cRoot::m_RunAsService = false;
 #if defined(_WIN32)
 	SERVICE_STATUS_HANDLE g_StatusHandle  = nullptr;
 	HANDLE                g_ServiceThread = INVALID_HANDLE_VALUE;
-	#define               SERVICE_NAME      "MCServerService"
+	#define               SERVICE_NAME      "CuberiteService"
 #endif
 
 
@@ -77,10 +77,10 @@ void NonCtrlHandler(int a_Signal)
 		case SIGSEGV:
 		{
 			std::signal(SIGSEGV, SIG_DFL);
-			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
+			LOGERROR("  D:    | Cuberite has encountered an error and needs to close");
 			LOGERROR("Details | SIGSEGV: Segmentation fault");
 			#ifdef BUILD_ID
-			LOGERROR("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID);
+			LOGERROR("Cuberite " BUILD_SERIES_NAME " build id: " BUILD_ID);
 			LOGERROR("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
 			#endif
 			PrintStackTrace();
@@ -92,10 +92,10 @@ void NonCtrlHandler(int a_Signal)
 		#endif
 		{
 			std::signal(a_Signal, SIG_DFL);
-			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
+			LOGERROR("  D:    | Cuberite has encountered an error and needs to close");
 			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
 			#ifdef BUILD_ID
-			LOGERROR("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID);
+			LOGERROR("Cuberite " BUILD_SERIES_NAME " build id: " BUILD_ID);
 			LOGERROR("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
 			#endif
 			PrintStackTrace();
@@ -358,7 +358,7 @@ std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char **argv)
 	try
 	{
 		// Parse the comand line args:
-		TCLAP::CmdLine cmd("MCServer");
+		TCLAP::CmdLine cmd("Cuberite");
 		TCLAP::ValueArg<int> slotsArg    ("s", "max-players",         "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
 		TCLAP::MultiArg<int> portsArg    ("p", "port",                "The port number the server should listen to", false, "port", cmd);
 		TCLAP::SwitchArg commLogArg      ("",  "log-comm",            "Log server client communications to file", cmd);

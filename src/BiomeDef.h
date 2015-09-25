@@ -16,7 +16,7 @@
 // tolua_begin
 /** Biome IDs
 The first batch corresponds to the clientside biomes, used by MineCraft.
-BiomeIDs over 255 are used by MCServer internally and are translated to MC biomes before sending them to client
+BiomeIDs over 255 are used by Cuberite internally and are translated to MC biomes before sending them to client
 */
 enum EMCSBiome
 {
