@@ -95,7 +95,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_UniqueID = s_ClientCount;
 	m_PingStartTime = std::chrono::steady_clock::now();
 
-	LOGD("New ClientHandle created at %p", this);
+	LOGD("New ClientHandle created at %p", static_cast<void *>(this));
 }
 
 
@@ -106,7 +106,7 @@ cClientHandle::~cClientHandle()
 {
 	ASSERT(m_State == csDestroyed);  // Has Destroy() been called?
 	
-	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
+	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), static_cast<void *>(this));
 
 	{
 		cCSLock Lock(m_CSChunkLists);
@@ -140,7 +140,7 @@ cClientHandle::~cClientHandle()
 	delete m_Protocol;
 	m_Protocol = nullptr;
 	
-	LOGD("ClientHandle at %p deleted", this);
+	LOGD("ClientHandle at %p deleted", static_cast<void *>(this));
 }
 
 
@@ -164,7 +164,7 @@ void cClientHandle::Destroy(void)
 	}
 	
 	// DEBUG:
-	LOGD("%s: client %p, \"%s\"", __FUNCTION__, this, m_Username.c_str());
+	LOGD("%s: client %p, \"%s\"", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
 	
 	if ((m_Player != nullptr) && (m_Player->GetWorld() != nullptr))
 	{
@@ -2935,7 +2935,7 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 		return;
 	}
 	
-	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, this);
+	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, static_cast<void *>(this));
 	cCSLock Lock(m_CSChunkLists);
 	if (m_ChunksToSend.find(cChunkCoords(a_ChunkX, a_ChunkZ)) == m_ChunksToSend.end())
 	{

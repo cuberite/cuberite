@@ -128,7 +128,7 @@ void cLuaState::Close(void)
 	{
 		LOGWARNING(
 			"%s: Detected mis-use, calling Close() on an attached state (0x%p). Detaching instead.",
-			__FUNCTION__, m_LuaState
+			__FUNCTION__, static_cast<void *>(m_LuaState)
 		);
 		Detach();
 		return;
@@ -146,7 +146,7 @@ void cLuaState::Attach(lua_State * a_State)
 {
 	if (m_LuaState != nullptr)
 	{
-		LOGINFO("%s: Already contains a LuaState (0x%p), will be closed / detached.", __FUNCTION__, m_LuaState);
+		LOGINFO("%s: Already contains a LuaState (0x%p), will be closed / detached.", __FUNCTION__, static_cast<void *>(m_LuaState));
 		if (m_IsOwned)
 		{
 			Close();
@@ -174,7 +174,7 @@ void cLuaState::Detach(void)
 	{
 		LOGWARNING(
 			"%s: Detected a mis-use, calling Detach() when the state is owned. Closing the owned state (0x%p).",
-			__FUNCTION__, m_LuaState
+			__FUNCTION__, static_cast<void *>(m_LuaState)
 		);
 		Close();
 		return;

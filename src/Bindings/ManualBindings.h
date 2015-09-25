@@ -400,7 +400,7 @@ public:
 		L.GetStackValues(1, Self, Box, FnRef);
 		if ((Self == nullptr) || (Box == nullptr))
 		{
-			LOGWARNING("Invalid world (%p) or boundingbox (%p)", Self, Box);
+			LOGWARNING("Invalid world (%p) or boundingbox (%p)", static_cast<void *>(Self), static_cast<void *>(Box));
 			L.LogStackTrace();
 			return 0;
 		}

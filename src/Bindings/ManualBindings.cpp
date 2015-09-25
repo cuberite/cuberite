@@ -1151,7 +1151,7 @@ static int tolua_cPlayer_GetPermissions(lua_State * tolua_S)
 	cPlayer * self = reinterpret_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
 		return 0;
 	}
 	
@@ -1182,7 +1182,7 @@ static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
 	cPlayer * self = reinterpret_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
 		return 0;
 	}
 	
@@ -1211,7 +1211,7 @@ static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
 	cWindow * wnd  = reinterpret_cast<cWindow *>(tolua_tousertype(tolua_S, 2, nullptr));
 	if ((self == nullptr) || (wnd == nullptr))
 	{
-		LOGWARNING("%s: invalid self (%p) or wnd (%p)", __FUNCTION__, self, wnd);
+		LOGWARNING("%s: invalid self (%p) or wnd (%p)", __FUNCTION__, static_cast<void *>(self), static_cast<void *>(wnd));
 		return 0;
 	}
 	
@@ -1292,7 +1292,7 @@ static int tolua_SetObjectCallback(lua_State * tolua_S)
 	OBJTYPE * self = reinterpret_cast<OBJTYPE *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
 		return 0;
 	}
 	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);  // Store function reference for later retrieval

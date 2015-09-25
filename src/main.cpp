@@ -522,7 +522,7 @@ int main(int argc, char **argv)
 
 			while (!cRoot::m_TerminateEventRaised)
 			{
-				UniversalMain(std::move(ParseArguments(argc, argv)));
+				UniversalMain(ParseArguments(argc, argv));
 			}
 		#endif
 	}
@@ -531,7 +531,7 @@ int main(int argc, char **argv)
 		while (!cRoot::m_TerminateEventRaised)
 		{
 			// Not running as a service, do normal startup
-			UniversalMain(std::move(ParseArguments(argc, argv)));
+			UniversalMain(ParseArguments(argc, argv));
 		}
 	}
 
