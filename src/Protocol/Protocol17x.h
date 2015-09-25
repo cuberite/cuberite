@@ -16,6 +16,7 @@ Declares the 1.7.x protocol classes:
 #pragma once
 
 #include "Protocol.h"
+#include "LengthenedProtocol.h"
 #include "../ByteBuffer.h"
 
 #ifdef _MSC_VER
@@ -46,9 +47,9 @@ namespace Json
 
 
 class cProtocol172 :
-	public cProtocol
+	public cLengthenedProtocol
 {
-	typedef cProtocol super;
+	typedef cLengthenedProtocol super;
 	
 public:
 
@@ -79,35 +80,35 @@ public:
 	virtual void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
-	virtual void SendExperience                 (void) override;
+	virtual void SendExperience                 (const cPlayer & a_Player) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
-	virtual void SendHealth                     (void) override;
+	virtual void SendHealth                     (int a_Health, int a_FoodLevel, double a_FoodSaturationLevel) override;
 	virtual void SendHideTitle                  (void) override;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void SendLoginSuccess               (void) override;
+	virtual void SendLoginSuccess               (const AString & a_UUID, const AString & a_Username) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendPickupSpawn                (const cPickup & a_Pickup) override;
-	virtual void SendPlayerAbilities            (void) override;
+	virtual void SendPlayerAbilities            (const cPlayer & a_Player) override;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) override;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
-	virtual void SendPlayerMaxSpeed             (void) override;
-	virtual void SendPlayerMoveLook             (void) override;
-	virtual void SendPlayerPosition             (void) override;
+	virtual void SendPlayerMaxSpeed             (const cPlayer & a_Player) override;
+	virtual void SendPlayerMoveLook             (const cPlayer & a_Player) override;
+	virtual void SendPlayerPosition             (const cPlayer & a_Player) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendResetTitle                 (void) override;
-	virtual void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
+	virtual void SendRespawn                    (eGameMode a_GameMode, eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) override;
@@ -131,7 +132,7 @@ public:
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendWeather                    (eWeather a_Weather) override;
-	virtual void SendWholeInventory             (const cWindow & a_Window) override;
+	virtual void SendWholeInventory             (const cPlayer & a_Player, const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
 	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
@@ -139,6 +140,8 @@ public:
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
 protected:
+
+	typedef std::vector<std::unique_ptr<cClientAction>> ActionList;
 
 	AString m_ServerAddress;
 	
@@ -156,40 +159,40 @@ protected:
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
 	*/
-	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
+	cProtocolError HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType, ActionList & a_Action) WARN_UNUSED;
 
 	// Packet handlers while in the Status state (m_State == 1):
-	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
+	cProtocolError HandlePacketStatusPing(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	virtual cProtocolError HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
 
 	// Packet handlers while in the Login state (m_State == 2):
-	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
-	void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
-	
+	cProtocolError HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketLoginStart(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+
 	// Packet handlers while in the Game state (m_State == 3):
-	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
-	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
-	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
+	cProtocolError HandlePacketAnimation              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
 	
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, to be read by this function. */
@@ -248,7 +251,7 @@ public:
 	
 	// cProtocol172 overrides:
 	virtual void SendPlayerSpawn(const cPlayer & a_Player) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+	virtual cProtocolError HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer, ActionList & a_Action) override WARN_UNUSED;
 
 } ;
 

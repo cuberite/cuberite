@@ -331,7 +331,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	}
 	
 	// Send login success (if the protocol supports it):
-	m_Protocol->SendLoginSuccess();
+	m_Protocol->SendLoginSuccess(GetUUID(), GetUsername());
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(m_Self, GetUsername());
@@ -371,7 +371,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay(), World->IsDaylightCycleEnabled());
 
 	// Send contents of the inventory window
-	m_Protocol->SendWholeInventory(*m_Player->GetWindow());
+	m_Protocol->SendWholeInventory(*m_Player, *m_Player->GetWindow());
 
 	// Send health
 	m_Player->SendHealth();
@@ -1859,7 +1859,8 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 }
 
 
-
+//reminds me to come back later
+void undefined(void *);
 
 
 void cClientHandle::Tick(float a_Dt)
@@ -1872,7 +1873,9 @@ void cClientHandle::Tick(float a_Dt)
 	}
 	if (!IncomingData.empty())
 	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+		std::vector<std::unique_ptr<cClientAction>> Actions;
+		auto success = m_Protocol->DataReceived(IncomingData.data(), IncomingData.size(), Actions);
+		undefined(&success);
 	}
 
 	// Send any queued outgoing data:
@@ -1905,7 +1908,7 @@ void cClientHandle::Tick(float a_Dt)
 	// If the chunk the player's in was just sent, spawn the player:
 	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
-		m_Protocol->SendPlayerMoveLook();
+		m_Protocol->SendPlayerMoveLook(*m_Player);
 		m_State = csPlaying;
 	}
 
@@ -1974,7 +1977,9 @@ void cClientHandle::ServerTick(float a_Dt)
 	}
 	if (!IncomingData.empty())
 	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+		std::vector<std::unique_ptr<cClientAction>> Actions;
+		auto success = m_Protocol->DataReceived(IncomingData.data(), IncomingData.size(), Actions);
+		undefined(&success);
 	}
 	
 	// Send any queued outgoing data:
@@ -2389,7 +2394,7 @@ void cClientHandle::SendGameMode(eGameMode a_GameMode)
 
 void cClientHandle::SendHealth(void)
 {
-	m_Protocol->SendHealth();
+	m_Protocol->SendHealth(m_Player->GetHealth(), m_Player->GetFoodLevel(), m_Player->GetFoodSaturationLevel());
 }
 
 
@@ -2469,7 +2474,7 @@ void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animati
 
 void cClientHandle::SendPlayerAbilities()
 {
-	m_Protocol->SendPlayerAbilities();
+	m_Protocol->SendPlayerAbilities(*m_Player);
 }
 
 
@@ -2523,7 +2528,7 @@ void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, co
 
 void cClientHandle::SendPlayerMaxSpeed(void)
 {
-	m_Protocol->SendPlayerMaxSpeed();
+	m_Protocol->SendPlayerMaxSpeed(*m_Player);
 }
 
 
@@ -2537,7 +2542,7 @@ void cClientHandle::SendPlayerMoveLook(void)
 		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
 	);
 	*/
-	m_Protocol->SendPlayerMoveLook();
+	m_Protocol->SendPlayerMoveLook(*m_Player);
 }
 
 
@@ -2546,7 +2551,7 @@ void cClientHandle::SendPlayerMoveLook(void)
 
 void cClientHandle::SendPlayerPosition(void)
 {
-	m_Protocol->SendPlayerPosition();
+	m_Protocol->SendPlayerPosition(*m_Player);
 }
 
 
@@ -2601,7 +2606,7 @@ void cClientHandle::SendResetTitle()
 
 void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
-	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
+	m_Protocol->SendRespawn(m_Player->GetEffectiveGameMode(), a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
 
@@ -2610,7 +2615,7 @@ void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimen
 
 void cClientHandle::SendExperience(void)
 {
-	m_Protocol->SendExperience();
+	m_Protocol->SendExperience(*m_Player);
 }
 
 
@@ -2854,7 +2859,7 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 
 void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 {
-	m_Protocol->SendWholeInventory(a_Window);
+	m_Protocol->SendWholeInventory(*m_Player, a_Window);
 }
 
 
@@ -2965,10 +2970,10 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-
+#if 0
 void cClientHandle::PacketBufferFull(void)
 {
-	#error
+	undefined(nullptr);
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
 	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_IPString.c_str());
 	SendDisconnect("Server busy");
@@ -3082,7 +3087,7 @@ void cClientHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	}
 	SocketClosed();
 }
-
+#endif
 
 
 

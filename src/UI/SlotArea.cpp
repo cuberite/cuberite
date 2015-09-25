@@ -428,7 +428,7 @@ cSlotAreaChest::cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow)
 
 
 
-const cItem * cSlotAreaChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaChest::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 26, use that to index the chest entity's inventory directly:
 	return &(m_Chest->GetSlot(a_SlotNum));
@@ -461,7 +461,7 @@ cSlotAreaDoubleChest::cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEnti
 
 
 
-const cItem * cSlotAreaDoubleChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaDoubleChest::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 53, use that to index the correct chest's inventory:
 	if (a_SlotNum < 27)
@@ -1358,7 +1358,7 @@ void cSlotAreaBeacon::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, b
 
 
 
-const cItem * cSlotAreaBeacon::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaBeacon::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	UNUSED(a_Player);
 	return &(m_Beacon->GetSlot(a_SlotNum));
@@ -1669,7 +1669,7 @@ cSlotAreaEnderChest::cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWind
 
 
 
-const cItem * cSlotAreaEnderChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaEnderChest::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	return &(a_Player.GetEnderChestContents().GetSlot(a_SlotNum));
 }
@@ -1886,7 +1886,7 @@ void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, 
 
 
 
-const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	UNUSED(a_Player);
 	// a_SlotNum ranges from 0 to 2, query the items from the underlying furnace:
@@ -2184,7 +2184,7 @@ cSlotAreaMinecartWithChest::cSlotAreaMinecartWithChest(cMinecartWithChest * a_Ch
 
 
 
-const cItem * cSlotAreaMinecartWithChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaMinecartWithChest::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 26, use that to index the minecart chest entity's inventory directly:
 	UNUSED(a_Player);
@@ -2242,7 +2242,7 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 
 
 
-const cItem * cSlotAreaInventoryBase::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaInventoryBase::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 35, map that to the player's inventory slots according to the internal offset
 	return &a_Player.GetInventory().GetSlot(a_SlotNum + m_SlotOffset);
@@ -2426,7 +2426,7 @@ cSlotAreaItemGrid::~cSlotAreaItemGrid()
 
 
 
-const cItem * cSlotAreaItemGrid::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaItemGrid::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	return &m_ItemGrid.GetSlot(a_SlotNum);
 }
@@ -2466,7 +2466,7 @@ cSlotAreaTemporary::cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow)
 
 
 
-const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, const cPlayer & a_Player) const
 {
 	cItemMap::const_iterator itr = m_Items.find(a_Player.GetUniqueID());
 	if (itr == m_Items.end())

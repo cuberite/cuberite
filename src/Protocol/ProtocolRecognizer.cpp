@@ -18,7 +18,7 @@
 
 
 
-
+#if 0
 
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
@@ -1051,7 +1051,7 @@ void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
 	ASSERT(!"Function not to be called");
 }
 
-
+#endif
 
 
 

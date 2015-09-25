@@ -81,16 +81,16 @@ public:
 	int DeltaExperience(int a_Xp_delta);
 
 	/** Gets the experience total - XpTotal for score on death */
-	inline int GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
+	inline int GetXpLifetimeTotal(void) const { return m_LifetimeTotalXp; }
 
 	/** Gets the current experience */
-	inline int GetCurrentXp(void) { return m_CurrentXp; }
+	inline int GetCurrentXp(void) const { return m_CurrentXp; }
 
 	/** Gets the current level - XpLevel */
-	int GetXpLevel(void);
+	int GetXpLevel(void) const;
 
 	/** Gets the experience bar percentage - XpP */
-	float GetXpPercentage(void);
+	float GetXpPercentage(void) const;
 
 	/** Calculates the amount of XP needed for a given level
 	Ref: http://minecraft.gamepedia.com/XP
@@ -128,6 +128,7 @@ public:
 
 	/** Gets the contents of the player's associated enderchest */
 	cItemGrid & GetEnderChestContents(void) { return m_EnderChestContents; }
+	const cItemGrid & GetEnderChestContents(void) const { return m_EnderChestContents; }
 
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 

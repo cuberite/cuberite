@@ -65,15 +65,19 @@ public:
 	{
 		Success,
 		BufferFull,
-		PacketError
+		PacketError,
+		PacketUnknown,
+		// The packet was unreadble
+		PacketReadError,
+		// One of the values read out of the packet was invalid.
+		// We send a kick packet in response to a process error
+		PacketProcessError
 	};
 
-	cProtocol(cClientHandle * a_Client, AString a_LogID) :
-		m_Client(a_Client),
+	cProtocol(AString a_LogID) :
 		m_OutPacketBuffer(64 KiB),
 		m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
-		m_IsEncrypted(false),
-		m_ReceivedData(32 KiB)
+		m_IsEncrypted(false)
 	{	
 		// Create the comm log file, if so requested:
 		if (g_ShouldLogCommIn || g_ShouldLogCommOut)
@@ -88,7 +92,7 @@ public:
 	virtual ~cProtocol() {}
 	
 	/** Called when client sends some data, a_Actions is cleared before being filled */
-	cProtocolError DataReceived(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions)  WARN_UNUSED;
+	virtual cProtocolError DataReceived(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions) WARN_UNUSED = 0;
 	
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) = 0;
@@ -115,16 +119,16 @@ public:
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
-	virtual void SendHealth                     (void) = 0;
+	virtual void SendHealth                     (int a_Health, int a_FoodLevel, double a_FoodSaturationLevel) = 0;
 	virtual void SendHideTitle                  (void) = 0;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
-	virtual void SendLoginSuccess               (void) = 0;
+	virtual void SendLoginSuccess               (const AString & a_UUID, const AString & a_Username) = 0;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) = 0;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) = 0;
 	virtual void SendPickupSpawn                (const cPickup & a_Pickup) = 0;
-	virtual void SendPlayerAbilities            (void) = 0;
+	virtual void SendPlayerAbilities            (const cPlayer & a_Player) = 0;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) = 0;
@@ -133,15 +137,15 @@ public:
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) = 0;
-	virtual void SendPlayerMaxSpeed             (void) = 0;  ///< Informs the client of the maximum player speed (1.6.1+)
-	virtual void SendPlayerMoveLook             (void) = 0;
-	virtual void SendPlayerPosition             (void) = 0;
+	virtual void SendPlayerMaxSpeed             (const cPlayer & a_Player) = 0;  ///< Informs the client of the maximum player speed (1.6.1+)
+	virtual void SendPlayerMoveLook             (const cPlayer & a_Player) = 0;
+	virtual void SendPlayerPosition             (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) = 0;
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) = 0;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) = 0;
 	virtual void SendResetTitle                 (void) = 0;
-	virtual void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) = 0;
-	virtual void SendExperience                 (void) = 0;
+	virtual void SendRespawn                    (eGameMode a_GameMode, eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) = 0;
+	virtual void SendExperience                 (const cPlayer & a_Player) = 0;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) = 0;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) = 0;
@@ -167,7 +171,7 @@ public:
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
 	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;
-	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
+	virtual void SendWholeInventory             (const cPlayer & a_Player, const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
 	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) = 0;
@@ -177,8 +181,6 @@ public:
 
 protected:
 	friend class cPacketizer;
-
-	cClientHandle * m_Client;
 
 	/** Provides synchronization for sending the entire packet at once.
 	Each SendXYZ() function must acquire this CS in order to send the whole packet at once.
@@ -204,19 +206,8 @@ protected:
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
 	virtual void SendPacket(cPacketizer & a_Packet) = 0;
 
-	/** This method should append the actions from incoming packets to a_Action */
-	virtual cProtocolError OnDataAddedToBuffer(cByteBuffer & a_Buffer, std::vector<std::unique_ptr<cClientAction>> & a_Action) WARN_UNUSED = 0;
-
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
-
-private:
-
-	/** Buffer for the received data */
-	cByteBuffer m_ReceivedData;
-
-	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets, appends to a_Actions */
-	cProtocolError AddReceivedData(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions) WARN_UNUSED;
 } ;
 
 

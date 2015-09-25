@@ -328,7 +328,7 @@ int cPlayer::XpForLevel(int a_Level)
 
 
 
-int cPlayer::GetXpLevel()
+int cPlayer::GetXpLevel() const
 {
 	return CalcLevelFromXp(m_CurrentXp);
 }
@@ -337,7 +337,7 @@ int cPlayer::GetXpLevel()
 
 
 
-float cPlayer::GetXpPercentage()
+float cPlayer::GetXpPercentage() const
 {
 	int currentLevel = CalcLevelFromXp(m_CurrentXp);
 	int currentLevel_XpBase = XpForLevel(currentLevel);

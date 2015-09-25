@@ -1,4 +1,6 @@
 
+#if 0
+
 // Protocol18x.cpp
 
 /*
@@ -539,7 +541,7 @@ void cProtocol180::SendGameMode(eGameMode a_GameMode)
 
 
 
-void cProtocol180::SendHealth(void)
+void cProtocol180::SendHealth(int a_Health, int a_FoodLevel, double a_FoodSaturationLevel)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -733,7 +735,7 @@ void cProtocol180::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
-void cProtocol180::SendPlayerAbilities(void)
+void cProtocol180::SendPlayerAbilities(const cPlayer const * a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -1069,7 +1071,7 @@ void cProtocol180::SendResetTitle(void)
 
 
 
-void cProtocol180::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
+void cProtocol180::SendRespawn(eGameMode a_GameMode, eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	if ((m_LastSentDimension == a_Dimension) && !a_ShouldIgnoreDimensionChecks)
 	{
@@ -3559,6 +3561,8 @@ void cProtocol180::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_
 	
 	a_Pkt.WriteBEInt32(0);  // NumProperties
 }
+
+#endif
 
 
 

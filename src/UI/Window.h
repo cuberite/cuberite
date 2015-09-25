@@ -108,7 +108,7 @@ public:
 	// tolua_end
 	
 	/** Fills a_Slots with the slots read from m_SlotAreas[], for the specified player */
-	void GetSlots(cPlayer & a_Player, cItems & a_Slots) const;
+	void GetSlots(const cPlayer & a_Player, cItems & a_Slots) const;
 
 	/** Handles a click event from a player */
 	void Clicked(

@@ -15,6 +15,7 @@ Declares the 1.8.x protocol classes:
 #pragma once
 
 #include "Protocol.h"
+#include "LengthenedProtocol.h"
 #include "../ByteBuffer.h"
 
 #ifdef _MSC_VER
@@ -48,9 +49,9 @@ namespace Json
 
 
 class cProtocol180 :
-	public cProtocol
+	public cLengthenedProtocol
 {
-	typedef cProtocol super;
+	typedef cLengthenedProtocol super;
 	
 public:
 
@@ -81,16 +82,16 @@ public:
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
-	virtual void SendHealth                     (void) override;
+	virtual void SendHealth                     (int a_Health, int a_FoodLevel, double a_FoodSaturationLevel) override;
 	virtual void SendHideTitle                  (void) override;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void SendLoginSuccess               (void) override;
+	virtual void SendLoginSuccess               (const AString & a_UUID, const AString & a_Username) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendPickupSpawn                (const cPickup & a_Pickup) override;
-	virtual void SendPlayerAbilities            (void) override;
+	virtual void SendPlayerAbilities            (const cPlayer & a_Player) override;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
@@ -99,16 +100,16 @@ public:
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
-	virtual void SendPlayerMaxSpeed             (void) override;
-	virtual void SendPlayerMoveLook             (void) override;
-	virtual void SendPlayerPosition             (void) override;
+	virtual void SendPlayerMaxSpeed             (const cPlayer & a_Player) override;
+	virtual void SendPlayerMoveLook             (const cPlayer & a_Player) override;
+	virtual void SendPlayerPosition             (const cPlayer & a_Player) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendResetTitle                 (void) override;
-	virtual void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
+	virtual void SendRespawn                    (eGameMode a_GameMode, eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendExperience                 (void) override;
+	virtual void SendExperience                 (const cPlayer & a_Player) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
@@ -133,7 +134,7 @@ public:
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendWeather                    (eWeather a_Weather) override;
-	virtual void SendWholeInventory             (const cWindow & a_Window) override;
+	virtual void SendWholeInventory             (const cPlayer & a_Player, const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
 	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;

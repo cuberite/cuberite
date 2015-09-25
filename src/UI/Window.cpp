@@ -170,7 +170,7 @@ bool cWindow::IsSlotInPlayerInventory(int a_SlotNum) const
 
 
 
-void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
+void cWindow::GetSlots(const cPlayer & a_Player, cItems & a_Slots) const
 {
 	a_Slots.clear();
 	a_Slots.reserve(static_cast<size_t>(GetNumSlots()));
