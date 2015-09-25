@@ -839,7 +839,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
 	TickQueuedTasks();
-	TickScheduledTasks();
 	
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
 
@@ -962,55 +961,39 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 
 void cWorld::TickQueuedTasks(void)
 {
-	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
-	cTasks Tasks;
+	// Move the tasks to be executed to a seperate vector to avoid deadlocks on accessing m_Tasks
+	decltype(m_Tasks) Tasks;
 	{
 		cCSLock Lock(m_CSTasks);
-		std::swap(Tasks, m_Tasks);
-	}
-
-	// Execute and delete each task:
-	for (cTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
-	{
-		(*itr)->Run(*this);
-	}  // for itr - m_Tasks[]
-}
-
-
-
-
-
-void cWorld::TickScheduledTasks(void)
-{
-	// Move the tasks to be executed to a seperate vector to avoid deadlocks on accessing m_Tasks
-	cScheduledTasks Tasks;
-	{
-		cCSLock Lock(m_CSScheduledTasks);
-		auto WorldAge = m_WorldAge;
-
-		// Move all the due tasks from m_ScheduledTasks into Tasks:
-		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-based for, we're modifying the container
+		if (m_Tasks.empty())
 		{
-			if ((*itr)->m_TargetTick < std::chrono::duration_cast<cTickTimeLong>(WorldAge).count())
-			{
-				auto next = itr;
-				++next;
-				Tasks.push_back(std::move(*itr));
-				m_ScheduledTasks.erase(itr);
-				itr = next;
-			}
-			else
-			{
-				// All the eligible tasks have been moved, bail out now
-				break;
-			}
+			return;
 		}
+
+		// Partition everything to be executed by returning false to move to end of list if time reached
+		auto MoveBeginIterator = std::partition(m_Tasks.begin(), m_Tasks.end(), [this](const decltype(m_Tasks)::value_type & a_Task)
+			{
+				if (a_Task.first < std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count())
+				{
+					return false;
+				}
+				return true;
+			}
+		);
+
+		// Cut all the due tasks from m_Tasks into Tasks:
+		Tasks.insert(
+			Tasks.end(),
+			std::make_move_iterator(MoveBeginIterator),
+			std::make_move_iterator(m_Tasks.end())
+		);
+		m_Tasks.erase(MoveBeginIterator, m_Tasks.end());
 	}
 
-	// Execute and delete each task:
-	for (cScheduledTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
+	// Execute each task:
+	for (const auto & Task : Tasks)
 	{
-		(*itr)->m_Task->Run(*this);
+		Task.second(*this);
 	}  // for itr - m_Tasks[]
 }
 
@@ -2662,7 +2645,7 @@ void cWorld::UnloadUnusedChunks(void)
 
 void cWorld::QueueUnloadUnusedChunks(void)
 {
-	QueueTask(cpp14::make_unique<cWorld::cTaskUnloadUnusedChunks>());
+	QueueTask([](cWorld & a_World) { a_World.UnloadUnusedChunks(); });
 }
 
 
@@ -3161,42 +3144,32 @@ void cWorld::SaveAllChunks(void)
 
 void cWorld::QueueSaveAllChunks(void)
 {
-	QueueTask(std::make_shared<cWorld::cTaskSaveAllChunks>());
+	QueueTask([](cWorld & a_World) { a_World.SaveAllChunks(); });
 }
 
 
 
 
 
-void cWorld::QueueTask(cTaskPtr a_Task)
+void cWorld::QueueTask(std::function<void(cWorld &)> a_Task)
 {
 	cCSLock Lock(m_CSTasks);
-	m_Tasks.push_back(std::move(a_Task));
+	m_Tasks.emplace_back(0, a_Task);
 }
 
 
-void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld&)> a_Func)
-{
-	cTaskLambda task(a_Func);
-	ScheduleTask(a_DelayTicks, static_cast<cTaskPtr>(std::make_shared<cTaskLambda>(task)));
-}
 
 
-void cWorld::ScheduleTask(int a_DelayTicks, cTaskPtr a_Task)
+
+void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Task)
 {
 	Int64 TargetTick = a_DelayTicks + std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
-	
-	// Insert the task into the list of scheduled tasks, ordered by its target tick
-	cCSLock Lock(m_CSScheduledTasks);
-	for (cScheduledTasks::iterator itr = m_ScheduledTasks.begin(), end = m_ScheduledTasks.end(); itr != end; ++itr)
+
+	// Insert the task into the list of scheduled tasks
 	{
-		if ((*itr)->m_TargetTick >= TargetTick)
-		{
-			m_ScheduledTasks.insert(itr, cScheduledTaskPtr(new cScheduledTask(TargetTick, a_Task)));
-			return;
-		}
+		cCSLock Lock(m_CSTasks);
+		m_Tasks.emplace_back(TargetTick, a_Task);
 	}
-	m_ScheduledTasks.push_back(cScheduledTaskPtr(new cScheduledTask(TargetTick, a_Task)));
 }
 
 
@@ -3622,75 +3595,6 @@ void cWorld::AddQueuedPlayers(void)
 
 
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWorld::cTaskSaveAllChunks:
-
-void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
-{
-	a_World.SaveAllChunks();
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWorld::cTaskUnloadUnusedChunks
-
-void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
-{
-	a_World.UnloadUnusedChunks();
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWorld::cTaskSendBlockToAllPlayers
-
-cWorld::cTaskSendBlockToAllPlayers::cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue) :
-	m_SendQueue(a_SendQueue)
-{
-}
-
-void cWorld::cTaskSendBlockToAllPlayers::Run(cWorld & a_World)
-{
-	class cPlayerCallback :
-		public cPlayerListCallback
-	{
-	public:
-		cPlayerCallback(std::vector<Vector3i> & a_SendQueue, cWorld & a_CallbackWorld) :
-			m_SendQueue(a_SendQueue),
-			m_World(a_CallbackWorld)
-		{
-		}
-
-		virtual bool Item(cPlayer * a_Player)
-		{
-			for (std::vector<Vector3i>::const_iterator itr = m_SendQueue.begin(); itr != m_SendQueue.end(); ++itr)
-			{
-				m_World.SendBlockTo(itr->x, itr->y, itr->z, a_Player);
-			}
-			return false;
-		}
-
-	private:
-
-		std::vector<Vector3i> m_SendQueue;
-		cWorld & m_World;
-
-	} PlayerCallback(m_SendQueue, a_World);
-
-	a_World.ForEachPlayer(PlayerCallback);
-}
-
-void cWorld::cTaskLambda::Run(cWorld & a_World)
-{
-	m_func(a_World);
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
