@@ -415,7 +415,7 @@ void cNBTChunkSerializer::AddFallingBlockEntity(cFallingBlock * a_FallingBlock)
 		AddBasicEntity(a_FallingBlock, "FallingSand");
 		m_Writer.AddInt("TileID", a_FallingBlock->GetBlockType());
 		m_Writer.AddByte("Data", a_FallingBlock->GetBlockMeta());
-		m_Writer.AddByte("Time", 1);  // Unused in MCServer, Vanilla said to need nonzero
+		m_Writer.AddByte("Time", 1);  // Unused in Cuberite, Vanilla said to need nonzero
 		m_Writer.AddByte("DropItem", 1);
 		m_Writer.AddByte("HurtEntities", a_FallingBlock->GetBlockType() == E_BLOCK_ANVIL);
 	m_Writer.EndCompound();

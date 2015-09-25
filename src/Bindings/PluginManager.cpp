@@ -1761,7 +1761,7 @@ bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_P
 	{
 		if (cmd->second.m_Plugin == nullptr)
 		{
-			LOGWARNING("Console command \"%s\" is already bound internally by MCServer, cannot bind in plugin \"%s\".", a_Command.c_str(), a_Plugin->GetName().c_str());
+			LOGWARNING("Console command \"%s\" is already bound internally by Cuberite, cannot bind in plugin \"%s\".", a_Command.c_str(), a_Plugin->GetName().c_str());
 		}
 		else
 		{
