@@ -16,11 +16,7 @@
 
 
 cFile::cFile(void) :
-	#ifdef USE_STDIO_FILE
 	m_File(nullptr)
-	#else
-	m_File(INVALID_HANDLE_VALUE)
-	#endif  // USE_STDIO_FILE
 {
 	// Nothing needed yet
 }
@@ -30,11 +26,7 @@ cFile::cFile(void) :
 
 
 cFile::cFile(const AString & iFileName, eMode iMode) :
-	#ifdef USE_STDIO_FILE
 	m_File(nullptr)
-	#else
-	m_File(INVALID_HANDLE_VALUE)
-	#endif  // USE_STDIO_FILE
 {
 	Open(iFileName, iMode);
 }
@@ -78,11 +70,11 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		return false;
 	}
 
-#ifdef _WIN32
-	m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
-#else
-	m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
-#endif  // _WIN32
+	#ifdef _WIN32
+		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
+	#else
+		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
+	#endif  // _WIN32
 
 	if ((m_File == nullptr) && (iMode == fmReadWrite))
 	{
@@ -91,11 +83,11 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		// So now we know either the file doesn't exist or we don't have rights, no need to worry about file contents.
 		// Simply re-open for read-writing, erasing existing contents:
 
-#ifdef _WIN32
-		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
-#else
-		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
-#endif  // _WIN32
+		#ifdef _WIN32
+			m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
+		#else
+			m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
+		#endif  // _WIN32
 
 	}
 	return (m_File != nullptr);
@@ -310,7 +302,77 @@ bool cFile::Exists(const AString & a_FileName)
 
 
 
-bool cFile::Delete(const AString & a_FileName)
+bool cFile::Delete(const AString & a_Path)
+{
+	if (IsFolder(a_Path))
+	{
+		return DeleteFolder(a_Path);
+	}
+	else
+	{
+		return DeleteFile(a_Path);
+	}
+}
+
+
+
+
+
+bool cFile::DeleteFolder(const AString & a_FolderName)
+{
+	#ifdef _WIN32
+		return (RemoveDirectoryA(a_FolderName.c_str()) != 0);
+	#else  // _WIN32
+		return (rmdir(a_FolderName.c_str()) == 0);
+	#endif  // else _WIN32
+}
+
+
+
+
+
+bool cFile::DeleteFolderContents(const AString & a_FolderName)
+{
+	auto Contents = cFile::GetFolderContents(a_FolderName);
+	for (const auto item: Contents)
+	{
+		// Skip "." and ".." altogether:
+		if ((item == ".") || (item == ".."))
+		{
+			continue;
+		}
+
+		// Remove the item:
+		auto WholePath = a_FolderName + GetPathSeparator() + item;
+		if (IsFolder(WholePath))
+		{
+			if (!DeleteFolderContents(WholePath))
+			{
+				return false;
+			}
+			if (!DeleteFolder(WholePath))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (!DeleteFile(WholePath))
+			{
+				return false;
+			}
+		}
+	}  // for item - Contents[]
+
+	// All deletes succeeded
+	return true;
+}
+
+
+
+
+
+bool cFile::DeleteFile(const AString & a_FileName)
 {
 	return (remove(a_FileName.c_str()) == 0);
 }
@@ -331,7 +393,7 @@ bool cFile::Rename(const AString & a_OrigFileName, const AString & a_NewFileName
 bool cFile::Copy(const AString & a_SrcFileName, const AString & a_DstFileName)
 {
 	#ifdef _WIN32
-		return (CopyFileA(a_SrcFileName.c_str(), a_DstFileName.c_str(), true) != 0);
+		return (CopyFileA(a_SrcFileName.c_str(), a_DstFileName.c_str(), FALSE) != 0);
 	#else
 		// Other OSs don't have a direct CopyFile equivalent, do it the harder way:
 		std::ifstream src(a_SrcFileName.c_str(), std::ios::binary);
@@ -409,57 +471,85 @@ bool cFile::CreateFolder(const AString & a_FolderPath)
 
 
 
+bool cFile::CreateFolderRecursive(const AString & a_FolderPath)
+{
+	// Special case: Fail if the path is empty
+	if (a_FolderPath.empty())
+	{
+		return false;
+	}
+
+	// Go through each path element and create the folder:
+	auto len = a_FolderPath.length();
+	auto PathSep = GetPathSeparator()[0];
+	for (decltype(len) i = 0; i < len; i++)
+	{
+		if (a_FolderPath[i] == PathSep)
+		{
+			CreateFolder(a_FolderPath.substr(0, i));
+		}
+	}
+	CreateFolder(a_FolderPath);
+
+	// Check the result by querying whether the final path exists:
+	return IsFolder(a_FolderPath);
+}
+
+
+
+
+
 AStringVector cFile::GetFolderContents(const AString & a_Folder)
 {
 	AStringVector AllFiles;
 	
 	#ifdef _WIN32
 
-	// If the folder name doesn't contain the terminating slash / backslash, add it:
-	AString FileFilter = a_Folder;
-	if (
-		!FileFilter.empty() &&
-		(FileFilter[FileFilter.length() - 1] != '\\') &&
-		(FileFilter[FileFilter.length() - 1] != '/')
-	)
-	{
-		FileFilter.push_back('\\');
-	}
-	
-	// Find all files / folders:
-	FileFilter.append("*.*");
-	HANDLE hFind;
-	WIN32_FIND_DATAA FindFileData;
-	if ((hFind = FindFirstFileA(FileFilter.c_str(), &FindFileData)) != INVALID_HANDLE_VALUE)
-	{
-		do
+		// If the folder name doesn't contain the terminating slash / backslash, add it:
+		AString FileFilter = a_Folder;
+		if (
+			!FileFilter.empty() &&
+			(FileFilter[FileFilter.length() - 1] != '\\') &&
+			(FileFilter[FileFilter.length() - 1] != '/')
+		)
 		{
-			AllFiles.push_back(FindFileData.cFileName);
-		} while (FindNextFileA(hFind, &FindFileData));
-		FindClose(hFind);
-	}
+			FileFilter.push_back('\\');
+		}
+	
+		// Find all files / folders:
+		FileFilter.append("*.*");
+		HANDLE hFind;
+		WIN32_FIND_DATAA FindFileData;
+		if ((hFind = FindFirstFileA(FileFilter.c_str(), &FindFileData)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				AllFiles.push_back(FindFileData.cFileName);
+			} while (FindNextFileA(hFind, &FindFileData));
+			FindClose(hFind);
+		}
 	
 	#else  // _WIN32
 
-	DIR * dp;
-	struct dirent *dirp;
-	AString Folder = a_Folder;
-	if (Folder.empty())
-	{
-		Folder = ".";
-	}
-	if ((dp = opendir(Folder.c_str())) == nullptr)
-	{
-		LOGERROR("Error (%i) opening directory \"%s\"\n", errno, Folder.c_str());
-	}
-	else
-	{
-		while ((dirp = readdir(dp)) != nullptr)
+		DIR * dp;
+		struct dirent *dirp;
+		AString Folder = a_Folder;
+		if (Folder.empty())
 		{
-			AllFiles.push_back(dirp->d_name);
+			Folder = ".";
 		}
-		closedir(dp);
-	}
+		if ((dp = opendir(Folder.c_str())) == nullptr)
+		{
+			LOGERROR("Error (%i) opening directory \"%s\"\n", errno, Folder.c_str());
+		}
+		else
+		{
+			while ((dirp = readdir(dp)) != nullptr)
+			{
+				AllFiles.push_back(dirp->d_name);
+			}
+			closedir(dp);
+		}
 	
 	#endif  // else _WIN32
 

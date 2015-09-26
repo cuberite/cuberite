@@ -174,11 +174,9 @@ local function WriteArticles(f)
 	]]);
 	for _, extra in ipairs(g_APIDesc.ExtraPages) do
 		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
-		if (cFile:Exists(SrcFileName)) then
+		if (cFile:IsFile(SrcFileName)) then
 			local DstFileName = "API/" .. extra.FileName;
-			if (cFile:Exists(DstFileName)) then
-				cFile:Delete(DstFileName);
-			end
+			cFile:Delete(DstFileName);
 			cFile:Copy(SrcFileName, DstFileName);
 			f:write("<li><a href=\"" .. extra.FileName .. "\">" .. extra.Title .. "</a></li>\n");
 		else
@@ -1112,7 +1110,7 @@ local function ListMissingPages()
 	local NumLinks = 0;
 	for PageName, Referrers in pairs(g_TrackedPages) do
 		NumLinks = NumLinks + 1;
-		if not(cFile:Exists("API/" .. PageName .. ".html")) then
+		if not(cFile:IsFile("API/" .. PageName .. ".html")) then
 			table.insert(MissingPages, {Name = PageName, Refs = Referrers} );
 		end
 	end;
