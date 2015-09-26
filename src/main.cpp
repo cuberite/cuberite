@@ -39,7 +39,7 @@ bool cRoot::m_RunAsService = false;
 #if defined(_WIN32)
 	SERVICE_STATUS_HANDLE g_StatusHandle  = nullptr;
 	HANDLE                g_ServiceThread = INVALID_HANDLE_VALUE;
-	#define               SERVICE_NAME      "CuberiteService"
+	#define               SERVICE_NAME      L"CuberiteService"
 #endif
 
 
@@ -131,7 +131,7 @@ typedef BOOL  (WINAPI *pMiniDumpWriteDump)(
 
 pMiniDumpWriteDump g_WriteMiniDump;  // The function in dbghlp DLL that creates dump files
 
-char g_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
+wchar_t g_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
 char g_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
 MINIDUMP_TYPE g_DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
 
@@ -310,14 +310,14 @@ void WINAPI serviceCtrlHandler(DWORD CtrlCode)
 
 void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 {
-	char applicationFilename[MAX_PATH];
-	char applicationDirectory[MAX_PATH];
+	wchar_t applicationFilename[MAX_PATH];
+	wchar_t applicationDirectory[MAX_PATH];
 
 	GetModuleFileName(nullptr, applicationFilename, sizeof(applicationFilename));  // This binary's file path.
 
 	// Strip off the filename, keep only the path:
-	strncpy_s(applicationDirectory, sizeof(applicationDirectory), applicationFilename, (strrchr(applicationFilename, '\\') - applicationFilename));
-	applicationDirectory[strlen(applicationDirectory)] = '\0';  // Make sure new path is null terminated
+	wcsncpy_s(applicationDirectory, sizeof(applicationDirectory), applicationFilename, (wcsrchr(applicationFilename, '\\') - applicationFilename));
+	applicationDirectory[wcslen(applicationDirectory)] = '\0';  // Make sure new path is null terminated
 
 	// Services are run by the SCM, and inherit its working directory - usually System32.
 	// Set the working directory to the same location as the binary.
@@ -442,11 +442,11 @@ int main(int argc, char **argv)
 
 	// Magic code to produce dump-files on Windows if the server crashes:
 	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)  // 32-bit Windows app compiled in MSVC
-		HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");
+		HINSTANCE hDbgHelp = LoadLibrary(L"DBGHELP.DLL");
 		g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
 		if (g_WriteMiniDump != nullptr)
 		{
-			_snprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, "crash_mcs_%x.dmp", GetCurrentProcessId());
+			_snwprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, L"crash_mcs_%x.dmp", GetCurrentProcessId());
 			SetUnhandledExceptionFilter(LastChanceExceptionFilter);
 		}
 	#endif  // 32-bit Windows app compiled in MSVC
