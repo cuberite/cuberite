@@ -676,6 +676,18 @@ void cLuaState::Push(int a_Value)
 
 
 
+void cLuaState::Push(long a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value));
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(UInt32 a_Value)
 {
 	ASSERT(IsValid());

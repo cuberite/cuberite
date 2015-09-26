@@ -32,17 +32,6 @@ For reading entire files into memory, just use the static cFile::ReadWholeFile()
 
 
 
-#ifndef _WIN32
-	#define USE_STDIO_FILE
-#endif  // _WIN32
-
-// DEBUG:
-#define USE_STDIO_FILE
-
-
-
-
-
 // tolua_begin
 
 class cFile
@@ -101,48 +90,64 @@ public:
 	/** Reads the file from current position till EOF into an AString; returns the number of bytes read or -1 for error */
 	int ReadRestOfFile(AString & a_Contents);
 	
-	// tolua_begin
-	
 	/** Returns true if the file specified exists */
-	static bool Exists(const AString & a_FileName);
+	static bool Exists(const AString & a_FileName);  // Exported in ManualBindings.cpp
 	
-	/** Deletes a file, returns true if successful */
-	static bool Delete(const AString & a_FileName);
+	/** Deletes a file or a folder, returns true if successful.
+	Prefer to use DeleteFile or DeleteFolder, since those don't have the penalty of checking whether a_Path is a folder. */
+	static bool Delete(const AString & a_Path);  // Exported in ManualBindings.cpp
+
+	/** Deletes a file, returns true if successful.
+	Returns false if a_FileName points to a folder. */
+	static bool DeleteFile(const AString & a_FileName);  // Exported in ManualBindings.cpp
+	
+	/** Deletes a folder, returns true if successful.
+	Returns false if a_FolderName points to a file. */
+	static bool DeleteFolder(const AString & a_FolderName);  // Exported in ManualBindings.cpp
+
+	/** Deletes all content from the specified folder.
+	The specified folder itself stays intact.
+	Returns true on success, false on failure. */
+	static bool DeleteFolderContents(const AString & a_FolderName);  // Exported in ManualBindings.cpp
 	
 	/** Renames a file or folder, returns true if successful. May fail if dest already exists (libc-dependant)! */
-	static bool Rename(const AString & a_OrigPath, const AString & a_NewPath);
+	static bool Rename(const AString & a_OrigPath, const AString & a_NewPath);  // Exported in ManualBindings.cpp
 	
-	/** Copies a file, returns true if successful. */
-	static bool Copy(const AString & a_SrcFileName, const AString & a_DstFileName);
+	/** Copies a file, returns true if successful.
+	Overwrites the dest file if it already exists. */
+	static bool Copy(const AString & a_SrcFileName, const AString & a_DstFileName);  // Exported in ManualBindings.cpp
 	
 	/** Returns true if the specified path is a folder */
-	static bool IsFolder(const AString & a_Path);
+	static bool IsFolder(const AString & a_Path);  // Exported in ManualBindings.cpp
 	
 	/** Returns true if the specified path is a regular file */
-	static bool IsFile(const AString & a_Path);
+	static bool IsFile(const AString & a_Path);  // Exported in ManualBindings.cpp
 	
 	/** Returns the size of the file, or a negative number on error */
-	static long GetSize(const AString & a_FileName);
+	static long GetSize(const AString & a_FileName);  // Exported in ManualBindings.cpp
 	
 	/** Creates a new folder with the specified name. Returns true if successful. Path may be relative or absolute */
-	static bool CreateFolder(const AString & a_FolderPath);
+	static bool CreateFolder(const AString & a_FolderPath);  // Exported in ManualBindings.cpp
+
+	/** Creates a new folder with the specified name, creating its parents if needed. Path may be relative or absolute.
+	Returns true if the folder exists at the end of the operation (either created, or already existed).
+	Supports only paths that use the path separator used by the current platform (MSVC CRT supports slashes for file paths, too, but this function doesn't) */
+	static bool CreateFolderRecursive(const AString & a_FolderPath);  // Exported in ManualBindings.cpp
 	
-	// tolua_end
-
-	/** Returns the entire contents of the specified file as a string. Returns empty string on error.
-	Exported manually in ManualBindings.cpp due to #1914 - ToLua code doesn't work well with binary files. */
-	static AString ReadWholeFile(const AString & a_FileName);
-
-	// tolua_begin
+	/** Returns the entire contents of the specified file as a string. Returns empty string on error. */
+	static AString ReadWholeFile(const AString & a_FileName);  // Exported in ManualBindings.cpp
 
 	/** Returns a_FileName with its extension changed to a_NewExt.
 	a_FileName may contain path specification. */
-	static AString ChangeFileExt(const AString & a_FileName, const AString & a_NewExt);
+	static AString ChangeFileExt(const AString & a_FileName, const AString & a_NewExt);  // Exported in ManualBindings.cpp
 
 	/** Returns the last modification time (in current timezone) of the specified file.
 	The value returned is in the same units as the value returned by time() function.
-	If the file is not found / accessible, zero is returned. */
-	static unsigned GetLastModificationTime(const AString & a_FileName);
+	If the file is not found / accessible, zero is returned.
+	Works for folders, too, when specified without the trailing path separator. */
+	static unsigned GetLastModificationTime(const AString & a_FileName);  // Exported in ManualBindings.cpp
+
+	// tolua_begin
 
 	/** Returns the path separator used by the current platform.
 	Note that the platform / CRT may support additional path separators (such as slashes on Windows), these don't get reported. */
@@ -162,11 +167,7 @@ public:
 	void Flush(void);
 	
 private:
-	#ifdef USE_STDIO_FILE
 	FILE * m_File;
-	#else
-	HANDLE m_File;
-	#endif
 } ;  // tolua_export
 
 

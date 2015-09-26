@@ -482,8 +482,258 @@ cPluginLua * cManualBindings::GetLuaPlugin(lua_State * L)
 
 
 
+static int tolua_cFile_ChangeFileExt(lua_State * tolua_S)
+{
+	// API signature:
+	// ChangeFileExt(string, string) -> string
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString FileName, NewExt;
+	ASSERT(L.GetStackValues(2, FileName, NewExt));
+	L.Push(cFile::ChangeFileExt(FileName, NewExt));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_Copy(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:Copy(string, string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString SrcFile, DstFile;
+	ASSERT(L.GetStackValues(2, SrcFile, DstFile));
+	L.Push(cFile::Copy(SrcFile, DstFile));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_CreateFolder(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:CreateFolder(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString FolderPath;
+	ASSERT(L.GetStackValues(2, FolderPath));
+	L.Push(cFile::CreateFolder(FolderPath));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_CreateFolderRecursive(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:CreateFolderRecursive(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString FolderPath;
+	ASSERT(L.GetStackValues(2, FolderPath));
+	L.Push(cFile::CreateFolderRecursive(FolderPath));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_Delete(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:Delete(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::Delete(Path));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_DeleteFile(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:DeleteFile(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::DeleteFile(Path));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_DeleteFolder(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:DeleteFolder(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::DeleteFolder(Path));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_DeleteFolderContents(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:DeleteFolderContents(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::DeleteFolderContents(Path));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_Exists(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:Exists(string) -> bool
+
+	// Obsolete, use IsFile() or IsFolder() instead
+	cLuaState L(tolua_S);
+	LOGWARNING("cFile:Exists() is obsolete, use cFile:IsFolder() or cFile:IsFile() instead!");
+	L.LogStackTrace();
+
+	// Check params:
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::Exists(Path));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 {
+	// API signature:
+	// cFile:GetFolderContents(string) -> {string, string, ...}
+
 	// Check params:
 	cLuaState LuaState(tolua_S);
 	if (
@@ -497,7 +747,7 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 	
 	// Get params:
 	AString Folder;
-	LuaState.GetStackValues(2, Folder);
+	ASSERT(LuaState.GetStackValues(2, Folder));
 
 	// Execute and push result:
 	LuaState.Push(cFile::GetFolderContents(Folder));
@@ -508,8 +758,119 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 
 
 
+static int tolua_cFile_GetLastModificationTime(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:GetLastModificationTime(string) -> number
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::GetLastModificationTime(Path));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_GetSize(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:GetSize(string) -> number
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::GetSize(Path));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_IsFile(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:IsFile(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::IsFile(Path));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_IsFolder(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:IsFolder(string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString Path;
+	ASSERT(L.GetStackValues(2, Path));
+	L.Push(cFile::IsFolder(Path));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cFile_ReadWholeFile(lua_State * tolua_S)
 {
+	// API signature:
+	// cFile:ReadWholeFile(string) -> string
+
 	// Check params:
 	cLuaState LuaState(tolua_S);
 	if (
@@ -523,10 +884,37 @@ static int tolua_cFile_ReadWholeFile(lua_State * tolua_S)
 	
 	// Get params:
 	AString FileName;
-	LuaState.GetStackValues(2, FileName);
+	ASSERT(LuaState.GetStackValues(2, FileName));
 
 	// Execute and push result:
 	LuaState.Push(cFile::ReadWholeFile(FileName));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_Rename(lua_State * tolua_S)
+{
+	// API signature:
+	// cFile:Rename(string, string) -> bool
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cFile") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	// Execute:
+	AString SrcPath, DstPath;
+	ASSERT(L.GetStackValues(2, SrcPath, DstPath));
+	L.Push(cFile::Rename(SrcPath, DstPath));
 	return 1;
 }
 
@@ -2846,8 +3234,22 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cFile");
-			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
-			tolua_function(tolua_S, "ReadWholeFile",     tolua_cFile_ReadWholeFile);
+			tolua_function(tolua_S, "ChangeFileExt",           tolua_cFile_ChangeFileExt);
+			tolua_function(tolua_S, "Copy",                    tolua_cFile_Copy);
+			tolua_function(tolua_S, "CreateFolder",            tolua_cFile_CreateFolder);
+			tolua_function(tolua_S, "CreateFolderRecursive",   tolua_cFile_CreateFolderRecursive);
+			tolua_function(tolua_S, "Delete",                  tolua_cFile_Delete);
+			tolua_function(tolua_S, "DeleteFile",              tolua_cFile_DeleteFile);
+			tolua_function(tolua_S, "DeleteFolder",            tolua_cFile_DeleteFolder);
+			tolua_function(tolua_S, "DeleteFolderContents",    tolua_cFile_DeleteFolderContents);
+			tolua_function(tolua_S, "Exists",                  tolua_cFile_Exists);
+			tolua_function(tolua_S, "GetFolderContents",       tolua_cFile_GetFolderContents);
+			tolua_function(tolua_S, "GetLastModificationTime", tolua_cFile_GetLastModificationTime);
+			tolua_function(tolua_S, "GetSize",                 tolua_cFile_GetSize);
+			tolua_function(tolua_S, "IsFile",                  tolua_cFile_IsFile);
+			tolua_function(tolua_S, "IsFolder",                tolua_cFile_IsFolder);
+			tolua_function(tolua_S, "ReadWholeFile",           tolua_cFile_ReadWholeFile);
+			tolua_function(tolua_S, "Rename",                  tolua_cFile_Rename);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cHopperEntity");

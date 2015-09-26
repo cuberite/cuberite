@@ -1008,16 +1008,20 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				Provides helper functions for manipulating and querying the filesystem. Most functions are static,
 				so they should be called directly on the cFile class itself:
 <pre class="prettyprint lang-lua">
-cFile:Delete("/usr/bin/virus.exe");
+cFile:DeleteFile("/usr/bin/virus.exe");
 </pre></p>
 			]],
 			Functions =
 			{
 				ChangeFileExt = { Params = "FileName, NewExt", Return = "string", Notes = "(STATIC) Returns FileName with its extension changed to NewExt. NewExt may begin with a dot, but needn't, the result is the same in both cases (the first dot, if present, is ignored). FileName may contain path elements, extension is recognized as the last dot after the last path separator in the string." },
 				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "(STATIC) Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
-				CreateFolder = { Params = "FolderName", Return = "bool", Notes = "(STATIC) Creates a new folder. Returns true if successful." },
-				Delete = { Params = "FileName", Return = "bool", Notes = "(STATIC) Deletes the specified file. Returns true if successful." },
-				Exists = { Params = "FileName", Return = "bool", Notes = "(STATIC) Returns true if the specified file exists." },
+				CreateFolder = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Creates a new folder. Returns true if successful. Only a single level can be created at a time, use CreateFolderRecursive() to create multiple levels of folders at once." },
+				CreateFolderRecursive = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Creates a new folder, creating its parents if needed. Returns true if successful." },
+				Delete = { Params = "Path", Return = "bool", Notes = "(STATIC) Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty.<br/><b>NOTE</b>: If you already know if the object is a file or folder, use DeleteFile() or DeleteFolder() explicitly." },
+				DeleteFile = { Params = "FilePath", Return = "bool", Notes = "(STATIC) Deletes the specified file. Returns true if successful." },
+				DeleteFolder = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Deletes the specified file or folder. Returns true if successful. Only deletes folders that are empty." },
+				DeleteFolderContents = { Params = "FolderPath", Return = "bool", Notes = "(STATIC) Deletes everything from the specified folder, recursively. The specified folder stays intact. Returns true if successful." },
+				Exists = { Params = "Path", Return = "bool", Notes = "(STATIC) Returns true if the specified file or folder exists.<br/><b>OBSOLETE</b>, use IsFile() or IsFolder() instead" },
 				GetExecutableExt = { Params = "", Return = "string", Notes = "(STATIC) Returns the customary executable extension (including the dot) used by the current platform (\".exe\" on Windows, empty string on Linux). " },
 				GetFolderContents = { Params = "FolderName", Return = "array table of strings", Notes = "(STATIC) Returns the contents of the specified folder, as an array table of strings. Each filesystem object is listed. Use the IsFile() and IsFolder() functions to determine the object type." },
 				GetLastModificationTime = { Params = "Path", Return = "number", Notes = "(STATIC) Returns the last modification time (in current timezone) of the specified file or folder. Returns zero if file not found / not accessible. The returned value is in the same units as values returned by os.time()." },
