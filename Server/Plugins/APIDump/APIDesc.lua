@@ -3029,6 +3029,7 @@ end
 		"cFurnaceEntity.__cBlockEntityWindowOwner__",
 		"cHopperEntity.__cBlockEntityWindowOwner__",
 		"cLuaWindow.__cItemGrid__cListener__",
+		"Globals._CuberiteInternal_.*",  -- Ignore all internal Cuberite constants
 	},
 
 	IgnoreVariables =
