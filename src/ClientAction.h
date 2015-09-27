@@ -19,7 +19,8 @@ public:
 		Respawn,
 		StatsRequest,
 		Achivement,
-		CreativeInventory
+		CreativeInventory,
+		SetProtocolVersion
 	};
 
 	cClientAction(Type a_Type) : m_Type(a_Type) {}

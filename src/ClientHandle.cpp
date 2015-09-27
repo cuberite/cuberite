@@ -90,7 +90,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastPlacedSign(0, -1, 0),
 	m_ProtocolVersion(0)
 {
-	m_Protocol = new cProtocolRecognizer(this);
+	m_Protocol = new cProtocolRecognizer(GetIPString());
 	
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
@@ -3002,7 +3002,7 @@ void cClientHandle::PacketError(UInt32 a_PacketType)
 	SendDisconnect("Protocol error");
 }
 
-
+#endif
 
 
 
@@ -3035,7 +3035,6 @@ void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 	ASSERT(m_Self == nullptr);
 	m_Self = a_Self;
 }
-
 
 
 
@@ -3087,7 +3086,6 @@ void cClientHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	}
 	SocketClosed();
 }
-#endif
 
 
 

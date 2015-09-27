@@ -55,7 +55,7 @@ class cProtocol180 :
 	
 public:
 
-	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol180(const AString a_LogID);
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
@@ -257,6 +257,8 @@ protected:
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
+
+	virtual cProtocolError OnDataAddedToBuffer(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) override WARN_UNUSED;
 } ;
 
 

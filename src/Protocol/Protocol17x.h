@@ -53,7 +53,7 @@ class cProtocol172 :
 	
 public:
 
-	cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol172(const AString a_LogID);
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
@@ -138,6 +138,7 @@ public:
 	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
 
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
+
 
 protected:
 
@@ -247,7 +248,7 @@ class cProtocol176 :
 	typedef cProtocol172 super;
 	
 public:
-	cProtocol176(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol176(const AString a_LogID);
 	
 	// cProtocol172 overrides:
 	virtual void SendPlayerSpawn(const cPlayer & a_Player) override;

@@ -11,6 +11,10 @@ public:
 	{
 	}
 
+	virtual ~cLengthenedProtocol() = default;
+
+	cProtocolError HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) override WARN_UNUSED;
+
 protected:
 	virtual cProtocolError DataReceived(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions) override WARN_UNUSED;
 	/** This method should append the actions from incoming packets to a_Action */

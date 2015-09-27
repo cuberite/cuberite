@@ -1,5 +1,4 @@
 
-#if 0
 
 // Protocol18x.cpp
 
@@ -12,7 +11,9 @@ Implements the 1.8.x protocol classes:
 
 #include "Globals.h"
 #include "json/json.h"
+#include "zlib/zlib.h"
 #include "Protocol18x.h"
+#if 0
 #include "ChunkDataSerializer.h"
 #include "PolarSSL++/Sha1Checksum.h"
 #include "Packetizer.h"
@@ -85,10 +86,10 @@ static const Int16 SLOT_NUM_OUTSIDE = -999;
 
 
 
-
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
+#endif
 const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
-
+#if 0
 
 
 
@@ -1636,7 +1637,7 @@ void cProtocol180::SendWindowProperty(const cWindow & a_Window, short a_Property
 }
 
 
-
+#endif
 
 
 bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
@@ -1680,7 +1681,7 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 
 
 
-
+#if 0
 
 int cProtocol180::GetParticleID(const AString & a_ParticleName)
 {
@@ -2918,8 +2919,6 @@ void cProtocol180::SendPacket(cPacketizer & a_Pkt)
 
 	if ((m_State == 3) && (PacketLen >= 256))
 	{
-		// Compress the packet payload:
-		if (!cProtocol180::CompressPacket(PacketData, CompressedPacket))
 		{
 			return;
 		}

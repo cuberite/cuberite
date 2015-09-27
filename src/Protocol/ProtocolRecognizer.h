@@ -38,8 +38,7 @@ public:
 		PROTO_VERSION_1_8_0 = 47,
 	} ;
 
-	cProtocolRecognizer(cClientHandle * a_Client);
-	virtual ~cProtocolRecognizer();
+	cProtocolRecognizer(AString a_LogID);
 	
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
@@ -133,21 +132,25 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
+	cProtocolError HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) override WARN_UNUSED;
+
 protected:
 	/** The recognized protocol */
-	cProtocol * m_Protocol;
+	std::unique_ptr<cProtocol> m_Protocol;
 
 	/** Buffer for the incoming data until we recognize the protocol */
 	cByteBuffer m_Buffer;
+
+	AString m_LogID;
 	
 
 	/** Tries to recognize protocol based on m_Buffer contents; returns true if recognized */
-	bool TryRecognizeProtocol(void);
+	cProtocolError TryRecognizeProtocol(std::vector<std::unique_ptr<cClientAction>> & a_Actions);
 	
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
 	The packet length and type have already been read, type is 0
 	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining. */
-	bool TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining);
+	cProtocolError TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining, std::vector<std::unique_ptr<cClientAction>> & a_Actions);
 
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */

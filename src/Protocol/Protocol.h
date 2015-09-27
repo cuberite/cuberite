@@ -71,7 +71,9 @@ public:
 		PacketReadError,
 		// One of the values read out of the packet was invalid.
 		// We send a kick packet in response to a process error
-		PacketProcessError
+		PacketProcessError,
+		NotCompleted,
+		UnsupportedProtocol
 	};
 
 	cProtocol(AString a_LogID) :
@@ -178,6 +180,8 @@ public:
 
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
+
+	virtual cProtocolError HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) WARN_UNUSED = 0;
 
 protected:
 	friend class cPacketizer;

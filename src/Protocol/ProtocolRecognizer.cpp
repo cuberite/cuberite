@@ -18,23 +18,12 @@
 
 
 
-#if 0
 
-cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
-	super(a_Client),
+cProtocolRecognizer::cProtocolRecognizer(AString a_LogID) :
+	super(a_LogID),
 	m_Protocol(nullptr),
 	m_Buffer(8192)     // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
 {
-}
-
-
-
-
-
-cProtocolRecognizer::~cProtocolRecognizer()
-{
-	delete m_Protocol;
-	m_Protocol = nullptr;
 }
 
 
@@ -57,30 +46,30 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 
 
 
-void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
+cProtocol::cProtocolError cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions)
 {
 	if (m_Protocol == nullptr)
 	{
 		if (!m_Buffer.Write(a_Data, a_Size))
 		{
-			m_Client->Kick("Unsupported protocol version");
-			return;
+			return cProtocolError::PacketReadError;
 		}
-		
-		if (!TryRecognizeProtocol())
+	
+		auto recognized = TryRecognizeProtocol(a_Actions);	
+		if (recognized != cProtocolError::Success)
 		{
-			return;
+			return recognized;
 		}
 
 		// The protocol has just been recognized, dump the whole m_Buffer contents into it for parsing:
 		AString Dump;
 		m_Buffer.ResetRead();
 		m_Buffer.ReadAll(Dump);
-		m_Protocol->DataReceived(Dump.data(), Dump.size());
+		return m_Protocol->DataReceived(Dump.data(), Dump.size(), a_Actions);
 	}
 	else
 	{
-		m_Protocol->DataReceived(a_Data, a_Size);
+		return m_Protocol->DataReceived(a_Data, a_Size, a_Actions);
 	}
 }
 
@@ -340,10 +329,10 @@ void cProtocolRecognizer::SendGameMode(eGameMode a_GameMode)
 
 
 
-void cProtocolRecognizer::SendHealth(void)
+void cProtocolRecognizer::SendHealth(int a_Health, int a_FoodLevel, double a_FoodSaturationLevel)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendHealth();
+	m_Protocol->SendHealth(a_Health, a_FoodLevel, a_FoodSaturationLevel);
 }
 
 
@@ -400,10 +389,10 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 
 
 
-void cProtocolRecognizer::SendLoginSuccess(void)
+void cProtocolRecognizer::SendLoginSuccess(const AString & a_UUID, const AString & a_Username)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendLoginSuccess();
+	m_Protocol->SendLoginSuccess(a_UUID, a_Username);
 }
 
 
@@ -459,10 +448,10 @@ void cProtocolRecognizer::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
-void cProtocolRecognizer::SendPlayerAbilities(void)
+void cProtocolRecognizer::SendPlayerAbilities(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendPlayerAbilities();
+	m_Protocol->SendPlayerAbilities(a_Player);
 }
 
 
@@ -529,30 +518,30 @@ void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Play
 
 
 
-void cProtocolRecognizer::SendPlayerMaxSpeed(void)
+void cProtocolRecognizer::SendPlayerMaxSpeed(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendPlayerMaxSpeed();
+	m_Protocol->SendPlayerMaxSpeed(a_Player);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendPlayerMoveLook(void)
+void cProtocolRecognizer::SendPlayerMoveLook(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendPlayerMoveLook();
+	m_Protocol->SendPlayerMoveLook(a_Player);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendPlayerPosition(void)
+void cProtocolRecognizer::SendPlayerPosition(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendPlayerPosition();
+	m_Protocol->SendPlayerPosition(a_Player);
 }
 
 
@@ -599,20 +588,20 @@ void cProtocolRecognizer::SendResetTitle(void)
 
 
 
-void cProtocolRecognizer::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
+void cProtocolRecognizer::SendRespawn(eGameMode a_GameMode, eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
+	m_Protocol->SendRespawn(a_GameMode, a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendExperience(void)
+void cProtocolRecognizer::SendExperience(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendExperience();
+	m_Protocol->SendExperience(a_Player);
 }
 
 
@@ -869,10 +858,10 @@ void cProtocolRecognizer::SendWeather(eWeather a_Weather)
 
 
 
-void cProtocolRecognizer::SendWholeInventory(const cWindow & a_Window)
+void cProtocolRecognizer::SendWholeInventory(const cPlayer & a_Player, const cWindow & a_Window)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendWholeInventory(a_Window);
+	m_Protocol->SendWholeInventory(a_Player, a_Window);
 }
 
 
@@ -908,18 +897,18 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 
 
 
-
+#if 0
 void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 {
 	// This is used only when handling the server ping
 	m_Client->SendData(a_Data, a_Size);
 }
+#endif
 
 
 
 
-
-bool cProtocolRecognizer::TryRecognizeProtocol(void)
+cProtocol::cProtocolError cProtocolRecognizer::TryRecognizeProtocol(std::vector<std::unique_ptr<cClientAction>> & a_Actions)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and
 	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
@@ -930,47 +919,48 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	if (!m_Buffer.ReadVarInt(PacketLen))
 	{
 		// Not enough bytes for the packet length, keep waiting
-		return false;
+		return cProtocolError::NotCompleted;
 	}
 	ReadSoFar -= static_cast<UInt32>(m_Buffer.GetReadableSpace());
 	if (!m_Buffer.CanReadBytes(PacketLen))
 	{
 		// Not enough bytes for the packet, keep waiting
-		return false;
+		return cProtocolError::NotCompleted;
 	}
-	return TryRecognizeLengthedProtocol(PacketLen - ReadSoFar);
+	return TryRecognizeLengthedProtocol(PacketLen - ReadSoFar, a_Actions);
 }
 
 
 
 
 
-bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
+cProtocol::cProtocolError cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining, std::vector<std::unique_ptr<cClientAction>> & a_Actions)
 {
 	UInt32 PacketType;
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
-		return false;
+		return cProtocolError::NotCompleted;
 	}
 	if (PacketType != 0x00)
 	{
 		// Not an initial handshake packet, we don't know how to talk to them
 		LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, initial packet %u)",
-			m_Client->GetIPString().c_str(), PacketType
+			m_LogID.c_str(), PacketType
 		);
-		m_Client->Kick("Unsupported protocol version");
-		return false;
+		return cProtocolError::UnsupportedProtocol;
 	}
 	UInt32 ProtocolVersion;
 	if (!m_Buffer.ReadVarInt(ProtocolVersion))
 	{
-		return false;
+		return cProtocolError::NotCompleted;
 	}
-	m_Client->SetProtocolVersion(ProtocolVersion);
+	a_Actions.push_back(cpp14::make_unique<cSimpleAction>(cClientAction::Type::SetProtocolVersion));
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:
 		{
+			m_Buffer.ResetRead();
+			/*
 			AString ServerAddress;
 			UInt16 ServerPort;
 			UInt32 NextState;
@@ -987,11 +977,14 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
-			return true;
+			*/
+			m_Protocol = cpp14::make_unique<cProtocol172>(m_LogID);
+			return m_Protocol->HandleHandshake(m_Buffer, a_Actions);
 		}
 		case PROTO_VERSION_1_7_6:
 		{
+			m_Buffer.ResetRead();
+			/*
 			AString ServerAddress;
 			UInt16 ServerPort;
 			UInt32 NextState;
@@ -1008,11 +1001,13 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol176(m_Client, ServerAddress, ServerPort, NextState);
-			return true;
+			*/
+			m_Protocol = cpp14::make_unique<cProtocol176>(m_LogID);
+			return m_Protocol->HandleHandshake(m_Buffer, a_Actions);
 		}
 		case PROTO_VERSION_1_8_0:
 		{
+		/*
 			AString ServerAddress;
 			UInt16 ServerPort;
 			UInt32 NextState;
@@ -1029,15 +1024,15 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
-			return true;
+		*/
+			m_Protocol = cpp14::make_unique<cProtocol180>(m_LogID);
+			return m_Protocol->HandleHandshake(m_Buffer, a_Actions);
 		}
 	}
 	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
-		m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
+		m_LogID.c_str(), ProtocolVersion, ProtocolVersion
 	);
-	m_Client->Kick("Unsupported protocol version");
-	return false;
+	return cProtocolError::UnsupportedProtocol;
 }
 
 
@@ -1050,8 +1045,6 @@ void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
 	LOGWARNING("%s: This function shouldn't ever be called.", __FUNCTION__);
 	ASSERT(!"Function not to be called");
 }
-
-#endif
 
 
 

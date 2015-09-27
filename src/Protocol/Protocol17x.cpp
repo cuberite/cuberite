@@ -88,14 +88,12 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol172:
-/*
-cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client->GetIPString()),
-	m_ServerAddress(a_ServerAddress),
-	m_ServerPort(a_ServerPort),
-	m_State(a_State),
+
+cProtocol172::cProtocol172(const AString a_LogID) :
+	super(a_LogID),
 	m_LastSentDimension(dimNotSet)
 {
+/*
 	// BungeeCord handling:
 	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
 	// hostname\00ip-address\00uuid\00profile-properties-as-json
@@ -108,8 +106,9 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 		a_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
 		a_Client->SetProperties(Params[3]);
 	}
-}
 */
+}
+
 
 
 
@@ -3123,8 +3122,8 @@ void cProtocol172::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol176:
 
-cProtocol176::cProtocol176(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+cProtocol176::cProtocol176(const AString a_LogID) :
+	super(a_LogID)
 {
 }
 
