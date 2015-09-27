@@ -56,7 +56,7 @@ players
 world
 world_nether
 
-#cmake stuff
+# cmake stuff
 CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
@@ -79,7 +79,7 @@ src/Bindings/BindingDependencies.txt
 Cuberite.dir/
 src/AllFiles.lst
 
-#win32 cmake stuff
+# win32 cmake stuff
 *.vcxproj
 *.vcproj
 *.vcxproj.filters
@@ -88,10 +88,16 @@ src/AllFiles.lst
 *.sln
 *.idb
 
-#cmake output folders
+# cmake output folders
 ZERO_CHECK.dir/
 Debug/
 DebugProfile/
 Release/
 ReleaseProfile/
 *.dir/
+
+# APIDump-generated status files:
+Server/cuberite_api.lua
+Server/official_undocumented.lua
+Server/NewlyUndocumented.lua
+

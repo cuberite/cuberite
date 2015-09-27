@@ -1000,7 +1000,7 @@ local function ListUndocumentedObjects(API, UndocumentedHooks)
 			if (HasFunctions or HasConstants or HasVariables) then
 				f:write("\t\t" .. cls.Name .. " =\n\t\t{\n");
 				if ((cls.Desc == nil) or (cls.Desc == "")) then
-					f:write("\t\t\tDesc = \"\"\n");
+					f:write("\t\t\tDesc = \"\",\n");
 				end
 			end
 
@@ -1564,9 +1564,8 @@ end
 
 
 
-local function DumpApi()
-	LOG("Dumping the API...")
-
+--- Prepares the API and Globals tables containing the documentation
+local function PrepareApi()
 	-- Load the API descriptions from the Classes and Hooks subfolders:
 	-- This needs to be done each time the command is invoked because the export modifies the tables' contents
 	dofile(g_PluginFolder .. "/APIDesc.lua")
@@ -1615,6 +1614,19 @@ local function DumpApi()
 	-- Read in the descriptions:
 	LOG("Reading descriptions...");
 	ReadDescriptions(API);
+
+	return API, Globals
+end
+
+
+
+
+
+local function DumpApi()
+	LOG("Dumping the API...")
+
+	-- Match the currently exported API with the available documentation:
+	local API, Globals = PrepareApi()
 
 	-- Check that the API lists the inheritance properly, report any problems to a file:
 	CheckAPIDescendants(API)
@@ -1666,6 +1678,86 @@ end
 
 
 
+local function HandleCmdApiCheck(a_Split, a_EntireCmd)
+	-- Download the official API stats on undocumented stuff:
+	-- (We need a blocking downloader, which is impossible with the current cNetwork API)
+	assert(os.execute("wget -O official_undocumented.lua http://apidocs.cuberite.org/_undocumented.lua"))
+	local OfficialStats = cFile:ReadWholeFile("official_undocumented.lua")
+	if (OfficialStats == "") then
+		return true, "Cannot load official stats"
+	end
+	
+	-- Load the API stats as a Lua file, process into usable dictionary:
+	local Loaded, Msg = loadstring(OfficialStats)
+	if not(Loaded) then
+		return true, "Cannot load official stats: " .. (Msg or "<unknown error>")
+	end
+	local OfficialStatsDict = {}
+	setfenv(Loaded, OfficialStatsDict)
+	local IsSuccess, ErrMsg = pcall(Loaded)
+	if not(IsSuccess) then
+		return true, "Cannot parse official stats: " .. tostring(ErrMsg or "<unknown error>")
+	end
+	local Parsed = {}
+	for clsK, clsV in pairs(OfficialStatsDict.g_APIDesc.Classes) do
+		local cls =
+		{
+			Desc = not(clsV.Desc),  -- set to true if the Desc was not documented in the official docs
+			Functions = {},
+			Constants = {}
+		}
+		for funK, _ in pairs(clsV.Functions or {}) do
+			cls.Functions[funK] = true
+		end
+		for conK, _ in pairs(clsV.Constants or {}) do
+			cls.Constants[conK] = true
+		end
+		Parsed[clsK] = cls
+	end
+	
+	-- Get the current API's undocumented stats:
+	local API = PrepareApi()
+	
+	-- Compare the two sets of undocumented stats, list anything extra in current:
+	local res = {}
+	local ins = table.insert
+	for _, cls in ipairs(API) do
+		local ParsedOfficial = Parsed[cls.Name] or {}
+		if (not(cls.Desc) and ParsedOfficial.Desc) then
+			ins(res, cls.Name .. ".Desc")
+		end
+		local ParsedOfficialFns = ParsedOfficial.Functions or {}
+		for _, funK in ipairs(cls.UndocumentedFunctions or {}) do
+			if not(ParsedOfficialFns[funK]) then
+				ins(res, cls.Name .. "." .. funK .. " (function)")
+			end
+		end
+		local ParsedOfficialCons = ParsedOfficial.Constants or {}
+		for _, conK in ipairs(cls.UndocumentedConstants or {}) do
+			if not(ParsedOfficialCons[conK]) then
+				ins(res, cls.Name .. "." .. conK .. " (constant)")
+			end
+		end
+	end
+	table.sort(res)
+	
+	-- Bail out if no items found:
+	if not(res[1]) then
+		return true, "No new undocumented functions"
+	end
+
+	-- Save any found items to a file:
+	local f = io.open("NewlyUndocumented.lua", "w")
+	f:write(table.concat(res, "\n"))
+	f:close()
+	
+	return true, "Newly undocumented items: " .. #res .. "\n" .. table.concat(res, "\n")
+end
+
+
+
+
+
 function Initialize(Plugin)
 	g_Plugin = Plugin;
 	g_PluginFolder = Plugin:GetLocalFolder();
@@ -1673,8 +1765,9 @@ function Initialize(Plugin)
 	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
 	-- Bind a console command to dump the API:
-	cPluginManager:BindConsoleCommand("api", HandleCmdApi, "Dumps the Lua API docs into the API/ subfolder")
-	cPluginManager:BindConsoleCommand("apishow", HandleCmdApiShow, "Runs the default browser to show the API docs")
+	cPluginManager:BindConsoleCommand("api",      HandleCmdApi,      "Dumps the Lua API docs into the API/ subfolder")
+	cPluginManager:BindConsoleCommand("apicheck", HandleCmdApiCheck, "Checks the Lua API documentation stats against the official stats")
+	cPluginManager:BindConsoleCommand("apishow",  HandleCmdApiShow,  "Runs the default browser to show the API docs")
 
 	-- Add a WebAdmin tab that has a Dump button
 	g_Plugin:AddWebTab("APIDump", HandleWebAdminDump)
