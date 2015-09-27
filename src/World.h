@@ -921,6 +921,9 @@ private:
 
 	eWeather m_Weather;
 	int m_WeatherInterval;
+	int m_MaxSunnyTicks, m_MinSunnyTicks;
+	int m_MaxRainTicks,  m_MinRainTicks;
+	int m_MaxThunderStormTicks, m_MinThunderStormTicks;
 	
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
