@@ -78,6 +78,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_IsFollowingPath(false)
 	, m_PathfinderActivated(false)
 	, m_GiveUpCounter(0)
+	, m_TicksSinceLastPathReset(1000)
 	, m_LastGroundHeight(POSY_TOINT)
 	, m_JumpCoolDown(0)
 	, m_IdleInterval(0)
@@ -128,11 +129,36 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 	{
 		return false;
 	}
+	if (m_TicksSinceLastPathReset < 1000)
+	{
+		// No need to count beyond 1000. 1000 is arbitary here.
+		++m_TicksSinceLastPathReset;
+	}
 
 	if (ReachedFinalDestination())
 	{
 		StopMovingToPosition();
 		return false;
+	}
+
+	if ((m_FinalDestination - m_PathFinderDestination).Length() > 0.25)  // if the distance between where we're going and where we should go is too big.
+	{
+		/* If we reached the last path waypoint,
+		Or if we haven't re-calculated for too long.
+		Interval is proportional to distance squared, and its minimum is 10.
+		(Recalculate lots when close, calculate rarely when far) */
+		if (
+			((GetPosition() - m_PathFinderDestination).Length() < 0.25) ||
+			((m_TicksSinceLastPathReset > 10) && (m_TicksSinceLastPathReset > (0.4 * (m_FinalDestination - GetPosition()).SqrLength())))
+		)
+		{
+			/* Re-calculating is expensive when there's no path to target, and it results in mobs freezing very often as a result of always recalculating.
+			This is a workaround till we get better path recalculation. */
+			if (!m_NoPathToTarget)
+			{
+				ResetPathFinding();
+			}
+		}
 	}
 
 	if (m_Path == nullptr)
@@ -143,16 +169,21 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 			return false;
 		}
 		m_GiveUpCounter = 40;
-		m_Path = new cPath(a_Chunk, GetPosition(), m_FinalDestination, 20, GetWidth(), GetHeight());
+		m_NoPathToTarget = false;
+		m_NoMoreWayPoints = false;
+		m_PathFinderDestination = m_FinalDestination;
+		m_Path = new cPath(a_Chunk, GetPosition(), m_PathFinderDestination, 20, GetWidth(), GetHeight());
 	}
 
 	switch (m_Path->Step(a_Chunk))
 	{
 		case ePathFinderStatus::NEARBY_FOUND:
 		{
-			m_FinalDestination = m_Path->AcceptNearbyPath();
+			m_NoPathToTarget = true;
+			m_PathFinderDestination = m_Path->AcceptNearbyPath();
 			break;
 		}
+
 		case ePathFinderStatus::PATH_NOT_FOUND:
 		{
 			StopMovingToPosition();  // Try to calculate a path again.
@@ -166,10 +197,9 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		}
 		case ePathFinderStatus::PATH_FOUND:
 		{
-			if ((--m_GiveUpCounter) == 0)
+			if (m_NoMoreWayPoints || (--m_GiveUpCounter == 0))
 			{
-				// Failed to reach a waypoint - that's a failure condition whichever point we're at
-				if (m_EMState == CHASING)
+				if (m_EMState == ATTACKING)
 				{
 					ResetPathFinding();  // Try to calculate a path again.
 					// This results in mobs hanging around an unreachable target (player).
@@ -187,6 +217,10 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 					m_NextWayPointPosition = m_Path->GetNextPoint();
 					m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
 				}
+			}
+			else
+			{
+				m_NoMoreWayPoints = true;
 			}
 
 			m_IsFollowingPath = true;
@@ -379,6 +413,7 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::ResetPathFinding(void)
 {
+	m_TicksSinceLastPathReset = 0;
 	m_IsFollowingPath = false;
 	if (m_Path != nullptr)
 	{
