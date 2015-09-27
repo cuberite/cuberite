@@ -166,7 +166,13 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_ChunkMap(),
 	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
-	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_WeatherInterval(24000),  // Guaranteed 1 game-day of sunshine at server start :)
+	m_MaxSunnyTicks(180000),        // 150 real-world minutes -+
+	m_MinSunnyTicks(12000),         // 10 real-world minutes   |
+	m_MaxRainTicks(24000),          // 20 real-world minutes   +- all values adapted from Vanilla 1.7.2
+	m_MinRainTicks(12000),          // 10 real-world minutes   |
+	m_MaxThunderStormTicks(15600),  // 13 real-world minutes   |
+	m_MinThunderStormTicks(3600),   // 3 real-world minutes   -+
 	m_MaxCactusHeight(3),
 	m_MaxSugarcaneHeight(4),
 	m_IsCactusBonemealable(false),
@@ -244,17 +250,25 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 	{
 		case eWeather_Sunny:
 		{
-			return 14400 + (m_TickRand.randInt() % 4800);  // 12 - 16 minutes
+			auto dif = m_MaxSunnyTicks - m_MinSunnyTicks + 1;
+			return m_MinSunnyTicks + (m_TickRand.randInt() % dif);
 		}
 		case eWeather_Rain:
 		{
-			return 9600 + (m_TickRand.randInt() % 7200);   // 8 - 14 minutes
+			auto dif = m_MaxRainTicks - m_MinRainTicks + 1;
+			return m_MinRainTicks + (m_TickRand.randInt() % dif);
 		}
 		case eWeather_ThunderStorm:
 		{
-			return 2400 + (m_TickRand.randInt() % 4800);   // 2 - 6 minutes
+			auto dif = m_MaxThunderStormTicks - m_MinThunderStormTicks + 1;
+			return m_MinThunderStormTicks + (m_TickRand.randInt() % dif);
 		}
 	}
+
+	#ifndef __clang__
+		ASSERT(!"Unknown weather");
+		return -1;
+	#endif
 }
 
 
@@ -472,6 +486,29 @@ void cWorld::Start(void)
 	m_IsDaylightCycleEnabled      = IniFile.GetValueSetB("General",       "IsDaylightCycleEnabled",      true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    static_cast<int>(m_GameMode));
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     static_cast<int>(m_Weather));
+
+	// Load the weather frequency data:
+	if (m_Dimension == dimOverworld)
+	{
+		m_MaxSunnyTicks        = IniFile.GetValueSetI("Weather", "MaxSunnyTicks",        m_MaxSunnyTicks);
+		m_MinSunnyTicks        = IniFile.GetValueSetI("Weather", "MinSunnyTicks",        m_MinSunnyTicks);
+		m_MaxRainTicks         = IniFile.GetValueSetI("Weather", "MaxRainTicks",         m_MaxRainTicks);
+		m_MinRainTicks         = IniFile.GetValueSetI("Weather", "MinRainTicks",         m_MinRainTicks);
+		m_MaxThunderStormTicks = IniFile.GetValueSetI("Weather", "MaxThunderStormTicks", m_MaxThunderStormTicks);
+		m_MinThunderStormTicks = IniFile.GetValueSetI("Weather", "MinThunderStormTicks", m_MinThunderStormTicks);
+		if (m_MaxSunnyTicks < m_MinSunnyTicks)
+		{
+			std::swap(m_MaxSunnyTicks, m_MinSunnyTicks);
+		}
+		if (m_MaxRainTicks < m_MinRainTicks)
+		{
+			std::swap(m_MaxRainTicks, m_MinRainTicks);
+		}
+		if (m_MaxThunderStormTicks < m_MinThunderStormTicks)
+		{
+			std::swap(m_MaxThunderStormTicks, m_MinThunderStormTicks);
+		}
+	}
 	
 	if (GetDimension() == dimOverworld)
 	{
@@ -644,6 +681,11 @@ eWeather cWorld::ChooseNewWeather()
 			return ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}
+
+	#ifndef __clang__
+		ASSERT(!"Unknown weather");
+		return eWeather_Sunny;
+	#endif
 }
 
 
