@@ -120,8 +120,8 @@ public:
 	char GetAge (void) const { return m_Age; }
 	void SetAge(char a_Age)  { m_Age = a_Age; }
 	// tolua_end
-	
-	
+
+
 	// tolua_begin
 
 	/** Returns true if the monster has a custom name. */
@@ -178,12 +178,23 @@ protected:
 
 	/* If 0, will give up reaching the next m_NextWayPointPosition and will re-compute path. */
 	int m_GiveUpCounter;
+	int m_TicksSinceLastPathReset;
 
 	/** Coordinates of the next position that should be reached */
 	Vector3d m_NextWayPointPosition;
 
 	/** Coordinates for the ultimate, final destination. */
 	Vector3d m_FinalDestination;
+
+	/** Coordinates for the ultimate, final destination last given to the pathfinder. */
+	Vector3d m_PathFinderDestination;
+
+	/** True if there's no path to target and we're walking to an approximated location. */
+	bool m_NoPathToTarget;
+
+	/** Whether The mob has finished their path, note that this does not imply reaching the destination,
+	the destination may sometimes differ from the current path. */
+	bool m_NoMoreWayPoints;
 
 	/** Finds the lowest non-air block position (not the highest, as cWorld::GetHeight does)
 	If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
