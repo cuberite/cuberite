@@ -10,7 +10,7 @@ AString GetOSErrorString( int a_ErrNo)
 
 	#ifdef _WIN32
 
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, a_ErrNo, 0, buffer, ARRAYCOUNT(buffer), nullptr);
+	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, a_ErrNo, 0, buffer, ARRAYCOUNT(buffer), nullptr);
 	Printf(Out, "%d: %s", a_ErrNo, buffer);
 	if (!Out.empty() && (Out[Out.length() - 1] == '\n'))
 	{

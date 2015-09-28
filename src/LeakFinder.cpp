@@ -875,7 +875,7 @@ static int MyAllocHook(int nAllocType, void *pvData,
 				printf("********************************************\n");
 				printf("Please wait\n");
 				
-				LeakFinderXmlOutput Output("memdump.xml");
+				LeakFinderXmlOutput Output(L"memdump.xml");
 				DumpUsedMemory(&Output);
 				
 				printf("\nMemory dump complete. Server will now abort.\n");
@@ -912,7 +912,7 @@ static int MyAllocHook(int nAllocType, void *pvData,
 				printf("********************************************\n");
 				printf("Please wait\n");
 				
-				LeakFinderXmlOutput Output("memdump.xml");
+				LeakFinderXmlOutput Output(L"memdump.xml");
 				DumpUsedMemory(&Output);
 				
 				printf("\nMemory dump complete. Server will now abort.\n");
@@ -955,7 +955,7 @@ static int MyAllocHook(int nAllocType, void *pvData,
 				printf("******************************************\n");
 				printf("Please wait\n");
 				
-				LeakFinderXmlOutput Output("memdump.xml");
+				LeakFinderXmlOutput Output(L"memdump.xml");
 				DumpUsedMemory(&Output);
 				
 				printf("\nMemory dump complete. Server will now abort.\n");
