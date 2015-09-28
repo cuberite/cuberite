@@ -1065,7 +1065,7 @@ bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 	tolua_Error tolua_err;
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
-		if (tolua_isstring(m_LuaState, i, 0, &tolua_err))
+		if (lua_isstring(m_LuaState, i))
 		{
 			continue;
 		}
@@ -1073,6 +1073,9 @@ bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		tolua_err.array = 0;
+		tolua_err.type = "string";
+		tolua_err.index = i;
 		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
