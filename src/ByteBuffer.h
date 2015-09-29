@@ -63,7 +63,6 @@ public:
 	bool ReadBEFloat        (float & a_Value);
 	bool ReadBEDouble       (double & a_Value);
 	bool ReadBool           (bool & a_Value);
-	bool ReadBEUTF16String16(AString & a_Value);  // string length as BE short, then string as UTF-16BE
 	bool ReadVarInt32       (UInt32 & a_Value);
 	bool ReadVarInt64       (UInt64 & a_Value);
 	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
@@ -108,9 +107,6 @@ public:
 	
 	/** Reads a_Count bytes into a_String; returns true if successful */
 	bool ReadString(AString & a_String, size_t a_Count);
-	
-	/** Reads 2 * a_NumChars bytes and interprets it as a UTF16-BE string, converting it into UTF8 string a_String */
-	bool ReadUTF16String(AString & a_String, size_t a_NumChars);
 	
 	/** Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer */
 	bool SkipRead(size_t a_Count);
