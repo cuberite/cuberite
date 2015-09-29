@@ -624,6 +624,12 @@ void cWorld::GenerateRandomSpawn(void)
 
 bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 {
+	// The bottom layer cannot hold a valid spawn point
+	if (a_PosY <= 0)
+	{
+		return false;
+	}
+
 	// Check that spawnblock and surrounding blocks are neither solid nor water / lava
 	static const struct
 	{
