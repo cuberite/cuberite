@@ -1,5 +1,4 @@
 version: 1.0.{build}
-os: Previous Windows Server 2012 R2
 configuration: Debug
 clone_depth: 50
 before_build:
