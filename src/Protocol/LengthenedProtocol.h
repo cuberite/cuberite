@@ -2,6 +2,8 @@
 #pragma once
 #include "Protocol.h"
 
+extern void undefined();
+
 class cLengthenedProtocol : public cProtocol
 {
 public:
@@ -9,6 +11,7 @@ public:
 		cProtocol(a_LogID),
 		m_ReceivedData(32 KiB)
 	{
+		undefined();
 	}
 
 	virtual ~cLengthenedProtocol() = default;

@@ -222,7 +222,7 @@ protected:
 	
 	
 	/** Sends the data to the client, encrypting them if needed. */
-	virtual void SendData(const char * a_Data, size_t a_Size) override;
+	//virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;

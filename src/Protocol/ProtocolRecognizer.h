@@ -130,7 +130,7 @@ public:
 	
 	virtual AString GetAuthServerID(void) override;
 
-	virtual void SendData(const char * a_Data, size_t a_Size) override;
+	//virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 	cProtocolError HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) override WARN_UNUSED;
 

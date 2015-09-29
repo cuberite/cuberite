@@ -100,19 +100,16 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 
 
 
-
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol180:
 
-cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client),
-	m_ServerAddress(a_ServerAddress),
-	m_ServerPort(a_ServerPort),
-	m_State(a_State),
+cProtocol180::cProtocol180(const AString a_LogID) :
+	super(a_LogID),
 	m_ReceivedData(32 KiB),
 	m_LastSentDimension(dimNotSet)
 {
-
+#if 0
 	// BungeeCord handling:
 	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
 	// hostname\00ip-address\00uuid\00profile-properties-as-json
@@ -143,8 +140,9 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 			LOG("Cannot log communication to file, the log file \"%s\" cannot be opened for writing.", FileName.c_str());
 		}
 	}
+#endif
 }
-
+#if 0
 
 
 

@@ -177,17 +177,17 @@ void cProtocolRecognizer::SendDestroyEntity(const cEntity & a_Entity)
 
 
 
-void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
+void cProtocolRecognizer::SendDisconnect(cByteBuffer & a_ByteBuffer, const AString & a_Reason)
 {
 	if (m_Protocol != nullptr)
 	{
-		m_Protocol->SendDisconnect(a_Reason);
+		m_Protocol->SendDisconnect(a_ByteBuffer, a_Reason);
 	}
 	else
 	{
 		// This is used when the client sends a server-ping, respond with the default packet:
 		static const int Packet = 0xff;  // PACKET_DISCONNECT
-		SendData(reinterpret_cast<const char *>(&Packet), 1);  // WriteByte()
+		a_ByteBuffer.Write(reinterpret_cast<const char *>(&Packet), 1);  // WriteByte()
 
 		auto UTF16 = UTF8ToRawBEUTF16(a_Reason);
 		static const u_short Size = htons(static_cast<u_short>(UTF16.size()));
@@ -197,7 +197,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 }
 
 
-
+e
 
 void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {

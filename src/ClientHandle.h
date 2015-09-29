@@ -351,7 +351,7 @@ public:  // tolua_export
 	*/
 	bool HandleLogin(UInt32 a_ProtocolVersion, const AString & a_Username);
 	
-	void SendData(const char * a_Data, size_t a_Size);
+	//void SendData(const char * a_Data, size_t a_Size);
 	
 	/** Called when the player moves into a different world.
 	Sends an UnloadChunk packet for each loaded chunk and resets the streamed chunks. */

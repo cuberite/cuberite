@@ -1803,7 +1803,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 
 
-
+#if 0
 void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_HasSentDC)
@@ -1815,7 +1815,7 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 	cCSLock Lock(m_CSOutgoingData);
 	m_OutgoingData.append(a_Data, a_Size);
 }
-
+#endif
 
 
 
