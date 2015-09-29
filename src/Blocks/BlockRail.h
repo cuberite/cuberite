@@ -494,18 +494,18 @@ public:
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
 		{
 			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			NIBBLETYPE OtherMeta = static_cast<NIBBLETYPE>(a_Meta & 0x08);
 			// Rotates according to table; 0x07 == 0111.
 			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
-				case 0x00: return 0x01 + OtherMeta;  // North / South -> East / West
-				case 0x01: return 0x00 + OtherMeta;  // East / West   -> North / South
+				case 0x00: return static_cast<NIBBLETYPE>(0x01 + OtherMeta);  // North / South -> East / West
+				case 0x01: return static_cast<NIBBLETYPE>(0x00 + OtherMeta);  // East / West   -> North / South
 
-				case 0x02: return 0x04 + OtherMeta;  // Asc. East   -> Asc. North
-				case 0x04: return 0x03 + OtherMeta;  // Asc. North  -> Asc. West
-				case 0x03: return 0x05 + OtherMeta;  // Asc. West   -> Asc. South
-				case 0x05: return 0x02 + OtherMeta;  // Asc. South  -> Asc. East
+				case 0x02: return static_cast<NIBBLETYPE>(0x04 + OtherMeta);  // Asc. East   -> Asc. North
+				case 0x04: return static_cast<NIBBLETYPE>(0x03 + OtherMeta);  // Asc. North  -> Asc. West
+				case 0x03: return static_cast<NIBBLETYPE>(0x05 + OtherMeta);  // Asc. West   -> Asc. South
+				case 0x05: return static_cast<NIBBLETYPE>(0x02 + OtherMeta);  // Asc. South  -> Asc. East
 			}
 		}
 		else
@@ -529,18 +529,18 @@ public:
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
 		{
 			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			NIBBLETYPE OtherMeta = static_cast<NIBBLETYPE>(a_Meta & 0x08);
 			// Rotates according to table; 0x07 == 0111.
 			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
-				case 0x00: return 0x01 + OtherMeta;  // North / South -> East / West
-				case 0x01: return 0x00 + OtherMeta;  // East / West   -> North / South
+				case 0x00: return static_cast<NIBBLETYPE>(0x01 + OtherMeta);  // North / South -> East / West
+				case 0x01: return static_cast<NIBBLETYPE>(0x00 + OtherMeta);  // East / West   -> North / South
 
-				case 0x02: return 0x05 + OtherMeta;  // Asc. East   -> Asc. South
-				case 0x05: return 0x03 + OtherMeta;  // Asc. South  -> Asc. West
-				case 0x03: return 0x04 + OtherMeta;  // Asc. West   -> Asc. North
-				case 0x04: return 0x02 + OtherMeta;  // Asc. North  -> Asc. East
+				case 0x02: return static_cast<NIBBLETYPE>(0x05 + OtherMeta);  // Asc. East   -> Asc. South
+				case 0x05: return static_cast<NIBBLETYPE>(0x03 + OtherMeta);  // Asc. South  -> Asc. West
+				case 0x03: return static_cast<NIBBLETYPE>(0x04 + OtherMeta);  // Asc. West   -> Asc. North
+				case 0x04: return static_cast<NIBBLETYPE>(0x02 + OtherMeta);  // Asc. North  -> Asc. East
 			}
 		}
 		else
@@ -564,13 +564,13 @@ public:
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
 		{
 			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			NIBBLETYPE OtherMeta = static_cast<NIBBLETYPE>(a_Meta & 0x08);
 			// Mirrors according to table; 0x07 == 0111.
 			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
-				case 0x05: return 0x04 + OtherMeta;  // Asc. South  -> Asc. North
-				case 0x04: return 0x05 + OtherMeta;  // Asc. North  -> Asc. South
+				case 0x05: return static_cast<NIBBLETYPE>(0x04 + OtherMeta);  // Asc. South  -> Asc. North
+				case 0x04: return static_cast<NIBBLETYPE>(0x05 + OtherMeta);  // Asc. North  -> Asc. South
 			}
 		}
 		else
@@ -594,13 +594,13 @@ public:
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
 		{
 			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
+			NIBBLETYPE OtherMeta = static_cast<NIBBLETYPE>(a_Meta & 0x08);
 			// Mirrors according to table; 0x07 == 0111.
 			// Rails can either be flat (North / South) or Ascending (Asc. East)
 			switch (a_Meta & 0x07)
 			{
-				case 0x02: return 0x03 + OtherMeta;  // Asc. East   -> Asc. West
-				case 0x03: return 0x02 + OtherMeta;  // Asc. West   -> Asc. East
+				case 0x02: return static_cast<NIBBLETYPE>(0x03 + OtherMeta);  // Asc. East   -> Asc. West
+				case 0x03: return static_cast<NIBBLETYPE>(0x02 + OtherMeta);  // Asc. West   -> Asc. East
 			}
 		}
 		else
