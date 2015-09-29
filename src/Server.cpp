@@ -145,6 +145,8 @@ cServer::cServer(void) :
 	m_ShouldLoadOfflinePlayerData(false),
 	m_ShouldLoadNamedPlayerData(true)
 {
+	// Initialize the LuaStateTracker singleton before the app goes multithreaded:
+	cLuaStateTracker::GetStats();
 }
 
 
@@ -519,6 +521,13 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	else if (split[0].compare("chunkstats") == 0)
 	{
 		cRoot::Get()->LogChunkStats(a_Output);
+		a_Output.Finished();
+		return;
+	}
+
+	else if (split[0].compare("luastats") == 0)
+	{
+		a_Output.Out(cLuaStateTracker::GetStats());
 		a_Output.Finished();
 		return;
 	}

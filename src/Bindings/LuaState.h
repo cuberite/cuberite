@@ -210,6 +210,9 @@ public:
 	
 	/** Returns true if the m_LuaState is valid */
 	bool IsValid(void) const { return (m_LuaState != nullptr); }
+
+	/** Returns the name of the subsystem, as specified when the instance was created. */
+	AString GetSubsystemName(void) const { return m_SubsystemName; }
 	
 	/** Adds the specified path to package.<a_PathVariable> */
 	void AddPackagePath(const AString & a_PathVariable, const AString & a_Path);
@@ -517,6 +520,40 @@ protected:
 	/** Tries to break into the MobDebug debugger, if it is installed. */
 	static int BreakIntoDebugger(lua_State * a_LuaState);
 } ;
+
+
+
+
+
+/** Keeps track of all create cLuaState instances.
+Can query each for the amount of currently used memory. */
+class cLuaStateTracker
+{
+public:
+	/** Adds the specified Lua state to the internal list of LuaStates. */
+	static void Add(cLuaState & a_LuaState);
+
+	/** Deletes the specified Lua state from the internal list of LuaStates. */
+	static void Del(cLuaState & a_LuaState);
+
+	/** Returns the statistics for all the registered LuaStates. */
+	static AString GetStats(void);
+
+protected:
+	typedef cLuaState * cLuaStatePtr;
+	typedef std::vector<cLuaStatePtr> cLuaStatePtrs;
+
+	/** The internal list of LuaStates.
+	Protected against multithreaded access by m_CSLuaStates. */
+	cLuaStatePtrs m_LuaStates;
+
+	/** Protects m_LuaStates against multithreaded access. */
+	cCriticalSection m_CSLuaStates;
+
+
+	/** Returns the single instance of this class. */
+	static cLuaStateTracker & Get(void);
+};
 
 
 

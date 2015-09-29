@@ -43,6 +43,76 @@ const cLuaState::cRet cLuaState::Return = {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cLuaStateTracker:
+
+void cLuaStateTracker::Add(cLuaState & a_LuaState)
+{
+	auto & Instance = Get();
+	cCSLock Lock(Instance.m_CSLuaStates);
+	Instance.m_LuaStates.push_back(&a_LuaState);
+}
+
+
+
+
+void cLuaStateTracker::Del(cLuaState & a_LuaState)
+{
+	auto & Instance = Get();
+	cCSLock Lock(Instance.m_CSLuaStates);
+	Instance.m_LuaStates.erase(
+		std::remove_if(
+			Instance.m_LuaStates.begin(), Instance.m_LuaStates.end(),
+			[&a_LuaState](cLuaStatePtr a_StoredLuaState)
+			{
+				return (&a_LuaState == a_StoredLuaState);
+			}
+		),
+		Instance.m_LuaStates.end()
+	);
+}
+
+
+
+
+
+AString cLuaStateTracker::GetStats(void)
+{
+	auto & Instance = Get();
+	cCSLock Lock(Instance.m_CSLuaStates);
+	AString res;
+	int Total = 0;
+	for (auto state: Instance.m_LuaStates)
+	{
+		int Mem = 0;
+		if (!state->Call("collectgarbage", "count", cLuaState::Return, Mem))
+		{
+			res.append(Printf("Cannot query memory for state \"%s\"\n", state->GetSubsystemName().c_str()));
+		}
+		else
+		{
+			res.append(Printf("State \"%s\" is using %d KiB of memory\n", state->GetSubsystemName().c_str(), Mem));
+			Total += Mem;
+		}
+	}
+	res.append(Printf("Total memory used by Lua: %d KiB\n", Total));
+	return res;
+}
+
+
+
+
+
+cLuaStateTracker & cLuaStateTracker::Get(void)
+{
+	static cLuaStateTracker Inst;  // The singleton
+	return Inst;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
@@ -98,6 +168,7 @@ void cLuaState::Create(void)
 	m_LuaState = lua_open();
 	luaL_openlibs(m_LuaState);
 	m_IsOwned = true;
+	cLuaStateTracker::Add(*this);
 }
 
 
@@ -133,6 +204,7 @@ void cLuaState::Close(void)
 		Detach();
 		return;
 	}
+	cLuaStateTracker::Del(*this);
 	lua_close(m_LuaState);
 	m_LuaState = nullptr;
 	m_IsOwned = false;
