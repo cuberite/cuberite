@@ -14,7 +14,7 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	Vector3i ThisPos( a_BlockX, a_BlockY, a_BlockZ);
-	Vector3i Direction = MetaDataToDirection( OldMeta & 0x3);
+	Vector3i Direction = MetaDataToDirection( static_cast<NIBBLETYPE>(OldMeta & 0x3));
 	if (OldMeta & 0x8)
 	{
 		// Was pillow
@@ -42,12 +42,7 @@ class cTimeFastForwardTester :
 {
 	virtual bool Item(cPlayer * a_Player) override
 	{
-		if (!a_Player->IsInBed())
-		{
-			return true;
-		}
-
-		return false;
+		return !a_Player->IsInBed();
 	}
 };
 
