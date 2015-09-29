@@ -1835,12 +1835,12 @@ bool cConnection::HandleServerKick(void)
 			Reason.append(Split[4]);
 			Reason.push_back(0);
 			Reason.append(Split[5]);
-			AString ReasonBE16 = UTF8ToRawBEUTF16(Reason.data(), Reason.size());
+			auto ReasonBE16 = UTF8ToRawBEUTF16(Reason);
 			AString PacketStart("\xff");
-			PacketStart.push_back(static_cast<char>((ReasonBE16.size() / 2) / 256));
-			PacketStart.push_back(static_cast<char>((ReasonBE16.size() / 2) % 256));
+			PacketStart.push_back(static_cast<char>(ReasonBE16.size() / 256));
+			PacketStart.push_back(static_cast<char>(ReasonBE16.size() % 256));
 			CLIENTSEND(PacketStart.data(), PacketStart.size());
-			CLIENTSEND(ReasonBE16.data(), ReasonBE16.size());
+			CLIENTSEND(reinterpret_cast<const char *>(ReasonBE16.data()), ReasonBE16.size() * sizeof(char16_t));
 			return true;
 		}
 		else

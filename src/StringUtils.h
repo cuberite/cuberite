@@ -82,7 +82,7 @@ extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AS
 extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
 
 /** Converts a UTF-8 string into a UTF-16 BE string. */
-extern AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length);
+extern std::u16string UTF8ToRawBEUTF16(const AString & a_String);
 
 /** Creates a nicely formatted HEX dump of the given memory block.
 Max a_BytesPerLine is 120. */
