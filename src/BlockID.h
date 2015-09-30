@@ -3,12 +3,13 @@
 // The following hackery is to allow typed C++ enum for C++ code, yet have ToLua process the values.
 // ToLua doesn't understand typed enums, so we use preprocessor to hide it from ToLua.
 
-enum ENUM_BLOCK_ID : BLOCKTYPE
+
+static const BLOCKTYPE
 #if 0
-enum ENUM_BLOCK_ID  // tolua_export
-#endif
 // tolua_begin
+enum BLOCKTYPE
 {
+#endif
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
 	E_BLOCK_GRASS = 2,
@@ -215,9 +216,9 @@ enum ENUM_BLOCK_ID  // tolua_export
 	E_BLOCK_ACACIA_DOOR = 196,
 	E_BLOCK_DARK_OAK_DOOR = 197,
 	
-	// Keep these two as the last values, without a number - they will get their correct number assigned automagically by C++
+	// Keep these two as the last values. Update the last block value when adding another block
 	// IsValidBlock() depends on this
-	E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
+	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_DARK_OAK_DOOR + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 	
 	// Synonym or ID compatibility
@@ -225,8 +226,12 @@ enum ENUM_BLOCK_ID  // tolua_export
 	E_BLOCK_RED_ROSE = E_BLOCK_FLOWER,
 	E_BLOCK_WOODEN_DOOR = E_BLOCK_OAK_DOOR,
 	E_BLOCK_FENCE_GATE = E_BLOCK_OAK_FENCE_GATE,
-	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS,
-};
+	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS
+
+#if 0
+}
+#endif
+	;
 // tolua_end
 
 
