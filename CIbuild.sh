@@ -13,11 +13,6 @@ if [ "$CXX" == "g++" ]; then
 fi
 cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1;
 
-echo "Checking basic style..."
-cd src
-lua CheckBasicStyle.lua
-cd ..
-
 echo "Building..."
 make -j 2;
 make -j 2 test ARGS="-V";
