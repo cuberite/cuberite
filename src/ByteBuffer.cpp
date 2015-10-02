@@ -473,22 +473,6 @@ bool cByteBuffer::ReadBool(bool & a_Value)
 
 
 
-bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
-{
-	CHECK_THREAD
-	CheckValid();
-	UInt16 Length;
-	if (!ReadBEUInt16(Length))
-	{
-		return false;
-	}
-	return ReadUTF16String(a_Value, Length);
-}
-
-
-
-
-
 bool cByteBuffer::ReadVarInt32(UInt32 & a_Value)
 {
 	CHECK_THREAD
@@ -922,24 +906,6 @@ bool cByteBuffer::ReadString(AString & a_String, size_t a_Count)
 		a_String.append(m_Buffer + m_ReadPos, a_Count);
 		m_ReadPos += a_Count;
 	}
-	return true;
-}
-
-
-
-
-
-bool cByteBuffer::ReadUTF16String(AString & a_String, size_t a_NumChars)
-{
-	// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
-	CHECK_THREAD
-	CheckValid();
-	AString RawData;
-	if (!ReadString(RawData, a_NumChars * 2))
-	{
-		return false;
-	}
-	RawBEToUTF8(RawData.data(), a_NumChars, a_String);
 	return true;
 }
 

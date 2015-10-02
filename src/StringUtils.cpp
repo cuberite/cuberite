@@ -500,13 +500,13 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 
 
 
-AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
+std::u16string UTF8ToRawBEUTF16(const AString & a_UTF8)
 {
-	AString UTF16;
-	UTF16.reserve(a_UTF8Length * 3);
+	std::u16string UTF16;
+	UTF16.reserve(a_UTF8.size() * 2);
 
-	const unsigned char * source    = reinterpret_cast<const unsigned char *>(a_UTF8);
-	const unsigned char * sourceEnd = source + a_UTF8Length;
+	const unsigned char * source    = reinterpret_cast<const unsigned char *>(a_UTF8.data());
+	const unsigned char * sourceEnd = source + a_UTF8.size();
 	const int halfShift  = 10;  // used for shifting by 10 bits
 	const unsigned int halfBase = 0x0010000UL;
 	const unsigned int halfMask = 0x3ffUL;
@@ -546,13 +546,13 @@ AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 				ch = ' ';
 			}
 			unsigned short v = htons(static_cast<unsigned short>(ch));
-			UTF16.append(reinterpret_cast<const char *>(&v), 2);
+			UTF16.push_back(static_cast<char16_t>(v));
 		}
 		else if (ch > UNI_MAX_UTF16)
 		{
 			// Invalid value, replace with a space
 			unsigned short v = htons(' ');
-			UTF16.append(reinterpret_cast<const char *>(&v), 2);
+			UTF16.push_back(static_cast<char16_t>(v));
 		}
 		else
 		{
@@ -560,8 +560,8 @@ AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 			ch -= halfBase;
 			unsigned short v1 = htons((ch >> halfShift) + UNI_SUR_HIGH_START);
 			unsigned short v2 = htons((ch & halfMask) + UNI_SUR_LOW_START);
-			UTF16.append(reinterpret_cast<const char *>(&v1), 2);
-			UTF16.append(reinterpret_cast<const char *>(&v2), 2);
+			UTF16.push_back(static_cast<char16_t>(v1));
+			UTF16.push_back(static_cast<char16_t>(v2));
 		}
 	}
 	return UTF16;
