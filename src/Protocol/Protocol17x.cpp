@@ -278,7 +278,7 @@ void cProtocol172::SendDestroyEntity(const cEntity & a_Entity)
 
 
 
-void cProtocol172::SendDisconnect(const AString & a_Reason)
+void cProtocol172::SendDisconnect(AString & a_ByteBuffer, const AString & a_Reason)
 {
 	switch (m_State)
 	{

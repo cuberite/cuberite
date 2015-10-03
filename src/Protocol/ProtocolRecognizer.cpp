@@ -15,6 +15,7 @@
 #include "../World.h"
 #include "../ChatColor.h"
 #include "Bindings/PluginManager.h"
+#include "Packetizer.h"
 
 
 
@@ -177,7 +178,7 @@ void cProtocolRecognizer::SendDestroyEntity(const cEntity & a_Entity)
 
 
 
-void cProtocolRecognizer::SendDisconnect(cByteBuffer & a_ByteBuffer, const AString & a_Reason)
+void cProtocolRecognizer::SendDisconnect(AString & a_ByteBuffer, const AString & a_Reason)
 {
 	if (m_Protocol != nullptr)
 	{
@@ -185,19 +186,18 @@ void cProtocolRecognizer::SendDisconnect(cByteBuffer & a_ByteBuffer, const AStri
 	}
 	else
 	{
+
 		// This is used when the client sends a server-ping, respond with the default packet:
-		static const int Packet = 0xff;  // PACKET_DISCONNECT
-		a_ByteBuffer.Write(reinterpret_cast<const char *>(&Packet), 1);  // WriteByte()
+		cPacketizer Pkt(*this, 0xff);
 
 		auto UTF16 = UTF8ToRawBEUTF16(a_Reason);
-		static const u_short Size = htons(static_cast<u_short>(UTF16.size()));
-		SendData(reinterpret_cast<const char *>(&Size), 2);      // WriteShort()
-		SendData(reinterpret_cast<const char *>(UTF16.data()), UTF16.size() * sizeof(char16_t));  // WriteString()
+		Pkt.WriteBEUInt16(static_cast<UInt16>(UTF16.size()));
+		Pkt.WriteBuf(reinterpret_cast<const char *>(UTF16.data()), UTF16.size() * sizeof(char16_t));
 	}
 }
 
 
-e
+
 
 void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {

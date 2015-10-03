@@ -59,7 +59,7 @@ int cClientHandle::s_ClientCount = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
-
+#if 0
 cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
@@ -98,7 +98,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 
 	LOGD("New ClientHandle created at %p", static_cast<void *>(this));
 }
-
+#endif
 
 
 
@@ -2257,7 +2257,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 	if (!m_HasSentDC)
 	{
 		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
-		m_Protocol->SendDisconnect(a_Reason);
+		m_Protocol->SendDisconnect(m_OutgoingData, a_Reason);
 		m_HasSentDC = true;
 	}
 }

@@ -66,7 +66,7 @@ public:
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
-	virtual void SendDisconnect                 (const AString & a_Reason) override;
+	virtual void SendDisconnect                 (AString & a_ByteBuffer, const AString & a_Reason) override;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) override;
@@ -200,7 +200,7 @@ protected:
 	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, UInt16 a_PayloadLength);
 	
 	/** Sends the data to the client, encrypting them if needed. */
-	//virtual void SendData(const char * a_Data, size_t a_Size) override;
+	//virtual void SendData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;

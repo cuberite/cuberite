@@ -107,7 +107,7 @@ public:
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
 	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
-	virtual void SendDisconnect                 (const AString & a_Reason) = 0;
+	virtual void SendDisconnect                 (AString & a_ByteBuffer, const AString & a_Reason) = 0;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) = 0;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
@@ -204,7 +204,7 @@ protected:
 
 	
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
-	virtual void SendData(cByteBuffer & a_ByteBuffer, const char * a_Data, size_t a_Size) = 0;
+	//virtual void SendData(cByteBuffer & a_ByteBuffer, const char * a_Data, size_t a_Size) = 0;
 
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
