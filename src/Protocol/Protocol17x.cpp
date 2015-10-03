@@ -2414,15 +2414,15 @@ void cProtocol172::SendPacket(cPacketizer & a_Packet)
 
 
 
-
-bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
+*/
+cProtocol::cProtocolError cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemType);
 	if (ItemType == -1)
 	{
 		// The item is empty, no more data follows
 		a_Item.Empty();
-		return true;
+		return cProtocolError::Success;
 	}
 	a_Item.m_ItemType = ItemType;
 	
@@ -2440,17 +2440,17 @@ bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 	AString Metadata;
 	if (!a_ByteBuffer.ReadString(Metadata, MetadataLength))
 	{
-		return false;
+		return cProtocolError::PacketReadError;
 	}
 	
 	ParseItemMetadata(a_Item, Metadata);
-	return true;
+	return cProtocolError::Success;
 }
 
 
 
 
-
+/*
 void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 {
 	// Uncompress the GZIPped data:
@@ -3171,15 +3171,17 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-/*
-void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+
+cProtocol::cProtocolError cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer, ActionList & a_Action)
 {
 	cServer * Server = cRoot::Get()->GetServer();
 	AString Motd = Server->GetDescription();
-	int NumPlayers = Server->GetNumPlayers();
-	int MaxPlayers = Server->GetMaxPlayers();
+	//int NumPlayers = Server->GetNumPlayers();
+	//int MaxPlayers = Server->GetMaxPlayers();
 	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
+	ADD_SIMPLE_ACTION(StatusRequest);
+	return cProtocolError::Success;
+	/*cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
 
 	// Version:
 	Json::Value Version;
@@ -3211,8 +3213,9 @@ void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Response);
+	*/
 }
-*/
+
 
 
 
