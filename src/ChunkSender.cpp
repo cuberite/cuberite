@@ -27,7 +27,7 @@
 class cNotifyChunkSender :
 	public cChunkCoordCallback
 {
-	virtual void Call(int a_ChunkX, int a_ChunkZ) override
+	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
 	{
 		cChunkSender & ChunkSender = m_ChunkSender;
 		m_World.DoWithChunk(

@@ -60,7 +60,8 @@ public:
 	
 	void Stop(void);
 	
-	/** Queues the entire chunk for lighting */
+	/** Queues the entire chunk for lighting.
+	The callback, if specified, is called after the lighting has been processed. */
 	void QueueChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter);
 	
 	/** Blocks until the queue is empty or the thread is terminated */

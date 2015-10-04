@@ -164,32 +164,6 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallba
 
 
 
-void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkZ)
-{
-	m_LoadQueue.RemoveIf([=](cChunkCoordsWithCallback & a_Item)
-		{
-			return (a_Item.m_ChunkX == a_ChunkX) && (a_Item.m_ChunkZ == a_ChunkZ);
-		}
-	);
-}
-
-
-
-
-
-void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
-{
-	m_SaveQueue.RemoveIf([=](cChunkCoordsWithCallback & a_Item)
-		{
-			return (a_Item.m_ChunkX == a_Chunk.m_ChunkX) && (a_Item.m_ChunkZ == a_Chunk.m_ChunkZ);
-		}
-	);
-}
-
-
-
-
-
 void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
@@ -266,7 +240,7 @@ bool cWorldStorage::LoadOneChunk(void)
 	// Call the callback, if specified:
 	if (ToLoad.m_Callback != nullptr)
 	{
-		ToLoad.m_Callback->Call(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
+		ToLoad.m_Callback->Call(ToLoad.m_ChunkX, ToLoad.m_ChunkZ, res);
 	}
 	return res;
 }
@@ -286,19 +260,21 @@ bool cWorldStorage::SaveOneChunk(void)
 	}
 	
 	// Save the chunk, if it's valid:
+	bool Status = false;
 	if (m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
 	{
 		m_World->MarkChunkSaving(ToSave.m_ChunkX, ToSave.m_ChunkZ);
 		if (m_SaveSchema->SaveChunk(cChunkCoords(ToSave.m_ChunkX, ToSave.m_ChunkZ)))
 		{
 			m_World->MarkChunkSaved(ToSave.m_ChunkX, ToSave.m_ChunkZ);
+			Status = true;
 		}
 	}
 
 	// Call the callback, if specified:
 	if (ToSave.m_Callback != nullptr)
 	{
-		ToSave.m_Callback->Call(ToSave.m_ChunkX, ToSave.m_ChunkZ);
+		ToSave.m_Callback->Call(ToSave.m_ChunkX, ToSave.m_ChunkZ, Status);
 	}
 	return true;
 }

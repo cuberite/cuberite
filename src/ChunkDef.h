@@ -464,7 +464,8 @@ public:
 
 	virtual ~cChunkCoordCallback() {}
 
-	virtual void Call(int a_ChunkX, int a_ChunkZ) = 0;
+	/** Called with the chunk's coords, and an optional operation status flag for operations that support it. */
+	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) = 0;
 } ;
 
 
