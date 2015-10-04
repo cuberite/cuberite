@@ -248,13 +248,13 @@ void cChunkGenerator::Execute(void)
 			LastReportTick = clock();
 		}
 
-		// Skip the chunk if it's already generated and regeneration is not forced:
+		// Skip the chunk if it's already generated and regeneration is not forced. Report as success:
 		if (!item.m_ForceGenerate && m_ChunkSink->IsChunkValid(item.m_ChunkX, item.m_ChunkZ))
 		{
 			LOGD("Chunk [%d, %d] already generated, skipping generation", item.m_ChunkX, item.m_ChunkZ);
 			if (item.m_Callback != nullptr)
 			{
-				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, true);
 			}
 			continue;
 		}
@@ -265,7 +265,7 @@ void cChunkGenerator::Execute(void)
 			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
 			if (item.m_Callback != nullptr)
 			{
-				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, false);
 			}
 			continue;
 		}
@@ -275,7 +275,7 @@ void cChunkGenerator::Execute(void)
 		DoGenerate(item.m_ChunkX, item.m_ChunkZ);
 		if (item.m_Callback != nullptr)
 		{
-			item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+			item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, true);
 		}
 		NumChunksGenerated++;
 	}  // while (!bStop)
@@ -296,8 +296,8 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ)
 	m_PluginInterface->CallHookChunkGenerated(ChunkDesc);
 
 	#ifdef _DEBUG
-	// Verify that the generator has produced valid data:
-	ChunkDesc.VerifyHeightmap();
+		// Verify that the generator has produced valid data:
+		ChunkDesc.VerifyHeightmap();
 	#endif
 
 	m_ChunkSink->OnChunkGenerated(ChunkDesc);

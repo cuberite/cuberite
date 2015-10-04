@@ -238,12 +238,12 @@ void cLightingThread::Execute(void)
 
 void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 {
-	// If the chunk is already lit, skip it:
+	// If the chunk is already lit, skip it (report as success):
 	if (m_World->IsChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ))
 	{
 		if (a_Item.m_CallbackAfter != nullptr)
 		{
-			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
+			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
 		}
 		return;
 	}
@@ -324,7 +324,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 
 	if (a_Item.m_CallbackAfter != nullptr)
 	{
-		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
+		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
 	}
 }
 

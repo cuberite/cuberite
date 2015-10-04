@@ -348,11 +348,11 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 		}
 
 		// cChunkCoordCallback override:
-		virtual void Call(int a_CBChunkX, int a_CBChunkZ) override
+		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
 		{
 			if (m_Callback.IsValid())
 			{
-				m_LuaState.Call(m_Callback, a_CBChunkX, a_CBChunkZ);
+				m_LuaState.Call(m_Callback, a_CBChunkX, a_CBChunkZ, a_IsSuccess);
 			}
 
 			// This is the last reference of this object, we must delete it so that it doesn't leak:

@@ -2396,10 +2396,10 @@ void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkC
 		return;
 	}
 
-	// The chunk is present and lit, just call the callback:
+	// The chunk is present and lit, just call the callback, report as success:
 	if (a_Callback != nullptr)
 	{
-		a_Callback->Call(a_ChunkX, a_ChunkZ);
+		a_Callback->Call(a_ChunkX, a_ChunkZ, true);
 	}
 }
 
@@ -2432,9 +2432,19 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 			}
 
 			// cChunkCoordCallback override:
-			virtual void Call(int a_CBChunkX, int a_CBChunkZ) override
+			virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_CBIsSuccess) override
 			{
-				// The chunk has been loaded or an error occurred, check if it's valid now:
+				// If success is reported, the chunk is already valid, no need to do anything else:
+				if (a_CBIsSuccess)
+				{
+					if (m_Callback != nullptr)
+					{
+						m_Callback->Call(a_CBChunkX, a_CBChunkZ, true);
+					}
+					return;
+				}
+
+				// The chunk failed to load, generate it:
 				cCSLock Lock(m_ChunkMap.m_CSLayers);
 				cChunkPtr CBChunk = m_ChunkMap.GetChunkNoLoad(a_CBChunkX, a_CBChunkZ);
 
@@ -2443,23 +2453,13 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 					// An error occurred, but we promised to call the callback, so call it even when there's no real chunk data:
 					if (m_Callback != nullptr)
 					{
-						m_Callback->Call(a_CBChunkX, a_CBChunkZ);
+						m_Callback->Call(a_CBChunkX, a_CBChunkZ, false);
 					}
 					return;
 				}
 
-				// If the chunk is not valid, queue it in the generator:
-				if (!CBChunk->IsValid())
-				{
-					m_World.GetGenerator().QueueGenerateChunk(a_CBChunkX, a_CBChunkZ, false, m_Callback);
-					return;
-				}
-
-				// The chunk was loaded, call the callback:
-				if (m_Callback != nullptr)
-				{
-					m_Callback->Call(a_CBChunkX, a_CBChunkZ);
-				}
+				CBChunk->SetPresence(cChunk::cpQueued);
+				m_World.GetGenerator().QueueGenerateChunk(a_CBChunkX, a_CBChunkZ, false, m_Callback);
 			}
 
 		protected:
@@ -2474,7 +2474,7 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 	// The chunk is valid, just call the callback:
 	if (a_Callback != nullptr)
 	{
-		a_Callback->Call(a_ChunkX, a_ChunkZ);
+		a_Callback->Call(a_ChunkX, a_ChunkZ, true);
 	}
 	return true;
 }

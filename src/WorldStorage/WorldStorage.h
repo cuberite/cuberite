@@ -63,12 +63,14 @@ public:
 
 	cWorldStorage(void);
 	~cWorldStorage();
-	
+
+	/** Queues a chunk to be loaded, asynchronously.
+	The callback, if specified, will be called with the result of the load operation. */
 	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
+
+	/** Queues a chunk to be saved, asynchronously.
+	The callback, if specified, will be called with the result of the save operation. */
 	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
-	
-	void UnqueueLoad(int a_ChunkX, int a_ChunkZ);
-	void UnqueueSave(const cChunkCoords & a_Chunk);
 	
 	bool Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor);  // Hide the cIsThread's Start() method, we need to provide args
 	void Stop(void);  // Hide the cIsThread's Stop() method, we need to signal the event
