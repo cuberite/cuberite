@@ -73,6 +73,10 @@ public:
 		int a_MaxUp = 1, int a_MaxDown = 1
 	);
 
+
+	/** Constructs a dummy cPath that shouldn't be used. */
+	cPath();
+
 	/** Performs part of the path calculation and returns the appropriate status.
 	If NEARBY_FOUND is returned, it means that the destination is not reachable, but a nearby destination
 	is reachable. If the user likes the alternative destination, they can call AcceptNearbyPath to treat the path as found,

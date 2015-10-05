@@ -4,10 +4,11 @@
 #include "PathFinder.h"
 #include "../Chunk.h"
 
-cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight)
-	: m_Path(nullptr)
-	, m_GiveUpCounter(0)
-	, m_TicksSinceLastPathReset(1000)
+cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
+	m_Path(),
+	m_PathIsvalid(false),
+	m_GiveUpCounter(0),
+	m_TicksSinceLastPathReset(1000)
 {
 	m_Width = a_MobWidth;
 	m_Height = a_MobHeight;
@@ -54,7 +55,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		}
 	}
 
-	if (m_Path == nullptr)
+	if (m_PathIsvalid == false)
 	{
 		if (!EnsureProperDestination(a_Chunk))
 		{
@@ -65,15 +66,16 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		m_NoPathToTarget = false;
 		m_NoMoreWayPoints = false;
 		m_PathDestination = m_FinalDestination;
-		m_Path = new cPath(a_Chunk, m_Source, m_PathDestination, 20, m_Width, m_Height);
+		m_Path = cPath(a_Chunk, m_Source, m_PathDestination, 20, m_Width, m_Height);
+		m_PathIsvalid = true;
 	}
 
-	switch (m_Path->Step(a_Chunk))
+	switch (m_Path.Step(a_Chunk))
 	{
 		case ePathFinderStatus::NEARBY_FOUND:
 		{
 			m_NoPathToTarget = true;
-			m_PathDestination = m_Path->AcceptNearbyPath();
+			m_PathDestination = m_Path.AcceptNearbyPath();
 			return ePathFinderStatus::PATH_FOUND;
 		}
 
@@ -93,11 +95,11 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 				ResetPathFinding();  // Try to calculate a path again.
 				return ePathFinderStatus::CALCULATING;
 			}
-			else if (!m_Path->IsLastPoint())  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
+			else if (!m_Path.IsLastPoint())  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
 			{
-				if ((m_Path->IsFirstPoint() || (m_NextWayPointPosition - m_Source).SqrLength() < 0.25))
+				if ((m_Path.IsFirstPoint() || (m_NextWayPointPosition - m_Source).SqrLength() < 0.25))
 				{
-					m_NextWayPointPosition = m_Path->GetNextPoint();
+					m_NextWayPointPosition = m_Path.GetNextPoint();
 					a_OutputWaypoint = m_NextWayPointPosition;
 					m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
 				}
@@ -127,11 +129,7 @@ void cPathFinder::ResetPathFinding(void)
 {
 	m_TicksSinceLastPathReset = 0;
 	m_NoMoreWayPoints = false;
-	if (m_Path != nullptr)
-	{
-		delete m_Path;
-		m_Path = nullptr;
-	}
+	m_PathIsvalid = false;
 }
 
 

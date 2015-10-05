@@ -25,6 +25,14 @@ bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
 
 
 
+cPath::cPath()
+{
+
+}
+
+
+
+
 
 /* cPath implementation */
 cPath::cPath(
