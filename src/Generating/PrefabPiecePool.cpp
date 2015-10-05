@@ -287,6 +287,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 	{
 		return false;
 	}
+	prefab->SetHitBox(Hitbox);
 
 	// Read the connectors
 	if (!ReadConnectorsCubesetVer1(a_FileName, a_LuaState, PieceName, prefab.get(), a_LogWarnings))

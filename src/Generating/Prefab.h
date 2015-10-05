@@ -146,6 +146,9 @@ public:
 	/** Sets the flag whether the lowest layer of the prefab should be repeated downwards until it hits a solid block. */
 	void SetExtendFloor(bool a_ShouldExtendFloor) { m_ShouldExtendFloor = a_ShouldExtendFloor; }
 
+	/** Sets the internal hitbox to the specified value. */
+	void SetHitBox(const cCuboid & a_HitBox) { m_HitBox = a_HitBox; }
+
 protected:
 	/** Packs complete definition of a single block, for per-letter assignment. */
 	struct sBlockTypeDef
