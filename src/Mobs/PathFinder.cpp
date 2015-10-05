@@ -158,7 +158,7 @@ bool cPathFinder::EnsureProperDestination(cChunk & a_Chunk)
 		{
 			for (x = -1; x <= 1; ++x)
 			{
-				if ((x==0) && (z==0))
+				if ((x == 0) && (z == 0))
 				{
 					continue;
 				}
