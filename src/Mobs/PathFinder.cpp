@@ -75,7 +75,6 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 			m_NoPathToTarget = true;
 			m_PathFinderDestination = m_Path->AcceptNearbyPath();
 			return ePathFinderStatus::PATH_FOUND;
-			break;
 		}
 
 		case ePathFinderStatus::PATH_NOT_FOUND:
@@ -111,10 +110,6 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 			m_IsFollowingPath = true;
 			return ePathFinderStatus::PATH_FOUND;
 		}
-
-	default:  // Dummy to get rid of compiler warning.
-		return ePathFinderStatus::PATH_FOUND;
-		break;
 	}
 }
 

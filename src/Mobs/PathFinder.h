@@ -33,7 +33,6 @@ private:
 	/* If 0, will give up reaching the next m_NextWayPointPosition and will re-compute path. */
 	int m_GiveUpCounter;
 	int m_TicksSinceLastPathReset;
-	int m_JumpCoolDown;
 
 	/** Coordinates of the next position that should be reached */
 	Vector3d m_NextWayPointPosition;
