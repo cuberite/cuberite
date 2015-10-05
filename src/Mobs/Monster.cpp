@@ -239,6 +239,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			case ePathFinderStatus::PATH_FOUND:
 			case ePathFinderStatus::NEARBY_FOUND:
+			{
 				/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
 				1. I am idle
 				2. I was not hurt by a player recently.
@@ -258,7 +259,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					a_IsFollowingPath = true;  // Used for proper body / head orientation only.
 					MoveToWayPoint(*Chunk);
 				}
-				break;
+			}
 			default:
 			{
 

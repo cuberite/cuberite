@@ -11,7 +11,6 @@ cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight)
 {
 	m_Width = a_MobWidth;
 	m_Height = a_MobHeight;
-
 }
 
 
