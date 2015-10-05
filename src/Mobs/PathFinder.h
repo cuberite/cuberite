@@ -51,9 +51,6 @@ private:
 	/** The current cPath instance we have. This is discarded and recreated when a path recalculation is needed. */
 	cPath m_Path;
 
-	/** If false, it means that m_Path should be initialized using m_Path = cPath(...) before use. */
-	bool m_PathIsvalid;
-
 	/** If 0, will give up reaching the next m_NextWayPointPosition and will recalculate path. */
 	int m_GiveUpCounter;
 

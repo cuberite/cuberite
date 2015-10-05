@@ -6,7 +6,6 @@
 
 cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
 	m_Path(),
-	m_PathIsvalid(false),
 	m_GiveUpCounter(0),
 	m_TicksSinceLastPathReset(1000)
 {
@@ -55,7 +54,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		}
 	}
 
-	if (m_PathIsvalid == false)
+	if (m_Path.IsValid() == false)
 	{
 		if (!EnsureProperDestination(a_Chunk))
 		{
@@ -67,7 +66,6 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		m_NoMoreWayPoints = false;
 		m_PathDestination = m_FinalDestination;
 		m_Path = cPath(a_Chunk, m_Source, m_PathDestination, 20, m_Width, m_Height);
-		m_PathIsvalid = true;
 	}
 
 	switch (m_Path.Step(a_Chunk))
@@ -129,7 +127,7 @@ void cPathFinder::ResetPathFinding(void)
 {
 	m_TicksSinceLastPathReset = 0;
 	m_NoMoreWayPoints = false;
-	m_PathIsvalid = false;
+	m_Path = cPath();  // "Destroy" our path.
 }
 
 

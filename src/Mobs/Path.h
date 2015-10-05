@@ -77,6 +77,9 @@ public:
 	/** Constructs a dummy cPath that shouldn't be used. */
 	cPath();
 
+	/** Returns false if this cPath was constructed with an empty constructor and shouldn't be used. */
+	bool IsValid();
+
 	/** Performs part of the path calculation and returns the appropriate status.
 	If NEARBY_FOUND is returned, it means that the destination is not reachable, but a nearby destination
 	is reachable. If the user likes the alternative destination, they can call AcceptNearbyPath to treat the path as found,
@@ -149,7 +152,7 @@ private:
 
 	/* Control fields */
 	ePathFinderStatus m_Status;
-
+	bool m_IsValid;
 	/* Final path fields */
 	size_t m_CurrentPoint;
 	std::vector<Vector3i> m_PathPoints;

@@ -25,14 +25,6 @@ bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
 
 
 
-cPath::cPath()
-{
-
-}
-
-
-
-
 
 /* cPath implementation */
 cPath::cPath(
@@ -42,6 +34,7 @@ cPath::cPath(
 	int a_MaxUp, int a_MaxDown
 ) :
 	m_StepsLeft(a_MaxSteps),
+	m_IsValid(true),
 	m_CurrentPoint(0),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
 	m_Chunk(&a_Chunk),
 	m_BadChunkFound(false)
@@ -74,6 +67,21 @@ cPath::cPath(
 	m_Status = ePathFinderStatus::CALCULATING;
 
 	ProcessCell(GetCell(m_Source), nullptr, 0);
+}
+
+
+
+
+
+cPath::cPath() : m_IsValid(false) { }
+
+
+
+
+
+bool cPath::IsValid()
+{
+	return m_IsValid;
 }
 
 
