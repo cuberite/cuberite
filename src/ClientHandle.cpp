@@ -456,7 +456,7 @@ bool cClientHandle::StreamNextChunk(void)
 				// If the chunk already loading / loaded -> skip
 				if (
 					(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
-					(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+					(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
 				)
 				{
 					continue;
@@ -494,7 +494,7 @@ bool cClientHandle::StreamNextChunk(void)
 			// If the chunk already loading / loaded -> skip
 			if (
 				(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
-				(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+				(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
 			)
 			{
 				continue;
@@ -525,7 +525,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 	cChunkCoordsList ChunksToRemove;
 	{
 		cCSLock Lock(m_CSChunkLists);
-		for (cChunkCoordsList::iterator itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end();)
+		for (auto itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end();)
 		{
 			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
 			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
@@ -581,7 +581,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunk
 	{
 		{
 			cCSLock Lock(m_CSChunkLists);
-			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+			m_LoadedChunks.emplace(a_ChunkX, a_ChunkZ);
 			m_ChunksToSend.emplace(a_ChunkX, a_ChunkZ);
 		}
 		World->SendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, this);
@@ -1821,15 +1821,15 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 void cClientHandle::RemoveFromWorld(void)
 {
 	// Remove all associated chunks:
-	cChunkCoordsList Chunks;
+	decltype(m_LoadedChunks) Chunks;
 	{
 		cCSLock Lock(m_CSChunkLists);
 		std::swap(Chunks, m_LoadedChunks);
 		m_ChunksToSend.clear();
 	}
-	for (cChunkCoordsList::iterator itr = Chunks.begin(), end = Chunks.end(); itr != end; ++itr)
+	for (auto && Chunk : Chunks)
 	{
-		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
+		m_Protocol->SendUnloadChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ);
 	}  // for itr - Chunks[]
 
 	// Here, we set last streamed values to bogus ones so everything is resent
