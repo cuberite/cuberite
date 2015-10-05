@@ -1260,6 +1260,7 @@ void cPlayer::SetCapabilities()
 	if (IsGameModeSpectator())
 	{
 		SetVisible(false);
+		SetCanFly(true);
 	}
 	else
 	{
