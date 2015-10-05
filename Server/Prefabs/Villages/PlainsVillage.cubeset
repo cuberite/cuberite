@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2015-06-20 10:16:55",
+		ExportDate = "2015-10-05 21:08:55",
 		["AllowedBiomes"] = "Plains, Savanna, SavannaM, SunflowerPlains",
 		["IntendedUse"] = "Village",
 	},
@@ -74,7 +74,7 @@ Cubeset =
 				"b: 67: 0",  -- stairs
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
-				"e:  5: 0",  -- planks
+				"e:  5: 0",  -- wood
 				"f: 67: 3",  -- stairs
 				"g: 17: 0",  -- tree
 				"h: 64: 3",  -- wooddoorblock
@@ -462,11 +462,14 @@ Cubeset =
 				"d: 60: 7",  -- tilleddirt
 				"e:  8: 0",  -- water
 				"f: 60: 5",  -- tilleddirt
-				"g: 60: 4",  -- tilleddirt
-				"h: 60: 1",  -- tilleddirt
-				"i: 50: 5",  -- torch
-				"j: 59: 7",  -- crops
+				"g: 60: 2",  -- tilleddirt
+				"h: 60: 6",  -- tilleddirt
+				"i: 60: 0",  -- tilleddirt
+				"j: 60: 4",  -- tilleddirt
+				"k: 60: 3",  -- tilleddirt
+				"l: 50: 5",  -- torch
 				"m: 19: 0",  -- sponge
+				"n: 59: 7",  -- crops
 			},
 			BlockData =
 			{
@@ -494,25 +497,25 @@ Cubeset =
 
 				-- Level 2
 				"ccccccc.ccccccc",  --  0
-				"cddeddc.cddeddc",  --  1
-				"cddeddc.cddeddc",  --  2
-				"cddeddc.cddeddc",  --  3
-				"cddeddc.cddeddc",  --  4
-				"cddeddc.cddeddc",  --  5
-				"cdfeddc.cdgeddc",  --  6
-				"cdfefhc.cddeddc",  --  7
+				"cddeddc.cffegfc",  --  1
+				"cddeddc.chdeddc",  --  2
+				"cddeddc.cfheijc",  --  3
+				"cddeddc.ckhehdc",  --  4
+				"cddeddc.cdjedhc",  --  5
+				"cddeddc.cfhekdc",  --  6
+				"cddeddc.cdjefic",  --  7
 				"ccccccc.ccccccc",  --  8
 
 				-- Level 3
-				"i.....i.i.....i",  --  0
-				".jj.jj...jj.jj.",  --  1
-				".jj.jj...jj.jj.",  --  2
-				".jj.jj...jj.jj.",  --  3
-				".jj.jj...jj.jj.",  --  4
-				".jj.jj...jj.jj.",  --  5
-				".jj.jj...jj.jj.",  --  6
-				".jj.jj...jj.jj.",  --  7
-				"i.....i.i.....i",  --  8
+				"l.....l.l.....l",  --  0
+				".nn.nn...nn.nn.",  --  1
+				".nn.nn...nn.nn.",  --  2
+				".nn.nn...nn.nn.",  --  3
+				".nn.nn...nn.nn.",  --  4
+				".nn.nn...nn.nn.",  --  5
+				".nn.nn...nn.nn.",  --  6
+				".nn.nn...nn.nn.",  --  7
+				"l.....l.l.....l",  --  8
 
 				-- Level 4
 				"...............",  --  0
@@ -614,10 +617,10 @@ Cubeset =
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
 				"b:  3: 0",  -- dirt
-				"c:  5: 0",  -- planks
+				"c:  5: 0",  -- wood
 				"d:  2: 0",  -- grass
 				"e: 67: 2",  -- stairs
-				"f: 43: 0",  -- doublestep
+				"f: 43: 0",  -- doubleslab
 				"g: 67: 0",  -- stairs
 				"h: 67: 3",  -- stairs
 				"i: 17: 0",  -- tree
@@ -785,9 +788,8 @@ Cubeset =
 				"a:  3: 0",  -- dirt
 				"b: 17: 0",  -- tree
 				"c: 60: 7",  -- tilleddirt
-				"d: 60: 6",  -- tilleddirt
-				"e:  8: 0",  -- water
-				"f: 59: 7",  -- crops
+				"d:  8: 0",  -- water
+				"e: 59: 7",  -- crops
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -804,19 +806,19 @@ Cubeset =
 				-- Level 1
 				"bbbbbbbbbb",  --  0
 				"bccccccccb",  --  1
-				"bcccccdccb",  --  2
-				"beeeeeeeeb",  --  3
+				"bccccccccb",  --  2
+				"bddddddddb",  --  3
 				"bccccccccb",  --  4
 				"bccccccccb",  --  5
 				"bbbbbbbbbb",  --  6
 
 				-- Level 2
 				"..........",  --  0
-				".ffffffff.",  --  1
-				".ffffffff.",  --  2
+				".eeeeeeee.",  --  1
+				".eeeeeeee.",  --  2
 				"..........",  --  3
-				".ffffffff.",  --  4
-				".ffffffff.",  --  5
+				".eeeeeeee.",  --  4
+				".eeeeeeee.",  --  5
 				"..........",  --  6
 
 				-- Level 3
@@ -930,7 +932,7 @@ Cubeset =
 				"s: 50: 1",  -- torch
 				"t: 50: 2",  -- torch
 				"u: 53: 6",  -- woodstairs
-				"v:  5: 0",  -- planks
+				"v:  5: 0",  -- wood
 			},
 			BlockData =
 			{
@@ -1052,7 +1054,7 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  3: 0",  -- dirt
-				"b:  5: 0",  -- planks
+				"b:  5: 0",  -- wood
 				"c: 13: 0",  -- gravel
 				"d: 17: 0",  -- tree
 				"e: 60: 7",  -- tilleddirt
@@ -1096,12 +1098,12 @@ Cubeset =
 				-- Level 2
 				"ddddddddddddd",  --  0
 				"deefeefeefeed",  --  1
-				"deefeefeefeed",  --  2
+				"dgefeefeefeed",  --  2
 				"deefeefeefeed",  --  3
 				"deefeefeefeed",  --  4
 				"deefeefeefeed",  --  5
 				"deefeefeefeed",  --  6
-				"deefeefegfeed",  --  7
+				"deefeefeefeed",  --  7
 				"deefeefeefeed",  --  8
 				"deefeefeefeed",  --  9
 				"deefeefeefeed",  -- 10
@@ -1232,7 +1234,7 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  3: 0",  -- dirt
-				"b: 43: 0",  -- doublestep
+				"b: 43: 0",  -- doubleslab
 				"c:139: 0",  -- cobblestonewall
 				"d: 50: 4",  -- torch
 				"e: 50: 2",  -- torch
@@ -1337,8 +1339,8 @@ Cubeset =
 				"d: 67: 1",  -- stairs
 				"e: 67: 3",  -- stairs
 				"f: 17: 0",  -- tree
-				"g:  5: 0",  -- planks
-				"h: 64: 3",  -- wooddoorblock
+				"g:  5: 0",  -- wood
+				"h: 64: 7",  -- wooddoorblock
 				"i: 64: 1",  -- wooddoorblock
 				"j:102: 0",  -- glasspane
 				"k: 64: 9",  -- wooddoorblock
@@ -1504,9 +1506,9 @@ Cubeset =
 				"b: 67: 0",  -- stairs
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
-				"e: 43: 0",  -- doublestep
+				"e: 43: 0",  -- doubleslab
 				"f: 17: 0",  -- tree
-				"g:  5: 0",  -- planks
+				"g:  5: 0",  -- wood
 				"h: 64: 3",  -- wooddoorblock
 				"i: 96: 8",  -- trapdoor
 				"j: 61: 2",  -- furnace
@@ -1727,7 +1729,7 @@ Cubeset =
 					Type = -1,
 					RelX = 4,
 					RelY = 1,
-					RelZ = -1,
+					RelZ = 0,
 					Direction = 2,  -- Z-
 				},
 			},
@@ -1750,7 +1752,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h:102: 0",  -- glasspane
 				"i: 64: 9",  -- wooddoorblock
@@ -1885,7 +1887,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h:102: 0",  -- glasspane
 				"i: 64: 9",  -- wooddoorblock
@@ -2020,7 +2022,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h:102: 0",  -- glasspane
 				"i: 64: 9",  -- wooddoorblock
@@ -2190,7 +2192,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h:102: 0",  -- glasspane
 				"i: 64: 9",  -- wooddoorblock
@@ -2358,7 +2360,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h: 53: 3",  -- woodstairs
 				"i: 85: 0",  -- fence
@@ -2500,7 +2502,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h: 53: 3",  -- woodstairs
 				"i: 85: 0",  -- fence
@@ -2665,13 +2667,13 @@ Cubeset =
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
 				"b:  3: 0",  -- dirt
-				"c: 67: 0",  -- stairs
-				"d: 67: 2",  -- stairs
-				"e: 67: 1",  -- stairs
-				"f: 43: 0",  -- doublestep
-				"g:  2: 0",  -- grass
+				"c:  2: 0",  -- grass
+				"d: 67: 0",  -- stairs
+				"e: 67: 2",  -- stairs
+				"f: 67: 1",  -- stairs
+				"g: 43: 0",  -- doubleslab
 				"h: 17: 0",  -- tree
-				"i:  5: 0",  -- planks
+				"i:  5: 0",  -- wood
 				"j: 64: 3",  -- wooddoorblock
 				"k: 53: 3",  -- woodstairs
 				"l: 85: 0",  -- fence
@@ -2700,30 +2702,30 @@ Cubeset =
 				"mmbbbbbbbmm",  --  8
 				"mmbbbbbbbmm",  --  9
 				"mmbbbbbbbmm",  -- 10
-				"mmbbbbbbbmm",  -- 11
+				"mmcbbbbbbmm",  -- 11
 				"mmbbbbbbbmm",  -- 12
 
 				-- Level 1
-				"....cde....",  --  0
+				"....def....",  --  0
 				".aaaaaaaaa.",  --  1
-				".affffaaaa.",  --  2
-				".affffaaaa.",  --  3
-				".affffaaaa.",  --  4
-				".affffaaaa.",  --  5
-				".affffaaaa.",  --  6
+				".aggggaaaa.",  --  2
+				".aggggaaaa.",  --  3
+				".aggggaaaa.",  --  4
+				".aggggaaaa.",  --  5
+				".aggggaaaa.",  --  6
 				".aaaaaaaaa.",  --  7
-				"..ggggggg..",  --  8
-				"mmgggggggmm",  --  9
-				"mmgggggggmm",  -- 10
-				"mmgggggggmm",  -- 11
-				"mmgggggggmm",  -- 12
+				"..ccccccc..",  --  8
+				"mmcccccccmm",  --  9
+				"mmcccccccmm",  -- 10
+				"mmcccccccmm",  -- 11
+				"mmcccccccmm",  -- 12
 
 				-- Level 2
 				"...........",  --  0
 				".hiiijiiih.",  --  1
-				".i.f....ki.",  --  2
-				".i.f....li.",  --  3
-				".i.f....ni.",  --  4
+				".i.g....ki.",  --  2
+				".i.g....li.",  --  3
+				".i.g....ni.",  --  4
 				".i.......i.",  --  5
 				".i.......i.",  --  6
 				".hiiioiiih.",  --  7
@@ -2867,7 +2869,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h: 64: 9",  -- wooddoorblock
 				"i:102: 0",  -- glasspane
@@ -3002,7 +3004,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 0",  -- wooddoorblock
 				"h: 10: 0",  -- lava
 				"i: 54: 2",  -- chest
@@ -3018,7 +3020,7 @@ Cubeset =
 				"s: 50: 1",  -- torch
 				"t: 53: 6",  -- woodstairs
 				"u: 53: 3",  -- woodstairs
-				"v: 43: 0",  -- doublestep
+				"v: 43: 0",  -- doubleslab
 				"w: 44: 0",  -- step
 			},
 			BlockData =
@@ -3199,7 +3201,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 3",  -- wooddoorblock
 				"h:102: 0",  -- glasspane
 				"i: 64: 9",  -- wooddoorblock
@@ -3361,7 +3363,7 @@ Cubeset =
 				"d: 67: 2",  -- stairs
 				"e: 67: 1",  -- stairs
 				"f: 17: 0",  -- tree
-				"g:  5: 0",  -- planks
+				"g:  5: 0",  -- wood
 				"h:170: 4",  -- haybale
 				"i:170: 8",  -- haybale
 				"j: 54: 2",  -- chest
@@ -3513,7 +3515,7 @@ Cubeset =
 				"f: 17: 0",  -- tree
 				"g:107: 0",  -- fencegate
 				"h:107: 4",  -- fencegate
-				"i:  5: 0",  -- planks
+				"i:  5: 0",  -- wood
 				"j:107: 6",  -- fencegate
 				"k: 85: 0",  -- fence
 				"l:170: 0",  -- haybale
@@ -3689,7 +3691,7 @@ Cubeset =
 				"c: 67: 2",  -- stairs
 				"d: 67: 1",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 64: 1",  -- wooddoorblock
 				"h: 65: 3",  -- ladder
 				"i: 53: 3",  -- woodstairs
@@ -3997,7 +3999,7 @@ Cubeset =
 				"c: 67: 1",  -- stairs
 				"d: 67: 3",  -- stairs
 				"e: 17: 0",  -- tree
-				"f:  5: 0",  -- planks
+				"f:  5: 0",  -- wood
 				"g: 54: 4",  -- chest
 				"h:154: 4",  -- hopper
 				"i: 64: 0",  -- wooddoorblock
@@ -4356,7 +4358,7 @@ Cubeset =
 				"h: 85: 0",  -- fence
 				"i: 53: 2",  -- woodstairs
 				"j: 53: 7",  -- woodstairs
-				"k:  5: 0",  -- planks
+				"k:  5: 0",  -- wood
 				"l: 53: 4",  -- woodstairs
 				"m: 19: 0",  -- sponge
 				"n: 53: 5",  -- woodstairs
@@ -4412,12 +4414,12 @@ Cubeset =
 
 				-- Level 5
 				"ddddddd",  --  0
-				"dbbbbbd",  --  1
+				"ebbbbbd",  --  1
 				"dbcccbd",  --  2
 				"dbcccbd",  --  3
 				"dbcccbd",  --  4
 				"dbbbbbd",  --  5
-				"ddddddd",  --  6
+				"edddddd",  --  6
 
 				-- Level 6
 				"ddddddd",  --  0
@@ -4582,7 +4584,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 77: 2",  -- stonebutton
 				"c: 66: 6",  -- tracks
 				"d: 27: 1",  -- poweredrail
@@ -5011,7 +5013,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 85: 0",  -- fence
 				"c: 66: 1",  -- tracks
 				"d: 50: 2",  -- torch
@@ -5099,7 +5101,7 @@ Cubeset =
 				"c:126: 4",  -- woodenslab
 				"d: 86: 1",  -- pumpkin
 				"e:139: 1",  -- cobblestonewall
-				"f:163: 4",  -- acaciawoodstairs
+				"f:163: 4",  -- acaciawoodenstairs
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -5237,7 +5239,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 66: 0",  -- tracks
 				"c: 66: 1",  -- tracks
 				"m: 19: 0",  -- sponge
@@ -5431,7 +5433,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 66: 0",  -- tracks
 				"c: 66: 1",  -- tracks
 				"m: 19: 0",  -- sponge
@@ -5597,7 +5599,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 66: 0",  -- tracks
 				"c: 85: 0",  -- fence
 				"d: 66: 1",  -- tracks
@@ -5750,7 +5752,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 66: 0",  -- tracks
 				"c: 85: 0",  -- fence
 				"d: 66: 1",  -- tracks
@@ -5873,7 +5875,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 66: 1",  -- tracks
 				"c: 66: 2",  -- tracks
 				"d: 85: 0",  -- fence
@@ -5997,7 +5999,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 85: 0",  -- fence
 				"c: 66: 4",  -- tracks
 				"d: 66: 0",  -- tracks
@@ -6202,14 +6204,14 @@ Cubeset =
 					Type = 3,
 					RelX = 5,
 					RelY = 1,
-					RelZ = 1,
+					RelZ = 0,
 					Direction = 2,  -- Z-
 				},
 				{
 					Type = -3,
 					RelX = 5,
 					RelY = 1,
-					RelZ = 1,
+					RelZ = 0,
 					Direction = 2,  -- Z-
 				},
 			},
@@ -6227,7 +6229,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 66: 0",  -- tracks
 				"c: 66: 5",  -- tracks
 				"d: 85: 0",  -- fence
@@ -6482,7 +6484,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  5: 0",  -- planks
+				"a:  5: 0",  -- wood
 				"b: 85: 0",  -- fence
 				"c: 66: 1",  -- tracks
 				"d: 50: 2",  -- torch
