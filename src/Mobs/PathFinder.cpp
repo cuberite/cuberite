@@ -17,6 +17,8 @@ cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight)
 
 
 
+
+
 ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Source, Vector3d a_Destination, Vector3d &a_OutputWaypoint)
 {
 	m_FinalDestination = a_Destination;
@@ -34,14 +36,14 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		return false;
 	} */
 
-	if ((m_FinalDestination - m_PathFinderDestination).Length() > 0.25)  // if the distance between where we're going and where we should go is too big.
+	if ((m_FinalDestination - m_PathDestination).Length() > 0.25)  // if the distance between where we're going and where we should go is too big.
 	{
 		/* If we reached the last path waypoint,
 		Or if we haven't re-calculated for too long.
 		Interval is proportional to distance squared, and its minimum is 10.
 		(Recalculate lots when close, calculate rarely when far) */
 		if (
-			((m_Source - m_PathFinderDestination).Length() < 0.25) ||
+			((m_Source - m_PathDestination).Length() < 0.25) ||
 			((m_TicksSinceLastPathReset > 10) && (m_TicksSinceLastPathReset > (0.4 * (m_FinalDestination - m_Source).SqrLength())))
 		)
 		{
@@ -64,8 +66,8 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		m_GiveUpCounter = 40;
 		m_NoPathToTarget = false;
 		m_NoMoreWayPoints = false;
-		m_PathFinderDestination = m_FinalDestination;
-		m_Path = new cPath(a_Chunk, m_Source, m_PathFinderDestination, 20, m_Width, m_Height);
+		m_PathDestination = m_FinalDestination;
+		m_Path = new cPath(a_Chunk, m_Source, m_PathDestination, 20, m_Width, m_Height);
 	}
 
 	switch (m_Path->Step(a_Chunk))
@@ -73,7 +75,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		case ePathFinderStatus::NEARBY_FOUND:
 		{
 			m_NoPathToTarget = true;
-			m_PathFinderDestination = m_Path->AcceptNearbyPath();
+			m_PathDestination = m_Path->AcceptNearbyPath();
 			return ePathFinderStatus::PATH_FOUND;
 		}
 
@@ -114,6 +116,9 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 }
 
 
+
+
+
 void cPathFinder::ResetPathFinding(void)
 {
 	m_TicksSinceLastPathReset = 0;
@@ -125,6 +130,9 @@ void cPathFinder::ResetPathFinding(void)
 		m_Path = nullptr;
 	}
 }
+
+
+
 
 
 bool cPathFinder::EnsureProperDestination(cChunk & a_Chunk)
