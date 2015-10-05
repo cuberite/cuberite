@@ -6,7 +6,6 @@
 
 cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight)
 	: m_Path(nullptr)
-	, m_IsFollowingPath(false)
 	, m_GiveUpCounter(0)
 	, m_TicksSinceLastPathReset(1000)
 {
@@ -109,7 +108,6 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 				m_NoMoreWayPoints = true;
 			}
 
-			m_IsFollowingPath = true;
 			return ePathFinderStatus::PATH_FOUND;
 		}
 	}
@@ -122,7 +120,6 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 void cPathFinder::ResetPathFinding(void)
 {
 	m_TicksSinceLastPathReset = 0;
-	m_IsFollowingPath = false;
 	m_NoMoreWayPoints = false;
 	if (m_Path != nullptr)
 	{
