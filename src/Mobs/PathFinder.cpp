@@ -35,14 +35,14 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		return false;
 	} */
 
-	if ((m_FinalDestination - m_PathDestination).Length() > 0.25)  // if the distance between where we're going and where we should go is too big.
+	if ((m_FinalDestination - m_PathDestination).SqrLength() > 0.25 * 0.25)  // if the distance between where we're going and where we should go is too big.
 	{
 		/* If we reached the last path waypoint,
 		Or if we haven't re-calculated for too long.
 		Interval is proportional to distance squared, and its minimum is 10.
 		(Recalculate lots when close, calculate rarely when far) */
 		if (
-			((m_Source - m_PathDestination).Length() < 0.25) ||
+			((m_Source - m_PathDestination).SqrLength() > 0.25 * 0.25) ||
 			((m_TicksSinceLastPathReset > 10) && (m_TicksSinceLastPathReset > (0.4 * (m_FinalDestination - m_Source).SqrLength())))
 		)
 		{
@@ -114,7 +114,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk &a_Chunk, Vector3d a_Sourc
 		default:
 		{
 			return ePathFinderStatus::PATH_FOUND;
-			// Fixes GCC warning: PathFinder.cpp:114: warning: control reaches end of non-void function.
+			// Fixes GCC warning: "control reaches end of non-void function".
 		}
 		#endif
 	}
