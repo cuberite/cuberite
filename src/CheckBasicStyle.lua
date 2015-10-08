@@ -187,11 +187,19 @@ local g_ViolationPatterns =
 	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%/[a-zA-Z0-9]+", "Add space around /"},
 
 	-- Check spaces around "&":
-	{"^[a-zA-Z0-9]+%&[a-zA-Z0-9]+",                             "Add space around /"},
-	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%&[a-zA-Z0-9]+",  "Add space around /"},
+	{"^[a-zA-Z0-9]+%&[a-zA-Z0-9]+",                             "Add space around &"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%&[a-zA-Z0-9]+",  "Add space around &"},
 	{"^[a-zA-Z0-9]+%& [a-zA-Z0-9]+",                            "Add space before &"},
 	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%& [a-zA-Z0-9]+", "Add space before &"},
 	
+	-- Check spaces around "==", "<=" and ">=":
+	{"==[a-zA-Z0-9]+",                             "Add space after =="},
+	{"[a-zA-Z0-9]+==",                             "Add space before =="},
+	{"<=[a-zA-Z0-9]+",                             "Add space after <="},
+	{"[a-zA-Z0-9]+<=",                             "Add space before <="},
+	{">=[a-zA-Z0-9]+",                             "Add space after >="},
+	{"[a-zA-Z0-9]+>=",                             "Add space before >="},
+
 	-- We don't like "Type const *" and "Type const &". Use "const Type *" and "const Type &" instead:
 	{"const %&", "Use 'const Type &' instead of 'Type const &'"},
 	{"const %*", "Use 'const Type *' instead of 'Type const *'"},
