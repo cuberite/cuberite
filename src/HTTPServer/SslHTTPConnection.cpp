@@ -56,6 +56,8 @@ void cSslHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 		if (NumRead > 0)
 		{
 			super::OnReceivedData(Buffer, static_cast<size_t>(NumRead));
+			// The link may have closed while processing the data, bail out:
+			return;
 		}
 		else if (NumRead == POLARSSL_ERR_NET_WANT_READ)
 		{
