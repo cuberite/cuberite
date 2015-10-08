@@ -626,25 +626,15 @@ static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 	// Function signature:
 	// LinkInstance:StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword) -> [true] or [nil, ErrMsg]
 
-	cLuaState S(L);
-	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
-		!S.CheckParamString(2, 4) ||
-		!S.CheckParamEnd(5)
-	)
-	{
-		return 0;
-	}
-	
 	// Get the link:
-	cLuaTCPLink * Link;
+	cLuaState S(L);
 	if (lua_isnil(L, 1))
 	{
 		LOGWARNING("cTCPLink:StartTLSClient(): invalid link object. Stack trace:");
 		S.LogStackTrace();
 		return 0;
 	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
 
 	// Read the params:
 	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword;
