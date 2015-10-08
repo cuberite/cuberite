@@ -320,7 +320,7 @@ bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
 		{
 			for (x = -1; x <= 1; ++x)
 			{
-				if ((x==0) && (z==0))
+				if ((x == 0) && (z == 0))
 				{
 					continue;
 				}
@@ -329,8 +329,8 @@ bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
 				{
 					return false;
 				}
-				RelX = FloorC(m_FinalDestination.x+x) - Chunk->GetPosX() * cChunkDef::Width;
-				RelZ = FloorC(m_FinalDestination.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
+				RelX = FloorC(m_FinalDestination.x + x) - Chunk->GetPosX() * cChunkDef::Width;
+				RelZ = FloorC(m_FinalDestination.z + z) - Chunk->GetPosZ() * cChunkDef::Width;
 				Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
 				if (cBlockInfo::IsSolid(BlockType))
 				{
