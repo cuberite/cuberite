@@ -34,6 +34,7 @@ if(DEFINED ENV{CUBERITE_BUILD_ID})
 		message("Commit id not set, attempting to determine id from git")
 		execute_process(
 			COMMAND git rev-parse HEAD
+			WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 			RESULT_VARIABLE GIT_EXECUTED
 			OUTPUT_VARIABLE BUILD_COMMIT_ID
 		)
@@ -48,6 +49,7 @@ else()
 	set(BUILD_SERIES_NAME "local build")
 	execute_process(
 		COMMAND git rev-parse HEAD
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 		RESULT_VARIABLE GIT_EXECUTED
 		OUTPUT_VARIABLE BUILD_COMMIT_ID
 	)
@@ -57,6 +59,7 @@ else()
 	string(STRIP ${BUILD_COMMIT_ID} BUILD_COMMIT_ID)
 	execute_process(
 		COMMAND git log -1 --date=iso --pretty=format:%ai
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 		RESULT_VARIABLE GIT_EXECUTED
 		OUTPUT_VARIABLE BUILD_DATETIME
 	)
