@@ -51,6 +51,14 @@ cPath::cPath(
 	m_Source.x = FloorC(a_StartingPoint.x - HalfWidthInt);
 	m_Source.y = FloorC(a_StartingPoint.y);
 	m_Source.z = FloorC(a_StartingPoint.z - HalfWidthInt);
+	
+	if ((m_Source.y <= 0) || (m_Destination.y <= 0)
+		|| (m_Source.y > 256) || (m_Destination.y > 256))
+	{
+		// The source or destination is outside the world, so cannot path
+		m_Status = ePathFinderStatus::PATH_NOT_FOUND;
+		return;
+	}
 
 	m_Destination.x = FloorC(a_EndingPoint.x - HalfWidthInt);
 	m_Destination.y = FloorC(a_EndingPoint.y);
