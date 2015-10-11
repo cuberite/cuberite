@@ -1749,6 +1749,7 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	-- Save any found items to a file:
 	local f = io.open("NewlyUndocumented.lua", "w")
 	f:write(table.concat(res, "\n"))
+	f:write("\n")
 	f:close()
 	
 	return true, "Newly undocumented items: " .. #res .. "\n" .. table.concat(res, "\n")
