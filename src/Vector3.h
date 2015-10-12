@@ -426,7 +426,6 @@ typedef Vector3<int>    Vector3i;
 
 
 
-typedef std::list<Vector3i>   cVector3iList;
 typedef std::vector<Vector3i> cVector3iArray;
 
 
