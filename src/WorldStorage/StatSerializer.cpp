@@ -102,7 +102,7 @@ bool cStatSerializer::LoadStatFromJSON(const Json::Value & a_In)
 {
 	m_Manager->Reset();
 
-	for (Json::ValueIterator it = a_In.begin() ; it != a_In.end() ; ++it)
+	for (Json::Value::const_iterator it = a_In.begin() ; it != a_In.end() ; ++it)
 	{
 		AString StatName = it.key().asString();
 
@@ -114,7 +114,7 @@ bool cStatSerializer::LoadStatFromJSON(const Json::Value & a_In)
 			continue;
 		}
 
-		Json::Value & Node = *it;
+		const Json::Value & Node = *it;
 
 		if (Node.isInt())
 		{

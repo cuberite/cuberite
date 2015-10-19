@@ -853,11 +853,11 @@ void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt32(Properties.size());
-	for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
+	for (auto & Node : Properties)
 	{
-		Pkt.WriteString(static_cast<Json::Value>(*itr).get("name", "").asString());
-		Pkt.WriteString(static_cast<Json::Value>(*itr).get("value", "").asString());
-		AString Signature = static_cast<Json::Value>(*itr).get("signature", "").asString();
+		Pkt.WriteString(Node.get("name", "").asString());
+		Pkt.WriteString(Node.get("value", "").asString());
+		AString Signature = Node.get("signature", "").asString();
 		if (Signature.empty())
 		{
 			Pkt.WriteBool(false);
