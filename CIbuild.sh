@@ -14,7 +14,7 @@ fi
 cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1;
 
 echo "Building..."
-make -j 2;
+VERBOSE=1 make -j 2;
 make -j 2 test ARGS="-V";
 
 echo "Testing..."
