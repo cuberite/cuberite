@@ -75,10 +75,10 @@ void cEnderChestEntity::OpenNewWindow()
 void cEnderChestEntity::LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid)
 {
 	int SlotIdx = 0;
-	for (Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr)
+	for (auto & Node : a_Value)
 	{
 		cItem Item;
-		Item.FromJson(*itr);
+		Item.FromJson(Node);
 		a_Grid.SetSlot(SlotIdx, Item);
 		SlotIdx++;
 	}

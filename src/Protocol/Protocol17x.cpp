@@ -3222,11 +3222,11 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt32(Properties.size());
 
-	for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
+	for (auto & Node : Properties)
 	{
-		Pkt.WriteString(itr->get("name", "").asString());
-		Pkt.WriteString(itr->get("value", "").asString());
-		Pkt.WriteString(itr->get("signature", "").asString());
+		Pkt.WriteString(Node.get("name", "").asString());
+		Pkt.WriteString(Node.get("value", "").asString());
+		Pkt.WriteString(Node.get("signature", "").asString());
 	}
 
 	Pkt.WriteFPInt(a_Player.GetPosX());
