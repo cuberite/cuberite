@@ -236,6 +236,17 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				}
 				return CanSpawn && HasFloor && (SkyLight <= 7) && (BlockLight <= 7);
 			}
+
+			case mtCaveSpider:
+			{
+				return (
+					(TargetBlock == E_BLOCK_AIR) &&
+					(!cBlockInfo::IsTransparent(BlockBelow)) &&
+					(SkyLight <= 7) &&
+					(BlockLight <= 7) &&
+					(Random.NextInt(2) == 0)
+				);
+			}
 			
 			case mtCreeper:
 			case mtSkeleton:
