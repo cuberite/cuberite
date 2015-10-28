@@ -21,7 +21,6 @@ Here are the conventions:
  * Add those extra parentheses to conditions, especially in C++:
   - `if ((a == 1) && ((b == 2) || (c == 3)))` instead of ambiguous `if (a == 1 && b == 2 || c == 3)`
   - This helps prevent mistakes such as `if (a & 1 == 0)`
- * 
  * Use the provided wrappers for OS stuff:
   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timers through `cTimer`, high-precision sleep through `cSleep`
  * No magic numbers, use named constants:
