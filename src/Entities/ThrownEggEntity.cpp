@@ -32,7 +32,11 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_H
 void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
 	int TotalDamage = 0;
-	// TODO: If entity is Ender Crystal, destroy it
+	//If entity is Ender Crystal, destroy it
+	if(a_EntityHit.IsEnderCrystal)
+	{
+		a_EntityHit.Destroy();
+	}
 	
 	TrySpawnChicken(a_HitPos);
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
