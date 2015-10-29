@@ -1160,33 +1160,17 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 		{
 			// MCS feature - stone pressure plates can only be triggered by players :D
 			cPlayer * a_Player = this->m_World.FindClosestPlayer(Vector3f(BlockX + 0.5f, static_cast<float>(a_RelBlockY), BlockZ + 0.5f), 0.5f, false);
-			static Int64 m_PlayerLastOnPlate = 0;
-			static bool m_WasPlayerOnPlate = false;
 
 			if (a_Player != nullptr)
 			{
-				if (m_WasPlayerOnPlate == false)
-				{
-					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
-				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x1);
 				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 				SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
-				m_WasPlayerOnPlate = true;
-				m_PlayerLastOnPlate = this->m_World.GetWorldAge();
 			}
 			else
 			{
-				if (m_PlayerLastOnPlate+10 <= this->m_World.GetWorldAge())
-				{
-					m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x0);
-					SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
-					if (m_WasPlayerOnPlate == true)
-					{
-						m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.5F);
-					}
-					m_WasPlayerOnPlate = false;
-				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x0);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 			}
 			break;
 		}
@@ -1234,12 +1218,10 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
 			this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
 
-			static Int64 m_PlayerLastOnPlate = 0;
 			unsigned char Power;
 			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 			if (PressurePlateCallback.GetPowerLevel(Power))
 			{
-				m_PlayerLastOnPlate = this->m_World.GetWorldAge();
 				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
 					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.5F);
@@ -1250,15 +1232,12 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			}
 			else
 			{
-				if (m_PlayerLastOnPlate+10 <= this->m_World.GetWorldAge())
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
-					if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
-					{
-						m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
-					}
-					m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-					SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
 				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 			}
 
 			break;
@@ -1307,12 +1286,10 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
 			this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
 
-			static Int64 m_PlayerLastOnPlate = 0;
 			unsigned char Power;
 			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 			if (PressurePlateCallback.GetPowerLevel(Power))
 			{
-				m_PlayerLastOnPlate = this->m_World.GetWorldAge();
 				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
 					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.5F);
@@ -1323,15 +1300,12 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			}
 			else
 			{
-				if (m_PlayerLastOnPlate+10 <= this->m_World.GetWorldAge())
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
-					if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
-					{
-						m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
-					}
-					m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-					SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
 				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 			}
 
 			break;
@@ -1380,11 +1354,9 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
 			this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
 
-			static Int64 m_PlayerLastOnPlate = 0;
 			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 			if (PressurePlateCallback.FoundEntity())
 			{
-				m_PlayerLastOnPlate = this->m_World.GetWorldAge();
 				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
 					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.5F);
@@ -1395,15 +1367,12 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			}
 			else
 			{
-				if (m_PlayerLastOnPlate+10 <= this->m_World.GetWorldAge())
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
-					if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
-					{
-						m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
-					}
-					m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-					SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
 				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 			}
 			break;
 		}
