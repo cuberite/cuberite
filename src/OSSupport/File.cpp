@@ -334,7 +334,7 @@ bool cFile::DeleteFolder(const AString & a_FolderName)
 bool cFile::DeleteFolderContents(const AString & a_FolderName)
 {
 	auto Contents = cFile::GetFolderContents(a_FolderName);
-	for (const auto item: Contents)
+	for (const auto & item: Contents)
 	{
 		// Skip "." and ".." altogether:
 		if ((item == ".") || (item == ".."))
