@@ -367,7 +367,7 @@ public:
 	/** Sets whether the entity is fireproof */
 	void SetIsFireproof(bool a_IsFireproof);
 	
-	bool IsFireproof(void) const { return m_IsFireproof; }
+	virtual bool IsFireproof(void) const { return m_IsFireproof; }
 	
 	/** Puts the entity on fire for the specified amount of ticks */
 	void StartBurning(int a_TicksLeftBurning);

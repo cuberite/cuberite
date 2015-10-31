@@ -23,6 +23,8 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	
+	virtual bool IsFireproof(void) const override;
+	
 	// tolua_begin
 	
 	/** Applies an entity effect
@@ -38,6 +40,11 @@ public:
 	@param a_EffectType The entity effect to remove
 	*/
 	void RemoveEntityEffect(cEntityEffect::eType a_EffectType);
+	
+	/** Returns true, if the entity effect is currently applied
+	@param a_EffectType The entity effect to check
+	*/
+	bool HasEntityEffect(cEntityEffect::eType a_EffectType) const;
 	
 	/** Removes all currently applied entity effects (used when drinking milk) */
 	void ClearEntityEffects(void);

@@ -61,6 +61,15 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+bool cPawn::IsFireproof(void) const
+{
+	return super::IsFireproof() || HasEntityEffect(cEntityEffect::effFireResistance);
+}
+
+
+
+
+
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
 {
 	// Check if the plugins allow the addition:
@@ -92,6 +101,15 @@ void cPawn::RemoveEntityEffect(cEntityEffect::eType a_EffectType)
 	m_EntityEffects[a_EffectType]->OnDeactivate(*this);
 	delete m_EntityEffects[a_EffectType];
 	m_EntityEffects.erase(a_EffectType);
+}
+
+
+
+
+
+bool cPawn::HasEntityEffect(cEntityEffect::eType a_EffectType) const
+{
+	return m_EntityEffects.find(a_EffectType) != m_EntityEffects.end();
 }
 
 

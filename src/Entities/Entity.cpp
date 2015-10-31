@@ -1104,7 +1104,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastBurnDamage++;
 		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
 		{
-			if (!m_IsFireproof)
+			if (!IsFireproof())
 			{
 				TakeDamage(dtOnFire, nullptr, BURN_DAMAGE, 0);
 			}
@@ -1175,7 +1175,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastLavaDamage++;
 		if (m_TicksSinceLastLavaDamage >= LAVA_TICKS_PER_DAMAGE)
 		{
-			if (!m_IsFireproof)
+			if (!IsFireproof())
 			{
 				TakeDamage(dtLavaContact, nullptr, LAVA_DAMAGE, 0);
 			}
@@ -1196,7 +1196,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastFireDamage++;
 		if (m_TicksSinceLastFireDamage >= FIRE_TICKS_PER_DAMAGE)
 		{
-			if (!m_IsFireproof)
+			if (!IsFireproof())
 			{
 				TakeDamage(dtFireContact, nullptr, FIRE_DAMAGE, 0);
 			}

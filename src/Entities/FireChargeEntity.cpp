@@ -46,6 +46,9 @@ void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hi
 	Destroy();
 	Explode(a_HitPos.Floor());
 	
-	// TODO: Some entities are immune to hits
-	a_EntityHit.StartBurning(5 * 20);  // 5 seconds of burning
+	if (!a_EntityHit.IsFireproof())
+	{
+		// TODO Damage Entity with 5 damage(from http://minecraft.gamepedia.com/Blaze#Blaze_fireball)
+		a_EntityHit.StartBurning(5 * 20);  // 5 seconds of burning
+	}
 }
