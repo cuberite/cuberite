@@ -1822,7 +1822,7 @@ a_Player:OpenWindow(Window);
 				TakeDamage = { Return = "" },
 				KilledBy = { Return = "" },
 				GetHealth = { Return = "number" },
-				AddEntityEffect = { Params = "{{cEntityEffect|EffectType}}, {{cEntityEffect}}", Return = "", Notes = "Applies an entity effect" },
+				AddEntityEffect = { Params = "{{cEntityEffect|EffectType}}", Return = "", Notes = "Applies an entity effect" },
 				RemoveEntityEffect = { Params = "{{cEntityEffect|EffectType}}", Return = "", Notes = "Removes a currently applied entity effect" },
 				HasEntityEffect = { Return = "bool", Params = "{{cEntityEffect|EffectType}}", Notes = "Returns true, if the supplied entity effect type is currently applied" }
 				ClearEntityEffects = { Return = "", Notes = "Removes all currently applied entity effects" },
