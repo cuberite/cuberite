@@ -14,4 +14,4 @@ echo "Downloading precompiled binaries."
 curl -s $DOWNLOADURL | tar -xzf -
 echo "Done."
 
-echo "Cuberite is now installed, run using 'cd MCServer; ./Cuberite'."
+echo "Cuberite is now installed, run using 'cd Server; ./Cuberite'."
