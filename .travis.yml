@@ -1,28 +1,37 @@
 language: cpp
-sudo: false
+compiler: gcc
 
-compiler:
-- clang
-- gcc
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
+install:
+  # g++4.8 and clang
+  - sudo apt-get install -qq g++-4.8
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
 
 script: ./CIbuild.sh
 
 env:
+  global:
+    - secure: "P0mU9OsE0Nbk4550oYovbbqNHCIjXkW6qOYhNkVZ8anhINuUvU2Vtb9ceLZPhhuEWxG/A+N3uzrsv5I65judOs/EsN01j9NqG8rAmd38cUmYCNLHE84yDu6upMby0hQt+2OuF1cb329IWedI8J93FxOBCenQwKsKedVwYq6rf9E="
+    # hack for coverity
+    - TRAVIS_REPO_SLUG: "mc-server/MCServer"
+  matrix:
   - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
-  - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG   CUBERITE_PATH=./Cuberite_debug
 
 notifications:
   email:
     on_success: change
     on_failure: always
-branches:
-  only:
-    - coverity_scan
-    - master
+
+addons:
+  coverity_scan:
+    project:
+      name: mc-server/MCServer
+      description: "Your project description here"
+    notification_email: work.tycho@gmail.com
+    build_command_prepend: cov-configure --comptype gcc --compiler $CC && cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1
+    build_command: make
+    branch_pattern: coverity_scan
