@@ -465,7 +465,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		!IsSwimming() && !IsFlying() &&
 		(
 			(
-				((GetPosY() >= 1) && ((GetPosY() - POSY_TOINT) <= EPS)) &&
+				((GetPosY() >= 1) && (GetPosY() <= 255) && ((GetPosY() - POSY_TOINT) <= EPS)) &&
 				(
 					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(0, -1, 0)).Floor())) ||
 					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, -1, 0)).Floor())) ||
@@ -475,7 +475,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				)
 			) ||
 			(
-			((GetPosY() >= POSY_TOINT) && ((GetPosY() - (POSY_TOINT + 0.5)) <= EPS)) &&
+			(((GetPosY() >= 1) && (GetPosY() <= 255) && GetPosY() >= POSY_TOINT) && ((GetPosY() - (POSY_TOINT + 0.5)) <= EPS)) &&
 				(
 					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, 0)).Floor())) ||
 					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, 0, 0)).Floor())) ||
@@ -485,7 +485,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				)
 			) ||
 			(
-				(fmod(GetPosY(), 0.125) <= EPS) &&
+				((GetPosY() >= 1) && (GetPosY() <= 255) && fmod(GetPosY(), 0.125) <= EPS) &&
 				(
 					(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, 0)).Floor()) == E_BLOCK_SNOW) ||
 					(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, 0, 0)).Floor()) == E_BLOCK_SNOW) ||
