@@ -1,4 +1,4 @@
-Cuberite [![Build Status](http://img.shields.io/travis/cuberite/cuberite/master.svg?style=flat)](https://travis-ci.org/cuberite/cuberite) [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/1930.svg)](https://scan.coverity.com/projects/1930) [![weekly tips](http://img.shields.io/gratipay/cuberite.svg?style=flat)](http://gratipay.com/cuberite)
+Cuberite [![Build Status](http://img.shields.io/travis/cuberite/cuberite/master.svg?style=flat)](https://travis-ci.org/cuberite/cuberite) [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/1930.svg)](https://scan.coverity.com/projects/1930)
 ========
 
 Cuberite is a Minecraft-compatible multiplayer game server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API. Cuberite is compatible with the vanilla Minecraft client.
@@ -42,7 +42,7 @@ Other Stuff
 
 For other stuff, including plugins and discussion, check out the [forums](http://forum.mc-server.org) and [Plugin API](http://api-docs.cuberite.org).
 
-Support Us on Gratipay: [![gratipay shield](http://img.shields.io/gratipay/cuberite.svg)](https://www.gratipay.com/cuberite)
+[Support Us on Bountysource](https://bountysource.com/teams/cuberite)
 
 Travis CI: [![travis build status shield](http://img.shields.io/travis/cuberite/cuberite.svg)](https://travis-ci.org/cuberite/cuberite)
 
