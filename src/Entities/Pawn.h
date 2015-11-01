@@ -24,6 +24,7 @@ public:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	
 	virtual bool IsFireproof(void) const override;
+	virtual void HandleAir(void) override;
 	
 	// tolua_begin
 	
