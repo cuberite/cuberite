@@ -1,9 +1,12 @@
 language: cpp
-sudo: false
+sudo: required
 
 compiler:
 - clang
 - gcc
+
+before_script:
+- ulimit -c unlimited -S    #enable core dumps
 
 addons:
   apt:
@@ -11,6 +14,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
+    - gdb
 
 script: ./CIbuild.sh
 
@@ -23,3 +27,8 @@ notifications:
     on_success: change
     on_failure: always
 
+after_failure:
+- cat /proc/sys/kernel/core_pattern
+- COREFILE=$(find Server -maxdepth 1 -name "core*" | head -n 1) # find core file
+- echo $COREFILE
+- if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" Server/Cuberite* -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
