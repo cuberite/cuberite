@@ -305,6 +305,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_RED_MUSHROOM        ].m_OneHitDig = true;
 	a_Info[E_BLOCK_REEDS               ].m_OneHitDig = true;
 	a_Info[E_BLOCK_SAPLING             ].m_OneHitDig = true;
+	a_Info[E_BLOCK_SLIME_BLOCK         ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TNT                 ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TALL_GRASS          ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TORCH               ].m_OneHitDig = true;

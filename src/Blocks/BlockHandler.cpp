@@ -72,6 +72,7 @@
 #include "BlockSideways.h"
 #include "BlockSignPost.h"
 #include "BlockSlab.h"
+#include "BlockSlime.h"
 #include "BlockSnow.h"
 #include "BlockStairs.h"
 #include "BlockStems.h"
@@ -297,6 +298,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SEA_LANTERN:           return new cBlockSeaLanternHandler      (a_BlockType);
 		case E_BLOCK_SIGN_POST:             return new cBlockSignPostHandler        (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
+		case E_BLOCK_SLIME_BLOCK:           return new cBlockSlimeHandler           (a_BlockType);
 		case E_BLOCK_SPRUCE_DOOR:           return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_FENCE_GATE:     return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
