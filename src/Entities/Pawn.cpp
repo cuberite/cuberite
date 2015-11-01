@@ -70,6 +70,21 @@ bool cPawn::IsFireproof(void) const
 
 
 
+void cPawn::HandleAir(void)
+{
+	if (IsSubmerged() && HasEntityEffect(cEntityEffect::effWaterBreathing))
+	{
+		// Prevent the oxygen from decreasing
+		return;
+	}
+	
+	super::HandleAir();
+}
+
+
+
+
+
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
 {
 	// Check if the plugins allow the addition:
