@@ -21,7 +21,7 @@ cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, 
 void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	TrySpawnChicken(a_HitPos);
-	
+
 	m_DestroyTimer = 2;
 }
 
@@ -32,11 +32,18 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_H
 void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
 	int TotalDamage = 0;
-	// TODO: If entity is Ender Crystal, destroy it
-	
+	// If entity is an Ender Dragon or Ender Crystal, it is damaged.
+	if (
+		(a_EntityHit.IsMob() && (static_cast<cMonster &>(a_EntityHit).GetMobType() == mtEnderDragon)) ||
+		a_EntityHit.IsEnderCrystal()
+	)
+	{
+		TotalDamage = 1;
+	}
+
 	TrySpawnChicken(a_HitPos);
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
-	
+
 	m_DestroyTimer = 5;
 }
 
@@ -79,3 +86,7 @@ void cThrownEggEntity::TrySpawnChicken(const Vector3d & a_HitPos)
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, false);
 	}
 }
+
+
+
+
