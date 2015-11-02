@@ -1792,20 +1792,20 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 	class cWorldCallback : public cWorldListCallback
 	{
 	public:
-		cWorldCallback(AStringVector results, const AString & text) :
-			Results(results),
-			m_Text(text)
+		cWorldCallback(AStringVector & a_Results, const AString & a_Search) :
+			m_Results(a_Results),
+			m_Search(a_Search)
 		{
 		}
 
 		virtual bool Item(cWorld * a_World) override
 		{
-			a_World->TabCompleteUserName(m_Text, Results);
+			a_World->TabCompleteUserName(m_Search, m_Results);
 			return true;
 		}
 	private:
-		AStringVector Results;
-		const AString & m_Text;
+		AStringVector & m_Results;
+		const AString & m_Search;
 	} WC(Results, a_Text);
 
 	cRoot::Get()->ForEachWorld(WC);
