@@ -3,6 +3,8 @@
 
 #include "BlockHandler.h"
 
+#include <unordered_set>
+
 
 class cWorld;
 
@@ -152,8 +154,11 @@ private:
 		return CanPush(a_BlockType, a_BlockMeta);
 	}
 
-	/** Returns how many blocks the piston has to push (where the first free space is); < 0 when unpushable */
-	static int FirstPassthroughBlock(int a_PistonX, int a_PistonY, int a_PistonZ, NIBBLETYPE a_PistonMeta, cWorld * a_World);
+	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
+	static bool CanPushBlock(
+		int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
+		std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, NIBBLETYPE a_PistonMeta
+	);
 } ;
 
 

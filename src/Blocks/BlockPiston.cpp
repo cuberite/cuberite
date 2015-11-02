@@ -86,28 +86,38 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 
 
 
-int cBlockPistonHandler::FirstPassthroughBlock(int a_PistonX, int a_PistonY, int a_PistonZ, NIBBLETYPE pistonmeta, cWorld * a_World)
+bool cBlockPistonHandler::CanPushBlock(
+	int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
+	std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, NIBBLETYPE a_PistonMeta
+)
 {
-	// Examine each of the 12 blocks ahead of the piston:
-	for (int ret = 0; ret < PISTON_MAX_PUSH_DISTANCE; ret++)
+	BLOCKTYPE currBlock;
+	NIBBLETYPE currMeta;
+	a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, currBlock, currMeta);
+	
+	if (currBlock == E_BLOCK_AIR)
 	{
-		BLOCKTYPE currBlock;
-		NIBBLETYPE currMeta;
-		AddPistonDir(a_PistonX, a_PistonY, a_PistonZ, pistonmeta, 1);
-		a_World->GetBlockTypeMeta(a_PistonX, a_PistonY, a_PistonZ, currBlock, currMeta);
-		if (cBlockInfo::IsPistonBreakable(currBlock))
-		{
-			// This block breaks when pushed, extend up to here
-			return ret;
-		}
-		if (!CanPush(currBlock, currMeta))
-		{
-			// This block cannot be pushed at all, the piston can't extend
-			return -1;
-		}
+		// Air can be pushed
+		return true;
 	}
-	// There is no space for the blocks to move, piston can't extend
-	return -1;
+	
+	if (!CanPush(currBlock, currMeta))
+	{
+		return !a_RequirePushable;
+	}
+
+	if (a_BlocksPushed.size() >= PISTON_MAX_PUSH_DISTANCE)
+	{
+		return false;
+	}
+	
+	if (!a_BlocksPushed.emplace(a_BlockX, a_BlockY, a_BlockZ).second || cBlockInfo::IsPistonBreakable(currBlock))
+	{
+		return true;  // Element exist already
+	}
+	
+	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, a_PistonMeta, 1);
+	return CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, true, a_BlocksPushed, a_PistonMeta);
 }
 
 
@@ -126,10 +136,12 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		return;
 	}
 
-	int dist = FirstPassthroughBlock(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, a_World);
-	if (dist < 0)
+	int dist = 1;  // TODO
+	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, 1);
+	std::unordered_set<Vector3i, VectorHasher<int>> blocksPushed;
+	if (!CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, true, blocksPushed, pistonMeta))
 	{
-		// FirstPassthroughBlock says piston can't push anything, bail out
+		// Can't push anything, bail out
 		return;
 	}
 
