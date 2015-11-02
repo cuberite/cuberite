@@ -64,7 +64,10 @@ void cSpawnPrepare::PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_Spa
 	}  // for i
 
 	// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
-	prep.m_EvtFinished.Wait();
+	if (MaxIdx > 0)
+	{
+		prep.m_EvtFinished.Wait();
+	}
 }
 
 
