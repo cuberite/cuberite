@@ -50,7 +50,7 @@ When contributing, the code conventions above *must* be followed. Otherwise, the
  * Clone the repository as usual. 
  * Go to your `<clone location>/.git/hooks` folder, create a text file named "pre-commit" there with the following contents:
 ```
-#!/usr/sh
+#!/bin/sh
 src/CheckBasicStyle.lua 1>&2 -g
 ```
  * If on Linux/Unix, you need to give the newly created file an execute permission: `chmod +x .git/hooks/pre-commit`
