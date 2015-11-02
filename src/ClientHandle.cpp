@@ -2197,6 +2197,12 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 		return;
 	}
 	
+	if (m_Protocol == nullptr)
+	{
+		// TODO (#2588): investigate if and why this occurs
+		return;
+	}
+	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
 
 	// Add the chunk to the list of chunks sent to the player:
