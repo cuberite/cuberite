@@ -5,6 +5,7 @@
 #include "Server.h"
 #include "World.h"
 #include "WebAdmin.h"
+#include "BrewingRecipes.h"
 #include "FurnaceRecipe.h"
 #include "CraftingRecipes.h"
 #include "Bindings/PluginManager.h"
@@ -53,6 +54,7 @@ cRoot::cRoot(void) :
 	m_MonsterConfig(nullptr),
 	m_CraftingRecipes(nullptr),
 	m_FurnaceRecipe(nullptr),
+	m_BrewingRecipes(nullptr),
 	m_WebAdmin(nullptr),
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr)
@@ -169,6 +171,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_RankManager->Initialize(*m_MojangAPI);
 	m_CraftingRecipes = new cCraftingRecipes();
 	m_FurnaceRecipe   = new cFurnaceRecipe();
+	m_BrewingRecipes.reset(new cBrewingRecipes());
 
 	LOGD("Loading worlds...");
 	LoadWorlds(*settingsRepo);
@@ -913,8 +916,3 @@ int cRoot::GetFurnaceFuelBurnTime(const cItem & a_Fuel)
 	cFurnaceRecipe * FR = Get()->GetFurnaceRecipe();
 	return FR->GetBurnTime(a_Fuel);
 }
-
-
-
-
-

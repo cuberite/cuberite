@@ -20,6 +20,7 @@
 #include "../ClientHandle.h"
 #include "../BlockArea.h"
 #include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/BrewingstandEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -2516,6 +2517,54 @@ static int tolua_cRoot_GetBuildSeriesName(lua_State * tolua_S)
 
 
 
+static int tolua_cRoot_GetBrewingRecipe(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cRoot") ||
+		!L.CheckParamUserType (2, "const cItem") ||
+		!L.CheckParamUserType (3, "const cItem") ||
+		!L.CheckParamEnd      (4)
+	)
+	{
+		return 0;
+	}
+
+	// Check the bottle param:
+	cItem * Bottle = nullptr;
+	L.GetStackValue(2, Bottle);
+	if (Bottle == nullptr)
+	{
+		LOGWARNING("cRoot:GetBrewingRecipe: the Bottle parameter is nil or missing.");
+		return 0;
+	}
+
+	cItem * Ingredient = nullptr;
+	L.GetStackValue(3, Ingredient);
+	if (Ingredient == nullptr)
+	{
+		LOGWARNING("cRoot:GetBrewingRecipe: the Ingredient parameter is nil or missing.");
+		return 0;
+	}
+
+	// Get the recipe for the input
+	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
+	const cBrewingRecipes::cRecipe * Recipe = BR->GetRecipeFrom(*Bottle, *Ingredient);
+	if (Recipe == nullptr)
+	{
+		// There is no such brewing recipe for this bottle and ingredient, return no value
+		return 0;
+	}
+
+	// Push the output item
+	L.Push(Recipe->Output.get());
+	return 1;
+}
+
+
+
+
+
 static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -3320,6 +3369,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithPlayerByUUID",  DoWith <cRoot, cPlayer, &cRoot::DoWithPlayerByUUID>);
 			tolua_function(tolua_S, "ForEachPlayer",       ForEach<cRoot, cPlayer, &cRoot::ForEachPlayer>);
 			tolua_function(tolua_S, "ForEachWorld",        ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
+			tolua_function(tolua_S, "GetBrewingRecipe",    tolua_cRoot_GetBrewingRecipe);
 			tolua_function(tolua_S, "GetBuildCommitID",    tolua_cRoot_GetBuildCommitID);
 			tolua_function(tolua_S, "GetBuildDateTime",    tolua_cRoot_GetBuildDateTime);
 			tolua_function(tolua_S, "GetBuildID",          tolua_cRoot_GetBuildID);

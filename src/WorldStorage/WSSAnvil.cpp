@@ -18,6 +18,7 @@
 #include "../Root.h"
 
 #include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/BrewingstandEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -689,6 +690,7 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 	{
 		// Specific entity loaders:
 		case E_BLOCK_BEACON:        return LoadBeaconFromNBT      (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
+		case E_BLOCK_BREWING_STAND: return LoadBrewingstandFromNBT(a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BREWING_STAND, a_BlockMeta);
 		case E_BLOCK_CHEST:         return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_CHEST);
 		case E_BLOCK_COMMAND_BLOCK: return LoadCommandBlockFromNBT(a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_DISPENSER:     return LoadDispenserFromNBT   (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
@@ -920,6 +922,55 @@ cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagI
 	}
 
 	return Beacon.release();
+}
+
+
+
+
+
+cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	// Check if the data has a proper type:
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Brewingstand"))
+	{
+		return nullptr;
+	}
+
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return nullptr;  // Make it an empty brewingstand - the chunk loader will provide an empty cBrewingstandEntity for this
+	}
+
+	std::unique_ptr<cBrewingstandEntity> Brewingstand(new cBrewingstandEntity(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, m_World));
+
+	// Load slots:
+	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
+	{
+		int Slot = a_NBT.FindChildByName(Child, "Slot");
+		if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
+		{
+			continue;
+		}
+		cItem Item;
+		if (LoadItemFromNBT(Item, a_NBT, Child))
+		{
+			Brewingstand->SetSlot(a_NBT.GetByte(Slot), Item);
+		}
+	}  // for itr - ItemDefs[]
+
+	// Load brewing time:
+	int BrewTime = a_NBT.FindChildByName(a_TagIdx, "BrewTime");
+	if (BrewTime >= 0)
+	{
+		Int16 tb = a_NBT.GetShort(BrewTime);
+		Brewingstand->setTimeBrewed(tb);
+	}
+
+	// Restart brewing:
+	Brewingstand->GetRecipes();
+	Brewingstand->ContinueBrewing();
+	return Brewingstand.release();
 }
 
 

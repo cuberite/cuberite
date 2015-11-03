@@ -9,6 +9,7 @@ SET (SRCS
 	Window.cpp
 	AnvilWindow.cpp
 	BeaconWindow.cpp
+	BrewingstandWindow.cpp
 	ChestWindow.cpp
 	CraftingWindow.cpp
 	DropSpenserWindow.cpp
@@ -23,6 +24,7 @@ SET (HDRS
 	Window.h
 	AnvilWindow.h
 	BeaconWindow.h
+	BrewingstandWindow.h
 	ChestWindow.h
 	CraftingWindow.h
 	DropSpenserWindow.h

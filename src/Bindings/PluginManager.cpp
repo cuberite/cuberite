@@ -269,6 +269,44 @@ bool cPluginManager::CallHookBlockToPickups(
 
 
 
+bool cPluginManager::CallHookBrewingCompleted(cWorld & a_World, cBrewingstandEntity & a_Brewingstand)
+{
+	FIND_HOOK(HOOK_BREWING_COMPLETED);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBrewingCompleted(a_World, a_Brewingstand))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookBrewingCompleting(cWorld & a_World, cBrewingstandEntity & a_Brewingstand)
+{
+	FIND_HOOK(HOOK_BREWING_COMPLETING);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBrewingCompleting(a_World, a_Brewingstand))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 {
 	// Check if the message contains a command, execute it:

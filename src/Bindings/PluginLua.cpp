@@ -294,6 +294,54 @@ bool cPluginLua::OnBlockToPickups(cWorld & a_World, cEntity * a_Digger, int a_Bl
 
 
 
+bool cPluginLua::OnBrewingCompleted(cWorld & a_World, cBrewingstandEntity & a_Brewingstand)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!m_LuaState.IsValid())
+	{
+		return false;
+	}
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BREWING_COMPLETED];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call(static_cast<int>(**itr), &a_World, &a_Brewingstand, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnBrewingCompleting(cWorld & a_World, cBrewingstandEntity & a_Brewingstand)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!m_LuaState.IsValid())
+	{
+		return false;
+	}
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BREWING_COMPLETING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call(static_cast<int>(**itr), &a_World, &a_Brewingstand, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnChat(cPlayer & a_Player, AString & a_Message)
 {
 	cCSLock Lock(m_CriticalSection);
