@@ -689,6 +689,10 @@ enum
 	E_META_SNOW_LAYER_SEVEN        = 6,
 	E_META_SNOW_LAYER_EIGHT        = 7,
 
+	// E_BLOCK_SPONGE metas:
+	E_META_SPONGE_NORMAL           = 0,
+	E_META_SPONGE_WET              = 1,
+
 	// E_BLOCK_STAINED_CLAY metas:
 	E_META_STAINED_CLAY_WHITE      = 0,
 	E_META_STAINED_CLAY_ORANGE     = 1,
