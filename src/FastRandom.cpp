@@ -8,17 +8,19 @@
 
 #include <random>
 
-#ifdef _WIN32
-	#define thread_local static __declspec(thread)
-#elif defined __APPLE__
-	#define thread_local static __thread
+#if defined (__GNUC__)
+	#define ATTRIBUTE_TLS static __thread
+#elif defined (_MSC_VER)
+	#define ATTRIBUTE_TLS static __declspec(thread)
+#else
+	#error "Unknown thread local storage qualifier"
 #endif
 
 static unsigned int GetRandomSeed()
 {
-	thread_local bool SeedCounterInitialized = 0;
-	thread_local unsigned int SeedCounter = 0;
-	
+	ATTRIBUTE_TLS bool SeedCounterInitialized = 0;
+	ATTRIBUTE_TLS unsigned int SeedCounter = 0;
+
 	if (!SeedCounterInitialized)
 	{
 		std::random_device rd;
@@ -47,8 +49,8 @@ public:
 		TestInts();
 		TestFloats();
 	}
-	
-	
+
+
 	void TestInts(void)
 	{
 		printf("Testing ints...\n");
