@@ -21,6 +21,8 @@ public:
 
 	virtual const cItem GetFollowedItem(void) const override { return cItem(E_ITEM_SEEDS); }
 
+	virtual void HandleFalling(void) override;
+
 private:
 
 	int m_EggDropTimer;
