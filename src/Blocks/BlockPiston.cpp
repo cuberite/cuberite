@@ -7,6 +7,8 @@
 #include "BlockInServerPluginInterface.h"
 #include "ChunkInterface.h"
 
+#include <vector>
+
 
 
 
@@ -136,56 +138,59 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		return;
 	}
 
-	int dist = 1;  // TODO
-	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, 1);
+	int moveX = a_BlockX;
+	int moveY = a_BlockY;
+	int moveZ = a_BlockZ;
+	
+	AddPistonDir(moveX, moveY, moveZ, pistonMeta, 1);
 	std::unordered_set<Vector3i, VectorHasher<int>> blocksPushed;
-	if (!CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, true, blocksPushed, pistonMeta))
+	if (!CanPushBlock(moveX, moveY, moveZ, a_World, true, blocksPushed, pistonMeta))
 	{
 		// Can't push anything, bail out
 		return;
 	}
+	
+	Vector3i pistonMoveVec;
+	AddPistonDir(pistonMoveVec.x, pistonMoveVec.y, pistonMoveVec.z, pistonMeta, 1);
+	std::vector<Vector3i> sortedBlocks(blocksPushed.begin(), blocksPushed.end());
+	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [pistonMoveVec](const Vector3i & a, const Vector3i & b)
+	{
+		return a.Dot(pistonMoveVec) > b.Dot(pistonMoveVec);
+	});
 
 	a_World->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, 0, pistonMeta, pistonBlock);
 	a_World->BroadcastSoundEffect("tile.piston.out", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 0.5f, 0.7f);
 
-	// Drop the breakable block in the line, if appropriate:
-	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, dist + 1);  // "a_Block" now at the breakable / empty block
-	BLOCKTYPE currBlock;
-	NIBBLETYPE currMeta;
-	a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, currBlock, currMeta);
-	if (currBlock != E_BLOCK_AIR)
+	BLOCKTYPE moveBlock;
+	NIBBLETYPE moveMeta;
+	for (const Vector3i & moveBlockVec : sortedBlocks)
 	{
-		cBlockHandler * Handler = BlockHandler(currBlock);
-		if (Handler->DoesDropOnUnsuitable())
+		moveX = moveBlockVec.x;
+		moveY = moveBlockVec.y;
+		moveZ = moveBlockVec.z;
+		a_World->GetBlockTypeMeta(moveX, moveY, moveZ, moveBlock, moveMeta);
+		a_World->SetBlock(moveX, moveY, moveZ, E_BLOCK_AIR, 0);
+		
+		AddPistonDir(moveX, moveY, moveZ, pistonMeta, 1);
+		
+		if (cBlockInfo::IsPistonBreakable(moveBlock))
 		{
-			cChunkInterface ChunkInterface(a_World->GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(*a_World);
-			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr, a_BlockX, a_BlockY, a_BlockZ);
+			cBlockHandler * Handler = BlockHandler(moveBlock);
+			if (Handler->DoesDropOnUnsuitable())
+			{
+				cChunkInterface ChunkInterface(a_World->GetChunkMap());
+				cBlockInServerPluginInterface PluginInterface(*a_World);
+				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr, moveX, moveY, moveZ);
+			}
+		} else
+		{
+			a_World->SetBlock(moveX, moveY, moveZ, moveBlock, moveMeta);
 		}
 	}
-
-	// Push blocks, from the furthest to the nearest:
-	int oldx = a_BlockX, oldy = a_BlockY, oldz = a_BlockZ;
-	NIBBLETYPE currBlockMeta;
-
-	for (int i = dist + 1; i > 1; i--)
-	{
-		AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, -1);
-		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, currBlock, currBlockMeta);
-		a_World->SetBlock(oldx, oldy, oldz, currBlock, currBlockMeta);
-		oldx = a_BlockX;
-		oldy = a_BlockY;
-		oldz = a_BlockZ;
-	}
-
-	int extx = a_BlockX;
-	int exty = a_BlockY;
-	int extz = a_BlockZ;
-	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, -1);
-	// "a_Block" now at piston body, "ext" at future extension
-
+	
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta | 0x8);
-	a_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
+	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, 1);
+	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
 }
 
 
