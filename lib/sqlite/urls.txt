@@ -1,9 +1,0 @@
-
-SQLite:
-http://www.sqlite.org
-SQLite is in public domain
-
-LuaSQLite3:
-http://lua.sqlite.org
-http://lua.sqlite.org/index.cgi/doc/tip/doc/lsqlite3.wiki -- documentation
-License for LuaSQLite is stored in $/install/LuaSQLite3-LICENSE.txt and distributed with the executables
