@@ -1119,7 +1119,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	int MinRelZ = FloorC(GetPosZ() - m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int MaxRelZ = FloorC(GetPosZ() + m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::Height - 1);
-	int MaxY = Clamp(CeilC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
 	bool HasWater = false;
 	bool HasLava = false;
 	bool HasFire = false;
