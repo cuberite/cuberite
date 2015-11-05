@@ -81,6 +81,8 @@ public:
 		}
 	}
 
+	static Vector3i GetDirectionVec(int a_PistonMeta);
+
 	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
@@ -157,7 +159,7 @@ private:
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
 	static bool CanPushBlock(
 		int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
-		std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, NIBBLETYPE a_PistonMeta
+		std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 } ;
 
