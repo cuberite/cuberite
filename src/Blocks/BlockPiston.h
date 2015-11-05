@@ -145,17 +145,6 @@ private:
 		return true;
 	}
 
-	/** Returns true if the specified block can be pulled by a sticky piston */
-	static inline bool CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
-		if (cBlockInfo::IsPistonBreakable(a_BlockType))
-		{
-			return false;  // CanBreakPush returns true, but we need false to prevent pulling
-		}
-		
-		return CanPush(a_BlockType, a_BlockMeta);
-	}
-
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
 	static bool CanPushBlock(
 		int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
