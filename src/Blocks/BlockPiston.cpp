@@ -95,6 +95,46 @@ Vector3i cBlockPistonHandler::GetDirectionVec(int a_PistonMeta)
 
 
 
+void cBlockPistonHandler::PushBlocks(const std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksToPush,
+	cWorld * a_World, const Vector3i & a_PushDir
+)
+{
+	std::vector<Vector3i> sortedBlocks(a_BlocksToPush.begin(), a_BlocksToPush.end());
+	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a, const Vector3i & b)
+	{
+		return a.Dot(a_PushDir) > b.Dot(a_PushDir);
+	});
+
+	BLOCKTYPE moveBlock;
+	NIBBLETYPE moveMeta;
+	for (Vector3i & moveBlockPos : sortedBlocks)
+	{	
+		a_World->GetBlockTypeMeta(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
+		a_World->SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
+
+		moveBlockPos += a_PushDir;
+		if (cBlockInfo::IsPistonBreakable(moveBlock))
+		{
+			cBlockHandler * Handler = BlockHandler(moveBlock);
+			if (Handler->DoesDropOnUnsuitable())
+			{
+				cChunkInterface ChunkInterface(a_World->GetChunkMap());
+				cBlockInServerPluginInterface PluginInterface(*a_World);
+				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr,
+					moveBlockPos.x, moveBlockPos.y, moveBlockPos.z
+				);
+			}
+		} else
+		{
+			a_World->SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
+		}
+	}
+}
+
+
+
+
+
 bool cBlockPistonHandler::CanPushBlock(
 	int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
 	std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, const Vector3i & a_PushDir
@@ -166,60 +206,25 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 	}
 
 	Vector3i pushDir = GetDirectionVec(pistonMeta);
-	int moveX = a_BlockX + pushDir.x;
-	int moveY = a_BlockY + pushDir.y;
-	int moveZ = a_BlockZ + pushDir.z;
 
 	std::unordered_set<Vector3i, VectorHasher<int>> blocksPushed;
-	if (!CanPushBlock(moveX, moveY, moveZ, a_World, true, blocksPushed, pushDir))
+	if (!CanPushBlock(a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z,
+		a_World, true, blocksPushed, pushDir)
+	)
 	{
 		// Can't push anything, bail out
 		return;
 	}
 
-	std::vector<Vector3i> sortedBlocks(blocksPushed.begin(), blocksPushed.end());
-	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [pushDir](const Vector3i & a, const Vector3i & b)
-	{
-		return a.Dot(pushDir) > b.Dot(pushDir);
-	});
-
 	a_World->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, 0, pistonMeta, pistonBlock);
 	a_World->BroadcastSoundEffect("tile.piston.out", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 0.5f, 0.7f);
 
-	BLOCKTYPE moveBlock;
-	NIBBLETYPE moveMeta;
-	for (const Vector3i & moveBlockVec : sortedBlocks)
-	{
-		moveX = moveBlockVec.x;
-		moveY = moveBlockVec.y;
-		moveZ = moveBlockVec.z;
-		a_World->GetBlockTypeMeta(moveX, moveY, moveZ, moveBlock, moveMeta);
-		a_World->SetBlock(moveX, moveY, moveZ, E_BLOCK_AIR, 0);
-
-		moveX += pushDir.x;
-		moveY += pushDir.y;
-		moveZ += pushDir.z;
-
-		if (cBlockInfo::IsPistonBreakable(moveBlock))
-		{
-			cBlockHandler * Handler = BlockHandler(moveBlock);
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				cChunkInterface ChunkInterface(a_World->GetChunkMap());
-				cBlockInServerPluginInterface PluginInterface(*a_World);
-				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr, moveX, moveY, moveZ);
-			}
-		} else
-		{
-			a_World->SetBlock(moveX, moveY, moveZ, moveBlock, moveMeta);
-		}
-	}
+	PushBlocks(blocksPushed, a_World, pushDir);
 
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta | 0x8);
-	a_BlockX += pushDir.x;
-	a_BlockY += pushDir.y;
-	a_BlockZ += pushDir.z;
-	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
+	a_World->SetBlock(a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z,
+		E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0)
+	);
 }
 
 
@@ -273,41 +278,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 		return;
 	}
 
-	std::vector<Vector3i> sortedBlocks(pushedBlocks.begin(), pushedBlocks.end());
-	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [pushDir](const Vector3i & a, const Vector3i & b)
-	{
-		return a.Dot(pushDir) > b.Dot(pushDir);
-	});
-
-	int moveX, moveY, moveZ;
-	BLOCKTYPE moveBlock;
-	NIBBLETYPE moveMeta;
-	for (const Vector3i & moveBlockVec : sortedBlocks)
-	{
-		moveX = moveBlockVec.x;
-		moveY = moveBlockVec.y;
-		moveZ = moveBlockVec.z;
-		a_World->GetBlockTypeMeta(moveX, moveY, moveZ, moveBlock, moveMeta);
-		a_World->SetBlock(moveX, moveY, moveZ, E_BLOCK_AIR, 0);
-
-		moveX += pushDir.x;
-		moveY += pushDir.y;
-		moveZ += pushDir.z;
-
-		if (cBlockInfo::IsPistonBreakable(moveBlock))
-		{
-			cBlockHandler * Handler = BlockHandler(moveBlock);
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				cChunkInterface ChunkInterface(a_World->GetChunkMap());
-				cBlockInServerPluginInterface PluginInterface(*a_World);
-				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr, moveX, moveY, moveZ);
-			}
-		} else
-		{
-			a_World->SetBlock(moveX, moveY, moveZ, moveBlock, moveMeta);
-		}
-	}
+	PushBlocks(pushedBlocks, a_World, pushDir);
 }
 
 

@@ -161,6 +161,10 @@ private:
 		int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
 		std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, const Vector3i & a_PushDir
 	);
+	
+	static void PushBlocks(const std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksToPush,
+		cWorld * a_World, const Vector3i & a_PushDir
+	);
 } ;
 
 
