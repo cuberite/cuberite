@@ -10,9 +10,6 @@
 
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)
-	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
-	#pragma warning(disable:4481)
-
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100)  // Unreferenced formal parameter
 
@@ -34,6 +31,7 @@
 
 	// Disabled because it's useless:
 	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
+	#pragma warning(disable: 4351)  // new behavior: elements of array 'member' will be default initialized
 	
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
 	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
