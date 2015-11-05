@@ -8,6 +8,7 @@
 #include "ChunkInterface.h"
 
 #include <vector>
+#include <array>
 
 
 
@@ -93,16 +94,19 @@ bool cBlockPistonHandler::CanPushBlock(
 	std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, NIBBLETYPE a_PistonMeta
 )
 {
+	const static std::array<Vector3i, 6> pushingDirs = {{ Vector3i(-1, 0, 0), Vector3i(1, 0, 0), Vector3i(0, -1, 0), Vector3i(0, 1, 0),
+		Vector3i(0, 0, -1), Vector3i(0, 0, 1) }};
+
 	BLOCKTYPE currBlock;
 	NIBBLETYPE currMeta;
 	a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, currBlock, currMeta);
-	
+
 	if (currBlock == E_BLOCK_AIR)
 	{
 		// Air can be pushed
 		return true;
 	}
-	
+
 	if (!CanPush(currBlock, currMeta))
 	{
 		return !a_RequirePushable;
@@ -112,12 +116,24 @@ bool cBlockPistonHandler::CanPushBlock(
 	{
 		return false;
 	}
-	
+
 	if (!a_BlocksPushed.emplace(a_BlockX, a_BlockY, a_BlockZ).second || cBlockInfo::IsPistonBreakable(currBlock))
 	{
 		return true;  // Element exist already
 	}
-	
+
+	if(currBlock == E_BLOCK_SLIME_BLOCK)
+	{
+		// Try to push the other directions
+		for(const Vector3i & testDir : pushingDirs)
+		{
+			if(!CanPushBlock(a_BlockX + testDir.x, a_BlockY + testDir.y, a_BlockZ + testDir.z, a_World, false, a_BlocksPushed, a_PistonMeta))
+			{
+				return false;
+			}
+		}
+	}
+
 	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, a_PistonMeta, 1);
 	return CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, true, a_BlocksPushed, a_PistonMeta);
 }
@@ -141,7 +157,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 	int moveX = a_BlockX;
 	int moveY = a_BlockY;
 	int moveZ = a_BlockZ;
-	
+
 	AddPistonDir(moveX, moveY, moveZ, pistonMeta, 1);
 	std::unordered_set<Vector3i, VectorHasher<int>> blocksPushed;
 	if (!CanPushBlock(moveX, moveY, moveZ, a_World, true, blocksPushed, pistonMeta))
@@ -149,7 +165,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		// Can't push anything, bail out
 		return;
 	}
-	
+
 	Vector3i pistonMoveVec;
 	AddPistonDir(pistonMoveVec.x, pistonMoveVec.y, pistonMoveVec.z, pistonMeta, 1);
 	std::vector<Vector3i> sortedBlocks(blocksPushed.begin(), blocksPushed.end());
@@ -170,9 +186,9 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		moveZ = moveBlockVec.z;
 		a_World->GetBlockTypeMeta(moveX, moveY, moveZ, moveBlock, moveMeta);
 		a_World->SetBlock(moveX, moveY, moveZ, E_BLOCK_AIR, 0);
-		
+
 		AddPistonDir(moveX, moveY, moveZ, pistonMeta, 1);
-		
+
 		if (cBlockInfo::IsPistonBreakable(moveBlock))
 		{
 			cBlockHandler * Handler = BlockHandler(moveBlock);
@@ -187,7 +203,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 			a_World->SetBlock(moveX, moveY, moveZ, moveBlock, moveMeta);
 		}
 	}
-	
+
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta | 0x8);
 	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, 1);
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
@@ -239,7 +255,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 			return;
 		}
 	}
-	
+
 	// Retract without pulling
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 }
@@ -283,8 +299,3 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 		a_WorldInterface.SpawnItemPickups(Pickups, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
 	}
 }
-
-
-
-
-
