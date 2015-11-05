@@ -40,3 +40,27 @@
 	url = https://github.com/mc-server/TCLAP.git
 	ignore = dirty
 
+[submodule "lib/cmake-coverage"]
+	path = lib/cmake-coverage
+	url = https://github.com/cuberite/cmake-coverage.git
+[submodule "lib/expat"]
+	path = lib/expat
+	url = https://github.com/cuberite/expat.git
+[submodule "lib/lua"]
+	path = lib/lua
+	url = https://github.com/cuberite/lua.git
+[submodule "lib/luaexpat"]
+	path = lib/luaexpat
+	url = https://github.com/cuberite/luaexpat.git
+[submodule "lib/luaproxy"]
+	path = lib/luaproxy
+	url = https://github.com/cuberite/luaproxy.git
+[submodule "lib/sqlite"]
+	path = lib/sqlite
+	url = https://github.com/cuberite/sqlite.git
+[submodule "lib/tolua++"]
+	path = lib/tolua++
+	url = https://github.com/cuberite/toluapp.git
+[submodule "lib/zlib"]
+	path = lib/zlib
+	url = https://github.com/cuberite/zlib.git
