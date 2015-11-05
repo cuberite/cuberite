@@ -233,31 +233,76 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 		return;
 	}
 
+	// Remove Extension
+	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+
 	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, -1);
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta & ~(8));
 	a_World->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, 1, pistonMeta & ~(8), pistonBlock);
 	a_World->BroadcastSoundEffect("tile.piston.in", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 0.5f, 0.7f);
-	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, 1);
 
-	// Retract the extension, pull block if appropriate
-	if (IsSticky(pistonBlock))
+	if(!IsSticky(pistonBlock))
 	{
-		int tempx = a_BlockX, tempy = a_BlockY, tempz = a_BlockZ;
-		AddPistonDir(tempx, tempy, tempz, pistonMeta, 1);
-		BLOCKTYPE tempBlock;
-		NIBBLETYPE tempMeta;
-		a_World->GetBlockTypeMeta(tempx, tempy, tempz, tempBlock, tempMeta);
-		if (CanPull(tempBlock, tempMeta))
-		{
-			// Pull the block
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, tempBlock, tempMeta);
-			a_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0);
-			return;
-		}
+		// No need for block pulling, bail out
+		return;
 	}
 
-	// Retract without pulling
-	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, 2);
+	// Try to "push" the pulling block in the opposite direction
+	switch(pistonMeta & 0x07)
+	{
+		case 0:
+		case 1:
+			pistonMeta = 1 - pistonMeta;
+			break;
+		case 2:
+		case 3:
+			pistonMeta = 5 - pistonMeta;
+			break;
+
+		case 4:
+		case 5:
+			pistonMeta = 9 - pistonMeta;
+			break;
+
+		default:
+			{
+				LOGWARNING("%s: invalid direction %d, ignoring", __FUNCTION__, pistonMeta & 0x07); \
+				break;
+			}
+	}
+
+	std::unordered_set<Vector3i, VectorHasher<int>> pushedBlocks;
+	if (!CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, true, pushedBlocks, pistonMeta))
+	{
+		// Not pushable, bail out
+		return;
+	}
+
+	Vector3i pistonMoveVec;
+	AddPistonDir(pistonMoveVec.x, pistonMoveVec.y, pistonMoveVec.z, pistonMeta, 1);
+	std::vector<Vector3i> sortedBlocks(pushedBlocks.begin(), pushedBlocks.end());
+	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [pistonMoveVec](const Vector3i & a, const Vector3i & b)
+	{
+		return a.Dot(pistonMoveVec) > b.Dot(pistonMoveVec);
+	});
+
+	int moveX, moveY, moveZ;
+	BLOCKTYPE moveBlock;
+	NIBBLETYPE moveMeta;
+	for (const Vector3i & moveBlockVec : sortedBlocks)
+	{
+		moveX = moveBlockVec.x;
+		moveY = moveBlockVec.y;
+		moveZ = moveBlockVec.z;
+		a_World->GetBlockTypeMeta(moveX, moveY, moveZ, moveBlock, moveMeta);
+		a_World->SetBlock(moveX, moveY, moveZ, E_BLOCK_AIR, 0);
+
+		AddPistonDir(moveX, moveY, moveZ, pistonMeta, 1);
+
+		// TODO Do not allow pisons to pull breakable blocks
+		a_World->SetBlock(moveX, moveY, moveZ, moveBlock, moveMeta);
+	}
 }
 
 
