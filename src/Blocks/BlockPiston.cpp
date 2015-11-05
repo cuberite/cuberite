@@ -99,22 +99,26 @@ void cBlockPistonHandler::PushBlocks(const std::unordered_set<Vector3i, VectorHa
 	cWorld * a_World, const Vector3i & a_PushDir
 )
 {
+	// Sort blocks to move the blocks first, which are farest away from the piston
+	// This prevents the overwriting of existing blocks
 	std::vector<Vector3i> sortedBlocks(a_BlocksToPush.begin(), a_BlocksToPush.end());
 	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a, const Vector3i & b)
 	{
 		return a.Dot(a_PushDir) > b.Dot(a_PushDir);
 	});
 
+	// Move every block
 	BLOCKTYPE moveBlock;
 	NIBBLETYPE moveMeta;
 	for (Vector3i & moveBlockPos : sortedBlocks)
-	{	
+	{
 		a_World->GetBlockTypeMeta(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
 		a_World->SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
 
 		moveBlockPos += a_PushDir;
 		if (cBlockInfo::IsPistonBreakable(moveBlock))
 		{
+			// Block is breakable, drop it
 			cBlockHandler * Handler = BlockHandler(moveBlock);
 			if (Handler->DoesDropOnUnsuitable())
 			{
@@ -126,6 +130,7 @@ void cBlockPistonHandler::PushBlocks(const std::unordered_set<Vector3i, VectorHa
 			}
 		} else
 		{
+			// Not breakable, just move it
 			a_World->SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
 		}
 	}
@@ -153,7 +158,7 @@ bool cBlockPistonHandler::CanPushBlock(
 		return true;
 	}
 
-	if(!a_RequirePushable && cBlockInfo::IsPistonBreakable(currBlock))
+	if (!a_RequirePushable && cBlockInfo::IsPistonBreakable(currBlock))
 	{
 		// Block should not be broken, when it's not in the pushing direction
 		return true;
@@ -161,11 +166,13 @@ bool cBlockPistonHandler::CanPushBlock(
 
 	if (!CanPush(currBlock, currMeta))
 	{
+		// When it's not required to push this block, don't fail
 		return !a_RequirePushable;
 	}
 
 	if (a_BlocksPushed.size() >= PISTON_MAX_PUSH_DISTANCE)
 	{
+		// Do not allow to push too much blocks
 		return false;
 	}
 
@@ -174,18 +181,20 @@ bool cBlockPistonHandler::CanPushBlock(
 		return true;  // Element exist already
 	}
 
-	if(currBlock == E_BLOCK_SLIME_BLOCK)
+	if (currBlock == E_BLOCK_SLIME_BLOCK)
 	{
 		// Try to push the other directions
-		for(const Vector3i & testDir : pushingDirs)
+		for (const Vector3i & testDir : pushingDirs)
 		{
-			if(!CanPushBlock(a_BlockX + testDir.x, a_BlockY + testDir.y, a_BlockZ + testDir.z, a_World, false, a_BlocksPushed, a_PushDir))
+			if (!CanPushBlock(a_BlockX + testDir.x, a_BlockY + testDir.y, a_BlockZ + testDir.z, a_World, false, a_BlocksPushed, a_PushDir))
 			{
+				// When it's not possible for a direction, then fail
 				return false;
 			}
 		}
 	}
 
+	// Try to push the block in front of this block
 	return CanPushBlock(a_BlockX + a_PushDir.x, a_BlockY + a_PushDir.y, a_BlockZ + a_PushDir.z, a_World, true, a_BlocksPushed, a_PushDir);
 }
 
@@ -221,6 +230,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 
 	PushBlocks(blocksPushed, a_World, pushDir);
 
+	// Set the extension and the piston base correctly
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta | 0x8);
 	a_World->SetBlock(a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z,
 		E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0)
@@ -259,12 +269,13 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 	a_World->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, 1, pistonMeta & ~(8), pistonBlock);
 	a_World->BroadcastSoundEffect("tile.piston.in", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 0.5f, 0.7f);
 
-	if(!IsSticky(pistonBlock))
+	if (!IsSticky(pistonBlock))
 	{
 		// No need for block pulling, bail out
 		return;
 	}
 
+	// Get the block to pull
 	a_BlockX += 2 * pushDir.x;
 	a_BlockY += 2 * pushDir.y;
 	a_BlockZ += 2 * pushDir.z;

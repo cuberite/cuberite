@@ -151,6 +151,7 @@ private:
 		std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 	
+	/** Moves a list of blocks in a specific direction */
 	static void PushBlocks(const std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksToPush,
 		cWorld * a_World, const Vector3i & a_PushDir
 	);
