@@ -107,6 +107,12 @@ bool cBlockPistonHandler::CanPushBlock(
 		return true;
 	}
 
+	if(!a_RequirePushable && cBlockInfo::IsPistonBreakable(currBlock))
+	{
+		// Block should not be broken, when it's not in the pushing direction
+		return true;
+	}
+
 	if (!CanPush(currBlock, currMeta))
 	{
 		return !a_RequirePushable;
@@ -273,7 +279,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 	}
 
 	std::unordered_set<Vector3i, VectorHasher<int>> pushedBlocks;
-	if (!CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, true, pushedBlocks, pistonMeta))
+	if (!CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, false, pushedBlocks, pistonMeta))
 	{
 		// Not pushable, bail out
 		return;
@@ -300,8 +306,19 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 
 		AddPistonDir(moveX, moveY, moveZ, pistonMeta, 1);
 
-		// TODO Do not allow pisons to pull breakable blocks
-		a_World->SetBlock(moveX, moveY, moveZ, moveBlock, moveMeta);
+		if (cBlockInfo::IsPistonBreakable(moveBlock))
+		{
+			cBlockHandler * Handler = BlockHandler(moveBlock);
+			if (Handler->DoesDropOnUnsuitable())
+			{
+				cChunkInterface ChunkInterface(a_World->GetChunkMap());
+				cBlockInServerPluginInterface PluginInterface(*a_World);
+				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr, moveX, moveY, moveZ);
+			}
+		} else
+		{
+			a_World->SetBlock(moveX, moveY, moveZ, moveBlock, moveMeta);
+		}
 	}
 }
 
