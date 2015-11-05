@@ -84,7 +84,7 @@ public:
 	/** This method converts the magic piston metadata into a direction vector.
 		This vector has a length of 1 and points into the direction, in which the piston will extend.
 	*/
-	static Vector3i GetDirectionVec(int a_PistonMeta);
+	static Vector3i VectorFromMetaData(int a_PistonMeta);
 
 	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);

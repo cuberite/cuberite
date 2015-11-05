@@ -32,7 +32,7 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	const Vector3i pushDir = GetDirectionVec(OldMeta);
+	const Vector3i pushDir = VectorFromMetaData(OldMeta);
 	int newX = a_BlockX + pushDir.x;
 	int newY = a_BlockY + pushDir.y;
 	int newZ = a_BlockZ + pushDir.z;
@@ -73,7 +73,7 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 
 
 
-Vector3i cBlockPistonHandler::GetDirectionVec(int a_PistonMeta)
+Vector3i cBlockPistonHandler::VectorFromMetaData(int a_PistonMeta)
 {
 	switch (a_PistonMeta & 0x07)
 	{
@@ -214,7 +214,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		return;
 	}
 
-	Vector3i pushDir = GetDirectionVec(pistonMeta);
+	Vector3i pushDir = VectorFromMetaData(pistonMeta);
 
 	std::unordered_set<Vector3i, VectorHasher<int>> blocksPushed;
 	if (!CanPushBlock(a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z,
@@ -253,7 +253,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 		return;
 	}
 
-	Vector3i pushDir = GetDirectionVec(pistonMeta);
+	Vector3i pushDir = VectorFromMetaData(pistonMeta);
 
 	// Check the extension:
 	if (a_World->GetBlock(a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z) != E_BLOCK_PISTON_EXTENSION)
@@ -312,7 +312,7 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	Vector3i pushDir = cBlockPistonHandler::GetDirectionVec(OldMeta);
+	Vector3i pushDir = cBlockPistonHandler::VectorFromMetaData(OldMeta);
 	int newX = a_BlockX - pushDir.x;
 	int newY = a_BlockY - pushDir.y;
 	int newZ = a_BlockZ - pushDir.z;
