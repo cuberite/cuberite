@@ -32,7 +32,7 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	const Vector3i pushDir = VectorFromMetaData(OldMeta);
+	const Vector3i pushDir = MetadataToOffset(OldMeta);
 	int newX = a_BlockX + pushDir.x;
 	int newY = a_BlockY + pushDir.y;
 	int newZ = a_BlockZ + pushDir.z;
@@ -73,7 +73,7 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 
 
 
-Vector3i cBlockPistonHandler::VectorFromMetaData(int a_PistonMeta)
+Vector3i cBlockPistonHandler::MetadataToOffset(NIBBLETYPE a_PistonMeta)
 {
 	switch (a_PistonMeta & 0x07)
 	{
@@ -86,6 +86,7 @@ Vector3i cBlockPistonHandler::VectorFromMetaData(int a_PistonMeta)
 		default:
 		{
 			LOGWARNING("%s: invalid direction %d, ignoring", __FUNCTION__, a_PistonMeta & 0x07);
+			ASSERT(!"Invalid direction");
 			return Vector3i();
 		}
 	}
@@ -95,7 +96,8 @@ Vector3i cBlockPistonHandler::VectorFromMetaData(int a_PistonMeta)
 
 
 
-void cBlockPistonHandler::PushBlocks(const std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksToPush,
+void cBlockPistonHandler::PushBlocks(
+	const Vector3iSet & a_BlocksToPush,
 	cWorld * a_World, const Vector3i & a_PushDir
 )
 {
@@ -110,7 +112,7 @@ void cBlockPistonHandler::PushBlocks(const std::unordered_set<Vector3i, VectorHa
 	// Move every block
 	BLOCKTYPE moveBlock;
 	NIBBLETYPE moveMeta;
-	for (Vector3i & moveBlockPos : sortedBlocks)
+	for (auto & moveBlockPos : sortedBlocks)
 	{
 		a_World->GetBlockTypeMeta(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
 		a_World->SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
@@ -142,11 +144,17 @@ void cBlockPistonHandler::PushBlocks(const std::unordered_set<Vector3i, VectorHa
 
 bool cBlockPistonHandler::CanPushBlock(
 	int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
-	std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, const Vector3i & a_PushDir
+	Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 )
 {
-	const static std::array<Vector3i, 6> pushingDirs = {{ Vector3i(-1, 0, 0), Vector3i(1, 0, 0), Vector3i(0, -1, 0), Vector3i(0, 1, 0),
-		Vector3i(0, 0, -1), Vector3i(0, 0, 1) }};
+	const static std::array<Vector3i, 6> pushingDirs =
+	{
+		{
+			Vector3i(-1,  0,  0), Vector3i(1, 0, 0),
+			Vector3i( 0, -1,  0), Vector3i(0, 1, 0),
+			Vector3i( 0,  0, -1), Vector3i(0, 0, 1)
+		}
+	};
 
 	BLOCKTYPE currBlock;
 	NIBBLETYPE currMeta;
@@ -184,9 +192,12 @@ bool cBlockPistonHandler::CanPushBlock(
 	if (currBlock == E_BLOCK_SLIME_BLOCK)
 	{
 		// Try to push the other directions
-		for (const Vector3i & testDir : pushingDirs)
+		for (const auto & testDir : pushingDirs)
 		{
-			if (!CanPushBlock(a_BlockX + testDir.x, a_BlockY + testDir.y, a_BlockZ + testDir.z, a_World, false, a_BlocksPushed, a_PushDir))
+			if (!CanPushBlock(
+				a_BlockX + testDir.x, a_BlockY + testDir.y, a_BlockZ + testDir.z,
+				a_World, false, a_BlocksPushed, a_PushDir)
+			)
 			{
 				// When it's not possible for a direction, then fail
 				return false;
@@ -195,7 +206,10 @@ bool cBlockPistonHandler::CanPushBlock(
 	}
 
 	// Try to push the block in front of this block
-	return CanPushBlock(a_BlockX + a_PushDir.x, a_BlockY + a_PushDir.y, a_BlockZ + a_PushDir.z, a_World, true, a_BlocksPushed, a_PushDir);
+	return CanPushBlock(
+		a_BlockX + a_PushDir.x, a_BlockY + a_PushDir.y, a_BlockZ + a_PushDir.z,
+		a_World, true, a_BlocksPushed, a_PushDir
+	);
 }
 
 
@@ -214,10 +228,11 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		return;
 	}
 
-	Vector3i pushDir = VectorFromMetaData(pistonMeta);
+	Vector3i pushDir = MetadataToOffset(pistonMeta);
 
-	std::unordered_set<Vector3i, VectorHasher<int>> blocksPushed;
-	if (!CanPushBlock(a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z,
+	Vector3iSet blocksPushed;
+	if (!CanPushBlock(
+		a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z,
 		a_World, true, blocksPushed, pushDir)
 	)
 	{
@@ -253,7 +268,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 		return;
 	}
 
-	Vector3i pushDir = VectorFromMetaData(pistonMeta);
+	Vector3i pushDir = MetadataToOffset(pistonMeta);
 
 	// Check the extension:
 	if (a_World->GetBlock(a_BlockX + pushDir.x, a_BlockY + pushDir.y, a_BlockZ + pushDir.z) != E_BLOCK_PISTON_EXTENSION)
@@ -282,7 +297,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 	// Try to "push" the pulling block in the opposite direction
 	pushDir *= -1;
 
-	std::unordered_set<Vector3i, VectorHasher<int>> pushedBlocks;
+	Vector3iSet pushedBlocks;
 	if (!CanPushBlock(a_BlockX, a_BlockY, a_BlockZ, a_World, false, pushedBlocks, pushDir))
 	{
 		// Not pushable, bail out
@@ -312,7 +327,7 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	Vector3i pushDir = cBlockPistonHandler::VectorFromMetaData(OldMeta);
+	Vector3i pushDir = cBlockPistonHandler::MetadataToOffset(OldMeta);
 	int newX = a_BlockX - pushDir.x;
 	int newY = a_BlockY - pushDir.y;
 	int newZ = a_BlockZ - pushDir.z;
@@ -331,3 +346,8 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 		a_WorldInterface.SpawnItemPickups(Pickups, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
 	}
 }
+
+
+
+
+

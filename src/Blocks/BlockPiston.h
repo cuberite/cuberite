@@ -81,10 +81,8 @@ public:
 		}
 	}
 
-	/** This method converts the magic piston metadata into a direction vector.
-		This vector has a length of 1 and points into the direction, in which the piston will extend.
-	*/
-	static Vector3i VectorFromMetaData(int a_PistonMeta);
+	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
+	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
 
 	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
@@ -96,6 +94,8 @@ public:
 	}
 
 private:
+	
+	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
 
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
 	static inline bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
@@ -151,11 +151,11 @@ private:
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
 	static bool CanPushBlock(
 		int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, bool a_RequirePushable,
-		std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksPushed, const Vector3i & a_PushDir
+		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 	
 	/** Moves a list of blocks in a specific direction */
-	static void PushBlocks(const std::unordered_set<Vector3i, VectorHasher<int>> & a_BlocksToPush,
+	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
 		cWorld * a_World, const Vector3i & a_PushDir
 	);
 } ;
