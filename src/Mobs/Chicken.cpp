@@ -61,6 +61,10 @@ void cChicken::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+void cChicken::HandleFalling(void)
+{
+	// empty - chickens don't take fall damage
+}
 
 
 
