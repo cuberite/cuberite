@@ -13,6 +13,8 @@ cChicken::cChicken(void) :
 	super("Chicken", mtChicken, "mob.chicken.hurt", "mob.chicken.hurt", 0.3, 0.4),
 	m_EggDropTimer(0)
 {
+	SetGravity(-2.0f);
+	SetAirDrag(0.0f);
 }
 
 
