@@ -29,9 +29,12 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!TargetIsInRange() && !m_BurnedWithFlintAndSteel)
 	{
-		m_ExplodingTimer = 0;
-		m_bIsBlowing = false;
-		m_World->BroadcastEntityMetadata(*this);
+		if (m_bIsBlowing)
+		{
+			m_ExplodingTimer = 0;
+			m_bIsBlowing = false;
+			m_World->BroadcastEntityMetadata(*this);
+		}
 	}
 	else
 	{
