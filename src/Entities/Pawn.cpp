@@ -93,20 +93,30 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cPawn::HandleFalling()
 {
-	if (m_bTouchGround)
+	if (!m_bTouchGround)
 	{
-		int Damage = (m_LastGroundHeight - POSY_TOINT) - 3;
+		// Just update the ground height to have the highest position of the player
+		m_LastGroundHeight = std::max(m_LastGroundHeight, POSY_TOINT);
+		return;
+	}
+	
+	int Damage = (m_LastGroundHeight - POSY_TOINT) - 3;
+	m_LastGroundHeight = POSY_TOINT;
+	
+	if (
+		(GetWorld()->GetBlock(POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT) == E_BLOCK_SLIME_BLOCK)    // Falling on slimeblocks does not inflict fall damage
+		// TODO !((GetEntityType() == eEntityType::etPlayer) && static_cast<cPlayer*>(this)->IsCrouched())  // Except the player is sneaking
+	)
+	{
+		return;
+	}
 
-		if (Damage > 0)
-		{
-			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
-
+	if (Damage > 0)
+	{
+		TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 			
-			// Fall particles
-			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
-		}
-
-		m_LastGroundHeight = POSY_TOINT;
+		// Fall particles
+		GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
 	}
 	
 	/* Player.cpp old code
