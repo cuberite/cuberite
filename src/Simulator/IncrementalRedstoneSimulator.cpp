@@ -882,11 +882,11 @@ void cIncrementalRedstoneSimulator::HandlePiston(int a_RelBlockX, int a_RelBlock
 
 	if (IsPistonPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x7))  // We only want the bottom three bits (4th controls extended-ness)
 	{
-		GetHandlerCompileTime<E_BLOCK_PISTON>::type::ExtendPiston(BlockX, a_RelBlockY, BlockZ, &this->m_World);
+		GetHandlerCompileTime<E_BLOCK_PISTON>::type::ExtendPiston(Vector3i(BlockX, a_RelBlockY, BlockZ), &this->m_World);
 	}
 	else
 	{
-		GetHandlerCompileTime<E_BLOCK_PISTON>::type::RetractPiston(BlockX, a_RelBlockY, BlockZ, &this->m_World);
+		GetHandlerCompileTime<E_BLOCK_PISTON>::type::RetractPiston(Vector3i(BlockX, a_RelBlockY, BlockZ), &this->m_World);
 	}
 }
 

@@ -3,6 +3,8 @@
 
 #include "BlockHandler.h"
 
+#include <unordered_set>
+
 
 class cWorld;
 
@@ -79,8 +81,11 @@ public:
 		}
 	}
 
-	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
+	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
+
+	static void ExtendPiston(Vector3i a_BlockPos, cWorld * a_World);
+	static void RetractPiston(Vector3i a_BlockPos, cWorld * a_World);
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -89,6 +94,8 @@ public:
 	}
 
 private:
+	
+	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
 
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
 	static inline bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
@@ -141,19 +148,16 @@ private:
 		return true;
 	}
 
-	/** Returns true if the specified block can be pulled by a sticky piston */
-	static inline bool CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
-		if (cBlockInfo::IsPistonBreakable(a_BlockType))
-		{
-			return false;  // CanBreakPush returns true, but we need false to prevent pulling
-		}
-		
-		return CanPush(a_BlockType, a_BlockMeta);
-	}
-
-	/** Returns how many blocks the piston has to push (where the first free space is); < 0 when unpushable */
-	static int FirstPassthroughBlock(int a_PistonX, int a_PistonY, int a_PistonZ, NIBBLETYPE a_PistonMeta, cWorld * a_World);
+	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
+	static bool CanPushBlock(
+		const Vector3i & a_BlockPos, cWorld * a_World, bool a_RequirePushable,
+		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
+	);
+	
+	/** Moves a list of blocks in a specific direction */
+	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
+		cWorld * a_World, const Vector3i & a_PushDir
+	);
 } ;
 
 
