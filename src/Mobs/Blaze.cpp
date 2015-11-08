@@ -32,7 +32,7 @@ void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cBlaze::Attack(std::chrono::milliseconds a_Dt)
+bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 {
 	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
 
@@ -44,16 +44,18 @@ void cBlaze::Attack(std::chrono::milliseconds a_Dt)
 		cFireChargeEntity * FireCharge = new cFireChargeEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
 		if (FireCharge == nullptr)
 		{
-			return;
+			return false;
 		}
 		if (!FireCharge->Initialize(*m_World))
 		{
 			delete FireCharge;
 			FireCharge = nullptr;
-			return;
+			return false;
 		}
 		m_World->BroadcastSpawnEntity(*FireCharge);
 		m_AttackInterval = 0.0;
 		// ToDo: Shoot 3 fireballs instead of 1.
+		return true;
 	}
+	return false;
 }

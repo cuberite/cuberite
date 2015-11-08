@@ -20,7 +20,7 @@ public:
 
 	// cAggressiveMonster overrides:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void Attack(std::chrono::milliseconds a_Dt) override;
+	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	int GetSize(void) const { return m_Size; }

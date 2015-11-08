@@ -20,7 +20,7 @@ public:
 	virtual void InStateChasing(std::chrono::milliseconds a_Dt) override;
 	
 	virtual void EventSeePlayer(cEntity *) override;
-	virtual void Attack(std::chrono::milliseconds a_Dt);
+	virtual bool Attack(std::chrono::milliseconds a_Dt);
 } ;
 
 

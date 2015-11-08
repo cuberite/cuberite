@@ -92,15 +92,17 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
+bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 {
 	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
 	if ((m_Target == nullptr) || (m_AttackInterval < 3.0))
 	{
-		return;
+		return false;
 	}
 
 	// Setting this higher gives us more wiggle room for attackrate
 	m_AttackInterval = 0.0;
 	m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
+	
+	return true;
 }
