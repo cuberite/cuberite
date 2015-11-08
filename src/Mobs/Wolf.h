@@ -22,7 +22,7 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
-	virtual void Attack(std::chrono::milliseconds a_Dt) override;
+	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 
 	// Get functions
 	bool    IsSitting     (void) const override { return m_IsSitting; }

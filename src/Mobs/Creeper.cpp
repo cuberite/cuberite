@@ -121,7 +121,7 @@ bool cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cCreeper::Attack(std::chrono::milliseconds a_Dt)
+bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 
@@ -130,7 +130,10 @@ void cCreeper::Attack(std::chrono::milliseconds a_Dt)
 		m_World->BroadcastSoundEffect("game.tnt.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
+		
+		return true;
 	}
+	return false;
 }
 
 

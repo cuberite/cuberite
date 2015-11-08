@@ -48,7 +48,7 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSkeleton::Attack(std::chrono::milliseconds a_Dt)
+bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
 	cFastRandom Random;
 	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
@@ -60,17 +60,20 @@ void cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 		cArrowEntity * Arrow = new cArrowEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
 		if (Arrow == nullptr)
 		{
-			return;
+			return false;
 		}
 		if (!Arrow->Initialize(*m_World))
 		{
 			delete Arrow;
 			Arrow = nullptr;
-			return;
+			return false;
 		}
 		m_World->BroadcastSpawnEntity(*Arrow);
 		m_AttackInterval = 0.0;
+		
+		return true;
 	}
+	return false;
 }
 
 

@@ -45,7 +45,7 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cWolf::Attack(std::chrono::milliseconds a_Dt)
+bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 
@@ -53,13 +53,15 @@ void cWolf::Attack(std::chrono::milliseconds a_Dt)
 	{
 		if (static_cast<cPlayer *>(m_Target)->GetName() != m_OwnerName)
 		{
-			super::Attack(a_Dt);
+			return super::Attack(a_Dt);
 		}
 	}
 	else
 	{
-		super::Attack(a_Dt);
+		return super::Attack(a_Dt);
 	}
+	
+	return false;
 }
 
 
