@@ -1161,14 +1161,23 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			// MCS feature - stone pressure plates can only be triggered by players :D
 			cPlayer * a_Player = this->m_World.FindClosestPlayer(Vector3f(BlockX + 0.5f, static_cast<float>(a_RelBlockY), BlockZ + 0.5f), 0.5f, false);
 
+			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 			if (a_Player != nullptr)
 			{
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.5F);
+				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x1);
 				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 				SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM);
 			}
 			else
 			{
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", static_cast<double>(BlockX) + 0.5, static_cast<double>(a_RelBlockY) + 0.1, static_cast<double>(BlockZ) + 0.5, 0.3F, 0.6F);
+				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x0);
 				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 			}
