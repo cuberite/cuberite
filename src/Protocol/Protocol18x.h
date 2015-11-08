@@ -52,6 +52,7 @@ class cProtocol180 :
 	public cLengthenedProtocol
 {
 	typedef cLengthenedProtocol super;
+	typedef std::vector<std::unique_ptr<cClientAction>> ActionList;
 	
 public:
 
@@ -154,15 +155,8 @@ public:
 
 protected:
 
-	AString m_ServerAddress;
-	
-	UInt16 m_ServerPort;
-	
 	AString m_AuthServerID;
 	
-	/** State of the protocol. 1 = status, 2 = login, 3 = game */
-	UInt32 m_State;
-
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
 	
@@ -181,40 +175,40 @@ protected:
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
 	*/
-	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
+	cProtocolError HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType, ActionList & a_Action) WARN_UNUSED;
 
 	// Packet handlers while in the Status state (m_State == 1):
-	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
-	void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
+	cProtocolError HandlePacketStatusPing(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
 
 	// Packet handlers while in the Login state (m_State == 2):
-	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
-	void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
+	cProtocolError HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketLoginStart(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
 	
 	// Packet handlers while in the Game state (m_State == 3):
-	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
-	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
-	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
+	cProtocolError HandlePacketAnimation              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
+	cProtocolError HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer, ActionList & a_Action) WARN_UNUSED;
 	
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
@@ -222,10 +216,10 @@ protected:
 	
 	
 	/** Sends the data to the client, encrypting them if needed. */
-	//virtual void SendData(cByteBuffer & a_ByteBuffer, const char * a_Data, size_t a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
-	//virtual void SendPacket(cPacketizer & a_Packet) override;
+	virtual void SendPacket(cPacketizer & a_Packet) override;
 
 	void SendCompass(const cWorld & a_World);
 	

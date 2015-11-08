@@ -132,8 +132,11 @@ public:
 
 	//virtual void SendData(const char * a_Data, size_t a_Size) override;
 
-	cProtocolError HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) override WARN_UNUSED;
-
+	cProtocolError HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) override WARN_UNUSED
+	{
+		ASSERT(!"cProtocolRecognizer should be decoding the handshake packet");
+		return cProtocolError::PacketError;
+	}
 protected:
 	/** The recognized protocol */
 	std::unique_ptr<cProtocol> m_Protocol;

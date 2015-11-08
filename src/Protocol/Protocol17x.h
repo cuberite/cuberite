@@ -41,6 +41,7 @@ namespace Json
 {
 	class Value;
 }
+class cDataSender;
 
 
 
@@ -144,14 +145,9 @@ protected:
 
 	typedef std::vector<std::unique_ptr<cClientAction>> ActionList;
 
-	AString m_ServerAddress;
-	
-	UInt16 m_ServerPort;
 	
 	AString m_AuthServerID;
 	
-	/** State of the protocol. 1 = status, 2 = login, 3 = game */
-	UInt32 m_State;
 	
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
@@ -197,10 +193,10 @@ protected:
 	
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, to be read by this function. */
-	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, UInt16 a_PayloadLength);
+	cProtocolError HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, UInt16 a_PayloadLength, ActionList & a_Action) WARN_UNUSED;
 	
 	/** Sends the data to the client, encrypting them if needed. */
-	//virtual void SendData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) override;
+	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;

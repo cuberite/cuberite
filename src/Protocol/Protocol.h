@@ -73,7 +73,8 @@ public:
 		// We send a kick packet in response to a process error
 		PacketProcessError,
 		NotCompleted,
-		UnsupportedProtocol
+		UnsupportedProtocol,
+		BadCompression
 	};
 
 	cProtocol(AString a_LogID) :
@@ -181,6 +182,8 @@ public:
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
+	
+	// Handle the initial handshake packets, called by cProtocolRecognizer after recognising the packet
 	virtual cProtocolError HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Actions) WARN_UNUSED = 0;
 
 protected:
@@ -204,11 +207,11 @@ protected:
 
 	
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
-	//virtual void SendData(cByteBuffer & a_ByteBuffer, const char * a_Data, size_t a_Size) = 0;
+	//virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
-	//virtual void SendPacket(cPacketizer & a_Packet) = 0;
+	virtual void SendPacket(cPacketizer & a_Packet) = 0;
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;

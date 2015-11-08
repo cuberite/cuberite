@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "LengthenedProtocol.h"
+#include "ClientAction.h"
 
 cProtocol::cProtocolError cLengthenedProtocol::DataReceived(const char * a_Data, size_t a_Size, std::vector<std::unique_ptr<cClientAction>> & a_Actions)
 {
@@ -85,3 +86,41 @@ cProtocol::cProtocolError cLengthenedProtocol::AddReceivedData(const char * a_Da
 	}
 	return cProtocolError::Success;
 }
+
+#define ADD_SIMPLE_ACTION(Name) a_Action.push_back(cpp14::make_unique<cSimpleAction>(cClientAction::Type::Name));
+
+cProtocol::cProtocolError cLengthenedProtocol::HandleHandshake(cByteBuffer & a_ByteBuffer, std::vector<std::unique_ptr<cClientAction>> & a_Action)
+{
+	// these need to replace the values provided to the constructor in the old version
+        if (!a_ByteBuffer.ReadVarUTF8String(m_ServerAddress))
+        {
+        	return cProtocolError::PacketReadError;
+        }
+        if (!a_ByteBuffer.ReadBEUInt16(m_ServerPort))
+        {
+        	return cProtocolError::PacketReadError;
+        }
+        if (!a_ByteBuffer.ReadVarInt(m_State))
+        {
+        	return cProtocolError::PacketReadError;
+        } 
+        a_ByteBuffer.CommitRead();
+
+	// BungeeCord handling:
+	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+	// hostname\00ip-address\00uuid\00profile-properties-as-json
+	AStringVector Params;
+	if (m_ShouldAllowBungeeCord && SplitZeroTerminatedStrings(m_ServerAddress, Params) && (Params.size() == 4))
+	{
+		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+		m_ServerAddress = Params[0];
+		//a_Client->SetIPString(Params[1]);
+		//a_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
+		//a_Client->SetProperties(Params[3]);
+		ADD_SIMPLE_ACTION(SetIPString);
+		ADD_SIMPLE_ACTION(SetUUID);
+		ADD_SIMPLE_ACTION(SetProperties);
+	}
+	return cProtocolError::Success;
+} 
+

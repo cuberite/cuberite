@@ -13,7 +13,6 @@ Implements the 1.8.x protocol classes:
 #include "json/json.h"
 #include "zlib/zlib.h"
 #include "Protocol18x.h"
-#if 0
 #include "ChunkDataSerializer.h"
 #include "PolarSSL++/Sha1Checksum.h"
 #include "Packetizer.h"
@@ -49,14 +48,14 @@ Implements the 1.8.x protocol classes:
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "Bindings/PluginManager.h"
+#include "DataSender.h"
 
 
 
 
-
+#if 0
 /** The slot number that the client uses to indicate "outside the window". */
 static const Int16 SLOT_NUM_OUTSIDE = -999;
-
 
 
 
@@ -68,7 +67,7 @@ static const Int16 SLOT_NUM_OUTSIDE = -999;
 		return;\
 	}
 
-
+#endif
 
 
 
@@ -82,15 +81,13 @@ static const Int16 SLOT_NUM_OUTSIDE = -999;
 		} \
 		ByteBuf.CheckValid(); \
 	}
-
-
+#if 0
 
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 #endif
 const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
 #if 0
-
 
 
 
@@ -141,30 +138,6 @@ cProtocol180::cProtocol180(const AString a_LogID) :
 		}
 	}
 #endif
-}
-#if 0
-
-
-
-
-void cProtocol180::DataReceived(const char * a_Data, size_t a_Size)
-{
-	if (m_IsEncrypted)
-	{
-		Byte Decrypted[512];
-		while (a_Size > 0)
-		{
-			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
-			a_Size -= NumBytes;
-			a_Data += NumBytes;
-		}
-	}
-	else
-	{
-		AddReceivedData(a_Data, a_Size);
-	}
 }
 
 
@@ -317,7 +290,7 @@ void cProtocol180::SendDestroyEntity(const cEntity & a_Entity)
 
 
 
-void cProtocol180::SendDisconnect(const AString & a_Reason)
+void cProtocol180::SendDisconnect(AString & a_Buffer, const AString & a_Reason)
 {
 	switch (m_State)
 	{
@@ -545,10 +518,9 @@ void cProtocol180::SendHealth(int a_Health, int a_FoodLevel, double a_FoodSatura
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x06);  // Update Health packet
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetHealth()));
-	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetFoodLevel()));
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetFoodSaturationLevel()));
+	Pkt.WriteBEFloat(static_cast<float>(a_Health));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_FoodLevel));
+	Pkt.WriteBEFloat(static_cast<float>(a_FoodSaturationLevel));
 }
 
 
@@ -627,13 +599,13 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	}
 	
 	// Send player abilities:
-	SendPlayerAbilities();
+	SendPlayerAbilities(a_Player);
 }
 
 
 
 
-void cProtocol180::SendLoginSuccess(void)
+void cProtocol180::SendLoginSuccess(const AString & a_UUID, const AString & a_Username)
 {
 	ASSERT(m_State == 2);  // State: login?
 
@@ -647,8 +619,8 @@ void cProtocol180::SendLoginSuccess(void)
 
 	{
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(m_Client->GetUUID()));
-		Pkt.WriteString(m_Client->GetUsername());
+		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_UUID));
+		Pkt.WriteString(a_Username);
 	}
 }
 
@@ -734,29 +706,28 @@ void cProtocol180::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
-void cProtocol180::SendPlayerAbilities(const cPlayer const * a_Player)
+void cProtocol180::SendPlayerAbilities(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x39);  // Player Abilities packet
 	Byte Flags = 0;
-	cPlayer * Player = m_Client->GetPlayer();
-	if (Player->IsGameModeCreative())
+	if (a_Player.IsGameModeCreative())
 	{
 		Flags |= 0x01;
 		Flags |= 0x08;  // Godmode, used for creative
 	}
-	if (Player->IsFlying())
+	if (a_Player.IsFlying())
 	{
 		Flags |= 0x02;
 	}
-	if (Player->CanFly())
+	if (a_Player.CanFly())
 	{
 		Flags |= 0x04;
 	}
 	Pkt.WriteBEUInt8(Flags);
-	Pkt.WriteBEFloat(static_cast<float>(0.05 * Player->GetFlyingMaxSpeed()));
-	Pkt.WriteBEFloat(static_cast<float>(0.1 * Player->GetNormalMaxSpeed()));
+	Pkt.WriteBEFloat(static_cast<float>(0.05 * a_Player.GetFlyingMaxSpeed()));
+	Pkt.WriteBEFloat(static_cast<float>(0.1 * a_Player.GetNormalMaxSpeed()));
 }
 
 
@@ -951,23 +922,22 @@ void cProtocol180::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, con
 
 
 
-void cProtocol180::SendPlayerMaxSpeed(void)
+void cProtocol180::SendPlayerMaxSpeed(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x20);  // Entity Properties
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteVarInt32(Player->GetUniqueID());
+	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteBEInt32(1);  // Count
 	Pkt.WriteString("generic.movementSpeed");
 	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
-	if (Player->IsSprinting())
+	Pkt.WriteBEDouble(0.1 * a_Player.GetNormalMaxSpeed());
+	if (a_Player.IsSprinting())
 	{
 		Pkt.WriteVarInt32(1);  // Modifier count
 		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
 		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
+		Pkt.WriteBEDouble(a_Player.GetSprintingMaxSpeed() - a_Player.GetNormalMaxSpeed());
 		Pkt.WriteBEUInt8(2);
 	}
 	else
@@ -980,17 +950,16 @@ void cProtocol180::SendPlayerMaxSpeed(void)
 
 
 
-void cProtocol180::SendPlayerMoveLook(void)
+void cProtocol180::SendPlayerMoveLook(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEDouble(Player->GetPosX());
-	Pkt.WriteBEDouble(Player->GetPosY());
-	Pkt.WriteBEDouble(Player->GetPosZ());
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
+	Pkt.WriteBEDouble(a_Player.GetPosX());
+	Pkt.WriteBEDouble(a_Player.GetPosY());
+	Pkt.WriteBEDouble(a_Player.GetPosZ());
+	Pkt.WriteBEFloat(static_cast<float>(a_Player.GetYaw()));
+	Pkt.WriteBEFloat(static_cast<float>(a_Player.GetPitch()));
 	Pkt.WriteBEUInt8(0);
 }
 
@@ -998,10 +967,10 @@ void cProtocol180::SendPlayerMoveLook(void)
 
 
 
-void cProtocol180::SendPlayerPosition(void)
+void cProtocol180::SendPlayerPosition(const cPlayer & a_Player)
 {
 	// There is no dedicated packet for this, send the whole thing:
-	SendPlayerMoveLook();
+	SendPlayerMoveLook(a_Player);
 }
 
 
@@ -1079,10 +1048,9 @@ void cProtocol180::SendRespawn(eGameMode a_GameMode, eDimension a_Dimension, boo
 	}
 
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
-	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Dimension));
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(a_GameMode));
 	Pkt.WriteString("default");
 	m_LastSentDimension = a_Dimension;
 }
@@ -1091,15 +1059,14 @@ void cProtocol180::SendRespawn(eGameMode a_GameMode, eDimension a_Dimension, boo
 
 
 
-void cProtocol180::SendExperience(void)
+void cProtocol180::SendExperience(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x1f);  // Experience Packet
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEFloat(Player->GetXpPercentage());
-	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetXpLevel()));
-	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetCurrentXp()));
+	Pkt.WriteBEFloat(a_Player.GetXpPercentage());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetXpLevel()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetCurrentXp()));
 }
 
 
@@ -1552,7 +1519,7 @@ void cProtocol180::SendWeather(eWeather a_Weather)
 
 
 
-void cProtocol180::SendWholeInventory(const cWindow & a_Window)
+void cProtocol180::SendWholeInventory(const cPlayer & a_Player, const cWindow & a_Window)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -1560,7 +1527,7 @@ void cProtocol180::SendWholeInventory(const cWindow & a_Window)
 	Pkt.WriteBEInt8(a_Window.GetWindowID());
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Window.GetNumSlots()));
 	cItems Slots;
-	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
+	a_Window.GetSlots(a_Player, Slots);
 	for (cItems::const_iterator itr = Slots.begin(), end = Slots.end(); itr != end; ++itr)
 	{
 		WriteItem(Pkt, *itr);
@@ -1635,7 +1602,6 @@ void cProtocol180::SendWindowProperty(const cWindow & a_Window, short a_Property
 }
 
 
-#endif
 
 
 bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
@@ -1777,45 +1743,13 @@ void cProtocol180::FixItemFramePositions(int a_ObjectData, double & a_PosX, doub
 		}
 	}
 }
+#endif
 
 
 
 
-
-void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
+cProtocol::cProtocolError cProtocol180::OnDataAddedToBuffer(cByteBuffer & a_Buffer, ActionList & a_Action)
 {
-	// Write the incoming data into the comm log file:
-	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-	{
-		if (m_ReceivedData.GetReadableSpace() > 0)
-		{
-			AString AllData;
-			size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
-			m_ReceivedData.ReadAll(AllData);
-			m_ReceivedData.ResetRead();
-			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
-			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
-			AString Hex;
-			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") unparsed bytes already present in buffer:\n%s\n",
-				AllData.size(), AllData.size(), Hex.c_str()
-			);
-		}
-		AString Hex;
-		CreateHexDump(Hex, a_Data, a_Size, 16);
-		m_CommLogFile.Printf("Incoming data: %u (0x%x) bytes: \n%s\n",
-			static_cast<unsigned>(a_Size), static_cast<unsigned>(a_Size), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
-	}
-
-	if (!m_ReceivedData.Write(a_Data, a_Size))
-	{
-		// Too much data in the incoming queue, report to caller:
-		m_Client->PacketBufferFull();
-		return;
-	}
-
 	// Handle all complete packets:
 	for (;;)
 	{
@@ -1842,8 +1776,8 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			m_ReceivedData.ReadVarInt(CompressedSize);
 			if (CompressedSize > PacketLen)
 			{
-				m_Client->Kick("Bad compression");
-				return;
+				//m_Client->Kick("Bad compression");
+				return cProtocolError::BadCompression;
 			}
 			if (CompressedSize > 0)
 			{
@@ -1851,8 +1785,8 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 				AString CompressedData;
 				if (!m_ReceivedData.ReadString(CompressedData, CompressedSize) || (InflateString(CompressedData.data(), CompressedSize, UncompressedData) != Z_OK))
 				{
-					m_Client->Kick("Compression failure");
-					return;
+					//m_Client->Kick("Compression failure");
+					return cProtocolError::BadCompression;
 				}
 				PacketLen = static_cast<UInt32>(UncompressedData.size());
 			}
@@ -1926,7 +1860,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
 			}
 			
-			return;
+			return cProtocolError::Success;
 		}
 
 		// The packet should have 1 byte left in the buffer - the NUL we had added
@@ -1947,32 +1881,16 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			}
 
 			ASSERT(!"Read wrong number of bytes!");
-			m_Client->PacketError(PacketType);
+			//m_Client->PacketError(PacketType);
+			return cProtocolError::PacketError;
 		}
 	}  // for (ever)
-
-	// Log any leftover bytes into the logfile:
-	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
-	{
-		AString AllData;
-		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
-		m_ReceivedData.ReadAll(AllData);
-		m_ReceivedData.ResetRead();
-		m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
-		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
-		AString Hex;
-		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-		m_CommLogFile.Printf("There are " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") bytes of non-parse-able data left in the buffer:\n%s",
-			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
-	}
+	return cProtocolError::Success;
 }
 
 
 
-
-bool cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+cProtocol::cProtocolError cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	switch (m_State)
 	{
@@ -2050,14 +1968,14 @@ bool cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 	}  // switch (m_State)
 	
 	// Unknown packet type, report to the ClientHandle:
-	m_Client->PacketUnknown(a_PacketType);
-	return false;
+	//m_Client->PacketUnknown(a_PacketType);
+	return cProtocolError::PacketUnknown;
 }
 
 
 
 
-
+#if 0
 void cProtocol180::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Timestamp);
@@ -2724,7 +2642,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	VERIFY(a_ByteBuffer.ReadString(Message, a_ByteBuffer.GetReadableSpace() - 1));
 	m_Client->HandlePluginMessage(a_Channel, Message);
 }
-
+#endif
 
 
 
@@ -2738,17 +2656,16 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 		{
 			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
 			m_Encryptor.ProcessData(Encrypted, reinterpret_cast<Byte *>(const_cast<char*>(a_Data)), NumBytes);
-			m_Client->SendData(reinterpret_cast<const char *>(Encrypted), NumBytes);
+			m_Sender->SendData(reinterpret_cast<const char *>(Encrypted), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
 	}
 	else
 	{
-		m_Client->SendData(a_Data, a_Size);
+		m_Sender->SendData(a_Data, a_Size);
 	}
 }
-
 
 
 
@@ -2783,7 +2700,6 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a
 	ParseItemMetadata(a_Item, Metadata);
 	return true;
 }
-
 
 
 
@@ -2862,7 +2778,7 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 
 
-
+#if 0
 void cProtocol180::StartEncryption(const Byte * a_Key)
 {
 	m_Encryptor.Init(a_Key, a_Key);
@@ -2900,7 +2816,7 @@ eBlockFace cProtocol180::FaceIntToBlockFace(Int8 a_BlockFace)
 		default: return BLOCK_FACE_NONE;
 	}
 }
-
+#endif
 
 
 
@@ -2961,7 +2877,6 @@ void cProtocol180::SendPacket(cPacketizer & a_Pkt)
 		);
 	}
 }
-
 
 
 
@@ -3053,7 +2968,7 @@ void cProtocol180::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 
 
-
+#if 0
 void cProtocol180::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
 {
 	cFastNBTWriter Writer;
