@@ -29,7 +29,7 @@ cBrewingstandEntity::cBrewingstandEntity(int a_BlockX, int a_BlockY, int a_Block
 	m_Contents.AddListener(*this);
 	for (int i = 0; i < 3; i++)
 	{
-		m_Results[i] = *(new cItem());
+		m_Results[i] = cItem{};
 	}
 }
 
