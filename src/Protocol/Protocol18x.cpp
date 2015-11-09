@@ -3296,7 +3296,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Creeper = reinterpret_cast<const cCreeper &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Creeper.IsBlowing() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(Creeper.IsBlowing() ? 1 : 255);
 			a_Pkt.WriteBEUInt8(0x11);
 			a_Pkt.WriteBEUInt8(Creeper.IsCharged() ? 1 : 0);
 			break;
