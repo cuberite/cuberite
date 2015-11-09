@@ -20,6 +20,10 @@ public:
 	virtual void InStateChasing(std::chrono::milliseconds a_Dt) override;
 	
 	virtual void EventSeePlayer(cEntity *) override;
+	
+	/** Try to perform attack
+	returns true if attack was deemed successful (hit player, fired projectile, creeper exploded, etc.) even if it didn't actually do damage
+	return false if e.g. the mob is still in cooldown from a previous attack */
 	virtual bool Attack(std::chrono::milliseconds a_Dt);
 } ;
 
