@@ -60,7 +60,15 @@ public:
 			)
 			{
 				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
+				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
+				{
+					return false;
+				}
+				if (a_Player.IsGameModeSurvival())
+				{
+					a_Player.GetInventory().RemoveOneEquippedItem();
+				}
+				return true;
 			}
 
 			// If clicking the bottom side of a top-half slab, combine into a doubleslab:
@@ -70,7 +78,15 @@ public:
 			)
 			{
 				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
+				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
+				{
+					return false;
+				}
+				if (a_Player.IsGameModeSurvival())
+				{
+					a_Player.GetInventory().RemoveOneEquippedItem();
+				}
+				return true;
 			}
 		}
 
@@ -86,7 +102,15 @@ public:
 		)
 		{
 			a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-			return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07);
+			if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07))
+			{
+				return false;
+			}
+			if (a_Player.IsGameModeSurvival())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
+			return true;
 		}
 
 		// The slabs didn't combine, use the default handler to place the slab:
