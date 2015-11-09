@@ -13,6 +13,8 @@
 cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 	super(a_EntityType, 0, 0, 0, a_Width, a_Height)
 	, m_EntityEffects(tEffectMap())
+	, m_bTouchGround(false)
+	, m_LastGroundHeight(POSY_TOINT)
 {
 	SetGravity(-32.0f);
 	SetAirDrag(0.02f);
@@ -80,7 +82,62 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), GetWidth(), GetHeight()), Callback);
 	
+	HandleFalling();
+	
 	super::Tick(a_Dt, a_Chunk);
+}
+
+
+
+
+
+void cPawn::HandleFalling()
+{
+	if (!m_bTouchGround)
+	{
+		// Just update the ground height to have the highest position of the player
+		m_LastGroundHeight = std::max(m_LastGroundHeight, POSY_TOINT);
+		return;
+	}
+	
+	int Damage = (m_LastGroundHeight - POSY_TOINT) - 3;
+	m_LastGroundHeight = POSY_TOINT;
+	
+	if (
+		(GetWorld()->GetBlock(POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT) == E_BLOCK_SLIME_BLOCK)    // Falling on slimeblocks does not inflict fall damage
+		// TODO !((GetEntityType() == eEntityType::etPlayer) && static_cast<cPlayer*>(this)->IsCrouched())  // Except the player is sneaking
+	)
+	{
+		return;
+	}
+
+	if (Damage > 0)
+	{
+		TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
+			
+		// Fall particles
+		GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
+	}
+	
+	/* Player.cpp old code
+	auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
+	if (Damage > 0)
+	{
+		// cPlayer makes sure damage isn't applied in creative, no need to check here
+		TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
+
+		// Fall particles
+		Damage = std::min(15, Damage);
+		GetClientHandle()->SendParticleEffect(
+			"blockdust",
+			GetPosition(),
+			{ 0, 0, 0 },
+			(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
+			static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
+			{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
+		);
+	}
+	*/
 }
 
 

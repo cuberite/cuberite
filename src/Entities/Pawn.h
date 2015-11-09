@@ -55,6 +55,11 @@ public:
 protected:
 	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
 	tEffectMap m_EntityEffects;
+	
+	bool m_bTouchGround;
+	int m_LastGroundHeight;
+	
+	virtual void HandleFalling(void);
 } ;  // tolua_export
 
 

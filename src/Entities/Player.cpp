@@ -55,8 +55,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_FoodSaturationLevel(5.0),
 	m_FoodTickTimer(0),
 	m_FoodExhaustionLevel(0.0),
-	m_LastGroundHeight(0),
-	m_bTouchGround(false),
 	m_Stance(0.0),
 	m_Inventory(*this),
 	m_EnderChestContents(9, 3),
@@ -497,26 +495,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		)
 	)
 	{
-		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
-		if (Damage > 0)
-		{
-			// cPlayer makes sure damage isn't applied in creative, no need to check here
-			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
-
-			// Fall particles
-			Damage = std::min(15, Damage);
-			GetClientHandle()->SendParticleEffect(
-				"blockdust",
-				GetPosition(),
-				{ 0, 0, 0 },
-				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
-				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-				{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
-			);
-		}
-
 		m_bTouchGround = true;
-		m_LastGroundHeight = GetPosY();
 	}
 	else
 	{

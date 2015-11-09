@@ -246,8 +246,7 @@ protected:
 	/** Sets the body yaw and head yaw / pitch based on next / ultimate destinations */
 	void SetPitchAndYawFromDestination(void);
 
-	virtual void HandleFalling(void);
-	int m_LastGroundHeight;
+	virtual void HandleFalling(void) override;
 	int m_JumpCoolDown;
 
 	std::chrono::milliseconds m_IdleInterval;

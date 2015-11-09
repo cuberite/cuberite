@@ -550,8 +550,6 @@ protected:
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
 
-	double m_LastGroundHeight;
-	bool m_bTouchGround;
 	double m_Stance;
 
 	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
