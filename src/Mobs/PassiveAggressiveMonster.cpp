@@ -39,3 +39,9 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+void cPassiveAggressiveMonster::EventSeePlayer(cEntity *)
+{
+	// don't do anything, neutral mobs don't react to just seeing the player
+}
+
+

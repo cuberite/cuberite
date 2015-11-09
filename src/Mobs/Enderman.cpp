@@ -126,7 +126,7 @@ void cEnderman::CheckEventSeePlayer()
 
 	if (!Callback.GetPlayer()->IsGameModeCreative())
 	{
-		super::EventSeePlayer(Callback.GetPlayer());
+		cMonster::EventSeePlayer(Callback.GetPlayer());
 		m_EMState = CHASING;
 		m_bIsScreaming = true;
 		GetWorld()->BroadcastEntityMetadata(*this);
