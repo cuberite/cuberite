@@ -3,6 +3,7 @@
 ..\Server\Plugins
 ..\Server\Prefabs
 ..\Server\webadmin
+..\Server\brewing.txt
 ..\Server\crafting.txt
 ..\Server\furnace.txt
 ..\Server\items.ini
