@@ -70,7 +70,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 			Vector3d v3Delta = a_Entity->GetPosition() - m_Pusher->GetPosition();
 			v3Delta.y = 0.0;  // we only push sideways
-			v3Delta *= 1.0 / v3Delta.Length();  // we push harder if we're close
+			v3Delta *= 1.0 / (v3Delta.Length() + 0.01);  // we push harder if we're close
 			// QUESTION: is there an additional multiplier for this? current shoving seems a bit weak
 
 			a_Entity->AddSpeed(v3Delta);
