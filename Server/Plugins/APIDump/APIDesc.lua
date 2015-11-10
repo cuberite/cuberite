@@ -399,6 +399,7 @@ g_APIDesc =
 				CanBeTerraformed = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns true if the block is suitable to be changed by a generator" },
 				FullyOccupiesVoxel = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block fully occupies its voxel." },
 				Get = { Params = "Type", Return = "{{cBlockInfo}}", Notes = "(STATIC) Returns the {{cBlockInfo}} structure for the specified type." },
+				GetBlockHeight = { Params = "Type", Return = "number", Notes = "(STATIC) Returns the block's hitbox height." },
 				GetLightValue = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block emits on its own." },
 				GetPlaceSound = { Params = "Type", Return = "", Notes = "(STATIC) Returns the name of the sound that is played when placing the block." },
 				GetSpreadLightFalloff = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block consumes." },

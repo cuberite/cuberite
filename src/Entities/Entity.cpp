@@ -1029,16 +1029,17 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					NextSpeed.z = 0.0f;
 				}
 
-				if (Tracer.HitNormal.y == 1.0f)  // Hit BLOCK_FACE_YP, we are on the ground
-				{
-					m_bOnGround = true;
-				}
-
 				// Now, set our position to the hit block (i.e. move part way along our intended trajectory)
 				NextPos.Set(Tracer.RealHit.x, Tracer.RealHit.y, Tracer.RealHit.z);
 				NextPos.x += Tracer.HitNormal.x * 0.1;
 				NextPos.y += Tracer.HitNormal.y * 0.05;
 				NextPos.z += Tracer.HitNormal.z * 0.1;
+
+				if (Tracer.HitNormal.y == 1.0f)  // Hit BLOCK_FACE_YP, we are on the ground
+				{
+					m_bOnGround = true;
+					NextPos.y = FloorC(NextPos.y);  // we clamp the height to 0 cos otherwise we'll constantly be slightly above the block
+				}
 			}
 			else
 			{

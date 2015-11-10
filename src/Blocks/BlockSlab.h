@@ -174,6 +174,15 @@ public:
 			}
 		}
 	}
+
+	virtual bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
+	{
+		if (a_BlockMeta & 0x8)  // top half
+		{
+			return true;
+		}
+		return cBlockHandler::IsInsideBlock(a_Position, a_BlockType, a_BlockMeta);
+	}
 } ;
 
 

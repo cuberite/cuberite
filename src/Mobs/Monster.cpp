@@ -77,7 +77,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_Target(nullptr)
 	, m_PathFinder(a_Width, a_Height)
 	, m_PathfinderActivated(false)
-	, m_LastGroundHeight(POSY_TOINT)
 	, m_JumpCoolDown(0)
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
@@ -298,7 +297,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	SetPitchAndYawFromDestination(a_IsFollowingPath);
-	HandleFalling();
 
 	switch (m_EMState)
 	{
@@ -397,20 +395,8 @@ void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 
 void cMonster::HandleFalling()
 {
-	if (m_bOnGround)
-	{
-		int Damage = (m_LastGroundHeight - POSY_TOINT) - 3;
-
-		if (Damage > 0)
-		{
-			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
-
-			// Fall particles
-			GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_FALL_PARTICLES, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
-		}
-
-		m_LastGroundHeight = POSY_TOINT;
-	}
+	m_bTouchGround = IsOnGround();
+	super::HandleFalling();
 }
 
 

@@ -553,6 +553,16 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
+/* default functionality: only test for height, since we assume full voxels with varying height */
+bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+{
+	return a_Position.y < cBlockInfo::GetBlockHeight(a_BlockType);
+}
+
+
+
+
+
 void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
 {
 	if (!CanBeAt(a_ChunkInterface, a_RelX, a_RelY, a_RelZ, a_Chunk))

@@ -25,7 +25,8 @@ public:
 	
 	virtual bool IsFireproof(void) const override;
 	virtual void HandleAir(void) override;
-	
+	virtual void HandleFalling(void);
+
 	// tolua_begin
 	
 	/** Applies an entity effect
@@ -49,12 +50,15 @@ public:
 	
 	/** Removes all currently applied entity effects (used when drinking milk) */
 	void ClearEntityEffects(void);
-	
+
 	// tolua_end
 
 protected:
 	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
 	tEffectMap m_EntityEffects;
+
+	double m_LastGroundHeight;
+	bool m_bTouchGround;
 } ;  // tolua_export
 
 
