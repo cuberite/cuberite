@@ -461,8 +461,13 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 	static const auto HalfWidth = GetWidth() / 2;
 	static const auto EPS = 0.0001;
+
+	BLOCKTYPE BlockAtFoot = GetWorld()->GetBlock(POS_TOINT);
+	bool IsFootInWater = IsBlockWater(BlockAtFoot);
+	bool IsFootInLiquid = IsFootInWater || IsBlockLava(BlockAtFoot) || (BlockAtFoot == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
+
 	if (
-		!IsSwimming() && !IsFlying() &&
+		!IsFlying() &&
 		(
 			(
 				((GetPosY() >= 1) && (GetPosY() <= 255) && ((GetPosY() - POSY_TOINT) <= EPS)) &&
@@ -498,7 +503,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	)
 	{
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
-		if (Damage > 0)
+		if ((Damage > 0) && !IsFootInWater)
 		{
 			// cPlayer makes sure damage isn't applied in creative, no need to check here
 			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
@@ -523,7 +528,10 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		m_bTouchGround = false;
 	}
 
-	if (IsFlying() || IsSwimming() || IsClimbing())
+	/* Note: it is currently possible to fall through lava and still die from fall damage
+	because of the client skipping an update about the lava block. This can only be resolved by
+	interpolating between positions. */
+	if (IsFlying() || IsFootInLiquid || IsClimbing())
 	{
 		m_LastGroundHeight = GetPosY();
 	}
