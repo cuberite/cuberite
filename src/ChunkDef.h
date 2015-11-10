@@ -115,6 +115,12 @@ public:
 		return Vector3i(a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width);
 	}
 
+	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
+	inline static bool IsValidHeight(int a_Height)
+	{
+		return ((a_Height >= 0) && (a_Height < Height));
+	}
+
 
 	/** Converts absolute block coords to chunk coords: */
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
