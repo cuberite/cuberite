@@ -1859,7 +1859,7 @@ bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback &
 void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
 	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
-	if ((a_BlockY < 0) || (a_BlockY > cChunkDef::Height - 1))
+	if (!cChunkDef::IsValidHeight(static_cast<int>(a_BlockY)))
 	{
 		return;
 	}
