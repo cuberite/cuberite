@@ -462,7 +462,17 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	static const auto HalfWidth = GetWidth() / 2;
 	static const auto EPS = 0.0001;
 
-	BLOCKTYPE BlockAtFoot = GetWorld()->GetBlock(POS_TOINT);
+	/* Since swimming is decided in a tick and is asynchronous to this, we have to check for dampeners ourselves.
+	The behaviour as of 1.8.8 is the following:
+	- Landing in water alleviates all fall damage
+	- Passing through any liquid (water + lava) and cobwebs "slows" the player down,
+		i.e. resets the fall distance to that block, but only after checking for fall damage
+		(this means that plummeting into lava will still kill the player via fall damage, although cobwebs
+		will slow players down enough to have multiple updates that keep them alive)
+
+	With this in mind, we first check the block at the player's feet, and decide which behaviour we want to go with.
+	*/
+	BLOCKTYPE BlockAtFoot = (cChunkDef::IsValidHeight(GetPosY())) ? GetWorld()->GetBlock(POS_TOINT) : E_BLOCK_AIR;
 	bool IsFootInWater = IsBlockWater(BlockAtFoot);
 	bool IsFootInLiquid = IsFootInWater || IsBlockLava(BlockAtFoot) || (BlockAtFoot == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
 
@@ -470,7 +480,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		!IsFlying() &&
 		(
 			(
-				((GetPosY() >= 1) && (GetPosY() <= 255) && ((GetPosY() - POSY_TOINT) <= EPS)) &&
+				(cChunkDef::IsValidHeight(GetPosY()) && ((GetPosY() - POSY_TOINT) <= EPS)) &&
 				(
 					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(0, -1, 0)).Floor())) ||
 					cBlockInfo::IsSolid(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, -1, 0)).Floor())) ||
@@ -480,7 +490,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				)
 			) ||
 			(
-			(((GetPosY() >= 1) && (GetPosY() <= 255) && GetPosY() >= POSY_TOINT) && ((GetPosY() - (POSY_TOINT + 0.5)) <= EPS)) &&
+				(cChunkDef::IsValidHeight(GetPosY()) && (GetPosY() >= POSY_TOINT) && ((GetPosY() - (POSY_TOINT + 0.5)) <= EPS)) &&
 				(
 					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, 0)).Floor())) ||
 					cBlockSlabHandler::IsAnySlabType(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, 0, 0)).Floor())) ||
@@ -490,7 +500,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				)
 			) ||
 			(
-				((GetPosY() >= 1) && (GetPosY() <= 255) && fmod(GetPosY(), 0.125) <= EPS) &&
+				(cChunkDef::IsValidHeight(GetPosY()) && (fmod(GetPosY(), 0.125) <= EPS)) &&
 				(
 					(GetWorld()->GetBlock((GetPosition() + Vector3d(0, 0, 0)).Floor()) == E_BLOCK_SNOW) ||
 					(GetWorld()->GetBlock((GetPosition() + Vector3d(HalfWidth, 0, 0)).Floor()) == E_BLOCK_SNOW) ||
