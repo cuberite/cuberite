@@ -103,7 +103,7 @@ void cWorld::cTickThread::Execute(void)
 	auto LastTime = std::chrono::steady_clock::now();
 	auto TickTime = std::chrono::duration_cast<std::chrono::milliseconds>(cTickTime(1));
 
-	while (!m_ShouldTerminate)
+	while (m_KeepRunning.test_and_set())
 	{
 		auto NowTime = std::chrono::steady_clock::now();
 		auto WaitTime = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime);

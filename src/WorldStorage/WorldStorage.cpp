@@ -94,7 +94,7 @@ void cWorldStorage::WaitForFinish(void)
 	WaitForSaveQueueEmpty();
 	
 	// Wait for the thread to finish:
-	m_ShouldTerminate = true;
+	m_KeepRunning.clear();
 	m_Event.Set();  // Wake up the thread if waiting
 	super::Wait();
 	LOGD("World storage thread finished");
@@ -202,14 +202,14 @@ void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 
 void cWorldStorage::Execute(void)
 {
-	while (!m_ShouldTerminate)
+	while (m_KeepRunning.test_and_set())
 	{
 		m_Event.Wait();
 		// Process both queues until they are empty again:
 		bool Success;
 		do
 		{
-			if (m_ShouldTerminate)
+			if (!m_KeepRunning.test_and_set())
 			{
 				return;
 			}

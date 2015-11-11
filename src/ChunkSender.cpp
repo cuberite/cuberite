@@ -81,7 +81,7 @@ cChunkSender::~cChunkSender()
 
 bool cChunkSender::Start()
 {
-	m_ShouldTerminate = false;
+	m_KeepRunning.test_and_set();
 	return super::Start();
 }
 
@@ -91,7 +91,7 @@ bool cChunkSender::Start()
 
 void cChunkSender::Stop(void)
 {
-	m_ShouldTerminate = true;
+	m_KeepRunning.clear();
 	m_evtQueue.Set();
 	Wait();
 }
@@ -184,7 +184,7 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 
 void cChunkSender::Execute(void)
 {
-	while (!m_ShouldTerminate)
+	while (m_KeepRunning.test_and_set())
 	{
 		m_evtQueue.Wait();
 

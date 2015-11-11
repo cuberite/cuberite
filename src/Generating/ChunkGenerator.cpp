@@ -97,7 +97,7 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 
 void cChunkGenerator::Stop(void)
 {
-	m_ShouldTerminate = true;
+	m_KeepRunning.clear();
 	m_Event.Set();
 	m_evtRemoved.Set();  // Wake up anybody waiting for empty queue
 	Wait();
@@ -147,7 +147,7 @@ void cChunkGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biom
 void cChunkGenerator::WaitForQueueEmpty(void)
 {
 	cCSLock Lock(m_CS);
-	while (!m_ShouldTerminate && !m_Queue.empty())
+	while (m_KeepRunning.test_and_set() && !m_Queue.empty())
 	{
 		cCSUnlock Unlock(Lock);
 		m_evtRemoved.Wait();
@@ -202,7 +202,7 @@ void cChunkGenerator::Execute(void)
 	clock_t GenerationStart = clock();  // Clock tick when the queue started to fill
 	clock_t LastReportTick = clock();  // Clock tick of the last report made (so that performance isn't reported too often)
 
-	while (!m_ShouldTerminate)
+	while (m_KeepRunning.test_and_set())
 	{
 		cCSLock Lock(m_CS);
 		while (m_Queue.empty())
@@ -216,7 +216,7 @@ void cChunkGenerator::Execute(void)
 			}
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
-			if (m_ShouldTerminate)
+			if (!m_KeepRunning.test_and_set())
 			{
 				return;
 			}

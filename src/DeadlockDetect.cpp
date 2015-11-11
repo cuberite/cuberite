@@ -64,7 +64,7 @@ bool cDeadlockDetect::Start(int a_IntervalSec)
 void cDeadlockDetect::Execute(void)
 {
 	// Loop until the signal to terminate:
-	while (!m_ShouldTerminate)
+	while (m_KeepRunning.test_and_set())
 	{
 		// Check the world ages:
 		class cChecker :

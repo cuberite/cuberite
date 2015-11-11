@@ -76,7 +76,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 void cAuthenticator::Start(cSettingsRepositoryInterface & a_Settings)
 {
 	ReadSettings(a_Settings);
-	m_ShouldTerminate = false;
+	m_KeepRunning.test_and_set();
 	super::Start();
 }
 
@@ -86,7 +86,7 @@ void cAuthenticator::Start(cSettingsRepositoryInterface & a_Settings)
 
 void cAuthenticator::Stop(void)
 {
-	m_ShouldTerminate = true;
+	m_KeepRunning.clear();
 	m_QueueNonempty.Set();
 	Wait();
 }
@@ -100,14 +100,18 @@ void cAuthenticator::Execute(void)
 	for (;;)
 	{
 		cCSLock Lock(m_CS);
-		while (!m_ShouldTerminate && (m_Queue.size() == 0))
-		{
-			cCSUnlock Unlock(Lock);
-			m_QueueNonempty.Wait();
-		}
-		if (m_ShouldTerminate)
+		if (!m_KeepRunning.test_and_set())
 		{
 			return;
+		}
+		while (m_Queue.size() == 0)
+		{
+			if (!m_KeepRunning.test_and_set())
+			{
+				return;
+			}
+			cCSUnlock Unlock(Lock);
+			m_QueueNonempty.Wait();
 		}
 		ASSERT(!m_Queue.empty());
 
