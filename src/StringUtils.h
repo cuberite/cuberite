@@ -17,6 +17,10 @@ typedef std::string AString;
 typedef std::vector<AString> AStringVector;
 typedef std::list<AString>   AStringList;
 
+/** A string dictionary, used for key-value pairs. */
+typedef std::map<AString, AString> AStringMap;
+
+
 
 
 
@@ -129,6 +133,10 @@ extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const 
 /** Concatenates the specified strings into a single string, separated by the specified separator. */
 extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
 
+
+
+
+
 /** Parses any integer type. Checks bounds and returns errors out of band. */
 template <class T>
 bool StringToInteger(const AString & a_str, T & a_Num)
@@ -196,6 +204,35 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 	a_Num = result;
 	return true;
 }
+
+
+
+
+
+/** Returns an integer from a key-value string map.
+Returns a_Default if the key is not present or the value is not an int. */
+template <typename T>
+int GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Default)
+{
+	// Try to locate the key:
+	auto itr = a_Map.find(a_Key);
+	if (itr == a_Map.end())
+	{
+		return a_Default;
+	}
+
+	// Try to convert the value to a number:
+	T res = a_Default;
+	if (!StringToInteger<T>(itr->second, res))
+	{
+		return a_Default;
+	}
+	return res;
+}
+
+
+
+
 
 // If you have any other string helper functions, declare them here
 

@@ -8,6 +8,8 @@
 #include "../Bindings/LuaState.h"
 #include "SelfTests.h"
 #include "WorldStorage/SchematicFileSerializer.h"
+#include "VerticalStrategy.h"
+#include "../StringCompression.h"
 
 
 
@@ -60,13 +62,14 @@ cPrefabPiecePool::cPrefabPiecePool(void)
 
 cPrefabPiecePool::cPrefabPiecePool(
 	const cPrefab::sDef * a_PieceDefs,         size_t a_NumPieceDefs,
-	const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs
+	const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs,
+	int a_DefaultStartingPieceHeight
 )
 {
 	AddPieceDefs(a_PieceDefs, a_NumPieceDefs);
 	if (a_StartingPieceDefs != nullptr)
 	{
-		AddStartingPieceDefs(a_StartingPieceDefs, a_NumStartingPieceDefs);
+		AddStartingPieceDefs(a_StartingPieceDefs, a_NumStartingPieceDefs, a_DefaultStartingPieceHeight);
 	}
 }
 
@@ -126,12 +129,21 @@ void cPrefabPiecePool::AddPieceDefs(const cPrefab::sDef * a_PieceDefs, size_t a_
 
 
 
-void cPrefabPiecePool::AddStartingPieceDefs(const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs)
+void cPrefabPiecePool::AddStartingPieceDefs(
+	const cPrefab::sDef * a_StartingPieceDefs,
+	size_t a_NumStartingPieceDefs,
+	int a_DefaultPieceHeight
+)
 {
 	ASSERT(a_StartingPieceDefs != nullptr);
+	auto verticalStrategy = CreateVerticalStrategyFromString(Printf("Fixed|%d", a_DefaultPieceHeight), false);
 	for (size_t i = 0; i < a_NumStartingPieceDefs; i++)
 	{
 		cPrefab * Prefab = new cPrefab(a_StartingPieceDefs[i]);
+		if (a_DefaultPieceHeight >= 0)
+		{
+			Prefab->SetVerticalStrategy(verticalStrategy);
+		}
 		m_StartingPieces.push_back(Prefab);
 	}
 }
@@ -142,21 +154,43 @@ void cPrefabPiecePool::AddStartingPieceDefs(const cPrefab::sDef * a_StartingPiec
 
 bool cPrefabPiecePool::LoadFromFile(const AString & a_FileName, bool a_LogWarnings)
 {
-	// Read the first 4 KiB of the file in order to auto-detect format:
-	cFile f;
-	if (!f.Open(a_FileName, cFile::fmRead))
+	// Read the file into a string buffer, load from string:
+	auto contents = cFile::ReadWholeFile(a_FileName);
+	if (contents.empty())
 	{
-		CONDWARNING(a_LogWarnings, "Cannot open file %s for reading", a_FileName.c_str());
+		CONDWARNING(a_LogWarnings, "Cannot read data from file %s", a_FileName.c_str());
 		return false;
 	}
-	char buf[4096];
-	auto len = f.Read(buf, sizeof(buf));
-	f.Close();
-	AString Header(buf, static_cast<size_t>(len));
+	return LoadFromString(contents, a_FileName, a_LogWarnings);
+}
 
+
+
+
+
+bool cPrefabPiecePool::LoadFromString(const AString & a_Contents, const AString & a_FileName, bool a_LogWarnings)
+{
+	// If the contents start with GZip signature, ungzip and retry:
+	if (a_Contents.substr(0, 3) == "\x1f\x8b\x08")
+	{
+		AString Uncompressed;
+		auto res = UncompressStringGZIP(a_Contents.data(), a_Contents.size(), Uncompressed);
+		if (res == Z_OK)
+		{
+			return LoadFromString(Uncompressed, a_FileName, a_LogWarnings);
+		}
+		else
+		{
+			CONDWARNING(a_LogWarnings, "Failed to decompress Gzip data in file %s: %d", a_FileName.c_str(), res);
+			return false;
+		}
+	}
+
+	// Read the first 4 KiB of the file in order to auto-detect format:
+	auto Header = a_Contents.substr(0, 4096);
 	if (Header.find("CubesetFormatVersion =") != AString::npos)
 	{
-		return LoadFromCubesetFile(a_FileName, a_LogWarnings);
+		return LoadFromCubeset(a_Contents, a_FileName, a_LogWarnings);
 	}
 	CONDWARNING(a_LogWarnings, "Cannot load prefabs from file %s, unknown file format", a_FileName.c_str());
 	return false;
@@ -166,12 +200,12 @@ bool cPrefabPiecePool::LoadFromFile(const AString & a_FileName, bool a_LogWarnin
 
 
 
-bool cPrefabPiecePool::LoadFromCubesetFile(const AString & a_FileName, bool a_LogWarnings)
+bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString & a_FileName, bool a_LogWarnings)
 {
 	// Load the file in the Lua interpreter:
 	cLuaState Lua(Printf("LoadablePiecePool %s", a_FileName.c_str()));
 	Lua.Create();
-	if (!Lua.LoadFile(a_FileName, a_LogWarnings))
+	if (!Lua.LoadString(a_Contents, a_FileName, a_LogWarnings))
 	{
 		// Reason for failure has already been logged in LoadFile()
 		return false;
@@ -188,7 +222,7 @@ bool cPrefabPiecePool::LoadFromCubesetFile(const AString & a_FileName, bool a_Lo
 	// Load the data, using the correct version loader:
 	if (Version == 1)
 	{
-		return LoadFromCubesetFileVer1(a_FileName, Lua, a_LogWarnings);
+		return LoadFromCubesetVer1(a_FileName, Lua, a_LogWarnings);
 	}
 
 	// Unknown version:
@@ -213,15 +247,14 @@ void cPrefabPiecePool::AddToPerConnectorMap(cPrefab * a_Prefab)
 
 
 
-bool cPrefabPiecePool::LoadFromCubesetFileVer1(const AString & a_FileName, cLuaState & a_LuaState, bool a_LogWarnings)
+bool cPrefabPiecePool::LoadFromCubesetVer1(const AString & a_FileName, cLuaState & a_LuaState, bool a_LogWarnings)
 {
-	// Load the metadata:
-	ApplyPoolMetadataCubesetVer1(a_FileName, a_LuaState, a_LogWarnings);
+	// Load the metadata and apply the known ones:
+	ReadPoolMetadataCubesetVer1(a_FileName, a_LuaState, a_LogWarnings);
+	ApplyBaseMetadataCubesetVer1(a_FileName, a_LogWarnings);
 
 	// Push the Cubeset.Pieces global value on the stack:
-	lua_getglobal(a_LuaState, "_G");
-	cLuaState::cStackValue stk(a_LuaState);
-	auto pieces = a_LuaState.WalkToValue("Cubeset.Pieces");
+	auto pieces = a_LuaState.WalkToNamedGlobal("Cubeset.Pieces");
 	if (!pieces.IsValid() || !lua_istable(a_LuaState, -1))
 	{
 		CONDWARNING(a_LogWarnings, "The cubeset file %s doesn't contain any pieces", a_FileName.c_str());
@@ -300,15 +333,27 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 	a_LuaState.GetNamedValue("Metadata.AllowedRotations", AllowedRotations);
 	prefab->SetAllowedRotations(AllowedRotations);
 
-	// Apply the relevant metadata:
-	if (!ApplyPieceMetadataCubesetVer1(a_FileName, a_LuaState, PieceName, prefab.get(), a_LogWarnings))
+	// Read the relevant metadata for the piece:
+	if (!ReadPieceMetadataCubesetVer1(a_FileName, a_LuaState, PieceName, prefab.get(), a_LogWarnings))
 	{
 		return false;
 	}
 
-	// Add the prefab into the list of pieces:
+	// If the piece is a starting piece, check that it has a vertical strategy:
 	int IsStartingPiece = 0;
 	a_LuaState.GetNamedValue("Metadata.IsStarting", IsStartingPiece);
+	if (IsStartingPiece != 0)
+	{
+		if (prefab->GetVerticalStrategy() == nullptr)
+		{
+			CONDWARNING(a_LogWarnings, "Starting prefab %s in file %s doesn't have its VerticalStrategy set. Setting to Fixed|150.",
+				PieceName.c_str(), a_FileName.c_str()
+			);
+			VERIFY(prefab->SetVerticalStrategyFromString("Fixed|150", false));
+		}
+	}
+
+	// Add the prefab into the list of pieces:
 	if (IsStartingPiece != 0)
 	{
 		m_StartingPieces.push_back(prefab.release());
@@ -319,6 +364,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 		m_AllPieces.push_back(p);
 		AddToPerConnectorMap(p);
 	}
+
 	return true;
 }
 
@@ -465,7 +511,7 @@ bool cPrefabPiecePool::ReadConnectorsCubesetVer1(
 
 
 
-bool cPrefabPiecePool::ApplyPieceMetadataCubesetVer1(
+bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 	const AString & a_FileName,
 	cLuaState & a_LuaState,
 	const AString & a_PieceName,
@@ -482,13 +528,15 @@ bool cPrefabPiecePool::ApplyPieceMetadataCubesetVer1(
 
 	// Get the values:
 	int AddWeightIfSame = 0, DefaultWeight = 100, MoveToGround = 0, ShouldExpandFloor = 0;
-	AString DepthWeight, MergeStrategy;
+	AString DepthWeight, MergeStrategy, VerticalLimit, VerticalStrategy;
 	a_LuaState.GetNamedValue("AddWeightIfSame",   AddWeightIfSame);
 	a_LuaState.GetNamedValue("DefaultWeight",     DefaultWeight);
 	a_LuaState.GetNamedValue("DepthWeight",       DepthWeight);
 	a_LuaState.GetNamedValue("MergeStrategy",     MergeStrategy);
 	a_LuaState.GetNamedValue("MoveToGround",      MoveToGround);
 	a_LuaState.GetNamedValue("ShouldExpandFloor", ShouldExpandFloor);
+	a_LuaState.GetNamedValue("VerticalLimit",     VerticalLimit);
+	a_LuaState.GetNamedValue("VerticalStrategy",  VerticalStrategy);
 
 	// Apply the values:
 	a_Prefab->SetAddWeightIfSame(AddWeightIfSame);
@@ -509,6 +557,16 @@ bool cPrefabPiecePool::ApplyPieceMetadataCubesetVer1(
 	}
 	a_Prefab->SetMoveToGround(MoveToGround != 0);
 	a_Prefab->SetExtendFloor(ShouldExpandFloor != 0);
+	if (!VerticalLimit.empty())
+	{
+		if (!a_Prefab->SetVerticalLimitFromString(VerticalLimit, a_LogWarnings))
+		{
+			CONDWARNING(a_LogWarnings, "Unknown VerticalLimit (\"%s\") specified for piece %s in file %s. Using no limit instead.",
+				VerticalLimit.c_str(), a_PieceName.c_str(), a_FileName.c_str()
+			);
+		}
+	}
+	a_Prefab->SetVerticalStrategyFromString(VerticalStrategy, a_LogWarnings);
 
 	return true;
 }
@@ -517,21 +575,11 @@ bool cPrefabPiecePool::ApplyPieceMetadataCubesetVer1(
 
 
 
-bool cPrefabPiecePool::ApplyPoolMetadataCubesetVer1(
+void cPrefabPiecePool::ApplyBaseMetadataCubesetVer1(
 	const AString & a_FileName,
-	cLuaState & a_LuaState,
 	bool a_LogWarnings
 )
 {
-	// Push the Cubeset.Metadata table on top of the Lua stack:
-	lua_getglobal(a_LuaState, "_G");
-	auto md = a_LuaState.WalkToValue("Cubeset.Metadata");
-	if (!md.IsValid())
-	{
-		CONDWARNING(a_LogWarnings, "Cannot load cubeset from file %s: Cubeset.Metadata table is missing", a_FileName.c_str());
-		return false;
-	}
-
 	// Set the metadata values to defaults:
 	m_MinDensity = 100;
 	m_MaxDensity = 100;
@@ -541,15 +589,29 @@ bool cPrefabPiecePool::ApplyPoolMetadataCubesetVer1(
 	m_VillageWaterRoadBlockMeta = 0;
 
 	// Read the metadata values:
-	a_LuaState.GetNamedValue("IntendedUse",               m_IntendedUse);
-	a_LuaState.GetNamedValue("MaxDensity",                m_MaxDensity);
-	a_LuaState.GetNamedValue("MinDensity",                m_MinDensity);
-	a_LuaState.GetNamedValue("VillageRoadBlockType",      m_VillageRoadBlockType);
-	a_LuaState.GetNamedValue("VillageRoadBlockMeta",      m_VillageRoadBlockMeta);
-	a_LuaState.GetNamedValue("VillageWaterRoadBlockType", m_VillageWaterRoadBlockType);
-	a_LuaState.GetNamedValue("VillageWaterRoadBlockMeta", m_VillageWaterRoadBlockMeta);
-	AString allowedBiomes;
-	if (a_LuaState.GetNamedValue("AllowedBiomes", allowedBiomes))
+	m_IntendedUse = GetMetadata("IntendedUse");
+	GetStringMapInteger(m_Metadata, "MaxDensity",                m_MaxDensity);
+	GetStringMapInteger(m_Metadata, "MinDensity",                m_MinDensity);
+	GetStringMapInteger(m_Metadata, "VillageRoadBlockType",      m_VillageRoadBlockType);
+	GetStringMapInteger(m_Metadata, "VillageRoadBlockMeta",      m_VillageRoadBlockMeta);
+	GetStringMapInteger(m_Metadata, "VillageWaterRoadBlockType", m_VillageWaterRoadBlockType);
+	GetStringMapInteger(m_Metadata, "VillageWaterRoadBlockMeta", m_VillageWaterRoadBlockMeta);
+
+	// Read the allowed biomes:
+	AString allowedBiomes = GetMetadata("AllowedBiomes");
+	if (allowedBiomes.empty())
+	{
+		// All biomes are allowed:
+		for (int b = biFirstBiome; b <= biMaxBiome; b++)
+		{
+			m_AllowedBiomes.insert(static_cast<EMCSBiome>(b));
+		}
+		for (int b = biFirstVariantBiome; b <= biMaxVariantBiome; b++)
+		{
+			m_AllowedBiomes.insert(static_cast<EMCSBiome>(b));
+		}
+	}
+	else
 	{
 		auto biomes = StringSplitAndTrim(allowedBiomes, ",");
 		for (const auto & biome: biomes)
@@ -565,19 +627,77 @@ bool cPrefabPiecePool::ApplyPoolMetadataCubesetVer1(
 			m_AllowedBiomes.insert(b);
 		}
 	}
-	else
+}
+
+
+
+
+
+bool cPrefabPiecePool::ReadPoolMetadataCubesetVer1(
+	const AString & a_FileName,
+	cLuaState & a_LuaState,
+	bool a_LogWarnings
+)
+{
+	// Push the Cubeset.Metadata table on top of the Lua stack:
+	auto gp = a_LuaState.WalkToNamedGlobal("Cubeset.Metadata");
+	if (!gp.IsValid())
 	{
-		// All biomes are allowed:
-		for (int b = biFirstBiome; b <= biMaxBiome; b++)
-		{
-			m_AllowedBiomes.insert(static_cast<EMCSBiome>(b));
-		}
-		for (int b = biFirstVariantBiome; b <= biMaxVariantBiome; b++)
-		{
-			m_AllowedBiomes.insert(static_cast<EMCSBiome>(b));
-		}
+		return true;
+	}
+
+	// Iterate over elements in the table, put them into the m_GeneratorParams map:
+	lua_pushnil(a_LuaState);  // Table is at index -2, starting key (nil) at index -1
+	while (lua_next(a_LuaState, -2) != 0)
+	{
+		// Table at index -3, key at index -2, value at index -1
+		AString key, val;
+		a_LuaState.GetStackValues(-2, key, val);
+		m_Metadata[key] = val;
+		lua_pop(a_LuaState, 1);  // Table at index -2, key at index -1
 	}
 	return true;
+}
+
+
+
+
+
+AString cPrefabPiecePool::GetMetadata(const AString & a_ParamName) const
+{
+	auto itr = m_Metadata.find(a_ParamName);
+	if (itr == m_Metadata.end())
+	{
+		return AString();
+	}
+	return itr->second;
+}
+
+
+
+
+
+void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel)
+{
+	// Assign the generator linkage to all starting pieces' VerticalStrategies:
+	for (auto & piece: m_StartingPieces)
+	{
+		auto verticalStrategy = piece->GetVerticalStrategy();
+		if (verticalStrategy != nullptr)
+		{
+			verticalStrategy->AssignGens(a_Seed, a_BiomeGen, a_HeightGen, a_SeaLevel);
+		}
+	}  // for piece - m_StartingPieces[]
+
+	// Assign the generator linkage to all pieces' VerticalLimits:
+	for (auto & piece: m_AllPieces)
+	{
+		auto verticalLimit = piece->GetVerticalLimit();
+		if (verticalLimit != nullptr)
+		{
+			verticalLimit->AssignGens(a_Seed, a_BiomeGen, a_HeightGen, a_SeaLevel);
+		}
+	}  // for piece - m_AllPieces[]
 }
 
 
@@ -611,7 +731,7 @@ cPieces cPrefabPiecePool::GetStartingPieces(void)
 
 int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
 {
-	return (static_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+	return (reinterpret_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 }
 
 
@@ -620,7 +740,7 @@ int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const c
 
 int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece)
 {
-	return (static_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
+	return (reinterpret_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
 }
 
 

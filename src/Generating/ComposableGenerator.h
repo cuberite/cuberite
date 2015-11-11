@@ -113,6 +113,18 @@ public:
 	/** Initializes the generator, reading its parameters from the INI file. */
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) {}
 
+	/** Returns the height at the specified column.
+	The default implementation calls GenHeightMap(), and then queries the heightmap.
+	Descendants may provide a better-performing method. */
+	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ)
+	{
+		int chunkX, chunkZ;
+		cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, chunkX, chunkZ);
+		cChunkDef::HeightMap heightMap;
+		GenHeightMap(chunkX, chunkZ, heightMap);
+		return cChunkDef::GetHeight(heightMap, a_BlockX - chunkX * cChunkDef::Width, a_BlockZ - chunkZ * cChunkDef::Width);
+	}
+
 	/** Creates a cTerrainHeightGen descendant based on the INI file settings. */
 	static cTerrainHeightGenPtr CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault);
 } ;

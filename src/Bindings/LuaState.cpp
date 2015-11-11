@@ -286,7 +286,7 @@ void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a
 bool cLuaState::LoadFile(const AString & a_FileName, bool a_LogWarnings)
 {
 	ASSERT(IsValid());
-	
+
 	// Load the file:
 	int s = luaL_loadfile(m_LuaState, a_FileName.c_str());
 	if (s != 0)
@@ -310,7 +310,42 @@ bool cLuaState::LoadFile(const AString & a_FileName, bool a_LogWarnings)
 		lua_pop(m_LuaState, 1);
 		return false;
 	}
-	
+
+	return true;
+}
+
+
+
+
+
+bool cLuaState::LoadString(const AString & a_StringToLoad, const AString & a_FileName, bool a_LogWarnings)
+{
+	ASSERT(IsValid());
+
+	// Load the file:
+	int s = luaL_loadstring(m_LuaState, a_StringToLoad.c_str());
+	if (s != 0)
+	{
+		if (a_LogWarnings)
+		{
+			LOGWARNING("Can't load %s because of a load error in string from \"%s\": %d (%s)", m_SubsystemName.c_str(), a_FileName.c_str(), s, lua_tostring(m_LuaState, -1));
+		}
+		lua_pop(m_LuaState, 1);
+		return false;
+	}
+
+	// Execute the globals:
+	s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+	if (s != 0)
+	{
+		if (a_LogWarnings)
+		{
+			LOGWARNING("Can't load %s because of an initialization error in string from \"%s\": %d (%s)", m_SubsystemName.c_str(), a_FileName.c_str(), s, lua_tostring(m_LuaState, -1));
+		}
+		lua_pop(m_LuaState, 1);
+		return false;
+	}
+
 	return true;
 }
 
@@ -952,7 +987,44 @@ cLuaState::cStackValue cLuaState::WalkToValue(const AString & a_Name)
 		// Remove the previous value from the stack (keep only the new one):
 		lua_remove(m_LuaState, -2);
 	}  // for elem - path[]
+	if (lua_isnil(m_LuaState, -1))
+	{
+		lua_pop(m_LuaState, 1);
+		return cStackValue();
+	}
 	return cStackValue(*this);
+}
+
+
+
+
+
+cLuaState::cStackValue cLuaState::WalkToNamedGlobal(const AString & a_Name)
+{
+	// Iterate over path and replace the top of the stack with the walked element
+	lua_getglobal(m_LuaState, "_G");
+	auto path = StringSplit(a_Name, ".");
+	for (const auto & elem: path)
+	{
+		// If the value is not a table, bail out (error):
+		if (!lua_istable(m_LuaState, -1))
+		{
+			lua_pop(m_LuaState, 1);
+			return cStackValue();
+		}
+
+		// Get the next part of the path:
+		lua_getfield(m_LuaState, -1, elem.c_str());
+
+		// Remove the previous value from the stack (keep only the new one):
+		lua_remove(m_LuaState, -2);
+	}  // for elem - path[]
+	if (lua_isnil(m_LuaState, -1))
+	{
+		lua_pop(m_LuaState, 1);
+		return cStackValue();
+	}
+	return std::move(cStackValue(*this));
 }
 
 

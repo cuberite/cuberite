@@ -33,6 +33,7 @@ public:
 	
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ) override;
 	
 	/** Retrieves height at the specified point in the cache, returns true if found, false if not found */
 	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
@@ -72,6 +73,7 @@ public:
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ) override;
 	
 	/** Retrieves height at the specified point in the cache, returns true if found, false if not found */
 	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
@@ -164,6 +166,8 @@ protected:
 class cHeiGenBiomal :
 	public cTerrainHeightGen
 {
+	typedef cTerrainHeightGen Super;
+
 public:
 	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 		m_Noise(a_Seed),
@@ -173,6 +177,10 @@ public:
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ) override  // Need to provide this override due to clang's overzealous detection of overloaded virtuals
+	{
+		return Super::GetHeightAt(a_BlockX, a_BlockZ);
+	}
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 
 protected:

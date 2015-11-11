@@ -14,8 +14,8 @@
 /*
 How village generating works:
 By descending from a cGridStructGen, a semi-random (jitter) grid is generated. A village may be generated for each
-of the grid's cells. Each cell checks the biomes in an entire chunk around it, only generating a village if all
-biomes are village-friendly. If yes, the entire village structure is built for that cell. If not, the cell
+of the grid's cells. Each cell checks the biomes in an entire chunk around its center, only generating a village if
+all biomes are village-friendly. If yes, the entire village structure is built for that cell. If not, the cell
 is left village-less.
 
 A village is generated using the regular BFS piece generator. The well piece is used as the starting piece,
@@ -28,7 +28,7 @@ both types' opposites, type "-2" at the far ends and type "1" on the long edges.
 type "2" connectors along the long edges of the roads as well, so that the roads create T junctions.
 
 When the village is about to be drawn into a chunk, it queries the heights for each piece intersecting the
-chunk. The pieces are shifted so that their pivot points lie on the surface, and the roads are drawn
+chunk. The pieces are shifted so that their first connector lies on the surface, and the roads are drawn
 directly by turning the surface blocks into gravel / sandstone.
 
 The village prefabs are stored in global piecepools (one pool per village type). In order to support
@@ -134,20 +134,10 @@ public:
 	{
 		// Generate the pieces for this village; don't care about the Y coord:
 		cBFSPieceGenerator pg(*this, a_Seed);
-		pg.PlacePieces(a_OriginX, 0, a_OriginZ, a_MaxRoadDepth + 1, m_Pieces);
+		pg.PlacePieces(a_OriginX, a_OriginZ, a_MaxRoadDepth + 1, m_Pieces);
 		if (m_Pieces.empty())
 		{
 			return;
-		}
-		
-		// If the central piece should be moved to ground, move it, and
-		// check all of its dependents and move those that are strictly connector-driven based on its new Y coord:
-		if (static_cast<const cPrefab &>(m_Pieces[0]->GetPiece()).ShouldMoveToGround())
-		{
-			int OrigPosY = m_Pieces[0]->GetCoords().y;
-			PlacePieceOnGround(*m_Pieces[0]);
-			int NewPosY = m_Pieces[0]->GetCoords().y;
-			MoveAllDescendants(m_Pieces, 0, NewPosY - OrigPosY);
 		}
 	}
 	
@@ -206,8 +196,8 @@ protected:
 			Prefab.Draw(a_Chunk, *itr);
 		}  // for itr - m_PlacedPieces[]
 	}
-	
-	
+
+
 	/**  Adjusts the Y coord of the given piece so that the piece is on the ground.
 	Ground level is assumed to be represented by the first connector in the piece. */
 	void PlacePieceOnGround(cPlacedPiece & a_Piece)
@@ -345,6 +335,7 @@ cVillageGen::cVillageGen(
 	int a_MaxDensity,
 	cBiomeGenPtr a_BiomeGen,
 	cTerrainHeightGenPtr a_HeightGen,
+	int a_SeaLevel,
 	const AStringVector & a_PrefabsToLoad
 ) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
@@ -368,6 +359,7 @@ cVillageGen::cVillageGen(
 					fileName.c_str(), prefabs->GetIntendedUse().c_str()
 				);
 			}
+			prefabs->AssignGens(a_Seed, m_BiomeGen, m_HeightGen, a_SeaLevel);
 			m_Pools.push_back(std::move(prefabs));
 		}
 	}

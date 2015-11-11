@@ -38,6 +38,7 @@ public:
 		int a_MinDensity, int a_MaxDensity,
 		cBiomeGenPtr a_BiomeGen,
 		cTerrainHeightGenPtr a_HeightGen,
+		int a_SeaLevel,
 		const AStringVector & a_PrefabsToLoad
 	);
 
