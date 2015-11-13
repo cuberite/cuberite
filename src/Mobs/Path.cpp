@@ -126,6 +126,10 @@ bool cPath::IsSolid(const Vector3i & a_Location)
 {
 	ASSERT(m_Chunk != nullptr);
 
+	if (!cChunkDef::IsValidHeight(a_Location.y))
+	{
+		return false;
+	}
 	auto Chunk = m_Chunk->GetNeighborChunk(a_Location.x, a_Location.z);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
