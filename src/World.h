@@ -1042,7 +1042,11 @@ private:
 	void UpdateSkyDarkness(void);
 
 	/** Generates a random spawnpoint on solid land by walking chunks and finding their biomes */
-	void GenerateRandomSpawn(void);
+	void GenerateRandomSpawn(int a_MaxSpawnRadius);
+
+	/** Can the specified coordinates be used as a spawn point?
+	Returns true if spawn position is valid and sets a_Y to the valid spawn height */
+	bool CanSpawnAt(double a_X, double & a_Y, double a_Z);
 
 	/** Check if player starting point is acceptable */
 	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
