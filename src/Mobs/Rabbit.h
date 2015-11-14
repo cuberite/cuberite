@@ -34,7 +34,12 @@ public:
 	CLASS_PROTODEF(cRabbit)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual const cItem GetFollowedItem(void) const override { return cItem(E_ITEM_CARROT); }
+	virtual void GetFollowedItems(cItems & a_Items) override
+	{
+		a_Items.Add(E_ITEM_CARROT);
+		a_Items.Add(E_ITEM_GOLDEN_CARROT);
+		a_Items.Add(E_BLOCK_DANDELION);
+	}
 
 	eRabbitType GetRabbitType()         const { return m_Type; }
 	UInt8       GetRabbitTypeAsNumber() const { return static_cast<UInt8>(GetRabbitType()); }
