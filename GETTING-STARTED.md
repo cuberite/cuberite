@@ -7,7 +7,7 @@ If you don't play Minecraft or don't have a great knowledge of the basic systems
 
 I'd say that the important topics are:
 
-* Differnt types of blocks and how they act.
+* Different types of blocks and how they act.
 * Mobs, what they do and how.
 * Redstone, pistons, and automation.
 * Farming.
