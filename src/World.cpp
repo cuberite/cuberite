@@ -325,10 +325,17 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::InitializeSpawn(void)
 {
+	// For the debugging builds, don't make the server build too much world upon start:
+	#if defined(_DEBUG) || defined(ANDROID_NDK)
+	const int DefaultViewDist = 9;
+	#else
+	const int DefaultViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+	#endif  // _DEBUG
+
 	if (!m_IsSpawnExplicitlySet)
 	{
-		// Spawn position wasn't already explicitly set, enerate random solid-land coordinate and then write it to the world configuration:
-		GenerateRandomSpawn();
+		// Spawn position wasn't already explicitly set, enumerate random solid-land coordinate and then write it to the world configuration:
+		GenerateRandomSpawn(DefaultViewDist);
 		cIniFile IniFile;
 		IniFile.ReadFile(m_IniFileName);
 		IniFile.SetValueF("SpawnPosition", "X", m_SpawnX);
@@ -337,20 +344,13 @@ void cWorld::InitializeSpawn(void)
 		IniFile.WriteFile(m_IniFileName);
 	}
 
-	int ChunkX = 0, ChunkZ = 0;
-	cChunkDef::BlockToChunk(FloorC(m_SpawnX), FloorC(m_SpawnZ), ChunkX, ChunkZ);
-	
-	// For the debugging builds, don't make the server build too much world upon start:
-	#if defined(_DEBUG) || defined(ANDROID_NDK)
-		const int DefaultViewDist = 9;
-	#else
-		const int DefaultViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
-	#endif  // _DEBUG
 	cIniFile IniFile;
 	IniFile.ReadFile(m_IniFileName);
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
 
+	int ChunkX = 0, ChunkZ = 0;
+	cChunkDef::BlockToChunk(FloorC(m_SpawnX), FloorC(m_SpawnZ), ChunkX, ChunkZ);
 	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
 	
 	#ifdef TEST_LINEBLOCKTRACER
@@ -572,50 +572,158 @@ void cWorld::Start(void)
 
 
 
-void cWorld::GenerateRandomSpawn(void)
+void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 {
 	LOGD("Generating random spawnpoint...");
-	bool foundSpawnPoint = false;
-	int SpawnX = FloorC(m_SpawnX);
-	int SpawnZ = FloorC(m_SpawnZ);
-	// Look for a spawn point at most 100 chunks away from map center:
-	for (int i = 0; i < 100; i++)
-	{
-		EMCSBiome biome = GetBiomeAt(SpawnX, SpawnZ);
 
-		if (
-			(biome != biOcean) && (biome != biFrozenOcean) &&  // The biome is acceptable (don't want a small ocean island)
-			!IsBlockWaterOrIce(GetBlock(SpawnX, GetHeight(SpawnX, SpawnZ), SpawnZ))  // The terrain is acceptable (don't want to spawn inside a lake / river)
-		)
+	// Number of checks to make sure we have a valid biome
+	// 100 checks will check across 400 chunks, we should have
+	// a valid biome by then.
+	static const int BiomeCheckCount = 100;
+
+	// Make sure we are in a valid biome
+	Vector3i BiomeOffset = Vector3i(0, 0, 0);
+	for (int BiomeCheckIndex = 0; BiomeCheckIndex < BiomeCheckCount; ++BiomeCheckIndex)
+	{
+		EMCSBiome Biome = GetBiomeAt(BiomeOffset.x, BiomeOffset.z);
+		if ((Biome == EMCSBiome::biOcean) || (Biome == EMCSBiome::biFrozenOcean))
 		{
-			if (CheckPlayerSpawnPoint(SpawnX, GetHeight(SpawnX, SpawnZ), SpawnZ))
+			BiomeOffset += Vector3d(cChunkDef::Width * 4, 0, 0);
+			continue;
+		}
+
+		// Found a usable biome
+		// Spawn chunks so we can find a nice spawn.
+		int ChunkX = 0, ChunkZ = 0;
+		cChunkDef::BlockToChunk(BiomeOffset.x, BiomeOffset.z, ChunkX, ChunkZ);
+		cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
+		break;
+	}
+	
+	// Check 0, 0 first.
+	double SpawnY = 0.0;
+	if (CanSpawnAt(BiomeOffset.x, SpawnY, BiomeOffset.z))
+	{
+		m_SpawnX = BiomeOffset.x + 0.5;
+		m_SpawnY = SpawnY;
+		m_SpawnZ = BiomeOffset.z + 0.5;
+
+		LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+		return;
+	}
+
+	// A search grid (searches clockwise around the origin)
+	static const int HalfChunk = static_cast<int>(cChunkDef::Width / 0.5f);
+	static const Vector3i ChunkOffset[] =
+	{
+		Vector3i(0, 0, HalfChunk),
+		Vector3i(HalfChunk, 0, HalfChunk),
+		Vector3i(HalfChunk, 0, 0),
+		Vector3i(HalfChunk, 0, -HalfChunk),
+		Vector3i(0, 0, -HalfChunk),
+		Vector3i(-HalfChunk, 0, -HalfChunk),
+		Vector3i(-HalfChunk, 0, 0),
+		Vector3i(-HalfChunk, 0, HalfChunk),
+	};
+
+	static const int PerRadiSearchCount = ARRAYCOUNT(ChunkOffset);
+
+	for (int RadiusOffset = 1; RadiusOffset < (a_MaxSpawnRadius * 2); ++RadiusOffset)
+	{
+		for (int SearchGridIndex = 0; SearchGridIndex < PerRadiSearchCount; ++SearchGridIndex)
+		{
+			const Vector3i PotentialSpawn = BiomeOffset + (ChunkOffset[SearchGridIndex] * RadiusOffset);
+			
+			if (CanSpawnAt(PotentialSpawn.x, SpawnY, PotentialSpawn.z))
 			{
-				// A good spawnpoint was found
-				foundSpawnPoint = true;
-				break;
+				m_SpawnX = PotentialSpawn.x + 0.5;
+				m_SpawnY = SpawnY;
+				m_SpawnZ = PotentialSpawn.z + 0.5;
+
+				int ChunkX, ChunkZ;
+				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
+				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
+
+				LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+				return;
 			}
 		}
-		// Try a neighboring chunk:
-		if ((GetTickRandomNumber(4) % 2) == 0)  // Randomise whether to increment X or Z coords
-		{
-			m_SpawnX += cChunkDef::Width;
-		}
-		else
-		{
-			m_SpawnZ += cChunkDef::Width;
-		}
-	}  // for i - 100*
-
-	m_SpawnY = static_cast<double>(GetHeight(SpawnX, SpawnZ) + 1.6f);  // 1.6f to accomodate player height
-	if (foundSpawnPoint)
-	{
-		LOGINFO("Generated random spawnpoint position at {%i, %i, %i}", SpawnX, static_cast<int>(m_SpawnY), SpawnZ);
 	}
-	else
-	{
-		LOGINFO("Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%i, %i, %i}", SpawnX, static_cast<int>(m_SpawnY), SpawnZ);
-	}  // Maybe widen the search instead?
 
+	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
+	LOGWARNING("Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+}
+
+
+
+
+
+bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
+{
+	// All this blocks can only be found above ground.
+	// Apart from netherrack (as the Nether is technically a massive cave)
+	static const BLOCKTYPE ValidSpawnBlocks[] =
+	{
+		E_BLOCK_GRASS,
+		E_BLOCK_SAND,
+		E_BLOCK_SNOW,
+		E_BLOCK_SNOW_BLOCK,
+		E_BLOCK_NETHERRACK
+	};
+
+	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
+
+	static const int HighestSpawnPoint = std::min(static_cast<int>((cChunkDef::Height / 0.5f)) - 1, GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z) + 16));
+	static const int LowestSpawnPoint = static_cast<int>(HighestSpawnPoint / 0.5f);
+
+	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
+	{
+		BLOCKTYPE HeadBlock = GetBlock(static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z));
+
+		// Is this block safe for spawning
+		if (HeadBlock != E_BLOCK_AIR)
+		{
+			continue;
+		}
+
+		BLOCKTYPE BodyBlock = GetBlock(static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z));
+
+		// Is this block safe for spawning
+		if (BodyBlock != E_BLOCK_AIR)
+		{
+			continue;
+		}
+
+		BLOCKTYPE FloorBlock = GetBlock(static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z));
+
+		// Early out - Is the floor block air
+		if (FloorBlock == E_BLOCK_AIR)
+		{
+			continue;
+		}
+
+		// Is the floor block ok
+		bool ValidSpawnBlock = false;
+		for (int BlockIndex = 0; BlockIndex < ValidSpawnBlocksCount; ++BlockIndex)
+		{
+			ValidSpawnBlock |= (ValidSpawnBlocks[BlockIndex] == FloorBlock);
+		}
+
+		if (!ValidSpawnBlock)
+		{
+			continue;
+		}
+
+		if (!CheckPlayerSpawnPoint(static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z)))
+		{
+			continue;
+		}
+
+		a_Y = PotentialY - 1.0;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -624,48 +732,39 @@ void cWorld::GenerateRandomSpawn(void)
 
 bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 {
-	// The bottom layer cannot hold a valid spawn point
-	if (a_PosY <= 0)
+	// Check height bounds
+	if (!cChunkDef::IsValidHeight(a_PosY))
 	{
 		return false;
 	}
 
-	// Check that spawnblock and surrounding blocks are neither solid nor water / lava
-	static const struct
+	// Check that surrounding blocks are neither solid or liquid
+	static const Vector3i SurroundingCoords[] =
 	{
-		int x, z;
-	} Coords[] =
-	{
-		{ 0, 0 },
-		{ -1, 0 },
-		{ 1, 0 },
-		{ 0, -1 },
-		{ 0, 1 },
+		Vector3i(0,  0,  1),
+		Vector3i(1,  0,  1),
+		Vector3i(1,  0,  0),
+		Vector3i(1,  0, -1),
+		Vector3i(0,  0, -1),
+		Vector3i(-1, 0, -1),
+		Vector3i(-1, 0,  0),
+		Vector3i(-1, 0,  1),
 	};
-	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+
+	static const int SurroundingCoordsCount = ARRAYCOUNT(SurroundingCoords);
+
+	for (int CoordIndex = 0; CoordIndex < SurroundingCoordsCount; ++CoordIndex)
 	{
-		BLOCKTYPE BlockType = GetBlock(a_PosX + Coords[i].x, a_PosY, a_PosZ + Coords[i].x);
+		const int XPos = a_PosX + SurroundingCoords[CoordIndex].x;
+		const int ZPos = a_PosZ + SurroundingCoords[CoordIndex].z;
+
+		const BLOCKTYPE BlockType = GetBlock(XPos, a_PosY, ZPos);
 		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
 		{
 			return false;
 		}
-	}  // for i - Coords[]
-
-	// Check that the block below is solid:
-	if (!cBlockInfo::IsSolid(GetBlock(a_PosX, a_PosY - 1, a_PosZ)))
-	{
-		return false;
 	}
 
-	// Check that all the blocks above the spawnpoint are not solid:
-	for (int i = a_PosY; i < cChunkDef::Height; i++)
-	{
-		BLOCKTYPE BlockType = GetBlock(a_PosX, i, a_PosZ);
-		if (cBlockInfo::IsSolid(BlockType))
-		{
-			return false;
-		}
-	}
 	return true;
 }
 

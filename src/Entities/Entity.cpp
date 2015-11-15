@@ -1343,7 +1343,7 @@ bool cEntity::DetectPortal()
 					TargetPos.x *= 8.0;
 					TargetPos.z *= 8.0;
 
-					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName(), dimNether, GetWorld()->GetName(), false);
+					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName(), dimNether, GetWorld()->GetName(), true);
 					LOGD("Jumping nether -> overworld");
 					new cNetherPortalScanner(this, TargetWorld, TargetPos, 256);
 					return true;
@@ -1367,7 +1367,7 @@ bool cEntity::DetectPortal()
 					TargetPos.x /= 8.0;
 					TargetPos.z /= 8.0;
 
-					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName(), false);
+					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName(), true);
 					LOGD("Jumping overworld -> nether");
 					new cNetherPortalScanner(this, TargetWorld, TargetPos, 128);
 					return true;
