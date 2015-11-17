@@ -1055,7 +1055,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	cItem SecondInput(*GetSlot(1, a_Player));
 	cItem Output(*GetSlot(2, a_Player));
 	
-	if (Input.IsEmpty())
+	if (Input.IsEmpty() || SecondInput.IsEmpty())
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
@@ -1066,6 +1066,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
 	int RepairCost = Input.m_RepairCost;
+	int EnchantmentCost = 0;
 	int NeedExp = 0;
 	bool IsEnchantBook = false;
 	if (!SecondInput.IsEmpty())
@@ -1127,8 +1128,141 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 					NeedExp += std::max(1, Damage / 100);
 				}
 			}
+		}
 
-			// TODO: Add enchantments.
+		// Enchantments for items and books
+		AStringVector Enchantments = StringSplit(SecondInput.m_Enchantments.ToString(), ";");
+
+		// Loop through each enchantment in the book
+		for (AString itr : Enchantments)
+		{
+			int CurrentEnchantment = cEnchantments::StringToEnchantmentID(StringSplit(itr, "=").at(0));
+			int CurrentLevel = SecondInput.m_Enchantments.GetLevel(CurrentEnchantment);
+			int FirstLevel = Input.m_Enchantments.GetLevel(CurrentEnchantment);
+
+			// The enchantment could be illegal (Example: Sharpness II on an iron helmet) - Should happen only with Books
+			if ((ItemCategory::IsHelmet(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) &&( CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchRespiration) && (CurrentEnchantment != cEnchantments::enchAquaAffinity) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
+				/* Helmet */
+				|| (ItemCategory::IsChestPlate(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
+				/* Chestplate */
+				|| (ItemCategory::IsLeggings(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
+				/* Leggings */
+				|| (ItemCategory::IsBoots(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchProtection) && (CurrentEnchantment != cEnchantments::enchFireProtection) && (CurrentEnchantment != cEnchantments::enchFeatherFalling) && (CurrentEnchantment != cEnchantments::enchBlastProtection) && (CurrentEnchantment != cEnchantments::enchProjectileProtection) && (CurrentEnchantment != cEnchantments::enchThorns) && (CurrentEnchantment != cEnchantments::enchDepthStrider) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
+				/* Boots */
+				|| (ItemCategory::IsSword(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchSharpness) && (CurrentEnchantment != cEnchantments::enchSmite) && (CurrentEnchantment != cEnchantments::enchBaneOfArthropods) && (CurrentEnchantment != cEnchantments::enchKnockback) && (CurrentEnchantment != cEnchantments::enchFireAspect) && (CurrentEnchantment != cEnchantments::enchLooting) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
+				/* Swords */
+				|| (ItemCategory::IsAxe(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchSharpness) && (CurrentEnchantment != cEnchantments::enchSmite) && (CurrentEnchantment != cEnchantments::enchBaneOfArthropods) && (CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
+				/* Axe */
+				|| (ItemCategory::IsShovel(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
+				/* Shovels */
+				|| (ItemCategory::IsHoe(Input.m_ItemType)
+				&& (CurrentEnchantment != cEnchantments::enchUnbreaking))
+				/* Hoes */
+				|| (ItemCategory::IsPickaxe(Input.m_ItemType)
+				&& ((CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch) && (CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchFortune)))
+				/* Pickaxes */
+				|| ((Input.m_ItemType == E_ITEM_BOW)
+				&& ((CurrentEnchantment != cEnchantments::enchPower) && (CurrentEnchantment != cEnchantments::enchPunch) && (CurrentEnchantment != cEnchantments::enchFlame) && (CurrentEnchantment != cEnchantments::enchInfinity) && (CurrentEnchantment != cEnchantments::enchUnbreaking)))
+				/* Bow */
+				|| ((Input.m_ItemType == E_ITEM_FISHING_ROD)
+				&& ((CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchLuckOfTheSea) && (CurrentEnchantment != cEnchantments::enchLure)))
+				/* Fishing Rod */
+				|| ((Input.m_ItemType == E_ITEM_CARROT_ON_STICK)
+				&& (CurrentEnchantment != cEnchantments::enchUnbreaking))
+				/* Carrot on a Stick */
+				|| ((Input.m_ItemType == E_ITEM_SHEARS)
+				&& ((CurrentEnchantment != cEnchantments::enchUnbreaking) && (CurrentEnchantment != cEnchantments::enchEfficiency) && (CurrentEnchantment != cEnchantments::enchSilkTouch)))
+				/* Shears */
+				|| ((Input.m_ItemType == E_ITEM_FLINT_AND_STEEL)
+				&& (CurrentEnchantment != cEnchantments::enchUnbreaking))
+				/* Flint and Steel */
+				)
+			{
+				// continue, or else 2 incompatible enchantments on a book will never apply
+				if (Enchantments.size() > 1)
+				{
+					continue;
+				}
+				else
+				{
+					Output.Empty();
+					SetSlot(2, a_Player, Output);
+					m_ParentWindow.SetProperty(0, 0, a_Player);
+					return;
+				}
+			}
+			
+			if ((CurrentLevel == FirstLevel) && (CurrentEnchantment != 0))
+			{
+				// Increment enchantment level
+				int OldLevel = static_cast<int>(itr.at(itr.size() - 1));
+				itr.pop_back();  // Note: pop_back() works in this case as vanilla enchantments are never >=10 ; will cause bugs if changed
+
+				// Add new level to string
+				itr.push_back(OldLevel + 1);
+				CurrentLevel++;
+			}
+			else if (CurrentLevel < FirstLevel)
+			{
+				CurrentLevel = Input.m_Enchantments.GetLevel(CurrentEnchantment);
+			}
+
+			// Could be an illegal fusion (Example: Sharpness V book with Sharpness V book to get Sharpness VI book)
+			if (((CurrentEnchantment == 0) && (CurrentLevel > 4)) || ((CurrentEnchantment == 1) && (CurrentLevel > 4))
+				|| ((CurrentEnchantment == 2) && (CurrentLevel > 4)) || ((CurrentEnchantment == 3) && (CurrentLevel > 4))
+				|| ((CurrentEnchantment == 4) && (CurrentLevel > 4)) || ((CurrentEnchantment == 5) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 6) && (CurrentLevel > 1)) || ((CurrentEnchantment == 7) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 8) && (CurrentLevel > 3)) || ((CurrentEnchantment == 16) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 17) && (CurrentLevel > 5)) || ((CurrentEnchantment == 18) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 19) && (CurrentLevel > 2)) || ((CurrentEnchantment == 20) && (CurrentLevel > 2))
+				|| ((CurrentEnchantment == 21) && (CurrentLevel > 3)) || ((CurrentEnchantment == 32) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 33) && (CurrentLevel > 1)) || ((CurrentEnchantment == 34) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 35) && (CurrentLevel > 3)) || ((CurrentEnchantment == 48) && (CurrentLevel > 5))
+				|| ((CurrentEnchantment == 49) && (CurrentLevel > 2)) || ((CurrentEnchantment == 50) && (CurrentLevel > 1))
+				|| ((CurrentEnchantment == 51) && (CurrentLevel > 1)) || ((CurrentEnchantment == 61) && (CurrentLevel > 3))
+				|| ((CurrentEnchantment == 62) && (CurrentLevel > 3)))
+			{
+				if (Enchantments.size() > 1)
+				{
+					continue;
+				}
+				else
+				{
+					Output.Empty();
+					SetSlot(2, a_Player, Output);
+					m_ParentWindow.SetProperty(0, 0, a_Player);
+					return;
+				}
+			}
+
+			// Finally add it
+			Input.m_Enchantments.AddFromString(itr);
+
+			// Increase cost
+			// Note: CostWithoutBook / CostWithBook
+			if ((CurrentEnchantment == 0) || (CurrentEnchantment == 16) || (CurrentEnchantment == 32) || (CurrentEnchantment == 48))
+			{
+				EnchantmentCost += CurrentLevel;  // Multiplier: 1 / 1
+			}
+			else if ((CurrentEnchantment == 1) || (CurrentEnchantment == 2) || (CurrentEnchantment == 4) || (CurrentEnchantment == 17) || (CurrentEnchantment == 18) || (CurrentEnchantment == 19) || (CurrentEnchantment == 34))
+			{
+				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 1 : 2);  // Multiplier: 2 / 1
+			}
+			else if ((CurrentEnchantment == 3) || (CurrentEnchantment == 5) || (CurrentEnchantment == 6) || (CurrentEnchantment == 8) || (CurrentEnchantment == 20) || (CurrentEnchantment == 21) || (CurrentEnchantment == 35) || (CurrentEnchantment == 49) || (CurrentEnchantment == 50) || (CurrentEnchantment == 61) || (CurrentEnchantment == 62))
+			{
+				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 2 : 4);  // Multiplier: 4 / 2
+			}
+			else if ((CurrentEnchantment == 7) || (CurrentEnchantment == 33) || (CurrentEnchantment == 51))
+			{
+				EnchantmentCost += CurrentLevel * (IsEnchantBook ? 4 : 8);  // Multiplier: 8 / 4
+			}
 		}
 	}
 
@@ -1158,9 +1292,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Input.m_CustomName = RepairedItemName;
 	}
 
-	// TODO: Add enchantment exp cost.
-
-	m_MaximumCost = RepairCost + NeedExp;
+	m_MaximumCost = RepairCost + EnchantmentCost + NeedExp;
 
 	if (NeedExp < 0)
 	{
