@@ -8,7 +8,9 @@
 #ifdef _WIN32
 	#include "../StackWalker.h"
 #else
-	#include <execinfo.h>
+	#ifdef __GLIBC__
+		#include <execinfo.h>
+	#endif
 	#include <unistd.h>
 #endif
 
