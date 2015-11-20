@@ -34,6 +34,7 @@ cPath::cPath(
 	int a_MaxUp, int a_MaxDown
 ) :
 	m_StepsLeft(a_MaxSteps),
+	m_IsValid(true),
 	m_CurrentPoint(0),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
 	m_Chunk(&a_Chunk),
 	m_BadChunkFound(false)
@@ -68,11 +69,14 @@ cPath::cPath(
 	ProcessCell(GetCell(m_Source), nullptr, 0);
 }
 
+cPath::cPath() : m_IsValid(false)
+{
+
+}
 
 
 
-
-ePathFinderStatus cPath::Step(cChunk & a_Chunk)
+ePathFinderStatus cPath::CalculationStep(cChunk & a_Chunk)
 {
 	m_Chunk = &a_Chunk;
 	if (m_Status != ePathFinderStatus::CALCULATING)
@@ -287,11 +291,12 @@ void cPath::AttemptToFindAlternative()
 void cPath::BuildPath()
 {
 	cPathCell * CurrentCell = GetCell(m_Destination);
-	do
+	while (CurrentCell->m_Parent != nullptr)
 	{
-		m_PathPoints.push_back(CurrentCell->m_Location);  // Populate the cPath with points.
+		m_PathPoints.push_back(CurrentCell->m_Location);  // Populate the cPath with points. All midpoints are added. Destination is added. Source is excluded.
 		CurrentCell = CurrentCell->m_Parent;
-	} while (CurrentCell != nullptr);
+	}
+
 }
 
 
