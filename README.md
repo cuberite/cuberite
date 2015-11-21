@@ -11,24 +11,32 @@ Subscribe to [the newsletter](http://newsletter.cuberite.org/subscribe.htm) for 
 
 Installation
 ------------
-Hosted Cuberite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamocosm](https://gamocosm.com) also offers Cuberite support.
 
-For Linux there is an easy installation method, just run this in your terminal:
+There are several ways to obtain Cuberite.
 
-    curl -s https://raw.githubusercontent.com/cuberite/cuberite/master/easyinstall.sh | sh
+#### Binaries
+ - The easiest method is downloading for Windows or Linux from the [Project site](http://cuberite.org/).
+ - You can use the EasyInstall script for Linux, which automatically downloads the correct binary. The script is described below.
+ - You can also obtain a binary from the [buildserver archive](http://builds.cuberite.org).
 
-For Windows, you just need to download a file and extract it:
+##### The EasyInstall script
+This Linux script will download the correct binary from the project site.
 
- - [Windows 32 bit](http://builds.cuberite.org/job/Cuberite%20Windows%20x86%20Master/lastSuccessfulBuild/artifact/Install/Cuberite.zip)
- - [Windows 64 bit](http://builds.cuberite.org/job/Cuberite%20Windows%20x64%20Master/lastSuccessfulBuild/artifact/Install/Cuberite.zip)
+    bash -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/easyinstall.sh)"
 
-For other operating systems you need to download and compile yourself. This can be done either manually, or with this automatic script:
+#### Compiling
+ - You can compile automatically for Linux with the `compile.sh` script. The script is described below.
+ - You can also compile manually.
+
+Compiling may provide better performance performance (1.5-3x as fast) and it supports more operating systems. See the [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md) file for more details.
+
+##### The compile.sh script
+This script downloads the source code and compiles it. The script is smart enough to notify you of missing dependencies and instructing you on how to install them. The script doesn't work for Windows.
 
     bash -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
 
-There is also an archive of binary builds on the buildserver: http://builds.cuberite.org
-
-Compiling the server yourself has other benefits: you may get better performance performance (1.5-3x as fast) and it supports more operating systems. See the [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md) file for more details.
+#### Hosted services
+ - Hosted Cuberite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://  doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamocosm](https://gamocosm.com) also offers Cuberite support.
 
 Contributing
 ------------
