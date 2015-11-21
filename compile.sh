@@ -84,6 +84,13 @@ if [[ $MISSING_PROGRAMS != "" ]]; then
 	missingDepsExit
 fi
 
+# Bypass Branch choice and choose master. Because it's the only branch right now.
+BRANCH="master"
+
+### Inactive code start. ###
+function inactiveCode
+{
+
 # Echo: Branch choice.
 echo
 echo "You can choose between 2 branches:"
@@ -112,6 +119,9 @@ elif [[ ($BRANCH == "d") || ($BRANCH == "D" ) ]]; then
 else
 	error "Unrecognized user input."
 fi
+
+}
+### Inactive code end. ###
 
 # Echo: Compile mode choice.
 echo
@@ -197,3 +207,4 @@ exit 0
 :windows_detected
 echo "This script is not available for Windows yet, sorry."
 echo "You can still download the Windows binaries from: http://cuberite.org"
+echo "You can also manually compile for Windows. See: https://github.com/cuberite/cuberite"
