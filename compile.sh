@@ -1,27 +1,29 @@
+#!/bin/sh
 #|| goto :windows_detected
+set -e
 
 # Do we already have a repo?
-if [[ -d .git && -f easyinstall.sh && -f src/BlockArea.cpp ]]; then # A good enough indicator that we're in the Cuberite git repo.
+if [ \( -d .git \) -a \( -f easyinstall.sh \) -a \( -f src/BlockArea.cpp \) ]; then # A good enough indicator that we're in the Cuberite git repo.
 cd ../
 echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
 fi
 
 # Error functions.
-function error
+error ()
 {
 	echo
 	echo "-----------------"
 	echo "Script aborted, reason:"
 	echo $1
-	exit -1
+	exit 1
 }
 
-function missingDepsExit
+missingDepsExit ()
 {
 	echo
 	echo "Please install the dependencies, then come back."
 	echo
-	exit -2
+	exit 2
 }
 
 
@@ -42,7 +44,7 @@ GCC_EXISTS=0
 CLANG_EXISTS=0
 g++ --help > /dev/null 2> /dev/null && GCC_EXISTS=1
 clang --help > /dev/null 2> /dev/null && CLANG_EXISTS=1
-if [[ $GCC_EXISTS == 0 && $CLANG_EXISTS == 0 ]]; then
+if [ $GCC_EXISTS -eq 0 -a $CLANG_EXISTS -eq 0 ]; then
 MISSING_PROGRAMS="gcc g++"
 fi
 
@@ -54,7 +56,7 @@ git
 make
 cmake
 EOF
-if [[ $MISSING_PROGRAMS != "" ]]; then
+if [ "$MISSING_PROGRAMS" != "" ]; then
 	echo
 	echo "-----------------"
 	echo "You have missing compilation dependencies:"
@@ -88,7 +90,7 @@ fi
 BRANCH="master"
 
 ### Inactive code start. ###
-function inactiveCode
+inactiveCode ()
 {
 
 # Echo: Branch choice.
@@ -109,12 +111,12 @@ echo
 # Input: Branch choice.
 echo -n "Choose the branch (s/t/d): "
 read BRANCH
-if [[ ($BRANCH == "s") || ($BRANCH == "S" ) ]]; then
+if [ \( "$BRANCH" = "s" \) -o \( "$BRANCH" = "S" \) ]; then
 	#BRANCH="stable"
 	error "We don't have a stable branch yet, please use testing, sorry."
-elif [[ ($BRANCH == "t") || ($BRANCH == "T" ) ]]; then
+elif [ \( $BRANCH = "t" \) -o \( $BRANCH = "T" \) ]; then
 	BRANCH="testing"
-elif [[ ($BRANCH == "d") || ($BRANCH == "D" ) ]]; then
+elif [ \( $BRANCH = "d" \) -o \( $BRANCH = "D" \) ]; then
 	BRANCH="master"
 else
 	error "Unrecognized user input."
@@ -138,9 +140,9 @@ echo
 # Input: Compile mode choice.
 echo -n "Choose compile mode: (n/d): "
 read BUILDTYPE
-if [[ ($BUILDTYPE == "d") || ($BUILDTYPE == "D") ]]; then
+if [ \( "$BUILDTYPE" = "d" \) -o \( "$BUILDTYPE" = "D" \) ]; then
 	BUILDTYPE="Debug"
-elif [[ ($BUILDTYPE == "n") || ($BUILDTYPE == "N") ]]; then
+elif [ \( "$BUILDTYPE" = "n" \) -o \( "$BUILDTYPE" = "N" \) ]; then
 	BUILDTYPE="Release"
 else
 	error "Unrecognized user input."
@@ -152,20 +154,19 @@ echo
 echo " --- Downloading Cuberite's source code from the $BRANCH branch..."
 
 
-# Git: Clone.
 if [ ! -d cuberite ]; then
+	# Git: Clone.
 	echo " --- Looks like your first run, cloning the whole code..."
 	git clone https://github.com/cuberite/cuberite.git
+	cd cuberite
+else
+	# Git: Fetch.
+	cd cuberite
+	echo " --- Updating the $BRANCH branch..."
+	git fetch origin $BRANCH || error "git fetch failed"
+	git checkout $BRANCH || error "git checkout failed"
+	git merge origin/$BRANCH || error "git merge failed"
 fi
-
-
-# Git: Fetch.
-pushd cuberite
-echo " --- Updating the $BRANCH branch..."
-git fetch origin $BRANCH || error "git fetch failed"
-git checkout $BRANCH || error "git checkout failed"
-git merge origin/$BRANCH || error "git merge failed"
-
 
 # Git: Submodules.
 echo " --- Updating submodules..."
@@ -175,7 +176,7 @@ git submodule update --init
 # Cmake.
 echo " --- Running cmake..."
 if [ ! -d build-cuberite ]; then mkdir build-cuberite; fi
-pushd build-cuberite
+cd build-cuberite
 cmake .. -DCMAKE_BUILD_TYPE=$BUILDTYPE || error "cmake failed"
 
 
@@ -186,22 +187,19 @@ echo
 
 
 # Echo: Compilation complete.
-popd > /dev/null
-pushd Server > /dev/null
+cd ../Server
 echo
 echo "-----------------"
 echo "Compilation done!"
 echo
 echo "Cuberite awaits you at:"
-if [[ $BUILDTYPE == "Debug" ]]; then
-echo "`pwd`/Cuberite_debug"
+if [ "$BUILDTYPE" = "Debug" ]; then
+	echo "`pwd`/Cuberite_debug"
 else
-echo "`pwd`/Cuberite"
+	echo "`pwd`/Cuberite"
 fi
 echo
 echo "Enjoy :)"
-popd > /dev/null
-popd > /dev/null
 exit 0
 
 :windows_detected
