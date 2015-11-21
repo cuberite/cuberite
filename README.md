@@ -22,7 +22,7 @@ There are several ways to obtain Cuberite.
 ##### The EasyInstall script
 This Linux script will download the correct binary from the project site.
 
-    bash -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/easyinstall.sh)"
+    sh -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/easyinstall.sh)"
 
 #### Compiling
  - You can compile automatically for Linux with the `compile.sh` script. The script is described below.
@@ -33,7 +33,7 @@ Compiling may provide better performance performance (1.5-3x as fast) and it sup
 ##### The compile.sh script
 This script downloads the source code and compiles it. The script is smart enough to notify you of missing dependencies and instructing you on how to install them. The script doesn't work for Windows.
 
-    bash -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
+    sh -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
 
 #### Hosted services
  - Hosted Cuberite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://  doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamocosm](https://gamocosm.com) also offers Cuberite support.
