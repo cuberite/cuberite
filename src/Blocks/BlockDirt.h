@@ -77,7 +77,7 @@ public:
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
-			if ((a_RelY + OfsY < 0) || (a_RelY + OfsY >= cChunkDef::Height - 1))
+			if (!cChunkDef::IsValidHeight(a_RelY + OfsY))
 			{
 				// Y Coord out of range
 				continue;

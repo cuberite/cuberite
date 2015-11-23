@@ -1132,7 +1132,7 @@ void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 
 bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
 		return false;
@@ -1153,7 +1153,7 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
 		return false;
@@ -1174,7 +1174,7 @@ bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 
 bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
 		return false;
@@ -1195,7 +1195,7 @@ bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLE
 
 bool cChunk::UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockBlockLight) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
 		return false;
@@ -1216,7 +1216,7 @@ bool cChunk::UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, 
 
 bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockSkyLight) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
 		return false;
@@ -1237,7 +1237,7 @@ bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NI
 
 bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
 		return false;
@@ -1259,7 +1259,7 @@ bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBB
 
 bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("UnboundedRelSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;
@@ -1280,7 +1280,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		LOGWARNING("UnboundedRelFastSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;
@@ -1301,7 +1301,7 @@ bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 
 void cChunk::UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
-	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_RelY))
 	{
 		// Outside of chunkmap
 		return;
