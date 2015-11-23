@@ -459,3 +459,33 @@ void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDama
 
 
 
+
+bool cItems::Contains(const cItem & a_Item)
+{
+	for (auto itr : *this)
+	{
+		if (a_Item.IsEqual(itr))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cItems::ContainsType(const cItem & a_Item)
+{
+	for (auto itr : *this)
+	{
+		if (a_Item.IsSameType(itr))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+

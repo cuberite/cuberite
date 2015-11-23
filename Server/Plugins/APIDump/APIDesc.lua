@@ -1550,6 +1550,8 @@ end
 					{ Params = "Index, ItemType, ItemCount, ItemDamage", Return = "", Notes = "Sets the item at the specified index to the specified item" },
 				},
 				Size = { Params = "", Return = "number", Notes = "Returns the number of items in the collection" },
+				Contains = { Params = "{{cItem|cItem}}", Return = "bool", Notes = "Returns true if the collection contains an item that is fully equivalent to the parameter" },
+				ContainsType = { Params = "{{cItem|cItem}}", Return = "bool", Notes = "Returns true if the collection contains an item that is the same type as the parameter" },
 			},
 		},  -- cItems
 
