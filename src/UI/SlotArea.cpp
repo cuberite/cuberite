@@ -20,6 +20,7 @@
 #include "../Root.h"
 #include "../FastRandom.h"
 #include "../BlockArea.h"
+#include "../EffectID.h"
 
 
 
@@ -1004,18 +1005,18 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		{
 			// Anvil will break
 			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(1020, PosX, PosY, PosZ, 0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, PosX, PosY, PosZ, 0);
 			a_Player.CloseWindow(false);
 		}
 		else
 		{
 			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, PosX, PosY, PosZ, 0);
 		}
 	}
 	else
 	{
-		a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, PosX, PosY, PosZ, 0);
 	}
 }
 

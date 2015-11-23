@@ -108,7 +108,7 @@ public:
 	virtual void SendSetTitle                   (const cCompositeChat & a_Title) override;
 	virtual void SendSetRawTitle                (const AString & a_Title) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
+	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override;

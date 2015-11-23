@@ -6,6 +6,7 @@
 #include "../Server.h"
 #include "../ClientHandle.h"
 #include "../World.h"
+#include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
@@ -573,7 +574,7 @@ void cMonster::HandleFalling()
 			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 
 			// Fall particles
-			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
+			GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_FALL_PARTICLES, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
 		}
 
 		m_LastGroundHeight = POSY_TOINT;

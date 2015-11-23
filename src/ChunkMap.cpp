@@ -656,7 +656,7 @@ void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, double a_X, do
 
 
 
-void cChunkMap::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;

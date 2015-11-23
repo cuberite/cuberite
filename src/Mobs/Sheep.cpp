@@ -5,6 +5,7 @@
 #include "../BlockID.h"
 #include "../Entities/Player.h"
 #include "../World.h"
+#include "../EffectID.h"
 #include "FastRandom.h"
 
 
@@ -107,7 +108,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				// The sheep ate the grass so we change it to dirt
 				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);
-				GetWorld()->BroadcastSoundParticleEffect(2001, PosX, PosY, PosX, E_BLOCK_GRASS);
+				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, PosX, PosY, PosX, E_BLOCK_GRASS);
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}

@@ -3,6 +3,7 @@
 #include "SplashPotionEntity.h"
 #include "Pawn.h"
 #include "../ClientHandle.h"
+#include "../EffectID.h"
 
 
 
@@ -121,7 +122,7 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 	m_World->ForEachEntity(Callback);
 	
 	m_World->BroadcastSoundParticleEffect(
-		2002,
+		EffectID::PARTICLE_SPLASH_POTION,
 		FloorC(a_HitPos.x),
 		FloorC(a_HitPos.y),
 		FloorC(a_HitPos.z),

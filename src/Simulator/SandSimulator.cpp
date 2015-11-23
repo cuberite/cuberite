@@ -8,6 +8,7 @@
 #include "../Entities/FallingBlock.h"
 #include "../Chunk.h"
 #include "../IniFile.h"
+#include "../EffectID.h"
 
 
 
@@ -258,7 +259,7 @@ void cSandSimulator::FinishFalling(
 		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FallingBlockType, a_FallingBlockMeta);
 		if (a_FallingBlockType == E_BLOCK_ANVIL)
 		{
-			a_World->BroadcastSoundParticleEffect(1022, a_BlockX, a_BlockY, a_BlockZ, 0);
+			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, a_BlockX, a_BlockY, a_BlockZ, 0);
 		}
 		return;
 	}

@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "MetaRotator.h"
+#include "../EffectID.h"
 
 
 
@@ -49,7 +50,7 @@ public:
 			// Standing aside - use last direction
 			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, OldMetaData);
 		}
-		a_Player->GetWorld()->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+		a_Player->GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
 	}
 
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
