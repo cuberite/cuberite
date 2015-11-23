@@ -120,7 +120,12 @@ public:
 	{
 		return ((a_Height >= 0) && (a_Height < Height));
 	}
-
+	
+	/** Validates a width-coordinate. Returns false if width-coordiante is out of width bounds */
+	inline static bool IsValidWidth(int a_Width)
+	{
+		return ((a_Width >= 0) && (a_Width < Width));
+	}
 
 	/** Converts absolute block coords to chunk coords: */
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
