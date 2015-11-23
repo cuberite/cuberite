@@ -597,7 +597,7 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
 	{
 		const AStringPair & cmd = *itr;
-		a_Output.Out(Printf("%-*s%s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), cmd.second.c_str()));
+		a_Output.Out(Printf("%-*s%s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), (" - " + cmd.second).c_str()));
 	}  // for itr - Callback.m_Commands[]
 }
 
@@ -608,14 +608,14 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 void cServer::BindBuiltInConsoleCommands(void)
 {
 	cPluginManager * PlgMgr = cPluginManager::Get();
-	PlgMgr->BindConsoleCommand("help", nullptr, " - Shows the available commands");
-	PlgMgr->BindConsoleCommand("reload", nullptr, " - Reloads all plugins");
-	PlgMgr->BindConsoleCommand("restart", nullptr, " - Restarts the server cleanly");
-	PlgMgr->BindConsoleCommand("stop", nullptr, " - Stops the server cleanly");
-	PlgMgr->BindConsoleCommand("chunkstats", nullptr, " - Displays detailed chunk memory statistics");
-	PlgMgr->BindConsoleCommand("load <pluginname>", nullptr, " - Adds and enables the specified plugin");
-	PlgMgr->BindConsoleCommand("unload <pluginname>", nullptr, " - Disables the specified plugin");
-	PlgMgr->BindConsoleCommand("destroyentities", nullptr, " - Destroys all entities in all worlds");
+	PlgMgr->BindConsoleCommand("help", nullptr, "Shows the available commands");
+	PlgMgr->BindConsoleCommand("reload", nullptr, "Reloads all plugins");
+	PlgMgr->BindConsoleCommand("restart", nullptr, "Restarts the server cleanly");
+	PlgMgr->BindConsoleCommand("stop", nullptr, "Stops the server cleanly");
+	PlgMgr->BindConsoleCommand("chunkstats", nullptr, "Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("load <pluginname>", nullptr, "Adds and enables the specified plugin");
+	PlgMgr->BindConsoleCommand("unload <pluginname>", nullptr, "Disables the specified plugin");
+	PlgMgr->BindConsoleCommand("destroyentities", nullptr, "Destroys all entities in all worlds");
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	PlgMgr->BindConsoleCommand("dumpmem", nullptr, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
