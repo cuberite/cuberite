@@ -20,6 +20,7 @@
 #include "UI/SlotArea.h"
 #include "json/json.h"
 #include "ChunkSender.h"
+#include "EffectID.h"
 
 
 #include <array>
@@ -204,7 +205,7 @@ public:  // tolua_export
 	void SendSetTitle                   (const cCompositeChat & a_Title);
 	void SendSetRawTitle                (const AString & a_Title);
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
-	void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
+	void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob                   (const cMonster & a_Mob);
 	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);

@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "BlockDoor.h"
+#include "../EffectID.h"
 #include "../Entities/Player.h"
 
 
@@ -64,7 +65,7 @@ void cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		case E_BLOCK_OAK_DOOR:
 		{
 			ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-			a_Player->GetWorld()->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+			a_Player->GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
 			break;
 		}
 		// Prevent iron door from opening on player click

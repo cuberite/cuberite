@@ -1163,13 +1163,13 @@ void cProtocol172::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 
 
 
-void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+void cProtocol172::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	ASSERT((a_SrcY >= 0) && (a_SrcY < 256));
 	
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
-	Pkt.WriteBEInt32(a_EffectID);
+	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
 	Pkt.WriteBEInt32(a_SrcX);
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_SrcY));
 	Pkt.WriteBEInt32(a_SrcZ);

@@ -173,7 +173,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					{
 						EntitiesSpawned = true;
 						Chunk->BroadcastSoundParticleEffect(
-							2004,
+							EffectID::PARTICLE_MOBSPAWN,
 							static_cast<int>(PosX * 8.0),
 							static_cast<int>(RelY * 8.0),
 							static_cast<int>(PosZ * 8.0),

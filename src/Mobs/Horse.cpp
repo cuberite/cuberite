@@ -2,6 +2,7 @@
 
 #include "Horse.h"
 #include "../World.h"
+#include "../EffectID.h"
 #include "../Entities/Player.h"
 
 
@@ -55,10 +56,10 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_World->GetTickRandomNumber(50) == 25)
 			{
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 0);
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 2);
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 6);
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 8);
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_EAST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_WEST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_EAST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_WEST));
 
 				m_Attachee->Detach();
 				m_bIsRearing = true;

@@ -444,7 +444,7 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_RelBlockX, int a_RelBl
 			if ((MetaData & 0x4) == 0)
 			{
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MetaData | 0x4);
-				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+				m_Chunk->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, BlockX, a_RelBlockY, BlockZ, 0);
 			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true);
 		}
@@ -456,7 +456,7 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_RelBlockX, int a_RelBl
 			if ((MetaData & 0x4) != 0)
 			{
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MetaData & ~0x04);
-				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+				m_Chunk->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, BlockX, a_RelBlockY, BlockZ, 0);
 			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, false);
 		}
@@ -973,7 +973,7 @@ void cIncrementalRedstoneSimulator::HandleDoor(int a_RelBlockX, int a_RelBlockY,
 			if (!DoorHandler::IsOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ))
 			{
 				DoorHandler::SetOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ, true);
-				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+				m_Chunk->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, BlockX, a_RelBlockY, BlockZ, 0);
 			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true);
 		}
@@ -986,7 +986,7 @@ void cIncrementalRedstoneSimulator::HandleDoor(int a_RelBlockX, int a_RelBlockY,
 			if (DoorHandler::IsOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ))
 			{
 				DoorHandler::SetOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ, false);
-				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+				m_Chunk->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, BlockX, a_RelBlockY, BlockZ, 0);
 			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, false);
 		}

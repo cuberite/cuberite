@@ -15,6 +15,7 @@
 #include "../Scoreboard.h"
 #include "../Map.h"
 #include "../ByteBuffer.h"
+#include "../EffectID.h"
 
 #include <array>
 
@@ -123,7 +124,7 @@ public:
 	virtual void SendSetTitle                   (const cCompositeChat & a_Title) = 0;
 	virtual void SendSetRawTitle                (const AString & a_Title) = 0;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) = 0;
-	virtual void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
+	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) = 0;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;
 	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) = 0;

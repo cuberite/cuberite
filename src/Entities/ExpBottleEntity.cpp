@@ -2,6 +2,7 @@
 
 #include "ExpBottleEntity.h"
 #include "../World.h"
+#include "../EffectID.h"
 
 
 
@@ -38,7 +39,7 @@ void cExpBottleEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hit
 void cExpBottleEntity::Break(const Vector3d &a_HitPos)
 {
 	// Spawn an experience orb with a reward between 3 and 11.
-	m_World->BroadcastSoundParticleEffect(2002, POSX_TOINT, POSY_TOINT, POSZ_TOINT, 0);
+	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SPLASH_POTION, POSX_TOINT, POSY_TOINT, POSZ_TOINT, 0);
 	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), 3 + m_World->GetTickRandomNumber(8));
 	Destroy();
 }

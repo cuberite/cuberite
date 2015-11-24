@@ -107,6 +107,7 @@ SET (HDRS
 	Cuboid.h
 	DeadlockDetect.h
 	Defines.h
+	EffectID.h
 	Enchantments.h
 	Endianness.h
 	FastRandom.h

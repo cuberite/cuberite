@@ -19,6 +19,7 @@ Implements the 1.8.x protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
+#include "../EffectID.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
 #include "../Statistics.h"
@@ -1234,12 +1235,12 @@ void cProtocol180::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 
 
 
-void cProtocol180::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+void cProtocol180::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
-	Pkt.WriteBEInt32(a_EffectID);
+	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
 	Pkt.WritePosition64(a_SrcX, a_SrcY, a_SrcZ);
 	Pkt.WriteBEInt32(a_Data);
 	Pkt.WriteBool(false);
