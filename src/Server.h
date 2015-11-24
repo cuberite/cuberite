@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "ChannelManager.h"
 #include "RCONServer.h"
 #include "OSSupport/IsThread.h"
 #include "OSSupport/Network.h"
@@ -79,6 +80,8 @@ public:
 	
 	// Hardcore mode or not:
 	bool IsHardcore(void) const { return m_bIsHardcore; }
+
+	cChannelManager & GetChannelManager() { return m_ChannelManager; }
 
 	// tolua_end
 
@@ -233,6 +236,8 @@ private:
 	/** The list of ports on which the server should listen for connections.
 	Initialized in InitServer(), used in Start(). */
 	AStringVector m_Ports;
+
+	cChannelManager m_ChannelManager;
 
 
 	cServer(void);

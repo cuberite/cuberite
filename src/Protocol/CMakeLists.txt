@@ -9,6 +9,7 @@ SET (SRCS
 	ChunkDataSerializer.cpp
 	MojangAPI.cpp
 	Packetizer.cpp
+	Protocol.cpp
 	Protocol17x.cpp
 	Protocol18x.cpp
 	ProtocolRecognizer.cpp
