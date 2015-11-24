@@ -2530,10 +2530,15 @@ void cProtocol180::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 	}
 
 	AString Lines[4];
+	Json::Value root;
+	Json::Reader reader;
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
-		Lines[i] = Line.substr(1, Line.length() - 2);  // Remove ""
+		if (reader.parse(Line, root, false))
+		{
+			Lines[i] = root.asString();
+		}
 	}
 
 	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);
