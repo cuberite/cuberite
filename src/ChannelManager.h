@@ -27,7 +27,7 @@ public:
 	void RemoveClientFromChannels(cClientHandle & a_Client, const AStringVector & a_Channels);
 	bool ClientHasChannel        (cClientHandle & a_Client, const AString & a_Channel);
 
-	void BroadcastChannelMessage (const AString & a_Channel,  const AString & a_Data, cWorld * a_World = nullptr); // tolua_export
+	void BroadcastChannelMessage (const AString & a_Channel,  const AString & a_Data, cWorld * a_World = nullptr);  // tolua_export
 
 	bool RegisterChannel         (const AString & a_Channel, cChannelCallbackPtr a_Callback);  // Exported in manual bindings
 	bool RemoveChannel           (const AString & a_Channel);  // tolua_export
@@ -41,4 +41,4 @@ private:
 	cCriticalSection m_CSCallbacks;
 
 	CallbackMap m_ChannelCallbacks;
-}; // tolua_export
+};  // tolua_export
