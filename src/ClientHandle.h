@@ -245,7 +245,14 @@ public:  // tolua_export
 	AString GetLocale(void) const { return m_Locale; }
 
 	int GetUniqueID(void) const { return m_UniqueID; }
-	
+
+	/** Adds a channel to the handles's collection of registered channels. */
+	void RegisterChannel(const AString & a_Channel);
+
+	/** Removes a channel from the handle's collection of registered channels. */
+	void RemoveChannel(const AString & a_Channel);
+
+	/** Check to see if the handle can receive messages on the specified channels */
 	bool HasPluginChannel(const AString & a_PluginChannel);
 	
 	/** Called by the protocol when it receives the MC|Brand plugin message. Also callable by plugins.
