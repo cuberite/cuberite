@@ -72,54 +72,6 @@ protected:
 
 
 
-class cStructGenOreNests :
-	public cFinishGen
-{
-public:
-	struct OreInfo
-	{
-		BLOCKTYPE  BlockType;  // The type of the nest.
-		NIBBLETYPE BlockMeta;  // The block meta
-		int        MaxHeight;  // The highest possible a nest can occur
-		int        NumNests;   // How many nests per chunk
-		int        NestSize;   // The amount of blocks a nest can have.
-
-		OreInfo() :
-			BlockType(0),
-			BlockMeta(0),
-			MaxHeight(0),
-			NumNests(0),
-			NestSize(0)
-		{
-		}
-	};
-
-	typedef std::vector<OreInfo> OreList;
-
-	cStructGenOreNests(int a_Seed, OreList a_OreList, BLOCKTYPE a_ToReplace) :
-		m_Noise(a_Seed),
-		m_Seed(a_Seed),
-		m_OreList(a_OreList),
-		m_ToReplace(a_ToReplace)
-	{}
-
-protected:
-	cNoise  m_Noise;
-	int     m_Seed;
-
-	OreList   m_OreList;  // A list of possible ores.
-	BLOCKTYPE m_ToReplace;
-	
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-	
-	void GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, NIBBLETYPE a_BlockMeta, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, cChunkDesc::BlockNibbleBytes & a_BlockMetas, int a_Seq);
-} ;
-
-
-
-
-
 class cStructGenLakes :
 	public cFinishGen
 {
