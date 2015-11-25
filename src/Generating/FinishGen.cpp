@@ -1441,13 +1441,11 @@ const cFinishGenOres::OreInfos & cFinishGenOres::DefaultOverworldOres(void)
 
 const cFinishGenOres::OreInfos & cFinishGenOres::DefaultNetherOres(void)
 {
-	static OreInfos res;
-	if (res.empty())
+	static OreInfos res
 	{
-		// Hasn't been initialized yet, emplace the defaults:
-		//               OreType,                   OreMeta, MaxHeight, NumNests, NestSize
-		res.emplace_back(E_BLOCK_NETHER_QUARTZ_ORE, 0,       127,       20,       8);
-	}
+		// OreType,                 OreMeta, MaxHeight, NumNests, NestSize
+		{E_BLOCK_NETHER_QUARTZ_ORE, 0,       127,       20,       8},
+	};
 	return res;
 }
 
@@ -1457,18 +1455,90 @@ const cFinishGenOres::OreInfos & cFinishGenOres::DefaultNetherOres(void)
 
 const cFinishGenOres::OreInfos & cFinishGenOres::DefaultNaturalPatches(void)
 {
-	static OreInfos res;
-	if (res.empty())
+	static OreInfos res
 	{
-		// Hasn't been initialized yet, emplace the defaults:
-		//               OreType,        OreMeta,               MaxHeight, NumNests, NestSize
-		res.emplace_back(E_BLOCK_DIRT,   0,                     127,       20,       32);
-		res.emplace_back(E_BLOCK_GRAVEL, 0,                     127,       10,       32);
-		res.emplace_back(E_BLOCK_STONE,  E_META_STONE_GRANITE,  127,       20,       32);
-		res.emplace_back(E_BLOCK_STONE,  E_META_STONE_DIORITE,  127,       20,       32);
-		res.emplace_back(E_BLOCK_STONE,  E_META_STONE_ANDESITE, 127,       20,       32);
-	}
+		// OreType,      OreMeta,               MaxHeight, NumNests, NestSize
+		{E_BLOCK_DIRT,   0,                     127,       20,       32},
+		{E_BLOCK_GRAVEL, 0,                     127,       10,       32},
+		{E_BLOCK_STONE,  E_META_STONE_GRANITE,  127,       20,       32},
+		{E_BLOCK_STONE,  E_META_STONE_DIORITE,  127,       20,       32},
+		{E_BLOCK_STONE,  E_META_STONE_ANDESITE, 127,       20,       32},
+	};
 	return res;
+}
+
+
+
+
+
+cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_OreInfosString)
+{
+	// The string is expected to be formatted as "<OreInfo1> | <OreInfo2> | <OreInfo3> | ..."
+	// Each OreInfo is expected to be formatted as "<OreType> : <OreMeta> : <MaxHeight> : <NumNests> : <NestSize>"
+
+	OreInfos res;
+	auto ores = StringSplitAndTrim(a_OreInfosString, "|");
+	for (const auto & ore: ores)
+	{
+		auto parts = StringSplitAndTrim(ore, ":");
+		if (parts.size() != 5)
+		{
+			LOGWARNING("Cannot parse ore information from string, not enough OreInfo members (exp 5, got %d). Offending item: \"%s\".",
+				static_cast<unsigned>(parts.size()), ore.c_str()
+			);
+			continue;
+		}
+		auto oreType = BlockStringToType(parts[0]);
+		if (oreType < 0)
+		{
+			LOGWARNING("Cannot parse ore information from string, invalid OreType: \"%s\".", parts[0].c_str());
+			continue;
+		}
+		NIBBLETYPE oreMeta;
+		int maxHeight, numNests, nestSize;
+		if (
+			!StringToInteger(parts[1], oreMeta) ||
+			!StringToInteger(parts[2], maxHeight) ||
+			!StringToInteger(parts[3], numNests) ||
+			!StringToInteger(parts[4], nestSize)
+		)
+		{
+			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
+			continue;
+		}
+		res.emplace_back(oreType, oreMeta, maxHeight, numNests, nestSize);
+	}  // for i - split[]
+	return res;
+}
+
+
+
+
+
+AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreInfos)
+{
+	AString res;
+	for (const auto & ore: a_OreInfos)
+	{
+		if (!res.empty())
+		{
+			res.append(" | ");
+		}
+		AppendPrintf(res, "%s:%d:%d:%d:%d",
+			ItemTypeToString(ore.m_BlockType).c_str(), ore.m_BlockMeta,
+			ore.m_MaxHeight, ore.m_NumNests, ore.m_NestSize
+		);
+	}  // for ore - a_OreInfos[]
+	return res;
+}
+
+
+
+
+
+void cFinishGenOres::SetSeed(int a_Seed)
+{
+	m_Noise.SetSeed(a_Seed);
 }
 
 
@@ -1576,9 +1646,25 @@ void cFinishGenOreNests::GenerateOre(
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenOrePockets:
 
-bool cFinishGenOrePockets::Initialize(cIniFile & a_IniFile)
+bool cFinishGenOrePockets::Initialize(cIniFile & a_IniFile, const AString & a_GenName)
 {
-	// TODO
+	// Read the OreInfos configuration:
+	auto valueName = a_GenName + "_blocks";
+	auto pocketCfg = a_IniFile.GetValue("Generator", valueName, "");
+	if (pocketCfg.empty())
+	{
+		// There's no config currently stored in the INI file. Store the defaults as the config:
+		a_IniFile.SetValue("Generator", valueName, OreInfosToString(m_OreInfos));
+	}
+	else
+	{
+		m_OreInfos = OreInfosFromString(pocketCfg);
+	}
+
+	// Read the optional seed configuration (but do not store the default):
+	valueName = a_GenName + "_seed";
+	SetSeed(a_IniFile.GetValueI("Generator", valueName, m_Noise.GetSeed()));
+
 	return true;
 }
 

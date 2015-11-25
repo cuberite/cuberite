@@ -332,7 +332,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "DirtPockets") == 0)
 		{
-			m_FinishGens.push_back(std::make_shared<cFinishGenOrePockets>(Seed + 1, cFinishGenOrePockets::DefaultNaturalPatches()));
+			auto gen = std::make_shared<cFinishGenOrePockets>(Seed + 1, cFinishGenOrePockets::DefaultNaturalPatches());
+			if (gen->Initialize(a_IniFile, "DirtPockets"))
+			{
+				m_FinishGens.push_back(gen);
+			}
 		}
 		else if (NoCaseCompare(*itr, "DistortedMembraneOverhangs") == 0)
 		{
@@ -425,7 +429,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "OrePockets") == 0)
 		{
 			auto gen = std::make_shared<cFinishGenOrePockets>(Seed + 2, cFinishGenOrePockets::DefaultOverworldOres());
-			if (gen->Initialize(a_IniFile))
+			if (gen->Initialize(a_IniFile, "OrePockets"))
 			{
 				m_FinishGens.push_back(gen);
 			}

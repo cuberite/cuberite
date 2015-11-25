@@ -49,6 +49,7 @@ public:
 	NOISE_DATATYPE CubicNoise3D (NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const;
 
 	void SetSeed(int a_Seed) { m_Seed = a_Seed; }
+	int GetSeed(void) const { return m_Seed; }
 
 	inline static NOISE_DATATYPE CubicInterpolate (NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct);
 	inline static NOISE_DATATYPE CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);

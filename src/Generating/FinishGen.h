@@ -440,7 +440,6 @@ public:
 
 	cFinishGenOres(int a_Seed, const OreInfos & a_OreInfos):
 		m_Noise(a_Seed),
-		m_Seed(a_Seed),
 		m_OreInfos(a_OreInfos)
 	{
 	}
@@ -457,12 +456,22 @@ public:
 	/** Returns a vector of OreInfo structures describing the default Overworld non-ore pockets (dirt, diorite etc), usable in the constructor. */
 	static const OreInfos & DefaultNaturalPatches(void);
 
+	/** Parses the parameter string into OreInfos array.
+	See OreInfosToString() for the complementary function.
+	Used for loading configuration from INI files. */
+	static OreInfos OreInfosFromString(const AString & a_OreInfosString);
+
+	/** Returns a string that represents the OreInfos given as the parameter.
+	See OreInfosFromString() for the complementary function.
+	Used for storing defaults in the INI file. */
+	static AString OreInfosToString(const OreInfos & a_OreInfos);
+
+	/** (Re-)sets the seed used by the internal generating mechanisms. */
+	void SetSeed(int a_Seed);
+
 protected:
 	/** The noise used for generating. */
 	cNoise m_Noise;
-
-	/** The seed for the generating noise. */
-	int m_Seed;
 
 	/** All the ores enabled in this generator. */
 	OreInfos m_OreInfos;
@@ -520,8 +529,9 @@ public:
 	{}
 
 	/** Reads the configuration from the specified INI file.
+	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different default).
 	Returns true on success, false and logs errors to console on failure. */
-	bool Initialize(cIniFile & a_IniFile);
+	bool Initialize(cIniFile & a_IniFile, const AString & a_GenName);
 
 protected:
 
