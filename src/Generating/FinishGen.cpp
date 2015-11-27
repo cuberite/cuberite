@@ -1649,7 +1649,7 @@ void cFinishGenOreNests::GenerateOre(
 bool cFinishGenOrePockets::Initialize(cIniFile & a_IniFile, const AString & a_GenName)
 {
 	// Read the OreInfos configuration:
-	auto valueName = a_GenName + "_blocks";
+	auto valueName = a_GenName + "Blocks";
 	auto pocketCfg = a_IniFile.GetValue("Generator", valueName, "");
 	if (pocketCfg.empty())
 	{
@@ -1662,7 +1662,7 @@ bool cFinishGenOrePockets::Initialize(cIniFile & a_IniFile, const AString & a_Ge
 	}
 
 	// Read the optional seed configuration (but do not store the default):
-	valueName = a_GenName + "_seed";
+	valueName = a_GenName + "Seed";
 	SetSeed(a_IniFile.GetValueI("Generator", valueName, m_Noise.GetSeed()));
 
 	return true;
