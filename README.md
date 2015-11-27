@@ -26,9 +26,9 @@ This Linux script will download the correct binary from the project site.
 
 #### Compiling
  - You can compile automatically for Linux with the `compile.sh` script. The script is described below.
- - You can also compile manually.
+ - You can also compile manually. See [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md).
 
-Compiling may provide better performance performance (1.5-3x as fast) and it supports more operating systems. See the [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md) file for more details.
+Compiling may provide better performance performance (1.5-3x as fast) and it supports more operating systems. 
 
 ##### The compile.sh script
 This script downloads the source code and compiles it. The script is smart enough to notify you of missing dependencies and instructing you on how to install them. The script doesn't work for Windows.
