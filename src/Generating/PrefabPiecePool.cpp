@@ -186,8 +186,8 @@ bool cPrefabPiecePool::LoadFromString(const AString & a_Contents, const AString 
 		}
 	}
 
-	// Read the first 4 KiB of the file in order to auto-detect format:
-	auto Header = a_Contents.substr(0, 4096);
+	// Search the first 8 KiB of the file for the format auto-detection string:
+	auto Header = a_Contents.substr(0, 8192);
 	if (Header.find("CubesetFormatVersion =") != AString::npos)
 	{
 		return LoadFromCubeset(a_Contents, a_FileName, a_LogWarnings);
