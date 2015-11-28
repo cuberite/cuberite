@@ -47,7 +47,7 @@ public:
 	}
 
 
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) override
+	virtual bool AddEatEffects(cPlayer & a_Player) override
 	{
 		return false;
 	}

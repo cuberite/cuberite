@@ -1046,7 +1046,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_SHOOT_EAT:
 		{
-			cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+			cItemHandler * ItemHandler = m_Player->GetEquippedItem().GetHandler();
 			if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(m_Player->GetEquippedItem().m_ItemDamage))
 			{
 				m_Player->AbortEating();
@@ -1175,7 +1175,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
 	Handler->OnDigging(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+	cItemHandler * ItemHandler = m_Player->GetEquippedItem().GetHandler();
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 }
 
@@ -1217,7 +1217,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 
 	cWorld * World = m_Player->GetWorld();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+	cItemHandler * ItemHandler = m_Player->GetEquippedItem().GetHandler();
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
@@ -1396,7 +1396,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	}
 	
 	short EquippedDamage = Equipped.m_ItemDamage;
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
+	cItemHandler * ItemHandler = Equipped.GetHandler();
 	
 	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
 	{

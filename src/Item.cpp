@@ -95,7 +95,7 @@ bool cItem::DamageItem(short a_Amount)
 
 bool cItem::IsFullStack(void) const
 {
-	return (m_ItemCount >= ItemHandler(m_ItemType)->GetMaxStackSize());
+	return (m_ItemCount >= GetMaxStackSize());
 }
 
 
@@ -104,7 +104,7 @@ bool cItem::IsFullStack(void) const
 
 char cItem::GetMaxStackSize(void) const
 {
-	return ItemHandler(m_ItemType)->GetMaxStackSize();
+	return GetHandler()->GetMaxStackSize();
 }
 
 
@@ -113,7 +113,7 @@ char cItem::GetMaxStackSize(void) const
 
 cItemHandler * cItem::GetHandler(void) const
 {
-	return ItemHandler(m_ItemType);
+	return cItemHandler::GetItemHandler(m_ItemType, m_ItemDamage);
 }
 
 

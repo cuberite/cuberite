@@ -666,7 +666,7 @@ void cPlayer::FinishEating(void)
 	// consume the item:
 	cItem Item(GetEquippedItem());
 	Item.m_ItemCount = 1;
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Item.m_ItemType);
+	cItemHandler * ItemHandler = Item.GetHandler();
 	if (!ItemHandler->EatItem(this, &Item))
 	{
 		return;

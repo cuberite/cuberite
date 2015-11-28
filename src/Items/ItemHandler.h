@@ -1,6 +1,9 @@
 
 #pragma once
 
+#include <vector>
+#include <memory>
+#include <array>
 #include "../Defines.h"
 #include "../Item.h"
 #include "../Entities/EntityEffect.h"
@@ -22,6 +25,10 @@ class cItemHandler
 {
 public:
 
+	// The ItemHandler is an array for each item. The vector is used as an dynamic array for the different meta-values
+	// of the item. e.g. x[ItemNr][MetaVal]->Eat
+	typedef std::array<std::vector<std::unique_ptr<cItemHandler>>, E_ITEM_LAST + 1> ItemHandlerType;
+
 	enum eDurabilityLostAction
 	{
 		dlaBreakBlock,
@@ -29,7 +36,7 @@ public:
 	};
 
 	cItemHandler(int a_ItemType);
-	
+
 	/** Force virtual destructor */
 	virtual ~cItemHandler() {}
 
@@ -130,7 +137,7 @@ public:
 	virtual FoodInfo GetFoodInfo();
 
 	/** If this function returns true, it sets the arguments to a effect who will be activated when you eat the item. */
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance);
+	virtual bool AddEatEffects(cPlayer & a_Player);
 
 	/** Lets the player eat a selected item. Returns true if the player ate the item */
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item);
@@ -154,18 +161,13 @@ public:
 	Defaults to false unless overridden. */
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
-	static cItemHandler * GetItemHandler(int a_ItemType);
-	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType); }
-
+	static cItemHandler * GetItemHandler(int a_ItemType, short a_ItemDamage);
 	static void Deinit();
-	
+
 protected:
 	int m_ItemType;
-	static cItemHandler * CreateItemHandler(int m_ItemType);
+	static void CreateItemHandler(int a_ItemType);
 
-	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
-	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized
+	// Pointer to make sure that the initialisation of the Object doesn't slow down the startup. It will be lazy loaded.
+	static ItemHandlerType *m_ItemHandler;
 };
-
-// Short function
-inline cItemHandler *ItemHandler(int a_ItemType) { return cItemHandler::GetItemHandler(a_ItemType); }
