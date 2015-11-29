@@ -104,6 +104,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_BurnsInDaylight(false)
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
+	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
 {
 	if (!a_ConfigName.empty())
 	{
@@ -505,6 +506,16 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}  // switch (m_EMState)
 
 	BroadcastMovementUpdate();
+
+	if (m_AgingTimer > 0)
+	{
+		m_AgingTimer--;
+		if ((m_AgingTimer <= 0) && IsBaby())
+		{
+			SetAge(1);
+			m_World->BroadcastEntityMetadata(*this);
+		}
+	}
 }
 
 

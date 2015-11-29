@@ -36,7 +36,10 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cCow::OnRightClicked(cPlayer & a_Player)
 {
-	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_BUCKET))
+	super::OnRightClicked(a_Player);
+
+	short HeldItem = a_Player.GetEquippedItem().m_ItemType;
+	if (HeldItem == E_ITEM_BUCKET)
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
@@ -45,4 +48,3 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 		}
 	}
 }
-
