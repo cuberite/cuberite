@@ -32,6 +32,12 @@ public:
 	int  GetHorseStyle  (void) const  {return m_Style; }
 	int  GetHorseArmour (void) const  {return m_Armour;}
 
+	virtual void GetBreedingItems(cItems & a_Items) override
+	{
+		a_Items.Add(E_ITEM_GOLDEN_CARROT);
+		a_Items.Add(E_ITEM_GOLDEN_APPLE);
+	}
+
 private:
 
 	bool m_bHasChest, m_bIsEating, m_bIsRearing, m_bIsMouthOpen, m_bIsTame, m_bIsSaddled;

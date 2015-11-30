@@ -93,6 +93,8 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cHorse::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if (!m_bIsSaddled && m_bIsTame)
 	{
 		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)

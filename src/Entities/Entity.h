@@ -126,6 +126,8 @@ public:
 
 		// Informs client to explode a firework based on its metadata
 		esFireworkExploding      = 17,
+		// Passive mob is in "love mode"
+		esMobInLove              = 18,
 	} ;
 
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire

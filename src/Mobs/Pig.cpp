@@ -39,6 +39,8 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cPig::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if (m_bIsSaddled)
 	{
 		if (m_Attachee != nullptr)
