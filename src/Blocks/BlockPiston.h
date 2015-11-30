@@ -14,7 +14,7 @@ class cBlockPistonHandler :
 {
 public:
 	cBlockPistonHandler(BLOCKTYPE a_BlockType);
-	
+
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override;
@@ -38,7 +38,7 @@ public:
 		}
 		else
 		{
-			a_Rotation += 90 + 45;  // So its not aligned with axis
+			a_Rotation += 90 + 45;  // So it's not aligned with axis.
 
 			if (a_Rotation > 360)
 			{
@@ -94,7 +94,7 @@ public:
 	}
 
 private:
-	
+
 	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
 
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
@@ -121,7 +121,7 @@ private:
 			case E_BLOCK_ENCHANTMENT_TABLE:
 			case E_BLOCK_END_PORTAL:
 			case E_BLOCK_END_PORTAL_FRAME:
-			// Notice the lack of an E_BLOCK_ENDER_CHEST here; its because ender chests can totally be pushed / pulled in MCS :)
+			// Notice the lack of an E_BLOCK_ENDER_CHEST here; it's because ender chests can totally be pushed / pulled in MCS :)
 			case E_BLOCK_FURNACE:
 			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
@@ -153,7 +153,7 @@ private:
 		const Vector3i & a_BlockPos, cWorld * a_World, bool a_RequirePushable,
 		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
-	
+
 	/** Moves a list of blocks in a specific direction */
 	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
 		cWorld * a_World, const Vector3i & a_PushDir
@@ -168,10 +168,10 @@ class cBlockPistonHeadHandler :
 	public cBlockHandler
 {
 	typedef cBlockHandler super;
-	
+
 public:
 	cBlockPistonHeadHandler(void);
-	
+
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
