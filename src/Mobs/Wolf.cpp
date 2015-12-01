@@ -18,7 +18,7 @@ cWolf::cWolf(void) :
 	m_IsBegging(false),
 	m_IsAngry(false),
 	m_OwnerName(""),
-	m_CollarColor(14)
+	m_CollarColor(E_META_DYE_ORANGE)
 {
 	m_RelativeWalkSpeed = 2;
 }
@@ -124,7 +124,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				if (a_Player.GetName() == m_OwnerName)  // Is the player the owner of the dog?
 				{
-					SetCollarColor(15 - a_Player.GetEquippedItem().m_ItemDamage);
+					SetCollarColor(a_Player.GetEquippedItem().m_ItemDamage);
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();
