@@ -1726,13 +1726,14 @@ void cChunk::SetAlwaysTicked(bool a_AlwaysTicked)
 
 
 
-void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
+bool cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 {
 	cBlockEntity * be = GetBlockEntity(a_X, a_Y, a_Z);
 	if (be != nullptr)
 	{
-		be->UsedBy(a_Player);
+		return be->UsedBy(a_Player);
 	}
+	return false;
 }
 
 

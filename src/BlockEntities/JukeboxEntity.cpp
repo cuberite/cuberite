@@ -28,11 +28,12 @@ cJukeboxEntity::~cJukeboxEntity()
 
 
 
-void cJukeboxEntity::UsedBy(cPlayer * a_Player)
+bool cJukeboxEntity::UsedBy(cPlayer * a_Player)
 {
 	if (IsPlayingRecord())
 	{
 		EjectRecord();
+		return true;
 	}
 	else
 	{
@@ -40,8 +41,10 @@ void cJukeboxEntity::UsedBy(cPlayer * a_Player)
 		if (PlayRecord(HeldItem.m_ItemType))
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
+			return true;
 		}
 	}
+	return false;
 }
 
 
