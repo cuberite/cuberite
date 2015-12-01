@@ -38,7 +38,6 @@ SET (HDRS
 	ItemMilk.h
 	ItemMinecart.h
 	ItemMobHead.h
-	ItemMushroomSoup.h
 	ItemNetherWart.h
 	ItemPainting.h
 	ItemPickaxe.h
