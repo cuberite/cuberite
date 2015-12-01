@@ -46,7 +46,8 @@ public:
 	
 	// tolua_end
 	
-	virtual void UsedBy(cPlayer * a_Player) override;
+	/** Called when the player is using the entity; returns true if it was a successful use, return false if it should be treated as a normal block */
+	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
 	static bool IsFlower(short m_ItemType, short m_ItemData);

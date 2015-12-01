@@ -35,7 +35,7 @@ public:
 
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
-	virtual void UsedBy(cPlayer * a_Player) override;
+	virtual bool UsedBy(cPlayer * a_Player) override;
 
 	void SetLastOutput(const AString & a_LastOut);
 

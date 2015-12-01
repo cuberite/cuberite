@@ -43,7 +43,7 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 
 
 
-void cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	UNUSED(a_WorldInterface);
 	UNUSED(a_BlockFace);
@@ -75,6 +75,8 @@ void cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 			break;
 		}
 	}
+
+	return true;
 }
 
 

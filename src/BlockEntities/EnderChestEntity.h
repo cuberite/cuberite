@@ -24,7 +24,7 @@ public:
 	virtual ~cEnderChestEntity();
 
 	// cBlockEntity overrides:
-	virtual void UsedBy(cPlayer * a_Player) override;
+	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override { UNUSED(a_Client); }
 
 	static void LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid);

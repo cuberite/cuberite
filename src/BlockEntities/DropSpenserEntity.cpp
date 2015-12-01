@@ -154,7 +154,7 @@ void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
+bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -170,6 +170,7 @@ void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 			a_Player->OpenWindow(Window);
 		}
 	}
+	return true;
 }
 
 

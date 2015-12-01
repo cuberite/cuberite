@@ -16,7 +16,7 @@ public:
 	{
 	}
 	
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		
@@ -27,7 +27,7 @@ public:
 		// If button is already on do nothing
 		if (Meta & 0x08)
 		{
-			return;
+			return false;
 		}
 
 		// Set p the ON bit to on
@@ -46,7 +46,8 @@ public:
 		{
 			a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
 		});
-	
+
+		return true;
 	}
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
