@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2015-06-20 10:17:14",
+		ExportDate = "2015-10-10 20:20:51",
 		["AllowedBiomes"] = "Desert, DesertM",
 		["IntendedUse"] = "Village",
 	},
@@ -672,7 +672,7 @@ Cubeset =
 				"aaaabfffb",  --  0
 				"agggffffm",  --  1
 				"agggbeheb",  --  2
-				"agggehhhe",  --  3
+				"agddehhhe",  --  3
 				"beeebhhhe",  --  4
 				"ehhhhhhhe",  --  5
 				"ehhhhhhhe",  --  6
@@ -3105,14 +3105,15 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
+				["AddWeightIfSame"] = "0",
+				["IsStarting"] = "1",
 				["AllowedRotations"] = "7",
 				["MergeStrategy"] = "msSpongePrint",
-				["IsStarting"] = "1",
-				["DepthWeight"] = "",
 				["ShouldExpandFloor"] = "1",
+				["DepthWeight"] = "",
+				["VerticalStrategy"] = "TerrainOrOceanTop|-16",
 				["MoveToGround"] = "1",
-				["AddWeightIfSame"] = "0",
+				["DefaultWeight"] = "100",
 			},
 			BlockDefinitions =
 			{

@@ -192,6 +192,27 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 
 
 
+HEIGHTTYPE cHeiGenCache::GetHeightAt(int a_BlockX, int a_BlockZ)
+{
+	// First try if the chunk is already in the cache:
+	int chunkX, chunkZ;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, chunkX, chunkZ);
+	HEIGHTTYPE res;
+	if (GetHeightAt(chunkX, chunkZ, a_BlockX - chunkX * cChunkDef::Width, a_BlockZ - chunkZ * cChunkDef::Width, res))
+	{
+		return res;
+	}
+
+	// Chunk not in cache, generate the chunk and ask again:
+	cChunkDef::HeightMap heightMap;
+	GenHeightMap(chunkX, chunkZ, heightMap);
+	return cChunkDef::GetHeight(heightMap, a_BlockX - chunkX * cChunkDef::Width, a_BlockZ - chunkZ * cChunkDef::Width);
+}
+
+
+
+
+
 bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height)
 {
 	for (size_t i = 0; i < m_CacheSize; i++)
@@ -234,6 +255,27 @@ void cHeiGenMultiCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Heig
 
 	// Ask the subcache:
 	m_SubCaches[cacheIdx]->GenHeightMap(a_ChunkX, a_ChunkZ, a_HeightMap);
+}
+
+
+
+
+
+HEIGHTTYPE cHeiGenMultiCache::GetHeightAt(int a_BlockX, int a_BlockZ)
+{
+	// First try if the chunk is already in the cache:
+	int chunkX, chunkZ;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, chunkX, chunkZ);
+	HEIGHTTYPE res;
+	if (GetHeightAt(chunkX, chunkZ, a_BlockX - chunkX * cChunkDef::Width, a_BlockZ - chunkZ * cChunkDef::Width, res))
+	{
+		return res;
+	}
+
+	// Chunk not in cache, generate the chunk and ask again:
+	cChunkDef::HeightMap heightMap;
+	GenHeightMap(chunkX, chunkZ, heightMap);
+	return cChunkDef::GetHeight(heightMap, a_BlockX - chunkX * cChunkDef::Width, a_BlockZ - chunkZ * cChunkDef::Width);
 }
 
 

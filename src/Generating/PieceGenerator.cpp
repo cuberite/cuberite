@@ -7,140 +7,8 @@
 #include "Globals.h"
 #include "PieceGenerator.h"
 #include "../SelfTests.h"
-
-
-
-
-
-#ifdef SELF_TEST
-
-////////////////////////////////////////////////////////////////////////////////
-// Self-test:
-
-static class cPieceGeneratorSelfTest :
-	public cPiecePool
-{
-public:
-	cPieceGeneratorSelfTest(void)
-	{
-		cSelfTests::Get().Register(std::bind(&cPieceGeneratorSelfTest::Test, this), "PieceGenerator");
-	}
-
-	void Test(void)
-	{
-		// Prepare the internal state:
-		InitializePieces();
-		
-		// Generate:
-		cBFSPieceGenerator Gen(*this, 0);
-		cPlacedPieces OutPieces;
-		Gen.PlacePieces(500, 50, 500, 3, OutPieces);
-		
-		// Print out the pieces:
-		LOG("OutPieces.size() = " SIZE_T_FMT, OutPieces.size());
-		size_t idx = 0;
-		for (cPlacedPieces::const_iterator itr = OutPieces.begin(), end = OutPieces.end(); itr != end; ++itr, ++idx)
-		{
-			const Vector3i & Coords = (*itr)->GetCoords();
-			cCuboid Hitbox = (*itr)->GetHitBox();
-			Hitbox.Sort();
-			LOG(SIZE_T_FMT ": {%d, %d, %d}, rot %d, hitbox {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)", idx,
-				Coords.x, Coords.y, Coords.z,
-				(*itr)->GetNumCCWRotations(),
-				Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
-				Hitbox.p2.x, Hitbox.p2.y, Hitbox.p2.z,
-				Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
-			);
-		}  // itr - OutPieces[]
-		LOG("Done.");
-		
-		// Free the placed pieces properly:
-		Gen.FreePieces(OutPieces);
-	}
-	
-	~cPieceGeneratorSelfTest()
-	{
-		// Dealloc all the pieces:
-		for (cPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
-		{
-			delete *itr;
-		}
-		m_Pieces.clear();
-	}
-	
-protected:
-	class cTestPiece :
-		public cPiece
-	{
-		int m_Size;
-	public:
-		cTestPiece(int a_Size) :
-			m_Size(a_Size)
-		{
-		}
-		
-		virtual cConnectors GetConnectors(void) const override
-		{
-			// Each piece has 4 connectors, one of each type, plus one extra, at the center of its walls:
-			cConnectors res;
-			res.push_back(cConnector(m_Size / 2, 1, 0,          0, BLOCK_FACE_ZM));
-			res.push_back(cConnector(m_Size / 2, 1, m_Size - 1, 1, BLOCK_FACE_ZP));
-			res.push_back(cConnector(0,          1, m_Size / 2, 2, BLOCK_FACE_XM));
-			res.push_back(cConnector(m_Size - 1, 1, m_Size / 2, m_Size % 3, BLOCK_FACE_XP));
-			return res;
-		}
-		
-		virtual Vector3i GetSize(void) const override
-		{
-			return Vector3i(m_Size, 5, m_Size);
-		}
-		
-		virtual cCuboid GetHitBox(void) const override
-		{
-			return cCuboid(0, 0, 0, m_Size - 1, 4, m_Size - 1);
-		}
-		
-		virtual bool CanRotateCCW(int a_NumCCWRotations) const override
-		{
-			return true;
-		}
-	};
-	
-	cPieces m_Pieces;
-	
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override
-	{
-		// Each piece contains each connector
-		return m_Pieces;
-	}
-	
-	
-	virtual cPieces GetStartingPieces(void) override
-	{
-		return m_Pieces;
-	}
-	
-	
-	virtual void PiecePlaced(const cPiece & a_Piece) override
-	{
-		UNUSED(a_Piece);
-	}
-	
-	
-	virtual void Reset(void) override
-	{
-	}
-	
-	
-	void InitializePieces(void)
-	{
-		m_Pieces.push_back(new cTestPiece(5));
-		m_Pieces.push_back(new cTestPiece(7));
-		m_Pieces.push_back(new cTestPiece(9));
-	}
-} g_Test;
-
-#endif  // SELF_TEST
+#include "VerticalStrategy.h"
+#include "VerticalLimit.h"
 
 
 
@@ -149,7 +17,36 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cPiece:
 
-	
+bool cPiece::SetVerticalStrategyFromString(const AString & a_StrategyDesc, bool a_LogWarnings)
+{
+	auto strategy = CreateVerticalStrategyFromString(a_StrategyDesc, a_LogWarnings);
+	if (strategy == nullptr)
+	{
+		return false;
+	}
+	m_VerticalStrategy = strategy;
+	return true;
+}
+
+
+
+
+
+bool cPiece::SetVerticalLimitFromString(const AString & a_LimitDesc, bool a_LogWarnings)
+{
+	auto limit = CreateVerticalLimitFromString(a_LimitDesc, a_LogWarnings);
+	if (limit == nullptr)
+	{
+		return false;
+	}
+	m_VerticalLimit = limit;
+	return true;
+}
+
+
+
+
+
 Vector3i cPiece::RotatePos(const Vector3i & a_Pos, int a_NumCCWRotations) const
 {
 	Vector3i Size = GetSize();
@@ -361,10 +258,10 @@ void cPieceGenerator::FreePieces(cPlacedPieces & a_PlacedPieces)
 
 
 
-cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, int a_BlockZ, cFreeConnectors & a_OutConnectors)
+cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockZ, cFreeConnectors & a_OutConnectors)
 {
 	m_PiecePool.Reset();
-	int rnd = m_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) / 7;
+	int rnd = m_Noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7;
 	
 	// Choose a random one of the starting pieces:
 	cPieces StartingPieces = m_PiecePool.GetStartingPieces();
@@ -407,15 +304,17 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 		}
 	}
 	int Rotation = Rotations[rnd % NumRotations];
-	
-	cPlacedPiece * res = new cPlacedPiece(nullptr, *StartingPiece, Vector3i(a_BlockX, a_BlockY, a_BlockZ), Rotation);
+	int BlockY = StartingPiece->GetStartingPieceHeight(a_BlockX, a_BlockZ);
+	ASSERT(BlockY >= 0);  // The vertical strategy should have been provided and should give valid coords
+
+	cPlacedPiece * res = new cPlacedPiece(nullptr, *StartingPiece, Vector3i(a_BlockX, BlockY, a_BlockZ), Rotation);
 
 	// Place the piece's connectors into a_OutConnectors:
 	const cPiece::cConnectors & Conn = StartingPiece->GetConnectors();
 	for (cPiece::cConnectors::const_iterator itr = Conn.begin(), end = Conn.end(); itr != end; ++itr)
 	{
 		a_OutConnectors.push_back(
-			cFreeConnector(res, StartingPiece->RotateMoveConnector(*itr, Rotation, a_BlockX, a_BlockY, a_BlockZ))
+			cFreeConnector(res, StartingPiece->RotateMoveConnector(*itr, Rotation, a_BlockX, BlockY, a_BlockZ))
 		);
 	}
 
@@ -466,6 +365,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		
 		// Try fitting each of the piece's connector:
 		cPiece::cConnectors Connectors = (*itrP)->GetConnectors();
+		auto verticalLimit = (*itrP)->GetVerticalLimit();
 		for (cPiece::cConnectors::iterator itrC = Connectors.begin(), endC = Connectors.end(); itrC != endC; ++itrC)
 		{
 			if (itrC->m_Type != WantedConnectorType)
@@ -479,6 +379,13 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 				// Doesn't support this rotation
 				continue;
 			}
+
+			// Check if the piece's VerticalLimit allows this connection:
+			if ((verticalLimit != nullptr) && (!verticalLimit->CanBeAtHeight(ConnPos.x, ConnPos.z, ConnPos.y - itrC->m_Pos.y)))
+			{
+				continue;
+			}
+
 			if (!CheckConnection(a_Connector, ConnPos, **itrP, *itrC, NumCCWRotations, a_OutPieces))
 			{
 				// Doesn't fit in this rotation
@@ -627,13 +534,13 @@ cBFSPieceGenerator::cBFSPieceGenerator(cPiecePool & a_PiecePool, int a_Seed) :
 
 
 
-void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, int a_MaxDepth, cPlacedPieces & a_OutPieces)
+void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDepth, cPlacedPieces & a_OutPieces)
 {
 	a_OutPieces.clear();
 	cFreeConnectors ConnectorPool;
 	
 	// Place the starting piece:
-	a_OutPieces.push_back(PlaceStartingPiece(a_BlockX, a_BlockY, a_BlockZ, ConnectorPool));
+	a_OutPieces.push_back(PlaceStartingPiece(a_BlockX, a_BlockZ, ConnectorPool));
 	
 	/*
 	// DEBUG:
@@ -681,9 +588,7 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockY, int a_BlockZ, i
 		NumProcessed++;
 		if (NumProcessed > 1000)
 		{
-
 			typedef cPieceGenerator::cFreeConnectors::difference_type difType;
-
 			ConnectorPool.erase(ConnectorPool.begin(), ConnectorPool.begin() + static_cast<difType>(NumProcessed));
 			NumProcessed = 0;
 		}

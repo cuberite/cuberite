@@ -19,20 +19,19 @@ SET (SRCS
 	GridStructGen.cpp
 	HeiGen.cpp
 	MineShafts.cpp
-	NetherFortGen.cpp
 	Noise3DGenerator.cpp
-	POCPieceGenerator.cpp
 	PieceGenerator.cpp
+	PieceStructuresGen.cpp
 	Prefab.cpp
 	PrefabPiecePool.cpp
-	RainbowRoadsGen.cpp
+	PrefabStructure.cpp
 	Ravines.cpp
 	RoughRavines.cpp
 	StructGen.cpp
-	TestRailsGen.cpp
 	Trees.cpp
 	TwoHeights.cpp
-	UnderwaterBaseGen.cpp
+	VerticalLimit.cpp
+	VerticalStrategy.cpp
 	VillageGen.cpp
 )
 
@@ -53,22 +52,21 @@ SET (HDRS
 	HeiGen.h
 	IntGen.h
 	MineShafts.h
-	NetherFortGen.h
 	Noise3DGenerator.h
-	POCPieceGenerator.h
 	PieceGenerator.h
+	PieceStructuresGen.h
 	Prefab.h
 	PrefabPiecePool.h
+	PrefabStructure.h
 	ProtIntGen.h
-	RainbowRoadsGen.h
 	Ravines.h
 	RoughRavines.h
 	ShapeGen.cpp
 	StructGen.h
-	TestRailsGen.h
 	Trees.h
 	TwoHeights.h
-	UnderwaterBaseGen.h
+	VerticalLimit.h
+	VerticalStrategy.h
 	VillageGen.h
 )
 
@@ -80,16 +78,12 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(EndGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(FinishGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
 	set_source_files_properties(HeiGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-	set_source_files_properties(NetherFortGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
 	set_source_files_properties(Noise3DGenerator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(PieceGenerator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
 	set_source_files_properties(Prefab.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-	set_source_files_properties(RainbowRoadsGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
 	set_source_files_properties(Ravines.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(RoughRavines.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=float-equal -Wno-error=old-style-cast")
 	set_source_files_properties(StructGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch -Wno-error=old-style-cast")
-	set_source_files_properties(TestRailsGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-	set_source_files_properties(UnderwaterBaseGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=switch-enum")
 	set_source_files_properties(VillageGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=switch-enum")
 endif()
 

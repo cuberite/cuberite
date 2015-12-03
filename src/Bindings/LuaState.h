@@ -207,24 +207,30 @@ public:
 	
 	/** Detaches a previously attached state. */
 	void Detach(void);
-	
+
 	/** Returns true if the m_LuaState is valid */
 	bool IsValid(void) const { return (m_LuaState != nullptr); }
 
 	/** Returns the name of the subsystem, as specified when the instance was created. */
 	AString GetSubsystemName(void) const { return m_SubsystemName; }
-	
+
 	/** Adds the specified path to package.<a_PathVariable> */
 	void AddPackagePath(const AString & a_PathVariable, const AString & a_Path);
-	
+
 	/** Loads the specified file
 	Returns false and optionally logs a warning to the console if not successful (but the LuaState is kept open).
 	m_SubsystemName is displayed in the warning log message. */
 	bool LoadFile(const AString & a_FileName, bool a_LogWarnings = true);
-	
+
+	/** Loads the specified string.
+	Returns false and optionally logs a warning to the console if not successful (but the LuaState is kept open).
+	a_FileName is the original filename from where the string was read, and is used only for logging. It may be empty.
+	m_SubsystemName is displayed in the warning log message. */
+	bool LoadString(const AString & a_StringToLoad, const AString & a_FileName, bool a_LogWarnings = true);
+
 	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
-	
+
 	void PushNil(void);
 
 	// Push a const value onto the stack (keep alpha-sorted):
@@ -291,10 +297,16 @@ public:
 	}
 
 	/** Pushes the named value in the table at the top of the stack.
-	a_Name may be a path containing multiple table levels, such as "_G.cChatColor.Blue".
+	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".
 	If the value is found, it is pushed on top of the stack and the returned cStackValue is valid.
 	If the value is not found, the stack is unchanged and the returned cStackValue is invalid. */
 	cStackValue WalkToValue(const AString & a_Name);
+
+	/** Pushes the named value in the global table to the top of the stack.
+	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".
+	If the value is found in the global table, it is pushed to the top of the stack and the returned cStackValue is valid.
+	If the value is not found, the stack is unchanged and the returned cStackValue is invalid. */
+	cStackValue WalkToNamedGlobal(const AString & a_Name);
 
 	/** Retrieves the named value in the table at the top of the Lua stack.
 	a_Name may be a path containing multiple table levels, such as "_G.cChatColor.Blue".

@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2015-06-20 10:17:02",
+		ExportDate = "2015-10-10 20:20:57",
 		["AllowedBiomes"] = "Plains, Savanna, SavannaM, SunflowerPlains",
 		["IntendedUse"] = "Village",
 	},
@@ -690,20 +690,20 @@ Cubeset =
 
 				-- Level 1
 				"mmmmmmmmmccmmmmm",  --  0
-				"ccbbbbbbbbbbcccm",  --  1
-				"ccbbbbbbbbbbcccm",  --  2
-				"ccbbbbbbbbbbcccm",  --  3
-				"ccbbbbbbbbbbcccm",  --  4
-				"ccbbbbbbbbbbcccm",  --  5
-				"ccbbbbbbbbbbcccm",  --  6
-				"ccbbbbbbbbbbcccm",  --  7
-				"ccbbbbbbbbbbcccm",  --  8
-				"ccbbbbbbbbbbcccm",  --  9
-				"cccccccccccccccm",  -- 10
-				"cccccccccccccccm",  -- 11
-				"cccccccccccccccm",  -- 12
-				"cccccccccccccacm",  -- 13
-				"cccccccccccccccm",  -- 14
+				"aabbbbbbbbbbaacm",  --  1
+				"acbbbbbbbbbbccam",  --  2
+				"acbbbbbbbbbbcaam",  --  3
+				"acbbbbbbbbbbccam",  --  4
+				"acbbbbbbbbbbaacm",  --  5
+				"acbbbbbbbbbbcaam",  --  6
+				"acbbbbbbbbbbccam",  --  7
+				"acbbbbbbbbbbccam",  --  8
+				"acbbbbbbbbbbcaam",  --  9
+				"acccccccccccccam",  -- 10
+				"aaaaaccaacccacam",  -- 11
+				"acacaccacaccccam",  -- 12
+				"accaaccaccaccaam",  -- 13
+				"cccaccacaccacaam",  -- 14
 				"mmmmmmmmmmmmmmmm",  -- 15
 
 				-- Level 2
@@ -1015,14 +1015,15 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
+				["AddWeightIfSame"] = "0",
+				["IsStarting"] = "1",
 				["AllowedRotations"] = "7",
 				["MergeStrategy"] = "msSpongePrint",
-				["IsStarting"] = "1",
-				["DepthWeight"] = "",
 				["ShouldExpandFloor"] = "1",
+				["DepthWeight"] = "",
+				["VerticalStrategy"] = "TerrainOrOceanTop|-1",
 				["MoveToGround"] = "1",
-				["AddWeightIfSame"] = "0",
+				["DefaultWeight"] = "100",
 			},
 			BlockDefinitions =
 			{
@@ -1716,20 +1717,20 @@ Cubeset =
 				"aaaaaaaaaaaaa",  -- 14
 
 				-- Level 1
-				"bbbbbbbbbbbbb",  --  0
-				"bbbbbbbbbbbbb",  --  1
-				"bbbaccdabbbbb",  --  2
-				"bbbedddebbbbb",  --  3
-				"bbbedddebbbbb",  --  4
-				"bbbedddebbbbb",  --  5
-				"bbbacccabbbbb",  --  6
-				"bbbbbbbbbbbbb",  --  7
-				"bbbbbbbbbbbbb",  --  8
-				"bbbbbbbbbbbbb",  --  9
-				"bbbbbbbbbbabb",  -- 10
-				"bbbbbbbbbbbbb",  -- 11
-				"bbbbbbbbbbbbb",  -- 12
-				"bbbbbbbbbbbbb",  -- 13
+				"aaaabbbaaaaaa",  --  0
+				"abbbbbbbbbbba",  --  1
+				"abbaccdabbaba",  --  2
+				"abbedddebbaba",  --  3
+				"abbedddebbbba",  --  4
+				"aabedddebbaba",  --  5
+				"abbacccabbbbb",  --  6
+				"abbbbbbbbbaba",  --  7
+				"aaabbbbbbbbba",  --  8
+				"ababbbbabbbba",  --  9
+				"aababbabbbaba",  -- 10
+				"ababbbbabbbba",  -- 11
+				"ababbbbbbbbba",  -- 12
+				"abbbbbbbbbbba",  -- 13
 				"bbbbbbbbbbbbb",  -- 14
 
 				-- Level 2
@@ -2542,14 +2543,15 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
+				["AddWeightIfSame"] = "0",
+				["IsStarting"] = "1",
 				["AllowedRotations"] = "7",
 				["MergeStrategy"] = "msSpongePrint",
-				["IsStarting"] = "1",
-				["DepthWeight"] = "",
 				["ShouldExpandFloor"] = "1",
+				["DepthWeight"] = "",
+				["VerticalStrategy"] = "TerrainOrOceanTop|-9",
 				["MoveToGround"] = "1",
-				["AddWeightIfSame"] = "0",
+				["DefaultWeight"] = "100",
 			},
 			BlockDefinitions =
 			{
@@ -2758,62 +2760,63 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  2: 0",  -- grass
-				"b: 13: 0",  -- gravel
-				"c:113: 0",  -- netherbrickfence
-				"d: 50: 5",  -- torch
-				"e: 44: 8",  -- step
-				"f: 44: 0",  -- step
-				"g: 43: 0",  -- doublestep
+				"b:  3: 0",  -- dirt
+				"c: 13: 0",  -- gravel
+				"d:113: 0",  -- netherbrickfence
+				"e: 50: 5",  -- torch
+				"f: 44: 8",  -- step
+				"g: 44: 0",  -- step
+				"h: 43: 0",  -- doublestep
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
 			{
 				-- Level 0
-				"aaaabbbaaaa",  --  0
-				"aaaabbbaaaa",  --  1
-				"aaaabbbaaaa",  --  2
-				"aaaabbbaaaa",  --  3
-				"aaaabbbaaaa",  --  4
+				"aabacccaaaa",  --  0
+				"aabacccabaa",  --  1
+				"aabacccaaaa",  --  2
+				"aaaacccaaaa",  --  3
+				"aaaacccaaaa",  --  4
 
 				-- Level 1
-				"..c.....c..",  --  0
-				"..c.....c..",  --  1
-				"..c.....c..",  --  2
-				"..c.....c..",  --  3
-				"..c.....c..",  --  4
+				"..d.....d..",  --  0
+				"..d.....d..",  --  1
+				"..d.....d..",  --  2
+				"..d.....d..",  --  3
+				"..d.....d..",  --  4
 
 				-- Level 2
-				"..c.....c..",  --  0
-				"...........",  --  1
-				"..c.....c..",  --  2
-				"...........",  --  3
-				"..c.....c..",  --  4
-
-				-- Level 3
 				"..d.....d..",  --  0
 				"...........",  --  1
-				"..c.....c..",  --  2
+				"..d.....d..",  --  2
 				"...........",  --  3
 				"..d.....d..",  --  4
 
-				-- Level 4
-				"...eeeee...",  --  0
+				-- Level 3
+				"..e.....e..",  --  0
 				"...........",  --  1
-				"..c.....c..",  --  2
+				"..d.....d..",  --  2
 				"...........",  --  3
-				"...eeeee...",  --  4
+				"..e.....e..",  --  4
+
+				-- Level 4
+				"...fffff...",  --  0
+				"...........",  --  1
+				"..d.....d..",  --  2
+				"...........",  --  3
+				"...fffff...",  --  4
 
 				-- Level 5
-				"..f.....f..",  --  0
-				".egfffffge.",  --  1
-				".egeeeeege.",  --  2
-				".egfffffge.",  --  3
-				"..f.....f..",  --  4
+				"..g.....g..",  --  0
+				".fhggggghf.",  --  1
+				".fhfffffhf.",  --  2
+				".fhggggghf.",  --  3
+				"..g.....g..",  --  4
 
 				-- Level 6
 				"...........",  --  0
 				"...........",  --  1
-				"gf.......fg",  --  2
+				"hg.......gh",  --  2
 				"...........",  --  3
 				"...........",  --  4
 
@@ -3034,11 +3037,11 @@ Cubeset =
 
 				-- Level 1
 				"bbbbbbb",  --  0
-				"bbbbbbb",  --  1
-				"bbbbbbb",  --  2
-				"bbbabbb",  --  3
-				"bbbbbbb",  --  4
-				"bbbbbbb",  --  5
+				"bbabbbb",  --  1
+				"bbabaab",  --  2
+				"bbbaabb",  --  3
+				"bbabaab",  --  4
+				"bbababb",  --  5
 				"bbbbbbb",  --  6
 
 				-- Level 2
@@ -3168,8 +3171,8 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  3: 0",  -- dirt
-				"b:  8: 0",  -- water
-				"c:  2: 0",  -- grass
+				"b:  2: 0",  -- grass
+				"c:  8: 0",  -- water
 				"d: 17: 1",  -- tree
 				"e: 13: 0",  -- gravel
 				"f: 31: 2",  -- tallgrass
@@ -3187,10 +3190,10 @@ Cubeset =
 				"aaaaaaaaaaaaaaaa",  --  3
 				"aaaaaaaaaaaaaaaa",  --  4
 				"aaaaaaaaaaaaaaaa",  --  5
-				"aaaaaaaaaaaaaaaa",  --  6
-				"aaaaaaaaaaaaaaaa",  --  7
-				"aaaaaaaaaaaaaaaa",  --  8
-				"aaaaaaaaaaaaaaaa",  --  9
+				"aaaaabaaaaaaaaaa",  --  6
+				"aaabbaaaaaaaaaaa",  --  7
+				"aaabbaaaaaaaaaaa",  --  8
+				"aaaabaaaaaaaaaaa",  --  9
 				"aaaaaaaaaaaaaaaa",  -- 10
 				"aaaaaaaaaaaaaaaa",  -- 11
 				"aaaaaaaaaaaaaaaa",  -- 12
@@ -3204,12 +3207,12 @@ Cubeset =
 				"aaaaaaaaaaaaaaaa",  --  2
 				"aaaaaaaaaaaaaaaa",  --  3
 				"aaaaaaaaaaaaaaaa",  --  4
-				"aaaaaaaaaaaaaaaa",  --  5
-				"aaaabbaaaaaaaaaa",  --  6
-				"aaabbbaaaaaaaaaa",  --  7
-				"aaabbaaaaaaaaaaa",  --  8
-				"aaaabaaaaaaaaaaa",  --  9
-				"aaaaaaaaaaaaaaaa",  -- 10
+				"aaabbbbaaaaaaaaa",  --  5
+				"aaaaccbaaaaaaaaa",  --  6
+				"aabcccbaaaaaaaaa",  --  7
+				"aabccabaaaaaaaaa",  --  8
+				"aabbcbaaaaaaaaaa",  --  9
+				"aaaabaaaaaaaaaaa",  -- 10
 				"aaaaaaaaaaaaaaaa",  -- 11
 				"aaaaaaaaaaaaaaaa",  -- 12
 				"aaaaaaaaaaaaaaaa",  -- 13
@@ -3217,22 +3220,22 @@ Cubeset =
 				"aaaaaaaaaaaaaaaa",  -- 15
 
 				-- Level 2
-				"cccccccccccccccc",  --  0
-				"ccdccccccccdcccc",  --  1
-				"cccccceecccccdcc",  --  2
-				"ccccccceeccccccc",  --  3
-				"cccccccceccccccc",  --  4
-				"cccbbbbceccccccc",  --  5
-				"cccbbbbceecccccc",  --  6
-				"ccbbbbbcceeeeccc",  --  7
-				"ccbbbbbccccceecc",  --  8
-				"ccbbbbcccccccecc",  --  9
-				"ccccbcccccccceec",  -- 10
-				"ccccccccccccccec",  -- 11
-				"ccccccccaaacccec",  -- 12
-				"cccccccccaccccec",  -- 13
-				"ccccccccccccceec",  -- 14
-				"cccccccccccceecc",  -- 15
+				"bbbbbbabbbbbbbbb",  --  0
+				"bbdbbbbbbbbdbbbb",  --  1
+				"abbbbbeebbbabdbb",  --  2
+				"bbbbbbbeebbbbbbb",  --  3
+				"bbbbbbbbebbabbbb",  --  4
+				"bbbccccbebbbbbab",  --  5
+				"bbbccccbeebbbaab",  --  6
+				"bbcccccbbeeeebba",  --  7
+				"bbcccccbbbbbeebb",  --  8
+				"bbccccbbababbebb",  --  9
+				"bbbbcbbaabbbbeeb",  -- 10
+				"bbbbbbbbbbbbabeb",  -- 11
+				"bbbbbbbbaaabbbeb",  -- 12
+				"bbbbbbbbbabbbbeb",  -- 13
+				"bbbbabbbbbbbbeeb",  -- 14
+				"bbbbbbbbbbbbeebb",  -- 15
 
 				-- Level 3
 				"......f...gg.g..",  --  0
@@ -3327,12 +3330,13 @@ Cubeset =
 				"a:  3: 0",  -- dirt
 				"b: 60: 7",  -- tilleddirt
 				"c:  8: 0",  -- water
-				"d: 43: 0",  -- doublestep
-				"e: 44: 0",  -- step
-				"f: 59: 7",  -- crops
-				"g: 83: 0",  -- reedblock
-				"h:113: 0",  -- netherbrickfence
-				"i: 50: 5",  -- torch
+				"d: 60: 6",  -- tilleddirt
+				"e: 43: 0",  -- doublestep
+				"f: 44: 0",  -- step
+				"g: 59: 7",  -- crops
+				"h: 83: 0",  -- reedblock
+				"i:113: 0",  -- netherbrickfence
+				"j: 50: 5",  -- torch
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -3361,7 +3365,7 @@ Cubeset =
 				"mabbbbbbbam",  --  5
 				"mabcccccaam",  --  6
 				"mabbbbbbbam",  --  7
-				"mabbbbbbbam",  --  8
+				"madbbbbbbam",  --  8
 				"mabbbbbbbam",  --  9
 				"mabbbbbbbam",  -- 10
 				"maaaaaaaaam",  -- 11
@@ -3369,52 +3373,52 @@ Cubeset =
 
 				-- Level 2
 				"...........",  --  0
-				".deeeeeeed.",  --  1
-				".efffffffe.",  --  2
-				".efffffffe.",  --  3
-				".efffffffe.",  --  4
-				".efgggggfe.",  --  5
-				".eg.....ge.",  --  6
-				".efgggggfe.",  --  7
-				".efffffffe.",  --  8
-				".efffffffe.",  --  9
-				".efffffffe.",  -- 10
-				".deeeeeeed.",  -- 11
+				".efffffffe.",  --  1
+				".fgggggggf.",  --  2
+				".fgggggggf.",  --  3
+				".fgggggggf.",  --  4
+				".fghhhhhgf.",  --  5
+				".fh.....hf.",  --  6
+				".fghhhhhgf.",  --  7
+				".fgggggggf.",  --  8
+				".fgggggggf.",  --  9
+				".fgggggggf.",  -- 10
+				".efffffffe.",  -- 11
 				"...........",  -- 12
 
 				-- Level 3
 				"...........",  --  0
-				".h.......h.",  --  1
+				".i.......i.",  --  1
 				"...........",  --  2
 				"...........",  --  3
 				"...........",  --  4
-				"...ggggg...",  --  5
-				"..g.....g..",  --  6
-				"...ggggg...",  --  7
+				"...hhhhh...",  --  5
+				"..h.....h..",  --  6
+				"...hhhhh...",  --  7
 				"...........",  --  8
 				"...........",  --  9
 				"...........",  -- 10
-				".h.......h.",  -- 11
+				".i.......i.",  -- 11
 				"...........",  -- 12
 
 				-- Level 4
 				"...........",  --  0
-				".h.......h.",  --  1
+				".i.......i.",  --  1
 				"...........",  --  2
 				"...........",  --  3
 				"...........",  --  4
-				"...ggggg...",  --  5
-				"..g.....g..",  --  6
-				"...ggggg...",  --  7
+				"...hhhhh...",  --  5
+				"..h.....h..",  --  6
+				"...hhhhh...",  --  7
 				"...........",  --  8
 				"...........",  --  9
 				"...........",  -- 10
-				".h.......h.",  -- 11
+				".i.......i.",  -- 11
 				"...........",  -- 12
 
 				-- Level 5
 				"...........",  --  0
-				".h.......h.",  --  1
+				".i.......i.",  --  1
 				"...........",  --  2
 				"...........",  --  3
 				"...........",  --  4
@@ -3424,27 +3428,12 @@ Cubeset =
 				"...........",  --  8
 				"...........",  --  9
 				"...........",  -- 10
-				".h.......h.",  -- 11
+				".i.......i.",  -- 11
 				"...........",  -- 12
 
 				-- Level 6
-				".h.......h.",  --  0
-				"hhh.....hhh",  --  1
-				".h.......h.",  --  2
-				"...........",  --  3
-				"...........",  --  4
-				"...........",  --  5
-				"...........",  --  6
-				"...........",  --  7
-				"...........",  --  8
-				"...........",  --  9
-				".h.......h.",  -- 10
-				"hhh.....hhh",  -- 11
-				".h.......h.",  -- 12
-
-				-- Level 7
 				".i.......i.",  --  0
-				"i.i.....i.i",  --  1
+				"iii.....iii",  --  1
 				".i.......i.",  --  2
 				"...........",  --  3
 				"...........",  --  4
@@ -3454,8 +3443,23 @@ Cubeset =
 				"...........",  --  8
 				"...........",  --  9
 				".i.......i.",  -- 10
-				"i.i.....i.i",  -- 11
+				"iii.....iii",  -- 11
 				".i.......i.",  -- 12
+
+				-- Level 7
+				".j.......j.",  --  0
+				"j.j.....j.j",  --  1
+				".j.......j.",  --  2
+				"...........",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"...........",  --  7
+				"...........",  --  8
+				"...........",  --  9
+				".j.......j.",  -- 10
+				"j.j.....j.j",  -- 11
+				".j.......j.",  -- 12
 
 			},
 		},  -- Farm
