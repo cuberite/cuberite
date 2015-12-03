@@ -14,11 +14,13 @@
 	#include <unistd.h>
 #endif
 
-// FreeBSD uses size_t for the return type of backtrace()
-#if defined(__FreeBSD__) && (__FreeBSD__ >= 10)
-	#define btsize size_t
-#else
-	#define btsize int
+#ifdef __GLIBC__
+	// FreeBSD uses size_t for the return type of backtrace()
+	#if defined(__FreeBSD__) && (__FreeBSD__ >= 10)
+		#define btsize size_t
+	#else
+		#define btsize int
+	#endif
 #endif
 
 
