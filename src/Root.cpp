@@ -183,7 +183,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	LOGD("Loading MonsterConfig...");
 	m_MonsterConfig = new cMonsterConfig;
 
-	// This sets stuff in motion
+	// This sets stuff in motion.
 	LOGD("Starting Authenticator...");
 	m_Authenticator.Start(*settingsRepo);
 
@@ -222,7 +222,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		m_StartTime = std::chrono::steady_clock::now();
 
 		#ifdef _WIN32
-			EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
+			EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button.
 		#endif
 
 		for (;;)
@@ -231,7 +231,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 			if (m_TerminateEventRaised && m_RunAsService)
 			{
-				// Dont kill if running as a service
+				// Don't kill if running as a service.
 				m_TerminateEventRaised = false;
 			}
 			else

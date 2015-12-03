@@ -33,10 +33,10 @@ public:
 		a_BlockMeta = RotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
-	
+
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
-		a_Rotation += 90 + 45;  // So its not aligned with axis
+		a_Rotation += 90 + 45;  // So it's not aligned with axis.
 
 		if (a_Rotation > 360.f)
 		{

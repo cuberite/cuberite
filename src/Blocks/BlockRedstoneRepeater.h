@@ -51,7 +51,7 @@ public:
 	{
 		return true;
 	}
-	
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
@@ -80,7 +80,7 @@ public:
 
 	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)
 	{
-		a_Rotation += 90 + 45;  // So its not aligned with axis
+		a_Rotation += 90 + 45;  // So it's not aligned with axis.
 		if (a_Rotation > 360)
 		{
 			a_Rotation -= 360;
