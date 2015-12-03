@@ -37,7 +37,6 @@
 #include "ItemMilk.h"
 #include "ItemMinecart.h"
 #include "ItemMobHead.h"
-#include "ItemMushroomSoup.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
@@ -138,7 +137,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
 		case E_ITEM_MAP:                 return new cItemMapHandler();
 		case E_ITEM_MILK:                return new cItemMilkHandler();
-		case E_ITEM_MUSHROOM_SOUP:       return new cItemMushroomSoupHandler(a_ItemType);
 		case E_ITEM_ITEM_FRAME:          return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:         return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:            return new cItemPaintingHandler(a_ItemType);
@@ -237,6 +235,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_COOKIE:
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
+		case E_ITEM_MUSHROOM_SOUP:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
 		case E_ITEM_RABBIT_STEW:
