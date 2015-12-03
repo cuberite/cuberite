@@ -77,17 +77,20 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		m_LovePartner = nullptr;
 	}
+
+	// if we have a partner, mate
 	if (m_LovePartner != nullptr)
 	{
-		// if we have a partner, bump into them until baby is made
+
 		if (m_MatingTimer > 0)
 		{
+			// If we should still mate, keep bumping into them until baby is made
 			Vector3d Pos = m_LovePartner->GetPosition();
 			MoveToPosition(Pos);
 		}
 		else
 		{
-			// spawn baby
+			// Mating finished. Spawn baby
 			Vector3f Pos = (GetPosition() + m_LovePartner->GetPosition()) * 0.5;
 			m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
 
@@ -100,6 +103,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
+		// We have no partner, so we just chase the player if they have our breeding item
 		cItems FollowedItems;
 		GetFollowedItems(FollowedItems);
 		if (FollowedItems.Size() > 0)
@@ -117,6 +121,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
+	// If we are in love mode but we have no partner, search for a partner neabry
 	if (m_LoveTimer > 0)
 	{
 		if (m_LovePartner == nullptr)
@@ -133,7 +138,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 				virtual bool Item(cEntity * a_Entity) override
 				{
-					// if we're the same species as someone around and they dont have a partner, swipe right
+					// if we're the same species as someone around and they don't have a partner, start mating with them
 					if ((a_Entity->GetEntityType() == m_Me->GetEntityType()) && (a_Entity != m_Me))
 					{
 						cPassiveMonster * Me = static_cast<cPassiveMonster*>(m_Me);
@@ -172,7 +177,7 @@ void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
-	// if right clicked on the player with breeding items, go into lovemode
+	// If a player holding breeding items right-clicked me, go into love mode
 	if ((m_LoveCooldown == 0) && !IsInLove() && !IsBaby())
 	{
 		short HeldItem = a_Player.GetEquippedItem().m_ItemType;
