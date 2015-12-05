@@ -3298,6 +3298,14 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			break;
 		}  // case mtBat
 
+		case mtChicken:
+		{
+			auto & Chicken = reinterpret_cast<const cChicken &>(a_Mob);
+			a_Pkt.WriteBEUInt8(0x0c);
+			a_Pkt.WriteBEInt8(Chicken.GetAge());
+			break;
+		}  // case mtChicken
+
 		case mtCreeper:
 		{
 			auto & Creeper = reinterpret_cast<const cCreeper &>(a_Mob);

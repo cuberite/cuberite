@@ -547,6 +547,11 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddByte("BatFlags", reinterpret_cast<const cBat *>(a_Monster)->IsHanging());
 				break;
 			}
+			case mtChicken:
+			{
+				m_Writer.AddByte("Age", reinterpret_cast<const cChicken *>(a_Monster)->GetAge());
+				break;
+			}
 			case mtCreeper:
 			{
 				const cCreeper *Creeper = reinterpret_cast<const cCreeper *>(a_Monster);
@@ -661,7 +666,6 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case mtInvalidType:
 			case mtBlaze:
 			case mtCaveSpider:
-			case mtChicken:
 			case mtCow:
 			case mtEnderDragon:
 			case mtGhast:

@@ -2168,6 +2168,13 @@ void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 		return;
 	}
 
+	int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+	if (AgeableIdx > 0)
+	{
+		Byte Age = a_NBT.GetByte(AgeableIdx);
+		Monster->SetAge(Age);
+	}
+	
 	a_Entities.push_back(Monster.release());
 }
 
