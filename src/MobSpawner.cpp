@@ -269,6 +269,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
 					(!cBlockInfo::IsTransparent(BlockBelow)) &&
+					(SkyLight <= 7) &&
+					(BlockLight <= 7) &&
 					(
 						(a_RelY <= 40) || (a_Biome == biSwampland)
 					)
