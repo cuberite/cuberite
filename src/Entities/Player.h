@@ -50,7 +50,7 @@ public:
 
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
-	/** Returns the curently equipped weapon; empty item if none */
+	/** Returns the currently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 
 	/** Returns the currently equipped helmet; empty item if none */
@@ -83,7 +83,7 @@ public:
 	/** Gets the experience total - XpTotal for score on death */
 	inline int GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
 
-	/** Gets the currrent experience */
+	/** Gets the current experience */
 	inline int GetCurrentXp(void) { return m_CurrentXp; }
 
 	/** Gets the current level - XpLevel */
@@ -92,7 +92,7 @@ public:
 	/** Gets the experience bar percentage - XpP */
 	float GetXpPercentage(void);
 
-	/** Caculates the amount of XP needed for a given level
+	/** Calculates the amount of XP needed for a given level
 	Ref: http://minecraft.gamepedia.com/XP
 	*/
 	static int XpForLevel(int a_Level);
