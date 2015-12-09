@@ -1585,7 +1585,7 @@ void cFinishGenOreNests::GenerateOre(
 			for (int x = xsize; x >= 0; --x)
 			{
 				int BlockX = BaseX + x;
-				if (cChunkDef::IsValidWidth(BlockX))
+				if (!cChunkDef::IsValidWidth(BlockX))
 				{
 					Num++;  // So that the cycle finishes even if the base coords wander away from the chunk
 					continue;
@@ -1601,7 +1601,7 @@ void cFinishGenOreNests::GenerateOre(
 					for (int z = zsize; z >= 0; --z)
 					{
 						int BlockZ = BaseZ + z;
-						if (cChunkDef::IsValidWidth(BlockZ))
+						if (!cChunkDef::IsValidWidth(BlockZ))
 						{
 							Num++;  // So that the cycle finishes even if the base coords wander away from the chunk
 							continue;
