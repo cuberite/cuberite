@@ -362,7 +362,12 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld * a_World)
 	}
 }
 
-void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockPistonHeadHandler::OnDestroyedByPlayer(
+	cChunkInterface& a_ChunkInterface, 
+	cWorldInterface& a_WorldInterface, 
+	cPlayer* a_Player, 
+	int a_BlockX, int a_BlockY, int a_BlockZ
+)
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 	
