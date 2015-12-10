@@ -38,9 +38,7 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 	
-	//
 	// Get the extension of the piston
-	//
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos.x, blockPos.y, blockPos.z);
 	blockPos += MetadataToOffset(OldMeta);
 
@@ -56,9 +54,7 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 
 void cBlockPistonHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 {
-	//
 	// Returning Piston Item without Direction-Metavalue
-	//
 	a_Pickups.push_back(cItem(m_BlockType, 1));
 }
 
@@ -106,19 +102,15 @@ Vector3i cBlockPistonHandler::MetadataToOffset(NIBBLETYPE a_PistonMeta)
 
 void cBlockPistonHandler::PushBlocks(const Vector3iSet & a_BlocksToPush, cWorld * a_World, const Vector3i & a_PushDir)
 {
-	//
 	// Sort blocks to move the blocks first, which are farest away from the piston
 	// This prevents the overwriting of existing blocks
-	//
 	std::vector<Vector3i> sortedBlocks(a_BlocksToPush.begin(), a_BlocksToPush.end());
 	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a, const Vector3i & b)
 	{
 		return a.Dot(a_PushDir) > b.Dot(a_PushDir);
 	});
 	
-	//
 	// Move every block
-	//
 	BLOCKTYPE moveBlock;
 	NIBBLETYPE moveMeta;
 	
@@ -130,24 +122,24 @@ void cBlockPistonHandler::PushBlocks(const Vector3iSet & a_BlocksToPush, cWorld 
 		moveBlockPos += a_PushDir;
 		if (cBlockInfo::IsPistonBreakable(moveBlock))
 		{
-			//
 			// Block is breakable, drop it
-			//
 			cBlockHandler * Handler = BlockHandler(moveBlock);
+			
 			if (Handler->DoesDropOnUnsuitable())
 			{
 				cChunkInterface ChunkInterface(a_World->GetChunkMap());
 				cBlockInServerPluginInterface PluginInterface(*a_World);
-				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr,
+				
+				Handler->DropBlock(
+					ChunkInterface, *a_World,
+					PluginInterface, nullptr,
 					moveBlockPos.x, moveBlockPos.y, moveBlockPos.z
 				);
 			}
 		}
 		else
 		{
-			//
 			// Not breakable, just move it
-			//
 			a_World->SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
 		}
 	}
@@ -171,41 +163,34 @@ bool cBlockPistonHandler::CanPushBlock(const Vector3i & a_BlockPos, cWorld * a_W
 	BLOCKTYPE currBlock;
 	NIBBLETYPE currMeta;
 	
-	a_World->GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, currBlock, currMeta);
-
+	a_World->GetBlockTypeMeta(
+		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+		currBlock, currMeta
+	);
+	
 	if (currBlock == E_BLOCK_AIR)
 	{
-		//
 		// Air can be pushed
-		//
 		result = true;
 	}
 	else if (!a_RequirePushable && cBlockInfo::IsPistonBreakable(currBlock))
 	{
-		//
 		// Block should not be broken, when it's not in the pushing direction
-		//
 		result = true;
 	}
 	else if (!CanPush(currBlock, currMeta))
 	{
-		//
-		// When it's not required to push this block, don't fail
-		//
+		// When it's not required to push this block, simply exit.
 		result = !a_RequirePushable;
 	}
 	else if (a_BlocksPushed.size() >= PISTON_MAX_PUSH_DISTANCE)
 	{
-		//
 		// Do not allow to push too much blocks
-		//
 		result = false;
 	}
 	else if (!a_BlocksPushed.insert(a_BlockPos).second || cBlockInfo::IsPistonBreakable(currBlock))
 	{
-		//
 		// Element exist already
-		//
 		result = true;
 	}
 	else
@@ -214,9 +199,7 @@ bool cBlockPistonHandler::CanPushBlock(const Vector3i & a_BlockPos, cWorld * a_W
 		{
 			bool finished = false;
 			
-			//
 			// Try to push the other directions
-			//
 			for (const auto & testDir: pushingDirs)
 			{
 				if (finished)
@@ -228,22 +211,16 @@ bool cBlockPistonHandler::CanPushBlock(const Vector3i & a_BlockPos, cWorld * a_W
 				
 				if (result == false)
 				{
-					//
 					// If we can't push the block, we're done.
-					//
 					finished = true;
 				}
 			}
 			
-			//
 			// All done here. DO PASS GO, do collect $100.
-			//
 		}
 		else
 		{
-			//
 			// Try to push the block in front of this block
-			//
 			result = CanPushBlock(a_BlockPos + a_PushDir, a_World, true, a_BlocksPushed, a_PushDir);
 		}
 	}
@@ -259,7 +236,10 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld * a_World)
 	BLOCKTYPE pistonBlock;
 	NIBBLETYPE pistonMeta;
 	
-	a_World->GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
+	a_World->GetBlockTypeMeta(
+		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+		pistonBlock, pistonMeta
+	);
 	
 	if (!IsExtended(pistonMeta))
 	{
@@ -268,14 +248,20 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld * a_World)
 		
 		if (CanPushBlock(a_BlockPos + pushDir, a_World, true, blocksPushed, pushDir))
 		{
-			a_World->BroadcastBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 0, pistonMeta, pistonBlock);
-			a_World->BroadcastSoundEffect("tile.piston.out", a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 0.5f, 0.7f);
+			a_World->BroadcastBlockAction(
+				a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+				0, pistonMeta, pistonBlock
+			);
+			
+			a_World->BroadcastSoundEffect(
+				"tile.piston.out", 
+				a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+				0.5f, 0.7f
+			);
 			
 			PushBlocks(blocksPushed, a_World, pushDir);
 			
-			//
 			// Set the extension and the piston base correctly
-			//
 			Vector3i extensionPos = a_BlockPos + pushDir;
 			
 			a_World->SetBlock(
@@ -289,9 +275,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld * a_World)
 		}
 		else
 		{
-			//
 			// Can't push anything.
-			//
 			BLOCKTYPE blockAtPos = a_World->GetBlock(a_BlockPos + pushDir);
 			LOGD("%s: Unable to push object; unable to proceed. (blockAtPos = %d)", __FUNCTION__, blockAtPos);
 		}
@@ -311,22 +295,19 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld * a_World)
 	
 	if (IsExtended(pistonMeta))
 	{
-		//
-		// Check the extension:
-		//
-		
 		Vector3i extensionPos = a_BlockPos + pushDir;
 		blockAtPos = a_World->GetBlock(extensionPos);
 		
+		// Check the extension
 		switch (blockAtPos)
 		{
+		// Remove Extension
 		case E_BLOCK_PISTON_EXTENSION:
-			//
-			// Remove Extension
-			//
 			a_World->SetBlock(extensionPos.x, extensionPos.y, extensionPos.z, E_BLOCK_AIR, 0);
 			break;
-			
+		
+		// This here is an air block. I think I will manually pull the block that's two blocks 
+		// away towards me.
 		case E_BLOCK_AIR:
 			
 			if (IsSticky(pistonBlock))
@@ -345,28 +326,33 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld * a_World)
 		default:
 			LOGD("%s: Piston without an extension - still extending, or just in an invalid state?", __FUNCTION__);
 			LOGD("%s: Expected: %d, Actual: %d", __FUNCTION__, E_BLOCK_PISTON_EXTENSION, blockAtPos);
-			
-			//
-			// Quick escape-hatch.
-			//
 			return;
 		}
 		
-		a_World->SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta & ~(8));
-		a_World->BroadcastBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 1, pistonMeta & ~(8), pistonBlock);
+		a_World->SetBlock(
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			pistonBlock, 
+			pistonMeta & ~(8)
+		);
 		
-		a_World->BroadcastSoundEffect("tile.piston.in", a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 0.5f, 0.7f);
+		a_World->BroadcastBlockAction(
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			1, pistonMeta & ~(8),
+			pistonBlock
+		);
+		
+		a_World->BroadcastSoundEffect(
+			"tile.piston.in", 
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			0.5f, 0.7f
+		);
 		
 		if (IsSticky(pistonBlock))
 		{
-			//
 			// Get the block to pull
-			//
 			a_BlockPos += pushDir * 2;
 			
-			//
 			// Try to "push" the pulling block in the opposite direction
-			//
 			pushDir *= -1;
 			Vector3iSet pushedBlocks;
 			
@@ -385,13 +371,12 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 	
-	//
 	// Get the base of the piston
-	//
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos.x, blockPos.y, blockPos.z);
+	
 	blockPos -= cBlockPistonHandler::MetadataToOffset(OldMeta);
-
 	BLOCKTYPE Block = a_ChunkInterface.GetBlock(blockPos);
+	
 	if ((Block == E_BLOCK_STICKY_PISTON) || (Block == E_BLOCK_PISTON))
 	{
 		a_ChunkInterface.DigBlock(a_WorldInterface, blockPos.x, blockPos.y, blockPos.z);
