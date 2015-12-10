@@ -1,4 +1,4 @@
-# This file describes the crafting recipes that MCServer knows.
+# This file describes the crafting recipes that Cuberite knows.
 # The syntax is as follows:
 #   <Line> = <Recipe>#<Comment>
 #   <Recipe> = <Result> = <Ingredient1> | <Ingredient2> | ... | <IngredientN>
@@ -90,7 +90,7 @@ Diorite, 2              = Cobblestone, * | NetherQuartz, *
 Andesite, 2             = Diorite, * | Cobblestone, *
 StoneBrick, 4           = Stone,     1:1, 1:2, 2:1, 2:2
 BookShelf               = Planks^-1, 1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2:2, 3:2
-Sandstone, 4            = Sand,      1:1, 1:2, 2:1, 2:2
+Sandstone               = Sand,      1:1, 1:2, 2:1, 2:2
 SmoothSandstone, 4      = Sandstone, 1:1, 1:2, 2:1, 2:2
 OrnamentSandstone       = SandstoneSlab, 1:1, 1:2
 JackOLantern            = Pumpkin, 1:1 | Torch, 1:2
@@ -101,15 +101,17 @@ Prismarine              = PrismarineShard, 1:1, 1:2, 2:1, 2:2
 PrismarineBricks        = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 DarkPrismarine          = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | Inksac, 2:2
 SeaLantern              = PrismarineShard, 1:1, 1:3, 3:1, 3:3 | PrismarineCrystals, 1:2, 2:1, 2:2, 2:3, 3:2
-RedSandstone, 4         = RedSand, 1:1, 1:2, 2:1, 2:2
-ChiseledRedSandstone, 4 = RedSandstoneSlab, 1:1, 1:2
-SmoothRedSandstone, 4   = RedSand, 1:1, 1:2, 2:1, 2:2
+RedSandstone            = RedSand, 1:1, 1:2, 2:1, 2:2
+ChiseledRedSandstone    = RedSandstoneSlab, 1:1, 1:2
+SmoothRedSandstone, 4   = RedSandstone, 1:1, 1:2, 2:1, 2:2
 MossyStoneBrick         = Stonebrick, * | Vines, *
 Leather                 = RabbitHide, 1:1, 1:2, 2:1, 2:2
 
 # Slabs:
 StoneSlab,       6  = Stone,             1:1, 2:1, 3:1
 SandstoneSlab,   6  = Sandstone,         1:1, 2:1, 3:1
+SandstoneSlab,   6  = SmoothSandstone,   1:1, 2:1, 3:1
+SandstoneSlab,   6  = OrnamentSandstone, 1:1, 2:1, 3:1
 SpruceWoodSlab,  6  = SprucePlanks,      1:1, 2:1, 3:1
 BirchWoodSlab,   6  = BirchPlanks,       1:1, 2:1, 3:1
 JungleWoodSlab,  6  = JunglePlanks,      1:1, 2:1, 3:1
@@ -122,8 +124,7 @@ StonebrickSlab,  6  = StoneBrick,        1:1, 2:1, 3:1
 NetherbrickSlab, 6  = NetherBrick,       1:1, 2:1, 3:1
 Quartzslab,      6  = QuartzBlock,       1:1, 2:1, 3:1
 snow,            6  = SnowBlock,         1:1, 2:1, 3:1
-RedSandstoneSlab, 6 = RedSandstone,      1:1, 2:1, 3:1
-
+RedSandstoneSlab, 6 = RedSandstone^-1,   1:1, 2:1, 3:1
 
 # Stairs:
 SpruceWoodStairs, 4  = SprucePlanks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
@@ -144,14 +145,18 @@ BrickStairs, 4       = BrickBlock,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 BrickStairs, 4       = BrickBlock,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 SandstoneStairs, 4   = Sandstone,   1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 SandstoneStairs, 4   = Sandstone,   3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4   = SmoothSandstone, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4   = SmoothSandstone, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4   = OrnamentSandstone, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4   = OrnamentSandstone, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 NetherBrickStairs, 4 = NetherBrick, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 NetherBrickStairs, 4 = NetherBrick, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 quartzstairs, 4      = QuartzBlock, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 quartzstairs, 4      = QuartzBlock, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 StoneBrickStairs, 4  = StoneBrick,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 StoneBrickStairs, 4  = StoneBrick,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-RedSandstoneStairs, 4 = RedSandstone,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-RedSandstoneStairs, 4 = RedSandstone,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+RedSandstoneStairs, 4 = RedSandstone^-1,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+RedSandstoneStairs, 4 = RedSandstone^-1,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 
 
 
@@ -192,8 +197,7 @@ GoldenHoe  = Stick, 2:2, 2:3 | GoldIngot,   2:1, *:1
 IronHoe    = Stick, 2:2, 2:3 | IronIngot,   2:1, *:1
 DiamondHoe = Stick, 2:2, 2:3 | Diamond,     2:1, *:1
 
-Lighter        = IronIngot, 1:1                | Flint, 2:2
-Lighter        = IronIngot, 2:1                | Flint, 1:2
+Lighter        = IronIngot, *                  | Flint, *
 Bucket         = IronIngot, 1:1, 2:2, 3:1
 Compass        = IronIngot, 2:1, 1:2, 3:2, 2:3 | RedstoneDust, 2:2
 EmptyMap       = Paper,     1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | Compass, 2:2
@@ -202,8 +206,8 @@ FishingRod     = Stick, 1:3, 2:2, 3:1          | String, 3:2, 3:3
 FishingRod     = Stick, 3:3, 2:2, 1:1          | String, 1:2, 1:3
 Shears         = IronIngot, 1:1, 2:2
 Shears         = IronIngot, 2:1, 1:2
-FireCharge     = BlazePowder, *   | Coal, *    | Gunpowder, *
-Lead           = String, 1:1, 1:2, 2:1, 3:3    | Slimeball, 2:2
+FireCharge, 3  = BlazePowder, *   | Coal, *    | Gunpowder, *
+Lead, 2        = String, 1:1, 1:2, 2:1, 3:3    | Slimeball, 2:2
 
 
 
@@ -294,8 +298,8 @@ TrapDoor, 2      = Planks^-1, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
 IronTrapDoor     = IronIngot, 1:1, 1:2, 2:1, 2:2
 WoodPlate        = Planks^-1, 1:1, 2:1
 StonePlate       = Stone,     1:1, 2:1
-lightweightedpressureplate = IronIngot, 1:1, 2:1
-heavyweightedpressureplate = GoldIngot, 1:1, 2:1
+lightweightedpressureplate = GoldIngot, 1:1, 2:1
+heavyweightedpressureplate = IronIngot, 1:1, 2:1
 StoneButton      = Stone,     1:1
 WoodenButton     = Planks^-1, 1:1
 RedstoneTorchOn  = Stick, 1:2        | RedstoneDust, 1:1
