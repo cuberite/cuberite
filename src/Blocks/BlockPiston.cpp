@@ -316,7 +316,8 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld * a_World)
 				
 				if (IsSticky(pistonBlock))
 				{	
-					LOGD("%s: Sticky piston without an extension - I'm supposed to pull my cargo back, right? -- lighth7015", __FUNCTION__);
+					LOGD("%s: Sticky piston without extension- am I supposed to pull my cargo back", __FUNCTION__);
+					LOGD("  -- lighth7015");
 					
 					a_World->SetBlock(
 						extensionPos.x, extensionPos.y, extensionPos.z,
