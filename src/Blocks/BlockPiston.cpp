@@ -206,29 +206,33 @@ bool cBlockPistonHandler::CanPushBlock(
 			// 
 			// Try to push the other directions
 			// 
-			for (const auto & testDir : pushingDirs)
+			for (const auto& testDir: pushingDirs)
 			{	
 				if (finished)
 					break;
 				
-				if (CanPushBlock(a_BlockPos + testDir, a_World, false, a_BlocksPushed, a_PushDir) == false)
+				result = CanPushBlock(a_BlockPos + testDir, a_World, false, a_BlocksPushed, a_PushDir);
+				
+				if (result == false)
 				{	
 					// 
-					// When it's not possible for a direction, then fail
+					// If we can't push the block, we're done.
 					// 
 					finished = true;
 				}	
 			}
 			
 			// 
-			// Finished, PASS GO, collect $100.
+			// All done here. DO PASS GO, do collect $100.
 			// 
 		}
-		
-		// 
-		// Try to push the block in front of this block
-		//
-		result = CanPushBlock(a_BlockPos + a_PushDir, a_World, true, a_BlocksPushed, a_PushDir);
+		else
+		{
+			// 
+			// Try to push the block in front of this block
+			// 
+			result = CanPushBlock(a_BlockPos + a_PushDir, a_World, true, a_BlocksPushed, a_PushDir);
+		}
 	}
 	
 	// 
