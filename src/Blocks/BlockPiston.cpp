@@ -9,6 +9,10 @@
 #include <vector>
 #include <array>
 
+
+
+
+
 #define PISTON_MAX_PUSH_DISTANCE 12
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -19,10 +23,16 @@ cBlockPistonHeadHandler::cBlockPistonHeadHandler(void)
 {
 }
 
+
+
+
 cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
 	: cBlockHandler(a_BlockType)
 {
 }
+
+
+
 
 void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
@@ -52,6 +62,9 @@ void cBlockPistonHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Bloc
 	a_Pickups.push_back(cItem(m_BlockType, 1));
 }
 
+
+
+
 bool cBlockPistonHandler::GetPlacementBlockTypeMeta(cChunkInterface  & a_ChunkInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	a_BlockType = m_BlockType;
@@ -59,6 +72,9 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(cChunkInterface  & a_ChunkIn
 	
 	return true;
 }
+
+
+
 
 Vector3i cBlockPistonHandler::MetadataToOffset(NIBBLETYPE a_PistonMeta)
 {
@@ -84,6 +100,9 @@ Vector3i cBlockPistonHandler::MetadataToOffset(NIBBLETYPE a_PistonMeta)
 	
 	return result;
 }
+
+
+
 
 void cBlockPistonHandler::PushBlocks(const Vector3iSet & a_BlocksToPush, cWorld * a_World, const Vector3i & a_PushDir)
 {
@@ -133,6 +152,9 @@ void cBlockPistonHandler::PushBlocks(const Vector3iSet & a_BlocksToPush, cWorld 
 		}
 	}
 }
+
+
+
 
 bool cBlockPistonHandler::CanPushBlock(const Vector3i & a_BlockPos, cWorld * a_World, bool a_RequirePushable, Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir)
 {
@@ -229,6 +251,9 @@ bool cBlockPistonHandler::CanPushBlock(const Vector3i & a_BlockPos, cWorld * a_W
 	return result;
 }
 
+
+
+
 void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld * a_World)
 {
 	BLOCKTYPE pistonBlock;
@@ -272,6 +297,9 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld * a_World)
 		}
 	}
 }
+
+
+
 
 void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld * a_World)
 {
@@ -349,6 +377,9 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld * a_World)
 		}
 	}
 }
+
+
+
 
 void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
