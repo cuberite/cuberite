@@ -922,6 +922,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etItemFrame:    AddItemFrameEntity   (reinterpret_cast<cItemFrame *>       (a_Entity)); break;
 		case cEntity::etPainting:     AddPaintingEntity    (reinterpret_cast<cPainting *>        (a_Entity)); break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
+		case cEntity::etFloater: return;  // Floaters aren't saved either
 		default:
 		{
 			ASSERT(!"Unhandled entity type is being saved");

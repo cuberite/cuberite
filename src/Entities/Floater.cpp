@@ -155,7 +155,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 			
 			m_CountDownTime--;
-			if (m_World->GetHeight(POSX_TOINT, POSY_TOINT) == POSZ_TOINT)
+			if (m_World->GetHeight(POSX_TOINT, POSZ_TOINT) == POSY_TOINT)
 			{
 				if (m_World->IsWeatherWet() && m_World->GetTickRandomNumber(3) == 0)  // 25% chance of an extra countdown when being rained on.
 				{
