@@ -24,7 +24,11 @@ cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
 {
 }
 
-void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockPistonHandler::OnDestroyed(
+	cChunkInterface& a_ChunkInterface, 
+	cWorldInterface& a_WorldInterface, 
+	int a_BlockX, int a_BlockY, int a_BlockZ
+)
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 	
