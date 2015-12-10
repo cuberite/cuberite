@@ -22,6 +22,7 @@ Implements the 1.8.x protocol classes:
 #include "../EffectID.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
+#include "../ChatMessageBuilder.h"
 #include "../Statistics.h"
 
 #include "../WorldStorage/FastNBT.h"
@@ -261,6 +262,20 @@ void cProtocol180::SendChat(const AString & a_Message, eChatType a_Type)
 
 
 void cProtocol180::SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+
+	// Send the message to the client:
+	cPacketizer Pkt(*this, 0x02);
+	Pkt.WriteString(a_Message.CreateJsonString(a_ShouldUseChatPrefixes));
+	Pkt.WriteBEInt8(a_Type);
+}
+
+
+
+
+void cProtocol180::SendChat(const cChatMessageBuilder & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
 {
 	ASSERT(m_State == 3);  // In game mode?
 

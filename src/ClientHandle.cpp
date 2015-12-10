@@ -2122,6 +2122,25 @@ void cClientHandle::SendChat(const cCompositeChat & a_Message)
 
 
 
+void cClientHandle::SendChat(const cChatMessageBuilder & a_Message)
+{
+	cWorld * World = GetPlayer()->GetWorld();
+	if (World == nullptr)
+	{
+		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		if (World == nullptr)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+		}
+	}
+
+	bool ShouldUsePrefixes = World->ShouldUseChatPrefixes();
+	m_Protocol->SendChat(a_Message, ctChatBox, ShouldUsePrefixes);
+}
+
+
+
+
 
 void cClientHandle::SendChatAboveActionBar(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {

@@ -67,6 +67,7 @@ public:
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
+	virtual void SendChat                       (const cChatMessageBuilder & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;

@@ -22,6 +22,7 @@ Implements the 1.7.x protocol classes:
 #include "../World.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
+#include "../ChatMessageBuilder.h"
 #include "../Statistics.h"
 
 #include "../WorldStorage/FastNBT.h"
@@ -263,6 +264,24 @@ void cProtocol172::SendChat(const AString & a_Message, eChatType a_Type)
 
 
 void cProtocol172::SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	if (a_Type != ctChatBox)  // 1.7.2 doesn't support anything else
+	{
+		return;
+	}
+
+	// Send the message to the client:
+	cPacketizer Pkt(*this, 0x02);
+	Pkt.WriteString(a_Message.CreateJsonString(a_ShouldUseChatPrefixes));
+}
+
+
+
+
+
+void cProtocol172::SendChat(const cChatMessageBuilder & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
 {
 	ASSERT(m_State == 3);  // In game mode?
 

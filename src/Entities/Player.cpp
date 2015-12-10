@@ -20,6 +20,7 @@
 
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
+#include "../ChatMessageBuilder.h"
 
 #include "../Blocks/BlockHandler.h"
 #include "../Blocks/BlockSlab.h"

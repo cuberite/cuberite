@@ -672,6 +672,69 @@ end</pre>
 				},
 			},  -- AdditionalInfo
 		},  -- cCompositeChat
+		
+		cChatMessageBuilder =
+		{
+			Desc = [[
+				Encapsulates a chat message that can contain various formatting, URLs, commands executed on click,
+				commands suggested on click, text inserted on shift click and text to show if the mouse is over text. The chat
+				message can be sent by the regular chat-sending functions,
+				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
+				<p>
+				Note that most of the functions in this class are so-called chaining modifiers - they modify the
+				object and then return the object itself, so that they can be chained one after another. See the
+				Chaining example below for details.</p>
+				<p>
+				Colors and Style can be directly used in the text with {cChatColor|cChatColor}. See the Chaining example.
+			]],
+			Functions =
+			{
+				constructor =
+				{
+					{ Params = "", Return = "", Notes = "Creates a ChatMessageBuilder." },
+				},
+				AppendPart = { Params = "Text", Return = "self", Notes = "Adds a text. Chaining." },
+				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
+				CreateJsonString = { Params = "[AddPrefixes]", Return = "string", Notes = "Returns the entire object serialized into JSON, as it would be sent to a client. AddPrefixes specifies whether the chat prefixes should be prepended to the message, true by default." },
+				SetClickEvent =
+				{ 
+					{ Params = "Action, Text", Return = "self", Notes = "Adds action and text, the action will be run by clicking the text. This actions are supported: run_command, suggest_command and open_url. Chaining" },
+				},
+				SetHoverEvent =
+				{ 
+					{ Params = "Action, Text", Return = "self", Notes = "Adds a action and text that will be shown if the mouse is over the text. This actions are supported: show_text, show_achievement and show_item. Chaining" },
+				},
+				SetInsertionText = { Params = "Text", Return = "self", Notes = "Adds a text, that can be inserted on the client-side with Shift + Click. Chaining" },
+				SetMessageType = { Params = "MessageType, AdditionalData", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. Also sets the additional data (string) associated with the message, which is specific for the message type - such as the sender's name for mtPrivateMessage. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.). Chaining." },
+				GetAdditionalMessageTypeData = { Params = "", Return = "string", Notes = "Returns the AdditionalData associated with the message, such as the sender's name for mtPrivateMessage" },
+				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
+			},
+
+			AdditionalInfo =
+			{
+				{
+					Header = "Chaining example",
+					Contents = [[
+						Sending a chat message that is composed of multiple different parts has been made easy thanks to
+						chaining. Consider the following example that shows how a message containing all kinds of parts
+						is sent):
+<pre class="prettyprint lang-lua">
+function OnPlayerJoined(a_Player)
+	-- Send an example chat message to the player:
+		a_Player:SendMessage(cChatMessageBuilder()
+		:AppendPart("Hello, " .. cChatColor.Green .. cChatColor.Underlined .. a_Player:GetName())
+		:SetClickEvent("open_url", "http://www.cuberite.org")
+		:AppendPart(cChatColor.Underlined .. ", and welcome.")
+		:SetClickEvent("suggest_command", "/help")
+		:AppendPart(" SetDay")
+		:SetClickEvent("run_command", "/time set 0")
+		:SetMessageType(mtJoin)
+	)
+end</pre>
+					]],
+				},
+			},  -- AdditionalInfo
+		},  -- cChatMessageBuilder		
 
 		cCraftingGrid =
 		{
