@@ -24,11 +24,7 @@ cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
 {
 }
 
-void cBlockPistonHandler::OnDestroyed(
-	cChunkInterface& a_ChunkInterface, 
-	cWorldInterface& a_WorldInterface, 
-	int a_BlockX, int a_BlockY, int a_BlockZ
-)
+void cBlockPistonHandler::OnDestroyed(cChunkInterface& a_ChunkInterface, cWorldInterface& a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 	
@@ -146,10 +142,7 @@ void cBlockPistonHandler::PushBlocks(
 	}
 }
 
-bool cBlockPistonHandler::CanPushBlock(
-	const Vector3i& a_BlockPos, cWorld* a_World, bool a_RequirePushable,
-	Vector3iSet& a_BlocksPushed, const Vector3i& a_PushDir
-)
+bool cBlockPistonHandler::CanPushBlock(const Vector3i& a_BlockPos, cWorld* a_World, bool a_RequirePushable, Vector3iSet& a_BlocksPushed, const Vector3i& a_PushDir)
 {
 	bool result = false;
 	const static std::array<Vector3i, 6> pushingDirs =
