@@ -1,5 +1,6 @@
 #!/bin/sh
 #|| goto :windows_detected
+{ # put the whole thing in a block so as not to behave weirdly if interrupted
 set -e
 
 # Do we already have a repo?
@@ -206,3 +207,4 @@ exit 0
 echo "This script is not available for Windows yet, sorry."
 echo "You can still download the Windows binaries from: http://cuberite.org"
 echo "You can also manually compile for Windows. See: https://github.com/cuberite/cuberite"
+}
