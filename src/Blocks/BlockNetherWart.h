@@ -23,7 +23,7 @@ public:
 	{
 		cFastRandom rand;
 
-		if (a_Meta == 0x7)
+		if (a_Meta == 0x3)
 		{
 			// Fully grown, drop the entire produce:
 			a_Pickups.push_back(cItem(E_ITEM_NETHER_WART, static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3))) / 2, 0));
@@ -37,7 +37,7 @@ public:
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		if ((Meta < 7) && (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth))
+		if ((Meta < 3) && (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth))
 		{
 			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_NETHER_WART, ++Meta);
 		}
