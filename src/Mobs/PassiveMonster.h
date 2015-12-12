@@ -27,6 +27,9 @@ public:
 	/** Returns the items that make the animal breed - this is usually the same as the ones that make the animal follow, but not necessarily. */
 	virtual void GetBreedingItems(cItems & a_Items) { GetFollowedItems(a_Items); }
 
+	/** Called after the baby is born, allows the baby to inherit the parents' properties (color, etc.) */
+	virtual void InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2) { }
+
 	/** Returns the partner which the monster is currently mating with. */
 	cPassiveMonster * GetPartner(void) const { return m_LovePartner; }
 

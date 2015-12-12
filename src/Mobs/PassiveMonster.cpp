@@ -92,7 +92,26 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// Mating finished. Spawn baby
 			Vector3f Pos = (GetPosition() + m_LovePartner->GetPosition()) * 0.5;
-			m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
+			UInt32 BabyID = m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
+
+			class cBabyInheritCallback :
+				public cEntityCallback
+			{
+			public:
+				cPassiveMonster * Baby;
+				cBabyInheritCallback() : Baby(nullptr) { }
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					Baby = static_cast<cPassiveMonster *>(a_Entity);
+					return true;
+				}
+			} Callback;
+
+			m_World->DoWithEntityByID(BabyID, Callback);
+			if (Callback.Baby != nullptr)
+			{
+				Callback.Baby->InheritFromParents(this, m_LovePartner);
+			}
 
 			cFastRandom Random;
 			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, 1 + Random.NextInt(6));

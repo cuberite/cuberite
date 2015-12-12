@@ -131,6 +131,46 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2)
+{
+	static const struct
+	{
+		short Parent1, Parent2, Child;
+	} ColorInheritance[] =
+	{
+		{ E_META_WOOL_BLUE,   E_META_WOOL_RED,   E_META_WOOL_PURPLE     },
+		{ E_META_WOOL_BLUE,   E_META_WOOL_GREEN, E_META_WOOL_CYAN       },
+		{ E_META_WOOL_YELLOW, E_META_WOOL_RED,   E_META_WOOL_ORANGE     },
+		{ E_META_WOOL_GREEN,  E_META_WOOL_WHITE, E_META_WOOL_LIGHTGREEN },
+		{ E_META_WOOL_RED,    E_META_WOOL_WHITE, E_META_WOOL_PINK       },
+		{ E_META_WOOL_WHITE,  E_META_WOOL_BLACK, E_META_WOOL_GRAY       },
+		{ E_META_WOOL_PURPLE, E_META_WOOL_PINK,  E_META_WOOL_MAGENTA    },
+		{ E_META_WOOL_WHITE,  E_META_WOOL_GRAY,  E_META_WOOL_LIGHTGRAY  },
+		{ E_META_WOOL_BLUE,   E_META_WOOL_WHITE, E_META_WOOL_LIGHTBLUE  },
+	};
+	cSheep * Parent1 = static_cast<cSheep *>(a_Parent1);
+	cSheep * Parent2 = static_cast<cSheep *>(a_Parent2);
+	for (size_t i = 0; i < ARRAYCOUNT(ColorInheritance); i++)
+	{
+		if (
+			((Parent1->GetFurColor() == ColorInheritance[i].Parent1) && (Parent2->GetFurColor() == ColorInheritance[i].Parent2)) ||
+			((Parent1->GetFurColor() == ColorInheritance[i].Parent2) && (Parent2->GetFurColor() == ColorInheritance[i].Parent1))
+		)
+		{
+			SetFurColor(ColorInheritance[i].Child);
+			m_World->BroadcastEntityMetadata(*this);
+			return;
+		}
+	}
+	cFastRandom Random;
+	SetFurColor((Random.NextInt(100) < 50) ? Parent1->GetFurColor() : Parent2->GetFurColor());
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
 NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
 {
 	cFastRandom Random;
