@@ -317,7 +317,9 @@ public:
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
-	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
+	/** Use block entity on coordinate.
+	returns true if the use was successful, return false to use the block as a "normal" block */
+	bool UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
 	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 

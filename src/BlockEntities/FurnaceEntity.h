@@ -43,7 +43,7 @@ public:
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void UsedBy(cPlayer * a_Player) override;
+	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void Destroy() override
 	{
 		m_IsDestroyed = true;

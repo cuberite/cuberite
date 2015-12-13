@@ -22,9 +22,10 @@ cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorl
 
 
 
-void cSignEntity::UsedBy(cPlayer * a_Player)
+bool cSignEntity::UsedBy(cPlayer * a_Player)
 {
 	UNUSED(a_Player);
+	return true;
 }
 
 

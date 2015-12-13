@@ -23,9 +23,10 @@ cMobHeadEntity::cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld 
 
 
 
-void cMobHeadEntity::UsedBy(cPlayer * a_Player)
+bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
 {
 	UNUSED(a_Player);
+	return true;
 }
 
 

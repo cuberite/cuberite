@@ -745,7 +745,7 @@ void cChunkMap::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClien
 
 
 
-void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// a_Player rclked block entity at the coords specified, handle it
 	cCSLock Lock(m_CSLayers);
@@ -754,9 +754,9 @@ void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, i
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
-		return;
+		return false;
 	}
-	Chunk->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
+	return Chunk->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 

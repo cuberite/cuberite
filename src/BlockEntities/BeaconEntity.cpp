@@ -282,7 +282,7 @@ bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cBeaconEntity::UsedBy(cPlayer * a_Player)
+bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -299,6 +299,7 @@ void cBeaconEntity::UsedBy(cPlayer * a_Player)
 			a_Player->OpenWindow(Window);
 		}
 	}
+	return true;
 }
 
 

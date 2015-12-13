@@ -21,7 +21,7 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_CAULDRON, 1, 0));
 	}
 
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		switch (a_Player->GetEquippedItem().m_ItemType)
@@ -52,6 +52,7 @@ public:
 				break;
 			}
 		}
+		return true;
 	}
 
 	virtual bool IsUseable() override

@@ -51,7 +51,7 @@ cBrewingstandEntity::~cBrewingstandEntity()
 
 
 
-void cBrewingstandEntity::UsedBy(cPlayer * a_Player)
+bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -76,6 +76,7 @@ void cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 	{
 		BroadcastProgress(0, 0);
 	}
+	return true;
 }
 
 

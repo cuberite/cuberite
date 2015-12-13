@@ -56,7 +56,7 @@ cFurnaceEntity::~cFurnaceEntity()
 
 
 
-void cFurnaceEntity::UsedBy(cPlayer * a_Player)
+bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -74,6 +74,7 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 	}
 
 	UpdateProgressBars(true);
+	return true;
 }
 
 

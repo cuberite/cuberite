@@ -33,13 +33,13 @@ cEnderChestEntity::~cEnderChestEntity()
 
 
 
-void cEnderChestEntity::UsedBy(cPlayer * a_Player)
+bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// TODO: cats are an obstruction
 	if ((GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
 	{
 		// Obstruction, don't open
-		return;
+		return false;
 	}
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
@@ -57,6 +57,7 @@ void cEnderChestEntity::UsedBy(cPlayer * a_Player)
 			a_Player->OpenWindow(Window);
 		}
 	}
+	return true;
 }
 
 

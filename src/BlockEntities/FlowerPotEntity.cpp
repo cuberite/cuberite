@@ -22,11 +22,11 @@ cFlowerPotEntity::cFlowerPotEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWo
 
 
 // It don't do anything when 'used'
-void cFlowerPotEntity::UsedBy(cPlayer * a_Player)
+bool cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 {
 	if (IsItemInPot())
 	{
-		return;
+		return false;
 	}
 
 	cItem SelectedItem = a_Player->GetInventory().GetEquippedItem();
@@ -39,6 +39,7 @@ void cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 		}
 		m_World->BroadcastBlockEntity(m_PosX, m_PosY, m_PosZ, a_Player->GetClientHandle());
 	}
+	return true;
 }
 
 
