@@ -28,14 +28,6 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 
 	if (m_Target != nullptr)
 	{
-		if (m_Target->IsPlayer())
-		{
-			if (static_cast<cPlayer *>(m_Target)->IsGameModeCreative())
-			{
-				m_EMState = IDLE;
-				return;
-			}
-		}
 		MoveToPosition(m_Target->GetPosition());
 	}
 }
@@ -103,6 +95,6 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 	// Setting this higher gives us more wiggle room for attackrate
 	m_AttackInterval = 0.0;
 	m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
-	
+
 	return true;
 }
