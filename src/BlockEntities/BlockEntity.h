@@ -102,8 +102,9 @@ public:
 	
 	// tolua_end
 	
-	/** Called when a player uses this entity; should open the UI window */
-	virtual void UsedBy( cPlayer * a_Player) = 0;
+	/** Called when a player uses this entity; should open the UI window.
+	returns true if the use was successful, return false to use the block as a "normal" block */
+	virtual bool UsedBy( cPlayer * a_Player) = 0;
 	
 	/** Sends the packet defining the block entity to the client specified.
 	To send to all eligible clients, use cWorld::BroadcastBlockEntity() */

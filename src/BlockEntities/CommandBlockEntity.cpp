@@ -29,10 +29,11 @@ cCommandBlockEntity::cCommandBlockEntity(int a_X, int a_Y, int a_Z, cWorld * a_W
 
 
 
-void cCommandBlockEntity::UsedBy(cPlayer * a_Player)
+bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 {
 	// Nothing to do
 	UNUSED(a_Player);
+	return true;
 }
 
 

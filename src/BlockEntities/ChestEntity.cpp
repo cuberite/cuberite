@@ -45,7 +45,7 @@ void cChestEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cChestEntity::UsedBy(cPlayer * a_Player)
+bool cChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
@@ -71,6 +71,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
 	m_World->MarkChunkDirty(ChunkX, ChunkZ, true);
+	return true;
 }
 
 

@@ -37,7 +37,7 @@ public:
 
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;
-	virtual void UsedBy(cPlayer * a_Player) override;
+	virtual bool UsedBy(cPlayer * a_Player) override;
 	
 	/** Opens a new chest window for this chest.
 	Scans for neighbors to open a double chest window, if appropriate. */

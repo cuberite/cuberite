@@ -80,7 +80,7 @@ void cHopperEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cHopperEntity::UsedBy(cPlayer * a_Player)
+bool cHopperEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
@@ -106,6 +106,7 @@ void cHopperEntity::UsedBy(cPlayer * a_Player)
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
 	m_World->MarkChunkDirty(ChunkX, ChunkZ);
+	return true;
 }
 
 
