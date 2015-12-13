@@ -243,7 +243,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				m_Target = nullptr;
 				m_EMState = IDLE;
-				return;
 			}
 		}
 	}
