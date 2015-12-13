@@ -18,7 +18,7 @@ public:
 		: Super(a_BlockType, false)
 	{
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
 	{
 		cFastRandom rand;
@@ -40,6 +40,10 @@ public:
 		if ((Meta < 3) && (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth))
 		{
 			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_NETHER_WART, ++Meta);
+		}
+		else if (Meta > 3)  // In older versions of cuberite, there was a bug which made wart grow too much. This check fixes previously saved buggy warts.
+		{
+			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_NETHER_WART, 3);
 		}
 	}
 
