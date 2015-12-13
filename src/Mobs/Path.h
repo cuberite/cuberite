@@ -72,12 +72,15 @@ public:
 		double a_BoundingBoxWidth, double a_BoundingBoxHeight,
 		int a_MaxUp = 1, int a_MaxDown = 1
 	);
-	
+
+	/** Creates a dummy path which does nothing except returning false when isValid is called. */
+	cPath();
+
 	/** Performs part of the path calculation and returns the appropriate status.
 	If NEARBY_FOUND is returned, it means that the destination is not reachable, but a nearby destination
 	is reachable. If the user likes the alternative destination, they can call AcceptNearbyPath to treat the path as found,
 	and to make consequent calls to step return PATH_FOUND */
-	ePathFinderStatus Step(cChunk & a_Chunk);
+	ePathFinderStatus CalculationStep(cChunk & a_Chunk);
 
 	/** Called after the PathFinder's step returns NEARBY_FOUND.
 	Changes the PathFinder status from NEARBY_FOUND to PATH_FOUND, returns the nearby destination that
@@ -90,24 +93,41 @@ public:
 	inline Vector3d GetNextPoint()
 	{
 		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
-		Vector3i Point = m_PathPoints[m_PathPoints.size() - 1 - (++m_CurrentPoint)];
+		ASSERT(m_CurrentPoint < m_PathPoints.size());
+		Vector3i Point = m_PathPoints[m_PathPoints.size() - 1 - m_CurrentPoint];
+		++m_CurrentPoint;
 		return Vector3d(Point.x + m_HalfWidth, Point.y, Point.z + m_HalfWidth);
 	}
 
 
-	/** Checks whether this is the last point or not. Never call getnextPoint when this is true. */
-	inline bool IsLastPoint() const
+	/** Checks if we have no more waypoints to return. Never call getnextPoint when this is true. */
+	inline bool NoMoreWayPoints() const
 	{
 		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
-		return (m_CurrentPoint == m_PathPoints.size() - 1);
+		return (m_CurrentPoint == m_PathPoints.size());
 	}
 
+	/** Returns true if GetNextPoint() was never called for this Path. */
 	inline bool IsFirstPoint() const
 	{
 		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		return (m_CurrentPoint == 0);
 	}
 
+	/** Returns true if this path is properly initialized.
+	Returns false if this path was initialized with an empty constructor.
+	If false, the path is unusable and you should not call any methods. */
+	inline bool IsValid() const
+	{
+		return m_IsValid;
+	}
+
+	/** The amount of waypoints left to return. */
+	inline size_t WayPointsLeft() const
+	{
+		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
+		return m_PathPoints.size() - m_CurrentPoint;
+	}
 
 
 
@@ -145,6 +165,7 @@ private:
 
 	/* Control fields */
 	ePathFinderStatus m_Status;
+	bool m_IsValid;
 
 	/* Final path fields */
 	size_t m_CurrentPoint;

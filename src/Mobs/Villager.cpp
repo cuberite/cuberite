@@ -158,7 +158,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 void cVillager::HandleFarmerTryHarvestCrops()
 {
 	// Harvest the crops if the villager isn't moving and if the crops are closer then 2 blocks.
-	if (!m_IsFollowingPath && (GetPosition() - m_CropsPos).Length() < 2)
+	if (!m_PathfinderActivated && (GetPosition() - m_CropsPos).Length() < 2)
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
