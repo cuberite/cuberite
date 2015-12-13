@@ -231,9 +231,21 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		++m_TicksSinceLastDamaged;
 	}
-	if ((m_Target != nullptr) && m_Target->IsDestroyed())
+	if ((m_Target != nullptr))
 	{
-		m_Target = nullptr;
+		if (m_Target->IsDestroyed())
+		{
+			m_Target = nullptr;
+		}
+		else if (m_Target->IsPlayer())
+		{
+			if (static_cast<cPlayer *>(m_Target)->IsGameModeCreative())
+			{
+				m_Target = nullptr;
+				m_EMState = IDLE;
+				return;
+			}
+		}
 	}
 
 	// Process the undead burning in daylight.
