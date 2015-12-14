@@ -124,7 +124,11 @@ public:
 	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
 	Default: true */
 	virtual bool DoesDropOnUnsuitable(void);
-	
+
+	/** Tests if a_Position is inside the block where a_Position is relative to the origin of the block
+	Note that this is considered from a "top-down" perspective i.e. empty spaces on the bottom of a block don't matter */
+	virtual bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta);
+
 	/** Called when one of the neighbors gets set; equivalent to MC block update.
 	By default drops if position no more suitable (CanBeAt(), DoesDropOnUnsuitable(), Drop()),
 	and wakes up all simulators on the block. */

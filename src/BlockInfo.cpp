@@ -584,6 +584,27 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_STONE               ].m_CanBeTerraformed = true;
 
 
+	// Block heights:
+	a_Info[E_BLOCK_BED                 ].m_BlockHeight = 0.5625;  // 9 pixels
+	a_Info[E_BLOCK_CAKE                ].m_BlockHeight = 0.5;     // 8 pixels
+	a_Info[E_BLOCK_ENCHANTMENT_TABLE   ].m_BlockHeight = 0.75;    // 12 pixels
+	a_Info[E_BLOCK_STONE_SLAB          ].m_BlockHeight = 0.5;
+	a_Info[E_BLOCK_WOODEN_SLAB         ].m_BlockHeight = 0.5;
+	a_Info[E_BLOCK_SNOW                ].m_BlockHeight = 0.125;   // one layer is 1 / 8 (2 pixels) tall
+	a_Info[E_BLOCK_ACACIA_FENCE        ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_ACACIA_FENCE_GATE   ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_BIRCH_FENCE         ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_BIRCH_FENCE_GATE    ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_DARK_OAK_FENCE      ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_DARK_OAK_FENCE_GATE ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_FENCE               ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_OAK_FENCE_GATE      ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_JUNGLE_FENCE        ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_JUNGLE_FENCE_GATE   ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_SPRUCE_FENCE        ].m_BlockHeight = 1.5;
+	a_Info[E_BLOCK_SPRUCE_FENCE_GATE   ].m_BlockHeight = 1.5;
+
+
 	// Block place sounds:
 	a_Info[E_BLOCK_STONE               ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_GRASS               ].m_PlaceSound = "dig.grass";

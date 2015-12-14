@@ -115,6 +115,38 @@ public:
 			}
 		}
 	}
+
+	/** EXCEPTION a.k.a. why is this removed:
+	This collision-detection is actually more accurate than the client, but since the client itself
+	sends inaccurate / sparse data, it's easier to just err on the side of the client and keep the
+	two in sync by assuming that if a player hit ANY of the stair's bounding cube, it counts as the ground. */
+	#if 0
+	bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+	{
+		if (a_BlockMeta & 0x4)  // upside down
+		{
+			return true;
+		}
+		else if ((a_BlockMeta & 0x3) == 0)  // tall side is east (+X)
+		{
+			return a_Position.y < ((a_Position.x > 0.5) ? 1.0 : 0.5);
+		}
+		else if ((a_BlockMeta & 0x3) == 1)  // tall side is west (-X)
+		{
+			return a_Position.y < ((a_Position.x < 0.5) ? 1.0 : 0.5);
+		}
+		else if ((a_BlockMeta & 0x3) == 2)  // tall side is south (+Z)
+		{
+			return a_Position.y < ((a_Position.z > 0.5) ? 1.0 : 0.5);
+		}
+		else if ((a_BlockMeta & 0x3) == 3)  // tall side is north (-Z)
+		{
+			return a_Position.y < ((a_Position.z < 0.5) ? 1.0 : 0.5);
+		}
+		return false;
+	}
+	#endif
+
 } ;
 
 

@@ -246,6 +246,15 @@ ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
 
 
 
+bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+{
+	return true;
+}
+
+
+
+
+
 cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
 {
 	return nullptr;

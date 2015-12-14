@@ -88,6 +88,11 @@ public:
 		UNUSED(a_Meta);
 		return 14;
 	}
+
+	virtual bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
+	{
+		return a_Position.y < (cBlockInfo::GetBlockHeight(a_BlockType) * (a_BlockMeta & 7));
+	}
 } ;
 
 

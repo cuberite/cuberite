@@ -56,6 +56,8 @@ public:
 
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
+	virtual void HandleFalling(void) override;
+
 	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mobile accordingly
 	Currently, the mob will only start moving to a new position after the position it is currently going to is reached. */
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
@@ -203,8 +205,6 @@ protected:
 	/** Sets the body yaw and head yaw */
 	void SetPitchAndYawFromDestination(bool a_IsFollowingPath);
 
-	virtual void HandleFalling(void);
-	int m_LastGroundHeight;
 	int m_JumpCoolDown;
 
 	std::chrono::milliseconds m_IdleInterval;
