@@ -49,7 +49,7 @@ bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, 
 	// Report a warning if no generators available:
 	if (m_Gens.empty())
 	{
-		LOGWARNING("The PieceStructures generator was asked to generate \"%s\", but none of them are valid.", a_Prefabs.c_str());
+		LOGWARNING("The PieceStructures generator was asked to generate \"%s\", but none of the prefabs are valid.", a_Prefabs.c_str());
 		return false;
 	}
 	return true;

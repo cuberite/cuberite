@@ -415,9 +415,9 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "NetherForts") == 0)
 		{
-			LOGINFO("The NetherForts finisher is obsolete, you should use \"PieceStructures: NetherForts\" instead.");
+			LOGINFO("The NetherForts finisher is obsolete, you should use \"PieceStructures: NetherFort\" instead.");
 			auto gen = std::make_shared<cPieceStructuresGen>(Seed);
-			if (gen->Initialize("NetherForts", seaLevel, m_BiomeGen, m_CompositedHeightCache))
+			if (gen->Initialize("NetherFort", seaLevel, m_BiomeGen, m_CompositedHeightCache))
 			{
 				m_FinishGens.push_back(gen);
 			}
@@ -438,11 +438,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				m_FinishGens.push_back(gen);
 			}
 		}
-		else if (NoCaseCompare(finisher, "POCPieces") == 0)
+		else if (NoCaseCompare(finisher, "PieceStructures") == 0)
 		{
 			if (split.size() < 2)
 			{
-				LOGWARNING("The PieceStructures generator needs the structures to use. Example: \"PieceStructures: NetherForts\".");
+				LOGWARNING("The PieceStructures generator needs the structures to use. Example: \"PieceStructures: NetherFort\".");
 				continue;
 			}
 
