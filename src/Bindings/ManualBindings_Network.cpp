@@ -261,7 +261,7 @@ static int tolua_cNetwork_Listen(lua_State * L)
 	}
 
 	// Read the params:
-	int Port;
+	int Port = 0;
 	S.GetStackValues(2, Port);
 	if ((Port < 0) || (Port > 65535))
 	{
