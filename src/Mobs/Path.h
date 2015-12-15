@@ -76,6 +76,13 @@ public:
 	/** Creates a dummy path which does nothing except returning false when isValid is called. */
 	cPath();
 
+	/** delete default constructors */
+	cPath(const cPath & a_other) = delete;
+	cPath(cPath && a_other) = delete;
+	
+	cPath & operator=(const cPath & a_other) = delete;
+	cPath & operator=(cPath && a_other) = delete;
+
 	/** Performs part of the path calculation and returns the appropriate status.
 	If NEARBY_FOUND is returned, it means that the destination is not reachable, but a nearby destination
 	is reachable. If the user likes the alternative destination, they can call AcceptNearbyPath to treat the path as found,
