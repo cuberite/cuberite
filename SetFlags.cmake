@@ -288,6 +288,7 @@ macro(set_exe_flags)
 			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
 				add_flags_cxx("-Wno-error=disabled-macro-expansion")
 			endif()
+			add_flags_cxx("-Wno-error=unused-command-line-argument")
 		endif()
 	endif()
 
