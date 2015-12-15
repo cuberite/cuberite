@@ -199,7 +199,7 @@ public:
 
 		// Get parameters:
 		Ty1 * Self = nullptr;
-		UInt32 ItemID;
+		UInt32 ItemID = 0;
 		cLuaState::cRef FnRef;
 		L.GetStackValues(1, Self, ItemID, FnRef);
 		if (Self == nullptr)
