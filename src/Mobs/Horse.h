@@ -18,6 +18,8 @@ public:
 	CLASS_PROTODEF(cHorse)
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual void InStateIdle(std::chrono::milliseconds a_Dt) override;
+	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
@@ -42,6 +44,7 @@ private:
 
 	bool m_bHasChest, m_bIsEating, m_bIsRearing, m_bIsMouthOpen, m_bIsTame, m_bIsSaddled;
 	int m_Type, m_Color, m_Style, m_Armour, m_TimesToTame, m_TameAttemptTimes, m_RearTickCount;
+	float m_Speed;
 
 } ;
 

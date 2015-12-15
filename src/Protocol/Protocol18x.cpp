@@ -2486,8 +2486,8 @@ void cProtocol180::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Forward);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Sideways);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Forward);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Flags);
 
 	if ((Flags & 0x2) != 0)
@@ -2495,6 +2495,10 @@ void cProtocol180::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 		m_Client->HandleUnmount();
 	}
 	else if ((Flags & 0x1) != 0)
+	{
+		// jump
+	}
+	else
 	{
 		m_Client->HandleSteerVehicle(Forward, Sideways);
 	}
