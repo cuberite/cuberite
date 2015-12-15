@@ -23,7 +23,8 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_Armour(0),
 	m_TimesToTame(TameTimes),
 	m_TameAttemptTimes(0),
-	m_RearTickCount(0)
+	m_RearTickCount(0),
+	m_Speed(20.0)
 {
 }
 
@@ -67,6 +68,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
+			// TODO: emit hearts here
 			m_bIsTame = true;
 		}
 	}
@@ -158,3 +160,21 @@ void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
+void cHorse::InStateIdle(std::chrono::milliseconds a_Dt)
+{
+	// If horse is tame and someone is sitting on it, don't walk around
+	if ((!m_bIsTame) || (m_Attachee == nullptr))
+	{
+		super::InStateIdle(a_Dt);
+	}
+}
+
+
+
+
+
+void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
+{
+	super::HandleSpeedFromAttachee(a_Forward * m_Speed, a_Sideways * m_Speed);
+}
