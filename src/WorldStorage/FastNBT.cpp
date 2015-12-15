@@ -64,6 +64,13 @@ bool cParsedNBT::Parse(void)
 		// Data too short
 		return false;
 	}
+
+	if (m_Data == nullptr)
+	{
+		// Invalid Data
+		return false;
+	}
+
 	if (m_Data[0] != TAG_Compound)
 	{
 		// The top-level tag must be a Compound
