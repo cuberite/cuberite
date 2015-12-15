@@ -134,7 +134,7 @@ static Json::Value JsonSerializeTable(cLuaState & a_LuaState)
 	{
 		if (lua_type(a_LuaState, -2) == LUA_TNUMBER)
 		{
-			int idx;
+			int idx = 0;
 			a_LuaState.GetStackValue(-2, idx);
 			res[idx - 1] = JsonSerializeValue(a_LuaState);
 		}
@@ -309,7 +309,3 @@ void cLuaJson::Bind(cLuaState & a_LuaState)
 		tolua_endmodule(a_LuaState);
 	tolua_endmodule(a_LuaState);
 }
-
-
-
-

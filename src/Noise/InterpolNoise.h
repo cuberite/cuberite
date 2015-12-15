@@ -42,7 +42,7 @@ public:
 		m_FracY(a_FracY)
 	{
 	}
-	
+
 
 	/** Generates part of the output noise array using the current m_WorkRnds[] values */
 	void Generate(
@@ -63,7 +63,7 @@ public:
 			}  // for x
 		}  // for y
 	}
-	
+
 
 	/** Initializes m_WorkRnds[] with the specified values of the noise at the specified integral coords. */
 	void InitWorkRnds(int a_FloorX, int a_FloorY)
@@ -75,7 +75,7 @@ public:
 		(*m_WorkRnds)[1][0] = m_Noise.IntNoise2D(m_CurFloorX + 1, m_CurFloorY);
 		(*m_WorkRnds)[1][1] = m_Noise.IntNoise2D(m_CurFloorX + 1, m_CurFloorY + 1);
 	}
-	
+
 
 	/** Updates m_WorkRnds[] for the new integral coords */
 	void Move(int a_NewFloorX, int a_NewFloorY)
@@ -85,7 +85,7 @@ public:
 		int OldFloorY = m_CurFloorY;
 		Workspace * OldWorkRnds = m_WorkRnds;
 		m_WorkRnds = (m_WorkRnds == &m_Workspace1) ? &m_Workspace2 : &m_Workspace1;
-	
+
 		// Reuse as much of the old workspace as possible:
 		// TODO: Try out if simply calculating all 4 elements each time is faster than this monster loop
 		int DiffX = OldFloorX - a_NewFloorX;
@@ -114,10 +114,10 @@ public:
 
 protected:
 	typedef NOISE_DATATYPE Workspace[2][2];
-	
+
 	/** The noise used for generating the values at integral coords. */
 	const cNoise & m_Noise;
-	
+
 	/** The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering) */
 	Workspace * m_WorkRnds;
 
@@ -129,7 +129,7 @@ protected:
 
 	/** Coords of the currently calculated m_WorkRnds[]. */
 	int m_CurFloorX, m_CurFloorY;
-	
+
 	/** The output array to generate into. */
 	NOISE_DATATYPE * m_Array;
 
@@ -346,7 +346,7 @@ public:
 		ASSERT(a_SizeY < MAX_SIZE);
 		ASSERT(a_StartX < a_EndX);
 		ASSERT(a_StartY < a_EndY);
-	
+
 		// Calculate the integral and fractional parts of each coord:
 		int FloorX[MAX_SIZE];
 		int FloorY[MAX_SIZE];
@@ -357,11 +357,11 @@ public:
 		int NumSameX, NumSameY;
 		CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
 		CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
-	
+
 		cInterpolCell2D<T> Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
-	
+
 		Cell.InitWorkRnds(FloorX[0], FloorY[0]);
-	
+
 		// Calculate query values using Cell:
 		int FromY = 0;
 		for (int y = 0; y < NumSameY; y++)
@@ -403,7 +403,7 @@ public:
 		ASSERT(a_StartZ < a_EndZ);
 
 		// Calculate the integral and fractional parts of each coord:
-		int FloorX[MAX_SIZE];
+		int FloorX[MAX_SIZE] = {};
 		int FloorY[MAX_SIZE];
 		int FloorZ[MAX_SIZE];
 		NOISE_DATATYPE FracX[MAX_SIZE];
@@ -412,7 +412,7 @@ public:
 		int SameX[MAX_SIZE];
 		int SameY[MAX_SIZE];
 		int SameZ[MAX_SIZE];
-		int NumSameX, NumSameY, NumSameZ;
+		int NumSameX = 0, NumSameY = 0, NumSameZ = 0;
 		CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
 		CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
 		CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ, SameZ, NumSameZ);
@@ -422,9 +422,9 @@ public:
 			a_SizeX, a_SizeY, a_SizeZ,
 			FracX, FracY, FracZ
 		);
-	
+
 		Cell.InitWorkRnds(FloorX[0], FloorY[0], FloorZ[0]);
-	
+
 		// Calculate query values using Cell:
 		int FromZ = 0;
 		for (int z = 0; z < NumSameZ; z++)
@@ -519,6 +519,3 @@ struct Interp5Deg
 };
 
 typedef cInterpolNoise<Interp5Deg> cInterp5DegNoise;
-
-
-
