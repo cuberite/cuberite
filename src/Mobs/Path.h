@@ -79,7 +79,8 @@ public:
 	/** delete default constructors */
 	cPath(const cPath & a_other) = delete;
 	cPath(cPath && a_other) = delete;
-	
+
+	/** delete default assignment operators */
 	cPath & operator=(const cPath & a_other) = delete;
 	cPath & operator=(cPath && a_other) = delete;
 
@@ -136,6 +137,31 @@ public:
 		return m_PathPoints.size() - m_CurrentPoint;
 	}
 
+	/** Recreates a pathfinder instance. A Mob will probably need a single pathfinder instance for its entire life.
+
+	Note that if you have a man-sized mob (1x1x2, zombies, etc), you are advised to call this function without parameters
+	because the declaration might change in later version of the pathFinder, and a parameter-less call always assumes a man-sized mob.
+
+	If your mob is not man-sized, you are advised to use cPath(width, height), this would be compatible with future versions,
+	but please be aware that as of now those parameters will be ignored and your mob will be assumed to be man sized.
+
+	@param a_BoundingBoxWidth the character's boundingbox width in blocks. Currently the parameter is ignored and 1 is assumed.
+	@param a_BoundingBoxHeight the character's boundingbox width in blocks. Currently the parameter is ignored and 2 is assumed.
+	@param a_MaxUp the character's max jump height in blocks. Currently the parameter is ignored and 1 is assumed.
+	@param a_MaxDown How far is the character willing to fall? Currently the parameter is ignored and 1 is assumed. */
+	/** Attempts to find a path starting from source to destination.
+	After calling this, you are expected to call Step() once per tick or once per several ticks until it returns true. You should then call getPath() to obtain the path.
+	Calling this before a path is found resets the current path and starts another search.
+	@param a_StartingPoint The function expects this position to be the lowest block the mob is in, a rule of thumb: "The block where the Zombie's knees are at".
+	@param a_EndingPoint "The block where the Zombie's knees want to be".
+	@param a_MaxSteps The maximum steps before giving up. */
+	void Reset(
+		cChunk & a_Chunk,
+		const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
+		double a_BoundingBoxWidth, double a_BoundingBoxHeight,
+		int a_MaxUp = 1, int a_MaxDown = 1
+	);
+
 
 
 
@@ -148,6 +174,11 @@ private:
 	void FinishCalculation(ePathFinderStatus a_NewStatus);  // Clears the memory used for calculating the path and changes the status.
 	void AttemptToFindAlternative();
 	void BuildPath();
+	/** Handles all logic associated with reseting the path to a clean state */
+	void ResetImpl(
+		const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint,
+		double a_BoundingBoxWidth, double a_BoundingBoxHeight
+	);
 
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);

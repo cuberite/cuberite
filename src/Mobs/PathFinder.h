@@ -52,7 +52,7 @@ private:
 	double m_Height;
 
 	/** The current cPath instance we have. This is discarded and recreated when a path recalculation is needed. */
-	std::unique_ptr<cPath> m_Path;
+	cPath m_Path;
 
 	/** If 0, will give up reaching the next m_WayPoint and will recalculate path. */
 	int m_GiveUpCounter;
