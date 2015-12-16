@@ -1051,18 +1051,30 @@ enum eDamageType
 
 
 
+/** The source of an explosion.
+Also dictates the type of the additional data passed to the explosion handlers:
+| esBed           | Vector3i *             | Bed exploding in the Nether or in the End
+| esEnderCrystal  | cEnderCrystal *        |
+| esGhastFireball | cGhastFireballEntity * |
+| esMonster       | cMonster *             |
+| esOther         | nullptr                | Any other explosion unaccounted for
+| esPlugin        | nullptr                | Explosion primarily attributed to a plugin
+| esPrimedTNT     | cTNTEntity *           |
+| esWitherBirth   | cMonster *             |
+| esWitherSkull   | cProjectileEntity *    |
+*/
 enum eExplosionSource
 {
-	esOther,
-	esPrimedTNT,
-	esMonster,
 	esBed,
 	esEnderCrystal,
 	esGhastFireball,
-	esWitherSkullBlack,
-	esWitherSkullBlue,
-	esWitherBirth,
+	esMonster,
+	esOther,
 	esPlugin,
+	esPrimedTNT,
+	esWitherBirth,
+	esWitherSkull,
+	esMax,
 } ;
 
 

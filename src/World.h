@@ -517,20 +517,11 @@ public:
 	/** Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true */
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
 	
-	/** Does an explosion with the specified strength at the specified coordinate
-	a_SourceData exact type depends on the a_Source:
-	| esOther            | void *           |
-	| esPrimedTNT        | cTNTEntity *     |
-	| esMonster          | cMonster *       |
-	| esBed              | cVector3i *      |
-	| esEnderCrystal     | Vector3i *       |
-	| esGhastFireball    | cGhastFireball * |
-	| esWitherSkullBlack | TBD              |
-	| esWitherSkullBlue  | TBD              |
-	| esWitherBirth      | cMonster *       |
-	| esPlugin           | void *           |
-	*/
-	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) override;  // tolua_export
+	/** Does an explosion with the specified strength at the specified coordinates.
+	Executes the HOOK_EXPLODING and HOOK_EXPLODED hooks as part of the processing.
+	a_SourceData exact type depends on the a_Source, see the declaration of the esXXX constants in BlockID.h for details.
+	Exported to Lua manually in ManualBindings_World.cpp in order to support the variable a_SourceData param. */
+	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) override;
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp

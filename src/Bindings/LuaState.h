@@ -259,7 +259,6 @@ public:
 	void Push(int a_Value);
 	void Push(long a_Value);
 	void Push(const UInt32 a_Value);
-	void Push(void * a_Ptr);
 	void Push(std::chrono::milliseconds a_time);
 	
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
@@ -374,6 +373,9 @@ public:
 	
 	/** Returns true if the specified parameters on the stack are numbers; also logs warning if not */
 	bool CheckParamNumber(int a_StartParam, int a_EndParam = -1);
+	
+	/** Returns true if the specified parameters on the stack are bools; also logs warning if not */
+	bool CheckParamBool(int a_StartParam, int a_EndParam = -1);
 	
 	/** Returns true if the specified parameters on the stack are strings; also logs warning if not */
 	bool CheckParamString(int a_StartParam, int a_EndParam = -1);

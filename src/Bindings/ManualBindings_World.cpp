@@ -110,6 +110,99 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 
 
+
+static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceType, [SourceData])
+	*/
+	
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType     (1, "cWorld") ||
+		!L.CheckParamNumber       (2, 5) ||
+		!L.CheckParamBool         (6) ||
+		!L.CheckParamNumber       (7) ||
+		!L.CheckParamEnd          (9)
+	)
+	{
+		return 0;
+	}
+	
+	// Read the params:
+	cWorld * World;
+	double ExplosionSize;
+	int BlockX, BlockY, BlockZ;
+	bool CanCauseFire;
+	int SourceTypeInt;
+	if (!L.GetStackValues(1, World, ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceTypeInt))
+	{
+		LOGWARNING("World:DoExplosionAt(): invalid parameters");
+		L.LogStackTrace();
+		return 0;
+	}
+	if ((SourceTypeInt < 0) || (SourceTypeInt >= esMax))
+	{
+		LOGWARNING("World:DoExplosionAt(): Invalid source type");
+		L.LogStackTrace();
+		return 0;
+	}
+	eExplosionSource SourceType;
+	void * SourceData;
+	switch (SourceTypeInt)
+	{
+		case esBed:
+		{
+			// esBed receives a Vector3i SourceData param:
+			Vector3i * pos = nullptr;
+			L.GetStackValue(8, pos);
+			SourceType = esBed;
+			SourceData = pos;
+			break;
+		}
+
+		case esEnderCrystal:
+		case esGhastFireball:
+		case esMonster:
+		case esPrimedTNT:
+		case esWitherBirth:
+		case esWitherSkull:
+		{
+			// These all receive a cEntity descendant SourceData param:
+			cEntity * ent = nullptr;
+			L.GetStackValue(8, ent);
+			SourceType = static_cast<eExplosionSource>(SourceTypeInt);
+			SourceData = ent;
+			break;
+		}
+
+		case esOther:
+		case esPlugin:
+		{
+			// esOther and esPlugin ignore their SourceData params
+			SourceType = static_cast<eExplosionSource>(SourceTypeInt);
+			SourceData = nullptr;
+			break;
+		}
+
+		default:
+		{
+			LOGWARNING("cWorld:DoExplosionAt(): invalid SourceType parameter: %d", SourceTypeInt);
+			L.LogStackTrace();
+			return 0;
+		}
+	}
+
+	// Create the actual explosion:
+	World->DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceType, SourceData);
+
+	return 0;
+}
+
+
+
+
+
 static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 {
 	// Exported manually, because tolua doesn't support converting functions to functor types.
@@ -576,41 +669,42 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
 		tolua_beginmodule(tolua_S, "cWorld");
-			tolua_function(tolua_S, "BroadcastParticleEffect",   tolua_cWorld_BroadcastParticleEffect);
-			tolua_function(tolua_S, "ChunkStay",                 tolua_cWorld_ChunkStay);
-			tolua_function(tolua_S, "DoWithBlockEntityAt",       DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
-			tolua_function(tolua_S, "DoWithBeaconAt",            DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);
-			tolua_function(tolua_S, "DoWithBrewingstandAt",      DoWithXYZ<cWorld, cBrewingstandEntity, &cWorld::DoWithBrewingstandAt>);
-			tolua_function(tolua_S, "DoWithChestAt",             DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);
-			tolua_function(tolua_S, "DoWithDispenserAt",         DoWithXYZ<cWorld, cDispenserEntity,    &cWorld::DoWithDispenserAt>);
-			tolua_function(tolua_S, "DoWithDropSpenserAt",       DoWithXYZ<cWorld, cDropSpenserEntity,  &cWorld::DoWithDropSpenserAt>);
-			tolua_function(tolua_S, "DoWithDropperAt",           DoWithXYZ<cWorld, cDropperEntity,      &cWorld::DoWithDropperAt>);
-			tolua_function(tolua_S, "DoWithEntityByID",          DoWithID< cWorld, cEntity,             &cWorld::DoWithEntityByID>);
-			tolua_function(tolua_S, "DoWithFurnaceAt",           DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
-			tolua_function(tolua_S, "DoWithNoteBlockAt",         DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
-			tolua_function(tolua_S, "DoWithCommandBlockAt",      DoWithXYZ<cWorld, cCommandBlockEntity, &cWorld::DoWithCommandBlockAt>);
-			tolua_function(tolua_S, "DoWithMobHeadAt",           DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
-			tolua_function(tolua_S, "DoWithFlowerPotAt",         DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
-			tolua_function(tolua_S, "DoWithPlayer",              DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
-			tolua_function(tolua_S, "FindAndDoWithPlayer",       DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
-			tolua_function(tolua_S, "DoWithPlayerByUUID",        DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayerByUUID>);
-			tolua_function(tolua_S, "ForEachBlockEntityInChunk", ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
+			tolua_function(tolua_S, "BroadcastParticleEffect",    tolua_cWorld_BroadcastParticleEffect);
+			tolua_function(tolua_S, "ChunkStay",                  tolua_cWorld_ChunkStay);
+			tolua_function(tolua_S, "DoExplosionAt",              tolua_cWorld_DoExplosionAt);
+			tolua_function(tolua_S, "DoWithBeaconAt",             DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);
+			tolua_function(tolua_S, "DoWithBlockEntityAt",        DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
+			tolua_function(tolua_S, "DoWithBrewingstandAt",       DoWithXYZ<cWorld, cBrewingstandEntity, &cWorld::DoWithBrewingstandAt>);
+			tolua_function(tolua_S, "DoWithChestAt",              DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);
+			tolua_function(tolua_S, "DoWithCommandBlockAt",       DoWithXYZ<cWorld, cCommandBlockEntity, &cWorld::DoWithCommandBlockAt>);
+			tolua_function(tolua_S, "DoWithDispenserAt",          DoWithXYZ<cWorld, cDispenserEntity,    &cWorld::DoWithDispenserAt>);
+			tolua_function(tolua_S, "DoWithDropSpenserAt",        DoWithXYZ<cWorld, cDropSpenserEntity,  &cWorld::DoWithDropSpenserAt>);
+			tolua_function(tolua_S, "DoWithDropperAt",            DoWithXYZ<cWorld, cDropperEntity,      &cWorld::DoWithDropperAt>);
+			tolua_function(tolua_S, "DoWithEntityByID",           DoWithID< cWorld, cEntity,             &cWorld::DoWithEntityByID>);
+			tolua_function(tolua_S, "DoWithFlowerPotAt",          DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
+			tolua_function(tolua_S, "DoWithFurnaceAt",            DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
+			tolua_function(tolua_S, "DoWithMobHeadAt",            DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
+			tolua_function(tolua_S, "DoWithNoteBlockAt",          DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
+			tolua_function(tolua_S, "DoWithPlayer",               DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
+			tolua_function(tolua_S, "DoWithPlayerByUUID",         DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayerByUUID>);
+			tolua_function(tolua_S, "FindAndDoWithPlayer",        DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
+			tolua_function(tolua_S, "ForEachBlockEntityInChunk",  ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
 			tolua_function(tolua_S, "ForEachBrewingstandInChunk", ForEachInChunk<cWorld, cBrewingstandEntity, &cWorld::ForEachBrewingstandInChunk>);
-			tolua_function(tolua_S, "ForEachChestInChunk",       ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
-			tolua_function(tolua_S, "ForEachEntity",             ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
-			tolua_function(tolua_S, "ForEachEntityInBox",        ForEachInBox<  cWorld, cEntity,        &cWorld::ForEachEntityInBox>);
-			tolua_function(tolua_S, "ForEachEntityInChunk",      ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
-			tolua_function(tolua_S, "ForEachFurnaceInChunk",     ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
-			tolua_function(tolua_S, "ForEachPlayer",             ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
-			tolua_function(tolua_S, "ForEachLoadedChunk",        tolua_cWorld_ForEachLoadedChunk);
-			tolua_function(tolua_S, "GetBlockInfo",              tolua_cWorld_GetBlockInfo);
-			tolua_function(tolua_S, "GetBlockTypeMeta",          tolua_cWorld_GetBlockTypeMeta);
-			tolua_function(tolua_S, "GetSignLines",              tolua_cWorld_GetSignLines);
-			tolua_function(tolua_S, "PrepareChunk",              tolua_cWorld_PrepareChunk);
-			tolua_function(tolua_S, "QueueTask",                 tolua_cWorld_QueueTask);
-			tolua_function(tolua_S, "ScheduleTask",              tolua_cWorld_ScheduleTask);
-			tolua_function(tolua_S, "SetSignLines",              tolua_cWorld_SetSignLines);
-			tolua_function(tolua_S, "TryGetHeight",              tolua_cWorld_TryGetHeight);
+			tolua_function(tolua_S, "ForEachChestInChunk",        ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
+			tolua_function(tolua_S, "ForEachEntity",              ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
+			tolua_function(tolua_S, "ForEachEntityInBox",         ForEachInBox<  cWorld, cEntity,        &cWorld::ForEachEntityInBox>);
+			tolua_function(tolua_S, "ForEachEntityInChunk",       ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
+			tolua_function(tolua_S, "ForEachFurnaceInChunk",      ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
+			tolua_function(tolua_S, "ForEachLoadedChunk",         tolua_cWorld_ForEachLoadedChunk);
+			tolua_function(tolua_S, "ForEachPlayer",              ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
+			tolua_function(tolua_S, "GetBlockInfo",               tolua_cWorld_GetBlockInfo);
+			tolua_function(tolua_S, "GetBlockTypeMeta",           tolua_cWorld_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetSignLines",               tolua_cWorld_GetSignLines);
+			tolua_function(tolua_S, "PrepareChunk",               tolua_cWorld_PrepareChunk);
+			tolua_function(tolua_S, "QueueTask",                  tolua_cWorld_QueueTask);
+			tolua_function(tolua_S, "ScheduleTask",               tolua_cWorld_ScheduleTask);
+			tolua_function(tolua_S, "SetSignLines",               tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "TryGetHeight",               tolua_cWorld_TryGetHeight);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);
 }
