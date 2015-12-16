@@ -75,14 +75,7 @@ public:
 	
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		NIBBLETYPE Meta     = a_Chunk.GetMeta      (a_RelX, a_RelY, a_RelZ);
-		NIBBLETYPE Light    = a_Chunk.GetBlockLight(a_RelX, a_RelY, a_RelZ);
-		NIBBLETYPE SkyLight = a_Chunk.GetSkyLight  (a_RelX, a_RelY, a_RelZ);
-
-		if (SkyLight > Light)
-		{
-			Light = SkyLight;
-		}
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 
 		// Check to see if the plant can grow
 		auto Action = CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);

@@ -513,7 +513,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			RemovedDamage += CeilC(EPFProtection * 0.04 * a_TDI.FinalDamage);
 		}
 
-		if ((a_TDI.DamageType == dtFalling) || (a_TDI.DamageType == dtFall) || (a_TDI.DamageType == dtEnderPearl))
+		if ((a_TDI.DamageType == dtFalling) || (a_TDI.DamageType == dtEnderPearl))
 		{
 			RemovedDamage += CeilC(EPFFeatherFalling * 0.04 * a_TDI.FinalDamage);
 		}

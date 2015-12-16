@@ -429,12 +429,11 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 	}
 
 	// Read the HTTP response:
-	int ret;
 	unsigned char buf[1024];
 
 	for (;;)
 	{
-		ret = Socket.Receive(buf, sizeof(buf));
+		int ret = Socket.Receive(buf, sizeof(buf));
 
 		if ((ret == POLARSSL_ERR_NET_WANT_READ) || (ret == POLARSSL_ERR_NET_WANT_WRITE))
 		{

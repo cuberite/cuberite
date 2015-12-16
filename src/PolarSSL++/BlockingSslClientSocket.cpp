@@ -189,7 +189,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 	size_t NumBytes = a_NumBytes;
 	for (;;)
 	{
-		int res = m_Ssl.WritePlain(a_Data, a_NumBytes);
+		int res = m_Ssl.WritePlain(Data, a_NumBytes);
 		if (res < 0)
 		{
 			ASSERT(res != POLARSSL_ERR_NET_WANT_READ);   // This should never happen with callback-based SSL

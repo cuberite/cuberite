@@ -330,9 +330,9 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 		const int BubbleR = 2 + (BubbleRnd & 0x03);  // 2 .. 5
 		const int Range = 16 - 2 * BubbleR;
 		const int BubbleX = BubbleR + (BubbleRnd % Range);
-		Rnd >>= 4;
+		BubbleRnd >>= 4;
 		const int BubbleY = 4 + (BubbleRnd & 0x01);  // 4 .. 5
-		Rnd >>= 1;
+		BubbleRnd >>= 1;
 		const int BubbleZ = BubbleR + (BubbleRnd % Range);
 		const int HalfR = BubbleR / 2;  // 1 .. 2
 		const int RSquared = BubbleR * BubbleR;
