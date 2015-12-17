@@ -18,10 +18,16 @@ public:
 	class cChatMessagePart
 	{
 	public:
+		cChatMessagePart() :
+			m_Text("")
+		{
+		}
+
 		cChatMessagePart(const AString & a_Text):
 			m_Text(a_Text)
 		{
 		}
+
 
 		~cChatMessagePart() {};
 
@@ -35,21 +41,42 @@ public:
 
 	std::vector<cChatMessagePart *> m_Parts;
 
+	// cParts m_Parts;
+
 	// tolua_begin
 
-	cChatMessageBuilder(void) :
+	/** Adds a cChatMessagePart with empty text. */
+	cChatMessageBuilder() :
 		m_MessageType(mtCustom)
 	{
+		m_Parts.push_back(new cChatMessagePart());
+	}
+
+	/** Adds a cChatMessagePart with text. */
+	cChatMessageBuilder(AString & a_Text) :
+		m_MessageType(mtCustom)
+	{
+		m_Parts.push_back(new cChatMessagePart(a_Text));
 	}
 
 	~cChatMessageBuilder();
 
 	void Clear(void);
 
-	/** Adds a new cChatMessagePart and sets the text. Returns cChatMessageBuilder  */
+	AString CreateJsonString(bool a_ShouldUseChatPrefixes = true) const;
+
+	/** Returns the message type set previously by SetMessageType(). */
+	eMessageType GetMessageType(void) const { return m_MessageType; }
+
+	/** Returns additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
+	AString GetAdditionalMessageTypeData(void) const { return m_AdditionalMessageTypeData; }
+
+	// tolua_end
+
+	/** Adds a new cChatMessagePart and sets the text. */
 	void AppendPart(const AString & a_Text);
 
-	/** Sets a action on the last part in m_Parts, that will be run, if the text has been clicked
+	/** Sets a action on the last part in m_Parts, that will be run, if the text has been clicked.
 	Actions:
 	- open_url
 	- run_command
@@ -68,23 +95,13 @@ public:
 	/** Inserts the specified text into the chat on Shift Click (>= 1.8) */
 	void SetInsertionText(const AString & a_Text);
 
-	AString CreateJsonString(bool a_ShouldUseChatPrefixes = true) const;
-
-	/** Returns the message type set previously by SetMessageType(). */
-	eMessageType GetMessageType(void) const { return m_MessageType; }
-
-	/** Returns additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
-	AString GetAdditionalMessageTypeData(void) const { return m_AdditionalMessageTypeData; }
-
 	/** Sets the message type, which is indicated by prefixes added to the message when serializing
 	Takes optional AdditionalMessageTypeData to set m_AdditionalMessageTypeData. See said variable for more documentation. */
 	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData = "");
-
-	// tolua_end
 protected:
 	/** The message type, as indicated by prefixes. */
 	eMessageType m_MessageType;
 
 	/** Additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
 	AString m_AdditionalMessageTypeData;
-} ; // tolua_export
+} ;  // tolua_export

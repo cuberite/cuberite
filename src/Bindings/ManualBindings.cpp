@@ -3129,7 +3129,7 @@ static int tolua_cChatMessageBuilder_AppendPart(lua_State * tolua_S)
 	if (
 		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
 		!L.CheckParamString(2)
-		)
+	)
 	{
 		return 0;
 	}
@@ -3164,7 +3164,7 @@ static int tolua_cChatMessageBuilder_SetClickEvent(lua_State * tolua_S)
 	if (
 		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
 		!L.CheckParamString(2, 3)
-		)
+	)
 	{
 		return 0;
 	}
@@ -3175,10 +3175,9 @@ static int tolua_cChatMessageBuilder_SetClickEvent(lua_State * tolua_S)
 		return 0;
 	}
 
-	// Add the part:
+	// Sets the click action of the part
 	AString Action, Text;
-	L.GetStackValue(2, Action);
-	L.GetStackValue(3, Text);
+	L.GetStackValues(2, Action, Text);
 	self->SetClickEvent(Action, Text);
 
 	// Cut away everything from the stack except for the cChatMessageBuilder instance; return that:
@@ -3200,7 +3199,7 @@ static int tolua_cChatMessageBuilder_SetHoverEvent(lua_State * tolua_S)
 	if (
 		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
 		!L.CheckParamString(2, 3)
-		)
+	)
 	{
 		return 0;
 	}
@@ -3211,10 +3210,9 @@ static int tolua_cChatMessageBuilder_SetHoverEvent(lua_State * tolua_S)
 		return 0;
 	}
 
-	// Add the part:
+	// Sets the hover action of the part
 	AString Action, Text;
-	L.GetStackValue(2, Action);
-	L.GetStackValue(3, Text);
+	L.GetStackValues(2, Action, Text);
 	self->SetHoverEvent(Action, Text);
 
 	// Cut away everything from the stack except for the cChatMessageBuilder instance; return that:
@@ -3236,7 +3234,7 @@ static int tolua_cChatMessageBuilder_SetInsertionText(lua_State * tolua_S)
 	if (
 		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
 		!L.CheckParamString(2)
-		)
+	)
 	{
 		return 0;
 	}
@@ -3247,7 +3245,7 @@ static int tolua_cChatMessageBuilder_SetInsertionText(lua_State * tolua_S)
 		return 0;
 	}
 
-	// Add the part:
+	// Sets the insertion text
 	AString Text;
 	L.GetStackValue(2, Text);
 	self->SetInsertionText(Text);
@@ -3271,7 +3269,7 @@ static int tolua_cChatMessageBuilder_SetMessageType(lua_State * tolua_S)
 	if (
 		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
 		!L.CheckParamNumber(2)
-		)
+	)
 	{
 		return 0;
 	}
@@ -3591,11 +3589,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cChatMessageBuilder");
-			tolua_function(tolua_S, "AppendPart", tolua_cChatMessageBuilder_AppendPart);
-			tolua_function(tolua_S, "SetClickEvent", tolua_cChatMessageBuilder_SetClickEvent);
-			tolua_function(tolua_S, "SetHoverEvent", tolua_cChatMessageBuilder_SetHoverEvent);
+			tolua_function(tolua_S, "AppendPart",       tolua_cChatMessageBuilder_AppendPart);
+			tolua_function(tolua_S, "SetClickEvent",    tolua_cChatMessageBuilder_SetClickEvent);
+			tolua_function(tolua_S, "SetHoverEvent",    tolua_cChatMessageBuilder_SetHoverEvent);
 			tolua_function(tolua_S, "SetInsertionText", tolua_cChatMessageBuilder_SetInsertionText);
-			tolua_function(tolua_S, "SetMessageType", tolua_cChatMessageBuilder_SetMessageType);
+			tolua_function(tolua_S, "SetMessageType",   tolua_cChatMessageBuilder_SetMessageType);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");

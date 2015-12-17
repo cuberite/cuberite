@@ -1,5 +1,5 @@
 
-// ChatMessage.cpp
+// ChatMessageBuilder.cpp
 
 // Implements the ChatMessage class used to wrap a chat message with multiple parts (text, url, run/sugest cmd, hover text)
 
@@ -11,7 +11,7 @@
 
 void cChatMessageBuilder::AppendPart(const AString & a_Text)
 {
-	m_Parts.push_back(new cChatMessageBuilder::cChatMessagePart(a_Text));
+	m_Parts.push_back(new cChatMessagePart(a_Text));
 }
 
 
@@ -20,7 +20,7 @@ void cChatMessageBuilder::AppendPart(const AString & a_Text)
 
 void cChatMessageBuilder::SetClickEvent(const AString & a_Action, const AString & a_Text)
 {
-	cChatMessagePart * Part = m_Parts.back();
+	auto & Part = m_Parts.back();
 	Part->m_ClickAction = a_Action;
 	Part->m_ClickText = a_Text;
 }
@@ -31,7 +31,7 @@ void cChatMessageBuilder::SetClickEvent(const AString & a_Action, const AString 
 
 void cChatMessageBuilder::SetHoverEvent(const AString & a_Action, const AString & a_Text)
 {
-	cChatMessagePart * Part = m_Parts.back();
+	auto & Part = m_Parts.back();
 	Part->m_HoverAction = a_Action;
 	Part->m_HoverText = a_Text;
 }
@@ -42,7 +42,7 @@ void cChatMessageBuilder::SetHoverEvent(const AString & a_Action, const AString 
 
 void cChatMessageBuilder::SetInsertionText(const AString & a_Text)
 {
-	cChatMessagePart * Part = m_Parts.back();
+	auto & Part = m_Parts.back();
 	Part->m_InsertionText = a_Text;
 }
 
@@ -108,9 +108,8 @@ cChatMessageBuilder::~cChatMessageBuilder()
 
 void cChatMessageBuilder::Clear(void)
 {
-	for (auto Part : m_Parts)
-	{
-		delete Part;
-	}  // for itr - m_Parts[]
 	m_Parts.clear();
+
+	// Add a empty part
+	m_Parts.push_back(new cChatMessagePart(""));
 }

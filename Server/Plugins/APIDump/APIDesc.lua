@@ -676,7 +676,7 @@ end</pre>
 		cChatMessageBuilder =
 		{
 			Desc = [[
-				Encapsulates a chat message that can contain various formatting, URLs, commands executed on click,
+				Builds a chat message that can contain various formatting, URLs, commands executed on click,
 				commands suggested on click, text inserted on shift click and text to show if the mouse is over text. The chat
 				message can be sent by the regular chat-sending functions,
 				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
@@ -685,7 +685,7 @@ end</pre>
 				object and then return the object itself, so that they can be chained one after another. See the
 				Chaining example below for details.</p>
 				<p>
-				Colors and Style can be directly used in the text with {cChatColor|cChatColor}. See the Chaining example.
+				Colors and Style can be directly used in the text with {{cChatColor}}. See the Chaining example.
 			]],
 			Functions =
 			{
@@ -722,13 +722,13 @@ end</pre>
 function OnPlayerJoined(a_Player)
 	-- Send an example chat message to the player:
 		a_Player:SendMessage(cChatMessageBuilder()
-		:AppendPart("Hello, " .. cChatColor.Green .. cChatColor.Underlined .. a_Player:GetName())
-		:SetClickEvent("open_url", "http://www.cuberite.org")
-		:AppendPart(cChatColor.Underlined .. ", and welcome.")
-		:SetClickEvent("suggest_command", "/help")
-		:AppendPart(" SetDay")
-		:SetClickEvent("run_command", "/time set 0")
-		:SetMessageType(mtJoin)
+			:AppendPart("Hello, " .. cChatColor.Green .. cChatColor.Underlined .. a_Player:GetName())
+				:SetClickEvent("open_url", "http://www.cuberite.org")
+			:AppendPart(cChatColor.Underlined .. ", and welcome.")
+				:SetClickEvent("suggest_command", "/help")
+			:AppendPart(" SetDay")
+				:SetClickEvent("run_command", "/time set 0")
+				:SetMessageType(mtJoin)
 	)
 end</pre>
 					]],
