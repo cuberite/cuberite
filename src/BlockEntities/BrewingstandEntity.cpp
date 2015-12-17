@@ -92,10 +92,10 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return false;
 	}
 
-	const cBrewingRecipes::cRecipe * Recipe = nullptr;
 	// The necessary brewing time, has been reached
 	if (m_TimeBrewed >= m_NeedBrewingTime)
 	{
+		const cBrewingRecipes::cRecipe * Recipe = nullptr;
 		BroadcastProgress(0, 0);
 		m_IsBrewing = false;
 		m_TimeBrewed = 0;

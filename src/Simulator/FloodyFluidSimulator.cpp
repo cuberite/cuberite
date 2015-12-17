@@ -88,9 +88,9 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	// If this is a source block or was falling, the new meta is just the falloff
 	// Otherwise it is the current meta plus falloff (may be larger than max height, will be checked later)
 	NIBBLETYPE NewMeta = ((MyMeta == 0) || ((MyMeta & 0x08) != 0)) ? m_Falloff : (MyMeta + m_Falloff);
-	bool SpreadFurther = true;
 	if (a_RelY > 0)
 	{
+		bool SpreadFurther = true;
 		BLOCKTYPE Below = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 		if (IsPassableForFluid(Below) || IsBlockLava(Below) || IsBlockWater(Below))
 		{

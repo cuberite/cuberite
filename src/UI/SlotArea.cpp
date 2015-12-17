@@ -1068,10 +1068,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	m_StackSizeToBeUsedInRepair = 0;
 	int RepairCost = Input.m_RepairCost;
 	int NeedExp = 0;
-	bool IsEnchantBook = false;
 	if (!SecondInput.IsEmpty())
 	{
-		IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+		bool IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
 		
 		RepairCost += SecondInput.m_RepairCost;
 		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
