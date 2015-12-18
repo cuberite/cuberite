@@ -110,7 +110,12 @@ bool cParsedNBT::ReadCompound(void)
 	for (;;)
 	{
 		NEEDBYTES(1);
-		eTagType TagType = static_cast<eTagType>(m_Data[m_Pos]);
+		const char TagTypeNum = m_Data[m_Pos];
+		if ((TagTypeNum < TAG_Min) || (TagTypeNum > TAG_Max))
+		{
+			return false;
+		}
+		eTagType TagType = static_cast<eTagType>(TagTypeNum);
 		m_Pos++;
 		if (TagType == TAG_End)
 		{
@@ -258,7 +263,6 @@ bool cParsedNBT::ReadTag(void)
 		#endif
 		case TAG_Min:
 		{
-			ASSERT(!"Unhandled NBT tag type");
 			return false;
 		}
 	}  // switch (iType)
