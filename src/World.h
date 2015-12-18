@@ -55,6 +55,7 @@ class cFurnaceEntity;
 class cNoteEntity;
 class cMobHeadEntity;
 class cCompositeChat;
+class cChatMessageBuilder;
 class cCuboid;
 class cSetChunkData;
 class cBroadcaster;
@@ -187,6 +188,7 @@ public:
 	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
 	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtDeath); }
 	void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastChat       (const cChatMessageBuilder & a_Message, const cClientHandle * a_Exclude = nullptr);
 	// tolua_end
 
 	void BroadcastCollectEntity              (const cEntity & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
