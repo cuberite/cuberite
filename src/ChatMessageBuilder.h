@@ -18,8 +18,7 @@ public:
 	class cChatMessagePart
 	{
 	public:
-		cChatMessagePart() :
-			m_Text("")
+		cChatMessagePart()
 		{
 		}
 
@@ -29,7 +28,7 @@ public:
 		}
 
 
-		~cChatMessagePart() {};
+		~cChatMessagePart() {}
 
 		AString m_Text;
 		AString m_InsertionText;
@@ -39,9 +38,10 @@ public:
 		AString m_ClickAction;
 	} ;
 
-	std::vector<cChatMessagePart *> m_Parts;
+	typedef std::unique_ptr<cChatMessagePart> cChatMessagePartPtr;
+	typedef std::vector<cChatMessagePartPtr> cParts;
 
-	// cParts m_Parts;
+	cParts m_Parts;
 
 	// tolua_begin
 
@@ -49,14 +49,14 @@ public:
 	cChatMessageBuilder() :
 		m_MessageType(mtCustom)
 	{
-		m_Parts.push_back(new cChatMessagePart());
+		m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(""))));
 	}
 
 	/** Adds a cChatMessagePart with text. */
 	cChatMessageBuilder(AString & a_Text) :
 		m_MessageType(mtCustom)
 	{
-		m_Parts.push_back(new cChatMessagePart(a_Text));
+		m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(a_Text))));
 	}
 
 	~cChatMessageBuilder();

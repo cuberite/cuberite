@@ -721,14 +721,14 @@ end</pre>
 <pre class="prettyprint lang-lua">
 function OnPlayerJoined(a_Player)
 	-- Send an example chat message to the player:
-		a_Player:SendMessage(cChatMessageBuilder()
-			:AppendPart("Hello, " .. cChatColor.Green .. cChatColor.Underlined .. a_Player:GetName())
-				:SetClickEvent("open_url", "http://www.cuberite.org")
-			:AppendPart(cChatColor.Underlined .. ", and welcome.")
-				:SetClickEvent("suggest_command", "/help")
-			:AppendPart(" SetDay")
-				:SetClickEvent("run_command", "/time set 0")
-				:SetMessageType(mtJoin)
+	a_Player:SendMessage(cChatMessageBuilder()
+		:AppendPart("Hello, " .. cChatColor.Green .. cChatColor.Underlined .. a_Player:GetName())
+			:SetClickEvent("open_url", "http://www.cuberite.org")
+		:AppendPart(cChatColor.Underlined .. ", and welcome.")
+			:SetClickEvent("suggest_command", "/help")
+		:AppendPart(" SetDay")
+			:SetClickEvent("run_command", "/time set 0")
+			:SetMessageType(mtJoin)
 	)
 end</pre>
 					]],

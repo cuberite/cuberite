@@ -1,7 +1,7 @@
 
 // ChatMessageBuilder.cpp
 
-// Implements the ChatMessage class used to wrap a chat message with multiple parts (text, url, run/sugest cmd, hover text)
+// Implements the ChatMessage class used to wrap a chat message with multiple parts (text, url, run / suggest cmd, hover text)
 
 #include "Globals.h"
 #include "ChatMessageBuilder.h"
@@ -11,7 +11,7 @@
 
 void cChatMessageBuilder::AppendPart(const AString & a_Text)
 {
-	m_Parts.push_back(new cChatMessagePart(a_Text));
+	m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(a_Text))));
 }
 
 
@@ -54,26 +54,26 @@ AString cChatMessageBuilder::CreateJsonString(bool a_ShouldUseChatPrefixes) cons
 {
 	Json::Value msg;
 	msg["text"] = cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData());  // The client crashes without this field being present
-	for (auto ChatMessagePart : m_Parts)
+	for (auto & ChatMessagePart : m_Parts)
 	{
 		Json::Value Part;
 		Part["text"] = ChatMessagePart->m_Text;
 
-		if (ChatMessagePart->m_ClickAction != "")
+		if (!ChatMessagePart->m_ClickAction.empty())
 		{
 			Json::Value Click;
 			Click["action"] = ChatMessagePart->m_ClickAction;
 			Click["value"] = ChatMessagePart->m_ClickText;
 			Part["clickEvent"] = Click;
 		}
-		if (ChatMessagePart->m_HoverAction != "")
+		if (!ChatMessagePart->m_HoverAction.empty())
 		{
 			Json::Value Hover;
 			Hover["action"] = ChatMessagePart->m_HoverAction;
 			Hover["value"] = ChatMessagePart->m_HoverText;
 			Part["hoverEvent"] = Hover;
 		}
-		if (ChatMessagePart->m_InsertionText != "")
+		if (!ChatMessagePart->m_HoverAction.empty())
 		{
 			Part["insertion"] = ChatMessagePart->m_InsertionText;
 		}
@@ -111,5 +111,5 @@ void cChatMessageBuilder::Clear(void)
 	m_Parts.clear();
 
 	// Add a empty part
-	m_Parts.push_back(new cChatMessagePart(""));
+	m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(""))));
 }
