@@ -691,10 +691,11 @@ end</pre>
 			{
 				constructor =
 				{
-					{ Params = "", Return = "", Notes = "Creates a ChatMessageBuilder." },
+					{ Params = "", Return = "", Notes = "Creates a ChatMessageBuilder with empty text." },
+					{ Params = "Text", Return = "", Notes = "Creates a ChatMessageBuilder with the param text." },
 				},
 				AppendPart = { Params = "Text", Return = "self", Notes = "Adds a text. Chaining." },
-				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
+				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object." },
 				CreateJsonString = { Params = "[AddPrefixes]", Return = "string", Notes = "Returns the entire object serialized into JSON, as it would be sent to a client. AddPrefixes specifies whether the chat prefixes should be prepended to the message, true by default." },
 				SetClickEvent =
 				{ 

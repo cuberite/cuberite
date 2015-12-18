@@ -41,22 +41,13 @@ public:
 	typedef std::unique_ptr<cChatMessagePart> cChatMessagePartPtr;
 	typedef std::vector<cChatMessagePartPtr> cParts;
 
-	cParts m_Parts;
-
 	// tolua_begin
 
-	/** Adds a cChatMessagePart with empty text. */
-	cChatMessageBuilder() :
+	/** Adds a cChatMessagePart with (empty) text. */
+	cChatMessageBuilder(const AString & a_Text = "") :
 		m_MessageType(mtCustom)
 	{
-		m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(""))));
-	}
-
-	/** Adds a cChatMessagePart with text. */
-	cChatMessageBuilder(AString & a_Text) :
-		m_MessageType(mtCustom)
-	{
-		m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(a_Text))));
+		m_Parts.push_back(std::move(cChatMessagePartPtr(cpp14::make_unique<cChatMessagePart>(a_Text))));
 	}
 
 	~cChatMessageBuilder();
@@ -99,6 +90,9 @@ public:
 	Takes optional AdditionalMessageTypeData to set m_AdditionalMessageTypeData. See said variable for more documentation. */
 	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData = "");
 protected:
+	/** This will never be empy, it will always contains one part. */
+	cParts m_Parts;
+
 	/** The message type, as indicated by prefixes. */
 	eMessageType m_MessageType;
 

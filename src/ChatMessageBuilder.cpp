@@ -11,7 +11,7 @@
 
 void cChatMessageBuilder::AppendPart(const AString & a_Text)
 {
-	m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(a_Text))));
+	m_Parts.push_back(std::move(cChatMessagePartPtr(cpp14::make_unique<cChatMessagePart>(a_Text))));
 }
 
 
@@ -77,7 +77,7 @@ AString cChatMessageBuilder::CreateJsonString(bool a_ShouldUseChatPrefixes) cons
 		{
 			Part["insertion"] = ChatMessagePart->m_InsertionText;
 		}
-		msg["extra"].append(Part);
+		msg["extra"].append(std::move(Part));
 	}
 
 	return msg.toStyledString();
@@ -111,5 +111,5 @@ void cChatMessageBuilder::Clear(void)
 	m_Parts.clear();
 
 	// Add a empty part
-	m_Parts.push_back(std::move(cChatMessagePartPtr(new cChatMessagePart(""))));
+	m_Parts.push_back(std::move(cChatMessagePartPtr(cpp14::make_unique<cChatMessagePart>(""))));
 }
