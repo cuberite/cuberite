@@ -786,7 +786,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 				cf:write("<a name='", group.Name, "'><p>");
 				cf:write(LinkifyString(group.TextBefore or "", Source));
 				WriteConstantTable(group.Constants, a_InheritedName or a_ClassAPI.Name);
-				cf:write(LinkifyString(group.TextAfter or "", Source), "</a></p>");
+				cf:write(LinkifyString(group.TextAfter or "", Source), "</a></p><hr/>");
 			end
 		end
 	end

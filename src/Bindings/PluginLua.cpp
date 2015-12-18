@@ -667,16 +667,20 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 	{
 		switch (a_Source)
 		{
-			case esOther:            m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-			case esPrimedTNT:        m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>(a_SourceData), cLuaState::Return, res); break;
-			case esMonster:          m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>(a_SourceData), cLuaState::Return, res); break;
-			case esBed:              m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>(a_SourceData), cLuaState::Return, res); break;
-			case esEnderCrystal:     m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>(a_SourceData), cLuaState::Return, res); break;
-			case esGhastFireball:    m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-			case esWitherSkullBlack:
-			case esWitherSkullBlue:  m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-			case esWitherBirth:      m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
-			case esPlugin:           m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
+			case esBed:           m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res); break;
+			case esEnderCrystal:  m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cEntity *>             (a_SourceData), cLuaState::Return, res); break;
+			case esGhastFireball: m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res); break;
+			case esMonster:       m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esOther:         m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
+			case esPlugin:        m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
+			case esPrimedTNT:     m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
+			case esWitherBirth:   m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esWitherSkull:   m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
+			case esMax:
+			{
+				ASSERT(!"Invalid explosion source");
+				return false;
+			}
 		}
 		if (res)
 		{
@@ -703,16 +707,20 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 	{
 		switch (a_Source)
 		{
-			case esOther:            m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esPrimedTNT:        m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>(a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esMonster:          m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>(a_SourceData),   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esBed:              m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>(a_SourceData),   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esEnderCrystal:     m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>(a_SourceData),   cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esGhastFireball:    m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherSkullBlack:
-			case esWitherSkullBlue:  m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherBirth:      m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esPlugin:           m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esBed:           m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esEnderCrystal:  m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cEntity *>             (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esGhastFireball: m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esMonster:       m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esOther:         m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esPlugin:        m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esPrimedTNT:     m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherBirth:   m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherSkull:   m_LuaState.Call(static_cast<int>(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esMax:
+			{
+				ASSERT(!"Invalid explosion source");
+				return false;
+			}
 		}
 		if (res)
 		{

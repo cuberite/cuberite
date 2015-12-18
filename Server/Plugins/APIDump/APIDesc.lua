@@ -2858,6 +2858,18 @@ end
 				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
 				md5 = {Params = "string", Return = "string", Notes = "<b>OBSOLETE</b>, use the {{cCryptoHash}} functions instead.<br>Converts a string to a raw binary md5 hash."},
 			},
+			Constants =
+			{
+				esBed = { Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed." },
+				esEnderCrystal = { Notes = "An ender crystal entity explosion. The SourceData param is the {{cEntity|ender crystal entity}} object." },
+				esGhastFireball = { Notes = "A ghast fireball explosion. The SourceData param is the {{cGhastFireballEntity|ghast fireball entity}} object." },
+				esMonster = { Notes = "A monster explosion (creeper). The SourceData param is the {{cMonster|monster entity}} object." },
+				esOther = { Notes = "Any other explosion. The SourceData param is unused." },
+				esPlugin = { Notes = "An explosion started by a plugin, without any further information. The SourceData param is unused. "},
+				esPrimedTNT = { Notes = "A TNT explosion. The SourceData param is the {{cTNTEntity|TNT entity}} object."},
+				esWitherBirth = { Notes = "An explosion at a wither's birth. The SourceData param is the {{cMonster|wither entity}} object." },
+				esWitherSkull = { Notes = "A wither skull explosion. The SourceData param is the {{cWitherSkullEntity|wither skull entity}} object." },
+			},
 			ConstantGroups =
 			{
 				BlockTypes =
@@ -2961,7 +2973,7 @@ end
 						These constants are used to differentiate the various sources of explosions. They are used in
 						the {{OnExploded|HOOK_EXPLODED}} hook, {{OnExploding|HOOK_EXPLODING}} hook and in the
 						{{cWorld}}:DoExplosionAt() function. These constants also dictate the type of the additional
-						data provided with the explosions, such as the exploding {{cCreeper|creeper}} entity or the
+						data provided with the explosions, such as the exploding creeper {{cEntity|entity}} or the
 						{{Vector3i|coords}} of the exploding bed.
 					]],
 				},
@@ -3037,6 +3049,7 @@ end
 		"cHopperEntity.__cBlockEntityWindowOwner__",
 		"cLuaWindow.__cItemGrid__cListener__",
 		"Globals._CuberiteInternal_.*",  -- Ignore all internal Cuberite constants
+		"Globals.esMax",
 	},
 
 	IgnoreVariables =
