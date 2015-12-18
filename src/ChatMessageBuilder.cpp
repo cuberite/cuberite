@@ -73,7 +73,7 @@ AString cChatMessageBuilder::CreateJsonString(bool a_ShouldUseChatPrefixes) cons
 			Hover["value"] = ChatMessagePart->m_HoverText;
 			Part["hoverEvent"] = Hover;
 		}
-		if (!ChatMessagePart->m_HoverAction.empty())
+		if (!ChatMessagePart->m_InsertionText.empty())
 		{
 			Part["insertion"] = ChatMessagePart->m_InsertionText;
 		}
