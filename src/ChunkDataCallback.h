@@ -52,26 +52,6 @@ public:
 
 
 
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a buffer */
-class cChunkDataCollector :
-	public cChunkDataCallback
-{
-public:
-
-	cChunkData m_BlockData;
-
-protected:
-
-	virtual void ChunkData(const cChunkData & a_BlockData) override
-	{
-		m_BlockData = a_BlockData.Copy();
-	}
-};
-
-
-
-
-
 /** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer */
 class cChunkDataArrayCollector :
 	public cChunkDataCallback
