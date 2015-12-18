@@ -91,7 +91,7 @@ bool cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringLen)
 	NEEDBYTES(2);
 	a_StringStart = m_Pos + 2;
 	a_StringLen = static_cast<size_t>(GetBEShort(m_Data + m_Pos));
-	NEEDBYTES(a_StringLen);
+	NEEDBYTES(2 + a_StringLen);
 	m_Pos += 2 + a_StringLen;
 	return true;
 }
