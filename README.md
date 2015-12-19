@@ -7,7 +7,7 @@ Cuberite can run on Windows, *nix and Android operating systems. This includes A
 
 We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 
-Subscribe to [the newsletter](http://newsletter.cuberite.org/subscribe.htm) for important updates and project news.
+Subscribe to [the newsletter](https://newsletter.cuberite.org/subscribe.htm) for important updates and project news.
 
 Installation
 ------------
