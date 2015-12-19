@@ -991,7 +991,7 @@ cLuaState::cStackValue cLuaState::WalkToNamedGlobal(const AString & a_Name)
 		lua_pop(m_LuaState, 1);
 		return cStackValue();
 	}
-	return std::move(cStackValue(*this));
+	return cStackValue(*this);
 }
 
 

@@ -42,7 +42,7 @@ public:
 		LOGD("Evaluating explodinator the trinitrotoluene (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 		if (a_PoweringData.PowerLevel != 0)
 		{
-			m_World.BroadcastSoundEffect("game.tnt.primed", (double)a_Position.x, (double)a_Position.y, (double)a_Position.z, 0.5f, 0.6f);
+			m_World.BroadcastSoundEffect("game.tnt.primed", static_cast<double>(a_Position.x), static_cast<double>(a_Position.y), static_cast<double>(a_Position.z), 0.5f, 0.6f);
 			m_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, E_BLOCK_AIR, 0);
 			m_World.SpawnPrimedTNT(a_Position.x + 0.5, a_Position.y + 0.5, a_Position.z + 0.5);  // 80 ticks to boom
 		}

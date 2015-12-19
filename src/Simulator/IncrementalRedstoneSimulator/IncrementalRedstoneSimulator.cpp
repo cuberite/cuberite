@@ -124,7 +124,7 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 			continue;
 		}
 
-		auto CurrentHandler = std::move(cIncrementalRedstoneSimulator::CreateComponent(m_World, CurrentBlock, &m_Data));
+		auto CurrentHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, CurrentBlock, &m_Data);
 		if (CurrentHandler == nullptr)
 		{
 			continue;
@@ -141,7 +141,7 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 			}
 			m_World.GetBlockTypeMeta(Location.x, Location.y, Location.z, PotentialBlock, PotentialMeta);
 
-			auto PotentialSourceHandler = std::move(cIncrementalRedstoneSimulator::CreateComponent(m_World, PotentialBlock, &m_Data));
+			auto PotentialSourceHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, PotentialBlock, &m_Data);
 			if (PotentialSourceHandler == nullptr)
 			{
 				continue;

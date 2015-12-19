@@ -37,7 +37,7 @@ public:
 		cVector3iArray RelativePositions;
 		bool IsYPTerracingBlocked = cBlockInfo::IsSolid(m_World.GetBlock(a_Position + OffsetYP()));
 
-		for (const auto Adjacent : GetRelativeLaterals())
+		for (const auto & Adjacent : GetRelativeLaterals())
 		{
 			if (
 				!IsYPTerracingBlocked &&
