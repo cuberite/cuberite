@@ -767,7 +767,7 @@ int cRoot::GetVirtualRAMUsage(void)
 		}
 		return -1;
 	#elif defined(__linux__)
-		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
 		std::ifstream StatFile("/proc/self/status");
 		if (!StatFile.good())
 		{
@@ -785,7 +785,7 @@ int cRoot::GetVirtualRAMUsage(void)
 		}
 		return -1;
 	#elif defined (__APPLE__)
-		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
 		struct task_basic_info t_info;
 		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
@@ -819,7 +819,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 		}
 		return -1;
 	#elif defined(__linux__)
-		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
 		std::ifstream StatFile("/proc/self/status");
 		if (!StatFile.good())
 		{
@@ -837,7 +837,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 		}
 		return -1;
 	#elif defined (__APPLE__)
-		// Code adapted from http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
 		struct task_basic_info t_info;
 		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 

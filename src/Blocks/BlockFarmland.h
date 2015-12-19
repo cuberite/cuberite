@@ -19,7 +19,7 @@
 class cBlockFarmlandHandler :
 	public cBlockHandler
 {
-	
+
 public:
 	cBlockFarmlandHandler(BLOCKTYPE a_BlockType) :
 		cBlockHandler(a_BlockType)
@@ -104,7 +104,7 @@ public:
 		}
 
 		// Search for water in a close proximity:
-		// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
+		// Ref.: http://minecraft.gamepedia.com/Farmland#Hydrated_Farmland_Tiles
 		// TODO: Rewrite this to use the chunk and its neighbors directly
 		cBlockArea Area;
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
@@ -139,7 +139,3 @@ public:
 		);
 	}
 } ;
-
-
-
-

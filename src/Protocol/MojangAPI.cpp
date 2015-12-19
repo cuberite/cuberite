@@ -67,7 +67,7 @@ static const AString & GetCACerts(void)
 
 		// Starfield G2 cert
 		// This is the data of the root certs for Starfield Technologies, the CA that used to sign sessionserver.mojang.com's cert
-		// Downloaded from http://certs.starfieldtech.com/repository/
+		// Downloaded from https://certs.starfieldtech.com/repository/
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIID3TCCAsWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBjzELMAkGA1UEBhMCVVMx\n"
 		"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT\n"
@@ -118,7 +118,7 @@ static const AString & GetCACerts(void)
 		"WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=\n"
 		"-----END CERTIFICATE-----\n"
 	);
-	
+
 	return Cert;
 }
 
@@ -152,7 +152,7 @@ cMojangAPI::sProfile::sProfile(
 		}
 	]
 	*/
-	
+
 	// Parse the Textures and TexturesSignature from the Profile:
 	if (!a_Properties.isArray())
 	{
@@ -272,7 +272,7 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 {
 	// Convert the playername to lowercase:
 	AString lcPlayerName = StrToLower(a_PlayerName);
-	
+
 	// Request the cache to query the name if not yet cached:
 	if (!a_UseOnlyCached)
 	{
@@ -280,7 +280,7 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 		PlayerNames.push_back(lcPlayerName);
 		CacheNamesToUUIDs(PlayerNames);
 	}
-	
+
 	// Retrieve from cache:
 	cCSLock Lock(m_CSNameToUUID);
 	cProfileMap::const_iterator itr = m_NameToUUID.find(lcPlayerName);
@@ -300,7 +300,7 @@ AString cMojangAPI::GetPlayerNameFromUUID(const AString & a_UUID, bool a_UseOnly
 {
 	// Normalize the UUID to lowercase short format that is used as the map key:
 	AString UUID = MakeUUIDShort(a_UUID);
-	
+
 	// Retrieve from caches:
 	{
 		cCSLock Lock(m_CSUUIDToProfile);
@@ -325,7 +325,7 @@ AString cMojangAPI::GetPlayerNameFromUUID(const AString & a_UUID, bool a_UseOnly
 		CacheUUIDToProfile(UUID);
 		return GetPlayerNameFromUUID(a_UUID, true);
 	}
-	
+
 	// No value found, none queried. Return an error:
 	return "";
 }
@@ -342,13 +342,13 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 	{
 		PlayerNames.push_back(StrToLower(*itr));
 	}  // for itr - a_PlayerNames[]
-	
+
 	// Request the cache to populate any names not yet contained:
 	if (!a_UseOnlyCached)
 	{
 		CacheNamesToUUIDs(PlayerNames);
 	}
-	
+
 	// Retrieve from cache:
 	size_t idx = 0;
 	AStringVector res;
@@ -367,7 +367,7 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 
 
 
-	
+
 
 void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID)
 {
@@ -475,7 +475,7 @@ AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 			// Already is a short UUID, only lowercase
 			return StrToLower(a_UUID);
 		}
-		
+
 		case 36:
 		{
 			// Remove the dashes from the string by appending together the parts between them:
@@ -507,7 +507,7 @@ AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 			// Already is a dashed UUID, only lowercase
 			return StrToLower(a_UUID);
 		}
-		
+
 		case 32:
 		{
 			// Insert dashes at the proper positions:
@@ -541,7 +541,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile    (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
-		
+
 		// Retrieve all entries:
 		{
 			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, DateTime FROM PlayerNameToUUID");
@@ -587,11 +587,11 @@ void cMojangAPI::SaveCachesToDisk(void)
 		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
-		
+
 		// Remove all entries:
 		db.exec("DELETE FROM PlayerNameToUUID");
 		db.exec("DELETE FROM UUIDToProfile");
-		
+
 		// Save all cache entries - m_PlayerNameToUUID:
 		Int64 LimitDateTime = time(nullptr) - MAX_AGE;
 		{
@@ -658,7 +658,7 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 			}
 		}  // for itr - a_PlayerNames[]
 	}  // Lock(m_CSNameToUUID)
-	
+
 	QueryNamesToUUIDs(NamesToQuery);
 }
 
@@ -720,7 +720,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 			continue;
 		}
 		Response.erase(0, idxHeadersEnd + 4);
-		
+
 		// Parse the returned string into Json:
 		Json::Reader reader;
 		if (!reader.parse(Response, root, false) || !root.isArray())
@@ -729,7 +729,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 			continue;
 		}
-	
+
 		// Store the returned results into cache:
 		Json::Value::UInt JsonCount = root.size();
 		Int64 Now = time(nullptr);
@@ -748,7 +748,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 				NotifyNameUUID(JsonName, JsonUUID);
 			}  // for idx - root[]
 		}  // cCSLock (m_CSNameToUUID)
-		
+
 		// Also cache the UUIDToName:
 		{
 			cCSLock Lock(m_CSUUIDToName);
@@ -774,7 +774,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
 {
 	ASSERT(a_UUID.size() == 32);
-	
+
 	// Check if already present:
 	{
 		cCSLock Lock(m_CSUUIDToProfile);
@@ -783,7 +783,7 @@ void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
 			return;
 		}
 	}
-	
+
 	QueryUUIDToProfile(a_UUID);
 }
 
@@ -796,7 +796,7 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 	// Create the request address:
 	AString Address = m_UUIDToProfileAddress;
 	ReplaceString(Address, "%UUID%", a_UUID);
-	
+
 	// Create the HTTP request:
 	AString Request;
 	Request += "GET " + Address + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
@@ -832,7 +832,7 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 		return;
 	}
 	Response.erase(0, idxHeadersEnd + 4);
-	
+
 	// Parse the returned string into Json:
 	Json::Reader reader;
 	Json::Value root;
@@ -943,7 +943,3 @@ void cMojangAPI::Update(void)
 		}
 	}
 }
-
-
-
-
