@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 
 project (MCADefrag)
 
-# Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
+# Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
 include(../../SetFlags.cmake)
@@ -106,4 +106,3 @@ add_executable(MCADefrag
 )
 
 target_link_libraries(MCADefrag zlib)
-

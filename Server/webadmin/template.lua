@@ -25,7 +25,7 @@ function GetDefaultPage()
 
 	local SubTitle = "Current Game"
 	local Content = ""
-	
+
 	Content = Content .. "<h4>Plugins:</h4><ul>"
 	PM:ForEachPlugin(
 		function (a_CBPlugin)
@@ -34,16 +34,16 @@ function GetDefaultPage()
 			end
 		end
 	)
-	
+
 	Content = Content .. "</ul>"
 	Content = Content .. "<h4>Players:</h4><ul>"
-	
+
 	cRoot:Get():ForEachPlayer(
 		function(a_CBPlayer)
 			Content = Content .. "<li>" .. a_CBPlayer:GetName() .. "</li>"
 		end
 	)
-	
+
 	Content = Content .. "</ul><br>";
 
 	return Content, SubTitle
@@ -69,17 +69,17 @@ function ShowPage(WebAdmin, TemplateRequest)
 	if (PageContent == "") then
 		PageContent, SubTitle = GetDefaultPage()
 	end
-	
+
 	local reqParamsClass = ""
-	
+
 	for key,value in pairs(TemplateRequest.Request.Params) do
 		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
 	end
-	
+
 	if (string.gsub(reqParamsClass, "%s", "") == "") then
 		reqParamsClass = " no-param"
 	end
-	
+
 	Output([[
 <!-- Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 -->
 <html>
@@ -140,7 +140,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 		local TabNames = value:GetTabNames()
 		if (GetTableSize(TabNames) > 0) then
 			Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>"..PluginWebTitle.."</b></a></div>\n");
-			
+
 			for webname,prettyname in pairs(TabNames) do
 				Output("<div><a href='" .. BaseURL .. PluginWebTitle .. "/" .. webname .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. prettyname .. "</a></div>\n")
 			end
@@ -149,7 +149,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 		end
 	end
 
-	
+
 	Output([[
 								</td>
 							</tr>
@@ -179,9 +179,9 @@ function ShowPage(WebAdmin, TemplateRequest)
 			<ul class="menu bottom_links">
 				<li><a href="http://cuberite.org" target="_blank">Cuberite</a></li>
 				<li><a href="http://forum.mc-server.org" target="_blank">Forums</a></li>
-				<li><a href="http://builds.cuberite.org" target="_blank">Buildserver</a></li>
+				<li><a href="https://builds.cuberite.org" target="_blank">Buildserver</a></li>
 				<li><a href="http://api-docs.cuberite.org" target="_blank">API Documentation</a></li>
-				<li><a href="http://book.cuberite.org/" target="_blank">User's Manual</a></li>
+				<li><a href="https://book.cuberite.org/" target="_blank">User's Manual</a></li>
 			</ul>
 		</div>
 	</div>
@@ -195,6 +195,6 @@ function ShowPage(WebAdmin, TemplateRequest)
 </body>
 </html>
 ]])
-	
+
 	return table.concat(SiteContent)
 end

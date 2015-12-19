@@ -7,7 +7,7 @@
 
 inline unsigned int GetTime()
 {
-	// NB: For caveats, please see http://stackoverflow.com/a/14505248
+	// NB: For caveats, please see https://stackoverflow.com/a/14505248
 	return static_cast<unsigned int>(std::chrono::seconds(time(0)).count());
 }
 
