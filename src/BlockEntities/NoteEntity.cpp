@@ -44,7 +44,7 @@ void cNoteEntity::MakeSound(void)
 		{
 			// TODO: add other wood-based blocks if needed
 			instrument = E_INST_DOUBLE_BASS;
-			sampleName = "note.db";
+			sampleName = "note.bassattack";
 			break;
 		}
 		
@@ -76,7 +76,7 @@ void cNoteEntity::MakeSound(void)
 		{
 			// TODO: add other stone-based blocks if needed
 			instrument = E_INST_BASS_DRUM;
-			sampleName = "note.bassattack";
+			sampleName = "note.bd";
 			break;
 		}
 

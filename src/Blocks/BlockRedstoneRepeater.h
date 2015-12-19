@@ -110,6 +110,42 @@ public:
 		UNUSED(a_Meta);
 		return 11;
 	}
+
+
+	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
+		{
+			case 0x0: return {0, 0, 1};
+			case 0x1: return {-1, 0, 0};
+			case 0x2: return {0, 0, -1};
+			case 0x3: return {1, 0, 0};
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				return {0, 0, 0};
+			}
+		}
+	}
+
+
+	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
+		{
+			case 0x0: return {0, 0, -1};
+			case 0x1: return {1, 0, 0};
+			case 0x2: return {0, 0, 1};
+			case 0x3: return {-1, 0, 0};
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				return {0, 0, 0};
+			}
+		}
+	}
 } ;
 
 

@@ -1099,58 +1099,6 @@ bool cChunkMap::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
 
 
 
-void cChunkMap::FastSetBlocks(sSetBlockList & a_BlockList)
-{
-	sSetBlockList Failed;
-	
-	// Process all items from a_BlockList, either successfully or by placing into Failed
-	while (!a_BlockList.empty())
-	{
-		int ChunkX = a_BlockList.front().m_ChunkX;
-		int ChunkZ = a_BlockList.front().m_ChunkZ;
-		cCSLock Lock(m_CSLayers);
-		cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
-		if ((Chunk != nullptr) && Chunk->IsValid())
-		{
-			for (sSetBlockList::iterator itr = a_BlockList.begin(); itr != a_BlockList.end();)
-			{
-				if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
-				{
-					Chunk->FastSetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
-					itr = a_BlockList.erase(itr);
-				}
-				else
-				{
-					++itr;
-				}
-			}  // for itr - a_BlockList[]
-		}
-		else
-		{
-			// The chunk is not valid, move all blocks within this chunk to Failed
-			for (sSetBlockList::iterator itr = a_BlockList.begin(); itr != a_BlockList.end();)
-			{
-				if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
-				{
-					Failed.push_back(*itr);
-					itr = a_BlockList.erase(itr);
-				}
-				else
-				{
-					++itr;
-				}
-			}  // for itr - a_BlockList[]
-		}
-	}
-	
-	// Return the failed:
-	std::swap(Failed, a_BlockList);
-}
-
-
-
-
-
 void cChunkMap::SetBlocks(const sSetBlockVector & a_Blocks)
 {
 	cCSLock lock(m_CSLayers);
@@ -1212,19 +1160,7 @@ BLOCKTYPE cChunkMap::GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
 
-	// First check if it isn't queued in the m_FastSetBlockQueue:
-	{
-		cCSLock Lock(m_CSFastSetBlock);
-		for (sSetBlockList::iterator itr = m_FastSetBlockQueue.begin(); itr != m_FastSetBlockQueue.end(); ++itr)
-		{
-			if ((itr->m_RelX == X) && (itr->m_RelY == Y) && (itr->m_RelZ == Z) && (itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
-			{
-				return itr->m_BlockType;
-			}
-		}  // for itr - m_FastSetBlockQueue[]
-	}
-
-	// Not in the queue, query the chunk, if loaded:
+	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
@@ -1244,19 +1180,7 @@ NIBBLETYPE cChunkMap::GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
 
-	// First check if it isn't queued in the m_FastSetBlockQueue:
-	{
-		cCSLock Lock(m_CSFastSetBlock);
-		for (sSetBlockList::iterator itr = m_FastSetBlockQueue.begin(); itr != m_FastSetBlockQueue.end(); ++itr)
-		{
-			if ((itr->m_RelX == X) && (itr->m_RelY == Y) && (itr->m_RelZ == Z) && (itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
-			{
-				return itr->m_BlockMeta;
-			}
-		}  // for itr - m_FastSetBlockQueue[]
-	}
-
-	// Not in the queue, query the chunk, if loaded:
+	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
@@ -1340,23 +1264,6 @@ void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_B
 		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
 	}
 	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
-void cChunkMap::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
-{
-	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
-
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
-	if ((Chunk != nullptr) && Chunk->IsValid())
-	{
-		Chunk->QueueSetBlock(X, Y, Z, a_BlockType, a_BlockMeta, a_Tick, a_PreviousBlockType);
-	}
 }
 
 
@@ -3187,28 +3094,14 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 
 void cChunkMap::FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	cCSLock Lock(m_CSFastSetBlock);
-	m_FastSetBlockQueue.push_back(sSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta));
-}
+	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
 
-
-
-
-
-void cChunkMap::FastSetQueuedBlocks()
-{
-	// Asynchronously set blocks:
-	sSetBlockList FastSetBlockQueueCopy;
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
+	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
-		cCSLock Lock(m_CSFastSetBlock);
-		std::swap(FastSetBlockQueueCopy, m_FastSetBlockQueue);
-	}
-	this->FastSetBlocks(FastSetBlockQueueCopy);
-	if (!FastSetBlockQueueCopy.empty())
-	{
-		// Some blocks failed, store them for next tick:
-		cCSLock Lock(m_CSFastSetBlock);
-		m_FastSetBlockQueue.splice(m_FastSetBlockQueue.end(), FastSetBlockQueueCopy);
+		Chunk->FastSetBlock(X, Y, Z, a_BlockType, a_BlockMeta);
 	}
 }
 

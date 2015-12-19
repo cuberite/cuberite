@@ -11,7 +11,6 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-#include "RedstonePoweredEntity.h"
 
 
 
@@ -26,9 +25,6 @@ class cClientHandle;
 // tolua_begin
 class cDropSpenserEntity :
 	public cBlockEntityWithItems
-	// tolua_end
-	, public cRedstonePoweredEntity
-	// tolua_begin
 {
 	typedef cBlockEntityWithItems super;
 
@@ -60,13 +56,9 @@ public:
 	void Activate(void);
 	
 	// tolua_end
-	
-	/** Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate */
-	virtual void SetRedstonePower(bool a_IsPowered) override;
 
 protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick
-	bool m_IsPowered;         ///< Set to true when the dropspenser receives redstone power.
 	
 	/** Does the actual work on dropspensing an item. Chooses the slot, calls DropSpenseFromSlot() and handles smoke / sound effects */
 	void DropSpense(cChunk & a_Chunk);

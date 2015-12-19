@@ -38,14 +38,18 @@ public:
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
-		int delay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
-
-		a_ChunkInterface.QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07), delay, m_BlockType, a_WorldInterface);
-
-		a_Player->GetWorld()->ScheduleTask(delay, [x, y, z](cWorld & a_World)
-		{
-			a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
-		});
+		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		a_Player->GetWorld()->ScheduleTask(TickDelay, [x, y, z, a_BlockX, a_BlockY, a_BlockZ, this](cWorld & a_World)
+			{
+				if (a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == m_BlockType)
+				{
+					// Block hasn't change in the meantime; set its meta
+					a_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07);
+					a_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+					a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
+				}
+			}
+		);
 
 		return true;
 	}
@@ -128,6 +132,12 @@ public:
 	{
 		UNUSED(a_Meta);
 		return 0;
+	}
+
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsButtonOn(NIBBLETYPE a_BlockMeta)
+	{
+		return ((a_BlockMeta & 0x8) == 0x8);
 	}
 } ;
 

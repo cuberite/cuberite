@@ -74,17 +74,13 @@ cChestWindow::~cChestWindow()
 
 bool cChestWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 {
-	int ChunkX, ChunkZ;
-
 	m_PrimaryChest->SetNumberOfPlayers(m_PrimaryChest->GetNumberOfPlayers() - 1);
-	cChunkDef::BlockToChunk(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosZ(), ChunkX, ChunkZ);
-	m_PrimaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+	m_PrimaryChest->GetWorld()->WakeUpSimulators(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosY(), m_PrimaryChest->GetPosZ());
 
 	if (m_SecondaryChest != nullptr)
 	{
 		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() - 1);
-		cChunkDef::BlockToChunk(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosZ(), ChunkX, ChunkZ);
-		m_SecondaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+		m_SecondaryChest->GetWorld()->WakeUpSimulators(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosY(), m_SecondaryChest->GetPosZ());
 	}
 
 	cWindow::ClosedByPlayer(a_Player, a_CanRefuse);
@@ -97,17 +93,13 @@ bool cChestWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 
 void cChestWindow::OpenedByPlayer(cPlayer & a_Player)
 {
-	int ChunkX, ChunkZ;
-
 	m_PrimaryChest->SetNumberOfPlayers(m_PrimaryChest->GetNumberOfPlayers() + 1);
-	cChunkDef::BlockToChunk(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosZ(), ChunkX, ChunkZ);
-	m_PrimaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+	m_PrimaryChest->GetWorld()->WakeUpSimulators(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosY(), m_PrimaryChest->GetPosZ());
 
 	if (m_SecondaryChest != nullptr)
 	{
 		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() + 1);
-		cChunkDef::BlockToChunk(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosZ(), ChunkX, ChunkZ);
-		m_SecondaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+		m_SecondaryChest->GetWorld()->WakeUpSimulators(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosY(), m_SecondaryChest->GetPosZ());
 	}
 
 	cWindow::OpenedByPlayer(a_Player);

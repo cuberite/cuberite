@@ -10,7 +10,6 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "RedstonePoweredEntity.h"
 
 
 
@@ -19,8 +18,7 @@
 // tolua_begin
 
 class cCommandBlockEntity :
-	public cBlockEntity,
-	public cRedstonePoweredEntity
+	public cBlockEntity
 {
 	typedef cBlockEntity super;
 	
@@ -42,9 +40,6 @@ public:
 	void SetResult(const NIBBLETYPE a_Result);
 
 	// tolua_begin
-
-	/** Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate */
-	virtual void SetRedstonePower(bool a_IsPowered) override;
 
 	/** Sets the command block to execute a command in the next tick */
 	void Activate(void);
@@ -69,7 +64,6 @@ private:
 	void Execute();
 
 	bool m_ShouldExecute;
-	bool m_IsPowered;
 
 	AString m_Command;
 

@@ -392,14 +392,6 @@ public:
 		m_ChunkMap->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 	}
 	
-	/** Queues a SetBlock() with the specified parameters after the specified number of ticks.
-	Calls SetBlock(), so performs full processing of the replaced block.
-	*/
-	void QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR)
-	{
-		m_ChunkMap->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, GetWorldAge() + a_TickDelay, a_PreviousBlockType);
-	}
-	
 	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		return m_ChunkMap->GetBlock(a_BlockX, a_BlockY, a_BlockZ);

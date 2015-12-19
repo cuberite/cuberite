@@ -156,6 +156,12 @@ public:
 		UNUSED(a_Meta);
 		return 0;
 	}
+
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
+	{
+		return ((a_BlockMeta & 0x8) == 0x8);
+	}
 } ;
 
 

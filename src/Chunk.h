@@ -7,7 +7,7 @@
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/IncrementalRedstoneSimulator.h"
+#include "Simulator/RedstoneSimulator.h"
 
 #include "Blocks/GetHandlerCompileTimeTemplate.h"
 
@@ -49,7 +49,6 @@ class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
-class cRedstonePoweredEntity;
 class cSetChunkData;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
@@ -63,7 +62,6 @@ typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
 typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 typedef cItemCallback<cMobHeadEntity>      cMobHeadCallback;
 typedef cItemCallback<cFlowerPotEntity>    cFlowerPotCallback;
-typedef cItemCallback<cRedstonePoweredEntity> cRedstonePoweredCallback;
 
 
 
@@ -176,9 +174,6 @@ public:
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta); }
 	
-	/** Queues a block change till the specified world tick */
-	void QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
-	
 	/** Queues block for ticking (m_ToTickQueue) */
 	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
 	
@@ -279,8 +274,6 @@ public:
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
 	
-	/** Calls the callback for the redstone powered entity at the specified coords; returns false if there's no redstone powered entity at those coords, true if found */
-	bool DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cRedstonePoweredCallback & a_Callback);
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Lua-acessible
 
@@ -489,8 +482,6 @@ private:
 	std::vector<Vector3i> m_ToTickBlocks;
 	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 	
-	sSetBlockQueueVector m_SetBlockQueue;  ///< Block changes that are queued to a specific tick
-	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;
 	cEntityList                  m_Entities;
@@ -569,9 +560,6 @@ private:
 	
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(cEntity * a_Entity);
-	
-	/** Processes all blocks that have been scheduled for replacement by the QueueSetBlock() function */
-	void ProcessQueuedSetBlocks(void);
 };
 
 typedef cChunk * cChunkPtr;

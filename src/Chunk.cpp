@@ -605,9 +605,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
 	BroadcastPendingBlockChanges();
 
-	// Set all blocks that have been queued for setting later:
-	ProcessQueuedSetBlocks();
-
 	CheckBlocks();
 	
 	// Tick simulators:
@@ -720,50 +717,6 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	} Mover(a_Entity);
 	
 	m_ChunkMap->CompareChunkClients(this, Neighbor, Mover);
-}
-
-
-
-
-
-void cChunk::ProcessQueuedSetBlocks(void)
-{
-	Int64 CurrTick = m_World->GetWorldAge();
-	for (sSetBlockQueueVector::iterator itr = m_SetBlockQueue.begin(); itr != m_SetBlockQueue.end();)
-	{
-		if (itr->m_Tick <= CurrTick)
-		{
-			if (itr->m_PreviousType != E_BLOCK_AIR)  // PreviousType defaults to 0 if not specified
-			{
-				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
-				{
-					// Current world age is bigger than / equal to target world age - delay time reached AND
-					// Previous block type was the same as current block type (to prevent duplication)
-					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);  // SetMeta doesn't send to client
-					itr = m_SetBlockQueue.erase(itr);
-					LOGD("Successfully set queued block - previous and current types matched");
-				}
-				else
-				{
-					itr = m_SetBlockQueue.erase(itr);
-					LOGD("Failure setting queued block - previous and current blocktypes didn't match");
-				}
-			}
-			else
-			{
-				// Current world age is bigger than / equal to target world age - delay time reached
-				SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
-				itr = m_SetBlockQueue.erase(itr);
-				LOGD("Successfully set queued block - previous type ignored");
-			}
-		}
-		else
-		{
-			// Not yet
-			++itr;
-			continue;
-		}
-	}  // for itr - m_SetBlockQueue[]
 }
 
 
@@ -1505,15 +1458,6 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 
 
 
-void cChunk::QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
-{
-	m_SetBlockQueue.push_back(sSetBlockQueueItem(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta, a_Tick, a_PreviousBlockType));
-}
-
-
-
-
-
 void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
 	ASSERT (
@@ -2208,46 +2152,6 @@ bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 		}
 		
 		if (a_Callback.Item(*itr))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-	
-	// Not found:
-	return false;
-}
-
-
-
-
-
-bool cChunk::DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cRedstonePoweredCallback & a_Callback)
-{
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		switch ((*itr)->GetBlockType())
-		{
-			case E_BLOCK_DROPPER:
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_NOTE_BLOCK:
-			{
-				break;
-			}
-			default:
-			{
-				// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-				return false;
-			}
-		}
-		
-		if (a_Callback.Item(dynamic_cast<cRedstonePoweredEntity *>(*itr)))  // Needs dynamic_cast due to multiple inheritance
 		{
 			return false;
 		}
