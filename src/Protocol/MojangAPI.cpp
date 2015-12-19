@@ -195,7 +195,7 @@ public:
 	~cUpdateThread()
 	{
 		// Notify the thread that it should stop:
-		m_ShouldTerminate = true;
+		m_KeepRunning.clear();
 		m_evtNotify.Set();
 
 		// Wait for the thread to actually finish work:
@@ -217,7 +217,7 @@ protected:
 		do
 		{
 			m_MojangAPI.Update();
-		} while (!m_ShouldTerminate && !m_evtNotify.Wait(60 * 60 * 1000));  // Repeat every 60 minutes until termination request
+		} while (m_KeepRunning.test_and_set() && !m_evtNotify.Wait(60 * 60 * 1000));  // Repeat every 60 minutes until termination request
 	}
 } ;
 

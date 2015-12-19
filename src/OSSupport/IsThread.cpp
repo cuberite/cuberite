@@ -49,9 +49,9 @@
 // cIsThread:
 
 cIsThread::cIsThread(const AString & a_ThreadName) :
-	m_ShouldTerminate(false),
 	m_ThreadName(a_ThreadName)
 {
+	m_KeepRunning.test_and_set();
 }
 
 
@@ -60,7 +60,7 @@ cIsThread::cIsThread(const AString & a_ThreadName) :
 
 cIsThread::~cIsThread()
 {
-	m_ShouldTerminate = true;
+	m_KeepRunning.clear();
 	Wait();
 }
 
@@ -116,7 +116,7 @@ void cIsThread::Stop(void)
 		return;
 	}
 
-	m_ShouldTerminate = true;
+	m_KeepRunning.clear();
 	Wait();
 }
 

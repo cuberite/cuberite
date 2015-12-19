@@ -139,7 +139,7 @@ void cLightingThread::Stop(void)
 		}
 		m_Queue.clear();
 	}
-	m_ShouldTerminate = true;
+	m_KeepRunning.clear();
 	m_evtItemAdded.Set();
 	
 	Wait();
@@ -170,8 +170,13 @@ void cLightingThread::QueueChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cCh
 void cLightingThread::WaitForQueueEmpty(void)
 {
 	cCSLock Lock(m_CS);
-	while (!m_ShouldTerminate && (!m_Queue.empty() || !m_PendingQueue.empty()))
+	while ((!m_Queue.empty() || !m_PendingQueue.empty()))
 	{
+		if (!m_KeepRunning.test_and_set())
+		{
+			m_KeepRunning.clear();
+			return;
+		}
 		cCSUnlock Unlock(Lock);
 		m_evtQueueEmpty.Wait();
 	}
@@ -204,8 +209,9 @@ void cLightingThread::Execute(void)
 			}
 		}
 		
-		if (m_ShouldTerminate)
+		if (!m_KeepRunning.test_and_set())
 		{
+			m_KeepRunning.clear();
 			return;
 		}
 		
