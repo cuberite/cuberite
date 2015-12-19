@@ -17,6 +17,7 @@ In the descending class' constructor call the Start() method to start the thread
 
 #pragma once
 #include <thread>
+#include <atomic>
 
 
 
@@ -30,7 +31,7 @@ protected:
 	virtual void Execute(void) = 0;
 
 	/** The overriden Execute() method should check this value periodically and terminate if this is true. */
-	volatile bool m_ShouldTerminate;
+	std::atomic<bool> m_ShouldTerminate;
 
 public:
 	cIsThread(const AString & a_ThreadName);
