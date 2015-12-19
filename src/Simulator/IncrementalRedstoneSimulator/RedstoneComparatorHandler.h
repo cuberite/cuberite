@@ -46,7 +46,7 @@ public:
 		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x3);
 		m_World.DoWithBlockEntityAt(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, CCB);
 		auto RearPower = CCB.m_SignalStrength;
-		auto PotentialSourceHandler = std::move(cIncrementalRedstoneSimulator::CreateComponent(m_World, m_World.GetBlock(RearCoordinate), static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()));
+		auto PotentialSourceHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, m_World.GetBlock(RearCoordinate), static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData());
 		if (PotentialSourceHandler != nullptr)
 		{
 			BLOCKTYPE Type;
@@ -83,7 +83,7 @@ public:
 		UNUSED(a_BlockType);
 
 		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x3);
-		auto PotentialSourceHandler = std::move(cIncrementalRedstoneSimulator::CreateComponent(m_World, m_World.GetBlock(RearCoordinate), static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()));
+		auto PotentialSourceHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, m_World.GetBlock(RearCoordinate), static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData());
 		if (PotentialSourceHandler != nullptr)
 		{
 			BLOCKTYPE Type;
