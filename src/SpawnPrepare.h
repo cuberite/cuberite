@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <atomic>
+
 class cWorld;
 	
 
@@ -25,7 +27,7 @@ protected:
 	int m_MaxIdx;
 
 	/** Total number of chunks already finished preparing. Preparation finishes when this number reaches m_MaxIdx. */
-	int m_NumPrepared;
+	std::atomic<int> m_NumPrepared;
 
 	/** Event used to signal that the preparation is finished. */
 	cEvent m_EvtFinished;
