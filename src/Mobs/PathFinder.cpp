@@ -46,17 +46,17 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 	}
 
 	// If m_Path has not been initialized yet, initialize it.
-	if (!m_Path.IsValid())
+	if (!m_Path->IsValid())
 	{
 		ResetPathFinding(a_Chunk);
 	}
 
-	switch (m_Path.CalculationStep(a_Chunk))
+	switch (m_Path->CalculationStep(a_Chunk))
 	{
 		case ePathFinderStatus::NEARBY_FOUND:
 		{
 			m_NoPathToTarget = true;
-			m_PathDestination = m_Path.AcceptNearbyPath();
+			m_PathDestination = m_Path->AcceptNearbyPath();
 			if (a_DontCare)
 			{
 				m_FinalDestination = m_PathDestination;
@@ -89,7 +89,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 				return ePathFinderStatus::CALCULATING;
 			}
 
-			if (m_Path.NoMoreWayPoints())
+			if (m_Path->NoMoreWayPoints())
 			{
 				// We're always heading towards m_PathDestination.
 				// If m_PathDestination is exactly m_FinalDestination, then we're about to reach the destination.
@@ -108,10 +108,10 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 			}
 
 
-			if (m_Path.IsFirstPoint() || ((m_WayPoint - m_Source).SqrLength() < WAYPOINT_RADIUS))
+			if (m_Path->IsFirstPoint() || ((m_WayPoint - m_Source).SqrLength() < WAYPOINT_RADIUS))
 			{
 				// if the mob has just started or if the mob reached a waypoint, give them a new waypoint.
-				m_WayPoint = m_Path.GetNextPoint();
+				m_WayPoint = m_Path->GetNextPoint();
 				m_GiveUpCounter = 40;
 				return ePathFinderStatus::PATH_FOUND;
 			}
@@ -142,7 +142,7 @@ void cPathFinder::ResetPathFinding(cChunk &a_Chunk)
 	m_NoPathToTarget = false;
 	m_PathDestination = m_FinalDestination;
 	m_DeviationOrigin = m_PathDestination;
-	m_Path.Reset(a_Chunk, m_Source, m_PathDestination, 20, m_Width, m_Height);
+	m_Path.reset(new cPath(a_Chunk, m_Source, m_PathDestination, 20, m_Width, m_Height));
 }
 
 
@@ -248,7 +248,7 @@ bool cPathFinder::EnsureProperDestination(cChunk & a_Chunk)
 
 bool cPathFinder::PathIsTooOld() const
 {
-	size_t acceptableDeviation = m_Path.WayPointsLeft() / 2;
+	size_t acceptableDeviation = m_Path->WayPointsLeft() / 2;
 	if (acceptableDeviation == 0)
 	{
 		acceptableDeviation = 1;

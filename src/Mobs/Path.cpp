@@ -39,7 +39,34 @@ cPath::cPath(
 	m_Chunk(&a_Chunk),
 	m_BadChunkFound(false)
 {
-	ResetImpl(a_StartingPoint, a_EndingPoint, a_BoundingBoxWidth, a_BoundingBoxHeight);
+	// TODO: if src not walkable OR dest not walkable, then abort.
+	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
+
+	a_BoundingBoxWidth = 1;  // Until we improve physics, if ever.
+
+	m_BoundingBoxWidth = CeilC(a_BoundingBoxWidth);
+	m_BoundingBoxHeight = CeilC(a_BoundingBoxHeight);
+	m_HalfWidth = a_BoundingBoxWidth / 2;
+
+	int HalfWidthInt = FloorC(a_BoundingBoxWidth / 2);
+	m_Source.x = FloorC(a_StartingPoint.x - HalfWidthInt);
+	m_Source.y = FloorC(a_StartingPoint.y);
+	m_Source.z = FloorC(a_StartingPoint.z - HalfWidthInt);
+
+	m_Destination.x = FloorC(a_EndingPoint.x - HalfWidthInt);
+	m_Destination.y = FloorC(a_EndingPoint.y);
+	m_Destination.z = FloorC(a_EndingPoint.z - HalfWidthInt);
+
+	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
+	{
+		m_Status = ePathFinderStatus::PATH_NOT_FOUND;
+		return;
+	}
+
+	m_NearestPointToTarget = GetCell(m_Source);
+	m_Status = ePathFinderStatus::CALCULATING;
+
+	ProcessCell(GetCell(m_Source), nullptr, 0);
 }
 
 cPath::cPath() : m_IsValid(false)
@@ -470,64 +497,3 @@ cPathCell * cPath::GetCell(const Vector3i & a_Location)
 		return &m_Map[a_Location];
 	}
 }
-
-
-
-
-
-void cPath::ResetImpl(
-	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint,
-	double a_BoundingBoxWidth, double a_BoundingBoxHeight
-)
-{
-	// TODO: if src not walkable OR dest not walkable, then abort.
-	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
-
-	a_BoundingBoxWidth = 1;  // Until we improve physics, if ever.
-
-	m_BoundingBoxWidth = CeilC(a_BoundingBoxWidth);
-	m_BoundingBoxHeight = CeilC(a_BoundingBoxHeight);
-	m_HalfWidth = a_BoundingBoxWidth / 2;
-
-	int HalfWidthInt = FloorC(a_BoundingBoxWidth / 2);
-	m_Source.x = FloorC(a_StartingPoint.x - HalfWidthInt);
-	m_Source.y = FloorC(a_StartingPoint.y);
-	m_Source.z = FloorC(a_StartingPoint.z - HalfWidthInt);
-
-	m_Destination.x = FloorC(a_EndingPoint.x - HalfWidthInt);
-	m_Destination.y = FloorC(a_EndingPoint.y);
-	m_Destination.z = FloorC(a_EndingPoint.z - HalfWidthInt);
-
-	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
-	{
-		m_Status = ePathFinderStatus::PATH_NOT_FOUND;
-		return;
-	}
-
-	m_NearestPointToTarget = GetCell(m_Source);
-	m_Status = ePathFinderStatus::CALCULATING;
-
-	ProcessCell(GetCell(m_Source), nullptr, 0);
-}
-
-
-
-
-
-void cPath::Reset(
-	cChunk & a_Chunk,
-	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
-	double a_BoundingBoxWidth, double a_BoundingBoxHeight,
-	int a_MaxUp, int a_MaxDown
-)
-{
-	m_Map.clear();
-	m_OpenList = decltype(m_OpenList){};
-	m_StepsLeft = a_MaxSteps;
-	m_IsValid = true;
-	m_CurrentPoint = 0;  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
-	m_Chunk = &a_Chunk;
-	m_BadChunkFound = false;
-	ResetImpl(a_StartingPoint, a_EndingPoint, a_BoundingBoxWidth, a_BoundingBoxHeight);
-}
-
