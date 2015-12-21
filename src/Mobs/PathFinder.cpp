@@ -107,8 +107,12 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 				}
 			}
 
+			Vector3d Waypoint(m_WayPoint);
+			Vector3d Source(m_Source);
+			Waypoint.y = 0;
+			Source.y = 0;
 
-			if (m_Path->IsFirstPoint() || ((m_WayPoint - m_Source).SqrLength() < WAYPOINT_RADIUS))
+			if (m_Path->IsFirstPoint() || (((Waypoint - Source).SqrLength() < WAYPOINT_RADIUS) && (m_Source.y >= m_WayPoint.y)))
 			{
 				// if the mob has just started or if the mob reached a waypoint, give them a new waypoint.
 				m_WayPoint = m_Path->GetNextPoint();
