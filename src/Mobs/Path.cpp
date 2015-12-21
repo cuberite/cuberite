@@ -522,6 +522,7 @@ void cPath::Reset(
 )
 {
 	m_Map.clear();
+	m_PathPoints.clear();
 	m_OpenList = decltype(m_OpenList){};
 	m_StepsLeft = a_MaxSteps;
 	m_IsValid = true;
