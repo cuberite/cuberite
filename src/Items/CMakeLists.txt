@@ -13,6 +13,7 @@ SET (HDRS
 	ItemBed.h
 	ItemBigFlower.h
 	ItemBoat.h
+	ItemBottle.h
 	ItemBow.h
 	ItemBrewingStand.h
 	ItemBucket.h
