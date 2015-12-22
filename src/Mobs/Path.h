@@ -79,7 +79,7 @@ public:
 	/** delete default constructors */
 	cPath(const cPath & a_other) = delete;
 	cPath(cPath && a_other) = delete;
-	
+
 	cPath & operator=(const cPath & a_other) = delete;
 	cPath & operator=(cPath && a_other) = delete;
 
@@ -152,7 +152,7 @@ private:
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);
 	cPathCell * OpenListPop();
-	void ProcessIfWalkable(const Vector3i &a_Location, cPathCell * a_Parent, int a_Cost);
+	bool ProcessIfWalkable(const Vector3i &a_Location, cPathCell * a_Parent, int a_Cost);
 
 	/* Map management */
 	void ProcessCell(cPathCell * a_Cell,  cPathCell * a_Caller,  int a_GDelta);
@@ -181,6 +181,11 @@ private:
 	/* Interfacing with the world */
 	cChunk * m_Chunk;  // Only valid inside Step()!
 	bool m_BadChunkFound;
+
+	/* High level world queries */
+	bool IsWalkable(const Vector3i & a_Location);
+	bool BodyFitsIn(const Vector3i & a_Location);
+	bool HasSolidBelow(const Vector3i & a_Location);
 	#ifdef COMPILING_PATHFIND_DEBUGGER
 	#include "../path_irrlicht.cpp"
 	#endif
