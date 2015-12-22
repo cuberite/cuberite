@@ -194,7 +194,7 @@ local g_ViolationPatterns =
 
 	-- Check spaces around "==", "<=" and ">=":
 	{"==[a-zA-Z0-9]+",                             "Add space after =="},
-	{"[a-zA-Z0-9]+==",                             "Add space before =="},
+	{"[a-zA-Z0-9]+==[^\\]",                        "Add space before =="},
 	{"<=[a-zA-Z0-9]+",                             "Add space after <="},
 	{"[a-zA-Z0-9]+<=",                             "Add space before <="},
 	{">=[a-zA-Z0-9]+",                             "Add space after >="},
