@@ -16,3 +16,13 @@ add_test(NAME fastnbt-creatable-test COMMAND fastnbt-creatable-exe)
 add_executable(fastnbt-parse-exe Parse.cpp)
 target_link_libraries(fastnbt-parse-exe TestFastNBT)
 add_test(NAME fastnbt-parse-test COMMAND fastnbt-parse-exe)
+
+
+add_executable(fastnbt-readlist-exe ReadList.cpp)
+target_link_libraries(fastnbt-readlist-exe TestFastNBT)
+add_test(NAME fastnbt-readlist-test COMMAND fastnbt-readlist-exe)
+
+
+add_executable(fastnbt-readtag-exe ReadTag.cpp)
+target_link_libraries(fastnbt-readtag-exe TestFastNBT)
+add_test(NAME fastnbt-readtag-test COMMAND fastnbt-readtag-exe)

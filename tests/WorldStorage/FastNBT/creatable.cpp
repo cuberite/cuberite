@@ -2,6 +2,7 @@
 #include "WorldStorage/FastNBT.h"
 
 int main() {
-	cParsedNBT{};
-	cFastNBTWriter test{};
+	std::string test = "";
+	cParsedNBT reader{test.c_str(), test.size()};
+	cFastNBTWriter writer{};
 }
