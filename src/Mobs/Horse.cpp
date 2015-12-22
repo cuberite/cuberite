@@ -72,7 +72,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_bIsTame = true;
 		}
 	}
-	
+
 	if (m_bIsRearing)
 	{
 		if (m_RearTickCount == 20)
@@ -161,12 +161,12 @@ void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cHorse::InStateIdle(std::chrono::milliseconds a_Dt)
+void cHorse::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// If horse is tame and someone is sitting on it, don't walk around
 	if ((!m_bIsTame) || (m_Attachee == nullptr))
 	{
-		super::InStateIdle(a_Dt);
+		super::InStateIdle(a_Dt, a_Chunk);
 	}
 }
 

@@ -3,16 +3,11 @@
 #include "Path.h"
 
 #define WAYPOINT_RADIUS 0.5
-/*
-TODO DOXY style
 
-This class wraps cPath.
+/** This class wraps cPath.
 cPath is a "dumb device" - You give it point A and point B, and it returns a full path path.
 cPathFinder - You give it a constant stream of point A (where you are) and point B (where you want to go),
-and it tells you where to go next. It manages path recalculation internally, and is much more efficient that calling cPath every step.
-
-*/
-
+and it tells you where to go next. It manages path recalculation internally, and is much more efficient that calling cPath every step. */
 class cPathFinder
 {
 
@@ -80,16 +75,17 @@ private:
 	/** When a path is not found, this cooldown prevents any recalculations for several ticks. */
 	int m_NotFoundCooldown;
 
-	/** Ensures the destination is not buried underground or under water. Also ensures the destination is not in the air.
-	Only the Y coordinate of m_FinalDestination might be changed by this call.
-	1. If m_FinalDestination is the position of a water block, m_FinalDestination's Y will be modified to point to the heighest water block in the pool in the current column.
-	2. If m_FinalDestination is the position of a solid, m_FinalDestination's Y will be modified to point to the first airblock above the solid in the current column.
-	3. If m_FinalDestination is the position of an air block, Y will keep decreasing until hitting either a solid or water.
-	Now either 1 or 2 is performed. */
-	bool EnsureProperDestination(cChunk & a_Chunk);
+	/** Ensures the location is not in the air or under water.
+	May change the Y coordinate of the given vector.
+	1. If a_Vector is the position of water, a_Vector's Y will be modified to point to the first air block above it.
+	2. If a_Vector is the position of air, a_Vector's Y will be modified to point to the first airblock below it which has solid or water beneath. */
+	bool EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk);
 
 	/** Resets a pathfinding task, typically because m_FinalDestination has deviated too much from m_DeviationOrigin. */
 	void ResetPathFinding(cChunk &a_Chunk);
+
+	/** Return true the the blocktype is either water or solid */
+	bool IsWaterOrSolid(BLOCKTYPE a_BlockType);
 
 	/** Is the path too old and should be recalculated? When this is true ResetPathFinding() is called. */
 	bool PathIsTooOld() const;

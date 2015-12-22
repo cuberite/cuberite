@@ -32,11 +32,19 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 	}
 
 	// Tweak the destination. If something is wrong with the destination or the chunk, rest for a while.
-	if (!EnsureProperDestination(a_Chunk))
+	if (!(EnsureProperPoint(m_FinalDestination, a_Chunk) && EnsureProperPoint(m_Source, a_Chunk)))
 	{
 		m_NotFoundCooldown = 20;
 		return ePathFinderStatus::PATH_NOT_FOUND;
 	}
+
+	/* printf("%d %d %d -> %d %d %d\n",
+	static_cast<int>(m_Source.x),
+	static_cast<int>(m_Source.y),
+	static_cast<int>(m_Source.z),
+	static_cast<int>(m_FinalDestination.x),
+	static_cast<int>(m_FinalDestination.y),
+	static_cast<int>(m_FinalDestination.z)); */
 
 	// Rest is over. Prepare m_Path by calling ResetPathFinding.
 	if (m_NotFoundCooldown == 0)
@@ -83,7 +91,25 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 		{
 			m_GiveUpCounter -= 1;
 
-			if ((m_GiveUpCounter == 0) || PathIsTooOld())
+			if (m_GiveUpCounter == 0)
+			{
+				if (a_DontCare)
+				{
+					// We're having trouble reaching the next waypoint but the mob
+					// Doesn't care where to go, just tell him we got there ;)
+					m_FinalDestination = m_Source;
+					*a_Destination = m_FinalDestination;
+					ResetPathFinding(a_Chunk);
+					return ePathFinderStatus::CALCULATING;
+				}
+				else
+				{
+					ResetPathFinding(a_Chunk);
+					return ePathFinderStatus::CALCULATING;
+				}
+			}
+
+			if (PathIsTooOld())
 			{
 				ResetPathFinding(a_Chunk);
 				return ePathFinderStatus::CALCULATING;
@@ -153,9 +179,9 @@ void cPathFinder::ResetPathFinding(cChunk &a_Chunk)
 
 
 
-bool cPathFinder::EnsureProperDestination(cChunk & a_Chunk)
+bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 {
-	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(m_FinalDestination.x), FloorC(m_FinalDestination.z));
+	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Vector.x), FloorC(a_Vector.z));
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 
@@ -164,14 +190,14 @@ bool cPathFinder::EnsureProperDestination(cChunk & a_Chunk)
 		return false;
 	}
 
-	int RelX = FloorC(m_FinalDestination.x) - Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = FloorC(m_FinalDestination.z) - Chunk->GetPosZ() * cChunkDef::Width;
+	int RelX = FloorC(a_Vector.x) - Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = FloorC(a_Vector.z) - Chunk->GetPosZ() * cChunkDef::Width;
 
 	// If destination in the air, first try to go 1 block north, or east, or west.
 	// This fixes the player leaning issue.
 	// If that failed, we instead go down to the lowest air block.
-	Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
-	if (!cBlockInfo::IsSolid(BlockType))
+	Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
+	if (!(IsWaterOrSolid(BlockType)))
 	{
 		bool InTheAir = true;
 		int x, z;
@@ -183,18 +209,18 @@ bool cPathFinder::EnsureProperDestination(cChunk & a_Chunk)
 				{
 					continue;
 				}
-				Chunk = a_Chunk.GetNeighborChunk(FloorC(m_FinalDestination.x+x), FloorC(m_FinalDestination.z+z));
+				Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Vector.x+x), FloorC(a_Vector.z+z));
 				if ((Chunk == nullptr) || !Chunk->IsValid())
 				{
 					return false;
 				}
-				RelX = FloorC(m_FinalDestination.x+x) - Chunk->GetPosX() * cChunkDef::Width;
-				RelZ = FloorC(m_FinalDestination.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
-				Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
-				if (cBlockInfo::IsSolid(BlockType))
+				RelX = FloorC(a_Vector.x+x) - Chunk->GetPosX() * cChunkDef::Width;
+				RelZ = FloorC(a_Vector.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
+				Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
+				if (IsWaterOrSolid((BlockType)))
 				{
-					m_FinalDestination.x += x;
-					m_FinalDestination.z += z;
+					a_Vector.x += x;
+					a_Vector.z += z;
 					InTheAir = false;
 					goto breakBothLoops;
 				}
@@ -205,45 +231,39 @@ bool cPathFinder::EnsureProperDestination(cChunk & a_Chunk)
 		// Go down to the lowest air block.
 		if (InTheAir)
 		{
-			while (m_FinalDestination.y > 0)
+			while (a_Vector.y > 0)
 			{
-				Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y) - 1, RelZ, BlockType, BlockMeta);
-				if (cBlockInfo::IsSolid(BlockType))
+				Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
+				if (IsWaterOrSolid(BlockType))
 				{
 					break;
 				}
-				m_FinalDestination.y -= 1;
+				a_Vector.y -= 1;
 			}
 		}
 	}
 
-	// If destination in water, go up to the highest water block.
-	// If destination in solid, go up to first air block.
-	bool InWater = false;
-	while (m_FinalDestination.y < cChunkDef::Height)
+	// If destination in water or solid, go up to the first air block.
+	while (a_Vector.y < cChunkDef::Height)
 	{
-		Chunk->GetBlockTypeMeta(RelX, FloorC(m_FinalDestination.y), RelZ, BlockType, BlockMeta);
-		if (BlockType == E_BLOCK_STATIONARY_WATER)
-		{
-			InWater = true;
-		}
-		else if (cBlockInfo::IsSolid(BlockType))
-		{
-			InWater = false;
-		}
-		else
+		Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y), RelZ, BlockType, BlockMeta);
+		if (!IsWaterOrSolid(BlockType))
 		{
 			break;
 		}
-		m_FinalDestination.y += 1;
+		a_Vector.y += 1;
 	}
-	if (InWater)
-	{
-		m_FinalDestination.y -= 1;
-	}
-
 
 	return true;
+}
+
+
+
+
+
+bool cPathFinder::IsWaterOrSolid(BLOCKTYPE a_BlockType)
+{
+	return ((a_BlockType == E_BLOCK_STATIONARY_WATER) || cBlockInfo::IsSolid(a_BlockType));
 }
 
 

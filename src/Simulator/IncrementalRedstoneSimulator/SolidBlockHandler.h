@@ -38,7 +38,7 @@ public:
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		LOGD("Evaluating blocky the generic block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		// LOGD("Evaluating blocky the generic block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto PreviousPower = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, a_PoweringData);
 		if ((a_PoweringData != PreviousPower) || (a_PoweringData.PoweringBlock != PreviousPower.PoweringBlock))

@@ -22,9 +22,9 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 
 
 // What to do if in Chasing State
-void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
+void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::InStateChasing(a_Dt);
+	super::InStateChasing(a_Dt, a_Chunk);
 
 	if (m_Target != nullptr)
 	{
