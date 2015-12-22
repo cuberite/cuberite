@@ -330,19 +330,8 @@ void inline LOGERROR(const char* a_Format, ...)
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
-// Allow both Older versions of MSVC and newer versions of everything use a shared_ptr:
-// Note that we cannot typedef, because C++ doesn't allow (partial) templates to be typedeffed.
-#if (defined(_MSC_VER) && (_MSC_VER < 1600))
-	// MSVC before 2010 doesn't have std::shared_ptr, but has std::tr1::shared_ptr, defined in <memory> included earlier
-	#define SharedPtr std::tr1::shared_ptr
-#elif (defined(_MSC_VER) || (__cplusplus >= 201103L))
-	// C++11 has std::shared_ptr in <memory>, included earlier
-	#define SharedPtr std::shared_ptr
-#else
-	// C++03 has std::tr1::shared_ptr in <tr1/memory>
-	#include <tr1/memory>
-	#define SharedPtr std::tr1::shared_ptr
-#endif
+// C++11 has std::shared_ptr in <memory>, included earlier
+#define SharedPtr std::shared_ptr
 
 
 
@@ -385,8 +374,3 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 #include "src/BiomeDef.h"
 #include "src/BlockID.h"
 #include "src/BlockInfo.h"
-
-
-
-
-

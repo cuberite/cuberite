@@ -9,17 +9,17 @@
 // OS-dependent stuff:
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
-	
+
 	#define _WIN32_WINNT 0x501  // We want to target WinXP and higher
-	
+
 	#include <Windows.h>
 	#include <winsock2.h>
 	#include <Ws2tcpip.h>  // IPv6 stuff
-	
+
 	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
 	#undef min
 	#undef max
-	
+
 	// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant
 	#ifdef GetFreeSpace
 		#undef GetFreeSpace
@@ -43,10 +43,6 @@
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
-	
-	#if !defined(ANDROID_NDK)
-		#include <tr1/memory>
-	#endif
 #endif
 
 
@@ -95,7 +91,3 @@
 #define MiB * 1024 * 1024
 
 #define ASSERT assert
-
-
-
-
