@@ -145,7 +145,7 @@ protected:
 	
 	
 	/** Parses the incoming data for the first line (RequestLine)
-	Returns the number of bytes consumed, or -1 for an error
+	Returns the number of bytes consumed, or AString::npos for an error
 	*/
 	size_t ParseRequestLine(const char * a_Data, size_t a_Size);
 	
