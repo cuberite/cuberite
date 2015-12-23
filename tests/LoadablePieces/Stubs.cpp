@@ -9,6 +9,7 @@
 #include "SelfTests.h"
 #include "Bindings.h"
 #include "Bindings/DeprecatedBindings.h"
+#include "Bindings/LuaJson.h"
 #include "Bindings/ManualBindings.h"
 #include "BlockEntities/BlockEntity.h"
 #include "Blocks/BlockHandler.h"
@@ -42,6 +43,14 @@ void cManualBindings::Bind(lua_State * a_LuaState)
 
 
 void DeprecatedBindings::Bind(lua_State * a_LuaState)
+{
+}
+
+
+
+
+
+void cLuaJson::Bind(cLuaState & a_LuaState)
 {
 }
 

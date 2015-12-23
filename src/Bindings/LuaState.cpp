@@ -16,6 +16,7 @@ extern "C"
 #include "Bindings.h"
 #include "ManualBindings.h"
 #include "DeprecatedBindings.h"
+#include "LuaJson.h"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 
@@ -180,6 +181,7 @@ void cLuaState::RegisterAPILibs(void)
 	tolua_AllToLua_open(m_LuaState);
 	cManualBindings::Bind(m_LuaState);
 	DeprecatedBindings::Bind(m_LuaState);
+	cLuaJson::Bind(*this);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
 }

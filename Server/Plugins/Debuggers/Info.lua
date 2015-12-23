@@ -242,11 +242,17 @@ g_PluginInfo =
 			HelpString = "Tests the world scheduling",
 		},
 		
+		["testjson"] =
+		{
+			Handler = HandleConsoleTestJson,
+			HelpString = "Tests the cJson parser and serializer",
+		},
+
 		["testtracer"] =
 		{
 			Handler = HandleConsoleTestTracer,
 			HelpString = "Tests the cLineBlockTracer",
-		}
+		},
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
 
