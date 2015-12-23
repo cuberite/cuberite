@@ -477,6 +477,30 @@ inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 
 
 
+inline bool IsBlockFence(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_FENCE:
+		case E_BLOCK_OAK_FENCE_GATE:
+		case E_BLOCK_NETHER_BRICK_FENCE:
+		case E_BLOCK_COBBLESTONE_WALL:
+		case E_BLOCK_DARK_OAK_FENCE:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
+		case E_BLOCK_ACACIA_FENCE:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
 inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false)  // tolua_export
 {  // tolua_export
 	if (!a_bInverse)
