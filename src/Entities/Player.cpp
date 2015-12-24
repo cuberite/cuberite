@@ -63,6 +63,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_GameMode(eGameMode_NotSet),
 	m_IP(""),
 	m_ClientHandle(a_Client),
+	m_FreezeCounter(-1),
 	m_NormalMaxSpeed(1.0),
 	m_SprintingMaxSpeed(1.3),
 	m_FlyingMaxSpeed(1.0),
@@ -112,6 +113,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 
 	m_LastGroundHeight = static_cast<float>(GetPosY());
 	m_Stance = GetPosY() + 1.62;
+	FreezeInternal(GetPosition(), false);  // Freeze. Will be unfrozen once the chunk is loaded
 
 	if (m_GameMode == gmNotSet)
 	{
@@ -220,8 +222,35 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_Stats.AddValue(statMinutesPlayed, 1);
 
+	// Handle a frozen player
+	if (m_IsFrozen)
+	{
+		m_FreezeCounter += 1;
+		if (!m_IsManuallyFrozen && a_Chunk.IsValid())
+		{
+			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded
+			Unfreeze();
+		}
+		else
+		{
+			// If the player was externally / manually frozen (plugin, etc.) or if the chunk isn't loaded yet:
+			// 1. Set the location to m_FrozenPosition every tick.
+			// 2. Zero out the speed every tick.
+			// 3. Send location updates every 60 ticks.
+			SetPosition(m_FrozenPosition);
+			SetSpeed(0, 0, 0);
+			if (m_FreezeCounter % 60 == 0)
+			{
+				BroadcastMovementUpdate(m_ClientHandle.get());
+				m_ClientHandle->SendPlayerPosition();
+			}
+			return;
+		}
+	}
+
 	if (!a_Chunk.IsValid())
 	{
+		FreezeInternal(GetPosition(), false);
 		// This may happen if the cPlayer is created before the chunks have the chance of being loaded / generated (#83)
 		return;
 	}
@@ -1263,6 +1292,46 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 
 
+void cPlayer::Freeze(const Vector3d & a_Location)
+{
+	FreezeInternal(a_Location, true);
+}
+
+
+
+
+
+bool cPlayer::IsFrozen()
+{
+	return m_IsFrozen;
+}
+
+
+
+
+
+int cPlayer::GetFrozenDuration()
+{
+	return m_FreezeCounter;
+}
+
+
+
+
+
+void cPlayer::Unfreeze()
+{
+	m_FreezeCounter = -1;
+	m_IsFrozen = false;
+	SetPosition(m_FrozenPosition);
+	BroadcastMovementUpdate(m_ClientHandle.get());
+	m_ClientHandle->SendPlayerPosition();
+}
+
+
+
+
+
 void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 {
 	SetYaw(a_YawDegrees);
@@ -1531,6 +1600,20 @@ void cPlayer::TossItems(const cItems & a_Items)
 	vY = -vY * 2 + 1.f;
 	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because created by player
 }
+
+
+
+
+
+void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
+{
+	m_IsFrozen = true;
+	m_FrozenPosition = a_Location;
+	m_IsManuallyFrozen = a_ManuallyFrozen;
+}
+
+
+
 
 
 bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)

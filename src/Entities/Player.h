@@ -138,6 +138,18 @@ public:
 
 	// tolua_begin
 
+	/** Prevent the player from moving and lock him into a_Location. */
+	void Freeze(const Vector3d & a_Location);
+
+	/** Is the player frozen? */
+	bool IsFrozen();
+
+	/** How long has the player been frozen? */
+	int GetFrozenDuration();
+
+	/** Cancels Freeze(...) and allows the player to move naturally. */
+	void Unfreeze();
+
 	/** Sends the "look" packet to the player, forcing them to set their rotation to the specified values.
 	a_YawDegrees is clipped to range [-180, +180),
 	a_PitchDegrees is clipped to range [-180, +180) but the client only uses [-90, +90]
@@ -240,7 +252,7 @@ public:
 	void SendMessageFatal         (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
 	void SendMessagePrivateMsg    (const AString & a_Message, const AString & a_Sender) { m_ClientHandle->SendChat(a_Message, mtPrivateMessage, a_Sender); }
 	void SendMessage              (const cCompositeChat & a_Message) { m_ClientHandle->SendChat(a_Message); }
-	
+
 	void SendSystemMessage        (const AString & a_Message) { m_ClientHandle->SendChatSystem(a_Message, mtCustom); }
 	void SendAboveActionBarMessage(const AString & a_Message) { m_ClientHandle->SendChatAboveActionBar(a_Message, mtCustom); }
 	void SendSystemMessage        (const cCompositeChat & a_Message) { m_ClientHandle->SendChatSystem(a_Message); }
@@ -576,6 +588,18 @@ protected:
 
 	cSlotNums m_InventoryPaintSlots;
 
+	/** if m_IsFrozen is true, we lock m_Location to this position. */
+	Vector3d m_FrozenPosition;
+
+	/** If true, we are locking m_Position to m_FrozenPosition. */
+	bool m_IsFrozen;
+
+	/** */
+	int m_FreezeCounter;
+
+	/** Was the player frozen manually by a plugin or automatically by the server? */
+	bool m_IsManuallyFrozen;
+
 	/** Max speed, relative to the game default.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
 	Default value is 1. */
@@ -660,6 +684,10 @@ protected:
 
 	/** Tosses a list of items. */
 	void TossItems(const cItems & a_Items);
+
+	/** Pins the player to a_Location until Unfreeze() is called.
+	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
+	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
 
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
