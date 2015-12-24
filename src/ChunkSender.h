@@ -135,7 +135,7 @@ protected:
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
 	/** Sends the specified chunk to all the specified clients */
-	void SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients);
+	void SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients) noexcept;
 } ;
 
 

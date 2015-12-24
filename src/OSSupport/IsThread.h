@@ -23,12 +23,12 @@ In the descending class' constructor call the Start() method to start the thread
 
 
 
-class cIsThread
+class CAPABILITY("role") cIsThread
 {
 protected:
 	/** This is the main thread entrypoint.
 	This function, overloaded by the descendants, is called in the new thread. */
-	virtual void Execute(void) = 0;
+	virtual void Execute(void) REQUIRES(this) = 0;
 
 	/** The overriden Execute() method should check this value periodically and terminate if this is true. */
 	std::atomic<bool> m_ShouldTerminate;
@@ -63,6 +63,11 @@ private:
 
 	/** Wrapper for Execute() that waits for the initialization event, to prevent race conditions in thread initialization. */
 	void DoExecute(void);
+
+	#ifdef __clang__
+		void AquireOnThread() ACQUIRE() {}
+		void ReleaseOnThread() RELEASE() {}
+	#endif
 } ;
 
 

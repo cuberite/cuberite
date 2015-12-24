@@ -254,8 +254,9 @@ int cBlockingSslClientSocket::ReceiveEncrypted(unsigned char * a_Buffer, size_t 
 	cCSLock Lock(m_CSIncomingData);
 	while (m_IsConnected && m_IncomingData.empty())
 	{
-		cCSUnlock Unlock(Lock);
+		m_CSIncomingData.Unlock();
 		m_Event.Wait();
+		m_CSIncomingData.Lock();
 	}
 
 	// If we got disconnected, report an error after processing all data:

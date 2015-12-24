@@ -205,8 +205,9 @@ void cChunkSender::Execute(void)
 				std::swap(itr->second.m_Clients, clients);
 				m_ChunkInfo.erase(itr);
 
-				cCSUnlock Unlock(Lock);
+				m_CS.Unlock();
 				SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
+				m_CS.Lock();
 			}
 		}
 
@@ -218,7 +219,7 @@ void cChunkSender::Execute(void)
 
 
 
-void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients)
+void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients) noexcept
 {
 	// Ask the client if it still wants the chunk:
 	for (auto itr = a_Clients.begin(); itr != a_Clients.end();)

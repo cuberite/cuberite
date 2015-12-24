@@ -1006,13 +1006,13 @@ private:
 	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
 	virtual ~cWorld();
 
-	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
+	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) REQUIRES(WorldTick);
 
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
 	
 	/** Handles the mob spawning / moving / destroying each tick */
-	void TickMobs(std::chrono::milliseconds a_Dt);
+	void TickMobs(std::chrono::milliseconds a_Dt) REQUIRES(WorldTick);
 	
 	/** Executes all tasks queued onto the tick thread */
 	void TickQueuedTasks(void);
@@ -1046,7 +1046,7 @@ private:
 
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
 	Assumes it is called from the Tick thread. */
-	void AddQueuedPlayers(void);
+	void AddQueuedPlayers(void) REQUIRES(WorldTick);
 
 	/** Sets generator values to dimension specific defaults, if those values do not exist */
 	void InitialiseGeneratorDefaults(cIniFile & a_IniFile);

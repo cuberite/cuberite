@@ -72,12 +72,21 @@ void cPluginLua::Close(void)
 	cResettablePtrs resettables;
 	std::swap(m_Resettables, resettables);
 	{
-		cCSUnlock Unlock(Lock);
-		for (auto resettable: resettables)
+		m_CriticalSection.Unlock();
+		try
 		{
-			resettable->Reset();
+			for (auto resettable: resettables)
+			{
+				resettable->Reset();
+			}
+			m_Resettables.clear();
+			m_CriticalSection.Lock();
 		}
-		m_Resettables.clear();
+		catch (...)
+		{
+			m_CriticalSection.Lock();
+			throw;
+		}
 	}  // cCSUnlock (m_CriticalSection)
 
 	// Release all the references in the hook map:

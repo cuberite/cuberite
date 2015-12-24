@@ -334,7 +334,7 @@ public:
 
 	// tolua_end
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) REQUIRES(WorldTick);
 
 	/** Handles the physics of the entity - updates position based on speed, updates speed based on environment */
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
