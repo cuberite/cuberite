@@ -143,13 +143,16 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	LOG("Reading server config...");
 
 	auto IniFile = cpp14::make_unique<cIniFile>();
-	if (!IniFile->ReadFile("settings.ini"))
+	bool IsNewIniFile = !IniFile->ReadFile("settings.ini");
+
+	if (IsNewIniFile)
 	{
 		LOGWARN("Regenerating settings.ini, all settings will be reset");
 		IniFile->AddHeaderComment(" This is the main server configuration");
 		IniFile->AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
 		IniFile->AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
 	}
+
 	auto settingsRepo = cpp14::make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(a_OverridesRepo));
 
 	LOG("Starting server...");
@@ -174,7 +177,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_BrewingRecipes.reset(new cBrewingRecipes());
 
 	LOGD("Loading worlds...");
-	LoadWorlds(*settingsRepo);
+	LoadWorlds(*settingsRepo, IsNewIniFile);
 
 	LOGD("Loading plugin manager...");
 	m_PluginManager = new cPluginManager();
@@ -341,10 +344,21 @@ void cRoot::LoadGlobalSettings()
 
 
 
-void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings)
+void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile)
 {
 	// First get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
+	if (a_IsNewIniFile)
+	{
+		a_Settings.AddValue("Worlds", "World", "world_nether");
+		a_Settings.AddValue("Worlds", "World", "world_end");
+		m_pDefaultWorld = new cWorld("world");
+		m_WorldsByName["world"] = m_pDefaultWorld;
+		m_WorldsByName["world_nether"] = new cWorld("world_nether", dimNether, "world");
+		m_WorldsByName["world_end"] = new cWorld("world_end", dimEnd, "world");
+		return;
+	}
+
 	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
