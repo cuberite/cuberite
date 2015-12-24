@@ -1921,6 +1921,34 @@ end
 
 
 
+function HandleConsoleTestJson(a_Split, a_EntireCmd)
+	LOG("Testing Json parsing...")
+	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5] }]])
+	assert(t1.a == 1)
+	assert(t1.b == "2")
+	assert(t1.c[1] == 3)
+	assert(t1.c[2] == "4")
+	assert(t1.c[3] == 5)
+	
+	local t2, msg = cJson:Parse([[{"some": invalid, json}]])
+	assert(t2 == nil)
+	assert(type(msg) == "string")
+	LOG("Error message returned: " .. msg)
+	
+	LOG("Json parsing test succeeded")
+	
+	LOG("Testing Json serializing...")
+	local s1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}}, {indentation = " "})
+	LOG("Serialization result: " .. (s1 or "<nil>"))
+	LOG("Json serializing test succeeded")
+	
+	return true
+end
+
+
+
+
+
 function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 	-- Check required params:
 	if not(a_Split[7]) then

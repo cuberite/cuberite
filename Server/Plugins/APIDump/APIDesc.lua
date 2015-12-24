@@ -1372,53 +1372,6 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 			},
 		},  -- cItem
 
-		cObjective =
-		{
-			Desc = [[
-				This class represents a single scoreboard objective.
-			]],
-			Functions =
-			{
-				AddScore = { Params = "string, number", Return = "Score", Notes = "Adds a value to the score of the specified player and returns the new value." },
-				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the objective. This name will be shown to the connected players." },
-				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the objective." },
-				GetScore = { Params = "string", Return = "Score", Notes = "Returns the score of the specified player." },
-				GetType = { Params = "", Return = "eType", Notes = "Returns the type of the objective. (i.e what is being tracked)" },
-				Reset = { Params = "", Return = "", Notes = "Resets the scores of the tracked players." },
-				ResetScore = { Params = "string", Return = "", Notes = "Reset the score of the specified player." },
-				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of the objective." },
-				SetScore = { Params = "string, Score", Return = "", Notes = "Sets the score of the specified player." },
-				SubScore = { Params = "string, number", Return = "Score", Notes = "Subtracts a value from the score of the specified player and returns the new value." },
-			},
-			Constants =
-			{
-				otAchievement = { Notes = "" },
-				otDeathCount = { Notes = "" },
-				otDummy = { Notes = "" },
-				otHealth = { Notes = "" },
-				otPlayerKillCount = { Notes = "" },
-				otStat = { Notes = "" },
-				otStatBlockMine = { Notes = "" },
-				otStatEntityKill = { Notes = "" },
-				otStatEntityKilledBy = { Notes = "" },
-				otStatItemBreak = { Notes = "" },
-				otStatItemCraft = { Notes = "" },
-				otStatItemUse = { Notes = "" },
-				otTotalKillCount = { Notes = "" },
-			},
-		}, -- cObjective
-
-		cPainting =
-		{
-			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
-			Functions =
-			{
-				GetDirection = { Params = "", Return = "number", Notes = "Returns the direction the painting faces. Directions: ZP - 0, ZM - 2, XM - 1, XP - 3. Note that these are not the BLOCK_FACE constants." },
-				GetName = { Params = "", Return = "string", Notes = "Returns the name of the painting" },
-			},
-
-		}, -- cPainting
-
 		cItemGrid =
 		{
 			Desc = [[This class represents a 2D array of items. It is used as the underlying storage and API for all cases that use a grid of items:
@@ -1555,6 +1508,65 @@ end
 				ContainsType = { Params = "{{cItem|cItem}}", Return = "bool", Notes = "Returns true if the collection contains an item that is the same type as the parameter" },
 			},
 		},  -- cItems
+
+		cJson =
+		{
+			Desc = [[
+				Exposes the Json parser and serializer available in the server. Plugins can parse Json strings into
+				Lua tables, and serialize Lua tables into Json strings easily.
+			]],
+			Functions =
+			{
+				Parse = { Params = "string", Return = "table", Notes = "Parses the Json in the input string into a Lua table. Returns nil and detailed error message if parsing fails." },
+				Serialize = { Params = "table, [options]", Return = "string", Notes = "Serializes the input table into a Json string. The options table, if present, is used to adjust the formatting of the serialized string, see below for details." },
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Serializer options",
+					Contents = [[
+						The "options" parameter given to the cJson:Serialize() function is a dictionary-table of "option
+						name" -> "option value". The serializer warns if any unknown options are used; the following
+						options are recognized:</p>
+						<ul>
+						<li><b>commentStyle</b> - either "All" or "None", specifies whether comments are written to the
+						output. Currently unused since comments cannot be represented in a Lua table</li>
+						<li><b>indentation</b> - the string that is repeated for each level of indentation of the output.
+						If empty, the Json is compressed (without linebreaks).</li>
+						<li><b>enableYAMLCompatibility</b> - bool manipulating the whitespace around the colons.</li>
+						<li><b>dropNullPlaceholders</b> - bool specifying whether null placeholders should be dropped
+						from the output</li>
+						</ul>
+					]],
+				},
+				{
+					Header = "Code example: Parsing a Json string",
+					Contents = [==[
+						The following code, adapted from the Debuggers plugin, parses a simple Json string and verifies
+						the results:
+<pre class="prettyprint lang-lua">
+local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5]}]])
+assert(t1.a == 1)
+assert(t1.b == "2")
+assert(t1.c[1] == 3)
+assert(t1.c[2] == "4")
+assert(t1.c[3] == 5)
+</pre>
+					]==],
+				},
+				{
+					Header = "Code example: Serializing into a Json string",
+					Contents = [==[
+						The following code, adapted from the Debuggers plugin, serializes a simple Lua table into a
+						string, using custom indentation:
+<pre class="prettyprint lang-lua">
+local s1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}}, {indentation = "  "})
+LOG("Serialization result: " .. (s1 or "<nil>"))
+</pre>
+					]==],
+				},
+			},
+		},  -- cJson
 
 		cLuaWindow =
 		{
@@ -1812,6 +1824,52 @@ a_Player:OpenWindow(Window);
 			},
 			Inherits = "cPawn",
 		},  -- cMonster
+
+		cObjective =
+		{
+			Desc = [[
+				This class represents a single scoreboard objective.
+			]],
+			Functions =
+			{
+				AddScore = { Params = "string, number", Return = "Score", Notes = "Adds a value to the score of the specified player and returns the new value." },
+				GetDisplayName = { Params = "", Return = "string", Notes = "Returns the display name of the objective. This name will be shown to the connected players." },
+				GetName = { Params = "", Return = "string", Notes = "Returns the internal name of the objective." },
+				GetScore = { Params = "string", Return = "Score", Notes = "Returns the score of the specified player." },
+				GetType = { Params = "", Return = "eType", Notes = "Returns the type of the objective. (i.e what is being tracked)" },
+				Reset = { Params = "", Return = "", Notes = "Resets the scores of the tracked players." },
+				ResetScore = { Params = "string", Return = "", Notes = "Reset the score of the specified player." },
+				SetDisplayName = { Params = "string", Return = "", Notes = "Sets the display name of the objective." },
+				SetScore = { Params = "string, Score", Return = "", Notes = "Sets the score of the specified player." },
+				SubScore = { Params = "string, number", Return = "Score", Notes = "Subtracts a value from the score of the specified player and returns the new value." },
+			},
+			Constants =
+			{
+				otAchievement = { Notes = "" },
+				otDeathCount = { Notes = "" },
+				otDummy = { Notes = "" },
+				otHealth = { Notes = "" },
+				otPlayerKillCount = { Notes = "" },
+				otStat = { Notes = "" },
+				otStatBlockMine = { Notes = "" },
+				otStatEntityKill = { Notes = "" },
+				otStatEntityKilledBy = { Notes = "" },
+				otStatItemBreak = { Notes = "" },
+				otStatItemCraft = { Notes = "" },
+				otStatItemUse = { Notes = "" },
+				otTotalKillCount = { Notes = "" },
+			},
+		}, -- cObjective
+
+		cPainting =
+		{
+			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
+			Functions =
+			{
+				GetDirection = { Params = "", Return = "number", Notes = "Returns the direction the painting faces. Directions: ZP - 0, ZM - 2, XM - 1, XP - 3. Note that these are not the BLOCK_FACE constants." },
+				GetName = { Params = "", Return = "string", Notes = "Returns the name of the painting" },
+			},
+		}, -- cPainting
 
 		cPawn =
 		{
