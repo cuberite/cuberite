@@ -38,7 +38,7 @@ public:
 
 	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
 	{
-		LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		// LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		if (a_PoweringData.PowerLevel > 0)
 		{
@@ -55,7 +55,7 @@ public:
 	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_BlockType);
-		
+
 		auto PositionsOffset = GetRelativeAdjacents();
 		auto Face = cBlockPistonHandler::MetaDataToDirection(a_Meta);
 		int OffsetX = 0, OffsetY = 0, OffsetZ = 0;

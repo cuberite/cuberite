@@ -69,7 +69,7 @@ public:
 
 	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
 	{
-		LOGD("Evaluating tricky the trapped chest (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		// LOGD("Evaluating tricky the trapped chest (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto Power = GetPowerLevel(a_Position, a_BlockType, a_Meta);
 		auto PreviousPower = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_BlockType, Power));
@@ -87,7 +87,7 @@ public:
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		
+
 		return {};
 	}
 };
