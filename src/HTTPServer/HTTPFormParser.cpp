@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "HTTPFormParser.h"
-#include "HTTPMessage.h"
+#include "HTTPRequestParser.h"
 #include "MultipartParser.h"
 #include "NameValueParser.h"
 
@@ -13,7 +13,7 @@
 
 
 
-cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks) :
+cHTTPFormParser::cHTTPFormParser(cHTTPRequestParser & a_Request, cCallbacks & a_Callbacks) :
 	m_Callbacks(a_Callbacks),
 	m_IsValid(true),
 	m_IsCurrentPartFile(false),
@@ -121,7 +121,7 @@ bool cHTTPFormParser::Finish(void)
 
 
 
-bool cHTTPFormParser::HasFormData(const cHTTPRequest & a_Request)
+bool cHTTPFormParser::HasFormData(const cHTTPRequestParser & a_Request)
 {
 	const AString & ContentType = a_Request.GetContentType();
 	return (
@@ -138,7 +138,7 @@ bool cHTTPFormParser::HasFormData(const cHTTPRequest & a_Request)
 
 
 
-void cHTTPFormParser::BeginMultipart(const cHTTPRequest & a_Request)
+void cHTTPFormParser::BeginMultipart(const cHTTPRequestParser & a_Request)
 {
 	ASSERT(m_MultipartParser.get() == nullptr);
 	m_MultipartParser.reset(new cMultipartParser(a_Request.GetContentType(), *this));

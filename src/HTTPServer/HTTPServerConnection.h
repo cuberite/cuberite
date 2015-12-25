@@ -18,7 +18,7 @@
 // fwd:
 class cHTTPServer;
 class cHTTPResponse;
-class cHTTPRequest;
+class cHTTPRequestParser;
 
 
 
@@ -81,7 +81,7 @@ protected:
 
 	/** The request being currently received
 	Valid only between having parsed the headers and finishing receiving the body. */
-	cHTTPRequest * m_CurrentRequest;
+	cHTTPRequestParser * m_CurrentRequest;
 
 	/** Number of bytes that remain to read for the complete body of the message to be received.
 	Valid only in wcsRecvBody */

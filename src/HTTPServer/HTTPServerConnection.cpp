@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "HTTPServerConnection.h"
-#include "HTTPMessage.h"
+#include "HTTPRequestParser.h"
 #include "HTTPServer.h"
 
 
@@ -166,7 +166,7 @@ void cHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 		{
 			if (m_CurrentRequest == nullptr)
 			{
-				m_CurrentRequest = new cHTTPRequest;
+				m_CurrentRequest = new cHTTPRequestParser;
 			}
 
 			size_t BytesConsumed = m_CurrentRequest->ParseHeaders(a_Data, a_Size);

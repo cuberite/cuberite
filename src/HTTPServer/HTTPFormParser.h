@@ -15,7 +15,7 @@
 
 
 // fwd:
-class cHTTPRequest;
+class cHTTPRequestParser;
 
 
 
@@ -51,7 +51,7 @@ public:
 
 
 	/** Creates a parser that is tied to a request and notifies of various events using a callback mechanism */
-	cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks);
+	cHTTPFormParser(cHTTPRequestParser & a_Request, cCallbacks & a_Callbacks);
 
 	/** Creates a parser with the specified content type that reads data from a string */
 	cHTTPFormParser(eKind a_Kind, const char * a_Data, size_t a_Size, cCallbacks & a_Callbacks);
@@ -64,7 +64,7 @@ public:
 	bool Finish(void);
 
 	/** Returns true if the headers suggest the request has form data parseable by this class */
-	static bool HasFormData(const cHTTPRequest & a_Request);
+	static bool HasFormData(const cHTTPRequestParser & a_Request);
 
 protected:
 
@@ -97,7 +97,7 @@ protected:
 
 
 	/** Sets up the object for parsing a fpkMultipart request */
-	void BeginMultipart(const cHTTPRequest & a_Request);
+	void BeginMultipart(const cHTTPRequestParser & a_Request);
 
 	/** Parses m_IncomingData as form-urlencoded data (fpkURL or fpkFormUrlEncoded kinds) */
 	void ParseFormUrlEncoded(void);

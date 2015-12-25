@@ -8,6 +8,7 @@ SET (SRCS
 	EnvelopeParser.cpp
 	HTTPFormParser.cpp
 	HTTPMessage.cpp
+	HTTPRequestParser.cpp
 	HTTPServer.cpp
 	HTTPServerConnection.cpp
 	MultipartParser.cpp
@@ -20,6 +21,7 @@ SET (HDRS
 	EnvelopeParser.h
 	HTTPFormParser.h
 	HTTPMessage.h
+	HTTPRequestParser.h
 	HTTPServer.h
 	HTTPServerConnection.h
 	MultipartParser.h
