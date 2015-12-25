@@ -79,9 +79,9 @@ public:
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(void);
 
-	virtual void InStateIdle    (std::chrono::milliseconds a_Dt);
-	virtual void InStateChasing (std::chrono::milliseconds a_Dt);
-	virtual void InStateEscaping(std::chrono::milliseconds a_Dt);
+	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	int GetAttackRate() { return static_cast<int>(m_AttackRate); }
 	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
@@ -193,7 +193,7 @@ protected:
 	/** Returns if a monster can reach a given height by jumping. */
 	inline bool DoesPosYRequireJump(int a_PosY)
 	{
-		return ((a_PosY > POSY_TOINT) && (a_PosY == POSY_TOINT + 1));
+		return ((a_PosY > POSY_TOINT));
 	}
 
 	/** Move in a straight line to the next waypoint in the path, will jump if needed. */

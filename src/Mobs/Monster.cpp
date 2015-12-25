@@ -133,9 +133,8 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 	{
 		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
-			if (
-				(IsOnGround() && (GetSpeedX() == 0.0f) && (GetSpeedY() == 0.0f))  // TODO water handling?
-			)
+			if (((IsOnGround()) && (GetSpeed().SqrLength() == 0.0f)) ||
+			(IsSwimming()))
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
@@ -303,18 +302,18 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		case IDLE:
 		{
 			// If enemy passive we ignore checks for player visibility.
-			InStateIdle(a_Dt);
+			InStateIdle(a_Dt, a_Chunk);
 			break;
 		}
 		case CHASING:
 		{
 			// If we do not see a player anymore skip chasing action.
-			InStateChasing(a_Dt);
+			InStateChasing(a_Dt, a_Chunk);
 			break;
 		}
 		case ESCAPING:
 		{
-			InStateEscaping(a_Dt);
+			InStateEscaping(a_Dt, a_Chunk);
 			break;
 		}
 		case ATTACKING: break;
@@ -377,7 +376,7 @@ void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 	double HeadRotation, HeadPitch;
 	HeadDistance.Normalize();
 	VectorToEuler(HeadDistance.x, HeadDistance.y, HeadDistance.z, HeadRotation, HeadPitch);
-	if (std::abs(BodyRotation - HeadRotation) < 90)
+	if ((std::abs(BodyRotation - HeadRotation) < 70) && (std::abs(HeadPitch) < 60))
 	{
 		SetHeadYaw(HeadRotation);
 		SetPitch(-HeadPitch);
@@ -385,7 +384,7 @@ void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 	else
 	{
 		SetHeadYaw(BodyRotation);
-		SetPitch(-BodyPitch);
+		SetPitch(0);
 	}
 }
 
@@ -611,7 +610,7 @@ void cMonster::EventLosePlayer(void)
 
 
 
-void cMonster::InStateIdle(std::chrono::milliseconds a_Dt)
+void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_PathfinderActivated)
 	{
@@ -632,9 +631,24 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt)
 
 		if ((Dist.SqrLength() > 2)  && (rem >= 3))
 		{
-			Vector3d Destination(GetPosX() + Dist.x, 0, GetPosZ() + Dist.z);
-			Destination.y = FindFirstNonAirBlockPosition(Destination.x, Destination.z);
-			MoveToPosition(Destination);
+
+			Vector3d Destination(GetPosX() + Dist.x, GetPosition().y, GetPosZ() + Dist.z);
+
+			cChunk * Chunk = a_Chunk.GetNeighborChunk(static_cast<int>(Destination.x), static_cast<int>(Destination.z));
+			if ((Chunk == nullptr) || !Chunk->IsValid())
+			{
+				return;
+			}
+
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			int RelX = static_cast<int>(Destination.x) - Chunk->GetPosX() * cChunkDef::Width;
+			int RelZ = static_cast<int>(Destination.z) - Chunk->GetPosZ() * cChunkDef::Width;
+			Chunk->GetBlockTypeMeta(RelX, static_cast<int>(Destination.y) - 1, RelZ, BlockType, BlockMeta);
+			if (BlockType != E_BLOCK_STATIONARY_WATER)  // Idle mobs shouldn't enter water on purpose
+			{
+				MoveToPosition(Destination);
+			}
 		}
 	}
 }
@@ -645,7 +659,7 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt)
 
 // What to do if in Chasing State
 // This state should always be defined in each child class
-void cMonster::InStateChasing(std::chrono::milliseconds a_Dt)
+void cMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 }
@@ -655,7 +669,7 @@ void cMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 
 
 // What to do if in Escaping State
-void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt)
+void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 
