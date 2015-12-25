@@ -2030,6 +2030,47 @@ end
 
 
 
+function HandleConsoleTestUrlParser(a_Split, a_EntireCmd)
+	LOG("Testing cUrlParser...")
+	local UrlsToTest =
+	{
+		"invalid URL",
+		"https://github.com",
+		"ftp://anonymous:user@example.com@ftp.cuberite.org:9921/releases/2015/2015-12-25.zip",
+		"ftp://anonymous:user:name:with:colons@example.com@ftp.cuberite.org:9921",
+		"http://google.com/",
+		"http://google.com/?q=cuberite",
+		"http://google.com/search?q=cuberite",
+		"http://google.com/some/search?q=cuberite#results",
+		"http://google.com/?q=cuberite#results",
+		"http://google.com/#results",
+		"ftp://cuberite.org:9921/releases/2015/2015-12-25.zip",
+		"mailto:support@cuberite.org",
+	}
+	for _, u in ipairs(UrlsToTest) do
+		LOG("URL: " .. u)
+		local scheme, username, password, host, port, path, query, fragment = cUrlParser:Parse(u)
+		if not(scheme) then
+			LOG("  Error: " .. (username or "<nil>"))
+		else
+			LOG("  Scheme   = " .. scheme)
+			LOG("  Username = " .. username)
+			LOG("  Password = " .. password)
+			LOG("  Host     = " .. host)
+			LOG("  Port     = " .. port)
+			LOG("  Path     = " .. path)
+			LOG("  Query    = " .. query)
+			LOG("  Fragment = " .. fragment)
+		end
+	end
+	LOG("cUrlParser test complete")
+	return true
+end
+
+
+
+
+
 function HandleConsoleBBox(a_Split)
 	local bbox = cBoundingBox(0, 10, 0, 10, 0, 10)
 	local v1 = Vector3d(1, 1, 1)

@@ -154,5 +154,5 @@ endif()
 
 if(NOT MSVC)
 	add_library(Bindings ${SRCS} ${HDRS})
-	target_link_libraries(Bindings lua sqlite tolualib mbedtls)
+	target_link_libraries(Bindings lua sqlite tolualib mbedtls HTTPServer)
 endif()

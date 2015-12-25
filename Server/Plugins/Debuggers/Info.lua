@@ -253,6 +253,12 @@ g_PluginInfo =
 			Handler = HandleConsoleTestTracer,
 			HelpString = "Tests the cLineBlockTracer",
 		},
+		
+		["testurlparser"] =
+		{
+			Handler = HandleConsoleTestUrlParser,
+			HelpString = "Tests the cUrlParser",
+		},
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
 

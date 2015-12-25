@@ -36,6 +36,7 @@
 #include "../StringCompression.h"
 #include "../CommandOutput.h"
 #include "../BuildInfo.h"
+#include "../HTTPServer/UrlParser.h"
 
 
 
@@ -1956,6 +1957,155 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 
 
 
+static int tolua_cUrlParser_GetDefaultPort(lua_State * a_LuaState)
+{
+	// API function signature:
+	// cUrlParser:GetDefaultPort("scheme") -> number
+
+	// Check params:
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamUserTable(1, "cUrlParser") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Read params from Lua:
+	AString scheme;
+	L.GetStackValue(2, scheme);
+
+	// Execute and push result:
+	L.Push(cUrlParser::GetDefaultPort(scheme));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cUrlParser_IsKnownScheme(lua_State * a_LuaState)
+{
+	// API function signature:
+	// cUrlParser:IsKnownScheme("scheme") -> bool
+
+	// Check params:
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamUserTable(1, "cUrlParser") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Read params from Lua:
+	AString scheme;
+	L.GetStackValue(2, scheme);
+
+	// Execute and push result:
+	L.Push(cUrlParser::IsKnownScheme(scheme));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cUrlParser_Parse(lua_State * a_LuaState)
+{
+	// API function signature:
+	// cUrlParser:Parse("url") -> "scheme", "user", "password", "host", portnum, "path", "query", "fragment"
+	// On error, returns nil and error message
+
+	// Check params:
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamUserTable(1, "cUrlParser") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Read params from Lua:
+	AString url;
+	L.GetStackValue(2, url);
+
+	// Execute and push result:
+	AString scheme, username, password, host, path, query, fragment;
+	UInt16 port;
+	auto res = cUrlParser::Parse(url, scheme, username, password, host, port, path, query, fragment);
+	if (!res.first)
+	{
+		// Error, return nil and error msg:
+		L.PushNil();
+		L.Push(res.second);
+		return 2;
+	}
+	L.Push(scheme);
+	L.Push(username);
+	L.Push(password);
+	L.Push(host);
+	L.Push(port);
+	L.Push(path);
+	L.Push(query);
+	L.Push(fragment);
+	return 8;
+}
+
+
+
+
+
+static int tolua_cUrlParser_ParseAuthorityPart(lua_State * a_LuaState)
+{
+	// API function signature:
+	// cUrlParser:ParseAuthorityPart("authority") -> "user", "password", "host", portnum
+	// On error, returns nil and error message
+	// Parts not specified in the "authority" are left empty / zero
+
+	// Check params:
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamUserTable(1, "cUrlParser") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Read params from Lua:
+	AString authPart;
+	L.GetStackValue(2, authPart);
+
+	// Execute and push result:
+	AString username, password, host;
+	UInt16 port;
+	auto res = cUrlParser::ParseAuthorityPart(authPart, username, password, host, port);
+	if (!res.first)
+	{
+		// Error, return nil and error msg:
+		L.PushNil();
+		L.Push(res.second);
+		return 2;
+	}
+	L.Push(username);
+	L.Push(password);
+	L.Push(host);
+	L.Push(port);
+	return 4;
+}
+
+
+
+
+
 static int tolua_cWebAdmin_GetPlugins(lua_State * tolua_S)
 {
 	cWebAdmin * self = reinterpret_cast<cWebAdmin *>(tolua_tousertype(tolua_S, 1, nullptr));
@@ -3224,9 +3374,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_usertype(tolua_S, "cCryptoHash");
 		tolua_usertype(tolua_S, "cLineBlockTracer");
 		tolua_usertype(tolua_S, "cStringCompression");
+		tolua_usertype(tolua_S, "cUrlParser");
 		tolua_cclass(tolua_S, "cCryptoHash",        "cCryptoHash",        "", nullptr);
 		tolua_cclass(tolua_S, "cLineBlockTracer",   "cLineBlockTracer",   "", nullptr);
 		tolua_cclass(tolua_S, "cStringCompression", "cStringCompression", "", nullptr);
+		tolua_cclass(tolua_S, "cUrlParser",         "cUrlParser",         "", nullptr);
 
 		// Globals:
 		tolua_function(tolua_S, "Clamp",                 tolua_Clamp);
@@ -3388,6 +3540,13 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "CompressStringGZIP",     tolua_CompressStringGZIP);
 			tolua_function(tolua_S, "UncompressStringGZIP",   tolua_UncompressStringGZIP);
 			tolua_function(tolua_S, "InflateString",          tolua_InflateString);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cUrlParser");
+			tolua_function(tolua_S, "GetDefaultPort",     tolua_cUrlParser_GetDefaultPort);
+			tolua_function(tolua_S, "IsKnownScheme",      tolua_cUrlParser_IsKnownScheme);
+			tolua_function(tolua_S, "Parse",              tolua_cUrlParser_Parse);
+			tolua_function(tolua_S, "ParseAuthorityPart", tolua_cUrlParser_ParseAuthorityPart);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cWebAdmin");
