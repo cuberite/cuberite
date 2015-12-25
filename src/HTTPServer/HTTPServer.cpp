@@ -6,9 +6,9 @@
 #include "Globals.h"
 #include "HTTPServer.h"
 #include "HTTPMessage.h"
-#include "HTTPConnection.h"
+#include "HTTPServerConnection.h"
 #include "HTTPFormParser.h"
-#include "SslHTTPConnection.h"
+#include "SslHTTPServerConnection.h"
 
 
 
@@ -28,7 +28,7 @@ class cDebugCallbacks :
 	public cHTTPServer::cCallbacks,
 	protected cHTTPFormParser::cCallbacks
 {
-		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
+		virtual void OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
 			UNUSED(a_Connection);
 
@@ -39,7 +39,7 @@ class cDebugCallbacks :
 		}
 
 
-		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override
+		virtual void OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override
 		{
 			UNUSED(a_Connection);
 
@@ -51,7 +51,7 @@ class cDebugCallbacks :
 		}
 
 
-		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
+		virtual void OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
 			cHTTPFormParser * FormParser = reinterpret_cast<cHTTPFormParser *>(a_Request.GetUserData());
 			if (FormParser != nullptr)
@@ -268,11 +268,11 @@ cTCPLink::cCallbacksPtr cHTTPServer::OnIncomingConnection(const AString & a_Remo
 
 	if (m_Cert.get() != nullptr)
 	{
-		return std::make_shared<cSslHTTPConnection>(*this, m_Cert, m_CertPrivKey);
+		return std::make_shared<cSslHTTPServerConnection>(*this, m_Cert, m_CertPrivKey);
 	}
 	else
 	{
-		return std::make_shared<cHTTPConnection>(*this);
+		return std::make_shared<cHTTPServerConnection>(*this);
 	}
 }
 
@@ -280,7 +280,7 @@ cTCPLink::cCallbacksPtr cHTTPServer::OnIncomingConnection(const AString & a_Remo
 
 
 
-void cHTTPServer::NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cHTTPServer::NewRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	m_Callbacks->OnRequestBegun(a_Connection, a_Request);
 }
@@ -289,7 +289,7 @@ void cHTTPServer::NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Re
 
 
 
-void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
+void cHTTPServer::RequestBody(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	m_Callbacks->OnRequestBody(a_Connection, a_Request, a_Data, a_Size);
 }
@@ -298,7 +298,7 @@ void cHTTPServer::RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_R
 
 
 
-void cHTTPServer::RequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cHTTPServer::RequestFinished(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	m_Callbacks->OnRequestFinished(a_Connection, a_Request);
 	a_Connection.AwaitNextRequest();

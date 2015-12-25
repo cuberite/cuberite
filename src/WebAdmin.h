@@ -236,18 +236,18 @@ protected:
 	cHTTPServer m_HTTPServer;
 
 	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
-	void HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	void HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request);
 
 	/** Handles requests for the root page */
-	void HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	void HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request);
 
 	/** Handles requests for a file */
-	void HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	void HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request);
 
 	// cHTTPServer::cCallbacks overrides:
-	virtual void OnRequestBegun   (cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
-	virtual void OnRequestBody    (cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override;
-	virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
+	virtual void OnRequestBegun   (cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request) override;
+	virtual void OnRequestBody    (cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override;
+	virtual void OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request) override;
 } ;  // tolua_export
 
 

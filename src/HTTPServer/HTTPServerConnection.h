@@ -24,7 +24,7 @@ class cHTTPRequest;
 
 
 
-class cHTTPConnection :
+class cHTTPServerConnection :
 	public cTCPLink::cCallbacks
 {
 public:
@@ -38,8 +38,8 @@ public:
 		wcsInvalid,      ///< The request was malformed, the connection is closing
 	} ;
 
-	cHTTPConnection(cHTTPServer & a_HTTPServer);
-	virtual ~cHTTPConnection();
+	cHTTPServerConnection(cHTTPServer & a_HTTPServer);
+	virtual ~cHTTPServerConnection();
 
 	/** Sends HTTP status code together with a_Reason (used for HTTP errors).
 	Sends the a_Reason as the body as well, so that browsers display it. */
@@ -116,7 +116,7 @@ protected:
 	}
 } ;
 
-typedef std::vector<cHTTPConnection *> cHTTPConnections;
+typedef std::vector<cHTTPServerConnection *> cHTTPServerConnections;
 
 
 

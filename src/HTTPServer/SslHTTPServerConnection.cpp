@@ -1,17 +1,17 @@
 
 // SslHTTPConnection.cpp
 
-// Implements the cSslHTTPConnection class representing a HTTP connection made over a SSL link
+// Implements the cSslHTTPServerConnection class representing a HTTP connection made over a SSL link
 
 #include "Globals.h"
-#include "SslHTTPConnection.h"
+#include "SslHTTPServerConnection.h"
 #include "HTTPServer.h"
 
 
 
 
 
-cSslHTTPConnection::cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey) :
+cSslHTTPServerConnection::cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey) :
 	super(a_HTTPServer),
 	m_Ssl(64000),
 	m_Cert(a_Cert),
@@ -25,7 +25,7 @@ cSslHTTPConnection::cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509Ce
 
 
 
-cSslHTTPConnection::~cSslHTTPConnection()
+cSslHTTPServerConnection::~cSslHTTPServerConnection()
 {
 	m_Ssl.NotifyClose();
 }
@@ -34,7 +34,7 @@ cSslHTTPConnection::~cSslHTTPConnection()
 
 
 
-void cSslHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
+void cSslHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 {
 	// Process the received data:
 	const char * Data = a_Data;
@@ -77,7 +77,7 @@ void cSslHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 
 
 
-void cSslHTTPConnection::SendData(const void * a_Data, size_t a_Size)
+void cSslHTTPServerConnection::SendData(const void * a_Data, size_t a_Size)
 {
 	const char * OutgoingData = reinterpret_cast<const char *>(a_Data);
 	size_t pos = 0;

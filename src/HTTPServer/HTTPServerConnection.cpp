@@ -1,10 +1,10 @@
 
 // HTTPConnection.cpp
 
-// Implements the cHTTPConnection class representing a single persistent connection in the HTTP server.
+// Implements the cHTTPServerConnection class representing a single persistent connection in the HTTP server.
 
 #include "Globals.h"
-#include "HTTPConnection.h"
+#include "HTTPServerConnection.h"
 #include "HTTPMessage.h"
 #include "HTTPServer.h"
 
@@ -12,7 +12,7 @@
 
 
 
-cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
+cHTTPServerConnection::cHTTPServerConnection(cHTTPServer & a_HTTPServer) :
 	m_HTTPServer(a_HTTPServer),
 	m_State(wcsRecvHeaders),
 	m_CurrentRequest(nullptr),
@@ -25,7 +25,7 @@ cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 
 
 
-cHTTPConnection::~cHTTPConnection()
+cHTTPServerConnection::~cHTTPServerConnection()
 {
 	// LOGD("HTTP: Connection deleting: %p", this);
 	delete m_CurrentRequest;
@@ -36,7 +36,7 @@ cHTTPConnection::~cHTTPConnection()
 
 
 
-void cHTTPConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Response)
+void cHTTPServerConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Response)
 {
 	SendData(Printf("HTTP/1.1 %d %s\r\n", a_StatusCode, a_Response.c_str()));
 	SendData(Printf("Content-Length: %u\r\n\r\n", static_cast<unsigned>(a_Response.size())));
@@ -48,7 +48,7 @@ void cHTTPConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Re
 
 
 
-void cHTTPConnection::SendNeedAuth(const AString & a_Realm)
+void cHTTPServerConnection::SendNeedAuth(const AString & a_Realm)
 {
 	SendData(Printf("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"%s\"\r\nContent-Length: 0\r\n\r\n", a_Realm.c_str()));
 	m_State = wcsRecvHeaders;
@@ -58,7 +58,7 @@ void cHTTPConnection::SendNeedAuth(const AString & a_Realm)
 
 
 
-void cHTTPConnection::Send(const cHTTPResponse & a_Response)
+void cHTTPServerConnection::Send(const cHTTPResponse & a_Response)
 {
 	ASSERT(m_State == wcsRecvIdle);
 	AString toSend;
@@ -71,7 +71,7 @@ void cHTTPConnection::Send(const cHTTPResponse & a_Response)
 
 
 
-void cHTTPConnection::Send(const void * a_Data, size_t a_Size)
+void cHTTPServerConnection::Send(const void * a_Data, size_t a_Size)
 {
 	ASSERT(m_State == wcsSendingResp);
 	// We're sending in Chunked transfer encoding
@@ -84,7 +84,7 @@ void cHTTPConnection::Send(const void * a_Data, size_t a_Size)
 
 
 
-void cHTTPConnection::FinishResponse(void)
+void cHTTPServerConnection::FinishResponse(void)
 {
 	ASSERT(m_State == wcsSendingResp);
 	SendData("0\r\n\r\n");
@@ -95,7 +95,7 @@ void cHTTPConnection::FinishResponse(void)
 
 
 
-void cHTTPConnection::AwaitNextRequest(void)
+void cHTTPServerConnection::AwaitNextRequest(void)
 {
 	switch (m_State)
 	{
@@ -133,7 +133,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 
 
 
-void cHTTPConnection::Terminate(void)
+void cHTTPServerConnection::Terminate(void)
 {
 	if (m_CurrentRequest != nullptr)
 	{
@@ -146,7 +146,7 @@ void cHTTPConnection::Terminate(void)
 
 
 
-void cHTTPConnection::OnLinkCreated(cTCPLinkPtr a_Link)
+void cHTTPServerConnection::OnLinkCreated(cTCPLinkPtr a_Link)
 {
 	ASSERT(m_Link == nullptr);
 	m_Link = a_Link;
@@ -156,7 +156,7 @@ void cHTTPConnection::OnLinkCreated(cTCPLinkPtr a_Link)
 
 
 
-void cHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
+void cHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 {
 	ASSERT(m_Link != nullptr);
 
@@ -198,12 +198,12 @@ void cHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 			// Process the rest of the incoming data into the request body:
 			if (a_Size > BytesConsumed)
 			{
-				cHTTPConnection::OnReceivedData(a_Data + BytesConsumed, a_Size - BytesConsumed);
+				cHTTPServerConnection::OnReceivedData(a_Data + BytesConsumed, a_Size - BytesConsumed);
 				return;
 			}
 			else
 			{
-				cHTTPConnection::OnReceivedData("", 0);  // If the request has zero body length, let it be processed right-away
+				cHTTPServerConnection::OnReceivedData("", 0);  // If the request has zero body length, let it be processed right-away
 				return;
 			}
 		}
@@ -246,7 +246,7 @@ void cHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 
 
 
-void cHTTPConnection::OnRemoteClosed(void)
+void cHTTPServerConnection::OnRemoteClosed(void)
 {
 	if (m_CurrentRequest != nullptr)
 	{
@@ -260,7 +260,7 @@ void cHTTPConnection::OnRemoteClosed(void)
 
 
 
-void cHTTPConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
+void cHTTPServerConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 {
 	OnRemoteClosed();
 }
@@ -268,7 +268,7 @@ void cHTTPConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 
 
 
-void cHTTPConnection::SendData(const void * a_Data, size_t a_Size)
+void cHTTPServerConnection::SendData(const void * a_Data, size_t a_Size)
 {
 	m_Link->Send(a_Data, a_Size);
 }

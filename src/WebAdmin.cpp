@@ -13,7 +13,7 @@
 #include "Root.h"
 
 #include "HTTPServer/HTTPMessage.h"
-#include "HTTPServer/HTTPConnection.h"
+#include "HTTPServer/HTTPServerConnection.h"
 
 
 
@@ -212,7 +212,7 @@ bool cWebAdmin::LoadLoginTemplate(void)
 
 
 
-void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	if (!a_Request.HasAuth())
 	{
@@ -349,7 +349,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 
 
 
-void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	UNUSED(a_Request);
 
@@ -364,7 +364,7 @@ void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest &
 
 
 
-void cWebAdmin::HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	AString FileURL = a_Request.GetURL();
 	std::replace(FileURL.begin(), FileURL.end(), '\\', '/');
@@ -621,7 +621,7 @@ AString cWebAdmin::GetBaseURL(const AStringVector & a_URLSplit)
 
 
 
-void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	UNUSED(a_Connection);
 	const AString & URL = a_Request.GetURL();
@@ -645,7 +645,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 
 
 
-void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
+void cWebAdmin::OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
 	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
@@ -660,7 +660,7 @@ void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_R
 
 
 
-void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	const AString & URL = a_Request.GetURL();
 	if (

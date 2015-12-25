@@ -23,9 +23,7 @@
 class cHTTPMessage;
 class cHTTPRequest;
 class cHTTPResponse;
-class cHTTPConnection;
-
-typedef std::vector<cHTTPConnection *> cHTTPConnections;
+class cHTTPServerConnection;
 
 
 
@@ -42,14 +40,14 @@ public:
 
 		/** Called when a new request arrives over a connection and all its headers have been parsed.
 		The request body needn't have arrived yet. */
-		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) = 0;
+		virtual void OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request) = 0;
 
 		/** Called when another part of request body has arrived.
 		May be called multiple times for a single request. */
-		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) = 0;
+		virtual void OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) = 0;
 
 		/** Called when the request body has been fully received in previous calls to OnRequestBody() */
-		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) = 0;
+		virtual void OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request) = 0;
 	} ;
 
 	cHTTPServer(void);
@@ -65,8 +63,8 @@ public:
 	void Stop(void);
 
 protected:
-	friend class cHTTPConnection;
-	friend class cSslHTTPConnection;
+	friend class cHTTPServerConnection;
+	friend class cSslHTTPServerConnection;
 	friend class cHTTPServerListenCallbacks;
 
 	/** The cNetwork API handle for the listening socket. */
@@ -86,15 +84,15 @@ protected:
 	Returns the connection instance to be used as the cTCPLink callbacks. */
 	cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort);
 
-	/** Called by cHTTPConnection when it finishes parsing the request header */
-	void NewRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	/** Called by cHTTPServerConnection when it finishes parsing the request header */
+	void NewRequest(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request);
 
 	/** Called by cHTTPConenction when it receives more data for the request body.
 	May be called multiple times for a single request. */
-	void RequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size);
+	void RequestBody(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size);
 
-	/** Called by cHTTPConnection when it detects that the request has finished (all of its body has been received) */
-	void RequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	/** Called by cHTTPServerConnection when it detects that the request has finished (all of its body has been received) */
+	void RequestFinished(cHTTPServerConnection & a_Connection, cHTTPRequest & a_Request);
 } ;
 
 
