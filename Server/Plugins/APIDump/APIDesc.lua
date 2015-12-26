@@ -2286,7 +2286,50 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				SetFuseTicks = { Return = "number", Notes = "Set the fuse ticks until the tnt will explode." },
 			},
 			Inherits = "cEntity",
-		},
+		},  -- cTNTEntity
+
+		cUrlParser =
+		{
+			Desc = [[
+			Provides a parser for generic URLs that returns the individual components of the URL.</p>
+			<p>
+			Note that all functions are static. Call them by using "cUrlParser:Parse(...)" etc.
+			]],
+			Functions =
+			{
+				GetDefaultPort = { Params = "Scheme", Return = "number", Notes = "(STATIC) Returns the default port that should be used for the given scheme (protocol). Returns zero if the scheme is not known." },
+				IsKnownScheme = { Params = "Scheme", Return = "bool", Notes = "(STATIC) Returns true if the scheme (protocol) is recognized by the parser." },
+				Parse = { Params = "URL", Return = "Scheme, Username, Password, Host, Port, Path, Query, Fragment", Notes = "(STATIC) Returns the individual parts of the URL. Parts that are not explicitly specified in the URL are empty, the default port for the scheme is used. If parsing fails, the function returns nil and an error message." },
+				ParseAuthorityPart = { Params = "AuthPart", Return = "Username, Password, Host, Port", Notes = "(STATIC) Parses the Authority part of the URL. Parts that are not explicitly specified in the AuthPart are returned empty, the port is returned zero. If parsing fails, the function returns nil and an error message." },
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Code example",
+					Contents = [==[
+						The following code fragment uses the cUrlParser to parse an URL string into its components, and
+						prints those components out:
+<pre class="prettyprint lang-lua">
+local Scheme, Username, Password, Host, Port, Path, Query, Fragment = cUrlParser:Parse(
+	"http://anonymous:user@example.com@ftp.cuberite.org:9921/releases/2015/?sort=date#files"
+)
+if not(Scheme) then
+	LOG("  Error: " .. (username or "<nil>"))
+else
+	LOG("  Scheme   = " .. Scheme)    -- "http"
+	LOG("  Username = " .. Username)  -- "anonymous"
+	LOG("  Password = " .. Password)  -- "user@example.com"
+	LOG("  Host     = " .. Host)      -- "ftp.cuberite.org"
+	LOG("  Port     = " .. Port)      -- 9921
+	LOG("  Path     = " .. Path)      -- "releases/2015/"
+	LOG("  Query    = " .. Query)     -- "sort=date"
+	LOG("  Fragment = " .. Fragment)  -- "files"
+end
+</pre>
+					]==],
+				},
+			},
+		},  -- cUrlParser
 
 		cWebPlugin =
 		{
