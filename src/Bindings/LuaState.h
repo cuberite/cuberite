@@ -39,6 +39,7 @@ extern "C"
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
+class cClientHandle;
 
 
 
@@ -236,6 +237,7 @@ public:
 	// Push a const value onto the stack (keep alpha-sorted):
 	void Push(const AString & a_String);
 	void Push(const AStringVector & a_Vector);
+	void Push(const cClientHandle & a_Handle);
 	void Push(const cCraftingGrid * a_Grid);
 	void Push(const cCraftingRecipe * a_Recipe);
 	void Push(const char * a_Value);

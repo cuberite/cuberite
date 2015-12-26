@@ -68,6 +68,7 @@ $cfile "../MapManager.h"
 $cfile "../Scoreboard.h"
 $cfile "../Statistics.h"
 $cfile "../Protocol/MojangAPI.h"
+$cfile "../ChannelManager.h"
 
 // Entities:
 $cfile "../Entities/Entity.h"

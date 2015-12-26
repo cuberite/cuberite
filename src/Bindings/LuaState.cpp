@@ -503,6 +503,18 @@ void cLuaState::Push(const AStringVector & a_Vector)
 
 
 
+void cLuaState::Push(const cClientHandle & a_Handle)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cClientHandle *>(& a_Handle)), "cClientHandle");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(const cCraftingGrid * a_Grid)
 {
 	ASSERT(IsValid());

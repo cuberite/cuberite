@@ -23,6 +23,8 @@ SET (SRCS
 	BoundingBox.cpp
 	ByteBuffer.cpp
 	ChatColor.cpp
+	ChannelCallback.cpp
+	ChannelManager.cpp
 	Chunk.cpp
 	ChunkData.cpp
 	ChunkMap.cpp
