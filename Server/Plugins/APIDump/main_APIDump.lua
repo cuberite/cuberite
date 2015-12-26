@@ -309,6 +309,22 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 	end
 	f:write([[</td></tr></table></div><script>prettyPrint();</script>]])
 	f:write(GetHtmlTimestamp())
+	f:write([[<!-- Piwik -->
+		<script type="text/javascript">
+		  var _paq = _paq || [];
+		  _paq.push(['trackPageView']);
+		  _paq.push(['enableLinkTracking']);
+		  (function() {
+			var u="https://analytics.cuberite.org/";
+			_paq.push(['setTrackerUrl', u+'piwik.php']);
+			_paq.push(['setSiteId', 5]);
+			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+			g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
+		  })();
+		</script>
+		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
+		<!-- End Piwik Code -->
+	]])
 	f:write([[</body></html>]])
 	f:close();
 end
@@ -956,6 +972,22 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 
 	cf:write([[</td></tr></table></div><script>prettyPrint();</script>]])
 	cf:write(GetHtmlTimestamp())
+	cf:write([[<!-- Piwik -->
+		<script type="text/javascript">
+		  var _paq = _paq || [];
+		  _paq.push(['trackPageView']);
+		  _paq.push(['enableLinkTracking']);
+		  (function() {
+		    var u="https://analytics.cuberite.org/";
+		    _paq.push(['setTrackerUrl', u+'piwik.php']);
+		    _paq.push(['setSiteId', 5]);
+		    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+		    g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
+		  })();
+		</script>
+		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
+		<!-- End Piwik Code -->
+	]])
 	cf:write([[</body></html>]])
 	cf:close()
 end
@@ -1318,6 +1350,7 @@ local function DumpAPIHtml(a_API)
 	local StaticFiles =
 	{
 		"main.css",
+		"piwik.js",
 		"prettify.js",
 		"prettify.css",
 		"lang-lua.js",
@@ -1337,6 +1370,22 @@ local function DumpAPIHtml(a_API)
 
 	f:write([[</ul></div>]])
 	f:write(GetHtmlTimestamp())
+	f:write([[<!-- Piwik -->
+		<script type="text/javascript">
+		  var _paq = _paq || [];
+		  _paq.push(['trackPageView']);
+		  _paq.push(['enableLinkTracking']);
+		  (function() {
+		    var u="https://analytics.cuberite.org/";
+		    _paq.push(['setTrackerUrl', u+'piwik.php']);
+		    _paq.push(['setSiteId', 5]);
+		    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+		    g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
+		  })();
+		</script>
+		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
+		<!-- End Piwik Code -->
+	]])
 	f:write([[</body></html>]])
 	f:close()
 
@@ -1686,7 +1735,7 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	if (OfficialStats == "") then
 		return true, "Cannot load official stats"
 	end
-	
+
 	-- Load the API stats as a Lua file, process into usable dictionary:
 	local Loaded, Msg = loadstring(OfficialStats)
 	if not(Loaded) then
@@ -1714,10 +1763,10 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 		end
 		Parsed[clsK] = cls
 	end
-	
+
 	-- Get the current API's undocumented stats:
 	local API = PrepareApi()
-	
+
 	-- Compare the two sets of undocumented stats, list anything extra in current:
 	local res = {}
 	local ins = table.insert
@@ -1740,7 +1789,7 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 		end
 	end
 	table.sort(res)
-	
+
 	-- Bail out if no items found:
 	if not(res[1]) then
 		return true, "No new undocumented functions"
@@ -1751,7 +1800,7 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	f:write(table.concat(res, "\n"))
 	f:write("\n")
 	f:close()
-	
+
 	return true, "Newly undocumented items: " .. #res .. "\n" .. table.concat(res, "\n")
 end
 
