@@ -147,7 +147,7 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 
 
 
-void cProtocol180::DataReceived(const char * a_Data, size_t a_Size)
+void cProtocol180::DataReceived(const Byte * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
@@ -155,8 +155,8 @@ void cProtocol180::DataReceived(const char * a_Data, size_t a_Size)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
+			m_Decryptor.ProcessData(Decrypted, a_Data, NumBytes);
+			AddReceivedData(Decrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -281,7 +281,7 @@ void cProtocol180::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0, a_ChunkX, a_ChunkZ);
+	const auto & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0, a_ChunkX, a_ChunkZ);
 
 	cCSLock Lock(m_CSPacket);
 	SendData(ChunkData.data(), ChunkData.size());
@@ -1038,7 +1038,7 @@ void cProtocol180::SendPluginMessage(const AString & a_Channel, const AString & 
 	
 	cPacketizer Pkt(*this, 0x3f);
 	Pkt.WriteString(a_Channel);
-	Pkt.WriteBuf(a_Message.data(), a_Message.size());
+	Pkt.WriteBuf(reinterpret_cast<const Byte *>(a_Message.data()), a_Message.size());
 }
 
 
@@ -1638,10 +1638,10 @@ void cProtocol180::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
+bool cProtocol180::CompressPacket(const std::basic_string<Byte> & a_Packet, std::basic_string<Byte> & a_CompressedData)
 {
 	// Compress the data:
-	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
+	Byte CompressedData[MAX_COMPRESSED_PACKET_LEN];
 
 	uLongf CompressedSize = compressBound(static_cast<uLongf>(a_Packet.size()));
 	if (CompressedSize >= MAX_COMPRESSED_PACKET_LEN)
@@ -1659,7 +1659,7 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 		return false;
 	}
 
-	AString LengthData;
+	std::basic_string<Byte> LengthData;
 	cByteBuffer Buffer(20);
 	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
 	Buffer.ReadAll(LengthData);
@@ -1782,14 +1782,14 @@ void cProtocol180::FixItemFramePositions(int a_ObjectData, double & a_PosX, doub
 
 
 
-void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
+void cProtocol180::AddReceivedData(const Byte * a_Data, size_t a_Size)
 {
 	// Write the incoming data into the comm log file:
 	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 	{
 		if (m_ReceivedData.GetReadableSpace() > 0)
 		{
-			AString AllData;
+			std::basic_string<Byte> AllData;
 			size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
 			m_ReceivedData.ReadAll(AllData);
 			m_ReceivedData.ResetRead();
@@ -1896,7 +1896,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		// Log the packet info into the comm log file:
 		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 		{
-			AString PacketData;
+			std::basic_string<Byte> PacketData;
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
 			bb.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again
@@ -1917,7 +1917,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			#ifdef _DEBUG
 				// Dump the packet contents into the log:
 				bb.ResetRead();
-				AString Packet;
+				std::basic_string<Byte> Packet;
 				bb.ReadAll(Packet);
 				Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
 				AString Out;
@@ -1959,7 +1959,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 	// Log any leftover bytes into the logfile:
 	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
 	{
-		AString AllData;
+		std::basic_string<Byte> AllData;
 		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
 		m_ReceivedData.ReadAll(AllData);
 		m_ReceivedData.ResetRead();
@@ -2206,7 +2206,7 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		Pkt.WriteString(Server->GetServerID());
 		const AString & PubKeyDer = Server->GetPublicKeyDER();
 		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
-		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
+		Pkt.WriteBuf(reinterpret_cast<const Byte *>(PubKeyDer.data()), PubKeyDer.size());
 		Pkt.WriteVarInt32(4);
 		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 		m_Client->SetUsername(Username);
@@ -2734,7 +2734,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 
 
 
-void cProtocol180::SendData(const char * a_Data, size_t a_Size)
+void cProtocol180::SendData(const Byte * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
@@ -2742,8 +2742,8 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, reinterpret_cast<Byte *>(const_cast<char*>(a_Data)), NumBytes);
-			m_Client->SendData(reinterpret_cast<const char *>(Encrypted), NumBytes);
+			m_Encryptor.ProcessData(Encrypted, a_Data, NumBytes);
+			m_Client->SendData(Encrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -2778,8 +2778,8 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a
 		a_Item.Empty();
 	}
 
-	AString Metadata;
-	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes - 1) || (Metadata.size() == 0) || (Metadata[0] == 0))
+	std::basic_string<Byte> Metadata;
+	if (!a_ByteBuffer.ReadByteString(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes - 1) || (Metadata.size() == 0) || (Metadata[0] == 0))
 	{
 		// No metadata
 		return true;
@@ -2793,10 +2793,10 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a
 
 
 
-void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+void cProtocol180::ParseItemMetadata(cItem & a_Item, const std::basic_string<Byte> & a_Metadata)
 {
 	// Parse into NBT:
-	cParsedNBT NBT(a_Metadata.data(), a_Metadata.size());
+	cParsedNBT NBT(a_Metadata);
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
@@ -2806,8 +2806,9 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	}
 	
 	// Load enchantments and custom display names from the NBT data:
-	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
+	for (auto maybetag = NBT.GetFirstChild(NBT.GetRoot()); maybetag.HasValue(); maybetag = NBT.GetNextSibling(maybetag.GetValue()))
 	{
+		auto tag = maybetag.GetValue();
 		AString TagName = NBT.GetName(tag);
 		switch (NBT.GetType(tag))
 		{
@@ -2823,8 +2824,9 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			{
 				if (TagName == "display")  // Custom name and lore tag
 				{
-					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+					for (auto maybedisplaytag = NBT.GetFirstChild(tag); maybedisplaytag.HasValue(); maybedisplaytag = NBT.GetNextSibling(maybedisplaytag.GetValue()))
 					{
+						auto displaytag = maybedisplaytag.GetValue();
 						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
 							a_Item.m_CustomName = NBT.GetString(displaytag);
@@ -2833,9 +2835,9 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 						{
 							AString Lore;
 
-							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
+							for (auto loretag = NBT.GetFirstChild(displaytag); loretag.HasValue(); loretag = NBT.GetNextSibling(loretag.GetValue()))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag.GetValue()).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 							}
 
 							a_Item.m_Lore = Lore;
@@ -2916,7 +2918,7 @@ eBlockFace cProtocol180::FaceIntToBlockFace(Int8 a_BlockFace)
 void cProtocol180::SendPacket(cPacketizer & a_Pkt)
 {
 	UInt32 PacketLen = static_cast<UInt32>(m_OutPacketBuffer.GetUsedSpace());
-	AString PacketData, CompressedPacket;
+	std::basic_string<Byte> PacketData, CompressedPacket;
 	m_OutPacketBuffer.ReadAll(PacketData);
 	m_OutPacketBuffer.CommitRead();
 
@@ -2933,7 +2935,7 @@ void cProtocol180::SendPacket(cPacketizer & a_Pkt)
 		// The packet is not compressed, indicate this in the packet header:
 		m_OutPacketLenBuffer.WriteVarInt32(PacketLen + 1);
 		m_OutPacketLenBuffer.WriteVarInt32(0);
-		AString LengthData;
+		std::basic_string<Byte> LengthData;
 		m_OutPacketLenBuffer.ReadAll(LengthData);
 		SendData(LengthData.data(), LengthData.size());
 	}
@@ -2941,7 +2943,7 @@ void cProtocol180::SendPacket(cPacketizer & a_Pkt)
 	{
 		// Compression doesn't apply to this state, send raw data:
 		m_OutPacketLenBuffer.WriteVarInt32(PacketLen);
-		AString LengthData;
+		std::basic_string<Byte> LengthData;
 		m_OutPacketLenBuffer.ReadAll(LengthData);
 		SendData(LengthData.data(), LengthData.size());
 	}
@@ -3048,7 +3050,7 @@ void cProtocol180::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	}
 	Writer.Finish();
 
-	AString Result = Writer.GetResult();
+	auto Result = Writer.GetResult();
 	if (Result.size() == 0)
 	{
 		a_Pkt.WriteBEInt8(0);

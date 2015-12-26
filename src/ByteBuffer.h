@@ -108,11 +108,14 @@ public:
 	/** Reads a_Count bytes into a_String; returns true if successful */
 	bool ReadString(AString & a_String, size_t a_Count);
 	
+	/** Reads a_Count bytes into a_String; returns true if successful */
+	bool ReadByteString(std::basic_string<Byte> & a_String, size_t a_Count);
+	
 	/** Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer */
 	bool SkipRead(size_t a_Count);
 	
 	/** Reads all available data into a_Data */
-	void ReadAll(AString & a_Data);
+	void ReadAll(std::basic_string<Byte> & a_Data);
 	
 	/** Reads the specified number of bytes and writes it into the destinatio bytebuffer. Returns true on success. */
 	bool ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes);

@@ -141,7 +141,7 @@ public:
 	friend void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName);
 	
 	/** Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments) */
-	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);
+	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, size_t a_EnchListTagIdx);
 
 protected:
 	/** Maps enchantment ID -> enchantment level */

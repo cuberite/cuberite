@@ -38,7 +38,7 @@ bool cMapSerializer::Load(void)
 		return false;
 	}
 
-	AString Uncompressed;
+	std::basic_string<Byte> Uncompressed;
 	int res = UncompressStringGZIP(Data.data(), Data.size(), Uncompressed);
 
 	if (res != Z_OK)
@@ -47,7 +47,7 @@ bool cMapSerializer::Load(void)
 	}
 
 	// Parse the NBT data:
-	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
+	cParsedNBT NBT(Uncompressed);
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
@@ -70,7 +70,7 @@ bool cMapSerializer::Save(void)
 	Writer.Finish();
 	
 	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
 	#endif  // _DEBUG
 
@@ -80,7 +80,7 @@ bool cMapSerializer::Save(void)
 		return false;
 	}
 
-	AString Compressed;
+	std::basic_string<Byte> Compressed;
 	int res = CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 
 	if (res != Z_OK)
@@ -112,7 +112,7 @@ void cMapSerializer::SaveMapToNBT(cFastNBTWriter & a_Writer)
 	a_Writer.AddInt("zCenter", m_Map->GetCenterZ());
 
 	const cMap::cColorList & Data = m_Map->GetData();
-	a_Writer.AddByteArray("colors", reinterpret_cast<const char *>(Data.data()), Data.size());
+	a_Writer.AddByteArray("colors", reinterpret_cast<const Byte *>(Data.data()), Data.size());
 
 	a_Writer.EndCompound();
 }
@@ -123,21 +123,21 @@ void cMapSerializer::SaveMapToNBT(cFastNBTWriter & a_Writer)
 
 bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 {
-	int Data = a_NBT.FindChildByName(0, "data");
-	if (Data < 0)
+	auto Data = a_NBT.FindChildByName(0, "data");
+	if (!Data.HasValue())
 	{
 		return false;
 	}
 
-	int CurrLine = a_NBT.FindChildByName(Data, "scale");
-	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Byte))
+	auto CurrLine = a_NBT.FindChildByName(Data.GetValue(), "scale");
+	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_Byte))
 	{
-		unsigned int Scale = static_cast<unsigned int>(a_NBT.GetByte(CurrLine));
+		unsigned int Scale = static_cast<unsigned int>(a_NBT.GetByte(CurrLine.GetValue()));
 		m_Map->SetScale(Scale);
 	}
 
-	CurrLine = a_NBT.FindChildByName(Data, "dimension");
-	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Byte))
+	CurrLine = a_NBT.FindChildByName(Data.GetValue(), "dimension");
+	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_Byte))
 	{
 		eDimension Dimension = static_cast<eDimension>(a_NBT.GetByte(CurrLine));
 		

@@ -57,7 +57,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 
 
 
-void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
+void cProtocolRecognizer::DataReceived(const Byte * a_Data, size_t a_Size)
 {
 	if (m_Protocol == nullptr)
 	{
@@ -73,7 +73,7 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 		}
 
 		// The protocol has just been recognized, dump the whole m_Buffer contents into it for parsing:
-		AString Dump;
+		std::basic_string<Byte> Dump;
 		m_Buffer.ResetRead();
 		m_Buffer.ReadAll(Dump);
 		m_Protocol->DataReceived(Dump.data(), Dump.size());
@@ -197,13 +197,13 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	else
 	{
 		// This is used when the client sends a server-ping, respond with the default packet:
-		static const int Packet = 0xff;  // PACKET_DISCONNECT
-		SendData(reinterpret_cast<const char *>(&Packet), 1);  // WriteByte()
+		static const Byte Packet = 0xff;  // PACKET_DISCONNECT
+		SendData(&Packet, 1);  // WriteByte()
 
 		auto UTF16 = UTF8ToRawBEUTF16(a_Reason);
 		static const u_short Size = htons(static_cast<u_short>(UTF16.size()));
-		SendData(reinterpret_cast<const char *>(&Size), 2);      // WriteShort()
-		SendData(reinterpret_cast<const char *>(UTF16.data()), UTF16.size() * sizeof(char16_t));  // WriteString()
+		SendData(reinterpret_cast<const Byte *>(&Size), 2);      // WriteShort()
+		SendData(reinterpret_cast<const Byte *>(UTF16.data()), UTF16.size() * sizeof(char16_t));  // WriteString()
 	}
 }
 
@@ -909,7 +909,7 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 
 
 
-void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
+void cProtocolRecognizer::SendData(const Byte * a_Data, size_t a_Size)
 {
 	// This is used only when handling the server ping
 	m_Client->SendData(a_Data, a_Size);
