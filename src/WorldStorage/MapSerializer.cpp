@@ -139,7 +139,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	CurrLine = a_NBT.FindChildByName(Data.GetValue(), "dimension");
 	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_Byte))
 	{
-		eDimension Dimension = static_cast<eDimension>(a_NBT.GetByte(CurrLine));
+		eDimension Dimension = static_cast<eDimension>(a_NBT.GetByte(CurrLine.GetValue()));
 		
 		if (Dimension != m_Map->m_World->GetDimension())
 		{
@@ -148,10 +148,10 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 		}
 	}
 
-	CurrLine = a_NBT.FindChildByName(Data, "width");
-	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Short))
+	CurrLine = a_NBT.FindChildByName(Data.GetValue(), "width");
+	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_Short))
 	{
-		unsigned int Width = static_cast<unsigned int>(a_NBT.GetShort(CurrLine));
+		unsigned int Width = static_cast<unsigned int>(a_NBT.GetShort(CurrLine.GetValue()));
 		if (Width != 128)
 		{
 			return false;
@@ -159,10 +159,10 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 		m_Map->m_Width = Width;
 	}
 
-	CurrLine = a_NBT.FindChildByName(Data, "height");
-	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Short))
+	CurrLine = a_NBT.FindChildByName(Data.GetValue(), "height");
+	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_Short))
 	{
-		unsigned int Height = static_cast<unsigned int>(a_NBT.GetShort(CurrLine));
+		unsigned int Height = static_cast<unsigned int>(a_NBT.GetShort(CurrLine.GetValue()));
 		if (Height >= 256)
 		{
 			return false;
@@ -170,27 +170,27 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 		m_Map->m_Height = Height;
 	}
 
-	CurrLine = a_NBT.FindChildByName(Data, "xCenter");
-	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Int))
+	CurrLine = a_NBT.FindChildByName(Data.GetValue(), "xCenter");
+	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_Int))
 	{
-		int CenterX = a_NBT.GetInt(CurrLine);
+		int CenterX = a_NBT.GetInt(CurrLine.GetValue());
 		m_Map->m_CenterX = CenterX;
 	}
 
-	CurrLine = a_NBT.FindChildByName(Data, "zCenter");
-	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Int))
+	CurrLine = a_NBT.FindChildByName(Data.GetValue(), "zCenter");
+	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_Int))
 	{
-		int CenterZ = a_NBT.GetInt(CurrLine);
+		int CenterZ = a_NBT.GetInt(CurrLine.GetValue());
 		m_Map->m_CenterZ = CenterZ;
 	}
 
 	unsigned int NumPixels = m_Map->GetNumPixels();
 	m_Map->m_Data.resize(NumPixels);
 
-	CurrLine = a_NBT.FindChildByName(Data, "colors");
-	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_ByteArray))
+	CurrLine = a_NBT.FindChildByName(Data.GetValue(), "colors");
+	if ((CurrLine.HasValue()) && (a_NBT.GetType(CurrLine.GetValue()) == TAG_ByteArray))
 	{
-		memcpy(m_Map->m_Data.data(), a_NBT.GetData(CurrLine), NumPixels);
+		memcpy(m_Map->m_Data.data(), a_NBT.GetData(CurrLine.GetValue()), NumPixels);
 	}
 
 	return true;
@@ -225,17 +225,17 @@ bool cIDCountSerializer::Load(void)
 	// NOTE: idcounts.dat is not compressed (raw format)
 
 	// Parse the NBT data:
-	cParsedNBT NBT(Data.data(), Data.size());
+	cParsedNBT NBT(std::basic_string<Byte>(reinterpret_cast<const Byte *>(Data.data()), Data.size()));
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
 		return false;
 	}
 
-	int CurrLine = NBT.FindChildByName(0, "map");
-	if (CurrLine >= 0)
+	auto CurrLine = NBT.FindChildByName(0, "map");
+	if (CurrLine.HasValue())
 	{
-		m_MapCount = static_cast<unsigned int>(NBT.GetShort(CurrLine) + 1);
+		m_MapCount = static_cast<unsigned int>(NBT.GetShort(CurrLine.GetValue()) + 1);
 	}
 	else
 	{
@@ -261,7 +261,7 @@ bool cIDCountSerializer::Save(void)
 	Writer.Finish();
 	
 	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
 	#endif  // _DEBUG
 
