@@ -197,7 +197,6 @@ private:
 	bool IsWalkable(const Vector3i & a_Location, const Vector3i & a_Source);
 	bool BodyFitsIn(const Vector3i & a_Location, const Vector3i & a_Source);
 	bool BlockTypeIsSpecial(BLOCKTYPE a_Type);
-	bool BlockTypeIsFence(BLOCKTYPE a_Type);  // TODO Perhaps this should be moved to cBlockInfo
 	bool SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,  const Vector3i & a_Direction);
 	bool HasSolidBelow(const Vector3i & a_Location);
 	#ifdef COMPILING_PATHFIND_DEBUGGER

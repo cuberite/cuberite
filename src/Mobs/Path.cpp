@@ -508,7 +508,7 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 		a_Cell.m_IsSpecial = true;
 		a_Cell.m_IsSolid = true;  // Specials are solids only from a certain direction. But their m_IsSolid is always true
 	}
-	else if ((a_Cell.m_BlockType == E_BLOCK_AIR) && BlockTypeIsFence(GetCell(Location + Vector3i(0, -1, 0))->m_BlockType))
+	else if ((a_Cell.m_BlockType == E_BLOCK_AIR) && IsBlockFence(GetCell(Location + Vector3i(0, -1, 0))->m_BlockType))
 	{
 		// Air blocks with fences below them are consider Special Solids. That is, they sometimes behave as solids.
 		a_Cell.m_IsSpecial = true;
@@ -597,7 +597,7 @@ bool cPath::BodyFitsIn(const Vector3i & a_Location, const Vector3i & a_Source)
 
 bool cPath::BlockTypeIsSpecial(BLOCKTYPE a_Type)
 {
-	if (BlockTypeIsFence(a_Type))
+	if (IsBlockFence(a_Type))
 	{
 		return true;
 	}
@@ -619,33 +619,6 @@ bool cPath::BlockTypeIsSpecial(BLOCKTYPE a_Type)
 	}
 }
 
-bool cPath::BlockTypeIsFence(BLOCKTYPE a_Type)
-{
-	switch (a_Type)
-	{
-		case E_BLOCK_COBBLESTONE_WALL:
-		case E_BLOCK_FENCE:
-		case E_BLOCK_OAK_FENCE_GATE:
-		case E_BLOCK_NETHER_BRICK_FENCE:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_SPRUCE_FENCE:
-		case E_BLOCK_BIRCH_FENCE:
-		case E_BLOCK_JUNGLE_FENCE:
-		case E_BLOCK_DARK_OAK_FENCE:
-		case E_BLOCK_ACACIA_FENCE:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
 
 
 
