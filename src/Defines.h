@@ -441,6 +441,7 @@ inline bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 
 
 
+
 inline bool IsBlockRail(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
@@ -504,6 +505,7 @@ inline bool IsBlockFence(BLOCKTYPE a_BlockType)
 		}
 	}
 }
+
 
 
 
