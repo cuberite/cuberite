@@ -159,12 +159,5 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 		{
 			m_Data.GetActiveBlocks().emplace_back(CurrentLocation);
 		}
-
-		#ifdef _DEBUG
-			for (const auto & UpdateLocation : Updates)
-			{
-				LOGD("Queueing block for reupdate (%i %i %i)", UpdateLocation.x, UpdateLocation.y, UpdateLocation.z);
-			}
-		#endif
 	}
 }
