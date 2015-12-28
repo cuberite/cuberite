@@ -157,7 +157,7 @@ private:
 	void FinishCalculation();  // Clears the memory used for calculating the path.
 	void FinishCalculation(ePathFinderStatus a_NewStatus);  // Clears the memory used for calculating the path and changes the status.
 	void AttemptToFindAlternative();
-	void BuildPath();
+	void BuildPath(const Vector3i & a_LastCellCoords);
 
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);
@@ -176,6 +176,7 @@ private:
 	int m_BoundingBoxWidth;
 	int m_BoundingBoxHeight;
 	double m_HalfWidth;
+	bool m_IsWideDestination;
 	int m_StepsLeft;
 	cPathCell * m_NearestPointToTarget;
 	cFastRandom m_Rand;
