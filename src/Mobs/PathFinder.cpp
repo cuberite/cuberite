@@ -5,7 +5,6 @@
 
 
 
-
 cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
 	m_Path(),
 	m_GiveUpCounter(0),
@@ -197,7 +196,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	// This fixes the player leaning issue.
 	// If that failed, we instead go down to the lowest air block.
 	Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
-	if (!(IsWaterOrSolid(BlockType)))
+	if (!(IsWaterOrSolidAndNotFence(BlockType)))
 	{
 		bool InTheAir = true;
 		int x, z;
@@ -217,7 +216,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 				RelX = FloorC(a_Vector.x+x) - Chunk->GetPosX() * cChunkDef::Width;
 				RelZ = FloorC(a_Vector.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
 				Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
-				if (IsWaterOrSolid((BlockType)))
+				if (IsWaterOrSolidAndNotFence((BlockType)))
 				{
 					a_Vector.x += x;
 					a_Vector.z += z;
@@ -234,7 +233,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 			while (a_Vector.y > 0)
 			{
 				Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
-				if (IsWaterOrSolid(BlockType))
+				if (IsWaterOrSolidAndNotFence(BlockType))
 				{
 					break;
 				}
@@ -247,7 +246,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	while (a_Vector.y < cChunkDef::Height)
 	{
 		Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y), RelZ, BlockType, BlockMeta);
-		if (!IsWaterOrSolid(BlockType))
+		if (!IsWaterOrSolidAndNotFence(BlockType))
 		{
 			break;
 		}
@@ -261,8 +260,12 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 
 
 
-bool cPathFinder::IsWaterOrSolid(BLOCKTYPE a_BlockType)
+bool cPathFinder::IsWaterOrSolidAndNotFence(BLOCKTYPE a_BlockType)
 {
+	if (IsBlockFence(a_BlockType))
+	{
+		return false;
+	}
 	return ((a_BlockType == E_BLOCK_STATIONARY_WATER) || cBlockInfo::IsSolid(a_BlockType));
 }
 
