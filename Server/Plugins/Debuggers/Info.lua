@@ -259,6 +259,12 @@ g_PluginInfo =
 			Handler = HandleConsoleTestUrlParser,
 			HelpString = "Tests the cUrlParser",
 		},
+		
+		["uuid"] =
+		{
+			Handler = HandleConsoleUuid,
+			HelpString = "Queries the cMojangAPI for a player's UUID",
+		}
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
 

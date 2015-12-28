@@ -2071,6 +2071,37 @@ end
 
 
 
+function HandleConsoleUuid(a_Split, a_EntireCmd)
+	-- Check params:
+	local playerName = a_Split[2]
+	if not(playerName) then
+		return true, "Usage: uuid <PlayerName>"
+	end
+	
+	-- Query with cache:
+	LOG("Player " .. playerName .. ":")
+	local cachedUuid = cMojangAPI:GetUUIDFromPlayerName(playerName, true)
+	if not(cachedUuid) then
+		LOG("  - not in the UUID cache")
+	else
+		LOG("  - in the cache: \"" .. cachedUuid .. "\"")
+	end
+	
+	-- Query online:
+	local onlineUuid = cMojangAPI:GetUUIDFromPlayerName(playerName, false)
+	if not(onlineUuid) then
+		LOG("  - UUID not available online")
+	else
+		LOG("  - online: \"" .. onlineUuid .. "\"")
+	end
+	
+	return true
+end
+
+
+
+
+
 function HandleConsoleBBox(a_Split)
 	local bbox = cBoundingBox(0, 10, 0, 10, 0, 10)
 	local v1 = Vector3d(1, 1, 1)
