@@ -1098,6 +1098,19 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 
 bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 {
+	// If the Y coord is out of range, return the most logical result without considering anything else:
+	int RelY = FloorC(a_Location.y);
+	if (RelY < 0)
+	{
+		// Never burn under the world
+		return false;
+	}
+	if (RelY >= cChunkDef::Height)
+	{
+		// Always burn above the world
+		return true;
+	}
+
 	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Location.x), FloorC(a_Location.z));
 	if ((Chunk == nullptr) || (!Chunk->IsValid()))
 	{
@@ -1105,14 +1118,13 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	}
 
 	int RelX = FloorC(a_Location.x) - Chunk->GetPosX() * cChunkDef::Width;
-	int RelY = FloorC(a_Location.y);
 	int RelZ = FloorC(a_Location.z) - Chunk->GetPosZ() * cChunkDef::Width;
 
 	if (
 		(Chunk->GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
 		(Chunk->GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
-		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)         // Not raining
+		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
+		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
 	)
 	{
 		return true;
