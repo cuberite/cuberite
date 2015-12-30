@@ -189,7 +189,7 @@ private:
 
 	bool m_bIsConnected;  // true - connected false - not connected
 
-	bool m_bRestarting;
+	std::atomic<bool> m_bRestarting;
 	
 	/** The private key used for the assymetric encryption start in the protocols */
 	cRsaPrivateKey m_PrivateKey;
