@@ -748,7 +748,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		Json::Reader reader;
 		if (!reader.parse(Response, root, false) || !root.isArray())
 		{
-			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON!", __FUNCTION__);
+			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, reader.getFormattedErrorMessages().c_str());
 			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 			continue;
 		}
@@ -861,7 +861,7 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 	Json::Value root;
 	if (!reader.parse(Response, root, false) || !root.isObject())
 	{
-		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON!", __FUNCTION__);
+		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, reader.getFormattedErrorMessages().c_str());
 		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return;
 	}
