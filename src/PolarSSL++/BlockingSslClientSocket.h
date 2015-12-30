@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <atomic>
 #include "OSSupport/Network.h"
 #include "CallbackSslContext.h"
 
@@ -81,7 +82,7 @@ protected:
 	AString m_LastErrorText;
 	
 	/** Set to true if the connection established successfully. */
-	bool m_IsConnected;
+	std::atomic<bool> m_IsConnected;
 
 	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;

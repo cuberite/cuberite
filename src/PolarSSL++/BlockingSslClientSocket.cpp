@@ -70,7 +70,9 @@ class cBlockingSslClientSocketLinkCallbacks:
 	{
 		m_Socket.OnDisconnected();
 	}
+
 public:
+
 	cBlockingSslClientSocketLinkCallbacks(cBlockingSslClientSocket & a_Socket):
 		m_Socket(a_Socket)
 	{
@@ -143,7 +145,6 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 		return false;
 	}
 	
-	m_IsConnected = true;
 	return true;
 }
 
@@ -182,7 +183,11 @@ bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_C
 
 bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 {
-	ASSERT(m_IsConnected);
+	if (!m_IsConnected)
+	{
+		m_LastErrorText = "Socket is closed";
+		return false;
+	}
 	
 	// Keep sending the data until all of it is sent:
 	const char * Data = reinterpret_cast<const char *>(a_Data);
@@ -216,8 +221,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 
 int cBlockingSslClientSocket::Receive(void * a_Data, size_t a_MaxBytes)
 {
-	ASSERT(m_IsConnected);
-	
+	// Even if m_IsConnected is false (socket disconnected), the SSL context may have more data in the queue
 	int res = m_Ssl.ReadPlain(a_Data, a_MaxBytes);
 	if (res < 0)
 	{
@@ -239,9 +243,16 @@ void cBlockingSslClientSocket::Disconnect(void)
 	}
 	
 	m_Ssl.NotifyClose();
-	m_Socket->Close();
-	m_Socket.reset();
 	m_IsConnected = false;
+
+	// Grab a copy of the socket so that we know it doesn't change under our hands:
+	auto socket = m_Socket;
+	if (socket != nullptr)
+	{
+		socket->Close();
+	}
+
+	m_Socket.reset();
 }
 
 
@@ -293,6 +304,7 @@ int cBlockingSslClientSocket::SendEncrypted(const unsigned char * a_Buffer, size
 
 
 
+
 void cBlockingSslClientSocket::OnConnected(void)
 {
 	m_IsConnected = true;
@@ -305,7 +317,7 @@ void cBlockingSslClientSocket::OnConnected(void)
 
 void cBlockingSslClientSocket::OnConnectError(const AString & a_ErrorMsg)
 {
-	LOG("Cannot connect to %s: %s", m_ServerName.c_str(), a_ErrorMsg.c_str());
+	LOG("Cannot connect to %s: \"%s\"", m_ServerName.c_str(), a_ErrorMsg.c_str());
 	m_Event.Set();
 }
 
@@ -337,8 +349,8 @@ void cBlockingSslClientSocket::SetLink(cTCPLinkPtr a_Link)
 
 void cBlockingSslClientSocket::OnDisconnected(void)
 {
-	m_Socket.reset();
 	m_IsConnected = false;
+	m_Socket.reset();
 	m_Event.Set();
 }
 
