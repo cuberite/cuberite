@@ -49,6 +49,7 @@ protected:
 
 	eKind m_Kind;
 
+	/** Map of headers, with their keys lowercased. */
 	AStringMap m_Headers;
 
 	/** Type of the content; parsed by AddHeader(), set directly by SetContentLength() */

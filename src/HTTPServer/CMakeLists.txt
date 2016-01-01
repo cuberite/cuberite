@@ -9,11 +9,13 @@ SET (SRCS
 	HTTPFormParser.cpp
 	HTTPMessage.cpp
 	HTTPRequestParser.cpp
+	HTTPResponseParser.cpp
 	HTTPServer.cpp
 	HTTPServerConnection.cpp
 	MultipartParser.cpp
 	NameValueParser.cpp
 	SslHTTPServerConnection.cpp
+	TransferEncodingParser.cpp
 	UrlParser.cpp
 )
 
@@ -22,11 +24,13 @@ SET (HDRS
 	HTTPFormParser.h
 	HTTPMessage.h
 	HTTPRequestParser.h
+	HTTPResponseParser.h
 	HTTPServer.h
 	HTTPServerConnection.h
 	MultipartParser.h
 	NameValueParser.h
 	SslHTTPServerConnection.h
+	TransferEncodingParser.h
 	UrlParser.h
 )
 
