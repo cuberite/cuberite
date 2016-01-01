@@ -258,7 +258,7 @@ macro(set_exe_flags)
 
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
-				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION}")
+				message(FATAL_ERROR "Cuberite requires clang version 3.0 or higher, your version is ${CLANG_VERSION}")
 			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")

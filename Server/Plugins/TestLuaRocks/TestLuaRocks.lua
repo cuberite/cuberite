@@ -1,7 +1,7 @@
 
 -- TestLuaRocks.lua
 
--- This is a mockup plugin that does a quick test of LuaRocks capability in MCServer
+-- This is a mockup plugin that does a quick test of LuaRocks capability in Cuberite
 
 -- "Success" is when the plugin loads, downloads the forum webpage and displays the headers and length and then displays both libs as loaded.
 -- "Failure" usually manifests as one of the "require" lines failing, although you have the luarock installed.

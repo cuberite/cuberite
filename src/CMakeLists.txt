@@ -216,7 +216,7 @@ if (NOT MSVC)
 
 	# If building a windows version, but not using MSVC, add the resources directly to the makefile:
 	if (WIN32)
-		list(APPEND SOURCE "Resources/MCServer.rc")
+		list(APPEND SOURCE "Resources/Cuberite.rc")
 	endif()
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
@@ -276,7 +276,7 @@ else ()
 	SET_SOURCE_FILES_PROPERTIES(
 		"StackWalker.cpp LeakFinder.cpp" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
 	)
-	list(APPEND SOURCE "Resources/MCServer.rc")
+	list(APPEND SOURCE "Resources/Cuberite.rc")
 
 	# Make MSVC generate the PDB files even for the release build:
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")

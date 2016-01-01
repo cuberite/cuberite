@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# This script runs MCServer under helgrind
+# This script runs Cuberite under helgrind
 # It expects valgrind to be normally installed and available
 # Note that this is for Linux only and debug-only, since it slows down MCS way too much
 

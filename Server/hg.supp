@@ -1,4 +1,4 @@
-# This is a valgrind suppressions file for running helgrind on MCServer
+# This is a valgrind suppressions file for running helgrind on Cuberite
 # Use by adding "--suppressions=hg.supp" to the helgrind commandline
 
 

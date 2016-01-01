@@ -88,8 +88,8 @@ Basically, the process is:
 **Windows:**
 
 You need to first generate a solution file by executing `cmake .` on the commandline at the top-level folder of the repository, then just open the solution file in MSVC and build. Note that the first time after generating the solution, you will need to do extra setup in order to be able to fully debug in MSVC:
-- Set the startup project to Cuberite: right-click the MCServer project in the Solution Explorer and choose "Set as Startup Project".
-- Set the debugging folder: right-click the MCServer project in the Solution Explorer, choose "Properties". In the dialog, browse to "Configuration Properties" -> "Debugging" and set "Working Directory" to "../MCServer".
+- Set the startup project to Cuberite: right-click the Cuberite project in the Solution Explorer and choose "Set as Startup Project".
+- Set the debugging folder: right-click the Cuberite project in the Solution Explorer, choose "Properties". In the dialog, browse to "Configuration Properties" -> "Debugging" and set "Working Directory" to "../Server".
 
 How to Run
 ----------

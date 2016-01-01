@@ -11,7 +11,7 @@ Login Sequence.txt
 	- Annotated log of packets exchanged between the client and server for login; 1.6.2 protocol
 
 Object ownership.gv
-	- a GraphViz file to visualise ownership relations in the MCServer code architecture
+	- a GraphViz file to visualise ownership relations in the Cuberite code architecture
 
 SocketThreads states.gv
 	- a GraphViz file documenting the states for individual sockets in cSocketThreads, and transitions between them

@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
-#include "resource_MCServer.h"
+#include "resource_Cuberite.h"
 
 
 

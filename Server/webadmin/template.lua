@@ -81,7 +81,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	end
 
 	Output([[
-<!-- Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 -->
+<!-- Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 -->
 <html>
 <head>
 	<title>]] .. Title .. [[</title>
@@ -94,7 +94,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<div class="pagehead">
 		<div class="row1">
 			<div class="wrapper">
-				<img src="/logo_login.png" alt="MCServer Logo" class="logo">
+				<img src="/logo_login.png" alt="Cuberite Logo" class="logo">
 			</div>
 		</div>
 		<div id="panel">

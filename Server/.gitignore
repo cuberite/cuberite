@@ -31,6 +31,7 @@ motd.txt
 *.dmp
 *.xml
 mcserver_api.lua
+cuberite_api.lua
 
 # Ignore the webadmin certs / privkey, so that no-one commits theirs by accident:
 webadmin/httpscert.crt

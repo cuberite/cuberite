@@ -1459,7 +1459,7 @@ function HandleCompo(a_Split, a_Player)
 	-- Send one composite message to self:
 	local msg = cCompositeChat()
 	msg:AddTextPart("Hello! ", "b@e")  -- bold yellow
-	msg:AddUrlPart("MCServer", "http://mc-server.org")
+	msg:AddUrlPart("Cuberite", "http://cuberite.org")
 	msg:AddTextPart(" rules! ")
 	msg:AddRunCommandPart("Set morning", "/time set 0")
 	a_Player:SendMessage(msg)
