@@ -9,14 +9,13 @@ if (MSVC)
 endif()
 
 # These env variables are used for configuring Travis CI builds.
-# See https://github.com/mc-server/MCServer/pull/767
 if(DEFINED ENV{TRAVIS_CUBERITE_BUILD_TYPE})
 	message("Setting build type to $ENV{TRAVIS_CUBERITE_BUILD_TYPE}")
 	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_CUBERITE_BUILD_TYPE})
 endif()
 
-if(DEFINED ENV{TRAVIS_MCSERVER_FORCE32})
-	set(FORCE32 $ENV{TRAVIS_MCSERVER_FORCE32})
+if(DEFINED ENV{TRAVIS_CUBERITE_FORCE32})
+	set(FORCE32 $ENV{TRAVIS_CUBERITE_FORCE32})
 endif()
 
 if(DEFINED ENV{TRAVIS_BUILD_WITH_COVERAGE})

@@ -128,7 +128,7 @@ clean :
 
 
 ###################################################
-# Build the parts of MCServer
+# Build the parts of Cuberite
 #
 # options used:
 #  -x c  ... compile as C code

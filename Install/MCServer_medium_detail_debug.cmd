@@ -1,1 +1,0 @@
-MCServer --crash-dump-globals
