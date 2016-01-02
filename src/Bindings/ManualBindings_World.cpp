@@ -36,9 +36,9 @@ static int tolua_cWorld_BroadcastParticleEffect(lua_State * tolua_S)
 	AString Name;
 	float PosX, PosY, PosZ, OffX, OffY, OffZ;
 	float ParticleData;
-	int ParticleAmmount;
+	int ParticleAmount;
 	cClientHandle * ExcludeClient = nullptr;
-	L.GetStackValues(1, World, Name, PosX, PosY, PosZ, OffX, OffY, OffZ, ParticleData, ParticleAmmount, ExcludeClient);
+	L.GetStackValues(1, World, Name, PosX, PosY, PosZ, OffX, OffY, OffZ, ParticleData, ParticleAmount, ExcludeClient);
 	if (World == nullptr)
 	{
 		LOGWARNING("World:BroadcastParticleEffect(): invalid world parameter");
@@ -53,7 +53,7 @@ static int tolua_cWorld_BroadcastParticleEffect(lua_State * tolua_S)
 		L.GetStackValue(11 + i, data[static_cast<size_t>(i)]);
 	}
 
-	World->GetBroadcaster().BroadcastParticleEffect(Name, Vector3f(PosX, PosY, PosZ), Vector3f(OffX, OffY, OffZ), ParticleData, ParticleAmmount, ExcludeClient);
+	World->GetBroadcaster().BroadcastParticleEffect(Name, Vector3f(PosX, PosY, PosZ), Vector3f(OffX, OffY, OffZ), ParticleData, ParticleAmount, ExcludeClient);
 
 	return 0;
 }
