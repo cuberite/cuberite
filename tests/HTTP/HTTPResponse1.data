@@ -1,0 +1,9 @@
+HTTP/1.0 200 OK
+Note: This is a test of a regular response with Content-Length set
+ (identity transfer encoding)
+Note2: The above header also tests multi-line header lines
+Header1: Value1
+Header2: Value2
+Content-Length: 3
+
+bla

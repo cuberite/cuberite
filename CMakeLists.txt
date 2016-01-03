@@ -263,6 +263,7 @@ if (MSVC)
 	if (${SELF_TEST})
 		set_target_properties(
 			Network
+			HTTP
 			PROPERTIES FOLDER Lib
 		)
 		set_target_properties(
@@ -274,6 +275,7 @@ if (MSVC)
 			creatable-exe
 			EchoServer
 			Google-exe
+			HTTPResponseParser_file-exe
 			LoadablePieces
 			NameLookup
 			PROPERTIES FOLDER Tests

@@ -9,5 +9,6 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(ChunkData)
+add_subdirectory(HTTP)
 add_subdirectory(Network)
 add_subdirectory(LoadablePieces)
