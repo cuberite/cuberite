@@ -453,22 +453,49 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		{
 			switch (m_BlockType)
 			{
+				case E_BLOCK_ACACIA_DOOR:
+				case E_BLOCK_ACTIVE_COMPARATOR:
+				case E_BLOCK_BED:
+				case E_BLOCK_BIRCH_DOOR:
+				case E_BLOCK_BREWING_STAND:
 				case E_BLOCK_CAKE:
 				case E_BLOCK_CARROTS:
+				case E_BLOCK_CAULDRON:
 				case E_BLOCK_COCOA_POD:
+				case E_BLOCK_CROPS:
+				case E_BLOCK_DARK_OAK_DOOR:
+				case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
 				case E_BLOCK_DOUBLE_STONE_SLAB:
 				case E_BLOCK_DOUBLE_WOODEN_SLAB:
 				case E_BLOCK_FIRE:
 				case E_BLOCK_FARMLAND:
+				case E_BLOCK_FLOWER_POT:
+				case E_BLOCK_HEAD:
+				case E_BLOCK_INACTIVE_COMPARATOR:
+				case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
+				case E_BLOCK_IRON_DOOR:
+				case E_BLOCK_JUNGLE_DOOR:
 				case E_BLOCK_MELON_STEM:
 				case E_BLOCK_MOB_SPAWNER:
 				case E_BLOCK_NETHER_WART:
+				case E_BLOCK_OAK_DOOR:
+				case E_BLOCK_PISTON_EXTENSION:
 				case E_BLOCK_POTATOES:
 				case E_BLOCK_PUMPKIN_STEM:
+				case E_BLOCK_REDSTONE_ORE_GLOWING:
+				case E_BLOCK_REDSTONE_REPEATER_OFF:
+				case E_BLOCK_REDSTONE_REPEATER_ON:
+				case E_BLOCK_REDSTONE_TORCH_OFF:
+				case E_BLOCK_REDSTONE_WIRE:
+				case E_BLOCK_SIGN_POST:
 				case E_BLOCK_SNOW:
+				case E_BLOCK_SPRUCE_DOOR:
+				case E_BLOCK_STANDING_BANNER:
 				case E_BLOCK_SUGARCANE:
 				case E_BLOCK_TALL_GRASS:
-				case E_BLOCK_CROPS:
+				case E_BLOCK_TRIPWIRE:
+				case E_BLOCK_WALL_BANNER:
+				case E_BLOCK_WALLSIGN:
 				{
 					// Silktouch can't be used for these blocks
 					ConvertToPickups(Pickups, Meta);
