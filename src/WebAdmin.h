@@ -7,8 +7,8 @@
 
 #include "Bindings/LuaState.h"
 #include "IniFile.h"
-#include "HTTPServer/HTTPServer.h"
-#include "HTTPServer/HTTPFormParser.h"
+#include "HTTP/HTTPServer.h"
+#include "HTTP/HTTPFormParser.h"
 
 
 

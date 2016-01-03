@@ -3,7 +3,7 @@
 
 #include "Protocol/Authenticator.h"
 #include "Protocol/MojangAPI.h"
-#include "HTTPServer/HTTPServer.h"
+#include "HTTP/HTTPServer.h"
 #include "Defines.h"
 #include "RankManager.h"
 #include <thread>

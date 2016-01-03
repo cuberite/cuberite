@@ -13,6 +13,7 @@
 cHTTPResponseParser::cHTTPResponseParser(cHTTPResponseParser::cCallbacks & a_Callbacks):
 	Super(mkResponse),
 	m_Callbacks(a_Callbacks),
+	m_HasHadError(false),
 	m_IsInHeaders(true),
 	m_IsFinished(false),
 	m_EnvelopeParser(*this)
@@ -56,7 +57,7 @@ size_t cHTTPResponseParser::Parse(const char * a_Data, size_t a_Size)
 		if (!m_Buffer.empty())
 		{
 			// Headers finished and there's still data left in the buffer, process it as message body:
-			m_IsInHeaders = false;
+			HeadersFinished();
 			return ParseBody(m_Buffer.data(), m_Buffer.size());
 		}
 		return 0;
@@ -132,6 +133,10 @@ void cHTTPResponseParser::HeadersFinished(void)
 	{
 		m_TransferEncodingParser = cTransferEncodingParser::Create(*this, "identity", m_ContentLength);
 	}
+	else
+	{
+		m_TransferEncodingParser = cTransferEncodingParser::Create(*this, transferEncoding->second, m_ContentLength);
+	}
 }
 
 
@@ -169,6 +174,7 @@ void cHTTPResponseParser::OnBodyData(const void * a_Data, size_t a_Size)
 
 void cHTTPResponseParser::OnBodyFinished(void)
 {
+	m_IsFinished = true;
 	m_Callbacks.OnBodyFinished();
 }
 

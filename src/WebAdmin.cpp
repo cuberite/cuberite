@@ -12,8 +12,8 @@
 #include "Server.h"
 #include "Root.h"
 
-#include "HTTPServer/HTTPRequestParser.h"
-#include "HTTPServer/HTTPServerConnection.h"
+#include "HTTP/HTTPRequestParser.h"
+#include "HTTP/HTTPServerConnection.h"
 
 
 
