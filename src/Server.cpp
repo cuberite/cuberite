@@ -153,16 +153,6 @@ cServer::cServer(void) :
 
 
 
-void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
-{
-	cCSLock Lock(m_CSClients);
-	m_ClientsToRemove.push_back(const_cast<cClientHandle *>(a_Client));
-}
-
-
-
-
-
 void cServer::PlayerCreated(const cPlayer * a_Player)
 {
 	UNUSED(a_Player);
@@ -268,7 +258,7 @@ int cServer::GetNumPlayers(void) const
 
 
 
-bool cServer::IsPlayerInQueue(AString a_Username)
+bool cServer::IsClientOnServer(AString a_Username)
 {
 	cCSLock Lock(m_CSClients);
 	for (auto client : m_Clients)
@@ -280,7 +270,6 @@ bool cServer::IsPlayerInQueue(AString a_Username)
 	}
 	return false;
 }
-
 
 
 
@@ -329,7 +318,7 @@ bool cServer::Tick(float a_Dt)
 	// Let the Root process all the queued commands:
 	cRoot::Get()->TickCommands();
 
-	// Tick all clients not yet assigned to a world:
+	// Tick all clients
 	TickClients(a_Dt);
 
 	if (!m_bRestarting)
@@ -354,20 +343,6 @@ void cServer::TickClients(float a_Dt)
 	{
 		cCSLock Lock(m_CSClients);
 
-		// Remove clients that have moved to a world (the world will be ticking them from now on)
-		for (auto itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
-		{
-			for (auto itrC = m_Clients.begin(), endC = m_Clients.end(); itrC != endC; ++itrC)
-			{
-				if (itrC->get() == *itr)
-				{
-					m_Clients.erase(itrC);
-					break;
-				}
-			}
-		}  // for itr - m_ClientsToRemove[]
-		m_ClientsToRemove.clear();
-
 		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
 		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
@@ -378,7 +353,7 @@ void cServer::TickClients(float a_Dt)
 				itr = m_Clients.erase(itr);
 				continue;
 			}
-			(*itr)->ServerTick(a_Dt);
+			(*itr)->Tick(a_Dt);
 			++itr;
 		}  // for itr - m_Clients[]
 	}
@@ -687,3 +662,7 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const ASt
 
 
 
+void cServer::QueueRemoveAndDestroyClient(cClientHandle * a_Client)
+{
+	a_Client->Destroy();
+}

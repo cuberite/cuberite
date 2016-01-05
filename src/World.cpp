@@ -886,15 +886,6 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 
 void cWorld::Stop(void)
 {
-	// Delete the clients that have been in this world:
-	{
-		cCSLock Lock(m_CSClients);
-		for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
-		{
-			(*itr)->Destroy();
-		}  // for itr - m_Clients[]
-		m_Clients.clear();
-	}
 
 	// Write settings to file; these are all plugin changeable values - keep updated!
 	cIniFile IniFile;
@@ -984,7 +975,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	m_ChunkMap->Tick(a_Dt);
 	m_MapManager.TickMaps();
 
-	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
 	TickQueuedTasks();
 	
@@ -1141,56 +1131,6 @@ void cWorld::TickQueuedTasks(void)
 	{
 		Task.second(*this);
 	}  // for itr - m_Tasks[]
-}
-
-
-
-
-void cWorld::TickClients(float a_Dt)
-{
-	cClientHandlePtrs RemoveClients;
-	{
-		cCSLock Lock(m_CSClients);
-		
-		// Remove clients scheduled for removal:
-		for (auto itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
-		{
-			for (auto itrC = m_Clients.begin(), endC = m_Clients.end(); itrC != endC; ++itrC)
-			{
-				if (itrC->get() == *itr)
-				{
-					m_Clients.erase(itrC);
-					break;
-				}
-			}
-		}  // for itr - m_ClientsToRemove[]
-		m_ClientsToRemove.clear();
-		
-		// Add clients scheduled for adding:
-		for (auto itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
-		{
-			ASSERT(std::find(m_Clients.begin(), m_Clients.end(), *itr) == m_Clients.end());
-			m_Clients.push_back(*itr);
-		}  // for itr - m_ClientsToRemove[]
-		m_ClientsToAdd.clear();
-		
-		// Tick the clients, take out those that have been destroyed into RemoveClients
-		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
-		{
-			if ((*itr)->IsDestroyed())
-			{
-				// Remove the client later, when CS is not held, to avoid deadlock
-				RemoveClients.push_back(*itr);
-				itr = m_Clients.erase(itr);
-				continue;
-			}
-			(*itr)->Tick(a_Dt);
-			++itr;
-		}  // for itr - m_Clients[]
-	}
-
-	// Delete the clients queued for removal:
-	RemoveClients.clear();
 }
 
 
@@ -2788,10 +2728,11 @@ bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkZ) const
 
 
 
-bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
+bool cWorld::cChunkGeneratorCallbacks::IsNeeded(int a_ChunkX, int a_ChunkZ)
 {
-	return m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
+	return m_World->m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
 }
+
 
 
 
@@ -2851,16 +2792,6 @@ void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
 		cCSLock Lock(m_CSPlayers);
 		LOGD("Removing player %s from world \"%s\"", a_Player->GetName().c_str(), m_WorldName.c_str());
 		m_Players.remove(a_Player);
-	}
-	
-	// Remove the player's client from the list of clients to be ticked:
-	cClientHandle * Client = a_Player->GetClientHandle();
-	if (Client != nullptr)
-	{
-		Client->RemoveFromWorld();
-		m_ChunkMap->RemoveClientFromChunks(Client);
-		cCSLock Lock(m_CSClients);
-		m_ClientsToRemove.push_back(Client);
 	}
 }
 
@@ -3060,12 +2991,12 @@ bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 
 
 
-
+/*
 void cWorld::CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
 {
 	m_ChunkMap->CompareChunkClients(a_ChunkX1, a_ChunkZ1, a_ChunkX2, a_ChunkZ2, a_Callback);
 }
-
+*/
 
 
 
@@ -3604,6 +3535,7 @@ void cWorld::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicke
 
 
 
+
 cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 {
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "Incremental");
@@ -3731,6 +3663,7 @@ void cWorld::AddQueuedPlayers(void)
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSPlayers)
 
+	/*
 	// Add all the players' clienthandles:
 	{
 		cCSLock Lock(m_CSClients);
@@ -3743,6 +3676,7 @@ void cWorld::AddQueuedPlayers(void)
 			}
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSClients)
+	*/
 
 	// Stream chunks to all eligible clients:
 	for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
@@ -3811,11 +3745,12 @@ bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
 
 
 
-
+/*
 bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
 {
 	return m_World->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
 }
+*/
 
 
 

@@ -132,14 +132,15 @@ public:  // tolua_export
 
 	/** Called while the client is being ticked from the world via its cPlayer object */
 	void Tick(float a_Dt);
-	
-	/** Called while the client is being ticked from the cServer object */
-	void ServerTick(float a_Dt);
 
 	void Destroy(void);
 	
 	bool IsPlaying   (void) const { return (m_State == csPlaying); }
-	bool IsDestroyed (void) const { return (m_State == csDestroyed); }
+	bool IsDestroyed (void) const
+	{
+		ASSERT((m_State != csDestroyed) || (m_Player == nullptr));
+		return (m_State == csDestroyed);
+	}
 	bool IsDestroying(void) const { return (m_State == csDestroying); }
 
 	// The following functions send the various packets:

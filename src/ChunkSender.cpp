@@ -233,12 +233,6 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 		}
 	}
 
-	// If the chunk has no clients, no need to packetize it:
-	if (!m_World.HasChunkAnyClients(a_ChunkX, a_ChunkZ))
-	{
-		return;
-	}
-
 	// If the chunk is not valid, do nothing - whoever needs it has queued it for loading / generating
 	if (!m_World.IsChunkValid(a_ChunkX, a_ChunkZ))
 	{
