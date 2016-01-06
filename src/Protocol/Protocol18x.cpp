@@ -1916,7 +1916,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 				bb.ReadAll(Packet);
 				Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
 				AString Out;
-				CreateHexDump(Out, Packet.data(), (int)Packet.size(), 24);
+				CreateHexDump(Out, Packet.data(), Packet.size(), 24);
 				LOGD("Packet contents:\n%s", Out.c_str());
 			#endif  // _DEBUG
 			
@@ -2145,7 +2145,7 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 
 	// Decrypt EncNonce using privkey
 	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
-	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	UInt32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncNonce.data()), EncNonce.size(), reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
 	if (res != 4)
 	{

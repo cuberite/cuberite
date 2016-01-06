@@ -20,6 +20,15 @@
 
 
 
+
+// Forward declarations to satisfy Clang's -Wmissing-variable-declarations:
+extern bool g_ShouldLogCommIn;
+extern bool g_ShouldLogCommOut;
+
+
+
+
+
 /** If something has told the server to stop; checked periodically in cRoot */
 bool cRoot::m_TerminateEventRaised = false;
 
@@ -67,7 +76,8 @@ Synchronize this with Server.cpp to enable the "dumpmem" console command. */
 
 
 
-void NonCtrlHandler(int a_Signal)
+#ifndef _DEBUG
+static void NonCtrlHandler(int a_Signal)
 {
 	LOGD("Terminate event raised from std::signal");
 	cRoot::Get()->QueueExecuteConsoleCommand("stop");
@@ -110,6 +120,7 @@ void NonCtrlHandler(int a_Signal)
 		default: break;
 	}
 }
+#endif  // _DEBUG
 
 
 
@@ -129,11 +140,11 @@ typedef BOOL  (WINAPI *pMiniDumpWriteDump)(
 	PMINIDUMP_CALLBACK_INFORMATION CallbackParam
 );
 
-pMiniDumpWriteDump g_WriteMiniDump;  // The function in dbghlp DLL that creates dump files
+static pMiniDumpWriteDump g_WriteMiniDump;  // The function in dbghlp DLL that creates dump files
 
-wchar_t g_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
-char g_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
-MINIDUMP_TYPE g_DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
+static wchar_t g_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
+static char g_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
+static MINIDUMP_TYPE g_DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
 
 
 
@@ -142,7 +153,7 @@ MINIDUMP_TYPE g_DumpFlags = MiniDumpNormal;  // By default dump only the stack a
 /** This function gets called just before the "program executed an illegal instruction and will be terminated" or similar.
 Its purpose is to create the crashdump using the dbghlp DLLs
 */
-LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_ExceptionInfo)
+static LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_ExceptionInfo)
 {
 	char * newStack = &g_ExceptionStack[sizeof(g_ExceptionStack) - 1];
 	char * oldStack;
@@ -185,7 +196,7 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 
 #ifdef _WIN32
 // Handle CTRL events in windows, including console window close
-BOOL CtrlHandler(DWORD fdwCtrlType)
+static BOOL CtrlHandler(DWORD fdwCtrlType)
 {
 	cRoot::Get()->QueueExecuteConsoleCommand("stop");
 	LOGD("Terminate event raised from the Windows CtrlHandler");
@@ -204,7 +215,7 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 ////////////////////////////////////////////////////////////////////////////////
 // UniversalMain - Main startup logic for both standard running and as a service
 
-void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
+static void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 {
 	// Initialize logging subsystem:
 	cLogger::InitiateMultithreading();
@@ -242,7 +253,7 @@ void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo
 ////////////////////////////////////////////////////////////////////////////////
 // serviceWorkerThread: Keep the service alive
 
-DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
+static DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
 {
 	UNREFERENCED_PARAMETER(lpParam);
 
@@ -262,7 +273,7 @@ DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
 ////////////////////////////////////////////////////////////////////////////////
 // serviceSetState: Set the internal status of the service
 
-void serviceSetState(DWORD acceptedControls, DWORD newState, DWORD exitCode)
+static void serviceSetState(DWORD acceptedControls, DWORD newState, DWORD exitCode)
 {
 	SERVICE_STATUS serviceStatus = {};
 	serviceStatus.dwCheckPoint = 0;
@@ -285,7 +296,7 @@ void serviceSetState(DWORD acceptedControls, DWORD newState, DWORD exitCode)
 ////////////////////////////////////////////////////////////////////////////////
 // serviceCtrlHandler: Handle stop events from the Service Control Manager
 
-void WINAPI serviceCtrlHandler(DWORD CtrlCode)
+static void WINAPI serviceCtrlHandler(DWORD CtrlCode)
 {
 	switch (CtrlCode)
 	{
@@ -308,7 +319,7 @@ void WINAPI serviceCtrlHandler(DWORD CtrlCode)
 ////////////////////////////////////////////////////////////////////////////////
 // serviceMain: Startup logic for running as a service
 
-void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
+static void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 {
 	wchar_t applicationFilename[MAX_PATH];
 	wchar_t applicationDirectory[MAX_PATH];
@@ -353,7 +364,7 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 
 
 
-std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char **argv)
+static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char ** argv)
 {
 	try
 	{
@@ -434,7 +445,7 @@ std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char **argv)
 ////////////////////////////////////////////////////////////////////////////////
 // main:
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 		InitLeakFinder();
