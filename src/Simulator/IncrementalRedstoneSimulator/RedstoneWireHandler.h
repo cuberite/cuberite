@@ -35,7 +35,7 @@ public:
 	const cVector3iArray GetTerracingConnectionOffsets(const Vector3i & a_Position)
 	{
 		cVector3iArray RelativePositions;
-		bool IsYPTerracingBlocked = cBlockInfo::IsSolid(m_World.GetBlock(a_Position + OffsetYP()));
+		bool IsYPTerracingBlocked = cBlockInfo::IsSolid(m_World.GetBlock(a_Position + OffsetYP())) ? !cBlockInfo::IsTransparent(m_World.GetBlock(a_Position + OffsetYP())) : false;
 
 		for (const auto & Adjacent : GetRelativeLaterals())
 		{
@@ -48,7 +48,8 @@ public:
 			}
 
 			if (
-				!cBlockInfo::IsSolid(m_World.GetBlock(a_Position + Adjacent)) &&  // IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
+                                    // IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
+				(!cBlockInfo::IsSolid(m_World.GetBlock(a_Position + Adjacent)) ? true : cBlockInfo::IsTransparent(m_World.GetBlock(a_Position + Adjacent))) &&  
 				(m_World.GetBlock(a_Position + Adjacent + OffsetYM()) == E_BLOCK_REDSTONE_WIRE)
 			)
 			{
