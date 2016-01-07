@@ -1896,10 +1896,10 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		public cEntityCallback
 	{
 	public:
-		cTNTDamageCallback(cBoundingBox & a_bbTNT, Vector3d a_ExplosionPos, int a_ExplosionSize) :
-			m_bbTNT(a_bbTNT),
-			m_ExplosionPos(a_ExplosionPos),
-			m_ExplosionSize(a_ExplosionSize)
+		cTNTDamageCallback(cBoundingBox & a_CBBBTNT, Vector3d a_CBExplosionPos, int a_CBExplosionSize) :
+			m_bbTNT(a_CBBBTNT),
+			m_ExplosionPos(a_CBExplosionPos),
+			m_ExplosionSize(a_CBExplosionSize)
 		{
 		}
 
@@ -2364,10 +2364,10 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 		class cPrepareLoadCallback: public cChunkCoordCallback
 		{
 		public:
-			cPrepareLoadCallback(cWorld & a_World, cChunkMap & a_ChunkMap, cChunkCoordCallback * a_Callback):
-				m_World(a_World),
-				m_ChunkMap(a_ChunkMap),
-				m_Callback(a_Callback)
+			cPrepareLoadCallback(cWorld & a_CBWorld, cChunkMap & a_CBChunkMap, cChunkCoordCallback * a_CBCallback):
+				m_World(a_CBWorld),
+				m_ChunkMap(a_CBChunkMap),
+				m_Callback(a_CBCallback)
 			{
 			}
 
@@ -2385,7 +2385,7 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 				}
 
 				// The chunk failed to load, generate it:
-				cCSLock Lock(m_ChunkMap.m_CSLayers);
+				cCSLock CBLock(m_ChunkMap.m_CSLayers);
 				cChunkPtr CBChunk = m_ChunkMap.GetChunkNoLoad(a_CBChunkX, a_CBChunkZ);
 
 				if (CBChunk == nullptr)

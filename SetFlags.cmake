@@ -264,6 +264,7 @@ macro(set_exe_flags)
 			add_flags_cxx("-D__extern_always_inline=inline")
 			add_flags_cxx("-Weverything -Werror -Wno-c++98-compat-pedantic -Wno-string-conversion")
 			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables")
+			add_flags_cxx("-Wno-switch-enum")  # This is a pretty useless warning, we've already got -Wswitch which is what we need
 			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
 				# flags that are not present in 3.0
 				add_flags_cxx("-Wno-implicit-fallthrough")
