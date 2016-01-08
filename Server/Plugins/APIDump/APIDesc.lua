@@ -2507,6 +2507,7 @@ end
 				GetName = { Params = "", Return = "string", Notes = "Returns the name of the world, as specified in the settings.ini file." },
 				GetNumChunks = { Params = "", Return = "number", Notes = "Returns the number of chunks currently loaded." },
 				GetScoreBoard = { Params = "", Return = "{{cScoreBoard}}", Notes = "Returns the {{cScoreBoard|ScoreBoard}} object used by this world. " },
+				GetSeed = { Params = "", Return = "number", Notes = "Returns the seed of the world." },
 				GetSignLines = { Params = "BlockX, BlockY, BlockZ", Return = "IsValid, [Line1, Line2, Line3, Line4]", Notes = "Returns true and the lines of a sign at the specified coords, or false if there is no sign at the coords." },
 				GetSpawnX = { Params = "", Return = "number", Notes = "Returns the X coord of the default spawn" },
 				GetSpawnY = { Params = "", Return = "number", Notes = "Returns the Y coord of the default spawn" },
