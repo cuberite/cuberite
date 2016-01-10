@@ -84,8 +84,8 @@ private:
 	/** Resets a pathfinding task, typically because m_FinalDestination has deviated too much from m_DeviationOrigin. */
 	void ResetPathFinding(cChunk &a_Chunk);
 
-	/** Return true the the blocktype is either water or solid */
-	bool IsWaterOrSolid(BLOCKTYPE a_BlockType);
+	/** Return true the the blocktype is either water or solid, and not a fence */
+	bool IsWaterOrSolidAndNotFence(BLOCKTYPE a_BlockType);
 
 	/** Is the path too old and should be recalculated? When this is true ResetPathFinding() is called. */
 	bool PathIsTooOld() const;

@@ -34,6 +34,7 @@ cPath::cPath(
 	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
 	double a_BoundingBoxWidth, double a_BoundingBoxHeight
 ) :
+	m_IsWideDestination(false),
 	m_StepsLeft(a_MaxSteps),
 	m_IsValid(true),
 	m_CurrentPoint(0),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
@@ -56,6 +57,11 @@ cPath::cPath(
 	m_Destination.y = FloorC(a_EndingPoint.y);
 	m_Destination.z = FloorC(a_EndingPoint.z - HalfWidthInt);
 
+	if (IsBlockFence(GetCell(m_Destination)->m_BlockType))
+	{
+		m_IsWideDestination = true;
+	}
+
 	if (!IsWalkable(m_Source, m_Source))
 	{
 		m_Status = ePathFinderStatus::PATH_NOT_FOUND;
@@ -67,6 +73,10 @@ cPath::cPath(
 
 	ProcessCell(GetCell(m_Source), nullptr, 0);
 }
+
+
+
+
 
 cPath::cPath() : m_IsValid(false)
 {
@@ -139,9 +149,26 @@ bool cPath::StepOnce()
 	// Path found.
 	if (CurrentCell->m_Location == m_Destination)
 	{
-		BuildPath();
+		BuildPath(m_Destination);
 		FinishCalculation(ePathFinderStatus::PATH_FOUND);
 		return true;
+	}
+
+	if (m_IsWideDestination)
+	{
+		Vector3i Delta = CurrentCell->m_Location - m_Destination;
+		int DeltaX = abs(Delta.x);
+		int DeltaZ = abs(Delta.z);
+		if (Delta.y == 0)
+		{
+			if (((DeltaX == 0) && (DeltaZ == 1)) || ((DeltaX == 1) && (DeltaZ == 0)))
+			{
+				m_Destination = CurrentCell->m_Location;
+				BuildPath(m_Destination);
+				FinishCalculation(ePathFinderStatus::NEARBY_FOUND);
+				return true;
+			}
+		}
 	}
 
 	// Calculation not finished yet
@@ -311,7 +338,7 @@ void cPath::AttemptToFindAlternative()
 	else
 	{
 		m_Destination = m_NearestPointToTarget->m_Location;
-		BuildPath();
+		BuildPath(m_Destination);
 		FinishCalculation(ePathFinderStatus::NEARBY_FOUND);
 	}
 }
@@ -320,9 +347,9 @@ void cPath::AttemptToFindAlternative()
 
 
 
-void cPath::BuildPath()
+void cPath::BuildPath(const Vector3i & a_LastCellCoords)
 {
-	cPathCell * CurrentCell = GetCell(m_Destination);
+	cPathCell * CurrentCell = GetCell(a_LastCellCoords);
 	while (CurrentCell->m_Parent != nullptr)
 	{
 		// Waypoints are cylinders that start at some particular x, y, z and have infinite height.
