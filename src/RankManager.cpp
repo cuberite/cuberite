@@ -2248,6 +2248,7 @@ void cRankManager::CreateDefaults(void)
 	AddGroupToRank("Everything", "Admin");
 
 	// Add permissions to groups:
+	AddPermissionToGroup("core.help",     "Default");
 	AddPermissionToGroup("core.build",    "Default");
 	AddPermissionToGroup("core.teleport", "Teleport");
 	AddPermissionToGroup("core.kick",     "Kick");
