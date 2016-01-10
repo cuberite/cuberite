@@ -1834,39 +1834,44 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		}
 		
 		// Check packet for compression:
-		UInt32 CompressedSize = 0;
+		UInt32 UncompressedSize = 0;
 		AString UncompressedData;
 		if (m_State == 3)
 		{
 			UInt32 NumBytesRead = static_cast<UInt32>(m_ReceivedData.GetReadableSpace());
-			m_ReceivedData.ReadVarInt(CompressedSize);
-			if (CompressedSize > PacketLen)
+
+			if (!m_ReceivedData.ReadVarInt(UncompressedSize))
 			{
-				m_Client->Kick("Bad compression");
+				m_Client->Kick("Compression packet incomplete");
 				return;
 			}
-			if (CompressedSize > 0)
+
+			NumBytesRead -= static_cast<UInt32>(m_ReceivedData.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
+			ASSERT(PacketLen > NumBytesRead);
+			PacketLen -= NumBytesRead;
+
+			if (UncompressedSize > 0)
 			{
 				// Decompress the data:
 				AString CompressedData;
-				if (!m_ReceivedData.ReadString(CompressedData, CompressedSize) || (InflateString(CompressedData.data(), CompressedSize, UncompressedData) != Z_OK))
+				VERIFY(m_ReceivedData.ReadString(CompressedData, PacketLen));
+				if (InflateString(CompressedData.data(), PacketLen, UncompressedData) != Z_OK)
 				{
 					m_Client->Kick("Compression failure");
 					return;
 				}
 				PacketLen = static_cast<UInt32>(UncompressedData.size());
-			}
-			else
-			{
-				NumBytesRead -= static_cast<UInt32>(m_ReceivedData.GetReadableSpace());  // How many bytes has the CompressedSize taken up?
-				ASSERT(PacketLen > NumBytesRead);
-				PacketLen -= NumBytesRead;
+				if (PacketLen != UncompressedSize)
+				{
+					m_Client->Kick("Wrong uncompressed packet size given");
+					return;
+				}
 			}
 		}
 		
 		// Move the packet payload to a separate cByteBuffer, bb:
 		cByteBuffer bb(PacketLen + 1);
-		if (CompressedSize == 0)
+		if (UncompressedSize == 0)
 		{
 			// No compression was used, move directly
 			VERIFY(m_ReceivedData.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
