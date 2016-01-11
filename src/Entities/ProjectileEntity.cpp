@@ -48,13 +48,13 @@ public:
 		m_SlowdownCoeff(0.99)  // Default slowdown when not in water
 	{
 	}
-	
+
 	double GetSlowdownCoeff(void) const { return m_SlowdownCoeff; }
-	
+
 protected:
 	cProjectileEntity * m_Projectile;
 	double m_SlowdownCoeff;
-	
+
 	// cCallbacks overrides:
 	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
@@ -67,7 +67,7 @@ protected:
 			ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
 		);
 		*/
-		
+
 		if (cBlockInfo::IsSolid(a_BlockType))
 		{
 			// The projectile hit a solid block, calculate the exact hit coords:
@@ -94,7 +94,7 @@ protected:
 				LOGD("WEIRD! block tracer reports a hit, but BBox tracer doesn't. Ignoring the hit.");
 			}
 		}
-		
+
 		// Convey some special effects from special blocks:
 		switch (a_BlockType)
 		{
@@ -113,7 +113,7 @@ protected:
 				break;
 			}
 		}  // switch (a_BlockType)
-		
+
 		// Continue tracing
 		return false;
 	}
@@ -138,8 +138,8 @@ public:
 		m_HitEntity(nullptr)
 	{
 	}
-	
-	
+
+
 	virtual bool Item(cEntity * a_Entity) override
 	{
 		if (
@@ -153,9 +153,9 @@ public:
 				return false;
 			}
 		}
-		
+
 		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
-		
+
 		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding box with a hairline.
 		// The results should be good enough for our purposes
 		double LineCoeff;
@@ -178,27 +178,27 @@ public:
 			// A plugin disagreed.
 			return false;
 		}
-		
+
 		if (LineCoeff < m_MinCoeff)
 		{
 			// The entity is closer than anything we've stored so far, replace it as the potential victim
 			m_MinCoeff = LineCoeff;
 			m_HitEntity = a_Entity;
 		}
-		
+
 		// Don't break the enumeration, we want all the entities
 		return false;
 	}
-	
+
 	/** Returns the nearest entity that was hit, after the enumeration has been completed */
 	cEntity * GetHitEntity(void) const { return m_HitEntity; }
-	
+
 	/** Returns the line coeff where the hit was encountered, after the enumeration has been completed */
 	double GetMinCoeff(void) const { return m_MinCoeff; }
-	
+
 	/** Returns true if the callback has encountered a true hit */
 	bool HasHit(void) const { return (m_MinCoeff < 1); }
-	
+
 protected:
 	cProjectileEntity * m_Projectile;
 	const Vector3d & m_Pos;
@@ -283,7 +283,7 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		}
 		case pkFishingFloat: break;
 	}
-	
+
 	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
 	return nullptr;
 }
@@ -306,6 +306,35 @@ void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 	);
 
 	m_IsInGround = true;
+}
+
+
+
+
+
+void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+{
+	if (a_EntityHit.IsPawn() && (GetCreatorName() != ""))  // If we're hitting a mob or a player and we were created by a player
+	{
+		class cNotifyWolves : public cEntityCallback
+		{
+		public:
+			cEntity * m_EntityHit;
+
+			cNotifyWolves(cEntity * a_Entity) :
+				m_EntityHit(a_Entity)
+			{
+			}
+
+			virtual bool Item(cEntity * a_Player) override
+			{
+				static_cast<cPlayer*>(a_Player)->NotifyFriendlyWolves(m_EntityHit);
+				return true;
+			}
+		} Callback(&a_EntityHit);
+
+		m_World->DoWithEntityByID(GetCreatorUniqueID(), Callback);
+	}
 }
 
 
@@ -353,7 +382,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		// Already-grounded projectiles don't move at all
 		return;
 	}
-	
+
 	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt);
 
 	const Vector3d DeltaSpeed = GetSpeed() * DtSec.count();
@@ -380,7 +409,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()), HitPos);
 	}
 	// TODO: Test the entities in the neighboring chunks, too
-	
+
 	// Trace the tick's worth of movement as a line:
 	cProjectileTracerCallback TracerCallback(this);
 	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
@@ -392,7 +421,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 
 	// Update the position:
 	SetPosition(NextPos);
-	
+
 	// Add slowdown and gravity effect to the speed:
 	Vector3d NewSpeed(GetSpeed());
 	NewSpeed.y += m_Gravity * DtSec.count();

@@ -12,7 +12,7 @@ class cWolf :
 	public cPassiveAggressiveMonster
 {
 	typedef cPassiveAggressiveMonster super;
-	
+
 public:
 	cWolf(void);
 
@@ -44,6 +44,16 @@ public:
 		m_OwnerName = a_NewOwnerName;
 		m_OwnerUUID = a_NewOwnerUUID;
 	}
+
+	/** Notfies the wolf that the player a_Player is being attacked by a_Attacker.
+	The wolf will then defend the player by attacking a_Attacker if all these conditions are met:
+	- a_Player is the wolf's owner.
+	- The wolf is not already attacking a mob.
+	- The wolf is not sitting.
+	This is called by cPlayer::NotifyFriendlyWolves whenever a player takes or deals damage and a wolf is nearby. */
+	void NearbyPlayerIsFighting(cPlayer * a_Player, cEntity * a_Opponent);
+
+	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 protected:
 
