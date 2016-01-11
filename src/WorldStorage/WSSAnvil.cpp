@@ -1293,10 +1293,47 @@ cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_Tag
 		MobHead->SetRotation(static_cast<eMobHeadRotation>(a_NBT.GetByte(currentLine)));
 	}
 
-	currentLine = a_NBT.FindChildByName(a_TagIdx, "ExtraType");
-	if (currentLine >= 0)
+	int ownerLine = a_NBT.FindChildByName(a_TagIdx, "Owner");
+	if (ownerLine >= 0)
 	{
-		MobHead->SetOwner(a_NBT.GetString(currentLine));
+		AString OwnerName, OwnerUUID, OwnerTexture, OwnerTextureSignature;
+
+		currentLine = a_NBT.FindChildByName(ownerLine, "Id");
+		if (currentLine >= 0)
+		{
+			OwnerUUID = a_NBT.GetString(currentLine);
+		}
+
+		currentLine = a_NBT.FindChildByName(ownerLine, "Name");
+		if (currentLine >= 0)
+		{
+			OwnerName = a_NBT.GetString(currentLine);
+		}
+
+		int textureLine = a_NBT.GetFirstChild(  // The first texture of
+			a_NBT.FindChildByName(              // The texture list of
+				a_NBT.FindChildByName(          // The Properties compound of
+					ownerLine,                  // The Owner compound
+					"Properties"
+				),
+				"textures"
+			)
+		);
+		if (textureLine >= 0)
+		{
+			currentLine = a_NBT.FindChildByName(textureLine, "Signature");
+			if (currentLine >= 0)
+			{
+				OwnerTextureSignature = a_NBT.GetString(currentLine);
+			}
+
+			currentLine = a_NBT.FindChildByName(textureLine, "Value");
+			if (currentLine >= 0)
+			{
+				OwnerTexture = a_NBT.GetString(currentLine);
+			}
+		}
+		MobHead->SetOwner(OwnerUUID, OwnerName, OwnerTexture, OwnerTextureSignature);
 	}
 
 	return MobHead.release();

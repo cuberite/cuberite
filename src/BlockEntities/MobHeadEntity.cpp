@@ -14,8 +14,7 @@
 cMobHeadEntity::cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(E_BLOCK_HEAD, a_BlockX, a_BlockY, a_BlockZ, a_World),
 	m_Type(SKULL_TYPE_SKELETON),
-	m_Rotation(SKULL_ROTATION_NORTH),
-	m_Owner("")
+	m_Rotation(SKULL_ROTATION_NORTH)
 {
 }
 
@@ -35,9 +34,9 @@ bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
 
 void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 {
-	if ((!m_Owner.empty()) && (a_Type != SKULL_TYPE_PLAYER))
+	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
 	{
-		m_Owner = "";
+		m_OwnerName = m_OwnerUUID = m_OwnerTexture = m_OwnerTextureSignature = "";
 	}
 	m_Type = a_Type;
 }
@@ -55,13 +54,43 @@ void cMobHeadEntity::SetRotation(eMobHeadRotation a_Rotation)
 
 
 
-void cMobHeadEntity::SetOwner(const AString & a_Owner)
+void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 {
-	if ((a_Owner.length() > 16) || (m_Type != SKULL_TYPE_PLAYER))
+	if (m_Type != SKULL_TYPE_PLAYER)
 	{
 		return;
 	}
-	m_Owner = a_Owner;
+
+	m_OwnerName = a_Owner.GetName();
+	m_OwnerUUID = a_Owner.GetUUID();
+
+	const Json::Value & Properties = a_Owner.GetClientHandle()->GetProperties();
+	for (auto & Node : Properties)
+	{
+		if (Node.get("name", "").asString() == "textures")
+		{
+			m_OwnerTexture = Node.get("value", "").asString();
+			m_OwnerTextureSignature = Node.get("signature", "").asString();
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cMobHeadEntity::SetOwner(const AString & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature)
+{
+	if (m_Type != SKULL_TYPE_PLAYER)
+	{
+		return;
+	}
+
+	m_OwnerUUID = a_OwnerUUID;
+	m_OwnerName = a_OwnerName;
+	m_OwnerTexture = a_OwnerTexture;
+	m_OwnerTextureSignature = a_OwnerTextureSignature;
 }
 
 

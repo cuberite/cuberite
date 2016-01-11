@@ -2784,7 +2784,7 @@ void cProtocol172::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_
 			Writer.AddInt("z", MobHeadEntity.GetPosZ());
 			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
 			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("ExtraType", MobHeadEntity.GetOwner().c_str());
+			Writer.AddString("ExtraType", MobHeadEntity.GetOwnerName());
 			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
