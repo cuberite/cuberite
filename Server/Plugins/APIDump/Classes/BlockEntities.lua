@@ -282,10 +282,13 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		{
 			SetType = { Params = "eMobHeadType", Return = "", Notes = "Set the type of the mob head" },
 			SetRotation = { Params = "eMobHeadRotation", Return = "", Notes = "Sets the rotation of the mob head" },
-			SetOwner = { Params = "string", Return = "", Notes = "Set the player name for mob heads with player type" },
+			SetOwner = { Params = "cPlayer", Return = "", Notes = "Set the {{cPlayer|player}} for mob heads with player type" },
 			GetType = { Params = "", Return = "eMobHeadType", Notes = "Returns the type of the mob head" },
 			GetRotation = { Params = "", Return = "eMobHeadRotation", Notes = "Returns the rotation of the mob head" },
-			GetOwner = { Params = "", Return = "string", Notes = "Returns the player name of the mob head" },
+			GetOwnerName = { Params = "", Return = "string", Notes = "Returns the player name of the mob head" },
+			GetOwnerUUID = { Params = "", Return = "string", Notes = "Returns the player UUID of the mob head" },
+			GetOwnerTexture = { Params = "", Return = "string", Notes = "Returns the player texture of the mob head" },
+			GetOwnerTextureSignature = { Params = "", Return = "string", Notes = "Returns the signature of the player texture of the mob head" },
 		},
 	},  -- cMobHeadEntity
 

@@ -358,7 +358,20 @@ void cNBTChunkSerializer::AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 		AddBasicTileEntity(a_MobHead, "Skull");
 		m_Writer.AddByte  ("SkullType", a_MobHead->GetType() & 0xFF);
 		m_Writer.AddByte  ("Rot",       a_MobHead->GetRotation() & 0xFF);
-		m_Writer.AddString("ExtraType", a_MobHead->GetOwner());
+
+		// The new Block Entity format for a Mob Head. See: http://minecraft.gamepedia.com/Head#Block_entity
+		m_Writer.BeginCompound("Owner");
+			m_Writer.AddString("Id", a_MobHead->GetOwnerUUID());
+			m_Writer.AddString("Name", a_MobHead->GetOwnerName());
+			m_Writer.BeginCompound("Properties");
+				m_Writer.BeginList("textures", TAG_Compound);
+					m_Writer.BeginCompound("");
+						m_Writer.AddString("Signature", a_MobHead->GetOwnerTextureSignature());
+						m_Writer.AddString("Value", a_MobHead->GetOwnerTexture());
+					m_Writer.EndCompound();
+				m_Writer.EndList();
+			m_Writer.EndCompound();
+		m_Writer.EndCompound();
 	m_Writer.EndCompound();
 }
 

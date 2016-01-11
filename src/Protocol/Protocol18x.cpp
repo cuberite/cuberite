@@ -3109,8 +3109,21 @@ void cProtocol180::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_
 			Writer.AddInt("z", MobHeadEntity.GetPosZ());
 			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
 			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("ExtraType", MobHeadEntity.GetOwner().c_str());
 			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+			// The new Block Entity format for a Mob Head. See: http://minecraft.gamepedia.com/Head#Block_entity
+			Writer.BeginCompound("Owner");
+				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID());
+				Writer.AddString("Name", MobHeadEntity.GetOwnerName());
+				Writer.BeginCompound("Properties");
+					Writer.BeginList("textures", TAG_Compound);
+						Writer.BeginCompound("");
+							Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
+							Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
+						Writer.EndCompound();
+					Writer.EndList();
+				Writer.EndCompound();
+			Writer.EndCompound();
 			break;
 		}
 

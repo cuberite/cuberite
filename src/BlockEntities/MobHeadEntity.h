@@ -39,8 +39,11 @@ public:
 	/** Set the rotation of the mob head */
 	void SetRotation(eMobHeadRotation a_Rotation);
 	
-	/** Set the player name for mob heads with player type */
-	void SetOwner(const AString & a_Owner);
+	/** Set the player for mob heads with player type */
+	void SetOwner(const cPlayer & a_Owner);
+
+	/** Sets the player components for the mob heads with player type */
+	void SetOwner(const AString & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature);
 	
 	/** Returns the type of the mob head */
 	eMobHeadType GetType(void) const { return m_Type; }
@@ -49,7 +52,16 @@ public:
 	eMobHeadRotation GetRotation(void) const { return m_Rotation; }
 	
 	/** Returns the player name of the mob head */
-	AString GetOwner(void) const { return m_Owner; }
+	AString GetOwnerName(void) const { return m_OwnerName; }
+
+	/** Returns the player UUID of the mob head */
+	AString GetOwnerUUID(void) const { return m_OwnerUUID; }
+
+	/** Returns the texture of the mob head */
+	AString GetOwnerTexture(void) const { return m_OwnerTexture; }
+
+	/** Returns the texture signature of the mob head */
+	AString GetOwnerTextureSignature(void) const { return m_OwnerTextureSignature; }
 	
 	// tolua_end
 	
@@ -60,7 +72,11 @@ private:
 
 	eMobHeadType m_Type;
 	eMobHeadRotation m_Rotation;
-	AString m_Owner;
+
+	AString m_OwnerName;
+	AString m_OwnerUUID;
+	AString m_OwnerTexture;
+	AString m_OwnerTextureSignature;
 } ;  // tolua_export
 
 
