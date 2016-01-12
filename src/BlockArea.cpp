@@ -454,22 +454,30 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinB
 	// Check coords validity:
 	if (a_MinBlockY < 0)
 	{
-		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero", __FUNCTION__);
+		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MinBlockY = 0;
 	}
 	else if (a_MinBlockY >= cChunkDef::Height)
 	{
-		LOGWARNING("%s: MinBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
+		LOGWARNING("%s: MinBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MinBlockY = cChunkDef::Height - 1;
 	}
 	if (a_MaxBlockY < 0)
 	{
-		LOGWARNING("%s: MaxBlockY less than zero, adjusting to zero", __FUNCTION__);
+		LOGWARNING("%s: MaxBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MaxBlockY = 0;
 	}
 	else if (a_MaxBlockY > cChunkDef::Height)
 	{
-		LOGWARNING("%s: MaxBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
+		LOGWARNING("%s: MaxBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MaxBlockY = cChunkDef::Height;
 	}
 	
