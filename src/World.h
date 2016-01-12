@@ -757,6 +757,9 @@ public:
 		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
+	/** Returns the seed of the world. */
+	int GetSeed(void) { return m_Generator.GetSeed(); }
+
 	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
