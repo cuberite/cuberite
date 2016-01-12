@@ -27,7 +27,7 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (!TargetIsInRange() && !m_BurnedWithFlintAndSteel)
+	if ((m_Target == nullptr) || (!TargetIsInRange() && !m_BurnedWithFlintAndSteel))
 	{
 		if (m_bIsBlowing)
 		{
@@ -130,7 +130,7 @@ bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
 		m_World->BroadcastSoundEffect("game.tnt.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
-		
+
 		return true;
 	}
 	return false;
