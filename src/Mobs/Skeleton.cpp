@@ -50,9 +50,9 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
+	StopMovingToPosition();  // Todo handle this in a better way, the skeleton does some uneeded recalcs due to inStateChasing
 	cFastRandom Random;
-	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
-	if ((m_Target != nullptr) && (m_AttackInterval > 3.0))
+	if ((m_Target != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
 		Vector3d Inaccuracy = Vector3d(Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25);
 		Vector3d Speed = (m_Target->GetPosition() + Inaccuracy - GetPosition()) * 5;
@@ -69,8 +69,8 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 			return false;
 		}
 		m_World->BroadcastSpawnEntity(*Arrow);
-		m_AttackInterval = 0.0;
-		
+		ResetAttackCooldown();
+
 		return true;
 	}
 	return false;
