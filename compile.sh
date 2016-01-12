@@ -21,6 +21,10 @@ error ()
 
 missingDepsExit ()
 {
+	if [ "$1" != "" ]; then
+		echo "You can install the missing depndencies via:"
+		echo "$1"
+	fi
 	echo
 	echo "Please install the dependencies, then come back."
 	echo
@@ -31,61 +35,83 @@ missingDepsExit ()
 # Echo: Greetings.
 echo
 echo "Hello, this script will download and compile Cuberite."
-echo "On subsequent runs, it will update your Cuberite."
+echo "On subsequent runs, it will update Cuberite."
 echo "The compilation and download will occur in the current directory."
 echo "If you're updating, you should run <Path to Cuberite>/cuberite/compile.sh"
-echo "Compiling from source takes time, but it usually generates better executables."
+echo "Compiling from source takes time, but it usually generates faster executables."
 echo "If you prefer ready-to-use binaries or if you want more info, please visit:"
 echo "http://cuberite.org/"
 
-MISSING_PROGRAMS=""
+### Dependency checks start. ###
+MISSING_PACKAGES=""
+
+# Most distros have the following default package and executable names.
+GCC_EXE_NAME="g++"
+CLANG_EXE_NAME="clang"
+COMPILER_PACKAGE_NAME="gcc g++"
+
+# Left side: Executable Name, Right side: Package Name. Note that this is TAB delimited. Spaces will not work.
+PROGRAMS='git	git
+make	make
+cmake	cmake'
+
+# If any OS deviates from the defaults, detect the OS here, and change PROGRAMS,COMPILER_PACKAGE_NAME, etc. as needed.
+
+# Fedora, CentOS, RHEL, Mageia, openSUSE, Mandriva
+if (rpm --help > /dev/null 2> /dev/null); then
+	COMPILER_PACKAGE_NAME="gcc-c++"
+fi
 
 # Compiler check.
 GCC_EXISTS=0
 CLANG_EXISTS=0
-g++ --help > /dev/null 2> /dev/null && GCC_EXISTS=1
-clang --help > /dev/null 2> /dev/null && CLANG_EXISTS=1
+$GCC_EXE_NAME --help > /dev/null 2> /dev/null && GCC_EXISTS=1
+$CLANG_EXE_NAME --help > /dev/null 2> /dev/null && CLANG_EXISTS=1
 if [ $GCC_EXISTS -eq 0 -a $CLANG_EXISTS -eq 0 ]; then
-MISSING_PROGRAMS="gcc g++"
+	MISSING_PACKAGES=" $COMPILER_PACKAGE_NAME"
 fi
 
 # Depdendency check.
-while read program; do
-$program --help > /dev/null 2> /dev/null || MISSING_PROGRAMS="$MISSING_PROGRAMS $program"
-done <<"EOF"
-git
-make
-cmake
-EOF
-if [ "$MISSING_PROGRAMS" != "" ]; then
+checkPackages ()
+{
+	echo "$PROGRAMS" | while read line; do
+		EXE_NAME=`echo "$line" | cut -f 1`
+		PACKAGE_NAME=`echo "$line" | cut -f 2`
+		$EXE_NAME --help > /dev/null 2> /dev/null || echo -n " $PACKAGE_NAME"		
+	done
+}
+MISSING_PACKAGES="$MISSING_PACKAGES`checkPackages`"
+
+if [ "$MISSING_PACKAGES" != "" ]; then
 	echo
 	echo "-----------------"
 	echo "You have missing compilation dependencies:"
-	echo $MISSING_PROGRAMS
+	echo $MISSING_PACKAGES
 	echo
 
 	# apt-get guide.
 	apt-get --help > /dev/null 2> /dev/null && \
-	echo "You can install the missing depndencies via:" && \
-	echo -n "sudo apt-get install " && echo $MISSING_PROGRAMS && missingDepsExit
+	missingDepsExit "sudo apt-get install$MISSING_PACKAGES"
 
 	# yum guide.
 	yum --help > /dev/null 2> /dev/null && \
-	echo "You can install the missing depndencies via:" && \
-	echo -n "sudo yum install " && echo $MISSING_PROGRAMS && missingDepsExit
+	missingDepsExit "sudo yum install$MISSING_PACKAGES"
 
-	# rpm guide.
-	rpm --help > /dev/null 2> /dev/null && \
-	echo "You can install the missing depndencies via:" && \
-	echo -n "sudo rpm -i " && echo $MISSING_PROGRAMS && missingDepsExit
+	# zypper guide.
+	zypper --help > /dev/null 2> /dev/null && \
+	missingDepsExit "sudo zypper install$MISSING_PACKAGES"
 
 	# pacman guide.
 	pacman --help > /dev/null 2> /dev/null && \
-	echo "You can install the missing depndencies via:" && \
-	echo -n "sudo pacman -S " && echo $MISSING_PROGRAMS && missingDepsExit
+	missingDepsExit "sudo pacman -S$MISSING_PACKAGES"
 
-	missingDepsExit
+	# urpmi guide.
+	urpmi --help > /dev/null 2> /dev/null && \
+	missingDepsExit "sudo urpmi$MISSING_PACKAGES"
+
+	missingDepsExit ""
 fi
+### Dependency checks end. ###
 
 # Bypass Branch choice and choose master. Because it's the only branch right now.
 BRANCH="master"
