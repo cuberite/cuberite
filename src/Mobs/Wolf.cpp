@@ -29,7 +29,7 @@ cWolf::cWolf(void) :
 
 bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (super::DoTakeDamage(a_TDI))
+	if (!super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -55,13 +55,30 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 		{
 			return super::Attack(a_Dt);
 		}
+		else
+		{
+			m_Target = nullptr;
+		}
 	}
 	else
 	{
 		return super::Attack(a_Dt);
 	}
-	
+
 	return false;
+}
+
+
+
+
+
+void cWolf::NearbyPlayerIsFighting(cPlayer * a_Player, cEntity * a_Opponent)
+{
+	if ((m_Target == nullptr) && (a_Player->GetName() == m_OwnerName) && !IsSitting())
+	{
+		m_Target = a_Opponent;
+	}
+
 }
 
 
@@ -160,43 +177,65 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		super::Tick(a_Dt, a_Chunk);
 	}
 
-	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
-	if (a_Closest_Player != nullptr)
+	if (m_Target == nullptr)
 	{
-		switch (a_Closest_Player->GetEquippedItem().m_ItemType)
+		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
+		if (a_Closest_Player != nullptr)
 		{
-			case E_ITEM_BONE:
-			case E_ITEM_RAW_BEEF:
-			case E_ITEM_STEAK:
-			case E_ITEM_RAW_CHICKEN:
-			case E_ITEM_COOKED_CHICKEN:
-			case E_ITEM_ROTTEN_FLESH:
-			case E_ITEM_RAW_PORKCHOP:
-			case E_ITEM_COOKED_PORKCHOP:
+			switch (a_Closest_Player->GetEquippedItem().m_ItemType)
 			{
-				if (!IsBegging())
+				case E_ITEM_BONE:
+				case E_ITEM_RAW_BEEF:
+				case E_ITEM_STEAK:
+				case E_ITEM_RAW_CHICKEN:
+				case E_ITEM_COOKED_CHICKEN:
+				case E_ITEM_ROTTEN_FLESH:
+				case E_ITEM_RAW_PORKCHOP:
+				case E_ITEM_COOKED_PORKCHOP:
 				{
-					SetIsBegging(true);
-					m_World->BroadcastEntityMetadata(*this);
+					if (!IsBegging())
+					{
+						SetIsBegging(true);
+						m_World->BroadcastEntityMetadata(*this);
+					}
+
+					m_FinalDestination = a_Closest_Player->GetPosition();  // So that we will look at a player holding food
+
+					// Don't move to the player if the wolf is sitting.
+					if (!IsSitting())
+					{
+						MoveToPosition(a_Closest_Player->GetPosition());
+					}
+
+					break;
 				}
-
-				m_FinalDestination = a_Closest_Player->GetPosition();  // So that we will look at a player holding food
-
-				// Don't move to the player if the wolf is sitting.
-				if (!IsSitting())
+				default:
 				{
-					MoveToPosition(a_Closest_Player->GetPosition());
+					if (IsBegging())
+					{
+						SetIsBegging(false);
+						m_World->BroadcastEntityMetadata(*this);
+					}
 				}
-
-				break;
 			}
-			default:
+		}
+	}
+	else
+	{
+		if (IsSitting())
+		{
+			m_Target = nullptr;
+		}
+		else
+		{
+			if (TargetIsInRange())
 			{
-				if (IsBegging())
-				{
-					SetIsBegging(false);
-					m_World->BroadcastEntityMetadata(*this);
-				}
+				StopMovingToPosition();
+				Attack(a_Dt);
+			}
+			else
+			{
+				MoveToPosition(m_Target->GetPosition());
 			}
 		}
 	}
@@ -237,14 +276,33 @@ void cWolf::TickFollowPlayer()
 		{
 			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
 			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+			m_Target = nullptr;
+		}
+		if (Distance < 2)
+		{
+			if (m_Target == nullptr)
+			{
+				StopMovingToPosition();
+			}
 		}
 		else
 		{
-			MoveToPosition(Callback.OwnerPos);
+			if (m_Target == nullptr)
+			{
+				MoveToPosition(Callback.OwnerPos);
+			}
 		}
 	}
 }
 
 
+
+void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	if (!IsTame())
+	{
+		cMonster::InStateIdle(a_Dt, a_Chunk);
+	}
+}
 
 

@@ -43,9 +43,11 @@ void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 
 void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
+	super::OnHitEntity(a_EntityHit, a_HitPos);
+
 	Destroy();
 	Explode(a_HitPos.Floor());
-	
+
 	if (!a_EntityHit.IsFireproof())
 	{
 		// TODO Damage Entity with 5 damage(from http://minecraft.gamepedia.com/Blaze#Blaze_fireball)

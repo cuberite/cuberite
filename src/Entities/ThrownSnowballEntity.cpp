@@ -29,6 +29,8 @@ void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFac
 
 void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
+	super::OnHitEntity(a_EntityHit, a_HitPos);
+
 	int TotalDamage = 0;
 	if (a_EntityHit.IsMob())
 	{
@@ -40,7 +42,7 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & 
 	}
 	// TODO: If entity is Ender Crystal, destroy it
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
-	
+
 	m_DestroyTimer = 5;
 }
 

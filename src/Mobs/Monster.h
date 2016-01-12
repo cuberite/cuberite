@@ -188,7 +188,7 @@ protected:
 	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS); }
 
 	/** Returns whether or not the target is close enough for attack. */
-	bool TargetIsInRange(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
+	bool TargetIsInRange(void) { ASSERT(m_Target != nullptr); return ((m_Target->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
 
 	/** Returns if a monster can reach a given height by jumping. */
 	inline bool DoesPosYRequireJump(int a_PosY)

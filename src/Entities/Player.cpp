@@ -2,6 +2,8 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
+#include "Mobs/Wolf.h"
+#include "../BoundingBox.h"
 #include <unordered_map>
 #include "../ChatColor.h"
 #include "../Server.h"
@@ -850,10 +852,47 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		AddFoodExhaustion(0.3f);
 		SendHealth();
 
+		NotifyFriendlyWolves(a_TDI.Attacker);
 		m_Stats.AddValue(statDamageTaken, FloorC<StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+void cPlayer::NotifyFriendlyWolves(cEntity * a_Opponent)
+{
+	class LookForWolves : public cEntityCallback
+	{
+	public:
+		cPlayer * m_Player;
+		cEntity * m_Attacker;
+
+		LookForWolves(cPlayer * a_Me, cEntity * a_MyAttacker) :
+			m_Player(a_Me),
+			m_Attacker(a_MyAttacker)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if (a_Entity->IsMob())
+			{
+				cMonster * Mob = static_cast<cMonster*>(a_Entity);
+				if (Mob->GetMobType() == mtWolf)
+				{
+					cWolf * Wolf = static_cast<cWolf*>(Mob);
+					Wolf->NearbyPlayerIsFighting(m_Player, m_Attacker);
+				}
+			}
+			return false;
+		}
+	} Callback(this, a_Opponent);
+
+	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 16, 16), Callback);
 }
 
 
