@@ -45,6 +45,7 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+
 bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
@@ -74,9 +75,21 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 
 void cWolf::NearbyPlayerIsFighting(cPlayer * a_Player, cEntity * a_Opponent)
 {
-	if ((m_Target == nullptr) && (a_Player->GetName() == m_OwnerName) && !IsSitting())
+	if ((m_Target == nullptr) && (a_Player->GetName() == m_OwnerName) && !IsSitting() && (a_Opponent->IsPawn()))
 	{
 		m_Target = a_Opponent;
+		if (m_Target->IsPlayer() && static_cast<cPlayer *>(m_Target)->GetName() == m_OwnerName)
+		{
+			m_Target = nullptr;  // Our owner has hurt himself, avoid attacking them.
+		}
+		if (m_Target->IsMob() && static_cast<cMonster *>(m_Target)->GetMobType() == mtWolf)
+		{
+			cWolf * Wolf = static_cast<cWolf *>(m_Target);
+			if (Wolf->GetOwnerUUID() == GetOwnerUUID())
+			{
+				m_Target = nullptr;  // Our owner attacked one of their wolves. Abort attacking wolf.
+			}
+		}
 	}
 
 }
