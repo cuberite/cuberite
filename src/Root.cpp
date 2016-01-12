@@ -369,42 +369,44 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 	if (DefaultWorldName == "world")
 	{
 		auto DefaultWorldIniFile= cpp14::make_unique<cIniFile>();
-		assert(DefaultWorldIniFile->ReadFile("world/world.ini"));
-		AString NetherName = DefaultWorldIniFile->GetValue("LinkedWorlds", "NetherWorldName", "");
-		AString EndName = DefaultWorldIniFile->GetValue("LinkedWorlds", "EndWorldName", "");
-		if ((NetherName.compare("world_nether") == 0) && (EndName.compare("world_end") == 0))
+		if (DefaultWorldIniFile->ReadFile("world/world.ini"))
 		{
-			// This is a default world linkage config, see if the nether and end are in settings.ini
-			// If both of them are not in settings.ini, then this is a pre-#2815 default config
-			// so we add them to settings.ini
-			// Note that if only one of them is not in settings.ini, it's nondefault and we don't touch it
-
-			bool NetherInSettings = false;
-			bool EndInSettings = false;
-
-			for (auto WorldNameValue : Worlds)
+			AString NetherName = DefaultWorldIniFile->GetValue("LinkedWorlds", "NetherWorldName", "");
+			AString EndName = DefaultWorldIniFile->GetValue("LinkedWorlds", "EndWorldName", "");
+			if ((NetherName.compare("world_nether") == 0) && (EndName.compare("world_end") == 0))
 			{
-				AString ValueName = WorldNameValue.first;
-				if (ValueName.compare("World") != 0)
-				{
-					continue;
-				}
-				AString WorldName = WorldNameValue.second;
-				if (WorldName.compare("world_nether") == 0)
-				{
-					NetherInSettings = true;
-				}
-				else if (WorldName.compare("world_end") == 0)
-				{
-					EndInSettings = true;
-				}
-			}
+				// This is a default world linkage config, see if the nether and end are in settings.ini
+				// If both of them are not in settings.ini, then this is a pre-#2815 default config
+				// so we add them to settings.ini
+				// Note that if only one of them is not in settings.ini, it's nondefault and we don't touch it
 
-			if ((!NetherInSettings) && (!EndInSettings))
-			{
-				a_Settings.AddValue("Worlds", "World", "world_nether");
-				a_Settings.AddValue("Worlds", "World", "world_end");
-				Worlds = a_Settings.GetValues("Worlds");  // Refresh the Worlds list so that the rest of the function works as usual
+				bool NetherInSettings = false;
+				bool EndInSettings = false;
+
+				for (auto WorldNameValue : Worlds)
+				{
+					AString ValueName = WorldNameValue.first;
+					if (ValueName.compare("World") != 0)
+					{
+						continue;
+					}
+					AString WorldName = WorldNameValue.second;
+					if (WorldName.compare("world_nether") == 0)
+					{
+						NetherInSettings = true;
+					}
+					else if (WorldName.compare("world_end") == 0)
+					{
+						EndInSettings = true;
+					}
+				}
+
+				if ((!NetherInSettings) && (!EndInSettings))
+				{
+					a_Settings.AddValue("Worlds", "World", "world_nether");
+					a_Settings.AddValue("Worlds", "World", "world_end");
+					Worlds = a_Settings.GetValues("Worlds");  // Refresh the Worlds list so that the rest of the function works as usual
+				}
 			}
 		}
 	}
