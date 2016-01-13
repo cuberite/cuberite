@@ -1719,6 +1719,12 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
+	if (a_Username.length() > 16)
+	{
+		Kick("Your username is too long(>16 characters)");
+		return false;
+	}
+
 	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
 	{
 		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())

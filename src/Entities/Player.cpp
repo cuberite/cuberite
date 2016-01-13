@@ -89,6 +89,8 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_UUID((a_Client != nullptr) ? a_Client->GetUUID() : ""),
 	m_CustomName("")
 {
+	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
+
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
