@@ -225,6 +225,9 @@ if [ "$BUILDTYPE" = "Debug" ]; then
 else
 	echo "`pwd`/Cuberite"
 fi
+cd ..
+echo
+echo "You can always update Cuberite by executing `pwd`/compile.sh"
 echo
 echo "Enjoy :)"
 exit 0
