@@ -3,6 +3,8 @@
 { # put the whole thing in a block so as not to behave weirdly if interrupted
 set -e
 
+#TODO command line parameter handling for non-interactive mode.
+
 # Do we already have a repo?
 if [ \( -d .git \) -a \( -f easyinstall.sh \) -a \( -f src/BlockArea.cpp \) ]; then # A good enough indicator that we're in the Cuberite git repo.
 cd ../
@@ -33,14 +35,14 @@ missingDepsExit ()
 
 
 # Echo: Greetings.
-echo
-echo "Hello, this script will download and compile Cuberite."
-echo "On subsequent runs, it will update Cuberite."
-echo "The compilation and download will occur in the current directory."
-echo "If you're updating, you should run <Path to Cuberite>/cuberite/compile.sh"
-echo "Compiling from source takes time, but it usually generates faster executables."
-echo "If you prefer ready-to-use binaries or if you want more info, please visit:"
-echo "http://cuberite.org/"
+echo "
+Hello, this script will download and compile Cuberite.
+On subsequent runs, it will update Cuberite.
+The compilation and download will occur in the current directory.
+If you're updating, you should run: <Path to Cuberite>/compile.sh
+Compiling from source takes time, but it usually generates faster
+executables. If you prefer ready-to-use binaries or if you want
+more info, please visit:  http://cuberite.org/"
 
 ### Dependency checks start. ###
 MISSING_PACKAGES=""
@@ -55,7 +57,7 @@ PROGRAMS='git	git
 make	make
 cmake	cmake'
 
-# If any OS deviates from the defaults, detect the OS here, and change PROGRAMS,COMPILER_PACKAGE_NAME, etc. as needed.
+# If any OS deviates from the defaults, detect the OS here, and change PROGRAMS, COMPILER_PACKAGE_NAME, etc. as needed.
 
 # Fedora, CentOS, RHEL, Mageia, openSUSE, Mandriva
 if (rpm --help > /dev/null 2> /dev/null); then
@@ -121,18 +123,18 @@ inactiveCode ()
 {
 
 # Echo: Branch choice.
-echo
-echo "You can choose between 2 branches:"
-echo "* (S)Stable:	(Coming soon) Choose the stable branch if you want the most reliable server."
-echo "		As of now, Stable is not yet available, please use testing instead."
-echo
-echo "* (T)Testing:	The testing branch is less stable,"
-echo "		but using it and finding and reporting bugs helps us a lot!"
-echo
-echo "* (D)Dev:	The least stable of the three. (Master branch)"
-echo "		Choose the development branch if you are feeling adventurous and"
-echo "		want to try new, bleeding edge features."
-echo
+echo "
+You can choose between 3 branches:
+* (S)Stable:   Choose the stable branch if you want the most
+               reliable server.
+
+* (T)Testing:  The testing branch is less stable,
+               but using it and reporting bugs helps us a lot!
+
+* (D)Dev:      The least stable of the three. (Master branch)
+               Choose the development branch if you want to try new,
+               bleeding-edge features.
+"
 
 
 # Input: Branch choice.
@@ -153,16 +155,20 @@ fi
 ### Inactive code end. ###
 
 # Echo: Compile mode choice.
-echo
-echo "Choose compile mode:"
-echo "* (N)Normal:	Compiles normally."
-echo
-echo "* (D)Debug:	Compiles in debug mode. Makes your console and crashes much more verbose."
-echo "		But it costs performance."
-echo
-echo "Note that the script will connect to the internet in order to fetch code after this step."
-echo "It will then compile your program."
-echo
+echo "
+Choose compile mode:
+* (N)Normal:  Compiles normally.
+              Generates the fastest build.
+
+* (D)Debug:   Compiles in debug mode.
+              Makes your console and crashes more verbose.  
+              A bit slower than Normal mode. If you plan to help
+              development by reporting bugs, this is preferred.
+		
+
+Note that the script will connect to the internet in order to fetch
+code after this step. It will then compile your program.
+"
 
 # Input: Compile mode choice.
 echo -n "Choose compile mode: (n/d): "
@@ -226,10 +232,11 @@ else
 	echo "`pwd`/Cuberite"
 fi
 cd ..
-echo
-echo "You can always update Cuberite by executing `pwd`/compile.sh"
-echo
-echo "Enjoy :)"
+echo "
+You can always update Cuberite by executing:
+`pwd`/compile.sh
+
+Enjoy :)"
 exit 0
 
 :windows_detected
