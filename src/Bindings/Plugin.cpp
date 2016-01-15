@@ -30,10 +30,10 @@ cPlugin::~cPlugin()
 
 void cPlugin::Unload(void)
 {
-	auto pm = cPluginManager::Get();
-	pm->RemovePluginCommands(this);
-	pm->RemovePluginConsoleCommands(this);
-	pm->RemoveHooks(this);
+	auto & pm = cPluginManager::Get();
+	pm.RemovePluginCommands(this);
+	pm.RemovePluginConsoleCommands(this);
+	pm.RemoveHooks(this);
 	OnDisable();
 	m_Status = cPluginManager::psUnloaded;
 	m_LoadError.clear();

@@ -163,7 +163,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					double PosX = Chunk->GetPosX() * cChunkDef::Width + RelX;
 					double PosZ = Chunk->GetPosZ() * cChunkDef::Width + RelZ;
 
-					cMonster * Monster = cMonster::NewMonsterFromType(m_MobType);
+					auto Monster = cMonster::NewMonsterFromType(m_MobType);
 					if (Monster == nullptr)
 					{
 						continue;

@@ -38,6 +38,7 @@ class cAuthenticator :
 public:
 	cAuthenticator(void);
 	~cAuthenticator();
+	cAuthenticator(const cAuthenticator & a_Authenticator) = delete;
 
 	/** (Re-)read server and address from INI: */
 	void ReadSettings(cSettingsRepositoryInterface & a_Settings);

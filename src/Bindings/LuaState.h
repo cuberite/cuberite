@@ -148,8 +148,7 @@ public:
 		{
 			if (m_LuaState != nullptr)
 			{
-				auto top = lua_gettop(m_LuaState);
-				ASSERT(m_StackLen == top);
+				ASSERT(m_StackLen == lua_gettop(m_LuaState));
 				lua_pop(m_LuaState, 1);
 			}
 		}

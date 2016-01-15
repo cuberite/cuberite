@@ -116,6 +116,7 @@ public:
 
 	cWebAdmin(void);
 	virtual ~cWebAdmin();
+	cWebAdmin(const cWebAdmin & a_WebAdmin) = delete;
 
 	/** Initializes the object. Returns true if successfully initialized and ready to start */
 	bool Init(void);

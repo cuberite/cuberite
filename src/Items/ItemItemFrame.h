@@ -38,11 +38,9 @@ public:
 
 		if (Block == E_BLOCK_AIR)
 		{
-			cItemFrame * ItemFrame = new cItemFrame(a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
-			if (!ItemFrame->Initialize(*a_World))
+			auto ItemFrame = std::make_shared<cItemFrame>(a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			if (!ItemFrame->Initialize(ItemFrame, *a_World))
 			{
-				delete ItemFrame;
-				ItemFrame = nullptr;
 				return false;
 			}
 

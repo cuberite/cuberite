@@ -35,6 +35,7 @@ public:
 
 	cMojangAPI(void);
 	~cMojangAPI();
+	cMojangAPI(const cMojangAPI & a_MojangAPI) = delete;
 
 	/** Initializes the API; reads the settings from the specified ini file.
 	Loads cached results from disk. */
@@ -183,7 +184,7 @@ protected:
 	cCriticalSection m_CSRankMgr;
 
 	/** The thread that periodically updates the stale data in the DB from the Mojang servers. */
-	SharedPtr<cUpdateThread> m_UpdateThread;
+	std::shared_ptr<cUpdateThread> m_UpdateThread;
 
 
 	/** Loads the caches from a disk storage. */

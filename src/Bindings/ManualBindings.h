@@ -169,7 +169,7 @@ public:
 		} Callback(L, FnRef);
 
 		// Call the DoWith function:
-		bool res = (Ty1::Get()->*DoWithFn)(ItemName, Callback);
+		bool res = (Ty1::Get().*DoWithFn)(ItemName, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -559,7 +559,7 @@ public:
 		} Callback(L, FnRef);
 
 		// Call the enumeration:
-		bool res = (Ty1::Get()->*ForEachFn)(Callback);
+		bool res = (Ty1::Get().*ForEachFn)(Callback);
 
 		// Push the return value:
 		L.Push(res);

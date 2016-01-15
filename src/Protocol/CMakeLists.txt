@@ -25,6 +25,9 @@ SET (HDRS
 	ProtocolRecognizer.h
 )
 
+get_directory_property(BINDING_OUTPUTS DIRECTORY ../ DEFINITION BINDING_OUTPUTS)
+set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(Protocol18x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast -Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch-enum -Wno-error=switch")
 	set_source_files_properties(Protocol17x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum ")
@@ -32,4 +35,5 @@ endif()
 
 if (NOT MSVC)
 	add_library(Protocol ${SRCS} ${HDRS})
+	add_dependencies(Protocol BindingsGeneration)
 endif()

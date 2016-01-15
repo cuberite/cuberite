@@ -9,7 +9,6 @@ The requests are not added to the queue if there is already a request with the s
 Before generating, the thread checks if the chunk hasn't been already generated.
 It is theoretically possible to have multiple generator threads by having multiple instances of this object,
 but then it MAY happen that the chunk is generated twice.
-If the generator queue is overloaded, the generator skips chunks with no clients in them
 */
 
 
@@ -102,8 +101,7 @@ public:
 		If this callback returns false, the chunk is not generated. */
 		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) = 0;
 
-		/** Called to check whether the specified chunk is in the queued state.
-		Currently used only in Debug-mode asserts. */
+		/** Called to check whether the specified chunk is in the queued state. */
 		virtual bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) = 0;
 	} ;
 
@@ -117,14 +115,11 @@ public:
 	/** Queues the chunk for generation
 	If a-ForceGenerate is set, the chunk is regenerated even if the data is already present in the chunksink.
 	a_Callback is called after the chunk is generated. If the chunk was already present, the callback is still called, even if not regenerating.
-	It is legal to set the callback to nullptr, no callback is called then.
-	If the generator becomes overloaded and skips this chunk, the callback is still called. */
+	It is legal to set the callback to nullptr, no callback is called then. */
 	void QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate, cChunkCoordCallback * a_Callback = nullptr);
 
 	/** Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading. */
 	void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
-
-	void WaitForQueueEmpty(void);
 
 	int GetQueueLength(void);
 
@@ -138,19 +133,14 @@ public:
 
 private:
 
-	struct cQueueItem
+	struct sQueueItem
 	{
 		/** The chunk coords */
 		int m_ChunkX, m_ChunkZ;
 
-		/** Force the regeneration of an already existing chunk */
-		bool m_ForceGenerate;
-
 		/** Callback to call after generating. */
 		cChunkCoordCallback * m_Callback;
 	};
-
-	typedef std::list<cQueueItem> cGenQueue;
 
 
 	/** Seed used for the generator. */
@@ -160,7 +150,7 @@ private:
 	cCriticalSection m_CS;
 
 	/** Queue of the chunks to be generated. Protected against multithreaded access by m_CS. */
-	cGenQueue m_Queue;
+	std::vector<sQueueItem> m_Queue;
 
 	/** Set when an item is added to the queue or the thread should terminate. */
 	cEvent m_Event;

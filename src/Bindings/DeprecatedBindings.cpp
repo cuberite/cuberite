@@ -291,6 +291,126 @@ tolua_lerror:
 
 
 
+/* function: TeleportToCoords */
+static int tolua_cEntity_TeleportToCoords00(lua_State* tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cEntity") ||
+		!LuaState.CheckParamNumber(2, 4) ||
+		!LuaState.CheckParamEnd(5)
+		)
+		return 0;
+	else
+	{
+		cEntity * self = nullptr;
+		double BlockX = 0;
+		double BlockY = 0;
+		double BlockZ = 0;
+
+		LuaState.GetStackValues(1, self, BlockX, BlockY, BlockZ);
+
+		#ifndef TOLUA_RELEASE
+		if (self == nullptr)
+		{
+			tolua_error(LuaState, "invalid 'self' in function 'TeleportToCoords'", nullptr);
+		}
+		#endif
+		{
+			self->TeleportToCoords({ BlockX, BlockY, BlockZ });
+		}
+	}
+	LOGWARNING("Warning in function call 'TeleportToCoords': TeleportToCoords(X, Y, Z) is deprecated. Please use TeleportToCoords(Vector3d)");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
+/* function: MoveToWorld */
+static int tolua_cEntity_MoveToWorld00(lua_State* tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (!LuaState.CheckParamUserType(1, "cEntity"))
+	{
+		return 0;
+	}
+
+	if (LuaState.CheckParamString(2) && (LuaState.CheckParamEnd(3) || LuaState.CheckParamEnd(4)))
+	{
+		cEntity * self = nullptr;
+		std::string WorldName;
+		LuaState.GetStackValues(1, self, WorldName);
+
+		#ifndef TOLUA_RELEASE
+		if (self == nullptr)
+		{
+			tolua_error(LuaState, "invalid 'self' in function 'MoveToWorld'", nullptr);
+		}
+		#endif
+		{
+			self->MoveToWorld(WorldName, self->GetPosition());
+		}
+	}
+	else if (LuaState.CheckParamUserType(2, "cWorld"))
+	{
+		if (LuaState.CheckParamUserType(4, "Vector3d") && LuaState.CheckParamEnd(5))
+		{
+			cEntity * self = nullptr;
+			cWorld * World;
+			Vector3d * Position;
+			LuaState.GetStackValues(1, self, World);
+			LuaState.GetStackValues(4, Position);
+
+			#ifndef TOLUA_RELEASE
+			if (self == nullptr)
+			{
+				tolua_error(LuaState, "invalid 'self' in function 'MoveToWorld'", nullptr);
+			}
+			#endif
+			{
+				self->MoveToWorld(*World, *Position);
+			}
+		}
+		else if (LuaState.CheckParamEnd(4))
+		{
+			cEntity * self = nullptr;
+			std::string WorldName;
+			LuaState.GetStackValues(1, self, WorldName);
+
+			#ifndef TOLUA_RELEASE
+			if (self == nullptr)
+			{
+				tolua_error(LuaState, "invalid 'self' in function 'MoveToWorld'", nullptr);
+			}
+			#endif
+			{
+				self->MoveToWorld(WorldName, self->GetPosition());
+			}
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+
+	LOGWARNING("Warning in function call 'MoveToWorld': the ShouldSendRespawn parameter is deprecated and a destination position is mandatory.");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
 /** function: cWorld:SetSignLines */
 static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 {
@@ -357,6 +477,11 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 
 	tolua_beginmodule(tolua_S, "cWorld");
 		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
+	tolua_endmodule(tolua_S);
+
+	tolua_beginmodule(tolua_S, "cEntity");
+		tolua_function(tolua_S, "MoveToWorld", tolua_cEntity_MoveToWorld00);
+		tolua_function(tolua_S, "TeleportToCoords", tolua_cEntity_TeleportToCoords00);
 	tolua_endmodule(tolua_S);
 
 	tolua_endmodule(tolua_S);

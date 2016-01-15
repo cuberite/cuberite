@@ -375,9 +375,9 @@ void inline LOG(const char * a_Format, ...)
 
 #else
 	#ifdef  _DEBUG
-		#define ASSERT( x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), assert(0), 0))
+		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), assert(0), 0))
 	#else
-		#define ASSERT(x) ((void)(x))
+		#define ASSERT(x)
 	#endif
 #endif
 
@@ -447,6 +447,18 @@ namespace cpp14
 	{
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
+}
+
+namespace std
+{
+	template <typename WeakPtrType>
+	struct equal_to<std::weak_ptr<WeakPtrType>>
+	{
+		constexpr bool operator()(const std::weak_ptr<WeakPtrType> & a_Lhs, const std::weak_ptr<WeakPtrType> & a_Rhs) const
+		{
+			return (!a_Lhs.owner_before(a_Rhs) && !a_Rhs.owner_before(a_Lhs));
+		}
+	};
 }
 
 // a tick is 50 ms

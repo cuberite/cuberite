@@ -102,6 +102,10 @@ SET (HDRS
 	WorldInterface.h
 )
 
+get_directory_property(BINDING_OUTPUTS DIRECTORY ../ DEFINITION BINDING_OUTPUTS)
+set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
+
 if(NOT MSVC)
 	add_library(Blocks ${SRCS} ${HDRS})
+	add_dependencies(Blocks BindingsGeneration)
 endif()

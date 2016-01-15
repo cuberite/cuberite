@@ -91,7 +91,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.BeginCompound("Data");
 		Writer.AddByte("allowCommands", 1);
 		Writer.AddByte("Difficulty", 2);
-		Writer.AddByte("hardcore", cRoot::Get()->GetServer()->IsHardcore() ? 1 : 0);
+		Writer.AddByte("hardcore", cRoot::Get()->GetServer().IsHardcore() ? 1 : 0);
 		Writer.AddByte("initialized", 1);
 		Writer.AddByte("MapFeatures", 1);
 		Writer.AddByte("raining", a_World->IsWeatherRain() ? 1 : 0);
@@ -459,7 +459,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	}  // for y
 	//*/
 
-	cSetChunkDataPtr SetChunkData(new cSetChunkData(
+	auto SetChunkData(cSetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockTypes, MetaData,
 		IsLightValid ? BlockLight : nullptr,
@@ -495,7 +495,16 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
 
 	cNBTChunkSerializer Serializer(a_Writer);
-	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
+	bool DataRetrivalSucceeded;
+
+	m_World->QueueTask(
+		[&Serializer, &a_Chunk, &DataRetrivalSucceeded](cWorld & a_World)
+		{
+			DataRetrivalSucceeded = a_World.GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer);
+		}
+	).wait();
+
+	if (!DataRetrivalSucceeded)
 	{
 		LOGWARNING("Cannot get chunk [%d, %d] data for NBT saving", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
@@ -1637,12 +1646,12 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cBoat> Boat = cpp14::make_unique<cBoat>(0, 0, 0);
+	std::shared_ptr<cBoat> Boat = std::make_shared<cBoat>(0, 0, 0);
 	if (!LoadEntityBaseFromNBT(*Boat.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
-	a_Entities.push_back(Boat.release());
+	a_Entities.emplace_back(Boat);
 }
 
 
@@ -1651,12 +1660,12 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cEnderCrystal> EnderCrystal = cpp14::make_unique<cEnderCrystal>(0, 0, 0);
+	std::shared_ptr<cEnderCrystal> EnderCrystal = std::make_shared<cEnderCrystal>(0, 0, 0);
 	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
-	a_Entities.push_back(EnderCrystal.release());
+	a_Entities.emplace_back(EnderCrystal);
 }
 
 
@@ -1676,12 +1685,12 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 	BLOCKTYPE Type = static_cast<BLOCKTYPE>(a_NBT.GetInt(TypeIdx));
 	NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_NBT.GetByte(MetaIdx));
 
-	std::unique_ptr<cFallingBlock> FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(0, 0, 0), Type, Meta);
+	std::shared_ptr<cFallingBlock> FallingBlock = std::make_shared<cFallingBlock>(Vector3i(0, 0, 0), Type, Meta);
 	if (!LoadEntityBaseFromNBT(*FallingBlock.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
-	a_Entities.push_back(FallingBlock.release());
+	a_Entities.emplace_back(FallingBlock);
 }
 
 
@@ -1690,12 +1699,12 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cRideableMinecart> Minecart = cpp14::make_unique<cRideableMinecart>(0, 0, 0, cItem(), 1);  // TODO: Load the block and the height
+	std::shared_ptr<cRideableMinecart> Minecart = std::make_shared<cRideableMinecart>(0, 0, 0, cItem(), 1);  // TODO: Load the block and the height
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(Minecart);
 }
 
 
@@ -1709,7 +1718,7 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	{
 		return;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
-	std::unique_ptr<cMinecartWithChest> Minecart = cpp14::make_unique<cMinecartWithChest>(0, 0, 0);
+	std::shared_ptr<cMinecartWithChest> Minecart = std::make_shared<cMinecartWithChest>(0, 0, 0);
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1727,7 +1736,7 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 			Minecart->SetSlot(a_NBT.GetByte(Slot), Item);
 		}
 	}  // for itr - ItemDefs[]
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(Minecart);
 }
 
 
@@ -1736,7 +1745,7 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cMinecartWithFurnace> Minecart = cpp14::make_unique<cMinecartWithFurnace>(0, 0, 0);
+	std::shared_ptr<cMinecartWithFurnace> Minecart = std::make_shared<cMinecartWithFurnace>(0, 0, 0);
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1744,7 +1753,7 @@ void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 	// TODO: Load the Push and Fuel tags
 
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(Minecart);
 }
 
 
@@ -1753,7 +1762,7 @@ void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cMinecartWithTNT> Minecart = cpp14::make_unique<cMinecartWithTNT>(0, 0, 0);
+	std::shared_ptr<cMinecartWithTNT> Minecart = std::make_shared<cMinecartWithTNT>(0, 0, 0);
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1761,7 +1770,7 @@ void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 	// TODO: Everything to do with TNT carts
 
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(Minecart);
 }
 
 
@@ -1770,7 +1779,7 @@ void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cMinecartWithHopper> Minecart = cpp14::make_unique<cMinecartWithHopper>(0, 0, 0);
+	std::shared_ptr<cMinecartWithHopper> Minecart = std::make_shared<cMinecartWithHopper>(0, 0, 0);
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1778,7 +1787,7 @@ void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 	// TODO: Everything to do with hopper carts
 
-	a_Entities.push_back(Minecart.release());
+	a_Entities.emplace_back(Minecart);
 }
 
 
@@ -1799,7 +1808,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
-	std::unique_ptr<cPickup> Pickup = cpp14::make_unique<cPickup>(0, 0, 0, Item, false);  // Pickup delay doesn't matter, just say false
+	std::shared_ptr<cPickup> Pickup = std::make_shared<cPickup>(0, 0, 0, Item, false);  // Pickup delay doesn't matter, just say false
 	if (!LoadEntityBaseFromNBT(*Pickup.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1812,7 +1821,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Pickup->SetAge(a_NBT.GetShort(Age));
 	}
 
-	a_Entities.push_back(Pickup.release());
+	a_Entities.emplace_back(Pickup);
 }
 
 
@@ -1821,7 +1830,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cTNTEntity> TNT = cpp14::make_unique<cTNTEntity>(0.0, 0.0, 0.0, 0);
+	std::shared_ptr<cTNTEntity> TNT = std::make_shared<cTNTEntity>(0.0, 0.0, 0.0, 0);
 	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1834,7 +1843,7 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		TNT->SetFuseTicks(static_cast<int>(a_NBT.GetByte(FuseTicks)));
 	}
 
-	a_Entities.push_back(TNT.release());
+	a_Entities.emplace_back(TNT);
 }
 
 
@@ -1843,7 +1852,7 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cExpOrb> ExpOrb = cpp14::make_unique<cExpOrb>(0.0, 0.0, 0.0, 0);
+	std::shared_ptr<cExpOrb> ExpOrb = std::make_shared<cExpOrb>(0.0, 0.0, 0.0, 0);
 	if (!LoadEntityBaseFromNBT(*ExpOrb.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1863,7 +1872,7 @@ void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		ExpOrb->SetReward(a_NBT.GetShort(Reward));
 	}
 
-	a_Entities.push_back(ExpOrb.release());
+	a_Entities.emplace_back(ExpOrb);
 }
 
 
@@ -1912,7 +1921,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	std::unique_ptr<cItemFrame> ItemFrame = cpp14::make_unique<cItemFrame>(BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
+	std::shared_ptr<cItemFrame> ItemFrame = std::make_shared<cItemFrame>(BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
 	if (!LoadEntityBaseFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1928,7 +1937,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		ItemFrame->SetItemRotation(static_cast<Byte>(a_NBT.GetByte(Rotation)));
 	}
 
-	a_Entities.push_back(ItemFrame.release());
+	a_Entities.emplace_back(ItemFrame);
 }
 
 
@@ -1944,14 +1953,14 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	std::unique_ptr<cPainting> Painting = cpp14::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
+	std::shared_ptr<cPainting> Painting = std::make_shared<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
 	if (!LoadEntityBaseFromNBT(*Painting.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
 	LoadHangingFromNBT(*Painting.get(), a_NBT, a_TagIdx);
-	a_Entities.push_back(Painting.release());
+	a_Entities.emplace_back(Painting);
 }
 
 
@@ -1960,7 +1969,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cArrowEntity> Arrow = cpp14::make_unique<cArrowEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	std::shared_ptr<cArrowEntity> Arrow = std::make_shared<cArrowEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
 	if (!LoadProjectileBaseFromNBT(*Arrow.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2022,7 +2031,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	}
 
 	// Store the new arrow in the entities list:
-	a_Entities.push_back(Arrow.release());
+	a_Entities.emplace_back(Arrow);
 }
 
 
@@ -2030,7 +2039,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cSplashPotionEntity> SplashPotion = cpp14::make_unique<cSplashPotionEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0), cItem());
+	std::shared_ptr<cSplashPotionEntity> SplashPotion = std::make_shared<cSplashPotionEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0), cItem());
 	if (!LoadProjectileBaseFromNBT(*SplashPotion.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2045,7 +2054,7 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 	SplashPotion->SetPotionColor(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
 
 	// Store the new splash potion in the entities list:
-	a_Entities.push_back(SplashPotion.release());
+	a_Entities.emplace_back(SplashPotion);
 }
 
 
@@ -2054,14 +2063,14 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cThrownSnowballEntity> Snowball = cpp14::make_unique<cThrownSnowballEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	std::shared_ptr<cThrownSnowballEntity> Snowball = std::make_shared<cThrownSnowballEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
 	if (!LoadProjectileBaseFromNBT(*Snowball.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
 	// Store the new snowball in the entities list:
-	a_Entities.push_back(Snowball.release());
+	a_Entities.emplace_back(Snowball);
 }
 
 
@@ -2070,14 +2079,14 @@ void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cThrownEggEntity> Egg = cpp14::make_unique<cThrownEggEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	std::shared_ptr<cThrownEggEntity> Egg = std::make_shared<cThrownEggEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
 	if (!LoadProjectileBaseFromNBT(*Egg.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
 	// Store the new egg in the entities list:
-	a_Entities.push_back(Egg.release());
+	a_Entities.emplace_back(Egg);
 }
 
 
@@ -2086,14 +2095,14 @@ void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cGhastFireballEntity> Fireball = cpp14::make_unique<cGhastFireballEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	std::shared_ptr<cGhastFireballEntity> Fireball = std::make_shared<cGhastFireballEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
 	if (!LoadProjectileBaseFromNBT(*Fireball.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
 	// Store the new fireball in the entities list:
-	a_Entities.push_back(Fireball.release());
+	a_Entities.emplace_back(Fireball);
 }
 
 
@@ -2102,14 +2111,14 @@ void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cFireChargeEntity> FireCharge = cpp14::make_unique<cFireChargeEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	std::shared_ptr<cFireChargeEntity> FireCharge = std::make_shared<cFireChargeEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
 	if (!LoadProjectileBaseFromNBT(*FireCharge.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
 	// Store the new FireCharge in the entities list:
-	a_Entities.push_back(FireCharge.release());
+	a_Entities.emplace_back(FireCharge);
 }
 
 
@@ -2118,14 +2127,14 @@ void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cThrownEnderPearlEntity> Enderpearl = cpp14::make_unique<cThrownEnderPearlEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	std::shared_ptr<cThrownEnderPearlEntity> Enderpearl = std::make_shared<cThrownEnderPearlEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
 	if (!LoadProjectileBaseFromNBT(*Enderpearl.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
 	// Store the new enderpearl in the entities list:
-	a_Entities.push_back(Enderpearl.release());
+	a_Entities.emplace_back(Enderpearl);
 }
 
 
@@ -2134,7 +2143,7 @@ void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cPar
 
 void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cBat> Monster = cpp14::make_unique<cBat>();
+	std::shared_ptr<cBat> Monster = std::make_shared<cBat>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2145,7 +2154,7 @@ void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2154,7 +2163,7 @@ void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cBlaze> Monster = cpp14::make_unique<cBlaze>();
+	std::shared_ptr<cBlaze> Monster = std::make_shared<cBlaze>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2165,7 +2174,7 @@ void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2174,7 +2183,7 @@ void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cCaveSpider> Monster = cpp14::make_unique<cCaveSpider>();
+	std::shared_ptr<cCaveSpider> Monster = std::make_shared<cCaveSpider>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2185,7 +2194,7 @@ void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2194,7 +2203,7 @@ void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cChicken> Monster = cpp14::make_unique<cChicken>();
+	std::shared_ptr<cChicken> Monster = std::make_shared<cChicken>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2205,7 +2214,7 @@ void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2214,7 +2223,7 @@ void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 
 void cWSSAnvil::LoadCowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cCow> Monster = cpp14::make_unique<cCow>();
+	std::shared_ptr<cCow> Monster = std::make_shared<cCow>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2225,7 +2234,7 @@ void cWSSAnvil::LoadCowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2234,7 +2243,7 @@ void cWSSAnvil::LoadCowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cCreeper> Monster = cpp14::make_unique<cCreeper>();
+	std::shared_ptr<cCreeper> Monster = std::make_shared<cCreeper>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2245,7 +2254,7 @@ void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2254,7 +2263,7 @@ void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 
 void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cEnderDragon> Monster = cpp14::make_unique<cEnderDragon>();
+	std::shared_ptr<cEnderDragon> Monster = std::make_shared<cEnderDragon>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2265,7 +2274,7 @@ void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNB
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2274,7 +2283,7 @@ void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNB
 
 void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cEnderman> Monster = cpp14::make_unique<cEnderman>();
+	std::shared_ptr<cEnderman> Monster = std::make_shared<cEnderman>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2285,7 +2294,7 @@ void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2294,7 +2303,7 @@ void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadGhastFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cGhast> Monster = cpp14::make_unique<cGhast>();
+	std::shared_ptr<cGhast> Monster = std::make_shared<cGhast>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2305,7 +2314,7 @@ void cWSSAnvil::LoadGhastFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2314,7 +2323,7 @@ void cWSSAnvil::LoadGhastFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cGiant> Monster = cpp14::make_unique<cGiant>();
+	std::shared_ptr<cGiant> Monster = std::make_shared<cGiant>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2325,7 +2334,7 @@ void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2334,7 +2343,7 @@ void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadGuardianFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cGuardian> Monster = cpp14::make_unique<cGuardian>();
+	std::shared_ptr<cGuardian> Monster = std::make_shared<cGuardian>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2345,7 +2354,7 @@ void cWSSAnvil::LoadGuardianFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2366,7 +2375,7 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	int Color = a_NBT.GetInt(ColorIdx);
 	int Style = a_NBT.GetInt(StyleIdx);
 
-	std::unique_ptr<cHorse> Monster = cpp14::make_unique<cHorse>(Type, Color, Style, 1);
+	std::shared_ptr<cHorse> Monster = std::make_shared<cHorse>(Type, Color, Style, 1);
 
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
@@ -2391,7 +2400,7 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2400,7 +2409,7 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cIronGolem> Monster = cpp14::make_unique<cIronGolem>();
+	std::shared_ptr<cIronGolem> Monster = std::make_shared<cIronGolem>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2411,7 +2420,7 @@ void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2429,7 +2438,7 @@ void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 	int Size = a_NBT.GetInt(SizeIdx);
 
-	std::unique_ptr<cMagmaCube> Monster = cpp14::make_unique<cMagmaCube>(Size);
+	std::shared_ptr<cMagmaCube> Monster = std::make_shared<cMagmaCube>(Size);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2440,7 +2449,7 @@ void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2449,7 +2458,7 @@ void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMooshroomFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cMooshroom> Monster = cpp14::make_unique<cMooshroom>();
+	std::shared_ptr<cMooshroom> Monster = std::make_shared<cMooshroom>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2460,7 +2469,7 @@ void cWSSAnvil::LoadMooshroomFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2469,7 +2478,7 @@ void cWSSAnvil::LoadMooshroomFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cOcelot> Monster = cpp14::make_unique<cOcelot>();
+	std::shared_ptr<cOcelot> Monster = std::make_shared<cOcelot>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2493,7 +2502,7 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2502,7 +2511,7 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cPig> Monster = cpp14::make_unique<cPig>();
+	std::shared_ptr<cPig> Monster = std::make_shared<cPig>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2526,7 +2535,7 @@ void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2546,7 +2555,7 @@ void cWSSAnvil::LoadRabbitFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	int Type = a_NBT.GetInt(TypeIdx);
 	int MoreCarrotTicks = a_NBT.GetInt(MoreCarrotTicksIdx);
 
-	std::unique_ptr<cRabbit> Monster = cpp14::make_unique<cRabbit>(static_cast<eRabbitType>(Type), MoreCarrotTicks);
+	std::shared_ptr<cRabbit> Monster = std::make_shared<cRabbit>(static_cast<eRabbitType>(Type), MoreCarrotTicks);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2570,7 +2579,7 @@ void cWSSAnvil::LoadRabbitFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2586,7 +2595,7 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		Color = static_cast<int>(a_NBT.GetByte(ColorIdx));
 	}
 
-	std::unique_ptr<cSheep> Monster = cpp14::make_unique<cSheep>(Color);
+	std::shared_ptr<cSheep> Monster = std::make_shared<cSheep>(Color);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2616,7 +2625,7 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2625,7 +2634,7 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cSilverfish> Monster = cpp14::make_unique<cSilverfish>();
+	std::shared_ptr<cSilverfish> Monster = std::make_shared<cSilverfish>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2636,7 +2645,7 @@ void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2653,7 +2662,7 @@ void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 	bool Type = ((a_NBT.GetByte(TypeIdx) == 1) ? true : false);
 
-	std::unique_ptr<cSkeleton> Monster = cpp14::make_unique<cSkeleton>(Type);
+	std::shared_ptr<cSkeleton> Monster = std::make_shared<cSkeleton>(Type);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2664,7 +2673,7 @@ void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2682,7 +2691,7 @@ void cWSSAnvil::LoadSlimeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 	int Size = a_NBT.GetInt(SizeIdx);
 
-	std::unique_ptr<cSlime> Monster = cpp14::make_unique<cSlime>(Size);
+	std::shared_ptr<cSlime> Monster = std::make_shared<cSlime>(Size);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2693,7 +2702,7 @@ void cWSSAnvil::LoadSlimeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2702,7 +2711,7 @@ void cWSSAnvil::LoadSlimeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSnowGolemFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cSnowGolem> Monster = cpp14::make_unique<cSnowGolem>();
+	std::shared_ptr<cSnowGolem> Monster = std::make_shared<cSnowGolem>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2713,7 +2722,7 @@ void cWSSAnvil::LoadSnowGolemFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2722,7 +2731,7 @@ void cWSSAnvil::LoadSnowGolemFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cSpider> Monster = cpp14::make_unique<cSpider>();
+	std::shared_ptr<cSpider> Monster = std::make_shared<cSpider>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2733,7 +2742,7 @@ void cWSSAnvil::LoadSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2742,7 +2751,7 @@ void cWSSAnvil::LoadSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadSquidFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cSquid> Monster = cpp14::make_unique<cSquid>();
+	std::shared_ptr<cSquid> Monster = std::make_shared<cSquid>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2753,7 +2762,7 @@ void cWSSAnvil::LoadSquidFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2770,7 +2779,7 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 	int Type = a_NBT.GetInt(TypeIdx);
 
-	std::unique_ptr<cVillager> Monster = cpp14::make_unique<cVillager>(cVillager::eVillagerType(Type));
+	std::shared_ptr<cVillager> Monster = std::make_shared<cVillager>(cVillager::eVillagerType(Type));
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2795,7 +2804,7 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	}
 
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2804,7 +2813,7 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadWitchFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cWitch> Monster = cpp14::make_unique<cWitch>();
+	std::shared_ptr<cWitch> Monster = std::make_shared<cWitch>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2815,7 +2824,7 @@ void cWSSAnvil::LoadWitchFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2824,7 +2833,7 @@ void cWSSAnvil::LoadWitchFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cWither> Monster = cpp14::make_unique<cWither>();
+	std::shared_ptr<cWither> Monster = std::make_shared<cWither>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2841,7 +2850,7 @@ void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetWitherInvulnerableTicks(static_cast<unsigned int>(a_NBT.GetInt(CurrLine)));
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2850,7 +2859,7 @@ void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cWolf> Monster = cpp14::make_unique<cWolf>();
+	std::shared_ptr<cWolf> Monster = std::make_shared<cWolf>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2908,7 +2917,7 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2925,7 +2934,7 @@ void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 	bool IsVillagerZombie = ((a_NBT.GetByte(IsVillagerIdx) == 1) ? true : false);
 
-	std::unique_ptr<cZombie> Monster = cpp14::make_unique<cZombie>(IsVillagerZombie);
+	std::shared_ptr<cZombie> Monster = std::make_shared<cZombie>(IsVillagerZombie);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2949,7 +2958,7 @@ void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 
@@ -2958,7 +2967,7 @@ void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cZombiePigman> Monster = cpp14::make_unique<cZombiePigman>();
+	std::shared_ptr<cZombiePigman> Monster = std::make_shared<cZombiePigman>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2982,7 +2991,7 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		Monster->SetAge(Age);
 	}
 
-	a_Entities.push_back(Monster.release());
+	a_Entities.emplace_back(Monster);
 }
 
 

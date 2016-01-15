@@ -11,11 +11,8 @@
 
 cWebPlugin::cWebPlugin()
 {
-	cWebAdmin * WebAdmin = cRoot::Get()->GetWebAdmin();
-	if (WebAdmin != nullptr)
-	{
-		WebAdmin->AddPlugin(this);
-	}
+	auto & WebAdmin = cRoot::Get()->GetWebAdmin();
+	WebAdmin.AddPlugin(this);
 }
 
 
@@ -27,11 +24,8 @@ cWebPlugin::~cWebPlugin()
 	ASSERT(m_Tabs.empty());  // Has ClearTabs() been called?
 
 	// Remove from WebAdmin:
-	cWebAdmin * WebAdmin = cRoot::Get()->GetWebAdmin();
-	if (WebAdmin != nullptr)
-	{
-		WebAdmin->RemovePlugin(this);
-	}
+	auto & WebAdmin = cRoot::Get()->GetWebAdmin();
+	WebAdmin.RemovePlugin(this);
 }
 
 

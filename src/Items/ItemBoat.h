@@ -77,8 +77,8 @@ public:
 		double y = Callbacks.m_Pos.y;
 		double z = Callbacks.m_Pos.z;
 
-		cBoat * Boat = new cBoat(x + 0.5, y + 1, z + 0.5);
-		Boat->Initialize(*a_World);
+		auto Boat = std::make_shared<cBoat>(x + 0.5, y + 1, z + 0.5);
+		Boat->Initialize(Boat, *a_World);
 
 		return true;
 	}

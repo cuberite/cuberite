@@ -88,8 +88,9 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 			// Success
 			return res;
 		}
+
 		// Failure
-		cNetworkSingleton::Get().RemoveLink(res.get());
+		res->Close();
 		return nullptr;
 	}
 
@@ -99,8 +100,9 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 		// Success
 		return res;
 	}
+
 	// Failure
-	cNetworkSingleton::Get().RemoveLink(res.get());
+	res->Close();
 	return nullptr;
 }
 
@@ -214,6 +216,7 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 {
 	ASSERT(a_Self != nullptr);
 	cTCPLinkImplPtr Self = static_cast<cTCPLinkImpl *>(a_Self)->m_Self;
+	ASSERT(Self != nullptr);
 
 	// If an error is reported, call the error callback:
 	if (a_What & BEV_EVENT_ERROR)
@@ -232,16 +235,9 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 		else
 		{
 			Self->m_Callbacks->OnError(err, evutil_socket_error_to_string(err));
-			if (Self->m_Server == nullptr)
-			{
-				cNetworkSingleton::Get().RemoveLink(Self.get());
-			}
-			else
-			{
-				Self->m_Server->RemoveLink(Self.get());
-			}
 		}
-		Self->m_Self.reset();
+
+		Self->Close();
 		return;
 	}
 
@@ -263,15 +259,7 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 	if (a_What & BEV_EVENT_EOF)
 	{
 		Self->m_Callbacks->OnRemoteClosed();
-		if (Self->m_Server != nullptr)
-		{
-			Self->m_Server->RemoveLink(Self.get());
-		}
-		else
-		{
-			cNetworkSingleton::Get().RemoveLink(Self.get());
-		}
-		Self->m_Self.reset();
+		Self->Close();
 		return;
 	}
 

@@ -36,6 +36,14 @@
 // 1000 = once per second
 #define PLAYER_LIST_TIME_MS std::chrono::milliseconds(1000)
 
+#define DO_WITH_VALID_CLIENTHANDLE(Command) \
+	auto ClientHandle = m_ClientHandle.lock(); \
+	if (ClientHandle != nullptr) \
+	{ \
+		ClientHandle->Command \
+	}
+
+
 
 
 
@@ -50,7 +58,7 @@ const int cPlayer::EATING_TICKS = 30;
 
 
 
-cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
+cPlayer::cPlayer(std::weak_ptr<cClientHandle> a_Client, const AString & a_PlayerName) :
 	super(etPlayer, 0.6, 1.8),
 	m_bVisible(true),
 	m_FoodLevel(MAX_FOOD_LEVEL),
@@ -86,7 +94,8 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_Team(nullptr),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
-	m_UUID((a_Client != nullptr) ? a_Client->GetUUID() : ""),
+	m_IsChangingWorlds(false),
+	m_UUID(a_Client.lock()->GetUUID()),
 	m_CustomName("")
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
@@ -141,26 +150,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		m_bVisible = false;
 	}
 
-	cRoot::Get()->GetServer()->PlayerCreated(this);
-}
-
-
-
-
-
-bool cPlayer::Initialize(cWorld & a_World)
-{
-	UNUSED(a_World);
-	ASSERT(GetWorld() != nullptr);
-	ASSERT(GetParentChunk() == nullptr);
-	GetWorld()->AddPlayer(this);
-
-	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
-
-	// Spawn the entity on the clients:
-	GetWorld()->BroadcastSpawnEntity(*this);
-
-	return true;
+	cRoot::Get()->GetServer().PlayerCreated(this);
 }
 
 
@@ -169,7 +159,7 @@ bool cPlayer::Initialize(cWorld & a_World)
 
 cPlayer::~cPlayer(void)
 {
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
+	if (!cRoot::Get()->GetPluginManager().CallHookPlayerDestroyed(*this))
 	{
 		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
 		LOGINFO("Player %s has left the game", GetName().c_str());
@@ -178,11 +168,7 @@ cPlayer::~cPlayer(void)
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
 
 	// Notify the server that the player is being destroyed
-	cRoot::Get()->GetServer()->PlayerDestroying(this);
-
-	SaveToDisk();
-
-	m_ClientHandle = nullptr;
+	cRoot::Get()->GetServer().PlayerDestroying(this);
 
 	delete m_InventoryWindow;
 	m_InventoryWindow = nullptr;
@@ -196,6 +182,7 @@ cPlayer::~cPlayer(void)
 
 void cPlayer::Destroyed()
 {
+	SaveToDisk();
 	CloseWindow(false);
 	super::Destroyed();
 }
@@ -206,7 +193,7 @@ void cPlayer::Destroyed()
 
 void cPlayer::SpawnOn(cClientHandle & a_Client)
 {
-	if (!m_bVisible || (m_ClientHandle.get() == (&a_Client)))
+	if (!m_bVisible || (m_ClientHandle.lock().get() == &a_Client))
 	{
 		return;
 	}
@@ -225,27 +212,21 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (m_ClientHandle != nullptr)
+	auto ClientHandle = m_ClientHandle.lock();
+	if ((ClientHandle == nullptr) || ClientHandle->IsDestroyed())
 	{
-		if (m_ClientHandle->IsDestroyed())
-		{
-			// This should not happen, because destroying a client will remove it from the world, but just in case
-			ASSERT(!"Player ticked whilst in the process of destruction!");
-			m_ClientHandle = nullptr;
-			return;
-		}
+		// If the ClientHandle was deleted or destroyed, the client has disconnected
+		// In theory, if it was only destroyed, we may continue ticking (just nothing would be sent over the network)
+		// For performance however, simply bail out
 
-		if (!m_ClientHandle->IsPlaying())
-		{
-			// We're not yet in the game, ignore everything
-			return;
-		}
-	}
-	else
-	{
-		ASSERT(!"Player ticked whilst in the process of destruction!");
+		return;
 	}
 
+	if (!ClientHandle->IsPlaying())
+	{
+		// We're not yet in the game, ignore everything
+		return;
+	}
 
 	m_Stats.AddValue(statMinutesPlayed, 1);
 
@@ -255,9 +236,8 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		return;
 	}
-	ASSERT((GetParentChunk() != nullptr) && (GetParentChunk()->IsValid()));
 
-	ASSERT(a_Chunk.IsValid());
+	ASSERT(GetParentChunk() != nullptr);
 
 	super::Tick(a_Dt, a_Chunk);
 
@@ -273,7 +253,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	BroadcastMovementUpdate(m_ClientHandle.get());
+	BroadcastMovementUpdate(ClientHandle.get());
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -321,9 +301,9 @@ void cPlayer::TickFreezeCode()
 {
 	if (m_IsFrozen)
 	{
-		if ((!m_IsManuallyFrozen) && (GetClientHandle()->IsPlayerChunkSent()))
+		if (!m_IsManuallyFrozen && GetClientHandle()->IsPlayerChunkSent())
 		{
-			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded and sent
+			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded
 			Unfreeze();
 
 			// Pull the player out of any solids that might have loaded on them.
@@ -360,6 +340,11 @@ void cPlayer::TickFreezeCode()
 			// Despite the client side freeze, the player may be able to move a little by
 			// Jumping or canceling flight. Re-freeze every now and then
 			FreezeInternal(GetPosition(), m_IsManuallyFrozen);
+
+			DO_WITH_VALID_CLIENTHANDLE(
+				SendPlayerPosition();
+				BroadcastMovementUpdate(ClientHandle.get());
+			)
 		}
 	}
 	else
@@ -499,7 +484,7 @@ void cPlayer::StartChargingBow(void)
 	LOGD("Player \"%s\" started charging their bow", GetName().c_str());
 	m_IsChargingBow = true;
 	m_BowCharge = 0;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.lock().get());
 }
 
 
@@ -512,7 +497,7 @@ int cPlayer::FinishChargingBow(void)
 	int res = m_BowCharge;
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.lock().get());
 
 	return res;
 }
@@ -526,7 +511,7 @@ void cPlayer::CancelChargingBow(void)
 	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.lock().get());
 }
 
 
@@ -565,7 +550,7 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
 	int FoodLevel = Clamp(a_FoodLevel, 0, MAX_FOOD_LEVEL);
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
+	if (cRoot::Get()->GetPluginManager().CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
 		m_FoodSaturationLevel = 5.0;
 		return;
@@ -654,7 +639,11 @@ void cPlayer::FinishEating(void)
 	m_EatingFinishTick = -1;
 
 	// Send the packets:
-	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
+	auto ClientHandle = m_ClientHandle.lock();
+	if (ClientHandle == nullptr)
+	{
+		ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
+	}
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -684,10 +673,9 @@ void cPlayer::AbortEating(void)
 
 void cPlayer::SendHealth(void)
 {
-	if (m_ClientHandle != nullptr)
-	{
-		m_ClientHandle->SendHealth();
-	}
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendHealth();
+	)
 }
 
 
@@ -696,11 +684,10 @@ void cPlayer::SendHealth(void)
 
 void cPlayer::SendExperience(void)
 {
-	if (m_ClientHandle != nullptr)
-	{
-		m_ClientHandle->SendExperience();
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendExperience();
 		m_bDirtyExperience = false;
-	}
+	)
 }
 
 
@@ -762,8 +749,9 @@ void cPlayer::SetNormalMaxSpeed(double a_Speed)
 	m_NormalMaxSpeed = a_Speed;
 	if (!m_IsSprinting && !m_IsFlying && !m_IsFrozen)
 	{
-		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerMaxSpeed();
+		DO_WITH_VALID_CLIENTHANDLE(
+			SendPlayerMaxSpeed();
+		)
 	}
 }
 
@@ -776,8 +764,9 @@ void cPlayer::SetSprintingMaxSpeed(double a_Speed)
 	m_SprintingMaxSpeed = a_Speed;
 	if (m_IsSprinting && !m_IsFlying && !m_IsFrozen)
 	{
-		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerMaxSpeed();
+		DO_WITH_VALID_CLIENTHANDLE(
+			SendPlayerMaxSpeed();
+		)
 	}
 }
 
@@ -789,11 +778,13 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 {
 	m_FlyingMaxSpeed = a_Speed;
 
-	// Update the flying speed, always:
+	// Update the flying speed:
 	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerAbilities();
+		DO_WITH_VALID_CLIENTHANDLE(
+			SendPlayerAbilities();
+		)
 	}
 }
 
@@ -827,7 +818,9 @@ void cPlayer::SetSprint(bool a_IsSprinting)
 	}
 
 	m_IsSprinting = a_IsSprinting;
-	m_ClientHandle->SendPlayerMaxSpeed();
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendPlayerMaxSpeed();
+	)
 }
 
 
@@ -842,7 +835,9 @@ void cPlayer::SetCanFly(bool a_CanFly)
 	}
 
 	m_CanFly = a_CanFly;
-	m_ClientHandle->SendPlayerAbilities();
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendPlayerAbilities();
+	)
 }
 
 
@@ -904,7 +899,9 @@ void cPlayer::SetFlying(bool a_IsFlying)
 	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerAbilities();
+		DO_WITH_VALID_CLIENTHANDLE(
+			SendPlayerAbilities();
+		)
 	}
 }
 
@@ -1027,7 +1024,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
-	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
+	auto & PluginManager = cRoot::Get()->GetPluginManager();
 
 	if ((a_TDI.Attacker == nullptr) && m_World->ShouldBroadcastDeathMessages())
 	{
@@ -1062,8 +1059,8 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			#endif  // __clang__
 		}
 		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
+		PluginManager.CallHookKilled(*this, a_TDI, DeathMessage);
+		if (!DeathMessage.empty())
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
@@ -1076,7 +1073,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		cPlayer * Killer = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
 		AString DeathMessage = Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		PluginManager.CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
@@ -1087,7 +1084,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		AString KillerClass = a_TDI.Attacker->GetClass();
 		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 		AString DeathMessage = Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		PluginManager.CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
@@ -1147,18 +1144,20 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(m_SpawnWorld->GetDimension(), true);
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendRespawn(m_SpawnWorld->GetDimension(), true);
+	)
 
 	// Extinguish the fire:
 	StopBurning();
 
 	if (GetWorld() != m_SpawnWorld)
 	{
-		MoveToWorld(m_SpawnWorld, false, GetLastBedPos());
+		MoveToWorld(*m_SpawnWorld, GetLastBedPos());
 	}
 	else
 	{
-		TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+		TeleportToCoords(GetLastBedPos());
 	}
 
 	SetVisible(true);
@@ -1335,7 +1334,9 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	}
 
 	m_GameMode = a_GameMode;
-	m_ClientHandle->SendGameMode(a_GameMode);
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendGameMode(a_GameMode);
+	)
 
 	SetCapabilities();
 
@@ -1422,7 +1423,9 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 		StatValue New = m_Stats.AddValue(a_Ach);
 
 		// Achievement Get!
-		m_ClientHandle->SendStatistics(m_Stats);
+		DO_WITH_VALID_CLIENTHANDLE(
+			SendStatistics(m_Stats);
+		)
 
 		return static_cast<unsigned int>(New);
 	}
@@ -1432,18 +1435,20 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 
 
 
-void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
+void cPlayer::TeleportToCoords(const Vector3d & a_Position)
 {
-	//  ask plugins to allow teleport to the new position.
-	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	// Ask plugins to allow teleport to the new position.
+	if (!cRoot::Get()->GetPluginManager().CallHookEntityTeleport(*this, m_LastPosition, a_Position))
 	{
-		SetPosition(a_PosX, a_PosY, a_PosZ);
+		SetPosition(a_Position);
+		m_LastGroundHeight = static_cast<float>(a_Position.y);
 		FreezeInternal(GetPosition(), false);
-		m_LastGroundHeight = static_cast<float>(a_PosY);
 		m_bIsTeleporting = true;
 
 		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
-		m_ClientHandle->SendPlayerMoveLook();
+		DO_WITH_VALID_CLIENTHANDLE(
+			SendPlayerMoveLook();
+		)
 	}
 }
 
@@ -1475,8 +1480,10 @@ void cPlayer::Unfreeze()
 	GetClientHandle()->SendPlayerMaxSpeed();
 
 	m_IsFrozen = false;
-	BroadcastMovementUpdate(GetClientHandle());
-	GetClientHandle()->SendPlayerPosition();
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendPlayerPosition();
+		BroadcastMovementUpdate(ClientHandle.get());
+	)
 }
 
 
@@ -1487,7 +1494,9 @@ void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 {
 	SetYaw(a_YawDegrees);
 	SetPitch(a_PitchDegrees);
-	m_ClientHandle->SendPlayerMoveLook();
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendPlayerMoveLook();
+	)
 }
 
 
@@ -1524,15 +1533,6 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
-void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
-{
-	SetSpeed(a_Speed);
-}
-
-
-
-
-
 void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
 	if (m_IsFrozen)
@@ -1542,7 +1542,9 @@ void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 	}
 	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 	// Send the speed to the client so he actualy moves
-	m_ClientHandle->SendEntityVelocity(*this);
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendEntityVelocity(*this);
+	)
 }
 
 
@@ -1560,8 +1562,118 @@ void cPlayer::SetVisible(bool a_bVisible)
 	if (!a_bVisible && m_bVisible)
 	{
 		m_bVisible = false;
-		m_World->BroadcastDestroyEntity(*this, m_ClientHandle.get());  // Destroy on all clients
+		m_World->BroadcastDestroyEntity(*this, m_ClientHandle.lock().get());  // Destroy on all clients
 	}
+}
+
+void cPlayer::SendMessage(const AString & a_Message)
+{
+	SendMessage(cCompositeChat(a_Message, mtCustom));
+}
+
+
+
+
+
+void cPlayer::SendMessageInfo(const AString & a_Message)
+{
+	SendMessage(cCompositeChat(a_Message, mtInformation));
+}
+
+
+
+
+
+void cPlayer::SendMessageFailure(const AString & a_Message)
+{
+	SendMessage(cCompositeChat(a_Message, mtFailure));
+}
+
+
+
+
+
+void cPlayer::SendMessageSuccess(const AString & a_Message)
+{
+	SendMessage(cCompositeChat(a_Message, mtSuccess));
+}
+
+
+
+
+
+void cPlayer::SendMessageWarning(const AString & a_Message)
+{
+	SendMessage(cCompositeChat(a_Message, mtWarning));
+}
+
+
+
+
+
+void cPlayer::SendMessageFatal(const AString & a_Message)
+{
+	SendMessage(cCompositeChat(a_Message, mtFailure));
+}
+
+
+
+
+
+void cPlayer::SendMessagePrivateMsg(const AString & a_Message, const AString & a_Sender)
+{
+	SendMessage(cCompositeChat(a_Message, mtPrivateMessage, a_Sender));
+}
+
+
+
+
+
+void cPlayer::SendMessage(const cCompositeChat & a_Message)
+{
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendChat(a_Message);
+	)
+}
+
+
+
+
+
+void cPlayer::SendSystemMessage(const AString & a_Message)
+{
+	SendSystemMessage(cCompositeChat(a_Message));
+}
+
+
+
+
+
+void cPlayer::SendAboveActionBarMessage(const AString & a_Message)
+{
+	SendAboveActionBarMessage(cCompositeChat(a_Message));
+}
+
+
+
+
+
+void cPlayer::SendSystemMessage(const cCompositeChat & a_Message)
+{
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendChatSystem(a_Message);
+	)
+}
+
+
+
+
+
+void cPlayer::SendAboveActionBarMessage(const cCompositeChat & a_Message)
+{
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendChatAboveActionBar(a_Message);
+	)
 }
 
 
@@ -1760,19 +1872,17 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+bool cPlayer::OnPreWorldTravel(cWorld & a_NewWorld)
 {
-	ASSERT(a_World != nullptr);
-	ASSERT(IsTicking());
-
-	if (GetWorld() == a_World)
+	if ((GetWorld() == &a_NewWorld) || IsChangingWorlds())
 	{
-		// Don't move to same world
+		// Don't move a) to same world or b) when already moving worlds
 		return false;
 	}
+	ASSERT(IsTicking());
 
-	//  Ask the plugins if the player is allowed to changing the world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	// Ask the plugins if the player is allowed to changing the world
+	if (cRoot::Get()->GetPluginManager().CallHookEntityChangingWorld(*this, a_NewWorld))
 	{
 		// A Plugin doesn't allow the player to changing the world
 		return false;
@@ -1784,53 +1894,115 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Prevent further ticking in this world
 	SetIsTicking(false);
 
-	// Tell others we are gone
-	GetWorld()->BroadcastDestroyEntity(*this);
+	// Stop sending chunks
+	SetIsChangingWorlds(true);
 
-	// Remove player from world
-	GetWorld()->RemovePlayer(this, false);
+	FreezeInternal(GetPosition(), false);
 
-	// Set position to the new position
-	SetPosition(a_NewPosition);
-	FreezeInternal(a_NewPosition, false);
-
-	// Stop all mobs from targeting this player
-	StopEveryoneFromTargetingMe();
-
-	// Send the respawn packet:
-	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
+	auto ClientHandle = GetClientHandlePtr().lock();
+	if (ClientHandle != nullptr)
 	{
-		m_ClientHandle->SendRespawn(a_World->GetDimension());
-	}
-
-	// Update the view distance.
-	m_ClientHandle->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
-
-	// Send current weather of target world to player
-	if (a_World->GetDimension() == dimOverworld)
-	{
-		m_ClientHandle->SendWeather(a_World->GetWeather());
-	}
-
-	// Broadcast the player into the new world.
-	a_World->BroadcastSpawnEntity(*this);
-
-	// Queue add to new world and removal from the old one
-	cChunk * ParentChunk = GetParentChunk();
-	cWorld * OldWorld = GetWorld();
-	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-	OldWorld->QueueTask([this, ParentChunk, a_World](cWorld & a_OldWorld)
-	{
-		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-			this->GetName().c_str(),
-			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+		cRoot::Get()->GetServer().QueueTask(
+			[ClientHandle]
+			{
+				ClientHandle->RemoveFromWorld();
+			}
 		);
-		ParentChunk->RemoveEntity(this);
-		a_World->AddPlayer(this);
-		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
-	});
+
+		GetWorld()->RemovePlayer(this);
+		ClientHandle->SendRespawn(a_NewWorld.GetDimension());
+
+		switch (a_NewWorld.GetDimension())
+		{
+			case eDimension::dimOverworld: break;
+			case eDimension::dimNether: AwardAchievement(achEnterPortal); break;
+			case eDimension::dimEnd: AwardAchievement(achEnterTheEnd); break;
+			default: ASSERT(!"Unexpected dimension during world travel.");
+		}
+	}
+	// If std::weak_ptr<>::lock returned nullptr, the destructor of cClientHandle would have handled player removal.
+
+	GetWorld()->QueueTask(
+		[this, &a_NewWorld](cWorld & a_CurrentWorld)
+		{
+			auto Entity = GetParentChunk()->GetAssociatedEntityPtr(*this);
+
+			class Callback : public cEntityCallback
+			{
+			public:
+				Callback(const std::weak_ptr<cPawn> & a_Pawn) :
+					m_Pawn(a_Pawn)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					if (!a_Entity->IsMob())
+					{
+						return false;
+					}
+
+					auto Monster = static_cast<cMonster *>(a_Entity);
+					if (std::equal_to<std::weak_ptr<cPawn>>()(Monster->GetWeakTargetPtr(), m_Pawn))
+					{
+						Monster->SetTarget(nullptr);
+					}
+
+					return false;
+				}
+
+			private:
+				const std::weak_ptr<cPawn> & m_Pawn;
+			} Callback(std::static_pointer_cast<cPawn, cEntity>(Entity));
+
+			ASSERT(Entity->IsPlayer() && Entity->IsPawn());
+			a_CurrentWorld.ForEachEntity(Callback);
+
+			GetParentChunk()->RemoveEntity(Entity);
+			SetParentChunk(nullptr);
+
+			a_NewWorld.QueueTask(
+				[Entity, &a_CurrentWorld](cWorld & a_DestinationWorld)
+				{
+					ASSERT(Entity->IsPlayer());
+					auto Player = static_cast<cPlayer *>(Entity.get());
+
+					// Player changed world, call the hook
+					cRoot::Get()->GetPluginManager().CallHookEntityChangedWorld(*Entity, a_CurrentWorld);
+
+					Entity->Initialize(Entity, a_DestinationWorld);
+					a_DestinationWorld.AddPlayer(Player);
+
+					Player->SetIsChangingWorlds(false);
+				}
+			);
+
+			// Broadcast for other people that the player is gone.
+			a_CurrentWorld.BroadcastDestroyEntity(*this);
+		}
+	);
+
 	return true;
+}
+
+
+
+
+
+void cPlayer::OnPostWorldTravel(eDimension a_PreviousDimension, const Vector3d & a_RecommendedPosition)
+{
+	if ((a_PreviousDimension == eDimension::dimEnd) && (GetWorld()->GetDimension() == eDimension::dimOverworld))
+	{
+		super::OnPostWorldTravel(a_PreviousDimension, GetLastBedPos());
+	}
+	else
+	{
+		super::OnPostWorldTravel(a_PreviousDimension, a_RecommendedPosition);
+	}
+
+	DO_WITH_VALID_CLIENTHANDLE(
+		SendPlayerMoveLook();
+	)
 }
 
 
@@ -1850,7 +2022,7 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 	// Load from the offline UUID file, if allowed:
 	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
 	const char * OfflineUsage = " (unused)";
-	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
+	if (cRoot::Get()->GetServer().ShouldLoadOfflinePlayerData())
 	{
 		OfflineUsage = "";
 		if (LoadFromFile(GetUUIDFileName(OfflineUUID), a_World))
@@ -1860,7 +2032,7 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 	}
 
 	// Load from the old-style name-based file, if allowed:
-	if (cRoot::Get()->GetServer()->ShouldLoadNamedPlayerData())
+	if (cRoot::Get()->GetServer().ShouldLoadNamedPlayerData())
 	{
 		AString OldStyleFileName = Printf("players/%s.json", GetName().c_str());
 		if (LoadFromFile(OldStyleFileName, a_World))
@@ -2333,20 +2505,20 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 void cPlayer::LoadRank(void)
 {
 	// Load the values from cRankManager:
-	cRankManager * RankMgr = cRoot::Get()->GetRankManager();
-	m_Rank = RankMgr->GetPlayerRankName(m_UUID);
+	auto & RankMgr = cRoot::Get()->GetRankManager();
+	m_Rank = RankMgr.GetPlayerRankName(m_UUID);
 	if (m_Rank.empty())
 	{
-		m_Rank = RankMgr->GetDefaultRank();
+		m_Rank = RankMgr.GetDefaultRank();
 	}
 	else
 	{
 		// Update the name:
-		RankMgr->UpdatePlayerName(m_UUID, m_PlayerName);
+		RankMgr.UpdatePlayerName(m_UUID, m_PlayerName);
 	}
-	m_Permissions = RankMgr->GetPlayerPermissions(m_UUID);
-	m_Restrictions = RankMgr->GetPlayerRestrictions(m_UUID);
-	RankMgr->GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
+	m_Permissions = RankMgr.GetPlayerPermissions(m_UUID);
+	m_Restrictions = RankMgr.GetPlayerRestrictions(m_UUID);
+	RankMgr.GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
 
 	// Break up the individual permissions on each dot, into m_SplitPermissions:
 	m_SplitPermissions.clear();
@@ -2412,7 +2584,9 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 	// Send the blocks for each affected chunk:
 	for (auto itr = Changes.cbegin(), end = Changes.cend(); itr != end; ++itr)
 	{
-		m_ClientHandle->SendBlockChanges(itr->first.m_ChunkX, itr->first.m_ChunkZ, itr->second);
+		DO_WITH_VALID_CLIENTHANDLE(
+			SendBlockChanges(itr->first.m_ChunkX, itr->first.m_ChunkZ, itr->second);
+		)
 	}
 }
 
@@ -2423,10 +2597,10 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 {
 	// Call the "placing" hooks; if any fail, abort:
-	cPluginManager * pm = cPluginManager::Get();
+	auto & pm = cPluginManager::Get();
 	for (auto blk: a_Blocks)
 	{
-		if (pm->CallHookPlayerPlacingBlock(*this, blk))
+		if (pm.CallHookPlayerPlacingBlock(*this, blk))
 		{
 			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
 			for (auto blk2: a_Blocks)
@@ -2449,9 +2623,9 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 	}
 
 	// Call the "placed" hooks:
-	for (auto blk: a_Blocks)
+	for (const auto & blk: a_Blocks)
 	{
-		pm->CallHookPlayerPlacedBlock(*this, blk);
+		pm.CallHookPlayerPlacedBlock(*this, blk);
 	}
 	return true;
 }
@@ -2478,22 +2652,12 @@ void cPlayer::Detach()
 			{
 				if (!cBlockInfo::IsSolid(m_World->GetBlock(x, y, z)) && cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z)))
 				{
-					TeleportToCoords(x, y, z);
+					SetPosition(Vector3i(x, y, z));
 					return;
 				}
 			}
 		}
 	}
-}
-
-
-
-
-
-void cPlayer::RemoveClientHandle(void)
-{
-	ASSERT(m_ClientHandle != nullptr);
-	m_ClientHandle.reset();
 }
 
 

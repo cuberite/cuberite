@@ -144,7 +144,9 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		{
 			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
 		}
+
 		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
+		++itr;
 	}  // for itr - Data[]
 }
 
@@ -333,7 +335,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
 					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
 
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, a_PosX, y, a_PosZ, ssFireSpread))
+					if (cRoot::Get()->GetPluginManager().CallHookBlockSpread(m_World, a_PosX, y, a_PosZ, ssFireSpread))
 					{
 						return;
 					}
@@ -382,7 +384,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		}
 
 		bool ShouldReplaceFuel = (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance);
-		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsX, Y, AbsZ, ssFireSpread))
+		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager().CallHookBlockSpread(m_World, AbsX, Y, AbsZ, ssFireSpread))
 		{
 			Neighbour->SetBlock(X, Y, Z, E_BLOCK_FIRE, 0);
 		}

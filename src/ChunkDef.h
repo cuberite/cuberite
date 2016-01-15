@@ -31,7 +31,7 @@ class cEntity;
 class cClientHandle;
 class cBlockEntity;
 
-typedef std::list<cEntity *>        cEntityList;
+typedef std::vector<std::shared_ptr<cEntity>> cEntityList;
 typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 
@@ -423,9 +423,8 @@ public:
 	{
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
-} ;
+};
 
-typedef std::list<cChunkCoords> cChunkCoordsList;
 typedef std::vector<cChunkCoords> cChunkCoordsVector;
 
 

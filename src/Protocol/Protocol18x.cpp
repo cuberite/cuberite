@@ -115,7 +115,7 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
 	// hostname\00ip-address\00uuid\00profile-properties-as-json
 	AStringVector Params;
-	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	if (cRoot::Get()->GetServer().ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
 	{
 		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 		m_ServerAddress = Params[0];
@@ -602,13 +602,13 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
 	{
-		cServer * Server = cRoot::Get()->GetServer();
+		auto & Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
-		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server.IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteBEInt8(static_cast<Int8>(a_World.GetDimension()));
 		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<int>(Server->GetMaxPlayers(), 0, 255)));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<int>(Server.GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");  // Level type - wtf?
 		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
 	}
@@ -912,15 +912,11 @@ void cProtocol180::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto ClientHandle = a_Player.GetClientHandlePtr();
-	if (ClientHandle != nullptr)
-	{
-		cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-		Pkt.WriteVarInt32(2);
-		Pkt.WriteVarInt32(1);
-		Pkt.WriteUUID(a_Player.GetUUID());
-		Pkt.WriteVarInt32(static_cast<UInt32>(ClientHandle->GetPing()));
-	}
+	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+	Pkt.WriteVarInt32(2);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 }
 
 
@@ -2077,12 +2073,12 @@ void cProtocol180::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	int NumPlayers = Server->GetNumPlayers();
-	int MaxPlayers = Server->GetMaxPlayers();
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+	auto & Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server.GetDescription();
+	int NumPlayers = Server.GetNumPlayers();
+	int MaxPlayers = Server.GetMaxPlayers();
+	AString Favicon = Server.GetFaviconData();
+	cRoot::Get()->GetPluginManager().CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
 
 	// Version:
 	Json::Value Version;
@@ -2149,7 +2145,7 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	}
 
 	// Decrypt EncNonce using privkey
-	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer().GetPrivateKey();
 	UInt32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncNonce.data()), EncNonce.size(), reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
 	if (res != 4)
@@ -2198,13 +2194,13 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	cServer * Server = cRoot::Get()->GetServer();
+	auto & Server = cRoot::Get()->GetServer();
 	// If auth is required, then send the encryption request:
-	if (Server->ShouldAuthenticate())
+	if (Server.ShouldAuthenticate())
 	{
 		cPacketizer Pkt(*this, 0x01);
-		Pkt.WriteString(Server->GetServerID());
-		const AString & PubKeyDer = Server->GetPublicKeyDER();
+		Pkt.WriteString(Server.GetServerID());
+		const AString & PubKeyDer = Server.GetPublicKeyDER();
 		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
 		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
 		Pkt.WriteVarInt32(4);
@@ -2222,7 +2218,7 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
-	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleAnimation, m_Client, 0));  // Packet exists solely for arm-swing notification
 }
 
 
@@ -2231,6 +2227,11 @@ void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
+	if (!m_Client->EnforceBlockInteractionsRate())
+	{
+		return;
+	}
+
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
 	int BlockX, BlockY, BlockZ;
@@ -2240,7 +2241,7 @@ void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleLeftClick, m_Client, BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status));
 }
 
 
@@ -2249,6 +2250,11 @@ void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
+	if (!m_Client->EnforceBlockInteractionsRate())
+	{
+		return;
+	}
+
 	int BlockX, BlockY, BlockZ;
 	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
 	{
@@ -2263,7 +2269,7 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleRightClick, m_Client, BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem()));
 }
 
 
@@ -2273,7 +2279,7 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Message);
-	m_Client->HandleChat(Message);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleChat, m_Client, Message));
 }
 
 
@@ -2300,26 +2306,23 @@ void cProtocol180::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, ActionID);
+
 	switch (ActionID)
 	{
 		case 0:
-		{
-			// Respawn
-			m_Client->HandleRespawn();
+		{  // Respawn
+			m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleRespawn, m_Client));
 			break;
 		}
 		case 1:
-		{
-			// Request stats
-			const cStatManager & Manager = m_Client->GetPlayer()->GetStatManager();
-			SendStatistics(Manager);
-
+		{  // Request stats
+			// TODO: move cPlayer::GetStatManager call to SendStatistics to improve security
+			m_Client->QueueDataCommit(std::bind(&cClientHandle::SendStatistics, m_Client, m_Client->GetPlayer()->GetStatManager()));
 			break;
 		}
 		case 2:
-		{
-			// Open Inventory achievement
-			m_Client->GetPlayer()->AwardAchievement(achOpenInv);
+		{  // Open Inventory achievement
+			m_Client->QueueDataCommit(std::bind(&cPlayer::AwardAchievement, m_Client->GetPlayer(), achOpenInv));
 			break;
 		}
 	}
@@ -2337,7 +2340,7 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 	{
 		return;
 	}
-	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleCreativeInventory, m_Client, SlotNum, Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick));
 }
 
 
@@ -2352,11 +2355,11 @@ void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	switch (Action)
 	{
-		case 0: m_Client->HandleEntityCrouch(PlayerID, true);     break;  // Crouch
-		case 1: m_Client->HandleEntityCrouch(PlayerID, false);    break;  // Uncrouch
-		case 2: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
-		case 3: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
-		case 4: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
+		case 0: m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleEntityCrouch, m_Client, PlayerID, true));     break;  // Crouch
+		case 1: m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleEntityCrouch, m_Client, PlayerID, false));    break;  // Uncrouch
+		case 2: m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleEntityLeaveBed, m_Client, PlayerID));         break;  // Leave Bed
+		case 3: m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleEntitySprinting, m_Client, PlayerID, true));  break;  // Start sprinting
+		case 4: m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleEntitySprinting, m_Client, PlayerID, false)); break;  // Stop sprinting
 	}
 }
 
@@ -2401,7 +2404,7 @@ void cProtocol180::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 		CanFly = true;
 	}
 
-	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandlePlayerAbilities, m_Client, CanFly, IsFlying, FlyingSpeed, WalkingSpeed));
 }
 
 
@@ -2413,7 +2416,7 @@ void cProtocol180::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  IsOnGround);
-	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandlePlayerLook, m_Client, Yaw, Pitch, IsOnGround));
 }
 
 
@@ -2426,7 +2429,7 @@ void cProtocol180::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
-	m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandlePlayerPos, m_Client, PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround));
 }
 
 
@@ -2441,7 +2444,7 @@ void cProtocol180::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
-	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandlePlayerMoveLook, m_Client, PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround));
 }
 
 
@@ -2482,7 +2485,7 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
-	m_Client->HandleSlotSelected(SlotNum);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleSlotSelected, m_Client, SlotNum));
 }
 
 
@@ -2497,7 +2500,7 @@ void cProtocol180::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 
 	if ((Flags & 0x2) != 0)
 	{
-		m_Client->HandleUnmount();
+		m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleUnmount, m_Client));
 	}
 	else if ((Flags & 0x1) != 0)
 	{
@@ -2505,7 +2508,7 @@ void cProtocol180::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 	}
 	else
 	{
-		m_Client->HandleSteerVehicle(Forward, Sideways);
+		m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleSteerVehicle, m_Client, Forward, Sideways));
 	}
 }
 
@@ -2523,7 +2526,7 @@ void cProtocol180::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
 	}
 
-	m_Client->HandleTabCompletion(Text);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleTabCompletion, m_Client, Text));
 }
 
 
@@ -2566,12 +2569,12 @@ void cProtocol180::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 	{
 		case 0:
 		{
-			m_Client->HandleUseEntity(EntityID, false);
+			m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleUseEntity, m_Client, EntityID, false));
 			break;
 		}
 		case 1:
 		{
-			m_Client->HandleUseEntity(EntityID, true);
+			m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleUseEntity, m_Client, EntityID, true));
 			break;
 		}
 		case 2:
@@ -2600,7 +2603,7 @@ void cProtocol180::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Enchantment);
 
-	m_Client->HandleEnchantItem(WindowID, Enchantment);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleEnchantItem, m_Client, WindowID, Enchantment));
 }
 
 
@@ -2652,7 +2655,7 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleWindowClick, m_Client, WindowID, SlotNum, Action, Item));
 }
 
 
@@ -2662,7 +2665,7 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
-	m_Client->HandleWindowClose(WindowID);
+	m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleWindowClose, m_Client, WindowID));
 }
 
 
@@ -2682,13 +2685,22 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
-				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleCommandBlockBlockChange, m_Client, BlockX, BlockY, BlockZ, Command));
 				break;
 			}
 
 			default:
 			{
-				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %u (0x%02x)", Mode, Mode), mtFailure);
+				m_Client->QueueDataCommit(
+					std::bind(
+						static_cast<void(cClientHandle::*)(const AString &, eMessageType, const AString &)>(&cClientHandle::SendChat),
+						m_Client,
+						Printf("Failure setting command block command; unhandled mode %u (0x%02x)", Mode, Mode),
+						mtFailure,
+						""
+					)
+				);
+
 				LOG("Unhandled MC|AdvCdm packet mode.");
 				return;
 			}
@@ -2707,19 +2719,19 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect1);
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect2);
-		m_Client->HandleBeaconSelection(Effect1, Effect2);
+		m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleBeaconSelection, m_Client, Effect1, Effect2));
 		return;
 	}
 	else if (a_Channel == "MC|ItemName")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, ItemName);
-		m_Client->HandleAnvilItemName(ItemName);
+		m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleAnvilItemName, m_Client, ItemName));
 		return;
 	}
 	else if (a_Channel == "MC|TrSel")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, SlotNum);
-		m_Client->HandleNPCTrade(SlotNum);
+		m_Client->QueueDataCommit(std::bind(&cClientHandle::HandleNPCTrade, m_Client, SlotNum));
 		return;
 	}
 	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
@@ -2876,11 +2888,11 @@ void cProtocol180::StartEncryption(const Byte * a_Key)
 
 	// Prepare the m_AuthServerID:
 	cSha1Checksum Checksum;
-	cServer * Server = cRoot::Get()->GetServer();
-	const AString & ServerID = Server->GetServerID();
+	auto & Server = cRoot::Get()->GetServer();
+	const AString & ServerID = Server.GetServerID();
 	Checksum.Update(reinterpret_cast<const Byte *>(ServerID.c_str()), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update(reinterpret_cast<const Byte *>(Server->GetPublicKeyDER().data()), Server->GetPublicKeyDER().size());
+	Checksum.Update(reinterpret_cast<const Byte *>(Server.GetPublicKeyDER().data()), Server.GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);

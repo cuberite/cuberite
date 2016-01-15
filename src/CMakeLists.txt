@@ -191,6 +191,120 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(main.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=missing-variable-declarations -Wno-error=missing-prototypes")
 endif()
 
+
+set(BINDING_OUTPUTS
+	${PROJECT_SOURCE_DIR}/Bindings/Bindings.cpp
+	${PROJECT_SOURCE_DIR}/Bindings/Bindings.h
+	${PROJECT_SOURCE_DIR}/Bindings/LuaState_Declaration.inc
+	${PROJECT_SOURCE_DIR}/Bindings/LuaState_Implementation.cpp
+	${PROJECT_SOURCE_DIR}/Bindings/LuaState_Typedefs.inc
+)
+
+set(BINDING_DEPENDENCIES
+	tolua
+	${PROJECT_SOURCE_DIR}/Bindings/AllToLua.pkg
+	${PROJECT_SOURCE_DIR}/Bindings/BindingsProcessor.lua
+	${PROJECT_SOURCE_DIR}/Bindings/LuaFunctions.h
+	${PROJECT_SOURCE_DIR}/Bindings/LuaWindow.h
+	${PROJECT_SOURCE_DIR}/Bindings/Plugin.h
+	${PROJECT_SOURCE_DIR}/Bindings/PluginLua.h
+	${PROJECT_SOURCE_DIR}/Bindings/PluginManager.h
+	${PROJECT_SOURCE_DIR}/Bindings/WebPlugin.h
+	${PROJECT_SOURCE_DIR}/BiomeDef.h
+	${PROJECT_SOURCE_DIR}/BlockArea.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/BeaconEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/BlockEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/BlockEntityWithItems.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/ChestEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/DispenserEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/DropSpenserEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/DropperEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/FurnaceEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/HopperEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/JukeboxEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/NoteEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/SignEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/MobHeadEntity.h
+	${PROJECT_SOURCE_DIR}/BlockEntities/FlowerPotEntity.h
+	${PROJECT_SOURCE_DIR}/BlockID.h
+	${PROJECT_SOURCE_DIR}/BoundingBox.h
+	${PROJECT_SOURCE_DIR}/ChatColor.h
+	${PROJECT_SOURCE_DIR}/ChunkDef.h
+	${PROJECT_SOURCE_DIR}/ClientHandle.h
+	${PROJECT_SOURCE_DIR}/CraftingRecipes.h
+	${PROJECT_SOURCE_DIR}/Cuboid.h
+	${PROJECT_SOURCE_DIR}/Defines.h
+	${PROJECT_SOURCE_DIR}/Enchantments.h
+	${PROJECT_SOURCE_DIR}/Entities/ArrowEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/Entity.h
+	${PROJECT_SOURCE_DIR}/Entities/EntityEffect.h
+	${PROJECT_SOURCE_DIR}/Entities/ExpBottleEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/FireChargeEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/FireworkEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/Floater.h
+	${PROJECT_SOURCE_DIR}/Entities/GhastFireballEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/HangingEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/ItemFrame.h
+	${PROJECT_SOURCE_DIR}/Entities/Pawn.h
+	${PROJECT_SOURCE_DIR}/Entities/Player.h
+	${PROJECT_SOURCE_DIR}/Entities/Painting.h
+	${PROJECT_SOURCE_DIR}/Entities/Pickup.h
+	${PROJECT_SOURCE_DIR}/Entities/ProjectileEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/SplashPotionEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/ThrownEggEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/ThrownEnderPearlEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/ThrownSnowballEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/TNTEntity.h
+	${PROJECT_SOURCE_DIR}/Entities/WitherSkullEntity.h
+	${PROJECT_SOURCE_DIR}/Generating/ChunkDesc.h
+	${PROJECT_SOURCE_DIR}/Inventory.h
+	${PROJECT_SOURCE_DIR}/Item.h
+	${PROJECT_SOURCE_DIR}/ItemGrid.h
+	${PROJECT_SOURCE_DIR}/Mobs/Monster.h
+	${PROJECT_SOURCE_DIR}/OSSupport/File.h
+	${PROJECT_SOURCE_DIR}/Root.h
+	${PROJECT_SOURCE_DIR}/Server.h
+	${PROJECT_SOURCE_DIR}/StringUtils.h
+	${PROJECT_SOURCE_DIR}/Tracer.h
+	${PROJECT_SOURCE_DIR}/UI/Window.h
+	${PROJECT_SOURCE_DIR}/Vector3.h
+	${PROJECT_SOURCE_DIR}/WebAdmin.h
+	${PROJECT_SOURCE_DIR}/World.h
+)
+
+if (MSVC)
+	add_custom_command(
+		OUTPUT ${BINDING_OUTPUTS}
+
+		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/Server/lua51.dll ./lua51.dll
+
+		# Regenerate bindings:
+		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Bindings/
+
+		# add any new generation dependencies here
+		DEPENDS ${BINDING_DEPENDENCIES}
+	)
+else ()
+	add_custom_command(
+		OUTPUT ${BINDING_OUTPUTS}
+
+		# Regenerate bindings:
+		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Bindings/
+
+		# add any new generation dependencies here
+		DEPENDS ${BINDING_DEPENDENCIES}
+	)
+endif ()
+
+# TODO: our current method of using libraries to add subdirectory source files is nonoptimal
+# change it, and remove this custom target, using just the custom command above
+# this is currently needed as custom commands do not propagate their build rules to subdirectories.
+add_custom_target(BindingsGeneration DEPENDS ${BINDING_OUTPUTS})
+
+
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead
 	# lib dependencies are not included
@@ -199,8 +313,6 @@ if (NOT MSVC)
 	foreach(folder ${FOLDERS})
 		add_subdirectory(${folder})
 	endforeach(folder)
-
-	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
 
 	#clear file
 	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependencies.txt)
@@ -307,32 +419,8 @@ FILE(WRITE "AllFiles.lst" "${ALLFILESLINES}")
 
 
 set(EXECUTABLE Cuberite)
-
-if (MSVC)
-	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
-	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
-
-	# The paths in BINDING_DEPENDENCIES are relative to the Bindings folder, convert them relative to this folder:
-	foreach (dep ${BINDING_DEPENDENCIES})
-		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
-	endforeach(dep)
-
-	ADD_CUSTOM_COMMAND(
-		OUTPUT ${BINDING_OUTPUTS}
-
-		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/Server/lua51.dll ./lua51.dll
-
-		# Regenerate bindings:
-		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
-
-		# add any new generation dependencies here
-		DEPENDS ${BINDINGS_DEPENDENCIES}
-	)
-endif()
-
 add_executable(${EXECUTABLE} ${SOURCE})
+add_dependencies(${EXECUTABLE} BindingsGeneration)
 
 
 # Output the executable into the $/Server folder, so that it has access to external resources:

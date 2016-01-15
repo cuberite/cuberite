@@ -232,20 +232,20 @@ public:
 					a_Player->GetStatManager().AddValue(statFishCaught, 1);
 				}
 
-				if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(*a_Player, Drops))
+				if (cRoot::Get()->GetPluginManager().CallHookPlayerFishing(*a_Player, Drops))
 				{
 					return true;
 				}
 				Vector3d FloaterPos = FloaterInfo.GetPos();
 				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y + 1, FlyDirection.z);
-				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
+				cRoot::Get()->GetPluginManager().CallHookPlayerFished(*a_Player, Drops);
 			}
 		}
 		else
 		{
-			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), static_cast<int>(100 + static_cast<unsigned int>(a_World->GetTickRandomNumber(800)) - (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
-			Floater->Initialize(*a_World);
+			auto Floater = std::make_shared<cFloater>(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), static_cast<int>(100 + static_cast<unsigned int>(a_World->GetTickRandomNumber(800)) - (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
+			Floater->Initialize(Floater, *a_World);
 			a_Player->SetIsFishing(true, Floater->GetUniqueID());
 		}
 		return true;

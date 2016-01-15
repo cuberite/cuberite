@@ -59,10 +59,14 @@ SET (HDRS
 	ItemThrowable.h
 )
 
+get_directory_property(BINDING_OUTPUTS DIRECTORY ../ DEFINITION BINDING_OUTPUTS)
+set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(ItemHandler.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch-enum")
 endif()
 
 if(NOT MSVC)
 	add_library(Items ${SRCS} ${HDRS})
+	add_dependencies(Items BindingsGeneration)
 endif()

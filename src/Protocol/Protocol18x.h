@@ -233,8 +233,6 @@ protected:
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;
 
-	void SendCompass(const cWorld & a_World);
-
 	/** Reads an item out of the received data, sets a_Item to the values read.
 	Returns false if not enough received data.
 	a_KeepRemainingBytes tells the function to keep that many bytes at the end of the buffer. */

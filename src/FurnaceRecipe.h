@@ -16,6 +16,7 @@ class cFurnaceRecipe
 public:
 	cFurnaceRecipe(void);
 	~cFurnaceRecipe();
+	cFurnaceRecipe(const cFurnaceRecipe & a_FurnaceRecipe) = delete;
 
 	void ReloadRecipes(void);
 

@@ -28,9 +28,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 #include "OSSupport/IsThread.h"
 #include "ChunkDef.h"
 #include "ChunkDataCallback.h"
-
-#include <unordered_set>
-#include <unordered_map>
+#include "ChunkStay.h"
 
 
 
@@ -51,8 +49,7 @@ class cChunkSender;
 
 
 class cChunkSender:
-	public cIsThread,
-	public cChunkDataSeparateCollector
+	public cIsThread
 {
 	typedef cIsThread super;
 public:
@@ -72,70 +69,68 @@ public:
 
 	void Stop(void);
 
-	/** Queues a chunk to be sent to a specific client */
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client);
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Client);
-
-	/** Removes the a_Client from all waiting chunk send operations */
-	void RemoveClient(cClientHandle * a_Client);
+	/** Queues a chunk to be sent to a specific client
+	A chunkstay ensures that the chunk is valid before sending */
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, const std::weak_ptr<cClientHandle> & a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, const std::vector<std::weak_ptr<cClientHandle>> & a_Clients);
 
 protected:
 
-	struct sChunkQueue
+	class cChunkQueue :
+		public cChunkStay,
+		public cChunkDataSeparateCollector
 	{
-		eChunkPriority m_Priority;
-		cChunkCoords m_Chunk;
+	public:
 
-		bool operator <(const sChunkQueue & a_Other) const
+		cChunkQueue(eChunkPriority a_Priority, cChunkCoords a_ChunkCoordinate, const std::weak_ptr<cClientHandle> & a_Client, cChunkSender & a_ChunkSender) :
+			m_Priority(a_Priority),
+			m_Chunk(a_ChunkCoordinate),
+			m_Clients{ a_Client },
+			m_ChunkSender(a_ChunkSender)
 		{
-			/* The Standard Priority Queue sorts from biggest to smallest
-			return true here means you are smaller than the other object, and you get pushed down.
-
-			The priorities go from HIGH (0) to LOW (2), so a smaller priority should mean further up the list
-			therefore, return true (affirm we're "smaller", and get pushed down) only if our priority is bigger than theirs (they're more urgent)
-			*/
-			return this->m_Priority > a_Other.m_Priority;
+			Add(a_ChunkCoordinate.m_ChunkX, a_ChunkCoordinate.m_ChunkZ);
 		}
-	};
 
-	/** Used for sending chunks to specific clients */
-	struct sSendChunk
-	{
-		cChunkCoords m_Chunk;
-		std::unordered_set<cClientHandle *> m_Clients;
 		eChunkPriority m_Priority;
-		sSendChunk(cChunkCoords a_Chunk, eChunkPriority a_Priority) :
-			m_Chunk(a_Chunk),
-			m_Priority(a_Priority)
+		cChunkCoords m_Chunk;
+		std::vector<std::weak_ptr<cClientHandle>> m_Clients;
+
+		// Data about the chunk that is being sent:
+		// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
+		unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
+
+	private:
+		cChunkSender & m_ChunkSender;
+
+		// cChunkDataCollector overrides:
+		// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
+		virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override;
+
+		// cChunkStay overrides
+		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override
 		{
+			UNUSED(a_ChunkX);
+			UNUSED(a_ChunkZ);
+		}
+		virtual bool OnAllChunksAvailable(void) override;
+		virtual void OnDisabled(void) override
+		{
+			delete this;
 		}
 	};
 
 	cWorld & m_World;
 
 	cCriticalSection  m_CS;
-	std::priority_queue<sChunkQueue> m_SendChunks;
-	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
+	std::vector<cChunkQueue *> m_LoadQueue;
+	std::vector<cChunkQueue *> m_SendChunks;
 	cEvent m_evtQueue;  // Set when anything is added to m_ChunksReady
-	cEvent m_evtRemoved;  // Set when removed clients are safe to be deleted
-
-	// Data about the chunk that is being sent:
-	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
-	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
-	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
-	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
 
 	// cIsThread override:
 	virtual void Execute(void) override;
 
-	// cChunkDataCollector overrides:
-	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) override;
-	virtual void Entity       (cEntity *      a_Entity) override;
-	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
-
 	/** Sends the specified chunk to all the specified clients */
-	void SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients);
+	void SendChunk(const cChunkQueue & a_Item);
 } ;
 
 

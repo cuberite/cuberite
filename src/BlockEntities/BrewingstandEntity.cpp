@@ -101,7 +101,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_TimeBrewed = 0;
 
 		// Return if the hook has been canceled
-		if (cPluginManager::Get()->CallHookBrewingCompleting(*m_World, *this))
+		if (cPluginManager::Get().CallHookBrewingCompleting(*m_World, *this))
 		{
 			return false;
 		}
@@ -124,7 +124,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Brewing process completed
-		cPluginManager::Get()->CallHookBrewingCompleted(*m_World, *this);
+		cPluginManager::Get().CallHookBrewingCompleted(*m_World, *this);
 
 		return true;
 	}
@@ -188,7 +188,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	}
 
 	// Recheck the bottles
-	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
+	auto & BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
 	bool Stop = true;
 	for (int i = 0; i < 3; i++)
@@ -210,7 +210,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 			}
 		}
 
-		Recipe = BR->GetRecipeFrom(m_Contents.GetSlot(i), m_Contents.GetSlot(bsIngredient));
+		Recipe = BR.GetRecipeFrom(m_Contents.GetSlot(i), m_Contents.GetSlot(bsIngredient));
 		if (Recipe != nullptr)
 		{
 			// Found a brewing recipe for the items
@@ -287,7 +287,7 @@ void cBrewingstandEntity::GetRecipes(void)
 		return;
 	}
 
-	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
+	auto & BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
 	for (int i = 0; i < 3; i++)
 	{
@@ -295,7 +295,7 @@ void cBrewingstandEntity::GetRecipes(void)
 		{
 			continue;
 		}
-		Recipe = BR->GetRecipeFrom(GetSlot(i), GetSlot(bsIngredient));
+		Recipe = BR.GetRecipeFrom(GetSlot(i), GetSlot(bsIngredient));
 		if (Recipe != nullptr)
 		{
 			m_CurrentBrewingRecipes[i] = Recipe;

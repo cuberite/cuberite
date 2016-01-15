@@ -200,8 +200,10 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	CheckValid();
 
 	// Store the current free space for a check after writing:
+	#ifdef _DEBUG
+		auto CurReadableSpace = GetReadableSpace();
+	#endif
 	size_t CurFreeSpace = GetFreeSpace();
-	size_t CurReadableSpace = GetReadableSpace();
 	size_t WrittenBytes = 0;
 
 	if (CurFreeSpace < a_Count)
