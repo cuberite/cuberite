@@ -3,7 +3,7 @@
 
 #include "MobSpawner.h"
 #include "Mobs/IncludeAllMonsters.h"
-
+#include "World.h"
 
 
 
@@ -84,7 +84,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 		addIfAllowed(mtCreeper, allowedMobs);
 		addIfAllowed(mtSquid, allowedMobs);
 		addIfAllowed(mtGuardian, allowedMobs);
-		
+
 		if ((a_Biome != biDesert) && (a_Biome != biBeach) && (a_Biome != biOcean))
 		{
 			addIfAllowed(mtSheep, allowedMobs);
@@ -94,7 +94,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 			addIfAllowed(mtEnderman, allowedMobs);
 			addIfAllowed(mtRabbit, allowedMobs);
 			addIfAllowed(mtSlime, allowedMobs);  // MG TODO : much more complicated rule
-			
+
 			if ((a_Biome == biForest) || (a_Biome == biForestHills) || (a_Biome == biTaiga) || (a_Biome == biTaigaHills))
 			{
 				addIfAllowed(mtWolf, allowedMobs);
@@ -128,6 +128,13 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, EMCSBiome a_Biome)
 {
+	ASSERT(a_Chunk != nullptr);
+	cPlayer * a_Closest_Player = a_Chunk->GetWorld()->FindClosestPlayer(a_Chunk->PositionToWorldPosition(a_RelX, a_RelY, a_RelZ), 24);
+	if (a_Closest_Player != nullptr)  // Too close to a player, bail out
+	{
+		return false;
+	}
+
 	cFastRandom Random;
 	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 	if (a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
@@ -150,7 +157,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			{
 				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
 			}
-			
+
 			case mtSquid:
 			{
 				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
@@ -176,7 +183,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(SkyLight >= 9)
 				);
 			}
-				
+
 			case mtOcelot:
 			{
 				return (
@@ -189,7 +196,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(Random.NextInt(3) != 0)
 				);
 			}
-			
+
 			case mtEnderman:
 			{
 				if (a_RelY < 250)
@@ -210,7 +217,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				}
 				break;
 			}
-			
+
 			case mtSpider:
 			{
 				bool CanSpawn = true;
@@ -247,7 +254,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(Random.NextInt(2) == 0)
 				);
 			}
-			
+
 			case mtCreeper:
 			case mtSkeleton:
 			case mtZombie:
@@ -274,7 +281,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					)
 				);
 			}
-			
+
 			case mtGhast:
 			case mtZombiePigman:
 			{
@@ -285,7 +292,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(Random.NextInt(20) == 0)
 				);
 			}
-			
+
 			case mtWolf:
 			{
 				return (
@@ -317,7 +324,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					)
 				);
 			}
-			
+
 			default:
 			{
 				LOGD("MG TODO: Write spawning rule for mob type %d", a_MobType);

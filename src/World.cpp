@@ -3504,15 +3504,6 @@ UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 		return cEntity::INVALID_ID;
 	}
 
-	cPlayer * a_Closest_Player = FindClosestPlayer(a_Monster->GetPosition(), 24);
-	if (a_Closest_Player != nullptr)  // Too close to a player, bail out.
-	{
-		delete a_Monster;
-		a_Monster = nullptr;
-		return cEntity::INVALID_ID;
-	}
-
-
 	// Initialize the monster into the current world.
 	if (!a_Monster->Initialize(*this))
 	{
