@@ -500,7 +500,7 @@ public:
 	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
 
 	/** Notify friendly wolves that we took damage or did damage to an entity so that they might assist us. */
-	void NotifyFriendlyWolves(cEntity * a_Opponent);
+	void NotifyFriendlyWolves(cPawn * a_Opponent);
 
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const override { return m_IsCrouched; }

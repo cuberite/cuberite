@@ -316,12 +316,13 @@ void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hi
 {
 	if (a_EntityHit.IsPawn() && (GetCreatorName() != ""))  // If we're hitting a mob or a player and we were created by a player
 	{
+
 		class cNotifyWolves : public cEntityCallback
 		{
 		public:
-			cEntity * m_EntityHit;
+			cPawn * m_EntityHit;
 
-			cNotifyWolves(cEntity * a_Entity) :
+			cNotifyWolves(cPawn * a_Entity) :
 				m_EntityHit(a_Entity)
 			{
 			}
@@ -331,7 +332,7 @@ void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hi
 				static_cast<cPlayer*>(a_Player)->NotifyFriendlyWolves(m_EntityHit);
 				return true;
 			}
-		} Callback(&a_EntityHit);
+		} Callback(static_cast<cPawn*>(&a_EntityHit));
 
 		m_World->DoWithEntityByID(GetCreatorUniqueID(), Callback);
 	}

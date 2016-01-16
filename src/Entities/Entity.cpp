@@ -79,7 +79,7 @@ cEntity::~cEntity()
 {
 	// Before deleting, the entity needs to have been removed from the world, if ever added
 	ASSERT((m_World == nullptr) || !m_World->HasEntity(m_UniqueID));
-	
+
 	/*
 	// DEBUG:
 	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p",
@@ -89,7 +89,7 @@ cEntity::~cEntity()
 		this
 		);
 	*/
-	
+
 	if (m_AttachedTo != nullptr)
 	{
 		Detach();
@@ -143,23 +143,23 @@ bool cEntity::Initialize(cWorld & a_World)
 	{
 		return false;
 	}
-	
+
 	/*
 	// DEBUG:
 	LOGD("Initializing entity #%d (%s) at {%.02f, %.02f, %.02f}",
 		m_UniqueID, GetClass(), m_Pos.x, m_Pos.y, m_Pos.z
 	);
 	*/
-	
+
 	m_IsInitialized = true;
 	m_World = &a_World;
 	m_World->AddEntity(this);
-	
+
 	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
-	
+
 	// Spawn the entity on the clients:
 	a_World.BroadcastSpawnEntity(*this);
-	
+
 	return true;
 }
 
@@ -202,7 +202,7 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	{
 		return;
 	}
-	
+
 	if (a_ShouldBroadcast)
 	{
 		m_World->BroadcastDestroyEntity(*this);
@@ -220,7 +220,7 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 void cEntity::TakeDamage(cEntity & a_Attacker)
 {
 	int RawDamage = a_Attacker.GetRawDamageAgainst(*this);
-	
+
 	TakeDamage(dtAttack, &a_Attacker, RawDamage, a_Attacker.GetKnockbackAmountAgainst(*this));
 }
 
@@ -242,10 +242,17 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 {
 	TakeDamageInfo TDI;
 	TDI.DamageType = a_DamageType;
-	TDI.Attacker = a_Attacker;
+	if ((a_Attacker != nullptr) && a_Attacker->IsPawn())
+	{
+		TDI.Attacker = a_Attacker;
+	}
+	else
+	{
+		TDI.Attacker = nullptr;
+	}
 	TDI.RawDamage = a_RawDamage;
 	TDI.FinalDamage = a_FinalDamage;
-	
+
 	Vector3d Heading(0, 0, 0);
 	if (a_Attacker != nullptr)
 	{
@@ -321,7 +328,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
 		const cEnchantments & Enchantments = Player->GetEquippedItem().m_Enchantments;
-		
+
 		int SharpnessLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSharpness));
 		int SmiteLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSmite));
 		int BaneOfArthropodsLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchBaneOfArthropods));
@@ -362,7 +369,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					{
 						a_TDI.RawDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
 						// TODO: Add slowness effect
-						
+
 						break;
 					};
 					default: break;
@@ -406,7 +413,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			const cItem & Item = ArmorItems[i];
 			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
 		}
-		
+
 		if (ThornsLevel > 0)
 		{
 			int Chance = static_cast<int>(ThornsLevel * 15);
@@ -419,7 +426,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.GenerateRandomInteger(1, 4), 0);
 			}
 		}
-	
+
 		if (!Player->IsOnGround())
 		{
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
@@ -478,13 +485,13 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 
 		TotalEPF = EPFProtection + EPFFireProtection + EPFFeatherFalling + EPFBlastProtection + EPFProjectileProtection;
-		
+
 		EPFProtection = EPFProtection / TotalEPF;
 		EPFFireProtection = EPFFireProtection / TotalEPF;
 		EPFFeatherFalling = EPFFeatherFalling / TotalEPF;
 		EPFBlastProtection = EPFBlastProtection / TotalEPF;
 		EPFProjectileProtection = EPFProjectileProtection / TotalEPF;
-	
+
 		if (TotalEPF > 25)
 		{
 			TotalEPF = 25;
@@ -505,7 +512,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		EPFFeatherFalling = TotalEPF * EPFFeatherFalling;
 		EPFBlastProtection = TotalEPF * EPFBlastProtection;
 		EPFProjectileProtection = TotalEPF * EPFProjectileProtection;
-		
+
 		int RemovedDamage = 0;
 
 		if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtAdmin))
@@ -517,7 +524,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			RemovedDamage += CeilC(EPFFeatherFalling * 0.04 * a_TDI.FinalDamage);
 		}
-		
+
 		if (a_TDI.DamageType == dtBurning)
 		{
 			RemovedDamage += CeilC(EPFFireProtection * 0.04 * a_TDI.FinalDamage);
@@ -542,9 +549,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 
 	m_Health -= static_cast<short>(a_TDI.FinalDamage);
-	
+
 	// TODO: Apply damage to armor
-	
+
 	m_Health = std::max(m_Health, 0);
 
 	// Add knockback:
@@ -644,7 +651,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		{
 			return false;
 		}
-			
+
 		case dtAttack:
 		case dtArrowAttack:
 		case dtCactusContact:
@@ -667,13 +674,13 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
-	
+
 	// Filter out damage types that are not protected by armor:
 	if (!ArmorCoversAgainst(a_DamageType))
 	{
 		return 0;
 	}
-	
+
 	// Add up all armor points:
 	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Defense_points as of 2012_12_20
 	int ArmorValue = 0;
@@ -709,10 +716,10 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case E_ITEM_IRON_BOOTS:    ArmorValue += 2; break;
 		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; break;
 	}
-	
+
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
 	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Mob_armor as of 2012_12_20
-	
+
 	// Now ArmorValue is in [0, 20] range, which corresponds to [0, 80%] protection. Calculate the hitpoints from that:
 	return a_Damage * (ArmorValue * 4) / 100;
 }
@@ -724,7 +731,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 {
 	// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
-	
+
 	// TODO: Enchantments
 	return 1;
 }
@@ -738,7 +745,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 	m_Health = 0;
 
 	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_TDI.Attacker, a_TDI);
-	
+
 	if (m_Health > 0)
 	{
 		// Plugin wants to 'unkill' the pawn. Abort
@@ -786,7 +793,7 @@ void cEntity::SetHealth(int a_Health)
 void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	m_TicksAlive++;
-	
+
 	if (m_InvulnerableTicks > 0)
 	{
 		m_InvulnerableTicks--;
@@ -829,7 +836,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// Handle drowning
 			HandleAir();
 		}
-		
+
 		if (!DetectPortal())  // Our chunk is invalid if we have moved to another world
 		{
 			// None of the above functions changed position, we remain in the chunk of NextChunk
@@ -855,7 +862,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt);
 	Vector3d NextPos = Vector3d(GetPosX(), GetPosY(), GetPosZ());
 	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
-	
+
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
@@ -863,7 +870,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		AddPosition(GetSpeed() * DtSec.count());
 		return;
 	}
-	
+
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
@@ -910,7 +917,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				break;
 			}
 		}  // for i - gCrossCoords[]
-			
+
 		if (IsNoAirSurrounding)
 		{
 			NextPos.y += 0.5;
@@ -983,7 +990,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_WaterSpeed.z = -0.2f;
 			m_bOnGround = false;
 			break;
-			
+
 	default:
 		break;
 	}
@@ -1098,7 +1105,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 			m_TicksLeftBurning = 0;
 		}
 	}
-	
+
 	// Do the burning damage:
 	if (m_TicksLeftBurning > 0)
 	{
@@ -1113,7 +1120,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		}
 		m_TicksLeftBurning--;
 	}
-	
+
 	// Update the burning times, based on surroundings:
 	int MinRelX = FloorC(GetPosX() - m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int MaxRelX = FloorC(GetPosX() + m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
@@ -1124,7 +1131,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	bool HasWater = false;
 	bool HasLava = false;
 	bool HasFire = false;
-	
+
 	for (int x = MinRelX; x <= MaxRelX; x++)
 	{
 		for (int z = MinRelZ; z <= MaxRelZ; z++)
@@ -1136,7 +1143,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 			{
 				BLOCKTYPE Block;
 				a_Chunk.UnboundedRelGetBlockType(RelX, y, RelZ, Block);
-				
+
 				switch (Block)
 				{
 					case E_BLOCK_FIRE:
@@ -1160,18 +1167,18 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 			}  // for y
 		}  // for z
 	}  // for x
-	
+
 	if (HasWater)
 	{
 		// Extinguish the fire
 		m_TicksLeftBurning = 0;
 	}
-	
+
 	if (HasLava)
 	{
 		// Burn:
 		m_TicksLeftBurning = BURN_TICKS;
-		
+
 		// Periodically damage:
 		m_TicksSinceLastLavaDamage++;
 		if (m_TicksSinceLastLavaDamage >= LAVA_TICKS_PER_DAMAGE)
@@ -1187,12 +1194,12 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	{
 		m_TicksSinceLastLavaDamage = 0;
 	}
-	
+
 	if (HasFire)
 	{
 		// Burn:
 		m_TicksLeftBurning = BURN_TICKS;
-		
+
 		// Periodically damage:
 		m_TicksSinceLastFireDamage++;
 		if (m_TicksSinceLastFireDamage >= FIRE_TICKS_PER_DAMAGE)
@@ -1208,7 +1215,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	{
 		m_TicksSinceLastFireDamage = 0;
 	}
-	
+
 	// If just started / finished burning, notify descendants:
 	if ((m_TicksLeftBurning > 0) && !HasBeenBurning)
 	{
@@ -1383,7 +1390,7 @@ bool cEntity::DetectPortal()
 
 				if (GetWorld()->GetDimension() == dimEnd)
 				{
-					
+
 					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
 						return false;
@@ -1417,7 +1424,7 @@ bool cEntity::DetectPortal()
 
 					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedEndWorldName(), dimEnd, GetWorld()->GetName()), false);
 				}
-				
+
 			}
 			default: break;
 		}
@@ -1528,7 +1535,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
 	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
-	
+
 	WrapSpeed();
 }
 
@@ -1644,7 +1651,7 @@ void cEntity::StartBurning(int a_TicksLeftBurning)
 		m_TicksLeftBurning = std::max(m_TicksLeftBurning, a_TicksLeftBurning);
 		return;
 	}
-	
+
 	m_TicksLeftBurning = a_TicksLeftBurning;
 	OnStartedBurning();
 }
@@ -1660,7 +1667,7 @@ void cEntity::StopBurning(void)
 	m_TicksSinceLastBurnDamage = 0;
 	m_TicksSinceLastFireDamage = 0;
 	m_TicksSinceLastLavaDamage = 0;
-	
+
 	// Notify if the entity has stopped burning
 	if (HasBeenBurning)
 	{
@@ -1717,7 +1724,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			m_World->BroadcastEntityVelocity(*this, a_Exclude);
 			m_bHasSentNoSpeed = false;
 		}
-		
+
 		// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
 		int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
 		int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);

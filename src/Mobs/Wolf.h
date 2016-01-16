@@ -51,7 +51,7 @@ public:
 	- The wolf is not already attacking a mob.
 	- The wolf is not sitting.
 	This is called by cPlayer::NotifyFriendlyWolves whenever a player takes or deals damage and a wolf is nearby. */
-	void NearbyPlayerIsFighting(cPlayer * a_Player, cEntity * a_Opponent);
+	void NearbyPlayerIsFighting(cPlayer * a_Player, cPawn * a_Opponent);
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
