@@ -894,14 +894,14 @@ void cPlayer::NotifyFriendlyWolves(cPawn * a_Opponent)
 				if (Mob->GetMobType() == mtWolf)
 				{
 					cWolf * Wolf = static_cast<cWolf*>(Mob);
-					Wolf->NearbyPlayerIsFighting(m_Player, m_Attacker);
+					Wolf->NearbyPlayerIsFighting(m_Player->GetUUID(), m_Attacker);
 				}
 			}
 			return false;
 		}
 	} Callback(this, a_Opponent);
 
-	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 16, 16), Callback);
+	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 16), Callback);
 }
 
 

@@ -45,13 +45,13 @@ public:
 		m_OwnerUUID = a_NewOwnerUUID;
 	}
 
-	/** Notfies the wolf that the player a_Player is being attacked by a_Attacker.
+	/** Notfies the wolf that the player whose ID is a_PlayerID is fighting, or that one of that player's wolves are fighting.
 	The wolf will then defend the player by attacking a_Attacker if all these conditions are met:
 	- a_Player is the wolf's owner.
 	- The wolf is not already attacking a mob.
 	- The wolf is not sitting.
 	This is called by cPlayer::NotifyFriendlyWolves whenever a player takes or deals damage and a wolf is nearby. */
-	void NearbyPlayerIsFighting(cPlayer * a_Player, cPawn * a_Opponent);
+	void NearbyPlayerIsFighting(AString a_PlayerID, cPawn * a_Opponent);
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 

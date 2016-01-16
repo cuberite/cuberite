@@ -38,6 +38,24 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		m_IsAngry = true;
 	}
+	else if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
+	{
+		// If we are tamed and our attacker is a cPawn, tell the other wolves owned by the same player about this
+		class cCallback : public cPlayerListCallback
+		{
+			virtual bool Item(cPlayer * a_Player) override
+			{
+				a_Player->NotifyFriendlyWolves(m_Attacker);
+				return false;
+			}
+		public:
+			cPawn * m_Attacker;
+		} Callback;
+
+		Callback.m_Attacker = static_cast<cPawn*>(a_TDI.Attacker);
+		m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback);
+	}
+
 	m_World->BroadcastEntityMetadata(*this);  // Broadcast health and possibly angry face
 	return true;
 }
@@ -73,28 +91,42 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 
 
 
-void cWolf::NearbyPlayerIsFighting(cPlayer * a_Player, cPawn * a_Opponent)
+void cWolf::NearbyPlayerIsFighting(AString a_PlayerID, cPawn * a_Opponent)
 {
-	if (a_Opponent == nullptr)
+	if (
+		(a_Opponent == nullptr) || IsSitting() || (!IsTame()) ||
+		(!a_Opponent->IsPawn()) || (a_PlayerID != m_OwnerUUID)
+	)
 	{
 		return;
 	}
-	if ((m_Target == nullptr) && (a_Player->GetName() == m_OwnerName) && !IsSitting() && (a_Opponent->IsPawn()))
+
+	if (a_Opponent->IsPlayer() && static_cast<cPlayer *>(a_Opponent)->GetName() == m_OwnerName)
 	{
-		m_Target = a_Opponent;
-		if (m_Target->IsPlayer() && static_cast<cPlayer *>(m_Target)->GetName() == m_OwnerName)
+		return;  // Our owner has hurt himself, avoid attacking them.
+	}
+
+	if (a_Opponent->IsMob() && static_cast<cMonster *>(a_Opponent)->GetMobType() == mtWolf)
+	{
+		cWolf * Wolf = static_cast<cWolf *>(a_Opponent);
+		if (Wolf->GetOwnerUUID() == GetOwnerUUID())
 		{
-			m_Target = nullptr;  // Our owner has hurt himself, avoid attacking them.
-		}
-		if (m_Target->IsMob() && static_cast<cMonster *>(m_Target)->GetMobType() == mtWolf)
-		{
-			cWolf * Wolf = static_cast<cWolf *>(m_Target);
-			if (Wolf->GetOwnerUUID() == GetOwnerUUID())
-			{
-				m_Target = nullptr;  // Our owner attacked one of their wolves. Abort attacking wolf.
-			}
+			return;  // Our owner attacked one of their wolves. Abort attacking wolf.
 		}
 	}
+
+	if (m_Target == nullptr)
+	{
+		// If we have no target, we target the player's opponent
+		m_Target = a_Opponent;
+	}
+	else if (m_World->GetTickRandomNumber(9)> 4)
+	{
+		// If we already have a target, there's a 50% chance we switch to the new target
+		m_Target = a_Opponent;
+	}
+
+
 
 }
 
