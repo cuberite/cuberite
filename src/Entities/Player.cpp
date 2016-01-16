@@ -856,7 +856,10 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (a_TDI.Attacker != nullptr)
 		{
-			NotifyFriendlyWolves(a_TDI.Attacker);
+			if (a_TDI.Attacker->IsPawn())
+			{
+				NotifyFriendlyWolves(static_cast<cPawn*>(a_TDI.Attacker));
+			}
 		}
 		m_Stats.AddValue(statDamageTaken, FloorC<StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
@@ -868,16 +871,16 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPlayer::NotifyFriendlyWolves(cEntity * a_Opponent)
+void cPlayer::NotifyFriendlyWolves(cPawn * a_Opponent)
 {
 	ASSERT(a_Opponent != nullptr);
 	class LookForWolves : public cEntityCallback
 	{
 	public:
 		cPlayer * m_Player;
-		cEntity * m_Attacker;
+		cPawn * m_Attacker;
 
-		LookForWolves(cPlayer * a_Me, cEntity * a_MyAttacker) :
+		LookForWolves(cPlayer * a_Me, cPawn * a_MyAttacker) :
 			m_Player(a_Me),
 			m_Attacker(a_MyAttacker)
 		{

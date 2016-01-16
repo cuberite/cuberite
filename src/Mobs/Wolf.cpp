@@ -73,8 +73,12 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 
 
 
-void cWolf::NearbyPlayerIsFighting(cPlayer * a_Player, cEntity * a_Opponent)
+void cWolf::NearbyPlayerIsFighting(cPlayer * a_Player, cPawn * a_Opponent)
 {
+	if (a_Opponent == nullptr)
+	{
+		return;
+	}
 	if ((m_Target == nullptr) && (a_Player->GetName() == m_OwnerName) && !IsSitting() && (a_Opponent->IsPawn()))
 	{
 		m_Target = a_Opponent;
