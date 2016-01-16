@@ -825,6 +825,10 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	SetSpeed(0, 0, 0);
+	// Prevents knocking the player in the wrong direction due to
+	// the speed vector problems, see #2865
+	// In the future, the speed vector should be fixed
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
 		if (IsGameModeCreative() || IsGameModeSpectator())
