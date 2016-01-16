@@ -854,7 +854,10 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		AddFoodExhaustion(0.3f);
 		SendHealth();
 
-		NotifyFriendlyWolves(a_TDI.Attacker);
+		if (a_TDI.Attacker != nullptr)
+		{
+			NotifyFriendlyWolves(a_TDI.Attacker);
+		}
 		m_Stats.AddValue(statDamageTaken, FloorC<StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
 	}
@@ -867,6 +870,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cPlayer::NotifyFriendlyWolves(cEntity * a_Opponent)
 {
+	ASSERT(a_Opponent != nullptr);
 	class LookForWolves : public cEntityCallback
 	{
 	public:
