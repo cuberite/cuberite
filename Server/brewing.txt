@@ -142,13 +142,13 @@
 ## Negative ##
 
 # Potion of Harming
-8197 + fermentedspidereye = 8204
 8196 + fermentedspidereye = 8204
+8197 + fermentedspidereye = 8204
 8260 + fermentedspidereye = 8204
 
 # Potion of Harming II
-8229 + fermentedspidereye = 8236
 8228 + fermentedspidereye = 8236
+8229 + fermentedspidereye = 8236
 
 # Potion of Harming II
 8204 + glowstonedust = 8236
@@ -163,8 +163,8 @@
 8260 + glowstonedust = 8228
 
 # Potion of Slowness
-8195 + fermentedspidereye = 8202
 8194 + fermentedspidereye = 8202
+8195 + fermentedspidereye = 8202
 8203 + fermentedspidereye = 8202
 
 # Potion of Slowness (extended)
@@ -172,17 +172,17 @@
 8234 + redstonedust = 8266
 
 # Potion of Slowness (extended)
-8259 + fermentedspidereye = 8266
 8258 + fermentedspidereye = 8266
+8259 + fermentedspidereye = 8266
 8267 + fermentedspidereye = 8266
 
 # Potion of Weakness
-8201 + fermentedspidereye = 8200
 8193 + fermentedspidereye = 8200
+8201 + fermentedspidereye = 8200
 
 # Potion of Weakness (extended)
-8265 + fermentedspidereye = 8264
 8257 + fermentedspidereye = 8264
+8265 + fermentedspidereye = 8264
 
 # Potion of Weakness (extended)
 8200 + redstonedust = 8264
@@ -223,13 +223,13 @@
 ## Fermented Spider Eye ##
 
 # Potion of Harming (reverted)
-8261 + fermentedspidereye = 8268
 8260 + fermentedspidereye = 8268
+8261 + fermentedspidereye = 8268
 
 # Potion of Slowness (reverted)
-8227 + fermentedspidereye = 8234
 8226 + fermentedspidereye = 8234
+8227 + fermentedspidereye = 8234
 
 # Potion of Weakness (reverted)
-8233 + fermentedspidereye = 8232
 8225 + fermentedspidereye = 8232
+8233 + fermentedspidereye = 8232
