@@ -327,7 +327,7 @@ void cPath::BuildPath()
 	{
 		// Waypoints are cylinders that start at some particular x, y, z and have infinite height.
 		// Submerging water waypoints allows swimming mobs to be able to touch them.
-		if (GetCell(CurrentCell->m_Location + Vector3i(0, -1, 0))->m_BlockType == E_BLOCK_STATIONARY_WATER)
+		if (IsBlockWater(GetCell(CurrentCell->m_Location + Vector3i(0, -1, 0))->m_BlockType))
 		{
 			CurrentCell->m_Location.y -= 30;
 		}
