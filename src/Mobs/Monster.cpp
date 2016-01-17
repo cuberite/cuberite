@@ -560,14 +560,14 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 
 // Checks to see if EventSeePlayer should be fired
 // monster sez: Do I see the player
-void cMonster::CheckEventSeePlayer(void)
+void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
 	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), false);
 
 	if (Closest != nullptr)
 	{
-		EventSeePlayer(Closest);
+		EventSeePlayer(Closest, a_Chunk);
 	}
 }
 
@@ -596,7 +596,7 @@ void cMonster::CheckEventLostPlayer(void)
 
 // What to do if player is seen
 // default to change state to chasing
-void cMonster::EventSeePlayer(cEntity * a_SeenPlayer)
+void cMonster::EventSeePlayer(cEntity * a_SeenPlayer, cChunk & a_Chunk)
 {
 	m_Target = a_SeenPlayer;
 }

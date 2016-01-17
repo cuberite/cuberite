@@ -37,7 +37,6 @@
 
 
 
-
 class cWorld;
 class cClientHandle;
 class cPlayer;

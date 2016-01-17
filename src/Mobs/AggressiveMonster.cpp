@@ -36,11 +36,11 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk &
 
 
 
-void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity)
+void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk)
 {
 	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative())
 	{
-		super::EventSeePlayer(a_Entity);
+		super::EventSeePlayer(a_Entity, a_Chunk);
 		m_EMState = CHASING;
 	}
 }
@@ -59,7 +59,7 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		CheckEventSeePlayer();
+		CheckEventSeePlayer(a_Chunk);
 	}
 
 	if (m_Target == nullptr)
