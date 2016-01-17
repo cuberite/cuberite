@@ -415,7 +415,7 @@ private:
 	int m_LastStreamedChunkZ;
 
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
-	int m_TicksSinceLastPacket;
+	std::atomic<int> m_TicksSinceLastPacket;
 	
 	/** Duration of the last completed client ping. */
 	std::chrono::steady_clock::duration m_Ping;
