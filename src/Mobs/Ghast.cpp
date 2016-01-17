@@ -50,7 +50,6 @@ bool cGhast::Attack(std::chrono::milliseconds a_Dt)
 			GhastBall = nullptr;
 			return false;
 		}
-		m_World->BroadcastSpawnEntity(*GhastBall);
 		ResetAttackCooldown();
 		return true;
 	}

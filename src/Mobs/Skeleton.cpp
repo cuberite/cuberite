@@ -68,7 +68,6 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 			Arrow = nullptr;
 			return false;
 		}
-		m_World->BroadcastSpawnEntity(*Arrow);
 		ResetAttackCooldown();
 
 		return true;
