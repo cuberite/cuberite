@@ -50,7 +50,6 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 			FireCharge = nullptr;
 			return false;
 		}
-		m_World->BroadcastSpawnEntity(*FireCharge);
 		ResetAttackCooldown();
 		// ToDo: Shoot 3 fireballs instead of 1.
 		return true;
