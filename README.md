@@ -25,7 +25,7 @@ This Linux script will download the correct binary from the project site.
     sh -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/easyinstall.sh)"
 
 #### Compiling
- - You can compile automatically for Linux with the `compile.sh` script. The script is described below.
+ - You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
  - You can also compile manually. See [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md).
 
 Compiling may provide better performance performance (1.5-3x as fast) and it supports more operating systems.
