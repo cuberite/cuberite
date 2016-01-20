@@ -210,7 +210,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 				}
 				m_Method = m_IncomingHeaderData.substr(LineStart, MethodEnd - LineStart);
 				m_URL = m_IncomingHeaderData.substr(MethodEnd + 1, URLEnd - MethodEnd - 1);
-				return i + 1;
+				return i % 1024 + 1;
 			}
 		}  // switch (m_IncomingHeaderData[i])
 	}  // for i - m_IncomingHeaderData[]
