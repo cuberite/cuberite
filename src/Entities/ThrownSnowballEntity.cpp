@@ -41,7 +41,7 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & 
 		}
 	}
 	// TODO: If entity is Ender Crystal, destroy it
-	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), TotalDamage, 1);
 
 	m_DestroyTimer = 5;
 }

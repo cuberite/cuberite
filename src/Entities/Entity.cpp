@@ -238,6 +238,47 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 
 
+void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount)
+{
+	class cNotifyWolves : public cEntityCallback
+	{
+	public:
+
+		cEntity * m_Entity;
+		eDamageType m_DamageType;
+		int m_RawDamage;
+		double m_KnockbackAmount;
+
+		virtual bool Item(cEntity * a_Attacker) override
+		{
+			cPawn * Attacker;
+			if (a_Attacker->IsPawn())
+			{
+				Attacker = static_cast<cPawn*>(a_Attacker);
+			}
+			else
+			{
+				Attacker = nullptr;
+			}
+
+
+			int FinalDamage = m_RawDamage - m_Entity->GetArmorCoverAgainst(Attacker, m_DamageType, m_RawDamage);
+			m_Entity->TakeDamage(m_DamageType, Attacker, m_RawDamage, FinalDamage, m_KnockbackAmount);
+			return true;
+		}
+	} Callback;
+
+	Callback.m_Entity = this;
+	Callback.m_DamageType = a_DamageType;
+	Callback.m_RawDamage = a_RawDamage;
+	Callback.m_KnockbackAmount = a_KnockbackAmount;
+	m_World->DoWithEntityByID(a_AttackerID, Callback);
+}
+
+
+
+
+
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount)
 {
 	TakeDamageInfo TDI;

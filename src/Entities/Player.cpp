@@ -862,7 +862,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			if (a_TDI.Attacker->IsPawn())
 			{
-				NotifyFriendlyWolves(static_cast<cPawn*>(a_TDI.Attacker));
+				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
 			}
 		}
 		m_Stats.AddValue(statDamageTaken, FloorC<StatValue>(a_TDI.FinalDamage * 10 + 0.5));
@@ -875,7 +875,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPlayer::NotifyFriendlyWolves(cPawn * a_Opponent)
+void cPlayer::NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved)
 {
 	ASSERT(a_Opponent != nullptr);
 	class LookForWolves : public cEntityCallback
@@ -883,10 +883,12 @@ void cPlayer::NotifyFriendlyWolves(cPawn * a_Opponent)
 	public:
 		cPlayer * m_Player;
 		cPawn * m_Attacker;
+		bool m_IsPlayerInvolved;
 
-		LookForWolves(cPlayer * a_Me, cPawn * a_MyAttacker) :
+		LookForWolves(cPlayer * a_Me, cPawn * a_MyAttacker, bool a_PlayerInvolved) :
 			m_Player(a_Me),
-			m_Attacker(a_MyAttacker)
+			m_Attacker(a_MyAttacker),
+			m_IsPlayerInvolved(a_PlayerInvolved)
 		{
 		}
 
@@ -898,14 +900,14 @@ void cPlayer::NotifyFriendlyWolves(cPawn * a_Opponent)
 				if (Mob->GetMobType() == mtWolf)
 				{
 					cWolf * Wolf = static_cast<cWolf*>(Mob);
-					Wolf->NearbyPlayerIsFighting(m_Player, m_Attacker);
+					Wolf->ReceiveNearbyFightInfo(m_Player->GetUUID(), m_Attacker, m_IsPlayerInvolved);
 				}
 			}
 			return false;
 		}
-	} Callback(this, a_Opponent);
+	} Callback(this, a_Opponent, a_IsPlayerInvolved);
 
-	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 16, 16), Callback);
+	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 16), Callback);
 }
 
 

@@ -263,6 +263,9 @@ public:
 	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called */
 	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
+	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called */
+	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount);
+
 	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
 	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
 

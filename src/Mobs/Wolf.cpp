@@ -18,7 +18,8 @@ cWolf::cWolf(void) :
 	m_IsBegging(false),
 	m_IsAngry(false),
 	m_OwnerName(""),
-	m_CollarColor(E_META_DYE_ORANGE)
+	m_CollarColor(E_META_DYE_ORANGE),
+	m_NotificationCooldown(0)
 {
 	m_RelativeWalkSpeed = 2;
 }
@@ -29,15 +30,42 @@ cWolf::cWolf(void) :
 
 bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	cEntity * PreviousTarget = m_Target;
 	if (!super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
 
-	if (!m_IsTame)
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
-		m_IsAngry = true;
+		cPawn * Pawn = static_cast<cPawn*>(m_Target);
+		if (Pawn->IsPlayer())
+		{
+			if (m_IsTame)
+			{
+				if ((static_cast<cPlayer*>(Pawn)->GetUUID() == m_OwnerUUID))
+				{
+					m_Target = PreviousTarget;  // Do not attack owner
+				}
+				else
+				{
+					SetIsSitting(false);
+					NotifyAlliesOfFight(static_cast<cPawn*>(a_TDI.Attacker));
+				}
+			}
+			else
+			{
+				m_IsAngry = true;
+			}
+		}
+		else if (m_IsTame)
+		{
+			SetIsSitting(false);
+			NotifyAlliesOfFight(static_cast<cPawn*>(a_TDI.Attacker));
+		}
 	}
+
+
 	m_World->BroadcastEntityMetadata(*this);  // Broadcast health and possibly angry face
 	return true;
 }
@@ -46,55 +74,93 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
+{
+	if (GetOwnerName() == "")
+	{
+		return;
+	}
+	m_NotificationCooldown = 15;
+	class cCallback : public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * a_Player) override
+		{
+			a_Player->NotifyNearbyWolves(m_Opponent, false);
+			return false;
+		}
+	public:
+		cPawn * m_Opponent;
+	} Callback;
+
+	Callback.m_Opponent = a_Opponent;
+	m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback);
+}
+
 bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 
 	if ((m_Target != nullptr) && (m_Target->IsPlayer()))
 	{
-		if (static_cast<cPlayer *>(m_Target)->GetName() != m_OwnerName)
-		{
-			return super::Attack(a_Dt);
-		}
-		else
+		if (static_cast<cPlayer *>(m_Target)->GetUUID() == m_OwnerUUID)
 		{
 			m_Target = nullptr;
+			return false;
 		}
 	}
-	else
-	{
-		return super::Attack(a_Dt);
-	}
 
-	return false;
+	NotifyAlliesOfFight(static_cast<cPawn*>(m_Target));
+	return super::Attack(a_Dt);
+
 }
 
 
 
 
 
-void cWolf::NearbyPlayerIsFighting(cPlayer * a_Player, cPawn * a_Opponent)
+void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved)
 {
-	if (a_Opponent == nullptr)
+	if (
+		(a_Opponent == nullptr) || IsSitting() || (!IsTame()) ||
+		(!a_Opponent->IsPawn()) || (a_PlayerID != m_OwnerUUID)
+	)
 	{
 		return;
 	}
-	if ((m_Target == nullptr) && (a_Player->GetName() == m_OwnerName) && !IsSitting() && (a_Opponent->IsPawn()))
+
+	// If we already have a target
+	if (m_Target != nullptr)
 	{
-		m_Target = a_Opponent;
-		if (m_Target->IsPlayer() && static_cast<cPlayer *>(m_Target)->GetName() == m_OwnerName)
+		// If a wolf is asking for help and we already have a target, do nothing
+		if (!a_IsPlayerInvolved)
 		{
-			m_Target = nullptr;  // Our owner has hurt himself, avoid attacking them.
+			return;
 		}
-		if (m_Target->IsMob() && static_cast<cMonster *>(m_Target)->GetMobType() == mtWolf)
+		// If a player is asking for help and we already have a target,
+		// there's a 50% chance of helping and a 50% chance of doing nothing
+		// This helps spread a wolf pack's targets over several mobs
+		else if (m_World->GetTickRandomNumber(9)> 4)
 		{
-			cWolf * Wolf = static_cast<cWolf *>(m_Target);
-			if (Wolf->GetOwnerUUID() == GetOwnerUUID())
-			{
-				m_Target = nullptr;  // Our owner attacked one of their wolves. Abort attacking wolf.
-			}
+			return;
 		}
 	}
+
+	if (a_Opponent->IsPlayer() && static_cast<cPlayer *>(a_Opponent)->GetUUID() == m_OwnerUUID)
+	{
+		return;  // Our owner has hurt himself, avoid attacking them.
+	}
+
+	if (a_Opponent->IsMob() && static_cast<cMonster *>(a_Opponent)->GetMobType() == mtWolf)
+	{
+		cWolf * Wolf = static_cast<cWolf *>(a_Opponent);
+		if (Wolf->GetOwnerUUID() == GetOwnerUUID())
+		{
+			return;  // Our owner attacked one of their wolves. Abort attacking wolf.
+		}
+	}
+
+	m_Target = a_Opponent;
+
 
 }
 
@@ -156,7 +222,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			}
 			case E_ITEM_DYE:
 			{
-				if (a_Player.GetName() == m_OwnerName)  // Is the player the owner of the dog?
+				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
 				{
 					SetCollarColor(a_Player.GetEquippedItem().m_ItemDamage);
 					if (!a_Player.IsGameModeCreative())
@@ -168,7 +234,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			}
 			default:
 			{
-				if (a_Player.GetName() == m_OwnerName)  // Is the player the owner of the dog?
+				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
 				{
 					SetIsSitting(!IsSitting());
 				}
@@ -188,6 +254,10 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (!IsAngry())
 	{
 		cMonster::Tick(a_Dt, a_Chunk);
+		if (m_NotificationCooldown > 0)
+		{
+			m_NotificationCooldown -= 1;
+		}
 	}
 	else
 	{
@@ -275,13 +345,13 @@ void cWolf::TickFollowPlayer()
 		virtual bool Item(cPlayer * a_Player) override
 		{
 			OwnerPos = a_Player->GetPosition();
-			return false;
+			return true;
 		}
 	public:
 		Vector3d OwnerPos;
 	} Callback;
 
-	if (m_World->DoWithPlayer(m_OwnerName, Callback))
+	if (m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback))
 	{
 		// The player is present in the world, follow him:
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();

@@ -18,6 +18,7 @@ public:
 
 	CLASS_PROTODEF(cWolf)
 
+	void NotifyAlliesOfFight(cPawn * a_Opponent);
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -45,13 +46,14 @@ public:
 		m_OwnerUUID = a_NewOwnerUUID;
 	}
 
-	/** Notfies the wolf that the player a_Player is being attacked by a_Attacker.
-	The wolf will then defend the player by attacking a_Attacker if all these conditions are met:
-	- a_Player is the wolf's owner.
-	- The wolf is not already attacking a mob.
-	- The wolf is not sitting.
-	This is called by cPlayer::NotifyFriendlyWolves whenever a player takes or deals damage and a wolf is nearby. */
-	void NearbyPlayerIsFighting(cPlayer * a_Player, cPawn * a_Opponent);
+	/** Notfies the wolf of a nearby fight.
+	The wolf may then decide to attack a_Opponent.
+	If a_IsPlayer is true, then the player whose ID is a_PlayerID is fighting a_Opponent
+	If false, then a wolf owned by the player whose ID is a_PlayerID is fighting a_Opponent
+	@param a_PlayerID The ID of the fighting player, or the ID of the owner whose wolf is fighting.
+	@param a_Opponent The opponent who is being faught.
+	@param a_IsPlayerInvolved Whether the fighter a player or a wolf. */
+	void ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
@@ -64,6 +66,7 @@ protected:
 	AString m_OwnerName;
 	AString m_OwnerUUID;
 	int     m_CollarColor;
+	int     m_NotificationCooldown;
 } ;
 
 
