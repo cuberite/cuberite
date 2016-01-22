@@ -5,7 +5,7 @@
 
 #include "../World.h"
 #include "../Entities/Player.h"
-
+#include "../Chunk.h"
 
 
 cSpider::cSpider(void) :
@@ -35,17 +35,22 @@ void cSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSpider::EventSeePlayer(cEntity * a_Entity)
+void cSpider::EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk)
 {
 	if (!GetWorld()->IsChunkLighted(GetChunkX(), GetChunkZ()))
 	{
-		GetWorld()->QueueLightChunk(GetChunkX(), GetChunkZ());
 		return;
 	}
 
-	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative() && (GetWorld()->GetBlockBlockLight(this->GetPosition()) <= 9))
+	PREPARE_REL_AND_CHUNK(GetPosition(), a_Chunk);
+	if (!RelSuccess)
 	{
-		super::EventSeePlayer(a_Entity);
+		return;
+	}
+
+	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative() && (Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) <= 9))
+	{
+		super::EventSeePlayer(a_Entity, a_Chunk);
 	}
 }
 

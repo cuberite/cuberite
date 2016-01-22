@@ -19,7 +19,7 @@ public:
 	virtual void Tick          (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	virtual void EventSeePlayer(cEntity *) override;
+	virtual void EventSeePlayer(cEntity * a_Player, cChunk & a_Chunk) override;
 
 	/** Try to perform attack
 	returns true if attack was deemed successful (hit player, fired projectile, creeper exploded, etc.) even if it didn't actually do damage
