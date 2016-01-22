@@ -94,11 +94,13 @@ size_t cHTTPRequest::ParseHeaders(const char * a_Data, size_t a_Size)
 	{
 		// The first line hasn't been processed yet
 		size_t res = ParseRequestLine(a_Data, a_Size);
+		ASSERT((res == AString::npos) || (res <= a_Size));
 		if ((res == AString::npos) || (res == a_Size))
 		{
 			return res;
 		}
 		size_t res2 = m_EnvelopeParser.Parse(a_Data + res, a_Size - res);
+		ASSERT((res2 == AString::npos) || (res2 <= a_Size - res));
 		if (res2 == AString::npos)
 		{
 			m_IsValid = false;
@@ -110,6 +112,7 @@ size_t cHTTPRequest::ParseHeaders(const char * a_Data, size_t a_Size)
 	if (m_EnvelopeParser.IsInHeaders())
 	{
 		size_t res = m_EnvelopeParser.Parse(a_Data, a_Size);
+		ASSERT((res == AString::npos) || (res <= a_Size));
 		if (res == AString::npos)
 		{
 			m_IsValid = false;
@@ -142,8 +145,9 @@ AString cHTTPRequest::GetBareURL(void) const
 
 size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 {
+	auto inBufferSoFar = m_IncomingHeaderData.size();
 	m_IncomingHeaderData.append(a_Data, a_Size);
-	size_t IdxEnd = m_IncomingHeaderData.size();
+	auto IdxEnd = m_IncomingHeaderData.size();
 
 	// Ignore the initial CRLFs (HTTP spec's "should")
 	size_t LineStart = 0;
@@ -210,7 +214,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 				}
 				m_Method = m_IncomingHeaderData.substr(LineStart, MethodEnd - LineStart);
 				m_URL = m_IncomingHeaderData.substr(MethodEnd + 1, URLEnd - MethodEnd - 1);
-				return i + 1;
+				return i + 1 - inBufferSoFar;
 			}
 		}  // switch (m_IncomingHeaderData[i])
 	}  // for i - m_IncomingHeaderData[]
