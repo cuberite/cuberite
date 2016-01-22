@@ -499,8 +499,11 @@ public:
 	Assumes that all the blocks are in currently loaded chunks. */
 	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
 
-	/** Notify friendly wolves that we took damage or did damage to an entity so that they might assist us. */
-	void NotifyFriendlyWolves(cPawn * a_Opponent);
+	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
+	@param a_Opponent the opponent we're fighting.
+	@param a_IsPlayerInvolved Should be true if the player took or did damage, and false if one of the player's wolves took or did damage.
+	*/
+	void NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const override { return m_IsCrouched; }

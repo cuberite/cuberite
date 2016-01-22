@@ -133,7 +133,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	}
 
 	// a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);  // TODO fix knockback.
-	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 0);  // Until knockback is fixed.
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, 0);  // Until knockback is fixed.
 
 	if (IsOnFire() && !a_EntityHit.IsSubmerged() && !a_EntityHit.IsSwimming())
 	{

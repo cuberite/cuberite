@@ -37,7 +37,7 @@ public:
 		} ;
 		bool Results[] = {true, true, true, false, true, false};
 		double LineCoeffs[] = {2, 0.25, 0.5, 0, 0.25, 0};
-		
+
 		for (size_t i = 0; i < ARRAYCOUNT(LineDefs) / 2; i++)
 		{
 			double LineCoeff;
@@ -99,6 +99,16 @@ cBoundingBox::cBoundingBox(const Vector3d & a_Min, const Vector3d & a_Max) :
 cBoundingBox::cBoundingBox(const Vector3d & a_Pos, double a_Radius, double a_Height) :
 	m_Min(a_Pos.x - a_Radius, a_Pos.y,            a_Pos.z - a_Radius),
 	m_Max(a_Pos.x + a_Radius, a_Pos.y + a_Height, a_Pos.z + a_Radius)
+{
+}
+
+
+
+
+
+cBoundingBox::cBoundingBox(const Vector3d & a_Pos, double a_CubeLength) :
+	m_Min(a_Pos.x - a_CubeLength / 2, a_Pos.y - a_CubeLength / 2, a_Pos.z - a_CubeLength / 2),
+	m_Max(a_Pos.x + a_CubeLength / 2, a_Pos.y + a_CubeLength / 2, a_Pos.z + a_CubeLength / 2)
 {
 }
 
@@ -269,10 +279,10 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 		a_Face = BLOCK_FACE_NONE;  // No faces hit
 		return true;
 	}
-	
+
 	eBlockFace Face = BLOCK_FACE_NONE;
 	double Coeff = Vector3d::NO_INTERSECTION;
-	
+
 	// Check each individual bbox face for intersection with the line, remember the one with the lowest coeff
 	double c = a_Line1.LineCoeffToXYPlane(a_Line2, a_Min.z);
 	if ((c >= 0) && (c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
@@ -310,13 +320,13 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 		Face = (a_Line1.x > a_Line2.x) ? BLOCK_FACE_XP : BLOCK_FACE_XM;
 		Coeff = c;
 	}
-	
+
 	if (Coeff >= Vector3d::NO_INTERSECTION)
 	{
 		// There has been no intersection
 		return false;
 	}
-	
+
 	a_LineCoeff = Coeff;
 	a_Face = Face;
 	return true;

@@ -314,26 +314,24 @@ void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 
 void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 {
-	if (a_EntityHit.IsPawn() && (GetCreatorName() != ""))  // If we're hitting a mob or a player and we were created by a player
-	{
+	UNUSED(a_HitPos);
 
+	// If we were created by a player and we hit a pawn, notify attacking player's wolves
+	if (a_EntityHit.IsPawn() && (GetCreatorName() != ""))
+	{
 		class cNotifyWolves : public cEntityCallback
 		{
 		public:
 			cPawn * m_EntityHit;
 
-			cNotifyWolves(cPawn * a_Entity) :
-				m_EntityHit(a_Entity)
+			virtual bool Item(cEntity * a_Hitter) override
 			{
-			}
-
-			virtual bool Item(cEntity * a_Player) override
-			{
-				static_cast<cPlayer*>(a_Player)->NotifyFriendlyWolves(m_EntityHit);
+				static_cast<cPlayer*>(a_Hitter)->NotifyNearbyWolves(m_EntityHit, true);
 				return true;
 			}
-		} Callback(static_cast<cPawn*>(&a_EntityHit));
+		} Callback;
 
+		Callback.m_EntityHit = static_cast<cPawn*>(&a_EntityHit);
 		m_World->DoWithEntityByID(GetCreatorUniqueID(), Callback);
 	}
 }

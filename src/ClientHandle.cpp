@@ -1642,7 +1642,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 			m_Me->AddFoodExhaustion(0.3);
 			if (a_Entity->IsPawn())
 			{
-				m_Me->NotifyFriendlyWolves(static_cast<cPawn*>(a_Entity));
+				m_Me->NotifyNearbyWolves(static_cast<cPawn*>(a_Entity), true);
 			}
 			return true;
 		}
