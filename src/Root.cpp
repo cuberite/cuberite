@@ -92,7 +92,8 @@ void cRoot::InputThread(cRoot & a_Params)
 	}
 
 	// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running
-	if (!std::cin.good())
+	// Ignore this when running as a service, cin was never opened in that case
+	if (!std::cin.good() && !m_RunAsService)
 	{
 		// Stop the server:
 		a_Params.QueueExecuteConsoleCommand("stop");
@@ -232,15 +233,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		{
 			m_StopEvent.Wait();
 
-			if (m_TerminateEventRaised && m_RunAsService)
-			{
-				// Dont kill if running as a service
-				m_TerminateEventRaised = false;
-			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 
 		// Stop the server:

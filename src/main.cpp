@@ -495,6 +495,9 @@ int main(int argc, char ** argv)
 		}
 	#endif
 
+	// Make sure m_RunAsService is set correctly before checking it's value
+	ParseArguments(argc, argv);
+
 	// Attempt to run as a service
 	if (cRoot::m_RunAsService)
 	{
