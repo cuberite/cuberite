@@ -61,7 +61,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 		return res;
 	}
 	ssl_set_endpoint(&m_Ssl, a_IsClient ? SSL_IS_CLIENT : SSL_IS_SERVER);
-	ssl_set_authmode(&m_Ssl, a_IsClient ? SSL_VERIFY_OPTIONAL : SSL_VERIFY_NONE);  // Clients ask for server's cert but don't verify strictly; servers don't ask clients for certs by default
+	ssl_set_authmode(&m_Ssl, SSL_VERIFY_NONE);  // We cannot verify because we don't have a CA chain, required by PolarSSL, implemented yet (TODO)
 	ssl_set_rng(&m_Ssl, ctr_drbg_random, &m_CtrDrbg->m_CtrDrbg);
 	ssl_set_bio(&m_Ssl, ReceiveEncrypted, this, SendEncrypted, this);
 	
@@ -85,7 +85,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 			0,  // Must be 0-terminated!
 		};
 		ssl_set_ciphersuites(&m_Ssl, CipherSuites);
-		*/
+		//*/
 	#endif
 	
 	m_IsValid = true;
