@@ -1,17 +1,13 @@
-/=============================\
-|  Custom Minecraft Server    |
-|(Cuberite, formerly MCServer)|
-|                             |
-| Founder: Kevin Bansberg     |
-|       A.K.A. FakeTruth      |
-| Lead dev: Mattes D          |
-|       A.K.A. _Xoft(o)       |
-|       A.K.A. xoft           |
-| Monsters by Alex Sonek      |
-|       A.K.A. Duralex        |
-|=============================|
-| Info: www.cuberite.org      |
-\=============================/
+---------------------------------------------------------------------------------
+   Welcome to your new Cuberite server, compatible with Minecraft 1.7 and 1.8!
+---------------------------------------------------------------------------------
 
-Compatible clients: 1.7.x and 1.8.x
-Compatible protocol versions: 4, 5, 47
+ - To get started with your server, read the user's manual at
+   https://book.cuberite.org/
+
+ - For information about adding plugins to your server, visit
+   http://cuberite.org/plugins/
+
+ - For additional support, visit http://cuberite.org/support/
+
+---------------------------------------------------------------------------------
