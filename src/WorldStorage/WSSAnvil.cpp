@@ -982,7 +982,7 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 	// Check if the data has a proper type:
 	// TODO: Does vanilla use "TrappedChest" or not? MCWiki says no, but previous code says yes
 	// Ref.: http://minecraft.gamepedia.com/Trapped_Chest
-	//       https://github.com/mc-server/MCServer/blob/d0551e2e0a98a28f31a88d489d17b408e4a7d38d/src/WorldStorage/WSSAnvil.cpp#L637
+	//       https://github.com/cuberite/cuberite/blob/d0551e2e0a98a28f31a88d489d17b408e4a7d38d/src/WorldStorage/WSSAnvil.cpp#L637
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Chest") && !CheckBlockEntityType(a_NBT, a_TagIdx, "TrappedChest"))
 	{
 		return nullptr;
