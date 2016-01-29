@@ -79,7 +79,7 @@ checkPackages ()
 	echo "$PROGRAMS" | while read line; do
 		EXE_NAME=`echo "$line" | cut -f 1`
 		PACKAGE_NAME=`echo "$line" | cut -f 2`
-		$EXE_NAME --help > /dev/null 2> /dev/null || echo -n " $PACKAGE_NAME"		
+		command -v $EXE_NAME > /dev/null 2> /dev/null || echo -n " $PACKAGE_NAME"
 	done
 }
 MISSING_PACKAGES="$MISSING_PACKAGES`checkPackages`"
