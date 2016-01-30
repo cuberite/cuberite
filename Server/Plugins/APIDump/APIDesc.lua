@@ -662,7 +662,7 @@ function OnPlayerJoined(a_Player)
 	-- Send an example composite chat message to the player:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "http://www.mc-server.org", "u@2")  -- Colored underlined link
+		:AddUrlPart(a_Player:GetName(), "http://cuberite.org", "u@2")  -- Colored underlined link
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")       -- Underlined suggest-command
 		:AddRunCommandPart(" SetDay", "/time set 0")                 -- Regular text that will execute command when clicked
 		:SetMessageType(mtJoin)                                      -- It is a join-message

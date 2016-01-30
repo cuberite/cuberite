@@ -1557,7 +1557,7 @@ function OnPlayerJoined(a_Player)
 	-- Test composite chat chaining:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "http://www.mc-server.org", "u@2")
+		:AddUrlPart(a_Player:GetName(), "http://cuberite.org", "u@2")
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")
 		:AddRunCommandPart(" SetDay", "/time set 0")
 	)
