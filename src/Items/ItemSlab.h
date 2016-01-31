@@ -121,7 +121,7 @@ public:
 		The client has a bug when a slab replaces snow and there's a slab above it.
 		The client then combines the slab above, rather than replacing the snow.
 		We send the block above the currently placed block back to the client to fix the bug.
-		Ref.: http://forum.mc-server.org/showthread.php?tid=434&pid=17388#pid17388
+		Ref.: https://forum.cuberite.org/thread-434-post-17388.html#pid17388
 		*/
 		if ((a_BlockFace == BLOCK_FACE_TOP) && (a_BlockY < cChunkDef::Height - 1))
 		{

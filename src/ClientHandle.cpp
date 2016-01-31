@@ -1366,7 +1366,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Only compare ItemType, not meta (torches have different metas)
 		// The -1 check is there because sometimes the client sends -1 instead of the held item
-		// Ref.: http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502
+		// Ref.: https://forum.cuberite.org/thread-549-post-4502.html#pid4502
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
 		);

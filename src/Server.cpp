@@ -373,7 +373,7 @@ void cServer::TickClients(float a_Dt)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				// Delete the client later, when CS is not held, to avoid deadlock: http://forum.mc-server.org/showthread.php?tid=374
+				// Delete the client later, when CS is not held, to avoid deadlock: https://forum.cuberite.org/thread-374.html
 				RemoveClients.push_back(*itr);
 				itr = m_Clients.erase(itr);
 				continue;

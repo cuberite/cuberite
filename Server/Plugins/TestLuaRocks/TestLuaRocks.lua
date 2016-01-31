@@ -21,7 +21,7 @@ local http = require("socket.http");
 
 
 LOGINFO("Trying to download a webpage...");
-local body, code, headers = http.request('http://forum.mc-server.org/index.php');
+local body, code, headers = http.request('https://forum.cuberite.org/');
 LOG("code: " .. tostring(code));
 LOG("headers: ");
 for k, v in pairs(headers or {}) do

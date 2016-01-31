@@ -35,7 +35,7 @@ cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_Owner(nullptr)
 {
 	// The window ID is signed in protocol 1.7, unsigned in protocol 1.8. Keep out of trouble by using only 7 bits:
-	// Ref.: http://forum.mc-server.org/showthread.php?tid=1876
+	// Ref.: https://forum.cuberite.org/thread-1876.html
 	ASSERT((m_WindowID >= 0) && (m_WindowID < 127));
 
 	if (a_WindowType == wtInventory)

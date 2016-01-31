@@ -2,7 +2,7 @@
 // FloodyFluidSimulator.h
 
 // Interfaces to the cFloodyFluidSimulator that represents a fluid simulator that tries to flood everything :)
-// http://forum.mc-server.org/showthread.php?tid=565
+// https://forum.cuberite.org/thread-565.html
 
 
 

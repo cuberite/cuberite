@@ -37,7 +37,7 @@ return
 			plugins, can enable or disable plugins, manages hooks and in-game console commands.</p>
 			<p>
 			Plugins can be identified by either the PluginFolder or PluginName. Note that these two can differ,
-			refer to <a href="http://forum.mc-server.org/showthread.php?tid=1877">the forum</a> for detailed discussion.
+			refer to <a href="https://forum.cuberite.org/thread-1877.html">the forum</a> for detailed discussion.
 			<p>
 			There is one instance of cPluginManager in Cuberite, to get it, call either
 			{{cRoot|cRoot}}:Get():GetPluginManager() or cPluginManager:Get() function.</p>
