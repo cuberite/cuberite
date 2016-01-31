@@ -57,7 +57,7 @@ public:
 	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 	
 	/** Called when client sends some data: */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
+	virtual void DataReceived(const Byte * a_Data, size_t a_Size) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
@@ -146,7 +146,7 @@ public:
 	/** Compress the packet. a_Packet must be without packet length.
 	a_Compressed will be set to the compressed packet includes packet length and data length.
 	If compression fails, the function returns false. */
-	static bool CompressPacket(const AString & a_Packet, AString & a_Compressed);
+	static bool CompressPacket(const std::basic_string<Byte> & a_Packet, std::basic_string<Byte> & a_Compressed);
 
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
@@ -182,7 +182,7 @@ protected:
 	
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	void AddReceivedData(const char * a_Data, size_t a_Size);
+	void AddReceivedData(const Byte * a_Data, size_t a_Size);
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
@@ -228,7 +228,7 @@ protected:
 	
 	
 	/** Sends the data to the client, encrypting them if needed. */
-	virtual void SendData(const char * a_Data, size_t a_Size) override;
+	virtual void SendData(const Byte * a_Data, size_t a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;
@@ -241,7 +241,7 @@ protected:
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes = 0);
 	
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
-	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+	void ParseItemMetadata(cItem & a_Item, const std::basic_string<Byte> & a_Metadata);
 	
 	void StartEncryption(const Byte * a_Key);
 

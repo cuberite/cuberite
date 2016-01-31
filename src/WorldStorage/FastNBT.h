@@ -20,6 +20,7 @@ It directly outputs a string containing the serialized NBT data.
 #pragma once
 
 #include "../Endianness.h"
+#include "../Option.h"
 
 
 
@@ -66,29 +67,29 @@ public:
 	size_t m_DataStart;
 	size_t m_DataLength;
 	
-	// The following members are indices into the array returned; -1 if not valid
+	// The following members are indices into the array returned; none if not valid
 	// They must not be pointers, because pointers would not survive std::vector reallocation
-	int m_Parent;
-	int m_PrevSibling;
-	int m_NextSibling;
-	int m_FirstChild;
-	int m_LastChild;
+	Option<size_t> m_Parent;
+	Option<size_t> m_PrevSibling;
+	Option<size_t> m_NextSibling;
+	Option<size_t> m_FirstChild;
+	Option<size_t> m_LastChild;
 	
-	cFastNBTTag(eTagType a_Type, int a_Parent) :
+	cFastNBTTag(eTagType a_Type, Option<size_t> a_Parent) :
 		m_Type(a_Type),
 		m_NameStart(0),
 		m_NameLength(0),
 		m_DataStart(0),
 		m_DataLength(0),
 		m_Parent(a_Parent),
-		m_PrevSibling(-1),
-		m_NextSibling(-1),
-		m_FirstChild(-1),
-		m_LastChild(-1)
+		m_PrevSibling(Option<size_t>::None()),
+		m_NextSibling(Option<size_t>::None()),
+		m_FirstChild(Option<size_t>::None()),
+		m_LastChild(Option<size_t>::None())
 	{
 	}
 
-	cFastNBTTag(eTagType a_Type, int a_Parent, int a_PrevSibling) :
+	cFastNBTTag(eTagType a_Type, Option<size_t> a_Parent, Option<size_t> a_PrevSibling) :
 		m_Type(a_Type),
 		m_NameStart(0),
 		m_NameLength(0),
@@ -96,9 +97,9 @@ public:
 		m_DataLength(0),
 		m_Parent(a_Parent),
 		m_PrevSibling(a_PrevSibling),
-		m_NextSibling(-1),
-		m_FirstChild(-1),
-		m_LastChild(-1)
+		m_NextSibling(Option<size_t>::None()),
+		m_FirstChild(Option<size_t>::None()),
+		m_LastChild(Option<size_t>::None())
 	{
 	}
 } ;
@@ -118,80 +119,81 @@ Each primitive tag also stores the length of the contained data, in bytes.
 class cParsedNBT
 {
 public:
-	cParsedNBT(const char * a_Data, size_t a_Length);
+	explicit cParsedNBT(const std::basic_string<Byte> & data);
 	
 	bool IsValid(void) const {return m_IsValid; }
 	
 	/** Returns the root tag of the hierarchy. */
-	int GetRoot(void) const {return 0; }
+	size_t GetRoot(void) const {return 0; }
 
-	/** Returns the first child of the specified tag, or -1 if none / not applicable. */
-	int GetFirstChild (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; }
+	/** Returns the first child of the specified tag, or none if none / not applicable. */
+	Option<size_t> GetFirstChild (size_t a_Tag) const { return m_Tags[a_Tag].m_FirstChild; }
 	
-	/** Returns the last child of the specified tag, or -1 if none / not applicable. */
-	int GetLastChild  (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_LastChild; }
+	/** Returns the last child of the specified tag, or  none if none / not applicable. */
+	Option<size_t> GetLastChild  (size_t a_Tag) const { return m_Tags[a_Tag].m_LastChild; }
 	
-	/** Returns the next sibling of the specified tag, or -1 if none. */
-	int GetNextSibling(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_NextSibling; }
+	/** Returns the next sibling of the specified tag, or none. */
+	Option<size_t> GetNextSibling(size_t a_Tag) const { return m_Tags[a_Tag].m_NextSibling; }
 	
-	/** Returns the previous sibling of the specified tag, or -1 if none. */
-	int GetPrevSibling(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_PrevSibling; }
+	/** Returns the previous sibling of the specified tag, or none if none. */
+	Option<size_t> GetPrevSibling(size_t a_Tag) const { return m_Tags[a_Tag].m_PrevSibling; }
 	
 	/** Returns the length of the tag's data, in bytes.
 	Not valid for Compound or List tags! */
-	size_t GetDataLength (int a_Tag) const
+	size_t GetDataLength (size_t a_Tag) const
 	{
-		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_List);
-		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound);
-		return m_Tags[static_cast<size_t>(a_Tag)].m_DataLength;
+		ASSERT(m_Tags[a_Tag].m_Type != TAG_List);
+		ASSERT(m_Tags[a_Tag].m_Type != TAG_Compound);
+		return m_Tags[a_Tag].m_DataLength;
 	}
 
 	/** Returns the data stored in this tag.
 	Not valid for Compound or List tags! */
-	const char * GetData(int a_Tag) const
+	const Byte * GetData(size_t a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_List);
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound);
 		return m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart;
 	}
 	
-	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
-	int FindChildByName(int a_Tag, const AString & a_Name) const
+	/** Returns the direct child tag of the specified name, or none if no such tag. */
+	Option<size_t> FindChildByName(size_t a_Tag, const AString & a_Name) const
+
 	{
 		return FindChildByName(a_Tag, a_Name.c_str(), a_Name.length());
 	}
 	
-	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
-	int FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLength = 0) const;
+	/** Returns the direct child tag of the specified name, or none if no such tag. */
+	Option<size_t> FindChildByName(size_t a_Tag, const char * a_Name, size_t a_NameLength = 0) const;
 
-	/** Returns the child tag of the specified path (Name1 / Name2 / Name3...), or -1 if no such tag. */
-	int FindTagByPath(int a_Tag, const AString & a_Path) const;
+	/** Returns the child tag of the specified path (Name1 / Name2 / Name3...), or none if no such tag. */
+	Option<size_t> FindTagByPath(size_t a_Tag, const AString & a_Path) const;
 	
-	eTagType GetType(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_Type; }
+	eTagType GetType(size_t a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_Type; }
 	
 	/** Returns the children type for a List tag; undefined on other tags. If list empty, returns TAG_End. */
-	eTagType GetChildrenType(int a_Tag) const
+	eTagType GetChildrenType(size_t a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_List);
-		return (m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild < 0) ? TAG_End : m_Tags[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild)].m_Type;
+		return m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild.To<eTagType>([this](size_t FirstChildValue) { return m_Tags[FirstChildValue].m_Type; }, TAG_End);
 	}
 	
 	/** Returns the value stored in a Byte tag. Not valid for any other tag type. */
-	inline unsigned char GetByte(int a_Tag) const
+	inline unsigned char GetByte(size_t a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Byte);
 		return static_cast<unsigned char>(m_Data[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_DataStart)]);
 	}
 	
 	/** Returns the value stored in a Short tag. Not valid for any other tag type. */
-	inline Int16 GetShort(int a_Tag) const
+	inline Int16 GetShort(size_t a_Tag) const
 	{
-		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Short);
-		return GetBEShort(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
+		ASSERT(m_Tags[a_Tag].m_Type == TAG_Short);
+		return GetBEShort(m_Data + m_Tags[a_Tag].m_DataStart);
 	}
 
 	/** Returns the value stored in an Int tag. Not valid for any other tag type. */
-	inline Int32 GetInt(int a_Tag) const
+	inline Int32 GetInt(size_t a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Int);
 		return GetBEInt(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
@@ -237,24 +239,28 @@ public:
 	}
 	
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
-	inline AString GetString(int a_Tag) const
+	inline AString GetString(size_t a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_String);
-		AString res;
-		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_DataLength));
+		size_t length = m_Tags[static_cast<size_t>(a_Tag)].m_DataLength;
+		const Byte * DataStart = m_Data + m_Tags[a_Tag].m_DataStart;
+		AString res(length, 0);
+		std::transform(DataStart, DataStart + length, res.begin(), [](Byte c){ return static_cast<char>(c); });
 		return res;
 	}
 	
 	/** Returns the tag's name. For tags that are not named, returns an empty string. */
-	inline AString GetName(int a_Tag) const
+	inline AString GetName(size_t a_Tag) const
 	{
-		AString res;
-		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_NameStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_NameLength));
+		size_t length = m_Tags[a_Tag].m_NameLength;
+		const Byte * NameStart = m_Data + m_Tags[a_Tag].m_NameStart;
+		AString res(length, 0);
+		std::transform(NameStart, NameStart + length, res.begin(), [](Byte c) { return static_cast<char>(c); });
 		return res;
 	}
 	
 protected:
-	const char *             m_Data;
+	const Byte *             m_Data;
 	size_t                   m_Length;
 	std::vector<cFastNBTTag> m_Tags;
 	bool                     m_IsValid;  // True if parsing succeeded
@@ -291,15 +297,15 @@ public:
 	void AddFloat    (const AString & a_Name, float a_Value);
 	void AddDouble   (const AString & a_Name, double a_Value);
 	void AddString   (const AString & a_Name, const AString & a_Value);
-	void AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements);
+	void AddByteArray(const AString & a_Name, const Byte * a_Value, size_t a_NumElements);
 	void AddIntArray (const AString & a_Name, const int *  a_Value, size_t a_NumElements);
 
-	void AddByteArray(const AString & a_Name, const AString & a_Value)
+	void AddByteArray(const AString & a_Name, const std::basic_string<Byte> & a_Value)
 	{
 		AddByteArray(a_Name, a_Value.data(), a_Value.size());
 	}
 	
-	const AString & GetResult(void) const {return m_Result; }
+	const std::basic_string<Byte> & GetResult(void) const {return m_Result; }
 	
 	void Finish(void);
 	
@@ -308,7 +314,7 @@ protected:
 	struct sParent
 	{
 		int m_Type;   // TAG_Compound or TAG_List
-		int m_Pos;    // for TAG_List, the position of the list count
+		size_t m_Pos; // for TAG_List, the position of the list count
 		int m_Count;  // for TAG_List, the element count
 		eTagType m_ItemType;  // for TAG_List, the element type
 	} ;
@@ -319,7 +325,7 @@ protected:
 	sParent m_Stack[MAX_STACK];
 	int     m_CurrentStack;
 	
-	AString m_Result;
+	std::basic_string<Byte> m_Result;
 	
 	bool IsStackTopCompound(void) const { return (m_Stack[m_CurrentStack].m_Type == TAG_Compound); }
 	
@@ -333,7 +339,7 @@ protected:
 		if (IsStackTopCompound())
 		{
 			// Compound: add the type and name:
-			m_Result.push_back(static_cast<char>(a_Type));
+			m_Result.push_back(static_cast<Byte>(a_Type));
 			WriteString(a_Name.c_str(), static_cast<UInt16>(a_Name.length()));
 		}
 		else

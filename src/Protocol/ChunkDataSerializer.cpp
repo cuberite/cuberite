@@ -32,7 +32,7 @@ cChunkDataSerializer::cChunkDataSerializer(
 
 
 
-const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ)
+const std::basic_string<Byte> & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ)
 {
 	Serializations::const_iterator itr = m_Serializations.find(a_Version);
 	if (itr != m_Serializations.end())
@@ -40,7 +40,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 		return itr->second;
 	}
 	
-	AString data;
+	std::basic_string<Byte> data;
 	switch (a_Version)
 	{
 		case RELEASE_1_3_2: Serialize39(data); break;
@@ -64,7 +64,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 
 
 
-void cChunkDataSerializer::Serialize39(AString & a_Data)
+void cChunkDataSerializer::Serialize39(std::basic_string<Byte> & a_Data)
 {
 	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib can stream)
 
@@ -88,7 +88,7 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	// In order not to use allocation, use a fixed-size buffer, with the size
 	// that uses the same calculation as compressBound():
 	const uLongf CompressedMaxSize = DataSize + (DataSize >> 12) + (DataSize >> 14) + (DataSize >> 25) + 16;
-	char CompressedBlockData[CompressedMaxSize];
+	Byte CompressedBlockData[CompressedMaxSize];
 
 	uLongf CompressedSize = compressBound(DataSize);
 	
@@ -106,11 +106,11 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	// Also, no endian flipping is needed because of the const values
 	unsigned short BitMap1 = 0xffff;
 	unsigned short BitMap2 = 0;
-	a_Data.append(reinterpret_cast<const char *>(&BitMap1), sizeof(short));
-	a_Data.append(reinterpret_cast<const char *>(&BitMap2), sizeof(short));
+	a_Data.append(reinterpret_cast<const Byte *>(&BitMap1), sizeof(short));
+	a_Data.append(reinterpret_cast<const Byte *>(&BitMap2), sizeof(short));
 	
 	UInt32 CompressedSizeBE = htonl(static_cast<UInt32>(CompressedSize));
-	a_Data.append(reinterpret_cast<const char *>(&CompressedSizeBE), sizeof(CompressedSizeBE));
+	a_Data.append(reinterpret_cast<const Byte *>(&CompressedSizeBE), sizeof(CompressedSizeBE));
 	
 	// Unlike 29, 39 doesn't have the "unused" int
 	
@@ -121,7 +121,7 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 
 
 
-void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+void cChunkDataSerializer::Serialize47(std::basic_string<Byte> & a_Data, int a_ChunkX, int a_ChunkZ)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 
@@ -157,7 +157,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	Packet.WriteBuf(m_BlockSkyLight, sizeof(m_BlockSkyLight));
 	Packet.WriteBuf(m_BiomeData,     BiomeDataSize);
 
-	AString PacketData;
+	std::basic_string<Byte> PacketData;
 	Packet.ReadAll(PacketData);
 	Packet.CommitRead();
 
@@ -173,7 +173,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	}
 	else
 	{
-		AString PostData;
+		std::basic_string<Byte> PostData;
 		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
 		Buffer.WriteVarInt32(0);
 		Buffer.ReadAll(PostData);
@@ -181,8 +181,8 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 
 		a_Data.clear();
 		a_Data.reserve(PostData.size() + PacketData.size());
-		a_Data.append(PostData.data(), PostData.size());
-		a_Data.append(PacketData.data(), PacketData.size());
+		a_Data.append(PostData);
+		a_Data.append(PacketData);
 	}
 }
 

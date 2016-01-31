@@ -136,7 +136,7 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 
 
 
-void cProtocol172::DataReceived(const char * a_Data, size_t a_Size)
+void cProtocol172::DataReceived(const Byte * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
@@ -144,8 +144,8 @@ void cProtocol172::DataReceived(const char * a_Data, size_t a_Size)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
+			m_Decryptor.ProcessData(Decrypted, a_Data, NumBytes);
+			AddReceivedData(Decrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -286,7 +286,7 @@ void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2, a_ChunkX, a_ChunkZ);
+	const auto & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2, a_ChunkX, a_ChunkZ);
 	
 	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
 	Pkt.WriteBEInt32(a_ChunkX);
@@ -694,7 +694,7 @@ void cProtocol172::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataS
 		Pkt.WriteBEUInt8(static_cast<Byte>(a_DataStartX));
 		Pkt.WriteBEUInt8(static_cast<Byte>(a_DataStartX));
 
-		Pkt.WriteBuf(reinterpret_cast<const char *>(a_Map.GetData().data()), a_Map.GetData().size());
+		Pkt.WriteBuf(reinterpret_cast<const Byte *>(a_Map.GetData().data()), a_Map.GetData().size());
 	}
 
 	{
@@ -981,7 +981,7 @@ void cProtocol172::SendPluginMessage(const AString & a_Channel, const AString & 
 	cPacketizer Pkt(*this, 0x3f);
 	Pkt.WriteString(a_Channel);
 	Pkt.WriteBEUInt16(static_cast<UInt16>(a_Message.size()));
-	Pkt.WriteBuf(a_Message.data(), a_Message.size());
+	Pkt.WriteBuf(reinterpret_cast<const Byte *>(a_Message.data()), a_Message.size());
 }
 
 
@@ -1544,14 +1544,14 @@ void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property
 
 
 
-void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
+void cProtocol172::AddReceivedData(const Byte * a_Data, size_t a_Size)
 {
 	// Write the incoming data into the comm log file:
 	if (g_ShouldLogCommIn)
 	{
 		if (m_ReceivedData.GetReadableSpace() > 0)
 		{
-			AString AllData;
+			std::basic_string<Byte> AllData;
 			size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
 			m_ReceivedData.ReadAll(AllData);
 			m_ReceivedData.ResetRead();
@@ -1611,7 +1611,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		// Log the packet info into the comm log file:
 		if (g_ShouldLogCommIn)
 		{
-			AString PacketData;
+			std::basic_string<Byte> PacketData;
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
 			bb.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again.
@@ -1632,7 +1632,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			#ifdef _DEBUG
 				// Dump the packet contents into the log:
 				bb.ResetRead();
-				AString Packet;
+				std::basic_string<Byte> Packet;
 				bb.ReadAll(Packet);
 				Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
 				AString Out;
@@ -1673,7 +1673,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 	// Log any leftover bytes into the logfile:
 	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
 	{
-		AString AllData;
+		std::basic_string<Byte> AllData;
 		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
 		m_ReceivedData.ReadAll(AllData);
 		m_ReceivedData.ResetRead();
@@ -1932,7 +1932,7 @@ void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		Pkt.WriteString(Server->GetServerID());
 		const AString & PubKeyDer = Server->GetPublicKeyDER();
 		Pkt.WriteBEUInt16(static_cast<UInt16>(PubKeyDer.size()));
-		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
+		Pkt.WriteBuf(reinterpret_cast<const Byte *>(PubKeyDer.data()), PubKeyDer.size());
 		Pkt.WriteBEInt16(4);
 		Pkt.WriteBEUInt32(static_cast<UInt32>(reinterpret_cast<uintptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 		m_Client->SetUsername(Username);
@@ -2431,7 +2431,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 
 
 
-void cProtocol172::SendData(const char * a_Data, size_t a_Size)
+void cProtocol172::SendData(const Byte * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
@@ -2440,7 +2440,7 @@ void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 		{
 			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
 			m_Encryptor.ProcessData(Encrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			m_Client->SendData(reinterpret_cast<const char *>(Encrypted), NumBytes);
+			m_Client->SendData(reinterpret_cast<const Byte *>(Encrypted), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -2457,7 +2457,7 @@ void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 
 void cProtocol172::SendPacket(cPacketizer & a_Packet)
 {
-	AString DataToSend;
+	std::basic_string<Byte> DataToSend;
 
 	// Send the packet length
 	UInt32 PacketLen = static_cast<UInt32>(m_OutPacketBuffer.GetUsedSpace());
@@ -2527,7 +2527,7 @@ bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 {
 	// Uncompress the GZIPped data:
-	AString Uncompressed;
+	std::basic_string<Byte> Uncompressed;
 	if (UncompressStringGZIP(a_Metadata.data(), a_Metadata.size(), Uncompressed) != Z_OK)
 	{
 		AString HexDump;
@@ -2537,7 +2537,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	}
 	
 	// Parse into NBT:
-	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
+	cParsedNBT NBT(Uncompressed);
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
@@ -2547,16 +2547,17 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	}
 	
 	// Load enchantments and custom display names from the NBT data:
-	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
+	for (auto tag = NBT.GetFirstChild(NBT.GetRoot()); tag.HasValue(); tag = NBT.GetNextSibling(tag.GetValue()))
 	{
-		AString TagName = NBT.GetName(tag);
-		switch (NBT.GetType(tag))
+		auto tagnum = tag.GetValue();
+		AString TagName = NBT.GetName(tagnum);
+		switch (NBT.GetType(tagnum))
 		{
 			case TAG_List:
 			{
 				if ((TagName == "ench") || (TagName == "StoredEnchantments"))  // Enchantments tags
 				{
-					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
+					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tagnum);
 				}
 				break;
 			}
@@ -2564,8 +2565,9 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			{
 				if (TagName == "display")  // Custom name and lore tag
 				{
-					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+					for (auto maybedisplaytag = NBT.GetFirstChild(tagnum); maybedisplaytag.HasValue(); maybedisplaytag = NBT.GetNextSibling(maybedisplaytag.GetValue()))
 					{
+						auto displaytag = maybedisplaytag.GetValue();
 						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
 							a_Item.m_CustomName = NBT.GetString(displaytag);
@@ -2574,9 +2576,9 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 						{
 							AString Lore;
 
-							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
+							for (auto loretag = NBT.GetFirstChild(displaytag); loretag.HasValue(); loretag = NBT.GetNextSibling(loretag.GetValue()))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag.GetValue()).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 							}
 
 							a_Item.m_Lore = Lore;
@@ -2589,7 +2591,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tagnum, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
 				}
 				break;
 			}
@@ -2597,7 +2599,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			{
 				if (TagName == "RepairCost")
 				{
-					a_Item.m_RepairCost = NBT.GetInt(tag);
+					a_Item.m_RepairCost = NBT.GetInt(tagnum);
 				}
 			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
@@ -2726,7 +2728,7 @@ void cProtocol172::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	}
 	Writer.Finish();
 
-	AString Compressed;
+	std::basic_string<Byte> Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	a_Pkt.WriteBEUInt16(static_cast<UInt16>(Compressed.size()));
 	a_Pkt.WriteBuf(Compressed.data(), Compressed.size());
@@ -2821,7 +2823,7 @@ void cProtocol172::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_
 
 	Writer.Finish();
 
-	AString Compressed;
+	std::basic_string<Byte> Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	a_Pkt.WriteBEUInt16(static_cast<UInt16>(Compressed.size()));
 	a_Pkt.WriteBuf(Compressed.data(), Compressed.size());

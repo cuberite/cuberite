@@ -25,7 +25,7 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 
 
 
-void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx)
+void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, size_t a_EnchListTagIdx)
 {
 	// Read the enchantments from the specified NBT list tag (ench or StoredEnchantments)
 
@@ -52,15 +52,19 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 	a_Enchantments.Clear();
 	
 	// Iterate over all the compound children, parse an enchantment from each:
-	for (int tag = a_NBT.GetFirstChild(a_EnchListTagIdx); tag >= 0; tag = a_NBT.GetNextSibling(tag))
+	for (auto maybetag = a_NBT.GetFirstChild(a_EnchListTagIdx); maybetag.HasValue(); maybetag = a_NBT.GetNextSibling(maybetag.GetValue()))
 	{
+		auto tag = maybetag.GetValue();
+
 		// tag is the compound inside the "ench" list tag
 		ASSERT(a_NBT.GetType(tag) == TAG_Compound);
 		
 		// Search for the id and lvl tags' values:
 		int id = -1, lvl = -1;
-		for (int ch = a_NBT.GetFirstChild(tag); ch >= 0; ch = a_NBT.GetNextSibling(ch))
+		for (auto maybech = a_NBT.GetFirstChild(tag); maybech.GetValue(); maybech = a_NBT.GetNextSibling(maybech.GetValue()))
 		{
+			auto ch = maybech.GetValue();
+
 			if (a_NBT.GetType(ch) != TAG_Short)
 			{
 				continue;

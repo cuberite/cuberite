@@ -72,7 +72,7 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 	File.Close();
 	
 	// Parse the NBT:
-	cParsedNBT NBT(Contents.data(), Contents.size());
+	cParsedNBT NBT(std::basic_string<Byte>(reinterpret_cast<const Byte *>(Contents.data()), Contents.size()));
 	if (!NBT.IsValid())
 	{
 		LOG("Cannot parse the NBT in the schematic file \"%s\".", a_FileName.c_str());
@@ -90,7 +90,7 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 bool cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea, const AString & a_SchematicData)
 {
 	// Uncompress the data:
-	AString UngzippedData;
+	std::basic_string<Byte> UngzippedData;
 	if (UncompressStringGZIP(a_SchematicData.data(), a_SchematicData.size(), UngzippedData) != Z_OK)
 	{
 		LOG("%s: Cannot unGZip the schematic data.", __FUNCTION__);
@@ -98,7 +98,7 @@ bool cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea,
 	}
 
 	// Parse the NBT:
-	cParsedNBT NBT(UngzippedData.data(), UngzippedData.size());
+	cParsedNBT NBT(UngzippedData);
 	if (!NBT.IsValid())
 	{
 		LOG("%s: Cannot parse the NBT in the schematic data.", __FUNCTION__);
@@ -168,38 +168,38 @@ bool cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockA
 
 bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cParsedNBT & a_NBT)
 {
-	int TMaterials = a_NBT.FindChildByName(a_NBT.GetRoot(), "Materials");
-	if ((TMaterials > 0) && (a_NBT.GetType(TMaterials) == TAG_String))
+	auto TMaterials = a_NBT.FindChildByName(a_NBT.GetRoot(), "Materials");
+	if ((TMaterials.HasValue()) && (a_NBT.GetType(TMaterials.GetValue()) == TAG_String))
 	{
-		AString Materials = a_NBT.GetString(TMaterials);
+		AString Materials = a_NBT.GetString(TMaterials.GetValue());
 		if (Materials.compare("Alpha") != 0)
 		{
 			LOG("Materials tag is present and \"%s\" instead of \"Alpha\". Possibly a wrong-format schematic file.", Materials.c_str());
 			return false;
 		}
 	}
-	int TSizeX = a_NBT.FindChildByName(a_NBT.GetRoot(), "Width");
-	int TSizeY = a_NBT.FindChildByName(a_NBT.GetRoot(), "Height");
-	int TSizeZ = a_NBT.FindChildByName(a_NBT.GetRoot(), "Length");
+	auto TSizeX = a_NBT.FindChildByName(a_NBT.GetRoot(), "Width");
+	auto TSizeY = a_NBT.FindChildByName(a_NBT.GetRoot(), "Height");
+	auto TSizeZ = a_NBT.FindChildByName(a_NBT.GetRoot(), "Length");
 	if (
-		(TSizeX < 0) || (TSizeY < 0) || (TSizeZ < 0) ||
-		(a_NBT.GetType(TSizeX) != TAG_Short) ||
-		(a_NBT.GetType(TSizeY) != TAG_Short) ||
-		(a_NBT.GetType(TSizeZ) != TAG_Short)
+		(!TSizeX.HasValue()) || (!TSizeY.HasValue()) || (!TSizeZ.HasValue()) ||
+		(a_NBT.GetType(TSizeX.GetValue()) != TAG_Short) ||
+		(a_NBT.GetType(TSizeY.GetValue()) != TAG_Short) ||
+		(a_NBT.GetType(TSizeZ.GetValue()) != TAG_Short)
 	)
 	{
 		LOG("Dimensions are missing from the schematic file (%d, %d, %d), (%d, %d, %d)",
-			TSizeX, TSizeY, TSizeZ,
-			(TSizeX >= 0) ? a_NBT.GetType(TSizeX) : -1,
-			(TSizeY >= 0) ? a_NBT.GetType(TSizeY) : -1,
-			(TSizeZ >= 0) ? a_NBT.GetType(TSizeZ) : -1
+			TSizeX.GetValue(), TSizeY.GetValue(), TSizeZ.GetValue(),
+			(TSizeX.HasValue()) ? a_NBT.GetType(TSizeX.GetValue()) : -1,
+			(TSizeY.HasValue()) ? a_NBT.GetType(TSizeY.GetValue()) : -1,
+			(TSizeZ.HasValue()) ? a_NBT.GetType(TSizeZ.GetValue()) : -1
 		);
 		return false;
 	}
 	
-	int SizeX = a_NBT.GetShort(TSizeX);
-	int SizeY = a_NBT.GetShort(TSizeY);
-	int SizeZ = a_NBT.GetShort(TSizeZ);
+	int SizeX = a_NBT.GetShort(TSizeX.GetValue());
+	int SizeY = a_NBT.GetShort(TSizeY.GetValue());
+	int SizeZ = a_NBT.GetShort(TSizeZ.GetValue());
 	if ((SizeX < 1) || (SizeX > 65535) || (SizeY < 1) || (SizeY > 256) || (SizeZ < 1) || (SizeZ > 65535))
 	{
 		LOG("Dimensions are invalid in the schematic file: %d, %d, %d", SizeX, SizeY, SizeZ);

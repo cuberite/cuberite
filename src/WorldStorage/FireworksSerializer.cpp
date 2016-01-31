@@ -58,19 +58,15 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 
 
 
-void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_ID a_Type)
+void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, size_t a_TagIdx, const ENUM_ITEM_ID a_Type)
 {
-	if (a_TagIdx < 0)
-	{
-		return;
-	}
-
 	switch (a_Type)
 	{
 		case E_ITEM_FIREWORK_STAR:
 		{
-			for (int explosiontag = a_NBT.GetFirstChild(a_TagIdx); explosiontag >= 0; explosiontag = a_NBT.GetNextSibling(explosiontag))
+			for (auto maybeexplosiontag = a_NBT.GetFirstChild(a_TagIdx); maybeexplosiontag.HasValue(); maybeexplosiontag = a_NBT.GetNextSibling(maybeexplosiontag.GetValue()))
 			{
+				auto explosiontag = maybeexplosiontag.GetValue();
 				eTagType TagType = a_NBT.GetType(explosiontag);
 				if (TagType == TAG_Byte)  // Custon name tag
 				{
@@ -104,7 +100,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * ColourData = (a_NBT.GetData(explosiontag));
+						const Byte * ColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_Colours.push_back(GetBEInt(ColourData + i));
@@ -120,7 +116,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * FadeColourData = (a_NBT.GetData(explosiontag));
+						const Byte * FadeColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_FadeColours.push_back(GetBEInt(FadeColourData + i));
@@ -132,8 +128,9 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 		}
 		case E_ITEM_FIREWORK_ROCKET:
 		{
-			for (int fireworkstag = a_NBT.GetFirstChild(a_TagIdx); fireworkstag >= 0; fireworkstag = a_NBT.GetNextSibling(fireworkstag))
+			for (auto maybefireworkstag = a_NBT.GetFirstChild(a_TagIdx); maybefireworkstag.HasValue(); maybefireworkstag = a_NBT.GetNextSibling(maybefireworkstag.GetValue()))
 			{
+				auto fireworkstag = maybefireworkstag.GetValue();
 				eTagType TagType = a_NBT.GetType(fireworkstag);
 				if (TagType == TAG_Byte)  // Custon name tag
 				{
@@ -144,10 +141,10 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 				}
 				else if ((TagType == TAG_List) && (a_NBT.GetName(fireworkstag) == "Explosions"))
 				{
-					int ExplosionsChild = a_NBT.GetFirstChild(fireworkstag);
-					if ((a_NBT.GetType(ExplosionsChild) == TAG_Compound) && (a_NBT.GetName(ExplosionsChild).empty()))
+					auto ExplosionsChild = a_NBT.GetFirstChild(fireworkstag);
+					if ((a_NBT.GetType(ExplosionsChild.GetValue()) == TAG_Compound) && (a_NBT.GetName(ExplosionsChild.GetValue()).empty()))
 					{
-						ParseFromNBT(a_FireworkItem, a_NBT, ExplosionsChild, E_ITEM_FIREWORK_STAR);
+						ParseFromNBT(a_FireworkItem, a_NBT, ExplosionsChild.GetValue(), E_ITEM_FIREWORK_STAR);
 					}
 				}
 			}

@@ -45,9 +45,9 @@ static const int MAX_LIST_ITEMS = 10000;
 
 
 
-cParsedNBT::cParsedNBT(const char * a_Data, size_t a_Length) :
-	m_Data(a_Data),
-	m_Length(a_Length),
+cParsedNBT::cParsedNBT(const std::basic_string<Byte> & a_Data) :
+	m_Data(a_Data.c_str()),
+	m_Length(a_Data.length()),
 	m_Pos(0)
 {
 	m_IsValid = Parse();
@@ -64,6 +64,13 @@ bool cParsedNBT::Parse(void)
 		// Data too short
 		return false;
 	}
+
+	if (m_Data == nullptr)
+	{
+		// Invalid Data
+		return false;
+	}
+
 	if (m_Data[0] != TAG_Compound)
 	{
 		// The top-level tag must be a Compound
@@ -72,7 +79,7 @@ bool cParsedNBT::Parse(void)
 	
 	m_Tags.reserve(NBT_RESERVE_SIZE);
 	
-	m_Tags.push_back(cFastNBTTag(TAG_Compound, -1));
+	m_Tags.push_back(cFastNBTTag(TAG_Compound, Option<size_t>::None()));
 	
 	m_Pos = 1;
 	
@@ -106,12 +113,12 @@ bool cParsedNBT::ReadCompound(void)
 
 	// Reads the latest tag as a compound
 	size_t ParentIdx = m_Tags.size() - 1;
-	int PrevSibling = -1;
+	Option<size_t> PrevSibling = Option<size_t>::None();
 	for (;;)
 	{
 		NEEDBYTES(1);
-		const char TagTypeNum = m_Data[m_Pos];
-		if ((TagTypeNum < TAG_Min) || (TagTypeNum > TAG_Max))
+		const auto TagTypeNum = m_Data[m_Pos];
+		if (TagTypeNum > TAG_Max)
 		{
 			return false;
 		}
@@ -121,16 +128,16 @@ bool cParsedNBT::ReadCompound(void)
 		{
 			break;
 		}
-		m_Tags.push_back(cFastNBTTag(TagType, static_cast<int>(ParentIdx), PrevSibling));
-		if (PrevSibling >= 0)
+		m_Tags.push_back(cFastNBTTag(TagType, ParentIdx, PrevSibling));
+		if (PrevSibling.HasValue())
 		{
-			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = static_cast<int>(m_Tags.size()) - 1;
+			m_Tags[PrevSibling.GetValue()].m_NextSibling = m_Tags.size() - 1;
 		}
 		else
 		{
-			m_Tags[ParentIdx].m_FirstChild = static_cast<int>(m_Tags.size()) - 1;
+			m_Tags[ParentIdx].m_FirstChild = m_Tags.size() - 1;
 		}
-		PrevSibling = static_cast<int>(m_Tags.size()) - 1;
+		PrevSibling = m_Tags.size() - 1;
 		RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
 		RETURN_FALSE_IF_FALSE(ReadTag());
 	}  // while (true)
@@ -158,19 +165,19 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 	// Read items:
 	ASSERT(m_Tags.size() > 0);
 	size_t ParentIdx = m_Tags.size() - 1;
-	int PrevSibling = -1;
+	Option<size_t> PrevSibling = Option<size_t>::None();
 	for (int i = 0; i < Count; i++)
 	{
-		m_Tags.push_back(cFastNBTTag(a_ChildrenType, static_cast<int>(ParentIdx), PrevSibling));
-		if (PrevSibling >= 0)
+		m_Tags.push_back(cFastNBTTag(a_ChildrenType, ParentIdx, PrevSibling));
+		if (PrevSibling.HasValue())
 		{
-			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = static_cast<int>(m_Tags.size()) - 1;
+			m_Tags[PrevSibling.GetValue()].m_NextSibling = m_Tags.size() - 1;
 		}
 		else
 		{
-			m_Tags[ParentIdx].m_FirstChild = static_cast<int>(m_Tags.size()) - 1;
+			m_Tags[ParentIdx].m_FirstChild = m_Tags.size() - 1;
 		}
-		PrevSibling = static_cast<int>(m_Tags.size()) - 1;
+		PrevSibling = m_Tags.size() - 1;
 		RETURN_FALSE_IF_FALSE(ReadTag());
 	}  // for (i)
 	m_Tags[ParentIdx].m_LastChild = PrevSibling;
@@ -274,64 +281,57 @@ bool cParsedNBT::ReadTag(void)
 
 
 
-int cParsedNBT::FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLength) const
+Option<size_t> cParsedNBT::FindChildByName(size_t a_Tag, const char * a_Name, size_t a_NameLength) const
 {
-	if (a_Tag < 0)
+	if (m_Tags[a_Tag].m_Type != TAG_Compound)
 	{
-		return -1;
-	}
-	if (m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound)
-	{
-		return -1;
+		return Option<size_t>::None();
 	}
 	
 	if (a_NameLength == 0)
 	{
 		a_NameLength = strlen(a_Name);
 	}
-	for (int Child = m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; Child != -1; Child = m_Tags[static_cast<size_t>(Child)].m_NextSibling)
+	for (auto Child = m_Tags[a_Tag].m_FirstChild; Child.HasValue(); Child = m_Tags[Child.GetValue()].m_NextSibling)
 	{
 		if (
-			(m_Tags[static_cast<size_t>(Child)].m_NameLength == a_NameLength) &&
-			(memcmp(m_Data + m_Tags[static_cast<size_t>(Child)].m_NameStart, a_Name, a_NameLength) == 0)
+			(m_Tags[Child.GetValue()].m_NameLength == a_NameLength) &&
+			(memcmp(m_Data + m_Tags[Child.GetValue()].m_NameStart, a_Name, a_NameLength) == 0)
 		)
 		{
-			return Child;
+			return Child.GetValue();
 		}
 	}  // for Child - children of a_Tag
-	return -1;
+	return Option<size_t>::None();
 }
 
 
 
 
 
-int cParsedNBT::FindTagByPath(int a_Tag, const AString & a_Path) const
+Option<size_t> cParsedNBT::FindTagByPath(size_t a_Tag, const AString & a_Path) const
 {
-	if (a_Tag < 0)
-	{
-		return -1;
-	}
 	size_t Begin = 0;
 	size_t Length = a_Path.length();
-	int Tag = a_Tag;
+	size_t Tag = a_Tag;
 	for (size_t i = 0; i < Length; i++)
 	{
 		if (a_Path[i] != '\\')
 		{
 			continue;
 		}
-		Tag = FindChildByName(Tag, a_Path.c_str() + Begin, i - Begin);
-		if (Tag < 0)
+		auto MaybeTag = FindChildByName(Tag, a_Path.c_str() + Begin, i - Begin);
+		if (!MaybeTag.HasValue())
 		{
-			return -1;
+			return Tag;
 		}
+		Tag = MaybeTag.GetValue();
 		Begin = i + 1;
 	}  // for i - a_Path[]
 	
 	if (Begin < Length)
 	{
-		Tag = FindChildByName(Tag, a_Path.c_str() + Begin, Length - Begin);
+		return FindChildByName(Tag, a_Path.c_str() + Begin, Length - Begin);
 	}
 	return Tag;
 }
@@ -397,12 +397,12 @@ void cFastNBTWriter::BeginList(const AString & a_Name, eTagType a_ChildrenType)
 	
 	TagCommon(a_Name, TAG_List);
 		
-	m_Result.push_back(static_cast<char>(a_ChildrenType));
+	m_Result.push_back(static_cast<Byte>(a_ChildrenType));
 	m_Result.append(4, static_cast<char>(0));
 	
 	++m_CurrentStack;
 	m_Stack[m_CurrentStack].m_Type     = TAG_List;
-	m_Stack[m_CurrentStack].m_Pos      = static_cast<int>(m_Result.size()) - 4;
+	m_Stack[m_CurrentStack].m_Pos      = m_Result.size() - 4;
 	m_Stack[m_CurrentStack].m_Count    = 0;
 	m_Stack[m_CurrentStack].m_ItemType = a_ChildrenType;
 }
@@ -417,7 +417,7 @@ void cFastNBTWriter::EndList(void)
 	ASSERT(m_Stack[m_CurrentStack].m_Type == TAG_List);
 	
 	// Update the list count:
-	SetBEInt(const_cast<char *>(m_Result.c_str() + m_Stack[m_CurrentStack].m_Pos), m_Stack[m_CurrentStack].m_Count);
+	SetBEInt(m_Result, m_Stack[m_CurrentStack].m_Pos, m_Stack[m_CurrentStack].m_Count);
 
 	--m_CurrentStack;
 }
@@ -429,7 +429,7 @@ void cFastNBTWriter::EndList(void)
 void cFastNBTWriter::AddByte(const AString & a_Name, unsigned char a_Value)
 {
 	TagCommon(a_Name, TAG_Byte);
-	m_Result.push_back(static_cast<char>(a_Value));
+	m_Result.push_back(a_Value);
 }
 
 
@@ -439,8 +439,8 @@ void cFastNBTWriter::AddByte(const AString & a_Name, unsigned char a_Value)
 void cFastNBTWriter::AddShort(const AString & a_Name, Int16 a_Value)
 {
 	TagCommon(a_Name, TAG_Short);
-	UInt16 Value = htons(a_Value);
-	m_Result.append(reinterpret_cast<const char *>(&Value), 2);
+	UInt16 Value = htons(static_cast<UInt16>(a_Value));
+	m_Result.append(reinterpret_cast<const Byte *>(&Value), 2);
 }
 
 
@@ -450,8 +450,8 @@ void cFastNBTWriter::AddShort(const AString & a_Name, Int16 a_Value)
 void cFastNBTWriter::AddInt(const AString & a_Name, Int32 a_Value)
 {
 	TagCommon(a_Name, TAG_Int);
-	UInt32 Value = htonl(a_Value);
-	m_Result.append(reinterpret_cast<const char *>(&Value), 4);
+	UInt32 Value = htonl(static_cast<UInt32>(a_Value));
+	m_Result.append(reinterpret_cast<const Byte *>(&Value), 4);
 }
 
 
@@ -462,7 +462,7 @@ void cFastNBTWriter::AddLong(const AString & a_Name, Int64 a_Value)
 {
 	TagCommon(a_Name, TAG_Long);
 	UInt64 Value = HostToNetwork8(&a_Value);
-	m_Result.append(reinterpret_cast<const char *>(&Value), 8);
+	m_Result.append(reinterpret_cast<const Byte *>(&Value), 8);
 }
 
 
@@ -473,7 +473,7 @@ void cFastNBTWriter::AddFloat(const AString & a_Name, float a_Value)
 {
 	TagCommon(a_Name, TAG_Float);
 	UInt32 Value = HostToNetwork4(&a_Value);
-	m_Result.append(reinterpret_cast<const char *>(&Value), 4);
+	m_Result.append(reinterpret_cast<const Byte *>(&Value), 4);
 }
 
 
@@ -484,7 +484,7 @@ void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 {
 	TagCommon(a_Name, TAG_Double);
 	UInt64 Value = HostToNetwork8(&a_Value);
-	m_Result.append(reinterpret_cast<const char *>(&Value), 8);
+	m_Result.append(reinterpret_cast<const Byte *>(&Value), 8);
 }
 
 
@@ -494,20 +494,20 @@ void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 void cFastNBTWriter::AddString(const AString & a_Name, const AString & a_Value)
 {
 	TagCommon(a_Name, TAG_String);
-	UInt16 len = htons(static_cast<short>(a_Value.size()));
-	m_Result.append(reinterpret_cast<const char *>(&len), 2);
-	m_Result.append(a_Value.c_str(), a_Value.size());
+	UInt16 len = htons(static_cast<UInt16>(a_Value.size()));
+	m_Result.append(reinterpret_cast<const Byte *>(&len), 2);
+	m_Result.append(reinterpret_cast<const Byte *>(a_Value.c_str()), a_Value.size());
 }
 
 
 
 
 
-void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements)
+void cFastNBTWriter::AddByteArray(const AString & a_Name, const Byte * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_ByteArray);
 	u_int len = htonl(static_cast<u_int>(a_NumElements));
-	m_Result.append(reinterpret_cast<const char *>(&len), 4);
+	m_Result.append(reinterpret_cast<const Byte *>(&len), 4);
 	m_Result.append(a_Value, a_NumElements);
 }
 
@@ -525,11 +525,11 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, si
 	{
 		m_Result.reserve(size + 4 + (a_NumElements * 4));
 	}
-	m_Result.append(reinterpret_cast<const char *>(&len), 4);
+	m_Result.append(reinterpret_cast<const Byte *>(&len), 4);
 	for (size_t i = 0; i < a_NumElements; i++)
 	{
-		UInt32 Element = htonl(a_Value[i]);
-		m_Result.append(reinterpret_cast<const char *>(&Element), 4);
+		UInt32 Element = htonl(static_cast<UInt32>(a_Value[i]));
+		m_Result.append(reinterpret_cast<const Byte *>(&Element), 4);
 	}
 }
 
@@ -550,8 +550,8 @@ void cFastNBTWriter::Finish(void)
 void cFastNBTWriter::WriteString(const char * a_Data, UInt16 a_Length)
 {
 	UInt16 Len = htons(a_Length);
-	m_Result.append(reinterpret_cast<const char *>(&Len), 2);
-	m_Result.append(a_Data, a_Length);
+	m_Result.append(reinterpret_cast<const Byte *>(&Len), 2);
+	m_Result.append(reinterpret_cast<const Byte *>(a_Data), a_Length);
 }
 
 

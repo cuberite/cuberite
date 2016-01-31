@@ -31,7 +31,6 @@ SET (HDRS
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(FastNBT.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion ")
 	set_source_files_properties(FireworksSerializer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum ")
 	set_source_files_properties(NBTChunkSerializer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=sign-conversion -Wno-error=conversion ")
 	set_source_files_properties(SchematicFileSerializer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=shadow -Wno-error=conversion  -Wno-error=global-constructors")
