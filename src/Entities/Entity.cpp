@@ -1554,7 +1554,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
 	{
 		// This sometimes happens on Linux machines
-		// Ref.: http://forum.mc-server.org/showthread.php?tid=1244
+		// Ref.: https://forum.cuberite.org/thread-1244.html
 		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, RelY, GetPosX(), GetPosZ()
 		);

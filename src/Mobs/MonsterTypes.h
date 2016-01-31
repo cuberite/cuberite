@@ -42,7 +42,7 @@ enum eMonsterType
 	mtWolf         = E_META_SPAWN_EGG_WOLF,
 	mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
 	mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
-	mtMax          = 120,  // This is just a hotfix for http://forum.mc-server.org/showthread.php?tid=1616. Tolua is too bad to find the highest value, so this is needed.
+	mtMax          = 120,  // This is just a hotfix for https://forum.cuberite.org/thread-1616.html. Tolua is too bad to find the highest value, so this is needed.
 } ;
 
 // tolua_end

@@ -627,7 +627,7 @@ template <class T> inline T Diff(T a_Val1, T a_Val2)
 
 enum eMessageType
 {
-	// http://forum.mc-server.org/showthread.php?tid=1212
+	// https://forum.cuberite.org/thread-1212.html
 	// MessageType...
 
 	mtCustom,          // Send raw data without any processing

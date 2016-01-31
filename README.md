@@ -7,7 +7,7 @@ Cuberite can run on Windows, *nix and Android operating systems. This includes A
 
 We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 
-Subscribe to [the newsletter](https://newsletter.cuberite.org/subscribe.htm) for important updates and project news.
+Subscribe to [the newsletter](http://cuberite.org/news/) for important updates and project news.
 
 Installation
 ------------
@@ -17,7 +17,7 @@ There are several ways to obtain Cuberite.
 #### Binaries
  - The easiest method is downloading for Windows or Linux from the [Project site](http://cuberite.org/).
  - You can use the EasyInstall script for Linux, which automatically downloads the correct binary. The script is described below.
- - You can also obtain a binary from the [buildserver archive](https://builds.cuberite.org).
+ - You can also obtain a binary from the [buildserver archive](https://builds.cuberite.org/).
 
 ##### The EasyInstall script
 This Linux script will download the correct binary from the project site.
@@ -36,7 +36,7 @@ This script downloads the source code and compiles it. The script is smart enoug
     sh -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
 
 #### Hosted services
- - Hosted Cuberite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamocosm](https://gamocosm.com) also offers Cuberite support.
+ - Hosted Cuberite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamocosm](https://gamocosm.com/) also offers Cuberite support.
 
 Contributing
 ------------
@@ -48,7 +48,7 @@ Check out the [CONTRIBUTING.md](https://github.com/cuberite/cuberite/blob/master
 Other Stuff
 -----------
 
-For other stuff, including plugins and discussion, check out the [forums](http://forum.mc-server.org) and [Plugin API](http://api-docs.cuberite.org).
+For other stuff, including plugins and discussion, check out the [forums](https://forum.cuberite.org/) and [Plugin API](http://api-docs.cuberite.org/).
 
 [Support Us on Bountysource](https://bountysource.com/teams/cuberite)
 

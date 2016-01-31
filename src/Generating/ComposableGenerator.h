@@ -8,7 +8,7 @@ Generating works by composing several algorithms:
 Biome, TerrainHeight, TerrainComposition, Ores, Structures and SmallFoliage
 Each algorithm may be chosen from a pool of available algorithms in the same class and combined with others,
 based on user's preferences in the world.ini.
-See http://forum.mc-server.org/showthread.php?tid=409 for details.
+See https://forum.cuberite.org/thread-409.html for details.
 */
 
 

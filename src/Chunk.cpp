@@ -781,7 +781,7 @@ void cChunk::CheckBlocks()
 void cChunk::TickBlocks(void)
 {
 	// Tick dem blocks
-	// _X: We must limit the random number or else we get a nasty int overflow bug - http://forum.mc-server.org/showthread.php?tid=457
+	// _X: We must limit the random number or else we get a nasty int overflow bug - https://forum.cuberite.org/thread-457.html
 	int RandomX = m_World->GetTickRandomNumber(0x00ffffff);
 	int RandomY = m_World->GetTickRandomNumber(0x00ffffff);
 	int RandomZ = m_World->GetTickRandomNumber(0x00ffffff);

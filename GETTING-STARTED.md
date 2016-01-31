@@ -17,8 +17,8 @@ Useful Resources
 ----------------
 
  * [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki)
- * [Minecraft Protocol Wiki](http://wiki.vg)
- * [Lua API Documentation](http://api-docs.cuberite.org)
+ * [Minecraft Protocol Wiki](http://wiki.vg/Main_Page)
+ * [Lua API Documentation](http://api-docs.cuberite.org/)
  * [VS2013 Community Edition Download](https://www.visualstudio.com/products/visual-studio-community-vs)
 
 Setting up a Dev Environment
@@ -102,9 +102,9 @@ Where to Get Started
 Issues that should be easy to get started with are tagged as [easy](https://github.com/cuberite/cuberite/issues?q=is%3Aopen+is%3Aissue+label%3Aeasy) in GitHub issues. Other good places to get started are:
 
  * Cleaning up some of the compiler warnings. (Check [Travis CI](https://travis-ci.org/cuberite/cuberite) for a list of them.) With clang, there are over 10000 lines of warnings to clean up.
- *  Writing some plugins: They are written in lua, with excellent API documentation available via [APIDump](http://api-docs.cuberite.org). The [Core](https://github.com/cuberite/Core) plugin should also help quite a bit here.
+ *  Writing some plugins: They are written in lua, with excellent API documentation available via [APIDump](http://api-docs.cuberite.org/). The [Core](https://github.com/cuberite/Core) plugin should also help quite a bit here.
 
 Special Things
 ---------------------
- * Make yourself familiar with the community. Visit the forums: http://forum.mc-server.org
+ * Make yourself familiar with the community. Visit the forums: https://forum.cuberite.org/
  * Ask questions as much as you like, we're here to help :smiley:
