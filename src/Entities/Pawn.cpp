@@ -8,7 +8,7 @@
 #include "BoundingBox.h"
 #include "../Blocks/BlockHandler.h"
 #include "EffectID.h"
-
+#include "../Mobs/Monster.h"
 
 
 
@@ -27,6 +27,25 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 
 
 
+cPawn::~cPawn()
+{
+	ASSERT(m_TargetingMe.size() == 0);
+}
+
+
+
+
+
+void cPawn::Destroyed()
+{
+	StopEveryoneFromTargetingMe();
+	super::Destroyed();
+}
+
+
+
+
+
 void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// Iterate through this entity's applied effects
@@ -35,18 +54,18 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Copies values to prevent pesky wrong accesses and erasures
 		cEntityEffect::eType EffectType = iter->first;
 		cEntityEffect * Effect = iter->second;
-		
+
 		Effect->OnTick(*this);
-		
+
 		// Iterates (must be called before any possible erasure)
 		++iter;
-		
+
 		// Remove effect if duration has elapsed
 		if (Effect->GetDuration() - Effect->GetTicks() <= 0)
 		{
 			RemoveEntityEffect(EffectType);
 		}
-		
+
 		// TODO: Check for discrepancies between client and server effect values
 	}
 
@@ -126,7 +145,7 @@ void cPawn::HandleAir(void)
 		// Prevent the oxygen from decreasing
 		return;
 	}
-	
+
 	super::HandleAir();
 }
 
@@ -142,14 +161,14 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 		// A plugin disallows the addition, bail out.
 		return;
 	}
-	
+
 	// No need to add empty effects:
 	if (a_EffectType == cEntityEffect::effNoEffect)
 	{
 		return;
 	}
 	a_Duration = static_cast<int>(a_Duration * a_DistanceModifier);
-	
+
 	m_EntityEffects[a_EffectType] = cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier);
 	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, static_cast<short>(a_Duration));
 	m_EntityEffects[a_EffectType]->OnActivate(*this);
@@ -187,13 +206,45 @@ void cPawn::ClearEntityEffects()
 	{
 		// Copy values to prevent pesky wrong erasures
 		cEntityEffect::eType EffectType = iter->first;
-		
+
 		// Iterates (must be called before any possible erasure)
 		++iter;
-		
+
 		// Remove effect
 		RemoveEntityEffect(EffectType);
 	}
+}
+
+
+
+
+
+void cPawn::NoLongerTargetingMe(cMonster * a_Monster)
+{
+	ASSERT(!IsDestroyed());  // Our destroy override is supposed to clear all targets before we're destroyed.
+	for (auto i = m_TargetingMe.begin(); i != m_TargetingMe.end(); ++i)
+	{
+		cMonster * Monster = *i;
+		if (Monster == a_Monster)
+		{
+			ASSERT(Monster->GetTarget() != this);  // The monster is notifying us it is no longer targeting us, assert if that's a lie
+			m_TargetingMe.erase(i);
+			return;
+		}
+	}
+	ASSERT(false);  // If this happens, something is wrong. Perhaps the monster never called TargetingMe() or called NoLongerTargetingMe() twice.
+}
+
+
+
+
+
+void cPawn::TargetingMe(cMonster * a_Monster)
+{
+	ASSERT(!IsDestroyed());
+	ASSERT(m_TargetingMe.size() < 10000);
+	ASSERT(a_Monster->GetTarget() == this);
+	m_TargetingMe.push_back(a_Monster);
 }
 
 
@@ -368,4 +419,21 @@ void cPawn::HandleFalling(void)
 	{
 		m_LastGroundHeight = GetPosY();
 	}
+}
+
+
+
+
+
+void cPawn::StopEveryoneFromTargetingMe()
+{
+	std::vector<cMonster*>::iterator i = m_TargetingMe.begin();
+	while (i != m_TargetingMe.end())
+	{
+		cMonster * Monster = *i;
+		ASSERT(Monster->GetTarget() == this);
+		Monster->UnsafeUnsetTarget();
+		i = m_TargetingMe.erase(i);
+	}
+	ASSERT(m_TargetingMe.size() == 0);
 }

@@ -44,6 +44,10 @@ public:
 	*/
 	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
+	~cMonster();
+
+	virtual void Destroyed() override;
+
 	CLASS_PROTODEF(cMonster)
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
@@ -156,6 +160,16 @@ public:
 
 	// tolua_end
 
+	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
+	void SetTarget (cPawn * a_NewTarget);
+
+	/** Unset the target without notifying the target entity. Do not use this, use SetTarget(nullptr) instead.
+	This is only used by cPawn internally. */
+	void UnsafeUnsetTarget();
+
+	/** Returns the current target. */
+	cPawn * GetTarget ();
+
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
 	Asserts and returns null if mob type is not specified
@@ -163,9 +177,6 @@ public:
 	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
 
 protected:
-
-	/** A pointer to the entity this mobile is aiming to reach */
-	cEntity * m_Target;
 
 	/** The pathfinder instance handles pathfinding for this monster. */
 	cPathFinder m_PathFinder;
@@ -254,5 +265,9 @@ protected:
 
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
+
+private:
+	/** A pointer to the entity this mobile is aiming to reach */
+	cPawn * m_Target;
 
 } ;  // tolua_export

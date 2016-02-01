@@ -1514,6 +1514,13 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	SetPosition(a_NewPosition);
 
+	if (this->IsMob())
+	{
+		cMonster * Monster = static_cast<cMonster*>(this);
+		Monster->SetTarget(nullptr);
+		Monster->StopEveryoneFromTargetingMe();
+	}
+
 	// Queue add to new world
 	a_World->AddEntity(this);
 	cWorld * OldWorld = cRoot::Get()->GetWorld(GetWorld()->GetName());  // Required for the hook HOOK_ENTITY_CHANGED_WORLD

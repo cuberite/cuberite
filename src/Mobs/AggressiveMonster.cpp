@@ -26,9 +26,9 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk &
 {
 	super::InStateChasing(a_Dt, a_Chunk);
 
-	if (m_Target != nullptr)
+	if (GetTarget() != nullptr)
 	{
-		MoveToPosition(m_Target->GetPosition());
+		MoveToPosition(GetTarget()->GetPosition());
 	}
 }
 
@@ -62,14 +62,14 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		CheckEventSeePlayer(a_Chunk);
 	}
 
-	if (m_Target == nullptr)
+	if (GetTarget() == nullptr)
 	{
 		return;
 	}
 
 	cTracer LineOfSight(GetWorld());
 	Vector3d MyHeadPosition = GetPosition() + Vector3d(0, GetHeight(), 0);
-	Vector3d AttackDirection(m_Target->GetPosition() + Vector3d(0, m_Target->GetHeight(), 0) - MyHeadPosition);
+	Vector3d AttackDirection(GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
 
 
 	if (TargetIsInRange() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())) && (GetHealth() > 0.0))
@@ -85,14 +85,14 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 {
-	if ((m_Target == nullptr) || (m_AttackCoolDownTicksLeft != 0))
+	if ((GetTarget() == nullptr) || (m_AttackCoolDownTicksLeft != 0))
 	{
 		return false;
 	}
 
 	// Setting this higher gives us more wiggle room for attackrate
 	ResetAttackCooldown();
-	m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
+	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
 
 	return true;
 }
