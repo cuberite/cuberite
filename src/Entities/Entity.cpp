@@ -40,7 +40,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirDrag(0.02f),
 	m_LastPosition(a_X, a_Y, a_Z),
 	m_IsInitialized(false),
-	m_WorldTravellingFrom(nullptr),
 	m_EntityType(a_EntityType),
 	m_World(nullptr),
 	m_IsWorldChangeScheduled(false),
@@ -1499,8 +1498,18 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
+	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
+	{
+		a_Chunk.RemoveEntity(this);
+		return true;
+	}))
+	{
+		LOGD("Entity Teleportation failed! Didn't find the source chunk!\n");
+		return false;
+	}
+
 	// Remove all links to the old world
-	SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
+	// SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	SetPosition(a_NewPosition);
