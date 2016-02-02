@@ -1695,6 +1695,17 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
+	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
+	{
+		a_Chunk.RemoveEntity(this);  // Remove player from the old chunk
+		return true;
+	}))
+	{
+		LOGD("Player Teleportation failed! Didn't find the source chunk!\n");
+		return false;
+	}
+	GetWorld()->RemovePlayer(this, false);  // remove player from the old world
+
 	// Send the respawn packet:
 	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
 	{
@@ -1703,11 +1714,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Broadcast for other people that the player is gone.
 	GetWorld()->BroadcastDestroyEntity(*this);
-
-	// Remove player from the old world
-	SetWorldTravellingFrom(GetWorld());  // cChunk handles entity removal
-	GetWorld()->RemovePlayer(this, false);
-
 	SetPosition(a_NewPosition);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object

@@ -408,12 +408,6 @@ public:
 
 	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
-	/** Returns if the entity is travelling away from a specified world */
-	bool IsWorldTravellingFrom(cWorld * a_World) const { return (m_WorldTravellingFrom == a_World); }
-
-	/** Sets the world the entity will be leaving */
-	void SetWorldTravellingFrom(cWorld * a_World) { m_WorldTravellingFrom = a_World; }
-
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
 
@@ -537,11 +531,6 @@ protected:
 
 	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
 	bool m_IsInitialized;
-
-	/** World entity is travelling from (such as when using portals).
-	Set to a valid world pointer by MoveToWorld; reset to nullptr when the entity is removed from the old world.
-	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it. */
-	cWorld * m_WorldTravellingFrom;
 
 	eEntityType m_EntityType;
 
