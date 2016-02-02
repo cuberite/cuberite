@@ -423,6 +423,9 @@ public:
 	/** Detaches from the currently attached entity, if any */
 	virtual void Detach(void);
 
+	/** Returns true if this entity is attached to the specified entity */
+	bool IsAttachedTo(const cEntity * a_Entity) const;
+
 	/** Makes sure head yaw is not over the specified range. */
 	void WrapHeadYaw();
 

@@ -73,6 +73,12 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				return false;
 			}
 
+			// do not push a boat / minecart you're sitting in
+			if (m_Pusher->IsAttachedTo(a_Entity))
+			{
+				return false;
+			}
+
 			Vector3d v3Delta = a_Entity->GetPosition() - m_Pusher->GetPosition();
 			v3Delta.y = 0.0;  // we only push sideways
 			v3Delta *= 1.0 / (v3Delta.Length() + 0.01);  // we push harder if we're close
