@@ -1894,7 +1894,27 @@ void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & 
 			// Player doesn't have permission for the command
 			continue;
 		}
-		a_Results.push_back(itr->first);
+
+		/*  Client expects to only get back the last part of a space separated command.
+		Find the position of the beginning of the last part:
+		Position of last space + 1 for space separated commands
+		string::npos + 1 = 0 for commands that are not separated
+
+		Then skip all commands that have too many subcommands.
+		When the client asks for suggestions for "/time s"
+		the server must skip all commands that consist of more than 2 words just as
+		"/time set day". Or in other words, the position of the last space (separator)
+		in the strings must be equal or string::npos for both. */
+		size_t LastSpaceInText = a_Text.find_last_of(' ') + 1;
+		size_t LastSpaceInSuggestion = itr->first.find_last_of(' ') + 1;
+
+		if (LastSpaceInText != LastSpaceInSuggestion)
+		{
+			// Suggestion has more subcommands than a_Text
+			continue;
+		}
+
+		a_Results.push_back(itr->first.substr(LastSpaceInSuggestion));
 	}
 }
 
