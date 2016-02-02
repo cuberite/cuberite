@@ -1499,8 +1499,17 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
-	// Remove all links to the old world
-	SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
+	// Remove entity from chunk
+	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
+	{
+		a_Chunk.SafeRemoveEntity(this);
+		return true;
+	}))
+	{
+		LOGD("Entity Teleportation failed! Didn't find the source chunk!\n");
+		return false;
+	}
+
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	SetPosition(a_NewPosition);
