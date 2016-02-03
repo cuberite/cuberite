@@ -603,6 +603,7 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
+	m_IsInTick = true;
 	BroadcastPendingBlockChanges();
 
 	CheckBlocks();
@@ -637,7 +638,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		else if ((*itr)->IsWorldTravellingFrom(m_World))
 		{
 			// Remove all entities that are travelling to another world
-			LOGD("Removing entity from [%d, %d] that's travelling between worlds.", m_PosX, m_PosZ);
+			LOGD("Removing entity from [%d, %d] that's travelling between worlds. (Scheduled)", m_PosX, m_PosZ);
 			MarkDirty();
 			(*itr)->SetWorldTravellingFrom(nullptr);
 			itr = m_Entities.erase(itr);
@@ -659,6 +660,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	}  // for itr - m_Entitites[]
 	
 	ApplyWeatherToTop();
+	m_IsInTick = false;
 }
 
 
@@ -1898,6 +1900,31 @@ void cChunk::AddEntity(cEntity * a_Entity)
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
 	m_Entities.remove(a_Entity);
+
+	// Mark as dirty if it was a server-generated entity:
+	if (!a_Entity->IsPlayer())
+	{
+		MarkDirty();
+	}
+}
+
+
+
+
+
+void cChunk::SafeRemoveEntity(cEntity * a_Entity)
+{
+	if (!m_IsInTick)
+	{
+		LOGD("Removing entity from [%d, %d] that's travelling between worlds. (immediate)", m_PosX, m_PosZ);
+		// If we're not in a tick, just remove it.
+		m_Entities.remove(a_Entity);
+	}
+	else
+	{
+		// If we are in a tick, we don't want to invalidate the iterator, so we schedule the removal. Removal will be done in cChunk::tick()
+		a_Entity->SetWorldTravellingFrom(GetWorld());
+	}
 
 	// Mark as dirty if it was a server-generated entity:
 	if (!a_Entity->IsPlayer())
