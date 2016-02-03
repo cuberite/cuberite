@@ -260,6 +260,9 @@ public:
 
 	void AddEntity(cEntity * a_Entity);
 	void RemoveEntity(cEntity * a_Entity);
+	/** RemoveEntity is dangerous if the chunk is inside the tick() method because it invalidates the iterator.
+	This will safely remove an entity. */
+	void SafeRemoveEntity(cEntity * a_Entity);
 	bool HasEntity(UInt32 a_EntityID);
 
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
@@ -502,7 +505,7 @@ private:
 
 	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
 	bool m_ShouldGenerateIfLoadFailed;
-
+	bool m_IsInTick;       // True if the chunk is executing the tick() method.
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
