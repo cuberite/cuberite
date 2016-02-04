@@ -51,8 +51,7 @@ public:
 	cHTTPResponseParser(cCallbacks & a_Callbacks);
 
 	/** Parses the incoming data and calls the appropriate callbacks.
-	Returns the number of bytes from the end of a_Data that is already not part of this response.
-	Returns AString::npos on an error. */
+	Returns the number of bytes consumed or AString::npos number for error. */
 	size_t Parse(const char * a_Data, size_t a_Size);
 
 	/** Called when the server indicates no more data will be sent (HTTP 1.0 socket closed).
@@ -97,8 +96,7 @@ protected:
 
 	/** Parses the message body.
 	Processes transfer encoding and calls the callbacks for body data.
-	Returns the number of bytes from the end of a_Data that is already not part of this response.
-	Returns AString::npos on error. */
+	Returns the number of bytes consumed or AString::npos number for error. */
 	size_t ParseBody(const char * a_Data, size_t a_Size);
 
 	/** Called internally when the headers-parsing has just finished. */

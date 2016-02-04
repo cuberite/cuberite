@@ -122,16 +122,16 @@ int main(int argc, char * argv[])
 			printf("Read 0 bytes from file (EOF?), terminating\n");
 			break;
 		}
-		auto numLeft = parser.Parse(buf, numBytes);
-		if (numLeft == AString::npos)
+		auto numConsumed = parser.Parse(buf, numBytes);
+		if (numConsumed == AString::npos)
 		{
 			printf("Parser indicates there was an error, terminating parsing.\n");
 			break;
 		}
-		ASSERT(numLeft <= numBytes);
-		if (numLeft > 0)
+		ASSERT(numConsumed <= numBytes);
+		if (numConsumed < numBytes)
 		{
-			printf("Parser indicates stream end, but there's more data (at least %u bytes) in the file.\n", static_cast<unsigned>(numLeft));
+			printf("Parser indicates stream end, but there's more data (at least %u bytes) in the file.\n", static_cast<unsigned>(numBytes - numConsumed));
 		}
 	}
 	if (!parser.IsFinished())

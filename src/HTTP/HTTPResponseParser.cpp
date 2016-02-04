@@ -29,17 +29,18 @@ size_t cHTTPResponseParser::Parse(const char * a_Data, size_t a_Size)
 	// If parsing already finished or errorred, let the caller keep all the data:
 	if (m_IsFinished || m_HasHadError)
 	{
-		return a_Size;
+		return 0;
 	}
 
 	// If still waiting for the status line, add to buffer and try parsing it:
+	auto inBufferSoFar = m_Buffer.size();
 	if (m_StatusLine.empty())
 	{
 		m_Buffer.append(a_Data, a_Size);
 		if (!ParseStatusLine())
 		{
 			// All data used, but not a complete status line yet.
-			return 0;
+			return a_Size;
 		}
 		if (m_HasHadError)
 		{
@@ -53,14 +54,20 @@ size_t cHTTPResponseParser::Parse(const char * a_Data, size_t a_Size)
 			m_Callbacks.OnError("Failed to parse the envelope");
 			return AString::npos;
 		}
+		ASSERT(bytesConsumed < inBufferSoFar + a_Size);
 		m_Buffer.erase(0, bytesConsumed);
 		if (!m_Buffer.empty())
 		{
 			// Headers finished and there's still data left in the buffer, process it as message body:
 			HeadersFinished();
-			return ParseBody(m_Buffer.data(), m_Buffer.size());
+			auto res = ParseBody(m_Buffer.data(), m_Buffer.size());
+			if (res == AString::npos)
+			{
+				return AString::npos;
+			}
+			return res + bytesConsumed - inBufferSoFar;
 		}
-		return 0;
+		return a_Size;
 	}  // if (m_StatusLine.empty())
 
 	// If still parsing headers, send them to the envelope parser:
@@ -77,9 +84,9 @@ size_t cHTTPResponseParser::Parse(const char * a_Data, size_t a_Size)
 		{
 			// Headers finished and there's still data left in the buffer, process it as message body:
 			HeadersFinished();
-			return ParseBody(a_Data + bytesConsumed, a_Size - bytesConsumed);
+			return bytesConsumed + ParseBody(a_Data + bytesConsumed, a_Size - bytesConsumed);
 		}
-		return 0;
+		return a_Size;
 	}
 
 	// Already parsing the body
@@ -116,7 +123,8 @@ size_t cHTTPResponseParser::ParseBody(const char * a_Data, size_t a_Size)
 	}
 
 	// Parse the body using the transfer encoding parser:
-	return m_TransferEncodingParser->Parse(a_Data, a_Size);
+	// (Note that TE parser returns the number of bytes left, while we return the number of bytes consumed)
+	return a_Size - m_TransferEncodingParser->Parse(a_Data, a_Size);
 }
 
 

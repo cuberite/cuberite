@@ -25,8 +25,8 @@ public:
 	cHTTPRequestParser(void);
 	
 	/** Parses the request line and then headers from the received data.
-	Returns the number of bytes consumed or AString::npos number for error
-	*/
+	Returns the number of bytes consumed or AString::npos number for error.
+	Once it has fully parsed all the headers, doesn't consume any more data. */
 	size_t ParseHeaders(const char * a_Data, size_t a_Size);
 	
 	/** Returns true if the request did contain a Content-Length header */
