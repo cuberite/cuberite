@@ -33,11 +33,11 @@ bool cCaveSpider::Attack(std::chrono::milliseconds a_Dt)
 	{
 		return false;
 	}
-	
-	if (m_Target->IsPawn())
+
+	if (GetTarget()->IsPawn())
 	{
 		// TODO: Easy = no poison, Medium = 7 seconds, Hard = 15 seconds
-		static_cast<cPawn *>(m_Target)->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
+		static_cast<cPawn *>(GetTarget())->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
 	}
 	return true;
 }

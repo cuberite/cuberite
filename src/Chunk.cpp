@@ -1959,6 +1959,10 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
+		if ((*itr)->IsDestroyed())
+		{
+			continue;
+		}
 		if (a_Callback.Item(*itr))
 		{
 			return false;
@@ -1977,6 +1981,10 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
+		if ((*itr)->IsDestroyed())
+		{
+			continue;
+		}
 		cBoundingBox EntBox((*itr)->GetPosition(), (*itr)->GetWidth() / 2, (*itr)->GetHeight());
 		if (!EntBox.DoesIntersect(a_Box))
 		{
@@ -2000,7 +2008,7 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, b
 	// The entity list is locked by the parent chunkmap's CS
 	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
-		if ((*itr)->GetUniqueID() == a_EntityID)
+		if (((*itr)->GetUniqueID() == a_EntityID) && (!(*itr)->IsDestroyed()))
 		{
 			a_CallbackResult = a_Callback.Item(*itr);
 			return true;

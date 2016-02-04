@@ -26,9 +26,9 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if ((m_Target != nullptr) && (m_Target->IsPlayer()))
+	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
 	{
-		if (!static_cast<cPlayer *>(m_Target)->IsGameModeCreative())
+		if (!static_cast<cPlayer *>(GetTarget())->IsGameModeCreative())
 		{
 			m_EMState = CHASING;
 		}

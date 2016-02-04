@@ -34,7 +34,7 @@ void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 bool cGhast::Attack(std::chrono::milliseconds a_Dt)
 {
-	if ((m_Target != nullptr) && (m_AttackCoolDownTicksLeft == 0))
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
 		// Setting this higher gives us more wiggle room for attackrate
 		Vector3d Speed = GetLookVector() * 20;

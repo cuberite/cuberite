@@ -30,7 +30,7 @@ cWolf::cWolf(void) :
 
 bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	cEntity * PreviousTarget = m_Target;
+	cPawn * PreviousTarget = GetTarget();
 	if (!super::DoTakeDamage(a_TDI))
 	{
 		return false;
@@ -38,14 +38,13 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
-		cPawn * Pawn = static_cast<cPawn*>(m_Target);
-		if (Pawn->IsPlayer())
+		if (GetTarget()->IsPlayer())
 		{
 			if (m_IsTame)
 			{
-				if ((static_cast<cPlayer*>(Pawn)->GetUUID() == m_OwnerUUID))
+				if ((static_cast<cPlayer*>(GetTarget())->GetUUID() == m_OwnerUUID))
 				{
-					m_Target = PreviousTarget;  // Do not attack owner
+					SetTarget(PreviousTarget);  // Do not attack owner
 				}
 				else
 				{
@@ -100,16 +99,16 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 
-	if ((m_Target != nullptr) && (m_Target->IsPlayer()))
+	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
 	{
-		if (static_cast<cPlayer *>(m_Target)->GetUUID() == m_OwnerUUID)
+		if (static_cast<cPlayer *>(GetTarget())->GetUUID() == m_OwnerUUID)
 		{
-			m_Target = nullptr;
+			SetTarget(nullptr);
 			return false;
 		}
 	}
 
-	NotifyAlliesOfFight(static_cast<cPawn*>(m_Target));
+	NotifyAlliesOfFight(static_cast<cPawn*>(GetTarget()));
 	return super::Attack(a_Dt);
 
 }
@@ -129,7 +128,7 @@ void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool 
 	}
 
 	// If we already have a target
-	if (m_Target != nullptr)
+	if (GetTarget() != nullptr)
 	{
 		// If a wolf is asking for help and we already have a target, do nothing
 		if (!a_IsPlayerInvolved)
@@ -159,7 +158,7 @@ void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool 
 		}
 	}
 
-	m_Target = a_Opponent;
+	SetTarget(a_Opponent);
 
 
 }
@@ -264,7 +263,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		super::Tick(a_Dt, a_Chunk);
 	}
 
-	if (m_Target == nullptr)
+	if (GetTarget() == nullptr)
 	{
 		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
 		if (a_Closest_Player != nullptr)
@@ -311,11 +310,11 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (IsSitting())
 		{
-			m_Target = nullptr;
+			SetTarget(nullptr);
 		}
 		else
 		{
-			MoveToPosition(m_Target->GetPosition());
+			MoveToPosition(GetTarget()->GetPosition());
 			if (TargetIsInRange())
 			{
 				Attack(a_Dt);
@@ -359,18 +358,18 @@ void cWolf::TickFollowPlayer()
 		{
 			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
 			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
-			m_Target = nullptr;
+			SetTarget(nullptr);
 		}
 		if (Distance < 2)
 		{
-			if (m_Target == nullptr)
+			if (GetTarget() == nullptr)
 			{
 				StopMovingToPosition();
 			}
 		}
 		else
 		{
-			if (m_Target == nullptr)
+			if (GetTarget() == nullptr)
 			{
 				MoveToPosition(Callback.OwnerPos);
 			}

@@ -2875,6 +2875,10 @@ bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 	for (cPlayerList::iterator itr = m_Players.begin(), itr2 = itr; itr != m_Players.end(); itr = itr2)
 	{
 		++itr2;
+		if ((*itr)->IsDestroyed())
+		{
+			continue;
+		}
 		if (a_Callback.Item(*itr))
 		{
 			return false;
@@ -2893,6 +2897,10 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
+		if ((*itr)->IsDestroyed())
+		{
+			continue;
+		}
 		if (NoCaseCompare((*itr)->GetName(), a_PlayerName) == 0)
 		{
 			a_Callback.Item(*itr);
@@ -2915,6 +2923,10 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
+		if ((*itr)->IsDestroyed())
+		{
+			continue;
+		}
 		size_t Rating = RateCompareString (a_PlayerNameHint, (*itr)->GetName());
 		if (Rating >= BestRating)
 		{
@@ -2943,6 +2955,10 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallbac
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
+		if ((*itr)->IsDestroyed())
+		{
+			continue;
+		}
 		if ((*itr)->GetUUID() == a_PlayerUUID)
 		{
 			return a_Callback.Item(*itr);
@@ -2966,6 +2982,10 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
+		if ((*itr)->IsDestroyed())
+		{
+			continue;
+		}
 		Vector3f Pos = (*itr)->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 

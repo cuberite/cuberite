@@ -74,7 +74,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	: super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
-	, m_Target(nullptr)
 	, m_PathFinder(a_Width, a_Height)
 	, m_PathfinderActivated(false)
 	, m_JumpCoolDown(0)
@@ -101,11 +100,31 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
+	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
 	{
 		GetMonsterConfig(a_ConfigName);
 	}
+}
+
+
+
+
+
+cMonster::~cMonster()
+{
+	ASSERT(GetTarget() == nullptr);
+}
+
+
+
+
+
+void cMonster::Destroyed()
+{
+	SetTarget(nullptr);  // Tell them we're no longer targeting them.
+	super::Destroyed();
 }
 
 
@@ -214,6 +233,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	super::Tick(a_Dt, a_Chunk);
 	GET_AND_VERIFY_CURRENT_CHUNK(Chunk, POSX_TOINT, POSZ_TOINT);
 
+	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == GetWorld())));
 	if (m_AttackCoolDownTicksLeft > 0)
 	{
 		m_AttackCoolDownTicksLeft -= 1;
@@ -234,17 +254,15 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		++m_TicksSinceLastDamaged;
 	}
-	if ((m_Target != nullptr))
+	if ((GetTarget() != nullptr))
 	{
-		if (m_Target->IsDestroyed())
+		ASSERT(!GetTarget()->IsDestroyed());
+
+		if (GetTarget()->IsPlayer())
 		{
-			m_Target = nullptr;
-		}
-		else if (m_Target->IsPlayer())
-		{
-			if (static_cast<cPlayer *>(m_Target)->IsGameModeCreative())
+			if (static_cast<cPlayer *>(GetTarget())->IsGameModeCreative())
 			{
-				m_Target = nullptr;
+				SetTarget(nullptr);
 				m_EMState = IDLE;
 			}
 		}
@@ -343,11 +361,10 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 {
-	/* Todo Buggy */
 	Vector3d BodyDistance;
-	if (!a_IsFollowingPath && (m_Target != nullptr))
+	if (!a_IsFollowingPath && (GetTarget() != nullptr))
 	{
-		BodyDistance = m_Target->GetPosition() - GetPosition();
+		BodyDistance = GetTarget()->GetPosition() - GetPosition();
 	}
 	else
 	{
@@ -359,17 +376,16 @@ void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 	SetYaw(BodyRotation);
 
 	Vector3d HeadDistance;
-	if (m_Target != nullptr)
+	if (GetTarget() != nullptr)
 	{
-		if (m_Target->IsPlayer())  // Look at a player
+		if (GetTarget()->IsPlayer())  // Look at a player
 		{
-			HeadDistance = m_Target->GetPosition() - GetPosition();
-			// HeadDistance.y = static_cast<cPlayer *>(m_Target)->GetStance() - 1;
+			HeadDistance = GetTarget()->GetPosition() - GetPosition();
 		}
 		else  // Look at some other entity
 		{
-			HeadDistance = m_Target->GetPosition() - GetPosition();
-			// HeadDistance.y = m_Target->GetPosY() + GetHeight();
+			HeadDistance = GetTarget()->GetPosition() - GetPosition();
+			// HeadDistance.y = GetTarget()->GetPosY() + GetHeight();
 		}
 	}
 	else  // Look straight
@@ -448,9 +464,9 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 
-	if (a_TDI.Attacker != nullptr)
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
-		m_Target = a_TDI.Attacker;
+		SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
 		m_TicksSinceLastDamaged = 0;
 	}
 	return true;
@@ -577,9 +593,9 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 
 void cMonster::CheckEventLostPlayer(void)
 {
-	if (m_Target != nullptr)
+	if (GetTarget() != nullptr)
 	{
-		if ((m_Target->GetPosition() - GetPosition()).Length() > m_SightDistance)
+		if ((GetTarget()->GetPosition() - GetPosition()).Length() > m_SightDistance)
 		{
 			EventLosePlayer();
 		}
@@ -598,7 +614,9 @@ void cMonster::CheckEventLostPlayer(void)
 // default to change state to chasing
 void cMonster::EventSeePlayer(cEntity * a_SeenPlayer, cChunk & a_Chunk)
 {
-	m_Target = a_SeenPlayer;
+	UNUSED(a_Chunk);
+	ASSERT(a_SeenPlayer->IsPlayer());
+	SetTarget(static_cast<cPawn*>(a_SeenPlayer));
 }
 
 
@@ -607,7 +625,7 @@ void cMonster::EventSeePlayer(cEntity * a_SeenPlayer, cChunk & a_Chunk)
 
 void cMonster::EventLosePlayer(void)
 {
-	m_Target = nullptr;
+	SetTarget(nullptr);
 	m_EMState = IDLE;
 }
 
@@ -678,11 +696,11 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 
-	if (m_Target != nullptr)
+	if (GetTarget() != nullptr)
 	{
 		Vector3d newloc = GetPosition();
-		newloc.x = (m_Target->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
-		newloc.z = (m_Target->GetPosition().z < newloc.z)? (newloc.z + m_SightDistance): (newloc.z - m_SightDistance);
+		newloc.x = (GetTarget()->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
+		newloc.z = (GetTarget()->GetPosition().z < newloc.z)? (newloc.z + m_SightDistance): (newloc.z - m_SightDistance);
 		MoveToPosition(newloc);
 	}
 	else
@@ -884,6 +902,55 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 	}
 	ASSERT(!"Unhandled mob family");
 	return -1;
+}
+
+
+
+
+
+
+/** Sets the target. */
+void cMonster::SetTarget (cPawn * a_NewTarget)
+{
+	ASSERT((a_NewTarget == nullptr) || (!IsDestroyed()));
+	if (m_Target == a_NewTarget)
+	{
+		return;
+	}
+	cPawn * OldTarget = m_Target;
+	m_Target = a_NewTarget;
+
+	if (OldTarget != nullptr)
+	{
+		// Notify the old target that we are no longer targeting it.
+		OldTarget->NoLongerTargetingMe(this);
+	}
+
+	if (a_NewTarget != nullptr)
+	{
+		ASSERT(!a_NewTarget->IsDestroyed());
+		// Notify the new target that we are now targeting it.
+		m_Target->TargetingMe(this);
+	}
+
+}
+
+
+
+
+
+void cMonster::UnsafeUnsetTarget()
+{
+	m_Target = nullptr;
+}
+
+
+
+
+
+cPawn * cMonster::GetTarget ()
+{
+	return m_Target;
 }
 
 

@@ -27,7 +27,7 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if ((m_Target == nullptr) || (!TargetIsInRange() && !m_BurnedWithFlintAndSteel))
+	if ((GetTarget() == nullptr) || (!TargetIsInRange() && !m_BurnedWithFlintAndSteel))
 	{
 		if (m_bIsBlowing)
 		{

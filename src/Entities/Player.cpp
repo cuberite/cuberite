@@ -176,6 +176,7 @@ cPlayer::~cPlayer(void)
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
+	super::Destroyed();
 }
 
 
@@ -1681,7 +1682,6 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	ASSERT(a_World != nullptr);
-
 	if (GetWorld() == a_World)
 	{
 		// Don't move to same world
@@ -1708,6 +1708,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Remove player from world
 	GetWorld()->RemovePlayer(this, false);
+	// Stop all mobs from targeting this player
+
+	StopEveryoneFromTargetingMe();
 
 	// Send the respawn packet:
 	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
@@ -1719,6 +1722,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	SetPosition(a_NewPosition);
+
+	// Stop all mobs from targeting this player
+	StopEveryoneFromTargetingMe();
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	a_World->AddPlayer(this);

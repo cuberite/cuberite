@@ -52,10 +52,10 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
 	StopMovingToPosition();  // Todo handle this in a better way, the skeleton does some uneeded recalcs due to inStateChasing
 	cFastRandom Random;
-	if ((m_Target != nullptr) && (m_AttackCoolDownTicksLeft == 0))
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
 		Vector3d Inaccuracy = Vector3d(Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25);
-		Vector3d Speed = (m_Target->GetPosition() + Inaccuracy - GetPosition()) * 5;
+		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 5;
 		Speed.y = Speed.y - 1 + Random.NextInt(3);
 		cArrowEntity * Arrow = new cArrowEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
 		if (Arrow == nullptr)
