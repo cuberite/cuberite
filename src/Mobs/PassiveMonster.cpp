@@ -157,19 +157,33 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 				virtual bool Item(cEntity * a_Entity) override
 				{
-					// if we're the same species as someone around and they don't have a partner, start mating with them
-					if ((a_Entity->GetEntityType() == m_Me->GetEntityType()) && (a_Entity != m_Me))
+					// If the entity is not a monster, don't breed with it
+					// Also, do not self-breed
+					if ((a_Entity->GetEntityType() != etMonster) || (a_Entity == m_Me))
 					{
-						cPassiveMonster * Me = static_cast<cPassiveMonster*>(m_Me);
-						cPassiveMonster * Partner = static_cast<cPassiveMonster*>(a_Entity);
-						if (Partner->IsInLove() && (Partner->GetPartner() == nullptr))
-						{
-							Partner->EngageLoveMode(Me);
-							Me->EngageLoveMode(Partner);
-							return true;
-						}
+						return false;
 					}
-					return false;
+
+					cPassiveMonster * Me = static_cast<cPassiveMonster*>(m_Me);
+					cPassiveMonster * PotentialPartner = static_cast<cPassiveMonster*>(a_Entity);
+
+					// If the potential partner is not of the same species, don't breed with it
+					if (PotentialPartner->GetMobType() != Me->GetMobType())
+					{
+						return false;
+					}
+
+					// If the potential partner is not in love
+					// Or they already have a mate, do not breed with them
+					if ((!PotentialPartner->IsInLove()) || (PotentialPartner->GetPartner() != nullptr))
+					{
+						return false;
+					}
+
+					// All conditions met, let's breed!
+					PotentialPartner->EngageLoveMode(Me);
+					Me->EngageLoveMode(PotentialPartner);
+					return true;
 				}
 			} Callback(this);
 
