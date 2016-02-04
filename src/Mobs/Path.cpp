@@ -508,9 +508,9 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 		a_Cell.m_IsSpecial = true;
 		a_Cell.m_IsSolid = true;  // Specials are solids only from a certain direction. But their m_IsSolid is always true
 	}
-	else if ((a_Cell.m_BlockType == E_BLOCK_AIR) && IsBlockFence(GetCell(Location + Vector3i(0, -1, 0))->m_BlockType))
+	else if ((!cBlockInfo::IsSolid(a_Cell.m_BlockType)) && IsBlockFence(GetCell(Location + Vector3i(0, -1, 0))->m_BlockType))
 	{
-		// Air blocks with fences below them are consider Special Solids. That is, they sometimes behave as solids.
+		// Nonsolid blocks with fences below them are consider Special Solids. That is, they sometimes behave as solids.
 		a_Cell.m_IsSpecial = true;
 		a_Cell.m_IsSolid = true;
 	}
@@ -631,25 +631,29 @@ bool cPath::SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,
 	}
 
 
-
-	switch (a_Type)
+	// If there is a nonsolid above a fence
+	if (!cBlockInfo::IsSolid(a_Type))
 	{
-		// Air is special only when above a fence
-		case E_BLOCK_AIR:
-		{
-			// Treat the air block as solid if the mob is going upward and trying to climb a fence
+			// If we're coming from below
 			if (a_Direction.y > 0)
 			{
-				return true;
+				return true;  // treat the nonsolid as solid
 			}
 			else
 			{
-				return false;
+				return false;  // Treat it as a nonsolid because we are not coming from below
 			}
+	}
+
+	/* switch (a_Type)
+	{
+		case E_BLOCK_ETC:
+		{
+			Decide if solid from this direction and return either true or false.
 		}
 
 		// TODO Fill this with the other specials after physics is fixed
-	}
+	} */
 
 
 
