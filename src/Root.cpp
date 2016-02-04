@@ -358,7 +358,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 	// Fix servers that have default world configs created prior to #2815. See #2810.
 	// This can probably be removed several years after 2016
 	// We start by inspecting the world linkage and determining if it's the default one
-	if (DefaultWorldName == "world")
+	if ((DefaultWorldName == "world") && (Worlds.size() == 1))
 	{
 		auto DefaultWorldIniFile= cpp14::make_unique<cIniFile>();
 		if (DefaultWorldIniFile->ReadFile("world/world.ini"))
