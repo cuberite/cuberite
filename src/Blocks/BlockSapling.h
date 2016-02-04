@@ -92,7 +92,18 @@ public:
 				}
 				break;
 			}
-			// Dark Oaks only grow in a 2x2 area
+			// Acacias don't need horizontal clearance
+			case E_META_SAPLING_ACACIA:
+			{
+				if (!IsLargeTree(a_Chunk, a_RelX, a_RelY, a_RelZ, a_Meta))
+				{
+					return false;
+				}
+				CheckHeight = 7;
+				LargeTree = true;
+				break;
+			}
+			// Dark Oaks don't need horizontal clearance
 			case E_META_SAPLING_DARK_OAK:
 			{
 				if (!IsLargeTree(a_Chunk, a_RelX, a_RelY, a_RelZ, a_Meta))
