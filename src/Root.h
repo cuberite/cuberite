@@ -57,6 +57,9 @@ public:
 
 	void Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo);
 
+	/** Stops the server, as if "/stop" was typed in the console. */
+	void StopServer();
+
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
 	cWorld *  GetDefaultWorld(void);
@@ -65,6 +68,7 @@ public:
 	If no world of that name was currently loaded and a_SearchForFolder was true, it will consult cFile::IsFolder() to see if a world folder of that name exists and if so, initialise a world based on that name
 	*/
 	cWorld * GetWorld(const AString & a_WorldName, bool a_SearchForFolder = false);
+
 
 	/** Returns a pointer to a world of specified name - will search loaded worlds first, then create anew if not found
 	The dimension parameter is used to create a world with a specific dimension
