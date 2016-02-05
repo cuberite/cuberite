@@ -36,26 +36,26 @@ private:
 	bool m_IsCaseInsensitive;
 
 	AString m_Filename;
-	
+
 	struct key
 	{
 		std::vector<AString> names;
 		std::vector<AString> values;
 		std::vector<AString> comments;
 	} ;
-	
+
 	std::vector<key>     keys;
 	std::vector<AString> names;
 	std::vector<AString> comments;
-	
+
 	/** If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is */
 	AString CheckCase(const AString & s) const;
 
 	/** Removes the UTF-8 BOMs (Byte order makers), if present. */
 	void RemoveBom(AString & a_line) const;
-	
+
 public:
-	
+
 	/** Creates a new instance with no data */
 	cIniFile(void);
 
@@ -86,7 +86,7 @@ public:
 
 	/** Deletes all stored ini data (but doesn't touch the file) */
 	void Clear(void);
-	
+
 	/** Returns true iff the specified value exists. */
 	bool HasValue(const AString & a_KeyName, const AString & a_ValueName) const override;
 
@@ -124,7 +124,7 @@ public:
 	{
 		return (GetValueI(keyname, valuename, defValue ? 1 : 0) != 0);
 	}
-	
+
 	// Gets the value; if not found, write the default to the INI file
 	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "") override;
 	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);
@@ -144,7 +144,7 @@ public:
 		return AddValueI(a_KeyName, a_ValueName, a_Value ? 1 : 0);
 	}
 	void AddValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value);
-	
+
 	// Overwrites the value of [keyname].valuename
 	// Specify the optional parameter as false (0) if you do not want the value created if it doesn't exist.
 	// Returns true if value set, false otherwise.
@@ -158,7 +158,7 @@ public:
 		return SetValueI(a_KeyName, a_ValueName, int(a_Value), a_CreateIfNotExists);
 	}
 	bool SetValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value, const bool a_CreateIfNotExists = true);
-	
+
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.
 	bool DeleteValueByID(const int keyID, const int valueID);
@@ -173,16 +173,16 @@ public:
 
 	/** Returns the number of header comments */
 	int GetNumHeaderComments(void) {return static_cast<int>(comments.size());}
-	
+
 	/** Adds a header comment */
 	void AddHeaderComment(const AString & comment);
-	
+
 	/** Returns a header comment, or empty string if out of range */
 	AString GetHeaderComment(const int commentID) const;
-	
+
 	/** Deletes a header comment. Returns true if successful */
 	bool DeleteHeaderComment(int commentID);
-	
+
 	/** Deletes all header comments */
 	void DeleteHeaderComments(void) {comments.clear();}
 
@@ -198,21 +198,21 @@ public:
 
 	/** Get number of key comments */
 	int GetNumKeyComments(const AString & keyname) const;
-	
+
 	/** Add a key comment */
 	bool AddKeyComment(const int keyID, const AString & comment);
 
 	/** Add a key comment */
 	bool AddKeyComment(const AString & keyname, const AString & comment) override;
-	
+
 	/** Return a key comment */
 	AString GetKeyComment(const int keyID, const int commentID) const;
 	AString GetKeyComment(const AString & keyname, const int commentID) const override;
-	
+
 	// Delete a key comment.
 	bool DeleteKeyComment(const int keyID, const int commentID);
 	bool DeleteKeyComment(const AString & keyname, const int commentID) override;
-	
+
 	// Delete all comments for a key.
 	bool DeleteKeyComments(const int keyID);
 	bool DeleteKeyComments(const AString & keyname);
