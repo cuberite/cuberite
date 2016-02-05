@@ -14,7 +14,7 @@ class cPathFinder
 public:
 	/** Creates a cPathFinder instance. Each mob should have one cPathFinder throughout its lifetime.
 	@param a_MobWidth The mob width.
-	@param a_MobWidth The mob height.
+	@param a_MobHeight The mob height.
 	*/
 	cPathFinder(double a_MobWidth, double a_MobHeight);
 
