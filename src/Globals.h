@@ -222,7 +222,7 @@ template class SizeChecker<UInt8,  1>;
 	#include <unistd.h>
 #endif
 
-#if defined(ANDROID_NDK)
+#if defined(ANDROID)
 	#define FILE_IO_PREFIX "/sdcard/Cuberite/"
 #else
 	#define FILE_IO_PREFIX ""

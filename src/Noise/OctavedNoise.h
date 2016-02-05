@@ -61,7 +61,7 @@ public:
 		std::unique_ptr<NOISE_DATATYPE[]> workspaceHeap;
 		if (a_Workspace == nullptr)
 		{
-			workspaceHeap.reset(new NOISE_DATATYPE[a_SizeX * a_SizeY]);
+			workspaceHeap.reset(new NOISE_DATATYPE[static_cast<size_t>(a_SizeX * a_SizeY)]);
 			a_Workspace = workspaceHeap.get();
 		}
 
@@ -121,7 +121,7 @@ public:
 		std::unique_ptr<NOISE_DATATYPE[]> workspaceHeap;
 		if (a_Workspace == nullptr)
 		{
-			workspaceHeap.reset(new NOISE_DATATYPE[a_SizeX * a_SizeY * a_SizeZ]);
+			workspaceHeap.reset(new NOISE_DATATYPE[static_cast<size_t>(a_SizeX * a_SizeY * a_SizeZ)]);
 			a_Workspace = workspaceHeap.get();
 		}
 

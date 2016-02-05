@@ -350,7 +350,7 @@ cVillageGen::cVillageGen(
 	for (const auto & toLoad: a_PrefabsToLoad)
 	{
 		auto prefabs = std::make_shared<cVillagePiecePool>();
-		auto fileName = Printf("Prefabs%sVillages%s%s.cubeset", cFile::GetPathSeparator().c_str(), cFile::GetPathSeparator().c_str(), toLoad.c_str());
+		auto fileName = Printf("%sPrefabs%sVillages%s%s.cubeset", FILE_IO_PREFIX, cFile::GetPathSeparator().c_str(), cFile::GetPathSeparator().c_str(), toLoad.c_str());
 		if (prefabs->LoadFromFile(fileName, true))
 		{
 			if (NoCaseCompare(prefabs->GetIntendedUse(), "village") != 0)

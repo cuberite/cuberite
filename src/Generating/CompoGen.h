@@ -115,7 +115,7 @@ class cCompoGenCache :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
+	cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, size_t a_CacheSize);  // Doesn't take ownership of a_Underlying
 	~cCompoGenCache();
 	
 	// cTerrainCompositionGen override:
@@ -136,8 +136,8 @@ protected:
 	} ;
 	
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
-	int          m_CacheSize;
-	int *        m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	size_t       m_CacheSize;
+	size_t *     m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
 	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
 	
 	// Cache statistics

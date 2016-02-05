@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 
-#if defined(ANDROID_NDK)
+#if defined(ANDROID)
 #include <ctype.h>
 #endif
 
