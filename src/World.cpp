@@ -3583,7 +3583,7 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 			PlayerName = (*itr)->GetCustomName();
 		}
 
-		AString::size_type Found = PlayerName.find(LastWord);  // Try to find last word in playername
+		AString::size_type Found = StrToLower(PlayerName).find(StrToLower(LastWord));  // Try to find last word in playername
 		if (Found == AString::npos)
 		{
 			continue;  // No match
