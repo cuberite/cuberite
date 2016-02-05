@@ -218,6 +218,7 @@ public:
 
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
+	[[deprecated("Use SetSpeed instead.")]]
 	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
 
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
