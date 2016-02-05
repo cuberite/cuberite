@@ -31,20 +31,20 @@ public:
 	// tolua_end
 
 	BLOCKENTITY_PROTODEF(cNoteEntity)
-	
+
 	/** Creates a new note entity. a_World may be nullptr */
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cNoteEntity() {}
 
 	// tolua_begin
-	
+
 	char GetPitch(void);
 	void SetPitch(char a_Pitch);
 	void IncrementPitch(void);
 	void MakeSound(void);
-	
+
 	// tolua_end
-	
+
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
 

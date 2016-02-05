@@ -41,7 +41,7 @@ public:
 		// The "foot" block:
 		NIBBLETYPE BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player.GetYaw());
 		a_BlocksToPlace.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BED, BlockMeta);
-		
+
 		// Check if there is empty space for the "head" block:
 		// (Vanilla only allows beds to be placed into air)
 		Vector3i Direction = cBlockBedHandler::MetaDataToDirection(BlockMeta);

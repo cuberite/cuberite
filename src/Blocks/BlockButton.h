@@ -15,11 +15,11 @@ public:
 		: cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>(a_BlockType)
 	{
 	}
-	
+
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		
+
 		double x(a_BlockX);
 		double y(a_BlockY);
 		double z(a_BlockZ);
@@ -53,7 +53,7 @@ public:
 
 		return true;
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0
@@ -64,7 +64,7 @@ public:
 	{
 		return true;
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,

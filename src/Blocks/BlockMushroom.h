@@ -30,9 +30,9 @@ public:
 		{
 			return false;
 		}
-		
+
 		// TODO: Cannot be at too much daylight
-		
+
 		switch (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))
 		{
 			case E_BLOCK_GLASS:

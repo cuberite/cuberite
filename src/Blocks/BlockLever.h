@@ -10,13 +10,13 @@ class cBlockLeverHandler :
 	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
 {
 	typedef cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false> super;
-	
+
 public:
 	cBlockLeverHandler(BLOCKTYPE a_BlockType) :
 		super(a_BlockType)
 	{
 	}
-	
+
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		// Flip the ON bit on / off using the XOR bitwise operation
@@ -38,7 +38,7 @@ public:
 	{
 		return true;
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -93,7 +93,7 @@ public:
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		
+
 		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);

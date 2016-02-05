@@ -43,7 +43,7 @@ public:
 		}
 		return false;
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to zero

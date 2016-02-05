@@ -61,7 +61,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 		LOG("Could not open the furnace recipes file \"%s\". No furnace recipes are available.", FURNACE_RECIPE_FILE);
 		return;
 	}
-	
+
 	unsigned int LineNum = 0;
 	AString ParsingLine;
 
@@ -207,7 +207,7 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 bool cFurnaceRecipe::ParseItem(const AString & a_String, cItem & a_Item)
 {
 	AString ItemString = a_String;
-	
+
 	const AStringVector & SplitAmount = StringSplit(ItemString, ",");
 	ItemString = SplitAmount[0];
 

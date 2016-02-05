@@ -20,7 +20,7 @@ class cVaporizeFluidSimulator :
 	public cFluidSimulator
 {
 	typedef cFluidSimulator super;
-	
+
 public:
 	cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 

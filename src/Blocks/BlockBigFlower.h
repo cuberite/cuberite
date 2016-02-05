@@ -34,12 +34,12 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
-		
+
 		if ((Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) || (Meta == E_META_BIG_FLOWER_LARGE_FERN))
 		{
 			return;
 		}
-		
+
 		a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, Meta));
 	}
 
@@ -50,7 +50,7 @@ public:
 		{
 			Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
 		}
-		
+
 		NIBBLETYPE FlowerMeta = Meta & 0x7;
 		if (!a_Player->IsGameModeCreative())
 		{

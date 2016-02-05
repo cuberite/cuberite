@@ -20,7 +20,7 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_BlockMeta == E_META_DIRT_COARSE)
@@ -33,7 +33,7 @@ public:
 			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
 		}
 	}
-	
+
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		if (m_BlockType != E_BLOCK_GRASS)
@@ -50,21 +50,21 @@ public:
 		else if ((a_RelY < cChunkDef::Height - 1))
 		{
 			BLOCKTYPE above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
-			
+
 			// Grass turns back to dirt when the block above is not transparent
 			if (!cBlockInfo::IsTransparent(above))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
 			}
-			
+
 			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ)));
 			// Source block is not bright enough to spread
 			if (light < 9)
 			{
 				return;
 			}
-			
+
 		}
 
 		// Grass spreads to adjacent dirt blocks:
@@ -74,7 +74,7 @@ public:
 			int OfsX = rand.NextInt(3) - 1;  // [-1 .. 1]
 			int OfsY = rand.NextInt(5) - 3;  // [-3 .. 1]
 			int OfsZ = rand.NextInt(3) - 1;  // [-1 .. 1]
-	
+
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
 			if (!cChunkDef::IsValidHeight(a_RelY + OfsY))

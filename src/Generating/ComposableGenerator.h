@@ -48,10 +48,10 @@ class cBiomeGen
 {
 public:
 	virtual ~cBiomeGen() {}  // Force a virtual destructor in descendants
-	
+
 	/** Generates biomes for the given chunk */
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) = 0;
-	
+
 	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) {}
 
@@ -79,13 +79,13 @@ class cTerrainShapeGen
 {
 public:
 	virtual ~cTerrainShapeGen() {}  // Force a virtual destructor in descendants
-	
+
 	/** Generates the shape for the given chunk */
 	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) = 0;
-	
+
 	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) {}
-	
+
 	/** Creates the correct TerrainShapeGen descendant based on the ini file settings and the seed provided.
 	a_BiomeGen is the underlying biome generator, some shape generators may depend on it providing additional biomes data around the chunk
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default
@@ -142,14 +142,14 @@ class cTerrainCompositionGen
 {
 public:
 	virtual ~cTerrainCompositionGen() {}  // Force a virtual destructor in descendants
-	
+
 	/** Generates the chunk's composition into a_ChunkDesc, using the terrain shape provided in a_Shape.
 	Is expected to fill a_ChunkDesc's heightmap with the data from a_Shape. */
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) = 0;
-	
+
 	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) {}
-	
+
 	/** Creates the correct TerrainCompositionGen descendant based on the ini file settings and the seed provided.
 	a_BiomeGen is the underlying biome generator, some composition generators may depend on it providing additional biomes around the chunk
 	a_ShapeGen is the underlying shape generator, some composition generators may depend on it providing additional shape around the chunk
@@ -172,7 +172,7 @@ class cFinishGen
 {
 public:
 	virtual ~cFinishGen() {}  // Force a virtual destructor in descendants
-	
+
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
@@ -186,10 +186,10 @@ class cComposableGenerator :
 	public cChunkGenerator::cGenerator
 {
 	typedef cChunkGenerator::cGenerator super;
-	
+
 public:
 	cComposableGenerator(cChunkGenerator & a_ChunkGenerator);
-	
+
 	// cChunkGenerator::cGenerator overrides:
 	virtual void Initialize(cIniFile & a_IniFile) override;
 	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
@@ -211,17 +211,17 @@ protected:
 
 	/** The finisher generators, in the order in which they are applied. */
 	cFinishGenList m_FinishGens;
-	
-	
+
+
 	/** Reads the BiomeGen settings from the ini and initializes m_BiomeGen accordingly */
 	void InitBiomeGen(cIniFile & a_IniFile);
-	
+
 	/** Reads the ShapeGen settings from the ini and initializes m_ShapeGen accordingly */
 	void InitShapeGen(cIniFile & a_IniFile);
-	
+
 	/** Reads the CompositionGen settings from the ini and initializes m_CompositionGen accordingly */
 	void InitCompositionGen(cIniFile & a_IniFile);
-	
+
 	/** Reads the finishers from the ini and initializes m_FinishGens accordingly */
 	void InitFinishGens(cIniFile & a_IniFile);
 } ;

@@ -180,7 +180,7 @@ void cWebAdmin::Stop(void)
 	{
 		return;
 	}
-	
+
 	LOGD("Stopping WebAdmin...");
 	m_HTTPServer.Stop();
 	m_IsRunning = false;
@@ -575,12 +575,12 @@ AString cWebAdmin::GetURLEncodedString(const AString & a_Input)
 {
 	// Translation table from nibble to hex:
 	static const char Hex[] = "0123456789abcdef";
-	
+
 	// Preallocate the output to match input:
 	AString dst;
 	size_t len = a_Input.length();
 	dst.reserve(len);
-	
+
 	// Loop over input and substitute whatever is needed:
 	for (size_t i = 0; i < len; i++)
 	{

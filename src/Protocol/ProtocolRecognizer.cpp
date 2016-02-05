@@ -66,7 +66,7 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 			m_Client->Kick("Unsupported protocol version");
 			return;
 		}
-		
+
 		if (!TryRecognizeProtocol())
 		{
 			return;

@@ -49,7 +49,7 @@ void cSslHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 			Data += BytesWritten;
 			Size -= BytesWritten;
 		}
-		
+
 		// Try to read as many bytes from SSL's decryption as possible:
 		char Buffer[32000];
 		int NumRead = m_Ssl.ReadPlain(Buffer, sizeof(Buffer));
@@ -64,7 +64,7 @@ void cSslHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 			// SSL requires us to send data to peer first, do so by "sending" empty data:
 			SendData(nullptr, 0);
 		}
-		
+
 		// If both failed, bail out:
 		if ((BytesWritten == 0) && (NumRead <= 0))
 		{
@@ -93,7 +93,7 @@ void cSslHTTPConnection::SendData(const void * a_Data, size_t a_Size)
 				pos += static_cast<size_t>(NumWritten);
 			}
 		}
-		
+
 		// Read as many bytes from SSL's "outgoing" buffer as possible:
 		char Buffer[32000];
 		size_t NumBytes = m_Ssl.ReadOutgoing(Buffer, sizeof(Buffer));
@@ -101,7 +101,7 @@ void cSslHTTPConnection::SendData(const void * a_Data, size_t a_Size)
 		{
 			m_Link->Send(Buffer, NumBytes);
 		}
-		
+
 		// If both failed, bail out:
 		if ((NumWritten <= 0) && (NumBytes == 0))
 		{

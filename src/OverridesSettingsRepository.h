@@ -20,7 +20,7 @@ public:
 	virtual int AddKeyName(const AString & keyname) override;
 
 	virtual bool AddKeyComment(const AString & keyname, const AString & comment) override;
-	
+
 	virtual AString GetKeyComment(const AString & keyname, const int commentID) const override;
 
 	virtual bool DeleteKeyComment(const AString & keyname, const int commentID) override;

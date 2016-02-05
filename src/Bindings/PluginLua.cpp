@@ -105,13 +105,13 @@ bool cPluginLua::Load(void)
 	{
 		m_LuaState.Create();
 		m_LuaState.RegisterAPILibs();
-		
+
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);
 		lua_setglobal(m_LuaState, LUA_PLUGIN_INSTANCE_VAR_NAME);
 		lua_pushstring(m_LuaState, GetName().c_str());
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
-		
+
 		// Add the plugin's folder to the package.path and package.cpath variables (#693):
 		m_LuaState.AddPackagePath("path", FILE_IO_PREFIX + GetLocalFolder() + "/?.lua");
 		#ifdef _WIN32
@@ -119,7 +119,7 @@ bool cPluginLua::Load(void)
 		#else
 			m_LuaState.AddPackagePath("cpath", FILE_IO_PREFIX + GetLocalFolder() + "/?.so");
 		#endif
-		
+
 		tolua_pushusertype(m_LuaState, this, "cPluginLua");
 		lua_setglobal(m_LuaState, "g_Plugin");
 	}
@@ -145,7 +145,7 @@ bool cPluginLua::Load(void)
 		}
 	}
 	std::sort(LuaFiles.begin(), LuaFiles.end());
-	
+
 	// Warn if there are no Lua files in the plugin folder:
 	if (LuaFiles.empty())
 	{
@@ -1879,7 +1879,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 		LOGWARNING("Command handler is registered in cPluginManager but not in cPlugin, wtf? Command \"%s\".", a_Split[0].c_str());
 		return false;
 	}
-	
+
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	m_LuaState.Call(cmd->second, a_Split, &a_Player, a_FullCommand, cLuaState::Return, res);
@@ -1901,7 +1901,7 @@ bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOut
 		);
 		return false;
 	}
-	
+
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	AString str;
@@ -1967,13 +1967,13 @@ bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 		m_LuaState.LogStackTrace();
 		return false;
 	}
-	
+
 	// Check if the function is available
 	if (m_LuaState.HasFunction(FnName))
 	{
 		return true;
 	}
-	
+
 	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.",
 		GetName().c_str(), a_HookType, FnName
 	);
@@ -2042,7 +2042,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_WEATHER_CHANGED:              return "OnWeatherChanged";
 		case cPluginManager::HOOK_WEATHER_CHANGING:             return "OnWeatherChanging";
 		case cPluginManager::HOOK_WORLD_TICK:                   return "OnWorldTick";
-		
+
 		case cPluginManager::HOOK_NUM_HOOKS:
 		{
 			// Satisfy a warning that all enum values should be used in a switch
@@ -2062,7 +2062,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 {
 	ASSERT(m_CriticalSection.IsLockedByCurrentThread());  // It probably has to be, how else would we have a LuaState?
-	
+
 	// Check if the function reference is valid:
 	cLuaState::cRef * Ref = new cLuaState::cRef(m_LuaState, a_FnRefIdx);
 	if ((Ref == nullptr) || !Ref->IsValid())
@@ -2073,7 +2073,7 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 		Ref = nullptr;
 		return false;
 	}
-	
+
 	m_HookMap[a_HookType].push_back(Ref);
 	return true;
 }
@@ -2090,7 +2090,7 @@ int cPluginLua::CallFunctionFromForeignState(
 )
 {
 	cCSLock Lock(m_CriticalSection);
-	
+
 	// Call the function:
 	int NumReturns = m_LuaState.CallFunctionWithForeignParams(a_FunctionName, a_ForeignState, a_ParamStart, a_ParamEnd);
 	if (NumReturns < 0)
@@ -2098,17 +2098,17 @@ int cPluginLua::CallFunctionFromForeignState(
 		// The call has failed, an error has already been output to the log, so just silently bail out with the same error
 		return NumReturns;
 	}
-	
+
 	// Copy all the return values:
 	int Top = lua_gettop(m_LuaState);
 	int res = a_ForeignState.CopyStackFrom(m_LuaState, Top - NumReturns + 1, Top);
-	
+
 	// Remove the return values off this stack:
 	if (NumReturns > 0)
 	{
 		lua_pop(m_LuaState, NumReturns);
 	}
-	
+
 	return res;
 }
 
@@ -2204,7 +2204,7 @@ void cPluginLua::Unreference(int a_LuaRef)
 bool cPluginLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse)
 {
 	ASSERT(a_FnRef != LUA_REFNIL);
-	
+
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	m_LuaState.Call(a_FnRef, &a_Window, &a_Player, a_CanRefuse, cLuaState::Return, res);
@@ -2218,7 +2218,7 @@ bool cPluginLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer 
 void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum)
 {
 	ASSERT(a_FnRef != LUA_REFNIL);
-	
+
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Call(a_FnRef, &a_Window, a_SlotNum);
 }

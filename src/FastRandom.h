@@ -33,10 +33,10 @@ class cFastRandom
 public:
 
 	cFastRandom(void);
-	
+
 	/** Returns a random int in the range [0 .. a_Range - 1]; a_Range must be less than 1M */
 	int NextInt(int a_Range);
-	
+
 	/** Returns a random float in the range [0 .. a_Range]; a_Range must be less than 1M */
 	float NextFloat(float a_Range);
 

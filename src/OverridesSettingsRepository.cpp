@@ -54,14 +54,14 @@ bool cOverridesSettingsRepository::AddKeyComment(const AString & a_keyname, cons
 
 	return m_Main->AddKeyComment(a_keyname, a_comment);
 }
-	
+
 
 
 
 
 AString cOverridesSettingsRepository::GetKeyComment(const AString & a_keyname, const int a_commentID) const
 {
-	
+
 	if (m_Overrides->KeyExists(a_keyname))
 	{
 		return m_Overrides->GetKeyComment(a_keyname, a_commentID);

@@ -22,7 +22,7 @@ public:
 		cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -34,7 +34,7 @@ public:
 		a_BlockMeta = a_Player->GetEquippedItem().m_ItemDamage & 0x0f;
 		return true;
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_CARPET, 1, a_BlockMeta));

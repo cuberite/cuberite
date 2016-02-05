@@ -160,13 +160,13 @@ void cItemGrid::EmptySlot(int a_SlotNum)
 		);
 		return;
 	}
-	
+
 	// Check if already empty:
 	if (m_Slots[a_SlotNum].IsEmpty())
 	{
 		return;
 	}
-	
+
 	// Empty and notify
 	m_Slots[a_SlotNum].Empty();
 	TriggerListeners(a_SlotNum);
@@ -296,12 +296,12 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 			return a_ItemStack.m_ItemCount;
 		}
 	}  // for i - m_Slots[]
-	
+
 	if (!a_AllowNewStacks)
 	{
 		return (a_ItemStack.m_ItemCount - NumLeft);
 	}
-	
+
 	for (int i = 0; i < m_NumSlots; i++)
 	{
 		if (m_Slots[i].IsEmpty())
@@ -393,7 +393,7 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 		// The item is empty, it's not gonna change
 		return 0;
 	}
-	
+
 	if (m_Slots[a_SlotNum].m_ItemCount <= -a_AddToCount)
 	{
 		// Trying to remove more items than there already are, make the item empty
@@ -401,7 +401,7 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 		TriggerListeners(a_SlotNum);
 		return 0;
 	}
-	
+
 	m_Slots[a_SlotNum].m_ItemCount += a_AddToCount;
 
 	cItemHandler * Handler = cItemHandler::GetItemHandler(m_Slots[a_SlotNum].m_ItemType);
@@ -436,27 +436,27 @@ cItem cItemGrid::RemoveOneItem(int a_SlotNum)
 		);
 		return cItem();
 	}
-	
+
 	// If the slot is empty, return an empty item
 	if (m_Slots[a_SlotNum].IsEmpty())
 	{
 		return cItem();
 	}
-	
+
 	// Make a copy of the item in slot, set count to 1 and remove one from the slot
 	cItem res = m_Slots[a_SlotNum];
 	res.m_ItemCount = 1;
 	m_Slots[a_SlotNum].m_ItemCount -= 1;
-	
+
 	// Emptying the slot correctly if appropriate
 	if (m_Slots[a_SlotNum].m_ItemCount == 0)
 	{
 		m_Slots[a_SlotNum].Empty();
 	}
-	
+
 	// Notify everyone of the change
 	TriggerListeners(a_SlotNum);
-	
+
 	// Return the stored one item
 	return res;
 }
@@ -629,7 +629,7 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 	{
 		TotalProbab += a_LootProbabs[i].m_Weight;
 	}
-	
+
 	// Pick the loot items:
 	cNoise Noise(a_Seed);
 	for (int i = 0; i < a_NumSlots; i++)
@@ -643,7 +643,7 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 		cWeightedEnchantments Enchantments;
 		cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7);
 		int NumEnchantments = Noise.IntNoise3DInt(TotalProbab, Rnd, a_Seed) % 5;  // The number of enchantments this book wil get.
-		
+
 		for (int j = 0; j <= NumEnchantments; j++)
 		{
 			cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, Noise.IntNoise2DInt(NumEnchantments, i));

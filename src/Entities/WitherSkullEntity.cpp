@@ -39,10 +39,10 @@ void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_H
 {
 	// TODO: If entity is Ender Crystal, destroy it
 	a_EntityHit.TakeDamage(dtRangedAttack, this, 0, 1);
-	
+
 	// TODO: Explode
 	// TODO: Apply wither effect to entity and others nearby
-	
+
 	Destroy(true);
 }
 

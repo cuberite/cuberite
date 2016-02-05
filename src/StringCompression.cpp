@@ -13,7 +13,7 @@
 int CompressString(const char * a_Data, size_t a_Length, AString & a_Compressed, int a_Factor)
 {
 	uLongf CompressedSize = compressBound(static_cast<uLong>(a_Length));
-	
+
 	// HACK: We're assuming that AString returns its internal buffer in its data() call and we're overwriting that buffer!
 	// It saves us one allocation and one memcpy of the entire compressed data
 	// It may not work on some STL implementations! (Confirmed working on MSVC 2008 & 2010)
@@ -64,14 +64,14 @@ int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compres
 	strm.avail_in = static_cast<uInt>(a_Length);
 	strm.next_out = reinterpret_cast<Bytef *>(Buffer);
 	strm.avail_out = sizeof(Buffer);
-	
+
 	int res = deflateInit2(&strm, 9, Z_DEFLATED, 31, 9, Z_DEFAULT_STRATEGY);
 	if (res != Z_OK)
 	{
 		LOG("%s: compression initialization failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
 		return res;
 	}
-	
+
 	for (;;)
 	{
 		res = deflate(&strm, Z_FINISH);
@@ -91,7 +91,7 @@ int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compres
 				}
 				break;
 			}
-			
+
 			case Z_STREAM_END:
 			{
 				// Finished compressing. Consume the rest of the buffer and return
@@ -99,7 +99,7 @@ int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compres
 				deflateEnd(&strm);
 				return Z_OK;
 			}
-			
+
 			default:
 			{
 				// An error has occurred, log it and return the error value
@@ -128,14 +128,14 @@ extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & 
 	strm.avail_in = static_cast<uInt>(a_Length);
 	strm.next_out = reinterpret_cast<Bytef *>(Buffer);
 	strm.avail_out = sizeof(Buffer);
-	
+
 	int res = inflateInit2(&strm, 31);  // Force GZIP decoding
 	if (res != Z_OK)
 	{
 		LOG("%s: uncompression initialization failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
 		return res;
 	}
-	
+
 	for (;;)
 	{
 		res = inflate(&strm, Z_NO_FLUSH);
@@ -155,7 +155,7 @@ extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & 
 				}
 				break;
 			}
-			
+
 			case Z_STREAM_END:
 			{
 				// Finished uncompressing. Consume the rest of the buffer and return
@@ -163,7 +163,7 @@ extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & 
 				inflateEnd(&strm);
 				return Z_OK;
 			}
-			
+
 			default:
 			{
 				// An error has occurred, log it and return the error value
@@ -190,14 +190,14 @@ extern int InflateString(const char * a_Data, size_t a_Length, AString & a_Uncom
 	strm.avail_in = static_cast<uInt>(a_Length);
 	strm.next_out = reinterpret_cast<Bytef *>(Buffer);
 	strm.avail_out = sizeof(Buffer);
-	
+
 	int res = inflateInit(&strm);  // Force GZIP decoding
 	if (res != Z_OK)
 	{
 		LOG("%s: inflation initialization failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
 		return res;
 	}
-	
+
 	for (;;)
 	{
 		res = inflate(&strm, Z_NO_FLUSH);
@@ -217,7 +217,7 @@ extern int InflateString(const char * a_Data, size_t a_Length, AString & a_Uncom
 				}
 				break;
 			}
-			
+
 			case Z_STREAM_END:
 			{
 				// Finished uncompressing. Consume the rest of the buffer and return
@@ -225,7 +225,7 @@ extern int InflateString(const char * a_Data, size_t a_Length, AString & a_Uncom
 				inflateEnd(&strm);
 				return Z_OK;
 			}
-			
+
 			default:
 			{
 				// An error has occurred, log it and return the error value

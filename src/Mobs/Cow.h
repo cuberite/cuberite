@@ -11,7 +11,7 @@ class cCow :
 	public cPassiveMonster
 {
 	typedef cPassiveMonster super;
-	
+
 public:
 	cCow();
 

@@ -87,9 +87,9 @@ int cVoronoiMap::GetValueAt(
 {
 	int CellX = a_X / m_CellSize;
 	int CellY = a_Y / m_CellSize;
-	
+
 	UpdateCell(CellX, CellY);
-	
+
 	// Get 5x5 neighboring cell seeds, compare distance to each. Return the value in the minumim-distance cell
 	int NearestSeedX = 0, NearestSeedY = 0;
 	int MinDist = m_CellSize * m_CellSize * 16;  // There has to be a cell closer than this
@@ -101,7 +101,7 @@ int cVoronoiMap::GetValueAt(
 		{
 			int SeedX = m_SeedX[x][y];
 			int SeedY = m_SeedZ[x][y];
-			
+
 			int Dist = (SeedX - a_X) * (SeedX - a_X) + (SeedY - a_Y) * (SeedY - a_Y);
 			if (Dist < MinDist)
 			{
@@ -187,7 +187,7 @@ void cVoronoiMap::UpdateCell(int a_CellX, int a_CellZ)
 	{
 		return;
 	}
-	
+
 	// Update the cell cache for the new cell position:
 	int NoiseBaseX = a_CellX - 2;
 	int NoiseBaseZ = a_CellZ - 2;

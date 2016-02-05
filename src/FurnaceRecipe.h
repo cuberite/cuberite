@@ -31,13 +31,13 @@ public:
 		cItem * Out;
 		int CookTime;  ///< How long this recipe takes to smelt, in ticks
 	};
-	
+
 	/** Returns a recipe for the specified input, nullptr if no recipe found */
 	const cRecipe * GetRecipeFrom(const cItem & a_Ingredient) const;
 
 	/** Returns true if the item is a fuel, false if not. */
 	bool IsFuel(const cItem & a_Item) const;
-	
+
 	/** Returns the amount of time that the specified fuel burns, in ticks */
 	int GetBurnTime(const cItem & a_Fuel) const;
 

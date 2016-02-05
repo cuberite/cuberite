@@ -31,7 +31,7 @@ public:
 		m_ShapeGen(a_ShapeGen),
 		m_CompositionGen(a_CompositionGen)
 	{}
-	
+
 protected:
 
 	int m_Seed;
@@ -39,7 +39,7 @@ protected:
 	cBiomeGenPtr              m_BiomeGen;
 	cTerrainShapeGenPtr       m_ShapeGen;
 	cTerrainCompositionGenPtr m_CompositionGen;
-	
+
 	/** Generates and applies an image of a single tree.
 	Parts of the tree inside the chunk are applied to a_ChunkDesc.
 	Parts of the tree outside the chunk are stored in a_OutsideXYZ
@@ -50,7 +50,7 @@ protected:
 		sSetBlockVector & a_OutsideLogs,
 		sSetBlockVector & a_OutsideOther
 	) ;
-	
+
 	/** Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow. */
 	void ApplyTreeImage(
 		int a_ChunkX, int a_ChunkZ,
@@ -63,7 +63,7 @@ protected:
 		int a_ChunkX, int a_ChunkZ,
 		const cChunkDef::BiomeMap & a_Biomes
 	);
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
@@ -84,7 +84,7 @@ public:
 		m_Probability(a_Probability)
 	{
 	}
-	
+
 protected:
 	cNoise              m_Noise;
 	int                 m_Seed;
@@ -93,11 +93,11 @@ protected:
 
 	/** Chance, [0 .. 100], of a chunk having the lake. */
 	int m_Probability;
-	
+
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-	
+
 	/** Creates a lake image for the specified chunk into a_Lake. */
 	void CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake);
 } ;
@@ -116,7 +116,7 @@ public:
 protected:
 	cNoise    m_Noise1;
 	cNoise    m_Noise2;
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
@@ -138,7 +138,7 @@ protected:
 	cNoise m_NoiseY;
 	cNoise m_NoiseZ;
 	cNoise m_NoiseH;
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;

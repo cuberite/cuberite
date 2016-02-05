@@ -92,7 +92,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunk
 		E_BLOCK_NETHER_BRICK,
 		E_BLOCK_BEDROCK,
 	} ;
-	
+
 	a_ChunkDesc.SetHeightFromShape(a_Shape);
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 
@@ -153,7 +153,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 	static int PatternLength = ARRAYCOUNT(PatternGround);
 	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternBeach));
 	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternOcean));
-	
+
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -172,19 +172,19 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 			{
 				Pattern = PatternOcean;
 			}
-			
+
 			// Fill water from sealevel down to height (if any):
 			for (int y = m_SeaLevel; y >= Height; --y)
 			{
 				a_ChunkDesc.SetBlockType(x, y, z, m_BlockSea);
 			}
-			
+
 			// Fill from height till the bottom:
 			for (int y = Height; y >= 1; y--)
 			{
 				a_ChunkDesc.SetBlockType(x, y, z, (Height - y < PatternLength) ? Pattern[Height - y] : m_BlockBottom);
 			}
-			
+
 			// The last layer is always bedrock:
 			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
@@ -229,21 +229,21 @@ cCompoGenNether::cCompoGenNether(int a_Seed) :
 void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
-	
+
 	const int SEGMENT_HEIGHT = 8;
 	const int INTERPOL_X = 16;  // Must be a divisor of 16
 	const int INTERPOL_Z = 16;  // Must be a divisor of 16
 	// Interpolate the chunk in 16 * SEGMENT_HEIGHT * 16 "segments", each SEGMENT_HEIGHT blocks high and each linearly interpolated separately.
 	// Have two buffers, one for the lowest floor and one for the highest floor, so that Y-interpolation can be done between them
 	// Then swap the buffers and use the previously-top one as the current-bottom, without recalculating it.
-	
+
 	int FloorBuf1[17 * 17];
 	int FloorBuf2[17 * 17];
 	int * FloorHi = FloorBuf1;
 	int * FloorLo = FloorBuf2;
 	int BaseX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BaseZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
-	
+
 	// Interpolate the lowest floor:
 	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 	{
@@ -259,7 +259,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 		//*/
 	}  // for x, z - FloorLo[]
 	LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorLo);
-	
+
 	// Interpolate segments:
 	for (int Segment = 0; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
 	{
@@ -278,7 +278,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 			//*/
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
-		
+
 		// Interpolate between FloorLo and FloorHi:
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 		{
@@ -294,11 +294,11 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 				}
 			}
 		}
-		
+
 		// Swap the floors:
 		std::swap(FloorLo, FloorHi);
 	}
-	
+
 	// Bedrock at the bottom and at the top:
 	for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 	{
@@ -380,10 +380,10 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		LOGD("CompoGenCache: Avg cache chain length: %.2f", static_cast<float>(m_TotalChain) / m_NumHits);
 	}
 	#endif  // _DEBUG
-	
+
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	
+
 	for (int i = 0; i < m_CacheSize; i++)
 	{
 		if (
@@ -395,28 +395,28 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		}
 		// Found it in the cache
 		int Idx = m_CacheOrder[i];
-		
+
 		// Move to front:
 		for (int j = i; j > 0; j--)
 		{
 			m_CacheOrder[j] = m_CacheOrder[j - 1];
 		}
 		m_CacheOrder[0] = Idx;
-		
+
 		// Use the cached data:
 		memcpy(a_ChunkDesc.GetBlockTypes(),             m_CacheData[Idx].m_BlockTypes, sizeof(a_ChunkDesc.GetBlockTypes()));
 		memcpy(a_ChunkDesc.GetBlockMetasUncompressed(), m_CacheData[Idx].m_BlockMetas, sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
 		memcpy(a_ChunkDesc.GetHeightMap(),              m_CacheData[Idx].m_HeightMap,  sizeof(a_ChunkDesc.GetHeightMap()));
-		
+
 		m_NumHits++;
 		m_TotalChain += i;
 		return;
 	}  // for i - cache
-	
+
 	// Not in the cache:
 	m_NumMisses++;
 	m_Underlying->ComposeTerrain(a_ChunkDesc, a_Shape);
-	
+
 	// Insert it as the first item in the MRU order:
 	int Idx = m_CacheOrder[m_CacheSize - 1];
 	for (int i = m_CacheSize - 1; i > 0; i--)

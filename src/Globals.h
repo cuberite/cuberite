@@ -32,7 +32,7 @@
 	// Disabled because it's useless:
 	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
 	#pragma warning(disable: 4351)  // new behavior: elements of array 'member' will be default initialized
-	
+
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
 	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
 
@@ -41,14 +41,14 @@
 	// No alignment needed in MSVC
 	#define ALIGN_8
 	#define ALIGN_16
-	
+
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
 	#define SIZE_T_FMT "%Iu"
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
 	#define SIZE_T_FMT_HEX "%Ix"
-	
+
 	#define NORETURN      __declspec(noreturn)
 
 	// Use non-standard defines in <cmath>
@@ -71,7 +71,7 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-	
+
 	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 	#if defined(_WIN32)
@@ -92,7 +92,7 @@
 		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
 		#define SIZE_T_FMT_HEX "%zx"
 	#endif
-	
+
 	#define NORETURN      __attribute((__noreturn__))
 
 #else
@@ -418,7 +418,7 @@ template <typename Type> class cItemCallback
 {
 public:
 	virtual ~cItemCallback() {}
-	
+
 	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
 	virtual bool Item(Type * a_Type) = 0;
 } ;

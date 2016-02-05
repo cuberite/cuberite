@@ -10,7 +10,7 @@ class cChicken :
 	public cPassiveMonster
 {
 	typedef cPassiveMonster super;
-	
+
 public:
 	cChicken(void);
 

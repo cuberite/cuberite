@@ -40,7 +40,7 @@ public:
 
 	/** Returns the title of the plugin, as it should be presented in the webadmin's pages tree. */
 	virtual const AString GetWebTitle(void) const = 0;
-	
+
 	/** Sanitizes the input string, replacing spaces with underscores. */
 	static AString SafeString(const AString & a_String);
 

@@ -66,7 +66,7 @@ cSha1Checksum::cSha1Checksum(void) :
 void cSha1Checksum::Update(const Byte * a_Data, size_t a_Length)
 {
 	ASSERT(m_DoesAcceptInput);  // Not Finalize()-d yet, or Restart()-ed
-	
+
 	sha1_update(&m_Sha1, a_Data, a_Length);
 }
 
@@ -77,7 +77,7 @@ void cSha1Checksum::Update(const Byte * a_Data, size_t a_Length)
 void cSha1Checksum::Finalize(cSha1Checksum::Checksum & a_Output)
 {
 	ASSERT(m_DoesAcceptInput);  // Not Finalize()-d yet, or Restart()-ed
-	
+
 	sha1_finish(&m_Sha1, a_Output);
 	m_DoesAcceptInput = false;
 }
@@ -90,7 +90,7 @@ void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 {
 	Checksum Digest;
 	memcpy(Digest, a_Digest, sizeof(Digest));
-	
+
 	bool IsNegative = (Digest[0] >= 0x80);
 	if (IsNegative)
 	{

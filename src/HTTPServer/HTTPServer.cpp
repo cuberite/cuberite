@@ -31,26 +31,26 @@ class cDebugCallbacks :
 		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
 			UNUSED(a_Connection);
-			
+
 			if (cHTTPFormParser::HasFormData(a_Request))
 			{
 				a_Request.SetUserData(new cHTTPFormParser(a_Request, *this));
 			}
 		}
-		
-		
+
+
 		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override
 		{
 			UNUSED(a_Connection);
-			
+
 			cHTTPFormParser * FormParser = reinterpret_cast<cHTTPFormParser *>(a_Request.GetUserData());
 			if (FormParser != nullptr)
 			{
 				FormParser->Parse(a_Data, a_Size);
 			}
 		}
-		
-		
+
+
 		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
 			cHTTPFormParser * FormParser = reinterpret_cast<cHTTPFormParser *>(a_Request.GetUserData());
@@ -69,7 +69,7 @@ class cDebugCallbacks :
 					a_Connection.Send("</table></body></html>");
 					return;
 				}
-				
+
 				// Parsing failed:
 				cHTTPResponse Resp;
 				Resp.SetContentType("text/plain");
@@ -77,7 +77,7 @@ class cDebugCallbacks :
 				a_Connection.Send("Form parsing failed");
 				return;
 			}
-			
+
 			// Test the auth failure and success:
 			if (a_Request.GetURL() == "/auth")
 			{
@@ -87,31 +87,31 @@ class cDebugCallbacks :
 					return;
 				}
 			}
-			
+
 			cHTTPResponse Resp;
 			Resp.SetContentType("text/plain");
 			a_Connection.Send(Resp);
 			a_Connection.Send("Hello, world");
 		}
-		
-		
+
+
 		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) override
 		{
 			// TODO
 		}
-		
-		
+
+
 		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, size_t a_Size) override
 		{
 			// TODO
 		}
-		
+
 
 		virtual void OnFileEnd(cHTTPFormParser & a_Parser) override
 		{
 			// TODO
 		}
-		
+
 };
 
 static cDebugCallbacks g_DebugCallbacks;
@@ -239,7 +239,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 			m_ServerHandles.push_back(Handle);
 		}
 	}  // for port - a_Ports[]
-	
+
 	// Report success if at least one port opened successfully:
 	return !m_ServerHandles.empty();
 }

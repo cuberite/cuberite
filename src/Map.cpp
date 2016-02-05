@@ -291,7 +291,7 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 {
 	int InsideWidth = (GetWidth() / 2) - 1;
 	int InsideHeight = (GetHeight() / 2) - 1;
-	
+
 	// Center of pixel
 	int PixelX = static_cast<int>(a_TrackedEntity->GetPosX() - GetCenterX()) / static_cast<int>(GetPixelWidth());
 	int PixelZ = static_cast<int>(a_TrackedEntity->GetPosZ() - GetCenterZ()) / static_cast<int>(GetPixelWidth());

@@ -55,9 +55,9 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 			a_ClosestPlayer->DeltaExperience(m_Reward);
-			
+
 			m_World->BroadcastSoundEffect("random.orb", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-			
+
 			Destroy();
 		}
 		a_Distance.Normalize();
@@ -68,7 +68,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate();
 	}
 	HandlePhysics(a_Dt, a_Chunk);
-	
+
 	m_Timer += a_Dt;
 	if (m_Timer >= std::chrono::minutes(5))
 	{

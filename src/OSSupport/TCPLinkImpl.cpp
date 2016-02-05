@@ -274,7 +274,7 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 		Self->m_Self.reset();
 		return;
 	}
-	
+
 	// Unknown event, report it:
 	LOGWARNING("cTCPLinkImpl: Unhandled LibEvent event %d (0x%x)", a_What, a_What);
 	ASSERT(!"cTCPLinkImpl: Unhandled LibEvent event");

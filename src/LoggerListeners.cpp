@@ -20,10 +20,10 @@
 		: public cLogger::cListener
 	{
 	protected:
-	
+
 		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) = 0;
 		virtual void SetDefaultLogColour() = 0;
-	
+
 		virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 		{
 			SetLogColour(a_LogLevel);
@@ -48,7 +48,7 @@
 			m_DefaultConsoleAttrib(a_DefaultConsoleAttrib)
 		{
 		}
-		
+
 		#ifdef _DEBUG
 			virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 			{
@@ -92,21 +92,21 @@
 			}
 			SetConsoleTextAttribute(m_Console, Attrib);
 		}
-		
-		
+
+
 		virtual void SetDefaultLogColour() override
 		{
 			SetConsoleTextAttribute(m_Console, m_DefaultConsoleAttrib);
 		}
-		
+
 	private:
-	
+
 		HANDLE m_Console;
 		WORD m_DefaultConsoleAttrib;
 	};
-	
-	
-	
+
+
+
 #elif defined (__linux) && !defined(ANDROID_NDK)
 
 
@@ -145,17 +145,17 @@
 				}
 			}
 		}
-		
-		
+
+
 		virtual void SetDefaultLogColour() override
 		{
 			// Whatever the console default is
 			printf("\x1b[0m");
 		}
 	};
-	
-	
-	
+
+
+
 #elif defined(ANDROID_NDK)
 
 
@@ -193,7 +193,7 @@
 			__android_log_print(AndroidLogLevel, "Cuberite", "%s", a_Message.c_str());
 		}
 	};
-	
+
 #endif
 
 
@@ -273,7 +273,7 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 		{
 			return cpp14::make_unique<cVanillaCPPConsoleListener>();
 		}
-		
+
 	#elif defined (__linux) && !defined(ANDROID_NDK)
 		// TODO: lookup terminal in terminfo
 		if (isatty(fileno(stdout)))
@@ -354,7 +354,7 @@ public:
 			m_File.Flush();
 		}
 	}
-	
+
 private:
 
 	cFile m_File;

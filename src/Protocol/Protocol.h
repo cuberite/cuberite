@@ -59,10 +59,10 @@ public:
 	}
 
 	virtual ~cProtocol() {}
-	
+
 	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
-	
+
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) = 0;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) = 0;
@@ -160,10 +160,10 @@ protected:
 
 	/** Buffer for composing the outgoing packets, through cPacketizer */
 	cByteBuffer m_OutPacketBuffer;
-	
+
 	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
 	cByteBuffer m_OutPacketLenBuffer;
-	
+
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 

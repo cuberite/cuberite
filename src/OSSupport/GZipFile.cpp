@@ -64,13 +64,13 @@ int cGZipFile::ReadRestOfFile(AString & a_Contents)
 		ASSERT(!"No file has been opened");
 		return -1;
 	}
-	
+
 	if (m_Mode != fmRead)
 	{
 		ASSERT(!"Bad file mode, cannot read");
 		return -1;
 	}
-	
+
 	// Since the gzip format doesn't really support getting the uncompressed length, we need to read incrementally. Yuck!
 	int NumBytesRead = 0;
 	int TotalBytes = 0;

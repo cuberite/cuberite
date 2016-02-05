@@ -33,7 +33,7 @@ cDeadlockDetect::cDeadlockDetect(void) :
 bool cDeadlockDetect::Start(int a_IntervalSec)
 {
 	m_IntervalSec = a_IntervalSec;
-	
+
 	// Read the initial world data:
 	class cFillIn :
 		public cWorldListCallback
@@ -43,13 +43,13 @@ bool cDeadlockDetect::Start(int a_IntervalSec)
 			m_Detect(a_Detect)
 		{
 		}
-		
+
 		virtual bool Item(cWorld * a_World) override
 		{
 			m_Detect->SetWorldAge(a_World->GetName(), a_World->GetWorldAge());
 			return false;
 		}
-		
+
 	protected:
 		cDeadlockDetect * m_Detect;
 	} FillIn(this);
@@ -75,10 +75,10 @@ void cDeadlockDetect::Execute(void)
 				m_Detect(a_Detect)
 			{
 			}
-			
+
 		protected:
 			cDeadlockDetect * m_Detect;
-			
+
 			virtual bool Item(cWorld * a_World) override
 			{
 				m_Detect->CheckWorldAge(a_World->GetName(), a_World->GetWorldAge());
@@ -86,7 +86,7 @@ void cDeadlockDetect::Execute(void)
 			}
 		} Checker(this);
 		cRoot::Get()->ForEachWorld(Checker);
-		
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(CYCLE_MILLISECONDS));
 	}  // while (should run)
 }

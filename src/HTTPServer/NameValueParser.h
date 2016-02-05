@@ -19,22 +19,22 @@ class cNameValueParser :
 public:
 	/** Creates an empty parser */
 	cNameValueParser(bool a_AllowsKeyOnly = true);
-	
+
 	/** Creates an empty parser, then parses the data given. Doesn't call Finish(), so more data can be parsed later */
 	cNameValueParser(const char * a_Data, size_t a_Size, bool a_AllowsKeyOnly = true);
-	
+
 	/** Parses the data given */
 	void Parse(const char * a_Data, size_t a_Size);
-	
+
 	/** Notifies the parser that no more data will be coming. Returns true if the parser state is valid */
 	bool Finish(void);
-	
+
 	/** Returns true if the data parsed so far was valid */
 	bool IsValid(void) const { return (m_State != psInvalid); }
-	
+
 	/** Returns true if the parser expects no more data */
 	bool IsFinished(void) const { return ((m_State == psInvalid) || (m_State == psFinished)); }
-	
+
 protected:
 	enum eState
 	{
@@ -49,20 +49,20 @@ protected:
 		psInvalid,         ///< The parser has encountered an invalid input; further parsing is skipped
 		psFinished,        ///< The parser has already been instructed to finish and doesn't expect any more data
 	} ;
-	
+
 	/** The current state of the parser */
 	eState m_State;
-	
+
 	/** If true, the parser will accept keys without an equal sign and the value */
 	bool m_AllowsKeyOnly;
-	
+
 	/** Buffer for the current Key */
 	AString m_CurrentKey;
-	
+
 	/** Buffer for the current Value; */
 	AString m_CurrentValue;
-	
-	
+
+
 } ;
 
 

@@ -56,16 +56,16 @@ Structure (all with the tree structure it describes) supports moving in memory (
 struct cFastNBTTag
 {
 public:
-	
+
 	eTagType m_Type;
-	
+
 	// The following members are indices into the data stream. m_DataLength == 0 if no data available
 	// They must not be pointers, because the datastream may be copied into another AString object in the meantime.
 	size_t m_NameStart;
 	size_t m_NameLength;
 	size_t m_DataStart;
 	size_t m_DataLength;
-	
+
 	// The following members are indices into the array returned; -1 if not valid
 	// They must not be pointers, because pointers would not survive std::vector reallocation
 	int m_Parent;
@@ -73,7 +73,7 @@ public:
 	int m_NextSibling;
 	int m_FirstChild;
 	int m_LastChild;
-	
+
 	cFastNBTTag(eTagType a_Type, int a_Parent) :
 		m_Type(a_Type),
 		m_NameStart(0),
@@ -119,24 +119,24 @@ class cParsedNBT
 {
 public:
 	cParsedNBT(const char * a_Data, size_t a_Length);
-	
+
 	bool IsValid(void) const {return m_IsValid; }
-	
+
 	/** Returns the root tag of the hierarchy. */
 	int GetRoot(void) const {return 0; }
 
 	/** Returns the first child of the specified tag, or -1 if none / not applicable. */
 	int GetFirstChild (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; }
-	
+
 	/** Returns the last child of the specified tag, or -1 if none / not applicable. */
 	int GetLastChild  (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_LastChild; }
-	
+
 	/** Returns the next sibling of the specified tag, or -1 if none. */
 	int GetNextSibling(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_NextSibling; }
-	
+
 	/** Returns the previous sibling of the specified tag, or -1 if none. */
 	int GetPrevSibling(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_PrevSibling; }
-	
+
 	/** Returns the length of the tag's data, in bytes.
 	Not valid for Compound or List tags! */
 	size_t GetDataLength (int a_Tag) const
@@ -154,35 +154,35 @@ public:
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound);
 		return m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart;
 	}
-	
+
 	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
 	int FindChildByName(int a_Tag, const AString & a_Name) const
 	{
 		return FindChildByName(a_Tag, a_Name.c_str(), a_Name.length());
 	}
-	
+
 	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
 	int FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLength = 0) const;
 
 	/** Returns the child tag of the specified path (Name1 / Name2 / Name3...), or -1 if no such tag. */
 	int FindTagByPath(int a_Tag, const AString & a_Path) const;
-	
+
 	eTagType GetType(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_Type; }
-	
+
 	/** Returns the children type for a List tag; undefined on other tags. If list empty, returns TAG_End. */
 	eTagType GetChildrenType(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_List);
 		return (m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild < 0) ? TAG_End : m_Tags[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild)].m_Type;
 	}
-	
+
 	/** Returns the value stored in a Byte tag. Not valid for any other tag type. */
 	inline unsigned char GetByte(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Byte);
 		return static_cast<unsigned char>(m_Data[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_DataStart)]);
 	}
-	
+
 	/** Returns the value stored in a Short tag. Not valid for any other tag type. */
 	inline Int16 GetShort(int a_Tag) const
 	{
@@ -208,20 +208,20 @@ public:
 	inline float GetFloat(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Float);
-		
+
 		// Cause a compile-time error if sizeof(float) != 4
 		// If your platform produces a compiler error here, you'll need to add code that manually decodes 32-bit floats
 		char Check1[5 - sizeof(float)];  // Fails if sizeof(float) > 4
 		char Check2[sizeof(float) - 3];  // Fails if sizeof(float) < 4
 		UNUSED_VAR(Check1);
 		UNUSED_VAR(Check2);
-		
+
 		Int32 i = GetBEInt(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
 		float f;
 		memcpy(&f, &i, sizeof(f));
 		return f;
 	}
-	
+
 	/** Returns the value stored in a Double tag. Not valid for any other tag type. */
 	inline double GetDouble(int a_Tag) const
 	{
@@ -235,7 +235,7 @@ public:
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Double);
 		return NetworkToHostDouble8(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
 	}
-	
+
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
 	inline AString GetString(int a_Tag) const
 	{
@@ -244,7 +244,7 @@ public:
 		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_DataLength));
 		return res;
 	}
-	
+
 	/** Returns the tag's name. For tags that are not named, returns an empty string. */
 	inline AString GetName(int a_Tag) const
 	{
@@ -252,7 +252,7 @@ public:
 		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_NameStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_NameLength));
 		return res;
 	}
-	
+
 protected:
 	const char *             m_Data;
 	size_t                   m_Length;
@@ -277,13 +277,13 @@ class cFastNBTWriter
 {
 public:
 	cFastNBTWriter(const AString & a_RootTagName = "");
-	
+
 	void BeginCompound(const AString & a_Name);
 	void EndCompound(void);
-	
+
 	void BeginList(const AString & a_Name, eTagType a_ChildrenType);
 	void EndList(void);
-	
+
 	void AddByte     (const AString & a_Name, unsigned char a_Value);
 	void AddShort    (const AString & a_Name, Int16 a_Value);
 	void AddInt      (const AString & a_Name, Int32 a_Value);
@@ -298,11 +298,11 @@ public:
 	{
 		AddByteArray(a_Name, a_Value.data(), a_Value.size());
 	}
-	
+
 	const AString & GetResult(void) const {return m_Result; }
-	
+
 	void Finish(void);
-	
+
 protected:
 
 	struct sParent
@@ -312,24 +312,24 @@ protected:
 		int m_Count;  // for TAG_List, the element count
 		eTagType m_ItemType;  // for TAG_List, the element type
 	} ;
-	
+
 	static const int MAX_STACK = 50;  // Highly doubtful that an NBT would be constructed this many levels deep
-	
+
 	// These two fields emulate a stack. A raw array is used due to speed issues - no reallocations are allowed.
 	sParent m_Stack[MAX_STACK];
 	int     m_CurrentStack;
-	
+
 	AString m_Result;
-	
+
 	bool IsStackTopCompound(void) const { return (m_Stack[m_CurrentStack].m_Type == TAG_Compound); }
-	
+
 	void WriteString(const char * a_Data, UInt16 a_Length);
-	
+
 	inline void TagCommon(const AString & a_Name, eTagType a_Type)
 	{
 		// If we're directly inside a list, check that the list is of the correct type:
 		ASSERT((m_Stack[m_CurrentStack].m_Type != TAG_List) || (m_Stack[m_CurrentStack].m_ItemType == a_Type));
-		
+
 		if (IsStackTopCompound())
 		{
 			// Compound: add the type and name:

@@ -14,7 +14,7 @@ class cBlockPistonHandler :
 {
 public:
 	cBlockPistonHandler(BLOCKTYPE a_BlockType);
-	
+
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override;
@@ -94,7 +94,7 @@ public:
 	}
 
 private:
-	
+
 	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
 
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
@@ -153,7 +153,7 @@ private:
 		const Vector3i & a_BlockPos, cWorld * a_World, bool a_RequirePushable,
 		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
-	
+
 	/** Moves a list of blocks in a specific direction */
 	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
 		cWorld * a_World, const Vector3i & a_PushDir
@@ -168,10 +168,10 @@ class cBlockPistonHeadHandler :
 	public cBlockHandler
 {
 	typedef cBlockHandler super;
-	
+
 public:
 	cBlockPistonHeadHandler(void);
-	
+
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override

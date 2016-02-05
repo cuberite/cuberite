@@ -28,7 +28,7 @@ public:
 	cMetaRotator(BLOCKTYPE a_BlockType) :
 		Base(a_BlockType)
 	{}
-	
+
 	virtual ~cMetaRotator() {}
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta)  override;

@@ -58,7 +58,7 @@ protected:
 
 		/** The underlying biome generator that defines whether the structure is created or not */
 		cBiomeGenPtr m_BiomeGen;
-	
+
 		/** The underlying height generator, used to position the prefabs crossing chunk borders if they are set to FitGround. */
 		cTerrainHeightGenPtr m_HeightGen;
 

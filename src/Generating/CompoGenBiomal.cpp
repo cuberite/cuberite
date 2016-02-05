@@ -39,7 +39,7 @@ public:
 		{
 			m_Pattern[i] = a_TopBlocks[i];
 		}
-		
+
 		// Fill the rest with stone:
 		static BlockInfo Stone = {E_BLOCK_STONE, 0};
 		for (int i = static_cast<int>(a_Count); i < cChunkDef::Height; i++)
@@ -47,9 +47,9 @@ public:
 			m_Pattern[i] = Stone;
 		}
 	}
-	
+
 	const BlockInfo * Get(void) const { return m_Pattern; }
-	
+
 protected:
 	BlockInfo m_Pattern[cChunkDef::Height];
 } ;
@@ -192,14 +192,14 @@ public:
 	{
 		initMesaPattern(a_Seed);
 	}
-	
+
 protected:
 	/** The block height at which water is generated instead of air. */
 	HEIGHTTYPE m_SeaLevel;
 
 	/** The pattern used for mesa biomes. Initialized by seed on generator creation. */
 	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::Height];
-	
+
 	/** Noise used for selecting between dirt and sand on the ocean floor. */
 	cNoise m_OceanFloorSelect;
 
@@ -226,7 +226,7 @@ protected:
 	{
 		m_SeaLevel = static_cast<HEIGHTTYPE>(a_IniFile.GetValueSetI("Generator", "SeaLevel", m_SeaLevel));
 	}
-	
+
 
 
 	/** Initializes the m_MesaPattern with a pattern based on the generator's seed. */
@@ -309,7 +309,7 @@ protected:
 		// Frequencies for the podzol floor selecting noise:
 		const NOISE_DATATYPE FrequencyX = 8;
 		const NOISE_DATATYPE FrequencyZ = 8;
-	
+
 		EMCSBiome Biome = a_ChunkDesc.GetBiome(a_RelX, a_RelZ);
 		switch (Biome)
 		{
@@ -381,7 +381,7 @@ protected:
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patSand.Get(), a_ShapeColumn);
 				return;
 			}
-		
+
 			case biMushroomIsland:
 			case biMushroomShore:
 			{
@@ -426,7 +426,7 @@ protected:
 			}
 		}  // switch (Biome)
 	}
-	
+
 
 
 	/** Fills the specified column with the specified pattern; restarts the pattern when air is reached,
@@ -445,23 +445,23 @@ protected:
 				PatternIdx++;
 				continue;
 			}
-		
+
 			// "air" or "water" part:
 			// Reset the pattern index to zero, so that the pattern is repeated from the top again:
 			PatternIdx = 0;
-		
+
 			if (y >= m_SeaLevel)
 			{
 				// "air" part, do nothing
 				continue;
 			}
-		
+
 			a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
 			if (HasHadWater)
 			{
 				continue;
 			}
-		
+
 			// Select the ocean-floor pattern to use:
 			if (a_ChunkDesc.GetBiome(a_RelX, a_RelZ) == biDeepOcean)
 			{
@@ -500,7 +500,7 @@ protected:
 		{
 			ClayFloor = Top - 1;
 		}
-	
+
 		if (Top - m_SeaLevel < 5)
 		{
 			// Simple case: top is red sand, then hardened clay down to ClayFloor, then stone:
@@ -516,7 +516,7 @@ protected:
 			a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
 			return;
 		}
-	
+
 		// Difficult case: use the mesa pattern and watch for overhangs:
 		int PatternIdx = cChunkDef::Height - (Top - ClayFloor);  // We want the block at index ClayFloor to be pattern's 256th block (first stone)
 		const cPattern::BlockInfo * Pattern = m_MesaPattern;
@@ -536,7 +536,7 @@ protected:
 				// "air" part, do nothing
 				continue;
 			}
-		
+
 			// "water" part, fill with water and choose new pattern for ocean floor, if not chosen already:
 			PatternIdx = 0;
 			a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
@@ -544,7 +544,7 @@ protected:
 			{
 				continue;
 			}
-		
+
 			// Select the ocean-floor pattern to use:
 			Pattern = ChooseOceanFloorPattern(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), a_RelX, a_RelZ);
 			HasHadWater = true;
@@ -567,7 +567,7 @@ protected:
 	}
 
 
-	
+
 	/** Returns the pattern to use for an ocean floor in the specified column.
 	The returned pattern is guaranteed to be 256 blocks long. */
 	const cPattern::BlockInfo * ChooseOceanFloorPattern(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ)

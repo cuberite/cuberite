@@ -129,7 +129,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate();
 		return;
 	}
-	
+
 	int RelPosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelPosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
@@ -199,7 +199,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_bIsOnDetectorRail = true;
 		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 	}
-	
+
 	// Broadcast positioning changes to client
 	BroadcastMovementUpdate();
 }
@@ -214,7 +214,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 	NOTE: Please bear in mind that taking away from negatives make them even more negative,
 	adding to negatives make them positive, etc.
 	*/
-	
+
 	switch (a_RailMeta)
 	{
 		case E_META_RAIL_ZM_ZP:  // NORTHSOUTH
@@ -230,7 +230,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 			{
 				return;
 			}
-			
+
 			if (GetSpeedZ() != NO_SPEED)  // Don't do anything if cart is stationary
 			{
 				if (GetSpeedZ() > 0)
@@ -440,7 +440,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			{
 				return;
 			}
-			
+
 			if (GetSpeedZ() != NO_SPEED)
 			{
 				if (GetSpeedZ() > NO_SPEED)
@@ -1022,7 +1022,7 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 	if (GetHealth() <= 0)
 	{
 		Destroy();
-		
+
 		cItems Drops;
 		switch (m_Payload)
 		{
@@ -1052,7 +1052,7 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 				break;
 			}
 		}
-		
+
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 	return true;
@@ -1100,17 +1100,17 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 			a_Player.Detach();
 			return;
 		}
-		
+
 		if (m_Attachee->IsPlayer())
 		{
 			// Another player is already sitting in here, cannot attach
 			return;
 		}
-		
+
 		// Detach whatever is sitting in this minecart now:
 		m_Attachee->Detach();
 	}
-	
+
 	// Attach the player to this minecart
 	a_Player.AttachTo(this);
 }

@@ -25,7 +25,7 @@ void cZombiePigman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	}
 	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_ROTTEN_FLESH);
 	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_GOLD_NUGGET);
-	
+
 	cItems RareDrops;
 	RareDrops.Add(cItem(E_ITEM_GOLD));
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);

@@ -15,23 +15,23 @@ public:
 	{
 		public:
 			virtual ~cStarvationCallbacks() {}
-			
+
 			/** Is called when the reserve buffer starts to be used */
 			virtual void OnStartUsingReserve() = 0;
-			
+
 			/** Is called once the reserve buffer has returned to normal size */
 			virtual void OnEndUsingReserve() = 0;
-			
+
 			/** Is called when the allocation pool is unable to allocate memory. Will be repeatedly
 			called if it does not free sufficient memory */
 			virtual void OnOutOfReserve() = 0;
 	};
-	
+
 	virtual ~cAllocationPool() {}
-	
+
 	/** Allocates a pointer to T */
 	virtual T * Allocate() = 0;
-	
+
 	/** Frees the pointer passed in a_ptr, invalidating it */
 	virtual void Free(T * a_ptr) = 0;
 };
@@ -47,7 +47,7 @@ class cListAllocationPool:
 	public cAllocationPool<T>
 {
 public:
-		
+
 	cListAllocationPool(std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> a_Callbacks):
 		m_Callbacks(std::move(a_Callbacks))
 	{
@@ -62,7 +62,7 @@ public:
 			m_FreeList.push_front(space);
 		}
 	}
-		
+
 
 	virtual ~cListAllocationPool()
 	{
@@ -72,7 +72,7 @@ public:
 			m_FreeList.pop_front();
 		}
 	}
-		
+
 
 	virtual T * Allocate() override
 	{
@@ -115,7 +115,7 @@ public:
 			m_Callbacks->OnEndUsingReserve();
 		}
 	}
-		
+
 private:
 	std::list<void *> m_FreeList;
 	std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> m_Callbacks;

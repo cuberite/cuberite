@@ -65,7 +65,7 @@ void cNBTChunkSerializer::Finish(void)
 	{
 		m_Writer.EndList();
 	}
-	
+
 	// If light not valid, reset it to all zeroes:
 	if (!m_IsLightValid)
 	{
@@ -100,7 +100,7 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 	{
 		m_Writer.AddByte ("Slot", static_cast<unsigned char>(a_Slot));
 	}
-	
+
 	// Write the tag compound (for enchantment, firework, custom name and repair cost):
 	if (
 		(!a_Item.m_Enchantments.IsEmpty()) ||
@@ -142,7 +142,7 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 			}
 		m_Writer.EndCompound();
 	}
-	
+
 	m_Writer.EndCompound();
 }
 
@@ -457,7 +457,7 @@ void cNBTChunkSerializer::AddFallingBlockEntity(cFallingBlock * a_FallingBlock)
 void cNBTChunkSerializer::AddMinecartEntity(cMinecart * a_Minecart)
 {
 	m_Writer.BeginCompound("");
-	
+
 		switch (a_Minecart->GetPayload())
 		{
 			case cMinecart::mpChest:
@@ -490,7 +490,7 @@ void cNBTChunkSerializer::AddMinecartEntity(cMinecart * a_Minecart)
 				break;
 			}
 		}  // switch (Payload)
-	
+
 	m_Writer.EndCompound();
 }
 
@@ -717,7 +717,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
 		m_Writer.AddByte("inGround", a_Projectile->IsInGround() ? 1 : 0);
-		
+
 		switch (a_Projectile->GetProjectileKind())
 		{
 			case cProjectileEntity::pkArrow:
@@ -734,7 +734,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			case cProjectileEntity::pkSplashPotion:
 			{
 				cSplashPotionEntity * Potion = reinterpret_cast<cSplashPotionEntity *>(a_Projectile);
-				
+
 				m_Writer.AddInt("EffectType",                static_cast<Int16>(Potion->GetEntityEffectType()));
 				m_Writer.AddInt("EffectDuration",            static_cast<Int16>(Potion->GetEntityEffect().GetDuration()));
 				m_Writer.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
@@ -920,7 +920,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 	}
 	m_IsTagOpen = true;
 	m_HasHadEntity = true;
-	
+
 	switch (a_Entity->GetEntityType())
 	{
 		case cEntity::etBoat:         AddBoatEntity        (reinterpret_cast<cBoat *>            (a_Entity)); break;

@@ -6,7 +6,7 @@ class cPawn;
 class cEntityEffect
 {
 public:
-	
+
 	/** All types of entity effects (numbers correspond to protocol / storage types) */
 	enum eType
 	{
@@ -35,46 +35,46 @@ public:
 		effAbsorption     = 22,
 		effSaturation     = 23,
 	} ;
-	
+
 	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
 	static int GetPotionColor(short a_ItemDamage);
-	
-	
+
+
 	/** Translates the potion's damage value into the entity effect that the potion gives */
 	static cEntityEffect::eType GetPotionEffectType(short a_ItemDamage);
-	
-	
+
+
 	/** Retrieves the intensity level from the potion's damage value. Returns 0 for level I potions, 1 for level II potions. */
 	static short GetPotionEffectIntensity(short a_ItemDamage);
-	
-	
+
+
 	/** Returns the effect duration, in ticks, based on the potion's damage value */
 	static int GetPotionEffectDuration(short a_ItemDamage);
-	
+
 	/** Returns true if the potion with the given damage is drinkable */
 	static bool IsPotionDrinkable(short a_ItemDamage);
-	
+
 	// tolua_end
-	
+
 	/** Creates an empty entity effect */
 	cEntityEffect(void);
-	
+
 	/** Creates an entity effect of the specified type
 	@param a_Duration         How long this effect will last, in ticks
 	@param a_Intensity        How strong the effect will be applied
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
 	cEntityEffect(int a_Duration, short a_Intensity, double a_DistanceModifier = 1);
-	
+
 	/** Creates an entity effect by copying another
 	@param a_OtherEffect      The other effect to copy */
 	cEntityEffect(const cEntityEffect & a_OtherEffect);
-	
+
 	/** Creates an entity effect by copying another
 	@param a_OtherEffect      The other effect to copy */
 	cEntityEffect & operator =(cEntityEffect a_OtherEffect);
-	
+
 	virtual ~cEntityEffect(void) {}
-	
+
 	/** Creates a pointer to the proper entity effect from the effect type
 	@warning This function creates raw pointers that must be manually managed.
 	@param a_EffectType       The effect type to create the effect from
@@ -82,44 +82,44 @@ public:
 	@param a_Intensity        How strong the effect will be applied
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
 	static cEntityEffect * CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier);
-	
+
 	/** Returns how many ticks this effect has been active for */
 	int GetTicks(void) const { return m_Ticks; }
-	
+
 	/** Returns the duration of the effect */
 	int GetDuration(void) const { return m_Duration; }
-	
+
 	/** Returns how strong the effect will be applied */
 	short GetIntensity(void) const { return m_Intensity; }
-	
+
 	/** Returns the distance modifier for affecting potency */
 	double GetDistanceModifier(void) const { return m_DistanceModifier; }
-	
+
 	void SetTicks(int a_Ticks)                          { m_Ticks            = a_Ticks;            }
 	void SetDuration(int a_Duration)                    { m_Duration         = a_Duration;         }
 	void SetIntensity(short a_Intensity)                { m_Intensity        = a_Intensity;        }
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
-	
+
 	/** Called on each tick.
 	By default increases the m_Ticks, descendants may override to provide additional processing. */
 	virtual void OnTick(cPawn & a_Target);
-	
+
 	/** Called when the effect is first added to an entity */
 	virtual void OnActivate(cPawn & a_Target) { }
-	
+
 	/** Called when the effect is removed from an entity */
 	virtual void OnDeactivate(cPawn & a_Target) { }
-	
+
 protected:
 	/** How many ticks this effect has been active for */
 	int m_Ticks;
-	
+
 	/** How long this effect will last, in ticks */
 	int m_Duration;
-	
+
 	/** How strong the effect will be applied */
 	short m_Intensity;
-	
+
 	/** The distance modifier for affecting potency */
 	double m_DistanceModifier;
 };  // tolua_export
@@ -220,7 +220,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	virtual void OnActivate(cPawn & a_Target) override;
 };
 
@@ -237,7 +237,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	virtual void OnActivate(cPawn & a_Target) override;
 };
 
@@ -284,7 +284,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	virtual void OnTick(cPawn & a_Target) override;
 };
 
@@ -391,7 +391,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	// cEntityEffect overrides:
 	virtual void OnTick(cPawn & a_Target) override;
 };
@@ -409,7 +409,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	// cEntityEffect overrides:
 	virtual void OnTick(cPawn & a_Target) override;
 };
@@ -427,7 +427,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	// cEntityEffect overrides:
 	virtual void OnTick(cPawn & a_Target) override;
 };
@@ -445,7 +445,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	// cEntityEffect overrides:
 	virtual void OnTick(cPawn & a_Target) override;
 };
@@ -493,7 +493,7 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
-	
+
 	virtual void OnTick(cPawn & a_Target) override;
 };
 

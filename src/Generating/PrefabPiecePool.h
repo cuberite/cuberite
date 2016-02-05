@@ -30,7 +30,7 @@ class cPrefabPiecePool :
 public:
 	/** Creates an empty instance. Prefabs can be added by calling AddPieceDefs() and AddStartingPieceDefs(). */
 	cPrefabPiecePool(void);
-	
+
 	/** Creates a piece pool with prefabs from the specified definitions.
 	If both a_PieceDefs and a_StartingPieceDefs are given, only the a_StartingPieceDefs are used as starting
 	pieces for the pool, and they do not participate in the generation any further.
@@ -44,22 +44,22 @@ public:
 		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs,
 		int a_DefaultStartingPieceHeight = -1
 	);
-	
+
 	/** Creates a pool and loads the contents of the specified file into it.
 	If a_LogWarnings is true, logs a warning to console when loading fails. */
 	cPrefabPiecePool(const AString & a_FileName, bool a_LogWarnings);
 
 	/** Destroys the pool, freeing all pieces. */
 	~cPrefabPiecePool();
-	
+
 	/** Removes and frees all pieces from this pool. */
 	void Clear(void);
-	
+
 	/** Adds pieces from the specified definitions into m_AllPieces. Also adds the pieces into
 	the m_PiecesByConnector map.
 	May be called multiple times with different PieceDefs, will add all such pieces. */
 	void AddPieceDefs(const cPrefab::sDef * a_PieceDefs, size_t a_NumPieceDefs);
-	
+
 	/** Adds pieces from the specified definitions into m_StartingPieces. Doesn't add them to
 	the m_PiecesByConnector map.
 	May be called multiple times with different PieceDefs, will add all such pieces.
@@ -70,7 +70,7 @@ public:
 		size_t a_NumStartingPieceDefs,
 		int a_DefaultPieceHeight = -1
 	);
-	
+
 	/** Loads the pieces from the specified file. Returns true if successful, false on error.
 	If a_LogWarnings is true, logs a warning to console when loading fails. */
 	bool LoadFromFile(const AString & a_FileName, bool a_LogWarnings);
@@ -132,11 +132,11 @@ protected:
 	/** All the pieces that are allowed for building.
 	This is the list that's used for memory allocation and deallocation for the pieces. */
 	cPieces m_AllPieces;
-	
+
 	/** The pieces that are used as starting pieces.
 	This list is not shared and the pieces need deallocation. */
 	cPieces m_StartingPieces;
-	
+
 	/** The map that has all pieces by their connector types
 	The pieces are copies out of m_AllPieces and shouldn't be ever delete-d. */
 	cPiecesMap m_PiecesByConnector;
@@ -158,7 +158,7 @@ protected:
 
 	/** The block type used for the village roads if the road is on water. */
 	BLOCKTYPE m_VillageWaterRoadBlockType;
-	
+
 	/** The block meta used for the village roads if the road is on water. */
 	NIBBLETYPE m_VillageWaterRoadBlockMeta;
 
@@ -196,7 +196,7 @@ protected:
 		const AString & a_PieceName,
 		bool a_LogWarnings
 	);
-	
+
 	/** Reads a single piece's connectors from the cubeset file parsed into the specified Lua state.
 	The piece's definition table is expected to be at the top of the Lua stack.
 	Returns true on success, false on failure.

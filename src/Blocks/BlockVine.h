@@ -14,7 +14,7 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -117,18 +117,18 @@ public:
 		}
 		return res;
 	}
-	
+
 	void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
 		NIBBLETYPE CurMeta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelX, a_RelY, a_RelZ);
-		
+
 		// Check if vine above us, add its meta to MaxMeta
 		if ((a_RelY < cChunkDef::Height - 1) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == m_BlockType))
 		{
 			MaxMeta |= a_Chunk.GetMeta(a_RelX, a_RelY + 1, a_RelZ);
 		}
-		
+
 		NIBBLETYPE Common = CurMeta & MaxMeta;  // Neighbors that we have and are legal
 		if (Common != CurMeta)
 		{

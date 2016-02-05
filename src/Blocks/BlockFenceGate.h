@@ -68,7 +68,7 @@ public:
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
 		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
-		
+
 		a_Yaw += 360 + 45;
 		if (a_Yaw > 360)
 		{

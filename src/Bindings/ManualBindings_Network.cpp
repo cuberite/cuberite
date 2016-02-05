@@ -37,7 +37,7 @@ static int tolua_cNetwork_Connect(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the plugin instance:
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
@@ -90,7 +90,7 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the plugin instance:
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
@@ -142,7 +142,7 @@ static int tolua_cNetwork_EnumLocalIPAddresses(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Push the enumerated addresses:
 	S.Push(cNetwork::EnumLocalIPAddresses());
 	return 1;
@@ -168,7 +168,7 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the plugin instance:
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
@@ -209,7 +209,7 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the plugin instance:
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
@@ -250,7 +250,7 @@ static int tolua_cNetwork_Listen(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the plugin instance:
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
@@ -320,7 +320,7 @@ static int tolua_cServerHandle_Close(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the server handle:
 	cLuaServerHandle * Srv;
 	if (lua_isnil(L, 1))
@@ -354,7 +354,7 @@ static int tolua_cServerHandle_IsListening(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the server handle:
 	cLuaServerHandle * Srv;
 	if (lua_isnil(L, 1))
@@ -391,7 +391,7 @@ static int tolua_cTCPLink_Close(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -425,7 +425,7 @@ static int tolua_cTCPLink_GetLocalIP(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -459,7 +459,7 @@ static int tolua_cTCPLink_GetLocalPort(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -493,7 +493,7 @@ static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -527,7 +527,7 @@ static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -562,7 +562,7 @@ static int tolua_cTCPLink_Send(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -600,7 +600,7 @@ static int tolua_cTCPLink_Shutdown(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -671,7 +671,7 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	cLuaTCPLink * Link;
 	if (lua_isnil(L, 1))
@@ -732,7 +732,7 @@ static int tolua_cUDPEndpoint_Close(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the endpoint:
 	if (lua_isnil(L, 1))
 	{
@@ -765,7 +765,7 @@ static int tolua_cUDPEndpoint_EnableBroadcasts(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the endpoint:
 	if (lua_isnil(L, 1))
 	{
@@ -798,7 +798,7 @@ static int tolua_cUDPEndpoint_GetPort(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the endpoint:
 	if (lua_isnil(L, 1))
 	{
@@ -831,7 +831,7 @@ static int tolua_cUDPEndpoint_IsOpen(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the endpoint:
 	if (lua_isnil(L, 1))
 	{
@@ -866,7 +866,7 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 	{
 		return 0;
 	}
-	
+
 	// Get the link:
 	if (lua_isnil(L, 1))
 	{
@@ -913,7 +913,7 @@ void cManualBindings::BindNetwork(lua_State * tolua_S)
 	tolua_cclass(tolua_S, "cServerHandle", "cServerHandle", "", tolua_collect_cServerHandle);
 	tolua_cclass(tolua_S, "cTCPLink",      "cTCPLink",      "", nullptr);
 	tolua_cclass(tolua_S, "cUDPEndpoint",  "cUDPEndpoint",  "", tolua_collect_cUDPEndpoint);
-	
+
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cNetwork");
 		tolua_function(tolua_S, "Connect",              tolua_cNetwork_Connect);

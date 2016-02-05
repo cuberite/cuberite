@@ -186,7 +186,7 @@ void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	
+
 	// Change the number of attempts to create a vein depending on the maximum height of the chunk. A standard Nether could have 5 veins at most.
 	int NumGlowStone = m_Noise.IntNoise2DInt(ChunkX, ChunkZ) % a_ChunkDesc.GetMaxHeight() / 23;
 
@@ -198,7 +198,7 @@ void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)
 		// Generate X / Z coordinates.
 		int X = Size + (m_Noise.IntNoise2DInt(i, Size) % (cChunkDef::Width - Size * 2));
 		int Z = Size + (m_Noise.IntNoise2DInt(X, i)    % (cChunkDef::Width - Size * 2));
-		
+
 		int Height = a_ChunkDesc.GetHeight(X, Z);
 		for (int y = Height; y > Size; y--)
 		{
@@ -234,14 +234,14 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 {
 	// The starting point of every glowstone string
 	Vector3i StartPoint = Vector3i(a_RelX, a_RelY, a_RelZ);
-	
+
 	// Array with possible directions for a string of glowstone to go to.
 	const Vector3i AvailableDirections[] =
 	{
 		{ -1,  0,  0 }, { 1, 0, 0 },
 		{  0, -1,  0 },  // Don't let the glowstone go up
 		{  0,  0, -1 }, { 0, 0, 1 },
-		
+
 		// Diagonal direction. Only X or Z with Y.
 		// If all were changed the glowstone string looks awkward
 		{ 0, -1,  1 }, {  1, -1, 0 },

@@ -26,7 +26,7 @@ class cRabbit :
 	public cPassiveMonster
 {
 	typedef cPassiveMonster super;
-	
+
 public:
 	cRabbit();
 	cRabbit(eRabbitType Type, int MoreCarrotTicks = 0);

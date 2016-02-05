@@ -40,7 +40,7 @@ public:
 			// Clicked in air
 			return false;
 		}
-	
+
 		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 		{
 			// The clicked block is outside the world, ignore this call altogether (#128)
@@ -62,13 +62,13 @@ public:
 		else
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			
+
 			if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 			{
 				// The block is being placed outside the world, ignore this packet altogether (#128)
 				return false;
 			}
-			
+
 			NIBBLETYPE PlaceMeta;
 			BLOCKTYPE PlaceBlock;
 			a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);

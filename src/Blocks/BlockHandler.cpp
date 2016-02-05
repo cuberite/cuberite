@@ -136,7 +136,7 @@ public:
 					// CW rotation of a CCW rotation should produce no change in the meta
 					printf("Handler for blocktype %d (%s) fails CW(CCW) rotation test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
 				}
-				
+
 				// Test the mirroring:
 				TestMeta = Handler->MetaMirrorXY(Handler->MetaMirrorXY(Meta));
 				if (TestMeta != Meta)
@@ -156,7 +156,7 @@ public:
 					// Double-mirroring should produce the same meta:
 					printf("Handler for blocktype %d (%s) fails YZ mirror test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
 				}
-				
+
 				// Test mirror-rotating:
 				TestMeta = Handler->MetaRotateCW(Handler->MetaRotateCW(Handler->MetaMirrorXY(Handler->MetaMirrorYZ(Meta))));
 				if (TestMeta != Meta)
@@ -331,7 +331,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_WOOL:                  return new cBlockClothHandler           (a_BlockType);
 		case E_BLOCK_WORKBENCH:             return new cBlockWorkbenchHandler       (a_BlockType);
 		case E_BLOCK_YELLOW_FLOWER:         return new cBlockFlowerHandler          (a_BlockType);
-			
+
 		default: return new cBlockHandler(a_BlockType);
 	}
 }
@@ -512,7 +512,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 	// Allow plugins to modify the pickups:
 	a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
-	
+
 	if (!Pickups.empty())
 	{
 		MTRand r1;
@@ -600,7 +600,7 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterf
 			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 			DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
 		}
-		
+
 		a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 	}
 	else

@@ -17,21 +17,21 @@ protected:
 	const cChunkDef::BlockNibbles & m_BlockLight;
 	const cChunkDef::BlockNibbles & m_BlockSkyLight;
 	const unsigned char * m_BiomeData;
-	
+
 	typedef std::map<int, AString> Serializations;
-	
+
 	Serializations m_Serializations;
-	
+
 	void Serialize39(AString & a_Data);  // Release 1.3.1 to 1.7.10
 	void Serialize47(AString & a_Data, int a_ChunkX, int a_ChunkZ);  // Release 1.8
-	
+
 public:
 	enum
 	{
 		RELEASE_1_3_2 = 39,
 		RELEASE_1_8_0 = 47,
 	} ;
-	
+
 	cChunkDataSerializer(
 		const cChunkDef::BlockTypes   & a_BlockTypes,
 		const cChunkDef::BlockNibbles & a_BlockMetas,

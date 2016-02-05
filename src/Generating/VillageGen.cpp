@@ -67,14 +67,14 @@ public:
 			RoadPiece->AddConnector(0,       0, 1, BLOCK_FACE_XM, -2);
 			RoadPiece->AddConnector(len - 1, 0, 1, BLOCK_FACE_XP, -2);
 			RoadPiece->SetDefaultWeight(100);
-			
+
 			// Add the road connectors:
 			for (int x = 1; x < len; x += 12)
 			{
 				RoadPiece->AddConnector(x, 0, 0, BLOCK_FACE_ZM, 2);
 				RoadPiece->AddConnector(x, 0, 2, BLOCK_FACE_ZP, 2);
 			}
-			
+
 			// Add the buildings connectors:
 			for (int x = 7; x < len; x += 12)
 			{
@@ -87,8 +87,8 @@ public:
 			m_PiecesByConnector[2].push_back(RoadPiece);
 		}  // for len - roads of varying length
 	}
-	
-	
+
+
 	// cPrefabPiecePool overrides:
 	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override
 	{
@@ -97,7 +97,7 @@ public:
 		{
 			return 0;
 		}
-		
+
 		return static_cast<const cPrefab &>(a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 	}
 };
@@ -111,7 +111,7 @@ class cVillageGen::cVillage :
 	protected cPiecePool
 {
 	typedef cGridStructGen::cStructure super;
-	
+
 public:
 	cVillage(
 		int a_Seed,
@@ -140,38 +140,38 @@ public:
 			return;
 		}
 	}
-	
+
 	~cVillage()
 	{
 		cPieceGenerator::FreePieces(m_Pieces);
 	}
-	
+
 protected:
 	/** Seed for the random functions */
 	int m_Seed;
-	
+
 	/** The noise used as a pseudo-random generator */
 	cNoise m_Noise;
-	
+
 	/** Maximum size, in X / Z blocks, of the village (radius from the origin) */
 	int m_MaxSize;
-	
+
 	/** The density for this village. Used to refrain from populating all house connectors. Range [0, 100] */
 	int m_Density;
-	
+
 	/** Borders of the village - no item may reach out of this cuboid. */
 	cCuboid m_Borders;
-	
+
 	/** Prefabs to use for buildings */
 	cVillagePiecePool & m_Prefabs;
-	
+
 	/** The underlying height generator, used for placing the structures on top of the terrain. */
 	cTerrainHeightGenPtr m_HeightGen;
-	
+
 	/** The village pieces, placed by the generator. */
 	cPlacedPieces m_Pieces;
-	
-	
+
+
 	// cGridStructGen::cStructure overrides:
 	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override
 	{
@@ -213,8 +213,8 @@ protected:
 		int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
 		a_Piece.MoveToGroundBy(TerrainHeight - FirstConnector.m_Pos.y + 1);
 	}
-	
-	
+
+
 	/** Draws the road into the chunk.
 	The heightmap is not queried from the heightgen, but is given via parameter, so that it may be queried just
 	once for all roads in a chunk. */
@@ -245,21 +245,21 @@ protected:
 			}
 		}
 	}
-	
-	
+
+
 	// cPiecePool overrides:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override
 	{
 		return m_Prefabs.GetPiecesWithConnector(a_ConnectorType);
 	}
-	
-	
+
+
 	virtual cPieces GetStartingPieces(void) override
 	{
 		return m_Prefabs.GetStartingPieces();
 	}
-	
-	
+
+
 	virtual int GetPieceWeight(
 		const cPlacedPiece & a_PlacedPiece,
 		const cPiece::cConnector & a_ExistingConnector,
@@ -276,30 +276,30 @@ protected:
 				return 0;
 			}
 		}
-		
+
 		// Density check passed, relay to m_Prefabs:
 		return m_Prefabs.GetPieceWeight(a_PlacedPiece, a_ExistingConnector, a_NewPiece);
 	}
-	
-	
+
+
 	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override
 	{
 		return m_Prefabs.GetStartingPieceWeight(a_NewPiece);
 	}
-	
-	
+
+
 	virtual void PiecePlaced(const cPiece & a_Piece) override
 	{
 		m_Prefabs.PiecePlaced(a_Piece);
 	}
-	
-	
+
+
 	virtual void Reset(void) override
 	{
 		m_Prefabs.Reset();
 	}
-	
-	
+
+
 	void MoveAllDescendants(cPlacedPieces & a_PlacedPieces, size_t a_Pivot, int a_HeightDifference)
 	{
 		size_t num = a_PlacedPieces.size();
@@ -416,7 +416,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	{
 		Density = pool->GetMinDensity();
 	}
-	
+
 	// Create a village based on the chosen prefabs:
 	return cStructurePtr(new cVillage(m_Seed, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, Density, *pool.get(), m_HeightGen));
 }

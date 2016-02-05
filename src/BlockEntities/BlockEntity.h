@@ -53,21 +53,21 @@ protected:
 
 public:
 	// tolua_end
-	
+
 	virtual ~cBlockEntity() {}  // force a virtual destructor in all descendants
-	
+
 	virtual void Destroy(void) {}
-	
+
 	void SetWorld(cWorld * a_World)
 	{
 		m_World = a_World;
 	}
-	
+
 	/** Creates a new block entity for the specified block type
 	If a_World is valid, then the entity is created bound to that world
 	Returns nullptr for unknown block types. */
 	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = nullptr);
-	
+
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
 		return "cBlockEntity";
@@ -81,9 +81,9 @@ public:
 
 	/** Returns the name of the parent class, or empty string if no parent class. */
 	virtual const char * GetParentClass(void) const { return ""; }
-	
+
 	// tolua_begin
-	
+
 	// Position, in absolute block coordinates:
 	Vector3i GetPos(void) const { return Vector3i{m_PosX, m_PosY, m_PosZ}; }
 	int GetPosX(void) const { return m_PosX; }
@@ -91,25 +91,25 @@ public:
 	int GetPosZ(void) const { return m_PosZ; }
 
 	BLOCKTYPE GetBlockType(void) const { return m_BlockType; }
-	
+
 	cWorld * GetWorld(void) const { return m_World; }
-	
+
 	int GetChunkX(void) const { return FAST_FLOOR_DIV(m_PosX, cChunkDef::Width); }
 	int GetChunkZ(void) const { return FAST_FLOOR_DIV(m_PosZ, cChunkDef::Width); }
-	
+
 	int GetRelX(void) const { return m_RelX; }
 	int GetRelZ(void) const { return m_RelZ; }
-	
+
 	// tolua_end
-	
+
 	/** Called when a player uses this entity; should open the UI window.
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	virtual bool UsedBy( cPlayer * a_Player) = 0;
-	
+
 	/** Sends the packet defining the block entity to the client specified.
 	To send to all eligible clients, use cWorld::BroadcastBlockEntity() */
 	virtual void SendTo(cClientHandle & a_Client) = 0;
-	
+
 	/** Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing. */
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
@@ -120,12 +120,12 @@ public:
 protected:
 	/** Position in absolute block coordinates */
 	int m_PosX, m_PosY, m_PosZ;
-	
+
 	/** Position relative to the chunk, used to speed up ticking */
 	int m_RelX, m_RelZ;
 
 	BLOCKTYPE m_BlockType;
-	
+
 	cWorld * m_World;
 } ;  // tolua_export
 

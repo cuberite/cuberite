@@ -11,7 +11,7 @@ class cGhast :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
-	
+
 public:
 	cGhast(void);
 

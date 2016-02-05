@@ -185,7 +185,7 @@ void cChunkDesc::GetShapeFromHeight(Shape & a_Shape) const
 			{
 				a_Shape[y + x * 256 + z * 16 * 256] = 1;
 			}
-			
+
 			for (int y = height + 1; y < cChunkDef::Height; y++)
 			{
 				a_Shape[y + x * 256 + z * 16 * 256] = 0;
@@ -590,7 +590,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 			return *itr;
 		}
 	}  // for itr - m_BlockEntities[]
-	
+
 	// The block entity is not created yet, try to create it and add to list:
 	cBlockEntity * be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), AbsX, a_RelY, AbsZ);
 	if (be == nullptr)

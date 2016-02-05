@@ -11,7 +11,7 @@ class cItemFoodHandler :
 	public cItemHandler
 {
 	typedef cItemHandler super;
-	
+
 public:
 	cItemFoodHandler(int a_ItemType)
 		: super(a_ItemType)

@@ -24,7 +24,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		
+
 		// Convert the blockface into meta:
 		switch (a_BlockFace)
 		{

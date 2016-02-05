@@ -51,7 +51,7 @@ public:
 			case dlaAttackEntity: return 1;
 			case dlaBreakBlock:   return 2;
 		}
-	
+
 		#ifndef __clang__
 		return 0;
 		#endif

@@ -51,11 +51,11 @@ class cProtocol180 :
 	public cProtocol
 {
 	typedef cProtocol super;
-	
+
 public:
 
 	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-	
+
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
@@ -157,30 +157,30 @@ public:
 protected:
 
 	AString m_ServerAddress;
-	
+
 	UInt16 m_ServerPort;
-	
+
 	AString m_AuthServerID;
-	
+
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
 
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
-	
+
 	bool m_IsEncrypted;
-	
+
 	cAesCfb128Decryptor m_Decryptor;
 	cAesCfb128Encryptor m_Encryptor;
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
-	
+
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
-	
-	
+
+
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(const char * a_Data, size_t a_Size);
 
@@ -196,7 +196,7 @@ protected:
 	// Packet handlers while in the Login state (m_State == 2):
 	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
 	void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
-	
+
 	// Packet handlers while in the Game state (m_State == 3):
 	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
@@ -221,12 +221,12 @@ protected:
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
-	
+
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
 	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
-	
-	
+
+
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
@@ -234,15 +234,15 @@ protected:
 	virtual void SendPacket(cPacketizer & a_Packet) override;
 
 	void SendCompass(const cWorld & a_World);
-	
+
 	/** Reads an item out of the received data, sets a_Item to the values read.
 	Returns false if not enough received data.
 	a_KeepRemainingBytes tells the function to keep that many bytes at the end of the buffer. */
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes = 0);
-	
+
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
-	
+
 	void StartEncryption(const Byte * a_Key);
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.

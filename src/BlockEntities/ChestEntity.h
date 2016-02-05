@@ -18,27 +18,27 @@ class cChestEntity :
 	public cBlockEntityWithItems
 {
 	typedef cBlockEntityWithItems super;
-	
+
 public:
 	enum
 	{
 		ContentsHeight = 3,
 		ContentsWidth  = 9,
 	} ;
-	
+
 	// tolua_end
-	
+
 	BLOCKENTITY_PROTODEF(cChestEntity)
-	
+
 	/** Constructor used for normal operation */
 	cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type);
-	
+
 	virtual ~cChestEntity();
 
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
-	
+
 	/** Opens a new chest window for this chest.
 	Scans for neighbors to open a double chest window, if appropriate. */
 	void OpenNewWindow(void);

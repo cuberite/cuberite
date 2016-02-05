@@ -43,7 +43,7 @@ void cProbabDistrib::SetPoints(const cProbabDistrib::cPoints & a_Points)
 		{
 			continue;
 		}
-		
+
 		// Add the current trapezoid to the sum:
 		ProbSum += (LastProb + itr->m_Probability) * (itr->m_Value - LastValue) / 2;
 		LastProb = itr->m_Probability;
@@ -89,7 +89,7 @@ bool cProbabDistrib::SetDefString(const AString & a_DefString)
 		}
 		Pts.push_back(cPoint(Value, Prob));
 	}  // for itr - Points[]
-	
+
 	SetPoints(Pts);
 	return true;
 }
@@ -112,7 +112,7 @@ int cProbabDistrib::MapValue(int a_OrigValue) const
 {
 	ASSERT(a_OrigValue >= 0);
 	ASSERT(a_OrigValue < m_Sum);
-	
+
 	// Binary search through m_Cumulative for placement:
 	size_t Lo = 0;
 	size_t Hi = m_Cumulative.size() - 1;
@@ -130,7 +130,7 @@ int cProbabDistrib::MapValue(int a_OrigValue) const
 		}
 	}
 	ASSERT(Hi - Lo == 1);
-	
+
 	// Linearly interpolate between Lo and Hi:
 	int ProbDif  = m_Cumulative[Hi].m_Probability - m_Cumulative[Lo].m_Probability;
 	ProbDif = (ProbDif != 0) ? ProbDif : 1;

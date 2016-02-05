@@ -53,7 +53,7 @@ bool cSlime::Attack(std::chrono::milliseconds a_Dt)
 		// Only slimes larger than size 1 attack a player.
 		return super::Attack(a_Dt);
 	}
-	
+
 	return false;
 }
 

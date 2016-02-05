@@ -83,7 +83,7 @@ cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(cIniFile & a_IniFile, cBiom
 		LOGWARN("[Generator] ShapeGen value not set in world.ini, using \"BiomalNoise3D\".");
 		shapeGenName = "BiomalNoise3D";
 	}
-	
+
 	// If the shapegen is HeightMap, redirect to older HeightMap-based generators:
 	if (NoCaseCompare(shapeGenName, "HeightMap") == 0)
 	{
@@ -133,10 +133,10 @@ cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(cIniFile & a_IniFile, cBiom
 		a_IniFile.SetValue("Generator", "ShapeGen", "BiomalNoise3D");
 		return CreateShapeGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
 	}
-	
+
 	// Read the settings:
 	res->InitializeShapeGen(a_IniFile);
-	
+
 	return res;
 }
 

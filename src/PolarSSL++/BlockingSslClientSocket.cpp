@@ -106,7 +106,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 		m_LastErrorText = "Already connected";
 		return false;
 	}
-	
+
 	// Connect the underlying socket:
 	m_ServerName = a_ServerName;
 	if (!cNetwork::Connect(a_ServerName, a_Port,
@@ -123,7 +123,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 	{
 		return false;
 	}
-	
+
 	// Initialize the SSL:
 	int ret = m_Ssl.Initialize(true);
 	if (ret != 0)
@@ -131,20 +131,20 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 		Printf(m_LastErrorText, "SSL initialization failed: -0x%x", -ret);
 		return false;
 	}
-	
+
 	// If we have been assigned a trusted CA root cert store, push it into the SSL context:
 	if (m_CACerts.get() != nullptr)
 	{
 		m_Ssl.SetCACerts(m_CACerts, m_ExpectedPeerName);
 	}
-	
+
 	ret = m_Ssl.Handshake();
 	if (ret != 0)
 	{
 		Printf(m_LastErrorText, "SSL handshake failed: -0x%x", -ret);
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -163,7 +163,7 @@ bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_C
 			a_ExpectedPeerName.c_str()
 		);
 	}
-	
+
 	// Parse the cert:
 	m_CACerts.reset(new cX509Cert);
 	int ret = m_CACerts->Parse(a_CACerts.data(), a_CACerts.size());
@@ -173,7 +173,7 @@ bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_C
 		return false;
 	}
 	m_ExpectedPeerName = a_ExpectedPeerName;
-	
+
 	return true;
 }
 
@@ -188,7 +188,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 		m_LastErrorText = "Socket is closed";
 		return false;
 	}
-	
+
 	// Keep sending the data until all of it is sent:
 	const char * Data = reinterpret_cast<const char *>(a_Data);
 	size_t NumBytes = a_NumBytes;
@@ -241,7 +241,7 @@ void cBlockingSslClientSocket::Disconnect(void)
 	{
 		return;
 	}
-	
+
 	m_Ssl.NotifyClose();
 	m_IsConnected = false;
 

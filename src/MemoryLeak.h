@@ -6,7 +6,7 @@
 		#define _CRTDBG_MAP_ALLOC
 		#include <stdlib.h>
 		#include <crtdbg.h>
-		
+
 		// This works only in MSVC 2010+:
 		#if _MSC_VER >= 1600
 			// Map the new operator

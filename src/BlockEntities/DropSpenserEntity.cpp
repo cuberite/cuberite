@@ -71,19 +71,19 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 			SlotsCnt++;
 		}
 	}  // for i - m_Contents[]
-	
+
 	if (SlotsCnt == 0)
 	{
 		// Nothing in the dropspenser, play the click sound
 		m_World->BroadcastSoundEffect("random.click", static_cast<double>(m_PosX), static_cast<double>(m_PosY), static_cast<double>(m_PosZ), 1.0f, 1.2f);
 		return;
 	}
-	
+
 	int RandomSlot = 	m_World->GetTickRandomNumber(SlotsCnt - 1);
-	
+
 	// DropSpense the item, using the specialized behavior in the subclasses:
 	DropSpenseFromSlot(a_Chunk, OccupiedSlots[RandomSlot]);
-	
+
 	// Broadcast a smoke and click effects:
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	int SmokeDir = 0;
@@ -120,7 +120,7 @@ bool cDropSpenserEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		return false;
 	}
-	
+
 	m_ShouldDropSpense = false;
 	DropSpense(a_Chunk);
 	return true;
@@ -148,7 +148,7 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 		OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
-	
+
 	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)

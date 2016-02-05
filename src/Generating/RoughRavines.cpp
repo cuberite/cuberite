@@ -18,7 +18,7 @@ class cRoughRavine :
 	public cGridStructGen::cStructure
 {
 	typedef cGridStructGen::cStructure super;
-	
+
 public:
 	cRoughRavine(
 		int a_Seed, size_t a_Size,
@@ -44,15 +44,15 @@ public:
 		m_DefPoints[0].Set   (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,             a_CeilingHeightEdge1,  a_FloorHeightEdge1);
 		m_DefPoints[Half].Set(static_cast<float>(a_OriginX), static_cast<float>(a_OriginZ), a_CenterWidth, a_CeilingHeightCenter, a_FloorHeightCenter);
 		m_DefPoints[Max].Set (a_OriginX + OfsX, a_OriginZ + OfsZ, 1,             a_CeilingHeightEdge2,  a_FloorHeightEdge2);
-		
+
 		// Calculate the points in between, recursively:
 		SubdivideLine(0, Half);
 		SubdivideLine(Half, Max);
-		
+
 		// Initialize the per-height radius modifiers:
 		InitPerHeightRadius(a_GridX, a_GridZ);
 	}
-	
+
 protected:
 	struct sRavineDefPoint
 	{
@@ -61,7 +61,7 @@ protected:
 		float m_Radius;
 		float m_Top;
 		float m_Bottom;
-		
+
 		void Set(float a_X, float a_Z, float a_Radius, float a_Top, float a_Bottom)
 		{
 			m_X = a_X;
@@ -72,21 +72,21 @@ protected:
 		}
 	};
 	typedef std::vector<sRavineDefPoint> sRavineDefPoints;
-	
+
 	int m_Seed;
-	
+
 	cNoise m_Noise;
-	
+
 	int m_MaxSize;
-	
+
 	sRavineDefPoints m_DefPoints;
-	
+
 	float m_Roughness;
-	
+
 	/** Number to add to the radius based on the height. This creates the "ledges" in the ravine walls. */
 	float m_PerHeightRadius[cChunkDef::Height];
-	
-	
+
+
 	/** Recursively subdivides the line between the points of the specified index.
 	Sets the midpoint to the center of the line plus or minus a random offset, then calls itself for each half
 	of the new line. */
@@ -116,7 +116,7 @@ protected:
 		}
 		size_t MidIdx = (a_Idx1 + a_Idx2) / 2;
 		m_DefPoints[MidIdx].Set(MidX, MidZ, MidR, MidT, MidB);
-		
+
 		// Recurse the two halves, if they are worth recursing:
 		if (MidIdx - a_Idx1 > 1)
 		{
@@ -127,8 +127,8 @@ protected:
 			SubdivideLine(MidIdx, a_Idx2);
 		}
 	}
-	
-	
+
+
 	void InitPerHeightRadius(int a_GridX, int a_GridZ)
 	{
 		int h = 0;
@@ -150,8 +150,8 @@ protected:
 			h += NumBlocks;
 		}
 	}
-	
-	
+
+
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
 	{
 		int BlockStartX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
@@ -170,7 +170,7 @@ protected:
 				// Cannot intersect, bail out early
 				continue;
 			}
-			
+
 			// Carve out a cylinder around the xz point, up to (m_Radius + 2) in diameter, from Bottom to Top:
 			// On each height level, use m_PerHeightRadius[] to modify the actual radius used
 			// EnlargedRadiusSq is the square of the radius enlarged by the maximum m_PerHeightRadius offset - anything outside it will never be touched.
@@ -186,14 +186,14 @@ protected:
 					a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
 				}
 				#endif  // _DEBUG
-				
+
 				// If the column is outside the enlarged radius, bail out completely
 				float DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 				if (DistSq > RadiusSq)
 				{
 					continue;
 				}
-				
+
 				int Top = std::min(static_cast<int>(ceilf(itr->m_Top)), +cChunkDef::Height);
 				for (int y = std::max(static_cast<int>(floorf(itr->m_Bottom)), 1); y <= Top; y++)
 				{
@@ -284,7 +284,7 @@ cGridStructGen::cStructurePtr cRoughRavines::CreateStructure(int a_GridX, int a_
 	float CeilingHeightEdge1  = m_Noise.IntNoise2DInRange(a_GridX + 60, a_GridZ, m_MinCeilingHeightEdge,   m_MaxCeilingHeightEdge);
 	float CeilingHeightEdge2  = m_Noise.IntNoise2DInRange(a_GridX + 70, a_GridZ, m_MinCeilingHeightEdge,   m_MaxCeilingHeightEdge);
 	float CeilingHeightCenter = m_Noise.IntNoise2DInRange(a_GridX + 80, a_GridZ, m_MinCeilingHeightCenter, m_MaxCeilingHeightCenter);
-	
+
 	// Create a ravine:
 	return cStructurePtr(new cRoughRavine(
 		m_Seed,

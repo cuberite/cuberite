@@ -24,7 +24,7 @@ class cMobSpawnerEntity :
 public:
 
 	// tolua_end
-	
+
 	cMobSpawnerEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	virtual void SendTo(cClientHandle & a_Client) override;

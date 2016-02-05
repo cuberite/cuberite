@@ -51,11 +51,11 @@ public:
 	public:
 		/** The grid point for which the structure is generated. */
 		int m_GridX, m_GridZ;
-		
+
 		/** The origin (the coords for which the structure is generated) */
 		int m_OriginX, m_OriginZ;
-		
-		
+
+
 		/** Creates a structure that has its origin set at the specified coords. */
 		cStructure (int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
 			m_GridX(a_GridX),
@@ -64,20 +64,20 @@ public:
 			m_OriginZ(a_OriginZ)
 		{
 		}
-		
+
 		// Force a virtual destructor in descendants:
 		virtual ~cStructure() {}
-		
+
 		/** Draws self into the specified chunk */
 		virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) = 0;
-		
+
 		/** Returns the cost of keeping this structure in the cache */
 		virtual size_t GetCacheCost(void) const { return 1; }
 	} ;
 	typedef SharedPtr<cStructure> cStructurePtr;
 	typedef std::list<cStructurePtr> cStructurePtrs;
-	
-	
+
+
 	cGridStructGen(
 		int a_Seed,
 		int a_GridSizeX, int a_GridSizeZ,
@@ -96,7 +96,7 @@ public:
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-	
+
 protected:
 	/** Base seed of the world for which the generator generates chunk. */
 	int m_BaseSeed;
@@ -104,43 +104,43 @@ protected:
 	/** Seed for generating grid offsets and also available for descendants.
 	Calculated from m_BaseSeed by adding the SeedOffset parameter loaded from the cubeset file (if applicable); otherwise the same as m_BaseSeed. */
 	int m_Seed;
-	
+
 	/** The noise used for generating grid offsets. */
 	cNoise m_Noise;
-	
+
 	/** The size of each grid's cell in the X axis */
 	int m_GridSizeX;
-	
+
 	/** The size of each grid's cell in the Z axis */
 	int m_GridSizeZ;
-	
+
 	/** The maximum offset of the structure's origin from the grid midpoint, in X coord. */
 	int m_MaxOffsetX;
-	
+
 	/** The maximum offset of the structure's origin from the grid midpoint, in Z coord. */
 	int m_MaxOffsetZ;
-	
+
 	/** Maximum theoretical size of the structure in the X axis.
 	This limits the structures considered for a single chunk, so the lesser the number, the better performance.
 	Structures large than this may get cropped. */
 	int m_MaxStructureSizeX;
-	
+
 	/** Maximum theoretical size of the structure in the Z axis.
 	This limits the structures considered for a single chunk, so the lesser the number, the better performance.
 	Structures large than this may get cropped. */
 	int m_MaxStructureSizeZ;
-	
+
 	/** Maximum allowed sum of costs for items in the cache. Items that are over this cost are removed from the
 	cache, oldest-first */
 	size_t m_MaxCacheSize;
-	
+
 	/** Cache for the most recently generated structures, ordered by the recentness. */
 	cStructurePtrs m_Cache;
-	
-	
+
+
 	/** Clears everything from the cache */
 	void ClearCache(void);
-	
+
 	/** Returns all structures that may intersect the given chunk.
 	The structures are considered as intersecting iff their bounding box (defined by m_MaxStructureSize)
 	around their gridpoint intersects the chunk. */

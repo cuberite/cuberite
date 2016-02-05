@@ -365,7 +365,7 @@ void cFurnaceEntity::UpdateProgressBars(bool a_ForceUpdate)
 
 	int CurFuel = (m_FuelBurnTime > 0) ? 200 - (200 * m_TimeBurned / m_FuelBurnTime) : 0;
 	BroadcastProgress(PROGRESSBAR_FUEL, static_cast<short>(CurFuel));
-	
+
 	int CurCook = (m_NeedCookTime > 0) ? (200 * m_TimeCooked / m_NeedCookTime) : 0;
 	BroadcastProgress(PROGRESSBAR_SMELTING_CONFIRM, 200);  // Post 1.8, Mojang requires a random packet with an ID of three and value of 200. Wat. Wat. Wat.
 	BroadcastProgress(PROGRESSBAR_SMELTING, static_cast<short>(CurCook));

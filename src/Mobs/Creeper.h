@@ -11,7 +11,7 @@ class cCreeper :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
-	
+
 public:
 	cCreeper(void);
 

@@ -39,14 +39,14 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 	{
 		return itr->second;
 	}
-	
+
 	AString data;
 	switch (a_Version)
 	{
 		case RELEASE_1_3_2: Serialize39(data); break;
 		case RELEASE_1_8_0: Serialize47(data, a_ChunkX, a_ChunkZ); break;
 		// TODO: Other protocol versions may serialize the data differently; implement here
-		
+
 		default:
 		{
 			LOGERROR("cChunkDataSerializer::Serialize(): Unknown version: %d", a_Version);
@@ -74,7 +74,7 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	const int SkyLightOffset   = BlockLightOffset + sizeof(m_BlockLight);
 	const int BiomeOffset      = SkyLightOffset   + sizeof(m_BlockSkyLight);
 	const int DataSize         = BiomeOffset      + BiomeDataSize;
-	
+
 	// Temporary buffer for the composed data:
 	char AllData [DataSize];
 
@@ -91,29 +91,29 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	char CompressedBlockData[CompressedMaxSize];
 
 	uLongf CompressedSize = compressBound(DataSize);
-	
+
 	// Run-time check that our compile-time guess about CompressedMaxSize was enough:
 	ASSERT(CompressedSize <= CompressedMaxSize);
-	
+
 	compress2(reinterpret_cast<Bytef*>(CompressedBlockData), &CompressedSize, reinterpret_cast<const Bytef*>(AllData), sizeof(AllData), Z_DEFAULT_COMPRESSION);
 
 	// Now put all those data into a_Data:
-	
+
 	// "Ground-up continuous", or rather, "biome data present" flag:
 	a_Data.push_back('\x01');
-	
+
 	// Two bitmaps; we're aways sending the full chunk with no additional data, so the bitmaps are 0xffff and 0, respectively
 	// Also, no endian flipping is needed because of the const values
 	unsigned short BitMap1 = 0xffff;
 	unsigned short BitMap2 = 0;
 	a_Data.append(reinterpret_cast<const char *>(&BitMap1), sizeof(short));
 	a_Data.append(reinterpret_cast<const char *>(&BitMap2), sizeof(short));
-	
+
 	UInt32 CompressedSizeBE = htonl(static_cast<UInt32>(CompressedSize));
 	a_Data.append(reinterpret_cast<const char *>(&CompressedSizeBE), sizeof(CompressedSizeBE));
-	
+
 	// Unlike 29, 39 doesn't have the "unused" int
-	
+
 	a_Data.append(CompressedBlockData, CompressedSize);
 }
 

@@ -26,20 +26,20 @@ size_t cEnvelopeParser::Parse(const char * a_Data, size_t a_Size)
 	{
 		return 0;
 	}
-	
+
 	// Start searching 1 char from the end of the already received data, if available:
 	size_t SearchStart = m_IncomingData.size();
 	SearchStart = (SearchStart > 1) ? SearchStart - 1 : 0;
-	
+
 	m_IncomingData.append(a_Data, a_Size);
-	
+
 	size_t idxCRLF = m_IncomingData.find("\r\n", SearchStart);
 	if (idxCRLF == AString::npos)
 	{
 		// Not a complete line yet, all input consumed:
 		return a_Size;
 	}
-	
+
 	// Parse as many lines as found:
 	size_t Last = 0;
 	do
@@ -61,7 +61,7 @@ size_t cEnvelopeParser::Parse(const char * a_Data, size_t a_Size)
 		idxCRLF = m_IncomingData.find("\r\n", idxCRLF + 2);
 	} while (idxCRLF != AString::npos);
 	m_IncomingData.erase(0, Last);
-	
+
 	// Parsed all lines and still expecting more
 	return a_Size;
 }
@@ -110,7 +110,7 @@ bool cEnvelopeParser::ParseLine(const char * a_Data, size_t a_Size)
 		m_LastValue.append(a_Data, a_Size);
 		return true;
 	}
-	
+
 	// This is a line with a new key:
 	NotifyLast();
 	for (size_t i = 0; i < a_Size; i++)
@@ -122,7 +122,7 @@ bool cEnvelopeParser::ParseLine(const char * a_Data, size_t a_Size)
 			return true;
 		}
 	}  // for i - a_Data[]
-	
+
 	// No colon was found, key-less header??
 	return false;
 }

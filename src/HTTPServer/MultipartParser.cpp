@@ -56,25 +56,25 @@ ThisIsIgnoredEpilogue";
 		// DEBUG: Check if the onscreen output corresponds with the data above
 		printf("Multipart parsing test finished\n");
 	}
-	
+
 	virtual void OnPartStart(void) override
 	{
 		printf("Starting a new part\n");
 	}
-	
-	
+
+
 	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) override
 	{
 		printf("  Hdr: \"%s\"=\"%s\"\n", a_Key.c_str(), a_Value.c_str());
 	}
-	
-	
+
+
 	virtual void OnPartData(const char * a_Data, int a_Size) override
 	{
 		printf("  Data: %d bytes, \"%.*s\"\n", a_Size, a_Size, a_Data);
 	}
-	
-	
+
+
 	virtual void OnPartEnd(void) override
 	{
 		printf("Part end\n");
@@ -110,7 +110,7 @@ cMultipartParser::cMultipartParser(const AString & a_ContentType, cCallbacks & a
 		m_IsValid = false;
 		return;
 	}
-	
+
 	// Find the multipart boundary:
 	ContentType.erase(0, idxSC + 1);
 	cNameValueParser CTParser(ContentType.c_str(), ContentType.size());
@@ -126,13 +126,13 @@ cMultipartParser::cMultipartParser(const AString & a_ContentType, cCallbacks & a
 	{
 		return;
 	}
-	
+
 	// Set the envelope parser for parsing the body, so that our Parse() function parses the ignored prefix data as a body
 	m_EnvelopeParser.SetIsInHeaders(false);
 
 	// Append an initial CRLF to the incoming data, so that a body starting with the boundary line will get caught
 	m_IncomingData.assign("\r\n");
-	
+
 	/*
 	m_Boundary = AString("\r\n--") + m_Boundary
 	m_BoundaryEnd = m_Boundary + "--\r\n";
@@ -151,7 +151,7 @@ void cMultipartParser::Parse(const char * a_Data, size_t a_Size)
 	{
 		return;
 	}
-	
+
 	// Append to buffer, then parse it:
 	m_IncomingData.append(a_Data, a_Size);
 	for (;;)
@@ -213,7 +213,7 @@ void cMultipartParser::Parse(const char * a_Data, size_t a_Size)
 			m_IncomingData.erase(0, LineEnd);
 			continue;
 		}
-		
+
 		if (strncmp(m_IncomingData.c_str() + idxBoundary, m_Boundary.c_str(), m_Boundary.size()) == 0)
 		{
 			// Boundary or BoundaryEnd found:
@@ -228,12 +228,12 @@ void cMultipartParser::Parse(const char * a_Data, size_t a_Size)
 			}
 			m_Callbacks.OnPartStart();
 			m_IncomingData.erase(0, LineEnd + 2);
-			
+
 			// Keep parsing for the headers that may have come with this data:
 			m_EnvelopeParser.Reset();
 			continue;
 		}
-		
+
 		// It's a line, but not a boundary. It can be fully sent to the data receiver, since a boundary cannot cross lines
 		m_Callbacks.OnPartData(m_IncomingData.c_str(), LineEnd);
 		m_IncomingData.erase(0, LineEnd);

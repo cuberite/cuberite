@@ -21,13 +21,13 @@ class cCommandBlockEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;
-	
+
 public:
 
 	// tolua_end
-	
+
 	BLOCKENTITY_PROTODEF(cCommandBlockEntity)
-	
+
 	/** Creates a new empty command block entity */
 	cCommandBlockEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 
@@ -43,7 +43,7 @@ public:
 
 	/** Sets the command block to execute a command in the next tick */
 	void Activate(void);
-	
+
 	/** Sets the command */
 	void SetCommand(const AString & a_Cmd);
 
@@ -55,9 +55,9 @@ public:
 
 	/** Retrieves the result (signal strength) of the last operation */
 	NIBBLETYPE GetResult(void) const;
-	
+
 	// tolua_end
-	
+
 private:
 
 	/** Executes the associated command */

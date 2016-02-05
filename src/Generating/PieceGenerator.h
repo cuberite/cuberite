@@ -33,20 +33,20 @@ class cPiece
 public:
 	// Force a virtual destructor in all descendants
 	virtual ~cPiece() {}
-	
+
 	struct cConnector
 	{
 		/** Position relative to the piece */
 		Vector3i m_Pos;
-		
+
 		/** Type of the connector. Any arbitrary number; the generator connects only connectors of opposite
 		(negative) types. */
 		int m_Type;
-		
+
 		/** Direction in which the connector is facing.
 		Will be matched by the opposite direction for the connecting connector. */
 		eBlockFace m_Direction;
-		
+
 		cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace a_Direction);
 		cConnector(const Vector3i & a_Pos, int a_Type, eBlockFace a_Direction);
 	};
@@ -117,15 +117,15 @@ public:
 	/** Returns all of the available connectors that the piece has.
 	Each connector has a (relative) position in the piece, and a type associated with it. */
 	virtual cConnectors GetConnectors(void) const = 0;
-	
+
 	/** Returns the dimensions of this piece.
 	The dimensions cover the entire piece, there is no block that the piece generates outside of this size. */
 	virtual Vector3i GetSize(void) const = 0;
-	
+
 	/** Returns the "hitbox" of this piece.
 	A hitbox is what is compared and must not intersect other pieces' hitboxes when generating. */
 	virtual cCuboid GetHitBox(void) const = 0;
-	
+
 	/** Returns true if the piece can be rotated CCW the specific number of 90-degree turns. */
 	virtual bool CanRotateCCW(int a_NumRotations) const = 0;
 
@@ -139,7 +139,7 @@ public:
 		}
 		return -1;
 	}
-	
+
 	void SetVerticalStrategy(cVerticalStrategyPtr a_VerticalStrategy)
 	{
 		m_VerticalStrategy = a_VerticalStrategy;
@@ -170,10 +170,10 @@ public:
 
 	/** Returns a copy of the connector that is rotated and then moved by the specified amounts. */
 	cConnector RotateMoveConnector(const cConnector & a_Connector, int a_NumCCWRotations, int a_MoveX, int a_MoveY, int a_MoveZ) const;
-	
+
 	/** Returns the hitbox after the specified number of rotations and moved so that a_MyConnector is placed at a_ToConnectorPos. */
 	cCuboid RotateHitBoxToConnector(const cConnector & a_MyConnector, const Vector3i & a_ToConnectorPos, int a_NumCCWRotations) const;
-	
+
 	/** Returns the hitbox after the specified number of CCW rotations and moved by the specified amounts. */
 	cCuboid RotateMoveHitBox(int a_NumCCWRotations, int a_MoveX, int a_MoveY, int a_MoveZ) const;
 };
@@ -198,15 +198,15 @@ class cPiecePool
 public:
 	// Force a virtual destructor in all descendants:
 	virtual ~cPiecePool() {}
-	
+
 	/** Returns a list of pieces that contain the specified connector type.
 	The cPiece pointers returned are managed by the pool and the caller doesn't free them. */
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) = 0;
-	
+
 	/** Returns the pieces that should be used as the starting point.
 	Multiple starting points are supported, one of the returned piece will be chosen. */
 	virtual cPieces GetStartingPieces(void) = 0;
-	
+
 	/** Returns the relative weight with which the a_NewPiece is to be selected for placing under a_PlacedPiece through a_ExistingConnector.
 	a_ExistingConnector is the original connector, before any movement or rotation is applied to it.
 	This allows the pool to tweak the piece's chances, based on the previous pieces in the tree and the connector used.
@@ -219,7 +219,7 @@ public:
 	{
 		return 1;
 	}
-	
+
 	/** Returns the relative weight with which the a_NewPiece is to be selected for placing as the first piece.
 	This allows the pool to tweak the piece's chances.
 	The higher the number returned, the higher the chance the piece will be chosen. 0 means the piece will not be chosen.
@@ -232,7 +232,7 @@ public:
 	/** Called after a piece is placed, to notify the pool that it has been used.
 	The pool may adjust the pieces it will return the next time. */
 	virtual void PiecePlaced(const cPiece & a_Piece) = 0;
-	
+
 	/** Called when the pool has finished the current structure and should reset any piece-counters it has
 	for a new structure. */
 	virtual void Reset(void) = 0;
@@ -247,7 +247,7 @@ class cPlacedPiece
 {
 public:
 	cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece, const Vector3i & a_Coords, int a_NumCCWRotations);
-	
+
 	const cPlacedPiece * GetParent           (void) const { return m_Parent; }
 	const cPiece &       GetPiece            (void) const { return *m_Piece; }
 	const Vector3i &     GetCoords           (void) const { return m_Coords; }
@@ -255,23 +255,23 @@ public:
 	const cCuboid &      GetHitBox           (void) const { return m_HitBox; }
 	int                  GetDepth            (void) const { return m_Depth; }
 	bool                 HasBeenMovedToGround(void) const { return m_HasBeenMovedToGround; }
-	
+
 	/** Returns the coords as a modifiable object. */
 	Vector3i & GetCoords(void) { return m_Coords; }
-	
+
 	/** Returns the connector at the specified index, rotated in the actual placement.
 	Undefined behavior if a_Index is out of range. */
 	cPiece::cConnector GetRotatedConnector(size_t a_Index) const;
-	
+
 	/** Returns a copy of the specified connector, modified to account for the translation and rotation for
 	this placement. */
 	cPiece::cConnector GetRotatedConnector(const cPiece::cConnector & a_Connector) const;
-	
+
 	/** Moves the placed piece Y-wise by the specified offset.
 	Sets m_HasBeenMovedToGround to true, too.
 	Used eg. by village houses. */
 	void MoveToGroundBy(int a_OffsetY);
-	
+
 protected:
 	const cPlacedPiece * m_Parent;
 	const cPiece * m_Piece;
@@ -279,7 +279,7 @@ protected:
 	int m_NumCCWRotations;
 	cCuboid m_HitBox;  // Hitbox of the placed piece, in world coords
 	int m_Depth;       // Depth in the generated piece tree
-	
+
 	/** Set to true once the piece has been moved Y-wise.
 	Used eg. by village houses. */
 	bool m_HasBeenMovedToGround;
@@ -295,11 +295,11 @@ class cPieceGenerator
 {
 public:
 	cPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
-	
+
 	/** Cleans up all the memory used by the placed pieces.
 	Call this utility function instead of freeing the items on your own. */
 	static void FreePieces(cPlacedPieces & a_PlacedPieces);
-	
+
 protected:
 	/** The type used for storing a connection from one piece to another, while building the piece tree. */
 	struct cConnection
@@ -308,17 +308,17 @@ protected:
 		cPiece::cConnector m_Connector;    // The piece's connector being used (relative non-rotated coords)
 		int m_NumCCWRotations;             // Number of rotations necessary to match the two connectors
 		int m_Weight;                      // Relative chance that this connection will be chosen
-		
+
 		cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations, int a_Weight);
 	};
 	typedef std::vector<cConnection> cConnections;
-	
+
 	/** The type used for storing a pool of connectors that will be attempted to expand by another piece. */
 	struct cFreeConnector
 	{
 		cPlacedPiece * m_Piece;
 		cPiece::cConnector m_Connector;
-		
+
 		cFreeConnector(cPlacedPiece * a_Piece, const cPiece::cConnector & a_Connector);
 	};
 	typedef std::vector<cFreeConnector> cFreeConnectors;
@@ -328,11 +328,11 @@ protected:
 	cNoise m_Noise;
 	int m_Seed;
 
-	
+
 	/** Selects a starting piece and places it, including its height and rotation.
 	Also puts the piece's connectors in a_OutConnectors. */
 	cPlacedPiece * PlaceStartingPiece(int a_BlockX, int a_BlockZ, cFreeConnectors & a_OutConnectors);
-	
+
 	/** Tries to place a new piece at the specified (placed) connector. Returns true if successful. */
 	bool TryPlacePieceAtConnector(
 		const cPlacedPiece & a_ParentPiece,      // The existing piece to a new piece should be placed
@@ -355,7 +355,7 @@ protected:
 		int a_NumCCWRotations,                           // Number of rotations for the new piece to align the connector
 		const cPlacedPieces & a_OutPieces                // All the already-placed pieces to check
 	);
-	
+
 	/** DEBUG: Outputs all the connectors in the pool into stdout.
 	a_NumProcessed signals the number of connectors from the pool that should be considered processed (not listed). */
 	void DebugConnectorPool(const cPieceGenerator::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed);
@@ -388,7 +388,7 @@ class cDFSPieceGenerator :
 {
 public:
 	cDFSPieceGenerator(cPiecePool & a_PiecePool, int a_Seed);
-	
+
 	/** Generates a placement for pieces at the specified coords.
 	The Y coord is generated automatically based on the starting piece that is chosen.
 	Caller must free each individual cPlacedPiece in a_OutPieces using cPieceGenerator::FreePieces(). */

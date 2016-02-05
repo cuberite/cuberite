@@ -11,7 +11,7 @@ class cMooshroom :
 	public cPassiveMonster
 {
 	typedef cPassiveMonster super;
-	
+
 public:
 	cMooshroom(void);
 

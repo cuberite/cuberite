@@ -68,7 +68,7 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	/* biMesa             */ { 2.0f,  2.0f},  // 37
 	/* biMesaPlateauF     */ { 2.0f,  2.0f},  // 38
 	/* biMesaPlateau      */ { 2.0f,  2.0f},  // 39
-	
+
 	// biomes 40 .. 128 are unused, 89 empty placeholders here:
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 40 .. 49
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 50 .. 59
@@ -79,7 +79,7 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 100 .. 109
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 110 .. 119
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},                // 120 .. 128
-	
+
 	// Release 1.7 biome variants:
 	/* biSunflowerPlains      */ { 1.0f,  1.0f},  // 129
 	/* biDesertM              */ { 1.0f,  1.0f},  // 130
@@ -87,12 +87,12 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	/* biFlowerForest         */ { 4.0f,  4.0f},  // 132
 	/* biTaigaM               */ { 3.0f,  3.0f},  // 133
 	/* biSwamplandM           */ { 0.0f,  0.0f},  // 134
-	
+
 	// Biomes 135 .. 139 unused, 5 empty placeholders here:
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 135 .. 139
 
 	/* biIcePlainsSpikes      */ { 1.0f,  1.0f},  // 140
-	
+
 	// Biomes 141 .. 148 unused, 8 empty placeholders here:
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 141 .. 148
 
@@ -358,7 +358,7 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 		{
 			continue;
 		}
-		
+
 		/*
 		// Sanity checks for biome parameters, enable them to check the biome param table in runtime (slow):
 		ASSERT(m_GenParam[i].m_DistortAmpX >= 0);

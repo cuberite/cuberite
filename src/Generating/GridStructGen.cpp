@@ -20,13 +20,13 @@ class cEmptyStructure :
 	public cGridStructGen::cStructure
 {
 	typedef cGridStructGen::cStructure super;
-	
+
 public:
 	cEmptyStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
 		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
 	{
 	}
-	
+
 protected:
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
 	{

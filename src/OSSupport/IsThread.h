@@ -48,7 +48,7 @@ public:
 
 	/** Returns true if the thread calling this function is the thread contained within this object. */
 	bool IsCurrentThread(void) const { return std::this_thread::get_id() == m_Thread.get_id(); }
-	
+
 private:
 
 	/** The name of the thread, used to aid debugging in IDEs which support named threads */

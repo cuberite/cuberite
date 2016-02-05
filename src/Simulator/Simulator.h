@@ -22,7 +22,7 @@ public:
 
 	/** Called in each tick, a_Dt is the time passed since the last tick, in msec */
 	virtual void Simulate(float a_Dt) = 0;
-	
+
 	/** Called in each tick for each chunk, a_Dt is the time passed since the last tick, in msec; direct access to chunk data available */
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 	{
@@ -31,7 +31,7 @@ public:
 		UNUSED(a_ChunkZ);
 		UNUSED(a_Chunk);
 	}
-	
+
 	/** Called when a block changes */
 	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
 
@@ -39,7 +39,7 @@ public:
 
 protected:
 	friend class cChunk;  // Calls AddBlock() in its WakeUpSimulators() function, to speed things up
-	
+
 	/** Called to simulate a new block */
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) = 0;
 

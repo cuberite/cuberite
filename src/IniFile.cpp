@@ -213,13 +213,13 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 	for (size_t keyID = 0; keyID < keys.size(); ++keyID)
 	{
 		f << '[' << names[keyID] << ']' << iniEOL;
-		
+
 		// Comments.
 		for (size_t commentID = 0; commentID < keys[keyID].comments.size(); ++commentID)
 		{
 			f << ';' << keys[keyID].comments[commentID] << iniEOL;
 		}
-		
+
 		// Values.
 		for (size_t valueID = 0; valueID < keys[keyID].names.size(); ++valueID)
 		{
@@ -662,7 +662,7 @@ bool cIniFile::HasValue(const AString & a_KeyName, const AString & a_ValueName) 
 	{
 		return false;
 	}
-	
+
 	// Find the value:
 	int valueID = FindValue(keyID, a_ValueName);
 	return (valueID != noID);

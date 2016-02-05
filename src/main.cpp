@@ -341,9 +341,9 @@ static void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 		serviceSetState(0, SERVICE_STOPPED, GetLastError());
 		return;
 	}
-	
+
 	serviceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
-	
+
 	DWORD ThreadID;
 	g_ServiceThread = CreateThread(nullptr, 0, serviceWorkerThread, nullptr, 0, &ThreadID);
 	if (g_ServiceThread == nullptr)
@@ -353,9 +353,9 @@ static void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 		return;
 	}
 	WaitForSingleObject(g_ServiceThread, INFINITE);  // Wait here for a stop signal.
-	
+
 	CloseHandle(g_ServiceThread);
-	
+
 	serviceSetState(0, SERVICE_STOPPED, 0);
 }
 #endif  // Windows service support.
@@ -466,11 +466,11 @@ int main(int argc, char ** argv)
 
 	#if defined(_DEBUG) && defined(_MSC_VER)
 		_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	
+
 		// _X: The simple built-in CRT leak finder - simply break when allocating the Nth block ({N} is listed in the leak output)
 		// Only useful when the leak is in the same sequence all the time
 		// _CrtSetBreakAlloc(85950);
-	
+
 	#endif  // _DEBUG && _MSC_VER
 
 	#ifndef _DEBUG
@@ -487,7 +487,7 @@ int main(int argc, char ** argv)
 	#ifdef __unix__
 		std::signal(SIGPIPE, SIG_IGN);
 	#endif
-	
+
 	#ifdef _WIN32
 		if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
 		{

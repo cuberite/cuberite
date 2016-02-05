@@ -46,7 +46,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		a_BlockType = m_BlockType;
 		a_BlockMeta = PlayerYawToMetaData(a_Player->GetYaw());
 		return true;
@@ -118,7 +118,7 @@ public:
 	{
 		// Vanilla refuses to place doors on transparent blocks, except top-half slabs and other doors
 		// We need to keep the door compatible with itself, otherwise the top half drops while the bottom half stays
-		
+
 		// Doors can be placed on upside-down slabs
 		if (cBlockSlabHandler::IsAnySlabType(a_BlockType) && ((a_BlockMeta & 0x08) != 0))
 		{
@@ -159,7 +159,7 @@ public:
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
 		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
-		
+
 		a_Yaw += 90 + 45;
 		if (a_Yaw > 360)
 		{

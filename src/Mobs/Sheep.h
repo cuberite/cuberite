@@ -11,7 +11,7 @@ class cSheep :
 	public cPassiveMonster
 {
 	typedef cPassiveMonster super;
-	
+
 public:
 
 	/** The number is the color of the sheep.

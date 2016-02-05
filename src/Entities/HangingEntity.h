@@ -20,7 +20,7 @@ public:
 	CLASS_PROTODEF(cHangingEntity)
 
 	cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
-	
+
 	// tolua_begin
 
 	/** Returns the direction in which the entity is facing. */

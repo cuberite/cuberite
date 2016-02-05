@@ -42,7 +42,7 @@ public:
 			default:            return FoodInfo(0, 0);
 		}
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -55,7 +55,7 @@ public:
 			// Only allow planting seeds from the top side of the block
 			return false;
 		}
-		
+
 		// Only allow placement on farmland
 		int X = a_BlockX;
 		int Y = a_BlockY;
@@ -65,7 +65,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		a_BlockMeta = 0;
 		switch (m_ItemType)
 		{

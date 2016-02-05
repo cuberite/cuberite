@@ -23,7 +23,7 @@ public:
 		short ItemType = (m_BlockType == E_BLOCK_MELON_STEM) ? E_ITEM_MELON_SEEDS : E_ITEM_PUMPKIN_SEEDS;
 		a_Pickups.push_back(cItem(ItemType, 1, 0));
 	}
-	
+
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		auto Action = CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);

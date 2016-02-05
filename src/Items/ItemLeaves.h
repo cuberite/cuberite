@@ -11,7 +11,7 @@ class cItemLeavesHandler :
 	public cItemHandler
 {
 	typedef cItemHandler super;
-	
+
 public:
 	cItemLeavesHandler(int a_ItemType)
 		: cItemHandler(a_ItemType)

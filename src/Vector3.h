@@ -121,7 +121,7 @@ public:
 		y = Clamp(y, a_Min, a_Max);
 		z = Clamp(z, a_Min, a_Max);
 	}
-	
+
 	inline Vector3<T> Cross(const Vector3<T> & a_Rhs) const
 	{
 		return Vector3<T>(
@@ -147,7 +147,7 @@ public:
 			#pragma clang diagnostic pop
 		#endif
 	}
-	
+
 	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const
 	{
 		return (Abs(x - a_Rhs.x) < a_Eps) && (Abs(y - a_Rhs.y) < a_Eps) && (Abs(z - a_Rhs.z) < a_Eps);
@@ -236,7 +236,7 @@ public:
 	}
 
 	// tolua_begin
-	
+
 	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
 	{
 		return Vector3<T>(
@@ -362,7 +362,7 @@ public:
 
 	/** Return value of LineCoeffToPlane() if the line is parallel to the plane. */
 	static const double NO_INTERSECTION;
-	
+
 protected:
 
 	/** Returns the absolute value of the given argument.

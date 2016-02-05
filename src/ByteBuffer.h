@@ -29,22 +29,22 @@ class cByteBuffer
 public:
 	cByteBuffer(size_t a_BufferSize);
 	~cByteBuffer();
-	
+
 	/** Writes the bytes specified to the ringbuffer. Returns true if successful, false if not */
 	bool Write(const void * a_Bytes, size_t a_Count);
-	
+
 	/** Returns the number of bytes that can be successfully written to the ringbuffer */
 	size_t GetFreeSpace(void) const;
-	
+
 	/** Returns the number of bytes that are currently in the ringbuffer. Note GetReadableBytes() */
 	size_t GetUsedSpace(void) const;
-	
+
 	/** Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already) */
 	size_t GetReadableSpace(void) const;
-	
+
 	/** Returns the current data start index. For debugging purposes. */
 	size_t  GetDataStart(void) const { return m_DataStart; }
-	
+
 	/** Returns true if the specified amount of bytes are available for reading */
 	bool CanReadBytes(size_t a_Count) const;
 
@@ -98,41 +98,41 @@ public:
 	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool WriteLEInt32        (Int32 a_Value);
 	bool WritePosition64     (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
-	
+
 	/** Reads a_Count bytes into a_Buffer; returns true if successful */
 	bool ReadBuf(void * a_Buffer, size_t a_Count);
-	
+
 	/** Writes a_Count bytes into a_Buffer; returns true if successful */
 	bool WriteBuf(const void * a_Buffer, size_t a_Count);
-	
+
 	/** Reads a_Count bytes into a_String; returns true if successful */
 	bool ReadString(AString & a_String, size_t a_Count);
-	
+
 	/** Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer */
 	bool SkipRead(size_t a_Count);
-	
+
 	/** Reads all available data into a_Data */
 	void ReadAll(AString & a_Data);
-	
+
 	/** Reads the specified number of bytes and writes it into the destinatio bytebuffer. Returns true on success. */
 	bool ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes);
-	
+
 	/** Removes the bytes that have been read from the ringbuffer */
 	void CommitRead(void);
-	
+
 	/** Restarts next reading operation at the start of the ringbuffer */
 	void ResetRead(void);
-	
+
 	/** Re-reads the data that has been read since the last commit to the current readpos. Used by ProtoProxy to duplicate communication */
 	void ReadAgain(AString & a_Out);
-	
+
 	/** Checks if the internal state is valid (read and write positions in the correct bounds) using ASSERTs */
 	void CheckValid(void) const;
 
 protected:
 	char * m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer
-	
+
 	size_t m_DataStart;  // Where the data starts in the ringbuffer
 	size_t m_WritePos;   // Where the data ends in the ringbuffer
 	size_t m_ReadPos;    // Where the next read will start in the ringbuffer
@@ -142,7 +142,7 @@ protected:
 		Used for checking that only one thread accesses the object at a time, via cSingleThreadAccessChecker. */
 		mutable std::thread::id m_ThreadID;
 	#endif
-	
+
 	/** Advances the m_ReadPos by a_Count bytes */
 	void AdvanceReadPos(size_t a_Count);
 } ;

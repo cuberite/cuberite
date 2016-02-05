@@ -267,12 +267,12 @@ void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a
 	lua_getfield(m_LuaState, -1, a_PathVariable.c_str());                            // Stk: <package> <package.path>
 	size_t len = 0;
 	const char * PackagePath = lua_tolstring(m_LuaState, -1, &len);
-	
+
 	// Append the new path:
 	AString NewPackagePath(PackagePath, len);
 	NewPackagePath.append(LUA_PATHSEP);
 	NewPackagePath.append(a_Path);
-	
+
 	// Set the new path to the environment:
 	lua_pop(m_LuaState, 1);                                                          // Stk: <package>
 	lua_pushlstring(m_LuaState, NewPackagePath.c_str(), NewPackagePath.length());    // Stk: <package> <NewPackagePath>
@@ -382,10 +382,10 @@ bool cLuaState::PushFunction(const char * a_FunctionName)
 		// This happens if cPlugin::Initialize() fails with an error
 		return false;
 	}
-	
+
 	// Push the error handler for lua_pcall()
 	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
-	
+
 	lua_getglobal(m_LuaState, a_FunctionName);
 	if (!lua_isfunction(m_LuaState, -1))
 	{
@@ -406,10 +406,10 @@ bool cLuaState::PushFunction(int a_FnRef)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
-	
+
 	// Push the error handler for lua_pcall()
 	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
-	
+
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // same as lua_getref()
 	if (!lua_isfunction(m_LuaState, -1))
 	{
@@ -429,10 +429,10 @@ bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
-	
+
 	// Push the error handler for lua_pcall()
 	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
-	
+
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_TableRef.GetTableRef());  // Get the table ref
 	if (!lua_istable(m_LuaState, -1))
 	{
@@ -447,10 +447,10 @@ bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 		lua_pop(m_LuaState, 3);
 		return false;
 	}
-	
+
 	// Pop the table off the stack:
 	lua_remove(m_LuaState, -2);
-	
+
 	Printf(m_CurrentFunctionName, "<table-callback %s>", a_TableRef.GetFnName());
 	m_NumCurrentFunctionArgs = 0;
 	return true;
@@ -1005,13 +1005,13 @@ bool cLuaState::CallFunction(int a_NumResults)
 	ASSERT (m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
 	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));  // The function to call
 	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 2));  // The error handler
-	
+
 	// Save the current "stack" state and reset, in case the callback calls another function:
 	AString CurrentFunctionName;
 	std::swap(m_CurrentFunctionName, CurrentFunctionName);
 	int NumArgs = m_NumCurrentFunctionArgs;
 	m_NumCurrentFunctionArgs = -1;
-	
+
 	// Call the function:
 	int s = lua_pcall(m_LuaState, NumArgs, a_NumResults, -NumArgs - 2);
 	if (s != 0)
@@ -1020,10 +1020,10 @@ bool cLuaState::CallFunction(int a_NumResults)
 		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
 		return false;
 	}
-	
+
 	// Remove the error handler from the stack:
 	lua_remove(m_LuaState, -a_NumResults - 1);
-	
+
 	return true;
 }
 
@@ -1034,12 +1034,12 @@ bool cLuaState::CallFunction(int a_NumResults)
 bool cLuaState::CheckParamUserTable(int a_StartParam, const char * a_UserTable, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	tolua_Error tolua_err;
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
@@ -1055,7 +1055,7 @@ bool cLuaState::CheckParamUserTable(int a_StartParam, const char * a_UserTable, 
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1067,12 +1067,12 @@ bool cLuaState::CheckParamUserTable(int a_StartParam, const char * a_UserTable, 
 bool cLuaState::CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	tolua_Error tolua_err;
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
@@ -1088,7 +1088,7 @@ bool cLuaState::CheckParamUserType(int a_StartParam, const char * a_UserType, in
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1100,12 +1100,12 @@ bool cLuaState::CheckParamUserType(int a_StartParam, const char * a_UserType, in
 bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	tolua_Error tolua_err;
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
@@ -1124,7 +1124,7 @@ bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1136,12 +1136,12 @@ bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
 bool cLuaState::CheckParamNumber(int a_StartParam, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	tolua_Error tolua_err;
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
@@ -1157,7 +1157,7 @@ bool cLuaState::CheckParamNumber(int a_StartParam, int a_EndParam)
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1169,12 +1169,12 @@ bool cLuaState::CheckParamNumber(int a_StartParam, int a_EndParam)
 bool cLuaState::CheckParamBool(int a_StartParam, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	tolua_Error tolua_err;
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
@@ -1190,7 +1190,7 @@ bool cLuaState::CheckParamBool(int a_StartParam, int a_EndParam)
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1202,12 +1202,12 @@ bool cLuaState::CheckParamBool(int a_StartParam, int a_EndParam)
 bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	tolua_Error tolua_err;
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
@@ -1226,7 +1226,7 @@ bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1238,12 +1238,12 @@ bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 bool cLuaState::CheckParamFunction(int a_StartParam, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
 		if (lua_isfunction(m_LuaState, i))
@@ -1259,7 +1259,7 @@ bool cLuaState::CheckParamFunction(int a_StartParam, int a_EndParam)
 		);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1271,12 +1271,12 @@ bool cLuaState::CheckParamFunction(int a_StartParam, int a_EndParam)
 bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 {
 	ASSERT(IsValid());
-	
+
 	if (a_EndParam < 0)
 	{
 		a_EndParam = a_StartParam;
 	}
-	
+
 	for (int i = a_StartParam; i <= a_EndParam; i++)
 	{
 		if (lua_isfunction(m_LuaState, i) || lua_isnil(m_LuaState, i))
@@ -1292,7 +1292,7 @@ bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 		);
 		return false;
 	}  // for i - Param
-	
+
 	// All params checked ok
 	return true;
 }
@@ -1324,7 +1324,7 @@ bool cLuaState::CheckParamEnd(int a_Param)
 bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
 {
 	ASSERT(IsValid());
-	
+
 	tolua_Error tolua_err;
 	return (tolua_isusertype(m_LuaState, a_Param, a_UserType.c_str(), 0, &tolua_err) == 1);
 }
@@ -1336,7 +1336,7 @@ bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
 bool cLuaState::IsParamNumber(int a_Param)
 {
 	ASSERT(IsValid());
-	
+
 	tolua_Error tolua_err;
 	return (tolua_isnumber(m_LuaState, a_Param, 0, &tolua_err) == 1);
 }
@@ -1361,7 +1361,7 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 		// No error to report
 		return false;
 	}
-	
+
 	LOGWARNING("LUA: %d - %s", a_Status, lua_tostring(a_LuaState, -1));
 	lua_pop(a_LuaState, 1);
 	return true;
@@ -1416,10 +1416,10 @@ int cLuaState::CallFunctionWithForeignParams(
 {
 	ASSERT(IsValid());
 	ASSERT(a_SrcLuaState.IsValid());
-	
+
 	// Store the stack position before any changes
 	int OldTop = lua_gettop(m_LuaState);
-	
+
 	// Push the function to call, including the error handler:
 	if (!PushFunction(a_FunctionName.c_str()))
 	{
@@ -1437,7 +1437,7 @@ int cLuaState::CallFunctionWithForeignParams(
 		m_CurrentFunctionName.clear();
 		return -1;
 	}
-	
+
 	// Call the function, with an error handler:
 	int s = lua_pcall(m_LuaState, a_SrcParamEnd - a_SrcParamStart + 1, LUA_MULTRET, OldTop + 1);
 	if (ReportErrors(s))
@@ -1445,23 +1445,23 @@ int cLuaState::CallFunctionWithForeignParams(
 		LOGWARN("Error while calling function '%s' in '%s'", a_FunctionName.c_str(), m_SubsystemName.c_str());
 		// Reset the stack:
 		lua_settop(m_LuaState, OldTop);
-		
+
 		// Reset the internal checking mechanisms:
 		m_NumCurrentFunctionArgs = -1;
 		m_CurrentFunctionName.clear();
-		
+
 		// Make Lua think everything is okay and return 0 values, so that plugins continue executing.
 		// The failure is indicated by the zero return values.
 		return 0;
 	}
-	
+
 	// Reset the internal checking mechanisms:
 	m_NumCurrentFunctionArgs = -1;
 	m_CurrentFunctionName.clear();
-	
+
 	// Remove the error handler from the stack:
 	lua_remove(m_LuaState, OldTop + 1);
-	
+
 	// Return the number of return values:
 	return lua_gettop(m_LuaState) - OldTop;
 }
@@ -1520,7 +1520,7 @@ int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_Sr
 				lua_rawget(a_SrcLuaState, LUA_REGISTRYINDEX);  // Stack +1
 				type = lua_tostring(a_SrcLuaState, -1);
 				lua_pop(a_SrcLuaState, 1);                     // Stack -1
-				
+
 				// Copy the value:
 				void * ud = tolua_touserdata(a_SrcLuaState, i, nullptr);
 				tolua_pushusertype(m_LuaState, ud, type);
@@ -1693,7 +1693,7 @@ void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 void cLuaState::cRef::UnRef(void)
 {
 	ASSERT(m_LuaState->IsValid());  // The reference should be destroyed before destroying the LuaState
-	
+
 	if (IsValid())
 	{
 		luaL_unref(*m_LuaState, LUA_REGISTRYINDEX, m_Ref);

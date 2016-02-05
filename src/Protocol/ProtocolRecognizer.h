@@ -29,7 +29,7 @@ class cProtocolRecognizer :
 	public cProtocol
 {
 	typedef cProtocol super;
-	
+
 public:
 	enum
 	{
@@ -40,13 +40,13 @@ public:
 
 	cProtocolRecognizer(cClientHandle * a_Client);
 	virtual ~cProtocolRecognizer();
-	
+
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
-	
+
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
-	
+
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
@@ -128,7 +128,7 @@ public:
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
 	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
-	
+
 	virtual AString GetAuthServerID(void) override;
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
@@ -139,11 +139,11 @@ protected:
 
 	/** Buffer for the incoming data until we recognize the protocol */
 	cByteBuffer m_Buffer;
-	
+
 
 	/** Tries to recognize protocol based on m_Buffer contents; returns true if recognized */
 	bool TryRecognizeProtocol(void);
-	
+
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
 	The packet length and type have already been read, type is 0
 	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining. */

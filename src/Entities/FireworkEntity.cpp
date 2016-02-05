@@ -26,14 +26,14 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int PosY = POSY_TOINT;
-	
+
 	if ((PosY < 0) || (PosY >= cChunkDef::Height))
 	{
 		AddSpeedY(1);
 		AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));
 		return;
 	}
-	
+
 	if (m_IsInGround)
 	{
 		if (a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ) == E_BLOCK_AIR)
@@ -53,7 +53,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 			return;
 		}
 	}
-	
+
 	AddSpeedY(1);
 	AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));
 }
@@ -65,7 +65,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	
+
 	if (m_TicksToExplosion <= 0)
 	{
 		// TODO: Notify the plugins
@@ -73,6 +73,6 @@ void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy();
 		return;
 	}
-	
+
 	m_TicksToExplosion -= 1;
 }
