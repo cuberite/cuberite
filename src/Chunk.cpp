@@ -138,10 +138,8 @@ cChunk::~cChunk()
 	cEntityList Entities(m_Entities);
 	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
 	{
-		if (!(*itr)->IsPlayer())  // Player entities will be deleted when the world deletes clientHandles, then those client handles will delete players.
-		{
-			(*itr)->Destroy(false);
-		}
+		ASSERT(!(*itr)->IsPlayer());  // Player entities were already deleted when the world deleted clientHandles, then those client handles deleted players.
+		(*itr)->Destroy(false);
 	}
 
 	if (m_NeighborXM != nullptr)

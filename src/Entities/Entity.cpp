@@ -227,7 +227,7 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	//  - It is safe for it to remove us right now, since it is not inside a tick, and it won't invalidate its iterators.
 	Destroyed();
 
-	m_ParentChunk->RemoveEntityIfNotTicking(this);
+	m_ParentChunk->DeleteEntityIfNotTicking(this);
 }
 
 
