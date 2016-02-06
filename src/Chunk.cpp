@@ -123,7 +123,7 @@ cChunk::cChunk(
 
 cChunk::~cChunk()
 {
-	ASSERT(!m_IsInTick);
+	ASSERT(!m_IsInTick);  // Something is really wrong if we're getting destroyed in a tick
 	cPluginManager::Get()->CallHookChunkUnloaded(*m_World, m_PosX, m_PosZ);
 
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
@@ -138,7 +138,7 @@ cChunk::~cChunk()
 	cEntityList Entities(m_Entities);
 	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
 	{
-		if (!(*itr)->IsPlayer())
+		if (!(*itr)->IsPlayer())  // Player entities will be deleted when the world deletes clientHandles, then those client handles will delete players.
 		{
 			(*itr)->Destroy(false);
 		}
