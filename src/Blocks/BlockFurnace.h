@@ -22,7 +22,7 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_FURNACE, 1, 0));
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -31,10 +31,10 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		
+
 		// FIXME: Do not use cPiston class for furnace placement!
 		a_BlockMeta = cBlockPistonHandler::RotationPitchToMetaData(a_Player->GetYaw(), 0);
-		
+
 		return true;
 	}
 

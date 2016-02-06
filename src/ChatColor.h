@@ -10,7 +10,7 @@ class cChatColor
 {
 public:
 	static const char * Delimiter;
-	
+
 	/** @deprecated use ChatColor::Delimiter instead */
 	static const char * Color;
 

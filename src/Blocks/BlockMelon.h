@@ -15,7 +15,7 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		cFastRandom Random;

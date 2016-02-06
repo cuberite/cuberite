@@ -21,7 +21,7 @@ class cEntropyContext
 public:
 	cEntropyContext(void);
 	~cEntropyContext();
-	
+
 protected:
 	entropy_context m_Entropy;
 } ;

@@ -36,7 +36,7 @@ class cPluginLua :
 
 public:
 	// tolua_end
-	
+
 	/** A RAII-style mutex lock for accessing the internal LuaState.
 	This will be the only way to retrieve the plugin's LuaState;
 	therefore it directly supports accessing the LuaState of the locked plugin.
@@ -54,10 +54,10 @@ public:
 		}
 
 		cLuaState & operator ()(void) { return m_Plugin.m_LuaState; }
-		
+
 	protected:
 		cPluginLua & m_Plugin;
-		
+
 		/** RAII lock for m_Plugin.m_CriticalSection */
 		cCSLock m_Lock;
 	} ;
@@ -92,8 +92,8 @@ public:
 
 	typedef SharedPtr<cResettable> cResettablePtr;
 	typedef std::vector<cResettablePtr> cResettablePtrs;
-	
-	
+
+
 	cPluginLua(const AString & a_PluginDirectory);
 	~cPluginLua();
 
@@ -169,18 +169,18 @@ public:
 	virtual bool OnWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) override;
 	virtual bool OnWorldStarted             (cWorld & a_World) override;
 	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) override;
-	
+
 	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand) override;
-	
+
 	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand) override;
 
 	virtual void ClearCommands(void) override;
-	
+
 	virtual void ClearConsoleCommands(void) override;
 
 	/** Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121) */
 	bool CanAddOldStyleHook(int a_HookType);
-	
+
 	// cWebPlugin overrides
 	virtual const AString GetWebTitle(void) const override {return GetName(); }
 	virtual AString HandleWebRequest(const HTTPRequest & a_Request) override;
@@ -188,7 +188,7 @@ public:
 	/** Adds a new web tab to webadmin.
 	Displaying the tab calls the referenced function. */
 	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);  // Exported in ManualBindings.cpp
-	
+
 	/** Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
 	void BindCommand(const AString & a_Command, int a_FnRef);
 
@@ -198,25 +198,25 @@ public:
 	cLuaState & GetLuaState(void) { return m_LuaState; }
 
 	cCriticalSection & GetCriticalSection(void) { return m_CriticalSection; }
-	
+
 	/** Removes a previously referenced object (luaL_unref()) */
 	void Unreference(int a_LuaRef);
-	
+
 	/** Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true */
 	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse);
-	
+
 	/** Calls the plugin-specified "cLuaWindow slot changed" callback. */
 	void CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum);
-	
+
 	/** Returns the name of Lua function that should handle the specified hook type in the older (#121) API */
 	static const char * GetHookFnName(int a_HookType);
-	
+
 	/** Adds a Lua function to be called for the specified hook.
 	The function has to be on the Lua stack at the specified index a_FnRefIdx
 	Returns true if the hook was added successfully.
 	*/
 	bool AddHookRef(int a_HookType, int a_FnRefIdx);
-	
+
 	/** Calls a function in this plugin's LuaState with parameters copied over from a_ForeignState.
 	The values that the function returns are placed onto a_ForeignState.
 	Returns the number of values returned, if successful, or negative number on failure. */
@@ -226,7 +226,7 @@ public:
 		int a_ParamStart,
 		int a_ParamEnd
 	);
-	
+
 	/** Call a Lua function residing in the plugin. */
 	template <typename FnT, typename... Args>
 	bool Call(FnT a_Fn, Args && ... a_Args)
@@ -241,20 +241,20 @@ public:
 protected:
 	/** Maps command name into Lua function reference */
 	typedef std::map<AString, int> CommandMap;
-	
+
 	/** Provides an array of Lua function references */
 	typedef std::vector<cLuaState::cRef *> cLuaRefs;
-	
+
 	/** Maps hook types into arrays of Lua function references to call for each hook type */
 	typedef std::map<int, cLuaRefs> cHookMap;
-	
+
 
 	/** The mutex protecting m_LuaState and each of the m_Resettables[] against multithreaded use. */
 	cCriticalSection m_CriticalSection;
 
 	/** The plugin's Lua state. */
 	cLuaState m_LuaState;
-	
+
 	/** Objects that need notification when the plugin is about to be unloaded. */
 	cResettablePtrs m_Resettables;
 
@@ -263,10 +263,10 @@ protected:
 
 	/** Console commands that the plugin has registered. */
 	CommandMap m_ConsoleCommands;
-	
+
 	/** Hooks that the plugin has registered. */
 	cHookMap m_HookMap;
-	
+
 
 	/** Releases all Lua references, notifies and removes all m_Resettables[] and closes the m_LuaState. */
 	void Close(void);

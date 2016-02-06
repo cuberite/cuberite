@@ -166,11 +166,11 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		LOGD("%s: Start Y is outside the world (%.2f), not tracing.", __FUNCTION__, a_Start.y);
 		return false;
 	}
-	
+
 	SetValues(a_Start, a_Direction);
 
 	Vector3f End = a_Start + (dir * static_cast<float>(a_Distance));
-	
+
 	if (End.y < 0)
 	{
 		float dist = -a_Start.y / dir.y;  // No division by 0 possible
@@ -181,7 +181,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	end1.x = static_cast<int>(floorf(End.x));
 	end1.y = static_cast<int>(floorf(End.y));
 	end1.z = static_cast<int>(floorf(End.z));
-	
+
 	// check if first is occupied
 	if (pos.Equals(end1))
 	{
@@ -250,7 +250,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		{
 			return false;
 		}
-		
+
 		if ((pos.y < 0) || (pos.y >= cChunkDef::Height))
 		{
 			return false;
@@ -328,7 +328,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 		}
 		return 0;  // no intersection
 	}
-	
+
 	// they are not parallel
 	// compute intersect param
 	float sI = N / D;

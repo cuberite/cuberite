@@ -120,7 +120,7 @@ public:
 	{
 		return ((a_Height >= 0) && (a_Height < Height));
 	}
-	
+
 	/** Validates a width-coordinate. Returns false if width-coordiante is out of width bounds */
 	inline static bool IsValidWidth(int a_Width)
 	{

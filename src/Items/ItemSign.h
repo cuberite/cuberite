@@ -45,7 +45,7 @@ public:
 		return true;
 	}
 
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,

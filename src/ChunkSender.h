@@ -65,22 +65,22 @@ public:
 		E_CHUNK_PRIORITY_MIDHIGH,
 		E_CHUNK_PRIORITY_MEDIUM,
 		E_CHUNK_PRIORITY_LOW,
-		
+
 	};
-	
+
 	bool Start();
-	
+
 	void Stop(void);
-	
+
 	/** Queues a chunk to be sent to a specific client */
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client);
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Client);
-	
+
 	/** Removes the a_Client from all waiting chunk send operations */
 	void RemoveClient(cClientHandle * a_Client);
-	
+
 protected:
-	
+
 	struct sChunkQueue
 	{
 		eChunkPriority m_Priority;
@@ -110,9 +110,9 @@ protected:
 		{
 		}
 	};
-	
+
 	cWorld & m_World;
-	
+
 	cCriticalSection  m_CS;
 	std::priority_queue<sChunkQueue> m_SendChunks;
 	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
@@ -124,10 +124,10 @@ protected:
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
 	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
 	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
-	
+
 	// cIsThread override:
 	virtual void Execute(void) override;
-	
+
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
 	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) override;

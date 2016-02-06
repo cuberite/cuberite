@@ -58,7 +58,7 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();
-	
+
 	m_FuseTicks -= 1;
 	if (m_FuseTicks <= 0)
 	{

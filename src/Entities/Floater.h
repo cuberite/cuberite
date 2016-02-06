@@ -12,7 +12,7 @@ class cFloater :
 	public cEntity
 {
 	typedef cEntity super;
-	
+
 public:
 	// tolua_end
 
@@ -22,7 +22,7 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	
+
 	// tolua_begin
 	bool CanPickup(void)       const { return m_CanPickupItem; }
 	UInt32 GetOwnerID(void)       const { return m_PlayerID; }

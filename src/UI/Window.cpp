@@ -253,7 +253,7 @@ void cWindow::Clicked(
 			break;
 		}
 	}
-	
+
 	if (a_SlotNum < 0)
 	{
 		// TODO: Other click actions with irrelevant slot number (FS #371)
@@ -270,7 +270,7 @@ void cWindow::Clicked(
 		}
 		LocalSlotNum -= itr->GetNumSlots();
 	}
-	
+
 	LOGWARNING("Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",
 		a_SlotNum, GetNumSlots(), a_Player.GetName().c_str()
 	);
@@ -288,7 +288,7 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 		m_OpenedBy.remove(&a_Player);
 		// Then add player
 		m_OpenedBy.push_back(&a_Player);
-		
+
 		for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
 		{
 			(*itr)->OnPlayerAdded(a_Player);
@@ -326,7 +326,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 		}  // for itr - m_SlotAreas[]
 
 		m_OpenedBy.remove(&a_Player);
-		
+
 		if ((m_WindowType != wtInventory) && m_OpenedBy.empty())
 		{
 			Destroy();
@@ -336,7 +336,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	{
 		delete this;
 	}
-	
+
 	return true;
 }
 
@@ -436,7 +436,7 @@ bool cWindow::CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer
 			return true;
 		}
 	}
-	
+
 	// a_Dragging still not full, ask slot areas before a_Area in the list:
 	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
 	{
@@ -480,7 +480,7 @@ void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_Relativ
 		ASSERT(!"cWindow::SendSlot(): unknown a_SlotArea");
 		return;
 	}
-	
+
 	a_Player.GetClientHandle()->SendInventorySlot(
 		m_WindowID, static_cast<short>(a_RelativeSlotNum + SlotBase), *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
 	);
@@ -512,7 +512,7 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 		ASSERT(!"Invalid SlotNum");
 		return nullptr;
 	}
-	
+
 	// Iterate through all the SlotAreas, find the correct one
 	int LocalSlotNum = a_GlobalSlotNum;
 	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
@@ -524,7 +524,7 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 		}
 		LocalSlotNum -= (*itr)->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
-	
+
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
 	LOGWARNING("%s: GetNumSlots() is out of sync: %d; LocalSlotNum = %d", __FUNCTION__, GetNumSlots(), LocalSlotNum);
 	ASSERT(!"Invalid GetNumSlots");
@@ -543,7 +543,7 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 		ASSERT(!"Invalid SlotNum");
 		return nullptr;
 	}
-	
+
 	// Iterate through all the SlotAreas, find the correct one
 	int LocalSlotNum = a_GlobalSlotNum;
 	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
@@ -555,7 +555,7 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 		}
 		LocalSlotNum -= (*itr)->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
-	
+
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
 	LOGWARNING("%s: GetNumSlots() is out of sync: %d; LocalSlotNum = %d", __FUNCTION__, GetNumSlots(), LocalSlotNum);
 	ASSERT(!"Invalid GetNumSlots");
@@ -590,20 +590,20 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 {
 	// Process the entire action stored in the internal structures for inventory painting
 	// distribute as many items as possible
-	
+
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
 	int ToEachSlot = static_cast<int>(ToDistribute.m_ItemCount) / static_cast<int>(SlotNums.size());
-	
+
 	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
-	
+
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
 	if (a_Player.GetDraggingItem().m_ItemCount == 0)
 	{
 		a_Player.GetDraggingItem().Empty();
 	}
-	
+
 	SendWholeWindow(*a_Player.GetClientHandle());
 
 	// To fix #2345 (custom recipes don't work when inventory-painting), we send the result slot explicitly once again
@@ -622,16 +622,16 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	
+
 	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, 1, SlotNums);
-	
+
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
 	if (a_Player.GetDraggingItem().m_ItemCount == 0)
 	{
 		a_Player.GetDraggingItem().Empty();
 	}
-	
+
 	SendWholeWindow(*a_Player.GetClientHandle());
 
 	// To fix #2345 (custom recipes don't work when inventory-painting), we send the result slot explicitly once again
@@ -651,7 +651,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now
 		return 0;
 	}
-	
+
 	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
 	int NumDistributed = 0;
 	for (cSlotNums::const_iterator itr = a_SlotNums.begin(), end = a_SlotNums.end(); itr != end; ++itr)
@@ -663,7 +663,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 			LOGWARNING("%s: Bad SlotArea for slot %d", __FUNCTION__, *itr);
 			continue;
 		}
-		
+
 		// Modify the item at the slot
 		cItem AtSlot(*Area->GetSlot(LocalSlotNum, a_Player));
 		int MaxStack = AtSlot.GetMaxStackSize();
@@ -712,7 +712,7 @@ void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
 		ASSERT(!"Invalid slot area");
 		return;
 	}
-	
+
 	// Broadcast the update packet:
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)

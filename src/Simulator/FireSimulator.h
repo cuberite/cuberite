@@ -39,22 +39,22 @@ protected:
 
 	/** Chance [0..100000] of an adjacent fuel to catch fire on each tick */
 	int m_Flammability;
-	
+
 	/** Chance [0..100000] of a fuel burning out being replaced by a new fire block instead of an air block */
 	int m_ReplaceFuelChance;
-	
-	
+
+
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
-	
+
 	/** Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels */
 	int GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
-	
+
 	/** Tries to spread fire to a neighborhood of the specified block */
 	void TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
-	
+
 	/** Removes all burnable blocks neighboring the specified block */
 	void RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
-	
+
 	/** Returns true if a fire can be started in the specified block,
 	that is, it is an air block and has fuel next to it.
 	Note that a_NearChunk may be a chunk neighbor to the block specified!

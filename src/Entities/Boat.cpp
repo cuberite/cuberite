@@ -74,17 +74,17 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 			a_Player.Detach();
 			return;
 		}
-		
+
 		if (m_Attachee->IsPlayer())
 		{
 			// Another player is already sitting in here, cannot attach
 			return;
 		}
-		
+
 		// Detach whatever is sitting in this boat now:
 		m_Attachee->Detach();
 	}
-	
+
 	// Attach the player to this boat
 	a_Player.AttachTo(this);
 }
@@ -124,7 +124,7 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 	{
 		return;
 	}
-	
+
 	Vector3d ToAddSpeed = m_Attachee->GetLookVector() * (a_Sideways * 0.4) ;
 	ToAddSpeed.y = 0;
 

@@ -78,7 +78,7 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 			}
 			m_IsValid = true;
 		}
-		
+
 		~cPubKey()
 		{
 			if (m_IsValid)
@@ -86,14 +86,14 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 				pk_free(&m_Key);
 			}
 		}
-		
+
 		operator pk_context * (void) { return &m_Key; }
-		
+
 	protected:
 		bool m_IsValid;
 		pk_context m_Key;
 	} PkCtx(&m_Rsa);
-	
+
 	unsigned char buf[3000];
 	int res = pk_write_pubkey_der(PkCtx, buf, sizeof(buf));
 	if (res < 0)

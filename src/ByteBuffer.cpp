@@ -66,7 +66,7 @@ public:
 		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestWrite), "ByteBuffer write");
 		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestWrap),  "ByteBuffer wraparound");
 	}
-	
+
 	static void TestRead(void)
 	{
 		cByteBuffer buf(50);
@@ -78,7 +78,7 @@ public:
 		UInt32 v3;
 		assert_test(buf.ReadVarInt(v3) && (v3 == 0));
 	}
-	
+
 	static void TestWrite(void)
 	{
 		cByteBuffer buf(50);
@@ -90,7 +90,7 @@ public:
 		assert_test(All.size() == 4);
 		assert_test(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
 	}
-	
+
 	static void TestWrap(void)
 	{
 		cByteBuffer buf(3);
@@ -110,7 +110,7 @@ public:
 			assert_test(buf.GetFreeSpace() == FreeSpace);  // We're back to normal
 		}
 	}
-	
+
 } g_ByteBufferTest;
 
 #endif
@@ -203,7 +203,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	size_t CurFreeSpace = GetFreeSpace();
 	size_t CurReadableSpace = GetReadableSpace();
 	size_t WrittenBytes = 0;
-	
+
 	if (CurFreeSpace < a_Count)
 	{
 		return false;
@@ -223,7 +223,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 		}
 		m_WritePos = 0;
 	}
-	
+
 	// We're guaranteed that we'll fit in a single write op
 	if (a_Count > 0)
 	{
@@ -231,7 +231,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 		m_WritePos += a_Count;
 		WrittenBytes += a_Count;
 	}
-	
+
 	ASSERT(GetFreeSpace() == CurFreeSpace - WrittenBytes);
 	ASSERT(GetReadableSpace() == CurReadableSpace + WrittenBytes);
 	return true;
@@ -543,12 +543,12 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 	CheckValid();
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
-	
+
 	#ifdef IS_BIG_ENDIAN
 		// Convert:
 		a_Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
 	#endif
-	
+
 	return true;
 }
 
@@ -569,7 +569,7 @@ bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
 	UInt32 BlockYRaw = (Value >> 26) & 0x0fff;      // Middle 12 bits
 	UInt32 BlockZRaw = (Value & 0x03ffffff);        // Bottom 26 bits
-	
+
 	// If the highest bit in the number's range is set, convert the number into negative:
 	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : -(0x04000000 - static_cast<int>(BlockXRaw));
 	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? static_cast<int>(BlockYRaw) : -(0x0800     - static_cast<int>(BlockYRaw));
@@ -728,7 +728,7 @@ bool cByteBuffer::WriteVarInt32(UInt32 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
-	
+
 	// A 32-bit integer can be encoded by at most 5 bytes:
 	unsigned char b[5];
 	size_t idx = 0;
@@ -750,7 +750,7 @@ bool cByteBuffer::WriteVarInt64(UInt64 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
-	
+
 	// A 64-bit integer can be encoded by at most 10 bytes:
 	unsigned char b[10];
 	size_t idx = 0;
@@ -835,7 +835,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 		}
 		m_ReadPos = 0;
 	}
-	
+
 	// Read the rest of the bytes in a single read (guaranteed to fit):
 	if (a_Count > 0)
 	{
@@ -865,7 +865,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 		a_Count -= BytesToEndOfBuffer;
 		m_WritePos = 0;
 	}
-	
+
 	// Read the rest of the bytes in a single read (guaranteed to fit):
 	if (a_Count > 0)
 	{

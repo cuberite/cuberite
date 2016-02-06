@@ -11,7 +11,7 @@ class cSlime :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
-	
+
 public:
 	/** Creates a slime of the specified size; size can be 1, 2 or 4, with 1 is the smallest and 4 is the tallest. */
 	cSlime(int a_Size);
@@ -24,11 +24,11 @@ public:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	int GetSize(void) const { return m_Size; }
-	
+
 	/** Returns the text describing the slime's size, as used by the client's resource subsystem for sounds.
 	Returns either "big" or "small". */
 	static AString GetSizeName(int a_Size);
-	
+
 protected:
 
 	/** Size of the slime, with 1 being the smallest.

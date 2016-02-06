@@ -10,7 +10,7 @@ class cMagmaCube :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
-	
+
 public:
 	/** Creates a MagmaCube of the specified size; with 1 being the smallest */
 	cMagmaCube(int a_Size);
@@ -23,7 +23,7 @@ public:
 	/** Returns the text describing the slime's size, as used by the client's resource subsystem for sounds.
 	Returns either "big" or "small". */
 	static AString GetSizeName(int a_Size);
-	
+
 protected:
 
 	/** Size of the MagmaCube, with 1 being the smallest */

@@ -11,24 +11,24 @@ class cBlockFluidHandler :
 	public cBlockHandler
 {
 	typedef cBlockHandler super;
-	
+
 public:
 	cBlockFluidHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 
 	}
-		
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// No pickups
 	}
-	
+
 	virtual bool DoesIgnoreBuildCollision(void) override
 	{
 		return true;
 	}
-	
+
 	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
 		switch (m_BlockType)
@@ -84,7 +84,7 @@ public:
 		super(a_BlockType)
 	{
 	}
-	
+
 	/** Called to tick the block */
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -97,7 +97,7 @@ public:
 			}
 		}
 	}
-	
+
 	/** Tries to start a fire near the lava at given coords. Returns true if fire started. */
 	static bool TryStartFireNear(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
 	{
@@ -106,7 +106,7 @@ public:
 		int x = (rnd % 3) - 1;         // -1 .. 1
 		int y = ((rnd / 4) % 4) - 1;   // -1 .. 2
 		int z = ((rnd / 16) % 3) - 1;  // -1 .. 1
-		
+
 		// Check if it's fuel:
 		BLOCKTYPE BlockType;
 		if (
@@ -117,7 +117,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		// Try to set it on fire:
 		static struct
 		{

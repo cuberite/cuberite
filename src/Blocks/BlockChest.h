@@ -18,7 +18,7 @@ public:
 		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -27,14 +27,14 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		
+
 		// Is there a doublechest already next to this block?
 		if (!CanBeAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ))
 		{
 			// Yup, cannot form a triple-chest, refuse:
 			return false;
 		}
-		
+
 		// Check if this forms a doublechest, if so, need to adjust the meta:
 		cBlockArea Area;
 		if (!Area.Read(&a_ChunkInterface, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
@@ -59,7 +59,7 @@ public:
 			a_BlockMeta = (yaw < 0) ? 4 : 5;
 			return true;
 		}
-		
+
 		// Single chest, get meta from rotation only
 		a_BlockMeta = PlayerYawToMetaData(yaw);
 		return true;
@@ -71,7 +71,7 @@ public:
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		return CanBeAt(a_ChunkInterface, BlockX, a_RelY, BlockZ);
 	}
-	
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		cBlockArea Area;
@@ -80,7 +80,7 @@ public:
 			// Cannot read the surroundings, probably at the edge of loaded chunks. Disallow.
 			return false;
 		}
-		
+
 		int NumChestNeighbors = 0;
 		if (Area.GetRelBlockType(1, 0, 2) == m_BlockType)
 		{
@@ -136,7 +136,7 @@ public:
 		}
 		return (NumChestNeighbors < 2);
 	}
-	
+
 	/** Translates player yaw when placing a chest into the chest block metadata. Valid for single chests only */
 	static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
@@ -163,7 +163,7 @@ public:
 			return 0x03;
 		}
 	}
-	
+
 	/** If there's a chest in the a_Area in the specified coords, modifies its meta to a_NewMeta and returns true. */
 	bool CheckAndAdjustNeighbor(cChunkInterface & a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta)
 	{

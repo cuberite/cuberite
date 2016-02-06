@@ -29,7 +29,7 @@ public:
 			default: return 0;
 		}
 	}
-	
+
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
 		switch (a_BlockType)
@@ -38,7 +38,7 @@ public:
 			{
 				return PickaxeLevel() >= 4;
 			}
-			
+
 			case E_BLOCK_DIAMOND_BLOCK:
 			case E_BLOCK_DIAMOND_ORE:
 			case E_BLOCK_EMERALD_ORE:
@@ -49,7 +49,7 @@ public:
 			{
 				return PickaxeLevel() >= 3;
 			}
-			
+
 			case E_BLOCK_IRON_BLOCK:
 			case E_BLOCK_IRON_ORE:
 			case E_BLOCK_LAPIS_ORE:
@@ -57,7 +57,7 @@ public:
 			{
 				return PickaxeLevel() >= 2;
 			}
-			
+
 			case E_BLOCK_ANVIL:
 			case E_BLOCK_BRICK:
 			case E_BLOCK_CAULDRON:

@@ -36,7 +36,7 @@ public:
 		}
 		return false;
 	}
-	
+
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
 		if (a_BlockType == E_BLOCK_SNOW)

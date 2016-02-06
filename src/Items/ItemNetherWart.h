@@ -35,7 +35,7 @@ public:
 			// Only allow planting nether wart from the top side of the block
 			return false;
 		}
-		
+
 		// Only allow placement on farmland
 		int X = a_BlockX;
 		int Y = a_BlockY;

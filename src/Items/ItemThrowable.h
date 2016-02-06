@@ -24,7 +24,7 @@ public:
 		m_SpeedCoeff(a_SpeedCoeff)
 	{
 	}
-	
+
 
 
 	virtual bool OnItemUse(
@@ -51,7 +51,7 @@ public:
 
 		return true;
 	}
-	
+
 protected:
 	cProjectileEntity::eKind m_ProjectileKind;
 	double m_SpeedCoeff;
@@ -79,7 +79,7 @@ class cItemSnowballHandler :
 	public cItemThrowableHandler
 {
 	typedef cItemThrowableHandler super;
-	
+
 public:
 	cItemSnowballHandler(void) :
 		super(E_ITEM_SNOWBALL, cProjectileEntity::pkSnowball, 30)
@@ -95,7 +95,7 @@ class cItemEnderPearlHandler :
 	public cItemThrowableHandler
 {
 	typedef cItemThrowableHandler super;
-	
+
 public:
 	cItemEnderPearlHandler(void) :
 		super(E_ITEM_ENDER_PEARL, cProjectileEntity::pkEnderPearl, 30)

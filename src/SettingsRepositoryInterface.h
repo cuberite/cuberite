@@ -23,7 +23,7 @@ public:
 
 	/** Add a key comment, will always fail if the repository does not support comments */
 	virtual bool AddKeyComment(const AString & keyname, const AString & comment) = 0;
-	
+
 	/** Return a key comment, returns "" for repositories that do not return comments */
 	virtual AString GetKeyComment(const AString & keyname, const int commentID) const = 0;
 

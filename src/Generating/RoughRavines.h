@@ -18,7 +18,7 @@ class cRoughRavines :
 	public cGridStructGen
 {
 	typedef cGridStructGen super;
-	
+
 public:
 	cRoughRavines(
 		int a_Seed,
@@ -31,22 +31,22 @@ public:
 		float a_MaxCeilingHeightCenter, float a_MinCeilingHeightCenter,
 		int a_GridSize, int a_MaxOffset
 	);
-	
+
 protected:
 	int m_Seed;
-	
+
 	/** Maximum size of the ravine, in each of the X / Z axis */
 	int m_MaxSize;
-	
+
 	/** Minimum size of the ravine */
 	int m_MinSize;
 
 	/** Maximum width of the ravine's center, in blocks */
 	float m_MaxCenterWidth;
-	
+
 	/** Minimum width of the ravine's center, in blocks */
 	float m_MinCenterWidth;
-	
+
 	/** Maximum roughness of the ravine */
 	float m_MaxRoughness;
 
@@ -55,25 +55,25 @@ protected:
 
 	/** Maximum floor height at the ravine's edge */
 	float m_MaxFloorHeightEdge;
-	
+
 	/** Minimum floor height at the ravine's edge */
 	float m_MinFloorHeightEdge;
-	
+
 	/** Maximum floor height at the ravine's center */
 	float m_MaxFloorHeightCenter;
-	
+
 	/** Minimum floor height at the ravine's center */
 	float m_MinFloorHeightCenter;
-	
+
 	/** Maximum ceiling height at the ravine's edge */
 	float m_MaxCeilingHeightEdge;
-	
+
 	/** Minimum ceiling height at the ravine's edge */
 	float m_MinCeilingHeightEdge;
-	
+
 	/** Maximum ceiling height at the ravine's center */
 	float m_MaxCeilingHeightCenter;
-	
+
 	/** Minimum ceiling height at the ravine's center */
 	float m_MinCeilingHeightCenter;
 

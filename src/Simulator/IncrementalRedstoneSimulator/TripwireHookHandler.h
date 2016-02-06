@@ -122,7 +122,7 @@ public:
 			m_World.SetBlockMeta(a_Position, Meta);
 			return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
 		}
-		
+
 		return {};
 	}
 

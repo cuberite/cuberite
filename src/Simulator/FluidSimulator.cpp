@@ -97,7 +97,7 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 		// Falling fluid is higher than anything, including self
 		return true;
 	}
-	
+
 	if (a_Meta2 == 0)
 	{
 		// Second block is a source and first block isn't
@@ -108,7 +108,7 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 		// Second block is falling and the first one is neither a source nor falling
 		return false;
 	}
-	
+
 	// All special cases have been handled, now it's just a raw comparison:
 	return (a_Meta1 < a_Meta2);
 }
@@ -177,7 +177,7 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 			LowestPoint = 9;  // This always dominates
 			X = Pos->x;
 			Z = Pos->z;
-		
+
 		}
 		delete Pos;
 		Pos = nullptr;

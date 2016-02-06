@@ -35,33 +35,33 @@ public:
 	public:
 		int m_Value;
 		int m_Probability;
-		
+
 		cPoint(int a_Value, int a_Probability) :
 			m_Value(a_Value),
 			m_Probability(a_Probability)
 		{
 		}
 	} ;
-	
+
 	typedef std::vector<cPoint> cPoints;
-	
-	
+
+
 	cProbabDistrib(int a_MaxValue);
-	
+
 	/** Sets the distribution curve using an array of [value, probability] points, linearly interpolated. a_Points must not be empty. */
 	void SetPoints(const cPoints & a_Points);
-	
+
 	/** Sets the distribution curve using a definition string; returns true on successful parse */
 	bool SetDefString(const AString & a_DefString);
-	
+
 	/** Gets a random value from a_Rand, shapes it into the distribution curve and returns the value. */
 	int Random(MTRand & a_Rand) const;
-	
+
 	/** Maps value in range [0, m_Sum] into the range [0, m_MaxValue] using the stored probability */
 	int MapValue(int a_OrigValue) const;
-	
+
 	int GetSum(void) const { return m_Sum; }
-	
+
 protected:
 
 	int m_MaxValue;

@@ -10,7 +10,7 @@
 enum eMonsterType
 {
 	mtInvalidType = -1,
-	
+
 	mtBat          = E_META_SPAWN_EGG_BAT,
 	mtBlaze        = E_META_SPAWN_EGG_BLAZE,
 	mtCaveSpider   = E_META_SPAWN_EGG_CAVE_SPIDER,

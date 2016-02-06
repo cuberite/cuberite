@@ -64,7 +64,7 @@ public:
 		m_BoundingBox(a_BoundingBox)
 	{
 	}
-	
+
 	virtual ~cMineShaft() {}
 
 	/** Returns true if this mineshaft intersects the specified cuboid */

@@ -19,7 +19,7 @@ public:
 protected:
 
 	cSpawnPrepare & m_SpawnPrepare;
-	
+
 	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
 	{
 		m_SpawnPrepare.PreparedChunkCallback(a_ChunkX, a_ChunkZ);

@@ -50,12 +50,12 @@ cFile::~cFile()
 bool cFile::Open(const AString & iFileName, eMode iMode)
 {
 	ASSERT(!IsOpen());  // You should close the file before opening another one
-	
+
 	if (IsOpen())
 	{
 		Close();
 	}
-	
+
 	const char * Mode = nullptr;
 	switch (iMode)
 	{
@@ -125,13 +125,13 @@ bool cFile::IsOpen(void) const
 bool cFile::IsEOF(void) const
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		// Unopened files behave as at EOF
 		return true;
 	}
-	
+
 	return (feof(m_File) != 0);
 }
 
@@ -142,12 +142,12 @@ bool cFile::IsEOF(void) const
 int cFile::Read (void * a_Buffer, size_t a_NumBytes)
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		return -1;
 	}
-	
+
 	return static_cast<int>(fread(a_Buffer, 1, a_NumBytes, m_File));  // fread() returns the portion of Count parameter actually read, so we need to send a_a_NumBytes as Count
 }
 
@@ -158,7 +158,7 @@ int cFile::Read (void * a_Buffer, size_t a_NumBytes)
 AString cFile::Read(size_t a_NumBytes)
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		return AString();
@@ -179,7 +179,7 @@ AString cFile::Read(size_t a_NumBytes)
 int cFile::Write(const void * a_Buffer, size_t a_NumBytes)
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		return -1;
@@ -196,12 +196,12 @@ int cFile::Write(const void * a_Buffer, size_t a_NumBytes)
 long cFile::Seek (int iPosition)
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		return -1;
 	}
-	
+
 	if (fseek(m_File, iPosition, SEEK_SET) != 0)
 	{
 		return -1;
@@ -217,12 +217,12 @@ long cFile::Seek (int iPosition)
 long cFile::Tell (void) const
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		return -1;
 	}
-	
+
 	return ftell(m_File);
 }
 
@@ -233,12 +233,12 @@ long cFile::Tell (void) const
 long cFile::GetSize(void) const
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		return -1;
 	}
-	
+
 	long CurPos = Tell();
 	if (CurPos < 0)
 	{
@@ -263,12 +263,12 @@ long cFile::GetSize(void) const
 int cFile::ReadRestOfFile(AString & a_Contents)
 {
 	ASSERT(IsOpen());
-	
+
 	if (!IsOpen())
 	{
 		return -1;
 	}
-	
+
 	long TotalSize = GetSize();
 	if (TotalSize < 0)
 	{
@@ -282,7 +282,7 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 	}
 
 	auto DataSize = static_cast<size_t>(TotalSize - Position);
-	
+
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
 	a_Contents.assign(DataSize, '\0');
 	return Read(reinterpret_cast<void *>(const_cast<char *>(a_Contents.data())), DataSize);
@@ -502,7 +502,7 @@ bool cFile::CreateFolderRecursive(const AString & a_FolderPath)
 AStringVector cFile::GetFolderContents(const AString & a_Folder)
 {
 	AStringVector AllFiles;
-	
+
 	#ifdef _WIN32
 
 		// If the folder name doesn't contain the terminating slash / backslash, add it:
@@ -515,7 +515,7 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 		{
 			FileFilter.push_back('\\');
 		}
-	
+
 		// Find all files / folders:
 		FileFilter.append("*.*");
 		HANDLE hFind;
@@ -528,7 +528,7 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 			} while (FindNextFileA(hFind, &FindFileData));
 			FindClose(hFind);
 		}
-	
+
 	#else  // _WIN32
 
 		DIR * dp;
@@ -550,7 +550,7 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 			}
 			closedir(dp);
 		}
-	
+
 	#endif  // else _WIN32
 
 	return AllFiles;

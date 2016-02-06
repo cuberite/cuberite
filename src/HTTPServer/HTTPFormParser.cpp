@@ -22,7 +22,7 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callba
 	if (a_Request.GetMethod() == "GET")
 	{
 		m_Kind = fpkURL;
-		
+
 		// Directly parse the URL in the request:
 		const AString & URL = a_Request.GetURL();
 		size_t idxQM = URL.find('?');
@@ -74,7 +74,7 @@ void cHTTPFormParser::Parse(const char * a_Data, size_t a_Size)
 	{
 		return;
 	}
-	
+
 	switch (m_Kind)
 	{
 		case fpkURL:
@@ -223,7 +223,7 @@ void cHTTPFormParser::OnPartHeader(const AString & a_Key, const AString & a_Valu
 			m_IsValid = false;
 			return;
 		}
-		
+
 		// Parse the field name and optional filename from this header:
 		cNameValueParser Parser(a_Value.data() + ParamsStart, a_Value.size() - ParamsStart);
 		Parser.Finish();

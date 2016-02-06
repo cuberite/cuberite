@@ -26,7 +26,7 @@ public:
 
 	/** Called when an Item is deleted from the queue without being returned */
 	static void Delete(T) {}
-	
+
 	/** Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted */
 	static void Combine(T & a_existing, const T & a_new)
 	{
@@ -44,10 +44,10 @@ class cQueue
 {
 	// The actual storage type for the queue
 	typedef typename std::list<ItemType> QueueType;
-	
+
 	// Make iterator an alias for the QueueType's iterator
 	typedef typename QueueType::iterator iterator;
-	
+
 public:
 	cQueue() {}
 	~cQueue() {}
@@ -188,13 +188,13 @@ public:
 private:
 	/** The contents of the queue */
 	QueueType m_Contents;
-	
+
 	/** Mutex that protects access to the queue contents */
 	cCriticalSection m_CS;
-	
+
 	/** Event that is signalled when an item is added */
 	cEvent m_evtAdded;
-	
+
 	/** Event that is signalled when an item is removed (both dequeued or erased) */
 	cEvent m_evtRemoved;
 };

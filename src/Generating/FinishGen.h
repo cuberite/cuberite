@@ -372,7 +372,7 @@ class cFinishGenPassiveMobs :
 	public cFinishGen
 {
 public:
-	
+
 	cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
 
 protected:

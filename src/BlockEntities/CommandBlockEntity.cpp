@@ -120,7 +120,7 @@ bool cCommandBlockEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		return false;
 	}
-	
+
 	m_ShouldExecute = false;
 	Execute();
 	return true;
@@ -142,7 +142,7 @@ void cCommandBlockEntity::SendTo(cClientHandle & a_Client)
 void cCommandBlockEntity::Execute()
 {
 	ASSERT(m_World != nullptr);  // Execute should not be called before the command block is attached to a world
-	
+
 	if (!m_World->AreCommandBlocksEnabled())
 	{
 		return;

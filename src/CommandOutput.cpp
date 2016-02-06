@@ -64,7 +64,7 @@ void cLogCommandOutputCallback::Finished(void)
 	{
 		LOG("%s", m_Accum.substr(last).c_str());
 	}
-	
+
 	// Clear the buffer for the next command output:
 	m_Accum.clear();
 }

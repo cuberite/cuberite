@@ -122,7 +122,7 @@ public:
 
 	/** Starts the HTTP server taking care of the admin. Returns true if successful */
 	bool Start(void);
-	
+
 	/** Stops the HTTP server, if it was started. */
 	void Stop(void);
 
@@ -160,7 +160,7 @@ public:
 
 	/** Escapes text passed into it, so it can be embedded into html. */
 	static AString GetHTMLEscapedString(const AString & a_Input);
-	
+
 	/** Escapes the string for use in an URL */
 	static AString GetURLEncodedString(const AString & a_Input);
 
@@ -214,7 +214,7 @@ protected:
 
 	/** Set to true if Init() succeeds and the webadmin isn't to be disabled */
 	bool m_IsInitialized;
-	
+
 	/** Set to true if Start() succeeds in starting the server, reset back to false in Stop(). */
 	bool m_IsRunning;
 

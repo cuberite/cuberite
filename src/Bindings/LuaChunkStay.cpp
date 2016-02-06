@@ -25,10 +25,10 @@ bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
 {
 	// This function is expected to be called just once, with all the coords in a table
 	ASSERT(m_Chunks.empty());
-	
+
 	cPluginLua::cOperation Op(m_Plugin);
 	cLuaState & L = Op();
-	
+
 	// Check that we got a table:
 	if (!lua_istable(L, a_ChunkCoordTableStackPos))
 	{
@@ -38,7 +38,7 @@ bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
 		L.LogStackTrace();
 		return false;
 	}
-	
+
 	// Add each set of coords:
 	int NumChunks = luaL_getn(L, a_ChunkCoordTableStackPos);
 	m_Chunks.reserve(static_cast<size_t>(NumChunks));
@@ -58,7 +58,7 @@ bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
 		AddChunkCoord(L, idx);
 		lua_pop(L, 1);
 	}
-	
+
 	// If there are no chunks, log a warning and return failure:
 	if (m_Chunks.empty())
 	{
@@ -66,7 +66,7 @@ bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
 		L.LogStackTrace();
 		return false;
 	}
-	
+
 	// All ok
 	return true;
 }
@@ -86,14 +86,14 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 		);
 		return;
 	}
-	
+
 	// Read the two coords from the element:
 	lua_rawgeti(L, -1, 1);
 	lua_rawgeti(L, -2, 2);
 	int ChunkX = luaL_checkint(L, -2);
 	int ChunkZ = luaL_checkint(L, -1);
 	lua_pop(L, 2);
-	
+
 	// Check that a coord is not yet present:
 	for (cChunkCoordsVector::iterator itr = m_Chunks.begin(), end = m_Chunks.end(); itr != end; ++itr)
 	{
@@ -105,7 +105,7 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 			return;
 		}
 	}  // for itr - m_Chunks[]
-	
+
 	m_Chunks.push_back(cChunkCoords(ChunkX, ChunkZ));
 }
 
@@ -119,7 +119,7 @@ void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, int a_OnChunkAvailableStackPo
 	m_LuaState = &m_Plugin.GetLuaState();
 	m_OnChunkAvailable.RefStack(*m_LuaState, a_OnChunkAvailableStackPos);
 	m_OnAllChunksAvailable.RefStack(*m_LuaState, a_OnAllChunksAvailableStackPos);
-	
+
 	// Enable the ChunkStay:
 	super::Enable(a_ChunkMap);
 }
@@ -148,12 +148,12 @@ bool cLuaChunkStay::OnAllChunksAvailable(void)
 		// Call the callback:
 		cPluginLua::cOperation Op(m_Plugin);
 		Op().Call(static_cast<int>(m_OnAllChunksAvailable));
-		
+
 		// Remove the callback references - they won't be needed anymore
 		m_OnChunkAvailable.UnRef();
 		m_OnAllChunksAvailable.UnRef();
 	}
-	
+
 	// Disable the ChunkStay by returning true
 	return true;
 }

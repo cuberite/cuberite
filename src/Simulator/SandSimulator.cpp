@@ -251,7 +251,7 @@ void cSandSimulator::FinishFalling(
 )
 {
 	ASSERT(a_BlockY < cChunkDef::Height);
-	
+
 	BLOCKTYPE CurrentBlockType = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if ((a_FallingBlockType == E_BLOCK_ANVIL) || IsReplacedOnRematerialization(CurrentBlockType))
 	{
@@ -263,7 +263,7 @@ void cSandSimulator::FinishFalling(
 		}
 		return;
 	}
-	
+
 	// Create a pickup instead:
 	cItems Pickups;
 	Pickups.Add(static_cast<ENUM_ITEM_ID>(a_FallingBlockType), 1, a_FallingBlockMeta);
@@ -286,7 +286,7 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 	NIBBLETYPE FallingBlockMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, FallingBlockType, FallingBlockMeta);
 	a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
-	
+
 	// Search for a place to put it:
 	for (int y = a_RelY - 1; y >= 0; y--)
 	{
@@ -307,14 +307,14 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 			// Can fall further down
 			continue;
 		}
-		
+
 		// Finish the fall at the found bottom:
 		int BlockX = a_RelX + a_Chunk->GetPosX() * cChunkDef::Width;
 		int BlockZ = a_RelZ + a_Chunk->GetPosZ() * cChunkDef::Width;
 		FinishFalling(&m_World, BlockX, BlockY, BlockZ, FallingBlockType, FallingBlockMeta);
 		return;
 	}
-	
+
 	// The block just "fell off the world" without leaving a trace
 }
 

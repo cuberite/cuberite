@@ -30,7 +30,7 @@ static int tolua_cWorld_BroadcastParticleEffect(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	
+
 	// Read the params:
 	cWorld * World = nullptr;
 	AString Name;
@@ -68,7 +68,7 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	World:ChunkStay(ChunkCoordTable, OnChunkAvailable, OnAllChunksAvailable)
 	ChunkCoordTable == { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ... }
 	*/
-	
+
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType     (1, "cWorld") ||
@@ -78,13 +78,13 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	
+
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
 	if (Plugin == nullptr)
 	{
 		return 0;
 	}
-	
+
 	// Read the params:
 	cWorld * World = reinterpret_cast<cWorld *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (World == nullptr)
@@ -116,7 +116,7 @@ static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
 	/* Function signature:
 	World:DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceType, [SourceData])
 	*/
-	
+
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType     (1, "cWorld") ||
@@ -128,7 +128,7 @@ static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	
+
 	// Read the params:
 	cWorld * World;
 	double ExplosionSize;
@@ -405,7 +405,7 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 	/* Function signature:
 	World:PrepareChunk(ChunkX, ChunkZ, Callback)
 	*/
-	
+
 	// Check the param types:
 	cLuaState L(tolua_S);
 	if (
@@ -416,7 +416,7 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	
+
 	// Read the params:
 	cWorld * world = nullptr;
 	int chunkX = 0;
@@ -497,7 +497,7 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 {
 	// Binding for cWorld::QueueTask
 	// Params: function
-	
+
 	// Retrieve the cPlugin from the LuaState:
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
 	if (Plugin == nullptr)
@@ -578,7 +578,7 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 {
 	// Binding for cWorld::ScheduleTask
 	// Params: function, Ticks
-	
+
 	// Retrieve the cPlugin from the LuaState:
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
 	if (Plugin == nullptr)
@@ -609,7 +609,7 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
-	
+
 	auto ResettableTask = std::make_shared<cLuaWorldTask>(*Plugin, FnRef);
 	Plugin->AddResettable(ResettableTask);
 	World->ScheduleTask(static_cast<int>(tolua_tonumber(tolua_S, 2, 0)), std::bind(&cLuaWorldTask::Run, ResettableTask, std::placeholders::_1));

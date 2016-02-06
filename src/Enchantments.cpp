@@ -45,7 +45,7 @@ void cEnchantments::Add(const cEnchantments & a_Other)
 void cEnchantments::AddFromString(const AString & a_StringSpec)
 {
 	// Add enchantments in the stringspec; if a specified enchantment already exists, overwrites it
-	
+
 	// Split the StringSpec into separate declarations, each in the form "id=lvl":
 	AStringVector Decls = StringSplit(a_StringSpec, ";");
 	for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
@@ -507,7 +507,7 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 			{
 				AddEnchantmentWeightToVector(a_Enchantments, 5, enchFeatherFalling, 1);
 			}
-			
+
 			// Depth Strider
 			if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 45))
 			{

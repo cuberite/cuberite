@@ -34,7 +34,7 @@ public:
 		m_EntityEffect(a_EntityEffect)
 	{
 	}
-	
+
 	/** Called by cWorld::ForEachEntity(), adds the stored entity effect to the entity, if it is close enough. */
 	virtual bool Item(cEntity * a_Entity) override
 	{
@@ -55,7 +55,7 @@ public:
 		// TODO: better equation
 		double Reduction = -0.25 * SplashDistance + 1.0;
 		Reduction = std::max(Reduction, 0.0);
-		
+
 		static_cast<cPawn *>(a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.GetDuration(), m_EntityEffect.GetIntensity(), Reduction);
 		return false;
 	}
@@ -65,7 +65,7 @@ private:
 	cEntityEffect::eType m_EntityEffectType;
 	const cEntityEffect & m_EntityEffect;
 };
-	
+
 
 
 
@@ -120,7 +120,7 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 {
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);
-	
+
 	m_World->BroadcastSoundParticleEffect(
 		EffectID::PARTICLE_SPLASH_POTION,
 		FloorC(a_HitPos.x),

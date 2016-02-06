@@ -19,9 +19,9 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	
+
 	cChunkDesc WorkerDesc(ChunkX, ChunkZ);
-	
+
 	// Generate trees:
 	for (int x = 0; x <= 2; x++)
 	{
@@ -29,14 +29,14 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 		for (int z = 0; z <= 2; z++)
 		{
 			int BaseZ = ChunkZ + z - 1;
-			
+
 			cChunkDesc * Dest;
 
 			if ((x != 1) || (z != 1))
 			{
 				Dest = &WorkerDesc;
 				WorkerDesc.SetChunkCoords(BaseX, BaseZ);
-				
+
 				// TODO: This may cause a lot of wasted calculations, instead of pulling data out of a single (cChunkDesc) cache
 
 				cChunkDesc::Shape workerShape;
@@ -66,7 +66,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc, OutsideLogs, IgnoredOverflow);
 		}  // for z
 	}  // for x
-	
+
 	// Update the heightmap:
 	for (int x = 0; x < cChunkDef::Width; x++)
 	{
@@ -97,9 +97,9 @@ void cStructGenTrees::GenerateSingleTree(
 {
 	int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, a_Seq) / 19) % cChunkDef::Width;
 	int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, a_Seq, a_ChunkZ) / 19) % cChunkDef::Width;
-	
+
 	int Height = a_ChunkDesc.GetHeight(x, z);
-	
+
 	if ((Height <= 0) || (Height >= 230))
 	{
 		return;
@@ -111,7 +111,7 @@ void cStructGenTrees::GenerateSingleTree(
 	{
 		return;
 	}
-	
+
 	sSetBlockVector TreeLogs, TreeOther;
 	GetTreeImageByBiome(
 		a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z,
@@ -148,7 +148,7 @@ void cStructGenTrees::GenerateSingleTree(
 			}
 		}
 	}
-	
+
 	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_ChunkDesc, TreeOther, a_OutsideOther);
 	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_ChunkDesc, TreeLogs,  a_OutsideLogs);
 }
@@ -185,11 +185,11 @@ void cStructGenTrees::ApplyTreeImage(
 					a_ChunkDesc.SetBlockTypeMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
 					break;
 				}
-				
+
 			}  // switch (GetBlock())
 			continue;
 		}
-		
+
 		// Outside the chunk, push into a_Overflow.
 		// Don't check if already present there, by separating logs and others we don't need the checks anymore:
 		a_Overflow.push_back(*itr);
@@ -279,20 +279,20 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	
+
 	for (int z = -1; z < 2; z++) for (int x = -1; x < 2; x++)
 	{
 		if (((m_Noise.IntNoise2DInt(ChunkX + x, ChunkZ + z) / 17) % 100) > m_Probability)
 		{
 			continue;
 		}
-		
+
 		cBlockArea Lake;
 		CreateLakeImage(ChunkX + x, ChunkZ + z, a_ChunkDesc.GetMinHeight(), Lake);
-		
+
 		int OfsX = Lake.GetOriginX() + x * cChunkDef::Width;
 		int OfsZ = Lake.GetOriginZ() + z * cChunkDef::Width;
-		
+
 		// Merge the lake into the current data
 		a_ChunkDesc.WriteBlockArea(Lake, OfsX, Lake.GetOriginY(), OfsZ, cBlockArea::msLake);
 	}  // for x, z - neighbor chunks
@@ -306,7 +306,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 {
 	a_Lake.Create(16, 8, 16);
 	a_Lake.Fill(cBlockArea::baTypes, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
-	
+
 	// Make a random position in the chunk by using a random 16 block XZ offset and random height up to chunk's max height minus 6
 	int MinHeight = std::max(a_MaxLakeHeight - 6, 2);
 	int Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 128, a_ChunkZ) / 11;
@@ -318,9 +318,9 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 	Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 512, a_ChunkZ) / 13;
 	// Random height [1 .. MinHeight] with preference to center heights
 	int HeightY = 1 + (((Rnd & 0x1ff) % MinHeight) + (((Rnd >> 9) & 0x1ff) % MinHeight)) / 2;
-	
+
 	a_Lake.SetOrigin(OffsetX, HeightY, OffsetZ);
-	
+
 	// Hollow out a few bubbles inside the blockarea:
 	int NumBubbles = 4 + ((Rnd >> 18) & 0x03);  // 4 .. 7 bubbles
 	BLOCKTYPE * BlockTypes = a_Lake.GetBlockTypes();
@@ -371,9 +371,9 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 			}
 		}  // for z, x
 	}  // for y
-	
+
 	// TODO: Turn sponge next to lava into stone
-	
+
 	// a_Lake.SaveToSchematicFile(Printf("Lake_%d_%d.schematic", a_ChunkX, a_ChunkZ));
 }
 
@@ -401,7 +401,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		return;
 	}
-	
+
 	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
 
 	const int SEGMENT_HEIGHT = 8;
@@ -410,7 +410,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	// Interpolate the chunk in 16 * SEGMENT_HEIGHT * 16 "segments", each SEGMENT_HEIGHT blocks high and each linearly interpolated separately.
 	// Have two buffers, one for the lowest floor and one for the highest floor, so that Y-interpolation can be done between them
 	// Then swap the buffers and use the previously-top one as the current-bottom, without recalculating it.
-	
+
 	int FloorBuf1[17 * 17];
 	int FloorBuf2[17 * 17];
 	int * FloorHi = FloorBuf1;
@@ -418,7 +418,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	int BaseX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BaseZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	int BaseY = 63;
-	
+
 	// Interpolate the lowest floor:
 	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 	{
@@ -428,7 +428,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 			256;
 	}  // for x, z - FloorLo[]
 	LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorLo);
-	
+
 	// Interpolate segments:
 	for (int Segment = BaseY; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
 	{
@@ -441,12 +441,12 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 			);
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
-		
+
 		// Interpolate between FloorLo and FloorHi:
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 		{
 			EMCSBiome biome = a_ChunkDesc.GetBiome(x, z);
-			
+
 			if ((biome == biExtremeHills) || (biome == biExtremeHillsEdge))
 			{
 				int Lo = FloorLo[x + 17 * z] / 256;
@@ -462,7 +462,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 				break;
 			}  // if (biome)
 		}  // for z, x
-		
+
 		// Swap the floors:
 		std::swap(FloorLo, FloorHi);
 	}

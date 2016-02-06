@@ -11,7 +11,7 @@ class cVillager :
 	public cPassiveMonster
 {
 	typedef cPassiveMonster super;
-	
+
 public:
 
 	enum eVillagerType

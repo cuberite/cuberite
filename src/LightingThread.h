@@ -50,25 +50,25 @@ class cLightingThread :
 	public cIsThread
 {
 	typedef cIsThread super;
-	
+
 public:
-	
+
 	cLightingThread(void);
 	~cLightingThread();
-	
+
 	bool Start(cWorld * a_World);
-	
+
 	void Stop(void);
-	
+
 	/** Queues the entire chunk for lighting.
 	The callback, if specified, is called after the lighting has been processed. */
 	void QueueChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter);
-	
+
 	/** Blocks until the queue is empty or the thread is terminated */
 	void WaitForQueueEmpty(void);
-	
+
 	size_t GetQueueLength(void);
-	
+
 protected:
 
 	class cLightingChunkStay :
@@ -79,9 +79,9 @@ protected:
 		int m_ChunkX;
 		int m_ChunkZ;
 		std::unique_ptr<cChunkCoordCallback> m_CallbackAfter;
-		
+
 		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter);
-		
+
 	protected:
 		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override
 		{
@@ -91,15 +91,15 @@ protected:
 		virtual bool OnAllChunksAvailable(void) override;
 		virtual void OnDisabled(void) override;
 	} ;
-	
+
 	typedef std::list<cChunkStay *> cChunkStays;
-	
-	
+
+
 	cWorld * m_World;
-	
+
 	/** The mutex to protect m_Queue and m_PendingQueue */
 	cCriticalSection m_CS;
-	
+
 	/** The ChunkStays that are loaded and are waiting to be lit. */
 	cChunkStays m_Queue;
 
@@ -108,11 +108,11 @@ protected:
 
 	cEvent m_evtItemAdded;    // Set when queue is appended, or to stop the thread
 	cEvent m_evtQueueEmpty;   // Set when the queue gets empty
-	
+
 	/** The highest block in the current 3x3 chunk data */
 	HEIGHTTYPE m_MaxHeight;
-	
-	
+
+
 	// Buffers for the 3x3 chunk data
 	// These buffers alone are 1.7 MiB in size, therefore they cannot be located on the stack safely - some architectures may have only 1 MiB for stack, or even less
 	// Placing the buffers into the object means that this object can light chunks only in one thread!
@@ -123,7 +123,7 @@ protected:
 	NIBBLETYPE m_BlockLight[BlocksPerYLayer * cChunkDef::Height];
 	NIBBLETYPE m_SkyLight  [BlocksPerYLayer * cChunkDef::Height];
 	HEIGHTTYPE m_HeightMap [BlocksPerYLayer];
-	
+
 	// Seed management (5.7 MiB)
 	// Two buffers, in each calc step one is set as input and the other as output, then in the next step they're swapped
 	// Each seed is represented twice in this structure - both as a "list" and as a "position".
@@ -139,33 +139,33 @@ protected:
 
 	/** Lights the entire chunk. If neighbor chunks don't exist, touches them and re-queues the chunk */
 	void LightChunk(cLightingChunkStay & a_Item);
-	
+
 	/** Prepares m_BlockTypes and m_HeightMap data; zeroes out the light arrays */
 	void ReadChunks(int a_ChunkX, int a_ChunkZ);
-	
+
 	/** Uses m_HeightMap to initialize the m_SkyLight[] data; fills in seeds for the skylight */
 	void PrepareSkyLight(void);
-	
+
 	/** Uses m_BlockTypes to initialize the m_BlockLight[] data; fills in seeds for the blocklight */
 	void PrepareBlockLight(void);
-	
+
 	/** Same as PrepareBlockLight(), but uses a different traversal scheme; possibly better perf cache-wise.
 	To be compared in perf benchmarks. */
 	void PrepareBlockLight2(void);
-	
+
 	/** Calculates light in the light array specified, using stored seeds */
 	void CalcLight(NIBBLETYPE * a_Light);
-	
+
 	/** Does one step in the light calculation - one seed propagation and seed recalculation */
 	void CalcLightStep(
 		NIBBLETYPE * a_Light,
 		size_t a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
-	
+
 	/** Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage): */
 	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
-	
+
 	inline void PropagateLight(
 		NIBBLETYPE * a_Light,
 		unsigned int a_SrcIdx, unsigned int a_DstIdx,
@@ -174,7 +174,7 @@ protected:
 	{
 		ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
 		ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
-		
+
 		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]))
 		{
 			// We're not offering more light than the dest block already has
@@ -188,11 +188,11 @@ protected:
 			a_SeedIdxOut[a_NumSeedsOut++] = a_DstIdx;
 		}
 	}
-	
+
 	/** Queues a chunkstay that has all of its chunks loaded.
 	Called by cLightingChunkStay when all of its chunks are loaded. */
 	void QueueChunkStay(cLightingChunkStay & a_ChunkStay);
-	
+
 } ;
 
 

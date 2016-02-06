@@ -69,7 +69,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 	// Base duration in ticks
 	int base = 0;
 	double TierCoeff = 1, ExtCoeff = 1, SplashCoeff = 1;
-	
+
 	switch (GetPotionEffectType(a_ItemDamage))
 	{
 		case cEntityEffect::effRegeneration:
@@ -78,7 +78,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 			base = 900;
 			break;
 		}
-			
+
 		case cEntityEffect::effSpeed:
 		case cEntityEffect::effFireResistance:
 		case cEntityEffect::effNightVision:
@@ -89,7 +89,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 			base = 3600;
 			break;
 		}
-			
+
 		case cEntityEffect::effWeakness:
 		case cEntityEffect::effSlowness:
 		{
@@ -98,22 +98,22 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 		}
 		default: break;
 	}
-	
+
 	// If potion is level II, half the duration. If not, stays the same
 	TierCoeff = (GetPotionEffectIntensity(a_ItemDamage) > 0) ? 0.5 : 1;
-	
+
 	// If potion is extended, multiply duration by 8 / 3. If not, stays the same
 	// Extended potion if sixth lowest bit is set
 	ExtCoeff = (a_ItemDamage & 0x40) ? (8.0 / 3.0) : 1;
-	
+
 	// If potion is splash potion, multiply duration by 3 / 4. If not, stays the same
 	SplashCoeff = IsPotionDrinkable(a_ItemDamage) ? 1 : 0.75;
-	
+
 	// Ref.:
 	//   http://minecraft.gamepedia.com/Data_values#.22Tier.22_bit
 	//   http://minecraft.gamepedia.com/Data_values#.22Extended_duration.22_bit
 	//   http://minecraft.gamepedia.com/Data_values#.22Splash_potion.22_bit
-	
+
 	return static_cast<int>(base * TierCoeff * ExtCoeff * SplashCoeff);
 }
 
@@ -138,7 +138,7 @@ cEntityEffect::cEntityEffect():
 	m_Intensity(0),
 	m_DistanceModifier(1)
 {
-	
+
 }
 
 
@@ -151,7 +151,7 @@ cEntityEffect::cEntityEffect(int a_Duration, short a_Intensity, double a_Distanc
 	m_Intensity(a_Intensity),
 	m_DistanceModifier(a_DistanceModifier)
 {
-	
+
 }
 
 
@@ -164,7 +164,7 @@ cEntityEffect::cEntityEffect(const cEntityEffect & a_OtherEffect):
 	m_Intensity(a_OtherEffect.m_Intensity),
 	m_DistanceModifier(a_OtherEffect.m_DistanceModifier)
 {
-	
+
 }
 
 
@@ -189,7 +189,7 @@ cEntityEffect * cEntityEffect::CreateEntityEffect(cEntityEffect::eType a_EffectT
 	switch (a_EffectType)
 	{
 		case cEntityEffect::effNoEffect:       return new cEntityEffect              (a_Duration, a_Intensity, a_DistanceModifier);
-		
+
 		case cEntityEffect::effAbsorption:     return new cEntityEffectAbsorption    (a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effBlindness:      return new cEntityEffectBlindness     (a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effFireResistance: return new cEntityEffectFireResistance(a_Duration, a_Intensity, a_DistanceModifier);
@@ -214,7 +214,7 @@ cEntityEffect * cEntityEffect::CreateEntityEffect(cEntityEffect::eType a_EffectT
 		case cEntityEffect::effWeakness:       return new cEntityEffectWeakness      (a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effWither:         return new cEntityEffectWither        (a_Duration, a_Intensity, a_DistanceModifier);
 	}
-	
+
 	ASSERT(!"Unhandled entity effect type!");
 	return nullptr;
 }
@@ -326,7 +326,7 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
 	int amount = static_cast<int>(6 * (1 << m_Intensity) * m_DistanceModifier);
-	
+
 	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
 	{
 		a_Target.TakeDamage(dtPotionOfHarming, nullptr, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
@@ -346,7 +346,7 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
 	int amount = static_cast<int>(6 * (1 << m_Intensity) * m_DistanceModifier);
-	
+
 	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
 	{
 		a_Target.Heal(amount);
@@ -370,10 +370,10 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 	{
 		return;
 	}
-	
+
 	// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
 	int frequency = FloorC(50.0 / static_cast<double>(m_Intensity + 1));
-	
+
 	if ((m_Ticks % frequency) != 0)
 	{
 		return;
@@ -392,7 +392,7 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 void cEntityEffectHunger::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
-	
+
 	if (a_Target.IsPlayer())
 	{
 		cPlayer & Target = reinterpret_cast<cPlayer &>(a_Target);
@@ -410,10 +410,10 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 void cEntityEffectWeakness::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
-	
+
 	// Damage reduction = 0.5 damage, multiplied by potion level (Weakness II = 1 damage)
 	// double dmg_reduc = 0.5 * (a_Effect.GetIntensity() + 1);
-	
+
 	// TODO: Implement me!
 	// TODO: Weakened villager zombies can be turned back to villagers with the god apple
 }
@@ -428,11 +428,11 @@ void cEntityEffectWeakness::OnTick(cPawn & a_Target)
 void cEntityEffectPoison::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
-	
+
 	if (a_Target.IsMob())
 	{
 		cMonster & Target = reinterpret_cast<cMonster &>(a_Target);
-		
+
 		// Doesn't effect undead mobs, spiders
 		if (
 			Target.IsUndead() ||
@@ -443,10 +443,10 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 			return;
 		}
 	}
-	
+
 	// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
 	int frequency = FloorC(25.0 / static_cast<double>(m_Intensity + 1));
-	
+
 	if ((m_Ticks % frequency) == 0)
 	{
 		// Cannot take poison damage when health is at 1
@@ -467,7 +467,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 void cEntityEffectWither::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
-	
+
 	// Damage frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
 	int frequency = FloorC(25.0 / static_cast<double>(m_Intensity + 1));
 

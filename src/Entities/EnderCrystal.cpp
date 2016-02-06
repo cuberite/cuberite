@@ -46,7 +46,7 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, esEnderCrystal, this);
 
 	Destroy();
-	
+
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT,     POSZ_TOINT, E_BLOCK_BEDROCK, 0);
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT + 1, POSZ_TOINT, E_BLOCK_FIRE,    0);
 }

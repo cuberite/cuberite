@@ -48,22 +48,22 @@ protected:
 
 	/** The noise used for generating random numbers */
 	cNoise m_Noise;
-	
+
 	/** Maximum depth of the generator tree */
 	int m_MaxDepth;
-	
+
 	/** Maximum size, in X / Z blocks, of the village (radius from the origin) */
 	int m_MaxSize;
-	
+
 	/** Minimum density - percentage of allowed house connections. Range [0, 100] */
 	int m_MinDensity;
-	
+
 	/** Maximum density - percentage of allowed house connections. Range [0, 100] */
 	int m_MaxDensity;
 
 	/** The underlying biome generator that defines whether the village is created or not */
 	cBiomeGenPtr m_BiomeGen;
-	
+
 	/** The underlying height generator, used to position the prefabs crossing chunk borders */
 	cTerrainHeightGenPtr m_HeightGen;
 

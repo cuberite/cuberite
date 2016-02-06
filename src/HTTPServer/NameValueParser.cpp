@@ -29,18 +29,18 @@ public:
 			Parser2.Parse(Data + i, 1);
 		}
 		Parser2.Finish();
-		
+
 		// Parse as a single chunk of data:
 		cNameValueParser Parser(Data, sizeof(Data) - 1);
-		
+
 		// Use the debugger to inspect the Parser variable
-		
+
 		// Check that the two parsers have the same content:
 		for (cNameValueParser::const_iterator itr = Parser.begin(), end = Parser.end(); itr != end; ++itr)
 		{
 			ASSERT(Parser2[itr->first] == itr->second);
 		}  // for itr - Parser[]
-		
+
 		// Try parsing in 2-char chunks:
 		cNameValueParser Parser3;
 		for (int i = 0; i < sizeof(Data) - 2; i += 2)
@@ -52,13 +52,13 @@ public:
 			Parser3.Parse(Data + sizeof(Data) - 2, 1);
 		}
 		Parser3.Finish();
-		
+
 		// Check that the third parser has the same content:
 		for (cNameValueParser::const_iterator itr = Parser.begin(), end = Parser.end(); itr != end; ++itr)
 		{
 			ASSERT(Parser3[itr->first] == itr->second);
 		}  // for itr - Parser[]
-		
+
 		printf("cNameValueParserTest done");
 	}
 } g_Test;
@@ -96,7 +96,7 @@ cNameValueParser::cNameValueParser(const char * a_Data, size_t a_Size, bool a_Al
 void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 {
 	ASSERT(m_State != psFinished);  // Calling Parse() after Finish() is wrong!
-	
+
 	size_t Last = 0;
 	for (size_t i = 0; i < a_Size;)
 	{
@@ -107,7 +107,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 			{
 				return;
 			}
-			
+
 			case psKeySpace:
 			{
 				// Skip whitespace until a non-whitespace is found, then start the key:
@@ -122,7 +122,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 				}
 				break;
 			}
-			
+
 			case psKey:
 			{
 				// Read the key until whitespace or an equal sign:
@@ -174,7 +174,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 				}
 				break;
 			}
-			
+
 			case psEqualSpace:
 			{
 				// The space before the expected equal sign; the current key is already assigned
@@ -211,7 +211,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 				}  // while (i < a_Size)
 				break;
 			}  // case psEqualSpace
-			
+
 			case psEqual:
 			{
 				// just parsed the equal-sign
@@ -256,7 +256,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 				}  // while (i < a_Size)
 				break;
 			}  // case psEqual
-			
+
 			case psValueInDQuotes:
 			{
 				while (i < a_Size)
@@ -280,7 +280,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 				}
 				break;
 			}  // case psValueInDQuotes
-			
+
 			case psValueInSQuotes:
 			{
 				while (i < a_Size)
@@ -304,7 +304,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 				}
 				break;
 			}  // case psValueInSQuotes
-			
+
 			case psValueRaw:
 			{
 				while (i < a_Size)
@@ -328,7 +328,7 @@ void cNameValueParser::Parse(const char * a_Data, size_t a_Size)
 				}
 				break;
 			}  // case psValueRaw
-			
+
 			case psAfterValue:
 			{
 				// Between the closing DQuote or SQuote and the terminating semicolon

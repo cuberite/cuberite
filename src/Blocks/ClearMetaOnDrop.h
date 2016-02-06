@@ -15,7 +15,7 @@ public:
 	cClearMetaOnDrop(BLOCKTYPE a_BlockType) :
 		Base(a_BlockType)
 	{}
-	
+
 	virtual ~cClearMetaOnDrop() {}
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{

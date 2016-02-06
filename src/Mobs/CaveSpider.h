@@ -10,7 +10,7 @@ class cCaveSpider :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
-	
+
 public:
 	cCaveSpider(void);
 

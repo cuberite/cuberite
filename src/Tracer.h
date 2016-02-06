@@ -57,7 +57,7 @@ private:
 	Returns 1 if an intersection occured at a single point
 	Returns 2 if the line segment lies in the plane being checked */
 	int intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f & a_End, const Vector3f & a_PlanePos, const Vector3f & a_PlaneNormal);
-	
+
 	/** Determines which face on the block a collision occured, if it does occur
 	Returns 0 if the block is air, water or no collision occured
 	Return 1 through 6 for the following block faces, repectively: -x, -z, x, z, y, -y */

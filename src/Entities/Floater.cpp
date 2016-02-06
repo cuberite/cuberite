@@ -49,7 +49,7 @@ public:
 			m_MinCoeff = LineCoeff;
 			m_HitEntity = a_Entity;
 		}
-		
+
 		// Don't break the enumeration, we want all the entities
 		return false;
 	}
@@ -91,7 +91,7 @@ public:
 		m_EntityExists = true;
 		return false;
 	}
-	
+
 	bool DoesExist(void) const { return m_EntityExists; }
 protected:
 	bool m_EntityExists;
@@ -153,7 +153,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_ParticlePos = (m_ParticlePos + (GetPosition() - m_ParticlePos) / 6);
 				m_World->GetBroadcaster().BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
 			}
-			
+
 			m_CountDownTime--;
 			if (m_World->GetHeight(POSX_TOINT, POSZ_TOINT) == POSY_TOINT)
 			{
@@ -186,7 +186,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if ((GetSpeed().Length() > 4) && (m_AttachedMobID == cEntity::INVALID_ID))
 	{
 		cFloaterEntityCollisionCallback Callback(this, GetPosition(), GetPosition() + GetSpeed() / 20);
-		
+
 		a_Chunk.ForEachEntity(Callback);
 		if (Callback.HasHit())
 		{

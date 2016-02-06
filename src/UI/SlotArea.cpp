@@ -48,7 +48,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		ItemToFullString(*GetSlot(a_SlotNum, a_Player)).c_str()
 	);
 	*/
-	
+
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
 	bool bAsync = false;
@@ -57,7 +57,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
 		return;
 	}
-	
+
 	switch (a_ClickAction)
 	{
 		case caShiftLeftClick:
@@ -100,7 +100,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			break;
 		}
 	}
-	
+
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
@@ -154,7 +154,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			}
 			break;
 		}
-		
+
 		case caLeftClick:
 		{
 			// Left-clicked
@@ -193,7 +193,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			return;
 		}
 	}  // switch (a_ClickAction
-	
+
 	SetSlot(a_SlotNum, a_Player, Slot);
 	if (bAsync)
 	{
@@ -216,7 +216,7 @@ void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_
 		Slot.Empty();
 	}
 	SetSlot(a_SlotNum, a_Player, Slot);
-	
+
 	// Some clients try to guess our actions and not always right (armor slots in 1.2.5), so we fix them:
 	m_ParentWindow.BroadcastWholeWindow();
 }
@@ -240,14 +240,14 @@ void cSlotArea::DblClicked(cPlayer & a_Player, int a_SlotNum)
 		LOGD("%s DblClicked with an empty hand over empty slot, ignoring", a_Player.GetName().c_str());
 		return;
 	}
-	
+
 	// Add as many items from the surrounding area into hand as possible:
 	// First skip full stacks, then if there's still space, process full stacks as well:
 	if (!m_ParentWindow.CollectItemsToHand(Dragging, *this, a_Player, false))
 	{
 		m_ParentWindow.CollectItemsToHand(Dragging, *this, a_Player, true);
 	}
-	
+
 	m_ParentWindow.BroadcastWholeWindow();  // We need to broadcast, in case the window was a chest opened by multiple players
 }
 
@@ -560,7 +560,7 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 {
 	// Toss all items on the crafting grid:
 	TossItems(a_Player, 1, m_NumSlots);
-	
+
 	// Remove the current recipe from the player -> recipe map:
 	for (cRecipeMap::iterator itr = m_Recipes.begin(), end = m_Recipes.end(); itr != end; ++itr)
 	{
@@ -640,7 +640,7 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 
 	// Get the new recipe and update the result slot:
 	UpdateRecipe(a_Player);
-	
+
 	// We're done. Send all changes to the client and bail out:
 	m_ParentWindow.BroadcastWholeWindow();
 }
@@ -667,7 +667,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 			// Couldn't distribute all of it. Bail out
 			return;
 		}
-		
+
 		// Distribute the result, this time for real:
 		ResultCopy = Result;
 		m_ParentWindow.DistributeStack(ResultCopy, 0, a_Player, this, true);
@@ -681,7 +681,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 
 		// Broadcast the window, we sometimes move items to different locations than Vanilla, causing needless desyncs:
 		m_ParentWindow.BroadcastWholeWindow();
-		
+
 		// If the recipe has changed, bail out:
 		if (!Recipe.GetResult().IsEqual(Result))
 		{
@@ -737,7 +737,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 			return itr->second;
 		}
 	}  // for itr - m_Recipes[]
-	
+
 	// Not found. Add a new one:
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe Recipe(Grid);
@@ -906,7 +906,7 @@ void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem
 		OnTakeResult(a_Player);
 	}
 	SetSlot(a_SlotNum, a_Player, Slot);
-	
+
 	// Some clients try to guess our actions and not always right (armor slots in 1.2.5), so we fix them:
 	m_ParentWindow.BroadcastWholeWindow();
 }
@@ -1055,7 +1055,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	cItem Input(*GetSlot(0, a_Player));
 	cItem SecondInput(*GetSlot(1, a_Player));
 	cItem Output(*GetSlot(2, a_Player));
-	
+
 	if (Input.IsEmpty())
 	{
 		Output.Empty();
@@ -1071,7 +1071,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	if (!SecondInput.IsEmpty())
 	{
 		bool IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
-		
+
 		RepairCost += SecondInput.m_RepairCost;
 		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
 		{
@@ -1307,7 +1307,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 		{
 			return;
 		}
-		
+
 		Slot = DraggingItem.CopyOne();
 		DraggingItem.m_ItemCount -= 1;
 		if (DraggingItem.m_ItemCount <= 0)
@@ -1459,7 +1459,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 			break;
 		}
 	}
-	
+
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
@@ -2227,12 +2227,12 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
 			return;
 		}
-		
+
 		// Creative inventory must treat a_ClickedItem as a DraggedItem instead, replacing the inventory slot with it
 		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
 		return;
 	}
-	
+
 	// Survival inventory and all other windows' inventory has the same handling as normal slot areas
 	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	return;
@@ -2316,7 +2316,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
 			return;
 		}
-		
+
 		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
 		return;
 	}
@@ -2473,18 +2473,18 @@ const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player) con
 	{
 		LOGERROR("cSlotAreaTemporary: player \"%s\" not found for slot %d!", a_Player.GetName().c_str(), a_SlotNum);
 		ASSERT(!"cSlotAreaTemporary: player not found!");
-		
+
 		// Player not found, this should not happen, ever! Return nullptr, but things may break by this.
 		return nullptr;
 	}
-	
+
 	if (a_SlotNum >= static_cast<int>(itr->second.size()))
 	{
 		LOGERROR("cSlotAreaTemporary: asking for more slots than actually stored!");
 		ASSERT(!"cSlotAreaTemporary: asking for more slots than actually stored!");
 		return nullptr;
 	}
-	
+
 	return &(itr->second[static_cast<size_t>(a_SlotNum)]);
 }
 
@@ -2501,13 +2501,13 @@ void cSlotAreaTemporary::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem 
 		LOGWARNING("cSlotAreaTemporary: player not found!");
 		return;
 	}
-	
+
 	if (a_SlotNum >= static_cast<int>(itr->second.size()))
 	{
 		LOGERROR("cSlotAreaTemporary: asking for more slots than actually stored!");
 		return;
 	}
-	
+
 	itr->second[static_cast<size_t>(a_SlotNum)] = a_Item;
 }
 
@@ -2544,7 +2544,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 		LOGWARNING("Player tossing items (%s) not found in the item map", a_Player.GetName().c_str());
 		return;
 	}
-	
+
 	cItems Drops;
 	for (int i = a_Begin; i < a_End; i++)
 	{
@@ -2555,7 +2555,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 		}
 		Item.Empty();
 	}  // for i - itr->second[]
-	
+
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-a_Player.GetYaw(), a_Player.GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;

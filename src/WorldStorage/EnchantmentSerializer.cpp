@@ -9,7 +9,7 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 {
 	// Write the enchantments into the specified NBT writer
 	// begin with the LIST tag of the specified name ("ench" or "StoredEnchantments")
-	
+
 	a_Writer.BeginList(a_ListTagName, TAG_Compound);
 	for (cEnchantments::cMap::const_iterator itr = a_Enchantments.m_Enchantments.begin(), end = a_Enchantments.m_Enchantments.end(); itr != end; ++itr)
 	{
@@ -38,7 +38,7 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 		ASSERT(!"Bad EnchListTag type");
 		return;
 	}
-	
+
 	// Verify that the list is of Compounds:
 	if (a_NBT.GetChildrenType(a_EnchListTagIdx) != TAG_Compound)
 	{
@@ -48,15 +48,15 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 		ASSERT(!"Bad EnchListTag children type");
 		return;
 	}
-	
+
 	a_Enchantments.Clear();
-	
+
 	// Iterate over all the compound children, parse an enchantment from each:
 	for (int tag = a_NBT.GetFirstChild(a_EnchListTagIdx); tag >= 0; tag = a_NBT.GetNextSibling(tag))
 	{
 		// tag is the compound inside the "ench" list tag
 		ASSERT(a_NBT.GetType(tag) == TAG_Compound);
-		
+
 		// Search for the id and lvl tags' values:
 		int id = -1, lvl = -1;
 		for (int ch = a_NBT.GetFirstChild(tag); ch >= 0; ch = a_NBT.GetNextSibling(ch))
@@ -74,13 +74,13 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 				lvl = a_NBT.GetShort(ch);
 			}
 		}  // for ch - children of the compound tag
-		
+
 		if ((id == -1) || (lvl <= 0))
 		{
 			// Failed to parse either the id or the lvl, skip this compound
 			continue;
 		}
-		
+
 		// Store the enchantment:
 		a_Enchantments.m_Enchantments[id] = static_cast<unsigned int>(lvl);
 	}  // for tag - children of the ench list tag

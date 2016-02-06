@@ -29,7 +29,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
 		if (a_BlockFace == BLOCK_FACE_YM)
@@ -49,11 +49,11 @@ public:
 			}
 			return true;
 		}
-		
+
 		return false;
 	}
 
-	
+
 	/** Converts the Spawn egg item damage to the monster type to spawn.
 	Returns mtInvalidType for invalid damage values. */
 	static eMonsterType ItemDamageToMonsterType(short a_ItemDamage)

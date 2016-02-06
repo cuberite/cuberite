@@ -93,7 +93,7 @@ void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCo
 		);
 		return;
 	}
-	
+
 	m_Items[x + m_Width * y] = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
 }
 
@@ -111,7 +111,7 @@ void cCraftingGrid::SetItem(int x, int y, const cItem & a_Item)
 		);
 		return;
 	}
-	
+
 	m_Items[x + m_Width * y] = a_Item;
 }
 
@@ -294,7 +294,7 @@ void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingG
 	{
 		return;
 	}
-	
+
 	// Built-in recipes:
 	std::unique_ptr<cRecipe> Recipe(FindRecipe(a_CraftingGrid.GetItems(), a_CraftingGrid.GetWidth(), a_CraftingGrid.GetHeight()));
 	a_Recipe.Clear();
@@ -309,7 +309,7 @@ void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingG
 		a_Recipe.SetIngredient(itr->x, itr->y, itr->m_Item);
 	}  // for itr
 	a_Recipe.SetResult(Recipe->m_Result);
-	
+
 	// Allow plugins to intercept recipes after they are processed:
 	cRoot::Get()->GetPluginManager()->CallHookPostCrafting(a_Player, a_CraftingGrid, a_Recipe);
 }
@@ -322,7 +322,7 @@ void cCraftingRecipes::LoadRecipes(void)
 {
 	LOGD("Loading crafting recipes from crafting.txt...");
 	ClearRecipes();
-	
+
 	// Load the crafting.txt file:
 	cFile f;
 	if (!f.Open("crafting.txt", cFile::fmRead))
@@ -337,7 +337,7 @@ void cCraftingRecipes::LoadRecipes(void)
 		return;
 	}
 	f.Close();
-	
+
 	// Split it into lines, then process each line as a single recipe:
 	AStringVector Split = StringSplit(Everything, "\n");
 	int LineNum = 1;
@@ -384,9 +384,9 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 		LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 		return;
 	}
-	
+
 	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe = cpp14::make_unique<cCraftingRecipes::cRecipe>();
-	
+
 	// Parse the result:
 	AStringVector ResultSplit = StringSplit(Sides[0], ",");
 	if (ResultSplit.empty())
@@ -414,7 +414,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	{
 		Recipe->m_Result.m_ItemCount = 1;
 	}
-	
+
 	// Parse each ingredient:
 	AStringVector Ingredients = StringSplit(Sides[1], "|");
 	int Num = 1;
@@ -427,9 +427,9 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 			return;
 		}
 	}  // for itr - Ingredients[]
-	
+
 	NormalizeIngredients(Recipe.get());
-	
+
 	m_Recipes.push_back(Recipe.release());
 }
 
@@ -440,18 +440,18 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 {
 	// The caller provides error logging
-	
+
 	AStringVector Split = StringSplit(a_String, "^");
 	if (Split.empty())
 	{
 		return false;
 	}
-	
+
 	if (!StringToItem(Split[0], a_Item))
 	{
 		return false;
 	}
-	
+
 	if (Split.size() > 1)
 	{
 		AString Damage = TrimString(Split[1]);
@@ -461,7 +461,7 @@ bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 			return false;
 		}
 	}
-	
+
 	// Success
 	return true;
 }
@@ -485,7 +485,7 @@ bool cCraftingRecipes::ParseIngredient(const AString & a_String, cRecipe * a_Rec
 		return false;
 	}
 	Item.m_ItemCount = 1;
-	
+
 	cCraftingRecipes::cRecipeSlots TempSlots;
 	for (AStringVector::const_iterator itr = Split.begin() + 1; itr != Split.end(); ++itr)
 	{
@@ -536,7 +536,7 @@ bool cCraftingRecipes::ParseIngredient(const AString & a_String, cRecipe * a_Rec
 		}
 		TempSlots.push_back(Slot);
 	}  // for itr - Split[]
-	
+
 	// Append the ingredients:
 	a_Recipe->m_Ingredients.insert(a_Recipe->m_Ingredients.end(), TempSlots.begin(), TempSlots.end());
 	return true;
@@ -579,7 +579,7 @@ void cCraftingRecipes::NormalizeIngredients(cCraftingRecipes::cRecipe * a_Recipe
 	}  // for itr - a_Recipe->m_Ingredients[]
 	a_Recipe->m_Width  = std::max(MaxX - MinX + 1, 1);
 	a_Recipe->m_Height = std::max(MaxY - MinY + 1, 1);
-	
+
 	// TODO: Compress two same ingredients with the same coords into a single ingredient with increased item count
 }
 
@@ -591,7 +591,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 {
 	ASSERT(a_GridWidth <= MAX_GRID_WIDTH);
 	ASSERT(a_GridHeight <= MAX_GRID_HEIGHT);
-	
+
 	// Get the real bounds of the crafting grid:
 	int GridLeft = MAX_GRID_WIDTH, GridTop = MAX_GRID_HEIGHT;
 	int GridRight = 0,  GridBottom = 0;
@@ -607,7 +607,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 	}
 	int GridWidth = GridRight - GridLeft + 1;
 	int GridHeight = GridBottom - GridTop + 1;
-	
+
 	// Search in the possibly minimized grid, but keep the stride:
 	const cItem * Grid = a_CraftingGrid + GridLeft + (a_GridWidth * GridTop);
 	cRecipe * Recipe = FindRecipeCropped(Grid, GridWidth, GridHeight, a_GridWidth);
@@ -615,14 +615,14 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 	{
 		return nullptr;
 	}
-	
+
 	// A recipe has been found, move it to correspond to the original crafting grid:
 	for (cRecipeSlots::iterator itrS = Recipe->m_Ingredients.begin(); itrS != Recipe->m_Ingredients.end(); ++itrS)
 	{
 		itrS->x += GridLeft;
 		itrS->y += GridTop;
 	}  // for itrS - Recipe->m_Ingredients[]
-	
+
 	return Recipe;
 }
 
@@ -639,7 +639,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_
 		// E. g. recipe "A, * | B, 1:1 | ..." still needs to check grid for B at 2:2 (in case A was in grid's 1:1)
 		// Calculate the maximum offsets for this recipe relative to the grid size, and iterate through all combinations of offsets.
 		// Also, this calculation automatically filters out recipes that are too large for the current grid - the loop won't be entered at all.
-		
+
 		int MaxOfsX = a_GridWidth  - (*itr)->m_Width;
 		int MaxOfsY = a_GridHeight - (*itr)->m_Height;
 		for (int x = 0; x <= MaxOfsX; x++) for (int y = 0; y <= MaxOfsY; y++)
@@ -651,7 +651,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_
 			}
 		}  // for y, for x
 	}  // for itr - m_Recipes[]
-	
+
 	// No matching recipe found
 	return nullptr;
 }
@@ -675,7 +675,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		ASSERT(itrS->x + a_OffsetX < a_GridWidth);
 		ASSERT(itrS->y + a_OffsetY < a_GridHeight);
 		int GridID = (itrS->x + a_OffsetX) + a_GridStride * (itrS->y + a_OffsetY);
-		
+
 		const cItem & Item = itrS->m_Item;
 		if (
 			(itrS->x >= a_GridWidth) ||
@@ -693,7 +693,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		}
 		HasMatched[itrS->x + a_OffsetX][itrS->y + a_OffsetY] = true;
 	}  // for itrS - Recipe->m_Ingredients[]
-	
+
 	// Process the "Anywhere" items now, and only in the cells that haven't matched yet
 	// The "anywhere" items are processed on a first-come-first-served basis.
 	// Do not use a recipe with one horizontal and one vertical "anywhere" ("*:1, 1:*") as it may not match properly!
@@ -754,7 +754,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 			return nullptr;
 		}
 	}  // for itrS - a_Recipe->m_Ingredients[]
-	
+
 	// Check if the whole grid has matched:
 	for (int x = 0; x < a_GridWidth; x++) for (int y = 0; y < a_GridHeight; y++)
 	{
@@ -764,7 +764,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 			return nullptr;
 		}
 	}  // for y, for x
-	
+
 	// The recipe has matched. Create a copy of the recipe and set its coords to match the crafting grid:
 	std::unique_ptr<cRecipe> Recipe = cpp14::make_unique<cRecipe>();
 	Recipe->m_Result = a_Recipe->m_Result;

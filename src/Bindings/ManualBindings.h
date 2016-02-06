@@ -27,7 +27,7 @@ class cManualBindings
 public:
 	/** Binds all the manually implemented functions to tolua_S. */
 	static void Bind(lua_State * tolua_S);
-	
+
 protected:
 	/** Binds the manually implemented cNetwork-related API to tolua_S.
 	Implemented in ManualBindings_Network.cpp. */

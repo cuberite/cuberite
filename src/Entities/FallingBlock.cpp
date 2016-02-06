@@ -36,11 +36,11 @@ void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
-	
+
 	int BlockX = POSX_TOINT;
 	int BlockY = static_cast<int>(GetPosY() - 0.5);
 	int BlockZ = POSZ_TOINT;
-	
+
 	if (BlockY < 0)
 	{
 		// Fallen out of this world, just continue falling until out of sight, then destroy:
@@ -50,13 +50,13 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		return;
 	}
-	
+
 	if (BlockY >= cChunkDef::Height)
 	{
 		// Above the world, just wait for it to fall back down
 		return;
 	}
-	
+
 	BLOCKTYPE BlockBelow = a_Chunk.GetBlock(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
 	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
 	if (cSandSimulator::DoesBreakFallingThrough(BlockBelow, BelowMeta))
@@ -86,7 +86,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy(true);
 		return;
 	}
-	
+
 	float MilliDt = a_Dt.count() * 0.001f;
 	AddSpeedY(MilliDt * -9.8f);
 	AddPosition(GetSpeed() * MilliDt);

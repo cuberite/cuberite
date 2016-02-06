@@ -42,7 +42,7 @@ static struct
 	{biExtremeHillsEdge, "ExtremeHillsEdge"},
 	{biJungle,           "Jungle"},
 	{biJungleHills,      "JungleHills"},
-	
+
 	// Release 1.7 biomes:
 	{biJungleEdge,       "JungleEdge"},
 	{biDeepOcean,        "DeepOcean"},
@@ -61,7 +61,7 @@ static struct
 	{biMesa,             "Mesa"},
 	{biMesaPlateauF,     "MesaPlateauF"},
 	{biMesaPlateau,      "MesaPlateau"},
-	
+
 	// Release 1.7 variants:
 	{biSunflowerPlains,      "SunflowerPlains"},
 	{biDesertM,              "DesertM"},
@@ -107,7 +107,7 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 		// It was an invalid number
 		return biInvalidBiome;
 	}
-	
+
 	for (size_t i = 0; i < ARRAYCOUNT(g_BiomeMap); i++)
 	{
 		if (NoCaseCompare(g_BiomeMap[i].m_String, a_BiomeString) == 0)
@@ -239,7 +239,7 @@ int GetSnowStartHeight(EMCSBiome a_Biome)
 			// Always snow
 			return 0;
 		}
-	
+
 		case biExtremeHills:
 		case biExtremeHillsM:
 		case biExtremeHillsPlus:
@@ -338,7 +338,7 @@ int GetSnowStartHeight(EMCSBiome a_Biome)
 			// These biomes don't actualy have any downfall.
 			return 1000;
 		}
-		
+
 		case biNether:
 		case biEnd:
 		{

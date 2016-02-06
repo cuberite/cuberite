@@ -143,10 +143,10 @@ public:
 		HOOK_WORLD_TICK,
 
 		// tolua_end
-		
+
 		// Note that if a hook type is added, it may need processing in cPlugin::CanAddHook() descendants,
 		//   and it definitely needs adding in cPluginLua::GetHookFnName() !
-		
+
 		// Keep these two as the last items, they are used for validity checking and get their values automagically
 		HOOK_NUM_HOOKS,
 		HOOK_MAX = HOOK_NUM_HOOKS - 1,
@@ -157,22 +157,22 @@ public:
 	{
 	public:
 		virtual ~cCommandEnumCallback() {}
-		
+
 		/** Called for each command; return true to abort enumeration
 		For console commands, a_Permission is not used (set to empty string)
 		*/
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) = 0;
 	} ;
-	
+
 	/** The interface used for enumerating and extern-calling plugins */
 	typedef cItemCallback<cPlugin> cPluginCallback;
-	
+
 	typedef std::list<cPlugin *> PluginList;
 
 
 	/** Called each tick, calls the plugins' OnTick hook, as well as processes plugin events (addition, removal) */
 	void Tick(float a_Dt);
-	
+
 	/** Returns the instance of the Plugin Manager (there is only ever one) */
 	static cPluginManager * Get(void);  // tolua_export
 
@@ -182,7 +182,7 @@ public:
 
 	/** Schedules a reload of the plugins to happen within the next call to Tick(). */
 	void ReloadPlugins();  // tolua_export
-	
+
 	/** Adds the plugin to the list of plugins called for the specified hook type.
 	If a plugin adds multiple handlers for a single hook, it is added only once (ignore-duplicates). */
 	void AddHook(cPlugin * a_Plugin, int a_HookType);
@@ -192,7 +192,7 @@ public:
 
 	/** Returns the number of plugins that are psLoaded. */
 	size_t GetNumLoadedPlugins(void) const;  // tolua_export
-	
+
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
 	bool CallHookBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
@@ -260,7 +260,7 @@ public:
 	bool CallHookWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather);
 	bool CallHookWorldStarted             (cWorld & a_World);
 	bool CallHookWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
-	
+
 	/** Queues the specified plugin to be unloaded in the next call to Tick().
 	Note that this function returns before the plugin is unloaded, to avoid deadlocks. */
 	void UnloadPlugin(const AString & a_PluginFolder);  // tolua_export
@@ -271,10 +271,10 @@ public:
 
 	/** Removes all hooks the specified plugin has registered */
 	void RemoveHooks(cPlugin * a_Plugin);
-	
+
 	/** Removes the plugin of the specified name from the internal structures and deletes its object. */
 	void RemovePlugin(const AString & a_PluginName);
-	
+
 	/** Removes all command bindings that the specified plugin has made */
 	void RemovePluginCommands(cPlugin * a_Plugin);
 
@@ -283,47 +283,47 @@ public:
 
 	/** Binds a command to the specified plugin. Returns true if successful, false if command already bound. */
 	bool BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
-	
+
 	/** Calls a_Callback for each bound command, returns true if all commands were enumerated */
 	bool ForEachCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
-	
+
 	/** Returns true if the command is in the command map */
 	bool IsCommandBound(const AString & a_Command);  // tolua_export
-	
+
 	/** Returns the permission needed for the specified command; empty string if command not found */
 	AString GetCommandPermission(const AString & a_Command);  // tolua_export
-	
+
 	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns crExecuted if executed. */
 	CommandResult ExecuteCommand(cPlayer & a_Player, const AString & a_Command);  // tolua_export
-	
+
 	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns crExecuted if executed. */
 	CommandResult ForceExecuteCommand(cPlayer & a_Player, const AString & a_Command);  // tolua_export
-	
+
 	/** Removes all console command bindings that the specified plugin has made */
 	void RemovePluginConsoleCommands(cPlugin * a_Plugin);
-	
+
 	/** Binds a console command to the specified plugin. Returns true if successful, false if command already bound. */
 	bool BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
-	
+
 	/** Calls a_Callback for each bound console command, returns true if all commands were enumerated */
 	bool ForEachConsoleCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
-	
+
 	/** Returns true if the console command is in the command map */
 	bool IsConsoleCommandBound(const AString & a_Command);  // tolua_export
-	
+
 	/** Executes the command split into a_Split, as if it was given on the console.
 	Returns true if executed. Output is sent to the a_Output callback
 	Exported in ManualBindings.cpp with a different signature. */
 	bool ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_Command);
-	
+
 	/** Appends all commands beginning with a_Text (case-insensitive) into a_Results.
 	If a_Player is not nullptr, only commands for which the player has permissions are added.
 	*/
 	void TabCompleteCommand(const AString & a_Text, AStringVector & a_Results, cPlayer * a_Player);
-	
+
 	/** Returns true if the specified hook type is within the allowed range */
 	static bool IsValidHookType(int a_HookType);
-	
+
 	/** Calls the specified callback with the plugin object of the specified plugin.
 	Returns false if plugin not found, otherwise returns the value that the callback has returned. */
 	bool DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback);
@@ -331,14 +331,14 @@ public:
 	/** Calls the specified callback for each plugin in m_Plugins.
 	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true. */
 	bool ForEachPlugin(cPluginCallback & a_Callback);
-	
+
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
 	static AString GetPluginsPath(void) { return FILE_IO_PREFIX + AString("Plugins"); }  // tolua_export
-	
+
 private:
 	friend class cRoot;
-	
+
 	class cCommandReg
 	{
 	public:
@@ -346,7 +346,7 @@ private:
 		AString   m_Permission;  // Not used for console commands
 		AString   m_HelpString;
 	} ;
-	
+
 	typedef std::map<int, cPluginManager::PluginList> HookMap;
 	typedef std::map<AString, cCommandReg> CommandMap;
 

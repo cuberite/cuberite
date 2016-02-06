@@ -317,21 +317,21 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 			// The command has executed successfully
 			return true;
 		}
-		
+
 		case crBlocked:
 		{
 			// The command was blocked by a plugin using HOOK_EXECUTE_COMMAND
 			// The plugin has most likely sent a message to the player already
 			return true;
 		}
-		
+
 		case crError:
 		{
 			// An error in the plugin has prevented the command from executing. Report the error to the player:
 			a_Player.SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
 			return true;
 		}
-		
+
 		case crNoPermission:
 		{
 			// The player is not allowed to execute this command

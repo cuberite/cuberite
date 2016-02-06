@@ -104,7 +104,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 			// Nothing has been received yet, or a special response was given (SendStatusAndReason() or SendNeedAuth())
 			break;
 		}
-		
+
 		case wcsRecvIdle:
 		{
 			// The client is waiting for a response, send an "Internal server error":
@@ -112,7 +112,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 			m_State = wcsRecvHeaders;
 			break;
 		}
-		
+
 		case wcsSendingResp:
 		{
 			// The response headers have been sent, we need to terminate the response body:
@@ -120,7 +120,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 			m_State = wcsRecvHeaders;
 			break;
 		}
-		
+
 		default:
 		{
 			ASSERT(!"Unhandled state recovery");
@@ -184,7 +184,7 @@ void cHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 				// The request headers are not yet complete
 				return;
 			}
-			
+
 			// The request has finished parsing its headers successfully, notify of it:
 			m_State = wcsRecvBody;
 			m_HTTPServer.NewRequest(*this, *m_CurrentRequest);
@@ -194,7 +194,7 @@ void cHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 				// The body length was not specified in the request, assume zero
 				m_CurrentRequestBodyRemaining = 0;
 			}
-			
+
 			// Process the rest of the incoming data into the request body:
 			if (a_Size > BytesConsumed)
 			{

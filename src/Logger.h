@@ -52,7 +52,7 @@ public:
 	void LogSimple(AString a_Message, eLogLevel a_LogLevel = llRegular);
 
 	cAttachment AttachListener(std::unique_ptr<cListener> a_Listener);
-	
+
 	static cLogger & GetInstance(void);
 	// Must be called before calling GetInstance in a multithreaded context
 	static void InitiateMultithreading();

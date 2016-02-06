@@ -39,7 +39,7 @@ public:
 					return false;
 				}
 				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
-				
+
 				cItems Pickups;
 				Pickups.Add(E_ITEM_HEAD, 1, static_cast<short>(MobHeadEntity->GetType()));
 				MTRand r1;
@@ -58,7 +58,7 @@ public:
 				return false;
 			}
 		} Callback;
-		
+
 		a_WorldInterface.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 	}
 

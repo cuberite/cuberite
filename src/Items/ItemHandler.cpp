@@ -104,7 +104,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 	switch (a_ItemType)
 	{
 		default:                       return new cItemHandler(a_ItemType);
-		
+
 		// Single item per handler, alphabetically sorted:
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
@@ -152,7 +152,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
-		
+
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
 		case E_ITEM_IRON_HOE:
@@ -161,7 +161,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemHoeHandler(a_ItemType);
 		}
-		
+
 		case E_ITEM_WOODEN_PICKAXE:
 		case E_ITEM_STONE_PICKAXE:
 		case E_ITEM_IRON_PICKAXE:
@@ -170,7 +170,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemPickaxeHandler(a_ItemType);
 		}
-		
+
 		case E_ITEM_WOODEN_SHOVEL:
 		case E_ITEM_STONE_SHOVEL:
 		case E_ITEM_IRON_SHOVEL:
@@ -179,7 +179,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemShovelHandler(a_ItemType);
 		}
-		
+
 		case E_ITEM_WOODEN_SWORD:
 		case E_ITEM_STONE_SWORD:
 		case E_ITEM_IRON_SWORD:
@@ -188,14 +188,14 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemSwordHandler(a_ItemType);
 		}
-		
+
 		case E_ITEM_BUCKET:
 		case E_ITEM_WATER_BUCKET:
 		case E_ITEM_LAVA_BUCKET:
 		{
 			return new cItemBucketHandler(a_ItemType);
 		}
-		
+
 		case E_ITEM_CARROT:
 		case E_ITEM_MELON_SEEDS:
 		case E_ITEM_POTATO:
@@ -204,7 +204,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemSeedsHandler(a_ItemType);
 		}
-		
+
 		case E_ITEM_ACACIA_DOOR:
 		case E_ITEM_BIRCH_DOOR:
 		case E_ITEM_DARK_OAK_DOOR:
@@ -215,7 +215,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemDoorHandler(a_ItemType);
 		}
-		
+
 		case E_ITEM_MINECART:
 		case E_ITEM_CHEST_MINECART:
 		case E_ITEM_FURNACE_MINECART:
@@ -224,7 +224,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemMinecartHandler(a_ItemType);
 		}
-		
+
 		// Food (please keep alpha-sorted):
 		// (carrots and potatoes handled separately in SeedHandler as they're both seed and food)
 		case E_ITEM_BAKED_POTATO:
@@ -321,13 +321,13 @@ bool cItemHandler::OnPlayerPlace(
 		// Clicked in air
 		return false;
 	}
-	
+
 	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 	{
 		// The clicked block is outside the world, ignore this call altogether (#128)
 		return false;
 	}
-	
+
 	BLOCKTYPE ClickedBlock;
 	NIBBLETYPE ClickedBlockMeta;
 
@@ -345,13 +345,13 @@ bool cItemHandler::OnPlayerPlace(
 	else
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			
+
 		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (#128)
 			return false;
 		}
-			
+
 		NIBBLETYPE PlaceMeta;
 		BLOCKTYPE PlaceBlock;
 		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
@@ -382,7 +382,7 @@ bool cItemHandler::OnPlayerPlace(
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;
 	}
-	
+
 	// Try to place the blocks:
 	if (!a_Player.PlaceBlocks(blocks))
 	{
@@ -477,7 +477,7 @@ bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cI
 	UNUSED(a_BlockY);
 	UNUSED(a_BlockZ);
 	UNUSED(a_Dir);
-	
+
 	return false;
 }
 
@@ -488,7 +488,7 @@ bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cI
 void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	UNUSED(a_Item);
-	
+
 	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	cBlockHandler * Handler = cBlockInfo::GetHandler(Block);
 
@@ -537,7 +537,7 @@ short cItemHandler::GetDurabilityLossByAction(eDurabilityLostAction a_Action)
 		case dlaAttackEntity: return 2;
 		case dlaBreakBlock:   return 1;
 	}
-	
+
 	#ifndef __clang__
 	return 0;
 	#endif
@@ -554,7 +554,7 @@ char cItemHandler::GetMaxStackSize(void)
 		// All blocks can stack up to 64
 		return 64;
 	}
-	
+
 	switch (m_ItemType)
 	{
 		case E_ITEM_ACACIA_DOOR:          return 64;
@@ -693,7 +693,7 @@ bool cItemHandler::IsFood(void)
 bool cItemHandler::IsDrinkable(short a_ItemDamage)
 {
 	UNUSED(a_ItemDamage);
-	
+
 	return false;
 }
 
@@ -793,13 +793,13 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 )
 {
 	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers
-	
+
 	if (m_ItemType >= 256)
 	{
 		LOGERROR("%s: Item %d is not eligible for direct block placement!", __FUNCTION__, m_ItemType);
 		return false;
 	}
-	
+
 	cBlockHandler * BlockH = BlockHandler(static_cast<BLOCKTYPE>(m_ItemType));
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(

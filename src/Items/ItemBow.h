@@ -19,22 +19,22 @@ class cItemBowHandler :
 	public cItemHandler
 {
 	typedef cItemHandler super;
-	
+
 public:
 	cItemBowHandler(void) :
 		super(E_ITEM_BOW)
 	{
 	}
-	
 
-	
+
+
 	virtual bool OnItemUse(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
 	) override
 	{
 		ASSERT(a_Player != nullptr);
-		
+
 		// Check if the player has an arrow in the inventory, or is in Creative:
 		if (!(a_Player->IsGameModeCreative() || a_Player->GetInventory().HasItems(cItem(E_ITEM_ARROW))))
 		{
@@ -45,8 +45,8 @@ public:
 		return true;
 	}
 
-	
-	
+
+
 	virtual void OnItemShoot(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
 		// Actual shot - produce the arrow with speed based on the ticks that the bow was charged
@@ -98,7 +98,7 @@ public:
 			{
 				Arrow->SetPickupState(cArrowEntity::psNoPickup);
 			}
-			
+
 
 			a_Player->UseEquippedItem();
 		}

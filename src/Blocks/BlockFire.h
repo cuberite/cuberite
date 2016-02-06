@@ -59,7 +59,7 @@ public:
 		{
 			return 0;
 		}
-		
+
 		for (int newY = Y + 1; newY < cChunkDef::Height; newY++)
 		{
 			BLOCKTYPE Block = a_ChunkInterface.GetBlock(X, newY, Z);

@@ -20,7 +20,7 @@ class cItemEmptyMapHandler :
 	typedef cItemHandler super;
 
 	static const unsigned int DEFAULT_SCALE = 0;
-	
+
 public:
 	cItemEmptyMapHandler() :
 		super(E_ITEM_EMPTY_MAP)

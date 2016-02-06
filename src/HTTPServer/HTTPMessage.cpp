@@ -47,7 +47,7 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 		itr->second.append(", ");
 		itr->second.append(a_Value);
 	}
-	
+
 	// Special processing for well-known headers:
 	if (Key == "content-type")
 	{
@@ -89,7 +89,7 @@ size_t cHTTPRequest::ParseHeaders(const char * a_Data, size_t a_Size)
 	{
 		return AString::npos;
 	}
-	
+
 	if (m_Method.empty())
 	{
 		// The first line hasn't been processed yet
@@ -108,7 +108,7 @@ size_t cHTTPRequest::ParseHeaders(const char * a_Data, size_t a_Size)
 		}
 		return res2 + res;
 	}
-	
+
 	if (m_EnvelopeParser.IsInHeaders())
 	{
 		size_t res = m_EnvelopeParser.Parse(a_Data, a_Size);
@@ -166,7 +166,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 		m_IsValid = false;
 		return AString::npos;
 	}
-	
+
 	int NumSpaces = 0;
 	size_t MethodEnd = 0;
 	size_t URLEnd = 0;
@@ -218,7 +218,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 			}
 		}  // switch (m_IncomingHeaderData[i])
 	}  // for i - m_IncomingHeaderData[]
-	
+
 	// CRLF hasn't been encountered yet, consider all data consumed
 	return a_Size;
 }

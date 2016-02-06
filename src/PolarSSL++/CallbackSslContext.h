@@ -25,7 +25,7 @@ public:
 	public:
 		// Force a virtual destructor in descendants:
 		virtual ~cDataCallbacks() {}
-		
+
 		/** Called when PolarSSL wants to read encrypted data from the SSL peer.
 		The returned value is the number of bytes received, or a PolarSSL error on failure.
 		The implementation can return POLARSSL_ERR_NET_WANT_READ or POLARSSL_ERR_NET_WANT_WRITE to indicate
@@ -33,7 +33,7 @@ public:
 		SSL operation that invoked this call will terminate with the same return value, so that the owner is
 		notified of this condition and can potentially restart the operation later on. */
 		virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) = 0;
-		
+
 		/** Called when PolarSSL wants to write encrypted data to the SSL peer.
 		The returned value is the number of bytes sent, or a PolarSSL error on failure.
 		The implementation can return POLARSSL_ERR_NET_WANT_READ or POLARSSL_ERR_NET_WANT_WRITE to indicate
@@ -42,14 +42,14 @@ public:
 		notified of this condition and can potentially restart the operation later on. */
 		virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) = 0;
 	} ;
-	
-	
+
+
 	/** Creates a new SSL context with no callbacks assigned */
 	cCallbackSslContext(void);
-	
+
 	/** Creates a new SSL context with the specified callbacks */
 	cCallbackSslContext(cDataCallbacks & a_Callbacks);
-	
+
 protected:
 	/** The callbacks to use to send and receive SSL peer data */
 	cDataCallbacks * m_Callbacks;

@@ -86,7 +86,7 @@ class cItemFishingRodHandler :
 	public cItemHandler
 {
 	typedef cItemHandler super;
-	
+
 public:
 	cItemFishingRodHandler(int a_ItemType) :
 		super(a_ItemType)

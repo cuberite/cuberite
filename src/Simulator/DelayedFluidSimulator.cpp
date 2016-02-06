@@ -21,7 +21,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 {
 	ASSERT(a_RelZ >= 0);
 	ASSERT(a_RelZ < static_cast<int>(ARRAYCOUNT(m_Blocks)));
-	
+
 	cCoordWithIntVector & Blocks = m_Blocks[a_RelZ];
 	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 	for (cCoordWithIntVector::const_iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
@@ -85,12 +85,12 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
 		return;
 	}
-	
+
 	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
-	
+
 	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_BlockY, RelZ);
@@ -102,7 +102,7 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
-	
+
 	// Add, if not already present:
 	if (!Slot.Add(RelX, a_BlockY, RelZ))
 	{
@@ -135,7 +135,7 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
-	
+
 	// Simulate all the blocks in the scheduled slot:
 	for (size_t i = 0; i < ARRAYCOUNT(Slot.m_Blocks); i++)
 	{

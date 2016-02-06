@@ -72,7 +72,7 @@ bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, 
 	m_DirY = (m_StartY < m_EndY) ? 1 : -1;
 	m_DirZ = (m_StartZ < m_EndZ) ? 1 : -1;
 	m_CurrentFace = BLOCK_FACE_NONE;
-	
+
 	// Check the start coords, adjust into the world:
 	if (m_StartY < 0)
 	{
@@ -99,11 +99,11 @@ bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, 
 	m_CurrentX = FloorC(m_StartX);
 	m_CurrentY = FloorC(m_StartY);
 	m_CurrentZ = FloorC(m_StartZ);
-	
+
 	m_DiffX = m_EndX - m_StartX;
 	m_DiffY = m_EndY - m_StartY;
 	m_DiffZ = m_EndZ - m_StartZ;
-	
+
 	// The actual trace is handled with ChunkMapCS locked by calling our Item() for the specified chunk
 	int BlockX = FloorC(m_StartX);
 	int BlockZ = FloorC(m_StartZ);
@@ -197,7 +197,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 			Direction = dirZ;
 		}
 	}
-	
+
 	// Based on the wall hit, adjust the current coords
 	switch (Direction)
 	{
@@ -216,7 +216,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 bool cLineBlockTracer::Item(cChunk * a_Chunk)
 {
 	ASSERT((m_CurrentY >= 0) && (m_CurrentY < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
-	
+
 	// This is the actual line tracing loop.
 	for (;;)
 	{

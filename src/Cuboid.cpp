@@ -99,7 +99,7 @@ bool cCuboid::DoesIntersect(const cCuboid & a_Other) const
 {
 	ASSERT(IsSorted());
 	ASSERT(a_Other.IsSorted());
-	
+
 	// In order for cuboids to intersect, each of their coord intervals need to intersect
 	return (
 		DoIntervalsIntersect(p1.x, p2.x, a_Other.p1.x, a_Other.p2.x) &&
@@ -116,7 +116,7 @@ bool cCuboid::IsCompletelyInside(const cCuboid & a_Outer) const
 {
 	ASSERT(IsSorted());
 	ASSERT(a_Outer.IsSorted());
-	
+
 	return (
 		(p1.x >= a_Outer.p1.x) &&
 		(p2.x <= a_Outer.p2.x) &&
@@ -158,7 +158,7 @@ void cCuboid::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY,
 		p2.x -= a_SubMinX;
 		p1.x += a_AddMaxX;
 	}
-	
+
 	if (p1.y < p2.y)
 	{
 		p1.y -= a_SubMinY;
@@ -169,7 +169,7 @@ void cCuboid::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY,
 		p2.y -= a_SubMinY;
 		p1.y += a_AddMaxY;
 	}
-	
+
 	if (p1.z < p2.z)
 	{
 		p1.z -= a_SubMinZ;

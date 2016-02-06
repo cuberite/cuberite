@@ -18,7 +18,7 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));
@@ -30,7 +30,7 @@ public:
 		a_Player->OpenWindow(Window);
 		return true;
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,

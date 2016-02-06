@@ -68,7 +68,7 @@ public:
 			cPlayer & m_Player;
 			eMobHeadType m_HeadType;
 			NIBBLETYPE m_BlockMeta;
-			
+
 			virtual bool Item(cBlockEntity * a_BlockEntity)
 			{
 				if (a_BlockEntity->GetBlockType() != E_BLOCK_HEAD)
@@ -88,7 +88,7 @@ public:
 				MobHeadEntity->GetWorld()->BroadcastBlockEntity(MobHeadEntity->GetPosX(), MobHeadEntity->GetPosY(), MobHeadEntity->GetPosZ());
 				return false;
 			}
-		
+
 		public:
 			cCallback (cPlayer & a_CBPlayer, eMobHeadType a_HeadType, NIBBLETYPE a_BlockMeta) :
 				m_Player(a_CBPlayer),
@@ -334,7 +334,7 @@ public:
 		return true;
 	}
 
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,

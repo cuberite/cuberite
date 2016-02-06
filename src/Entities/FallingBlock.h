@@ -18,7 +18,7 @@ class cFallingBlock :
 	public cEntity
 {
 	typedef cEntity super;
-	
+
 public:
 	CLASS_PROTODEF(cFallingBlock)
 
@@ -27,11 +27,11 @@ public:
 
 	BLOCKTYPE  GetBlockType(void) const { return m_BlockType; }
 	NIBBLETYPE GetBlockMeta(void) const { return m_BlockMeta; }
-	
+
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	
+
 private:
 	BLOCKTYPE  m_BlockType;
 	NIBBLETYPE m_BlockMeta;

@@ -30,7 +30,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		if (!a_Player->IsGameModeCreative())
 		{
 			switch (m_ItemType)

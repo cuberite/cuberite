@@ -23,7 +23,7 @@ void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockF
 {
 	// TODO: Tweak a_HitPos based on block face.
 	TeleportCreator(a_HitPos);
-	
+
 	m_DestroyTimer = 2;
 }
 
@@ -35,10 +35,10 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d 
 {
 	int TotalDamage = 0;
 	// TODO: If entity is Ender Crystal, destroy it
-	
+
 	TeleportCreator(a_HitPos);
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
-	
+
 	m_DestroyTimer = 5;
 }
 

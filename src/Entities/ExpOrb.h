@@ -12,7 +12,7 @@ class cExpOrb :
 	public cEntity
 {
 	typedef cEntity super;
-	
+
 public:
 	// tolua_end
 
@@ -39,7 +39,7 @@ public:
 
 protected:
 	int m_Reward;
-	
+
 	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
 	std::chrono::milliseconds m_Timer;
 } ;  // tolua_export

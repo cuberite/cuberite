@@ -84,7 +84,7 @@ Vector3i cPiece::RotatePos(const Vector3i & a_Pos, int a_NumCCWRotations) const
 cPiece::cConnector cPiece::RotateMoveConnector(const cConnector & a_Connector, int a_NumCCWRotations, int a_MoveX, int a_MoveY, int a_MoveZ) const
 {
 	cPiece::cConnector res(a_Connector);
-	
+
 	// Rotate the res connector:
 	switch (a_NumCCWRotations)
 	{
@@ -113,12 +113,12 @@ cPiece::cConnector cPiece::RotateMoveConnector(const cConnector & a_Connector, i
 		}
 	}
 	res.m_Pos = RotatePos(a_Connector.m_Pos, a_NumCCWRotations);
-	
+
 	// Move the res connector:
 	res.m_Pos.x += a_MoveX;
 	res.m_Pos.y += a_MoveY;
 	res.m_Pos.z += a_MoveZ;
-	
+
 	return res;
 }
 
@@ -262,7 +262,7 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockZ, c
 {
 	m_PiecePool.Reset();
 	int rnd = m_Noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7;
-	
+
 	// Choose a random one of the starting pieces:
 	cPieces StartingPieces = m_PiecePool.GetStartingPieces();
 	int Total = 0;
@@ -291,7 +291,7 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockZ, c
 		StartingPiece = StartingPieces[static_cast<size_t>(rnd) % StartingPieces.size()];
 	}
 	rnd = rnd >> 16;
-	
+
 	// Choose a random supported rotation:
 	int Rotations[4] = {0};
 	int NumRotations = 1;
@@ -344,7 +344,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		/* XM */ { 0,  0,  3,  1,  2,  0},
 		/* XP */ { 0,  0,  1,  3,  0,  2},
 	};
-	
+
 	// Get a list of available connections:
 	const int * RotTable = DirectionRotationTable[a_Connector.m_Direction];
 	cConnections Connections;
@@ -362,7 +362,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		{
 			continue;
 		}
-		
+
 		// Try fitting each of the piece's connector:
 		cPiece::cConnectors Connectors = (*itrP)->GetConnectors();
 		auto verticalLimit = (*itrP)->GetVerticalLimit();
@@ -402,7 +402,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		return false;
 	}
 	ASSERT(WeightTotal > 0);
-	
+
 	// Choose a random connection from the list, based on the weights:
 	int rnd = (m_Noise.IntNoise3DInt(a_Connector.m_Pos.x, a_Connector.m_Pos.y, a_Connector.m_Pos.z) / 7) % WeightTotal;
 	size_t ChosenIndex = 0;
@@ -416,13 +416,13 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		}
 	}
 	cConnection & Conn = Connections[ChosenIndex];
-	
+
 	// Place the piece:
 	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
 	ConnPos -= NewPos;
 	cPlacedPiece * PlacedPiece = new cPlacedPiece(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
 	a_OutPieces.push_back(PlacedPiece);
-	
+
 	// Add the new piece's connectors to the list of free connectors:
 	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
 	for (cPiece::cConnectors::const_iterator itr = Connectors.begin(), end = Connectors.end(); itr != end; ++itr)
@@ -434,7 +434,7 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 		}
 		a_OutConnectors.push_back(cFreeConnector(PlacedPiece, Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z)));
 	}
-	
+
 	return true;
 }
 
@@ -538,10 +538,10 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDepth,
 {
 	a_OutPieces.clear();
 	cFreeConnectors ConnectorPool;
-	
+
 	// Place the starting piece:
 	a_OutPieces.push_back(PlaceStartingPiece(a_BlockX, a_BlockZ, ConnectorPool));
-	
+
 	/*
 	// DEBUG:
 	printf("Placed the starting piece at {%d, %d, %d}\n", a_BlockX, a_BlockY, a_BlockZ);
@@ -554,7 +554,7 @@ void cBFSPieceGenerator::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDepth,
 	);
 	DebugConnectorPool(ConnectorPool, 0);
 	//*/
-	
+
 	// Place pieces at the available connectors:
 	/*
 	Instead of removing them one by one from the pool, we process them sequentially and take note of the last

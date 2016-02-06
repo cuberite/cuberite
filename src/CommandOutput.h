@@ -14,13 +14,13 @@ class cCommandOutputCallback
 {
 public:
 	virtual ~cCommandOutputCallback() {}  // Force a virtual destructor in subclasses
-	
+
 	/** Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline" */
 	void Out(const char * a_Fmt, ...) FORMATSTRING(2, 3);
-	
+
 	/** Called when the command wants to output anything; may be called multiple times */
 	virtual void Out(const AString & a_Text) = 0;
-	
+
 	/** Called when the command processing has been finished */
 	virtual void Finished(void) {}
 } ;
@@ -87,7 +87,7 @@ class cLogCommandDeleteSelfOutputCallback :
 	public cLogCommandOutputCallback
 {
 	typedef cLogCommandOutputCallback super;
-	
+
 	virtual void Finished(void) override
 	{
 		super::Finished();

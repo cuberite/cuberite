@@ -39,7 +39,7 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player->GetEquippedItem().m_ItemDamage);
-		
+
 		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
 		switch (a_BlockFace)
 		{
@@ -84,7 +84,7 @@ public:
 
 		return true;
 	}
-	
+
 	/** Returns true if the specified blocktype is one of the slabs handled by this handler */
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
 	{
@@ -101,7 +101,7 @@ public:
 		// Sends the slab back to the client. It's to refuse a doubleslab placement. */
 		a_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
-	
+
 	/** Converts the single-slab blocktype to its equivalent double-slab blocktype */
 	static BLOCKTYPE GetDoubleSlabType(BLOCKTYPE a_SingleSlabBlockType)
 	{
@@ -114,7 +114,7 @@ public:
 		ASSERT(!"Unhandled slab type!");
 		return E_BLOCK_AIR;
 	}
-	
+
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Toggle the 4th bit - up / down:
@@ -203,7 +203,7 @@ public:
 		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
 		a_Pickups.push_back(cItem(Block, 2, a_BlockMeta & 0x7));
 	}
-	
+
 	inline static BLOCKTYPE GetSingleSlabType(BLOCKTYPE a_BlockType)
 	{
 		switch (a_BlockType)

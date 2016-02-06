@@ -167,7 +167,7 @@ protected:
 	{
 	public:
 		N m_Noise;
-		
+
 		/** Coord multiplier. */
 		NOISE_DATATYPE m_Frequency;
 

@@ -35,8 +35,8 @@ public:
 	{
 		// No pickups
 	}
-	
-	
+
+
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		cItemHandler * Handler = a_Player->GetEquippedItem().GetHandler();

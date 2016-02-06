@@ -47,14 +47,14 @@ public:
 			LOGWARNING("Used unknown armor: %i", a_Item.m_ItemType);
 			return false;
 		}
-		
+
 		if (!a_Player->GetInventory().GetArmorSlot(SlotNum).IsEmpty())
 		{
 			return false;
 		}
-		
+
 		a_Player->GetInventory().SetArmorSlot(SlotNum, a_Item.CopyOne());
-		
+
 		cItem Item(a_Item);
 		Item.m_ItemCount--;
 		if (Item.m_ItemCount <= 0)

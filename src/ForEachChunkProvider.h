@@ -25,10 +25,10 @@ class cForEachChunkProvider
 {
 public:
 	virtual ~cForEachChunkProvider() {}
-	
+
 	/** Calls the callback for each chunk in the specified range. */
 	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) = 0;
-	
+
 	/** Writes the block area into the specified coords.
 	Returns true if all chunks have been processed.
 	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.

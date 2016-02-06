@@ -50,7 +50,7 @@ public:
 
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);
-	
+
 private:
 
 	class cUser
@@ -76,13 +76,13 @@ private:
 
 	/** The server that is to be contacted for auth / UUID conversions */
 	AString m_Server;
-	
+
 	/** The URL to use for auth, without server part.
 	%USERNAME% will be replaced with actual user name.
 	%SERVERID% will be replaced with server's ID.
 	For example "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%". */
 	AString m_Address;
-	
+
 	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 

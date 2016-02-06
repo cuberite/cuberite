@@ -68,7 +68,7 @@ bool cMapSerializer::Save(void)
 	SaveMapToNBT(Writer);
 
 	Writer.Finish();
-	
+
 	#ifdef _DEBUG
 	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
 	ASSERT(TestParse.IsValid());
@@ -140,7 +140,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Byte))
 	{
 		eDimension Dimension = static_cast<eDimension>(a_NBT.GetByte(CurrLine));
-		
+
 		if (Dimension != m_Map->m_World->GetDimension())
 		{
 			// TODO 2014-03-20 xdot: We should store nether maps in nether worlds, e.t.c.
@@ -259,7 +259,7 @@ bool cIDCountSerializer::Save(void)
 	}
 
 	Writer.Finish();
-	
+
 	#ifdef _DEBUG
 	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
 	ASSERT(TestParse.IsValid());

@@ -47,7 +47,7 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 		LOGWARN("[Generator] CompositionGen value not set in world.ini, using \"Biomal\".");
 		CompoGenName = "Biomal";
 	}
-	
+
 	// Compositor list is alpha-sorted
 	cTerrainCompositionGenPtr res;
 	if (NoCaseCompare(CompoGenName, "Biomal") == 0)
@@ -96,10 +96,10 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 		return CreateCompositionGen(a_IniFile, a_BiomeGen, a_ShapeGen, a_Seed);
 	}
 	ASSERT(res != nullptr);
-	
+
 	// Read the settings from the ini file:
 	res->InitializeCompoGen(a_IniFile);
-	
+
 	return cTerrainCompositionGenPtr(res);
 }
 
@@ -125,7 +125,7 @@ cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
 void cComposableGenerator::Initialize(cIniFile & a_IniFile)
 {
 	super::Initialize(a_IniFile);
-	
+
 	InitBiomeGen(a_IniFile);
 	InitShapeGen(a_IniFile);
 	InitCompositionGen(a_IniFile);
@@ -154,7 +154,7 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 	{
 		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_ChunkDesc.GetBiomeMap());
 	}
-	
+
 	cChunkDesc::Shape shape;
 	if (a_ChunkDesc.IsUsingDefaultHeight())
 	{
@@ -166,7 +166,7 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 		// Convert the heightmap in a_ChunkDesc into shape:
 		a_ChunkDesc.GetShapeFromHeight(shape);
 	}
-	
+
 	bool ShouldUpdateHeightmap = false;
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
@@ -181,7 +181,7 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 		}  // for itr - m_FinishGens[]
 		ShouldUpdateHeightmap = true;
 	}
-	
+
 	if (ShouldUpdateHeightmap)
 	{
 		a_ChunkDesc.UpdateHeightmap();
@@ -196,7 +196,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 {
 	bool CacheOffByDefault = false;
 	m_BiomeGen = cBiomeGen::CreateBiomeGen(a_IniFile, m_ChunkGenerator.GetSeed(), CacheOffByDefault);
-	
+
 	// Add a cache, if requested:
 	// The default is 16 * 128 caches, which is 2 MiB of RAM. Reasonable, for the amount of work this is saving.
 	int CacheSize = a_IniFile.GetValueSetI("Generator", "BiomeGenCacheSize", CacheOffByDefault ? 0 : 16);
@@ -232,7 +232,7 @@ void cComposableGenerator::InitShapeGen(cIniFile & a_IniFile)
 {
 	bool CacheOffByDefault = false;
 	m_ShapeGen = cTerrainShapeGen::CreateShapeGen(a_IniFile, m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);
-	
+
 	/*
 	// TODO
 	// Add a cache, if requested:
@@ -259,7 +259,7 @@ void cComposableGenerator::InitShapeGen(cIniFile & a_IniFile)
 void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
 	m_CompositionGen = cTerrainCompositionGen::CreateCompositionGen(a_IniFile, m_BiomeGen, m_ShapeGen, m_ChunkGenerator.GetSeed());
-	
+
 	// Add a cache over the composition generator:
 	// Even a cache of size 1 is useful due to the CompositedHeiGen cache after us doing re-composition on its misses
 	int CompoGenCacheSize = a_IniFile.GetValueSetI("Generator", "CompositionGenCacheSize", 64);

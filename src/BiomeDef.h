@@ -49,7 +49,7 @@ enum EMCSBiome
 	biExtremeHillsEdge = 20,
 	biJungle           = 21,
 	biJungleHills      = 22,
-	
+
 	// Release 1.7 biomes:
 	biJungleEdge       = 23,
 	biDeepOcean        = 24,
@@ -68,14 +68,14 @@ enum EMCSBiome
 	biMesa             = 37,
 	biMesaPlateauF     = 38,
 	biMesaPlateau      = 39,
-	
+
 	// Automatically capture the maximum consecutive biome value into biMaxBiome:
 	biNumBiomes,  // True number of biomes, since they are zero-based
 	biMaxBiome = biNumBiomes - 1,  // The maximum biome value
-	
+
 	// Add this number to the biomes to get the variant
 	biVariant = 128,
-	
+
 	// Release 1.7 biome variants:
 	biFirstVariantBiome    = 129,
 	biSunflowerPlains      = 129,
