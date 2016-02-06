@@ -75,6 +75,7 @@ cChunk::cChunk(
 ) :
 	m_Presence(cpInvalid),
 	m_ShouldGenerateIfLoadFailed(false),
+	m_IsInTick(false),
 	m_IsLightValid(false),
 	m_IsDirty(false),
 	m_IsSaving(false),
@@ -122,6 +123,7 @@ cChunk::cChunk(
 
 cChunk::~cChunk()
 {
+	ASSERT(!m_IsInTick);
 	cPluginManager::Get()->CallHookChunkUnloaded(*m_World, m_PosX, m_PosZ);
 
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
@@ -133,14 +135,12 @@ cChunk::~cChunk()
 	m_BlockEntities.clear();
 
 	// Remove and destroy all entities that are not players:
-	cEntityList Entities;
-	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
+	cEntityList Entities(m_Entities);
 	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
 	{
 		if (!(*itr)->IsPlayer())
 		{
 			(*itr)->Destroy(false);
-			delete *itr;
 		}
 	}
 
@@ -1891,6 +1891,7 @@ void cChunk::AddEntity(cEntity * a_Entity)
 	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
 
 	m_Entities.push_back(a_Entity);
+	a_Entity->SetParentChunk(this);
 }
 
 
@@ -1922,7 +1923,7 @@ void cChunk::SafeRemoveEntity(cEntity * a_Entity)
 	}
 	else
 	{
-		// If we are in a tick, we don't want to invalidate the iterator, so we schedule the removal. Removal will be done in cChunk::tick()
+		// If we are in a tick, we don't want to invalidate the iterator, so we schedule the removal. Removal will be done in cChunk)
 		a_Entity->SetWorldTravellingFrom(GetWorld());
 	}
 
@@ -1930,6 +1931,20 @@ void cChunk::SafeRemoveEntity(cEntity * a_Entity)
 	if (!a_Entity->IsPlayer())
 	{
 		MarkDirty();
+	}
+}
+
+
+
+
+
+void cChunk::DeleteEntityIfNotTicking(cEntity * a_Entity)
+{
+	if (!m_IsInTick)
+	{
+		LOGD("Destroying entity #%i (%s) (immediate)", a_Entity->GetUniqueID(), a_Entity->GetClass());
+		m_Entities.remove(a_Entity);
+		delete a_Entity;
 	}
 }
 
