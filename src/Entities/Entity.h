@@ -336,6 +336,8 @@ public:
 
 	// tolua_end
 
+	bool BeginTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	/** Handles the physics of the entity - updates position based on speed, updates speed based on environment */
@@ -408,12 +410,6 @@ public:
 
 	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
-	/** Returns if the entity is travelling away from a specified world */
-	bool IsWorldTravellingFrom(cWorld * a_World) const { return (m_WorldTravellingFrom == a_World); }
-
-	/** Sets the world the entity will be leaving */
-	void SetWorldTravellingFrom(cWorld * a_World) { m_WorldTravellingFrom = a_World; }
-
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
 
@@ -481,7 +477,14 @@ public:
 	/** Sets the internal world pointer to a new cWorld, doesn't update anything else. */
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
+	/** Sets the chunk which is owning us. Should only be called by cChunk::addEntity. */
+	void SetParentChunk(cChunk * a_Chunk);
+
+	/** Sets whether we're removed or not. Should only be called by cChunk::addEntity or cEntity::BeginTick */
+	void SetRemoved(bool a_Removed) { m_Removed = a_Removed; }
 protected:
+	bool GetIsInTick();
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -540,11 +543,6 @@ protected:
 
 	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
 	bool m_IsInitialized;
-
-	/** World entity is travelling from (such as when using portals).
-	Set to a valid world pointer by MoveToWorld; reset to nullptr when the entity is removed from the old world.
-	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it. */
-	cWorld * m_WorldTravellingFrom;
 
 	eEntityType m_EntityType;
 
@@ -606,6 +604,16 @@ protected:
 	virtual void SetSwimState(cChunk & a_Chunk);
 
 private:
+
+	/** Whether the entity is removed from its parent chunk. */
+	bool m_Removed;
+
+	/** Whether we're currently executing a tick. */
+	bool m_IsInTick;
+
+	/** The chunk which is currently ticking this entity. */
+	cChunk * m_ParentChunk;  // TODO use this everywhere instead of propogating the chunk in ::tick()'s
+
 	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
 
