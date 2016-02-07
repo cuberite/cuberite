@@ -221,7 +221,7 @@ void cPawn::ClearEntityEffects()
 
 void cPawn::NoLongerTargetingMe(cMonster * a_Monster)
 {
-	ASSERT(!IsDestroyed());  // Our destroy override is supposed to clear all targets before we're destroyed.
+	ASSERT(IsTicking());  // Our destroy override is supposed to clear all targets before we're destroyed.
 	for (auto i = m_TargetingMe.begin(); i != m_TargetingMe.end(); ++i)
 	{
 		cMonster * Monster = *i;
@@ -241,7 +241,7 @@ void cPawn::NoLongerTargetingMe(cMonster * a_Monster)
 
 void cPawn::TargetingMe(cMonster * a_Monster)
 {
-	ASSERT(!IsDestroyed());
+	ASSERT(IsTicking());
 	ASSERT(m_TargetingMe.size() < 10000);
 	ASSERT(a_Monster->GetTarget() == this);
 	m_TargetingMe.push_back(a_Monster);

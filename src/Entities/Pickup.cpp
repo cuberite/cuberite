@@ -30,10 +30,12 @@ public:
 
 	virtual bool Item(cEntity * a_Entity) override
 	{
-		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
+		ASSERT(a_Entity->IsTicking());
+		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()))
 		{
 			return false;
 		}
+
 
 		Vector3d EntityPos = a_Entity->GetPosition();
 		double Distance = (EntityPos - m_Position).Length();
@@ -152,7 +154,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			// Try to combine the pickup with adjacent same-item pickups:
-			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine if already full
+			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine if already full
 			{
 				// By using a_Chunk's ForEachEntity() instead of cWorld's, pickups don't combine across chunk boundaries.
 				// That is a small price to pay for not having to traverse the entire world for each entity.

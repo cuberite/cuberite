@@ -195,7 +195,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		{
 			ASSERT(a_Entity != nullptr);
 
-			if (!a_Entity->IsPickup() || a_Entity->IsDestroyed())
+			if (!a_Entity->IsPickup())
 			{
 				return false;
 			}

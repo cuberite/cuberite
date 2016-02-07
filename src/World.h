@@ -819,7 +819,6 @@ private:
 		virtual void Execute(void) override;
 	} ;
 
-
 	/** Implementation of the callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	class cChunkGeneratorCallbacks :
 		public cChunkGenerator::cChunkSink,

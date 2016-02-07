@@ -1018,6 +1018,8 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		{
 			(*itr)->SetWorld(this);
 			m_ChunkMap->AddEntity(*itr);
+			ASSERT(!(*itr)->IsTicking());
+			(*itr)->SetIsTicking(true);
 		}
 		m_EntitiesToAdd.clear();
 	}
@@ -1026,6 +1028,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	AddQueuedPlayers();
 
 	m_ChunkMap->Tick(a_Dt);
+	TickMobs(a_Dt);
 	m_MapManager.TickMaps();
 
 	TickClients(static_cast<float>(a_Dt.count()));
@@ -1046,7 +1049,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		UnloadUnusedChunks();
 	}
 
-	TickMobs(a_Dt);
 }
 
 
@@ -1134,7 +1136,16 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
 	for (cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; ++itr)
 	{
-		itr->second.m_Monster.Tick(a_Dt, itr->second.m_Chunk);
+		cEntity & Entity = itr->second.m_Monster;
+		cChunk * Chunk = Entity.GetParentChunk();
+		if (!Entity.IsTicking())
+		{
+			++itr;
+			continue;
+		}
+		ASSERT(Chunk == &(itr->second.m_Chunk));
+		Entity.Tick(a_Dt, *Chunk);
+		ASSERT(Chunk == &(itr->second.m_Chunk));
 	}
 
 	// remove too far mobs
@@ -2919,7 +2930,7 @@ bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 	for (cPlayerList::iterator itr = m_Players.begin(), itr2 = itr; itr != m_Players.end(); itr = itr2)
 	{
 		++itr2;
-		if ((*itr)->IsDestroyed())
+		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
@@ -2941,7 +2952,7 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if ((*itr)->IsDestroyed())
+		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
@@ -2967,7 +2978,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if ((*itr)->IsDestroyed())
+		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
@@ -2999,7 +3010,7 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallbac
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if ((*itr)->IsDestroyed())
+		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
@@ -3026,7 +3037,7 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if ((*itr)->IsDestroyed())
+		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
@@ -3406,6 +3417,7 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 
 void cWorld::AddEntity(cEntity * a_Entity)
 {
+	a_Entity->SetWorld(this);
 	cCSLock Lock(m_CSEntitiesToAdd);
 	m_EntitiesToAdd.push_back(a_Entity);
 }
@@ -3792,6 +3804,8 @@ void cWorld::AddQueuedPlayers(void)
 
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
 			m_ChunkMap->AddEntityIfNotPresent(*itr);
+			ASSERT(!(*itr)->IsTicking());
+			(*itr)->SetIsTicking(true);
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSPlayers)
 
@@ -3909,6 +3923,3 @@ cBroadcaster cWorld::GetBroadcaster()
 {
 	return cBroadcaster(this);
 }
-
-
-

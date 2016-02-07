@@ -260,9 +260,6 @@ public:
 
 	void AddEntity(cEntity * a_Entity);
 	void RemoveEntity(cEntity * a_Entity);
-	/** RemoveEntity is dangerous if the chunk is inside the tick() method because it invalidates the iterator.
-	This will safely remove an entity. */
-	void SafeRemoveEntity(cEntity * a_Entity);
 	bool HasEntity(UInt32 a_EntityID);
 
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */

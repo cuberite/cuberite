@@ -139,7 +139,8 @@ cChunk::~cChunk()
 	{
 		if (!(*itr)->IsPlayer())
 		{
-			(*itr)->Destroy(false);
+			// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
+			(*itr)->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
 			delete *itr;
 		}
 	}
@@ -621,37 +622,44 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
+		// Do not tick mobs that are detached from the world. They're either scheduled for teleportation or for removal.
+		if (!(*itr)->IsTicking())
+		{
+			++itr;
+			continue;
+		}
+
 		if (!((*itr)->IsMob()))  // Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		{
 			// Tick all entities in this chunk (except mobs):
+			ASSERT((*itr)->GetParentChunk() == this);
 			(*itr)->Tick(a_Dt, *this);
+			ASSERT((*itr)->GetParentChunk() == this);
 		}
 
-		if ((*itr)->IsDestroyed())  // Remove all entities that were scheduled for removal:
+		// Do not move mobs that are detached from the world to neighbors. They're either scheduled for teleportation or for removal.
+		if (!(*itr)->IsTicking())
 		{
-			LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
-			MarkDirty();
-			cEntity * ToDelete = *itr;
-			itr = m_Entities.erase(itr);
-			delete ToDelete;
+			++itr;
+			continue;
 		}
-		else if ((*itr)->IsWorldTravellingFrom(m_World))
-		{
-			// Remove all entities that are travelling to another world
-			LOGD("Removing entity from [%d, %d] that's travelling between worlds. (Scheduled)", m_PosX, m_PosZ);
-			MarkDirty();
-			(*itr)->SetWorldTravellingFrom(nullptr);
-			itr = m_Entities.erase(itr);
-		}
-		else if (
-			((*itr)->GetChunkX() != m_PosX) ||
-			((*itr)->GetChunkZ() != m_PosZ)
+
+		// Because the schedulded destruction is going to look for them in this chunk. See cEntity::destroy.
+		if ((((*itr)->GetChunkX() != m_PosX) ||
+			((*itr)->GetChunkZ() != m_PosZ))
 		)
 		{
+			// This block is very similar to RemoveEntity, except it uses an iterator to avoid scanning the whole m_Entities
 			// The entity moved out of the chunk, move it to the neighbor
-			MarkDirty();
+
+			(*itr)->SetParentChunk(nullptr);
 			MoveEntityToNewChunk(*itr);
 			itr = m_Entities.erase(itr);
+			// Mark as dirty if it was a server-generated entity:
+			if (!(*itr)->IsPlayer())
+			{
+				MarkDirty();
+			}
 		}
 		else
 		{
@@ -1891,6 +1899,8 @@ void cChunk::AddEntity(cEntity * a_Entity)
 	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
 
 	m_Entities.push_back(a_Entity);
+	ASSERT(a_Entity->GetParentChunk() == nullptr);
+	a_Entity->SetParentChunk(this);
 }
 
 
@@ -1899,33 +1909,9 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
+	ASSERT(a_Entity->GetParentChunk() == this);
+	a_Entity->SetParentChunk(nullptr);
 	m_Entities.remove(a_Entity);
-
-	// Mark as dirty if it was a server-generated entity:
-	if (!a_Entity->IsPlayer())
-	{
-		MarkDirty();
-	}
-}
-
-
-
-
-
-void cChunk::SafeRemoveEntity(cEntity * a_Entity)
-{
-	if (!m_IsInTick)
-	{
-		LOGD("Removing entity from [%d, %d] that's travelling between worlds. (immediate)", m_PosX, m_PosZ);
-		// If we're not in a tick, just remove it.
-		m_Entities.remove(a_Entity);
-	}
-	else
-	{
-		// If we are in a tick, we don't want to invalidate the iterator, so we schedule the removal. Removal will be done in cChunk::tick()
-		a_Entity->SetWorldTravellingFrom(GetWorld());
-	}
-
 	// Mark as dirty if it was a server-generated entity:
 	if (!a_Entity->IsPlayer())
 	{
@@ -1959,7 +1945,7 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
-		if ((*itr)->IsDestroyed())
+		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
@@ -1981,7 +1967,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
-		if ((*itr)->IsDestroyed())
+		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
@@ -2008,7 +1994,7 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, b
 	// The entity list is locked by the parent chunkmap's CS
 	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
-		if (((*itr)->GetUniqueID() == a_EntityID) && (!(*itr)->IsDestroyed()))
+		if (((*itr)->GetUniqueID() == a_EntityID) && ((*itr)->IsTicking()))
 		{
 			a_CallbackResult = a_Callback.Item(*itr);
 			return true;

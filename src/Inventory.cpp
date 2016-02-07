@@ -713,7 +713,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	// Send the neccessary updates to whoever needs them
 
-	if (m_Owner.IsDestroyed())
+	if (!m_Owner.IsTicking())
 	{
 		// Owner is not (yet) valid, skip for now
 		return;

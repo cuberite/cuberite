@@ -45,6 +45,8 @@ public:
 	/** Returns whether the monster is tired of breeding and is in the cooldown state. */
 	bool IsInLoveCooldown() const { return (m_LoveCooldown > 0); }
 
+	virtual void Destroyed(void) override;
+
 protected:
 	/** The monster's breeding partner. */
 	cPassiveMonster * m_LovePartner;
