@@ -146,7 +146,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			case '=':
 			{
 				valuename = line.substr(0, pLeft);
-				value = line.substr(pLeft + 1);
+				value = TrimString(line.substr(pLeft + 1));
 				AddValue(keyname, valuename, value);
 				break;
 			}
