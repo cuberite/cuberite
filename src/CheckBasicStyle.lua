@@ -119,7 +119,7 @@ local g_ViolationPatterns =
 	{"[^%s]\t+[^%s]", "Aligning with a tab"},
 
 	-- Check against trailing whitespace:
-	{"[^%s]%s+\n", "Trailing whitespace"},
+	{"%s+\n", "Trailing whitespace or whitespace-only line"},
 
 	-- Check that all "//"-style comments have at least two spaces in front (unless alone on line):
 	{"[^%s] //", "Needs at least two spaces in front of a \"//\"-style comment"},
