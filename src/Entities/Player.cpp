@@ -1698,7 +1698,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Remove player from chunk
 	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
 	{
-		a_Chunk.SafeRemoveEntity(this);
+		a_Chunk.SafeRemoveEntity(this, GetIsInTick());
 		return true;
 	}))
 	{

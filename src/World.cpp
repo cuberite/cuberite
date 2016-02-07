@@ -1088,9 +1088,16 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for (cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; ++itr)
+	for (cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End;)
 	{
-		itr->second.m_Monster.Tick(a_Dt, itr->second.m_Chunk);
+		cMobProximityCounter::tDistanceToMonster::const_iterator Next = ++itr;  // Ticking might destroy the monster, so we preserve the next iterator.
+		--itr;
+		bool Destroyed = itr->second.m_Monster.BeginTick(a_Dt, itr->second.m_Chunk);
+		if (Destroyed)
+		{
+			itr->second.m_Chunk.MarkDirty();
+		}
+		itr = Next;
 	}
 
 	// remove too far mobs

@@ -336,6 +336,8 @@ public:
 
 	// tolua_end
 
+	bool BeginTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	/** Handles the physics of the entity - updates position based on speed, updates speed based on environment */
@@ -481,7 +483,11 @@ public:
 	/** Sets the internal world pointer to a new cWorld, doesn't update anything else. */
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
+	/** Sets the chunk which is owning us. Should only be called by cChunk::addEntity. */
+	void SetParentChunk(cChunk * a_Chunk);
 protected:
+	bool GetIsInTick();
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -606,6 +612,13 @@ protected:
 	virtual void SetSwimState(cChunk & a_Chunk);
 
 private:
+
+	/** Whether we're currently executing a tick. */
+	bool m_IsInTick;
+
+	/** The chunk which is currently ticking this entity. */
+	cChunk * m_ParentChunk;  // TODO use this everywhere instead of propogating the chunk in ::tick()'s
+
 	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
 

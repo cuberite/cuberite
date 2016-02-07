@@ -40,7 +40,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirDrag(0.02f),
 	m_LastPosition(a_X, a_Y, a_Z),
 	m_IsInitialized(false),
-	m_WorldTravellingFrom(nullptr),
 	m_EntityType(a_EntityType),
 	m_World(nullptr),
 	m_IsWorldChangeScheduled(false),
@@ -55,6 +54,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirLevel(0),
 	m_AirTickTimer(0),
 	m_TicksAlive(0),
+	m_IsInTick(false),
+	m_ParentChunk(nullptr),
 	m_HeadYaw(0.0),
 	m_Rot(0.0, 0.0, 0.0),
 	m_Position(a_X, a_Y, a_Z),
@@ -79,7 +80,6 @@ cEntity::~cEntity()
 {
 	// Before deleting, the entity needs to have been removed from the world, if ever added
 	ASSERT((m_World == nullptr) || !m_World->HasEntity(m_UniqueID));
-
 	/*
 	// DEBUG:
 	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p",
@@ -196,6 +196,24 @@ void cEntity::WrapSpeed(void)
 
 
 
+bool cEntity::GetIsInTick()
+{
+	return m_IsInTick;
+}
+
+
+
+
+
+void cEntity::SetParentChunk(cChunk * a_Chunk)
+{
+	m_ParentChunk = a_Chunk;
+}
+
+
+
+
+
 void cEntity::Destroy(bool a_ShouldBroadcast)
 {
 	if (!m_IsInitialized)
@@ -211,6 +229,12 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	m_IsInitialized = false;
 
 	Destroyed();
+
+	if (!GetIsInTick())
+	{
+		LOGD("Destruction (outside tick) of #%i (%s)", GetUniqueID(), GetClass());
+		m_ParentChunk->DestroyEntity(this);
+	}
 }
 
 
@@ -830,9 +854,23 @@ void cEntity::SetHealth(int a_Health)
 
 
 
+bool cEntity::BeginTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	m_IsInTick = true;
+	Tick(a_Dt, a_Chunk);
+	m_IsInTick = false;
+	if (IsDestroyed())
+	{
+		LOGD("Destruction (in tick) of #%i (%s)", GetUniqueID(), GetClass());
+		m_ParentChunk->DestroyEntity(this);
+		return true;
+	}
+	return false;
+}
 
 void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	ASSERT(GetIsInTick());
 	m_TicksAlive++;
 
 	if (m_InvulnerableTicks > 0)
@@ -1502,7 +1540,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Remove entity from chunk
 	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
 	{
-		a_Chunk.SafeRemoveEntity(this);
+		a_Chunk.SafeRemoveEntity(this, GetIsInTick());
 		return true;
 	}))
 	{
