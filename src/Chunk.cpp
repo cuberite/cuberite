@@ -633,7 +633,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 
 		if (Destroyed)
 		{
-			MarkDirty();
 			itr = Next;
 		}
 		else if ((*itr)->IsWorldTravellingFrom(m_World))  // Remove this entity if it's schedule for removal.
@@ -1943,8 +1942,7 @@ void cChunk::SafeRemoveEntity(cEntity * a_Entity, bool a_IsEntityTicking)
 
 void cChunk::DestroyEntity(cEntity * a_Entity)
 {
-		// ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) != m_Entities.end());  // TODO prevent player destruction code from calling this twice
-		m_Entities.remove(a_Entity);
+		RemoveEntity(a_Entity);
 		delete a_Entity;
 }
 
