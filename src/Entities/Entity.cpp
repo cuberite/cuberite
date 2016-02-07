@@ -56,6 +56,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirTickTimer(0),
 	m_TicksAlive(0),
 	m_HeadYaw(0.0),
+	m_ParentChunk(nullptr),
 	m_Rot(0.0, 0.0, 0.0),
 	m_Position(a_X, a_Y, a_Z),
 	m_LastSentPosition(a_X, a_Y, a_Z),
@@ -196,6 +197,15 @@ void cEntity::WrapSpeed(void)
 
 
 
+void cEntity::SetParentChunk(cChunk * a_Chunk)
+{
+	m_ParentChunk = a_Chunk;
+}
+
+
+
+
+
 void cEntity::Destroy(bool a_ShouldBroadcast)
 {
 	if (!m_IsInitialized)
@@ -210,7 +220,14 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 
 	m_IsInitialized = false;
 
+	// Normally setting m_IsInitialized to false makes the chunk remove us next tick.
+
+	// If the chunk is not ticking:
+	//  - It won't remove us next tick, this is bad.
+	//  - It is safe for it to remove us right now, since it is not inside a tick, and it won't invalidate its iterators.
 	Destroyed();
+
+	m_ParentChunk->DeleteEntityIfNotTicking(this);
 }
 
 
@@ -834,6 +851,8 @@ void cEntity::SetHealth(int a_Health)
 void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	m_TicksAlive++;
+
+	ASSERT(m_ParentChunk != nullptr);
 
 	if (m_InvulnerableTicks > 0)
 	{

@@ -481,6 +481,9 @@ public:
 	/** Sets the internal world pointer to a new cWorld, doesn't update anything else. */
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
+	/** Sets the owning chunk. Should only be calld by cChunk::AddEntity */
+	void SetParentChunk(cChunk * a_Chunk);
+
 protected:
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
@@ -608,6 +611,9 @@ protected:
 private:
 	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
+
+	/** The chunk which owns this entity. */
+	cChunk * m_ParentChunk;
 
 	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;

@@ -126,10 +126,9 @@ cClientHandle::~cClientHandle()
 				World->BroadcastPlayerListRemovePlayer(*m_Player, this);
 			}
 
-			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
+			World->RemovePlayer(m_Player, true);
 			m_Player->Destroy();
 		}
-		delete m_Player;
 		m_Player = nullptr;
 	}
 
