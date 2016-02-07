@@ -41,6 +41,12 @@ public:
 		return (Result == m_MechanismDelays.end()) ? nullptr : &Result->second;
 	}
 
+	/** Erase cached PowerData for position */
+	void ErasePowerData(const Vector3i & a_Position)
+	{
+		m_CachedPowerLevels.erase(a_Position);
+	}
+
 	cRedstoneHandler::PoweringData ExchangeUpdateOncePowerData(const Vector3i & a_Position, cRedstoneHandler::PoweringData a_PoweringData)
 	{
 		auto Result = m_CachedPowerLevels.find(a_Position);

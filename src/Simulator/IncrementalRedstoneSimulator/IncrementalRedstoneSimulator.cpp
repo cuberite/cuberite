@@ -125,8 +125,11 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 		}
 
 		auto CurrentHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, CurrentBlock, &m_Data);
-		if (CurrentHandler == nullptr)
+		if (CurrentHandler == nullptr)  // Block at CurrentPosition doesn't have a corresponding redstone handler
 		{
+			// Clean up cached PowerData for CurrentPosition
+			static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ErasePowerData(CurrentLocation);
+
 			continue;
 		}
 
