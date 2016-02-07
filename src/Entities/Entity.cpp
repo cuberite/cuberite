@@ -856,6 +856,7 @@ void cEntity::SetHealth(int a_Health)
 
 bool cEntity::BeginTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	ASSERT(!m_Removed);
 	m_IsInTick = true;
 	Tick(a_Dt, a_Chunk);
 	m_IsInTick = false;
@@ -863,6 +864,10 @@ bool cEntity::BeginTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		LOGD("Destruction (in tick) of #%i (%s)", GetUniqueID(), GetClass());
 		m_ParentChunk->DestroyEntity(this);
+		return true;
+	}
+	if (m_Removed)
+	{
 		return true;
 	}
 	return false;
@@ -1540,7 +1545,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Remove entity from chunk
 	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
 	{
-		a_Chunk.SafeRemoveEntity(this, GetIsInTick());
+		a_Chunk.RemoveEntity(this);
 		return true;
 	}))
 	{

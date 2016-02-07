@@ -621,31 +621,19 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
 		cEntityList::iterator Next = ++itr;  // BeginTick may destroy the entity, soo keep the next iterator.
-		bool Destroyed;
+		bool DestroyedOrRemoved;
 		--itr;
 
 		ASSERT(!(*itr)->IsDestroyed());
 		if (!(*itr)->IsMob())  // Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		{
 			// Tick all entities in this chunk (except mobs):
-			Destroyed = (*itr)->BeginTick(a_Dt, *this);
+			DestroyedOrRemoved = (*itr)->BeginTick(a_Dt, *this);
 		}
 
-		if (Destroyed)
-		{
-			itr = Next;
-		}
-		else if ((*itr)->IsWorldTravellingFrom(m_World))  // Remove this entity if it's schedule for removal.
-		{
-			// Remove all entities that are travelling to another world
-			LOGD("Removing entity from [%d, %d] that's travelling between worlds. (Scheduled)", m_PosX, m_PosZ);
-			MarkDirty();
-			(*itr)->SetWorldTravellingFrom(nullptr);
-			itr = m_Entities.erase(itr);
-		}
-		else if (
-			((*itr)->GetChunkX() != m_PosX) ||
-			((*itr)->GetChunkZ() != m_PosZ)
+		if (
+			(!DestroyedOrRemoved)  &&
+			(((*itr)->GetChunkX() != m_PosX) || ((*itr)->GetChunkZ() != m_PosZ))
 		)
 		{
 			// The entity moved out of the chunk, move it to the neighbor
@@ -1891,6 +1879,7 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 	m_Entities.push_back(a_Entity);
 	a_Entity->SetParentChunk(this);
+	a_Entity->SetRemoved(false);
 }
 
 
@@ -1899,35 +1888,9 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
+	a_Entity->SetRemoved(true);
 	// ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) != m_Entities.end());  // TODO prevent player destruction code from calling this twice
 	m_Entities.remove(a_Entity);
-
-	// Mark as dirty if it was a server-generated entity:
-	if (!a_Entity->IsPlayer())
-	{
-		MarkDirty();
-	}
-}
-
-
-
-
-
-void cChunk::SafeRemoveEntity(cEntity * a_Entity, bool a_IsEntityTicking)
-{
-	if (!a_IsEntityTicking)
-	{
-		LOGD("Removing entity from [%d, %d] that's travelling between worlds. (immediate)", m_PosX, m_PosZ);
-		// If we're not in a tick, just remove us.
-		ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) != m_Entities.end());
-		m_Entities.remove(a_Entity);
-	}
-	else
-	{
-		ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) != m_Entities.end());
-		// If we are in a tick, we don't want to mess our tick calls, so we schedule the removal. our removal will be done in cEntity::BeginTick()
-		a_Entity->SetWorldTravellingFrom(GetWorld());
-	}
 
 	// Mark as dirty if it was a server-generated entity:
 	if (!a_Entity->IsPlayer())
