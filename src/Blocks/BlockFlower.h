@@ -18,8 +18,9 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
+		NIBBLETYPE Meta = a_BlockMeta & 0x7;
+
+		a_Pickups.push_back(cItem(m_BlockType, 1, Meta));
 	}
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
