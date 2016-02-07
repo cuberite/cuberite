@@ -621,7 +621,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
 		cEntityList::iterator Next = ++itr;  // BeginTick may destroy the entity, soo keep the next iterator.
-		bool DestroyedOrRemoved;
+		bool DestroyedOrRemoved = false;
 		--itr;
 
 		ASSERT(!(*itr)->IsDestroyed());
