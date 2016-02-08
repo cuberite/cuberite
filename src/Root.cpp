@@ -409,6 +409,28 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		return;
 	}
 
+	/* Here are the world creation rules. Note that these only apply for a world which is in settings.ini but has no world.ini file.
+	If an ini file is present, it overrides the world linkages and the dimension type in cWorld::start()
+	The creation rules are as follows:
+
+	- If a world exists in settings.ini but has no world.ini, then:
+		- If the world name is x_nether, create a world.ini with the dimension type "nether".
+			- If a world called x exists, set it as x_nether's overworld.
+			- Otherwise set the default world as x_nether's overworld.
+
+		- If the world name is x_end, create a world.ini with the dimension type "end".
+			- If a world called x exists, set it as x_end's overworld.
+			- Otherwise set the default world as x_end's overworld.
+
+		- If the world name is x (and doesn't end with _end or _nether)
+			- Create a world.ini with a dimension type of "overworld".
+			- If a world called x_nether exists, set it as x's nether world.
+			- Otherwise set x's nether world to blank.h
+			- If a world called x_end  exists, set it as x's end world.
+			- Otherwise set x's nether world to blank.
+
+	*/
+
 	bool FoundAdditionalWorlds = false;
 	for (auto WorldNameValue : Worlds)
 	{
@@ -423,7 +445,43 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			continue;
 		}
 		FoundAdditionalWorlds = true;
-		cWorld * NewWorld = new cWorld(WorldName.c_str());
+		cWorld * NewWorld;
+		AString LowercaseName = StrToLower(WorldName);
+		AString NetherAppend="_nether";
+		AString EndAppend="_end";
+
+		// if the world is called x_nether
+		if ((LowercaseName.size() > NetherAppend.size()) && (LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
+		{
+			// The world is called x_nether, see if a world called x exists. If yes, choose it as the linked world,
+			// otherwise, choose the default world as the linked world.
+			// As before, any ini settings will completely override this if an ini is already present.
+
+			AString LinkTo = WorldName.substr(0, WorldName.size() - NetherAppend.size());
+			if (GetWorld(LinkTo) == nullptr)
+			{
+				LinkTo = DefaultWorldName;
+			}
+			NewWorld = new cWorld(WorldName.c_str(), dimNether, LinkTo);
+		}
+		// if the world is called x_end
+		else if ((LowercaseName.size() > EndAppend.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend.size()) == EndAppend))
+		{
+			// The world is called x_end, see if a world called x exists. If yes, choose it as the linked world,
+			// otherwise, choose the default world as the linked world.
+			// As before, any ini settings will completely override this if an ini is already present.
+
+			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend.size());
+			if (GetWorld(LinkTo) == nullptr)
+			{
+				LinkTo = DefaultWorldName;
+			}
+			NewWorld = new cWorld(WorldName.c_str(), dimEnd, LinkTo);
+		}
+		else
+		{
+			NewWorld = new cWorld(WorldName.c_str());
+		}
 		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds
 
