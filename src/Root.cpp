@@ -510,29 +510,6 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 
 
 
-cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName, bool a_InitSpawn)
-{
-	cWorld * World = m_WorldsByName[a_WorldName];
-	if (World != nullptr)
-	{
-		return World;
-	}
-
-	cWorld * NewWorld = new cWorld(a_WorldName.c_str(), a_Dimension, a_OverworldName);
-	m_WorldsByName[a_WorldName] = NewWorld;
-	NewWorld->Start();
-	if (a_InitSpawn)
-	{
-		NewWorld->InitializeSpawn();
-	}
-	m_PluginManager->CallHookWorldStarted(*NewWorld);
-	return NewWorld;
-}
-
-
-
-
-
 void cRoot::StartWorlds(void)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
@@ -582,7 +559,7 @@ cWorld * cRoot::GetDefaultWorld()
 
 
 
-cWorld * cRoot::GetWorld(const AString & a_WorldName, bool a_SearchForFolder)
+cWorld * cRoot::GetWorld(const AString & a_WorldName)
 {
 	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
 	if (itr != m_WorldsByName.end())
@@ -590,10 +567,6 @@ cWorld * cRoot::GetWorld(const AString & a_WorldName, bool a_SearchForFolder)
 		return itr->second;
 	}
 
-	if (a_SearchForFolder && cFile::IsFolder(FILE_IO_PREFIX + a_WorldName))
-	{
-		return CreateAndInitializeWorld(a_WorldName);
-	}
 	return nullptr;
 }
 

@@ -1871,7 +1871,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
-	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), false);
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
 	if (a_World == nullptr)
 	{
 		a_World = cRoot::Get()->GetDefaultWorld();

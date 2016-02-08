@@ -1392,7 +1392,8 @@ bool cEntity::DetectPortal()
 					TargetPos.x *= 8.0;
 					TargetPos.z *= 8.0;
 
-					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName(), dimNether, GetWorld()->GetName(), true);
+					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping nether -> overworld");
 					new cNetherPortalScanner(this, TargetWorld, TargetPos, 256);
 					return true;
@@ -1416,7 +1417,8 @@ bool cEntity::DetectPortal()
 					TargetPos.x /= 8.0;
 					TargetPos.z /= 8.0;
 
-					cWorld * TargetWorld = cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName(), true);
+					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
+					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping overworld -> nether");
 					new cNetherPortalScanner(this, TargetWorld, TargetPos, 128);
 					return true;
@@ -1446,7 +1448,9 @@ bool cEntity::DetectPortal()
 						Player->GetClientHandle()->SendRespawn(dimOverworld);
 					}
 
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					return MoveToWorld(TargetWorld, false);
 				}
 				else
 				{
@@ -1463,7 +1467,9 @@ bool cEntity::DetectPortal()
 						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(dimEnd);
 					}
 
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
+					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					return MoveToWorld(TargetWorld, false);
 				}
 
 			}

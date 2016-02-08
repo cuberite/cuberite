@@ -64,17 +64,8 @@ public:
 	cServer * GetServer(void) { return m_Server; }
 	cWorld *  GetDefaultWorld(void);
 
-	/** Returns a pointer to the world specified
-	If no world of that name was currently loaded and a_SearchForFolder was true, it will consult cFile::IsFolder() to see if a world folder of that name exists and if so, initialise a world based on that name
-	*/
-	cWorld * GetWorld(const AString & a_WorldName, bool a_SearchForFolder = false);
-
-
-	/** Returns a pointer to a world of specified name - will search loaded worlds first, then create anew if not found
-	The dimension parameter is used to create a world with a specific dimension
-	a_OverworldName should be set for non-overworld dimensions if one wishes that world to link back to an overworld via portals
-	*/
-	cWorld * CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "", bool a_InitSpawn = true);
+	/** Returns a pointer to the world specified. If no world of that name exists, returns a nullptr. */
+	cWorld * GetWorld(const AString & a_WorldName);
 
 	/** Returns the up time of the server in seconds */
 	int GetServerUpTime(void)
