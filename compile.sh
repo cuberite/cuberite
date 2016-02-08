@@ -215,7 +215,7 @@ cmake .. -DCMAKE_BUILD_TYPE=$BUILDTYPE || error "cmake failed"
 
 # Make.
 echo " --- Compiling..."
-make -j`nproc` || error "Compiling failed"
+make -j 2 || error "Compiling failed"
 echo
 
 
