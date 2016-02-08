@@ -349,9 +349,9 @@ void cRoot::LoadGlobalSettings()
 
 void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile)
 {
-	// First get the default world
 	if (a_IsNewIniFile)
 	{
+		a_Settings.AddValue("Worlds", "DefaultWorld", "world");
 		a_Settings.AddValue("Worlds", "World", "world_nether");
 		a_Settings.AddValue("Worlds", "World", "world_end");
 		m_pDefaultWorld = new cWorld("world");
@@ -361,6 +361,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		return;
 	}
 
+	// First get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
 	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
