@@ -530,6 +530,40 @@ void cWorld::Start(void)
 		m_LinkedOverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
 	}
 
+	// If we are linked to one or more worlds that do not exist, ask the server to stop.
+	AString BadWorlds = "";
+	cRoot * Root = cRoot::Get();
+	if (GetDimension() == dimOverworld)
+	{
+		if ((!m_LinkedNetherWorldName.empty()) && (Root->GetWorld(m_LinkedNetherWorldName) == nullptr))
+		{
+			BadWorlds = m_LinkedNetherWorldName;
+		}
+		if ((!m_LinkedEndWorldName.empty()) && (Root->GetWorld(m_LinkedEndWorldName) == nullptr))
+		{
+			if (!(BadWorlds.empty()))
+			{
+				BadWorlds += ", ";
+			}
+			BadWorlds += m_LinkedEndWorldName;
+		}
+	}
+	else
+	{
+		if ((!m_LinkedOverworldName.empty()) && (Root->GetWorld(m_LinkedOverworldName) == nullptr))
+		{
+			BadWorlds = m_LinkedOverworldName;
+		}
+	}
+	if (!BadWorlds.empty())
+	{
+		const char * WorldName = m_WorldName.c_str();
+		LOGERROR("\n######\nERROR: %s is linked to one or more invalid worlds: %s\nPlease edit %s/world.ini and fix this.\n######\n",
+			WorldName, BadWorlds.c_str(), WorldName);
+		cRoot::Get()->StopServer();
+	}
+
+
 	// Adjust the enum-backed variables into their respective bounds:
 	m_GameMode         = static_cast<eGameMode>     (Clamp<int>(GameMode,         gmSurvival, gmSpectator));
 	m_TNTShrapnelLevel = static_cast<eShrapnelLevel>(Clamp<int>(TNTShrapnelLevel, slNone,     slAll));

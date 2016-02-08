@@ -327,6 +327,17 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 
 
+void cRoot::StopServer()
+{
+	m_TerminateEventRaised = true;
+	m_StopEvent.Set();
+	m_InputThreadRunFlag.clear();
+}
+
+
+
+
+
 void cRoot::LoadGlobalSettings()
 {
 	// Nothing needed yet
@@ -655,9 +666,7 @@ void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback 
 	// Some commands are built-in:
 	if (a_Cmd == "stop")
 	{
-		m_TerminateEventRaised = true;
-		m_StopEvent.Set();
-		m_InputThreadRunFlag.clear();
+		StopServer();
 		return;
 	}
 	else if (a_Cmd == "restart")
