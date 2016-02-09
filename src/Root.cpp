@@ -410,6 +410,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 					a_Settings.AddValue("Worlds", "World", "world_nether");
 					a_Settings.AddValue("Worlds", "World", "world_end");
 					Worlds = a_Settings.GetValues("Worlds");  // Refresh the Worlds list so that the rest of the function works as usual
+					LOG("The server detected an old default config with bad world linkages. This has been autofixed by adding \"world_nether\" and \"world_end\" to settings.ini");
 				}
 			}
 		}
