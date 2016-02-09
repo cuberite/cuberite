@@ -558,7 +558,7 @@ void cWorld::Start(void)
 	if (!BadWorlds.empty())
 	{
 		const char * WorldName = m_WorldName.c_str();
-		LOGERROR("\n###### ERROR: %s is linked to the following nonexisting world/s:\n%s\n\nPlease edit %s/world.ini and fix this.\n\nNote that the server started enforcing proper world linkages recently. And people with older configs may naturally get this error. If you just want a working default config and don't mind losing this world, delete the folder \"%s\" and the server will receate one for you. Otherwise edit the world.ini file and fix the invalid linkages.\n######\n",
+		LOGERROR("\n###### ERROR: \"%s\" is linked to the following nonexisting world/s:\n%s\n\nPlease edit %s/world.ini and fix this.\n\nNote that the server started enforcing proper world linkages recently. And people with older configs may naturally get this error. If you just want a working default config and don't mind losing this world, delete the folder \"%s\" and the server will receate one for you. Otherwise edit the world.ini file and fix the invalid linkages.\n\nMore help and info:\nhttps://forum.cuberite.org/thread-2366.html\n######\n",
 			WorldName, BadWorlds.c_str(), WorldName, WorldName);
 		cRoot::Get()->StopServer();
 	}
