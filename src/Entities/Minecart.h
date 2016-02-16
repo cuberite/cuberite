@@ -75,7 +75,7 @@ protected:
 	void SnapToRail(NIBBLETYPE a_RailMeta);
 	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction */
 	bool TestBlockCollision(NIBBLETYPE a_RailMeta);
-	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away */
+	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
 
 } ;
