@@ -222,7 +222,7 @@ AString TrimString(const AString & str)
 	size_t start = 0;
 	while (start < len)
 	{
-		if (str[start] > 32)
+		if (static_cast<unsigned char>(str[start]) > 32)
 		{
 			break;
 		}
@@ -236,7 +236,7 @@ AString TrimString(const AString & str)
 	size_t end = len;
 	while (end >= start)
 	{
-		if (str[end] > 32)
+		if (static_cast<unsigned char>(str[end]) > 32)
 		{
 			break;
 		}
