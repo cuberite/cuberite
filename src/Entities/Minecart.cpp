@@ -845,24 +845,16 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (MinecartCollisionCallback.GetCollidedEntityPosition().z >= GetPosZ())
 			{
-				if ((-GetSpeedZ() * 0.4) < 0.01)
+				if (GetSpeedZ() > 0)  // True if minecart is moving into the direction of the entity
 				{
-					AddSpeedZ(-4);
-				}
-				else
-				{
-					SetSpeedZ(-GetSpeedZ() * 0.4);
+					SetSpeedZ(0);  // Entity handles the pushing
 				}
 			}
-			else
+			else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().z < GetPosZ())
 			{
-				if ((GetSpeedZ() * 0.4) < 0.01)
+				if (GetSpeedZ() < 0)  // True if minecart is moving into the direction of the entity
 				{
-					AddSpeedZ(4);
-				}
-				else
-				{
-					SetSpeedZ(GetSpeedZ() * 0.4);
+					SetSpeedZ(0);  // Entity handles the pushing
 				}
 			}
 			return true;
@@ -871,24 +863,16 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (MinecartCollisionCallback.GetCollidedEntityPosition().x >= GetPosX())
 			{
-				if ((-GetSpeedX() * 0.4) < 0.01)
+				if (GetSpeedX() > 0)  // True if minecart is moving into the direction of the entity
 				{
-					AddSpeedX(-4);
-				}
-				else
-				{
-					SetSpeedX(-GetSpeedX() * 0.4);
+					SetSpeedX(0);  // Entity handles the pushing
 				}
 			}
-			else
+			else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().x < GetPosX())
 			{
-				if ((GetSpeedX() * 0.4) < 0.01)
+				if (GetSpeedX() < 0)  // True if minecart is moving into the direction of the entity
 				{
-					AddSpeedX(4);
-				}
-				else
-				{
-					SetSpeedX(GetSpeedX() * 0.4);
+					SetSpeedX(0);  // Entity handles the pushing
 				}
 			}
 			return true;
