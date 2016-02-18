@@ -242,6 +242,7 @@ public:
 	void Push(const cItems & a_Items);
 	void Push(const cPlayer * a_Player);
 	void Push(const cRef & a_Ref);
+	void Push(const cVector3Container<int> & a_VectorArray);
 	void Push(const HTTPRequest * a_Request);
 	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(const Vector3d & a_Vector);
@@ -568,7 +569,3 @@ protected:
 	/** Returns the single instance of this class. */
 	static cLuaStateTracker & Get(void);
 };
-
-
-
-

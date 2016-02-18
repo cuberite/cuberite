@@ -437,4 +437,37 @@ typedef std::vector<Vector3i> cVector3iArray;
 
 
 
+/** This class bridges a vector of Vector3 for safe access via Lua. It checks boundaries for all accesses
+Note that this class is zero-indexed!
+*/
+template <typename T>
+// tolua_begin
+class cVector3Container
+{
+
+	TOLUA_TEMPLATE_BIND((T, int, float, double))
+
+public:
+	// tolua_begin
+
+	cVector3Container(std::vector<Vector3<T> > & a_Content) : m_Content(a_Content) {}
+
+	Vector3<T> * Get   (int a_Idx) { return &m_Content.at(a_Idx); }
+	void    Set   (int a_Idx, const Vector3<T> & a_Vector) { m_Content.at(a_Idx) = a_Vector; }
+	void    Add   (const Vector3<T> & a_Vector) { m_Content.push_back(a_Vector); }
+	void    Delete(int a_Idx) { m_Content.erase(m_Content.begin() + a_Idx); }
+	void    Clear (void) { m_Content.clear(); }
+	size_t  Size  (void) const { return m_Content.size(); }
+	bool    Contains(const Vector3<T> & a_Item) { return (std::find(m_Content.begin(), m_Content.end(), a_Item) != m_Content.end()); };
+
+	// tolua_end
+
+private:
+	std::vector<Vector3<T>> & m_Content;
+} ;  // tolua_export
+
+
+
+
+
 

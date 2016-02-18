@@ -734,6 +734,46 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 
 
 
+bool cPluginLua::OnExplosionBreakingBlocks  (cWorld & a_World, cVector3Container<int> & a_DestroyedBlocks, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!m_LuaState.IsValid())
+	{
+		return false;
+	}
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_EXPLOSION_BREAKING_BLOCKS];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		switch (a_Source)
+		{
+			case esBed:           m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res); break;
+			case esEnderCrystal:  m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cEntity *>             (a_SourceData), cLuaState::Return, res); break;
+			case esGhastFireball: m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res); break;
+			case esMonster:       m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esOther:         m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res); break;
+			case esPlugin:        m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res); break;
+			case esPrimedTNT:     m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
+			case esWitherBirth:   m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esWitherSkull:   m_LuaState.Call(static_cast<int>(**itr), &a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
+			case esMax:
+			{
+				ASSERT(!"Invalid explosion source");
+				return false;
+			}
+		}
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnHandshake(cClientHandle & a_Client, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);

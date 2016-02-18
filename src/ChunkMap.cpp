@@ -1763,7 +1763,7 @@ bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback &
 
 
 
-void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected)
+void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected, eExplosionSource a_Source, void * a_SourceData)
 {
 	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
 	if (!cChunkDef::IsValidHeight(FloorC(a_BlockY)))
@@ -1818,16 +1818,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					BLOCKTYPE Block = area.GetBlockType(bx + x, by + y, bz + z);
 					switch (Block)
 					{
-						case E_BLOCK_TNT:
-						{
-							// Activate the TNT, with a random fuse between 10 to 30 game ticks
-							int FuseTime = 10 + m_World->GetTickRandomNumber(20);
-							m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
-							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
-							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-							break;
-						}
-
+						case E_BLOCK_AIR:
 						case E_BLOCK_OBSIDIAN:
 						case E_BLOCK_BEACON:
 						case E_BLOCK_BEDROCK:
@@ -1853,35 +1844,8 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							break;
 						}
 
-						case E_BLOCK_AIR:
-						{
-							// No pickups for air
-							break;
-						}
-
 						default:
 						{
-							if (m_World->GetTickRandomNumber(100) <= 25)  // 25% chance of pickups
-							{
-								cItems Drops;
-								cBlockHandler * Handler = BlockHandler(Block);
-
-								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
-								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
-							}
-							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20))  // 20% chance of flinging stuff around
-							{
-								// If the block is shrapnel-able, make a falling block entity out of it:
-								if (
-									((m_World->GetTNTShrapnelLevel() == slAll) && cBlockInfo::FullyOccupiesVoxel(Block)) ||
-									((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block == E_BLOCK_SAND) || (Block == E_BLOCK_GRAVEL)))
-								)
-								{
-									m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
-								}
-							}
-
-							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
 							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 							break;
 						}
@@ -1889,6 +1853,53 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				}  // for z
 			}  // for y
 		}  // for x
+
+		{
+			cVector3Container<int> container(a_BlocksAffected);
+			cPluginManager::Get()->CallHookExplosionBreakingBlocks(*m_World, container, bx, by, bz, a_Source, a_SourceData);
+		}
+
+		for (Vector3i Position : a_BlocksAffected)
+		{
+			BLOCKTYPE Block = area.GetBlockType(Position.x, Position.y, Position.z);
+
+			switch (Block)
+			{
+				case E_BLOCK_TNT:
+				{
+					// Activate the TNT, with a random fuse between 10 to 30 game ticks
+					int FuseTime = 10 + m_World->GetTickRandomNumber(20);
+					// Position.x = bx + x <=> x = Position.x - bx
+					m_World->SpawnPrimedTNT(a_BlockX + Position.x - bx + 0.5, a_BlockY + Position.y - by + 0.5, a_BlockZ + Position.z - bz + 0.5, FuseTime);
+					break;
+				}
+
+				default:
+				{
+					if (m_World->GetTickRandomNumber(100) <= 25)   // 25% chance of pickups
+					{
+						cItems Drops;
+						cBlockHandler * Handler = BlockHandler(Block);
+
+						Handler->ConvertToPickups(Drops, area.GetBlockMeta(Position.x, Position.y, Position.z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
+						m_World->SpawnItemPickups(Drops, Position.x, Position.y, Position.z);
+					}
+					else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20))     // 20% chance of flinging stuff around
+					{
+						// If the block is shrapnel-able, make a falling block entity out of it:
+						if (
+							((m_World->GetTNTShrapnelLevel() == slAll) && cBlockInfo::FullyOccupiesVoxel(Block)) ||
+							((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block == E_BLOCK_SAND) || (Block == E_BLOCK_GRAVEL)))
+						)
+						{
+							m_World->SpawnFallingBlock(Position.x, Position.y + 5, Position.z, Block, area.GetBlockMeta(Position.x, Position.y, Position.z));
+						}
+					}
+					break;
+				}
+			}  // switch
+			area.SetBlockTypeMeta(Position.x, Position.y, Position.z, E_BLOCK_AIR, 0);
+		}  // foreach
 		area.Write(m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
 	}
 
