@@ -219,10 +219,12 @@ void cWolf::TickFollowPlayer()
 		virtual bool Item(cPlayer * a_Player) override
 		{
 			OwnerPos = a_Player->GetPosition();
+			OwnerFlying = a_Player->isFlying();
 			return false;
 		}
 	public:
 		Vector3d OwnerPos;
+		bool OwnerFlying;
 	} Callback;
 
 	if (m_World->DoWithPlayer(m_OwnerName, Callback))
@@ -236,7 +238,10 @@ void cWolf::TickFollowPlayer()
 		}
 		else
 		{
-			MoveToPosition(Callback.OwnerPos);
+			if (!Callback.OwnerFlying)
+			{
+				MoveToPosition(Callback.OwnerPos);
+			}
 		}
 	}
 }
