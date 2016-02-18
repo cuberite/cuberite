@@ -575,6 +575,18 @@ void cLuaState::Push(const cLuaState::cRef & a_Ref)
 
 
 
+void cLuaState::Push(const cVector3Container<int> & a_VectorArray)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cVector3Container<int> *>(&a_VectorArray)), "cVector3Container<int>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(const HTTPRequest * a_Request)
 {
 	ASSERT(IsValid());

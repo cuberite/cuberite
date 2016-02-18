@@ -656,6 +656,25 @@ bool cPluginManager::CallHookExploding(cWorld & a_World, double & a_ExplosionSiz
 
 
 
+bool cPluginManager::CallHookExplosionBreakingBlocks(cWorld & a_World, cVector3Container<int> & a_DestroyedBlocks, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
+{
+	FIND_HOOK(HOOK_EXPLOSION_BREAKING_BLOCKS);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnExplosionBreakingBlocks(a_World, a_DestroyedBlocks, a_X, a_Y, a_Z, a_Source, a_SourceData))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookHandshake(cClientHandle & a_ClientHandle, const AString & a_Username)
 {
 	FIND_HOOK(HOOK_HANDSHAKE);
