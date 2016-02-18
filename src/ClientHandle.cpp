@@ -1246,7 +1246,11 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
-	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+	// This call would remove the water, placed from the ice block handler
+	if (a_OldBlock != E_BLOCK_ICE)
+	{
+		World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+	}
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
