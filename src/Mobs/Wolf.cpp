@@ -224,6 +224,7 @@ void cWolf::TickFollowPlayer()
 		}
 	public:
 		Vector3d OwnerPos;
+		bool OwnerFlying;
 	} Callback;
 
 	if (m_World->DoWithPlayer(m_OwnerName, Callback))
