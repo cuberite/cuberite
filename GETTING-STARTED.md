@@ -1,5 +1,10 @@
 Hello! Thanks for wanting to work on this project :smile:, and I hope that this file will help you somewhat in getting all set up and running. I'll go through the basics of getting the project environment set up, the code organization and style, and general development practices. I'll also show you some good issues to start off working on to get yourself familiarised with the code.
 
+Note that this document is about contributing code for Cuberite.
+
+ - If you are looking for usage instructions, see the [user manual](https://book.cuberite.org/) instead.
+ - If you would like to help but you are not a programmer, you can still help with testing! Please see the `TESTING.md` file.
+
 Minecraft Basics
 ----------------
 
