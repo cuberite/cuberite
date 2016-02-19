@@ -120,14 +120,15 @@ cClientHandle::~cClientHandle()
 		cWorld * World = m_Player->GetWorld();
 		if (World != nullptr)
 		{
+			RemoveFromAllChunks();
+			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
+			m_Player->SetIsTicking(false);
 			if (!m_Username.empty())
 			{
 				// Send the Offline PlayerList packet:
 				World->BroadcastPlayerListRemovePlayer(*m_Player, this);
 			}
-
-			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
-			m_Player->Destroy();
+			m_Player->DestroyNoScheduling(true);
 		}
 		delete m_Player;
 		m_Player = nullptr;
@@ -164,18 +165,18 @@ void cClientHandle::Destroy(void)
 		m_State = csDestroying;
 	}
 
-	// DEBUG:
 	LOGD("%s: client %p, \"%s\"", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
 
-	if ((m_Player != nullptr) && (m_Player->GetWorld() != nullptr))
-	{
-		RemoveFromAllChunks();
-		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-	}
 	if (m_Player != nullptr)
 	{
+		cWorld * World = m_Player->GetWorld();
+		if (World != nullptr)
+		{
+			World->RemovePlayer(m_Player, true);  // TODO this is NOT thread safe.
+		}
 		m_Player->RemoveClientHandle();
 	}
+
 	m_State = csDestroyed;
 }
 
@@ -384,7 +385,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
 	cRoot::Get()->SendPlayerLists(m_Player);
 
-	m_Player->Initialize(*World);
+	m_Player->SetWorld(World);
 	m_State = csAuthenticated;
 
 	// Query player team
@@ -2020,7 +2021,7 @@ void cClientHandle::ServerTick(float a_Dt)
 
 		// Add the player to the world (start ticking from there):
 		m_State = csDownloadingWorld;
-		m_Player->GetWorld()->AddPlayer(m_Player);
+		m_Player->Initialize(*(m_Player->GetWorld()));
 		return;
 	}
 
@@ -3031,14 +3032,6 @@ void cClientHandle::SocketClosed(void)
 	{
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
-	}
-	if ((m_State < csDestroying) && (m_Player != nullptr))
-	{
-		cWorld * World = m_Player->GetWorld();
-		if (World != nullptr)
-		{
-			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
-		}
 	}
 	Destroy();
 }

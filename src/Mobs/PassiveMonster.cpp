@@ -65,6 +65,18 @@ void cPassiveMonster::ResetLoveMode()
 
 
 
+void cPassiveMonster::Destroyed()
+{
+	if (m_LovePartner != nullptr)
+	{
+		m_LovePartner->ResetLoveMode();
+	}
+}
+
+
+
+
+
 void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
@@ -72,10 +84,6 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_EMState == ESCAPING)
 	{
 		CheckEventLostPlayer();
-	}
-	if ((m_LovePartner != nullptr) && m_LovePartner->IsDestroyed())
-	{
-		m_LovePartner = nullptr;
 	}
 
 	// if we have a partner, mate

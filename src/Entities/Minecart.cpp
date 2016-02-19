@@ -116,10 +116,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (IsDestroyed())  // Mainly to stop detector rails triggering again after minecart is dead
-	{
-		return;
-	}
+	ASSERT(IsTicking());
 
 	int PosY = POSY_TOINT;
 	if ((PosY <= 0) || (PosY >= cChunkDef::Height))

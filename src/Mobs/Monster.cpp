@@ -256,7 +256,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	if ((GetTarget() != nullptr))
 	{
-		ASSERT(!GetTarget()->IsDestroyed());
+		ASSERT(GetTarget()->IsTicking());
 
 		if (GetTarget()->IsPlayer())
 		{
@@ -912,7 +912,7 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 /** Sets the target. */
 void cMonster::SetTarget (cPawn * a_NewTarget)
 {
-	ASSERT((a_NewTarget == nullptr) || (!IsDestroyed()));
+	ASSERT((a_NewTarget == nullptr) || (IsTicking()));
 	if (m_Target == a_NewTarget)
 	{
 		return;
@@ -928,7 +928,7 @@ void cMonster::SetTarget (cPawn * a_NewTarget)
 
 	if (a_NewTarget != nullptr)
 	{
-		ASSERT(!a_NewTarget->IsDestroyed());
+		ASSERT(a_NewTarget->IsTicking());
 		// Notify the new target that we are now targeting it.
 		m_Target->TargetingMe(this);
 	}

@@ -146,6 +146,25 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 
 
 
+bool cPlayer::Initialize(cWorld & a_World)
+{
+	UNUSED(a_World);
+	ASSERT(GetWorld() != nullptr);
+	ASSERT(GetParentChunk() == nullptr);
+	GetWorld()->AddPlayer(this);
+
+	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
+
+	// Spawn the entity on the clients:
+	GetWorld()->BroadcastSpawnEntity(*this);
+
+	return true;
+}
+
+
+
+
+
 cPlayer::~cPlayer(void)
 {
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
@@ -1682,6 +1701,8 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	ASSERT(a_World != nullptr);
+	ASSERT(IsTicking());
+
 	if (GetWorld() == a_World)
 	{
 		// Don't move to same world
@@ -1695,21 +1716,19 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
-	// Remove player from chunk
-	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
-	{
-		a_Chunk.SafeRemoveEntity(this);
-		return true;
-	}))
-	{
-		LOGD("Entity Teleportation failed! Didn't find the source chunk!\n");
-		return false;
-	}
+	// Prevent further ticking in this world
+	SetIsTicking(false);
+
+	// Tell others we are gone
+	GetWorld()->BroadcastDestroyEntity(*this);
 
 	// Remove player from world
 	GetWorld()->RemovePlayer(this, false);
-	// Stop all mobs from targeting this player
 
+	// Set position to the new position
+	SetPosition(a_NewPosition);
+
+	// Stop all mobs from targeting this player
 	StopEveryoneFromTargetingMe();
 
 	// Send the respawn packet:
@@ -1717,19 +1736,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	{
 		m_ClientHandle->SendRespawn(a_World->GetDimension());
 	}
-
-	// Broadcast for other people that the player is gone.
-	GetWorld()->BroadcastDestroyEntity(*this);
-
-	SetPosition(a_NewPosition);
-
-	// Stop all mobs from targeting this player
-	StopEveryoneFromTargetingMe();
-
-	// Queue adding player to the new world, including all the necessary adjustments to the object
-	a_World->AddPlayer(this);
-	cWorld * OldWorld = cRoot::Get()->GetWorld(GetWorld()->GetName());  // Required for the hook HOOK_ENTITY_CHANGED_WORLD
-	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
 	// Update the view distance.
 	m_ClientHandle->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
@@ -1743,9 +1749,21 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Broadcast the player into the new world.
 	a_World->BroadcastSpawnEntity(*this);
 
-	// Player changed the world, call the hook
-	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *OldWorld);
-
+	// Queue add to new world and removal from the old one
+	cChunk * ParentChunk = GetParentChunk();
+	cWorld * OldWorld = GetWorld();
+	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+	OldWorld->QueueTask([this, ParentChunk, a_World](cWorld & a_OldWorld)
+	{
+		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+			this->GetName().c_str(),
+			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
+			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+		);
+		ParentChunk->RemoveEntity(this);
+		a_World->AddPlayer(this);
+		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
+	});
 	return true;
 }
 

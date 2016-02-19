@@ -39,8 +39,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_Gravity(-9.81f),
 	m_AirDrag(0.02f),
 	m_LastPosition(a_X, a_Y, a_Z),
-	m_IsInitialized(false),
-	m_WorldTravellingFrom(nullptr),
 	m_EntityType(a_EntityType),
 	m_World(nullptr),
 	m_IsWorldChangeScheduled(false),
@@ -55,6 +53,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirLevel(0),
 	m_AirTickTimer(0),
 	m_TicksAlive(0),
+	m_IsTicking(false),
+	m_ParentChunk(nullptr),
 	m_HeadYaw(0.0),
 	m_Rot(0.0, 0.0, 0.0),
 	m_Position(a_X, a_Y, a_Z),
@@ -77,8 +77,10 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 
 cEntity::~cEntity()
 {
+
 	// Before deleting, the entity needs to have been removed from the world, if ever added
 	ASSERT((m_World == nullptr) || !m_World->HasEntity(m_UniqueID));
+	ASSERT(!IsTicking());
 
 	/*
 	// DEBUG:
@@ -97,12 +99,6 @@ cEntity::~cEntity()
 	if (m_Attachee != nullptr)
 	{
 		m_Attachee->Detach();
-	}
-
-	if (m_IsInitialized)
-	{
-		LOGWARNING("ERROR: Entity deallocated without being destroyed");
-		ASSERT(!"Entity deallocated without being destroyed or unlinked");
 	}
 }
 
@@ -139,7 +135,7 @@ const char * cEntity::GetParentClass(void) const
 
 bool cEntity::Initialize(cWorld & a_World)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this) && !IsPlayer())
+	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this))
 	{
 		return false;
 	}
@@ -151,9 +147,10 @@ bool cEntity::Initialize(cWorld & a_World)
 	);
 	*/
 
-	m_IsInitialized = true;
-	m_World = &a_World;
-	m_World->AddEntity(this);
+	ASSERT(m_World == nullptr);
+	ASSERT(GetParentChunk() == nullptr);
+	a_World.AddEntity(this);
+	ASSERT(m_World != nullptr);
 
 	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
 
@@ -171,7 +168,6 @@ void cEntity::WrapHeadYaw(void)
 {
 	m_HeadYaw = NormalizeAngleDegrees(m_HeadYaw);
 }
-
 
 
 
@@ -196,19 +192,59 @@ void cEntity::WrapSpeed(void)
 
 
 
+void cEntity::SetParentChunk(cChunk * a_Chunk)
+{
+	m_ParentChunk = a_Chunk;
+}
+
+
+
+
+
+cChunk * cEntity::GetParentChunk()
+{
+	return m_ParentChunk;
+}
+
+
+
+
+
 void cEntity::Destroy(bool a_ShouldBroadcast)
 {
-	if (!m_IsInitialized)
-	{
-		return;
-	}
+	ASSERT(IsTicking());
+	ASSERT(GetParentChunk() != nullptr);
+	SetIsTicking(false);
 
 	if (a_ShouldBroadcast)
 	{
 		m_World->BroadcastDestroyEntity(*this);
 	}
 
-	m_IsInitialized = false;
+	cChunk * ParentChunk = GetParentChunk();
+	m_World->QueueTask([this, ParentChunk](cWorld & a_World)
+	{
+		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
+			this->GetUniqueID(), this->GetClass(),
+			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+		);
+		ParentChunk->RemoveEntity(this);
+		delete this;
+	});
+	Destroyed();
+}
+
+
+
+
+
+void cEntity::DestroyNoScheduling(bool a_ShouldBroadcast)
+{
+	SetIsTicking(false);
+	if (a_ShouldBroadcast)
+	{
+		m_World->BroadcastDestroyEntity(*this);
+	}
 
 	Destroyed();
 }
@@ -217,10 +253,10 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 
 
 
+
 void cEntity::TakeDamage(cEntity & a_Attacker)
 {
 	int RawDamage = a_Attacker.GetRawDamageAgainst(*this);
-
 	TakeDamage(dtAttack, &a_Attacker, RawDamage, a_Attacker.GetKnockbackAmountAgainst(*this));
 }
 
@@ -833,6 +869,8 @@ void cEntity::SetHealth(int a_Health)
 
 void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	ASSERT(IsTicking());
+	ASSERT(GetWorld() != nullptr);
 	m_TicksAlive++;
 
 	if (m_InvulnerableTicks > 0)
@@ -1491,6 +1529,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 {
 	UNUSED(a_ShouldSendRespawn);
 	ASSERT(a_World != nullptr);
+	ASSERT(IsTicking());
 
 	if (GetWorld() == a_World)
 	{
@@ -1505,21 +1544,17 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
-	// Remove entity from chunk
-	if (!GetWorld()->DoWithChunk(GetChunkX(), GetChunkZ(), [this](cChunk & a_Chunk) -> bool
-	{
-		a_Chunk.SafeRemoveEntity(this);
-		return true;
-	}))
-	{
-		LOGD("Entity Teleportation failed! Didn't find the source chunk!\n");
-		return false;
-	}
+	// Stop ticking, in preperation for detaching from this world.
+	SetIsTicking(false);
 
+	// Tell others we are gone
 	GetWorld()->BroadcastDestroyEntity(*this);
 
+	// Set position to the new position
 	SetPosition(a_NewPosition);
 
+	// Stop all mobs from targeting this entity
+	// Stop this entity from targeting other mobs
 	if (this->IsMob())
 	{
 		cMonster * Monster = static_cast<cMonster*>(this);
@@ -1527,14 +1562,21 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		Monster->StopEveryoneFromTargetingMe();
 	}
 
-	// Queue add to new world
-	a_World->AddEntity(this);
-	cWorld * OldWorld = cRoot::Get()->GetWorld(GetWorld()->GetName());  // Required for the hook HOOK_ENTITY_CHANGED_WORLD
-	SetWorld(a_World);
-
-	// Entity changed the world, call the hook
-	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *OldWorld);
-
+	// Queue add to new world and removal from the old one
+	cWorld * OldWorld = GetWorld();
+	cChunk * ParentChunk = GetParentChunk();
+	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+	OldWorld->QueueTask([this, ParentChunk, a_World](cWorld & a_OldWorld)
+	{
+		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+			this->GetUniqueID(), this->GetClass(),
+			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
+			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+		);
+		ParentChunk->RemoveEntity(this);
+		a_World->AddEntity(this);
+		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
+	});
 	return true;
 }
 
@@ -1589,6 +1631,16 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	// Check if the player is submerged:
 	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
 	m_IsSubmerged = IsBlockWater(BlockIn);
+}
+
+
+
+
+
+void cEntity::SetIsTicking(bool a_IsTicking)
+{
+	m_IsTicking = a_IsTicking;
+	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
 }
 
 
@@ -2068,6 +2120,12 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 
 
 
+
+bool cEntity::IsTicking(void) const
+{
+	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
+	return m_IsTicking;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
