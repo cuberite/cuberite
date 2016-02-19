@@ -1135,28 +1135,51 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 		}  // for i - AllFamilies[]
 	}  // if (Spawning enabled)
 
-	// move close mobs
-	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for (cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; ++itr)
+	class cCallback : public cEntityCallback
 	{
-		cEntity & Entity = itr->second.m_Monster;
-		cChunk * Chunk = Entity.GetParentChunk();
-		if (!Entity.IsTicking())
+		virtual bool Item(cEntity * a_Entity) override
 		{
-			++itr;
-			continue;
-		}
-		ASSERT(Chunk == &(itr->second.m_Chunk));
-		Entity.Tick(a_Dt, *Chunk);
-		ASSERT(Chunk == &(itr->second.m_Chunk));
-	}
+			if (!a_Entity->IsMob())
+			{
+				return false;
+			}
+			if (!a_Entity->IsTicking())
+			{
+				return false;
+			}
 
-	// remove too far mobs
-	cMobProximityCounter::sIterablePair allTooFarMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(128 * 16, -1);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for (cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; ++itr)
-	{
-		itr->second.m_Monster.Destroy(true);
-	}
+			auto Monster = static_cast<cMonster *>(a_Entity);
+			ASSERT(Monster->GetParentChunk() != nullptr);  // A ticking entity must have a valid parent chunk
+
+			// Tick close mobs
+			if (Monster->GetParentChunk()->HasAnyClients())
+			{
+				Monster->Tick(m_Dt, *(a_Entity->GetParentChunk()));
+			}
+			// Destroy far hostile mobs
+			else if ((Monster->GetMobFamily() == cMonster::eFamily::mfHostile))
+			{
+				if (Monster->GetMobType() != eMonsterType::mtWolf)
+				{
+					Monster->Destroy(true);
+				}
+				else
+				{
+					auto Wolf = static_cast<cWolf *>(Monster);
+					if (Wolf->IsAngry())
+					{
+						Monster->Destroy(true);
+					}
+				}
+			}
+			return false;
+		}
+	public:
+		std::chrono::milliseconds m_Dt;
+	} Callback;
+
+	Callback.m_Dt = a_Dt;
+	ForEachEntity(Callback);
 }
 
 
