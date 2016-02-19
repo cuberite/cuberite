@@ -344,10 +344,12 @@ void cWolf::TickFollowPlayer()
 		virtual bool Item(cPlayer * a_Player) override
 		{
 			OwnerPos = a_Player->GetPosition();
+			OwnerFlying = a_Player->IsFlying();
 			return true;
 		}
 	public:
 		Vector3d OwnerPos;
+		bool OwnerFlying;
 	} Callback;
 
 	if (m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback))
@@ -356,9 +358,12 @@ void cWolf::TickFollowPlayer()
 		double Distance = (Callback.OwnerPos - GetPosition()).Length();
 		if (Distance > 20)
 		{
-			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
-			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
-			SetTarget(nullptr);
+			if (!Callback.OwnerFlying)
+			{
+				Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
+				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+				SetTarget(nullptr);
+			}
 		}
 		if (Distance < 2)
 		{
@@ -371,7 +376,10 @@ void cWolf::TickFollowPlayer()
 		{
 			if (GetTarget() == nullptr)
 			{
-				MoveToPosition(Callback.OwnerPos);
+				if (!Callback.OwnerFlying)
+				{
+					MoveToPosition(Callback.OwnerPos);
+				}
 			}
 		}
 	}
