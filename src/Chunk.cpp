@@ -654,12 +654,12 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 
 			(*itr)->SetParentChunk(nullptr);
 			MoveEntityToNewChunk(*itr);
-			itr = m_Entities.erase(itr);
 			// Mark as dirty if it was a server-generated entity:
 			if (!(*itr)->IsPlayer())
 			{
 				MarkDirty();
 			}
+			itr = m_Entities.erase(itr);
 		}
 		else
 		{
@@ -3189,11 +3189,3 @@ NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
 	// Because NIBBLETYPE is unsigned, we clamp it to 0 .. 15 by checking for values above 15
 	return (a_Skylight < 16)? a_Skylight : 0;
 }
-
-
-
-
-
-
-
-
