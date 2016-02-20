@@ -1019,7 +1019,10 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 			(*itr)->SetWorld(this);
 			m_ChunkMap->AddEntity(*itr);
 			ASSERT(!(*itr)->IsTicking());
-			(*itr)->SetIsTicking(true);
+			if (m_ChunkMap->HasEntity((*itr)->GetUniqueID()))
+			{
+				(*itr)->SetIsTicking(true);
+			}
 		}
 		m_EntitiesToAdd.clear();
 	}
@@ -3805,7 +3808,10 @@ void cWorld::AddQueuedPlayers(void)
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
 			m_ChunkMap->AddEntityIfNotPresent(*itr);
 			ASSERT(!(*itr)->IsTicking());
-			(*itr)->SetIsTicking(true);
+			if (m_ChunkMap->HasEntity((*itr)->GetUniqueID()))
+			{
+				(*itr)->SetIsTicking(true);
+			}
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSPlayers)
 
