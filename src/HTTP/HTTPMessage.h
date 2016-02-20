@@ -65,17 +65,17 @@ protected:
 
 
 
-class cHTTPResponse :
+/** Stores outgoing response headers and serializes them to an HTTP data stream. */
+class cHTTPOutgoingResponse :
 	public cHTTPMessage
 {
 	typedef cHTTPMessage super;
 
 public:
-	cHTTPResponse(void);
+	cHTTPOutgoingResponse(void);
 
 	/** Appends the response to the specified datastream - response line and headers.
-	The body will be sent later directly through cConnection::Send()
-	*/
+	The body will be sent later directly through cConnection::Send() */
 	void AppendToData(AString & a_DataStream) const;
 } ;
 

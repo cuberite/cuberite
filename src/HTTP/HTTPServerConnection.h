@@ -18,7 +18,7 @@
 
 // fwd:
 class cHTTPServer;
-class cHTTPResponse;
+class cHTTPOutgoingResponse;
 class cHTTPIncomingRequest;
 
 
@@ -45,7 +45,7 @@ public:
 	void SendNeedAuth(const AString & a_Realm);
 
 	/** Sends the headers contained in a_Response */
-	void Send(const cHTTPResponse & a_Response);
+	void Send(const cHTTPOutgoingResponse & a_Response);
 
 	/** Sends the data as the response (may be called multiple times) */
 	void Send(const void * a_Data, size_t a_Size);

@@ -23,7 +23,6 @@
 class cHTTPMessage;
 class cHTTPRequestParser;
 class cHTTPIncomingRequest;
-class cHTTPResponse;
 class cHTTPServerConnection;
 
 

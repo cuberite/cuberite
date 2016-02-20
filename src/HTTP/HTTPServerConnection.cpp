@@ -59,7 +59,7 @@ void cHTTPServerConnection::SendNeedAuth(const AString & a_Realm)
 
 
 
-void cHTTPServerConnection::Send(const cHTTPResponse & a_Response)
+void cHTTPServerConnection::Send(const cHTTPOutgoingResponse & a_Response)
 {
 	ASSERT(m_CurrentRequest != nullptr);
 	AString toSend;

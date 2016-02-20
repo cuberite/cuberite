@@ -69,7 +69,7 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 ////////////////////////////////////////////////////////////////////////////////
 // cHTTPResponse:
 
-cHTTPResponse::cHTTPResponse(void) :
+cHTTPOutgoingResponse::cHTTPOutgoingResponse(void) :
 	super(mkResponse)
 {
 }
@@ -78,7 +78,7 @@ cHTTPResponse::cHTTPResponse(void) :
 
 
 
-void cHTTPResponse::AppendToData(AString & a_DataStream) const
+void cHTTPOutgoingResponse::AppendToData(AString & a_DataStream) const
 {
 	a_DataStream.append("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nContent-Type: ");
 	a_DataStream.append(m_ContentType);

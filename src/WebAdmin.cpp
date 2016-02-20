@@ -314,7 +314,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 	{
 		if (m_TemplateScript.Call("ShowPage", this, &TemplateRequest, cLuaState::Return, Template))
 		{
-			cHTTPResponse Resp;
+			cHTTPOutgoingResponse Resp;
 			Resp.SetContentType("text/html");
 			a_Connection.Send(Resp);
 			a_Connection.Send(Template.c_str(), Template.length());
@@ -373,7 +373,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 	Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
 	ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
 
-	cHTTPResponse Resp;
+	cHTTPOutgoingResponse Resp;
 	Resp.SetContentType("text/html");
 	a_Connection.Send(Resp);
 	a_Connection.Send(Template.c_str(), Template.length());
@@ -388,7 +388,7 @@ void cWebAdmin::HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 {
 	UNUSED(a_Request);
 
-	cHTTPResponse Resp;
+	cHTTPOutgoingResponse Resp;
 	Resp.SetContentType("text/html");
 	a_Connection.Send(Resp);
 	a_Connection.Send(m_LoginTemplate);
@@ -441,7 +441,7 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 	}
 
 	// Send the response:
-	cHTTPResponse Resp;
+	cHTTPOutgoingResponse Resp;
 	Resp.SetContentType(ContentType);
 	a_Connection.Send(Resp);
 	a_Connection.Send(Content);
