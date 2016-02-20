@@ -12,8 +12,8 @@
 #include "Server.h"
 #include "Root.h"
 
-#include "HTTP/HTTPRequestParser.h"
 #include "HTTP/HTTPServerConnection.h"
+#include "HTTP/HTTPFormParser.h"
 
 
 
@@ -43,6 +43,40 @@ class cPlayerAccum :
 public:
 
 	AString m_Contents;
+} ;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cWebadminRequestData
+
+/** The form parser callbacks for requests in the "/webadmin" and "/~webadmin" paths */
+class cWebadminRequestData :
+	public cHTTPFormParser::cCallbacks,
+	public cHTTPIncomingRequest::cUserData
+{
+public:
+	cHTTPFormParser m_Form;
+
+
+	cWebadminRequestData(const cHTTPIncomingRequest & a_Request):
+		m_Form(a_Request, *this)
+	{
+	}
+
+	// cHTTPFormParser::cCallbacks overrides. Files are ignored:
+	virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override
+	{
+		UNUSED(a_FileName);
+	}
+	virtual void OnFileData(cHTTPFormParser &, const char * a_Data, size_t a_Size) override
+	{
+		UNUSED(a_Data);
+		UNUSED(a_Size);
+	}
+	virtual void OnFileEnd(cHTTPFormParser &) override {}
 } ;
 
 
@@ -212,7 +246,7 @@ bool cWebAdmin::LoadLoginTemplate(void)
 
 
 
-void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPRequestParser & a_Request)
+void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	if (!a_Request.HasAuth())
 	{
@@ -229,12 +263,12 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 	}
 
 	// Check if the contents should be wrapped in the template:
-	AString BareURL = a_Request.GetBareURL();
+	auto BareURL = a_Request.GetURLPath();
 	ASSERT(BareURL.length() > 0);
 	bool ShouldWrapInTemplate = ((BareURL.length() > 1) && (BareURL[1] != '~'));
 
 	// Retrieve the request data:
-	cWebadminRequestData * Data = reinterpret_cast<cWebadminRequestData *>(a_Request.GetUserData());
+	auto Data = std::static_pointer_cast<cWebadminRequestData>(a_Request.GetUserData());
 	if (Data == nullptr)
 	{
 		a_Connection.SendStatusAndReason(500, "Bad UserData");
@@ -343,13 +377,14 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 	Resp.SetContentType("text/html");
 	a_Connection.Send(Resp);
 	a_Connection.Send(Template.c_str(), Template.length());
+	a_Connection.FinishResponse();
 }
 
 
 
 
 
-void cWebAdmin::HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPRequestParser & a_Request)
+void cWebAdmin::HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	UNUSED(a_Request);
 
@@ -364,7 +399,7 @@ void cWebAdmin::HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPReq
 
 
 
-void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPRequestParser & a_Request)
+void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	AString FileURL = a_Request.GetURL();
 	std::replace(FileURL.begin(), FileURL.end(), '\\', '/');
@@ -621,7 +656,7 @@ AString cWebAdmin::GetBaseURL(const AStringVector & a_URLSplit)
 
 
 
-void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPRequestParser & a_Request)
+void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	UNUSED(a_Connection);
 	const AString & URL = a_Request.GetURL();
@@ -630,7 +665,7 @@ void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPReques
 		(strncmp(URL.c_str(), "/~webadmin", 10) == 0)
 	)
 	{
-		a_Request.SetUserData(new cWebadminRequestData(a_Request));
+		a_Request.SetUserData(std::make_shared<cWebadminRequestData>(a_Request));
 		return;
 	}
 	if (URL == "/")
@@ -645,22 +680,22 @@ void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPReques
 
 
 
-void cWebAdmin::OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPRequestParser & a_Request, const char * a_Data, size_t a_Size)
+void cWebAdmin::OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
-	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
+	auto Data = std::static_pointer_cast<cWebadminRequestData>(a_Request.GetUserData());
 	if (Data == nullptr)
 	{
 		return;
 	}
-	Data->OnBody(a_Data, a_Size);
+	Data->m_Form.Parse(a_Data, a_Size);
 }
 
 
 
 
 
-void cWebAdmin::OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPRequestParser & a_Request)
+void cWebAdmin::OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	const AString & URL = a_Request.GetURL();
 	if (
@@ -679,24 +714,9 @@ void cWebAdmin::OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPReq
 	{
 		HandleFileRequest(a_Connection, a_Request);
 	}
-
-	// Delete any request data assigned to the request:
-	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
-	delete Data;
-	Data = nullptr;
 }
 
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWebAdmin::cWebadminRequestData
-
-void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)
-{
-	m_Form.Parse(a_Data, a_Size);
-}
 
 
 

@@ -100,3 +100,60 @@ void cHTTPResponse::AppendToData(AString & a_DataStream) const
 
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// cHTTPIncomingRequest:
+
+cHTTPIncomingRequest::cHTTPIncomingRequest(const AString & a_Method, const AString & a_URL):
+	Super(mkRequest),
+	m_Method(a_Method),
+	m_URL(a_URL)
+{
+}
+
+
+
+
+
+AString cHTTPIncomingRequest::GetURLPath(void) const
+{
+	auto idxQuestionMark = m_URL.find('?');
+	if (idxQuestionMark == AString::npos)
+	{
+		return m_URL;
+	}
+	else
+	{
+		return m_URL.substr(0, idxQuestionMark);
+	}
+}
+
+
+
+
+
+void cHTTPIncomingRequest::AddHeader(const AString & a_Key, const AString & a_Value)
+{
+	if (
+		(NoCaseCompare(a_Key, "Authorization") == 0) &&
+		(strncmp(a_Value.c_str(), "Basic ", 6) == 0)
+	)
+	{
+		AString UserPass = Base64Decode(a_Value.substr(6));
+		size_t idxCol = UserPass.find(':');
+		if (idxCol != AString::npos)
+		{
+			m_AuthUsername = UserPass.substr(0, idxCol);
+			m_AuthPassword = UserPass.substr(idxCol + 1);
+			m_HasAuth = true;
+		}
+	}
+	if ((a_Key == "Connection") && (NoCaseCompare(a_Value, "keep-alive") == 0))
+	{
+		m_AllowKeepAlive = true;
+	}
+}
+
+
+
+

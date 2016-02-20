@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../OSSupport/Network.h"
+#include "HTTPMessageParser.h"
 
 
 
@@ -18,34 +19,29 @@
 // fwd:
 class cHTTPServer;
 class cHTTPResponse;
-class cHTTPRequestParser;
-
+class cHTTPIncomingRequest;
 
 
 
 
 class cHTTPServerConnection :
-	public cTCPLink::cCallbacks
+	public cTCPLink::cCallbacks,
+	public cHTTPMessageParser::cCallbacks
 {
 public:
-
-	enum eState
-	{
-		wcsRecvHeaders,  ///< Receiving request headers (m_CurrentRequest is created if nullptr)
-		wcsRecvBody,     ///< Receiving request body    (m_CurrentRequest is valid)
-		wcsRecvIdle,     ///< Has received the entire body, waiting to send the response (m_CurrentRequest == nullptr)
-		wcsSendingResp,  ///< Sending response body     (m_CurrentRequest == nullptr)
-		wcsInvalid,      ///< The request was malformed, the connection is closing
-	} ;
-
+	/** Creates a new instance, connected to the specified HTTP server instance */
 	cHTTPServerConnection(cHTTPServer & a_HTTPServer);
+
+	// Force a virtual destructor in all descendants
 	virtual ~cHTTPServerConnection();
 
 	/** Sends HTTP status code together with a_Reason (used for HTTP errors).
-	Sends the a_Reason as the body as well, so that browsers display it. */
+	Sends the a_Reason as the body as well, so that browsers display it.
+	Clears the current request (since it's finished by this call). */
 	void SendStatusAndReason(int a_StatusCode, const AString & a_Reason);
 
-	/** Sends the "401 unauthorized" reply together with instructions on authorizing, using the specified realm */
+	/** Sends the "401 unauthorized" reply together with instructions on authorizing, using the specified realm.
+	Clears the current request (since it's finished by this call). */
 	void SendNeedAuth(const AString & a_Realm);
 
 	/** Sends the headers contained in a_Response */
@@ -57,12 +53,9 @@ public:
 	/** Sends the data as the response (may be called multiple times) */
 	void Send(const AString & a_Data) { Send(a_Data.data(), a_Data.size()); }
 
-	/** Indicates that the current response is finished, gets ready for receiving another request (HTTP 1.1 keepalive) */
+	/** Indicates that the current response is finished, gets ready for receiving another request (HTTP 1.1 keepalive).
+	Clears the current request (since it's finished by this call). */
 	void FinishResponse(void);
-
-	/** Resets the internal connection state for a new request.
-	Depending on the state, this will send an "InternalServerError" status or a "ResponseEnd" */
-	void AwaitNextRequest(void);
 
 	/** Terminates the connection; finishes any request being currently processed */
 	void Terminate(void);
@@ -73,19 +66,12 @@ protected:
 	/** The parent webserver that is to be notified of events on this connection */
 	cHTTPServer & m_HTTPServer;
 
-	/** All the incoming data until the entire request header is parsed */
-	AString m_IncomingHeaderData;
-
-	/** Status in which the request currently is */
-	eState m_State;
+	/** The parser responsible for reading the requests. */
+	cHTTPMessageParser m_Parser;
 
 	/** The request being currently received
 	Valid only between having parsed the headers and finishing receiving the body. */
-	cHTTPRequestParser * m_CurrentRequest;
-
-	/** Number of bytes that remain to read for the complete body of the message to be received.
-	Valid only in wcsRecvBody */
-	size_t m_CurrentRequestBodyRemaining;
+	std::unique_ptr<cHTTPIncomingRequest> m_CurrentRequest;
 
 	/** The network link attached to this connection. */
 	cTCPLinkPtr m_Link;
@@ -103,6 +89,14 @@ protected:
 
 	/** An error has occurred on the socket. */
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
+
+	// cHTTPMessageParser::cCallbacks overrides:
+	virtual void OnError(const AString & a_ErrorDescription) override;
+	virtual void OnFirstLine(const AString & a_FirstLine) override;
+	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) override;
+	virtual void OnHeadersFinished(void) override;
+	virtual void OnBodyData(const void * a_Data, size_t a_Size) override;
+	virtual void OnBodyFinished(void) override;
 
 	// Overridable:
 	/** Called to send raw data over the link. Descendants may provide data transformations (SSL etc.) */

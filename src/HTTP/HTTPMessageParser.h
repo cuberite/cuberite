@@ -1,27 +1,26 @@
 
-// HTTPResponseParser.h
+// HTTPMessageParser.h
 
-// Declares the cHTTPResponseParser class representing the parser for incoming HTTP responses
+// Declares the cHTTPMessageParser class that parses HTTP messages (request or response) being pushed into the parser,
+// and reports the individual parts via callbacks
+
 
 
 
 
 #pragma once
 
-#include "HTTPMessage.h"
+#include "EnvelopeParser.h"
 #include "TransferEncodingParser.h"
 
 
 
 
 
-class cHTTPResponseParser:
-	public cHTTPMessage,
+class cHTTPMessageParser:
 	protected cEnvelopeParser::cCallbacks,
 	protected cTransferEncodingParser::cCallbacks
 {
-	typedef cHTTPMessage Super;
-
 public:
 	class cCallbacks
 	{
@@ -32,8 +31,8 @@ public:
 		/** Called when an error has occured while parsing. */
 		virtual void OnError(const AString & a_ErrorDescription) = 0;
 
-		/** Called when the status line is fully parsed. */
-		virtual void OnStatusLine(const AString & a_StatusLine) = 0;
+		/** Called when the first line (request / status) is fully parsed. */
+		virtual void OnFirstLine(const AString & a_FirstLine) = 0;
 
 		/** Called when a single header line is parsed. */
 		virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) = 0;
@@ -48,7 +47,8 @@ public:
 		virtual void OnBodyFinished(void) = 0;
 	};
 
-	cHTTPResponseParser(cCallbacks & a_Callbacks);
+	/** Creates a new parser instance that will use the specified callbacks for reporting. */
+	cHTTPMessageParser(cCallbacks & a_Callbacks);
 
 	/** Parses the incoming data and calls the appropriate callbacks.
 	Returns the number of bytes consumed or AString::npos number for error. */
@@ -61,6 +61,9 @@ public:
 	/** Returns true if the entire response has been already parsed. */
 	bool IsFinished(void) const { return m_IsFinished; }
 
+	/** Resets the parser to the initial state, so that a new request can be parsed. */
+	void Reset(void);
+
 
 protected:
 
@@ -70,14 +73,11 @@ protected:
 	/** Set to true if an error has been encountered by the parser. */
 	bool m_HasHadError;
 
-	/** True if the parser is still parsing the status or headers. */
-	bool m_IsInHeaders;
-
 	/** True if the response has been fully parsed. */
 	bool m_IsFinished;
 
-	/** The complete status line of the response. Empty if not parsed yet. */
-	AString m_StatusLine;
+	/** The complete first line of the response. Empty if not parsed yet. */
+	AString m_FirstLine;
 
 	/** Buffer for the incoming data until the status line is parsed. */
 	AString m_Buffer;
@@ -88,11 +88,20 @@ protected:
 	/** The specific parser for the transfer encoding used by this response. */
 	cTransferEncodingParserPtr m_TransferEncodingParser;
 
+	/** The transfer encoding to be used by the parser.
+	Filled while parsing headers, used when headers are finished. */
+	AString m_TransferEncoding;
 
-	/** Parses the status line out of the m_Buffer.
-	Removes the status line from m_Buffer, if appropriate.
-	Returns true if the entire status line has been parsed. */
-	bool ParseStatusLine(void);
+	/** The content length, parsed from the headers, if available.
+	Unused for chunked encoding.
+	Filled while parsing headers, used when headers are finished. */
+	size_t m_ContentLength;
+
+
+	/** Parses the first line out of m_Buffer.
+	Removes the first line from m_Buffer, if appropriate.
+	Returns the number of bytes consumed out of m_Buffer, or AString::npos number for error. */
+	size_t ParseFirstLine(void);
 
 	/** Parses the message body.
 	Processes transfer encoding and calls the callbacks for body data.

@@ -1,0 +1,3 @@
+GET /some/url HTTP/1.1
+Note: This is a test of a regular body-less request
+

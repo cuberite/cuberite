@@ -5,7 +5,8 @@
 
 #include "Globals.h"
 #include "HTTPServerConnection.h"
-#include "HTTPRequestParser.h"
+#include "HTTPMessage.h"
+#include "HTTPMessageParser.h"
 #include "HTTPServer.h"
 
 
@@ -14,9 +15,8 @@
 
 cHTTPServerConnection::cHTTPServerConnection(cHTTPServer & a_HTTPServer) :
 	m_HTTPServer(a_HTTPServer),
-	m_State(wcsRecvHeaders),
-	m_CurrentRequest(nullptr),
-	m_CurrentRequestBodyRemaining(0)
+	m_Parser(*this),
+	m_CurrentRequest(nullptr)
 {
 	// LOGD("HTTP: New connection at %p", this);
 }
@@ -28,8 +28,7 @@ cHTTPServerConnection::cHTTPServerConnection(cHTTPServer & a_HTTPServer) :
 cHTTPServerConnection::~cHTTPServerConnection()
 {
 	// LOGD("HTTP: Connection deleting: %p", this);
-	delete m_CurrentRequest;
-	m_CurrentRequest = nullptr;
+	m_CurrentRequest.reset();
 }
 
 
@@ -41,7 +40,8 @@ void cHTTPServerConnection::SendStatusAndReason(int a_StatusCode, const AString 
 	SendData(Printf("HTTP/1.1 %d %s\r\n", a_StatusCode, a_Response.c_str()));
 	SendData(Printf("Content-Length: %u\r\n\r\n", static_cast<unsigned>(a_Response.size())));
 	SendData(a_Response.data(), a_Response.size());
-	m_State = wcsRecvHeaders;
+	m_CurrentRequest.reset();
+	m_Parser.Reset();
 }
 
 
@@ -51,7 +51,8 @@ void cHTTPServerConnection::SendStatusAndReason(int a_StatusCode, const AString 
 void cHTTPServerConnection::SendNeedAuth(const AString & a_Realm)
 {
 	SendData(Printf("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"%s\"\r\nContent-Length: 0\r\n\r\n", a_Realm.c_str()));
-	m_State = wcsRecvHeaders;
+	m_CurrentRequest.reset();
+	m_Parser.Reset();
 }
 
 
@@ -60,10 +61,9 @@ void cHTTPServerConnection::SendNeedAuth(const AString & a_Realm)
 
 void cHTTPServerConnection::Send(const cHTTPResponse & a_Response)
 {
-	ASSERT(m_State == wcsRecvIdle);
+	ASSERT(m_CurrentRequest != nullptr);
 	AString toSend;
 	a_Response.AppendToData(toSend);
-	m_State = wcsSendingResp;
 	SendData(toSend);
 }
 
@@ -73,7 +73,7 @@ void cHTTPServerConnection::Send(const cHTTPResponse & a_Response)
 
 void cHTTPServerConnection::Send(const void * a_Data, size_t a_Size)
 {
-	ASSERT(m_State == wcsSendingResp);
+	ASSERT(m_CurrentRequest != nullptr);
 	// We're sending in Chunked transfer encoding
 	SendData(Printf(SIZE_T_FMT_HEX "\r\n", a_Size));
 	SendData(a_Data, a_Size);
@@ -86,47 +86,10 @@ void cHTTPServerConnection::Send(const void * a_Data, size_t a_Size)
 
 void cHTTPServerConnection::FinishResponse(void)
 {
-	ASSERT(m_State == wcsSendingResp);
+	ASSERT(m_CurrentRequest != nullptr);
 	SendData("0\r\n\r\n");
-	m_State = wcsRecvHeaders;
-}
-
-
-
-
-
-void cHTTPServerConnection::AwaitNextRequest(void)
-{
-	switch (m_State)
-	{
-		case wcsRecvHeaders:
-		{
-			// Nothing has been received yet, or a special response was given (SendStatusAndReason() or SendNeedAuth())
-			break;
-		}
-
-		case wcsRecvIdle:
-		{
-			// The client is waiting for a response, send an "Internal server error":
-			SendData("HTTP/1.1 500 Internal Server Error\r\n\r\n");
-			m_State = wcsRecvHeaders;
-			break;
-		}
-
-		case wcsSendingResp:
-		{
-			// The response headers have been sent, we need to terminate the response body:
-			SendData("0\r\n\r\n");
-			m_State = wcsRecvHeaders;
-			break;
-		}
-
-		default:
-		{
-			ASSERT(!"Unhandled state recovery");
-			break;
-		}
-	}
+	m_CurrentRequest.reset();
+	m_Parser.Reset();
 }
 
 
@@ -160,86 +123,7 @@ void cHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 {
 	ASSERT(m_Link != nullptr);
 
-	switch (m_State)
-	{
-		case wcsRecvHeaders:
-		{
-			if (m_CurrentRequest == nullptr)
-			{
-				m_CurrentRequest = new cHTTPRequestParser;
-			}
-
-			size_t BytesConsumed = m_CurrentRequest->ParseHeaders(a_Data, a_Size);
-			if (BytesConsumed == AString::npos)
-			{
-				delete m_CurrentRequest;
-				m_CurrentRequest = nullptr;
-				m_State = wcsInvalid;
-				m_Link->Close();
-				m_Link.reset();
-				return;
-			}
-			if (m_CurrentRequest->IsInHeaders())
-			{
-				// The request headers are not yet complete
-				return;
-			}
-
-			// The request has finished parsing its headers successfully, notify of it:
-			m_State = wcsRecvBody;
-			m_HTTPServer.NewRequest(*this, *m_CurrentRequest);
-			m_CurrentRequestBodyRemaining = m_CurrentRequest->GetContentLength();
-			if (m_CurrentRequestBodyRemaining == AString::npos)
-			{
-				// The body length was not specified in the request, assume zero
-				m_CurrentRequestBodyRemaining = 0;
-			}
-
-			// Process the rest of the incoming data into the request body:
-			if (a_Size > BytesConsumed)
-			{
-				cHTTPServerConnection::OnReceivedData(a_Data + BytesConsumed, a_Size - BytesConsumed);
-				return;
-			}
-			else
-			{
-				cHTTPServerConnection::OnReceivedData("", 0);  // If the request has zero body length, let it be processed right-away
-				return;
-			}
-		}
-
-		case wcsRecvBody:
-		{
-			ASSERT(m_CurrentRequest != nullptr);
-			if (m_CurrentRequestBodyRemaining > 0)
-			{
-				size_t BytesToConsume = std::min(m_CurrentRequestBodyRemaining, static_cast<size_t>(a_Size));
-				m_HTTPServer.RequestBody(*this, *m_CurrentRequest, a_Data, BytesToConsume);
-				m_CurrentRequestBodyRemaining -= BytesToConsume;
-			}
-			if (m_CurrentRequestBodyRemaining == 0)
-			{
-				m_State = wcsRecvIdle;
-				m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
-				if (!m_CurrentRequest->DoesAllowKeepAlive())
-				{
-					m_State = wcsInvalid;
-					m_Link->Close();
-					m_Link.reset();
-					return;
-				}
-				delete m_CurrentRequest;
-				m_CurrentRequest = nullptr;
-			}
-			break;
-		}
-
-		default:
-		{
-			// TODO: Should we be receiving data in this state?
-			break;
-		}
-	}
+	m_Parser.Parse(a_Data, a_Size);
 }
 
 
@@ -264,6 +148,84 @@ void cHTTPServerConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 {
 	OnRemoteClosed();
 }
+
+
+
+
+
+void cHTTPServerConnection::OnError(const AString & a_ErrorDescription)
+{
+	OnRemoteClosed();
+}
+
+
+
+
+
+void cHTTPServerConnection::OnFirstLine(const AString & a_FirstLine)
+{
+	// Create a new request object for this request:
+	auto split = StringSplit(a_FirstLine, " ");
+	if (split.size() < 2)
+	{
+		// Invalid request line. We need at least the Method and URL
+		OnRemoteClosed();
+		return;
+	}
+	m_CurrentRequest.reset(new cHTTPIncomingRequest(split[0], split[1]));
+}
+
+
+
+
+
+void cHTTPServerConnection::OnHeaderLine(const AString & a_Key, const AString & a_Value)
+{
+	if (m_CurrentRequest == nullptr)
+	{
+		return;
+	}
+	m_CurrentRequest->AddHeader(a_Key, a_Value);
+}
+
+
+
+
+
+void cHTTPServerConnection::OnHeadersFinished(void)
+{
+	if (m_CurrentRequest == nullptr)
+	{
+		return;
+	}
+	m_HTTPServer.NewRequest(*this, *m_CurrentRequest);
+}
+
+
+
+
+
+void cHTTPServerConnection::OnBodyData(const void * a_Data, size_t a_Size)
+{
+	if (m_CurrentRequest == nullptr)
+	{
+		return;
+	}
+	m_HTTPServer.RequestBody(*this, *m_CurrentRequest, a_Data, a_Size);
+}
+
+
+
+
+
+void cHTTPServerConnection::OnBodyFinished(void)
+{
+	// Process the request and reset:
+	m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
+	m_CurrentRequest.reset();
+	m_Parser.Reset();
+}
+
 
 
 

@@ -127,6 +127,9 @@ if(${SELF_TEST})
 	add_definitions(-DSELF_TEST)
 endif()
 
+# Build all dependent libraries as static:
+SET(CMAKE_BUILD_STATIC_LIBRARIES ON)
+
 
 
 
@@ -275,7 +278,7 @@ if (MSVC)
 			creatable-exe
 			EchoServer
 			Google-exe
-			HTTPResponseParser_file-exe
+			HTTPMessageParser_file-exe
 			LoadablePieces
 			NameLookup
 			PROPERTIES FOLDER Tests
