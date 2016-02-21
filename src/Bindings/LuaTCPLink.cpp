@@ -416,9 +416,10 @@ void cLuaTCPLink::OnReceivedData(const char * a_Data, size_t a_Length)
 	}
 
 	// If we're running in SSL mode, put the data into the SSL decryptor:
-	if (m_SslContext != nullptr)
+	auto sslContext = m_SslContext;
+	if (sslContext != nullptr)
 	{
-		m_SslContext->StoreReceivedData(a_Data, a_Length);
+		sslContext->StoreReceivedData(a_Data, a_Length);
 		return;
 	}
 
@@ -440,6 +441,13 @@ void cLuaTCPLink::OnRemoteClosed(void)
 	if (!m_Callbacks.IsValid())
 	{
 		return;
+	}
+
+	// If running in SSL mode and there's data left in the SSL contect, report it:
+	auto sslContext = m_SslContext;
+	if (sslContext != nullptr)
+	{
+		sslContext->FlushBuffers();
 	}
 
 	// Call the callback:
