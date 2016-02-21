@@ -25,8 +25,7 @@ class cMinecartCollisionCallback :
 {
 public:
 	cMinecartCollisionCallback(Vector3d a_Pos, double a_Height, double a_Width, UInt32 a_UniqueID, UInt32 a_AttacheeUniqueID) :
-		m_DoesInteserct(false),
-		m_CollidedEntityPos(0, 0, 0),
+		m_DoesIntersect(false),
 		m_Pos(a_Pos),
 		m_Height(a_Height),
 		m_Width(a_Width),
@@ -53,27 +52,31 @@ public:
 
 		if (bbEntity.DoesIntersect(bbMinecart))
 		{
-			m_CollidedEntityPos = a_Entity->GetPosition();
-			m_DoesInteserct = true;
-			return true;
+			// One or none of the candidates has a collision with the minecart
+			m_CollidedEntityCandidatesPos.push_back(a_Entity->GetPosition());
+
+			m_DoesIntersect = true;
+
+			// Go through all entities
+			return false;
 		}
 		return false;
 	}
 
 	bool FoundIntersection(void) const
 	{
-		return m_DoesInteserct;
+		return m_DoesIntersect;
 	}
 
-	Vector3d GetCollidedEntityPosition(void) const
+	std::vector<Vector3d> GetCollidedEntityCandidatesPositions(void) const
 	{
-		return m_CollidedEntityPos;
+		return m_CollidedEntityCandidatesPos;
 	}
 
 protected:
-	bool m_DoesInteserct;
+	bool m_DoesIntersect;
 
-	Vector3d m_CollidedEntityPos;
+	std::vector<Vector3d> m_CollidedEntityCandidatesPos;
 
 	Vector3d m_Pos;
 	double m_Height, m_Width;
@@ -807,46 +810,50 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
 	m_World->ForEachEntityInChunk(ChunkX, ChunkZ, MinecartCollisionCallback);
 
-	if (!MinecartCollisionCallback.FoundIntersection())
+	// Positions of all entities inside the minecarts bounding box
+	std::vector<Vector3d> CollidedEntityCandidates = MinecartCollisionCallback.GetCollidedEntityCandidatesPositions();
+
+	// The minecart will handle a collision with one or none of the candidates
+	for (auto CollidedEntityCandidate : CollidedEntityCandidates)
 	{
-		return false;
-	}
-
-
 		switch (a_RailMeta)
 		{
 			case E_META_RAIL_ZM_ZP:
 			{
-				if (MinecartCollisionCallback.GetCollidedEntityPosition().z >= GetPosZ())
+				if (CollidedEntityCandidate.z >= GetPosZ())
 				{
 					if (GetSpeedZ() > 0)  // True if minecart is moving into the direction of the entity
 					{
 						SetSpeedZ(0);  // Entity handles the pushing
+						return true;
 					}
 				}
-				else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().z < GetPosZ())
+				else  // if (CollidedEntityCandidate.z < GetPosZ())
 				{
 					if (GetSpeedZ() < 0)  // True if minecart is moving into the direction of the entity
 					{
 						SetSpeedZ(0);  // Entity handles the pushing
+						return true;
 					}
 				}
 				return true;
 			}
 			case E_META_RAIL_XM_XP:
 			{
-				if (MinecartCollisionCallback.GetCollidedEntityPosition().x >= GetPosX())
+				if (CollidedEntityCandidate.x >= GetPosX())
 				{
 					if (GetSpeedX() > 0)  // True if minecart is moving into the direction of the entity
 					{
 						SetSpeedX(0);  // Entity handles the pushing
+						return true;
 					}
 				}
-				else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().x < GetPosX())
+				else  // if (CollidedEntityCandidate.x < GetPosX())
 				{
 					if (GetSpeedX() < 0)  // True if minecart is moving into the direction of the entity
 					{
 						SetSpeedX(0);  // Entity handles the pushing
+						return true;
 					}
 				}
 				return true;
@@ -854,7 +861,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			case E_META_RAIL_CURVED_ZM_XM:
 			case E_META_RAIL_CURVED_ZP_XP:
 			{
-				Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
+				Vector3d Distance = CollidedEntityCandidate - Vector3d(GetPosX(), 0, GetPosZ());
 
 				// Prevent division by small numbers
 				if (std::abs(Distance.z) < 0.001)
@@ -903,7 +910,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			case E_META_RAIL_CURVED_ZM_XP:
 			case E_META_RAIL_CURVED_ZP_XM:
 			{
-				Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
+				Vector3d Distance = CollidedEntityCandidate - Vector3d(GetPosX(), 0, GetPosZ());
 
 				// Prevent division by small numbers
 				if (std::abs(Distance.z) < 0.001)
@@ -951,6 +958,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			}
 			default: break;
 		}
+	}
 
 	return false;
 }
