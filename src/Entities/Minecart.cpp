@@ -812,119 +812,85 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 		return false;
 	}
 
-	switch (a_RailMeta)
-	{
-		case E_META_RAIL_ZM_ZP:
-		{
-			if (MinecartCollisionCallback.GetCollidedEntityPosition().z >= GetPosZ())
-			{
-				if (GetSpeedZ() > 0)  // True if minecart is moving into the direction of the entity
-				{
-					SetSpeedZ(0);  // Entity handles the pushing
-				}
-			}
-			else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().z < GetPosZ())
-			{
-				if (GetSpeedZ() < 0)  // True if minecart is moving into the direction of the entity
-				{
-					SetSpeedZ(0);  // Entity handles the pushing
-				}
-			}
-			return true;
-		}
-		case E_META_RAIL_XM_XP:
-		{
-			if (MinecartCollisionCallback.GetCollidedEntityPosition().x >= GetPosX())
-			{
-				if (GetSpeedX() > 0)  // True if minecart is moving into the direction of the entity
-				{
-					SetSpeedX(0);  // Entity handles the pushing
-				}
-			}
-			else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().x < GetPosX())
-			{
-				if (GetSpeedX() < 0)  // True if minecart is moving into the direction of the entity
-				{
-					SetSpeedX(0);  // Entity handles the pushing
-				}
-			}
-			return true;
-		}
-		case E_META_RAIL_CURVED_ZM_XM:
-		case E_META_RAIL_CURVED_ZP_XP:
-		{
-			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
-			// Prevent division by small numbers
-			if (std::abs(Distance.z) < 0.001)
-			{
-				Distance.z = 0.001;
-			}
-
-			/* Check to which side the minecart is to be pushed.
-			Let's consider a z-x-coordinate system where the minecart is the center (0, 0).
-			The minecart moves along the line x = -z, the perpendicular line to this is x = z.
-			In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located. */
-			if (
-				((Distance.z > 0) && ((Distance.x / Distance.z) >= 1)) ||
-				((Distance.z < 0) && ((Distance.x / Distance.z) <= 1))
-			)
-			{
-				// Moving -X +Z
-				if ((-GetSpeedX() * 0.4 / sqrt(2.0)) < 0.01)
-				{
-					// ~ SpeedX >= 0 Immobile or not moving in the "right" direction. Give it a bump!
-					AddSpeedX(-4 / sqrt(2.0));
-					AddSpeedZ(4 / sqrt(2.0));
-				}
-				else
-				{
-					// ~ SpeedX < 0 Moving in the "right" direction. Only accelerate it a bit.
-					SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
-					SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
-				}
-			}
-			else if ((GetSpeedX() * 0.4 / sqrt(2.0)) < 0.01)
-			{
-				// Moving +X -Z
-				// ~ SpeedX <= 0 Immobile or not moving in the "right" direction
-				AddSpeedX(4 / sqrt(2.0));
-				AddSpeedZ(-4 / sqrt(2.0));
-			}
-			else
-			{
-				// ~ SpeedX > 0 Moving in the "right" direction
-				SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
-				SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
-			}
-			break;
-		}
-		case E_META_RAIL_CURVED_ZM_XP:
-		case E_META_RAIL_CURVED_ZP_XM:
+		switch (a_RailMeta)
 		{
-			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
-
-			// Prevent division by small numbers
-			if (std::abs(Distance.z) < 0.001)
+			case E_META_RAIL_ZM_ZP:
 			{
-				Distance.z = 0.001;
-			}
-
-			/* Check to which side the minecart is to be pushed.
-			Let's consider a z-x-coordinate system where the minecart is the center (0, 0).
-			The minecart moves along the line x = z, the perpendicular line to this is x = -z.
-			In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located. */
-			if (
-				((Distance.z > 0) && ((Distance.x / Distance.z) <= -1)) ||
-				((Distance.z < 0) && ((Distance.x / Distance.z) >= -1))
-			)
-			{
-				// Moving +X +Z
-				if ((GetSpeedX() * 0.4) < 0.01)
+				if (MinecartCollisionCallback.GetCollidedEntityPosition().z >= GetPosZ())
 				{
+					if (GetSpeedZ() > 0)  // True if minecart is moving into the direction of the entity
+					{
+						SetSpeedZ(0);  // Entity handles the pushing
+					}
+				}
+				else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().z < GetPosZ())
+				{
+					if (GetSpeedZ() < 0)  // True if minecart is moving into the direction of the entity
+					{
+						SetSpeedZ(0);  // Entity handles the pushing
+					}
+				}
+				return true;
+			}
+			case E_META_RAIL_XM_XP:
+			{
+				if (MinecartCollisionCallback.GetCollidedEntityPosition().x >= GetPosX())
+				{
+					if (GetSpeedX() > 0)  // True if minecart is moving into the direction of the entity
+					{
+						SetSpeedX(0);  // Entity handles the pushing
+					}
+				}
+				else  // if (MinecartCollisionCallback.GetCollidedEntityPosition().x < GetPosX())
+				{
+					if (GetSpeedX() < 0)  // True if minecart is moving into the direction of the entity
+					{
+						SetSpeedX(0);  // Entity handles the pushing
+					}
+				}
+				return true;
+			}
+			case E_META_RAIL_CURVED_ZM_XM:
+			case E_META_RAIL_CURVED_ZP_XP:
+			{
+				Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
+
+				// Prevent division by small numbers
+				if (std::abs(Distance.z) < 0.001)
+				{
+					Distance.z = 0.001;
+				}
+
+				/* Check to which side the minecart is to be pushed.
+				Let's consider a z-x-coordinate system where the minecart is the center (0, 0).
+				The minecart moves along the line x = -z, the perpendicular line to this is x = z.
+				In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located. */
+				if (
+					((Distance.z > 0) && ((Distance.x / Distance.z) >= 1)) ||
+					((Distance.z < 0) && ((Distance.x / Distance.z) <= 1))
+				)
+				{
+					// Moving -X +Z
+					if ((-GetSpeedX() * 0.4 / sqrt(2.0)) < 0.01)
+					{
+						// ~ SpeedX >= 0 Immobile or not moving in the "right" direction. Give it a bump!
+						AddSpeedX(-4 / sqrt(2.0));
+						AddSpeedZ(4 / sqrt(2.0));
+					}
+					else
+					{
+						// ~ SpeedX < 0 Moving in the "right" direction. Only accelerate it a bit.
+						SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
+						SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
+					}
+				}
+				else if ((GetSpeedX() * 0.4 / sqrt(2.0)) < 0.01)
+				{
+					// Moving +X -Z
 					// ~ SpeedX <= 0 Immobile or not moving in the "right" direction
 					AddSpeedX(4 / sqrt(2.0));
-					AddSpeedZ(4 / sqrt(2.0));
+					AddSpeedZ(-4 / sqrt(2.0));
 				}
 				else
 				{
@@ -932,24 +898,59 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 					SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
 					SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
 				}
+				break;
 			}
-			else if ((-GetSpeedX() * 0.4) < 0.01)
+			case E_META_RAIL_CURVED_ZM_XP:
+			case E_META_RAIL_CURVED_ZP_XM:
 			{
-				// Moving -X -Z
-				// ~ SpeedX >= 0 Immobile or not moving in the "right" direction
-				AddSpeedX(-4 / sqrt(2.0));
-				AddSpeedZ(-4 / sqrt(2.0));
+				Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
+
+				// Prevent division by small numbers
+				if (std::abs(Distance.z) < 0.001)
+				{
+					Distance.z = 0.001;
+				}
+
+				/* Check to which side the minecart is to be pushed.
+				Let's consider a z-x-coordinate system where the minecart is the center (0, 0).
+				The minecart moves along the line x = z, the perpendicular line to this is x = -z.
+				In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located. */
+				if (
+					((Distance.z > 0) && ((Distance.x / Distance.z) <= -1)) ||
+					((Distance.z < 0) && ((Distance.x / Distance.z) >= -1))
+				)
+				{
+					// Moving +X +Z
+					if ((GetSpeedX() * 0.4) < 0.01)
+					{
+						// ~ SpeedX <= 0 Immobile or not moving in the "right" direction
+						AddSpeedX(4 / sqrt(2.0));
+						AddSpeedZ(4 / sqrt(2.0));
+					}
+					else
+					{
+						// ~ SpeedX > 0 Moving in the "right" direction
+						SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
+						SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
+					}
+				}
+				else if ((-GetSpeedX() * 0.4) < 0.01)
+				{
+					// Moving -X -Z
+					// ~ SpeedX >= 0 Immobile or not moving in the "right" direction
+					AddSpeedX(-4 / sqrt(2.0));
+					AddSpeedZ(-4 / sqrt(2.0));
+				}
+				else
+				{
+					// ~ SpeedX < 0 Moving in the "right" direction
+					SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
+					SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
+				}
+				break;
 			}
-			else
-			{
-				// ~ SpeedX < 0 Moving in the "right" direction
-				SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
-				SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
-			}
-			break;
+			default: break;
 		}
-		default: break;
-	}
 
 	return false;
 }
