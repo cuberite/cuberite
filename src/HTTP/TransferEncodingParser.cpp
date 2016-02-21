@@ -1,7 +1,7 @@
 
 // TransferEncodingParser.cpp
 
-// Implements the cTransferEncodingParser class and its descendants representing the parser for the various transfer encodings (chunked etc.)
+// Implements the cTransferEncodingParser class and its descendants representing the parsers for the various transfer encodings (chunked etc.)
 
 #include "Globals.h"
 #include "TransferEncodingParser.h"
@@ -50,6 +50,7 @@ protected:
 	When in psChunkLength, the value is the currently parsed length digits. */
 	size_t m_ChunkDataLengthLeft;
 
+	/** The parser used for the last (empty) chunk's trailer data */
 	cEnvelopeParser m_TrailerParser;
 
 

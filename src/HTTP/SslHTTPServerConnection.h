@@ -1,7 +1,7 @@
 
 // SslHTTPServerConnection.h
 
-// Declared the cSslHTTPServerConnection class representing a HTTP connection made over a SSL link
+// Declares the cSslHTTPServerConnection class representing a HTTP connection made over an SSL link
 
 
 
