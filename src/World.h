@@ -513,7 +513,7 @@ public:
 	Executes the HOOK_EXPLODING and HOOK_EXPLODED hooks as part of the processing.
 	a_SourceData exact type depends on the a_Source, see the declaration of the esXXX constants in BlockID.h for details.
 	Exported to Lua manually in ManualBindings_World.cpp in order to support the variable a_SourceData param. */
-	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) override;
+	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, bool a_CanDestroyBlocks, bool a_CanDamageEntities, eExplosionSource a_Source, void * a_SourceData) override;
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp

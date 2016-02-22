@@ -637,14 +637,14 @@ bool cPluginManager::CallHookExploded(cWorld & a_World, double a_ExplosionSize, 
 
 
 
-bool cPluginManager::CallHookExploding(cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
+bool cPluginManager::CallHookExploding(cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, bool & a_CanDestroyBlocks, bool & a_CanDamageEntities, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
 {
 	FIND_HOOK(HOOK_EXPLODING);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnExploding(a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData))
+		if ((*itr)->OnExploding(a_World, a_ExplosionSize, a_CanCauseFire, a_CanDestroyBlocks, a_CanDamageEntities, a_X, a_Y, a_Z, a_Source, a_SourceData))
 		{
 			return true;
 		}

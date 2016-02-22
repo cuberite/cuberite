@@ -25,7 +25,8 @@ public:
 
 	virtual cBroadcastInterface & GetBroadcastManager() = 0;
 
-	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0;
+	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, bool a_CanDestroyBlocks, bool a_CanDamageEntities, eExplosionSource a_Source, void * a_SourceData) = 0;
+
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) = 0;
