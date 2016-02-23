@@ -1685,7 +1685,7 @@ bool cChunkMap::HasEntity(UInt32 a_UniqueID)
 void cChunkMap::RemoveEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
+	cChunkPtr Chunk = a_Entity->GetParentChunk();
 
 	// Even if a chunk is not valid, it may still contain entities such as players; make sure to remove them (#1190)
 	if (Chunk == nullptr)
