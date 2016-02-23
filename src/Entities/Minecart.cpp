@@ -25,7 +25,7 @@ class cMinecartCollisionCallback :
 {
 public:
 	cMinecartCollisionCallback(Vector3d a_Pos, double a_Height, double a_Width, UInt32 a_UniqueID, UInt32 a_AttacheeUniqueID) :
-		m_DoesInteserct(false),
+		m_DoesIntersect(false),
 		m_CollidedEntityPos(0, 0, 0),
 		m_Pos(a_Pos),
 		m_Height(a_Height),
@@ -54,7 +54,7 @@ public:
 		if (bbEntity.DoesIntersect(bbMinecart))
 		{
 			m_CollidedEntityPos = a_Entity->GetPosition();
-			m_DoesInteserct = true;
+			m_DoesIntersect = true;
 			return true;
 		}
 		return false;
@@ -62,7 +62,7 @@ public:
 
 	bool FoundIntersection(void) const
 	{
-		return m_DoesInteserct;
+		return m_DoesIntersect;
 	}
 
 	Vector3d GetCollidedEntityPosition(void) const
@@ -71,7 +71,7 @@ public:
 	}
 
 protected:
-	bool m_DoesInteserct;
+	bool m_DoesIntersect;
 
 	Vector3d m_CollidedEntityPos;
 
@@ -768,25 +768,71 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			break;
 		}
 		case E_META_RAIL_CURVED_ZM_XM:
-		case E_META_RAIL_CURVED_ZM_XP:
-		case E_META_RAIL_CURVED_ZP_XM:
-		case E_META_RAIL_CURVED_ZP_XP:
 		{
 			BLOCKTYPE BlockXM = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
-			BLOCKTYPE BlockXP = m_World->GetBlock(POSX_TOINT + 1, POSY_TOINT, POSZ_TOINT);
 			BLOCKTYPE BlockZM = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
-			BLOCKTYPE BlockZP = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT + 1);
+
 			if (
-				(!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)) ||
-				(!IsBlockRail(BlockXP) && cBlockInfo::IsSolid(BlockXP)) ||
-				(!IsBlockRail(BlockZM) && cBlockInfo::IsSolid(BlockZM)) ||
-				(!IsBlockRail(BlockZP) && cBlockInfo::IsSolid(BlockZP))
+				((GetSpeedZ() < 0) && (!IsBlockRail(BlockZM) && cBlockInfo::IsSolid(BlockZM))) ||
+				((GetSpeedX() < 0) && (!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)))
 				)
 			{
 				SetSpeed(0, 0, 0);
 				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
 				return true;
 			}
+
+			break;
+		}
+		case E_META_RAIL_CURVED_ZM_XP:
+		{
+			BLOCKTYPE BlockXP = m_World->GetBlock(POSX_TOINT + 1, POSY_TOINT, POSZ_TOINT);
+			BLOCKTYPE BlockZM = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
+
+			if (
+				((GetSpeedZ() < 0) && (!IsBlockRail(BlockZM) && cBlockInfo::IsSolid(BlockZM))) ||
+				((GetSpeedX() > 0) && (!IsBlockRail(BlockXP) && cBlockInfo::IsSolid(BlockXP)))
+				)
+			{
+				SetSpeed(0, 0, 0);
+				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
+				return true;
+			}
+
+			break;
+		}
+		case E_META_RAIL_CURVED_ZP_XM:
+		{
+			BLOCKTYPE BlockXM = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
+			BLOCKTYPE BlockZP = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT + 1);
+
+			if (
+				((GetSpeedZ() > 0) && (!IsBlockRail(BlockZP) && cBlockInfo::IsSolid(BlockZP))) ||
+				((GetSpeedX() < 0) && (!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)))
+				)
+			{
+				SetSpeed(0, 0, 0);
+				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
+				return true;
+			}
+
+			break;
+		}
+		case E_META_RAIL_CURVED_ZP_XP:
+		{
+			BLOCKTYPE BlockXP = m_World->GetBlock(POSX_TOINT + 1, POSY_TOINT, POSZ_TOINT);
+			BLOCKTYPE BlockZP = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT + 1);
+
+			if (
+				((GetSpeedZ() > 0) && (!IsBlockRail(BlockZP) && cBlockInfo::IsSolid(BlockZP))) ||
+				((GetSpeedX() > 0) && (!IsBlockRail(BlockXP) && cBlockInfo::IsSolid(BlockXP)))
+				)
+			{
+				SetSpeed(0, 0, 0);
+				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
+				return true;
+			}
+
 			break;
 		}
 		default: break;
