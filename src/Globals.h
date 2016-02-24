@@ -99,24 +99,9 @@
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
 
-	/*
-	// Copy and uncomment this into another #elif section based on your compiler identification
-
-	// Explicitly mark classes as abstract (no instances can be created)
-	#define abstract
-
-	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
-
-	// Mark functions as obsolete, so that their usage results in a compile-time warning
-	#define OBSOLETE
-
-	// Mark types / variables for alignment. Do the platforms need it?
-	#define ALIGN_8
-	#define ALIGN_16
-	*/
-
 #endif
+
+
 
 
 #ifdef  _DEBUG
