@@ -28,13 +28,25 @@ overhead; this however means that there's (an arbitrary) limit to the size of th
 
 
 
+/** Maximum size of the generated area.
+This value is used only if there isn't an override in place.
+To adjust the actual buffer size, just do a "#define PROT_INT_BUFFER_SIZE 9000" before including this header.
+Note, however, that you should use a consistent value throughout a single project. */
+#ifndef PROT_INT_BUFFER_SIZE
+	#define PROT_INT_BUFFER_SIZE 900
+#endif
+
+
+
+
+
 /** Interface that all the generator classes provide. */
 class cProtIntGen
 {
 protected:
 	/** Maximum size of the generated area.
 	Adjust the constant if you need larger areas, these are just so that we can use fixed-size buffers. */
-	static const int m_BufferSize = 900;
+	static const int m_BufferSize = PROT_INT_BUFFER_SIZE;
 
 public:
 

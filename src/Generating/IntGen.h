@@ -29,9 +29,9 @@ by using templates.
 
 #pragma once
 
-#include "../BiomeDef.h"
-
 #include <tuple>
+#include "../BiomeDef.h"
+#include "../Noise/Noise.h"
 
 
 
