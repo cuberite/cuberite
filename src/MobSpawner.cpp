@@ -134,6 +134,11 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 		return false;
 	}
 
+	if (cChunkDef::IsValidHeight(a_RelY - 1) && (a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ) == E_BLOCK_BEDROCK))
+	{
+		return false;   // Make sure mobs do not spawn on bedrock.
+	}
+
 	cFastRandom Random;
 	BLOCKTYPE TargetBlock = a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ);
 
