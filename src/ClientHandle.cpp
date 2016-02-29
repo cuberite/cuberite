@@ -761,6 +761,13 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		return;
 	}
 
+	if (m_Player->IsTeleporting())
+	{
+		m_Player->SetIsTeleporting(false);
+		// Skip this once for Teleporting
+		return;
+	}
+
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	Vector3d OldPosition = GetPlayer()->GetPosition();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();

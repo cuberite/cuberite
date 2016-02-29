@@ -324,6 +324,11 @@ public:
 	/** Returns true if the player is currently flying. */
 	bool IsFlying(void) const { return m_IsFlying; }
 
+	/** Returns true if the player is currently teleporting. */
+	bool IsTeleporting(void) const { return m_bIsTeleporting; }
+
+	void SetIsTeleporting(bool a_IsTeleporting) { m_bIsTeleporting = a_IsTeleporting; }
+
 	/** Returns if a player is sleeping in a bed */
 	bool IsInBed(void) const { return m_bIsInBed; }
 

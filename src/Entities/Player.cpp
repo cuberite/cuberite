@@ -2177,11 +2177,6 @@ bool cPlayer::IsClimbing(void) const
 
 void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround)
 {
-	if (m_bIsTeleporting)
-	{
-		m_bIsTeleporting = false;
-		return;
-	}
 
 	StatValue Value = FloorC<StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 	if (m_AttachedTo == nullptr)
