@@ -62,36 +62,6 @@ public:
 
 
 
-	/** A base class that represents something related to a plugin
-	The plugin can reset this class so that the instance can continue to exist but will not engage the (possibly non-existent) plugin anymore.
-	This is used for scheduled tasks etc., so that they can be queued and reset when the plugin is terminated, without removing them from the queue. */
-	class cResettable
-	{
-	public:
-		/** Creates a new instance bound to the specified plugin. */
-		cResettable(cPluginLua & a_Plugin);
-
-		// Force a virtual destructor in descendants:
-		virtual ~cResettable() {}
-
-		/** Resets the plugin instance stored within.
-		The instance will continue to exist, but should not call into the plugin anymore. */
-		virtual void Reset(void);
-
-	protected:
-		/** The plugin that this instance references.
-		If nullptr, the plugin has already unloaded and the instance should bail out any processing.
-		Protected against multithreaded access by m_CSPlugin. */
-		cPluginLua * m_Plugin;
-
-		/** The mutex protecting m_Plugin against multithreaded access. */
-		cCriticalSection m_CSPlugin;
-	};
-
-	typedef SharedPtr<cResettable> cResettablePtr;
-	typedef std::vector<cResettablePtr> cResettablePtrs;
-
-
 	cPluginLua(const AString & a_PluginDirectory);
 	~cPluginLua();
 
@@ -223,9 +193,6 @@ public:
 		return m_LuaState.Call(a_Fn, a_Args...);
 	}
 
-	/** Adds the specified cResettable instance to m_Resettables, so that it is notified when the plugin is being closed. */
-	void AddResettable(cResettablePtr a_Resettable);
-
 protected:
 	/** Maps command name into Lua function reference */
 	typedef std::map<AString, int> CommandMap;
@@ -237,14 +204,11 @@ protected:
 	typedef std::map<int, cLuaCallbacks> cHookMap;
 
 
-	/** The mutex protecting m_LuaState and each of the m_Resettables[] against multithreaded use. */
+	/** The mutex protecting m_LuaState against multithreaded use. */
 	cCriticalSection m_CriticalSection;
 
 	/** The plugin's Lua state. */
 	cLuaState m_LuaState;
-
-	/** Objects that need notification when the plugin is about to be unloaded. */
-	cResettablePtrs m_Resettables;
 
 	/** In-game commands that the plugin has registered. */
 	CommandMap m_Commands;
