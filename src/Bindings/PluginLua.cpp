@@ -60,7 +60,6 @@ void cPluginLua::Close(void)
 	// If already closed, bail out:
 	if (!m_LuaState.IsValid())
 	{
-		ASSERT(m_Resettables.empty());
 		ASSERT(m_HookMap.empty());
 		return;
 	}
@@ -69,18 +68,6 @@ void cPluginLua::Close(void)
 	ClearCommands();
 	ClearConsoleCommands();
 	ClearWebTabs();
-
-	// Notify and remove all m_Resettables (unlock the m_CriticalSection while resetting them):
-	cResettablePtrs resettables;
-	std::swap(m_Resettables, resettables);
-	{
-		cCSUnlock Unlock(Lock);
-		for (auto resettable: resettables)
-		{
-			resettable->Reset();
-		}
-		m_Resettables.clear();
-	}  // cCSUnlock (m_CriticalSection)
 
 	// Release all the references in the hook map:
 	m_HookMap.clear();
@@ -1244,16 +1231,6 @@ int cPluginLua::CallFunctionFromForeignState(
 
 
 
-void cPluginLua::AddResettable(cPluginLua::cResettablePtr a_Resettable)
-{
-	cCSLock Lock(m_CriticalSection);
-	m_Resettables.push_back(a_Resettable);
-}
-
-
-
-
-
 void cPluginLua::BindCommand(const AString & a_Command, int a_FnRef)
 {
 	ASSERT(m_Commands.find(a_Command) == m_Commands.end());
@@ -1317,28 +1294,6 @@ void cPluginLua::ClearWebTabs(void)
 	{
 		webAdmin->RemoveAllPluginWebTabs(m_Name);
 	}
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cPluginLua::cResettable:
-
-cPluginLua::cResettable::cResettable(cPluginLua & a_Plugin):
-	m_Plugin(&a_Plugin)
-{
-}
-
-
-
-
-
-void cPluginLua::cResettable::Reset(void)
-{
-	cCSLock Lock(m_CSPlugin);
-	m_Plugin = nullptr;
 }
 
 
