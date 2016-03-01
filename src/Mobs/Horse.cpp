@@ -176,5 +176,8 @@ void cHorse::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
-	super::HandleSpeedFromAttachee(a_Forward * m_Speed, a_Sideways * m_Speed);
+	if ((m_bIsTame) && (m_bIsSaddled))
+	{
+		super::HandleSpeedFromAttachee(a_Forward * m_Speed, a_Sideways * m_Speed);
+	}
 }
