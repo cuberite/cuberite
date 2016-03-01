@@ -8,7 +8,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include")
 
 set(FOLDERS
-	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
+	OSSupport HTTP Items Blocks Protocol Generating PolarSSL++ Bindings
 	WorldStorage Mobs Entities Simulator Simulator/IncrementalRedstoneSimulator
 	BlockEntities UI Noise
 )

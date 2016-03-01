@@ -36,7 +36,7 @@
 #include "../StringCompression.h"
 #include "../CommandOutput.h"
 #include "../BuildInfo.h"
-#include "../HTTPServer/UrlParser.h"
+#include "../HTTP/UrlParser.h"
 
 
 

@@ -36,7 +36,7 @@ public:
 	virtual ~cHTTPMessage() {}
 
 	/** Adds a header into the internal map of headers. Recognizes special headers: Content-Type and Content-Length */
-	void AddHeader(const AString & a_Key, const AString & a_Value);
+	virtual void AddHeader(const AString & a_Key, const AString & a_Value);
 
 	void SetContentType  (const AString & a_ContentType) { m_ContentType   = a_ContentType; }
 	void SetContentLength(size_t a_ContentLength)        { m_ContentLength = a_ContentLength; }
@@ -49,7 +49,8 @@ protected:
 
 	eKind m_Kind;
 
-	cNameValueMap m_Headers;
+	/** Map of headers, with their keys lowercased. */
+	AStringMap m_Headers;
 
 	/** Type of the content; parsed by AddHeader(), set directly by SetContentLength() */
 	AString m_ContentType;
@@ -64,22 +65,42 @@ protected:
 
 
 
-class cHTTPRequest :
-	public cHTTPMessage,
-	protected cEnvelopeParser::cCallbacks
+/** Stores outgoing response headers and serializes them to an HTTP data stream. */
+class cHTTPOutgoingResponse :
+	public cHTTPMessage
 {
 	typedef cHTTPMessage super;
 
 public:
-	cHTTPRequest(void);
+	cHTTPOutgoingResponse(void);
 
-	/** Parses the request line and then headers from the received data.
-	Returns the number of bytes consumed or AString::npos number for error
-	*/
-	size_t ParseHeaders(const char * a_Data, size_t a_Size);
+	/** Appends the response to the specified datastream - response line and headers.
+	The body will be sent later directly through cConnection::Send() */
+	void AppendToData(AString & a_DataStream) const;
+} ;
 
-	/** Returns true if the request did contain a Content-Length header */
-	bool HasReceivedContentLength(void) const { return (m_ContentLength != AString::npos); }
+
+
+
+
+/** Provides storage for an incoming HTTP request. */
+class cHTTPIncomingRequest:
+	public cHTTPMessage
+{
+	typedef cHTTPMessage Super;
+public:
+	/** Base class for anything that can be used as the UserData for the request. */
+	class cUserData
+	{
+	public:
+		// Force a virtual destructor in descendants:
+		virtual ~cUserData() {}
+	};
+	typedef SharedPtr<cUserData> cUserDataPtr;
+
+
+	/** Creates a new instance of the class, containing the method and URL provided by the client. */
+	cHTTPIncomingRequest(const AString & a_Method, const AString & a_URL);
 
 	/** Returns the method used in the request */
 	const AString & GetMethod(void) const { return m_Method; }
@@ -87,20 +108,10 @@ public:
 	/** Returns the URL used in the request */
 	const AString & GetURL(void) const { return m_URL; }
 
-	/** Returns the URL used in the request, without any parameters */
-	AString GetBareURL(void) const;
+	/** Returns the path part of the URL. */
+	AString GetURLPath(void) const;
 
-	/** Sets the UserData pointer that is stored within this request.
-	The request doesn't touch this data (doesn't delete it)! */
-	void SetUserData(void * a_UserData) { m_UserData = a_UserData; }
-
-	/** Retrieves the UserData pointer that has been stored within this request. */
-	void * GetUserData(void) const { return m_UserData; }
-
-	/** Returns true if more data is expected for the request headers */
-	bool IsInHeaders(void) const { return m_EnvelopeParser.IsInHeaders(); }
-
-	/** Returns true if the request did present auth data that was understood by the parser */
+	/** Returns true if the request has had the Auth header present. */
 	bool HasAuth(void) const { return m_HasAuth; }
 
 	/** Returns the username that the request presented. Only valid if HasAuth() is true */
@@ -111,24 +122,23 @@ public:
 
 	bool DoesAllowKeepAlive(void) const { return m_AllowKeepAlive; }
 
+	/** Attaches any kind of data to this request, to be later retrieved by GetUserData(). */
+	void SetUserData(cUserDataPtr a_UserData) { m_UserData = a_UserData; }
+
+	/** Returns the data attached to this request by the class client. */
+	cUserDataPtr GetUserData(void) { return m_UserData; }
+
+	/** Adds the specified header into the internal list of headers.
+	Overrides the parent to add recognizing additional headers: auth and keepalive. */
+	virtual void AddHeader(const AString & a_Key, const AString & a_Value) override;
+
 protected:
-	/** Parser for the envelope data */
-	cEnvelopeParser m_EnvelopeParser;
-
-	/** True if the data received so far is parsed successfully. When false, all further parsing is skipped */
-	bool m_IsValid;
-
-	/** Bufferred incoming data, while parsing for the request line */
-	AString m_IncomingHeaderData;
 
 	/** Method of the request (GET / PUT / POST / ...) */
 	AString m_Method;
 
 	/** Full URL of the request */
 	AString m_URL;
-
-	/** Data that the HTTPServer callbacks are allowed to store. */
-	void * m_UserData;
 
 	/** Set to true if the request contains auth data that was understood by the parser */
 	bool m_HasAuth;
@@ -143,34 +153,6 @@ protected:
 	If false, the server will close the connection once the request is finished */
 	bool m_AllowKeepAlive;
 
-
-	/** Parses the incoming data for the first line (RequestLine)
-	Returns the number of bytes consumed, or AString::npos for an error
-	*/
-	size_t ParseRequestLine(const char * a_Data, size_t a_Size);
-
-	// cEnvelopeParser::cCallbacks overrides:
-	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) override;
-} ;
-
-
-
-
-
-class cHTTPResponse :
-	public cHTTPMessage
-{
-	typedef cHTTPMessage super;
-
-public:
-	cHTTPResponse(void);
-
-	/** Appends the response to the specified datastream - response line and headers.
-	The body will be sent later directly through cConnection::Send()
-	*/
-	void AppendToData(AString & a_DataStream) const;
-} ;
-
-
-
-
+	/** Any data attached to the request by the class client. */
+	cUserDataPtr m_UserData;
+};

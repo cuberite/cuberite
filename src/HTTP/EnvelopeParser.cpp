@@ -28,12 +28,12 @@ size_t cEnvelopeParser::Parse(const char * a_Data, size_t a_Size)
 	}
 
 	// Start searching 1 char from the end of the already received data, if available:
-	size_t SearchStart = m_IncomingData.size();
-	SearchStart = (SearchStart > 1) ? SearchStart - 1 : 0;
+	auto searchStart = m_IncomingData.size();
+	searchStart = (searchStart > 1) ? searchStart - 1 : 0;
 
 	m_IncomingData.append(a_Data, a_Size);
 
-	size_t idxCRLF = m_IncomingData.find("\r\n", SearchStart);
+	size_t idxCRLF = m_IncomingData.find("\r\n", searchStart);
 	if (idxCRLF == AString::npos)
 	{
 		// Not a complete line yet, all input consumed:

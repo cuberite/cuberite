@@ -7,8 +7,8 @@
 
 #include "Bindings/LuaState.h"
 #include "IniFile.h"
-#include "HTTPServer/HTTPServer.h"
-#include "HTTPServer/HTTPFormParser.h"
+#include "HTTP/HTTPServer.h"
+#include "HTTP/HTTPMessage.h"
 
 
 
@@ -171,46 +171,6 @@ public:
 	static AString GetContentTypeFromFileExt(const AString & a_FileExtension);
 
 protected:
-	/** Common base class for request body data handlers */
-	class cRequestData
-	{
-	public:
-		virtual ~cRequestData() {}  // Force a virtual destructor in all descendants
-
-		/** Called when a new chunk of body data is received */
-		virtual void OnBody(const char * a_Data, size_t a_Size) = 0;
-	} ;
-
-	/** The body handler for requests in the "/webadmin" and "/~webadmin" paths */
-	class cWebadminRequestData :
-		public cRequestData,
-		public cHTTPFormParser::cCallbacks
-	{
-	public:
-		cHTTPFormParser m_Form;
-
-
-		cWebadminRequestData(cHTTPRequest & a_Request) :
-			m_Form(a_Request, *this)
-		{
-		}
-
-		// cRequestData overrides:
-		virtual void OnBody(const char * a_Data, size_t a_Size) override;
-
-		// cHTTPFormParser::cCallbacks overrides. Files are ignored:
-		virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override
-		{
-			UNUSED(a_FileName);
-		}
-		virtual void OnFileData(cHTTPFormParser &, const char * a_Data, size_t a_Size) override
-		{
-			UNUSED(a_Data);
-			UNUSED(a_Size);
-		}
-		virtual void OnFileEnd(cHTTPFormParser &) override {}
-	} ;
-
 
 	/** Set to true if Init() succeeds and the webadmin isn't to be disabled */
 	bool m_IsInitialized;
@@ -236,18 +196,18 @@ protected:
 	cHTTPServer m_HTTPServer;
 
 	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
-	void HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	void HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);
 
 	/** Handles requests for the root page */
-	void HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	void HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);
 
 	/** Handles requests for a file */
-	void HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+	void HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);
 
 	// cHTTPServer::cCallbacks overrides:
-	virtual void OnRequestBegun   (cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
-	virtual void OnRequestBody    (cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override;
-	virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
+	virtual void OnRequestBegun   (cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request) override;
+	virtual void OnRequestBody    (cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const char * a_Data, size_t a_Size) override;
+	virtual void OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request) override;
 } ;  // tolua_export
 
 
