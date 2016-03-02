@@ -20,6 +20,10 @@ extern "C"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 
+
+
+
+
 // fwd: "SQLite/lsqlite3.c"
 extern "C"
 {
@@ -38,6 +42,10 @@ extern "C"
 
 
 const cLuaState::cRet cLuaState::Return = {};
+
+/** Each Lua state stores a pointer to its creating cLuaState in Lua globals, under this name.
+This way any cLuaState can reference the main cLuaState's TrackedCallbacks, mutex etc. */
+static const char * g_CanonLuaStateGlobalName = "_CuberiteInternal_CanonLuaState";
 
 
 
@@ -114,6 +122,72 @@ cLuaStateTracker & cLuaStateTracker::Get(void)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cCallback:
+
+bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	// Check if the stack contains a function:
+	if (!lua_isfunction(a_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	// Clear any previous callback:
+	Clear();
+
+	// Add self to LuaState's callback-tracking:
+	a_LuaState.TrackCallback(*this);
+
+	// Store the new callback:
+	cCSLock Lock(m_CS);
+	m_Ref.RefStack(a_LuaState, a_StackPos);
+	return true;
+}
+
+
+
+
+
+void cLuaState::cCallback::Clear(void)
+{
+	// Free the callback reference:
+	lua_State * luaState = nullptr;
+	{
+		cCSLock Lock(m_CS);
+		if (!m_Ref.IsValid())
+		{
+			return;
+		}
+		luaState = m_Ref.GetLuaState();
+		m_Ref.UnRef();
+	}
+
+	// Remove from LuaState's callback-tracking:
+	cLuaState(luaState).UntrackCallback(*this);
+}
+
+
+
+
+
+void cLuaState::cCallback::Invalidate(void)
+{
+	cCSLock Lock(m_CS);
+	if (!m_Ref.IsValid())
+	{
+		LOGD("%s: Invalidating an already invalid callback at %p, this should not happen",
+			__FUNCTION__, reinterpret_cast<void *>(this)
+		);
+		return;
+	}
+	m_Ref.UnRef();
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
@@ -170,6 +244,10 @@ void cLuaState::Create(void)
 	luaL_openlibs(m_LuaState);
 	m_IsOwned = true;
 	cLuaStateTracker::Add(*this);
+
+	// Add the CanonLuaState value into the Lua state, so that we can get it from anywhere:
+	lua_pushlightuserdata(m_LuaState, reinterpret_cast<void *>(this));
+	lua_setglobal(m_LuaState, g_CanonLuaStateGlobalName);
 }
 
 
@@ -206,6 +284,16 @@ void cLuaState::Close(void)
 		Detach();
 		return;
 	}
+
+	// Invalidate all callbacks:
+	{
+		cCSLock Lock(m_CSTrackedCallbacks);
+		for (auto & c: m_TrackedCallbacks)
+		{
+			c->Invalidate();
+		}
+	}
+
 	cLuaStateTracker::Del(*this);
 	lua_close(m_LuaState);
 	m_LuaState = nullptr;
@@ -865,6 +953,15 @@ bool cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
 {
 	a_Ref.RefStack(*this, a_StackPos);
 	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cCallback & a_Callback)
+{
+	return a_Callback.RefStack(*this, a_StackPos);
 }
 
 
@@ -1626,6 +1723,52 @@ int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
 
 
 
+void cLuaState::TrackCallback(cCallback & a_Callback)
+{
+	// Get the CanonLuaState global from Lua:
+	auto cb = WalkToNamedGlobal(g_CanonLuaStateGlobalName);
+	if (!cb.IsValid())
+	{
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		return;
+	}
+	auto & canonState = *reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
+
+	// Add the callback:
+	cCSLock Lock(canonState.m_CSTrackedCallbacks);
+	canonState.m_TrackedCallbacks.push_back(&a_Callback);
+}
+
+
+
+
+
+void cLuaState::UntrackCallback(cCallback & a_Callback)
+{
+	// Get the CanonLuaState global from Lua:
+	auto cb = WalkToNamedGlobal(g_CanonLuaStateGlobalName);
+	if (!cb.IsValid())
+	{
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		return;
+	}
+	auto & canonState = *reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
+
+	// Remove the callback:
+	cCSLock Lock(canonState.m_CSTrackedCallbacks);
+	auto & trackedCallbacks = canonState.m_TrackedCallbacks;
+	trackedCallbacks.erase(std::remove_if(trackedCallbacks.begin(), trackedCallbacks.end(),
+		[&a_Callback](cCallback * a_StoredCallback)
+		{
+			return (a_StoredCallback == &a_Callback);
+		}
+	));
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 
@@ -1681,7 +1824,7 @@ void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 	{
 		UnRef();
 	}
-	m_LuaState = &a_LuaState;
+	m_LuaState = a_LuaState;
 	lua_pushvalue(a_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
 	m_Ref = luaL_ref(a_LuaState, LUA_REGISTRYINDEX);
 }
@@ -1692,11 +1835,9 @@ void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 
 void cLuaState::cRef::UnRef(void)
 {
-	ASSERT(m_LuaState->IsValid());  // The reference should be destroyed before destroying the LuaState
-
 	if (IsValid())
 	{
-		luaL_unref(*m_LuaState, LUA_REGISTRYINDEX, m_Ref);
+		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
 	m_LuaState = nullptr;
 	m_Ref = LUA_REFNIL;
