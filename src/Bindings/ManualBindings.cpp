@@ -992,7 +992,13 @@ static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, 
 	}
 
 	// Retrieve and check the hook type
-	int HookType = static_cast<int>(tolua_tonumber(S, a_ParamIdx, -1));
+	int HookType;
+	if (!S.GetStackValue(a_ParamIdx, HookType))
+	{
+		LOGWARNING("cPluginManager.AddHook(): Cannot read the hook type.");
+		S.LogStackTrace();
+		return 0;
+	}
 	if (!a_PluginManager->IsValidHookType(HookType))
 	{
 		LOGWARNING("cPluginManager.AddHook(): Invalid HOOK_TYPE parameter: %d", HookType);
@@ -1001,7 +1007,14 @@ static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, 
 	}
 
 	// Add the hook to the plugin
-	if (!Plugin->AddHookRef(HookType, a_ParamIdx + 1))
+	auto callback = std::make_shared<cLuaState::cCallback>();
+	if (!S.GetStackValue(a_ParamIdx + 1, callback))
+	{
+		LOGWARNING("cPluginManager.AddHook(): Cannot read the callback parameter");
+		S.LogStackTrace();
+		return 0;
+	}
+	if (!Plugin->AddHookCallback(HookType, callback))
 	{
 		LOGWARNING("cPluginManager.AddHook(): Cannot add hook %d, unknown error.", HookType);
 		S.LogStackTrace();
@@ -1058,10 +1071,11 @@ static int tolua_cPluginManager_AddHook_DefFn(cPluginManager * a_PluginManager, 
 	}
 
 	// Retrieve the function to call and add it to the plugin:
-	lua_pushstring(S, FnName);
-	bool res = Plugin->AddHookRef(HookType, 1);
-	lua_pop(S, 1);  // Pop the function off the stack
-	if (!res)
+	auto callback = std::make_shared<cLuaState::cCallback>();
+	lua_getglobal(S, FnName);
+	bool res = S.GetStackValue(-1, callback);
+	lua_pop(S, 1);
+	if (!res || !callback->IsValid())
 	{
 		LOGWARNING("cPluginManager.AddHook(): Function %s not found. Hook not added.", FnName);
 		S.LogStackTrace();

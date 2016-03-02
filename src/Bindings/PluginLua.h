@@ -201,11 +201,9 @@ public:
 	/** Returns the name of Lua function that should handle the specified hook type in the older (#121) API */
 	static const char * GetHookFnName(int a_HookType);
 
-	/** Adds a Lua function to be called for the specified hook.
-	The function has to be on the Lua stack at the specified index a_FnRefIdx
-	Returns true if the hook was added successfully.
-	*/
-	bool AddHookRef(int a_HookType, int a_FnRefIdx);
+	/** Adds a Lua callback to be called for the specified hook.
+	Returns true if the hook was added successfully. */
+	bool AddHookCallback(int a_HookType, cLuaState::cCallbackPtr a_Callback);
 
 	/** Calls a function in this plugin's LuaState with parameters copied over from a_ForeignState.
 	The values that the function returns are placed onto a_ForeignState.
@@ -233,10 +231,10 @@ protected:
 	typedef std::map<AString, int> CommandMap;
 
 	/** Provides an array of Lua function references */
-	typedef std::vector<cLuaState::cRef *> cLuaRefs;
+	typedef std::vector<cLuaState::cCallbackPtr> cLuaCallbacks;
 
 	/** Maps hook types into arrays of Lua function references to call for each hook type */
-	typedef std::map<int, cLuaRefs> cHookMap;
+	typedef std::map<int, cLuaCallbacks> cHookMap;
 
 
 	/** The mutex protecting m_LuaState and each of the m_Resettables[] against multithreaded use. */
@@ -263,6 +261,27 @@ protected:
 
 	/** Removes all WebTabs currently registered for this plugin from the WebAdmin. */
 	void ClearWebTabs(void);
+
+	/** Calls a hook that has the simple format - single bool return value specifying whether the chain should continue.
+	The advanced hook types that need more processing implement a similar loop manually instead.
+	Returns true if any of hook calls wants to abort the hook (returned true), false if all hook calls returned false. */
+	template <typename... Args>
+	bool CallSimpleHooks(int a_HookType, Args && ... a_Args)
+	{
+		cCSLock lock(m_CriticalSection);
+		auto & hooks = m_HookMap[a_HookType];
+		bool res = false;
+		for (auto & hook: hooks)
+		{
+			hook->Call(std::forward<Args>(a_Args)..., cLuaState::Return, res);
+			if (res)
+			{
+				// Hook wants to terminate the chain processing
+				return true;
+			}
+		}
+		return false;
+	}
 } ;  // tolua_export
 
 
