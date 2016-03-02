@@ -155,6 +155,9 @@ public:
 		/** Frees the contained callback, if any. */
 		void Clear(void);
 
+		/** Returns true if the contained callback is valid. */
+		bool IsValid(void);
+
 	protected:
 		friend class cLuaState;
 
@@ -332,9 +335,10 @@ public:
 	// Enum values are checked for their allowed values and fail if the value is not assigned.
 	bool GetStackValue(int a_StackPos, AString & a_Value);
 	bool GetStackValue(int a_StackPos, bool & a_Value);
+	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
+	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
 	bool GetStackValue(int a_StackPos, cRef & a_Ref);
-	bool GetStackValue(int a_StackPos, cCallback & a_Ref);
 	bool GetStackValue(int a_StackPos, double & a_Value);
 	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);

@@ -170,6 +170,16 @@ void cLuaState::cCallback::Clear(void)
 
 
 
+bool cLuaState::cCallback::IsValid(void)
+{
+	cCSLock lock(m_CS);
+	return m_Ref.IsValid();
+}
+
+
+
+
+
 void cLuaState::cCallback::Invalidate(void)
 {
 	cCSLock Lock(m_CS);
@@ -935,6 +945,24 @@ bool cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, cCallback & a_Callback)
+{
+	return a_Callback.RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cCallbackPtr & a_Callback)
+{
+	return a_Callback->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
 bool cLuaState::GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
@@ -953,15 +981,6 @@ bool cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
 {
 	a_Ref.RefStack(*this, a_StackPos);
 	return true;
-}
-
-
-
-
-
-bool cLuaState::GetStackValue(int a_StackPos, cCallback & a_Callback)
-{
-	return a_Callback.RefStack(*this, a_StackPos);
 }
 
 
