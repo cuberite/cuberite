@@ -2,7 +2,7 @@ return
 {
 	cPlugin =
 	{
-		Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own Plugin object.
+		Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own cPlugin object.
 ]],
 		Functions =
 		{
@@ -22,10 +22,10 @@ return
 
 	cPluginLua =
 	{
-		Desc = "",
+		Desc = "(<b>OBSOLETE</b>) This class is no longer useful in the API and will be removed as soon as all core plugins are migrated away from it. The {{cPlugin}} class serves as the main plugin instance's interface.",
 		Functions =
 		{
-			AddWebTab = { Params = "", Return = "", Notes = "Adds a new webadmin tab" },
+			AddWebTab = { Params = "Title, HandlerFn", Return = "", Notes = "<b>OBSOLETE</b> - Use {{cWebAdmin}}:AddWebTab() instead." },
 		},
 		Inherits = "cPlugin",
 	},  -- cPluginLua
@@ -81,6 +81,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			GetNumLoadedPlugins = { Params = "", Return = "number", Notes = "Returns the number of loaded plugins (psLoaded only)" },
 			GetNumPlugins = { Params = "", Return = "number", Notes = "Returns the number of plugins, including the disabled, errored, unloaded and not-found ones" },
 			GetPlugin = { Params = "PluginName", Return = "{{cPlugin}}", Notes = "(<b>DEPRECATED, UNSAFE</b>) Returns a plugin handle of the specified plugin, or nil if such plugin is not loaded. Note thatdue to multithreading the handle is not guaranteed to be safe for use when stored - a single-plugin reload may have been triggered in the mean time for the requested plugin." },
+			GetPluginFolderName = { Params = "PluginName", Return = "string", Notes = "Returns the name of the folder from which the plugin was loaded (without the \"Plugins\" part). Used as a plugin's display name." },
 			GetPluginsPath = { Params = "", Return = "string", Notes = "Returns the path where the individual plugin folders are located. Doesn't include the path separator at the end of the returned string." },
 			IsCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if in-game Command is already bound (by any plugin)" },
 			IsConsoleCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if console Command is already bound (by any plugin)" },

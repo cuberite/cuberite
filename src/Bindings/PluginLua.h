@@ -10,7 +10,6 @@
 #pragma once
 
 #include "Plugin.h"
-#include "WebPlugin.h"
 #include "LuaState.h"
 
 // Names for the global variables through which the plugin is identified in its LuaState
@@ -29,8 +28,7 @@ class cWindow;
 
 // tolua_begin
 class cPluginLua :
-	public cPlugin,
-	public cWebPlugin
+	public cPlugin
 {
 	typedef cPlugin super;
 
@@ -181,14 +179,6 @@ public:
 	/** Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121) */
 	bool CanAddOldStyleHook(int a_HookType);
 
-	// cWebPlugin overrides
-	virtual const AString GetWebTitle(void) const override {return GetName(); }
-	virtual AString HandleWebRequest(const HTTPRequest & a_Request) override;
-
-	/** Adds a new web tab to webadmin.
-	Displaying the tab calls the referenced function. */
-	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);  // Exported in ManualBindings.cpp
-
 	/** Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
 	void BindCommand(const AString & a_Command, int a_FnRef);
 
@@ -270,6 +260,9 @@ protected:
 
 	/** Releases all Lua references, notifies and removes all m_Resettables[] and closes the m_LuaState. */
 	void Close(void);
+
+	/** Removes all WebTabs currently registered for this plugin from the WebAdmin. */
+	void ClearWebTabs(void);
 } ;  // tolua_export
 
 
