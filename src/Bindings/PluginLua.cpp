@@ -15,6 +15,8 @@
 #include "../CommandOutput.h"
 #include "PluginManager.h"
 #include "../Item.h"
+#include "../Root.h"
+#include "../WebAdmin.h"
 
 extern "C"
 {
@@ -66,7 +68,7 @@ void cPluginLua::Close(void)
 	// Remove the command bindings and web tabs:
 	ClearCommands();
 	ClearConsoleCommands();
-	ClearTabs();
+	ClearWebTabs();
 
 	// Notify and remove all m_Resettables (unlock the m_CriticalSection while resetting them):
 	cResettablePtrs resettables;
@@ -205,7 +207,7 @@ bool cPluginLua::Load(void)
 
 void cPluginLua::Unload(void)
 {
-	ClearTabs();
+	ClearWebTabs();
 	super::Unload();
 	Close();
 }
@@ -2126,51 +2128,6 @@ void cPluginLua::AddResettable(cPluginLua::cResettablePtr a_Resettable)
 
 
 
-AString cPluginLua::HandleWebRequest(const HTTPRequest & a_Request)
-{
-	// Find the tab to use for the request:
-	auto TabName = GetTabNameForRequest(a_Request);
-	AString SafeTabTitle = TabName.second;
-	if (SafeTabTitle.empty())
-	{
-		return "";
-	}
-	auto Tab = GetTabBySafeTitle(SafeTabTitle);
-	if (Tab == nullptr)
-	{
-		return "";
-	}
-
-	// Get the page content from the plugin:
-	cCSLock Lock(m_CriticalSection);
-	AString Contents = Printf("WARNING: WebPlugin tab '%s' did not return a string!", Tab->m_Title.c_str());
-	if (!m_LuaState.Call(Tab->m_UserData, &a_Request, cLuaState::Return, Contents))
-	{
-		return "Lua encountered error while processing the page request";
-	}
-	return Contents;
-}
-
-
-
-
-
-bool cPluginLua::AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (a_LuaState != m_LuaState)
-	{
-		LOGERROR("Only allowed to add a tab to a WebPlugin of your own Plugin!");
-		return false;
-	}
-	AddNewWebTab(a_Title, a_FunctionReference);
-	return true;
-}
-
-
-
-
-
 void cPluginLua::BindCommand(const AString & a_Command, int a_FnRef)
 {
 	ASSERT(m_Commands.find(a_Command) == m_Commands.end());
@@ -2221,6 +2178,19 @@ void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int 
 
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Call(a_FnRef, &a_Window, a_SlotNum);
+}
+
+
+
+
+
+void cPluginLua::ClearWebTabs(void)
+{
+	auto webAdmin = cRoot::Get()->GetWebAdmin();
+	if (webAdmin != nullptr)  // can be nullptr when shutting down the server
+	{
+		webAdmin->RemoveAllPluginWebTabs(m_Name);
+	}
 }
 
 
