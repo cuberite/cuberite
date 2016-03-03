@@ -318,6 +318,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 			Resp.SetContentType("text/html");
 			a_Connection.Send(Resp);
 			a_Connection.Send(Template.c_str(), Template.length());
+			a_Connection.FinishResponse();
 			return;
 		}
 		a_Connection.SendStatusAndReason(500, "m_TemplateScript failed");
