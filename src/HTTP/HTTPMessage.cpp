@@ -152,6 +152,7 @@ void cHTTPIncomingRequest::AddHeader(const AString & a_Key, const AString & a_Va
 	{
 		m_AllowKeepAlive = true;
 	}
+	Super::AddHeader(a_Key, a_Value);
 }
 
 
