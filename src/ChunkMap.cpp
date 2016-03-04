@@ -1763,7 +1763,7 @@ bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback &
 
 
 
-void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected)
+void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanDestroyBlocks, bool a_CanDamageEntities, cVector3iArray & a_BlocksAffected)
 {
 	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
 	if (!cChunkDef::IsValidHeight(FloorC(a_BlockY)))
@@ -1771,12 +1771,10 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		return;
 	}
 
-	bool ShouldDestroyBlocks = true;
-
 	// Don't explode if the explosion center is inside a liquid block:
 	if (IsBlockLiquid(m_World->GetBlock(FloorC(a_BlockX), FloorC(a_BlockY), FloorC(a_BlockZ))))
 	{
-		ShouldDestroyBlocks = false;
+		a_CanDestroyBlocks = false;
 	}
 
 	int ExplosionSizeInt = CeilC(a_ExplosionSize);
@@ -1789,7 +1787,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	int MinY = std::max(FloorC(a_BlockY - ExplosionSizeInt), 0);
 	int MaxY = std::min(CeilC(a_BlockY + ExplosionSizeInt), cChunkDef::Height - 1);
 
-	if (ShouldDestroyBlocks)
+	if (a_CanDestroyBlocks)
 	{
 		cBlockArea area;
 		a_BlocksAffected.reserve(8 * static_cast<size_t>(ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt));
@@ -1896,10 +1894,11 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		public cEntityCallback
 	{
 	public:
-		cTNTDamageCallback(cBoundingBox & a_CBBBTNT, Vector3d a_CBExplosionPos, int a_CBExplosionSize) :
+		cTNTDamageCallback(cBoundingBox & a_CBBBTNT, Vector3d a_CBExplosionPos, int a_CBExplosionSize, bool a_CBCanDamageEntities) :
 			m_bbTNT(a_CBBBTNT),
 			m_ExplosionPos(a_CBExplosionPos),
-			m_ExplosionSize(a_CBExplosionSize)
+			m_ExplosionSize(a_CBExplosionSize),
+			m_CanDamageEntities(a_CBCanDamageEntities)
 		{
 		}
 
@@ -1922,8 +1921,11 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					return false;
 				}
 
-				// Ensure that the damage dealt is inversely proportional to the distance to the TNT centre - the closer a player is, the harder they are hit
-				a_Entity->TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / DistanceFromExplosion.Length()) * 6 * m_ExplosionSize), 0);
+				if (m_CanDamageEntities)
+				{
+					// Ensure that the damage dealt is inversely proportional to the distance to the TNT centre - the closer a player is, the harder they are hit
+					a_Entity->TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / DistanceFromExplosion.Length()) * 6 * m_ExplosionSize), 0);
+				}
 			}
 
 			// Apply force to entities around the explosion - code modified from World.cpp DoExplosionAt()
@@ -1938,13 +1940,14 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		cBoundingBox & m_bbTNT;
 		Vector3d m_ExplosionPos;
 		int m_ExplosionSize;
+		bool m_CanDamageEntities;
 	};
 
 	cBoundingBox bbTNT(Vector3d(a_BlockX, a_BlockY, a_BlockZ), 0.5, 1);
 	bbTNT.Expand(ExplosionSizeInt * 2, ExplosionSizeInt * 2, ExplosionSizeInt * 2);
 
 
-	cTNTDamageCallback TNTDamageCallback(bbTNT, Vector3d(a_BlockX, a_BlockY, a_BlockZ), ExplosionSizeInt);
+	cTNTDamageCallback TNTDamageCallback(bbTNT, Vector3d(a_BlockX, a_BlockY, a_BlockZ), ExplosionSizeInt, a_CanDamageEntities);
 	ForEachEntity(TNTDamageCallback);
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):

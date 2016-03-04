@@ -21,7 +21,7 @@ cGhastFireballEntity::cGhastFireballEntity(cEntity * a_Creator, double a_X, doub
 
 void cGhastFireballEntity::Explode(Vector3i a_Block)
 {
-	m_World->DoExplosionAt(1, a_Block.x, a_Block.y, a_Block.z, true, esGhastFireball, this);
+	m_World->DoExplosionAt(1, a_Block.x, a_Block.y, a_Block.z, true, true, true, esGhastFireball, this);
 }
 
 

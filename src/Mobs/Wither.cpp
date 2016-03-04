@@ -76,7 +76,7 @@ void cWither::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (NewTicks == 0)
 		{
-			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
+			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, true, true, esWitherBirth, this);
 		}
 
 		m_WitherInvulnerableTicks = NewTicks;

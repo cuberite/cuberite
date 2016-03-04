@@ -47,7 +47,7 @@ void cTNTEntity::Explode(void)
 	m_FuseTicks = 0;
 	Destroy(true);
 	LOGD("BOOM at {%f, %f, %f}", GetPosX(), GetPosY(), GetPosZ());
-	m_World->DoExplosionAt(4.0, GetPosX() + 0.49, GetPosY() + 0.49, GetPosZ() + 0.49, true, esPrimedTNT, this);
+	m_World->DoExplosionAt(4.0, GetPosX() + 0.49, GetPosY() + 0.49, GetPosZ() + 0.49, true, true, true, esPrimedTNT, this);
 }
 
 

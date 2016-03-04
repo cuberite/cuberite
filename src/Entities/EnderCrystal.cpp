@@ -43,7 +43,7 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 {
 	super::KilledBy(a_TDI);
 
-	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, esEnderCrystal, this);
+	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, true, true, esEnderCrystal, this);
 
 	Destroy();
 

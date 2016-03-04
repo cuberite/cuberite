@@ -114,16 +114,16 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
 {
 	/* Function signature:
-	World:DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceType, [SourceData])
+	World:DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, CanDestroyBlocks, CanDamageEntities, SourceType, [SourceData])
 	*/
 
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType     (1, "cWorld") ||
 		!L.CheckParamNumber       (2, 5) ||
-		!L.CheckParamBool         (6) ||
-		!L.CheckParamNumber       (7) ||
-		!L.CheckParamEnd          (9)
+		!L.CheckParamBool         (6, 8) ||
+		!L.CheckParamNumber       (9) ||
+		!L.CheckParamEnd          (10)
 	)
 	{
 		return 0;
@@ -134,8 +134,10 @@ static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
 	double ExplosionSize;
 	int BlockX, BlockY, BlockZ;
 	bool CanCauseFire;
+	bool CanDestroyBlocks;
+	bool CanDamageEntities;
 	int SourceTypeInt;
-	if (!L.GetStackValues(1, World, ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceTypeInt))
+	if (!L.GetStackValues(1, World, ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, CanDestroyBlocks, CanDamageEntities, SourceTypeInt))
 	{
 		LOGWARNING("World:DoExplosionAt(): invalid parameters");
 		L.LogStackTrace();
@@ -194,7 +196,7 @@ static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
 	}
 
 	// Create the actual explosion:
-	World->DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceType, SourceData);
+	World->DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, CanDestroyBlocks, CanDamageEntities, SourceType, SourceData);
 
 	return 0;
 }

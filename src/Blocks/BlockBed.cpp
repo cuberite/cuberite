@@ -86,7 +86,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 	if (a_WorldInterface.GetDimension() != dimOverworld)
 	{
 		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
-		a_WorldInterface.DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
+		a_WorldInterface.DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, true, true, esBed, &Coords);
 	}
 	else
 	{

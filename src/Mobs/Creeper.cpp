@@ -45,7 +45,7 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if ((m_ExplodingTimer == 30) && (GetHealth() > 0.0))  // only explode when not already dead
 		{
-			m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, esMonster, this);
+			m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, true, true, esMonster, this);
 			Destroy();  // Just in case we aren't killed by the explosion
 		}
 	}
