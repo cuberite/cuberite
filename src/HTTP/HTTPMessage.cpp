@@ -107,7 +107,8 @@ void cHTTPOutgoingResponse::AppendToData(AString & a_DataStream) const
 cHTTPIncomingRequest::cHTTPIncomingRequest(const AString & a_Method, const AString & a_URL):
 	Super(mkRequest),
 	m_Method(a_Method),
-	m_URL(a_URL)
+	m_URL(a_URL),
+	m_HasAuth(false)
 {
 }
 
