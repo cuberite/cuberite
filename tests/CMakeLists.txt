@@ -10,6 +10,7 @@ endif()
 
 add_subdirectory(ByteBuffer)
 add_subdirectory(ChunkData)
+add_subdirectory(CompositeChat)
 add_subdirectory(HTTP)
 add_subdirectory(LoadablePieces)
 add_subdirectory(Network)
