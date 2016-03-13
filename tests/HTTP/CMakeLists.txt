@@ -58,3 +58,16 @@ add_test(NAME HTTPMessageParser_file-test3-2 COMMAND HTTPMessageParser_file-exe 
 # Test parsing the request file in 512-byte chunks (should process everything in a single call):
 add_test(NAME HTTPMessageParser_file-test4-512 COMMAND HTTPMessageParser_file-exe HTTPRequest1.data 512)
 
+
+
+
+
+# Put all the tests into a solution folder (MSVC):
+set_target_properties(
+	HTTPMessageParser_file-exe
+	PROPERTIES FOLDER Tests
+)
+set_target_properties(
+	HTTP
+	PROPERTIES FOLDER Lib
+)

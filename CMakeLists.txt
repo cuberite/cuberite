@@ -264,27 +264,6 @@ if (MSVC)
 		tolua
 		PROPERTIES FOLDER Support
 	)
-	if (${SELF_TEST})
-		set_target_properties(
-			Network
-			HTTP
-			PROPERTIES FOLDER Lib
-		)
-		set_target_properties(
-			arraystocoords-exe
-			ChunkBuffer
-			coordinates-exe
-			copies-exe
-			copyblocks-exe
-			creatable-exe
-			EchoServer
-			Google-exe
-			HTTPMessageParser_file-exe
-			LoadablePieces
-			NameLookup
-			PROPERTIES FOLDER Tests
-		)
-	endif()
 
 	if(${BUILD_TOOLS})
 		set_target_properties(

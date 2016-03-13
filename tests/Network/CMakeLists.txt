@@ -78,7 +78,11 @@ set_target_properties(
 	Google-exe
 	NameLookup
 	EnumInterfaces-exe
-	PROPERTIES FOLDER Tests
+	PROPERTIES FOLDER Tests/Network
+)
+set_target_properties(
+	Network
+	PROPERTIES FOLDER Lib
 )
 
 
