@@ -83,6 +83,15 @@ public:
 		/** Returns the Lua state associated with the value. */
 		lua_State * GetLuaState(void) { return m_LuaState; }
 
+		/** Creates a Lua reference to the specified object instance in the specified Lua state.
+		This is useful to make anti-GC references for objects that were created by Lua and need to stay alive longer than Lua GC would normally guarantee. */
+		template <typename T> void CreateFromObject(cLuaState & a_LuaState, T && a_Object)
+		{
+			a_LuaState.Push(std::forward<T>(a_Object));
+			RefStack(a_LuaState, -1);
+			a_LuaState.Pop();
+		}
+
 	protected:
 		lua_State * m_LuaState;
 		int m_Ref;
@@ -157,6 +166,10 @@ public:
 
 		/** Returns true if the contained callback is valid. */
 		bool IsValid(void);
+
+		/** Returns true if the callback resides in the specified Lua state.
+		Internally, compares the callback's canon Lua state. */
+		bool IsSameLuaState(cLuaState & a_LuaState);
 
 	protected:
 		friend class cLuaState;
@@ -330,6 +343,9 @@ public:
 	void Push(const UInt32 a_Value);
 	void Push(std::chrono::milliseconds a_time);
 
+	/** Pops the specified number of values off the top of the Lua stack. */
+	void Pop(int a_NumValuesToPop = 1);
+
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
 	// Returns whether value was changed
 	// Enum values are checked for their allowed values and fail if the value is not assigned.
@@ -499,10 +515,14 @@ public:
 	void ToString(int a_StackPos, AString & a_String);
 
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
-	void LogStack(const char * a_Header = nullptr);
+	void LogStackValues(const char * a_Header = nullptr);
 
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
-	static void LogStack(lua_State * a_LuaState, const char * a_Header = nullptr);
+	static void LogStackValues(lua_State * a_LuaState, const char * a_Header = nullptr);
+
+	/** Returns the canon Lua state (the primary cLuaState instance that was used to create, rather than attach, the lua_State structure).
+	Returns nullptr if the canon Lua state cannot be queried. */
+	cLuaState * QueryCanonLuaState(void);
 
 protected:
 

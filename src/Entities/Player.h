@@ -225,10 +225,10 @@ public:
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
 
-	/** Opens the specified window; closes the current one first using CloseWindow() */
-	void OpenWindow(cWindow * a_Window);  // Exported in ManualBindings.cpp
-
 	// tolua_begin
+
+	/** Opens the specified window; closes the current one first using CloseWindow() */
+	void OpenWindow(cWindow * a_Window);
 
 	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true */
 	void CloseWindow(bool a_CanRefuse = true);

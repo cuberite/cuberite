@@ -15,14 +15,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cLuaWindow:
 
-cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title) :
-	super(a_WindowType, a_Title),
+cLuaWindow::cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title) :
+	Super(a_WindowType, a_Title),
 	m_Contents(a_SlotsX, a_SlotsY),
-	m_Plugin(nullptr),
-	m_LuaRef(LUA_REFNIL),
-	m_OnClosingFnRef(LUA_REFNIL),
-	m_OnSlotChangedFnRef(LUA_REFNIL)
+	m_LuaState(a_LuaState.QueryCanonLuaState())
 {
+	ASSERT(m_LuaState != nullptr);  // We must have a valid Lua state; this assert fails only if there was no Canon Lua state
+
 	m_Contents.AddListener(*this);
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(m_Contents, *this));
 
@@ -67,62 +66,42 @@ cLuaWindow::~cLuaWindow()
 
 
 
-void cLuaWindow::SetLuaRef(cPluginLua * a_Plugin, int a_LuaRef)
+void cLuaWindow::SetOnClosing(cLuaState::cCallbackPtr a_OnClosing)
 {
-	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
-	ASSERT((m_Plugin == nullptr) || (m_Plugin == a_Plugin));
-	ASSERT(m_LuaRef == LUA_REFNIL);
-	m_Plugin = a_Plugin;
-	m_LuaRef = a_LuaRef;
+	// Only one Lua state can be a cLuaWindow object callback:
+	ASSERT(a_OnClosing->IsSameLuaState(*m_LuaState));
+
+	// Store the new reference, releasing the old one if appropriate:
+	m_OnClosing = a_OnClosing;
 }
 
 
 
 
 
-bool cLuaWindow::IsLuaReferenced(void) const
+void cLuaWindow::SetOnSlotChanged(cLuaState::cCallbackPtr a_OnSlotChanged)
 {
-	return ((m_Plugin != nullptr) && (m_LuaRef != LUA_REFNIL));
+	// Only one Lua state can be a cLuaWindow object callback:
+	ASSERT(a_OnSlotChanged->IsSameLuaState(*m_LuaState));
+
+	// Store the new reference, releasing the old one if appropriate:
+	m_OnSlotChanged = a_OnSlotChanged;
 }
 
 
 
 
 
-void cLuaWindow::SetOnClosing(cPluginLua * a_Plugin, int a_FnRef)
+void cLuaWindow::OpenedByPlayer(cPlayer & a_Player)
 {
-	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
-	ASSERT((m_Plugin == nullptr) || (m_Plugin == a_Plugin));
-
-	// If there already was a function, unreference it first
-	if (m_OnClosingFnRef != LUA_REFNIL)
+	// If the first player is opening the window, create a Lua Reference to the window object so that Lua will not GC it until the last player closes the window:
+	if (m_PlayerCount == 0)
 	{
-		m_Plugin->Unreference(m_OnClosingFnRef);
+		m_LuaRef.CreateFromObject(*m_LuaState, this);
 	}
 
-	// Store the new reference
-	m_Plugin = a_Plugin;
-	m_OnClosingFnRef = a_FnRef;
-}
-
-
-
-
-
-void cLuaWindow::SetOnSlotChanged(cPluginLua * a_Plugin, int a_FnRef)
-{
-	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
-	ASSERT((m_Plugin == nullptr) || (m_Plugin == a_Plugin));
-
-	// If there already was a function, unreference it first
-	if (m_OnSlotChangedFnRef != LUA_REFNIL)
-	{
-		m_Plugin->Unreference(m_OnSlotChangedFnRef);
-	}
-
-	// Store the new reference
-	m_Plugin = a_Plugin;
-	m_OnSlotChangedFnRef = a_FnRef;
+	++m_PlayerCount;
+	Super::OpenedByPlayer(a_Player);
 }
 
 
@@ -132,17 +111,27 @@ void cLuaWindow::SetOnSlotChanged(cPluginLua * a_Plugin, int a_FnRef)
 bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 {
 	// First notify the plugin through the registered callback:
-	if (m_OnClosingFnRef != LUA_REFNIL)
+	if (m_OnClosing != nullptr)
 	{
-		ASSERT(m_Plugin != nullptr);
-		if (m_Plugin->CallbackWindowClosing(m_OnClosingFnRef, *this, a_Player, a_CanRefuse))
+		bool res;
+		if (
+			m_OnClosing->Call(this, &a_Player, a_CanRefuse, cLuaState::Return, res) &&  // The callback succeeded
+			res                                                                        // The callback says not to close the window
+		)
 		{
 			// The callback disagrees (the higher levels check the CanRefuse flag compliance)
 			return false;
 		}
 	}
 
-	return super::ClosedByPlayer(a_Player, a_CanRefuse);
+	// If the last player has closed the window, release the Lua reference, so that Lua may GC the object:
+	--m_PlayerCount;
+	if (m_PlayerCount == 0)
+	{
+		m_LuaRef.UnRef();
+	}
+
+	return Super::ClosedByPlayer(a_Player, a_CanRefuse);
 }
 
 
@@ -151,13 +140,7 @@ bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 
 void cLuaWindow::Destroy(void)
 {
-	super::Destroy();
-
-	if ((m_LuaRef != LUA_REFNIL) && (m_Plugin != nullptr))
-	{
-		// The object is referenced by Lua, un-reference it
-		m_Plugin->Unreference(m_LuaRef);
-	}
+	Super::Destroy();
 
 	// Lua will take care of this object, it will garbage-collect it, so we must not delete it!
 	m_IsDestroyed = false;
@@ -178,7 +161,7 @@ void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Pl
 		}
 	}
 
-	super::DistributeStackToAreas(a_ItemStack, a_Player, Areas, a_ShouldApply, false);
+	Super::DistributeStackToAreas(a_ItemStack, a_Player, Areas, a_ShouldApply, false);
 }
 
 
@@ -194,9 +177,9 @@ void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	}
 
 	// If an OnSlotChanged callback has been registered, call it:
-	if (m_OnSlotChangedFnRef != LUA_REFNIL)
+	if (m_OnSlotChanged != nullptr)
 	{
-		m_Plugin->CallbackWindowSlotChanged(m_OnSlotChangedFnRef, *this, a_SlotNum);
+		m_OnSlotChanged->Call(this, a_SlotNum);
 	}
 }
 
