@@ -196,7 +196,7 @@ echo " --- Downloading Cuberite's source code from the $BRANCH branch..."
 if [ ! -d cuberite ]; then
 	# Git: Clone.
 	echo " --- Looks like your first run, cloning the whole code..."
-	git clone https://github.com/cuberite/cuberite.git
+	git clone  --depth 1 https://github.com/cuberite/cuberite.git -b "$BRANCH"
 	cd cuberite
 else
 	# Git: Fetch.
