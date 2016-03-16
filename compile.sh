@@ -6,9 +6,9 @@ set -e
 #TODO command line parameter handling for non-interactive mode.
 
 # Do we already have a repo?
-if [ \( -d .git \) -a \( -f easyinstall.sh \) -a \( -f src/BlockArea.cpp \) ]; then # A good enough indicator that we're in the Cuberite git repo.
-cd ../
-echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
+if [ -d .git ] && [ -f easyinstall.sh ] && [ -f src/BlockArea.cpp ]; then # A good enough indicator that we're in the Cuberite git repo.
+	cd ../
+	echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
 fi
 
 # Error functions.
@@ -69,7 +69,7 @@ GCC_EXISTS=0
 CLANG_EXISTS=0
 $GCC_EXE_NAME --help > /dev/null 2> /dev/null && GCC_EXISTS=1
 $CLANG_EXE_NAME --help > /dev/null 2> /dev/null && CLANG_EXISTS=1
-if [ $GCC_EXISTS -eq 0 -a $CLANG_EXISTS -eq 0 ]; then
+if [ "$GCC_EXISTS" -eq 0 ] && [ "$CLANG_EXISTS" -eq 0 ]; then
 	MISSING_PACKAGES=" $COMPILER_PACKAGE_NAME"
 fi
 
@@ -79,7 +79,7 @@ checkPackages ()
 	echo "$PROGRAMS" | while read line; do
 		EXE_NAME=`echo "$line" | cut -f 1`
 		PACKAGE_NAME=`echo "$line" | cut -f 2`
-		command -v $EXE_NAME > /dev/null 2> /dev/null || echo -n " $PACKAGE_NAME"
+		command -v $EXE_NAME > /dev/null 2> /dev/null || printf %s " $PACKAGE_NAME"
 	done
 }
 MISSING_PACKAGES="$MISSING_PACKAGES`checkPackages`"
@@ -138,18 +138,22 @@ You can choose between 3 branches:
 
 
 # Input: Branch choice.
-echo -n "Choose the branch (s/t/d): "
+printf %s "Choose the branch (s/t/d): "
 read BRANCH
-if [ \( "$BRANCH" = "s" \) -o \( "$BRANCH" = "S" \) ]; then
-	#BRANCH="stable"
-	error "We don't have a stable branch yet, please use testing, sorry."
-elif [ \( $BRANCH = "t" \) -o \( $BRANCH = "T" \) ]; then
-	BRANCH="testing"
-elif [ \( $BRANCH = "d" \) -o \( $BRANCH = "D" \) ]; then
-	BRANCH="master"
-else
-	error "Unrecognized user input."
-fi
+case $BRANCH in
+	s|S)
+		error "We don't have a stable branch yet, please use testing, sorry."
+		;;
+	t|T)
+		BRANCH="testing"
+		;;
+	d|D)
+		BRANCH="master"
+		;;
+	*)
+		error "Unrecognized user input."
+		;;
+esac
 
 }
 ### Inactive code end. ###
@@ -171,16 +175,19 @@ code after this step. It will then compile your program.
 "
 
 # Input: Compile mode choice.
-echo -n "Choose compile mode: (n/d): "
+printf %s "Choose compile mode: (n/d): "
 read BUILDTYPE
-if [ \( "$BUILDTYPE" = "d" \) -o \( "$BUILDTYPE" = "D" \) ]; then
-	BUILDTYPE="Debug"
-elif [ \( "$BUILDTYPE" = "n" \) -o \( "$BUILDTYPE" = "N" \) ]; then
-	BUILDTYPE="Release"
-else
-	error "Unrecognized user input."
-fi
-
+case $BUILDTYPE in
+	d|D)
+		BUILDTYPE="Debug"
+		;;
+	n|N)
+		BUILDTYPE="Release"
+		;;
+	*)
+		error "Unrecognized user input."
+		;;
+esac
 
 # Echo: Downloading began.
 echo
