@@ -17,7 +17,7 @@ error ()
 	echo
 	echo "-----------------"
 	echo "Script aborted, reason:"
-	echo $1
+	echo "$@"
 	exit 1
 }
 
@@ -76,9 +76,8 @@ fi
 # Depdendency check.
 checkPackages ()
 {
-	echo "$PROGRAMS" | while read line; do
-		EXE_NAME=`echo "$line" | cut -f 1`
-		PACKAGE_NAME=`echo "$line" | cut -f 2`
+	# note that IFS is a TAB here!
+	echo "$PROGRAMS" | while IFS='	' read EXE_NAME PACKAGE_NAME __trash__; do
 		command -v $EXE_NAME > /dev/null 2> /dev/null || printf %s " $PACKAGE_NAME"
 	done
 }
@@ -93,23 +92,23 @@ if [ "$MISSING_PACKAGES" != "" ]; then
 
 	# apt-get guide.
 	apt-get --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo apt-get install$MISSING_PACKAGES"
+	missingDepsExit "sudo apt-get install $MISSING_PACKAGES"
 
 	# yum guide.
 	yum --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo yum install$MISSING_PACKAGES"
+	missingDepsExit "sudo yum install $MISSING_PACKAGES"
 
 	# zypper guide.
 	zypper --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo zypper install$MISSING_PACKAGES"
+	missingDepsExit "sudo zypper install $MISSING_PACKAGES"
 
 	# pacman guide.
 	pacman --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo pacman -S$MISSING_PACKAGES"
+	missingDepsExit "sudo pacman -S $MISSING_PACKAGES"
 
 	# urpmi guide.
 	urpmi --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo urpmi$MISSING_PACKAGES"
+	missingDepsExit "sudo urpmi $MISSING_PACKAGES"
 
 	missingDepsExit ""
 fi
@@ -203,9 +202,9 @@ else
 	# Git: Fetch.
 	cd cuberite
 	echo " --- Updating the $BRANCH branch..."
-	git fetch origin $BRANCH || error "git fetch failed"
-	git checkout $BRANCH || error "git checkout failed"
-	git merge origin/$BRANCH || error "git merge failed"
+	git fetch origin "$BRANCH" || error "git fetch failed"
+	git checkout "$BRANCH" || error "git checkout failed"
+	git merge "origin/$BRANCH" || error "git merge failed"
 fi
 
 # Git: Submodules.
@@ -217,7 +216,7 @@ git submodule update --init
 echo " --- Running cmake..."
 if [ ! -d build-cuberite ]; then mkdir build-cuberite; fi
 cd build-cuberite
-cmake .. -DCMAKE_BUILD_TYPE=$BUILDTYPE || error "cmake failed"
+cmake .. -DCMAKE_BUILD_TYPE="$BUILDTYPE" || error "cmake failed"
 
 
 # Make.
@@ -234,9 +233,9 @@ echo "Compilation done!"
 echo
 echo "Cuberite awaits you at:"
 if [ "$BUILDTYPE" = "Debug" ]; then
-	echo "`pwd`/Cuberite_debug"
+	echo "$PWD/Cuberite_debug"
 else
-	echo "`pwd`/Cuberite"
+	echo "$PWD/Cuberite"
 fi
 cd ..
 echo "
@@ -247,7 +246,11 @@ Enjoy :)"
 exit 0
 
 :windows_detected
-echo "This script is not available for Windows yet, sorry."
-echo "You can still download the Windows binaries from: http://cuberite.org"
-echo "You can also manually compile for Windows. See: https://github.com/cuberite/cuberite"
+@echo off
+rem Putting echo "Foo" in Windows CMD gives you "Foo" -- with quotes.
+echo This script is not available for Windows yet, sorry.
+echo You can still download the Windows binaries from: http://cuberite.org
+echo You can also manually compile for Windows. See: https://github.com/cuberite/cuberite
+rem windows_exit
+exit
 }
