@@ -84,6 +84,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 		case cEntityEffect::effNightVision:
 		case cEntityEffect::effStrength:
 		case cEntityEffect::effWaterBreathing:
+		case cEntityEffect::effJumpBoost:
 		case cEntityEffect::effInvisibility:
 		{
 			base = 3600;
