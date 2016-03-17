@@ -332,6 +332,9 @@ public:
 	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true. */
 	bool ForEachPlugin(cPluginCallback & a_Callback);
 
+	/** Returns the name of the folder (cPlugin::GetFolderName()) from which the specified plugin was loaded. */
+	AString GetPluginFolderName(const AString & a_PluginName);  // tolua_export
+
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
 	static AString GetPluginsPath(void) { return FILE_IO_PREFIX + AString("Plugins"); }  // tolua_export

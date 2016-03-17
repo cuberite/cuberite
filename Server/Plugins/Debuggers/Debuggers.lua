@@ -1876,8 +1876,8 @@ end
 
 function HandleConsoleSchedule(a_Split)
 	local prev = os.clock()
-	LOG("Scheduling a task for 2 seconds in the future (current os.clock is " .. prev .. ")")
-	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
+	LOG("Scheduling a task for 5 seconds in the future (current os.clock is " .. prev .. ")")
+	cRoot:Get():GetDefaultWorld():ScheduleTask(5 * 20,
 		function ()
 			local current = os.clock()
 			local diff = current - prev

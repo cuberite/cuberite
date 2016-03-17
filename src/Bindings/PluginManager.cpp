@@ -1965,6 +1965,23 @@ bool cPluginManager::ForEachPlugin(cPluginCallback & a_Callback)
 
 
 
+AString cPluginManager::GetPluginFolderName(const AString & a_PluginName)
+{
+	// TODO: Implement locking for plugins
+	for (auto & plugin: m_Plugins)
+	{
+		if (plugin->GetName() == a_PluginName)
+		{
+			return plugin->GetFolderName();
+		}
+	}
+	return AString();
+}
+
+
+
+
+
 void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 {
 	if (a_Plugin == nullptr)

@@ -992,7 +992,13 @@ static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, 
 	}
 
 	// Retrieve and check the hook type
-	int HookType = static_cast<int>(tolua_tonumber(S, a_ParamIdx, -1));
+	int HookType;
+	if (!S.GetStackValue(a_ParamIdx, HookType))
+	{
+		LOGWARNING("cPluginManager.AddHook(): Cannot read the hook type.");
+		S.LogStackTrace();
+		return 0;
+	}
 	if (!a_PluginManager->IsValidHookType(HookType))
 	{
 		LOGWARNING("cPluginManager.AddHook(): Invalid HOOK_TYPE parameter: %d", HookType);
@@ -1001,7 +1007,14 @@ static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, 
 	}
 
 	// Add the hook to the plugin
-	if (!Plugin->AddHookRef(HookType, a_ParamIdx + 1))
+	auto callback = std::make_shared<cLuaState::cCallback>();
+	if (!S.GetStackValue(a_ParamIdx + 1, callback))
+	{
+		LOGWARNING("cPluginManager.AddHook(): Cannot read the callback parameter");
+		S.LogStackTrace();
+		return 0;
+	}
+	if (!Plugin->AddHookCallback(HookType, callback))
 	{
 		LOGWARNING("cPluginManager.AddHook(): Cannot add hook %d, unknown error.", HookType);
 		S.LogStackTrace();
@@ -1058,10 +1071,11 @@ static int tolua_cPluginManager_AddHook_DefFn(cPluginManager * a_PluginManager, 
 	}
 
 	// Retrieve the function to call and add it to the plugin:
-	lua_pushstring(S, FnName);
-	bool res = Plugin->AddHookRef(HookType, 1);
-	lua_pop(S, 1);  // Pop the function off the stack
-	if (!res)
+	auto callback = std::make_shared<cLuaState::cCallback>();
+	lua_getglobal(S, FnName);
+	bool res = S.GetStackValue(-1, callback);
+	lua_pop(S, 1);
+	if (!res || !callback->IsValid())
 	{
 		LOGWARNING("cPluginManager.AddHook(): Function %s not found. Hook not added.", FnName);
 		S.LogStackTrace();
@@ -1585,55 +1599,6 @@ static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
 
 
 
-static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
-{
-	// Function signature: cPlayer:OpenWindow(Window)
-
-	// Retrieve the plugin instance from the Lua state
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
-	if (Plugin == nullptr)
-	{
-		return 0;
-	}
-
-	// Get the parameters:
-	cPlayer * self = reinterpret_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
-	cWindow * wnd  = reinterpret_cast<cWindow *>(tolua_tousertype(tolua_S, 2, nullptr));
-	if ((self == nullptr) || (wnd == nullptr))
-	{
-		LOGWARNING("%s: invalid self (%p) or wnd (%p)", __FUNCTION__, static_cast<void *>(self), static_cast<void *>(wnd));
-		return 0;
-	}
-
-	// If cLuaWindow, add a reference, so that Lua won't delete the cLuaWindow object mid-processing
-	tolua_Error err;
-	if (tolua_isusertype(tolua_S, 2, "cLuaWindow", 0, &err))
-	{
-		cLuaWindow * LuaWnd = reinterpret_cast<cLuaWindow *>(wnd);
-		// Only if not already referenced
-		if (!LuaWnd->IsLuaReferenced())
-		{
-			int LuaRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-			if (LuaRef == LUA_REFNIL)
-			{
-				LOGWARNING("%s: Cannot create a window reference. Cannot open window \"%s\".",
-					__FUNCTION__, wnd->GetWindowTitle().c_str()
-				);
-				return 0;
-			}
-			LuaWnd->SetLuaRef(Plugin, LuaRef);
-		}
-	}
-
-	// Open the window
-	self->OpenWindow(wnd);
-	return 0;
-}
-
-
-
-
-
 static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 {
 	// Function signature: cPlayer:PermissionMatches(PermissionStr, TemplateStr) -> bool
@@ -1664,36 +1629,25 @@ static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 
 template <
 	class OBJTYPE,
-	void (OBJTYPE::*SetCallback)(cPluginLua * a_Plugin, int a_FnRef)
+	void (OBJTYPE::*SetCallback)(cLuaState::cCallbackPtr a_CallbackFn)
 >
 static int tolua_SetObjectCallback(lua_State * tolua_S)
 {
 	// Function signature: OBJTYPE:SetWhateverCallback(CallbackFunction)
 
-	// Retrieve the plugin instance from the Lua state
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
-	if (Plugin == nullptr)
-	{
-		// Warning message has already been printed by GetLuaPlugin(), bail out silently
-		return 0;
-	}
-
 	// Get the parameters - self and the function reference:
-	OBJTYPE * self = reinterpret_cast<OBJTYPE *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cLuaState L(tolua_S);
+	OBJTYPE * self;
+	cLuaState::cCallbackPtr callback;
+	if (!L.GetStackValues(1, self, callback))
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
-		return 0;
-	}
-	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);  // Store function reference for later retrieval
-	if (FnRef == LUA_REFNIL)
-	{
-		LOGERROR("%s: Cannot create a function reference. Callback not set.", __FUNCTION__);
+		LOGWARNING("%s: Cannot get parameters", __FUNCTION__);
+		L.LogStackTrace();
 		return 0;
 	}
 
 	// Set the callback
-	(self->*SetCallback)(Plugin, FnRef);
+	(self->*SetCallback)(callback);
 	return 0;
 }
 
@@ -1701,46 +1655,70 @@ static int tolua_SetObjectCallback(lua_State * tolua_S)
 
 
 
+// Callback class used for the WebTab:
+class cWebTabCallback:
+	public cWebAdmin::cWebTabCallback
+{
+public:
+	/** The Lua callback to call to generate the page contents. */
+	cLuaState::cCallback m_Callback;
+
+	virtual bool Call(
+		const HTTPRequest & a_Request,
+		const AString & a_UrlPath,
+		AString & a_Content,
+		AString & a_ContentType
+	) override
+	{
+		AString content, contentType;
+		return m_Callback.Call(&a_Request, a_UrlPath, cLuaState::Return, a_Content, a_ContentType);
+	}
+};
+
+
+
+
+
 static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 {
-	cLuaState LuaState(tolua_S);
-	cPluginLua * self = nullptr;
+	// OBSOLETE, use cWebAdmin:AddWebTab() instead!
+	// Function signature:
+	// cPluginLua:AddWebTab(Title, CallbackFn, [UrlPath])
 
-	if (!LuaState.GetStackValue(1, self))
+	// TODO: Warn about obsolete API usage
+	// Only implement after merging the new API change and letting some time for changes in the plugins
+
+	// Check params:
+	cLuaState LuaState(tolua_S);
+	cPluginLua * self = cManualBindings::GetLuaPlugin(tolua_S);
+	if (self == nullptr)
 	{
-		LOGWARNING("cPluginLua:AddWebTab: invalid self as first argument");
+		return 0;
+	}
+	if (
+		!LuaState.CheckParamString(2) ||
+		!LuaState.CheckParamFunction(3) ||
+		// Optional string as param 4
+		!LuaState.CheckParamEnd(5)
+	)
+	{
 		return 0;
 	}
 
-	tolua_Error tolua_err;
-	tolua_err.array = 0;
-	tolua_err.index = 3;
-	tolua_err.type = "function";
-
-	std::string Title;
-	int Reference = LUA_REFNIL;
-
-	if (LuaState.CheckParamString(2) && LuaState.CheckParamFunction(3))
+	// Read the params:
+	AString title, urlPath;
+	auto callback = std::make_shared<cWebTabCallback>();
+	if (!LuaState.GetStackValues(2, title, callback->m_Callback))
 	{
-		Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		LuaState.GetStackValue(2, Title);
+		LOGWARNING("cPlugin:AddWebTab(): Cannot read required parameters");
+		return 0;
 	}
-	else
+	if (!LuaState.GetStackValue(4, urlPath))
 	{
-		return cManualBindings::tolua_do_error(tolua_S, "#ferror calling function '#funcname#'", &tolua_err);
+		urlPath = cWebAdmin::GetURLEncodedString(title);
 	}
 
-	if (Reference != LUA_REFNIL)
-	{
-		if (!self->AddWebTab(Title.c_str(), tolua_S, Reference))
-		{
-			luaL_unref(tolua_S, LUA_REGISTRYINDEX, Reference);
-		}
-	}
-	else
-	{
-		LOGWARNING("cPluginLua:AddWebTab: invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str());
-	}
+	cRoot::Get()->GetWebAdmin()->AddWebTab(title, urlPath, self->GetName(), callback);
 
 	return 0;
 }
@@ -2106,22 +2084,68 @@ static int tolua_cUrlParser_ParseAuthorityPart(lua_State * a_LuaState)
 
 
 
-static int tolua_cWebAdmin_GetPlugins(lua_State * tolua_S)
+static int tolua_cWebAdmin_AddWebTab(lua_State * tolua_S)
 {
-	cWebAdmin * self = reinterpret_cast<cWebAdmin *>(tolua_tousertype(tolua_S, 1, nullptr));
+	// Function signatures:
+	// cWebAdmin:AddWebTab(Title, UrlPath, CallbackFn)
 
-	const cWebAdmin::PluginList & AllPlugins = self->GetPlugins();
+	// Check params:
+	cLuaState LuaState(tolua_S);
+	cPluginLua * self = cManualBindings::GetLuaPlugin(tolua_S);
+	if (self == nullptr)
+	{
+		return 0;
+	}
+	if (
+		// Don't care whether the first param is a cWebAdmin instance or class
+		!LuaState.CheckParamString(2, 3) ||
+		!LuaState.CheckParamFunction(4) ||
+		!LuaState.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
 
-	lua_createtable(tolua_S, static_cast<int>(AllPlugins.size()), 0);
+	// Read the params:
+	AString title, urlPath;
+	auto callback = std::make_shared<cWebTabCallback>();
+	if (!LuaState.GetStackValues(2, title, urlPath, callback->m_Callback))
+	{
+		LOGWARNING("cWebAdmin:AddWebTab(): Cannot read required parameters");
+		return 0;
+	}
+
+	cRoot::Get()->GetWebAdmin()->AddWebTab(title, urlPath, self->GetName(), callback);
+
+	return 0;
+}
+
+
+
+
+
+static int tolua_cWebAdmin_GetAllWebTabs(lua_State * tolua_S)
+{
+	// Function signature:
+	// cWebAdmin:GetAllWebTabs() -> { {"PluginName", "UrlPath", "Title"}, {"PluginName", "UrlPath", "Title"}, ...}
+
+	// Don't care about params at all
+
+	auto webTabs = cRoot::Get()->GetWebAdmin()->GetAllWebTabs();
+	lua_createtable(tolua_S, static_cast<int>(webTabs.size()), 0);
 	int newTable = lua_gettop(tolua_S);
 	int index = 1;
-	cWebAdmin::PluginList::const_iterator iter = AllPlugins.begin();
-	while (iter != AllPlugins.end())
+	cLuaState L(tolua_S);
+	for (const auto & wt: webTabs)
 	{
-		const cWebPlugin * Plugin = *iter;
-		tolua_pushusertype(tolua_S, reinterpret_cast<void *>(const_cast<cWebPlugin*>(Plugin)), "const cWebPlugin");
+		lua_createtable(tolua_S, 0, 3);
+		L.Push(wt->m_PluginName);
+		lua_setfield(tolua_S, -2, "PluginName");
+		L.Push(wt->m_UrlPath);
+		lua_setfield(tolua_S, -2, "UrlPath");
+		L.Push(wt->m_Title);
+		lua_setfield(tolua_S, -2, "Title");
 		lua_rawseti(tolua_S, newTable, index);
-		++iter;
 		++index;
 	}
 	return 1;
@@ -2131,14 +2155,70 @@ static int tolua_cWebAdmin_GetPlugins(lua_State * tolua_S)
 
 
 
-/** Binding for cWebAdmin::GetHTMLEscapedString.
+/** Binding for cWebAdmin::GetBaseURL.
 Manual code required because ToLua generates an extra return value */
-static int tolua_AllToLua_cWebAdmin_GetHTMLEscapedString(lua_State * tolua_S)
+static int tolua_cWebAdmin_GetBaseURL(lua_State * tolua_S)
 {
 	// Check the param types:
 	cLuaState S(tolua_S);
 	if (
-		!S.CheckParamUserTable(1, "cWebAdmin") ||
+		// Don't care whether the first param is a cWebAdmin instance or class
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the parameters:
+	AString Input;
+	S.GetStackValue(2, Input);
+
+	// Convert and return:
+	S.Push(cWebAdmin::GetBaseURL(Input));
+	return 1;
+}
+
+
+
+
+
+/** Binding for cWebAdmin::GetContentTypeFromFileExt.
+Manual code required because ToLua generates an extra return value */
+static int tolua_cWebAdmin_GetContentTypeFromFileExt(lua_State * tolua_S)
+{
+	// Check the param types:
+	cLuaState S(tolua_S);
+	if (
+		// Don't care whether the first param is a cWebAdmin instance or class
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the parameters:
+	AString Input;
+	S.GetStackValue(2, Input);
+
+	// Convert and return:
+	S.Push(cWebAdmin::GetContentTypeFromFileExt(Input));
+	return 1;
+}
+
+
+
+
+
+/** Binding for cWebAdmin::GetHTMLEscapedString.
+Manual code required because ToLua generates an extra return value */
+static int tolua_cWebAdmin_GetHTMLEscapedString(lua_State * tolua_S)
+{
+	// Check the param types:
+	cLuaState S(tolua_S);
+	if (
+		// Don't care whether the first param is a cWebAdmin instance or class
 		!S.CheckParamString(2) ||
 		!S.CheckParamEnd(3)
 	)
@@ -2159,14 +2239,71 @@ static int tolua_AllToLua_cWebAdmin_GetHTMLEscapedString(lua_State * tolua_S)
 
 
 
+/** Binding for cWebAdmin::GetPage. */
+static int tolua_cWebAdmin_GetPage(lua_State * tolua_S)
+{
+	/*
+	Function signature:
+	cWebAdmin:GetPage(a_HTTPRequest) ->
+	{
+		Content = "",       // Content generated by the plugin
+		ContentType = "",   // Content type generated by the plugin (default: "text/html")
+		UrlPath = "",       // URL path of the tab
+		TabTitle = "",      // Tab's title, as register via cWebAdmin:AddWebTab()
+		PluginName = "",    // Plugin's API name
+		PluginFolder = "",  // Plugin's folder name (display name)
+	}
+	*/
+
+	// Check the param types:
+	cLuaState S(tolua_S);
+	if (
+		// Don't care about first param, whether it's cWebAdmin instance or class
+		!S.CheckParamUserType(2, "HTTPRequest") ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the parameters:
+	HTTPRequest * request = nullptr;
+	if (!S.GetStackValue(2, request))
+	{
+		LOGWARNING("cWebAdmin:GetPage(): Cannot read the HTTPRequest parameter.");
+		return 0;
+	}
+
+	// Generate the page and push the results as a dictionary-table:
+	auto page = cRoot::Get()->GetWebAdmin()->GetPage(*request);
+	lua_createtable(S, 0, 6);
+	S.Push(page.Content);
+	lua_setfield(S, -2, "Content");
+	S.Push(page.ContentType);
+	lua_setfield(S, -2, "ContentType");
+	S.Push(page.TabUrlPath);
+	lua_setfield(S, -2, "UrlPath");
+	S.Push(page.TabTitle);
+	lua_setfield(S, -2, "TabTitle");
+	S.Push(page.PluginName);
+	lua_setfield(S, -2, "PluginName");
+	S.Push(cPluginManager::Get()->GetPluginFolderName(page.PluginName));
+	lua_setfield(S, -2, "PluginFolder");
+	return 1;
+}
+
+
+
+
+
 /** Binding for cWebAdmin::GetURLEncodedString.
 Manual code required because ToLua generates an extra return value */
-static int tolua_AllToLua_cWebAdmin_GetURLEncodedString(lua_State * tolua_S)
+static int tolua_cWebAdmin_GetURLEncodedString(lua_State * tolua_S)
 {
 	// Check the param types:
 	cLuaState S(tolua_S);
 	if (
-		!S.CheckParamUserTable(1, "cWebAdmin") ||
+		// Don't care whether the first param is a cWebAdmin instance or class
 		!S.CheckParamString(2) ||
 		!S.CheckParamEnd(3)
 	)
@@ -2180,27 +2317,6 @@ static int tolua_AllToLua_cWebAdmin_GetURLEncodedString(lua_State * tolua_S)
 
 	// Convert and return:
 	S.Push(cWebAdmin::GetURLEncodedString(Input));
-	return 1;
-}
-
-
-
-
-
-static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
-{
-	// Returns a map of (SafeTitle -> Title) for the plugin's web tabs.
-	auto self = reinterpret_cast<cWebPlugin *>(tolua_tousertype(tolua_S, 1, nullptr));
-	auto TabNames = self->GetTabNames();
-	lua_newtable(tolua_S);
-	int index = 1;
-	for (auto itr = TabNames.cbegin(), end = TabNames.cend(); itr != end; ++itr)
-	{
-		tolua_pushstring(tolua_S, itr->second.c_str());  // Because the SafeTitle is supposed to be unique, use it as key
-		tolua_pushstring(tolua_S, itr->first.c_str());
-		lua_rawset(tolua_S, -3);
-		++index;
-	}
 	return 1;
 }
 
@@ -2616,6 +2732,79 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 	double EndZ   = tolua_tonumber(L, idx + 7, 0);
 	bool res = cLineBlockTracer::Trace(*World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ);
 	tolua_pushboolean(L, res ? 1 : 0);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cLuaWindow_new(lua_State * tolua_S)
+{
+	// Function signature:
+	// cLuaWindow:new(type, slotsX, slotsY, title)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cLuaWindow") ||
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamString(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Read params:
+	int windowType, slotsX, slotsY;
+	AString title;
+	if (!L.GetStackValues(2, windowType, slotsX, slotsY, title))
+	{
+		LOGWARNING("%s: Cannot read Lua parameters", __FUNCTION__);
+		L.LogStackValues();
+		L.LogStackTrace();
+	}
+
+	// Create the window and return it:
+	L.Push(new cLuaWindow(L, static_cast<cLuaWindow::WindowType>(windowType), slotsX, slotsY, title));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cLuaWindow_new_local(lua_State * tolua_S)
+{
+	// Function signature:
+	// cLuaWindow:new(type, slotsX, slotsY, title)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cLuaWindow") ||
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamString(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Read params:
+	int windowType, slotsX, slotsY;
+	AString title;
+	if (!L.GetStackValues(2, windowType, slotsX, slotsY, title))
+	{
+		LOGWARNING("%s: Cannot read Lua parameters", __FUNCTION__);
+		L.LogStackValues();
+		L.LogStackTrace();
+	}
+
+	// Create the window, register it for GC and return it:
+	L.Push(new cLuaWindow(L, static_cast<cLuaWindow::WindowType>(windowType), slotsX, slotsY, title));
+	tolua_register_gc(tolua_S, lua_gettop(tolua_S));
 	return 1;
 }
 
@@ -3466,6 +3655,9 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cLuaWindow");
+			tolua_function(tolua_S, "new",              tolua_cLuaWindow_new);
+			tolua_function(tolua_S, "new_local",        tolua_cLuaWindow_new_local);
+			tolua_function(tolua_S, ".call",            tolua_cLuaWindow_new_local);
 			tolua_function(tolua_S, "SetOnClosing",     tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnClosing>);
 			tolua_function(tolua_S, "SetOnSlotChanged", tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnSlotChanged>);
 		tolua_endmodule(tolua_S);
@@ -3486,7 +3678,6 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cPlayer");
 			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);
 			tolua_function(tolua_S, "GetRestrictions",   tolua_cPlayer_GetRestrictions);
-			tolua_function(tolua_S, "OpenWindow",        tolua_cPlayer_OpenWindow);
 			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
 		tolua_endmodule(tolua_S);
 
@@ -3550,13 +3741,13 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cWebAdmin");
-			tolua_function(tolua_S, "GetHTMLEscapedString", tolua_AllToLua_cWebAdmin_GetHTMLEscapedString);
-			tolua_function(tolua_S, "GetPlugins",           tolua_cWebAdmin_GetPlugins);
-			tolua_function(tolua_S, "GetURLEncodedString",  tolua_AllToLua_cWebAdmin_GetURLEncodedString);
-		tolua_endmodule(tolua_S);
-
-		tolua_beginmodule(tolua_S, "cWebPlugin");
-			tolua_function(tolua_S, "GetTabNames", tolua_cWebPlugin_GetTabNames);
+			tolua_function(tolua_S, "AddWebTab",                 tolua_cWebAdmin_AddWebTab);
+			tolua_function(tolua_S, "GetAllWebTabs",             tolua_cWebAdmin_GetAllWebTabs);
+			tolua_function(tolua_S, "GetBaseURL",                tolua_cWebAdmin_GetBaseURL);
+			tolua_function(tolua_S, "GetContentTypeFromFileExt", tolua_cWebAdmin_GetContentTypeFromFileExt);
+			tolua_function(tolua_S, "GetHTMLEscapedString",      tolua_cWebAdmin_GetHTMLEscapedString);
+			tolua_function(tolua_S, "GetPage",                   tolua_cWebAdmin_GetPage);
+			tolua_function(tolua_S, "GetURLEncodedString",       tolua_cWebAdmin_GetURLEncodedString);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "HTTPRequest");
