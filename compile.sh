@@ -6,9 +6,9 @@ set -e
 #TODO command line parameter handling for non-interactive mode.
 
 # Do we already have a repo?
-if [ \( -d .git \) -a \( -f easyinstall.sh \) -a \( -f src/BlockArea.cpp \) ]; then # A good enough indicator that we're in the Cuberite git repo.
-cd ../
-echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
+if [ -d .git ] && [ -f easyinstall.sh ] && [ -f src/BlockArea.cpp ]; then # A good enough indicator that we're in the Cuberite git repo.
+	cd ../
+	echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
 fi
 
 # Error functions.
@@ -17,7 +17,7 @@ error ()
 	echo
 	echo "-----------------"
 	echo "Script aborted, reason:"
-	echo $1
+	echo "$@"
 	exit 1
 }
 
@@ -69,17 +69,16 @@ GCC_EXISTS=0
 CLANG_EXISTS=0
 $GCC_EXE_NAME --help > /dev/null 2> /dev/null && GCC_EXISTS=1
 $CLANG_EXE_NAME --help > /dev/null 2> /dev/null && CLANG_EXISTS=1
-if [ $GCC_EXISTS -eq 0 -a $CLANG_EXISTS -eq 0 ]; then
+if [ "$GCC_EXISTS" -eq 0 ] && [ "$CLANG_EXISTS" -eq 0 ]; then
 	MISSING_PACKAGES=" $COMPILER_PACKAGE_NAME"
 fi
 
 # Depdendency check.
 checkPackages ()
 {
-	echo "$PROGRAMS" | while read line; do
-		EXE_NAME=`echo "$line" | cut -f 1`
-		PACKAGE_NAME=`echo "$line" | cut -f 2`
-		command -v $EXE_NAME > /dev/null 2> /dev/null || echo -n " $PACKAGE_NAME"
+	# note that IFS is a TAB here!
+	echo "$PROGRAMS" | while IFS='	' read EXE_NAME PACKAGE_NAME __trash__; do
+		command -v $EXE_NAME > /dev/null 2> /dev/null || printf %s " $PACKAGE_NAME"
 	done
 }
 MISSING_PACKAGES="$MISSING_PACKAGES`checkPackages`"
@@ -93,23 +92,23 @@ if [ "$MISSING_PACKAGES" != "" ]; then
 
 	# apt-get guide.
 	apt-get --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo apt-get install$MISSING_PACKAGES"
+	missingDepsExit "sudo apt-get install $MISSING_PACKAGES"
 
 	# yum guide.
 	yum --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo yum install$MISSING_PACKAGES"
+	missingDepsExit "sudo yum install $MISSING_PACKAGES"
 
 	# zypper guide.
 	zypper --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo zypper install$MISSING_PACKAGES"
+	missingDepsExit "sudo zypper install $MISSING_PACKAGES"
 
 	# pacman guide.
 	pacman --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo pacman -S$MISSING_PACKAGES"
+	missingDepsExit "sudo pacman -S $MISSING_PACKAGES"
 
 	# urpmi guide.
 	urpmi --help > /dev/null 2> /dev/null && \
-	missingDepsExit "sudo urpmi$MISSING_PACKAGES"
+	missingDepsExit "sudo urpmi $MISSING_PACKAGES"
 
 	missingDepsExit ""
 fi
@@ -138,18 +137,22 @@ You can choose between 3 branches:
 
 
 # Input: Branch choice.
-echo -n "Choose the branch (s/t/d): "
+printf %s "Choose the branch (s/t/d): "
 read BRANCH
-if [ \( "$BRANCH" = "s" \) -o \( "$BRANCH" = "S" \) ]; then
-	#BRANCH="stable"
-	error "We don't have a stable branch yet, please use testing, sorry."
-elif [ \( $BRANCH = "t" \) -o \( $BRANCH = "T" \) ]; then
-	BRANCH="testing"
-elif [ \( $BRANCH = "d" \) -o \( $BRANCH = "D" \) ]; then
-	BRANCH="master"
-else
-	error "Unrecognized user input."
-fi
+case $BRANCH in
+	s|S)
+		error "We don't have a stable branch yet, please use testing, sorry."
+		;;
+	t|T)
+		BRANCH="testing"
+		;;
+	d|D)
+		BRANCH="master"
+		;;
+	*)
+		error "Unrecognized user input."
+		;;
+esac
 
 }
 ### Inactive code end. ###
@@ -171,16 +174,19 @@ code after this step. It will then compile your program.
 "
 
 # Input: Compile mode choice.
-echo -n "Choose compile mode: (n/d): "
+printf %s "Choose compile mode: (n/d): "
 read BUILDTYPE
-if [ \( "$BUILDTYPE" = "d" \) -o \( "$BUILDTYPE" = "D" \) ]; then
-	BUILDTYPE="Debug"
-elif [ \( "$BUILDTYPE" = "n" \) -o \( "$BUILDTYPE" = "N" \) ]; then
-	BUILDTYPE="Release"
-else
-	error "Unrecognized user input."
-fi
-
+case $BUILDTYPE in
+	d|D)
+		BUILDTYPE="Debug"
+		;;
+	n|N)
+		BUILDTYPE="Release"
+		;;
+	*)
+		error "Unrecognized user input."
+		;;
+esac
 
 # Echo: Downloading began.
 echo
@@ -190,15 +196,15 @@ echo " --- Downloading Cuberite's source code from the $BRANCH branch..."
 if [ ! -d cuberite ]; then
 	# Git: Clone.
 	echo " --- Looks like your first run, cloning the whole code..."
-	git clone https://github.com/cuberite/cuberite.git
+	git clone  --depth 1 https://github.com/cuberite/cuberite.git -b "$BRANCH"
 	cd cuberite
 else
 	# Git: Fetch.
 	cd cuberite
 	echo " --- Updating the $BRANCH branch..."
-	git fetch origin $BRANCH || error "git fetch failed"
-	git checkout $BRANCH || error "git checkout failed"
-	git merge origin/$BRANCH || error "git merge failed"
+	git fetch origin "$BRANCH" || error "git fetch failed"
+	git checkout "$BRANCH" || error "git checkout failed"
+	git merge "origin/$BRANCH" || error "git merge failed"
 fi
 
 # Git: Submodules.
@@ -210,7 +216,7 @@ git submodule update --init
 echo " --- Running cmake..."
 if [ ! -d build-cuberite ]; then mkdir build-cuberite; fi
 cd build-cuberite
-cmake .. -DCMAKE_BUILD_TYPE=$BUILDTYPE || error "cmake failed"
+cmake .. -DCMAKE_BUILD_TYPE="$BUILDTYPE" || error "cmake failed"
 
 
 # Make.
@@ -227,9 +233,9 @@ echo "Compilation done!"
 echo
 echo "Cuberite awaits you at:"
 if [ "$BUILDTYPE" = "Debug" ]; then
-	echo "`pwd`/Cuberite_debug"
+	echo "$PWD/Cuberite_debug"
 else
-	echo "`pwd`/Cuberite"
+	echo "$PWD/Cuberite"
 fi
 cd ..
 echo "
@@ -240,7 +246,11 @@ Enjoy :)"
 exit 0
 
 :windows_detected
-echo "This script is not available for Windows yet, sorry."
-echo "You can still download the Windows binaries from: http://cuberite.org"
-echo "You can also manually compile for Windows. See: https://github.com/cuberite/cuberite"
+@echo off
+rem Putting echo "Foo" in Windows CMD gives you "Foo" -- with quotes.
+echo This script is not available for Windows yet, sorry.
+echo You can still download the Windows binaries from: http://cuberite.org
+echo You can also manually compile for Windows. See: https://github.com/cuberite/cuberite
+rem windows_exit
+exit
 }
