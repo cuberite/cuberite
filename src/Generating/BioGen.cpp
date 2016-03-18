@@ -917,7 +917,7 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 	m_AmpX1  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Amp",  80));
 	m_FreqX2 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Freq", 0.05));
 	m_AmpX2  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Amp",  20));
-	m_FreqX3 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Freq", 0.1)),
+	m_FreqX3 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Freq", 0.1));
 	m_AmpX3  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Amp",  8));
 	m_FreqZ1 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Freq", 0.01));
 	m_AmpZ1  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Amp",  80));

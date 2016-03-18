@@ -430,7 +430,7 @@ void cNoise3DComposable::Initialize(cIniFile & a_IniFile)
 	}
 
 	// Add octaves for the density noises:
-	wavlen = 1, ampl = 1;
+	wavlen = 1; ampl = 1;
 	for (int i = 0; i < NumDensityOctaves; i++)
 	{
 		m_DensityNoiseA.AddOctave(wavlen, ampl);
@@ -440,7 +440,7 @@ void cNoise3DComposable::Initialize(cIniFile & a_IniFile)
 	}
 
 	// Add octaves for the base noise:
-	wavlen = 1, ampl = BaseNoiseAmplitude;
+	wavlen = 1; ampl = BaseNoiseAmplitude;
 	for (int i = 0; i < NumBaseOctaves; i++)
 	{
 		m_BaseNoise.AddOctave(wavlen, ampl);
@@ -590,7 +590,7 @@ void cBiomalNoise3DComposable::Initialize(cIniFile & a_IniFile)
 	}
 
 	// Add octaves for the density noises:
-	wavlen = 1, ampl = 1;
+	wavlen = 1; ampl = 1;
 	for (int i = 0; i < NumDensityOctaves; i++)
 	{
 		m_DensityNoiseA.AddOctave(wavlen, ampl);
@@ -600,7 +600,7 @@ void cBiomalNoise3DComposable::Initialize(cIniFile & a_IniFile)
 	}
 
 	// Add octaves for the base noise:
-	wavlen = 1, ampl = BaseNoiseAmplitude;
+	wavlen = 1; ampl = BaseNoiseAmplitude;
 	for (int i = 0; i < NumBaseOctaves; i++)
 	{
 		m_BaseNoise.AddOctave(wavlen, ampl);
