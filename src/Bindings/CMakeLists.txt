@@ -23,6 +23,7 @@ SET (SRCS
 	Plugin.cpp
 	PluginLua.cpp
 	PluginManager.cpp
+	WebPlugin.cpp
 )
 
 SET (HDRS
@@ -43,6 +44,7 @@ SET (HDRS
 	Plugin.h
 	PluginLua.h
 	PluginManager.h
+	WebPlugin.h
 	tolua++.h
 )
 
@@ -64,6 +66,7 @@ set(BINDING_DEPENDENCIES
 	../Bindings/Plugin.h
 	../Bindings/PluginLua.h
 	../Bindings/PluginManager.h
+	../Bindings/WebPlugin.h
 	../BiomeDef.h
 	../BlockArea.h
 	../BlockEntities/BeaconEntity.h

@@ -307,7 +307,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	// Checks whether the player is still holding an item
 	if (!a_Player.GetDraggingItem().IsEmpty())
 	{
-		LOGD("Player is holding an item while closing their window, dropping it as a pickup...");
+		LOGD("Player holds item! Dropping it...");
 		a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
 	}
 
