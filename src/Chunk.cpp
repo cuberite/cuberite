@@ -2594,16 +2594,6 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if (
-		(a_RelX < 0) || (a_RelX >= Width) ||
-		(a_RelY < 0) || (a_RelY >= Height) ||
-		(a_RelZ < 0) || (a_RelZ >= Width)
-	)
-	{
-		ASSERT(!"GetBlock(x, y, z) out of bounds!");
-		return 0;  // Clip
-	}
-
 	return m_ChunkData.GetBlock(a_RelX, a_RelY, a_RelZ);
 }
 
