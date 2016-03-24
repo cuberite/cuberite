@@ -1998,7 +1998,7 @@ a_Player:OpenWindow(Window);
 				SendAboveActionBarMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player (shows above action bar, doesn't show for < 1.8 clients)." },
 				SendSystemMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player (doesn't show for < 1.8 clients)." },
 				SendRotation = { Params = "YawDegrees, PitchDegrees", Return = "", Notes = "Sends the specified rotation to the player, forcing them to look that way" },
-				SetBedPos = { Params = "{{Vector3i|Position}}", Return = "", Notes = "Sets the internal representation of the last bed position the player has slept in. The player will respawn at this position if they die." },
+				SetBedPos = { Params = "{{Vector3i|Position}}, [{{cWorld*|World}}]", Return = "", Notes = "Sets the position and world of the player's respawn point, which is also known as the bed position. The player will respawn at this position and world upon death. If the world is not specified, it is set to the player's current world." },
 				SetCanFly = { Params = "CanFly", Notes = "Sets if the player can fly or not." },
 				SetCrouch = { Params = "IsCrouched", Return = "", Notes = "Sets the crouch state, broadcasts the change to other players." },
 				SetCurrentExperience = { Params = "XPAmount", Return = "", Notes = "Sets the current amount of experience (and indirectly, the XP level)." },
