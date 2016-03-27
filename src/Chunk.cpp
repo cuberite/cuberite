@@ -638,13 +638,13 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		}
 
 		// Do not move mobs that are detached from the world to neighbors. They're either scheduled for teleportation or for removal.
+		// Because the schedulded destruction is going to look for them in this chunk. See cEntity::destroy.
 		if (!(*itr)->IsTicking())
 		{
 			++itr;
 			continue;
 		}
 
-		// Because the schedulded destruction is going to look for them in this chunk. See cEntity::destroy.
 		if ((((*itr)->GetChunkX() != m_PosX) ||
 			((*itr)->GetChunkZ() != m_PosZ))
 		)

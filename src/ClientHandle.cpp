@@ -3,6 +3,7 @@
 #include "ClientHandle.h"
 #include "Server.h"
 #include "World.h"
+#include "Chunk.h"
 #include "Entities/Pickup.h"
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
@@ -65,6 +66,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
 	m_Player(nullptr),
+	m_CachedSentChunk(0, 0),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(0x7fffffff),
@@ -336,6 +338,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(m_Self, GetUsername());
+	InvalidateCachedSentChunk();
 	m_Self.reset();
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
@@ -1869,6 +1872,18 @@ void cClientHandle::RemoveFromWorld(void)
 
 
 
+void cClientHandle::InvalidateCachedSentChunk()
+{
+	ASSERT(m_Player != nullptr);
+	// Sets this to a junk value different from the player's current chunk, which invalidates it and
+	// ensures its value will not be used.
+	m_CachedSentChunk = cChunkCoords(m_Player->GetChunkX() + 500, m_Player->GetChunkZ());
+}
+
+
+
+
+
 bool cClientHandle::CheckBlockInteractionsRate(void)
 {
 	ASSERT(m_Player != nullptr);
@@ -1926,6 +1941,36 @@ void cClientHandle::Tick(float a_Dt)
 		return;
 	}
 
+
+	// Freeze the player if it is standing on a chunk not yet sent to the client
+	{
+		bool PlayerIsStandingAtASentChunk = false;
+		// If the chunk is invalid, do not bother checking if it's sent to the client, it is definitely not
+		if (m_Player->GetParentChunk()->IsValid())
+		{
+			// Before iterating m_SentChunks, see if the player's coords equal m_CachedSentChunk
+			// If so, the chunk has been sent to the client. This is an optimization that saves an iteration of m_SentChunks.
+			if (cChunkCoords(m_Player->GetChunkX(), m_Player->GetChunkZ()) == m_CachedSentChunk)
+			{
+				PlayerIsStandingAtASentChunk = true;
+			}
+			else
+			{
+				// This block is entered only when the player moves to a new chunk, invalidating the cached coords.
+				// Otherwise the cached coords are used.
+				cCSLock Lock(m_CSChunkLists);
+				auto itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), cChunkCoords(m_Player->GetChunkX(), m_Player->GetChunkZ()));
+				if (itr != m_SentChunks.end())
+				{
+					m_CachedSentChunk = *itr;
+					PlayerIsStandingAtASentChunk = true;
+				}
+			}
+		}
+		// The player will freeze itself if it is standing on a chunk not yet sent to the client
+		m_Player->TickFreezeCode(PlayerIsStandingAtASentChunk);
+	}
+
 	// If the chunk the player's in was just sent, spawn the player:
 	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
@@ -1957,7 +2002,7 @@ void cClientHandle::Tick(float a_Dt)
 			}
 		}
 
-		// Unload all chunks that are out of the view distance (all 5 seconds)
+		// Unload all chunks that are out of the view distance (every 5 seconds)
 		if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
 		{
 			UnloadOutOfRangeChunks();

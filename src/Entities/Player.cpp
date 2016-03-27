@@ -251,35 +251,10 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Handle a frozen player
 	if (m_IsFrozen)
 	{
-		m_FreezeCounter += 1;
-		if (!m_IsManuallyFrozen && a_Chunk.IsValid())
-		{
-			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded
-			Unfreeze();
-		}
-		else
-		{
-			// If the player was externally / manually frozen (plugin, etc.) or if the chunk isn't loaded yet:
-			// 1. Set the location to m_FrozenPosition every tick.
-			// 2. Zero out the speed every tick.
-			// 3. Send location updates every 60 ticks.
-			SetPosition(m_FrozenPosition);
-			SetSpeed(0, 0, 0);
-			if (m_FreezeCounter % 60 == 0)
-			{
-				BroadcastMovementUpdate(m_ClientHandle.get());
-				m_ClientHandle->SendPlayerPosition();
-			}
-			return;
-		}
-	}
-
-	if (!a_Chunk.IsValid())
-	{
-		FreezeInternal(GetPosition(), false);
-		// This may happen if the cPlayer is created before the chunks have the chance of being loaded / generated (#83)
 		return;
 	}
+
+	ASSERT(a_Chunk.IsValid());
 
 	super::Tick(a_Dt, a_Chunk);
 
@@ -332,6 +307,79 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else
 	{
 		m_TicksUntilNextSave--;
+	}
+}
+
+
+
+
+
+void cPlayer::TickFreezeCode(bool a_MyChunkIsSent)
+{
+	// This function is ticked by the player's client handle. This ensures it always ticks, even if the player
+	// is standing in an unloaded chunk, unlike cPlayer::Tick. We need this because the freeze handling code must
+	// also tick in unloaded chunks.
+	if (m_IsFrozen)
+	{
+		m_FreezeCounter += 1;
+		if ((!m_IsManuallyFrozen) && (a_MyChunkIsSent))
+		{
+			cWorld::cLock Lock(*GetWorld());
+			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded
+			Unfreeze();
+
+			// Pull the player out of any solids that might have loaded on them.
+			PREPARE_REL_AND_CHUNK(GetPosition(), *(GetParentChunk()));
+			if (RelSuccess)
+			{
+				int NewY = Rel.y;
+				if (NewY < 0)
+				{
+					NewY = 0;
+				}
+				while (NewY < cChunkDef::Height - 2)
+				{
+					// If we find a position with enough space for the player
+					if (
+						(Chunk->GetBlock(Rel.x, NewY, Rel.z) == E_BLOCK_AIR) &&
+						(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z) == E_BLOCK_AIR)
+					)
+					{
+						// If the found position is not the same as the original
+						if (NewY != Rel.y)
+						{
+							SetPosition(GetPosition().x, NewY, GetPosition().z);
+							GetClientHandle()->SendPlayerPosition();
+						}
+						break;
+					}
+					++NewY;
+				}
+			}
+		}
+		else
+		{
+			// If the player was externally / manually frozen (plugin, etc.) or if the chunk isn't loaded yet:
+			// 1. Set the location to m_FrozenPosition every tick.
+			// 2. Zero out the speed every tick.
+			// 3. Send location updates every 60 ticks.
+
+			if ((m_FreezeCounter % 60 == 0) || ((m_FrozenPosition - GetPosition()).SqrLength() > 2 * 2))
+			{
+				SetPosition(m_FrozenPosition);
+				SetSpeed(0, 0, 0);
+				BroadcastMovementUpdate(m_ClientHandle.get());
+				m_ClientHandle->SendPlayerPosition();
+			}
+			return;
+		}
+	}
+	else
+	{
+		if (!a_MyChunkIsSent)
+		{
+			FreezeInternal(GetPosition(), false);
+		}
 	}
 }
 
@@ -1392,6 +1440,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		SetPosition(a_PosX, a_PosY, a_PosZ);
+		FreezeInternal(GetPosition(), false);
 		m_LastGroundHeight = static_cast<float>(a_PosY);
 		m_bIsTeleporting = true;
 
@@ -1746,6 +1795,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
+	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
+	GetClientHandle()->InvalidateCachedSentChunk();
+
 	// Prevent further ticking in this world
 	SetIsTicking(false);
 
@@ -1757,6 +1809,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Set position to the new position
 	SetPosition(a_NewPosition);
+	FreezeInternal(a_NewPosition, false);
 
 	// Stop all mobs from targeting this player
 	StopEveryoneFromTargetingMe();
