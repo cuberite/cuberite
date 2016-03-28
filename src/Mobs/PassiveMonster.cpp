@@ -71,6 +71,7 @@ void cPassiveMonster::Destroyed()
 	{
 		m_LovePartner->ResetLoveMode();
 	}
+	super::Destroyed();
 }
 
 
