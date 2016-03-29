@@ -1623,11 +1623,8 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 void cChunkMap::AddEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-	if (
-		(Chunk == nullptr) ||  // Chunk not present at all
-		(!Chunk->IsValid() && !a_Entity->IsPlayer())  // Chunk present, but no valid data; players need to spawn in such chunks (#953)
-	)
+	cChunkPtr Chunk = GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
+	if (Chunk == nullptr)  // This will assert inside GetChunk in Debug builds
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
 			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
@@ -1644,11 +1641,8 @@ void cChunkMap::AddEntity(cEntity * a_Entity)
 void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-	if (
-		(Chunk == nullptr) ||  // Chunk not present at all
-		(!Chunk->IsValid() && !a_Entity->IsPlayer())  // Chunk present, but no valid data; players need to spawn in such chunks (#953)
-	)
+	cChunkPtr Chunk = GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
+	if (Chunk == nullptr)  // This will assert inside GetChunk in Debug builds
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
 			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
