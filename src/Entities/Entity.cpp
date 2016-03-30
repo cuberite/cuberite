@@ -1584,6 +1584,24 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 
 
+bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+{
+	return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition);
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+{
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World->GetSpawnX(), a_World->GetSpawnY(), a_World->GetSpawnZ()));
+}
+
+
+
+
+
 bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 {
 	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
@@ -1593,7 +1611,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return DoMoveToWorld(World, a_ShouldSendRespawn, GetPosition());
+	return DoMoveToWorld(World, a_ShouldSendRespawn, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
 }
 
 
