@@ -1790,7 +1790,50 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		);
 		ParentChunk->RemoveEntity(this);
 		a_World->AddPlayer(this);
+		AString PlayerUUID = this->GetUUID();
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
+
+		// If the player teleported into a solid, schedule moving them out
+		a_World->QueueTask([PlayerUUID](cWorld & a_NewWorld)
+		{
+			class cCallback : public cPlayerListCallback
+			{
+				virtual bool Item(cPlayer * a_Player) override
+				{
+					Vector3d PlayerPos = a_Player->GetPosition();
+					PREPARE_REL_AND_CHUNK(PlayerPos, *(a_Player->GetParentChunk()));
+					if (RelSuccess)
+					{
+						int NewY = Rel.y;
+						if (NewY < 0)
+						{
+							NewY = 0;
+						}
+						while (NewY < cChunkDef::Height - 2)
+						{
+							// If we find a position with enough space for the player
+							if (
+								(Chunk->GetBlock(Rel.x, NewY, Rel.z) == E_BLOCK_AIR) &&
+								(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z) == E_BLOCK_AIR)
+							)
+							{
+								// If the found position is not the same as the original
+								if (NewY != Rel.y)
+								{
+									a_Player->SetPosition(PlayerPos.x, NewY, PlayerPos.z);
+									a_Player->GetClientHandle()->SendPlayerPosition();
+								}
+								break;
+							}
+							++NewY;
+						}
+					}
+					return true;
+				}
+			public:
+			} Callback;
+			a_NewWorld.DoWithPlayerByUUID(PlayerUUID, Callback);
+		});
 	});
 	return true;
 }
