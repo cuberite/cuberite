@@ -406,10 +406,10 @@ public:
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
 	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown = false);
 
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) { return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition); }
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
 	/** Moves entity to specified world, taking a world pointer */
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) { return MoveToWorld(a_World, a_ShouldSendRespawn, GetPosition()); }
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
 
 	/** Moves entity to specified world, taking a world name */
 	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
