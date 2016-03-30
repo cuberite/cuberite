@@ -2340,6 +2340,24 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 
 
 
+void cWorld::BroadcastChat(const cChatMessageBuilder & a_Message, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendChat(a_Message);
+	}
+}
+
+
+
+
+
 void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastCollectEntity(a_Entity, a_Player, a_Exclude);

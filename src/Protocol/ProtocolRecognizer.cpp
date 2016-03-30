@@ -157,6 +157,15 @@ void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message, eChatType a
 
 
 
+void cProtocolRecognizer::SendChat(const cChatMessageBuilder & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendChat(a_Message, a_Type, a_ShouldUseChatPrefixes);
+}
+
+
+
+
 
 void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {

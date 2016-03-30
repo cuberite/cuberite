@@ -26,6 +26,7 @@ class cWorld;
 class cPlayer;
 class cCommandOutputCallback;
 class cCompositeChat;
+class cChatMessageBuilder;
 class cSettingsRepositoryInterface;
 
 typedef cItemCallback<cPlayer> cPlayerListCallback;
@@ -153,6 +154,7 @@ public:
 	/** Sends a chat message to all connected clients (in all worlds) */
 	void BroadcastChat       (const AString & a_Message, eMessageType a_ChatPrefix = mtCustom);
 	void BroadcastChat       (const cCompositeChat & a_Message);
+	void BroadcastChat       (const cChatMessageBuilder & a_Message);
 	void BroadcastChatDeath  (const AString & a_Message) { BroadcastChat(a_Message, mtDeath); }
 	void BroadcastChatFailure(const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
 	void BroadcastChatFatal  (const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }

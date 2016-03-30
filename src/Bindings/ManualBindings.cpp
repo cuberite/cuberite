@@ -33,6 +33,7 @@
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
+#include "../ChatMessageBuilder.h"
 #include "../StringCompression.h"
 #include "../CommandOutput.h"
 #include "../BuildInfo.h"
@@ -3118,6 +3119,185 @@ static int tolua_cBlockArea_SaveToSchematicString(lua_State * tolua_S)
 
 
 
+static int tolua_cChatMessageBuilder_AppendPart(lua_State * tolua_S)
+{
+	// function cChatMessageBuilder:AppendPart(Message)
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	cChatMessageBuilder * self = reinterpret_cast<cChatMessageBuilder *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cChatMessageBuilder:AppendPart'", nullptr);
+		return 0;
+	}
+
+	// Add the part:
+	AString Text;
+	L.GetStackValue(2, Text);
+	self->AppendPart(Text);
+
+	// Cut away everything from the stack except for the cChatMessageBuilder instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cChatMessageBuilder_SetClickEvent(lua_State * tolua_S)
+{
+	// function cChatMessageBuilder:SetClickEvent(Action, Text)
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	cChatMessageBuilder * self = reinterpret_cast<cChatMessageBuilder *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cChatMessageBuilder:SetClickEvent'", nullptr);
+		return 0;
+	}
+
+	// Sets the click action of the part
+	AString Action, Text;
+	L.GetStackValues(2, Action, Text);
+	self->SetClickEvent(Action, Text);
+
+	// Cut away everything from the stack except for the cChatMessageBuilder instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cChatMessageBuilder_SetHoverEvent(lua_State * tolua_S)
+{
+	// function cChatMessageBuilder:SetHoverEvent(Action, Text)
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	cChatMessageBuilder * self = reinterpret_cast<cChatMessageBuilder *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cChatMessageBuilder:SetHoverEvent'", nullptr);
+		return 0;
+	}
+
+	// Sets the hover action of the part
+	AString Action, Text;
+	L.GetStackValues(2, Action, Text);
+	self->SetHoverEvent(Action, Text);
+
+	// Cut away everything from the stack except for the cChatMessageBuilder instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cChatMessageBuilder_SetInsertionText(lua_State * tolua_S)
+{
+	// function cChatMessageBuilder:SetInsertionText(Text)
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	cChatMessageBuilder * self = reinterpret_cast<cChatMessageBuilder *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cChatMessageBuilder:SetInsertionText'", nullptr);
+		return 0;
+	}
+
+	// Sets the insertion text
+	AString Text;
+	L.GetStackValue(2, Text);
+	self->SetInsertionText(Text);
+
+	// Cut away everything from the stack except for the cChatMessageBuilder instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cChatMessageBuilder_SetMessageType(lua_State * tolua_S)
+{
+	// function cChatMessageBuilder:SetMessageType(MessageType)
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cChatMessageBuilder") ||
+		!L.CheckParamNumber(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	cChatMessageBuilder * self = reinterpret_cast<cChatMessageBuilder *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cChatMessageBuilder:SetMessageType'", nullptr);
+		return 0;
+	}
+
+	// Set the type:
+	int MessageType = mtCustom;
+	L.GetStackValue(2, MessageType);
+	self->SetMessageType(static_cast<eMessageType>(MessageType));
+
+	// Cut away everything from the stack except for the cChatMessageBuilder instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
 
 static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 {
@@ -3411,6 +3591,14 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cChatMessageBuilder");
+			tolua_function(tolua_S, "AppendPart",       tolua_cChatMessageBuilder_AppendPart);
+			tolua_function(tolua_S, "SetClickEvent",    tolua_cChatMessageBuilder_SetClickEvent);
+			tolua_function(tolua_S, "SetHoverEvent",    tolua_cChatMessageBuilder_SetHoverEvent);
+			tolua_function(tolua_S, "SetInsertionText", tolua_cChatMessageBuilder_SetInsertionText);
+			tolua_function(tolua_S, "SetMessageType",   tolua_cChatMessageBuilder_SetMessageType);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");

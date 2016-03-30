@@ -42,6 +42,7 @@ class cFallingBlock;
 class cItemHandler;
 class cWorld;
 class cCompositeChat;
+class cChatMessageBuilder;
 class cStatManager;
 class cClientHandle;
 typedef SharedPtr<cClientHandle> cClientHandlePtr;
@@ -151,6 +152,8 @@ public:  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                       (const cCompositeChat & a_Message);
+	void SendChat                       (const cChatMessageBuilder & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) ;
+	void SendChat                       (const cChatMessageBuilder & a_Message);
 	void SendChatAboveActionBar         (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatAboveActionBar         (const cCompositeChat & a_Message);
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
