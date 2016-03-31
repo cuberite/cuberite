@@ -3817,7 +3817,7 @@ void cWorld::AddQueuedPlayers(void)
 	// Add all the players in the grabbed list:
 	{
 		cCSLock Lock(m_CSPlayers);
-		for (auto Player : m_Players)
+		for (auto Player : PlayersToAdd)
 		{
 			ASSERT(std::find(m_Players.begin(), m_Players.end(), Player) == m_Players.end());  // Is it already in the list? HOW?
 			LOGD("Adding player %s to world \"%s\".", Player->GetName().c_str(), m_WorldName.c_str());
