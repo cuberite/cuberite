@@ -63,6 +63,7 @@ int cClientHandle::s_ClientCount = 0;
 cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
+	m_ChunkSendDelay(0),
 	m_IPString(a_IPString),
 	m_Player(nullptr),
 	m_HasSentDC(false),
@@ -95,7 +96,6 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
 	m_PingStartTime = std::chrono::steady_clock::now();
-
 	LOGD("New ClientHandle created at %p", static_cast<void *>(this));
 }
 
@@ -1863,6 +1863,12 @@ void cClientHandle::RemoveFromWorld(void)
 	m_LastStreamedChunkZ = 0x7fffffff;
 
 	m_HasSentPlayerChunk = false;
+
+	// Do not send chunks for 1.5 seconds.
+	// Apparently, the chunks of the old world fail to unload if
+	// chunks in the new world which have the same coords are sent too fast after the unload.
+	// this is a temp fix, find the root cause!
+	m_ChunkSendDelay = 30;
 }
 
 
@@ -1944,24 +1950,31 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 
-	if ((m_State >= csAuthenticated) && (m_State < csDestroying))
+	if (m_ChunkSendDelay == 0)
 	{
-		// Stream 4 chunks per tick
-		for (int i = 0; i < 4; i++)
+		if ((m_State >= csAuthenticated) && (m_State < csDestroying))
 		{
-			// Stream the next chunk
-			if (StreamNextChunk())
+			// Stream 4 chunks per tick
+			for (int i = 0; i < 4; i++)
 			{
-				// Streaming finished. All chunks are loaded.
-				break;
+				// Stream the next chunk
+				if (StreamNextChunk())
+				{
+					// Streaming finished. All chunks are loaded.
+					break;
+				}
+			}
+
+			// Unload all chunks that are out of the view distance (all 5 seconds)
+			if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
+			{
+				UnloadOutOfRangeChunks();
 			}
 		}
-
-		// Unload all chunks that are out of the view distance (all 5 seconds)
-		if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
-		{
-			UnloadOutOfRangeChunks();
-		}
+	}
+	else
+	{
+		--m_ChunkSendDelay;
 	}
 
 	// Handle block break animation:

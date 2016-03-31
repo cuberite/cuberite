@@ -377,6 +377,9 @@ private:
 	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
 	int m_RequestedViewDistance;
 
+	/** If more than zero, represents the number of ticks the client will wait before sending chunks. */
+	int m_ChunkSendDelay;
+
 	AString m_IPString;
 
 	AString m_Username;
