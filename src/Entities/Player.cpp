@@ -108,7 +108,9 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		SetPosX(World->GetSpawnX());
 		SetPosY(World->GetSpawnY());
 		SetPosZ(World->GetSpawnZ());
-		SetBedPos(Vector3i(static_cast<int>(World->GetSpawnX()), static_cast<int>(World->GetSpawnY()), static_cast<int>(World->GetSpawnZ())));
+
+		// This is a new player. Set the player spawn point to the spawn point of the default world
+		SetBedPos(Vector3i(static_cast<int>(World->GetSpawnX()), static_cast<int>(World->GetSpawnY()), static_cast<int>(World->GetSpawnZ())), World);
 
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -1990,7 +1992,7 @@ bool cPlayer::SaveToDisk()
 	root["SpawnX"]              = GetLastBedPos().x;
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
-	root["SpawnWorld"]        = m_SpawnWorld->GetName();
+	root["SpawnWorld"]          = m_SpawnWorld->GetName();
 
 	if (m_World != nullptr)
 	{
