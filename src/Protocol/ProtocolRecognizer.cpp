@@ -9,6 +9,7 @@
 #include "ProtocolRecognizer.h"
 #include "Protocol17x.h"
 #include "Protocol18x.h"
+#include "Protocol19x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -1030,6 +1031,27 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_TESTING:
+		{
+			AString ServerAddress;
+			UInt16 ServerPort;
+			UInt32 NextState;
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol190(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 	}

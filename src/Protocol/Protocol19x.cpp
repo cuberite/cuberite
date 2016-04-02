@@ -2,13 +2,15 @@
 // Protocol19x.cpp
 
 /*
-Implements the 1.8.x protocol classes:
+Implements the 1.9.x protocol classes:
+	- cProtocol190
+		- shapshot 15w31a protocol (#49)
 (others may be added later in the future for the 1.9 release series)
 */
 
 #include "Globals.h"
 #include "json/json.h"
-#include "Protocol18x.h"
+#include "Protocol19x.h"
 #include "ChunkDataSerializer.h"
 #include "PolarSSL++/Sha1Checksum.h"
 #include "Packetizer.h"
@@ -374,6 +376,11 @@ void cProtocol190::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 
 	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	// Needs to be adjusted due to the insertion of offhand at slot 1
+	if (a_SlotNum > 0)
+	{
+		a_SlotNum++;
+	}
 	Pkt.WriteBEInt16(a_SlotNum);
 	WriteItem(Pkt, a_Item);
 }
@@ -710,6 +717,9 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 	{
 		cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
 		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
+		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+		Pkt.WriteBEUInt64(0);
+		Pkt.WriteBEUInt64(a_Pickup.GetUniqueID());
 		Pkt.WriteBEUInt8(2);  // Type = Pickup
 		Pkt.WriteFPInt(a_Pickup.GetPosX());
 		Pkt.WriteFPInt(a_Pickup.GetPosY());
@@ -717,6 +727,9 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 		Pkt.WriteByteAngle(a_Pickup.GetYaw());
 		Pkt.WriteByteAngle(a_Pickup.GetPitch());
 		Pkt.WriteBEInt32(0);  // No object data
+		Pkt.WriteBEInt16(0);  // No velocity
+		Pkt.WriteBEInt16(0);
+		Pkt.WriteBEInt16(0);
 	}
 
 	{
@@ -1017,8 +1030,6 @@ void cProtocol190::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteFPInt(a_Player.GetPosZ());
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	short ItemType = a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType;
-	Pkt.WriteBEInt16(ItemType);
 	Pkt.WriteBEUInt8((3 << 5) | 6);  // Metadata: float + index 6
 	Pkt.WriteBEFloat(static_cast<float>(a_Player.GetHealth()));
 	Pkt.WriteBEUInt8((4 << 5 | (2 & 0x1F)) & 0xFF);
@@ -1254,6 +1265,9 @@ void cProtocol190::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 
 	cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
 	Pkt.WriteVarInt32(a_FallingBlock.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_FallingBlock.GetUniqueID());
 	Pkt.WriteBEUInt8(70);  // Falling block
 	Pkt.WriteFPInt(a_FallingBlock.GetPosX());
 	Pkt.WriteFPInt(a_FallingBlock.GetPosY());
@@ -1276,6 +1290,9 @@ void cProtocol190::SendSpawnMob(const cMonster & a_Mob)
 
 	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
 	Pkt.WriteFPInt(a_Mob.GetPosX());
 	Pkt.WriteFPInt(a_Mob.GetPosY());
@@ -1305,7 +1322,10 @@ void cProtocol190::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 		FixItemFramePositions(a_ObjectData, PosX, PosZ, Yaw);
 	}
 
-	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
+	cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_ObjectType));
 	Pkt.WriteFPInt(PosX);
@@ -1314,12 +1334,9 @@ void cProtocol190::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteByteAngle(Yaw);
 	Pkt.WriteBEInt32(a_ObjectData);
-	if (a_ObjectData != 0)
-	{
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
-	}
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 }
 
 
@@ -1330,8 +1347,11 @@ void cProtocol190::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
+	cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Vehicle.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
 	Pkt.WriteFPInt(a_Vehicle.GetPosX());
 	Pkt.WriteFPInt(a_Vehicle.GetPosY());
@@ -1339,12 +1359,9 @@ void cProtocol190::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
 	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteBEInt32(a_VehicleSubType);
-	if (a_VehicleSubType != 0)
-	{
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedX() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedY() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedZ() * 400));
-	}
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedZ() * 400));
 }
 
 
@@ -2014,22 +2031,23 @@ bool cProtocol190::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 				case 0x05: HandlePacketPlayerLook             (a_ByteBuffer); return true;
 				case 0x06: HandlePacketPlayerPosLook          (a_ByteBuffer); return true;
 				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return true;
-				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return true;
-				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return true;
-				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return true;
-				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return true;
-				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
-				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return true;
-				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return true;
-				case 0x0f:  // Confirm transaction - not used in MCS
-				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
-				case 0x11: HandlePacketEnchantItem            (a_ByteBuffer); return true;
-				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return true;
-				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
-				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return true;
-				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return true;
-				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return true;
-				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return true;
+				case 0x08: HandlePacketUseItem                (a_ByteBuffer); return true;
+				case 0x09: HandlePacketBlockPlace             (a_ByteBuffer); return true;
+				case 0x0a: HandlePacketSlotSelect             (a_ByteBuffer); return true;
+				case 0x0b: HandlePacketAnimation              (a_ByteBuffer); return true;
+				case 0x0c: HandlePacketEntityAction           (a_ByteBuffer); return true;
+				case 0x0d: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
+				case 0x0e: HandlePacketWindowClose            (a_ByteBuffer); return true;
+				case 0x0f: HandlePacketWindowClick            (a_ByteBuffer); return true;
+				case 0x10: break;  // Confirm transaction - not used in MCS
+				case 0x11: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x12: HandlePacketEnchantItem            (a_ByteBuffer); return true;
+				case 0x13: HandlePacketUpdateSign             (a_ByteBuffer); return true;
+				case 0x14: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
+				case 0x15: HandlePacketTabComplete            (a_ByteBuffer); return true;
+				case 0x16: HandlePacketClientSettings         (a_ByteBuffer); return true;
+				case 0x17: HandlePacketClientStatus           (a_ByteBuffer); return true;
+				case 0x18: HandlePacketPluginMessage          (a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -2220,6 +2238,8 @@ void cProtocol190::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 void cProtocol190::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
+
 	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
 }
 
@@ -2237,7 +2257,7 @@ void cProtocol190::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
 	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
 }
 
@@ -2253,11 +2273,8 @@ void cProtocol190::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
-
-	cItem Item;
-	ReadItem(a_ByteBuffer, Item, 3);
-
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
@@ -2285,6 +2302,7 @@ void cProtocol190::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinFlags);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,   MainHand);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
@@ -2564,6 +2582,7 @@ void cProtocol190::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 	{
 		case 0:
 		{
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand)
 			m_Client->HandleUseEntity(EntityID, false);
 			break;
 		}
@@ -2577,6 +2596,7 @@ void cProtocol190::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetX);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
 
 			// TODO: Do anything
 			break;
@@ -2587,6 +2607,18 @@ void cProtocol190::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			return;
 		}
 	}
+}
+
+
+
+
+
+void cProtocol190::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt64, Hand);
+
+	// TODO: Handle this right-click - we need to figure out what they are looking at or else rewrite the HandleRightClick method.
+	// m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
 
@@ -2888,7 +2920,7 @@ void cProtocol190::StartEncryption(const Byte * a_Key)
 
 
 
-eBlockFace cProtocol190::FaceIntToBlockFace(Int8 a_BlockFace)
+eBlockFace cProtocol190::FaceIntToBlockFace(UInt32 a_BlockFace)
 {
 	// Normalize the blockface values returned from the protocol
 	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE

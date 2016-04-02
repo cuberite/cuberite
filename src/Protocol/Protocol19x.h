@@ -3,6 +3,8 @@
 
 /*
 Declares the 1.9.x protocol classes:
+	- cProtocol190
+		- snapshot 15w31a protocol (#49)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -216,6 +218,7 @@ protected:
 	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
+	void HandlePacketUseItem                (cByteBuffer & a_ByteBuffer);
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
@@ -245,7 +248,7 @@ protected:
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
+	eBlockFace FaceIntToBlockFace(UInt32 a_FaceInt);
 
 	/** Writes the item data into a packet. */
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
