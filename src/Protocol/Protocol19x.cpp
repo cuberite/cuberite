@@ -381,7 +381,7 @@ void cProtocol190::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 	{
 		a_SlotNum++;
 	}
-	Pkt.WriteBEInt16(a_SlotNum);
+	Pkt.WriteVarInt32(a_SlotNum);
 	WriteItem(Pkt, a_Item);
 }
 
@@ -424,7 +424,7 @@ void cProtocol190::SendEntityMetadata(const cEntity & a_Entity)
 	cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityMetadata(Pkt, a_Entity);
-	Pkt.WriteBEUInt8(0x7f);  // The termination byte
+	Pkt.WriteBEUInt8(0xff);  // The termination byte
 }
 
 
@@ -687,6 +687,7 @@ void cProtocol190::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataS
 	Pkt.WriteVarInt32(a_Map.GetID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
 
+	Pkt.WriteBool(true);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
 	for (const auto & Decorator : a_Map.GetDecorators())
 	{
@@ -735,9 +736,10 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 	{
 		cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
 		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
-		Pkt.WriteBEUInt8((0x05 << 5) | 10);  // Slot type + index 10
+		Pkt.WriteBEUInt8(5);  // Index 5: Item
+		Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 		WriteItem(Pkt, a_Pickup.GetItem());
-		Pkt.WriteBEUInt8(0x7f);  // End of metadata
+		Pkt.WriteBEUInt8(0xff);  // End of metadata
 	}
 }
 
@@ -1030,11 +1032,13 @@ void cProtocol190::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteFPInt(a_Player.GetPosZ());
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	Pkt.WriteBEUInt8((3 << 5) | 6);  // Metadata: float + index 6
+	Pkt.WriteBEUInt8(6);  // Start metadata - Index 6: Health
+	Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 	Pkt.WriteBEFloat(static_cast<float>(a_Player.GetHealth()));
-	Pkt.WriteBEUInt8((4 << 5 | (2 & 0x1F)) & 0xFF);
+	Pkt.WriteBEUInt8(2);  // Index 2: Custom name
+	Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
 	Pkt.WriteString(a_Player.GetName());
-	Pkt.WriteBEUInt8(0x7f);  // Metadata: end
+	Pkt.WriteBEUInt8(0xff);  // Metadata: end
 }
 
 
@@ -1304,7 +1308,7 @@ void cProtocol190::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
-	Pkt.WriteBEUInt8(0x7f);  // Metadata terminator
+	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
 }
 
 
@@ -2532,6 +2536,7 @@ void cProtocol190::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 void cProtocol190::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Text);
+	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    AssumeCommand);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    HasPosition);
 
 	if (HasPosition)
@@ -3198,7 +3203,7 @@ void cProtocol190::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_
 void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
 	// Common metadata:
-	Byte Flags = 0;
+	Int8 Flags = 0;
 	if (a_Entity.IsOnFire())
 	{
 		Flags |= 0x01;
@@ -3219,21 +3224,24 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 	{
 		Flags |= 0x20;
 	}
-	a_Pkt.WriteBEUInt8(0);  // Byte(0) + index 0
-	a_Pkt.WriteBEUInt8(Flags);
+	a_Pkt.WriteBEUInt8(0);  // Index 0
+	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
+	a_Pkt.WriteBEInt8(Flags);
 
 	switch (a_Entity.GetEntityType())
 	{
 		case cEntity::etPlayer: break;  // TODO?
 		case cEntity::etPickup:
 		{
-			a_Pkt.WriteBEUInt8((5 << 5) | 10);  // Slot(5) + index 10
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 			WriteItem(a_Pkt, reinterpret_cast<const cPickup &>(a_Entity).GetItem());
 			break;
 		}
 		case cEntity::etMinecart:
 		{
-			a_Pkt.WriteBEUInt8(0x51);
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Shaking power
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 
 			// The following expression makes Minecarts shake more with less health or higher damage taken
 			// It gets half the maximum health, and takes it away from the current health minus the half health:
@@ -3243,11 +3251,15 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 			Health: 1 | 3 - (1 - 3) = 5
 			*/
 			auto & Minecart = reinterpret_cast<const cMinecart &>(a_Entity);
-			a_Pkt.WriteBEInt32((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4);
-			a_Pkt.WriteBEUInt8(0x52);
-			a_Pkt.WriteBEInt32(1);  // Shaking direction, doesn't seem to affect anything
-			a_Pkt.WriteBEUInt8(0x73);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // Damage taken / shake effect multiplyer
+			a_Pkt.WriteVarInt32((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4);
+
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Shaking direction (doesn't seem to effect anything)
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(1);
+
+			a_Pkt.WriteBEUInt8(7);  // Index 7: Shake multiplier / damage taken
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));
 
 			if (Minecart.GetPayload() == cMinecart::mpNone)
 			{
@@ -3255,20 +3267,26 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 				const cItem & MinecartContent = RideableMinecart.GetContent();
 				if (!MinecartContent.IsEmpty())
 				{
-					a_Pkt.WriteBEUInt8(0x54);
+					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 					int Content = MinecartContent.m_ItemType;
 					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteBEInt32(Content);
-					a_Pkt.WriteBEUInt8(0x55);
-					a_Pkt.WriteBEInt32(RideableMinecart.GetBlockHeight());
-					a_Pkt.WriteBEUInt8(0x56);
-					a_Pkt.WriteBEUInt8(1);
+					a_Pkt.WriteVarInt32(Content);
+
+					a_Pkt.WriteBEUInt8(9);  // Index 9: Block ID and damage
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+					a_Pkt.WriteVarInt32(RideableMinecart.GetBlockHeight());
+
+					a_Pkt.WriteBEUInt8(10);  // Index 10: Show block
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+					a_Pkt.WriteBool(true);
 				}
 			}
 			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
 			{
-				a_Pkt.WriteBEUInt8(0x10);
-				a_Pkt.WriteBEUInt8(reinterpret_cast<const cMinecartWithFurnace &>(Minecart).IsFueled() ? 1 : 0);
+				a_Pkt.WriteBEUInt8(11);  // Index 11: Is powered
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+				a_Pkt.WriteBool(reinterpret_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
 			}
 			break;
 		}  // case etMinecart
@@ -3280,13 +3298,15 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 			{
 				case cProjectileEntity::pkArrow:
 				{
-					a_Pkt.WriteBEUInt8(0x10);
-					a_Pkt.WriteBEUInt8(reinterpret_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Is critical
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+					a_Pkt.WriteBEInt8(reinterpret_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
 					break;
 				}
 				case cProjectileEntity::pkFirework:
 				{
-					a_Pkt.WriteBEUInt8(0xa8);
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Firework item used for this firework
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 					WriteItem(a_Pkt, reinterpret_cast<const cFireworkEntity &>(Projectile).GetItem());
 					break;
 				}
@@ -3307,10 +3327,12 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 		case cEntity::etItemFrame:
 		{
 			auto & Frame = reinterpret_cast<const cItemFrame &>(a_Entity);
-			a_Pkt.WriteBEUInt8(0xa8);
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 			WriteItem(a_Pkt, Frame.GetItem());
-			a_Pkt.WriteBEUInt8(0x09);
-			a_Pkt.WriteBEUInt8(Frame.GetItemRotation());
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Rotation
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
 		}  // case etItemFrame
 
@@ -3330,14 +3352,18 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 	// Living Enitiy Metadata
 	if (a_Mob.HasCustomName())
 	{
-		a_Pkt.WriteBEUInt8(0x82);
+		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
+		a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
+		a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
 		a_Pkt.WriteString(a_Mob.GetCustomName());
 
-		a_Pkt.WriteBEUInt8(0x03);
+		a_Pkt.WriteBEUInt8(3);  // Index 3: Custom name always visible
+		a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
 	}
 
-	a_Pkt.WriteBEUInt8(0x66);
+	a_Pkt.WriteBEUInt8(6);  // Index 6: Health
+	a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
 
 	switch (a_Mob.GetMobType())
@@ -3345,45 +3371,59 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		case mtBat:
 		{
 			auto & Bat = reinterpret_cast<const cBat &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Bat.IsHanging() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Bat flags - currently only hanging
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 0 : 1);
 			break;
 		}  // case mtBat
 
 		case mtCreeper:
 		{
 			auto & Creeper = reinterpret_cast<const cCreeper &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Creeper.IsBlowing() ? 1 : 255);
-			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8(Creeper.IsCharged() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: State (idle or "blowing")
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : -1);
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: Is charged
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Creeper.IsCharged());
+
+			a_Pkt.WriteBEUInt8(13);  // Index 13: Is ignited
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Creeper.IsBurnedWithFlintAndSteel());
 			break;
 		}  // case mtCreeper
 
 		case mtEnderman:
 		{
 			auto & Enderman = reinterpret_cast<const cEnderman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x30);
-			a_Pkt.WriteBEInt16(static_cast<Byte>(Enderman.GetCarriedBlock()));
-			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8(static_cast<Byte>(Enderman.GetCarriedMeta()));
-			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(Enderman.IsScreaming() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Carried block
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Enderman.GetCarriedBlock());
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: Carried block meta
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Enderman.GetCarriedMeta());
+
+			a_Pkt.WriteBEUInt8(13);  // Index 13: Is screaming
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Enderman.IsScreaming());
 			break;
 		}  // case mtEnderman
 
 		case mtGhast:
 		{
 			auto & Ghast = reinterpret_cast<const cGhast &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Ghast.IsCharging());
+			a_Pkt.WriteBEUInt8(11);  // Is attacking
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Ghast.IsCharging());
 			break;
 		}  // case mtGhast
 
 		case mtHorse:
 		{
 			auto & Horse = reinterpret_cast<const cHorse &>(a_Mob);
-			int Flags = 0;
+			Int8 Flags = 0;
 			if (Horse.IsTame())
 			{
 				Flags |= 0x02;
@@ -3408,139 +3448,176 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			{
 				Flags |= 0x80;
 			}
-			a_Pkt.WriteBEUInt8(0x50);  // Int at index 16
-			a_Pkt.WriteBEInt32(Flags);
-			a_Pkt.WriteBEUInt8(0x13);  // Byte at index 19
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Horse.GetHorseType()));
-			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
+			a_Pkt.WriteBEUInt8(12);  // Index 12: flags
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEInt8(Flags);
+
+			a_Pkt.WriteBEUInt8(13);  // Index 13: Variant / type
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Horse.GetHorseType());
+
+			a_Pkt.WriteBEUInt8(14);  // Index 14: Color/style
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			int Appearance = 0;
 			Appearance = Horse.GetHorseColor();
 			Appearance |= Horse.GetHorseStyle() << 8;
-			a_Pkt.WriteBEInt32(Appearance);
-			a_Pkt.WriteBEUInt8(0x56);  // Int at index 22
-			a_Pkt.WriteBEInt32(Horse.GetHorseArmour());
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Horse.IsBaby() ? -1 : (Horse.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteVarInt32(Appearance);
+
+			a_Pkt.WriteBEUInt8(16);  // Index 16: Armor
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Horse.GetHorseArmour());
+
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Horse.IsBaby());
 			break;
 		}  // case mtHorse
 
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = reinterpret_cast<const cMagmaCube &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(MagmaCube.GetSize()));
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Size
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(MagmaCube.GetSize());
 			break;
 		}  // case mtMagmaCube
 
 		case mtOcelot:
 		{
 			auto & Ocelot = reinterpret_cast<const cOcelot &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Ocelot.IsBaby() ? -1 : (Ocelot.IsInLoveCooldown() ? 1 : 0));
+
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Ocelot.IsBaby());
 			break;
 		}  // case mtOcelot
 
 		case mtCow:
 		{
 			auto & Cow = reinterpret_cast<const cCow &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Cow.IsBaby() ? -1 : (Cow.IsInLoveCooldown() ? 1 : 0));
+
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Cow.IsBaby());
 			break;
 		}  // case mtCow
 
 		case mtChicken:
 		{
 			auto & Chicken = reinterpret_cast<const cChicken &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Chicken.IsBaby() ? -1 : (Chicken.IsInLoveCooldown() ? 1 : 0));
+
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Chicken.IsBaby());
 			break;
 		}  // case mtChicken
 
 		case mtPig:
 		{
 			auto & Pig = reinterpret_cast<const cPig &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Pig.IsBaby() ? -1 : (Pig.IsInLoveCooldown() ? 1 : 0));
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Pig.IsSaddled() ? 1 : 0);
+
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Pig.IsBaby());
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: Is saddled
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Pig.IsSaddled());
 			break;
 		}  // case mtPig
 
 		case mtSheep:
 		{
 			auto & Sheep = reinterpret_cast<const cSheep &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Sheep.IsBaby() ? -1 : (Sheep.IsInLoveCooldown() ? 1 : 0));
 
-			a_Pkt.WriteBEUInt8(0x10);
-			Byte SheepMetadata = 0;
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Sheep.IsBaby());
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: sheared, color
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			Int8 SheepMetadata = 0;
 			SheepMetadata = static_cast<Byte>(Sheep.GetFurColor());
 			if (Sheep.IsSheared())
 			{
 				SheepMetadata |= 0x10;
 			}
-			a_Pkt.WriteBEUInt8(SheepMetadata);
+			a_Pkt.WriteBEInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
 
 		case mtRabbit:
 		{
 			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(Rabbit.GetRabbitTypeAsNumber());
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Rabbit.IsBaby() ? -1 : (Rabbit.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Rabbit.IsBaby());
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: Type
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Rabbit.GetRabbitTypeAsNumber());
 			break;
 		}  // case mtRabbit
 
 		case mtSkeleton:
 		{
 			auto & Skeleton = reinterpret_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(Skeleton.IsWither() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Type
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
 			break;
 		}  // case mtSkeleton
 
 		case mtSlime:
 		{
 			auto & Slime = reinterpret_cast<const cSlime &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Slime.GetSize()));
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Size
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Slime.GetSize());
 			break;
 		}  // case mtSlime
 
 		case mtVillager:
 		{
 			auto & Villager = reinterpret_cast<const cVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x50);
-			a_Pkt.WriteBEInt32(Villager.GetVilType());
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Villager.IsBaby() ? -1 : 0);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Villager.IsBaby());
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: Type
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Villager.GetVilType());
 			break;
 		}  // case mtVillager
 
 		case mtWitch:
 		{
 			auto & Witch = reinterpret_cast<const cWitch &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x15);
-			a_Pkt.WriteBEUInt8(Witch.IsAngry() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is angry
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Witch.IsAngry());
 			break;
 		}  // case mtWitch
 
 		case mtWither:
 		{
 			auto & Wither = reinterpret_cast<const cWither &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
-			a_Pkt.WriteBEInt32(static_cast<Int32>(Wither.GetWitherInvulnerableTicks()));
-			a_Pkt.WriteBEUInt8(0x66);  // Float at index 6
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
+			a_Pkt.WriteBEUInt8(14);  // Index 14: Invulnerable ticks
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Wither.GetWitherInvulnerableTicks());
+
+			// TODO: Use boss bar packet for health
 			break;
 		}  // case mtWither
 
 		case mtWolf:
 		{
 			auto & Wolf = reinterpret_cast<const cWolf &>(a_Mob);
-			Byte WolfStatus = 0;
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Wolf.IsBaby());
+
+			Int8 WolfStatus = 0;
 			if (Wolf.IsSitting())
 			{
 				WolfStatus |= 0x1;
@@ -3553,37 +3630,47 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			{
 				WolfStatus |= 0x4;
 			}
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(WolfStatus);
+			a_Pkt.WriteBEUInt8(12);  // Index 12: status
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEInt8(WolfStatus);
 
-			a_Pkt.WriteBEUInt8(0x72);
+			a_Pkt.WriteBEUInt8(14);  // Index 14: Health
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-			a_Pkt.WriteBEUInt8(0x13);
-			a_Pkt.WriteBEUInt8(Wolf.IsBegging() ? 1 : 0);
-			a_Pkt.WriteBEUInt8(0x14);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Wolf.GetCollarColor()));
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Wolf.IsBaby() ? -1 : 0);
+
+			a_Pkt.WriteBEUInt8(15);  // Index 15: Is begging
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Wolf.IsBegging());
+			
+			a_Pkt.WriteBEUInt8(16);  // Index 16: Collar color
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteVarInt32(static_cast<UInt8>(Wolf.GetCollarColor()));
 			break;
 		}  // case mtWolf
 
 		case mtZombie:
 		{
 			auto & Zombie = reinterpret_cast<const cZombie &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Zombie.IsBaby() ? 1 : -1);
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(Zombie.IsVillagerZombie() ? 1 : 0);
-			a_Pkt.WriteBEUInt8(0x0e);
-			a_Pkt.WriteBEUInt8(Zombie.IsConverting() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Zombie.IsBaby());
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: Is a villager
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Zombie.IsVillagerZombie());
+
+			a_Pkt.WriteBEUInt8(13);  // Index 13: Is converting
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Zombie.IsConverting());
 			break;
 		}  // case mtZombie
 
 		case mtZombiePigman:
 		{
 			auto & ZombiePigman = reinterpret_cast<const cZombiePigman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(ZombiePigman.IsBaby() ? 1 : -1);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
 	}  // switch (a_Mob.GetType())

@@ -25,6 +25,7 @@ public:
 
 	bool IsBlowing(void) const {return m_bIsBlowing; }
 	bool IsCharged(void) const {return m_bIsCharged; }
+	bool IsBurnedWithFlintAndSteel(void) const {return m_BurnedWithFlintAndSteel; }
 
 private:
 

@@ -253,7 +253,7 @@ protected:
 	/** Writes the item data into a packet. */
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
-	/** Writes the metadata for the specified entity, not including the terminating 0x7f. */
+	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
 	void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the mob-specific metadata for the specified mob */
@@ -264,6 +264,23 @@ protected:
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
+
+	/** Types used within metadata */
+	enum eMetadataType
+	{
+		METADATA_TYPE_BYTE              = 0,
+		METADATA_TYPE_VARINT            = 1,
+		METADATA_TYPE_FLOAT             = 2,
+		METADATA_TYPE_STRING            = 3,
+		METADATA_TYPE_CHAT              = 4,
+		METADATA_TYPE_ITEM              = 5,
+		METADATA_TYPE_BOOL              = 6,
+		METADATA_TYPE_ROTATION          = 7,
+		METADATA_TYPE_POSITION          = 8,
+		METADATA_TYPE_OPTIONAL_POSITION = 9,
+		METADATA_TYPE_DIRECTION         = 10,
+		METADATA_TYPE_OPTIONAL_UUID     = 11
+	} ;
 } ;
 
 
