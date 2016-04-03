@@ -1014,15 +1014,12 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	// Add entities waiting in the queue to be added:
 	{
 		cCSLock Lock(m_CSEntitiesToAdd);
-		for (cEntityList::iterator itr = m_EntitiesToAdd.begin(), end = m_EntitiesToAdd.end(); itr != end; ++itr)
+		for (auto & Entity : m_EntitiesToAdd)
 		{
-			(*itr)->SetWorld(this);
-			m_ChunkMap->AddEntity(*itr);
-			ASSERT(!(*itr)->IsTicking());
-			if (m_ChunkMap->HasEntity((*itr)->GetUniqueID()))
-			{
-				(*itr)->SetIsTicking(true);
-			}
+			Entity->SetWorld(this);
+			m_ChunkMap->AddEntity(Entity);
+			ASSERT(!Entity->IsTicking());
+			Entity->SetIsTicking(true);
 		}
 		m_EntitiesToAdd.clear();
 	}
@@ -3820,21 +3817,18 @@ void cWorld::AddQueuedPlayers(void)
 	// Add all the players in the grabbed list:
 	{
 		cCSLock Lock(m_CSPlayers);
-		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
+		for (auto Player : PlayersToAdd)
 		{
-			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?
-			LOGD("Adding player %s to world \"%s\".", (*itr)->GetName().c_str(), m_WorldName.c_str());
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), Player) == m_Players.end());  // Is it already in the list? HOW?
+			LOGD("Adding player %s to world \"%s\".", Player->GetName().c_str(), m_WorldName.c_str());
 
-			m_Players.push_back(*itr);
-			(*itr)->SetWorld(this);
+			m_Players.push_back(Player);
+			Player->SetWorld(this);
 
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
-			m_ChunkMap->AddEntityIfNotPresent(*itr);
-			ASSERT(!(*itr)->IsTicking());
-			if (m_ChunkMap->HasEntity((*itr)->GetUniqueID()))
-			{
-				(*itr)->SetIsTicking(true);
-			}
+			m_ChunkMap->AddEntityIfNotPresent(Player);
+			ASSERT(!Player->IsTicking());
+			Player->SetIsTicking(true);
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSPlayers)
 

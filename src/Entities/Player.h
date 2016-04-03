@@ -459,8 +459,12 @@ public:
 	*/
 	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
 
-	/** Sets the player's bed (home) position */
-	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
+	/** Sets the player's bed (home / respawn) position to the specified position.
+	Sets the respawn world to the player's world. */
+	void SetBedPos(const Vector3i & a_Pos);
+
+	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
+	void SetBedPos(const Vector3i & a_Pos, cWorld * a_World);
 
 	// tolua_end
 
@@ -583,6 +587,9 @@ protected:
 
 	/** The player's last saved bed position */
 	Vector3i m_LastBedPos;
+
+	/** The world which the player respawns in upon death */
+	cWorld * m_SpawnWorld;
 
 	eGameMode m_GameMode;
 	AString m_IP;

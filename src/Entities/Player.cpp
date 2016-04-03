@@ -108,7 +108,9 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		SetPosX(World->GetSpawnX());
 		SetPosY(World->GetSpawnY());
 		SetPosZ(World->GetSpawnZ());
-		SetBedPos(Vector3i(static_cast<int>(World->GetSpawnX()), static_cast<int>(World->GetSpawnY()), static_cast<int>(World->GetSpawnZ())));
+
+		// This is a new player. Set the player spawn point to the spawn point of the default world
+		SetBedPos(Vector3i(static_cast<int>(World->GetSpawnX()), static_cast<int>(World->GetSpawnY()), static_cast<int>(World->GetSpawnZ())), World);
 
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -828,6 +830,27 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 
 
+void cPlayer::SetBedPos(const Vector3i & a_Pos)
+{
+	m_LastBedPos = a_Pos;
+	m_SpawnWorld = m_World;
+}
+
+
+
+
+
+void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
+{
+	m_LastBedPos = a_Pos;
+	ASSERT(a_World != nullptr);
+	m_SpawnWorld = a_World;
+}
+
+
+
+
+
 void cPlayer::SetFlying(bool a_IsFlying)
 {
 	if (a_IsFlying == m_IsFlying)
@@ -1078,12 +1101,19 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(GetWorld()->GetDimension(), true);
+	m_ClientHandle->SendRespawn(m_SpawnWorld->GetDimension(), true);
 
 	// Extinguish the fire:
 	StopBurning();
 
-	TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+	if (GetWorld() != m_SpawnWorld)
+	{
+		MoveToWorld(m_SpawnWorld, false, GetLastBedPos());
+	}
+	else
+	{
+		TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+	}
 
 	SetVisible(true);
 }
@@ -1895,9 +1925,16 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		a_World = cRoot::Get()->GetDefaultWorld();
 	}
 
+
 	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
 	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
 	m_LastBedPos.z = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
+	AString SpawnWorldName =  root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
+	m_SpawnWorld = cRoot::Get()->GetWorld(SpawnWorldName);
+	if (m_SpawnWorld == nullptr)
+	{
+		m_SpawnWorld = cRoot::Get()->GetDefaultWorld();
+	}
 
 	// Load the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
@@ -1955,6 +1992,7 @@ bool cPlayer::SaveToDisk()
 	root["SpawnX"]              = GetLastBedPos().x;
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
+	root["SpawnWorld"]          = m_SpawnWorld->GetName();
 
 	if (m_World != nullptr)
 	{
