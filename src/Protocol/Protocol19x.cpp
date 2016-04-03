@@ -4,7 +4,7 @@
 /*
 Implements the 1.9.x protocol classes:
 	- cProtocol190
-		- shapshot 15w31a protocol (#49)
+		- shapshot 15w35e protocol (#66)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -189,7 +189,7 @@ void cProtocol190::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x24);  // Block Action packet
+	cPacketizer Pkt(*this, 0x25);  // Block Action packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
@@ -204,7 +204,7 @@ void cProtocol190::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_Blo
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x25);  // Block Break Animation packet
+	cPacketizer Pkt(*this, 0x26);  // Block Break Animation packet
 	Pkt.WriteVarInt32(a_EntityID);
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Stage);
@@ -218,7 +218,7 @@ void cProtocol190::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x23);  // Block Change packet
+	cPacketizer Pkt(*this, 0x24);  // Block Change packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
 }
@@ -231,7 +231,7 @@ void cProtocol190::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x22);  // Multi Block Change packet
+	cPacketizer Pkt(*this, 0x23);  // Multi Block Change packet
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
@@ -281,7 +281,7 @@ void cProtocol190::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0, a_ChunkX, a_ChunkZ);
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_0, a_ChunkX, a_ChunkZ);
 
 	cCSLock Lock(m_CSPacket);
 	SendData(ChunkData.data(), ChunkData.size());
@@ -1483,12 +1483,9 @@ void cProtocol190::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
+	cPacketizer Pkt(*this, 0x22);  // Unload chunk packet
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
-	Pkt.WriteBool(true);
-	Pkt.WriteBEInt16(0);  // Primary bitmap
-	Pkt.WriteVarInt32(0);  // Data size
 }
 
 
@@ -2560,15 +2557,10 @@ void cProtocol190::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 	}
 
 	AString Lines[4];
-	Json::Value root;
-	Json::Reader reader;
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
-		if (reader.parse(Line, root, false))
-		{
-			Lines[i] = root.asString();
-		}
+		Lines[i] = Line;
 	}
 
 	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);
@@ -3456,7 +3448,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(Horse.GetHorseType());
 
-			a_Pkt.WriteBEUInt8(14);  // Index 14: Color/style
+			a_Pkt.WriteBEUInt8(14);  // Index 14: Color / style
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			int Appearance = 0;
 			Appearance = Horse.GetHorseColor();
@@ -3641,7 +3633,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(15);  // Index 15: Is begging
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Wolf.IsBegging());
-			
+
 			a_Pkt.WriteBEUInt8(16);  // Index 16: Collar color
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
 			a_Pkt.WriteVarInt32(static_cast<UInt8>(Wolf.GetCollarColor()));
@@ -3656,8 +3648,8 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBool(Zombie.IsBaby());
 
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Is a villager
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Zombie.IsVillagerZombie());
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);  // TODO: This actually encodes the zombie villager profession, but that isn't implemented yet.
 
 			a_Pkt.WriteBEUInt8(13);  // Index 13: Is converting
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
