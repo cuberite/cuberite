@@ -363,6 +363,8 @@ public:  // tolua_export
 	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
 	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
 
+	void InvalidateCachedSentChunk();
+
 private:
 
 	friend class cServer;  // Needs access to SetSelf()
@@ -407,6 +409,13 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
+
+	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
+	whether or not the player is standing at a sent chunk.
+	If this is equal to the coordinates of the chunk the player is currrently standing at, then this must be a sent chunk
+	and a member of m_SentChunks.
+	Otherwise, this contains an arbitrary value which should not be used. */
+	cChunkCoords m_CachedSentChunk;
 
 	bool m_HasSentDC;  ///< True if a Disconnect packet has been sent in either direction
 

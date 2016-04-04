@@ -50,6 +50,8 @@ public:
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
+	void TickFreezeCode(bool a_MyChunkIsSent);
+
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the currently equipped weapon; empty item if none */
