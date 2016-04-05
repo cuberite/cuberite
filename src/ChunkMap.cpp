@@ -2920,8 +2920,9 @@ void cChunkMap::cChunkLayer::Tick(std::chrono::milliseconds a_Dt)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
-		// Only tick chunks that are valid and should be ticked:
-		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->IsValid() && m_Chunks[i]->ShouldBeTicked())
+		// Only tick chunks that should be ticked:
+		// Note that chunks that are not IsValid() will only tick players and then bailout
+		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->ShouldBeTicked())
 		{
 			m_Chunks[i]->Tick(a_Dt);
 		}

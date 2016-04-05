@@ -50,7 +50,7 @@ public:
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	void TickFreezeCode(bool a_MyChunkIsSent);
+	void TickFreezeCode();
 
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
@@ -147,9 +147,6 @@ public:
 
 	/** Is the player frozen? */
 	bool IsFrozen();
-
-	/** How long has the player been frozen? */
-	int GetFrozenDuration();
 
 	/** Cancels Freeze(...) and allows the player to move naturally. */
 	void Unfreeze();
@@ -605,14 +602,8 @@ protected:
 
 	cSlotNums m_InventoryPaintSlots;
 
-	/** if m_IsFrozen is true, we lock m_Location to this position. */
-	Vector3d m_FrozenPosition;
-
 	/** If true, we are locking m_Position to m_FrozenPosition. */
 	bool m_IsFrozen;
-
-	/** */
-	int m_FreezeCounter;
 
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;

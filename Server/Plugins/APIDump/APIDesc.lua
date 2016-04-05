@@ -1946,7 +1946,6 @@ a_Player:OpenWindow(Window);
 				GetFoodPoisonedTicksRemaining = { Params = "", Return = "", Notes = "Returns the number of ticks left for the food posoning effect" },
 				GetFoodSaturationLevel = { Params = "", Return = "number", Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)" },
 				GetFoodTickTimer = { Params = "", Return = "", Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
-				GetFrozenDuration = { Params = "", Return = "number", Notes = "Returns the number of ticks since the player was frozen" },
 				GetGameMode = { Return = "{{Globals#GameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
 				GetIP = { Return = "string", Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report."},
 				GetInventory = { Return = "{{cInventory|Inventory}}", Notes = "Returns the player's inventory"},
