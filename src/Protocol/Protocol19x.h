@@ -4,7 +4,7 @@
 /*
 Declares the 1.9.x protocol classes:
 	- cProtocol190
-		- snapshot 15w35e protocol (#66)
+		- snapshot 15w40b protocol (#76)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -279,7 +279,8 @@ protected:
 		METADATA_TYPE_POSITION          = 8,
 		METADATA_TYPE_OPTIONAL_POSITION = 9,
 		METADATA_TYPE_DIRECTION         = 10,
-		METADATA_TYPE_OPTIONAL_UUID     = 11
+		METADATA_TYPE_OPTIONAL_UUID     = 11,
+		METADATA_TYPE_BLOCKID           = 12
 	} ;
 } ;
 

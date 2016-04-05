@@ -10,6 +10,7 @@
 #include "zlib/zlib.h"
 #include "ByteBuffer.h"
 #include "Protocol18x.h"
+#include "Protocol19x.h"
 
 
 
@@ -45,6 +46,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 	{
 		case RELEASE_1_3_2: Serialize39(data); break;
 		case RELEASE_1_8_0: Serialize47(data, a_ChunkX, a_ChunkZ); break;
+		case RELEASE_1_9_0: Serialize107(data, a_ChunkX, a_ChunkZ); break;
 		// TODO: Other protocol versions may serialize the data differently; implement here
 
 		default:
@@ -165,6 +167,130 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	if (PacketData.size() >= 256)
 	{
 		if (!cProtocol180::CompressPacket(PacketData, a_Data))
+		{
+			ASSERT(!"Packet compression failed.");
+			a_Data.clear();
+			return;
+		}
+	}
+	else
+	{
+		AString PostData;
+		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
+		Buffer.WriteVarInt32(0);
+		Buffer.ReadAll(PostData);
+		Buffer.CommitRead();
+
+		a_Data.clear();
+		a_Data.reserve(PostData.size() + PacketData.size());
+		a_Data.append(PostData.data(), PostData.size());
+		a_Data.append(PacketData.data(), PacketData.size());
+	}
+}
+
+
+
+
+
+void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+{
+	// This function returns the fully compressed packet (including packet size), not the raw packet!
+
+	// Create the packet:
+	cByteBuffer Packet(512 KiB);
+	Packet.WriteVarInt32(0x20);  // Packet id (Chunk Data packet)
+	Packet.WriteBEInt32(a_ChunkX);
+	Packet.WriteBEInt32(a_ChunkZ);
+	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag
+	Packet.WriteVarInt32(0x0000ffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
+	// Write the chunk size:
+	const size_t NumChunkSections = 16;
+	const size_t ChunkSectionBlocks = 16 * 16 * 16;
+	const size_t BitsPerEntry = 13;
+	const size_t ChunkSectionDataArraySize = (ChunkSectionBlocks * BitsPerEntry) / 8 / 8;  // Convert from bit count to long count
+	const size_t ChunkSectionSize = (
+		1 +                                         // Bits per block - set to 0, so the global palette is used and the palette fields are not sent
+		1 +                                         // Palette length
+		2 +                                         // Data array length VarInt - 2 bytes for the current value
+		ChunkSectionDataArraySize * 8 +             // Actual block data - multiplied by 8 because first number is longs
+		sizeof(m_BlockLight) / NumChunkSections +   // Block light
+		sizeof(m_BlockSkyLight) / NumChunkSections  // Sky light
+	);
+
+	const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
+	const size_t ChunkSize = (
+		ChunkSectionSize * 16 +
+		BiomeDataSize
+	);
+	Packet.WriteVarInt32(ChunkSize);
+
+	// Write each chunk section...
+	for (size_t SectionIndex = 0; SectionIndex < 16; SectionIndex++)
+	{
+		Packet.WriteBEUInt8(BitsPerEntry);
+		Packet.WriteVarInt32(0);  // Palette length is 0
+		Packet.WriteVarInt32(ChunkSectionDataArraySize);
+
+		size_t StartIndex = SectionIndex * ChunkSectionBlocks;
+
+		UInt64 Buffer[ChunkSectionDataArraySize] = { };
+
+		for (size_t Index = 0; Index < ChunkSectionBlocks; Index++)
+		{
+			UInt64 Value = m_BlockTypes[StartIndex + Index] << 4;
+			if (Index % 2 == 0)
+			{
+				Value |= m_BlockMetas[(StartIndex + Index) / 2] & 0x0f;
+			}
+			else
+			{
+				Value |= m_BlockMetas[(StartIndex + Index) / 2] >> 4;
+			}
+			Value &= 0b1111111111111;  // 13 bits
+
+			// Painful part where we write data into the long array.  Based off of the normal code.
+			int BitPosition = Index * BitsPerEntry;
+			int FirstIndex = BitPosition / 64;
+			int SecondIndex = ((Index + 1) * BitsPerEntry - 1) / 64;
+			int Bit = BitPosition % 64;
+			Buffer[FirstIndex] |= (Value << Bit);
+
+			if (FirstIndex != SecondIndex)
+			{
+				Buffer[SecondIndex] |= (Value >> (64 - Bit));
+			}
+		}
+
+		// Write out those values now.
+		for (size_t i = 0; i < ChunkSectionDataArraySize; i++)
+		{
+			Packet.WriteBEUInt64(Buffer[i]);
+		}
+
+		// Light - stored as a nibble, so we need half sizes
+		// As far as I know, there isn't a method to only write a range of the array
+		for (size_t Index = 0; Index < ChunkSectionBlocks / 2; Index++)
+		{
+			Packet.WriteBEUInt8(m_BlockLight[(StartIndex / 2) + Index]);
+		}
+		// Two separate arrays, one after the other - can't merge these two loops together
+		for (size_t Index = 0; Index < ChunkSectionBlocks / 2; Index++)
+		{
+			Packet.WriteBEUInt8(m_BlockSkyLight[(StartIndex / 2) + Index]);
+		}
+	}
+
+	// Write the biome data
+	Packet.WriteBuf(m_BiomeData, BiomeDataSize);
+
+	AString PacketData;
+	Packet.ReadAll(PacketData);
+	Packet.CommitRead();
+
+	cByteBuffer Buffer(20);
+	if (PacketData.size() >= 256)
+	{
+		if (!cProtocol190::CompressPacket(PacketData, a_Data))
 		{
 			ASSERT(!"Packet compression failed.");
 			a_Data.clear();

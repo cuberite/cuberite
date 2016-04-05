@@ -24,12 +24,14 @@ protected:
 
 	void Serialize39(AString & a_Data);  // Release 1.3.1 to 1.7.10
 	void Serialize47(AString & a_Data, int a_ChunkX, int a_ChunkZ);  // Release 1.8
+	void Serialize107(AString & a_Data, int a_ChunkX, int a_ChunkZ);  // Release 1.9
 
 public:
 	enum
 	{
 		RELEASE_1_3_2 = 39,
 		RELEASE_1_8_0 = 47,
+		RELEASE_1_9_0 = 107,
 	} ;
 
 	cChunkDataSerializer(
