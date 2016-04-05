@@ -764,6 +764,12 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		return;
 	}
 
+	if (m_Player->IsFrozen())
+	{
+		// Ignore client-side updates if the player is frozen
+		return;
+	}
+
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	Vector3d OldPosition = GetPlayer()->GetPosition();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
@@ -1864,8 +1870,6 @@ void cClientHandle::RemoveFromWorld(void)
 	// Here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
-
-	m_HasSentPlayerChunk = false;
 }
 
 
@@ -1878,6 +1882,15 @@ void cClientHandle::InvalidateCachedSentChunk()
 	// Sets this to a junk value different from the player's current chunk, which invalidates it and
 	// ensures its value will not be used.
 	m_CachedSentChunk = cChunkCoords(m_Player->GetChunkX() + 500, m_Player->GetChunkZ());
+}
+
+
+
+
+
+bool cClientHandle::IsPlayerChunkSent()
+{
+	return m_HasSentPlayerChunk;
 }
 
 
@@ -1943,8 +1956,9 @@ void cClientHandle::Tick(float a_Dt)
 
 
 	// Freeze the player if it is standing on a chunk not yet sent to the client
+	m_HasSentPlayerChunk = false;
+	if (m_Player->GetParentChunk() != nullptr)
 	{
-		bool PlayerIsStandingAtASentChunk = false;
 		// If the chunk is invalid, do not bother checking if it's sent to the client, it is definitely not
 		if (m_Player->GetParentChunk()->IsValid())
 		{
@@ -1952,7 +1966,7 @@ void cClientHandle::Tick(float a_Dt)
 			// If so, the chunk has been sent to the client. This is an optimization that saves an iteration of m_SentChunks.
 			if (cChunkCoords(m_Player->GetChunkX(), m_Player->GetChunkZ()) == m_CachedSentChunk)
 			{
-				PlayerIsStandingAtASentChunk = true;
+				m_HasSentPlayerChunk = true;
 			}
 			else
 			{
@@ -1963,12 +1977,10 @@ void cClientHandle::Tick(float a_Dt)
 				if (itr != m_SentChunks.end())
 				{
 					m_CachedSentChunk = *itr;
-					PlayerIsStandingAtASentChunk = true;
+					m_HasSentPlayerChunk = true;
 				}
 			}
 		}
-		// The player will freeze itself if it is standing on a chunk not yet sent to the client
-		m_Player->TickFreezeCode(PlayerIsStandingAtASentChunk);
 	}
 
 	// If the chunk the player's in was just sent, spawn the player:
@@ -2280,15 +2292,6 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	{
 		cCSLock Lock(m_CSChunkLists);
 		m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
-	}
-
-	// If it is the chunk the player's in, make them spawn (in the tick thread):
-	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
-	{
-		if ((a_ChunkX == m_Player->GetChunkX()) && (a_ChunkZ == m_Player->GetChunkZ()))
-		{
-			m_HasSentPlayerChunk = true;
-		}
 	}
 }
 

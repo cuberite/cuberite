@@ -365,6 +365,8 @@ public:  // tolua_export
 
 	void InvalidateCachedSentChunk();
 
+	bool IsPlayerChunkSent();
+
 private:
 
 	friend class cServer;  // Needs access to SetSelf()

@@ -502,7 +502,6 @@ private:
 
 	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
 	bool m_ShouldGenerateIfLoadFailed;
-	bool m_IsInTick;       // True if the chunk is executing the tick() method.
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved

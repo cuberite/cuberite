@@ -604,7 +604,19 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
-	m_IsInTick = true;
+	// If we are not valid, tick players and bailout
+	if (!IsValid())
+	{
+		for (auto Entity : m_Entities)
+		{
+			if (Entity->IsPlayer())
+			{
+				Entity->Tick(a_Dt, *this);
+			}
+		}
+		return;
+	}
+
 	BroadcastPendingBlockChanges();
 
 	CheckBlocks();
@@ -668,7 +680,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	}  // for itr - m_Entitites[]
 
 	ApplyWeatherToTop();
-	m_IsInTick = false;
 }
 
 

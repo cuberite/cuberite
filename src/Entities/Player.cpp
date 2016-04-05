@@ -65,7 +65,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_GameMode(eGameMode_NotSet),
 	m_IP(""),
 	m_ClientHandle(a_Client),
-	m_FreezeCounter(-1),
 	m_NormalMaxSpeed(1.0),
 	m_SprintingMaxSpeed(1.3),
 	m_FlyingMaxSpeed(1.0),
@@ -119,7 +118,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 
 	m_LastGroundHeight = static_cast<float>(GetPosY());
 	m_Stance = GetPosY() + 1.62;
-	FreezeInternal(GetPosition(), false);  // Freeze. Will be unfrozen once the chunk is loaded
+
 
 	if (m_GameMode == gmNotSet)
 	{
@@ -246,13 +245,16 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		ASSERT(!"Player ticked whilst in the process of destruction!");
 	}
 
+
 	m_Stats.AddValue(statMinutesPlayed, 1);
 
 	// Handle a frozen player
+	TickFreezeCode();
 	if (m_IsFrozen)
 	{
 		return;
 	}
+	ASSERT((GetParentChunk() != nullptr) && (GetParentChunk()->IsValid()));
 
 	ASSERT(a_Chunk.IsValid());
 
@@ -314,18 +316,13 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cPlayer::TickFreezeCode(bool a_MyChunkIsSent)
+void cPlayer::TickFreezeCode()
 {
-	// This function is ticked by the player's client handle. This ensures it always ticks, even if the player
-	// is standing in an unloaded chunk, unlike cPlayer::Tick. We need this because the freeze handling code must
-	// also tick in unloaded chunks.
 	if (m_IsFrozen)
 	{
-		m_FreezeCounter += 1;
-		if ((!m_IsManuallyFrozen) && (a_MyChunkIsSent))
+		if ((!m_IsManuallyFrozen) && (GetClientHandle()->IsPlayerChunkSent()))
 		{
-			cWorld::cLock Lock(*GetWorld());
-			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded
+			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded and sent
 			Unfreeze();
 
 			// Pull the player out of any solids that might have loaded on them.
@@ -357,26 +354,16 @@ void cPlayer::TickFreezeCode(bool a_MyChunkIsSent)
 				}
 			}
 		}
-		else
+		else if (GetWorld()->GetWorldAge() % 4096 == 0)
 		{
-			// If the player was externally / manually frozen (plugin, etc.) or if the chunk isn't loaded yet:
-			// 1. Set the location to m_FrozenPosition every tick.
-			// 2. Zero out the speed every tick.
-			// 3. Send location updates every 60 ticks.
-
-			if ((m_FreezeCounter % 60 == 0) || ((m_FrozenPosition - GetPosition()).SqrLength() > 2 * 2))
-			{
-				SetPosition(m_FrozenPosition);
-				SetSpeed(0, 0, 0);
-				BroadcastMovementUpdate(m_ClientHandle.get());
-				m_ClientHandle->SendPlayerPosition();
-			}
-			return;
+			// Despite the client side freeze, the player may be able to move a little by
+			// Jumping or canceling flight. Re-freeze every now and then
+			FreezeInternal(GetPosition(), m_IsManuallyFrozen);
 		}
 	}
 	else
 	{
-		if (!a_MyChunkIsSent)
+		if (!GetClientHandle()->IsPlayerChunkSent())
 		{
 			FreezeInternal(GetPosition(), false);
 		}
@@ -772,8 +759,9 @@ double cPlayer::GetMaxSpeed(void) const
 void cPlayer::SetNormalMaxSpeed(double a_Speed)
 {
 	m_NormalMaxSpeed = a_Speed;
-	if (!m_IsSprinting && !m_IsFlying)
+	if (!m_IsSprinting && !m_IsFlying && !m_IsFrozen)
 	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
 }
@@ -785,8 +773,9 @@ void cPlayer::SetNormalMaxSpeed(double a_Speed)
 void cPlayer::SetSprintingMaxSpeed(double a_Speed)
 {
 	m_SprintingMaxSpeed = a_Speed;
-	if (m_IsSprinting && !m_IsFlying)
+	if (m_IsSprinting && !m_IsFlying && !m_IsFrozen)
 	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
 }
@@ -800,7 +789,11 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 	m_FlyingMaxSpeed = a_Speed;
 
 	// Update the flying speed, always:
-	m_ClientHandle->SendPlayerAbilities();
+	if (!m_IsFrozen)
+	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
+		m_ClientHandle->SendPlayerAbilities();
+	}
 }
 
 
@@ -907,7 +900,11 @@ void cPlayer::SetFlying(bool a_IsFlying)
 	}
 
 	m_IsFlying = a_IsFlying;
-	m_ClientHandle->SendPlayerAbilities();
+	if (!m_IsFrozen)
+	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
+		m_ClientHandle->SendPlayerAbilities();
+	}
 }
 
 
@@ -1471,22 +1468,14 @@ bool cPlayer::IsFrozen()
 
 
 
-int cPlayer::GetFrozenDuration()
-{
-	return m_FreezeCounter;
-}
-
-
-
-
-
 void cPlayer::Unfreeze()
 {
-	m_FreezeCounter = -1;
+	GetClientHandle()->SendPlayerAbilities();
+	GetClientHandle()->SendPlayerMaxSpeed();
+
 	m_IsFrozen = false;
-	SetPosition(m_FrozenPosition);
-	BroadcastMovementUpdate(m_ClientHandle.get());
-	m_ClientHandle->SendPlayerPosition();
+	BroadcastMovementUpdate(GetClientHandle());
+	GetClientHandle()->SendPlayerPosition();
 }
 
 
@@ -1545,8 +1534,12 @@ void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 
 void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
+	if (m_IsFrozen)
+	{
+		// Do not set speed to a frozen client
+		return;
+	}
 	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
-
 	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
 }
@@ -1768,9 +1761,33 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 {
+	SetSpeed(0, 0, 0);
+	SetPosition(a_Location);
 	m_IsFrozen = true;
-	m_FrozenPosition = a_Location;
 	m_IsManuallyFrozen = a_ManuallyFrozen;
+
+	double NormalMaxSpeed = GetNormalMaxSpeed();
+	double SprintMaxSpeed = GetSprintingMaxSpeed();
+	double FlyingMaxpeed = GetFlyingMaxSpeed();
+	bool IsFlying = m_IsFlying;
+
+	// Set the client-side speed to 0
+	m_NormalMaxSpeed = 0;
+	m_SprintingMaxSpeed = 0;
+	m_FlyingMaxSpeed = 0;
+	m_IsFlying = true;
+
+	// Send the client its fake speed and max speed of 0
+	GetClientHandle()->SendPlayerMoveLook();
+	GetClientHandle()->SendPlayerAbilities();
+	GetClientHandle()->SendPlayerMaxSpeed();
+	GetClientHandle()->SendEntityVelocity(*this);
+
+	// Keep the server side speed variables as they were in the first place
+	m_NormalMaxSpeed = NormalMaxSpeed;
+	m_SprintingMaxSpeed = SprintMaxSpeed;
+	m_FlyingMaxSpeed = FlyingMaxpeed;
+	m_IsFlying = IsFlying;
 }
 
 
