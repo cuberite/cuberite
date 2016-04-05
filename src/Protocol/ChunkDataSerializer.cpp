@@ -233,7 +233,8 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 
 		size_t StartIndex = SectionIndex * ChunkSectionBlocks;
 
-		UInt64 Buffer[ChunkSectionDataArraySize] = { };
+		UInt64 TempLong = 0;  // Temporary value that will be stored into
+		UInt64 CurrentlyWrittenIndex = 0;  // "Index" of the long that would be written to
 
 		for (size_t Index = 0; Index < ChunkSectionBlocks; Index++)
 		{
@@ -249,23 +250,32 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 			Value &= 0b1111111111111;  // 13 bits
 
 			// Painful part where we write data into the long array.  Based off of the normal code.
-			int BitPosition = Index * BitsPerEntry;
-			int FirstIndex = BitPosition / 64;
-			int SecondIndex = ((Index + 1) * BitsPerEntry - 1) / 64;
-			int Bit = BitPosition % 64;
-			Buffer[FirstIndex] |= (Value << Bit);
+			size_t BitPosition = Index * BitsPerEntry;
+			size_t FirstIndex = BitPosition / 64;
+			size_t SecondIndex = ((Index + 1) * BitsPerEntry - 1) / 64;
+			size_t BitOffset = BitPosition % 64;
+
+			if (FirstIndex != CurrentlyWrittenIndex)
+			{
+				// Write the current data before modifiying it.
+				Packet.WriteBEUInt64(TempLong);
+				TempLong = 0;
+				CurrentlyWrittenIndex = FirstIndex;
+			}
+
+			TempLong |= (Value << BitOffset);
 
 			if (FirstIndex != SecondIndex)
 			{
-				Buffer[SecondIndex] |= (Value >> (64 - Bit));
+				// Part of the data is now in the second long; write the first one first
+				Packet.WriteBEUInt64(TempLong);
+				CurrentlyWrittenIndex = SecondIndex;
+
+				TempLong = (Value >> (64 - BitOffset));
 			}
 		}
-
-		// Write out those values now.
-		for (size_t i = 0; i < ChunkSectionDataArraySize; i++)
-		{
-			Packet.WriteBEUInt64(Buffer[i]);
-		}
+		// The last long will generally not be written
+		Packet.WriteBEUInt64(TempLong);
 
 		// Light - stored as a nibble, so we need half sizes
 		// As far as I know, there isn't a method to only write a range of the array
