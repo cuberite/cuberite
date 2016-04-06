@@ -1131,52 +1131,6 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 			}
 		}  // for i - AllFamilies[]
 	}  // if (Spawning enabled)
-
-	class cCallback : public cEntityCallback
-	{
-		virtual bool Item(cEntity * a_Entity) override
-		{
-			if (!a_Entity->IsMob())
-			{
-				return false;
-			}
-			if (!a_Entity->IsTicking())
-			{
-				return false;
-			}
-
-			auto Monster = static_cast<cMonster *>(a_Entity);
-			ASSERT(Monster->GetParentChunk() != nullptr);  // A ticking entity must have a valid parent chunk
-
-			// Tick close mobs
-			if (Monster->GetParentChunk()->HasAnyClients())
-			{
-				Monster->Tick(m_Dt, *(a_Entity->GetParentChunk()));
-			}
-			// Destroy far hostile mobs
-			else if ((Monster->GetMobFamily() == cMonster::eFamily::mfHostile))
-			{
-				if (Monster->GetMobType() != eMonsterType::mtWolf)
-				{
-					Monster->Destroy(true);
-				}
-				else
-				{
-					auto Wolf = static_cast<cWolf *>(Monster);
-					if (Wolf->IsAngry())
-					{
-						Monster->Destroy(true);
-					}
-				}
-			}
-			return false;
-		}
-	public:
-		std::chrono::milliseconds m_Dt;
-	} Callback;
-
-	Callback.m_Dt = a_Dt;
-	ForEachEntity(Callback);
 }
 
 
