@@ -1191,24 +1191,51 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		// Always burn above the world
 		return true;
 	}
+	if (RelY <= 0)
+	{
+		// The mob is about to die, no point in burning
+		return false;
+	}
 
-	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Location.x), FloorC(a_Location.z));
-	if ((Chunk == nullptr) || (!Chunk->IsValid()))
+	PREPARE_REL_AND_CHUNK(a_Location, a_Chunk);
+	if (!RelSuccess)
 	{
 		return false;
 	}
 
-	int RelX = FloorC(a_Location.x) - Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = FloorC(a_Location.z) - Chunk->GetPosZ() * cChunkDef::Width;
-
 	if (
-		(Chunk->GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
-		(Chunk->GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
+		(Chunk->GetBlock(Rel.x, Rel.y, Rel.z) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
 		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
 	)
 	{
+		int MobHeight = static_cast<int>(a_Location.y) + round(GetHeight()) - 1;  // The height of the mob head
+		if (MobHeight >= cChunkDef::Height)
+		{
+			return true;
+		}
+		// Start with the highest block and scan down to the mob's head.
+		// If a non transparent is found, return false (do not burn). Otherwise return true.
+		// Note that this loop is not a performance concern as transparent blocks are rare and the loop almost always bailes out
+		// instantly.(An exception is e.g. standing under a long column of glass).
+		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
+		while (CurrentBlock >= MobHeight)
+		{
+			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
+			if (
+				// Do not burn if a block above us meets one of the following conditions:
+				(!cBlockInfo::IsTransparent(Block)) ||
+				(Block == E_BLOCK_LEAVES) ||
+				(Block == E_BLOCK_NEW_LEAVES) ||
+				(IsBlockWater(Block))
+			)
+			{
+				return false;
+			}
+			--CurrentBlock;
+		}
 		return true;
+
 	}
 	return false;
 }
