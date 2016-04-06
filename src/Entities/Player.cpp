@@ -354,7 +354,7 @@ void cPlayer::TickFreezeCode()
 				}
 			}
 		}
-		else if (GetWorld()->GetWorldAge() % 4096 == 0)
+		else if (GetWorld()->GetWorldAge() % 100 == 0)
 		{
 			// Despite the client side freeze, the player may be able to move a little by
 			// Jumping or canceling flight. Re-freeze every now and then
