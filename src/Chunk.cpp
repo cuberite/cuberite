@@ -40,7 +40,6 @@
 #include "SetChunkData.h"
 #include "BoundingBox.h"
 #include "Blocks/ChunkInterface.h"
-#include "Mobs/Wolf.h"
 
 #include "json/json.h"
 
@@ -642,11 +641,13 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 			continue;
 		}
 
-		// Tick all entities in this chunk - including mobs.
-		// In the past Cuberite ticked mobs in cWorld. This is no longer the case.
-		ASSERT((*itr)->GetParentChunk() == this);
-		(*itr)->Tick(a_Dt, *this);
-		ASSERT((*itr)->GetParentChunk() == this);
+		if (!((*itr)->IsMob()))  // Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
+		{
+			// Tick all entities in this chunk (except mobs):
+			ASSERT((*itr)->GetParentChunk() == this);
+			(*itr)->Tick(a_Dt, *this);
+			ASSERT((*itr)->GetParentChunk() == this);
+		}
 
 		// Do not move mobs that are detached from the world to neighbors. They're either scheduled for teleportation or for removal.
 		// Because the schedulded destruction is going to look for them in this chunk. See cEntity::destroy.
@@ -1852,11 +1853,11 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 
 void cChunk::RemoveClient(cClientHandle * a_Client)
 {
-	auto ClientItr = std::remove(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client);
+	auto itr = std::remove(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client);
 	// We should always remove at most one client.
-	ASSERT(std::distance(ClientItr, m_LoadedByClient.end()) <= 1);
+	ASSERT(std::distance(itr, m_LoadedByClient.end()) <= 1);
 	// Note: itr can equal m_LoadedByClient.end()
-	m_LoadedByClient.erase(ClientItr, m_LoadedByClient.end());
+	m_LoadedByClient.erase(itr, m_LoadedByClient.end());
 
 	if (!a_Client->IsDestroyed())
 	{
@@ -1873,37 +1874,6 @@ void cChunk::RemoveClient(cClientHandle * a_Client)
 		}
 	}
 
-	// All clients were removed. No one sees this chunk any more.
-	// Delete all hostiles inside it.
-	if (!HasAnyClients())
-	{
-		for (auto Entity : m_Entities)
-		{
-			if (Entity->IsTicking() && Entity->IsMob())
-			{
-				auto Monster = static_cast<cMonster *>(Entity);
-				if (
-					(Monster->GetMobFamily() == cMonster::eFamily::mfHostile) &&
-					(Monster->GetCustomName().empty())  // Monsters that have name tags are never removed
-				)
-				{
-					// Non-hostile wolves should not be removed when player is too far
-					if (Monster->GetMobType() != eMonsterType::mtWolf)
-					{
-						Monster->Destroy(true);
-					}
-					else
-					{
-						auto Wolf = static_cast<cWolf *>(Monster);
-						if (Wolf->IsAngry())
-						{
-							Monster->Destroy(true);
-						}
-					}
-				}
-			}
-		}
-	}
 	return;
 }
 
