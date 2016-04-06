@@ -89,7 +89,7 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 
 
 
-void cProtocolRecognizer::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cProtocolRecognizer::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
@@ -183,6 +183,16 @@ void cProtocolRecognizer::SendDestroyEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendDestroyEntity(a_Entity);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 

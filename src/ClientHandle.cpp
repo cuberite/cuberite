@@ -2095,7 +2095,7 @@ void cClientHandle::ServerTick(float a_Dt)
 
 
 
-void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
 }
@@ -2313,6 +2313,15 @@ void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & 
 void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
 {
 	m_Protocol->SendDestroyEntity(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	m_Protocol->SendDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 
