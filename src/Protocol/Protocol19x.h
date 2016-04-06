@@ -4,7 +4,7 @@
 /*
 Declares the 1.9.x protocol classes:
 	- cProtocol190
-		- snapshot 15w41a protocol (#77)
+		- snapshot 15w45a protocol (#85)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -205,6 +205,7 @@ protected:
 	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
+	void HandleConfirmTeleport              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
 	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
 	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);

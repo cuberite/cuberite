@@ -198,7 +198,7 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
-	Packet.WriteVarInt32(0x20);  // Packet id (Chunk Data packet)
+	Packet.WriteVarInt32(0x21);  // Packet id (Chunk Data packet)
 	Packet.WriteBEInt32(a_ChunkX);
 	Packet.WriteBEInt32(a_ChunkZ);
 	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag

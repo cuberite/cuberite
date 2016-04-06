@@ -4,7 +4,7 @@
 /*
 Implements the 1.9.x protocol classes:
 	- cProtocol190
-		- shapshot 15w41a protocol (#77)
+		- shapshot 15w45a protocol (#85)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -174,7 +174,7 @@ void cProtocol190::DataReceived(const char * a_Data, size_t a_Size)
 void cProtocol190::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x3a);  // Set passangers packet
+	cPacketizer Pkt(*this, 0x41);  // Set passangers packet
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
 	Pkt.WriteVarInt32(1);  // 1 passenger
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
@@ -307,7 +307,7 @@ void cProtocol190::SendDestroyEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x30);  // Destroy Entities packet
+	cPacketizer Pkt(*this, 0x31);  // Destroy Entities packet
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 }
@@ -319,7 +319,7 @@ void cProtocol190::SendDestroyEntity(const cEntity & a_Entity)
 void cProtocol190::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x3a);  // Set passangers packet
+	cPacketizer Pkt(*this, 0x41);  // Set passangers packet
 	Pkt.WriteVarInt32(a_PreviousVehicle.GetUniqueID());
 	Pkt.WriteVarInt32(0);  // No passangers
 }
@@ -342,7 +342,7 @@ void cProtocol190::SendDisconnect(const AString & a_Reason)
 		case 3:
 		{
 			// In-game:
-			cPacketizer Pkt(*this, 0x19);
+			cPacketizer Pkt(*this, 0x1a);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
 		}
@@ -357,7 +357,7 @@ void cProtocol190::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2a);  // Sign Editor Open packet
+	cPacketizer Pkt(*this, 0x2b);  // Sign Editor Open packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 }
 
@@ -369,7 +369,7 @@ void cProtocol190::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, in
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x4b);  // Entity Effect packet
+	cPacketizer Pkt(*this, 0x4d);  // Entity Effect packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Amplifier));
@@ -404,7 +404,7 @@ void cProtocol190::SendEntityHeadLook(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x34);  // Entity Head Look packet
+	cPacketizer Pkt(*this, 0x35);  // Entity Head Look packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
 }
@@ -432,7 +432,7 @@ void cProtocol190::SendEntityMetadata(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x39);  // Entity Metadata packet
+	cPacketizer Pkt(*this, 0x3a);  // Entity Metadata packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityMetadata(Pkt, a_Entity);
 	Pkt.WriteBEUInt8(0xff);  // The termination byte
@@ -446,7 +446,7 @@ void cProtocol190::SendEntityProperties(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x4a);  // Entity Properties packet
+	cPacketizer Pkt(*this, 0x4c);  // Entity Properties packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityProperties(Pkt, a_Entity);
 }
@@ -493,7 +493,7 @@ void cProtocol190::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1a);  // Entity Status packet
+	cPacketizer Pkt(*this, 0x1b);  // Entity Status packet
 	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEInt8(a_Status);
 }
@@ -522,7 +522,7 @@ void cProtocol190::SendExplosion(double a_BlockX, double a_BlockY, double a_Bloc
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1b);  // Explosion packet
+	cPacketizer Pkt(*this, 0x1c);  // Explosion packet
 	Pkt.WriteBEFloat(static_cast<float>(a_BlockX));
 	Pkt.WriteBEFloat(static_cast<float>(a_BlockY));
 	Pkt.WriteBEFloat(static_cast<float>(a_BlockZ));
@@ -547,7 +547,7 @@ void cProtocol190::SendGameMode(eGameMode a_GameMode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1e);  // Change Game State packet
+	cPacketizer Pkt(*this, 0x1f);  // Change Game State packet
 	Pkt.WriteBEUInt8(3);  // Reason: Change game mode
 	Pkt.WriteBEFloat(static_cast<float>(a_GameMode));  // The protocol really represents the value with a float!
 }
@@ -575,7 +575,7 @@ void cProtocol190::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, 0x46);  // Title packet
 	Pkt.WriteVarInt32(3);  // Hide title
 }
 
@@ -606,7 +606,7 @@ void cProtocol190::SendKeepAlive(UInt32 a_PingID)
 		return;
 	}
 
-	cPacketizer Pkt(*this, 0x1f);  // Keep Alive packet
+	cPacketizer Pkt(*this, 0x20);  // Keep Alive packet
 	Pkt.WriteVarInt32(a_PingID);
 }
 
@@ -632,7 +632,7 @@ void cProtocol190::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 	// Send the spawn position:
 	{
-		cPacketizer Pkt(*this, 0x43);  // Spawn Position packet
+		cPacketizer Pkt(*this, 0x44);  // Spawn Position packet
 		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
@@ -745,7 +745,7 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 	}
 
 	{
-		cPacketizer Pkt(*this, 0x39);  // Entity Metadata packet
+		cPacketizer Pkt(*this, 0x3a);  // Entity Metadata packet
 		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
 		Pkt.WriteBEUInt8(5);  // Index 5: Item
 		Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
@@ -762,7 +762,7 @@ void cProtocol190::SendPlayerAbilities(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2b);  // Player Abilities packet
+	cPacketizer Pkt(*this, 0x2c);  // Player Abilities packet
 	Byte Flags = 0;
 	cPlayer * Player = m_Client->GetPlayer();
 	if (Player->IsGameModeCreative())
@@ -805,7 +805,7 @@ void cProtocol190::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	ASSERT(m_State == 3);  // In game mode?
 	int ParticleID = GetParticleID(a_ParticleName);
 
-	cPacketizer Pkt(*this, 0x22);  // Particle effect packet
+	cPacketizer Pkt(*this, 0x23);  // Particle effect packet
 	Pkt.WriteBEInt32(ParticleID);
 	Pkt.WriteBool(false);
 	Pkt.WriteBEFloat(a_SrcX);
@@ -827,7 +827,7 @@ void cProtocol190::SendParticleEffect(const AString & a_ParticleName, Vector3f a
 	ASSERT(m_State == 3);  // In game mode?
 	int ParticleID = GetParticleID(a_ParticleName);
 
-	cPacketizer Pkt(*this, 0x22);  // Particle effect packet
+	cPacketizer Pkt(*this, 0x23);  // Particle effect packet
 	Pkt.WriteBEInt32(ParticleID);
 	Pkt.WriteBool(false);
 	Pkt.WriteBEFloat(a_Src.x);
@@ -870,7 +870,7 @@ void cProtocol190::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, 0x2e);  // Playerlist Item packet
 	Pkt.WriteVarInt32(0);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -907,7 +907,7 @@ void cProtocol190::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, 0x2e);  // Playerlist Item packet
 	Pkt.WriteVarInt32(4);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -921,7 +921,7 @@ void cProtocol190::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, 0x2e);  // Playerlist Item packet
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -939,7 +939,7 @@ void cProtocol190::SendPlayerListUpdatePing(const cPlayer & a_Player)
 	auto ClientHandle = a_Player.GetClientHandlePtr();
 	if (ClientHandle != nullptr)
 	{
-		cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+		cPacketizer Pkt(*this, 0x2e);  // Playerlist Item packet
 		Pkt.WriteVarInt32(2);
 		Pkt.WriteVarInt32(1);
 		Pkt.WriteUUID(a_Player.GetUUID());
@@ -955,7 +955,7 @@ void cProtocol190::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, con
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, 0x2e);  // Playerlist Item packet
 	Pkt.WriteVarInt32(3);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -979,7 +979,7 @@ void cProtocol190::SendPlayerMaxSpeed(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x4a);  // Entity Properties
+	cPacketizer Pkt(*this, 0x4c);  // Entity Properties
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteVarInt32(Player->GetUniqueID());
 	Pkt.WriteBEInt32(1);  // Count
@@ -1008,7 +1008,7 @@ void cProtocol190::SendPlayerMoveLook(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2e);  // Player Position And Look packet
+	cPacketizer Pkt(*this, 0x2f);  // Player Position And Look packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEDouble(Player->GetPosX());
 	Pkt.WriteBEDouble(Player->GetPosY());
@@ -1016,6 +1016,7 @@ void cProtocol190::SendPlayerMoveLook(void)
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
 	Pkt.WriteBEUInt8(0);
+	Pkt.WriteVarInt32(0);  // Teleport ID - not implemented here
 }
 
 
@@ -1073,7 +1074,7 @@ void cProtocol190::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x31);  // Remove entity effect packet
+	cPacketizer Pkt(*this, 0x32);  // Remove entity effect packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
 }
@@ -1086,7 +1087,7 @@ void cProtocol190::SendResetTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, 0x46);  // Title packet
 	Pkt.WriteVarInt32(4);  // Reset title
 }
 
@@ -1102,7 +1103,7 @@ void cProtocol190::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimens
 		return;
 	}
 
-	cPacketizer Pkt(*this, 0x33);  // Respawn packet
+	cPacketizer Pkt(*this, 0x34);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Dimension));
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
@@ -1168,7 +1169,7 @@ void cProtocol190::SendScoreUpdate(const AString & a_Objective, const AString & 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x42);  // Update score packet
+	cPacketizer Pkt(*this, 0x43);  // Update score packet
 	Pkt.WriteString(a_Player);
 	Pkt.WriteBEUInt8(a_Mode);
 	Pkt.WriteString(a_Objective);
@@ -1187,7 +1188,7 @@ void cProtocol190::SendDisplayObjective(const AString & a_Objective, cScoreboard
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x38);  // Display scoreboard packet
+	cPacketizer Pkt(*this, 0x39);  // Display scoreboard packet
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Display));
 	Pkt.WriteString(a_Objective);
 }
@@ -1209,7 +1210,7 @@ void cProtocol190::SendSetRawSubTitle(const AString & a_SubTitle)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, 0x46);  // Title packet
 	Pkt.WriteVarInt32(1);  // Set subtitle
 
 	Pkt.WriteString(a_SubTitle);
@@ -1232,7 +1233,7 @@ void cProtocol190::SendSetRawTitle(const AString & a_Title)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, 0x46);  // Title packet
 	Pkt.WriteVarInt32(0);  // Set title
 
 	Pkt.WriteString(a_Title);
@@ -1246,7 +1247,7 @@ void cProtocol190::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x23);  // Sound Effect packet
+	cPacketizer Pkt(*this, 0x19);  // Named sound effect packet
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Y * 8.0));
@@ -1263,7 +1264,7 @@ void cProtocol190::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x21);  // Effect packet
+	cPacketizer Pkt(*this, 0x22);  // Effect packet
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
 	Pkt.WritePosition64(a_SrcX, a_SrcY, a_SrcZ);
 	Pkt.WriteBEInt32(a_Data);
@@ -1426,7 +1427,7 @@ void cProtocol190::SendTeleportEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x49);  // Entity teleport packet
+	cPacketizer Pkt(*this, 0x4b);  // Entity teleport packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteFPInt(a_Entity.GetPosX());
 	Pkt.WriteFPInt(a_Entity.GetPosY());
@@ -1460,7 +1461,7 @@ void cProtocol190::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_F
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, 0x46);  // Title packet
 	Pkt.WriteVarInt32(2);  // Set title display times
 
 	Pkt.WriteBEInt32(a_FadeInTicks);
@@ -1481,7 +1482,7 @@ void cProtocol190::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_Do
 		a_TimeOfDay = std::min(-a_TimeOfDay, -1LL);
 	}
 
-	cPacketizer Pkt(*this, 0x44);  // Time update packet
+	cPacketizer Pkt(*this, 0x45);  // Time update packet
 	Pkt.WriteBEInt64(a_WorldAge);
 	Pkt.WriteBEInt64(a_TimeOfDay);
 }
@@ -1494,7 +1495,7 @@ void cProtocol190::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1c);  // Unload chunk packet
+	cPacketizer Pkt(*this, 0x1d);  // Unload chunk packet
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
 }
@@ -1532,7 +1533,7 @@ void cProtocol190::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x46);  // Update sign packet
+	cPacketizer Pkt(*this, 0x47);  // Update sign packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 
 	Json::StyledWriter JsonWriter;
@@ -1553,7 +1554,7 @@ void cProtocol190::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2f);  // Use bed
+	cPacketizer Pkt(*this, 0x30);  // Use bed
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 }
@@ -1567,7 +1568,7 @@ void cProtocol190::SendWeather(eWeather a_Weather)
 	ASSERT(m_State == 3);  // In game mode?
 
 	{
-		cPacketizer Pkt(*this, 0x1e);  // Change Game State packet
+		cPacketizer Pkt(*this, 0x1f);  // Change Game State packet
 		Pkt.WriteBEUInt8((a_Weather == wSunny) ? 1 : 2);  // End rain / begin rain
 		Pkt.WriteBEFloat(0);  // Unused for weather
 	}
@@ -2035,35 +2036,36 @@ bool cProtocol190::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 			// Game
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketTabComplete            (a_ByteBuffer); return true;
-				case 0x01: HandlePacketChatMessage            (a_ByteBuffer); return true;
-				case 0x02: HandlePacketClientStatus           (a_ByteBuffer); return true;
-				case 0x03: HandlePacketClientSettings         (a_ByteBuffer); return true;
-				case 0x04: break;  // Confirm transaction - not used in MCS
-				case 0x05: HandlePacketEnchantItem            (a_ByteBuffer); return true;
-				case 0x06: HandlePacketWindowClick            (a_ByteBuffer); return true;
-				case 0x07: HandlePacketWindowClose            (a_ByteBuffer); return true;
-				case 0x08: HandlePacketPluginMessage          (a_ByteBuffer); return true;
-				case 0x09: HandlePacketUseEntity              (a_ByteBuffer); return true;
-				case 0x0a: HandlePacketKeepAlive              (a_ByteBuffer); return true;
-				case 0x0b: break;  // Vehicle move - not yet implemented
+				case 0x00: HandleConfirmTeleport              (a_ByteBuffer); return true;
+				case 0x01: HandlePacketTabComplete            (a_ByteBuffer); return true;
+				case 0x02: HandlePacketChatMessage            (a_ByteBuffer); return true;
+				case 0x03: HandlePacketClientStatus           (a_ByteBuffer); return true;
+				case 0x04: HandlePacketClientSettings         (a_ByteBuffer); return true;
+				case 0x05: break;  // Confirm transaction - not used in MCS
+				case 0x06: HandlePacketEnchantItem            (a_ByteBuffer); return true;
+				case 0x07: HandlePacketWindowClick            (a_ByteBuffer); return true;
+				case 0x08: HandlePacketWindowClose            (a_ByteBuffer); return true;
+				case 0x09: HandlePacketPluginMessage          (a_ByteBuffer); return true;
+				case 0x0a: HandlePacketUseEntity              (a_ByteBuffer); return true;
+				case 0x0b: HandlePacketKeepAlive              (a_ByteBuffer); return true;
 				case 0x0c: HandlePacketPlayerPos              (a_ByteBuffer); return true;
 				case 0x0d: HandlePacketPlayerPosLook          (a_ByteBuffer); return true;
 				case 0x0e: HandlePacketPlayerLook             (a_ByteBuffer); return true;
 				case 0x0f: HandlePacketPlayer                 (a_ByteBuffer); return true;
-				case 0x10: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
-				case 0x11: HandlePacketBlockDig               (a_ByteBuffer); return true;
-				case 0x12: HandlePacketEntityAction           (a_ByteBuffer); return true;
-				case 0x13: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
-				case 0x14: break;  // Resource pack status - not yet implemented
-				case 0x15: HandlePacketSlotSelect             (a_ByteBuffer); return true;
-				case 0x16: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
-				case 0x17: HandlePacketUpdateSign             (a_ByteBuffer); return true;
-				case 0x18: HandlePacketAnimation              (a_ByteBuffer); return true;
-				case 0x19: break;  // Spectate?
-				case 0x1a: HandlePacketBlockPlace             (a_ByteBuffer); return true;
-				case 0x1b: HandlePacketUseItem                (a_ByteBuffer); return true;
-				case 0x1c: break;  // Steer boat - not yet implemented
+				case 0x10: break;  // Vehicle move - not yet implemented
+				case 0x11: break;  // Steer boat - not yet implemented
+				case 0x12: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
+				case 0x13: HandlePacketBlockDig               (a_ByteBuffer); return true;
+				case 0x14: HandlePacketEntityAction           (a_ByteBuffer); return true;
+				case 0x15: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
+				case 0x16: break;  // Resource pack status - not yet implemented
+				case 0x17: HandlePacketSlotSelect             (a_ByteBuffer); return true;
+				case 0x18: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x19: HandlePacketUpdateSign             (a_ByteBuffer); return true;
+				case 0x1a: HandlePacketAnimation              (a_ByteBuffer); return true;
+				case 0x1b: break;  // Spectate?
+				case 0x1c: HandlePacketBlockPlace             (a_ByteBuffer); return true;
+				case 0x1d: HandlePacketUseItem                (a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -2355,6 +2357,16 @@ void cProtocol190::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 			break;
 		}
 	}
+}
+
+
+
+
+
+void cProtocol190::HandleConfirmTeleport(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, TeleportID);
+	// We don't actually validate that this packet is sent or anything yet, but it still needs to be read.
 }
 
 
@@ -2655,7 +2667,7 @@ void cProtocol190::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  SlotNum);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Button);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt16, UInt16, TransactionID);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Mode);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  Mode);
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
 
