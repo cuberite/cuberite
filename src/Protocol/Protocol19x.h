@@ -4,7 +4,7 @@
 /*
 Declares the 1.9.x protocol classes:
 	- cProtocol190
-		- snapshot 15w45a protocol (#85)
+		- snapshot 15w51b protocol (#94)
 (others may be added later in the future for the 1.9 release series)
 */
 
