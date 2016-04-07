@@ -45,7 +45,7 @@ Cuberite is licensed under the Apache License V2, and we welcome anybody to fork
 
 Cuberite is developed in C++ and Lua. To contribute code, please check out [GETTING-STARTED.md](https://github.com/cuberite/cuberite/blob/master/GETTING-STARTED.md) and [CONTRIBUTING.md](https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md) for more details.
 
-Plugins are written in Lua. You can contribute by developing plugins and submitting them to [the forum](https://forum.cuberite.org/forum-2.html). please check out our [plugin introduction guide](http://api-docs.cuberite.org/Writing-a-Cuberite-plugin.html) for more info. 
+Plugins are written in Lua. You can contribute by developing plugins and submitting them to [the forum](https://forum.cuberite.org/forum-2.html). Please check out our [plugin introduction guide](http://api-docs.cuberite.org/Writing-a-Cuberite-plugin.html) for more info. 
 
 If you are not a programmer, you can help by testing Cuberite and reporting bugs. See [TESTING.md](https://github.com/cuberite/cuberite/blob/master/TESTING.md) for details.
 
@@ -54,7 +54,8 @@ You can also help with documentation by contributing to the [User's Manual](http
 Other Stuff
 -----------
 
-For other stuff, including plugins and discussion, check out the [forums](https://forum.cuberite.org/) and [Plugin API](http://api-docs.cuberite.org/).
+For other stuff, check out the [homepage](http://cuberite.org), the [Users' Manual](https://book.cuberite.org),
+the [forums](https://forum.cuberite.org/), and the [Plugin API](http://api-docs.cuberite.org/).
 
 [Support Us on Bountysource](https://bountysource.com/teams/cuberite)
 
