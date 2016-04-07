@@ -43,7 +43,13 @@ Contributing
 
 Cuberite is licensed under the Apache License V2, and we welcome anybody to fork and submit a Pull Request back with their changes, and if you want to join as a permanent member we can add you to the team.
 
-Check out the [CONTRIBUTING.md](https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md) file for more details.
+Cuberite is developed in C++ and Lua. To contribute code, please check out [GETTING-STARTED.md](https://github.com/cuberite/cuberite/blob/master/GETTING-STARTED.md) and [CONTRIBUTING.md](https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md) for more details.
+
+Plugins are written in Lua. You can contribute by developing plugins and submitting them to [the forum](https://forum.cuberite.org/forum-2.html). please check out our [plugin introduction guide](http://api-docs.cuberite.org/Writing-a-Cuberite-plugin.html) for more info. 
+
+If you are not a programmer, you can help by testing Cuberite and reporting bugs. See [TESTING.md](https://github.com/cuberite/cuberite/blob/master/TESTING.md) for details.
+
+You can also help with documentation by contributing to the [User's Manual](https://github.com/cuberite/users-manual).
 
 Other Stuff
 -----------
