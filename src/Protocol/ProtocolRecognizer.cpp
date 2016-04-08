@@ -1043,7 +1043,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
-		case PROTO_VERSION_TESTING:
+		case PROTO_VERSION_1_9_0:
 		{
 			AString ServerAddress;
 			UInt16 ServerPort;

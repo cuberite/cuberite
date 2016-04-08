@@ -4,7 +4,7 @@
 /*
 Implements the 1.9.x protocol classes:
 	- cProtocol190
-		- shapshot 15w51b protocol (#94)
+		- release 1.9.0 protocol (#107)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -461,9 +461,10 @@ void cProtocol190::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char
 
 	cPacketizer Pkt(*this, 0x25);  // Entity Relative Move packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_RelX);
-	Pkt.WriteBEInt8(a_RelY);
-	Pkt.WriteBEInt8(a_RelZ);
+	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
+	Pkt.WriteBEInt16(a_RelX * 128);
+	Pkt.WriteBEInt16(a_RelY * 128);
+	Pkt.WriteBEInt16(a_RelZ * 128);
 	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
@@ -477,9 +478,10 @@ void cProtocol190::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 
 	cPacketizer Pkt(*this, 0x26);  // Entity Look And Relative Move packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_RelX);
-	Pkt.WriteBEInt8(a_RelY);
-	Pkt.WriteBEInt8(a_RelZ);
+	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
+	Pkt.WriteBEInt16(a_RelX * 128);
+	Pkt.WriteBEInt16(a_RelY * 128);
+	Pkt.WriteBEInt16(a_RelZ * 128);
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteBool(a_Entity.IsOnGround());
@@ -681,6 +683,9 @@ void cProtocol190::SendPaintingSpawn(const cPainting & a_Painting)
 
 	cPacketizer Pkt(*this, 0x04);  // Spawn Painting packet
 	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName().c_str());
 	Pkt.WritePosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
 	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
@@ -733,9 +738,9 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 		Pkt.WriteBEUInt64(0);
 		Pkt.WriteBEUInt64(a_Pickup.GetUniqueID());
 		Pkt.WriteBEUInt8(2);  // Type = Pickup
-		Pkt.WriteFPInt(a_Pickup.GetPosX());
-		Pkt.WriteFPInt(a_Pickup.GetPosY());
-		Pkt.WriteFPInt(a_Pickup.GetPosZ());
+		Pkt.WriteBEDouble(a_Pickup.GetPosX());
+		Pkt.WriteBEDouble(a_Pickup.GetPosY());
+		Pkt.WriteBEDouble(a_Pickup.GetPosZ());
 		Pkt.WriteByteAngle(a_Pickup.GetYaw());
 		Pkt.WriteByteAngle(a_Pickup.GetPitch());
 		Pkt.WriteBEInt32(0);  // No object data
@@ -1039,9 +1044,9 @@ void cProtocol190::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, 0x05);  // Spawn Player packet
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(cMojangAPI::MakeUUIDShort(a_Player.GetUUID()));
-	Pkt.WriteFPInt(a_Player.GetPosX());
-	Pkt.WriteFPInt(a_Player.GetPosY() + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
-	Pkt.WriteFPInt(a_Player.GetPosZ());
+	Pkt.WriteBEDouble(a_Player.GetPosX());
+	Pkt.WriteBEDouble(a_Player.GetPosY() + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteBEDouble(a_Player.GetPosZ());
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
 	Pkt.WriteBEUInt8(6);  // Start metadata - Index 6: Health
@@ -1137,9 +1142,9 @@ void cProtocol190::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 	cPacketizer Pkt(*this, 0x01);  // Spawn experience orb packet
 	Pkt.WriteVarInt32(a_ExpOrb.GetUniqueID());
-	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
-	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
-	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
+	Pkt.WriteBEDouble(a_ExpOrb.GetPosX());
+	Pkt.WriteBEDouble(a_ExpOrb.GetPosY());
+	Pkt.WriteBEDouble(a_ExpOrb.GetPosZ());
 	Pkt.WriteBEInt16(static_cast<Int16>(a_ExpOrb.GetReward()));
 }
 
@@ -1249,6 +1254,7 @@ void cProtocol190::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 
 	cPacketizer Pkt(*this, 0x19);  // Named sound effect packet
 	Pkt.WriteString(a_SoundName);
+	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Y * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Z * 8.0));
@@ -1285,9 +1291,9 @@ void cProtocol190::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_FallingBlock.GetUniqueID());
 	Pkt.WriteBEUInt8(70);  // Falling block
-	Pkt.WriteFPInt(a_FallingBlock.GetPosX());
-	Pkt.WriteFPInt(a_FallingBlock.GetPosY());
-	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
+	Pkt.WriteBEDouble(a_FallingBlock.GetPosX());
+	Pkt.WriteBEDouble(a_FallingBlock.GetPosY());
+	Pkt.WriteBEDouble(a_FallingBlock.GetPosZ());
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
 	Pkt.WriteBEInt32(static_cast<Int32>(a_FallingBlock.GetBlockType()) | (static_cast<Int32>(a_FallingBlock.GetBlockMeta()) << 12));
@@ -1310,9 +1316,9 @@ void cProtocol190::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
-	Pkt.WriteFPInt(a_Mob.GetPosX());
-	Pkt.WriteFPInt(a_Mob.GetPosY());
-	Pkt.WriteFPInt(a_Mob.GetPosZ());
+	Pkt.WriteBEDouble(a_Mob.GetPosX());
+	Pkt.WriteBEDouble(a_Mob.GetPosY());
+	Pkt.WriteBEDouble(a_Mob.GetPosZ());
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
@@ -1344,9 +1350,9 @@ void cProtocol190::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_ObjectType));
-	Pkt.WriteFPInt(PosX);
-	Pkt.WriteFPInt(a_Entity.GetPosY());
-	Pkt.WriteFPInt(PosZ);
+	Pkt.WriteBEDouble(PosX);
+	Pkt.WriteBEDouble(a_Entity.GetPosY());
+	Pkt.WriteBEDouble(PosZ);
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteByteAngle(Yaw);
 	Pkt.WriteBEInt32(a_ObjectData);
@@ -1369,9 +1375,9 @@ void cProtocol190::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Vehicle.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
-	Pkt.WriteFPInt(a_Vehicle.GetPosX());
-	Pkt.WriteFPInt(a_Vehicle.GetPosY());
-	Pkt.WriteFPInt(a_Vehicle.GetPosZ());
+	Pkt.WriteBEDouble(a_Vehicle.GetPosX());
+	Pkt.WriteBEDouble(a_Vehicle.GetPosY());
+	Pkt.WriteBEDouble(a_Vehicle.GetPosZ());
 	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
 	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteBEInt32(a_VehicleSubType);
@@ -1429,9 +1435,9 @@ void cProtocol190::SendTeleportEntity(const cEntity & a_Entity)
 
 	cPacketizer Pkt(*this, 0x4a);  // Entity teleport packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteFPInt(a_Entity.GetPosX());
-	Pkt.WriteFPInt(a_Entity.GetPosY());
-	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteBEDouble(a_Entity.GetPosX());
+	Pkt.WriteBEDouble(a_Entity.GetPosY());
+	Pkt.WriteBEDouble(a_Entity.GetPosZ());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteBool(a_Entity.IsOnGround());
@@ -1448,9 +1454,9 @@ void cProtocol190::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 	cPacketizer Pkt(*this, 0x02);  // Spawn Global Entity packet
 	Pkt.WriteVarInt32(0);  // EntityID = 0, always
 	Pkt.WriteBEUInt8(1);  // Type = Thunderbolt
-	Pkt.WriteFPInt(a_BlockX);
-	Pkt.WriteFPInt(a_BlockY);
-	Pkt.WriteFPInt(a_BlockZ);
+	Pkt.WriteBEDouble(a_BlockX);
+	Pkt.WriteBEDouble(a_BlockY);
+	Pkt.WriteBEDouble(a_BlockZ);
 }
 
 
