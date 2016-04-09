@@ -1065,6 +1065,26 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			return true;
 		}
 		case PROTO_VERSION_1_9_1:
+		{
+			AString ServerAddress;
+			UInt16 ServerPort;
+			UInt32 NextState;
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol191(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
 		case PROTO_VERSION_1_9_2:
 		{
 			AString ServerAddress;

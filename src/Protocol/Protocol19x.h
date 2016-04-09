@@ -5,8 +5,9 @@
 Declares the 1.9.x protocol classes:
 	- cProtocol190
 		- release 1.9.0 protocol (#107)
-	- cProtocol192
+	- cProtocol191
 		- release 1.9.1 protocol (#108)
+	- cProtocol192
 		- release 1.9.2 protocol (#109)
 (others may be added later in the future for the 1.9 release series)
 */
@@ -194,8 +195,8 @@ protected:
 	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 
 	// Packet handlers while in the Status state (m_State == 1):
-	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
-	void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
 
 	// Packet handlers while in the Login state (m_State == 2):
 	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
@@ -293,17 +294,36 @@ protected:
 
 
 
-/** The version 108 and 109 protocol, used by 1.9.1 and 1.9.2.  The protocols are the same despite differing version numbers. */
-class cProtocol192 :
+/** The version 108 protocol, used by 1.9.1.  Uses an int rather than a byte for dimension in join game. */
+class cProtocol191 :
 	public cProtocol190
 {
 	typedef cProtocol190 super;
 
 public:
-	cProtocol192(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol191(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
 	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+
+} ;
+
+
+
+
+
+/** The version 109 protocol, used by 1.9.2.  Same as 1.9.1, except the server list ping version number changed with the protocol number. */
+class cProtocol192 :
+	public cProtocol191
+{
+	typedef cProtocol191 super;
+
+public:
+	cProtocol192(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+
+	// cProtocol190 overrides:
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
 } ;
 

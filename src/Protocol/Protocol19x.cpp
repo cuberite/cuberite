@@ -5,8 +5,9 @@
 Implements the 1.9.x protocol classes:
 	- cProtocol190
 		- release 1.9.0 protocol (#107)
-	- cProtocol192
+	- cProtocol191
 		- release 1.9.1 protocol (#108)
+	- cProtocol192
 		- release 1.9.2 protocol (#109)
 (others may be added later in the future for the 1.9 release series)
 */
@@ -2129,8 +2130,8 @@ void cProtocol190::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Version:
 	Json::Value Version;
-	Version["name"] = "Cuberite 1.8";
-	Version["protocol"] = 47;
+	Version["name"] = "Cuberite 1.9";
+	Version["protocol"] = 107;
 
 	// Players:
 	Json::Value Players;
@@ -3728,9 +3729,9 @@ void cProtocol190::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cProtocol192:
+// cProtocol191:
 
-cProtocol192::cProtocol192(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol191::cProtocol191(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }
@@ -3739,7 +3740,7 @@ cProtocol192::cProtocol192(cClientHandle * a_Client, const AString &a_ServerAddr
 
 
 
-void cProtocol192::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
+void cProtocol191::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
 	{
@@ -3770,6 +3771,109 @@ void cProtocol192::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send player abilities:
 	SendPlayerAbilities();
 }
+
+
+
+
+
+void cProtocol191::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite 1.9.1";
+	Version["protocol"] = 108;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol192:
+
+cProtocol192::cProtocol192(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+{
+}
+
+
+
+
+
+void cProtocol192::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite 1.9.2";
+	Version["protocol"] = 109;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
+}
+
 
 
 
