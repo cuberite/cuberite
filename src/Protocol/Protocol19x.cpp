@@ -5,6 +5,9 @@
 Implements the 1.9.x protocol classes:
 	- cProtocol190
 		- release 1.9.0 protocol (#107)
+	- cProtocol192
+		- release 1.9.1 protocol (#108)
+		- release 1.9.2 protocol (#109)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -3719,6 +3722,55 @@ void cProtocol190::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
 }
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol192:
+
+cProtocol192::cProtocol192(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+{
+}
+
+
+
+
+
+void cProtocol192::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
+{
+	// Send the Join Game packet:
+	{
+		cServer * Server = cRoot::Get()->GetServer();
+		cPacketizer Pkt(*this, 0x23);  // Join Game packet
+		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
+		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
+		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
+		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<int>(Server->GetMaxPlayers(), 0, 255)));
+		Pkt.WriteString("default");  // Level type - wtf?
+		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
+	}
+	m_LastSentDimension = a_World.GetDimension();
+
+	// Send the spawn position:
+	{
+		cPacketizer Pkt(*this, 0x43);  // Spawn Position packet
+		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+	}
+
+	// Send the server difficulty:
+	{
+		cPacketizer Pkt(*this, 0x0d);  // Server difficulty packet
+		Pkt.WriteBEInt8(1);
+	}
+
+	// Send player abilities:
+	SendPlayerAbilities();
+}
+
 
 
 

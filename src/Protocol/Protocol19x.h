@@ -5,6 +5,9 @@
 Declares the 1.9.x protocol classes:
 	- cProtocol190
 		- release 1.9.0 protocol (#107)
+	- cProtocol192
+		- release 1.9.1 protocol (#108)
+		- release 1.9.2 protocol (#109)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -285,6 +288,25 @@ protected:
 		METADATA_TYPE_BLOCKID           = 12
 	} ;
 } ;
+
+
+
+
+
+/** The version 108 and 109 protocol, used by 1.9.1 and 1.9.2.  The protocols are the same despite differing version numbers. */
+class cProtocol192 :
+	public cProtocol190
+{
+	typedef cProtocol190 super;
+
+public:
+	cProtocol192(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+
+	// cProtocol190 overrides:
+	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+
+} ;
+
 
 
 

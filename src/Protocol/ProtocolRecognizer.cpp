@@ -1064,6 +1064,28 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Protocol = new cProtocol190(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
+		case PROTO_VERSION_1_9_1:
+		case PROTO_VERSION_1_9_2:
+		{
+			AString ServerAddress;
+			UInt16 ServerPort;
+			UInt32 NextState;
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol192(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
 	}
 	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
 		m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
