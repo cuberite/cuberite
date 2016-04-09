@@ -2965,27 +2965,27 @@ end
 			},
 			Constants =
 			{
-				BLOCK_FACE_BOTTOM = { Notes = "(<b>DEPRECATED!</b>) Please use {{BLOCK_FACE_YM}} instead. Interacting with the bottom face of the block." },
-				BLOCK_FACE_EAST = { Notes = "(<b>DEPRECATED!</b>) Please use {{BLOCK_FACE_XM}} instead. Interacting with the eastern face of the block." },
-				BLOCK_FACE_MAX = { Notes = "Used for range checking - highest legal value for an {{Globals#BlockFaces|eBlockFace}}" },
-				BLOCK_FACE_MIN = { Notes = "Used for range checking - lowest legal value for an {{Globals#BlockFaces|eBlockFace}}" },
-				BLOCK_FACE_NONE = { Notes = "Interacting with no block face - swinging the item in the air" },
-				BLOCK_FACE_NORTH = { Notes = "(<b>DEPRECATED!</b>) Please use {{BLOCK_FACE_ZM}} instead. Interacting with the northern face of the block."" },
-				BLOCK_FACE_SOUTH = { Notes = "(<b>DEPRECATED!</b>) Please use {{BLOCK_FACE_ZP}} instead. Interacting with the southern face of the block."" },
-				BLOCK_FACE_TOP = { Notes = "(<b>DEPRECATED!</b>) Please use {{BLOCK_FACE_YP}} instead. Interacting with the top face of the block." },
-				BLOCK_FACE_WEST = { Notes = "(<b>DEPRECATED!</b>) Please use {{BLOCK_FACE_XP}} instead. Interacting with the western face of the block."" },
 				BLOCK_FACE_XM = { Notes = "Interacting with the X- face of the block" },
 				BLOCK_FACE_XP = { Notes = "Interacting with the X+ face of the block" },
 				BLOCK_FACE_YM = { Notes = "Interacting with the Y- face of the block" },
 				BLOCK_FACE_YP = { Notes = "Interacting with the Y+ face of the block" },
 				BLOCK_FACE_ZM = { Notes = "Interacting with the Z- face of the block" },
 				BLOCK_FACE_ZP = { Notes = "Interacting with the Z+ face of the block" },
+				BLOCK_FACE_NONE = { Notes = "Interacting with no block face - swinging the item in the air" },
+				BLOCK_FACE_EAST = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_XM instead. Interacting with the eastern face of the block." },
+				BLOCK_FACE_WEST = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_XP instead. Interacting with the western face of the block." },
+				BLOCK_FACE_BOTTOM = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_YM instead. Interacting with the bottom face of the block." },
+				BLOCK_FACE_TOP = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_YP instead. Interacting with the top face of the block." },
+				BLOCK_FACE_NORTH = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_ZM instead. Interacting with the northern face of the block." },
+				BLOCK_FACE_SOUTH = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_ZP instead. Interacting with the southern face of the block." },
+				BLOCK_FACE_MAX = { Notes = "Used for range checking - highest legal value for an {{Globals#BlockFaces|eBlockFace}}" },
+				BLOCK_FACE_MIN = { Notes = "Used for range checking - lowest legal value for an {{Globals#BlockFaces|eBlockFace}}" },
+				DIG_STATUS_STARTED = { Notes = "The player has started digging" },
 				DIG_STATUS_CANCELLED = { Notes = "The player has let go of the mine block key before finishing mining the block" },
+				DIG_STATUS_FINISHED = { Notes = "The player thinks that it has finished mining a block" },
 				DIG_STATUS_DROP_HELD = { Notes = "The player has dropped a single item using the Drop Item key (default: Q)" },
 				DIG_STATUS_DROP_STACK = { Notes = "The player has dropped a full stack of items using the Drop Item key (default: Q) while holding down a specific modifier key (in windows, control)" },
-				DIG_STATUS_FINISHED = { Notes = "The player thinks that it has finished mining a block" },
-				DIG_STATUS_SHOOT_EAT = { Notes = "The player has started shooting a bow or started eating" },
-				DIG_STATUS_STARTED = { Notes = "The player has started digging" },
+				DIG_STATUS_SHOOT_EAT = { Notes = "The player has finished shooting a bow or finished eating" },
         DIG_STATUS_SWAP_ITEM_IN_HAND = { Notes = "The player has swapped their held item with the item in their offhand slot (1.9)" },
 				esBed = { Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed." },
 				esEnderCrystal = { Notes = "An ender crystal entity explosion. The SourceData param is the {{cEntity|ender crystal entity}} object." },
@@ -3068,6 +3068,14 @@ end
 					TextBefore = [[
 						These constants are used for specifying the cause of damage to entities. They are used in the
 						{{TakeDamageInfo}} structure, as well as in {{cEntity}}'s damage-related API functions.
+					]],
+				},
+				DigStatuses =
+				{
+					Include = "^DIG_STATUS_.*",
+					TextBefore = [[
+						These constants are used to describe digging statuses, but in reality cover several more cases.
+						They are used with {{OnPlayerLeftClick|HOOK_PLAYER_LEFT_CLICK}}.
 					]],
 				},
 				GameMode =
