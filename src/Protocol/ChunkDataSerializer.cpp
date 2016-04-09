@@ -207,6 +207,7 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 	const size_t NumChunkSections = 16;
 	const size_t ChunkSectionBlocks = 16 * 16 * 16;
 	const size_t BitsPerEntry = 13;
+	const size_t Mask = (1 << BitsPerEntry) - 1;  // Creates a mask that is 13 bits long, ie 0b1111111111111
 	const size_t ChunkSectionDataArraySize = (ChunkSectionBlocks * BitsPerEntry) / 8 / 8;  // Convert from bit count to long count
 	const size_t ChunkSectionSize = (
 		1 +                                         // Bits per block - set to 0, so the global palette is used and the palette fields are not sent
@@ -238,7 +239,7 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 
 		for (size_t Index = 0; Index < ChunkSectionBlocks; Index++)
 		{
-			UInt64 Value = m_BlockTypes[StartIndex + Index] << 4;
+			UInt64 Value = static_cast<UInt64>(m_BlockTypes[StartIndex + Index] << 4);
 			if (Index % 2 == 0)
 			{
 				Value |= m_BlockMetas[(StartIndex + Index) / 2] & 0x0f;
@@ -247,7 +248,7 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 			{
 				Value |= m_BlockMetas[(StartIndex + Index) / 2] >> 4;
 			}
-			Value &= 0b1111111111111;  // 13 bits
+			Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
 
 			// Painful part where we write data into the long array.  Based off of the normal code.
 			size_t BitPosition = Index * BitsPerEntry;
