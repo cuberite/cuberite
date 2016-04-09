@@ -294,7 +294,7 @@ void cProtocol190::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x12);  // Collect Item packet
+	cPacketizer Pkt(*this, 0x49);  // Collect Item packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 }
