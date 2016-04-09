@@ -11,6 +11,7 @@ SET (SRCS
 	Packetizer.cpp
 	Protocol17x.cpp
 	Protocol18x.cpp
+	Protocol19x.cpp
 	ProtocolRecognizer.cpp
 )
 
@@ -22,6 +23,7 @@ SET (HDRS
 	Protocol.h
 	Protocol17x.h
 	Protocol18x.h
+	Protocol19x.h
 	ProtocolRecognizer.h
 )
 
