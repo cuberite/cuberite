@@ -963,6 +963,3 @@ AStringVector ReadUpgradeIniPorts(
 
 	return Ports;
 }
-
-
-
