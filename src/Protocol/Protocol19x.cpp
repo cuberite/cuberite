@@ -2651,8 +2651,8 @@ void cProtocol190::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt64, Hand);
 
-	// TODO: Handle this right-click - we need to figure out what they are looking at or else rewrite the HandleRightClick method.
-	// m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	// Didn't click a block - emulate old values used with place block of -1, -1, -1 (and BLOCK_FACE_NONE).
+	m_Client->HandleRightClick(-1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0, m_Client->GetPlayer()->GetEquippedItem());
 }
 
 
