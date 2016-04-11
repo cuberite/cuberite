@@ -1349,10 +1349,10 @@ void cProtocol190::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	}
 
 	cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_ObjectType));
 	Pkt.WriteBEDouble(PosX);
 	Pkt.WriteBEDouble(a_Entity.GetPosY());
@@ -3402,7 +3402,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			auto & Bat = reinterpret_cast<const cBat &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);  // Index 11: Bat flags - currently only hanging
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 0 : 1);
+			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 1 : 0);
 			break;
 		}  // case mtBat
 
