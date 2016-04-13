@@ -108,31 +108,26 @@ std::vector<std::pair<AString, AString>> cOverridesSettingsRepository::GetValues
 {
 	auto overrides = m_Overrides->GetValues(a_keyName);
 	auto main = m_Main->GetValues(a_keyName);
-	std::sort(overrides.begin(), overrides.end(), [](std::pair<AString, AString> a, std::pair<AString, AString> b) -> bool { return a < b ;});
-	std::sort(main.begin(), main.end(), [](std::pair<AString, AString> a, std::pair<AString, AString> b) -> bool { return a < b ;});
 
-	std::vector<std::pair<AString, AString>> ret;
+	auto ret = overrides;
 
-
-	size_t overridesIndex = 0;
-	for (auto pair : main)
+	for (const auto & mainpair : main)
 	{
-		if (overridesIndex >= overrides.size())
+		bool found = false;
+		for (const auto & returnpair : ret)
 		{
-			ret.push_back(pair);
-			continue;
+			if (returnpair.first == mainpair.first)
+			{
+				found = true;
+				break;
+			}
 		}
-		if (pair.first == overrides[overridesIndex].first)
+		if (found == false)
 		{
-			continue;
+			ret.push_back(mainpair);
 		}
-		while (pair.first > overrides[overridesIndex].first)
-		{
-			ret.push_back(overrides[overridesIndex]);
-			overridesIndex++;
-		}
-		ret.push_back(pair);
 	}
+
 	return ret;
 }
 
@@ -270,4 +265,3 @@ bool cOverridesSettingsRepository::Flush()
 {
 	return m_Overrides->Flush() && m_Main->Flush();
 }
-

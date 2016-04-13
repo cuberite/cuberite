@@ -371,7 +371,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		// Parse the comand line args:
 		TCLAP::CmdLine cmd("Cuberite");
 		TCLAP::ValueArg<int> slotsArg    ("s", "max-players",         "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
-		TCLAP::MultiArg<int> portsArg    ("p", "port",                "The port number the server should listen to", false, "port", cmd);
+		TCLAP::MultiArg<int> portsArg    ("p", "port",                "The port numbers the server should listen to", false, "port", cmd);
 		TCLAP::SwitchArg commLogArg      ("",  "log-comm",            "Log server client communications to file", cmd);
 		TCLAP::SwitchArg commLogInArg    ("",  "log-comm-in",         "Log inbound server client communications to file", cmd);
 		TCLAP::SwitchArg commLogOutArg   ("",  "log-comm-out",        "Log outbound server client communications to file", cmd);
@@ -392,7 +392,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		{
 			for (auto port: portsArg.getValue())
 			{
-				repo->AddValue("Server", "Port", static_cast<Int64>(port));
+				repo->AddValue("Server", "Ports", static_cast<Int64>(port));
 			}
 		}
 		if (commLogArg.getValue())
@@ -555,7 +555,3 @@ int main(int argc, char ** argv)
 
 	return EXIT_SUCCESS;
 }
-
-
-
-
