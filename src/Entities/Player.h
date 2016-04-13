@@ -693,11 +693,13 @@ protected:
 	/** Tosses a list of items. */
 	void TossItems(const cItems & a_Items);
 
-	/** Pins the player to a_Location until Unfreeze() is called.
-	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
-	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
-
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
+
+private:
+
+	/** Pins the player to a_Location until Unfreeze() is called.
+	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
+	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
 } ;  // tolua_export
