@@ -65,6 +65,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_GameMode(eGameMode_NotSet),
 	m_IP(""),
 	m_ClientHandle(a_Client),
+	m_IsFrozen(false),
 	m_NormalMaxSpeed(1.0),
 	m_SprintingMaxSpeed(1.3),
 	m_FlyingMaxSpeed(1.0),
@@ -1759,41 +1760,6 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
-{
-	SetSpeed(0, 0, 0);
-	SetPosition(a_Location);
-	m_IsFrozen = true;
-	m_IsManuallyFrozen = a_ManuallyFrozen;
-
-	double NormalMaxSpeed = GetNormalMaxSpeed();
-	double SprintMaxSpeed = GetSprintingMaxSpeed();
-	double FlyingMaxpeed = GetFlyingMaxSpeed();
-	bool IsFlying = m_IsFlying;
-
-	// Set the client-side speed to 0
-	m_NormalMaxSpeed = 0;
-	m_SprintingMaxSpeed = 0;
-	m_FlyingMaxSpeed = 0;
-	m_IsFlying = true;
-
-	// Send the client its fake speed and max speed of 0
-	GetClientHandle()->SendPlayerMoveLook();
-	GetClientHandle()->SendPlayerAbilities();
-	GetClientHandle()->SendPlayerMaxSpeed();
-	GetClientHandle()->SendEntityVelocity(*this);
-
-	// Keep the server side speed variables as they were in the first place
-	m_NormalMaxSpeed = NormalMaxSpeed;
-	m_SprintingMaxSpeed = SprintMaxSpeed;
-	m_FlyingMaxSpeed = FlyingMaxpeed;
-	m_IsFlying = IsFlying;
-}
-
-
-
-
-
 bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	ASSERT(a_World != nullptr);
@@ -2545,4 +2511,39 @@ AString cPlayer::GetUUIDFileName(const AString & a_UUID)
 	res.append(UUID, 2, AString::npos);
 	res.append(".json");
 	return res;
+}
+
+
+
+
+
+void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
+{
+	SetSpeed(0, 0, 0);
+	SetPosition(a_Location);
+	m_IsFrozen = true;
+	m_IsManuallyFrozen = a_ManuallyFrozen;
+
+	double NormalMaxSpeed = GetNormalMaxSpeed();
+	double SprintMaxSpeed = GetSprintingMaxSpeed();
+	double FlyingMaxpeed = GetFlyingMaxSpeed();
+	bool IsFlying = m_IsFlying;
+
+	// Set the client-side speed to 0
+	m_NormalMaxSpeed = 0;
+	m_SprintingMaxSpeed = 0;
+	m_FlyingMaxSpeed = 0;
+	m_IsFlying = true;
+
+	// Send the client its fake speed and max speed of 0
+	GetClientHandle()->SendPlayerMoveLook();
+	GetClientHandle()->SendPlayerAbilities();
+	GetClientHandle()->SendPlayerMaxSpeed();
+	GetClientHandle()->SendEntityVelocity(*this);
+
+	// Keep the server side speed variables as they were in the first place
+	m_NormalMaxSpeed = NormalMaxSpeed;
+	m_SprintingMaxSpeed = SprintMaxSpeed;
+	m_FlyingMaxSpeed = FlyingMaxpeed;
+	m_IsFlying = IsFlying;
 }
