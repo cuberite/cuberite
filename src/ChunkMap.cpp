@@ -3066,6 +3066,7 @@ void cChunkMap::cChunkLayer::Save(void)
 
 void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 {
+	cWorld * World = m_Parent->GetWorld();
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if (
@@ -3074,11 +3075,20 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 			!cPluginManager::Get()->CallHookChunkUnloading(*(m_Parent->GetWorld()), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
 		)
 		{
-			// The cChunk destructor calls our GetChunk() while removing its entities
-			// so we still need to be able to return the chunk. Therefore we first delete, then nullptrify
-			// Doing otherwise results in bug https://forum.cuberite.org/thread-355.html
-			delete m_Chunks[i];
-			m_Chunks[i] = nullptr;
+			if (m_Chunks[i]->IsDirty() && m_Chunks[i]->IsValid())
+			{
+				// The chunk is ready to unload, except that it's dirty. Let's save it first.
+				// It will be unloaded in the next unload cycle.
+				World->GetStorage().QueueSaveChunk(m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ());
+			}
+			else
+			{
+				// The cChunk destructor calls our GetChunk() while removing its entities
+				// so we still need to be able to return the chunk. Therefore we first delete, then nullptrify
+				// Doing otherwise results in bug https://forum.cuberite.org/thread-355.html
+				delete m_Chunks[i];
+				m_Chunks[i] = nullptr;
+			}
 		}
 	}  // for i - m_Chunks[]
 }
