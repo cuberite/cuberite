@@ -277,11 +277,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 			if (GetSpeedZ() >= 0)
 			{
 				// SpeedZ POSITIVE, going SOUTH
-				if (GetSpeedZ() <= MAX_SPEED)  // Speed limit
-				{
-					AddSpeedZ(0.5);  // Speed up
-					SetSpeedY(-GetSpeedZ());  // Downward movement is negative (0 minus positive numbers is negative)
-				}
+				AddSpeedZ(0.5);  // Speed up
+				SetSpeedY(-GetSpeedZ());  // Downward movement is negative (0 minus positive numbers is negative)
 			}
 			else
 			{
@@ -304,12 +301,9 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 			}
 			else
 			{
-				if (GetSpeedZ() >= MAX_SPEED_NEGATIVE)  // Speed limit
-				{
-					// SpeedZ NEGATIVE, going NORTH
-					AddSpeedZ(-0.5);  // Speed up
-					SetSpeedY(GetSpeedZ());  // Downward movement negative
-				}
+				// SpeedZ NEGATIVE, going NORTH
+				AddSpeedZ(-0.5);  // Speed up
+				SetSpeedY(GetSpeedZ());  // Downward movement negative
 			}
 			break;
 		}
@@ -320,11 +314,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 
 			if (GetSpeedX() >= NO_SPEED)
 			{
-				if (GetSpeedX() <= MAX_SPEED)
-				{
-					AddSpeedX(0.5);
-					SetSpeedY(-GetSpeedX());
-				}
+				AddSpeedX(0.5);
+				SetSpeedY(-GetSpeedX());
 			}
 			else
 			{
@@ -345,11 +336,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 			}
 			else
 			{
-				if (GetSpeedX() >= MAX_SPEED_NEGATIVE)
-				{
-					AddSpeedX(-0.5);
-					SetSpeedY(GetSpeedX());
-				}
+				AddSpeedX(-0.5);
+				SetSpeedY(GetSpeedX());
 			}
 			break;
 		}
@@ -484,11 +472,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 			if (GetSpeedX() >= NO_SPEED)
 			{
-				if (GetSpeedX() <= MAX_SPEED)
-				{
-					AddSpeedX(AccelDecelSpeed);
-					SetSpeedY(-GetSpeedX());
-				}
+				AddSpeedX(AccelDecelSpeed);
+				SetSpeedY(-GetSpeedX());
 			}
 			else
 			{
@@ -509,11 +494,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			}
 			else
 			{
-				if (GetSpeedX() >= MAX_SPEED_NEGATIVE)
-				{
-					AddSpeedX(AccelDecelNegSpeed);
-					SetSpeedY(GetSpeedX());
-				}
+				AddSpeedX(AccelDecelNegSpeed);
+				SetSpeedY(GetSpeedX());
 			}
 			break;
 		}
@@ -524,11 +506,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 			if (GetSpeedZ() >= NO_SPEED)
 			{
-				if (GetSpeedZ() <= MAX_SPEED)
-				{
-					AddSpeedZ(AccelDecelSpeed);
-					SetSpeedY(-GetSpeedZ());
-				}
+				AddSpeedZ(AccelDecelSpeed);
+				SetSpeedY(-GetSpeedZ());
 			}
 			else
 			{
@@ -549,11 +528,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			}
 			else
 			{
-				if (GetSpeedZ() >= MAX_SPEED_NEGATIVE)
-				{
-					AddSpeedZ(AccelDecelNegSpeed);
-					SetSpeedY(GetSpeedZ());
-				}
+				AddSpeedZ(AccelDecelNegSpeed);
+				SetSpeedY(GetSpeedZ());
 			}
 			break;
 		}
@@ -1037,6 +1013,40 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 	return true;
+}
+
+
+
+
+
+void cMinecart::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+{
+	if (a_SpeedX > MAX_SPEED)
+	{
+		a_SpeedX = MAX_SPEED;
+	}
+	else if (a_SpeedX < MAX_SPEED_NEGATIVE)
+	{
+		a_SpeedX = MAX_SPEED_NEGATIVE;
+	}
+	if (a_SpeedY > MAX_SPEED)
+	{
+		a_SpeedY = MAX_SPEED;
+	}
+	else if (a_SpeedY < MAX_SPEED_NEGATIVE)
+	{
+		a_SpeedY = MAX_SPEED_NEGATIVE;
+	}
+	if (a_SpeedZ > MAX_SPEED)
+	{
+		a_SpeedZ = MAX_SPEED;
+	}
+	else if (a_SpeedZ < MAX_SPEED_NEGATIVE)
+	{
+		a_SpeedZ = MAX_SPEED_NEGATIVE;
+	}
+
+	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
