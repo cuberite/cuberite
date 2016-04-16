@@ -51,8 +51,10 @@ public:
 		{
 			BLOCKTYPE above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
 
-			// Grass turns back to dirt when the block above it is not transparent or water
-			if (!cBlockInfo::IsTransparent(above) || IsBlockWater(above))
+			// Grass turns back to dirt when the block above it is not transparent or water.
+			// It does not turn to dirt when a snow layer is above.
+			if ((above != E_BLOCK_SNOW) &&
+				(!cBlockInfo::IsTransparent(above) || IsBlockWater(above)))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
