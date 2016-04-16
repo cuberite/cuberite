@@ -79,7 +79,7 @@ public:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if ((Meta & 0x08) != 0)
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);
+			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7, false, false);
 		}
 	}
 
@@ -116,8 +116,10 @@ public:
 
 		if (HasNearLog(Area, BlockX, a_RelY, BlockZ))
 		{
-			// Wood found, the leaves stay; mark them as checked:
-			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x8);
+			// Wood found, the leaves stay; mark them as checked.
+			// There is no point in saving this to disk or informing the client
+			// So we use SetMetaQuiet
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x8, false, false);
 			return;
 		}
 
