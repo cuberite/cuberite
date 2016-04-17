@@ -1119,6 +1119,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 			return;
 		}
 
+		case DIG_STATUS_SWAP_ITEM_IN_HAND:
+		{
+			// TODO: Not yet implemented
+			return;
+		}
+
 		default:
 		{
 			ASSERT(!"Unhandled DIG_STATUS");
