@@ -3883,8 +3883,8 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBool(Wolf.IsBegging());
 
 			a_Pkt.WriteBEUInt8(16);  // Index 16: Collar color
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteVarInt32(static_cast<UInt8>(Wolf.GetCollarColor()));
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Wolf.GetCollarColor());
 			break;
 		}  // case mtWolf
 
