@@ -878,6 +878,12 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_InvulnerableTicks--;
 	}
 
+	if ((GetPosY() < 0) && (!IsPlayer()))
+	{
+		Destroy();
+		return;
+	}
+
 	if (m_AttachedTo != nullptr)
 	{
 		SetPosition(m_AttachedTo->GetPosition());

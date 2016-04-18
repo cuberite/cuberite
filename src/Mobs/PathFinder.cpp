@@ -196,7 +196,13 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	// If destination in the air, first try to go 1 block north, or east, or west.
 	// This fixes the player leaning issue.
 	// If that failed, we instead go down to the lowest air block.
-	Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
+	int YBelowUs = FloorC(a_Vector.y) - 1;
+	if (YBelowUs < 0)
+	{
+		return false;
+
+	}
+	Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
 	if (!(IsWaterOrSolid(BlockType)))
 	{
 		bool InTheAir = true;
@@ -216,7 +222,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 				}
 				RelX = FloorC(a_Vector.x+x) - Chunk->GetPosX() * cChunkDef::Width;
 				RelZ = FloorC(a_Vector.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
-				Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
+				Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
 				if (IsWaterOrSolid((BlockType)))
 				{
 					a_Vector.x += x;

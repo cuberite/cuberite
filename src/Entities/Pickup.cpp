@@ -182,12 +182,6 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy(true);
 		return;
 	}
-
-	if (GetPosY() < VOID_BOUNDARY)  // Out of this world and no more visible!
-	{
-		Destroy(true);
-		return;
-	}
 }
 
 
