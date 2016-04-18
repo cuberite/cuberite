@@ -209,10 +209,10 @@ void cChunkGenerator::Execute(void)
 		{
 			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
 			{
-				LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
+				/* LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
 					static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC/ (clock() - GenerationStart),
 					NumChunksGenerated
-				);
+				); */
 			}
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
@@ -239,7 +239,7 @@ void cChunkGenerator::Execute(void)
 		m_evtRemoved.Set();
 
 		// Display perf info once in a while:
-		if ((NumChunksGenerated > 16) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
+		if ((NumChunksGenerated > 512) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
 		{
 			LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
 				static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart),
@@ -271,7 +271,7 @@ void cChunkGenerator::Execute(void)
 		}
 
 		// Generate the chunk:
-		LOGD("Generating chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
+		// LOGD("Generating chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
 		DoGenerate(item.m_ChunkX, item.m_ChunkZ);
 		if (item.m_Callback != nullptr)
 		{

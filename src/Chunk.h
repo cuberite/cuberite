@@ -401,7 +401,6 @@ public:
 			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
 			if (hasChanged)
 			{
-				m_IsRedstoneDirty = true;
 				if (a_ShouldMarkDirty)
 				{
 					MarkDirty();
@@ -462,8 +461,6 @@ public:
 
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
 	void SetRedstoneSimulatorData(cRedstoneSimulatorChunkData * a_Data) { m_RedstoneSimulatorData = a_Data; }
-	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
-	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -550,10 +547,6 @@ private:
 	cSandSimulatorChunkData m_SandSimulatorData;
 
 	cRedstoneSimulatorChunkData * m_RedstoneSimulatorData;
-
-
-	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
-	bool m_IsRedstoneDirty;
 
 	/** If greater than zero, the chunk is ticked even if it has no clients.
 	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.

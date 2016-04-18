@@ -95,7 +95,6 @@ cChunk::cChunk(
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
 	m_RedstoneSimulatorData(a_World->GetRedstoneSimulator()->CreateChunkData()),
-	m_IsRedstoneDirty(false),
 	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != nullptr)
@@ -1536,8 +1535,17 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		return;
 	}
 
-	MarkDirty();
-	m_IsRedstoneDirty = true;
+	bool ReplacingLiquids = (
+		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary lava with lava
+		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing lava with stationary lava
+	);
+
+	if (!ReplacingLiquids)
+	{
+		MarkDirty();
+	}
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
@@ -1550,13 +1558,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 				((OldBlockType == E_BLOCK_NEW_LEAVES) && (a_BlockType == E_BLOCK_NEW_LEAVES))
 			) &&                              // ... AND ...
 			(
-				(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
-				!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them):
-					((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
-					((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
-					((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
-					((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
-				)
+				(OldBlockMeta != a_BlockMeta) || (!ReplacingLiquids)
 			)
 		)
 	)

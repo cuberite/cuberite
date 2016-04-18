@@ -2706,18 +2706,9 @@ void cWorld::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHa
 
 
 
-void cWorld::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
+void cWorld::MarkChunkDirty(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->MarkRedstoneDirty(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
-void cWorld::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
-{
-	m_ChunkMap->MarkChunkDirty(a_ChunkX, a_ChunkZ, a_MarkRedstoneDirty);
+	m_ChunkMap->MarkChunkDirty(a_ChunkX, a_ChunkZ);
 }
 
 
