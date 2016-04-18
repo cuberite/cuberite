@@ -667,10 +667,14 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NIBBLETYPE BlockMeta;
 			int RelX = static_cast<int>(Destination.x) - Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = static_cast<int>(Destination.z) - Chunk->GetPosZ() * cChunkDef::Width;
-			Chunk->GetBlockTypeMeta(RelX, static_cast<int>(Destination.y) - 1, RelZ, BlockType, BlockMeta);
-			if (BlockType != E_BLOCK_STATIONARY_WATER)  // Idle mobs shouldn't enter water on purpose
+			int YBelowUs = static_cast<int>(Destination.y) - 1;
+			if (YBelowUs >= 0)
 			{
-				MoveToPosition(Destination);
+				Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
+				if (BlockType != E_BLOCK_STATIONARY_WATER)  // Idle mobs shouldn't enter water on purpose
+				{
+					MoveToPosition(Destination);
+				}
 			}
 		}
 	}
