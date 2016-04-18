@@ -41,6 +41,8 @@ Implements the 1.9.x protocol classes:
 #include "../Entities/ArrowEntity.h"
 #include "../Entities/FireworkEntity.h"
 
+#include "../Items/ItemSpawnEgg.h"
+
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
 
@@ -2914,6 +2916,18 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				{
 					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
 				}
+				else if (TagName == "EntityTag")
+				{
+					for (int entitytag = NBT.GetFirstChild(tag); entitytag >= 0; entitytag = NBT.GetNextSibling(entitytag))
+					{
+						if ((NBT.GetType(entitytag) == TAG_String) && (NBT.GetName(entitytag) == "id"))
+						{
+							eMonsterType MonsterType = cMonster::StringToMobType(NBT.GetString(entitytag));
+							// No special method here to convert to the numeric damage value; just cast to the given ID
+							a_Item.m_ItemDamage = static_cast<short>(MonsterType);
+						}
+					}
+				}
 				break;
 			}
 			case TAG_Int:
@@ -2921,6 +2935,124 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				if (TagName == "RepairCost")
 				{
 					a_Item.m_RepairCost = NBT.GetInt(tag);
+				}
+			}
+			case TAG_String:
+			{
+				if (TagName == "Potion")
+				{
+					AString PotionEffect = NBT.GetString(tag);
+					LOGD("Potion effect string: %s", PotionEffect.c_str());
+					if (PotionEffect.find("minecraft:") == AString::npos)
+					{
+						LOGD("Unknown or missing domain on potion effect name %s!", PotionEffect.c_str());
+						continue;
+					}
+					if (PotionEffect.find("empty") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 0;
+					}
+					else if (PotionEffect.find("water") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 0;
+					}
+					else if (PotionEffect.find("mundane") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 0;
+					}
+					else if (PotionEffect.find("thick") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 20;
+					}
+					else if (PotionEffect.find("awkward") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 10;
+					}
+					else if (PotionEffect.find("regeneration") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 1;
+					}
+					else if (PotionEffect.find("swiftness") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 2;
+					}
+					else if (PotionEffect.find("fire_resistance") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 3;
+					}
+					else if (PotionEffect.find("poison") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 4;
+					}
+					else if (PotionEffect.find("healing") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 5;
+					}
+					else if (PotionEffect.find("night_vision") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 6;
+					}
+					else if (PotionEffect.find("weakness") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 8;
+					}
+					else if (PotionEffect.find("strength") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 9;
+					}
+					else if (PotionEffect.find("slowness") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 10;
+					}
+					else if (PotionEffect.find("leaping") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 11;
+					}
+					else if (PotionEffect.find("harming") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 12;
+					}
+					else if (PotionEffect.find("water_breathing") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 13;
+					}
+					else if (PotionEffect.find("invisibility") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 14;
+					}
+					else
+					{
+						// Note: luck potions are not handled and will reach this location
+						LOGD("Unknown potion type for effect name %s!", PotionEffect.c_str());
+						continue;
+					}
+
+					LOGD("Item damage: %d", a_Item.m_ItemDamage);
+
+					if (PotionEffect.find("strong") != AString::npos)
+					{
+						a_Item.m_ItemDamage |= 0x20;
+						LOGD("Strong: %d", a_Item.m_ItemDamage);
+					}
+					if (PotionEffect.find("long") != AString::npos)
+					{
+						a_Item.m_ItemDamage |= 0x40;
+						LOGD("Long: %d", a_Item.m_ItemDamage);
+					}
+
+					// Ugly special case with the changed splash potion ID in 1.9
+					if ((a_Item.m_ItemType == 438) || (a_Item.m_ItemType == 441))
+					{
+						// Splash or lingering potions - change the ID to the normal one and mark as splash potions
+						a_Item.m_ItemType = E_ITEM_POTION;
+						a_Item.m_ItemDamage |= 0x4000;  // Is splash potion
+						LOGD("Spash: %d", a_Item.m_ItemDamage);
+					}
+					else
+					{
+						a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
+						LOGD("Not a spash: %d", a_Item.m_ItemDamage);
+					}
 				}
 			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
@@ -3053,11 +3185,28 @@ void cProtocol190::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		return;
 	}
 
-	a_Pkt.WriteBEInt16(ItemType);
+	if ((ItemType == E_ITEM_POTION) && ((a_Item.m_ItemDamage & 0x4000) != 0))
+	{
+		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are implemented
+		a_Pkt.WriteBEInt16(438);  // minecraft:splash_potion
+	}
+	else
+	{
+		// Normal item
+		a_Pkt.WriteBEInt16(ItemType);
+	}
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+	if ((ItemType == E_ITEM_POTION) || (ItemType == E_ITEM_SPAWN_EGG))
+	{
+		// These items lost their metadata; if it is sent they don't render correctly.
+		a_Pkt.WriteBEInt16(0);
+	}
+	else
+	{
+		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+	}
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (ItemType != E_ITEM_FIREWORK_ROCKET) && (ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() && (ItemType != E_ITEM_POTION) && (ItemType != E_ITEM_SPAWN_EGG))
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -3110,6 +3259,83 @@ void cProtocol190::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	{
 		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
 	}
+	if (a_Item.m_ItemType == E_ITEM_POTION)
+	{
+		// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
+		AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
+
+		cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
+		LOGD("Writing potion.  Damage: %d, Potion type: %d", a_Item.m_ItemDamage, Type);
+		if (Type != cEntityEffect::effNoEffect)
+		{
+			LOGD("Valid effect");
+			switch (Type)
+			{
+				case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
+				case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
+				case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
+				case cEntityEffect::effPoison: PotionID = "poison"; break;
+				case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
+				case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
+				case cEntityEffect::effWeakness: PotionID = "weakness"; break;
+				case cEntityEffect::effStrength: PotionID = "strength"; break;
+				case cEntityEffect::effSlowness: PotionID = "slowness"; break;
+				case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
+				case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
+				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
+				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
+			}
+			LOGD("Base effect %s", PotionID.c_str());
+			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
+			{
+				LOGD("Strong");
+				PotionID = "strong_" + PotionID;
+			}
+			else if (a_Item.m_ItemDamage & 0x40)
+			{
+				LOGD("Long");
+				// Extended potion bit
+				PotionID = "long_" + PotionID;
+			}
+		}
+		else
+		{
+			LOGD("Invalid effect");
+			// Empty potions: Water bottles and other base ones
+			if (a_Item.m_ItemDamage == 0)
+			{
+				// No other bits set; thus it's a water bottle
+				PotionID = "water";
+			}
+			else
+			{
+				switch (a_Item.m_ItemDamage & 0x3f)
+				{
+					case 0x00: PotionID = "mundane"; break;
+					case 0x10: PotionID = "awkward"; break;
+					case 0x20: PotionID = "thick"; break;
+				}
+				// Default cases will use "empty" from before.
+			}
+		}
+
+		PotionID = "minecraft:" + PotionID;
+		LOGD("ID is %s", PotionID.c_str());
+
+		Writer.AddString("Potion", PotionID.c_str());
+	}
+	if (a_Item.m_ItemType == E_ITEM_SPAWN_EGG)
+	{
+		// Convert entity ID to the name.
+		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Item.m_ItemDamage);
+		if (MonsterType != eMonsterType::mtInvalidType)
+		{
+			Writer.BeginCompound("EntityTag");
+			Writer.AddString("id", cMonster::MobTypeToVanillaName(MonsterType));
+			Writer.EndCompound();
+		}
+	}
+
 	Writer.Finish();
 
 	AString Result = Writer.GetResult();
