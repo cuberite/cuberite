@@ -2942,7 +2942,6 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				if (TagName == "Potion")
 				{
 					AString PotionEffect = NBT.GetString(tag);
-					LOGD("Potion effect string: %s", PotionEffect.c_str());
 					if (PotionEffect.find("minecraft:") == AString::npos)
 					{
 						LOGD("Unknown or missing domain on potion effect name %s!", PotionEffect.c_str());
@@ -3027,17 +3026,13 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 						continue;
 					}
 
-					LOGD("Item damage: %d", a_Item.m_ItemDamage);
-
 					if (PotionEffect.find("strong") != AString::npos)
 					{
 						a_Item.m_ItemDamage |= 0x20;
-						LOGD("Strong: %d", a_Item.m_ItemDamage);
 					}
 					if (PotionEffect.find("long") != AString::npos)
 					{
 						a_Item.m_ItemDamage |= 0x40;
-						LOGD("Long: %d", a_Item.m_ItemDamage);
 					}
 
 					// Ugly special case with the changed splash potion ID in 1.9
@@ -3046,12 +3041,10 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 						// Splash or lingering potions - change the ID to the normal one and mark as splash potions
 						a_Item.m_ItemType = E_ITEM_POTION;
 						a_Item.m_ItemDamage |= 0x4000;  // Is splash potion
-						LOGD("Spash: %d", a_Item.m_ItemDamage);
 					}
 					else
 					{
 						a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
-						LOGD("Not a spash: %d", a_Item.m_ItemDamage);
 					}
 				}
 			}
@@ -3265,10 +3258,8 @@ void cProtocol190::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
 
 		cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
-		LOGD("Writing potion.  Damage: %d, Potion type: %d", a_Item.m_ItemDamage, Type);
 		if (Type != cEntityEffect::effNoEffect)
 		{
-			LOGD("Valid effect");
 			switch (Type)
 			{
 				case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
@@ -3285,22 +3276,18 @@ void cProtocol190::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
 				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
 			}
-			LOGD("Base effect %s", PotionID.c_str());
 			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
 			{
-				LOGD("Strong");
 				PotionID = "strong_" + PotionID;
 			}
 			else if (a_Item.m_ItemDamage & 0x40)
 			{
-				LOGD("Long");
 				// Extended potion bit
 				PotionID = "long_" + PotionID;
 			}
 		}
 		else
 		{
-			LOGD("Invalid effect");
 			// Empty potions: Water bottles and other base ones
 			if (a_Item.m_ItemDamage == 0)
 			{
@@ -3320,7 +3307,6 @@ void cProtocol190::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		}
 
 		PotionID = "minecraft:" + PotionID;
-		LOGD("ID is %s", PotionID.c_str());
 
 		Writer.AddString("Potion", PotionID.c_str());
 	}
