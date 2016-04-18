@@ -392,15 +392,24 @@ public:
 	{
 		return m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
 	}
-	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+
+	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
+	Used for setting metas that are of little value for saving to disk and / or for sending to the client,
+	such as leaf decay flags. */
+	inline void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClient = true)
 	{
 			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
 			if (hasChanged)
 			{
-				MarkDirty();
 				m_IsRedstoneDirty = true;
-
-				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
+				if (a_ShouldMarkDirty)
+				{
+					MarkDirty();
+				}
+				if (a_ShouldInformClient)
+				{
+					m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
+				}
 			}
 	}
 
