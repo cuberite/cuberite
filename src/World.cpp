@@ -530,38 +530,36 @@ void cWorld::Start(void)
 		m_LinkedOverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
 	}
 
-	// If we are linked to one or more worlds that do not exist, ask the server to stop.
-	AString BadWorlds = "";
+	// If we are linked to one or more worlds that do not exist, unlink them
 	cRoot * Root = cRoot::Get();
 	if (GetDimension() == dimOverworld)
 	{
 		if ((!m_LinkedNetherWorldName.empty()) && (Root->GetWorld(m_LinkedNetherWorldName) == nullptr))
 		{
-			BadWorlds = m_LinkedNetherWorldName;
+			IniFile.SetValue("LinkedWorlds", "NetherWorldName", "");
+			LOG("%s Is linked to a nonexisting nether world called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
+				GetName().c_str(), m_LinkedNetherWorldName.c_str(), GetName().c_str());
+			m_LinkedNetherWorldName = "";
 		}
 		if ((!m_LinkedEndWorldName.empty()) && (Root->GetWorld(m_LinkedEndWorldName) == nullptr))
 		{
-			if (!(BadWorlds.empty()))
-			{
-				BadWorlds += ", ";
-			}
-			BadWorlds += m_LinkedEndWorldName;
+			IniFile.SetValue("LinkedWorlds", "EndWorldName", "");
+			LOG("%s Is linked to a nonexisting end world called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
+				GetName().c_str(), m_LinkedEndWorldName.c_str(), GetName().c_str());
+			m_LinkedEndWorldName = "";
 		}
 	}
 	else
 	{
 		if ((!m_LinkedOverworldName.empty()) && (Root->GetWorld(m_LinkedOverworldName) == nullptr))
 		{
-			BadWorlds = m_LinkedOverworldName;
+			IniFile.SetValue("LinkedWorlds", "OverworldName", "");
+			LOG("%s Is linked to a nonexisting overworld called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
+				GetName().c_str(), m_LinkedOverworldName.c_str(), GetName().c_str());
+			m_LinkedOverworldName = "";
 		}
 	}
-	if (!BadWorlds.empty())
-	{
-		const char * WorldName = m_WorldName.c_str();
-		LOGERROR("\n###### ERROR: \"%s\" is linked to the following nonexisting world/s:\n%s\n\nPlease edit %s/world.ini and fix this.\n\nNote that the server started enforcing proper world linkages recently. And people with older configs may naturally get this error. If you just want a working default config and don't mind losing this world, delete the folder \"%s\" and the server will receate one for you. Otherwise edit the world.ini file and fix the invalid linkages.\n\nMore help and info:\nhttps://forum.cuberite.org/thread-2366.html\n######\n",
-			WorldName, BadWorlds.c_str(), WorldName, WorldName);
-		cRoot::Get()->StopServer();
-	}
+
 
 
 	// Adjust the enum-backed variables into their respective bounds:

@@ -345,6 +345,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	if (World == nullptr)
 	{
 		World = cRoot::Get()->GetDefaultWorld();
+		m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
 	}
 
 	if (m_Player->GetGameMode() == eGameMode_NotSet)
