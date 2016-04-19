@@ -1,11 +1,12 @@
 
 #include "Globals.h"
 #include "ChunkData.h"
-
+#include "MemoryCounter.h"
 
 
 int main(int argc, char** argv)
 {
+	cMemoryCounter Dummy;
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
 	{
@@ -20,7 +21,7 @@ int main(int argc, char** argv)
 		}
 	} Pool;
 	{
-		cChunkData buffer(Pool);
+		cChunkData buffer(Pool, Dummy);
 
 		// Empty chunks
 		buffer.SetBlock(0, 0, 0, 0xAB);
@@ -93,7 +94,7 @@ int main(int argc, char** argv)
 	}
 
 	{
-		cChunkData buffer(Pool);
+		cChunkData buffer(Pool, Dummy);
 
 		// Zero's
 		buffer.SetBlock(0, 0, 0, 0x0);
@@ -110,9 +111,9 @@ int main(int argc, char** argv)
 
 	{
 		// Operator =
-		cChunkData buffer(Pool);
+		cChunkData buffer(Pool, Dummy);
 		buffer.SetBlock(0, 0, 0, 0x42);
-		cChunkData copy(Pool);
+		cChunkData copy(Pool, Dummy);
 		copy = std::move(buffer);
 		testassert(copy.GetBlock(0, 0, 0) == 0x42);
 	}

@@ -11,13 +11,11 @@
 
 
 #include <cstring>
-
-
 #include "ChunkDef.h"
-
 #include "AllocationPool.h"
 
-
+// fwd
+class cMemoryCounter;
 
 #if __cplusplus < 201103L
 // auto_ptr style interface for memory management
@@ -37,7 +35,7 @@ public:
 
 	struct sChunkSection;
 
-	cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool);
+	cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool, cMemoryCounter & a_WorldMemoryCounter);
 	~cChunkData();
 
 	#if __cplusplus < 201103L
@@ -109,6 +107,8 @@ private:
 	// auto_ptr style interface for memory management
 	mutable bool m_IsOwner;
 	#endif
+
+	cMemoryCounter & m_WorldMemoryCounter;
 
 	sChunkSection * m_Sections[NumSections];
 

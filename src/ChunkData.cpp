@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "ChunkData.h"
-
+#include "MemoryCounter.h"
 
 
 
@@ -27,11 +27,12 @@ template <typename T> inline bool IsAllValue(const T * a_Array, size_t a_NumElem
 
 
 
-cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool) :
+cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool, cMemoryCounter & a_WorldMemoryCounter) :
 #if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
 	m_IsOwner(true),
 #endif
+	m_WorldMemoryCounter(a_WorldMemoryCounter),
 	m_Pool(a_Pool)
 {
 	for (size_t i = 0; i < NumSections; i++)
@@ -68,6 +69,7 @@ cChunkData::~cChunkData()
 	// auto_ptr style interface for memory management
 	cChunkData::cChunkData(const cChunkData & a_Other) :
 		m_IsOwner(true),
+		m_WorldMemoryCounter(a_Other.m_WorldMemoryCounter),
 		m_Pool(a_Other.m_Pool)
 	{
 		// Move contents and ownership from a_Other to this, pointer-wise:
@@ -115,6 +117,7 @@ cChunkData::~cChunkData()
 
 	// unique_ptr style interface for memory management
 	cChunkData::cChunkData(cChunkData && other) :
+	m_WorldMemoryCounter(other.m_WorldMemoryCounter),
 	m_Pool(other.m_Pool)
 	{
 		for (size_t i = 0; i < NumSections; i++)
@@ -327,7 +330,7 @@ NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 
 cChunkData cChunkData::Copy(void) const
 {
-	cChunkData copy(m_Pool);
+	cChunkData copy(m_Pool, m_WorldMemoryCounter);
 	for (size_t i = 0; i < NumSections; i++)
 	{
 		if (m_Sections[i] != nullptr)
@@ -571,6 +574,7 @@ void cChunkData::SetSkyLight(const NIBBLETYPE * a_Src)
 
 cChunkData::sChunkSection * cChunkData::Allocate(void)
 {
+	m_WorldMemoryCounter.IncrementApproximateChunkRAM(sizeof(cChunkData::sChunkSection));
 	return m_Pool.Allocate();
 }
 
@@ -580,7 +584,11 @@ cChunkData::sChunkSection * cChunkData::Allocate(void)
 
 void cChunkData::Free(cChunkData::sChunkSection * a_Section)
 {
-	m_Pool.Free(a_Section);
+	if (a_Section != nullptr)
+	{
+		m_WorldMemoryCounter.DecrementApproximateChunkRAM(sizeof(cChunkData::sChunkSection));
+		m_Pool.Free(a_Section);
+	}
 }
 
 

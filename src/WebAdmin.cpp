@@ -371,7 +371,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 	ReplaceString(Template, "{TITLE}",       "Cuberite");
 
 	AString NumChunks;
-	Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
+	Printf(NumChunks, SIZE_T_FMT, cRoot::Get()->GetTotalChunkCount());
 	ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
 
 	cHTTPOutgoingResponse Resp;

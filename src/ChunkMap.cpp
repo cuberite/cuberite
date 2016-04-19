@@ -36,6 +36,7 @@
 
 cChunkMap::cChunkMap(cWorld * a_World) :
 	m_World(a_World),
+	m_ChunkCounter(0),
 	m_Pool(
 		new cListAllocationPool<cChunkData::sChunkSection, 1600>(
 			std::unique_ptr<cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks>(
@@ -66,6 +67,7 @@ cChunkMap::~cChunkMap()
 
 void cChunkMap::RemoveLayer(cChunkLayer * a_Layer)
 {
+	// Layers might also be remove in cChunkMap::TickAndUnload
 	cCSLock Lock(m_CSLayers);
 	m_Layers.erase(std::pair<int, int>(a_Layer->GetX(), a_Layer->GetZ()));
 }
@@ -2693,6 +2695,32 @@ void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 
 
+size_t cChunkMap::TickAndUnload(std::chrono::milliseconds a_Dt, int a_UnloadChance)
+{
+	size_t UnloadedAmount = 0;
+	ASSERT(a_UnloadChance != 0);  // You should be using regular cChunkMap::Tick for this.
+	cFastRandom rnd;
+	cCSLock Lock(m_CSLayers);
+	for (auto  itr = m_Layers.begin(); itr != m_Layers.end();)
+	{
+		cChunkLayer & Layer = itr->second;
+		UnloadedAmount += Layer.TickAndUnload(a_Dt, a_UnloadChance, &rnd);
+		if (Layer.GetNumChunks() == 0)
+		{
+			itr = m_Layers.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}
+	return UnloadedAmount;
+}
+
+
+
+
+
 void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 {
 	cCSLock Lock(m_CSLayers);
@@ -2700,7 +2728,8 @@ void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 	{
 		cChunkLayer & Layer = itr.second;
 		Layer.Tick(a_Dt);
-	}  // for itr - m_Layers
+	}
+
 }
 
 
@@ -2724,27 +2753,14 @@ void cChunkMap::TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cChunkMap::UnloadUnusedChunks(void)
+
+void cChunkMap::SaveChunks(bool a_UnusedOnly)
 {
 	cCSLock Lock(m_CSLayers);
 	for (auto & itr: m_Layers)
 	{
 		cChunkLayer & Layer = itr.second;
-		Layer.UnloadUnusedChunks();
-	}  // for itr - m_Layers
-}
-
-
-
-
-
-void cChunkMap::SaveAllChunks(void)
-{
-	cCSLock Lock(m_CSLayers);
-	for (auto & itr: m_Layers)
-	{
-		cChunkLayer & Layer = itr.second;
-		Layer.Save();
+		Layer.Save(a_UnusedOnly);
 	}  // for itr - m_Layers[]
 }
 
@@ -2752,16 +2768,10 @@ void cChunkMap::SaveAllChunks(void)
 
 
 
-int cChunkMap::GetNumChunks(void)
+size_t cChunkMap::GetNumChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
-	int NumChunks = 0;
-	for (auto & itr: m_Layers)
-	{
-		cChunkLayer & Layer = itr.second;
-		NumChunks += Layer.GetNumChunksLoaded();
-	}
-	return NumChunks;
+	return m_ChunkCounter;
 }
 
 
@@ -2809,6 +2819,24 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 
 
 
+void cChunkMap::IncreaseChunkCounter()
+{
+	++m_ChunkCounter;
+}
+
+
+
+
+
+void cChunkMap::DecreaseChunkCounter()
+{
+	--m_ChunkCounter;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkMap::cChunkLayer:
 
@@ -2820,9 +2848,11 @@ cChunkMap::cChunkLayer::cChunkLayer(
 	: m_LayerX( a_LayerX)
 	, m_LayerZ( a_LayerZ)
 	, m_Parent( a_Parent)
-	, m_NumChunksLoaded( 0)
 	, m_Pool(a_Pool)
+	, m_ChunkCounter(0)
 {
+	ASSERT(m_Parent != nullptr);
+	m_Parent->GetWorld()->GetMemoryCounter().IncrementApproximateChunkRAM(sizeof(cChunkLayer));
 	memset(m_Chunks, 0, sizeof(m_Chunks));
 }
 
@@ -2832,11 +2862,17 @@ cChunkMap::cChunkLayer::cChunkLayer(
 
 cChunkMap::cChunkLayer::~cChunkLayer()
 {
+	m_Parent->GetWorld()->GetMemoryCounter().DecrementApproximateChunkRAM(sizeof(cChunkLayer));
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
-		delete m_Chunks[i];
-		m_Chunks[i] = nullptr;  // Must zero out, because further chunk deletions query the chunkmap for entities and that would touch deleted data
+		if (m_Chunks[i] != nullptr)
+		{
+			DecreaseChunkCounter();
+			delete m_Chunks[i];
+			m_Chunks[i] = nullptr;  // Must zero out, because further chunk deletions query the chunkmap for entities and that would touch deleted data
+		}
 	}  // for i - m_Chunks[]
+	ASSERT(m_ChunkCounter == 0);
 }
 
 
@@ -2864,6 +2900,7 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkZ)
 		cChunk * neizm = (LocalZ > 0)              ? m_Chunks[Index - LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX,     a_ChunkZ - 1);
 		cChunk * neizp = (LocalZ < LAYER_SIZE - 1) ? m_Chunks[Index + LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX,     a_ChunkZ + 1);
 		m_Chunks[Index] = new cChunk(a_ChunkX, a_ChunkZ, m_Parent, m_Parent->GetWorld(), neixm, neixp, neizm, neizp, m_Pool);
+		IncreaseChunkCounter();
 	}
 	return m_Chunks[Index];
 }
@@ -2919,6 +2956,43 @@ void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner & a_MobSpawner)
 			m_Chunks[i]->SpawnMobs(a_MobSpawner);
 		}
 	}  // for i - m_Chunks[]
+}
+
+
+
+
+
+size_t cChunkMap::cChunkLayer::TickAndUnload(std::chrono::milliseconds a_Dt, int a_UnloadChance, cFastRandom * a_Random)
+{
+	size_t UnloadedAmount = 0;
+	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	{
+		if (m_Chunks[i] == nullptr)
+		{
+			continue;
+		}
+
+		if (
+			(m_Chunks[i]->CanUnload()) &&  // Can unload
+			(a_Random->NextInt(CHUNK_CHANCE_ACCURACY) < a_UnloadChance) &&
+			!cPluginManager::Get()->CallHookChunkUnloading(*(m_Parent->GetWorld()), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
+		)
+		{
+			ASSERT(m_ChunkCounter != 0);
+			// The cChunk destructor calls our GetChunk() while removing its entities
+			// so we still need to be able to return the chunk. Therefore we first delete, then nullptrify
+			// Doing otherwise results in bug https://forum.cuberite.org/thread-355.html
+			delete m_Chunks[i];
+			m_Chunks[i] = nullptr;
+			DecreaseChunkCounter();
+			UnloadedAmount++;
+		}
+		else if (m_Chunks[i]->ShouldBeTicked())
+		{
+			m_Chunks[i]->Tick(a_Dt);
+		}
+	}
+	return UnloadedAmount;
 }
 
 
@@ -3016,17 +3090,29 @@ bool cChunkMap::cChunkLayer::HasEntity(UInt32 a_EntityID)
 
 
 
-int cChunkMap::cChunkLayer::GetNumChunksLoaded(void) const
+size_t cChunkMap::cChunkLayer::GetNumChunks()
 {
-	int NumChunks = 0;
-	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
-	{
-		if (m_Chunks[i] != nullptr)
-		{
-			NumChunks++;
-		}
-	}  // for i - m_Chunks[]
-	return NumChunks;
+	return m_ChunkCounter;
+}
+
+
+
+
+
+void cChunkMap::cChunkLayer::IncreaseChunkCounter()
+{
+	++m_ChunkCounter;
+	m_Parent->IncreaseChunkCounter();
+}
+
+
+
+
+
+void cChunkMap::cChunkLayer::DecreaseChunkCounter()
+{
+	--m_ChunkCounter;
+	m_Parent->DecreaseChunkCounter();
 }
 
 
@@ -3057,37 +3143,17 @@ void cChunkMap::cChunkLayer::GetChunkStats(int & a_NumChunksValid, int & a_NumCh
 
 
 
-void cChunkMap::cChunkLayer::Save(void)
+void cChunkMap::cChunkLayer::Save(bool a_UnusedOnly)
 {
 	cWorld * World = m_Parent->GetWorld();
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
-		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->IsValid() && m_Chunks[i]->IsDirty())
+		// Queues for saving chunks that are valid, dirty, and not queued for saving.
+		// If a_UnusedOnly is true, the chunks must also be unused, in addition to the above.
+		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->IsValid() && m_Chunks[i]->IsDirtyAndNotQueuedForSave() && ((!a_UnusedOnly) || m_Chunks[i]->IsUnused()))
 		{
+			m_Chunks[i]->MarkQueuedSaving();
 			World->GetStorage().QueueSaveChunk(m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ());
-		}
-	}  // for i - m_Chunks[]
-}
-
-
-
-
-
-void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
-{
-	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
-	{
-		if (
-			(m_Chunks[i] != nullptr) &&   // Is valid
-			(m_Chunks[i]->CanUnload()) &&  // Can unload
-			!cPluginManager::Get()->CallHookChunkUnloading(*(m_Parent->GetWorld()), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
-		)
-		{
-			// The cChunk destructor calls our GetChunk() while removing its entities
-			// so we still need to be able to return the chunk. Therefore we first delete, then nullptrify
-			// Doing otherwise results in bug https://forum.cuberite.org/thread-355.html
-			delete m_Chunks[i];
-			m_Chunks[i] = nullptr;
 		}
 	}  // for i - m_Chunks[]
 }

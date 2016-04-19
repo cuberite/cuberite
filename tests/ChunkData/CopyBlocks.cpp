@@ -9,28 +9,29 @@
 
 #include "Globals.h"
 #include "ChunkData.h"
-
+#include "MemoryCounter.h"
 
 
 
 
 int main(int argc, char ** argv)
 {
+	cMemoryCounter Dummy;
 	// Set up a cChunkData with known contents - all blocks 0x01, all metas 0x02:
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
- 	{
+	{
 		virtual cChunkData::sChunkSection * Allocate()
 		{
 			return new cChunkData::sChunkSection();
 		}
-		
+
 		virtual void Free(cChunkData::sChunkSection * a_Ptr)
 		{
 			delete a_Ptr;
 		}
 	} Pool;
-	cChunkData Data(Pool);
+	cChunkData Data(Pool, Dummy);
 	cChunkDef::BlockTypes   BlockTypes;
 	cChunkDef::BlockNibbles BlockMetas;
 	memset(BlockTypes, 0x01, sizeof(BlockTypes));

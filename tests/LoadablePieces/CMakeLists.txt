@@ -13,6 +13,7 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/BlockArea.cpp
 	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
 	${CMAKE_SOURCE_DIR}/src/ChunkData.cpp
+	${CMAKE_SOURCE_DIR}/src/MemoryCounter.cpp
 	${CMAKE_SOURCE_DIR}/src/StringCompression.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 
@@ -42,6 +43,7 @@ set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/BlockArea.h
 	${CMAKE_SOURCE_DIR}/src/Cuboid.h
 	${CMAKE_SOURCE_DIR}/src/ChunkData.h
+	${CMAKE_SOURCE_DIR}/src/MemoryCounter.h
 	${CMAKE_SOURCE_DIR}/src/Globals.h
 	${CMAKE_SOURCE_DIR}/src/StringCompression.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h

@@ -159,6 +159,14 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_MojangAPI = new cMojangAPI;
 	bool ShouldAuthenticate = settingsRepo->GetValueSetB("Authentication", "Authenticate", true);
 	m_MojangAPI->Start(*settingsRepo, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
+	AString MaxLoadedChunks = settingsRepo->GetValueSet("Server", "MaxChunkRAM", "30");
+	m_MinimizeRam = settingsRepo->GetValueSetB("Server", "MinimizeRAM", true);
+	if (!StringToInteger(MaxLoadedChunks, m_MaxRAMChunks))
+	{
+		settingsRepo->SetValue("Server", "MaxChunkRAM", "30");
+		m_MaxRAMChunks = 30;  // in MiB
+	}
+
 	if (!m_Server->InitServer(*settingsRepo, ShouldAuthenticate))
 	{
 		settingsRepo->Flush();
@@ -677,12 +685,36 @@ void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AStri
 
 
 
-int cRoot::GetTotalChunkCount(void)
+size_t cRoot::GetTotalChunkCount(void)
 {
-	int res = 0;
+	size_t res = 0;
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		res += itr->second->GetNumChunks();
+	}
+	return res;
+}
+
+size_t cRoot::GetTotalCanUnloadCount()
+{
+	size_t res = 0;
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	{
+		res += itr->second->GetMemoryCounter().GetCanUnloadCount();
+	}
+	return res;
+}
+
+
+
+
+
+size_t cRoot::GetApproximateChunkRAM()
+{
+	size_t res = 0;
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	{
+		res += itr->second->GetMemoryCounter().GetApproximateChunkRAM();
 	}
 	return res;
 }
@@ -701,6 +733,8 @@ void cRoot::SaveAllChunks(void)
 
 
 
+
+
 void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 {
 	for (const auto & itr : m_WorldsByName)
@@ -711,6 +745,8 @@ void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 
 
 
+
+
 void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	for (const auto & itr : m_WorldsByName)
@@ -718,6 +754,27 @@ void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClien
 		itr.second->BroadcastPlayerListAddPlayer(a_Player);
 	}  // for itr - m_WorldsByName[]
 }
+
+
+
+
+
+size_t cRoot::GetMaxRAMChunks()
+{
+	return m_MaxRAMChunks;
+}
+
+
+
+
+
+bool cRoot::GetMinimizeRam()
+{
+	return m_MinimizeRam;
+}
+
+
+
 
 
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)

@@ -50,6 +50,7 @@ SET (SRCS
 	Logger.cpp
 	Map.cpp
 	MapManager.cpp
+	MemoryCounter.cpp
 	MemorySettingsRepository.cpp
 	MobCensus.cpp
 	MobFamilyCollecter.cpp
@@ -127,6 +128,7 @@ SET (HDRS
 	Map.h
 	MapManager.h
 	Matrix4.h
+	MemoryCounter.h
 	MemorySettingsRepository.h
 	MobCensus.h
 	MobFamilyCollecter.h

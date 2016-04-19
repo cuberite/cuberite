@@ -224,10 +224,10 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	cChunk * ParentChunk = GetParentChunk();
 	m_World->QueueTask([this, ParentChunk](cWorld & a_World)
 	{
-		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
+		/* LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
 			this->GetUniqueID(), this->GetClass(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
-		);
+		); */  // TODO uncomment this after testing
 		ParentChunk->RemoveEntity(this);
 		delete this;
 	});
