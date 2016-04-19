@@ -17,6 +17,7 @@ protected:
 	const cChunkDef::BlockNibbles & m_BlockLight;
 	const cChunkDef::BlockNibbles & m_BlockSkyLight;
 	const unsigned char * m_BiomeData;
+	const eDimension m_Dimension;
 
 	typedef std::map<int, AString> Serializations;
 
@@ -39,7 +40,8 @@ public:
 		const cChunkDef::BlockNibbles & a_BlockMetas,
 		const cChunkDef::BlockNibbles & a_BlockLight,
 		const cChunkDef::BlockNibbles & a_BlockSkyLight,
-		const unsigned char *           a_BiomeData
+		const unsigned char *           a_BiomeData,
+		const eDimension                a_Dimension
 	);
 
 	const AString & Serialize(int a_Version, int a_ChunkX, int a_ChunkZ);  // Returns one of the internal m_Serializations[]

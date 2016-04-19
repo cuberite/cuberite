@@ -20,13 +20,15 @@ cChunkDataSerializer::cChunkDataSerializer(
 	const cChunkDef::BlockNibbles & a_BlockMetas,
 	const cChunkDef::BlockNibbles & a_BlockLight,
 	const cChunkDef::BlockNibbles & a_BlockSkyLight,
-	const unsigned char *           a_BiomeData
+	const unsigned char *           a_BiomeData,
+	const eDimension a_Dimension
 ) :
 	m_BlockTypes(a_BlockTypes),
 	m_BlockMetas(a_BlockMetas),
 	m_BlockLight(a_BlockLight),
 	m_BlockSkyLight(a_BlockSkyLight),
-	m_BiomeData(a_BiomeData)
+	m_BiomeData(a_BiomeData),
+	m_Dimension(a_Dimension)
 {
 }
 
@@ -209,28 +211,33 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 	const size_t BitsPerEntry = 13;
 	const size_t Mask = (1 << BitsPerEntry) - 1;  // Creates a mask that is 13 bits long, ie 0b1111111111111
 	const size_t ChunkSectionDataArraySize = (ChunkSectionBlocks * BitsPerEntry) / 8 / 8;  // Convert from bit count to long count
-	const size_t ChunkSectionSize = (
-		1 +                                         // Bits per block - set to 0, so the global palette is used and the palette fields are not sent
-		1 +                                         // Palette length
-		2 +                                         // Data array length VarInt - 2 bytes for the current value
-		ChunkSectionDataArraySize * 8 +             // Actual block data - multiplied by 8 because first number is longs
-		sizeof(m_BlockLight) / NumChunkSections +   // Block light
-		sizeof(m_BlockSkyLight) / NumChunkSections  // Sky light
+	size_t ChunkSectionSize = (
+		1 +                                      // Bits per block - set to 13, so the global palette is used and the palette has a length of 0
+		1 +                                      // Palette length
+		2 +                                      // Data array length VarInt - 2 bytes for the current value
+		ChunkSectionDataArraySize * 8 +          // Actual block data - multiplied by 8 because first number is longs
+		sizeof(m_BlockLight) / NumChunkSections  // Block light
 	);
 
+	if (m_Dimension == dimOverworld)
+	{
+		// Sky light is only sent in the overworld.
+		ChunkSectionSize += sizeof(m_BlockSkyLight) / NumChunkSections;
+	}
+
 	const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
-	const size_t ChunkSize = (
+	size_t ChunkSize = (
 		ChunkSectionSize * 16 +
 		BiomeDataSize
 	);
-	Packet.WriteVarInt32(ChunkSize);
+	Packet.WriteVarInt32(static_cast<Int32>(ChunkSize));
 
 	// Write each chunk section...
 	for (size_t SectionIndex = 0; SectionIndex < 16; SectionIndex++)
 	{
 		Packet.WriteBEUInt8(BitsPerEntry);
 		Packet.WriteVarInt32(0);  // Palette length is 0
-		Packet.WriteVarInt32(ChunkSectionDataArraySize);
+		Packet.WriteVarInt32(static_cast<Int32>(ChunkSectionDataArraySize));
 
 		size_t StartIndex = SectionIndex * ChunkSectionBlocks;
 
@@ -284,10 +291,13 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 		{
 			Packet.WriteBEUInt8(m_BlockLight[(StartIndex / 2) + Index]);
 		}
-		// Two separate arrays, one after the other - can't merge these two loops together
-		for (size_t Index = 0; Index < ChunkSectionBlocks / 2; Index++)
+		if (m_Dimension == dimOverworld)
 		{
-			Packet.WriteBEUInt8(m_BlockSkyLight[(StartIndex / 2) + Index]);
+			// Skylight is only sent in the overworld; the nether and end do not use it
+			for (size_t Index = 0; Index < ChunkSectionBlocks / 2; Index++)
+			{
+				Packet.WriteBEUInt8(m_BlockSkyLight[(StartIndex / 2) + Index]);
+			}
 		}
 	}
 
