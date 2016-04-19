@@ -230,14 +230,14 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 		ChunkSectionSize * 16 +
 		BiomeDataSize
 	);
-	Packet.WriteVarInt32(static_cast<Int32>(ChunkSize));
+	Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
 	// Write each chunk section...
 	for (size_t SectionIndex = 0; SectionIndex < 16; SectionIndex++)
 	{
 		Packet.WriteBEUInt8(BitsPerEntry);
 		Packet.WriteVarInt32(0);  // Palette length is 0
-		Packet.WriteVarInt32(static_cast<Int32>(ChunkSectionDataArraySize));
+		Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 
 		size_t StartIndex = SectionIndex * ChunkSectionBlocks;
 
