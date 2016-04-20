@@ -12,7 +12,6 @@
 
 
 
-
 class cWorld;
 class cWorldInterface;
 class cItem;
@@ -68,7 +67,6 @@ public:
 	static const int LAYER_SIZE = 32;
 
 	cChunkMap(cWorld * a_World);
-	~cChunkMap();
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
@@ -424,6 +422,8 @@ private:
 		);
 		~cChunkLayer();
 
+		cChunkLayer(const cChunkLayer & a_That) = delete;
+
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
 		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkZ);
 
@@ -506,7 +506,7 @@ private:
 	void RemoveLayer(cChunkLayer * a_Layer);
 
 	cCriticalSection m_CSLayers;
-	cChunkLayerList  m_Layers;
+	std::map<std::pair<int, int>, cChunkLayer>  m_Layers;
 	cEvent           m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
 	cWorld * m_World;
