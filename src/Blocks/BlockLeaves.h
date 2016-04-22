@@ -75,11 +75,12 @@ public:
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
 	{
-		// Unset 0x8 bit so this block gets checked for decay:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		if ((Meta & 0x08) != 0)
+
+		// Set 0x8 bit so this block gets checked for decay:
+		if ((Meta & 0x08) == 0)
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7, false, false);
+			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x8, true, false);
 		}
 	}
 
@@ -92,7 +93,7 @@ public:
 			return;
 		}
 
-		if ((Meta & 0x8) != 0)
+		if ((Meta & 0x8) == 0)
 		{
 			// These leaves have been checked for decay lately and nothing around them changed
 			return;
@@ -116,10 +117,8 @@ public:
 
 		if (HasNearLog(Area, BlockX, a_RelY, BlockZ))
 		{
-			// Wood found, the leaves stay; mark them as checked.
-			// There is no point in saving this to disk or informing the client
-			// So we use SetMetaQuiet
-			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x8, false, false);
+			// Wood found, the leaves stay; unset the check bit
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta ^ 0x8, true, false);
 			return;
 		}
 

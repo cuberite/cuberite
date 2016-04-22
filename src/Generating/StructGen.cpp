@@ -183,6 +183,14 @@ void cStructGenTrees::ApplyTreeImage(
 				CASE_TREE_OVERWRITTEN_BLOCKS:
 				{
 					a_ChunkDesc.SetBlockTypeMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+					// If grass is below our tree, turn it to dirt
+					if (
+						(cBlockInfo::IsSolid(itr->m_BlockType)) &&
+						(a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY - 1, itr->m_RelZ) == E_BLOCK_GRASS)
+					)
+					{
+						a_ChunkDesc.SetBlockType(itr->m_RelX, itr->m_RelY - 1, itr->m_RelZ, E_BLOCK_DIRT);
+					}
 					break;
 				}
 

@@ -551,9 +551,9 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 	}
 
 	// Add the leaves to the top of the branch
-	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
-	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
-	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD));
+	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
 
 	// Choose if we have to add another branch
 	bool TwoTop = (a_Noise.IntNoise3D(a_BlockX, a_BlockY, a_BlockZ) < 0 ? true : false);
@@ -579,9 +579,9 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 	}
 
 	// And add the leaves ontop of the second branch
-	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
-	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
-	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD));
+	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
 }
 
 
@@ -635,15 +635,15 @@ void GetDarkoakTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 	// The lower two leaves layers are BigO4 with log in the middle and possibly corners:
 	for (int i = 0; i < 2; i++)
 	{
-		PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO4, ARRAYCOUNT(BigO4), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
-		PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
+		PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO4, ARRAYCOUNT(BigO4), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK);
+		PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK);
 		hei++;
 	}  // for i < 2
 
 	// The top leaves layer is a BigO3 with leaves in the middle and possibly corners:
-	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
-	PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
-	a_OtherBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD));
+	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK);
+	PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK);
+	a_OtherBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK));
 }
 
 
@@ -1125,7 +1125,3 @@ bool GetLargeTreeAdjustment(cWorld & a_World, int & a_X, int & a_Y, int & a_Z, N
 
 	return IsLarge;
 }
-
-
-
-

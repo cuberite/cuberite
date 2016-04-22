@@ -227,8 +227,7 @@ public:
 	/** If there is a block entity at the specified coords, sends it to the client specified */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
-	void MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ);
-	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 
