@@ -77,7 +77,7 @@ Install git, make, cmake and clang (or gcc), using your platform's package manag
 ```
 sudo apt-get install git make cmake clang
 ```
-(Ensure you have a recent version of clang, or gcc/g++ 4.8 or higher installed to avoid errors during compilation)
+Ensure that you have modern C++ compiler and linker (Clang 3.4+, GCC 4.8+, or VS 2013+).
 
 ### Getting the source ###
 
