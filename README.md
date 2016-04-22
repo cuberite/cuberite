@@ -27,6 +27,7 @@ This Linux script will download the correct binary from the project site.
 #### Compiling
  - You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
  - You can also compile manually. See [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md).
+ - Clang 3.4 is the minimum version required to compile.
 
 Compiling may provide better performance (1.5-3x as fast) and it supports more operating systems.
 
