@@ -7,7 +7,6 @@ To compile Cuberite from source, you need the following set of software:
  * Platform-specific make tool \(windows would be MSVC, linux/osx GNU make, etc.\)
  * C compiler
  * modern C++ compiler and linker
- * Clang version 3.4 or above.
 
 To contribute code, you also need a Git client.
 
@@ -78,7 +77,7 @@ Install git, make, cmake and clang (or gcc), using your platform's package manag
 ```
 sudo apt-get install git make cmake clang
 ```
-(Ensure you have a recent version of clang, or gcc/g++ 4.8 or higher installed to avoid errors during compilation)
+modern C++ compiler and linker (Clang 3.4+, GCC 4.8+, or VS 2013+).
 
 ### Getting the source ###
 
