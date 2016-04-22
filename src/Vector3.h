@@ -396,13 +396,11 @@ public:
 	/** Provides a hash of a vector's contents */
 	size_t operator()(const Vector3<What> & a_Vector) const
 	{
-		// Guaranteed to have no hash collisions for any 128x128x128 area
-		size_t Hash = 0;
+		// Guaranteed to have non repeating hashes for any 128x128x128 area
+		size_t Hash = static_cast<size_t>(a_Vector.y);
+		Hash <<= 16;
 		Hash ^= static_cast<size_t>(a_Vector.x);
-		Hash <<= 8;
-		Hash ^= static_cast<size_t>(a_Vector.y);
-		Hash <<= 8;
-		Hash ^= static_cast<size_t>(a_Vector.z);
+		Hash ^= static_cast<size_t>(a_Vector.z) << 8;
 		return Hash;
 	}
 };
