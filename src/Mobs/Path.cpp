@@ -250,7 +250,7 @@ bool cPath::StepOnce()
 		{
 			if (ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, y, 1),  CurrentCell, NORMAL_G_COST))
 			{
-				DoneWest = true;
+				DoneSouth = true;
 				if (y == 0)
 				{
 					WalkableSouth = true;

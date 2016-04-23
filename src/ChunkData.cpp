@@ -150,9 +150,14 @@ cChunkData::~cChunkData()
 
 BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
 {
-	ASSERT((a_X >= 0) && (a_X < cChunkDef::Width));
-	ASSERT((a_Y >= 0) && (a_Y < cChunkDef::Height));
-	ASSERT((a_Z >= 0) && (a_Z < cChunkDef::Width));
+	if (
+		(a_X < 0) || (a_X >= cChunkDef::Width) ||
+		(a_Y < 0) || (a_Y >= cChunkDef::Height) ||
+		(a_Z < 0) || (a_Z >= cChunkDef::Width)
+	)
+	{
+		return E_BLOCK_AIR;  // Coordinates are outside outside the world, so this must be an air block
+	}
 	int Section = a_Y / SectionHeight;
 	if (m_Sections[Section] != nullptr)
 	{
@@ -222,7 +227,7 @@ NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 			return 0;
 		}
 	}
-	ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
+	// Coordinates are outside outside the world, so it must be an air block with a blank meta
 	return 0;
 }
 
