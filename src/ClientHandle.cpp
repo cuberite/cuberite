@@ -174,7 +174,7 @@ void cClientHandle::Destroy(void)
 		cWorld * World = m_Player->GetWorld();
 		if (World != nullptr)
 		{
-			World->RemovePlayer(m_Player, true);  // TODO this is NOT thread safe.
+			World->RemovePlayer(m_Player, true);
 		}
 		m_Player->RemoveClientHandle();
 	}
@@ -3082,7 +3082,18 @@ void cClientHandle::SocketClosed(void)
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
-	Destroy();
+	if (m_Player != nullptr)
+	{
+		m_Player->GetWorld()->ScheduleTask(1, [this](cWorld & World)
+		{
+			UNUSED(World);
+			Destroy();
+		});
+	}
+	else
+	{
+		Destroy();
+	}
 }
 
 
