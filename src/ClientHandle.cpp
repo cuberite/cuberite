@@ -124,7 +124,6 @@ cClientHandle::~cClientHandle()
 		{
 			RemoveFromAllChunks();
 			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-			m_Player->SetIsTicking(false);
 			if (!m_Username.empty())
 			{
 				// Send the Offline PlayerList packet:
@@ -174,6 +173,8 @@ void cClientHandle::Destroy(void)
 		cWorld * World = m_Player->GetWorld();
 		if (World != nullptr)
 		{
+			m_Player->StopEveryoneFromTargetingMe();
+			m_Player->SetIsTicking(false);
 			World->RemovePlayer(m_Player, true);
 		}
 		m_Player->RemoveClientHandle();
@@ -3084,7 +3085,7 @@ void cClientHandle::SocketClosed(void)
 	}
 	if (m_Player != nullptr)
 	{
-		m_Player->GetWorld()->ScheduleTask(1, [this](cWorld & World)
+		m_Player->GetWorld()->QueueTask([this](cWorld & World)
 		{
 			UNUSED(World);
 			Destroy();
