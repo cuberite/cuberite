@@ -51,10 +51,24 @@ cChunkMap::cChunkMap(cWorld * a_World) :
 
 
 
+cChunkMap::~cChunkMap()
+{
+	cCSLock Lock(m_CSLayers);
+	while (!m_Layers.empty())
+	{
+		delete m_Layers.back();
+		m_Layers.pop_back();  // Must pop, because further chunk deletions query the chunkmap for entities and that would touch deleted data
+	}
+}
+
+
+
+
+
 void cChunkMap::RemoveLayer(cChunkLayer * a_Layer)
 {
 	cCSLock Lock(m_CSLayers);
-	m_Layers.erase(std::pair<int, int>(a_Layer->GetX(), a_Layer->GetZ()));
+	m_Layers.remove(a_Layer);
 }
 
 
@@ -64,19 +78,23 @@ void cChunkMap::RemoveLayer(cChunkLayer * a_Layer)
 cChunkMap::cChunkLayer * cChunkMap::GetLayer(int a_LayerX, int a_LayerZ)
 {
 	cCSLock Lock(m_CSLayers);
-	auto it = m_Layers.find(std::pair<int, int>(a_LayerX, a_LayerZ));
-	if (it !=m_Layers.end())
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = it->second;
-		return &Layer;
+		if (((*itr)->GetX() == a_LayerX) && ((*itr)->GetZ() == a_LayerZ))
+		{
+			return *itr;
+		}
 	}
 
 	// Not found, create new:
-	m_Layers.emplace(std::piecewise_construct,
-		std::forward_as_tuple(a_LayerX, a_LayerZ),
-		std::forward_as_tuple(a_LayerX, a_LayerZ, this, *m_Pool));
-	cChunkLayer & Layer = m_Layers.find(std::pair<int, int>(a_LayerX, a_LayerZ))->second;
-	return &Layer;
+	cChunkLayer * Layer = new cChunkLayer(a_LayerX, a_LayerZ, this, *m_Pool);
+	if (Layer == nullptr)
+	{
+		LOGERROR("cChunkMap: Cannot create new layer, server out of memory?");
+		return nullptr;
+	}
+	m_Layers.push_back(Layer);
+	return Layer;
 }
 
 
@@ -98,12 +116,13 @@ cChunkMap::cChunkLayer * cChunkMap::FindLayer(int a_LayerX, int a_LayerZ)
 {
 	ASSERT(m_CSLayers.IsLockedByCurrentThread());
 
-	auto it = m_Layers.find(std::pair<int, int>(a_LayerX, a_LayerZ));
-	if (it != m_Layers.end())
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = it->second;
-		return &Layer;
-	}
+		if (((*itr)->GetX() == a_LayerX) && ((*itr)->GetZ() == a_LayerZ))
+		{
+			return *itr;
+		}
+	}  // for itr - m_Layers[]
 
 	// Not found
 	return nullptr;
@@ -1572,10 +1591,9 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSLayers);
 
-	for (auto & itr : m_Layers)
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		Layer.RemoveClient(a_Client);
+		(*itr)->RemoveClient(a_Client);
 	}  // for itr - m_Layers[]
 }
 
@@ -1625,10 +1643,9 @@ void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
 bool cChunkMap::HasEntity(UInt32 a_UniqueID)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr : m_Layers)
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		if (Layer.HasEntity(a_UniqueID))
+		if ((*itr)->HasEntity(a_UniqueID))
 		{
 			return true;
 		}
@@ -1660,10 +1677,9 @@ void cChunkMap::RemoveEntity(cEntity * a_Entity)
 bool cChunkMap::ForEachEntity(cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr : m_Layers)
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		if (Layer.ForEachEntity(a_Callback))
+		if (!(*itr)->ForEachEntity(a_Callback))
 		{
 			return false;
 		}
@@ -1922,10 +1938,9 @@ bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback
 {
 	cCSLock Lock(m_CSLayers);
 	bool res = false;
-	for (auto & itr : m_Layers)
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		if (Layer.DoWithEntityByID(a_UniqueID, a_Callback, res))
+		if ((*itr)->DoWithEntityByID(a_UniqueID, a_Callback, res))
 		{
 			return res;
 		}
@@ -2479,14 +2494,14 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 bool cChunkMap::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr: m_Layers)
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)  // iterate over ALL loaded layers
 	{
-		cChunkLayer & Layer = itr.second;
+		cChunkLayer * layer = *itr;
 		for (int x = 0; x < LAYER_SIZE; x++)
 		{
 			for (int z = 0; z < LAYER_SIZE; z++)
 			{
-				cChunkPtr p = Layer.FindChunk(Layer.GetX() * LAYER_SIZE + x, Layer.GetZ() * LAYER_SIZE + z);
+				cChunkPtr p = layer->FindChunk(layer->GetX() * LAYER_SIZE + x, layer->GetZ() * LAYER_SIZE + z);
 				if ((p != nullptr) && p->IsValid())  // if chunk is loaded
 				{
 					if (a_Callback(p->GetPosX(), p->GetPosZ()))
@@ -2547,11 +2562,10 @@ void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
 	a_NumChunksValid = 0;
 	a_NumChunksDirty = 0;
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr : m_Layers)
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
 		int NumValid = 0, NumDirty = 0;
-		Layer.GetChunkStats(NumValid, NumDirty);
+		(*itr)->GetChunkStats(NumValid, NumDirty);
 		a_NumChunksValid += NumValid;
 		a_NumChunksDirty += NumDirty;
 	}  // for itr - m_Layers[]
@@ -2631,10 +2645,9 @@ void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr: m_Layers)
+	for (auto && layer: m_Layers)
 	{
-		cChunkLayer & Layer = itr.second;
-		Layer.CollectMobCensus(a_ToFill);
+		layer->CollectMobCensus(a_ToFill);
 	}  // for itr - m_Layers
 }
 
@@ -2646,10 +2659,9 @@ void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr: m_Layers)
+	for (auto && layer: m_Layers)
 	{
-		cChunkLayer & Layer = itr.second;
-		Layer.SpawnMobs(a_MobSpawner);
+		layer->SpawnMobs(a_MobSpawner);
 	}  // for itr - m_Layers
 }
 
@@ -2660,10 +2672,9 @@ void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr: m_Layers)
+	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		Layer.Tick(a_Dt);
+		(*itr)->Tick(a_Dt);
 	}  // for itr - m_Layers
 }
 
@@ -2691,10 +2702,9 @@ void cChunkMap::TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunkMap::UnloadUnusedChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr: m_Layers)
+	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		Layer.UnloadUnusedChunks();
+		(*itr)->UnloadUnusedChunks();
 	}  // for itr - m_Layers
 }
 
@@ -2705,10 +2715,9 @@ void cChunkMap::UnloadUnusedChunks(void)
 void cChunkMap::SaveAllChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto & itr: m_Layers)
+	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		Layer.Save();
+		(*itr)->Save();
 	}  // for itr - m_Layers[]
 }
 
@@ -2720,10 +2729,9 @@ int cChunkMap::GetNumChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
 	int NumChunks = 0;
-	for (auto & itr: m_Layers)
+	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		cChunkLayer & Layer = itr.second;
-		NumChunks += Layer.GetNumChunksLoaded();
+		NumChunks += (*itr)->GetNumChunksLoaded();
 	}
 	return NumChunks;
 }
