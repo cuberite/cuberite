@@ -2936,6 +2936,7 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 				{
 					a_Item.m_RepairCost = NBT.GetInt(tag);
 				}
+				break;
 			}
 			case TAG_String:
 			{
@@ -2947,11 +2948,14 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 						LOGD("Unknown or missing domain on potion effect name %s!", PotionEffect.c_str());
 						continue;
 					}
-					if (PotionEffect.find("empty") != AString::npos)
+
+					if (PotionEffect.find("water") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 0;
+						// Water bottles shouldn't have other bits set on them; exit early.
+						continue;
 					}
-					else if (PotionEffect.find("water") != AString::npos)
+					if (PotionEffect.find("empty") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 0;
 					}
@@ -3047,6 +3051,7 @@ void cProtocol190::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 						a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
 					}
 				}
+				break;
 			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
 		}
