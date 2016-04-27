@@ -408,6 +408,7 @@ g_APIDesc =
 				IsSnowable = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block can hold snow atop." },
 				IsSolid = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block is solid." },
 				IsTransparent = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block is transparent." },
+				IsUseableBySpectator = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether a spectator can interact with the specified block." },
 				RequiresSpecialTool = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block requires a special tool to drop." },
 			},
 			Variables =
@@ -1924,6 +1925,7 @@ a_Player:OpenWindow(Window);
 				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
 				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "(STATIC) Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
 				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
+				CanMobsTarget = { Return = "bool", Notes = "Returns if the player can be targeted by mobs." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
 				CloseWindowIfID = { Params = "WindowID, [CanRefuse]", Return = "", Notes = "Closes the currently open UI window if its ID matches the given ID. If CanRefuse is true (default), the window may refuse the closing." },
 				DeltaExperience = { Params = "DeltaXP", Return = "", Notes = "Adds or removes XP from the current XP amount. Won't allow XP to go negative. Returns the new experience, -1 on error (XP overflow)." },

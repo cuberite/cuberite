@@ -108,7 +108,11 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	} Callback(this);
 
-	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), GetWidth(), GetHeight()), Callback);
+	// Spectators cannot push entities around
+	if ((!IsPlayer()) || (!reinterpret_cast<cPlayer *>(this)->IsGameModeSpectator()))
+	{
+		m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), GetWidth(), GetHeight()), Callback);
+	}
 
 	super::Tick(a_Dt, a_Chunk);
 

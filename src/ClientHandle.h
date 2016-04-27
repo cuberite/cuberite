@@ -149,6 +149,7 @@ public:  // tolua_export
 	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
+	void SendCameraSetTo                (const cEntity & a_Entity);
 	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                       (const cCompositeChat & a_Message);
 	void SendChatAboveActionBar         (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
@@ -334,6 +335,7 @@ public:  // tolua_export
 	void HandleRespawn          (void);
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
 	void HandleSlotSelected     (Int16 a_SlotNum);
+	void HandleSpectate         (const AString & a_PlayerUUID);
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (

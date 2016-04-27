@@ -77,6 +77,8 @@ typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 typedef cItemCallback<cMobHeadEntity>      cMobHeadCallback;
 typedef cItemCallback<cFlowerPotEntity>    cFlowerPotCallback;
 
+typedef std::function<bool (cPlayer *)>    cLambdaPlayerCallback;
+typedef std::function<bool (cEntity *)>    cLambdaEntityCallback;
 
 
 
@@ -285,6 +287,7 @@ public:
 
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallback a_Callback);  // Lambda version
 
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
@@ -310,6 +313,7 @@ public:
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
 	bool DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithEntityByID(UInt32 a_UniqueID, cLambdaEntityCallback a_Callback);  // Lambda version
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);

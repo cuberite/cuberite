@@ -7,6 +7,7 @@
 #include "Entities/Pickup.h"
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
+#include "Entities/Minecart.h"
 #include "Inventory.h"
 #include "EffectID.h"
 #include "BlockEntities/BeaconEntity.h"
@@ -1405,7 +1406,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 
-		if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
+		if (BlockHandler->IsUseable() && !m_Player->IsCrouched() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType)))
 		{
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
@@ -1418,6 +1419,12 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				}
 			}
 		}
+	}
+
+	// Players, who spectate cannot use their items
+	if (m_Player->IsGameModeSpectator())
+	{
+		return;
 	}
 
 	short EquippedDamage = Equipped.m_ItemDamage;
@@ -1550,6 +1557,19 @@ void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 
 
 
+void cClientHandle::HandleSpectate(const AString & a_PlayerUUID)
+{
+	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [=](cPlayer * a_ToSpectate)
+	{
+		m_Player->TeleportToEntity(*a_ToSpectate);
+		return true;
+	});
+}
+
+
+
+
+
 void cClientHandle::HandleSteerVehicle(float a_Forward, float a_Sideways)
 {
 	m_Player->SteerVehicle(a_Forward, a_Sideways);
@@ -1610,6 +1630,17 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 {
 	// TODO: Let plugins interfere via a hook
 
+	// If the player is a spectator, let him spectate
+	if (m_Player->IsGameModeSpectator() && a_IsLeftClick)
+	{
+		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity * a_Entity)
+		{
+			m_Player->AttachTo(a_Entity);
+			return true;
+		});
+		return;
+	}
+
 	// If it is a right click, call the entity's OnRightClicked() handler:
 	if (!a_IsLeftClick)
 	{
@@ -1618,7 +1649,19 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 			cPlayer & m_Player;
 			virtual bool Item(cEntity * a_Entity) override
 			{
-				if (cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity))
+				if (
+					cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity) ||
+					(
+						m_Player.IsGameModeSpectator() &&  // Spectators cannot interact with every entity
+						(
+							!a_Entity->IsMinecart() ||  // They can only interact with minecarts
+							(
+								(reinterpret_cast<cMinecart *>(a_Entity)->GetPayload() != cMinecart::mpChest) &&  // And only if the type matches a minecart with a chest or
+								(reinterpret_cast<cMinecart *>(a_Entity)->GetPayload() != cMinecart::mpHopper)    // a minecart with a hopper
+							)
+						)
+					)
+				)
 				{
 					return false;
 				}
@@ -2153,6 +2196,15 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 		Lock.Unlock();
 		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 	}
+}
+
+
+
+
+
+void cClientHandle::SendCameraSetTo(const cEntity & a_Entity)
+{
+	m_Protocol->SendCameraSetTo(a_Entity);
 }
 
 

@@ -45,7 +45,7 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5));
-	if (a_ClosestPlayer != nullptr)
+	if ((a_ClosestPlayer != nullptr) && (!a_ClosestPlayer->IsGameModeSpectator()))
 	{
 		Vector3f a_PlayerPos(a_ClosestPlayer->GetPosition());
 		a_PlayerPos.y++;

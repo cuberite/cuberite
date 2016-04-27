@@ -23,8 +23,8 @@ public:
 
 	virtual bool Item(cPlayer * a_Player) override
 	{
-		// Don't check players who are in creative gamemode
-		if (a_Player->IsGameModeCreative())
+		// Don't check players who cannot be targeted
+		if (!a_Player->CanMobsTarget())
 		{
 			return false;
 		}
@@ -124,13 +124,16 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 		return;
 	}
 
-	if (!Callback.GetPlayer()->IsGameModeCreative())
+	if (!Callback.GetPlayer()->CanMobsTarget())
 	{
-		cMonster::EventSeePlayer(Callback.GetPlayer(), a_Chunk);
-		m_EMState = CHASING;
-		m_bIsScreaming = true;
-		GetWorld()->BroadcastEntityMetadata(*this);
+		return;
 	}
+
+	// Target the player
+	cMonster::EventSeePlayer(Callback.GetPlayer(), a_Chunk);
+	m_EMState = CHASING;
+	m_bIsScreaming = true;
+	GetWorld()->BroadcastEntityMetadata(*this);
 }
 
 

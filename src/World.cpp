@@ -3021,6 +3021,15 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
 {
+	return DoWithPlayerByUUID(a_PlayerUUID, std::bind(&cPlayerListCallback::Item, &a_Callback, std::placeholders::_1));
+}
+
+
+
+
+
+bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallback a_Callback)
+{
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
@@ -3030,7 +3039,7 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallbac
 		}
 		if ((*itr)->GetUUID() == a_PlayerUUID)
 		{
-			return a_Callback.Item(*itr);
+			return a_Callback(*itr);
 		}
 	}
 	return false;
@@ -3129,6 +3138,15 @@ bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 {
+	return DoWithEntityByID(a_UniqueID, std::bind(&cEntityCallback::Item, &a_Callback, std::placeholders::_1));
+}
+
+
+
+
+
+bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cLambdaEntityCallback a_Callback)
+{
 	// First check the entities-to-add:
 	{
 		cCSLock Lock(m_CSEntitiesToAdd);
@@ -3136,7 +3154,7 @@ bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 		{
 			if (ent->GetUniqueID() == a_UniqueID)
 			{
-				a_Callback.Item(ent);
+				a_Callback(ent);
 				return true;
 			}
 		}  // for ent - m_EntitiesToAdd[]

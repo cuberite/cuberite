@@ -203,6 +203,12 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 		return false;  // Not old enough
 	}
 
+	// If the player is a spectator, he cannot collect anything
+	if (a_Dest.IsGameModeSpectator())
+	{
+		return false;
+	}
+
 	if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(a_Dest, *this))
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because a plugin has said no.", m_UniqueID, a_Dest->GetName().c_str());

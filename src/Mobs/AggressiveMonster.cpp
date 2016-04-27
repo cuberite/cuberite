@@ -36,13 +36,16 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk &
 
 
 
-void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk)
+
+void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 {
-	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative())
+	if (!a_Player->CanMobsTarget())
 	{
-		super::EventSeePlayer(a_Entity, a_Chunk);
-		m_EMState = CHASING;
+		return;
 	}
+
+	super::EventSeePlayer(a_Player, a_Chunk);
+	m_EMState = CHASING;
 }
 
 

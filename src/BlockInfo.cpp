@@ -492,6 +492,15 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_WOODEN_PRESSURE_PLATE].m_IsSolid = false;
 
 
+	// Blocks, which a spectator is allowed to interact with
+	a_Info[E_BLOCK_BEACON              ].m_UseableBySpectator = true;
+	a_Info[E_BLOCK_BREWING_STAND       ].m_UseableBySpectator = true;
+	a_Info[E_BLOCK_CHEST               ].m_UseableBySpectator = true;
+	a_Info[E_BLOCK_DISPENSER           ].m_UseableBySpectator = true;
+	a_Info[E_BLOCK_DROPPER             ].m_UseableBySpectator = true;
+	a_Info[E_BLOCK_HOPPER              ].m_UseableBySpectator = true;
+
+
 	// Blocks that fully occupy their voxel - used as a guide for torch placeable blocks, amongst other things:
 	a_Info[E_BLOCK_BARRIER             ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_BEDROCK             ].m_FullyOccupiesVoxel = true;

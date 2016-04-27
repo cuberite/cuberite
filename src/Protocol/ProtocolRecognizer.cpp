@@ -137,6 +137,15 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 
 
+void cProtocolRecognizer::SendCameraSetTo(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendCameraSetTo(a_Entity);
+}
+
+
+
+
 
 void cProtocolRecognizer::SendChat(const AString & a_Message, eChatType a_Type)
 {

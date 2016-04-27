@@ -193,6 +193,9 @@ public:
 	/** Returns true if the player is in Spectator mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeSpectator(void) const;
 
+	/** Returns true if the player can be targeted by Mobs */
+	bool CanMobsTarget(void) const;
+
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
 	/** Returns the associated team, nullptr if none */
@@ -515,6 +518,7 @@ public:
 	virtual bool IsSprinting(void) const override { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const override { return IsEating() || IsChargingBow(); }
 
+	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;
 
 	/** Called by cClientHandle when the client is being destroyed.

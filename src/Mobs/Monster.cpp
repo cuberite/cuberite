@@ -260,7 +260,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (GetTarget()->IsPlayer())
 		{
-			if (static_cast<cPlayer *>(GetTarget())->IsGameModeCreative())
+			if (!static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
 			{
 				SetTarget(nullptr);
 				m_EMState = IDLE;
@@ -466,7 +466,13 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
-		SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
+		if (
+			(!a_TDI.Attacker->IsPlayer()) ||
+			(static_cast<cPlayer *>(a_TDI.Attacker)->CanMobsTarget())
+		)
+		{
+			SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
+		}
 		m_TicksSinceLastDamaged = 0;
 	}
 	return true;
@@ -612,11 +618,10 @@ void cMonster::CheckEventLostPlayer(void)
 
 // What to do if player is seen
 // default to change state to chasing
-void cMonster::EventSeePlayer(cEntity * a_SeenPlayer, cChunk & a_Chunk)
+void cMonster::EventSeePlayer(cPlayer * a_SeenPlayer, cChunk & a_Chunk)
 {
 	UNUSED(a_Chunk);
-	ASSERT(a_SeenPlayer->IsPlayer());
-	SetTarget(static_cast<cPawn*>(a_SeenPlayer));
+	SetTarget(a_SeenPlayer);
 }
 
 

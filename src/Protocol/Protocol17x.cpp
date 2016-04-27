@@ -245,6 +245,15 @@ void cProtocol172::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 
 
 
+void cProtocol172::SendCameraSetTo(const cEntity & a_Entity)
+{
+	// This packet doesn't exist in Minecraft 1.7
+}
+
+
+
+
+
 void cProtocol172::SendChat(const AString & a_Message, eChatType a_Type)
 {
 	ASSERT(m_State == 3);  // In game mode?

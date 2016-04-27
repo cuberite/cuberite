@@ -1927,6 +1927,15 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 {
+	return DoWithEntityByID(a_UniqueID, std::bind(&cEntityCallback::Item, &a_Callback, std::placeholders::_1));
+}
+
+
+
+
+
+bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cLambdaEntityCallback a_Callback)
+{
 	cCSLock Lock(m_CSLayers);
 	bool res = false;
 	for (auto & itr : m_Layers)
@@ -2949,6 +2958,15 @@ bool cChunkMap::cChunkLayer::ForEachEntity(cEntityCallback & a_Callback)
 
 
 bool cChunkMap::cChunkLayer::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn)
+{
+	return DoWithEntityByID(a_EntityID, std::bind(&cEntityCallback::Item, &a_Callback, std::placeholders::_1), a_CallbackReturn);
+}
+
+
+
+
+
+bool cChunkMap::cChunkLayer::DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback, bool & a_CallbackReturn)
 {
 	// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
