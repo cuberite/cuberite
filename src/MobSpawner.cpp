@@ -6,7 +6,7 @@
 #include "World.h"
 
 
-
+//Enderman spawners have been temporarily comented out until their glitches can be fixed
 
 
 cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<eMonsterType>& a_AllowedTypes) :
@@ -74,7 +74,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 	}
 	else if (a_Biome == biEnd)
 	{
-		addIfAllowed(mtEnderman, allowedMobs);
+		//addIfAllowed(mtEnderman, allowedMobs);
 	}
 	else
 	{
@@ -92,7 +92,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 			addIfAllowed(mtPig, allowedMobs);
 			addIfAllowed(mtCow, allowedMobs);
 			addIfAllowed(mtChicken, allowedMobs);
-			addIfAllowed(mtEnderman, allowedMobs);
+			//addIfAllowed(mtEnderman, allowedMobs);
 			addIfAllowed(mtRabbit, allowedMobs);
 			addIfAllowed(mtSlime, allowedMobs);  // MG TODO : much more complicated rule
 
