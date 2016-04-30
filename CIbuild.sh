@@ -7,9 +7,11 @@ export CUBERITE_BUILD_ID=$TRAVIS_JOB_NUMBER
 export CUBERITE_BUILD_DATETIME=`date`
 
 if [ "$CXX" == "g++" ]; then
-	# This is a temporary workaround to allow the identification of GCC-4.8 by CMake, required for C++11 features
+	# This is a temporary workaround to allow the identification of GCC-4.9 by CMake, required for newer C++ features
 	# Travis Docker containers don't allow sudo, which update-alternatives needs, and it seems no alternative to this command is provided, hence:
-	export CXX="/usr/bin/g++-4.8"
+	export CXX="/usr/bin/g++-4.9"
+elif [ "$CXX" == "clang++" ]; then
+	export CXX="/usr/bin/clang++-3.5"
 fi
 cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1;
 

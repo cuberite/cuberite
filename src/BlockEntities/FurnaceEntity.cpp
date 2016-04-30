@@ -178,8 +178,8 @@ void cFurnaceEntity::FinishOne()
 
 void cFurnaceEntity::BurnNewFuel(void)
 {
-	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
-	int NewTime = FR->GetBurnTime(m_Contents.GetSlot(fsFuel));
+	auto & FR = cRoot::Get()->GetFurnaceRecipe();
+	int NewTime = FR.GetBurnTime(m_Contents.GetSlot(fsFuel));
 	if ((NewTime == 0) || !CanCookInputToOutput())
 	{
 		// The item in the fuel slot is not suitable
@@ -247,8 +247,8 @@ void cFurnaceEntity::UpdateInput(void)
 	}
 	m_LastInput = m_Contents.GetSlot(fsInput);
 
-	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
-	m_CurrentRecipe = FR->GetRecipeFrom(m_Contents.GetSlot(fsInput));
+	auto & FR = cRoot::Get()->GetFurnaceRecipe();
+	m_CurrentRecipe = FR.GetRecipeFrom(m_Contents.GetSlot(fsInput));
 	if (!CanCookInputToOutput())
 	{
 		// This input cannot be cooked, reset cook counter immediately

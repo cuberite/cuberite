@@ -100,7 +100,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
-	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -123,7 +122,7 @@ cMonster::~cMonster()
 
 void cMonster::Destroyed()
 {
-	SetTarget(nullptr);  // Tell them we're no longer targeting them.
+	SetTarget(nullptr);
 	super::Destroyed();
 }
 
@@ -761,7 +760,7 @@ void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
 
 void cMonster::GetMonsterConfig(const AString & a_Name)
 {
-	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, a_Name);
+	cRoot::Get()->GetMonsterConfig().AssignAttributes(this, a_Name);
 }
 
 
@@ -912,78 +911,53 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-
-/** Sets the target. */
-void cMonster::SetTarget (cPawn * a_NewTarget)
+void cMonster::SetTarget(cPawn * a_NewTarget)
 {
-	ASSERT((a_NewTarget == nullptr) || (IsTicking()));
-	if (m_Target == a_NewTarget)
+	ASSERT((a_NewTarget == nullptr) || IsTicking());
+
+	if (a_NewTarget == nullptr)
 	{
+		m_Target.reset();
 		return;
 	}
-	cPawn * OldTarget = m_Target;
-	m_Target = a_NewTarget;
 
-	if (OldTarget != nullptr)
-	{
-		// Notify the old target that we are no longer targeting it.
-		OldTarget->NoLongerTargetingMe(this);
-	}
-
-	if (a_NewTarget != nullptr)
-	{
-		ASSERT(a_NewTarget->IsTicking());
-		// Notify the new target that we are now targeting it.
-		m_Target->TargetingMe(this);
-	}
-
+	ASSERT(a_NewTarget->IsTicking());
+	m_Target = std::static_pointer_cast<cPawn, cEntity>(a_NewTarget->GetParentChunk()->GetAssociatedEntityPtr(*a_NewTarget));
+	ASSERT(GetTarget() != nullptr);
 }
 
 
 
 
 
-void cMonster::UnsafeUnsetTarget()
+cPawn * cMonster::GetTarget()
 {
-	m_Target = nullptr;
+	return m_Target.lock().get();
 }
 
 
 
 
 
-cPawn * cMonster::GetTarget ()
-{
-	return m_Target;
-}
-
-
-
-
-
-cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
+std::shared_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
 	cFastRandom Random;
-	cMonster * toReturn = nullptr;
 
 	// Create the mob entity
 	switch (a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			toReturn = new cMagmaCube(1 << Random.NextInt(3));  // Size 1, 2 or 4
-			break;
+			return std::make_shared<cMagmaCube>(1 << Random.NextInt(3));  // Size 1, 2 or 4
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
-			break;
+			return std::make_shared<cSlime>(1 << Random.NextInt(3));  // Size 1, 2 or 4
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
-			break;
+			return std::make_shared<cSkeleton>((Random.NextInt(1) == 0) ? false : true);
 		}
 		case mtVillager:
 		{
@@ -994,8 +968,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				VillagerType = 0;
 			}
 
-			toReturn = new cVillager(static_cast<cVillager::eVillagerType>(VillagerType));
-			break;
+			return std::make_shared<cVillager>(static_cast<cVillager::eVillagerType>(VillagerType));
 		}
 		case mtHorse:
 		{
@@ -1011,42 +984,41 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				HorseType = 0;
 			}
 
-			toReturn = new cHorse(HorseType, HorseColor, HorseStyle, HorseTameTimes);
-			break;
+			return std::make_shared<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
 		}
 
-		case mtBat:           toReturn = new cBat();                      break;
-		case mtBlaze:         toReturn = new cBlaze();                    break;
-		case mtCaveSpider:    toReturn = new cCaveSpider();               break;
-		case mtChicken:       toReturn = new cChicken();                  break;
-		case mtCow:           toReturn = new cCow();                      break;
-		case mtCreeper:       toReturn = new cCreeper();                  break;
-		case mtEnderDragon:   toReturn = new cEnderDragon();              break;
-		case mtEnderman:      toReturn = new cEnderman();                 break;
-		case mtGhast:         toReturn = new cGhast();                    break;
-		case mtGiant:         toReturn = new cGiant();                    break;
-		case mtGuardian:      toReturn = new cGuardian();                 break;
-		case mtIronGolem:     toReturn = new cIronGolem();                break;
-		case mtMooshroom:     toReturn = new cMooshroom();                break;
-		case mtOcelot:        toReturn = new cOcelot();                   break;
-		case mtPig:           toReturn = new cPig();                      break;
-		case mtRabbit:        toReturn = new cRabbit();                   break;
-		case mtSheep:         toReturn = new cSheep();                    break;
-		case mtSilverfish:    toReturn = new cSilverfish();               break;
-		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
-		case mtSpider:        toReturn = new cSpider();                   break;
-		case mtSquid:         toReturn = new cSquid();                    break;
-		case mtWitch:         toReturn = new cWitch();                    break;
-		case mtWither:	      toReturn = new cWither();                   break;
-		case mtWolf:          toReturn = new cWolf();                     break;
-		case mtZombie:        toReturn = new cZombie(false);              break;  // TODO: Infected zombie parameter
-		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
+		case mtBat:           return std::make_shared<cBat>();
+		case mtBlaze:         return std::make_shared<cBlaze>();
+		case mtCaveSpider:    return std::make_shared<cCaveSpider>();
+		case mtChicken:       return std::make_shared<cChicken>();
+		case mtCow:           return std::make_shared<cCow>();
+		case mtCreeper:       return std::make_shared < cCreeper>();
+		case mtEnderDragon:   return std::make_shared<cEnderDragon>();
+		case mtEnderman:      return std::make_shared<cEnderman>();
+		case mtGhast:         return std::make_shared<cGhast>();
+		case mtGiant:         return std::make_shared<cGiant>();
+		case mtGuardian:      return std::make_shared<cGuardian>();
+		case mtIronGolem:     return std::make_shared<cIronGolem>();
+		case mtMooshroom:     return std::make_shared<cMooshroom>();
+		case mtOcelot:        return std::make_shared<cOcelot>();
+		case mtPig:           return std::make_shared<cPig>();
+		case mtRabbit:        return std::make_shared<cRabbit>();
+		case mtSheep:         return std::make_shared<cSheep>();
+		case mtSilverfish:    return std::make_shared<cSilverfish>();
+		case mtSnowGolem:     return std::make_shared<cSnowGolem>();
+		case mtSpider:        return std::make_shared<cSpider>();
+		case mtSquid:         return std::make_shared<cSquid>();
+		case mtWitch:         return std::make_shared<cWitch>();
+		case mtWither:	      return std::make_shared<cWither>();
+		case mtWolf:          return std::make_shared<cWolf>();
+		case mtZombie:        return std::make_shared<cZombie>(false);  // TODO: Infected zombie parameter
+		case mtZombiePigman:  return std::make_shared<cZombiePigman>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
+			return nullptr;
 		}
 	}
-	return toReturn;
 }
 
 

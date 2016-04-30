@@ -10,8 +10,9 @@
 
 
 
-cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
+cNetherPortalScanner::cNetherPortalScanner(const std::weak_ptr<cEntity> & a_MovingEntity, eDimension a_PreviousDimension, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
 	m_Entity(a_MovingEntity),
+	m_PreviousDimension(a_PreviousDimension),
 	m_World(a_DestinationWorld),
 	m_FoundPortal(false),
 	m_BuildPlatform(true),
@@ -31,7 +32,13 @@ cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_
 			Add(x, z);
 		}
 	}
-	Enable(*a_DestinationWorld->GetChunkMap());
+
+	a_DestinationWorld->QueueTask(
+		[this](cWorld & a_World)
+		{
+			Enable(*a_World.GetChunkMap());
+		}
+	);
 }
 
 
@@ -289,8 +296,20 @@ void cNetherPortalScanner::OnDisabled(void)
 		Position.z += OutOffset;
 	}
 
-	LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
-	m_Entity->ScheduleMoveToWorld(m_World, Position, true);
+	Position.y++;
+
+	auto EntityPtr = m_Entity.lock();
+	if (EntityPtr != nullptr)
+	{
+		LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
+		m_World->QueueTask(
+			[PreviousDimension = m_PreviousDimension, Position, EntityPtr](cWorld & a_World)
+			{
+				EntityPtr->OnPostWorldTravel(PreviousDimension, Position);
+			}
+		);
+	}
+
 	delete this;
 }
 

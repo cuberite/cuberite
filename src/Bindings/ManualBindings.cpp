@@ -977,7 +977,7 @@ static int tolua_cPluginManager_LogStackTrace(lua_State * S)
 
 
 
-static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, cLuaState & S, int a_ParamIdx)
+static int tolua_cPluginManager_AddHook_FnRef(cPluginManager & a_PluginManager, cLuaState & S, int a_ParamIdx)
 {
 	// Helper function for cPluginmanager:AddHook() binding
 	// Takes care of the new case (#121): args are HOOK_TYPE and CallbackFunction
@@ -993,7 +993,7 @@ static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, 
 
 	// Retrieve and check the hook type
 	int HookType = static_cast<int>(tolua_tonumber(S, a_ParamIdx, -1));
-	if (!a_PluginManager->IsValidHookType(HookType))
+	if (!a_PluginManager.IsValidHookType(HookType))
 	{
 		LOGWARNING("cPluginManager.AddHook(): Invalid HOOK_TYPE parameter: %d", HookType);
 		S.LogStackTrace();
@@ -1007,67 +1007,7 @@ static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, 
 		S.LogStackTrace();
 		return 0;
 	}
-	a_PluginManager->AddHook(Plugin, HookType);
-
-	// Success
-	return 0;
-}
-
-
-
-
-
-static int tolua_cPluginManager_AddHook_DefFn(cPluginManager * a_PluginManager, cLuaState & S, int a_ParamIdx)
-{
-	// Helper function for cPluginmanager:AddHook() binding
-	// Takes care of the old case (#121): args are cPluginLua and HOOK_TYPE
-	// The arg types have already been checked
-
-	// Retrieve and check the cPlugin parameter
-	cPluginLua * Plugin = reinterpret_cast<cPluginLua *>(tolua_tousertype(S, a_ParamIdx, nullptr));
-	if (Plugin == nullptr)
-	{
-		LOGWARNING("cPluginManager.AddHook(): Invalid Plugin parameter, expected a valid cPlugin object. Hook not added");
-		S.LogStackTrace();
-		return 0;
-	}
-	if (Plugin != cManualBindings::GetLuaPlugin(S))
-	{
-		// The plugin parameter passed to us is not our stored plugin. Disallow this!
-		LOGWARNING("cPluginManager.AddHook(): Invalid Plugin parameter, cannot add hook to foreign plugins. Hook not added.");
-		S.LogStackTrace();
-		return 0;
-	}
-
-	// Retrieve and check the hook type
-	int HookType = static_cast<int>(tolua_tonumber(S, a_ParamIdx + 1, -1));
-	if (!a_PluginManager->IsValidHookType(HookType))
-	{
-		LOGWARNING("cPluginManager.AddHook(): Invalid HOOK_TYPE parameter: %d", HookType);
-		S.LogStackTrace();
-		return 0;
-	}
-
-	// Get the standard name for the callback function:
-	const char * FnName = cPluginLua::GetHookFnName(HookType);
-	if (FnName == nullptr)
-	{
-		LOGWARNING("cPluginManager.AddHook(): Unknown hook type (%d). Hook not added.", HookType);
-		S.LogStackTrace();
-		return 0;
-	}
-
-	// Retrieve the function to call and add it to the plugin:
-	lua_pushstring(S, FnName);
-	bool res = Plugin->AddHookRef(HookType, 1);
-	lua_pop(S, 1);  // Pop the function off the stack
-	if (!res)
-	{
-		LOGWARNING("cPluginManager.AddHook(): Function %s not found. Hook not added.", FnName);
-		S.LogStackTrace();
-		return 0;
-	}
-	a_PluginManager->AddHook(Plugin, HookType);
+	a_PluginManager.AddHook(Plugin, HookType);
 
 	// Success
 	return 0;
@@ -1089,24 +1029,12 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 	*/
 
 	cLuaState S(tolua_S);
-	cPluginManager * PlgMgr = cPluginManager::Get();
+	auto & PlgMgr = cPluginManager::Get();
 
 	// If the first param is a cPluginManager instance, use it instead of the global one:
 	int ParamIdx = 1;
 	tolua_Error err;
-	if (tolua_isusertype(S, 1, "cPluginManager", 0, &err))
-	{
-		// Style 2 or 3, retrieve the PlgMgr instance
-		PlgMgr = reinterpret_cast<cPluginManager *>(tolua_tousertype(S, 1, nullptr));
-		if (PlgMgr == nullptr)
-		{
-			LOGWARNING("Malformed plugin, use cPluginManager.AddHook(HOOK_TYPE, CallbackFunction). Fixing the call for you.");
-			S.LogStackTrace();
-			PlgMgr = cPluginManager::Get();
-		}
-		ParamIdx += 1;
-	}
-	else if (tolua_isusertable(S, 1, "cPluginManager", 0, &err))
+	if (tolua_isusertable(S, 1, "cPluginManager", 0, &err))
 	{
 		// Style 1, use the global PlgMgr, but increment ParamIdx
 		ParamIdx++;
@@ -1116,13 +1044,6 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 	{
 		// The next params are a number and a function, assume style 1 or 2
 		return tolua_cPluginManager_AddHook_FnRef(PlgMgr, S, ParamIdx);
-	}
-	else if (tolua_isusertype(S, ParamIdx, "cPlugin", 0, &err) && lua_isnumber(S, ParamIdx + 1))
-	{
-		// The next params are a cPlugin and a number, assume style 3 or 4
-		LOGINFO("cPluginManager.AddHook(): Deprecated format used, use cPluginManager.AddHook(HOOK_TYPE, CallbackFunction) instead. Fixing the call for you.");
-		S.LogStackTrace();
-		return tolua_cPluginManager_AddHook_DefFn(PlgMgr, S, ParamIdx);
 	}
 
 	AString ParamDesc;
@@ -1186,7 +1107,7 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 	} Callback(L, FnRef);
 
 	// Execute and push the returned value:
-	L.Push(cPluginManager::Get()->ForEachCommand(Callback));
+	L.Push(cPluginManager::Get().ForEachCommand(Callback));
 	return 1;
 }
 
@@ -1245,7 +1166,7 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 	} Callback(L, FnRef);
 
 	// Execute and push the returned value:
-	L.Push(cPluginManager::Get()->ForEachConsoleCommand(Callback));
+	L.Push(cPluginManager::Get().ForEachConsoleCommand(Callback));
 	return 1;
 }
 
@@ -1290,7 +1211,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 		luaL_error(L, "\"BindCommand\" function expects a function as its 3rd parameter. Command-binding aborted.");
 		return 0;
 	}
-	cPluginManager * self = cPluginManager::Get();
+	auto & self = cPluginManager::Get();
 	AString Command   (tolua_tocppstring(L, idx,     ""));
 	AString Permission(tolua_tocppstring(L, idx + 1, ""));
 	AString HelpString(tolua_tocppstring(L, idx + 3, ""));
@@ -1304,7 +1225,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 		return 0;
 	}
 
-	if (!self->BindCommand(Command, Plugin, Permission, HelpString))
+	if (!self.BindCommand(Command, Plugin, Permission, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
 		cLuaState LS(L);
@@ -1359,7 +1280,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 		luaL_error(L, "\"BindConsoleCommand\" function expects a function as its 2nd parameter. Command-binding aborted.");
 		return 0;
 	}
-	cPluginManager * self = cPluginManager::Get();
+	auto & self = cPluginManager::Get();
 	AString Command   (tolua_tocppstring(L, idx,     ""));
 	AString HelpString(tolua_tocppstring(L, idx + 2, ""));
 
@@ -1372,7 +1293,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 		return 0;
 	}
 
-	if (!self->BindConsoleCommand(Command, Plugin, HelpString))
+	if (!self.BindConsoleCommand(Command, Plugin, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
 		cLuaState LS(L);
@@ -1458,7 +1379,7 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 			return true;
 		}
 	} Callback(FunctionName, L);
-	if (!cPluginManager::Get()->DoWithPlugin(PluginName, Callback))
+	if (!cPluginManager::Get().DoWithPlugin(PluginName, Callback))
 	{
 		return 0;
 	}
@@ -1499,7 +1420,7 @@ static int tolua_cPluginManager_ExecuteConsoleCommand(lua_State * tolua_S)
 
 	// Store the command output in a string:
 	cStringAccumCommandOutputCallback CommandOutput;
-	L.Push(cPluginManager::Get()->ExecuteConsoleCommand(Split, CommandOutput, Command));
+	L.Push(cPluginManager::Get().ExecuteConsoleCommand(Split, CommandOutput, Command));
 	L.Push(CommandOutput.GetAccum());
 	return 2;
 }
@@ -1515,7 +1436,7 @@ static int tolua_cPluginManager_FindPlugins(lua_State * tolua_S)
 	cLuaState::LogStackTrace(tolua_S);
 
 	// Still, do the actual work performed by the API function when it existed:
-	cPluginManager::Get()->RefreshPluginList();
+	cPluginManager::Get().RefreshPluginList();
 	return 0;
 }
 
@@ -2698,8 +2619,8 @@ static int tolua_cRoot_GetBrewingRecipe(lua_State * tolua_S)
 	}
 
 	// Get the recipe for the input
-	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
-	const cBrewingRecipes::cRecipe * Recipe = BR->GetRecipeFrom(*Bottle, *Ingredient);
+	auto & BR = cRoot::Get()->GetBrewingRecipes();
+	const cBrewingRecipes::cRecipe * Recipe = BR.GetRecipeFrom(*Bottle, *Ingredient);
 	if (Recipe == nullptr)
 	{
 		// There is no such brewing recipe for this bottle and ingredient, return no value
@@ -2737,8 +2658,8 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	}
 
 	// Get the recipe for the input
-	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
-	const cFurnaceRecipe::cRecipe * Recipe = FR->GetRecipeFrom(*Input);
+	auto & FR = cRoot::Get()->GetFurnaceRecipe();
+	const auto Recipe = FR.GetRecipeFrom(*Input);
 	if (Recipe == nullptr)
 	{
 		// There is no such furnace recipe for this input, return no value

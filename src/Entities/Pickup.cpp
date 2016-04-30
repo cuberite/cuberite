@@ -203,7 +203,7 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 		return false;  // Not old enough
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(a_Dest, *this))
+	if (cRoot::Get()->GetPluginManager().CallHookCollectingPickup(a_Dest, *this))
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because a plugin has said no.", m_UniqueID, a_Dest->GetName().c_str());
 		return false;

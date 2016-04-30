@@ -87,7 +87,11 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(VillageGen.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=switch-enum")
 endif()
 
+get_directory_property(BINDING_OUTPUTS DIRECTORY ../ DEFINITION BINDING_OUTPUTS)
+set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
+
 if(NOT MSVC)
 	add_library(Generating ${SRCS} ${HDRS})
+	add_dependencies(Generating BindingsGeneration)
 	target_link_libraries(Generating OSSupport Blocks Bindings)
 endif()

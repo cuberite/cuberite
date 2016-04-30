@@ -27,18 +27,8 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 
 
 
-cPawn::~cPawn()
-{
-	ASSERT(m_TargetingMe.size() == 0);
-}
-
-
-
-
-
 void cPawn::Destroyed()
 {
-	StopEveryoneFromTargetingMe();
 	super::Destroyed();
 }
 
@@ -156,7 +146,7 @@ void cPawn::HandleAir(void)
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
 {
 	// Check if the plugins allow the addition:
-	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_DistanceModifier))
+	if (cPluginManager::Get().CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_DistanceModifier))
 	{
 		// A plugin disallows the addition, bail out.
 		return;
@@ -213,38 +203,6 @@ void cPawn::ClearEntityEffects()
 		// Remove effect
 		RemoveEntityEffect(EffectType);
 	}
-}
-
-
-
-
-
-void cPawn::NoLongerTargetingMe(cMonster * a_Monster)
-{
-	ASSERT(IsTicking());  // Our destroy override is supposed to clear all targets before we're destroyed.
-	for (auto i = m_TargetingMe.begin(); i != m_TargetingMe.end(); ++i)
-	{
-		cMonster * Monster = *i;
-		if (Monster == a_Monster)
-		{
-			ASSERT(Monster->GetTarget() != this);  // The monster is notifying us it is no longer targeting us, assert if that's a lie
-			m_TargetingMe.erase(i);
-			return;
-		}
-	}
-	ASSERT(false);  // If this happens, something is wrong. Perhaps the monster never called TargetingMe() or called NoLongerTargetingMe() twice.
-}
-
-
-
-
-
-void cPawn::TargetingMe(cMonster * a_Monster)
-{
-	ASSERT(IsTicking());
-	ASSERT(m_TargetingMe.size() < 10000);
-	ASSERT(a_Monster->GetTarget() == this);
-	m_TargetingMe.push_back(a_Monster);
 }
 
 
@@ -419,21 +377,4 @@ void cPawn::HandleFalling(void)
 	{
 		m_LastGroundHeight = GetPosY();
 	}
-}
-
-
-
-
-
-void cPawn::StopEveryoneFromTargetingMe()
-{
-	std::vector<cMonster*>::iterator i = m_TargetingMe.begin();
-	while (i != m_TargetingMe.end())
-	{
-		cMonster * Monster = *i;
-		ASSERT(Monster->GetTarget() == this);
-		Monster->UnsafeUnsetTarget();
-		i = m_TargetingMe.erase(i);
-	}
-	ASSERT(m_TargetingMe.size() == 0);
 }

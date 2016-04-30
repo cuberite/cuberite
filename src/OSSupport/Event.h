@@ -30,10 +30,6 @@ public:
 	If there was no thread waiting, the next call to Wait() will not block. */
 	void Set(void);
 
-	/** Sets the event - releases all threads that have been waiting in Wait().
-	If there was no thread waiting, the next call to Wait() will not block. */
-	void SetAll(void);
-
 	/** Waits for the event until either it is signalled, or the (relative) timeout is passed.
 	Returns true if the event was signalled, false if the timeout was hit or there was an error. */
 	bool Wait(unsigned a_TimeoutMSec);

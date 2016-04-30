@@ -719,7 +719,7 @@ void cSlotAreaCrafting::UpdateRecipe(cPlayer & a_Player)
 {
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
-	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
+	cRoot::Get()->GetCraftingRecipes().GetRecipe(a_Player, Grid, Recipe);
 	SetSlot(0, a_Player, Recipe.GetResult());
 	m_ParentWindow.SendSlot(a_Player, this, 0);
 }
@@ -741,7 +741,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	// Not found. Add a new one:
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe Recipe(Grid);
-	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
+	cRoot::Get()->GetCraftingRecipes().GetRecipe(a_Player, Grid, Recipe);
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
 }
@@ -1839,13 +1839,13 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	int SlotNum;
-	cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
+	auto & FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
 
-	if (FurnaceRecipes->GetRecipeFrom(a_ItemStack) != nullptr)
+	if (FurnaceRecipes.GetRecipeFrom(a_ItemStack) != nullptr)
 	{
 		SlotNum = 0;
 	}
-	else if (FurnaceRecipes->IsFuel(a_ItemStack))
+	else if (FurnaceRecipes.IsFuel(a_ItemStack))
 	{
 		SlotNum = 1;
 	}
@@ -2081,8 +2081,8 @@ void cSlotAreaBrewingstand::HandleBrewedItem(cPlayer & a_Player)
 void cSlotAreaBrewingstand::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	int SlotNum = -1;
-	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
-	if (BR->IsBottle(a_ItemStack))
+	auto & BR = cRoot::Get()->GetBrewingRecipes();
+	if (BR.IsBottle(a_ItemStack))
 	{
 		for (int i = 0;i < 3;i++)
 		{
@@ -2099,7 +2099,7 @@ void cSlotAreaBrewingstand::DistributeStack(cItem & a_ItemStack, cPlayer & a_Pla
 			return;
 		}
 	}
-	else if (BR->IsIngredient(a_ItemStack))
+	else if (BR.IsIngredient(a_ItemStack))
 	{
 		SlotNum = 3;
 	}

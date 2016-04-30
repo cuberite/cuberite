@@ -38,7 +38,7 @@ public :
 	If this is the first of a Pack, determine the type of monster
 	a_Biome, BlockType & BlockMeta are used to decide what kind of Mob can Spawn here
 	a_MaxPackSize is set to the maximal size for a pack this type of mob */
-	cMonster * TryToSpawnHere(cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize);
+	std::shared_ptr<cMonster> TryToSpawnHere(cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize);
 
 	/** Mark the beginning of a new Pack.
 	All mobs of the same Pack are the same type */
@@ -47,7 +47,7 @@ public :
 	// return true if there is at least one allowed type
 	bool CanSpawnAnything(void);
 
-	typedef const std::set<cMonster *> tSpawnedContainer;
+	typedef const std::set<std::shared_ptr<cMonster>> tSpawnedContainer;
 	tSpawnedContainer & getSpawned(void);
 
 	/** Returns true if specified type of mob can spawn on specified block */
@@ -65,7 +65,7 @@ protected :
 	std::set<eMonsterType> m_AllowedTypes;
 	bool m_NewPack;
 	eMonsterType m_MobType;
-	std::set<cMonster*> m_Spawned;
+	std::set<std::shared_ptr<cMonster>> m_Spawned;
 	cFastRandom m_Random;
 } ;
 

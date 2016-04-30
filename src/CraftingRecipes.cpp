@@ -18,7 +18,7 @@
 cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_Items(new cItem[a_Width * a_Height])
+	m_Items(new cItem[static_cast<size_t>(a_Width * a_Height)])
 {
 }
 
@@ -29,7 +29,7 @@ cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_Items(new cItem[a_Width * a_Height])
+	m_Items(new cItem[static_cast<size_t>(a_Width * a_Height)])
 {
 	for (int i = a_Width * a_Height - 1; i >= 0; i--)
 	{
@@ -44,7 +44,7 @@ cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
 cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
 	m_Width(a_Original.m_Width),
 	m_Height(a_Original.m_Height),
-	m_Items(new cItem[a_Original.m_Width * a_Original.m_Height])
+	m_Items(new cItem[static_cast<size_t>(a_Original.m_Width * a_Original.m_Height)])
 {
 	for (int i = m_Width * m_Height - 1; i >= 0; i--)
 	{
@@ -290,7 +290,7 @@ cCraftingRecipes::~cCraftingRecipes()
 void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe)
 {
 	// Allow plugins to intercept recipes using a pre-craft hook:
-	if (cRoot::Get()->GetPluginManager()->CallHookPreCrafting(a_Player, a_CraftingGrid, a_Recipe))
+	if (cRoot::Get()->GetPluginManager().CallHookPreCrafting(a_Player, a_CraftingGrid, a_Recipe))
 	{
 		return;
 	}
@@ -301,7 +301,7 @@ void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingG
 	if (Recipe.get() == nullptr)
 	{
 		// Allow plugins to intercept a no-recipe-found situation:
-		cRoot::Get()->GetPluginManager()->CallHookCraftingNoRecipe(a_Player, a_CraftingGrid, a_Recipe);
+		cRoot::Get()->GetPluginManager().CallHookCraftingNoRecipe(a_Player, a_CraftingGrid, a_Recipe);
 		return;
 	}
 	for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
@@ -311,7 +311,7 @@ void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingG
 	a_Recipe.SetResult(Recipe->m_Result);
 
 	// Allow plugins to intercept recipes after they are processed:
-	cRoot::Get()->GetPluginManager()->CallHookPostCrafting(a_Player, a_CraftingGrid, a_Recipe);
+	cRoot::Get()->GetPluginManager().CallHookPostCrafting(a_Player, a_CraftingGrid, a_Recipe);
 }
 
 

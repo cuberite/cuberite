@@ -82,10 +82,14 @@ SET (HDRS
 	Zombie.h
 	ZombiePigman.h)
 
+get_directory_property(BINDING_OUTPUTS DIRECTORY ../ DEFINITION BINDING_OUTPUTS)
+set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(Monster.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch -Wno-error=switch-enum -Wno-error=float-equal ")
 endif()
 
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})
+	add_dependencies(Mobs BindingsGeneration)
 endif()

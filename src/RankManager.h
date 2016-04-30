@@ -51,6 +51,7 @@ public:
 	cRankManager(void);
 
 	~cRankManager();
+	cRankManager(const cRankManager & a_RankManager) = delete;
 
 	/** Initializes the rank manager. Performs migration and default-setting if no data is found in the DB.
 	The a_MojangAPI param is used when migrating from old ini files, to look up player UUIDs. */

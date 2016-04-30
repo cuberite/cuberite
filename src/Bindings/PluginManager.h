@@ -28,7 +28,7 @@ class cWorld;
 class cSettingsRepositoryInterface;
 struct TakeDamageInfo;
 
-typedef SharedPtr<cPlugin> cPluginPtr;
+typedef std::shared_ptr<cPlugin> cPluginPtr;
 typedef std::vector<cPluginPtr> cPluginPtrs;
 
 
@@ -174,7 +174,7 @@ public:
 	void Tick(float a_Dt);
 
 	/** Returns the instance of the Plugin Manager (there is only ever one) */
-	static cPluginManager * Get(void);  // tolua_export
+	static cPluginManager & Get(void);  // tolua_export
 
 	/** Refreshes the m_Plugins list based on the current contents of the Plugins folder.
 	If an active plugin's folder is not found anymore, the plugin is set as psNotFound, but not yet unloaded. */
@@ -372,6 +372,7 @@ private:
 
 	cPluginManager();
 	virtual ~cPluginManager();
+	cPluginManager(const cPluginManager & a_PluginManager) = delete;
 
 	/** Reloads all plugins, defaulting to settings.ini for settings location */
 	void ReloadPluginsNow(void);

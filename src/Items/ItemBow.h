@@ -69,15 +69,9 @@ public:
 		}
 
 		// Create the arrow entity:
-		cArrowEntity * Arrow = new cArrowEntity(*a_Player, Force * 2);
-		if (Arrow == nullptr)
+		auto Arrow = std::make_shared<cArrowEntity>(*a_Player, Force * 2);
+		if (!Arrow->Initialize(Arrow, *a_Player->GetWorld()))
 		{
-			return;
-		}
-		if (!Arrow->Initialize(*a_Player->GetWorld()))
-		{
-			delete Arrow;
-			Arrow = nullptr;
 			return;
 		}
 		a_Player->GetWorld()->BroadcastSoundEffect(

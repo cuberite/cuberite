@@ -361,7 +361,7 @@ void cWolf::TickFollowPlayer()
 			if (!Callback.OwnerFlying)
 			{
 				Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
-				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+				TeleportToCoords(Callback.OwnerPos);
 				SetTarget(nullptr);
 			}
 		}

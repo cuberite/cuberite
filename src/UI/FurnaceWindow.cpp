@@ -49,8 +49,8 @@ void cFurnaceWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & 
 	}
 	else
 	{
-		cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
-		if ((FurnaceRecipes->GetRecipeFrom(a_ItemStack) != nullptr) || (FurnaceRecipes->IsFuel(a_ItemStack)))
+		auto & FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
+		if ((FurnaceRecipes.GetRecipeFrom(a_ItemStack) != nullptr) || (FurnaceRecipes.IsFuel(a_ItemStack)))
 		{
 			// The item is a valid input item or fuel
 			AreasInOrder.push_back(m_SlotAreas[0]);  /* Furnace Area */

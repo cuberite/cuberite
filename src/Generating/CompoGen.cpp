@@ -341,8 +341,8 @@ void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize) :
 	m_Underlying(a_Underlying),
 	m_CacheSize(a_CacheSize),
-	m_CacheOrder(new int[a_CacheSize]),
-	m_CacheData(new sCacheData[a_CacheSize]),
+	m_CacheOrder(new int[static_cast<size_t>(a_CacheSize)]),
+	m_CacheData(new sCacheData[static_cast<size_t>(a_CacheSize)]),
 	m_NumHits(0),
 	m_NumMisses(0),
 	m_TotalChain(0)

@@ -29,6 +29,8 @@ SET (HDRS
 	VanillaFluidSimulator.h
 	VaporizeFluidSimulator.h)
 
+get_directory_property(BINDING_OUTPUTS DIRECTORY ../ DEFINITION BINDING_OUTPUTS)
+set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(FireSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
@@ -37,4 +39,5 @@ endif()
 
 if(NOT MSVC)
 	add_library(Simulator ${SRCS} ${HDRS})
+	add_dependencies(Simulator BindingsGeneration)
 endif()

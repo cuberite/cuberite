@@ -62,16 +62,3 @@ void cEvent::Set(void)
 
 
 
-void cEvent::SetAll(void)
-{
-	{
-		std::unique_lock<std::mutex> Lock(m_Mutex);
-		m_ShouldContinue = true;
-	}
-	m_CondVar.notify_all();
-}
-
-
-
-
-

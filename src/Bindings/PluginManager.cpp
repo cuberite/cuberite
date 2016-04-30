@@ -23,7 +23,7 @@
 
 
 
-cPluginManager * cPluginManager::Get(void)
+cPluginManager & cPluginManager::Get(void)
 {
 	return cRoot::Get()->GetPluginManager();
 }

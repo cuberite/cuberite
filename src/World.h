@@ -28,7 +28,7 @@
 #include "FastRandom.h"
 #include "ClientHandle.h"
 #include "EffectID.h"
-#include <functional>
+#include <future>
 
 
 
@@ -39,9 +39,6 @@ class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
-typedef SharedPtr<cClientHandle> cClientHandlePtr;
-typedef std::list<cClientHandlePtr> cClientHandlePtrs;
-typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
 class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
@@ -58,12 +55,6 @@ class cCompositeChat;
 class cCuboid;
 class cSetChunkData;
 class cBroadcaster;
-
-
-typedef std::list< cPlayer * > cPlayerList;
-
-typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
-typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 typedef cItemCallback<cPlayer>             cPlayerListCallback;
 typedef cItemCallback<cEntity>             cEntityCallback;
@@ -92,14 +83,9 @@ public:
 
 	// tolua_end
 
-	/** A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor */
-	class cLock :
-		public cCSLock
-	{
-		typedef cCSLock super;
-	public:
-		cLock(cWorld & a_World);
-	};
+	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
+	virtual ~cWorld();
+	cWorld(const cWorld & a_World) = delete;
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
@@ -233,7 +219,7 @@ public:
 
 	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
 	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
-	void QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData);
+	void QueueSetChunkData(cSetChunkData & a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -266,9 +252,8 @@ public:
 
 	/** Removes the player from the world.
 	Removes the player from the addition queue, too, if appropriate.
-	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore.
-	@param a_RemoveFromChunk determines if the entity should be removed from its chunk as well. Should be false when ticking from cChunk. */
-	void RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk);
+	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore. */
+	void RemovePlayer(cPlayer * a_Player);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -290,7 +275,7 @@ public:
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
 	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
-	void AddEntity(cEntity * a_Entity);
+	void AddEntity(const std::shared_ptr<cEntity> & a_Entity);
 
 	/** Returns true if an entity with the specified UniqueID exists in the world.
 	Note: Only loaded chunks are considered. */
@@ -315,24 +300,12 @@ public:
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
 
 	/** Adds client to a chunk, if not already present; returns true if added, false if present */
-	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
+	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, const std::shared_ptr<cClientHandle> & a_Client);
 
 	/** Removes client from the chunk specified */
-	void RemoveChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
+	void RemoveChunkClient(int a_ChunkX, int a_ChunkZ, const std::shared_ptr<cClientHandle> & a_Client);
 
-	/** Removes the client from all chunks it is present in */
-	void RemoveClientFromChunks(cClientHandle * a_Client);
-
-	/** Sends the chunk to the client specified, if the client doesn't have the chunk yet.
-	If chunk not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
-
-	/** Sends the chunk to the client specified, even if the client already has the chunk.
-	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
-
-	/** Removes client from ChunkSender's queue of chunks to be sent */
-	void RemoveClientFromChunkSender(cClientHandle * a_Client);
+	cChunkSender & GetChunkSender(void) { return m_ChunkSender; }
 
 	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkZ);
@@ -667,7 +640,13 @@ public:
 	void QueueSaveAllChunks(void);  // tolua_export
 
 	/** Queues a task onto the tick thread. The task object will be deleted once the task is finished */
-	void QueueTask(std::function<void(cWorld &)> a_Task);  // Exported in ManualBindings.cpp
+	template <typename FunctionType>
+	auto QueueTask(FunctionType && a_Task)  // Exported in ManualBindings.cpp
+	{
+		cCSLock Lock(m_CSTasks);
+		m_Tasks.emplace_back(-1, decltype(m_Tasks)::value_type::second_type(a_Task));
+		return m_Tasks.back().second.get_future();
+	}
 
 	/** Queues a lambda task onto the tick thread, with the specified delay. */
 	void ScheduleTask(int a_DelayTicks, std::function<void(cWorld &)> a_Task);
@@ -686,10 +665,16 @@ public:
 
 	cLightingThread & GetLightingThread(void) { return m_Lighting; }
 
-	void InitializeSpawn(void);
+	/** Starts the tick thread that belongs to this world. */
+	void Start(void) { m_TickThread.Start(); }
 
-	/** Starts threads that belong to this world */
-	void Start(void);
+	/** Performs one-off initial configuration of the world.
+	MUST be called within the context of the world tick thread. */
+	void Initialise(void);
+
+	/** Performs one-off initial configuration of the world spawn.
+	MUST be called within the context of the world tick thread. */
+	void InitialiseSpawn(void);
 
 	/** Stops threads that belong to this world (part of deinit) */
 	void Stop(void);
@@ -777,7 +762,7 @@ public:
 	/** Spawns a mob of the specified type. Returns the mob's UniqueID if recognized and spawned, cEntity::INVALID_ID otherwise */
 	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby = false) override;  // tolua_export
 
-	UInt32 SpawnMobFinalize(cMonster * a_Monster);
+	UInt32 SpawnMobFinalize(const std::shared_ptr<cMonster> & a_Monster);
 
 	/** Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
@@ -800,6 +785,14 @@ public:
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
 	cBroadcaster GetBroadcaster();
+
+#ifdef _DEBUG
+
+	/** Debug-only function to ensure the current execution is within the context of this world's tick thread
+	Enforces single-thread access requirements of cWorld, cChunkMap, cChunk, cEntity and descendants, etc. */
+	bool IsInTickThread(void) { return m_TickThread.IsCurrentThread(); }
+
+#endif
 
 private:
 
@@ -838,8 +831,11 @@ private:
 
 	public:
 		cChunkGeneratorCallbacks(cWorld & a_World);
-	} ;
+	};
 
+	/** Flag to indicate whether cWorld::Tick should be called in cTickThread::Execute.
+	MUST NOT be mutated by a caller other than cWorld::Stop. */
+	bool m_ShouldTick;
 
 	AString m_WorldName;
 
@@ -901,8 +897,9 @@ private:
 	std::unique_ptr<cFireSimulator>      m_FireSimulator;
 	cRedstoneSimulator * m_RedstoneSimulator;
 
-	cCriticalSection m_CSPlayers;
-	cPlayerList      m_Players;
+	/** Stores pointers to all players in the world for easy access.
+	Players MUST be removed from this list through a call to RemovePlayer before they are destroyed. */
+	std::vector<cPlayer *> m_Players;
 
 	cWorldStorage     m_Storage;
 
@@ -972,41 +969,7 @@ private:
 	cCriticalSection m_CSTasks;
 
 	/** Tasks that have been queued onto the tick thread, possibly to be executed at target tick in the future; guarded by m_CSTasks */
-	std::vector<std::pair<Int64, std::function<void(cWorld &)>>> m_Tasks;
-
-	/** Guards m_Clients */
-	cCriticalSection  m_CSClients;
-
-	/** List of clients in this world, these will be ticked by this world */
-	cClientHandlePtrs m_Clients;
-
-	/** Clients that are scheduled for removal (ticked in another world), waiting for TickClients() to remove them */
-	cClientHandles m_ClientsToRemove;
-
-	/** Clients that are scheduled for adding, waiting for TickClients to add them */
-	cClientHandlePtrs m_ClientsToAdd;
-
-	/** Guards m_EntitiesToAdd */
-	cCriticalSection m_CSEntitiesToAdd;
-
-	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
-	cEntityList m_EntitiesToAdd;
-
-	/** Guards m_PlayersToAdd */
-	cCriticalSection m_CSPlayersToAdd;
-
-	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
-	cPlayerList m_PlayersToAdd;
-
-	/** CS protecting m_SetChunkDataQueue. */
-	cCriticalSection m_CSSetChunkDataQueue;
-
-	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
-	cSetChunkDataPtrs m_SetChunkDataQueue;
-
-
-	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
-	virtual ~cWorld();
+	std::vector<std::pair<Int64, std::packaged_task<void(cWorld &)>>> m_Tasks;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
@@ -1019,23 +982,10 @@ private:
 	/** Executes all tasks queued onto the tick thread */
 	void TickQueuedTasks(void);
 
-	/** Ticks all clients that are in this world */
-	void TickClients(float a_Dt);
-
 	/** Unloads all chunks immediately. */
 	void UnloadUnusedChunks(void);
 
 	void UpdateSkyDarkness(void);
-
-	/** Generates a random spawnpoint on solid land by walking chunks and finding their biomes */
-	void GenerateRandomSpawn(int a_MaxSpawnRadius);
-
-	/** Can the specified coordinates be used as a spawn point?
-	Returns true if spawn position is valid and sets a_Y to the valid spawn height */
-	bool CanSpawnAt(double a_X, double & a_Y, double a_Z);
-
-	/** Check if player starting point is acceptable */
-	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
 
 	/** Chooses a reasonable transition from the current weather to a new weather */
 	eWeather ChooseNewWeather(void);
@@ -1045,10 +995,6 @@ private:
 
 	/** Creates a new redstone simulator. */
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
-
-	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
-	Assumes it is called from the Tick thread. */
-	void AddQueuedPlayers(void);
 
 	/** Sets generator values to dimension specific defaults, if those values do not exist */
 	void InitialiseGeneratorDefaults(cIniFile & a_IniFile);

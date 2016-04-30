@@ -6,8 +6,16 @@
 #include "HTTP/HTTPServer.h"
 #include "Defines.h"
 #include "RankManager.h"
-#include <thread>
+#include "WebAdmin.h"
+#include "FurnaceRecipe.h"
+#include "Server.h"
+#include "CraftingRecipes.h"
+#include "BrewingRecipes.h"
+#include "MonsterConfig.h"
+#include "World.h"
+
 #include <atomic>
+#include <unordered_map>
 
 
 
@@ -15,14 +23,6 @@
 
 // fwd:
 class cThread;
-class cMonsterConfig;
-class cBrewingRecipes;
-class cCraftingRecipes;
-class cFurnaceRecipe;
-class cWebAdmin;
-class cPluginManager;
-class cServer;
-class cWorld;
 class cPlayer;
 class cCommandOutputCallback;
 class cCompositeChat;
@@ -53,7 +53,6 @@ public:
 
 
 	cRoot(void);
-	~cRoot();
 
 	void Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo);
 
@@ -61,11 +60,12 @@ public:
 	void StopServer();
 
 	// tolua_begin
-	cServer * GetServer(void) { return m_Server; }
+	cServer & GetServer(void) { return m_Server; }
 	cWorld *  GetDefaultWorld(void);
 
 	/** Returns a pointer to the world specified. If no world of that name exists, returns a nullptr. */
 	cWorld * GetWorld(const AString & a_WorldName);
+
 
 	/** Returns the up time of the server in seconds */
 	int GetServerUpTime(void)
@@ -80,11 +80,11 @@ public:
 	/** Writes chunkstats, for each world and totals, to the output callback */
 	void LogChunkStats(cCommandOutputCallback & a_Output);
 
-	cMonsterConfig * GetMonsterConfig(void) { return m_MonsterConfig; }
+	cMonsterConfig & GetMonsterConfig(void) { return m_MonsterConfig; }
 
-	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
-	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
-	cBrewingRecipes *  GetBrewingRecipes (void) { return m_BrewingRecipes.get(); }    // Exported in ManualBindings.cpp
+	cCraftingRecipes & GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
+	cFurnaceRecipe &   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
+	cBrewingRecipes &  GetBrewingRecipes (void) { return m_BrewingRecipes; }    // Exported in ManualBindings.cpp
 
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
@@ -92,11 +92,11 @@ public:
 	/** The current time where the startup of the server has been completed */
 	std::chrono::steady_clock::time_point m_StartTime;
 
-	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
-	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
+	cWebAdmin &        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
+	cPluginManager &   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
-	cMojangAPI &       GetMojangAPI      (void) { return *m_MojangAPI; }
-	cRankManager *     GetRankManager    (void) { return m_RankManager.get(); }
+	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }
+	cRankManager &     GetRankManager    (void) { return m_RankManager; }
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
@@ -187,11 +187,7 @@ private:
 		cCommandOutputCallback * m_Output;
 	} ;
 
-	typedef std::map<AString, cWorld *> WorldMap;
 	typedef std::vector<cCommand> cCommandQueue;
-
-	cWorld * m_pDefaultWorld;
-	WorldMap m_WorldsByName;
 
 	cCriticalSection m_CSPendingCommands;
 	cCommandQueue    m_PendingCommands;
@@ -200,20 +196,22 @@ private:
 	cEvent m_StopEvent;
 	std::atomic_flag m_InputThreadRunFlag;
 
-	cServer *        m_Server;
-	cMonsterConfig * m_MonsterConfig;
+	cServer m_Server;
+	cMonsterConfig m_MonsterConfig;
 
-	cCraftingRecipes * m_CraftingRecipes;
-	cFurnaceRecipe *   m_FurnaceRecipe;
-	std::unique_ptr<cBrewingRecipes> m_BrewingRecipes;
-	cWebAdmin *        m_WebAdmin;
-	cPluginManager *   m_PluginManager;
-	cAuthenticator     m_Authenticator;
-	cMojangAPI *       m_MojangAPI;
-
-	std::unique_ptr<cRankManager> m_RankManager;
+	cCraftingRecipes m_CraftingRecipes;
+	cFurnaceRecipe m_FurnaceRecipe;
+	cBrewingRecipes m_BrewingRecipes;
+	cWebAdmin m_WebAdmin;
+	cPluginManager m_PluginManager;
+	cAuthenticator m_Authenticator;
+	cMojangAPI m_MojangAPI;
+	cRankManager m_RankManager;
 
 	cHTTPServer m_HTTPServer;
+
+	cWorld * m_pDefaultWorld;
+	std::unordered_map<AString, std::unique_ptr<cWorld>> m_WorldsByName;
 
 
 	void LoadGlobalSettings();
@@ -221,14 +219,11 @@ private:
 	/** Loads the worlds from settings.ini, creates the worldmap */
 	void LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile);
 
-	/** Starts each world's life */
+	/** Starts the tick thread of each loaded world. */
 	void StartWorlds(void);
 
-	/** Stops each world's threads, so that it's safe to unload them */
+	/** Stops each world's threads, so that it's safe to unload them. */
 	void StopWorlds(void);
-
-	/** Unloads all worlds from memory */
-	void UnloadWorlds(void);
 
 	/** Does the actual work of executing a command */
 	void DoExecuteConsoleCommand(const AString & a_Cmd);

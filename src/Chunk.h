@@ -247,19 +247,18 @@ public:
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
 	/** Adds a client to the chunk; returns true if added, false if already there */
-	bool AddClient(cClientHandle * a_Client);
+	bool AddClient(const std::shared_ptr<cClientHandle> & a_Client);
 
 	/** Removes the specified client from the chunk; ignored if client not in chunk. */
-	void RemoveClient(cClientHandle * a_Client);
-
-	/** Returns true if the specified client is present in this chunk. */
-	bool HasClient(cClientHandle * a_Client);
+	void RemoveClient(const std::shared_ptr<cClientHandle> & a_Client);
 
 	/** Returns true if theres any client in the chunk; false otherwise */
 	bool HasAnyClients(void) const;
 
-	void AddEntity(cEntity * a_Entity);
-	void RemoveEntity(cEntity * a_Entity);
+	void AddEntity(const std::shared_ptr<cEntity> & a_Entity);
+
+	void RemoveEntity(const std::shared_ptr<cEntity> & a_Entity);
+
 	bool HasEntity(UInt32 a_EntityID);
 
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
@@ -476,10 +475,26 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
-	// Makes a copy of the list
-	cClientHandleList GetAllClients(void) const
+	/** Collects and returns a list of all clients in the world who currently have this chunk. */
+	std::vector<std::shared_ptr<cClientHandle>> GetAllStrongClientPtrs(void);
+
+	/** Returns the internal data structure holding weak pointers to all clients in this chunk. */
+	auto & GetAllWeakClientPtrs(void)
 	{
-		return cClientHandleList(m_LoadedByClient.begin(), m_LoadedByClient.end());
+		return m_LoadedByClient;
+	}
+
+	std::shared_ptr<cEntity> GetAssociatedEntityPtr(const cEntity & a_Entity)
+	{
+		auto Iterator = std::find_if(
+			m_Entities.cbegin(),
+			m_Entities.cend(),
+			[&a_Entity](const decltype(m_Entities)::value_type & a_Value)
+			{
+				return (a_Value.get() == &a_Entity);
+			}
+		);
+		return (Iterator == m_Entities.cend()) ? nullptr : *Iterator;
 	}
 
 private:
@@ -516,9 +531,8 @@ private:
 	std::vector<Vector3i> m_ToTickBlocks;
 	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 
-	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
-	std::vector<cClientHandle *> m_LoadedByClient;
-	cEntityList                  m_Entities;
+	std::vector<std::weak_ptr<cClientHandle>> m_LoadedByClient;
+	std::vector<std::shared_ptr<cEntity>> m_Entities;
 	cBlockEntityList             m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
@@ -589,7 +603,7 @@ private:
 	void GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
-	void MoveEntityToNewChunk(cEntity * a_Entity);
+	void MoveEntityToNewChunk(std::shared_ptr<cEntity> & a_Entity);
 };
 
 typedef cChunk * cChunkPtr;

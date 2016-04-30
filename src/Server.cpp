@@ -153,16 +153,6 @@ cServer::cServer(void) :
 
 
 
-void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
-{
-	cCSLock Lock(m_CSClients);
-	m_ClientsToRemove.push_back(const_cast<cClientHandle *>(a_Client));
-}
-
-
-
-
-
 void cServer::PlayerCreated(const cPlayer * a_Player)
 {
 	UNUSED(a_Player);
@@ -299,10 +289,12 @@ void cServer::PrepareKeys(void)
 cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIPAddress)
 {
 	LOGD("Client \"%s\" connected!", a_RemoteIPAddress.c_str());
-	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
-	NewHandle->SetSelf(NewHandle);
-	cCSLock Lock(m_CSClients);
-	m_Clients.push_back(NewHandle);
+
+	auto NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
+	{
+		cCSLock Lock(m_CSClients);
+		m_Clients.push_back(NewHandle);
+	}
 	return NewHandle;
 }
 
@@ -324,13 +316,20 @@ bool cServer::Tick(float a_Dt)
 	}
 
 	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
-	cPluginManager::Get()->Tick(a_Dt);
+	cPluginManager::Get().Tick(a_Dt);
 
 	// Let the Root process all the queued commands:
 	cRoot::Get()->TickCommands();
 
-	// Tick all clients not yet assigned to a world:
+	// Tick all clients:
 	TickClients(a_Dt);
+
+	// Process queued tasks:
+	TickQueuedTasks();
+
+	// cClientHandle::Destroy guarantees that no more data will be sent after it is called, and this may be from TickQueuedTasks, therefore,
+	// remove destroyed clients, after processing queued tasks:
+	ReleaseDestroyedClients();
 
 	if (!m_bRestarting)
 	{
@@ -350,41 +349,49 @@ bool cServer::Tick(float a_Dt)
 
 void cServer::TickClients(float a_Dt)
 {
-	cClientHandlePtrs RemoveClients;
+	cCSLock Lock(m_CSClients);
+	for (const auto & Client : m_Clients)
 	{
-		cCSLock Lock(m_CSClients);
+		Client->Tick(a_Dt);
+	}
+}
 
-		// Remove clients that have moved to a world (the world will be ticking them from now on)
-		for (auto itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
-		{
-			for (auto itrC = m_Clients.begin(), endC = m_Clients.end(); itrC != endC; ++itrC)
-			{
-				if (itrC->get() == *itr)
-				{
-					m_Clients.erase(itrC);
-					break;
-				}
-			}
-		}  // for itr - m_ClientsToRemove[]
-		m_ClientsToRemove.clear();
 
-		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
-		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
-		{
-			if ((*itr)->IsDestroyed())
+
+
+
+void cServer::ReleaseDestroyedClients(void)
+{
+	cCSLock Lock(m_CSClients);
+	m_Clients.erase(
+		std::remove_if(
+			m_Clients.begin(),
+			m_Clients.end(),
+			[](const decltype(m_Clients)::value_type & a_Client)
 			{
-				// Delete the client later, when CS is not held, to avoid deadlock: https://forum.cuberite.org/thread-374.html
-				RemoveClients.push_back(*itr);
-				itr = m_Clients.erase(itr);
-				continue;
+				return a_Client->IsDestroyed();
 			}
-			(*itr)->ServerTick(a_Dt);
-			++itr;
-		}  // for itr - m_Clients[]
+		),
+		m_Clients.end()
+	);
+}
+
+
+
+
+
+void cServer::TickQueuedTasks(void)
+{
+	decltype(m_Tasks) Tasks;
+	{
+		cCSLock Lock(m_CSTasks);
+		std::swap(Tasks, m_Tasks);
 	}
 
-	// Delete the clients that have been destroyed
-	RemoveClients.clear();
+	for (const auto & Task : Tasks)
+	{
+		Task();
+	}
 }
 
 
@@ -425,7 +432,7 @@ bool cServer::Start(void)
 
 bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 {
-	return cRoot::Get()->GetPluginManager()->CallHookChat(*(a_Client.GetPlayer()), a_Cmd);
+	return cRoot::Get()->GetPluginManager().CallHookChat(*(a_Client.GetPlayer()), a_Cmd);
 }
 
 
@@ -451,13 +458,13 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	else if (split[0] == "reload")
 	{
-		cPluginManager::Get()->ReloadPlugins();
+		cPluginManager::Get().ReloadPlugins();
 		a_Output.Finished();
 		return;
 	}
 	else if (split[0] == "reloadplugins")
 	{
-		cPluginManager::Get()->ReloadPlugins();
+		cPluginManager::Get().ReloadPlugins();
 		a_Output.Out("Plugins reloaded");
 		a_Output.Finished();
 		return;
@@ -466,8 +473,8 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
-			cPluginManager::Get()->RefreshPluginList();  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
-			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
+			cPluginManager::Get().RefreshPluginList();  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
+			a_Output.Out(cPluginManager::Get().LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
 		{
@@ -480,7 +487,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
-			cPluginManager::Get()->UnloadPlugin(split[1]);
+			cPluginManager::Get().UnloadPlugin(split[1]);
 			a_Output.Out("Plugin unload scheduled");
 		}
 		else
@@ -494,7 +501,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		class WorldCallback : public cWorldListCallback
 		{
-			virtual bool Item(cWorld * a_World) override
+			virtual bool Item(cWorld * a_EntityWorld) override
 			{
 				class EntityCallback : public cEntityCallback
 				{
@@ -506,8 +513,15 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 						}
 						return false;
 					}
-				} EC;
-				a_World->ForEachEntity(EC);
+				};
+
+				a_EntityWorld->QueueTask(
+					[](cWorld & a_World)
+					{
+						EntityCallback EC;
+						a_World.ForEachEntity(EC);
+					}
+				);
 				return false;
 			}
 		} WC;
@@ -548,7 +562,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	#endif
 
-	else if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output, a_Cmd))
+	else if (cPluginManager::Get().ExecuteConsoleCommand(split, a_Output, a_Cmd))
 	{
 		a_Output.Finished();
 		return;
@@ -592,7 +606,7 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 		AStringPairs m_Commands;
 		size_t m_MaxLen;
 	} Callback;
-	cPluginManager::Get()->ForEachConsoleCommand(Callback);
+	cPluginManager::Get().ForEachConsoleCommand(Callback);
 	std::sort(Callback.m_Commands.begin(), Callback.m_Commands.end());
 	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
 	{
@@ -607,15 +621,15 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 
 void cServer::BindBuiltInConsoleCommands(void)
 {
-	cPluginManager * PlgMgr = cPluginManager::Get();
-	PlgMgr->BindConsoleCommand("help", nullptr, "Shows the available commands");
-	PlgMgr->BindConsoleCommand("reload", nullptr, "Reloads all plugins");
-	PlgMgr->BindConsoleCommand("restart", nullptr, "Restarts the server cleanly");
-	PlgMgr->BindConsoleCommand("stop", nullptr, "Stops the server cleanly");
-	PlgMgr->BindConsoleCommand("chunkstats", nullptr, "Displays detailed chunk memory statistics");
-	PlgMgr->BindConsoleCommand("load <pluginname>", nullptr, "Adds and enables the specified plugin");
-	PlgMgr->BindConsoleCommand("unload <pluginname>", nullptr, "Disables the specified plugin");
-	PlgMgr->BindConsoleCommand("destroyentities", nullptr, "Destroys all entities in all worlds");
+	auto & PlgMgr = cPluginManager::Get();
+	PlgMgr.BindConsoleCommand("help", nullptr, "Shows the available commands");
+	PlgMgr.BindConsoleCommand("reload", nullptr, "Reloads all plugins");
+	PlgMgr.BindConsoleCommand("restart", nullptr, "Restarts the server cleanly");
+	PlgMgr.BindConsoleCommand("stop", nullptr, "Stops the server cleanly");
+	PlgMgr.BindConsoleCommand("chunkstats", nullptr, "Displays detailed chunk memory statistics");
+	PlgMgr.BindConsoleCommand("load <pluginname>", nullptr, "Adds and enables the specified plugin");
+	PlgMgr.BindConsoleCommand("unload <pluginname>", nullptr, "Disables the specified plugin");
+	PlgMgr.BindConsoleCommand("destroyentities", nullptr, "Destroys all entities in all worlds");
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	PlgMgr->BindConsoleCommand("dumpmem", nullptr, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
@@ -645,9 +659,9 @@ void cServer::Shutdown(void)
 	cCSLock Lock(m_CSClients);
 	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
-		(*itr)->Destroy();
+		(*itr)->SetState(cClientHandle::eState::csDestroyed);
+		// TODO: send "Server shut down: kthnxbai!"
 	}
-	m_Clients.clear();
 }
 
 
@@ -677,7 +691,7 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const ASt
 	{
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
-			(*itr)->Authenticate(a_Name, a_UUID, a_Properties);
+			QueueTask(std::bind(&cClientHandle::Authenticate, *itr, a_Name, a_UUID, a_Properties));
 			return;
 		}
 	}  // for itr - m_Clients[]

@@ -347,15 +347,14 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 
 
-cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize)
+std::shared_ptr<cMonster> cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize)
 {
-	cMonster * toReturn = nullptr;
 	if (m_NewPack)
 	{
 		m_MobType = ChooseMobType(a_Biome);
 		if (m_MobType == mtInvalidType)
 		{
-			return toReturn;
+			return nullptr;
 		}
 		if (m_MobType == mtWolf)
 		{
@@ -373,14 +372,15 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY,
 
 	if ((m_AllowedTypes.find(m_MobType) != m_AllowedTypes.end()) && CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_Biome))
 	{
-		cMonster * newMob = cMonster::NewMonsterFromType(m_MobType);
+		auto newMob = cMonster::NewMonsterFromType(m_MobType);
 		if (newMob)
 		{
 			m_Spawned.insert(newMob);
 		}
-		toReturn = newMob;
+		return newMob;
 	}
-	return toReturn;
+
+	return nullptr;
 }
 
 

@@ -21,13 +21,15 @@
 #include "json/json.h"
 #include "ChunkSender.h"
 #include "EffectID.h"
-
+#include "Protocol/ProtocolRecognizer.h"
 
 #include <array>
 #include <atomic>
+#include <unordered_map>
 
 
 // fwd:
+class cChunk;
 class cChunkDataSerializer;
 class cInventory;
 class cMonster;
@@ -36,7 +38,6 @@ class cExpOrb;
 class cPainting;
 class cPickup;
 class cPlayer;
-class cProtocol;
 class cWindow;
 class cFallingBlock;
 class cItemHandler;
@@ -44,14 +45,14 @@ class cWorld;
 class cCompositeChat;
 class cStatManager;
 class cClientHandle;
-typedef SharedPtr<cClientHandle> cClientHandlePtr;
 
 
 
 
 
-class cClientHandle  // tolua_export
-	: public cTCPLink::cCallbacks
+class cClientHandle :  // tolua_export
+	public std::enable_shared_from_this<cClientHandle>,
+	public cTCPLink::cCallbacks
 {  // tolua_export
 public:  // tolua_export
 
@@ -62,6 +63,17 @@ public:  // tolua_export
 	#endif
 	static const int MAX_VIEW_DISTANCE = 32;
 	static const int MIN_VIEW_DISTANCE = 1;
+
+	enum class eState
+	{
+		csConnected,         ///< The client has just connected, waiting for their handshake / login
+		csAuthenticating,    ///< The client has logged in, waiting for external authentication
+		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
+		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
+		csPlaying,           ///< Normal gameplay
+		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
+		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
+	};
 
 	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
 	cClientHandle(const AString & a_IPString, int a_ViewDistance);
@@ -74,7 +86,9 @@ public:  // tolua_export
 	Used mainly by BungeeCord compatibility code. */
 	void SetIPString(const AString & a_IPString) { m_IPString = a_IPString; }
 
-	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
+	cPlayer * GetPlayer(void) { return m_Player.lock().get(); }  // tolua_export
+
+	auto GetStrongPlayerPtr() { return m_Player.lock(); }
 
 	/** Returns the player's UUID, as used by the protocol, in the short form (no dashes) */
 	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
@@ -85,6 +99,11 @@ public:  // tolua_export
 	void SetUUID(const AString & a_UUID) { ASSERT(a_UUID.size() == 32); m_UUID = a_UUID; }
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
+
+	/** Atomically sets the internal client handle state.
+	Allows only a consecutive state to be set.
+	Returns if the state was set or not. */
+	bool SetState(eState a_State);
 
 	/** Sets the player's properties, such as skin image and signature.
 	Used mainly by BungeeCord compatibility code - property querying is done on the BungeeCord server
@@ -119,28 +138,26 @@ public:  // tolua_export
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
-	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
-	bool StreamNextChunk();
+	/** Send all necessary chunks to the player */
+	void StreamAllChunks();
 
 	/** Remove all loaded chunks that are no longer in range */
 	void UnloadOutOfRangeChunks(void);
 
-	// Removes the client from all chunks. Used when switching worlds or destroying the player
-	void RemoveFromAllChunks(void);
-
-	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
+	inline bool IsLoggedIn(void) const { return (m_State >= eState::csAuthenticating); }
 
 	/** Called while the client is being ticked from the world via its cPlayer object */
 	void Tick(float a_Dt);
 
-	/** Called while the client is being ticked from the cServer object */
-	void ServerTick(float a_Dt);
-
+	/** Mark the clienthandle as disconnected.
+	Guarantees that no more data is sent or received. Therefore, MUST be called in context of server tick thread.
+	Will result in cServer releasing the shared_ptr to the handle.
+	Will eventually result in the object's destruction. */
 	void Destroy(void);
 
-	bool IsPlaying   (void) const { return (m_State == csPlaying); }
-	bool IsDestroyed (void) const { return (m_State == csDestroyed); }
-	bool IsDestroying(void) const { return (m_State == csDestroying); }
+	bool IsPlaying   (void) const { return (m_State == eState::csPlaying); }
+	bool IsDestroyed (void) const { return (m_State == eState::csDestroyed); }
+	bool IsDestroying(void) const { return (m_State == eState::csDestroying); }
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
@@ -155,7 +172,7 @@ public:  // tolua_export
 	void SendChatAboveActionBar         (const cCompositeChat & a_Message);
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
-	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
+	void SendChunkData                  (cWorld & a_ChunkSenderWorld, const cChunkCoords & a_ChunkCoordinates, cChunkDataSerializer & a_Serializer);
 	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDisconnect                 (const AString & a_Reason);
@@ -216,7 +233,6 @@ public:  // tolua_export
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);
 	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
-	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -257,18 +273,12 @@ public:  // tolua_export
 
 	// tolua_end
 
-	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
-	bool WantsSendChunk(int a_ChunkX, int a_ChunkZ);
-
-	/** Adds the chunk specified to the list of chunks wanted for sending (m_ChunksToSend) */
-	void AddWantedChunk(int a_ChunkX, int a_ChunkZ);
-
 	// Calls that cProtocol descendants use to report state:
 	void PacketBufferFull(void);
 	void PacketUnknown(UInt32 a_PacketType);
 	void PacketError(UInt32 a_PacketType);
 
-	// Calls that cProtocol descendants use for handling packets:
+	/** Calls that cProtocol descendants use for handling packets. */
 	void HandleAnimation(int a_Animation);
 
 	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
@@ -318,10 +328,9 @@ public:  // tolua_export
 	the NPC UI. */
 	void HandleNPCTrade(int a_SlotNum);
 
-	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
-	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
+	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);
 
 	/** Verifies and sets player position, performing relevant checks
 	Calls relevant methods to process movement related statistics
@@ -367,6 +376,20 @@ public:  // tolua_export
 
 	bool IsPlayerChunkSent();
 
+	/** Add a new functor which will commit processed incoming network data in the world tick thread */
+	template <typename FunctionType>
+	void QueueDataCommit(FunctionType && a_Function)
+	{
+		m_DataCommitQueue.emplace_back(a_Function);
+	}
+
+	/** Enforces a rate limit on block interactions.
+	Will kick client if limit exceeded.
+	Returns true if the block interactions rate is within MAX_BLOCK_CHANGE_INTERACTIONS per tick. */
+	bool EnforceBlockInteractionsRate(void);
+
+	cProtocol & GetProtocol(void) { return m_Protocol; }
+
 private:
 
 	friend class cServer;  // Needs access to SetSelf()
@@ -384,15 +407,31 @@ private:
 	AString m_IPString;
 
 	AString m_Username;
-	AString m_Password;
 	Json::Value m_Properties;
 
-	cCriticalSection                                   m_CSChunkLists;
-	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_LoadedChunks;  // Chunks that the player belongs to
-	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
-	cChunkCoordsList                                   m_SentChunks;    // Chunks that are currently sent to the client
+	struct sChunkCoordsHash
+	{
+		auto operator()(const cChunkCoords & a_ChunkCoords) const
+		{
+			size_t Seed = static_cast<size_t>(a_ChunkCoords.m_ChunkX) + 0x9e3779b9;
+			return (Seed ^= static_cast<size_t>(a_ChunkCoords.m_ChunkZ) + 0x9e3779b9 + (Seed << 6) + (Seed >> 2));
+		}
+	};
 
-	cProtocol * m_Protocol;
+	/** Chunks that are currently loaded by the player */
+	std::unordered_map<cChunkCoords, std::reference_wrapper<cWorld>, cChunkCoordsHash> m_LoadedChunks;
+
+	/** Functors which will commit processed incoming network data to the world.
+	Functors MUST be called in the context of the world's tick thread */
+	std::vector<std::function<void()>> m_DataCommitQueue;
+
+	cProtocolRecognizer m_Protocol;
+
+	/** Empties the incoming send queue in a thread safe manner and processes the data. */
+	void ProcessQueuedIncomingData(void);
+
+	/** Empties the data commit queue and queues the data to be executed in the context of the world tick thread. */
+	void ProcessDataCommitQueue(void);
 
 	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;
@@ -401,16 +440,18 @@ private:
 	Protected by m_CSIncomingData. */
 	AString m_IncomingData;
 
+	/** Empties the outgoing send queue in a thread safe manner and sends the data via the network link. */
+	void ProcessQueuedOutgoingData(void);
+
 	/** Protects m_OutgoingData against multithreaded access. */
 	cCriticalSection m_CSOutgoingData;
 
-	/** Buffer for storing outgoing data from any thread; will get sent in Tick() (to prevent deadlocks).
+	/** Queue for the outgoing data to be sent through the link until it is processed in Tick().
 	Protected by m_CSOutgoingData. */
 	AString m_OutgoingData;
 
-	Vector3d m_ConfirmPosition;
-
-	cPlayer * m_Player;
+	/** Protects m_Link against multithreaded access. */
+	cCriticalSection m_CSLink;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.
@@ -419,11 +460,7 @@ private:
 	Otherwise, this contains an arbitrary value which should not be used. */
 	cChunkCoords m_CachedSentChunk;
 
-	bool m_HasSentDC;  ///< True if a Disconnect packet has been sent in either direction
-
-	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
-	int m_LastStreamedChunkX;
-	int m_LastStreamedChunkZ;
+	std::weak_ptr<cPlayer> m_Player;
 
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
 	std::atomic<int> m_TicksSinceLastPacket;
@@ -450,24 +487,7 @@ private:
 	int m_LastDigBlockY;
 	int m_LastDigBlockZ;
 
-	enum eState
-	{
-		csConnected,         ///< The client has just connected, waiting for their handshake / login
-		csAuthenticating,    ///< The client has logged in, waiting for external authentication
-		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
-		csDownloadingWorld,  ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
-		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
-		csPlaying,           ///< Normal gameplay
-		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
-		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
-
-		// TODO: Add Kicking here as well
-	} ;
-
 	std::atomic<eState> m_State;
-
-	/** m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads */
-	cCriticalSection m_CSDestroyingState;
 
 	/** If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded() */
 	bool m_ShouldCheckDownloaded;
@@ -508,12 +528,6 @@ private:
 	m_CSOutgoingData is used to synchronize access for sending data. */
 	cTCPLinkPtr m_Link;
 
-	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
-	cClientHandlePtr m_Self;
-
-
-	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
-	bool CheckBlockInteractionsRate(void);
 
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
 	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority);
@@ -538,9 +552,6 @@ private:
 
 	/** Called when the network socket has been closed. */
 	void SocketClosed(void);
-
-	/** Called right after the instance is created to store its SharedPtr inside. */
-	void SetSelf(cClientHandlePtr a_Self);
 
 	// cTCPLink::cCallbacks overrides:
 	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;

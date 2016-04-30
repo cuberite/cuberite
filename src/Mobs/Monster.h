@@ -161,20 +161,19 @@ public:
 	// tolua_end
 
 	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
-	void SetTarget (cPawn * a_NewTarget);
-
-	/** Unset the target without notifying the target entity. Do not use this, use SetTarget(nullptr) instead.
-	This is only used by cPawn internally. */
-	void UnsafeUnsetTarget();
+	void SetTarget(cPawn * a_NewTarget);
 
 	/** Returns the current target. */
-	cPawn * GetTarget ();
+	cPawn * GetTarget();
+
+	/** Returns the current target's underlying weak pointer. */
+	auto GetWeakTargetPtr() { return m_Target; }
 
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
 	Asserts and returns null if mob type is not specified
 	*/
-	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
+	static std::shared_ptr<cMonster> NewMonsterFromType(eMonsterType a_MobType);
 
 protected:
 
@@ -200,7 +199,11 @@ protected:
 	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS); }
 
 	/** Returns whether or not the target is close enough for attack. */
-	bool TargetIsInRange(void) { ASSERT(m_Target != nullptr); return ((m_Target->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
+	bool TargetIsInRange(void)
+	{
+		ASSERT(GetTarget() != nullptr);
+		return ((GetTarget()->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
+	}
 
 	/** Returns if a monster can reach a given height by jumping. */
 	inline bool DoesPosYRequireJump(int a_PosY)
@@ -268,6 +271,6 @@ protected:
 
 private:
 	/** A pointer to the entity this mobile is aiming to reach */
-	cPawn * m_Target;
+	std::weak_ptr<cPawn> m_Target;
 
 } ;  // tolua_export

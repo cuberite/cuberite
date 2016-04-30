@@ -172,9 +172,9 @@ void cCommandBlockEntity::Execute()
 		(m_Command != "ipban")
 	)
 	{
-		cServer * Server = cRoot::Get()->GetServer();
+		auto & Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
-		Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
+		Server.ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
 	}
 	else
 	{

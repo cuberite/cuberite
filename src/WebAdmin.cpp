@@ -524,7 +524,7 @@ AString cWebAdmin::GetDefaultPage(void)
 {
 	AString Content;
 	Content += "<h4>Server Name:</h4>";
-	Content += "<p>" + AString( cRoot::Get()->GetServer()->GetServerID()) + "</p>";
+	Content += "<p>" + AString( cRoot::Get()->GetServer().GetServerID()) + "</p>";
 
 	// Display a list of all plugins:
 	Content += "<h4>Plugins:</h4><ul>";
@@ -547,7 +547,7 @@ AString cWebAdmin::GetDefaultPage(void)
 			return false;
 		}
 	} Callback(Content);
-	cPluginManager::Get()->ForEachPlugin(Callback);
+	cPluginManager::Get().ForEachPlugin(Callback);
 	Content += "</ul>";
 
 	// Display a list of all players:

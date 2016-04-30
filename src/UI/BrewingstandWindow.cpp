@@ -49,8 +49,8 @@ void cBrewingstandWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlay
 	}
 	else
 	{
-		cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
-		if ((BR->IsBottle(a_ItemStack)) || (BR->IsIngredient(a_ItemStack)))
+		auto & BR = cRoot::Get()->GetBrewingRecipes();
+		if ((BR.IsBottle(a_ItemStack)) || (BR.IsIngredient(a_ItemStack)))
 		{
 			AreasInOrder.push_back(m_SlotAreas[0]);  /* brewing stand Area */
 		}

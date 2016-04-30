@@ -22,7 +22,6 @@ public:
 	CLASS_PROTODEF(cPawn)
 
 	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
-	~cPawn();
 	virtual void Destroyed() override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -31,11 +30,6 @@ public:
 	virtual bool IsFireproof(void) const override;
 	virtual void HandleAir(void) override;
 	virtual void HandleFalling(void);
-
-	/** Tells all pawns which are targeting us to stop targeting us. */
-	void StopEveryoneFromTargetingMe();
-
-
 
 	// tolua_begin
 
@@ -63,12 +57,6 @@ public:
 
 	// tolua_end
 
-	/** remove the monster from the list of monsters targeting this pawn. */
-	void NoLongerTargetingMe(cMonster * a_Monster);
-
-	/** Add the monster to the list of monsters targeting this pawn. (Does not check if already in list!) */
-	void TargetingMe(cMonster * a_Monster);
-
 protected:
 	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
 	tEffectMap m_EntityEffects;
@@ -76,10 +64,6 @@ protected:
 	double m_LastGroundHeight;
 	bool m_bTouchGround;
 
-private:
-
-	/** A list of all monsters that are targeting this pawn. */
-	std::vector<cMonster*> m_TargetingMe;
 } ;  // tolua_export
 
 

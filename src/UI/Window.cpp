@@ -202,7 +202,7 @@ void cWindow::Clicked(
 	const cItem & a_ClickedItem
 )
 {
-	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	auto & PlgMgr = cRoot::Get()->GetPluginManager();
 	if (a_WindowID != m_WindowID)
 	{
 		LOGWARNING("%s: Wrong window ID (exp %d, got %d) received from \"%s\"; ignoring click.", __FUNCTION__, m_WindowID, a_WindowID, a_Player.GetName().c_str());
@@ -214,7 +214,7 @@ void cWindow::Clicked(
 		case caLeftClickOutside:
 		case caRightClickOutside:
 		{
-			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
+			if (PlgMgr.CallHookPlayerTossingItem(a_Player))
 			{
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
