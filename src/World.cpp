@@ -215,8 +215,6 @@ cWorld::~cWorld()
 	delete m_LavaSimulator;      m_LavaSimulator     = nullptr;
 	delete m_RedstoneSimulator;  m_RedstoneSimulator = nullptr;
 
-	UnloadUnusedChunks();
-
 	m_Storage.WaitForFinish();
 
 	// Unload the scoreboard
