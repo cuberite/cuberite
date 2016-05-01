@@ -51,6 +51,19 @@ cChunkMap::cChunkMap(cWorld * a_World) :
 
 
 
+cChunkMap::~cChunkMap()
+{
+	// Explicitly destroy all chunks and ChunkLayers, so that they're guaranteed to be
+	// destroyed before other internals. This fixes crashes on stopping the server.
+	// because the chunk destructor deletes entities and those may access the chunkmap.
+	// Also, the cChunkData destructor accesses the chunkMap's allocator.
+	m_Layers.clear();
+}
+
+
+
+
+
 void cChunkMap::RemoveLayer(cChunkLayer * a_Layer)
 {
 	cCSLock Lock(m_CSLayers);

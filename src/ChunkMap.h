@@ -67,6 +67,7 @@ public:
 	static const int LAYER_SIZE = 32;
 
 	cChunkMap(cWorld * a_World);
+	~cChunkMap();
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
