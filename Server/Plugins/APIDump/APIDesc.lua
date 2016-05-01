@@ -2232,6 +2232,14 @@ end
 			},
 		},  -- cServer
 
+		cSplashPotionEntity =
+		{
+			Functions =
+			{
+				GetItem = { Params = "", Return = "cItem", Notes = "Gets the potion item that was thrown." },
+			},
+		},
+
 		cStringCompression =
 		{
 			Desc = [[
