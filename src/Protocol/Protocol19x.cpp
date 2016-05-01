@@ -40,6 +40,7 @@ Implements the 1.9.x protocol classes:
 #include "../Entities/ItemFrame.h"
 #include "../Entities/ArrowEntity.h"
 #include "../Entities/FireworkEntity.h"
+#include "../Entities/SplashPotionEntity.h"
 
 #include "../Items/ItemSpawnEgg.h"
 
@@ -3555,6 +3556,12 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 					WriteItem(a_Pkt, reinterpret_cast<const cFireworkEntity &>(Projectile).GetItem());
 					break;
+				}
+				case cProjectileEntity::pkSplashPotion:
+				{
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Potion item which was thrown
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+					WriteItem(a_Pkt, reinterpret_cast<const cSplashPotionEntity &>(Projectile).GetItem());
 				}
 				default:
 				{

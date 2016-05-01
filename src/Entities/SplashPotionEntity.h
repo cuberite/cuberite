@@ -41,6 +41,7 @@ public:
 	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }
 	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
 	int                  GetPotionColor(void)      const { return m_PotionColor; }
+	const cItem &        GetItem(void)             const { return m_Item; }
 
 	void SetEntityEffectType(cEntityEffect::eType a_EntityEffectType) { m_EntityEffectType = a_EntityEffectType; }
 	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
@@ -53,6 +54,7 @@ protected:
 	cEntityEffect::eType m_EntityEffectType;
 	cEntityEffect m_EntityEffect;
 	int m_PotionColor;
+	cItem m_Item;
 
 
 	// cProjectileEntity overrides:

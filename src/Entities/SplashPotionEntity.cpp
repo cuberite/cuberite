@@ -80,7 +80,8 @@ cSplashPotionEntity::cSplashPotionEntity(
 	const cItem & a_Item
 ) :
 	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
-	m_DestroyTimer(-1)
+	m_DestroyTimer(-1),
+	m_Item(a_Item)
 {
 	SetSpeed(a_Speed);
 	m_EntityEffectType = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
