@@ -215,7 +215,7 @@ public:
 	void SetPosY    (double a_PosY) { SetPosition({m_Position.x, a_PosY, m_Position.z}); }
 	void SetPosZ    (double a_PosZ) { SetPosition({m_Position.x, m_Position.y, a_PosZ}); }
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ) { SetPosition({a_PosX, a_PosY, a_PosZ}); }
-	void SetPosition(const Vector3d & a_Position);
+	virtual void SetPosition(const Vector3d & a_Position);
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
