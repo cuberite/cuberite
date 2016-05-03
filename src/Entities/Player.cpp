@@ -364,7 +364,7 @@ void cPlayer::TickFreezeCode()
 	}
 	else
 	{
-		if (!GetClientHandle()->IsPlayerChunkSent())
+		if (!GetClientHandle()->IsPlayerChunkSent() || (!GetParentChunk()->IsValid()))
 		{
 			FreezeInternal(GetPosition(), false);
 		}
