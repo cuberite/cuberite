@@ -49,6 +49,9 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_7_2: return "1.7.2";
 		case PROTO_VERSION_1_7_6: return "1.7.6";
 		case PROTO_VERSION_1_8_0: return "1.8";
+		case PROTO_VERSION_1_9_0: return "1.9";
+		case PROTO_VERSION_1_9_1: return "1.9.1";
+		case PROTO_VERSION_1_9_2: return "1.9.2";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -207,14 +210,21 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	}
 	else
 	{
-		// This is used when the client sends a server-ping, respond with the default packet:
-		static const int Packet = 0xff;  // PACKET_DISCONNECT
-		SendData(reinterpret_cast<const char *>(&Packet), 1);  // WriteByte()
-
-		auto UTF16 = UTF8ToRawBEUTF16(a_Reason);
-		static const u_short Size = htons(static_cast<u_short>(UTF16.size()));
-		SendData(reinterpret_cast<const char *>(&Size), 2);      // WriteShort()
-		SendData(reinterpret_cast<const char *>(UTF16.data()), UTF16.size() * sizeof(char16_t));  // WriteString()
+		AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
+		cByteBuffer OutBuffer(Message.length() + 16);
+		// Asuming non-compressed packets since compression cannot start at this point
+		// Send the login disconnect packet (ID 0x00)
+		size_t Length = (
+			cByteBuffer::GetVarIntSize(0x00) +  // Size of packet ID
+			cByteBuffer::GetVarIntSize(Message.length()) +  // Size of reason
+			Message.length()  // Reason itself
+		);
+		OutBuffer.WriteVarInt32(Length);
+		OutBuffer.WriteVarInt32(0x00);  // Disconnect packet for login state (as of 1.9; this _probably_ will not change)
+		OutBuffer.WriteVarUTF8String(Message);
+		AString PacketData;
+		OutBuffer.ReadAll(PacketData);
+		SendData(PacketData.data(), PacketData.size());
 	}
 }
 
@@ -978,140 +988,64 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		return false;
 	}
 	m_Client->SetProtocolVersion(ProtocolVersion);
+	AString ServerAddress;
+	UInt16 ServerPort;
+	UInt32 NextState;
+	if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+	{
+		return false;
+	}
+	if (!m_Buffer.ReadBEUInt16(ServerPort))
+	{
+		return false;
+	}
+	if (!m_Buffer.ReadVarInt(NextState))
+	{
+		return false;
+	}
+	m_Buffer.CommitRead();
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
-			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_7_6:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
-			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_8_0:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_9_0:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
-			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol190(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_9_1:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
-			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol191(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_9_2:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
-			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol192(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
+		default:
+		{
+			LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
+				m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
+			);
+			m_Client->Kick(Printf("Unsupported protocol version %u, please use one of these versions:\n" MCS_CLIENT_VERSIONS, ProtocolVersion));
+			return false;
+		}
 	}
-	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
-		m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
-	);
-	m_Client->Kick("Unsupported protocol version");
-	return false;
 }
 
 
