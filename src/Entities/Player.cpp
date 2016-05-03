@@ -2468,17 +2468,21 @@ void cPlayer::Detach()
 	int PosZ = POSZ_TOINT;
 
 	// Search for a position within an area to teleport player after detachment
-	// Position must be solid land, and occupied by a nonsolid block
+	// Position must be solid land with two air blocks above.
 	// If nothing found, player remains where they are
-	for (int x = PosX - 2; x <= (PosX + 2); ++x)
+	for (int x = PosX - 1; x <= (PosX + 1); ++x)
 	{
 		for (int y = PosY; y <= (PosY + 3); ++y)
 		{
-			for (int z = PosZ - 2; z <= (PosZ + 2); ++z)
+			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
 			{
-				if (!cBlockInfo::IsSolid(m_World->GetBlock(x, y, z)) && cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z)))
+				if (
+					(m_World->GetBlock(x, y, z) == E_BLOCK_AIR) &&
+					(m_World->GetBlock(x, y + 1, z) == E_BLOCK_AIR) &&
+					cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z))
+				)
 				{
-					TeleportToCoords(x, y, z);
+					TeleportToCoords(x + 0.5, y, z + 0.5);
 					return;
 				}
 			}

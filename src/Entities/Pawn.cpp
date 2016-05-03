@@ -250,6 +250,24 @@ void cPawn::TargetingMe(cMonster * a_Monster)
 
 
 
+void cPawn::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
+{
+	SetPosition({a_PosX, a_PosY, a_PosZ});
+}
+
+
+
+
+
+void cPawn::SetPosition(const Vector3d & a_Position)
+{
+	super::SetPosition(a_Position);
+	m_LastGroundHeight = a_Position.y;  // Prevent fall damage on teleport
+}
+
+
+
+
 
 void cPawn::HandleFalling(void)
 {

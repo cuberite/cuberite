@@ -69,6 +69,10 @@ public:
 	/** Add the monster to the list of monsters targeting this pawn. (Does not check if already in list!) */
 	void TargetingMe(cMonster * a_Monster);
 
+	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
+
+	virtual void SetPosition(const Vector3d & a_Position) override;
+
 protected:
 	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
 	tEffectMap m_EntityEffects;
