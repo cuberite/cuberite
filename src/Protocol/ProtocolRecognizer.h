@@ -137,12 +137,17 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
+	void SendPingStatusResponse(void);
+
 protected:
 	/** The recognized protocol */
 	cProtocol * m_Protocol;
 
 	/** Buffer for the incoming data until we recognize the protocol */
 	cByteBuffer m_Buffer;
+
+	/** Is a server list ping for an unrecognized version currently occuring? */
+	bool m_InPingForUnrecognizedVersion;
 
 
 	/** Tries to recognize protocol based on m_Buffer contents; returns true if recognized */

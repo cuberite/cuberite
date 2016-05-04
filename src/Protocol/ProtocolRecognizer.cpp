@@ -10,6 +10,7 @@
 #include "Protocol17x.h"
 #include "Protocol18x.h"
 #include "Protocol19x.h"
+#include "Packetizer.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -24,7 +25,8 @@
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
 	m_Protocol(nullptr),
-	m_Buffer(8192)     // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
+	m_Buffer(8192),  // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
+	m_InPingForUnrecognizedVersion(false)
 {
 }
 
@@ -68,6 +70,33 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 		if (!m_Buffer.Write(a_Data, a_Size))
 		{
 			m_Client->Kick("Unsupported protocol version");
+			return;
+		}
+
+		if (m_InPingForUnrecognizedVersion)
+		{
+			// We already know the verison; handle it here.
+			UInt32 PacketLen;
+			UInt32 PacketID;
+			if (!m_Buffer.ReadVarInt32(PacketLen))
+			{
+				return;
+			}
+			if (!m_Buffer.ReadVarInt32(PacketID))
+			{
+				return;
+			}
+			ASSERT(PacketID == 0x01);  // Ping packet
+			ASSERT(PacketLen == 9);  // Payload of the packet ID and a UInt64
+
+			Int64 Data;
+			if (!m_Buffer.ReadBEInt64(Data))
+			{
+				return;
+			}
+
+			cPacketizer Pkt(*this, 0x01);  // Pong packet
+			Pkt.WriteBEInt64(Data);
 			return;
 		}
 
@@ -1042,7 +1071,29 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
 				m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
 			);
-			m_Client->Kick(Printf("Unsupported protocol version %u, please use one of these versions:\n" MCS_CLIENT_VERSIONS, ProtocolVersion));
+			if (NextState != 1)
+			{
+				m_Client->Kick(Printf("Unsupported protocol version %u, please use one of these versions:\n" MCS_CLIENT_VERSIONS, ProtocolVersion));
+				return false;
+			}
+			else
+			{
+				m_InPingForUnrecognizedVersion = true;
+
+				UInt32 PacketLen;
+				UInt32 PacketID;
+				if (!m_Buffer.ReadVarInt32(PacketLen))
+				{
+					return false;
+				}
+				if (!m_Buffer.ReadVarInt32(PacketID))
+				{
+					return false;
+				}
+				ASSERT(PacketID == 0x00);  // Request packet
+				ASSERT(PacketLen == 1);  // No payload except for packet ID
+				SendPingStatusResponse();
+			}
 			return false;
 		}
 	}
@@ -1051,12 +1102,69 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 
 
 
+
 void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
 {
-	// This function should never be called - it needs to exists so that cProtocolRecognizer can be instantiated,
-	// but the actual sending is done by the internal m_Protocol itself.
-	LOGWARNING("%s: This function shouldn't ever be called.", __FUNCTION__);
-	ASSERT(!"Function not to be called");
+	// Writes out the packet normally.
+	UInt32 PacketLen = static_cast<UInt32>(m_OutPacketBuffer.GetUsedSpace());
+	AString PacketData, CompressedPacket;
+	m_OutPacketBuffer.ReadAll(PacketData);
+	m_OutPacketBuffer.CommitRead();
+
+	// Compression doesn't apply to this state, send raw data:
+	m_OutPacketLenBuffer.WriteVarInt32(PacketLen);
+	AString LengthData;
+	m_OutPacketLenBuffer.ReadAll(LengthData);
+	SendData(LengthData.data(), LengthData.size());
+
+	// Send the packet's payload
+	m_OutPacketLenBuffer.CommitRead();
+	SendData(PacketData.data(), PacketData.size());
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPingStatusResponse(void)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite " MCS_CLIENT_VERSIONS;
+	Version["protocol"] = 0;  // Force client to think this is an invalid version (no other good default)
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
 }
 
 
