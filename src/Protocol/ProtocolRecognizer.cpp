@@ -240,20 +240,8 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	else
 	{
 		AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
-		cByteBuffer OutBuffer(Message.length() + 16);
-		// Asuming non-compressed packets since compression cannot start at this point
-		// Send the login disconnect packet (ID 0x00)
-		size_t Length = (
-			cByteBuffer::GetVarIntSize(0x00) +  // Size of packet ID
-			cByteBuffer::GetVarIntSize(Message.length()) +  // Size of reason
-			Message.length()  // Reason itself
-		);
-		OutBuffer.WriteVarInt32(Length);
-		OutBuffer.WriteVarInt32(0x00);  // Disconnect packet for login state (as of 1.9; this _probably_ will not change)
-		OutBuffer.WriteVarUTF8String(Message);
-		AString PacketData;
-		OutBuffer.ReadAll(PacketData);
-		SendData(PacketData.data(), PacketData.size());
+		cPacketizer Pkt(*this, 0x00);  // Disconnect packet (in login state)
+		Pkt.WriteString(Message);
 	}
 }
 
