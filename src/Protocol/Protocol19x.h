@@ -9,6 +9,8 @@ Declares the 1.9.x protocol classes:
 		- release 1.9.1 protocol (#108)
 	- cProtocol192
 		- release 1.9.2 protocol (#109)
+	- cProtocol194
+		- release 1.9.4 protocol (#110)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -323,6 +325,32 @@ public:
 	cProtocol192(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+
+} ;
+
+
+
+
+
+/** The version 110 protocol, used by 1.9.3 and 1.9.4. */
+class cProtocol194 :
+	public cProtocol192
+{
+	typedef cProtocol192 super;
+
+public:
+	cProtocol194(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+
+	// cProtocol190 overrides:
+	virtual void SendCollectEntity   (const cEntity & a_Entity, const cPlayer & a_Player) override;
+	virtual void SendChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
+	virtual void SendEntityEffect    (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
+	virtual void SendEntityProperties(const cEntity & a_Entity) override;
+	virtual void SendPlayerMaxSpeed  (void) override;
+	virtual void SendTeleportEntity  (const cEntity & a_Entity) override;
+	virtual void SendUpdateSign      (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
+
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
 } ;

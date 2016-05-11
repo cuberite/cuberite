@@ -9,6 +9,8 @@ Implements the 1.9.x protocol classes:
 		- release 1.9.1 protocol (#108)
 	- cProtocol192
 		- release 1.9.2 protocol (#109)
+	- cProtocol194
+		- release 1.9.4 protocol (#110)
 (others may be added later in the future for the 1.9 release series)
 */
 
@@ -4096,6 +4098,206 @@ void cProtocol192::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Response);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol194:
+
+cProtocol194::cProtocol194(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+{
+}
+
+
+
+
+
+void cProtocol194::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite 1.9.4";
+	Version["protocol"] = 110;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
+}
+
+
+
+
+
+void cProtocol194::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x48);  // Collect Item packet
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteVarInt32(a_Player.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol194::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
+	// This contains the flags and bitmasks, too
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_4, a_ChunkX, a_ChunkZ);
+
+	cCSLock Lock(m_CSPacket);
+	SendData(ChunkData.data(), ChunkData.size());
+}
+
+
+
+
+
+void cProtocol194::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x4b);  // Entity Effect packet
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Amplifier));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Duration));
+	Pkt.WriteBool(false);  // Hide particles
+}
+
+
+
+
+
+void cProtocol194::SendEntityProperties(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+
+	cPacketizer Pkt(*this, 0x4a);  // Entity Properties packet
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	WriteEntityProperties(Pkt, a_Entity);
+}
+
+
+
+
+
+void cProtocol194::SendPlayerMaxSpeed(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x4a);  // Entity Properties
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteVarInt32(Player->GetUniqueID());
+	Pkt.WriteBEInt32(1);  // Count
+	Pkt.WriteString("generic.movementSpeed");
+	// The default game speed is 0.1, multiply that value by the relative speed:
+	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
+	if (Player->IsSprinting())
+	{
+		Pkt.WriteVarInt32(1);  // Modifier count
+		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
+		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
+		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
+		Pkt.WriteBEUInt8(2);
+	}
+	else
+	{
+		Pkt.WriteVarInt32(0);  // Modifier count
+	}
+}
+
+
+
+
+
+void cProtocol194::SendTeleportEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x49);  // Entity teleport packet
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEDouble(a_Entity.GetPosX());
+	Pkt.WriteBEDouble(a_Entity.GetPosY());
+	Pkt.WriteBEDouble(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteBool(a_Entity.IsOnGround());
+}
+
+
+
+
+
+void cProtocol194::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	// 1.9.4 removed the update sign packet and now uses Update Block Entity
+	cPacketizer Pkt(*this, 0x09);  // Update tile entity packet
+	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteBEUInt8(9);  // Action 9 - update sign
+
+	cFastNBTWriter Writer;
+	Writer.AddInt("x",        a_BlockX);
+	Writer.AddInt("y",        a_BlockY);
+	Writer.AddInt("z",        a_BlockZ);
+	Writer.AddString("id", "Sign");
+
+	Json::StyledWriter JsonWriter;
+	Json::Value Line1;
+	Line1["text"] = a_Line1;
+	Writer.AddString("Text1", JsonWriter.write(Line1));
+	Json::Value Line2;
+	Line2["text"] = a_Line2;
+	Writer.AddString("Text2", JsonWriter.write(Line2));
+	Json::Value Line3;
+	Line3["text"] = a_Line3;
+	Writer.AddString("Text3", JsonWriter.write(Line3));
+	Json::Value Line4;
+	Line4["text"] = a_Line4;
+	Writer.AddString("Text4", JsonWriter.write(Line4));
+
+	Writer.Finish();
+	Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
 }
 
 

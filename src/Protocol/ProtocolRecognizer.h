@@ -19,7 +19,7 @@
 
 // Adjust these if a new protocol is added or an old one is removed:
 #define MCS_CLIENT_VERSIONS "1.7.x, 1.8.x, 1.9.x"
-#define MCS_PROTOCOL_VERSIONS "4, 5, 47, 107, 108, 109"
+#define MCS_PROTOCOL_VERSIONS "4, 5, 47, 107, 108, 109, 110"
 
 
 
@@ -38,7 +38,8 @@ public:
 		PROTO_VERSION_1_8_0 = 47,
 		PROTO_VERSION_1_9_0 = 107,
 		PROTO_VERSION_1_9_1 = 108,
-		PROTO_VERSION_1_9_2 = 109
+		PROTO_VERSION_1_9_2 = 109,
+		PROTO_VERSION_1_9_4 = 110,
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
