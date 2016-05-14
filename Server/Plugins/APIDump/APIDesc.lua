@@ -2986,7 +2986,7 @@ end
 				DIG_STATUS_DROP_HELD = { Notes = "The player has dropped a single item using the Drop Item key (default: Q)" },
 				DIG_STATUS_DROP_STACK = { Notes = "The player has dropped a full stack of items using the Drop Item key (default: Q) while holding down a specific modifier key (in windows, control)" },
 				DIG_STATUS_SHOOT_EAT = { Notes = "The player has finished shooting a bow or finished eating" },
-        DIG_STATUS_SWAP_ITEM_IN_HAND = { Notes = "The player has swapped their held item with the item in their offhand slot (1.9)" },
+				DIG_STATUS_SWAP_ITEM_IN_HAND = { Notes = "The player has swapped their held item with the item in their offhand slot (1.9)" },
 				esBed = { Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed." },
 				esEnderCrystal = { Notes = "An ender crystal entity explosion. The SourceData param is the {{cEntity|ender crystal entity}} object." },
 				esGhastFireball = { Notes = "A ghast fireball explosion. The SourceData param is the {{cGhastFireballEntity|ghast fireball entity}} object." },
