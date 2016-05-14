@@ -2156,3 +2156,31 @@ end
 
 
 
+
+function HandleBlkCmd(a_Split, a_Player)
+	-- Gets info about the block the player is looking at.
+	local World = a_Player:GetWorld();
+
+	local Callbacks = {
+		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+			if (a_BlockType ~= E_BLOCK_AIR) then
+				a_Player:SendMessage("Block at " .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
+				return true;
+			end
+		end
+	};
+	
+	local EyePos = a_Player:GetEyePosition();
+	local LookVector = a_Player:GetLookVector();
+	LookVector:Normalize();
+	
+	local End = EyePos + LookVector * 50;
+	
+	cLineBlockTracer.Trace(World, Callbacks, EyePos.x, EyePos.y, EyePos.z, End.x, End.y, End.z);
+	
+	return true;
+end
+
+
+
+

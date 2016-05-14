@@ -60,12 +60,13 @@ enum eBlockFace
 /** PlayerDigging status constants */
 enum
 {
-	DIG_STATUS_STARTED   = 0,
-	DIG_STATUS_CANCELLED = 1,
-	DIG_STATUS_FINISHED  = 2,
-	DIG_STATUS_DROP_STACK= 3,
-	DIG_STATUS_DROP_HELD = 4,
-	DIG_STATUS_SHOOT_EAT = 5,
+	DIG_STATUS_STARTED           = 0,
+	DIG_STATUS_CANCELLED         = 1,
+	DIG_STATUS_FINISHED          = 2,
+	DIG_STATUS_DROP_STACK        = 3,
+	DIG_STATUS_DROP_HELD         = 4,
+	DIG_STATUS_SHOOT_EAT         = 5,
+	DIG_STATUS_SWAP_ITEM_IN_HAND = 6,
 } ;
 
 

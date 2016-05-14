@@ -2263,9 +2263,9 @@ bool cWorld::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
 
 
 
-void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
-	return m_ChunkMap->BroadcastAttachEntity(a_Entity, a_Vehicle);
+	m_ChunkMap->BroadcastAttachEntity(a_Entity, a_Vehicle);
 }
 
 
@@ -2347,6 +2347,15 @@ void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	m_ChunkMap->BroadcastDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 

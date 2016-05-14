@@ -144,7 +144,7 @@ public:  // tolua_export
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
-	void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle);
+	void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle);
 	void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
 	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
@@ -158,6 +158,7 @@ public:  // tolua_export
 	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity              (const cEntity & a_Entity);
+	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void SendDisconnect                 (const AString & a_Reason);
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);

@@ -2785,7 +2785,7 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 
 
 
-void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	for (auto ClientHandle : m_LoadedByClient)
 	{
@@ -2876,6 +2876,18 @@ void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 			continue;
 		}
 		(*itr)->SendDestroyEntity(a_Entity);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	for (auto ClientHandle : m_LoadedByClient)
+	{
+		ClientHandle->SendDetachEntity(a_Entity, a_PreviousVehicle);
 	}  // for itr - LoadedByClient[]
 }
 

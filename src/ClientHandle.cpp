@@ -1119,6 +1119,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 			return;
 		}
 
+		case DIG_STATUS_SWAP_ITEM_IN_HAND:
+		{
+			// TODO: Not yet implemented
+			return;
+		}
+
 		default:
 		{
 			ASSERT(!"Unhandled DIG_STATUS");
@@ -2095,7 +2101,7 @@ void cClientHandle::ServerTick(float a_Dt)
 
 
 
-void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
 }
@@ -2313,6 +2319,15 @@ void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & 
 void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
 {
 	m_Protocol->SendDestroyEntity(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	m_Protocol->SendDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 

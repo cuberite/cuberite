@@ -202,6 +202,12 @@ g_PluginInfo =
 			Handler = HandleRemoveXp,
 			HelpString = "Remove all xp"
 		},
+		["/blk"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleBlkCmd,
+			HelpString = "Gets info about the block you are looking at"
+		},
 	},  -- Commands
 	
 	ConsoleCommands =
