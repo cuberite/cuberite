@@ -64,7 +64,10 @@ public:
 
 	int Resolve(const AString & a_ItemName)
 	{
-		ItemMap::iterator itr = m_Map.find(a_ItemName);
+		// Convert to lowercase and remove underscores.
+		auto saneItemName = StrToLower(a_ItemName);
+		saneItemName.erase(std::remove(saneItemName.begin(), saneItemName.end(), '_'), saneItemName.end());
+		ItemMap::iterator itr = m_Map.find(saneItemName);
 		if (itr == m_Map.end())
 		{
 			return -1;
@@ -75,8 +78,12 @@ public:
 
 	bool ResolveItem(const AString & a_ItemName, cItem & a_Item)
 	{
+		// Convert to lowercase and remove underscores.
+		auto saneItemName = StrToLower(a_ItemName);
+		saneItemName.erase(std::remove(saneItemName.begin(), saneItemName.end(), '_'), saneItemName.end());
+
 		// Split into parts divided by either ':' or '^'
-		AStringVector Split = StringSplitAndTrim(a_ItemName, ":^");
+		AStringVector Split = StringSplitAndTrim(saneItemName, ":^");
 		if (Split.empty())
 		{
 			return false;
