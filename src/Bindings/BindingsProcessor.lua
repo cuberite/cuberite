@@ -363,7 +363,10 @@ local function outputClassFunctionDocs(a_File, a_Class, a_Functions)
 			for _, ret in ipairs(desc.Returns) do
 				a_File:write("\t\t\t\t\t\t{\n\t\t\t\t\t\t\tType = \"", ret.Type, "\",\n\t\t\t\t\t\t},\n")
 			end
-			a_File:write("\t\t\t\t\t}\n\t\t\t\t\tDesc = ", string.format("%q", desc.DoxyComment or ""), ",\n")
+			a_File:write("\t\t\t\t\t}\n")
+			if (desc.DoxyComment) then
+				a_File:write("\t\t\t\t\tDesc = ", string.format("%q", desc.DoxyComment), ",\n")
+			end
 			a_File:write("\t\t\t\t},\n")
 		end
 		a_File:write("\t\t\t},\n")
@@ -401,7 +404,9 @@ local function outputClassVariableDocs(a_File, a_Class, a_Variables)
 	for _, v in ipairs(variables) do
 		a_File:write("\t\t\t", v.Name, " =\n\t\t\t{\n")
 		a_File:write("\t\t\t\tType = \"", v.Desc.Type, "\",\n")
-		a_File:write("\t\t\t\tDesc = ", string.format("%q", v.Desc.DoxyComment or ""), ",\n")
+		if (v.Desc.DoxyComment) then
+			a_File:write("\t\t\t\tDesc = ", string.format("%q", v.Desc.DoxyComment), ",\n")
+		end
 		a_File:write("\t\t\t},\n")
 	end
 	a_File:write("\t\t},\n")
@@ -440,7 +445,9 @@ local function outputClassConstantDocs(a_File, a_Class, a_Constants, a_IgnoredCo
 	for _, con in ipairs(constants) do
 		a_File:write("\t\t\t", con.Name, " =\n\t\t\t{\n")
 		a_File:write("\t\t\t\tType = \"", con.Desc.Type, "\",\n")
-		a_File:write("\t\t\t\tDesc = ", string.format("%q", con.Desc.DoxyComment or ""), ",\n")
+		if (con.Desc.DoxyComment) then
+			a_File:write("\t\t\t\tDesc = ", string.format("%q", con.Desc.DoxyComment), ",\n")
+		end
 		a_File:write("\t\t\t},\n")
 	end
 	a_File:write("\t\t},\n")
@@ -476,14 +483,28 @@ local function outputClassEnumDocs(a_File, a_Class, a_Enums)
 		end
 		a_File:write("\t\t\t", name, " =\n\t\t\t{\n")
 		local valnames = {}
+		-- Make a copy of enum.lnames so that we can sort it:
 		local idx = 1
-		for _, valname in ipairs(enum.lnames) do
-			valnames[idx] = valname
+		for i, valname in ipairs(enum.lnames) do
+			valnames[idx] = { Name = valname, DoxyComment = enum.DoxyComments[i] }
 			idx = idx + 1
 		end
-		table.sort(valnames)
+		table.sort(valnames,
+			function (a_Val1, a_Val2)
+				return (a_Val1.Name < a_Val2.Name)
+			end
+		)
 		for _, valname in ipairs(valnames) do
-			a_File:write("\t\t\t\t\"", valname, "\",\n")
+			assert(not(valname.Name:find("\17")))
+			assert(not(valname.Name:find("\18")))
+			assert(not(valname.Name:find("\19")))
+			assert(not(valname.Name:find("\20")))
+			a_File:write("\t\t\t\t{\n")
+			a_File:write("\t\t\t\t\tName = \"", valname.Name, "\",\n")
+			if (valname.DoxyComment) then
+				a_File:write("\t\t\t\t\tDesc = ", string.format("%q", valname.DoxyComment), ",\n")
+			end
+			a_File:write("\t\t\t\t},\n")
 		end
 		a_File:write("\t\t\t},\n")
 	end
@@ -508,7 +529,9 @@ local function outputClassDocs(a_Class, a_Functions, a_Variables, a_Constants, a
 	-- Output the header:
 	local f = assert(io.open("docs/" .. fnam, "w"))
 	f:write("return\n{\n\t", a_Class.lname, " =\n\t{\n")
-	f:write("\t\tDesc = ", string.format("%q", a_Class.DoxyComment or ""), ",\n")
+	if (a_Class.DoxyComment) then
+		f:write("\t\tDesc = ", string.format("%q", a_Class.DoxyComment), ",\n")
+	end
 	
 	-- If the class inherits from anything, output it here:
 	local ignoredConstants = {}
@@ -557,7 +580,6 @@ local function applyNextDoxyComments(a_Container)
 	while (a_Container[i]) do
 		if (a_Container[i].next_DoxyComment) then
 			if (a_Container[i + 1]) then
-				print("Applying forward DoxyComment for " .. (a_Container[i].name or a_Container[i].cname or a_Container[i].lname or "<unknown name>"))
 				a_Container[i + 1].DoxyComment = a_Container[i].next_DoxyComment
 			end
 		end
@@ -813,11 +835,8 @@ function preprocess_hook(a_Package)
 	assert(type(a_Package.code) == "string")
 	
 	-- Replace all DoxyComments with placeholders so that they aren't erased later on:
-	local f = assert(io.open("code_in.cpp", "wb"))
-	f:write(a_Package.code)
-	f:close()
 	a_Package.code = a_Package.code
-		:gsub("/%*%*%s*(.-)%s*%*/%s*",
+		:gsub("/%*%*%s*(.-)%s*%*/",
 			function (a_Comment)
 				local n = g_ForwardDoxyComments.n + 1
 				g_ForwardDoxyComments[n] = a_Comment
@@ -830,12 +849,109 @@ function preprocess_hook(a_Package)
 				local n = g_BackwardDoxyComments.n + 1
 				g_BackwardDoxyComments[n] = a_Comment
 				g_BackwardDoxyComments.n = n
-				return "\19" .. n .."\20"
+				return "\19" .. n .."\20\n"
 			end
 		)
-	f = assert(io.open("code_out.cpp", "wb"))
+	local f = io.open("code_out.cpp", "wb")
 	f:write(a_Package.code)
 	f:close()
+end
+
+
+
+
+
+--- Chooses the smaller of the indices, and the number indicating whether it chose the first or the second
+-- If one of the indices is nil, returns the other one
+-- If both indices are nil, returns nil
+local function chooseNextIndex(a_Index1, a_Index2)
+	if not(a_Index1) then
+		return a_Index2, 2
+	end
+	if not(a_Index2) then
+		return a_Index1, 1
+	end
+	if (a_Index1 > a_Index2) then
+		return a_Index2, 2
+	else
+		return a_Index1, 1
+	end
+end
+
+
+
+
+
+--- Override for ToLua++'s own code extraction
+-- Called for each "$cfile" and "$hfile" directive in the package file
+-- a_FileName is the C++ header filename
+-- a_Contents is the code contents of the header file
+-- The function returns the code to be parsed by ToLua++
+-- In addition to the original function, this override extracts all DoxyComments as well
+-- This is needed when a function is marked with "// tolua_export" but its DoxyComment is not included
+function extract_code(a_FileName, a_Contents)
+	local code = '\n$#include "' .. a_FileName .. '"\n'
+	a_Contents= "\n" .. a_Contents .. "\n" -- add blank lines as sentinels
+	local _, e, c, t = strfind(a_Contents, "\n([^\n]-)[Tt][Oo][Ll][Uu][Aa]_([^%s]*)[^\n]*\n")
+	local dcb, dce, dc = strfind(a_Contents, "/%*%*.-%*/")
+	local nextEnd, whichOne = chooseNextIndex(e, dce)
+	while (nextEnd) do
+		if (whichOne == 2) then
+			code = code .. a_Contents:sub(dcb, dce) .. "\n"
+		else
+			t = strlower(t)
+			if (t == "begin") then
+				_, nextEnd, c = strfind(a_Contents,"(.-)\n[^\n]*[Tt][Oo][Ll][Uu][Aa]_[Ee][Nn][Dd][^\n]*\n", e)
+				if not(nextEnd) then
+				 tolua_error("Unbalanced 'tolua_begin' directive in header file " .. a_FileName)
+				end
+			end
+			code = code .. c .. "\n"
+		end
+		_, e, c, t = strfind(a_Contents, "\n([^\n]-)[Tt][Oo][Ll][Uu][Aa]_([^%s]*)[^\n]*\n", nextEnd)
+		dcb, dce, dc = strfind(a_Contents, "/%*%*.-%*/", nextEnd)
+		nextEnd, whichOne = chooseNextIndex(e, dce)
+	end
+	return code
+end
+
+
+
+
+
+--- Installs a hook that is called by ToLua++ for each instantiation of classEnumerate
+-- The hook is used to fix DoxyComments in enums
+local function installEnumHook()
+	local oldEnumerate = Enumerate
+	Enumerate = function (a_Name, a_Body, a_VarName)
+		-- We need to remove the DoxyComment items from the enum
+		-- otherwise ToLua++ parser would make an enum value out of them
+		a_Body = string.gsub(a_Body, ",[%s\n]*}", "\n}") -- eliminate last ','
+		local t = split(strsub(a_Body, 2, -2), ',') -- eliminate braces
+		local doxyComments = {}
+		local enumValues = {}
+		local numEnumValues = 0
+		for _, txt in ipairs(t) do
+			txt = txt:gsub("(%b\17\18)",
+				function (a_CommentID)
+					doxyComments[numEnumValues + 1] = g_ForwardDoxyComments[tonumber(a_CommentID:sub(2, -2))]
+					return ""
+				end
+			):gsub("(%b\19\20)",
+				function (a_CommentID)
+					doxyComments[numEnumValues] = g_BackwardDoxyComments[tonumber(a_CommentID:sub(2, -2))]
+					return ""
+				end
+			)
+			if (txt ~= "") then
+				numEnumValues = numEnumValues + 1
+				enumValues[numEnumValues] = txt
+			end
+		end
+		local res = oldEnumerate(a_Name, "{" .. table.concat(enumValues, ",") .. "}", a_VarName)
+		res.DoxyComments = doxyComments
+		return res
+	end
 end
 
 
@@ -847,6 +963,9 @@ if not(TOLUA_VERSION) then
 	print("Generating Lua bindings and docs...")
 	invokeToLua()
 	return
+else
+	-- We're being executed from inside the ToLua++ parser. Install the needed hooks:
+	installEnumHook()
 end
 
 
