@@ -15,6 +15,17 @@ The transformations implemented:
 	- Export additional files to be included in cLuaState:
 		- Forward declarations and typedefs for custom classes' pointers
 		- Pushing and popping of bindings' classes
+
+To parse DoxyComments, the preprocessor first replaces them with markers and then the parser uses
+those markers to apply the DoxyComment to the next or previous item in the container, based on
+the DoxyComment type.
+
+Placeholders in use (i = internal ToLua++):
+	- \1 and \2: (i) Embedded Lua code
+	- \3 and \4: (i) Embedded C code ("<>")
+	- \5 and \6: (i) Embedded C code ("{}")
+	- \17 and \18: DoxyComment for next item ("/** ... */") via an ID lookup
+	- \19 and \20: DocyComment for previous item ("///< ... \n") via an ID lookup
 --]]
 
 
@@ -48,7 +59,12 @@ end
 
 
 
-local access = {public = 0, protected = 1, private = 2}
+local access =
+{
+	public = 0,
+	protected = 1,
+	private = 2
+}
 
 
 
@@ -65,20 +81,71 @@ local g_HasCustomPushImplementation =
 
 
 
-function parser_hook(s)
-	local container = classContainer.curr -- get the current container
+--- Array-table of forward DoxyComments that are replaced in preprocess_hook() and substituted back in parser_hook()
+-- We need to use a lookup table because the comments themselves may contain "//" which the preprocessor
+-- would eliminate, thus breaking the code
+-- The "n" member is a counter for faster insertion
+local g_ForwardDoxyComments =
+{
+	n = 0
+}
 
-	-- process access-specifying labels (public, private, etc)
+
+--- Array-table of backward DoxyComments that are replaced in preprocess_hook() and substituted back in parser_hook()
+-- We need to use a lookup table because the comments themselves may contain "//" which the preprocessor
+-- would eliminate, thus breaking the code
+-- The "n" member is a counter for faster insertion
+local g_BackwardDoxyComments =
+{
+	n = 0,
+}
+
+
+
+
+
+--- Provides extra parsing in addition to ToLua++'s own
+-- Called by ToLua++ each time it extracts the next piece of code to parse
+-- a_Code is the string representing the code to be parsed
+-- The return value is the remaining code to be parsed in the next iteration
+-- Processes the class access specifiers (public, protected, private), and doxycomments
+function parser_hook(a_Code)
+	-- Process access-specifying labels (public, private, etc)
 	do
-		local b, e, label = string.find(s, "^%s*(%w*)%s*:[^:]") -- we need to check for [^:], otherwise it would match 'namespace::type'
+		local b, e, label = string.find(a_Code, "^%s*(%w*)%s*:[^:]") -- we need to check for [^:], otherwise it would match 'namespace::type'
 		if b then
-
-			-- found a label, get the new access value from the global 'access' table
+			-- Found a label, get the new access value for it:
 			if access[label] then
-				container.curr_member_access = access[label]
+				classContainer.curr.curr_member_access = access[label]
 			end -- else ?
-
-			return strsub(s, e) -- normally we would use 'e+1', but we need to preserve the [^:]
+			return strsub(a_Code, e) -- normally we would use 'e + 1', but we need to preserve the [^:]
+		end
+	end
+	
+	-- Process forward DoxyComments:
+	do
+		local b, e, comment = a_Code:find("^%s*(%b\17\18)")
+		if (b) then
+			local curr = classContainer.curr
+			if (curr.n and (curr.n > 0)) then
+				curr[curr.n].next_DoxyComment = g_ForwardDoxyComments[tonumber(comment:sub(2, -2))]
+			end
+			return strsub(a_Code, e + 1)
+		end
+	end
+	
+	-- Process backward DoxyComments:
+	do
+		local b, e, comment = a_Code:find("^%s*(%b\19\20)")
+		if (b) then
+			comment = g_BackwardDoxyComments[tonumber(comment:sub(2, -2))]
+			local currContainer = classContainer.curr
+			if (currContainer.n > 0) then
+				currContainer[currContainer.n].DoxyComment = comment
+			else
+				print("Backward DoxyComment lost in " .. (currContainer.name or currContainer.lname or currContainer.cname or "<no name>"))
+			end
+			return strsub(a_Code, e + 1)
 		end
 	end
 end
@@ -334,7 +401,7 @@ local function outputClassVariableDocs(a_File, a_Class, a_Variables)
 	for _, v in ipairs(variables) do
 		a_File:write("\t\t\t", v.Name, " =\n\t\t\t{\n")
 		a_File:write("\t\t\t\tType = \"", v.Desc.Type, "\",\n")
-		a_File:write("\t\t\t\tDesc = [[", v.Desc.DoxyComment or "", "]],\n")
+		a_File:write("\t\t\t\tDesc = ", string.format("%q", v.Desc.DoxyComment or ""), ",\n")
 		a_File:write("\t\t\t},\n")
 	end
 	a_File:write("\t\t},\n")
@@ -373,7 +440,7 @@ local function outputClassConstantDocs(a_File, a_Class, a_Constants, a_IgnoredCo
 	for _, con in ipairs(constants) do
 		a_File:write("\t\t\t", con.Name, " =\n\t\t\t{\n")
 		a_File:write("\t\t\t\tType = \"", con.Desc.Type, "\",\n")
-		a_File:write("\t\t\t\tDesc = [[", con.Desc.DoxyComment or "", "]],\n")
+		a_File:write("\t\t\t\tDesc = ", string.format("%q", con.Desc.DoxyComment or ""), ",\n")
 		a_File:write("\t\t\t},\n")
 	end
 	a_File:write("\t\t},\n")
@@ -441,7 +508,7 @@ local function outputClassDocs(a_Class, a_Functions, a_Variables, a_Constants, a
 	-- Output the header:
 	local f = assert(io.open("docs/" .. fnam, "w"))
 	f:write("return\n{\n\t", a_Class.lname, " =\n\t{\n")
-	f:write("\t\tDesc = [[", a_Class.doxycomment or "", "]],\n")
+	f:write("\t\tDesc = ", string.format("%q", a_Class.DoxyComment or ""), ",\n")
 	
 	-- If the class inherits from anything, output it here:
 	local ignoredConstants = {}
@@ -483,7 +550,39 @@ end
 
 
 
+--- Recursively applies the next_DoxyComment member to the next item in the container
+-- a_Container is the ToLua++'s table potentially containing children as its array members
+local function applyNextDoxyComments(a_Container)
+	local i = 1
+	while (a_Container[i]) do
+		if (a_Container[i].next_DoxyComment) then
+			if (a_Container[i + 1]) then
+				print("Applying forward DoxyComment for " .. (a_Container[i].name or a_Container[i].cname or a_Container[i].lname or "<unknown name>"))
+				a_Container[i + 1].DoxyComment = a_Container[i].next_DoxyComment
+			end
+		end
+		applyNextDoxyComments(a_Container[i])
+		i = i + 1
+	end
+end
+
+
+
+
+
+--- Generates documentation for a package.
 local function genPackageDocs(a_Self)
+	-- DEBUG: Output the raw package object:
+	do
+		local f = io.open("docs/_raw.lua", "w")
+		if (f) then
+			OutputTable(f, a_Self, "", "", {}, {})
+			f:close()
+		end
+	end
+	
+	applyNextDoxyComments(a_Self)
+
 	-- Generate docs for each member:
 	local i = 1
 	local filenames = {}
@@ -650,6 +749,34 @@ end
 
 
 
+--- Generates the entire documentation for the API
+-- a_Package is ToLua++'s classPackage object
+-- Checks if the documentation folder is writable, if not, skips the docs generation
+-- Returns true if documentation was generated, false and message if not
+local function generateDocs(a_Package)
+	-- Check if the docs folder is writable:
+	local f, msg = io.open("docs/_files.lua", "w")
+	if not(f) then
+		return false, "Cannot access the docs folder: " .. msg
+	end
+	f:close()
+	
+	-- Generate the docs:
+	classPackage.genDocs = genPackageDocs
+	classClass.genDocs = genClassDocs
+	classFunction.genMemberDocs = genFunctionMemberDocs
+	classVariable.genMemberDocs = genVariableMemberDocs
+	a_Package:genDocs()
+	return true
+end
+
+
+
+
+
+--- Outputs the cLuaState helper files.
+-- Called by ToLua++ before it starts outputting its generated files.
+-- a_Package is ToLua++'s classPackage object
 function pre_output_hook(a_Package)
 	OutputLuaStateHelpers(a_Package)
 end
@@ -658,15 +785,57 @@ end
 
 
 
+--- Outputs the documentation files.
+-- Called by ToLua++ after writing its generated files.
+-- a_Package is ToLua++'s classPackage object
 function post_output_hook(a_Package)
 	-- Generate the documentation:
-	classPackage.genDocs = genPackageDocs
-	classClass.genDocs = genClassDocs
-	classFunction.genMemberDocs = genFunctionMemberDocs
-	classVariable.genMemberDocs = genVariableMemberDocs
-	a_Package:genDocs()
+	local isSuccess, msg = generateDocs(a_Package)
+	if not(isSuccess) then
+		print("Lua bindings have been generated.")
+		print("API docs haven't been generated due to an error: " .. (msg or "<no message>"))
+		return
+	end
 	
 	print("Lua bindings and docs have been generated.")
+end
+
+
+
+
+
+--- Provides DoxyComment processing while parsing the C++ code.
+-- Called by ToLua++ parser before it starts parsing the code.
+-- a_Package is the ToLua++'s classPackage object, currently unparsed
+-- The C++ code to be parsed is in a_Packade.code
+function preprocess_hook(a_Package)
+	assert(a_Package)
+	assert(type(a_Package.code) == "string")
+	
+	-- Replace all DoxyComments with placeholders so that they aren't erased later on:
+	local f = assert(io.open("code_in.cpp", "wb"))
+	f:write(a_Package.code)
+	f:close()
+	a_Package.code = a_Package.code
+		:gsub("/%*%*%s*(.-)%s*%*/%s*",
+			function (a_Comment)
+				local n = g_ForwardDoxyComments.n + 1
+				g_ForwardDoxyComments[n] = a_Comment
+				g_ForwardDoxyComments.n = n
+				return "\17" .. n .."\18"
+			end
+		)  -- Replace /** ... */ with an ID into a lookup table wrapped in DC1 and DC2
+		:gsub("///<%s*(.-)%s*\n%s*",
+			function (a_Comment)
+				local n = g_BackwardDoxyComments.n + 1
+				g_BackwardDoxyComments[n] = a_Comment
+				g_BackwardDoxyComments.n = n
+				return "\19" .. n .."\20"
+			end
+		)
+	f = assert(io.open("code_out.cpp", "wb"))
+	f:write(a_Package.code)
+	f:close()
 end
 
 
