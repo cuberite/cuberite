@@ -378,3 +378,6 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 endif()
 
 target_link_libraries(${EXECUTABLE} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)
+
+# Create a folder for Bindings' documentation:
+FILE(MAKE_DIRECTORY "Bindings/docs")
