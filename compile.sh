@@ -30,22 +30,22 @@ missingDepsExit ()
 greeting ()
 {
 	# Do not greet when running with arguments.
-	if [ "$BRANCH" = "" -a "$COMPILEMODE" = "" ]; then
+	if [ "$BRANCH" = "" -a "$BUILDTYPE" = "" ]; then
 		# Do we already have a repo?
 		if [ -d .git ] && [ -f easyinstall.sh ] && [ -f src/BlockArea.cpp ]; then # A good enough indicator that we're in the Cuberite git repo.
 			cd ../
 			echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
+			echo
 		fi
 
 		# Echo: Greetings.
-		echo "
-Hello, this script will download and compile Cuberite.
-On subsequent runs, it will update Cuberite.
-The compilation and download will occur in the current directory.
-If you're updating, you should run: <Path to Cuberite>/compile.sh
-Compiling from source takes time, but it usually generates faster
-executables. If you prefer ready-to-use binaries or if you want
-more info, please visit:  http://cuberite.org/"
+		echo "Hello, this script will download and compile Cuberite."
+		echo "On subsequent runs, it will update Cuberite."
+		echo "The compilation and download will occur in the current directory."
+		echo "If you're updating, you should run: <Path to Cuberite>/compile.sh"
+		echo "Compiling from source takes time, but it usually generates faster"
+		echo "executables. If you prefer ready-to-use binaries or if you want"
+		echo "more info, please visit:  http://cuberite.org/"
 	fi
 }
 
@@ -245,7 +245,7 @@ You can choose between 3 branches:
 
 }
 
-selectCompileMode ()
+selectBuildType ()
 {
 	# Echo: Compile mode choice.
 	echo "
@@ -288,8 +288,8 @@ if [ -z "$BRANCH" ]; then
 	selectBranch
 fi
 
-if [ -z "$COMPILEMODE" ]; then
-	selectCompileMode
+if [ -z "$BUILDTYPE" ]; then
+	selectBuildType
 fi
 
 if [ -z "$THREADS" ]; then
