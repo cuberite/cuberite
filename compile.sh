@@ -29,24 +29,36 @@ missingDepsExit ()
 
 greeting ()
 {
-	# Do not greet when running with arguments.
-	if [ "$BRANCH" = "" -a "$BUILDTYPE" = "" ]; then
-		# Do we already have a repo?
-		if [ -d .git ] && [ -f easyinstall.sh ] && [ -f src/BlockArea.cpp ]; then # A good enough indicator that we're in the Cuberite git repo.
-			cd ../
-			echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
-			echo
-		fi
+	# Echo: Greetings.
+	echo "Hello, this script will download and compile Cuberite."
+	echo "On subsequent runs, it will update Cuberite."
+	echo "The compilation and download will occur in the current directory."
+	echo "If you're updating, you should run: <Path to Cuberite>/compile.sh"
+	echo "Compiling from source takes time, but it usually generates faster"
+	echo "executables. If you prefer ready-to-use binaries or if you want"
+	echo "more info, please visit:  http://cuberite.org/"
+}
 
-		# Echo: Greetings.
-		echo "Hello, this script will download and compile Cuberite."
-		echo "On subsequent runs, it will update Cuberite."
-		echo "The compilation and download will occur in the current directory."
-		echo "If you're updating, you should run: <Path to Cuberite>/compile.sh"
-		echo "Compiling from source takes time, but it usually generates faster"
-		echo "executables. If you prefer ready-to-use binaries or if you want"
-		echo "more info, please visit:  http://cuberite.org/"
+checkRepository ()
+{
+	# Do we already have a repo?
+	if [ -d .git ] && [ -f easyinstall.sh ] && [ -f src/BlockArea.cpp ]; then # A good enough indicator that we're in the Cuberite git repo.
+		DIRECTORY=$(basename `pwd`)
+		cd ../
+		echo "Cuberite repository detected. This should make the process faster, especially if you compiled before."
+		echo
+	else
+		DIRECTORY='cuberite'
 	fi
+}
+
+# Depdendency check. This used to be in dependencyCheck () but there is no reason to nest it.
+checkPackages ()
+{
+	# note that IFS is a TAB here!
+	echo "$PROGRAMS" | while IFS='	' read EXE_NAME PACKAGE_NAME __trash__; do
+		command -v $EXE_NAME > /dev/null 2> /dev/null || printf %s " $PACKAGE_NAME"
+	done
 }
 
 dependencyCheck ()
@@ -79,14 +91,6 @@ cmake	cmake'
 		MISSING_PACKAGES=" $COMPILER_PACKAGE_NAME"
 	fi
 
-	# Depdendency check.
-	checkPackages ()
-	{
-		# note that IFS is a TAB here!
-		echo "$PROGRAMS" | while IFS='	' read EXE_NAME PACKAGE_NAME __trash__; do
-			command -v $EXE_NAME > /dev/null 2> /dev/null || printf %s " $PACKAGE_NAME"
-		done
-	}
 	MISSING_PACKAGES="$MISSING_PACKAGES`checkPackages`"
 
 	if [ "$MISSING_PACKAGES" != "" ]; then
@@ -146,18 +150,18 @@ compile ()
 	echo " --- Downloading Cuberite's source code from the $BRANCH branch..."
 
 
-	if [ ! -d cuberite ]; then
-		# Git: Clone.
-		echo " --- Looks like your first run, cloning the whole code..."
-		git clone  --depth 1 https://github.com/cuberite/cuberite.git -b "$BRANCH"
-		cd cuberite
-	else
+	if [ -d $DIRECTORY ] && [ -d $DIRECTORY/.git ] && [ -f $DIRECTORY/easyinstall.sh ] && [ -f $DIRECTORY/src/BlockArea.cpp ]; then # A good enough indicator that we're dealing with the Cuberite git repo.
 		# Git: Fetch.
-		cd cuberite
+		cd $DIRECTORY
 		echo " --- Updating the $BRANCH branch..."
 		git fetch origin "$BRANCH" || error "git fetch failed"
 		git checkout "$BRANCH" || error "git checkout failed"
 		git merge "origin/$BRANCH" || error "git merge failed"
+	else
+		# Git: Clone.
+		echo " --- Looks like your first run, cloning the whole code... (into $DIRECTORY)"
+		git clone --depth 1 https://github.com/cuberite/cuberite.git -b "$BRANCH" $DIRECTORY
+		cd $DIRECTORY
 	fi
 
 	# Git: Submodules.
@@ -254,10 +258,10 @@ Choose compile mode:
               Generates the fastest build.
 
 * (D)Debug:   Compiles in debug mode.
-              Makes your console and crashes more verbose.  
+              Makes your console and crashes more verbose.
               A bit slower than Normal mode. If you plan to help
               development by reporting bugs, this is preferred.
-		
+
 
 Note that the script will connect to the internet in order to fetch
 code after this step. It will then compile your program.
@@ -283,7 +287,10 @@ code after this step. It will then compile your program.
 greeting
 dependencyCheck
 
-# If $BRANCH is unset
+if [ -z "$DIRECTORY" ]; then
+	checkRepository
+fi
+
 if [ -z "$BRANCH" ]; then
 	selectBranch
 fi
