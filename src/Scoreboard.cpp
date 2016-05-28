@@ -416,6 +416,22 @@ cTeam * cScoreboard::GetTeam(const AString & a_Name)
 
 
 
+AStringVector cScoreboard::GetTeamNames()
+{
+	AStringVector TeamNames;
+
+	for (const auto & Team: m_Teams)
+	{
+		TeamNames.push_back(Team.first);
+	}
+
+	return TeamNames;
+}
+
+
+
+
+
 cTeam * cScoreboard::QueryPlayerTeam(const AString & a_Name)
 {
 	cCSLock Lock(m_CSTeams);

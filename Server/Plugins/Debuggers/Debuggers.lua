@@ -2184,3 +2184,16 @@ end
 
 
 
+
+function HandleTeamsCmd(a_Split, a_Player)
+	local Scoreboard = a_Player:GetWorld():GetScoreBoard()
+
+	a_Player:SendMessage("Teams: " .. table.concat(Scoreboard:GetTeamNames(), ", "))
+
+	return true
+end
+
+
+
+
+

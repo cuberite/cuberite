@@ -208,6 +208,12 @@ g_PluginInfo =
 			Handler = HandleBlkCmd,
 			HelpString = "Gets info about the block you are looking at"
 		},
+		["/teams"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleTeamsCmd,
+			HelpString = "List the teams"
+		},
 	},  -- Commands
 	
 	ConsoleCommands =
