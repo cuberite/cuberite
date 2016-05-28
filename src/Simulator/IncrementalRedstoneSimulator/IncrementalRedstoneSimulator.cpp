@@ -36,7 +36,7 @@ cRedstoneHandler * cIncrementalRedstoneSimulator::CreateComponent(cWorld & a_Wor
 	{
 		case E_BLOCK_ACTIVATOR_RAIL:
 		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_POWERED_RAIL: 
+		case E_BLOCK_POWERED_RAIL:
 		{
 			static cPoweredRailHandler ComponentHandler(a_World);
 			return &ComponentHandler;

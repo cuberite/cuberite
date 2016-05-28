@@ -23,8 +23,7 @@ public:
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
-		UNUSED(a_QueryBlockType);
-		return 15;
+		return cIncrementalRedstoneSimulator::IsMechanism(a_QueryBlockType) ? 15 : 0;
 	}
 
 	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
