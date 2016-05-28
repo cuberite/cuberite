@@ -18,6 +18,8 @@ public:
 	{
 	}
 
+	cIncrementalRedstoneSimulator(const cIncrementalRedstoneSimulator & a_Simulator) = delete;
+
 	virtual void Simulate(float a_dt) override;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override {}
 
@@ -158,7 +160,7 @@ public:
 	}
 
 	cIncrementalRedstoneSimulatorChunkData * GetChunkData() { return &m_Data; }
-	static std::unique_ptr<cRedstoneHandler> CreateComponent(cWorld & a_World, BLOCKTYPE a_BlockType, cIncrementalRedstoneSimulatorChunkData * a_Data);
+	static cRedstoneHandler * CreateComponent(cWorld & a_World, BLOCKTYPE a_BlockType, cIncrementalRedstoneSimulatorChunkData * a_Data);
 
 private:
 

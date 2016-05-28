@@ -30,62 +30,122 @@
 
 
 
-std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent(cWorld & a_World, BLOCKTYPE a_BlockType, cIncrementalRedstoneSimulatorChunkData * a_Data)
+cRedstoneHandler * cIncrementalRedstoneSimulator::CreateComponent(cWorld & a_World, BLOCKTYPE a_BlockType, cIncrementalRedstoneSimulatorChunkData * a_Data)
 {
 	switch (a_BlockType)
 	{
 		case E_BLOCK_ACTIVATOR_RAIL:
 		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_POWERED_RAIL: return cpp14::make_unique<cPoweredRailHandler>(a_World);
-
+		case E_BLOCK_POWERED_RAIL: 
+		{
+			static cPoweredRailHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_INACTIVE_COMPARATOR: return cpp14::make_unique<cRedstoneComparatorHandler>(a_World);
-
+		case E_BLOCK_INACTIVE_COMPARATOR:
+		{
+			static cRedstoneComparatorHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER: return cpp14::make_unique<cDropSpenserHandler>(a_World);
-
+		case E_BLOCK_DROPPER:
+		{
+			static cDropSpenserHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE: return cpp14::make_unique<cPressurePlateHandler>(a_World);
-
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		{
+			static cPressurePlateHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_FENCE_GATE:
 		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_TRAPDOOR: return cpp14::make_unique<cSmallGateHandler>(a_World);
-
+		case E_BLOCK_TRAPDOOR:
+		{
+			static cSmallGateHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON: return cpp14::make_unique<cRedstoneLampHandler>(a_World);
-
+		case E_BLOCK_REDSTONE_LAMP_ON:
+		{
+			static cRedstoneLampHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON: return cpp14::make_unique<cRedstoneRepeaterHandler>(a_World);
-
+		case E_BLOCK_REDSTONE_REPEATER_ON:
+		{
+			static cRedstoneRepeaterHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON: return cpp14::make_unique<cRedstoneTorchHandler>(a_World);
-
+		case E_BLOCK_REDSTONE_TORCH_ON:
+		{
+			static cRedstoneTorchHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_PISTON:
-		case E_BLOCK_STICKY_PISTON: return cpp14::make_unique<cPistonHandler>(a_World);
-
+		case E_BLOCK_STICKY_PISTON:
+		{
+			static cPistonHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		case E_BLOCK_LEVER:
 		case E_BLOCK_STONE_BUTTON:
-		case E_BLOCK_WOODEN_BUTTON: return cpp14::make_unique<cRedstoneToggleHandler>(a_World);
-
-		case E_BLOCK_BLOCK_OF_REDSTONE: return cpp14::make_unique<cRedstoneBlockHandler>(a_World);
-		case E_BLOCK_COMMAND_BLOCK: return cpp14::make_unique<cCommandBlockHandler>(a_World);
-		case E_BLOCK_NOTE_BLOCK: return cpp14::make_unique<cNoteBlockHandler>(a_World);
-		case E_BLOCK_REDSTONE_WIRE: return cpp14::make_unique<cRedstoneWireHandler>(a_World);
-		case E_BLOCK_TNT: return cpp14::make_unique<cTNTHandler>(a_World);
-		case E_BLOCK_TRAPPED_CHEST: return cpp14::make_unique<cTrappedChestHandler>(a_World);
-		case E_BLOCK_TRIPWIRE_HOOK: return cpp14::make_unique<cTripwireHookHandler>(a_World);
+		case E_BLOCK_WOODEN_BUTTON:
+		{
+			static cRedstoneToggleHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
+		case E_BLOCK_BLOCK_OF_REDSTONE:
+		{
+			static cRedstoneBlockHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
+		case E_BLOCK_COMMAND_BLOCK:
+		{
+			static cCommandBlockHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
+		case E_BLOCK_NOTE_BLOCK:
+		{
+			static cNoteBlockHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
+		case E_BLOCK_REDSTONE_WIRE:
+		{
+			static cRedstoneWireHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
+		case E_BLOCK_TNT:
+		{
+			static cTNTHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
+		case E_BLOCK_TRAPPED_CHEST:
+		{
+			static cTrappedChestHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
+		case E_BLOCK_TRIPWIRE_HOOK:
+		{
+			static cTripwireHookHandler ComponentHandler(a_World);
+			return &ComponentHandler;
+		}
 		default:
 		{
 			if (cBlockDoorHandler::IsDoorBlockType(a_BlockType))
 			{
-				return cpp14::make_unique<cDoorHandler>(a_World);
+				static cDoorHandler ComponentHandler(a_World);
+				return &ComponentHandler;
 			}
 
 			if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
 			{
-				return cpp14::make_unique<cSolidBlockHandler>(a_World);
+				static cSolidBlockHandler ComponentHandler(a_World);
+				return &ComponentHandler;
 			}
 			return nullptr;
 		}
