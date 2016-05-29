@@ -929,7 +929,7 @@ void cChunk::ApplyWeatherToTop()
 
 
 
-void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
+bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
 {
 	// Convert the stem BlockType into produce BlockType
 	BLOCKTYPE ProduceType;
@@ -940,7 +940,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		default:
 		{
 			ASSERT(!"Unhandled blocktype in TickMelonPumpkin()");
-			return;
+			return false;
 		}
 	}
 
@@ -961,7 +961,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 	)
 	{
 		// Neighbors not valid or already taken by the same produce
-		return;
+		return false;
 	}
 
 	// Pick a direction in which to place the produce:
@@ -985,7 +985,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		{
 			break;
 		}
-		default: return;
+		default: return false;
 	}
 
 	// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
@@ -1013,13 +1013,14 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 			break;
 		}
 	}
+	return true;
 }
 
 
 
 
 
-void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
+int cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 {
 	// Check the total height of the sugarcane blocks here:
 	int Top = a_RelY + 1;
@@ -1051,16 +1052,17 @@ void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		}
 		else
 		{
-			break;
+			return i;
 		}
 	}  // for i
+	return ToGrow;
 }
 
 
 
 
 
-void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
+int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 {
 	// Check the total height of the sugarcane blocks here:
 	int Top = a_RelY + 1;
@@ -1093,9 +1095,10 @@ void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		}
 		else
 		{
-			break;
+			return i;
 		}
 	}  // for i
+	return ToGrow;
 }
 
 

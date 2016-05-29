@@ -360,14 +360,14 @@ public:
 	/** Returns the number of valid chunks and the number of dirty chunks */
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 
-	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem) */
-	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
+	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
+	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
 
-	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config */
-	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
+	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the sugarcane grew inside this call */
+	int GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 
-	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config */
-	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
+	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
+	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 
 	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);

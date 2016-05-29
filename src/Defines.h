@@ -788,6 +788,19 @@ namespace ItemCategory
 
 
 
+	inline bool IsMinecart(short a_ItemType)
+	{
+		return (
+			(a_ItemType == E_ITEM_MINECART) ||
+			(a_ItemType == E_ITEM_CHEST_MINECART) ||
+			(a_ItemType == E_ITEM_FURNACE_MINECART) ||
+			(a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
+			(a_ItemType == E_ITEM_MINECART_WITH_HOPPER)
+		);
+	}
+
+
+
 	inline bool IsArmor(short a_ItemType)
 	{
 		return (
