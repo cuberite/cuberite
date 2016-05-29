@@ -4,9 +4,7 @@
 </head>
 <body>
 <h1>Generating terrain in Cuberite</h1>
-<p>This article explains the principles behind the terrain generator in Cuberite. It is not strictly
-specific to Cuberite, though, it can be viewed as a generic guide to various terrain-generating algorithms,
-with specific implementation notes regarding Cuberite.</p>
+<p>This article explains the principles behind the terrain generator in Cuberite. It is not strictly specific to Cuberite, though, it can be viewed as a generic guide to various terrain-generating algorithms, with specific implementation notes regarding Cuberite.</p>
 
 <p>Contents:
 <ul>
@@ -15,7 +13,15 @@ with specific implementation notes regarding Cuberite.</p>
 <li><a href="#reversingflow">Reversing the flow</a></li>
 <li><a href="#composablegen">The ComposableGenerator pipeline</a></li>
 <li><a href="#coherentnoise">Using coherent noise</a></li>
-<li><a href="#biomegen">Generating biomes</a></li>
+<li><a href="#biomegen">Generating biomes</a>
+<ul>
+	<li><a href="#biome.voronoi">Voronoi</a></li>
+	<li><a href="#biome.distortedvoronoi">DistortedVoronoi</a></li>
+	<li><a href="#biome.multistepmap">MultiStepMap</a></li>
+	<li><a href="#biome.twolevel">TwoLevel</a></li>
+	<li><a href="#biome.grown">Grown</a></li>
+</ul>
+</li>
 <li><a href="#heightgen">Terrain height</a></li>
 <li><a href="#compositiongen">Terrain composition</a></li>
 <li><a href="#finishgen">Finishers</a></li>
@@ -28,17 +34,9 @@ with specific implementation notes regarding Cuberite.</p>
 <hr />
 
 <a name="preface"><h2>Preface: How it's done in real life</h2></a>
-<p>The nature has many complicated geological, physical and biological processes working on all scales from
-microscopic to planet-wide scale, that have shaped the terrain into what we see today. The tectonic plates
-collide, push mountain ranges up and ocean trenches down. Erosion dulls the sharp shapes. Plantlife takes
-over to further change the overall look of the world.</p>
+<p>The nature has many complicated geological, physical and biological processes working on all scales from microscopic to planet-wide scale, that have shaped the terrain into what we see today. The tectonic plates collide, push mountain ranges up and ocean trenches down. Erosion dulls the sharp shapes. Plantlife takes over to further change the overall look of the world.</p>
 
-<p>Generally speaking, the processes take what's there and change it. Unlike computer generating, which
-usually creates a finished terrain from scratch, or maybe with only a few iterations. It would be unfeasible
-for software to emulate all the natural processes in enough detail to provide world generation for a game,
-mainly because in the nature everything interacts with everything. If a mountain range rises, it changes the
-way that the precipitation is carried by the wind to the lands beyond the mountains, thus changing the
-erosion rate there and the vegetation type. </p>
+<p>Generally speaking, the processes take what's there and change it. Unlike computer generating, which usually creates a finished terrain from scratch, or maybe with only a few iterations. It would be unfeasible for software to emulate all the natural processes in enough detail to provide world generation for a game, mainly because in the nature everything interacts with everything. If a mountain range rises, it changes the way that the precipitation is carried by the wind to the lands beyond the mountains, thus changing the erosion rate there and the vegetation type. </p>
 
 
 <hr />
@@ -46,15 +44,9 @@ erosion rate there and the vegetation type. </p>
 <a name="expectedprops"><h2>Expected properties</h2></a>
 <p>For a MineCraft-like game terrain generator we need the generator to have several properties:
 <ul>
-<li>The generator must be able to generate terrain in small chunks. This means it must be possible to
-generate each of the chunks separately, without dependencies on the neighboring chunks. Note that this
-doesn't mean chunks cannot coordinate together, it means that "a tree in one chunk cannot ask if there's
-a building in the neighbor chunk", simply because the neighbor chunk may not be generated yet.</li>
-<li>The generated chunk needs to be the same if re-generated. This property is not exactly required, but it
-makes available several techniques that wouldn't be possible otherwise.</li>
-<li>The generator needs to be reasonably fast. For a server application this means at least some 20 chunks
-per second for chunks close to each other, and 5 chunks per second for distant chunks. The reason for this
-distinction will be discussed later.</li>
+<li>The generator must be able to generate terrain in small chunks. This means it must be possible to generate each of the chunks separately, without dependencies on the neighboring chunks. Note that this doesn't mean chunks cannot coordinate together, it means that "a tree in one chunk cannot ask if there's a building in the neighbor chunk", simply because the neighbor chunk may not be generated yet.</li>
+<li>The generated chunk needs to be the same if re-generated. This property is not exactly required, but it makes available several techniques that wouldn't be possible otherwise.</li>
+<li>The generator needs to be reasonably fast. For a server application this means at least some 20 chunks per second for chunks close to each other, and 5 chunks per second for distant chunks. The reason for this distinction will be discussed later.</li>
 </ul>
 </p>
 
@@ -62,28 +54,15 @@ distinction will be discussed later.</li>
 <hr />
 
 <a name="reversingflow"><h2>Reversing the flow</h2></a>
-<p>As already mentioned, the nature works basically by generating raw terrain composition, then "applying"
-erosion, vegetation and finally this leads to biomes being formed. Let's now try a somewhat inverse
-approach: First generate biomes, then fit them with appropriate terrain, and finally cover in vegetation
-and all the other stuff.</p>
+<p>As already mentioned, the nature works basically by generating raw terrain composition, then "applying" erosion, vegetation and finally this leads to biomes being formed. Let's now try a somewhat inverse approach: First generate biomes, then fit them with appropriate terrain, and finally cover in vegetation and all the other stuff.</p>
 
-<p>Splitting the parts like this suddenly makes it possible to create a generator with the required
-properties. We can generate a reasonable biome map chunk-wise, independently of all the other data. Once we
-have the biomes, we can compose the terrain for the chunk by using the biome data for the chunk, and
-possibly even for neighboring chunks. Note that we're not breaking the first property, the biomes can be
-generated separately so a neighboring chunk's biome map can be generated without the need for the entire
-neighboring chunk to be present. Similarly, once we have the terrain composition for a chunk, we can
-generate all the vegetation and structures in it, and those can again use the terrain composition in
-neighboring chunks.</p>
+<p>Splitting the parts like this suddenly makes it possible to create a generator with the required properties. We can generate a reasonable biome map chunk-wise, independently of all the other data. Once we have the biomes, we can compose the terrain for the chunk by using the biome data for the chunk, and possibly even for neighboring chunks. Note that we're not breaking the first property, the biomes can be generated separately so a neighboring chunk's biome map can be generated without the need for the entire neighboring chunk to be present. Similarly, once we have the terrain composition for a chunk, we can generate all the vegetation and structures in it, and those can again use the terrain composition in neighboring chunks.</p>
 
 
 <hr />
 
 <a name="composablegen"><h2>The ComposableGenerator pipeline</h2></a>
-<p>This leads us directly to the main pipeline that is used for generating terrain in Cuberite. For
-technical reasons, the terrain composition step is further subdivided into Height generation and Composition
-generation, and the structures are really called Finishers. For each chunk the generator generates, in this
-sequence:
+<p>This leads us directly to the main pipeline that is used for generating terrain in Cuberite. For technical reasons, the terrain composition step is further subdivided into Height generation and Composition generation, and the structures are really called Finishers. For each chunk the generator generates, in this sequence:
 <ul>
 <li>Biomes</li>
 <li>Terrain height</li>
@@ -96,144 +75,91 @@ sequence:
 <img src="img/terrainheight.jpg" />
 <img src="img/terraincomposition.jpg" />
 <img src="img/finishers.jpg" />
-<p>The beautiful thing about this is that the individual components can be changed independently. You can
-have 5 biome generators and 3 height generators and you can let the users mix'n'match.
-</p>
+<p>The beautiful thing about this is that the individual components can be changed independently. You can have 5 biome generators and 3 height generators and you can let the users mix'n'match.</p>
+<p>This pipeline had been used in Cuberite for about a year, before we realized that is has a flaw: There is no way for it to generate overhangs. We tried to implement a Finisher that would actually carve overhangs into the terrain; this approach has several problems, most severe one of those is that tree and village generation becomes unbelievably difficult - those finishers need to know the basic terrain composition of the neighboring chunks in order to generate, and the composition would be different after the overhangs are carved. So we need to come up with a better way, something that directly generates the overhangs at latest by the Terrain composition stage.</p>
+<p>Luckily we have just the thing. Instead of generating a 2D heightmap, we generate a 3D "density map" - we decide about each block in the chunk being generated, whether it is a solid block or an air block. The following pictures try to illustrate this in one less dimension - the heightmap is a 1D function and the density map is a 2D function:</p>
 
+<img src="img/heightmap.jpg" />
+<img src="img/densitymap.jpg" />
+
+<p>This way we can have generators that produce overhangs and yet allow finishers that need the entire composition of the neighboring chunks. However, we pay the price for this in performance, because a 3D noise for the density map needs order of magnitude more CPU cycles than 2D noise for heightmap. Also the RAM usage is increased because instead of storing 16 * 16 height values we need to store 16 * 256 * 16 density values. </p>
 
 <hr />
 
 <a name="coherentnoise"><h2>Using coherent noise for the generation</h2></a>
-<p>For a great tutorial on coherent noise, see the <a href="http://libnoise.sourceforge.net/">LibNoise
-documentation</a>.</p>
+<p>For a great tutorial on coherent noise, see the <a href="http://libnoise.sourceforge.net/">LibNoise documentation</a>.</p>
 <p>Coherent noise is a type of noise that has three important properties that we can use to our advantage:
 <ul>
-<li>The noise is smooth</li>
-<li>The noise is algorithmically generated, which means that the same data is generated when the same
-parameters are given to the noise functions.</li>
+<li>The noise is smooth - small change in the input coord produces only a small change in the output value</li>
+<li>The noise is algorithmically generated, which means that the same data is generated when the same inputs are given to the noise functions.</li>
 <li>The noise can be seamlessly extended in any direction</li>
 </ul></p>
 
-<p>We'll be mostly using Perlin noise in this article. It is the easiest one to visualise and use and is one
-of the most useful kinds of coherent noises. Here's an example of a Perlin noise generated in 2 dimensions:</p>
+<p>We'll be mostly using Perlin noise in this article. It is the easiest one to visualise and use and is one of the most useful kinds of coherent noises. Here's an example of a Perlin noise generated in 2 dimensions:</p>
 <img src="img/perlin.jpg" />
 
 <p>It comes only naturally that such a 2D noise can be used as a terrain height map directly:</p>
 <img src="img/perlinheightmap.jpg" />
 
-<p>However, this is not the only use for this noise, and 2 dimensions is not the limit - this noise can be
-generated for any number of dimensions.</p>
+<p>However, this is not the only use for this noise, and 2 dimensions is not the limit - this noise can be generated for any number of dimensions.</p>
 
 
 
 <hr />
 
 <a name="biomegen"><h2>Generating biomes</h2></a>
-<p>The easiest way to generate biomes is to not generate them at all - simply assign a single constant biome
-to everywhere. And indeed there are times when this kind of "generator" is useful - for the MineCraft's Flat
-world type, or for testing purposes, or for tematic maps. In Cuberite, this is exactly what the Constant
-biome generator does.</p>
+<p>The easiest way to generate biomes is to not generate them at all - simply assign a single constant biome to everywhere. And indeed there are times when this kind of "generator" is useful - for the MineCraft's Flat world type, or for testing purposes, or for tematic maps. In Cuberite, this is exactly what the Constant biome generator does.</p>
 
-<p>Of course, there are more interesting test scenarios for which multiple biomes must be generated as easy
-as possible. For these special needs, there's a CheckerBoard biome generator. As the name suggests, it
-generates a grid of alternating biomes.</p>
+<p>Of course, there are more interesting test scenarios for which multiple biomes must be generated as easy as possible. For these special needs, there's a CheckerBoard biome generator. As the name suggests, it generates a grid of alternating biomes.</p>
 
-<h3>Voronoi diagram</h3>
-<p>Those two generators were more of a technicality, we need to make something more interesting if we're
-going for a natural look. The Voronoi generator is the first step towards such a change. Recall that a
-<a href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> is a construct that creates a
-set of areas where each point in an area is closer to the appropriate seed of the area than the seeds of any
-other area:</p>
+<a name="biome.voronoi"><h3>Voronoi diagram</h3></a>
+<p>Those two generators were more of a technicality, we need to make something more interesting if we're going for a natural look. The Voronoi generator is the first step towards such a change. Recall that a <a href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> is a construct that creates a set of areas where each point in an area is closer to the appropriate seed of the area than the seeds of any other area:</p>
 <img src="img/voronoi.png" />
 
-<p>To generate biomes using this approach, you select random "seeds", assign a biome to each one, and then
-for each "column" of the world you find the seed that is the nearest to that column, and use that seed's
-biome.</p>
+<p>To generate biomes using this approach, you select random "seeds", assign a biome to each one, and then for each "column" of the world you find the seed that is the nearest to that column, and use that seed's biome.</p>
 
-<p>The overall shape of a Voronoi diagram is governed by the placement of the seeds. In extreme cases, a
-seed could affect the entire diagram, which is what we don't want - we need our locality, so that we can
-generate a chunk's worth of biome data. We also don't want the too much irregular diagrams that are produced
-when the seeds are in small clusters. We need our seeds to come in random, yet somewhat uniform fashion.</p>
+<p>The overall shape of a Voronoi diagram is governed by the placement of the seeds. In extreme cases, a seed could affect the entire diagram, which is what we don't want - we need our locality, so that we can generate a chunk's worth of biome data. We also don't want the too much irregular diagrams that are produced when the seeds are in small clusters. We need our seeds to come in random, yet somewhat uniform fashion.</p>
 
-<p>Luckily, we have just the tool: Grid with jitter. Originally used in antialiasing techniques, they can be
-successfully applied as a source of the seeds for a Voronoi diagram. Simply take a regular 2D grid of seeds
-with the grid distance being N, and move each seed along the X and Y axis by a random distance, usually in
-the range [-N / 2, +N / 2]:</p>
+<p>Luckily, we have just the tool: Grid with jitter. Originally used in antialiasing techniques, they can be successfully applied as a source of the seeds for a Voronoi diagram. Simply take a regular 2D grid of seeds with the grid distance being N, and move each seed along the X and Y axis by a random distance, usually in the range [-N / 2, +N / 2]:</p>
 <img src="img/jittergrid.jpg" />
 
-<p>Such a grid is the ideal seed source for a Voronoi biome generator, because not
-only are the Voronoi cells "reasonable", but the seed placement's effect on the diagram is localized - each
-pixel in the diagram depends on at most 4 x 4 seeds around it. In the following picture, the seed for the
-requested point (blue) must be within the indicated circle. Even the second-nearest seed, which we will need
-later, is inside that circle.</p>
+<p>Such a grid is the ideal seed source for a Voronoi biome generator, because not only are the Voronoi cells "reasonable", but the seed placement's effect on the diagram is localized - each pixel in the diagram depends on at most 4 x 4 seeds around it. In the following picture, the seed for the requested point (blue) must be within the indicated circle. Even the second-nearest seed, which we will need later, is inside that circle.</p>
 <img src="img/jittergridlocality.jpg" />
 
-<p>Calculating the jitter for each cell can be done easily by using a 2D Perlin noise for each coord. We
-calculate the noise's value at [X, Z], which gives us a number in the range [-1; 1]. We then multiply the
-number by N / 2, this gives us the required range of [-N / 2, +N / 2]. Adding this number to the X coord
-gives us the seed's X position. We use another Perlin noise and the same calculation for the Z coord of the
-seed.</p>
+<p>Calculating the jitter for each cell can be done easily by using a 2D Perlin noise for each coord. We calculate the noise's value at [X, Z], which gives us a number in the range [-1; 1]. We then multiply the number by N / 2, this gives us the required range of [-N / 2, +N / 2]. Adding this number to the X coord gives us the seed's X position. We use another Perlin noise and the same calculation for the Z coord of the seed.</p>
 
-<p>Here's an example of a biome map generated using the Voronoi + jitter grid, as implemented by the Voronoi
-biome generator in Cuberite:</p>
+<p>Here's an example of a biome map generated using the Voronoi + jitter grid, as implemented by the Voronoi biome generator in Cuberite:</p>
 <img src="img/voronoijitterbiomes.png" />
 
-<h3>Distorted Voronoi</h3>
-<p>The biomes are starting to look interesting, but now they have straight-line borders, which looks rather
-weird and the players will most likely notice very soon. We need to somehow distort the borders to make them
-look more natural. By far the easiest way to achieve that is to use a little trick: When the generator is
-asked for the biome at column [X, Z], instead of calculating the Voronoi biome for column [X, Z], we first
-calculate a random offset for each coord, and add it to the coordinates. So the generator actually responds
-with the biome for [X + rndX, Z + rndZ].</p>
+<a name="biome.distortedvoronoi"><h3>Distorted Voronoi</h3></a>
+<p>The biomes are starting to look interesting, but now they have straight-line borders, which looks rather weird and the players will most likely notice very soon. We need to somehow distort the borders to make them look more natural. By far the easiest way to achieve that is to use a little trick: When the generator is asked for the biome at column [X, Z], instead of calculating the Voronoi biome for column [X, Z], we first calculate a random offset for each coord, and add it to the coordinates. So the generator actually responds with the biome for [X + rndX, Z + rndZ].</p>
 
-<p>In order to keep the property that generating for the second time gives us the same result, we need the
-"random offset" to be replicatable - same output for the same input. This is where we use yet another Perlin
-noise - just like with the jitter for the Voronoi grid, we add a value from a separate noise to each
-coordinate before sending the coordinates down to the Voronoi generator:</p>
+<p>In order to keep the property that generating for the second time gives us the same result, we need the "random offset" to be replicatable - same output for the same input. This is where we use yet another Perlin noise - just like with the jitter for the Voronoi grid, we add a value from a separate noise to each coordinate before sending the coordinates down to the Voronoi generator:</p>
 <code>
 DistortedVoronoiBiome(X, Z) := VoronoiBiome(X + PerlinX(X, Z), Z + PerlinZ(X, Z))
 </code>
 
-<p>The following image shows the effects of the change, as generated by Cuberite's DistortedVoronoi biome
-generator. It is actually using the very same Voronoi map as the previous image, the only change has been
-the addition of the distortion:</p>
+<p>The following image shows the effects of the change, as generated by Cuberite's DistortedVoronoi biome generator. It is actually using the very same Voronoi map as the previous image, the only change has been the addition of the distortion:</p>
 <img src="img/distortedvoronoibiomes.png" />
 
-<p>As you can see, this already looks reasonable enough, it could be considered natural biomes, if it
-weren't for several drawbacks:
+<p>As you can see, this already looks reasonable enough, it could be considered natural biomes, if it weren't for several drawbacks:
 <ul>
 <li>There's no way to limit the neighbors. A desert biome can neighbor a tundra biome. </li>
-<li>All the biomes are considered equal. There's no way to make oceans larger. A mushroom biome is
-generated right next to other land biomes.</li>
+<li>All the biomes are considered equal. There's no way to make oceans larger. A mushroom biome is generated right next to other land biomes.</li>
 </ul></p>
 
-<h3>Adding relativity</h3>
-<p>Our next goal is to remove the first defect of the distorted Voronoi generator: unrelated biomes
-generating next to each other. It is highly unlikely to find a jungle biome next to a desert biome, so we
-want to have as few of those borders as possible. We could further improve on the selection of
-biome-to-seed in the Voronoi generator. Or we can try a completely different idea altogether.</p>
+<a name="biome.multistepmap"><h3>MultiStepMap</h3></a>
+<p>Our next goal is to remove the first defect of the distorted Voronoi generator: unrelated biomes generating next to each other. You are highly unlikely to find a jungle biome next to a desert biome in the real world, so we want to have as few of those borders as possible in our generator, too. We could further improve on the selection of biome-to-seed in the Voronoi generator. Or we can try a completely different idea altogether.</p>
 
-<p>Recall how we talked about the nature, where the biomes are formed by the specific conditions of a place.
-What if we could make a similar dependency, but without the terrain? It turns out this is possible rather
-easily - instead of depending on the terrain, we choose two completely artificial measures. Let's call them
-Temperature and Humidity. If we knew the temperature of the place, we know what set of biomes are possible
-for such temperatures - we won't place deserts in the cold and tundra in the hot anymore. Similarly, the
-humidity will help us sort out the desert vs jungle issue. But how do we get a temperature and humidity?
-Once again, the Perlin noise comes to the rescue. We can use a simple 2D Perlin noise as the temperature
-map, and another one as the humidity map.</p>
+<p>Recall how we talked about the nature, where the biomes are formed by the specific conditions of a place. What if we could make a similar dependency, but without the terrain? It turns out this is possible rather easily - instead of depending on the terrain, we choose two completely artificial measures. Let's call them Temperature and Humidity. If we knew the temperature of the place, we know what set of biomes are possible for such temperatures - we won't place deserts in the cold and tundra in the hot anymore. Similarly, the humidity will help us sort out the desert vs jungle issue. But how do we get a temperature and humidity? Once again, the Perlin noise comes to the rescue. We can use a simple 2D Perlin noise as the temperature map, and another one as the humidity map.</p>
 
-<p>What we need next is a decision of what biome to generate in certain temperature and humidity
-combinations. The fastest way for a computer is to have a 2D array, where the temperature is one dimension
-and humidity the other, and the values in the array specify the biome to generate:</p>
+<p>What we need next is a decision of what biome to generate in certain temperature and humidity combinations. The fastest way for a computer is to have a 2D array, where the temperature is one dimension and humidity the other, and the values in the array specify the biome to generate:</p>
 <img src="img/temperaturehumiditydecisionsimple.jpg" />
 
-<p>We can even "misuse" the above diagram to include the hill variants of the biomes and have those hills
-neighbor each other properly, simply by declaring some of the decision diagram's parts as hills:</p>
+<p>We can even "misuse" the above diagram to include the hill variants of the biomes and have those hills neighbor each other properly, simply by declaring some of the decision diagram's parts as hills:</p>
 <img src="img/temperaturehumiditydecisionhills.jpg" />
 
-<p>The problem with this approach is that there are biomes that should not depend on temperature or
-humidity, they generate across all of their values. Biomes like Oceans, Rivers and Mushroom. We could
-either add them somewhere into the decision diagram, or we can make the generator use a multi-step decision:
+<p>The problem with this approach is that there are biomes that should not depend on temperature or humidity, they generate across all of their values. Biomes like Oceans, Rivers and Mushroom. We could either add them somewhere into the decision diagram, or we can make the generator use a multi-step decision:
 <ul>
 <li>Decide whether the point is in the ocean, land or mushroom</li>
 <li>If it's land, decide if it's real land or river.</li>
@@ -241,66 +167,270 @@ either add them somewhere into the decision diagram, or we can make the generato
 </ul>
 </p>
 
-<p>This is the approach implemented in Cuberite's MultiStepMap biome generator. It generates biome maps like
-this:</p>
+<p>This is the approach implemented in Cuberite's MultiStepMap biome generator. It generates biome maps like this:</p>
 <img src="img/multistepmapbiomes.png" />
 
-<p>To decide whether the point is in the ocean, land or mushroom, the generator first chooses seeds in a grid
-that will be later fed to a DistortedVoronoi algorithm, the seeds get the "ocean" and "land" values. Then it
-considers all the "ocean" seeds that are surrounded by 8 other "ocean" seeds and turns a random few of them
-into "mushroom". This special seed processing makes the mushroom biomes mostly surrounded by ocean. The
-following image shows an example seeds grid that the generator might consider, only the two framed cells are
-allowed to change into mushroom. L = land, O = ocean:</p>
+<p>To decide whether the point is in the ocean, land or mushroom, the generator first chooses seeds in a grid that will be later fed to a DistortedVoronoi algorithm, the seeds get the "ocean" and "land" values. Then it considers all the "ocean" seeds that are surrounded by 8 other "ocean" seeds and turns a random few of them into "mushroom". This special seed processing makes the mushroom biomes mostly surrounded by ocean. The following image shows an example seeds grid that the generator might consider, only the two framed cells are allowed to change into mushroom. L = land, O = ocean:</p>
 <img src="img/multistepmapgrid.jpg" />
 
-<p>Next, the generator calculates the DistortedVoronoi for the seeds. For the areas that are calculated as
-mushroom, the distance to the nearest-seed is used to further shrink the mushroom biome and then to
-distinguish between mushroom and mushroom-shore (image depicts a Voronoi cell for illustration purposes, it
-works similarly with DistortedVoronoi). O = ocean, M = mushroom, MS = mushroom shore:</p>
+<p>Next, the generator calculates the DistortedVoronoi for the seeds. For the areas that are calculated as mushroom, the distance to the nearest-seed is used to further shrink the mushroom biome and then to distinguish between mushroom and mushroom-shore (image depicts a Voronoi cell for illustration purposes, it works similarly with DistortedVoronoi). O = ocean, M = mushroom, MS = mushroom shore:</p>
 <img src="img/multistepmapdistance.jpg" />
 
 <a name="perlinrivers">
-<p>The rivers are added only to the areas that have been previously marked as land. A simple 2D Perlin noise
-is used as the base, where its value is between 0 and a configured threshold value, a river is created. This
-creates the rivers in a closed-loop-like shapes, occasionally splitting two branches off:</p>
+<p>The rivers are added only to the areas that have been previously marked as land. A simple 2D Perlin noise is used as the base, where its value is between 0 and a configured threshold value, a river is created. This creates the rivers in a closed-loop-like shapes, occasionally splitting two branches off:</p>
 <img src="img/perlinrivers1.jpg" />
 <img src="img/perlinrivers2.jpg" />
 <img src="img/perlinrivers3.jpg" />
 </a>
 
-<p>For the leftover land biomes, the two Perlin noises, representing temperature and humidity, are used to
-generate the biomes, as described earlier. Additionally, the temperature map is used to turn the Ocean biome
-into FrozenOcean, and the River biome into FrozenRiver, wherever the temperature drops below a threshold.</p>
+<p>For the leftover land biomes, the two Perlin noises, representing temperature and humidity, are used to generate the biomes, as described earlier. Additionally, the temperature map is used to turn the Ocean biome into FrozenOcean, and the River biome into FrozenRiver, wherever the temperature drops below a threshold.</p>
 
-<h3>Two-level Voronoi</h3>
-<p>The 1.7 MineCraft update brought a completely new terrain generation, which has sparked renewed interest
-in the biome generation. A new, potentially simpler way of generating biomes was found, the two-level
-DistortedVoronoi generator.</p>
+<a name="biome.twolevel"><h3>TwoLevel</h3></a>
+<p>The 1.7 MineCraft update brought a completely new terrain generation, which has sparked renewed interest in the biome generation. A new, potentially simpler way of generating biomes was found, the two-level DistortedVoronoi generator.</p>
 
-<p>The main idea behind it all is that we create large areas of similar biomes. There are several groups of
-related biomes that can be generated near each other: Desert biomes, Ice biomes, Forest biomes, Mesa biomes.
-Technically, the Ocean biomes were added as yet another group, so that the oceans will generate in
-approximately the size of the larger areas, too.</p>
+<p>The main idea behind it all is that we create large areas of similar biomes. There are several groups of related biomes that can be generated near each other: Desert biomes, Ice biomes, Forest biomes, Mesa biomes. Technically, the Ocean biomes were added as yet another group, so that the oceans will generate in approximately the size of the larger areas, too.</p>
 
-<p>For each column a DistortedVoronoi is used to select, which large area to use. This in turn results in
-the list of biomes from which to choose. Another DistortedVoronoi, this time with a smaller grid size, is
-used to select one biome out of that list. Additionally, the smaller DistortedVoronoi calculates not only
-the nearest seed's distance, but also the distance to the second-nearest seed; the ratio between these two
-is used as an indicator whether the column is in the "inside" or on the "outskirt" of the smaller Voronoi
-cell. This allows us to give certain biomes an "edge" biome - the Mushroom biome has a MushroomShore edge,
-the ExtremeHills biome have an ExtremeHillsEdge biome on the edge, etc.</p>
+<p>For each column a DistortedVoronoi is used to select, which large area to use. This in turn results in the list of biomes from which to choose. Another DistortedVoronoi, this time with a smaller grid size, is used to select one biome out of that list. Additionally, the smaller DistortedVoronoi calculates not only the nearest seed's distance, but also the distance to the second-nearest seed; the ratio between these two is used as an indicator whether the column is in the "inside" or on the "outskirt" of the smaller Voronoi cell. This allows us to give certain biomes an "edge" biome - the Mushroom biome has a MushroomShore edge, the ExtremeHills biome have an ExtremeHillsEdge biome on the edge, etc.</p>
 
-<p>The images below illustrate the process with regular Voronoi diagrams, for clarity purposes. The real
-generator uses distortion before querying the small areas.</p>
+<p>The images below illustrate the process with regular Voronoi diagrams, for clarity purposes. The real generator uses distortion before querying the small areas.</p>
 <img src="img/twolevellargeareas.jpg" /><br />
 <img src="img/twolevelsmallgrid.jpg" /><br />
 <img src="img/twolevelsmallareas.jpg" /><br />
 
-<p>The following image shows an example output of a TwoLevel biome generator in Cuberite:</p>
+<p>The following image shows an example output of a TwoLevel biome generator in Cuberite. Note how the mushroom biomes (violet) have mushroom shores (pink) on their edges.</p>
 <img src="img/twolevelbiomes.png" />
 
 <p>Note that rivers are currently not implemented in this generator in Cuberite, but they could be added
 using the same approach as in MultiStepMap - by using a thresholded 2D Perlin noise.</p>
+
+
+
+<a name="biome.grown"><h3>Grown biomes</h3></a>
+<p>This generator uses a completely new approach to biome generation. Internally, it uses 2D arrays of integers of varying sizes, and defines a few operations on those arrays. At various points in the generator's pipeline, the integers are interpreted as having a different meaning. At the first stage, they diffentiate between ocean and land. Later on they are interpreted as biome groups - ocean biomes, dry biomes, temperate biomes, mountain biomes or ice biomes. In the final stages they represent individual biomes, each number in the array representing the biome of a single-block-wide column in the world. Still, most of the operations are agnostic of this interpretation, they only "see numbers".</p>
+<p>At the core of the generator is the <b>"Zoom"</b> operation, that enlarges the array almost twice in size (N -&gt; 2*N - 1). For each 2x2 neighboring numbers in the original array it produces a 3x3 array, where the corner values inherit from their corner counterparts of the original array, and the values in the middle get chosen randomly from their appropriate neighbors:</p>
+<table><tr>
+<td><table border="1" cellspacing="0" cellpadding="2"><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table></td>
+<td>--- zooom --></td>
+<td><table border="1" cellspacing="0" cellpadding="2">
+	<tr><td align="center">a</td><td align="center">a or b</td><td align="center">b</td></tr>
+	<tr><td align="center">a or c</td><td align="center">a or b or c or d</td><td align="center">b or d</td></tr>
+	<tr><td align="center">c</td><td align="center">c or d</td><td align="center">d</td></tr>
+</table></td>
+</tr></table>
+
+<style>
+	.h1 { background-color: #cff; }
+	.hh { background-color: #fcf; }
+	.hv { background-color: #ffc; }
+	.ho { background-color: #fff; }
+	.hr { background-color: #ddd; }
+	.bgr { width: 1em; height: 1em; background-color: red; }
+	.bgg { width: 1em; height: 1em; background-color: green; }
+	.bgb { width: 1em; height: 1em; background-color: blue; }
+	.bgc { width: 1em; height: 1em; background-color: cyan; }
+	.bgy { width: 1em; height: 1em; background-color: yellow; }
+</style>
+
+<p>This scheme is repeated for larger arrays accordingly, for example (highlighted values are the ones directly copied from the source array):</p>
+<table>
+<tr>
+<td><table border="1" cellspacing="0" cellpadding="2">
+	<tr><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+	<tr><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+	<tr><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+	<tr><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+</table></td>
+<td>--- Zooom --&gt;</td>
+<td><table border="1" cellspacing="0" cellpadding="2">
+	<tr><td class="h1">0</td><td>0</td><td class="h1">0</td><td>1</td><td class="h1">1</td><td>1</td><td class="h1">1</td></tr>
+	<tr><td>           0</td><td>1</td><td>           0</td><td>1</td><td>           0</td><td>1</td><td>           1</td></tr>
+	<tr><td class="h1">0</td><td>0</td><td class="h1">1</td><td>1</td><td class="h1">0</td><td>0</td><td class="h1">1</td></tr>
+	<tr><td>           0</td><td>1</td><td>           1</td><td>1</td><td>           0</td><td>0</td><td>           1</td></tr>
+	<tr><td class="h1">1</td><td>1</td><td class="h1">1</td><td>0</td><td class="h1">0</td><td>0</td><td class="h1">0</td></tr>
+	<tr><td>           1</td><td>1</td><td>           1</td><td>1</td><td>           0</td><td>0</td><td>           0</td></tr>
+	<tr><td class="h1">0</td><td>0</td><td class="h1">1</td><td>1</td><td class="h1">1</td><td>1</td><td class="h1">0</td></tr>
+</table></td>
+</tr></table>
+<p>The basic idea is that we're having a low-resolution image of the "land" and we're zooming in; in each zoom iteration we're adding random details - the randomly chosen numbers. This becomes apparent when we enlarge each image to the same dimensions:</p>
+<img src="img/zoomedgrown_1.png"/>
+<img src="img/zoomedgrown_2.png"/>
+<img src="img/zoomedgrown_3.png"/>
+<img src="img/zoomedgrown_4.png"/>
+<img src="img/zoomedgrown_5.png"/>
+<img src="img/zoomedgrown_6.png"/>
+<img src="img/zoomedgrown_7.png"/>
+<p>As you can see, the areas take a nice random-looking shape, but the edges are a little bit too noisy. There's where the second most important operation comes in: the <b>"Smooth"</b> slightly reduces the array size (N -&gt; N - 2), losing the values on the edge of the array, and for the internal numbers it considers their 4 neighbors. If both the horizontal neighbors are the same and the vertical neighbors are the same (but not necessarily the same as the horizontal ones), the value is set randomly to either the horizontal or the vertical neihbors' value. If both the horizontal neighbors are the same, the value is set to the value of those neighbors, otherwise if both the vertical neighbors are the same, the value is set to the value of those neighbors. In all the rest cases, the value is kept at its original.</p>
+<table><tr>
+<td><table border="1" cellspacing="0" cellpadding="2">
+	<tr><td align="center"></td><td align="center">a</td><td align="center"></td></tr>
+	<tr><td align="center">b</td><td align="center">X</td><td align="center">c</td></tr>
+	<tr><td align="center"></td><td align="center">d</td><td align="center"></td></tr>
+</table></td>
+<td><table border="1" cellspacing="0" cellpadding="2">
+	<tr><th align="center">Condition</th><th>X becomes</th></tr>
+	<tr><td align="center">(a == d) && (b == c)</td><td align="center">a or b (random)</td></tr>
+	<tr><td align="center">a == d</td><td align="center">a</td></tr>
+	<tr><td align="center">b == c</td><td align="center">b</td></tr>
+	<tr><td align="center">otherwise</td><td align="center">X (unchanged)</td></tr>
+</table></td>
+</tr></table>
+<p>The following examples show how the decisions work:</p>
+<table border="1" cellspacing="0" cellpadding="4px">
+<tr><th>Input</th><th>Output</th><th>Notes</th></tr>
+<tr>
+<td><table>
+	<tr><td/>                      <td class="bgb">&nbsp;</td><td/></tr>
+	<tr><td class="bgr">&nbsp;</td><td class="bgg">&nbsp;</td><td class="bgy">&nbsp;</td></tr>
+	<tr><td/>                      <td class="bgr">&nbsp;</td><td/></tr>
+</table></td>
+<td align="center"><table><tr><td class="bgg">&nbsp;</td></tr></table></td>
+<td>Neither pair of neighbors are the same, so the value is left intact</td>
+</tr>
+<tr>
+<td><table>
+	<tr><td/>                      <td class="bgb">&nbsp;</td><td/></tr>
+	<tr><td class="bgr">&nbsp;</td><td class="bgg">&nbsp;</td><td class="bgr">&nbsp;</td></tr>
+	<tr><td/>                      <td class="bgc">&nbsp;</td><td/></tr>
+</table></td>
+<td align="center"><table><tr><td class="bgr">&nbsp;</td></tr></table></td>
+<td>Horizontal neighbors are the same, so the value is copied from them</td>
+</tr>
+<tr>
+<td><table>
+	<tr><td/>                      <td class="bgb">&nbsp;</td><td/></tr>
+	<tr><td class="bgr">&nbsp;</td><td class="bgg">&nbsp;</td><td class="bgy">&nbsp;</td></tr>
+	<tr><td/>                      <td class="bgb">&nbsp;</td><td/></tr>
+</table></td>
+<td align="center"><table><tr><td class="bgb">&nbsp;</td></tr></table></td>
+<td>Vertical neighbors are the same, so the value is copied from them</td>
+</tr>
+<tr>
+<td><table>
+	<tr><td/>                      <td class="bgb">&nbsp;</td><td/></tr>
+	<tr><td class="bgr">&nbsp;</td><td class="bgg">&nbsp;</td><td class="bgr">&nbsp;</td></tr>
+	<tr><td/>                      <td class="bgb">&nbsp;</td><td/></tr>
+</table></td>
+<td align="center"><table><tr><td class="bgr">&nbsp;</td></tr></table></td>
+<td>Each pair of neighbors are the same, so the value is chosen from one of the pairs randomly</td>
+</tr>
+</table>
+<p>This decision is repeated for each value in the array, for example:</p>
+<table>
+<tr>
+<td><table border="1" cellspacing="0" cellpadding="2">
+	<tr><td>0</td><td>           0</td><td>           0</td><td>           1</td><td>           1</td><td>           1</td><td>1</td></tr>
+	<tr><td>0</td><td class="h1">1</td><td class="h1">0</td><td class="h1">1</td><td class="h1">0</td><td class="h1">1</td><td>1</td></tr>
+	<tr><td>0</td><td class="h1">0</td><td class="h1">1</td><td class="h1">1</td><td class="h1">0</td><td class="h1">0</td><td>1</td></tr>
+	<tr><td>0</td><td class="h1">1</td><td class="h1">1</td><td class="h1">1</td><td class="h1">0</td><td class="h1">0</td><td>1</td></tr>
+	<tr><td>1</td><td class="h1">1</td><td class="h1">1</td><td class="h1">0</td><td class="h1">0</td><td class="h1">0</td><td>0</td></tr>
+	<tr><td>1</td><td class="h1">1</td><td class="h1">1</td><td class="h1">1</td><td class="h1">0</td><td class="h1">0</td><td>0</td></tr>
+	<tr><td>0</td><td>           0</td><td>           1</td><td>           1</td><td>           1</td><td>           1</td><td>0</td></tr>
+</table></td>
+<td>--- Smooth --&gt;</td>
+<td><table border="1" cellspacing="0" cellpadding="2">
+	<tr><td class="hr">0</td><td class="hh">1</td><td class="hr">0</td><td class="hh">1</td><td class="ho">1</td></tr>
+	<tr><td class="hv">1</td><td class="ho">1</td><td class="hv">1</td><td class="hv">0</td><td class="ho">0</td></tr>
+	<tr><td class="ho">1</td><td class="hh">1</td><td class="ho">1</td><td class="hv">0</td><td class="hv">0</td></tr>
+	<tr><td class="hh">1</td><td class="hv">1</td><td class="hv">1</td><td class="hh">0</td><td class="hh">0</td></tr>
+	<tr><td class="hh">1</td><td class="hh">1</td><td class="ho">1</td><td class="ho">0</td><td class="hh">0</td></tr>
+</table></td>
+</tr>
+<tr><td>Highlighted area is processed into output</td>
+<td/>
+<td>
+<span class="ho">Original value kept</span><br/>
+<span class="hr">Value forced by both horizontal and vertical neighbors, random</span><br/>
+<span class="hh">Value forced by horizontal neighbors</span><br/>
+<span class="hv">Value forced by vertical neighbors</span>
+</td></table>
+<p>The following example shows multiple successive Smooth operations performed on the same data set over and over again:</p>
+<img src="img/smoothedgrown_1.png"/>
+<img src="img/smoothedgrown_2.png"/>
+<img src="img/smoothedgrown_3.png"/>
+<img src="img/smoothedgrown_4.png"/>
+<img src="img/smoothedgrown_5.png"/>
+<img src="img/smoothedgrown_6.png"/>
+<img src="img/smoothedgrown_7.png"/>
+<p>As you can see, the smoothing operation doesn't make much difference after its first pass, so it usually isn't used more than once after each zoom.</p>
+<p>One important thing to note is that both the Zoom and Smooth operations only output the numbers already present in the array, they don't create new numbers. This is important because it allows the late stages of the generator to grow indepent biomes next to each other without them "bleeding" into different biomes on their edges.</p>
+<p>The Grown generator uses several more supplementary operations, such as "AddIslands", "ReplaceRandomly", "River", "Beaches" and more. There isn't anything too special to those, they perform mostly trivial operations, manipulating the numbers in some way; the main power of the generator lies in the zoom and smooth operations. Perhaps noteworthy is the generation of rivers: it starts with the regular bitmap (only 0 and 1 used), zooms in and smooths for a while and then performs edge detection - a river biome is set in pixels whose neighbors are different, and no change applied when the neighbors are the same. Among other things, this means that there are actually two chains of array operations, and their results are combined together in the "MixRivers" operation.</p>
+<p>The following table summarizes the operations, visually:</p>
+<table border="1" cellpadding="2" cellspacing="1">
+<tr><th>Operation</th><th>Input 1</th><th>Input 2</th><th>Output</th><th>Notes</th></tr>
+<tr>
+	<td>AddIslands</td>
+	<td><img src="img/grownexample_in1.png"/></td>
+	<td>-</td>
+	<td><img src="img/grownexample_add_islands.png"/></td>
+	<td>Adds a configurable (by percentage) amount of islands to ocean biome group.</td>
+</tr>
+<tr>
+	<td>AlternateBiomes</td>
+	<td><img src="img/grownexample_in3.png"/></td>
+	<td><img src="img/grownexample_in_alt.png"/></td>
+	<td><img src="img/grownexample_alt_biomes.png"/></td>
+	<td>Mostly copies the first input, but where the second input has non-ocean biome group, turns the first input's biomes into their alternatives.</td>
+</tr>
+<tr>
+	<td>Beaches</td>
+	<td><img src="img/grownexample_in3.png"/></td>
+	<td>-</td>
+	<td><img src="img/grownexample_beaches.png"/></td>
+	<td>Any biome neighboring an ocean is turned into a corresponding beach.</td>
+</tr>
+<tr>
+	<td>BiomeEdges</td>
+	<td><img src="img/grownexample_in3.png"/></td>
+	<td>-</td>
+	<td><img src="img/grownexample_biome_edges.png"/></td>
+	<td>If the neighbors of a biome are incompatible (such as desert vs ice plains, or jungle vs anything etc.), turns the biome into a corresponding neutral biome (plains, jungle-edge etc.)</td>
+</tr>
+<tr>
+	<td>Biomes</td>
+	<td><img src="img/grownexample_in2.png"/></td>
+	<td>-</td>
+	<td><img src="img/grownexample_biomes.png"/></td>
+	<td>Input is interpreted as biome groups, for each point a random biome corresponding to the group is chosen for the output.</td>
+</tr>
+<tr>
+	<td>BiomeGroupEdges</td>
+	<td><img src="img/grownexample_in1.png"/></td>
+	<td>-</td>
+	<td><img src="img/grownexample_grp_edges.png"/></td>
+	<td>Converts biome groups on an edge between two incompatible groups (such as desert and ice) into a neutral one (temperate).</td>
+</tr>
+<tr>
+	<td>MBiomes</td>
+	<td><img src="img/grownexample_in3.png"/></td>
+	<td><img src="img/grownexample_in_alt.png"/></td>
+	<td><img src="img/grownexample_m_biomes.png"/></td>
+	<td>Where the second input is zero, copies the first input's biomes; where the second input is nonzero, converts first input's biomes into their M variants. </td>
+</tr>
+<tr>
+	<td>MixRivers</td>
+	<td><img src="img/grownexample_in3.png"/></td>
+	<td><img src="img/grownexample_in_river.png"/></td>
+	<td><img src="img/grownexample_mix_river.png"/></td>
+	<td>Copies first input's biomes into the output, unless there's a river biome in the second input and a land biome in the first input - then it sets a river biome in the output instead.</td>
+</tr>
+<tr>
+	<td>River</td>
+	<td><img src="img/grownexample_in2.png"/></td>
+	<td>-</td>
+	<td><img src="img/grownexample_river.png"/></td>
+	<td>Somewhat of an edge detector - wherever the input has a different biome neighbors, sets a river biome; otherwise sets an ocean biome.</td>
+</tr>
+<tr>
+	<td>SetRandomly</td>
+	<td><img src="img/grownexample_in3.png"/></td>
+	<td>-</td>
+	<td><img src="img/grownexample_set_rnd.png"/></td>
+	<td>Randomly sets points to a specified biome. The amount of changed points is settable as a percentage.</td>
+</tr>
+</table>
+
+<p>Of further note is the existence of two sets of the IntGen classes, representing the individual operations. There are the cProtIntGen class descendants, which are used for prototyping the connections between the operations - it's easy to just chain several operations after each other and they automatically use the correct array dimensions. However, it is possible to further optimize the calculations by moving the array dimensions into template parameters (so that they are, in fact, constant from the code's point of view, and so highly optimizable). This is what the cIntGen class descendants do. Unfortunately, this optimization makes it difficult to change the operation chain - when a new operation is added or removed in the chain, the array sizes for the rest of the chain change and they all have to be updated manually. So the optimal strategy was to use the cProtIntGen classes to find out the best-looking combination of operations, and once the combination was found, to rewrite it using cIntGen classes for performance.
+</p>
 
 
 <hr />
@@ -508,11 +638,15 @@ spring:</p>
 <p>Cuberite uses an approximation of the above curves to choose the height at which to generate the
 spring.</p>
 
-<!--
 <h3>Caves</h3>
 <p>Caves are definitely one of the main things people notice about MineCraft terrain. There are quite a lot
-of different algorithms available to generate terrain with caves.
--->
+of different algorithms available to generate terrain with caves, each with different results. Cuberite currently implements three finishers that generate caves:</p>
+<ul>
+<li>MarbleCaves</li>
+<li>DualRidgeCaves</li>
+<li>WormNestCaves</li>
+</ul>
+<p></p>
 
 <hr />
 
