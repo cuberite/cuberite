@@ -2756,6 +2756,30 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 
 
 
+static int tolua_cScoreboard_GetTeamNames(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cScoreboard") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the groups:
+	cScoreboard * Scoreboard = reinterpret_cast<cScoreboard *>(tolua_tousertype(L, 1, nullptr));
+	AStringVector Teams = Scoreboard->GetTeamNames();
+
+	// Push the results:
+	S.Push(Teams);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 {
 	// function cHopperEntity::GetOutputBlockPos()
@@ -3532,6 +3556,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cScoreboard");
 			tolua_function(tolua_S, "ForEachObjective", ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
 			tolua_function(tolua_S, "ForEachTeam",      ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
+			tolua_function(tolua_S, "GetTeamNames",     tolua_cScoreboard_GetTeamNames);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");

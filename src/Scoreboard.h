@@ -256,6 +256,9 @@ public:
 
 	// tolua_end
 
+	/** Retrieves the list of team names */
+	AStringVector GetTeamNames();
+
 	/** Send this scoreboard to the specified client */
 	void SendTo(cClientHandle & a_Client);
 
