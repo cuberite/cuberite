@@ -1105,6 +1105,37 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 
 
 
+bool cChunk::GrowTallGrass(int a_RelX, int a_RelY, int a_RelZ)
+{
+	if (a_RelY > (cChunkDef::Height - 2))
+	{
+		return false;
+	}
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	if (!UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta))
+	{
+		return false;
+	}
+	if (BlockType != E_BLOCK_TALL_GRASS)
+	{
+		return false;
+	}
+	NIBBLETYPE LargeFlowerMeta;
+	switch (BlockMeta)
+	{
+		case E_META_TALL_GRASS_GRASS: LargeFlowerMeta = E_META_BIG_FLOWER_DOUBLE_TALL_GRASS; break;
+		case E_META_TALL_GRASS_FERN:  LargeFlowerMeta = E_META_BIG_FLOWER_LARGE_FERN; break;
+		default:                      return false;
+	}
+	return UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_BIG_FLOWER, LargeFlowerMeta) &&
+		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, 8);
+}
+
+
+
+
+
 bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	if (!cChunkDef::IsValidHeight(a_RelY))

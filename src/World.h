@@ -937,6 +937,8 @@ private:
 	bool m_IsPumpkinBonemealable;
 	bool m_IsSaplingBonemealable;
 	bool m_IsSugarcaneBonemealable;
+	bool m_IsBigFlowerBonemealable;
+	bool m_IsTallGrassBonemealable;
 
 	/** Whether command blocks are enabled or not */
 	bool m_bCommandBlocksEnabled;

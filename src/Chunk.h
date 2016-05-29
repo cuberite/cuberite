@@ -586,6 +586,9 @@ private:
 	/** Grows cactus by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking); returns the amount of blocks the cactus grew inside this call */
 	int GrowCactus      (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
 
+	/** Grows a tall grass present at the block specified to a two tall grass; returns true if the grass grew */
+	bool GrowTallGrass      (int a_RelX, int a_RelY, int a_RelZ);
+
 	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
 	bool GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
 

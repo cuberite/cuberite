@@ -369,6 +369,9 @@ public:
 	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
 	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 
+	/** Grows a tall grass present at the block specified to a two tall grass; returns true if the grass grew */
+	bool GrowTallGrass(int a_BlockX, int a_BlockY, int a_BlockZ);
+
 	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 

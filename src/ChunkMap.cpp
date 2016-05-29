@@ -2651,6 +2651,24 @@ int cChunkMap::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlo
 
 
 
+bool cChunkMap::GrowTallGrass(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
+	if (Chunk != nullptr)
+	{
+		return Chunk->GrowTallGrass(a_BlockX, a_BlockY, a_BlockZ);
+	}
+	return 0;
+}
+
+
+
+
+
 void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	int ChunkX, ChunkZ;
