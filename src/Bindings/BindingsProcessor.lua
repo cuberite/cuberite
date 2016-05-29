@@ -350,7 +350,11 @@ local function outputClassFunctionDocs(a_File, a_Class, a_Functions)
 	-- Output the descriptions:
 	a_File:write("\t\tFunctions =\n\t\t{\n")
 	for _, fn in ipairs(functions) do
-		a_File:write("\t\t\t", fn.Name, " =\n\t\t\t{\n")
+		local name = fn.Name
+		if (name:sub(1, 1) == ".") then
+			name = "[\"" .. name .. "\"]"
+		end
+		a_File:write("\t\t\t", name, " =\n\t\t\t{\n")
 		for _, desc in ipairs(fn.Descs) do
 			a_File:write("\t\t\t\t{\n\t\t\t\t\tParams =\n\t\t\t\t\t{\n")
 			for _, param in ipairs(desc.Parameters) do
@@ -363,7 +367,7 @@ local function outputClassFunctionDocs(a_File, a_Class, a_Functions)
 			for _, ret in ipairs(desc.Returns) do
 				a_File:write("\t\t\t\t\t\t{\n\t\t\t\t\t\t\tType = \"", ret.Type, "\",\n\t\t\t\t\t\t},\n")
 			end
-			a_File:write("\t\t\t\t\t}\n")
+			a_File:write("\t\t\t\t\t},\n")
 			if (desc.DoxyComment) then
 				a_File:write("\t\t\t\t\tDesc = ", string.format("%q", desc.DoxyComment), ",\n")
 			end
@@ -565,7 +569,7 @@ local function outputClassDocs(a_Class, a_Functions, a_Variables, a_Constants, a
 	outputClassEnumDocs(f, a_Class, a_Class.enums)
 	
 	-- Output the footer:
-	f:write("\t}\n}\n")
+	f:write("\t},\n}\n")
 	f:close()
 end
 
