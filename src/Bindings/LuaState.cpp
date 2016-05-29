@@ -1470,7 +1470,7 @@ int cLuaState::CallFunctionWithForeignParams(
 
 
 
-int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd)
+int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd, int a_NumAllowedNestingLevels)
 {
 	/*
 	// DEBUG:
@@ -1480,64 +1480,138 @@ int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_Sr
 	*/
 	for (int i = a_SrcStart; i <= a_SrcEnd; ++i)
 	{
-		int t = lua_type(a_SrcLuaState, i);
-		switch (t)
+		if (!CopySingleValueFrom(a_SrcLuaState, i, a_NumAllowedNestingLevels))
 		{
-			case LUA_TNIL:
-			{
-				lua_pushnil(m_LuaState);
-				break;
-			}
-			case LUA_TSTRING:
-			{
-				AString s;
-				a_SrcLuaState.ToString(i, s);
-				Push(s);
-				break;
-			}
-			case LUA_TBOOLEAN:
-			{
-				bool b = (tolua_toboolean(a_SrcLuaState, i, false) != 0);
-				Push(b);
-				break;
-			}
-			case LUA_TNUMBER:
-			{
-				lua_Number d = tolua_tonumber(a_SrcLuaState, i, 0);
-				Push(d);
-				break;
-			}
-			case LUA_TUSERDATA:
-			{
-				// Get the class name:
-				const char * type = nullptr;
-				if (lua_getmetatable(a_SrcLuaState, i) == 0)
-				{
-					LOGWARNING("%s: Unknown class in pos %d, cannot copy.", __FUNCTION__, i);
-					lua_pop(m_LuaState, i - a_SrcStart);
-					return -1;
-				}
-				lua_rawget(a_SrcLuaState, LUA_REGISTRYINDEX);  // Stack +1
-				type = lua_tostring(a_SrcLuaState, -1);
-				lua_pop(a_SrcLuaState, 1);                     // Stack -1
-
-				// Copy the value:
-				void * ud = tolua_touserdata(a_SrcLuaState, i, nullptr);
-				tolua_pushusertype(m_LuaState, ud, type);
-				break;
-			}
-			default:
-			{
-				LOGWARNING("%s: Unsupported value: '%s' at stack position %d. Can only copy numbers, strings, bools and classes!",
-					__FUNCTION__, lua_typename(a_SrcLuaState, t), i
-				);
-				a_SrcLuaState.LogStack("Stack where copying failed:");
-				lua_pop(m_LuaState, i - a_SrcStart);
-				return -1;
-			}
+			lua_pop(m_LuaState, i - a_SrcStart);
+			return -1;
 		}
 	}
 	return a_SrcEnd - a_SrcStart + 1;
+}
+
+
+
+
+
+bool cLuaState::CopyTableFrom(cLuaState & a_SrcLuaState, int a_SrcStackIdx, int a_NumAllowedNestingLevels)
+{
+	// Create the dest table:
+	#ifdef _DEBUG
+		auto srcTop = lua_gettop(a_SrcLuaState);
+		auto dstTop = lua_gettop(m_LuaState);
+	#endif
+	lua_createtable(m_LuaState, 0, 0);            // DST: <table>
+	lua_pushvalue(a_SrcLuaState, a_SrcStackIdx);  // SRC: <table>
+	lua_pushnil(a_SrcLuaState);                   // SRC: <table> <key>
+	while (lua_next(a_SrcLuaState, -2) != 0)      // SRC: <table> <key> <value>
+	{
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		assert(lua_gettop(m_LuaState) == dstTop + 1);
+
+		// Copy the key:
+		if (!CopySingleValueFrom(a_SrcLuaState, -2, a_NumAllowedNestingLevels))  // DST: <table> <key>
+		{
+			lua_pop(m_LuaState, 1);
+			lua_pop(a_SrcLuaState, 3);
+			assert(lua_gettop(a_SrcLuaState) == srcTop);
+			assert(lua_gettop(m_LuaState) == dstTop);
+			return false;
+		}
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		assert(lua_gettop(m_LuaState) == dstTop + 2);
+
+		// Copy the value:
+		if (!CopySingleValueFrom(a_SrcLuaState, -1, a_NumAllowedNestingLevels - 1))  // DST: <table> <key> <value>
+		{
+			lua_pop(m_LuaState, 2);     // DST: empty
+			lua_pop(a_SrcLuaState, 3);  // SRC: empty
+			assert(lua_gettop(a_SrcLuaState) == srcTop);
+			assert(lua_gettop(m_LuaState) == dstTop);
+			return false;
+		}
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		assert(lua_gettop(m_LuaState) == dstTop + 3);
+
+		// Set the value and fix up stacks:
+		lua_rawset(m_LuaState, -3);  // DST: <table>
+		lua_pop(a_SrcLuaState, 1);  // SRC: <table> <key>
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 2);
+		assert(lua_gettop(m_LuaState) == dstTop + 1);
+	}
+	lua_pop(a_SrcLuaState, 1);  // SRC: empty
+	assert(lua_gettop(a_SrcLuaState) == srcTop);
+	assert(lua_gettop(m_LuaState) == dstTop + 1);
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CopySingleValueFrom(cLuaState & a_SrcLuaState, int a_StackIdx, int a_NumAllowedNestingLevels)
+{
+	int t = lua_type(a_SrcLuaState, a_StackIdx);
+	switch (t)
+	{
+		case LUA_TNIL:
+		{
+			lua_pushnil(m_LuaState);
+			return true;
+		}
+		case LUA_TSTRING:
+		{
+			AString s;
+			a_SrcLuaState.ToString(a_StackIdx, s);
+			Push(s);
+			return true;
+		}
+		case LUA_TBOOLEAN:
+		{
+			bool b = (tolua_toboolean(a_SrcLuaState, a_StackIdx, false) != 0);
+			Push(b);
+			return true;
+		}
+		case LUA_TNUMBER:
+		{
+			lua_Number d = tolua_tonumber(a_SrcLuaState, a_StackIdx, 0);
+			Push(d);
+			return true;
+		}
+		case LUA_TUSERDATA:
+		{
+			// Get the class name:
+			const char * type = nullptr;
+			if (lua_getmetatable(a_SrcLuaState, a_StackIdx) == 0)
+			{
+				LOGWARNING("%s: Unknown class in pos %d, cannot copy.", __FUNCTION__, a_StackIdx);
+				return false;
+			}
+			lua_rawget(a_SrcLuaState, LUA_REGISTRYINDEX);  // Stack +1
+			type = lua_tostring(a_SrcLuaState, -1);
+			lua_pop(a_SrcLuaState, 1);                     // Stack -1
+
+			// Copy the value:
+			void * ud = tolua_touserdata(a_SrcLuaState, a_StackIdx, nullptr);
+			tolua_pushusertype(m_LuaState, ud, type);
+			return true;
+		}
+		case LUA_TTABLE:
+		{
+			if (!CopyTableFrom(a_SrcLuaState, a_StackIdx, a_NumAllowedNestingLevels - 1))
+			{
+				LOGWARNING("%s: Failed to copy table in pos %d.", __FUNCTION__, a_StackIdx);
+				return false;
+			}
+			return true;
+		}
+		default:
+		{
+			LOGWARNING("%s: Unsupported value: '%s' at stack position %d. Can only copy numbers, strings, bools, classes and simple tables!",
+				__FUNCTION__, lua_typename(a_SrcLuaState, t), a_StackIdx
+			);
+			return false;
+		}
+	}
 }
 
 
