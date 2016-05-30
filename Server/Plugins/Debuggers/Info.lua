@@ -254,6 +254,12 @@ g_PluginInfo =
 			HelpString = "Tests the world scheduling",
 		},
 		
+		["testcall"] =
+		{
+			Handler = HandleConsoleTestCall,
+			HelpString = "Tests inter-plugin calls with various values"
+		},
+		
 		["testjson"] =
 		{
 			Handler = HandleConsoleTestJson,

@@ -1921,6 +1921,63 @@ end
 
 
 
+function HandleConsoleTestCall(a_Split, a_EntireCmd)
+	LOG("Testing inter-plugin calls")
+	LOG("Note: These will fail if the Core plugin is not enabled")
+	
+	-- Test calling the HandleConsoleWeather handler:
+	local pm = cPluginManager
+	LOG("Calling Core's HandleConsoleWeather")
+	local isSuccess = pm:CallPlugin("Core", "HandleConsoleWeather",
+		{
+			"/weather",
+			"rain",
+		}
+	)
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+	
+	-- Test injecting some code:
+	LOG("Injecting code into the Core plugin")
+	isSuccess = pm:CallPlugin("Core", "dofile", pm:GetCurrentPlugin():GetLocalFolder() .. "/Inject.lua")
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+	
+	-- Test the full capabilities of the table-passing API, using the injected function:
+	LOG("Calling injected code")
+	isSuccess = pm:CallPlugin("Core", "injectedPrintParams",
+		{
+			"test",
+			nil,
+			{
+				"test",
+				"test"
+			},
+			[10] = "test",
+			["test"] = "test",
+			[{"test"}] = "test",
+			[true] = "test",
+		}
+	)
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+
+	return true
+end
+
+
+
+
+
 function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	LOG("Testing Json parsing...")
 	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5] }]])

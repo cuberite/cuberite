@@ -419,10 +419,22 @@ public:
 	);
 
 	/** Copies objects on the stack from the specified state.
-	Only numbers, bools, strings and userdatas are copied.
+	Only numbers, bools, strings, API classes and simple tables containing these (recursively) are copied.
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
 	If successful, returns the number of objects copied.
 	If failed, returns a negative number and rewinds the stack position. */
-	int CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd);
+	int CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd, int a_NumAllowedNestingLevels = 16);
+
+	/** Copies a table at the specified stack index of the source Lua state to the top of this Lua state's stack.
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
+	Returns true if successful, false on failure.
+	Can copy only simple values - numbers, bools, strings and recursively simple tables. */
+	bool CopyTableFrom(cLuaState & a_SrcLuaState, int a_TableIdx, int a_NumAllowedNestingLevels);
+
+	/** Copies a single value from the specified stack index of the source Lua state to the top of this Lua state's stack.
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
+	Returns true if the value was copied, false on failure. */
+	bool CopySingleValueFrom(cLuaState & a_SrcLuaState, int a_StackIdx, int a_NumAllowedNestingLevels);
 
 	/** Reads the value at the specified stack position as a string and sets it to a_String. */
 	void ToString(int a_StackPos, AString & a_String);
