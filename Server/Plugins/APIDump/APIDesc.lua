@@ -5,7 +5,7 @@
 
 
 
-g_APIDesc =
+return
 {
 	Classes =
 	{

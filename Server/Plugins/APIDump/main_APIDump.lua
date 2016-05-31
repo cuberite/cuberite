@@ -47,6 +47,7 @@ end
 
 
 
+--- Returns the API currently detected from the global environment
 local function CreateAPITables()
 	--[[
 	We want an API table of the following shape:
@@ -133,8 +134,7 @@ local function CreateAPITables()
 		if (
 			(v ~= _G) and           -- don't want the global namespace
 			(v ~= _G.packages) and  -- don't want any packages
-			(v ~= _G[".get"]) and
-			(v ~= g_APIDesc)
+			(v ~= _G[".get"])
 		) then
 			if (type(v) == "table") then
 				local cls = ParseClass(i, v)
@@ -166,13 +166,16 @@ end
 
 
 
-local function WriteArticles(f)
+--- Writes links to articles in a bullet format into the output HTML file
+-- f is the output file stream
+-- a_APIDesc is the API description as read from APIDesc.lua
+local function WriteArticles(f, a_APIDesc)
 	f:write([[
 		<a name="articles"><h2>Articles</h2></a>
 		<p>The following articles provide various extra information on plugin development</p>
 		<ul>
 	]]);
-	for _, extra in ipairs(g_APIDesc.ExtraPages) do
+	for _, extra in ipairs(a_APIDesc.ExtraPages) do
 		local SrcFileName = g_PluginFolder .. "/" .. extra.FileName;
 		if (cFile:IsFile(SrcFileName)) then
 			local DstFileName = "API/" .. extra.FileName;
@@ -333,6 +336,11 @@ end
 
 
 
+--- Writes all hooks into HTML output file as links in a sorted bullet list, as well as the individual hook HTML files
+-- f is the output HTML index file
+-- a_Hooks is an array of hook descriptions
+-- a_UndocumentedHooks is a table that will be filled with the names of hooks that are not documented
+-- a_HookNav is the HTML code for the menu on the left that is constant for all hook pages
 local function WriteHooks(f, a_Hooks, a_UndocumentedHooks, a_HookNav)
 	f:write([[
 		<a name="hooks"><h2>Hooks</h2></a>
@@ -372,13 +380,16 @@ end
 
 
 
-local function ReadDescriptions(a_API)
+--- Fills the API in a_API table with descriptions from a_Desc
+-- a_API is the API detected from current global environment
+-- a_Desc is the description loaded from APIDesc.lua and Classes files
+local function ReadDescriptions(a_API, a_Desc)
 	-- Returns true if the class of the specified name is to be ignored
 	local function IsClassIgnored(a_ClsName)
-		if (g_APIDesc.IgnoreClasses == nil) then
+		if (a_Desc.IgnoreClasses == nil) then
 			return false;
 		end
-		for _, name in ipairs(g_APIDesc.IgnoreClasses) do
+		for _, name in ipairs(a_Desc.IgnoreClasses) do
 			if (a_ClsName:match(name)) then
 				return true;
 			end
@@ -388,15 +399,15 @@ local function ReadDescriptions(a_API)
 
 	-- Returns true if the function is to be ignored
 	local function IsFunctionIgnored(a_ClassName, a_FnName)
-		if (g_APIDesc.IgnoreFunctions == nil) then
+		if (a_Desc.IgnoreFunctions == nil) then
 			return false;
 		end
-		if (((g_APIDesc.Classes[a_ClassName] or {}).Functions or {})[a_FnName] ~= nil) then
+		if (((a_Desc.Classes[a_ClassName] or {}).Functions or {})[a_FnName] ~= nil) then
 			-- The function is documented, don't ignore
 			return false;
 		end
 		local FnName = a_ClassName .. "." .. a_FnName;
-		for _, name in ipairs(g_APIDesc.IgnoreFunctions) do
+		for _, name in ipairs(a_Desc.IgnoreFunctions) do
 			if (FnName:match(name)) then
 				return true;
 			end
@@ -406,10 +417,10 @@ local function ReadDescriptions(a_API)
 
 	-- Returns true if the constant (specified by its fully qualified name) is to be ignored
 	local function IsConstantIgnored(a_CnName)
-		if (g_APIDesc.IgnoreConstants == nil) then
+		if (a_Desc.IgnoreConstants == nil) then
 			return false;
 		end;
-		for _, name in ipairs(g_APIDesc.IgnoreConstants) do
+		for _, name in ipairs(a_Desc.IgnoreConstants) do
 			if (a_CnName:match(name)) then
 				return true;
 			end
@@ -419,10 +430,10 @@ local function ReadDescriptions(a_API)
 
 	-- Returns true if the member variable (specified by its fully qualified name) is to be ignored
 	local function IsVariableIgnored(a_VarName)
-		if (g_APIDesc.IgnoreVariables == nil) then
+		if (a_Desc.IgnoreVariables == nil) then
 			return false;
 		end;
-		for _, name in ipairs(g_APIDesc.IgnoreVariables) do
+		for _, name in ipairs(a_Desc.IgnoreVariables) do
 			if (a_VarName:match(name)) then
 				return true;
 			end
@@ -471,7 +482,7 @@ local function ReadDescriptions(a_API)
 			end
 		end
 
-		local APIDesc = g_APIDesc.Classes[cls.Name];
+		local APIDesc = a_Desc.Classes[cls.Name];
 		if (APIDesc ~= nil) then
 			APIDesc.IsExported = true;
 			cls.Desc = APIDesc.Desc;
@@ -722,7 +733,10 @@ end
 
 
 
-local function ReadHooks(a_Hooks)
+--- Fills the hooks in a_Hooks with their descriptions from a_Descs
+-- a_Hooks is an array of hooks detected from current global environment
+-- a_Descs is the description read from APIDesc.lua and Hooks files
+local function ReadHooks(a_Hooks, a_Descs)
 	--[[
 	a_Hooks = {
 		{ Name = "HOOK_1"},
@@ -732,7 +746,7 @@ local function ReadHooks(a_Hooks)
 	We want to add hook descriptions to each hook in this array
 	--]]
 	for _, hook in ipairs(a_Hooks) do
-		local HookDesc = g_APIDesc.Hooks[hook.Name];
+		local HookDesc = a_Descs.Hooks[hook.Name];
 		if (HookDesc ~= nil) then
 			for key, val in pairs(HookDesc) do
 				hook[key] = val;
@@ -996,6 +1010,10 @@ end
 
 
 
+--- Writes all classes into HTML output file as links in a sorted bullet list, as well as the individual class HTML files
+-- f is the output file
+-- a_API is the API detected from current environment enriched with descriptions
+-- a_ClassMenu is the HTML code for the menu on the left that is constant for all class pages
 local function WriteClasses(f, a_API, a_ClassMenu)
 	f:write([[
 		<a name="classes"><h2>Class index</h2></a>
@@ -1021,7 +1039,7 @@ local function ListUndocumentedObjects(API, UndocumentedHooks)
 	local f = io.open("API/_undocumented.lua", "w");
 	if (f ~= nil) then
 		f:write("\n-- This is the list of undocumented API objects, automatically generated by APIDump\n\n");
-		f:write("g_APIDesc =\n{\n\tClasses =\n\t{\n");
+		f:write("return\n{\n\tClasses =\n\t{\n");
 		for _, cls in ipairs(API) do
 			local HasFunctions = ((cls.UndocumentedFunctions ~= nil) and (#cls.UndocumentedFunctions > 0));
 			local HasConstants = ((cls.UndocumentedConstants ~= nil) and (#cls.UndocumentedConstants > 0));
@@ -1105,10 +1123,10 @@ end
 
 
 --- Lists the API objects that are documented but not available in the API:
-local function ListUnexportedObjects()
+local function ListUnexportedObjects(a_APIDesc)
 	f = io.open("API/_unexported-documented.txt", "w");
 	if (f ~= nil) then
-		for clsname, cls in pairs(g_APIDesc.Classes) do
+		for clsname, cls in pairs(a_APIDesc.Classes) do
 			if not(cls.IsExported) then
 				-- The whole class is not exported
 				f:write("class\t" .. clsname .. "\n");
@@ -1128,7 +1146,7 @@ local function ListUnexportedObjects()
 					end  -- for j, fn - cls.Functions[]
 				end
 			end
-		end  -- for i, cls - g_APIDesc.Classes[]
+		end  -- for i, cls - a_APIDesc.Classes[]
 		f:close();
 	end
 end
@@ -1252,7 +1270,7 @@ end
 
 
 
-local function DumpAPIHtml(a_API)
+local function DumpAPIHtml(a_API, a_Descs)
 	LOG("Dumping all available functions and constants to API subfolder...");
 
 	-- Create the output folder
@@ -1286,7 +1304,7 @@ local function DumpAPIHtml(a_API)
 			return (Hook1.Name < Hook2.Name);
 		end
 	);
-	ReadHooks(Hooks);
+	ReadHooks(Hooks, a_Descs);
 
 	-- Create a "class index" file, write each class as a link to that file,
 	-- then dump class contents into class-specific file
@@ -1342,7 +1360,7 @@ local function DumpAPIHtml(a_API)
 		<hr />
 	]]);
 
-	WriteArticles(f);
+	WriteArticles(f, a_Descs);
 	WriteClasses(f, a_API, ClassMenu);
 	WriteHooks(f, Hooks, UndocumentedHooks, HookNav);
 
@@ -1363,7 +1381,7 @@ local function DumpAPIHtml(a_API)
 	-- List the documentation problems:
 	LOG("Listing leftovers...");
 	ListUndocumentedObjects(a_API, UndocumentedHooks);
-	ListUnexportedObjects();
+	ListUnexportedObjects(a_Descs);
 	ListMissingPages();
 
 	WriteStats(f);
@@ -1614,18 +1632,20 @@ end
 
 
 --- Prepares the API and Globals tables containing the documentation
+-- Returns the API and Globals desc table, containing the Classes and Hooks subtables with descriptions,
+-- and the apiDesc table containing the descriptions only in their original format.
 local function PrepareApi()
 	-- Load the API descriptions from the Classes and Hooks subfolders:
 	-- This needs to be done each time the command is invoked because the export modifies the tables' contents
-	dofile(g_PluginFolder .. "/APIDesc.lua")
-	if (g_APIDesc.Classes == nil) then
-		g_APIDesc.Classes = {};
+	local apiDesc = dofile(g_PluginFolder .. "/APIDesc.lua")
+	if (apiDesc.Classes == nil) then
+		apiDesc.Classes = {};
 	end
-	if (g_APIDesc.Hooks == nil) then
-		g_APIDesc.Hooks = {};
+	if (apiDesc.Hooks == nil) then
+		apiDesc.Hooks = {};
 	end
-	LoadAPIFiles("/Classes/", g_APIDesc.Classes);
-	LoadAPIFiles("/Hooks/",   g_APIDesc.Hooks);
+	LoadAPIFiles("/Classes/", apiDesc.Classes);
+	LoadAPIFiles("/Hooks/",   apiDesc.Hooks);
 
 	-- Reset the stats:
 	g_TrackedPages = {};  -- List of tracked pages, to be checked later whether they exist. Each item is an array of referring pagenames.
@@ -1662,9 +1682,9 @@ local function PrepareApi()
 
 	-- Read in the descriptions:
 	LOG("Reading descriptions...");
-	ReadDescriptions(API);
+	ReadDescriptions(API, apiDesc);
 
-	return API, Globals
+	return API, Globals, apiDesc
 end
 
 
@@ -1675,13 +1695,13 @@ local function DumpApi()
 	LOG("Dumping the API...")
 
 	-- Match the currently exported API with the available documentation:
-	local API, Globals = PrepareApi()
+	local API, Globals, descs = PrepareApi()
 
 	-- Check that the API lists the inheritance properly, report any problems to a file:
 	CheckAPIDescendants(API)
 
 	-- Dump all available API objects in HTML format into a subfolder:
-	DumpAPIHtml(API);
+	DumpAPIHtml(API, descs);
 
 	-- Dump all available API objects in format used by ZeroBraneStudio API descriptions:
 	DumpAPIZBS(API)
@@ -1737,18 +1757,20 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	end
 
 	-- Load the API stats as a Lua file, process into usable dictionary:
+	-- The _undocumented.lua file format has changed from "g_APIDesc = {}" to "return {}"
+	-- To support both versions, we execute the function in a sandbox and check both its return value and the sandbox globals
 	local Loaded, Msg = loadstring(OfficialStats)
 	if not(Loaded) then
 		return true, "Cannot load official stats: " .. (Msg or "<unknown error>")
 	end
-	local OfficialStatsDict = {}
-	setfenv(Loaded, OfficialStatsDict)
-	local IsSuccess, ErrMsg = pcall(Loaded)
+	local sandbox = {}
+	setfenv(Loaded, sandbox)
+	local IsSuccess, OfficialUndocumented = pcall(Loaded)
 	if not(IsSuccess) then
-		return true, "Cannot parse official stats: " .. tostring(ErrMsg or "<unknown error>")
+		return true, "Cannot parse official stats: " .. tostring(OfficialUndocumented or "<unknown error>")
 	end
 	local Parsed = {}
-	for clsK, clsV in pairs(OfficialStatsDict.g_APIDesc.Classes) do
+	for clsK, clsV in pairs((sandbox.g_APIDesc or OfficialUndocumented).Classes) do  -- Check return value OR sandbox global, whichever is present
 		local cls =
 		{
 			Desc = not(clsV.Desc),  -- set to true if the Desc was not documented in the official docs
