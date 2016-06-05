@@ -60,6 +60,11 @@ public:
 		return true;
 	}
 
+	inline static bool IsOn(NIBBLETYPE a_Meta)
+	{
+		return ((a_Meta & 0x8) == 0x8);
+	}
+
 	inline static Vector3i GetSideCoordinate(const Vector3i & a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
 	{
 		auto Position = a_Position;

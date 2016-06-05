@@ -99,22 +99,42 @@ public:
 
 	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
 	{
+		// Note that a_PoweringData here contains the maximum *side* power level, as specified by GetValidSourcePositions
 		// LOGD("Evaluating ALU the comparator (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		auto Data = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData();
+		auto DelayInfo = Data->GetMechanismDelayInfo(a_Position);
 
-		if (GetPowerLevel(a_Position, a_BlockType, a_Meta) > 0)
+		// Delay is used here to prevent an infinite loop (#3168)
+		if (DelayInfo == nullptr)
 		{
-			m_World.SetBlockMeta(a_Position, a_Meta | 0x8);
+			auto Power = GetFrontPowerLevel(a_Position, a_BlockType, a_Meta, a_PoweringData.PowerLevel);
+			auto PreviousFrontPower = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, Power));
+
+			bool ShouldBeOn = (GetPowerLevel(a_Position, a_BlockType, a_Meta) > 0);  // Provide visual indication by examining *rear* power level
+			bool ShouldUpdate = (Power != PreviousFrontPower.PowerLevel);  // "Business logic" (:P) - determine by examining *side* power levels
+
+			if (ShouldUpdate || (ShouldBeOn != cBlockComparatorHandler::IsOn(a_Meta)))
+			{
+				Data->m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeOn);
+			}
 		}
 		else
 		{
-			m_World.SetBlockMeta(a_Position, a_Meta & 0x7);
-		}
+			int DelayTicks;
+			bool ShouldPowerOn;
+			std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
 
-		auto Power = GetFrontPowerLevel(a_Position, a_BlockType, a_Meta, a_PoweringData.PowerLevel);
-		auto PreviousFrontPower = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, Power));
-		if (Power != PreviousFrontPower.PowerLevel)
-		{
-			return GetAdjustedRelatives(a_Position, GetRelativeLaterals());
+			if (DelayTicks == 0)
+			{
+				m_World.SetBlockMeta(a_Position, ShouldPowerOn ? (a_Meta | 0x8) : (a_Meta & 0x7));
+				Data->m_MechanismDelays.erase(a_Position);
+
+				// Assume that an update (to front power) is needed.
+				// Note: potential inconsistencies will arise as power data is updated before-delay due to limitations of the power data caching functionality (only stores one bool)
+				// This means that other mechanisms like wires may get our new power data before our delay has finished
+				// This also means that we have to manually update ourselves to be aware of any changes that happened in the previous redstone tick
+				return StaticAppend(GetAdjustedRelatives(a_Position, GetRelativeLaterals()), { a_Position });
+			}
 		}
 
 		return {};
