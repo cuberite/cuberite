@@ -63,20 +63,25 @@ public:
 	/** Returns true if the specified point is inside the bounding box specified by its min / max corners */
 	static bool IsInside(const Vector3d & a_Min, const Vector3d & a_Max, double a_X, double a_Y, double a_Z);
 
-	/** Returns true if this bounding box is intersected by the line specified by its two points
-	Also calculates the distance along the line in which the intersection occurs (0 .. 1)
-	Only forward collisions (a_LineCoeff >= 0) are returned. */
-	bool CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face);
-
-	/** Returns true if the specified bounding box is intersected by the line specified by its two points
-	Also calculates the distance along the line in which the intersection occurs (0 .. 1) and the face hit (BLOCK_FACE_ constants)
-	Only forward collisions (a_LineCoeff >= 0) are returned. */
-	static bool CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face);
-
 	// tolua_end
 
-	/** Calculates the intersection of the two bounding boxes; returns true if nonempty */
-	bool Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Intersection);
+	/** Returns true if this bounding box is intersected by the line specified by its two points
+	Also calculates the distance along the line in which the intersection occurs, and the face hit (BLOCK_FACE_ constants)
+	Only forward collisions (a_LineCoeff >= 0) are returned.
+	Exported to Lua manually, because ToLua++ would generate needless input params (a_LineCoeff, a_Face). */
+	bool CalcLineIntersection(const Vector3d & a_LinePoint1, const Vector3d & a_LinePoint2, double & a_LineCoeff, eBlockFace & a_Face) const;
+
+	/** Returns true if the specified bounding box is intersected by the line specified by its two points
+	Also calculates the distance along the line in which the intersection occurs, and the face hit (BLOCK_FACE_ constants)
+	Only forward collisions (a_LineCoeff >= 0) are returned.
+	Exported to Lua manually, because ToLua++ would generate needless input params (a_LineCoeff, a_Face). */
+	static bool CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_LinePoint1, const Vector3d & a_LinePoint2, double & a_LineCoeff, eBlockFace & a_Face);
+
+	/** Calculates the intersection of the two bounding boxes; returns true if nonempty.
+	Exported manually, because ToLua++ would generate needless input params (a_Intersection). */
+	bool Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Intersection) const;
+
+	// tolua_begin
 
 	double GetMinX(void) const { return m_Min.x; }
 	double GetMinY(void) const { return m_Min.y; }
@@ -88,6 +93,8 @@ public:
 
 	const Vector3d & GetMin(void) const { return m_Min; }
 	const Vector3d & GetMax(void) const { return m_Max; }
+
+	// tolua_end
 
 protected:
 	Vector3d m_Min;

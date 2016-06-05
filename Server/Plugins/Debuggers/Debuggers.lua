@@ -1921,6 +1921,52 @@ end
 
 
 
+function HandleConsoleTestBbox(a_Split, a_EntireCmd)
+	-- Test bbox intersection:
+	local bbox1 = cBoundingBox(0, 5, 0, 5, 0, 5)
+	local bbox2 = cBoundingBox(bbox1)  -- Make a copy
+	bbox2:Move(20, 20, 20)
+	local bbox3 = cBoundingBox(bbox1)  -- Make a copy
+	bbox3:Move(2, 2, 2)
+	local doesIntersect, intersection = bbox1:Intersect(bbox2)
+	LOG("Bbox 2 intersection: " .. tostring(doesIntersect))
+	LOG("  Intersection type: " .. type(intersection) .. " / " .. tolua.type(intersection))
+	if (intersection) then
+		LOG("  {" .. intersection:GetMinX() .. ", " .. intersection:GetMinY() .. ", " .. intersection:GetMinZ() .. "}")
+		LOG("  {" .. intersection:GetMaxX() .. ", " .. intersection:GetMaxY() .. ", " .. intersection:GetMaxZ() .. "}")
+	end
+	doesIntersect, intersection = bbox1:Intersect(bbox3)
+	LOG("Bbox 3 intersection: " .. tostring(doesIntersect))
+	LOG("  Intersection type: " .. type(intersection) .. " / " .. tolua.type(intersection))
+	if (intersection) then
+		LOG("  {" .. intersection:GetMinX() .. ", " .. intersection:GetMinY() .. ", " .. intersection:GetMinZ() .. "}")
+		LOG("  {" .. intersection:GetMaxX() .. ", " .. intersection:GetMaxY() .. ", " .. intersection:GetMaxZ() .. "}")
+	end
+	
+	-- Test line intersection:
+	local lines =
+	{
+		{ Vector3d(5, 0, 5), Vector3d(5, 1, 5) },
+		{ Vector3d(0, 0, 0), Vector3d(0, 1, 0) },
+	}
+	for idx, line in ipairs(lines) do
+		local doesIntersect, coeff, face = bbox2:CalcLineIntersection(line[1], line[2])
+		LOG("Line " .. idx .. " intersection: " .. tostring(doesIntersect))
+		LOG("  Coeff: " .. tostring(coeff))
+		LOG("  Face: " .. tostring(face))
+		local doesIntersect2, coeff2, face2 = cBoundingBox:CalcLineIntersection(bbox2:GetMin(), bbox2:GetMax(), line[1], line[2])
+		assert(doesIntersect == doesIntersect2)
+		assert(coeff == coeff2)
+		assert(face == face2)
+	end
+	
+	return true
+end
+
+
+
+
+
 function HandleConsoleTestCall(a_Split, a_EntireCmd)
 	LOG("Testing inter-plugin calls")
 	LOG("Note: These will fail if the Core plugin is not enabled")

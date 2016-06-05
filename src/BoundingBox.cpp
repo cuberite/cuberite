@@ -261,7 +261,7 @@ bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, doub
 
 
 
-bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face)
+bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face) const
 {
 	return CalcLineIntersection(m_Min, m_Max, a_Line1, a_Line2, a_LineCoeff, a_Face);
 }
@@ -336,7 +336,7 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 
 
 
-bool cBoundingBox::Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Intersection)
+bool cBoundingBox::Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Intersection) const
 {
 	a_Intersection.m_Min.x = std::max(m_Min.x, a_Other.m_Min.x);
 	a_Intersection.m_Max.x = std::min(m_Max.x, a_Other.m_Max.x);
