@@ -60,6 +60,11 @@ public:
 		return true;
 	}
 
+	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
+	{
+		return ((a_Meta & 0x4) == 0x4);
+	}
+
 	inline static bool IsOn(NIBBLETYPE a_Meta)
 	{
 		return ((a_Meta & 0x8) == 0x8);
