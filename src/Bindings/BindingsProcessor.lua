@@ -129,6 +129,8 @@ function parser_hook(a_Code)
 			local curr = classContainer.curr
 			if (curr.n and (curr.n > 0)) then
 				curr[curr.n].next_DoxyComment = g_ForwardDoxyComments[tonumber(comment:sub(2, -2))]
+			else
+				curr.first_child_DoxyComment = g_ForwardDoxyComments[tonumber(comment:sub(2, -2))]
 			end
 			return strsub(a_Code, e + 1)
 		end
@@ -368,6 +370,9 @@ local function outputClassFunctionDocs(a_File, a_Class, a_Functions)
 				a_File:write("\t\t\t\t\t\t{\n\t\t\t\t\t\t\tType = \"", ret.Type, "\",\n\t\t\t\t\t\t},\n")
 			end
 			a_File:write("\t\t\t\t\t},\n")
+			if (desc.IsStatic) then
+				a_File:write("\t\t\t\t\tIsStatic = true,\n")
+			end
 			if (desc.DoxyComment) then
 				a_File:write("\t\t\t\t\tDesc = ", string.format("%q", desc.DoxyComment), ",\n")
 			end
@@ -577,9 +582,15 @@ end
 
 
 
---- Recursively applies the next_DoxyComment member to the next item in the container
+--- Recursively applies the next_DoxyComment member to the next item, and first_child_DoxyComment to first child item in the container.
 -- a_Container is the ToLua++'s table potentially containing children as its array members
 local function applyNextDoxyComments(a_Container)
+	-- Apply the DoxyComment to the first child, if appropriate:
+	if (a_Container[1] and a_Container.first_child_DoxyComment) then
+		a_Container[1].DoxyComment = a_Container.first_child_DoxyComment
+	end
+
+	-- Apply each child's next_DoxyComment to the actual next child:
 	local i = 1
 	while (a_Container[i]) do
 		if (a_Container[i].next_DoxyComment) then
@@ -613,7 +624,10 @@ local function genPackageDocs(a_Self)
 	local i = 1
 	local filenames = {}
 	while (a_Self[i]) do
-		if (a_Self[i].genDocs) then
+		if (
+			a_Self[i]:check_public_access() and  -- Do not export private and protected members
+			a_Self[i].genDocs
+		) then
 			a_Self[i]:genDocs(filenames)
 		end
 		i = i + 1
@@ -665,7 +679,10 @@ local function genClassDocs(a_Self, a_Filenames)
 	local variables = {}
 	local constants = {}
 	while (a_Self[i]) do
-		if (a_Self[i].genMemberDocs) then
+		if (
+			a_Self[i]:check_public_access() and  -- Don't export private and protected members
+			a_Self[i].genMemberDocs
+		) then
 			a_Self[i]:genMemberDocs(functions, variables, constants)
 		end
 		i = i + 1
@@ -747,6 +764,10 @@ local function genFunctionMemberDocs(a_Self, a_Functions, a_Variables, a_Constan
 		Parameters = parseFunctionParameters(a_Self),
 		Returns = parseFunctionReturns(a_Self),
 	}
+	local _, _, hasStatic = string.find(a_Self.mod, "^%s*(static)")
+	if (hasStatic) then
+		desc.IsStatic = true
+	end
 	table.insert(fn, desc)
 end
 
@@ -805,6 +826,15 @@ end
 -- a_Package is ToLua++'s classPackage object
 function pre_output_hook(a_Package)
 	OutputLuaStateHelpers(a_Package)
+
+	-- Generate the documentation:
+	-- (must generate documentation before ToLua++ writes the bindings, because "static" information is lost at that point)
+	local isSuccess, msg = generateDocs(a_Package)
+	if not(isSuccess) then
+		print("API docs haven't been generated due to an error: " .. (msg or "<no message>"))
+	else
+		print("API docs have been generated.");
+	end
 end
 
 
@@ -815,15 +845,7 @@ end
 -- Called by ToLua++ after writing its generated files.
 -- a_Package is ToLua++'s classPackage object
 function post_output_hook(a_Package)
-	-- Generate the documentation:
-	local isSuccess, msg = generateDocs(a_Package)
-	if not(isSuccess) then
-		print("Lua bindings have been generated.")
-		print("API docs haven't been generated due to an error: " .. (msg or "<no message>"))
-		return
-	end
-	
-	print("Lua bindings and docs have been generated.")
+	print("Lua bindings have been generated.")
 end
 
 
@@ -855,7 +877,7 @@ function preprocess_hook(a_Package)
 				g_BackwardDoxyComments.n = n
 				return "\19" .. n .."\20\n"
 			end
-		)
+		)  -- Replace ///< comments with an ID into a lookup table wrapped in DC3 and DC4
 	local f = io.open("code_out.cpp", "wb")
 	f:write(a_Package.code)
 	f:close()
