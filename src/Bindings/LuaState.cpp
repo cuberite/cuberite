@@ -1656,6 +1656,7 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 			case LUA_TNUMBER:        Printf(Value, "%f", static_cast<double>(lua_tonumber(a_LuaState, i))); break;
 			case LUA_TSTRING:        Printf(Value, "%s", lua_tostring(a_LuaState, i)); break;
 			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
+			case LUA_TUSERDATA:      Printf(Value, "%p (%s)", lua_touserdata(a_LuaState, i), tolua_typename(a_LuaState, i)); break;
 			default: break;
 		}
 		LOGD("  Idx %d: type %d (%s) %s", i, Type, lua_typename(a_LuaState, Type), Value.c_str());
