@@ -785,10 +785,10 @@ local function genVariableMemberDocs(a_Self, a_Functions, a_Variables, a_Constan
 		DoxyComment = a_Self.DoxyComment,
 	}
 	
-	if (a_Self.csetname) then
-		a_Variables[a_Self.lname] = desc
-	else
+	if (string.find(a_Self.type,'const%s+') or string.find(a_Self.mod, 'tolua_readonly') or string.find(a_Self.mod, 'tolua_inherits'))  then
 		a_Constants[a_Self.lname] = desc
+	else
+		a_Variables[a_Self.lname] = desc
 	end
 end
 
