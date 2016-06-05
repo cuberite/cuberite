@@ -85,6 +85,7 @@ local function OutputLuaStateHelpers(a_Package)
 		f:write("\n\n\n\n\n")
 		for _, item in ipairs(types) do
 			f:write("typedef " .. item.name .. " * Ptr" .. item.lname .. ";\n")
+			f:write("typedef const " .. item.name .. " * ConstPtr" .. item.lname .. ";\n")
 		end
 		f:write("\n\n\n\n\n")
 		f:close()
@@ -104,6 +105,7 @@ local function OutputLuaStateHelpers(a_Package)
 		end
 		for _, item in ipairs(types) do
 			f:write("bool GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal);\n")
+			f:write("bool GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal);\n")
 		end
 		f:write("\n\n\n\n\n")
 		f:close()
@@ -135,6 +137,19 @@ local function OutputLuaStateHelpers(a_Package)
 			f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"" .. item.name .. "\", false, &err))\n")
 			f:write("\t{\n")
 			f:write("\t\ta_ReturnedVal = *(reinterpret_cast<" .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
+			f:write("\t\treturn true;\n");
+			f:write("\t}\n")
+			f:write("\treturn false;\n")
+			f:write("}\n\n\n\n\n\n")
+
+			f:write("bool cLuaState::GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal)\n{\n\tASSERT(IsValid());\n")
+			f:write("\tif (lua_isnil(m_LuaState, a_StackPos))\n\t{\n")
+			f:write("\t\ta_ReturnedVal = nullptr;\n")
+			f:write("\t\treturn false;\n\t}\n")
+			f:write("\ttolua_Error err;\n")
+			f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"const " .. item.name .. "\", false, &err))\n")
+			f:write("\t{\n")
+			f:write("\t\ta_ReturnedVal = *(reinterpret_cast<const " .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
 			f:write("\t\treturn true;\n");
 			f:write("\t}\n")
 			f:write("\treturn false;\n")

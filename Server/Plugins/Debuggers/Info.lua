@@ -254,6 +254,12 @@ g_PluginInfo =
 			HelpString = "Tests the world scheduling",
 		},
 		
+		["testbbox"] =
+		{
+			Handler = HandleConsoleTestBbox,
+			HelpString = "Tests cBoundingBox API"
+		},
+
 		["testcall"] =
 		{
 			Handler = HandleConsoleTestCall,
