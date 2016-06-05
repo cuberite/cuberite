@@ -1,11 +1,11 @@
 version: 1.0.{build}
 configuration: Debug
-clone_depth: 50
+clone_depth: 1
 before_build:
 - echo %TIME%
 - git submodule update --init
 - echo %TIME%
-- cmake -G "Visual Studio 12" .
+- cmake .
 - echo %TIME%
 build:
   project: Cuberite.sln
