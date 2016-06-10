@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "Network.h"
 #include "event2/util.h"
-#include "../SelfTests.h"
 
 #ifdef _WIN32
 	#include <IPHlpApi.h>

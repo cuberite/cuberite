@@ -22,7 +22,6 @@
 #include "IniFile.h"
 #include "SettingsRepositoryInterface.h"
 #include "OverridesSettingsRepository.h"
-#include "SelfTests.h"
 #include "Logger.h"
 
 #include <iostream>
@@ -126,11 +125,6 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	#ifdef BUILD_ID
 		LOG("Cuberite " BUILD_SERIES_NAME " build id: " BUILD_ID);
 		LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
-	#endif
-
-	// Run the self-tests registered previously via cSelfTests::Register():
-	#ifdef SELF_TEST
-		cSelfTests::ExecuteAll();
 	#endif
 
 	cDeadlockDetect dd;
