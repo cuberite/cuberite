@@ -445,7 +445,7 @@ void GetLargeAppleTreeBranch(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Bra
 			return;
 		}
 		Direction -= a_Direction;
-		Direction.clamp(-1.0, 1.0);
+		Direction.Clamp(-1.0, 1.0);
 		a_LogBlocks.push_back(sSetBlock(FloorC(CurrentPos.x), FloorC(CurrentPos.y), FloorC(CurrentPos.z), E_BLOCK_LOG, GetLogMetaFromDirection(E_META_LOG_APPLE, Direction)));
 	}
 }
@@ -456,7 +456,7 @@ void GetLargeAppleTreeBranch(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Bra
 
 NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction)
 {
-	a_Direction.abs();
+	a_Direction.Abs();
 
 	if ((a_Direction.y > a_Direction.x) && (a_Direction.y > a_Direction.z))
 	{
