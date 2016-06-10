@@ -1600,55 +1600,6 @@ static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
 
 
 
-static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
-{
-	// Function signature: cPlayer:OpenWindow(Window)
-
-	// Retrieve the plugin instance from the Lua state
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
-	if (Plugin == nullptr)
-	{
-		return 0;
-	}
-
-	// Get the parameters:
-	cPlayer * self = reinterpret_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
-	cWindow * wnd  = reinterpret_cast<cWindow *>(tolua_tousertype(tolua_S, 2, nullptr));
-	if ((self == nullptr) || (wnd == nullptr))
-	{
-		LOGWARNING("%s: invalid self (%p) or wnd (%p)", __FUNCTION__, static_cast<void *>(self), static_cast<void *>(wnd));
-		return 0;
-	}
-
-	// If cLuaWindow, add a reference, so that Lua won't delete the cLuaWindow object mid-processing
-	tolua_Error err;
-	if (tolua_isusertype(tolua_S, 2, "cLuaWindow", 0, &err))
-	{
-		cLuaWindow * LuaWnd = reinterpret_cast<cLuaWindow *>(wnd);
-		// Only if not already referenced
-		if (!LuaWnd->IsLuaReferenced())
-		{
-			int LuaRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-			if (LuaRef == LUA_REFNIL)
-			{
-				LOGWARNING("%s: Cannot create a window reference. Cannot open window \"%s\".",
-					__FUNCTION__, wnd->GetWindowTitle().c_str()
-				);
-				return 0;
-			}
-			LuaWnd->SetLuaRef(Plugin, LuaRef);
-		}
-	}
-
-	// Open the window
-	self->OpenWindow(wnd);
-	return 0;
-}
-
-
-
-
-
 static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 {
 	// Function signature: cPlayer:PermissionMatches(PermissionStr, TemplateStr) -> bool
@@ -1679,36 +1630,25 @@ static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 
 template <
 	class OBJTYPE,
-	void (OBJTYPE::*SetCallback)(cPluginLua * a_Plugin, int a_FnRef)
+	void (OBJTYPE::*SetCallback)(cLuaState::cCallbackPtr a_CallbackFn)
 >
 static int tolua_SetObjectCallback(lua_State * tolua_S)
 {
 	// Function signature: OBJTYPE:SetWhateverCallback(CallbackFunction)
 
-	// Retrieve the plugin instance from the Lua state
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
-	if (Plugin == nullptr)
-	{
-		// Warning message has already been printed by GetLuaPlugin(), bail out silently
-		return 0;
-	}
-
 	// Get the parameters - self and the function reference:
-	OBJTYPE * self = reinterpret_cast<OBJTYPE *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cLuaState L(tolua_S);
+	OBJTYPE * self;
+	cLuaState::cCallbackPtr callback;
+	if (!L.GetStackValues(1, self, callback))
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
-		return 0;
-	}
-	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);  // Store function reference for later retrieval
-	if (FnRef == LUA_REFNIL)
-	{
-		LOGERROR("%s: Cannot create a function reference. Callback not set.", __FUNCTION__);
+		LOGWARNING("%s: Cannot get parameters", __FUNCTION__);
+		L.LogStackTrace();
 		return 0;
 	}
 
 	// Set the callback
-	(self->*SetCallback)(Plugin, FnRef);
+	(self->*SetCallback)(callback);
 	return 0;
 }
 
@@ -2800,6 +2740,79 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 
 
+static int tolua_cLuaWindow_new(lua_State * tolua_S)
+{
+	// Function signature:
+	// cLuaWindow:new(type, slotsX, slotsY, title)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cLuaWindow") ||
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamString(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Read params:
+	int windowType, slotsX, slotsY;
+	AString title;
+	if (!L.GetStackValues(2, windowType, slotsX, slotsY, title))
+	{
+		LOGWARNING("%s: Cannot read Lua parameters", __FUNCTION__);
+		L.LogStackValues();
+		L.LogStackTrace();
+	}
+
+	// Create the window and return it:
+	L.Push(new cLuaWindow(L, static_cast<cLuaWindow::WindowType>(windowType), slotsX, slotsY, title));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cLuaWindow_new_local(lua_State * tolua_S)
+{
+	// Function signature:
+	// cLuaWindow:new(type, slotsX, slotsY, title)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserTable(1, "cLuaWindow") ||
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamString(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Read params:
+	int windowType, slotsX, slotsY;
+	AString title;
+	if (!L.GetStackValues(2, windowType, slotsX, slotsY, title))
+	{
+		LOGWARNING("%s: Cannot read Lua parameters", __FUNCTION__);
+		L.LogStackValues();
+		L.LogStackTrace();
+	}
+
+	// Create the window, register it for GC and return it:
+	L.Push(new cLuaWindow(L, static_cast<cLuaWindow::WindowType>(windowType), slotsX, slotsY, title));
+	tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cRoot_GetBuildCommitID(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -3343,7 +3356,7 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 		const cBoundingBox * bbox;
 		if (!L.GetStackValues(1, bbox, pt1, pt2))  // Try the regular signature
 		{
-			L.LogStack();
+			L.LogStackValues();
 			tolua_error(a_LuaState, "Invalid function params. Expected either bbox:CalcLineIntersection(pt1, pt2) or cBoundingBox:CalcLineIntersection(min, max, pt1, pt2).", nullptr);
 			return 0;
 		}
@@ -3373,7 +3386,7 @@ static int tolua_cBoundingBox_Intersect(lua_State * a_LuaState)
 	const cBoundingBox * other;
 	if (!L.GetStackValues(1, self, other))
 	{
-		L.LogStack();
+		L.LogStackValues();
 		tolua_error(a_LuaState, "Invalid function params. Expected bbox:Intersect(otherBbox).", nullptr);
 		return 0;
 	}
@@ -3746,6 +3759,9 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cLuaWindow");
+			tolua_function(tolua_S, "new",              tolua_cLuaWindow_new);
+			tolua_function(tolua_S, "new_local",        tolua_cLuaWindow_new_local);
+			tolua_function(tolua_S, ".call",            tolua_cLuaWindow_new_local);
 			tolua_function(tolua_S, "SetOnClosing",     tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnClosing>);
 			tolua_function(tolua_S, "SetOnSlotChanged", tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnSlotChanged>);
 		tolua_endmodule(tolua_S);
@@ -3766,7 +3782,6 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cPlayer");
 			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);
 			tolua_function(tolua_S, "GetRestrictions",   tolua_cPlayer_GetRestrictions);
-			tolua_function(tolua_S, "OpenWindow",        tolua_cPlayer_OpenWindow);
 			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
 		tolua_endmodule(tolua_S);
 

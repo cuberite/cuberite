@@ -180,6 +180,25 @@ bool cLuaState::cCallback::IsValid(void)
 
 
 
+bool cLuaState::cCallback::IsSameLuaState(cLuaState & a_LuaState)
+{
+	cCSLock lock(m_CS);
+	if (!m_Ref.IsValid())
+	{
+		return false;
+	}
+	auto canonState = a_LuaState.QueryCanonLuaState();
+	if (canonState == nullptr)
+	{
+		return false;
+	}
+	return (m_Ref.GetLuaState() == static_cast<lua_State *>(*canonState));
+}
+
+
+
+
+
 void cLuaState::cCallback::Invalidate(void)
 {
 	cCSLock Lock(m_CS);
@@ -913,6 +932,18 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 
 	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value.count()));
 	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Pop(int a_NumValuesToPop)
+{
+	ASSERT(IsValid());
+
+	lua_pop(m_LuaState, a_NumValuesToPop);
+	m_NumCurrentFunctionArgs -= a_NumValuesToPop;
 }
 
 
@@ -1748,16 +1779,16 @@ void cLuaState::ToString(int a_StackPos, AString & a_String)
 
 
 
-void cLuaState::LogStack(const char * a_Header)
+void cLuaState::LogStackValues(const char * a_Header)
 {
-	LogStack(m_LuaState, a_Header);
+	LogStackValues(m_LuaState, a_Header);
 }
 
 
 
 
 
-void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
+void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 {
 	// Format string consisting only of %s is used to appease the compiler
 	LOG("%s", (a_Header != nullptr) ? a_Header : "Lua C API Stack contents:");
@@ -1777,6 +1808,21 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 		}
 		LOGD("  Idx %d: type %d (%s) %s", i, Type, lua_typename(a_LuaState, Type), Value.c_str());
 	}  // for i - stack idx
+}
+
+
+
+
+
+cLuaState * cLuaState::QueryCanonLuaState(void)
+{
+	// Get the CanonLuaState global from Lua:
+	auto cb = WalkToNamedGlobal(g_CanonLuaStateGlobalName);
+	if (!cb.IsValid())
+	{
+		return nullptr;
+	}
+	return reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
 }
 
 
@@ -1820,17 +1866,16 @@ int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
 void cLuaState::TrackCallback(cCallback & a_Callback)
 {
 	// Get the CanonLuaState global from Lua:
-	auto cb = WalkToNamedGlobal(g_CanonLuaStateGlobalName);
-	if (!cb.IsValid())
+	auto canonState = QueryCanonLuaState();
+	if (canonState == nullptr)
 	{
 		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
 		return;
 	}
-	auto & canonState = *reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
 
 	// Add the callback:
-	cCSLock Lock(canonState.m_CSTrackedCallbacks);
-	canonState.m_TrackedCallbacks.push_back(&a_Callback);
+	cCSLock Lock(canonState->m_CSTrackedCallbacks);
+	canonState->m_TrackedCallbacks.push_back(&a_Callback);
 }
 
 
@@ -1840,17 +1885,16 @@ void cLuaState::TrackCallback(cCallback & a_Callback)
 void cLuaState::UntrackCallback(cCallback & a_Callback)
 {
 	// Get the CanonLuaState global from Lua:
-	auto cb = WalkToNamedGlobal(g_CanonLuaStateGlobalName);
-	if (!cb.IsValid())
+	auto canonState = QueryCanonLuaState();
+	if (canonState == nullptr)
 	{
 		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
 		return;
 	}
-	auto & canonState = *reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
 
 	// Remove the callback:
-	cCSLock Lock(canonState.m_CSTrackedCallbacks);
-	auto & trackedCallbacks = canonState.m_TrackedCallbacks;
+	cCSLock Lock(canonState->m_CSTrackedCallbacks);
+	auto & trackedCallbacks = canonState->m_TrackedCallbacks;
 	trackedCallbacks.erase(std::remove_if(trackedCallbacks.begin(), trackedCallbacks.end(),
 		[&a_Callback](cCallback * a_StoredCallback)
 		{
