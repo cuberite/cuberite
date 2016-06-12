@@ -91,13 +91,15 @@ src/AllFiles.lst
 *.opendb
 *.idb
 
-# cmake output folders
+# cmake output folders and files
 ZERO_CHECK.dir/
 Debug/
 DebugProfile/
 Release/
 ReleaseProfile/
 *.dir/
+CPackConfig.cmake
+CPackSourceConfig.cmake
 
 # APIDump-generated status files:
 Server/cuberite_api.lua

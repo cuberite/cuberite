@@ -37,6 +37,7 @@
 #include "../CommandOutput.h"
 #include "../BuildInfo.h"
 #include "../HTTP/UrlParser.h"
+#include "../BoundingBox.h"
 
 
 
@@ -2756,6 +2757,30 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 
 
 
+static int tolua_cScoreboard_GetTeamNames(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cScoreboard") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the groups:
+	cScoreboard * Scoreboard = reinterpret_cast<cScoreboard *>(tolua_tousertype(L, 1, nullptr));
+	AStringVector Teams = Scoreboard->GetTeamNames();
+
+	// Push the results:
+	S.Push(Teams);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 {
 	// function cHopperEntity::GetOutputBlockPos()
@@ -3119,6 +3144,80 @@ static int tolua_cBlockArea_SaveToSchematicString(lua_State * tolua_S)
 
 
 
+static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	bbox:CalcLineIntersection(pt1, pt2) -> bool, [number, blockface]
+	cBoundingBox:CalcLineIntersection(min, max, pt1, pt2) -> bool, [number, blockface]
+	*/
+	cLuaState L(a_LuaState);
+	const Vector3d * min;
+	const Vector3d * max;
+	const Vector3d * pt1;
+	const Vector3d * pt2;
+	double lineCoeff;
+	eBlockFace blockFace;
+	bool res;
+	if (L.GetStackValues(2, min, max, pt1, pt2))  // Try the static signature first
+	{
+		res = cBoundingBox::CalcLineIntersection(min, max, pt1, pt2, lineCoeff, blockFace);
+	}
+	else
+	{
+		const cBoundingBox * bbox;
+		if (!L.GetStackValues(1, bbox, pt1, pt2))  // Try the regular signature
+		{
+			L.LogStack();
+			tolua_error(a_LuaState, "Invalid function params. Expected either bbox:CalcLineIntersection(pt1, pt2) or cBoundingBox:CalcLineIntersection(min, max, pt1, pt2).", nullptr);
+			return 0;
+		}
+		res = bbox->CalcLineIntersection(pt1, pt2, lineCoeff, blockFace);
+	}
+	L.Push(res);
+	if (res)
+	{
+		L.Push(lineCoeff);
+		L.Push(blockFace);
+		return 3;
+	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cBoundingBox_Intersect(lua_State * a_LuaState)
+{
+	/* Function signature:
+	bbox:Intersect(a_OtherBbox) -> bool, cBoundingBox
+	*/
+	cLuaState L(a_LuaState);
+	const cBoundingBox * self;
+	const cBoundingBox * other;
+	if (!L.GetStackValues(1, self, other))
+	{
+		L.LogStack();
+		tolua_error(a_LuaState, "Invalid function params. Expected bbox:Intersect(otherBbox).", nullptr);
+		return 0;
+	}
+	auto intersection = new cBoundingBox(*self);
+	auto res = self->Intersect(*other, *intersection);
+	L.Push(res);
+	if (!res)
+	{
+		delete intersection;
+		return 1;
+	}
+	L.Push(intersection);
+	tolua_register_gc(L, lua_gettop(L));  // Make Lua own the "intersection" object
+	return 2;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 {
 	// function cCompositeChat:AddRunCommandPart(Message, Command, [Style])
@@ -3407,6 +3506,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "SaveToSchematicString",   tolua_cBlockArea_SaveToSchematicString);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cBoundingBox");
+			tolua_function(tolua_S, "CalcLineIntersection", tolua_cBoundingBox_CalcLineIntersection);
+			tolua_function(tolua_S, "Intersect",            tolua_cBoundingBox_Intersect);
+		tolua_endmodule(tolua_S);
+
 		tolua_beginmodule(tolua_S, "cClientHandle");
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
@@ -3532,6 +3636,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cScoreboard");
 			tolua_function(tolua_S, "ForEachObjective", ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
 			tolua_function(tolua_S, "ForEachTeam",      ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
+			tolua_function(tolua_S, "GetTeamNames",     tolua_cScoreboard_GetTeamNames);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");

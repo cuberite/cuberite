@@ -95,7 +95,6 @@ cChunk::cChunk(
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
 	m_RedstoneSimulatorData(a_World->GetRedstoneSimulator()->CreateChunkData()),
-	m_IsRedstoneDirty(false),
 	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != nullptr)
@@ -604,7 +603,19 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
-	m_IsInTick = true;
+	// If we are not valid, tick players and bailout
+	if (!IsValid())
+	{
+		for (auto Entity : m_Entities)
+		{
+			if (Entity->IsPlayer())
+			{
+				Entity->Tick(a_Dt, *this);
+			}
+		}
+		return;
+	}
+
 	BroadcastPendingBlockChanges();
 
 	CheckBlocks();
@@ -638,13 +649,13 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		}
 
 		// Do not move mobs that are detached from the world to neighbors. They're either scheduled for teleportation or for removal.
+		// Because the schedulded destruction is going to look for them in this chunk. See cEntity::destroy.
 		if (!(*itr)->IsTicking())
 		{
 			++itr;
 			continue;
 		}
 
-		// Because the schedulded destruction is going to look for them in this chunk. See cEntity::destroy.
 		if ((((*itr)->GetChunkX() != m_PosX) ||
 			((*itr)->GetChunkZ() != m_PosZ))
 		)
@@ -668,7 +679,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	}  // for itr - m_Entitites[]
 
 	ApplyWeatherToTop();
-	m_IsInTick = false;
 }
 
 
@@ -919,7 +929,7 @@ void cChunk::ApplyWeatherToTop()
 
 
 
-void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
+bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
 {
 	// Convert the stem BlockType into produce BlockType
 	BLOCKTYPE ProduceType;
@@ -930,7 +940,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		default:
 		{
 			ASSERT(!"Unhandled blocktype in TickMelonPumpkin()");
-			return;
+			return false;
 		}
 	}
 
@@ -951,7 +961,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 	)
 	{
 		// Neighbors not valid or already taken by the same produce
-		return;
+		return false;
 	}
 
 	// Pick a direction in which to place the produce:
@@ -975,7 +985,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		{
 			break;
 		}
-		default: return;
+		default: return false;
 	}
 
 	// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
@@ -1003,13 +1013,14 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 			break;
 		}
 	}
+	return true;
 }
 
 
 
 
 
-void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
+int cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 {
 	// Check the total height of the sugarcane blocks here:
 	int Top = a_RelY + 1;
@@ -1041,16 +1052,17 @@ void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		}
 		else
 		{
-			break;
+			return i;
 		}
 	}  // for i
+	return ToGrow;
 }
 
 
 
 
 
-void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
+int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 {
 	// Check the total height of the sugarcane blocks here:
 	int Top = a_RelY + 1;
@@ -1083,9 +1095,41 @@ void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		}
 		else
 		{
-			break;
+			return i;
 		}
 	}  // for i
+	return ToGrow;
+}
+
+
+
+
+
+bool cChunk::GrowTallGrass(int a_RelX, int a_RelY, int a_RelZ)
+{
+	if (a_RelY > (cChunkDef::Height - 2))
+	{
+		return false;
+	}
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	if (!UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta))
+	{
+		return false;
+	}
+	if (BlockType != E_BLOCK_TALL_GRASS)
+	{
+		return false;
+	}
+	NIBBLETYPE LargeFlowerMeta;
+	switch (BlockMeta)
+	{
+		case E_META_TALL_GRASS_GRASS: LargeFlowerMeta = E_META_BIG_FLOWER_DOUBLE_TALL_GRASS; break;
+		case E_META_TALL_GRASS_FERN:  LargeFlowerMeta = E_META_BIG_FLOWER_LARGE_FERN; break;
+		default:                      return false;
+	}
+	return UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_BIG_FLOWER, LargeFlowerMeta) &&
+		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, 8);
 }
 
 
@@ -1525,8 +1569,17 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		return;
 	}
 
-	MarkDirty();
-	m_IsRedstoneDirty = true;
+	bool ReplacingLiquids = (
+		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary lava with lava
+		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing lava with stationary lava
+	);
+
+	if (!ReplacingLiquids)
+	{
+		MarkDirty();
+	}
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
@@ -1539,13 +1592,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 				((OldBlockType == E_BLOCK_NEW_LEAVES) && (a_BlockType == E_BLOCK_NEW_LEAVES))
 			) &&                              // ... AND ...
 			(
-				(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
-				!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them):
-					((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
-					((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
-					((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
-					((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
-				)
+				(OldBlockMeta != a_BlockMeta) || (!ReplacingLiquids)
 			)
 		)
 	)
@@ -2581,16 +2628,6 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if (
-		(a_RelX < 0) || (a_RelX >= Width) ||
-		(a_RelY < 0) || (a_RelY >= Height) ||
-		(a_RelZ < 0) || (a_RelZ >= Width)
-	)
-	{
-		ASSERT(!"GetBlock(x, y, z) out of bounds!");
-		return 0;  // Clip
-	}
-
 	return m_ChunkData.GetBlock(a_RelX, a_RelY, a_RelZ);
 }
 
@@ -2782,7 +2819,7 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 
 
 
-void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	for (auto ClientHandle : m_LoadedByClient)
 	{
@@ -2873,6 +2910,18 @@ void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 			continue;
 		}
 		(*itr)->SendDestroyEntity(a_Entity);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	for (auto ClientHandle : m_LoadedByClient)
+	{
+		ClientHandle->SendDetachEntity(a_Entity, a_PreviousVehicle);
 	}  // for itr - LoadedByClient[]
 }
 

@@ -29,9 +29,22 @@ return
 				{ Params = "{{Vector3d|Pos}}, Radius, Height", Return = "cBoundingBox", Notes = "Creates a new bounding box from the position given and radius (X/Z) and height. Radius is added from X/Z to calculate the maximum coords and subtracted from X/Z to get the minimum; minimum Y is set to Pos.y and maxumim Y to Pos.y plus Height. This corresponds with how {{cEntity|entities}} are represented in Minecraft." },
 				{ Params = "OtherBoundingBox", Return = "cBoundingBox", Notes = "Creates a new copy of the given bounding box. Same result can be achieved by using a simple assignment." },
 			},
-			CalcLineIntersection = { Params = "{{Vector3d|LineStart}}, {{Vector3d|LinePt2}}", Return = "DoesIntersect, LineCoeff, Face", Notes = "Calculates the intersection of a ray (half-line), given by two of its points, with the bounding box. Returns false if the line doesn't intersect the bounding box, or true, together with coefficient of the intersection (how much of the difference between the two ray points is needed to reach the intersection), and the face of the box which is intersected.<br /><b>TODO</b>: Lua binding for this function is wrong atm." },
+			CalcLineIntersection =
+			{
+				{ Params = "{{Vector3d|LineStart}}, {{Vector3d|LinePt2}}", Return = "DoesIntersect, [LineCoeff, Face]", Notes = "Calculates the intersection of a ray (half-line), given by two of its points, with the bounding box. Returns false if the line doesn't intersect the bounding box, or true, together with coefficient of the intersection (how much of the difference between the two ray points is needed to reach the intersection), and the face of the box which is intersected." },
+				{ Params = "{{Vector3d|BoxMin}}, {{Vector3d|BoxMax}}, {{Vector3d|LineStart}}, {{Vector3d|LinePt2}}", Return = "DoesIntersect, [LineCoeff, Face]", Notes = "(STATIC) Calculates the intersection of a ray (half-line), given by two of its points, with the bounding box specified as its minimum and maximum coords. Returns false if the line doesn't intersect the bounding box, or true, together with coefficient of the intersection (how much of the difference between the two ray points is needed to reach the intersection), and the face of the box which is intersected." },
+			},
 			DoesIntersect = { Params = "OtherBoundingBox", Return = "bool", Notes = "Returns true if the two bounding boxes have an intersection of nonzero volume." },
 			Expand = { Params = "ExpandX, ExpandY, ExpandZ", Return = "", Notes = "Expands this bounding box by the specified amount in each direction (so the box becomes larger by 2 * Expand in each axis)." },
+			GetMax = { Params = "", Return = "{{Vector3d|Point}}", Notes = "Returns the boundary point with the maximum coords" },
+			GetMaxX = { Params = "", Return = "number", Notes = "Returns the maximum X coord of the bounding box" },
+			GetMaxY = { Params = "", Return = "number", Notes = "Returns the maximum Y coord of the bounding box" },
+			GetMaxZ = { Params = "", Return = "number", Notes = "Returns the maximum Z coord of the bounding box" },
+			GetMin = { Params = "", Return = "{{Vector3d|Point}}", Notes = "Returns the boundary point with the minimum coords" },
+			GetMinX = { Params = "", Return = "number", Notes = "Returns the minimum X coord of the bounding box" },
+			GetMinY = { Params = "", Return = "number", Notes = "Returns the minimum Y coord of the bounding box" },
+			GetMinZ = { Params = "", Return = "number", Notes = "Returns the minimum Z coord of the bounding box" },
+			Intersect = { Params = "{{cBoundingBox|OtherBbox}}", Return = "bool, [{{cBoundingBox|bbox}}]", Notes = "Checks if the intersection between this bounding box and another one is non-empty. Returns false if the intersection is empty, true and a new cBoundingBox representing the intersection of the two boxes." },
 			IsInside =
 			{
 				{ Params = "{{Vector3d|Point}}", Return = "bool", Notes = "Returns true if the specified point is inside (including on the edge) of the box." },

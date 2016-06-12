@@ -65,7 +65,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_GameMode(eGameMode_NotSet),
 	m_IP(""),
 	m_ClientHandle(a_Client),
-	m_FreezeCounter(-1),
+	m_IsFrozen(false),
 	m_NormalMaxSpeed(1.0),
 	m_SprintingMaxSpeed(1.3),
 	m_FlyingMaxSpeed(1.0),
@@ -119,7 +119,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 
 	m_LastGroundHeight = static_cast<float>(GetPosY());
 	m_Stance = GetPosY() + 1.62;
-	FreezeInternal(GetPosition(), false);  // Freeze. Will be unfrozen once the chunk is loaded
+
 
 	if (m_GameMode == gmNotSet)
 	{
@@ -246,40 +246,18 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		ASSERT(!"Player ticked whilst in the process of destruction!");
 	}
 
+
 	m_Stats.AddValue(statMinutesPlayed, 1);
 
 	// Handle a frozen player
+	TickFreezeCode();
 	if (m_IsFrozen)
 	{
-		m_FreezeCounter += 1;
-		if (!m_IsManuallyFrozen && a_Chunk.IsValid())
-		{
-			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded
-			Unfreeze();
-		}
-		else
-		{
-			// If the player was externally / manually frozen (plugin, etc.) or if the chunk isn't loaded yet:
-			// 1. Set the location to m_FrozenPosition every tick.
-			// 2. Zero out the speed every tick.
-			// 3. Send location updates every 60 ticks.
-			SetPosition(m_FrozenPosition);
-			SetSpeed(0, 0, 0);
-			if (m_FreezeCounter % 60 == 0)
-			{
-				BroadcastMovementUpdate(m_ClientHandle.get());
-				m_ClientHandle->SendPlayerPosition();
-			}
-			return;
-		}
-	}
-
-	if (!a_Chunk.IsValid())
-	{
-		FreezeInternal(GetPosition(), false);
-		// This may happen if the cPlayer is created before the chunks have the chance of being loaded / generated (#83)
 		return;
 	}
+	ASSERT((GetParentChunk() != nullptr) && (GetParentChunk()->IsValid()));
+
+	ASSERT(a_Chunk.IsValid());
 
 	super::Tick(a_Dt, a_Chunk);
 
@@ -332,6 +310,64 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else
 	{
 		m_TicksUntilNextSave--;
+	}
+}
+
+
+
+
+
+void cPlayer::TickFreezeCode()
+{
+	if (m_IsFrozen)
+	{
+		if ((!m_IsManuallyFrozen) && (GetClientHandle()->IsPlayerChunkSent()))
+		{
+			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded and sent
+			Unfreeze();
+
+			// Pull the player out of any solids that might have loaded on them.
+			PREPARE_REL_AND_CHUNK(GetPosition(), *(GetParentChunk()));
+			if (RelSuccess)
+			{
+				int NewY = Rel.y;
+				if (NewY < 0)
+				{
+					NewY = 0;
+				}
+				while (NewY < cChunkDef::Height - 2)
+				{
+					// If we find a position with enough space for the player
+					if (
+						(Chunk->GetBlock(Rel.x, NewY, Rel.z) == E_BLOCK_AIR) &&
+						(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z) == E_BLOCK_AIR)
+					)
+					{
+						// If the found position is not the same as the original
+						if (NewY != Rel.y)
+						{
+							SetPosition(GetPosition().x, NewY, GetPosition().z);
+							GetClientHandle()->SendPlayerPosition();
+						}
+						break;
+					}
+					++NewY;
+				}
+			}
+		}
+		else if (GetWorld()->GetWorldAge() % 100 == 0)
+		{
+			// Despite the client side freeze, the player may be able to move a little by
+			// Jumping or canceling flight. Re-freeze every now and then
+			FreezeInternal(GetPosition(), m_IsManuallyFrozen);
+		}
+	}
+	else
+	{
+		if (!GetClientHandle()->IsPlayerChunkSent() || (!GetParentChunk()->IsValid()))
+		{
+			FreezeInternal(GetPosition(), false);
+		}
 	}
 }
 
@@ -724,8 +760,9 @@ double cPlayer::GetMaxSpeed(void) const
 void cPlayer::SetNormalMaxSpeed(double a_Speed)
 {
 	m_NormalMaxSpeed = a_Speed;
-	if (!m_IsSprinting && !m_IsFlying)
+	if (!m_IsSprinting && !m_IsFlying && !m_IsFrozen)
 	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
 }
@@ -737,8 +774,9 @@ void cPlayer::SetNormalMaxSpeed(double a_Speed)
 void cPlayer::SetSprintingMaxSpeed(double a_Speed)
 {
 	m_SprintingMaxSpeed = a_Speed;
-	if (m_IsSprinting && !m_IsFlying)
+	if (m_IsSprinting && !m_IsFlying && !m_IsFrozen)
 	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
 		m_ClientHandle->SendPlayerMaxSpeed();
 	}
 }
@@ -752,7 +790,11 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 	m_FlyingMaxSpeed = a_Speed;
 
 	// Update the flying speed, always:
-	m_ClientHandle->SendPlayerAbilities();
+	if (!m_IsFrozen)
+	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
+		m_ClientHandle->SendPlayerAbilities();
+	}
 }
 
 
@@ -859,7 +901,11 @@ void cPlayer::SetFlying(bool a_IsFlying)
 	}
 
 	m_IsFlying = a_IsFlying;
-	m_ClientHandle->SendPlayerAbilities();
+	if (!m_IsFrozen)
+	{
+		// If we are frozen, we do not send this yet. We send when unfreeze() is called
+		m_ClientHandle->SendPlayerAbilities();
+	}
 }
 
 
@@ -1392,7 +1438,8 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		SetPosition(a_PosX, a_PosY, a_PosZ);
-		m_LastGroundHeight = static_cast<float>(a_PosY);
+		FreezeInternal(GetPosition(), false);
+		m_LastGroundHeight = a_PosY;
 		m_bIsTeleporting = true;
 
 		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
@@ -1422,22 +1469,14 @@ bool cPlayer::IsFrozen()
 
 
 
-int cPlayer::GetFrozenDuration()
-{
-	return m_FreezeCounter;
-}
-
-
-
-
-
 void cPlayer::Unfreeze()
 {
-	m_FreezeCounter = -1;
+	GetClientHandle()->SendPlayerAbilities();
+	GetClientHandle()->SendPlayerMaxSpeed();
+
 	m_IsFrozen = false;
-	SetPosition(m_FrozenPosition);
-	BroadcastMovementUpdate(m_ClientHandle.get());
-	m_ClientHandle->SendPlayerPosition();
+	BroadcastMovementUpdate(GetClientHandle());
+	GetClientHandle()->SendPlayerPosition();
 }
 
 
@@ -1496,8 +1535,12 @@ void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 
 void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
+	if (m_IsFrozen)
+	{
+		// Do not set speed to a frozen client
+		return;
+	}
 	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
-
 	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
 }
@@ -1717,17 +1760,6 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
-{
-	m_IsFrozen = true;
-	m_FrozenPosition = a_Location;
-	m_IsManuallyFrozen = a_ManuallyFrozen;
-}
-
-
-
-
-
 bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	ASSERT(a_World != nullptr);
@@ -1746,6 +1778,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
+	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
+	GetClientHandle()->InvalidateCachedSentChunk();
+
 	// Prevent further ticking in this world
 	SetIsTicking(false);
 
@@ -1757,6 +1792,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Set position to the new position
 	SetPosition(a_NewPosition);
+	FreezeInternal(a_NewPosition, false);
 
 	// Stop all mobs from targeting this player
 	StopEveryoneFromTargetingMe();
@@ -2432,17 +2468,21 @@ void cPlayer::Detach()
 	int PosZ = POSZ_TOINT;
 
 	// Search for a position within an area to teleport player after detachment
-	// Position must be solid land, and occupied by a nonsolid block
+	// Position must be solid land with two air blocks above.
 	// If nothing found, player remains where they are
-	for (int x = PosX - 2; x <= (PosX + 2); ++x)
+	for (int x = PosX - 1; x <= (PosX + 1); ++x)
 	{
 		for (int y = PosY; y <= (PosY + 3); ++y)
 		{
-			for (int z = PosZ - 2; z <= (PosZ + 2); ++z)
+			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
 			{
-				if (!cBlockInfo::IsSolid(m_World->GetBlock(x, y, z)) && cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z)))
+				if (
+					(m_World->GetBlock(x, y, z) == E_BLOCK_AIR) &&
+					(m_World->GetBlock(x, y + 1, z) == E_BLOCK_AIR) &&
+					cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z))
+				)
 				{
-					TeleportToCoords(x, y, z);
+					TeleportToCoords(x + 0.5, y, z + 0.5);
 					return;
 				}
 			}
@@ -2475,4 +2515,39 @@ AString cPlayer::GetUUIDFileName(const AString & a_UUID)
 	res.append(UUID, 2, AString::npos);
 	res.append(".json");
 	return res;
+}
+
+
+
+
+
+void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
+{
+	SetSpeed(0, 0, 0);
+	SetPosition(a_Location);
+	m_IsFrozen = true;
+	m_IsManuallyFrozen = a_ManuallyFrozen;
+
+	double NormalMaxSpeed = GetNormalMaxSpeed();
+	double SprintMaxSpeed = GetSprintingMaxSpeed();
+	double FlyingMaxpeed = GetFlyingMaxSpeed();
+	bool IsFlying = m_IsFlying;
+
+	// Set the client-side speed to 0
+	m_NormalMaxSpeed = 0;
+	m_SprintingMaxSpeed = 0;
+	m_FlyingMaxSpeed = 0;
+	m_IsFlying = true;
+
+	// Send the client its fake speed and max speed of 0
+	GetClientHandle()->SendPlayerMoveLook();
+	GetClientHandle()->SendPlayerAbilities();
+	GetClientHandle()->SendPlayerMaxSpeed();
+	GetClientHandle()->SendEntityVelocity(*this);
+
+	// Keep the server side speed variables as they were in the first place
+	m_NormalMaxSpeed = NormalMaxSpeed;
+	m_SprintingMaxSpeed = SprintMaxSpeed;
+	m_FlyingMaxSpeed = FlyingMaxpeed;
+	m_IsFlying = IsFlying;
 }

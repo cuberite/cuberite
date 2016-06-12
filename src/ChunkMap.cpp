@@ -53,12 +53,11 @@ cChunkMap::cChunkMap(cWorld * a_World) :
 
 cChunkMap::~cChunkMap()
 {
-	cCSLock Lock(m_CSLayers);
-	while (!m_Layers.empty())
-	{
-		delete m_Layers.back();
-		m_Layers.pop_back();  // Must pop, because further chunk deletions query the chunkmap for entities and that would touch deleted data
-	}
+	// Explicitly destroy all chunks and ChunkLayers, so that they're guaranteed to be
+	// destroyed before other internals. This fixes crashes on stopping the server.
+	// because the chunk destructor deletes entities and those may access the chunkmap.
+	// Also, the cChunkData destructor accesses the chunkMap's allocator.
+	m_Layers.clear();
 }
 
 
@@ -68,7 +67,7 @@ cChunkMap::~cChunkMap()
 void cChunkMap::RemoveLayer(cChunkLayer * a_Layer)
 {
 	cCSLock Lock(m_CSLayers);
-	m_Layers.remove(a_Layer);
+	m_Layers.erase(std::pair<int, int>(a_Layer->GetX(), a_Layer->GetZ()));
 }
 
 
@@ -78,23 +77,26 @@ void cChunkMap::RemoveLayer(cChunkLayer * a_Layer)
 cChunkMap::cChunkLayer * cChunkMap::GetLayer(int a_LayerX, int a_LayerZ)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	auto it = m_Layers.find(std::pair<int, int>(a_LayerX, a_LayerZ));
+	if (it !=m_Layers.end())
 	{
-		if (((*itr)->GetX() == a_LayerX) && ((*itr)->GetZ() == a_LayerZ))
-		{
-			return *itr;
-		}
+		cChunkLayer & Layer = it->second;
+		return &Layer;
 	}
 
 	// Not found, create new:
-	cChunkLayer * Layer = new cChunkLayer(a_LayerX, a_LayerZ, this, *m_Pool);
-	if (Layer == nullptr)
-	{
-		LOGERROR("cChunkMap: Cannot create new layer, server out of memory?");
-		return nullptr;
-	}
-	m_Layers.push_back(Layer);
-	return Layer;
+	auto EmplaceResult = m_Layers.emplace(std::piecewise_construct,
+		std::forward_as_tuple(a_LayerX, a_LayerZ),
+		std::forward_as_tuple(a_LayerX, a_LayerZ, this, *m_Pool));
+
+	// EmplaceResult.second = a bool, if false, then the item is already there.
+	// EmplaceResult.first = an iterator pointing to the inserted item
+	// EmplaceResult.first->second = the inserted chunk layer
+	// EmplaceResult.first->first = the item's key (an std::pair if chunk X and chunk Z) - we don't need this
+
+	ASSERT (EmplaceResult.second == true);  // Make sure the element did not exist prior to the insertion
+	cChunkLayer & Layer = (EmplaceResult.first->second);
+	return &Layer;
 }
 
 
@@ -116,13 +118,12 @@ cChunkMap::cChunkLayer * cChunkMap::FindLayer(int a_LayerX, int a_LayerZ)
 {
 	ASSERT(m_CSLayers.IsLockedByCurrentThread());
 
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	auto it = m_Layers.find(std::pair<int, int>(a_LayerX, a_LayerZ));
+	if (it != m_Layers.end())
 	{
-		if (((*itr)->GetX() == a_LayerX) && ((*itr)->GetZ() == a_LayerZ))
-		{
-			return *itr;
-		}
-	}  // for itr - m_Layers[]
+		cChunkLayer & Layer = it->second;
+		return &Layer;
+	}
 
 	// Not found
 	return nullptr;
@@ -337,7 +338,7 @@ cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkMap::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cChunkMap::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkZ());
@@ -435,6 +436,22 @@ void cChunkMap::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHa
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
 	Chunk->BroadcastDestroyEntity(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cChunkMap::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkZ());
+	if (Chunk == nullptr)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 
@@ -859,22 +876,7 @@ void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_M
 
 
 
-void cChunkMap::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return;
-	}
-	Chunk->SetIsRedstoneDirty(true);
-}
-
-
-
-
-
-void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
+void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -883,10 +885,6 @@ void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDi
 		return;
 	}
 	Chunk->MarkDirty();
-	if (a_MarkRedstoneDirty)
-	{
-		Chunk->SetIsRedstoneDirty(true);
-	}
 }
 
 
@@ -1230,7 +1228,7 @@ NIBBLETYPE cChunkMap::GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_Block
 
 
 
-void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta)
+void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClient)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
@@ -1240,7 +1238,7 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
-		Chunk->SetMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
+		Chunk->SetMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta, a_ShouldMarkDirty, a_ShouldInformClient);
 	}
 }
 
@@ -1610,9 +1608,10 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSLayers);
 
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr : m_Layers)
 	{
-		(*itr)->RemoveClient(a_Client);
+		cChunkLayer & Layer = itr.second;
+		Layer.RemoveClient(a_Client);
 	}  // for itr - m_Layers[]
 }
 
@@ -1662,9 +1661,10 @@ void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
 bool cChunkMap::HasEntity(UInt32 a_UniqueID)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr : m_Layers)
 	{
-		if ((*itr)->HasEntity(a_UniqueID))
+		cChunkLayer & Layer = itr.second;
+		if (Layer.HasEntity(a_UniqueID))
 		{
 			return true;
 		}
@@ -1696,9 +1696,10 @@ void cChunkMap::RemoveEntity(cEntity * a_Entity)
 bool cChunkMap::ForEachEntity(cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr : m_Layers)
 	{
-		if (!(*itr)->ForEachEntity(a_Callback))
+		cChunkLayer & Layer = itr.second;
+		if (!Layer.ForEachEntity(a_Callback))
 		{
 			return false;
 		}
@@ -1957,9 +1958,10 @@ bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback
 {
 	cCSLock Lock(m_CSLayers);
 	bool res = false;
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr : m_Layers)
 	{
-		if ((*itr)->DoWithEntityByID(a_UniqueID, a_Callback, res))
+		cChunkLayer & Layer = itr.second;
+		if (Layer.DoWithEntityByID(a_UniqueID, a_Callback, res))
 		{
 			return res;
 		}
@@ -2513,14 +2515,14 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 bool cChunkMap::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)  // iterate over ALL loaded layers
+	for (auto & itr: m_Layers)
 	{
-		cChunkLayer * layer = *itr;
+		cChunkLayer & Layer = itr.second;
 		for (int x = 0; x < LAYER_SIZE; x++)
 		{
 			for (int z = 0; z < LAYER_SIZE; z++)
 			{
-				cChunkPtr p = layer->FindChunk(layer->GetX() * LAYER_SIZE + x, layer->GetZ() * LAYER_SIZE + z);
+				cChunkPtr p = Layer.FindChunk(Layer.GetX() * LAYER_SIZE + x, Layer.GetZ() * LAYER_SIZE + z);
 				if ((p != nullptr) && p->IsValid())  // if chunk is loaded
 				{
 					if (a_Callback(p->GetPosX(), p->GetPosZ()))
@@ -2581,10 +2583,11 @@ void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
 	a_NumChunksValid = 0;
 	a_NumChunksDirty = 0;
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr : m_Layers)
 	{
+		cChunkLayer & Layer = itr.second;
 		int NumValid = 0, NumDirty = 0;
-		(*itr)->GetChunkStats(NumValid, NumDirty);
+		Layer.GetChunkStats(NumValid, NumDirty);
 		a_NumChunksValid += NumValid;
 		a_NumChunksDirty += NumDirty;
 	}  // for itr - m_Layers[]
@@ -2594,7 +2597,7 @@ void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
 
 
 
-void cChunkMap::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand)
+bool cChunkMap::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
@@ -2603,15 +2606,16 @@ void cChunkMap::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCK
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
 	if (Chunk != nullptr)
 	{
-		Chunk->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_Rand);
+		return Chunk->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_Rand);
 	}
+	return false;
 }
 
 
 
 
 
-void cChunkMap::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
+int cChunkMap::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
@@ -2620,15 +2624,16 @@ void cChunkMap::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Nu
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
 	if (Chunk != nullptr)
 	{
-		Chunk->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+		return Chunk->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
 	}
+	return 0;
 }
 
 
 
 
 
-void cChunkMap::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
+int cChunkMap::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
@@ -2637,8 +2642,27 @@ void cChunkMap::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBl
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
 	if (Chunk != nullptr)
 	{
-		Chunk->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+		return Chunk->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
 	}
+	return 0;
+}
+
+
+
+
+
+bool cChunkMap::GrowTallGrass(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
+	if (Chunk != nullptr)
+	{
+		return Chunk->GrowTallGrass(a_BlockX, a_BlockY, a_BlockZ);
+	}
+	return 0;
 }
 
 
@@ -2664,9 +2688,10 @@ void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto && layer: m_Layers)
+	for (auto & itr: m_Layers)
 	{
-		layer->CollectMobCensus(a_ToFill);
+		cChunkLayer & Layer = itr.second;
+		Layer.CollectMobCensus(a_ToFill);
 	}  // for itr - m_Layers
 }
 
@@ -2678,9 +2703,10 @@ void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 {
 	cCSLock Lock(m_CSLayers);
-	for (auto && layer: m_Layers)
+	for (auto & itr: m_Layers)
 	{
-		layer->SpawnMobs(a_MobSpawner);
+		cChunkLayer & Layer = itr.second;
+		Layer.SpawnMobs(a_MobSpawner);
 	}  // for itr - m_Layers
 }
 
@@ -2691,9 +2717,10 @@ void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr: m_Layers)
 	{
-		(*itr)->Tick(a_Dt);
+		cChunkLayer & Layer = itr.second;
+		Layer.Tick(a_Dt);
 	}  // for itr - m_Layers
 }
 
@@ -2721,9 +2748,10 @@ void cChunkMap::TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunkMap::UnloadUnusedChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr: m_Layers)
 	{
-		(*itr)->UnloadUnusedChunks();
+		cChunkLayer & Layer = itr.second;
+		Layer.UnloadUnusedChunks();
 	}  // for itr - m_Layers
 }
 
@@ -2734,9 +2762,10 @@ void cChunkMap::UnloadUnusedChunks(void)
 void cChunkMap::SaveAllChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr: m_Layers)
 	{
-		(*itr)->Save();
+		cChunkLayer & Layer = itr.second;
+		Layer.Save();
 	}  // for itr - m_Layers[]
 }
 
@@ -2748,9 +2777,10 @@ int cChunkMap::GetNumChunks(void)
 {
 	cCSLock Lock(m_CSLayers);
 	int NumChunks = 0;
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	for (auto & itr: m_Layers)
 	{
-		NumChunks += (*itr)->GetNumChunksLoaded();
+		cChunkLayer & Layer = itr.second;
+		NumChunks += Layer.GetNumChunksLoaded();
 	}
 	return NumChunks;
 }
@@ -2920,8 +2950,9 @@ void cChunkMap::cChunkLayer::Tick(std::chrono::milliseconds a_Dt)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
-		// Only tick chunks that are valid and should be ticked:
-		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->IsValid() && m_Chunks[i]->ShouldBeTicked())
+		// Only tick chunks that should be ticked:
+		// Note that chunks that are not IsValid() will only tick players and then bailout
+		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->ShouldBeTicked())
 		{
 			m_Chunks[i]->Tick(a_Dt);
 		}

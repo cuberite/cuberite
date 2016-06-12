@@ -70,7 +70,7 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 	// The few false positives aren't much to worry about
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
-	m_World->MarkChunkDirty(ChunkX, ChunkZ, true);
+	m_World->MarkChunkDirty(ChunkX, ChunkZ);
 	return true;
 }
 

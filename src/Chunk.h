@@ -340,12 +340,13 @@ public:
 
 	// Broadcast various packets to all clients of this chunk:
 	// (Please keep these alpha-sorted)
-	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
+	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity & a_Vehicle);
 	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastCollectEntity      (const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastDestroyEntity      (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastDetachEntity       (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void BroadcastEntityEffect       (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityHeadLook     (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
@@ -392,15 +393,23 @@ public:
 	{
 		return m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
 	}
-	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+
+	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
+	Used for setting metas that are of little value for saving to disk and / or for sending to the client,
+	such as leaf decay flags. */
+	inline void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClient = true)
 	{
 			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
 			if (hasChanged)
 			{
-				MarkDirty();
-				m_IsRedstoneDirty = true;
-
-				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
+				if (a_ShouldMarkDirty)
+				{
+					MarkDirty();
+				}
+				if (a_ShouldInformClient)
+				{
+					m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
+				}
 			}
 	}
 
@@ -453,8 +462,6 @@ public:
 
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
 	void SetRedstoneSimulatorData(cRedstoneSimulatorChunkData * a_Data) { m_RedstoneSimulatorData = a_Data; }
-	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
-	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -502,7 +509,6 @@ private:
 
 	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
 	bool m_ShouldGenerateIfLoadFailed;
-	bool m_IsInTick;       // True if the chunk is executing the tick() method.
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
@@ -543,10 +549,6 @@ private:
 
 	cRedstoneSimulatorChunkData * m_RedstoneSimulatorData;
 
-
-	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
-	bool m_IsRedstoneDirty;
-
 	/** If greater than zero, the chunk is ticked even if it has no clients.
 	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
 	This is the support for plugin-accessible chunk tick forcing. */
@@ -578,14 +580,17 @@ private:
 	/** Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes */
 	void ApplyWeatherToTop(void);
 
-	/** Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking) */
-	void GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
+	/** Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking); returns the amount of blocks the sugarcane grew inside this call */
+	int GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
 
-	/** Grows cactus by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking) */
-	void GrowCactus      (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
+	/** Grows cactus by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking); returns the amount of blocks the cactus grew inside this call */
+	int GrowCactus      (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
 
-	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem) */
-	void GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
+	/** Grows a tall grass present at the block specified to a two tall grass; returns true if the grass grew */
+	bool GrowTallGrass      (int a_RelX, int a_RelY, int a_RelZ);
+
+	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
+	bool GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(cEntity * a_Entity);

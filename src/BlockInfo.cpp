@@ -250,7 +250,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_REDSTONE_WIRE       ].m_Transparent = true;
 	a_Info[E_BLOCK_SAPLING             ].m_Transparent = true;
 	a_Info[E_BLOCK_SIGN_POST           ].m_Transparent = true;
-	a_Info[E_BLOCK_SNOW                ].m_Transparent = true;
 	a_Info[E_BLOCK_SPRUCE_DOOR         ].m_Transparent = true;
 	a_Info[E_BLOCK_SPRUCE_FENCE        ].m_Transparent = true;
 	a_Info[E_BLOCK_SPRUCE_FENCE_GATE   ].m_Transparent = true;

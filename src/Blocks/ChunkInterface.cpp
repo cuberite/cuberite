@@ -61,13 +61,10 @@ void cChunkInterface::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 
 
 
-
-void cChunkInterface::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData)
+void cChunkInterface::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClient)
 {
-	m_ChunkMap->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_MetaData);
+	m_ChunkMap->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClient);
 }
-
-
 
 
 

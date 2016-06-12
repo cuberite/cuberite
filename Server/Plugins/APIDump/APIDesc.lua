@@ -1946,7 +1946,6 @@ a_Player:OpenWindow(Window);
 				GetFoodPoisonedTicksRemaining = { Params = "", Return = "", Notes = "Returns the number of ticks left for the food posoning effect" },
 				GetFoodSaturationLevel = { Params = "", Return = "number", Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)" },
 				GetFoodTickTimer = { Params = "", Return = "", Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
-				GetFrozenDuration = { Params = "", Return = "number", Notes = "Returns the number of ticks since the player was frozen" },
 				GetGameMode = { Return = "{{Globals#GameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
 				GetIP = { Return = "string", Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report."},
 				GetInventory = { Return = "{{cInventory|Inventory}}", Notes = "Returns the player's inventory"},
@@ -2197,6 +2196,7 @@ end
 				GetObjective = { Params = "string", Return = "{{cObjective}}", Notes = "Returns the objective with the specified name." },
 				GetObjectiveIn = { Params = "DisplaySlot", Return = "{{cObjective}}", Notes = "Returns the objective in the specified display slot. Can be nil." },
 				GetTeam = { Params = "string", Return = "{{cTeam}}", Notes = "Returns the team with the specified name." },
+				GetTeamNames = { Params = "", Return = "array table of strings", Notes = "Returns the names of all teams" },
 				RegisterObjective = { Params = "Name, DisplayName, Type", Return = "{{cObjective}}", Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, nil on error." },
 				RegisterTeam = { Params = "Name, DisplayName, Prefix, Suffix", Return = "{{cTeam}}", Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error." },
 				RemoveObjective = { Params = "string", Return = "bool", Notes = "Removes the objective with the specified name. Returns true if operation was successful." },
@@ -2519,10 +2519,10 @@ end
 				GetTNTShrapnelLevel = { Params = "", Return = "{{Globals#ShrapnelLevel|ShrapnelLevel}}", Notes = "Returns the shrapnel level, representing the block types that are propelled outwards following an explosion. Based on this value and a random picker, blocks are selectively converted to physics entities (FallingSand) and flung outwards." },
 				GetWeather = { Params = "", Return = "eWeather", Notes = "Returns the current weather in the world (wSunny, wRain, wStorm). To check for weather, use IsWeatherXXX() functions instead." },
 				GetWorldAge = { Params = "", Return = "number", Notes = "Returns the total age of the world, in ticks. The age always grows, cannot be set by plugins and is unrelated to TimeOfDay." },
-				GrowCactus = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "", Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight())." },
-				GrowMelonPumpkin = { Params = "BlockX, BlockY, BlockZ, StemType", Return = "", Notes = "Grows a melon or pumpkin, based on the stem type specified (assumed to be in the coords provided). Checks for normal melon / pumpkin growth conditions - stem not having another produce next to it and suitable ground below." },
+				GrowCactus = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "number", Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight()). Returns the amount of blocks the cactus grew inside this call." },
+				GrowMelonPumpkin = { Params = "BlockX, BlockY, BlockZ, StemType", Return = "bool", Notes = "Grows a melon or pumpkin, based on the stem type specified (assumed to be in the coords provided). Checks for normal melon / pumpkin growth conditions - stem not having another produce next to it and suitable ground below. Returns true if the melon or pumpkin grew successfully." },
 				GrowRipePlant = { Params = "BlockX, BlockY, BlockZ, IsByBonemeal", Return = "bool", Notes = "Grows the plant at the specified coords. If IsByBonemeal is true, checks first if the specified plant type is bonemealable in the settings. Returns true if the plant was grown, false if not." },
-				GrowSugarcane = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "", Notes = "Grows a sugarcane block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum sugarcane growth (GetMaxSugarcaneHeight())." },
+				GrowSugarcane = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "number", Notes = "Grows a sugarcane block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum sugarcane growth (GetMaxSugarcaneHeight()). Returns the amount of blocks the sugarcane grew inside this call." },
 				GrowTree = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome." },
 				GrowTreeByBiome = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords." },
 				GrowTreeFromSapling = { Params = "BlockX, BlockY, BlockZ, SaplingMeta", Return = "", Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta (the sapling itself needn't be present)." },
@@ -2593,6 +2593,7 @@ end
 					{ Params = "{{cItems|Pickups}}, X, Y, Z, SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Spawns the specified pickups at the position specified. All the pickups fly away from the spawn position using the specified speed." },
 				},
 				SpawnMinecart = { Params = "X, Y, Z, MinecartType, Item, BlockHeight", Return = "number", Notes = "Spawns a minecart at the specific coordinates. MinecartType is the item type of the minecart. If the minecart is an empty minecart then the given item is the block inside the minecart, and blockheight is the distance of the block and the minecart." },
+				SpawnBoat = { Params = "X, Y, Z", Return = "number", Notes = "Spawns a boat at the specific coordinates." },
 				SpawnMob = { Params = "X, Y, Z, {{cMonster|MonsterType}}, [Baby]", Return = "EntityID", Notes = "Spawns the specified type of mob at the specified coords. If the Baby parameter is true, the mob will be a baby. Returns the EntityID of the creates entity, or -1 on failure. " },
 				SpawnFallingBlock = { Params = "X, Y, Z, BlockType, BlockMeta", Return = "EntityID", Notes = "Spawns an {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta" },
 				SpawnExperienceOrb = { Params = "X, Y, Z, Reward", Return = "EntityID", Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward" },
@@ -2679,6 +2680,7 @@ World:ForEachEntity(
 				IsArmor      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of an armor." },
 				IsAxe        = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of an axe." },
 				IsBoots      = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of boots." },
+				IsMinecart   = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a minecart." },
 				IsChestPlate = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a chestplate." },
 				IsHelmet     = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a helmet." },
 				IsHoe        = { Params = "ItemType", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is any kind of a hoe." },
@@ -2966,6 +2968,28 @@ end
 			},
 			Constants =
 			{
+				BLOCK_FACE_XM = { Notes = "Interacting with the X- face of the block" },
+				BLOCK_FACE_XP = { Notes = "Interacting with the X+ face of the block" },
+				BLOCK_FACE_YM = { Notes = "Interacting with the Y- face of the block" },
+				BLOCK_FACE_YP = { Notes = "Interacting with the Y+ face of the block" },
+				BLOCK_FACE_ZM = { Notes = "Interacting with the Z- face of the block" },
+				BLOCK_FACE_ZP = { Notes = "Interacting with the Z+ face of the block" },
+				BLOCK_FACE_NONE = { Notes = "Interacting with no block face - swinging the item in the air" },
+				BLOCK_FACE_EAST = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_XM instead. Interacting with the eastern face of the block." },
+				BLOCK_FACE_WEST = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_XP instead. Interacting with the western face of the block." },
+				BLOCK_FACE_BOTTOM = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_YM instead. Interacting with the bottom face of the block." },
+				BLOCK_FACE_TOP = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_YP instead. Interacting with the top face of the block." },
+				BLOCK_FACE_NORTH = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_ZM instead. Interacting with the northern face of the block." },
+				BLOCK_FACE_SOUTH = { Notes = "(<b>DEPRECATED!</b>) Please use BLOCK_FACE_ZP instead. Interacting with the southern face of the block." },
+				BLOCK_FACE_MAX = { Notes = "Used for range checking - highest legal value for an {{Globals#BlockFaces|eBlockFace}}" },
+				BLOCK_FACE_MIN = { Notes = "Used for range checking - lowest legal value for an {{Globals#BlockFaces|eBlockFace}}" },
+				DIG_STATUS_STARTED = { Notes = "The player has started digging" },
+				DIG_STATUS_CANCELLED = { Notes = "The player has let go of the mine block key before finishing mining the block" },
+				DIG_STATUS_FINISHED = { Notes = "The player thinks that it has finished mining a block" },
+				DIG_STATUS_DROP_HELD = { Notes = "The player has dropped a single item using the Drop Item key (default: Q)" },
+				DIG_STATUS_DROP_STACK = { Notes = "The player has dropped a full stack of items using the Drop Item key (default: Q) while holding down a specific modifier key (in windows, control)" },
+				DIG_STATUS_SHOOT_EAT = { Notes = "The player has finished shooting a bow or finished eating" },
+				DIG_STATUS_SWAP_ITEM_IN_HAND = { Notes = "The player has swapped their held item with the item in their offhand slot (1.9)" },
 				esBed = { Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed." },
 				esEnderCrystal = { Notes = "An ender crystal entity explosion. The SourceData param is the {{cEntity|ender crystal entity}} object." },
 				esGhastFireball = { Notes = "A ghast fireball explosion. The SourceData param is the {{cGhastFireballEntity|ghast fireball entity}} object." },
@@ -3047,6 +3071,14 @@ end
 					TextBefore = [[
 						These constants are used for specifying the cause of damage to entities. They are used in the
 						{{TakeDamageInfo}} structure, as well as in {{cEntity}}'s damage-related API functions.
+					]],
+				},
+				DigStatuses =
+				{
+					Include = "^DIG_STATUS_.*",
+					TextBefore = [[
+						These constants are used to describe digging statuses, but in reality cover several more cases.
+						They are used with {{OnPlayerLeftClick|HOOK_PLAYER_LEFT_CLICK}}.
 					]],
 				},
 				GameMode =

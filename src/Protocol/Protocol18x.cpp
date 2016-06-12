@@ -171,13 +171,13 @@ void cProtocol180::DataReceived(const char * a_Data, size_t a_Size)
 
 
 
-void cProtocol180::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cProtocol180::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
 	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEUInt32((a_Vehicle != nullptr) ? a_Vehicle->GetUniqueID() : 0);
+	Pkt.WriteBEUInt32(a_Vehicle.GetUniqueID());
 	Pkt.WriteBool(false);
 }
 
@@ -311,6 +311,20 @@ void cProtocol180::SendDestroyEntity(const cEntity & a_Entity)
 	cPacketizer Pkt(*this, 0x13);  // Destroy Entities packet
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol180::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt32(0);
+	Pkt.WriteBool(false);
 }
 
 

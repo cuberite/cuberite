@@ -144,7 +144,7 @@ public:  // tolua_export
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
-	void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle);
+	void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle);
 	void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
 	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
@@ -158,6 +158,7 @@ public:  // tolua_export
 	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity              (const cEntity & a_Entity);
+	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void SendDisconnect                 (const AString & a_Reason);
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -363,6 +364,10 @@ public:  // tolua_export
 	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
 	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
 
+	void InvalidateCachedSentChunk();
+
+	bool IsPlayerChunkSent();
+
 private:
 
 	friend class cServer;  // Needs access to SetSelf()
@@ -407,6 +412,13 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
+
+	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
+	whether or not the player is standing at a sent chunk.
+	If this is equal to the coordinates of the chunk the player is currrently standing at, then this must be a sent chunk
+	and a member of m_SentChunks.
+	Otherwise, this contains an arbitrary value which should not be used. */
+	cChunkCoords m_CachedSentChunk;
 
 	bool m_HasSentDC;  ///< True if a Disconnect packet has been sent in either direction
 

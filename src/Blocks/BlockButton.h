@@ -33,7 +33,7 @@ public:
 		// Set p the ON bit to on
 		Meta |= 0x08;
 
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta, false);
 		a_WorldInterface.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.6f);
 
@@ -44,7 +44,7 @@ public:
 				if (a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == m_BlockType)
 				{
 					// Block hasn't change in the meantime; set its meta
-					a_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07);
+					a_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07, false);
 					a_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 					a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
 				}

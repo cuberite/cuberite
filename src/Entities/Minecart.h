@@ -51,6 +51,9 @@ protected:
 	Vector3i m_DetectorRailPosition;
 	bool m_bIsOnDetectorRail;
 
+	// Overwrite to enforce speed limit
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
+
 	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
 
 	/** Handles physics on normal rails

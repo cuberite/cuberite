@@ -80,6 +80,7 @@ cSplashPotionEntity::cSplashPotionEntity(
 	const cItem & a_Item
 ) :
 	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+	m_Item(a_Item),
 	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);

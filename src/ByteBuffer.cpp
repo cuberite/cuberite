@@ -1034,3 +1034,21 @@ void cByteBuffer::CheckValid(void) const
 
 
 
+size_t cByteBuffer::GetVarIntSize(UInt32 a_Value)
+{
+	size_t Count = 0;
+
+	do
+	{
+		// If the value cannot be expressed in 7 bits, it needs to take up another byte
+		Count++;
+		a_Value >>= 7;
+	} while (a_Value != 0);
+
+	return Count;
+}
+
+
+
+
+

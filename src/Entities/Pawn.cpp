@@ -306,8 +306,8 @@ void cPawn::HandleFalling(void)
 		int x, y, z;
 	} BlockSampleOffsets[] =
 	{
-		{ 0, 0, 0 },
-		{ 0, -1, 0 },
+		{ 0, 0, 0 },  // TODO: something went wrong here (offset 0?)
+		{ 0, -1, 0 },  // Potentially causes mis-detection (IsFootInWater) when player stands on block diagonal to water (i.e. on side of pool)
 	};
 
 	/* Here's the rough outline of how this mechanism works:
@@ -350,12 +350,6 @@ void cPawn::HandleFalling(void)
 		}
 	}
 
-	// Update the ground height to have the highest position of the player (i.e. jumping up adds to the eventual fall damage)
-	if (!OnGround)
-	{
-		m_LastGroundHeight = std::max(m_LastGroundHeight, GetPosY());
-	}
-
 	/* So here's the use of the rules above: */
 	/* 1. Falling in water absorbs all fall damage */
 	bool FallDamageAbsorbed = IsFootInWater;
@@ -363,17 +357,14 @@ void cPawn::HandleFalling(void)
 	/* 2. Falling in liquid (lava, water, cobweb) or hitting a slime block resets the "fall zenith".
 	Note: Even though the pawn bounces back with no damage after hitting the slime block,
 	the "fall zenith" will continue to increase back up when flying upwards - which is good */
-	bool FallDistanceReset = IsFootOnSlimeBlock || IsFootInLiquid;
-	bool IsFlying = false;
 	bool ShouldBounceOnSlime = true;
 
-	if (GetEntityType() == eEntityType::etPlayer)
+	if (IsPlayer())
 	{
-		cPlayer * Player = static_cast<cPlayer *>(this);
-		IsFlying = Player->IsFlying();
+		auto Player = static_cast<cPlayer *>(this);
 
 		/* 3. If the player is flying or climbing, absorb fall damage */
-		FallDamageAbsorbed |= IsFlying || Player->IsClimbing();
+		FallDamageAbsorbed |= Player->IsFlying() || Player->IsClimbing();
 
 		/* 4. If the player is about to bounce on a slime block and is not crouching, absorb all fall damage  */
 		ShouldBounceOnSlime = !Player->IsCrouched();
@@ -389,10 +380,18 @@ void cPawn::HandleFalling(void)
 	NOTE: this will only work in some cases; should be done in HandlePhysics() */
 	if (IsFootOnSlimeBlock && ShouldBounceOnSlime)
 	{
-		SetSpeedY(-GetSpeedY());
+		// TODO: doesn't work too well, causes dissatisfactory experience for players on slime blocks - SetSpeedY(-GetSpeedY());
 	}
 
-	if (!IsFlying && OnGround)
+	// TODO: put player speed into GetSpeedY, and use that.
+	// If flying, climbing, swimming, or going up...
+	if (FallDamageAbsorbed || ((GetPosition() - m_LastPosition).y > 0))
+	{
+		// ...update the ground height to have the highest position of the player (i.e. jumping up adds to the eventual fall damage)
+		m_LastGroundHeight = GetPosY();
+	}
+
+	if (OnGround)
 	{
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
@@ -400,8 +399,9 @@ void cPawn::HandleFalling(void)
 			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 
 			// Fall particles
-			int ParticleSize = static_cast<int>((std::min(15, Damage) - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f);
-			GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_FALL_PARTICLES, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, ParticleSize);
+			// TODO: Re-enable this when effects in 1.9 aren't broken (right now this uses the wrong effect ID in 1.9 and the right one in 1.8 and 1.7)
+			// int ParticleSize = static_cast<int>((std::min(15, Damage) - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f);
+			// GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_FALL_PARTICLES, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, ParticleSize);
 		}
 
 		m_bTouchGround = true;
@@ -415,10 +415,6 @@ void cPawn::HandleFalling(void)
 	/* Note: it is currently possible to fall through lava and still die from fall damage
 	because of the client skipping an update about the lava block. This can only be resolved by
 	somehow integrating these above checks into the tracer in HandlePhysics. */
-	if (FallDistanceReset)
-	{
-		m_LastGroundHeight = GetPosY();
-	}
 }
 
 

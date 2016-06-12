@@ -50,6 +50,8 @@ public:
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
+	void TickFreezeCode();
+
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the currently equipped weapon; empty item if none */
@@ -145,9 +147,6 @@ public:
 
 	/** Is the player frozen? */
 	bool IsFrozen();
-
-	/** How long has the player been frozen? */
-	int GetFrozenDuration();
 
 	/** Cancels Freeze(...) and allows the player to move naturally. */
 	void Unfreeze();
@@ -603,14 +602,8 @@ protected:
 
 	cSlotNums m_InventoryPaintSlots;
 
-	/** if m_IsFrozen is true, we lock m_Location to this position. */
-	Vector3d m_FrozenPosition;
-
 	/** If true, we are locking m_Position to m_FrozenPosition. */
 	bool m_IsFrozen;
-
-	/** */
-	int m_FreezeCounter;
 
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;
@@ -700,11 +693,13 @@ protected:
 	/** Tosses a list of items. */
 	void TossItems(const cItems & a_Items);
 
-	/** Pins the player to a_Location until Unfreeze() is called.
-	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
-	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
-
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
+
+private:
+
+	/** Pins the player to a_Location until Unfreeze() is called.
+	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
+	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
 } ;  // tolua_export

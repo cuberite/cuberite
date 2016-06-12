@@ -51,8 +51,10 @@ public:
 		{
 			BLOCKTYPE above = a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
 
-			// Grass turns back to dirt when the block above is not transparent
-			if (!cBlockInfo::IsTransparent(above))
+			// Grass turns back to dirt when the block above it is not transparent or water.
+			// It does not turn to dirt when a snow layer is above.
+			if ((above != E_BLOCK_SNOW) &&
+				(!cBlockInfo::IsTransparent(above) || IsBlockWater(above)))
 			{
 				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 				return;
@@ -97,10 +99,13 @@ public:
 				// Not a regular dirt block
 				continue;
 			}
-			BLOCKTYPE above = a_Chunk.GetBlock(BlockX, BlockY + 1, BlockZ);
-			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(BlockX, BlockY + 1, BlockZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(BlockX, BlockY + 1, BlockZ)));
-			// Grass does not spread to blocks with a light level less than 5
-			if ((light > 4)  && cBlockInfo::IsTransparent(above))
+			BLOCKTYPE above = Chunk->GetBlock(BlockX, BlockY + 1, BlockZ);
+			NIBBLETYPE light = std::max(Chunk->GetBlockLight(BlockX, BlockY + 1, BlockZ), Chunk->GetTimeAlteredLight(Chunk->GetSkyLight(BlockX, BlockY + 1, BlockZ)));
+			if ((light > 4)  &&
+				cBlockInfo::IsTransparent(above) &&
+				(!IsBlockLava(above)) &&
+				(!IsBlockWaterOrIce(above))
+			)
 			{
 				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
 				{

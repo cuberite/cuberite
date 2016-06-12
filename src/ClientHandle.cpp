@@ -3,6 +3,7 @@
 #include "ClientHandle.h"
 #include "Server.h"
 #include "World.h"
+#include "Chunk.h"
 #include "Entities/Pickup.h"
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
@@ -65,6 +66,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
 	m_Player(nullptr),
+	m_CachedSentChunk(0, 0),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(0x7fffffff),
@@ -122,7 +124,6 @@ cClientHandle::~cClientHandle()
 		{
 			RemoveFromAllChunks();
 			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-			m_Player->SetIsTicking(false);
 			if (!m_Username.empty())
 			{
 				// Send the Offline PlayerList packet:
@@ -172,7 +173,9 @@ void cClientHandle::Destroy(void)
 		cWorld * World = m_Player->GetWorld();
 		if (World != nullptr)
 		{
-			World->RemovePlayer(m_Player, true);  // TODO this is NOT thread safe.
+			m_Player->StopEveryoneFromTargetingMe();
+			m_Player->SetIsTicking(false);
+			World->RemovePlayer(m_Player, true);
 		}
 		m_Player->RemoveClientHandle();
 	}
@@ -336,12 +339,14 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(m_Self, GetUsername());
+	InvalidateCachedSentChunk();
 	m_Self.reset();
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
 	if (World == nullptr)
 	{
 		World = cRoot::Get()->GetDefaultWorld();
+		m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
 	}
 
 	if (m_Player->GetGameMode() == eGameMode_NotSet)
@@ -761,6 +766,12 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		return;
 	}
 
+	if (m_Player->IsFrozen())
+	{
+		// Ignore client-side updates if the player is frozen
+		return;
+	}
+
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	Vector3d OldPosition = GetPlayer()->GetPosition();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
@@ -1030,7 +1041,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, static_cast<char>(a_Status)))
+	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, static_cast<char>(a_Status)))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -1105,6 +1116,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 				return;
 			}
 			m_Player->TossEquippedItem(64);  // Toss entire slot - if there aren't enough items, the maximum will be ejected
+			return;
+		}
+
+		case DIG_STATUS_SWAP_ITEM_IN_HAND:
+		{
+			// TODO: Not yet implemented
 			return;
 		}
 
@@ -1331,7 +1348,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		if (AreRealCoords)
@@ -1432,7 +1449,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			return;
 		}
 		m_Player->StartEating();
-		if (PlgMgr->CallHookPlayerEating(*m_Player))
+		if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerEating(*m_Player))
 		{
 			// A plugin won't let us eat, abort (send the proper packets to the client, too):
 			m_Player->AbortEating();
@@ -1440,7 +1457,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	}
 	else
 	{
-		if (PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 		{
 			// A plugin doesn't agree with using the item, abort
 			return;
@@ -1861,8 +1878,27 @@ void cClientHandle::RemoveFromWorld(void)
 	// Here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
+}
 
-	m_HasSentPlayerChunk = false;
+
+
+
+
+void cClientHandle::InvalidateCachedSentChunk()
+{
+	ASSERT(m_Player != nullptr);
+	// Sets this to a junk value different from the player's current chunk, which invalidates it and
+	// ensures its value will not be used.
+	m_CachedSentChunk = cChunkCoords(m_Player->GetChunkX() + 500, m_Player->GetChunkZ());
+}
+
+
+
+
+
+bool cClientHandle::IsPlayerChunkSent()
+{
+	return m_HasSentPlayerChunk;
 }
 
 
@@ -1926,6 +1962,35 @@ void cClientHandle::Tick(float a_Dt)
 		return;
 	}
 
+
+	// Freeze the player if it is standing on a chunk not yet sent to the client
+	m_HasSentPlayerChunk = false;
+	if (m_Player->GetParentChunk() != nullptr)
+	{
+		// If the chunk is invalid, do not bother checking if it's sent to the client, it is definitely not
+		if (m_Player->GetParentChunk()->IsValid())
+		{
+			// Before iterating m_SentChunks, see if the player's coords equal m_CachedSentChunk
+			// If so, the chunk has been sent to the client. This is an optimization that saves an iteration of m_SentChunks.
+			if (cChunkCoords(m_Player->GetChunkX(), m_Player->GetChunkZ()) == m_CachedSentChunk)
+			{
+				m_HasSentPlayerChunk = true;
+			}
+			else
+			{
+				// This block is entered only when the player moves to a new chunk, invalidating the cached coords.
+				// Otherwise the cached coords are used.
+				cCSLock Lock(m_CSChunkLists);
+				auto itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), cChunkCoords(m_Player->GetChunkX(), m_Player->GetChunkZ()));
+				if (itr != m_SentChunks.end())
+				{
+					m_CachedSentChunk = *itr;
+					m_HasSentPlayerChunk = true;
+				}
+			}
+		}
+	}
+
 	// If the chunk the player's in was just sent, spawn the player:
 	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
@@ -1957,7 +2022,7 @@ void cClientHandle::Tick(float a_Dt)
 			}
 		}
 
-		// Unload all chunks that are out of the view distance (all 5 seconds)
+		// Unload all chunks that are out of the view distance (every 5 seconds)
 		if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
 		{
 			UnloadOutOfRangeChunks();
@@ -2036,7 +2101,7 @@ void cClientHandle::ServerTick(float a_Dt)
 
 
 
-void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
 }
@@ -2236,15 +2301,6 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 		cCSLock Lock(m_CSChunkLists);
 		m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 	}
-
-	// If it is the chunk the player's in, make them spawn (in the tick thread):
-	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
-	{
-		if ((a_ChunkX == m_Player->GetChunkX()) && (a_ChunkZ == m_Player->GetChunkZ()))
-		{
-			m_HasSentPlayerChunk = true;
-		}
-	}
 }
 
 
@@ -2263,6 +2319,15 @@ void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & 
 void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
 {
 	m_Protocol->SendDestroyEntity(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	m_Protocol->SendDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 
@@ -3033,7 +3098,18 @@ void cClientHandle::SocketClosed(void)
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
-	Destroy();
+	if (m_Player != nullptr)
+	{
+		m_Player->GetWorld()->QueueTask([this](cWorld & World)
+		{
+			UNUSED(World);
+			Destroy();
+		});
+	}
+	else
+	{
+		Destroy();
+	}
 }
 
 

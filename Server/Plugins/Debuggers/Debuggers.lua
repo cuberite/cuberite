@@ -1921,6 +1921,109 @@ end
 
 
 
+function HandleConsoleTestBbox(a_Split, a_EntireCmd)
+	-- Test bbox intersection:
+	local bbox1 = cBoundingBox(0, 5, 0, 5, 0, 5)
+	local bbox2 = cBoundingBox(bbox1)  -- Make a copy
+	bbox2:Move(20, 20, 20)
+	local bbox3 = cBoundingBox(bbox1)  -- Make a copy
+	bbox3:Move(2, 2, 2)
+	local doesIntersect, intersection = bbox1:Intersect(bbox2)
+	LOG("Bbox 2 intersection: " .. tostring(doesIntersect))
+	LOG("  Intersection type: " .. type(intersection) .. " / " .. tolua.type(intersection))
+	if (intersection) then
+		LOG("  {" .. intersection:GetMinX() .. ", " .. intersection:GetMinY() .. ", " .. intersection:GetMinZ() .. "}")
+		LOG("  {" .. intersection:GetMaxX() .. ", " .. intersection:GetMaxY() .. ", " .. intersection:GetMaxZ() .. "}")
+	end
+	doesIntersect, intersection = bbox1:Intersect(bbox3)
+	LOG("Bbox 3 intersection: " .. tostring(doesIntersect))
+	LOG("  Intersection type: " .. type(intersection) .. " / " .. tolua.type(intersection))
+	if (intersection) then
+		LOG("  {" .. intersection:GetMinX() .. ", " .. intersection:GetMinY() .. ", " .. intersection:GetMinZ() .. "}")
+		LOG("  {" .. intersection:GetMaxX() .. ", " .. intersection:GetMaxY() .. ", " .. intersection:GetMaxZ() .. "}")
+	end
+	
+	-- Test line intersection:
+	local lines =
+	{
+		{ Vector3d(5, 0, 5), Vector3d(5, 1, 5) },
+		{ Vector3d(0, 0, 0), Vector3d(0, 1, 0) },
+	}
+	for idx, line in ipairs(lines) do
+		local doesIntersect, coeff, face = bbox2:CalcLineIntersection(line[1], line[2])
+		LOG("Line " .. idx .. " intersection: " .. tostring(doesIntersect))
+		LOG("  Coeff: " .. tostring(coeff))
+		LOG("  Face: " .. tostring(face))
+		local doesIntersect2, coeff2, face2 = cBoundingBox:CalcLineIntersection(bbox2:GetMin(), bbox2:GetMax(), line[1], line[2])
+		assert(doesIntersect == doesIntersect2)
+		assert(coeff == coeff2)
+		assert(face == face2)
+	end
+	
+	return true
+end
+
+
+
+
+
+function HandleConsoleTestCall(a_Split, a_EntireCmd)
+	LOG("Testing inter-plugin calls")
+	LOG("Note: These will fail if the Core plugin is not enabled")
+	
+	-- Test calling the HandleConsoleWeather handler:
+	local pm = cPluginManager
+	LOG("Calling Core's HandleConsoleWeather")
+	local isSuccess = pm:CallPlugin("Core", "HandleConsoleWeather",
+		{
+			"/weather",
+			"rain",
+		}
+	)
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+	
+	-- Test injecting some code:
+	LOG("Injecting code into the Core plugin")
+	isSuccess = pm:CallPlugin("Core", "dofile", pm:GetCurrentPlugin():GetLocalFolder() .. "/Inject.lua")
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+	
+	-- Test the full capabilities of the table-passing API, using the injected function:
+	LOG("Calling injected code")
+	isSuccess = pm:CallPlugin("Core", "injectedPrintParams",
+		{
+			"test",
+			nil,
+			{
+				"test",
+				"test"
+			},
+			[10] = "test",
+			["test"] = "test",
+			[{"test"}] = "test",
+			[true] = "test",
+		}
+	)
+	if (type(isSuccess) == "boolean") then
+		LOG("Success")
+	else
+		LOG("FAILED")
+	end
+
+	return true
+end
+
+
+
+
+
 function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	LOG("Testing Json parsing...")
 	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5] }]])
@@ -2152,6 +2255,47 @@ function HandleConsoleBBox(a_Split)
 	
 	return true
 end
+
+
+
+
+
+function HandleBlkCmd(a_Split, a_Player)
+	-- Gets info about the block the player is looking at.
+	local World = a_Player:GetWorld();
+
+	local Callbacks = {
+		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+			if (a_BlockType ~= E_BLOCK_AIR) then
+				a_Player:SendMessage("Block at " .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
+				return true;
+			end
+		end
+	};
+	
+	local EyePos = a_Player:GetEyePosition();
+	local LookVector = a_Player:GetLookVector();
+	LookVector:Normalize();
+	
+	local End = EyePos + LookVector * 50;
+	
+	cLineBlockTracer.Trace(World, Callbacks, EyePos.x, EyePos.y, EyePos.z, End.x, End.y, End.z);
+	
+	return true;
+end
+
+
+
+
+
+function HandleTeamsCmd(a_Split, a_Player)
+	local Scoreboard = a_Player:GetWorld():GetScoreBoard()
+
+	a_Player:SendMessage("Teams: " .. table.concat(Scoreboard:GetTeamNames(), ", "))
+
+	return true
+end
+
 
 
 

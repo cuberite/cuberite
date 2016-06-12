@@ -12,7 +12,6 @@
 
 
 
-
 class cWorld;
 class cWorldInterface;
 class cItem;
@@ -72,13 +71,14 @@ public:
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
-	void BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle);
+	void BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle);
 	void BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
 	void BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
@@ -116,8 +116,7 @@ public:
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
-	void MarkRedstoneDirty  (int a_ChunkX, int a_ChunkZ);
-	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
+	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
 
@@ -159,7 +158,7 @@ public:
 	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
-	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta);
+	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClient);
 	void       SetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
 	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
@@ -361,14 +360,17 @@ public:
 	/** Returns the number of valid chunks and the number of dirty chunks */
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 
-	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem) */
-	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
+	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
+	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
 
-	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config */
-	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
+	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the sugarcane grew inside this call */
+	int GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 
-	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config */
-	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
+	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
+	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
+
+	/** Grows a tall grass present at the block specified to a two tall grass; returns true if the grass grew */
+	bool GrowTallGrass(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -424,6 +426,8 @@ private:
 			cAllocationPool<cChunkData::sChunkSection> & a_Pool
 		);
 		~cChunkLayer();
+
+		cChunkLayer(const cChunkLayer & a_That) = delete;
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
 		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkZ);
@@ -507,7 +511,7 @@ private:
 	void RemoveLayer(cChunkLayer * a_Layer);
 
 	cCriticalSection m_CSLayers;
-	cChunkLayerList  m_Layers;
+	std::map<std::pair<int, int>, cChunkLayer>  m_Layers;
 	cEvent           m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
 	cWorld * m_World;

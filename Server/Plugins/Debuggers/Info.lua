@@ -202,6 +202,18 @@ g_PluginInfo =
 			Handler = HandleRemoveXp,
 			HelpString = "Remove all xp"
 		},
+		["/blk"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleBlkCmd,
+			HelpString = "Gets info about the block you are looking at"
+		},
+		["/teams"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleTeamsCmd,
+			HelpString = "List the teams"
+		},
 	},  -- Commands
 	
 	ConsoleCommands =
@@ -240,6 +252,18 @@ g_PluginInfo =
 		{
 			Handler = HandleConsoleSchedule,
 			HelpString = "Tests the world scheduling",
+		},
+		
+		["testbbox"] =
+		{
+			Handler = HandleConsoleTestBbox,
+			HelpString = "Tests cBoundingBox API"
+		},
+
+		["testcall"] =
+		{
+			Handler = HandleConsoleTestCall,
+			HelpString = "Tests inter-plugin calls with various values"
 		},
 		
 		["testjson"] =

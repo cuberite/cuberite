@@ -67,7 +67,6 @@ private:
 			}
 
 			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-			m_World->MarkRedstoneDirty(GetChunkX(), GetChunkZ());
 		}
 	}
 

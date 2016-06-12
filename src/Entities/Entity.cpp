@@ -878,6 +878,12 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_InvulnerableTicks--;
 	}
 
+	if ((GetPosY() < 0) && (!IsPlayer()))
+	{
+		Destroy();
+		return;
+	}
+
 	if (m_AttachedTo != nullptr)
 	{
 		SetPosition(m_AttachedTo->GetPosition());
@@ -1921,10 +1927,13 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 		Detach();
 	}
 
-	// Attach to the new entity:
+	// Update state information
 	m_AttachedTo = a_AttachTo;
 	a_AttachTo->m_Attachee = this;
-	m_World->BroadcastAttachEntity(*this, a_AttachTo);
+	if (a_AttachTo != nullptr)
+	{
+		m_World->BroadcastAttachEntity(*this, *a_AttachTo);
+	}
 }
 
 
@@ -1935,12 +1944,13 @@ void cEntity::Detach(void)
 {
 	if (m_AttachedTo == nullptr)
 	{
-		// Attached to no entity, our work is done
+		// Already not attached to any entity, our work is done
 		return;
 	}
+	m_World->BroadcastDetachEntity(*this, *m_AttachedTo);
+
 	m_AttachedTo->m_Attachee = nullptr;
 	m_AttachedTo = nullptr;
-	m_World->BroadcastAttachEntity(*this, nullptr);
 }
 
 
