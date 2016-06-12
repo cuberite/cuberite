@@ -43,6 +43,50 @@
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// LuaCommandHandler:
+
+/** Defines a bridge between cPluginManager::cCommandHandler and cLuaState::cCallback. */
+class LuaCommandHandler:
+	public cPluginManager::cCommandHandler
+{
+public:
+	LuaCommandHandler(cLuaState::cCallbackPtr a_Callback):
+		m_Callback(a_Callback)
+	{
+	}
+
+	virtual bool ExecuteCommand(
+		const AStringVector & a_Split,
+		cPlayer * a_Player,
+		const AString & a_Command,
+		cCommandOutputCallback * a_Output
+	) override
+	{
+		bool res = false;
+		AString s;
+		if (!m_Callback->Call(a_Split, a_Player, a_Command, cLuaState::Return, res, s))
+		{
+			return false;
+		}
+		if (res && (a_Output != nullptr) && !s.empty())
+		{
+			a_Output->Out(s);
+		}
+		return res;
+	}
+
+protected:
+	cLuaState::cCallbackPtr m_Callback;
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cManualBindings:
+
 // Better error reporting for Lua
 int cManualBindings::tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Error * a_pToLuaError)
 {
@@ -1268,12 +1312,13 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 
 
 
-static int tolua_cPluginManager_BindCommand(lua_State * L)
+static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 {
 	/* Function signatures:
 		cPluginManager:BindCommand(Command, Permission, Function, HelpString)
 		cPluginManager.BindCommand(Command, Permission, Function, HelpString)  -- without the "self" param
 	*/
+	cLuaState L(a_LuaState);
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
 	{
@@ -1306,29 +1351,24 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 		return 0;
 	}
 	cPluginManager * self = cPluginManager::Get();
-	AString Command   (tolua_tocppstring(L, idx,     ""));
-	AString Permission(tolua_tocppstring(L, idx + 1, ""));
-	AString HelpString(tolua_tocppstring(L, idx + 3, ""));
-
-	// Store the function reference:
-	lua_pop(L, 1);  // Pop the help string off the stack
-	int FnRef = luaL_ref(L, LUA_REGISTRYINDEX);  // Store function reference
-	if (FnRef == LUA_REFNIL)
+	AString Command, Permission, HelpString;
+	cLuaState::cCallbackPtr Handler;
+	L.GetStackValues(idx, Command, Permission, Handler, HelpString);
+	if (!Handler->IsValid())
 	{
 		LOGERROR("\"BindCommand\": Cannot create a function reference. Command \"%s\" not bound.", Command.c_str());
 		return 0;
 	}
 
-	if (!self->BindCommand(Command, Plugin, Permission, HelpString))
+	auto CommandHandler = std::make_shared<LuaCommandHandler>(Handler);
+	if (!self->BindCommand(Command, Plugin, CommandHandler, Permission, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
-		cLuaState LS(L);
-		LS.LogStackTrace();
+		L.LogStackTrace();
 		return 0;
 	}
 
-	Plugin->BindCommand(Command, FnRef);
-	lua_pushboolean(L, true);
+	L.Push(true);
 	return 1;
 }
 
@@ -1336,7 +1376,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 
 
 
-static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
+static int tolua_cPluginManager_BindConsoleCommand(lua_State * a_LuaState)
 {
 	/* Function signatures:
 		cPluginManager:BindConsoleCommand(Command, Function, HelpString)
@@ -1344,6 +1384,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 	*/
 
 	// Get the plugin identification out of LuaState:
+	cLuaState L(a_LuaState);
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
 	if (Plugin == nullptr)
 	{
@@ -1375,28 +1416,23 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
 		return 0;
 	}
 	cPluginManager * self = cPluginManager::Get();
-	AString Command   (tolua_tocppstring(L, idx,     ""));
-	AString HelpString(tolua_tocppstring(L, idx + 2, ""));
-
-	// Store the function reference:
-	lua_pop(L, 1);  // Pop the help string off the stack
-	int FnRef = luaL_ref(L, LUA_REGISTRYINDEX);  // Store function reference
-	if (FnRef == LUA_REFNIL)
+	AString Command, HelpString;
+	cLuaState::cCallbackPtr Handler;
+	L.GetStackValues(idx, Command, Handler, HelpString);
+	if (!Handler->IsValid())
 	{
-		LOGERROR("\"BindConsoleCommand\": Cannot create a function reference. Console Command \"%s\" not bound.", Command.c_str());
+		LOGERROR("\"BindConsoleCommand\": Cannot create a function reference. Console command \"%s\" not bound.", Command.c_str());
 		return 0;
 	}
 
-	if (!self->BindConsoleCommand(Command, Plugin, HelpString))
+	auto CommandHandler = std::make_shared<LuaCommandHandler>(Handler);
+	if (!self->BindConsoleCommand(Command, Plugin, CommandHandler, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
-		cLuaState LS(L);
-		LS.LogStackTrace();
+		L.LogStackTrace();
 		return 0;
 	}
-
-	Plugin->BindConsoleCommand(Command, FnRef);
-	lua_pushboolean(L, true);
+	L.Push(true);
 	return 1;
 }
 

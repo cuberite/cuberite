@@ -1569,9 +1569,9 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 		return crNoPermission;
 	}
 
-	ASSERT(cmd->second.m_Plugin != nullptr);
+	ASSERT(cmd->second.m_Handler != nullptr);
 
-	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player, a_Command))
+	if (!cmd->second.m_Handler->ExecuteCommand(Split, &a_Player, a_Command, nullptr))
 	{
 		return crError;
 	}
@@ -1654,11 +1654,6 @@ void cPluginManager::RemoveHooks(cPlugin * a_Plugin)
 
 void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
 {
-	if (a_Plugin != nullptr)
-	{
-		a_Plugin->ClearCommands();
-	}
-
 	for (CommandMap::iterator itr = m_Commands.begin(); itr != m_Commands.end();)
 	{
 		if (itr->second.m_Plugin == a_Plugin)
@@ -1694,7 +1689,13 @@ bool cPluginManager::IsPluginLoaded(const AString & a_PluginName)
 
 
 
-bool cPluginManager::BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString)
+bool cPluginManager::BindCommand(
+	const AString & a_Command,
+	cPlugin * a_Plugin,
+	cCommandHandlerPtr a_Handler,
+	const AString & a_Permission,
+	const AString & a_HelpString
+)
 {
 	CommandMap::iterator cmd = m_Commands.find(a_Command);
 	if (cmd != m_Commands.end())
@@ -1703,9 +1704,11 @@ bool cPluginManager::BindCommand(const AString & a_Command, cPlugin * a_Plugin, 
 		return false;
 	}
 
-	m_Commands[a_Command].m_Plugin     = a_Plugin;
-	m_Commands[a_Command].m_Permission = a_Permission;
-	m_Commands[a_Command].m_HelpString = a_HelpString;
+	auto & reg = m_Commands[a_Command];
+	reg.m_Plugin     = a_Plugin;
+	reg.m_Handler    = a_Handler;
+	reg.m_Permission = a_Permission;
+	reg.m_HelpString = a_HelpString;
 	return true;
 }
 
@@ -1768,11 +1771,6 @@ cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer & a_Pl
 
 void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
 {
-	if (a_Plugin != nullptr)
-	{
-		a_Plugin->ClearConsoleCommands();
-	}
-
 	for (CommandMap::iterator itr = m_ConsoleCommands.begin(); itr != m_ConsoleCommands.end();)
 	{
 		if (itr->second.m_Plugin == a_Plugin)
@@ -1792,7 +1790,12 @@ void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
 
 
 
-bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString)
+bool cPluginManager::BindConsoleCommand(
+	const AString & a_Command,
+	cPlugin * a_Plugin,
+	cCommandHandlerPtr a_Handler,
+	const AString & a_HelpString
+)
 {
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Command);
 	if (cmd != m_ConsoleCommands.end())
@@ -1808,9 +1811,11 @@ bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_P
 		return false;
 	}
 
-	m_ConsoleCommands[a_Command].m_Plugin     = a_Plugin;
-	m_ConsoleCommands[a_Command].m_Permission = "";
-	m_ConsoleCommands[a_Command].m_HelpString = a_HelpString;
+	auto & reg = m_ConsoleCommands[a_Command];
+	reg.m_Plugin     = a_Plugin;
+	reg.m_Handler    = a_Handler;
+	reg.m_Permission = "";
+	reg.m_HelpString = a_HelpString;
 	return true;
 }
 
@@ -1873,7 +1878,7 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 		return (res == crExecuted);
 	}
 
-	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output, a_Command);
+	return cmd->second.m_Handler->ExecuteCommand(a_Split, nullptr, a_Command, &a_Output);
 }
 
 

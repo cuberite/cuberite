@@ -1021,6 +1021,10 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallback & a_Callback)
 
 bool cLuaState::GetStackValue(int a_StackPos, cCallbackPtr & a_Callback)
 {
+	if (a_Callback == nullptr)
+	{
+		a_Callback = std::make_shared<cCallback>();
+	}
 	return a_Callback->RefStack(*this, a_StackPos);
 }
 

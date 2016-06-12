@@ -138,22 +138,8 @@ public:
 	virtual bool OnWorldStarted             (cWorld & a_World) override;
 	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) override;
 
-	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand) override;
-
-	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand) override;
-
-	virtual void ClearCommands(void) override;
-
-	virtual void ClearConsoleCommands(void) override;
-
 	/** Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121) */
 	bool CanAddOldStyleHook(int a_HookType);
-
-	/** Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
-	void BindCommand(const AString & a_Command, int a_FnRef);
-
-	/** Binds the console command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
-	void BindConsoleCommand(const AString & a_Command, int a_FnRef);
 
 	/** Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true */
 	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse);
@@ -186,9 +172,6 @@ public:
 	}
 
 protected:
-	/** Maps command name into Lua function reference */
-	typedef std::map<AString, int> CommandMap;
-
 	/** Provides an array of Lua function references */
 	typedef std::vector<cLuaState::cCallbackPtr> cLuaCallbacks;
 
@@ -198,12 +181,6 @@ protected:
 
 	/** The plugin's Lua state. */
 	cLuaState m_LuaState;
-
-	/** In-game commands that the plugin has registered. */
-	CommandMap m_Commands;
-
-	/** Console commands that the plugin has registered. */
-	CommandMap m_ConsoleCommands;
 
 	/** Hooks that the plugin has registered. */
 	cHookMap m_HookMap;

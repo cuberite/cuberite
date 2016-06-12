@@ -62,9 +62,7 @@ void cPluginLua::Close(void)
 		return;
 	}
 
-	// Remove the command bindings and web tabs:
-	ClearCommands();
-	ClearConsoleCommands();
+	// Remove the web tabs:
 	ClearWebTabs();
 
 	// Release all the references in the hook map:
@@ -994,91 +992,6 @@ bool cPluginLua::OnWorldTick(cWorld & a_World, std::chrono::milliseconds a_Dt, s
 
 
 
-bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand)
-{
-	ASSERT(!a_Split.empty());
-	cOperation op(*this);
-	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
-	if (cmd == m_Commands.end())
-	{
-		LOGWARNING("Command handler is registered in cPluginManager but not in cPlugin, wtf? Command \"%s\".", a_Split[0].c_str());
-		return false;
-	}
-
-	bool res = false;
-	op().Call(cmd->second, a_Split, &a_Player, a_FullCommand, cLuaState::Return, res);
-	return res;
-}
-
-
-
-
-
-bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand)
-{
-	ASSERT(!a_Split.empty());
-	cOperation op(*this);
-	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
-	if (cmd == m_ConsoleCommands.end())
-	{
-		LOGWARNING("Console command handler is registered in cPluginManager but not in cPlugin, wtf? Console command \"%s\", plugin \"%s\".",
-			a_Split[0].c_str(), GetName().c_str()
-		);
-		return false;
-	}
-
-	bool res = false;
-	AString str;
-	op().Call(cmd->second, a_Split, a_FullCommand, cLuaState::Return, res, str);
-	if (res && !str.empty())
-	{
-		a_Output.Out(str);
-	}
-	return res;
-}
-
-
-
-
-
-void cPluginLua::ClearCommands(void)
-{
-	cOperation op(*this);
-
-	// Unreference the bound functions so that Lua can GC them
-	if (m_LuaState != nullptr)
-	{
-		for (CommandMap::iterator itr = m_Commands.begin(), end = m_Commands.end(); itr != end; ++itr)
-		{
-			luaL_unref(m_LuaState, LUA_REGISTRYINDEX, itr->second);
-		}
-	}
-	m_Commands.clear();
-}
-
-
-
-
-
-void cPluginLua::ClearConsoleCommands(void)
-{
-	cOperation op(*this);
-
-	// Unreference the bound functions so that Lua can GC them
-	if (m_LuaState != nullptr)
-	{
-		for (CommandMap::iterator itr = m_ConsoleCommands.begin(), end = m_ConsoleCommands.end(); itr != end; ++itr)
-		{
-			luaL_unref(m_LuaState, LUA_REGISTRYINDEX, itr->second);
-		}
-	}
-	m_ConsoleCommands.clear();
-}
-
-
-
-
-
 bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 {
 	const char * FnName = GetHookFnName(a_HookType);
@@ -1221,26 +1134,6 @@ int cPluginLua::CallFunctionFromForeignState(
 	}
 
 	return res;
-}
-
-
-
-
-
-void cPluginLua::BindCommand(const AString & a_Command, int a_FnRef)
-{
-	ASSERT(m_Commands.find(a_Command) == m_Commands.end());
-	m_Commands[a_Command] = a_FnRef;
-}
-
-
-
-
-
-void cPluginLua::BindConsoleCommand(const AString & a_Command, int a_FnRef)
-{
-	ASSERT(m_ConsoleCommands.find(a_Command) == m_ConsoleCommands.end());
-	m_ConsoleCommands[a_Command] = a_FnRef;
 }
 
 

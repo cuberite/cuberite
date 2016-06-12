@@ -110,21 +110,6 @@ public:
 	virtual bool OnWorldStarted             (cWorld & a_World) = 0;
 	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) = 0;
 
-	/** Handles the command split into a_Split, issued by player a_Player.
-	Command permissions have already been checked.
-	Returns true if command handled successfully. */
-	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand) = 0;
-
-	/** Handles the console command split into a_Split.
-	Returns true if command handled successfully. Output is to be sent to the a_Output callback. */
-	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand) = 0;
-
-	/** All bound commands are to be removed, do any language-dependent cleanup here */
-	virtual void ClearCommands(void) {}
-
-	/** All bound console commands are to be removed, do any language-dependent cleanup here */
-	virtual void ClearConsoleCommands(void) {}
-
 	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }
 	void SetName(const AString & a_Name) { m_Name = a_Name; }
