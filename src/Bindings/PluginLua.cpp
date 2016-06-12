@@ -1140,32 +1140,6 @@ int cPluginLua::CallFunctionFromForeignState(
 
 
 
-bool cPluginLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse)
-{
-	ASSERT(a_FnRef != LUA_REFNIL);
-
-	cOperation op(*this);
-	bool res = false;
-	op().Call(a_FnRef, &a_Window, &a_Player, a_CanRefuse, cLuaState::Return, res);
-	return res;
-}
-
-
-
-
-
-void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum)
-{
-	ASSERT(a_FnRef != LUA_REFNIL);
-
-	cOperation op(*this);
-	op().Call(a_FnRef, &a_Window, a_SlotNum);
-}
-
-
-
-
-
 void cPluginLua::ClearWebTabs(void)
 {
 	auto webAdmin = cRoot::Get()->GetWebAdmin();

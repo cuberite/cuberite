@@ -141,12 +141,6 @@ public:
 	/** Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121) */
 	bool CanAddOldStyleHook(int a_HookType);
 
-	/** Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true */
-	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse);
-
-	/** Calls the plugin-specified "cLuaWindow slot changed" callback. */
-	void CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum);
-
 	/** Returns the name of Lua function that should handle the specified hook type in the older (#121) API */
 	static const char * GetHookFnName(int a_HookType);
 

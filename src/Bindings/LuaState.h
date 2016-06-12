@@ -640,18 +640,10 @@ protected:
 	*/
 	bool PushFunction(const char * a_FunctionName);
 
-	/** Pushes a function that has been saved into the global registry, identified by a_FnRef.
-	Returns true if successful. Logs a warning on failure
-	*/
-	bool PushFunction(int a_FnRef);
-
 	/** Pushes a function that has been saved as a reference.
 	Returns true if successful. Logs a warning on failure
 	*/
-	bool PushFunction(const cRef & a_FnRef)
-	{
-		return PushFunction(static_cast<int>(a_FnRef));
-	}
+	bool PushFunction(const cRef & a_FnRef);
 
 	/** Pushes a function that is stored in a referenced table by name
 	Returns true if successful. Logs a warning on failure

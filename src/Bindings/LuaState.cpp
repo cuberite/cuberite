@@ -553,7 +553,7 @@ bool cLuaState::PushFunction(const char * a_FunctionName)
 
 
 
-bool cLuaState::PushFunction(int a_FnRef)
+bool cLuaState::PushFunction(const cRef & a_FnRef)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
@@ -561,7 +561,7 @@ bool cLuaState::PushFunction(int a_FnRef)
 	// Push the error handler for lua_pcall()
 	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
 
-	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // same as lua_getref()
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, static_cast<int>(a_FnRef));  // same as lua_getref()
 	if (!lua_isfunction(m_LuaState, -1))
 	{
 		lua_pop(m_LuaState, 2);
