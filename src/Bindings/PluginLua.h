@@ -47,7 +47,7 @@ public:
 	public:
 		cOperation(cPluginLua & a_Plugin) :
 			m_Plugin(a_Plugin),
-			m_Lock(a_Plugin.m_CriticalSection)
+			m_Lock(a_Plugin.m_LuaState)
 		{
 		}
 
@@ -56,8 +56,8 @@ public:
 	protected:
 		cPluginLua & m_Plugin;
 
-		/** RAII lock for m_Plugin.m_CriticalSection */
-		cCSLock m_Lock;
+		/** RAII lock for the Lua state. */
+		cLuaState::cLock m_Lock;
 	} ;
 
 
@@ -155,13 +155,6 @@ public:
 	/** Binds the console command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
 	void BindConsoleCommand(const AString & a_Command, int a_FnRef);
 
-	cLuaState & GetLuaState(void) { return m_LuaState; }
-
-	cCriticalSection & GetCriticalSection(void) { return m_CriticalSection; }
-
-	/** Removes a previously referenced object (luaL_unref()) */
-	void Unreference(int a_LuaRef);
-
 	/** Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true */
 	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse);
 
@@ -189,8 +182,7 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(FnT a_Fn, Args && ... a_Args)
 	{
-		cCSLock Lock(m_CriticalSection);
-		return m_LuaState.Call(a_Fn, a_Args...);
+		return cOperation(*this)().Call(a_Fn, a_Args...);
 	}
 
 protected:
@@ -203,9 +195,6 @@ protected:
 	/** Maps hook types into arrays of Lua function references to call for each hook type */
 	typedef std::map<int, cLuaCallbacks> cHookMap;
 
-
-	/** The mutex protecting m_LuaState against multithreaded use. */
-	cCriticalSection m_CriticalSection;
 
 	/** The plugin's Lua state. */
 	cLuaState m_LuaState;
@@ -232,7 +221,7 @@ protected:
 	template <typename... Args>
 	bool CallSimpleHooks(int a_HookType, Args && ... a_Args)
 	{
-		cCSLock lock(m_CriticalSection);
+		cOperation op(*this);
 		auto & hooks = m_HookMap[a_HookType];
 		bool res = false;
 		for (auto & hook: hooks)

@@ -103,7 +103,9 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 		return 0;
 	}
 
-	ChunkStay->Enable(*World->GetChunkMap(), 3, 4);
+	cLuaState::cCallbackPtr onChunkAvailable, onAllChunksAvailable;
+	L.GetStackValues(3, onChunkAvailable, onAllChunksAvailable);  // Callbacks may be unassigned at all - as a request to load / generate chunks
+	ChunkStay->Enable(*World->GetChunkMap(), onChunkAvailable, onAllChunksAvailable);
 	return 0;
 }
 

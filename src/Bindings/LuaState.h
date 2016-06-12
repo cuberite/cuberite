@@ -7,7 +7,7 @@
 The contained lua_State can be either owned or attached.
 Owned lua_State is created by calling Create() and the cLuaState automatically closes the state
 Or, lua_State can be attached by calling Attach(), the cLuaState doesn't close such a state
-Attaching a state will automatically close an owned state.
+If owning a state, trying to attach a state will automatically close the previously owned state.
 
 Calling a Lua function is done internally by pushing the function using PushFunction(), then pushing the
 arguments and finally executing CallFunction(). cLuaState automatically keeps track of the number of
@@ -16,8 +16,12 @@ the stack using GetStackValue(). All of this is wrapped in a templated function 
 which is generated automatically by gen_LuaState_Call.lua script file into the LuaState_Call.inc file.
 
 Reference management is provided by the cLuaState::cRef class. This is used when you need to hold a reference to
-any Lua object across several function calls; usually this is used for callbacks. The class is RAII-like, with
-automatic resource management.
+any Lua object across several function calls. The class is RAII-like, with automatic resource management.
+
+Callbacks management is provided by the cLuaState::cCallback class. Use a GetStackValue() with cCallbackPtr
+parameter to store the callback, and then at any time you can use the cCallback's Call() templated function
+to call the callback. The callback management takes care of cLuaState being destroyed - the cCallback object
+stays valid but doesn't call into Lua code anymore, returning false for "failure" instead.
 */
 
 
@@ -39,6 +43,7 @@ extern "C"
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
+class cPluginLua;
 
 
 
@@ -48,6 +53,20 @@ class cLuaUDPEndpoint;
 class cLuaState
 {
 public:
+
+	/** Provides a RAII-style locking for the LuaState.
+	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
+	class cLock
+	{
+	public:
+		cLock(cLuaState & a_LuaState):
+			m_Lock(a_LuaState.m_CS)
+		{
+		}
+	protected:
+		cCSLock m_Lock;
+	};
+
 
 	/** Used for storing references to object in the global registry.
 	Can be bound (contains a reference) or unbound (doesn't contain reference).
@@ -127,15 +146,15 @@ public:
 	/** Represents a callback to Lua that C++ code can call.
 	Is thread-safe and unload-safe.
 	When the Lua state is unloaded, the callback returns an error instead of calling into non-existent code.
-	To receive the callback instance from the Lua side, use RefStack() or (better) cLuaState::GetStackValue().
-	Note that instances of this class are tracked in the canon LuaState instance, so that they can be invalidated
-	when the LuaState is unloaded; due to multithreading issues they can only be tracked by-ptr, which has
-	an unfortunate effect of disabling the copy and move constructors. */
+	To receive the callback instance from the Lua side, use RefStack() or (better) cLuaState::GetStackValue()
+	with a cCallbackPtr. Note that instances of this class are tracked in the canon LuaState instance, so that
+	they can be invalidated when the LuaState is unloaded; due to multithreading issues they can only be tracked
+	by-ptr, which has an unfortunate effect of disabling the copy and move constructors. */
 	class cCallback
 	{
 	public:
 		/** Creates an unbound callback instance. */
-		cCallback(void) = default;
+		cCallback(void);
 
 		~cCallback()
 		{
@@ -148,13 +167,17 @@ public:
 		template <typename... Args>
 		bool Call(Args &&... args)
 		{
-			cCSLock Lock(m_CS);
+			auto cs = m_CS;
+			if (cs == nullptr)
+			{
+				return false;
+			}
+			cCSLock Lock(*cs);
 			if (!m_Ref.IsValid())
 			{
 				return false;
 			}
-			cLuaState(m_Ref.GetLuaState()).Call(m_Ref, std::forward<Args>(args)...);
-			return true;
+			return cLuaState(m_Ref.GetLuaState()).Call(m_Ref, std::forward<Args>(args)...);
 		}
 
 		/** Set the contained callback to the function in the specified Lua state's stack position.
@@ -175,7 +198,7 @@ public:
 		friend class cLuaState;
 
 		/** The mutex protecting m_Ref against multithreaded access */
-		cCriticalSection m_CS;
+		cCriticalSection * m_CS;
 
 		/** Reference to the Lua callback */
 		cRef m_Ref;
@@ -185,10 +208,12 @@ public:
 		Called only from cLuaState when closing the Lua state. */
 		void Invalidate(void);
 
-		/** This class cannot be copied, because it is tracked in the LuaState by-ptr. */
+		/** This class cannot be copied, because it is tracked in the LuaState by-ptr.
+		Use cCallbackPtr for a copyable object. */
 		cCallback(const cCallback &) = delete;
 
-		/** This class cannot be moved, because it is tracked in the LuaState by-ptr. */
+		/** This class cannot be moved, because it is tracked in the LuaState by-ptr.
+		Use cCallbackPtr for a copyable object. */
 		cCallback(cCallback &&) = delete;
 	};
 	typedef SharedPtr<cCallback> cCallbackPtr;
@@ -250,6 +275,8 @@ public:
 	protected:
 		lua_State * m_LuaState;
 
+		/** Used for debugging, Lua state's stack size is checked against this number to make sure
+		it is the same as when the value was pushed. */
 		int m_StackLen;
 
 		// Remove the copy-constructor:
@@ -537,6 +564,8 @@ public:
 	cLuaState * QueryCanonLuaState(void);
 
 protected:
+
+	cCriticalSection m_CS;
 
 	lua_State * m_LuaState;
 

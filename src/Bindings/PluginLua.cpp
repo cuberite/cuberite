@@ -45,7 +45,6 @@ cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
 
 cPluginLua::~cPluginLua()
 {
-	cCSLock Lock(m_CriticalSection);
 	Close();
 }
 
@@ -55,10 +54,9 @@ cPluginLua::~cPluginLua()
 
 void cPluginLua::Close(void)
 {
-	cCSLock Lock(m_CriticalSection);
-
+	cOperation op(*this);
 	// If already closed, bail out:
-	if (!m_LuaState.IsValid())
+	if (!op().IsValid())
 	{
 		ASSERT(m_HookMap.empty());
 		return;
@@ -73,7 +71,7 @@ void cPluginLua::Close(void)
 	m_HookMap.clear();
 
 	// Close the Lua engine:
-	m_LuaState.Close();
+	op().Close();
 }
 
 
@@ -82,8 +80,8 @@ void cPluginLua::Close(void)
 
 bool cPluginLua::Load(void)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		m_LuaState.Create();
 		m_LuaState.RegisterAPILibs();
@@ -198,12 +196,12 @@ void cPluginLua::Unload(void)
 
 void cPluginLua::OnDisable(void)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.HasFunction("OnDisable"))
+	cOperation op(*this);
+	if (!op().HasFunction("OnDisable"))
 	{
 		return;
 	}
-	m_LuaState.Call("OnDisable");
+	op().Call("OnDisable");
 }
 
 
@@ -257,8 +255,8 @@ bool cPluginLua::OnBrewingCompleting(cWorld & a_World, cBrewingstandEntity & a_B
 
 bool cPluginLua::OnChat(cPlayer & a_Player, AString & a_Message)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -380,8 +378,8 @@ bool cPluginLua::OnEntityChangedWorld(cEntity & a_Entity, cWorld & a_World)
 
 bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, cPluginManager::CommandResult & a_Result)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -404,8 +402,8 @@ bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Sp
 
 bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -444,8 +442,8 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 
 bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -511,8 +509,8 @@ bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 
 bool cPluginLua::OnKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -777,8 +775,8 @@ bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Cha
 
 bool cPluginLua::OnPluginsLoaded(void)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -835,8 +833,8 @@ bool cPluginLua::OnProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity
 
 bool cPluginLua::OnServerPing(cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -923,8 +921,8 @@ bool cPluginLua::OnUpdatingSign(
 	cPlayer * a_Player
 )
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -956,8 +954,8 @@ bool cPluginLua::OnWeatherChanged(cWorld & a_World)
 
 bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.IsValid())
+	cOperation op(*this);
+	if (!op().IsValid())
 	{
 		return false;
 	}
@@ -999,6 +997,7 @@ bool cPluginLua::OnWorldTick(cWorld & a_World, std::chrono::milliseconds a_Dt, s
 bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand)
 {
 	ASSERT(!a_Split.empty());
+	cOperation op(*this);
 	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
 	if (cmd == m_Commands.end())
 	{
@@ -1006,9 +1005,8 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 		return false;
 	}
 
-	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(cmd->second, a_Split, &a_Player, a_FullCommand, cLuaState::Return, res);
+	op().Call(cmd->second, a_Split, &a_Player, a_FullCommand, cLuaState::Return, res);
 	return res;
 }
 
@@ -1019,6 +1017,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand)
 {
 	ASSERT(!a_Split.empty());
+	cOperation op(*this);
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
 	if (cmd == m_ConsoleCommands.end())
 	{
@@ -1028,10 +1027,9 @@ bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOut
 		return false;
 	}
 
-	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	AString str;
-	m_LuaState.Call(cmd->second, a_Split, a_FullCommand, cLuaState::Return, res, str);
+	op().Call(cmd->second, a_Split, a_FullCommand, cLuaState::Return, res, str);
 	if (res && !str.empty())
 	{
 		a_Output.Out(str);
@@ -1045,7 +1043,7 @@ bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOut
 
 void cPluginLua::ClearCommands(void)
 {
-	cCSLock Lock(m_CriticalSection);
+	cOperation op(*this);
 
 	// Unreference the bound functions so that Lua can GC them
 	if (m_LuaState != nullptr)
@@ -1064,7 +1062,7 @@ void cPluginLua::ClearCommands(void)
 
 void cPluginLua::ClearConsoleCommands(void)
 {
-	cCSLock Lock(m_CriticalSection);
+	cOperation op(*this);
 
 	// Unreference the bound functions so that Lua can GC them
 	if (m_LuaState != nullptr)
@@ -1187,8 +1185,6 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 
 bool cPluginLua::AddHookCallback(int a_HookType, cLuaState::cCallbackPtr a_Callback)
 {
-	ASSERT(m_CriticalSection.IsLockedByCurrentThread());  // It probably has to be, how else would we have a LuaState?
-
 	m_HookMap[a_HookType].push_back(a_Callback);
 	return true;
 }
@@ -1204,10 +1200,10 @@ int cPluginLua::CallFunctionFromForeignState(
 	int a_ParamEnd
 )
 {
-	cCSLock Lock(m_CriticalSection);
+	cOperation op(*this);
 
 	// Call the function:
-	int NumReturns = m_LuaState.CallFunctionWithForeignParams(a_FunctionName, a_ForeignState, a_ParamStart, a_ParamEnd);
+	int NumReturns = op().CallFunctionWithForeignParams(a_FunctionName, a_ForeignState, a_ParamStart, a_ParamEnd);
 	if (NumReturns < 0)
 	{
 		// The call has failed, an error has already been output to the log, so just silently bail out with the same error
@@ -1251,23 +1247,13 @@ void cPluginLua::BindConsoleCommand(const AString & a_Command, int a_FnRef)
 
 
 
-void cPluginLua::Unreference(int a_LuaRef)
-{
-	cCSLock Lock(m_CriticalSection);
-	luaL_unref(m_LuaState, LUA_REGISTRYINDEX, a_LuaRef);
-}
-
-
-
-
-
 bool cPluginLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse)
 {
 	ASSERT(a_FnRef != LUA_REFNIL);
 
-	cCSLock Lock(m_CriticalSection);
+	cOperation op(*this);
 	bool res = false;
-	m_LuaState.Call(a_FnRef, &a_Window, &a_Player, a_CanRefuse, cLuaState::Return, res);
+	op().Call(a_FnRef, &a_Window, &a_Player, a_CanRefuse, cLuaState::Return, res);
 	return res;
 }
 
@@ -1279,8 +1265,8 @@ void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int 
 {
 	ASSERT(a_FnRef != LUA_REFNIL);
 
-	cCSLock Lock(m_CriticalSection);
-	m_LuaState.Call(a_FnRef, &a_Window, a_SlotNum);
+	cOperation op(*this);
+	op().Call(a_FnRef, &a_Window, a_SlotNum);
 }
 
 

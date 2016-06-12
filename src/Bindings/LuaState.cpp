@@ -124,6 +124,15 @@ cLuaStateTracker & cLuaStateTracker::Get(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cCallback:
 
+cLuaState::cCallback::cCallback(void):
+	m_CS(nullptr)
+{
+}
+
+
+
+
+
 bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
 {
 	// Check if the stack contains a function:
@@ -136,11 +145,12 @@ bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
 	Clear();
 
 	// Add self to LuaState's callback-tracking:
-	a_LuaState.TrackCallback(*this);
+	auto canonState = a_LuaState.QueryCanonLuaState();
+	canonState->TrackCallback(*this);
 
 	// Store the new callback:
-	cCSLock Lock(m_CS);
-	m_Ref.RefStack(a_LuaState, a_StackPos);
+	m_CS = &(canonState->m_CS);
+	m_Ref.RefStack(*canonState, a_StackPos);
 	return true;
 }
 
@@ -153,16 +163,24 @@ void cLuaState::cCallback::Clear(void)
 	// Free the callback reference:
 	lua_State * luaState = nullptr;
 	{
-		cCSLock Lock(m_CS);
-		if (!m_Ref.IsValid())
+		auto cs = m_CS;
+		if (cs != nullptr)
 		{
-			return;
+			cCSLock Lock(*cs);
+			if (!m_Ref.IsValid())
+			{
+				return;
+			}
+			luaState = m_Ref.GetLuaState();
+			m_Ref.UnRef();
 		}
-		luaState = m_Ref.GetLuaState();
-		m_Ref.UnRef();
 	}
 
 	// Remove from LuaState's callback-tracking:
+	if (luaState == nullptr)
+	{
+		return;
+	}
 	cLuaState(luaState).UntrackCallback(*this);
 }
 
@@ -172,7 +190,12 @@ void cLuaState::cCallback::Clear(void)
 
 bool cLuaState::cCallback::IsValid(void)
 {
-	cCSLock lock(m_CS);
+	auto cs = m_CS;
+	if (cs == nullptr)
+	{
+		return false;
+	}
+	cCSLock lock(*cs);
 	return m_Ref.IsValid();
 }
 
@@ -182,7 +205,12 @@ bool cLuaState::cCallback::IsValid(void)
 
 bool cLuaState::cCallback::IsSameLuaState(cLuaState & a_LuaState)
 {
-	cCSLock lock(m_CS);
+	auto cs = m_CS;
+	if (cs == nullptr)
+	{
+		return false;
+	}
+	cCSLock lock(*cs);
 	if (!m_Ref.IsValid())
 	{
 		return false;
@@ -201,10 +229,16 @@ bool cLuaState::cCallback::IsSameLuaState(cLuaState & a_LuaState)
 
 void cLuaState::cCallback::Invalidate(void)
 {
-	cCSLock Lock(m_CS);
+	auto cs = m_CS;
+	if (cs == nullptr)
+	{
+		// Already invalid
+		return;
+	}
+	cCSLock Lock(*cs);
 	if (!m_Ref.IsValid())
 	{
-		LOGD("%s: Invalidating an already invalid callback at %p, this should not happen",
+		LOGD("%s: Inconsistent callback at %p, has a CS but an invalid Ref. This should not happen",
 			__FUNCTION__, reinterpret_cast<void *>(this)
 		);
 		return;
