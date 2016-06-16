@@ -68,9 +68,17 @@ static void TestWrap(void)
 
 int main(int argc, char * argv[])
 {
+	LOGD("Test started");
+
+	LOGD("Testing reads");
 	TestRead();
+
+	LOGD("Testing writes");
 	TestWrite();
+
+	LOGD("Testing wraps");
 	TestWrap();
+
 	LOG("ByteBuffer test finished.");
 }
 

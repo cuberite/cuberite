@@ -66,6 +66,9 @@ static int Test(void)
 
 int main(int argc, char * argv[])
 {
+	LOGD("Test started");
+
+	LOGD("Running test");
 	auto NumFailed = Test();
 	LOG("BoundingBox test finished, number of failed tests: %d", NumFailed);
 	return NumFailed;

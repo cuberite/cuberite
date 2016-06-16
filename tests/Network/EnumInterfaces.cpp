@@ -15,6 +15,7 @@
 int main(int argc, char * argv[])
 {
 	// Initialize the cNetwork subsystem:
+	LOGD("Initializing cNetwork...");
 	cNetworkSingleton::Get().Initialise();
 
 	// Enumerate all the addresses:

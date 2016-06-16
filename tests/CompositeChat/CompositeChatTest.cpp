@@ -98,11 +98,23 @@ static void TestParser5(void)
 
 int main(int argc, char * argv[])
 {
+	LOGD("Test started.");
+
+	LOGD("Running tests: 1");
 	TestParser1();
+
+	LOGD("Running tests: 2");
 	TestParser2();
+
+	LOGD("Running tests: 3");
 	TestParser3();
+
+	LOGD("Running tests: 4");
 	TestParser4();
+
+	LOGD("Running tests: 5");
 	TestParser5();
+
 	LOG("CompositeChat test finished.");
 }
 
