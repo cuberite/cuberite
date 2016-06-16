@@ -283,7 +283,7 @@ UInt32 cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY
 
 Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE a_Meta)
 {
-	switch (a_Meta & 0x7)
+	switch (a_Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
 		case E_META_DROPSPENSER_FACING_YP: return Vector3d( 0,  1,  0);
 		case E_META_DROPSPENSER_FACING_YM: return Vector3d( 0, -1,  0);

@@ -196,12 +196,12 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 		cRedstoneHandler::PoweringData Power;
 		for (const auto & Location : CurrentHandler->GetValidSourcePositions(CurrentLocation, CurrentBlock, CurrentMeta))
 		{
-			BLOCKTYPE PotentialBlock;
-			NIBBLETYPE PotentialMeta;
-			if ((Location.y < 0) || (Location.y > cChunkDef::Height))
+			if (!cChunk::IsValidHeight(Location.y))
 			{
 				continue;
 			}
+			BLOCKTYPE PotentialBlock;
+			NIBBLETYPE PotentialMeta;
 			m_World.GetBlockTypeMeta(Location.x, Location.y, Location.z, PotentialBlock, PotentialMeta);
 
 			auto PotentialSourceHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, PotentialBlock, &m_Data);
