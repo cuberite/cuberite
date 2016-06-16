@@ -13,6 +13,7 @@ set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/HostnameLookup.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/IPLookup.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkInterfaceEnum.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.cpp
@@ -62,3 +63,24 @@ target_link_libraries(EchoServer Network)
 # NameLookup: Lookup hostname-to-IP and IP-to-hostname:
 add_executable(NameLookup NameLookup.cpp)
 target_link_libraries(NameLookup Network)
+
+# EnumInterfaces: List all network interfaces:
+add_executable(EnumInterfaces-exe EnumInterfaces.cpp)
+target_link_libraries(EnumInterfaces-exe Network)
+add_test(NAME EnumInterfaces-test COMMAND EnumInterfaces-exe)
+
+
+
+
+# Put all the tests into a solution folder (MSVC):
+set_target_properties(
+	EchoServer
+	Google-exe
+	NameLookup
+	EnumInterfaces-exe
+	PROPERTIES FOLDER Tests
+)
+
+
+
+

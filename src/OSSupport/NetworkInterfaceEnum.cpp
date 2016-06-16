@@ -22,34 +22,6 @@
 
 
 
-#ifdef SELF_TEST
-
-static class cEnumIPAddressTest
-{
-public:
-	cEnumIPAddressTest(void)
-	{
-		cSelfTests::Get().Register(std::function<void(void)>(&Test), "Network IP enumeration");
-	}
-
-	static void Test(void)
-	{
-		LOG("Enumerating all IP addresses...");
-		auto IPs = cNetwork::EnumLocalIPAddresses();
-		for (auto & ip: IPs)
-		{
-			LOG("  %s", ip.c_str());
-		}
-		LOG("Done.");
-	}
-} g_EnumIPAddressTest;
-
-#endif  // SELF_TEST
-
-
-
-
-
 #ifdef _WIN32
 
 /** Converts the SOCKET_ADDRESS structure received from the OS into an IP address string. */
