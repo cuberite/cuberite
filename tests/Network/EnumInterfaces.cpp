@@ -23,13 +23,14 @@ int main(int argc, char * argv[])
 	auto IPs = cNetwork::EnumLocalIPAddresses();
 	for (auto & ip: IPs)
 	{
-		printf("  %s\n", ip.c_str());
+		LOGD("  %s", ip.c_str());
 	}
-	printf("Done.\n");
+	LOGD("All addresses enumerated.");
 
 	// Terminate the cNetwork subsystem:
 	cNetworkSingleton::Get().Terminate();
 
+	LOGD("Test finished.");
 	return 0;
 }
 
