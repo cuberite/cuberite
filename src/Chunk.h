@@ -82,6 +82,14 @@ public:
 		cpPresent,  /**< The chunk is present */
 	};
 
+	enum class eSaveStatus
+	{
+		CLEAN,                 // No changes were made to the chunk since last save
+		DIRTY,                 // Changes were made since last save, chunk is dirty
+		DIRTY_QUEUED_SAVING,   // Chunk is dirty, but it is queued for saving
+		DIRTY_IS_SAVING        // Chunk is dirty, but it is in the process of being saved, it will become CLEAN soon.
+	};
+
 	cChunk(
 		int a_ChunkX, int a_ChunkZ,   // Chunk coords
 		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
@@ -107,10 +115,21 @@ public:
 	/** Marks all clients attached to this chunk as wanting this chunk. Also sets presence to cpQueued. */
 	void MarkRegenerating(void);
 
-	/** Returns true iff the chunk has changed since it was last saved. */
-	bool IsDirty(void) const {return m_IsDirty; }
+	/** Returns true if the chunk has changed since it was last saved.
+	If true, implies that CanUnload() is false. */
+	bool IsDirty(void) const {return m_SaveStatus != eSaveStatus::CLEAN; }
 
+	/** Returns true if the chunk is dirty, not saving, and not queued for save.
+	If true, implies that IsDirty() is true, and that CanUnload() is false. */
+	bool IsDirtyAndNotQueuedForSave(void) const {return m_SaveStatus == eSaveStatus::DIRTY; }
+
+	/** The chunk is unused and not dirty, and can therefore be unloaded.
+	If true, implies that IsUnused is true, and that ShouldBeTicked() is false. */
 	bool CanUnload(void);
+
+	/** The chunk is unused, but it may or may not be dirty.
+	Saving may be needed before unload. If true, implies that ShouldBeTicked() is false. */
+	bool IsUnused(void);
 
 	bool IsLightValid(void) const {return m_IsLightValid; }
 
@@ -121,6 +140,7 @@ public:
 	3. Mark the chunk as saved (MarkSaved())
 	If anywhere inside this sequence another thread mmodifies the chunk, the chunk will not get marked as saved in MarkSaved()
 	*/
+	void MarkQueuedSaving(void);
 	void MarkSaving(void);  // Marks the chunk as being saved.
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
@@ -377,8 +397,11 @@ public:
 
 	inline void MarkDirty(void)
 	{
-		m_IsDirty = true;
-		m_IsSaving = false;
+		if (m_SaveStatus == eSaveStatus::CLEAN)
+		{
+			m_SaveStatus = eSaveStatus::DIRTY;
+			UpdateCanUnload();
+		}
 	}
 
 	/** Sets the blockticking to start at the specified block. Only one blocktick may be set, second call overwrites the first call */
@@ -507,11 +530,13 @@ private:
 	/** Holds the presence status of the chunk - if it is present, or in the loader / generator queue, or unloaded */
 	ePresence m_Presence;
 
+	/** Stores whether it's safe to unload this chunk. Returned by CanUnload(), modified by UpdateCanUnload(). */
+	bool m_CanUnload;
+
 	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
+	eSaveStatus m_SaveStatus;
 	bool m_ShouldGenerateIfLoadFailed;
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
-	bool m_IsDirty;        // True if the chunk has changed since it was last saved
-	bool m_IsSaving;       // True if the chunk is being saved
 	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 
 	std::vector<Vector3i> m_ToTickBlocks;
@@ -594,6 +619,10 @@ private:
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(cEntity * a_Entity);
+
+	/** Checks whether the chunk can unload and updates m_CanUnload accordingly.
+	Updates the world's counter of how many chunks can be unloaded. */
+	void UpdateCanUnload();
 };
 
 typedef cChunk * cChunkPtr;

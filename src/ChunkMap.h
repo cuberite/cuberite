@@ -38,6 +38,7 @@ class cMobCensus;
 class cMobSpawner;
 class cSetChunkData;
 class cBoundingBox;
+class cFastRandom;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cChunk *                           cChunkPtr;
@@ -381,17 +382,20 @@ public:
 	/** Try to Spawn Monsters inside all Chunks */
 	void SpawnMobs(cMobSpawner & a_MobSpawner);
 
+	size_t TickAndUnload(std::chrono::milliseconds a_Dt, int a_UnloadChance);
+
 	void Tick(std::chrono::milliseconds a_Dt);
 
 	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
 	void TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	void UnloadUnusedChunks(void);
-	void SaveAllChunks(void);
+	/** Saves chunks immediately. If UnusedOnly is set to true, only unused chunks are saved.
+	Otherwise, all chunks are saved. */
+	void SaveChunks(bool a_UnusedOnly);
 
 	cWorld * GetWorld(void) { return m_World; }
 
-	int GetNumChunks(void);
+	size_t GetNumChunks(void);
 
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
@@ -407,6 +411,12 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked);
+
+	/** Increase the internal chunk counter. */
+	void IncreaseChunkCounter();
+
+	/** Decrease the internal chunk counter. */
+	void DecreaseChunkCounter();
 
 private:
 
@@ -438,12 +448,9 @@ private:
 		int GetX(void) const {return m_LayerX; }
 		int GetZ(void) const {return m_LayerZ; }
 
-		int GetNumChunksLoaded(void) const ;
-
 		void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) const;
 
-		void Save(void);
-		void UnloadUnusedChunks(void);
+		void Save(bool a_UnusedOnly);
 
 		/** Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player */
 		void CollectMobCensus(cMobCensus & a_ToFill);
@@ -451,6 +458,7 @@ private:
 		/** Try to Spawn Monsters inside all Chunks */
 		void SpawnMobs(cMobSpawner & a_MobSpawner);
 
+		size_t TickAndUnload(std::chrono::milliseconds a_Dt, int a_UnloadChance, cFastRandom * a_Random);
 		void Tick(std::chrono::milliseconds a_Dt);
 
 		void RemoveClient(cClientHandle * a_Client);
@@ -464,15 +472,25 @@ private:
 		/** Returns true if there is an entity with the specified ID within this layer's chunks */
 		bool HasEntity(UInt32 a_EntityID);
 
+		/** Returns how many chunks this layer has. */
+		size_t GetNumChunks();
+
 	protected:
 
 		cChunkPtr m_Chunks[LAYER_SIZE * LAYER_SIZE];
 		int m_LayerX;
 		int m_LayerZ;
 		cChunkMap * m_Parent;
-		int m_NumChunksLoaded;
 
 		cAllocationPool<cChunkData::sChunkSection> & m_Pool;
+	private:
+		/** Increase the internal chunk counter. */
+		void IncreaseChunkCounter();
+
+		/** Decrease the internal chunk counter. */
+		void DecreaseChunkCounter();
+
+		size_t m_ChunkCounter;
 	};
 
 	class cStarvationCallbacks
@@ -515,6 +533,8 @@ private:
 	cEvent           m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
 	cWorld * m_World;
+
+	size_t m_ChunkCounter;
 
 	/** The cChunkStay descendants that are currently enabled in this chunkmap */
 	cChunkStays m_ChunkStays;

@@ -29,7 +29,7 @@
 #include "ClientHandle.h"
 #include "EffectID.h"
 #include <functional>
-
+#include "MemoryCounter.h"
 
 
 class cFireSimulator;
@@ -79,7 +79,7 @@ typedef cItemCallback<cFlowerPotEntity>    cFlowerPotCallback;
 
 
 
-
+const int CHUNK_CHANCE_ACCURACY = 100000;
 
 
 // tolua_begin
@@ -254,9 +254,6 @@ public:
 	bool IsChunkValid(int a_ChunkX, int a_ChunkZ) const;
 
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
-
-	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading. */
-	void QueueUnloadUnusedChunks(void);  // tolua_export
 
 	void CollectPickupsByPlayer(cPlayer & a_Player);
 
@@ -665,8 +662,9 @@ public:
 
 	// tolua_end
 
-	/** Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead */
-	void SaveAllChunks(void);
+	/** Saves chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead.
+	If UnusedOnly is set to true, only unused chunks are saved. Otherwise, all chunks are saved. */
+	void SaveChunks(bool a_UnusedOnly = false);
 
 	/** Queues a task to save all chunks onto the tick thread. The prefferred way of saving chunks from external sources */
 	void QueueSaveAllChunks(void);  // tolua_export
@@ -677,10 +675,10 @@ public:
 	/** Queues a lambda task onto the tick thread, with the specified delay. */
 	void ScheduleTask(int a_DelayTicks, std::function<void(cWorld &)> a_Task);
 
-	/** Returns the number of chunks loaded	 */
-	int GetNumChunks() const;  // tolua_export
+	/** Returns the number of chunks loaded.	 */
+	size_t GetNumChunks() const;  // tolua_export
 
-	/** Returns the number of chunks loaded and dirty, and in the lighting queue */
+	/** Returns the number of chunks loaded and dirty, and in the lighting queue. */
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
 
 	// Various queues length queries (cannot be const, they lock their CS):
@@ -701,6 +699,9 @@ public:
 
 	/** Processes the blocks queued for ticking with a delay (m_BlockTickQueue[]) */
 	void TickQueuedBlocks(void);
+
+	/** Returns the memory counter owned by this world. */
+	cMemoryCounter & GetMemoryCounter();
 
 	struct BlockTickQueueItem
 	{
@@ -884,8 +885,17 @@ private:
 	std::chrono::milliseconds  m_WorldAge;
 	std::chrono::milliseconds  m_TimeOfDay;
 	cTickTimeLong  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
-	cTickTimeLong  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
+	cTickTimeLong  m_LastUnloadCheck;        // The last WorldAge (in ticks) in which we checked if we need to unlad
 	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	cTickTimeLong  m_LastUnusedSave;    // The last WorldAge (in ticks) in which only unused chunks were saved.
+
+	// If too many chunks are loaded and we cannot free enough, this starts decreaminting once every
+	// 2 seconds. When it reaches zero, we save unused chunks in an attempt to free them.
+	// We do not do this immediately because we hope other worlds have freed enough chunks in the meantime.
+	int m_UnusedSaveCountDown;
+
+	cMemoryCounter m_MemoryCounter;
+
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
@@ -1017,6 +1027,22 @@ private:
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
+	/** Analyses various server meters, and determines how many chunks this world should unload
+	in order to maintain the proper amount of RAM.
+	Converts the result into a chance for a single chunk to unload during the following tick
+	and returns that. The returned chance is a fraction of the constant CHUNK_CHANCE_ACCURACY.
+
+	For instance:
+	- if 0 is returned, then no chunks should unload during the following tick.
+	- If CHUNK_CHANCE_ACCURACY / 2 is returned, then about half the unloadable chunks
+	should unload during the following tick.
+	- If CHUNK_CHANCE_ACCURACY is returned, then all chunks that can unload should unload
+	during the following tick.
+
+	Side effects:
+	May call cWorld::SaveChunks(true) if it estimates that we cannot unload enough chunks without saving. */
+	int ManageChunkUnload();
+
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
 
@@ -1028,9 +1054,6 @@ private:
 
 	/** Ticks all clients that are in this world */
 	void TickClients(float a_Dt);
-
-	/** Unloads all chunks immediately. */
-	void UnloadUnusedChunks(void);
 
 	void UpdateSkyDarkness(void);
 

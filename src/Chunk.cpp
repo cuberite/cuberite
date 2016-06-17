@@ -74,17 +74,17 @@ cChunk::cChunk(
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ) :
 	m_Presence(cpInvalid),
+	m_CanUnload(true),
+	m_SaveStatus(eSaveStatus::CLEAN),
 	m_ShouldGenerateIfLoadFailed(false),
 	m_IsLightValid(false),
-	m_IsDirty(false),
-	m_IsSaving(false),
 	m_HasLoadFailed(false),
 	m_StayCount(0),
 	m_PosX(a_ChunkX),
 	m_PosZ(a_ChunkZ),
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
-	m_ChunkData(a_Pool),
+	m_ChunkData(a_Pool, a_World->GetMemoryCounter()),
 	m_BlockTickX(0),
 	m_BlockTickY(0),
 	m_BlockTickZ(0),
@@ -113,6 +113,8 @@ cChunk::cChunk(
 	{
 		a_NeighborZP->m_NeighborZM = this;
 	}
+	m_World->GetMemoryCounter().IncrementCanUnloadCount();
+	m_World->GetMemoryCounter().IncrementApproximateChunkRAM(sizeof(cChunk));
 }
 
 
@@ -121,6 +123,9 @@ cChunk::cChunk(
 
 cChunk::~cChunk()
 {
+	ASSERT(m_CanUnload);
+	m_World->GetMemoryCounter().DecrementCanUnloadCount();
+	m_World->GetMemoryCounter().DecrementApproximateChunkRAM(sizeof(cChunk));
 	cPluginManager::Get()->CallHookChunkUnloaded(*m_World, m_PosX, m_PosZ);
 
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
@@ -179,6 +184,7 @@ void cChunk::SetPresence(cChunk::ePresence a_Presence)
 	{
 		m_World->GetChunkMap()->ChunkValidated();
 	}
+	UpdateCanUnload();
 }
 
 
@@ -212,11 +218,28 @@ void cChunk::MarkRegenerating(void)
 
 bool cChunk::CanUnload(void)
 {
-	return
-		m_LoadedByClient.empty() &&  // The chunk is not used by any client
-		!m_IsDirty &&                // The chunk has been saved properly or hasn't been touched since the load / gen
-		(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
-		(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
+	return m_CanUnload;
+}
+
+
+
+
+
+bool cChunk::IsUnused()
+{
+	return m_LoadedByClient.empty() &&  // The chunk is not used by any client
+	(m_StayCount == 0) &&               // The chunk is not in a ChunkStay
+	(m_Presence != cpQueued) ;          // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
+}
+
+
+
+
+
+void cChunk::MarkQueuedSaving(void)
+{
+	ASSERT(m_SaveStatus == eSaveStatus::DIRTY);
+	m_SaveStatus = eSaveStatus::DIRTY_QUEUED_SAVING;
 }
 
 
@@ -225,7 +248,8 @@ bool cChunk::CanUnload(void)
 
 void cChunk::MarkSaving(void)
 {
-	m_IsSaving = true;
+	ASSERT(m_SaveStatus == eSaveStatus::DIRTY_QUEUED_SAVING);
+	m_SaveStatus = eSaveStatus::DIRTY_IS_SAVING;
 }
 
 
@@ -234,11 +258,9 @@ void cChunk::MarkSaving(void)
 
 void cChunk::MarkSaved(void)
 {
-	if (!m_IsSaving)
-	{
-		return;
-	}
-	m_IsDirty = false;
+	ASSERT(m_SaveStatus == eSaveStatus::DIRTY_IS_SAVING);
+	m_SaveStatus = eSaveStatus::CLEAN;
+	UpdateCanUnload();
 }
 
 
@@ -247,7 +269,7 @@ void cChunk::MarkSaved(void)
 
 void cChunk::MarkLoaded(void)
 {
-	m_IsDirty = false;
+	m_SaveStatus = eSaveStatus::CLEAN;
 	SetPresence(cpPresent);
 }
 
@@ -266,7 +288,7 @@ void cChunk::MarkLoadFailed(void)
 	}
 	else
 	{
-		m_Presence = cpInvalid;
+		SetPresence(cpInvalid);
 	}
 }
 
@@ -466,6 +488,7 @@ bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunk::Stay(bool a_Stay)
 {
 	m_StayCount += (a_Stay ? 1 : -1);
+	UpdateCanUnload();
 	ASSERT(m_StayCount >= 0);
 }
 
@@ -628,7 +651,10 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	// Tick all block entities in this chunk:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
-		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
+		if ((*itr)->Tick(a_Dt, *this) && (!IsDirty()))
+		{
+			m_SaveStatus = eSaveStatus::DIRTY;
+		}
 	}
 
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
@@ -736,6 +762,29 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	} Mover(a_Entity);
 
 	m_ChunkMap->CompareChunkClients(this, Neighbor, Mover);
+}
+
+
+
+
+void cChunk::UpdateCanUnload()
+{
+	bool CanUnload =
+	m_LoadedByClient.empty() &&  // The chunk is not used by any client
+	(!IsDirty()) &&              // The chunk is not dirty
+	(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
+	(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
+
+	if ((CanUnload == false) && (m_CanUnload == true))
+	{
+		m_CanUnload = false;
+		m_World->GetMemoryCounter().DecrementCanUnloadCount();
+	}
+	if ((CanUnload == true) && (m_CanUnload == false))
+	{
+		m_CanUnload = true;
+		m_World->GetMemoryCounter().IncrementCanUnloadCount();
+	}
 }
 
 
@@ -1867,7 +1916,7 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 	}
 
 	m_LoadedByClient.push_back(a_Client);
-
+	UpdateCanUnload();
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		/*
@@ -1894,6 +1943,7 @@ void cChunk::RemoveClient(cClientHandle * a_Client)
 	ASSERT(std::distance(itr, m_LoadedByClient.end()) <= 1);
 	// Note: itr can equal m_LoadedByClient.end()
 	m_LoadedByClient.erase(itr, m_LoadedByClient.end());
+	UpdateCanUnload();
 
 	if (!a_Client->IsDestroyed())
 	{

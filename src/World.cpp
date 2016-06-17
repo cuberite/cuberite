@@ -63,7 +63,6 @@
 #include "FastRandom.h"
 
 
-
 const int TIME_SUNSET        = 12000;
 const int TIME_NIGHT_START   = 13187;
 const int TIME_NIGHT_END     = 22812;
@@ -149,8 +148,11 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
-	m_LastUnload(0),
+	m_LastUnloadCheck(0),
 	m_LastSave(0),
+	m_LastUnusedSave(0),
+	m_UnusedSaveCountDown(5),
+	m_MemoryCounter(),
 	m_SkyDarkness(0),
 	m_GameMode(gmNotSet),
 	m_bEnabledPVP(false),
@@ -225,6 +227,9 @@ cWorld::~cWorld()
 	Serializer.Save();
 
 	m_MapManager.SaveMapData();
+
+	// Must remove all chunk layers before reset, to keep the allocation pool while removal takes place
+	// m_ChunkMap->RemoveAllLayersAndChunks();  // TODO this can assert fail in cEntity destructor
 
 	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
 	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
@@ -1028,7 +1033,29 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	// Add players waiting in the queue to be added:
 	AddQueuedPlayers();
 
-	m_ChunkMap->Tick(a_Dt);
+	if (m_WorldAge - m_LastUnloadCheck > std::chrono::seconds(2))
+	{
+		m_LastUnloadCheck = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
+		// Unused non dirty chunks unload randomly in Cuberite.
+		// This is the chance of a single unused, non dirty chunk to unload, out of CHUNK_CHANCE_ACCURACY.
+		int UnloadChance = ManageChunkUnload();  // This function also does some chunk unload bookkeeping.
+		if (UnloadChance != 0)
+		{
+			m_ChunkMap->TickAndUnload(a_Dt, UnloadChance);
+			/* size_t UnloadedAmount = m_ChunkMap->TickAndUnload(a_Dt, UnloadChance);
+			LOGD("%s: Unloaded: %zu, Chance: %d / %d", GetName().c_str(), UnloadedAmount, UnloadChance, CHUNK_CHANCE_ACCURACY); */
+
+		}
+		else
+		{
+			m_ChunkMap->Tick(a_Dt);
+		}
+	}
+	else
+	{
+		m_ChunkMap->Tick(a_Dt);
+	}
+
 	TickMobs(a_Dt);
 	m_MapManager.TickMaps();
 
@@ -1042,14 +1069,122 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	if (m_WorldAge - m_LastSave > std::chrono::minutes(5))  // Save each 5 minutes
 	{
-		SaveAllChunks();
+		// LOGD("%s: ********* Saving ALL dirty chunks (periodic save)", GetName().c_str());
+		SaveChunks();
 	}
+}
 
-	if (m_WorldAge - m_LastUnload > std::chrono::seconds(10))  // Unload every 10 seconds
+
+
+
+
+int cWorld::ManageChunkUnload()
+{
+	/* #ifdef _DEBUG
+	size_t MyRam = GetMemoryCounter().GetApproximateChunkRAM();  // RAM used by our loaded chunks (approximated)
+	#endif */
+
+	cRoot * Root = cRoot::Get();
+	size_t Ram = Root->GetApproximateChunkRAM();  // RAM used by all world's loaded chunks combined (approximated) in MiB
+	size_t MaxRam = Root->GetMaxRAMChunks();      // Maximum allowed RAM use of all worlds in MiB
+
+	/* LOGD("%s: GlobalRam: %zu, myChunks: %zu, Unloadable: %zu", GetName().c_str(), Ram, GetNumChunks(), GetMemoryCounter().GetCanUnloadCount()); */
+
+	// If the setting is set to minimize ram
+	if (Root->GetMinimizeRam())
 	{
-		UnloadUnusedChunks();
+		// Save all chunks if RAM is too much
+		if (Ram > MaxRam)
+		{
+			if (m_WorldAge - m_LastSave > std::chrono::seconds(20))
+			{
+				LOGD("###### %s: Saving all unused dirty chunks", GetName().c_str());
+				SaveChunks(true);
+			}
+		}
+
+		// Unload all unused non dirty chunks anyways
+		return CHUNK_CHANCE_ACCURACY;
+		// The chance of a chunk to unload the next tick is random, and is equal to
+		// <returned value> out of CHUNK_CHANCE_ACCURACY.
+		// returning CHUNK_CHANCE_ACCURACY means all unused non dirty chunks will
+		// unload with 100% certainty.
 	}
 
+	// If we're here, then the setting is not set to minimize RAM, therefore we
+	// take advantage of the RAM we have and use it as a chunk cache.
+	// We unload as lazily as possible.
+
+	// *** The code below explained briefly ***
+	// Keeping chunks in the RAM is a good thing and RAM acts as a chunk cache.
+	// We want to unload chunks as little as possible.
+	// If maxRam is exceeded, we unload just enough to go below the limit.
+	// If we really cannot stop RAM growth because too many chunks are dirty and unloadable,
+	// then we call the save cycle.
+
+	if (Ram > MaxRam)  // If all worlds combined should free something
+	{
+		// Calculate how much RAM all worlds combined should free (MiB)
+		size_t RamFreeGoal = Root->GetApproximateChunkRAM() - Root->GetMaxRAMChunks();
+
+		// Calculate how many chunks all worlds should free, assuming all chunks consume equal RAM.
+		size_t ChunkUnloadGoal = (RamFreeGoal * Root->GetTotalChunkCount()) / Ram;
+
+		// How many unloadable chunks all worlds have
+		size_t UnloadableChunks = Root->GetTotalCanUnloadCount();
+
+		// If the chunk unload goal is bigger than the amount of unloadable chunks the worlds have,
+		// then we consider saving chunks in the following if block, and we may unload all unused
+		// non dirty chunks we have. We are patient, and we don't save straight away.
+		if (ChunkUnloadGoal > UnloadableChunks)
+		{
+			if (m_UnusedSaveCountDown > 0)
+			{
+				--m_UnusedSaveCountDown;
+				// Wait and don't save yet, in hopes that other worlds managed to free enough.
+				// We'll get back here next iteration
+			}
+			else
+			{
+				// We have waited for 5 iterations (10 seconds), and we still can't free enough,
+				// and other worlds didn't free enough. Let's resort to saving unused dirty chunks.
+
+				// Make sure we haven't saved recently.
+				if (m_WorldAge - m_LastUnusedSave > std::chrono::seconds(20))
+				{
+					// Wait randomly before saving, so that not all worlds save at once.
+					// During this wait, other worlds may save and we won't have to save if enough RAM is freed.
+					if (m_TickRand.randInt(3) == 0)
+					{
+						LOGD("###### %s: Saving unused dirty chunks to meet unload goal", GetName().c_str());
+						SaveChunks(true);
+					}
+				}
+			}
+
+			// Unload all unused non dirty chunks anyways.
+			return CHUNK_CHANCE_ACCURACY;
+		}
+		// ... Otherwise, the unload goal is attainable without a save. Just unload enough chunks.
+		else
+		{
+			m_UnusedSaveCountDown = 4;  // Reset the "save patience countdown". We won't save chunks any time soon.
+
+			// Calculate the chance for a single chunk to get freed next tick.
+			// The chance is in the range [1 to CHUNK_CHANCE_ACCURACY - 1].
+			size_t FreeChance = (CHUNK_CHANCE_ACCURACY * ChunkUnloadGoal) / UnloadableChunks;
+			return static_cast<int>(FreeChance);
+		}
+	}
+	else
+	{
+		// Reset the "save patience countdown". We won't save chunks any time soon.
+		m_UnusedSaveCountDown = 4;
+	}
+
+	// If we're here, it means nothing should be unloaded because RAM is smaller than maxRam
+	// Return an unload chance of zero (Unload chance per chunk per tick is <returned value> / CHUNK_CHANCE_ACCURACY)
+	return 0;
 }
 
 
@@ -2858,10 +2993,11 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	// If a client is requesting this chunk, send it to them:
 	int ChunkX = a_SetChunkData.GetChunkX();
 	int ChunkZ = a_SetChunkData.GetChunkZ();
+	bool ShouldMarkDirty = a_SetChunkData.ShouldMarkDirty();
 	cChunkSender & ChunkSender = m_ChunkSender;
 	DoWithChunk(
 		ChunkX, ChunkZ,
-		[&ChunkSender] (cChunk & a_Chunk) -> bool
+		[&ChunkSender, ShouldMarkDirty] (cChunk & a_Chunk) -> bool
 		{
 			if (a_Chunk.HasAnyClients())
 			{
@@ -2872,12 +3008,16 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 					a_Chunk.GetAllClients()
 				);
 			}
+			if (ShouldMarkDirty)
+			{
+				a_Chunk.MarkQueuedSaving();
+			}
 			return true;
 		}
 	);
 
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
-	if (a_SetChunkData.ShouldMarkDirty())
+	if (ShouldMarkDirty)
 	{
 		m_Storage.QueueSaveChunk(ChunkX, ChunkZ);
 	}
@@ -2939,25 +3079,6 @@ bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkZ) const
 bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 {
 	return m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
-void cWorld::UnloadUnusedChunks(void)
-{
-	m_LastUnload = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
-	m_ChunkMap->UnloadUnusedChunks();
-}
-
-
-
-
-
-void cWorld::QueueUnloadUnusedChunks(void)
-{
-	QueueTask([](cWorld & a_World) { a_World.UnloadUnusedChunks(); });
 }
 
 
@@ -3464,10 +3585,14 @@ bool cWorld::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 
 
 
-void cWorld::SaveAllChunks(void)
+void cWorld::SaveChunks(bool a_UnusedOnly)
 {
-	m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
-	m_ChunkMap->SaveAllChunks();
+	m_LastUnusedSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);;
+	if (!a_UnusedOnly)
+	{
+		m_LastSave = m_LastUnusedSave;
+	}
+	m_ChunkMap->SaveChunks(a_UnusedOnly);
 }
 
 
@@ -3476,7 +3601,7 @@ void cWorld::SaveAllChunks(void)
 
 void cWorld::QueueSaveAllChunks(void)
 {
-	QueueTask([](cWorld & a_World) { a_World.SaveAllChunks(); });
+	QueueTask([](cWorld & a_World) { a_World.SaveChunks(); });
 }
 
 
@@ -3558,9 +3683,13 @@ unsigned int cWorld::GetNumPlayers(void)
 
 
 
-int cWorld::GetNumChunks(void) const
+size_t cWorld::GetNumChunks(void) const
 {
-	return m_ChunkMap->GetNumChunks();
+	if (m_ChunkMap.get() != nullptr)
+	{
+		return m_ChunkMap->GetNumChunks();
+	}
+	return 0;
 }
 
 
@@ -3603,6 +3732,14 @@ void cWorld::TickQueuedBlocks(void)
 	}  // for itr - m_BlockTickQueueCopy[]
 }
 
+
+
+
+
+cMemoryCounter & cWorld::GetMemoryCounter()
+{
+	return m_MemoryCounter;
+}
 
 
 

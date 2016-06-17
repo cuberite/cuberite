@@ -124,8 +124,15 @@ public:
 	/** Executes commands queued in the command queue */
 	void TickCommands(void);
 
-	/** Returns the number of chunks loaded */
-	int GetTotalChunkCount(void);  // tolua_export
+	/** Returns the number of chunks loaded. */
+	size_t GetTotalChunkCount(void);  // tolua_export
+
+	/** Returns the number of loaded chunks that can be unloaded. */
+	size_t GetTotalCanUnloadCount();
+
+	/** Returns the estimated amount of RAM being used by all worlds' chunkmaps in MiB.
+	Actual amount is higher. */
+	size_t GetApproximateChunkRAM();
 
 	/** Saves all chunks in all worlds */
 	void SaveAllChunks(void);  // tolua_export
@@ -147,6 +154,13 @@ public:
 
 	/** Broadcast Player through all worlds */
 	void BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
+
+	/** Returns the RAM cap that all the chunks of the worlds combined must not exceed, in MiB.
+	This value can be set by the user in settings.ini. */
+	size_t GetMaxRAMChunks();
+
+	/** Returns whether ram magement is set to minimize RAM or to use as much RAM as possible as a chunk cache. */
+	bool GetMinimizeRam();
 
 	// tolua_begin
 
@@ -215,6 +229,12 @@ private:
 
 	cHTTPServer m_HTTPServer;
 
+	/** The amount of max RAM usage allowed by the chunks of all worlds combined, in MiB. */
+	size_t m_MaxRAMChunks;
+
+	/** Stores the chunk saving scheme. If true, worlds strive for minimizing RAM.
+	If false, worlds make full use of m_MaxRAMChunks as a chunk cache. */
+	bool m_MinimizeRam;
 
 	void LoadGlobalSettings();
 
