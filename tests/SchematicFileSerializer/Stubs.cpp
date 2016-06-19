@@ -6,79 +6,7 @@
 
 #include "Globals.h"
 #include "BlockInfo.h"
-#include "Bindings.h"
-#include "Bindings/DeprecatedBindings.h"
-#include "Bindings/LuaJson.h"
-#include "Bindings/ManualBindings.h"
-#include "BlockEntities/BlockEntity.h"
 #include "Blocks/BlockHandler.h"
-#include "Generating/ChunkDesc.h"
-
-
-
-
-
-// fwd:
-struct lua_State;
-
-
-
-
-
-// Prototypes, needed by clang:
-extern "C" int luaopen_lsqlite3(lua_State * a_LuaState);
-extern "C" int luaopen_lxp(lua_State * a_LuaState);
-
-
-
-
-
-void cManualBindings::Bind(lua_State * a_LuaState)
-{
-}
-
-
-
-
-
-void DeprecatedBindings::Bind(lua_State * a_LuaState)
-{
-}
-
-
-
-
-
-void cLuaJson::Bind(cLuaState & a_LuaState)
-{
-}
-
-
-
-
-
-int tolua_AllToLua_open(lua_State * a_LuaState)
-{
-	return 0;
-}
-
-
-
-
-
-extern "C" int luaopen_lsqlite3(lua_State * a_LuaState)
-{
-	return 0;
-}
-
-
-
-
-
-extern "C" int luaopen_lxp(lua_State * a_LuaState)
-{
-	return 0;
-}
 
 
 
@@ -259,14 +187,6 @@ bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a
 	return true;
 }
 
-
-
-
-
-cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-{
-	return nullptr;
-}
 
 
 

@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <event2/event.h>
 #include "Network.h"
 #include "CriticalSection.h"
 #include "Event.h"
@@ -127,11 +128,18 @@ protected:
 	/** The thread in which the main LibEvent loop runs. */
 	std::thread m_EventLoopThread;
 
+	/** Event that is signalled once the startup is finished and the LibEvent loop is running. */
+	UniquePtr<cEvent> m_StartupEvent;
+
+
 	/** Converts LibEvent-generated log events into log messages in MCS log. */
 	static void LogCallback(int a_Severity, const char * a_Msg);
 
 	/** Implements the thread that runs LibEvent's event dispatcher loop. */
 	static void RunEventLoop(cNetworkSingleton * a_Self);
+
+	/** Callback called by LibEvent when the event loop is started. */
+	static void SignalizeStartup(evutil_socket_t a_Socket, short a_Events, void * a_Self);
 };
 
 

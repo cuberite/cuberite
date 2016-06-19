@@ -8,7 +8,6 @@
 #include "ByteBuffer.h"
 #include "Endianness.h"
 #include "OSSupport/IsThread.h"
-#include "SelfTests.h"
 
 
 
@@ -49,71 +48,6 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 
 #define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false;  // Check if at least Num bytes can be read from  the buffer, return false if not
 #define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false;  // Check if at least Num bytes can be written to the buffer, return false if not
-
-
-
-
-
-#ifdef SELF_TEST
-
-/** Self-test of the VarInt-reading and writing code */
-static class cByteBufferSelfTest
-{
-public:
-	cByteBufferSelfTest(void)
-	{
-		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestRead),  "ByteBuffer read");
-		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestWrite), "ByteBuffer write");
-		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&TestWrap),  "ByteBuffer wraparound");
-	}
-
-	static void TestRead(void)
-	{
-		cByteBuffer buf(50);
-		buf.Write("\x05\xac\x02\x00", 4);
-		UInt32 v1;
-		assert_test(buf.ReadVarInt(v1) && (v1 == 5));
-		UInt32 v2;
-		assert_test(buf.ReadVarInt(v2) && (v2 == 300));
-		UInt32 v3;
-		assert_test(buf.ReadVarInt(v3) && (v3 == 0));
-	}
-
-	static void TestWrite(void)
-	{
-		cByteBuffer buf(50);
-		buf.WriteVarInt32(5);
-		buf.WriteVarInt32(300);
-		buf.WriteVarInt32(0);
-		AString All;
-		buf.ReadAll(All);
-		assert_test(All.size() == 4);
-		assert_test(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
-	}
-
-	static void TestWrap(void)
-	{
-		cByteBuffer buf(3);
-		for (int i = 0; i < 1000; i++)
-		{
-			size_t FreeSpace = buf.GetFreeSpace();
-			assert_test(buf.GetReadableSpace() == 0);
-			assert_test(FreeSpace > 0);
-			assert_test(buf.Write("a", 1));
-			assert_test(buf.CanReadBytes(1));
-			assert_test(buf.GetReadableSpace() == 1);
-			UInt8 v = 0;
-			assert_test(buf.ReadBEUInt8(v));
-			assert_test(v == 'a');
-			assert_test(buf.GetReadableSpace() == 0);
-			buf.CommitRead();
-			assert_test(buf.GetFreeSpace() == FreeSpace);  // We're back to normal
-		}
-	}
-
-} g_ByteBufferTest;
-
-#endif
 
 
 

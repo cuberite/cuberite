@@ -6,6 +6,8 @@
 
 int main(int argc, char** argv)
 {
+	LOGD("Test started");
+
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
 	{

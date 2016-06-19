@@ -16,15 +16,6 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/StringCompression.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 
-	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.cpp
-
-	${CMAKE_SOURCE_DIR}/src/Generating/ChunkDesc.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/PieceGenerator.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/VerticalStrategy.cpp
-
 	${CMAKE_SOURCE_DIR}/src/Noise/Noise.cpp
 
 	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
@@ -68,11 +59,8 @@ set (SHARED_HDRS
 )
 
 set (SRCS
-	LoadablePieces.cpp
+	SchematicFileSerializerTest.cpp
 	Stubs.cpp
-	LuaState_Typedefs.inc
-	LuaState_Declaration.inc
-	Bindings.h
 )
 
 
@@ -91,15 +79,15 @@ endif()
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
-add_executable(LoadablePieces ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(LoadablePieces tolualib zlib)
-add_test(NAME LoadablePieces-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LoadablePieces)
+add_executable(SchematicFileSerializer-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
+target_link_libraries(SchematicFileSerializer-exe zlib)
+add_test(NAME SchematicFileSerializer-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND SchematicFileSerializer-exe)
 
 
 
 
 # Put the projects into solution folders (MSVC):
 set_target_properties(
-	LoadablePieces
+	SchematicFileSerializer-exe
 	PROPERTIES FOLDER Tests
 )

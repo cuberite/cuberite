@@ -33,3 +33,20 @@ add_test(NAME arraystocoords-test COMMAND arraystocoords-exe)
 add_executable(copyblocks-exe CopyBlocks.cpp)
 target_link_libraries(copyblocks-exe ChunkBuffer)
 add_test(NAME copyblocks-test COMMAND copyblocks-exe)
+
+
+
+
+# Put all test projects into a separate folder:
+set_target_properties(
+	arraystocoords-exe
+	coordinates-exe
+	copies-exe
+	copyblocks-exe
+	creatable-exe
+	PROPERTIES FOLDER Tests/ChunkData
+)
+set_target_properties(
+	ChunkBuffer
+	PROPERTIES FOLDER Lib
+)

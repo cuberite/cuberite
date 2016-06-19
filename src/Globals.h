@@ -255,72 +255,73 @@ template class SizeChecker<UInt8,  1>;
 
 #ifndef TEST_GLOBALS
 
-// These fiunctions are defined in Logger.cpp, but are declared here to avoid including all of logger.h
-extern void LOG       (const char * a_Format, ...) FORMATSTRING(1, 2);
-extern void LOGINFO   (const char * a_Format, ...) FORMATSTRING(1, 2);
-extern void LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
-extern void LOGERROR  (const char * a_Format, ...) FORMATSTRING(1, 2);
+	// These functions are defined in Logger.cpp, but are declared here to avoid including all of logger.h
+	extern void LOG       (const char * a_Format, ...) FORMATSTRING(1, 2);
+	extern void LOGINFO   (const char * a_Format, ...) FORMATSTRING(1, 2);
+	extern void LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
+	extern void LOGERROR  (const char * a_Format, ...) FORMATSTRING(1, 2);
 
+	// In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
+	#ifdef _DEBUG
+		#define LOGD LOG
+	#else
+		#define LOGD(...)
+	#endif  // _DEBUG
 
+	#define LOGWARN LOGWARNING
 
-
-
-// In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
-#ifdef _DEBUG
-	#define LOGD LOG
-#else
-	#define LOGD(...)
-#endif  // _DEBUG
-
-#define LOGWARN LOGWARNING
 #else
 	// Logging functions
-void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGERROR(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOGERROR(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-void inline LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGWARNING(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOGWARNING(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-void inline LOGD(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOGD(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGD(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOGD(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-void inline LOG(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOG(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOG(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOG(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-#define LOGINFO LOG
-#define LOGWARN LOGWARNING
+	#define LOGINFO LOG
+	#define LOGWARN LOGWARNING
 
 #endif
 

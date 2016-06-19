@@ -79,7 +79,12 @@ static void DoTest(void)
 
 int main()
 {
+	LOGD("Initializing cNetwork...");
+	cNetworkSingleton::Get().Initialise();
+
+	LOGD("Running test...");
 	DoTest();
+
 	cNetworkSingleton::Get().Terminate();
 	LOGD("Network test finished");
 	return 0;
