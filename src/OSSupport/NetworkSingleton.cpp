@@ -91,10 +91,8 @@ void cNetworkSingleton::Initialise(void)
 
 	// Create the event loop thread:
 	m_HasTerminated = false;
-	m_StartupEvent.reset(new cEvent);
 	m_EventLoopThread = std::thread(RunEventLoop, this);
-	m_StartupEvent->Wait();  // Wait for the LibEvent loop to actually start running (otherwise calling Terminate too soon would hang, see #3228)
-	m_StartupEvent.reset();  // Don't need the cEvent any more, release all its resources
+	m_StartupEvent.Wait();  // Wait for the LibEvent loop to actually start running (otherwise calling Terminate too soon would hang, see #3228)
 }
 
 
@@ -169,8 +167,7 @@ void cNetworkSingleton::SignalizeStartup(evutil_socket_t a_Socket, short a_Event
 {
 	auto self = reinterpret_cast<cNetworkSingleton *>(a_Self);
 	ASSERT(self != nullptr);
-	ASSERT(self->m_StartupEvent != nullptr);
-	self->m_StartupEvent->Set();
+	self->m_StartupEvent.Set();
 }
 
 

@@ -129,7 +129,7 @@ protected:
 	std::thread m_EventLoopThread;
 
 	/** Event that is signalled once the startup is finished and the LibEvent loop is running. */
-	UniquePtr<cEvent> m_StartupEvent;
+	cEvent m_StartupEvent;
 
 
 	/** Converts LibEvent-generated log events into log messages in MCS log. */
