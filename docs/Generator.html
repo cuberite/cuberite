@@ -1,6 +1,8 @@
 <html>
 <head>
-<title>Generating terrain in Cuberite</title>
+	<title>Generating terrain in Cuberite</title>
+	<script src="js/ValueMap.js"></script>
+	<script src="js/grown.js"></script>
 </head>
 <body>
 <h1>Generating terrain in Cuberite</h1>
@@ -429,9 +431,41 @@ using the same approach as in MultiStepMap - by using a thresholded 2D Perlin no
 </tr>
 </table>
 
+
 <p>Of further note is the existence of two sets of the IntGen classes, representing the individual operations. There are the cProtIntGen class descendants, which are used for prototyping the connections between the operations - it's easy to just chain several operations after each other and they automatically use the correct array dimensions. However, it is possible to further optimize the calculations by moving the array dimensions into template parameters (so that they are, in fact, constant from the code's point of view, and so highly optimizable). This is what the cIntGen class descendants do. Unfortunately, this optimization makes it difficult to change the operation chain - when a new operation is added or removed in the chain, the array sizes for the rest of the chain change and they all have to be updated manually. So the optimal strategy was to use the cProtIntGen classes to find out the best-looking combination of operations, and once the combination was found, to rewrite it using cIntGen classes for performance.
 </p>
 
+<br />
+
+Here is a visualizer where you can play with the algorithm that the Grown biome generator uses. Note that rendering the map takes way longer than the zoom/smooth operation.
+<table>
+	<tr>
+		<td rowspan="5">
+			<canvas id="stage" width="600" height="600"></canvas>
+			<noscript>JavaScript is needed to use the visualizer</noscript>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button id="grownZoomButton" onclick="btnZoom(event.target)">Zoom</button>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button onclick="btnSmooth()">Smooth</button>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button onclick="btnReset()">Reset</button>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button onclick="btnAutomatic(event.target)">Auto</button>
+		</td>
+	</tr>
+</table>
 
 <hr />
 
