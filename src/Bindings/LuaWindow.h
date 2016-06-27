@@ -50,10 +50,10 @@ public:
 	// tolua_end
 
 	/** Sets the Lua callback function to call when the window is about to close */
-	void SetOnClosing(cLuaState::cCallbackPtr a_OnClosing);
+	void SetOnClosing(cLuaState::cCallbackPtr && a_OnClosing);
 
 	/** Sets the Lua callback function to call when a slot is changed */
-	void SetOnSlotChanged(cLuaState::cCallbackPtr a_OnSlotChanged);
+	void SetOnSlotChanged(cLuaState::cCallbackPtr && a_OnSlotChanged);
 
 protected:
 

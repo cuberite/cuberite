@@ -1023,6 +1023,19 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallbackPtr & a_Callback)
 {
 	if (a_Callback == nullptr)
 	{
+		a_Callback = cpp14::make_unique<cCallback>();
+	}
+	return a_Callback->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
+{
+	if (a_Callback == nullptr)
+	{
 		a_Callback = std::make_shared<cCallback>();
 	}
 	return a_Callback->RefStack(*this, a_StackPos);

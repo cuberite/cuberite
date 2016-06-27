@@ -105,7 +105,7 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 	cLuaState::cCallbackPtr onChunkAvailable, onAllChunksAvailable;
 	L.GetStackValues(3, onChunkAvailable, onAllChunksAvailable);  // Callbacks may be unassigned at all - as a request to load / generate chunks
-	ChunkStay->Enable(*World->GetChunkMap(), onChunkAvailable, onAllChunksAvailable);
+	ChunkStay->Enable(*World->GetChunkMap(), std::move(onChunkAvailable), std::move(onAllChunksAvailable));
 	return 0;
 }
 
@@ -484,7 +484,7 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 		return 0;
 	}
 	cWorld * World;
-	auto Task = std::make_shared<cLuaState::cCallback>();
+	cLuaState::cCallbackSharedPtr Task;
 	if (!L.GetStackValues(1, World, Task))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Cannot read parameters");

@@ -146,7 +146,7 @@ public:
 
 	/** Adds a Lua callback to be called for the specified hook.
 	Returns true if the hook was added successfully. */
-	bool AddHookCallback(int a_HookType, cLuaState::cCallbackPtr a_Callback);
+	bool AddHookCallback(int a_HookType, cLuaState::cCallbackPtr && a_Callback);
 
 	/** Calls a function in this plugin's LuaState with parameters copied over from a_ForeignState.
 	The values that the function returns are placed onto a_ForeignState.

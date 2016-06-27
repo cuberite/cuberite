@@ -260,7 +260,7 @@ bool cPluginLua::OnChat(cPlayer & a_Player, AString & a_Message)
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_CHAT];
-	for (auto hook: hooks)
+	for (auto & hook: hooks)
 	{
 		hook->Call(&a_Player, a_Message, cLuaState::Return, res, a_Message);
 		if (res)
@@ -1096,9 +1096,9 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 
 
 
-bool cPluginLua::AddHookCallback(int a_HookType, cLuaState::cCallbackPtr a_Callback)
+bool cPluginLua::AddHookCallback(int a_HookType, cLuaState::cCallbackPtr && a_Callback)
 {
-	m_HookMap[a_HookType].push_back(a_Callback);
+	m_HookMap[a_HookType].push_back(std::move(a_Callback));
 	return true;
 }
 

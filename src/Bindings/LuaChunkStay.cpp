@@ -115,8 +115,8 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 
 void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, cLuaState::cCallbackPtr a_OnChunkAvailable, cLuaState::cCallbackPtr a_OnAllChunksAvailable)
 {
-	m_OnChunkAvailable = a_OnChunkAvailable;
-	m_OnAllChunksAvailable = a_OnAllChunksAvailable;
+	m_OnChunkAvailable = std::move(a_OnChunkAvailable);
+	m_OnAllChunksAvailable = std::move(a_OnAllChunksAvailable);
 
 	// Enable the ChunkStay:
 	super::Enable(a_ChunkMap);

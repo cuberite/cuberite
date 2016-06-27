@@ -51,8 +51,8 @@ class LuaCommandHandler:
 	public cPluginManager::cCommandHandler
 {
 public:
-	LuaCommandHandler(cLuaState::cCallbackPtr a_Callback):
-		m_Callback(a_Callback)
+	LuaCommandHandler(cLuaState::cCallbackPtr && a_Callback):
+		m_Callback(std::move(a_Callback))
 	{
 	}
 
@@ -1052,14 +1052,14 @@ static int tolua_cPluginManager_AddHook_FnRef(cPluginManager * a_PluginManager, 
 	}
 
 	// Add the hook to the plugin
-	auto callback = std::make_shared<cLuaState::cCallback>();
+	cLuaState::cCallbackPtr callback;
 	if (!S.GetStackValue(a_ParamIdx + 1, callback))
 	{
 		LOGWARNING("cPluginManager.AddHook(): Cannot read the callback parameter");
 		S.LogStackTrace();
 		return 0;
 	}
-	if (!Plugin->AddHookCallback(HookType, callback))
+	if (!Plugin->AddHookCallback(HookType, std::move(callback)))
 	{
 		LOGWARNING("cPluginManager.AddHook(): Cannot add hook %d, unknown error.", HookType);
 		S.LogStackTrace();
@@ -1116,7 +1116,7 @@ static int tolua_cPluginManager_AddHook_DefFn(cPluginManager * a_PluginManager, 
 	}
 
 	// Retrieve the function to call and add it to the plugin:
-	auto callback = std::make_shared<cLuaState::cCallback>();
+	cLuaState::cCallbackPtr callback;
 	lua_getglobal(S, FnName);
 	bool res = S.GetStackValue(-1, callback);
 	lua_pop(S, 1);
@@ -1360,7 +1360,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 		return 0;
 	}
 
-	auto CommandHandler = std::make_shared<LuaCommandHandler>(Handler);
+	auto CommandHandler = std::make_shared<LuaCommandHandler>(std::move(Handler));
 	if (!self->BindCommand(Command, Plugin, CommandHandler, Permission, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
@@ -1425,7 +1425,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * a_LuaState)
 		return 0;
 	}
 
-	auto CommandHandler = std::make_shared<LuaCommandHandler>(Handler);
+	auto CommandHandler = std::make_shared<LuaCommandHandler>(std::move(Handler));
 	if (!self->BindConsoleCommand(Command, Plugin, CommandHandler, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
@@ -1666,7 +1666,7 @@ static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 
 template <
 	class OBJTYPE,
-	void (OBJTYPE::*SetCallback)(cLuaState::cCallbackPtr a_CallbackFn)
+	void (OBJTYPE::*SetCallback)(cLuaState::cCallbackPtr && a_CallbackFn)
 >
 static int tolua_SetObjectCallback(lua_State * tolua_S)
 {
@@ -1684,7 +1684,7 @@ static int tolua_SetObjectCallback(lua_State * tolua_S)
 	}
 
 	// Set the callback
-	(self->*SetCallback)(callback);
+	(self->*SetCallback)(std::move(callback));
 	return 0;
 }
 

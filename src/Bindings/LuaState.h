@@ -216,7 +216,8 @@ public:
 		Use cCallbackPtr for a copyable object. */
 		cCallback(cCallback &&) = delete;
 	};
-	typedef SharedPtr<cCallback> cCallbackPtr;
+	typedef UniquePtr<cCallback> cCallbackPtr;
+	typedef SharedPtr<cCallback> cCallbackSharedPtr;
 
 
 	/** A dummy class that's used only to delimit function args from return values for cLuaState::Call() */
@@ -380,6 +381,7 @@ public:
 	bool GetStackValue(int a_StackPos, bool & a_Value);
 	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
+	bool GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
 	bool GetStackValue(int a_StackPos, cRef & a_Ref);
 	bool GetStackValue(int a_StackPos, double & a_Value);

@@ -66,26 +66,26 @@ cLuaWindow::~cLuaWindow()
 
 
 
-void cLuaWindow::SetOnClosing(cLuaState::cCallbackPtr a_OnClosing)
+void cLuaWindow::SetOnClosing(cLuaState::cCallbackPtr && a_OnClosing)
 {
 	// Only one Lua state can be a cLuaWindow object callback:
 	ASSERT(a_OnClosing->IsSameLuaState(*m_LuaState));
 
 	// Store the new reference, releasing the old one if appropriate:
-	m_OnClosing = a_OnClosing;
+	m_OnClosing = std::move(a_OnClosing);
 }
 
 
 
 
 
-void cLuaWindow::SetOnSlotChanged(cLuaState::cCallbackPtr a_OnSlotChanged)
+void cLuaWindow::SetOnSlotChanged(cLuaState::cCallbackPtr && a_OnSlotChanged)
 {
 	// Only one Lua state can be a cLuaWindow object callback:
 	ASSERT(a_OnSlotChanged->IsSameLuaState(*m_LuaState));
 
 	// Store the new reference, releasing the old one if appropriate:
-	m_OnSlotChanged = a_OnSlotChanged;
+	m_OnSlotChanged = std::move(a_OnSlotChanged);
 }
 
 
