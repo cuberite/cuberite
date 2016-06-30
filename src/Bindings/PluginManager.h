@@ -152,6 +152,7 @@ public:
 		HOOK_MAX = HOOK_NUM_HOOKS - 1,
 	} ;  // tolua_export
 
+
 	/** Used as a callback for enumerating bound commands */
 	class cCommandEnumCallback
 	{
@@ -163,6 +164,30 @@ public:
 		*/
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) = 0;
 	} ;
+
+
+	/** Interface that must be provided by any class that implements a command handler, either in-game or console command. */
+	class cCommandHandler
+	{
+	public:
+		// Force a virtual destructor in descendants
+		virtual ~cCommandHandler() {}
+
+		/** Executes the specified in-game command.
+		a_Split is the command string, split at the spaces.
+		a_Player is the player executing the command, nullptr in case of the console.
+		a_Command is the entire command string.
+		a_Output is the sink into which the additional text returned by the command handler should be sent; only used for console commands. */
+		virtual bool ExecuteCommand(
+			const AStringVector & a_Split,
+			cPlayer * a_Player,
+			const AString & a_Command,
+			cCommandOutputCallback * a_Output = nullptr
+		) = 0;
+	};
+
+	typedef SharedPtr<cCommandHandler> cCommandHandlerPtr;
+
 
 	/** The interface used for enumerating and extern-calling plugins */
 	typedef cItemCallback<cPlugin> cPluginCallback;
@@ -281,8 +306,16 @@ public:
 	/** Returns true if the specified plugin is loaded. */
 	bool IsPluginLoaded(const AString & a_PluginName);  // tolua_export
 
-	/** Binds a command to the specified plugin. Returns true if successful, false if command already bound. */
-	bool BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
+	/** Binds a command to the specified handler.
+	Returns true if successful, false if command already bound.
+	Exported in ManualBindings.cpp. */
+	bool BindCommand(
+		const AString & a_Command,
+		cPlugin * a_Plugin,
+		cCommandHandlerPtr a_Handler,
+		const AString & a_Permission,
+		const AString & a_HelpString
+	);
 
 	/** Calls a_Callback for each bound command, returns true if all commands were enumerated */
 	bool ForEachCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -302,8 +335,15 @@ public:
 	/** Removes all console command bindings that the specified plugin has made */
 	void RemovePluginConsoleCommands(cPlugin * a_Plugin);
 
-	/** Binds a console command to the specified plugin. Returns true if successful, false if command already bound. */
-	bool BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
+	/** Binds a console command to the specified handler.
+	Returns true if successful, false if command already bound.
+	Exported in ManualBindings.cpp. */
+	bool BindConsoleCommand(
+		const AString & a_Command,
+		cPlugin * a_Plugin,
+		cCommandHandlerPtr a_Handler,
+		const AString & a_HelpString
+	);
 
 	/** Calls a_Callback for each bound console command, returns true if all commands were enumerated */
 	bool ForEachConsoleCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -332,6 +372,9 @@ public:
 	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true. */
 	bool ForEachPlugin(cPluginCallback & a_Callback);
 
+	/** Returns the name of the folder (cPlugin::GetFolderName()) from which the specified plugin was loaded. */
+	AString GetPluginFolderName(const AString & a_PluginName);  // tolua_export
+
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
 	static AString GetPluginsPath(void) { return FILE_IO_PREFIX + AString("Plugins"); }  // tolua_export
@@ -345,6 +388,7 @@ private:
 		cPlugin * m_Plugin;
 		AString   m_Permission;  // Not used for console commands
 		AString   m_HelpString;
+		cCommandHandlerPtr m_Handler;
 	} ;
 
 	typedef std::map<int, cPluginManager::PluginList> HookMap;
