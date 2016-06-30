@@ -30,6 +30,7 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
+#include "../Generating/ChunkDesc.h"
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
@@ -3443,6 +3444,33 @@ static int tolua_cBoundingBox_Intersect(lua_State * a_LuaState)
 
 
 
+static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
+{
+	/* Function signature:
+	ChunkDesc:GetBlockTypeMeta(RelX, RelY, RelZ) -> BlockType, BlockMeta
+	*/
+
+	cLuaState L(a_LuaState);
+	const cChunkDesc * self;
+	int relX, relY, relZ;
+	if (!L.GetStackValues(1, self, relX, relY, relZ))
+	{
+		L.LogStackValues();
+		tolua_error(a_LuaState, "Invalid function params. Expected chunkDesc:GetBlockTypeMeta(relX, relY, relZ)", nullptr);
+		return 0;
+	}
+	BLOCKTYPE blockType;
+	NIBBLETYPE blockMeta;
+	self->GetBlockTypeMeta(relX, relY, relZ, blockType, blockMeta);
+	L.Push(blockType);
+	L.Push(blockMeta);
+	return 2;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 {
 	// function cCompositeChat:AddRunCommandPart(Message, Command, [Style])
@@ -3734,6 +3762,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cBoundingBox");
 			tolua_function(tolua_S, "CalcLineIntersection", tolua_cBoundingBox_CalcLineIntersection);
 			tolua_function(tolua_S, "Intersect",            tolua_cBoundingBox_Intersect);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cChunkDesc");
+			tolua_function(tolua_S, "GetBlockTypeMeta", tolua_cChunkDesc_GetBlockTypeMeta);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cClientHandle");

@@ -72,7 +72,7 @@ void cChunkDesc::SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 
 
-void cChunkDesc::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+void cChunkDesc::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	m_BlockArea.GetRelBlockTypeMeta(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 }
