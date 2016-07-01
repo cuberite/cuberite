@@ -69,22 +69,27 @@ set(BINDING_DEPENDENCIES
 	../BlockEntities/BeaconEntity.h
 	../BlockEntities/BlockEntity.h
 	../BlockEntities/BlockEntityWithItems.h
+	../BlockEntities/BrewingstandEntity.h
 	../BlockEntities/ChestEntity.h
+	../BlockEntities/CommandBlockEntity.h
 	../BlockEntities/DispenserEntity.h
 	../BlockEntities/DropSpenserEntity.h
 	../BlockEntities/DropperEntity.h
 	../BlockEntities/FurnaceEntity.h
 	../BlockEntities/HopperEntity.h
 	../BlockEntities/JukeboxEntity.h
+	../BlockEntities/MobSpawnerEntity.h
 	../BlockEntities/NoteEntity.h
 	../BlockEntities/SignEntity.h
 	../BlockEntities/MobHeadEntity.h
 	../BlockEntities/FlowerPotEntity.h
 	../BlockID.h
+	../BlockInfo.h
 	../BoundingBox.h
 	../ChatColor.h
 	../ChunkDef.h
 	../ClientHandle.h
+	../CompositeChat.h
 	../CraftingRecipes.h
 	../Cuboid.h
 	../Defines.h
@@ -111,13 +116,20 @@ set(BINDING_DEPENDENCIES
 	../Entities/TNTEntity.h
 	../Entities/WitherSkullEntity.h
 	../Generating/ChunkDesc.h
+	../IniFile.h
 	../Inventory.h
 	../Item.h
 	../ItemGrid.h
+	../Map.h
+	../MapManager.h
 	../Mobs/Monster.h
+	../Mobs/MonsterTypes.h
 	../OSSupport/File.h
+	../Protocol/MojangAPI.h
 	../Root.h
+	../Scoreboard.h
 	../Server.h
+	../Statistics.h
 	../StringUtils.h
 	../Tracer.h
 	../UI/Window.h
