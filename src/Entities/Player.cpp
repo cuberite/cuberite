@@ -1232,14 +1232,17 @@ void cPlayer::SetTeam(cTeam * a_Team)
 
 	if (m_Team)
 	{
-		m_Team->RemovePlayer(GetName());
+		if (!m_Team->RemovePlayer(GetUUID()))
+		{
+			m_Team->RemovePlayer(GetName());
+		}
 	}
 
 	m_Team = a_Team;
 
 	if (m_Team)
 	{
-		m_Team->AddPlayer(GetName());
+		m_Team->AddPlayer(GetUUID());
 	}
 }
 
@@ -1256,8 +1259,14 @@ cTeam * cPlayer::UpdateTeam(void)
 	else
 	{
 		cScoreboard & Scoreboard = m_World->GetScoreBoard();
+		cTeam * Team = Scoreboard.QueryPlayerTeam(GetUUID());
 
-		SetTeam(Scoreboard.QueryPlayerTeam(GetName()));
+		if (Team == nullptr)
+		{
+			Team = Scoreboard.QueryPlayerTeam(GetName());
+		}
+
+		SetTeam(Team);
 	}
 
 	return m_Team;
