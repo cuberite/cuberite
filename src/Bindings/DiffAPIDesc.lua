@@ -41,6 +41,7 @@ local g_CTypeToLuaType =
 	unsigned = "number",
 	["const AString"] = "string",
 	["const char*"] = "string",
+	["std::string"] = "string",
 	["Vector3<int>"]    = "Vector3i",
 	["Vector3<float>"]  = "Vector3f",
 	["Vector3<double>"] = "Vector3d",
@@ -129,13 +130,16 @@ end
 local function functionDescMatchesDocs(a_FunctionDesc, a_FunctionDoc)
 	-- Check the number of parameters:
 	local numParams
+	local numOptionalParams = 0
 	if (not(a_FunctionDesc.Params) or (a_FunctionDesc.Params == "")) then
 		numParams = 0
 	else
 		_, numParams = string.gsub(a_FunctionDesc.Params, ",", "")
 		numParams = numParams + 1
+		_, numOptionalParams = string.gsub(a_FunctionDesc.Params, "%b[]", "")
 	end
-	if (#(a_FunctionDoc.Params) ~= numParams) then
+	local numDocParams = #(a_FunctionDoc.Params)
+	if ((numDocParams > numParams) or (numDocParams < numParams - numOptionalParams)) then
 		return false
 	end
 	
@@ -151,20 +155,12 @@ end
 -- a_FunctionDocs is an array of function documentation items, as loaded from ToLua++'s parser
 -- If all descriptions match, nil is returned instead
 local function listMissingClassSingleFunctionDescs(a_FunctionDescs, a_FunctionDocs)
-	-- Generate a helper map of index -> true that monitors a_FunctionDescs' items' usage:
-	local freeDescs = {}
-	for i = 1, #a_FunctionDescs do
-		freeDescs[i] = true
-	end
-	
-	-- For each documentation item, try to find a match in a_FunctionDescs that hasn't been used yet:
+	-- For each documentation item, try to find a match in a_FunctionDescs:
 	local res = {}
 	for _, docs in ipairs(a_FunctionDocs) do
 		local hasFound = false
-		for idx, _ in pairs(freeDescs) do
-			local desc = a_FunctionDescs[idx]
+		for _, desc in ipairs(a_FunctionDescs) do
 			if (functionDescMatchesDocs(desc, docs)) then
-				freeDescs[idx] = nil
 				hasFound = true
 				break
 			end
@@ -269,7 +265,11 @@ local function listMissingClassDescs(a_ClassName, a_ClassDesc, a_ClassDocs, a_Mi
 		Constants = listMissingClassVarConstDescs(a_ClassDesc.Constants, a_ClassDocs.Constants),
 		Variables = listMissingClassVarConstDescs(a_ClassDesc.Variables, a_ClassDocs.Variables),
 	}
-	if not(missing.Functions) and not(missing.Constants) and not(missing.Variables) then
+	if (
+		not(missing.Functions) and
+		not(missing.Constants) and
+		not(missing.Variables)
+	) then
 		-- Nothing missing, don't add anything
 		return
 	end
