@@ -2,12 +2,15 @@ build/
 nbproject/
 ipch/
 Win32/
-MCServer/MCServer
-MCServer/buildinfo
-MCServer/CONTRIBUTORS
-MCServer/LICENSE
-MCServer/Licenses
-MCServer/itemblacklist
+MCServer
+Server/Cuberite
+Server/buildinfo
+Server/CONTRIBUTORS
+Server/LICENSE
+Server/Licenses
+Server/itemblacklist
+Tools/MCADefrag/MCADefrag
+Tools/ProtoProxy/ProtoProxy
 Testing/
 ChunkWorxSave.ini
 doxy/
@@ -55,7 +58,7 @@ players
 world
 world_nether
 
-#cmake stuff
+# cmake stuff
 CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
@@ -71,26 +74,35 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 install_mainfest.txt
-src/MCServer
+src/Cuberite
 lib/tolua++/tolua
 src/Bindings/Bindings.*
 src/Bindings/BindingDependencies.txt
-MCServer.dir/
+Cuberite.dir/
 src/AllFiles.lst
 
-#win32 cmake stuff
+# win32 cmake stuff
 *.vcxproj
 *.vcproj
 *.vcxproj.filters
 *.opensdf
 *.sdf
 *.sln
+*.opendb
 *.idb
 
-#cmake output folders
+# cmake output folders and files
 ZERO_CHECK.dir/
 Debug/
 DebugProfile/
 Release/
 ReleaseProfile/
 *.dir/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+
+# APIDump-generated status files:
+Server/cuberite_api.lua
+Server/official_undocumented.lua
+Server/NewlyUndocumented.lua
+

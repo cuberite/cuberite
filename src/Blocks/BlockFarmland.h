@@ -19,7 +19,7 @@
 class cBlockFarmlandHandler :
 	public cBlockHandler
 {
-	
+
 public:
 	cBlockFarmlandHandler(BLOCKTYPE a_BlockType) :
 		cBlockHandler(a_BlockType)
@@ -45,7 +45,7 @@ public:
 		}
 
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		BLOCKTYPE UpperBlock = (a_RelY >= cChunkDef::Height - 1) ? E_BLOCK_AIR : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
+		BLOCKTYPE UpperBlock = (a_RelY >= cChunkDef::Height - 1) ? static_cast<BLOCKTYPE>(E_BLOCK_AIR) : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
 		switch (UpperBlock)
 		{
 			case E_BLOCK_CROPS:
@@ -104,7 +104,7 @@ public:
 		}
 
 		// Search for water in a close proximity:
-		// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
+		// Ref.: http://minecraft.gamepedia.com/Farmland#Hydrated_Farmland_Tiles
 		// TODO: Rewrite this to use the chunk and its neighbors directly
 		cBlockArea Area;
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
@@ -127,8 +127,15 @@ public:
 
 		return false;
 	}
+
+	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) override
+	{
+		return (
+			(a_Plant == E_BLOCK_CROPS) ||
+			(a_Plant == E_BLOCK_CARROTS) ||
+			(a_Plant == E_BLOCK_POTATOES) ||
+			(a_Plant == E_BLOCK_MELON_STEM) ||
+			(a_Plant == E_BLOCK_PUMPKIN_STEM)
+		);
+	}
 } ;
-
-
-
-

@@ -48,7 +48,7 @@ cSetChunkData::cSetChunkData(
 	// Copy block types and metas:
 	memcpy(m_BlockTypes, a_BlockTypes, sizeof(cChunkDef::BlockTypes));
 	memcpy(m_BlockMetas, a_BlockMetas, sizeof(cChunkDef::BlockNibbles));
-	
+
 	// Copy lights, if both given:
 	if ((a_BlockLight != nullptr) && (a_SkyLight != nullptr))
 	{
@@ -60,7 +60,7 @@ cSetChunkData::cSetChunkData(
 	{
 		m_IsLightValid = false;
 	}
-	
+
 	// Copy the heightmap, if available:
 	if (a_HeightMap != nullptr)
 	{
@@ -71,7 +71,7 @@ cSetChunkData::cSetChunkData(
 	{
 		m_IsHeightMapValid = false;
 	}
-	
+
 	// Copy biomes, if available:
 	if (a_Biomes != nullptr)
 	{
@@ -82,7 +82,7 @@ cSetChunkData::cSetChunkData(
 	{
 		m_AreBiomesValid = false;
 	}
-	
+
 	// Move entities and blockentities:
 	m_Entities = std::move(a_Entities);
 	m_BlockEntities = std::move(a_BlockEntities);

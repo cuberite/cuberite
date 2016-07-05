@@ -33,10 +33,10 @@ extern "C"
 
 
 
-// For the "dumpmem" server command:
-/// Synchronize this with main.cpp - the leak finder needs initialization before it can be used to dump memory
-// _X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
-// and we haven't had a memory leak for over a year anyway.
+/** Enable the memory leak finder - needed for the "dumpmem" server command:
+Synchronize this with main.cpp - the leak finder needs initialization before it can be used to dump memory
+_X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
+and we haven't had a memory leak for over a year anyway. */
 // #define ENABLE_LEAK_FINDER
 
 #if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
@@ -145,6 +145,8 @@ cServer::cServer(void) :
 	m_ShouldLoadOfflinePlayerData(false),
 	m_ShouldLoadNamedPlayerData(true)
 {
+	// Initialize the LuaStateTracker singleton before the app goes multithreaded:
+	cLuaStateTracker::GetStats();
 }
 
 
@@ -187,7 +189,7 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 
 bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth)
 {
-	m_Description = a_Settings.GetValueSet("Server", "Description", "MCServer - in C++!");
+	m_Description = a_Settings.GetValueSet("Server", "Description", "Cuberite - in C++!");
 	m_MaxPlayers  = a_Settings.GetValueSetI("Server", "MaxPlayers", 100);
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
@@ -371,7 +373,7 @@ void cServer::TickClients(float a_Dt)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				// Delete the client later, when CS is not held, to avoid deadlock: http://forum.mc-server.org/showthread.php?tid=374
+				// Delete the client later, when CS is not held, to avoid deadlock: https://forum.cuberite.org/thread-374.html
 				RemoveClients.push_back(*itr);
 				itr = m_Clients.erase(itr);
 				continue;
@@ -522,6 +524,13 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
+
+	else if (split[0].compare("luastats") == 0)
+	{
+		a_Output.Out(cLuaStateTracker::GetStats());
+		a_Output.Finished();
+		return;
+	}
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	else if (split[0].compare("dumpmem") == 0)
 	{
@@ -588,7 +597,7 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
 	{
 		const AStringPair & cmd = *itr;
-		a_Output.Out(Printf("%-*s%s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), cmd.second.c_str()));
+		a_Output.Out(Printf("%-*s - %s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), cmd.second.c_str()));
 	}  // for itr - Callback.m_Commands[]
 }
 
@@ -598,18 +607,35 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 
 void cServer::BindBuiltInConsoleCommands(void)
 {
+	// Create an empty handler - the actual handling for the commands is performed before they are handed off to cPluginManager
+	class cEmptyHandler:
+		public cPluginManager::cCommandHandler
+	{
+		virtual bool ExecuteCommand(
+			const AStringVector & a_Split,
+			cPlayer * a_Player,
+			const AString & a_Command,
+			cCommandOutputCallback * a_Output = nullptr
+		) override
+		{
+			return false;
+		}
+	};
+	auto handler = std::make_shared<cEmptyHandler>();
+
+	// Register internal commands:
 	cPluginManager * PlgMgr = cPluginManager::Get();
-	PlgMgr->BindConsoleCommand("help", nullptr, " - Shows the available commands");
-	PlgMgr->BindConsoleCommand("reload", nullptr, " - Reloads all plugins");
-	PlgMgr->BindConsoleCommand("restart", nullptr, " - Restarts the server cleanly");
-	PlgMgr->BindConsoleCommand("stop", nullptr, " - Stops the server cleanly");
-	PlgMgr->BindConsoleCommand("chunkstats", nullptr, " - Displays detailed chunk memory statistics");
-	PlgMgr->BindConsoleCommand("load <pluginname>", nullptr, " - Adds and enables the specified plugin");
-	PlgMgr->BindConsoleCommand("unload <pluginname>", nullptr, " - Disables the specified plugin");
-	PlgMgr->BindConsoleCommand("destroyentities", nullptr, " - Destroys all entities in all worlds");
+	PlgMgr->BindConsoleCommand("help",            nullptr, handler, "Shows the available commands");
+	PlgMgr->BindConsoleCommand("reload",          nullptr, handler, "Reloads all plugins");
+	PlgMgr->BindConsoleCommand("restart",         nullptr, handler, "Restarts the server cleanly");
+	PlgMgr->BindConsoleCommand("stop",            nullptr, handler, "Stops the server cleanly");
+	PlgMgr->BindConsoleCommand("chunkstats",      nullptr, handler, "Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("load",            nullptr, handler, "Adds and enables the specified plugin");
+	PlgMgr->BindConsoleCommand("unload",          nullptr, handler, "Disables the specified plugin");
+	PlgMgr->BindConsoleCommand("destroyentities", nullptr, handler, "Destroys all entities in all worlds");
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	PlgMgr->BindConsoleCommand("dumpmem", nullptr, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
+	PlgMgr->BindConsoleCommand("dumpmem", nullptr, handler, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
 	#endif
 }
 

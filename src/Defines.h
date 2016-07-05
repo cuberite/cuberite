@@ -8,7 +8,7 @@
 
 
 
-/// List of slot numbers, used for inventory-painting
+/** List of slot numbers, used for inventory-painting */
 typedef std::vector<int> cSlotNums;
 
 
@@ -18,7 +18,7 @@ typedef std::vector<int> cSlotNums;
 
 // tolua_begin
 
-/// Experience Orb setup
+/** Experience Orb setup */
 enum
 {
 	// Open to suggestion on naming convention here :)
@@ -57,22 +57,23 @@ enum eBlockFace
 
 
 
-/// PlayerDigging status constants
+/** PlayerDigging status constants */
 enum
 {
-	DIG_STATUS_STARTED   = 0,
-	DIG_STATUS_CANCELLED = 1,
-	DIG_STATUS_FINISHED  = 2,
-	DIG_STATUS_DROP_STACK= 3,
-	DIG_STATUS_DROP_HELD = 4,
-	DIG_STATUS_SHOOT_EAT = 5,
+	DIG_STATUS_STARTED           = 0,
+	DIG_STATUS_CANCELLED         = 1,
+	DIG_STATUS_FINISHED          = 2,
+	DIG_STATUS_DROP_STACK        = 3,
+	DIG_STATUS_DROP_HELD         = 4,
+	DIG_STATUS_SHOOT_EAT         = 5,
+	DIG_STATUS_SWAP_ITEM_IN_HAND = 6,
 } ;
 
 
 
 
 
-/// Individual actions sent in the WindowClick packet
+/** Individual actions sent in the WindowClick packet */
 enum eClickAction
 {
 	// Sorted by occurrence in the 1.5 protocol
@@ -477,6 +478,37 @@ inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 
 
 
+inline bool IsBlockFence(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ACACIA_FENCE:
+		case E_BLOCK_ACACIA_FENCE_GATE:
+		case E_BLOCK_BIRCH_FENCE:
+		case E_BLOCK_BIRCH_FENCE_GATE:
+		case E_BLOCK_COBBLESTONE_WALL:
+		case E_BLOCK_DARK_OAK_FENCE:
+		case E_BLOCK_DARK_OAK_FENCE_GATE:
+		case E_BLOCK_FENCE:
+		case E_BLOCK_JUNGLE_FENCE:
+		case E_BLOCK_JUNGLE_FENCE_GATE:
+		case E_BLOCK_NETHER_BRICK_FENCE:
+		case E_BLOCK_OAK_FENCE_GATE:
+		case E_BLOCK_SPRUCE_FENCE:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
 inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false)  // tolua_export
 {  // tolua_export
 	if (!a_bInverse)
@@ -596,7 +628,7 @@ template <class T> inline T Diff(T a_Val1, T a_Val2)
 
 enum eMessageType
 {
-	// http://forum.mc-server.org/showthread.php?tid=1212
+	// https://forum.cuberite.org/thread-1212.html
 	// MessageType...
 
 	mtCustom,          // Send raw data without any processing
@@ -751,6 +783,19 @@ namespace ItemCategory
 			(a_ItemType == E_ITEM_CHAIN_BOOTS) ||
 			(a_ItemType == E_ITEM_IRON_BOOTS) ||
 			(a_ItemType == E_ITEM_DIAMOND_BOOTS)
+		);
+	}
+
+
+
+	inline bool IsMinecart(short a_ItemType)
+	{
+		return (
+			(a_ItemType == E_ITEM_MINECART) ||
+			(a_ItemType == E_ITEM_CHEST_MINECART) ||
+			(a_ItemType == E_ITEM_FURNACE_MINECART) ||
+			(a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
+			(a_ItemType == E_ITEM_MINECART_WITH_HOPPER)
 		);
 	}
 

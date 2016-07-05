@@ -15,6 +15,7 @@
 #include "../Scoreboard.h"
 #include "../Map.h"
 #include "../ByteBuffer.h"
+#include "../EffectID.h"
 
 #include <array>
 
@@ -58,27 +59,22 @@ public:
 	}
 
 	virtual ~cProtocol() {}
-	
-	/// Called when client sends some data
+
+	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
-	
+
 	// Sending stuff to clients (alphabetically sorted):
-	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) = 0;
+	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) = 0;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) = 0;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
-	virtual void SendChat                       (const AString & a_Message) = 0;
-	virtual void SendChat                       (const cCompositeChat & a_Message) = 0;
-	virtual void SendChatAboveActionBar         (const AString & a_Message) = 0;
-	virtual void SendChatAboveActionBar         (const cCompositeChat & a_Message) = 0;
-	virtual void SendChatSystem                 (const AString & a_Message) = 0;
-	virtual void SendChatSystem                 (const cCompositeChat & a_Message) = 0;
-	virtual void SendChatType                   (const AString & a_Message, eChatType type) = 0;
-	virtual void SendChatType                   (const cCompositeChat & a_Message, eChatType type) = 0;
+	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) = 0;
+	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) = 0;
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
 	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
+	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
 	virtual void SendDisconnect                 (const AString & a_Reason) = 0;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) = 0;
@@ -96,7 +92,7 @@ public:
 	virtual void SendHealth                     (void) = 0;
 	virtual void SendHideTitle                  (void) = 0;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
-	virtual void SendKeepAlive                  (int a_PingID) = 0;
+	virtual void SendKeepAlive                  (UInt32 a_PingID) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
 	virtual void SendLoginSuccess               (void) = 0;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) = 0;
@@ -129,7 +125,7 @@ public:
 	virtual void SendSetTitle                   (const cCompositeChat & a_Title) = 0;
 	virtual void SendSetRawTitle                (const AString & a_Title) = 0;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) = 0;
-	virtual void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
+	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) = 0;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;
 	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) = 0;
@@ -150,7 +146,7 @@ public:
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
 	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) = 0;
 
-	/// Returns the ServerID used for authentication through session.minecraft.net
+	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
 protected:
@@ -165,10 +161,10 @@ protected:
 
 	/** Buffer for composing the outgoing packets, through cPacketizer */
 	cByteBuffer m_OutPacketBuffer;
-	
+
 	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
 	cByteBuffer m_OutPacketLenBuffer;
-	
+
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 

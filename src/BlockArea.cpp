@@ -26,8 +26,8 @@
 
 typedef void (CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta);
 
-// This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
-/// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
+/** Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
+This wild construct allows us to pass a function argument and still have it inlined by the compiler. */
 template <bool MetasValid, CombinatorFunc Combinator>
 void InternalMergeBlocks(
 	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
@@ -73,7 +73,7 @@ void InternalMergeBlocks(
 
 
 
-/// Combinator used for cBlockArea::msOverwrite merging
+/** Combinator used for cBlockArea::msOverwrite merging */
 template <bool MetaValid>
 void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
@@ -88,7 +88,7 @@ void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLE
 
 
 
-/// Combinator used for cBlockArea::msFillAir merging
+/** Combinator used for cBlockArea::msFillAir merging */
 template <bool MetaValid>
 void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
@@ -107,7 +107,7 @@ void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 
-/// Combinator used for cBlockArea::msImprint merging
+/** Combinator used for cBlockArea::msImprint merging */
 template <bool MetaValid>
 void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
@@ -126,7 +126,7 @@ void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 
-/// Combinator used for cBlockArea::msLake merging
+/** Combinator used for cBlockArea::msLake merging */
 template <bool MetaValid>
 void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
@@ -146,7 +146,7 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 		}
 		return;
 	}
-	
+
 	// Water and lava are never overwritten
 	switch (a_DstType)
 	{
@@ -158,7 +158,7 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 			return;
 		}
 	}
-	
+
 	// Water and lava always overwrite
 	switch (a_SrcType)
 	{
@@ -175,7 +175,7 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 			return;
 		}
 	}
-	
+
 	if (a_SrcType == E_BLOCK_STONE)
 	{
 		switch (a_DstType)
@@ -342,7 +342,7 @@ void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	{
 		LOGWARNING("Creating a cBlockArea with height larger than world height (%d). Continuing, but the area may misbehave.", a_SizeY);
 	}
-	
+
 	Clear();
 	int BlockCount = a_SizeX * a_SizeY * a_SizeZ;
 	if ((a_DataTypes & baTypes) != 0)
@@ -445,34 +445,42 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinB
 	{
 		std::swap(a_MinBlockZ, a_MaxBlockZ);
 	}
-	
+
 	// Include the Max coords:
 	a_MaxBlockX += 1;
 	a_MaxBlockY += 1;
 	a_MaxBlockZ += 1;
-	
+
 	// Check coords validity:
 	if (a_MinBlockY < 0)
 	{
-		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero", __FUNCTION__);
+		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MinBlockY = 0;
 	}
 	else if (a_MinBlockY >= cChunkDef::Height)
 	{
-		LOGWARNING("%s: MinBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
+		LOGWARNING("%s: MinBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MinBlockY = cChunkDef::Height - 1;
 	}
 	if (a_MaxBlockY < 0)
 	{
-		LOGWARNING("%s: MaxBlockY less than zero, adjusting to zero", __FUNCTION__);
+		LOGWARNING("%s: MaxBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MaxBlockY = 0;
 	}
 	else if (a_MaxBlockY > cChunkDef::Height)
 	{
-		LOGWARNING("%s: MaxBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
+		LOGWARNING("%s: MaxBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
+			__FUNCTION__, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ
+		);
 		a_MaxBlockY = cChunkDef::Height;
 	}
-	
+
 	// Allocate the needed memory:
 	Clear();
 	if (!SetSize(a_MaxBlockX - a_MinBlockX, a_MaxBlockY - a_MinBlockY, a_MaxBlockZ - a_MinBlockZ, a_DataTypes))
@@ -481,20 +489,20 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinB
 	}
 	m_Origin.Set(a_MinBlockX, a_MinBlockY, a_MinBlockZ);
 	cChunkReader Reader(*this);
-	
+
 	// Convert block coords to chunks coords:
 	int MinChunkX, MaxChunkX;
 	int MinChunkZ, MaxChunkZ;
 	cChunkDef::AbsoluteToRelative(a_MinBlockX, a_MinBlockY, a_MinBlockZ, MinChunkX, MinChunkZ);
 	cChunkDef::AbsoluteToRelative(a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
-	
+
 	// Query block data:
 	if (!a_ForEachChunkProvider->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
 	{
 		Clear();
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -576,7 +584,7 @@ void cBlockArea::CopyTo(cBlockArea & a_Into) const
 		LOGWARNING("Trying to copy a cBlockArea into self, ignoring.");
 		return;
 	}
-	
+
 	a_Into.Clear();
 	a_Into.SetSize(m_Size.x, m_Size.y, m_Size.z, GetDataTypes());
 	a_Into.m_Origin = m_Origin;
@@ -676,7 +684,7 @@ void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY
 		);
 		return;
 	}
-	
+
 	if (HasBlockTypes())
 	{
 		CropBlockTypes(a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
@@ -736,9 +744,9 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 
 	const NIBBLETYPE * SrcMetas = a_Src.GetBlockMetas();
 	NIBBLETYPE * DstMetas = m_BlockMetas;
-	
+
 	bool IsDummyMetas = ((SrcMetas == nullptr) || (DstMetas == nullptr));
-	
+
 	if (IsDummyMetas)
 	{
 		MergeByStrategy<false>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
@@ -771,7 +779,7 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 		);
 		a_DataTypes = a_DataTypes & GetDataTypes();
 	}
-	
+
 	size_t BlockCount = GetBlockCount();
 	if ((a_DataTypes & baTypes) != 0)
 	{
@@ -819,7 +827,7 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 		);
 		a_DataTypes = a_DataTypes & GetDataTypes();
 	}
-	
+
 	if ((a_DataTypes & baTypes) != 0)
 	{
 		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
@@ -975,7 +983,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 				a_RelY1 += sy;
 				yd -= dz;
 			}
-			
+
 			// move along z
 			a_RelZ1 += sz;
 			xd += dx;
@@ -1011,14 +1019,14 @@ void cBlockArea::RotateCCW(void)
 		LOGWARNING("cBlockArea: Cannot rotate blockmeta without blocktypes!");
 		return;
 	}
-	
+
 	if (!HasBlockMetas())
 	{
 		// There are no blockmetas to rotate, just use the NoMeta function
 		RotateCCWNoMeta();
 		return;
 	}
-	
+
 	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
 	BLOCKTYPE * NewTypes = new BLOCKTYPE[GetBlockCount()];
 	NIBBLETYPE * NewMetas = new NIBBLETYPE[GetBlockCount()];
@@ -1063,7 +1071,7 @@ void cBlockArea::RotateCW(void)
 		RotateCWNoMeta();
 		return;
 	}
-	
+
 	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
 	BLOCKTYPE * NewTypes = new BLOCKTYPE[GetBlockCount()];
 	NIBBLETYPE * NewMetas = new NIBBLETYPE[GetBlockCount()];
@@ -1101,7 +1109,7 @@ void cBlockArea::MirrorXY(void)
 		LOGWARNING("cBlockArea: Cannot mirror meta without blocktypes!");
 		return;
 	}
-	
+
 	if (!HasBlockMetas())
 	{
 		// There are no blockmetas to mirror, just use the NoMeta function
@@ -1321,7 +1329,7 @@ void cBlockArea::MirrorXYNoMeta(void)
 			}  // for z
 		}  // for y
 	}  // if (HasBlockTypes)
-	
+
 	if (HasBlockMetas())
 	{
 		for (int y = 0; y < m_Size.y; y++)
@@ -1358,7 +1366,7 @@ void cBlockArea::MirrorXZNoMeta(void)
 			}  // for z
 		}  // for y
 	}  // if (HasBlockTypes)
-	
+
 	if (HasBlockMetas())
 	{
 		for (int y = 0; y < HalfY; y++)
@@ -1395,7 +1403,7 @@ void cBlockArea::MirrorYZNoMeta(void)
 			}  // for z
 		}  // for y
 	}  // if (HasBlockTypes)
-	
+
 	if (HasBlockMetas())
 	{
 		for (int y = 0; y < m_Size.y; y++)
@@ -1624,7 +1632,7 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 	{
 		a_BlockType = m_BlockTypes[idx];
 	}
-	
+
 	if (m_BlockMetas == nullptr)
 	{
 		LOGWARNING("cBlockArea: BlockMetas have not been read!");
@@ -1826,7 +1834,7 @@ int cBlockArea::GetDataTypes(void) const
 bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 {
 	ASSERT(m_BlockTypes == nullptr);  // Has been cleared
-	
+
 	if (a_DataTypes & baTypes)
 	{
 		m_BlockTypes = new BLOCKTYPE[a_SizeX * a_SizeY * a_SizeZ];
@@ -1887,7 +1895,7 @@ int cBlockArea::MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 	ASSERT(a_RelY < m_Size.y);
 	ASSERT(a_RelZ >= 0);
 	ASSERT(a_RelZ < m_Size.z);
-	
+
 	return a_RelX + a_RelZ * m_Size.x + a_RelY * m_Size.x * m_Size.z;
 }
 
@@ -1961,7 +1969,7 @@ void cBlockArea::cChunkReader::CopyNibbles(NIBBLETYPE * a_AreaDst, const NIBBLET
 {
 	int SizeY = m_Area.m_Size.y;
 	int MinY = m_Origin.y;
-	
+
 	// SizeX, SizeZ are the dmensions of the block data to copy from the current chunk (size of the geometric union)
 	// OffX, OffZ are the offsets of the current chunk data from the area origin
 	// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
@@ -2077,7 +2085,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 	{
 		SizeZ -= (m_CurrentChunkZ + 1) * cChunkDef::Width - (m_Origin.z + m_Area.m_Size.z);
 	}
-	
+
 	// Copy the blocktypes:
 	if (m_Area.m_BlockTypes != nullptr)
 	{
@@ -2315,7 +2323,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 		LOGWARNING("%s: cannot merge because one of the areas doesn't have blocktypes.", __FUNCTION__);
 		return;
 	}
-	
+
 	// Dst is *this, Src is a_Src
 	int SrcOffX = std::max(0, -a_RelX);  // Offset in Src where to start reading
 	int DstOffX = std::max(0,  a_RelX);  // Offset in Dst where to start writing
@@ -2328,7 +2336,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 	int SrcOffZ = std::max(0, -a_RelZ);  // Offset in Src where to start reading
 	int DstOffZ = std::max(0,  a_RelZ);  // Offset in Dst where to start writing
 	int SizeZ   = std::min(a_Src.GetSizeZ() - SrcOffZ, GetSizeZ() - DstOffZ);  // How many blocks to copy
-	
+
 	switch (a_Strategy)
 	{
 		case cBlockArea::msOverwrite:
@@ -2344,7 +2352,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			return;
 		}  // case msOverwrite
-		
+
 		case cBlockArea::msFillAir:
 		{
 			InternalMergeBlocks<MetasValid, MergeCombinatorFillAir<MetasValid> >(
@@ -2358,7 +2366,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			return;
 		}  // case msFillAir
-		
+
 		case cBlockArea::msImprint:
 		{
 			InternalMergeBlocks<MetasValid, MergeCombinatorImprint<MetasValid> >(
@@ -2372,7 +2380,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			return;
 		}  // case msImprint
-		
+
 		case cBlockArea::msLake:
 		{
 			InternalMergeBlocks<MetasValid, MergeCombinatorLake<MetasValid> >(
@@ -2386,7 +2394,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			return;
 		}  // case msLake
-		
+
 		case cBlockArea::msSpongePrint:
 		{
 			InternalMergeBlocks<MetasValid, MergeCombinatorSpongePrint<MetasValid> >(
@@ -2414,7 +2422,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			return;
 		}  // case msDifference
-		
+
 		case cBlockArea::msSimpleCompare:
 		{
 			InternalMergeBlocks<MetasValid, MergeCombinatorSimpleCompare<MetasValid> >(
@@ -2428,7 +2436,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			return;
 		}  // case msSimpleCompare
-		
+
 		case cBlockArea::msMask:
 		{
 			InternalMergeBlocks<MetasValid, MergeCombinatorMask<MetasValid> >(
@@ -2443,7 +2451,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			return;
 		}  // case msMask
 	}  // switch (a_Strategy)
-	
+
 	LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
 	ASSERT(!"Unknown block area merge strategy");
 	return;

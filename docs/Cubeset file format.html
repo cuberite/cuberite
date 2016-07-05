@@ -33,7 +33,7 @@ With Lua, we could store any metadata for the prefabs, any additional informatio
 
 <a name="details"><h2>Detailed description of the format</h2></a>
 <p>
-The Cubeset file has a .cubeset extension. Internally it is a Lua source file that provides a global value, Cubeset, which is a table containing the structured data. The loader checks the file's first 4 KiB to see if there is a "CubesetFormatVersion =" string in it, and if it is, the file is considered a Cubeset file and further loading is attempted. It is therefore crucial that tools producing this file format include this string as early as possible in the file.</p>
+The Cubeset file has a .cubeset extension. Internally it is a Lua source file that provides a global value, Cubeset, which is a table containing the structured data. The loader checks the file's first 8 KiB to see if there is a "CubesetFormatVersion =" string in it (note the space between the word and the equals-sign), and if it is, the file is considered a Cubeset file and further loading is attempted. It is therefore crucial that tools producing this file format include this string as early as possible in the file.</p>
 <p>
 The top-level Cubeset table must contain at least two sub-tables: Metadata and Pieces. The Metadata table contains the metadata relevant to the entire set of prefabs in the file, the Pieces table contains the definitions and metadata for the individual prefabs. It is advised to make the Metadata table the first one, because it contains the signature used to identify the file ("CubesetFormatVersion ="). Apart from these two subtables the server ignores everything else.</p>
 
@@ -42,11 +42,31 @@ The top-level Cubeset table must contain at least two sub-tables: Metadata and P
 The Cubeset.Metadata table is used to store metadata for the entire set of prefabs, and also for the format and version identification. It is a regular dictionary-style Lua table; the following elements are recognized:
 <table>
 <tr><th>Name</th><th>Type</th><th>Content</th></tr>
-<tr><td>CubesetFormatVersion</td><td>number</td><td>This is the format identification and at the same time it specifies the version of the file. Currently the file version is 1.</td></tr>
+<tr><td>CubesetFormatVersion</td><td>number</td><td>This is the format identification and at the same time it specifies the version of the file. Currently the file version is 1. Note that Cuberite checks the presence of the string "CubesetFormatVersion =", including the space between the word and the equals-sign, within the first 8 KiB of the file.</td></tr>
 <tr><td>ExportDate</td><td>string</td><td>The date when this file was exported, in the ISO format ("2015-06-16 13:34:03"). Inserted by <a href="https://github.com/madmaxoft/GalExport">GalExport</a> for versioning purposes. Ignored elsewhere.</td></tr>
 <tr><td>ExternalSchematic</td><td>boolean</td><td>Flag inserted by <a href="https://github.com/madmaxoft/GalExport">GalExport</a> to indicate that the individual prefabs are stored in separate .schematic files. Ignored elsewhere.</td></tr>
+<tr><td>IntendedUse</td><td>string</td><td>String identifying the generator part that the cubeset file is intended for. The server logs a warning when loading a cubeset file without an IntendedUse metadata; individual generators log a warning if a wrong IntendedUse is detected in a file they are asked to use.</td></tr>
 </table>
-We expect that the set of values recognized by the server will grow when the format is used for some time. All values are optional, except for the CubesetFormatVersion value which is strictly checked by the server. </p>
+</p>
+<p>Additional values are recognized by the specific generator (which is indicated by the IntendedUse value): </p>
+<table><tr><th>Generator (IntendedUse)</th><th>Name</th><th>Type</th><th>Content</th><th>Notes</th></tr>
+<tr><td>Village / PieceStructures / Trees</td><td>AllowedBiomes</td><td>string</td><td>Comma-separated list of biomes</td><td>The generator only generates the structure / village / tree in the specified biomes. If empty, all biomes are eligible.</td></tr>
+<tr><td rowspan=6>Village</td><td>MaxDensity</td><td>number</td><td>Maximum density (0 - 100) at which the connectors are populated.</td><td rowspan=2>The village generator picks a density between Min and Max, and then only that many percent of the free connectors are actually attempted. This eventually reduces the number of houses to make the village look more "roomy".</tr>
+<tr><td>MinDensity</td><td>number</td><td>Minimum density (0 - 100) at which the connectors are populated.</td></tr>
+<tr><td>VillageRoadBlockType</td><td>number</td><td>The block type used in the village for regular roads on the solid surface</td><td rowspan=4>The generator replaces the top terrain block with the specified block type and meta to form the roads. The generator can distinguish when it's replacing water and when it's replacing regular terrain, allowing the villages to include "bridges" as their roads.</td></tr>
+<tr><td>VillageRoadBlockMeta</td><td>number</td><td>The block meta used in the village for regular roads on the solid surface</td></tr>
+<tr><td>VillageWaterRoadBlockType</td><td>number</td><td>The block type used in the village for roads on the surface of water</td></tr>
+<tr><td>VillageWaterRoadBlockMeta</td><td>number</td><td>The block meta used in the village for roads on the surface of water</td></tr>
+<tr><td rowspan=8>PieceStructures</td><td>GridSizeX</td><td>number</td><td rowspan=2>Size, in blocks, of the seed grid</td><td rowspan=2>The generator starts each generated structure in a "seed", these two parameters control the (average) distances between two adjacent seeds.</td></tr>
+<tr><td>GridSizeZ</td><td>number</td></tr>
+<tr><td>MaxOffsetX</td><td>number</td><td rowspan=2>Maximum offset, in blocks, of the seed from the grid's center</td><td rowspan=2>The generator starts each generated structure in a "seed", these two parameters control the maximum distance of the seed from the regular grid (specified by GridSizeX and GridSizeZ). When zero, the structures are generated exactly on a rectangular grid. Recommended value is about half of the grid's size.</td></tr>
+<tr><td>MaxOffsetZ</td><td>number</td></tr>
+<tr><td>MaxStructureSizeX</td><td>number</td><td rowspan=2>Size, in blocks, of the bounding box for a single structure.</td><td rowspan=2>The generator will not connect any prefab to the rest of the structure if it crosses the bounding box.</td></tr>
+<tr><td>MaxStructureSizeZ</td><td>number</td></tr>
+<tr><td>MaxDepth</td><td>number</td><td>Maximum depth of the generated piece tree</td><td>The maximum number of connectors, away from the starting piece</td></tr>
+<tr><td>SeedOffset</td><td>number</td><td>Number that is added to world's seed for this generator</td><td>Each cubeset file should have a different seed offset, otherwise it runs the risk of its structures being generated directly over other cubeset file's that the server admin has enabled. Since the seed is used for placement, if two cubeset files share the same seed, they will share the structure placement as well. </td></tr>
+
+</table>
 
 <a name="piece"><h3>Individual piece</h3></a>
 <p>
@@ -112,6 +132,15 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
+		IntendedUse = "PieceStructures",
+		GridSizeX = 128,
+		GridSizeZ = 128,
+		MaxStructureSizeX = 64,
+		MaxStructureSizeZ = 64,
+		MaxOffsetX = 16,
+		MaxOffsetZ = 16,
+		MaxDepth = 4,
+		SeedOffset = 13,
 	},
 
 	Pieces =
@@ -288,7 +317,7 @@ Cubeset =
 			},
 			SchematicFile = "PlainsVillage/20.schematic",
 		},  -- DoublePlantBed
-	}
+	}  -- Pieces
 }
 </pre>
 

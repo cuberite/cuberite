@@ -98,7 +98,7 @@ protected:
 
 
 	/** Decodes the position index along the room walls into a proper 2D position for a chest.
-	The Y coord of the returned vector specifies the chest's meta value*/
+	The Y coord of the returned vector specifies the chest's meta value. */
 	Vector3i DecodeChestCoords(int a_PosIdx, int a_SizeX, int a_SizeZ)
 	{
 		if (a_PosIdx < a_SizeX)

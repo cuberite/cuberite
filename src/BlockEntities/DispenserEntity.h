@@ -18,19 +18,19 @@ public:
 	// tolua_end
 
 	BLOCKENTITY_PROTODEF(cDispenserEntity)
-	
+
 	/** Constructor used for normal operation */
 	cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	// tolua_begin
-	
+
 	/** Spawns a projectile of the given kind in front of the dispenser with the specified speed.
 	Returns the UniqueID of the spawned projectile, or 0 on failure. */
-	UInt32 SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_Speed);
+	UInt32 SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_Speed, const cItem * a_Item = nullptr);
 
 	/** Returns a unit vector in the cardinal direction of where the dispenser is facing. */
 	Vector3d GetShootVector(NIBBLETYPE a_Meta);
-	
+
 	// tolua_end
 
 private:

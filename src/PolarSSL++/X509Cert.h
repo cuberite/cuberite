@@ -18,15 +18,15 @@
 class cX509Cert
 {
 	friend class cSslContext;
-	
+
 public:
 	cX509Cert(void);
 	~cX509Cert(void);
-	
+
 	/** Parses the certificate chain data into the context.
 	Returns 0 on succes, or PolarSSL error code on failure. */
 	int Parse(const void * a_CertContents, size_t a_Size);
-	
+
 protected:
 	x509_crt m_Cert;
 

@@ -57,13 +57,13 @@ cMonsterConfig::~cMonsterConfig()
 void cMonsterConfig::Initialize()
 {
 	cIniFile MonstersIniFile;
-	
+
 	if (!MonstersIniFile.ReadFile("monsters.ini"))
 	{
 		LOGWARNING("%s: Cannot read monsters.ini file, monster attributes not available", __FUNCTION__);
 		return;
 	}
-	
+
 	for (int i = static_cast<int>(MonstersIniFile.GetNumKeys()); i >= 0; i--)
 	{
 		sAttributesStruct Attributes;

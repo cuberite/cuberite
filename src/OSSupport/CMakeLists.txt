@@ -1,6 +1,6 @@
 
 cmake_minimum_required (VERSION 2.6)
-project (MCServer)
+project (Cuberite)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
@@ -40,7 +40,7 @@ SET (HDRS
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=global-constructors -Wno-error=old-style-cast")
+	add_flags_cxx("-Wno-error=global-constructors ")
 endif()
 
 if(NOT MSVC)

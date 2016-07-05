@@ -22,6 +22,8 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceGenerator.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/VerticalStrategy.cpp
 
 	${CMAKE_SOURCE_DIR}/src/Noise/Noise.cpp
 
@@ -50,6 +52,8 @@ set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceGenerator.h
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
+	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.h
+	${CMAKE_SOURCE_DIR}/src/Generating/VerticalStrategy.h
 
 	${CMAKE_SOURCE_DIR}/src/Noise/Noise.h
 
@@ -94,3 +98,8 @@ add_test(NAME LoadablePieces-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
 
 
 
+# Put the projects into solution folders (MSVC):
+set_target_properties(
+	LoadablePieces
+	PROPERTIES FOLDER Tests
+)

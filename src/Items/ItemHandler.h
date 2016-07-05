@@ -29,7 +29,7 @@ public:
 	};
 
 	cItemHandler(int a_ItemType);
-	
+
 	/** Force virtual destructor */
 	virtual ~cItemHandler() {}
 
@@ -45,7 +45,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ
 	);
-	
+
 
 	/** Called from OnPlayerPlace() to determine the blocks that the current placement operation should set.
 	The block coords are where the new (main) block should be placed.
@@ -69,7 +69,7 @@ public:
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	);
-	
+
 
 	/** Called when the player tries to use the item (right mouse button).
 	Return false to abort the usage. DEFAULT: False */
@@ -77,7 +77,7 @@ public:
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
 	);
-	
+
 
 	/** Called when the client sends the SHOOT status in the lclk packet */
 	virtual void OnItemShoot(cPlayer *, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
@@ -95,16 +95,16 @@ public:
 		UNUSED(a_Player);
 		UNUSED(a_Item);
 	}
-	
+
 	/** Called while the player diggs a block using this item */
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
-	
+
 	/** Called when the player destroys a block using this item. This also calls the drop function for the destroyed block */
 	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Called when a player attacks a other entity. */
 	virtual void OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity);
-	
+
 	/** Called after the player has eaten this item. */
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
 
@@ -137,13 +137,13 @@ public:
 
 	/** Indicates if this item is a tool */
 	virtual bool IsTool(void);
-	
+
 	/** Indicates if this item is food */
 	virtual bool IsFood(void);
-	
+
 	/** Indicates if this item is drinkable */
 	virtual bool IsDrinkable(short a_ItemDamage);
-	
+
 	/** Blocks simply get placed */
 	virtual bool IsPlaceable(void);
 
@@ -158,7 +158,7 @@ public:
 	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType); }
 
 	static void Deinit();
-	
+
 protected:
 	int m_ItemType;
 	static cItemHandler * CreateItemHandler(int m_ItemType);

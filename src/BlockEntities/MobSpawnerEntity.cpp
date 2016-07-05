@@ -33,14 +33,14 @@ void cMobSpawnerEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
+bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 {
 	if (a_Player->GetEquippedItem().m_ItemType == E_ITEM_SPAWN_EGG)
 	{
 		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Player->GetEquippedItem().m_ItemDamage);
 		if (MonsterType == eMonsterType::mtInvalidType)
 		{
-			return;
+			return false;
 		}
 
 		m_Entity = MonsterType;
@@ -50,7 +50,9 @@ void cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
 		LOGD("Changed monster spawner at {%d, %d, %d} to type %s.", GetPosX(), GetPosY(), GetPosZ(), cMonster::MobTypeToString(MonsterType).c_str());
+		return true;
 	}
+	return false;
 }
 
 
@@ -173,7 +175,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					{
 						EntitiesSpawned = true;
 						Chunk->BroadcastSoundParticleEffect(
-							2004,
+							EffectID::PARTICLE_MOBSPAWN,
 							static_cast<int>(PosX * 8.0),
 							static_cast<int>(RelY * 8.0),
 							static_cast<int>(PosZ * 8.0),

@@ -2,6 +2,7 @@
 
 #include "Horse.h"
 #include "../World.h"
+#include "../EffectID.h"
 #include "../Entities/Player.h"
 
 
@@ -22,7 +23,8 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_Armour(0),
 	m_TimesToTame(TameTimes),
 	m_TameAttemptTimes(0),
-	m_RearTickCount(0)
+	m_RearTickCount(0),
+	m_Speed(20.0)
 {
 }
 
@@ -55,10 +57,10 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_World->GetTickRandomNumber(50) == 25)
 			{
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 0);
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 2);
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 6);
-				m_World->BroadcastSoundParticleEffect(2000, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), 8);
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_EAST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_WEST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_EAST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_WEST));
 
 				m_Attachee->Detach();
 				m_bIsRearing = true;
@@ -66,10 +68,11 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
+			// TODO: emit hearts here
 			m_bIsTame = true;
 		}
 	}
-	
+
 	if (m_bIsRearing)
 	{
 		if (m_RearTickCount == 20)
@@ -92,6 +95,8 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cHorse::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if (!m_bIsSaddled && m_bIsTame)
 	{
 		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
@@ -155,3 +160,24 @@ void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
+void cHorse::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	// If horse is tame and someone is sitting on it, don't walk around
+	if ((!m_bIsTame) || (m_Attachee == nullptr))
+	{
+		super::InStateIdle(a_Dt, a_Chunk);
+	}
+}
+
+
+
+
+
+void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
+{
+	if ((m_bIsTame) && (m_bIsSaddled))
+	{
+		super::HandleSpeedFromAttachee(a_Forward * m_Speed, a_Sideways * m_Speed);
+	}
+}

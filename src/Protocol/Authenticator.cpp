@@ -149,7 +149,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	AString Request;
 	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
 	Request += "Host: " + m_Server + "\r\n";
-	Request += "User-Agent: MCServer\r\n";
+	Request += "User-Agent: Cuberite\r\n";
 	Request += "Connection: close\r\n";
 	Request += "\r\n";
 
@@ -194,7 +194,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	a_UserName = root.get("name", "Unknown").asString();
 	a_UUID = cMojangAPI::MakeUUIDShort(root.get("id", "").asString());
 	a_Properties = root["properties"];
-	
+
 	// Store the player's profile in the MojangAPI caches:
 	cRoot::Get()->GetMojangAPI().AddPlayerProfile(a_UserName, a_UUID, a_Properties);
 
@@ -223,7 +223,7 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	AString Request;
 	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
 	Request += "Host: " + m_Server + "\r\n";
-	Request += "User-Agent: MCServer\r\n";
+	Request += "User-Agent: Cuberite\r\n";
 	Request += "Connection: close\r\n";
 	Request += "\r\n";
 

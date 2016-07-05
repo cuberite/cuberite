@@ -19,11 +19,12 @@ cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_Wo
 
 
 
-void cNoteEntity::UsedBy(cPlayer * a_Player)
+bool cNoteEntity::UsedBy(cPlayer * a_Player)
 {
 	UNUSED(a_Player);
 	IncrementPitch();
 	MakeSound();
+	return true;
 }
 
 
@@ -34,7 +35,7 @@ void cNoteEntity::MakeSound(void)
 {
 	char instrument;
 	AString sampleName;
-	
+
 	switch (m_World->GetBlock(m_PosX, m_PosY - 1, m_PosZ))
 	{
 		case E_BLOCK_PLANKS:
@@ -43,10 +44,10 @@ void cNoteEntity::MakeSound(void)
 		{
 			// TODO: add other wood-based blocks if needed
 			instrument = E_INST_DOUBLE_BASS;
-			sampleName = "note.db";
+			sampleName = "note.bassattack";
 			break;
 		}
-		
+
 		case E_BLOCK_SAND:
 		case E_BLOCK_GRAVEL:
 		case E_BLOCK_SOULSAND:
@@ -55,7 +56,7 @@ void cNoteEntity::MakeSound(void)
 			sampleName = "note.snare";
 			break;
 		}
-		
+
 		case E_BLOCK_GLASS:
 		case E_BLOCK_GLASS_PANE:
 		case E_BLOCK_GLOWSTONE:
@@ -75,7 +76,7 @@ void cNoteEntity::MakeSound(void)
 		{
 			// TODO: add other stone-based blocks if needed
 			instrument = E_INST_BASS_DRUM;
-			sampleName = "note.bassattack";
+			sampleName = "note.bd";
 			break;
 		}
 
@@ -87,10 +88,10 @@ void cNoteEntity::MakeSound(void)
 		}
 	}
 
-	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, instrument, m_Pitch, E_BLOCK_NOTE_BLOCK);
-	
+	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, static_cast<Byte>(instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
+
 	// TODO: instead of calculating the power function over and over, make a precalculated table - there's only 24 pitches after all
-	float calcPitch = pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f);
+	float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f));
 	m_World->BroadcastSoundEffect(
 		sampleName,
 		static_cast<double>(m_PosX),

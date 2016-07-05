@@ -9,6 +9,8 @@
 #include "ProtocolRecognizer.h"
 #include "Protocol17x.h"
 #include "Protocol18x.h"
+#include "Protocol19x.h"
+#include "Packetizer.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -23,7 +25,8 @@
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
 	m_Protocol(nullptr),
-	m_Buffer(8192)     // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
+	m_Buffer(8192),  // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
+	m_InPingForUnrecognizedVersion(false)
 {
 }
 
@@ -48,6 +51,10 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_7_2: return "1.7.2";
 		case PROTO_VERSION_1_7_6: return "1.7.6";
 		case PROTO_VERSION_1_8_0: return "1.8";
+		case PROTO_VERSION_1_9_0: return "1.9";
+		case PROTO_VERSION_1_9_1: return "1.9.1";
+		case PROTO_VERSION_1_9_2: return "1.9.2";
+		case PROTO_VERSION_1_9_4: return "1.9.4";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -66,7 +73,34 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 			m_Client->Kick("Unsupported protocol version");
 			return;
 		}
-		
+
+		if (m_InPingForUnrecognizedVersion)
+		{
+			// We already know the verison; handle it here.
+			UInt32 PacketLen;
+			UInt32 PacketID;
+			if (!m_Buffer.ReadVarInt32(PacketLen))
+			{
+				return;
+			}
+			if (!m_Buffer.ReadVarInt32(PacketID))
+			{
+				return;
+			}
+			ASSERT(PacketID == 0x01);  // Ping packet
+			ASSERT(PacketLen == 9);  // Payload of the packet ID and a UInt64
+
+			Int64 Data;
+			if (!m_Buffer.ReadBEInt64(Data))
+			{
+				return;
+			}
+
+			cPacketizer Pkt(*this, 0x01);  // Pong packet
+			Pkt.WriteBEInt64(Data);
+			return;
+		}
+
 		if (!TryRecognizeProtocol())
 		{
 			return;
@@ -88,7 +122,7 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 
 
 
-void cProtocolRecognizer::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cProtocolRecognizer::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
@@ -138,80 +172,20 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 
 
-void cProtocolRecognizer::SendChat(const AString & a_Message)
+void cProtocolRecognizer::SendChat(const AString & a_Message, eChatType a_Type)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChat(a_Message);
+	m_Protocol->SendChat(a_Message, a_Type);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
+void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChat(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatAboveActionBar(const AString & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatAboveActionBar(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatAboveActionBar(const cCompositeChat & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatAboveActionBar(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatSystem(const AString & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatSystem(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatSystem(const cCompositeChat & a_Message)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatSystem(a_Message);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatType(const AString & a_Message, eChatType type)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatType(a_Message, type);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendChatType(const cCompositeChat & a_Message, eChatType type)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendChatType(a_Message, type);
+	m_Protocol->SendChat(a_Message, a_Type, a_ShouldUseChatPrefixes);
 }
 
 
@@ -248,6 +222,16 @@ void cProtocolRecognizer::SendDestroyEntity(const cEntity & a_Entity)
 
 
 
+void cProtocolRecognizer::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendDetachEntity(a_Entity, a_PreviousVehicle);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 {
 	if (m_Protocol != nullptr)
@@ -256,14 +240,9 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	}
 	else
 	{
-		// This is used when the client sends a server-ping, respond with the default packet:
-		static const int Packet = 0xff;  // PACKET_DISCONNECT
-		SendData((const char *)&Packet, 1);  // WriteByte()
-
-		AString UTF16 = UTF8ToRawBEUTF16(a_Reason.c_str(), a_Reason.length());
-		static const u_short Size = htons((u_short)(UTF16.size() / 2));
-		SendData((const char *)&Size, 2);      // WriteShort()
-		SendData(UTF16.data(), UTF16.size());  // WriteString()
+		AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
+		cPacketizer Pkt(*this, 0x00);  // Disconnect packet (in login state)
+		Pkt.WriteString(Message);
 	}
 }
 
@@ -440,7 +419,7 @@ void cProtocolRecognizer::SendInventorySlot(char a_WindowID, short a_SlotNum, co
 
 
 
-void cProtocolRecognizer::SendKeepAlive(int a_PingID)
+void cProtocolRecognizer::SendKeepAlive(UInt32 a_PingID)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendKeepAlive(a_PingID);
@@ -769,7 +748,7 @@ void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, double a_
 
 
 
-void cProtocolRecognizer::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+void cProtocolRecognizer::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
@@ -986,13 +965,13 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 
 	// Lengthed protocol, try if it has the entire initial handshake packet:
 	UInt32 PacketLen;
-	UInt32 ReadSoFar = (UInt32)m_Buffer.GetReadableSpace();
+	UInt32 ReadSoFar = static_cast<UInt32>(m_Buffer.GetReadableSpace());
 	if (!m_Buffer.ReadVarInt(PacketLen))
 	{
 		// Not enough bytes for the packet length, keep waiting
 		return false;
 	}
-	ReadSoFar -= (UInt32)m_Buffer.GetReadableSpace();
+	ReadSoFar -= static_cast<UInt32>(m_Buffer.GetReadableSpace());
 	if (!m_Buffer.CanReadBytes(PacketLen))
 	{
 		// Not enough bytes for the packet, keep waiting
@@ -1027,88 +1006,159 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		return false;
 	}
 	m_Client->SetProtocolVersion(ProtocolVersion);
+	AString ServerAddress;
+	UInt16 ServerPort;
+	UInt32 NextState;
+	if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+	{
+		return false;
+	}
+	if (!m_Buffer.ReadBEUInt16(ServerPort))
+	{
+		return false;
+	}
+	if (!m_Buffer.ReadVarInt(NextState))
+	{
+		return false;
+	}
+	m_Buffer.CommitRead();
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
-			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_7_6:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
-			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_8_0:
 		{
-			AString ServerAddress;
-			UInt16 ServerPort;
-			UInt32 NextState;
-			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadBEUInt16(ServerPort))
-			{
-				break;
-			}
-			if (!m_Buffer.ReadVarInt(NextState))
-			{
-				break;
-			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
+		case PROTO_VERSION_1_9_0:
+		{
+			m_Protocol = new cProtocol190(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_9_1:
+		{
+			m_Protocol = new cProtocol191(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_9_2:
+		{
+			m_Protocol = new cProtocol192(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_9_4:
+		{
+			m_Protocol = new cProtocol194(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		default:
+		{
+			LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
+				m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
+			);
+			if (NextState != 1)
+			{
+				m_Client->Kick(Printf("Unsupported protocol version %u, please use one of these versions:\n" MCS_CLIENT_VERSIONS, ProtocolVersion));
+				return false;
+			}
+			else
+			{
+				m_InPingForUnrecognizedVersion = true;
+
+				UInt32 PacketLen;
+				UInt32 PacketID;
+				if (!m_Buffer.ReadVarInt32(PacketLen))
+				{
+					return false;
+				}
+				if (!m_Buffer.ReadVarInt32(PacketID))
+				{
+					return false;
+				}
+				ASSERT(PacketID == 0x00);  // Request packet
+				ASSERT(PacketLen == 1);  // No payload except for packet ID
+				SendPingStatusResponse();
+			}
+			return false;
+		}
 	}
-	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
-		m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
-	);
-	m_Client->Kick("Unsupported protocol version");
-	return false;
 }
+
 
 
 
 
 void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
 {
-	// This function should never be called - it needs to exists so that cProtocolRecognizer can be instantiated,
-	// but the actual sending is done by the internal m_Protocol itself.
-	LOGWARNING("%s: This function shouldn't ever be called.", __FUNCTION__);
-	ASSERT(!"Function not to be called");
+	// Writes out the packet normally.
+	UInt32 PacketLen = static_cast<UInt32>(m_OutPacketBuffer.GetUsedSpace());
+	AString PacketData, CompressedPacket;
+	m_OutPacketBuffer.ReadAll(PacketData);
+	m_OutPacketBuffer.CommitRead();
+
+	// Compression doesn't apply to this state, send raw data:
+	m_OutPacketLenBuffer.WriteVarInt32(PacketLen);
+	AString LengthData;
+	m_OutPacketLenBuffer.ReadAll(LengthData);
+	SendData(LengthData.data(), LengthData.size());
+
+	// Send the packet's payload
+	m_OutPacketLenBuffer.CommitRead();
+	SendData(PacketData.data(), PacketData.size());
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPingStatusResponse(void)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite " MCS_CLIENT_VERSIONS;
+	Version["protocol"] = 0;  // Force client to think this is an invalid version (no other good default)
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Response);
 }
 
 

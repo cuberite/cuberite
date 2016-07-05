@@ -14,9 +14,9 @@
 #define PROCESS_NEIGHBOR(x, y, z) \
 	switch (a_Area.GetBlockType(x, y, z)) \
 	{ \
-		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \
+		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break; \
 		case E_BLOCK_LOG: return true; \
-		case E_BLOCK_NEW_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \
+		case E_BLOCK_NEW_LEAVES: a_Area.SetBlockType(x, y, z, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break; \
 		case E_BLOCK_NEW_LOG: return true; \
 	}
 
@@ -75,14 +75,15 @@ public:
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
 	{
-		// Unset 0x8 bit so this block gets checked for decay:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		if ((Meta & 0x08) != 0)
+
+		// Set 0x8 bit so this block gets checked for decay:
+		if ((Meta & 0x08) == 0)
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);
+			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x8, true, false);
 		}
 	}
-	
+
 	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
@@ -92,7 +93,7 @@ public:
 			return;
 		}
 
-		if ((Meta & 0x8) != 0)
+		if ((Meta & 0x8) == 0)
 		{
 			// These leaves have been checked for decay lately and nothing around them changed
 			return;
@@ -116,8 +117,8 @@ public:
 
 		if (HasNearLog(Area, BlockX, a_RelY, BlockZ))
 		{
-			// Wood found, the leaves stay; mark them as checked:
-			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x8);
+			// Wood found, the leaves stay; unset the check bit
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta ^ 0x8, true, false);
 			return;
 		}
 
@@ -159,7 +160,7 @@ bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 			}
 		}
 	}  // for i - Types[]
-	
+
 	// Perform a breadth-first search to see if there's a log connected within 4 blocks of the leaves block:
 	// Simply replace all reachable leaves blocks with a sponge block plus iteration (in the Area) and see if we can reach a log in 4 iterations
 	a_Area.SetBlockType(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_SPONGE);

@@ -21,10 +21,10 @@ class cMinecart :
 	public cEntity
 {
 	typedef cEntity super;
-	
+
 public:
 	CLASS_PROTODEF(cMinecart)
-	
+
 	/** Minecart payload, values correspond to packet subtype */
 	enum ePayload
 	{
@@ -35,22 +35,25 @@ public:
 		mpHopper  = 5,  // Minecart-with-hopper, can be hopper
 		// TODO: Spawner minecarts, (and possibly any block in a minecart with NBT editing)
 	} ;
-	
+
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void Destroyed() override;
-	
+
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
-	
+
 protected:
 	ePayload m_Payload;
 	int m_LastDamage;
 	Vector3i m_DetectorRailPosition;
 	bool m_bIsOnDetectorRail;
-	
+
+	// Overwrite to enforce speed limit
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
+
 	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
 
 	/** Handles physics on normal rails
@@ -75,7 +78,7 @@ protected:
 	void SnapToRail(NIBBLETYPE a_RailMeta);
 	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction */
 	bool TestBlockCollision(NIBBLETYPE a_RailMeta);
-	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away */
+	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
 
 } ;
@@ -88,10 +91,10 @@ class cRideableMinecart :
 	public cMinecart
 {
 	typedef cMinecart super;
-	
+
 public:
 	CLASS_PROTODEF(cRideableMinecart)
-	
+
 	cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
 
 	const cItem & GetContent(void) const {return m_Content;}
@@ -114,10 +117,10 @@ class cMinecartWithChest :
 	public cEntityWindowOwner
 {
 	typedef cMinecart super;
-	
+
 public:
 	CLASS_PROTODEF(cMinecartWithChest)
-	
+
 	cMinecartWithChest(double a_X, double a_Y, double a_Z);
 
 	enum
@@ -125,9 +128,9 @@ public:
 		ContentsHeight = 3,
 		ContentsWidth = 9,
 	};
-	
+
 	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
-	void SetSlot(size_t a_Idx, const cItem & a_Item) { m_Contents.SetSlot(static_cast<int>(a_Idx), a_Item); }
+	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
 protected:
 	cItemGrid m_Contents;
@@ -149,7 +152,7 @@ protected:
 			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
 		}
 	}
-	
+
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 } ;
@@ -162,12 +165,12 @@ class cMinecartWithFurnace :
 	public cMinecart
 {
 	typedef cMinecart super;
-	
+
 public:
 	CLASS_PROTODEF(cMinecartWithFurnace)
-	
+
 	cMinecartWithFurnace(double a_X, double a_Y, double a_Z);
-	
+
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -194,10 +197,10 @@ class cMinecartWithTNT :
 	public cMinecart
 {
 	typedef cMinecart super;
-	
+
 public:
 	CLASS_PROTODEF(cMinecartWithTNT)
-	
+
 	cMinecartWithTNT(double a_X, double a_Y, double a_Z);
 } ;
 
@@ -209,9 +212,9 @@ class cMinecartWithHopper :
 	public cMinecart
 {
 	typedef cMinecart super;
-	
+
 public:
 	CLASS_PROTODEF(cMinecartWithHopper)
-	
+
 	cMinecartWithHopper(double a_X, double a_Y, double a_Z);
 } ;

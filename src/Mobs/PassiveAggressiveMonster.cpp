@@ -25,10 +25,10 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		return false;
 	}
-	
-	if ((m_Target != nullptr) && (m_Target->IsPlayer()))
+
+	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
 	{
-		if (!static_cast<cPlayer *>(m_Target)->IsGameModeCreative())
+		if (!static_cast<cPlayer *>(GetTarget())->IsGameModeCreative())
 		{
 			m_EMState = CHASING;
 		}
@@ -37,5 +37,11 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 }
 
 
+
+
+void cPassiveAggressiveMonster::EventSeePlayer(cEntity *, cChunk & a_Chunk)
+{
+	// don't do anything, neutral mobs don't react to just seeing the player
+}
 
 

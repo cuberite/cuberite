@@ -15,11 +15,11 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		cFastRandom Random;
-		a_Pickups.push_back(cItem(E_ITEM_MELON_SLICE, (char)(3 + Random.NextInt(5)), 0));
+		a_Pickups.push_back(cItem(E_ITEM_MELON_SLICE, static_cast<char>(3 + Random.NextInt(5)), 0));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

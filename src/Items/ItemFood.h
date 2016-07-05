@@ -11,7 +11,7 @@ class cItemFoodHandler :
 	public cItemHandler
 {
 	typedef cItemHandler super;
-	
+
 public:
 	cItemFoodHandler(int a_ItemType)
 		: super(a_ItemType)
@@ -42,6 +42,7 @@ public:
 			// Golden apple handled in ItemGoldenApple
 			case E_ITEM_GOLDEN_CARROT:    return FoodInfo(6, 14.4);
 			case E_ITEM_MELON_SLICE:      return FoodInfo(2, 1.2);
+			case E_ITEM_MUSHROOM_SOUP:    return FoodInfo(6, 7.2);
 			case E_ITEM_POISONOUS_POTATO: return FoodInfo(2, 1.2);
 			// Potatoes handled in ItemSeeds
 			case E_ITEM_PUMPKIN_PIE:      return FoodInfo(8, 4.8);
@@ -99,6 +100,29 @@ public:
 			}
 		}
 		return false;
+	}
+
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	{
+		if (!super::EatItem(a_Player, a_Item))
+		{
+			return false;
+		}
+
+		switch (m_ItemType)
+		{
+			case E_ITEM_MUSHROOM_SOUP:
+			case E_ITEM_RABBIT_STEW:
+			{
+				// Return a bowl to the inventory
+				if (!a_Player->IsGameModeCreative())
+				{
+					a_Player->GetInventory().AddItem(cItem(E_ITEM_BOWL));
+				}
+				break;
+			}
+		}
+		return true;
 	}
 
 };

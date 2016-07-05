@@ -20,14 +20,14 @@ class cPlugin
 {
 public:
 	// tolua_end
-	
+
 	/** Creates a new instance.
 	a_FolderName is the name of the folder (in the Plugins folder) from which the plugin is loaded.
 	The plugin's name defaults to the folder name. */
 	cPlugin(const AString & a_FolderName);
 
 	virtual ~cPlugin();
-	
+
 	/** Called as the last call into the plugin before it is unloaded. */
 	virtual void OnDisable(void) {}
 
@@ -42,9 +42,11 @@ public:
 	// Called each tick
 	virtual void Tick(float a_Dt) = 0;
 
-	/** Calls the specified hook with the params given. Returns the bool that the hook callback returns.*/
+	/** Calls the specified hook with the params given. Returns the bool that the hook callback returns. */
 	virtual bool OnBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) = 0;
 	virtual bool OnBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) = 0;
+	virtual bool OnBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_BrewingstandEntity) = 0;
+	virtual bool OnBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_BrewingstandEntity) = 0;
 	virtual bool OnChat                     (cPlayer & a_Player, AString & a_Message) = 0;
 	virtual bool OnChunkAvailable           (cWorld & a_World, int a_ChunkX, int a_ChunkZ) = 0;
 	virtual bool OnChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) = 0;
@@ -66,7 +68,7 @@ public:
 	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) = 0;
 	virtual bool OnKilled                   (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage) = 0;
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) = 0;
-	virtual bool OnLogin                    (cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username) = 0;
+	virtual bool OnLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username) = 0;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) = 0;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
@@ -107,22 +109,7 @@ public:
 	virtual bool OnWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) = 0;
 	virtual bool OnWorldStarted             (cWorld & a_World) = 0;
 	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) = 0;
-	
-	/** Handles the command split into a_Split, issued by player a_Player.
-	Command permissions have already been checked.
-	Returns true if command handled successfully. */
-	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand) = 0;
-	
-	/** Handles the console command split into a_Split.
-	Returns true if command handled successfully. Output is to be sent to the a_Output callback. */
-	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand) = 0;
-	
-	/** All bound commands are to be removed, do any language-dependent cleanup here */
-	virtual void ClearCommands(void) {}
-	
-	/** All bound console commands are to be removed, do any language-dependent cleanup here */
-	virtual void ClearConsoleCommands(void) {}
-	
+
 	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }
 	void SetName(const AString & a_Name) { m_Name = a_Name; }
@@ -143,7 +130,7 @@ public:
 
 	bool IsLoaded(void) const { return (m_Status == cPluginManager::psLoaded); }
 	// tolua_end
-	
+
 	// Needed for ManualBindings' tolua_ForEach<>
 	static const char * GetClassStatic(void) { return "cPlugin"; }
 

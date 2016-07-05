@@ -5,72 +5,6 @@
 #include "Globals.h"
 #include "BoundingBox.h"
 #include "Defines.h"
-#include "SelfTests.h"
-
-
-
-
-
-#ifdef SELF_TEST
-
-/** A simple self-test that is executed on program start, used to verify bbox functionality */
-static class SelfTest_BoundingBox
-{
-public:
-	SelfTest_BoundingBox(void)
-	{
-		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&Test), "Bounding box intersections");
-	}
-
-	static void Test(void)
-	{
-		Vector3d Min(1, 1, 1);
-		Vector3d Max(2, 2, 2);
-		Vector3d LineDefs[] =
-		{
-			Vector3d(1.5,   4, 1.5), Vector3d(1.5,   3, 1.5),  // Should intersect at 2,    face 1 (YP)
-			Vector3d(1.5,   0, 1.5), Vector3d(1.5,   4, 1.5),  // Should intersect at 0.25, face 0 (YM)
-			Vector3d(0,     0,   0), Vector3d(2,     2,   2),  // Should intersect at 0.5,  face 0, 3 or 5 (anyM)
-			Vector3d(0.999, 0, 1.5), Vector3d(0.999, 4, 1.5),  // Should not intersect
-			Vector3d(1.999, 0, 1.5), Vector3d(1.999, 4, 1.5),  // Should intersect at 0.25, face 0 (YM)
-			Vector3d(2.001, 0, 1.5), Vector3d(2.001, 4, 1.5),  // Should not intersect
-		} ;
-		bool Results[] = {true, true, true, false, true, false};
-		double LineCoeffs[] = {2, 0.25, 0.5, 0, 0.25, 0};
-		
-		for (size_t i = 0; i < ARRAYCOUNT(LineDefs) / 2; i++)
-		{
-			double LineCoeff;
-			eBlockFace Face;
-			Vector3d Line1 = LineDefs[2 * i];
-			Vector3d Line2 = LineDefs[2 * i + 1];
-			bool res = cBoundingBox::CalcLineIntersection(Min, Max, Line1, Line2, LineCoeff, Face);
-			if (res != Results[i])
-			{
-				LOGERROR("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d",
-					Line1.x, Line1.y, Line1.z,
-					Line2.x, Line2.y, Line2.z,
-					res ? 1 : 0, LineCoeff, Face
-				);
-				abort();
-			}
-			if (res)
-			{
-				if (LineCoeff != LineCoeffs[i])
-				{
-					LOGERROR("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d",
-						Line1.x, Line1.y, Line1.z,
-						Line2.x, Line2.y, Line2.z,
-						res ? 1 : 0, LineCoeff, Face
-					);
-					abort();
-				}
-			}
-		}  // for i - LineDefs[]
-	}
-} g_BoundingBoxTest;
-
-#endif
 
 
 
@@ -99,6 +33,16 @@ cBoundingBox::cBoundingBox(const Vector3d & a_Min, const Vector3d & a_Max) :
 cBoundingBox::cBoundingBox(const Vector3d & a_Pos, double a_Radius, double a_Height) :
 	m_Min(a_Pos.x - a_Radius, a_Pos.y,            a_Pos.z - a_Radius),
 	m_Max(a_Pos.x + a_Radius, a_Pos.y + a_Height, a_Pos.z + a_Radius)
+{
+}
+
+
+
+
+
+cBoundingBox::cBoundingBox(const Vector3d & a_Pos, double a_CubeLength) :
+	m_Min(a_Pos.x - a_CubeLength / 2, a_Pos.y - a_CubeLength / 2, a_Pos.z - a_CubeLength / 2),
+	m_Max(a_Pos.x + a_CubeLength / 2, a_Pos.y + a_CubeLength / 2, a_Pos.z + a_CubeLength / 2)
 {
 }
 
@@ -251,7 +195,7 @@ bool cBoundingBox::IsInside(const Vector3d & a_Min, const Vector3d & a_Max, doub
 
 
 
-bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face)
+bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face) const
 {
 	return CalcLineIntersection(m_Min, m_Max, a_Line1, a_Line2, a_LineCoeff, a_Face);
 }
@@ -269,10 +213,10 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 		a_Face = BLOCK_FACE_NONE;  // No faces hit
 		return true;
 	}
-	
+
 	eBlockFace Face = BLOCK_FACE_NONE;
 	double Coeff = Vector3d::NO_INTERSECTION;
-	
+
 	// Check each individual bbox face for intersection with the line, remember the one with the lowest coeff
 	double c = a_Line1.LineCoeffToXYPlane(a_Line2, a_Min.z);
 	if ((c >= 0) && (c < Coeff) && IsInside(a_Min, a_Max, a_Line1 + (a_Line2 - a_Line1) * c))
@@ -310,13 +254,13 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 		Face = (a_Line1.x > a_Line2.x) ? BLOCK_FACE_XP : BLOCK_FACE_XM;
 		Coeff = c;
 	}
-	
+
 	if (Coeff >= Vector3d::NO_INTERSECTION)
 	{
 		// There has been no intersection
 		return false;
 	}
-	
+
 	a_LineCoeff = Coeff;
 	a_Face = Face;
 	return true;
@@ -326,7 +270,7 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d &
 
 
 
-bool cBoundingBox::Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Intersection)
+bool cBoundingBox::Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Intersection) const
 {
 	a_Intersection.m_Min.x = std::max(m_Min.x, a_Other.m_Min.x);
 	a_Intersection.m_Max.x = std::min(m_Max.x, a_Other.m_Max.x);

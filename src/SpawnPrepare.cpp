@@ -19,8 +19,8 @@ public:
 protected:
 
 	cSpawnPrepare & m_SpawnPrepare;
-	
-	virtual void Call(int a_ChunkX, int a_ChunkZ) override
+
+	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
 	{
 		m_SpawnPrepare.PreparedChunkCallback(a_ChunkX, a_ChunkZ);
 	}
@@ -64,7 +64,10 @@ void cSpawnPrepare::PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_Spa
 	}  // for i
 
 	// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
-	prep.m_EvtFinished.Wait();
+	if (MaxIdx > 0)
+	{
+		prep.m_EvtFinished.Wait();
+	}
 }
 
 
@@ -116,7 +119,7 @@ void cSpawnPrepare::PreparedChunkCallback(int a_ChunkX, int a_ChunkZ)
 		float PercentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
 		float ChunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / std::chrono::duration_cast<std::chrono::milliseconds>(Now - m_LastReportTime).count();
 		LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks / sec)",
-			m_World.GetName().c_str(), PercentDone, m_NumPrepared, m_MaxIdx, ChunkSpeed
+			m_World.GetName().c_str(), PercentDone, m_NumPrepared.load(std::memory_order_seq_cst), m_MaxIdx, ChunkSpeed
 		);
 		m_LastReportTime = Now;
 		m_LastReportChunkCount = m_NumPrepared;

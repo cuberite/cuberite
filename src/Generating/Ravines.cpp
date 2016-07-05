@@ -22,7 +22,7 @@ struct cRavDefPoint
 	int m_Radius;
 	int m_Top;
 	int m_Bottom;
-	
+
 	cRavDefPoint(int a_BlockX, int a_BlockZ, int a_Radius, int a_Top, int a_Bottom) :
 		m_BlockX(a_BlockX),
 		m_BlockZ(a_BlockZ),
@@ -46,25 +46,25 @@ class cStructGenRavines::cRavine :
 
 	cRavDefPoints m_Points;
 
-	
+
 	/** Generates the shaping defpoints for the ravine, based on the ravine block coords and noise */
 	void GenerateBaseDefPoints(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise);
-	
+
 	/** Refines (adds and smooths) defpoints from a_Src into a_Dst */
 	void RefineDefPoints(const cRavDefPoints & a_Src, cRavDefPoints & a_Dst);
-	
+
 	/** Does one round of smoothing, two passes of RefineDefPoints() */
 	void Smooth(void);
-	
+
 	/** Linearly interpolates the points so that the maximum distance between two neighbors is max 1 block */
 	void FinishLinear(void);
-	
+
 public:
-	
+
 	cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise);
-	
+
 	#ifdef _DEBUG
-	/// Exports itself as a SVG line definition
+	/** Exports itself as a SVG line definition */
 	AString ExportAsSVG(int a_Color, int a_OffsetX = 0, int a_OffsetZ = 0) const;
 	#endif  // _DEBUG
 
@@ -109,11 +109,11 @@ cStructGenRavines::cRavine::cRavine(int a_GridX, int a_GridZ, int a_OriginX, int
 {
 	// Calculate the ravine shape-defining points:
 	GenerateBaseDefPoints(a_OriginX, a_OriginZ, a_Size, a_Noise);
-	
+
 	// Smooth the ravine. Two passes are needed:
 	Smooth();
 	Smooth();
-	
+
 	// Linearly interpolate the neighbors so that they're close enough together:
 	FinishLinear();
 }
@@ -126,42 +126,42 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 {
 	// Modify the size slightly to have different-sized ravines (1 / 2 to 1 / 1 of a_Size):
 	a_Size = (512 + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 11 * a_BlockZ, a_BlockX + a_BlockZ) / 17) % 512)) * a_Size / 1024;
-	
+
 	// The complete offset of the ravine from its cellpoint, up to 2 * a_Size in each direction
 	int OffsetX = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 0)    / 9) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 1000) / 7) % (2 * a_Size)) - 2 * a_Size) / 2;
 	int OffsetZ = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 2000) / 7) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 3000) / 9) % (2 * a_Size)) - 2 * a_Size) / 2;
 	int CenterX = a_BlockX + OffsetX;
 	int CenterZ = a_BlockZ + OffsetZ;
-	
+
 	// Get the base angle in which the ravine "axis" goes:
-	float Angle = (float)(((float)((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI);
+	float Angle = static_cast<float>((static_cast<float>((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI);
 	float xc = sinf(Angle);
 	float zc = cosf(Angle);
-	
+
 	// Calculate the definition points and radii:
-	int MaxRadius = (int)(sqrt(12.0 + ((a_Noise.IntNoise2DInt(61 * a_BlockX, 97 * a_BlockZ) / 13) % a_Size) / 16));
+	int MaxRadius = static_cast<int>(sqrt(12.0 + ((a_Noise.IntNoise2DInt(61 * a_BlockX, 97 * a_BlockZ) / 13) % a_Size) / 16));
 	int Top       = 32 + ((a_Noise.IntNoise2DInt(13 * a_BlockX, 17 * a_BlockZ) / 23) % 32);
 	int Bottom    = 5 + ((a_Noise.IntNoise2DInt(17 * a_BlockX, 29 * a_BlockZ) / 13) % 32);
 	int Mid = (Top + Bottom) / 2;
-	int DefinitionPointX = CenterX - (int)(xc * a_Size / 2);
-	int DefinitionPointZ = CenterZ - (int)(zc * a_Size / 2);
+	int DefinitionPointX = CenterX - static_cast<int>(xc * a_Size / 2);
+	int DefinitionPointZ = CenterZ - static_cast<int>(zc * a_Size / 2);
 	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
 	for (int i = 1; i < NUM_RAVINE_POINTS - 1; i++)
 	{
-		int LineX = CenterX + (int)(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
-		int LineZ = CenterZ + (int)(zc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
+		int LineX = CenterX + static_cast<int>(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
+		int LineZ = CenterZ + static_cast<int>(zc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
 		// Amplitude is the amount of blocks that this point is away from the ravine "axis"
 		int Amplitude = (a_Noise.IntNoise3DInt(70 * a_BlockX, 20 * a_BlockZ + 31 * i, 10000 * i) / 9) % a_Size;
 		Amplitude = Amplitude / 4 - a_Size / 8;  // Amplitude is in interval [-a_Size / 4, a_Size / 4]
-		int PointX = LineX + (int)(zc * Amplitude);
-		int PointZ = LineZ - (int)(xc * Amplitude);
+		int PointX = LineX + static_cast<int>(zc * Amplitude);
+		int PointZ = LineZ - static_cast<int>(xc * Amplitude);
 		int Radius = MaxRadius - abs(i - NUM_RAVINE_POINTS / 2);  // TODO: better radius function
 		int ThisTop    = Top    + ((a_Noise.IntNoise3DInt(7 *  a_BlockX, 19 * a_BlockZ, i * 31) / 13) % 8) - 4;
 		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 *  a_BlockZ, i * 31) / 13) % 8) - 4;
 		m_Points.push_back(cRavDefPoint(PointX, PointZ, Radius, ThisTop, ThisBottom));
 	}  // for i - m_Points[]
-	DefinitionPointX = CenterX + (int)(xc * a_Size / 2);
-	DefinitionPointZ = CenterZ + (int)(zc * a_Size / 2);
+	DefinitionPointX = CenterX + static_cast<int>(xc * a_Size / 2);
+	DefinitionPointZ = CenterZ + static_cast<int>(zc * a_Size / 2);
 	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, Mid, Mid));
 }
 
@@ -234,10 +234,10 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 	// For each segment, use Bresenham's line algorithm to draw a "line" of defpoints
 	// _X 2012_07_20: I tried modifying this algorithm to produce "thick" lines (only one coord change per point)
 	//   But the results were about the same as the original, so I disposed of it again - no need to use twice the count of points
-	
+
 	cRavDefPoints Pts;
 	std::swap(Pts, m_Points);
-	
+
 	m_Points.reserve(Pts.size() * 3);
 	int PrevX = Pts.front().m_BlockX;
 	int PrevZ = Pts.front().m_BlockZ;
@@ -299,12 +299,12 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
 	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d, %d L %d, %d\"/>\n",
 		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ - 5, a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ + 5
 	);
-	
+
 	// A gray line from the base point to the first point of the ravine, for identification:
 	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M %d, %d L %d, %d\"/>\n",
 		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ, a_OffsetX + m_Points.front().m_BlockX, a_OffsetZ + m_Points.front().m_BlockZ
 	);
-	
+
 	// Offset guides:
 	if (a_OffsetX > 0)
 	{
@@ -344,7 +344,7 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 			// Cannot intersect, bail out early
 			continue;
 		}
-		
+
 		// Carve out a cylinder around the xz point, m_Radius in diameter, from Bottom to Top:
 		int RadiusSq = itr->m_Radius * itr->m_Radius;  // instead of doing sqrt for each distance, we do sqr of the radius
 		int DifX = BlockStartX - itr->m_BlockX;  // substitution for faster calc
@@ -358,11 +358,11 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 				a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
 			}
 			#endif  // _DEBUG
-			
+
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)
 			{
-				int Top = std::min(itr->m_Top, (int)(cChunkDef::Height));  // Stupid gcc needs int cast
+				int Top = std::min(itr->m_Top, static_cast<int>(cChunkDef::Height));  // Stupid gcc needs int cast
 				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
 				{
 					switch (a_ChunkDesc.GetBlockType(x, y, z))

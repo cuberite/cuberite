@@ -23,7 +23,7 @@ cCriticalSection::cCriticalSection()
 void cCriticalSection::Lock()
 {
 	m_Mutex.lock();
-	
+
 	#ifdef _DEBUG
 		m_IsLocked += 1;
 		m_OwningThreadID = std::this_thread::get_id();
@@ -40,7 +40,7 @@ void cCriticalSection::Unlock()
 		ASSERT(m_IsLocked > 0);
 		m_IsLocked -= 1;
 	#endif  // _DEBUG
-	
+
 	m_Mutex.unlock();
 }
 

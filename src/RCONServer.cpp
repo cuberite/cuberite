@@ -29,7 +29,7 @@ enum
 	// Client -> Server:
 	RCON_PACKET_COMMAND = 2,
 	RCON_PACKET_LOGIN   = 3,
-	
+
 	// Server -> Client:
 	RCON_PACKET_RESPONSE = 2,
 } ;
@@ -87,19 +87,19 @@ public:
 		m_RequestID(a_RequestID)
 	{
 	}
-	
+
 	// cCommandOutputCallback overrides:
 	virtual void Out(const AString & a_Text) override
 	{
 		m_Buffer.append(a_Text);
 	}
-	
+
 	virtual void Finished(void) override
 	{
 		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, static_cast<UInt32>(m_Buffer.size()), m_Buffer.c_str());
 		delete this;
 	}
-	
+
 protected:
 	cRCONServer::cConnection & m_Connection;
 	UInt32 m_RequestID;
@@ -148,7 +148,7 @@ void cRCONServer::Initialize(cSettingsRepositoryInterface & a_Settings)
 		LOGWARNING("RCON is requested, but the password is not set. RCON is now disabled.");
 		return;
 	}
-	
+
 	// Read the listening ports for RCON from config:
 	AStringVector Ports = ReadUpgradeIniPorts(a_Settings, "RCON", "Ports", "PortsIPv4", "PortsIPv6", "25575");
 
@@ -207,7 +207,7 @@ void cRCONServer::cConnection::OnReceivedData(const char * a_Data, size_t a_Size
 
 	// Append data to the buffer:
 	m_Buffer.append(a_Data, a_Size);
-	
+
 	// Process the packets in the buffer:
 	while (m_Buffer.size() >= 14)
 	{
@@ -227,7 +227,7 @@ void cRCONServer::cConnection::OnReceivedData(const char * a_Data, size_t a_Size
 			// Incomplete packet yet, wait for more data to come
 			return;
 		}
-		
+
 		UInt32 RequestID  = UIntFromBuffer(m_Buffer.data() + 4);
 		UInt32 PacketType = UIntFromBuffer(m_Buffer.data() + 8);
 		if (!ProcessPacket(RequestID, PacketType, Length - 10, m_Buffer.data() + 12))
@@ -276,14 +276,14 @@ bool cRCONServer::cConnection::ProcessPacket(UInt32 a_RequestID, UInt32 a_Packet
 				return false;
 			}
 			m_IsAuthenticated = true;
-			
+
 			LOGD("RCON: Client at %s has successfully authenticated", m_IPAddress.c_str());
-			
+
 			// Send OK response:
 			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, nullptr);
 			return true;
 		}
-		
+
 		case RCON_PACKET_COMMAND:
 		{
 			if (!m_IsAuthenticated)
@@ -292,17 +292,17 @@ bool cRCONServer::cConnection::ProcessPacket(UInt32 a_RequestID, UInt32 a_Packet
 				SendResponse(a_RequestID, RCON_PACKET_RESPONSE, sizeof(AuthNeeded), AuthNeeded);
 				return false;
 			}
-			
+
 			AString cmd(a_Payload, a_PayloadLength);
 			LOGD("RCON command from %s: \"%s\"", m_IPAddress.c_str(), cmd.c_str());
 			cRoot::Get()->ExecuteConsoleCommand(cmd, *(new cRCONCommandOutput(*this, a_RequestID)));
-			
+
 			// Send an empty response:
 			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, nullptr);
 			return true;
 		}
 	}
-	
+
 	// Unknown packet type, drop the connection:
 	LOGWARNING("RCON: Client at %s has sent an unknown packet type %d, dropping connection.",
 		m_IPAddress.c_str(), a_PacketType
@@ -317,7 +317,7 @@ bool cRCONServer::cConnection::ProcessPacket(UInt32 a_RequestID, UInt32 a_Packet
 UInt32 cRCONServer::cConnection::UIntFromBuffer(const char * a_Buffer)
 {
 	const Byte * Buffer = reinterpret_cast<const Byte *>(a_Buffer);
-	return (Buffer[3] << 24) | (Buffer[2] << 16) | (Buffer[1] << 8) | Buffer[0];
+	return static_cast<UInt32>((Buffer[3] << 24) | (Buffer[2] << 16) | (Buffer[1] << 8) | Buffer[0]);
 }
 
 
@@ -336,12 +336,11 @@ void cRCONServer::cConnection::UIntToBuffer(UInt32 a_Value, char * a_Buffer)
 
 
 
-/// Sends a RCON packet back to the client
 void cRCONServer::cConnection::SendResponse(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload)
 {
 	ASSERT((a_PayloadLength == 0) || (a_Payload != nullptr));  // Either zero data to send, or a valid payload ptr
 	ASSERT(m_Link != nullptr);
-	
+
 	char Buffer[12];
 	UInt32 Length = a_PayloadLength + 10;
 	UIntToBuffer(Length, Buffer);

@@ -1,16 +1,24 @@
-Code Conventions
-----------
+How to contribute to Cuberite
+-----------------------------
+Thank you for your interest in Cuberite. Contributing to Cuberite is easy, just fork the project on GitHub, make your changes and submit a pull request to get your code merged. That's all there is to it.
+Check out [GETTING-STARTED.md](https://github.com/cuberite/cuberite/blob/master/GETTING-STARTED.md) for more information about setting up the development environment for Cuberite, finding issues to work on, etc...
 
-When contributing, you must follow our code conventions. Otherwise, the CI builds will automatically fail and your PR will not be merged until the non-conforming code is fixed. Due to this, we strongly advise you to run `src/CheckBasicStyle.lua` before commiting, it will perform various code style checks and warn you if your code does not conform to our conventions. `CheckBasicStyle.lua` can be configured to run automatically before every commit via a pre-commit hook, **this is highly recommended**. The way to do it is listed at the bottom of this file.
+If you are new to open source and/or GitHub, or just aren't sure about some details in the contribution process, here's a tutorial to get you started:
+[How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
+
+Code Conventions
+----------------
+
+When contributing, you must follow our code conventions. Otherwise, CI builds will automatically fail and your PR will not be merged until the non-conforming code is fixed. Due to this, we strongly advise you to run `src/CheckBasicStyle.lua` before committing, it will perform various code style checks and warn you if your code does not conform to our conventions. `CheckBasicStyle.lua` can be configured to run automatically before every commit via a pre-commit hook, **this is highly recommended**. There are instructions on how to achieve this at the bottom of this file.
 
 Here are the conventions:
 
- * We use the subset of C++11 supported by MSVC 2013 (ask if you think that something would be useful)
+ * We use the subset of C++11 supported by MSVC 2013 (ask if you think that something outside of this subset would be useful)
  * All new public functions in all classes need documenting comments on what they do and what behavior they follow, use doxy-comments formatted as `/** Description */`. Do not use asterisks on additional lines in multi-line comments.
  * Use spaces after the comment markers: `// Comment` instead of `//Comment`. A comment must be prefixed with two spaces if it's on the same line with code:
   - `SomeFunction()<Space><Space>//<Space>Note the two spaces prefixed to me and the space after the slashes.`
  * All variable names and function names use CamelCase style, with the exception of single letter variables.  
-  - `ThisIsAProperFunction()` `This_is_bad()` `this_is_bad` `GoodVariableName` `badVariableName`.
+  - `ThisIsAProperFunction()` `This_is_bad()` `this_is_bad()` `GoodVariableName` `badVariableName`.
  * All member variables start with `m_`, all function parameters start with `a_`, all class names start with `c`.
   - `class cMonster { int m_Health; int DecreaseHealth(int a_Amount); }`
  * Put spaces after commas. `Vector3d(1, 2, 3)` instead of `Vector3d(1,2,3)`
@@ -21,7 +29,6 @@ Here are the conventions:
  * Add those extra parentheses to conditions, especially in C++:
   - `if ((a == 1) && ((b == 2) || (c == 3)))` instead of ambiguous `if (a == 1 && b == 2 || c == 3)`
   - This helps prevent mistakes such as `if (a & 1 == 0)`
- * 
  * Use the provided wrappers for OS stuff:
   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timers through `cTimer`, high-precision sleep through `cSleep`
  * No magic numbers, use named constants:
@@ -38,33 +45,31 @@ Here are the conventions:
  * Alpha-sort stuff that makes sense alpha-sorting - long lists of similar items etc.
  * White space is free, so use it freely
   - "freely" as in "plentifully", not "arbitrarily"
- * All `case` statements inside a `switch` need an extra indent.
- * Each and every control statement deserves its braces. This helps maintainability later on when the file is edited, lines added or removed - the control logic doesn't break so easily.
-  - The only exception: a `switch` statement with all `case` statements being a single short statement is allowed to use the short brace-less form.
+ * All `case` statements inside a `switch` need an extra indent
+ * Each and every control statement deserves its braces. This helps maintainability later on when the file is edited, lines added or removed - the control logic doesn't break so easily
+  - The only exception: a `switch` statement with all `case` statements being a single short statement is allowed to use the short brace-less form
   - These two rules really mean that indent is governed by braces
- * Add an empty last line in all source files (GCC and GIT can complain otherwise)
+ * Add an empty last line in all source files (GCC and Git can complain otherwise)
 
 Pre-commit hook
 ---------
 When contributing, the code conventions above *must* be followed. Otherwise, the CI builds will automatically fail and your PR will not be merged until the non-conforming code is fixed. It is highly recommended to set up a pre-commit hook which will check your code style before every commit. Here is how to do that:
 
- * Clone the repository as usual. 
+ * Clone the repository as usual.
  * Go to your `<clone location>/.git/hooks` folder, create a text file named "pre-commit" there with the following contents:
 ```
-#!/usr/sh
+#!/bin/sh
 src/CheckBasicStyle.lua 1>&2 -g
 ```
  * If on Linux/Unix, you need to give the newly created file an execute permission: `chmod +x .git/hooks/pre-commit`
  * Lua must be installed.
  * You're done. Now, `src/CheckBasicStyle.lua` will check the changed files before every commit. If a problem is found, it will point you to that problem and will cancel the commit.
- 
+
 Note that the check script is not smart enough to catch everything, so not having any warnings does not necessarily imply that you followed the conventions fully. The other humans working on this will perform more checks before merging.
 
 Copyright
 ---------
 
-Your work must be licensed at least under the Apache license.
+Your must either place your work in the public domain or licensed it under the Apache License 2.0, and if so you must add yourself to the contributors file to show that you accept the publication of your work under the license.
 
-You can add yourself to the CONTRIBUTORS file if you wish.
-
-**PLUGINS ONLY**: If your plugin is not licensed under the Apache license, then it must be compatible and marked as such. This is only valid for the plugins included within the MCServer source; plugins developed on separate repositories can use whatever license they want.
+**PLUGINS ONLY**: If your plugin is not licensed under the Apache license, then it must be compatible and marked as such. This is only valid for the plugins included within the Cuberite source; plugins developed on separate repositories can use whatever license they want.

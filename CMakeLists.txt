@@ -9,31 +9,31 @@ if (MSVC)
 endif()
 
 # These env variables are used for configuring Travis CI builds.
-# See https://github.com/mc-server/MCServer/pull/767
-if(DEFINED ENV{TRAVIS_MCSERVER_BUILD_TYPE})
-	message("Setting build type to $ENV{TRAVIS_MCSERVER_BUILD_TYPE}")
-	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_MCSERVER_BUILD_TYPE})
+if(DEFINED ENV{TRAVIS_CUBERITE_BUILD_TYPE})
+	message("Setting build type to $ENV{TRAVIS_CUBERITE_BUILD_TYPE}")
+	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_CUBERITE_BUILD_TYPE})
 endif()
 
-if(DEFINED ENV{TRAVIS_MCSERVER_FORCE32})
-	set(FORCE32 $ENV{TRAVIS_MCSERVER_FORCE32})
+if(DEFINED ENV{TRAVIS_CUBERITE_FORCE32})
+	set(FORCE32 $ENV{TRAVIS_CUBERITE_FORCE32})
 endif()
 
 if(DEFINED ENV{TRAVIS_BUILD_WITH_COVERAGE})
 	set(BUILD_WITH_COVERAGE $ENV{TRAVIS_BUILD_WITH_COVERAGE})
 endif()
 
-if(DEFINED ENV{MCSERVER_BUILD_ID})
+if(DEFINED ENV{CUBERITE_BUILD_ID})
 	# The build info is defined by the build system (Travis / Jenkins)
-	set(BUILD_ID $ENV{MCSERVER_BUILD_ID})
-	set(BUILD_SERIES_NAME $ENV{MCSERVER_BUILD_SERIES_NAME})
-	set(BUILD_DATETIME $ENV{MCSERVER_BUILD_DATETIME})
-	if(DEFINED ENV{MCSERVER_BUILD_COMMIT_ID})
-		set(BUILD_COMMIT_ID $ENV{MCSERVER_BUILD_COMMIT_ID})
+	set(BUILD_ID $ENV{CUBERITE_BUILD_ID})
+	set(BUILD_SERIES_NAME $ENV{CUBERITE_BUILD_SERIES_NAME})
+	set(BUILD_DATETIME $ENV{CUBERITE_BUILD_DATETIME})
+	if(DEFINED ENV{CUBERITE_BUILD_COMMIT_ID})
+		set(BUILD_COMMIT_ID $ENV{CUBERITE_BUILD_COMMIT_ID})
 	else()
 		message("Commit id not set, attempting to determine id from git")
 		execute_process(
 			COMMAND git rev-parse HEAD
+			WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 			RESULT_VARIABLE GIT_EXECUTED
 			OUTPUT_VARIABLE BUILD_COMMIT_ID
 		)
@@ -48,6 +48,7 @@ else()
 	set(BUILD_SERIES_NAME "local build")
 	execute_process(
 		COMMAND git rev-parse HEAD
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 		RESULT_VARIABLE GIT_EXECUTED
 		OUTPUT_VARIABLE BUILD_COMMIT_ID
 	)
@@ -57,6 +58,7 @@ else()
 	string(STRIP ${BUILD_COMMIT_ID} BUILD_COMMIT_ID)
 	execute_process(
 		COMMAND git log -1 --date=iso --pretty=format:%ai
+		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 		RESULT_VARIABLE GIT_EXECUTED
 		OUTPUT_VARIABLE BUILD_DATETIME
 	)
@@ -75,16 +77,16 @@ endif()
 # We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
 # Adapted from http://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
 if(MSVC OR MSVC_IDE)
-  if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
-    message(FATAL_ERROR "The project requires C++11 features. "
-      "You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
-      "with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
-  elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
-    message( "VC11: using Microsoft Visual Studio 2012 "
-      "with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
-    set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
-  else() # VC12+, assuming C++11 supported.
-  endif()
+	if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
+		message(FATAL_ERROR "The project requires C++11 features. "
+		"You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
+		"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
+	elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
+		message( "VC11: using Microsoft Visual Studio 2012 "
+		"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
+		set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
+	else() # VC12+, assuming C++11 supported.
+	endif()
 endif()
 
 set(BUILD_TOOLS OFF CACHE BOOL "")
@@ -93,6 +95,7 @@ set(SELF_TEST OFF CACHE BOOL "")
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	message("Building tools")
+	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
 	add_subdirectory(Tools/MCADefrag/)
 	add_subdirectory(Tools/ProtoProxy/)
 endif()
@@ -125,11 +128,14 @@ if(${SELF_TEST})
 	add_definitions(-DSELF_TEST)
 endif()
 
+# Build all dependent libraries as static:
+SET(CMAKE_BUILD_STATIC_LIBRARIES ON)
 
 
 
 
-project (MCServer)
+
+project (Cuberite)
 
 # Set options for SQLiteCpp, disable all their tests and lints:
 set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide."  FORCE)
@@ -164,6 +170,36 @@ endif()
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/libevent/CMakeLists.txt)
 	message(FATAL_ERROR "LibEvent is missing in folder lib/libevent. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/jsoncpp/CMakeLists.txt)
+	message(FATAL_ERROR "JsonCPP is missing in folder lib/jsoncpp. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/cmake-coverage/CodeCoverage.cmake)
+	message(FATAL_ERROR "cmake-coverage is missing in folder lib/cmake-coverage. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/expat/CMakeLists.txt)
+	message(FATAL_ERROR "expat is missing in folder lib/expat. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/lua/CMakeLists.txt)
+	message(FATAL_ERROR "lua is missing in folder lib/lua. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/luaexpat/CMakeLists.txt)
+	message(FATAL_ERROR "luaexpat is missing in folder lib/luaexpat. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/luaproxy/CMakeLists.txt)
+	message(FATAL_ERROR "luaproxy is missing in folder lib/luaproxy. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/sqlite/CMakeLists.txt)
+	message(FATAL_ERROR "sqlite is missing in folder lib/sqlite. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/tolua++/CMakeLists.txt)
+	message(FATAL_ERROR "tolua++ is missing in folder lib/tolua++. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/zlib/CMakeLists.txt)
+	message(FATAL_ERROR "zlib is missing in folder lib/zlib. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+
+
+
 
 # Include all the libraries:
 add_subdirectory(lib/jsoncpp/)
@@ -228,25 +264,6 @@ if (MSVC)
 		tolua
 		PROPERTIES FOLDER Support
 	)
-	if (${SELF_TEST})
-		set_target_properties(
-			Network
-			PROPERTIES FOLDER Lib
-		)
-		set_target_properties(
-			arraystocoords-exe
-			ChunkBuffer
-			coordinates-exe
-			copies-exe
-			copyblocks-exe
-			creatable-exe
-			EchoServer
-			Google-exe
-			LoadablePieces
-			NameLookup
-			PROPERTIES FOLDER Tests
-		)
-	endif()
 
 	if(${BUILD_TOOLS})
 		set_target_properties(
@@ -256,4 +273,3 @@ if (MSVC)
 		)
 	endif()
 endif()
-

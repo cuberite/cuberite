@@ -29,12 +29,12 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		
+
 		// FIXME: Do not use cPiston class for dispenser placement!
 		a_BlockMeta = cBlockPistonHandler::RotationPitchToMetaData(a_Player->GetYaw(), a_Player->GetPitch());
 		return true;
 	}
-	
+
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Bit 0x08 is a flag. Lowest three bits are position. 0x08 == 1000

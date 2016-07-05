@@ -1,6 +1,6 @@
 
 cmake_minimum_required (VERSION 2.6)
-project (MCServer)
+project (Cuberite)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
@@ -9,6 +9,7 @@ SET (SRCS
 	Window.cpp
 	AnvilWindow.cpp
 	BeaconWindow.cpp
+	BrewingstandWindow.cpp
 	ChestWindow.cpp
 	CraftingWindow.cpp
 	DropSpenserWindow.cpp
@@ -23,6 +24,7 @@ SET (HDRS
 	Window.h
 	AnvilWindow.h
 	BeaconWindow.h
+	BrewingstandWindow.h
 	ChestWindow.h
 	CraftingWindow.h
 	DropSpenserWindow.h
@@ -35,9 +37,8 @@ SET (HDRS
 	WindowOwner.h)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(SlotArea.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=switch-enum -Wno-error=sign-conversion -Wno-error=old-style-cast")
-	set_source_files_properties(Window.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=switch-enum -Wno-error=sign-conversion -Wno-error=old-style-cast")
-	set_source_files_properties(ChestWindow.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(SlotArea.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=switch-enum -Wno-error=sign-conversion ")
+	set_source_files_properties(Window.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=switch-enum -Wno-error=sign-conversion ")
 endif()
 
 if(NOT MSVC)

@@ -22,21 +22,13 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 
 
 // What to do if in Chasing State
-void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
+void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::InStateChasing(a_Dt);
+	super::InStateChasing(a_Dt, a_Chunk);
 
-	if (m_Target != nullptr)
+	if (GetTarget() != nullptr)
 	{
-		if (m_Target->IsPlayer())
-		{
-			if (static_cast<cPlayer *>(m_Target)->IsGameModeCreative())
-			{
-				m_EMState = IDLE;
-				return;
-			}
-		}
-		MoveToPosition(m_Target->GetPosition());
+		MoveToPosition(GetTarget()->GetPosition());
 	}
 }
 
@@ -44,11 +36,11 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 
 
 
-void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity)
+void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk)
 {
 	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative())
 	{
-		super::EventSeePlayer(a_Entity);
+		super::EventSeePlayer(a_Entity, a_Chunk);
 		m_EMState = CHASING;
 	}
 }
@@ -67,23 +59,22 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		CheckEventSeePlayer();
+		CheckEventSeePlayer(a_Chunk);
 	}
 
-	if (m_Target == nullptr)
+	if (GetTarget() == nullptr)
 	{
 		return;
 	}
 
 	cTracer LineOfSight(GetWorld());
 	Vector3d MyHeadPosition = GetPosition() + Vector3d(0, GetHeight(), 0);
-	Vector3d AttackDirection(m_Target->GetPosition() + Vector3d(0, m_Target->GetHeight(), 0) - MyHeadPosition);
+	Vector3d AttackDirection(GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
 
 
-	if (TargetIsInRange() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())))
+	if (TargetIsInRange() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())) && (GetHealth() > 0.0))
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
-		StopMovingToPosition();
 		Attack(a_Dt);
 	}
 }
@@ -92,33 +83,16 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
+bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 {
-	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
-	if ((m_Target == nullptr) || (m_AttackInterval < 3.0))
+	if ((GetTarget() == nullptr) || (m_AttackCoolDownTicksLeft != 0))
 	{
-		return;
+		return false;
 	}
 
 	// Setting this higher gives us more wiggle room for attackrate
-	m_AttackInterval = 0.0;
-	m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
-}
+	ResetAttackCooldown();
+	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
 
-
-
-
-bool cAggressiveMonster::IsMovingToTargetPosition()
-{
-	// Difference between destination x and target x is negligible (to 10^-12 precision)
-	if (fabsf(static_cast<float>(m_FinalDestination.x) - static_cast<float>(m_Target->GetPosX())) < std::numeric_limits<float>::epsilon())
-	{
-		return false;
-	}
-	// Difference between destination z and target z is negligible (to 10^-12 precision)
-	else if (fabsf(static_cast<float>(m_FinalDestination.z) - static_cast<float>(m_Target->GetPosZ())) > std::numeric_limits<float>::epsilon())
-	{
-		return false;
-	}
 	return true;
 }

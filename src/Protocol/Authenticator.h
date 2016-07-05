@@ -1,10 +1,10 @@
 
 // cAuthenticator.h
 
-// Interfaces to the cAuthenticator class representing the thread that authenticates users against the official MC server
+// Interfaces to the cAuthenticator class representing the thread that authenticates users against the official Mojang servers
 // Authentication prevents "hackers" from joining with an arbitrary username (possibly impersonating the server admins)
 // For more info, see http://wiki.vg/Session#Server_operation
-// In MCS, authentication is implemented as a single thread that receives queued auth requests and dispatches them one by one.
+// In Cuberite, authentication is implemented as a single thread that receives queued auth requests and dispatches them one by one.
 
 
 
@@ -50,7 +50,7 @@ public:
 
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);
-	
+
 private:
 
 	class cUser
@@ -76,13 +76,13 @@ private:
 
 	/** The server that is to be contacted for auth / UUID conversions */
 	AString m_Server;
-	
+
 	/** The URL to use for auth, without server part.
 	%USERNAME% will be replaced with actual user name.
 	%SERVERID% will be replaced with server's ID.
 	For example "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%". */
 	AString m_Address;
-	
+
 	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 

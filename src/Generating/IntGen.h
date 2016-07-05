@@ -29,9 +29,9 @@ by using templates.
 
 #pragma once
 
-#include "../BiomeDef.h"
-
 #include <tuple>
+#include "../BiomeDef.h"
+#include "../Noise/Noise.h"
 
 
 
@@ -67,10 +67,10 @@ public:
 
 	/** Generates the array of templated size into a_Values, based on given min coords. */
 	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) = 0;
-	
+
 };
 
-// Code adapted from http://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
+// Code adapted from https://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
 
 template<int... >
 struct sSeq
@@ -92,7 +92,7 @@ struct sGens<0, S...>
 template<class Gen, class... Args>
 class cIntGenFactory
 {
-	
+
 public:
 
 	typedef Gen Generator;
@@ -101,7 +101,7 @@ public:
 		m_args(std::make_tuple<Args...>(std::forward<Args>(a_args)...))
 	{
 	}
-	
+
 	template <class LhsGen>
 	std::shared_ptr<Gen> construct(LhsGen&& a_Lhs)
 	{
@@ -111,13 +111,13 @@ public:
 
 private:
 	std::tuple<Args...> m_args;
-	
+
 	template <class LhsGen, int... S>
 	std::shared_ptr<Gen> construct_impl(LhsGen&& a_Lhs, sSeq<S...>)
 	{
 		return std::make_shared<Gen>(std::get<S>(m_args)..., std::forward<LhsGen>(a_Lhs));
 	}
-	
+
 };
 
 template<class T, class RhsGen, class... Args>
@@ -1466,7 +1466,3 @@ protected:
 	Underlying m_Underlying;
 	Underlying m_Alteration;
 };
-
-
-
-

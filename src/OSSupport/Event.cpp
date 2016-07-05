@@ -25,9 +25,9 @@ void cEvent::Wait(void)
 {
 	{
 		std::unique_lock<std::mutex> Lock(m_Mutex);
-		m_CondVar.wait(Lock, [this](){ return m_ShouldContinue.load(); });
+		m_CondVar.wait(Lock, [this](){ return m_ShouldContinue; });
+		m_ShouldContinue = false;
 	}
-	m_ShouldContinue = false;
 }
 
 
@@ -40,9 +40,9 @@ bool cEvent::Wait(unsigned a_TimeoutMSec)
 	bool Result;
 	{
 		std::unique_lock<std::mutex> Lock(m_Mutex);  // We assume that this lock is acquired without much delay - we are the only user of the mutex
-		Result = m_CondVar.wait_until(Lock, dst, [this](){ return m_ShouldContinue.load(); });
+		Result = m_CondVar.wait_until(Lock, dst, [this](){ return m_ShouldContinue; });
+		m_ShouldContinue = false;
 	}
-	m_ShouldContinue = false;
 	return Result;
 }
 
@@ -52,7 +52,10 @@ bool cEvent::Wait(unsigned a_TimeoutMSec)
 
 void cEvent::Set(void)
 {
-	m_ShouldContinue = true;
+	{
+		std::unique_lock<std::mutex> Lock(m_Mutex);
+		m_ShouldContinue = true;
+	}
 	m_CondVar.notify_one();
 }
 
@@ -61,7 +64,10 @@ void cEvent::Set(void)
 
 void cEvent::SetAll(void)
 {
-	m_ShouldContinue = true;
+	{
+		std::unique_lock<std::mutex> Lock(m_Mutex);
+		m_ShouldContinue = true;
+	}
 	m_CondVar.notify_all();
 }
 

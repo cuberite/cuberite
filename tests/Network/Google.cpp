@@ -118,6 +118,10 @@ static void DoTest(void)
 
 int main()
 {
+	LOGD("Initializing cNetwork...\n");
+	cNetworkSingleton::Get().Initialise();
+
+	LOGD("Testing...");
 	DoTest();
 
 	cNetworkSingleton::Get().Terminate();

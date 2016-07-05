@@ -30,13 +30,13 @@ AString cObjective::TypeToString(eType a_Type)
 		case otStatBlockMine:      return "stat.mineBlock";
 		case otStatEntityKill:     return "stat.killEntity";
 		case otStatEntityKilledBy: return "stat.entityKilledBy";
-		
+
 		// clang optimisises this line away then warns that it has done so.
 		#if !defined(__clang__)
 		default: return "";
 		#endif
 	}
-	
+
 }
 
 
@@ -410,6 +410,22 @@ cTeam * cScoreboard::GetTeam(const AString & a_Name)
 	{
 		return &it->second;
 	}
+}
+
+
+
+
+
+AStringVector cScoreboard::GetTeamNames()
+{
+	AStringVector TeamNames;
+
+	for (const auto & Team: m_Teams)
+	{
+		TeamNames.push_back(Team.first);
+	}
+
+	return TeamNames;
 }
 
 

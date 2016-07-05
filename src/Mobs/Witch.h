@@ -11,7 +11,7 @@ class cWitch :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
-	
+
 public:
 	cWitch();
 

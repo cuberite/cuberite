@@ -17,7 +17,7 @@ class cBlockInfo
 public:
 
 	/** Returns the associated BlockInfo structure for the specified block type. */
-	
+
 	/** This accessor makes sure that the cBlockInfo structures are properly initialized exactly once.
 	It does so by using the C++ singleton approximation - storing the actual singleton as the function's static variable.
 	It works only if it is called for the first time before the app spawns other threads. */
@@ -61,6 +61,9 @@ public:
 	/** Can a finisher change it? */
 	bool m_CanBeTerraformed;
 
+	/** Block height */
+	float m_BlockHeight;
+
 	/** Sound when placing this block */
 	AString m_PlaceSound;
 
@@ -80,6 +83,7 @@ public:
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
 	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
+	inline static float GetBlockHeight            (BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
 	inline static AString GetPlaceSound           (BLOCKTYPE a_Type) { return Get(a_Type).m_PlaceSound;          }
 
 	// tolua_end
@@ -101,6 +105,7 @@ protected:
 		, m_IsSolid(true)
 		, m_FullyOccupiesVoxel(false)
 		, m_CanBeTerraformed(false)
+		, m_BlockHeight(1.0)
 		, m_PlaceSound("")
 		, m_Handler(nullptr)
 	{}

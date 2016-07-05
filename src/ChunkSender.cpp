@@ -23,11 +23,11 @@
 // cNotifyChunkSender:
 
 
-/// Callback that can be used to notify chunk sender upon another chunkcoord notification
+/** Callback that can be used to notify chunk sender upon another chunkcoord notification */
 class cNotifyChunkSender :
 	public cChunkCoordCallback
 {
-	virtual void Call(int a_ChunkX, int a_ChunkZ) override
+	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
 	{
 		cChunkSender & ChunkSender = m_ChunkSender;
 		m_World.DoWithChunk(
@@ -43,11 +43,22 @@ class cNotifyChunkSender :
 	cChunkSender & m_ChunkSender;
 
 	cWorld & m_World;
+
 public:
-	cNotifyChunkSender(cChunkSender & a_ChunkSender, cWorld & a_World) : m_ChunkSender(a_ChunkSender), m_World(a_World) {}
-
-
+	cNotifyChunkSender(cChunkSender & a_ChunkSender, cWorld & a_World):
+		m_ChunkSender(a_ChunkSender),
+		m_World(a_World)
+	{
+	}
 };
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cChunkSender:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
 	super("ChunkSender"),
@@ -246,7 +257,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	{
 		return;
 	}
-	cChunkDataSerializer Data(m_BlockTypes, m_BlockMetas, m_BlockLight, m_BlockSkyLight, m_BiomeMap);
+	cChunkDataSerializer Data(m_BlockTypes, m_BlockMetas, m_BlockLight, m_BlockSkyLight, m_BiomeMap, m_World.GetDimension());
 
 	for (const auto client : a_Clients)
 	{

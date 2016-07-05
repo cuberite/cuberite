@@ -6,6 +6,7 @@
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"
+#include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
 #include "../UI/DropSpenserWindow.h"
@@ -16,8 +17,7 @@
 
 cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
-	m_ShouldDropSpense(false),
-	m_IsPowered(false)
+	m_ShouldDropSpense(false)
 {
 }
 
@@ -41,7 +41,7 @@ cDropSpenserEntity::~cDropSpenserEntity()
 
 void cDropSpenserEntity::AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_Direction)
 {
-	switch (a_Direction & 0x07)  // Vanilla uses the 8th bit to determine power state - we don't
+	switch (a_Direction & E_META_DROPSPENSER_FACING_MASK)
 	{
 		case E_META_DROPSPENSER_FACING_YM: a_BlockY--; return;
 		case E_META_DROPSPENSER_FACING_YP: a_BlockY++; return;
@@ -71,32 +71,32 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 			SlotsCnt++;
 		}
 	}  // for i - m_Contents[]
-	
+
 	if (SlotsCnt == 0)
 	{
 		// Nothing in the dropspenser, play the click sound
 		m_World->BroadcastSoundEffect("random.click", static_cast<double>(m_PosX), static_cast<double>(m_PosY), static_cast<double>(m_PosZ), 1.0f, 1.2f);
 		return;
 	}
-	
+
 	int RandomSlot = 	m_World->GetTickRandomNumber(SlotsCnt - 1);
-	
+
 	// DropSpense the item, using the specialized behavior in the subclasses:
 	DropSpenseFromSlot(a_Chunk, OccupiedSlots[RandomSlot]);
-	
+
 	// Broadcast a smoke and click effects:
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	int SmokeDir = 0;
-	switch (Meta)
+	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
-		case E_META_DROPSPENSER_FACING_YP: SmokeDir = 4; break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
-		case E_META_DROPSPENSER_FACING_YM: SmokeDir = 4; break;
-		case E_META_DROPSPENSER_FACING_XM: SmokeDir = 3; break;
-		case E_META_DROPSPENSER_FACING_XP: SmokeDir = 5; break;
-		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = 1; break;
-		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = 7; break;
+		case E_META_DROPSPENSER_FACING_YP: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
+		case E_META_DROPSPENSER_FACING_YM: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;
+		case E_META_DROPSPENSER_FACING_XM: SmokeDir = static_cast<int>(SmokeDirection::EAST); break;
+		case E_META_DROPSPENSER_FACING_XP: SmokeDir = static_cast<int>(SmokeDirection::WEST); break;
+		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = static_cast<int>(SmokeDirection::SOUTH); break;
+		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = static_cast<int>(SmokeDirection::NORTH); break;
 	}
-	m_World->BroadcastSoundParticleEffect(2000, m_PosX, m_PosY, m_PosZ, SmokeDir);
+	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, m_PosX, m_PosY, m_PosZ, SmokeDir);
 	m_World->BroadcastSoundEffect("random.click", static_cast<double>(m_PosX), static_cast<double>(m_PosY), static_cast<double>(m_PosZ), 1.0f, 1.0f);
 }
 
@@ -113,19 +113,6 @@ void cDropSpenserEntity::Activate(void)
 
 
 
-void cDropSpenserEntity::SetRedstonePower(bool a_IsPowered)
-{
-	if (a_IsPowered && !m_IsPowered)
-	{
-		Activate();
-	}
-	m_IsPowered = a_IsPowered;
-}
-
-
-
-
-
 bool cDropSpenserEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
@@ -133,7 +120,7 @@ bool cDropSpenserEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		return false;
 	}
-	
+
 	m_ShouldDropSpense = false;
 	DropSpense(a_Chunk);
 	return true;
@@ -153,7 +140,7 @@ void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
+bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -161,7 +148,7 @@ void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 		OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
-	
+
 	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
@@ -169,6 +156,7 @@ void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 			a_Player->OpenWindow(Window);
 		}
 	}
+	return true;
 }
 
 
@@ -188,7 +176,7 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 	const int PickupSpeed = m_World->GetTickRandomNumber(4) + 2;  // At least 2, at most 6
 	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
-	switch (Meta)
+	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
 		case E_META_DROPSPENSER_FACING_YP: PickupSpeedY =  PickupSpeed; break;
 		case E_META_DROPSPENSER_FACING_YM: PickupSpeedY = -PickupSpeed; break;

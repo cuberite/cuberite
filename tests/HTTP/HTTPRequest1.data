@@ -1,0 +1,5 @@
+GET /some/url HTTP/1.1
+Note: This is a test of a regular request
+Content-Length: 3
+
+bla

@@ -159,7 +159,7 @@ public:
 	bool CanSeeFriendlyInvisible(void) const { return m_CanSeeFriendlyInvisible; }
 
 	const AString & GetDisplayName(void) const { return m_DisplayName; }
-	const AString & GetName(void)        const { return m_DisplayName; }
+	const AString & GetName(void)        const { return m_Name; }
 
 	const AString & GetPrefix(void) const { return m_Prefix; }
 	const AString & GetSuffix(void) const { return m_Suffix; }
@@ -255,6 +255,9 @@ public:
 	void AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value = 1);
 
 	// tolua_end
+
+	/** Retrieves the list of team names */
+	AStringVector GetTeamNames();
 
 	/** Send this scoreboard to the specified client */
 	void SendTo(cClientHandle & a_Client);

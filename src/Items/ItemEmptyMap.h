@@ -20,7 +20,7 @@ class cItemEmptyMapHandler :
 	typedef cItemHandler super;
 
 	static const unsigned int DEFAULT_SCALE = 0;
-	
+
 public:
 	cItemEmptyMapHandler() :
 		super(E_ITEM_EMPTY_MAP)
@@ -60,7 +60,7 @@ public:
 			return true;
 		}
 
-		a_Player->GetInventory().AddItem(cItem(E_ITEM_MAP, 1, (short)(NewMap->GetID() & 0x7fff)));
+		a_Player->GetInventory().AddItem(cItem(E_ITEM_MAP, 1, static_cast<short>(NewMap->GetID() & 0x7fff)));
 
 		return true;
 	}

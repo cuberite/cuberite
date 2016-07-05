@@ -35,7 +35,7 @@ cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_Owner(nullptr)
 {
 	// The window ID is signed in protocol 1.7, unsigned in protocol 1.8. Keep out of trouble by using only 7 bits:
-	// Ref.: http://forum.mc-server.org/showthread.php?tid=1876
+	// Ref.: https://forum.cuberite.org/thread-1876.html
 	ASSERT((m_WindowID >= 0) && (m_WindowID < 127));
 
 	if (a_WindowType == wtInventory)
@@ -173,7 +173,7 @@ bool cWindow::IsSlotInPlayerInventory(int a_SlotNum) const
 void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 {
 	a_Slots.clear();
-	a_Slots.reserve(GetNumSlots());
+	a_Slots.reserve(static_cast<size_t>(GetNumSlots()));
 	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
 	{
 		int NumSlots = (*itr)->GetNumSlots();
@@ -253,7 +253,7 @@ void cWindow::Clicked(
 			break;
 		}
 	}
-	
+
 	if (a_SlotNum < 0)
 	{
 		// TODO: Other click actions with irrelevant slot number (FS #371)
@@ -270,7 +270,7 @@ void cWindow::Clicked(
 		}
 		LocalSlotNum -= itr->GetNumSlots();
 	}
-	
+
 	LOGWARNING("Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",
 		a_SlotNum, GetNumSlots(), a_Player.GetName().c_str()
 	);
@@ -288,7 +288,7 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 		m_OpenedBy.remove(&a_Player);
 		// Then add player
 		m_OpenedBy.push_back(&a_Player);
-		
+
 		for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
 		{
 			(*itr)->OnPlayerAdded(a_Player);
@@ -307,7 +307,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	// Checks whether the player is still holding an item
 	if (!a_Player.GetDraggingItem().IsEmpty())
 	{
-		LOGD("Player holds item! Dropping it...");
+		LOGD("Player is holding an item while closing their window, dropping it as a pickup...");
 		a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
 	}
 
@@ -326,7 +326,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 		}  // for itr - m_SlotAreas[]
 
 		m_OpenedBy.remove(&a_Player);
-		
+
 		if ((m_WindowType != wtInventory) && m_OpenedBy.empty())
 		{
 			Destroy();
@@ -336,7 +336,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	{
 		delete this;
 	}
-	
+
 	return true;
 }
 
@@ -436,7 +436,7 @@ bool cWindow::CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer
 			return true;
 		}
 	}
-	
+
 	// a_Dragging still not full, ask slot areas before a_Area in the list:
 	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
 	{
@@ -480,9 +480,9 @@ void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_Relativ
 		ASSERT(!"cWindow::SendSlot(): unknown a_SlotArea");
 		return;
 	}
-	
+
 	a_Player.GetClientHandle()->SendInventorySlot(
-		m_WindowID, a_RelativeSlotNum + SlotBase, *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
+		m_WindowID, static_cast<short>(a_RelativeSlotNum + SlotBase), *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
 	);
 }
 
@@ -512,7 +512,7 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 		ASSERT(!"Invalid SlotNum");
 		return nullptr;
 	}
-	
+
 	// Iterate through all the SlotAreas, find the correct one
 	int LocalSlotNum = a_GlobalSlotNum;
 	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
@@ -524,7 +524,7 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 		}
 		LocalSlotNum -= (*itr)->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
-	
+
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
 	LOGWARNING("%s: GetNumSlots() is out of sync: %d; LocalSlotNum = %d", __FUNCTION__, GetNumSlots(), LocalSlotNum);
 	ASSERT(!"Invalid GetNumSlots");
@@ -543,7 +543,7 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 		ASSERT(!"Invalid SlotNum");
 		return nullptr;
 	}
-	
+
 	// Iterate through all the SlotAreas, find the correct one
 	int LocalSlotNum = a_GlobalSlotNum;
 	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
@@ -555,7 +555,7 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 		}
 		LocalSlotNum -= (*itr)->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
-	
+
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
 	LOGWARNING("%s: GetNumSlots() is out of sync: %d; LocalSlotNum = %d", __FUNCTION__, GetNumSlots(), LocalSlotNum);
 	ASSERT(!"Invalid GetNumSlots");
@@ -590,21 +590,25 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 {
 	// Process the entire action stored in the internal structures for inventory painting
 	// distribute as many items as possible
-	
+
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	int ToEachSlot = (int)ToDistribute.m_ItemCount / (int)SlotNums.size();
-	
+	int ToEachSlot = static_cast<int>(ToDistribute.m_ItemCount) / static_cast<int>(SlotNums.size());
+
 	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
-	
+
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
 	if (a_Player.GetDraggingItem().m_ItemCount == 0)
 	{
 		a_Player.GetDraggingItem().Empty();
 	}
-	
+
 	SendWholeWindow(*a_Player.GetClientHandle());
+
+	// To fix #2345 (custom recipes don't work when inventory-painting), we send the result slot explicitly once again
+	// This is a fix for what seems like a client-side bug
+	a_Player.GetClientHandle()->SendInventorySlot(m_WindowID, 0, *GetSlot(a_Player, 0));
 }
 
 
@@ -618,17 +622,21 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	
+
 	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, 1, SlotNums);
-	
+
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
 	if (a_Player.GetDraggingItem().m_ItemCount == 0)
 	{
 		a_Player.GetDraggingItem().Empty();
 	}
-	
+
 	SendWholeWindow(*a_Player.GetClientHandle());
+
+	// To fix #2345 (custom recipes don't work when inventory-painting), we send the result slot explicitly once again
+	// This is a fix for what seems like a client-side bug
+	a_Player.GetClientHandle()->SendInventorySlot(m_WindowID, 0, *GetSlot(a_Player, 0));
 }
 
 
@@ -637,13 +645,13 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 
 int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums)
 {
-	if ((size_t)(a_Item.m_ItemCount) < a_SlotNums.size())
+	if (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size())
 	{
-		LOGWARNING("%s: Distributing less items (%d) than slots (" SIZE_T_FMT  ")", __FUNCTION__, (int)a_Item.m_ItemCount, a_SlotNums.size());
+		LOGWARNING("%s: Distributing less items (%d) than slots (" SIZE_T_FMT  ")", __FUNCTION__, static_cast<int>(a_Item.m_ItemCount), a_SlotNums.size());
 		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now
 		return 0;
 	}
-	
+
 	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
 	int NumDistributed = 0;
 	for (cSlotNums::const_iterator itr = a_SlotNums.begin(), end = a_SlotNums.end(); itr != end; ++itr)
@@ -655,7 +663,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 			LOGWARNING("%s: Bad SlotArea for slot %d", __FUNCTION__, *itr);
 			continue;
 		}
-		
+
 		// Modify the item at the slot
 		cItem AtSlot(*Area->GetSlot(LocalSlotNum, a_Player));
 		int MaxStack = AtSlot.GetMaxStackSize();
@@ -663,14 +671,14 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 		{
 			// Empty, just move all of it there:
 			cItem ToStore(a_Item);
-			ToStore.m_ItemCount = std::min(a_NumToEachSlot, (int)MaxStack);
+			ToStore.m_ItemCount = static_cast<char>(std::min(a_NumToEachSlot, static_cast<int>(MaxStack)));
 			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
 			NumDistributed += ToStore.m_ItemCount;
 		}
 		else if (AtSlot.IsEqual(a_Item))
 		{
 			// Occupied, add and cap at MaxStack:
-			int CanStore = std::min(a_NumToEachSlot, (int)MaxStack - AtSlot.m_ItemCount);
+			int CanStore = std::min(a_NumToEachSlot, static_cast<int>(MaxStack) - AtSlot.m_ItemCount);
 			AtSlot.m_ItemCount += CanStore;
 			Area->SetSlot(LocalSlotNum, a_Player, AtSlot);
 			NumDistributed += CanStore;
@@ -704,12 +712,12 @@ void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
 		ASSERT(!"Invalid slot area");
 		return;
 	}
-	
+
 	// Broadcast the update packet:
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
 	{
-		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, SlotNum, *a_Area->GetSlot(a_LocalSlotNum, **itr));
+		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
 	}  // for itr - m_OpenedBy[]
 }
 

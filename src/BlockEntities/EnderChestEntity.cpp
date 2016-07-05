@@ -33,13 +33,13 @@ cEnderChestEntity::~cEnderChestEntity()
 
 
 
-void cEnderChestEntity::UsedBy(cPlayer * a_Player)
+bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// TODO: cats are an obstruction
 	if ((GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
 	{
 		// Obstruction, don't open
-		return;
+		return false;
 	}
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
@@ -57,6 +57,7 @@ void cEnderChestEntity::UsedBy(cPlayer * a_Player)
 			a_Player->OpenWindow(Window);
 		}
 	}
+	return true;
 }
 
 
@@ -75,10 +76,10 @@ void cEnderChestEntity::OpenNewWindow()
 void cEnderChestEntity::LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid)
 {
 	int SlotIdx = 0;
-	for (Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr)
+	for (auto & Node : a_Value)
 	{
 		cItem Item;
-		Item.FromJson(*itr);
+		Item.FromJson(Node);
 		a_Grid.SetSlot(SlotIdx, Item);
 		SlotIdx++;
 	}

@@ -1,13 +1,16 @@
 
 #pragma once
 
-/// This identifies individual monster type, as well as their network type-ID
+
+
+
 
 // tolua_begin
+/** Identifies individual monster type, as well as their network type-ID. */
 enum eMonsterType
 {
 	mtInvalidType = -1,
-	
+
 	mtBat          = E_META_SPAWN_EGG_BAT,
 	mtBlaze        = E_META_SPAWN_EGG_BLAZE,
 	mtCaveSpider   = E_META_SPAWN_EGG_CAVE_SPIDER,
@@ -39,7 +42,7 @@ enum eMonsterType
 	mtWolf         = E_META_SPAWN_EGG_WOLF,
 	mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
 	mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
-	mtMax          = 120,  // This is just a hotfix for http://forum.mc-server.org/showthread.php?tid=1616. Tolua is too bad to find the highest value, so this is needed.
+	mtMax          = 120,  // This is just a hotfix for https://forum.cuberite.org/thread-1616.html. Tolua is too bad to find the highest value, so this is needed.
 } ;
 
 // tolua_end

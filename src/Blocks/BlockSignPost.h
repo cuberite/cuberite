@@ -13,7 +13,7 @@ class cBlockSignPostHandler :
 	public cBlockHandler
 {
 	typedef cBlockHandler super;
-	
+
 public:
 	cBlockSignPostHandler(BLOCKTYPE a_BlockType) :
 		super(a_BlockType)
@@ -43,10 +43,10 @@ public:
 		{
 			a_Rotation -= 360;
 		}
-		
+
 		a_Rotation = (a_Rotation / 360) * 16;
-		
-		return ((char)a_Rotation) % 16;
+
+		return (static_cast<char>(a_Rotation)) % 16;
 	}
 
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override

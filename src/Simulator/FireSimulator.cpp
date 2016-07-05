@@ -70,8 +70,8 @@ cFireSimulator::cFireSimulator(cWorld & a_World, cIniFile & a_IniFile) :
 	cSimulator(a_World)
 {
 	// Read params from the ini file:
-	m_BurnStepTimeFuel    = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel",     500);
-	m_BurnStepTimeNonfuel = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100);
+	m_BurnStepTimeFuel    = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel",     500));
+	m_BurnStepTimeNonfuel = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100));
 	m_Flammability        = a_IniFile.GetValueSetI("FireSimulator", "Flammability",          50);
 	m_ReplaceFuelChance   = a_IniFile.GetValueSetI("FireSimulator", "ReplaceFuelChance",  50000);
 }
@@ -120,7 +120,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			++itr;
 			continue;
 		}
-		
+
 		// Burn out the fire one step by increasing the meta:
 		/*
 		FLOG("FS: Fire at {%d, %d, %d} is stepping",
@@ -224,7 +224,7 @@ void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 	{
 		return;
 	}
-	
+
 	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_BlockY, RelZ);
@@ -232,7 +232,7 @@ void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 	{
 		return;
 	}
-	
+
 	// Check for duplicates:
 	cFireSimulatorChunkData & ChunkData = a_Chunk->GetFireSimulatorData();
 	for (cCoordWithIntList::iterator itr = ChunkData.begin(), end = ChunkData.end(); itr != end; ++itr)
@@ -265,11 +265,11 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		}
 		if (IsFuel(BlockBelow))
 		{
-			return m_BurnStepTimeFuel;
+			return static_cast<int>(m_BurnStepTimeFuel);
 		}
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
-	
+
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 	{
 		BLOCKTYPE  BlockType;
@@ -278,7 +278,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		{
 			if (IsFuel(BlockType))
 			{
-				return m_BurnStepTimeFuel;
+				return static_cast<int>(m_BurnStepTimeFuel);
 			}
 		}
 	}  // for i - gCrossCoords[]
@@ -291,7 +291,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 		return 0;
 	}
-	return m_BurnStepTimeNonfuel;
+	return static_cast<int>(m_BurnStepTimeNonfuel);
 }
 
 
@@ -307,7 +307,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 		return;
 	}
 	*/
-	
+
 	for (int x = a_RelX - 1; x <= a_RelX + 1; x++)
 	{
 		for (int z = a_RelZ - 1; z <= a_RelZ + 1; z++)
@@ -316,12 +316,12 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 			{
 				// No need to check the coords for equality with the parent block,
 				// it cannot catch fire anyway (because it's not an air block)
-				
+
 				if (m_World.GetTickRandomNumber(MAX_CHANCE_FLAMMABILITY) > m_Flammability)
 				{
 					continue;
 				}
-				
+
 				// Start the fire in the neighbor {x, y, z}
 				/*
 				FLOG("FS: Trying to start fire at {%d, %d, %d}.",
@@ -332,12 +332,12 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 				{
 					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
 					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
-					
+
 					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, a_PosX, y, a_PosZ, ssFireSpread))
 					{
 						return;
 					}
-					
+
 					FLOG("FS: Starting new fire at {%d, %d, %d}.", a_PosX, y, a_PosZ);
 					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
 				}
@@ -406,13 +406,13 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 		// The chunk is not accessible
 		return false;
 	}
-	
+
 	if (BlockType != E_BLOCK_AIR)
 	{
 		// Only an air block can be replaced by a fire block
 		return false;
 	}
-	
+
 	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
 	{
 		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))

@@ -1,5 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "Logger.h"
 
 #include "OSSupport/IsThread.h"
 #ifdef _WIN32
@@ -73,10 +74,14 @@ void cLogger::Log(const char * a_Format, eLogLevel a_LogLevel, va_list a_ArgList
 
 
 
-void cLogger::AttachListener(cListener * a_Listener)
+cLogger::cAttachment cLogger::AttachListener(std::unique_ptr<cListener> a_Listener)
 {
-	cCSLock Lock(m_CriticalSection);
-	m_LogListeners.push_back(a_Listener);
+	auto nonOwning = a_Listener.get();
+	{
+		cCSLock Lock(m_CriticalSection);
+		m_LogListeners.push_back(std::move(a_Listener));
+	}
+	return cAttachment{nonOwning};
 }
 
 
@@ -86,7 +91,16 @@ void cLogger::AttachListener(cListener * a_Listener)
 void cLogger::DetachListener(cListener * a_Listener)
 {
 	cCSLock Lock(m_CriticalSection);
-	m_LogListeners.erase(std::remove(m_LogListeners.begin(), m_LogListeners.end(), a_Listener));
+	m_LogListeners.erase(
+		std::remove_if(
+			m_LogListeners.begin(),
+			m_LogListeners.end(),
+			[=](std::unique_ptr<cListener> & a_OtherListener) -> bool
+			{
+				return a_OtherListener.get() == a_Listener;
+			}
+		)
+	);
 }
 
 
@@ -120,7 +134,7 @@ void LOGINFO(const char * a_Format, ...)
 
 
 
-void LOGWARN(const char * a_Format, ...)
+void LOGWARNING(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);

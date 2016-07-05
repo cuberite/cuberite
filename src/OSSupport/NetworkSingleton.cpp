@@ -6,7 +6,6 @@
 
 #include "Globals.h"
 #include "NetworkSingleton.h"
-#include <event2/event.h>
 #include <event2/thread.h>
 #include <event2/bufferevent.h>
 #include <event2/dns.h>
@@ -18,8 +17,36 @@
 
 
 
-cNetworkSingleton::cNetworkSingleton(void):
-	m_HasTerminated(false)
+cNetworkSingleton::cNetworkSingleton() :
+	m_HasTerminated(true)
+{
+}
+
+
+
+
+
+cNetworkSingleton::~cNetworkSingleton()
+{
+	// Check that Terminate has been called already:
+	ASSERT(m_HasTerminated);
+}
+
+
+
+
+
+cNetworkSingleton & cNetworkSingleton::Get(void)
+{
+	static cNetworkSingleton Instance;
+	return Instance;
+}
+
+
+
+
+
+void cNetworkSingleton::Initialise(void)
 {
 	// Windows: initialize networking:
 	#ifdef _WIN32
@@ -63,27 +90,9 @@ cNetworkSingleton::cNetworkSingleton(void):
 	}
 
 	// Create the event loop thread:
+	m_HasTerminated = false;
 	m_EventLoopThread = std::thread(RunEventLoop, this);
-}
-
-
-
-
-
-cNetworkSingleton::~cNetworkSingleton()
-{
-	// Check that Terminate has been called already:
-	ASSERT(m_HasTerminated);
-}
-
-
-
-
-
-cNetworkSingleton & cNetworkSingleton::Get(void)
-{
-	static cNetworkSingleton Instance;
-	return Instance;
+	m_StartupEvent.Wait();  // Wait for the LibEvent loop to actually start running (otherwise calling Terminate too soon would hang, see #3228)
 }
 
 
@@ -93,7 +102,6 @@ cNetworkSingleton & cNetworkSingleton::Get(void)
 void cNetworkSingleton::Terminate(void)
 {
 	ASSERT(!m_HasTerminated);
-	m_HasTerminated = true;
 
 	// Wait for the LibEvent event loop to terminate:
 	event_base_loopbreak(m_EventBase);
@@ -113,6 +121,10 @@ void cNetworkSingleton::Terminate(void)
 	event_base_free(m_EventBase);
 
 	libevent_global_shutdown();
+
+	// Set the HasTerminated flag:
+	// (Only set the flag after everything has been removed, to avoid the random failures in the Google-test, caused by links terminating after this flag was set)
+	m_HasTerminated = true;
 }
 
 
@@ -141,7 +153,21 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 
 void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 {
+	auto timer = evtimer_new(a_Self->m_EventBase, SignalizeStartup, a_Self);
+	timeval timeout{};  // Zero timeout - execute immediately
+	evtimer_add(timer, &timeout);
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
+}
+
+
+
+
+
+void cNetworkSingleton::SignalizeStartup(evutil_socket_t a_Socket, short a_Events, void * a_Self)
+{
+	auto self = reinterpret_cast<cNetworkSingleton *>(a_Self);
+	ASSERT(self != nullptr);
+	self->m_StartupEvent.Set();
 }
 
 

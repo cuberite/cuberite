@@ -24,7 +24,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		
+
 		// Convert the blockface into meta:
 		switch (a_BlockFace)
 		{
@@ -51,6 +51,12 @@ public:
 		}
 		// Not Facing Up or Down; No change.
 		return a_Meta;
+	}
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		// Reset meta to 0
+		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

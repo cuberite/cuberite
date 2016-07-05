@@ -12,10 +12,10 @@
 
 
 
-/// If the generation queue size exceeds this number, a warning will be output
+/** If the generation queue size exceeds this number, a warning will be output */
 const unsigned int QUEUE_WARNING_LIMIT = 1000;
 
-/// If the generation queue size exceeds this number, chunks with no clients will be skipped
+/** If the generation queue size exceeds this number, chunks with no clients will be skipped */
 const unsigned int QUEUE_SKIP_LIMIT = 500;
 
 
@@ -64,7 +64,7 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 		LOGINFO("Chosen a new random seed for world: %d", m_Seed);
 		a_IniFile.SetValueI("Seed", "Seed", m_Seed);
 	}
-	
+
 	// Get the generator engine based on the INI file settings:
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
 	if (NoCaseCompare(GeneratorName, "Noise3D") == 0)
@@ -161,7 +161,7 @@ void cChunkGenerator::WaitForQueueEmpty(void)
 int cChunkGenerator::GetQueueLength(void)
 {
 	cCSLock Lock(m_CS);
-	return (int)m_Queue.size();
+	return static_cast<int>(m_Queue.size());
 }
 
 
@@ -209,10 +209,10 @@ void cChunkGenerator::Execute(void)
 		{
 			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
 			{
-				LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-					(double)NumChunksGenerated * CLOCKS_PER_SEC/ (clock() - GenerationStart),
+				/* LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
+					static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC/ (clock() - GenerationStart),
 					NumChunksGenerated
-				);
+				); */
 			}
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
@@ -239,22 +239,22 @@ void cChunkGenerator::Execute(void)
 		m_evtRemoved.Set();
 
 		// Display perf info once in a while:
-		if ((NumChunksGenerated > 16) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
+		if ((NumChunksGenerated > 512) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
 		{
 			LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-				(double)NumChunksGenerated * CLOCKS_PER_SEC / (clock() - GenerationStart),
+				static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart),
 				NumChunksGenerated
 			);
 			LastReportTick = clock();
 		}
 
-		// Skip the chunk if it's already generated and regeneration is not forced:
+		// Skip the chunk if it's already generated and regeneration is not forced. Report as success:
 		if (!item.m_ForceGenerate && m_ChunkSink->IsChunkValid(item.m_ChunkX, item.m_ChunkZ))
 		{
 			LOGD("Chunk [%d, %d] already generated, skipping generation", item.m_ChunkX, item.m_ChunkZ);
 			if (item.m_Callback != nullptr)
 			{
-				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, true);
 			}
 			continue;
 		}
@@ -265,17 +265,17 @@ void cChunkGenerator::Execute(void)
 			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
 			if (item.m_Callback != nullptr)
 			{
-				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, false);
 			}
 			continue;
 		}
 
 		// Generate the chunk:
-		LOGD("Generating chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
+		// LOGD("Generating chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
 		DoGenerate(item.m_ChunkX, item.m_ChunkZ);
 		if (item.m_Callback != nullptr)
 		{
-			item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+			item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, true);
 		}
 		NumChunksGenerated++;
 	}  // while (!bStop)
@@ -296,8 +296,8 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ)
 	m_PluginInterface->CallHookChunkGenerated(ChunkDesc);
 
 	#ifdef _DEBUG
-	// Verify that the generator has produced valid data:
-	ChunkDesc.VerifyHeightmap();
+		// Verify that the generator has produced valid data:
+		ChunkDesc.VerifyHeightmap();
 	#endif
 
 	m_ChunkSink->OnChunkGenerated(ChunkDesc);

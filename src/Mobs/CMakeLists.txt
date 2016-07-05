@@ -1,6 +1,6 @@
 
 cmake_minimum_required (VERSION 2.6)
-project (MCServer)
+project (Cuberite)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
@@ -25,6 +25,7 @@ SET (SRCS
 	PassiveAggressiveMonster.cpp
 	PassiveMonster.cpp
 	Path.cpp
+	PathFinder.cpp
 	Pig.cpp
 	Rabbit.cpp
 	Sheep.cpp
@@ -39,7 +40,7 @@ SET (SRCS
 	Wolf.cpp
 	Zombie.cpp
 	ZombiePigman.cpp)
-	
+
 SET (HDRS
 	AggressiveMonster.h
 	Bat.h
@@ -64,6 +65,7 @@ SET (HDRS
 	PassiveAggressiveMonster.h
 	PassiveMonster.h
 	Path.h
+	PathFinder.h
 	Pig.h
 	Rabbit.h
 	Sheep.h
@@ -81,9 +83,7 @@ SET (HDRS
 	ZombiePigman.h)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(Monster.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch -Wno-error=switch-enum -Wno-error=float-equal -Wno-error=old-style-cast")
-	set_source_files_properties(SnowGolem.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-	set_source_files_properties(Villager.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
+	set_source_files_properties(Monster.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch -Wno-error=switch-enum -Wno-error=float-equal ")
 endif()
 
 if(NOT MSVC)

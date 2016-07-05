@@ -61,23 +61,10 @@ void cChunkInterface::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 
 
 
-
-void cChunkInterface::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData)
+void cChunkInterface::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClient)
 {
-	m_ChunkMap->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_MetaData);
+	m_ChunkMap->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClient);
 }
-
-
-
-
-
-
-void cChunkInterface::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_TickDelay, BLOCKTYPE a_PreviousBlockType, cWorldInterface &  a_WorldInterface)
-{
-	m_ChunkMap->QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_WorldInterface.GetWorldAge() + a_TickDelay, a_PreviousBlockType);
-}
-
-
 
 
 
@@ -106,9 +93,9 @@ void cChunkInterface::FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType
 
 
 
-void cChunkInterface::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cChunkInterface::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	m_ChunkMap->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 

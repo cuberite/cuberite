@@ -28,9 +28,6 @@ cHopperEntity::cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * 
 
 
 
-/** Returns the block coords of the block receiving the output items, based on the meta
-Returns false if unattached
-*/
 bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, int & a_OutputY, int & a_OutputZ)
 {
 	a_OutputX = m_PosX;
@@ -83,7 +80,7 @@ void cHopperEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cHopperEntity::UsedBy(cPlayer * a_Player)
+bool cHopperEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
@@ -109,13 +106,13 @@ void cHopperEntity::UsedBy(cPlayer * a_Player)
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
 	m_World->MarkChunkDirty(ChunkX, ChunkZ);
+	return true;
 }
 
 
 
 
 
-/// Opens a new window UI for this hopper
 void cHopperEntity::OpenNewWindow(void)
 {
 	OpenWindow(new cHopperWindow(m_PosX, m_PosY, m_PosZ, this));
@@ -125,7 +122,6 @@ void cHopperEntity::OpenNewWindow(void)
 
 
 
-/// Moves items from the container above it into this hopper. Returns true if the contents have changed.
 bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 {
 	if (m_PosY >= cChunkDef::Height)
@@ -180,7 +176,6 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 
-/// Moves pickups from above this hopper into it. Returns true if the contents have changed.
 bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 {
 	UNUSED(a_CurrentTick);
@@ -200,7 +195,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		{
 			ASSERT(a_Entity != nullptr);
 
-			if (!a_Entity->IsPickup() || a_Entity->IsDestroyed())
+			if (!a_Entity->IsPickup())
 			{
 				return false;
 			}
@@ -273,7 +268,6 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 
-/// Moves items out from this hopper into the destination. Returns true if the contents have changed.
 bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 {
 	if (a_CurrentTick - m_LastMoveItemsOutTick < TICKS_PER_TRANSFER)
@@ -352,7 +346,6 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 
-/// Moves items from a chest (dblchest) above the hopper into this hopper. Returns true if contents have changed.
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
 	cChestEntity * MainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ));
@@ -419,7 +412,6 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 
 
 
-/// Moves items from a furnace above the hopper into this hopper. Returns true if contents have changed.
 bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 {
 	cFurnaceEntity * Furnace = static_cast<cFurnaceEntity *>(a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ));
@@ -479,7 +471,6 @@ bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 
 
 
-/// Moves one piece of the specified a_Entity's slot itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
 bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SlotNum)
 {
 	cItem One(a_Entity.GetSlot(a_SlotNum).CopyOne());
@@ -521,7 +512,6 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 
 
 
-/// Moves items to the chest at the specified coords. Returns true if contents have changed
 bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Try the chest directly connected to the hopper:
@@ -589,7 +579,6 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 
 
 
-/// Moves items to the furnace at the specified coords. Returns true if contents have changed
 bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_HopperMeta)
 {
 	cFurnaceEntity * Furnace = static_cast<cFurnaceEntity *>(a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ));
@@ -674,3 +663,7 @@ bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstS
 		return false;
 	}
 }
+
+
+
+

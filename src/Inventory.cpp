@@ -27,7 +27,7 @@ cInventory::cInventory(cPlayer & a_Owner) :
 	m_ArmorSlots.AddListener(*this);
 	m_InventorySlots.AddListener(*this);
 	m_HotbarSlots.AddListener(*this);
-	
+
 	SetEquippedSlotNum(0);
 }
 
@@ -138,12 +138,12 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 	}
 
 	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks);
-	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;
+	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
 	if (ToAdd.m_ItemCount == 0)
 	{
 		return res;
 	}
-	
+
 	res += m_InventorySlots.AddItem(ToAdd, a_AllowNewStacks);
 	return res;
 }
@@ -200,7 +200,7 @@ bool cInventory::RemoveOneEquippedItem(void)
 	{
 		return false;
 	}
-	
+
 	m_HotbarSlots.ChangeSlotCount(m_EquippedSlotNum, -1);
 	return true;
 }
@@ -416,7 +416,7 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 	{
 		return false;
 	}
-	
+
 	int GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
 	if (Grid == nullptr)
@@ -430,7 +430,7 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 		SendSlot(a_SlotNum);
 		return false;
 	}
-	
+
 	// The item has broken, remove it:
 	Grid->EmptySlot(GridSlotNum);
 	return true;
@@ -459,7 +459,7 @@ void cInventory::SendSlot(int a_SlotNum)
 		// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
 		Item.Empty();
 	}
-	m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum + 5, Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
+	m_Owner.GetClientHandle()->SendInventorySlot(0, static_cast<short>(a_SlotNum + 5), Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
 }
 
 
@@ -600,7 +600,7 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 	{
 		a_Value.append(EmptyItemJson);
 	}
-	
+
 	// The 4 armor slots follow:
 	for (int i = 0; i < invArmorCount; i++)
 	{
@@ -633,24 +633,24 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 bool cInventory::LoadFromJson(Json::Value & a_Value)
 {
 	int SlotIdx = 0;
-	
+
 	for (Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr, SlotIdx++)
 	{
 		cItem Item;
 		Item.FromJson(*itr);
-		
+
 		// The JSON originally included the 4 crafting slots and the result slot, so we need to skip the first 5 items:
 		if (SlotIdx < 5)
 		{
 			continue;
 		}
-		
+
 		// If we loaded all the slots, stop now, even if the JSON has more:
 		if (SlotIdx - 5 >= invNumSlots)
 		{
 			break;
 		}
-		
+
 		int GridSlotNum = 0;
 		cItemGrid * Grid = GetGridForSlotNum(SlotIdx - 5, GridSlotNum);
 		ASSERT(Grid != nullptr);
@@ -666,7 +666,7 @@ bool cInventory::LoadFromJson(Json::Value & a_Value)
 const cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum) const
 {
 	ASSERT(a_SlotNum >= 0);
-	
+
 	if (a_SlotNum < invArmorCount)
 	{
 		a_GridSlotNum = a_SlotNum;
@@ -689,7 +689,7 @@ const cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotN
 cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum)
 {
 	ASSERT(a_SlotNum >= 0);
-	
+
 	if (a_SlotNum < invArmorCount)
 	{
 		a_GridSlotNum = a_SlotNum;
@@ -712,19 +712,19 @@ cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum)
 void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	// Send the neccessary updates to whoever needs them
-	
-	if (m_Owner.IsDestroyed())
+
+	if (!m_Owner.IsTicking())
 	{
 		// Owner is not (yet) valid, skip for now
 		return;
 	}
-	
+
 	// Armor update needs broadcast to other players:
 	cWorld * World = m_Owner.GetWorld();
 	if ((a_ItemGrid == &m_ArmorSlots) && (World != nullptr))
 	{
 		World->BroadcastEntityEquipment(
-			m_Owner, ArmorSlotNumToEntityEquipmentID(a_SlotNum),
+			m_Owner, static_cast<short>(ArmorSlotNumToEntityEquipmentID(static_cast<short>(a_SlotNum))),
 			m_ArmorSlots.GetSlot(a_SlotNum), m_Owner.GetClientHandle()
 		);
 	}
@@ -734,7 +734,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	{
 		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, 0, GetEquippedItem(), m_Owner.GetClientHandle());
 	}
-	
+
 	// Convert the grid-local a_SlotNum to our global SlotNum:
 	int Base = 0;
 	if (a_ItemGrid == &m_ArmorSlots)
@@ -754,7 +754,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		ASSERT(!"Unknown ItemGrid calling OnSlotChanged()");
 		return;
 	}
-	
+
 	SendSlot(Base + a_SlotNum);
 }
 

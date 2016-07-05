@@ -11,7 +11,7 @@ If the specifier line ends with an additional " BE", both blocks and entities ar
 
 The tool is aware of extended blocktypes (256 .. 4096).
 
-The source code for this tool is public domain, but note that it depends on a few shared sources in MCServer that may be under other licenses.
+The source code for this tool is public domain, but note that it depends on a few shared sources in Cuberite that may be under other licenses.
 */
 
 

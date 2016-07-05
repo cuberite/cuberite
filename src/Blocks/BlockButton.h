@@ -15,11 +15,11 @@ public:
 		: cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>(a_BlockType)
 	{
 	}
-	
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+
+	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		
+
 		double x(a_BlockX);
 		double y(a_BlockY);
 		double z(a_BlockZ);
@@ -27,28 +27,33 @@ public:
 		// If button is already on do nothing
 		if (Meta & 0x08)
 		{
-			return;
+			return false;
 		}
 
 		// Set p the ON bit to on
 		Meta |= 0x08;
 
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta, false);
 		a_WorldInterface.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
-		int delay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		a_Player->GetWorld()->ScheduleTask(TickDelay, [x, y, z, a_BlockX, a_BlockY, a_BlockZ, this](cWorld & a_World)
+			{
+				if (a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == m_BlockType)
+				{
+					// Block hasn't change in the meantime; set its meta
+					a_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07, false);
+					a_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+					a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
+				}
+			}
+		);
 
-		a_ChunkInterface.QueueSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07), delay, m_BlockType, a_WorldInterface);
-
-		a_Player->GetWorld()->ScheduleTask(delay, [x, y, z](cWorld & a_World)
-		{
-			a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
-		});
-	
+		return true;
 	}
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0
@@ -59,7 +64,7 @@ public:
 	{
 		return true;
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -127,6 +132,12 @@ public:
 	{
 		UNUSED(a_Meta);
 		return 0;
+	}
+
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsButtonOn(NIBBLETYPE a_BlockMeta)
+	{
+		return ((a_BlockMeta & 0x8) == 0x8);
 	}
 } ;
 

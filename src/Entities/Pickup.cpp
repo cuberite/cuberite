@@ -30,10 +30,12 @@ public:
 
 	virtual bool Item(cEntity * a_Entity) override
 	{
-		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
+		ASSERT(a_Entity->IsTicking());
+		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()))
 		{
 			return false;
 		}
+
 
 		Vector3d EntityPos = a_Entity->GetPosition();
 		double Distance = (EntityPos - m_Position).Length();
@@ -117,7 +119,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	BroadcastMovementUpdate();  // Notify clients of position
 
 	m_Timer += a_Dt;
-	
+
 	if (!m_bCollected)
 	{
 		int BlockY = POSY_TOINT;
@@ -128,10 +130,10 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
 			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ)
-			
+
 			int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
 			int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
-				
+
 			// If the pickup is on the bottommost block position, make it think the void is made of air: (#131)
 			BLOCKTYPE BlockBelow = (BlockY > 0) ? CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 			BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
@@ -152,7 +154,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			// Try to combine the pickup with adjacent same-item pickups:
-			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine if already full
+			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine if already full
 			{
 				// By using a_Chunk's ForEachEntity() instead of cWorld's, pickups don't combine across chunk boundaries.
 				// That is a small price to pay for not having to traverse the entire world for each entity.
@@ -180,12 +182,6 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy(true);
 		return;
 	}
-
-	if (GetPosY() < VOID_BOUNDARY)  // Out of this world and no more visible!
-	{
-		Destroy(true);
-		return;
-	}
 }
 
 
@@ -199,7 +195,7 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 		// LOG("Pickup %d cannot be collected by \"%s\", because it has already been collected.", m_UniqueID, a_Dest->GetName().c_str());
 		return false;  // It's already collected!
 	}
-	
+
 	// Two seconds if player created the pickup (vomiting), half a second if anything else
 	if (m_Timer < (m_bIsPlayerCreated ? std::chrono::seconds(2) : std::chrono::milliseconds(500)))
 	{

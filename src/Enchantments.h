@@ -42,7 +42,7 @@ class cEnchantments
 public:
 	/** Individual enchantment IDs, corresponding to their NBT IDs: http://www.minecraftwiki.net/wiki/Data_Values#Enchantment_IDs
 	*/
-	
+
 	enum eEnchantment
 	{
 		enchProtection           = 0,
@@ -74,38 +74,38 @@ public:
 
 	/** Creates an empty enchantments container */
 	cEnchantments(void);
-	
+
 	/** Creates an enchantments container filled with enchantments parsed from stringspec */
 	cEnchantments(const AString & a_StringSpec);
-	
+
 	/** Adds the enchantments contained in a_Other into this object.
 	Existing enchantments are preserved, unless a_Other specifies a different level, in which case the level is changed. */
 	void Add(const cEnchantments & a_Other);
-	
+
 	/** Adds enchantments in the stringspec; if a specified enchantment already exists, overwrites it */
 	void AddFromString(const AString & a_StringSpec);
-	
+
 	/** Get the count of enchantments */
 	size_t Count(void);
-	
+
 	/** Serializes all the enchantments into a string */
 	AString ToString(void) const;
-	
+
 	/** Returns the level for the specified enchantment; 0 if not stored */
 	unsigned int GetLevel(int a_EnchantmentID) const;
-	
+
 	/** Sets the level for the specified enchantment, adding it if not stored before or removing it if level <= 0 */
 	void SetLevel(int a_EnchantmentID, unsigned int a_Level);
-	
+
 	/** Removes all enchantments */
 	void Clear(void);
-	
+
 	/** Returns true if there are no enchantments */
 	bool IsEmpty(void) const;
-	
+
 	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name not found; case insensitive */
 	static int StringToEnchantmentID(const AString & a_EnchantmentName);
-	
+
 	/** Returns true if a_Other contains exactly the same enchantments and levels */
 	bool operator ==(const cEnchantments & a_Other) const;
 
@@ -116,10 +116,10 @@ public:
 
 	/** Add a enchantment with weight to the vector */
 	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, unsigned int a_EnchantmentLevel);
-	
+
 	/** Remove the entire enchantment (with weight) from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID);
-	
+
 	/** Remove the entire enchantment (with weight) from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment);
 
@@ -136,17 +136,17 @@ public:
 
 	/** Returns true if a_Other doesn't contain exactly the same enchantments and levels */
 	bool operator !=(const cEnchantments & a_Other) const;
-	
+
 	/** Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or "StoredEnchantments") */
 	friend void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName);
-	
+
 	/** Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments) */
 	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);
 
 protected:
 	/** Maps enchantment ID -> enchantment level */
 	typedef std::map<int, unsigned int> cMap;
-	
+
 	/** Currently stored enchantments */
 	cMap m_Enchantments;
 } ;  // tolua_export

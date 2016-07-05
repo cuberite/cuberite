@@ -2,7 +2,7 @@
 // FloodyFluidSimulator.cpp
 
 // Interfaces to the cFloodyFluidSimulator that represents a fluid simulator that tries to flood everything :)
-// http://forum.mc-server.org/showthread.php?tid=565
+// https://forum.cuberite.org/thread-565.html
 
 #include "Globals.h"
 
@@ -54,7 +54,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ),
 		a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ)
 	);
-	
+
 	BLOCKTYPE MyBlock; NIBBLETYPE MyMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta);
 
@@ -88,9 +88,9 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	// If this is a source block or was falling, the new meta is just the falloff
 	// Otherwise it is the current meta plus falloff (may be larger than max height, will be checked later)
 	NIBBLETYPE NewMeta = ((MyMeta == 0) || ((MyMeta & 0x08) != 0)) ? m_Falloff : (MyMeta + m_Falloff);
-	bool SpreadFurther = true;
 	if (a_RelY > 0)
 	{
+		bool SpreadFurther = true;
 		BLOCKTYPE Below = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 		if (IsPassableForFluid(Below) || IsBlockLava(Below) || IsBlockWater(Below))
 		{
@@ -108,7 +108,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		{
 			SpreadXZ(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
 		}
-		
+
 		// If source creation is on, check for it here:
 		if (
 			(m_NumNeighborsForSource > 0) &&    // Source creation is on
@@ -189,7 +189,7 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 			}
 		}  // for i - Coords[]
 	}  // if not fed from above
-	
+
 	// Block is not fed, decrease by m_Falloff levels:
 	if (a_MyMeta >= 8)
 	{
@@ -231,11 +231,11 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 
 	const int BlockX = a_NearChunk->GetPosX() * cChunkDef::Width + a_RelX;
 	const int BlockZ = a_NearChunk->GetPosZ() * cChunkDef::Width + a_RelZ;
-	
+
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	a_NearChunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta);
-	
+
 	if (IsAllowedBlock(BlockType))
 	{
 		if ((BlockMeta == a_NewMeta) || IsHigherMeta(BlockMeta, a_NewMeta))
@@ -295,13 +295,13 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	{
 		ASSERT(!"Unknown fluid!");
 	}
-	
+
 	if (!IsPassableForFluid(BlockType))
 	{
 		// Can't spread there
 		return;
 	}
-	
+
 	// Wash away the block there, if possible:
 	if (CanWashAway(BlockType))
 	{
@@ -337,7 +337,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
 	FLOG("  Checking neighbors for source creation");
-	
+
 	static const Vector3i NeighborCoords[] =
 	{
 		Vector3i(-1, 0,  0),
@@ -345,7 +345,7 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 		Vector3i( 0, 0, -1),
 		Vector3i( 0, 0,  1),
 	} ;
-	
+
 	int NumNeeded = m_NumNeighborsForSource;
 	for (size_t i = 0; i < ARRAYCOUNT(NeighborCoords); i++)
 	{

@@ -14,7 +14,7 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -23,7 +23,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
+		a_BlockMeta = static_cast<NIBBLETYPE>(a_Player->GetEquippedItem().m_ItemDamage);
 		return true;
 	}
 

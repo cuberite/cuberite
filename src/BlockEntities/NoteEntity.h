@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "RedstonePoweredEntity.h"
 
 
 
@@ -25,9 +24,6 @@ enum ENUM_NOTE_INSTRUMENTS
 
 class cNoteEntity :
 	public cBlockEntity
-	// tolua_end
-	, public cRedstonePoweredEntity
-	// tolua_begin
 {
 	typedef cBlockEntity super;
 public:
@@ -35,30 +31,22 @@ public:
 	// tolua_end
 
 	BLOCKENTITY_PROTODEF(cNoteEntity)
-	
-	/// Creates a new note entity. a_World may be nullptr
+
+	/** Creates a new note entity. a_World may be nullptr */
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cNoteEntity() {}
 
 	// tolua_begin
-	
+
 	char GetPitch(void);
 	void SetPitch(char a_Pitch);
 	void IncrementPitch(void);
 	void MakeSound(void);
-	
+
 	// tolua_end
-	
-	virtual void UsedBy(cPlayer * a_Player) override;
+
+	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
-	
-	virtual void SetRedstonePower(bool a_Value) override
-	{
-		if (a_Value)
-		{
-			MakeSound();
-		}
-	}
 
 private:
 	char m_Pitch;

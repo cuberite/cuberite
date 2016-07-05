@@ -12,23 +12,23 @@
 #if defined(_MSC_VER)
 	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
 	#pragma warning(disable:4481)
-	
+
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100)
 
 	#define OBSOLETE __declspec(deprecated)
-	
+
 	// No alignment needed in MSVC
 	#define ALIGN_8
 	#define ALIGN_16
-	
+
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
 	#define SIZE_T_FMT "%Iu"
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
 	#define SIZE_T_FMT_HEX "%Ix"
-	
+
 	#define NORETURN      __declspec(noreturn)
 
 	// Use non-standard defines in <cmath>
@@ -38,10 +38,10 @@
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
-	
+
 	// TODO: Can GCC mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
 	#define override
-	
+
 	#define OBSOLETE __attribute__((deprecated))
 
 	#define ALIGN_8 __attribute__((aligned(8)))
@@ -70,19 +70,19 @@
 		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
 		#define SIZE_T_FMT_HEX "%zx"
 	#endif
-	
+
 	#define NORETURN      __attribute((__noreturn__))
 
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
-	
+
 	/*
 	// Copy and uncomment this into another #elif section based on your compiler identification
-	
+
 	// Explicitly mark classes as abstract (no instances can be created)
 	#define abstract
-	
+
 	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
 	#define override
 
@@ -136,11 +136,11 @@ typedef unsigned char Byte;
 	#include <Windows.h>
 	#include <winsock2.h>
 	#include <Ws2tcpip.h>  // IPv6 stuff
-	
+
 	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
 	#undef min
 	#undef max
-	
+
 	// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant
 	#ifdef GetFreeSpace
 		#undef GetFreeSpace
@@ -164,9 +164,6 @@ typedef unsigned char Byte;
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
-#if !defined(ANDROID_NDK)
-	#include <tr1/memory>
-#endif
 #endif
 
 #if !defined(ANDROID_NDK)
@@ -239,8 +236,3 @@ typedef unsigned char Byte;
 
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
-
-
-
-
-

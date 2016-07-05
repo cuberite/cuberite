@@ -18,7 +18,7 @@ public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override;
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
@@ -46,7 +46,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		a_BlockType = m_BlockType;
 		a_BlockMeta = PlayerYawToMetaData(a_Player->GetYaw());
 		return true;
@@ -118,7 +118,7 @@ public:
 	{
 		// Vanilla refuses to place doors on transparent blocks, except top-half slabs and other doors
 		// We need to keep the door compatible with itself, otherwise the top half drops while the bottom half stays
-		
+
 		// Doors can be placed on upside-down slabs
 		if (cBlockSlabHandler::IsAnySlabType(a_BlockType) && ((a_BlockMeta & 0x08) != 0))
 		{
@@ -159,7 +159,7 @@ public:
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
 		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
-		
+
 		a_Yaw += 90 + 45;
 		if (a_Yaw > 360)
 		{

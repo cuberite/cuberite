@@ -34,7 +34,7 @@ void cAesCfb128Encryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
 {
 	ASSERT(!IsValid());  // Cannot Init twice
 	ASSERT(m_IVOffset == 0);
-	
+
 	memcpy(m_IV, a_IV, 16);
 	aes_setkey_enc(&m_Aes, a_Key, 128);
 	m_IsValid = true;
@@ -47,7 +47,7 @@ void cAesCfb128Encryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
 void cAesCfb128Encryptor::ProcessData(Byte * a_EncryptedOut, const Byte * a_PlainIn, size_t a_Length)
 {
 	ASSERT(IsValid());  // Must Init() first
-	
+
 	// PolarSSL doesn't do AES-CFB8, so we need to implement it ourselves:
 	for (size_t i = 0; i < a_Length; i++)
 	{

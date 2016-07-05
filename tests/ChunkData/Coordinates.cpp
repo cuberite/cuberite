@@ -6,6 +6,8 @@
 
 int main(int argc, char** argv)
 {
+	LOGD("Test started");
+
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
 	{
@@ -13,7 +15,7 @@ int main(int argc, char** argv)
 		{
 			return new cChunkData::sChunkSection();
 		}
-		
+
 		virtual void Free(cChunkData::sChunkSection * a_Ptr)
 		{
 			delete a_Ptr;
@@ -36,7 +38,7 @@ int main(int argc, char** argv)
 		testassert(buffer.GetBlock(0, 32, 0) == 0x0);
 		testassert(buffer.GetMeta(0, 48, 0) == 0x0);
 
-		// Out of Range
+		// Out of range SetBlock
 		CheckAsserts(
 			buffer.SetBlock(-1, 0, 0, 0);
 		);
@@ -55,28 +57,7 @@ int main(int argc, char** argv)
 		CheckAsserts(
 			buffer.SetBlock(0, 0, 256, 0);
 		);
-
-		// Out of Range
-		CheckAsserts(
-			buffer.GetBlock(-1, 0, 0);
-		);
-		CheckAsserts(
-			buffer.GetBlock(0, -1, 0);
-		);
-		CheckAsserts(
-			buffer.GetBlock(0, 0, -1);
-		);
-		CheckAsserts(
-			buffer.GetBlock(256, 0, 0);
-		);
-		CheckAsserts(
-			buffer.GetBlock(0, 256, 0);
-		);
-		CheckAsserts(
-			buffer.GetBlock(0, 0, 256);
-		);
-
-		// Out of Range
+		// Out of range SetMeta
 		CheckAsserts(
 			buffer.SetMeta(-1, 0, 0, 0);
 		);
@@ -96,30 +77,26 @@ int main(int argc, char** argv)
 			buffer.SetMeta(0, 0, 256, 0);
 		);
 
-		// Out of Range
-		CheckAsserts(
-			buffer.GetMeta(-1, 0, 0);
-		);
-		CheckAsserts(
-			buffer.GetMeta(0, -1, 0);
-		);
-		CheckAsserts(
-			buffer.GetMeta(0, 0, -1);
-		);
-		CheckAsserts(
-			buffer.GetMeta(256, 0, 0);
-		);
-		CheckAsserts(
-			buffer.GetMeta(0, 256, 0);
-		);
-		CheckAsserts(
-			buffer.GetMeta(0, 0, 256);
-		);
+		// Reading out of range blocks should return air
+		testassert(buffer.GetBlock(-1, 0, 0) == 0);
+		testassert(buffer.GetBlock(0, -1, 0) == 0);
+		testassert(buffer.GetBlock(0, 0, -1) == 0);
+		testassert(buffer.GetBlock(256, 0, 0) == 0);
+		testassert(buffer.GetBlock(0, 256, 0) == 0);
+		testassert(buffer.GetBlock(0, 0, 256) == 0);
+
+		// Reading out of range metas should return 0
+		testassert(buffer.GetMeta(-1, 0, 0) == 0);
+		testassert(buffer.GetMeta(0, -1, 0) == 0);
+		testassert(buffer.GetMeta(0, 0, -1) == 0);
+		testassert(buffer.GetMeta(256, 0, 0) == 0);
+		testassert(buffer.GetMeta(0, 256, 0) == 0);
+		testassert(buffer.GetMeta(0, 0, 256) == 0);
 	}
-	
+
 	{
 		cChunkData buffer(Pool);
-		
+
 		// Zero's
 		buffer.SetBlock(0, 0, 0, 0x0);
 		buffer.SetBlock(0, 0, 1, 0xab);
@@ -131,8 +108,8 @@ int main(int argc, char** argv)
 		testassert(buffer.GetMeta(0, 16, 0) == 0x0);
 		testassert(buffer.GetMeta(0, 16, 1) == 0xc);
 	}
-	
-	
+
+
 	{
 		// Operator =
 		cChunkData buffer(Pool);
@@ -141,6 +118,6 @@ int main(int argc, char** argv)
 		copy = std::move(buffer);
 		testassert(copy.GetBlock(0, 0, 0) == 0x42);
 	}
-	
+
 	return 0;
 }

@@ -19,7 +19,7 @@ class cVoronoiMap
 {
 public:
 	cVoronoiMap(int a_Seed, int a_CellSize = 128, int a_JitterSize = 128);
-	
+
 	/** Sets both the cell size and jitter size used for generating the Voronoi seeds. */
 	void SetCellSize(int a_CellSize);
 
@@ -30,14 +30,14 @@ public:
 	This offset makes the voronoi cells align to a non-grid.
 	Clamps the value to [-m_CellSize, +m_CellSize]. */
 	void SetOddRowOffset(int a_OddRowOffset);
-	
+
 	/** Returns the value in the cell into which the specified point lies. */
 	int GetValueAt(int a_X, int a_Y);
-	
+
 	/** Returns the value in the cell into which the specified point lies,
 	and the distance to the nearest Voronoi seed. */
 	int GetValueAt(int a_X, int a_Y, int & a_MinDistance);
-	
+
 	/** Returns the value in the cell into which the specified point lies,
 	and the distances to the 2 nearest Voronoi seeds. Uses a cache. */
 	int GetValueAt(
@@ -54,11 +54,11 @@ public:
 	);
 
 protected:
-	/// The noise used for generating Voronoi seeds
+	/** The noise used for generating Voronoi seeds */
 	cNoise m_Noise1;
 	cNoise m_Noise2;
 	cNoise m_Noise3;
-	
+
 	/** Size of the Voronoi cells (avg X / Y distance between the seeds). Expected to be at least 2. */
 	int m_CellSize;
 
@@ -70,10 +70,10 @@ protected:
 	This allows us to have non-rectangular grids.
 	Expected to be between -m_CellSize and +m_CellSize. */
 	int m_OddRowOffset;
-	
+
 	/** The X coordinate of the currently cached cell neighborhood */
 	int m_CurrentCellX;
-	
+
 	/** The Z coordinate of the currently cached cell neighborhood */
 	int m_CurrentCellZ;
 
@@ -82,8 +82,8 @@ protected:
 
 	/** The seeds of cells around m_CurrentCellX, m_CurrentCellZ, X-coords */
 	int m_SeedZ[5][5];
-	
-	
+
+
 	/** Updates the cached cell seeds to match the specified cell. Noop if cell pos already matches.
 	Updates m_SeedX and m_SeedZ. */
 	void UpdateCell(int a_CellX, int a_CellZ);

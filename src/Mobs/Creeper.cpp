@@ -27,11 +27,14 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (!TargetIsInRange() && !m_BurnedWithFlintAndSteel)
+	if ((GetTarget() == nullptr) || (!TargetIsInRange() && !m_BurnedWithFlintAndSteel))
 	{
-		m_ExplodingTimer = 0;
-		m_bIsBlowing = false;
-		m_World->BroadcastEntityMetadata(*this);
+		if (m_bIsBlowing)
+		{
+			m_ExplodingTimer = 0;
+			m_bIsBlowing = false;
+			m_World->BroadcastEntityMetadata(*this);
+		}
 	}
 	else
 	{
@@ -40,7 +43,7 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_ExplodingTimer += 1;
 		}
 
-		if (m_ExplodingTimer == 30)
+		if ((m_ExplodingTimer == 30) && (GetHealth() > 0.0))  // only explode when not already dead
 		{
 			m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, esMonster, this);
 			Destroy();  // Just in case we aren't killed by the explosion
@@ -118,7 +121,7 @@ bool cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cCreeper::Attack(std::chrono::milliseconds a_Dt)
+bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 
@@ -127,7 +130,10 @@ void cCreeper::Attack(std::chrono::milliseconds a_Dt)
 		m_World->BroadcastSoundEffect("game.tnt.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
+
+		return true;
 	}
+	return false;
 }
 
 

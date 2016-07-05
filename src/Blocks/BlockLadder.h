@@ -29,7 +29,7 @@ public:
 		if (!LadderCanBePlacedAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
 			a_BlockFace = FindSuitableBlockFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-			
+
 			if (a_BlockFace == BLOCK_FACE_BOTTOM)
 			{
 				return false;

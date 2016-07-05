@@ -92,8 +92,8 @@ template <typename TYPE> void LinearUpscale2DArray(
 {
 	// For optimization reasons, we're storing the upscaling ratios in a fixed-size arrays of these sizes
 	// Feel free to enlarge them if needed, but keep in mind that they're on the stack
-	const int MAX_UPSCALE_X = 128;
-	const int MAX_UPSCALE_Y = 128;
+	const int MAX_UPSCALE_X = 129;
+	const int MAX_UPSCALE_Y = 129;
 
 	ASSERT(a_Src != nullptr);
 	ASSERT(a_Dst != nullptr);
@@ -101,8 +101,8 @@ template <typename TYPE> void LinearUpscale2DArray(
 	ASSERT(a_SrcSizeY > 0);
 	ASSERT(a_UpscaleX > 0);
 	ASSERT(a_UpscaleY > 0);
-	ASSERT(a_UpscaleX <= MAX_UPSCALE_X);
-	ASSERT(a_UpscaleY <= MAX_UPSCALE_Y);
+	ASSERT(a_UpscaleX < MAX_UPSCALE_X);
+	ASSERT(a_UpscaleY < MAX_UPSCALE_Y);
 
 	// Pre-calculate the upscaling ratios:
 	TYPE RatioX[MAX_UPSCALE_X];

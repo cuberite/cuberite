@@ -10,9 +10,6 @@
 
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)
-	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
-	#pragma warning(disable:4481)
-
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100)  // Unreferenced formal parameter
 
@@ -34,7 +31,8 @@
 
 	// Disabled because it's useless:
 	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
-	
+	#pragma warning(disable: 4351)  // new behavior: elements of array 'member' will be default initialized
+
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
 	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
 
@@ -43,14 +41,14 @@
 	// No alignment needed in MSVC
 	#define ALIGN_8
 	#define ALIGN_16
-	
+
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
 	#define SIZE_T_FMT "%Iu"
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
 	#define SIZE_T_FMT_HEX "%Ix"
-	
+
 	#define NORETURN      __declspec(noreturn)
 
 	// Use non-standard defines in <cmath>
@@ -73,7 +71,7 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-	
+
 	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 	#if defined(_WIN32)
@@ -94,31 +92,16 @@
 		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
 		#define SIZE_T_FMT_HEX "%zx"
 	#endif
-	
+
 	#define NORETURN      __attribute((__noreturn__))
 
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
 
-	/*
-	// Copy and uncomment this into another #elif section based on your compiler identification
-
-	// Explicitly mark classes as abstract (no instances can be created)
-	#define abstract
-
-	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
-
-	// Mark functions as obsolete, so that their usage results in a compile-time warning
-	#define OBSOLETE
-
-	// Mark types / variables for alignment. Do the platforms need it?
-	#define ALIGN_8
-	#define ALIGN_16
-	*/
-
 #endif
+
+
 
 
 #ifdef  _DEBUG
@@ -225,7 +208,7 @@ template class SizeChecker<UInt8,  1>;
 #endif
 
 #if defined(ANDROID_NDK)
-	#define FILE_IO_PREFIX "/sdcard/mcserver/"
+	#define FILE_IO_PREFIX "/sdcard/Cuberite/"
 #else
 	#define FILE_IO_PREFIX ""
 #endif
@@ -271,55 +254,74 @@ template class SizeChecker<UInt8,  1>;
 #include "OSSupport/StackTrace.h"
 
 #ifndef TEST_GLOBALS
-	#include "Logger.h"
+
+	// These functions are defined in Logger.cpp, but are declared here to avoid including all of logger.h
+	extern void LOG       (const char * a_Format, ...) FORMATSTRING(1, 2);
+	extern void LOGINFO   (const char * a_Format, ...) FORMATSTRING(1, 2);
+	extern void LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
+	extern void LOGERROR  (const char * a_Format, ...) FORMATSTRING(1, 2);
+
+	// In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
+	#ifdef _DEBUG
+		#define LOGD LOG
+	#else
+		#define LOGD(...)
+	#endif  // _DEBUG
+
+	#define LOGWARN LOGWARNING
+
 #else
 	// Logging functions
-void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGERROR(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOGERROR(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-void inline LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGWARNING(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOGWARNING(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-void inline LOGD(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOGD(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGD(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOGD(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-void inline LOG(const char * a_Format, ...) FORMATSTRING(1, 2);
+	void inline LOG(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOG(const char * a_Format, ...)
-{
-	va_list argList;
-	va_start(argList, a_Format);
-	vprintf(a_Format, argList);
-	putchar('\n');
-	va_end(argList);
-}
+	void inline LOG(const char * a_Format, ...)
+	{
+		va_list argList;
+		va_start(argList, a_Format);
+		vprintf(a_Format, argList);
+		putchar('\n');
+		fflush(stdout);
+		va_end(argList);
+	}
 
-#define LOGINFO LOG
-#define LOGWARN LOGWARNING
+	#define LOGINFO LOG
+	#define LOGWARN LOGWARNING
 
 #endif
 
@@ -329,15 +331,15 @@ void inline LOG(const char * a_Format, ...)
 
 // Common definitions:
 
-/// Evaluates to the number of elements in an array (compile-time!)
+/** Evaluates to the number of elements in an array (compile-time!) */
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
-/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)")
+/** Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)") */
 #define KiB * 1024
 #define MiB * 1024 * 1024
 
-/// Faster than (int)floorf((float)x / (float)div)
-#define FAST_FLOOR_DIV( x, div) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
+/** Faster than (int)floorf((float)x / (float)div) */
+#define FAST_FLOOR_DIV(x, div) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
 
 // Own version of assert() that writes failed assertions to the log for review
 #ifdef TEST_GLOBALS
@@ -402,7 +404,7 @@ template <typename Type> class cItemCallback
 {
 public:
 	virtual ~cItemCallback() {}
-	
+
 	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
 	virtual bool Item(Type * a_Type) = 0;
 } ;

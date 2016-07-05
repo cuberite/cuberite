@@ -1,28 +1,28 @@
 language: cpp
+sudo: false
 
-compiler: 
+compiler:
 - clang
 - gcc
 
-before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
-
-install:
-  - sudo apt-get install -qq g++-4.8
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
-
-  # lua, needed for style checking and possibly later on for bindings generation
-  - sudo apt-get install -qq lua5.1
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
 
 script: ./CIbuild.sh
 
 env:
-  - TRAVIS_MCSERVER_BUILD_TYPE=RELEASE MCSERVER_PATH=./MCServer
-  - TRAVIS_MCSERVER_BUILD_TYPE=DEBUG   MCSERVER_PATH=./MCServer_debug
+  - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
+  - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG   CUBERITE_PATH=./Cuberite_debug
 
 notifications:
   email:
     on_success: change
     on_failure: always
+branches:
+  only:
+    - coverity_scan
+    - master

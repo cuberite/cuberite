@@ -16,6 +16,8 @@
 
 int main(int argc, char ** argv)
 {
+	LOGD("Test started");
+
 	// Set up a cChunkData with known contents - all blocks 0x01, all metas 0x02:
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>

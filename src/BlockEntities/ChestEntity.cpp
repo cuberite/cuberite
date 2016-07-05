@@ -45,7 +45,7 @@ void cChestEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cChestEntity::UsedBy(cPlayer * a_Player)
+bool cChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
@@ -70,7 +70,8 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 	// The few false positives aren't much to worry about
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
-	m_World->MarkChunkDirty(ChunkX, ChunkZ, true);
+	m_World->MarkChunkDirty(ChunkX, ChunkZ);
+	return true;
 }
 
 

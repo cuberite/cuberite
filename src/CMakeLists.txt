@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.2)
-project (MCServer)
+project (Cuberite)
 
 
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
@@ -8,9 +8,9 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include")
 
 set(FOLDERS
-	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
-	WorldStorage Mobs Entities Simulator BlockEntities UI Generating/Prefabs
-	Noise
+	OSSupport HTTP Items Blocks Protocol Generating PolarSSL++ Bindings
+	WorldStorage Mobs Entities Simulator Simulator/IncrementalRedstoneSimulator
+	BlockEntities UI Noise
 )
 
 SET (SRCS
@@ -18,6 +18,7 @@ SET (SRCS
 	BlockArea.cpp
 	BlockID.cpp
 	BlockInfo.cpp
+	BrewingRecipes.cpp
 	Broadcaster.cpp
 	BoundingBox.cpp
 	ByteBuffer.cpp
@@ -62,7 +63,6 @@ SET (SRCS
 	RCONServer.cpp
 	Root.cpp
 	Scoreboard.cpp
-	SelfTests.cpp
 	Server.cpp
 	SetChunkData.cpp
 	SpawnPrepare.cpp
@@ -84,6 +84,7 @@ SET (HDRS
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockTracer.h
+	BrewingRecipes.h
 	Broadcaster.h
 	BoundingBox.h
 	BuildInfo.h
@@ -98,12 +99,14 @@ SET (HDRS
 	ChunkSender.h
 	ChunkStay.h
 	ClientHandle.h
+	Color.h
 	CommandOutput.h
 	CompositeChat.h
 	CraftingRecipes.h
 	Cuboid.h
 	DeadlockDetect.h
 	Defines.h
+	EffectID.h
 	Enchantments.h
 	Endianness.h
 	FastRandom.h
@@ -136,12 +139,12 @@ SET (HDRS
 	RCONServer.h
 	Root.h
 	Scoreboard.h
-	SelfTests.h
 	Server.h
 	SetChunkData.h
 	SettingsRepositoryInterface.h
 	SpawnPrepare.h
 	Statistics.h
+	Stopwatch.h
 	StringCompression.h
 	StringUtils.h
 	Tracer.h
@@ -164,30 +167,25 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(BlockArea.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
 	set_source_files_properties(BlockID.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
 	set_source_files_properties(BoundingBox.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=float-equal")
-	set_source_files_properties(ByteBuffer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast -Wno-error=global-constructors")
-	set_source_files_properties(Chunk.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-	set_source_files_properties(ChunkData.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast")
-	set_source_files_properties(ChunkMap.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=shadow -Wno-error=sign-conversion -Wno-error=old-style-cast")
-	set_source_files_properties(ClientHandle.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=sign-conversion -Wno-error=global-constructors -Wno-error=old-style-cast")
+	set_source_files_properties(ByteBuffer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion  -Wno-error=global-constructors")
+	set_source_files_properties(ChunkData.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion ")
+	set_source_files_properties(ChunkMap.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=shadow -Wno-error=sign-conversion ")
+	set_source_files_properties(ClientHandle.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=sign-conversion -Wno-error=global-constructors ")
 	set_source_files_properties(CompositeChat.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors -Wno-error=missing-variable-declarations")
-	set_source_files_properties(Enchantments.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-	set_source_files_properties(IniFile.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast")
+	set_source_files_properties(IniFile.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion ")
 	set_source_files_properties(Inventory.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion")
-	set_source_files_properties(Item.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
+	set_source_files_properties(Item.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion ")
 	set_source_files_properties(ItemGrid.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion")
 	set_source_files_properties(LightingThread.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=sign-conversion")
-	set_source_files_properties(LinearInterpolation.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(Map.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
 	set_source_files_properties(MobProximityCounter.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=float-equal")
 	set_source_files_properties(MobSpawner.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum")
 	set_source_files_properties(RCONServer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
 	set_source_files_properties(Root.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=shadow -Wno-error=old-style-cast")
-	set_source_files_properties(Server.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
 	set_source_files_properties(Statistics.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-	set_source_files_properties(StringCompression.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast")
-	set_source_files_properties(StringUtils.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
+	set_source_files_properties(StringUtils.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion ")
 	set_source_files_properties(Tracer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
-	set_source_files_properties(World.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=old-style-cast")
+	set_source_files_properties(World.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion ")
 	set_source_files_properties(main.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=missing-variable-declarations -Wno-error=missing-prototypes")
 endif()
 
@@ -216,7 +214,7 @@ if (NOT MSVC)
 
 	# If building a windows version, but not using MSVC, add the resources directly to the makefile:
 	if (WIN32)
-		list(APPEND SOURCE "Resources/MCServer.rc")
+		list(APPEND SOURCE "Resources/Cuberite.rc")
 	endif()
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
@@ -276,7 +274,7 @@ else ()
 	SET_SOURCE_FILES_PROPERTIES(
 		"StackWalker.cpp LeakFinder.cpp" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
 	)
-	list(APPEND SOURCE "Resources/MCServer.rc")
+	list(APPEND SOURCE "Resources/Cuberite.rc")
 
 	# Make MSVC generate the PDB files even for the release build:
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
@@ -306,12 +304,12 @@ endforeach()
 FILE(WRITE "AllFiles.lst" "${ALLFILESLINES}")
 
 
-set(EXECUTABLE MCServer)
+set(EXECUTABLE Cuberite)
 
 if (MSVC)
 	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
-	
+
 	# The paths in BINDING_DEPENDENCIES are relative to the Bindings folder, convert them relative to this folder:
 	foreach (dep ${BINDING_DEPENDENCIES})
 		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
@@ -321,7 +319,7 @@ if (MSVC)
 		OUTPUT ${BINDING_OUTPUTS}
 
 		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/MCServer/lua51.dll ./lua51.dll
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/Server/lua51.dll ./lua51.dll
 
 		# Regenerate bindings:
 		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
@@ -335,13 +333,13 @@ endif()
 add_executable(${EXECUTABLE} ${SOURCE})
 
 
-# Output the executable into the $/MCServer folder, so that it has access to external resources:
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
+# Output the executable into the $/Server folder, so that it has access to external resources:
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/Server)
 SET_TARGET_PROPERTIES(${EXECUTABLE} PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/MCServer
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_SOURCE_DIR}/MCServer
-	RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_SOURCE_DIR}/MCServer
-	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_SOURCE_DIR}/MCServer
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_SOURCE_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_SOURCE_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_SOURCE_DIR}/Server
 )
 
 
@@ -365,8 +363,9 @@ endif ()
 if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE}
 		OSSupport HTTPServer Bindings Items Blocks Noise
-		Protocol Generating Generating_Prefabs WorldStorage
-		Mobs Entities Simulator BlockEntities UI PolarSSL++
+		Protocol Generating WorldStorage
+		Mobs Entities Simulator IncrementalRedstoneSimulator
+		BlockEntities UI PolarSSL++
 	)
 endif ()
 if (WIN32)
@@ -375,6 +374,7 @@ endif()
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/local/lib)
+	add_flags_lnk(-L/usr/ports/devel)
 endif()
 
 target_link_libraries(${EXECUTABLE} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)

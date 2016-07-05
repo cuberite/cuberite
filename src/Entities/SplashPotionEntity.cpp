@@ -3,13 +3,18 @@
 #include "SplashPotionEntity.h"
 #include "Pawn.h"
 #include "../ClientHandle.h"
+#include "../EffectID.h"
 
 
 
 
 
-/// Converts an angle in radians into a byte representation used by the network protocol
+/** Converts an angle in radians into a byte representation used by the network protocol */
 #define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // cSplashPotionEntityCallback:
@@ -29,7 +34,7 @@ public:
 		m_EntityEffect(a_EntityEffect)
 	{
 	}
-	
+
 	/** Called by cWorld::ForEachEntity(), adds the stored entity effect to the entity, if it is close enough. */
 	virtual bool Item(cEntity * a_Entity) override
 	{
@@ -50,7 +55,7 @@ public:
 		// TODO: better equation
 		double Reduction = -0.25 * SplashDistance + 1.0;
 		Reduction = std::max(Reduction, 0.0);
-		
+
 		static_cast<cPawn *>(a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.GetDuration(), m_EntityEffect.GetIntensity(), Reduction);
 		return false;
 	}
@@ -60,7 +65,7 @@ private:
 	cEntityEffect::eType m_EntityEffectType;
 	const cEntityEffect & m_EntityEffect;
 };
-	
+
 
 
 
@@ -75,6 +80,7 @@ cSplashPotionEntity::cSplashPotionEntity(
 	const cItem & a_Item
 ) :
 	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+	m_Item(a_Item),
 	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);
@@ -115,9 +121,9 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 {
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);
-	
+
 	m_World->BroadcastSoundParticleEffect(
-		2002,
+		EffectID::PARTICLE_SPLASH_POTION,
 		FloorC(a_HitPos.x),
 		FloorC(a_HitPos.y),
 		FloorC(a_HitPos.z),

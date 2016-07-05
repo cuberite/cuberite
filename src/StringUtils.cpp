@@ -21,7 +21,7 @@
 AString & AppendVPrintf(AString & str, const char * format, va_list args)
 {
 	ASSERT(format != nullptr);
-	
+
 	char buffer[2048];
 	int len;
 	#ifdef va_copy
@@ -47,7 +47,7 @@ AString & AppendVPrintf(AString & str, const char * format, va_list args)
 	#ifdef va_copy
 	va_end(argsCopy);
 	#endif
-	
+
 	// The result did not fit into the static buffer, use a dynamic buffer:
 	#ifdef _MSC_VER
 	// for MS CRT, we need to calculate the result length
@@ -57,7 +57,7 @@ AString & AppendVPrintf(AString & str, const char * format, va_list args)
 		return str;
 	}
 	#endif  // _MSC_VER
-	
+
 	// Allocate a buffer and printf into it:
 	#ifdef va_copy
 	va_copy(argsCopy, args);
@@ -222,7 +222,7 @@ AString TrimString(const AString & str)
 	size_t start = 0;
 	while (start < len)
 	{
-		if (str[start] > 32)
+		if (static_cast<unsigned char>(str[start]) > 32)
 		{
 			break;
 		}
@@ -232,17 +232,17 @@ AString TrimString(const AString & str)
 	{
 		return "";
 	}
-	
+
 	size_t end = len;
 	while (end >= start)
 	{
-		if (str[end] > 32)
+		if (static_cast<unsigned char>(str[end]) > 32)
 		{
 			break;
 		}
 		--end;
 	}
-	
+
 	return str.substr(start, end - start + 1);
 }
 
@@ -320,8 +320,8 @@ size_t RateCompareString(const AString & s1, const AString & s2)
 
 	for (size_t i = 0; i < s1Length; i++)
 	{
-		char c1 = (char)toupper(s1[i]);
-		char c2 = (char)toupper(s2[i]);
+		char c1 = static_cast<char>(toupper(s1[i]));
+		char c2 = static_cast<char>(toupper(s2[i]));
 		if (c1 == c2)
 		{
 			++MatchedLetters;
@@ -360,12 +360,12 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 		int c = GetBEShort(&a_RawData[i * 2]);
 		if (c < 0x80)
 		{
-			a_UTF8.push_back((char)c);
+			a_UTF8.push_back(static_cast<char>(c));
 		}
 		else if (c < 0x800)
 		{
-			a_UTF8.push_back((char)(192 + c / 64));
-			a_UTF8.push_back((char)(128 + c % 64));
+			a_UTF8.push_back(static_cast<char>(192 + c / 64));
+			a_UTF8.push_back(static_cast<char>(128 + c % 64));
 		}
 		else if (c - 0xd800 < 0x800)
 		{
@@ -396,7 +396,7 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 
 
 // UTF-8 conversion code adapted from:
-//  http://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
+//  https://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
 
 ////////////////////////////////////////////////////////////////////////////////
 // Begin of Unicode, Inc.'s code / information
@@ -500,13 +500,13 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 
 
 
-AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
+std::u16string UTF8ToRawBEUTF16(const AString & a_UTF8)
 {
-	AString UTF16;
-	UTF16.reserve(a_UTF8Length * 3);
+	std::u16string UTF16;
+	UTF16.reserve(a_UTF8.size() * 2);
 
-	const unsigned char * source    = (const unsigned char *)a_UTF8;
-	const unsigned char * sourceEnd = source + a_UTF8Length;
+	const unsigned char * source    = reinterpret_cast<const unsigned char *>(a_UTF8.data());
+	const unsigned char * sourceEnd = source + a_UTF8.size();
 	const int halfShift  = 10;  // used for shifting by 10 bits
 	const unsigned int halfBase = 0x0010000UL;
 	const unsigned int halfMask = 0x3ffUL;
@@ -524,7 +524,7 @@ AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 		{
 			return UTF16;
 		}
-		
+
 		// The cases all fall through. See "Note A" below.
 		switch (extraBytesToRead)
 		{
@@ -545,14 +545,14 @@ AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 				// UTF-16 surrogate values are illegal in UTF-32
 				ch = ' ';
 			}
-			unsigned short v = htons((unsigned short)ch);
-			UTF16.append((const char *)&v, 2);
+			unsigned short v = htons(static_cast<unsigned short>(ch));
+			UTF16.push_back(static_cast<char16_t>(v));
 		}
 		else if (ch > UNI_MAX_UTF16)
 		{
 			// Invalid value, replace with a space
 			unsigned short v = htons(' ');
-			UTF16.append((const char *)&v, 2);
+			UTF16.push_back(static_cast<char16_t>(v));
 		}
 		else
 		{
@@ -560,8 +560,8 @@ AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 			ch -= halfBase;
 			unsigned short v1 = htons((ch >> halfShift) + UNI_SUR_HIGH_START);
 			unsigned short v2 = htons((ch & halfMask) + UNI_SUR_LOW_START);
-			UTF16.append((const char *)&v1, 2);
-			UTF16.append((const char *)&v2, 2);
+			UTF16.push_back(static_cast<char16_t>(v1));
+			UTF16.push_back(static_cast<char16_t>(v2));
 		}
 	}
 	return UTF16;
@@ -609,7 +609,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 	char line[512];
 	char * p;
 	char * q;
-	
+
 	a_Out.reserve(a_Size / a_BytesPerLine * (18 + 6 * a_BytesPerLine));
 	for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
 	{
@@ -620,9 +620,9 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		}
 		#ifdef _MSC_VER
 		// MSVC provides a "secure" version of sprintf()
-		int Count = sprintf_s(line, sizeof(line), "%08x:", (unsigned)i);
+		int Count = sprintf_s(line, sizeof(line), "%08x:", static_cast<unsigned>(i));
 		#else
-		int Count = sprintf(line, "%08x:", (unsigned)i);
+		int Count = sprintf(line, "%08x:", static_cast<unsigned>(i));
 		#endif
 		// Remove the terminating nullptr / leftover garbage in line, after the sprintf-ed value
 		memset(line + Count, 32, sizeof(line) - static_cast<size_t>(Count));
@@ -782,7 +782,7 @@ AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_
 
 
 
-/// Converts one Hex character in a Base64 encoding into the data value
+/** Converts one Hex character in a Base64 encoding into the data value */
 static inline int UnBase64(char c)
 {
 	if ((c >='A') && (c <= 'Z'))
@@ -870,24 +870,24 @@ AString Base64Encode(const AString & a_Input)
 
 	for (size_t i = 0; i < size_full24; i += 3)
 	{
-		output[output_index++] = BASE64[(unsigned char)a_Input[i] >> 2];
-		output[output_index++] = BASE64[((unsigned char)a_Input[i] << 4 | (unsigned char)a_Input[i + 1] >> 4) & 63];
-		output[output_index++] = BASE64[((unsigned char)a_Input[i + 1] << 2 | (unsigned char)a_Input[i + 2] >> 6) & 63];
-		output[output_index++] = BASE64[(unsigned char)a_Input[i + 2] & 63];
+		output[output_index++] = BASE64[static_cast<unsigned char>(a_Input[i]) >> 2];
+		output[output_index++] = BASE64[(static_cast<unsigned char>(a_Input[i]) << 4 | static_cast<unsigned char>(a_Input[i + 1]) >> 4) & 63];
+		output[output_index++] = BASE64[(static_cast<unsigned char>(a_Input[i + 1]) << 2 | static_cast<unsigned char>(a_Input[i + 2]) >> 6) & 63];
+		output[output_index++] = BASE64[static_cast<unsigned char>(a_Input[i + 2]) & 63];
 	}
 
 	if (size_full24 < a_Input.size())
 	{
-		output[output_index++] = BASE64[(unsigned char)a_Input[size_full24] >> 2];
+		output[output_index++] = BASE64[static_cast<unsigned char>(a_Input[size_full24]) >> 2];
 		if (size_full24 + 1 == a_Input.size())
 		{
-			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24] << 4) & 63];
+			output[output_index++] = BASE64[(static_cast<unsigned char>(a_Input[size_full24]) << 4) & 63];
 			output[output_index++] = '=';
 		}
 		else
 		{
-			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24] << 4 | (unsigned char)a_Input[size_full24 + 1] >> 4) & 63];
-			output[output_index++] = BASE64[((unsigned char)a_Input[size_full24 + 1] << 2) & 63];
+			output[output_index++] = BASE64[(static_cast<unsigned char>(a_Input[size_full24]) << 4 | static_cast<unsigned char>(a_Input[size_full24 + 1]) >> 4) & 63];
+			output[output_index++] = BASE64[(static_cast<unsigned char>(a_Input[size_full24 + 1]) << 2) & 63];
 		}
 
 		output[output_index++] = '=';
@@ -903,7 +903,7 @@ AString Base64Encode(const AString & a_Input)
 
 short GetBEShort(const char * a_Mem)
 {
-	const Byte * Bytes = (const Byte *)a_Mem;
+	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
 	return static_cast<short>((Bytes[0] << 8) | Bytes[1]);
 }
 
@@ -913,7 +913,7 @@ short GetBEShort(const char * a_Mem)
 
 int GetBEInt(const char * a_Mem)
 {
-	const Byte * Bytes = (const Byte *)a_Mem;
+	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
 	return (Bytes[0] << 24) | (Bytes[1] << 16) | (Bytes[2] << 8) | Bytes[3];
 }
 
@@ -953,7 +953,7 @@ bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Out
 		a_Output.push_back(a_Strings.substr(start, size - start));
 		res = true;
 	}
-	
+
 	return res;
 }
 
@@ -1000,7 +1000,3 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 	}
 	return res;
 }
-
-
-
-

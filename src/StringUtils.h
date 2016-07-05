@@ -17,6 +17,10 @@ typedef std::string AString;
 typedef std::vector<AString> AStringVector;
 typedef std::list<AString>   AStringList;
 
+/** A string dictionary, used for key-value pairs. */
+typedef std::map<AString, AString> AStringMap;
+
+
 
 
 
@@ -82,7 +86,7 @@ extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AS
 extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
 
 /** Converts a UTF-8 string into a UTF-16 BE string. */
-extern AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length);
+extern std::u16string UTF8ToRawBEUTF16(const AString & a_String);
 
 /** Creates a nicely formatted HEX dump of the given memory block.
 Max a_BytesPerLine is 120. */
@@ -94,25 +98,25 @@ extern AString EscapeString(const AString & a_Message);  // tolua_export
 /** Removes all control codes used by MC for colors and styles. */
 extern AString StripColorCodes(const AString & a_Message);  // tolua_export
 
-/// URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact
+/** URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact */
 extern AString URLDecode(const AString & a_String);  // Cannot export to Lua automatically - would generated an extra return value
 
-/// Replaces all occurrences of char a_From inside a_String with char a_To.
+/** Replaces all occurrences of char a_From inside a_String with char a_To. */
 extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
 
-/// Decodes a Base64-encoded string into the raw data
+/** Decodes a Base64-encoded string into the raw data */
 extern AString Base64Decode(const AString & a_Base64String);  // Exported manually due to embedded NULs and extra parameter
 
-/// Encodes a string into Base64
+/** Encodes a string into Base64 */
 extern AString Base64Encode(const AString & a_Input);  // Exported manually due to embedded NULs and extra parameter
 
-/// Reads two bytes from the specified memory location and interprets them as BigEndian short
+/** Reads two bytes from the specified memory location and interprets them as BigEndian short */
 extern short GetBEShort(const char * a_Mem);
 
-/// Reads four bytes from the specified memory location and interprets them as BigEndian int
+/** Reads four bytes from the specified memory location and interprets them as BigEndian int */
 extern int GetBEInt(const char * a_Mem);
 
-/// Writes four bytes to the specified memory location so that they interpret as BigEndian int
+/** Writes four bytes to the specified memory location so that they interpret as BigEndian int */
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
 /** Splits a string that has embedded \0 characters, on those characters.
@@ -128,6 +132,10 @@ extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const 
 
 /** Concatenates the specified strings into a single string, separated by the specified separator. */
 extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
+
+
+
+
 
 /** Parses any integer type. Checks bounds and returns errors out of band. */
 template <class T>
@@ -196,6 +204,35 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 	a_Num = result;
 	return true;
 }
+
+
+
+
+
+/** Returns an integer from a key-value string map.
+Returns a_Default if the key is not present or the value is not an int. */
+template <typename T>
+int GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Default)
+{
+	// Try to locate the key:
+	auto itr = a_Map.find(a_Key);
+	if (itr == a_Map.end())
+	{
+		return a_Default;
+	}
+
+	// Try to convert the value to a number:
+	T res = a_Default;
+	if (!StringToInteger<T>(itr->second, res))
+	{
+		return a_Default;
+	}
+	return res;
+}
+
+
+
+
 
 // If you have any other string helper functions, declare them here
 

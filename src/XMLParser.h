@@ -22,29 +22,29 @@ class CXMLParser
 public:
 	CXMLParser(void);
 	virtual ~CXMLParser();
-	
+
 	// The actual parsing, may be called several times; the last time needs iIsFinal == true (-> flush)
 	int Parse(const char * iData, size_t iLength, bool iIsFinal = false);
 
 private:
 	// LibExpat stuff:
 	XML_Parser mParser;
-	
+
 	static void StartElementHandler(void * iContext, const XML_Char * iElement, const XML_Char ** iAttributes)
 	{
 		((CXMLParser *)iContext)->OnStartElement(iElement, iAttributes);
 	}
-	
+
 	static void EndElementHandler  (void * iContext, const XML_Char * iElement)
 	{
 		((CXMLParser *)iContext)->OnEndElement(iElement);
 	}
-	
+
 	static void CharacterDataHandler (void * iContext, const XML_Char * iData, int iLength)
 	{
 		((CXMLParser *)iContext)->OnCharacters(iData, iLength);
 	}
-	
+
 protected:
 	virtual void OnStartElement(const XML_Char * iElement, const XML_Char ** iAttributes) = 0;
 	virtual void OnEndElement  (const XML_Char * iElement) = 0;
@@ -79,7 +79,7 @@ class CExpatImpl
 
 // @access Constructors and destructors
 public:
-	
+
 	// @cmember General constructor
 
 	CExpatImpl ()
@@ -245,7 +245,7 @@ protected:
 	}
 
 	// @cmember Enable / Disable default handler
-	
+
 	void EnableDefaultHandler (bool fEnable = true, bool fExpand = true)
 	{
 		assert (m_p != nullptr);
@@ -258,33 +258,33 @@ protected:
 			XML_SetDefaultHandler (m_p, fEnable ? DefaultHandler : nullptr);
 		}
 	}
-	
+
 	// @cmember Enable / Disable external entity ref handler
-	
+
 	void EnableExternalEntityRefHandler (bool fEnable = true)
 	{
 		assert (m_p != nullptr);
 		XML_SetExternalEntityRefHandler (m_p, fEnable ? ExternalEntityRefHandler : nullptr);
 	}
-	
+
 	// @cmember Enable / Disable unknown encoding handler
-	
+
 	void EnableUnknownEncodingHandler (bool fEnable = true)
 	{
 		assert (m_p != nullptr);
 		XML_SetUnknownEncodingHandler (m_p, fEnable ? UnknownEncodingHandler : nullptr);
 	}
-	
+
 	// @cmember Enable / Disable start namespace handler
-	
+
 	void EnableStartNamespaceDeclHandler (bool fEnable = true)
 	{
 		assert (m_p != nullptr);
 		XML_SetStartNamespaceDeclHandler (m_p, fEnable ? StartNamespaceDeclHandler : nullptr);
 	}
-	
+
 	// @cmember Enable / Disable end namespace handler
-	
+
 	void EnableEndNamespaceDeclHandler (bool fEnable = true)
 	{
 		assert (m_p != nullptr);
@@ -298,7 +298,7 @@ protected:
 		EnableStartNamespaceDeclHandler (fEnable);
 		EnableEndNamespaceDeclHandler (fEnable);
 	}
-	
+
 	// @cmember Enable / Disable the XML declaration handler
 
 	void EnableXmlDeclHandler (bool fEnable = true)
@@ -479,43 +479,43 @@ public:
 	}
 
 	// @cmember Default handler
-	
+
 	void OnDefault (const XML_Char *pszData, int nLength)
 	{
 		return;
 	}
-	
+
 	// @cmember External entity ref handler
-	
+
 	bool OnExternalEntityRef (const XML_Char *pszContext,
 		const XML_Char *pszBase, const XML_Char *pszSystemID,
 		const XML_Char *pszPublicID)
 	{
 		return false;
 	}
-	
+
 	// @cmember Unknown encoding handler
-	
+
 	bool OnUnknownEncoding (const XML_Char *pszName, XML_Encoding *pInfo)
 	{
 		return false;
 	}
-	
+
 	// @cmember Start namespace declaration handler
-	
+
 	void OnStartNamespaceDecl (const XML_Char *pszPrefix,
 		const XML_Char *pszURI)
 	{
 		return;
 	}
-	
+
 	// @cmember End namespace declaration handler
-	
+
 	void OnEndNamespaceDecl (const XML_Char *pszPrefix)
 	{
 		return;
 	}
-	
+
 	// @cmember XML declaration handler
 
 	void OnXmlDecl (const XML_Char *pszVersion, const XML_Char *pszEncoding,
@@ -614,16 +614,16 @@ protected:
 	}
 
 	// @cmember Default wrapper
-	
+
 	static void __cdecl DefaultHandler (void *pUserData,
 		const XML_Char *pszData, int nLength)
 	{
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
 		pThis ->OnDefault (pszData, nLength);
 	}
-	
+
 	// @cmember External entity ref wrapper
-	
+
 	static int __cdecl ExternalEntityRefHandler (void *pUserData,
 		const XML_Char *pszContext, const XML_Char *pszBase,
 		const XML_Char *pszSystemID, const XML_Char *pszPublicID)
@@ -632,31 +632,31 @@ protected:
 		return pThis ->OnExternalEntityRef (pszContext,
 			pszBase, pszSystemID, pszPublicID) ? 1 : 0;
 	}
-	
+
 	// @cmember Unknown encoding wrapper
-	
+
 	static int __cdecl UnknownEncodingHandler (void * pUserData, const XML_Char * pszName, XML_Encoding * pInfo)
 	{
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
 		return pThis ->OnUnknownEncoding (pszName, pInfo) ? 1 : 0;
 	}
-	
+
 	// @cmember Start namespace decl wrapper
-	
+
 	static void __cdecl StartNamespaceDeclHandler (void * pUserData, const XML_Char * pszPrefix, const XML_Char * pszURI)
 	{
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
 		pThis ->OnStartNamespaceDecl (pszPrefix, pszURI);
 	}
-	
+
 	// @cmember End namespace decl wrapper
-	
+
 	static void __cdecl EndNamespaceDeclHandler (void * pUserData, const XML_Char * pszPrefix)
 	{
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
 		pThis ->OnEndNamespaceDecl (pszPrefix);
 	}
-	
+
 	// @cmember XML declaration wrapper
 
 	static void __cdecl XmlDeclHandler (void *pUserData, const XML_Char *pszVersion, const XML_Char *pszEncoding, int nStandalone)
@@ -684,13 +684,13 @@ protected:
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
 		pThis ->OnEndDoctypeDecl ();
 	}
-	
-	
+
+
 protected:
 
 	XML_Parser m_p;
-	
-	/// Returns the value of the specified attribute, if found; nullptr otherwise
+
+	/** Returns the value of the specified attribute, if found; nullptr otherwise */
 	static const XML_Char * FindAttr(const XML_Char ** iAttrs, const XML_Char * iAttrToFind)
 	{
 		for (const XML_Char ** Attr = iAttrs; *Attr != nullptr; Attr += 2)

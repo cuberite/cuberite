@@ -51,31 +51,26 @@ class cProtocol180 :
 	public cProtocol
 {
 	typedef cProtocol super;
-	
+
 public:
 
 	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-	
+
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
-	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
+	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-	virtual void SendChat                       (const AString & a_Message) override;
-	virtual void SendChat                       (const cCompositeChat & a_Message) override;
-	virtual void SendChatAboveActionBar         (const AString & a_Message) override;
-	virtual void SendChatAboveActionBar         (const cCompositeChat & a_Message) override;
-	virtual void SendChatSystem                 (const AString & a_Message) override;
-	virtual void SendChatSystem                 (const cCompositeChat & a_Message) override;
-	virtual void SendChatType                   (const AString & a_Message, eChatType type) override;
-	virtual void SendChatType                   (const cCompositeChat & a_Message, eChatType type) override;
+	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
+	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
+	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
@@ -93,7 +88,7 @@ public:
 	virtual void SendHealth                     (void) override;
 	virtual void SendHideTitle                  (void) override;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
-	virtual void SendKeepAlive                  (int a_PingID) override;
+	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendLoginSuccess               (void) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
@@ -126,7 +121,7 @@ public:
 	virtual void SendSetRawSubTitle             (const AString & a_SubTitle) override;
 	virtual void SendSetTitle                   (const cCompositeChat & a_Title) override;
 	virtual void SendSetRawTitle                (const AString & a_Title) override;
-	virtual void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
+	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override;
@@ -163,30 +158,30 @@ public:
 protected:
 
 	AString m_ServerAddress;
-	
+
 	UInt16 m_ServerPort;
-	
+
 	AString m_AuthServerID;
-	
+
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
 
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
-	
+
 	bool m_IsEncrypted;
-	
+
 	cAesCfb128Decryptor m_Decryptor;
 	cAesCfb128Encryptor m_Encryptor;
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
-	
+
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
-	
-	
+
+
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(const char * a_Data, size_t a_Size);
 
@@ -202,7 +197,7 @@ protected:
 	// Packet handlers while in the Login state (m_State == 2):
 	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
 	void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
-	
+
 	// Packet handlers while in the Game state (m_State == 3):
 	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
@@ -227,12 +222,12 @@ protected:
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
-	
+
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
 	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
-	
-	
+
+
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
@@ -240,15 +235,15 @@ protected:
 	virtual void SendPacket(cPacketizer & a_Packet) override;
 
 	void SendCompass(const cWorld & a_World);
-	
+
 	/** Reads an item out of the received data, sets a_Item to the values read.
 	Returns false if not enough received data.
 	a_KeepRemainingBytes tells the function to keep that many bytes at the end of the buffer. */
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes = 0);
-	
+
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
-	
+
 	void StartEncryption(const Byte * a_Key);
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.

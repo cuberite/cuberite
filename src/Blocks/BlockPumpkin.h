@@ -15,7 +15,7 @@ public:
 		super(a_BlockType)
 	{
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -31,7 +31,7 @@ public:
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
 		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
-		
+
 		a_Yaw += 180 + 45;
 		if (a_Yaw > 360)
 		{

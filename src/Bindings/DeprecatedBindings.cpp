@@ -19,7 +19,9 @@
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockLightValue
 static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -29,12 +31,12 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushnumber(tolua_S, (lua_Number)cBlockInfo::GetLightValue((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::GetLightValue(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -47,7 +49,9 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockSpreadLightFalloff
 static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -57,12 +61,12 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushnumber(tolua_S, (lua_Number)cBlockInfo::GetSpreadLightFalloff((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::GetSpreadLightFalloff(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -75,7 +79,9 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockTransparent
 static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -85,12 +91,12 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsTransparent((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::IsTransparent(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -103,7 +109,9 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockOneHitDig
 static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -113,12 +121,12 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsOneHitDig((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::IsOneHitDig(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -131,7 +139,9 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockPistonBreakable
 static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -141,12 +151,12 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsPistonBreakable((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::IsPistonBreakable(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -159,7 +169,9 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSnowable
 static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -169,12 +181,12 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, cBlockInfo::IsSnowable((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::IsSnowable(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -187,7 +199,9 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSolid
 static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -197,12 +211,12 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, (bool)cBlockInfo::IsSolid((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::IsSolid(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -215,7 +229,9 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockFullyOccupiesVoxel
 static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 {
-	int BlockType;
+	cLuaState LuaState(tolua_S);
+
+	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
@@ -225,12 +241,12 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 		}
 	}
 	#endif
-	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	tolua_pushboolean(tolua_S, (bool)cBlockInfo::FullyOccupiesVoxel((BLOCKTYPE)BlockType));
+	LuaState.Push(cBlockInfo::FullyOccupiesVoxel(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -256,8 +272,8 @@ static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
 	{
 		const AString a_MobString = tolua_tocppstring(LuaState, 1, 0);
 		eMonsterType MobType = cMonster::StringToMobType(a_MobString);
-		tolua_pushnumber(LuaState, (lua_Number) MobType);
-		tolua_pushcppstring(LuaState, (const char *) a_MobString);
+		tolua_pushnumber(LuaState, static_cast<lua_Number>(MobType));
+		tolua_pushcppstring(LuaState, a_MobString);
 	}
 
 	LOGWARNING("Warning in function call 'StringToMobType': StringToMobType() is deprecated. Please use cMonster:StringToMobType()");
@@ -281,32 +297,29 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	cLuaState LuaState(tolua_S);
 
 	#ifndef TOLUA_RELEASE
-	tolua_Error tolua_err;
 	if (
-		!tolua_isusertype (LuaState, 1, "cWorld", 0, &tolua_err) ||
-		!tolua_isnumber   (LuaState, 2, 0, &tolua_err) ||
-		!tolua_isnumber   (LuaState, 3, 0, &tolua_err) ||
-		!tolua_isnumber   (LuaState, 4, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 5, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 6, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 7, 0, &tolua_err) ||
-		!tolua_iscppstring(LuaState, 8, 0, &tolua_err) ||
-		!tolua_isusertype (LuaState, 9, "cPlayer", 1, &tolua_err) ||
-		!tolua_isnoobj    (LuaState, 10, &tolua_err)
+		!LuaState.CheckParamUserType(1, "cWorld") ||
+		!LuaState.CheckParamNumber(2, 4) ||
+		!LuaState.CheckParamString(5, 8) ||
+		!LuaState.CheckParamUserType(9, "cPlayer") ||
+		!LuaState.CheckParamEnd(10)
 		)
-		goto tolua_lerror;
+		return 0;
 	else
 	#endif
 	{
-		cWorld * self       = (cWorld *) tolua_tousertype (LuaState, 1, nullptr);
-		int BlockX          = (int)      tolua_tonumber   (LuaState, 2, 0);
-		int BlockY          = (int)      tolua_tonumber   (LuaState, 3, 0);
-		int BlockZ          = (int)      tolua_tonumber   (LuaState, 4, 0);
-		const AString Line1 =            tolua_tocppstring(LuaState, 5, 0);
-		const AString Line2 =            tolua_tocppstring(LuaState, 6, 0);
-		const AString Line3 =            tolua_tocppstring(LuaState, 7, 0);
-		const AString Line4 =            tolua_tocppstring(LuaState, 8, 0);
-		cPlayer * Player    = (cPlayer *)tolua_tousertype (LuaState, 9, nullptr);
+		cWorld * self = nullptr;
+		cPlayer * Player = nullptr;
+		int BlockX = 0;
+		int BlockY = 0;
+		int BlockZ = 0;
+		AString Line1;
+		AString Line2;
+		AString Line3;
+		AString Line4;
+
+		LuaState.GetStackValues(1, self, BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+
 		#ifndef TOLUA_RELEASE
 		if (self == nullptr)
 		{
@@ -321,12 +334,49 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	LOGWARNING("Warning in function call 'UpdateSign': UpdateSign() is deprecated. Please use SetSignLines()");
 	LuaState.LogStackTrace(0);
 	return 1;
-	
-	#ifndef TOLUA_RELEASE
-tolua_lerror:
-	tolua_error(LuaState, "#ferror in function 'UpdateSign'.", &tolua_err);
+}
+
+
+
+
+
+template <typename T>
+int tolua_Vector3_Abs(lua_State * a_LuaState)
+{
+	// Retrieve the params, including self:
+	cLuaState L(a_LuaState);
+	Vector3<T> * self;
+	if (!L.GetStackValues(1, self))
+	{
+		tolua_error(a_LuaState, "invalid 'self' in function 'Vector3<T>:Abs'", nullptr);
+		return 0;
+	}
+
+	// Absolutize the vector:
+	self->Abs();
 	return 0;
-	#endif
+}
+
+
+
+
+
+template <typename T>
+int tolua_Vector3_Clamp(lua_State * a_LuaState)
+{
+	// Retrieve the params, including self:
+	cLuaState L(a_LuaState);
+	Vector3<T> * self;
+	T min, max;
+	if (!L.GetStackValues(1, self, min, max))
+	{
+		tolua_error(a_LuaState, "invalid parameters for function 'Vector3<T>:Clamp', expected a Vector3 and two numbers", nullptr);
+		return 0;
+	}
+
+	// Clamp the vector:
+	self->Clamp(min, max);
+	return 0;
 }
 
 
@@ -350,6 +400,21 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 
 	tolua_beginmodule(tolua_S, "cWorld");
 		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
+	tolua_endmodule(tolua_S);
+
+	tolua_beginmodule(tolua_S, "Vector3i");
+		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<int>);
+		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<int>);
+	tolua_endmodule(tolua_S);
+
+	tolua_beginmodule(tolua_S, "Vector3f");
+		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<float>);
+		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<float>);
+	tolua_endmodule(tolua_S);
+
+	tolua_beginmodule(tolua_S, "Vector3d");
+		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<double>);
+		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<double>);
 	tolua_endmodule(tolua_S);
 
 	tolua_endmodule(tolua_S);

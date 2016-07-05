@@ -23,11 +23,11 @@ class cStructGenMarbleCaves :
 {
 public:
 	cStructGenMarbleCaves(int a_Seed) : m_Seed(a_Seed) {}
-	
+
 protected:
 
 	int m_Seed;
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
@@ -47,13 +47,13 @@ public:
 		m_Threshold(a_Threshold)
 	{
 	}
-	
+
 protected:
 	cNoise m_Noise1;
 	cNoise m_Noise2;
 	int    m_Seed;
 	float  m_Threshold;
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
@@ -75,7 +75,7 @@ public:
 		m_Grid(a_Grid)
 	{
 	}
-	
+
 protected:
 	class cCaveSystem;  // fwd: Caves.cpp
 

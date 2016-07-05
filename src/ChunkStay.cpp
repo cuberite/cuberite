@@ -80,7 +80,7 @@ void cChunkStay::Remove(int a_ChunkX, int a_ChunkZ)
 void cChunkStay::Enable(cChunkMap & a_ChunkMap)
 {
 	ASSERT(m_ChunkMap == nullptr);
-	
+
 	m_OutstandingChunks = m_Chunks;
 	m_ChunkMap = &a_ChunkMap;
 	a_ChunkMap.AddChunkStay(*this);
@@ -93,7 +93,7 @@ void cChunkStay::Enable(cChunkMap & a_ChunkMap)
 void cChunkStay::Disable(void)
 {
 	ASSERT(m_ChunkMap != nullptr);
-	
+
 	cChunkMap * ChunkMap = m_ChunkMap;
 	m_ChunkMap = nullptr;
 	ChunkMap->DelChunkStay(*this);
@@ -120,7 +120,7 @@ bool cChunkStay::ChunkAvailable(int a_ChunkX, int a_ChunkZ)
 	{
 		return false;
 	}
-	
+
 	// Call the appropriate callbacks:
 	OnChunkAvailable(a_ChunkX, a_ChunkZ);
 	if (m_OutstandingChunks.empty())

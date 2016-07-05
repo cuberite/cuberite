@@ -3,6 +3,8 @@
 
 #include "BlockHandler.h"
 
+#include <unordered_set>
+
 
 class cWorld;
 
@@ -12,7 +14,7 @@ class cBlockPistonHandler :
 {
 public:
 	cBlockPistonHandler(BLOCKTYPE a_BlockType);
-	
+
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override;
@@ -63,7 +65,7 @@ public:
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
-		switch (a_MetaData)
+		switch (a_MetaData & 0x7)  // We only want the bottom three bits (4th controls extended-ness))
 		{
 			case 0x0: return BLOCK_FACE_YM;
 			case 0x1: return BLOCK_FACE_YP;
@@ -79,8 +81,11 @@ public:
 		}
 	}
 
-	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
+	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
+
+	static void ExtendPiston(Vector3i a_BlockPos, cWorld * a_World);
+	static void RetractPiston(Vector3i a_BlockPos, cWorld * a_World);
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -90,13 +95,15 @@ public:
 
 private:
 
-	/// Returns true if the piston (specified by blocktype) is a sticky piston
+	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
+
+	/** Returns true if the piston (specified by blocktype) is a sticky piston */
 	static inline bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
 
-	/// Returns true if the piston (with the specified meta) is extended
+	/** Returns true if the piston (with the specified meta) is extended */
 	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
 
-	/// Returns true if the specified block can be pushed by a piston (and left intact)
+	/** Returns true if the specified block can be pushed by a piston (and left intact) */
 	static inline bool CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		switch (a_BlockType)
@@ -141,19 +148,16 @@ private:
 		return true;
 	}
 
-	/// Returns true if the specified block can be pulled by a sticky piston
-	static inline bool CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
-		if (cBlockInfo::IsPistonBreakable(a_BlockType))
-		{
-			return false;  // CanBreakPush returns true, but we need false to prevent pulling
-		}
-		
-		return CanPush(a_BlockType, a_BlockMeta);
-	}
+	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
+	static bool CanPushBlock(
+		const Vector3i & a_BlockPos, cWorld * a_World, bool a_RequirePushable,
+		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
+	);
 
-	/// Returns how many blocks the piston has to push (where the first free space is); < 0 when unpushable
-	static int FirstPassthroughBlock(int a_PistonX, int a_PistonY, int a_PistonZ, NIBBLETYPE a_PistonMeta, cWorld * a_World);
+	/** Moves a list of blocks in a specific direction */
+	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
+		cWorld * a_World, const Vector3i & a_PushDir
+	);
 } ;
 
 
@@ -164,10 +168,10 @@ class cBlockPistonHeadHandler :
 	public cBlockHandler
 {
 	typedef cBlockHandler super;
-	
+
 public:
 	cBlockPistonHeadHandler(void);
-	
+
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override

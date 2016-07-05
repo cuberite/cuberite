@@ -45,7 +45,7 @@ void cEnchantments::Add(const cEnchantments & a_Other)
 void cEnchantments::AddFromString(const AString & a_StringSpec)
 {
 	// Add enchantments in the stringspec; if a specified enchantment already exists, overwrites it
-	
+
 	// Split the StringSpec into separate declarations, each in the form "id=lvl":
 	AStringVector Decls = StringSplit(a_StringSpec, ";");
 	for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
@@ -507,7 +507,7 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 			{
 				AddEnchantmentWeightToVector(a_Enchantments, 5, enchFeatherFalling, 1);
 			}
-			
+
 			// Depth Strider
 			if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 45))
 			{
@@ -1040,7 +1040,7 @@ cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantm
 {
 	// Sum up all the enchantments' weights:
 	int AllWeights = 0;
-	for (const auto Enchantment : a_Enchantments)
+	for (const auto & Enchantment : a_Enchantments)
 	{
 		AllWeights += Enchantment.m_Weight;
 	}
@@ -1054,7 +1054,7 @@ cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantm
 	// Pick a random enchantment:
 	cNoise Noise(a_Seed);
 	int RandomNumber = Noise.IntNoise1DInt(AllWeights) / 7 % AllWeights;
-	for (const auto Enchantment : a_Enchantments)
+	for (const auto & Enchantment : a_Enchantments)
 	{
 		RandomNumber -= Enchantment.m_Weight;
 		if (RandomNumber <= 0)

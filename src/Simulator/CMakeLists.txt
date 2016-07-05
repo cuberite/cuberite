@@ -1,6 +1,6 @@
 
 cmake_minimum_required (VERSION 2.6)
-project (MCServer)
+project (Cuberite)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
@@ -9,7 +9,6 @@ SET (SRCS
 	FireSimulator.cpp
 	FloodyFluidSimulator.cpp
 	FluidSimulator.cpp
-	IncrementalRedstoneSimulator.cpp
 	SandSimulator.cpp
 	Simulator.cpp
 	SimulatorManager.cpp
@@ -21,7 +20,6 @@ SET (HDRS
 	FireSimulator.h
 	FloodyFluidSimulator.h
 	FluidSimulator.h
-	IncrementalRedstoneSimulator.h
 	NoopFluidSimulator.h
 	NoopRedstoneSimulator.h
 	RedstoneSimulator.h
@@ -35,7 +33,6 @@ SET (HDRS
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(FireSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
 	set_source_files_properties(FluidSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=shadow")
-	set_source_files_properties(IncrementalRedstoneSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=old-style-cast")
 endif()
 
 if(NOT MSVC)

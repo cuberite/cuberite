@@ -3,7 +3,7 @@
 
 #include "Noise.h"
 
-#define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
+#define FAST_FLOOR(x) (((x) < 0) ? ((static_cast<int>(x)) - 1) : (static_cast<int>(x)))
 
 
 
@@ -116,7 +116,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
-	
+
 	// Save in XY cuts:
 	cFile f1;
 	if (f1.Open(Printf("%s_XY (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
@@ -129,7 +129,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 				unsigned char buf[BUF_SIZE];
 				for (size_t x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+					buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f1.Write(buf, a_SizeX);
 			}  // for y
@@ -150,7 +150,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 				unsigned char buf[BUF_SIZE];
 				for (size_t x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+					buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f2.Write(buf, a_SizeX);
 			}  // for z
@@ -169,7 +169,7 @@ void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
-	
+
 	cFile f1;
 	if (f1.Open(Printf("%s (" SIZE_T_FMT ").grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
 	{
@@ -179,7 +179,7 @@ void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 			unsigned char buf[BUF_SIZE];
 			for (size_t x = 0; x < a_SizeX; x++)
 			{
-				buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+				buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 			}
 			f1.Write(buf, a_SizeX);
 		}  // for y
@@ -203,30 +203,30 @@ public:
 		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
 		const NOISE_DATATYPE * a_FracY   ///< Pointer to the attay that stores the Y fractional values
 	);
-	
-	/// Uses current m_WorkRnds[] to generate part of the array
+
+	/** Uses current m_WorkRnds[] to generate part of the array */
 	void Generate(
 		int a_FromX, int a_ToX,
 		int a_FromY, int a_ToY
 	);
-	
-	/// Initializes m_WorkRnds[] with the specified Floor values
+
+	/** Initializes m_WorkRnds[] with the specified Floor values */
 	void InitWorkRnds(int a_FloorX, int a_FloorY);
-	
-	/// Updates m_WorkRnds[] for the new Floor values.
+
+	/** Updates m_WorkRnds[] for the new Floor values. */
 	void Move(int a_NewFloorX, int a_NewFloorY);
 
 protected:
 	typedef NOISE_DATATYPE Workspace[4][4];
-	
+
 	const cNoise & m_Noise;
-	
+
 	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
 	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
 	Workspace m_Workspace2;  ///< Buffer 2 for workspace doublebuffering, used in Move()
 	int m_CurFloorX;
 	int m_CurFloorY;
-	
+
 	NOISE_DATATYPE * m_Array;
 	int m_SizeX, m_SizeY;
 	const NOISE_DATATYPE * m_FracX;
@@ -295,7 +295,7 @@ void cCubicCell2D::InitWorkRnds(int a_FloorX, int a_FloorY)
 		for (int y = 0; y < 4; y++)
 		{
 			int cy = a_FloorY + y - 1;
-			(*m_WorkRnds)[x][y] = (NOISE_DATATYPE)m_Noise.IntNoise2D(cx, cy);
+			(*m_WorkRnds)[x][y] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise2D(cx, cy));
 		}
 	}
 }
@@ -311,7 +311,7 @@ void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 	int OldFloorY = m_CurFloorY;
 	Workspace * OldWorkRnds = m_WorkRnds;
 	m_WorkRnds = (m_WorkRnds == &m_Workspace1) ? &m_Workspace2 : &m_Workspace1;
-	
+
 	// Reuse as much of the old workspace as possible:
 	int DiffX = OldFloorX - a_NewFloorX;
 	int DiffY = OldFloorY - a_NewFloorY;
@@ -329,7 +329,7 @@ void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 			}
 			else
 			{
-				(*m_WorkRnds)[x][y] = (NOISE_DATATYPE)m_Noise.IntNoise2D(cx, cy);
+				(*m_WorkRnds)[x][y] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise2D(cx, cy));
 			}
 		}
 	}
@@ -355,32 +355,32 @@ public:
 		const NOISE_DATATYPE * a_FracY,         ///< Pointer to the attay that stores the Y fractional values
 		const NOISE_DATATYPE * a_FracZ          ///< Pointer to the array that stores the Z fractional values
 	);
-	
-	/// Uses current m_WorkRnds[] to generate part of the array
+
+	/** Uses current m_WorkRnds[] to generate part of the array */
 	void Generate(
 		int a_FromX, int a_ToX,
 		int a_FromY, int a_ToY,
 		int a_FromZ, int a_ToZ
 	);
-	
-	/// Initializes m_WorkRnds[] with the specified Floor values
+
+	/** Initializes m_WorkRnds[] with the specified Floor values */
 	void InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ);
-	
-	/// Updates m_WorkRnds[] for the new Floor values.
+
+	/** Updates m_WorkRnds[] for the new Floor values. */
 	void Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ);
 
 protected:
 	typedef NOISE_DATATYPE Workspace[4][4][4];
-	
+
 	const cNoise & m_Noise;
-	
+
 	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
 	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
 	Workspace m_Workspace2;  ///< Buffer 2 for workspace doublebuffering, used in Move()
 	int m_CurFloorX;
 	int m_CurFloorY;
 	int m_CurFloorZ;
-	
+
 	NOISE_DATATYPE * m_Array;
 	int m_SizeX, m_SizeY, m_SizeZ;
 	const NOISE_DATATYPE * m_FracX;
@@ -472,7 +472,7 @@ void cCubicCell3D::InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ)
 			for (int z = 0; z < 4; z++)
 			{
 				int cz = a_FloorZ + z - 1;
-				(*m_WorkRnds)[x][y][z] = (NOISE_DATATYPE)m_Noise.IntNoise3D(cx, cy, cz);
+				(*m_WorkRnds)[x][y][z] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(cx, cy, cz));
 			}
 		}
 	}
@@ -490,7 +490,7 @@ void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
 	int OldFloorZ = m_CurFloorZ;
 	Workspace * OldWorkRnds = m_WorkRnds;
 	m_WorkRnds = (m_WorkRnds == &m_Workspace1) ? &m_Workspace2 : &m_Workspace1;
-	
+
 	// Reuse as much of the old workspace as possible:
 	int DiffX = OldFloorX - a_NewFloorX;
 	int DiffY = OldFloorY - a_NewFloorY;
@@ -513,7 +513,7 @@ void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
 				}
 				else
 				{
-					(*m_WorkRnds)[x][y][z] = (NOISE_DATATYPE)m_Noise.IntNoise3D(cx, cy, cz);
+					(*m_WorkRnds)[x][y][z] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(cx, cy, cz));
 				}
 			}  // for z
 		}  // for y
@@ -594,7 +594,7 @@ NOISE_DATATYPE cNoise::CubicNoise2D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) cons
 {
 	const int BaseX = FAST_FLOOR(a_X);
 	const int BaseY = FAST_FLOOR(a_Y);
-	
+
 	const NOISE_DATATYPE points[4][4] =
 	{
 		{ IntNoise2D(BaseX - 1, BaseY - 1), IntNoise2D(BaseX, BaseY - 1), IntNoise2D(BaseX + 1, BaseY - 1), IntNoise2D(BaseX + 2, BaseY - 1), },
@@ -623,7 +623,7 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 	const int BaseX = FAST_FLOOR(a_X);
 	const int BaseY = FAST_FLOOR(a_Y);
 	const int BaseZ = FAST_FLOOR(a_Z);
-	
+
 	const NOISE_DATATYPE points1[4][4] =
 	{
 		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ - 1), },
@@ -716,7 +716,7 @@ void cCubicNoise::Generate2D(
 	ASSERT(a_SizeY < MAX_SIZE);
 	ASSERT(a_StartX < a_EndX);
 	ASSERT(a_StartY < a_EndY);
-	
+
 	// Calculate the integral and fractional parts of each coord:
 	int FloorX[MAX_SIZE];
 	int FloorY[MAX_SIZE];
@@ -727,11 +727,11 @@ void cCubicNoise::Generate2D(
 	int NumSameX, NumSameY;
 	CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
 	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
-	
+
 	cCubicCell2D Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
-	
+
 	Cell.InitWorkRnds(FloorX[0], FloorY[0]);
-	
+
 	// Calculate query values using Cell:
 	int FromY = 0;
 	for (int y = 0; y < NumSameY; y++)
@@ -769,7 +769,7 @@ void cCubicNoise::Generate3D(
 	ASSERT(a_StartX < a_EndX);
 	ASSERT(a_StartY < a_EndY);
 	ASSERT(a_StartZ < a_EndZ);
-	
+
 	// Calculate the integral and fractional parts of each coord:
 	int FloorX[MAX_SIZE];
 	int FloorY[MAX_SIZE];
@@ -784,15 +784,15 @@ void cCubicNoise::Generate3D(
 	CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
 	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
 	CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ, SameZ, NumSameZ);
-	
+
 	cCubicCell3D Cell(
 		m_Noise, a_Array,
 		a_SizeX, a_SizeY, a_SizeZ,
 		FracX, FracY, FracZ
 	);
-	
+
 	Cell.InitWorkRnds(FloorX[0], FloorY[0], FloorZ[0]);
-	
+
 	// Calculate query values using Cell:
 	int FromZ = 0;
 	for (int z = 0; z < NumSameZ; z++)
@@ -841,7 +841,7 @@ void cCubicNoise::CalcFloorFrac(
 		a_Frac[i] = val - a_Floor[i];
 		val += dif;
 	}
-	
+
 	// Mark up the same floor values into a_Same / a_NumSame:
 	int CurFloor = a_Floor[0];
 	int LastSame = 0;

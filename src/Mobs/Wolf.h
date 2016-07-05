@@ -12,17 +12,18 @@ class cWolf :
 	public cPassiveAggressiveMonster
 {
 	typedef cPassiveAggressiveMonster super;
-	
+
 public:
 	cWolf(void);
 
 	CLASS_PROTODEF(cWolf)
 
+	void NotifyAlliesOfFight(cPawn * a_Opponent);
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
-	virtual void Attack(std::chrono::milliseconds a_Dt) override;
+	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 
 	// Get functions
 	bool    IsSitting     (void) const override { return m_IsSitting; }
@@ -45,6 +46,17 @@ public:
 		m_OwnerUUID = a_NewOwnerUUID;
 	}
 
+	/** Notfies the wolf of a nearby fight.
+	The wolf may then decide to attack a_Opponent.
+	If a_IsPlayer is true, then the player whose ID is a_PlayerID is fighting a_Opponent
+	If false, then a wolf owned by the player whose ID is a_PlayerID is fighting a_Opponent
+	@param a_PlayerID The ID of the fighting player, or the ID of the owner whose wolf is fighting.
+	@param a_Opponent The opponent who is being faught.
+	@param a_IsPlayerInvolved Whether the fighter a player or a wolf. */
+	void ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
+
+	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
 protected:
 
 	bool    m_IsSitting;
@@ -54,6 +66,7 @@ protected:
 	AString m_OwnerName;
 	AString m_OwnerUUID;
 	int     m_CollarColor;
+	int     m_NotificationCooldown;
 } ;
 
 

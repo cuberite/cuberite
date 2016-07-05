@@ -36,7 +36,7 @@ static const int MAX_LIST_ITEMS = 10000;
 // cParsedNBT:
 
 #define NEEDBYTES(N) \
-	if (m_Length - m_Pos < (size_t)N) \
+	if (m_Length - m_Pos < static_cast<size_t>(N)) \
 	{ \
 		return false; \
 	}
@@ -69,16 +69,16 @@ bool cParsedNBT::Parse(void)
 		// The top-level tag must be a Compound
 		return false;
 	}
-	
+
 	m_Tags.reserve(NBT_RESERVE_SIZE);
-	
+
 	m_Tags.push_back(cFastNBTTag(TAG_Compound, -1));
-	
+
 	m_Pos = 1;
-	
+
 	RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
 	RETURN_FALSE_IF_FALSE(ReadCompound());
-	
+
 	return true;
 }
 
@@ -90,12 +90,8 @@ bool cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringLen)
 {
 	NEEDBYTES(2);
 	a_StringStart = m_Pos + 2;
-	a_StringLen = (size_t)GetBEShort(m_Data + m_Pos);
-	if (a_StringLen > 0xffff)
-	{
-		// Suspicious string length
-		return false;
-	}
+	a_StringLen = static_cast<size_t>(GetBEShort(m_Data + m_Pos));
+	NEEDBYTES(2 + a_StringLen);
 	m_Pos += 2 + a_StringLen;
 	return true;
 }
@@ -114,7 +110,12 @@ bool cParsedNBT::ReadCompound(void)
 	for (;;)
 	{
 		NEEDBYTES(1);
-		eTagType TagType = (eTagType)(m_Data[m_Pos]);
+		const char TagTypeNum = m_Data[m_Pos];
+		if ((TagTypeNum < TAG_Min) || (TagTypeNum > TAG_Max))
+		{
+			return false;
+		}
+		eTagType TagType = static_cast<eTagType>(TagTypeNum);
 		m_Pos++;
 		if (TagType == TAG_End)
 		{
@@ -123,13 +124,13 @@ bool cParsedNBT::ReadCompound(void)
 		m_Tags.push_back(cFastNBTTag(TagType, static_cast<int>(ParentIdx), PrevSibling));
 		if (PrevSibling >= 0)
 		{
-			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = (int)m_Tags.size() - 1;
+			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = static_cast<int>(m_Tags.size()) - 1;
 		}
 		else
 		{
-			m_Tags[ParentIdx].m_FirstChild = (int)m_Tags.size() - 1;
+			m_Tags[ParentIdx].m_FirstChild = static_cast<int>(m_Tags.size()) - 1;
 		}
-		PrevSibling = (int)m_Tags.size() - 1;
+		PrevSibling = static_cast<int>(m_Tags.size()) - 1;
 		RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
 		RETURN_FALSE_IF_FALSE(ReadTag());
 	}  // while (true)
@@ -144,7 +145,7 @@ bool cParsedNBT::ReadCompound(void)
 bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 {
 	// Reads the latest tag as a list of items of type a_ChildrenType
-	
+
 	// Read the count:
 	NEEDBYTES(4);
 	int Count = GetBEInt(m_Data + m_Pos);
@@ -189,7 +190,7 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 		m_Pos += LEN; \
 		return true; \
 	}
-	
+
 bool cParsedNBT::ReadTag(void)
 {
 	cFastNBTTag & Tag = m_Tags.back();
@@ -201,12 +202,12 @@ bool cParsedNBT::ReadTag(void)
 		CASE_SIMPLE_TAG(Long,   8)
 		CASE_SIMPLE_TAG(Float,  4)
 		CASE_SIMPLE_TAG(Double, 8)
-		
+
 		case TAG_String:
 		{
 			return ReadString(Tag.m_DataStart, Tag.m_DataLength);
 		}
-		
+
 		case TAG_ByteArray:
 		{
 			NEEDBYTES(4);
@@ -223,7 +224,7 @@ bool cParsedNBT::ReadTag(void)
 			m_Pos += static_cast<size_t>(len);
 			return true;
 		}
-		
+
 		case TAG_List:
 		{
 			NEEDBYTES(1);
@@ -232,13 +233,13 @@ bool cParsedNBT::ReadTag(void)
 			RETURN_FALSE_IF_FALSE(ReadList(ItemType));
 			return true;
 		}
-		
+
 		case TAG_Compound:
 		{
 			RETURN_FALSE_IF_FALSE(ReadCompound());
 			return true;
 		}
-		
+
 		case TAG_IntArray:
 		{
 			NEEDBYTES(4);
@@ -256,13 +257,12 @@ bool cParsedNBT::ReadTag(void)
 			m_Pos += static_cast<size_t>(len);
 			return true;
 		}
-		
+
 		#if !defined(__clang__)
 		default:
 		#endif
 		case TAG_Min:
 		{
-			ASSERT(!"Unhandled NBT tag type");
 			return false;
 		}
 	}  // switch (iType)
@@ -284,7 +284,7 @@ int cParsedNBT::FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLen
 	{
 		return -1;
 	}
-	
+
 	if (a_NameLength == 0)
 	{
 		a_NameLength = strlen(a_Name);
@@ -328,7 +328,7 @@ int cParsedNBT::FindTagByPath(int a_Tag, const AString & a_Path) const
 		}
 		Begin = i + 1;
 	}  // for i - a_Path[]
-	
+
 	if (Begin < Length)
 	{
 		Tag = FindChildByName(Tag, a_Path.c_str() + Begin, Length - Begin);
@@ -349,7 +349,7 @@ cFastNBTWriter::cFastNBTWriter(const AString & a_RootTagName) :
 	m_Stack[0].m_Type = TAG_Compound;
 	m_Result.reserve(100 * 1024);
 	m_Result.push_back(TAG_Compound);
-	WriteString(a_RootTagName.data(), (UInt16)a_RootTagName.size());
+	WriteString(a_RootTagName.data(), static_cast<UInt16>(a_RootTagName.size()));
 }
 
 
@@ -363,9 +363,9 @@ void cFastNBTWriter::BeginCompound(const AString & a_Name)
 		ASSERT(!"Stack overflow");
 		return;
 	}
-	
+
 	TagCommon(a_Name, TAG_Compound);
-	
+
 	++m_CurrentStack;
 	m_Stack[m_CurrentStack].m_Type = TAG_Compound;
 }
@@ -378,7 +378,7 @@ void cFastNBTWriter::EndCompound(void)
 {
 	ASSERT(m_CurrentStack > 0);
 	ASSERT(IsStackTopCompound());
-	
+
 	m_Result.push_back(TAG_End);
 	--m_CurrentStack;
 }
@@ -394,15 +394,15 @@ void cFastNBTWriter::BeginList(const AString & a_Name, eTagType a_ChildrenType)
 		ASSERT(!"Stack overflow");
 		return;
 	}
-	
+
 	TagCommon(a_Name, TAG_List);
-		
-	m_Result.push_back((char)a_ChildrenType);
-	m_Result.append(4, (char)0);
-	
+
+	m_Result.push_back(static_cast<char>(a_ChildrenType));
+	m_Result.append(4, static_cast<char>(0));
+
 	++m_CurrentStack;
 	m_Stack[m_CurrentStack].m_Type     = TAG_List;
-	m_Stack[m_CurrentStack].m_Pos      = (int)m_Result.size() - 4;
+	m_Stack[m_CurrentStack].m_Pos      = static_cast<int>(m_Result.size()) - 4;
 	m_Stack[m_CurrentStack].m_Count    = 0;
 	m_Stack[m_CurrentStack].m_ItemType = a_ChildrenType;
 }
@@ -415,7 +415,7 @@ void cFastNBTWriter::EndList(void)
 {
 	ASSERT(m_CurrentStack > 0);
 	ASSERT(m_Stack[m_CurrentStack].m_Type == TAG_List);
-	
+
 	// Update the list count:
 	SetBEInt(const_cast<char *>(m_Result.c_str() + m_Stack[m_CurrentStack].m_Pos), m_Stack[m_CurrentStack].m_Count);
 

@@ -62,12 +62,17 @@ macro(set_flags)
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASE    "${CMAKE_EXE_LINKER_FLAGS_RELEASE}    /LTCG")
 		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
 		set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG")
+
+		# Make build use Unicode:
+		add_definitions(-DUNICODE -D_UNICODE)
 	elseif(APPLE)
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-                		OUTPUT_VARIABLE GCC_VERSION)
-                endif()
+			execute_process(
+				COMMAND ${CMAKE_C_COMPILER} -dumpversion
+				OUTPUT_VARIABLE GCC_VERSION
+			)
+		endif()
 
 		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
 		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
@@ -90,9 +95,15 @@ macro(set_flags)
 		endif()
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-                		OUTPUT_VARIABLE GCC_VERSION)
-                endif()
+			execute_process(
+				COMMAND ${CMAKE_C_COMPILER} -dumpversion
+				OUTPUT_VARIABLE GCC_VERSION
+			)
+		endif()
+
+		if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
+			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fomit-frame-pointer")
+		endif()
 
 		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
 		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
@@ -118,8 +129,8 @@ macro(set_flags)
 	endif()
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        get_clang_version()
-    endif()
+		get_clang_version()
+	endif()
 
 
 	# Use static CRT in MSVC builds:
@@ -247,12 +258,13 @@ macro(set_exe_flags)
 
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
-				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION}")
+				message(FATAL_ERROR "Cuberite requires clang version 3.0 or higher, your version is ${CLANG_VERSION}")
 			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
 			add_flags_cxx("-Weverything -Werror -Wno-c++98-compat-pedantic -Wno-string-conversion")
 			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables")
+			add_flags_cxx("-Wno-switch-enum")  # This is a pretty useless warning, we've already got -Wswitch which is what we need
 			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
 				# flags that are not present in 3.0
 				add_flags_cxx("-Wno-implicit-fallthrough")
@@ -262,12 +274,28 @@ macro(set_exe_flags)
 				add_flags_cxx("-Wno-documentation")
 			endif()
 			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+				include(CheckCXXCompilerFlag)
 				check_cxx_compiler_flag(-Wno-reserved-id-macro HAS_NO_RESERVED_ID_MACRO)
+				check_cxx_compiler_flag(-Wno-documentation-unknown-command HAS_NO_DOCUMENTATION_UNKNOWN)
 				if (HAS_NO_RESERVED_ID_MACRO)
 					# Use this flag to ignore error for a reserved macro problem in sqlite 3
 					add_flags_cxx("-Wno-reserved-id-macro")
 				endif()
+				if (HAS_NO_DOCUMENTATION_UNKNOWN)
+					# Ignore another problem in sqlite
+					add_flags_cxx("-Wno-documentation-unknown-command")
+				endif()
 			endif()
+			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+				add_flags_cxx("-Wno-error=disabled-macro-expansion")
+			endif()
+			if ("${CLANG_VERSION}" VERSION_GREATER 3.7)
+				check_cxx_compiler_flag(-Wno-double-promotion HAS_NO_DOUBLE_PROMOTION)
+				if (HAS_NO_DOUBLE_PROMOTION)
+					add_flags_cxx("-Wno-double-promotion")
+				endif()
+			endif()
+			add_flags_cxx("-Wno-error=unused-command-line-argument")
 		endif()
 	endif()
 

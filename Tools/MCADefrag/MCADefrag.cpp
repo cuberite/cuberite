@@ -22,25 +22,25 @@ static const Byte g_Zeroes[4096] = {0};
 
 int main(int argc, char ** argv)
 {
-	cLogger::cListener * consoleLogListener = MakeConsoleListener(false);
-	cLogger::cListener * fileLogListener = new cFileListener();
-	cLogger::GetInstance().AttachListener(consoleLogListener);
-	cLogger::GetInstance().AttachListener(fileLogListener);
+	auto consoleLogListener = MakeConsoleListener(false);
+	auto consoleAttachment = cLogger::GetInstance().AttachListener(std::move(consoleLogListener));
+	auto fileLogListenerRet = MakeFileListener();
+	if (!fileLogListenerRet.first)
+	{
+		LOGERROR("Failed to open log file, aborting");
+		return EXIT_FAILURE;
+	}
+	auto fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
 	
 	cLogger::InitiateMultithreading();
 	
 	cMCADefrag Defrag;
 	if (!Defrag.Init(argc, argv))
 	{
-		return 1;
+		return EXIT_FAILURE;
 	}
 	
 	Defrag.Run();
-	
-	cLogger::GetInstance().DetachListener(consoleLogListener);
-	delete consoleLogListener;
-	cLogger::GetInstance().DetachListener(fileLogListener);
-	delete fileLogListener;
 	
 	return 0;
 }

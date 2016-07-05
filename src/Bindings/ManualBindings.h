@@ -27,7 +27,7 @@ class cManualBindings
 public:
 	/** Binds all the manually implemented functions to tolua_S. */
 	static void Bind(lua_State * tolua_S);
-	
+
 protected:
 	/** Binds the manually implemented cNetwork-related API to tolua_S.
 	Implemented in ManualBindings_Network.cpp. */
@@ -199,7 +199,7 @@ public:
 
 		// Get parameters:
 		Ty1 * Self = nullptr;
-		UInt32 ItemID;
+		UInt32 ItemID = 0;
 		cLuaState::cRef FnRef;
 		L.GetStackValues(1, Self, ItemID, FnRef);
 		if (Self == nullptr)
@@ -263,7 +263,9 @@ public:
 
 		// Get parameters:
 		Ty1 * Self = nullptr;
-		int BlockX, BlockY, BlockZ;
+		int BlockX = 0;
+		int BlockY = 0;
+		int BlockZ = 0;
 		cLuaState::cRef FnRef;
 		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
 		if (Self == nullptr)
@@ -327,7 +329,8 @@ public:
 
 		// Get parameters:
 		Ty1 * Self = nullptr;
-		int ChunkX, ChunkZ;
+		int ChunkX = 0;
+		int ChunkZ = 0;
 		cLuaState::cRef FnRef;
 		L.GetStackValues(1, Self, ChunkX, ChunkZ, FnRef);
 		if (Self == nullptr)
@@ -397,7 +400,7 @@ public:
 		L.GetStackValues(1, Self, Box, FnRef);
 		if ((Self == nullptr) || (Box == nullptr))
 		{
-			LOGWARNING("Invalid world (%p) or boundingbox (%p)", Self, Box);
+			LOGWARNING("Invalid world (%p) or boundingbox (%p)", static_cast<void *>(Self), static_cast<void *>(Box));
 			L.LogStackTrace();
 			return 0;
 		}

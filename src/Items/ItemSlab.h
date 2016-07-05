@@ -40,7 +40,7 @@ public:
 	) override
 	{
 		// Prepare sound effect
-		AString PlaceSound = cBlockInfo::GetPlaceSound(m_ItemType);
+		AString PlaceSound = cBlockInfo::GetPlaceSound(static_cast<BLOCKTYPE>(m_ItemType));
 		float Volume = 1.0f, Pitch = 0.8f;
 
 		// Special slab handling - placing a slab onto another slab produces a dblslab instead:
@@ -60,7 +60,15 @@ public:
 			)
 			{
 				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
+				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
+				{
+					return false;
+				}
+				if (a_Player.IsGameModeSurvival())
+				{
+					a_Player.GetInventory().RemoveOneEquippedItem();
+				}
+				return true;
 			}
 
 			// If clicking the bottom side of a top-half slab, combine into a doubleslab:
@@ -70,7 +78,15 @@ public:
 			)
 			{
 				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
+				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
+				{
+					return false;
+				}
+				if (a_Player.IsGameModeSurvival())
+				{
+					a_Player.GetInventory().RemoveOneEquippedItem();
+				}
+				return true;
 			}
 		}
 
@@ -86,7 +102,15 @@ public:
 		)
 		{
 			a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-			return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07);
+			if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07))
+			{
+				return false;
+			}
+			if (a_Player.IsGameModeSurvival())
+			{
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
+			return true;
 		}
 
 		// The slabs didn't combine, use the default handler to place the slab:
@@ -97,7 +121,7 @@ public:
 		The client has a bug when a slab replaces snow and there's a slab above it.
 		The client then combines the slab above, rather than replacing the snow.
 		We send the block above the currently placed block back to the client to fix the bug.
-		Ref.: http://forum.mc-server.org/showthread.php?tid=434&pid=17388#pid17388
+		Ref.: https://forum.cuberite.org/thread-434-post-17388.html#pid17388
 		*/
 		if ((a_BlockFace == BLOCK_FACE_TOP) && (a_BlockY < cChunkDef::Height - 1))
 		{

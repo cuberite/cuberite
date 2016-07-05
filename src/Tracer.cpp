@@ -166,11 +166,11 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		LOGD("%s: Start Y is outside the world (%.2f), not tracing.", __FUNCTION__, a_Start.y);
 		return false;
 	}
-	
+
 	SetValues(a_Start, a_Direction);
 
 	Vector3f End = a_Start + (dir * static_cast<float>(a_Distance));
-	
+
 	if (End.y < 0)
 	{
 		float dist = -a_Start.y / dir.y;  // No division by 0 possible
@@ -181,7 +181,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	end1.x = static_cast<int>(floorf(End.x));
 	end1.y = static_cast<int>(floorf(End.y));
 	end1.z = static_cast<int>(floorf(End.z));
-	
+
 	// check if first is occupied
 	if (pos.Equals(end1))
 	{
@@ -250,7 +250,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		{
 			return false;
 		}
-		
+
 		if ((pos.y < 0) || (pos.y >= cChunkDef::Height))
 		{
 			return false;
@@ -264,7 +264,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			int Normal = GetHitNormal(a_Start, End, pos);
 			if (Normal > 0)
 			{
-				HitNormal = m_NormalTable()[Normal - 1];
+				HitNormal = m_NormalTable()[static_cast<size_t>(Normal - 1)];
 			}
 			return true;
 		}
@@ -328,7 +328,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 		}
 		return 0;  // no intersection
 	}
-	
+
 	// they are not parallel
 	// compute intersect param
 	float sI = N / D;
@@ -349,7 +349,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Vector3i & a_BlockPos)
 {
 	Vector3i SmallBlockPos = a_BlockPos;
-	char BlockID = m_World->GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+	BLOCKTYPE BlockID = static_cast<BLOCKTYPE>(m_World->GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z));
 
 	if ((BlockID == E_BLOCK_AIR) || IsBlockWater(BlockID))
 	{

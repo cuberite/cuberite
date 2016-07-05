@@ -29,7 +29,7 @@ class cChunkData
 {
 private:
 
-	static const size_t SectionHeight = 16;
+	static const int SectionHeight = 16;
 	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
 	static const size_t SectionBlockCount = SectionHeight * cChunkDef::Width * cChunkDef::Width;
 
@@ -39,7 +39,7 @@ public:
 
 	cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool);
 	~cChunkData();
-	
+
 	#if __cplusplus < 201103L
 		// auto_ptr style interface for memory management
 		cChunkData(const cChunkData & a_Other);
@@ -55,11 +55,11 @@ public:
 
 	NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const;
 	bool SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble);
-	
+
 	NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const;
-	
+
 	NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const;
-	
+
 	/** Creates a (deep) copy of self. */
 	cChunkData Copy(void) const;
 
@@ -75,7 +75,7 @@ public:
 
 	/** Copies the skylight data into the specified flat array. */
 	void CopySkyLight  (NIBBLETYPE * a_Dest) const;
-	
+
 	/** Copies the blocktype data from the specified flat array into the internal representation.
 	Allocates sections that are needed for the operation.
 	Requires that a_Src is a valid pointer. */
@@ -103,7 +103,7 @@ public:
 		NIBBLETYPE m_BlockLight   [SectionHeight * 16 * 16 / 2];
 		NIBBLETYPE m_BlockSkyLight[SectionHeight * 16 * 16 / 2];
 	};
-	
+
 private:
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
@@ -113,14 +113,14 @@ private:
 	sChunkSection * m_Sections[NumSections];
 
 	cAllocationPool<cChunkData::sChunkSection> & m_Pool;
-	
+
 	/** Allocates a new section. Entry-point to custom allocators. */
 	sChunkSection * Allocate(void);
 
 	/** Frees the specified section, previously allocated using Allocate().
 	Note that a_Section may be nullptr. */
 	void Free(sChunkSection * a_Section);
-	
+
 	/** Sets the data in the specified section to their default values. */
 	void ZeroSection(sChunkSection * a_Section) const;
 

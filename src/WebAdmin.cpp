@@ -2,18 +2,14 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "WebAdmin.h"
-#include "Bindings/WebPlugin.h"
-
-#include "Bindings/PluginManager.h"
-#include "Bindings/Plugin.h"
 
 #include "World.h"
 #include "Entities/Player.h"
 #include "Server.h"
 #include "Root.h"
 
-#include "HTTPServer/HTTPMessage.h"
-#include "HTTPServer/HTTPConnection.h"
+#include "HTTP/HTTPServerConnection.h"
+#include "HTTP/HTTPFormParser.h"
 
 
 
@@ -50,12 +46,46 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cWebadminRequestData
+
+/** The form parser callbacks for requests in the "/webadmin" and "/~webadmin" paths */
+class cWebadminRequestData :
+	public cHTTPFormParser::cCallbacks,
+	public cHTTPIncomingRequest::cUserData
+{
+public:
+	cHTTPFormParser m_Form;
+
+
+	cWebadminRequestData(const cHTTPIncomingRequest & a_Request):
+		m_Form(a_Request, *this)
+	{
+	}
+
+	// cHTTPFormParser::cCallbacks overrides. Files are ignored:
+	virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override
+	{
+		UNUSED(a_FileName);
+	}
+	virtual void OnFileData(cHTTPFormParser &, const char * a_Data, size_t a_Size) override
+	{
+		UNUSED(a_Data);
+		UNUSED(a_Size);
+	}
+	virtual void OnFileEnd(cHTTPFormParser &) override {}
+} ;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cWebAdmin:
 
 cWebAdmin::cWebAdmin(void) :
+	m_TemplateScript("<webadmin_template>"),
 	m_IsInitialized(false),
-	m_IsRunning(false),
-	m_TemplateScript("<webadmin_template>")
+	m_IsRunning(false)
 {
 }
 
@@ -72,40 +102,9 @@ cWebAdmin::~cWebAdmin()
 
 
 
-void cWebAdmin::AddPlugin(cWebPlugin * a_Plugin)
-{
-	m_Plugins.remove(a_Plugin);
-	m_Plugins.push_back(a_Plugin);
-}
-
-
-
-
-
-void cWebAdmin::RemovePlugin(cWebPlugin * a_Plugin)
-{
-	m_Plugins.remove(a_Plugin);
-}
-
-
-
-
-
 bool cWebAdmin::Init(void)
 {
-	if (!m_IniFile.ReadFile("webadmin.ini"))
-	{
-		LOGWARN("Regenerating webadmin.ini, all settings will be reset");
-		m_IniFile.AddHeaderComment(" This file controls the webadmin feature of MCServer");
-		m_IniFile.AddHeaderComment(" Username format: [User:*username*]");
-		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
-		m_IniFile.AddHeaderComment(" [User:admin]");
-		m_IniFile.AddHeaderComment(" Password=admin");
-		m_IniFile.SetValue("WebAdmin", "Ports", DEFAULT_WEBADMIN_PORTS);
-		m_IniFile.WriteFile("webadmin.ini");
-	}
-
-	if (!m_IniFile.GetValueSetB("WebAdmin", "Enabled", true))
+	if (!LoadIniFile())
 	{
 		// WebAdmin is disabled, bail out faking a success
 		return true;
@@ -113,31 +112,7 @@ bool cWebAdmin::Init(void)
 
 	LOGD("Initialising WebAdmin...");
 
-	// Initialize the WebAdmin template script and load the file
-	m_TemplateScript.Create();
-	m_TemplateScript.RegisterAPILibs();
-	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
-	{
-		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin disabled!", FILE_IO_PREFIX "webadmin/template.lua");
-		m_TemplateScript.Close();
-		m_HTTPServer.Stop();
-		return false;
-	}
-
-	// Load the login template, provide a fallback default if not found:
-	if (!LoadLoginTemplate())
-	{
-		LOGWARN("Could not load WebAdmin login template \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
-
-		// Sets the fallback template:
-		m_LoginTemplate = \
-		"<h1>MCServer WebAdmin</h1>" \
-		"<center>" \
-		"<form method='get' action='webadmin/'>" \
-		"<input type='submit' value='Log in'>" \
-		"</form>" \
-		"</center>";
-	}
+	Reload();
 
 	// Read the ports to be used:
 	// Note that historically the ports were stored in the "Port" and "PortsIPv6" values
@@ -180,7 +155,7 @@ void cWebAdmin::Stop(void)
 	{
 		return;
 	}
-	
+
 	LOGD("Stopping WebAdmin...");
 	m_HTTPServer.Stop();
 	m_IsRunning = false;
@@ -190,7 +165,7 @@ void cWebAdmin::Stop(void)
 
 
 
-bool cWebAdmin::LoadLoginTemplate(void)
+bool cWebAdmin::LoadLoginPage(void)
 {
 	cFile File(FILE_IO_PREFIX "webadmin/login_template.html", cFile::fmRead);
 	if (!File.IsOpen())
@@ -204,7 +179,8 @@ bool cWebAdmin::LoadLoginTemplate(void)
 		return false;
 	}
 
-	m_LoginTemplate = TemplateContent;
+	cCSLock Lock(m_CS);
+	m_LoginPage = TemplateContent;
 	return true;
 }
 
@@ -212,29 +188,115 @@ bool cWebAdmin::LoadLoginTemplate(void)
 
 
 
-void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::RemoveAllPluginWebTabs(const AString & a_PluginName)
+{
+	cCSLock lock(m_CS);
+	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](cWebTabPtr a_CBWebTab)
+		{
+			return (a_CBWebTab->m_PluginName == a_PluginName);
+		}),
+		m_WebTabs.end()
+	);
+}
+
+
+
+
+
+void cWebAdmin::Reload(void)
+{
+	cCSLock lock(m_CS);
+	if (!LoadIniFile())
+	{
+		// We are asked to disable the webadmin, cannot do that, so warn the admin:
+		LOGWARNING(
+			"WebAdmin was previously enabled and now the settings say to disable it."
+			" This will not take effect until you restart the server."
+		);
+	}
+
+	// Initialize the WebAdmin template script and reload the file:
+	if (m_TemplateScript.IsValid())
+	{
+		m_TemplateScript.Close();
+	}
+	m_TemplateScript.Create();
+	m_TemplateScript.RegisterAPILibs();
+	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
+	{
+		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin will not work properly!", FILE_IO_PREFIX "webadmin/template.lua");
+		m_TemplateScript.Close();
+	}
+
+	// Load the login template, provide a fallback default if not found:
+	if (!LoadLoginPage())
+	{
+		LOGWARN("Could not load WebAdmin login page \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
+
+		// Set the fallback:
+		m_LoginPage = \
+		"<h1>Cuberite WebAdmin</h1>" \
+		"<center>" \
+		"<form method='get' action='webadmin/'>" \
+		"<input type='submit' value='Log in'>" \
+		"</form>" \
+		"</center>";
+	}
+}
+
+
+
+
+
+bool cWebAdmin::LoadIniFile(void)
+{
+	m_IniFile.Clear();
+	if (!m_IniFile.ReadFile("webadmin.ini"))
+	{
+		LOGWARN("Regenerating webadmin.ini, all settings will be reset");
+		m_IniFile.AddHeaderComment(" This file controls the webadmin feature of Cuberite");
+		m_IniFile.AddHeaderComment(" It specifies whether webadmin is enabled, and what logins are allowed. ");
+		m_IniFile.AddHeaderComment(" Username format: [User:*username*]");
+		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
+		m_IniFile.AddHeaderComment(" [User:admin]");
+		m_IniFile.AddHeaderComment(" Password=admin");
+		m_IniFile.SetValue("WebAdmin", "Ports", DEFAULT_WEBADMIN_PORTS);
+		m_IniFile.WriteFile("webadmin.ini");
+	}
+
+	return m_IniFile.GetValueSetB("WebAdmin", "Enabled", true);
+}
+
+
+
+
+
+void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	if (!a_Request.HasAuth())
 	{
-		a_Connection.SendNeedAuth("MCServer WebAdmin");
+		a_Connection.SendNeedAuth("Cuberite WebAdmin");
 		return;
 	}
 
 	// Check auth:
-	AString UserPassword = m_IniFile.GetValue("User:" + a_Request.GetAuthUsername(), "Password", "");
-	if ((UserPassword == "") || (a_Request.GetAuthPassword() != UserPassword))
 	{
-		a_Connection.SendNeedAuth("MCServer WebAdmin - bad username or password");
-		return;
+		cCSLock Lock(m_CS);
+		AString UserPassword = m_IniFile.GetValue("User:" + a_Request.GetAuthUsername(), "Password", "");
+		if ((UserPassword == "") || (a_Request.GetAuthPassword() != UserPassword))
+		{
+			a_Connection.SendNeedAuth("Cuberite WebAdmin - bad username or password");
+			return;
+		}
 	}
 
 	// Check if the contents should be wrapped in the template:
-	AString BareURL = a_Request.GetBareURL();
+	auto BareURL = a_Request.GetURLPath();
 	ASSERT(BareURL.length() > 0);
-	bool ShouldWrapInTemplate = ((BareURL.length() > 1) && (BareURL[1] != '~'));
+	bool ShouldWrapInTemplate = (!BareURL.empty() && (BareURL[1] != '~'));
 
 	// Retrieve the request data:
-	cWebadminRequestData * Data = reinterpret_cast<cWebadminRequestData *>(a_Request.GetUserData());
+	auto Data = std::static_pointer_cast<cWebadminRequestData>(a_Request.GetUserData());
 	if (Data == nullptr)
 	{
 		a_Connection.SendStatusAndReason(500, "Bad UserData");
@@ -278,85 +340,26 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	// Try to get the template from the Lua template script
 	if (ShouldWrapInTemplate)
 	{
+		cCSLock Lock(m_CS);
 		if (m_TemplateScript.Call("ShowPage", this, &TemplateRequest, cLuaState::Return, Template))
 		{
-			cHTTPResponse Resp;
+			cHTTPOutgoingResponse Resp;
 			Resp.SetContentType("text/html");
 			a_Connection.Send(Resp);
 			a_Connection.Send(Template.c_str(), Template.length());
+			a_Connection.FinishResponse();
 			return;
 		}
 		a_Connection.SendStatusAndReason(500, "m_TemplateScript failed");
 		return;
 	}
 
-	AString BaseURL = GetBaseURL(BareURL);
-	AString Menu;
-	Template = "{CONTENT}";
-	AString FoundPlugin;
-
-	for (PluginList::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
-	{
-		cWebPlugin * WebPlugin = *itr;
-		std::list< std::pair<AString, AString> > NameList = WebPlugin->GetTabNames();
-		for (std::list< std::pair<AString, AString> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names)
-		{
-			Menu += "<li><a href='" + BaseURL + WebPlugin->GetWebTitle().c_str() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
-		}
-	}
-
-	sWebAdminPage Page = GetPage(TemplateRequest.Request);
-	AString Content = Page.Content;
-	FoundPlugin = Page.PluginName;
-	if (!Page.TabName.empty())
-	{
-		FoundPlugin += " - " + Page.TabName;
-	}
-
-	if (FoundPlugin.empty())  // Default page
-	{
-		Content = GetDefaultPage();
-	}
-
-	int MemUsageKiB = cRoot::GetPhysicalRAMUsage();
-	if (MemUsageKiB > 0)
-	{
-		ReplaceString(Template, "{MEM}",       Printf("%.02f", static_cast<double>(MemUsageKiB) / 1024));
-		ReplaceString(Template, "{MEMKIB}",    Printf("%d", MemUsageKiB));
-	}
-	else
-	{
-		ReplaceString(Template, "{MEM}",       "unknown");
-		ReplaceString(Template, "{MEMKIB}",    "unknown");
-	}
-	ReplaceString(Template, "{USERNAME}",    a_Request.GetAuthUsername());
-	ReplaceString(Template, "{MENU}",        Menu);
-	ReplaceString(Template, "{PLUGIN_NAME}", FoundPlugin);
-	ReplaceString(Template, "{CONTENT}",     Content);
-	ReplaceString(Template, "{TITLE}",       "MCServer");
-
-	AString NumChunks;
-	Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
-	ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
-
-	cHTTPResponse Resp;
-	Resp.SetContentType("text/html");
-	a_Connection.Send(Resp);
-	a_Connection.Send(Template.c_str(), Template.length());
-}
-
-
-
-
-
-void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
-{
-	UNUSED(a_Request);
-
-	cHTTPResponse Resp;
-	Resp.SetContentType("text/html");
-	a_Connection.Send(Resp);
-	a_Connection.Send(m_LoginTemplate);
+	// Send the un-decorated page content:
+	auto page = GetPage(TemplateRequest.Request);
+	cHTTPOutgoingResponse resp;
+	resp.SetContentType(page.ContentType);
+	a_Connection.Send(resp);
+	a_Connection.Send(page.Content.c_str(), page.Content.length());
 	a_Connection.FinishResponse();
 }
 
@@ -364,13 +367,28 @@ void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest &
 
 
 
-void cWebAdmin::HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::HandleRootRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
+{
+	UNUSED(a_Request);
+
+	cHTTPOutgoingResponse Resp;
+	Resp.SetContentType("text/html");
+	a_Connection.Send(Resp);
+	a_Connection.Send(m_LoginPage);
+	a_Connection.FinishResponse();
+}
+
+
+
+
+
+void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	AString FileURL = a_Request.GetURL();
 	std::replace(FileURL.begin(), FileURL.end(), '\\', '/');
 
 	// Remove all leading backslashes:
-	if (FileURL[0] == '/')
+	if (!FileURL.empty() && (FileURL[0] == '/'))
 	{
 		size_t FirstCharToRead = FileURL.find_first_not_of('/');
 		if (FirstCharToRead != AString::npos)
@@ -382,8 +400,9 @@ void cWebAdmin::HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest &
 	// Remove all "../" strings:
 	ReplaceString(FileURL, "../", "");
 
-	bool LoadedSuccessfull = false;
+	// Read the file contents and guess its mime-type, based on the extension:
 	AString Content = "<h2>404 Not Found</h2>";
+	AString ContentType;
 	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
 	if (cFile::IsFile(Path))
 	{
@@ -391,22 +410,21 @@ void cWebAdmin::HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest &
 		AString FileContent;
 		if (File.IsOpen() && (File.ReadRestOfFile(FileContent) != -1))
 		{
-			LoadedSuccessfull = true;
-			Content = FileContent;
+			std::swap(Content, FileContent);
+			size_t LastPointPosition = Path.find_last_of('.');
+			if (LastPointPosition != AString::npos)
+			{
+				ContentType = GetContentTypeFromFileExt(Path.substr(LastPointPosition + 1));
+			}
 		}
 	}
-
-	// Find content type (The currently method is very bad. We should change it later)
-	AString ContentType = "text/html";
-	size_t LastPointPosition = Path.find_last_of('.');
-	if (LoadedSuccessfull && (LastPointPosition != AString::npos) && (LastPointPosition < Path.length()))
+	if (ContentType.empty())
 	{
-		AString FileExtension = Path.substr(LastPointPosition + 1);
-		ContentType = GetContentTypeFromFileExt(FileExtension);
+		ContentType = "application/unknown";
 	}
 
 	// Send the response:
-	cHTTPResponse Resp;
+	cHTTPOutgoingResponse Resp;
 	Resp.SetContentType(ContentType);
 	a_Connection.Send(Resp);
 	a_Connection.Send(Content);
@@ -420,32 +438,36 @@ void cWebAdmin::HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest &
 AString cWebAdmin::GetContentTypeFromFileExt(const AString & a_FileExtension)
 {
 	static bool IsInitialized = false;
-	static std::map<AString, AString> ContentTypeMap;
+	static AStringMap ContentTypeMap;
 	if (!IsInitialized)
 	{
 		// Initialize the ContentTypeMap:
-		ContentTypeMap["png"]  = "image/png";
-		ContentTypeMap["fif"]  = "image/fif";
-		ContentTypeMap["gif"]  = "image/gif";
-		ContentTypeMap["jpeg"] = "image/jpeg";
-		ContentTypeMap["jpg"]  = "image/jpeg";
-		ContentTypeMap["jpe"]  = "image/jpeg";
-		ContentTypeMap["tiff"] = "image/tiff";
-		ContentTypeMap["ico"]  = "image/ico";
-		ContentTypeMap["csv"]  = "image/comma-separated-values";
-		ContentTypeMap["css"]  = "text/css";
-		ContentTypeMap["js"]   = "text/javascript";
-		ContentTypeMap["txt"]  = "text/plain";
-		ContentTypeMap["rtx"]  = "text/richtext";
-		ContentTypeMap["xml"]  = "text/xml";
+		ContentTypeMap["png"]   = "image/png";
+		ContentTypeMap["fif"]   = "image/fif";
+		ContentTypeMap["gif"]   = "image/gif";
+		ContentTypeMap["jpeg"]  = "image/jpeg";
+		ContentTypeMap["jpg"]   = "image/jpeg";
+		ContentTypeMap["jpe"]   = "image/jpeg";
+		ContentTypeMap["tiff"]  = "image/tiff";
+		ContentTypeMap["ico"]   = "image/ico";
+		ContentTypeMap["csv"]   = "text/csv";
+		ContentTypeMap["css"]   = "text/css";
+		ContentTypeMap["js"]    = "text/javascript";
+		ContentTypeMap["txt"]   = "text/plain";
+		ContentTypeMap["rtx"]   = "text/richtext";
+		ContentTypeMap["rtf"]   = "text/richtext";
+		ContentTypeMap["xml"]   = "text/xml";
+		ContentTypeMap["html"]  = "text/html";
+		ContentTypeMap["htm"]   = "text/html";
+		ContentTypeMap["xhtml"] = "application/xhtml+xml";  // Not recomended for IE6, but no-one uses that anymore
 	}
 
-	AString FileExtension = StrToLower(a_FileExtension);
-	if (ContentTypeMap.find(a_FileExtension) == ContentTypeMap.end())
+	auto itr = ContentTypeMap.find(StrToLower(a_FileExtension));
+	if (itr == ContentTypeMap.end())
 	{
-		return "text/html";
+		return AString();
 	}
-	return ContentTypeMap[FileExtension];
+	return itr->second;
 }
 
 
@@ -454,77 +476,49 @@ AString cWebAdmin::GetContentTypeFromFileExt(const AString & a_FileExtension)
 
 sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 {
-	sWebAdminPage Page;
-	AStringVector Split = StringSplit(a_Request.Path, "/");
+	sWebAdminPage page;
+	auto split = StringSplit(a_Request.Path, "/");
 
-	// Find the plugin that corresponds to the requested path
-	AString FoundPlugin;
-	if (Split.size() > 1)
+	// If no specific page was requested, return an empty object:
+	if (split.size() <= 2)
 	{
-		for (PluginList::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
+		return page;
+	}
+
+	// Find the WebTab handler responsible for the request:
+	cWebTabPtr tab;
+	{
+		cCSLock Lock(m_CS);
+		for (auto & wt: m_WebTabs)
 		{
-			if ((*itr)->GetWebTitle() == Split[1])
+			if (
+				(wt->m_PluginName == split[1]) &&
+				(wt->m_UrlPath == split[2])
+			)
 			{
-				Page.Content = (*itr)->HandleWebRequest(a_Request);
-				cWebPlugin * WebPlugin = *itr;
-				FoundPlugin = WebPlugin->GetWebTitle();
-				AString TabName = WebPlugin->GetTabNameForRequest(a_Request).first;
-				Page.PluginName = FoundPlugin;
-				Page.TabName = TabName;
+				tab = wt;
 				break;
 			}
-		}
+		}  // for wt - m_WebTabs[]
 	}
 
-	// Return the page contents
-	return Page;
-}
-
-
-
-
-
-AString cWebAdmin::GetDefaultPage(void)
-{
-	AString Content;
-	Content += "<h4>Server Name:</h4>";
-	Content += "<p>" + AString( cRoot::Get()->GetServer()->GetServerID()) + "</p>";
-
-	// Display a list of all plugins:
-	Content += "<h4>Plugins:</h4><ul>";
-	struct cPluginCallback:
-		public cPluginManager::cPluginCallback
+	// If a WebTab handler was found, call it:
+	if (tab != nullptr)
 	{
-		AString & m_Content;
-
-		cPluginCallback(AString & a_Content):
-			m_Content(a_Content)
+		page.ContentType = "text/html";  // Default to HTML content type, unless overridden by a plugin
+		if (!tab->m_Callback->Call(a_Request, split[1], page.Content, page.ContentType))
 		{
+			page.Content = GetHTMLEscapedString(Printf(
+				"WebTab callback for plugin %s, page %s has failed.",
+				tab->m_PluginName.c_str(), tab->m_Title.c_str()
+			));
 		}
-
-		virtual bool Item(cPlugin * a_Plugin) override
-		{
-			if (a_Plugin->IsLoaded())
-			{
-				AppendPrintf(m_Content, "<li>%s V.%i</li>", a_Plugin->GetName().c_str(), a_Plugin->GetVersion());
-			}
-			return false;
-		}
-	} Callback(Content);
-	cPluginManager::Get()->ForEachPlugin(Callback);
-	Content += "</ul>";
-
-	// Display a list of all players:
-	Content += "<h4>Players:</h4><ul>";
-	cPlayerAccum PlayerAccum;
-	cWorld * World = cRoot::Get()->GetDefaultWorld();  // TODO - Create a list of worlds and players
-	if (World != nullptr)
-	{
-		World->ForEachPlayer(PlayerAccum);
-		Content.append(PlayerAccum.m_Contents);
+		page.PluginName = tab->m_PluginName;
+		page.TabTitle = tab->m_Title;
+		page.TabUrlPath = split[1];
 	}
-	Content += "</ul><br>";
-	return Content;
+
+	return page;
 }
 
 
@@ -534,6 +528,41 @@ AString cWebAdmin::GetDefaultPage(void)
 AString cWebAdmin::GetBaseURL(const AString & a_URL)
 {
 	return GetBaseURL(StringSplit(a_URL, "/"));
+}
+
+
+
+
+
+void cWebAdmin::AddWebTab(
+	const AString & a_Title,
+	const AString & a_UrlPath,
+	const AString & a_PluginName,
+	SharedPtr<cWebAdmin::cWebTabCallback> a_Callback
+)
+{
+	cCSLock lock(m_CS);
+	m_WebTabs.emplace_back(std::make_shared<cWebTab>(a_Title, a_UrlPath, a_PluginName, a_Callback));
+}
+
+
+
+
+
+bool cWebAdmin::DelWebTab(const AString & a_UrlPath)
+{
+	cCSLock lock(m_CS);
+	for (auto itr = m_WebTabs.begin(), end = m_WebTabs.end(); itr != end; ++itr)
+	{
+		if ((*itr)->m_UrlPath == a_UrlPath)
+		{
+			m_WebTabs.erase(itr);
+			return true;
+		}
+	}  // for itr - m_WebTabs[]
+
+	// Not found:
+	return false;
 }
 
 
@@ -575,12 +604,12 @@ AString cWebAdmin::GetURLEncodedString(const AString & a_Input)
 {
 	// Translation table from nibble to hex:
 	static const char Hex[] = "0123456789abcdef";
-	
+
 	// Preallocate the output to match input:
 	AString dst;
 	size_t len = a_Input.length();
 	dst.reserve(len);
-	
+
 	// Loop over input and substitute whatever is needed:
 	for (size_t i = 0; i < len; i++)
 	{
@@ -621,7 +650,7 @@ AString cWebAdmin::GetBaseURL(const AStringVector & a_URLSplit)
 
 
 
-void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	UNUSED(a_Connection);
 	const AString & URL = a_Request.GetURL();
@@ -630,7 +659,7 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 		(strncmp(URL.c_str(), "/~webadmin", 10) == 0)
 	)
 	{
-		a_Request.SetUserData(new cWebadminRequestData(a_Request));
+		a_Request.SetUserData(std::make_shared<cWebadminRequestData>(a_Request));
 		return;
 	}
 	if (URL == "/")
@@ -645,22 +674,22 @@ void cWebAdmin::OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_
 
 
 
-void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size)
+void cWebAdmin::OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const char * a_Data, size_t a_Size)
 {
 	UNUSED(a_Connection);
-	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
+	auto Data = std::static_pointer_cast<cWebadminRequestData>(a_Request.GetUserData());
 	if (Data == nullptr)
 	{
 		return;
 	}
-	Data->OnBody(a_Data, a_Size);
+	Data->m_Form.Parse(a_Data, a_Size);
 }
 
 
 
 
 
-void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+void cWebAdmin::OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	const AString & URL = a_Request.GetURL();
 	if (
@@ -679,24 +708,9 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	{
 		HandleFileRequest(a_Connection, a_Request);
 	}
-
-	// Delete any request data assigned to the request:
-	cRequestData * Data = reinterpret_cast<cRequestData *>(a_Request.GetUserData());
-	delete Data;
-	Data = nullptr;
 }
 
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWebAdmin::cWebadminRequestData
-
-void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)
-{
-	m_Form.Parse(a_Data, a_Size);
-}
 
 
 

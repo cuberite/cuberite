@@ -22,13 +22,13 @@ class cBlockRailHandler :
 	public cBlockHandler
 {
 	typedef cBlockHandler super;
-	
+
 public:
 	cBlockRailHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -73,10 +73,11 @@ public:
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		if (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ) && (Meta != FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ)))
+		auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		auto NewMeta = FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		if (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ) && (Meta != NewMeta))
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
+			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08));
 		}
 	}
 
@@ -84,7 +85,7 @@ public:
 	{
 		super::ConvertToPickups(a_Pickups, 0);
 	}
-	
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
@@ -278,7 +279,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_XM_XP:
 			{
 				if (
@@ -290,7 +291,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_ASCEND_XP:
 			{
 				if (
@@ -302,7 +303,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_ASCEND_XM:
 			{
 				if (
@@ -314,7 +315,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_ASCEND_ZM:
 			{
 				if (
@@ -326,7 +327,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_ASCEND_ZP:
 			{
 				if (
@@ -338,7 +339,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_CURVED_ZP_XP:
 			{
 				if (
@@ -350,7 +351,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_CURVED_ZP_XM:
 			{
 				if (
@@ -362,7 +363,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_CURVED_ZM_XM:
 			{
 				if (
@@ -374,7 +375,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case E_META_RAIL_CURVED_ZM_XP:
 			{
 				if (
@@ -416,7 +417,7 @@ public:
 		{
 			Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		}
-		
+
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_NORTH:
@@ -433,7 +434,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case BLOCK_FACE_SOUTH:
 			{
 				if (
@@ -448,7 +449,7 @@ public:
 				}
 				break;
 			}
-			
+
 			case BLOCK_FACE_EAST:
 			{
 				if (

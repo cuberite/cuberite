@@ -9,42 +9,6 @@
 #include "FastNBT.h"
 #include "SchematicFileSerializer.h"
 #include "../StringCompression.h"
-#include "../SelfTests.h"
-
-
-
-
-
-#ifdef SELF_TEST
-
-static class cSchematicStringSelfTest
-{
-public:
-	cSchematicStringSelfTest(void)
-	{
-		cSelfTests::Get().Register(cSelfTests::SelfTestFunction(&Test), "Schematic-to-string serialization");
-	}
-
-	static void Test(void)
-	{
-		cBlockArea ba;
-		ba.Create(21, 256, 21);
-		ba.RelLine(0, 0, 0, 9, 8, 7, cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_WOODEN_STAIRS, 1);
-		AString Schematic;
-		if (!cSchematicFileSerializer::SaveToSchematicString(ba, Schematic))
-		{
-			assert_test(!"Schematic failed to save!");
-		}
-		cBlockArea ba2;
-		if (!cSchematicFileSerializer::LoadFromSchematicString(ba2, Schematic))
-		{
-			assert_test(!"Schematic failed to load!");
-		}
-	}
-} g_SelfTest;
-
-#endif
-
 
 
 
@@ -70,7 +34,7 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 		return false;
 	}
 	File.Close();
-	
+
 	// Parse the NBT:
 	cParsedNBT NBT(Contents.data(), Contents.size());
 	if (!NBT.IsValid())
@@ -78,7 +42,7 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 		LOG("Cannot parse the NBT in the schematic file \"%s\".", a_FileName.c_str());
 		return false;
 	}
-	
+
 	return LoadFromSchematicNBT(a_BlockArea, NBT);
 }
 
@@ -104,7 +68,7 @@ bool cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea,
 		LOG("%s: Cannot parse the NBT in the schematic data.", __FUNCTION__);
 		return false;
 	}
-	
+
 	return LoadFromSchematicNBT(a_BlockArea, NBT);
 }
 
@@ -121,7 +85,7 @@ bool cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockAre
 		LOG("%s: Cannot serialize the area into an NBT representation for file \"%s\".", __FUNCTION__, a_FileName.c_str());
 		return false;
 	}
-	
+
 	// Save to file
 	cGZipFile File;
 	if (!File.Open(a_FileName, cGZipFile::fmWrite))
@@ -151,7 +115,7 @@ bool cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockA
 		LOG("%s: Cannot serialize the area into an NBT representation.", __FUNCTION__);
 		return false;
 	}
-	
+
 	// Gzip the data:
 	int res = CompressStringGZIP(NBT.data(), NBT.size(), a_Out);
 	if (res != Z_OK)
@@ -196,7 +160,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		);
 		return false;
 	}
-	
+
 	int SizeX = a_NBT.GetShort(TSizeX);
 	int SizeY = a_NBT.GetShort(TSizeY);
 	int SizeZ = a_NBT.GetShort(TSizeZ);
@@ -205,7 +169,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		LOG("Dimensions are invalid in the schematic file: %d, %d, %d", SizeX, SizeY, SizeZ);
 		return false;
 	}
-	
+
 	int TBlockTypes = a_NBT.FindChildByName(a_NBT.GetRoot(), "Blocks");
 	int TBlockMetas = a_NBT.FindChildByName(a_NBT.GetRoot(), "Data");
 	if ((TBlockTypes < 0) || (a_NBT.GetType(TBlockTypes) != TAG_ByteArray))
@@ -214,14 +178,14 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		return false;
 	}
 	bool AreMetasPresent = (TBlockMetas > 0) && (a_NBT.GetType(TBlockMetas) == TAG_ByteArray);
-	
+
 	a_BlockArea.Clear();
 	a_BlockArea.SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (cBlockArea::baTypes | cBlockArea::baMetas) : cBlockArea::baTypes);
-	
+
 	int TOffsetX = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetX");
 	int TOffsetY = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetY");
 	int TOffsetZ = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetZ");
-	
+
 	if (
 		(TOffsetX < 0) || (TOffsetY < 0) || (TOffsetZ < 0) ||
 		(a_NBT.GetType(TOffsetX) != TAG_Int) ||
@@ -247,7 +211,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		NumTypeBytes = a_NBT.GetDataLength(TBlockTypes);
 	}
 	memcpy(a_BlockArea.m_BlockTypes, a_NBT.GetData(TBlockTypes), NumTypeBytes);
-	
+
 	if (AreMetasPresent)
 	{
 		size_t NumMetaBytes = a_BlockArea.GetBlockCount();
@@ -260,7 +224,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		}
 		memcpy(a_BlockArea.m_BlockMetas, a_NBT.GetData(TBlockMetas), NumMetaBytes);
 	}
-	
+
 	return true;
 }
 
@@ -271,13 +235,13 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
 {
 	cFastNBTWriter Writer("Schematic");
-	Writer.AddShort("Width",  a_BlockArea.m_Size.x);
-	Writer.AddShort("Height", a_BlockArea.m_Size.y);
-	Writer.AddShort("Length", a_BlockArea.m_Size.z);
+	Writer.AddShort("Width",  static_cast<Int16>(a_BlockArea.m_Size.x));
+	Writer.AddShort("Height", static_cast<Int16>(a_BlockArea.m_Size.y));
+	Writer.AddShort("Length", static_cast<Int16>(a_BlockArea.m_Size.z));
 	Writer.AddString("Materials", "Alpha");
 	if (a_BlockArea.HasBlockTypes())
 	{
-		Writer.AddByteArray("Blocks", (const char *)a_BlockArea.m_BlockTypes, a_BlockArea.GetBlockCount());
+		Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(a_BlockArea.m_BlockTypes), a_BlockArea.GetBlockCount());
 	}
 	else
 	{
@@ -286,14 +250,14 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 	}
 	if (a_BlockArea.HasBlockMetas())
 	{
-		Writer.AddByteArray("Data", (const char *)a_BlockArea.m_BlockMetas, a_BlockArea.GetBlockCount());
+		Writer.AddByteArray("Data", reinterpret_cast<const char *>(a_BlockArea.m_BlockMetas), a_BlockArea.GetBlockCount());
 	}
 	else
 	{
 		AString Dummy(a_BlockArea.GetBlockCount(), 0);
 		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
 	}
-	
+
 	Writer.AddInt("WEOffsetX", a_BlockArea.m_WEOffset.x);
 	Writer.AddInt("WEOffsetY", a_BlockArea.m_WEOffset.y);
 	Writer.AddInt("WEOffsetZ", a_BlockArea.m_WEOffset.z);
@@ -304,7 +268,7 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 	Writer.BeginList("TileEntities", TAG_Compound);
 	Writer.EndList();
 	Writer.Finish();
-	
+
 	return Writer.GetResult();
 }
 

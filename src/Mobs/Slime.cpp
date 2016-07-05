@@ -46,13 +46,15 @@ void cSlime::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSlime::Attack(std::chrono::milliseconds a_Dt)
+bool cSlime::Attack(std::chrono::milliseconds a_Dt)
 {
 	if (m_Size > 1)
 	{
 		// Only slimes larger than size 1 attack a player.
-		super::Attack(a_Dt);
+		return super::Attack(a_Dt);
 	}
+
+	return false;
 }
 
 

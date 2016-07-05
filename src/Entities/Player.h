@@ -42,15 +42,19 @@ public:
 
 	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
 
+	virtual bool Initialize(cWorld & a_World) override;
+
 	virtual ~cPlayer();
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
+	void TickFreezeCode();
+
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
-	/** Returns the curently equipped weapon; empty item if none */
+	/** Returns the currently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 
 	/** Returns the currently equipped helmet; empty item if none */
@@ -83,7 +87,7 @@ public:
 	/** Gets the experience total - XpTotal for score on death */
 	inline int GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
 
-	/** Gets the currrent experience */
+	/** Gets the current experience */
 	inline int GetCurrentXp(void) { return m_CurrentXp; }
 
 	/** Gets the current level - XpLevel */
@@ -92,7 +96,7 @@ public:
 	/** Gets the experience bar percentage - XpP */
 	float GetXpPercentage(void);
 
-	/** Caculates the amount of XP needed for a given level
+	/** Calculates the amount of XP needed for a given level
 	Ref: http://minecraft.gamepedia.com/XP
 	*/
 	static int XpForLevel(int a_Level);
@@ -117,8 +121,8 @@ public:
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
-	void SetTouchGround( bool a_bTouchGround);
-	inline void SetStance( const double a_Stance) { m_Stance = a_Stance; }
+	void SetTouchGround(bool a_bTouchGround);
+	inline void SetStance(const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
 	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
@@ -137,6 +141,15 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
 	// tolua_begin
+
+	/** Prevent the player from moving and lock him into a_Location. */
+	void Freeze(const Vector3d & a_Location);
+
+	/** Is the player frozen? */
+	bool IsFrozen();
+
+	/** Cancels Freeze(...) and allows the player to move naturally. */
+	void Unfreeze();
 
 	/** Sends the "look" packet to the player, forcing them to set their rotation to the specified values.
 	a_YawDegrees is clipped to range [-180, +180),
@@ -208,16 +221,13 @@ public:
 	@deprecated Use SetSpeed instead. */
 	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
 
-	/** Tries to move to a new position, with attachment-related checks (y == -999) */
-	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
-
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
 
-	/** Opens the specified window; closes the current one first using CloseWindow() */
-	void OpenWindow(cWindow * a_Window);  // Exported in ManualBindings.cpp
-
 	// tolua_begin
+
+	/** Opens the specified window; closes the current one first using CloseWindow() */
+	void OpenWindow(cWindow * a_Window);
 
 	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true */
 	void CloseWindow(bool a_CanRefuse = true);
@@ -243,7 +253,7 @@ public:
 	void SendMessageFatal         (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
 	void SendMessagePrivateMsg    (const AString & a_Message, const AString & a_Sender) { m_ClientHandle->SendChat(a_Message, mtPrivateMessage, a_Sender); }
 	void SendMessage              (const cCompositeChat & a_Message) { m_ClientHandle->SendChat(a_Message); }
-	
+
 	void SendSystemMessage        (const AString & a_Message) { m_ClientHandle->SendChatSystem(a_Message, mtCustom); }
 	void SendAboveActionBarMessage(const AString & a_Message) { m_ClientHandle->SendChatAboveActionBar(a_Message, mtCustom); }
 	void SendSystemMessage        (const cCompositeChat & a_Message) { m_ClientHandle->SendChatSystem(a_Message); }
@@ -319,9 +329,9 @@ public:
 	/** returns true if the player has thrown out a floater. */
 	bool IsFishing(void) const { return m_IsFishing; }
 
-	void SetIsFishing(bool a_IsFishing, int a_FloaterID = -1) { m_IsFishing = a_IsFishing; m_FloaterID = a_FloaterID; }
+	void SetIsFishing(bool a_IsFishing, UInt32 a_FloaterID = cEntity::INVALID_ID) { m_IsFishing = a_IsFishing; m_FloaterID = a_FloaterID; }
 
-	int GetFloaterID(void) const { return m_FloaterID; }
+	UInt32 GetFloaterID(void) const { return m_FloaterID; }
 
 	// tolua_end
 
@@ -448,13 +458,17 @@ public:
 	*/
 	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
 
-	/** Sets the player's bed (home) position */
-	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
+	/** Sets the player's bed (home / respawn) position to the specified position.
+	Sets the respawn world to the player's world. */
+	void SetBedPos(const Vector3i & a_Pos);
+
+	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
+	void SetBedPos(const Vector3i & a_Pos, cWorld * a_World);
 
 	// tolua_end
 
 	/** Update movement-related statistics. */
-	void UpdateMovementStats(const Vector3d & a_DeltaPos);
+	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 
 	// tolua_begin
 
@@ -489,6 +503,12 @@ public:
 	Returns true if all the blocks are placed.
 	Assumes that all the blocks are in currently loaded chunks. */
 	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
+
+	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
+	@param a_Opponent the opponent we're fighting.
+	@param a_IsPlayerInvolved Should be true if the player took or did damage, and false if one of the player's wolves took or did damage.
+	*/
+	void NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const override { return m_IsCrouched; }
@@ -553,9 +573,6 @@ protected:
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
 
-	float m_LastJumpHeight;
-	float m_LastGroundHeight;
-	bool m_bTouchGround;
 	double m_Stance;
 
 	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
@@ -570,6 +587,9 @@ protected:
 	/** The player's last saved bed position */
 	Vector3i m_LastBedPos;
 
+	/** The world which the player respawns in upon death */
+	cWorld * m_SpawnWorld;
+
 	eGameMode m_GameMode;
 	AString m_IP;
 
@@ -581,6 +601,12 @@ protected:
 	cClientHandlePtr m_ClientHandle;
 
 	cSlotNums m_InventoryPaintSlots;
+
+	/** If true, we are locking m_Position to m_FrozenPosition. */
+	bool m_IsFrozen;
+
+	/** Was the player frozen manually by a plugin or automatically by the server? */
+	bool m_IsManuallyFrozen;
 
 	/** Max speed, relative to the game default.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
@@ -619,7 +645,7 @@ protected:
 	bool m_IsChargingBow;
 	int  m_BowCharge;
 
-	int m_FloaterID;
+	UInt32 m_FloaterID;
 
 	cTeam * m_Team;
 
@@ -667,10 +693,13 @@ protected:
 	/** Tosses a list of items. */
 	void TossItems(const cItems & a_Items);
 
-	/** Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block) */
-	void ApplyFoodExhaustionFromMovement();
-
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
+
+private:
+
+	/** Pins the player to a_Location until Unfreeze() is called.
+	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
+	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
 } ;  // tolua_export

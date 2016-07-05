@@ -30,7 +30,7 @@ all: NoiseTest
 # CXX_OPTIONS ... options for the C++ code compiler
 # LNK_OPTIONS ... options for the linker
 # LNK_LIBS    ... libraries to link in
-#   -- according to http://stackoverflow.com/questions/6183899/undefined-reference-to-dlopen, libs must come after all sources
+#   -- according to https://stackoverflow.com/questions/6183899/undefined-reference-to-dlopen, libs must come after all sources
 # BUILDDIR    ... folder where the intermediate object files are built
 
 LNK_LIBS = -lstdc++ -ldl
@@ -120,7 +120,7 @@ SHAREDOBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(SHAREDOBJECTS))
 NoiseTest : $(OBJECTS) $(SHAREDOBJECTS)
 	$(CC) $(LNK_OPTIONS) $(OBJECTS) $(SHAREDOBJECTS) $(LNK_LIBS) -o NoiseTest
 
-clean : 
+clean :
 		rm -rf $(BUILDDIR) NoiseTest
 
 
@@ -128,7 +128,7 @@ clean :
 
 
 ###################################################
-# Build the parts of MCServer
+# Build the parts of Cuberite
 #
 # options used:
 #  -x c  ... compile as C code
@@ -136,7 +136,7 @@ clean :
 #  -MM   ... generate a list of includes
 
 $(BUILDDIR)%.o: %.c
-	@mkdir -p $(dir $@) 
+	@mkdir -p $(dir $@)
 	$(CC) $(CC_OPTIONS) -x c -c $(INCLUDE) $< -o $@
 	@$(CC) $(CC_OPTIONS) -x c -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %.o,%.d,$@).tmp

@@ -78,7 +78,7 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 			}
 			m_IsValid = true;
 		}
-		
+
 		~cPubKey()
 		{
 			if (m_IsValid)
@@ -86,21 +86,21 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 				pk_free(&m_Key);
 			}
 		}
-		
+
 		operator pk_context * (void) { return &m_Key; }
-		
+
 	protected:
 		bool m_IsValid;
 		pk_context m_Key;
 	} PkCtx(&m_Rsa);
-	
+
 	unsigned char buf[3000];
 	int res = pk_write_pubkey_der(PkCtx, buf, sizeof(buf));
 	if (res < 0)
 	{
 		return AString();
 	}
-	return AString((const char *)(buf + sizeof(buf) - res), (size_t)res);
+	return AString(reinterpret_cast<const char *>(buf + sizeof(buf) - res), static_cast<size_t>(res));
 }
 
 
@@ -134,7 +134,7 @@ int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 	{
 		return -1;
 	}
-	return (int)DecryptedLength;
+	return static_cast<int>(DecryptedLength);
 }
 
 
@@ -167,7 +167,7 @@ int cRsaPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 	{
 		return -1;
 	}
-	return (int)m_Rsa.len;
+	return static_cast<int>(m_Rsa.len);
 }
 
 

@@ -24,10 +24,10 @@ class cVanillaFluidSimulator :
 	public cFloodyFluidSimulator
 {
 	typedef cFloodyFluidSimulator super;
-	
+
 public:
 	cVanillaFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_Falloff, int a_TickDelay, int a_NumNeighborsForSource);
-	
+
 protected:
 	// cFloodyFluidSimulator overrides:
 	virtual void SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta) override;

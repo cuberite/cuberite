@@ -42,8 +42,31 @@ const int MAX_PER_QUERY = 100;
 static const AString & GetCACerts(void)
 {
 	static const AString Cert(
-		// Equifax root CA cert
+		// GeoTrust root CA cert
 		// Currently used for signing *.mojang.com's cert
+		// Exported from Mozilla Firefox's built-in CA repository
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIDVDCCAjygAwIBAgIDAjRWMA0GCSqGSIb3DQEBBQUAMEIxCzAJBgNVBAYTAlVT\n"
+		"MRYwFAYDVQQKEw1HZW9UcnVzdCBJbmMuMRswGQYDVQQDExJHZW9UcnVzdCBHbG9i\n"
+		"YWwgQ0EwHhcNMDIwNTIxMDQwMDAwWhcNMjIwNTIxMDQwMDAwWjBCMQswCQYDVQQG\n"
+		"EwJVUzEWMBQGA1UEChMNR2VvVHJ1c3QgSW5jLjEbMBkGA1UEAxMSR2VvVHJ1c3Qg\n"
+		"R2xvYmFsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2swYYzD9\n"
+		"9BcjGlZ+W988bDjkcbd4kdS8odhM+KhDtgPpTSEHCIjaWC9mOSm9BXiLnTjoBbdq\n"
+		"fnGk5sRgprDvgOSJKA+eJdbtg/OtppHHmMlCGDUUna2YRpIuT8rxh0PBFpVXLVDv\n"
+		"iS2Aelet8u5fa9IAjbkU+BQVNdnARqN7csiRv8lVK83Qlz6cJmTM386DGXHKTubU\n"
+		"1XupGc1V3sjs0l44U+VcT4wt/lAjNvxm5suOpDkZALeVAjmRCw7+OC7RHQWa9k0+\n"
+		"bw8HHa8sHo9gOeL6NlMTOdReJivbPagUvTLrGAMoUgRx5aszPeE4uwc2hGKceeoW\n"
+		"MPRfwCvocWvk+QIDAQABo1MwUTAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTA\n"
+		"ephojYn7qwVkDBF9qn1luMrMTjAfBgNVHSMEGDAWgBTAephojYn7qwVkDBF9qn1l\n"
+		"uMrMTjANBgkqhkiG9w0BAQUFAAOCAQEANeMpauUvXVSOKVCUn5kaFOSPeCpilKIn\n"
+		"Z57QzxpeR+nBsqTP3UEaBU6bS+5Kb1VSsyShNwrrZHYqLizz/Tt1kL/6cdjHPTfS\n"
+		"tQWVYrmm3ok9Nns4d0iXrKYgjy6myQzCsplFAMfOEVEiIuCl6rYVSAlk6l5PdPcF\n"
+		"PseKUgzbFbS9bZvlxrFUaKnjaZC2mqUPuLk/IH2uSrW4nOQdtqvmlKXBx4Ot2/Un\n"
+		"hw4EbNX/3aBd7YdStysVAq45pmp06drE57xNNB6pXE0zX5IJL4hmXXeXxx12E6nV\n"
+		"5fEWCRE11azbJHFwLJhWC9kXtNHjUStedejV0NxPNO3CBWaAocvmMw==\n"
+		"-----END CERTIFICATE-----\n\n"
+
+		// Equifax root CA cert
 		// Exported from Mozilla Firefox's built-in CA repository
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIIDIDCCAomgAwIBAgIENd70zzANBgkqhkiG9w0BAQUFADBOMQswCQYDVQQGEwJV\n"
@@ -67,7 +90,7 @@ static const AString & GetCACerts(void)
 
 		// Starfield G2 cert
 		// This is the data of the root certs for Starfield Technologies, the CA that used to sign sessionserver.mojang.com's cert
-		// Downloaded from http://certs.starfieldtech.com/repository/
+		// Downloaded from https://certs.starfieldtech.com/repository/
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIID3TCCAsWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBjzELMAkGA1UEBhMCVVMx\n"
 		"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT\n"
@@ -118,7 +141,7 @@ static const AString & GetCACerts(void)
 		"WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=\n"
 		"-----END CERTIFICATE-----\n"
 	);
-	
+
 	return Cert;
 }
 
@@ -152,7 +175,7 @@ cMojangAPI::sProfile::sProfile(
 		}
 	]
 	*/
-	
+
 	// Parse the Textures and TexturesSignature from the Profile:
 	if (!a_Properties.isArray())
 	{
@@ -272,7 +295,7 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 {
 	// Convert the playername to lowercase:
 	AString lcPlayerName = StrToLower(a_PlayerName);
-	
+
 	// Request the cache to query the name if not yet cached:
 	if (!a_UseOnlyCached)
 	{
@@ -280,7 +303,7 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 		PlayerNames.push_back(lcPlayerName);
 		CacheNamesToUUIDs(PlayerNames);
 	}
-	
+
 	// Retrieve from cache:
 	cCSLock Lock(m_CSNameToUUID);
 	cProfileMap::const_iterator itr = m_NameToUUID.find(lcPlayerName);
@@ -300,7 +323,7 @@ AString cMojangAPI::GetPlayerNameFromUUID(const AString & a_UUID, bool a_UseOnly
 {
 	// Normalize the UUID to lowercase short format that is used as the map key:
 	AString UUID = MakeUUIDShort(a_UUID);
-	
+
 	// Retrieve from caches:
 	{
 		cCSLock Lock(m_CSUUIDToProfile);
@@ -325,7 +348,7 @@ AString cMojangAPI::GetPlayerNameFromUUID(const AString & a_UUID, bool a_UseOnly
 		CacheUUIDToProfile(UUID);
 		return GetPlayerNameFromUUID(a_UUID, true);
 	}
-	
+
 	// No value found, none queried. Return an error:
 	return "";
 }
@@ -342,13 +365,13 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 	{
 		PlayerNames.push_back(StrToLower(*itr));
 	}  // for itr - a_PlayerNames[]
-	
+
 	// Request the cache to populate any names not yet contained:
 	if (!a_UseOnlyCached)
 	{
 		CacheNamesToUUIDs(PlayerNames);
 	}
-	
+
 	// Retrieve from cache:
 	size_t idx = 0;
 	AStringVector res;
@@ -367,7 +390,7 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 
 
 
-	
+
 
 void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID)
 {
@@ -429,12 +452,11 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 	}
 
 	// Read the HTTP response:
-	int ret;
 	unsigned char buf[1024];
 
 	for (;;)
 	{
-		ret = Socket.Receive(buf, sizeof(buf));
+		int ret = Socket.Receive(buf, sizeof(buf));
 
 		if ((ret == POLARSSL_ERR_NET_WANT_READ) || (ret == POLARSSL_ERR_NET_WANT_WRITE))
 		{
@@ -456,7 +478,7 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 			break;
 		}
 
-		a_Response.append((const char *)buf, (size_t)ret);
+		a_Response.append(reinterpret_cast<const char *>(buf), static_cast<size_t>(ret));
 	}
 
 	return true;
@@ -476,7 +498,7 @@ AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 			// Already is a short UUID, only lowercase
 			return StrToLower(a_UUID);
 		}
-		
+
 		case 36:
 		{
 			// Remove the dashes from the string by appending together the parts between them:
@@ -508,7 +530,7 @@ AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 			// Already is a dashed UUID, only lowercase
 			return StrToLower(a_UUID);
 		}
-		
+
 		case 32:
 		{
 			// Insert dashes at the proper positions:
@@ -542,7 +564,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile    (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
-		
+
 		// Retrieve all entries:
 		{
 			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, DateTime FROM PlayerNameToUUID");
@@ -588,11 +610,11 @@ void cMojangAPI::SaveCachesToDisk(void)
 		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
-		
+
 		// Remove all entries:
 		db.exec("DELETE FROM PlayerNameToUUID");
 		db.exec("DELETE FROM UUIDToProfile");
-		
+
 		// Save all cache entries - m_PlayerNameToUUID:
 		Int64 LimitDateTime = time(nullptr) - MAX_AGE;
 		{
@@ -659,7 +681,7 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 			}
 		}  // for itr - a_PlayerNames[]
 	}  // Lock(m_CSNameToUUID)
-	
+
 	QueryNamesToUUIDs(NamesToQuery);
 }
 
@@ -688,7 +710,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		AString Request;
 		Request += "POST " + m_NameToUUIDAddress + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
 		Request += "Host: " + m_NameToUUIDServer + "\r\n";
-		Request += "User-Agent: MCServer\r\n";
+		Request += "User-Agent: Cuberite\r\n";
 		Request += "Connection: close\r\n";
 		Request += "Content-Type: application/json\r\n";
 		Request += Printf("Content-Length: %u\r\n", static_cast<unsigned>(RequestBody.length()));
@@ -721,16 +743,16 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 			continue;
 		}
 		Response.erase(0, idxHeadersEnd + 4);
-		
+
 		// Parse the returned string into Json:
 		Json::Reader reader;
 		if (!reader.parse(Response, root, false) || !root.isArray())
 		{
-			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON!", __FUNCTION__);
+			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, reader.getFormattedErrorMessages().c_str());
 			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 			continue;
 		}
-	
+
 		// Store the returned results into cache:
 		Json::Value::UInt JsonCount = root.size();
 		Int64 Now = time(nullptr);
@@ -749,7 +771,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 				NotifyNameUUID(JsonName, JsonUUID);
 			}  // for idx - root[]
 		}  // cCSLock (m_CSNameToUUID)
-		
+
 		// Also cache the UUIDToName:
 		{
 			cCSLock Lock(m_CSUUIDToName);
@@ -775,7 +797,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
 {
 	ASSERT(a_UUID.size() == 32);
-	
+
 	// Check if already present:
 	{
 		cCSLock Lock(m_CSUUIDToProfile);
@@ -784,7 +806,7 @@ void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
 			return;
 		}
 	}
-	
+
 	QueryUUIDToProfile(a_UUID);
 }
 
@@ -797,12 +819,12 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 	// Create the request address:
 	AString Address = m_UUIDToProfileAddress;
 	ReplaceString(Address, "%UUID%", a_UUID);
-	
+
 	// Create the HTTP request:
 	AString Request;
 	Request += "GET " + Address + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
 	Request += "Host: " + m_UUIDToProfileServer + "\r\n";
-	Request += "User-Agent: MCServer\r\n";
+	Request += "User-Agent: Cuberite\r\n";
 	Request += "Connection: close\r\n";
 	Request += "Content-Length: 0\r\n";
 	Request += "\r\n";
@@ -833,13 +855,13 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 		return;
 	}
 	Response.erase(0, idxHeadersEnd + 4);
-	
+
 	// Parse the returned string into Json:
 	Json::Reader reader;
 	Json::Value root;
 	if (!reader.parse(Response, root, false) || !root.isObject())
 	{
-		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON!", __FUNCTION__);
+		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, reader.getFormattedErrorMessages().c_str());
 		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return;
 	}
@@ -919,7 +941,7 @@ void cMojangAPI::Update(void)
 	}
 	if (!PlayerNames.empty())
 	{
-		LOG("cMojangAPI: Updating name-to-uuid cache for %u names", (unsigned)PlayerNames.size());
+		LOG("cMojangAPI: Updating name-to-uuid cache for %u names", static_cast<unsigned>(PlayerNames.size()));
 		QueryNamesToUUIDs(PlayerNames);
 	}
 
@@ -937,14 +959,10 @@ void cMojangAPI::Update(void)
 	}
 	if (!ProfileUUIDs.empty())
 	{
-		LOG("cMojangAPI: Updating uuid-to-profile cache for %u uuids", (unsigned)ProfileUUIDs.size());
+		LOG("cMojangAPI: Updating uuid-to-profile cache for %u uuids", static_cast<unsigned>(ProfileUUIDs.size()));
 		for (AStringVector::const_iterator itr = ProfileUUIDs.begin(), end = ProfileUUIDs.end(); itr != end; ++itr)
 		{
 			QueryUUIDToProfile(*itr);
 		}
 	}
 }
-
-
-
-

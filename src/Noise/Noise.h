@@ -49,6 +49,7 @@ public:
 	NOISE_DATATYPE CubicNoise3D (NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const;
 
 	void SetSeed(int a_Seed) { m_Seed = a_Seed; }
+	int GetSeed(void) const { return m_Seed; }
 
 	inline static NOISE_DATATYPE CubicInterpolate (NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct);
 	inline static NOISE_DATATYPE CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
@@ -67,12 +68,12 @@ class cCubicNoise
 public:
 	/** Maximum size of each dimension of the query arrays. */
 	static const int MAX_SIZE = 512;
-	
-	
+
+
 	/** Creates a new instance with the specified seed. */
 	cCubicNoise(int a_Seed);
-	
-	
+
+
 	/** Fills a 2D array with the values of the noise. */
 	void Generate2D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
@@ -80,8 +81,8 @@ public:
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
 	) const;
-	
-	
+
+
 	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
@@ -90,9 +91,9 @@ public:
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
 		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Z direction
 	) const;
-	
+
 protected:
-	
+
 	/** Noise used for integral random values. */
 	cNoise m_Noise;
 
@@ -114,8 +115,8 @@ protected:
 
 
 
-/** Improved noise, as described by Ken Perlin: http://mrl.nyu.edu/~perlin/paper445.pdf
-Implementation adapted from Perlin's Java implementation: http://mrl.nyu.edu/~perlin/noise/ */
+/** Improved noise, as described by Ken Perlin: https://mrl.nyu.edu/~perlin/paper445.pdf
+Implementation adapted from Perlin's Java implementation: https://mrl.nyu.edu/~perlin/noise/ */
 class cImprovedNoise
 {
 public:
@@ -131,8 +132,8 @@ public:
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
 	) const;
-	
-	
+
+
 	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
@@ -323,12 +324,3 @@ inline NOISE_DATATYPE ClampedLerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, 
 	}
 	return Lerp(a_Val1, a_Val2, a_Ratio);
 }
-
-
-
-
-
-
-
-
-

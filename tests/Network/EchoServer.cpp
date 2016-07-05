@@ -75,7 +75,7 @@ class cEchoLinkCallbacks:
 class cEchoServerCallbacks:
 	public cNetwork::cListenCallbacks
 {
-	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort)
+	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) override
 	{
 		LOGD("New incoming connection(%s:%d).", a_RemoteIPAddress.c_str(), a_RemotePort);
 		return std::make_shared<cEchoLinkCallbacks>();

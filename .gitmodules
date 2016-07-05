@@ -1,23 +1,23 @@
 [submodule "MCServer/Plugins/Core"]
-	path = MCServer/Plugins/Core
+	path = Server/Plugins/Core
 	url = https://github.com/mc-server/Core.git
 [submodule "MCServer/Plugins/ProtectionAreas"]
-	path = MCServer/Plugins/ProtectionAreas
+	path = Server/Plugins/ProtectionAreas
 	url = https://github.com/mc-server/ProtectionAreas.git
 [submodule "MCServer/Plugins/TransAPI"]
-	path = MCServer/Plugins/TransAPI
+	path = Server/Plugins/TransAPI
 	url = https://github.com/bearbin/transapi.git
 [submodule "MCServer/Plugins/ChunkWorx"]
-	path = MCServer/Plugins/ChunkWorx
+	path = Server/Plugins/ChunkWorx
 	url = https://github.com/mc-server/ChunkWorx.git
 [submodule "MCServer/Plugins/ChatLog"]
-	path = MCServer/Plugins/ChatLog
+	path = Server/Plugins/ChatLog
 	url = https://github.com/mc-server/ChatLog.git
 [submodule "MCServer/Plugins/Handy"]
-	path = MCServer/Plugins/Handy
+	path = Server/Plugins/Handy
 	url = https://github.com/mc-server/Handy.git
 [submodule "MCServer/Plugins/MagicCarpet"]
-	path = MCServer/Plugins/MagicCarpet
+	path = Server/Plugins/MagicCarpet
 	url = https://github.com/mc-server/MagicCarpet.git
 [submodule "lib/polarssl"]
 	path = lib/polarssl
@@ -39,4 +39,35 @@
 	path = lib/TCLAP
 	url = https://github.com/mc-server/TCLAP.git
 	ignore = dirty
-
+[submodule "lib/cmake-coverage"]
+	path = lib/cmake-coverage
+	url = https://github.com/cuberite/cmake-coverage.git
+	ignore = dirty
+[submodule "lib/expat"]
+	path = lib/expat
+	url = https://github.com/cuberite/expat.git
+	ignore = dirty
+[submodule "lib/lua"]
+	path = lib/lua
+	url = https://github.com/cuberite/lua.git
+	ignore = dirty
+[submodule "lib/luaexpat"]
+	path = lib/luaexpat
+	url = https://github.com/cuberite/luaexpat.git
+	ignore = dirty
+[submodule "lib/luaproxy"]
+	path = lib/luaproxy
+	url = https://github.com/cuberite/luaproxy.git
+	ignore = dirty
+[submodule "lib/sqlite"]
+	path = lib/sqlite
+	url = https://github.com/cuberite/sqlite.git
+	ignore = dirty
+[submodule "lib/tolua++"]
+	path = lib/tolua++
+	url = https://github.com/cuberite/toluapp.git
+	ignore = dirty
+[submodule "lib/zlib"]
+	path = lib/zlib
+	url = https://github.com/cuberite/zlib.git
+	ignore = dirty

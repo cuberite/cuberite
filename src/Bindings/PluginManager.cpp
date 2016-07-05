@@ -269,6 +269,44 @@ bool cPluginManager::CallHookBlockToPickups(
 
 
 
+bool cPluginManager::CallHookBrewingCompleted(cWorld & a_World, cBrewingstandEntity & a_Brewingstand)
+{
+	FIND_HOOK(HOOK_BREWING_COMPLETED);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBrewingCompleted(a_World, a_Brewingstand))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookBrewingCompleting(cWorld & a_World, cBrewingstandEntity & a_Brewingstand)
+{
+	FIND_HOOK(HOOK_BREWING_COMPLETING);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBrewingCompleting(a_World, a_Brewingstand))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 {
 	// Check if the message contains a command, execute it:
@@ -279,21 +317,21 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 			// The command has executed successfully
 			return true;
 		}
-		
+
 		case crBlocked:
 		{
 			// The command was blocked by a plugin using HOOK_EXECUTE_COMMAND
 			// The plugin has most likely sent a message to the player already
 			return true;
 		}
-		
+
 		case crError:
 		{
 			// An error in the plugin has prevented the command from executing. Report the error to the player:
 			a_Player.SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
 			return true;
 		}
-		
+
 		case crNoPermission:
 		{
 			// The player is not allowed to execute this command
@@ -713,7 +751,7 @@ bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer, Tak
 
 
 
-bool cPluginManager::CallHookLogin(cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username)
+bool cPluginManager::CallHookLogin(cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username)
 {
 	FIND_HOOK(HOOK_LOGIN);
 	VERIFY_HOOK;
@@ -1531,9 +1569,9 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 		return crNoPermission;
 	}
 
-	ASSERT(cmd->second.m_Plugin != nullptr);
+	ASSERT(cmd->second.m_Handler != nullptr);
 
-	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player, a_Command))
+	if (!cmd->second.m_Handler->ExecuteCommand(Split, &a_Player, a_Command, nullptr))
 	{
 		return crError;
 	}
@@ -1616,11 +1654,6 @@ void cPluginManager::RemoveHooks(cPlugin * a_Plugin)
 
 void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
 {
-	if (a_Plugin != nullptr)
-	{
-		a_Plugin->ClearCommands();
-	}
-
 	for (CommandMap::iterator itr = m_Commands.begin(); itr != m_Commands.end();)
 	{
 		if (itr->second.m_Plugin == a_Plugin)
@@ -1656,7 +1689,13 @@ bool cPluginManager::IsPluginLoaded(const AString & a_PluginName)
 
 
 
-bool cPluginManager::BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString)
+bool cPluginManager::BindCommand(
+	const AString & a_Command,
+	cPlugin * a_Plugin,
+	cCommandHandlerPtr a_Handler,
+	const AString & a_Permission,
+	const AString & a_HelpString
+)
 {
 	CommandMap::iterator cmd = m_Commands.find(a_Command);
 	if (cmd != m_Commands.end())
@@ -1665,9 +1704,11 @@ bool cPluginManager::BindCommand(const AString & a_Command, cPlugin * a_Plugin, 
 		return false;
 	}
 
-	m_Commands[a_Command].m_Plugin     = a_Plugin;
-	m_Commands[a_Command].m_Permission = a_Permission;
-	m_Commands[a_Command].m_HelpString = a_HelpString;
+	auto & reg = m_Commands[a_Command];
+	reg.m_Plugin     = a_Plugin;
+	reg.m_Handler    = a_Handler;
+	reg.m_Permission = a_Permission;
+	reg.m_HelpString = a_HelpString;
 	return true;
 }
 
@@ -1730,11 +1771,6 @@ cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer & a_Pl
 
 void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
 {
-	if (a_Plugin != nullptr)
-	{
-		a_Plugin->ClearConsoleCommands();
-	}
-
 	for (CommandMap::iterator itr = m_ConsoleCommands.begin(); itr != m_ConsoleCommands.end();)
 	{
 		if (itr->second.m_Plugin == a_Plugin)
@@ -1754,14 +1790,19 @@ void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
 
 
 
-bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString)
+bool cPluginManager::BindConsoleCommand(
+	const AString & a_Command,
+	cPlugin * a_Plugin,
+	cCommandHandlerPtr a_Handler,
+	const AString & a_HelpString
+)
 {
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Command);
 	if (cmd != m_ConsoleCommands.end())
 	{
 		if (cmd->second.m_Plugin == nullptr)
 		{
-			LOGWARNING("Console command \"%s\" is already bound internally by MCServer, cannot bind in plugin \"%s\".", a_Command.c_str(), a_Plugin->GetName().c_str());
+			LOGWARNING("Console command \"%s\" is already bound internally by Cuberite, cannot bind in plugin \"%s\".", a_Command.c_str(), a_Plugin->GetName().c_str());
 		}
 		else
 		{
@@ -1770,9 +1811,11 @@ bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_P
 		return false;
 	}
 
-	m_ConsoleCommands[a_Command].m_Plugin     = a_Plugin;
-	m_ConsoleCommands[a_Command].m_Permission = "";
-	m_ConsoleCommands[a_Command].m_HelpString = a_HelpString;
+	auto & reg = m_ConsoleCommands[a_Command];
+	reg.m_Plugin     = a_Plugin;
+	reg.m_Handler    = a_Handler;
+	reg.m_Permission = "";
+	reg.m_HelpString = a_HelpString;
 	return true;
 }
 
@@ -1835,7 +1878,7 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 		return (res == crExecuted);
 	}
 
-	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output, a_Command);
+	return cmd->second.m_Handler->ExecuteCommand(a_Split, nullptr, a_Command, &a_Output);
 }
 
 
@@ -1856,7 +1899,27 @@ void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & 
 			// Player doesn't have permission for the command
 			continue;
 		}
-		a_Results.push_back(itr->first);
+
+		/*  Client expects to only get back the last part of a space separated command.
+		Find the position of the beginning of the last part:
+		Position of last space + 1 for space separated commands
+		string::npos + 1 = 0 for commands that are not separated
+
+		Then skip all commands that have too many subcommands.
+		When the client asks for suggestions for "/time s"
+		the server must skip all commands that consist of more than 2 words just as
+		"/time set day". Or in other words, the position of the last space (separator)
+		in the strings must be equal or string::npos for both. */
+		size_t LastSpaceInText = a_Text.find_last_of(' ') + 1;
+		size_t LastSpaceInSuggestion = itr->first.find_last_of(' ') + 1;
+
+		if (LastSpaceInText != LastSpaceInSuggestion)
+		{
+			// Suggestion has more subcommands than a_Text
+			continue;
+		}
+
+		a_Results.push_back(itr->first.substr(LastSpaceInSuggestion));
 	}
 }
 
@@ -1901,6 +1964,23 @@ bool cPluginManager::ForEachPlugin(cPluginCallback & a_Callback)
 		}
 	}
 	return true;
+}
+
+
+
+
+
+AString cPluginManager::GetPluginFolderName(const AString & a_PluginName)
+{
+	// TODO: Implement locking for plugins
+	for (auto & plugin: m_Plugins)
+	{
+		if (plugin->GetName() == a_PluginName)
+		{
+			return plugin->GetFolderName();
+		}
+	}
+	return AString();
 }
 
 

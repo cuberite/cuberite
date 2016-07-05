@@ -32,11 +32,9 @@ void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cGhast::Attack(std::chrono::milliseconds a_Dt)
+bool cGhast::Attack(std::chrono::milliseconds a_Dt)
 {
-	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
-	
-	if ((m_Target != nullptr) && (m_AttackInterval > 3.0))
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
 		// Setting this higher gives us more wiggle room for attackrate
 		Vector3d Speed = GetLookVector() * 20;
@@ -44,17 +42,18 @@ void cGhast::Attack(std::chrono::milliseconds a_Dt)
 		cGhastFireballEntity * GhastBall = new cGhastFireballEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
 		if (GhastBall == nullptr)
 		{
-			return;
+			return false;
 		}
 		if (!GhastBall->Initialize(*m_World))
 		{
 			delete GhastBall;
 			GhastBall = nullptr;
-			return;
+			return false;
 		}
-		m_World->BroadcastSpawnEntity(*GhastBall);
-		m_AttackInterval = 0.0;
+		ResetAttackCooldown();
+		return true;
 	}
+	return false;
 }
 
 

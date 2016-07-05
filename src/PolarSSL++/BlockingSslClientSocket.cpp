@@ -70,7 +70,9 @@ class cBlockingSslClientSocketLinkCallbacks:
 	{
 		m_Socket.OnDisconnected();
 	}
+
 public:
+
 	cBlockingSslClientSocketLinkCallbacks(cBlockingSslClientSocket & a_Socket):
 		m_Socket(a_Socket)
 	{
@@ -104,7 +106,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 		m_LastErrorText = "Already connected";
 		return false;
 	}
-	
+
 	// Connect the underlying socket:
 	m_ServerName = a_ServerName;
 	if (!cNetwork::Connect(a_ServerName, a_Port,
@@ -121,7 +123,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 	{
 		return false;
 	}
-	
+
 	// Initialize the SSL:
 	int ret = m_Ssl.Initialize(true);
 	if (ret != 0)
@@ -129,21 +131,20 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 		Printf(m_LastErrorText, "SSL initialization failed: -0x%x", -ret);
 		return false;
 	}
-	
+
 	// If we have been assigned a trusted CA root cert store, push it into the SSL context:
 	if (m_CACerts.get() != nullptr)
 	{
 		m_Ssl.SetCACerts(m_CACerts, m_ExpectedPeerName);
 	}
-	
+
 	ret = m_Ssl.Handshake();
 	if (ret != 0)
 	{
 		Printf(m_LastErrorText, "SSL handshake failed: -0x%x", -ret);
 		return false;
 	}
-	
-	m_IsConnected = true;
+
 	return true;
 }
 
@@ -162,7 +163,7 @@ bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_C
 			a_ExpectedPeerName.c_str()
 		);
 	}
-	
+
 	// Parse the cert:
 	m_CACerts.reset(new cX509Cert);
 	int ret = m_CACerts->Parse(a_CACerts.data(), a_CACerts.size());
@@ -172,7 +173,7 @@ bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_C
 		return false;
 	}
 	m_ExpectedPeerName = a_ExpectedPeerName;
-	
+
 	return true;
 }
 
@@ -182,14 +183,18 @@ bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_C
 
 bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 {
-	ASSERT(m_IsConnected);
-	
+	if (!m_IsConnected)
+	{
+		m_LastErrorText = "Socket is closed";
+		return false;
+	}
+
 	// Keep sending the data until all of it is sent:
 	const char * Data = reinterpret_cast<const char *>(a_Data);
 	size_t NumBytes = a_NumBytes;
 	for (;;)
 	{
-		int res = m_Ssl.WritePlain(a_Data, a_NumBytes);
+		int res = m_Ssl.WritePlain(Data, a_NumBytes);
 		if (res < 0)
 		{
 			ASSERT(res != POLARSSL_ERR_NET_WANT_READ);   // This should never happen with callback-based SSL
@@ -216,8 +221,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 
 int cBlockingSslClientSocket::Receive(void * a_Data, size_t a_MaxBytes)
 {
-	ASSERT(m_IsConnected);
-	
+	// Even if m_IsConnected is false (socket disconnected), the SSL context may have more data in the queue
 	int res = m_Ssl.ReadPlain(a_Data, a_MaxBytes);
 	if (res < 0)
 	{
@@ -237,11 +241,18 @@ void cBlockingSslClientSocket::Disconnect(void)
 	{
 		return;
 	}
-	
+
 	m_Ssl.NotifyClose();
-	m_Socket->Close();
-	m_Socket.reset();
 	m_IsConnected = false;
+
+	// Grab a copy of the socket so that we know it doesn't change under our hands:
+	auto socket = m_Socket;
+	if (socket != nullptr)
+	{
+		socket->Close();
+	}
+
+	m_Socket.reset();
 }
 
 
@@ -293,6 +304,7 @@ int cBlockingSslClientSocket::SendEncrypted(const unsigned char * a_Buffer, size
 
 
 
+
 void cBlockingSslClientSocket::OnConnected(void)
 {
 	m_IsConnected = true;
@@ -305,7 +317,7 @@ void cBlockingSslClientSocket::OnConnected(void)
 
 void cBlockingSslClientSocket::OnConnectError(const AString & a_ErrorMsg)
 {
-	LOG("Cannot connect to %s: %s", m_ServerName.c_str(), a_ErrorMsg.c_str());
+	LOG("Cannot connect to %s: \"%s\"", m_ServerName.c_str(), a_ErrorMsg.c_str());
 	m_Event.Set();
 }
 
@@ -337,8 +349,8 @@ void cBlockingSslClientSocket::SetLink(cTCPLinkPtr a_Link)
 
 void cBlockingSslClientSocket::OnDisconnected(void)
 {
-	m_Socket.reset();
 	m_IsConnected = false;
+	m_Socket.reset();
 	m_Event.Set();
 }
 

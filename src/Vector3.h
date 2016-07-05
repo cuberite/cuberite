@@ -107,21 +107,22 @@ public:
 		return x * a_Rhs.x + y * a_Rhs.y + z * a_Rhs.z;
 	}
 
-	inline void abs()
+	/** Updates each coord to its absolute value */
+	inline void Abs()
 	{
 		x = (x < 0) ? -x : x;
 		y = (y < 0) ? -y : y;
 		z = (z < 0) ? -z : z;
 	}
 
-	// We can't use a capital letter, because we wouldn't be able to call the normal Clamp function.
-	inline void clamp(T a_Min, T a_Max)
+	/** Clamps each coord into the specified range. */
+	inline void Clamp(T a_Min, T a_Max)
 	{
-		x = Clamp(x, a_Min, a_Max);
-		y = Clamp(y, a_Min, a_Max);
-		z = Clamp(z, a_Min, a_Max);
+		x = ::Clamp(x, a_Min, a_Max);
+		y = ::Clamp(y, a_Min, a_Max);
+		z = ::Clamp(z, a_Min, a_Max);
 	}
-	
+
 	inline Vector3<T> Cross(const Vector3<T> & a_Rhs) const
 	{
 		return Vector3<T>(
@@ -147,7 +148,7 @@ public:
 			#pragma clang diagnostic pop
 		#endif
 	}
-	
+
 	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const
 	{
 		return (Abs(x - a_Rhs.x) < a_Eps) && (Abs(y - a_Rhs.y) < a_Eps) && (Abs(z - a_Rhs.z) < a_Eps);
@@ -236,7 +237,7 @@ public:
 	}
 
 	// tolua_begin
-	
+
 	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
 	{
 		return Vector3<T>(
@@ -253,6 +254,11 @@ public:
 			y - a_Rhs.y,
 			z - a_Rhs.z
 		);
+	}
+
+	inline Vector3<T> operator - (void) const
+	{
+		return Vector3<T>(-x, -y, -z);
 	}
 
 	inline Vector3<T> operator * (const Vector3<T>& a_Rhs) const
@@ -357,7 +363,7 @@ public:
 
 	/** Return value of LineCoeffToPlane() if the line is parallel to the plane. */
 	static const double NO_INTERSECTION;
-	
+
 protected:
 
 	/** Returns the absolute value of the given argument.
@@ -391,13 +397,11 @@ public:
 	/** Provides a hash of a vector's contents */
 	size_t operator()(const Vector3<What> & a_Vector) const
 	{
-		// Guaranteed to have no hash collisions for any 128x128x128 area
-		size_t Hash = 0;
+		// Guaranteed to have non repeating hashes for any 128x128x128 area
+		size_t Hash = static_cast<size_t>(a_Vector.y);
+		Hash <<= 16;
 		Hash ^= static_cast<size_t>(a_Vector.x);
-		Hash <<= 8;
-		Hash ^= static_cast<size_t>(a_Vector.y);
-		Hash <<= 8;
-		Hash ^= static_cast<size_t>(a_Vector.z);
+		Hash ^= static_cast<size_t>(a_Vector.z) << 8;
 		return Hash;
 	}
 };
@@ -426,7 +430,6 @@ typedef Vector3<int>    Vector3i;
 
 
 
-typedef std::list<Vector3i>   cVector3iList;
 typedef std::vector<Vector3i> cVector3iArray;
 
 

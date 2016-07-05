@@ -13,6 +13,8 @@ cChicken::cChicken(void) :
 	super("Chicken", mtChicken, "mob.chicken.hurt", "mob.chicken.hurt", 0.3, 0.4),
 	m_EggDropTimer(0)
 {
+	SetGravity(-2.0f);
+	SetAirDrag(0.0f);
 }
 
 
@@ -21,6 +23,11 @@ cChicken::cChicken(void) :
 void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+
+	if (IsBaby())
+	{
+		return;  // Babies don't lay eggs
+	}
 
 	if ((m_EggDropTimer == 6000) && (m_World->GetTickRandomNumber(1) == 0))
 	{
@@ -61,6 +68,10 @@ void cChicken::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+void cChicken::HandleFalling(void)
+{
+	// empty - chickens don't take fall damage
+}
 
 
 
