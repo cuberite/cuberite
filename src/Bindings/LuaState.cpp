@@ -20,6 +20,10 @@ extern "C"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 
+
+
+
+
 // fwd: "SQLite/lsqlite3.c"
 extern "C"
 {
@@ -38,6 +42,10 @@ extern "C"
 
 
 const cLuaState::cRet cLuaState::Return = {};
+
+/** Each Lua state stores a pointer to its creating cLuaState in Lua globals, under this name.
+This way any cLuaState can reference the main cLuaState's TrackedCallbacks, mutex etc. */
+static const char * g_CanonLuaStateGlobalName = "_CuberiteInternal_CanonLuaState";
 
 
 
@@ -114,6 +122,135 @@ cLuaStateTracker & cLuaStateTracker::Get(void)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cCallback:
+
+cLuaState::cCallback::cCallback(void):
+	m_CS(nullptr)
+{
+}
+
+
+
+
+
+bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	// Check if the stack contains a function:
+	if (!lua_isfunction(a_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	// Clear any previous callback:
+	Clear();
+
+	// Add self to LuaState's callback-tracking:
+	auto canonState = a_LuaState.QueryCanonLuaState();
+	canonState->TrackCallback(*this);
+
+	// Store the new callback:
+	m_CS = &(canonState->m_CS);
+	m_Ref.RefStack(*canonState, a_StackPos);
+	return true;
+}
+
+
+
+
+
+void cLuaState::cCallback::Clear(void)
+{
+	// Free the callback reference:
+	lua_State * luaState = nullptr;
+	{
+		auto cs = m_CS;
+		if (cs != nullptr)
+		{
+			cCSLock Lock(*cs);
+			if (!m_Ref.IsValid())
+			{
+				return;
+			}
+			luaState = m_Ref.GetLuaState();
+			m_Ref.UnRef();
+		}
+	}
+
+	// Remove from LuaState's callback-tracking:
+	if (luaState == nullptr)
+	{
+		return;
+	}
+	cLuaState(luaState).UntrackCallback(*this);
+}
+
+
+
+
+
+bool cLuaState::cCallback::IsValid(void)
+{
+	auto cs = m_CS;
+	if (cs == nullptr)
+	{
+		return false;
+	}
+	cCSLock lock(*cs);
+	return m_Ref.IsValid();
+}
+
+
+
+
+
+bool cLuaState::cCallback::IsSameLuaState(cLuaState & a_LuaState)
+{
+	auto cs = m_CS;
+	if (cs == nullptr)
+	{
+		return false;
+	}
+	cCSLock lock(*cs);
+	if (!m_Ref.IsValid())
+	{
+		return false;
+	}
+	auto canonState = a_LuaState.QueryCanonLuaState();
+	if (canonState == nullptr)
+	{
+		return false;
+	}
+	return (m_Ref.GetLuaState() == static_cast<lua_State *>(*canonState));
+}
+
+
+
+
+
+void cLuaState::cCallback::Invalidate(void)
+{
+	auto cs = m_CS;
+	if (cs == nullptr)
+	{
+		// Already invalid
+		return;
+	}
+	cCSLock Lock(*cs);
+	if (!m_Ref.IsValid())
+	{
+		LOGD("%s: Inconsistent callback at %p, has a CS but an invalid Ref. This should not happen",
+			__FUNCTION__, reinterpret_cast<void *>(this)
+		);
+		return;
+	}
+	m_Ref.UnRef();
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
@@ -170,6 +307,10 @@ void cLuaState::Create(void)
 	luaL_openlibs(m_LuaState);
 	m_IsOwned = true;
 	cLuaStateTracker::Add(*this);
+
+	// Add the CanonLuaState value into the Lua state, so that we can get it from anywhere:
+	lua_pushlightuserdata(m_LuaState, reinterpret_cast<void *>(this));
+	lua_setglobal(m_LuaState, g_CanonLuaStateGlobalName);
 }
 
 
@@ -206,6 +347,16 @@ void cLuaState::Close(void)
 		Detach();
 		return;
 	}
+
+	// Invalidate all callbacks:
+	{
+		cCSLock Lock(m_CSTrackedCallbacks);
+		for (auto & c: m_TrackedCallbacks)
+		{
+			c->Invalidate();
+		}
+	}
+
 	cLuaStateTracker::Del(*this);
 	lua_close(m_LuaState);
 	m_LuaState = nullptr;
@@ -402,7 +553,7 @@ bool cLuaState::PushFunction(const char * a_FunctionName)
 
 
 
-bool cLuaState::PushFunction(int a_FnRef)
+bool cLuaState::PushFunction(const cRef & a_FnRef)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
@@ -410,7 +561,7 @@ bool cLuaState::PushFunction(int a_FnRef)
 	// Push the error handler for lua_pcall()
 	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
 
-	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // same as lua_getref()
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, static_cast<int>(a_FnRef));  // same as lua_getref()
 	if (!lua_isfunction(m_LuaState, -1))
 	{
 		lua_pop(m_LuaState, 2);
@@ -821,6 +972,18 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 
 
 
+void cLuaState::Pop(int a_NumValuesToPop)
+{
+	ASSERT(IsValid());
+
+	lua_pop(m_LuaState, a_NumValuesToPop);
+	m_NumCurrentFunctionArgs -= a_NumValuesToPop;
+}
+
+
+
+
+
 bool cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 {
 	size_t len = 0;
@@ -841,6 +1004,41 @@ bool cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
 	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cCallback & a_Callback)
+{
+	return a_Callback.RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cCallbackPtr & a_Callback)
+{
+	if (a_Callback == nullptr)
+	{
+		a_Callback = cpp14::make_unique<cCallback>();
+	}
+	return a_Callback->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
+{
+	if (a_Callback == nullptr)
+	{
+		a_Callback = std::make_shared<cCallback>();
+	}
+	return a_Callback->RefStack(*this, a_StackPos);
 }
 
 
@@ -1470,7 +1668,7 @@ int cLuaState::CallFunctionWithForeignParams(
 
 
 
-int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd)
+int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd, int a_NumAllowedNestingLevels)
 {
 	/*
 	// DEBUG:
@@ -1480,64 +1678,138 @@ int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_Sr
 	*/
 	for (int i = a_SrcStart; i <= a_SrcEnd; ++i)
 	{
-		int t = lua_type(a_SrcLuaState, i);
-		switch (t)
+		if (!CopySingleValueFrom(a_SrcLuaState, i, a_NumAllowedNestingLevels))
 		{
-			case LUA_TNIL:
-			{
-				lua_pushnil(m_LuaState);
-				break;
-			}
-			case LUA_TSTRING:
-			{
-				AString s;
-				a_SrcLuaState.ToString(i, s);
-				Push(s);
-				break;
-			}
-			case LUA_TBOOLEAN:
-			{
-				bool b = (tolua_toboolean(a_SrcLuaState, i, false) != 0);
-				Push(b);
-				break;
-			}
-			case LUA_TNUMBER:
-			{
-				lua_Number d = tolua_tonumber(a_SrcLuaState, i, 0);
-				Push(d);
-				break;
-			}
-			case LUA_TUSERDATA:
-			{
-				// Get the class name:
-				const char * type = nullptr;
-				if (lua_getmetatable(a_SrcLuaState, i) == 0)
-				{
-					LOGWARNING("%s: Unknown class in pos %d, cannot copy.", __FUNCTION__, i);
-					lua_pop(m_LuaState, i - a_SrcStart);
-					return -1;
-				}
-				lua_rawget(a_SrcLuaState, LUA_REGISTRYINDEX);  // Stack +1
-				type = lua_tostring(a_SrcLuaState, -1);
-				lua_pop(a_SrcLuaState, 1);                     // Stack -1
-
-				// Copy the value:
-				void * ud = tolua_touserdata(a_SrcLuaState, i, nullptr);
-				tolua_pushusertype(m_LuaState, ud, type);
-				break;
-			}
-			default:
-			{
-				LOGWARNING("%s: Unsupported value: '%s' at stack position %d. Can only copy numbers, strings, bools and classes!",
-					__FUNCTION__, lua_typename(a_SrcLuaState, t), i
-				);
-				a_SrcLuaState.LogStack("Stack where copying failed:");
-				lua_pop(m_LuaState, i - a_SrcStart);
-				return -1;
-			}
+			lua_pop(m_LuaState, i - a_SrcStart);
+			return -1;
 		}
 	}
 	return a_SrcEnd - a_SrcStart + 1;
+}
+
+
+
+
+
+bool cLuaState::CopyTableFrom(cLuaState & a_SrcLuaState, int a_SrcStackIdx, int a_NumAllowedNestingLevels)
+{
+	// Create the dest table:
+	#ifdef _DEBUG
+		auto srcTop = lua_gettop(a_SrcLuaState);
+		auto dstTop = lua_gettop(m_LuaState);
+	#endif
+	lua_createtable(m_LuaState, 0, 0);            // DST: <table>
+	lua_pushvalue(a_SrcLuaState, a_SrcStackIdx);  // SRC: <table>
+	lua_pushnil(a_SrcLuaState);                   // SRC: <table> <key>
+	while (lua_next(a_SrcLuaState, -2) != 0)      // SRC: <table> <key> <value>
+	{
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		assert(lua_gettop(m_LuaState) == dstTop + 1);
+
+		// Copy the key:
+		if (!CopySingleValueFrom(a_SrcLuaState, -2, a_NumAllowedNestingLevels))  // DST: <table> <key>
+		{
+			lua_pop(m_LuaState, 1);
+			lua_pop(a_SrcLuaState, 3);
+			assert(lua_gettop(a_SrcLuaState) == srcTop);
+			assert(lua_gettop(m_LuaState) == dstTop);
+			return false;
+		}
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		assert(lua_gettop(m_LuaState) == dstTop + 2);
+
+		// Copy the value:
+		if (!CopySingleValueFrom(a_SrcLuaState, -1, a_NumAllowedNestingLevels - 1))  // DST: <table> <key> <value>
+		{
+			lua_pop(m_LuaState, 2);     // DST: empty
+			lua_pop(a_SrcLuaState, 3);  // SRC: empty
+			assert(lua_gettop(a_SrcLuaState) == srcTop);
+			assert(lua_gettop(m_LuaState) == dstTop);
+			return false;
+		}
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		assert(lua_gettop(m_LuaState) == dstTop + 3);
+
+		// Set the value and fix up stacks:
+		lua_rawset(m_LuaState, -3);  // DST: <table>
+		lua_pop(a_SrcLuaState, 1);  // SRC: <table> <key>
+		assert(lua_gettop(a_SrcLuaState) == srcTop + 2);
+		assert(lua_gettop(m_LuaState) == dstTop + 1);
+	}
+	lua_pop(a_SrcLuaState, 1);  // SRC: empty
+	assert(lua_gettop(a_SrcLuaState) == srcTop);
+	assert(lua_gettop(m_LuaState) == dstTop + 1);
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CopySingleValueFrom(cLuaState & a_SrcLuaState, int a_StackIdx, int a_NumAllowedNestingLevels)
+{
+	int t = lua_type(a_SrcLuaState, a_StackIdx);
+	switch (t)
+	{
+		case LUA_TNIL:
+		{
+			lua_pushnil(m_LuaState);
+			return true;
+		}
+		case LUA_TSTRING:
+		{
+			AString s;
+			a_SrcLuaState.ToString(a_StackIdx, s);
+			Push(s);
+			return true;
+		}
+		case LUA_TBOOLEAN:
+		{
+			bool b = (tolua_toboolean(a_SrcLuaState, a_StackIdx, false) != 0);
+			Push(b);
+			return true;
+		}
+		case LUA_TNUMBER:
+		{
+			lua_Number d = tolua_tonumber(a_SrcLuaState, a_StackIdx, 0);
+			Push(d);
+			return true;
+		}
+		case LUA_TUSERDATA:
+		{
+			// Get the class name:
+			const char * type = nullptr;
+			if (lua_getmetatable(a_SrcLuaState, a_StackIdx) == 0)
+			{
+				LOGWARNING("%s: Unknown class in pos %d, cannot copy.", __FUNCTION__, a_StackIdx);
+				return false;
+			}
+			lua_rawget(a_SrcLuaState, LUA_REGISTRYINDEX);  // Stack +1
+			type = lua_tostring(a_SrcLuaState, -1);
+			lua_pop(a_SrcLuaState, 1);                     // Stack -1
+
+			// Copy the value:
+			void * ud = tolua_touserdata(a_SrcLuaState, a_StackIdx, nullptr);
+			tolua_pushusertype(m_LuaState, ud, type);
+			return true;
+		}
+		case LUA_TTABLE:
+		{
+			if (!CopyTableFrom(a_SrcLuaState, a_StackIdx, a_NumAllowedNestingLevels - 1))
+			{
+				LOGWARNING("%s: Failed to copy table in pos %d.", __FUNCTION__, a_StackIdx);
+				return false;
+			}
+			return true;
+		}
+		default:
+		{
+			LOGWARNING("%s: Unsupported value: '%s' at stack position %d. Can only copy numbers, strings, bools, classes and simple tables!",
+				__FUNCTION__, lua_typename(a_SrcLuaState, t), a_StackIdx
+			);
+			return false;
+		}
+	}
 }
 
 
@@ -1558,16 +1830,16 @@ void cLuaState::ToString(int a_StackPos, AString & a_String)
 
 
 
-void cLuaState::LogStack(const char * a_Header)
+void cLuaState::LogStackValues(const char * a_Header)
 {
-	LogStack(m_LuaState, a_Header);
+	LogStackValues(m_LuaState, a_Header);
 }
 
 
 
 
 
-void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
+void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 {
 	// Format string consisting only of %s is used to appease the compiler
 	LOG("%s", (a_Header != nullptr) ? a_Header : "Lua C API Stack contents:");
@@ -1582,10 +1854,26 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 			case LUA_TNUMBER:        Printf(Value, "%f", static_cast<double>(lua_tonumber(a_LuaState, i))); break;
 			case LUA_TSTRING:        Printf(Value, "%s", lua_tostring(a_LuaState, i)); break;
 			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
+			case LUA_TUSERDATA:      Printf(Value, "%p (%s)", lua_touserdata(a_LuaState, i), tolua_typename(a_LuaState, i)); break;
 			default: break;
 		}
 		LOGD("  Idx %d: type %d (%s) %s", i, Type, lua_typename(a_LuaState, Type), Value.c_str());
 	}  // for i - stack idx
+}
+
+
+
+
+
+cLuaState * cLuaState::QueryCanonLuaState(void)
+{
+	// Get the CanonLuaState global from Lua:
+	auto cb = WalkToNamedGlobal(g_CanonLuaStateGlobalName);
+	if (!cb.IsValid())
+	{
+		return nullptr;
+	}
+	return reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
 }
 
 
@@ -1620,6 +1908,50 @@ int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
 	LOGD("Returned from BreakIntoDebugger().");
 
 	return 0;
+}
+
+
+
+
+
+void cLuaState::TrackCallback(cCallback & a_Callback)
+{
+	// Get the CanonLuaState global from Lua:
+	auto canonState = QueryCanonLuaState();
+	if (canonState == nullptr)
+	{
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		return;
+	}
+
+	// Add the callback:
+	cCSLock Lock(canonState->m_CSTrackedCallbacks);
+	canonState->m_TrackedCallbacks.push_back(&a_Callback);
+}
+
+
+
+
+
+void cLuaState::UntrackCallback(cCallback & a_Callback)
+{
+	// Get the CanonLuaState global from Lua:
+	auto canonState = QueryCanonLuaState();
+	if (canonState == nullptr)
+	{
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		return;
+	}
+
+	// Remove the callback:
+	cCSLock Lock(canonState->m_CSTrackedCallbacks);
+	auto & trackedCallbacks = canonState->m_TrackedCallbacks;
+	trackedCallbacks.erase(std::remove_if(trackedCallbacks.begin(), trackedCallbacks.end(),
+		[&a_Callback](cCallback * a_StoredCallback)
+		{
+			return (a_StoredCallback == &a_Callback);
+		}
+	));
 }
 
 
@@ -1681,7 +2013,7 @@ void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 	{
 		UnRef();
 	}
-	m_LuaState = &a_LuaState;
+	m_LuaState = a_LuaState;
 	lua_pushvalue(a_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
 	m_Ref = luaL_ref(a_LuaState, LUA_REGISTRYINDEX);
 }
@@ -1692,11 +2024,9 @@ void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 
 void cLuaState::cRef::UnRef(void)
 {
-	ASSERT(m_LuaState->IsValid());  // The reference should be destroyed before destroying the LuaState
-
 	if (IsValid())
 	{
-		luaL_unref(*m_LuaState, LUA_REGISTRYINDEX, m_Ref);
+		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
 	m_LuaState = nullptr;
 	m_Ref = LUA_REFNIL;

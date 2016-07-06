@@ -1214,6 +1214,7 @@ void cMinecartWithChest::OpenNewWindow()
 
 void cMinecartWithChest::Destroyed()
 {
+	GetWindow()->OwnerDestroyed();
 	cItems Pickups;
 	m_Contents.CopyToItems(Pickups);
 	GetWorld()->SpawnItemPickups(Pickups, GetPosX(), GetPosY() + 1, GetPosZ(), 4);

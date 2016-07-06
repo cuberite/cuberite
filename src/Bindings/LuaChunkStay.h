@@ -39,7 +39,7 @@ public:
 	bool AddChunks(int a_ChunkCoordTableStackPos);
 
 	/** Enables the ChunkStay for the specified chunkmap, with the specified Lua callbacks. */
-	void Enable(cChunkMap & a_ChunkMap, int a_OnChunkAvailableStackPos, int a_OnAllChunksAvailableStackPos);
+	void Enable(cChunkMap & a_ChunkMap, cLuaState::cCallbackPtr a_OnChunkAvailable, cLuaState::cCallbackPtr a_OnAllChunksAvailable);
 
 protected:
 	/** The plugin which has created the ChunkStay, via cWorld:ChunkStay() binding method.  */
@@ -49,10 +49,10 @@ protected:
 	cLuaState * m_LuaState;
 
 	/** The Lua function to call in OnChunkAvailable. Only valid when enabled. */
-	cLuaState::cRef m_OnChunkAvailable;
+	cLuaState::cCallbackPtr m_OnChunkAvailable;
 
 	/** The Lua function to call in OnAllChunksAvailable. Only valid when enabled. */
-	cLuaState::cRef m_OnAllChunksAvailable;
+	cLuaState::cCallbackPtr m_OnAllChunksAvailable;
 
 
 	// cChunkStay overrides:

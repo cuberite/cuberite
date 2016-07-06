@@ -103,7 +103,9 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 		return 0;
 	}
 
-	ChunkStay->Enable(*World->GetChunkMap(), 3, 4);
+	cLuaState::cCallbackPtr onChunkAvailable, onAllChunksAvailable;
+	L.GetStackValues(3, onChunkAvailable, onAllChunksAvailable);  // Callbacks may be unassigned at all - as a request to load / generate chunks
+	ChunkStay->Enable(*World->GetChunkMap(), std::move(onChunkAvailable), std::move(onAllChunksAvailable));
 	return 0;
 }
 
@@ -466,67 +468,41 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 
 
 
-class cLuaWorldTask :
-	public cPluginLua::cResettable
-{
-public:
-	cLuaWorldTask(cPluginLua & a_Plugin, int a_FnRef) :
-		cPluginLua::cResettable(a_Plugin),
-		m_FnRef(a_FnRef)
-	{
-	}
-
-	void Run(cWorld & a_World)
-	{
-		cCSLock Lock(m_CSPlugin);
-		if (m_Plugin != nullptr)
-		{
-			m_Plugin->Call(m_FnRef, &a_World);
-		}
-	}
-
-protected:
-	int m_FnRef;
-};
-
-
-
-
-
 static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 {
-	// Binding for cWorld::QueueTask
-	// Params: function
-
-	// Retrieve the cPlugin from the LuaState:
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
-	if (Plugin == nullptr)
-	{
-		// An error message has been already printed in GetLuaPlugin()
-		return 0;
-	}
+	// Function signature:
+	// World:QueueTask(Callback)
 
 	// Retrieve the args:
-	cWorld * self = reinterpret_cast<cWorld *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamNumber  (2) ||
+		!L.CheckParamFunction(3)
+	)
+	{
+		return 0;
+	}
+	cWorld * World;
+	cLuaState::cCallbackSharedPtr Task;
+	if (!L.GetStackValues(1, World, Task))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Cannot read parameters");
+	}
+	if (World == nullptr)
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
 	}
-	if (!lua_isfunction(tolua_S, 2))
+	if (!Task->IsValid())
 	{
-		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #1");
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not store the callback parameter");
 	}
 
-	// Create a reference to the function:
-	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-	if (FnRef == LUA_REFNIL)
-	{
-		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
-	}
-
-	auto ResettableTask = std::make_shared<cLuaWorldTask>(*Plugin, FnRef);
-	Plugin->AddResettable(ResettableTask);
-	self->QueueTask(std::bind(&cLuaWorldTask::Run, ResettableTask, std::placeholders::_1));
+	World->QueueTask([Task](cWorld & a_World)
+		{
+			Task->Call(&a_World);
+		}
+	);
 	return 0;
 }
 
@@ -576,16 +552,8 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 {
-	// Binding for cWorld::ScheduleTask
-	// Params: function, Ticks
-
-	// Retrieve the cPlugin from the LuaState:
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
-	if (Plugin == nullptr)
-	{
-		// An error message has been already printed in GetLuaPlugin()
-		return 0;
-	}
+	// Function signature:
+	// World:ScheduleTask(NumTicks, Callback)
 
 	// Retrieve the args:
 	cLuaState L(tolua_S);
@@ -597,22 +565,27 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cWorld * World = reinterpret_cast<cWorld *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cWorld * World;
+	int NumTicks;
+	auto Task = std::make_shared<cLuaState::cCallback>();
+	if (!L.GetStackValues(1, World, NumTicks, Task))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Cannot read parameters");
+	}
 	if (World == nullptr)
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
 	}
-
-	// Create a reference to the function:
-	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-	if (FnRef == LUA_REFNIL)
+	if (!Task->IsValid())
 	{
-		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not store the callback parameter");
 	}
 
-	auto ResettableTask = std::make_shared<cLuaWorldTask>(*Plugin, FnRef);
-	Plugin->AddResettable(ResettableTask);
-	World->ScheduleTask(static_cast<int>(tolua_tonumber(tolua_S, 2, 0)), std::bind(&cLuaWorldTask::Run, ResettableTask, std::placeholders::_1));
+	World->ScheduleTask(NumTicks, [Task](cWorld & a_World)
+		{
+			Task->Call(&a_World);
+		}
+	);
 	return 0;
 }
 

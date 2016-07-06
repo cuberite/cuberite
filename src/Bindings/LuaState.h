@@ -7,7 +7,7 @@
 The contained lua_State can be either owned or attached.
 Owned lua_State is created by calling Create() and the cLuaState automatically closes the state
 Or, lua_State can be attached by calling Attach(), the cLuaState doesn't close such a state
-Attaching a state will automatically close an owned state.
+If owning a state, trying to attach a state will automatically close the previously owned state.
 
 Calling a Lua function is done internally by pushing the function using PushFunction(), then pushing the
 arguments and finally executing CallFunction(). cLuaState automatically keeps track of the number of
@@ -16,8 +16,12 @@ the stack using GetStackValue(). All of this is wrapped in a templated function 
 which is generated automatically by gen_LuaState_Call.lua script file into the LuaState_Call.inc file.
 
 Reference management is provided by the cLuaState::cRef class. This is used when you need to hold a reference to
-any Lua object across several function calls; usually this is used for callbacks. The class is RAII-like, with
-automatic resource management.
+any Lua object across several function calls. The class is RAII-like, with automatic resource management.
+
+Callbacks management is provided by the cLuaState::cCallback class. Use a GetStackValue() with cCallbackPtr
+parameter to store the callback, and then at any time you can use the cCallback's Call() templated function
+to call the callback. The callback management takes care of cLuaState being destroyed - the cCallback object
+stays valid but doesn't call into Lua code anymore, returning false for "failure" instead.
 */
 
 
@@ -39,6 +43,7 @@ extern "C"
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
+class cPluginLua;
 
 
 
@@ -48,6 +53,20 @@ class cLuaUDPEndpoint;
 class cLuaState
 {
 public:
+
+	/** Provides a RAII-style locking for the LuaState.
+	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
+	class cLock
+	{
+	public:
+		cLock(cLuaState & a_LuaState):
+			m_Lock(a_LuaState.m_CS)
+		{
+		}
+	protected:
+		cCSLock m_Lock;
+	};
+
 
 	/** Used for storing references to object in the global registry.
 	Can be bound (contains a reference) or unbound (doesn't contain reference).
@@ -80,8 +99,20 @@ public:
 		/** Allows to use this class wherever an int (i. e. ref) is to be used */
 		explicit operator int(void) const { return m_Ref; }
 
+		/** Returns the Lua state associated with the value. */
+		lua_State * GetLuaState(void) { return m_LuaState; }
+
+		/** Creates a Lua reference to the specified object instance in the specified Lua state.
+		This is useful to make anti-GC references for objects that were created by Lua and need to stay alive longer than Lua GC would normally guarantee. */
+		template <typename T> void CreateFromObject(cLuaState & a_LuaState, T && a_Object)
+		{
+			a_LuaState.Push(std::forward<T>(a_Object));
+			RefStack(a_LuaState, -1);
+			a_LuaState.Pop();
+		}
+
 	protected:
-		cLuaState * m_LuaState;
+		lua_State * m_LuaState;
 		int m_Ref;
 
 		// Remove the copy-constructor:
@@ -110,6 +141,83 @@ public:
 		int GetTableRef(void) const { return m_TableRef; }
 		const char * GetFnName(void) const { return m_FnName; }
 	} ;
+
+
+	/** Represents a callback to Lua that C++ code can call.
+	Is thread-safe and unload-safe.
+	When the Lua state is unloaded, the callback returns an error instead of calling into non-existent code.
+	To receive the callback instance from the Lua side, use RefStack() or (better) cLuaState::GetStackValue()
+	with a cCallbackPtr. Note that instances of this class are tracked in the canon LuaState instance, so that
+	they can be invalidated when the LuaState is unloaded; due to multithreading issues they can only be tracked
+	by-ptr, which has an unfortunate effect of disabling the copy and move constructors. */
+	class cCallback
+	{
+	public:
+		/** Creates an unbound callback instance. */
+		cCallback(void);
+
+		~cCallback()
+		{
+			Clear();
+		}
+
+		/** Calls the Lua callback, if still available.
+		Returns true if callback has been called.
+		Returns false if the Lua state isn't valid anymore. */
+		template <typename... Args>
+		bool Call(Args &&... args)
+		{
+			auto cs = m_CS;
+			if (cs == nullptr)
+			{
+				return false;
+			}
+			cCSLock Lock(*cs);
+			if (!m_Ref.IsValid())
+			{
+				return false;
+			}
+			return cLuaState(m_Ref.GetLuaState()).Call(m_Ref, std::forward<Args>(args)...);
+		}
+
+		/** Set the contained callback to the function in the specified Lua state's stack position.
+		If a callback has been previously contained, it is freed first. */
+		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
+
+		/** Frees the contained callback, if any. */
+		void Clear(void);
+
+		/** Returns true if the contained callback is valid. */
+		bool IsValid(void);
+
+		/** Returns true if the callback resides in the specified Lua state.
+		Internally, compares the callback's canon Lua state. */
+		bool IsSameLuaState(cLuaState & a_LuaState);
+
+	protected:
+		friend class cLuaState;
+
+		/** The mutex protecting m_Ref against multithreaded access */
+		cCriticalSection * m_CS;
+
+		/** Reference to the Lua callback */
+		cRef m_Ref;
+
+
+		/** Invalidates the callback, without untracking it from the cLuaState.
+		Called only from cLuaState when closing the Lua state. */
+		void Invalidate(void);
+
+		/** This class cannot be copied, because it is tracked in the LuaState by-ptr.
+		Use cCallbackPtr for a copyable object. */
+		cCallback(const cCallback &) = delete;
+
+		/** This class cannot be moved, because it is tracked in the LuaState by-ptr.
+		Use cCallbackPtr for a copyable object. */
+		cCallback(cCallback &&) = delete;
+	};
+	typedef UniquePtr<cCallback> cCallbackPtr;
+	typedef SharedPtr<cCallback> cCallbackSharedPtr;
 
 
 	/** A dummy class that's used only to delimit function args from return values for cLuaState::Call() */
@@ -168,6 +276,8 @@ public:
 	protected:
 		lua_State * m_LuaState;
 
+		/** Used for debugging, Lua state's stack size is checked against this number to make sure
+		it is the same as when the value was pushed. */
 		int m_StackLen;
 
 		// Remove the copy-constructor:
@@ -261,11 +371,17 @@ public:
 	void Push(const UInt32 a_Value);
 	void Push(std::chrono::milliseconds a_time);
 
+	/** Pops the specified number of values off the top of the Lua stack. */
+	void Pop(int a_NumValuesToPop = 1);
+
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
 	// Returns whether value was changed
 	// Enum values are checked for their allowed values and fail if the value is not assigned.
 	bool GetStackValue(int a_StackPos, AString & a_Value);
 	bool GetStackValue(int a_StackPos, bool & a_Value);
+	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
+	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
+	bool GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
 	bool GetStackValue(int a_StackPos, cRef & a_Ref);
 	bool GetStackValue(int a_StackPos, double & a_Value);
@@ -419,21 +535,39 @@ public:
 	);
 
 	/** Copies objects on the stack from the specified state.
-	Only numbers, bools, strings and userdatas are copied.
+	Only numbers, bools, strings, API classes and simple tables containing these (recursively) are copied.
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
 	If successful, returns the number of objects copied.
 	If failed, returns a negative number and rewinds the stack position. */
-	int CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd);
+	int CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd, int a_NumAllowedNestingLevels = 16);
+
+	/** Copies a table at the specified stack index of the source Lua state to the top of this Lua state's stack.
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
+	Returns true if successful, false on failure.
+	Can copy only simple values - numbers, bools, strings and recursively simple tables. */
+	bool CopyTableFrom(cLuaState & a_SrcLuaState, int a_TableIdx, int a_NumAllowedNestingLevels);
+
+	/** Copies a single value from the specified stack index of the source Lua state to the top of this Lua state's stack.
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
+	Returns true if the value was copied, false on failure. */
+	bool CopySingleValueFrom(cLuaState & a_SrcLuaState, int a_StackIdx, int a_NumAllowedNestingLevels);
 
 	/** Reads the value at the specified stack position as a string and sets it to a_String. */
 	void ToString(int a_StackPos, AString & a_String);
 
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
-	void LogStack(const char * a_Header = nullptr);
+	void LogStackValues(const char * a_Header = nullptr);
 
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
-	static void LogStack(lua_State * a_LuaState, const char * a_Header = nullptr);
+	static void LogStackValues(lua_State * a_LuaState, const char * a_Header = nullptr);
+
+	/** Returns the canon Lua state (the primary cLuaState instance that was used to create, rather than attach, the lua_State structure).
+	Returns nullptr if the canon Lua state cannot be queried. */
+	cLuaState * QueryCanonLuaState(void);
 
 protected:
+
+	cCriticalSection m_CS;
 
 	lua_State * m_LuaState;
 
@@ -441,8 +575,7 @@ protected:
 	bool m_IsOwned;
 
 	/** The subsystem name is used for reporting errors to the console, it is either "plugin %s" or "LuaScript"
-	whatever is given to the constructor
-	*/
+	whatever is given to the constructor. */
 	AString m_SubsystemName;
 
 	/** Name of the currently pushed function (for the Push / Call chain) */
@@ -450,6 +583,15 @@ protected:
 
 	/** Number of arguments currently pushed (for the Push / Call chain) */
 	int m_NumCurrentFunctionArgs;
+
+	/** The tracked callbacks.
+	This object will invalidate all of these when it is about to be closed.
+	Protected against multithreaded access by m_CSTrackedCallbacks. */
+	std::vector<cCallback *> m_TrackedCallbacks;
+
+	/** Protects m_TrackedTallbacks against multithreaded access. */
+	cCriticalSection m_CSTrackedCallbacks;
+
 
 	/** Variadic template terminator: If there's nothing more to push / pop, just call the function.
 	Note that there are no return values either, because those are prefixed by a cRet value, so the arg list is never empty. */
@@ -500,18 +642,10 @@ protected:
 	*/
 	bool PushFunction(const char * a_FunctionName);
 
-	/** Pushes a function that has been saved into the global registry, identified by a_FnRef.
-	Returns true if successful. Logs a warning on failure
-	*/
-	bool PushFunction(int a_FnRef);
-
 	/** Pushes a function that has been saved as a reference.
 	Returns true if successful. Logs a warning on failure
 	*/
-	bool PushFunction(const cRef & a_FnRef)
-	{
-		return PushFunction(static_cast<int>(a_FnRef));
-	}
+	bool PushFunction(const cRef & a_FnRef);
 
 	/** Pushes a function that is stored in a referenced table by name
 	Returns true if successful. Logs a warning on failure
@@ -533,6 +667,14 @@ protected:
 
 	/** Tries to break into the MobDebug debugger, if it is installed. */
 	static int BreakIntoDebugger(lua_State * a_LuaState);
+
+	/** Adds the specified callback to tracking.
+	The callback will be invalidated when this Lua state is about to be closed. */
+	void TrackCallback(cCallback & a_Callback);
+
+	/** Removes the specified callback from tracking.
+	The callback will no longer be invalidated when this Lua state is about to be closed. */
+	void UntrackCallback(cCallback & a_Callback);
 } ;
 
 

@@ -98,3 +98,8 @@ add_test(NAME LoadablePieces-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
 
 
 
+# Put the projects into solution folders (MSVC):
+set_target_properties(
+	LoadablePieces
+	PROPERTIES FOLDER Tests
+)

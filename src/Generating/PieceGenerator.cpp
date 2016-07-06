@@ -6,7 +6,6 @@
 
 #include "Globals.h"
 #include "PieceGenerator.h"
-#include "../SelfTests.h"
 #include "VerticalStrategy.h"
 #include "VerticalLimit.h"
 

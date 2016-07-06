@@ -113,12 +113,10 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 
 
 
-void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, int a_OnChunkAvailableStackPos, int a_OnAllChunksAvailableStackPos)
+void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, cLuaState::cCallbackPtr a_OnChunkAvailable, cLuaState::cCallbackPtr a_OnAllChunksAvailable)
 {
-	// Get the references to the callback functions:
-	m_LuaState = &m_Plugin.GetLuaState();
-	m_OnChunkAvailable.RefStack(*m_LuaState, a_OnChunkAvailableStackPos);
-	m_OnAllChunksAvailable.RefStack(*m_LuaState, a_OnAllChunksAvailableStackPos);
+	m_OnChunkAvailable = std::move(a_OnChunkAvailable);
+	m_OnAllChunksAvailable = std::move(a_OnAllChunksAvailable);
 
 	// Enable the ChunkStay:
 	super::Enable(a_ChunkMap);
@@ -130,10 +128,9 @@ void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, int a_OnChunkAvailableStackPo
 
 void cLuaChunkStay::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
-	if (m_OnChunkAvailable.IsValid())
+	if (m_OnChunkAvailable != nullptr)
 	{
-		cPluginLua::cOperation Op(m_Plugin);
-		Op().Call(static_cast<int>(m_OnChunkAvailable), a_ChunkX, a_ChunkZ);
+		m_OnChunkAvailable->Call(a_ChunkX, a_ChunkZ);
 	}
 }
 
@@ -143,15 +140,14 @@ void cLuaChunkStay::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 
 bool cLuaChunkStay::OnAllChunksAvailable(void)
 {
-	if (m_OnAllChunksAvailable.IsValid())
+	if (m_OnAllChunksAvailable != nullptr)
 	{
 		// Call the callback:
-		cPluginLua::cOperation Op(m_Plugin);
-		Op().Call(static_cast<int>(m_OnAllChunksAvailable));
+		m_OnAllChunksAvailable->Call();
 
 		// Remove the callback references - they won't be needed anymore
-		m_OnChunkAvailable.UnRef();
-		m_OnAllChunksAvailable.UnRef();
+		m_OnChunkAvailable.reset();
+		m_OnAllChunksAvailable.reset();
 	}
 
 	// Disable the ChunkStay by returning true

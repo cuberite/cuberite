@@ -129,6 +129,9 @@ public:
 	/** Checks if the internal state is valid (read and write positions in the correct bounds) using ASSERTs */
 	void CheckValid(void) const;
 
+	/** Gets the number of bytes that are needed to represent the given VarInt */
+	static size_t GetVarIntSize(UInt32 a_Value);
+
 protected:
 	char * m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer

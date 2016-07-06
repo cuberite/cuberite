@@ -41,6 +41,8 @@ static int DoTest(void)
 
 int main(int argc, char * argv[])
 {
+	LOGD("Test started");
+
 	// Print the current directory for reference:
 	char folder[FILENAME_MAX];
 	GetCurrentFolder(folder, sizeof(folder));

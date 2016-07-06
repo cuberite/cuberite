@@ -237,7 +237,7 @@ local function ProcessFile(a_FileName)
 	local lineCounter = 1
 	local lastIndentLevel = 0
 	local isLastLineControl = false
-	all:gsub("\r\n", "\n")  -- normalize CRLF into LF-only
+	all = all:gsub("\r\n", "\n")  -- normalize CRLF into LF-only
 	string.gsub(all .. "\n", "[^\n]*\n",  -- Iterate over each line, while preserving empty lines
 		function(a_Line)
 			-- Check against each violation pattern:

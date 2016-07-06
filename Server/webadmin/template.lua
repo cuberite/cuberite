@@ -20,7 +20,7 @@ end
 
 
 
-function GetDefaultPage()
+local function GetDefaultPage()
 	local PM = cRoot:Get():GetPluginManager()
 
 	local SubTitle = "Current Game"
@@ -55,30 +55,31 @@ end
 
 function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
-	local BaseURL = WebAdmin:GetBaseURL(TemplateRequest.Request.Path)
+	local BaseURL = cWebAdmin:GetBaseURL(TemplateRequest.Request.Path)
 	local Title = "Cuberite WebAdmin"
 	local NumPlayers = cRoot:Get():GetServer():GetNumPlayers()
 	local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
 	local NumChunks = cRoot:Get():GetTotalChunkCount()
-	local PluginPage = WebAdmin:GetPage(TemplateRequest.Request)
+	local PluginPage = cWebAdmin:GetPage(TemplateRequest.Request)
 	local PageContent = PluginPage.Content
-	local SubTitle = PluginPage.PluginName
-	if (PluginPage.TabName ~= "") then
-		SubTitle = PluginPage.PluginName .. " - " .. PluginPage.TabName
+	local SubTitle = PluginPage.PluginFolder
+	if (PluginPage.UrlPath ~= "") then
+		SubTitle = PluginPage.PluginFolder .. " - " .. PluginPage.TabTitle
 	end
 	if (PageContent == "") then
 		PageContent, SubTitle = GetDefaultPage()
 	end
 
+	--[[
+	-- 2016-01-15 Mattes: This wasn't used anywhere in the code, no idea what it was supposed to do
 	local reqParamsClass = ""
-
-	for key,value in pairs(TemplateRequest.Request.Params) do
+	for key, value in pairs(TemplateRequest.Request.Params) do
 		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
 	end
-
 	if (string.gsub(reqParamsClass, "%s", "") == "") then
 		reqParamsClass = " no-param"
 	end
+	--]]
 
 	Output([[
 <!-- Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 -->
@@ -133,20 +134,39 @@ function ShowPage(WebAdmin, TemplateRequest)
 									<td class="trow1 smalltext">
 	]])
 
-
-	local AllPlugins = WebAdmin:GetPlugins()
-	for key,value in pairs(AllPlugins) do
-		local PluginWebTitle = value:GetWebTitle()
-		local TabNames = value:GetTabNames()
-		if (GetTableSize(TabNames) > 0) then
-			Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>"..PluginWebTitle.."</b></a></div>\n");
-
-			for webname,prettyname in pairs(TabNames) do
-				Output("<div><a href='" .. BaseURL .. PluginWebTitle .. "/" .. webname .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. prettyname .. "</a></div>\n")
+	-- Get all tabs:
+	local perPluginTabs = {}
+	for _, tab in ipairs(cWebAdmin:GetAllWebTabs()) do
+		local pluginTabs = perPluginTabs[tab.PluginName] or {};
+		perPluginTabs[tab.PluginName] = pluginTabs
+		table.insert(pluginTabs, tab)
+	end
+	
+	-- Sort by plugin:
+	local pluginNames = {}
+	for pluginName, pluginTabs in pairs(perPluginTabs) do
+		table.insert(pluginNames, pluginName)
+	end
+	table.sort(pluginNames)
+	
+	-- Output by plugin, then alphabetically:
+	for _, pluginName in ipairs(pluginNames) do
+		local pluginTabs = perPluginTabs[pluginName]
+		table.sort(pluginTabs,
+			function(a_Tab1, a_Tab2)
+				return ((a_Tab1.Title or "") < (a_Tab2.Title or ""))
 			end
+		)
+		
+		-- Translate the plugin name into the folder name (-> title)
+		local pluginWebTitle = cPluginManager:Get():GetPluginFolderName(pluginName) or pluginName
+		Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>" .. pluginWebTitle .. "</b></a></div>\n");
 
-			Output("<br>\n");
+		-- Output each tab:
+		for _, tab in pairs(pluginTabs) do
+			Output("<div><a href='" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. tab.Title .. "</a></div>\n")
 		end
+		Output("<br>\n");
 	end
 
 

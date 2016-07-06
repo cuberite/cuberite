@@ -17,6 +17,7 @@
 #include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
+#include "Entities/Boat.h"
 #include "Entities/ExpOrb.h"
 #include "Entities/FallingBlock.h"
 #include "Entities/Minecart.h"
@@ -186,6 +187,8 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_IsPumpkinBonemealable(true),
 	m_IsSaplingBonemealable(true),
 	m_IsSugarcaneBonemealable(false),
+	m_IsBigFlowerBonemealable(true),
+	m_IsTallGrassBonemealable(true),
 	m_bCommandBlocksEnabled(true),
 	m_bUseChatPrefixes(false),
 	m_TNTShrapnelLevel(slNone),
@@ -214,8 +217,6 @@ cWorld::~cWorld()
 	delete m_WaterSimulator;     m_WaterSimulator    = nullptr;
 	delete m_LavaSimulator;      m_LavaSimulator     = nullptr;
 	delete m_RedstoneSimulator;  m_RedstoneSimulator = nullptr;
-
-	UnloadUnusedChunks();
 
 	m_Storage.WaitForFinish();
 
@@ -472,6 +473,8 @@ void cWorld::Start(void)
 	m_IsPumpkinBonemealable       = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",       false);
 	m_IsSaplingBonemealable       = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",       true);
 	m_IsSugarcaneBonemealable     = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",     false);
+	m_IsBigFlowerBonemealable     = IniFile.GetValueSetB("Plants",        "IsBigFlowerBonemealable",     true);
+	m_IsTallGrassBonemealable     = IniFile.GetValueSetB("Plants",        "IsTallGrassBonemealable",     true);
 	m_IsDeepSnowEnabled           = IniFile.GetValueSetB("Physics",       "DeepSnow",                    true);
 	m_ShouldLavaSpawnFire         = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",         true);
 	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            static_cast<int>(slAll));
@@ -892,9 +895,9 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 	AString DefaultMonsters;
 	switch (m_Dimension)
 	{
-		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, guardian, horse, mooshroom, ocelot, pig, rabbit, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
+		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, guardian, horse, mooshroom, ocelot, pig, rabbit, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;  // TODO Re-add Enderman when bugs are fixed
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
-		case dimEnd:       DefaultMonsters = "enderman"; break;
+		case dimEnd:       DefaultMonsters = ""; break;  // TODO Re-add Enderman when bugs are fixed
 		case dimNotSet:    ASSERT(!"Dimension not set"); break;
 	}
 
@@ -1707,25 +1710,22 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 	{
 		case E_BLOCK_CARROTS:
 		{
-			if (a_IsByBonemeal && !m_IsCarrotsBonemealable)
+			if ((a_IsByBonemeal && !m_IsCarrotsBonemealable) || (BlockMeta >= 7))
 			{
 				return false;
 			}
-			if (BlockMeta < 7)
+			if (!a_IsByBonemeal)
 			{
-				if (!a_IsByBonemeal)
-				{
-					++BlockMeta;
-				}
-				else
-				{
-					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-				}
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+				++BlockMeta;
 			}
-			return BlockMeta == 7;
+			else
+			{
+				BlockMeta += random.NextInt(4) + 2;
+				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
+			}
+			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
 		}
 
 		case E_BLOCK_COCOA_POD:
@@ -1733,36 +1733,34 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			NIBBLETYPE TypeMeta = BlockMeta & 0x03;
 			int GrowState = BlockMeta >> 2;
 
-			if (GrowState < 2)
+			if (GrowState >= 2)
 			{
-				GrowState++;
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 2 | TypeMeta));
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+				return false;
 			}
-			return GrowState == 2;
+			++GrowState;
+			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 2 | TypeMeta));
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
 		}
 
 		case E_BLOCK_CROPS:
 		{
-			if (a_IsByBonemeal && !m_IsCropsBonemealable)
+			if ((a_IsByBonemeal && !m_IsCropsBonemealable) || (BlockMeta >= 7))
 			{
 				return false;
 			}
-			if (BlockMeta < 7)
+			if (!a_IsByBonemeal)
 			{
-				if (!a_IsByBonemeal)
-				{
-					++BlockMeta;
-				}
-				else
-				{
-					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-				}
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+				++BlockMeta;
 			}
-			return BlockMeta == 7;
+			else
+			{
+				BlockMeta += random.NextInt(4) + 2;
+				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
+			}
+			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
 		}
 
 		case E_BLOCK_MELON_STEM:
@@ -1784,7 +1782,6 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			else
 			{
@@ -1792,32 +1789,33 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				{
 					return false;
 				}
-				GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType);
+				if (!GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType))
+				{
+					return false;
+				}
 			}
-			return BlockMeta == 7;
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
 		}
 
 		case E_BLOCK_POTATOES:
 		{
-			if (a_IsByBonemeal && !m_IsPotatoesBonemealable)
+			if ((a_IsByBonemeal && !m_IsPotatoesBonemealable) || (BlockMeta >= 7))
 			{
 				return false;
 			}
-			if (BlockMeta < 7)
+			if (!a_IsByBonemeal)
 			{
-				if (!a_IsByBonemeal)
-				{
-					++BlockMeta;
-				}
-				else
-				{
-					BlockMeta += random.NextInt(4) + 2;
-					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-				}
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+				++BlockMeta;
 			}
-			return BlockMeta == 7;
+			else
+			{
+				BlockMeta += random.NextInt(4) + 2;
+				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
+			}
+			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
 		}
 
 		case E_BLOCK_PUMPKIN_STEM:
@@ -1839,7 +1837,6 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			else
 			{
@@ -1847,9 +1844,13 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				{
 					return false;
 				}
-				GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType);
+				if (!GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType))
+				{
+					return false;
+				}
 			}
-			return BlockMeta == 7;
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
 		}
 
 		case E_BLOCK_SAPLING:
@@ -1874,15 +1875,13 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				}
 
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 3 | TypeMeta));
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
 			}
 			else if (random.NextInt(99) < 45)
 			{
-
 				GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
-				return true;
 			}
-			return false;
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
 		}
 
 		case E_BLOCK_GRASS:
@@ -1932,7 +1931,11 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, m_MaxSugarcaneHeight);
+			if (m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 1) == 0)
+			{
+				return false;
+			}
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
 			return true;
 		}
 
@@ -1942,9 +1945,58 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, m_MaxCactusHeight);
+			if (m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, 1) == 0)
+			{
+				return false;
+			}
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
 			return true;
 		}
+
+		case E_BLOCK_TALL_GRASS:
+		{
+			if (a_IsByBonemeal && !m_IsTallGrassBonemealable)
+			{
+				return false;
+			}
+			if (!m_ChunkMap->GrowTallGrass(a_BlockX, a_BlockY, a_BlockZ))
+			{
+				return false;
+			}
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
+		}
+
+		case E_BLOCK_BIG_FLOWER:
+		{
+			if (a_IsByBonemeal && !m_IsBigFlowerBonemealable)
+			{
+				return false;
+			}
+			if (BlockMeta & 8)  // the upper flower block does not save the type of the flower
+			{
+				GetBlockTypeMeta(a_BlockX, a_BlockY - 1, a_BlockZ, BlockType, BlockMeta);
+				if (BlockType != E_BLOCK_BIG_FLOWER)
+				{
+					return false;
+				}
+			}
+			if (
+				(BlockMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
+				(BlockMeta == E_META_BIG_FLOWER_LARGE_FERN)
+			)  // tall grass and fern do not work
+			{
+				return false;
+			}
+
+			// spawn flower item
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			cItems FlowerItem;
+			FlowerItem.Add(E_BLOCK_BIG_FLOWER, 1, BlockMeta);
+			SpawnItemPickups(FlowerItem, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
+			return true;
+		}
+
 	}  // switch (BlockType)
 	return false;
 }
@@ -1953,28 +2005,28 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 
 
 
-void cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
+int cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
-	m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+	return m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
 }
 
 
 
 
 
-void cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
+bool cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
 {
 	MTRand Rand;
-	m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, Rand);
+	return m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, Rand);
 }
 
 
 
 
 
-void cWorld::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
+int cWorld::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
-	m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+	return m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
 }
 
 
@@ -2183,6 +2235,24 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 
 
+UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
+{
+	cBoat * Boat = new cBoat(a_X, a_Y, a_Z);
+	if (Boat == nullptr)
+	{
+		return cEntity::INVALID_ID;
+	}
+	if (!Boat->Initialize(*this))
+	{
+		delete Boat;
+		return cEntity::INVALID_ID;
+	}
+	return Boat->GetUniqueID();
+}
+
+
+
+
 UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
@@ -2265,9 +2335,9 @@ bool cWorld::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
 
 
 
-void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
-	return m_ChunkMap->BroadcastAttachEntity(a_Entity, a_Vehicle);
+	m_ChunkMap->BroadcastAttachEntity(a_Entity, a_Vehicle);
 }
 
 
@@ -2349,6 +2419,15 @@ void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	m_ChunkMap->BroadcastDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 

@@ -6,7 +6,6 @@
 
 #include "Globals.h"
 #include "NetworkSingleton.h"
-#include <event2/event.h>
 #include <event2/thread.h>
 #include <event2/bufferevent.h>
 #include <event2/dns.h>
@@ -91,8 +90,9 @@ void cNetworkSingleton::Initialise(void)
 	}
 
 	// Create the event loop thread:
-	m_EventLoopThread = std::thread(RunEventLoop, this);
 	m_HasTerminated = false;
+	m_EventLoopThread = std::thread(RunEventLoop, this);
+	m_StartupEvent.Wait();  // Wait for the LibEvent loop to actually start running (otherwise calling Terminate too soon would hang, see #3228)
 }
 
 
@@ -153,7 +153,21 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 
 void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 {
+	auto timer = evtimer_new(a_Self->m_EventBase, SignalizeStartup, a_Self);
+	timeval timeout{};  // Zero timeout - execute immediately
+	evtimer_add(timer, &timeout);
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
+}
+
+
+
+
+
+void cNetworkSingleton::SignalizeStartup(evutil_socket_t a_Socket, short a_Events, void * a_Self)
+{
+	auto self = reinterpret_cast<cNetworkSingleton *>(a_Self);
+	ASSERT(self != nullptr);
+	self->m_StartupEvent.Set();
 }
 
 

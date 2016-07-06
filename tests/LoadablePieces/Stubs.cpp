@@ -6,7 +6,6 @@
 
 #include "Globals.h"
 #include "BlockInfo.h"
-#include "SelfTests.h"
 #include "Bindings.h"
 #include "Bindings/DeprecatedBindings.h"
 #include "Bindings/LuaJson.h"
@@ -267,33 +266,6 @@ bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a
 cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
 {
 	return nullptr;
-}
-
-
-
-
-
-cSelfTests::cSelfTests(void):
-	m_AllowRegistering(true)
-{
-}
-
-
-
-
-
-cSelfTests & cSelfTests::Get(void)
-{
-	static cSelfTests singleton;
-	return singleton;
-}
-
-
-
-
-
-void cSelfTests::Register(cSelfTests::SelfTestFunction a_TestFn, const AString & a_TestName)
-{
 }
 
 

@@ -131,6 +131,7 @@ return
 				GetEntityEffect = { Params = "", Return = "{{cEntityEffect}}", Notes = "Returns the entity effect in this potion" },
 				GetEntityEffectType = { Params = "", Return = "{{cEntityEffect|Entity effect type}}", Notes = "Returns the effect type of this potion" },
 				GetPotionColor = { Params = "", Return = "number", Notes = "Returns the color index of the particles emitted by this potion" },
+				GetItem  = { Params = "", Return = "{{cItem}}", Notes = "Gets the potion item that was thrown." },
 				SetEntityEffect = { Params = "{{cEntityEffect}}", Return = "", Notes = "Sets the entity effect for this potion" },
 				SetEntityEffectType = { Params = "{{cEntityEffect|Entity effect type}}", Return = "", Notes = "Sets the effect type of this potion" },
 				SetPotionColor = { Params = "number", Return = "", Notes = "Sets the color index of the particles for this potion" },

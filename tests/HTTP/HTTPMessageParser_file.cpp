@@ -71,7 +71,7 @@ public:
 
 int main(int argc, char * argv[])
 {
-	printf("HTTPMessageParser_file beginning\n");
+	LOGD("Test started");
 
 	// Open the input file:
 	if (argc <= 1)

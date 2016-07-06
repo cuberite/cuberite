@@ -44,17 +44,30 @@ add_executable(HTTPMessageParser_file-exe HTTPMessageParser_file.cpp)
 target_link_libraries(HTTPMessageParser_file-exe HTTP)
 
 # Test parsing the response file in 2-byte chunks (should go from response line parsing through headers parsing to body parsing, each within a different step):
-add_test(NAME HTTPMessageParser_file-test1-2 COMMAND HTTPMessageParser_file-exe HTTPResponse1.data 2)
+add_test(NAME HTTPMessageParser_file-test1-2 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPResponse1.data 2)
 
 # Test parsing the response file in 128-byte chunks (should parse response line and part of headers in one step, the rest in another step):
-add_test(NAME HTTPMessageParser_file-test1-128 COMMAND HTTPMessageParser_file-exe HTTPResponse1.data 128)
+add_test(NAME HTTPMessageParser_file-test1-128 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPResponse1.data 128)
 
 # Test parsing a chunked-encoding response:
-add_test(NAME HTTPMessageParser_file-test2 COMMAND HTTPMessageParser_file-exe HTTPResponse2.data)
+add_test(NAME HTTPMessageParser_file-test2 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPResponse2.data)
 
 # Test parsing the request file in 2-byte chunks (should go from request line parsing through headers parsing to body parsing, each within a different step):
-add_test(NAME HTTPMessageParser_file-test3-2 COMMAND HTTPMessageParser_file-exe HTTPRequest1.data 2)
+add_test(NAME HTTPMessageParser_file-test3-2 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPRequest1.data 2)
 
 # Test parsing the request file in 512-byte chunks (should process everything in a single call):
-add_test(NAME HTTPMessageParser_file-test4-512 COMMAND HTTPMessageParser_file-exe HTTPRequest1.data 512)
+add_test(NAME HTTPMessageParser_file-test4-512 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPRequest1.data 512)
 
+
+
+
+
+# Put all the tests into a solution folder (MSVC):
+set_target_properties(
+	HTTPMessageParser_file-exe
+	PROPERTIES FOLDER Tests
+)
+set_target_properties(
+	HTTP
+	PROPERTIES FOLDER Lib
+)

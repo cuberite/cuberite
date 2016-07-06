@@ -60,12 +60,13 @@ enum eBlockFace
 /** PlayerDigging status constants */
 enum
 {
-	DIG_STATUS_STARTED   = 0,
-	DIG_STATUS_CANCELLED = 1,
-	DIG_STATUS_FINISHED  = 2,
-	DIG_STATUS_DROP_STACK= 3,
-	DIG_STATUS_DROP_HELD = 4,
-	DIG_STATUS_SHOOT_EAT = 5,
+	DIG_STATUS_STARTED           = 0,
+	DIG_STATUS_CANCELLED         = 1,
+	DIG_STATUS_FINISHED          = 2,
+	DIG_STATUS_DROP_STACK        = 3,
+	DIG_STATUS_DROP_HELD         = 4,
+	DIG_STATUS_SHOOT_EAT         = 5,
+	DIG_STATUS_SWAP_ITEM_IN_HAND = 6,
 } ;
 
 
@@ -782,6 +783,19 @@ namespace ItemCategory
 			(a_ItemType == E_ITEM_CHAIN_BOOTS) ||
 			(a_ItemType == E_ITEM_IRON_BOOTS) ||
 			(a_ItemType == E_ITEM_DIAMOND_BOOTS)
+		);
+	}
+
+
+
+	inline bool IsMinecart(short a_ItemType)
+	{
+		return (
+			(a_ItemType == E_ITEM_MINECART) ||
+			(a_ItemType == E_ITEM_CHEST_MINECART) ||
+			(a_ItemType == E_ITEM_FURNACE_MINECART) ||
+			(a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
+			(a_ItemType == E_ITEM_MINECART_WITH_HOPPER)
 		);
 	}
 

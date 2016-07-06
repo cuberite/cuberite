@@ -8,5 +8,5 @@ dependencies:
 
 test:
  override:
-  - cd src && find . -name \*.cpp -or -name \*.h > AllFiles.lst
-  - cd src && lua CheckBasicStyle.lua
+  - cd src && find . -name \*.cpp -or -name \*.h > AllFiles.lst && lua CheckBasicStyle.lua
+  - cd src/Bindings && lua CheckBindingsDependencies.lua

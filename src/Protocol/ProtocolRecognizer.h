@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.7.x, 1.8.x"
-#define MCS_PROTOCOL_VERSIONS "4, 5, 47"
+#define MCS_CLIENT_VERSIONS "1.7.x, 1.8.x, 1.9.x"
+#define MCS_PROTOCOL_VERSIONS "4, 5, 47, 107, 108, 109, 110"
 
 
 
@@ -36,6 +36,10 @@ public:
 		PROTO_VERSION_1_7_2 = 4,
 		PROTO_VERSION_1_7_6 = 5,
 		PROTO_VERSION_1_8_0 = 47,
+		PROTO_VERSION_1_9_0 = 107,
+		PROTO_VERSION_1_9_1 = 108,
+		PROTO_VERSION_1_9_2 = 109,
+		PROTO_VERSION_1_9_4 = 110,
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
@@ -48,7 +52,7 @@ public:
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
-	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
+	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
@@ -59,6 +63,7 @@ public:
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
+	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
@@ -134,12 +139,17 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
+	void SendPingStatusResponse(void);
+
 protected:
 	/** The recognized protocol */
 	cProtocol * m_Protocol;
 
 	/** Buffer for the incoming data until we recognize the protocol */
 	cByteBuffer m_Buffer;
+
+	/** Is a server list ping for an unrecognized version currently occuring? */
+	bool m_InPingForUnrecognizedVersion;
 
 
 	/** Tries to recognize protocol based on m_Buffer contents; returns true if recognized */

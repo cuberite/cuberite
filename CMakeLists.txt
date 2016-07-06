@@ -95,6 +95,7 @@ set(SELF_TEST OFF CACHE BOOL "")
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	message("Building tools")
+	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
 	add_subdirectory(Tools/MCADefrag/)
 	add_subdirectory(Tools/ProtoProxy/)
 endif()
@@ -263,27 +264,6 @@ if (MSVC)
 		tolua
 		PROPERTIES FOLDER Support
 	)
-	if (${SELF_TEST})
-		set_target_properties(
-			Network
-			HTTP
-			PROPERTIES FOLDER Lib
-		)
-		set_target_properties(
-			arraystocoords-exe
-			ChunkBuffer
-			coordinates-exe
-			copies-exe
-			copyblocks-exe
-			creatable-exe
-			EchoServer
-			Google-exe
-			HTTPMessageParser_file-exe
-			LoadablePieces
-			NameLookup
-			PROPERTIES FOLDER Tests
-		)
-	endif()
 
 	if(${BUILD_TOOLS})
 		set_target_properties(

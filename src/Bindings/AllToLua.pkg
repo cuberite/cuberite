@@ -38,7 +38,6 @@ $cfile "LuaFunctions.h"
 $cfile "PluginManager.h"
 $cfile "Plugin.h"
 $cfile "PluginLua.h"
-$cfile "WebPlugin.h"
 $cfile "LuaWindow.h"
 
 $cfile "../BlockID.h"

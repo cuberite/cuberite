@@ -107,19 +107,20 @@ public:
 		return x * a_Rhs.x + y * a_Rhs.y + z * a_Rhs.z;
 	}
 
-	inline void abs()
+	/** Updates each coord to its absolute value */
+	inline void Abs()
 	{
 		x = (x < 0) ? -x : x;
 		y = (y < 0) ? -y : y;
 		z = (z < 0) ? -z : z;
 	}
 
-	// We can't use a capital letter, because we wouldn't be able to call the normal Clamp function.
-	inline void clamp(T a_Min, T a_Max)
+	/** Clamps each coord into the specified range. */
+	inline void Clamp(T a_Min, T a_Max)
 	{
-		x = Clamp(x, a_Min, a_Max);
-		y = Clamp(y, a_Min, a_Max);
-		z = Clamp(z, a_Min, a_Max);
+		x = ::Clamp(x, a_Min, a_Max);
+		y = ::Clamp(y, a_Min, a_Max);
+		z = ::Clamp(z, a_Min, a_Max);
 	}
 
 	inline Vector3<T> Cross(const Vector3<T> & a_Rhs) const

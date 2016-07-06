@@ -41,7 +41,7 @@ cDropSpenserEntity::~cDropSpenserEntity()
 
 void cDropSpenserEntity::AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_Direction)
 {
-	switch (a_Direction & 0x07)  // Vanilla uses the 8th bit to determine power state - we don't
+	switch (a_Direction & E_META_DROPSPENSER_FACING_MASK)
 	{
 		case E_META_DROPSPENSER_FACING_YM: a_BlockY--; return;
 		case E_META_DROPSPENSER_FACING_YP: a_BlockY++; return;
@@ -87,7 +87,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	// Broadcast a smoke and click effects:
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	int SmokeDir = 0;
-	switch (Meta)
+	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
 		case E_META_DROPSPENSER_FACING_YP: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
 		case E_META_DROPSPENSER_FACING_YM: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;
@@ -176,7 +176,7 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 	const int PickupSpeed = m_World->GetTickRandomNumber(4) + 2;  // At least 2, at most 6
 	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
-	switch (Meta)
+	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
 		case E_META_DROPSPENSER_FACING_YP: PickupSpeedY =  PickupSpeed; break;
 		case E_META_DROPSPENSER_FACING_YM: PickupSpeedY = -PickupSpeed; break;

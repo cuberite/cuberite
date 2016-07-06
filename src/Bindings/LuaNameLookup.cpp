@@ -12,7 +12,7 @@
 
 cLuaNameLookup::cLuaNameLookup(const AString & a_Query, cPluginLua & a_Plugin, int a_CallbacksTableStackPos):
 	m_Plugin(a_Plugin),
-	m_Callbacks(a_Plugin.GetLuaState(), a_CallbacksTableStackPos),
+	m_Callbacks(cPluginLua::cOperation(a_Plugin)(), a_CallbacksTableStackPos),
 	m_Query(a_Query)
 {
 }

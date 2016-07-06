@@ -69,6 +69,7 @@ BookShelf               = Planks^-1, 1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2
 BrickBlock              = Brick,     1:1, 1:2, 2:1, 2:2
 ChiseledQuartzBlock     = QuartzSlab, 1:1, 1:2
 ChiseledRedSandstone    = RedSandstoneSlab, 1:1, 1:2
+ChiseledStoneBrick      = StoneBrickSlab, 1:1, 1:2
 ClayBlock               = Clay,      1:1, 1:2, 2:1, 2:2
 CoalBlock               = Coal, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 CoarsedDirt, 4          = Dirt, 1:1, 2:2 | Gravel, 1:2, 2:1
@@ -77,6 +78,7 @@ DarkPrismarine          = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:
 DiamondBlock            = Diamond,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 Diorite, 2              = Cobblestone, * | NetherQuartz, *
 EmeraldBlock            = Emerald,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+EndstoneBrick, 4        = Endstone, 1:1, 1:2, 2:1, 2:2
 Glowstone               = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
 GoldBlock               = GoldIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 Granite, 2              = Diorite, * | NetherQuartz, *
@@ -93,8 +95,10 @@ PillarQuartzBlock, 2    = QuartzBlock, 1:1, 1:2
 PolishedAndesite, 4     = Andesite,  1:1, 1:2, 2:1, 2:2
 PolishedDiorite, 4      = Diorite,   1:1, 1:2, 2:1, 2:2
 PolishedGranite, 4      = Granite,   1:1, 1:2, 2:1, 2:2
-PrismarineBricks        = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 Prismarine              = PrismarineShard, 1:1, 1:2, 2:1, 2:2
+PrismarineBricks        = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+PurpurBlock, 4          = PoppedChorusFruit, 1:1, 1:2, 2:1, 2:2
+PurpurPillar, 1         = PurpurSlab, 1:1, 1:2
 QuartzBlock             = NetherQuartz, 1:1, 1:2, 2:1, 2:2
 RedSandstone            = RedSand, 1:1, 1:2, 2:1, 2:2
 RedstoneBlock           = RedstoneDust,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
@@ -109,55 +113,58 @@ TNT                     = Gunpowder, 1:1, 3:1, 2:2, 1:3, 3:3 | Sand, 2:1, 1:2, 3
 Wool                    = String,    1:1, 1:2, 2:1, 2:2
 
 # Slabs:
-AcaciaWoodSlab,  6  = AcaciaPlanks,      1:1, 2:1, 3:1
-BirchWoodSlab,   6  = BirchPlanks,       1:1, 2:1, 3:1
-BrickSlab,       6  = BrickBlock,        1:1, 2:1, 3:1
-CobblestoneSlab, 6  = Cobblestone,       1:1, 2:1, 3:1
-DarkOakWoodSlab, 6  = DarkOakPlanks,     1:1, 2:1, 3:1
-JungleWoodSlab,  6  = JunglePlanks,      1:1, 2:1, 3:1
-NetherbrickSlab, 6  = NetherBrick,       1:1, 2:1, 3:1
-OakWoodSlab,     6  = OakPlanks,         1:1, 2:1, 3:1
-Quartzslab,      6  = QuartzBlock,       1:1, 2:1, 3:1
+AcaciaWoodSlab,   6 = AcaciaPlanks,      1:1, 2:1, 3:1
+BirchWoodSlab,    6 = BirchPlanks,       1:1, 2:1, 3:1
+BrickSlab,        6 = BrickBlock,        1:1, 2:1, 3:1
+CobblestoneSlab,  6 = Cobblestone,       1:1, 2:1, 3:1
+DarkOakWoodSlab,  6 = DarkOakPlanks,     1:1, 2:1, 3:1
+JungleWoodSlab,   6 = JunglePlanks,      1:1, 2:1, 3:1
+NetherbrickSlab,  6 = NetherBrick,       1:1, 2:1, 3:1
+OakWoodSlab,      6 = OakPlanks,         1:1, 2:1, 3:1
+PurpurSlab,       6 = PurpurBlock,       1:1, 2:1, 3:1
+Quartzslab,       6 = QuartzBlock,       1:1, 2:1, 3:1
 RedSandstoneSlab, 6 = RedSandstone^-1,   1:1, 2:1, 3:1
-SandstoneSlab,   6  = OrnamentSandstone, 1:1, 2:1, 3:1
-SandstoneSlab,   6  = Sandstone,         1:1, 2:1, 3:1
-SandstoneSlab,   6  = SmoothSandstone,   1:1, 2:1, 3:1
-SnowLayer,       6  = SnowBlock,         1:1, 2:1, 3:1
-SpruceWoodSlab,  6  = SprucePlanks,      1:1, 2:1, 3:1
-StonebrickSlab,  6  = StoneBrick,        1:1, 2:1, 3:1
-StoneSlab,       6  = Stone,             1:1, 2:1, 3:1
+SandstoneSlab,    6 = OrnamentSandstone, 1:1, 2:1, 3:1
+SandstoneSlab,    6 = Sandstone,         1:1, 2:1, 3:1
+SandstoneSlab,    6 = SmoothSandstone,   1:1, 2:1, 3:1
+SnowLayer,        6 = SnowBlock,         1:1, 2:1, 3:1
+SpruceWoodSlab,   6 = SprucePlanks,      1:1, 2:1, 3:1
+StonebrickSlab,   6 = StoneBrick,        1:1, 2:1, 3:1
+StoneSlab,        6 = Stone,             1:1, 2:1, 3:1
 
 # Stairs:
-AcaciaWoodStairs, 4  = AcaciaPlanks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-AcaciaWoodStairs, 4  = AcaciaPlanks, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-BirchWoodStairs, 4   = BirchPlanks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-BirchWoodStairs, 4   = BirchPlanks, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-BrickStairs, 4       = BrickBlock,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-BrickStairs, 4       = BrickBlock,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-cobblestoneStairs, 4 = Cobblestone, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-cobblestoneStairs, 4 = Cobblestone, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-DarkOakWoodStairs, 4 = DarkOakPlanks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-DarkOakWoodStairs, 4 = DarkOakPlanks, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-JungleWoodStairs, 4  = JunglePlanks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-JungleWoodStairs, 4  = JunglePlanks, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-NetherBrickStairs, 4 = NetherBrick, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-NetherBrickStairs, 4 = NetherBrick, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-quartzstairs, 4      = QuartzBlock, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-quartzstairs, 4      = QuartzBlock, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-RedSandstoneStairs, 4 = RedSandstone^-1,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-RedSandstoneStairs, 4 = RedSandstone^-1,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-SandstoneStairs, 4   = OrnamentSandstone, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-SandstoneStairs, 4   = OrnamentSandstone, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-SandstoneStairs, 4   = Sandstone,   1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-SandstoneStairs, 4   = Sandstone,   3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-SandstoneStairs, 4   = SmoothSandstone, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-SandstoneStairs, 4   = SmoothSandstone, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-SpruceWoodStairs, 4  = SprucePlanks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-SpruceWoodStairs, 4  = SprucePlanks, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-StoneBrickStairs, 4  = StoneBrick,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-StoneBrickStairs, 4  = StoneBrick,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-WoodStairs, 4        = OakPlanks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-WoodStairs, 4        = OakPlanks, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+AcaciaWoodStairs, 4   = AcaciaPlanks,      1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+AcaciaWoodStairs, 4   = AcaciaPlanks,      3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+BirchWoodStairs, 4    = BirchPlanks,       1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+BirchWoodStairs, 4    = BirchPlanks,       3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+BrickStairs, 4        = BrickBlock,        1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+BrickStairs, 4        = BrickBlock,        3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+cobblestoneStairs, 4  = Cobblestone,       1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+cobblestoneStairs, 4  = Cobblestone,       3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+DarkOakWoodStairs, 4  = DarkOakPlanks,     1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+DarkOakWoodStairs, 4  = DarkOakPlanks,     3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+JungleWoodStairs, 4   = JunglePlanks,      1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+JungleWoodStairs, 4   = JunglePlanks,      3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+NetherBrickStairs, 4  = NetherBrick,       1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+NetherBrickStairs, 4  = NetherBrick,       3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+PurpurStairs, 4       = PurpurBlock,       1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+PurpurStairs, 4       = PurpurBlock,       3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+QuartzStairs, 4       = QuartzBlock,       1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+QuartzStairs, 4       = QuartzBlock,       3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+RedSandstoneStairs, 4 = RedSandstone^-1,   1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+RedSandstoneStairs, 4 = RedSandstone^-1,   3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4    = OrnamentSandstone, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4    = OrnamentSandstone, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4    = Sandstone,         1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4    = Sandstone,         3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4    = SmoothSandstone,   1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+SandstoneStairs, 4    = SmoothSandstone,   3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+SpruceWoodStairs, 4   = SprucePlanks,      1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+SpruceWoodStairs, 4   = SprucePlanks,      3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+StoneBrickStairs, 4   = StoneBrick,        1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+StoneBrickStairs, 4   = StoneBrick,        3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+WoodStairs, 4         = OakPlanks,         1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+WoodStairs, 4         = OakPlanks,         3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 
 
 
@@ -217,14 +224,15 @@ Watch          = GoldIngot, 2:1, 1:2, 3:2, 2:3 | RedstoneDust, 2:2
 #******************************************************#
 # Weapons
 #
-Arrow, 4       = Flint, 1:1             | Stick, 1:2       | Feather, 1:3
-Bow            = Stick, 2:1, 1:2, 2:3   | String, 3:1, 3:2, 3:3
-Bow            = Stick, 2:1, 3:2, 2:3   | String, 1:1, 1:2, 1:3
-DiamondSword   = Stick, 2:3 | Diamond,     2:1, 2:2
-GoldenSword    = Stick, 2:3 | GoldIngot,   2:1, 2:2
-IronSword      = Stick, 2:3 | IronIngot,   2:1, 2:2
-StoneSword     = Stick, 2:3 | Cobblestone, 2:1, 2:2
-WoodenSword    = Stick, 2:3 | Planks^-1,   2:1, 2:2
+Arrow, 4         = Flint, 1:1             | Stick, 1:2       | Feather, 1:3
+Bow              = Stick, 2:1, 1:2, 2:3   | String, 3:1, 3:2, 3:3
+Bow              = Stick, 2:1, 3:2, 2:3   | String, 1:1, 1:2, 1:3
+DiamondSword     = Stick, 2:3 | Diamond,     2:1, 2:2
+GoldenSword      = Stick, 2:3 | GoldIngot,   2:1, 2:2
+IronSword        = Stick, 2:3 | IronIngot,   2:1, 2:2
+SpectralArrow, 2 = Arrow, 2:2 | GlowstoneDust, 1:2, 2:1, 2:3, 3:2
+StoneSword       = Stick, 2:3 | Cobblestone, 2:1, 2:2
+WoodenSword      = Stick, 2:3 | Planks^-1,   2:1, 2:2
 
 
 
@@ -243,18 +251,18 @@ IronHelmet       = IronIngot, 1:1, 2:1, 3:1, 1:2, 3:2
 LeatherHelmet    = Leather,   1:1, 2:1, 3:1, 1:2, 3:2
 
 # Chestplates:
-ChainmailChestplate  = Fire,      1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
-DiamondChestplate    = Diamond,   1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
-GoldenChestplate     = GoldIngot, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
-IronChestplate       = IronIngot, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
-LeatherChestplate    = Leather,   1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
+ChainmailChestplate = Fire,      1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
+DiamondChestplate   = Diamond,   1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
+GoldenChestplate    = GoldIngot, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
+IronChestplate      = IronIngot, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
+LeatherChestplate   = Leather,   1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
 
-# Leggins:
-ChainmailPants   = Fire,      1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
-DiamondPants     = Diamond,   1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
-GoldenPants      = GoldIngot, 1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
-IronPants        = IronIngot, 1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
-LeatherPants     = Leather,   1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
+# Leggings:
+ChainmailLeggings = Fire,      1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
+DiamondLeggings   = Diamond,   1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
+GoldenLeggings    = GoldIngot, 1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
+IronLeggings      = IronIngot, 1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
+LeatherPants      = Leather,   1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
 
 # Boots:
 ChainmailBoots   = Fire,      1:1, 3:1, 1:2, 3:2
@@ -263,6 +271,8 @@ GoldenBoots      = GoldIngot, 1:1, 3:1, 1:2, 3:2
 IronBoots        = IronIngot, 1:1, 3:1, 1:2, 3:2
 LeatherBoots     = Leather,   1:1, 3:1, 1:2, 3:2
 
+# Shield:
+Shield = IronIngot, 2:1 | Planks^-1, 1:1, 3:1, 1:2, 2:2, 3:2, 2:3
 
 
 
@@ -270,15 +280,20 @@ LeatherBoots     = Leather,   1:1, 3:1, 1:2, 3:2
 #******************************************************#
 # Transportation
 #
+AcaciaBoat       = AcaciaPlanks, 1:1, 3:1, 1:2, 2:2, 3:2
 ActivatorRail, 6 = IronIngot, 1:1, 1:2, 1:3, 3:1, 3:2, 3:3 | Stick, 2:1, 2:3 | RedstoneTorchon, 2:2
-Boat             = Planks^-1, 1:1, 3:1, 1:2, 2:2, 3:2
+BirchBoat        = BirchPlanks, 1:1, 3:1, 1:2, 2:2, 3:2
 CarrotOnAStick   = FishingRod, 1:2 | Carrot, 2:3
+DarkOakBoat      = DarkOakPlanks, 1:1, 3:1, 1:2, 2:2, 3:2
 DetectorRail, 6  = IronIngot, 1:1, 3:1, 1:2, 3:2, 1:3, 3:3 | StonePlate, 2:2 | RedstoneDust, 2:3
 hopperminecart   = Minecart, * | Hopper, *
+JungleBoat       = JunglePlanks, 1:1, 3:1, 1:2, 2:2, 3:2
 Minecart         = IronIngot, 1:1, 3:1, 1:2, 2:2, 3:2
+OakBoat          = OakPlanks, 1:1, 3:1, 1:2, 2:2, 3:2
 PoweredMinecart  = Minecart, * | Furnace, *
 PoweredRail, 6   = GoldIngot, 1:1, 3:1, 1:2, 3:2, 1:3, 3:3 | Stick, 2:2      | RedstoneDust, 2:3
 Rails, 16        = IronIngot, 1:1, 3:1, 1:2, 3:2, 1:3, 3:3 | Stick, 2:2
+SpruceBoat       = SprucePlanks, 1:1, 3:1, 1:2, 2:2, 3:2
 StorageMinecart  = Minecart, * | Chest, *
 TNTMinecart      = Minecart, * | TNT, *
 
@@ -334,6 +349,7 @@ GoldenApple          = RedApple, 2:2 | GoldIngot, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 
 MelonBlock           = MelonSlice, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 MelonSeeds           = MelonSlice, *
 MushroomStew         = Bowl, * | BrownMushroom, * | RedMushroom, *
+BeetrootSoup         = Bowl, 2:3  | Beetroot, 1:1, 2:1, 3:1, 1:2, 2:2, 2:3
 PumpkinPie           = Pumpkin, * | Sugar, * | egg, *
 PumpkinSeeds, 4      = Pumpkin, *
 RabbitStew           = Cooked Rabbit, 2:1 | Carrot, 1:2 | BakedPotato, 2:2 | BrownMushroom, 3:2 | Bowl, 2:3
@@ -360,37 +376,37 @@ LapisLazuli, 9  = LapisBlock, *
 RedstoneDust, 9 = RedstoneBlock, *
 SlimeBall, 9    = SlimeBlock, *
 
-AcaciaFence, 3      = AcaciaPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
-AcaciaFenceGate     = Stick,       1:1, 1:2, 3:1, 3:2  | AcaciaPlanks, 2:1, 2:2
-Anvil               = IronBlock, 1:1, 2:1, 3:1 | IronIngot, 2:2, 1:3, 2:3, 3:3
-ArmorStand          = Stick, 1:1, 1:3, 2:1, 2:2, 3:1, 3:3 | StoneSlab, 2:3
-Beacon              = Glass, 1:1, 1:2, 2:1, 3:1, 3:2 | Obsidian, 1:3, 2:3, 3:3 | NetherStar, 2:2
-Bed                 = Planks^-1,   1:2, 2:2, 3:2       | Wool^-1,   1:1, 2:1, 3:1
-BirchFence, 3       = BirchPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
-BirchFenceGate      = Stick,       1:1, 1:2, 3:1, 3:2  | BirchPlanks, 2:1, 2:2
-Bookandquill        = Book, * | feather, * | inksac, *
-Book                = Paper, *, *, * | leather, *
-Cobblestonewall, 6  = cobblestone, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
-DarkOakFence, 3     = DarkOakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
-DarkOakFenceGate    = Stick,       1:1, 1:2, 3:1, 3:2  | DarkOakPlanks, 2:1, 2:2
-EyeOfEnder          = EnderPearl, *                 | BlazePowder, *
-Fence, 3            = OakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
-FenceGate           = Stick,       1:1, 1:2, 3:1, 3:2  | OakPlanks, 2:1, 2:2
-FlowerPot           = Brick, 1:2, 2:3, 3:2
-GlassPane, 16       = Glass,     1:1, 2:1, 3:1, 1:2, 2:2, 3:2
-GoldIngot           = GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-IronBars, 16        = IronIngot, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
-ItemFrame           = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Leather, 2:2
-JungleFence, 3      = JunglePlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
-JungleFenceGate     = Stick,       1:1, 1:2, 3:1, 3:2  | JunglePlanks, 2:1, 2:2
-Ladder, 3           = Stick, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 3:3
+AcaciaFence, 3           = AcaciaPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+AcaciaFenceGate          = Stick, 1:1, 1:2, 3:1, 3:2 | AcaciaPlanks, 2:1, 2:2
+Anvil                    = IronBlock, 1:1, 2:1, 3:1 | IronIngot, 2:2, 1:3, 2:3, 3:3
+ArmorStand               = Stick, 1:1, 1:3, 2:1, 2:2, 3:1, 3:3 | StoneSlab, 2:3
+Beacon                   = Glass, 1:1, 1:2, 2:1, 3:1, 3:2 | Obsidian, 1:3, 2:3, 3:3 | NetherStar, 2:2
+Bed                      = Planks^-1, 1:2, 2:2, 3:2 | Wool^-1, 1:1, 2:1, 3:1
+BirchFence, 3            = BirchPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+BirchFenceGate           = Stick, 1:1, 1:2, 3:1, 3:2 | BirchPlanks, 2:1, 2:2
+Bookandquill             = Book, * | feather, * | inksac, *
+Book                     = Paper, *, *, * | leather, *
+Cobblestonewall, 6       = cobblestone, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
+DarkOakFence, 3          = DarkOakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+DarkOakFenceGate         = Stick, 1:1, 1:2, 3:1, 3:2  | DarkOakPlanks, 2:1, 2:2
+EyeOfEnder               = EnderPearl, * | BlazePowder, *
+Fence, 3                 = OakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+FenceGate                = Stick, 1:1, 1:2, 3:1, 3:2 | OakPlanks, 2:1, 2:2
+FlowerPot                = Brick, 1:2, 2:3, 3:2
+GlassPane, 16            = Glass, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
+GoldIngot                = GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+IronBars, 16             = IronIngot, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
+ItemFrame                = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | Leather, 2:2
+JungleFence, 3           = JunglePlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+JungleFenceGate          = Stick, 1:1, 1:2, 3:1, 3:2 | JunglePlanks, 2:1, 2:2
+Ladder, 3                = Stick, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 3:3
 mossycobblestonewall, 6  = mossycobblestone, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
-NetherBrickFence, 6 = NetherBrick, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
-Painting            = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Wool^-1, 2:2
-Paper, 3            = Sugarcane, 1:1, 2:1, 3:1
-Sign, 3             = Planks^-1, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2         | Stick, 2:3
-SpruceFence, 3      = SprucePlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
-SpruceFenceGate     = Stick,       1:1, 1:2, 3:1, 3:2  | SprucePlanks, 2:1, 2:2
+NetherBrickFence, 6      = NetherBrick, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
+Painting                 = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | Wool^-1, 2:2
+Paper, 3                 = Sugarcane, 1:1, 2:1, 3:1
+Sign, 3                  = Planks^-1, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2 | Stick, 2:3
+SpruceFence, 3           = SprucePlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+SpruceFenceGate          = Stick, 1:1, 1:2, 3:1, 3:2 | SprucePlanks, 2:1, 2:2
 
 # These are just the basic ones, you can add various shapes and stuff to each of them
 # ToDo: Add the various shapes (saved in NBT-Tags, not in meta)
@@ -421,6 +437,7 @@ YellowBanner        = Stick, 2:3 | YellowWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
 # Dyes
 #
 
+RedDye, 1     = Beetroot, *
 RedDye, 2     = Rose, *
 WhiteDye, 3   = Bone, *
 YellowDye, 2  = Dandelion, *
@@ -464,7 +481,7 @@ OrangeWool    = WhiteWool, * | OrangeDye, *
 PinkWool      = WhiteWool, * | PinkDye, *
 PurpleWool    = WhiteWool, * | PurpleDye, *
 RedWool       = WhiteWool, * | RedDye, *
-WhiteWool     = Wool^-1, * | BoneMeal, *
+WhiteWool     = Wool^-1, *   | BoneMeal, *
 YellowWool    = WhiteWool, * | YellowDye, *
 
 BlackCarpet, 3     = BlackWool, 1:1, 2:1
@@ -548,54 +565,54 @@ YellowStainedClay, 8    = HardenedClay, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 |
 # Enchantment & Brewing
 #
 BlazePowder, 2     = BlazeRod, *
-BrewingStand       = Cobblestone, 1:2, 2:2, 3:2   | BlazeRod, 2:1
+BrewingStand       = Cobblestone, 1:2, 2:2, 3:2 | BlazeRod, 2:1
 Cauldron           = IronIngot, 1:1, 3:1, 1:2, 3:2, 1:3, 2:3, 3:3
 EnchantmentTable   = Obsidian, 1:3, 2:3, 3:3, 2:2 | Diamond, 1:2, 3:2 | Book, 2:1
-FermentedSpiderEye = SpiderEye, *   | Sugar, *    | BrownMushroom, *
+FermentedSpiderEye = SpiderEye, * | Sugar, * | BrownMushroom, *
 GlassBottle, 3     = Glass, 1:1, 2:2, 3:1
-GlisteringMelon    = MelonSlice, 2:2  | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
-GoldenCarrot       = Carrot, 2:2  | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
+GlisteringMelon    = MelonSlice, 2:2 | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
+GoldenCarrot       = Carrot, 2:2 | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 GoldNugget, 9      = GoldIngot, *
-MagmaCream         = SlimeBall, *    | BlazePowder, *
+MagmaCream         = SlimeBall, * | BlazePowder, *
 
 #******************************************************#
 # Dyed Armor 
 # Do not modify
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, *
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, *
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherHelmet		= LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
 
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, *
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, *
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherChestplate		= LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherChestplate = LeatherChestplate^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
 
-LeatherPants		= LeatherPants^-1, * | Dye^-1, *
-LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, *
-LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherPants		= LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherPants = LeatherPants^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
 
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, *
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, *
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
-LeatherBoots		= LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
+LeatherBoots = LeatherBoots^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, * | Dye^-1, *
 
 #******************************************************#
 # Fireworks & Co.

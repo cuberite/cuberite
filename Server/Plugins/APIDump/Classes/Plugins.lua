@@ -2,7 +2,7 @@ return
 {
 	cPlugin =
 	{
-		Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own Plugin object.
+		Desc = [[cPlugin describes a Lua plugin. This page is dedicated to new-style plugins and contain their functions. Each plugin has its own cPlugin object.
 ]],
 		Functions =
 		{
@@ -22,10 +22,10 @@ return
 
 	cPluginLua =
 	{
-		Desc = "",
+		Desc = "(<b>OBSOLETE</b>) This class is no longer useful in the API and will be removed as soon as all core plugins are migrated away from it. The {{cPlugin}} class serves as the main plugin instance's interface.",
 		Functions =
 		{
-			AddWebTab = { Params = "", Return = "", Notes = "Adds a new webadmin tab" },
+			AddWebTab = { Params = "Title, HandlerFn", Return = "", Notes = "<b>OBSOLETE</b> - Use {{cWebAdmin}}:AddWebTab() instead." },
 		},
 		Inherits = "cPlugin",
 	},  -- cPluginLua
@@ -65,7 +65,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				{ Params = "Command, Callback, HelpString", Return = "[bool]", Notes = "(STATIC) Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split)</pre> The Split parameter contains an array-table of the words that the admin has typed. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server issues a warning to the console that the command is unknown (this is so that subcommands can be implemented)." },
 				{ Params = "Command, Callback, HelpString", Return = "[bool]", Notes = "Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split)</pre> The Split parameter contains an array-table of the words that the admin has typed. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server issues a warning to the console that the command is unknown (this is so that subcommands can be implemented)." },
 			},
-			CallPlugin = { Params = "PluginName, FunctionName, [FunctionArgs...]", Return = "[FunctionRets]", Notes = "(STATIC) Calls the specified function in the specified plugin, passing all the given arguments to it. If it succeeds, it returns all the values returned by that function. If it fails, returns no value at all. Note that only strings, numbers, bools, nils and classes can be used for parameters and return values; tables and functions cannot be copied across plugins." },
+			CallPlugin = { Params = "PluginName, FunctionName, [FunctionArgs...]", Return = "[FunctionRets]", Notes = "(STATIC) Calls the specified function in the specified plugin, passing all the given arguments to it. If it succeeds, it returns all the values returned by that function. If it fails, returns no value at all. Note that only strings, numbers, bools, nils, API classes and simple tables can be used for parameters and return values; functions cannot be copied across plugins." },
 			DoWithPlugin = { Params = "PluginName, CallbackFn", Return = "bool", Notes = "(STATIC) Calls the CallbackFn for the specified plugin, if found. A plugin can be found even if it is currently unloaded, disabled or errored, the callback should check the plugin status. If the plugin is not found, this function returns false, otherwise it returns the bool value that the callback has returned. The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre>" },
 			ExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "{{cPluginManager#CommandResult|CommandResult}}", Notes = "Executes the command as if given by the specified Player. Checks permissions." },
 			ExecuteConsoleCommand = { Params = "CommandStr", Return = "bool, string", Notes = "Executes the console command as if given by the admin on the console. If the command is successfully executed, returns true and the text that would be output to the console normally. On error it returns false and an error message." },
@@ -81,6 +81,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			GetNumLoadedPlugins = { Params = "", Return = "number", Notes = "Returns the number of loaded plugins (psLoaded only)" },
 			GetNumPlugins = { Params = "", Return = "number", Notes = "Returns the number of plugins, including the disabled, errored, unloaded and not-found ones" },
 			GetPlugin = { Params = "PluginName", Return = "{{cPlugin}}", Notes = "(<b>DEPRECATED, UNSAFE</b>) Returns a plugin handle of the specified plugin, or nil if such plugin is not loaded. Note thatdue to multithreading the handle is not guaranteed to be safe for use when stored - a single-plugin reload may have been triggered in the mean time for the requested plugin." },
+			GetPluginFolderName = { Params = "PluginName", Return = "string", Notes = "Returns the name of the folder from which the plugin was loaded (without the \"Plugins\" part). Used as a plugin's display name." },
 			GetPluginsPath = { Params = "", Return = "string", Notes = "Returns the path where the individual plugin folders are located. Doesn't include the path separator at the end of the returned string." },
 			IsCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if in-game Command is already bound (by any plugin)" },
 			IsConsoleCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if console Command is already bound (by any plugin)" },
