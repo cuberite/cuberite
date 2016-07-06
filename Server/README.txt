@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------------
-   Welcome to your new Cuberite server, compatible with Minecraft 1.7 and 1.8!
+   Welcome to your new Cuberite server, compatible with Minecraft 1.8 and 1.9!
 ---------------------------------------------------------------------------------
 
  - To get started with your server, read the user's manual at
