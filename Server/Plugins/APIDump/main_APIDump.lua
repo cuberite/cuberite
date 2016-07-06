@@ -504,8 +504,8 @@ local function ReadDescriptions(a_API, a_Desc)
 
 			local DoxyFunctions = {};  -- This will contain all the API functions together with their documentation
 
-			local function AddFunction(a_Name, a_Params, a_Return, a_Notes)
-				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Return = a_Return, Notes = a_Notes});
+			local function AddFunction(a_Name, a_Params, a_Return, a_IsStatic, a_Notes)
+				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Return = a_Return, IsStatic = a_IsStatic, Notes = a_Notes});
 			end
 
 			if (APIDesc.Functions ~= nil) then
@@ -523,11 +523,11 @@ local function ReadDescriptions(a_API, a_Desc)
 						-- Description is available
 						if (FnDesc[1] == nil) then
 							-- Single function definition
-							AddFunction(func.Name, FnDesc.Params, FnDesc.Return, FnDesc.Notes);
+							AddFunction(func.Name, FnDesc.Params, FnDesc.Return, FnDesc.IsStatic, FnDesc.Notes);
 						else
 							-- Multiple function overloads
 							for _, desc in ipairs(FnDesc) do
-								AddFunction(func.Name, desc.Params, desc.Return, desc.Notes);
+								AddFunction(func.Name, desc.Params, desc.Return, desc.IsStatic, desc.Notes);
 							end  -- for k, desc - FnDesc[]
 						end
 						FnDesc.IsExported = true;
@@ -778,10 +778,14 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		end
 		cf:write("<table>\n<tr><th>Name</th><th>Parameters</th><th>Return value</th><th>Notes</th></tr>\n");
 		for _, func in ipairs(a_Functions) do
+			local StaticClause = ""
+			if (func.IsStatic) then
+				StaticClause = "(STATIC) "
+			end
 			cf:write("<tr><td>", func.Name, "</td>\n");
 			cf:write("<td>", LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
 			cf:write("<td>", LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
-			cf:write("<td>", LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td></tr>\n");
+			cf:write("<td>", StaticClause .. LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td></tr>\n");
 		end
 		cf:write("</table>\n");
 	end

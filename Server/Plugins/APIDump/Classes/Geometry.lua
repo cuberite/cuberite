@@ -33,7 +33,7 @@ return
 			CalcLineIntersection =
 			{
 				{ Params = "{{Vector3d|LineStart}}, {{Vector3d|LinePt2}}", Return = "DoesIntersect, [LineCoeff, Face]", Notes = "Calculates the intersection of a ray (half-line), given by two of its points, with the bounding box. Returns false if the line doesn't intersect the bounding box, or true, together with coefficient of the intersection (how much of the difference between the two ray points is needed to reach the intersection), and the face of the box which is intersected." },
-				{ Params = "{{Vector3d|BoxMin}}, {{Vector3d|BoxMax}}, {{Vector3d|LineStart}}, {{Vector3d|LinePt2}}", Return = "DoesIntersect, [LineCoeff, Face]", Notes = "(STATIC) Calculates the intersection of a ray (half-line), given by two of its points, with the bounding box specified as its minimum and maximum coords. Returns false if the line doesn't intersect the bounding box, or true, together with coefficient of the intersection (how much of the difference between the two ray points is needed to reach the intersection), and the face of the box which is intersected." },
+				{ Params = "{{Vector3d|BoxMin}}, {{Vector3d|BoxMax}}, {{Vector3d|LineStart}}, {{Vector3d|LinePt2}}", Return = "DoesIntersect, [LineCoeff, Face]", IsStatic = true, Notes = "Calculates the intersection of a ray (half-line), given by two of its points, with the bounding box specified as its minimum and maximum coords. Returns false if the line doesn't intersect the bounding box, or true, together with coefficient of the intersection (how much of the difference between the two ray points is needed to reach the intersection), and the face of the box which is intersected." },
 			},
 			DoesIntersect = { Params = "OtherBoundingBox", Return = "bool", Notes = "Returns true if the two bounding boxes have an intersection of nonzero volume." },
 			Expand = { Params = "ExpandX, ExpandY, ExpandZ", Return = "", Notes = "Expands this bounding box by the specified amount in each direction (so the box becomes larger by 2 * Expand in each axis)." },
@@ -131,7 +131,7 @@ various events. See below for further information.
 		]],
 		Functions =
 		{
-			Trace = { Params = "{{cWorld}}, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ", Return = "bool", Notes = "(STATIC) Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)" },
+			Trace = { Params = "{{cWorld}}, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ", Return = "bool", IsStatic = true, Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)" },
 		},
 
 		AdditionalInfo =
