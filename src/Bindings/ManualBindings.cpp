@@ -2647,17 +2647,16 @@ class cLuaBlockTracerCallbacks :
 	public cBlockTracer::cCallbacks
 {
 public:
-	cLuaBlockTracerCallbacks(cLuaState & a_LuaState, int a_ParamNum) :
-		m_LuaState(a_LuaState),
-		m_TableRef(a_LuaState, a_ParamNum)
+	cLuaBlockTracerCallbacks(cLuaState::cTableRefPtr && a_Callbacks):
+		m_Callbacks(std::move(a_Callbacks))
 	{
 	}
 
 	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnNextBlock"),
+		if (!m_Callbacks->CallTableFn(
+			"OnNextBlock",
 			a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_EntryFace,
 			cLuaState::Return, res
 		))
@@ -2671,8 +2670,8 @@ public:
 	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnNextBlockNoData"),
+		if (!m_Callbacks->CallTableFn(
+			"OnNextBlockNoData",
 			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
 			cLuaState::Return, res
 		))
@@ -2686,8 +2685,8 @@ public:
 	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnOutOfWorld"),
+		if (!m_Callbacks->CallTableFn(
+			"OnOutOfWorld",
 			a_BlockX, a_BlockY, a_BlockZ,
 			cLuaState::Return, res
 		))
@@ -2701,8 +2700,8 @@ public:
 	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnIntoWorld"),
+		if (!m_Callbacks->CallTableFn(
+			"OnIntoWorld",
 			a_BlockX, a_BlockY, a_BlockZ,
 			cLuaState::Return, res
 		))
@@ -2715,17 +2714,16 @@ public:
 
 	virtual void OnNoMoreHits(void) override
 	{
-		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoMoreHits"));
+		m_Callbacks->CallTableFn("OnNoMoreHits");
 	}
 
 	virtual void OnNoChunk(void) override
 	{
-		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoChunk"));
+		m_Callbacks->CallTableFn("OnNoChunk");
 	}
 
 protected:
-	cLuaState & m_LuaState;
-	cLuaState::cRef m_TableRef;
+	cLuaState::cTableRefPtr m_Callbacks;
 } ;
 
 
@@ -2759,16 +2757,22 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 		return 0;
 	}
 
+	// Get the params:
+	cWorld * world;
+	double startX, startY, startZ;
+	double endX, endY, endZ;
+	cLuaState::cTableRefPtr callbacks;
+	if (!L.GetStackValues(idx, world, callbacks, startX, startY, startZ, endX, endY, endZ))
+	{
+		LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+		L.LogStackTrace();
+		L.LogStackValues("Values on the stack");
+		return 0;
+	}
+
 	// Trace:
-	cWorld * World = reinterpret_cast<cWorld *>(tolua_tousertype(L, idx, nullptr));
-	cLuaBlockTracerCallbacks Callbacks(L, idx + 1);
-	double StartX = tolua_tonumber(L, idx + 2, 0);
-	double StartY = tolua_tonumber(L, idx + 3, 0);
-	double StartZ = tolua_tonumber(L, idx + 4, 0);
-	double EndX   = tolua_tonumber(L, idx + 5, 0);
-	double EndY   = tolua_tonumber(L, idx + 6, 0);
-	double EndZ   = tolua_tonumber(L, idx + 7, 0);
-	bool res = cLineBlockTracer::Trace(*World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ);
+	cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
+	bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, startX, startY, startZ, endX, endY, endZ);
 	tolua_pushboolean(L, res ? 1 : 0);
 	return 1;
 }
