@@ -28,6 +28,7 @@ return
 				{ Params = "{{Vector3d|Min}}, {{Vector3d|Max}}", Return = "cBoundingBox", Notes = "Creates a new bounding box with the coords specified as two vectors" },
 				{ Params = "{{Vector3d|Pos}}, Radius, Height", Return = "cBoundingBox", Notes = "Creates a new bounding box from the position given and radius (X/Z) and height. Radius is added from X/Z to calculate the maximum coords and subtracted from X/Z to get the minimum; minimum Y is set to Pos.y and maxumim Y to Pos.y plus Height. This corresponds with how {{cEntity|entities}} are represented in Minecraft." },
 				{ Params = "OtherBoundingBox", Return = "cBoundingBox", Notes = "Creates a new copy of the given bounding box. Same result can be achieved by using a simple assignment." },
+				{ Params = "{{Vector3d|Pos}}, CubeSideLength", Return = "{{cBoundingBox}}", Notes = "Creates a new bounding box as a cube with the specified side length centered around the specified point." },
 			},
 			CalcLineIntersection =
 			{
@@ -51,6 +52,8 @@ return
 				{ Params = "PointX, PointY, PointZ", Return = "bool", Notes = "Returns true if the specified point is inside (including on the edge) of the box." },
 				{ Params = "OtherBoundingBox", Return = "bool", Notes = "Returns true if OtherBoundingBox is inside of this box." },
 				{ Params = "{{Vector3d|OtherBoxMin}}, {{Vector3d|OtherBoxMax}}", Return = "bool", Notes = "Returns true if the other bounding box, specified by its 2 corners, is inside of this box." },
+				{ Params = "{{Vector3d|Min}}, {{Vector3d|Max}}, {{Vector3d|Point}}", Return = "boolean", IsStatic = true, Notes = "Returns true if the specified point is inside the bounding box specified by its min / max corners" },
+				{ Params = "{{Vector3d|Min}}, {{Vector3d|Max}}, X, Y, Z", Return = "boolean", IsStatic = true, Notes = "Returns true if the specified point is inside the bounding box specified by its min / max corners" },
 			},
 			Move =
 			{
@@ -238,30 +241,52 @@ end
 				{ Params = "", Return = "Vector3d", Notes = "Creates a new Vector3d object with all its coords set to 0." },
 				{ Params = "X, Y, Z", Return = "Vector3d", Notes = "Creates a new Vector3d object with its coords set to the specified values." },
 			},
-			operator_div = { Params = "number", Return = "Vector3d", Notes = "Returns a new Vector3d with each coord divided by the specified number." },
-			operator_mul = { Params = "number", Return = "Vector3d", Notes = "Returns a new Vector3d with each coord multiplied." },
-			operator_sub = { Params = "Vector3d", Return = "Vector3d", Notes = "Returns a new Vector3d containing the difference between this object and the specified vector." },
+			operator_div =
+			{
+				{ Params = "{{Vector3d}}", Return = "{{Vector3d}}", Notes = "Returns a new Vector3d object with each coord divided by the corresponding coord from the given vector." },
+				{ Params = "number", Return = "Vector3d", Notes = "Returns a new Vector3d object with each coord divided by the specified number." },
+			},
+			operator_mul =
+			{
+				{ Params = "{{Vector3d}}", Return = "{{Vector3d}}", Notes = "Returns a new Vector3d object with each coord multiplied by the corresponding coord from the given vector." },
+				{ Params = "number", Return = "Vector3d", Notes = "Returns a new Vector3d object with each coord multiplied." },
+			},
 			operator_plus = {Params = "Vector3d", Return = "Vector3d", Notes = "Returns a new Vector3d containing the sum of this vector and the specified vector" },
+			operator_sub =
+			{
+				{ Params = "{{Vector3d}}", Return = "{{Vector3d}}", Notes = "Returns a new Vector3d object containing the difference between this object and the specified vector." },
+				{ Params = "", Return = "{{Vector3d}}", Notes = "Returns a new Vector3d object that is a negative of this vector (all coords multiplied by -1)." },
+			},
 			abs = { Params = "", Return = "", Notes = "<b>OBSOLETE</b>, use Abs() instead." },
 			clamp = { Params = "min, max", Return = "", Notes = "<b>OBSOLETE</b>, use Clamp() instead." },
 			Abs = { Params = "", Return = "", Notes = "Updates each coord to its absolute value." },
 			Clamp = { Params = "min, max", Return = "", Notes = "Clamps each coord into the specified range." },
 			Cross = { Params = "Vector3d", Return = "Vector3d", Notes = "Returns a new Vector3d that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector." },
 			Dot = { Params = "Vector3d", Return = "number", Notes = "Returns the dot product of this vector and the specified vector." },
-			Equals = { Params = "Vector3d", Return = "bool", Notes = "Returns true if this vector is exactly equal to the specified vector." },
+			Equals = { Params = "Vector3d", Return = "bool", Notes = "Returns true if this vector is exactly equal to the specified vector. Note that this is subject to (possibly imprecise) floating point math." },
+			EqualsEps = { Params = "{{Vector3d|Rhs}}, Eps", Return = "boolean", Notes = "Returns true if the differences between each corresponding coords of this vector and the one specified, are less than the specified Eps." },
+			Floor = { Params = "", Return = "{{Vector3i}}", Notes = "Returns a new {{Vector3i}} object with coords set to math.floor of this vector's coords." },
+			HasNonZeroLength = { Params = "", Return = "boolean", Notes = "Returns true if the vector has at least one coord non-zero. Note that this is subject to (possibly imprecise) floating point math." },
 			Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of the vector." },
 			LineCoeffToXYPlane = { Params = "Vector3d, Z", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Z coord. The result satisfies the following equation: (this + Result * (Param - this)).z = Z. Returns the NO_INTERSECTION constant if there's no intersection." },
 			LineCoeffToXZPlane = { Params = "Vector3d, Y", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Y coord. The result satisfies the following equation: (this + Result * (Param - this)).y = Y. Returns the NO_INTERSECTION constant if there's no intersection." },
 			LineCoeffToYZPlane = { Params = "Vector3d, X", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified X coord. The result satisfies the following equation: (this + Result * (Param - this)).x = X. Returns the NO_INTERSECTION constant if there's no intersection." },
+			Move =
+			{
+				{ Params = "X, Y, Z", Return = "", Notes = "Adds the specified offsets to each coord, effectively moving the vector by the specified coord offsets." },
+				{ Params = "{{Vector3d|Diff}}", Return = "", Notes = "Adds the specified vector to this vector. Is slightly better performant than adding with a \"+\" because this doesn't create a new object for the result." },
+			},
 			Normalize = { Params = "", Return = "", Notes = "Changes this vector so that it keeps current direction but is exactly 1 unit long. FIXME: Fails for a zero vector." },
-			NormalizeCopy = { Params = "", Return = "Vector3d", Notes = "Returns a new vector that has the same directino as this but is exactly 1 unit long. FIXME: Fails for a zero vector." },
+			NormalizeCopy = { Params = "", Return = "Vector3d", Notes = "Returns a new vector that has the same direction as this but is exactly 1 unit long. FIXME: Fails for a zero vector." },
 			Set = { Params = "X, Y, Z", Return = "", Notes = "Sets all the coords in this object." },
 			SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison. " },
+			TurnCCW = { Params = "", Return = "", Notes = "Rotates the vector 90 degrees counterclockwise around the vertical axis. Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down." },
+			TurnCW = { Params = "", Return = "", Notes = "Rotates the vector 90 degrees clockwise around the vertical axis. Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down." },
 		},
 		Constants =
 		{
 			EPS = { Notes = "The max difference between two coords for which the coords are assumed equal (in LineCoeffToXYPlane() et al)." },
-			NO_INTERSECTION = { Notes = "Special return value for the LineCoeffToXYPlane() et al meaning that there's no intersectino with the plane." },
+			NO_INTERSECTION = { Notes = "Special return value for the LineCoeffToXYPlane() et al meaning that there's no intersection with the plane." },
 		},
 		Variables =
 		{
@@ -289,25 +314,52 @@ end
 				{ Params = "{{Vector3d}}", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified {{Vector3d}}" },
 				{ Params = "{{Vector3i}}", Return = "Vector3f", Notes = "Creates a new Vector3f object as a copy of the specified {{Vector3i}}" },
 			},
+			operator_div =
+			{
+				{ Params = "{{Vector3f}}", Return = "{{Vector3f}}", Notes = "Returns a new Vector3f object with each coord divided by the corresponding coord from the given vector." },
+				{ Params = "number", Return = "{{Vector3f}}", Notes = "Returns a new Vector3f object with each coord divided by the specified number." },
+			},
 			operator_mul =
 			{
-				{ Params = "number", Return = "Vector3f", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the specified number" },
-				{ Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the respective coord of the specified vector." },
+				{ Params = "number", Return = "{{Vector3f}}", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the specified number" },
+				{ Params = "{{Vector3f}}", Return = "{{Vector3f}}", Notes = "Returns a new Vector3f object that has each of its coords multiplied by the respective coord of the specified vector." },
 			},
 			operator_plus = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the vector sum of this vector and the specified vector." },
-			operator_sub = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the vector differrence between this vector and the specified vector." },
+			operator_sub =
+			{
+				{ Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the vector differrence between this vector and the specified vector." },
+				{ Params = "", Return = "{{Vector3f}}", Notes = "Returns a new Vector3f that is a negative of this vector (all coords multiplied by -1)." },
+			},
 			abs = { Params = "", Return = "", Notes = "<b>OBSOLETE</b>, use Abs() instead." },
 			clamp = { Params = "min, max", Return = "", Notes = "<b>OBSOLETE</b>, use Clamp() instead." },
 			Abs = { Params = "", Return = "", Notes = "Updates each coord to its absolute value." },
 			Clamp = { Params = "min, max", Return = "", Notes = "Clamps each coord into the specified range." },
 			Cross = { Params = "Vector3f", Return = "Vector3f", Notes = "Returns a new Vector3f object that holds the cross product of this vector and the specified vector." },
 			Dot = { Params = "Vector3f", Return = "number", Notes = "Returns the dot product of this vector and the specified vector." },
-			Equals = { Params = "Vector3f", Return = "bool", Notes = "Returns true if the specified vector is exactly equal to this vector." },
+			Equals = { Params = "Vector3f", Return = "bool", Notes = "Returns true if the specified vector is exactly equal to this vector. Note that this is subject to (possibly imprecise) floating point math." },
+			EqualsEps = { Params = "{{Vector3f|Rhs}}, Eps", Return = "boolean", Notes = "Returns true if the differences between each corresponding coords of this vector and the one specified, are less than the specified Eps." },
+			Floor = { Params = "", Return = "{{Vector3i}}", Notes = "Returns a new {{Vector3i}} object with coords set to math.floor of this vector's coords." },
+			HasNonZeroLength = { Params = "", Return = "boolean", Notes = "Returns true if the vector has at least one coord non-zero. Note that this is subject to (possibly imprecise) floating point math." },
 			Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector" },
+			LineCoeffToXYPlane = { Params = "Vector3f, Z", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Z coord. The result satisfies the following equation: (this + Result * (Param - this)).z = Z. Returns the NO_INTERSECTION constant if there's no intersection." },
+			LineCoeffToXZPlane = { Params = "Vector3f, Y", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Y coord. The result satisfies the following equation: (this + Result * (Param - this)).y = Y. Returns the NO_INTERSECTION constant if there's no intersection." },
+			LineCoeffToYZPlane = { Params = "Vector3f, X", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified X coord. The result satisfies the following equation: (this + Result * (Param - this)).x = X. Returns the NO_INTERSECTION constant if there's no intersection." },
+			Move =
+			{
+				{ Params = "X, Y, Z", Return = "", Notes = "Adds the specified offsets to each coord, effectively moving the vector by the specified coord offsets." },
+				{ Params = "{{Vector3f|Diff}}", Return = "", Notes = "Adds the specified vector to this vector. Is slightly better performant than adding with a \"+\" because this doesn't create a new object for the result." },
+			},
 			Normalize = { Params = "", Return = "", Notes = "Normalizes this vector (makes it 1 unit long while keeping the direction). FIXME: Fails for zero vectors." },
 			NormalizeCopy = { Params = "", Return = "Vector3f", Notes = "Returns a copy of this vector that is normalized (1 unit long while keeping the same direction). FIXME: Fails for zero vectors." },
 			Set = { Params = "x, y, z", Return = "", Notes = "Sets all the coords of the vector at once." },
 			SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison." },
+			TurnCCW = { Params = "", Return = "", Notes = "Rotates the vector 90 degrees counterclockwise around the vertical axis. Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down." },
+			TurnCW = { Params = "", Return = "", Notes = "Rotates the vector 90 degrees clockwise around the vertical axis. Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down." },
+		},
+		Constants =
+		{
+			EPS = { Notes = "The max difference between two coords for which the coords are assumed equal (in LineCoeffToXYPlane() et al)." },
+			NO_INTERSECTION = { Notes = "Special return value for the LineCoeffToXYPlane() et al meaning that there's no intersection with the plane." },
 		},
 		Variables =
 		{
@@ -333,6 +385,22 @@ end
 				{ Params = "x, y, z", Return = "Vector3i", Notes = "Creates a new Vector3i object with the specified coords." },
 				{ Params = "{{Vector3d}}", Return = "Vector3i", Notes = "Creates a new Vector3i object with coords copied and floor()-ed from the specified {{Vector3d}}." },
 			},
+			operator_div =
+			{
+				{ Params = "number", Return = "Vector3i", Notes = "Returns a new Vector3i object that has each of its coords divided by the specified number" },
+				{ Params = "Vector3i", Return = "Vector3i", Notes = "Returns a new Vector3i object that has each of its coords divided by the respective coord of the specified vector." },
+			},
+			operator_mul =
+			{
+				{ Params = "number", Return = "Vector3i", Notes = "Returns a new Vector3i object that has each of its coords multiplied by the specified number" },
+				{ Params = "Vector3i", Return = "Vector3i", Notes = "Returns a new Vector3i object that has each of its coords multiplied by the respective coord of the specified vector." },
+			},
+			operator_plus = { Params = "Vector3i", Return = "Vector3i", Notes = "Returns a new Vector3f object that holds the vector sum of this vector and the specified vector." },
+			operator_sub =
+			{
+				{ Params = "Vector3i", Return = "Vector3i", Notes = "Returns a new Vector3i object that holds the vector differrence between this vector and the specified vector." },
+				{ Params = "", Return = "{{Vector3i}}", Notes = "Returns a new Vector3i that is a negative of this vector (all coords multiplied by -1)." },
+			},
 			abs = { Params = "", Return = "", Notes = "<b>OBSOLETE</b>, use Abs() instead." },
 			clamp = { Params = "min, max", Return = "", Notes = "<b>OBSOLETE</b>, use Clamp() instead." },
 			Abs = { Params = "", Return = "", Notes = "Updates each coord to its absolute value." },
@@ -340,10 +408,29 @@ end
 			Cross = { Params = "Vector3d", Return = "Vector3d", Notes = "Returns a new Vector3d that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector." },
 			Dot = { Params = "Vector3d", Return = "number", Notes = "Returns the dot product of this vector and the specified vector." },
 			Equals = { Params = "Vector3i", Return = "bool", Notes = "Returns true if this vector is exactly the same as the specified vector." },
+			EqualsEps = { Params = "{{Vector3i|Rhs}}, Eps", Return = "boolean", Notes = "Returns true if the differences between each corresponding coords of this vector and the one specified, are less than the specified Eps. Normally not too useful for integer-only vectors, but still included for API completeness." },
+			Floor = { Params = "", Return = "{{Vector3i}}", Notes = "Returns a new {{Vector3i}} object with coords set to math.floor of this vector's coords. Normally not too useful with integer-only vectors, but still included for API completeness." },
+			HasNonZeroLength = { Params = "", Return = "boolean", Notes = "Returns true if the vector has at least one coord non-zero." },
 			Length = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector." },
-			Move = { Params = "x, y, z", Return = "", Notes = "Moves the vector by the specified amount in each axis direction." },
+			LineCoeffToXYPlane = { Params = "Vector3i, Z", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Z coord. The result satisfies the following equation: (this + Result * (Param - this)).z = Z. Returns the NO_INTERSECTION constant if there's no intersection." },
+			LineCoeffToXZPlane = { Params = "Vector3i, Y", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified Y coord. The result satisfies the following equation: (this + Result * (Param - this)).y = Y. Returns the NO_INTERSECTION constant if there's no intersection." },
+			LineCoeffToYZPlane = { Params = "Vector3i, X", Return = "number", Notes = "Returns the coefficient for the line from the specified vector through this vector to reach the specified X coord. The result satisfies the following equation: (this + Result * (Param - this)).x = X. Returns the NO_INTERSECTION constant if there's no intersection." },
+			Move =
+			{
+				{ Params = "x, y, z", Return = "", Notes = "Moves the vector by the specified amount in each axis direction." },
+				{ Params = "{{Vector3i|Diff}}", Return = "", Notes = "Adds the specified vector to this vector. Is slightly better performant than adding with a \"+\" because this doesn't create a new object for the result." },
+			},
+			Normalize = { Params = "", Return = "", Notes = "Normalizes this vector (makes it 1 unit long while keeping the direction). Quite useless for integer-only vectors, since the normalized vector will almost always truncate to zero vector. FIXME: Fails for zero vectors." },
+			NormalizeCopy = { Params = "", Return = "Vector3f", Notes = "Returns a copy of this vector that is normalized (1 unit long while keeping the same direction). Quite useless for integer-only vectors, since the normalized vector will almost always truncate to zero vector. FIXME: Fails for zero vectors." },
 			Set = { Params = "x, y, z", Return = "", Notes = "Sets all the coords of the vector at once" },
 			SqrLength = { Params = "", Return = "number", Notes = "Returns the (euclidean) length of this vector, squared. This operation is slightly less computationally expensive than Length(), while it conserves some properties of Length(), such as comparison." },
+			TurnCCW = { Params = "", Return = "", Notes = "Rotates the vector 90 degrees counterclockwise around the vertical axis. Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down." },
+			TurnCW = { Params = "", Return = "", Notes = "Rotates the vector 90 degrees clockwise around the vertical axis. Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down." },
+		},
+		Constants =
+		{
+			EPS = { Notes = "The max difference between two coords for which the coords are assumed equal (in LineCoeffToXYPlane() et al). Quite useless with integer-only vector." },
+			NO_INTERSECTION = { Notes = "Special return value for the LineCoeffToXYPlane() et al meaning that there's no intersection with the plane." },
 		},
 		Variables =
 		{

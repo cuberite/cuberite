@@ -52,6 +52,17 @@ return
 			Username = { Type = "string", Notes = "Name of the logged-in user." },
 		},
 	},  -- HTTPRequest
+
+
+	HTTPTemplateRequest =
+	{
+		Desc = [[This class is used only in the WebAdmin template script as the parameter to the function that provides the template.
+		]],
+		Variables =
+		{
+			Request = { Type = "HTTPRequest", Notes = "The request for which the template is being built." },
+		},
+	},  -- HTTPTemplateRequest
 }
 
 

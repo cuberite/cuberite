@@ -305,7 +305,7 @@ public:
 	/** Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items */
 	virtual int GetRawDamageAgainst(const cEntity & a_Receiver);
 
-	/** Returns whether armor will protect against the passed damage type */
+	/** Returns whether armor will protect against the specified damage type */
 	virtual bool ArmorCoversAgainst(eDamageType a_DamageType);
 
 	/** Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover */
@@ -329,8 +329,12 @@ public:
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
-	/** Called when the health drops below zero. a_Killer may be nullptr (environmental damage) */
+	// tolua_end
+
+	/** Called when the health drops below zero. a_TDI's Attacker may be nullptr (environmental damage) */
 	virtual void KilledBy(TakeDamageInfo & a_TDI);
+
+	// tolua_begin
 
 	/** Called when the entity kills another entity */
 	virtual void Killed(cEntity * a_Victim) {}
@@ -404,7 +408,7 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown = false);
+	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false);
 
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
