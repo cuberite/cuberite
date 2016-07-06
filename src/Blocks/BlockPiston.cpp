@@ -32,13 +32,17 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 
-	// Get the extension of the piston
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos.x, blockPos.y, blockPos.z);
-	blockPos += MetadataToOffset(OldMeta);
-
-	if (a_ChunkInterface.GetBlock(blockPos) == E_BLOCK_PISTON_EXTENSION)
+	// If the piston is extended, destroy the extension as well
+	if (IsExtended(OldMeta))
 	{
-		a_ChunkInterface.SetBlock(blockPos.x, blockPos.y, blockPos.z, E_BLOCK_AIR, 0);
+		// Get the position of the extension
+		blockPos += MetadataToOffset(OldMeta);
+
+		if (a_ChunkInterface.GetBlock(blockPos) == E_BLOCK_PISTON_EXTENSION)
+		{
+			a_ChunkInterface.SetBlock(blockPos.x, blockPos.y, blockPos.z, E_BLOCK_AIR, 0);
+		}
 	}
 }
 
