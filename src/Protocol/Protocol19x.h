@@ -71,6 +71,7 @@ public:
 	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+	virtual void SendCameraSetTo                (const cEntity & a_Entity) override;
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
@@ -223,6 +224,7 @@ protected:
 	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
+	void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);
 	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);

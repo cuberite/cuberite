@@ -53,6 +53,16 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 
 
 
+static char ValueToHexDigit(UInt8 digit)
+{
+	ASSERT(digit < 16);
+	return "0123456789abcdef"[digit];
+}
+
+
+
+
+
 #ifdef DEBUG_SINGLE_THREAD_ACCESS
 
 	/** Simple RAII class that is used for checking that no two threads are using an object simultanously.
@@ -508,6 +518,29 @@ bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : -(0x04000000 - static_cast<int>(BlockXRaw));
 	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? static_cast<int>(BlockYRaw) : -(0x0800     - static_cast<int>(BlockYRaw));
 	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : -(0x04000000 - static_cast<int>(BlockZRaw));
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadUUID(AString & a_Value)
+{
+	CHECK_THREAD
+
+	if (!ReadString(a_Value, 16))
+	{
+		return false;
+	}
+
+	a_Value.resize(32);
+	for (unsigned int i = 15; i < 16; i--)
+	{
+		a_Value[i * 2 + 1] = ValueToHexDigit(a_Value[i] & 0xf);
+		a_Value[i * 2] = ValueToHexDigit(static_cast<UInt8>(a_Value[i]) >> 4);
+	}
+	
 	return true;
 }
 

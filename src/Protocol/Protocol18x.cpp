@@ -98,16 +98,6 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 
 
 
-static char ValueToHexDigit(UInt8 digit)
-{
-	ASSERT(digit < 16);
-	return "0123456789abcdef"[digit];
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol180:
 
@@ -2527,16 +2517,9 @@ void cProtocol180::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketSpectate(cByteBuffer &a_ByteBuffer)
 {
 	AString playerUUID;
-	if (!a_ByteBuffer.ReadString(playerUUID, 16))
+	if(!a_ByteBuffer.ReadUUID(playerUUID))
 	{
 		return;
-	}
-
-	playerUUID.resize(32);
-	for (unsigned int i = 15; i < 16; i--)
-	{
-		playerUUID[i * 2 + 1] = ValueToHexDigit(playerUUID[i] & 0xf);
-		playerUUID[i * 2] = ValueToHexDigit(static_cast<UInt8>(playerUUID[i]) >> 4);
 	}
 
 	m_Client->HandleSpectate(playerUUID);
