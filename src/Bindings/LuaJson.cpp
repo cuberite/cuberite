@@ -160,6 +160,16 @@ static Json::Value JsonSerializeValue(cLuaState & a_LuaState)
 {
 	switch (lua_type(a_LuaState, -1))
 	{
+		case LUA_TBOOLEAN:
+		{
+			bool v;
+			a_LuaState.GetStackValue(-1, v);
+			return Json::Value(v);
+		}
+		case LUA_TNIL:
+		{
+			return Json::Value(Json::nullValue);
+		}
 		case LUA_TNUMBER:
 		{
 			lua_Number v;
