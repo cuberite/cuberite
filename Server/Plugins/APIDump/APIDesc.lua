@@ -1640,7 +1640,7 @@ end
 
 -- Set window contents:
 -- a_Player is a cPlayer object received from the outside of this code fragment
-local Window = cLuaWindow(cWindow.Hopper, 3, 3, "TestWnd");
+local Window = cLuaWindow(cWindow.wtHopper, 3, 3, "TestWnd");
 Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
 Window:SetOnClosing(OnClosing);
 Window:SetOnSlotChanged(OnSlotChanged);
