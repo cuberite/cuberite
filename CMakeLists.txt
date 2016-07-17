@@ -1,5 +1,9 @@
 cmake_minimum_required (VERSION 2.8.7)
 
+if (POLICY CMP0054)
+	cmake_policy(SET CMP0054 NEW)
+endif()
+
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
