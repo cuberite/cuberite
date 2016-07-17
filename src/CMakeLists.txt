@@ -252,6 +252,10 @@ else ()
 		foreach (hdr ${FOLDER_HDRS})
 			list(APPEND SOURCE "${folder}/${hdr}")
 		endforeach(hdr)
+
+		# Include this folder's CMakeLists.txt in the project:
+		list(APPEND SOURCE "${folder}/CMakeLists.txt")
+		source_group("${folder}" FILES "${folder}/CMakeLists.txt")
 	endforeach(folder)
 
 	list(APPEND SOURCE "${SRCS}")
@@ -315,19 +319,26 @@ if (MSVC)
 		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
 	endforeach(dep)
 
-	ADD_CUSTOM_COMMAND(
-		OUTPUT ${BINDING_OUTPUTS}
+	if (HAS_LUA_INTERPRETER)
+		ADD_CUSTOM_COMMAND(
+			OUTPUT ${BINDING_OUTPUTS}
+			COMMAND lua BindingsProcessor.lua
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+			DEPENDS ${BINDINGS_DEPENDENCIES}
+		)
+	else()
+		ADD_CUSTOM_COMMAND(
+			OUTPUT ${BINDING_OUTPUTS}
 
-		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/Server/lua51.dll ./lua51.dll
+			# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/Server/lua51.dll ./lua51.dll
 
-		# Regenerate bindings:
-		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
-
-		# add any new generation dependencies here
-		DEPENDS ${BINDINGS_DEPENDENCIES}
-	)
+			# Regenerate bindings:
+			COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+			DEPENDS ${BINDINGS_DEPENDENCIES} tolua
+		)
+	endif()
 endif()
 
 add_executable(${EXECUTABLE} ${SOURCE})
