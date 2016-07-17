@@ -421,6 +421,9 @@ public:
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
 
+	/** Gets entity (vehicle) attached to this entity */
+	cEntity * GetAttached();
+
 	/** Attaches to the specified entity; detaches from any previous one first */
 	void AttachTo(cEntity * a_AttachTo);
 
