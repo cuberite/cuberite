@@ -358,6 +358,7 @@ public:
 	void Push(const Vector3d * a_Vector);
 	void Push(const Vector3i & a_Vector);
 	void Push(const Vector3i * a_Vector);
+	void Push(const cByteBuffer & a_Buffer);
 
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
@@ -368,7 +369,9 @@ public:
 	void Push(double a_Value);
 	void Push(int a_Value);
 	void Push(long a_Value);
+	void Push(const Int64 a_Value);
 	void Push(const UInt32 a_Value);
+	void Push(const UInt64 a_Value);
 	void Push(std::chrono::milliseconds a_time);
 
 	/** Pops the specified number of values off the top of the Lua stack. */

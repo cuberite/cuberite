@@ -18,6 +18,7 @@
 #include "../Entities/Player.h"
 #include "../WebAdmin.h"
 #include "../ClientHandle.h"
+#include "../ChannelManager.h"
 #include "../BlockArea.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -39,6 +40,7 @@
 #include "../BuildInfo.h"
 #include "../HTTP/UrlParser.h"
 #include "../BoundingBox.h"
+#include "../ChannelCallback.h"
 
 
 
@@ -3718,6 +3720,571 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 
 
 
+static int tolua_cChannelManager_RegisterChannel(lua_State * tolua_S)
+{
+
+	// Retrieve the cPlugin from the LuaState:
+	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
+	if (Plugin == nullptr)
+	{
+		// An error message has been already printed in GetLuaPlugin()
+		return 0;
+	}
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cChannelManager"))
+	{
+		return 0;
+	}
+	cChannelManager * self = reinterpret_cast<cChannelManager *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cChannelManager:RegisterChannel'");
+	}
+	if (!L.CheckParamString(2) || !L.CheckParamFunction(3))
+	{
+		return 0;
+	}
+
+	AString Channel;
+	L.GetStackValue(2, Channel);
+	cLuaState::cCallbackPtr Callback;
+	L.GetStackValue(3, Callback);
+	auto ChannelCallback = std::make_shared<cChannelCallback>(*Plugin, Callback);
+
+	auto Result = self->RegisterChannel(Channel, ChannelCallback);
+
+	// Cut away everything from the stack and push on the result of RegisterChannel
+	lua_settop(L, 2);
+	L.Push(Result);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEInt8(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEInt8'");
+	}
+
+	Int8 Value = 0;
+	auto Success = Buffer->ReadBEInt8(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEInt16(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEInt16'");
+	}
+
+	Int16 Value = 0;
+	auto Success = Buffer->ReadBEInt16(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEInt32(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEInt32'");
+	}
+
+	Int32 Value = 0;
+	auto Success = Buffer->ReadBEInt32(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEInt64(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEInt64'");
+	}
+
+	Int64 Value = 0;
+	auto Success = Buffer->ReadBEInt64(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEUInt8(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEUInt8'");
+	}
+
+	UInt8 Value = 0;
+	auto Success = Buffer->ReadBEUInt8(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEUInt16(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEUInt16'");
+	}
+
+	UInt16 Value = 0;
+	auto Success = Buffer->ReadBEUInt16(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEUInt32(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEUInt32'");
+	}
+
+	UInt32 Value = 0;
+	auto Success = Buffer->ReadBEUInt32(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEUInt64(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEUInt64'");
+	}
+
+	UInt64 Value = 0;
+	auto Success = Buffer->ReadBEUInt64(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEFloat(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEFloat'");
+	}
+
+	float Value = 0.0f;
+	auto Success = Buffer->ReadBEFloat(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBEDouble(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBEDouble'");
+	}
+
+	double Value = 0.0;
+	auto Success = Buffer->ReadBEDouble(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadBool(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadBool'");
+	}
+
+	bool Value = false;
+	auto Success = Buffer->ReadBool(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadVarInt32(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadVarInt32'");
+	}
+
+	UInt32 Value = 0;
+	auto Success = Buffer->ReadVarInt32(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadVarInt64(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadVarInt64'");
+	}
+
+	UInt64 Value = 0;
+	auto Success = Buffer->ReadVarInt64(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadVarUTF8String(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadVarUTF8String'");
+	}
+
+	AString Value;
+	auto Success = Buffer->ReadVarUTF8String(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadLEInt(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadLEInt'");
+	}
+
+	int Value = 0;
+	auto Success = Buffer->ReadLEInt(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadPosition64(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadPosition64'");
+	}
+
+	int X = 0;
+	int Y = 0;
+	int Z = 0;
+	auto Success = Buffer->ReadPosition64(X, Y, Z);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(X);
+	L.Push(Y);
+	L.Push(Z);
+	return 4;
+}
+
+
+
+
+static int tolua_cByteBuffer_ReadString(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadString'");
+	}
+	if (!L.CheckParamNumber(2))
+	{
+		return 0;
+	}
+
+	AString Value;
+	size_t Count;
+	L.GetStackValue(2, Count);
+	auto Success = Buffer->ReadString(Value, Count);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Success);
+	L.Push(Value);
+	return 2;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadAll(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadAll'");
+	}
+
+	AString Value;
+	Buffer->ReadAll(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Value);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cByteBuffer_ReadAgain(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cByteBuffer"))
+	{
+		return 0;
+	}
+
+	cByteBuffer * Buffer = reinterpret_cast<cByteBuffer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Buffer == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "invalid 'self' in function 'cByteBuffer:ReadAgain'");
+	}
+
+	AString Value;
+	Buffer->ReadAll(Value);
+
+	lua_settop(tolua_S, 2);
+	L.Push(Value);
+	return 1;
+}
+
+
+
+
+
 void cManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
@@ -3929,13 +4496,35 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_variable(tolua_S, "PostParams", tolua_get_HTTPRequest_PostParams, nullptr);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cChannelManager");
+			tolua_function(tolua_S, "RegisterChannel", tolua_cChannelManager_RegisterChannel);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cByteBuffer");
+			tolua_function(tolua_S, "ReadBEInt8", tolua_cByteBuffer_ReadBEInt8);
+			tolua_function(tolua_S, "ReadBEInt16", tolua_cByteBuffer_ReadBEInt16);
+			tolua_function(tolua_S, "ReadBEInt32", tolua_cByteBuffer_ReadBEInt32);
+			tolua_function(tolua_S, "ReadBEInt64", tolua_cByteBuffer_ReadBEInt64);
+			tolua_function(tolua_S, "ReadBEUInt8", tolua_cByteBuffer_ReadBEUInt8);
+			tolua_function(tolua_S, "ReadBEUInt16", tolua_cByteBuffer_ReadBEUInt16);
+			tolua_function(tolua_S, "ReadBEUInt32", tolua_cByteBuffer_ReadBEUInt32);
+			tolua_function(tolua_S, "ReadBEUInt64", tolua_cByteBuffer_ReadBEUInt64);
+			tolua_function(tolua_S, "ReadBEFloat", tolua_cByteBuffer_ReadBEFloat);
+			tolua_function(tolua_S, "ReadBEDouble", tolua_cByteBuffer_ReadBEDouble);
+			tolua_function(tolua_S, "ReadBool", tolua_cByteBuffer_ReadBool);
+			tolua_function(tolua_S, "ReadVarInt32", tolua_cByteBuffer_ReadVarInt32);
+			tolua_function(tolua_S, "ReadVarInt64", tolua_cByteBuffer_ReadVarInt64);
+			tolua_function(tolua_S, "ReadVarUTF8String", tolua_cByteBuffer_ReadVarUTF8String);
+			tolua_function(tolua_S, "ReadLEInt", tolua_cByteBuffer_ReadLEInt);
+			tolua_function(tolua_S, "ReadPosition64", tolua_cByteBuffer_ReadPosition64);
+			tolua_function(tolua_S, "ReadString", tolua_cByteBuffer_ReadString);
+			tolua_function(tolua_S, "ReadAll", tolua_cByteBuffer_ReadAll);
+			tolua_function(tolua_S, "ReadAgain", tolua_cByteBuffer_ReadAgain);
+		tolua_endmodule(tolua_S);
+
 		BindNetwork(tolua_S);
 		BindRankManager(tolua_S);
 		BindWorld(tolua_S);
 
 	tolua_endmodule(tolua_S);
 }
-
-
-
-

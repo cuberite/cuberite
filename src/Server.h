@@ -40,6 +40,7 @@ typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cCommandOutputCallback;
 class cSettingsRepositoryInterface;
+class cChannelManager;
 
 
 namespace Json
@@ -57,7 +58,7 @@ class cServer
 public:
 	// tolua_end
 
-	virtual ~cServer() {}
+	virtual ~cServer();
 	bool InitServer(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth);
 
 	// tolua_begin
@@ -142,6 +143,9 @@ public:
 	/** Returns true if usernames should be completed across worlds. This is read
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
+
+	/** Returns the channel manager. */
+	cChannelManager * GetChannelManager();  // tolua_export
 
 private:
 
@@ -241,6 +245,8 @@ private:
 	Initialized in InitServer(), used in Start(). */
 	AStringVector m_Ports;
 
+	UniquePtr<cChannelManager> m_ChannelManager;
+
 
 	cServer(void);
 
@@ -256,7 +262,3 @@ private:
 	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
 };  // tolua_export
-
-
-
-

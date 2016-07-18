@@ -437,6 +437,22 @@ return
 			},
 		}, -- cBlockInfo
 
+		cChannelManager =
+		{
+			Desc = [[
+				This class allows plugins to register handlers for specific plugin channels.
+			]],
+
+			Functions =
+			{
+				AddClientToChannel = { Params = "{{cClientHandle}}, Channel Name", Notes = "Adds and registers a client on the specified channel." },
+				RemoveClientFromChannel = { Params = "{{cClientHandle}}, Channel Name", Notes = "Removes and unregisters a client on the specified channel." },
+				RegisterChannel = { Params = "Channel Name, Callback", Return = "bool", Notes = "Registers a handler for a specific channel. Returns true if it was able to be registered." },
+				RemoveChannel = { Params = "Channel Name", Return = "bool", Notes = "Removes the handler for the specified channel. Returns true if the handler was removed." },
+				BroadcastChannelMessage = { Params = "Channel Name, Message, {{cWorld|World}}", Notes = "Sends the message on the specified channel. Limits the message to the specified world, if provided." }
+			}
+		}, -- cChannelManager
+
 		cChatColor =
 		{
 			Desc = [[
@@ -2288,6 +2304,7 @@ end
 			Functions =
 			{
 				DoesAllowMultiLogin = { Params = "", Return = "boolean", Notes = "Returns true if players can log in multiple times from the same account (normally used for debugging), false if only one player per name is allowed." },
+				GetChannelManager = { Return = "{{cChannelManager}}", Notes = "Returns the {{cChannelManager|Channel Manager}}." },
 				GetDescription = { Return = "string", Notes = "Returns the server description set in the settings.ini." },
 				GetMaxPlayers = { Return = "number", Notes = "Returns the max amount of players who can join the server." },
 				GetNumPlayers = { Return = "number", Notes = "Returns the amount of players online." },

@@ -17,6 +17,7 @@
 #include "WebAdmin.h"
 #include "Protocol/ProtocolRecognizer.h"
 #include "CommandOutput.h"
+#include "ChannelManager.h"
 
 #include "IniFile.h"
 #include "Vector3.h"
@@ -89,6 +90,15 @@ public:
 
 
 
+cServer::~cServer()
+{
+	m_ChannelManager = nullptr;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cServer::cTickThread:
 
@@ -147,6 +157,9 @@ cServer::cServer(void) :
 {
 	// Initialize the LuaStateTracker singleton before the app goes multithreaded:
 	cLuaStateTracker::GetStats();
+
+	// Create a new channel manager
+	m_ChannelManager = UniquePtr<cChannelManager>(new cChannelManager());
 }
 
 
@@ -705,3 +718,7 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const ASt
 
 
 
+cChannelManager * cServer::GetChannelManager()
+{
+	return m_ChannelManager.get();
+}
