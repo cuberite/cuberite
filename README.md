@@ -36,7 +36,7 @@ This script downloads the source code and compiles it. The script is smart enoug
     sh -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
 
 #### Hosted services
- - Hosted Cuberite is available DIY on DigitalOcean: [![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/cuberite/cuberite) and [Gamocosm](https://gamocosm.com/) also offers Cuberite support.
+ - Hosted Cuberite is available via [Gamocosm](https://gamocosm.com/).
 
 Contributing
 ------------
