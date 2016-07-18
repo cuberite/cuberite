@@ -77,7 +77,22 @@ public:
 		double y = Callbacks.m_Pos.y;
 		double z = Callbacks.m_Pos.z;
 
-		cBoat * Boat = new cBoat(x + 0.5, y + 1, z + 0.5);
+		// Verify that block type for spawn point is water
+		BLOCKTYPE SpawnBlock = a_World->GetBlock(x, y, z);
+		if (!IsBlockWater(SpawnBlock))
+		{
+			return false;
+		}
+
+		// Block above must be air to spawn a boat (prevents spawning a boat underwater)
+		BLOCKTYPE BlockAbove = a_World->GetBlock(x, y + 1, z);
+		if (BlockAbove != E_BLOCK_AIR)
+		{
+			return false;
+		}
+
+		// Spawn block at water level
+		cBoat * Boat = new cBoat(x + 0.5, y + 0.5, z + 0.5);
 		Boat->Initialize(*a_World);
 
 		return true;

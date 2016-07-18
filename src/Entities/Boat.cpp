@@ -14,7 +14,10 @@
 
 
 cBoat::cBoat(double a_X, double a_Y, double a_Z) :
-	super(etBoat, a_X, a_Y, a_Z, 0.98, 0.7)
+	super(etBoat, a_X, a_Y, a_Z, 0.98, 0.7),
+	m_LastDamage(0), m_ForwardDirection(0),
+	m_DamageTaken(0.0f), m_Type(0),
+	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
 {
 	SetMass(20.0f);
 	SetGravity(-16.0f);
@@ -37,12 +40,15 @@ void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 
 bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 {
+	m_LastDamage = 10;
 	if (!super::DoTakeDamage(TDI))
 	{
 		return false;
 	}
 
-	if (GetHealth() == 0)
+	m_World->BroadcastEntityMetadata(*this);
+
+	if (GetHealth() <= 0)
 	{
 		if (TDI.Attacker != nullptr)
 		{
@@ -112,6 +118,14 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			AddSpeedY(0.2);
 		}
 	}
+
+	if (GetLastDamage() > 0)
+	{
+		SetLastDamage(GetLastDamage() - 1);
+	}
+
+	// Broadcast any changes in position
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -129,4 +143,24 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 	ToAddSpeed.y = 0;
 
 	AddSpeed(ToAddSpeed);
+}
+
+
+
+
+void cBoat::SetLastDamage(int TimeSinceLastHit)
+{
+	m_LastDamage = TimeSinceLastHit;
+}
+
+
+
+
+
+void cBoat::UpdatePaddles(bool a_RightPaddleUsed, bool a_LeftPaddleUsed)
+{
+	m_RightPaddleUsed = a_RightPaddleUsed;
+	m_LeftPaddleUsed = a_LeftPaddleUsed;
+
+	m_World->BroadcastEntityMetadata(*this);
 }

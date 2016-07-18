@@ -208,6 +208,7 @@ protected:
 	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
+	void HandlePacketBoatSteer              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
@@ -228,6 +229,7 @@ protected:
 	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUseItem                (cByteBuffer & a_ByteBuffer);
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
+	void HandlePacketVehicleMove            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 
