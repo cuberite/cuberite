@@ -62,10 +62,10 @@ public:
 	void Clear(void);
 
 	/** Returns number of items out of a_ItemStack that can fit in the storage */
-	int HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlots);
+	int HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlots = true);
 
 	/** Returns how many items of the specified type would fit into the slot range specified */
-	int HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots);
+	int HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots = true);
 
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;

@@ -1,4 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
 project (Cuberite)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
@@ -56,7 +55,6 @@ set (BINDING_OUTPUTS
 )
 
 set(BINDING_DEPENDENCIES
-	tolua
 	../Bindings/AllToLua.pkg
 	../Bindings/BindingsProcessor.lua
 	../Bindings/LuaFunctions.h
@@ -139,17 +137,21 @@ set(BINDING_DEPENDENCIES
 )
 
 if (NOT MSVC)
-	ADD_CUSTOM_COMMAND(
-		# add any new generated bindings here
-		OUTPUT ${BINDING_OUTPUTS}
-
-		# Regenerate bindings:
-		COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-
-		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDENCIES}
-	)
+	if (HAS_LUA_INTERPRETER)
+		ADD_CUSTOM_COMMAND(
+			OUTPUT ${BINDING_OUTPUTS}
+			COMMAND lua BindingsProcessor.lua
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			DEPENDS ${BINDING_DEPENDENCIES}
+		)
+	else()
+		ADD_CUSTOM_COMMAND(
+			OUTPUT ${BINDING_OUTPUTS}
+			COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			DEPENDS ${BINDING_DEPENDENCIES} tolua
+		)
+	endif()
 endif ()
 
 set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)

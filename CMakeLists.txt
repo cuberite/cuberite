@@ -1,5 +1,9 @@
 cmake_minimum_required (VERSION 2.8.7)
 
+if (POLICY CMP0054)
+	cmake_policy(SET CMP0054 NEW)
+endif()
+
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
@@ -91,6 +95,18 @@ endif()
 
 set(BUILD_TOOLS OFF CACHE BOOL "")
 set(SELF_TEST OFF CACHE BOOL "")
+
+# Check whether Lua 5.1 is installed locally:
+include(CheckLua.cmake)
+if(HAS_LUA_INTERPRETER AND ("${LUA_INTERPRETER_VERSION}" STREQUAL "5.1"))
+	message(STATUS "Lua 5.1 has been found in your system and will be used for the build.")
+else()
+	if (CROSSCOMPILE)
+		message(FATAL "To crosscompile, you need to have Lua 5.1 installed in your system and available in PATH.")
+	endif()
+	message(STATUS "Lua 5.1 has NOT been found in your system, the build will use its own Lua implementation.")
+endif()
+
 
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})

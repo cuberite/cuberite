@@ -1,3 +1,4 @@
+docs/
 lua51.dll
 LuaState_Declaration.inc
 LuaState_Implementation.cpp

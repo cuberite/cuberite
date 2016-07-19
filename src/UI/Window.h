@@ -77,6 +77,8 @@ public:
 
 	char GetWindowID(void) const { return m_WindowID; }  // tolua_export
 	int GetWindowType(void) const { return m_WindowType; }  // tolua_export
+
+	/** Returns the textual representation of the window's type, such as "minecraft:chest". */
 	const AString GetWindowTypeName(void) const;  // tolua_export
 
 	cWindowOwner * GetOwner(void) { return m_Owner; }
@@ -136,10 +138,12 @@ public:
 	const AString & GetWindowTitle() const { return m_WindowTitle; }
 	void SetWindowTitle(const AString & a_WindowTitle) { m_WindowTitle = a_WindowTitle; }
 
-	/** Sends the UpdateWindowProperty (0x69) packet to all clients of the window */
+	/** Updates a numerical property associated with the window. Typically used for furnace progressbars.
+	Sends the UpdateWindowProperty packet to all clients of the window */
 	virtual void SetProperty(short a_Property, short a_Value);
 
-	/** Sends the UpdateWindowPropert(0x69) packet to the specified player */
+	/** Updates a numerical property associated with the window. Typically used for furnace progressbars.
+	Sends the UpdateWindowProperty packet only to the specified player */
 	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player);
 
 	// tolua_end

@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-
 enable_testing()
 
 if (CMAKE_BUILD_TYPE STREQUAL "COVERAGE")

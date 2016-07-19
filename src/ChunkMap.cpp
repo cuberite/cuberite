@@ -1228,7 +1228,7 @@ NIBBLETYPE cChunkMap::GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_Block
 
 
 
-void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClient)
+void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
@@ -1238,7 +1238,7 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
-		Chunk->SetMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta, a_ShouldMarkDirty, a_ShouldInformClient);
+		Chunk->SetMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta, a_ShouldMarkDirty, a_ShouldInformClients);
 	}
 }
 

@@ -78,10 +78,9 @@ public:
 
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
-	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used in
-	first (if empty or compatible with added items)
-	if a_PrioritarySlot is set to -1, regular order apply
+	If a_AllowNewStacks is set to true, empty slots can be used for the rest.
+	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used  first (if empty or compatible with added items).
+	If a_PrioritarySlot is set to -1, regular order applies.
 	Returns the number of items that fit.
 	*/
 	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
@@ -89,10 +88,9 @@ public:
 	/** Same as AddItem, but works on an entire list of item stacks.
 	The a_ItemStackList is modified to reflect the leftover items.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
-	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used in
-	first (if empty or compatible with added items)
-	if a_PrioritarySlot is set to -1, regular order apply
+	If a_AllowNewStacks is set to true, empty slots can be used for the rest.
+	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used first (if empty or compatible with added items).
+	If a_PrioritarySlot is set to -1, regular order applies.
 	Returns the total number of items that fit.
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);

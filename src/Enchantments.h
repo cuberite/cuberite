@@ -79,7 +79,7 @@ public:
 	cEnchantments(const AString & a_StringSpec);
 
 	/** Adds the enchantments contained in a_Other into this object.
-	Existing enchantments are preserved, unless a_Other specifies a different level, in which case the level is changed. */
+	Existing enchantments are preserved, unless a_Other specifies a different level, in which case the level is changed to the a_Other's one. */
 	void Add(const cEnchantments & a_Other);
 
 	/** Adds enchantments in the stringspec; if a specified enchantment already exists, overwrites it */

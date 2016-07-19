@@ -1,6 +1,3 @@
-
-cmake_minimum_required (VERSION 2.6)
-
 project (GrownBiomeGenVisualiser)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
