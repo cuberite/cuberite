@@ -7,7 +7,7 @@ Cuberite can run on Windows, *nix and Android operating systems. This includes A
 
 We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 
-Subscribe to [the newsletter](http://cuberite.org/news/) for important updates and project news.
+Subscribe to [the newsletter](https://newsletter.cuberite.org/subscribe.htm) for important updates and project news.
 
 Installation
 ------------
@@ -15,7 +15,7 @@ Installation
 There are several ways to obtain Cuberite.
 
 #### Binaries
- - The easiest method is downloading for Windows or Linux from the [Project site](http://cuberite.org/).
+ - The easiest method is downloading for Windows or Linux from the [Project site](https://cuberite.org/).
  - You can use the EasyInstall script for Linux, which automatically downloads the correct binary. The script is described below.
  - You can also obtain a binary from the [buildserver archive](https://builds.cuberite.org/).
 
@@ -54,7 +54,7 @@ You can also help with documentation by contributing to the [User's Manual](http
 Other Stuff
 -----------
 
-For other stuff, check out the [homepage](http://cuberite.org), the [Users' Manual](https://book.cuberite.org),
+For other stuff, check out the [homepage](https://cuberite.org), the [Users' Manual](https://book.cuberite.org),
 the [forums](https://forum.cuberite.org/), and the [Plugin API](http://api-docs.cuberite.org/).
 
 [Support Us on Bountysource](https://bountysource.com/teams/cuberite)
