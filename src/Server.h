@@ -139,6 +139,10 @@ public:
 	it makes the server vulnerable to identity theft through direct connections. */
 	bool ShouldAllowBungeeCord(void) const { return m_ShouldAllowBungeeCord; }
 
+	/** Returns true if usernames should be completed across worlds. This is read
+	from the settings. */
+	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
+
 private:
 
 	friend class cRoot;  // so cRoot can create and destroy cServer
@@ -229,6 +233,9 @@ private:
 
 	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
 	bool m_ShouldAllowBungeeCord;
+
+	/** True if usernames should be completed across worlds. */
+	bool m_ShouldAllowMultiWorldTabCompletion;
 
 	/** The list of ports on which the server should listen for connections.
 	Initialized in InitServer(), used in Start(). */
