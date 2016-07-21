@@ -318,7 +318,7 @@ if (MSVC)
 		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
 	endforeach(dep)
 
-	if (HAS_LUA_INTERPRETER)
+	if (USE_SYSTEM_LUA)
 		ADD_CUSTOM_COMMAND(
 			OUTPUT ${BINDING_OUTPUTS}
 			COMMAND lua BindingsProcessor.lua
