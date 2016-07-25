@@ -124,7 +124,7 @@ macro(set_flags)
 
 
 	# Have the compiler generate code specifically targeted at the current machine on Linux
-	if(LINUX AND NOT CROSSCOMPILE)
+	if(LINUX AND NOT NOMARCHNATIVE)
 		add_flags_cxx("-march=native")
 	endif()
 

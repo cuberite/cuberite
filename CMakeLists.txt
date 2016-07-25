@@ -5,7 +5,7 @@
 # This script supports some configuration through CMake arguments (-Dparam=val syntax):
 #   BUILD_TOOLS=1          sets up additional executables to be built along with the server (ProtoProxy, GrownBiomeGenVisualiser, MCADefrag)
 #   BUILD_UNSTABLE_TOOLS=1 sets up yet more executables to be built, these can be broken and generally are obsolete (GeneratorPerformanceTest)
-#   CROSSCOMPILE=1         marks the build as a crosscompile (doesn't include optimizations for current platform)
+#   NOMARCHNATIVE=1        disables CPU-specific optimisations, allows use on other CPUs of the same platform
 #   DISABLE_SYSTEM_LUA=1   disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
 #   SELF_TEST=1            enables testing code to be built
 
@@ -118,16 +118,10 @@ if (NOT(DISABLE_SYSTEM_LUA))
 		message(STATUS "Lua 5.1 has been found in your system and will be used for the build.")
 		set(USE_SYSTEM_LUA 1)
 	else()
-		if (CROSSCOMPILE)
-			message(FATAL "To crosscompile, you need to have Lua 5.1 installed in your system and available in PATH.")
-		endif()
 		message(STATUS "Lua 5.1 has NOT been found in your system, the build will use its own Lua implementation.")
 		unset(USE_SYSTEM_LUA)
 	endif()
 else()
-	if (CROSSCOMPILE)
-		message(FATAL "CMake parameter mismatch: CROSSCOMPILE is mutually exclusive with DISABLE_SYSTEM_LUA")
-	endif()
 	message(STATUS "System Lua is disabled via CMake command-line parameters. The build will use its own Lua implementation.")
 endif()
 

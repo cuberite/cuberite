@@ -144,31 +144,27 @@ to your cmake command and 32 bit will be forced.
 
 ### Compiling for another computer ###
 
-When cross-compiling for another computer it is important to set cross compiling mode. This tells the compiler not to optimise for your machine. This switch can be used with debug or release mode. To enable, simply add:
+When cross-compiling for another computer of the same architechture it is important to set the NOMARCHNATIVE flag. This tells the compiler not to optimise for your machine. This switch can be used with debug or release mode. To enable, simply add:
 
-    -DCROSSCOMPILE=1
+    -DNOMARCHNATIVE=1
 
 to your cmake command.
-
-Note that real cross-compilation is hard at this moment, because an executable generated during the build process is required for later stages, so if your computer cannot run executables it generates the build will not work.
 
 ### List of all build flags ###
 
 Cuberite's build process supports a large number of flags for customising the builds. Use these flags by adding `-DFlag_name=Value` to the cmake configuration command. For example to enable test generation using the `SELF_TEST` flag add: `-DSELF_TEST=ON`
 
 ###### BUILD_TOOLS
-Adds the Cuberite tools to the build. At the moment only MCADefrag and ProtoProxy are added. Define as ON to enable. Define as OFF to disable. 
+Adds the Cuberite tools to the build. At the moment only MCADefrag and ProtoProxy are added. Define as ON to enable. Define as OFF to disable.
 
 ###### BUILD_UNSTABLE_TOOLS
-Adds tools that are not working yet to the build. Currently this is only the Generator Performance Test. Used for developing these tools. Define as ON to enable. Define as OFF to disable. 
+Adds tools that are not working yet to the build. Currently this is only the Generator Performance Test. Used for developing these tools. Define as ON to enable. Define as OFF to disable.
 
 ###### SELF_TEST
-Enables generation of tests and self-test startup code. Tests can be run with ctest and with makefiles make test. Define as ON to enable. Define as OFF to disable. 
+Enables generation of tests and self-test startup code. Tests can be run with ctest and with makefiles make test. Define as ON to enable. Define as OFF to disable.
 
 ###### FORCE_32
 Forces the build to use 32 bit builds on *nix systems. Define as ON to enable. Define as OFF to disable.
- 
-###### CROSSCOMPILE
-Disables optimizations for the build host. This is important when building on a different machine from the one you will run Cuberite on as the build machine may support instructions the final machine does not. This flag only has any effect on linux. Define as ON to enable. Define as OFF to disable. 
 
-
+###### NOMARCHNATIVE
+Disables optimizations for the build host. This is important when building on a different machine from the one you will run Cuberite on as the build machine may support instructions the final machine does not. This flag only has any effect on linux. Define as ON to enable. Define as OFF to disable.
