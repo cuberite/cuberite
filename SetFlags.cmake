@@ -128,6 +128,10 @@ macro(set_flags)
 		add_flags_cxx("-march=native")
 	endif()
 
+	if(CROSSCOMPILE)
+		message(FATAL_ERROR "The CROSSCOMPILE flag has been renamed to NOMARCHNATIVE. Please update your build scripts to compile Cuberite.")
+	endif()
+
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		get_clang_version()
 	endif()
