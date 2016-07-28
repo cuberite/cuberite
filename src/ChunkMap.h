@@ -396,7 +396,7 @@ public:
 	void QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
-	cCriticalSection & GetCS(void) { return m_CSLayers; }
+	cCriticalSection & GetCS(void) { return m_CSChunks; }
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
@@ -447,7 +447,7 @@ private:
 
 	typedef std::list<cChunkStay *> cChunkStays;
 
-	cCriticalSection m_CSLayers;
+	cCriticalSection m_CSChunks;
 
 	/** A map of chunk coordinates to chunk pointers
 	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster */
@@ -462,10 +462,19 @@ private:
 
 	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
+	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
+	Emplaces this chunk in the chunk map.
+	Developers SHOULD use the GetChunk variants instead of this function. */
 	cChunkPtr ConstructChunk(int a_ChunkX, int a_ChunkZ);
-	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
-	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);  // Doesn't load, doesn't generate
+
+	/** Constructs a chunk and queues it for loading / generating if not valid, returning it */
+	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
+	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ);
+
+	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
+	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);
 
 	/** Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
@@ -482,7 +491,7 @@ private:
 	/** Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSLayers is locked. To be called only from cChunkMap. */
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Adds a new cChunkStay descendant to the internal list of ChunkStays; loads its chunks.
