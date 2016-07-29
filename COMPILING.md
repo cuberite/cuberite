@@ -142,11 +142,11 @@ This is useful if you want to compile Cuberite on an x64 (64-bit Intel) machine 
 
 to your cmake command and 32 bit will be forced.
 
-### Compiling for another computer ###
+### Compiling for another computer of the same architecture ###
 
-When cross-compiling for another computer of the same architechture it is important to set the NOMARCHNATIVE flag. This tells the compiler not to optimise for your machine. This switch can be used with debug or release mode. To enable, simply add:
+When cross-compiling for another computer of the same architecture it is important to set the NO_NATIVE_OPTIMIZATION flag. This tells the compiler not to optimise for your machine. This switch can be used with debug or release mode. To enable, simply add:
 
-    -DNOMARCHNATIVE=1
+    -DNO_NATIVE_OPTIMIZATION=1
 
 to your cmake command.
 
@@ -166,5 +166,5 @@ Enables generation of tests and self-test startup code. Tests can be run with ct
 ###### FORCE_32
 Forces the build to use 32 bit builds on *nix systems. Define as ON to enable. Define as OFF to disable.
 
-###### NOMARCHNATIVE
+###### NO_NATIVE_OPTIMIZATION
 Disables optimizations for the build host. This is important when building on a different machine from the one you will run Cuberite on as the build machine may support instructions the final machine does not. This flag only has any effect on linux. Define as ON to enable. Define as OFF to disable.

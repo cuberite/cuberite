@@ -3,11 +3,11 @@
 # Use CMake to generate the build files for your platform
 #
 # This script supports some configuration through CMake arguments (-Dparam=val syntax):
-#   BUILD_TOOLS=1          sets up additional executables to be built along with the server (ProtoProxy, GrownBiomeGenVisualiser, MCADefrag)
-#   BUILD_UNSTABLE_TOOLS=1 sets up yet more executables to be built, these can be broken and generally are obsolete (GeneratorPerformanceTest)
-#   NOMARCHNATIVE=1        disables CPU-specific optimisations, allows use on other CPUs of the same platform
-#   DISABLE_SYSTEM_LUA=1   disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
-#   SELF_TEST=1            enables testing code to be built
+#   BUILD_TOOLS=1            sets up additional executables to be built along with the server (ProtoProxy, GrownBiomeGenVisualiser, MCADefrag)
+#   BUILD_UNSTABLE_TOOLS=1   sets up yet more executables to be built, these can be broken and generally are obsolete (GeneratorPerformanceTest)
+#   NO_NATIVE_OPTIMIZATION=1 disables CPU-specific optimisations for the current machine, allows use on other CPUs of the same platform
+#   DISABLE_SYSTEM_LUA=1     disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
+#   SELF_TEST=1              enables testing code to be built
 
 
 

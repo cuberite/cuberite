@@ -124,12 +124,12 @@ macro(set_flags)
 
 
 	# Have the compiler generate code specifically targeted at the current machine on Linux
-	if(LINUX AND NOT NOMARCHNATIVE)
+	if(LINUX AND NOT NO_NATIVE_OPTIMIZATION)
 		add_flags_cxx("-march=native")
 	endif()
 
 	if(CROSSCOMPILE)
-		message(FATAL_ERROR "The CROSSCOMPILE flag has been renamed to NOMARCHNATIVE. Please update your build scripts to compile Cuberite.")
+		message(FATAL_ERROR "The CROSSCOMPILE flag has been renamed to NO_NATIVE_OPTIMIZATION. Please update your build scripts to compile Cuberite.")
 	endif()
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
