@@ -39,37 +39,14 @@ public:
 	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
 	{
 		// LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-		auto Data = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData();
-		auto DelayInfo = Data->GetMechanismDelayInfo(a_Position);
 
-		// Delay is used here to prevent an infinite loop (#3168)
-		if (DelayInfo == nullptr)
+		if (a_PoweringData.PowerLevel > 0)
 		{
-			bool ShouldBeExtended = (a_PoweringData.PowerLevel != 0);
-			if (ShouldBeExtended != cBlockPistonHandler::IsExtended(a_Meta))
-			{
-				Data->m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeExtended);
-			}
+			cBlockPistonHandler::ExtendPiston(a_Position, &m_World);
 		}
 		else
 		{
-			int DelayTicks;
-			bool ShouldBeExtended;
-			std::tie(DelayTicks, ShouldBeExtended) = *DelayInfo;
-
-			if (DelayTicks == 0)
-			{
-				if (ShouldBeExtended)
-				{
-					cBlockPistonHandler::ExtendPiston(a_Position, &m_World);
-				}
-				else
-				{
-					cBlockPistonHandler::RetractPiston(a_Position, &m_World);
-				}
-
-				Data->m_MechanismDelays.erase(a_Position);
-			}
+			cBlockPistonHandler::RetractPiston(a_Position, &m_World);
 		}
 
 		return {};
