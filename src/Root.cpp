@@ -1026,7 +1026,7 @@ AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
 		virtual bool Item(cWorld * a_World) override
 		{
 			a_World->TabCompleteUserName(m_Search, m_Results);
-			return true;
+			return false;
 		}
 	private:
 		AStringVector & m_Results;
