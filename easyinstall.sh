@@ -1,5 +1,9 @@
 #!/bin/sh
 
+{
+
+set -e
+
 PLATFORM=$(uname -m)
 
 echo "Identifying platform: $PLATFORM"
@@ -15,3 +19,5 @@ curl -s $DOWNLOADURL | tar -xzf -
 echo "Done."
 
 echo "Cuberite is now installed, run using 'cd Server; ./Cuberite'."
+
+}
