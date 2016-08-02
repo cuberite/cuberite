@@ -405,7 +405,9 @@ bool cNameValueParser::Finish(void)
 		}
 	}
 	ASSERT(!"Unhandled parser state!");
-	return false;
+	#ifndef __clang__
+		return false;
+	#endif
 }
 
 

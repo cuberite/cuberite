@@ -118,7 +118,9 @@ template <typename TYPE> void LinearUpscale2DArray(
 
 	// Interpolate each XY cell:
 	int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
-	int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
+	#ifdef _DEBUG
+		int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
+	#endif
 	for (int y = 0; y < (a_SrcSizeY - 1); y++)
 	{
 		int DstY = y * a_UpscaleY;
@@ -198,7 +200,9 @@ template <typename TYPE> void LinearUpscale3DArray(
 	// Interpolate each XYZ cell:
 	int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
 	int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
-	int DstSizeZ = (a_SrcSizeZ - 1) * a_UpscaleZ + 1;
+	#ifdef _DEBUG
+		int DstSizeZ = (a_SrcSizeZ - 1) * a_UpscaleZ + 1;
+	#endif
 	for (int z = 0; z < (a_SrcSizeZ - 1); z++)
 	{
 		int DstZ = z * a_UpscaleZ;

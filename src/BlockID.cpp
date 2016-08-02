@@ -392,7 +392,9 @@ AString DamageTypeToString(eDamageType a_DamageType)
 
 	// Unknown damage type:
 	ASSERT(!"Unknown DamageType");
-	return Printf("dtUnknown_%d", static_cast<int>(a_DamageType));
+	#ifndef __clang__
+		return Printf("dtUnknown_%d", static_cast<int>(a_DamageType));
+	#endif
 }
 
 

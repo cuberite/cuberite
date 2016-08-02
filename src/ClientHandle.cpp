@@ -238,7 +238,9 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		}
 	}
 	ASSERT(!"Unhandled chat prefix type!");
-	return "";
+	#ifndef __clang__
+		return "";
+	#endif
 }
 
 
