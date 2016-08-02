@@ -22,7 +22,7 @@ There are several ways to obtain Cuberite.
 ##### The EasyInstall script
 This Linux script will download the correct binary from the project site.
 
-    sh -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/easyinstall.sh)"
+    sh -c "$(wget -O - https://download.cuberite.org)"
 
 #### Compiling
  - You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
@@ -33,7 +33,7 @@ Compiling may provide better performance (1.5-3x as fast) and it supports more o
 ##### The compile.sh script
 This script downloads the source code and compiles it. The script is smart enough to notify you of missing dependencies and instructing you on how to install them. The script doesn't work for Windows.
 
-    sh -c "$(wget -O - https://raw.githubusercontent.com/cuberite/cuberite/master/compile.sh)"
+    sh -c "$(wget -O - https://compile.cuberite.org)"
 
 #### Hosted services
  - Hosted Cuberite is available via [Gamocosm](https://gamocosm.com/).
@@ -45,7 +45,7 @@ Cuberite is licensed under the Apache License V2, and we welcome anybody to fork
 
 Cuberite is developed in C++ and Lua. To contribute code, please check out [GETTING-STARTED.md](https://github.com/cuberite/cuberite/blob/master/GETTING-STARTED.md) and [CONTRIBUTING.md](https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md) for more details.
 
-Plugins are written in Lua. You can contribute by developing plugins and submitting them to [the forum](https://forum.cuberite.org/forum-2.html). Please check out our [plugin introduction guide](http://api-docs.cuberite.org/Writing-a-Cuberite-plugin.html) for more info. 
+Plugins are written in Lua. You can contribute by developing plugins and submitting them to [the forum](https://forum.cuberite.org/forum-2.html). Please check out our [plugin introduction guide](http://api-docs.cuberite.org/Writing-a-Cuberite-plugin.html) for more info.
 
 If you are not a programmer, you can help by testing Cuberite and reporting bugs. See [TESTING.md](https://github.com/cuberite/cuberite/blob/master/TESTING.md) for details.
 
