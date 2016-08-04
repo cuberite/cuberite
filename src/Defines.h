@@ -203,7 +203,7 @@ enum eMobHeadRotation
 
 
 
-inline const char * ClickActionToString(eClickAction a_ClickAction)
+inline const char * ClickActionToString(int a_ClickAction)
 {
 	switch (a_ClickAction)
 	{

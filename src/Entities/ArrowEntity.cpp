@@ -67,7 +67,9 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 		case psInCreative:           return a_Player.IsGameModeCreative();
 	}
 	ASSERT(!"Unhandled pickup state");
-	return false;
+	#ifndef __clang__
+		return false;
+	#endif
 }
 
 

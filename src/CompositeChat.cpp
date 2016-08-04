@@ -284,7 +284,9 @@ cLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageT
 		case mtLeave:          return cLogger::llRegular;
 	}
 	ASSERT(!"Unhandled MessageType");
-	return cLogger::llError;
+	#ifndef __clang__
+		return cLogger::llError;
+	#endif
 }
 
 

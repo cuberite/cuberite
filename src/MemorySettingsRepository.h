@@ -53,20 +53,45 @@ private:
 
 	struct sValue
 	{
-		sValue(AString value) : m_Type(eType::String), m_stringValue (value) {}
-		sValue(Int64 value) : m_Type(eType::Int64), m_intValue(value) {}
-		sValue(bool value) : m_Type(eType::Bool), m_boolValue(value) {}
+		sValue(AString value):
+			#ifdef _DEBUG
+				m_Type(eType::String),
+			#endif
+			m_stringValue (value)
+		{
+		}
+
+		sValue(Int64 value):
+			#ifdef _DEBUG
+				m_Type(eType::Int64),
+			#endif
+			m_intValue(value)
+		{
+		}
+
+		sValue(bool value):
+			#ifdef _DEBUG
+				m_Type(eType::Bool),
+			#endif
+			m_boolValue(value)
+		{
+		}
 
 		AString getStringValue() const { ASSERT(m_Type == eType::String); return m_stringValue; }
 		Int64   getIntValue()    const { ASSERT(m_Type == eType::Int64);  return m_intValue;    }
 		bool    getBoolValue()   const { ASSERT(m_Type == eType::Bool);   return m_boolValue;   }
-		private:
-		enum class eType
-		{
-			String,
-			Int64,
-			Bool
-		} m_Type;
+
+	private:
+
+		#ifdef _DEBUG
+			enum class eType
+			{
+				String,
+				Int64,
+				Bool
+			} m_Type;
+		#endif
+
 		AString m_stringValue;
 		union
 		{
