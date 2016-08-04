@@ -1,6 +1,10 @@
 
 // BlockArea.cpp
 
+// NOTE: compile.sh checks for this file in order to determine if this is the Cuberite folder.
+// Please modify compile.sh if you want to rename or remove this file.
+// This file was chosen arbitrarily and it's a good enough indicator we're in the Cuberite folder.
+
 // Implements the cBlockArea object representing an area of block data that can be queried from cWorld and then accessed again without further queries
 // The object also supports writing the blockdata back into cWorld, even into other coords
 
