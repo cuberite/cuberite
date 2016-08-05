@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	virtual void GetBreedingItems(cItems & a_Items) override
+	virtual void GetBreedingItems(cItems & a_Items) const override
 	{
 		a_Items.Add(E_ITEM_RAW_FISH);
 	}

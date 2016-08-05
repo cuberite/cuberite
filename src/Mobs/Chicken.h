@@ -19,7 +19,7 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	virtual void GetFollowedItems(cItems & a_Items) override
+	virtual void GetFollowedItems(cItems & a_Items) const override
 	{
 		a_Items.Add(E_ITEM_SEEDS);
 	}

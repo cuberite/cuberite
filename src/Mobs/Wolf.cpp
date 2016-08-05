@@ -95,6 +95,10 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 	m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback);
 }
 
+
+
+
+
 bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);

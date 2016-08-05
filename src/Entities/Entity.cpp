@@ -222,8 +222,15 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	}
 
 	cChunk * ParentChunk = GetParentChunk();
-	m_World->QueueTask([this, ParentChunk](cWorld & a_World)
+
+	// We remove the entity from memory 5 ticks later, giving everyone plenty of time
+	// to read IsTicking(formerly IsDestroyed), finding out it's false, and nulling out their pointers.
+	// LogicParrot TODO Clear out the previous much more complicated mechanism
+	// (See: cPawn::StopEveryoneFromTargetingMe() and its friends)
+	// Take world travel into account.
+	m_World->ScheduleTask(40, [this, ParentChunk](cWorld & a_World)
 	{
+		UNUSED(a_World);
 		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
 			this->GetUniqueID(), this->GetClass(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()

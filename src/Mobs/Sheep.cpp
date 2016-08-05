@@ -131,7 +131,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2)
+void cSheep::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 {
 	static const struct
 	{

@@ -3404,7 +3404,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(0x56);  // Int at index 22
 			a_Pkt.WriteBEInt32(Horse.GetHorseArmour());
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Horse.IsBaby() ? -1 : (Horse.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEInt8(Horse.IsBaby() ? -1 : (Horse.GetTraitBreeder().IsInLoveCooldown() ? 1 : 0));
 			break;
 		}  // case mtHorse
 
@@ -3420,7 +3420,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Ocelot = reinterpret_cast<const cOcelot &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Ocelot.IsBaby() ? -1 : (Ocelot.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEInt8(Ocelot.IsBaby() ? -1 : (Ocelot.GetTraitBreeder().IsInLoveCooldown() ? 1 : 0));
 			break;
 		}  // case mtOcelot
 
@@ -3428,7 +3428,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Cow = reinterpret_cast<const cCow &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Cow.IsBaby() ? -1 : (Cow.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEInt8(Cow.IsBaby() ? -1 : (Cow.GetTraitBreeder().IsInLoveCooldown() ? 1 : 0));
 			break;
 		}  // case mtCow
 
@@ -3436,7 +3436,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Chicken = reinterpret_cast<const cChicken &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Chicken.IsBaby() ? -1 : (Chicken.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEInt8(Chicken.IsBaby() ? -1 : (Chicken.GetTraitBreeder().IsInLoveCooldown() ? 1 : 0));
 			break;
 		}  // case mtChicken
 
@@ -3444,7 +3444,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Pig = reinterpret_cast<const cPig &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Pig.IsBaby() ? -1 : (Pig.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEInt8(Pig.IsBaby() ? -1 : (Pig.GetTraitBreeder().IsInLoveCooldown() ? 1 : 0));
 			a_Pkt.WriteBEUInt8(0x10);
 			a_Pkt.WriteBEUInt8(Pig.IsSaddled() ? 1 : 0);
 			break;
@@ -3454,7 +3454,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Sheep = reinterpret_cast<const cSheep &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Sheep.IsBaby() ? -1 : (Sheep.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEInt8(Sheep.IsBaby() ? -1 : (Sheep.GetTraitBreeder().IsInLoveCooldown() ? 1 : 0));
 
 			a_Pkt.WriteBEUInt8(0x10);
 			Byte SheepMetadata = 0;
@@ -3473,7 +3473,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(0x12);
 			a_Pkt.WriteBEUInt8(Rabbit.GetRabbitTypeAsNumber());
 			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Rabbit.IsBaby() ? -1 : (Rabbit.IsInLoveCooldown() ? 1 : 0));
+			a_Pkt.WriteBEInt8(Rabbit.IsBaby() ? -1 : (Rabbit.GetTraitBreeder().IsInLoveCooldown() ? 1 : 0));
 			break;
 		}  // case mtRabbit
 
