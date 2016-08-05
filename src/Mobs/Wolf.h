@@ -3,7 +3,7 @@
 
 #include "PassiveAggressiveMonster.h"
 #include "../Entities/Entity.h"
-
+#include "Traits/TraitBreeder.h"
 
 
 
@@ -56,6 +56,20 @@ public:
 	void ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+	/*// Implementing the iTraitBreeding interface
+	virtual void GetFollowedItems(cItems & a_Items) const override { }
+
+	virtual void GetBreedingItems(cItems & a_Items) const override { GetFollowedItems(a_Items); }
+
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) override { }
+
+	cTraitBreeding & GetTraitBreeding() override;
+
+	const cTraitBreeding & GetTraitBreeding() const override;
+
+private:
+	cTraitBreeding m_TraitBreeding; */
 
 protected:
 

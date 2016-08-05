@@ -8,7 +8,7 @@
 #include "../Enchantments.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
-
+#include "Traits/TraitWanderer.h"
 
 class cClientHandle;
 class cWorld;
@@ -92,6 +92,7 @@ public:
 	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
 	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
+	int GetSightDistance() { return m_SightDistance; }
 
 	float GetDropChanceWeapon() { return m_DropChanceWeapon; }
 	float GetDropChanceHelmet() { return m_DropChanceHelmet; }
@@ -116,6 +117,7 @@ public:
 	// Overridables to handle ageable mobs
 	virtual bool IsTame    (void) const { return false; }
 	virtual bool IsSitting (void) const { return false; }
+	bool IsPathFinderActivated();
 
 	// tolua_begin
 	bool IsBaby (void) const { return m_Age < 0; }
@@ -219,7 +221,6 @@ protected:
 
 	int m_JumpCoolDown;
 
-	std::chrono::milliseconds m_IdleInterval;
 	std::chrono::milliseconds m_DestroyTimer;
 
 	eMonsterType m_MobType;
@@ -250,6 +251,8 @@ protected:
 
 	int m_Age;
 	int m_AgingTimer;
+
+	cTraitWanderer m_TraitWanderer;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);

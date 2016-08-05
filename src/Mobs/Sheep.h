@@ -25,9 +25,9 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2) override;
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) override;
 
-	virtual void GetFollowedItems(cItems & a_Items) override
+	virtual void GetFollowedItems(cItems & a_Items) const override
 	{
 		a_Items.Add(E_ITEM_WHEAT);
 	}
