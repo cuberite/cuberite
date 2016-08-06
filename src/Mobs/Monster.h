@@ -8,7 +8,7 @@
 #include "../Enchantments.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
-#include "Traits/TraitWanderer.h"
+#include "Behaviors/BehaviorWanderer.h"
 
 class cClientHandle;
 class cWorld;
@@ -252,7 +252,7 @@ protected:
 	int m_Age;
 	int m_AgingTimer;
 
-	cTraitWanderer m_TraitWanderer;
+	cBehaviorWanderer m_BehaviorWanderer;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);

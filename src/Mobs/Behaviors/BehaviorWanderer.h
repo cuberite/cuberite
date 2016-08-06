@@ -4,11 +4,11 @@ class cMonster;
 class cEntity;
 class cChunk;
 
-class cTraitWanderer
+class cBehaviorWanderer
 {
 
 public:
-	cTraitWanderer(cMonster * a_Parent);
+	cBehaviorWanderer(cMonster * a_Parent);
 
 	// Functions our host Monster should invoke:
 	bool ActiveTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);

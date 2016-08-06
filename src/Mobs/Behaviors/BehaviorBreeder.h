@@ -1,38 +1,38 @@
 #pragma once
 
-class cTraitBreeder;
-class iTraitBreeder;
+class cBehaviorBreeder;
+class iBehaviorBreeder;
 
 class cWorld;
 class cMonster;
 class cPlayer;
 class cItems;
 
-// To use this trait, a Monster must implement the following interface.
-// The monster must also have a cTraitBreeder as a member variable.
+// To use this Behavior, a Monster must implement the following interface.
+// The monster must also have a cBehaviorBreeder as a member variable.
 
-class iTraitBreeder
+class iBehaviorBreeder
 {
 public:
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) = 0;
 
 	virtual void GetBreedingItems(cItems & a_Items) const = 0;
 
-	virtual cTraitBreeder & GetTraitBreeder() = 0;
+	virtual cBehaviorBreeder & GetBehaviorBreeder() = 0;
 
-	virtual const cTraitBreeder & GetTraitBreeder() const = 0;
-	virtual ~iTraitBreeder();
+	virtual const cBehaviorBreeder & GetBehaviorBreeder() const = 0;
+	virtual ~iBehaviorBreeder();
 };
 
 
 
 
 
-class cTraitBreeder
+class cBehaviorBreeder
 {
 
 public:
-	cTraitBreeder(iTraitBreeder * a_Parent);
+	cBehaviorBreeder(iBehaviorBreeder * a_Parent);
 
 	// Functions our host Monster should invoke:
 	void Tick();
@@ -56,11 +56,11 @@ public:
 	bool IsInLoveCooldown() const;
 
 private:
-	static iTraitBreeder * ToInterface(cMonster * a_Monster);
-	static cTraitBreeder * ToTrait(cMonster * a_Monster);
+	static iBehaviorBreeder * ToInterface(cMonster * a_Monster);
+	static cBehaviorBreeder * ToBehavior(cMonster * a_Monster);
 
 	/** Our parent */
-	iTraitBreeder * m_ParentInterface;
+	iBehaviorBreeder * m_ParentInterface;
 	cMonster * m_Parent;
 
 	/** The monster's breeding partner. */

@@ -1,16 +1,16 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "TraitItemFollower.h"
+#include "BehaviorItemFollower.h"
 #include "../Monster.h"
 #include "../../World.h"
 #include "../../Entities/Player.h"
 
-iTraitItemFollower::~iTraitItemFollower()
+iBehaviorItemFollower::~iBehaviorItemFollower()
 {
 
 }
 
-cTraitItemFollower::cTraitItemFollower(iTraitItemFollower * a_ParentInterface) :
+cBehaviorItemFollower::cBehaviorItemFollower(iBehaviorItemFollower * a_ParentInterface) :
 	m_ParentInterface(a_ParentInterface)
 {
 	m_Parent = dynamic_cast<cMonster *>(m_ParentInterface);
@@ -21,7 +21,7 @@ cTraitItemFollower::cTraitItemFollower(iTraitItemFollower * a_ParentInterface) :
 
 
 
-bool cTraitItemFollower::ActiveTick()
+bool cBehaviorItemFollower::ActiveTick()
 {
 	cWorld * World = m_Parent->GetWorld();
 	cItems FollowedItems;
@@ -36,7 +36,7 @@ bool cTraitItemFollower::ActiveTick()
 			{
 				Vector3d PlayerPos = a_Closest_Player->GetPosition();
 				m_Parent->MoveToPosition(PlayerPos);
-				return true;  // We took control of the monster, prevent other traits from doing so
+				return true;  // We took control of the monster, prevent other Behaviors from doing so
 			}
 		}
 	}

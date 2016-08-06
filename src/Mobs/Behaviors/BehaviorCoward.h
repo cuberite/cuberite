@@ -6,10 +6,10 @@ class cItems;
 class cEntity;
 struct TakeDamageInfo;
 
-class cTraitCoward
+class cBehaviorCoward
 {
 public:
-	cTraitCoward(cMonster * a_Parent);
+	cBehaviorCoward(cMonster * a_Parent);
 
 	// Functions our host Monster should invoke:
 	bool ActiveTick();

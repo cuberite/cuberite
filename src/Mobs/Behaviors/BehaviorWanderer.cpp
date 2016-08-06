@@ -1,17 +1,17 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "TraitWanderer.h"
+#include "BehaviorWanderer.h"
 #include "../Monster.h"
 #include "../../Chunk.h"
 #include "../../World.h"
 
-cTraitWanderer::cTraitWanderer(cMonster * a_Parent)
+cBehaviorWanderer::cBehaviorWanderer(cMonster * a_Parent)
 	: m_Parent(a_Parent)
 	, m_IdleInterval(0)
 {
 	ASSERT(m_Parent != nullptr);
 }
 
-bool cTraitWanderer::ActiveTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cBehaviorWanderer::ActiveTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_Parent->IsPathFinderActivated())
 	{

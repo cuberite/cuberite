@@ -11,7 +11,7 @@
 
 cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
 	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height),
-	m_TraitBreeder(this), m_TraitItemFollower(this), m_TraitCoward(this)
+	m_BehaviorBreeder(this), m_BehaviorItemFollower(this), m_BehaviorCoward(this)
 {
 	m_EMPersonality = PASSIVE;
 }
@@ -26,7 +26,7 @@ bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		return false;
 	}
-	m_TraitCoward.DoTakeDamage(a_TDI);
+	m_BehaviorCoward.DoTakeDamage(a_TDI);
 	return true;
 }
 
@@ -36,7 +36,7 @@ bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cPassiveMonster::Destroyed()
 {
-	m_TraitBreeder.Destroyed();
+	m_BehaviorBreeder.Destroyed();
 	super::Destroyed();
 }
 
@@ -44,18 +44,18 @@ void cPassiveMonster::Destroyed()
 
 
 
-cTraitBreeder & cPassiveMonster::GetTraitBreeder()
+cBehaviorBreeder & cPassiveMonster::GetBehaviorBreeder()
 {
-	return m_TraitBreeder;
+	return m_BehaviorBreeder;
 }
 
 
 
 
 
-const cTraitBreeder & cPassiveMonster::GetTraitBreeder() const
+const cBehaviorBreeder & cPassiveMonster::GetBehaviorBreeder() const
 {
-	return static_cast<const cTraitBreeder &>(m_TraitBreeder);
+	return static_cast<const cBehaviorBreeder &>(m_BehaviorBreeder);
 }
 
 
@@ -70,32 +70,32 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	for (;;)
 	{
-		if (m_TraitCoward.ActiveTick())
+		if (m_BehaviorCoward.ActiveTick())
 		{
 			break;
 		}
-		if (m_TraitBreeder.ActiveTick())
+		if (m_BehaviorBreeder.ActiveTick())
 		{
 			break;
 		}
-		if (m_TraitItemFollower.ActiveTick())
+		if (m_BehaviorItemFollower.ActiveTick())
 		{
 			break;
 		}
-		if (super::m_TraitWanderer.ActiveTick(a_Dt, a_Chunk))
+		if (super::m_BehaviorWanderer.ActiveTick(a_Dt, a_Chunk))
 		{
 			break;
 		}
 
-		ASSERT(!"Not a single trait took control, this is not normal. ");
+		ASSERT(!"Not a single Behavior took control, this is not normal. ");
 		break;
 	}
 
-	m_TraitBreeder.Tick();
-	// someOtherTrait.Tick();
-	// someOtherTrait.Tick();
-	// someOtherTrait.Tick();
-	// someOtherTrait.Tick();
+	m_BehaviorBreeder.Tick();
+	// someOtherBehavior.Tick();
+	// someOtherBehavior.Tick();
+	// someOtherBehavior.Tick();
+	// someOtherBehavior.Tick();
 }
 
 
@@ -105,5 +105,5 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
-	m_TraitBreeder.OnRightClicked(a_Player);
+	m_BehaviorBreeder.OnRightClicked(a_Player);
 }
