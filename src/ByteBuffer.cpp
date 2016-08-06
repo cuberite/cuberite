@@ -542,7 +542,7 @@ bool cByteBuffer::ReadUUID(AString & a_Value)
 		a_Value[i * 2 + 1] = ValueToHexDigit(a_Value[i] & 0xf);
 		a_Value[i * 2] = ValueToHexDigit(static_cast<UInt8>(a_Value[i]) >> 4);
 	}
-	
+
 	return true;
 }
 

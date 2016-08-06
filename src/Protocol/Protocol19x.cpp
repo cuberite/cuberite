@@ -2585,7 +2585,7 @@ void cProtocol190::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 void cProtocol190::HandlePacketSpectate(cByteBuffer & a_ByteBuffer)
 {
 	AString playerUUID;
-	if(!a_ByteBuffer.ReadUUID(playerUUID))
+	if (!a_ByteBuffer.ReadUUID(playerUUID))
 	{
 		return;
 	}
