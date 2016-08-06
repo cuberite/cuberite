@@ -79,7 +79,8 @@ public:
 	Returns true if successful, false otherwise. */
 	bool ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect = true);
 
-	/** Writes data stored in class to the specified ini file */
+	/** Writes data stored in class to the specified ini file.
+	Returns true on success, false on failure. */
 	bool WriteFile(const AString & a_FileName) const;
 
 	virtual bool Flush() override { return WriteFile(m_Filename); }

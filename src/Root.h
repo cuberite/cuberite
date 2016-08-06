@@ -89,6 +89,10 @@ public:
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
 
+	/** Returns the completions for a player name across all worlds. Returns an
+	empty vector if none are found. */
+	AStringVector GetPlayerTabCompletionMultiWorld(const AString & a_Text);
+
 	/** The current time where the startup of the server has been completed */
 	std::chrono::steady_clock::time_point m_StartTime;
 

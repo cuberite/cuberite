@@ -741,7 +741,9 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		}
 	}
 	ASSERT(!"Invalid damage type!");
-	return false;
+	#ifndef __clang__
+		return false;
+	#endif
 }
 
 
@@ -1038,6 +1040,20 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NextSpeed -= NextSpeed * (m_AirDrag * 20.0f) * DtSec.count();
 		}
 		NextSpeed.y += static_cast<float>(fallspeed);
+
+		// A real boat floats
+		if (IsBoat())
+		{
+			// Find top water block and sit there
+			int NextBlockY = BlockY;
+			BLOCKTYPE NextBlock = NextChunk->GetBlock(RelBlockX, NextBlockY, RelBlockZ);
+			while (IsBlockWater(NextBlock))
+			{
+				NextBlock = NextChunk->GetBlock(RelBlockX, ++NextBlockY, RelBlockZ);
+			}
+			NextPos.y = NextBlockY - 0.5;
+			NextSpeed.y = 0;
+		}
 	}
 	else
 	{
@@ -1908,6 +1924,14 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			m_bDirtyOrientation = false;
 		}
 	}
+}
+
+
+
+
+cEntity * cEntity::GetAttached()
+{
+	return m_AttachedTo;
 }
 
 

@@ -2026,22 +2026,24 @@ end
 
 function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	LOG("Testing Json parsing...")
-	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5] }]])
+	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5], "d": true }]])
 	assert(t1.a == 1)
 	assert(t1.b == "2")
 	assert(t1.c[1] == 3)
 	assert(t1.c[2] == "4")
 	assert(t1.c[3] == 5)
-	
+	assert(t1.d == true)
+	LOG("Json parsing example 1 successful")
+
 	local t2, msg = cJson:Parse([[{"some": invalid, json}]])
 	assert(t2 == nil)
 	assert(type(msg) == "string")
-	LOG("Error message returned: " .. msg)
+	LOG("Json parsing an invalid string: Error message returned: " .. msg)
 	
 	LOG("Json parsing test succeeded")
 	
 	LOG("Testing Json serializing...")
-	local s1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}}, {indentation = " "})
+	local s1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}, d = true}, {indentation = " "})
 	LOG("Serialization result: " .. (s1 or "<nil>"))
 	LOG("Json serializing test succeeded")
 	

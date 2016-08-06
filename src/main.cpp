@@ -392,7 +392,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		{
 			for (auto port: portsArg.getValue())
 			{
-				repo->AddValue("Server", "Port", static_cast<Int64>(port));
+				repo->AddValue("Server", "Ports", std::to_string(port));
 			}
 		}
 		if (commLogArg.getValue())
@@ -555,7 +555,3 @@ int main(int argc, char ** argv)
 
 	return EXIT_SUCCESS;
 }
-
-
-
-

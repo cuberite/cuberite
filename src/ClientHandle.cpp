@@ -239,7 +239,9 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		}
 	}
 	ASSERT(!"Unhandled chat prefix type!");
-	return "";
+	#ifndef __clang__
+		return "";
+	#endif
 }
 
 
@@ -1874,12 +1876,24 @@ void cClientHandle::HandleUnmount(void)
 void cClientHandle::HandleTabCompletion(const AString & a_Text)
 {
 	AStringVector Results;
-	m_Player->GetWorld()->TabCompleteUserName(a_Text, Results);
+	// Get player name completions.
+	if (cRoot::Get()->GetServer()->ShouldAllowMultiWorldTabCompletion())
+	{
+		Results = cRoot::Get()->GetPlayerTabCompletionMultiWorld(a_Text);
+	}
+	else
+	{
+		m_Player->GetWorld()->TabCompleteUserName(a_Text, Results);
+	}
+
+	// Get command completions.
 	cRoot::Get()->GetPluginManager()->TabCompleteCommand(a_Text, Results, m_Player);
 	if (Results.empty())
 	{
 		return;
 	}
+
+	// Sort and send results.
 	std::sort(Results.begin(), Results.end());
 	SendTabCompletionResults(Results);
 }

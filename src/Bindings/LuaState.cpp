@@ -1703,42 +1703,42 @@ bool cLuaState::CopyTableFrom(cLuaState & a_SrcLuaState, int a_SrcStackIdx, int 
 	lua_pushnil(a_SrcLuaState);                   // SRC: <table> <key>
 	while (lua_next(a_SrcLuaState, -2) != 0)      // SRC: <table> <key> <value>
 	{
-		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
-		assert(lua_gettop(m_LuaState) == dstTop + 1);
+		ASSERT(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		ASSERT(lua_gettop(m_LuaState) == dstTop + 1);
 
 		// Copy the key:
 		if (!CopySingleValueFrom(a_SrcLuaState, -2, a_NumAllowedNestingLevels))  // DST: <table> <key>
 		{
 			lua_pop(m_LuaState, 1);
 			lua_pop(a_SrcLuaState, 3);
-			assert(lua_gettop(a_SrcLuaState) == srcTop);
-			assert(lua_gettop(m_LuaState) == dstTop);
+			ASSERT(lua_gettop(a_SrcLuaState) == srcTop);
+			ASSERT(lua_gettop(m_LuaState) == dstTop);
 			return false;
 		}
-		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
-		assert(lua_gettop(m_LuaState) == dstTop + 2);
+		ASSERT(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		ASSERT(lua_gettop(m_LuaState) == dstTop + 2);
 
 		// Copy the value:
 		if (!CopySingleValueFrom(a_SrcLuaState, -1, a_NumAllowedNestingLevels - 1))  // DST: <table> <key> <value>
 		{
 			lua_pop(m_LuaState, 2);     // DST: empty
 			lua_pop(a_SrcLuaState, 3);  // SRC: empty
-			assert(lua_gettop(a_SrcLuaState) == srcTop);
-			assert(lua_gettop(m_LuaState) == dstTop);
+			ASSERT(lua_gettop(a_SrcLuaState) == srcTop);
+			ASSERT(lua_gettop(m_LuaState) == dstTop);
 			return false;
 		}
-		assert(lua_gettop(a_SrcLuaState) == srcTop + 3);
-		assert(lua_gettop(m_LuaState) == dstTop + 3);
+		ASSERT(lua_gettop(a_SrcLuaState) == srcTop + 3);
+		ASSERT(lua_gettop(m_LuaState) == dstTop + 3);
 
 		// Set the value and fix up stacks:
 		lua_rawset(m_LuaState, -3);  // DST: <table>
 		lua_pop(a_SrcLuaState, 1);  // SRC: <table> <key>
-		assert(lua_gettop(a_SrcLuaState) == srcTop + 2);
-		assert(lua_gettop(m_LuaState) == dstTop + 1);
+		ASSERT(lua_gettop(a_SrcLuaState) == srcTop + 2);
+		ASSERT(lua_gettop(m_LuaState) == dstTop + 1);
 	}
 	lua_pop(a_SrcLuaState, 1);  // SRC: empty
-	assert(lua_gettop(a_SrcLuaState) == srcTop);
-	assert(lua_gettop(m_LuaState) == dstTop + 1);
+	ASSERT(lua_gettop(a_SrcLuaState) == srcTop);
+	ASSERT(lua_gettop(m_LuaState) == dstTop + 1);
 	return true;
 }
 

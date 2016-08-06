@@ -67,6 +67,10 @@ public:
 		);
 	}
 
+	// tolua_end
+
+	/** Sets the given vector to the normalized version of this vector.
+	Removed from LuaAPI, because Lua doesn't need distinguishing from the other overload. */
 	inline void NormalizeCopy(Vector3<T> & a_Rhs) const
 	{
 		double Len = 1.0 / Length();
@@ -77,6 +81,8 @@ public:
 			static_cast<T>(z * Len)
 		);
 	}
+
+	// tolua_begin
 
 	inline bool HasNonZeroLength(void) const
 	{
@@ -168,7 +174,7 @@ public:
 		z += a_Diff.z;
 	}
 
-	/** Runs each value of the vector through std::floor() */
+	/** Returns a new Vector3i with coords set to std::floor() of this vector's coords. */
 	inline Vector3<int> Floor(void) const
 	{
 		return Vector3<int>(

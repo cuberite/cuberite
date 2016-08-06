@@ -33,6 +33,7 @@ Implements the 1.9.x protocol classes:
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
 
+#include "../Entities/Boat.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -2077,8 +2078,8 @@ bool cProtocol190::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 				case 0x0d: HandlePacketPlayerPosLook          (a_ByteBuffer); return true;
 				case 0x0e: HandlePacketPlayerLook             (a_ByteBuffer); return true;
 				case 0x0f: HandlePacketPlayer                 (a_ByteBuffer); return true;
-				case 0x10: break;  // Vehicle move - not yet implemented
-				case 0x11: break;  // Steer boat - not yet implemented
+				case 0x10: HandlePacketVehicleMove            (a_ByteBuffer); return true;
+				case 0x11: HandlePacketBoatSteer              (a_ByteBuffer); return true;
 				case 0x12: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
 				case 0x13: HandlePacketBlockDig               (a_ByteBuffer); return true;
 				case 0x14: HandlePacketEntityAction           (a_ByteBuffer); return true;
@@ -2322,6 +2323,29 @@ void cProtocol190::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+}
+
+
+
+
+
+void cProtocol190::HandlePacketBoatSteer(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, RightPaddle);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, LeftPaddle);
+
+	// Get the players vehicle
+	cPlayer * Player = m_Client->GetPlayer();
+	cEntity * Vehicle = Player->GetAttached();
+
+	if (Vehicle)
+	{
+		if (Vehicle->GetEntityType() == cEntity::etBoat)
+		{
+			auto * Boat = reinterpret_cast<cBoat *>(Vehicle);
+			Boat->UpdatePaddles(RightPaddle, LeftPaddle);
+		}
+	}
 }
 
 
@@ -2585,7 +2609,7 @@ void cProtocol190::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 	}
 	else if ((Flags & 0x1) != 0)
 	{
-		// jump
+		// TODO: Handle vehicle jump (for animals)
 	}
 	else
 	{
@@ -2695,6 +2719,32 @@ void cProtocol190::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Enchantment);
 
 	m_Client->HandleEnchantItem(WindowID, Enchantment);
+}
+
+
+
+
+
+void cProtocol190::HandlePacketVehicleMove(cByteBuffer & a_ByteBuffer)
+{
+	// This handles updating the vehicles location server side
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, xPos);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, yPos);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, zPos);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  pitch);
+
+	// Get the players vehicle
+	cEntity * Vehicle = m_Client->GetPlayer()->GetAttached();
+
+	if (Vehicle)
+	{
+		Vehicle->SetPosX(xPos);
+		Vehicle->SetPosY(yPos);
+		Vehicle->SetPosZ(zPos);
+		Vehicle->SetYaw(yaw);
+		Vehicle->SetPitch(pitch);
+	}
 }
 
 
@@ -3604,6 +3654,37 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 			break;
 		}
 
+		case cEntity::etBoat:
+		{
+			auto & Boat = reinterpret_cast<const cBoat &>(a_Entity);
+
+			a_Pkt.WriteBEInt8(5);  // Index 6: Time since last hit
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteBEInt32(Boat.GetLastDamage());
+
+			a_Pkt.WriteBEInt8(6);  // Index 7: Forward direction
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteBEInt32(Boat.GetForwardDirection());
+
+			a_Pkt.WriteBEInt8(7);  // Index 8: Damage taken
+			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+
+			a_Pkt.WriteBEInt8(8);  // Index 9: Type
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteBEInt32(Boat.GetType());
+
+			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
+			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
+
+			a_Pkt.WriteBEInt8(10);  // Index 11: Left paddle turning
+			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Boat.IsLeftPaddleUsed());
+
+			break;
+		}  // case etBoat
+
 		case cEntity::etItemFrame:
 		{
 			auto & Frame = reinterpret_cast<const cItemFrame &>(a_Entity);
@@ -3802,6 +3883,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Is saddled
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Pig.IsSaddled());
+
 			break;
 		}  // case mtPig
 

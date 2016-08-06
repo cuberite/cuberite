@@ -88,7 +88,8 @@ src/AllFiles.lst
 *.opensdf
 *.sdf
 *.sln
-*.opendb
+*.VC.opendb
+*.VC.db
 *.idb
 
 # cmake output folders and files

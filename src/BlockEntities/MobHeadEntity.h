@@ -42,7 +42,7 @@ public:
 	/** Set the player for mob heads with player type */
 	void SetOwner(const cPlayer & a_Owner);
 
-	/** Sets the player components for the mob heads with player type */
+	/** Sets the player components for the mob heads with player type. */
 	void SetOwner(const AString & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature);
 
 	/** Returns the type of the mob head */

@@ -39,23 +39,17 @@ public:
 
 	// tolua_begin
 
-	/** Applies an entity effect
+	/** Applies an entity effect.
 	Checks with plugins if they allow the addition.
-	@param a_EffectType          The entity effect to apply
-	@param a_EffectDurationTicks The duration of the effect
-	@param a_EffectIntensity     The level of the effect (0 = Potion I, 1 = Potion II, etc)
-	@param a_DistanceModifier    The scalar multiplied to the potion duration, only applies to splash potions)
+	a_EffectIntensity is the level of the effect (0 = Potion I, 1 = Potion II, etc).
+	a_DistanceModifier is the scalar multiplied to the potion duration (only applies to splash potions).
 	*/
 	void AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, double a_DistanceModifier = 1);
 
-	/** Removes a currently applied entity effect
-	@param a_EffectType The entity effect to remove
-	*/
+	/** Removes a currently applied entity effect. */
 	void RemoveEntityEffect(cEntityEffect::eType a_EffectType);
 
-	/** Returns true, if the entity effect is currently applied
-	@param a_EffectType The entity effect to check
-	*/
+	/** Returns true, if the entity effect is currently applied. */
 	bool HasEntityEffect(cEntityEffect::eType a_EffectType) const;
 
 	/** Removes all currently applied entity effects (used when drinking milk) */
@@ -63,7 +57,7 @@ public:
 
 	// tolua_end
 
-	/** remove the monster from the list of monsters targeting this pawn. */
+	/** Remove the monster from the list of monsters targeting this pawn. */
 	void NoLongerTargetingMe(cMonster * a_Monster);
 
 	/** Add the monster to the list of monsters targeting this pawn. (Does not check if already in list!) */

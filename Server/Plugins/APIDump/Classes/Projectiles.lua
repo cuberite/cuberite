@@ -8,6 +8,7 @@ return
 		Functions =
 		{
 			CanPickup      = { Params = "{{cPlayer|Player}}", Return = "bool", Notes = "Returns true if the specified player can pick the arrow when it's on the ground" },
+			GetBlockHit    = { Params = "", Returns = "{{Vector3i}}", Desc = "Gets the block arrow is in" },
 			GetDamageCoeff = { Params = "", Return = "number", Notes = "Returns the damage coefficient stored within the arrow. The damage dealt by this arrow is multiplied by this coeff" },
 			GetPickupState = { Params = "", Return = "PickupState", Notes = "Returns the pickup state (one of the psXXX constants, above)" },
 			IsCritical     = { Params = "", Return = "bool", Notes = "Returns true if the arrow should deal critical damage. Based on the bow charge when the arrow was shot." },
@@ -35,6 +36,7 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cArrowEntity
 
+
 	cExpBottleEntity =
 	{
 		Desc = [[
@@ -46,6 +48,7 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cExpBottleEntity
 
+
 	cFireChargeEntity =
 	{
 		Desc = [[
@@ -55,7 +58,8 @@ return
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cFireChargeEntity
-	
+
+
 	cFireworkEntity =
 	{
 		Desc = [[
@@ -72,12 +76,14 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cFireworkEntity
 
+
 	cFloater =
 	{
 		Desc = "",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cFloater
+
 
 	cGhastFireballEntity =
 	{
@@ -86,13 +92,16 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cGhastFireballEntity
 
+
 	cProjectileEntity =
 	{
-		Desc = "",
+		Desc = "Base class for all projectiles, such as arrows and fireballs.",
 		Functions =
 		{
 			GetCreator = { Params = "", Return = "{{cEntity}} descendant", Notes = "Returns the entity who created this projectile. May return nil." },
-			GetMCAClassName = { Params = "", Return = "string", Notes = "Returns the string that identifies the projectile type  (class name) in MCA files" },
+			GetCreatorName = { Params = "", Return = "string", Notes = "Returns the name of the player that created the projectile. Will be empty for non-player creators" },
+			GetCreatorUniqueID = { Params = "", Return = "number", Notes = "Returns the unique ID of the entity who created this projectile, or {{cEntity#NO_ID|cEntity.NO_ID}} if the projectile wasn't created by an entity." },
+			GetMCAClassName = { Params = "", Return = "string", Notes = "Returns the string that identifies the projectile type (class name) in MCA files" },
 			GetProjectileKind = { Params = "", Return = "ProjectileKind", Notes = "Returns the kind of this projectile (pkXXX constant)" },
 			IsInGround = { Params = "", Return = "bool", Notes = "Returns true if this projectile has hit the ground." },
 		},
@@ -121,6 +130,7 @@ return
 		Inherits = "cEntity",
 	},  -- cProjectileEntity
 
+
 	cSplashPotionEntity =
 	{
 		Desc = [[
@@ -139,6 +149,7 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cSplashPotionEntity
 
+
 	cThrownEggEntity =
 	{
 		Desc = [[
@@ -148,19 +159,22 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cThrownEggEntity
 
+
 	cThrownEnderPearlEntity =
 	{
 		Desc = "Represents a thrown ender pearl.",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownEnderPearlEntity
-	
+
+
 	cThrownSnowballEntity =
 	{
 		Desc = "Represents a thrown snowball.",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownSnowballEntity
+
 
 	cWitherSkullEntity =
 	{

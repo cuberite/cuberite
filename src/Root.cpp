@@ -1006,3 +1006,33 @@ int cRoot::GetFurnaceFuelBurnTime(const cItem & a_Fuel)
 	cFurnaceRecipe * FR = Get()->GetFurnaceRecipe();
 	return FR->GetBurnTime(a_Fuel);
 }
+
+
+
+
+
+AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
+{
+	AStringVector Results;
+	class cWorldCallback : public cWorldListCallback
+	{
+	public:
+		cWorldCallback(AStringVector & a_Results, const AString & a_Search) :
+			m_Results(a_Results),
+			m_Search(a_Search)
+		{
+		}
+
+		virtual bool Item(cWorld * a_World) override
+		{
+			a_World->TabCompleteUserName(m_Search, m_Results);
+			return false;
+		}
+	private:
+		AStringVector & m_Results;
+		const AString & m_Search;
+	} WC(Results, a_Text);
+
+	Get()->ForEachWorld(WC);
+	return Results;
+}

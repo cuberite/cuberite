@@ -1,4 +1,23 @@
+# This is the top-level CMakeLists.txt file for the Cuberite project
+#
+# Use CMake to generate the build files for your platform
+#
+# This script supports some configuration through CMake arguments (-Dparam=val syntax):
+#   BUILD_TOOLS=1            sets up additional executables to be built along with the server (ProtoProxy, GrownBiomeGenVisualiser, MCADefrag)
+#   BUILD_UNSTABLE_TOOLS=1   sets up yet more executables to be built, these can be broken and generally are obsolete (GeneratorPerformanceTest)
+#   NO_NATIVE_OPTIMIZATION=1 disables CPU-specific optimisations for the current machine, allows use on other CPUs of the same platform
+#   DISABLE_SYSTEM_LUA=1     disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
+#   SELF_TEST=1              enables testing code to be built
+
+
+
+
+
 cmake_minimum_required (VERSION 2.8.7)
+
+if (POLICY CMP0054)
+	cmake_policy(SET CMP0054 NEW)
+endif()
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
@@ -91,6 +110,21 @@ endif()
 
 set(BUILD_TOOLS OFF CACHE BOOL "")
 set(SELF_TEST OFF CACHE BOOL "")
+
+# Check whether Lua 5.1 can be used:
+if (NOT(DISABLE_SYSTEM_LUA))
+	include(CheckLua.cmake)
+	if(HAS_LUA_INTERPRETER AND ("${LUA_INTERPRETER_VERSION}" STREQUAL "5.1"))
+		message(STATUS "Lua 5.1 has been found in your system and will be used for the build.")
+		set(USE_SYSTEM_LUA 1)
+	else()
+		message(STATUS "Lua 5.1 has NOT been found in your system, the build will use its own Lua implementation.")
+		unset(USE_SYSTEM_LUA)
+	endif()
+else()
+	message(STATUS "System Lua is disabled via CMake command-line parameters. The build will use its own Lua implementation.")
+endif()
+
 
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})

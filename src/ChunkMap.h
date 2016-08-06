@@ -66,8 +66,6 @@ class cChunkMap
 {
 public:
 
-	static const int LAYER_SIZE = 32;
-
 	cChunkMap(cWorld * a_World);
 	~cChunkMap();
 
@@ -78,7 +76,6 @@ public:
 	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
 	void BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = nullptr);
@@ -160,7 +157,7 @@ public:
 	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
-	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClient);
+	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients);
 	void       SetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
 	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
@@ -402,7 +399,7 @@ public:
 	void QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
-	cCriticalSection & GetCS(void) { return m_CSLayers; }
+	cCriticalSection & GetCS(void) { return m_CSChunks; }
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
@@ -419,65 +416,6 @@ private:
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
 	friend class cChunkStay;
 
-
-	class cChunkLayer
-	{
-	public:
-		cChunkLayer(
-			int a_LayerX, int a_LayerZ,
-			cChunkMap * a_Parent,
-			cAllocationPool<cChunkData::sChunkSection> & a_Pool
-		);
-		~cChunkLayer();
-
-		cChunkLayer(const cChunkLayer & a_That) = delete;
-
-		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
-		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkZ);
-
-		/** Returns the specified chunk, or nullptr if not created yet */
-		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
-
-		int GetX(void) const {return m_LayerX; }
-		int GetZ(void) const {return m_LayerZ; }
-
-		int GetNumChunksLoaded(void) const ;
-
-		void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) const;
-
-		void Save(void);
-		void UnloadUnusedChunks(void);
-
-		/** Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player */
-		void CollectMobCensus(cMobCensus & a_ToFill);
-
-		/** Try to Spawn Monsters inside all Chunks */
-		void SpawnMobs(cMobSpawner & a_MobSpawner);
-
-		void Tick(std::chrono::milliseconds a_Dt);
-
-		void RemoveClient(cClientHandle * a_Client);
-
-		/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
-		bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
-
-		/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
-		bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn);  // Lua-accessible
-		bool DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback, bool & a_CallbackReturn);  // Lambda version
-
-		/** Returns true if there is an entity with the specified ID within this layer's chunks */
-		bool HasEntity(UInt32 a_EntityID);
-
-	protected:
-
-		cChunkPtr m_Chunks[LAYER_SIZE * LAYER_SIZE];
-		int m_LayerX;
-		int m_LayerZ;
-		cChunkMap * m_Parent;
-		int m_NumChunksLoaded;
-
-		cAllocationPool<cChunkData::sChunkSection> & m_Pool;
-	};
 
 	class cStarvationCallbacks
 		: public cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
@@ -496,27 +434,29 @@ private:
 		}
 	};
 
-	typedef std::list<cChunkLayer *> cChunkLayerList;
+	struct ChunkCoordinate
+	{
+		struct Comparer
+		{
+			bool operator() (const ChunkCoordinate & a_Lhs, const ChunkCoordinate & a_Rhs) const
+			{
+				return ((a_Lhs.ChunkX == a_Rhs.ChunkX) ? (a_Lhs.ChunkZ < a_Rhs.ChunkZ) : (a_Lhs.ChunkX < a_Rhs.ChunkX));
+			}
+		};
+
+		int ChunkX;
+		int ChunkZ;
+	};
 
 	typedef std::list<cChunkStay *> cChunkStays;
 
-	/** Finds the cChunkLayer object responsible for the specified chunk; returns nullptr if not found. Assumes m_CSLayers is locked. */
-	cChunkLayer * FindLayerForChunk(int a_ChunkX, int a_ChunkZ);
+	cCriticalSection m_CSChunks;
 
-	/** Returns the specified cChunkLayer object; returns nullptr if not found. Assumes m_CSLayers is locked. */
-	cChunkLayer * FindLayer(int a_LayerX, int a_LayerZ);
+	/** A map of chunk coordinates to chunk pointers
+	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster */
+	std::map<ChunkCoordinate, std::unique_ptr<cChunk>, ChunkCoordinate::Comparer> m_Chunks;
 
-	/** Returns the cChunkLayer object responsible for the specified chunk; creates it if not found. */
-	cChunkLayer * GetLayerForChunk (int a_ChunkX, int a_ChunkZ);
-
-	/** Returns the specified cChunkLayer object; creates it if not found. */
-	cChunkLayer * GetLayer(int a_LayerX, int a_LayerZ);
-
-	void RemoveLayer(cChunkLayer * a_Layer);
-
-	cCriticalSection m_CSLayers;
-	std::map<std::pair<int, int>, cChunkLayer>  m_Layers;
-	cEvent           m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
+	cEvent m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
 	cWorld * m_World;
 
@@ -525,9 +465,19 @@ private:
 
 	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
-	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
-	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);  // Doesn't load, doesn't generate
+	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
+	Emplaces this chunk in the chunk map.
+	Developers SHOULD use the GetChunk variants instead of this function. */
+	cChunkPtr ConstructChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Constructs a chunk and queues it for loading / generating if not valid, returning it */
+	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
+	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ);
+
+	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
+	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);
 
 	/** Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
@@ -544,7 +494,7 @@ private:
 	/** Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSLayers is locked. To be called only from cChunkMap. */
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Adds a new cChunkStay descendant to the internal list of ChunkStays; loads its chunks.

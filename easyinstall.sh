@@ -1,5 +1,12 @@
 #!/bin/sh
 
+{
+# NOTE: compile.sh looks for this file in order to determine if this is the Cuberite folder.
+# Please modify compile.sh if you want to rename or remove this file.
+# This file was chosen arbitrarily and it is a good enough indicator that we are in the Cuberite folder.
+
+set -e
+
 PLATFORM=$(uname -m)
 
 echo "Identifying platform: $PLATFORM"
@@ -15,3 +22,5 @@ curl -s $DOWNLOADURL | tar -xzf -
 echo "Done."
 
 echo "Cuberite is now installed, run using 'cd Server; ./Cuberite'."
+
+}

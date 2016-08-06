@@ -93,15 +93,15 @@ public:
 		return 11;
 	}
 
+	/** Returns true if the piston (with the specified meta) is extended */
+	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
+
 private:
 
 	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
 
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
 	static inline bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
-
-	/** Returns true if the piston (with the specified meta) is extended */
-	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
 
 	/** Returns true if the specified block can be pushed by a piston (and left intact) */
 	static inline bool CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)

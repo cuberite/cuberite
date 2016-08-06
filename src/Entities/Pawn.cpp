@@ -403,7 +403,7 @@ void cPawn::HandleFalling(void)
 			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 
 			// Fall particles
-			// TODO: Re-enable this when effects in 1.9 aren't broken (right now this uses the wrong effect ID in 1.9 and the right one in 1.8 and 1.7)
+			// TODO: Re-enable this when effects in 1.9 aren't broken (right now this uses the wrong effect ID in 1.9 and the right one in 1.8)
 			// int ParticleSize = static_cast<int>((std::min(15, Damage) - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f);
 			// GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_FALL_PARTICLES, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, ParticleSize);
 		}

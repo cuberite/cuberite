@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-
 enable_testing()
 
 if (CMAKE_BUILD_TYPE STREQUAL "COVERAGE")
@@ -12,6 +10,7 @@ add_subdirectory(BoundingBox)
 add_subdirectory(ByteBuffer)
 add_subdirectory(ChunkData)
 add_subdirectory(CompositeChat)
+add_subdirectory(FastRandom)
 add_subdirectory(HTTP)
 add_subdirectory(LoadablePieces)
 add_subdirectory(Network)

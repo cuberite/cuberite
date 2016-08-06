@@ -13,6 +13,7 @@ return
 			GetBlockType = { Params = "", Return = "BLOCKTYPE", Notes = "Returns the blocktype which is represented by this blockentity. This is the primary means of type-identification" },
 			GetChunkX    = { Params = "", Return = "number", Notes = "Returns the chunk X-coord of the block entity's chunk" },
 			GetChunkZ    = { Params = "", Return = "number", Notes = "Returns the chunk Z-coord of the block entity's chunk" },
+			GetPos       = { Params = "", Return = "{{Vector3i}}", Notes = "Returns the name of the parent class, or empty string if no parent class." },
 			GetPosX      = { Params = "", Return = "number", Notes = "Returns the block X-coord of the block entity's block" },
 			GetPosY      = { Params = "", Return = "number", Notes = "Returns the block Y-coord of the block entity's block" },
 			GetPosZ      = { Params = "", Return = "number", Notes = "Returns the block Z-coord of the block entity's block" },
@@ -36,16 +37,16 @@ return
 
 		Functions =
 		{
-			GetContents = { Params = "", Return = "{{cItemGrid|cItemGrid}}", Notes = "Returns the cItemGrid object representing the items stored within this block entity" },
+			GetContents = { Params = "", Return = "{{cItemGrid}}", Notes = "Returns the cItemGrid object representing the items stored within this block entity" },
 			GetSlot =
 			{
-				{ Params = "SlotNum", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot number. Returns nil for invalid slot numbers" },
-				{ Params = "X, Y", Return = "{{cItem|cItem}}", Notes = "Returns the cItem for the specified slot coords. Returns nil for invalid slot coords" },
+				{ Params = "SlotNum", Return = "{{cItem}}", Notes = "Returns the cItem for the specified slot number. Returns nil for invalid slot numbers" },
+				{ Params = "X, Y", Return = "{{cItem}}", Notes = "Returns the cItem for the specified slot coords. Returns nil for invalid slot coords" },
 			},
 			SetSlot =
 			{
-				{ Params = "SlotNum, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot number. Ignored if invalid slot number" },
-				{ Params = "X, Y, {{cItem|cItem}}", Return = "", Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords" },
+				{ Params = "SlotNum, {{cItem}}", Return = "", Notes = "Sets the cItem for the specified slot number. Ignored if invalid slot number" },
+				{ Params = "X, Y, {{cItem}}", Return = "", Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords" },
 			},
 		},
 	},
@@ -53,7 +54,7 @@ return
 	cBeaconEntity =
 	{
 		Desc = [[
-			A beacon entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a beacon
+			A beacon entity is a {{cBlockEntityWithItems}} descendant that represents a beacon
 			in the world.
 		]],
 
@@ -61,18 +62,18 @@ return
 
 		Functions =
 		{
-			IsActive = { Params = "", Return = "bool", Notes = "Is the beacon active?" },
-			GetBeaconLevel = { Params = "", Return = "number", Notes = "Returns the beacon level. (0 - 4)" },
-			GetPrimaryEffect = { Params = "", Return = "EffectType", Notes = "Returns the primary effect." },
-			GetSecondaryEffect = { Params = "", Return = "EffectType", Notes = "Returns the secondary effect." },
-			SetPrimaryEffect = { Params = "EffectType", Return = "bool", Notes = "Select the primary effect. Returns false when the effect is invalid." },
-			SetSecondaryEffect = { Params = "EffectType", Return = "bool", Notes = "Select the secondary effect. Returns false when the effect is invalid." },
 			CalculatePyramidLevel = { Params = "", Return = "number", Notes = "Calculate the amount of layers the pyramid below the beacon has." },
-			IsBeaconBlocked = { Params = "", Return = "bool", Notes = "Is the beacon blocked by non-transparent blocks that are higher than the beacon?" },
-			UpdateBeacon = { Params = "", Return = "", Notes = "Update the beacon." },
+			GetBeaconLevel = { Params = "", Return = "number", Notes = "Returns the beacon level. (0 - 4)" },
+			GetPrimaryEffect = { Params = "", Return = "{{cEntityEffect#eType|EffectType}}", Notes = "Returns the primary effect." },
+			GetSecondaryEffect = { Params = "", Return = "{{cEntityEffect#eType|EffectType}}", Notes = "Returns the secondary effect." },
 			GiveEffects = { Params = "", Return = "", Notes = "Give the near-players the effects." },
-			IsMineralBlock = { Params = "BLOCKTYPE", Return = "bool", Notes = "Returns true if the block is a diamond block, a golden block, an iron block or an emerald block." },
-			IsValidEffect = { Params = "EffectType", Return = "bool", Notes = "Returns true if the effect can be used." },
+			IsActive = { Params = "", Return = "bool", Notes = "Is the beacon active?" },
+			IsBeaconBlocked = { Params = "", Return = "bool", Notes = "Is the beacon blocked by non-transparent blocks that are higher than the beacon?" },
+			IsMineralBlock = { Params = "BLOCKTYPE", Return = "bool", IsStatic = true, Notes = "Returns true if the block is a diamond block, a golden block, an iron block or an emerald block." },
+			IsValidEffect = { Params = "{{cEntityEffect#eType|EffectType}}, BeaconLevel", Return = "boolean", IsStatic = true, Notes = "Returns true if the effect can be used." },
+			SetPrimaryEffect = { Params = "{{cEntityEffect#eType|EffectType}}", Return = "bool", Notes = "Select the primary effect. Returns false when the effect is invalid." },
+			SetSecondaryEffect = { Params = "{{cEntityEffect#eType|EffectType}}", Return = "bool", Notes = "Select the secondary effect. Returns false when the effect is invalid." },
+			UpdateBeacon = { Params = "", Return = "", Notes = "Update the beacon." },
 		},
 	},
 
@@ -87,15 +88,15 @@ return
 		{
 			GetBrewingTimeLeft = { Params = "", Return = "number", Notes = "Returns the time until the current items finishes brewing, in ticks" },
 			GetTimeBrewed = { Params = "", Return = "number", Notes = "Returns the time that the current items has been brewing, in ticks" },
-			GetLeftBottleSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the left bottle slot" },
-			GetMiddleBottleSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the middle bottle slot" },
-			GetRightBottleSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the right bottle slot" },
-			GetIndgredientSlot = { Params = "", Return = "{{cItem|cItem}}", Notes = "Returns the item in the ingredient slot" },
-			GetResultItem = { Params = "number", Return = "{{cItem|cItem}}", Notes = "Returns the expected result item for the given slot number." },
-			SetLeftBottleSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the left bottle slot" },
-			SetMiddleBottleSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the middle bottle slot" },
-			SetRightBottleSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the right bottle slot" },
-			SetIngredientSlot = { Params = "{{cItem|cItem}}", Return = "", Notes = "Sets the item in the ingredient bottle slot" },
+			GetLeftBottleSlot = { Params = "", Return = "{{cItem}}", Notes = "Returns the item in the left bottle slot" },
+			GetMiddleBottleSlot = { Params = "", Return = "{{cItem}}", Notes = "Returns the item in the middle bottle slot" },
+			GetRightBottleSlot = { Params = "", Return = "{{cItem}}", Notes = "Returns the item in the right bottle slot" },
+			GetIndgredientSlot = { Params = "", Return = "{{cItem}}", Notes = "Returns the item in the ingredient slot" },
+			GetResultItem = { Params = "number", Return = "{{cItem}}", Notes = "Returns the expected result item for the given slot number." },
+			SetLeftBottleSlot = { Params = "{{cItem|LeftSlot}}", Return = "", Notes = "Sets the item in the left bottle slot" },
+			SetMiddleBottleSlot = { Params = "{{cItem|MiddleSlot}}", Return = "", Notes = "Sets the item in the middle bottle slot" },
+			SetRightBottleSlot = { Params = "{{cItem|RightSlot}}", Return = "", Notes = "Sets the item in the right bottle slot" },
+			SetIngredientSlot = { Params = "{{cItem|Ingredient}}", Return = "", Notes = "Sets the item in the ingredient bottle slot" },
 		},
 		Constants =
 		{
@@ -154,16 +155,36 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				]],
 			},
 		},  -- AdditionalInfo
-	},
+	},  -- cChestEntity
+
+
+	cCommandBlockEntity =
+	{
+		Inherits = "cBlockEntity",
+		Functions =
+		{
+			Activate = { Params = "", Return = "", Notes = "Sets the command block to execute a command in the next tick" },
+			GetCommand = { Params = "", Return = "string", Notes = "Retrieves stored command" },
+			GetLastOutput = { Params = "", Return = "string", Notes = "Retrieves the last line of output generated by the command block" },
+			GetResult = { Params = "", Return = "number", Notes = "Retrieves the result (signal strength) of the last operation" },
+			SetCommand = { Params = "Cmd", Return = "string", Notes = "Sets the command" },
+		},
+	},  -- cCommandBlockEntity
+
 
 	cDispenserEntity =
 	{
 		Desc = [[
 			This class represents a dispenser block entity in the world. Most of this block entity's
-			functionality is implemented in the {{cDropSpenserEntity|cDropSpenserEntity}} class that represents
-			the behavior common with a {{cDropperEntity|dropper}} entity.
+			functionality is implemented in the {{cDropSpenserEntity}} class that represents
+			the behavior common with the {{cDropperEntity|dropper}} block entity.
 		]],
 		Inherits = "cDropSpenserEntity",
+		Functions =
+		{
+			GetShootVector = { Params = "BlockMeta", Return = "{{Vector3d}}", IsStatic = true, Notes = "Returns a unit vector in the cardinal direction of where the dispenser with the specified meta would be facing." },
+			SpawnProjectileFromDispenser = { Params = "BlockX, BlockY, BlockZ, {{cProjectileEntity#eKind|Kind}}, Speed, {{cItem|Item}}", Return = "number", Notes = "Spawns a projectile of the given kind in front of the dispenser with the specified speed. Returns the UniqueID of the spawned projectile, or {{cEntity#INVALID_ID|cEntity.INVALID_ID}} on failure." },
+		},
 	},
 
 	cDropperEntity =
@@ -177,6 +198,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		]],
 		Inherits = "cDropSpenserEntity",
 	},  -- cDropperEntity
+
 
 	cDropSpenserEntity =
 	{
@@ -196,6 +218,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		},
 		Inherits = "cBlockEntityWithItems";
 	},  -- cDropSpenserEntity
+
 
 	cFurnaceEntity =
 	{
@@ -236,6 +259,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		Inherits = "cBlockEntityWithItems"
 	},  -- cFurnaceEntity
 
+
 	cHopperEntity =
 	{
 		Desc = [[
@@ -253,6 +277,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		},
 		Inherits = "cBlockEntityWithItems",
 	},  -- cHopperEntity
+
 
 	cJukeboxEntity =
 	{
@@ -272,6 +297,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		},
 	},  -- cJukeboxEntity
 
+
 	cMobHeadEntity =
 	{
 		Desc = [[
@@ -280,17 +306,22 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		Inherits = "cBlockEntity",
 		Functions =
 		{
-			SetType = { Params = "eMobHeadType", Return = "", Notes = "Set the type of the mob head" },
-			SetRotation = { Params = "eMobHeadRotation", Return = "", Notes = "Sets the rotation of the mob head" },
-			SetOwner = { Params = "cPlayer", Return = "", Notes = "Set the {{cPlayer|player}} for mob heads with player type" },
-			GetType = { Params = "", Return = "eMobHeadType", Notes = "Returns the type of the mob head" },
-			GetRotation = { Params = "", Return = "eMobHeadRotation", Notes = "Returns the rotation of the mob head" },
 			GetOwnerName = { Params = "", Return = "string", Notes = "Returns the player name of the mob head" },
-			GetOwnerUUID = { Params = "", Return = "string", Notes = "Returns the player UUID of the mob head" },
 			GetOwnerTexture = { Params = "", Return = "string", Notes = "Returns the player texture of the mob head" },
 			GetOwnerTextureSignature = { Params = "", Return = "string", Notes = "Returns the signature of the player texture of the mob head" },
+			GetOwnerUUID = { Params = "", Return = "string", Notes = "Returns the player UUID of the mob head" },
+			GetRotation = { Params = "", Return = "eMobHeadRotation", Notes = "Returns the rotation of the mob head" },
+			GetType = { Params = "", Return = "eMobHeadType", Notes = "Returns the type of the mob head" },
+			SetOwner =
+			{
+				{ Params = "cPlayer", Return = "", Notes = "Set the {{cPlayer|player}} for mob heads with player type" },
+				{ Params = "OwnerUUID, OwnerName, OwnerTexture, OwnerTextureSignature", Return = "", Notes = "Sets the player components for the mob heads with player type" },
+			},
+			SetRotation = { Params = "eMobHeadRotation", Return = "", Notes = "Sets the rotation of the mob head" },
+			SetType = { Params = "eMobHeadType", Return = "", Notes = "Set the type of the mob head" },
 		},
 	},  -- cMobHeadEntity
+
 
 	cMobSpawnerEntity =
 	{
@@ -300,17 +331,18 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		Inherits = "cBlockEntity",
 		Functions =
 		{
-			UpdateActiveState = { Params = "", Return = "", Notes = "Upate the active flag from the mob spawner. This function will called every 5 seconds from the Tick() function." },
-			ResetTimer = { Params = "", Return = "", Notes = "Sets the spawn delay to a new random value." },
-			SpawnEntity = { Params = "", Return = "", Notes = "Spawns the entity. This function automaticly change the spawn delay!" },
 			GetEntity = { Params = "", Return = "{{Globals#MobType|MobType}}", Notes = "Returns the entity type that will be spawn by this mob spawner." },
-			SetEntity = { Params = "{{Globals#MobType|MobType}}", Return = "", Notes = "Sets the entity type who will be spawn by this mob spawner." },
-			GetSpawnDelay = { Params = "", Return = "number", Notes = "Returns the spawn delay. This is the tick delay that is needed to spawn new monsters." },
-			SetSpawnDelay = { Params = "number", Return = "", Notes = "Sets the spawn delay." },
+			GetNearbyMonsterNum = { Params = "EntityType", Return = "number", Notes = "Returns the amount of this monster type in a 8-block radius (Y: 4-block radius)." },
 			GetNearbyPlayersNum = { Params = "", Return = "number", Notes = "Returns the amount of the nearby players in a 16-block radius." },
-			GetNearbyMonsterNum = { Params = "", Return = "number", Notes = "Returns the amount of this monster type in a 8-block radius (Y: 4-block radius)." },
+			GetSpawnDelay = { Params = "", Return = "number", Notes = "Returns the spawn delay. This is the tick delay that is needed to spawn new monsters." },
+			ResetTimer = { Params = "", Return = "", Notes = "Sets the spawn delay to a new random value." },
+			SetEntity = { Params = "{{Globals#MobType|MobType}}", Return = "", Notes = "Sets the entity type who will be spawn by this mob spawner." },
+			SetSpawnDelay = { Params = "number", Return = "", Notes = "Sets the spawn delay." },
+			SpawnEntity = { Params = "", Return = "", Notes = "Spawns the entity. This function automaticly change the spawn delay!" },
+			UpdateActiveState = { Params = "", Return = "", Notes = "Upate the active flag from the mob spawner. This function will called every 5 seconds from the Tick() function." },
 		},
 	},  -- cMobSpawnerEntity
+
 
 	cNoteEntity =
 	{
