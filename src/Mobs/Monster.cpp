@@ -99,7 +99,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
-	, m_TraitWanderer(this)
+	, m_BehaviorWanderer(this)
 	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())

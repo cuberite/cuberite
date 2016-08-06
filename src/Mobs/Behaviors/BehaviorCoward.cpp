@@ -1,12 +1,12 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "TraitCoward.h"
+#include "BehaviorCoward.h"
 #include "../Monster.h"
 #include "../../World.h"
 #include "../../Entities/Player.h"
 #include "../../Entities/Entity.h"
 
-cTraitCoward::cTraitCoward(cMonster * a_Parent) :
+cBehaviorCoward::cBehaviorCoward(cMonster * a_Parent) :
 	m_Parent(a_Parent),
 	m_Attacker(nullptr)
 {
@@ -17,7 +17,7 @@ cTraitCoward::cTraitCoward(cMonster * a_Parent) :
 
 
 
-bool cTraitCoward::ActiveTick()
+bool cBehaviorCoward::ActiveTick()
 {
 	if (m_Attacker == nullptr)
 	{
@@ -42,7 +42,7 @@ bool cTraitCoward::ActiveTick()
 
 
 
-void cTraitCoward::DoTakeDamage(TakeDamageInfo & a_TDI)
+void cBehaviorCoward::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if ((a_TDI.Attacker != m_Parent) && (a_TDI.Attacker != nullptr))
 	{

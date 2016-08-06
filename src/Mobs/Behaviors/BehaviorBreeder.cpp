@@ -1,7 +1,7 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "TraitBreeder.h"
+#include "BehaviorBreeder.h"
 #include "../PassiveMonster.h"
 #include "../../World.h"
 #include "../Monster.h"
@@ -9,7 +9,7 @@
 #include "../../Item.h"
 #include "../../BoundingBox.h"
 
-iTraitBreeder::~iTraitBreeder()
+iBehaviorBreeder::~iBehaviorBreeder()
 {
 
 }
@@ -18,7 +18,7 @@ iTraitBreeder::~iTraitBreeder()
 
 
 
-cTraitBreeder::cTraitBreeder(iTraitBreeder * a_ParentInterface) :
+cBehaviorBreeder::cBehaviorBreeder(iBehaviorBreeder * a_ParentInterface) :
 	m_ParentInterface(a_ParentInterface),
 	m_LovePartner(nullptr),
 	m_LoveTimer(0),
@@ -33,7 +33,7 @@ cTraitBreeder::cTraitBreeder(iTraitBreeder * a_ParentInterface) :
 
 
 
-bool cTraitBreeder::ActiveTick()
+bool cBehaviorBreeder::ActiveTick()
 {
 	cWorld * World = m_Parent->GetWorld();
 	// if we have a partner, mate
@@ -75,8 +75,8 @@ bool cTraitBreeder::ActiveTick()
 			World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, 1 + Random.NextInt(6));
 
 			auto PartnerInterface =  ToInterface(m_LovePartner);
-			cTraitBreeder & PartnerBreedingTrait = PartnerInterface->GetTraitBreeder();
-			PartnerBreedingTrait.ResetLoveMode();
+			cBehaviorBreeder & PartnerBreedingBehavior = PartnerInterface->GetBehaviorBreeder();
+			PartnerBreedingBehavior.ResetLoveMode();
 			ResetLoveMode();
 		}
 		return true;
@@ -111,20 +111,20 @@ bool cTraitBreeder::ActiveTick()
 					return false;
 				}
 
-				auto PartnerBreedingTrait = ToTrait(PotentialPartner);
-				auto MyBreedingTrait = ToTrait(m_Me);
+				auto PartnerBreedingBehavior = ToBehavior(PotentialPartner);
+				auto MyBreedingBehavior = ToBehavior(m_Me);
 
 				// If the potential partner is not in love
 				// Or they already have a mate, do not breed with them
 
-				if ((!PartnerBreedingTrait->IsInLove()) || (PartnerBreedingTrait->GetPartner() != nullptr))
+				if ((!PartnerBreedingBehavior->IsInLove()) || (PartnerBreedingBehavior->GetPartner() != nullptr))
 				{
 					return false;
 				}
 
 				// All conditions met, let's breed!
-				PartnerBreedingTrait->EngageLoveMode(m_Me);
-				MyBreedingTrait->EngageLoveMode(PotentialPartner);
+				PartnerBreedingBehavior->EngageLoveMode(m_Me);
+				MyBreedingBehavior->EngageLoveMode(PotentialPartner);
 				return true;
 			}
 		} Callback(m_Parent);
@@ -132,7 +132,7 @@ bool cTraitBreeder::ActiveTick()
 		World->ForEachEntityInBox(cBoundingBox(m_Parent->GetPosition(), 8, 8), Callback);
 		if (m_LovePartner != nullptr)
 		{
-			return true;  // We found love and took control of the monster, prevent other traits from doing so
+			return true;  // We found love and took control of the monster, prevent other Behaviors from doing so
 		}
 	}
 
@@ -143,7 +143,7 @@ bool cTraitBreeder::ActiveTick()
 
 
 
-void cTraitBreeder::Tick()
+void cBehaviorBreeder::Tick()
 {
 	if (m_MatingTimer > 0)
 	{
@@ -163,12 +163,12 @@ void cTraitBreeder::Tick()
 
 
 
-void cTraitBreeder::Destroyed()
+void cBehaviorBreeder::Destroyed()
 {
 	UNUSED(m_ParentInterface);
 	if (m_LovePartner != nullptr)
 	{
-		ToTrait(m_LovePartner)->ResetLoveMode();
+		ToBehavior(m_LovePartner)->ResetLoveMode();
 	}
 }
 
@@ -176,7 +176,7 @@ void cTraitBreeder::Destroyed()
 
 
 
-void cTraitBreeder::OnRightClicked(cPlayer & a_Player)
+void cBehaviorBreeder::OnRightClicked(cPlayer & a_Player)
 {
 	// If a player holding breeding items right-clicked me, go into love mode
 	if ((m_LoveCooldown == 0) && !IsInLove() && !m_Parent->IsBaby())
@@ -198,7 +198,7 @@ void cTraitBreeder::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cTraitBreeder::EngageLoveMode(cMonster * a_Partner)
+void cBehaviorBreeder::EngageLoveMode(cMonster * a_Partner)
 {
 	m_LovePartner = a_Partner;
 	m_MatingTimer = 50;  // about 3 seconds of mating
@@ -208,7 +208,7 @@ void cTraitBreeder::EngageLoveMode(cMonster * a_Partner)
 
 
 
-void cTraitBreeder::ResetLoveMode()
+void cBehaviorBreeder::ResetLoveMode()
 {
 	m_LovePartner = nullptr;
 	m_LoveTimer = 0;
@@ -223,7 +223,7 @@ void cTraitBreeder::ResetLoveMode()
 
 
 
-bool cTraitBreeder::IsInLove() const
+bool cBehaviorBreeder::IsInLove() const
 {
 	return m_LoveTimer > 0;
 }
@@ -232,7 +232,7 @@ bool cTraitBreeder::IsInLove() const
 
 
 
-bool cTraitBreeder::IsInLoveCooldown() const
+bool cBehaviorBreeder::IsInLoveCooldown() const
 {
 	return (m_LoveCooldown > 0);
 }
@@ -241,9 +241,9 @@ bool cTraitBreeder::IsInLoveCooldown() const
 
 
 
-iTraitBreeder * cTraitBreeder::ToInterface(cMonster * a_Monster)
+iBehaviorBreeder * cBehaviorBreeder::ToInterface(cMonster * a_Monster)
 {
-	auto ptr = dynamic_cast<iTraitBreeder *>(a_Monster);
+	auto ptr = dynamic_cast<iBehaviorBreeder *>(a_Monster);
 	ASSERT(ptr != nullptr);
 	return ptr;
 }
@@ -252,7 +252,7 @@ iTraitBreeder * cTraitBreeder::ToInterface(cMonster * a_Monster)
 
 
 
-cTraitBreeder * cTraitBreeder::ToTrait(cMonster * a_Monster)
+cBehaviorBreeder * cBehaviorBreeder::ToBehavior(cMonster * a_Monster)
 {
-	return &ToInterface(a_Monster)->GetTraitBreeder();
+	return &ToInterface(a_Monster)->GetBehaviorBreeder();
 }

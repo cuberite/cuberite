@@ -1,7 +1,7 @@
 #pragma once
 
-class cTraitItemFollower;
-class iTraitItemFollower;
+class cBehaviorItemFollower;
+class iBehaviorItemFollower;
 
 //fwds
 class cMonster;
@@ -11,21 +11,21 @@ class cItems;
 
 
 
-class iTraitItemFollower
+class iBehaviorItemFollower
 {
 public:
 	virtual void GetFollowedItems(cItems & a_Items) const = 0;
-	virtual ~iTraitItemFollower();
+	virtual ~iBehaviorItemFollower();
 };
 
 
 
 
 
-class cTraitItemFollower
+class cBehaviorItemFollower
 {
 public:
-	cTraitItemFollower(iTraitItemFollower * a_Parent);
+	cBehaviorItemFollower(iBehaviorItemFollower * a_Parent);
 
 	// Functions our host Monster should invoke:
 	bool ActiveTick();
@@ -33,6 +33,6 @@ public:
 
 private:
 	/** Our parent */
-	iTraitItemFollower * m_ParentInterface;
+	iBehaviorItemFollower * m_ParentInterface;
 	cMonster * m_Parent;
 };

@@ -2,13 +2,13 @@
 #pragma once
 
 #include "Monster.h"
-#include "Traits/TraitBreeder.h"
-#include "Traits/TraitItemFollower.h"
-#include "Traits/TraitCoward.h"
+#include "Behaviors/BehaviorBreeder.h"
+#include "Behaviors/BehaviorItemFollower.h"
+#include "Behaviors/BehaviorCoward.h"
 
 
 
-class cPassiveMonster : public cMonster, public iTraitBreeder, public iTraitItemFollower
+class cPassiveMonster : public cMonster, public iBehaviorBreeder, public iBehaviorItemFollower
 {
 	typedef cMonster super;
 
@@ -23,23 +23,23 @@ public:
 
 	virtual void Destroyed(void) override;
 
-	// Implementing the iTraitBreeder interface
+	// Implementing the iBehaviorBreeder interface
 	/** Returns the items that make the animal breed - this is usually the same as the ones that make the animal follow, but not necessarily. */
 	virtual void GetBreedingItems(cItems & a_Items) const override { GetFollowedItems(a_Items); }
 
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) override { }
 
-	cTraitBreeder & GetTraitBreeder() override;
+	cBehaviorBreeder & GetBehaviorBreeder() override;
 
-	const cTraitBreeder & GetTraitBreeder() const override;
+	const cBehaviorBreeder & GetBehaviorBreeder() const override;
 
-	// Implementing the iTraitItemFollower interface
+	// Implementing the iBehaviorItemFollower interface
 
 	/** Returns the items that the animal of this class follows when a player holds it in hand. */
 	virtual void GetFollowedItems(cItems & a_Items) const override { }
 
 private:
-	cTraitBreeder m_TraitBreeder;
-	cTraitItemFollower m_TraitItemFollower;
-	cTraitCoward m_TraitCoward;
+	cBehaviorBreeder m_BehaviorBreeder;
+	cBehaviorItemFollower m_BehaviorItemFollower;
+	cBehaviorCoward m_BehaviorCoward;
 };

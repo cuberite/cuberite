@@ -8,7 +8,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include
 
 set(FOLDERS
 	OSSupport HTTP Items Blocks Protocol Generating PolarSSL++ Bindings
-	WorldStorage Mobs Mobs/Traits Entities Simulator Simulator/IncrementalRedstoneSimulator
+	WorldStorage Mobs Mobs/Behaviors Entities Simulator Simulator/IncrementalRedstoneSimulator
 	BlockEntities UI Noise
 )
 
@@ -374,7 +374,7 @@ if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE}
 		OSSupport HTTPServer Bindings Items Blocks Noise
 		Protocol Generating WorldStorage
-		Mobs Traits Entities Simulator IncrementalRedstoneSimulator
+		Mobs Behaviors Entities Simulator IncrementalRedstoneSimulator
 		BlockEntities UI PolarSSL++
 	)
 endif ()
