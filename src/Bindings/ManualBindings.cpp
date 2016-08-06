@@ -548,7 +548,7 @@ static int tolua_cFile_ChangeFileExt(lua_State * tolua_S)
 
 	// Execute:
 	AString FileName, NewExt;
-	ASSERT(L.GetStackValues(2, FileName, NewExt));
+	VERIFY(L.GetStackValues(2, FileName, NewExt));
 	L.Push(cFile::ChangeFileExt(FileName, NewExt));
 	return 1;
 }
@@ -575,7 +575,7 @@ static int tolua_cFile_Copy(lua_State * tolua_S)
 
 	// Execute:
 	AString SrcFile, DstFile;
-	ASSERT(L.GetStackValues(2, SrcFile, DstFile));
+	VERIFY(L.GetStackValues(2, SrcFile, DstFile));
 	L.Push(cFile::Copy(SrcFile, DstFile));
 	return 1;
 }
@@ -602,7 +602,7 @@ static int tolua_cFile_CreateFolder(lua_State * tolua_S)
 
 	// Execute:
 	AString FolderPath;
-	ASSERT(L.GetStackValues(2, FolderPath));
+	VERIFY(L.GetStackValues(2, FolderPath));
 	L.Push(cFile::CreateFolder(FolderPath));
 	return 1;
 }
@@ -629,7 +629,7 @@ static int tolua_cFile_CreateFolderRecursive(lua_State * tolua_S)
 
 	// Execute:
 	AString FolderPath;
-	ASSERT(L.GetStackValues(2, FolderPath));
+	VERIFY(L.GetStackValues(2, FolderPath));
 	L.Push(cFile::CreateFolderRecursive(FolderPath));
 	return 1;
 }
@@ -656,7 +656,7 @@ static int tolua_cFile_Delete(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::Delete(Path));
 	return 1;
 }
@@ -683,7 +683,7 @@ static int tolua_cFile_DeleteFile(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::DeleteFile(Path));
 	return 1;
 }
@@ -710,7 +710,7 @@ static int tolua_cFile_DeleteFolder(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::DeleteFolder(Path));
 	return 1;
 }
@@ -737,7 +737,7 @@ static int tolua_cFile_DeleteFolderContents(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::DeleteFolderContents(Path));
 	return 1;
 }
@@ -768,7 +768,7 @@ static int tolua_cFile_Exists(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::Exists(Path));
 	return 1;
 }
@@ -795,7 +795,7 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 
 	// Get params:
 	AString Folder;
-	ASSERT(LuaState.GetStackValues(2, Folder));
+	VERIFY(LuaState.GetStackValues(2, Folder));
 
 	// Execute and push result:
 	LuaState.Push(cFile::GetFolderContents(Folder));
@@ -824,7 +824,7 @@ static int tolua_cFile_GetLastModificationTime(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::GetLastModificationTime(Path));
 	return 1;
 }
@@ -851,7 +851,7 @@ static int tolua_cFile_GetSize(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::GetSize(Path));
 	return 1;
 }
@@ -878,7 +878,7 @@ static int tolua_cFile_IsFile(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::IsFile(Path));
 	return 1;
 }
@@ -905,7 +905,7 @@ static int tolua_cFile_IsFolder(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::IsFolder(Path));
 	return 1;
 }
@@ -932,7 +932,7 @@ static int tolua_cFile_ReadWholeFile(lua_State * tolua_S)
 
 	// Get params:
 	AString FileName;
-	ASSERT(LuaState.GetStackValues(2, FileName));
+	VERIFY(LuaState.GetStackValues(2, FileName));
 
 	// Execute and push result:
 	LuaState.Push(cFile::ReadWholeFile(FileName));
@@ -961,7 +961,7 @@ static int tolua_cFile_Rename(lua_State * tolua_S)
 
 	// Execute:
 	AString SrcPath, DstPath;
-	ASSERT(L.GetStackValues(2, SrcPath, DstPath));
+	VERIFY(L.GetStackValues(2, SrcPath, DstPath));
 	L.Push(cFile::Rename(SrcPath, DstPath));
 	return 1;
 }
