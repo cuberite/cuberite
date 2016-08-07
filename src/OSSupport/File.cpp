@@ -524,6 +524,13 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 		{
 			do
 			{
+				if (
+					(strcmp(FindFileData.cFileName, ".") == 0) ||
+					(strcmp(FindFileData.cFileName, "..") == 0)
+				)
+				{
+					continue;
+				}
 				AllFiles.push_back(FindFileData.cFileName);
 			} while (FindNextFileA(hFind, &FindFileData));
 			FindClose(hFind);
@@ -546,6 +553,13 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 			struct dirent *dirp;
 			while ((dirp = readdir(dp)) != nullptr)
 			{
+				if (
+					(strcmp(dirp->d_name, ".") == 0) ||
+					(strcmp(dirp->d_name, "..") == 0)
+				)
+				{
+					continue;
+				}
 				AllFiles.push_back(dirp->d_name);
 			}
 			closedir(dp);
