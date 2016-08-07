@@ -259,6 +259,7 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 	f:write([[<!DOCTYPE html><html>
 		<head>
 		<title>Cuberite API - ]], HookName, [[ Hook</title>
+		<link rel="canonical" href="http://api-docs.cuberite.org/">
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
