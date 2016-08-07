@@ -27,6 +27,7 @@ bool cBehaviorCoward::ActiveTick()
 	// TODO NOT SAFE
 	if (m_Attacker->IsDestroyed() || (m_Attacker->GetPosition() - m_Parent->GetPosition()).Length() > m_Parent->GetSightDistance())
 	{
+		// We lost the attacker
 		m_Attacker = nullptr;
 		return false;
 	}

@@ -1,5 +1,7 @@
 #pragma once
 
+// The mob will wander around
+
 class cMonster;
 class cEntity;
 class cChunk;

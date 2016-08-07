@@ -74,6 +74,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	: super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
+	, m_NearestPlayerIsStale(true)
 	, m_PathFinder(a_Width, a_Height)
 	, m_PathfinderActivated(false)
 	, m_JumpCoolDown(0)
@@ -83,10 +84,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
-	, m_AttackRate(3)
-	, m_AttackDamage(1)
-	, m_AttackRange(1)
-	, m_AttackCoolDownTicksLeft(0)
 	, m_SightDistance(25)
 	, m_DropChanceWeapon(0.085f)
 	, m_DropChanceHelmet(0.085f)
@@ -94,13 +91,9 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_DropChanceLeggings(0.085f)
 	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
-	, m_TicksSinceLastDamaged(100)
-	, m_BurnsInDaylight(false)
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
-	, m_BehaviorWanderer(this)
-	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -114,7 +107,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 
 cMonster::~cMonster()
 {
-	ASSERT(GetTarget() == nullptr);
+
 }
 
 
@@ -123,7 +116,6 @@ cMonster::~cMonster()
 
 void cMonster::Destroyed()
 {
-	SetTarget(nullptr);  // Tell them we're no longer targeting them.
 	super::Destroyed();
 }
 
@@ -230,14 +222,11 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	m_NearestPlayerIsStale = true;
 	super::Tick(a_Dt, a_Chunk);
 	GET_AND_VERIFY_CURRENT_CHUNK(Chunk, POSX_TOINT, POSZ_TOINT);
 
-	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == GetWorld())));
-	if (m_AttackCoolDownTicksLeft > 0)
-	{
-		m_AttackCoolDownTicksLeft -= 1;
-	}
+	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == GetWorld())))
 
 	if (m_Health <= 0)
 	{
@@ -319,29 +308,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	SetPitchAndYawFromDestination(a_IsFollowingPath);
-
-	/*
-	switch (m_EMState)
-	{
-		case IDLE:
-		{
-			// If enemy passive we ignore checks for player visibility.
-			InStateIdle(a_Dt, a_Chunk);
-			break;
-		}
-		case CHASING:
-		{
-			// If we do not see a player anymore skip chasing action.
-			InStateChasing(a_Dt, a_Chunk);
-			break;
-		}
-		case ESCAPING:
-		{
-			InStateEscaping(a_Dt, a_Chunk);
-			break;
-		}
-		case ATTACKING: break;
-	}  // switch (m_EMState) */
 
 	BroadcastMovementUpdate();
 
@@ -579,13 +545,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
-	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), false);
 
-	if (Closest != nullptr)
-	{
-		EventSeePlayer(Closest, a_Chunk);
-	}
 }
 
 
@@ -596,10 +556,7 @@ void cMonster::CheckEventLostPlayer(void)
 {
 	if (GetTarget() != nullptr)
 	{
-		if ((GetTarget()->GetPosition() - GetPosition()).Length() > m_SightDistance)
-		{
-			EventLosePlayer();
-		}
+
 	}
 	else
 	{
@@ -679,7 +636,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMonster::ResetAttackCooldown()
 {
-	m_AttackCoolDownTicksLeft = static_cast<int>(3 * 20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every 3 seconds
+	// Taken to cBehaviorChaser
 }
 
 
@@ -880,56 +837,6 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-
-
-/** Sets the target. */
-void cMonster::SetTarget (cPawn * a_NewTarget)
-{
-	ASSERT((a_NewTarget == nullptr) || (IsTicking()));
-	if (m_Target == a_NewTarget)
-	{
-		return;
-	}
-	cPawn * OldTarget = m_Target;
-	m_Target = a_NewTarget;
-
-	if (OldTarget != nullptr)
-	{
-		// Notify the old target that we are no longer targeting it.
-		OldTarget->NoLongerTargetingMe(this);
-	}
-
-	if (a_NewTarget != nullptr)
-	{
-		ASSERT(a_NewTarget->IsTicking());
-		// Notify the new target that we are now targeting it.
-		m_Target->TargetingMe(this);
-	}
-
-}
-
-
-
-
-
-void cMonster::UnsafeUnsetTarget()
-{
-	m_Target = nullptr;
-}
-
-
-
-
-
-cPawn * cMonster::GetTarget ()
-{
-	return m_Target;
-}
-
-
-
-
-
 cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
 	cFastRandom Random;
@@ -1016,6 +923,81 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		}
 	}
 	return toReturn;
+}
+
+
+
+
+
+cBehaviorAggressive * cMonster::GetBehaviorAggressive()
+{
+	return nullptr;
+}
+
+
+
+
+
+cBehaviorBreeder * cMonster::GetBehaviorBreeder()
+{
+	return nullptr;
+}
+
+
+
+
+
+const cBehaviorBreeder * cMonster::GetBehaviorBreeder() const
+{
+	return nullptr;
+}
+
+
+
+
+
+cBehaviorChaser * cMonster::GetBehaviorChaser()
+{
+	return nullptr;
+}
+
+
+
+
+
+cBehaviorStriker * cMonster::GetBehaviorStriker()
+{
+	return nullptr;
+}
+
+
+
+
+
+void cMonster::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
+{
+	UNUSED(a_Parent1);
+	UNUSED(a_Parent2);
+	return;
+}
+
+
+
+
+
+cPlayer * cMonster::GetNearestPlayer()
+{
+	if (m_NearestPlayerIsStale)
+	{
+		// TODO: Rewrite this to use cWorld's DoWithPlayers()
+		m_NearestPlayer = GetWorld()->FindClosestPlayer(GetPosition(), static_cast<float>(GetSightDistance()));
+		m_NearestPlayerIsStale = false;
+	}
+	if ((m_NearestPlayer != nullptr) && (!m_NearestPlayer->IsTicking()))
+	{
+		m_NearestPlayer = nullptr;
+	}
+	return m_NearestPlayer;
 }
 
 
@@ -1115,102 +1097,6 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingL
 			a_Drops.push_back(GetEquippedWeapon());
 		}
 	}
-}
-
-
-
-
-
-void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
-{
-	if (!m_BurnsInDaylight)
-	{
-		return;
-	}
-
-	int RelY = POSY_TOINT;
-	if ((RelY < 0) || (RelY >= cChunkDef::Height))
-	{
-		// Outside the world
-		return;
-	}
-	if (!a_Chunk.IsLightValid())
-	{
-		m_World->QueueLightChunk(GetChunkX(), GetChunkZ());
-		return;
-	}
-
-	if (!IsOnFire() && WouldBurn)
-	{
-		// Burn for 100 ticks, then decide again
-		StartBurning(100);
-	}
-}
-
-
-
-
-bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
-{
-	// If the Y coord is out of range, return the most logical result without considering anything else:
-	int RelY = FloorC(a_Location.y);
-	if (RelY < 0)
-	{
-		// Never burn under the world
-		return false;
-	}
-	if (RelY >= cChunkDef::Height)
-	{
-		// Always burn above the world
-		return true;
-	}
-	if (RelY <= 0)
-	{
-		// The mob is about to die, no point in burning
-		return false;
-	}
-
-	PREPARE_REL_AND_CHUNK(a_Location, a_Chunk);
-	if (!RelSuccess)
-	{
-		return false;
-	}
-
-	if (
-		(Chunk->GetBlock(Rel.x, Rel.y, Rel.z) != E_BLOCK_SOULSAND) &&  // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
-		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
-	)
-	{
-		int MobHeight = static_cast<int>(a_Location.y) + round(GetHeight()) - 1;  // The height of the mob head
-		if (MobHeight >= cChunkDef::Height)
-		{
-			return true;
-		}
-		// Start with the highest block and scan down to the mob's head.
-		// If a non transparent is found, return false (do not burn). Otherwise return true.
-		// Note that this loop is not a performance concern as transparent blocks are rare and the loop almost always bailes out
-		// instantly.(An exception is e.g. standing under a long column of glass).
-		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
-		while (CurrentBlock >= MobHeight)
-		{
-			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
-			if (
-				// Do not burn if a block above us meets one of the following conditions:
-				(!cBlockInfo::IsTransparent(Block)) ||
-				(Block == E_BLOCK_LEAVES) ||
-				(Block == E_BLOCK_NEW_LEAVES) ||
-				(IsBlockWater(Block))
-			)
-			{
-				return false;
-			}
-			--CurrentBlock;
-		}
-		return true;
-
-	}
-	return false;
 }
 
 

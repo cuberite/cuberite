@@ -8,11 +8,15 @@
 #include "../Enchantments.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
-#include "Behaviors/BehaviorWanderer.h"
 
 class cClientHandle;
 class cWorld;
 
+//Behavior fwds
+class cBehaviorAggressive;
+class cBehaviorBreeder;
+class cBehaviorChaser;
+class cBehaviorStriker;
 
 // tolua_begin
 class cMonster :
@@ -71,26 +75,16 @@ public:
 	eFamily GetMobFamily(void) const;
 	// tolua_end
 
-	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
-	virtual void EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk);
-
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
 
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 
-	virtual void EventLosePlayer(void);
-	virtual void CheckEventLostPlayer(void);
-
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
-	int GetAttackRate() { return static_cast<int>(m_AttackRate); }
-	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
-	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
-	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
 	int GetSightDistance() { return m_SightDistance; }
 
@@ -106,7 +100,6 @@ public:
 	void SetDropChanceLeggings(float a_DropChanceLeggings) { m_DropChanceLeggings = a_DropChanceLeggings; }
 	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; }
 	void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
-	void ResetAttackCooldown();
 
 	/** Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick */
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
@@ -162,23 +155,31 @@ public:
 
 	// tolua_end
 
-	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
-	void SetTarget (cPawn * a_NewTarget);
-
-	/** Unset the target without notifying the target entity. Do not use this, use SetTarget(nullptr) instead.
-	This is only used by cPawn internally. */
-	void UnsafeUnsetTarget();
-
-	/** Returns the current target. */
-	cPawn * GetTarget ();
-
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
 	Asserts and returns null if mob type is not specified
 	*/
 	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
 
+	// Behavior getters
+	virtual cBehaviorAggressive * GetBehaviorAggressive();
+	virtual cBehaviorBreeder * GetBehaviorBreeder();
+	virtual const cBehaviorBreeder * GetBehaviorBreeder() const;
+	virtual cBehaviorChaser * GetBehaviorChaser();
+	virtual cBehaviorStriker * GetBehaviorStriker();
+
+	// Polymorphic behavior functions
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);
+
+	cPlayer * GetNearestPlayer();
+
 protected:
+
+	/** Whether or not m_NearestPlayer is stale. Always true at the beginning of a tick.
+	When true, GetNearestPlayer() actually searches for a player, updates m_NearestPlayer, and sets it to false.
+	otherwise it returns m_NearestPlayer. This means we only perform 1 search per tick. */
+	bool m_NearestPlayerIsStale;
+	cPlayer * m_NearestPlayer;
 
 	/** The pathfinder instance handles pathfinding for this monster. */
 	cPathFinder m_PathFinder;
@@ -200,9 +201,6 @@ protected:
 
 	/** Returns if the ultimate, final destination has been reached. */
 	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS); }
-
-	/** Returns whether or not the target is close enough for attack. */
-	bool TargetIsInRange(void) { ASSERT(m_Target != nullptr); return ((m_Target->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
 
 	/** Returns if a monster can reach a given height by jumping. */
 	inline bool DoesPosYRequireJump(int a_PosY)
@@ -230,10 +228,6 @@ protected:
 	AString m_SoundHurt;
 	AString m_SoundDeath;
 
-	float m_AttackRate;
-	int m_AttackDamage;
-	int m_AttackRange;
-	int m_AttackCoolDownTicksLeft;
 	int m_SightDistance;
 
 	float m_DropChanceWeapon;
@@ -242,17 +236,11 @@ protected:
 	float m_DropChanceLeggings;
 	float m_DropChanceBoots;
 	bool m_CanPickUpLoot;
-	int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
-	void HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn);
-	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
-	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;
 
 	int m_Age;
 	int m_AgingTimer;
-
-	cBehaviorWanderer m_BehaviorWanderer;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
@@ -268,9 +256,5 @@ protected:
 
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
-
-private:
-	/** A pointer to the entity this mobile is aiming to reach */
-	cPawn * m_Target;
 
 } ;  // tolua_export

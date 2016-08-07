@@ -1,5 +1,7 @@
 #pragma once
 
+// Grants breeding capabilities to the mob
+
 class cBehaviorBreeder;
 class iBehaviorBreeder;
 
@@ -7,22 +9,6 @@ class cWorld;
 class cMonster;
 class cPlayer;
 class cItems;
-
-// To use this Behavior, a Monster must implement the following interface.
-// The monster must also have a cBehaviorBreeder as a member variable.
-
-class iBehaviorBreeder
-{
-public:
-	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) = 0;
-
-	virtual void GetBreedingItems(cItems & a_Items) const = 0;
-
-	virtual cBehaviorBreeder & GetBehaviorBreeder() = 0;
-
-	virtual const cBehaviorBreeder & GetBehaviorBreeder() const = 0;
-	virtual ~iBehaviorBreeder();
-};
 
 
 
@@ -32,7 +18,7 @@ class cBehaviorBreeder
 {
 
 public:
-	cBehaviorBreeder(iBehaviorBreeder * a_Parent);
+	cBehaviorBreeder(iBehaviorBreeder * a_ParentInterface);
 
 	// Functions our host Monster should invoke:
 	void Tick();

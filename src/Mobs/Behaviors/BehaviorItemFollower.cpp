@@ -28,7 +28,7 @@ bool cBehaviorItemFollower::ActiveTick()
 	m_ParentInterface->GetFollowedItems(FollowedItems);
 	if (FollowedItems.Size() > 0)
 	{
-		cPlayer * a_Closest_Player = World->FindClosestPlayer(m_Parent->GetPosition(), static_cast<float>(m_Parent->GetSightDistance()));
+		cPlayer * a_Closest_Player = m_Parent->GetNearestPlayer();
 		if (a_Closest_Player != nullptr)
 		{
 			cItem EquippedItem = a_Closest_Player->GetEquippedItem();

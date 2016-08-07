@@ -3,6 +3,7 @@
 
 #include "MonsterConfig.h"
 #include "Mobs/Monster.h"
+#include "Mobs/Behaviors/BehaviorChaser.h"
 #include "IniFile.h"
 
 
@@ -88,12 +89,13 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	std::list<sAttributesStruct>::const_iterator itr;
 	for (itr = m_pState->AttributesList.begin(); itr != m_pState->AttributesList.end(); ++itr)
 	{
+		cBehaviorChaser * Behavior = a_Monster->GetBehaviorChaser();
 		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			a_Monster->SetAttackDamage (itr->m_AttackDamage);
-			a_Monster->SetAttackRange  (itr->m_AttackRange);
+			Behavior->SetAttackDamage (itr->m_AttackDamage);
+			Behavior->SetAttackRange  (itr->m_AttackRange);
+			Behavior->SetAttackRate   (static_cast<float>(itr->m_AttackRate));
 			a_Monster->SetSightDistance(itr->m_SightDistance);
-			a_Monster->SetAttackRate   (static_cast<float>(itr->m_AttackRate));
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
 			a_Monster->SetIsFireproof  (itr->m_IsFireproof);
 			return;

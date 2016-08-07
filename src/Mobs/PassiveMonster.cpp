@@ -63,11 +63,6 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (m_EMState == ESCAPING)
-	{
-		CheckEventLostPlayer();
-	}
-
 	for (;;)
 	{
 		if (m_BehaviorCoward.ActiveTick())
@@ -92,10 +87,6 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	m_BehaviorBreeder.Tick();
-	// someOtherBehavior.Tick();
-	// someOtherBehavior.Tick();
-	// someOtherBehavior.Tick();
-	// someOtherBehavior.Tick();
 }
 
 

@@ -1,5 +1,7 @@
 #pragma once
 
+// Makes the mob run away from any other mob that damages it
+
 //fwds
 class cMonster;
 class cItems;

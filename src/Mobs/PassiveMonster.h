@@ -8,7 +8,7 @@
 
 
 
-class cPassiveMonster : public cMonster, public iBehaviorBreeder, public iBehaviorItemFollower
+class cPassiveMonster : public cMonster
 {
 	typedef cMonster super;
 
@@ -28,10 +28,6 @@ public:
 	virtual void GetBreedingItems(cItems & a_Items) const override { GetFollowedItems(a_Items); }
 
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) override { }
-
-	cBehaviorBreeder & GetBehaviorBreeder() override;
-
-	const cBehaviorBreeder & GetBehaviorBreeder() const override;
 
 	// Implementing the iBehaviorItemFollower interface
 

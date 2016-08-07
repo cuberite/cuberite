@@ -1,22 +1,13 @@
 #pragma once
 
+// Makes the mob follow specific held items
+
 class cBehaviorItemFollower;
 class iBehaviorItemFollower;
 
 //fwds
 class cMonster;
 class cItems;
-
-
-
-
-
-class iBehaviorItemFollower
-{
-public:
-	virtual void GetFollowedItems(cItems & a_Items) const = 0;
-	virtual ~iBehaviorItemFollower();
-};
 
 
 
