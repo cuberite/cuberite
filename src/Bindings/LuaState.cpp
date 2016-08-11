@@ -336,7 +336,6 @@ void cLuaState::RegisterAPILibs(void)
 	}
 	ASSERT(top == lua_gettop(m_LuaState));
 	luaopen_lxp(m_LuaState);
-	this->LogStackValues("After lxp");
 	if (top == lua_gettop(m_LuaState) - 1)
 	{
 		// lxp left the unregistered "lxp" table on the stack, register and pop it (#3304):
