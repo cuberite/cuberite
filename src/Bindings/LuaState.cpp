@@ -319,12 +319,30 @@ void cLuaState::Create(void)
 
 void cLuaState::RegisterAPILibs(void)
 {
+	auto top = lua_gettop(m_LuaState);
 	tolua_AllToLua_open(m_LuaState);
+	ASSERT(top == lua_gettop(m_LuaState));
 	cManualBindings::Bind(m_LuaState);
+	ASSERT(top == lua_gettop(m_LuaState));
 	DeprecatedBindings::Bind(m_LuaState);
+	ASSERT(top == lua_gettop(m_LuaState));
 	cLuaJson::Bind(*this);
+	ASSERT(top == lua_gettop(m_LuaState));
 	luaopen_lsqlite3(m_LuaState);
+	if (top == lua_gettop(m_LuaState) - 1)
+	{
+		// lsqlite3 left the "sqlite3" table on the stack, pop it:
+		lua_pop(m_LuaState, 1);
+	}
+	ASSERT(top == lua_gettop(m_LuaState));
 	luaopen_lxp(m_LuaState);
+	this->LogStackValues("After lxp");
+	if (top == lua_gettop(m_LuaState) - 1)
+	{
+		// lxp left the unregistered "lxp" table on the stack, register and pop it (#3304):
+		lua_setglobal(m_LuaState, "lxp");
+	}
+	ASSERT(top == lua_gettop(m_LuaState));
 }
 
 
@@ -428,7 +446,6 @@ void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a
 	lua_pop(m_LuaState, 1);                                                          // Stk: <package>
 	lua_pushlstring(m_LuaState, NewPackagePath.c_str(), NewPackagePath.length());    // Stk: <package> <NewPackagePath>
 	lua_setfield(m_LuaState, -2, a_PathVariable.c_str());                            // Stk: <package>
-	lua_pop(m_LuaState, 1);
 	lua_pop(m_LuaState, 1);                                                          // Stk: -
 }
 
