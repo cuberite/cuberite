@@ -11,6 +11,7 @@
 , m_AttackDamage(1)
 , m_AttackRange(1)
 , m_AttackCoolDownTicksLeft(0)
+, m_TicksSinceLastDamaged(50)
 
 cBehaviorChaser::cBehaviorChaser(cMonster * a_Parent) :
 	m_Parent(a_Parent)
@@ -55,7 +56,11 @@ void cBehaviorChaser::Chase()
 
 void cBehaviorChaser::Tick()
 {
-
+	++m_TicksSinceLastDamaged;
+	if (m_AttackCoolDownTicksLeft > 0)
+	{
+		m_AttackCoolDownTicksLeft -= 1;
+	}
 }
 
 
