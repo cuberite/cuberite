@@ -203,8 +203,6 @@ local g_ViolationPatterns =
 	-- We don't like "Type const *" and "Type const &". Use "const Type *" and "const Type &" instead:
 	{"const %&", "Use 'const Type &' instead of 'Type const &'"},
 	{"const %*", "Use 'const Type *' instead of 'Type const *'"},
-
-	{"virtual [^~]*%(.*%)%s*;%s*$", "Virtual function without override keyword"},
 }
 
 
