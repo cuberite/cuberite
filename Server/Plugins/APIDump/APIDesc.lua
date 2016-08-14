@@ -1236,10 +1236,10 @@ end
 local IniFile = cIniFile();
 IniFile:ReadFile("somefile.ini")
 local NumKeys = IniFile:GetNumKeys();
-for k = 0, NumKeys do
+for k = 0, (NumKeys - 1) do
 	local NumValues = IniFile:GetNumValues(k);
 	LOG("key \"" .. IniFile:GetKeyName(k) .. "\" has " .. NumValues .. " values:");
-	for v = 0, NumValues do
+	for v = 0, (NumValues - 1) do
 		LOG("  value \"" .. IniFile:GetValueName(k, v) .. "\".");
 	end
 end
