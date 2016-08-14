@@ -237,13 +237,43 @@ public:
 	typedef SharedPtr<cCallback> cCallbackSharedPtr;
 
 
+	/** Same thing as cCallback, but GetStackValue() won't fail if the callback value is nil.
+	Used for callbacks that are optional - they needn't be present and in such a case they won't get called. */
+	class cOptionalCallback:
+		public cCallback
+	{
+		typedef cCallback Super;
+
+	public:
+
+		cOptionalCallback(void) {}
+
+		/** Set the contained callback to the function in the specified Lua state's stack position.
+		If a callback has been previously contained, it is unreferenced first.
+		Returns true on success, false on failure (not a function at the specified stack pos). */
+		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
+
+	protected:
+
+		/** This class cannot be copied, because it is tracked in the LuaState by-ptr.
+		Use cCallbackPtr for a copyable object. */
+		cOptionalCallback(const cOptionalCallback &) = delete;
+
+		/** This class cannot be moved, because it is tracked in the LuaState by-ptr.
+		Use cCallbackPtr for a copyable object. */
+		cOptionalCallback(cOptionalCallback &&) = delete;
+	};
+	typedef UniquePtr<cOptionalCallback> cOptionalCallbackPtr;
+
+
 	/** Represents a stored Lua table with callback functions that C++ code can call.
 	Is thread-safe and unload-safe.
 	When Lua state is unloaded, the CallFn() will return failure instead of calling into non-existent code.
-	To receive the callback instance from the Lua side, use RefStack() or (better) cLuaState::GetStackValue()
-	with a cCallbackPtr. Note that instances of this class are tracked in the canon LuaState instance, so that
-	they can be invalidated when the LuaState is unloaded; due to multithreading issues they can only be tracked
-	by-ptr, which has an unfortunate effect of disabling the copy and move constructors. */
+	To receive the cTableRef instance from the Lua side, use RefStack() or (better) cLuaState::GetStackValue()
+	with a cTableRefPtr.
+	Note that instances of this class are tracked in the canon LuaState instance, so that they can be
+	invalidated when the LuaState is unloaded; due to multithreading issues they can only be tracked by-ptr,
+	which has an unfortunate effect of disabling the copy and move constructors. */
 	class cTableRef:
 		public cTrackedRef
 	{
@@ -340,6 +370,40 @@ public:
 		// Remove the copy-constructor:
 		cStackValue(const cStackValue &) = delete;
 	};
+
+
+	/** Represents a table on the Lua stack.
+	Provides easy access to the elements in the table.
+	Note that this class doesn't have cTrackedRef's thread-safeness and unload-safeness, it is expected to be
+	used for immediate queries in API bindings. */
+	class cStackTable
+	{
+	public:
+		cStackTable(cLuaState & a_LuaState, int a_StackPos);
+
+		/** Iterates over all array elements in the table consecutively and calls the a_ElementCallback for each.
+		The callback receives the LuaState in which the table resides, and the element's index. The LuaState has
+		the element on top of its stack. If the callback returns true, the iteration is aborted, if it returns
+		false, the iteration continues with the next element. */
+		void ForEachArrayElement(std::function<bool(cLuaState & a_LuaState, int a_Index)> a_ElementCallback) const;
+
+		/** Iterates over all dictionary elements in the table in random order, and calls the a_ElementCallback for
+		each of them.
+		The callback receives the LuaState in which the table reside. The LuaState has the element on top of its
+		stack, and the element's key just below it. If the callback returns true, the iteration is aborted, if it
+		returns false, the iteration continues with the next element. */
+		void ForEachElement(std::function<bool(cLuaState & a_LuaState)> a_ElementCallback) const;
+
+		cLuaState & GetLuaState(void) const { return m_LuaState; }
+
+	protected:
+		/** The Lua state in which the table resides. */
+		cLuaState & m_LuaState;
+
+		/** The stack index where the table resides in the Lua state. */
+		int m_StackPos;
+	};
+	typedef UniquePtr<cStackTable> cStackTablePtr;
 
 
 	/** Creates a new instance. The LuaState is not initialized.
@@ -439,10 +503,13 @@ public:
 	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback);
-	bool GetStackValue(int a_StackPos, cTableRef & a_TableRef);
-	bool GetStackValue(int a_StackPos, cTableRefPtr & a_TableRef);
+	bool GetStackValue(int a_StackPos, cOptionalCallback & a_Callback);
+	bool GetStackValue(int a_StackPos, cOptionalCallbackPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);
 	bool GetStackValue(int a_StackPos, cRef & a_Ref);
+	bool GetStackValue(int a_StackPos, cStackTablePtr & a_StackTable);
+	bool GetStackValue(int a_StackPos, cTableRef & a_TableRef);
+	bool GetStackValue(int a_StackPos, cTableRefPtr & a_TableRef);
 	bool GetStackValue(int a_StackPos, cTrackedRef & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefPtr & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref);

@@ -12,7 +12,6 @@
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
-#include "LuaChunkStay.h"
 #include "../Root.h"
 #include "../World.h"
 #include "../Entities/Player.h"

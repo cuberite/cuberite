@@ -265,6 +265,26 @@ bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cOptionalCallback:
+
+bool cLuaState::cOptionalCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	// If the stack pos is nil, make this an empty callback:
+	if (lua_isnil(a_LuaState, a_StackPos))
+	{
+		Clear();
+		return true;
+	}
+
+	// Use default cCallback implementation:
+	return Super::RefStack(a_LuaState, a_StackPos);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cTableRef:
 
 bool cLuaState::cTableRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
@@ -276,6 +296,45 @@ bool cLuaState::cTableRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 	}
 
 	return Super::RefStack(a_LuaState, a_StackPos);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cStackTable:
+
+cLuaState::cStackTable::cStackTable(cLuaState & a_LuaState, int a_StackPos):
+	m_LuaState(a_LuaState),
+	m_StackPos(a_StackPos)
+{
+	ASSERT(lua_istable(a_LuaState, a_StackPos));
+}
+
+
+
+
+
+void cLuaState::cStackTable::ForEachArrayElement(std::function<bool(cLuaState & a_LuaState, int a_Index)> a_ElementCallback) const
+{
+	auto numElements = luaL_getn(m_LuaState, m_StackPos);
+	#ifdef _DEBUG
+		auto stackTop = lua_gettop(m_LuaState);
+	#endif
+	for (int idx = 1; idx <= numElements; idx++)
+	{
+		// Push the idx-th element of the array onto stack top and call the callback:
+		lua_rawgeti(m_LuaState, m_StackPos, idx);
+		auto shouldAbort = a_ElementCallback(m_LuaState, idx);
+		ASSERT(lua_gettop(m_LuaState) == stackTop + 1);  // The element callback must not change the Lua stack below the value
+		lua_pop(m_LuaState, 1);
+		if (shouldAbort)
+		{
+			// The callback wants to abort
+			return;
+		}
+	}
 }
 
 
@@ -1086,11 +1145,20 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallbackPtr & a_Callback)
 
 
 
-bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
+bool cLuaState::GetStackValue(int a_StackPos, cOptionalCallback & a_Callback)
+{
+	return a_Callback.RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cOptionalCallbackPtr & a_Callback)
 {
 	if (a_Callback == nullptr)
 	{
-		a_Callback = std::make_shared<cCallback>();
+		a_Callback = cpp14::make_unique<cOptionalCallback>();
 	}
 	return a_Callback->RefStack(*this, a_StackPos);
 }
@@ -1099,22 +1167,13 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
 
 
 
-bool cLuaState::GetStackValue(int a_StackPos, cTableRef & a_TableRef)
+bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
 {
-	return a_TableRef.RefStack(*this, a_StackPos);
-}
-
-
-
-
-
-bool cLuaState::GetStackValue(int a_StackPos, cTableRefPtr & a_TableRef)
-{
-	if (a_TableRef == nullptr)
+	if (a_Callback == nullptr)
 	{
-		a_TableRef = cpp14::make_unique<cTableRef>();
+		a_Callback = std::make_shared<cCallback>();
 	}
-	return a_TableRef->RefStack(*this, a_StackPos);
+	return a_Callback->RefStack(*this, a_StackPos);
 }
 
 
@@ -1139,6 +1198,45 @@ bool cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
 {
 	a_Ref.RefStack(*this, a_StackPos);
 	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cStackTablePtr & a_StackTable)
+{
+	// Only allow tables to be stored in a_StackTable:
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	// Assign the StackTable to the specified stack position:
+	a_StackTable = cpp14::make_unique<cStackTable>(*this, a_StackPos);
+	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cTableRef & a_TableRef)
+{
+	return a_TableRef.RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cTableRefPtr & a_TableRef)
+{
+	if (a_TableRef == nullptr)
+	{
+		a_TableRef = cpp14::make_unique<cTableRef>();
+	}
+	return a_TableRef->RefStack(*this, a_StackPos);
 }
 
 
