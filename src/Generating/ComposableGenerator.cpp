@@ -438,6 +438,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				m_FinishGens.push_back(gen);
 			}
 		}
+		else if (NoCaseCompare(finisher, "OverworldClumpFlowers") == 0)
+		{
+			auto flowers = cFinishGenClumpTopBlock::ParseIniFile(a_IniFile, "OverworldClumpFlowers");
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenClumpTopBlock(Seed, flowers)));
+		}
 		else if (NoCaseCompare(finisher, "PieceStructures") == 0)
 		{
 			if (split.size() < 2)
