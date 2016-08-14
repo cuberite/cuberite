@@ -122,9 +122,9 @@ cLuaStateTracker & cLuaStateTracker::Get(void)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cLuaState::cCallback:
+// cLuaState::cTrackedRef:
 
-cLuaState::cCallback::cCallback(void):
+cLuaState::cTrackedRef::cTrackedRef(void):
 	m_CS(nullptr)
 {
 }
@@ -133,20 +133,14 @@ cLuaState::cCallback::cCallback(void):
 
 
 
-bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
+bool cLuaState::cTrackedRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 {
-	// Check if the stack contains a function:
-	if (!lua_isfunction(a_LuaState, a_StackPos))
-	{
-		return false;
-	}
-
 	// Clear any previous callback:
 	Clear();
 
 	// Add self to LuaState's callback-tracking:
 	auto canonState = a_LuaState.QueryCanonLuaState();
-	canonState->TrackCallback(*this);
+	canonState->TrackRef(*this);
 
 	// Store the new callback:
 	m_CS = &(canonState->m_CS);
@@ -158,9 +152,9 @@ bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
 
 
 
-void cLuaState::cCallback::Clear(void)
+void cLuaState::cTrackedRef::Clear(void)
 {
-	// Free the callback reference:
+	// Free the reference:
 	lua_State * luaState = nullptr;
 	{
 		auto cs = m_CS;
@@ -175,20 +169,21 @@ void cLuaState::cCallback::Clear(void)
 			m_Ref.UnRef();
 		}
 	}
+	m_CS = nullptr;
 
 	// Remove from LuaState's callback-tracking:
 	if (luaState == nullptr)
 	{
 		return;
 	}
-	cLuaState(luaState).UntrackCallback(*this);
+	cLuaState(luaState).UntrackRef(*this);
 }
 
 
 
 
 
-bool cLuaState::cCallback::IsValid(void)
+bool cLuaState::cTrackedRef::IsValid(void)
 {
 	auto cs = m_CS;
 	if (cs == nullptr)
@@ -203,7 +198,7 @@ bool cLuaState::cCallback::IsValid(void)
 
 
 
-bool cLuaState::cCallback::IsSameLuaState(cLuaState & a_LuaState)
+bool cLuaState::cTrackedRef::IsSameLuaState(cLuaState & a_LuaState)
 {
 	auto cs = m_CS;
 	if (cs == nullptr)
@@ -227,7 +222,7 @@ bool cLuaState::cCallback::IsSameLuaState(cLuaState & a_LuaState)
 
 
 
-void cLuaState::cCallback::Invalidate(void)
+void cLuaState::cTrackedRef::Invalidate(void)
 {
 	auto cs = m_CS;
 	if (cs == nullptr)
@@ -244,6 +239,102 @@ void cLuaState::cCallback::Invalidate(void)
 		return;
 	}
 	m_Ref.UnRef();
+	m_CS = nullptr;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cCallback:
+
+bool cLuaState::cCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	// Check if the stack contains a function:
+	if (!lua_isfunction(a_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	return Super::RefStack(a_LuaState, a_StackPos);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cOptionalCallback:
+
+bool cLuaState::cOptionalCallback::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	// If the stack pos is nil, make this an empty callback:
+	if (lua_isnil(a_LuaState, a_StackPos))
+	{
+		Clear();
+		return true;
+	}
+
+	// Use default cCallback implementation:
+	return Super::RefStack(a_LuaState, a_StackPos);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cTableRef:
+
+bool cLuaState::cTableRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
+{
+	// Check if the stack contains a table:
+	if (!lua_istable(a_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	return Super::RefStack(a_LuaState, a_StackPos);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cStackTable:
+
+cLuaState::cStackTable::cStackTable(cLuaState & a_LuaState, int a_StackPos):
+	m_LuaState(a_LuaState),
+	m_StackPos(a_StackPos)
+{
+	ASSERT(lua_istable(a_LuaState, a_StackPos));
+}
+
+
+
+
+
+void cLuaState::cStackTable::ForEachArrayElement(std::function<bool(cLuaState & a_LuaState, int a_Index)> a_ElementCallback) const
+{
+	auto numElements = luaL_getn(m_LuaState, m_StackPos);
+	#ifdef _DEBUG
+		auto stackTop = lua_gettop(m_LuaState);
+	#endif
+	for (int idx = 1; idx <= numElements; idx++)
+	{
+		// Push the idx-th element of the array onto stack top and call the callback:
+		lua_rawgeti(m_LuaState, m_StackPos, idx);
+		auto shouldAbort = a_ElementCallback(m_LuaState, idx);
+		ASSERT(lua_gettop(m_LuaState) == stackTop + 1);  // The element callback must not change the Lua stack below the value
+		lua_pop(m_LuaState, 1);
+		if (shouldAbort)
+		{
+			// The callback wants to abort
+			return;
+		}
+	}
 }
 
 
@@ -365,12 +456,12 @@ void cLuaState::Close(void)
 		return;
 	}
 
-	// Invalidate all callbacks:
+	// Invalidate all tracked refs:
 	{
-		cCSLock Lock(m_CSTrackedCallbacks);
-		for (auto & c: m_TrackedCallbacks)
+		cCSLock Lock(m_CSTrackedRefs);
+		for (auto & r: m_TrackedRefs)
 		{
-			c->Invalidate();
+			r->Invalidate();
 		}
 	}
 
@@ -592,22 +683,28 @@ bool cLuaState::PushFunction(const cRef & a_FnRef)
 
 
 
-bool cLuaState::PushFunction(const cTableRef & a_TableRef)
+bool cLuaState::PushFunction(const cRef & a_TableRef, const char * a_FnName)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
 
+	if (!a_TableRef.IsValid())
+	{
+		return false;
+	}
+
 	// Push the error handler for lua_pcall()
 	lua_pushcfunction(m_LuaState, &ReportFnCallErrors);
 
-	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_TableRef.GetTableRef());  // Get the table ref
+	// Get the function from the table:
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, static_cast<int>(a_TableRef));
 	if (!lua_istable(m_LuaState, -1))
 	{
 		// Not a table, bail out
 		lua_pop(m_LuaState, 2);
 		return false;
 	}
-	lua_getfield(m_LuaState, -1, a_TableRef.GetFnName());
+	lua_getfield(m_LuaState, -1, a_FnName);
 	if (lua_isnil(m_LuaState, -1) || !lua_isfunction(m_LuaState, -1))
 	{
 		// Not a valid function, bail out
@@ -618,7 +715,7 @@ bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 	// Pop the table off the stack:
 	lua_remove(m_LuaState, -2);
 
-	Printf(m_CurrentFunctionName, "<table-callback %s>", a_TableRef.GetFnName());
+	Printf(m_CurrentFunctionName, "<table-callback %s>", a_FnName);
 	m_NumCurrentFunctionArgs = 0;
 	return true;
 }
@@ -1048,6 +1145,28 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallbackPtr & a_Callback)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, cOptionalCallback & a_Callback)
+{
+	return a_Callback.RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cOptionalCallbackPtr & a_Callback)
+{
+	if (a_Callback == nullptr)
+	{
+		a_Callback = cpp14::make_unique<cOptionalCallback>();
+	}
+	return a_Callback->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
 bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
 {
 	if (a_Callback == nullptr)
@@ -1079,6 +1198,80 @@ bool cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
 {
 	a_Ref.RefStack(*this, a_StackPos);
 	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cStackTablePtr & a_StackTable)
+{
+	// Only allow tables to be stored in a_StackTable:
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	// Assign the StackTable to the specified stack position:
+	a_StackTable = cpp14::make_unique<cStackTable>(*this, a_StackPos);
+	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cTableRef & a_TableRef)
+{
+	return a_TableRef.RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cTableRefPtr & a_TableRef)
+{
+	if (a_TableRef == nullptr)
+	{
+		a_TableRef = cpp14::make_unique<cTableRef>();
+	}
+	return a_TableRef->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cTrackedRef & a_Ref)
+{
+	return a_Ref.RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cTrackedRefPtr & a_Ref)
+{
+	if (a_Ref == nullptr)
+	{
+		a_Ref = cpp14::make_unique<cTrackedRef>();
+	}
+	return a_Ref->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref)
+{
+	if (a_Ref == nullptr)
+	{
+		a_Ref = std::make_shared<cTrackedRef>();
+	}
+	return a_Ref->RefStack(*this, a_StackPos);
 }
 
 
@@ -1930,7 +2123,7 @@ int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
 
 
 
-void cLuaState::TrackCallback(cCallback & a_Callback)
+void cLuaState::TrackRef(cTrackedRef & a_Ref)
 {
 	// Get the CanonLuaState global from Lua:
 	auto canonState = QueryCanonLuaState();
@@ -1941,15 +2134,15 @@ void cLuaState::TrackCallback(cCallback & a_Callback)
 	}
 
 	// Add the callback:
-	cCSLock Lock(canonState->m_CSTrackedCallbacks);
-	canonState->m_TrackedCallbacks.push_back(&a_Callback);
+	cCSLock Lock(canonState->m_CSTrackedRefs);
+	canonState->m_TrackedRefs.push_back(&a_Ref);
 }
 
 
 
 
 
-void cLuaState::UntrackCallback(cCallback & a_Callback)
+void cLuaState::UntrackRef(cTrackedRef & a_Ref)
 {
 	// Get the CanonLuaState global from Lua:
 	auto canonState = QueryCanonLuaState();
@@ -1960,12 +2153,12 @@ void cLuaState::UntrackCallback(cCallback & a_Callback)
 	}
 
 	// Remove the callback:
-	cCSLock Lock(canonState->m_CSTrackedCallbacks);
-	auto & trackedCallbacks = canonState->m_TrackedCallbacks;
-	trackedCallbacks.erase(std::remove_if(trackedCallbacks.begin(), trackedCallbacks.end(),
-		[&a_Callback](cCallback * a_StoredCallback)
+	cCSLock Lock(canonState->m_CSTrackedRefs);
+	auto & trackedRefs = canonState->m_TrackedRefs;
+	trackedRefs.erase(std::remove_if(trackedRefs.begin(), trackedRefs.end(),
+		[&a_Ref](cTrackedRef * a_StoredRef)
 		{
-			return (a_StoredCallback == &a_Callback);
+			return (a_StoredRef == &a_Ref);
 		}
 	));
 }

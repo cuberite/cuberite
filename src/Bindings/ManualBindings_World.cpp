@@ -79,33 +79,34 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 		return 0;
 	}
 
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(tolua_S);
-	if (Plugin == nullptr)
+	// Read the params:
+	cWorld * world;
+	cLuaState::cStackTablePtr chunkCoords;
+	cLuaState::cOptionalCallbackPtr onChunkAvailable, onAllChunksAvailable;  // Callbacks may be unassigned at all - as a request to load / generate chunks
+	if (!L.GetStackValues(1, world, chunkCoords, onChunkAvailable, onAllChunksAvailable))
 	{
+		LOGWARNING("cWorld:ChunkStay(): Cannot read parameters, bailing out.");
+		L.LogStackTrace();
+		L.LogStackValues("Values on the stack");
 		return 0;
 	}
-
-	// Read the params:
-	cWorld * World = reinterpret_cast<cWorld *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (World == nullptr)
+	if (world == nullptr)
 	{
 		LOGWARNING("World:ChunkStay(): invalid world parameter");
 		L.LogStackTrace();
 		return 0;
 	}
+	ASSERT(chunkCoords != nullptr);  // If the table was invalid, GetStackValues() would have failed
 
-	cLuaChunkStay * ChunkStay = new cLuaChunkStay(*Plugin);
-
-	if (!ChunkStay->AddChunks(2))
+	// Read the chunk coords:
+	auto chunkStay = cpp14::make_unique<cLuaChunkStay>();
+	if (!chunkStay->AddChunks(*chunkCoords))
 	{
-		delete ChunkStay;
-		ChunkStay = nullptr;
 		return 0;
 	}
 
-	cLuaState::cCallbackPtr onChunkAvailable, onAllChunksAvailable;
-	L.GetStackValues(3, onChunkAvailable, onAllChunksAvailable);  // Callbacks may be unassigned at all - as a request to load / generate chunks
-	ChunkStay->Enable(*World->GetChunkMap(), std::move(onChunkAvailable), std::move(onAllChunksAvailable));
+	// Activate the ChunkStay:
+	chunkStay.release()->Enable(*world->GetChunkMap(), std::move(onChunkAvailable), std::move(onAllChunksAvailable));
 	return 0;
 }
 

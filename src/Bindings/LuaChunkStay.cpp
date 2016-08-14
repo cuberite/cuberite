@@ -11,9 +11,7 @@
 
 
 
-cLuaChunkStay::cLuaChunkStay(cPluginLua & a_Plugin) :
-	m_Plugin(a_Plugin),
-	m_LuaState(nullptr)
+cLuaChunkStay::cLuaChunkStay()
 {
 }
 
@@ -21,49 +19,33 @@ cLuaChunkStay::cLuaChunkStay(cPluginLua & a_Plugin) :
 
 
 
-bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
+bool cLuaChunkStay::AddChunks(const cLuaState::cStackTable & a_ChunkCoordsTable)
 {
 	// This function is expected to be called just once, with all the coords in a table
 	ASSERT(m_Chunks.empty());
 
-	cPluginLua::cOperation Op(m_Plugin);
-	cLuaState & L = Op();
-
-	// Check that we got a table:
-	if (!lua_istable(L, a_ChunkCoordTableStackPos))
-	{
-		LOGWARNING("%s: The parameter is not a table of coords (got %s). Ignoring the call.",
-			__FUNCTION__, lua_typename(L, lua_type(L, a_ChunkCoordTableStackPos))
-		);
-		L.LogStackTrace();
-		return false;
-	}
-
 	// Add each set of coords:
-	int NumChunks = luaL_getn(L, a_ChunkCoordTableStackPos);
-	m_Chunks.reserve(static_cast<size_t>(NumChunks));
-	for (int idx = 1; idx <= NumChunks; idx++)
-	{
-		// Push the idx-th element of the array onto stack top, check that it's a table:
-		lua_rawgeti(L, a_ChunkCoordTableStackPos, idx);
-		if (!lua_istable(L, -1))
+	a_ChunkCoordsTable.ForEachArrayElement([=](cLuaState & a_LuaState, int a_Index)
 		{
-			LOGWARNING("%s: Element #%d is not a table (got %s). Ignoring the element.",
-				__FUNCTION__, idx, lua_typename(L, -1)
-			);
-			L.LogStackTrace();
-			lua_pop(L, 1);
-			continue;
+			if (!lua_istable(a_LuaState, -1))
+			{
+				LOGWARNING("%s: Element #%d is not a table (got %s). Ignoring the element.",
+					__FUNCTION__, a_Index, lua_typename(a_LuaState, -1)
+				);
+				a_LuaState.LogStackTrace();
+				lua_pop(a_LuaState, 1);
+				return false;
+			}
+			AddChunkCoord(a_LuaState, a_Index);
+			return false;
 		}
-		AddChunkCoord(L, idx);
-		lua_pop(L, 1);
-	}
+	);
 
 	// If there are no chunks, log a warning and return failure:
 	if (m_Chunks.empty())
 	{
-		LOGWARNING("%s: Zero chunks to stay.", __FUNCTION__);
-		L.LogStackTrace();
+		LOGWARNING("%s: No valid chunk coords.", __FUNCTION__);
+		a_ChunkCoordsTable.GetLuaState().LogStackTrace();
 		return false;
 	}
 

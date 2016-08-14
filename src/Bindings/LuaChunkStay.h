@@ -30,24 +30,19 @@ class cLuaChunkStay
 	typedef cChunkStay super;
 
 public:
-	cLuaChunkStay(cPluginLua & a_Plugin);
+	cLuaChunkStay();
 
 	~cLuaChunkStay() { }
 
-	/** Adds chunks in the specified on-stack Lua table.
+	/** Adds chunks in the specified Lua table.
+	Can be called only once.
 	Returns true if any chunk added, false (plus log warning) if none. */
-	bool AddChunks(int a_ChunkCoordTableStackPos);
+	bool AddChunks(const cLuaState::cStackTable & a_ChunkCoords);
 
 	/** Enables the ChunkStay for the specified chunkmap, with the specified Lua callbacks. */
 	void Enable(cChunkMap & a_ChunkMap, cLuaState::cCallbackPtr a_OnChunkAvailable, cLuaState::cCallbackPtr a_OnAllChunksAvailable);
 
 protected:
-	/** The plugin which has created the ChunkStay, via cWorld:ChunkStay() binding method.  */
-	cPluginLua & m_Plugin;
-
-	/** The Lua state associated with the callbacks. Only valid when enabled. */
-	cLuaState * m_LuaState;
-
 	/** The Lua function to call in OnChunkAvailable. Only valid when enabled. */
 	cLuaState::cCallbackPtr m_OnChunkAvailable;
 
