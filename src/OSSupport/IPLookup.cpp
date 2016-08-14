@@ -103,7 +103,13 @@ bool cNetwork::IPToHostName(
 {
 	auto res = std::make_shared<cIPLookup>(a_Callbacks);
 	cNetworkSingleton::Get().AddIPLookup(res);
-	return res->Lookup(a_IP);
+	if (!res->Lookup(a_IP))
+	{
+		// Lookup failed early on, remove the object completely:
+		cNetworkSingleton::Get().RemoveIPLookup(res.get());
+		return false;
+	}
+	return true;
 }
 
 

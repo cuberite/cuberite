@@ -10,17 +10,9 @@
 
 
 
-cLuaUDPEndpoint::cLuaUDPEndpoint(cPluginLua & a_Plugin, int a_CallbacksTableStackPos):
-	m_Plugin(a_Plugin),
-	m_Callbacks(cPluginLua::cOperation(a_Plugin)(), a_CallbacksTableStackPos)
+cLuaUDPEndpoint::cLuaUDPEndpoint(cLuaState::cTableRefPtr && a_Callbacks):
+	m_Callbacks(std::move(a_Callbacks))
 {
-	// Warn if the callbacks aren't valid:
-	if (!m_Callbacks.IsValid())
-	{
-		LOGWARNING("cLuaUDPEndpoint in plugin %s: callbacks could not be retrieved", m_Plugin.GetName().c_str());
-		cPluginLua::cOperation Op(m_Plugin);
-		Op().LogStackTrace();
-	}
 }
 
 
@@ -30,10 +22,10 @@ cLuaUDPEndpoint::cLuaUDPEndpoint(cPluginLua & a_Plugin, int a_CallbacksTableStac
 cLuaUDPEndpoint::~cLuaUDPEndpoint()
 {
 	// If the endpoint is still open, close it:
-	cUDPEndpointPtr Endpoint = m_Endpoint;
-	if (Endpoint != nullptr)
+	auto endpoint = m_Endpoint;
+	if (endpoint != nullptr)
 	{
-		Endpoint->Close();
+		endpoint->Close();
 	}
 
 	Terminated();
@@ -60,14 +52,14 @@ bool cLuaUDPEndpoint::Open(UInt16 a_Port, cLuaUDPEndpointPtr a_Self)
 bool cLuaUDPEndpoint::Send(const AString & a_Data, const AString & a_RemotePeer, UInt16 a_RemotePort)
 {
 	// Safely grab a copy of the endpoint:
-	cUDPEndpointPtr Endpoint = m_Endpoint;
-	if (Endpoint == nullptr)
+	auto endpoint = m_Endpoint;
+	if (endpoint == nullptr)
 	{
 		return false;
 	}
 
 	// Send the data:
-	return Endpoint->Send(a_Data, a_RemotePeer, a_RemotePort);
+	return endpoint->Send(a_Data, a_RemotePeer, a_RemotePort);
 }
 
 
@@ -77,14 +69,14 @@ bool cLuaUDPEndpoint::Send(const AString & a_Data, const AString & a_RemotePeer,
 UInt16 cLuaUDPEndpoint::GetPort(void) const
 {
 	// Safely grab a copy of the endpoint:
-	cUDPEndpointPtr Endpoint = m_Endpoint;
-	if (Endpoint == nullptr)
+	auto endpoint = m_Endpoint;
+	if (endpoint == nullptr)
 	{
 		return 0;
 	}
 
 	// Get the port:
-	return Endpoint->GetPort();
+	return endpoint->GetPort();
 }
 
 
@@ -94,15 +86,15 @@ UInt16 cLuaUDPEndpoint::GetPort(void) const
 bool cLuaUDPEndpoint::IsOpen(void) const
 {
 	// Safely grab a copy of the endpoint:
-	cUDPEndpointPtr Endpoint = m_Endpoint;
-	if (Endpoint == nullptr)
+	auto endpoint = m_Endpoint;
+	if (endpoint == nullptr)
 	{
 		// No endpoint means that we're not open
 		return false;
 	}
 
 	// Get the state:
-	return Endpoint->IsOpen();
+	return endpoint->IsOpen();
 }
 
 
@@ -112,10 +104,10 @@ bool cLuaUDPEndpoint::IsOpen(void) const
 void cLuaUDPEndpoint::Close(void)
 {
 	// If the endpoint is still open, close it:
-	cUDPEndpointPtr Endpoint = m_Endpoint;
-	if (Endpoint != nullptr)
+	auto endpoint = m_Endpoint;
+	if (endpoint != nullptr)
 	{
-		Endpoint->Close();
+		endpoint->Close();
 		m_Endpoint.reset();
 	}
 
@@ -129,10 +121,10 @@ void cLuaUDPEndpoint::Close(void)
 void cLuaUDPEndpoint::EnableBroadcasts(void)
 {
 	// Safely grab a copy of the endpoint:
-	cUDPEndpointPtr Endpoint = m_Endpoint;
-	if (Endpoint != nullptr)
+	auto endpoint = m_Endpoint;
+	if (endpoint != nullptr)
 	{
-		Endpoint->EnableBroadcasts();
+		endpoint->EnableBroadcasts();
 	}
 }
 
@@ -156,17 +148,14 @@ void cLuaUDPEndpoint::Release(void)
 void cLuaUDPEndpoint::Terminated(void)
 {
 	// Disable the callbacks:
-	if (m_Callbacks.IsValid())
-	{
-		m_Callbacks.UnRef();
-	}
+	m_Callbacks.reset();
 
 	// If the endpoint is still open, close it:
 	{
-		cUDPEndpointPtr Endpoint = m_Endpoint;
-		if (Endpoint != nullptr)
+		auto endpoint = m_Endpoint;
+		if (endpoint != nullptr)
 		{
-			Endpoint->Close();
+			endpoint->Close();
 			m_Endpoint.reset();
 		}
 	}
@@ -178,18 +167,7 @@ void cLuaUDPEndpoint::Terminated(void)
 
 void cLuaUDPEndpoint::OnReceivedData(const char * a_Data, size_t a_NumBytes, const AString & a_RemotePeer, UInt16 a_RemotePort)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
-	// Call the callback:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnReceivedData"), this, AString(a_Data, a_NumBytes), a_RemotePeer, a_RemotePort))
-	{
-		LOGINFO("cUDPEndpoint OnReceivedData callback failed in plugin %s.", m_Plugin.GetName().c_str());
-	}
+	m_Callbacks->CallTableFn("OnReceivedData", this, AString(a_Data, a_NumBytes), a_RemotePeer, a_RemotePort);
 }
 
 
@@ -198,21 +176,10 @@ void cLuaUDPEndpoint::OnReceivedData(const char * a_Data, size_t a_NumBytes, con
 
 void cLuaUDPEndpoint::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
+	// Notify the plugin:
+	m_Callbacks->CallTableFn("OnError", a_ErrorCode, a_ErrorMsg);
 
-	// Call the callback:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnError"), a_ErrorCode, a_ErrorMsg))
-	{
-		LOGINFO("cUDPEndpoint OnError() callback failed in plugin %s; the endpoint error is %d (%s).",
-			m_Plugin.GetName().c_str(), a_ErrorCode, a_ErrorMsg.c_str()
-		);
-	}
-
+	// Terminate all processing on the endpoint:
 	Terminated();
 }
 

@@ -11,35 +11,19 @@
 
 
 
-cLuaTCPLink::cLuaTCPLink(cPluginLua & a_Plugin, int a_CallbacksTableStackPos):
-	m_Plugin(a_Plugin),
-	m_Callbacks(cPluginLua::cOperation(a_Plugin)(), a_CallbacksTableStackPos)
+cLuaTCPLink::cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks):
+	m_Callbacks(std::move(a_Callbacks))
 {
-	// Warn if the callbacks aren't valid:
-	if (!m_Callbacks.IsValid())
-	{
-		LOGWARNING("cTCPLink in plugin %s: callbacks could not be retrieved", m_Plugin.GetName().c_str());
-		cPluginLua::cOperation Op(m_Plugin);
-		Op().LogStackTrace();
-	}
 }
 
 
 
 
 
-cLuaTCPLink::cLuaTCPLink(cPluginLua & a_Plugin, cLuaState::cRef && a_CallbacksTableRef, cLuaServerHandleWPtr a_ServerHandle):
-	m_Plugin(a_Plugin),
-	m_Callbacks(std::move(a_CallbacksTableRef)),
+cLuaTCPLink::cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks, cLuaServerHandleWPtr a_ServerHandle):
+	m_Callbacks(std::move(a_Callbacks)),
 	m_Server(std::move(a_ServerHandle))
 {
-	// Warn if the callbacks aren't valid:
-	if (!m_Callbacks.IsValid())
-	{
-		LOGWARNING("cTCPLink in plugin %s: callbacks could not be retrieved", m_Plugin.GetName().c_str());
-		cPluginLua::cOperation Op(m_Plugin);
-		Op().LogStackTrace();
-	}
 }
 
 
@@ -49,10 +33,10 @@ cLuaTCPLink::cLuaTCPLink(cPluginLua & a_Plugin, cLuaState::cRef && a_CallbacksTa
 cLuaTCPLink::~cLuaTCPLink()
 {
 	// If the link is still open, close it:
-	cTCPLinkPtr Link = m_Link;
-	if (Link != nullptr)
+	auto link = m_Link;
+	if (link != nullptr)
 	{
-		Link->Close();
+		link->Close();
 	}
 
 	Terminated();
@@ -72,14 +56,14 @@ bool cLuaTCPLink::Send(const AString & a_Data)
 	}
 
 	// Safely grab a copy of the link:
-	cTCPLinkPtr Link = m_Link;
-	if (Link == nullptr)
+	auto link = m_Link;
+	if (link == nullptr)
 	{
 		return false;
 	}
 
 	// Send the data:
-	return Link->Send(a_Data);
+	return link->Send(a_Data);
 }
 
 
@@ -89,14 +73,14 @@ bool cLuaTCPLink::Send(const AString & a_Data)
 AString cLuaTCPLink::GetLocalIP(void) const
 {
 	// Safely grab a copy of the link:
-	cTCPLinkPtr Link = m_Link;
-	if (Link == nullptr)
+	auto link = m_Link;
+	if (link == nullptr)
 	{
 		return "";
 	}
 
 	// Get the IP address:
-	return Link->GetLocalIP();
+	return link->GetLocalIP();
 }
 
 
@@ -106,14 +90,14 @@ AString cLuaTCPLink::GetLocalIP(void) const
 UInt16 cLuaTCPLink::GetLocalPort(void) const
 {
 	// Safely grab a copy of the link:
-	cTCPLinkPtr Link = m_Link;
-	if (Link == nullptr)
+	auto link = m_Link;
+	if (link == nullptr)
 	{
 		return 0;
 	}
 
 	// Get the port:
-	return Link->GetLocalPort();
+	return link->GetLocalPort();
 }
 
 
@@ -123,14 +107,14 @@ UInt16 cLuaTCPLink::GetLocalPort(void) const
 AString cLuaTCPLink::GetRemoteIP(void) const
 {
 	// Safely grab a copy of the link:
-	cTCPLinkPtr Link = m_Link;
-	if (Link == nullptr)
+	cTCPLinkPtr link = m_Link;
+	if (link == nullptr)
 	{
 		return "";
 	}
 
 	// Get the IP address:
-	return Link->GetRemoteIP();
+	return link->GetRemoteIP();
 }
 
 
@@ -140,14 +124,14 @@ AString cLuaTCPLink::GetRemoteIP(void) const
 UInt16 cLuaTCPLink::GetRemotePort(void) const
 {
 	// Safely grab a copy of the link:
-	cTCPLinkPtr Link = m_Link;
-	if (Link == nullptr)
+	cTCPLinkPtr link = m_Link;
+	if (link == nullptr)
 	{
 		return 0;
 	}
 
 	// Get the port:
-	return Link->GetRemotePort();
+	return link->GetRemotePort();
 }
 
 
@@ -157,8 +141,8 @@ UInt16 cLuaTCPLink::GetRemotePort(void) const
 void cLuaTCPLink::Shutdown(void)
 {
 	// Safely grab a copy of the link and shut it down:
-	cTCPLinkPtr Link = m_Link;
-	if (Link != nullptr)
+	cTCPLinkPtr link = m_Link;
+	if (link != nullptr)
 	{
 		if (m_SslContext != nullptr)
 		{
@@ -166,7 +150,7 @@ void cLuaTCPLink::Shutdown(void)
 			m_SslContext->ResetSelf();
 			m_SslContext.reset();
 		}
-		Link->Shutdown();
+		link->Shutdown();
 	}
 }
 
@@ -177,8 +161,8 @@ void cLuaTCPLink::Shutdown(void)
 void cLuaTCPLink::Close(void)
 {
 	// If the link is still open, close it:
-	cTCPLinkPtr Link = m_Link;
-	if (Link != nullptr)
+	cTCPLinkPtr link = m_Link;
+	if (link != nullptr)
 	{
 		if (m_SslContext != nullptr)
 		{
@@ -186,7 +170,7 @@ void cLuaTCPLink::Close(void)
 			m_SslContext->ResetSelf();
 			m_SslContext.reset();
 		}
-		Link->Close();
+		link->Close();
 	}
 
 	Terminated();
@@ -303,9 +287,9 @@ AString cLuaTCPLink::StartTLSServer(
 void cLuaTCPLink::Terminated(void)
 {
 	// Disable the callbacks:
-	if (m_Callbacks.IsValid())
+	if (m_Callbacks->IsValid())
 	{
-		m_Callbacks.UnRef();
+		m_Callbacks->Clear();
 	}
 
 	// If the managing server is still alive, let it know we're terminating:
@@ -317,10 +301,10 @@ void cLuaTCPLink::Terminated(void)
 
 	// If the link is still open, close it:
 	{
-		cTCPLinkPtr Link = m_Link;
-		if (Link != nullptr)
+		auto link= m_Link;
+		if (link != nullptr)
 		{
-			Link->Close();
+			link->Close();
 			m_Link.reset();
 		}
 	}
@@ -335,18 +319,8 @@ void cLuaTCPLink::Terminated(void)
 
 void cLuaTCPLink::ReceivedCleartextData(const char * a_Data, size_t a_NumBytes)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
 	// Call the callback:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnReceivedData"), this, AString(a_Data, a_NumBytes)))
-	{
-		LOGINFO("cTCPLink OnReceivedData callback failed in plugin %s.", m_Plugin.GetName().c_str());
-	}
+	m_Callbacks->CallTableFn("OnReceivedData", this, AString(a_Data, a_NumBytes));
 }
 
 
@@ -355,18 +329,8 @@ void cLuaTCPLink::ReceivedCleartextData(const char * a_Data, size_t a_NumBytes)
 
 void cLuaTCPLink::OnConnected(cTCPLink & a_Link)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
 	// Call the callback:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnConnected"), this))
-	{
-		LOGINFO("cTCPLink OnConnected() callback failed in plugin %s.", m_Plugin.GetName().c_str());
-	}
+	m_Callbacks->CallTableFn("OnConnected", this);
 }
 
 
@@ -375,21 +339,10 @@ void cLuaTCPLink::OnConnected(cTCPLink & a_Link)
 
 void cLuaTCPLink::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
 	// Call the callback:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnError"), this, a_ErrorCode, a_ErrorMsg))
-	{
-		LOGINFO("cTCPLink OnError() callback failed in plugin %s; the link error is %d (%s).",
-			m_Plugin.GetName().c_str(), a_ErrorCode, a_ErrorMsg.c_str()
-		);
-	}
+	m_Callbacks->CallTableFn("OnError", this, a_ErrorCode, a_ErrorMsg);
 
+	// Terminate all processing on the link:
 	Terminated();
 }
 
@@ -409,12 +362,6 @@ void cLuaTCPLink::OnLinkCreated(cTCPLinkPtr a_Link)
 
 void cLuaTCPLink::OnReceivedData(const char * a_Data, size_t a_Length)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
 	// If we're running in SSL mode, put the data into the SSL decryptor:
 	auto sslContext = m_SslContext;
 	if (sslContext != nullptr)
@@ -424,11 +371,7 @@ void cLuaTCPLink::OnReceivedData(const char * a_Data, size_t a_Length)
 	}
 
 	// Call the callback:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnReceivedData"), this, AString(a_Data, a_Length)))
-	{
-		LOGINFO("cTCPLink OnReceivedData callback failed in plugin %s.", m_Plugin.GetName().c_str());
-	}
+	m_Callbacks->CallTableFn("OnReceivedData", this, AString(a_Data, a_Length));
 }
 
 
@@ -437,12 +380,6 @@ void cLuaTCPLink::OnReceivedData(const char * a_Data, size_t a_Length)
 
 void cLuaTCPLink::OnRemoteClosed(void)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
 	// If running in SSL mode and there's data left in the SSL contect, report it:
 	auto sslContext = m_SslContext;
 	if (sslContext != nullptr)
@@ -451,12 +388,9 @@ void cLuaTCPLink::OnRemoteClosed(void)
 	}
 
 	// Call the callback:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnRemoteClosed"), this))
-	{
-		LOGINFO("cTCPLink OnRemoteClosed() callback failed in plugin %s.", m_Plugin.GetName().c_str());
-	}
+	m_Callbacks->CallTableFn("OnRemoteClosed", this);
 
+	// Terminate all processing on the link:
 	Terminated();
 }
 
