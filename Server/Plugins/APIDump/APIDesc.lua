@@ -2654,6 +2654,7 @@ end
 				SetMinNetherPortalWidth = { Params = "number", Return = "", Notes = "Sets the minimum width for a nether portal" },
 				SetShouldUseChatPrefixes = { Params = "", Return = "ShouldUse (bool)", Notes = "Sets whether coloured chat prefixes such as [INFO] is used with the SendMessageXXX() or BroadcastChatXXX(), or simply the entire message is coloured in the respective colour." },
 				SetSignLines = { Params = "X, Y, Z, Line1, Line2, Line3, Line4, [{{cPlayer|Player}}]", Return = "", Notes = "Sets the sign text at the specified coords. The sign-updating hooks are called for the change. The Player parameter is used to indicate the player from whom the change has come, it may be nil." },
+				SetSpawn = { Params = "X, Y, Z", Return = "bool", Notes = "Sets the default spawn at the specified coords." },
 				SetTicksUntilWeatherChange = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks after which the weather will be changed." },
 				SetTimeOfDay = { Params = "TimeOfDayTicks", Return = "", Notes = "Sets the time of day, expressed as number of ticks past sunrise, in the range 0 .. 24000." },
 				SetTNTShrapnelLevel = { Params = "{{Globals#ShrapnelLevel|ShrapnelLevel}}", Return = "", Notes = "Sets the Shrampel level of the world." },

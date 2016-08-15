@@ -324,6 +324,33 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+bool cWorld::SetSpawn(double a_X, double a_Y, double a_Z)
+{
+		cIniFile IniFile;
+
+		IniFile.ReadFile(m_IniFileName);
+		IniFile.SetValueF("SpawnPosition", "X", a_X);
+		IniFile.SetValueF("SpawnPosition", "Y", a_Y);
+		IniFile.SetValueF("SpawnPosition", "Z", a_Z);
+		if (IniFile.WriteFile(m_IniFileName))
+		{
+			m_SpawnX = a_X;
+			m_SpawnY = a_Y;
+			m_SpawnZ = a_Z;
+			LOGD("Spawn set at {%f, %f, %f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+			return true;
+		}
+		else
+		{
+			LOGWARNING("Couldn't write new spawn settings to \"%s\".", m_IniFileName.c_str());
+		}
+		return false;
+}
+
+
+
+
+
 void cWorld::InitializeSpawn(void)
 {
 	// For the debugging builds, don't make the server build too much world upon start:
@@ -337,12 +364,6 @@ void cWorld::InitializeSpawn(void)
 	{
 		// Spawn position wasn't already explicitly set, enumerate random solid-land coordinate and then write it to the world configuration:
 		GenerateRandomSpawn(DefaultViewDist);
-		cIniFile IniFile;
-		IniFile.ReadFile(m_IniFileName);
-		IniFile.SetValueF("SpawnPosition", "X", m_SpawnX);
-		IniFile.SetValueF("SpawnPosition", "Y", m_SpawnY);
-		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ);
-		IniFile.WriteFile(m_IniFileName);
 	}
 
 	cIniFile IniFile;
@@ -649,9 +670,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	double SpawnY = 0.0;
 	if (CanSpawnAt(BiomeOffset.x, SpawnY, BiomeOffset.z))
 	{
-		m_SpawnX = BiomeOffset.x + 0.5;
-		m_SpawnY = SpawnY;
-		m_SpawnZ = BiomeOffset.z + 0.5;
+		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
 
 		LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
 		return;
@@ -681,9 +700,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 
 			if (CanSpawnAt(PotentialSpawn.x, SpawnY, PotentialSpawn.z))
 			{
-				m_SpawnX = PotentialSpawn.x + 0.5;
-				m_SpawnY = SpawnY;
-				m_SpawnZ = PotentialSpawn.z + 0.5;
+				SetSpawn(PotentialSpawn.x + 0.5, SpawnY, PotentialSpawn.z + 0.5);
 
 				int ChunkX, ChunkZ;
 				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
