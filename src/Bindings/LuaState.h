@@ -634,6 +634,7 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
+		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{
 			// Pushing the function failed
@@ -795,6 +796,7 @@ protected:
 	inline bool PushCallPop(T && a_Param, Args &&... args)
 	{
 		Push(std::forward<T>(a_Param));
+		m_NumCurrentFunctionArgs += 1;
 		return PushCallPop(std::forward<Args>(args)...);
 	}
 

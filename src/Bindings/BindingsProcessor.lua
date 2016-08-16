@@ -234,7 +234,6 @@ local function OutputLuaStateHelpers(a_Package)
 			if not(g_HasCustomPushImplementation[item.name]) then
 				f:write("void cLuaState::Push(" .. item.name .. " * a_Value)\n{\n\tASSERT(IsValid());\n")
 				f:write("\ttolua_pushusertype(m_LuaState, a_Value, \"" .. item.name .. "\");\n");
-				f:write("\tm_NumCurrentFunctionArgs += 1;\n")
 				f:write("}\n\n\n\n\n\n")
 			end
 		end
