@@ -327,12 +327,19 @@ public:
 		T & m_Dest;
 	};
 
+
 	/** A dummy class that's used only to delimit function args from return values for cLuaState::Call() */
 	class cRet
 	{
 	} ;
-
 	static const cRet Return;  // Use this constant to delimit function args from return values for cLuaState::Call()
+
+
+	/** A dummy class that's used only to push a constant nil as a function parameter in Call(). */
+	class cNil
+	{
+	};
+	static const cNil Nil;  // Use this constant to give a function a nil parameter in Call()
 
 
 	/** A RAII class for values pushed onto the Lua stack.
@@ -489,8 +496,6 @@ public:
 		Push(std::forward<Arg2>(a_Arg2), std::forward<Args>(a_Args)...);
 	}
 
-	void PushNil(void);
-
 	// Push a const value onto the stack (keep alpha-sorted):
 	void Push(const AString & a_String);
 	void Push(const AStringMap & a_Dictionary);
@@ -499,6 +504,7 @@ public:
 	void Push(const cCraftingRecipe * a_Recipe);
 	void Push(const char * a_Value);
 	void Push(const cItems & a_Items);
+	void Push(const cNil & a_Nil);
 	void Push(const cPlayer * a_Player);
 	void Push(const cRef & a_Ref);
 	void Push(const HTTPRequest * a_Request);

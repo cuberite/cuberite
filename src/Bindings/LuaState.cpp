@@ -42,6 +42,7 @@ extern "C"
 
 
 const cLuaState::cRet cLuaState::Return = {};
+const cLuaState::cNil cLuaState::Nil = {};
 
 /** Each Lua state stores a pointer to its creating cLuaState in Lua globals, under this name.
 This way any cLuaState can reference the main cLuaState's TrackedCallbacks, mutex etc. */
@@ -751,18 +752,6 @@ bool cLuaState::PushFunction(const cRef & a_TableRef, const char * a_FnName)
 
 
 
-void cLuaState::PushNil(void)
-{
-	ASSERT(IsValid());
-
-	lua_pushnil(m_LuaState);
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
 void cLuaState::Push(const AString & a_String)
 {
 	ASSERT(IsValid());
@@ -853,6 +842,18 @@ void cLuaState::Push(const cItems & a_Items)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cItems *>(&a_Items)), "cItems");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const cNil & a_Nil)
+{
+	ASSERT(IsValid());
+
+	lua_pushnil(m_LuaState);
 	m_NumCurrentFunctionArgs += 1;
 }
 

@@ -2058,8 +2058,7 @@ static int tolua_cUrlParser_Parse(lua_State * a_LuaState)
 	if (!res.first)
 	{
 		// Error, return nil and error msg:
-		L.PushNil();
-		L.Push(res.second);
+		L.Push(cLuaState::Nil, res.second);
 		return 2;
 	}
 	L.Push(scheme, username, password, host, port, path, query, fragment);
@@ -2099,8 +2098,7 @@ static int tolua_cUrlParser_ParseAuthorityPart(lua_State * a_LuaState)
 	if (!res.first)
 	{
 		// Error, return nil and error msg:
-		L.PushNil();
-		L.Push(res.second);
+		L.Push(cLuaState::Nil, res.second);
 		return 2;
 	}
 	L.Push(username, password, host, port);
