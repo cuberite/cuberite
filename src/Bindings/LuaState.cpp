@@ -341,6 +341,33 @@ void cLuaState::cStackTable::ForEachArrayElement(std::function<bool(cLuaState & 
 
 
 
+void cLuaState::cStackTable::ForEachElement(std::function<bool(cLuaState & a_LuaState)> a_ElementCallback) const
+{
+	#ifdef _DEBUG
+		auto stackTop = lua_gettop(m_LuaState);
+	#endif
+	lua_pushvalue(m_LuaState, m_StackPos);  // Stk: <table>
+	lua_pushnil(m_LuaState);                // Stk: <table> nil
+	while (lua_next(m_LuaState, -2))        // Stk: <table> <key> <val>
+	{
+		auto shouldAbort = a_ElementCallback(m_LuaState);
+		ASSERT(lua_gettop(m_LuaState) == stackTop + 3);  // The element callback must not change the Lua stack below the value
+		lua_pop(m_LuaState, 1);  // Stk: <table> <key>
+		if (shouldAbort)
+		{
+			// The callback wants to abort
+			lua_pop(m_LuaState, 2);  // Stk: empty
+			return;
+		}
+	}
+	// Stk: <table>
+	lua_pop(m_LuaState, 1);  // Stk: empty
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
@@ -748,6 +775,24 @@ void cLuaState::Push(const AString & a_String)
 
 
 
+void cLuaState::Push(const AStringMap & a_Dictionary)
+{
+	ASSERT(IsValid());
+
+	lua_createtable(m_LuaState, 0, static_cast<int>(a_Dictionary.size()));
+	int newTable = lua_gettop(m_LuaState);
+	for (const auto & item: a_Dictionary)
+	{
+		Push(item.first);   // key
+		Push(item.second);  // value
+		lua_rawset(m_LuaState, newTable);
+	}
+}
+
+
+
+
+
 void cLuaState::Push(const AStringVector & a_Vector)
 {
 	ASSERT(IsValid());
@@ -1107,6 +1152,37 @@ bool cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, AStringMap & a_Value)
+{
+	// Retrieve all values in a string => string dictionary table:
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	cStackTable tbl(*this, a_StackPos);
+	bool isValid = true;
+	tbl.ForEachElement([&isValid, &a_Value](cLuaState & a_LuaState)
+		{
+			AString key, val;
+			if (a_LuaState.GetStackValues(-2, key, val))
+			{
+				a_Value[key] = val;
+			}
+			else
+			{
+				isValid = false;
+				return true;
+			}
+			return false;
+		}
+	);
+	return isValid;
 }
 
 
