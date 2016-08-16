@@ -86,6 +86,7 @@ public:
 		for such a response; instead, the redirect is silently attempted. */
 		virtual void OnRedirecting(const AString & a_NewLocation) {}
 	};
+	typedef UniquePtr<cCallbacks> cCallbacksPtr;
 
 
 	/** Used for HTTP status codes. */
@@ -112,7 +113,7 @@ public:
 	static std::pair<bool, AString> Request(
 		const AString & a_Method,
 		const AString & a_URL,
-		cCallbacks & a_Callbacks,
+		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		AString && a_Body,
 		AStringMap && a_Options
@@ -121,7 +122,7 @@ public:
 	/** Alias for Request("GET", ...) */
 	static std::pair<bool, AString> Get(
 		const AString & a_URL,
-		cCallbacks & a_Callbacks,
+		cCallbacksPtr && a_Callbacks,
 		AStringMap a_Headers = AStringMap(),
 		AString a_Body = AString(),
 		AStringMap a_Options = AStringMap()
@@ -130,7 +131,7 @@ public:
 	/** Alias for Request("POST", ...) */
 	static std::pair<bool, AString> Post(
 		const AString & a_URL,
-		cCallbacks & a_Callbacks,
+		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		AString && a_Body,
 		AStringMap && a_Options
@@ -139,7 +140,7 @@ public:
 	/** Alias for Request("PUT", ...) */
 	static std::pair<bool, AString> Put(
 		const AString & a_URL,
-		cCallbacks & a_Callbacks,
+		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		AString && a_Body,
 		AStringMap && a_Options

@@ -32,7 +32,7 @@ public:
 	static std::pair<bool, AString> Request(
 		const AString & a_Method,
 		const AString & a_URL,
-		cUrlClient::cCallbacks & a_Callbacks,
+		cUrlClient::cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		const AString & a_Body,
 		AStringMap && a_Options
@@ -41,7 +41,7 @@ public:
 		// Create a new instance of cUrlClientRequest, wrapped in a SharedPtr, so that it has a controlled lifetime.
 		// Cannot use std::make_shared, because the constructor is not public
 		SharedPtr<cUrlClientRequest> ptr (new cUrlClientRequest(
-			a_Method, a_URL, a_Callbacks, std::move(a_Headers), a_Body, std::move(a_Options)
+			a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 		));
 		return ptr->DoRequest(ptr);
 	}
@@ -51,7 +51,7 @@ public:
 	void CallErrorCallback(const AString & a_ErrorMessage)
 	{
 		// Call the error callback:
-		m_Callbacks.OnError(a_ErrorMessage);
+		m_Callbacks->OnError(a_ErrorMessage);
 
 		// Terminate the request's TCP link:
 		auto link = m_Link;
@@ -63,7 +63,7 @@ public:
 	}
 
 
-	cUrlClient::cCallbacks & GetCallbacks() { return m_Callbacks; }
+	cUrlClient::cCallbacks & GetCallbacks() { return *m_Callbacks; }
 
 	void RedirectTo(const AString & a_RedirectUrl);
 
@@ -115,7 +115,7 @@ protected:
 	UInt16 m_UrlPort;
 
 	/** Callbacks that report progress and results of the request. */
-	cUrlClient::cCallbacks & m_Callbacks;
+	cUrlClient::cCallbacksPtr m_Callbacks;
 
 	/** Extra headers to be sent with the request (besides the normal ones). */
 	AStringMap m_Headers;
@@ -145,14 +145,14 @@ protected:
 	cUrlClientRequest(
 		const AString & a_Method,
 		const AString & a_Url,
-		cUrlClient::cCallbacks & a_Callbacks,
+		cUrlClient::cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		const AString & a_Body,
 		AStringMap && a_Options
 	):
 		m_Method(a_Method),
 		m_Url(a_Url),
-		m_Callbacks(a_Callbacks),
+		m_Callbacks(std::move(a_Callbacks)),
 		m_Headers(std::move(a_Headers)),
 		m_Body(a_Body),
 		m_Options(std::move(a_Options))
@@ -170,7 +170,7 @@ protected:
 	// cNetwork::cConnectCallbacks override: An error has occurred:
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		m_Callbacks.OnError(Printf("Network error %d (%s)", a_ErrorCode, a_ErrorMsg.c_str()));
+		m_Callbacks->OnError(Printf("Network error %d (%s)", a_ErrorCode, a_ErrorMsg.c_str()));
 		m_Self.reset();
 	}
 
@@ -486,7 +486,7 @@ cSchemeHandlerPtr cSchemeHandler::Create(const AString & a_Scheme, cUrlClientReq
 void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 {
 	// Check that redirection is allowed:
-	m_Callbacks.OnRedirecting(a_RedirectUrl);
+	m_Callbacks->OnRedirecting(a_RedirectUrl);
 	if (!ShouldAllowRedirects())
 	{
 		CallErrorCallback(Printf("Redirect to \"%s\" not allowed", a_RedirectUrl.c_str()));
@@ -500,7 +500,7 @@ void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 	auto res = DoRequest(m_Self);
 	if (!res.first)
 	{
-		m_Callbacks.OnError(Printf("Redirection failed: %s", res.second.c_str()));
+		m_Callbacks->OnError(Printf("Redirection failed: %s", res.second.c_str()));
 		return;
 	}
 }
@@ -520,7 +520,7 @@ bool cUrlClientRequest::ShouldAllowRedirects() const
 
 void cUrlClientRequest::OnConnected(cTCPLink & a_Link)
 {
-	m_Callbacks.OnConnected(a_Link);
+	m_Callbacks->OnConnected(a_Link);
 	m_SchemeHandler->OnConnected(a_Link);
 }
 
@@ -532,7 +532,7 @@ void cUrlClientRequest::OnTlsHandshakeCompleted(void)
 {
 	// Notify the scheme handler and the callbacks:
 	m_SchemeHandler->OnTlsHandshakeCompleted();
-	m_Callbacks.OnTlsHandshakeCompleted();
+	m_Callbacks->OnTlsHandshakeCompleted();
 }
 
 
@@ -607,14 +607,14 @@ std::pair<bool, AString> cUrlClientRequest::DoRequest(SharedPtr<cUrlClientReques
 std::pair<bool, AString> cUrlClient::Request(
 	const AString & a_Method,
 	const AString & a_URL,
-	cCallbacks & a_Callbacks,
+	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
 	AString && a_Body,
 	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		a_Method, a_URL, a_Callbacks, std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
 	);
 }
 
@@ -624,14 +624,14 @@ std::pair<bool, AString> cUrlClient::Request(
 
 std::pair<bool, AString> cUrlClient::Get(
 	const AString & a_URL,
-	cCallbacks & a_Callbacks,
+	cCallbacksPtr && a_Callbacks,
 	AStringMap a_Headers,
 	AString a_Body,
 	AStringMap a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"GET", a_URL, a_Callbacks, std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
 	);
 }
 
@@ -641,14 +641,14 @@ std::pair<bool, AString> cUrlClient::Get(
 
 std::pair<bool, AString> cUrlClient::Post(
 	const AString & a_URL,
-	cCallbacks & a_Callbacks,
+	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
 	AString && a_Body,
 	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"POST", a_URL, a_Callbacks, std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
 	);
 }
 
@@ -658,14 +658,14 @@ std::pair<bool, AString> cUrlClient::Post(
 
 std::pair<bool, AString> cUrlClient::Put(
 	const AString & a_URL,
-	cCallbacks & a_Callbacks,
+	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
 	AString && a_Body,
 	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"PUT", a_URL, a_Callbacks, std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
 	);
 }
 

@@ -106,10 +106,10 @@ static int TestRequest1()
 {
 	LOG("Running test 1");
 	cEvent evtFinished;
-	cCallbacks callbacks(evtFinished);
+	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
-	auto res = cUrlClient::Get("http://github.com", callbacks, AStringMap(), AString(), options);
+	auto res = cUrlClient::Get("http://github.com", std::move(callbacks), AStringMap(), AString(), options);
 	if (res.first)
 	{
 		evtFinished.Wait();
@@ -130,8 +130,8 @@ static int TestRequest2()
 {
 	LOG("Running test 2");
 	cEvent evtFinished;
-	cCallbacks callbacks(evtFinished);
-	auto res = cUrlClient::Get("http://github.com", callbacks);
+	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto res = cUrlClient::Get("http://github.com", std::move(callbacks));
 	if (res.first)
 	{
 		evtFinished.Wait();
@@ -152,10 +152,10 @@ static int TestRequest3()
 {
 	LOG("Running test 3");
 	cEvent evtFinished;
-	cCallbacks callbacks(evtFinished);
+	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
-	auto res = cUrlClient::Get("https://github.com", callbacks, AStringMap(), AString(), options);
+	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), AStringMap(), AString(), options);
 	if (res.first)
 	{
 		evtFinished.Wait();
@@ -176,8 +176,8 @@ static int TestRequest4()
 {
 	LOG("Running test 4");
 	cEvent evtFinished;
-	cCallbacks callbacks(evtFinished);
-	auto res = cUrlClient::Get("https://github.com", callbacks);
+	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto res = cUrlClient::Get("https://github.com", std::move(callbacks));
 	if (res.first)
 	{
 		evtFinished.Wait();
