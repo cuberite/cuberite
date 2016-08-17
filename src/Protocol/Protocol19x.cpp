@@ -2819,7 +2819,7 @@ void cProtocol190::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
 		m_Client->SetClientBrand(Brand);
 		// Send back our brand, including the length:
-		SendPluginMessage("MC|Brand", "\x08Cuberite");
+		SendPluginMessage("MC|Brand", "\x08""Cuberite");
 		return;
 	}
 	else if (a_Channel == "MC|Beacon")
