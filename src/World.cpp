@@ -2990,10 +2990,10 @@ void cWorld::CollectPickupsByPlayer(cPlayer & a_Player)
 
 
 
-void cWorld::AddPlayer(cPlayer * a_Player)
+void cWorld::AddPlayer(cPlayer * a_Player, cWorld * a_OldWorld)
 {
 	cCSLock Lock(m_CSPlayersToAdd);
-	m_PlayersToAdd.push_back(a_Player);
+	m_PlayersToAdd.emplace_back(a_Player, a_OldWorld);
 }
 
 
@@ -3010,7 +3010,10 @@ void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
 	}
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
-		m_PlayersToAdd.remove(a_Player);
+		m_PlayersToAdd.remove_if([&](const std::pair< cPlayer *, cWorld * > & value) -> bool
+		{
+			return (value.first == a_Player);
+		});
 	}
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -3895,7 +3898,7 @@ void cWorld::AddQueuedPlayers(void)
 	ASSERT(m_TickThread.IsCurrentThread());
 
 	// Grab the list of players to add, it has to be locked to access it:
-	cPlayerList PlayersToAdd;
+	cAwaitingPlayerList PlayersToAdd;
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
 		std::swap(PlayersToAdd, m_PlayersToAdd);
@@ -3904,8 +3907,9 @@ void cWorld::AddQueuedPlayers(void)
 	// Add all the players in the grabbed list:
 	{
 		cCSLock Lock(m_CSPlayers);
-		for (auto Player : PlayersToAdd)
+		for (auto & AwaitingPlayer : PlayersToAdd)
 		{
+			auto & Player = AwaitingPlayer.first;
 			ASSERT(std::find(m_Players.begin(), m_Players.end(), Player) == m_Players.end());  // Is it already in the list? HOW?
 			LOGD("Adding player %s to world \"%s\".", Player->GetName().c_str(), m_WorldName.c_str());
 
@@ -3922,9 +3926,10 @@ void cWorld::AddQueuedPlayers(void)
 	// Add all the players' clienthandles:
 	{
 		cCSLock Lock(m_CSClients);
-		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
+		for (auto & AwaitingPlayer : PlayersToAdd)
 		{
-			cClientHandlePtr Client = (*itr)->GetClientHandlePtr();
+			auto & Player = AwaitingPlayer.first;
+			cClientHandlePtr Client = Player->GetClientHandlePtr();
 			if (Client != nullptr)
 			{
 				m_Clients.push_back(Client);
@@ -3933,16 +3938,26 @@ void cWorld::AddQueuedPlayers(void)
 	}  // Lock(m_CSClients)
 
 	// Stream chunks to all eligible clients:
-	for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
+	for (auto & AwaitingPlayer : PlayersToAdd)
 	{
-		cClientHandle * Client = (*itr)->GetClientHandle();
+		auto & Player = AwaitingPlayer.first;
+		cClientHandle * Client = Player->GetClientHandle();
 		if (Client != nullptr)
 		{
 			Client->SendPlayerMoveLook();
 			Client->SendHealth();
-			Client->SendWholeInventory(*(*itr)->GetWindow());
+			Client->SendWholeInventory(*Player->GetWindow());
 		}
 	}  // for itr - PlayersToAdd[]
+
+	// Call EntityChangedWorld callback on all eligible clients
+	for (auto & AwaitingPlayer : PlayersToAdd)
+	{
+		if (AwaitingPlayer.second != nullptr)
+		{
+			cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*(static_cast <cEntity *>(AwaitingPlayer.first)), *AwaitingPlayer.second);
+		}
+	}
 }
 
 
