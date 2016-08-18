@@ -478,8 +478,7 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(1, "cWorld") ||
-		!L.CheckParamNumber  (2) ||
-		!L.CheckParamFunction(3)
+		!L.CheckParamFunction(2)
 	)
 	{
 		return 0;
