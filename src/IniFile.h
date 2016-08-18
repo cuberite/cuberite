@@ -33,6 +33,9 @@
 class cIniFile : public cSettingsRepositoryInterface
 {
 private:
+	typedef cSettingsRepositoryInterface Super;
+
+
 	bool m_IsCaseInsensitive;
 
 	AString m_Filename;
@@ -55,6 +58,14 @@ private:
 	void RemoveBom(AString & a_line) const;
 
 public:
+
+	// NOTE: This has to be present for ToLua++'s parser to output the noID constant into the API
+	// We don't want to export the entire base class, so the constant needs to get pulled into this descendant
+	enum
+	{
+		noID = Super::noID,
+	};
+
 
 	/** Creates a new instance with no data */
 	cIniFile(void);
