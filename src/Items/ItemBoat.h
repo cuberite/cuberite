@@ -73,19 +73,22 @@ public:
 			return false;
 		}
 
-		double x = Callbacks.m_Pos.x;
-		double y = Callbacks.m_Pos.y;
-		double z = Callbacks.m_Pos.z;
+		auto x = Callbacks.m_Pos.x;
+		auto y = Callbacks.m_Pos.y;
+		auto z = Callbacks.m_Pos.z;
+		auto bx = FloorC(x);
+		auto by = FloorC(y);
+		auto bz = FloorC(z);
 
 		// Verify that block type for spawn point is water
-		BLOCKTYPE SpawnBlock = a_World->GetBlock(x, y, z);
+		BLOCKTYPE SpawnBlock = a_World->GetBlock(bx, by, bz);
 		if (!IsBlockWater(SpawnBlock))
 		{
 			return false;
 		}
 
 		// Block above must be air to spawn a boat (prevents spawning a boat underwater)
-		BLOCKTYPE BlockAbove = a_World->GetBlock(x, y + 1, z);
+		BLOCKTYPE BlockAbove = a_World->GetBlock(bx, by + 1, bz);
 		if (BlockAbove != E_BLOCK_AIR)
 		{
 			return false;
