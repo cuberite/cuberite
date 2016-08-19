@@ -12,11 +12,12 @@ If owning a state, trying to attach a state will automatically close the previou
 Calling a Lua function is done internally by pushing the function using PushFunction(), then pushing the
 arguments and finally executing CallFunction(). cLuaState automatically keeps track of the number of
 arguments and the name of the function (for logging purposes). After the call the return values are read from
-the stack using GetStackValue(). All of this is wrapped in a templated function overloads cLuaState::Call(),
-which is generated automatically by gen_LuaState_Call.lua script file into the LuaState_Call.inc file.
+the stack using GetStackValue(). All of this is wrapped in a templated function overloads cLuaState::Call().
 
 Reference management is provided by the cLuaState::cRef class. This is used when you need to hold a reference to
-any Lua object across several function calls. The class is RAII-like, with automatic resource management.
+any Lua object across several function calls. The class is RAII-like, with automatic resource management. Note
+that the cRef object is not inherently thread-safe and is not notified when its cLuaState is closed. For those
+purposes, cTrackedRef can be used.
 
 Callbacks management is provided by the cLuaState::cCallback class. Use a GetStackValue() with cCallbackPtr
 parameter to store the callback, and then at any time you can use the cCallback's Call() templated function
@@ -461,6 +462,14 @@ public:
 
 	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
+
+	/** Pushes multiple arguments onto the Lua stack. */
+	template <typename Arg1, typename Arg2, typename... Args>
+	void Push(Arg1 && a_Arg1, Arg2 && a_Arg2, Args &&... a_Args)
+	{
+		Push(std::forward<Arg1>(a_Arg1));
+		Push(std::forward<Arg2>(a_Arg2), std::forward<Args>(a_Args)...);
+	}
 
 	void PushNil(void);
 

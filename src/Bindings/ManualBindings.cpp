@@ -2062,14 +2062,7 @@ static int tolua_cUrlParser_Parse(lua_State * a_LuaState)
 		L.Push(res.second);
 		return 2;
 	}
-	L.Push(scheme);
-	L.Push(username);
-	L.Push(password);
-	L.Push(host);
-	L.Push(port);
-	L.Push(path);
-	L.Push(query);
-	L.Push(fragment);
+	L.Push(scheme, username, password, host, port, path, query, fragment);
 	return 8;
 }
 
@@ -2110,10 +2103,7 @@ static int tolua_cUrlParser_ParseAuthorityPart(lua_State * a_LuaState)
 		L.Push(res.second);
 		return 2;
 	}
-	L.Push(username);
-	L.Push(password);
-	L.Push(host);
-	L.Push(port);
+	L.Push(username, password, host, port);
 	return 4;
 }
 
@@ -2976,9 +2966,7 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	}
 
 	// Push the output, number of ticks and input as the three return values:
-	L.Push(Recipe->Out);
-	L.Push(Recipe->CookTime);
-	L.Push(Recipe->In);
+	L.Push(Recipe->Out, Recipe->CookTime, Recipe->In);
 	return 3;
 }
 
@@ -3141,12 +3129,7 @@ static int tolua_cBlockArea_GetNonAirCropRelCoords(lua_State * tolua_S)
 	self->GetNonAirCropRelCoords(MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ, IgnoreBlockType);
 
 	// Push the six crop coords:
-	L.Push(MinRelX);
-	L.Push(MinRelY);
-	L.Push(MinRelZ);
-	L.Push(MaxRelX);
-	L.Push(MaxRelY);
-	L.Push(MaxRelZ);
+	L.Push(MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ);
 	return 6;
 }
 
@@ -3405,8 +3388,7 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 	L.Push(res);
 	if (res)
 	{
-		L.Push(lineCoeff);
-		L.Push(blockFace);
+		L.Push(lineCoeff, blockFace);
 		return 3;
 	}
 	return 1;
@@ -3465,8 +3447,7 @@ static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
 	BLOCKTYPE blockType;
 	NIBBLETYPE blockMeta;
 	self->GetBlockTypeMeta(relX, relY, relZ, blockType, blockMeta);
-	L.Push(blockType);
-	L.Push(blockMeta);
+	L.Push(blockType, blockMeta);
 	return 2;
 }
 

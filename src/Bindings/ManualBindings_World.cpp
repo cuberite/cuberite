@@ -296,10 +296,7 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 	L.Push(res);
 	if (res)
 	{
-		L.Push(BlockType);
-		L.Push(BlockMeta);
-		L.Push(BlockSkyLight);
-		L.Push(BlockBlockLight);
+		L.Push(BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
 		return 5;
 	}
 	return 1;
@@ -345,8 +342,7 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 	L.Push(res);
 	if (res)
 	{
-		L.Push(BlockType);
-		L.Push(BlockMeta);
+		L.Push(BlockType, BlockMeta);
 		return 3;
 	}
 	return 1;
@@ -390,10 +386,7 @@ static int tolua_cWorld_GetSignLines(lua_State * tolua_S)
 	L.Push(res);
 	if (res)
 	{
-		L.Push(Line1);
-		L.Push(Line2);
-		L.Push(Line3);
-		L.Push(Line4);
+		L.Push(Line1, Line2, Line3, Line4);
 		return 5;
 	}
 	return 1;
