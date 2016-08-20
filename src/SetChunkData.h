@@ -116,10 +116,6 @@ protected:
 	bool m_ShouldMarkDirty;
 };
 
-typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
-typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
-
-
 
 
 

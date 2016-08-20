@@ -12,25 +12,19 @@ class cSpawnPrepare
 {
 
 public:
-	static void PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance);
+	cSpawnPrepare(cWorld & a_World, int a_PrepareDistance, std::function<void()> a_PreparationCompletedCallback);
+
+	static void PrepareChunks(cWorld & a_World, int a_PrepareDistance, std::function<void()> a_PreparationCompletedCallback = {});
+
+	/** Generates a random spawnpoint on solid land by walking chunks and finding their biomes */
+	static Vector3d GenerateRandomSpawn(cWorld & a_World, int a_PrepareDistance);
 
 protected:
 	cWorld & m_World;
-	int m_SpawnChunkX;
-	int m_SpawnChunkZ;
-	int m_PrepareDistance;
-
-	/** The index of the next chunk to be queued in the lighting thread. */
-	int m_NextIdx;
-
-	/** The maximum index of the prepared chunks. Queueing stops when m_NextIdx reaches this number. */
-	int m_MaxIdx;
+	const int m_TotalChunks;
 
 	/** Total number of chunks already finished preparing. Preparation finishes when this number reaches m_MaxIdx. */
-	std::atomic<int> m_NumPrepared;
-
-	/** Event used to signal that the preparation is finished. */
-	cEvent m_EvtFinished;
+	int m_NumPrepared;
 
 	/** The timestamp of the last progress report emitted. */
 	std::chrono::steady_clock::time_point m_LastReportTime;
@@ -38,12 +32,19 @@ protected:
 	/** Number of chunks prepared when the last progress report was emitted. */
 	int m_LastReportChunkCount;
 
-	cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance, int a_FirstIdx);
+	std::function<void()> m_PreparationCompletedCallback;
 
 	void PreparedChunkCallback(int a_ChunkX, int a_ChunkZ);
 
-	/** Decodes the index into chunk coords. Provides the specific chunk ordering. */
-	void DecodeChunkCoords(int a_Idx, int & a_ChunkX, int & a_ChunkZ);
+	/** Returns if the biome of the given chunk coordinates is a valid spawn candidate. */
+	static bool IsValidSpawnBiome(cWorld & a_World, int a_ChunkX, int a_ChunkZ);
+
+	/** Can the specified coordinates be used as a spawn point?
+	Returns true if spawn position is valid and sets a_Y to the valid spawn height */
+	static bool CanSpawnAt(cWorld & a_World, double a_X, double & a_Y, double a_Z);
+
+	/** Check if player starting point is acceptable */
+	static bool CheckPlayerSpawnPoint(cWorld & a_World, int a_PosX, int a_PosY, int a_PosZ);
 
 	friend class cSpawnPrepareCallback;
 

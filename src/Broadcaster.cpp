@@ -15,13 +15,14 @@ void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const
 	m_World->DoWithChunkAt(a_Src,
 		[=](cChunk & a_Chunk) -> bool
 		{
-			for (auto && client : a_Chunk.GetAllClients())
+			for (const auto & ClientHandle : a_Chunk.GetAllStrongClientPtrs())
 			{
-				if (client == a_Exclude)
+				if (ClientHandle.get() == a_Exclude)
 				{
 					continue;
 				}
-				client->SendParticleEffect(a_ParticleName, a_Src.x, a_Src.y, a_Src.z, a_Offset.x, a_Offset.y, a_Offset.z, a_ParticleData, a_ParticleAmount);
+
+				ClientHandle->SendParticleEffect(a_ParticleName, a_Src.x, a_Src.y, a_Src.z, a_Offset.x, a_Offset.y, a_Offset.z, a_ParticleData, a_ParticleAmount);
 			};
 			return true;
 		});
@@ -33,13 +34,14 @@ void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const
 	m_World->DoWithChunkAt(a_Src,
 		[=](cChunk & a_Chunk) -> bool
 		{
-			for (auto && client : a_Chunk.GetAllClients())
+			for (const auto & ClientHandle : a_Chunk.GetAllStrongClientPtrs())
 			{
-				if (client == a_Exclude)
+				if (ClientHandle.get() == a_Exclude)
 				{
 					continue;
 				}
-				client->SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
+
+				ClientHandle->SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
 			};
 			return true;
 		});

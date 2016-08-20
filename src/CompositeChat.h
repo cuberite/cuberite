@@ -130,7 +130,7 @@ public:
 	/** Creates a new chat message and parses the text into parts.
 	Recognizes "http:" and "https:" links and @color-codes.
 	Uses ParseText() for the actual parsing. */
-	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
+	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom, const AString & a_AdditionalMessageTypeData = "");
 
 	~cCompositeChat();
 

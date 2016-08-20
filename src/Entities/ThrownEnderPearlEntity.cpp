@@ -86,7 +86,7 @@ void cThrownEnderPearlEntity::TeleportCreator(const Vector3d & a_HitPos)
 		virtual bool Item(cPlayer * a_Entity) override
 		{
 			// Teleport the creator here, make them take 5 damage:
-			a_Entity->TeleportToCoords(m_HitPos.x, m_HitPos.y + 0.2, m_HitPos.z);
+			a_Entity->TeleportToCoords(m_HitPos + Vector3d(0, 0.2, 0));
 			a_Entity->TakeDamage(dtEnderPearl, m_Attacker, 5, 0);
 			return true;
 		}

@@ -40,9 +40,7 @@ public:
 	CLASS_PROTODEF(cPlayer)
 
 
-	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
-
-	virtual bool Initialize(cWorld & a_World) override;
+	cPlayer(std::weak_ptr<cClientHandle> a_Client, const AString & a_PlayerName);
 
 	virtual ~cPlayer();
 
@@ -138,7 +136,7 @@ public:
 	/** Returns whether the player is climbing (ladders, vines etc.) */
 	bool IsClimbing(void) const;
 
-	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
+	virtual void TeleportToCoords(const Vector3d & a_Position) override;
 
 	// tolua_begin
 
@@ -217,10 +215,6 @@ public:
 
 	void SetIP(const AString & a_IP);
 
-	/** Forces the player to move in the given direction.
-	@deprecated Use SetSpeed instead. */
-	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
-
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
 
@@ -236,28 +230,28 @@ public:
 	void CloseWindowIfID(char a_WindowID, bool a_CanRefuse = true);
 
 	/** Returns the raw client handle associated with the player. */
-	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.get(); }
+	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.lock().get(); }
 
 	// tolua_end
 
 	/** Returns the SharedPtr to client handle associated with the player. */
-	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
+	auto GetClientHandlePtr(void) const { return m_ClientHandle; }
 
 	// tolua_begin
 
-	void SendMessage              (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtCustom); }
-	void SendMessageInfo          (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtInformation); }
-	void SendMessageFailure       (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
-	void SendMessageSuccess       (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtSuccess); }
-	void SendMessageWarning       (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtWarning); }
-	void SendMessageFatal         (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
-	void SendMessagePrivateMsg    (const AString & a_Message, const AString & a_Sender) { m_ClientHandle->SendChat(a_Message, mtPrivateMessage, a_Sender); }
-	void SendMessage              (const cCompositeChat & a_Message) { m_ClientHandle->SendChat(a_Message); }
+	void SendMessage(const AString & a_Message);
+	void SendMessageInfo(const AString & a_Message);
+	void SendMessageFailure(const AString & a_Message);
+	void SendMessageSuccess(const AString & a_Message);
+	void SendMessageWarning(const AString & a_Message);
+	void SendMessageFatal(const AString & a_Message);
+	void SendMessagePrivateMsg(const AString & a_Message, const AString & a_Sender);
+	void SendMessage(const cCompositeChat & a_Message);
 
-	void SendSystemMessage        (const AString & a_Message) { m_ClientHandle->SendChatSystem(a_Message, mtCustom); }
-	void SendAboveActionBarMessage(const AString & a_Message) { m_ClientHandle->SendChatAboveActionBar(a_Message, mtCustom); }
-	void SendSystemMessage        (const cCompositeChat & a_Message) { m_ClientHandle->SendChatSystem(a_Message); }
-	void SendAboveActionBarMessage(const cCompositeChat & a_Message) { m_ClientHandle->SendChatAboveActionBar(a_Message); }
+	void SendSystemMessage(const AString & a_Message);
+	void SendAboveActionBarMessage(const AString & a_Message);
+	void SendSystemMessage(const cCompositeChat & a_Message);
+	void SendAboveActionBarMessage(const cCompositeChat & a_Message);
 
 	const AString & GetName(void) const { return m_PlayerName; }
 	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }
@@ -266,7 +260,7 @@ public:
 
 	bool HasPermission(const AString & a_Permission);  // tolua_export
 
-	/** Returns true iff a_Permission matches the a_Template.
+	/** Returns true if a_Permission matches the a_Template.
 	A match is defined by either being exactly the same, or each sub-item matches until there's a wildcard in a_Template.
 	Ie. {"a", "b", "c"} matches {"a", "b", "*"} but doesn't match {"a", "b"} */
 	static bool PermissionMatches(const AStringVector & a_Permission, const AStringVector & a_Template);  // Exported in ManualBindings with AString params
@@ -367,11 +361,21 @@ public:
 	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
 	/** Moves the player to the specified world.
-	Returns true if successful, false on failure (world not found). */
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) override;
+	Overloads cEntity to perform additional housekeeping with regards to the clienthandle and world. */
+	virtual bool OnPreWorldTravel(cWorld & a_NewWorld) override;
+
+	/** Sets the player to the correct coordinates having changed world.
+	Overloads cEntity to ensure we return to our own spawn point (not the world spawn) when returning from the End. */
+	virtual void OnPostWorldTravel(eDimension a_PreviousDimension, const Vector3d & a_RecommendedPosition) override;
 
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
+
+	/** Returns whether the player is in the process of changing worlds in a thread-safe manner. */
+	bool IsChangingWorlds(void) const { return m_IsChangingWorlds; }
+
+	/** Sets whether the player is in the process of changing worlds in a thread-safe manner. */
+	void SetIsChangingWorlds(bool a_Flag) { m_IsChangingWorlds = a_Flag; }
 
 	typedef cWorld * cWorldPtr;
 
@@ -517,10 +521,6 @@ public:
 
 	virtual void Detach(void) override;
 
-	/** Called by cClientHandle when the client is being destroyed.
-	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
-	void RemoveClientHandle(void);
-
 protected:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
@@ -598,15 +598,12 @@ protected:
 
 	std::chrono::steady_clock::time_point m_LastPlayerListTime;
 
-	cClientHandlePtr m_ClientHandle;
+	std::weak_ptr<cClientHandle> m_ClientHandle;
 
 	cSlotNums m_InventoryPaintSlots;
 
 	/** If true, we are locking m_Position to m_FrozenPosition. */
 	bool m_IsFrozen;
-
-	/** Was the player frozen manually by a plugin or automatically by the server? */
-	bool m_IsManuallyFrozen;
 
 	/** Max speed, relative to the game default.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
@@ -659,10 +656,10 @@ protected:
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
 	unsigned int m_TicksUntilNextSave;
 
-	/** Flag used by food handling system to determine whether a teleport has just happened
-	Will not apply food penalties if found to be true; will set to false after processing
-	*/
-	bool m_bIsTeleporting;
+	/** Flag indicating whether the entity is in the process of changing worlds.
+	MAY be accessed concurrently.
+	Used currently to prevent chunk sending before the player is added to the destination world. */
+	std::atomic_bool m_IsChangingWorlds;
 
 	/** The short UUID (no dashes) of the player, as read from the ClientHandle.
 	If no ClientHandle is given, the UUID is initialized to empty. */
@@ -672,9 +669,6 @@ protected:
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	void ResolvePermissions(void);
-	void ResolveGroups(void);
 
 	virtual void Destroyed(void) override;
 
@@ -697,9 +691,4 @@ protected:
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
 
-private:
-
-	/** Pins the player to a_Location until Unfreeze() is called.
-	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
-	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
-} ;  // tolua_export
+};  // tolua_export

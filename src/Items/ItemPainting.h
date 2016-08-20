@@ -70,8 +70,8 @@ public:
 				{ "BurningSkull" }
 			};
 
-			cPainting * Painting = new cPainting(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
-			Painting->Initialize(*a_World);
+			auto Painting = cpp14::make_unique<cPainting>(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			Painting->Initialize(std::move(Painting), *a_World);
 
 			if (!a_Player->IsGameModeCreative())
 			{

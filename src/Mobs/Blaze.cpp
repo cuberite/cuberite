@@ -39,15 +39,9 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 		// Setting this higher gives us more wiggle room for attackrate
 		Vector3d Speed = GetLookVector() * 20;
 		Speed.y = Speed.y + 1;
-		cFireChargeEntity * FireCharge = new cFireChargeEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-		if (FireCharge == nullptr)
+		auto FireCharge = cpp14::make_unique<cFireChargeEntity>(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
+		if (!FireCharge->Initialize(std::move(FireCharge), *m_World))
 		{
-			return false;
-		}
-		if (!FireCharge->Initialize(*m_World))
-		{
-			delete FireCharge;
-			FireCharge = nullptr;
 			return false;
 		}
 		ResetAttackCooldown();

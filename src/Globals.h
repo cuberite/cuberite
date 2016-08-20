@@ -444,17 +444,49 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 	return static_cast<C>(std::ceil(a_Value));
 }
 
-
-
-//temporary replacement for std::make_unique until we get c++14
-
 namespace cpp14
 {
+	// Temporary replacement for std::make_unique until we get c++14
 	template <class T, class... Args>
 	std::unique_ptr<T> make_unique(Args&&... args)
 	{
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
+
+	// Temporary workaround for ...
+	template <typename StorageType>
+	struct move_on_copy_wrapper
+	{
+		move_on_copy_wrapper(StorageType && a_Value) :
+			value(std::move(a_Value))
+		{
+		}
+
+		move_on_copy_wrapper(const move_on_copy_wrapper & a_Other) :
+			value(std::move(a_Other.value))
+		{
+		}
+
+		move_on_copy_wrapper& operator=(const move_on_copy_wrapper & a_Other)
+		{
+			value = std::move(a_Other.value);
+			return *this;
+		}
+
+		mutable StorageType value;
+	};
+}
+
+namespace std
+{
+	template <typename WeakPtrType>
+	struct equal_to<std::weak_ptr<WeakPtrType>>
+	{
+		constexpr bool operator()(const std::weak_ptr<WeakPtrType> & a_Lhs, const std::weak_ptr<WeakPtrType> & a_Rhs) const
+		{
+			return (!a_Lhs.owner_before(a_Rhs) && !a_Rhs.owner_before(a_Lhs));
+		}
+	};
 }
 
 // a tick is 50 ms

@@ -31,7 +31,7 @@ class cEntity;
 class cClientHandle;
 class cBlockEntity;
 
-typedef std::list<cEntity *>        cEntityList;
+typedef std::vector<std::unique_ptr<cEntity>> cEntityList;
 typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 
@@ -49,6 +49,32 @@ typedef unsigned char NIBBLETYPE;
 typedef unsigned char HEIGHTTYPE;
 
 // tolua_end
+
+
+
+
+
+class cChunkCoords
+{
+public:
+	int m_ChunkX;
+	int m_ChunkZ;
+
+	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
+
+	bool operator == (const cChunkCoords & a_Other) const
+	{
+		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
+	}
+
+	bool operator != (const cChunkCoords & a_Other) const
+	{
+		return !operator == (a_Other);
+	}
+};
+
+typedef std::vector<cChunkCoords> cChunkCoordsVector;
+
 
 
 
@@ -140,6 +166,12 @@ public:
 		{
 			a_ChunkZ--;
 		}
+	}
+
+	/** Converts absolute block coords to chunk coords. */
+	inline static cChunkCoords BlockToChunk(const Vector3i & a_Position)
+	{
+		return { FloorC(a_Position.x / cChunkDef::Width),  FloorC(a_Position.x / cChunkDef::Width) };
 	}
 
 
@@ -406,27 +438,6 @@ struct sSetBlock
 
 typedef std::list<sSetBlock> sSetBlockList;
 typedef std::vector<sSetBlock> sSetBlockVector;
-
-
-
-
-
-class cChunkCoords
-{
-public:
-	int m_ChunkX;
-	int m_ChunkZ;
-
-	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
-
-	bool operator == (const cChunkCoords & a_Other) const
-	{
-		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
-	}
-} ;
-
-typedef std::list<cChunkCoords> cChunkCoordsList;
-typedef std::vector<cChunkCoords> cChunkCoordsVector;
 
 
 

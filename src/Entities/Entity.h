@@ -153,7 +153,7 @@ public:
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
-	virtual bool Initialize(cWorld & a_World);
+	virtual bool Initialize(std::unique_ptr<cEntity>a_Entity, cWorld & a_EntityWorld);
 
 	// tolua_begin
 
@@ -215,7 +215,7 @@ public:
 	void SetPosY    (double a_PosY) { SetPosition({m_Position.x, a_PosY, m_Position.z}); }
 	void SetPosZ    (double a_PosZ) { SetPosition({m_Position.x, m_Position.y, a_PosZ}); }
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ) { SetPosition({a_PosX, a_PosY, a_PosZ}); }
-	void SetPosition(const Vector3d & a_Position);
+	virtual void SetPosition(const Vector3d & a_Position);
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
@@ -299,6 +299,9 @@ public:
 	The TDI is sent through plugins first, then applied.
 	If it returns false, the entity hasn't receive any damage. */
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI);
+
+	/** Returns the position stored before the last call to SetPosition. */
+	auto GetLastPosition(void) const { return m_LastPosition; }
 
 	// tolua_begin
 
@@ -405,22 +408,29 @@ public:
 	virtual void TeleportToEntity(cEntity & a_Entity);
 
 	/** Teleports to the coordinates specified */
-	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
+	virtual void TeleportToCoords(const Vector3d & a_Position);
 
-	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false);
+	/** Moves entity to the specified world reference and to the specified position.
+	Returns if the entity changed worlds. */
+	bool MoveToWorld(cWorld & a_NewWorld, const Vector3d & a_NewPosition);
 
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
-
-	/** Moves entity to specified world, taking a world pointer */
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
-
-	/** Moves entity to specified world, taking a world name */
-	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
+	/** Moves entity to the specified world name and to the specified position.
+	Returns if the entity changed worlds. */
+	bool MoveToWorld(const AString & a_WorldName, const Vector3d & a_NewPosition);
 
 	// tolua_end
 
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+	/** Event called on initial world change request.
+	The recommended coordinates have not been calculated, and the destination spawn area may not have been prepared yet.
+	Descendants MAY overload to modify the specifics of their world change behaviour. */
+	virtual bool OnPreWorldTravel(cWorld & a_NewWorld);
+
+	/** Event called after world change request has been fully processed.
+	The suggested spawn coordinates have been calculated.
+	Descendants MAY ignore the recommended position.
+	This function MUST be called within the context of the destination world's tick thread:
+	we may safely ignore the originating world as the entity is guaranteed to no longer be accessed / ticked from that thread. */
+	virtual void OnPostWorldTravel(eDimension a_PreviousDimension, const Vector3d & a_RecommendedPosition);
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
@@ -490,14 +500,17 @@ public:
 	}
 
 	/** Sets the internal world pointer to a new cWorld, doesn't update anything else. */
-	void SetWorld(cWorld * a_World) { m_World = a_World; }
+	void SetWorld(cWorld * a_World)
+	{
+		m_World = a_World;
+	}
 
 	/** Sets the parent chunk, which is the chunk responsible for ticking this entity.
 	Only cChunk::AddEntity and cChunk::RemoveEntity cChunk::~cChunk should ever call this. */
 	void SetParentChunk(cChunk * a_Chunk);
 
 	/** Returns the chunk responsible for ticking this entity. */
-	cChunk * GetParentChunk();
+	cChunk * GetParentChunk() const;
 
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
@@ -512,6 +525,10 @@ protected:
 		/** Whether the entity has just exited the portal, and should therefore not be teleported again.
 		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
 		bool m_ShouldPreventTeleportation;
+
+		/** Whether the entity's position has been calculated and set.
+		Processing does not occur until this is true. */
+		bool m_PositionValid;
 	};
 
 	static cCriticalSection m_CSCount;
@@ -562,12 +579,6 @@ protected:
 	eEntityType m_EntityType;
 
 	cWorld * m_World;
-
-	/** State variables for ScheduleMoveToWorld. */
-	bool m_IsWorldChangeScheduled;
-	bool m_WorldChangeSetPortalCooldown;
-	cWorld * m_NewWorld;
-	Vector3d m_NewWorldPosition;
 
 	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;
@@ -655,8 +666,6 @@ private:
 	While this ticks, a player can't hit this entity. */
 	int m_InvulnerableTicks;
 } ;  // tolua_export
-
-typedef std::list<cEntity *> cEntityList;
 
 
 

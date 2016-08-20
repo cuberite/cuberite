@@ -67,6 +67,12 @@ public:
 	cChunkMap(cWorld * a_World);
 	~cChunkMap();
 
+#ifdef _DEBUG
+	/** The ID of the thread currently accessing the object.
+	Used for checking that only one thread accesses the object at a time, via cSingleThreadAccessChecker. */
+	mutable std::thread::id m_ThreadID;
+#endif
+
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle);
@@ -199,26 +205,16 @@ public:
 	void CompareChunkClients(cChunk * a_Chunk1, cChunk * a_Chunk2, cClientDiffCallback & a_Callback);
 
 	/** Adds client to a chunk, if not already present; returns true if added, false if present */
-	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
+	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, const std::shared_ptr<cClientHandle> & a_Client);
 
 	/** Removes the client from the chunk */
-	void RemoveChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
-
-	/** Removes the client from all chunks it is present in */
-	void RemoveClientFromChunks(cClientHandle * a_Client);
+	void RemoveChunkClient(int a_ChunkX, int a_ChunkZ, const std::shared_ptr<cClientHandle> & a_Client);
 
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
-	void AddEntity(cEntity * a_Entity);
-
-	/** Adds the entity to its appropriate chunk, if the entity is not already added.
-	Takes ownership of the entity pointer */
-	void AddEntityIfNotPresent(cEntity * a_Entity);
+	void AddEntity(std::unique_ptr<cEntity> a_Entity);
 
 	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(UInt32 a_EntityID);
-
-	/** Removes the entity from its appropriate chunk */
-	void RemoveEntity(cEntity * a_Entity);
 
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
@@ -395,9 +391,6 @@ public:
 	/** Queues the specified block for ticking (block update) */
 	void QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
-	cCriticalSection & GetCS(void) { return m_CSChunks; }
-
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
 	whether it has any clients or not.
@@ -447,7 +440,6 @@ private:
 
 	typedef std::list<cChunkStay *> cChunkStays;
 
-	cCriticalSection m_CSChunks;
 
 	/** A map of chunk coordinates to chunk pointers
 	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster */
@@ -491,7 +483,7 @@ private:
 	/** Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Adds a new cChunkStay descendant to the internal list of ChunkStays; loads its chunks.

@@ -10,8 +10,9 @@
 
 
 
-cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
-	m_Entity(a_MovingEntity),
+cNetherPortalScanner::cNetherPortalScanner(UInt32 a_MovingEntityID, eDimension a_PreviousDimension, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
+	m_EntityID(a_MovingEntityID),
+	m_PreviousDimension(a_PreviousDimension),
 	m_World(a_DestinationWorld),
 	m_FoundPortal(false),
 	m_BuildPlatform(true),
@@ -31,7 +32,13 @@ cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_
 			Add(x, z);
 		}
 	}
-	Enable(*a_DestinationWorld->GetChunkMap());
+
+	a_DestinationWorld->QueueTask(
+		[this](cWorld & a_World)
+		{
+			Enable(*a_World.GetChunkMap());
+		}
+	);
 }
 
 
@@ -289,8 +296,38 @@ void cNetherPortalScanner::OnDisabled(void)
 		Position.z += OutOffset;
 	}
 
-	LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
-	m_Entity->ScheduleMoveToWorld(m_World, Position, true);
+	Position.y++;
+
+	class cCallback : public cEntityCallback
+	{
+	public:
+		cCallback(const eDimension & a_PreviousDimension, const Vector3d & a_Position) :
+			m_PreviousDimension(a_PreviousDimension),
+			m_Position(a_Position)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			a_Entity->OnPostWorldTravel(m_PreviousDimension, m_Position);
+			return true;
+		}
+
+	private:
+		const eDimension & m_PreviousDimension;
+		const Vector3d & m_Position;
+	};
+	
+	m_World->QueueTask(
+		[PreviousDimension = m_PreviousDimension, Position, EntityID = m_EntityID](cWorld & a_World)
+		{
+			LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
+
+			cCallback CB(PreviousDimension, Position);
+			a_World.DoWithEntityByID(EntityID, CB);
+		}
+	);
+
 	delete this;
 }
 

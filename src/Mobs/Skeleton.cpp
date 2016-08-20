@@ -57,15 +57,9 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 		Vector3d Inaccuracy = Vector3d(Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25, Random.NextFloat(0.5) - 0.25);
 		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 5;
 		Speed.y = Speed.y - 1 + Random.NextInt(3);
-		cArrowEntity * Arrow = new cArrowEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-		if (Arrow == nullptr)
+		auto Arrow = cpp14::make_unique<cArrowEntity>(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
+		if (!Arrow->Initialize(std::move(Arrow), *m_World))
 		{
-			return false;
-		}
-		if (!Arrow->Initialize(*m_World))
-		{
-			delete Arrow;
-			Arrow = nullptr;
 			return false;
 		}
 		ResetAttackCooldown();

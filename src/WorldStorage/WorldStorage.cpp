@@ -156,6 +156,7 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallba
 {
 	ASSERT(m_World->IsChunkValid(a_ChunkX, a_ChunkZ));
 
+	m_World->MarkChunkSaving(a_ChunkX, a_ChunkZ);
 	m_SaveQueue.EnqueueItem(cChunkCoordsWithCallback(a_ChunkX, a_ChunkZ, a_Callback));
 	m_Event.Set();
 }
@@ -259,16 +260,18 @@ bool cWorldStorage::SaveOneChunk(void)
 		return false;
 	}
 
-	// Save the chunk, if it's valid:
+	cChunkCoords SaveCoordinates(ToSave.m_ChunkX, ToSave.m_ChunkZ);
 	bool Status = false;
-	if (m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
+
+	// Save the chunk; validity is checked inside a cWorld task:
+	if (m_SaveSchema->SaveChunk(SaveCoordinates))
 	{
-		m_World->MarkChunkSaving(ToSave.m_ChunkX, ToSave.m_ChunkZ);
-		if (m_SaveSchema->SaveChunk(cChunkCoords(ToSave.m_ChunkX, ToSave.m_ChunkZ)))
-		{
-			m_World->MarkChunkSaved(ToSave.m_ChunkX, ToSave.m_ChunkZ);
-			Status = true;
-		}
+		Status = true;
+		m_World->QueueTask([SaveCoordinates](cWorld & a_World)
+			{
+				a_World.MarkChunkSaved(SaveCoordinates.m_ChunkX, SaveCoordinates.m_ChunkZ);
+			}
+		);
 	}
 
 	// Call the callback, if specified:
@@ -285,8 +288,6 @@ bool cWorldStorage::SaveOneChunk(void)
 
 bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
-
 	cChunkCoords Coords(a_ChunkX, a_ChunkZ);
 
 	// First try the schema that is used for saving
@@ -305,7 +306,12 @@ bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkZ)
 	}
 
 	// Notify the chunk owner that the chunk failed to load (sets cChunk::m_HasLoadFailed to true):
-	m_World->ChunkLoadFailed(a_ChunkX, a_ChunkZ);
+	m_World->QueueTask(
+		[a_ChunkX, a_ChunkZ](cWorld & a_World)
+		{
+			a_World.ChunkLoadFailed(a_ChunkX, a_ChunkZ);
+		}
+	);
 
 	return false;
 }

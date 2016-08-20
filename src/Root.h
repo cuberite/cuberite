@@ -225,10 +225,10 @@ private:
 	/** Loads the worlds from settings.ini, creates the worldmap */
 	void LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile);
 
-	/** Starts each world's life */
+	/** Starts the tick thread of each loaded world. */
 	void StartWorlds(void);
 
-	/** Stops each world's threads, so that it's safe to unload them */
+	/** Stops each world's threads, so that it's safe to unload them. */
 	void StopWorlds(void);
 
 	/** Unloads all worlds from memory */

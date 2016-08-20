@@ -131,17 +131,18 @@ cChunk::~cChunk()
 	}
 	m_BlockEntities.clear();
 
-	// Remove and destroy all entities that are not players:
-	cEntityList Entities;
-	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
-	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
+	// Remove and destroy all entities:
+	for (auto & Entity : m_Entities)
 	{
-		if (!(*itr)->IsPlayer())
+		if (Entity->IsDestroyed())
 		{
-			// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
-			(*itr)->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
-			delete *itr;
+			// Workaround to mitigate crashing in cPlayer::SaveToDisk which may try to access destroyed member variables on server stop
+			// All entities will have been destroyed in cWorld::Stop in this circumstance
+			continue;
 		}
+
+		// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
+		Entity->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
 	}
 
 	if (m_NeighborXM != nullptr)
@@ -200,10 +201,7 @@ void cChunk::MarkRegenerating(void)
 	SetPresence(cpQueued);
 
 	// Tell all clients attached to this chunk that they want this chunk:
-	for (auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->AddWantedChunk(m_PosX, m_PosZ);
-	}  // for itr - m_LoadedByClient[]
+	GetWorld()->GetChunkSender().QueueSendChunkTo(GetPosX(), GetPosZ(), cChunkSender::E_CHUNK_PRIORITY_MEDIUM, GetAllWeakClientPtrs());
 }
 
 
@@ -213,10 +211,12 @@ void cChunk::MarkRegenerating(void)
 bool cChunk::CanUnload(void)
 {
 	return
-		m_LoadedByClient.empty() &&  // The chunk is not used by any client
+		m_LoadedByClient.empty() &&  // The chunk is not loaded by any client
 		!m_IsDirty &&                // The chunk has been saved properly or hasn't been touched since the load / gen
 		(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
-		(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
+		(m_Presence != cpQueued) &&  // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
+		(std::find_if(m_Entities.cbegin(), m_Entities.cend(), [](const decltype(m_Entities)::value_type & a_Value) { return a_Value->IsPlayer(); }) == m_Entities.cend())  // The chunk does not contain a player
+	;
 }
 
 
@@ -285,9 +285,9 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 	a_Callback.ChunkData(m_ChunkData);
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (const auto & Entity : m_Entities)
 	{
-		a_Callback.Entity(*itr);
+		a_Callback.Entity(Entity.get());
 	}
 
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -477,14 +477,14 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 	toFill.CollectSpawnableChunk(*this);
 	std::vector<Vector3d> PlayerPositions;
 	PlayerPositions.reserve(m_LoadedByClient.size());
-	for (auto ClientHandle : m_LoadedByClient)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
 		const cPlayer * currentPlayer = ClientHandle->GetPlayer();
 		PlayerPositions.push_back(currentPlayer->GetPosition());
 	}
 
 	Vector3d currentPosition;
-	for (auto entity : m_Entities)
+	for (auto & entity : m_Entities)
 	{
 		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if (entity->IsMob())
@@ -582,7 +582,7 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 			continue;
 		}
 
-		cEntity * newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
+		auto newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
 		if (newMob == nullptr)
 		{
 			continue;
@@ -606,7 +606,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	// If we are not valid, tick players and bailout
 	if (!IsValid())
 	{
-		for (auto Entity : m_Entities)
+		for (const auto & Entity : m_Entities)
 		{
 			if (Entity->IsPlayer())
 			{
@@ -631,7 +631,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+	for (auto itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
 		// Do not tick mobs that are detached from the world. They're either scheduled for teleportation or for removal.
 		if (!(*itr)->IsTicking())
@@ -656,20 +656,22 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 			continue;
 		}
 
-		if ((((*itr)->GetChunkX() != m_PosX) ||
-			((*itr)->GetChunkZ() != m_PosZ))
+		if (
+			((*itr)->GetChunkX() != m_PosX) ||
+			((*itr)->GetChunkZ() != m_PosZ)
 		)
 		{
-			// This block is very similar to RemoveEntity, except it uses an iterator to avoid scanning the whole m_Entities
-			// The entity moved out of the chunk, move it to the neighbor
-
 			(*itr)->SetParentChunk(nullptr);
-			MoveEntityToNewChunk(*itr);
+
 			// Mark as dirty if it was a server-generated entity:
 			if (!(*itr)->IsPlayer())
 			{
 				MarkDirty();
 			}
+
+			// The entity moved out of the chunk, move it to the neighbor
+			MoveEntityToNewChunk(std::move(*itr));
+
 			itr = m_Entities.erase(itr);
 		}
 		else
@@ -698,7 +700,7 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
+void cChunk::MoveEntityToNewChunk(std::unique_ptr<cEntity> a_Entity)
 {
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == nullptr)
@@ -712,28 +714,29 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	}
 
 	ASSERT(Neighbor != this);  // Moving into the same chunk? wtf?
-	Neighbor->AddEntity(a_Entity);
+	auto & EntityPtr = *a_Entity;
+	Neighbor->AddEntity(std::move(a_Entity));
 
 	class cMover :
 		public cClientDiffCallback
 	{
 		virtual void Removed(cClientHandle * a_Client) override
 		{
-			a_Client->SendDestroyEntity(*m_Entity);
+			a_Client->SendDestroyEntity(m_Entity);
 		}
 
 		virtual void Added(cClientHandle * a_Client) override
 		{
-			m_Entity->SpawnOn(*a_Client);
+			m_Entity.SpawnOn(*a_Client);
 		}
 
-		cEntity * m_Entity;
+		cEntity & m_Entity;
 
 	public:
-		cMover(cEntity * a_CallbackEntity) :
+		cMover(cEntity & a_CallbackEntity) :
 			m_Entity(a_CallbackEntity)
 		{}
-	} Mover(a_Entity);
+	} Mover(EntityPtr);
 
 	m_ChunkMap->CompareChunkClients(this, Neighbor, Mover);
 }
@@ -752,15 +755,12 @@ void cChunk::BroadcastPendingBlockChanges(void)
 	if (m_PendingSendBlocks.size() >= 10240)
 	{
 		// Resend the full chunk
-		for (auto ClientHandle : m_LoadedByClient)
-		{
-			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, ClientHandle);
-		}
+		m_World->GetChunkSender().QueueSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, m_LoadedByClient);
 	}
 	else
 	{
 		// Only send block changes
-		for (auto ClientHandle : m_LoadedByClient)
+		for (const auto & ClientHandle : GetAllStrongClientPtrs())
 		{
 			ClientHandle->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
 		}
@@ -1637,25 +1637,35 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 
 
-void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
+void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, const std::weak_ptr<cClientHandle> & a_Client)
 {
-
-	if (a_Client == nullptr)
+	auto Client = a_Client.lock();
+	if (Client == nullptr)
 	{
-		// Queue the block for all clients in the chunk (will be sent in Tick())
-		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ)));
+		return;
+	}
+	
+	if (
+		std::find_if(
+			m_LoadedByClient.cbegin(),
+			m_LoadedByClient.cend(),
+			std::bind(std::equal_to<decltype(m_LoadedByClient)::value_type>(), a_Client, std::placeholders::_1)
+		) == m_LoadedByClient.cend()
+	)
+	{
+		// Do not send block changes in chunks that weren't sent (or are soon to be sent) to the client yet
 		return;
 	}
 
 	Vector3i wp = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+	Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
 
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
 	{
 		if (((*itr)->GetPosX() == wp.x) && ((*itr)->GetPosY() == wp.y) && ((*itr)->GetPosZ() == wp.z))
 		{
-			(*itr)->SendTo(*a_Client);
+			(*itr)->SendTo(*Client);
 		}
 	}  // for itr - m_BlockEntities
 }
@@ -1726,6 +1736,35 @@ void cChunk::SetAlwaysTicked(bool a_AlwaysTicked)
 
 
 
+std::vector<std::shared_ptr<cClientHandle>> cChunk::GetAllStrongClientPtrs(void)
+{
+	std::vector<std::shared_ptr<cClientHandle>> Clients;
+	m_LoadedByClient.erase(
+		std::remove_if(
+			m_LoadedByClient.begin(),
+			m_LoadedByClient.end(),
+			[&Clients](const auto & a_Value)
+			{
+				auto ClientHandle = a_Value.lock();
+				if (ClientHandle == nullptr)
+				{
+					return true;
+				}
+
+				Clients.emplace_back(ClientHandle);
+				return false;
+			}
+		),
+		m_LoadedByClient.end()
+	);
+
+	return Clients;
+}
+
+
+
+
+
 bool cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 {
 	cBlockEntity * be = GetBlockEntity(a_X, a_Y, a_Z);
@@ -1762,10 +1801,7 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 	MarkDirty();
 
 	// Re-send the chunk to all clients:
-	for (auto ClientHandle : m_LoadedByClient)
-	{
-		m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, ClientHandle);
-	}  // for itr - m_LoadedByClient[]
+	m_World->GetChunkSender().QueueSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, m_LoadedByClient);
 }
 
 
@@ -1778,15 +1814,15 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 	double PosY = a_Player.GetPosY();
 	double PosZ = a_Player.GetPosZ();
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (auto & Entity : m_Entities)
 	{
-		if ((!(*itr)->IsPickup()) && (!(*itr)->IsProjectile()))
+		if ((!Entity->IsPickup()) && (!Entity->IsProjectile()))
 		{
 			continue;  // Only pickups and projectiles can be picked up
 		}
-		float DiffX = static_cast<float>((*itr)->GetPosX() - PosX);
-		float DiffY = static_cast<float>((*itr)->GetPosY() - PosY);
-		float DiffZ = static_cast<float>((*itr)->GetPosZ() - PosZ);
+		float DiffX = static_cast<float>(Entity->GetPosX() - PosX);
+		float DiffY = static_cast<float>(Entity->GetPosY() - PosY);
+		float DiffZ = static_cast<float>(Entity->GetPosZ() - PosZ);
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
 		{
@@ -1796,13 +1832,13 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 			);
 			*/
 			MarkDirty();
-			if ((*itr)->IsPickup())
+			if (Entity->IsPickup())
 			{
-				(reinterpret_cast<cPickup *>(*itr))->CollectedBy(a_Player);
+				reinterpret_cast<cPickup *>(Entity.get())->CollectedBy(a_Player);
 			}
 			else
 			{
-				(reinterpret_cast<cProjectileEntity *>(*itr))->CollectedBy(a_Player);
+				reinterpret_cast<cProjectileEntity *>(Entity.get())->CollectedBy(a_Player);
 			}
 		}
 		else if (SqrDist < 5 * 5)
@@ -1858,17 +1894,23 @@ void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
 
 
 
-bool cChunk::AddClient(cClientHandle * a_Client)
+bool cChunk::AddClient(const std::shared_ptr<cClientHandle> & a_Client)
 {
-	if (std::find(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client) != m_LoadedByClient.end())
+	if (
+		std::find_if(
+			m_LoadedByClient.cbegin(),
+			m_LoadedByClient.cend(),
+			std::bind(std::equal_to<decltype(m_LoadedByClient)::value_type>(), a_Client, std::placeholders::_1)  // Alternatively, std::bind1st, but you know, it's deprecated
+		) != m_LoadedByClient.end()
+	)
 	{
 		// Already there, nothing needed
 		return false;
 	}
 
-	m_LoadedByClient.push_back(a_Client);
+	m_LoadedByClient.emplace_back(a_Client);
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (const auto & Entity : m_Entities)
 	{
 		/*
 		// DEBUG:
@@ -1878,7 +1920,12 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 			a_Client->GetUsername().c_str()
 		);
 		*/
-		(*itr)->SpawnOn(*a_Client);
+		Entity->SpawnOn(*a_Client);
+	}
+
+	for (const auto & BlockEntity : m_BlockEntities)
+	{
+		BlockEntity->SendTo(*a_Client);
 	}
 	return true;
 }
@@ -1887,39 +1934,31 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 
 
 
-void cChunk::RemoveClient(cClientHandle * a_Client)
+void cChunk::RemoveClient(const std::shared_ptr<cClientHandle> & a_Client)
 {
-	auto itr = std::remove(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client);
+	auto itr = std::remove_if(
+		m_LoadedByClient.begin(),
+		m_LoadedByClient.end(),
+		std::bind(std::equal_to<decltype(m_LoadedByClient)::value_type>(), a_Client, std::placeholders::_1)
+	);
+
 	// We should always remove at most one client.
 	ASSERT(std::distance(itr, m_LoadedByClient.end()) <= 1);
+
 	// Note: itr can equal m_LoadedByClient.end()
 	m_LoadedByClient.erase(itr, m_LoadedByClient.end());
 
-	if (!a_Client->IsDestroyed())
+	for (const auto & Entity : m_Entities)
 	{
-		for (auto Entity : m_Entities)
-		{
-			/*
-			// DEBUG:
-			LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"",
-				m_PosX, m_PosZ,
-				(*itr)->GetUniqueID(), a_Client->GetUsername().c_str()
-			);
-			*/
-			a_Client->SendDestroyEntity(*Entity);
-		}
+		/*
+		// DEBUG:
+		LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"",
+			m_PosX, m_PosZ,
+			(*itr)->GetUniqueID(), a_Client->GetUsername().c_str()
+		);
+		*/
+		a_Client->SendDestroyEntity(*Entity);
 	}
-
-	return;
-}
-
-
-
-
-
-bool cChunk::HasClient(cClientHandle * a_Client)
-{
-	return std::find(m_LoadedByClient.begin(), m_LoadedByClient.end(), a_Client) != m_LoadedByClient.end();
 }
 
 
@@ -1935,34 +1974,49 @@ bool cChunk::HasAnyClients(void) const
 
 
 
-void cChunk::AddEntity(cEntity * a_Entity)
+void cChunk::AddEntity(std::unique_ptr<cEntity> a_Entity)
 {
 	if (!a_Entity->IsPlayer())
 	{
 		MarkDirty();
 	}
 
-	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
+	auto EntityPtr = a_Entity.get();
 
-	m_Entities.push_back(a_Entity);
-	ASSERT(a_Entity->GetParentChunk() == nullptr);
-	a_Entity->SetParentChunk(this);
+	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
+	m_Entities.emplace_back(std::move(a_Entity));
+
+	ASSERT(EntityPtr->GetParentChunk() == nullptr);
+	EntityPtr->SetParentChunk(this);
+	EntityPtr->SetIsTicking(true);
 }
 
 
 
 
 
-void cChunk::RemoveEntity(cEntity * a_Entity)
+void cChunk::RemoveEntity(cEntity & a_Entity)
 {
-	ASSERT(a_Entity->GetParentChunk() == this);
-	a_Entity->SetParentChunk(nullptr);
-	m_Entities.remove(a_Entity);
-	// Mark as dirty if it was a server-generated entity:
-	if (!a_Entity->IsPlayer())
+	ASSERT(a_Entity.GetParentChunk() == this);
+	ASSERT(!a_Entity.IsTicking());
+	a_Entity.SetParentChunk(nullptr);
+
+	if (!a_Entity.IsPlayer())
 	{
 		MarkDirty();
 	}
+
+	m_Entities.erase(
+		std::remove_if(
+			m_Entities.begin(),
+			m_Entities.end(),
+			[&a_Entity](const decltype(m_Entities)::value_type & a_Value)
+			{
+				return (a_Value.get() == &a_Entity);
+			}
+		),
+		m_Entities.end()
+	);
 }
 
 
@@ -1971,13 +2025,13 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 bool cChunk::HasEntity(UInt32 a_EntityID)
 {
-	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
+	for (const auto & Entity : m_Entities)
 	{
-		if ((*itr)->GetUniqueID() == a_EntityID)
+		if (Entity->GetUniqueID() == a_EntityID)
 		{
 			return true;
 		}
-	}  // for itr - m_Entities[]
+	}
 	return false;
 }
 
@@ -1988,14 +2042,14 @@ bool cChunk::HasEntity(UInt32 a_EntityID)
 bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
-	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
+	for (auto itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
 		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
-		if (a_Callback.Item(*itr))
+		if (a_Callback.Item((*itr).get()))
 		{
 			return false;
 		}
@@ -2010,7 +2064,7 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
-	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
+	for (auto itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
 		if (!(*itr)->IsTicking())
@@ -2023,7 +2077,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 			// The entity is not in the specified box
 			continue;
 		}
-		if (a_Callback.Item(*itr))
+		if (a_Callback.Item((*itr).get()))
 		{
 			return false;
 		}
@@ -2037,15 +2091,14 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
 {
-	// The entity list is locked by the parent chunkmap's CS
-	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
+	for (auto & Entity : m_Entities)
 	{
-		if (((*itr)->GetUniqueID() == a_EntityID) && ((*itr)->IsTicking()))
+		if ((Entity->GetUniqueID() == a_EntityID) && Entity->IsTicking())
 		{
-			a_CallbackResult = a_Callback.Item(*itr);
+			a_CallbackResult = a_Callback.Item(Entity.get());
 			return true;
 		}
-	}  // for itr - m_Entitites[]
+	}
 	return false;
 }
 
@@ -2821,10 +2874,10 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 
 void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
-	for (auto ClientHandle : m_LoadedByClient)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
 		ClientHandle->SendAttachEntity(a_Entity, a_Vehicle);
-	}  // for itr - LoadedByClient[]
+	}
 }
 
 
@@ -2833,14 +2886,15 @@ void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_V
 
 void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType);
+	}
 }
 
 
@@ -2849,14 +2903,15 @@ void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 
 void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
+	}
 }
 
 
@@ -2871,14 +2926,16 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	{
 		return;
 	}
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		Entity->SendTo(*(*itr));
-	}  // for itr - LoadedByClient[]
+
+		Entity->SendTo(*ClientHandle);
+	}
 }
 
 
@@ -2887,14 +2944,15 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendCollectEntity(a_Entity, a_Player);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendCollectEntity(a_Entity, a_Player);
+	}
 }
 
 
@@ -2903,14 +2961,15 @@ void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 
 void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendDestroyEntity(a_Entity);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendDestroyEntity(a_Entity);
+	}
 }
 
 
@@ -2919,7 +2978,7 @@ void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 
 void cChunk::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
 {
-	for (auto ClientHandle : m_LoadedByClient)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
 		ClientHandle->SendDetachEntity(a_Entity, a_PreviousVehicle);
 	}  // for itr - LoadedByClient[]
@@ -2931,14 +2990,15 @@ void cChunk::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_P
 
 void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
+	}
 }
 
 
@@ -2947,14 +3007,15 @@ void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int
 
 void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
+	}
 }
 
 
@@ -2963,14 +3024,15 @@ void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum,
 
 void cChunk::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityHeadLook(a_Entity);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityHeadLook(a_Entity);
+	}
 }
 
 
@@ -2979,14 +3041,15 @@ void cChunk::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityLook(a_Entity);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityLook(a_Entity);
+	}
 }
 
 
@@ -2995,14 +3058,15 @@ void cChunk::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle *
 
 void cChunk::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityMetadata(a_Entity);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityMetadata(a_Entity);
+	}
 }
 
 
@@ -3011,14 +3075,15 @@ void cChunk::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+	}
 }
 
 
@@ -3027,14 +3092,15 @@ void cChunk::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char 
 
 void cChunk::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+	}
 }
 
 
@@ -3043,14 +3109,15 @@ void cChunk::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, c
 
 void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityStatus(a_Entity, a_Status);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityStatus(a_Entity, a_Status);
+	}
 }
 
 
@@ -3059,14 +3126,15 @@ void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, cons
 
 void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityVelocity(a_Entity);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityVelocity(a_Entity);
+	}
 }
 
 
@@ -3075,14 +3143,15 @@ void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendEntityAnimation(a_Entity, a_Animation);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendEntityAnimation(a_Entity, a_Animation);
+	}
 }
 
 
@@ -3091,14 +3160,15 @@ void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation
 
 void cChunk::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
+	}
 }
 
 
@@ -3107,14 +3177,15 @@ void cChunk::BroadcastParticleEffect(const AString & a_ParticleName, float a_Src
 
 void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendRemoveEntityEffect(a_Entity, a_EffectID);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendRemoveEntityEffect(a_Entity, a_EffectID);
+	}
 }
 
 
@@ -3123,14 +3194,15 @@ void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 void cChunk::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
+	}
 }
 
 
@@ -3139,14 +3211,15 @@ void cChunk::BroadcastSoundEffect(const AString & a_SoundName, double a_X, doubl
 
 void cChunk::BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
+	}
 }
 
 
@@ -3155,14 +3228,15 @@ void cChunk::BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX,
 
 void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		a_Entity.SpawnOn(*(*itr));
-	}  // for itr - LoadedByClient[]
+
+		a_Entity.SpawnOn(*ClientHandle);
+	}
 }
 
 
@@ -3171,14 +3245,15 @@ void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Ex
 
 void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		if (*itr == a_Exclude)
+		if (ClientHandle.get() == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
-	}  // for itr - LoadedByClient[]
+
+		ClientHandle->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+	}
 }
 
 
@@ -3187,10 +3262,10 @@ void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (const auto & ClientHandle : GetAllStrongClientPtrs())
 	{
-		(*itr)->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
-	}  // for itr - LoadedByClient[]
+		ClientHandle->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+	}
 }
 
 

@@ -35,9 +35,6 @@
 // fwd:
 class cPlayer;
 class cClientHandle;
-typedef SharedPtr<cClientHandle> cClientHandlePtr;
-typedef std::list<cClientHandlePtr> cClientHandlePtrs;
-typedef std::list<cClientHandle *> cClientHandles;
 class cCommandOutputCallback;
 class cSettingsRepositoryInterface;
 
@@ -104,12 +101,6 @@ public:
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 
-	/** Called by cClientHandle's destructor; stop m_SocketThreads from calling back into a_Client */
-	void ClientDestroying(const cClientHandle * a_Client);
-
-	/** Don't tick a_Client anymore, it will be ticked from its cPlayer instead */
-	void ClientMovedToWorld(const cClientHandle * a_Client);
-
 	/** Notifies the server that a player was created; the server uses this to adjust the number of players */
 	void PlayerCreated(const cPlayer * a_Player);
 
@@ -143,6 +134,21 @@ public:
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
 
+	/** Queues a new task to be executed in the context of the server tick thread */
+	template <typename FunctionType>
+	void QueueTask(FunctionType && a_Task)
+	{
+		cCSLock Lock(m_CSTasks);
+		m_Tasks.emplace_back(a_Task);
+	}
+
+#ifdef _DEBUG
+
+	/** Debug-only function to ensure the current execution is within the context of the server tick thread */
+	bool IsInTickThread(void) { return m_TickThread.IsCurrentThread(); }
+
+#endif
+
 private:
 
 	friend class cRoot;  // so cRoot can create and destroy cServer
@@ -172,10 +178,7 @@ private:
 	cCriticalSection m_CSClients;
 
 	/** Clients that are connected to the server and not yet assigned to a cWorld. */
-	cClientHandlePtrs m_Clients;
-
-	/** Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick(). */
-	cClientHandles m_ClientsToRemove;
+	std::vector<std::shared_ptr<cClientHandle>> m_Clients;
 
 	/** Protects m_PlayerCount against multithreaded access. */
 	mutable cCriticalSection m_CSPlayerCount;
@@ -241,6 +244,12 @@ private:
 	Initialized in InitServer(), used in Start(). */
 	AStringVector m_Ports;
 
+	/** Enforces thread safety for member variable m_Tasks */
+	cCriticalSection m_CSTasks;
+
+	/** Stores tasks queued onto the server tick thread to be executed as soon as possible with tick resolution */
+	std::vector<std::function<void(void)>> m_Tasks;
+
 
 	cServer(void);
 
@@ -255,6 +264,12 @@ private:
 
 	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
+
+	/** Removes all clienthandles who return true as a response to a call to IsDestroyed() */
+	void ReleaseDestroyedClients(void);
+
+	/** Processes tasks queued in m_Tasks within the server tick thread */
+	void TickQueuedTasks(void);
 };  // tolua_export
 
 

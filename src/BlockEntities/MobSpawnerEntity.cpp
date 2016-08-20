@@ -163,7 +163,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					double PosX = Chunk->GetPosX() * cChunkDef::Width + RelX;
 					double PosZ = Chunk->GetPosZ() * cChunkDef::Width + RelZ;
 
-					cMonster * Monster = cMonster::NewMonsterFromType(m_MobType);
+					auto Monster = cMonster::NewMonsterFromType(m_MobType);
 					if (Monster == nullptr)
 					{
 						continue;
@@ -171,7 +171,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 					Monster->SetPosition(PosX, RelY, PosZ);
 					Monster->SetYaw(Random.NextFloat() * 360.0f);
-					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != cEntity::INVALID_ID)
+					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{
 						EntitiesSpawned = true;
 						Chunk->BroadcastSoundParticleEffect(
