@@ -1215,7 +1215,7 @@ void cMinecartWithChest::Destroyed()
 
 
 	// This makes the command not execute if the world is in the midst of destruction :)
-	GetWorld()->ScheduleTask(1, [this, &Pickups](cWorld & World)
+	GetWorld()->ScheduleTask(1, [this, Pickups](cWorld & World)
 	{
 		World.SpawnItemPickups(Pickups, GetPosX(), GetPosY() + 1, GetPosZ(), 4);
 	});
