@@ -8,6 +8,7 @@
 #   NO_NATIVE_OPTIMIZATION=1 disables CPU-specific optimisations for the current machine, allows use on other CPUs of the same platform
 #   DISABLE_SYSTEM_LUA=1     disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
 #   SELF_TEST=1              enables testing code to be built
+#   DISABLE_CCACHE=1         disable the use of ccache (external compiler cache)
 
 
 
@@ -110,6 +111,15 @@ endif()
 
 set(BUILD_TOOLS OFF CACHE BOOL "")
 set(SELF_TEST OFF CACHE BOOL "")
+
+# Check whether ccache can be used:
+if (NOT(DISABLE_CCACHE))
+	find_program(CCACHE_FOUND ccache)
+	if(CCACHE_FOUND)
+	    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+	    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+	endif(CCACHE_FOUND)
+endif()
 
 # Check whether Lua 5.1 can be used:
 if (NOT(DISABLE_SYSTEM_LUA))
