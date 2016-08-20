@@ -1206,10 +1206,19 @@ void cMinecartWithChest::OpenNewWindow()
 
 void cMinecartWithChest::Destroyed()
 {
-	GetWindow()->OwnerDestroyed();
+	if (GetWindow() != nullptr)
+	{
+		GetWindow()->OwnerDestroyed();
+	}
 	cItems Pickups;
 	m_Contents.CopyToItems(Pickups);
-	GetWorld()->SpawnItemPickups(Pickups, GetPosX(), GetPosY() + 1, GetPosZ(), 4);
+
+
+	// This makes the command not execute if the world is in the midst of destruction :)
+	GetWorld()->ScheduleTask(1, [this, &Pickups](cWorld & World)
+	{
+		World.SpawnItemPickups(Pickups, GetPosX(), GetPosY() + 1, GetPosZ(), 4);
+	});
 }
 
 
