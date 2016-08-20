@@ -113,6 +113,10 @@ macro(set_flags)
 		# We use a signed char (fixes #640 on RasPi)
 		add_flags_cxx("-fsigned-char")
 
+		# Ubuntu gcc-defaults package bug #1228201
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+			add_flags_lnk("-Wl,--no-as-needed")
+		endif()
 	endif()
 
 
@@ -299,7 +303,7 @@ macro(set_exe_flags)
 					add_flags_cxx("-Wno-double-promotion")
 				endif()
 			endif()
-			add_flags_cxx("-Wno-error=unused-command-line-argument")
+			add_flags_cxx("-Qunused-arguments")
 		endif()
 	endif()
 
