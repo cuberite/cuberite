@@ -17,7 +17,7 @@ class cBehaviorAggressive;
 class cBehaviorBreeder;
 class cBehaviorChaser;
 class cBehaviorStriker;
-
+class cBehaviorWanderer;
 // tolua_begin
 class cMonster :
 	public cPawn
@@ -164,6 +164,7 @@ public:
 	virtual const cBehaviorBreeder * GetBehaviorBreeder() const;
 	virtual cBehaviorChaser * GetBehaviorChaser();
 	virtual cBehaviorStriker * GetBehaviorStriker();
+	virtual cBehaviorWanderer * GetBehaviorWanderer();
 
 	// Polymorphic behavior functions
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);

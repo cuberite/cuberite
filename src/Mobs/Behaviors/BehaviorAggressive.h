@@ -24,7 +24,7 @@ private:
 
 	// Our parent
 	cMonster * m_Parent;
-	cBehaviorChaser * m_ParentAttacker;
+	cBehaviorChaser * m_ParentChaser;
 
 	// The mob we want to attack
 	cPawn * m_Target;

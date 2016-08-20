@@ -15,10 +15,9 @@ class cBehaviorChaser
 
 public:
 	cBehaviorChaser(cMonster * a_Parent);
-	void Chase();
 
 	// Functions our host Monster should invoke:
-	void Tick();
+	bool ActiveTick();
 	void Destroyed();
 
 	// Our host monster will call these once it loads its config file

@@ -974,6 +974,15 @@ cBehaviorStriker * cMonster::GetBehaviorStriker()
 
 
 
+cBehaviorWanderer * cMonster::GetBehaviorWanderer()
+{
+	return nullptr;
+}
+
+
+
+
+
 void cMonster::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 {
 	UNUSED(a_Parent1);
