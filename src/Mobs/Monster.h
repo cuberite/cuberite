@@ -101,9 +101,6 @@ public:
 	void SetDropChanceBoots(float a_DropChanceBoots) { m_DropChanceBoots = a_DropChanceBoots; }
 	void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
 
-	/** Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick */
-	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
-
 	double GetRelativeWalkSpeed(void) const { return m_RelativeWalkSpeed; }  // tolua_export
 	void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
 

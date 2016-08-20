@@ -3,6 +3,7 @@ project (Cuberite)
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
+	AggressiveMonster.cpp
 	Bat.cpp
 	Blaze.cpp
 	CaveSpider.cpp
@@ -39,6 +40,7 @@ SET (SRCS
 	ZombiePigman.cpp)
 
 SET (HDRS
+	AggressiveMonster.h
 	Bat.h
 	Blaze.h
 	CaveSpider.h
