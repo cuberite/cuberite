@@ -110,12 +110,12 @@ bool cHTTPServer::Initialize(void)
 	// Notify the admin about the HTTPS / HTTP status
 	if (m_Cert.get() == nullptr)
 	{
-		LOGWARNING("WebServer: The server is running in unsecured HTTP mode.");
+		LOGWARNING("WebServer: The server will run in unsecured HTTP mode.");
 		LOGINFO("Put a valid HTTPS certificate in file 'webadmin/httpscert.crt' and its corresponding private key to 'webadmin/httpskey.pem' (without any password) to enable HTTPS support");
 	}
 	else
 	{
-		LOGINFO("WebServer: The server is running in secure HTTPS mode.");
+		LOGINFO("WebServer: The server will run in secure HTTPS mode.");
 	}
 	return true;
 }
@@ -129,6 +129,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 	m_Callbacks = &a_Callbacks;
 
 	// Open up requested ports:
+	AStringVector ports;
 	for (auto port : a_Ports)
 	{
 		UInt16 PortNum;
@@ -141,8 +142,21 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 		if (Handle->IsListening())
 		{
 			m_ServerHandles.push_back(Handle);
+			ports.push_back(port);
 		}
 	}  // for port - a_Ports[]
+
+	// Inform the admin about the ports opened:
+	AString reportPorts;
+	for (const auto & port: ports)
+	{
+		if (!reportPorts.empty())
+		{
+			reportPorts.append(", ");
+		}
+		reportPorts.append(port);
+	}
+	LOGINFO("WebAdmin is running on port(s) %s", reportPorts.c_str());
 
 	// Report success if at least one port opened successfully:
 	return !m_ServerHandles.empty();
