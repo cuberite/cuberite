@@ -158,12 +158,6 @@ cPlayer::cPlayer(std::weak_ptr<cClientHandle> a_Client, const AString & a_Player
 
 cPlayer::~cPlayer(void)
 {
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
-	{
-		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
-		LOGINFO("Player %s has left the game", GetName().c_str());
-	}
-
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
 
 	// Notify the server that the player is being destroyed

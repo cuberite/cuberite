@@ -455,6 +455,8 @@ private:
 	/** Protects m_Link against multithreaded access. */
 	cCriticalSection m_CSLink;
 
+	/** Non-owning pointer to the player object we are associated with
+	It is guaranteed to exist whilst the server is running and this clienthandle is alive */
 	cPlayer * m_Player;
 
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */

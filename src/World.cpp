@@ -253,6 +253,10 @@ cWorld::~cWorld()
 	Serializer.Save();
 
 	m_MapManager.SaveMapData();
+
+	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
+	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
+	m_ChunkMap.reset();
 }
 
 

@@ -572,7 +572,7 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 {
 	for (const auto & World : m_WorldsByName)
 	{
-		if (a_Callback.Item(World.second.get()))
+		if (a_Callback.Item(World.second))
 		{
 			return false;
 		}
@@ -960,7 +960,7 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	int SumMem = 0;
 	for (const auto & WorldEntry : m_WorldsByName)
 	{
-		auto World = WorldEntry.second.get();
+		auto World = WorldEntry.second;
 		int NumInGenerator = World->GetGeneratorQueueLength();
 		int NumInSaveQueue = static_cast<int>(World->GetStorageSaveQueueLength());
 		int NumInLoadQueue = static_cast<int>(World->GetStorageLoadQueueLength());
