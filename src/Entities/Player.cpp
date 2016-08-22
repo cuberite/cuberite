@@ -1827,8 +1827,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
 		ParentChunk->RemoveEntity(this);
-		a_World->AddPlayer(this);
-		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
+		a_World->AddPlayer(this, &a_OldWorld);  // New world will appropriate and announce client at his next tick
 	});
 	return true;
 }
