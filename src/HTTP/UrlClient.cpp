@@ -7,6 +7,8 @@
 #include "UrlClient.h"
 #include "UrlParser.h"
 #include "HTTPMessageParser.h"
+#include "../PolarSSL++/X509Cert.h"
+#include "../PolarSSL++/CryptoKey.h"
 
 
 
@@ -67,6 +69,38 @@ public:
 
 	bool ShouldAllowRedirects() const;
 
+	cX509CertPtr GetOwnCert() const
+	{
+		auto itr = m_Options.find("OwnCert");
+		if (itr == m_Options.end())
+		{
+			return nullptr;
+		}
+		cX509CertPtr cert;
+		if (!cert->Parse(itr->second.data(), itr->second.size()))
+		{
+			LOGD("OwnCert failed to parse");
+			return nullptr;
+		}
+		return cert;
+	}
+
+	cCryptoKeyPtr GetOwnPrivKey() const
+	{
+		auto itr = m_Options.find("OwnPrivKey");
+		if (itr == m_Options.end())
+		{
+			return nullptr;
+		}
+		cCryptoKeyPtr key;
+		auto passItr = m_Options.find("OwnPrivKeyPassword");
+		auto pass = (passItr == m_Options.end()) ? AString() : passItr->second;
+		if (!key->ParsePrivate(itr->second.data(), itr->second.size(), pass))
+		{
+			return nullptr;
+		}
+		return key;
+	}
 
 protected:
 
@@ -148,6 +182,9 @@ protected:
 	}
 
 
+	// cTCPLink::cCallbacks override: TLS handshake completed on the link:
+	virtual void OnTlsHandshakeCompleted(void) override;
+
 	/** Called when there's data incoming from the remote peer. */
 	virtual void OnReceivedData(const char * a_Data, size_t a_Length) override;
 
@@ -188,6 +225,9 @@ public:
 	/** Called when there's data incoming from the remote peer. */
 	virtual void OnReceivedData(const char * a_Data, size_t a_Length) = 0;
 
+	/** Called when the TLS handshake has completed on the underlying link. */
+	virtual void OnTlsHandshakeCompleted(void) = 0;
+
 	/** Called when the remote end closes the connection.
 	The link is still available for connection information query (IP / port).
 	Sending data on the link is not an error, but the data won't be delivered. */
@@ -223,7 +263,7 @@ public:
 		m_Link = &a_Link;
 		if (m_IsTls)
 		{
-			// TODO: Start TLS
+			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey());
 		}
 		else
 		{
@@ -231,9 +271,12 @@ public:
 		}
 	}
 
+
+	/** Sends the HTTP request over the link.
+	Common code for both HTTP and HTTPS. */
 	void SendRequest()
 	{
-		// Send the request:
+		// Compose the request line:
 		auto requestLine = m_ParentRequest.m_UrlPath;
 		if (requestLine.empty())
 		{
@@ -245,6 +288,8 @@ public:
 			requestLine.append(m_ParentRequest.m_UrlQuery);
 		}
 		m_Link->Send(Printf("%s %s HTTP/1.1\r\n", m_ParentRequest.m_Method.c_str(), requestLine.c_str()));
+
+		// Send the headers:
 		m_Link->Send(Printf("Host: %s\r\n", m_ParentRequest.m_UrlHost.c_str()));
 		m_Link->Send(Printf("Content-Length: %u\r\n", static_cast<unsigned>(m_ParentRequest.m_Body.size())));
 		for (auto itr = m_ParentRequest.m_Headers.cbegin(), end = m_ParentRequest.m_Headers.cend(); itr != end; ++itr)
@@ -252,6 +297,8 @@ public:
 			m_Link->Send(Printf("%s: %s\r\n", itr->first.c_str(), itr->second.c_str()));
 		}  // for itr - m_Headers[]
 		m_Link->Send("\r\n", 2);
+
+		// Send the body:
 		m_Link->Send(m_ParentRequest.m_Body);
 
 		// Notify the callbacks that the request has been sent:
@@ -267,6 +314,12 @@ public:
 			m_ParentRequest.CallErrorCallback("Failed to parse HTTP response");
 			return;
 		}
+	}
+
+
+	virtual void OnTlsHandshakeCompleted(void) override
+	{
+		SendRequest();
 	}
 
 
@@ -385,11 +438,11 @@ protected:
 	/** The network link. */
 	cTCPLink * m_Link;
 
-	/** If true, the TLS should be started on the link before sending the request (used for https). */
-	bool m_IsTls;
-
 	/** Parser of the HTTP response message. */
 	cHTTPMessageParser m_Parser;
+
+	/** If true, the TLS should be started on the link before sending the request (used for https). */
+	bool m_IsTls;
 
 	/** Set to true if the first line contains a redirecting HTTP status code and the options specify to follow redirects.
 	If true, and the parent request allows redirects, neither headers not the body contents are reported through the callbacks,
@@ -469,6 +522,17 @@ void cUrlClientRequest::OnConnected(cTCPLink & a_Link)
 {
 	m_Callbacks.OnConnected(a_Link);
 	m_SchemeHandler->OnConnected(a_Link);
+}
+
+
+
+
+
+void cUrlClientRequest::OnTlsHandshakeCompleted(void)
+{
+	// Notify the scheme handler and the callbacks:
+	m_SchemeHandler->OnTlsHandshakeCompleted();
+	m_Callbacks.OnTlsHandshakeCompleted();
 }
 
 

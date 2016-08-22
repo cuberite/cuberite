@@ -20,6 +20,11 @@ typedef std::vector<cTCPLinkPtr> cTCPLinkPtrs;
 class cServerHandle;
 typedef SharedPtr<cServerHandle> cServerHandlePtr;
 typedef std::vector<cServerHandlePtr> cServerHandlePtrs;
+class cCryptoKey;
+typedef SharedPtr<cCryptoKey> cCryptoKeyPtr;
+class cX509Cert;
+typedef SharedPtr<cX509Cert> cX509CertPtr;
+
 
 
 
@@ -48,6 +53,10 @@ public:
 		The link is still available for connection information query (IP / port).
 		Sending data on the link is not an error, but the data won't be delivered. */
 		virtual void OnRemoteClosed(void) = 0;
+
+		/** Called when the TLS handshake has been completed and communication can continue regularly.
+		Has an empty default implementation, so that link callback descendants don't need to specify TLS handlers when they don't use TLS at all. */
+		virtual void OnTlsHandshakeCompleted(void) {}
 
 		/** Called when an error is detected on the connection. */
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
@@ -89,6 +98,30 @@ public:
 	/** Drops the connection without any more processing.
 	Sends the RST packet, queued outgoing and incoming data is lost. */
 	virtual void Close(void) = 0;
+
+	/** Starts a TLS handshake as a client connection.
+	If a client certificate should be used for the connection, set the certificate into a_OwnCertData and
+	its corresponding private key to a_OwnPrivKeyData. If both are empty, no client cert is presented.
+	a_OwnPrivKeyPassword is the password to be used for decoding PrivKey, empty if not passworded.
+	Returns empty string on success, non-empty error description on failure. */
+	virtual AString StartTLSClient(
+		cX509CertPtr a_OwnCert,
+		cCryptoKeyPtr a_OwnPrivKey
+	) = 0;
+
+	/** Starts a TLS handshake as a server connection.
+	Set the server certificate into a_CertData and its corresponding private key to a_OwnPrivKeyData.
+	a_OwnPrivKeyPassword is the password to be used for decoding PrivKey, empty if not passworded.
+	a_StartTLSData is any data that should be pushed into the TLS before reading more data from the remote.
+	This is used mainly for protocols starting TLS in the middle of communication, when the TLS start command
+	can be received together with the TLS Client Hello message in one OnReceivedData() call, to re-queue the
+	Client Hello message into the TLS handshake buffer.
+	Returns empty string on success, non-empty error description on failure. */
+	virtual AString StartTLSServer(
+		cX509CertPtr a_OwnCert,
+		cCryptoKeyPtr a_OwnPrivKey,
+		const AString & a_StartTLSData
+	) = 0;
 
 	/** Returns the callbacks that are used. */
 	cCallbacksPtr GetCallbacks(void) const { return m_Callbacks; }

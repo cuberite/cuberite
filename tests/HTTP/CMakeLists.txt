@@ -2,6 +2,7 @@ enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/lib/libevent/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/polarssl/include)
 
 add_definitions(-DTEST_GLOBALS=1)
 
@@ -74,6 +75,9 @@ add_test(NAME HTTPMessageParser_file-test3-2 COMMAND HTTPMessageParser_file-exe 
 
 # Test parsing the request file in 512-byte chunks (should process everything in a single call):
 add_test(NAME HTTPMessageParser_file-test4-512 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPRequest1.data 512)
+
+# Test the URLClient
+add_test(NAME UrlClient-test COMMAND UrlClientTest-exe)
 
 
 
