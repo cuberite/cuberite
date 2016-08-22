@@ -38,33 +38,34 @@ static int tolua_cNetwork_Connect(lua_State * L)
 		return 0;
 	}
 
-	// Get the plugin instance:
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
-	if (Plugin == nullptr)
+	// Read the params:
+	AString host;
+	int port = 0;
+	cLuaState::cTableRefPtr callbacks;
+	if (!S.GetStackValues(2, host, port, callbacks))
 	{
-		// An error message has been already printed in GetLuaPlugin()
+		LOGWARNING("cNetwork::Connect() cannot read its parameters, failing the request.");
+		S.LogStackTrace();
+		S.LogStackValues("Values on the stack");
 		S.Push(false);
 		return 1;
 	}
-
-	// Read the params:
-	AString Host;
-	int Port = 0;
-	S.GetStackValues(2, Host, Port);
 
 	// Check validity:
-	if ((Port < 0) || (Port > 65535))
+	if ((port < 0) || (port > 65535))
 	{
-		LOGWARNING("cNetwork:Connect() called with invalid port (%d), failing the request.", Port);
+		LOGWARNING("cNetwork:Connect() called with invalid port (%d), failing the request.", port);
+		S.LogStackTrace();
 		S.Push(false);
 		return 1;
 	}
+	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Create the LuaTCPLink glue class:
-	auto Link = std::make_shared<cLuaTCPLink>(*Plugin, 4);
+	auto link = std::make_shared<cLuaTCPLink>(std::move(callbacks));
 
 	// Try to connect:
-	bool res = cNetwork::Connect(Host, static_cast<UInt16>(Port), Link, Link);
+	bool res = cNetwork::Connect(host, static_cast<UInt16>(port), link, link);
 	S.Push(res);
 
 	return 1;
@@ -91,36 +92,38 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 		return 0;
 	}
 
-	// Get the plugin instance:
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
-	if (Plugin == nullptr)
+	// Read the params:
+	UInt16 port;
+	cLuaState::cTableRefPtr callbacks;
+	if (!S.GetStackValues(2, port, callbacks))
 	{
-		// An error message has been already printed in GetLuaPlugin()
+		LOGWARNING("cNetwork:CreateUDPEndpoint() cannot read its parameters, failing the request.");
+		S.LogStackTrace();
+		S.LogStackValues("Values on the stack");
 		S.Push(false);
 		return 1;
 	}
-
-	// Read the params:
-	UInt16 Port;
 
 	// Check validity:
-	if (!S.GetStackValues(2, Port))
+	if ((port < 0) || (port > 65535))
 	{
-		LOGWARNING("cNetwork:CreateUDPEndpoint() called with invalid port, failing the request.");
+		LOGWARNING("cNetwork:CreateUDPEndpoint() called with invalid port (%d), failing the request.", port);
+		S.LogStackTrace();
 		S.Push(false);
 		return 1;
 	}
+	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Create the LuaUDPEndpoint glue class:
-	auto Endpoint = std::make_shared<cLuaUDPEndpoint>(*Plugin, 3);
-	Endpoint->Open(Port, Endpoint);
+	auto endpoint = std::make_shared<cLuaUDPEndpoint>(std::move(callbacks));
+	endpoint->Open(port, endpoint);
 
 	// Register the endpoint to be garbage-collected by Lua:
-	tolua_pushusertype(L, Endpoint.get(), "cUDPEndpoint");
+	tolua_pushusertype(L, endpoint.get(), "cUDPEndpoint");
 	tolua_register_gc(L, lua_gettop(L));
 
 	// Return the endpoint object:
-	S.Push(Endpoint.get());
+	S.Push(endpoint.get());
 	return 1;
 }
 
@@ -169,21 +172,21 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 		return 0;
 	}
 
-	// Get the plugin instance:
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
-	if (Plugin == nullptr)
+	// Read the params:
+	AString host;
+	cLuaState::cTableRefPtr callbacks;
+	if (!S.GetStackValues(2, host, callbacks))
 	{
-		// An error message has been already printed in GetLuaPlugin()
+		LOGWARNING("cNetwork::HostnameToIP() cannot read its parameters, failing the request.");
+		S.LogStackTrace();
+		S.LogStackValues("Values on the stack");
 		S.Push(false);
 		return 1;
 	}
-
-	// Read the params:
-	AString Host;
-	S.GetStackValue(2, Host);
+	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Try to look up:
-	bool res = cNetwork::HostnameToIP(Host, std::make_shared<cLuaNameLookup>(Host, *Plugin, 3));
+	bool res = cNetwork::HostnameToIP(host, std::make_shared<cLuaNameLookup>(host, std::move(callbacks)));
 	S.Push(res);
 
 	return 1;
@@ -210,21 +213,21 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 		return 0;
 	}
 
-	// Get the plugin instance:
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
-	if (Plugin == nullptr)
+	// Read the params:
+	AString ip;
+	cLuaState::cTableRefPtr callbacks;
+	if (!S.GetStackValues(2, ip, callbacks))
 	{
-		// An error message has been already printed in GetLuaPlugin()
+		LOGWARNING("cNetwork::IPToHostname() cannot read its parameters, failing the request.");
+		S.LogStackTrace();
+		S.LogStackValues("Values on the stack");
 		S.Push(false);
 		return 1;
 	}
-
-	// Read the params:
-	AString Host;
-	S.GetStackValue(2, Host);
+	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Try to look up:
-	bool res = cNetwork::IPToHostName(Host, std::make_shared<cLuaNameLookup>(Host, *Plugin, 3));
+	bool res = cNetwork::IPToHostName(ip, std::make_shared<cLuaNameLookup>(ip, std::move(callbacks)));
 	S.Push(res);
 
 	return 1;
@@ -251,38 +254,40 @@ static int tolua_cNetwork_Listen(lua_State * L)
 		return 0;
 	}
 
-	// Get the plugin instance:
-	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
-	if (Plugin == nullptr)
+	// Read the params:
+	int port = 0;
+	cLuaState::cTableRefPtr callbacks;
+	if (!S.GetStackValues(2, port, callbacks))
 	{
-		// An error message has been already printed in GetLuaPlugin()
+		LOGWARNING("cNetwork::Listen() cannot read its parameters, failing the request.");
+		S.LogStackTrace();
+		S.LogStackValues("Values on the stack");
 		S.Push(false);
 		return 1;
 	}
 
-	// Read the params:
-	int Port = 0;
-	S.GetStackValues(2, Port);
-	if ((Port < 0) || (Port > 65535))
+	// Check the validity:
+	if ((port < 0) || (port > 65535))
 	{
-		LOGWARNING("cNetwork:Listen() called with invalid port (%d), failing the request.", Port);
+		LOGWARNING("cNetwork:Listen() called with invalid port (%d), failing the request.", port);
+		S.LogStackTrace();
 		S.Push(false);
 		return 1;
 	}
-	UInt16 Port16 = static_cast<UInt16>(Port);
+	auto port16 = static_cast<UInt16>(port);
 
 	// Create the LuaTCPLink glue class:
-	auto Srv = std::make_shared<cLuaServerHandle>(Port16, *Plugin, 3);
+	auto srv = std::make_shared<cLuaServerHandle>(port16, std::move(callbacks));
 
 	// Listen:
-	Srv->SetServerHandle(cNetwork::Listen(Port16, Srv), Srv);
+	srv->SetServerHandle(cNetwork::Listen(port16, srv), srv);
 
 	// Register the server to be garbage-collected by Lua:
-	tolua_pushusertype(L, Srv.get(), "cServerHandle");
+	tolua_pushusertype(L, srv.get(), "cServerHandle");
 	tolua_register_gc(L, lua_gettop(L));
 
 	// Return the server handle wrapper:
-	S.Push(Srv.get());
+	S.Push(srv.get());
 	return 1;
 }
 

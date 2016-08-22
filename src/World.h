@@ -479,6 +479,9 @@ public:
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
 	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player) override;
 
+	/** Set default spawn at the given coordinates. */
+	bool SetSpawn(double a_X, double a_Y, double a_Z);
+
 	double GetSpawnX(void) const { return m_SpawnX; }
 	double GetSpawnY(void) const { return m_SpawnY; }
 	double GetSpawnZ(void) const { return m_SpawnZ; }

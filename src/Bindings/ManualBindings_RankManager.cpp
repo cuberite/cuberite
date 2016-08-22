@@ -489,9 +489,7 @@ static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * L)
 	}
 
 	// Push the results:
-	S.Push(MsgPrefix);
-	S.Push(MsgSuffix);
-	S.Push(MsgNameColorCode);
+	S.Push(MsgPrefix, MsgSuffix, MsgNameColorCode);
 	return 3;
 }
 
@@ -752,9 +750,7 @@ static int tolua_cRankManager_GetRankVisuals(lua_State * L)
 	}
 
 	// Push the results:
-	S.Push(MsgPrefix);
-	S.Push(MsgSuffix);
-	S.Push(MsgNameColorCode);
+	S.Push(MsgPrefix, MsgSuffix, MsgNameColorCode);
 	return 3;
 }
 

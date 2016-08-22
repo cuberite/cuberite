@@ -12,9 +12,8 @@
 
 
 
-cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cPluginLua & a_Plugin, int a_CallbacksTableStackPos):
-	m_Plugin(a_Plugin),
-	m_Callbacks(cPluginLua::cOperation(a_Plugin)(), a_CallbacksTableStackPos),
+cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_Callbacks):
+	m_Callbacks(std::move(a_Callbacks)),
 	m_Port(a_Port)
 {
 }
@@ -127,28 +126,19 @@ void cLuaServerHandle::Release(void)
 
 cTCPLink::cCallbacksPtr cLuaServerHandle::OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort)
 {
-	// If not valid anymore, drop the connection:
-	if (!m_Callbacks.IsValid())
-	{
-		return nullptr;
-	}
-
 	// Ask the plugin for link callbacks:
-	cPluginLua::cOperation Op(m_Plugin);
-	cLuaState::cRef LinkCallbacks;
+	cLuaState::cTableRefPtr LinkCallbacks;
 	if (
-		!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnIncomingConnection"), a_RemoteIPAddress, a_RemotePort, m_Port, cLuaState::Return, LinkCallbacks) ||
-		!LinkCallbacks.IsValid()
+		!m_Callbacks->CallTableFn("OnIncomingConnection", a_RemoteIPAddress, a_RemotePort, m_Port, cLuaState::Return, LinkCallbacks) ||
+		!LinkCallbacks->IsValid()
 	)
 	{
-		LOGINFO("cNetwork server (port %d) OnIncomingConnection callback failed in plugin %s. Dropping connection.",
-			m_Port, m_Plugin.GetName().c_str()
-		);
+		LOGINFO("cNetwork server (port %d) OnIncomingConnection callback failed. Dropping connection.", m_Port);
 		return nullptr;
 	}
 
 	// Create the link wrapper to use with the callbacks:
-	auto res = std::make_shared<cLuaTCPLink>(m_Plugin, std::move(LinkCallbacks), m_Self);
+	auto res = std::make_shared<cLuaTCPLink>(std::move(LinkCallbacks), m_Self);
 
 	// Add the link to the list of our connections:
 	cCSLock Lock(m_CSConnections);
@@ -163,21 +153,8 @@ cTCPLink::cCallbacksPtr cLuaServerHandle::OnIncomingConnection(const AString & a
 
 void cLuaServerHandle::OnAccepted(cTCPLink & a_Link)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
 	// Notify the plugin:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnAccepted"), static_cast<cLuaTCPLink *>(a_Link.GetCallbacks().get())))
-	{
-		LOGINFO("cNetwork server (port %d) OnAccepted callback failed in plugin %s, connection to %s:%d.",
-			m_Port, m_Plugin.GetName().c_str(), a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort()
-		);
-		return;
-	}
+	m_Callbacks->CallTableFn("OnAccepted", static_cast<cLuaTCPLink *>(a_Link.GetCallbacks().get()));
 }
 
 
@@ -186,21 +163,8 @@ void cLuaServerHandle::OnAccepted(cTCPLink & a_Link)
 
 void cLuaServerHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 {
-	// Check if we're still valid:
-	if (!m_Callbacks.IsValid())
-	{
-		return;
-	}
-
 	// Notify the plugin:
-	cPluginLua::cOperation Op(m_Plugin);
-	if (!Op().Call(cLuaState::cTableRef(m_Callbacks, "OnError"), a_ErrorCode, a_ErrorMsg))
-	{
-		LOGINFO("cNetwork server (port %d) OnError callback failed in plugin %s. The error is %d (%s).",
-			m_Port, m_Plugin.GetName().c_str(), a_ErrorCode, a_ErrorMsg.c_str()
-		);
-		return;
-	}
+	m_Callbacks->CallTableFn("OnError", a_ErrorCode, a_ErrorMsg);
 }
 
 

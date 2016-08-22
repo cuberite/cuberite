@@ -12,7 +12,6 @@
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
-#include "LuaChunkStay.h"
 #include "../Root.h"
 #include "../World.h"
 #include "../Entities/Player.h"
@@ -548,7 +547,7 @@ static int tolua_cFile_ChangeFileExt(lua_State * tolua_S)
 
 	// Execute:
 	AString FileName, NewExt;
-	ASSERT(L.GetStackValues(2, FileName, NewExt));
+	VERIFY(L.GetStackValues(2, FileName, NewExt));
 	L.Push(cFile::ChangeFileExt(FileName, NewExt));
 	return 1;
 }
@@ -575,7 +574,7 @@ static int tolua_cFile_Copy(lua_State * tolua_S)
 
 	// Execute:
 	AString SrcFile, DstFile;
-	ASSERT(L.GetStackValues(2, SrcFile, DstFile));
+	VERIFY(L.GetStackValues(2, SrcFile, DstFile));
 	L.Push(cFile::Copy(SrcFile, DstFile));
 	return 1;
 }
@@ -602,7 +601,7 @@ static int tolua_cFile_CreateFolder(lua_State * tolua_S)
 
 	// Execute:
 	AString FolderPath;
-	ASSERT(L.GetStackValues(2, FolderPath));
+	VERIFY(L.GetStackValues(2, FolderPath));
 	L.Push(cFile::CreateFolder(FolderPath));
 	return 1;
 }
@@ -629,7 +628,7 @@ static int tolua_cFile_CreateFolderRecursive(lua_State * tolua_S)
 
 	// Execute:
 	AString FolderPath;
-	ASSERT(L.GetStackValues(2, FolderPath));
+	VERIFY(L.GetStackValues(2, FolderPath));
 	L.Push(cFile::CreateFolderRecursive(FolderPath));
 	return 1;
 }
@@ -656,7 +655,7 @@ static int tolua_cFile_Delete(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::Delete(Path));
 	return 1;
 }
@@ -683,7 +682,7 @@ static int tolua_cFile_DeleteFile(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::DeleteFile(Path));
 	return 1;
 }
@@ -710,7 +709,7 @@ static int tolua_cFile_DeleteFolder(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::DeleteFolder(Path));
 	return 1;
 }
@@ -737,7 +736,7 @@ static int tolua_cFile_DeleteFolderContents(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::DeleteFolderContents(Path));
 	return 1;
 }
@@ -768,7 +767,7 @@ static int tolua_cFile_Exists(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::Exists(Path));
 	return 1;
 }
@@ -795,7 +794,7 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 
 	// Get params:
 	AString Folder;
-	ASSERT(LuaState.GetStackValues(2, Folder));
+	VERIFY(LuaState.GetStackValues(2, Folder));
 
 	// Execute and push result:
 	LuaState.Push(cFile::GetFolderContents(Folder));
@@ -824,7 +823,7 @@ static int tolua_cFile_GetLastModificationTime(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::GetLastModificationTime(Path));
 	return 1;
 }
@@ -851,7 +850,7 @@ static int tolua_cFile_GetSize(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::GetSize(Path));
 	return 1;
 }
@@ -878,7 +877,7 @@ static int tolua_cFile_IsFile(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::IsFile(Path));
 	return 1;
 }
@@ -905,7 +904,7 @@ static int tolua_cFile_IsFolder(lua_State * tolua_S)
 
 	// Execute:
 	AString Path;
-	ASSERT(L.GetStackValues(2, Path));
+	VERIFY(L.GetStackValues(2, Path));
 	L.Push(cFile::IsFolder(Path));
 	return 1;
 }
@@ -932,7 +931,7 @@ static int tolua_cFile_ReadWholeFile(lua_State * tolua_S)
 
 	// Get params:
 	AString FileName;
-	ASSERT(LuaState.GetStackValues(2, FileName));
+	VERIFY(LuaState.GetStackValues(2, FileName));
 
 	// Execute and push result:
 	LuaState.Push(cFile::ReadWholeFile(FileName));
@@ -961,7 +960,7 @@ static int tolua_cFile_Rename(lua_State * tolua_S)
 
 	// Execute:
 	AString SrcPath, DstPath;
-	ASSERT(L.GetStackValues(2, SrcPath, DstPath));
+	VERIFY(L.GetStackValues(2, SrcPath, DstPath));
 	L.Push(cFile::Rename(SrcPath, DstPath));
 	return 1;
 }
@@ -2063,14 +2062,7 @@ static int tolua_cUrlParser_Parse(lua_State * a_LuaState)
 		L.Push(res.second);
 		return 2;
 	}
-	L.Push(scheme);
-	L.Push(username);
-	L.Push(password);
-	L.Push(host);
-	L.Push(port);
-	L.Push(path);
-	L.Push(query);
-	L.Push(fragment);
+	L.Push(scheme, username, password, host, port, path, query, fragment);
 	return 8;
 }
 
@@ -2111,10 +2103,7 @@ static int tolua_cUrlParser_ParseAuthorityPart(lua_State * a_LuaState)
 		L.Push(res.second);
 		return 2;
 	}
-	L.Push(username);
-	L.Push(password);
-	L.Push(host);
-	L.Push(port);
+	L.Push(username, password, host, port);
 	return 4;
 }
 
@@ -2647,17 +2636,16 @@ class cLuaBlockTracerCallbacks :
 	public cBlockTracer::cCallbacks
 {
 public:
-	cLuaBlockTracerCallbacks(cLuaState & a_LuaState, int a_ParamNum) :
-		m_LuaState(a_LuaState),
-		m_TableRef(a_LuaState, a_ParamNum)
+	cLuaBlockTracerCallbacks(cLuaState::cTableRefPtr && a_Callbacks):
+		m_Callbacks(std::move(a_Callbacks))
 	{
 	}
 
 	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnNextBlock"),
+		if (!m_Callbacks->CallTableFn(
+			"OnNextBlock",
 			a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_EntryFace,
 			cLuaState::Return, res
 		))
@@ -2671,8 +2659,8 @@ public:
 	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnNextBlockNoData"),
+		if (!m_Callbacks->CallTableFn(
+			"OnNextBlockNoData",
 			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
 			cLuaState::Return, res
 		))
@@ -2686,8 +2674,8 @@ public:
 	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnOutOfWorld"),
+		if (!m_Callbacks->CallTableFn(
+			"OnOutOfWorld",
 			a_BlockX, a_BlockY, a_BlockZ,
 			cLuaState::Return, res
 		))
@@ -2701,8 +2689,8 @@ public:
 	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
 		bool res = false;
-		if (!m_LuaState.Call(
-			cLuaState::cTableRef(m_TableRef, "OnIntoWorld"),
+		if (!m_Callbacks->CallTableFn(
+			"OnIntoWorld",
 			a_BlockX, a_BlockY, a_BlockZ,
 			cLuaState::Return, res
 		))
@@ -2715,17 +2703,16 @@ public:
 
 	virtual void OnNoMoreHits(void) override
 	{
-		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoMoreHits"));
+		m_Callbacks->CallTableFn("OnNoMoreHits");
 	}
 
 	virtual void OnNoChunk(void) override
 	{
-		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoChunk"));
+		m_Callbacks->CallTableFn("OnNoChunk");
 	}
 
 protected:
-	cLuaState & m_LuaState;
-	cLuaState::cRef m_TableRef;
+	cLuaState::cTableRefPtr m_Callbacks;
 } ;
 
 
@@ -2759,16 +2746,22 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 		return 0;
 	}
 
+	// Get the params:
+	cWorld * world;
+	double startX, startY, startZ;
+	double endX, endY, endZ;
+	cLuaState::cTableRefPtr callbacks;
+	if (!L.GetStackValues(idx, world, callbacks, startX, startY, startZ, endX, endY, endZ))
+	{
+		LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+		L.LogStackTrace();
+		L.LogStackValues("Values on the stack");
+		return 0;
+	}
+
 	// Trace:
-	cWorld * World = reinterpret_cast<cWorld *>(tolua_tousertype(L, idx, nullptr));
-	cLuaBlockTracerCallbacks Callbacks(L, idx + 1);
-	double StartX = tolua_tonumber(L, idx + 2, 0);
-	double StartY = tolua_tonumber(L, idx + 3, 0);
-	double StartZ = tolua_tonumber(L, idx + 4, 0);
-	double EndX   = tolua_tonumber(L, idx + 5, 0);
-	double EndY   = tolua_tonumber(L, idx + 6, 0);
-	double EndZ   = tolua_tonumber(L, idx + 7, 0);
-	bool res = cLineBlockTracer::Trace(*World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ);
+	cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
+	bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, startX, startY, startZ, endX, endY, endZ);
 	tolua_pushboolean(L, res ? 1 : 0);
 	return 1;
 }
@@ -2973,9 +2966,7 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	}
 
 	// Push the output, number of ticks and input as the three return values:
-	L.Push(Recipe->Out);
-	L.Push(Recipe->CookTime);
-	L.Push(Recipe->In);
+	L.Push(Recipe->Out, Recipe->CookTime, Recipe->In);
 	return 3;
 }
 
@@ -3138,12 +3129,7 @@ static int tolua_cBlockArea_GetNonAirCropRelCoords(lua_State * tolua_S)
 	self->GetNonAirCropRelCoords(MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ, IgnoreBlockType);
 
 	// Push the six crop coords:
-	L.Push(MinRelX);
-	L.Push(MinRelY);
-	L.Push(MinRelZ);
-	L.Push(MaxRelX);
-	L.Push(MaxRelY);
-	L.Push(MaxRelZ);
+	L.Push(MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ);
 	return 6;
 }
 
@@ -3402,8 +3388,7 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 	L.Push(res);
 	if (res)
 	{
-		L.Push(lineCoeff);
-		L.Push(blockFace);
+		L.Push(lineCoeff, blockFace);
 		return 3;
 	}
 	return 1;
@@ -3462,8 +3447,7 @@ static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
 	BLOCKTYPE blockType;
 	NIBBLETYPE blockMeta;
 	self->GetBlockTypeMeta(relX, relY, relZ, blockType, blockMeta);
-	L.Push(blockType);
-	L.Push(blockMeta);
+	L.Push(blockType, blockMeta);
 	return 2;
 }
 

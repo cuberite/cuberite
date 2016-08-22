@@ -10,7 +10,7 @@
 #pragma once
 
 #include "../OSSupport/Network.h"
-#include "PluginLua.h"
+#include "LuaState.h"
 
 
 
@@ -31,8 +31,8 @@ class cLuaServerHandle:
 {
 public:
 	/** Creates a new instance of the server handle,
-	attached to the specified lua plugin and wrapping the (listen-) callbacks that are in a table at the specified stack pos. */
-	cLuaServerHandle(UInt16 a_Port, cPluginLua & a_Plugin, int a_CallbacksTableStackPos);
+	wrapping the (listen-) callbacks that are in the specified table. */
+	cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_Callbacks);
 
 	~cLuaServerHandle();
 
@@ -54,11 +54,8 @@ public:
 	void Release(void);
 
 protected:
-	/** The plugin for which the server is created. */
-	cPluginLua & m_Plugin;
-
 	/** The Lua table that holds the callbacks to be invoked. */
-	cLuaState::cRef m_Callbacks;
+	cLuaState::cTableRefPtr m_Callbacks;
 
 	/** The port on which the server is listening.
 	Used mainly for better error reporting. */

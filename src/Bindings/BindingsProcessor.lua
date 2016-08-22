@@ -878,9 +878,13 @@ function preprocess_hook(a_Package)
 				return "\19" .. n .."\20\n"
 			end
 		)  -- Replace ///< comments with an ID into a lookup table wrapped in DC3 and DC4
+
+	--[[
+	-- Output the preprocessed code out to a file for manual inspection:
 	local f = io.open("code_out.cpp", "wb")
 	f:write(a_Package.code)
 	f:close()
+	--]]
 end
 
 
