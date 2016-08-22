@@ -649,8 +649,7 @@ static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 	AString res = Link->StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword);
 	if (!res.empty())
 	{
-		S.PushNil();
-		S.Push(Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
+		S.Push(cLuaState::Nil, Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
 		return 2;
 	}
 	return 1;
@@ -695,10 +694,10 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 	AString res = Link->StartTLSServer(OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData);
 	if (!res.empty())
 	{
-		S.PushNil();
-		S.Push(Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
+		S.Push(cLuaState::Nil, Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
 		return 2;
 	}
+	S.Push(true);
 	return 1;
 }
 
