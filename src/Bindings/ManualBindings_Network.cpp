@@ -2,6 +2,7 @@
 // ManualBindings_Network.cpp
 
 // Implements the cNetwork-related API bindings for Lua
+// Also implements the cUrlClient bindings
 
 #include "Globals.h"
 #include "LuaTCPLink.h"
@@ -12,6 +13,7 @@
 #include "LuaNameLookup.h"
 #include "LuaServerHandle.h"
 #include "LuaUDPEndpoint.h"
+#include "../HTTP/UrlClient.h"
 
 
 
@@ -903,6 +905,329 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 
 
 
+/** Used when the cUrlClient Lua request wants all the callbacks.
+Maps each callback onto a Lua function callback in the callback table. */
+class cFullUrlClientCallbacks:
+	public cUrlClient::cCallbacks
+{
+public:
+	/** Creates a new instance bound to the specified table of callbacks. */
+	cFullUrlClientCallbacks(cLuaState::cTableRefPtr && a_Callbacks):
+		m_Callbacks(std::move(a_Callbacks))
+	{
+	}
+
+
+	// cUrlClient::cCallbacks overrides:
+	virtual void OnConnected(cTCPLink & a_Link) override
+	{
+		// TODO: Cannot push a cTCPLink to Lua, need to translate via cLuaTCPLink
+		m_Callbacks->CallTableFnWithSelf("OnConnected", cLuaState::Nil, a_Link.GetRemoteIP(), a_Link.GetRemotePort());
+	}
+
+
+	virtual bool OnCertificateReceived() override
+	{
+		// TODO: The received cert needs proper type specification from the underlying cUrlClient framework and in the Lua engine as well
+		bool res = true;
+		m_Callbacks->CallTableFnWithSelf("OnCertificateReceived", cLuaState::Return, res);
+		return res;
+	}
+
+
+	virtual void OnTlsHandshakeCompleted() override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnTlsHandshakeCompleted");
+	}
+
+
+	virtual void OnRequestSent() override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnRequestSent");
+	}
+
+
+	virtual void OnStatusLine(const AString & a_HttpVersion, int a_StatusCode, const AString & a_Rest) override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnStatusLine", a_HttpVersion, a_StatusCode, a_Rest);
+	}
+
+
+	virtual void OnHeader(const AString & a_Key, const AString & a_Value) override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnHeader", a_Key, a_Value);
+		m_Headers[a_Key] = a_Value;
+	}
+
+
+	virtual void OnHeadersFinished() override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnHeadersFinished", m_Headers);
+	}
+
+
+	virtual void OnBodyData(const void * a_Data, size_t a_Size) override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnBodyData", AString(reinterpret_cast<const char *>(a_Data), a_Size));
+	}
+
+
+	virtual void OnBodyFinished() override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnBodyFinished");
+	}
+
+
+	virtual void OnError(const AString & a_ErrorMsg) override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnError", a_ErrorMsg);
+	}
+
+
+	virtual void OnRedirecting(const AString & a_NewLocation) override
+	{
+		m_Callbacks->CallTableFnWithSelf("OnRedirecting", a_NewLocation);
+	}
+
+
+protected:
+	/** The Lua table containing the callbacks. */
+	cLuaState::cTableRefPtr m_Callbacks;
+
+	/** Accumulator for all the headers to be reported in the OnHeadersFinished() callback. */
+	AStringMap m_Headers;
+};
+
+
+
+
+
+/** Used when the cUrlClient Lua request has just a single callback.
+The callback is used to report the entire body at once, together with the HTTP headers, or to report an error:
+callback("BodyContents", {headers})
+callback(nil, "ErrorMessage")
+Accumulates the body contents into a single string until the body is finished.
+Accumulates all HTTP headers into an AStringMap. */
+class cSimpleUrlClientCallbacks:
+	public cUrlClient::cCallbacks
+{
+public:
+	/** Creates a new instance that uses the specified callback to report when request finishes. */
+	cSimpleUrlClientCallbacks(cLuaState::cCallbackPtr && a_Callback):
+		m_Callback(std::move(a_Callback))
+	{
+	}
+
+
+	virtual void OnHeader(const AString & a_Key, const AString & a_Value) override
+	{
+		m_Headers[a_Key] = a_Value;
+	}
+
+
+	virtual void OnBodyData(const void * a_Data, size_t a_Size) override
+	{
+		m_ResponseBody.append(reinterpret_cast<const char *>(a_Data), a_Size);
+	}
+
+
+	virtual void OnBodyFinished() override
+	{
+		m_Callback->Call(m_ResponseBody, m_Headers);
+	}
+
+
+	virtual void OnError(const AString & a_ErrorMsg) override
+	{
+		m_Callback->Call(cLuaState::Nil, a_ErrorMsg);
+	}
+
+
+protected:
+
+	/** The callback to call when the request finishes. */
+	cLuaState::cCallbackPtr m_Callback;
+
+	/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
+	AString m_ResponseBody;
+
+	/** Accumulator for all the headers to be reported in the combined callback. */
+	AStringMap m_Headers;
+};
+
+
+
+
+
+/** Common code shared among the cUrlClient request methods.
+a_Method is the method name to be used in the request.
+a_UrlStackIdx is the position on the Lua stack of the Url parameter. */
+static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString & a_Method, int a_UrlStackIdx)
+{
+	// Check params:
+	cLuaState L(a_LuaState);
+	if (!L.CheckParamString(a_UrlStackIdx))
+	{
+		return 0;
+	}
+
+	// Read params:
+	AString url, requestBody;
+	AStringMap headers, options;
+	cLuaState::cTableRefPtr callbacks;
+	cLuaState::cCallbackPtr onCompleteBodyCallback;
+	if (!L.GetStackValues(a_UrlStackIdx, url))
+	{
+		L.LogApiCallParamFailure("cUrlClient:Request()", Printf("URL (%d)", a_UrlStackIdx).c_str());
+		L.Push(false);
+		L.Push("Invalid params");
+		return 2;
+	}
+	cUrlClient::cCallbacksPtr urlClientCallbacks;
+	if (lua_istable(L, a_UrlStackIdx + 1))
+	{
+		if (!L.GetStackValue(a_UrlStackIdx + 1, callbacks))
+		{
+			L.LogApiCallParamFailure("cUrlClient:Request()", Printf("CallbacksTable (%d)", a_UrlStackIdx + 1).c_str());
+			L.Push(false);
+			L.Push("Invalid Callbacks param");
+			return 2;
+		}
+		urlClientCallbacks = cpp14::make_unique<cFullUrlClientCallbacks>(std::move(callbacks));
+	}
+	else if (lua_isfunction(L, a_UrlStackIdx + 1))
+	{
+		if (!L.GetStackValue(a_UrlStackIdx + 1, onCompleteBodyCallback))
+		{
+			L.LogApiCallParamFailure("cUrlClient:Request()", Printf("CallbacksFn (%d)", a_UrlStackIdx + 1).c_str());
+			L.Push(false);
+			L.Push("Invalid OnCompleteBodyCallback param");
+			return 2;
+		}
+		urlClientCallbacks = cpp14::make_unique<cSimpleUrlClientCallbacks>(std::move(onCompleteBodyCallback));
+	}
+	else
+	{
+		L.LogApiCallParamFailure("cUrlClient:Request()", Printf("Callbacks (%d)", a_UrlStackIdx + 1).c_str());
+		L.Push(false);
+		L.Push("Invalid OnCompleteBodyCallback param");
+		return 2;
+	}
+	if (!L.GetStackValues(a_UrlStackIdx + 2, cLuaState::cOptionalParam<AStringMap>(headers), cLuaState::cOptionalParam<AString>(requestBody), cLuaState::cOptionalParam<AStringMap>(options)))
+	{
+		L.LogApiCallParamFailure("cUrlClient:Request()", Printf("Header, Body or Options (%d, %d, %d)", a_UrlStackIdx + 2, a_UrlStackIdx + 3, a_UrlStackIdx + 4).c_str());
+		L.Push(false);
+		L.Push("Invalid params");
+		return 2;
+	}
+
+	// Make the request:
+	auto res = cUrlClient::Request(a_Method, url, std::move(urlClientCallbacks), std::move(headers), std::move(requestBody), std::move(options));
+	if (!res.first)
+	{
+		L.Push(false);
+		L.Push(res.second);
+		return 2;
+	}
+	L.Push(true);
+	return 1;
+}
+
+
+
+
+
+/** Implements cUrlClient:Get() using cUrlClient::Request(). */
+static int tolua_cUrlClient_Delete(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	cUrlClient:Delete(URL, {CallbacksFnTable}, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	cUrlClient:Delete(URL, OnCompleteBodyCallback, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	*/
+
+	return tolua_cUrlClient_Request_Common(a_LuaState, "DELETE", 2);
+}
+
+
+
+
+
+/** Implements cUrlClient:Get() using cUrlClient::Request(). */
+static int tolua_cUrlClient_Get(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	cUrlClient:Get(URL, {CallbacksFnTable}, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	cUrlClient:Get(URL, OnCompleteBodyCallback, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	*/
+
+	return tolua_cUrlClient_Request_Common(a_LuaState, "GET", 2);
+}
+
+
+
+
+
+/** Implements cUrlClient:Post() using cUrlClient::Request(). */
+static int tolua_cUrlClient_Post(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	cUrlClient:Post(URL, {CallbacksFnTable}, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	cUrlClient:Post(URL, OnCompleteBodyCallback, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	*/
+
+	return tolua_cUrlClient_Request_Common(a_LuaState, "POST", 2);
+}
+
+
+
+
+
+/** Implements cUrlClient:Put() using cUrlClient::Request(). */
+static int tolua_cUrlClient_Put(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	cUrlClient:Put(URL, {CallbacksFnTable}, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	cUrlClient:Put(URL, OnCompleteBodyCallback, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	*/
+
+	return tolua_cUrlClient_Request_Common(a_LuaState, "PUT", 2);
+}
+
+
+
+
+
+/** Binds cUrlClient::Request(). */
+static int tolua_cUrlClient_Request(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	cUrlClient:Request(Method, URL, {CallbacksFnTable}, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	cUrlClient:Request(Method, URL, OnCompleteBodyCallback, [{HeadersMapTable}], [RequestBody], [{OptionsMapTable}]) -> true / false + string
+	*/
+
+	// Check that the Method param is a string:
+	cLuaState L(a_LuaState);
+	if (!L.CheckParamString(2))
+	{
+		return 0;
+	}
+
+	// Redirect the rest to the common code:
+	AString method;
+	if (!L.GetStackValue(2, method))
+	{
+		L.LogApiCallParamFailure("cUrlClient:Request", "Method (2)");
+		L.Push(cLuaState::Nil);
+		L.Push("Invalid params");
+		return 2;
+	}
+	return tolua_cUrlClient_Request_Common(a_LuaState, method, 3);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Register the bindings:
 
@@ -913,10 +1238,12 @@ void cManualBindings::BindNetwork(lua_State * tolua_S)
 	tolua_usertype(tolua_S, "cServerHandle");
 	tolua_usertype(tolua_S, "cTCPLink");
 	tolua_usertype(tolua_S, "cUDPEndpoint");
+	tolua_usertype(tolua_S, "cUrlClient");
 	tolua_cclass(tolua_S, "cNetwork",      "cNetwork",      "", nullptr);
 	tolua_cclass(tolua_S, "cServerHandle", "cServerHandle", "", tolua_collect_cServerHandle);
 	tolua_cclass(tolua_S, "cTCPLink",      "cTCPLink",      "", nullptr);
 	tolua_cclass(tolua_S, "cUDPEndpoint",  "cUDPEndpoint",  "", tolua_collect_cUDPEndpoint);
+	tolua_cclass(tolua_S, "cUrlClient",    "cUrlClient",    "", nullptr);
 
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cNetwork");
@@ -953,6 +1280,13 @@ void cManualBindings::BindNetwork(lua_State * tolua_S)
 		tolua_function(tolua_S, "Send",             tolua_cUDPEndpoint_Send);
 	tolua_endmodule(tolua_S);
 
+	tolua_beginmodule(tolua_S, "cUrlClient");
+		tolua_function(tolua_S, "Delete",  tolua_cUrlClient_Delete);
+		tolua_function(tolua_S, "Get",     tolua_cUrlClient_Get);
+		tolua_function(tolua_S, "Post",    tolua_cUrlClient_Post);
+		tolua_function(tolua_S, "Put",     tolua_cUrlClient_Put);
+		tolua_function(tolua_S, "Request", tolua_cUrlClient_Request);
+	tolua_endmodule(tolua_S);
 }
 
 

@@ -322,6 +322,11 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 {
 	ASSERT(a_Self != nullptr);
 	cTCPLinkImplPtr Self = static_cast<cTCPLinkImpl *>(a_Self)->m_Self;
+	if (Self == nullptr)
+	{
+		// The link has already been freed
+		return;
+	}
 
 	// If an error is reported, call the error callback:
 	if (a_What & BEV_EVENT_ERROR)

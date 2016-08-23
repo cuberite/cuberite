@@ -224,6 +224,12 @@ g_PluginInfo =
 			HelpString = "Performs cBoundingBox API tests",
 		},
 		
+		["download"] =
+		{
+			Handler = HandleConsoleDownload,
+			HelpString = "Downloads a file from a specified URL",
+		},
+		
 		["hash"] =
 		{
 			Handler = HandleConsoleHash,
@@ -276,6 +282,12 @@ g_PluginInfo =
 		{
 			Handler = HandleConsoleTestTracer,
 			HelpString = "Tests the cLineBlockTracer",
+		},
+		
+		["testurlclient"] =
+		{
+			Handler = HandleConsoleTestUrlClient,
+			HelpString = "Tests the cUrlClient",
 		},
 		
 		["testurlparser"] =

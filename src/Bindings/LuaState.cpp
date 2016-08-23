@@ -2139,6 +2139,17 @@ cLuaState * cLuaState::QueryCanonLuaState(void)
 
 
 
+void cLuaState::LogApiCallParamFailure(const char * a_FnName, const char * a_ParamNames)
+{
+	LOGWARNING("%s: Cannot read params: %s, bailing out.", a_FnName, a_ParamNames);
+	LogStackTrace();
+	LogStackValues("Values on the stack");
+}
+
+
+
+
+
 int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 {
 	LOGWARNING("LUA: %s", lua_tostring(a_LuaState, -1));
