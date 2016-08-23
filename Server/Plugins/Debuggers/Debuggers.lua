@@ -61,7 +61,7 @@ function Initialize(a_Plugin)
 	-- TestUUIDFromName()
 	-- TestRankMgr()
 	TestFileExt()
-	TestFileLastMod()
+	-- TestFileLastMod()
 	TestPluginInterface()
 	
 	local LastSelfMod = cFile:GetLastModificationTime(a_Plugin:GetLocalFolder() .. "/Debuggers.lua")
@@ -2135,6 +2135,35 @@ end
 
 
 
+function HandleConsoleTestUrlClient(a_Split, a_EntireCmd)
+	local url = a_Split[2] or "https://github.com"
+	local isSuccess, msg = cUrlClient:Get(url,
+		function (a_Body, a_SecondParam)
+			if not(a_Body) then
+				-- An error has occurred, a_SecondParam is the error message
+				LOG("Error while retrieving URL \"" .. url .. "\": " .. (a_SecondParam or "<no message>"))
+				return
+			end
+			-- Body received, a_SecondParam is the HTTP headers dictionary-table
+			assert(type(a_Body) == "string")
+			assert(type(a_SecondParam) == "table")
+			LOG("URL body received, length is " .. string.len(a_Body) .. " bytes and there are these headers:")
+			for k, v in pairs(a_SecondParam) do
+				LOG("  \"" .. k .. "\": \"" .. v .. "\"")
+			end
+			LOG("(headers list finished)")
+		end
+	)
+	if not(isSuccess) then
+		LOG("cUrlClient request failed: " .. (msg or "<no message>"))
+	end
+	return true
+end
+
+
+
+
+
 function HandleConsoleTestUrlParser(a_Split, a_EntireCmd)
 	LOG("Testing cUrlParser...")
 	local UrlsToTest =
@@ -2255,6 +2284,56 @@ function HandleConsoleBBox(a_Split)
 		LOG("v2*v3 is not inside bbox")
 	end
 	
+	return true
+end
+
+
+
+
+
+function HandleConsoleDownload(a_Split)
+	-- Check params:
+	local url = a_Split[2]
+	local fnam = a_Split[3]
+	if (not(url) or not(fnam)) then
+		return true, "Missing parameters. Usage: download <url> <filename>"
+	end
+	
+	local callbacks =
+	{
+		OnStatusLine = function (self, a_HttpVersion, a_Status, a_Rest)
+			if (a_Status ~= 200) then
+				LOG("Cannot download " .. url .. ", HTTP error code " .. a_Status)
+				return
+			end
+			
+			local f, err = io.open(fnam, "wb")
+			if not(f) then
+				LOG("Cannot download " .. url .. ", error opening the file " .. fnam .. ": " .. (err or "<no message>"))
+				return
+			end
+			self.m_File = f
+		end,
+
+		OnBodyData = function (self, a_Data)
+			if (self.m_File) then
+				self.m_File:write(a_Data)
+			end
+		end,
+		
+		OnBodyFinished = function (self)
+			if (self.m_File) then
+				self.m_File:close()
+				LOG("File " .. fnam .. " has been downloaded.")
+			end
+		end,
+	}
+	
+	local isSuccess, msg = cUrlClient:Get(url, callbacks)
+	if not(isSuccess) then
+		LOG("Cannot start an URL download: " .. (msg or "<no message>"))
+		return true
+	end
 	return true
 end
 

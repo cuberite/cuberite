@@ -301,6 +301,26 @@ public:
 			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, std::forward<Args>(args)...);
 		}
 
+		/** Calls the Lua function stored under the specified name in the referenced table, if still available.
+		A "self" parameter is injected in front of all the given parameters and is set to the callback table.
+		Returns true if callback has been called.
+		Returns false if the Lua state isn't valid anymore, or the function doesn't exist. */
+		template <typename... Args>
+		bool CallTableFnWithSelf(const char * a_FnName, Args &&... args)
+		{
+			auto cs = m_CS;
+			if (cs == nullptr)
+			{
+				return false;
+			}
+			cCSLock Lock(*cs);
+			if (!m_Ref.IsValid())
+			{
+				return false;
+			}
+			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, m_Ref, std::forward<Args>(args)...);
+		}
+
 		/** Set the contained reference to the table in the specified Lua state's stack position.
 		If another table has been previously contained, it is unreferenced first.
 		Returns true on success, false on failure (not a table at the specified stack pos). */
@@ -740,6 +760,10 @@ public:
 	/** Returns the canon Lua state (the primary cLuaState instance that was used to create, rather than attach, the lua_State structure).
 	Returns nullptr if the canon Lua state cannot be queried. */
 	cLuaState * QueryCanonLuaState(void);
+
+	/** Outputs to log a warning about API call being unable to read its parameters from the stack,
+	logs the stack trace and stack values. */
+	void LogApiCallParamFailure(const char * a_FnName, const char * a_ParamNames);
 
 protected:
 

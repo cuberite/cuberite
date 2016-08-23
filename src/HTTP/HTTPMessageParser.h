@@ -31,7 +31,8 @@ public:
 		/** Called when an error has occured while parsing. */
 		virtual void OnError(const AString & a_ErrorDescription) = 0;
 
-		/** Called when the first line (request / status) is fully parsed. */
+		/** Called when the first line of the request or response is fully parsed.
+		Doesn't check the validity of the line, only extracts the first complete line. */
 		virtual void OnFirstLine(const AString & a_FirstLine) = 0;
 
 		/** Called when a single header line is parsed. */
