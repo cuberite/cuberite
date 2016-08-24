@@ -151,7 +151,7 @@ AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor)
 {
 	return Printf("<%d, %d, %d> ~ {%.02f, %.02f, %.02f}",
 		a_X, a_Y, a_Z,
-		(double)a_X / a_Divisor, (double)a_Y / a_Divisor, (double)a_Z / a_Divisor
+		static_cast<double>(a_X) / a_Divisor, static_cast<double>(a_Y) / a_Divisor, static_cast<double>(a_Z) / a_Divisor
 	);
 }
 
@@ -212,7 +212,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 		mkdir("Logs", 0777);
 	#endif
 
-	Printf(m_LogNameBase, "Logs/Log_%d_%d", (int)time(NULL), a_ClientSocket);
+	Printf(m_LogNameBase, "Logs/Log_%d_%d", static_cast<int>(time(nullptr)), static_cast<int>(a_ClientSocket));
 	AString fnam(m_LogNameBase);
 	fnam.append(".log");
 	#ifdef _WIN32
@@ -352,7 +352,7 @@ bool cConnection::ConnectToServer(void)
 	localhost.sin_family = AF_INET;
 	localhost.sin_port = htons(m_Server.GetConnectPort());
 	localhost.sin_addr.s_addr = htonl(0x7f000001);  // localhost
-	if (connect(m_ServerSocket, (sockaddr *)&localhost, sizeof(localhost)) != 0)
+	if (connect(m_ServerSocket, reinterpret_cast<const sockaddr *>(&localhost), sizeof(localhost)) != 0)
 	{
 		printf("connection to server failed: %d\n", SocketError);
 		return false;
@@ -485,13 +485,13 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
 	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
-	const Byte * Data = (const Byte *)a_Data;
+	const Byte * Data = reinterpret_cast<const Byte *>(a_Data);
 	while (a_Size > 0)
 	{
 		Byte Buffer[64 KiB];
 		size_t NumBytes = (a_Size > sizeof(Buffer)) ? sizeof(Buffer) : a_Size;
 		a_Encryptor.ProcessData(Buffer, Data, NumBytes);
-		bool res = SendData(a_Socket, (const char *)Buffer, NumBytes, a_Peer);
+		bool res = SendData(a_Socket, reinterpret_cast<const char *>(Buffer), NumBytes, a_Peer);
 		if (!res)
 		{
 			return false;
@@ -1313,7 +1313,7 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 	}
 	Log("Got PACKET_ENCRYPTION_KEY_REQUEST from the SERVER:");
 	Log("  ServerID = %s", ServerID.c_str());
-	DataLog(PublicKey.data(), PublicKey.size(), "  Public key (%u bytes)", (unsigned)PublicKey.size());
+	DataLog(PublicKey.data(), PublicKey.size(), "  Public key (%u bytes)", static_cast<unsigned>(PublicKey.size()));
 	
 	// Reply to the server:
 	SendEncryptionKeyResponse(PublicKey, Nonce);
@@ -2942,7 +2942,7 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	
 	// Encrypt the nonce:
 	Byte EncryptedNonce[128];
-	res = PubKey.Encrypt((const Byte *)a_Nonce.data(), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
+	res = PubKey.Encrypt(reinterpret_cast<const Byte *>(a_Nonce.data()), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
 	if (res < 0)
 	{
 		Log("Nonce encryption failed: %d (0x%x)", res, res);

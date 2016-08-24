@@ -3471,7 +3471,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(Rabbit.GetRabbitTypeAsNumber());
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Rabbit.GetRabbitType()));
 			a_Pkt.WriteBEUInt8(0x0c);
 			a_Pkt.WriteBEInt8(Rabbit.IsBaby() ? -1 : (Rabbit.IsInLoveCooldown() ? 1 : 0));
 			break;

@@ -3,8 +3,8 @@
 
 #include "Globals.h"
 #include "RsaPrivateKey.h"
+#include <polarssl/pk.h>
 #include "CtrDrbgContext.h"
-#include "polarssl/pk.h"
 
 
 
@@ -112,7 +112,7 @@ int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 	if (a_EncryptedLength < m_Rsa.len)
 	{
 		LOGD("%s: Invalid a_EncryptedLength: got %u, exp at least %u",
-			__FUNCTION__, (unsigned)a_EncryptedLength, (unsigned)(m_Rsa.len)
+			__FUNCTION__, static_cast<unsigned>(a_EncryptedLength), static_cast<unsigned>(m_Rsa.len)
 		);
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;
@@ -120,7 +120,7 @@ int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 	if (a_DecryptedMaxLength < m_Rsa.len)
 	{
 		LOGD("%s: Invalid a_DecryptedMaxLength: got %u, exp at least %u",
-			__FUNCTION__, (unsigned)a_EncryptedLength, (unsigned)(m_Rsa.len)
+			__FUNCTION__, static_cast<unsigned>(a_EncryptedLength), static_cast<unsigned>(m_Rsa.len)
 		);
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;
@@ -146,7 +146,7 @@ int cRsaPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 	if (a_EncryptedMaxLength < m_Rsa.len)
 	{
 		LOGD("%s: Invalid a_EncryptedMaxLength: got %u, exp at least %u",
-			__FUNCTION__, (unsigned)a_EncryptedMaxLength, (unsigned)(m_Rsa.len)
+			__FUNCTION__, static_cast<unsigned>(a_EncryptedMaxLength), static_cast<unsigned>(m_Rsa.len)
 		);
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;
@@ -154,7 +154,7 @@ int cRsaPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 	if (a_PlainLength < m_Rsa.len)
 	{
 		LOGD("%s: Invalid a_PlainLength: got %u, exp at least %u",
-			__FUNCTION__, (unsigned)a_PlainLength, (unsigned)(m_Rsa.len)
+			__FUNCTION__, static_cast<unsigned>(a_PlainLength), static_cast<unsigned>(m_Rsa.len)
 		);
 		ASSERT(!"Invalid a_PlainLength!");
 		return -1;

@@ -26,7 +26,7 @@ class cServer
 public:
 	cServer(void);
 	
-	int  Init(short a_ListenPort, short a_ConnectPort);
+	int  Init(UInt16 a_ListenPort, UInt16 a_ConnectPort);
 	void Run(void);
 	
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }

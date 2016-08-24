@@ -402,7 +402,7 @@ void cProtocol190::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 	{
 		a_SlotNum++;
 	}
-	Pkt.WriteVarInt32(a_SlotNum);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_SlotNum));
 	WriteItem(Pkt, a_Item);
 }
 
@@ -3137,7 +3137,7 @@ void cProtocol190::StartEncryption(const Byte * a_Key)
 
 
 
-eBlockFace cProtocol190::FaceIntToBlockFace(UInt32 a_BlockFace)
+eBlockFace cProtocol190::FaceIntToBlockFace(Int32 a_BlockFace)
 {
 	// Normalize the blockface values returned from the protocol
 	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
@@ -3543,14 +3543,10 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 
 			// The following expression makes Minecarts shake more with less health or higher damage taken
-			// It gets half the maximum health, and takes it away from the current health minus the half health:
-			/*
-			Health: 5 | 3 - (5 - 3) = 1 (shake power)
-			Health: 3 | 3 - (3 - 3) = 3
-			Health: 1 | 3 - (1 - 3) = 5
-			*/
 			auto & Minecart = reinterpret_cast<const cMinecart &>(a_Entity);
-			a_Pkt.WriteVarInt32((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
 
 			a_Pkt.WriteBEUInt8(6);  // Index 6: Shaking direction (doesn't seem to effect anything)
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
@@ -3570,11 +3566,11 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 					int Content = MinecartContent.m_ItemType;
 					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(Content);
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
 					a_Pkt.WriteBEUInt8(9);  // Index 9: Block ID and damage
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					a_Pkt.WriteVarInt32(RideableMinecart.GetBlockHeight());
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
 
 					a_Pkt.WriteBEUInt8(10);  // Index 10: Show block
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -3718,7 +3714,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			auto & Creeper = reinterpret_cast<const cCreeper &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);  // Index 11: State (idle or "blowing")
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : -1);
+			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : 0xffffffff);
 
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Is charged
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -3736,7 +3732,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(11);  // Index 11: Carried block
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
 			UInt32 Carried = 0;
-			Carried |= Enderman.GetCarriedBlock() << 4;
+			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
 			Carried |= Enderman.GetCarriedMeta();
 			a_Pkt.WriteVarInt32(Carried);
 
@@ -3789,18 +3785,18 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 
 			a_Pkt.WriteBEUInt8(13);  // Index 13: Variant / type
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Horse.GetHorseType());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseType()));
 
 			a_Pkt.WriteBEUInt8(14);  // Index 14: Color / style
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			int Appearance = 0;
 			Appearance = Horse.GetHorseColor();
 			Appearance |= Horse.GetHorseStyle() << 8;
-			a_Pkt.WriteVarInt32(Appearance);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Appearance));
 
 			a_Pkt.WriteBEUInt8(16);  // Index 16: Armor
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Horse.GetHorseArmour());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseArmour()));
 
 			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -3813,7 +3809,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			auto & MagmaCube = reinterpret_cast<const cMagmaCube &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);  // Index 11: Size
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(MagmaCube.GetSize());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(MagmaCube.GetSize()));
 			break;
 		}  // case mtMagmaCube
 
@@ -3873,7 +3869,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			a_Pkt.WriteBEUInt8(12);  // Index 12: sheared, color
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
 			Int8 SheepMetadata = 0;
-			SheepMetadata = static_cast<Byte>(Sheep.GetFurColor());
+			SheepMetadata = static_cast<Int8>(Sheep.GetFurColor());
 			if (Sheep.IsSheared())
 			{
 				SheepMetadata |= 0x10;
@@ -3891,7 +3887,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Type
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Rabbit.GetRabbitTypeAsNumber());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
 			break;
 		}  // case mtRabbit
 
@@ -3909,7 +3905,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 			auto & Slime = reinterpret_cast<const cSlime &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);  // Index 11: Size
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Slime.GetSize());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
 
@@ -3922,7 +3918,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Type
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Villager.GetVilType());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
 			break;
 		}  // case mtVillager
 
@@ -3980,7 +3976,7 @@ void cProtocol190::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 
 			a_Pkt.WriteBEUInt8(16);  // Index 16: Collar color
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Wolf.GetCollarColor());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Wolf.GetCollarColor()));
 			break;
 		}  // case mtWolf
 

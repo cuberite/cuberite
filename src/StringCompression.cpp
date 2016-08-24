@@ -16,7 +16,7 @@ int CompressString(const char * a_Data, size_t a_Length, AString & a_Compressed,
 
 	// HACK: We're assuming that AString returns its internal buffer in its data() call and we're overwriting that buffer!
 	// It saves us one allocation and one memcpy of the entire compressed data
-	// It may not work on some STL implementations! (Confirmed working on MSVC 2008 & 2010)
+	// It may not work on some STL implementations! (Confirmed working on all currently used MSVC, GCC and Clang versions)
 	a_Compressed.resize(CompressedSize);
 	int errorcode = compress2(reinterpret_cast<Bytef *>(const_cast<char *>(a_Compressed.data())), &CompressedSize, reinterpret_cast<const Bytef *>(a_Data), static_cast<uLong>(a_Length), a_Factor);
 	if (errorcode != Z_OK)
@@ -35,7 +35,7 @@ int UncompressString(const char * a_Data, size_t a_Length, AString & a_Uncompres
 {
 	// HACK: We're assuming that AString returns its internal buffer in its data() call and we're overwriting that buffer!
 	// It saves us one allocation and one memcpy of the entire compressed data
-	// It may not work on some STL implementations! (Confirmed working on MSVC 2008 & 2010)
+	// It may not work on some STL implementations! (Confirmed working on all currently used MSVC, GCC and Clang versions)
 	a_Uncompressed.resize(a_UncompressedSize);
 	uLongf UncompressedSize = static_cast<uLongf>(a_UncompressedSize);  // On some architectures the uLongf is different in size to int, that may be the cause of the -5 error
 	int errorcode = uncompress(reinterpret_cast<Bytef *>(const_cast<char *>(a_Uncompressed.data())), &UncompressedSize, reinterpret_cast<const Bytef *>(a_Data), static_cast<uLong>(a_Length));

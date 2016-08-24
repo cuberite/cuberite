@@ -20,7 +20,7 @@ cServer::cServer(void)
 
 
 
-int cServer::Init(short a_ListenPort, short a_ConnectPort)
+int cServer::Init(UInt16 a_ListenPort, UInt16 a_ConnectPort)
 {
 	m_ConnectPort = a_ConnectPort;
 	
@@ -50,7 +50,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 	local.sin_family = AF_INET;
 	local.sin_addr.s_addr = INADDR_ANY;  // All interfaces
 	local.sin_port = htons(a_ListenPort);
-	if (bind(m_ListenSocket, (sockaddr *)&local, sizeof(local)) != 0)
+	if (bind(m_ListenSocket, reinterpret_cast<const sockaddr *>(&local), sizeof(local)) != 0)
 	{
 		#ifdef _WIN32
 			int err = WSAGetLastError();
@@ -70,7 +70,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 		printf("Failed to listen on socket: %d\n", err);
 		return err;
 	}
-	LOGINFO("Listening on port %d, connecting to localhost:%d", a_ListenPort, a_ConnectPort);
+	LOGINFO("Listening for client connections on port %d, connecting to server at localhost:%d", a_ListenPort, a_ConnectPort);
 	
 	LOGINFO("Generating protocol encryption keypair...");
 	m_PrivateKey.Generate();
@@ -91,7 +91,7 @@ void cServer::Run(void)
 		sockaddr_in Addr;
 		memset(&Addr, 0, sizeof(Addr));
 		socklen_t AddrSize = sizeof(Addr);
-		SOCKET client = accept(m_ListenSocket, (sockaddr *)&Addr, &AddrSize);
+		SOCKET client = accept(m_ListenSocket, reinterpret_cast<sockaddr *>(&Addr), &AddrSize);
 		if (client == INVALID_SOCKET)
 		{
 			printf("accept returned an error: %d; bailing out.\n", SocketError);
