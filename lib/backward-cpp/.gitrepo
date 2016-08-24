@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/bombela/backward-cpp.git
+	branch = master
+	commit = 56cd35f97b604f18a28505e6573c2bddf3031a9e
+	parent = f6ef1098cff86924a6dbfd6731b4bf97a92611c8
+	cmdver = 0.3.0
