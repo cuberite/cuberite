@@ -9,7 +9,9 @@
 	#include "../StackWalker.h"
 #else
 	#ifdef __GLIBC__
+		#include <cxxabi.h>
 		#include <execinfo.h>
+		#include <regex>
 	#endif
 	#include <unistd.h>
 #endif
@@ -34,11 +36,35 @@ void PrintStackTrace(void)
 		sw.ShowCallstack();
 	#else
 		#ifdef __GLIBC__
-			// Use the backtrace() function to get and output the stackTrace:
-			// Code adapted from https://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
-			void * stackTrace[30];
+			auto output = stderr;
+			void * stackTrace[66];
+			char * demangled = nullptr;
+			size_t demangledLen = 0;
+			int demangledStatus;
+			std::regex lineSplitter ("^([^(]+)\\(([^+]+)\\+(?:[^)]+)\\) \\[([^\\]]+)\\]$");
+
 			auto numItems = backtrace(stackTrace, ARRAYCOUNT(stackTrace));
-			backtrace_symbols_fd(stackTrace, numItems, STDERR_FILENO);
+			char** buffer = backtrace_symbols(stackTrace, numItems);
+
+			for (auto frameId = (numItems - 1); frameId > 0; frameId--)
+			{
+				bool handled = false;
+				std::cmatch m;
+				if (std::regex_match (buffer[frameId], m, lineSplitter))
+				{
+					demangled = abi::__cxa_demangle(m[2].str().c_str(), demangled, &demangledLen, &demangledStatus) ;
+					if (demangledStatus == 0)
+					{
+						fprintf(output, "[#%i] \"%.*s\", at %.*s, in %s\n", frameId, (int)(m[1].second - m[1].first), m[1].first, (int)(m[3].second - m[3].first), m[3].first, demangled);
+						handled = true;
+					}
+				}
+				if (!handled)
+				{
+					fprintf(output, "[#%i] %s\n", frameId, buffer[frameId]);
+				}
+			}
+			free(demangled);
 		#endif
 	#endif
 }
