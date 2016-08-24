@@ -2,6 +2,7 @@ HTTP/1.0 200 OK
 Note: This is a Chunked transfer encoding test
 Header2: Value2
 Transfer-Encoding: chunked
+Empty-Header:
 
 4
 Wiki
