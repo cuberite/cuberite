@@ -118,7 +118,14 @@ bool cEnvelopeParser::ParseLine(const char * a_Data, size_t a_Size)
 		if (a_Data[i] == ':')
 		{
 			m_LastKey.assign(a_Data, i);
-			m_LastValue.assign(a_Data + i + 2, a_Size - i - 2);
+			if (a_Size > i + 1)
+			{
+				m_LastValue.assign(a_Data + i + 2, a_Size - i - 2);
+			}
+			else
+			{
+				m_LastValue.clear();
+			}
 			return true;
 		}
 	}  // for i - a_Data[]

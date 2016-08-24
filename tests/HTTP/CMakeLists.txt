@@ -44,11 +44,22 @@ endif()
 
 
 
+set (TEST_DATA_FILES
+	HTTPRequest1.data
+	HTTPRequest2.data
+	HTTPResponse1.data
+	HTTPResponse2.data
+)
+
+source_group("Data Files" FILES ${TEST_DATA_FILES})
+
+
+
 
 # Define individual test executables:
 
 # HTTPMessageParser_file: Feed file contents into a cHTTPResponseParser and print the callbacks as they're called:
-add_executable(HTTPMessageParser_file-exe HTTPMessageParser_file.cpp)
+add_executable(HTTPMessageParser_file-exe HTTPMessageParser_file.cpp ${TEST_DATA_FILES})
 target_link_libraries(HTTPMessageParser_file-exe HTTP Network OSSupport)
 
 # UrlClientTest: Tests the UrlClient class by requesting a few things off the internet:
