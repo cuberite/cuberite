@@ -39,7 +39,7 @@ local g_ShouldProcessExt =
 }
 
 --- The list of files not to be processed:
-local g_IgnoredFiles =
+local g_IgnoreMatchingFilenames =
 {
 	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
@@ -49,15 +49,8 @@ local g_IgnoredFiles =
 	"MersenneTwister.h",
 	"StackWalker.cpp",
 	"StackWalker.h",
+	"lib/",
 }
-
---- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles
-local g_ShouldIgnoreFile = {}
-
--- Initialize the g_ShouldIgnoreFile map:
-for _, fnam in ipairs(g_IgnoredFiles) do
-	g_ShouldIgnoreFile[fnam] = true
-end
 
 --- Keeps track of the number of violations for this folder
 local g_NumViolations = 0
@@ -306,8 +299,10 @@ local function ProcessItem(a_ItemName)
 	assert(type(a_ItemName) == "string")
 
 	-- Skip files / folders that should be ignored
-	if (g_ShouldIgnoreFile[a_ItemName]) then
-		return
+	for _, pattern in ipairs(g_IgnoreMatchingFilenames) do
+		if (a_ItemName:match(pattern)) then
+			return
+		end
 	end
 
 	local ext = a_ItemName:match("%.([^/%.]-)$")
