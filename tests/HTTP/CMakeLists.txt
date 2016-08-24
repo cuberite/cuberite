@@ -2,6 +2,7 @@ enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/lib/libevent/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/polarssl/include)
 
 add_definitions(-DTEST_GLOBALS=1)
 
@@ -11,6 +12,8 @@ set (HTTP_SRCS
 	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessage.cpp
 	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessageParser.cpp
 	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.cpp
+	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.cpp
+	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 )
 
@@ -19,13 +22,20 @@ set (HTTP_HDRS
 	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessage.h
 	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessageParser.h
 	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.h
+	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.h
+	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h
+)
+
+set (SHARED_SRCS
+	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
 )
 
 add_library(HTTP
 	${HTTP_SRCS}
 	${HTTP_HDRS}
 )
+target_link_libraries(HTTP Network OSSupport)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast")
@@ -34,12 +44,33 @@ endif()
 
 
 
+set (TEST_DATA_FILES
+	HTTPRequest1.data
+	HTTPRequest2.data
+	HTTPResponse1.data
+	HTTPResponse2.data
+)
 
-# Define individual tests:
+source_group("Data Files" FILES ${TEST_DATA_FILES})
+
+
+
+
+# Define individual test executables:
 
 # HTTPMessageParser_file: Feed file contents into a cHTTPResponseParser and print the callbacks as they're called:
-add_executable(HTTPMessageParser_file-exe HTTPMessageParser_file.cpp)
-target_link_libraries(HTTPMessageParser_file-exe HTTP)
+add_executable(HTTPMessageParser_file-exe HTTPMessageParser_file.cpp ${TEST_DATA_FILES})
+target_link_libraries(HTTPMessageParser_file-exe HTTP Network OSSupport)
+
+# UrlClientTest: Tests the UrlClient class by requesting a few things off the internet:
+add_executable(UrlClientTest-exe UrlClientTest.cpp)
+target_link_libraries(UrlClientTest-exe HTTP)
+
+
+
+
+
+# Define individual tests:
 
 # Test parsing the response file in 2-byte chunks (should go from response line parsing through headers parsing to body parsing, each within a different step):
 add_test(NAME HTTPMessageParser_file-test1-2 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPResponse1.data 2)
@@ -56,6 +87,9 @@ add_test(NAME HTTPMessageParser_file-test3-2 COMMAND HTTPMessageParser_file-exe 
 # Test parsing the request file in 512-byte chunks (should process everything in a single call):
 add_test(NAME HTTPMessageParser_file-test4-512 COMMAND HTTPMessageParser_file-exe ${CMAKE_CURRENT_SOURCE_DIR}/HTTPRequest1.data 512)
 
+# Test the URLClient
+add_test(NAME UrlClient-test COMMAND UrlClientTest-exe)
+
 
 
 
@@ -63,7 +97,8 @@ add_test(NAME HTTPMessageParser_file-test4-512 COMMAND HTTPMessageParser_file-ex
 # Put all the tests into a solution folder (MSVC):
 set_target_properties(
 	HTTPMessageParser_file-exe
-	PROPERTIES FOLDER Tests
+	UrlClientTest-exe
+	PROPERTIES FOLDER Tests/HTTP
 )
 set_target_properties(
 	HTTP

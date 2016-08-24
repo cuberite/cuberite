@@ -68,6 +68,7 @@ Makefile
 *.a
 *.d
 *.so
+tests/*/*-exe
 BuildInfo.h
 CMakeCache.txt
 CMakeFiles

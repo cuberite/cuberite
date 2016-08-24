@@ -10,7 +10,6 @@
 #pragma once
 
 #include "../OSSupport/Network.h"
-#include "../PolarSSL++/SslContext.h"
 #include "LuaState.h"
 
 
@@ -90,54 +89,6 @@ public:
 	);
 
 protected:
-	// fwd:
-	class cLinkSslContext;
-	typedef SharedPtr<cLinkSslContext> cLinkSslContextPtr;
-	typedef WeakPtr<cLinkSslContext> cLinkSslContextWPtr;
-
-	/** Wrapper around cSslContext that is used when this link is being encrypted by SSL. */
-	class cLinkSslContext :
-		public cSslContext
-	{
-		cLuaTCPLink & m_Link;
-
-		/** Buffer for storing the incoming encrypted data until it is requested by the SSL decryptor. */
-		AString m_EncryptedData;
-
-		/** Buffer for storing the outgoing cleartext data until the link has finished handshaking. */
-		AString m_CleartextData;
-
-		/** Shared ownership of self, so that this object can keep itself alive for as long as it needs. */
-		cLinkSslContextWPtr m_Self;
-
-	public:
-		cLinkSslContext(cLuaTCPLink & a_Link);
-
-		/** Shares ownership of self, so that this object can keep itself alive for as long as it needs. */
-		void SetSelf(cLinkSslContextWPtr a_Self);
-
-		/** Removes the self ownership so that we can detect the SSL closure. */
-		void ResetSelf(void);
-
-		/** Stores the specified block of data into the buffer of the data to be decrypted (incoming from remote).
-		Also flushes the SSL buffers by attempting to read any data through the SSL context. */
-		void StoreReceivedData(const char * a_Data, size_t a_NumBytes);
-
-		/** Tries to read any cleartext data available through the SSL, reports it in the link. */
-		void FlushBuffers(void);
-
-		/** Tries to finish handshaking the SSL. */
-		void TryFinishHandshaking(void);
-
-		/** Sends the specified cleartext data over the SSL to the remote peer.
-		If the handshake hasn't been completed yet, queues the data for sending when it completes. */
-		void Send(const AString & a_Data);
-
-		// cSslContext overrides:
-		virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
-		virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
-	};
-
 
 	/** The Lua table that holds the callbacks to be invoked. */
 	cLuaState::cTableRefPtr m_Callbacks;
@@ -148,11 +99,6 @@ protected:
 
 	/** The server that is responsible for this link, if any. */
 	cLuaServerHandleWPtr m_Server;
-
-	/** The SSL context used for encryption, if this link uses SSL.
-	If valid, the link uses encryption through this context. */
-	cLinkSslContextPtr m_SslContext;
-
 
 	/** Common code called when the link is considered as terminated.
 	Releases m_Link, m_Callbacks and this from m_Server, each when applicable. */

@@ -13,6 +13,7 @@ SET (SRCS
 	NameValueParser.cpp
 	SslHTTPServerConnection.cpp
 	TransferEncodingParser.cpp
+	UrlClient.cpp
 	UrlParser.cpp
 )
 
@@ -27,6 +28,7 @@ SET (HDRS
 	NameValueParser.h
 	SslHTTPServerConnection.h
 	TransferEncodingParser.h
+	UrlClient.h
 	UrlParser.h
 )
 

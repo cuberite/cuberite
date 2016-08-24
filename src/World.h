@@ -61,6 +61,7 @@ class cBroadcaster;
 
 
 typedef std::list< cPlayer * > cPlayerList;
+typedef std::list< std::pair< cPlayer *, cWorld * > > cAwaitingPlayerList;
 
 typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
 typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
@@ -264,8 +265,9 @@ public:
 
 	/** Adds the player to the world.
 	Uses a queue to store the player object until the Tick thread processes the addition event.
-	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking. */
-	void AddPlayer(cPlayer * a_Player);
+	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking.
+	If a_OldWorld is provided, a corresponding ENTITY_CHANGED_WORLD event is triggerred after the addition. */
+	void AddPlayer(cPlayer * a_Player, cWorld * a_OldWorld = nullptr);
 
 	/** Removes the player from the world.
 	Removes the player from the addition queue, too, if appropriate.
@@ -1010,7 +1012,7 @@ private:
 	cCriticalSection m_CSPlayersToAdd;
 
 	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
-	cPlayerList m_PlayersToAdd;
+	cAwaitingPlayerList m_PlayersToAdd;
 
 	/** CS protecting m_SetChunkDataQueue. */
 	cCriticalSection m_CSSetChunkDataQueue;

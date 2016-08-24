@@ -42,6 +42,7 @@ extern "C"
 
 
 const cLuaState::cRet cLuaState::Return = {};
+const cLuaState::cNil cLuaState::Nil = {};
 
 /** Each Lua state stores a pointer to its creating cLuaState in Lua globals, under this name.
 This way any cLuaState can reference the main cLuaState's TrackedCallbacks, mutex etc. */
@@ -335,6 +336,33 @@ void cLuaState::cStackTable::ForEachArrayElement(std::function<bool(cLuaState & 
 			return;
 		}
 	}
+}
+
+
+
+
+
+void cLuaState::cStackTable::ForEachElement(std::function<bool(cLuaState & a_LuaState)> a_ElementCallback) const
+{
+	#ifdef _DEBUG
+		auto stackTop = lua_gettop(m_LuaState);
+	#endif
+	lua_pushvalue(m_LuaState, m_StackPos);  // Stk: <table>
+	lua_pushnil(m_LuaState);                // Stk: <table> nil
+	while (lua_next(m_LuaState, -2))        // Stk: <table> <key> <val>
+	{
+		auto shouldAbort = a_ElementCallback(m_LuaState);
+		ASSERT(lua_gettop(m_LuaState) == stackTop + 3);  // The element callback must not change the Lua stack below the value
+		lua_pop(m_LuaState, 1);  // Stk: <table> <key>
+		if (shouldAbort)
+		{
+			// The callback wants to abort
+			lua_pop(m_LuaState, 2);  // Stk: empty
+			return;
+		}
+	}
+	// Stk: <table>
+	lua_pop(m_LuaState, 1);  // Stk: empty
 }
 
 
@@ -724,24 +752,29 @@ bool cLuaState::PushFunction(const cRef & a_TableRef, const char * a_FnName)
 
 
 
-void cLuaState::PushNil(void)
+void cLuaState::Push(const AString & a_String)
 {
 	ASSERT(IsValid());
 
-	lua_pushnil(m_LuaState);
-	m_NumCurrentFunctionArgs += 1;
+	lua_pushlstring(m_LuaState, a_String.data(), a_String.size());
 }
 
 
 
 
 
-void cLuaState::Push(const AString & a_String)
+void cLuaState::Push(const AStringMap & a_Dictionary)
 {
 	ASSERT(IsValid());
 
-	lua_pushlstring(m_LuaState, a_String.data(), a_String.size());
-	m_NumCurrentFunctionArgs += 1;
+	lua_createtable(m_LuaState, 0, static_cast<int>(a_Dictionary.size()));
+	int newTable = lua_gettop(m_LuaState);
+	for (const auto & item: a_Dictionary)
+	{
+		Push(item.first);   // key
+		Push(item.second);  // value
+		lua_rawset(m_LuaState, newTable);
+	}
 }
 
 
@@ -760,7 +793,6 @@ void cLuaState::Push(const AStringVector & a_Vector)
 		tolua_pushstring(m_LuaState, itr->c_str());
 		lua_rawseti(m_LuaState, newTable, index);
 	}
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -772,7 +804,6 @@ void cLuaState::Push(const cCraftingGrid * a_Grid)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cCraftingGrid *>(a_Grid)), "cCraftingGrid");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -784,7 +815,6 @@ void cLuaState::Push(const cCraftingRecipe * a_Recipe)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cCraftingRecipe *>(a_Recipe)), "cCraftingRecipe");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -796,7 +826,6 @@ void cLuaState::Push(const char * a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushstring(m_LuaState, a_Value);
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -808,7 +837,17 @@ void cLuaState::Push(const cItems & a_Items)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cItems *>(&a_Items)), "cItems");
-	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const cNil & a_Nil)
+{
+	ASSERT(IsValid());
+
+	lua_pushnil(m_LuaState);
 }
 
 
@@ -820,7 +859,6 @@ void cLuaState::Push(const cPlayer * a_Player)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cPlayer *>(a_Player)), "cPlayer");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -832,7 +870,6 @@ void cLuaState::Push(const cLuaState::cRef & a_Ref)
 	ASSERT(IsValid());
 
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, static_cast<int>(a_Ref));
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -844,7 +881,6 @@ void cLuaState::Push(const HTTPRequest * a_Request)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<HTTPRequest *>(a_Request)), "HTTPRequest");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -856,7 +892,6 @@ void cLuaState::Push(const HTTPTemplateRequest * a_Request)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<HTTPTemplateRequest *>(a_Request)), "HTTPTemplateRequest");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -868,7 +903,6 @@ void cLuaState::Push(const Vector3d & a_Vector)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3d *>(&a_Vector)), "Vector3<double>");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -880,7 +914,6 @@ void cLuaState::Push(const Vector3d * a_Vector)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3d *>(a_Vector)), "Vector3<double>");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -892,7 +925,6 @@ void cLuaState::Push(const Vector3i & a_Vector)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3i *>(&a_Vector)), "Vector3<int>");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -904,7 +936,6 @@ void cLuaState::Push(const Vector3i * a_Vector)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3i *>(a_Vector)), "Vector3<int>");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -916,7 +947,6 @@ void cLuaState::Push(bool a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushboolean(m_LuaState, a_Value ? 1 : 0);
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -981,8 +1011,6 @@ void cLuaState::Push(cEntity * a_Entity)
 			}
 		}  // switch (EntityType)
 	}
-
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -994,7 +1022,6 @@ void cLuaState::Push(cLuaServerHandle * a_ServerHandle)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, a_ServerHandle, "cServerHandle");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1006,7 +1033,6 @@ void cLuaState::Push(cLuaTCPLink * a_TCPLink)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, a_TCPLink, "cTCPLink");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1018,7 +1044,6 @@ void cLuaState::Push(cLuaUDPEndpoint * a_UDPEndpoint)
 	ASSERT(IsValid());
 
 	tolua_pushusertype(m_LuaState, a_UDPEndpoint, "cUDPEndpoint");
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1030,7 +1055,6 @@ void cLuaState::Push(double a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushnumber(m_LuaState, a_Value);
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1042,7 +1066,6 @@ void cLuaState::Push(int a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushnumber(m_LuaState, a_Value);
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1054,7 +1077,6 @@ void cLuaState::Push(long a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value));
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1066,7 +1088,6 @@ void cLuaState::Push(UInt32 a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushnumber(m_LuaState, a_Value);
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1078,7 +1099,6 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value.count()));
-	m_NumCurrentFunctionArgs += 1;
 }
 
 
@@ -1090,7 +1110,6 @@ void cLuaState::Pop(int a_NumValuesToPop)
 	ASSERT(IsValid());
 
 	lua_pop(m_LuaState, a_NumValuesToPop);
-	m_NumCurrentFunctionArgs -= a_NumValuesToPop;
 }
 
 
@@ -1107,6 +1126,37 @@ bool cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, AStringMap & a_Value)
+{
+	// Retrieve all values in a string => string dictionary table:
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	cStackTable tbl(*this, a_StackPos);
+	bool isValid = true;
+	tbl.ForEachElement([&isValid, &a_Value](cLuaState & a_LuaState)
+		{
+			AString key, val;
+			if (a_LuaState.GetStackValues(-2, key, val))
+			{
+				a_Value[key] = val;
+			}
+			else
+			{
+				isValid = false;
+				return true;
+			}
+			return false;
+		}
+	);
+	return isValid;
 }
 
 
@@ -2083,6 +2133,17 @@ cLuaState * cLuaState::QueryCanonLuaState(void)
 		return nullptr;
 	}
 	return reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
+}
+
+
+
+
+
+void cLuaState::LogApiCallParamFailure(const char * a_FnName, const char * a_ParamNames)
+{
+	LOGWARNING("%s: Cannot read params: %s, bailing out.", a_FnName, a_ParamNames);
+	LogStackTrace();
+	LogStackValues("Values on the stack");
 }
 
 

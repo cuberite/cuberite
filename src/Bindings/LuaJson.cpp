@@ -82,7 +82,7 @@ void PushJsonValue(const Json::Value & a_Value, cLuaState & a_LuaState)
 	{
 		case Json::nullValue:
 		{
-			a_LuaState.PushNil();
+			a_LuaState.Push(cLuaState::Nil);
 			break;
 		}
 
@@ -228,8 +228,7 @@ static int tolua_cJson_Parse(lua_State * a_LuaState)
 	Json::Reader reader;
 	if (!reader.parse(input, root, false))
 	{
-		L.PushNil();
-		L.Push(Printf("Parsing Json failed: %s", reader.getFormattedErrorMessages().c_str()));
+		L.Push(cLuaState::Nil, Printf("Parsing Json failed: %s", reader.getFormattedErrorMessages().c_str()));
 		return 2;
 	}
 

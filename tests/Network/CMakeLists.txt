@@ -2,6 +2,7 @@ enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(${CMAKE_SOURCE_DIR}/lib/libevent/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/polarssl/include)
 
 add_definitions(-DTEST_GLOBALS=1)
 
@@ -15,6 +16,11 @@ set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.cpp
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CtrDrbgContext.cpp
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CryptoKey.cpp
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/EntropyContext.cpp
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/SslContext.cpp
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/X509Cert.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 )
 
@@ -27,6 +33,11 @@ set (Network_HDRS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.h
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CtrDrbgContext.h
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CryptoKey.h
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/EntropyContext.h
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/SslContext.h
+	${CMAKE_SOURCE_DIR}/src/PolarSSL++/X509Cert.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h
 )
 
@@ -35,7 +46,7 @@ add_library(Network
 	${Network_HDRS}
 )
 
-target_link_libraries(Network event_core event_extra)
+target_link_libraries(Network event_core event_extra mbedtls)
 if (MSVC)
 	target_link_libraries(Network ws2_32.lib)
 endif()

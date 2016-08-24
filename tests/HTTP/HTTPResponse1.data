@@ -6,5 +6,6 @@ Note3: The data is 2 bytes longer than the actual request, parser should indicat
 Header1: Value1
 Header2: Value2
 Content-Length: 3
+Empty-Header:
 
 bla

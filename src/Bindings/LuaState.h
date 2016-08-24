@@ -301,6 +301,26 @@ public:
 			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, std::forward<Args>(args)...);
 		}
 
+		/** Calls the Lua function stored under the specified name in the referenced table, if still available.
+		A "self" parameter is injected in front of all the given parameters and is set to the callback table.
+		Returns true if callback has been called.
+		Returns false if the Lua state isn't valid anymore, or the function doesn't exist. */
+		template <typename... Args>
+		bool CallTableFnWithSelf(const char * a_FnName, Args &&... args)
+		{
+			auto cs = m_CS;
+			if (cs == nullptr)
+			{
+				return false;
+			}
+			cCSLock Lock(*cs);
+			if (!m_Ref.IsValid())
+			{
+				return false;
+			}
+			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, m_Ref, std::forward<Args>(args)...);
+		}
+
 		/** Set the contained reference to the table in the specified Lua state's stack position.
 		If another table has been previously contained, it is unreferenced first.
 		Returns true on success, false on failure (not a table at the specified stack pos). */
@@ -309,12 +329,37 @@ public:
 	typedef UniquePtr<cTableRef> cTableRefPtr;
 
 
+	/** Represents a parameter that is optional - calling a GetStackValue() with this object will not fail if the value on the Lua stack is nil.
+	Note that the GetStackValue() will still fail if the param is present but of a different type.
+	The class itself is just a marker so that the template magic will select the correct GetStackValue() overload. */
+	template <typename T>
+	class cOptionalParam
+	{
+	public:
+		explicit cOptionalParam(T & a_Dest):
+			m_Dest(a_Dest)
+		{
+		}
+
+		T & GetDest(void) { return m_Dest; }
+
+	protected:
+		T & m_Dest;
+	};
+
+
 	/** A dummy class that's used only to delimit function args from return values for cLuaState::Call() */
 	class cRet
 	{
 	} ;
-
 	static const cRet Return;  // Use this constant to delimit function args from return values for cLuaState::Call()
+
+
+	/** A dummy class that's used only to push a constant nil as a function parameter in Call(). */
+	class cNil
+	{
+	};
+	static const cNil Nil;  // Use this constant to give a function a nil parameter in Call()
 
 
 	/** A RAII class for values pushed onto the Lua stack.
@@ -471,15 +516,15 @@ public:
 		Push(std::forward<Arg2>(a_Arg2), std::forward<Args>(a_Args)...);
 	}
 
-	void PushNil(void);
-
 	// Push a const value onto the stack (keep alpha-sorted):
 	void Push(const AString & a_String);
+	void Push(const AStringMap & a_Dictionary);
 	void Push(const AStringVector & a_Vector);
 	void Push(const cCraftingGrid * a_Grid);
 	void Push(const cCraftingRecipe * a_Recipe);
 	void Push(const char * a_Value);
 	void Push(const cItems & a_Items);
+	void Push(const cNil & a_Nil);
 	void Push(const cPlayer * a_Player);
 	void Push(const cRef & a_Ref);
 	void Push(const HTTPRequest * a_Request);
@@ -508,6 +553,7 @@ public:
 	// Returns whether value was changed
 	// Enum values are checked for their allowed values and fail if the value is not assigned.
 	bool GetStackValue(int a_StackPos, AString & a_Value);
+	bool GetStackValue(int a_StackPos, AStringMap & a_Value);
 	bool GetStackValue(int a_StackPos, bool & a_Value);
 	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
@@ -547,6 +593,17 @@ public:
 		}
 		a_ReturnedVal = static_cast<T>(Val);
 		return true;
+	}
+
+	/** Retrieves an optional value on the stack - doesn't fail if the stack contains nil instead of the value. */
+	template <typename T>
+	bool GetStackValue(int a_StackPos, cOptionalParam<T> && a_ReturnedVal)
+	{
+		if (lua_isnoneornil(m_LuaState, a_StackPos))
+		{
+			return true;
+		}
+		return GetStackValue(a_StackPos, a_ReturnedVal.GetDest());
 	}
 
 	/** Pushes the named value in the table at the top of the stack.
@@ -597,6 +654,7 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
+		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{
 			// Pushing the function failed
@@ -606,14 +664,14 @@ public:
 	}
 
 	/** Retrieves a list of values from the Lua stack, starting at the specified index. */
-	template <typename T, typename... Args>
-	inline bool GetStackValues(int a_StartStackPos, T & a_Ret, Args &&... args)
+	template <typename Arg1, typename... Args>
+	inline bool GetStackValues(int a_StartStackPos, Arg1 && a_Arg1, Args &&... args)
 	{
-		if (!GetStackValue(a_StartStackPos, a_Ret))
+		if (!GetStackValue(a_StartStackPos, std::forward<Arg1>(a_Arg1)))
 		{
 			return false;
 		}
-		return GetStackValues(a_StartStackPos + 1, args...);
+		return GetStackValues(a_StartStackPos + 1, std::forward<Args>(args)...);
 	}
 
 	/** Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions */
@@ -703,6 +761,10 @@ public:
 	Returns nullptr if the canon Lua state cannot be queried. */
 	cLuaState * QueryCanonLuaState(void);
 
+	/** Outputs to log a warning about API call being unable to read its parameters from the stack,
+	logs the stack trace and stack values. */
+	void LogApiCallParamFailure(const char * a_FnName, const char * a_ParamNames);
+
 protected:
 
 	cCriticalSection m_CS;
@@ -758,6 +820,7 @@ protected:
 	inline bool PushCallPop(T && a_Param, Args &&... args)
 	{
 		Push(std::forward<T>(a_Param));
+		m_NumCurrentFunctionArgs += 1;
 		return PushCallPop(std::forward<Args>(args)...);
 	}
 
