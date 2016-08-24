@@ -1,6 +1,9 @@
 project (Cuberite)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
+if(UNIX AND (NOT APPLE))
+	include("${PROJECT_SOURCE_DIR}/../../lib/backward-cpp/BackwardMacros.cmake")
+endif()
 
 SET (SRCS
 	CriticalSection.cpp
@@ -47,6 +50,7 @@ if(NOT MSVC)
 	if(UNIX)
 		if(NOT APPLE)
 			target_link_libraries(OSSupport rt)
+			add_backward(OSSupport)
 		endif()
 
 		target_link_libraries(OSSupport pthread event_core event_extra)
