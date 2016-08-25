@@ -1,8 +1,8 @@
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(${CMAKE_SOURCE_DIR}/lib/libevent/include)
-include_directories(${CMAKE_SOURCE_DIR}/lib/polarssl/include)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/libevent/include)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/polarssl/include)
 
 add_definitions(-DTEST_GLOBALS=1)
 
@@ -51,12 +51,9 @@ if (MSVC)
 	target_link_libraries(Network ws2_32.lib)
 endif()
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast")
-	if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
-		add_flags_cxx("-Wno-error=inconsistent-missing-override")
-	endif()
-endif()
+
+
+
 
 # Define individual tests:
 

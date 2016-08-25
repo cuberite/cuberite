@@ -7,17 +7,9 @@ set_lib_flags()
 
 
 # Set include paths to the used libraries:
-include_directories("../../lib")
-include_directories("../../lib/polarssl/include")
+include_directories(SYSTEM "../../lib")
+include_directories(SYSTEM "../../lib/polarssl/include")
 include_directories("../../src")
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=shorten-64-to-32")
-	add_flags_cxx("-Wno-error=old-style-cast")
-	if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
-		add_flags_cxx("-Wno-error=keyword-macro")
-	endif()
-endif()
 
 function(flatten_files arg1)
 	set(res "")

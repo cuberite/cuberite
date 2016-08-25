@@ -11,7 +11,8 @@ SET (SRCS
 	Simulator.cpp
 	SimulatorManager.cpp
 	VanillaFluidSimulator.cpp
-	VaporizeFluidSimulator.cpp)
+	VaporizeFluidSimulator.cpp
+)
 
 SET (HDRS
 	DelayedFluidSimulator.h
@@ -25,13 +26,9 @@ SET (HDRS
 	Simulator.h
 	SimulatorManager.h
 	VanillaFluidSimulator.h
-	VaporizeFluidSimulator.h)
+	VaporizeFluidSimulator.h
+)
 
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(FireSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion")
-	set_source_files_properties(FluidSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=shadow")
-endif()
 
 if(NOT MSVC)
 	add_library(Simulator ${SRCS} ${HDRS})

@@ -42,7 +42,6 @@ public:
 	}
 
 	eRabbitType GetRabbitType()         const { return m_Type; }
-	UInt8       GetRabbitTypeAsNumber() const { return static_cast<UInt8>(GetRabbitType()); }
 	int         GetMoreCarrotTicks()    const { return m_MoreCarrotTicks; }
 
 private:

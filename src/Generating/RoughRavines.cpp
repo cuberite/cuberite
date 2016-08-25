@@ -181,7 +181,7 @@ protected:
 			{
 				#ifdef _DEBUG
 				// DEBUG: Make the roughravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
-				if ((DifX + x == 0) && (DifZ + z == 0))
+				if ((FloorC(DifX + x) == 0) && (FloorC(DifZ + z) == 0))
 				{
 					a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
 				}
@@ -194,8 +194,8 @@ protected:
 					continue;
 				}
 
-				int Top = std::min(static_cast<int>(ceilf(itr->m_Top)), +cChunkDef::Height);
-				for (int y = std::max(static_cast<int>(floorf(itr->m_Bottom)), 1); y <= Top; y++)
+				int Top = std::min(CeilC(itr->m_Top), +cChunkDef::Height);
+				for (int y = std::max(FloorC(itr->m_Bottom), 1); y <= Top; y++)
 				{
 					if ((itr->m_Radius + m_PerHeightRadius[y]) * (itr->m_Radius + m_PerHeightRadius[y]) < DistSq)
 					{

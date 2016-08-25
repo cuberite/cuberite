@@ -51,7 +51,7 @@ int main(int argc, char ** argv)
 	{
 		if (idx / 500 != LastReportedStep)
 		{
-			printf("Testing index %u...\n", (unsigned)idx);
+			printf("Testing index %u...\n", static_cast<unsigned>(idx));
 			LastReportedStep = idx / 500;
 		}
 

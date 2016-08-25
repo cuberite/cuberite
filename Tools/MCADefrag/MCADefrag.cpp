@@ -257,7 +257,10 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 	int SizeInSectors = a_LocationRaw[3] * (4 KiB);
 	if (a_File.Seek(SectorNum * (4 KiB)) < 0)
 	{
-		LOGWARNING("Failed to seek to chunk data - file pos %llu (%d KiB, %.02f MiB)!", (Int64)SectorNum * (4 KiB), SectorNum * 4, ((double)SectorNum) / 256);
+		LOGWARNING("Failed to seek to chunk data - file pos %llu (%d KiB, %.02f MiB)!",
+			static_cast<Int64>(SectorNum) * (4 KiB), SectorNum * 4,
+			static_cast<double>(SectorNum) / 256
+		);
 		return false;
 	}
 	
@@ -276,7 +279,7 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 	}
 	
 	// Read the data:
-	if (a_File.Read(m_CompressedChunkData, m_CompressedChunkDataSize) != m_CompressedChunkDataSize)
+	if (a_File.Read(m_CompressedChunkData, static_cast<size_t>(m_CompressedChunkDataSize)) != m_CompressedChunkDataSize)
 	{
 		LOGWARNING("Failed to read chunk data!");
 		return false;
@@ -311,15 +314,15 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 	}
 	
 	// Update the Location:
-	a_LocationRaw[0] = m_CurrentSectorOut >> 16;
+	a_LocationRaw[0] = static_cast<Byte>(m_CurrentSectorOut >> 16);
 	a_LocationRaw[1] = (m_CurrentSectorOut >> 8) & 0xff;
 	a_LocationRaw[2] = m_CurrentSectorOut & 0xff;
-	a_LocationRaw[3] = (m_CompressedChunkDataSize + (4 KiB) + 3) / (4 KiB);  // +3 because the m_CompressedChunkDataSize doesn't include the exact-length
+	a_LocationRaw[3] = static_cast<Byte>((m_CompressedChunkDataSize + (4 KiB) + 3) / (4 KiB));  // +3 because the m_CompressedChunkDataSize doesn't include the exact-length
 	m_CurrentSectorOut += a_LocationRaw[3];
 	
 	// Write the data length:
 	Byte Buf[4];
-	Buf[0] = m_CompressedChunkDataSize >> 24;
+	Buf[0] = static_cast<Byte>(m_CompressedChunkDataSize >> 24);
 	Buf[1] = (m_CompressedChunkDataSize >> 16) & 0xff;
 	Buf[2] = (m_CompressedChunkDataSize >> 8) & 0xff;
 	Buf[3] = m_CompressedChunkDataSize & 0xff;
@@ -330,7 +333,7 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 	}
 	
 	// Write the data:
-	if (a_File.Write(m_CompressedChunkData, m_CompressedChunkDataSize) != m_CompressedChunkDataSize)
+	if (a_File.Write(m_CompressedChunkData, static_cast<size_t>(m_CompressedChunkDataSize)) != m_CompressedChunkDataSize)
 	{
 		LOGWARNING("Failed to write chunk data!");
 		return false;
@@ -339,7 +342,7 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 	// Pad onto the next sector:
 	int NumPadding = a_LocationRaw[3] * 4096 - (m_CompressedChunkDataSize + 4);
 	ASSERT(NumPadding >= 0);
-	if ((NumPadding > 0) && (a_File.Write(g_Zeroes, NumPadding) != NumPadding))
+	if ((NumPadding > 0) && (a_File.Write(g_Zeroes, static_cast<size_t>(NumPadding)) != NumPadding))
 	{
 		LOGWARNING("Failed to write padding");
 		return false;
@@ -382,14 +385,14 @@ bool cMCADefrag::cThread::UncompressChunkZlib(void)
 {
 	// Uncompress the data:
 	z_stream strm;
-	strm.zalloc = (alloc_func)NULL;
-	strm.zfree = (free_func)NULL;
-	strm.opaque = NULL;
+	strm.zalloc = nullptr;
+	strm.zfree = nullptr;
+	strm.opaque = nullptr;
 	inflateInit(&strm);
 	strm.next_out  = m_RawChunkData;
 	strm.avail_out = sizeof(m_RawChunkData);
 	strm.next_in   = m_CompressedChunkData + 1;  // The first byte is the compression method, skip it
-	strm.avail_in  = m_CompressedChunkDataSize;
+	strm.avail_in  = static_cast<uInt>(m_CompressedChunkDataSize);
 	int res = inflate(&strm, Z_FINISH);
 	inflateEnd(&strm);
 	if (res != Z_STREAM_END)
@@ -397,7 +400,8 @@ bool cMCADefrag::cThread::UncompressChunkZlib(void)
 		LOGWARNING("Failed to uncompress chunk data: %s", strm.msg);
 		return false;
 	}
-	m_RawChunkDataSize = strm.total_out;
+	ASSERT(strm.total_out < static_cast<uLong>(std::numeric_limits<int>::max()));
+	m_RawChunkDataSize = static_cast<int>(strm.total_out);
 
 	return true;
 }
@@ -409,7 +413,7 @@ bool cMCADefrag::cThread::UncompressChunkZlib(void)
 bool cMCADefrag::cThread::CompressChunk(void)
 {
 	// Check that the compressed data can fit:
-	uLongf CompressedSize = compressBound(m_RawChunkDataSize);
+	uLongf CompressedSize = compressBound(static_cast<uLong>(m_RawChunkDataSize));
 	if (CompressedSize > sizeof(m_CompressedChunkData))
 	{
 		LOGINFO("Too much data for the internal compression buffer!");
@@ -417,14 +421,15 @@ bool cMCADefrag::cThread::CompressChunk(void)
 	}
 	
 	// Compress the data using the highest compression factor:
-	int errorcode = compress2(m_CompressedChunkData + 1, &CompressedSize, m_RawChunkData, m_RawChunkDataSize, Z_BEST_COMPRESSION);
+	int errorcode = compress2(m_CompressedChunkData + 1, &CompressedSize, m_RawChunkData, static_cast<uLong>(m_RawChunkDataSize), Z_BEST_COMPRESSION);
 	if (errorcode != Z_OK)
 	{
 		LOGINFO("Recompression failed: %d", errorcode);
 		return false;
 	}
 	m_CompressedChunkData[0] = COMPRESSION_ZLIB;
-	m_CompressedChunkDataSize = CompressedSize + 1;
+	ASSERT(CompressedSize < static_cast<uLong>(std::numeric_limits<int>::max()));
+	m_CompressedChunkDataSize = static_cast<int>(CompressedSize + 1);
 	return true;
 }
 

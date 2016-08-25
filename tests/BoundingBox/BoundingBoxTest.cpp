@@ -46,7 +46,7 @@ static int Test(void)
 		}
 		if (res)
 		{
-			if (LineCoeff != LineCoeffs[i])
+			if (std::abs(LineCoeff - LineCoeffs[i]) > 0.0000001)
 			{
 				LOGERROR("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d",
 					Line1.x, Line1.y, Line1.z,

@@ -1,7 +1,7 @@
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(${CMAKE_SOURCE_DIR}/lib/)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_definitions(-DTEST_GLOBALS=1)
@@ -63,9 +63,7 @@ set (SRCS
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast")
 	add_flags_cxx("-Wno-error=global-constructors")
-	add_flags_cxx("-Wno-error=switch-enum")
 endif()
 
 

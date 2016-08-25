@@ -1,8 +1,8 @@
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(${CMAKE_SOURCE_DIR}/lib/libevent/include)
-include_directories(${CMAKE_SOURCE_DIR}/lib/polarssl/include)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/libevent/include)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/polarssl/include)
 
 add_definitions(-DTEST_GLOBALS=1)
 
@@ -37,9 +37,6 @@ add_library(HTTP
 )
 target_link_libraries(HTTP Network OSSupport)
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=conversion -Wno-error=old-style-cast")
-endif()
 
 
 
