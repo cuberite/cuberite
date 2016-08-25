@@ -35,6 +35,15 @@ Implements the 1.10.x protocol classes:
 
 
 
+// The disabled error is intended, since the Metadata have overlapping indexes
+// based on the type of the Entity.
+//
+// IMPORTANT: The enum is used to automate the sequential counting of the
+// Metadata indexes. Adding a new enum value causes the following values to
+// increase their index. Therefore the ordering of the enum values is VERY important!
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wduplicate-enum"
+
 namespace Metadata
 {
 	enum Metadata_Index
@@ -263,6 +272,8 @@ namespace Metadata
 	};
 }
 
+#pragma clang diagnostic pop  // Restore ignored clang errors
+
 
 
 
@@ -385,14 +396,10 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 
 			// The following expression makes Minecarts shake more with less health or higher damage taken
-			// It gets half the maximum health, and takes it away from the current health minus the half health:
-			/*
-			Health: 5 | 3 - (5 - 3) = 1 (shake power)
-			Health: 3 | 3 - (3 - 3) = 3
-			Health: 1 | 3 - (1 - 3) = 5
-			*/
 			auto & Minecart = reinterpret_cast<const cMinecart &>(a_Entity);
-			a_Pkt.WriteVarInt32((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
 
 			a_Pkt.WriteBEUInt8(SHAKING_DIRECTION);  // (doesn't seem to effect anything)
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
@@ -412,11 +419,11 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 					int Content = MinecartContent.m_ItemType;
 					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(Content);
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
 					a_Pkt.WriteBEUInt8(BLOCK_Y);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					a_Pkt.WriteVarInt32(RideableMinecart.GetBlockHeight());
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
 
 					a_Pkt.WriteBEUInt8(SHOW_BLOCK);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -562,7 +569,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			auto & Creeper = reinterpret_cast<const cCreeper &>(a_Mob);
 			a_Pkt.WriteBEUInt8(CREEPER_STATE);  // (idle or "blowing")
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : -1);
+			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : static_cast<UInt32>(-1));
 
 			a_Pkt.WriteBEUInt8(CREEPER_POWERED);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -580,7 +587,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			a_Pkt.WriteBEUInt8(CARRIED_BLOCK);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
 			UInt32 Carried = 0;
-			Carried |= Enderman.GetCarriedBlock() << 4;
+			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
 			Carried |= Enderman.GetCarriedMeta();
 			a_Pkt.WriteVarInt32(Carried);
 
@@ -633,18 +640,18 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 
 			a_Pkt.WriteBEUInt8(HORSE_TYPE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Horse.GetHorseType());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseType()));
 
 			a_Pkt.WriteBEUInt8(HORSE_VARIANT);  // Color / style
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			int Appearance = 0;
 			Appearance = Horse.GetHorseColor();
 			Appearance |= Horse.GetHorseStyle() << 8;
-			a_Pkt.WriteVarInt32(Appearance);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Appearance));
 
 			a_Pkt.WriteBEUInt8(ARMOR);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Horse.GetHorseArmour());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseArmour()));
 
 			a_Pkt.WriteBEUInt8(BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -657,7 +664,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			auto & MagmaCube = reinterpret_cast<const cMagmaCube &>(a_Mob);
 			a_Pkt.WriteBEUInt8(SLIME_SIZE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(MagmaCube.GetSize());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(MagmaCube.GetSize()));
 			break;
 		}  // case mtMagmaCube
 
@@ -717,7 +724,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			a_Pkt.WriteBEUInt8(SHEEP_STATUS);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
 			Int8 SheepMetadata = 0;
-			SheepMetadata = static_cast<Byte>(Sheep.GetFurColor());
+			SheepMetadata = static_cast<Int8>(Sheep.GetFurColor());
 			if (Sheep.IsSheared())
 			{
 				SheepMetadata |= 0x10;
@@ -735,7 +742,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 
 			a_Pkt.WriteBEUInt8(RABBIT_TYPE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Rabbit.GetRabbitTypeAsNumber());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
 			break;
 		}  // case mtRabbit
 
@@ -753,7 +760,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			auto & Slime = reinterpret_cast<const cSlime &>(a_Mob);
 			a_Pkt.WriteBEUInt8(SLIME_SIZE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Slime.GetSize());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
 
@@ -766,7 +773,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 
 			a_Pkt.WriteBEUInt8(PROFESSION);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Villager.GetVilType());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
 			break;
 		}  // case mtVillager
 
@@ -824,7 +831,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 
 			a_Pkt.WriteBEUInt8(COLLAR_COLOR);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Wolf.GetCollarColor());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Wolf.GetCollarColor()));
 			break;
 		}  // case mtWolf
 
