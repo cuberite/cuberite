@@ -1800,6 +1800,11 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Send the respawn packet:
 	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
 	{
+		// Respawning in current dimension is illegal if wasn't dead, let's tour a bit...
+		if (a_World->GetDimension() == GetWorld()->GetDimension())
+		{
+			m_ClientHandle->SendRespawn((a_World->GetDimension() == dimOverworld) ? dimNether : dimOverworld);
+		}
 		m_ClientHandle->SendRespawn(a_World->GetDimension());
 	}
 
