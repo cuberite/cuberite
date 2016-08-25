@@ -739,7 +739,7 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	{
+	{  // TODO Use SendSpawnObject
 		cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
 		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
 		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
@@ -757,14 +757,7 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 		Pkt.WriteBEInt16(0);
 	}
 
-	{
-		cPacketizer Pkt(*this, 0x39);  // Entity Metadata packet
-		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
-		Pkt.WriteBEUInt8(5);  // Index 5: Item
-		Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-		WriteItem(Pkt, a_Pickup.GetItem());
-		Pkt.WriteBEUInt8(0xff);  // End of metadata
-	}
+	SendEntityMetadata(a_Pickup);
 }
 
 
