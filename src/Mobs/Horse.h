@@ -34,7 +34,7 @@ public:
 	int  GetHorseStyle  (void) const  {return m_Style; }
 	int  GetHorseArmour (void) const  {return m_Armour;}
 
-	virtual void GetBreedingItems(cItems & a_Items) override
+	virtual void GetBreedingItems(cItems & a_Items) const override
 	{
 		a_Items.Add(E_ITEM_GOLDEN_CARROT);
 		a_Items.Add(E_ITEM_GOLDEN_APPLE);

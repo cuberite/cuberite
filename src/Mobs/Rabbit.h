@@ -34,7 +34,7 @@ public:
 	CLASS_PROTODEF(cRabbit)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void GetFollowedItems(cItems & a_Items) override
+	virtual void GetFollowedItems(cItems & a_Items) const override
 	{
 		a_Items.Add(E_ITEM_CARROT);
 		a_Items.Add(E_ITEM_GOLDEN_CARROT);

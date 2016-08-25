@@ -77,7 +77,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_PathFinder(a_Width, a_Height)
 	, m_PathfinderActivated(false)
 	, m_JumpCoolDown(0)
-	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
 	, m_CustomName("")
@@ -100,6 +99,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
+	, m_BehaviorWanderer(this)
 	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
@@ -320,6 +320,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	SetPitchAndYawFromDestination(a_IsFollowingPath);
 
+	/*
 	switch (m_EMState)
 	{
 		case IDLE:
@@ -340,7 +341,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			break;
 		}
 		case ATTACKING: break;
-	}  // switch (m_EMState)
+	}  // switch (m_EMState) */
 
 	BroadcastMovementUpdate();
 
@@ -635,49 +636,8 @@ void cMonster::EventLosePlayer(void)
 
 void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (m_PathfinderActivated)
-	{
-		return;  // Still getting there
-	}
-
-	m_IdleInterval += a_Dt;
-
-	if (m_IdleInterval > std::chrono::seconds(1))
-	{
-		// At this interval the results are predictable
-		int rem = m_World->GetTickRandomNumber(6) + 1;
-		m_IdleInterval -= std::chrono::seconds(1);  // So nothing gets dropped when the server hangs for a few seconds
-
-		Vector3d Dist;
-		Dist.x = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
-		Dist.z = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
-
-		if ((Dist.SqrLength() > 2)  && (rem >= 3))
-		{
-
-			Vector3d Destination(GetPosX() + Dist.x, GetPosition().y, GetPosZ() + Dist.z);
-
-			cChunk * Chunk = a_Chunk.GetNeighborChunk(static_cast<int>(Destination.x), static_cast<int>(Destination.z));
-			if ((Chunk == nullptr) || !Chunk->IsValid())
-			{
-				return;
-			}
-
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
-			int RelX = static_cast<int>(Destination.x) - Chunk->GetPosX() * cChunkDef::Width;
-			int RelZ = static_cast<int>(Destination.z) - Chunk->GetPosZ() * cChunkDef::Width;
-			int YBelowUs = static_cast<int>(Destination.y) - 1;
-			if (YBelowUs >= 0)
-			{
-				Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
-				if (BlockType != E_BLOCK_STATIONARY_WATER)  // Idle mobs shouldn't enter water on purpose
-				{
-					MoveToPosition(Destination);
-				}
-			}
-		}
-	}
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 }
 
 
@@ -720,6 +680,15 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cMonster::ResetAttackCooldown()
 {
 	m_AttackCoolDownTicksLeft = static_cast<int>(3 * 20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every 3 seconds
+}
+
+
+
+
+
+bool cMonster::IsPathFinderActivated()
+{
+	return m_PathfinderActivated;
 }
 
 
