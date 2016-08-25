@@ -1394,7 +1394,7 @@ bool cEntity::DetectPortal()
 			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 		}
 
-		MoveToWorld(m_NewWorld, false, m_NewWorldPosition);
+		MoveToWorld(m_NewWorld, true, m_NewWorldPosition);
 		return true;
 	}
 
