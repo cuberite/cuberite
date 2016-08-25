@@ -298,7 +298,7 @@ void cProtocol1100::SendSoundEffect(const AString & a_SoundName, double a_X, dou
 	Pkt.WriteBEInt32(FloorC(a_Y * 8.0));
 	Pkt.WriteBEInt32(FloorC(a_Z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
-	Pkt.WriteBEFloat(a_Pitch * 63);
+	Pkt.WriteBEFloat(a_Pitch);
 }
 
 
@@ -382,7 +382,22 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 
 	switch (a_Entity.GetEntityType())
 	{
-		case cEntity::etPlayer: break;  // TODO?
+		case cEntity::etPlayer:
+		{
+			auto & Player = reinterpret_cast<const cPlayer &>(a_Entity);
+
+			// TODO Set player custom name to their name.
+			// Then it's possible to move the custom name of mobs to the entities
+			// and to remove the "special" player custom name.
+			a_Pkt.WriteBEUInt8(CUSTOM_NAME);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
+			a_Pkt.WriteString(Player.GetName());
+
+			a_Pkt.WriteBEUInt8(HEALTH);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+			break;
+		}
 		case cEntity::etPickup:
 		{
 			a_Pkt.WriteBEUInt8(ITEM);
