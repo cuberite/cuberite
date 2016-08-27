@@ -369,6 +369,9 @@ public:  // tolua_export
 	bool IsPlayerChunkSent();
 
 private:
+	/** The dimension that was last sent to a player in a Respawn or Login packet.
+	Used to avoid Respawning into the same dimension, which confuses the client. */
+	eDimension m_LastSentDimension;
 
 	friend class cServer;  // Needs access to SetSelf()
 
