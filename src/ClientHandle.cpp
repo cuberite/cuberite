@@ -1886,7 +1886,7 @@ void cClientHandle::RemoveFromWorld(void)
 	}
 	for (auto && Chunk : Chunks)
 	{
-		m_Protocol->SendUnloadChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ);
+		SendUnloadChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ);
 	}  // for itr - Chunks[]
 
 	// Here, we set last streamed values to bogus ones so everything is resent
