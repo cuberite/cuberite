@@ -49,52 +49,52 @@ namespace Metadata
 	enum Metadata_Index
 	{
 		// Entity
-		FLAGS,
-		AIR,
-		CUSTOM_NAME,
-		CUSTOM_NAME_VISIBLE,
-		SILENT,
-		NO_GRAVITY,
+		ENTITY_FLAGS,
+		ENTITY_AIR,
+		ENTITY_CUSTOM_NAME,
+		ENTITY_CUSTOM_NAME_VISIBLE,
+		ENTITY_SILENT,
+		ENTITY_NO_GRAVITY,
 		_ENTITY_NEXT,  // Used by descendants
 
 		// Potion
-		THROWN = _ENTITY_NEXT,
+		POTION_THROWN = _ENTITY_NEXT,
 
 		// FallingBlock
-		POSITION = _ENTITY_NEXT,
+		FALLING_BLOCK_POSITION = _ENTITY_NEXT,
 
 		// AreaEffectCloud
-		RADIUS = _ENTITY_NEXT,
-		AREAEFFECTCLOUD_COLOR,
-		SINGLE_POINT_EFFECT,
-		PARTICLE_ID,
-		PARTICLE_PARAMETER1,
-		PARTICLE_PARAMETER2,
+		AREA_EFFECT_CLOUD_RADIUS = _ENTITY_NEXT,
+		AREA_EFFECT_CLOUD_COLOR,
+		AREA_EFFECT_CLOUD_SINGLE_POINT_EFFECT,
+		AREA_EFFECT_CLOUD_PARTICLE_ID,
+		AREA_EFFECT_CLOUD_PARTICLE_PARAMETER1,
+		AREA_EFFECT_CLOUD_PARTICLE_PARAMETER2,
 
 		// Arrow
-		CRITICAL = _ENTITY_NEXT,
+		ARROW_CRITICAL = _ENTITY_NEXT,
 		_ARROW_NEXT,
 
 		// TippedArrow
-		ARROW_COLOR = _ARROW_NEXT,
+		TIPPED_ARROW_COLOR = _ARROW_NEXT,
 
 		// Boat
-		LAST_HIT_TIME = _ENTITY_NEXT,
-		FORWARD_DIRECTION,
+		BOAT_LAST_HIT_TIME = _ENTITY_NEXT,
+		BOAT_FORWARD_DIRECTION,
 		BOAT_DAMAGE_TAKEN,
 		BOAT_TYPE,
-		RIGHT_PADDLE_TURNING,
-		LEFT_PADDLE_TURNING,
+		BOAT_RIGHT_PADDLE_TURNING,
+		BOAT_LEFT_PADDLE_TURNING,
 
 		// EnderCrystal
-		BEAM_TARGET = _ENTITY_NEXT,
-		SHOW_BOTTOM,
+		ENDER_CRYSTAL_BEAM_TARGET = _ENTITY_NEXT,
+		ENDER_CRYSTAL_SHOW_BOTTOM,
 
 		// Fireball
 		_FIREBALL_NEXT = _ENTITY_NEXT,
 
 		// WitherSkull
-		INVULNERABLE = _FIREBALL_NEXT,
+		WITHER_SKULL_INVULNERABLE = _FIREBALL_NEXT,
 
 		// Fireworks
 		FIREWORK_INFO = _ENTITY_NEXT,
@@ -104,33 +104,33 @@ namespace Metadata
 
 		// ItemFrame
 		ITEM_FRAME_ITEM = _HANGING_NEXT,
-		ROTATION,
+		ITEM_FRAME_ROTATION,
 
 		// Item
-		ITEM = _ENTITY_NEXT,
+		ITEM_ITEM = _ENTITY_NEXT,
 
 		// Living
-		ACTIVE_HAND = _ENTITY_NEXT,
-		HEALTH,
-		POTION_EFFECT_COLOR,
-		POTION_EFFECT_AMBIENT,
-		NUMBER_OF_ARROWS,
+		LIVING_ACTIVE_HAND = _ENTITY_NEXT,
+		LIVING_HEALTH,
+		LIVING_POTION_EFFECT_COLOR,
+		LIVING_POTION_EFFECT_AMBIENT,
+		LIVING_NUMBER_OF_ARROWS,
 		_LIVING_NEXT,
 
 		// Player
-		ADDITIONAL_HEARTHS = _LIVING_NEXT,
-		SCORE,
-		DISPLAYED_SKIN_PARTS,
-		MAIN_HAND,
+		PLAYER_ADDITIONAL_HEARTHS = _LIVING_NEXT,
+		PLAYER_SCORE,
+		PLAYER_DISPLAYED_SKIN_PARTS,
+		PLAYER_MAIN_HAND,
 
 		// ArmorStand
 		ARMOR_STAND_STATUS = _LIVING_NEXT,
-		HEAD_ROTATION,
-		BODY_ROTATION,
-		LEFT_ARM_ROTATION,
-		RIGHT_ARM_ROTATION,
-		LEFT_LEG_ROTATION,
-		RIGHT_LEG_ROTATION,
+		ARMOR_STAND_HEAD_ROTATION,
+		ARMOR_STAND_BODY_ROTATION,
+		ARMOR_STAND_LEFT_ARM_ROTATION,
+		ARMOR_STAND_RIGHT_ARM_ROTATION,
+		ARMOR_STAND_LEFT_LEG_ROTATION,
+		ARMOR_STAND_RIGHT_LEG_ROTATION,
 
 		// Insentient
 		INSENTIENT_STATUS = _LIVING_NEXT,
@@ -140,17 +140,17 @@ namespace Metadata
 		_AMBIENT_NEXT = _INSENTIENT_NEXT,
 
 		// Bat
-		HANGING = _AMBIENT_NEXT,
+		BAT_HANGING = _AMBIENT_NEXT,
 
 		// Creature
 		_CREATURE_NEXT = _INSENTIENT_NEXT,
 
 		// Ageable
-		BABY = _CREATURE_NEXT,
+		AGEABLE_BABY = _CREATURE_NEXT,
 		_AGEABLE_NEXT,
 
 		// PolarBear
-		STANDING = _AGEABLE_NEXT,
+		POLAR_BEAR_STANDING = _AGEABLE_NEXT,
 
 		// Animal
 		_ANIMAL_NEXT = _AGEABLE_NEXT,
@@ -160,10 +160,10 @@ namespace Metadata
 		HORSE_TYPE,
 		HORSE_VARIANT,
 		HORSE_OWNER,
-		ARMOR,
+		HORSE_ARMOR,
 
 		// Pig
-		HAS_SADDLE = _ANIMAL_NEXT,
+		PIG_HAS_SADDLE = _ANIMAL_NEXT,
 
 		// Rabbit
 		RABBIT_TYPE = _ANIMAL_NEXT,
@@ -172,8 +172,8 @@ namespace Metadata
 		SHEEP_STATUS = _ANIMAL_NEXT,
 
 		// TameableAnimal
-		TAMEABLEANIMAL_STATUS = _ANIMAL_NEXT,
-		TAMEABLE_OWNER,
+		TAMEABLE_ANIMAL_STATUS = _ANIMAL_NEXT,
+		TAMEABLE_ANIMAL_OWNER,
 		_TAMEABLE_NEXT,
 
 		// Ocelot
@@ -181,94 +181,94 @@ namespace Metadata
 
 		// Wolf
 		WOLF_DAMAGE_TAKEN = _TAMEABLE_NEXT,
-		BEGGING,
-		COLLAR_COLOR,
+		WOLF_BEGGING,
+		WOLF_COLLAR_COLOR,
 
 		// Villager
-		PROFESSION = _AGEABLE_NEXT,
+		VILLAGER_PROFESSION = _AGEABLE_NEXT,
 
 		// Golem
 		_GOLEM_NEXT = _CREATURE_NEXT,
 
 		// IronGolem
-		PLAYER_CREATED = _GOLEM_NEXT,
+		IRON_GOLEM_PLAYER_CREATED = _GOLEM_NEXT,
 
 		// Shulker
-		FACING_DIRECTION = _GOLEM_NEXT,
-		ATTACHMENT_POSITION,
-		SHIELD_HEIGHT,
+		SHULKER_FACING_DIRECTION = _GOLEM_NEXT,
+		SHULKER_ATTACHMENT_FALLING_BLOCK_POSITION,
+		SHULKER_SHIELD_HEIGHT,
 
 		// Monster
 		_MONSTER_NEXT = _CREATURE_NEXT,
 
 		// Blaze
-		ON_FIRE = _MONSTER_NEXT,
+		BLAZE_ON_FIRE = _MONSTER_NEXT,
 
 		// Creeper
 		CREEPER_STATE = _MONSTER_NEXT,
 		CREEPER_POWERED,
-		IGNITED,
+		CREEPER_IGNITED,
 
 		// Guardian
 		GUARDIAN_STATUS = _MONSTER_NEXT,
-		TARGET,
+		GUARDIAN_TARGET,
 
 		// Skeleton
 		SKELETON_TYPE = _MONSTER_NEXT,
-		ARMS_SWINGING,
+		SKELETON_ARMS_SWINGING,
 
 		// Spider
-		CLIMBING = _MONSTER_NEXT,
+		SPIDER_CLIMBING = _MONSTER_NEXT,
 
 		// Witch
-		AGGRESIVE = _MONSTER_NEXT,
+		WITCH_AGGRESIVE = _MONSTER_NEXT,
 
 		// Wither
-		FIRST_HEAD_TARGET = _MONSTER_NEXT,
-		SECOND_HEAD_TARGET,
-		THIRD_HEAD_TARGET,
-		INVULNERABLE_TIMER,
+		WITHER_FIRST_HEAD_TARGET = _MONSTER_NEXT,
+		WITHER_SECOND_HEAD_TARGET,
+		WITHER_THIRD_HEAD_TARGET,
+		WITHER_INVULNERABLE_TIMER,
 
 		// Zombie
 		ZOMBIE_IS_BABY = _MONSTER_NEXT,
 		ZOMBIE_TYPE,
-		CONVERTING,
-		HANDS_RISED_UP,
+		ZOMBIE_CONVERTING,
+		ZOMBIE_HANDS_RISED_UP,
 
 		// Enderman
-		CARRIED_BLOCK = _MONSTER_NEXT,
-		SCREAMING,
+		ENDERMAN_CARRIED_BLOCK = _MONSTER_NEXT,
+		ENDERMAN_SCREAMING,
 
 		// EnderDragon
-		DRAGON_PHASE = _INSENTIENT_NEXT,
+		ENDER_DRAGON_DRAGON_PHASE = _INSENTIENT_NEXT,
 
 		// Flying
 		_FLYING_NEXT = _INSENTIENT_NEXT,
 
 		// Ghast
-		ATTACKING = _FLYING_NEXT,
+		GHAST_ATTACKING = _FLYING_NEXT,
 
 		// Slime
 		SLIME_SIZE = _INSENTIENT_NEXT,
 
 		// Minecart
-		SHAKING_POWER = _ENTITY_NEXT,
-		SHAKING_DIRECTION,
-		SHAKING_MULTIPLIER,
-		BLOCK_ID_META,
-		BLOCK_Y,
-		SHOW_BLOCK,
+		MINECART_SHAKING_POWER = _ENTITY_NEXT,
+		MINECART_SHAKING_DIRECTION,
+		MINECART_SHAKING_MULTIPLIER,
+		MINECART_BLOCK_ID_META,
+		MINECART_BLOCK_Y,
+		MINECART_SHOW_BLOCK,
 		_MINECART_NEXT,
 
 		// MinecartCommandBlock
-		COMMAND = _MINECART_NEXT,
-		LAST_OUTPUT,
+		MINECART_COMMAND_BLOCK_COMMAND = _MINECART_NEXT,
+		MINECART_COMMAND_BLOCK_LAST_OUTPUT,
 
 		// MinecartFurnace
-		MINECARTFURNACE_POWERED = _MINECART_NEXT,
+		MINECART_FURNACE_POWERED = _MINECART_NEXT,
 
 		// TNTPrimed
-		FUSE_TIME = _ENTITY_NEXT,
+		TNT_PRIMED_FUSE_TIME = _ENTITY_NEXT,
 	};
 }
 
@@ -376,7 +376,7 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 	{
 		Flags |= 0x20;
 	}
-	a_Pkt.WriteBEUInt8(FLAGS);  // Index
+	a_Pkt.WriteBEUInt8(ENTITY_FLAGS);  // Index
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 	a_Pkt.WriteBEInt8(Flags);
 
@@ -389,25 +389,25 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 			// TODO Set player custom name to their name.
 			// Then it's possible to move the custom name of mobs to the entities
 			// and to remove the "special" player custom name.
-			a_Pkt.WriteBEUInt8(CUSTOM_NAME);
+			a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
 			a_Pkt.WriteString(Player.GetName());
 
-			a_Pkt.WriteBEUInt8(HEALTH);
+			a_Pkt.WriteBEUInt8(LIVING_HEALTH);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
 			break;
 		}
 		case cEntity::etPickup:
 		{
-			a_Pkt.WriteBEUInt8(ITEM);
+			a_Pkt.WriteBEUInt8(ITEM_ITEM);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 			WriteItem(a_Pkt, reinterpret_cast<const cPickup &>(a_Entity).GetItem());
 			break;
 		}
 		case cEntity::etMinecart:
 		{
-			a_Pkt.WriteBEUInt8(SHAKING_POWER);
+			a_Pkt.WriteBEUInt8(MINECART_SHAKING_POWER);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 
 			// The following expression makes Minecarts shake more with less health or higher damage taken
@@ -416,11 +416,11 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 			auto curHealth = a_Entity.GetHealth();
 			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
 
-			a_Pkt.WriteBEUInt8(SHAKING_DIRECTION);  // (doesn't seem to effect anything)
+			a_Pkt.WriteBEUInt8(MINECART_SHAKING_DIRECTION);  // (doesn't seem to effect anything)
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(1);
 
-			a_Pkt.WriteBEUInt8(SHAKING_MULTIPLIER);  // or damage taken
+			a_Pkt.WriteBEUInt8(MINECART_SHAKING_MULTIPLIER);  // or damage taken
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));
 
@@ -430,24 +430,24 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 				const cItem & MinecartContent = RideableMinecart.GetContent();
 				if (!MinecartContent.IsEmpty())
 				{
-					a_Pkt.WriteBEUInt8(BLOCK_ID_META);
+					a_Pkt.WriteBEUInt8(MINECART_BLOCK_ID_META);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 					int Content = MinecartContent.m_ItemType;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
-					a_Pkt.WriteBEUInt8(BLOCK_Y);
+					a_Pkt.WriteBEUInt8(MINECART_BLOCK_Y);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
 
-					a_Pkt.WriteBEUInt8(SHOW_BLOCK);
+					a_Pkt.WriteBEUInt8(MINECART_SHOW_BLOCK);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 					a_Pkt.WriteBool(true);
 				}
 			}
 			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
 			{
-				a_Pkt.WriteBEUInt8(MINECARTFURNACE_POWERED);
+				a_Pkt.WriteBEUInt8(MINECART_FURNACE_POWERED);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 				a_Pkt.WriteBool(reinterpret_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
 			}
@@ -461,7 +461,7 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 			{
 				case cProjectileEntity::pkArrow:
 				{
-					a_Pkt.WriteBEUInt8(CRITICAL);
+					a_Pkt.WriteBEUInt8(ARROW_CRITICAL);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
 					a_Pkt.WriteBEInt8(reinterpret_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
 					break;
@@ -475,7 +475,7 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 				}
 				case cProjectileEntity::pkSplashPotion:
 				{
-					a_Pkt.WriteBEUInt8(THROWN);  // Potion item which was thrown
+					a_Pkt.WriteBEUInt8(POTION_THROWN);  // Potion item which was thrown
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 					WriteItem(a_Pkt, reinterpret_cast<const cSplashPotionEntity &>(Projectile).GetItem());
 				}
@@ -497,11 +497,11 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 		{
 			auto & Boat = reinterpret_cast<const cBoat &>(a_Entity);
 
-			a_Pkt.WriteBEInt8(LAST_HIT_TIME);
+			a_Pkt.WriteBEInt8(BOAT_LAST_HIT_TIME);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteBEInt32(Boat.GetLastDamage());
 
-			a_Pkt.WriteBEInt8(FORWARD_DIRECTION);
+			a_Pkt.WriteBEInt8(BOAT_FORWARD_DIRECTION);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteBEInt32(Boat.GetForwardDirection());
 
@@ -513,11 +513,11 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteBEInt32(Boat.GetType());
 
-			a_Pkt.WriteBEInt8(RIGHT_PADDLE_TURNING);
+			a_Pkt.WriteBEInt8(BOAT_RIGHT_PADDLE_TURNING);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
 
-			a_Pkt.WriteBEInt8(LEFT_PADDLE_TURNING);
+			a_Pkt.WriteBEInt8(BOAT_LEFT_PADDLE_TURNING);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Boat.IsLeftPaddleUsed());
 
@@ -530,7 +530,7 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 			a_Pkt.WriteBEUInt8(ITEM_FRAME_ITEM);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 			WriteItem(a_Pkt, Frame.GetItem());
-			a_Pkt.WriteBEUInt8(ROTATION);
+			a_Pkt.WriteBEUInt8(ITEM_FRAME_ROTATION);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
@@ -555,16 +555,16 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
-		a_Pkt.WriteBEUInt8(CUSTOM_NAME);
+		a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME);
 		a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
 		a_Pkt.WriteString(a_Mob.GetCustomName());
 
-		a_Pkt.WriteBEUInt8(CUSTOM_NAME_VISIBLE);  // Custom name always visible
+		a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME_VISIBLE);  // Custom name always visible
 		a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
 	}
 
-	a_Pkt.WriteBEUInt8(HEALTH);
+	a_Pkt.WriteBEUInt8(LIVING_HEALTH);
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
 
@@ -573,7 +573,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtBat:
 		{
 			auto & Bat = reinterpret_cast<const cBat &>(a_Mob);
-			a_Pkt.WriteBEUInt8(HANGING);
+			a_Pkt.WriteBEUInt8(BAT_HANGING);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
 			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 1 : 0);
 			break;
@@ -590,7 +590,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Creeper.IsCharged());
 
-			a_Pkt.WriteBEUInt8(IGNITED);
+			a_Pkt.WriteBEUInt8(CREEPER_IGNITED);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Creeper.IsBurnedWithFlintAndSteel());
 			break;
@@ -599,14 +599,14 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtEnderman:
 		{
 			auto & Enderman = reinterpret_cast<const cEnderman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(CARRIED_BLOCK);
+			a_Pkt.WriteBEUInt8(ENDERMAN_CARRIED_BLOCK);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
 			UInt32 Carried = 0;
 			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
 			Carried |= Enderman.GetCarriedMeta();
 			a_Pkt.WriteVarInt32(Carried);
 
-			a_Pkt.WriteBEUInt8(SCREAMING);
+			a_Pkt.WriteBEUInt8(ENDERMAN_SCREAMING);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Enderman.IsScreaming());
 			break;
@@ -615,7 +615,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtGhast:
 		{
 			auto & Ghast = reinterpret_cast<const cGhast &>(a_Mob);
-			a_Pkt.WriteBEUInt8(ATTACKING);
+			a_Pkt.WriteBEUInt8(GHAST_ATTACKING);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Ghast.IsCharging());
 			break;
@@ -664,11 +664,11 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			Appearance |= Horse.GetHorseStyle() << 8;
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Appearance));
 
-			a_Pkt.WriteBEUInt8(ARMOR);
+			a_Pkt.WriteBEUInt8(HORSE_ARMOR);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseArmour()));
 
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Horse.IsBaby());
 			break;
@@ -687,7 +687,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		{
 			auto & Ocelot = reinterpret_cast<const cOcelot &>(a_Mob);
 
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Ocelot.IsBaby());
 			break;
@@ -697,7 +697,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		{
 			auto & Cow = reinterpret_cast<const cCow &>(a_Mob);
 
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Cow.IsBaby());
 			break;
@@ -707,7 +707,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		{
 			auto & Chicken = reinterpret_cast<const cChicken &>(a_Mob);
 
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Chicken.IsBaby());
 			break;
@@ -717,11 +717,11 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		{
 			auto & Pig = reinterpret_cast<const cPig &>(a_Mob);
 
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Pig.IsBaby());
 
-			a_Pkt.WriteBEUInt8(HAS_SADDLE);
+			a_Pkt.WriteBEUInt8(PIG_HAS_SADDLE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Pig.IsSaddled());
 
@@ -732,7 +732,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		{
 			auto & Sheep = reinterpret_cast<const cSheep &>(a_Mob);
 
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Sheep.IsBaby());
 
@@ -751,7 +751,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtRabbit:
 		{
 			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Rabbit.IsBaby());
 
@@ -782,11 +782,11 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtVillager:
 		{
 			auto & Villager = reinterpret_cast<const cVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Villager.IsBaby());
 
-			a_Pkt.WriteBEUInt8(PROFESSION);
+			a_Pkt.WriteBEUInt8(VILLAGER_PROFESSION);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
 			break;
@@ -795,7 +795,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtWitch:
 		{
 			auto & Witch = reinterpret_cast<const cWitch &>(a_Mob);
-			a_Pkt.WriteBEUInt8(AGGRESIVE);
+			a_Pkt.WriteBEUInt8(WITCH_AGGRESIVE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Witch.IsAngry());
 			break;
@@ -804,7 +804,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtWither:
 		{
 			auto & Wither = reinterpret_cast<const cWither &>(a_Mob);
-			a_Pkt.WriteBEUInt8(INVULNERABLE_TIMER);
+			a_Pkt.WriteBEUInt8(WITHER_INVULNERABLE_TIMER);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(Wither.GetWitherInvulnerableTicks());
 
@@ -815,7 +815,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtWolf:
 		{
 			auto & Wolf = reinterpret_cast<const cWolf &>(a_Mob);
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Wolf.IsBaby());
 
@@ -832,7 +832,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			{
 				WolfStatus |= 0x4;
 			}
-			a_Pkt.WriteBEUInt8(TAMEABLEANIMAL_STATUS);
+			a_Pkt.WriteBEUInt8(TAMEABLE_ANIMAL_STATUS);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
 			a_Pkt.WriteBEInt8(WolfStatus);
 
@@ -840,11 +840,11 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));  // TODO Not use the current health
 
-			a_Pkt.WriteBEUInt8(BEGGING);
+			a_Pkt.WriteBEUInt8(WOLF_BEGGING);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Wolf.IsBegging());
 
-			a_Pkt.WriteBEUInt8(COLLAR_COLOR);
+			a_Pkt.WriteBEUInt8(WOLF_COLLAR_COLOR);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Wolf.GetCollarColor()));
 			break;
@@ -853,7 +853,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtZombie:
 		{
 			auto & Zombie = reinterpret_cast<const cZombie &>(a_Mob);
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Zombie.IsBaby());
 
@@ -861,7 +861,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);  // TODO: This actually encodes the zombie villager profession, but that isn't implemented yet.
 
-			a_Pkt.WriteBEUInt8(CONVERTING);
+			a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Zombie.IsConverting());
 			break;
@@ -870,7 +870,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 		case mtZombiePigman:
 		{
 			auto & ZombiePigman = reinterpret_cast<const cZombiePigman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(BABY);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
