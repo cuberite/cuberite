@@ -3,7 +3,6 @@
 // Grants breeding capabilities to the mob
 
 class cBehaviorBreeder;
-class iBehaviorBreeder;
 
 class cWorld;
 class cMonster;
@@ -18,7 +17,7 @@ class cBehaviorBreeder
 {
 
 public:
-	cBehaviorBreeder(iBehaviorBreeder * a_ParentInterface);
+	cBehaviorBreeder(cMonster * a_Parent, cItems & a_BreedingItems);
 
 	// Functions our host Monster should invoke:
 	void Tick();
@@ -42,11 +41,7 @@ public:
 	bool IsInLoveCooldown() const;
 
 private:
-	static iBehaviorBreeder * ToInterface(cMonster * a_Monster);
-	static cBehaviorBreeder * ToBehavior(cMonster * a_Monster);
-
 	/** Our parent */
-	iBehaviorBreeder * m_ParentInterface;
 	cMonster * m_Parent;
 
 	/** The monster's breeding partner. */
@@ -60,4 +55,6 @@ private:
 
 	/** The monster is engaged in mating, once this reaches zero, a baby will be born. Decrements by 1 per tick till reaching zero, then a baby is made and ResetLoveMode() is called. */
 	int m_MatingTimer;
+
+	cItems & m_BreedingItems;
 };

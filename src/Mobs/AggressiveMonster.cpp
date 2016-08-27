@@ -12,10 +12,11 @@
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
-	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height)
+cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height, int a_AggressionLightLevel) :
+	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height), m_BehaviorAggressive(this, a_AggressionLightLevel)
 {
 	m_EMPersonality = AGGRESSIVE;
+	ASSERT(GetBehaviorChaser() != nullptr);
 }
 
 
@@ -27,14 +28,17 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
+	cBehaviorChaser * BehaviorChaser = GetBehaviorChaser();
+	cBehaviorWanderer * BehaviorWanderer = GetBehaviorWanderer();
+
 	for (;;)
 	{
-		GetBehaviorAggressive()->ActiveTick();
-		if (GetBehaviorChaser()->ActiveTick())
+		m_BehaviorAggressive.ActiveTick();
+		if (BehaviorChaser->ActiveTick())
 		{
 			break;
 		}
-		if (GetBehaviorWanderer()->ActiveTick())
+		if ((BehaviorWanderer != nullptr) && BehaviorWanderer->ActiveTick(a_Dt, a_Chunk))
 		{
 			break;
 		}
@@ -43,5 +47,5 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		break;
 	}
 
-
+	BehaviorChaser->Tick();
 }

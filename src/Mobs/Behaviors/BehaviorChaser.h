@@ -19,6 +19,7 @@ public:
 	// Functions our host Monster should invoke:
 	bool ActiveTick();
 	void Destroyed();
+	void Tick();
 
 	// Our host monster will call these once it loads its config file
 	void SetAttackRate(float a_AttackRate);

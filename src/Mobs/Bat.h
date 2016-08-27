@@ -7,10 +7,8 @@
 
 
 
-class cBat :
-	public cPassiveMonster
+class cBat : public cMonster
 {
-	typedef cPassiveMonster super;
 
 public:
 	cBat(void);

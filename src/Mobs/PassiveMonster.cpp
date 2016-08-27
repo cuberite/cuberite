@@ -9,11 +9,20 @@
 
 
 
-cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
+cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height, cItems & a_BreedingItems, cItems & a_FollowedItems) :
 	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height),
-	m_BehaviorBreeder(this), m_BehaviorItemFollower(this), m_BehaviorCoward(this)
+	m_BehaviorBreeder(this), m_BehaviorItemFollower(this, a_FollowedItems), m_BehaviorCoward(this)
 {
 	m_EMPersonality = PASSIVE;
+}
+
+
+
+
+
+cPassiveMonster::~cPassiveMonster()
+{
+
 }
 
 

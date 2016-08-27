@@ -18,12 +18,13 @@ iBehaviorBreeder::~iBehaviorBreeder()
 
 
 
-cBehaviorBreeder::cBehaviorBreeder(iBehaviorBreeder * a_ParentInterface) :
-	m_ParentInterface(a_ParentInterface),
+cBehaviorBreeder::cBehaviorBreeder(cMonster * a_Parent, cItems & a_BreedingItems) :
+	m_Parent(a_Parent),
 	m_LovePartner(nullptr),
 	m_LoveTimer(0),
 	m_LoveCooldown(0),
-	m_MatingTimer(0)
+	m_MatingTimer(0),
+	m_BreedingItems(a_BreedingItems)
 {
 	m_Parent = dynamic_cast<cMonster *>(m_ParentInterface);
 	ASSERT(m_Parent != nullptr);
@@ -67,16 +68,13 @@ bool cBehaviorBreeder::ActiveTick()
 			m_Parent->GetWorld()->DoWithEntityByID(BabyID, Callback);
 			if (Callback.Baby != nullptr)
 			{
-				auto BabyInterface = ToInterface(Callback.Baby);
-				BabyInterface->InheritFromParents(m_Parent, m_LovePartner);
+				Callback.Baby->InheritFromParents(m_Parent, m_LovePartner);
 			}
 
 			cFastRandom Random;
 			World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, 1 + Random.NextInt(6));
 
-			auto PartnerInterface =  ToInterface(m_LovePartner);
-			cBehaviorBreeder & PartnerBreedingBehavior = PartnerInterface->GetBehaviorBreeder();
-			PartnerBreedingBehavior.ResetLoveMode();
+			m_LovePartner->GetBehaviorBreeder()->ResetLoveMode();
 			ResetLoveMode();
 		}
 		return true;
@@ -111,8 +109,8 @@ bool cBehaviorBreeder::ActiveTick()
 					return false;
 				}
 
-				auto PartnerBreedingBehavior = ToBehavior(PotentialPartner);
-				auto MyBreedingBehavior = ToBehavior(m_Me);
+				auto PartnerBreedingBehavior = PotentialPartner->GetBehaviorBreeder();
+				auto MyBreedingBehavior = m_Me->GetBehaviorBreeder();
 
 				// If the potential partner is not in love
 				// Or they already have a mate, do not breed with them
@@ -165,10 +163,9 @@ void cBehaviorBreeder::Tick()
 
 void cBehaviorBreeder::Destroyed()
 {
-	UNUSED(m_ParentInterface);
 	if (m_LovePartner != nullptr)
 	{
-		ToBehavior(m_LovePartner)->ResetLoveMode();
+		m_LovePartner->GetBehaviorBreeder()->ResetLoveMode();
 	}
 }
 
@@ -181,10 +178,8 @@ void cBehaviorBreeder::OnRightClicked(cPlayer & a_Player)
 	// If a player holding breeding items right-clicked me, go into love mode
 	if ((m_LoveCooldown == 0) && !IsInLove() && !m_Parent->IsBaby())
 	{
-		cItems BreedingItems;
-		m_ParentInterface->GetBreedingItems(BreedingItems);
 		short HeldItem = a_Player.GetEquippedItem().m_ItemType;
-		if (BreedingItems.ContainsType(HeldItem))
+		if (m_BreedingItems.ContainsType(HeldItem))
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -235,24 +230,4 @@ bool cBehaviorBreeder::IsInLove() const
 bool cBehaviorBreeder::IsInLoveCooldown() const
 {
 	return (m_LoveCooldown > 0);
-}
-
-
-
-
-
-iBehaviorBreeder * cBehaviorBreeder::ToInterface(cMonster * a_Monster)
-{
-	auto ptr = dynamic_cast<iBehaviorBreeder *>(a_Monster);
-	ASSERT(ptr != nullptr);
-	return ptr;
-}
-
-
-
-
-
-cBehaviorBreeder * cBehaviorBreeder::ToBehavior(cMonster * a_Monster)
-{
-	return &ToInterface(a_Monster)->GetBehaviorBreeder();
 }
