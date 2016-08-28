@@ -204,8 +204,6 @@ void cChunkSender::Execute(void)
 				std::unordered_set<cClientHandle *> clients;
 				std::swap(itr->second.m_Clients, clients);
 				m_ChunkInfo.erase(itr);
-
-				cCSUnlock Unlock(Lock);
 				SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
 			}
 		}
