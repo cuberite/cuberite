@@ -235,7 +235,7 @@ public:
 	// tolua_end
 
 	/** Returns the SharedPtr to client handle associated with the player. */
-	auto GetClientHandlePtr(void) const { return m_ClientHandle; }
+	std::weak_ptr<cClientHandle> GetClientHandlePtr(void) const { return m_ClientHandle; }
 
 	// tolua_begin
 

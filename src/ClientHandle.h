@@ -413,7 +413,7 @@ private:
 
 	struct sChunkCoordsHash
 	{
-		auto operator()(const cChunkCoords & a_ChunkCoords) const
+		size_t operator()(const cChunkCoords & a_ChunkCoords) const
 		{
 			size_t Seed = static_cast<size_t>(a_ChunkCoords.m_ChunkX) + 0x9e3779b9;
 			return (Seed ^= static_cast<size_t>(a_ChunkCoords.m_ChunkZ) + 0x9e3779b9 + (Seed << 6) + (Seed >> 2));

@@ -482,7 +482,7 @@ namespace std
 	template <typename WeakPtrType>
 	struct equal_to<std::weak_ptr<WeakPtrType>>
 	{
-		constexpr bool operator()(const std::weak_ptr<WeakPtrType> & a_Lhs, const std::weak_ptr<WeakPtrType> & a_Rhs) const
+		/* constexpr */ bool operator()(const std::weak_ptr<WeakPtrType> & a_Lhs, const std::weak_ptr<WeakPtrType> & a_Rhs) const
 		{
 			return (!a_Lhs.owner_before(a_Rhs) && !a_Rhs.owner_before(a_Lhs));
 		}

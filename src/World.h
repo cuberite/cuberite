@@ -649,7 +649,7 @@ public:
 
 	/** Queues a task onto the tick thread. The task object will be deleted once the task is finished */
 	template <typename FunctionType>
-	auto QueueTask(FunctionType && a_Task)  // Exported in ManualBindings.cpp
+	std::future<void> QueueTask(FunctionType && a_Task)  // Exported in ManualBindings.cpp
 	{
 		cCSLock Lock(m_CSTasks);
 		m_Tasks.emplace_back(-1, std::forward<FunctionType>(a_Task));

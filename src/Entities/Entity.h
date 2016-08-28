@@ -301,7 +301,7 @@ public:
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI);
 
 	/** Returns the position stored before the last call to SetPosition. */
-	auto GetLastPosition(void) const { return m_LastPosition; }
+	Vector3d GetLastPosition(void) const { return m_LastPosition; }
 
 	// tolua_begin
 

@@ -414,7 +414,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 			cRoot::Get()->BroadcastPlayerListsAddPlayer(*Player);
 			cRoot::Get()->SendPlayerLists(Player);
 
-			// Note: cEnttiy::Initialize takes ownership of the player object
+			// Note: cEntity::Initialize takes ownership of the player object
 			Player->Initialize(std::move(PlayerPtr.value), *World);
 
 			World->AddPlayer(Player);
