@@ -168,6 +168,7 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 {
 	{
 		cCSLock Lock(m_CS);
+		cCSLock Lock2(m_CSClientRemoval);
 		for (auto && pair : m_ChunkInfo)
 		{
 			auto && clients = pair.second.m_Clients;
@@ -190,6 +191,13 @@ void cChunkSender::Execute(void)
 
 		{
 			cCSLock Lock(m_CS);
+
+			// We hold this lock to prevent any cClientHandle from freeing
+			// its memory while we're trying to send it a chunk. Accessing a freed cClientHandle
+			// is a dangling pointer error and is undefined behavior.
+			// The client will be delayed at ~cClientHandle, which calls our RemoveClient, which also holds this lock.
+			// This makes the cClientHandle destruction stop and wait until we're done here and we've released the lock.
+			cCSLock Lock2(m_CSClientRemoval);
 			while (!m_SendChunks.empty())
 			{
 				// Take one from the queue:
@@ -204,6 +212,7 @@ void cChunkSender::Execute(void)
 				std::unordered_set<cClientHandle *> clients;
 				std::swap(itr->second.m_Clients, clients);
 				m_ChunkInfo.erase(itr);
+				cCSUnlock Unlock(Lock);
 				SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
 			}
 		}
