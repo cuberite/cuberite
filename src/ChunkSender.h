@@ -114,7 +114,8 @@ protected:
 	cWorld & m_World;
 
 	cCriticalSection  m_CS;
-	cCriticalSection  m_CSClientRemoval;  // This lock is held as long as the clients of m_ChunkInfo may be modified
+	// This lock is held as long as the cClientHandle pointers of m_ChunkInfo are being used. Prevents dangling client pointers.
+	cCriticalSection  m_CSClientRemoval;
 	std::priority_queue<sChunkQueue> m_SendChunks;
 	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
 	cEvent m_evtQueue;  // Set when anything is added to m_ChunksReady
