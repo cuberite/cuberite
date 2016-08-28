@@ -38,8 +38,7 @@ public:
 				return;
 			}
 
-			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WATER, 0);
-			// This is called later than the real destroying of this ice block
+			a_ChunkInterface.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WATER, 0);
 		}
 	}
 
