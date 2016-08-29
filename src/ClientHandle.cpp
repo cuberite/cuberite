@@ -104,7 +104,24 @@ cClientHandle::~cClientHandle()
 {
 	ASSERT(m_State == eState::csDestroyed);  // Has Destroy() been called?
 
-	// Note: don't handle player destruction here because we don't own them, so problems arise during shutdown
+	if (m_Player != nullptr)
+	{
+		cWorld * World = m_Player->GetWorld();
+
+		// Upon clienthandle destruction, the world pointer of a valid player SHALL NOT be null.
+		// The only time where it can be null is after player construction but before cEntity::Initialize is called in the queued task in Authenticate.
+		// During this time, it is guaranteed that the clienthandle is not deleted.
+		ASSERT(World != nullptr);
+
+		World->QueueTask(
+			[this](cWorld & a_World)
+			{
+				a_World.RemovePlayer(m_Player);
+				a_World.BroadcastPlayerListRemovePlayer(*m_Player);
+				m_Player->Destroy();
+			}
+		);
+	}
 
 	LOGD("Deletied client \"%s\" at %p", GetUsername().c_str(), static_cast<void *>(this));
 }
@@ -125,38 +142,6 @@ void cClientHandle::Destroy(void)
 	{
 		cCSLock Lock(m_CSLink);
 		m_Link.reset();
-	}
-
-	if (m_Player != nullptr)
-	{
-		cWorld * World = m_Player->GetWorld();
-
-		// Upon Destroy, the world pointer of a valid player SHALL NOT be null.
-		// Guaranteed by Destroy and Authenticate being called in the same thread
-		ASSERT(World != nullptr);
-
-		// We do not leak a player object as Authenticate checks to see if Destroy was called before creating a player
-		World->QueueTask(
-			[this](cWorld & a_World)
-			{
-				if (m_Player->GetParentChunk() == nullptr)
-				{
-					// Player not yet initialised; calling Destroy is not valid
-					LOGWARN("ParentChunk null");
-					return;
-				}
-
-				if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*m_Player))
-				{
-					cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", m_Player->GetName().c_str()));
-					LOGINFO("Player %s has left the game", m_Player->GetName().c_str());
-				}
-
-				a_World.RemovePlayer(m_Player);
-				a_World.BroadcastPlayerListRemovePlayer(*m_Player);
-				m_Player->Destroy();
-			}
-		);
 	}
 
 	RemoveFromWorld();
@@ -366,22 +351,12 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	}
 	m_Player->SetIP(m_IPString);
 
-	// So Destroy always has a valid world for a valid player
-	// Additionally, plugins expect world to be set
-	m_Player->SetWorld(World);  
-
 	cpp14::move_on_copy_wrapper<decltype(Player)> PlayerPtr(std::move(Player));
 	World->QueueTask(
 		[World, Player = m_Player, PlayerPtr, Client](cWorld & a_World) mutable
 		{
-			// We're in the task to create the player - any other QueueTask will execute in the next tick
-			// So, check to see cClientHandle::Destroy has not been called (State >= IsDestroying where State is monotonic)
-			if (Client->IsDestroying() || Client->IsDestroyed())
-			{
-				// Destroy called - proceeding now means we may create a player object that's never deleted
-				LOGWARN("Destroyed");
-				return;
-			}
+			// Plugins expect world to be set:
+			Player->SetWorld(World);
 
 			if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*Player))
 			{
