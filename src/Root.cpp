@@ -361,55 +361,6 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 	auto Worlds = a_Settings.GetValues("Worlds");
 
-	// Fix servers that have default world configs created prior to #2815. See #2810.
-	// This can probably be removed several years after 2016
-	// We start by inspecting the world linkage and determining if it's the default one
-	if ((DefaultWorldName == "world") && (Worlds.size() == 1))
-	{
-		auto DefaultWorldIniFile= cpp14::make_unique<cIniFile>();
-		if (DefaultWorldIniFile->ReadFile("world/world.ini"))
-		{
-			AString NetherName = DefaultWorldIniFile->GetValue("LinkedWorlds", "NetherWorldName", "");
-			AString EndName = DefaultWorldIniFile->GetValue("LinkedWorlds", "EndWorldName", "");
-			if ((NetherName.compare("world_nether") == 0) && (EndName.compare("world_end") == 0))
-			{
-				// This is a default world linkage config, see if the nether and end are in settings.ini
-				// If both of them are not in settings.ini, then this is a pre-#2815 default config
-				// so we add them to settings.ini
-				// Note that if only one of them is not in settings.ini, it's nondefault and we don't touch it
-
-				bool NetherInSettings = false;
-				bool EndInSettings = false;
-
-				for (auto WorldNameValue : Worlds)
-				{
-					AString ValueName = WorldNameValue.first;
-					if (ValueName.compare("World") != 0)
-					{
-						continue;
-					}
-					AString WorldName = WorldNameValue.second;
-					if (WorldName.compare("world_nether") == 0)
-					{
-						NetherInSettings = true;
-					}
-					else if (WorldName.compare("world_end") == 0)
-					{
-						EndInSettings = true;
-					}
-				}
-
-				if ((!NetherInSettings) && (!EndInSettings))
-				{
-					a_Settings.AddValue("Worlds", "World", "world_nether");
-					a_Settings.AddValue("Worlds", "World", "world_end");
-					Worlds = a_Settings.GetValues("Worlds");  // Refresh the Worlds list so that the rest of the function works as usual
-					LOG("The server detected an old default config with bad world linkages. This has been autofixed by adding \"world_nether\" and \"world_end\" to settings.ini. If you do not want this autofix to trigger, please remove the nether and / or end from settings.ini and from world/world.ini");
-				}
-			}
-		}
-	}
-
 	// Then load the other worlds
 	if (Worlds.size() <= 0)
 	{
