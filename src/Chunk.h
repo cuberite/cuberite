@@ -112,6 +112,9 @@ public:
 
 	bool CanUnload(void);
 
+	/** Returns true if the chunk could have been unloaded if it weren't dirty */
+	bool CanUnloadAfterSaving(void);
+
 	bool IsLightValid(void) const {return m_IsLightValid; }
 
 	/*
