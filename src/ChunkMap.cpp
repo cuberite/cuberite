@@ -2762,7 +2762,7 @@ void cChunkMap::QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked)
 {
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
+	cChunkPtr Chunk = GetChunk(a_ChunkX, a_ChunkZ);
 	if (Chunk != nullptr)
 	{
 		Chunk->SetAlwaysTicked(a_AlwaysTicked);
