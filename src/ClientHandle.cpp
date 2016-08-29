@@ -66,6 +66,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
+	m_ShouldDestroyPlayer(true),
 	m_Protocol(this),
 	m_Player(nullptr),  // In order to catch when client leaves before authentication
 	m_TicksSinceLastPacket(0),
@@ -105,7 +106,7 @@ cClientHandle::~cClientHandle()
 	ASSERT(m_State == eState::csDestroyed);  // Has Destroy() been called?
 
 	if (
-		!cRoot::Get()->GetServer()->IsShuttingDown() &&  // If server is shutting down, m_Player is considered invalid. It will be cleaned up by cWorld
+		m_ShouldDestroyPlayer &&  // If server is shutting down, m_Player is considered invalid. It will be cleaned up by cWorld
 		(m_Player != nullptr)
 	)
 	{

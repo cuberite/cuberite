@@ -660,6 +660,16 @@ void cServer::BindBuiltInConsoleCommands(void)
 
 void cServer::Shutdown(void)
 {
+	{
+		// Notify all clients of the shutdown:
+		cCSLock Lock(m_CSClients);
+		for (const auto & Client : m_Clients)
+		{
+			Client->StopPlayerDestructionManagement();
+			// TODO: send "Server shut down: kthnxbai!"
+		}
+	}
+
 	// Stop listening on all sockets:
 	for (auto srv: m_ServerHandles)
 	{
@@ -667,19 +677,14 @@ void cServer::Shutdown(void)
 	}
 	m_ServerHandles.clear();
 
+	// At this point, OnRemoteClosed will eventually be called for the clienthandle before it is deleted
+	// No need to manually call Destroy
+
 	// Notify the tick thread and wait for it to terminate:
 	m_bRestarting = true;
 	m_RestartEvent.Wait();
 
 	cRoot::Get()->SaveAllChunks();
-
-	// Remove all clients:
-	cCSLock Lock(m_CSClients);
-	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
-	{
-		(*itr)->SetState(cClientHandle::eState::csDestroyed);
-		// TODO: send "Server shut down: kthnxbai!"
-	}
 }
 
 

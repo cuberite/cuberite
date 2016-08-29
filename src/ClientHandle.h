@@ -375,6 +375,9 @@ public:  // tolua_export
 	/** Called by the protocol recognizer when the protocol version is known. */
 	void SetProtocolVersion(UInt32 a_ProtocolVersion) { m_ProtocolVersion = a_ProtocolVersion; }
 
+	/** Called by cServer::Shutdown to indicate m_Player's destruction is out of our control */
+	void StopPlayerDestructionManagement() { m_ShouldDestroyPlayer = false; }
+
 	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
 	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
 
@@ -410,6 +413,10 @@ private:
 
 	AString m_Username;
 	Json::Value m_Properties;
+
+	/** Flag indicating whether it is safe to access m_Player in our destructor to destroy it
+	While used inter-thread, atomicity not necessary as is only ever set in the main thread and read in a destructor, which is not called as long as someone has a reference to us */
+	bool m_ShouldDestroyPlayer;
 
 	struct sChunkCoordsHash
 	{
