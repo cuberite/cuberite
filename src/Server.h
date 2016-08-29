@@ -94,6 +94,9 @@ public:
 
 	void Shutdown(void);
 
+	/** Returns whether cServer::Shutdown has been called */
+	bool IsShuttingDown(void) { return m_bRestarting; }
+
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
 	/** Authenticates the specified user, called by cAuthenticator */

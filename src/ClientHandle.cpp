@@ -104,7 +104,10 @@ cClientHandle::~cClientHandle()
 {
 	ASSERT(m_State == eState::csDestroyed);  // Has Destroy() been called?
 
-	if (m_Player != nullptr)
+	if (
+		!cRoot::Get()->GetServer()->IsShuttingDown() &&  // If server is shutting down, m_Player is considered invalid. It will be cleaned up by cWorld
+		(m_Player != nullptr)
+	)
 	{
 		cWorld * World = m_Player->GetWorld();
 
