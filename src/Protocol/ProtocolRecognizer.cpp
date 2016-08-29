@@ -635,10 +635,10 @@ void cProtocolRecognizer::SendResetTitle(void)
 
 
 
-void cProtocolRecognizer::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
+void cProtocolRecognizer::SendRespawn(eDimension a_Dimension)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
+	m_Protocol->SendRespawn(a_Dimension);
 }
 
 

@@ -893,6 +893,15 @@ void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
 
 
 
+cWorld * cPlayer::GetBedWorld()
+{
+	return m_SpawnWorld;
+}
+
+
+
+
+
 void cPlayer::SetFlying(bool a_IsFlying)
 {
 	if (a_IsFlying == m_IsFlying)
