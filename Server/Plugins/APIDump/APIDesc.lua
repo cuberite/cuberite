@@ -599,7 +599,7 @@ end
 				SendHideTitle = { Params = "", Return = "", Notes = "Sends to hide the title." },
 				SendPluginMessage = { Params = "Channel, Message", Return = "", Notes = "Sends the plugin message on the specified channel." },
 				SendResetTitle = { Params = "", Return = "", Notes = "Sends to reset the title." },
-				SendSetSubTitle = { Params = "SubTitle", Return = "", Notes = "Send the subtitle but does not show it. Use SendTitleTimes to show the title." },
+				SendSetSubTitle = { Params = "SubTitle", Return = "", Notes = "Sends the subtitle but does not show it. Use SendTitleTimes to show the title." },
 				SendSetRawSubTitle = { Params = "RawSubTitle", Return = "", Notes = "Sends the raw subtitle but does not show it. Use SendTitleTimes to show the title." },
 				SendSetTitle = { Params = "Title", Return = "", Notes = "Sends the title but does not show it. Use SendTitleTimes to show the title." },
 				SendSetRawTitle = { Params = "RawTitle", Return = "", Notes = "Sends the raw title but does not show it. Use SendTitleTimes to show the title." },
