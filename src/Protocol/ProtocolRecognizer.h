@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x"
-#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110"
+#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x"
+#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210"
 
 
 
@@ -33,11 +33,12 @@ class cProtocolRecognizer :
 public:
 	enum
 	{
-		PROTO_VERSION_1_8_0 = 47,
-		PROTO_VERSION_1_9_0 = 107,
-		PROTO_VERSION_1_9_1 = 108,
-		PROTO_VERSION_1_9_2 = 109,
-		PROTO_VERSION_1_9_4 = 110,
+		PROTO_VERSION_1_8_0  = 47,
+		PROTO_VERSION_1_9_0  = 107,
+		PROTO_VERSION_1_9_1  = 108,
+		PROTO_VERSION_1_9_2  = 109,
+		PROTO_VERSION_1_9_4  = 110,
+		PROTO_VERSION_1_10_0 = 210,
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
