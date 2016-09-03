@@ -29,6 +29,7 @@
 #include "ClientHandle.h"
 #include "EffectID.h"
 #include <functional>
+#include "ExplosionLimiter.h"
 
 
 
@@ -775,9 +776,11 @@ public:
 
 	// tolua_end
 
-	cChunkGenerator & GetGenerator(void) { return m_Generator; }
-	cWorldStorage &   GetStorage  (void) { return m_Storage; }
-	cChunkMap *       GetChunkMap (void) { return m_ChunkMap.get(); }
+	cChunkGenerator &   GetGenerator(void) { return m_Generator; }
+	cWorldStorage &     GetStorage  (void) { return m_Storage; }
+	cChunkMap *         GetChunkMap (void) { return m_ChunkMap.get(); }
+	cExplosionLimiter & GetExplosionLimiter();
+
 
 	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
@@ -896,10 +899,11 @@ private:
 	// std::chrono::milliseconds is guaranteed to be good for 292 years by the standard.
 	std::chrono::milliseconds  m_WorldAge;
 	std::chrono::milliseconds  m_TimeOfDay;
-	cTickTimeLong  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
-	cTickTimeLong  m_LastChunkCheck;        // The last WorldAge (in ticks) in which unloading and possibly saving was triggered
-	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	unsigned int  m_TickCount;        // The number of ticks we've ever ticked. Wraps to 0 every 10000 ticks
+	cTickTimeLong  m_LastTimeUpdate;  // The tick in which the last time update has been sent.
+	cTickTimeLong  m_LastSave;        // The last WorldAge (in ticks) in which save-all was triggerred
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
+
 
 	NIBBLETYPE m_SkyDarkness;
 
@@ -927,6 +931,7 @@ private:
 	unsigned int m_MaxPlayers;
 
 	std::unique_ptr<cChunkMap> m_ChunkMap;
+	cExplosionLimiter m_ExplosionLimiter;
 
 	bool m_bAnimals;
 	std::set<eMonsterType> m_AllowedMobs;

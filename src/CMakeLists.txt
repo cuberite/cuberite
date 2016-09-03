@@ -35,6 +35,7 @@ SET (SRCS
 	Cuboid.cpp
 	DeadlockDetect.cpp
 	Enchantments.cpp
+	ExplosionLimiter.cpp
 	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
@@ -108,6 +109,7 @@ SET (HDRS
 	EffectID.h
 	Enchantments.h
 	Endianness.h
+	ExplosionLimiter.h
 	FastRandom.h
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
