@@ -453,7 +453,7 @@ void cWorld::Start(void)
 	// The presence of a configuration value overrides everything
 	// If no configuration value is found, GetDimension() is written to file and the variable is written to again to ensure that cosmic rays haven't sneakily changed its value
 	m_Dimension = StringToDimension(IniFile.GetValueSet("General", "Dimension", DimensionToString(GetDimension())));
-	int UnusedDirtyChunksCap = IniFile.GetValueSetI("General", "UnusedChunkCap", 500);
+	int UnusedDirtyChunksCap = IniFile.GetValueSetI("General", "UnusedChunkCap", 1000);
 	if (UnusedDirtyChunksCap < 0)
 	{
 		UnusedDirtyChunksCap *= -1;
