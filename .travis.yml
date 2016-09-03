@@ -11,6 +11,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
+    - gdb
 
 script: ./CIbuild.sh
 
@@ -26,3 +27,10 @@ branches:
   only:
     - coverity_scan
     - master
+
+after_failure:
+- cat /proc/sys/kernel/core_pattern
+- COREFILE=$(find Server -maxdepth 1 -name "core*" | head -n 1) # find core file
+- echo $COREFILE # print path of core file
+- echo `pwd` # print path of working directory
+- if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" $CUBERITE_PATH -ex "info threads" -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
