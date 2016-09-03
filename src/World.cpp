@@ -471,7 +471,7 @@ void cWorld::Start(void)
 	}
 	m_UnusedDirtyChunksCap = static_cast<size_t>(UnusedDirtyChunksCap);
 	m_ExplosionLimiter.SetExplosionsAllowedPerSecond(
-				static_cast<unsigned int>(IniFile.GetValueSetI("General", "ExplosionPerSecCap", 15)));
+		static_cast<unsigned int>(IniFile.GetValueSetI("General", "ExplosionPerSecCap", 15)));
 
 	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
 	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);

@@ -1711,26 +1711,29 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			return;
 		}
 
-		for (int radius = 1; radius <= ExplosionSizeInt; ++radius)
+		// Loop a sphere, inside out
+		// We scan the surface of a cube. The cube increases in size each iteration
+		for (int CubeSize = 1; CubeSize <= ExplosionSizeInt; ++CubeSize)
 		{
-			for (int x = -radius; x <= radius; x++)
+			for (int x = -CubeSize; x <= CubeSize; x++)
 			{
-				for (int y = -radius; y <= radius; y++)
+				for (int y = -CubeSize; y <= CubeSize; y++)
 				{
 					if ((by + y >= cChunkDef::Height) || (by + y < 0))
 					{
 						// Outside of the world
 						continue;
 					}
-					for (int z = -radius; z <= radius; z++)
+					for (int z = -CubeSize; z <= CubeSize; z++)
 					{
 						if ((x * x + y * y + z * z) > ExplosionSizeSq)
 						{
-							// Too far away
+							// Outside the sphere
 							continue;
 						}
-						if ((abs(x) != radius) && (abs(y) != radius) && (abs(z) != radius))
+						if ((abs(x) != CubeSize) && (abs(y) != CubeSize) && (abs(z) != CubeSize))
 						{
+							// Not on the surface of the cube
 							continue;
 						}
 
@@ -1811,7 +1814,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 					}  // for z
 				}  // for y
 			}  // for x
-		} // for radius
+		}  // for radius
 		area.Write(m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
 	}
 
