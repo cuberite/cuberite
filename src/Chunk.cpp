@@ -223,6 +223,19 @@ bool cChunk::CanUnload(void)
 
 
 
+bool cChunk::CanUnloadAfterSaving(void)
+{
+	return
+		m_LoadedByClient.empty() &&  // The chunk is not used by any client
+		m_IsDirty &&                 // The chunk is dirty
+		(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
+		(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
+}
+
+
+
+
+
 void cChunk::MarkSaving(void)
 {
 	m_IsSaving = true;

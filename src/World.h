@@ -683,7 +683,10 @@ public:
 	void ScheduleTask(int a_DelayTicks, std::function<void(cWorld &)> a_Task);
 
 	/** Returns the number of chunks loaded	 */
-	int GetNumChunks() const;  // tolua_export
+	size_t GetNumChunks() const;  // tolua_export
+
+	/** Returns the number of unused dirty chunks. That's the number of chunks that we can save and then unload. */
+	size_t GetNumUnusedDirtyChunks(void) const;  // tolua_export
 
 	/** Returns the number of chunks loaded and dirty, and in the lighting queue */
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
@@ -851,6 +854,11 @@ private:
 	} ;
 
 
+	/** The maximum number of allowed unused dirty chunks for this world.
+	Loaded from config, enforced every 10 seconds by freeing some unused dirty chunks
+	if this was exceeded. */
+	size_t m_UnusedDirtyChunksCap;
+
 	AString m_WorldName;
 
 	/** The name of the overworld that portals in this world should link to.
@@ -889,7 +897,7 @@ private:
 	std::chrono::milliseconds  m_WorldAge;
 	std::chrono::milliseconds  m_TimeOfDay;
 	cTickTimeLong  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
-	cTickTimeLong  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
+	cTickTimeLong  m_LastChunkCheck;        // The last WorldAge (in ticks) in which unloading and possibly saving was triggered
 	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 

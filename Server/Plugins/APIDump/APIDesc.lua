@@ -2582,6 +2582,7 @@ end
 				GetMinNetherPortalWidth = { Params = "", Return = "number", Notes = "Returns the minimum width for a nether portal" },
 				GetName = { Params = "", Return = "string", Notes = "Returns the name of the world, as specified in the settings.ini file." },
 				GetNumChunks = { Params = "", Return = "number", Notes = "Returns the number of chunks currently loaded." },
+				GetNumUnusedDirtyChunks = { Params = "", Return = "number", Notes = "Returns the number of unused dirty chunks. That's the number of chunks that we can save and then unload." },
 				GetScoreBoard = { Params = "", Return = "{{cScoreBoard}}", Notes = "Returns the {{cScoreBoard|ScoreBoard}} object used by this world. " },
 				GetSeed = { Params = "", Return = "number", Notes = "Returns the seed of the world." },
 				GetSignLines = { Params = "BlockX, BlockY, BlockZ", Return = "IsValid, [Line1, Line2, Line3, Line4]", Notes = "Returns true and the lines of a sign at the specified coords, or false if there is no sign at the coords." },
