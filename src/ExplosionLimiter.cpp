@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "ExplosionLimiter.h"
 cExplosionLimiter::cExplosionLimiter()
 	: m_ExplosionsAllowedPerSecond()
