@@ -85,6 +85,11 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 
 	// If the attachee player is holding a carrot-on-stick, let them drive this pig:
 	if (m_bIsSaddled && (m_Attachee != nullptr))

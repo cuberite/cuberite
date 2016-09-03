@@ -189,6 +189,11 @@ bool cEnderman::CheckLight()
 void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 
 	// TODO take damage in rain
 
