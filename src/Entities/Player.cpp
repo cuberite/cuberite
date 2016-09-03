@@ -1780,64 +1780,71 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
-	//  Ask the plugins if the player is allowed to changing the world
+	//  Ask the plugins if the player is allowed to change the world
 	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
 	{
-		// A Plugin doesn't allow the player to changing the world
+		// A Plugin doesn't allow the player to change the world
 		return false;
 	}
 
-	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-	GetClientHandle()->InvalidateCachedSentChunk();
-
-	// Prevent further ticking in this world
-	SetIsTicking(false);
-
-	// Tell others we are gone
-	GetWorld()->BroadcastDestroyEntity(*this);
-
-	// Remove player from world
-	GetWorld()->RemovePlayer(this, false);
-
-	// Set position to the new position
-	SetPosition(a_NewPosition);
-	FreezeInternal(a_NewPosition, false);
-
-	// Stop all mobs from targeting this player
-	StopEveryoneFromTargetingMe();
-
-	// Send the respawn packet:
-	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
+	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
 	{
-		m_ClientHandle->SendRespawn(a_World->GetDimension());
-	}
+		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
+		GetClientHandle()->InvalidateCachedSentChunk();
 
-	// Update the view distance.
-	m_ClientHandle->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
+		// Prevent further ticking in this world
+		SetIsTicking(false);
 
-	// Send current weather of target world to player
-	if (a_World->GetDimension() == dimOverworld)
-	{
-		m_ClientHandle->SendWeather(a_World->GetWeather());
-	}
+		// Tell others we are gone
+		GetWorld()->BroadcastDestroyEntity(*this);
 
-	// Broadcast the player into the new world.
-	a_World->BroadcastSpawnEntity(*this);
+		// Remove player from world
+		GetWorld()->RemovePlayer(this, false);
 
-	// Queue add to new world and removal from the old one
-	cChunk * ParentChunk = GetParentChunk();
-	cWorld * OldWorld = GetWorld();
-	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-	OldWorld->QueueTask([this, ParentChunk, a_World](cWorld & a_OldWorld)
-	{
+		// Set position to the new position
+		SetPosition(a_NewPosition);
+		FreezeInternal(a_NewPosition, false);
+
+		// Stop all mobs from targeting this player
+		StopEveryoneFromTargetingMe();
+
+		cClientHandle * ch = this->GetClientHandle();
+		if (ch != nullptr)
+		{
+			// Send the respawn packet:
+			if (a_ShouldSendRespawn)
+			{
+				m_ClientHandle->SendRespawn(a_World->GetDimension());
+			}
+
+
+			// Update the view distance.
+			ch->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
+
+			// Send current weather of target world to player
+			if (a_World->GetDimension() == dimOverworld)
+			{
+				ch->SendWeather(a_World->GetWeather());
+			}
+		}
+
+		// Broadcast the player into the new world.
+		a_World->BroadcastSpawnEntity(*this);
+
+		// Queue add to new world and removal from the old one
+
+		SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+		cChunk * ParentChunk = this->GetParentChunk();
+
 		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
 			this->GetName().c_str(),
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
 		ParentChunk->RemoveEntity(this);
-		a_World->AddPlayer(this, &a_OldWorld);  // New world will appropriate and announce client at his next tick
+		a_World->AddPlayer(this, &a_OldWorld);  // New world will take over and announce client at its next tick
 	});
+
 	return true;
 }
 

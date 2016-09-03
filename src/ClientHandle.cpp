@@ -603,7 +603,6 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunk
 
 
 
-// Removes the client from all chunks. Used when switching worlds or destroying the player
 void cClientHandle::RemoveFromAllChunks()
 {
 	cWorld * World = m_Player->GetWorld();
