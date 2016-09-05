@@ -150,7 +150,6 @@ bool cPluginLua::Load(void)
 		if (!m_LuaState.LoadFile(Path))
 		{
 			SetLoadError("Failed to load file Info.lua.");
-			m_Status = cPluginManager::psError;
 			Close();
 			return false;
 		}
