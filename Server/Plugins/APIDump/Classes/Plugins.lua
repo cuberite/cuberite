@@ -82,7 +82,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			GetNumPlugins = { Params = "", Return = "number", Notes = "Returns the number of plugins, including the disabled, errored, unloaded and not-found ones" },
 			GetPlugin = { Params = "PluginName", Return = "{{cPlugin}}", Notes = "(<b>DEPRECATED, UNSAFE</b>) Returns a plugin handle of the specified plugin, or nil if such plugin is not loaded. Note thatdue to multithreading the handle is not guaranteed to be safe for use when stored - a single-plugin reload may have been triggered in the mean time for the requested plugin." },
 			GetPluginFolderName = { Params = "PluginName", Return = "string", Notes = "Returns the name of the folder from which the plugin was loaded (without the \"Plugins\" part). Used as a plugin's display name." },
-			GetPluginsPath = { Params = "", Return = "string", Notes = "Returns the path where the individual plugin folders are located. Doesn't include the path separator at the end of the returned string." },
+			GetPluginsPath = { Params = "", Return = "string", IsStatic = true, Notes = "Returns the path where the individual plugin folders are located. Doesn't include the path separator at the end of the returned string." },
 			IsCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if in-game Command is already bound (by any plugin)" },
 			IsConsoleCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if console Command is already bound (by any plugin)" },
 			IsPluginLoaded = { Params = "PluginName", Return = "", Notes = "Returns true if the specified plugin is loaded." },
