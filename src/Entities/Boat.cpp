@@ -102,6 +102,11 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 	BroadcastMovementUpdate();
 
 	SetSpeed(GetSpeed() * 0.97);  // Slowly decrease the speed

@@ -467,6 +467,9 @@ public:
 
 	// tolua_end
 
+	// TODO lua export GetBedPos and GetBedWorld
+	cWorld * GetBedWorld();
+
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 

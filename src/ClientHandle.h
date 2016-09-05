@@ -125,7 +125,8 @@ public:  // tolua_export
 	/** Remove all loaded chunks that are no longer in range */
 	void UnloadOutOfRangeChunks(void);
 
-	// Removes the client from all chunks. Used when switching worlds or destroying the player
+	/** Removes the client from all chunks. Used when destroying the player.
+	When switching worlds, RemoveFromWorld does this function's job so it isn't called. */
 	void RemoveFromAllChunks(void);
 
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
@@ -369,6 +370,9 @@ public:  // tolua_export
 	bool IsPlayerChunkSent();
 
 private:
+	/** The dimension that was last sent to a player in a Respawn or Login packet.
+	Used to avoid Respawning into the same dimension, which confuses the client. */
+	eDimension m_LastSentDimension;
 
 	friend class cServer;  // Needs access to SetSelf()
 

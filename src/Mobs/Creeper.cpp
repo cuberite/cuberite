@@ -26,6 +26,11 @@ cCreeper::cCreeper(void) :
 void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 
 	if ((GetTarget() == nullptr) || (!TargetIsInRange() && !m_BurnedWithFlintAndSteel))
 	{

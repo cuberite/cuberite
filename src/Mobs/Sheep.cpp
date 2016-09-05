@@ -88,6 +88,11 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 	int PosX = POSX_TOINT;
 	int PosY = POSY_TOINT - 1;
 	int PosZ = POSZ_TOINT;

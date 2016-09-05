@@ -111,7 +111,11 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), GetWidth(), GetHeight()), Callback);
 
 	super::Tick(a_Dt, a_Chunk);
-
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 	HandleFalling();
 }
 
