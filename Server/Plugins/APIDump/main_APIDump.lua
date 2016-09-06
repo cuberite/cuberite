@@ -778,12 +778,17 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 			cf:write("<h2>Functions inherited from ", a_InheritedName, "</h2>\n");
 		end
 		cf:write("<table>\n<tr><th>Name</th><th>Parameters</th><th>Return value</th><th>Notes</th></tr>\n");
+		-- Store all function names, to create unique anchor names for all functions
+		local TableOverloadedFunctions = {}
 		for _, func in ipairs(a_Functions) do
 			local StaticClause = ""
 			if (func.IsStatic) then
 				StaticClause = "(STATIC) "
 			end
-			cf:write("<tr><td>", func.Name, "</td>\n");
+			-- Increase number by one
+			TableOverloadedFunctions[func.Name] = (TableOverloadedFunctions[func.Name] or 0) + 1
+			-- Add the anchor names as a title
+			cf:write("<tr><td id=\"", func.Name, "_", TableOverloadedFunctions[func.Name], "\" title=\"", func.Name, "_", TableOverloadedFunctions[func.Name], "\">", func.Name, "</td>\n");
 			cf:write("<td>", LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
 			cf:write("<td>", LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
 			cf:write("<td>", StaticClause .. LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td></tr>\n");
@@ -794,7 +799,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 	local function WriteConstantTable(a_Constants, a_Source)
 		cf:write("<table>\n<tr><th>Name</th><th>Value</th><th>Notes</th></tr>\n");
 		for _, cons in ipairs(a_Constants) do
-			cf:write("<tr><td>", cons.Name, "</td>\n");
+			cf:write("<tr><td id=\"", cons.Name, "\">", cons.Name, "</td>\n");
 			cf:write("<td>", cons.Value, "</td>\n");
 			cf:write("<td>", LinkifyString(cons.Notes or "", a_Source), "</td></tr>\n");
 		end
@@ -837,7 +842,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 
 		cf:write("<table><tr><th>Name</th><th>Type</th><th>Notes</th></tr>\n");
 		for _, var in ipairs(a_Variables) do
-			cf:write("<tr><td>", var.Name, "</td>\n");
+			cf:write("<tr><td id=\"", var.Name, "\">", var.Name, "</td>\n");
 			cf:write("<td>", LinkifyString(var.Type or "<i>(undocumented)</i>", a_InheritedName or a_ClassAPI.Name), "</td>\n");
 			cf:write("<td>", LinkifyString(var.Notes or "", a_InheritedName or a_ClassAPI.Name), "</td>\n				</tr>\n");
 		end
