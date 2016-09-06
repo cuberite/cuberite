@@ -21,7 +21,7 @@ protected:
 	int m_PrepareDistance;
 
 	/** The index of the next chunk to be queued in the lighting thread. */
-	int m_NextIdx;
+	std::atomic<int> m_NextIdx;
 
 	/** The maximum index of the prepared chunks. Queueing stops when m_NextIdx reaches this number. */
 	int m_MaxIdx;
