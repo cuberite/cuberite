@@ -176,14 +176,14 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			HOOK_WEATHER_CHANGING = { Notes = "Called just before the weather changes" },
 			HOOK_WORLD_STARTED = { Notes = "Called when a world has been started." },
 			HOOK_WORLD_TICK = { Notes = "Called in each world's tick thread when the game logic is about to tick (20 times a second)." },
-			
+
 			psDisabled = { Notes = "The plugin is not enabled in settings.ini" },
 			psError = { Notes = "The plugin is enabled in settings.ini, but it has run into an error while loading. Use {{cPlugin}}:GetLoadError() to identify the error." },
 			psLoaded = { Notes = "The plugin is enabled and loaded." },
 			psNotFound = { Notes = "The plugin has been loaded, but is no longer present on disk." },
 			psUnloaded = { Notes = "The plugin is enabled in settings.ini, but it has been unloaded (by a command)." },
 		},  -- constants
-		
+
 		ConstantGroups =
 		{
 			Hooks =

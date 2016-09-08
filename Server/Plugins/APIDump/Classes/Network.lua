@@ -48,7 +48,7 @@ local LinkCallbacks =
 		-- Not used for incoming server links
 		-- All returned values are ignored
 	end,
-	
+
 	OnError = function ({{cTCPLink|a_TCPLink}}, a_ErrorCode, a_ErrorMsg)
 		-- The specified error has occured on the {{cTCPLink|link}}
 		-- No other callback will be called for this link from now on
@@ -56,14 +56,14 @@ local LinkCallbacks =
 		-- It is an Undefined Behavior to send data to a_TCPLink in or after this callback
 		-- All returned values are ignored
 	end,
-	
+
 	OnReceivedData = function ({{cTCPLink|a_TCPLink}}, a_Data)
 		-- Data has been received on the {{cTCPLink|link}}
 		-- Will get called whenever there's new data on the {{cTCPLink|link}}
 		-- a_Data contains the raw received data, as a string
 		-- All returned values are ignored
 	end,
-	
+
 	OnRemoteClosed = function ({{cTCPLink|a_TCPLink}})
 		-- The remote peer has closed the {{cTCPLink|link}}
 		-- The link is already closed, any data sent to it now will be lost
@@ -109,7 +109,7 @@ local ListenCallbacks =
 		-- It is safe to send data to the link now
 		-- All returned values are ignored
 	end,
-	
+
 	OnError = function (a_ErrorCode, a_ErrorMsg)
 		-- The specified error has occured while trying to listen
 		-- No other callback will be called for this server handle from now on
@@ -146,7 +146,7 @@ local UDPCallbacks =
 </pre>
 				]],
 			},
-			
+
 			{
 				Header = "Example client connection",
 				Contents =
@@ -168,17 +168,17 @@ local ConnectCallbacks =
 		-- Connection succeeded, send the http request:
 		a_Link:Send("GET / HTTP/1.0\r\nHost: www.google.com\r\n\r\n")
 	end,
-	
+
 	OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
 		-- Log the error to console:
 		LOG("An error has occurred while talking to google.com: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
 	end,
-	
+
 	OnReceivedData = function (a_Link, a_Data)
 		-- Log the received data to console:
 		LOG("Incoming http data:\r\n" .. a_Data)
 	end,
-	
+
 	OnRemoteClosed = function (a_Link)
 		-- Log the event into the console:
 		LOG("Connection to www.google.com closed")
@@ -195,7 +195,7 @@ end
 </pre>
 				]],
 			},
-			
+
 			{
 				Header = "Example server implementation",
 				Contents =
@@ -225,18 +225,18 @@ local EchoLinkCallbacks =
 		-- This will not be called for a server connection, ever
 		assert(false, "Unexpected Connect callback call")
 	end,
-	
+
 	OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
 		-- Log the error to console:
 		local RemoteName = "'" .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. "'"
 		LOG("An error has occurred while talking to " .. RemoteName .. ": " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
 	end,
-	
+
 	OnReceivedData = function (a_Link, a_Data)
 		-- Send the received data back to the remote peer
 		a_Link:Send(Data)
 	end,
-	
+
 	OnRemoteClosed = function (a_Link)
 		-- Log the event into the console:
 		local RemoteName = "'" .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. "'"
@@ -251,7 +251,7 @@ local ListenCallbacks =
 		-- No processing needed, just log that this happened:
 		LOG("OnAccepted callback called")
 	end,
-	
+
 	OnError = function (a_ErrorCode, a_ErrorMsg)
 		-- An error has occured while listening for incoming connections, log it:
 		LOG("Cannot listen, error " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")"
@@ -284,7 +284,7 @@ g_Server = nil
 				]],
 			},
 		},  -- AdditionalInfo
-		
+
 		Functions =
 		{
 				Connect = { Params = "Host, Port, LinkCallbacks", Return = "bool", IsStatic = true, Notes = "Begins establishing a (client) TCP connection to the specified host. Uses the LinkCallbacks table to report progress, success, errors and incoming data. Returns false if it fails immediately (bad port value, bad hostname format), true otherwise. Host can be either an IP address or a hostname." },
@@ -306,7 +306,7 @@ g_Server = nil
 			Note that when Lua garbage-collects this class, the listening socket is closed. Therefore the plugin
 			should keep it referenced in a global variable for as long as it wants the server running.
 		]],
-		
+
 		Functions =
 		{
 			Close = { Params = "", Return = "", Notes = "Closes the listening socket. No more connections will be accepted, and all current connections will be closed." },
@@ -332,7 +332,7 @@ g_Server = nil
 			network. Note that calling Send() before the TLS handshake finishes is supported, but the data is
 			queued internally and only sent once the TLS handshake is completed.
 		]],
-		
+
 		Functions =
 		{
 			Close = { Params = "", Return = "", Notes = "Closes the link forcefully (TCP RST). There's no guarantee that the last sent data is even being delivered. See also the Shutdown() method." },
@@ -355,7 +355,7 @@ g_Server = nil
 			<p>
 			Note that when Lua garbage-collects this class, the listening socket is closed. Therefore the plugin should keep this object referenced in a global variable for as long as it wants the endpoint open.
 		]],
-		
+
 		Functions =
 		{
 			Close = { Params = "", Return = "", Notes = "Closes the UDP endpoint. No more datagrams will be reported through the callbacks, the UDP port will be closed." },
@@ -365,8 +365,8 @@ g_Server = nil
 			Send = { Params = "RawData, RemoteHost, RemotePort", Return = "bool", Notes = "Sends the specified raw data (string) to the specified remote host. The RemoteHost can be either a hostname or an IP address; if it is a hostname, the endpoint will queue a DNS lookup first, if it is an IP address, the send operation is executed immediately. Returns true if there was no immediate error, false on any failure. Note that the return value needn't represent whether the packet was actually sent, only if it was successfully queued." },
 		},
 	},  -- cUDPEndpoint
-	
-	
+
+
 	cUrlClient =
 	{
 		Desc =
@@ -391,7 +391,7 @@ g_Server = nil
 			POST and PUT requests), and an Options parameter specifying additional options specific to the protocol
 			used.
 		]],
-		
+
 		AdditionalInfo =
 		{
 			{
@@ -457,7 +457,7 @@ function HandleConsoleDownload(a_Split)  -- Console command handler
 	if (not(url) or not(fnam)) then
 		return true, "Missing parameters. Usage: download <url> <filename>"
 	end
-	
+
 	-- Define the cUrlClient callbacks
 	local callbacks =
 	{
@@ -481,7 +481,7 @@ function HandleConsoleDownload(a_Split)  -- Console command handler
 				self.m_File:write(a_Data)
 			end
 		end,
-		
+
 		OnBodyFinished = function (self)
 			-- If the file has been opened, close it and report success
 			if (self.m_File) then
@@ -490,7 +490,7 @@ function HandleConsoleDownload(a_Split)  -- Console command handler
 			end
 		end,
 	}
-	
+
 	-- Start the URL download:
 	local isSuccess, msg = cUrlClient:Get(url, callbacks)
 	if not(isSuccess) then
@@ -527,7 +527,7 @@ end
 				]],
 			},
 		},
-		
+
 		Functions =
 		{
 			Delete = { Params = "URL, Callbacks, [Headers], [RequestBody], [Options]", Return = "bool, [ErrMsg]", IsStatic = true, Notes = "Starts a HTTP DELETE request. Alias for Request(\"DELETE\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.)."},

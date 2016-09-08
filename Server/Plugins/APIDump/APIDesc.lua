@@ -1434,7 +1434,7 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 				SetItemRotation = { Params = "ItemRotation", Return = "", Notes = "Set the rotation from the item in the frame" },
 			},
 		},
-		
+
 
 		cItemGrid =
 		{
