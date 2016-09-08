@@ -1315,8 +1315,9 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 {
 	/* Function signatures:
-		cPluginManager:BindCommand(Command, Permission, Function, HelpString)
-		cPluginManager.BindCommand(Command, Permission, Function, HelpString)  -- without the "self" param
+		cPluginManager:Get():BindCommand(Command, Permission, Function, HelpString)  -- regular
+		cPluginManager:BindCommand(Command, Permission, Function, HelpString)        -- static
+		cPluginManager.BindCommand(Command, Permission, Function, HelpString)        -- without the "self" param
 	*/
 	cLuaState L(a_LuaState);
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
@@ -1379,8 +1380,9 @@ static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 static int tolua_cPluginManager_BindConsoleCommand(lua_State * a_LuaState)
 {
 	/* Function signatures:
-		cPluginManager:BindConsoleCommand(Command, Function, HelpString)
-		cPluginManager.BindConsoleCommand(Command, Function, HelpString)  -- without the "self" param
+		cPluginManager:Get():BindConsoleCommand(Command, Function, HelpString)  -- regular
+		cPluginManager:BindConsoleCommand(Command, Function, HelpString)        -- static
+		cPluginManager.BindConsoleCommand(Command, Function, HelpString)        -- without the "self" param
 	*/
 
 	// Get the plugin identification out of LuaState:
