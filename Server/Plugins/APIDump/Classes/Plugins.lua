@@ -52,14 +52,50 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 		{
 			AddHook =
 			{
-				{ Params = "{{cPluginManager#Hooks|HookType}}, [HookFunction]", Return = "", IsStatic = true, Notes = "Informs the plugin manager that it should call the specified function when the specified hook event occurs. If a function is not specified, a default global function name is looked up, based on the hook type" },
-				{ Params = "{{cPlugin|Plugin}}, {{cPluginManager#Hooks|HookType}}, [HookFunction]", Return = "", IsStatic = true, Notes = "(<b>DEPRECATED</b>) Informs the plugin manager that it should call the specified function when the specified hook event occurs. If a function is not specified, a default function name is looked up, based on the hook type. NOTE: This format is deprecated and the server outputs a warning if it is used!" },
+				{
+					Params =
+					{
+						{ Name = "HookType", Type = "cPluginManager::PluginHook"},
+						{ Name = "Callback", Type = "callback", IsOptional = true},
+					},
+					IsStatic = true,
+					Notes = "Informs the plugin manager that it should call the specified function when the specified hook event occurs. If a function is not specified, a default global function name is looked up, based on the hook type",
+				},
 			},
+
 			BindCommand =
 			{
-				{ Params = "Command, Permission, Callback, HelpString", Return = "[bool]", IsStatic = true, Notes = "Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split, {{cPlayer|Player}})</pre> The Split parameter contains an array-table of the words that the player has sent, Player is the {{cPlayer}} object representing the player who sent the command. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server sends a warning to the player that the command is unknown (this is so that subcommands can be implemented)." },
-				{ Params = "Command, Permission, Callback, HelpString", Return = "[bool]", Notes = "Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split, {{cPlayer|Player}})</pre> The Split parameter contains an array-table of the words that the player has sent, Player is the {{cPlayer}} object representing the player who sent the command. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server sends a warning to the player that the command is unknown (this is so that subcommands can be implemented)." },
-			},
+				{
+					Params =
+					{
+						{ Name = "Command",    Type = "string"},
+						{ Name = "Permission", Type = "string"},
+						{ Name = "Callback",   Type = "callback"},
+						{ Name = "HelpString", Type = "string"},
+					},
+					Return =
+					{
+						{ Type = "boolean" },
+					},
+					Notes = "Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split, {{cPlayer|Player}})</pre> The Split parameter contains an array-table of the words that the player has sent, Player is the {{cPlayer}} object representing the player who sent the command. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server sends a warning to the player that the command is unknown (this is so that subcommands can be implemented)." ,
+				},
+				{
+					Params =
+					{
+						{ Name = "Command",    Type = "string"},
+						{ Name = "Permission", Type = "string"},
+						{ Name = "Callback",   Type = "callback"},
+						{ Name = "HelpString", Type = "string"},
+					},
+					Return =
+					{
+						{ Type = "boolean" },
+					},
+					IsStatic = true,
+					Notes = "Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split, {{cPlayer|Player}})</pre> The Split parameter contains an array-table of the words that the player has sent, Player is the {{cPlayer}} object representing the player who sent the command. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server sends a warning to the player that the command is unknown (this is so that subcommands can be implemented)." ,
+				},
+			},  -- BindCommand
+
 			BindConsoleCommand =
 			{
 				{ Params = "Command, Callback, HelpString", Return = "[bool]", IsStatic = true, Notes = "Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split)</pre> The Split parameter contains an array-table of the words that the admin has typed. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server issues a warning to the console that the command is unknown (this is so that subcommands can be implemented)." },
@@ -91,16 +127,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			RefreshPluginList = { Params = "", Return = "", Notes = "Refreshes the list of plugins to include all folders inside the Plugins folder (potentially new disabled plugins)" },
 			ReloadPlugins = { Params = "", Return = "", Notes = "Reloads all active plugins" },
 			UnloadPlugin = { Params = "PluginName", Return = "", Notes = "Queues the specified plugin to be unloaded. To avoid deadlocks, the unloading happens in the main tick thread asynchronously." },
-		},
-		ConstantGroups=
-		{
-			CommandResult =
-			{
-				Include = "^cr.*",
-				TextBefore = [[
-					Results that the (Force)ExecuteCommand return. This gives information if the command is executed or not and the reason.
-				]],
-			},
 		},
 		Constants =
 		{
@@ -186,7 +212,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 
 		ConstantGroups =
 		{
-			Hooks =
+			PluginHook =
 			{
 				Include = {"HOOK_.*"},
 				TextBefore = [[
@@ -203,10 +229,8 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			CommandResult =
 			{
-				Include = {"cr.*"},
-				TextBefore = [[
-					These constants are returned by the ExecuteCommand() function to identify the exact outcome of the
-					operation.]],
+				Include = {"^cr.*"},
+				TextBefore = "Results that the (Force)ExecuteCommand functions return. This gives information whether the command was executed or not, and the reason.",
 			},
 		},
 	},  -- cPluginManager
