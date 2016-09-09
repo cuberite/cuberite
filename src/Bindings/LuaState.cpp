@@ -942,6 +942,18 @@ void cLuaState::Push(const Vector3i * a_Vector)
 
 
 
+void cLuaState::Push(const cByteBuffer & a_Buffer)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cByteBuffer *>(&a_Buffer)), "cByteBuffer");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(bool a_Value)
 {
 	ASSERT(IsValid());
@@ -1083,11 +1095,35 @@ void cLuaState::Push(long a_Value)
 
 
 
+void cLuaState::Push(const Int64 a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(UInt32 a_Value)
 {
 	ASSERT(IsValid());
 
 	tolua_pushnumber(m_LuaState, a_Value);
+}
+
+
+
+
+
+void cLuaState::Push(const UInt64 a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
 }
 
 

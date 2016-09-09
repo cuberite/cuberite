@@ -1188,14 +1188,20 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, cByteBuffer & a_Buffer)
 {
 	FIND_HOOK(HOOK_PLUGIN_MESSAGE);
 	VERIFY_HOOK;
 
+	a_Buffer.CommitRead();
+	AString Data;
+	a_Buffer.ReadAll(Data);
+	cByteBuffer Temp(Data.size());
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPluginMessage(a_Client, a_Channel, a_Message))
+		Temp.WriteBuf(Data.c_str(), Data.size());
+		if ((*itr)->OnPluginMessage(a_Client, a_Channel, Temp))
 		{
 			return true;
 		}

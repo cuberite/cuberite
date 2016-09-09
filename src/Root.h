@@ -241,8 +241,3 @@ private:
 
 	static void InputThread(cRoot & a_Params);
 };  // tolua_export
-
-
-
-
-

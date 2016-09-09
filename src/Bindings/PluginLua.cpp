@@ -12,11 +12,14 @@
 #endif
 
 #include "PluginLua.h"
+#include "../ByteBuffer.h"
 #include "../CommandOutput.h"
 #include "PluginManager.h"
 #include "../Item.h"
 #include "../Root.h"
 #include "../WebAdmin.h"
+#include "../ChannelManager.h"
+#include "../Server.h"
 
 extern "C"
 {
@@ -184,6 +187,7 @@ void cPluginLua::Unload(void)
 {
 	ClearWebTabs();
 	super::Unload();
+	cRoot::Get()->GetServer()->GetChannelManager()->HandlePluginUnloading(this);
 	Close();
 }
 
@@ -761,7 +765,7 @@ bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const cByteBuffer & a_Message)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLUGIN_MESSAGE, &a_Client, a_Channel, a_Message);
 }
@@ -1147,7 +1151,3 @@ void cPluginLua::ClearWebTabs(void)
 		webAdmin->RemoveAllPluginWebTabs(m_Name);
 	}
 }
-
-
-
-

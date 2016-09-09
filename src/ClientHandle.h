@@ -332,7 +332,6 @@ public:  // tolua_export
 	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
 
 
-	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
 	void HandleRespawn          (void);
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
 	void HandleSlotSelected     (Int16 a_SlotNum);
@@ -368,6 +367,16 @@ public:  // tolua_export
 	void InvalidateCachedSentChunk();
 
 	bool IsPlayerChunkSent();
+
+	void RegisterChannel(const AString & a_Channel);
+
+	void UnregisterChannel(const AString & a_Channel);
+
+	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
+	void RegisterChannels(const AStringVector & a_ChannelList);
+
+	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
+	void UnregisterChannels(const AStringVector & a_ChannelList);
 
 private:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
@@ -532,15 +541,6 @@ private:
 	/** The clients will receive a finished dig animation */
 	void FinishDigAnimation();
 
-	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
-	AStringVector BreakApartPluginChannels(const AString & a_PluginChannels);
-
-	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
-	void RegisterPluginChannels(const AStringVector & a_ChannelList);
-
-	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
-	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
-
 	/** Called when the network socket has been closed. */
 	void SocketClosed(void);
 
@@ -553,8 +553,3 @@ private:
 	virtual void OnRemoteClosed(void) override;
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
 };  // tolua_export
-
-
-
-
-

@@ -117,6 +117,20 @@ cByteBuffer::cByteBuffer(size_t a_BufferSize) :
 
 
 
+cByteBuffer::cByteBuffer(const cByteBuffer & a_ByteBuffer)
+{
+	m_Buffer = new char[a_ByteBuffer.m_BufferSize];
+	m_BufferSize = a_ByteBuffer.m_BufferSize;
+	m_DataStart = a_ByteBuffer.m_DataStart;
+	m_WritePos = a_ByteBuffer.m_WritePos;
+	m_ReadPos = a_ByteBuffer.m_ReadPos;
+	memcpy(m_Buffer, a_ByteBuffer.m_Buffer, m_BufferSize);
+}
+
+
+
+
+
 cByteBuffer::~cByteBuffer()
 {
 	CheckValid();
@@ -982,6 +996,27 @@ size_t cByteBuffer::GetVarIntSize(UInt32 a_Value)
 	} while (a_Value != 0);
 
 	return Count;
+}
+
+
+
+
+
+cByteBuffer * cByteBuffer::Create(size_t a_BufferSize)
+{
+	return new cByteBuffer(a_BufferSize);
+}
+
+
+
+
+
+void cByteBuffer::Destroy(cByteBuffer * a_ByteBuffer)
+{
+	if (a_ByteBuffer != nullptr)
+	{
+		delete a_ByteBuffer;
+	}
 }
 
 

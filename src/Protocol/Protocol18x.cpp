@@ -16,6 +16,7 @@ Implements the 1.8.x protocol classes:
 #include "Packetizer.h"
 
 #include "../ClientHandle.h"
+#include "../ChannelManager.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
@@ -2475,10 +2476,24 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	// Read the plugin message and relay to clienthandle:
+	// Read the rest of the message
+	cByteBuffer Buffer = a_ByteBuffer;
 	AString Data;
 	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
-	m_Client->HandlePluginMessage(Channel, Data);
+
+	auto manager = cRoot::Get()->GetServer()->GetChannelManager();
+	// Register the client on the requested channels
+	if (Channel == "REGISTER")
+	{
+		manager->AddClientToChannels(*m_Client, Data);
+	}
+	else if (Channel == "UNREGISTER")
+	{
+		manager->RemoveClientFromChannels(*m_Client, Data);
+	}
+
+	// Call the channel message handler
+	manager->HandleChannelMessage(*m_Client, Channel, Buffer);
 }
 
 
@@ -2730,10 +2745,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	}
 	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
 
-	// Read the payload and send it through to the clienthandle:
-	AString Message;
-	VERIFY(a_ByteBuffer.ReadString(Message, a_ByteBuffer.GetReadableSpace() - 1));
-	m_Client->HandlePluginMessage(a_Channel, Message);
+	cRoot::Get()->GetServer()->GetChannelManager()->HandleChannelMessage(*m_Client, a_Channel, a_ByteBuffer);
 }
 
 
@@ -3584,6 +3596,3 @@ void cProtocol180::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
 }
-
-
-

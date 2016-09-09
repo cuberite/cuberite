@@ -806,68 +806,25 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 
 
-void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
+void cClientHandle::RegisterChannel(const AString & a_Channel)
 {
-	if (a_Channel == "REGISTER")
-	{
-		if (HasPluginChannel(a_Channel))
-		{
-			SendPluginMessage("UNREGISTER", a_Channel);
-			return;  // Can't register again if already taken - kinda defeats the point of plugin messaging!
-		}
-
-		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
-	}
-	else if (a_Channel == "UNREGISTER")
-	{
-		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
-	}
-	else if (!HasPluginChannel(a_Channel))
-	{
-		// Ignore if client sent something but didn't register the channel first
-		LOGD("Player %s sent a plugin message on channel \"%s\", but didn't REGISTER it first", GetUsername().c_str(), a_Channel.c_str());
-		SendPluginMessage("UNREGISTER", a_Channel);
-		return;
-	}
-
-	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
+	m_PluginChannels.insert(a_Channel);
 }
 
 
 
 
 
-AStringVector cClientHandle::BreakApartPluginChannels(const AString & a_PluginChannels)
+void cClientHandle::UnregisterChannel(const AString & a_Channel)
 {
-	// Break the string on each NUL character.
-	// Note that StringSplit() doesn't work on this because NUL is a special char - string terminator
-	size_t len = a_PluginChannels.size();
-	size_t first = 0;
-	AStringVector res;
-	for (size_t i = 0; i < len; i++)
-	{
-		if (a_PluginChannels[i] != 0)
-		{
-			continue;
-		}
-		if (i > first)
-		{
-			res.push_back(a_PluginChannels.substr(first, i - first));
-		}
-		first = i + 1;
-	}  // for i - a_PluginChannels[]
-	if (first < len)
-	{
-		res.push_back(a_PluginChannels.substr(first, len - first));
-	}
-	return res;
+	m_PluginChannels.erase(a_Channel);
 }
 
 
 
 
 
-void cClientHandle::RegisterPluginChannels(const AStringVector & a_ChannelList)
+void cClientHandle::RegisterChannels(const AStringVector & a_ChannelList)
 {
 	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
 	{
@@ -879,7 +836,7 @@ void cClientHandle::RegisterPluginChannels(const AStringVector & a_ChannelList)
 
 
 
-void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList)
+void cClientHandle::UnregisterChannels(const AStringVector & a_ChannelList)
 {
 	for (AStringVector::const_iterator itr = a_ChannelList.begin(), end = a_ChannelList.end(); itr != end; ++itr)
 	{
@@ -3043,7 +3000,7 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 
 bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
 {
-	return (m_PluginChannels.find(a_PluginChannel) != m_PluginChannels.end());
+	return (m_PluginChannels.find(a_PluginChannel) != m_PluginChannels.end()) || (a_PluginChannel == "REGISTER") || (a_PluginChannel == "UNREGISTER");
 }
 
 
@@ -3202,7 +3159,3 @@ void cClientHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	}
 	SocketClosed();
 }
-
-
-
-

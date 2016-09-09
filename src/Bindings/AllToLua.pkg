@@ -42,10 +42,12 @@ $cfile "LuaWindow.h"
 
 $cfile "../BlockID.h"
 $cfile "../BlockInfo.h"
+$cfile "../ByteBuffer.h"
 $cfile "../StringUtils.h"
 $cfile "../Defines.h"
 $cfile "../ChatColor.h"
 $cfile "../ClientHandle.h"
+$cfile "../ChannelManager.h"
 $cfile "../Server.h"
 $cfile "../World.h"
 $cfile "../Inventory.h"
@@ -125,6 +127,3 @@ typedef unsigned char Byte;
 $renaming Vector3<double> @ Vector3d
 $renaming Vector3<float>  @ Vector3f
 $renaming Vector3<int>    @ Vector3i
-
-
-
