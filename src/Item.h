@@ -197,8 +197,8 @@ public:
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
 	int GetEnchantability();  // tolua_export
 
-	/** Enchants the item using the specified number of XP levels.
-	Returns true if item enchanted, false if not. */
+	/** Randomly enchants the item using the specified number of XP levels.
+	Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already). */
 	bool EnchantByXPLevels(int a_NumXPLevels);  // tolua_export
 
 	// tolua_begin

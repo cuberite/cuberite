@@ -11,8 +11,7 @@ return
 {
 	cNetwork =
 	{
-		Desc =
-		[[
+		Desc = [[
 			This is the namespace for high-level network-related operations. Allows plugins to make TCP
 			connections to the outside world using a callback-based API.</p>
 			<p>
@@ -21,12 +20,139 @@ return
 local Server = cNetwork:Listen(1024, ListenCallbacks);
 </pre></p>
 		]],
+		Functions =
+		{
+			Connect =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "Host",
+						Type = "string",
+					},
+					{
+						Name = "Port",
+						Type = "number",
+					},
+					{
+						Name = "LinkCallbacks",
+						Type = "table",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Begins establishing a (client) TCP connection to the specified host. Uses the LinkCallbacks table to report progress, success, errors and incoming data. Returns false if it fails immediately (bad port value, bad hostname format), true otherwise. Host can be either an IP address or a hostname.",
+			},
+			CreateUDPEndpoint =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "Port",
+						Type = "number",
+					},
+					{
+						Name = "UDPCallbacks",
+						Type = "table",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "cUDPEndpoint",
+					},
+				},
+				Notes = "Creates a UDP endpoint that listens for incoming datagrams on the specified port, and can be used to send or broadcast datagrams. Uses the UDPCallbacks to report incoming datagrams or errors. If the endpoint cannot be created, the OnError callback is called with the error details and the returned endpoint will report IsOpen() == false. The plugin needs to store the returned endpoint object for as long as it needs the UDP port open; if the endpoint is garbage-collected by Lua, the socket will be closed and no more incoming data will be reported.<br>If the Port is zero, the OS chooses an available UDP port for the endpoint; use {{cUDPEndpoint}}:GetPort() to query the port number in such case.",
+			},
+			EnumLocalIPAddresses =
+			{
+				IsStatic = true,
+				Returns =
+				{
+					{
+						Type = "table",
+					},
+				},
+				Notes = "Returns all local IP addresses for network interfaces currently available on the machine, as an array-table of strings.",
+			},
+			HostnameToIP =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "Host",
+						Type = "string",
+					},
+					{
+						Name = "LookupCallbacks",
+						Type = "table",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Begins a DNS lookup to find the IP address(es) for the specified host. Uses the LookupCallbacks table to report progress, success or errors. Returns false if it fails immediately (bad hostname format), true if the lookup started successfully. Host can be either a hostname or an IP address.",
+			},
+			IPToHostname =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "Address",
+						Type = "string",
+					},
+					{
+						Name = "LookupCallbacks",
+						Type = "table",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Begins a reverse-DNS lookup to find out the hostname for the specified IP address. Uses the LookupCallbacks table to report progress, success or errors. Returns false if it fails immediately (bad address format), true if the lookup started successfully.",
+			},
+			Listen =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "Port",
+						Type = "number",
+					},
+					{
+						Name = "ListenCallbacks",
+						Type = "table",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "cServerHandle",
+					},
+				},
+				Notes = "Starts listening on the specified port. Uses the ListenCallbacks to report incoming connections or errors. Returns a {{cServerHandle}} object representing the server. If the listen operation failed, the OnError callback is called with the error details and the returned server handle will report IsListening() == false. The plugin needs to store the server handle object for as long as it needs the server running, if the server handle is garbage-collected by Lua, the listening socket will be closed and all current connections dropped.",
+			},
+		},
 		AdditionalInfo =
 		{
 			{
 				Header = "Using callbacks",
-				Contents =
-				[[
+				Contents = [[
 					The entire Networking API is callback-based. Whenever an event happens on the network object, a
 					specific plugin-provided function is called. The callbacks are stored in tables which are passed
 					to the API functions, each table contains multiple callbacks for the various situations.</p>
@@ -146,11 +272,9 @@ local UDPCallbacks =
 </pre>
 				]],
 			},
-
 			{
 				Header = "Example client connection",
-				Contents =
-				[[
+				Contents = [[
 					The following example, adapted from the NetworkTest plugin, shows a simple example of a client
 					connection using the cNetwork API. It connects to www.google.com on port 80 (http) and sends a http
 					request for the front page. It dumps the received data to the console.</p>
@@ -195,11 +319,9 @@ end
 </pre>
 				]],
 			},
-
 			{
 				Header = "Example server implementation",
-				Contents =
-				[[
+				Contents = [[
 					The following example, adapted from the NetworkTest plugin, shows a simple example of creating a
 					server listening on a TCP port using the cNetwork API. The server listens on port 9876 and for
 					each incoming connection it sends a welcome message and then echoes back whatever the client has
@@ -283,41 +405,38 @@ g_Server = nil
 </pre>
 				]],
 			},
-		},  -- AdditionalInfo
-
-		Functions =
-		{
-				Connect = { Params = "Host, Port, LinkCallbacks", Return = "bool", IsStatic = true, Notes = "Begins establishing a (client) TCP connection to the specified host. Uses the LinkCallbacks table to report progress, success, errors and incoming data. Returns false if it fails immediately (bad port value, bad hostname format), true otherwise. Host can be either an IP address or a hostname." },
-				CreateUDPEndpoint = { Params = "Port, UDPCallbacks", Return = "{{cUDPEndpoint|UDPEndpoint}}", IsStatic = true, Notes = "Creates a UDP endpoint that listens for incoming datagrams on the specified port, and can be used to send or broadcast datagrams. Uses the UDPCallbacks to report incoming datagrams or errors. If the endpoint cannot be created, the OnError callback is called with the error details and the returned endpoint will report IsOpen() == false. The plugin needs to store the returned endpoint object for as long as it needs the UDP port open; if the endpoint is garbage-collected by Lua, the socket will be closed and no more incoming data will be reported.<br>If the Port is zero, the OS chooses an available UDP port for the endpoint; use {{cUDPEndpoint}}:GetPort() to query the port number in such case." },
-				EnumLocalIPAddresses = { Params = "", Return = "array-table of strings", IsStatic = true, Notes = "Returns all local IP addresses for network interfaces currently available on the machine." },
-				HostnameToIP = { Params = "Host, LookupCallbacks", Return = "bool", IsStatic = true, Notes = "Begins a DNS lookup to find the IP address(es) for the specified host. Uses the LookupCallbacks table to report progress, success or errors. Returns false if it fails immediately (bad hostname format), true if the lookup started successfully. Host can be either a hostname or an IP address." },
-				IPToHostname = { Params = "Address, LookupCallbacks", Return = "bool", IsStatic = true, Notes = "Begins a reverse-DNS lookup to find out the hostname for the specified IP address. Uses the LookupCallbacks table to report progress, success or errors. Returns false if it fails immediately (bad address format), true if the lookup started successfully." },
-				Listen = { Params = "Port, ListenCallbacks", Return = "{{cServerHandle|ServerHandle}}", IsStatic = true, Notes = "Starts listening on the specified port. Uses the ListenCallbacks to report incoming connections or errors. Returns a {{cServerHandle}} object representing the server. If the listen operation failed, the OnError callback is called with the error details and the returned server handle will report IsListening() == false. The plugin needs to store the server handle object for as long as it needs the server running, if the server handle is garbage-collected by Lua, the listening socket will be closed and all current connections dropped." },
 		},
-	},  -- cNetwork
-
+	},
 	cServerHandle =
 	{
-		Desc =
-		[[
+		Desc = [[
 			This class provides an interface for TCP sockets listening for a connection. In order to listen, the
 			plugin needs to use the {{cNetwork}}:Listen() function to create the listening socket.</p>
 			<p>
 			Note that when Lua garbage-collects this class, the listening socket is closed. Therefore the plugin
 			should keep it referenced in a global variable for as long as it wants the server running.
 		]],
-
 		Functions =
 		{
-			Close = { Params = "", Return = "", Notes = "Closes the listening socket. No more connections will be accepted, and all current connections will be closed." },
-			IsListening = { Params = "", Return = "bool", Notes = "Returns true if the socket is listening." },
+			Close =
+			{
+				Notes = "Closes the listening socket. No more connections will be accepted, and all current connections will be closed.",
+			},
+			IsListening =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if the socket is listening.",
+			},
 		},
-	},  -- cServerHandle
-
+	},
 	cTCPLink =
 	{
-		Desc =
-		[[
+		Desc = [[
 			This class wraps a single TCP connection, that has been established. Plugins can create these by
 			calling {{cNetwork}}:Connect() to connect to a remote server, or by listening using
 			{{cNetwork}}:Listen() and accepting incoming connections. The links are callback-based - when an event
@@ -332,45 +451,202 @@ g_Server = nil
 			network. Note that calling Send() before the TLS handshake finishes is supported, but the data is
 			queued internally and only sent once the TLS handshake is completed.
 		]],
-
 		Functions =
 		{
-			Close = { Params = "", Return = "", Notes = "Closes the link forcefully (TCP RST). There's no guarantee that the last sent data is even being delivered. See also the Shutdown() method." },
-			GetLocalIP = { Params = "", Return = "string", Notes = "Returns the IP address of the local endpoint of the TCP connection." },
-			GetLocalPort = { Params = "", Return = "number", Notes = "Returns the port of the local endpoint of the TCP connection." },
-			GetRemoteIP = { Params = "", Return = "string", Notes = "Returns the IP address of the remote endpoint of the TCP connection." },
-			GetRemotePort = { Params = "", Return = "number", Notes = "Returns the port of the remote endpoint of the TCP connection." },
-			Send = { Params = "Data", Return = "", Notes = "Sends the data (raw string) to the remote peer. The data is sent asynchronously and there is no report on the success of the send operation, other than the connection being closed or reset by the underlying OS." },
-			Shutdown = { Params = "", Return = "", Notes = "Shuts the socket down for sending data. Notifies the remote peer that there will be no more data coming from us (TCP FIN). The data that is in flight will still be delivered. The underlying socket will be closed when the remote end shuts down as well, or after a timeout." },
-			StartTLSClient = { Params = "OwnCert, OwnPrivateKey, OwnPrivateKeyPassword", Return = "true / nil + ErrMsg", Notes = "Starts a TLS handshake on the link, as a client side of the TLS. The Own___ parameters specify the client certificate and its corresponding private key and password; all three parameters are optional and no client certificate is presented to the remote peer if they are not used or all empty. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link. Returns true on success, nil and optional error message on immediate failure.<br/><b>NOTE:</b> The TLS support in the API is currently experimental and shouldn't be considered safe - there's no peer certificate verification and the error reporting is only basic." },
-			StartTLSServer = { Params = "Certificate, PrivateKey, PrivateKeyPassword, StartTLSData", Return = "true / nil + ErrMsg", Notes = "Starts a TLS handshake on the link, as a server side of the TLS. The plugin needs to specify the server certificate and its corresponding private key and password. The StartTLSData can contain data that the link has already reported as received but it should be used as part of the TLS handshake. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link. Returns true on success, nil and optional error message on immediate failure.<br/><b>NOTE:</b> The TLS support in the API is currently experimental and shouldn't be considered safe - there's no peer certificate verification and the error reporting is only basic." },
+			Close =
+			{
+				Notes = "Closes the link forcefully (TCP RST). There's no guarantee that the last sent data is even being delivered. See also the Shutdown() method.",
+			},
+			GetLocalIP =
+			{
+				Returns =
+				{
+					{
+						Type = "string",
+					},
+				},
+				Notes = "Returns the IP address of the local endpoint of the TCP connection.",
+			},
+			GetLocalPort =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Returns the port of the local endpoint of the TCP connection.",
+			},
+			GetRemoteIP =
+			{
+				Returns =
+				{
+					{
+						Type = "string",
+					},
+				},
+				Notes = "Returns the IP address of the remote endpoint of the TCP connection.",
+			},
+			GetRemotePort =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Returns the port of the remote endpoint of the TCP connection.",
+			},
+			Send =
+			{
+				Params =
+				{
+					{
+						Name = "Data",
+						Type = "string",
+					},
+				},
+				Notes = "Sends the data (raw string) to the remote peer. The data is sent asynchronously and there is no report on the success of the send operation, other than the connection being closed or reset by the underlying OS.",
+			},
+			Shutdown =
+			{
+				Notes = "Shuts the socket down for sending data. Notifies the remote peer that there will be no more data coming from us (TCP FIN). The data that is in flight will still be delivered. The underlying socket will be closed when the remote end shuts down as well, or after a timeout.",
+			},
+			StartTLSClient =
+			{
+				Params =
+				{
+					{
+						Name = "OwnCert",
+						Type = "string",
+					},
+					{
+						Name = "OwnPrivateKey",
+						Type = "string",
+					},
+					{
+						Name = "OwnPrivateKeyPassword",
+						Type = "string",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					},
+					{
+						Name = "ErrorMessage",
+						Type = "string",
+						IsOptional = true,
+					},
+				},
+				Notes = "Starts a TLS handshake on the link, as a client side of the TLS. The Own___ parameters specify the client certificate and its corresponding private key and password; all three parameters are optional and no client certificate is presented to the remote peer if they are not used or all empty. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link. Returns true on success, nil and optional error message on immediate failure.<br/><b>NOTE:</b> The TLS support in the API is currently experimental and shouldn't be considered safe - there's no peer certificate verification and the error reporting is only basic.",
+			},
+			StartTLSServer =
+			{
+				Params =
+				{
+					{
+						Name = "Certificate",
+						Type = "string",
+					},
+					{
+						Name = "PrivateKey",
+						Type = "string",
+					},
+					{
+						Name = "PrivateKeyPassword",
+						Type = "string",
+					},
+					{
+						Name = "StartTLSData",
+						Type = "string",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					},
+					{
+						Name = "ErrorMessage",
+						Type = "string",
+						IsOptional = true,
+					},
+				},
+				Notes = "Starts a TLS handshake on the link, as a server side of the TLS. The plugin needs to specify the server certificate and its corresponding private key and password. The StartTLSData can contain data that the link has already reported as received but it should be used as part of the TLS handshake. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link. Returns true on success, nil and optional error message on immediate failure.<br/><b>NOTE:</b> The TLS support in the API is currently experimental and shouldn't be considered safe - there's no peer certificate verification and the error reporting is only basic.",
+			},
 		},
-	},  -- cTCPLink
-
+	},
 	cUDPEndpoint =
 	{
-		Desc =
-		[[
+		Desc = [[
 			Represents a UDP socket that is listening for incoming datagrams on a UDP port and can send or broadcast datagrams to other peers on the network. Plugins can create an instance of the endpoint by calling {{cNetwork}}:CreateUDPEndpoint(). The endpoints are callback-based - when a datagram is read from the network, the OnRececeivedData() callback is called with details about the datagram. See the additional information in {{cNetwork}} documentation for details.</p>
 			<p>
 			Note that when Lua garbage-collects this class, the listening socket is closed. Therefore the plugin should keep this object referenced in a global variable for as long as it wants the endpoint open.
 		]],
-
 		Functions =
 		{
-			Close = { Params = "", Return = "", Notes = "Closes the UDP endpoint. No more datagrams will be reported through the callbacks, the UDP port will be closed." },
-			EnableBroadcasts = { Params = "", Return = "", Notes = "Some OSes need this call before they allow UDP broadcasts on an endpoint." },
-			GetPort = { Params = "", Return = "number", Notes = "Returns the local port number of the UDP endpoint listening for incoming datagrams. Especially useful if the UDP endpoint was created with auto-assign port (0)." },
-			IsOpen = { Params = "", Return = "bool", Notes = "Returns true if the UDP endpoint is listening for incoming datagrams." },
-			Send = { Params = "RawData, RemoteHost, RemotePort", Return = "bool", Notes = "Sends the specified raw data (string) to the specified remote host. The RemoteHost can be either a hostname or an IP address; if it is a hostname, the endpoint will queue a DNS lookup first, if it is an IP address, the send operation is executed immediately. Returns true if there was no immediate error, false on any failure. Note that the return value needn't represent whether the packet was actually sent, only if it was successfully queued." },
+			Close =
+			{
+				Notes = "Closes the UDP endpoint. No more datagrams will be reported through the callbacks, the UDP port will be closed.",
+			},
+			EnableBroadcasts =
+			{
+				Notes = "Some OSes need this call before they allow UDP broadcasts on an endpoint.",
+			},
+			GetPort =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Returns the local port number of the UDP endpoint listening for incoming datagrams. Especially useful if the UDP endpoint was created with auto-assign port (0).",
+			},
+			IsOpen =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if the UDP endpoint is listening for incoming datagrams.",
+			},
+			Send =
+			{
+				Params =
+				{
+					{
+						Name = "RawData",
+						Type = "string",
+					},
+					{
+						Name = "RemoteHost",
+						Type = "string",
+					},
+					{
+						Name = "RemotePort",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Sends the specified raw data (string) to the specified remote host. The RemoteHost can be either a hostname or an IP address; if it is a hostname, the endpoint will queue a DNS lookup first, if it is an IP address, the send operation is executed immediately. Returns true if there was no immediate error, false on any failure. Note that the return value needn't represent whether the packet was actually sent, only if it was successfully queued.",
+			},
 		},
-	},  -- cUDPEndpoint
-
-
+	},
 	cUrlClient =
 	{
-		Desc =
-		[[
+		Desc = [[
 			Implements high-level asynchronous access to URLs, such as downloading webpages over HTTP(S).</p>
 			<p>
 			Note that unlike other languages' URL access libraries, this class implements asynchronous requests.
@@ -391,13 +667,233 @@ g_Server = nil
 			POST and PUT requests), and an Options parameter specifying additional options specific to the protocol
 			used.
 		]],
-
+		Functions =
+		{
+			Delete =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "URL",
+						Type = "string",
+					},
+					{
+						Name = "Callbacks",
+						Type = "table",
+					},
+					{
+						Name = "Headers",
+						Type = "table",
+						IsOptional = true,
+					},
+					{
+						Name = "RequestBody",
+						Type = "string",
+						IsOptional = true,
+					},
+					{
+						Name = "Options",
+						Type = "table",
+						IsOptional = true,
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					},
+					{
+						Name = "ErrorMessagge",
+						Type = "string",
+						IsOptional = true,
+					},
+				},
+				Notes = "Starts a HTTP DELETE request. Alias for Request(\"DELETE\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
+			},
+			Get =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "URL",
+						Type = "string",
+					},
+					{
+						Name = "Callbacks",
+						Type = "table",
+					},
+					{
+						Name = "Headers",
+						Type = "table",
+						IsOptional = true,
+					},
+					{
+						Name = "RequestBody",
+						Type = "string",
+						IsOptional = true,
+					},
+					{
+						Name = "Options",
+						Type = "table",
+						IsOptional = true,
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					},
+					{
+						Name = "ErrMsg",
+						Type = "string",
+						IsOptional = true,
+					},
+				},
+				Notes = "Starts a HTTP GET request. Alias for Request(\"GET\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
+			},
+			Post =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "URL",
+						Type = "string",
+					},
+					{
+						Name = "Callbacks",
+						Type = "table",
+					},
+					{
+						Name = "Headers",
+						Type = "table",
+						IsOptional = true,
+					},
+					{
+						Name = "RequestBody",
+						Type = "string",
+						IsOptional = true,
+					},
+					{
+						Name = "Options",
+						Type = "table",
+						IsOptional = true,
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					},
+					{
+						Name = "ErrMsg",
+						Type = "string",
+						IsOptional = true,
+					},
+				},
+				Notes = "Starts a HTTP POST request. Alias for Request(\"POST\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
+			},
+			Put =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "URL",
+						Type = "string",
+					},
+					{
+						Name = "Callbacks",
+						Type = "table",
+					},
+					{
+						Name = "Headers",
+						Type = "table",
+						IsOptional = true,
+					},
+					{
+						Name = "RequestBody",
+						Type = "string",
+						IsOptional = true,
+					},
+					{
+						Name = "Options",
+						Type = "table",
+						IsOptional = true,
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					},
+					{
+						Name = "ErrMsg",
+						Type = "string",
+						IsOptional = true,
+					},
+				},
+				Notes = "Starts a HTTP PUT request. Alias for Request(\"PUT\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
+			},
+			Request =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "Method",
+						Type = "string",
+					},
+					{
+						Name = "URL",
+						Type = "string",
+					},
+					{
+						Name = "Callbacks",
+						Type = "table",
+					},
+					{
+						Name = "Headers",
+						Type = "table",
+						IsOptional = true,
+					},
+					{
+						Name = "RequestBody",
+						Type = "string",
+						IsOptional = true,
+					},
+					{
+						Name = "Options",
+						Type = "table",
+						IsOptional = true,
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					},
+					{
+						Name = "ErrMsg",
+						Type = "string",
+						IsOptional = true,
+					},
+				},
+				Notes = "Starts a request with the specified Method. Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
+			},
+		},
 		AdditionalInfo =
 		{
 			{
 				Header = "Simple Callback",
-				Contents =
-				[[
+				Contents = [[
 					When you don't need fine control for receiving the requests and are interested only in the result,
 					you can use the simple callback approach. Pass a single function as the Callback parameter, the
 					function will get called when the response is fully processed, either with the body of the response,
@@ -418,8 +914,7 @@ cUrlClient:Get(url,
 			},
 			{
 				Header = "Callback Table",
-				Contents =
-				[[
+				Contents = [[
 					To provide complete control over the request and response handling, Cuberite allows plugins to pass
 					a table of callbacks as the Callback parameter. Then the respective functions are called for their
 					respective events during the lifetime of the request and response. This way it is possible to
@@ -504,8 +999,7 @@ end
 			},
 			{
 				Header = "Options",
-				Contents =
-				[[
+				Contents = [[
 					The requests support the following options, specified in the optional Options table parameter:
 					<table>
 						<tr><th>Option name</th><th>Description</th></tr>
@@ -527,18 +1021,5 @@ end
 				]],
 			},
 		},
-
-		Functions =
-		{
-			Delete = { Params = "URL, Callbacks, [Headers], [RequestBody], [Options]", Return = "bool, [ErrMsg]", IsStatic = true, Notes = "Starts a HTTP DELETE request. Alias for Request(\"DELETE\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.)."},
-			Get = { Params = "URL, Callbacks, [Headers], [RequestBody], [Options]", Return = "bool, [ErrMsg]", IsStatic = true, Notes = "Starts a HTTP GET request. Alias for Request(\"GET\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.)."},
-			Post = { Params = "URL, Callbacks, [Headers], [RequestBody], [Options]", Return = "bool, [ErrMsg]", IsStatic = true, Notes = "Starts a HTTP POST request. Alias for Request(\"POST\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.)."},
-			Put = { Params = "URL, Callbacks, [Headers], [RequestBody], [Options]", Return = "bool, [ErrMsg]", IsStatic = true, Notes = "Starts a HTTP PUT request. Alias for Request(\"PUT\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.)."},
-			Request = { Params = "Method, URL, Callbacks, [Headers], [RequestBody], [Options]", Return = "bool, [ErrMsg]", IsStatic = true, Notes = "Starts a request with the specified Method. Returns true on succes, false and error message on immediate failure (unparsable URL etc.)."},
-		},
-	},  -- cUrlClient
+	},
 }
-
-
-
-

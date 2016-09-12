@@ -36,6 +36,16 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 					break
 				end
 				for k, cls in pairs(Tables) do
+					if (a_DstTable[k]) then
+						-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
+						LOGWARNING(string.format(
+							"APIDump warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
+							k, FileName
+						))
+						local f = io.open("DuplicateDocs.txt", "a")
+						f:write(k, "\t", FileName)
+						f:close()
+					end
 					a_DstTable[k] = cls;
 				end
 			end  -- if (TablesFn)
@@ -511,8 +521,8 @@ local function ReadDescriptions(a_API, a_Desc)
 
 			local DoxyFunctions = {};  -- This will contain all the API functions together with their documentation
 
-			local function AddFunction(a_Name, a_Params, a_Return, a_IsStatic, a_Notes)
-				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Return = a_Return, IsStatic = a_IsStatic, Notes = a_Notes});
+			local function AddFunction(a_Name, a_Params, a_Returns, a_IsStatic, a_Notes)
+				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Returns = a_Returns, IsStatic = a_IsStatic, Notes = a_Notes});
 			end
 
 			if (APIDesc.Functions ~= nil) then
@@ -530,11 +540,11 @@ local function ReadDescriptions(a_API, a_Desc)
 						-- Description is available
 						if (FnDesc[1] == nil) then
 							-- Single function definition
-							AddFunction(func.Name, FnDesc.Params, FnDesc.Return, FnDesc.IsStatic, FnDesc.Notes);
+							AddFunction(func.Name, FnDesc.Params, FnDesc.Returns, FnDesc.IsStatic, FnDesc.Notes);
 						else
 							-- Multiple function overloads
 							for _, desc in ipairs(FnDesc) do
-								AddFunction(func.Name, desc.Params, desc.Return, desc.IsStatic, desc.Notes);
+								AddFunction(func.Name, desc.Params, desc.Returns, desc.IsStatic, desc.Notes);
 							end  -- for k, desc - FnDesc[]
 						end
 						FnDesc.IsExported = true;
@@ -773,14 +783,19 @@ local function LinkifyType(a_Type, a_API)
 		return "<a href=\"" .. a_Type .. ".html\">" .. a_Type .. "</a>"
 	end
 
-	-- If the type has a colon, it's a child enum of a class:
-	local idxColon = a_Type:find(":")
+	-- If the type has a hash sign, it's a child enum of a class:
+	local idxColon = a_Type:find("#")
 	if (idxColon) then
 		local classType = a_Type:sub(1, idxColon - 1)
 		if (a_API[classType]) then
-			local enumType = a_Type:sub(idxColon + 2)
-			return "<a href=\"" .. classType .. ".html#" .. enumType .. "\">" .. a_Type .. "</a>"
+			local enumType = a_Type:sub(idxColon + 1)
+			return "<a href=\"" .. classType .. ".html#" .. enumType .. "\">" .. enumType .. "</a>"
 		end
+	end
+
+	-- If the type is a ConstantGroup within the Globals, it's a global enum:
+	if ((a_API.Globals.ConstantGroups or {})[a_Type]) then
+		return "<a href=\"Globals.html#" .. a_Type .. "\">" .. a_Type .. "</a>"
 	end
 
 	-- Unknown or built-in type, output just text:
@@ -869,7 +884,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu, a_API)
 			-- Add the anchor names as a title
 			cf:write("<tr><td id=\"", func.Name, "_", TableOverloadedFunctions[func.Name], "\" title=\"", func.Name, "_", TableOverloadedFunctions[func.Name], "\">", func.Name, "</td>\n");
 			cf:write("<td>", CreateFunctionParamsDescription(func.Params or {}, a_InheritedName or a_ClassAPI.Name, a_API), "</td>\n");
-			cf:write("<td>", CreateFunctionParamsDescription(func.Return or {}, a_InheritedName or a_ClassAPI.Name, a_API), "</td>\n");
+			cf:write("<td>", CreateFunctionParamsDescription(func.Returns or {}, a_InheritedName or a_ClassAPI.Name, a_API), "</td>\n");
 			cf:write("<td>", StaticClause .. LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td></tr>\n");
 		end
 		cf:write("</table>\n");
@@ -1531,6 +1546,7 @@ local function WriteZBSMethods(f, a_Methods)
 		f:write("\t\t\t[\"", func.Name, "\"] =\n")
 		f:write("\t\t\t{\n")
 		f:write("\t\t\t\ttype = \"method\",\n")
+		-- No way to indicate multiple signatures to ZBS, so don't output any params at all
 		if ((func.Notes ~= nil) and (func.Notes ~= "")) then
 			f:write("\t\t\t\tdescription = [[", CleanUpDescription(func.Notes or ""), " ]],\n")
 		end
@@ -1764,6 +1780,7 @@ local function PrepareApi()
 	-- Add Globals into the API:
 	Globals.Name = "Globals";
 	table.insert(API, Globals);
+	API.Globals = Globals
 
 	-- Read in the descriptions:
 	LOG("Reading descriptions...");
