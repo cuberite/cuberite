@@ -31,4 +31,9 @@ EOF
 		cat ./NewlyUndocumented.lua
 		exit 1
 	fi
+	if [ -f ./DuplicateDocs.txt ]; then
+		echo "ERROR: API documentation has duplicate symbol warnings:"
+		cat ./DuplicateDocs.txt
+		exit 1
+	fi
 fi
