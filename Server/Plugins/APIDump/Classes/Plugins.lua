@@ -682,11 +682,11 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			HOOK_BREWING_COMPLETED =
 			{
-				"Called when a brewing stand completed a brewing process.",
+				Notes = "Called when a brewing stand completed a brewing process.",
 			},
 			HOOK_BREWING_COMPLETING =
 			{
-				"Called before a brewing stand completes a brewing process.",
+				Notes = "Called before a brewing stand completes a brewing process.",
 			},
 			HOOK_CHAT =
 			{

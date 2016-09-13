@@ -13479,7 +13479,7 @@ end
 					{
 						{
 							Name = "Username",
-							Type = "<unknown>",
+							Type = "string",
 						},
 					},
 					Returns =
@@ -13858,7 +13858,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 					{
 						{
 							Name = "Scheme",
-							Type = "<unknown>",
+							Type = "string",
 						},
 					},
 					Returns =
@@ -14142,8 +14142,8 @@ end
 							Type = "number",
 						},
 						{
-							Name = "PropartyValue",
-							Type = "<unknown>",
+							Name = "PropertyValue",
+							Type = "number",
 						},
 						{
 							Name = "Player",
@@ -14298,11 +14298,11 @@ end
 						},
 						{
 							Name = "ActionByte1",
-							Type = "<unknown>",
+							Type = "number",
 						},
 						{
 							Name = "ActionByte2",
-							Type = "<unknown>",
+							Type = "number",
 						},
 						{
 							Name = "BlockType",
@@ -14331,7 +14331,7 @@ end
 						},
 						{
 							Name = "ChatPrefix",
-							Type = "<unknown>",
+							Type = "eMessageType",
 							IsOptional = true,
 						},
 					},
@@ -14443,7 +14443,7 @@ end
 						},
 						{
 							Name = "Animation",
-							Type = "<unknown>",
+							Type = "number",
 						},
 						{
 							Name = "ExcludeClient",
@@ -14462,11 +14462,6 @@ end
 							Type = "string",
 						},
 						{
-							Name = "ExcludeClient",
-							Type = "cClientHandle",
-							IsOptional = true,
-						},
-						{
 							Name = "X",
 							Type = "number",
 						},
@@ -14479,24 +14474,29 @@ end
 							Type = "number",
 						},
 						{
-							Name = "OffSetX",
-							Type = "<unknown>",
+							Name = "OffsetX",
+							Type = "number",
 						},
 						{
-							Name = "OffSetY",
-							Type = "<unknown>",
+							Name = "OffsetY",
+							Type = "number",
 						},
 						{
-							Name = "OffSetZ",
-							Type = "<unknown>",
+							Name = "OffsetZ",
+							Type = "number",
 						},
 						{
 							Name = "ParticleData",
-							Type = "string",
+							Type = "number",
 						},
 						{
 							Name = "ParticleAmount",
-							Type = "<unknown>",
+							Type = "number",
+						},
+						{
+							Name = "ExcludeClient",
+							Type = "cClientHandle",
+							IsOptional = true,
 						},
 					},
 					Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}",
@@ -14523,11 +14523,11 @@ end
 						},
 						{
 							Name = "Volume",
-							Type = "<unknown>",
+							Type = "number",
 						},
 						{
 							Name = "Pitch",
-							Type = "<unknown>",
+							Type = "number",
 						},
 						{
 							Name = "ExcludeClient",
@@ -14598,15 +14598,15 @@ end
 					{
 						{
 							Name = "ChunkCoordTable",
-							Type = "<unknown>",
+							Type = "table",
 						},
 						{
 							Name = "OnChunkAvailable",
-							Type = "<unknown>",
+							Type = "function",
 						},
 						{
 							Name = "OnAllChunksAvailable",
-							Type = "<unknown>",
+							Type = "function",
 						},
 					},
 					Notes = "Queues the specified chunks to be loaded or generated and calls the specified callbacks once they are loaded. ChunkCoordTable is an arra-table of chunk coords, each coord being a table of 2 numbers: { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ...}. When any of those chunks are made available (including being available at the start of this call), the OnChunkAvailable() callback is called. When all the chunks are available, the OnAllChunksAvailable() callback is called. The function signatures are: <pre class=\"prettyprint lang-lua\">function OnChunkAvailable(ChunkX, ChunkZ)\
@@ -14630,7 +14630,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						},
 						{
 							Name = "ProjectileKind",
-							Type = "cProjectileEntity",
+							Type = "cProjectileEntity#eKind",
 						},
 						{
 							Name = "Creator",
@@ -14673,7 +14673,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						{
 							Name = "Force",
-							Type = "<unknown>",
+							Type = "number",
 						},
 						{
 							Name = "X",
@@ -14693,11 +14693,11 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						},
 						{
 							Name = "Source",
-							Type = "<unknown>",
+							Type = "eExplosionSource",
 						},
 						{
 							Name = "SourceData",
-							Type = "string",
+							Type = "any",
 						},
 					},
 					Notes = "Creates an explosion of the specified relative force in the specified position. If CanCauseFire is set, the explosion will set blocks on fire, too. The Source parameter specifies the source of the explosion, one of the esXXX constants. The SourceData parameter is specific to each source type, usually it provides more info about the source.",
@@ -15473,8 +15473,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Params =
 						{
 							{
-								Name = "{{Vector3i|Pos}",
-								Type = "<unknown>",
+								Name = "Pos",
+								Type = "Vector3i",
 							},
 						},
 						Returns =
@@ -15506,8 +15506,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					Returns =
 					{
 						{
-							Name = "BlockValid",
-							Type = "<unknown>",
+							Name = "IsBlockValid",
+							Type = "boolean",
 						},
 						{
 							Name = "BlockType",
@@ -15523,7 +15523,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						},
 						{
 							Name = "BlockBlockLight",
-							Type = "<unknown>",
+							Type = "number",
 						},
 					},
 					Notes = "Returns the complete block info for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true.",
@@ -15616,8 +15616,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					Returns =
 					{
 						{
-							Name = "BlockValid",
-							Type = "<unknown>",
+							Name = "IsBlockValid",
+							Type = "boolean",
 						},
 						{
 							Name = "BlockType",
@@ -15635,7 +15635,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					Params =
 					{
 						{
-							Name = "eWeather",
+							Name = "Weather",
 							Type = "eWeather",
 						},
 					},
@@ -15896,20 +15896,24 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "boolean",
 						},
 						{
-							Name = "[Line1",
-							Type = "<unknown>",
+							Name = "Line1",
+							Type = "string",
+							IsOptional = true,
 						},
 						{
 							Name = "Line2",
-							Type = "<unknown>",
+							Type = "string",
+							IsOptional = true,
 						},
 						{
 							Name = "Line3",
-							Type = "<unknown>",
+							Type = "string",
+							IsOptional = true,
 						},
 						{
-							Name = "Line4]",
-							Type = "<unknown>",
+							Name = "Line4",
+							Type = "string",
+							IsOptional = true,
 						},
 					},
 					Notes = "Returns true and the lines of a sign at the specified coords, or false if there is no sign at the coords.",
@@ -15990,7 +15994,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						{
 							Name = "ShrapnelLevel",
-							Type = "Globals#ShrapnelLevel",
+							Type = "Globals#eShrapnelLevel",
 						},
 					},
 					Notes = "Returns the shrapnel level, representing the block types that are propelled outwards following an explosion. Based on this value and a random picker, blocks are selectively converted to physics entities (FallingSand) and flung outwards.",
@@ -16187,7 +16191,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						},
 						{
 							Name = "SaplingMeta",
-							Type = "<unknown>",
+							Type = "number",
 						},
 					},
 					Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta (the sapling itself needn't be present).",
@@ -16520,7 +16524,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						{
 							Name = "TaskFunction",
-							Type = "<unknown>",
+							Type = "function",
 						},
 					},
 					Notes = "Queues the specified function to be executed in the tick thread. This is the primary means of interaction with a cWorld from the WebAdmin page handlers (see {{WebWorldThreads}}). The function signature is <pre class=\"pretty-print lang-lua\">function()</pre>All return values from the function are ignored. Note that this function is actually called *after* the QueueTask() function returns. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead.",
@@ -16554,7 +16558,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						},
 						{
 							Name = "TaskFunction",
-							Type = "<unknown>",
+							Type = "function",
 						},
 					},
 					Notes = "Queues the specified function to be executed in the world's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cWorld|World}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead.",
@@ -17024,10 +17028,10 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						{
 							Name = "ShrapnelLevel",
-							Type = "Globals#ShrapnelLevel",
+							Type = "Globals#eShrapnelLevel",
 						},
 					},
-					Notes = "Sets the Shrampel level of the world.",
+					Notes = "Sets the Shrapnel level of the world.",
 				},
 				SetTrapdoorOpen =
 				{
@@ -17147,7 +17151,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						},
 						{
 							Name = "Reward",
-							Type = "<unknown>",
+							Type = "number",
 						},
 					},
 					Returns =
@@ -17191,7 +17195,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Spawns an {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta",
+					Notes = "Spawns a {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta",
 				},
 				SpawnItemPickups =
 				{
@@ -17216,7 +17220,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							},
 							{
 								Name = "FlyAwaySpeed",
-								Type = "<unknown>",
+								Type = "number",
 								IsOptional = true,
 							},
 							{
@@ -17400,32 +17404,32 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					Params =
 					{
 						{
-							Name = "X",
+							Name = "BlockX",
 							Type = "number",
 						},
 						{
-							Name = "Y",
+							Name = "BlockY",
 							Type = "number",
 						},
 						{
-							Name = "Z",
+							Name = "BlockZ",
 							Type = "number",
 						},
 						{
 							Name = "Line1",
-							Type = "<unknown>",
+							Type = "string",
 						},
 						{
 							Name = "Line2",
-							Type = "<unknown>",
+							Type = "string",
 						},
 						{
 							Name = "Line3",
-							Type = "<unknown>",
+							Type = "string",
 						},
 						{
 							Name = "Line4",
-							Type = "<unknown>",
+							Type = "string",
 						},
 						{
 							Name = "Player",
@@ -18913,7 +18917,7 @@ end
 						},
 						{
 							Name = "SeparatorChar",
-							Type = "<unknown>",
+							Type = "string",
 							IsOptional = true,
 						},
 					},
@@ -18921,7 +18925,7 @@ end
 					{
 						{
 							Name = "XMLParser object",
-							Type = "<unknown>",
+							Type = "table",
 						},
 					},
 					Notes = "Creates a new XML parser object, with the specified callbacks table and optional separator character.",
@@ -19171,7 +19175,7 @@ end
 					{
 						{
 							Name = "Object",
-							Type = "<unknown>",
+							Type = "any",
 						},
 						{
 							Name = "TypeStr",
@@ -19182,7 +19186,7 @@ end
 					{
 						{
 							Name = "Object",
-							Type = "<unknown>",
+							Type = "any",
 						},
 					},
 					Notes = "Casts the object to the specified type.<br/><b>Note:</b> This is a potentially unsafe operation and it could crash the server. There is normally no need to use this function at all, so don't use it unless you know exactly what you're doing.",
@@ -19213,7 +19217,7 @@ end
 					{
 						{
 							Name = "Object",
-							Type = "<unknown>",
+							Type = "any",
 						},
 					},
 					Returns =
