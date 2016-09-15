@@ -19033,6 +19033,8 @@ Parser:close();
 			{
 				complete =
 				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
 					Params =
 					{
 						{
@@ -19050,6 +19052,8 @@ Parser:close();
 				},
 				open =
 				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
 					Params =
 					{
 						{
@@ -19083,6 +19087,8 @@ myDB:close()
 				},
 				open_memory =
 				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
 					Returns =
 					{
 						{
@@ -19094,6 +19100,8 @@ myDB:close()
 				},
 				version =
 				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
 					Returns =
 					{
 						{
