@@ -383,22 +383,24 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 	a_Pkt.WriteBEInt8(Flags);
 
+	if (a_Entity.HasCustomName())
+	{
+		a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME);
+		a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
+		a_Pkt.WriteString(a_Entity.GetCustomName());
+
+		a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME_VISIBLE);  // Custom name always visible
+		a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+		a_Pkt.WriteBool(a_Entity.IsCustomNameAlwaysVisible());
+	}
+
 	switch (a_Entity.GetEntityType())
 	{
 		case cEntity::etPlayer:
 		{
-			auto & Player = reinterpret_cast<const cPlayer &>(a_Entity);
-
-			// TODO Set player custom name to their name.
-			// Then it's possible to move the custom name of mobs to the entities
-			// and to remove the "special" player custom name.
-			a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-			a_Pkt.WriteString(Player.GetName());
-
 			a_Pkt.WriteBEUInt8(LIVING_HEALTH);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
 			break;
 		}
 		case cEntity::etPickup:
@@ -554,18 +556,7 @@ void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob
 {
 	using namespace Metadata;
 
-	// Living Enitiy Metadata
-	if (a_Mob.HasCustomName())
-	{
-		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
-		a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME);
-		a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-
-		a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME_VISIBLE);  // Custom name always visible
-		a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
-	}
+	// Living Enitity Metadata
 
 	a_Pkt.WriteBEUInt8(LIVING_HEALTH);
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);

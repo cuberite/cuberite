@@ -80,8 +80,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
-	, m_CustomName("")
-	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
 	, m_AttackRate(3)
@@ -725,39 +723,6 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cMonster::ResetAttackCooldown()
 {
 	m_AttackCoolDownTicksLeft = static_cast<int>(3 * 20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every 3 seconds
-}
-
-
-
-
-
-void cMonster::SetCustomName(const AString & a_CustomName)
-{
-	m_CustomName = a_CustomName;
-
-	// The maximal length is 64
-	if (a_CustomName.length() > 64)
-	{
-		m_CustomName = a_CustomName.substr(0, 64);
-	}
-
-	if (m_World != nullptr)
-	{
-		m_World->BroadcastEntityMetadata(*this);
-	}
-}
-
-
-
-
-
-void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
-{
-	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
-	if (m_World != nullptr)
-	{
-		m_World->BroadcastEntityMetadata(*this);
-	}
 }
 
 

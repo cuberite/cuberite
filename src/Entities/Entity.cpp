@@ -63,7 +63,9 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_Mass (0.001),  // Default 1g
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_InvulnerableTicks(0)
+	m_InvulnerableTicks(0),
+	m_CustomName(""),
+	m_CustomNameAlwaysVisible(false)
 {
 	// Assign a proper ID:
 	cCSLock Lock(m_CSCount);
@@ -2206,6 +2208,39 @@ bool cEntity::IsTicking(void) const
 {
 	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
 	return m_IsTicking;
+}
+
+
+
+
+
+void cEntity::SetCustomName(const AString & a_CustomName)
+{
+	m_CustomName = a_CustomName;
+
+	// The maximal length is 64
+	if (a_CustomName.length() > 64)
+	{
+		m_CustomName = a_CustomName.substr(0, 64);
+	}
+
+	if (m_World != nullptr)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cEntity::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
+{
+	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
+	if (m_World != nullptr)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -477,6 +477,23 @@ public:
 	/** Returns whether the entity is on ground or not */
 	virtual bool IsOnGround(void) const { return m_bOnGround; }
 
+	/** Returns true if the monster has a custom name. */
+	bool HasCustomName(void) const { return !m_CustomName.empty(); }
+
+	/** Gets the custom name of the monster. If no custom name is set, the function returns an empty string. */
+	const AString & GetCustomName(void) const { return m_CustomName; }
+
+	/** Sets the custom name of the monster. You see the name over the monster.
+	If you want to disable the custom name, simply set an empty string. */
+	void SetCustomName(const AString & a_CustomName);
+
+	/** Is the custom name of this monster always visible? If not, you only see the name when you sight the mob. */
+	bool IsCustomNameAlwaysVisible(void) const { return m_CustomNameAlwaysVisible; }
+
+	/** Sets the custom name visiblity of this monster.
+	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
+	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
+
 	// tolua_end
 
 	/** Called when the specified player right-clicks this entity */
@@ -599,6 +616,11 @@ protected:
 
 	/** The number of ticks this entity has been alive for */
 	long int m_TicksAlive;
+
+	/** The entity's custom name, or an empty string */
+	AString m_CustomName;
+	/** Is the custom name visible even if not directly looking at the entity? */
+	bool m_CustomNameAlwaysVisible;
 
 
 	/** Does the actual speed-setting. The default implementation just sets the member variable value;
