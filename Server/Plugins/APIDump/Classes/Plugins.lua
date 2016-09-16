@@ -163,7 +163,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 						},
 						{
 							Name = "Callback",
-							Type = "callback",
+							Type = "function",
 							IsOptional = true,
 						},
 					},
@@ -185,7 +185,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 						},
 						{
 							Name = "Callback",
-							Type = "callback",
+							Type = "function",
 						},
 						{
 							Name = "HelpString",
@@ -214,7 +214,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 						},
 						{
 							Name = "Callback",
-							Type = "callback",
+							Type = "function",
 						},
 						{
 							Name = "HelpString",
