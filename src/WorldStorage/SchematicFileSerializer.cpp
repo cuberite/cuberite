@@ -164,7 +164,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	int SizeX = a_NBT.GetShort(TSizeX);
 	int SizeY = a_NBT.GetShort(TSizeY);
 	int SizeZ = a_NBT.GetShort(TSizeZ);
-	if ((SizeX < 1) || (SizeX > 65535) || (SizeY < 1) || (SizeY > 256) || (SizeZ < 1) || (SizeZ > 65535))
+	if ((SizeX < 1) || (SizeX > 65535) || (SizeY < 1) || (SizeY > cChunkDef::Height) || (SizeZ < 1) || (SizeZ > 65535))
 	{
 		LOG("Dimensions are invalid in the schematic file: %d, %d, %d", SizeX, SizeY, SizeZ);
 		return false;
