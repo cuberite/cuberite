@@ -77,11 +77,11 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_BlockDigAnimStage(-1),
 	m_BlockDigAnimSpeed(0),
 	m_BlockDigAnimX(0),
-	m_BlockDigAnimY(256),  // Invalid Y, so that the coords don't get picked up
+	m_BlockDigAnimY(cChunkDef::Height + 1),  // Invalid Y, so that the coords don't get picked up
 	m_BlockDigAnimZ(0),
 	m_HasStartedDigging(false),
 	m_LastDigBlockX(0),
-	m_LastDigBlockY(256),  // Invalid Y, so that the coords don't get picked up
+	m_LastDigBlockY(cChunkDef::Height + 1),  // Invalid Y, so that the coords don't get picked up
 	m_LastDigBlockZ(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),

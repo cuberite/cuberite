@@ -163,7 +163,7 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Short))
 	{
 		unsigned int Height = static_cast<unsigned int>(a_NBT.GetShort(CurrLine));
-		if (Height >= 256)
+		if (Height >= cChunkDef::Height)
 		{
 			return false;
 		}

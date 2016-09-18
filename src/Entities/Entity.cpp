@@ -1458,7 +1458,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, 256);
+					new cNetherPortalScanner(this, TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
 				// Nether portal in the overworld
