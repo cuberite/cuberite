@@ -517,7 +517,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			// Get the top block + 1. This is the place where the grass would finaly be placed:
 			int y = a_ChunkDesc.GetHeight(x, z) + 1;
 
-			if (y >= 255)
+			if (y >= cChunkDef::Height - 1)
 			{
 				continue;
 			}
@@ -1221,7 +1221,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 
 cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension) :
 	m_Noise(a_Seed + a_Fluid * 100),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
-	m_HeightDistribution(255),
+	m_HeightDistribution(cChunkDef::Height - 1),
 	m_Fluid(a_Fluid)
 {
 	bool IsWater = (a_Fluid == E_BLOCK_WATER);
