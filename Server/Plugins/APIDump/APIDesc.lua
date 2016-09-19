@@ -6284,11 +6284,10 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 					Returns =
 					{
 						{
-							Name = "array table of strings",
-							Type = "string",
+							Type = "table",
 						},
 					},
-					Notes = "Returns the contents of the specified folder, as an array table of strings. Each filesystem object is listed. Use the IsFile() and IsFolder() functions to determine the object type.",
+					Notes = "Returns the contents of the specified folder, as an array table of strings. Each filesystem object is listed. Use the IsFile() and IsFolder() functions to determine the object type. Note that \".\" and \"..\" are NOT returned. The order of the names is arbitrary (as returned by OS, no sorting).",
 				},
 				GetLastModificationTime =
 				{
@@ -11236,11 +11235,10 @@ a_Player:OpenWindow(Window);
 					Returns =
 					{
 						{
-							Name = "array-table of strings",
-							Type = "string",
+							Type = "table",
 						},
 					},
-					Notes = "Returns the list of all permissions that the player has assigned to them through their rank.",
+					Notes = "Returns an array-table of all permissions (strings) that the player has assigned to them through their rank.",
 				},
 				GetPlayerListName =
 				{
@@ -11257,11 +11255,10 @@ a_Player:OpenWindow(Window);
 					Returns =
 					{
 						{
-							Name = "array-table of string",
-							Type = "string",
+							Type = "table",
 						},
 					},
-					Notes = "Returns all the player's permissions, as a table. The permissions are stored in the array part of the table, beginning with index 1.",
+					Notes = "Returns all the player's permissions, as an array-table of strings.",
 				},
 				GetSprintingMaxSpeed =
 				{
