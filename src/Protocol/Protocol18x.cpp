@@ -101,8 +101,8 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol180:
 
-cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client),
+cProtocol180::cProtocol180(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ProtocolVersion),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),

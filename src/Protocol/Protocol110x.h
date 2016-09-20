@@ -22,7 +22,7 @@ class cProtocol1100 :
 	typedef cProtocol194 super;
 
 public:
-	cProtocol1100(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol1100(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	virtual void SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 

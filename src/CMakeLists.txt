@@ -126,6 +126,7 @@ SET (HDRS
 	MapManager.h
 	Matrix4.h
 	MemorySettingsRepository.h
+	MetadataWriter.h
 	MobCensus.h
 	MobFamilyCollecter.h
 	MobProximityCounter.h

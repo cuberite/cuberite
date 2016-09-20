@@ -3,6 +3,7 @@
 
 #include "../Item.h"
 #include "../Vector3.h"
+#include "../MetadataWriter.h"
 
 
 

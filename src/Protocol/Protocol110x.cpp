@@ -281,8 +281,8 @@ namespace Metadata
 
 
 
-cProtocol1100::cProtocol1100(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+cProtocol1100::cProtocol1100(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ProtocolVersion, a_ServerAddress, a_ServerPort, a_State)
 {
 }
 

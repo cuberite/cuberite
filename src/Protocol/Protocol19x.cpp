@@ -111,8 +111,8 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol190:
 
-cProtocol190::cProtocol190(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client),
+cProtocol190::cProtocol190(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ProtocolVersion),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
@@ -4019,8 +4019,8 @@ void cProtocol190::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol191:
 
-cProtocol191::cProtocol191(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+cProtocol191::cProtocol191(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ProtocolVersion, a_ServerAddress, a_ServerPort, a_State)
 {
 }
 
@@ -4111,8 +4111,8 @@ void cProtocol191::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol192:
 
-cProtocol192::cProtocol192(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+cProtocol192::cProtocol192(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ProtocolVersion, a_ServerAddress, a_ServerPort, a_State)
 {
 }
 
@@ -4168,8 +4168,8 @@ void cProtocol192::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol194:
 
-cProtocol194::cProtocol194(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+cProtocol194::cProtocol194(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ProtocolVersion, a_ServerAddress, a_ServerPort, a_State)
 {
 }
 
@@ -4359,4 +4359,121 @@ void cProtocol194::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 	Writer.Finish();
 	Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cMetadataWriter190:
+
+cMetadataWriter190::cMetadataWriter190(int a_ProtocolVersion, cPacketizer & a_Pkt, cProtocol190 & a_Protocol) :
+	super(a_ProtocolVersion),
+	m_Pkt(a_Pkt),
+	m_Protocol(a_Protocol),
+	m_Index(0)
+{
+
+}
+
+
+
+
+
+void cMetadataWriter190::WriteByte(Int8 a_Value)
+{
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+	m_Pkt.WriteBEInt8(a_Value);
+}
+
+
+
+
+
+void cMetadataWriter190::WriteInt(Int32 a_Value)
+{
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+	// NOTE: VarInts are actually signed, but WriteVarInt32 incorrectly wants them unsigned
+	m_Pkt.WriteVarInt32(static_cast<UInt32>(a_Value));
+}
+
+
+
+
+
+void cMetadataWriter190::WriteFloat(float a_Value)
+{
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+	m_Pkt.WriteBEFloat(a_Value);
+}
+
+
+
+
+
+void cMetadataWriter190::WriteString(const AString & a_Value)
+{
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
+	m_Pkt.WriteString(a_Value);
+}
+
+
+
+
+
+void cMetadataWriter190::WriteItem(const cItem & a_Value)
+{
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+	m_Protocol.WriteItem(m_Pkt, a_Value);
+}
+
+
+
+
+
+void cMetadataWriter190::WritePosition(int a_X, int a_Y, int a_Z)
+{
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_POSITION);
+	m_Pkt.WritePosition64(a_X, a_Y, a_Z);
+}
+
+
+
+
+
+void cMetadataWriter190::WriteBool(bool a_Value)
+{
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+	m_Pkt.WriteBool(a_Value);
+}
+
+
+
+
+
+void cMetadataWriter190::WriteBlockID(BLOCKTYPE a_ID, NIBBLETYPE a_Data)
+{
+	Int32 Value = 0;
+	Value |= a_ID << 4;
+	Value |= a_Data;
+	m_Pkt.WriteBEUInt8(m_Index++);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
+	m_Pkt.WriteVarInt32(static_cast<UInt32>(Value));
+}
+
+
+
+
+
+void cMetadataWriter190::SkipMeta(void)
+{
+	m_Index++;
 }
