@@ -159,7 +159,9 @@ function RegisterPluginInfoCommands()
 	end
 
 	-- Loop through all commands in the plugin info, register each:
-	RegisterSubcommands("", g_PluginInfo.Commands, 1)
+	if (g_PluginInfo.Commands) then
+		RegisterSubcommands("", g_PluginInfo.Commands, 1)
+	end
 end
 
 
@@ -190,7 +192,9 @@ function RegisterPluginInfoConsoleCommands()
 	end
 
 	-- Loop through all commands in the plugin info, register each:
-	RegisterSubcommands("", g_PluginInfo.ConsoleCommands, 1)
+	if (g_PluginInfo.ConsoleCommands) then
+		RegisterSubcommands("", g_PluginInfo.ConsoleCommands, 1)
+	end
 end
 
 
