@@ -25,6 +25,8 @@ public:
 
 	bool IsWither(void) const { return m_bIsWither; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	bool m_bIsWither;

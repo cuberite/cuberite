@@ -64,3 +64,14 @@ void cGuardian::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+
+void cGuardian::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // Flags
+	a_Writer.SkipMeta();  // Target
+}
+
+
+
+

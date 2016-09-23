@@ -2566,3 +2566,17 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 	m_FlyingMaxSpeed = FlyingMaxpeed;
 	m_IsFlying = IsFlying;
 }
+
+
+
+
+
+void cPlayer::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	// Player-specific fields (none currently implemented)
+	a_Writer.SkipMeta();  // Aditional hearts
+	a_Writer.SkipMeta();  // Score
+	a_Writer.SkipMeta();  // Skin flags
+	a_Writer.SkipMeta();  // Main hand
+}

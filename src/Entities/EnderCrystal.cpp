@@ -54,3 +54,14 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+
+void cEnderCrystal::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // Beam target
+	a_Writer.SkipMeta();  // Show bottom
+}
+
+
+
+

@@ -49,6 +49,8 @@ public:
 
 	// tolua_end
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 
 	cEntityEffect::eType m_EntityEffectType;

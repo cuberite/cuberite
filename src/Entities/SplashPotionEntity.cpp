@@ -144,3 +144,13 @@ void cSplashPotionEntity::SpawnOn(cClientHandle & a_Client)
 
 
 
+
+void cSplashPotionEntity::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteItem(GetItem());  // Potion item
+}
+
+
+
+

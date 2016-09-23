@@ -520,6 +520,9 @@ public:
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
 
+	/** Writes this entity's protocol metadata */
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const;
+
 protected:
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData

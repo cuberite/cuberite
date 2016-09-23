@@ -52,6 +52,8 @@ public:
 	Vector3i GetCropsPos(void)             const { return m_CropsPos; }
 	bool     DoesHaveActionActivated(void) const { return m_VillagerAction; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	int m_ActionCountDown;

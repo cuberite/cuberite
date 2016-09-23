@@ -22,6 +22,8 @@ public:
 	bool IsVillagerZombie(void) const { return m_IsVillagerZombie; }
 	bool IsConverting    (void) const { return m_IsConverting; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	bool m_IsVillagerZombie;

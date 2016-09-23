@@ -169,3 +169,18 @@ void cBoat::UpdatePaddles(bool a_RightPaddleUsed, bool a_LeftPaddleUsed)
 
 	m_World->BroadcastEntityMetadata(*this);
 }
+
+
+
+
+
+void cBoat::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteInt(GetLastDamage());  // Time since last hit
+	a_Writer.WriteInt(GetForwardDirection());  // Forward direction
+	a_Writer.WriteFloat(GetDamageTaken());  // Damage taken
+	a_Writer.WriteInt(GetType());  // Type
+	a_Writer.WriteBool(IsRightPaddleUsed());  // Right paddle
+	a_Writer.WriteBool(IsLeftPaddleUsed());  // Left paddle
+}

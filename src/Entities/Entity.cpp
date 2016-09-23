@@ -2243,6 +2243,53 @@ void cEntity::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
 	}
 }
 
+
+
+
+
+void cEntity::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	Int8 Flags = 0;
+	if (IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	a_Writer.WriteByte(Flags);  // Flags
+	a_Writer.SkipMeta();  // Air
+	if (HasCustomName())
+	{
+		a_Writer.WriteString(GetCustomName());  // Custom name
+		a_Writer.WriteBool(IsCustomNameAlwaysVisible());  // Custom name visible
+	}
+	else
+	{
+		a_Writer.SkipMeta();  // Custom name
+		a_Writer.SkipMeta();  // Custom name visible
+	}
+	a_Writer.SkipMeta();  // Is silent
+	if (a_Writer.m_ProtocolVersion >= PROTO_VERSION_1_10_0)
+	{
+		a_Writer.WriteBool(GetGravity() == 0);  // No gravity
+	}
+	// Subclasses add aditional metadata fields
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
 Vector3d cEntity::GetLookVector(void) const

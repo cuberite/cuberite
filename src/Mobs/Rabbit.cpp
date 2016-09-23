@@ -45,3 +45,13 @@ void cRabbit::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 }
 
+
+
+
+
+void cRabbit::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteInt(static_cast<Int32>(GetRabbitType()));  // Rabit type
+}
+

@@ -155,8 +155,20 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 		}
 		m_World->BroadcastSoundEffect("game.tnt.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
-		m_World->BroadcastEntityMetadata(*this);
 		m_BurnedWithFlintAndSteel = true;
+		m_World->BroadcastEntityMetadata(*this);
 	}
+}
+
+
+
+
+
+void cCreeper::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteInt(IsBlowing() ? 1 : -1);  // State
+	a_Writer.WriteBool(IsCharged());  // Is charged
+	a_Writer.WriteBool(IsBurnedWithFlintAndSteel());  // Is burned with flint and steel
 }
 

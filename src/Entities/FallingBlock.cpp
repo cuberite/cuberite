@@ -101,3 +101,13 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+
+void cFallingBlock::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WritePosition(m_OriginalPosition.x, m_OriginalPosition.y, m_OriginalPosition.z);  // Spawn position
+}
+
+
+
+

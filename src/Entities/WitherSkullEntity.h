@@ -30,6 +30,8 @@ public:
 
 	cWitherSkullEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 
 	// cProjectileEntity overrides:

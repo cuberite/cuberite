@@ -1111,6 +1111,46 @@ void cMinecart::Destroyed()
 
 
 
+void cMinecart::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	// The following expression makes Minecarts shake more with less health or higher damage taken
+	a_Writer.WriteInt(static_cast<UInt32>((GetMaxHealth() - GetHealth()) * LastDamage() * 4));
+	a_Writer.WriteInt(1);  // Shaking direction
+	a_Writer.WriteFloat(static_cast<float>(LastDamage() + 10));  // Shaking multiplier
+
+	// TODO: Move these flags to cMinecart, since they are on all minecarts (#3343)
+	if (GetPayload() == cMinecart::mpNone)
+	{
+		auto RideableMinecart = reinterpret_cast<const cRideableMinecart *>(this);
+		const cItem & MinecartContent = RideableMinecart->GetContent();
+		if (!MinecartContent.IsEmpty())
+		{
+			int Content = MinecartContent.m_ItemType;
+			Content |= MinecartContent.m_ItemDamage << 8;
+			a_Writer.WriteInt(Content);  // Block ID and damage
+			a_Writer.WriteInt(RideableMinecart->GetBlockHeight());  // Block height
+			a_Writer.WriteBool(true);  // Show block
+		}
+		else
+		{
+			a_Writer.SkipMeta();  // Block ID and damage
+			a_Writer.SkipMeta();  // Block height
+			a_Writer.SkipMeta();  // Show block
+		}
+	}
+	else
+	{
+		a_Writer.SkipMeta();  // Block ID and damage
+		a_Writer.SkipMeta();  // Block height
+		a_Writer.SkipMeta();  // Show block
+	}
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
@@ -1286,6 +1326,16 @@ void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk
 		}
 		AddSpeed(GetSpeed() / 4);
 	}
+}
+
+
+
+
+
+void cMinecartWithFurnace::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteBool(IsFueled());  // Is powered
 }
 
 

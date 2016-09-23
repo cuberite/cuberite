@@ -209,3 +209,13 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
 	return false;
 }
 
+
+
+
+
+void cVillager::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteInt(GetVilType());  // Villager profession
+}
+

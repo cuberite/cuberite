@@ -106,3 +106,13 @@ AString cSlime::GetSizeName(int a_Size)
 
 
 
+
+void cSlime::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteInt(GetSize());  // Size
+}
+
+
+
+

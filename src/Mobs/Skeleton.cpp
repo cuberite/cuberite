@@ -88,3 +88,14 @@ void cSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
+
+void cSkeleton::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteInt(IsWither() ? 1 : 0);  // Type (TODO: Stray)
+	a_Writer.SkipMeta();  // Is swinging arms
+}
+
+
+
+

@@ -186,3 +186,45 @@ void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 		super::HandleSpeedFromAttachee(a_Forward * m_Speed, a_Sideways * m_Speed);
 	}
 }
+
+
+
+
+
+void cHorse::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	Int8 Flags = 0;
+	if (IsTame())
+	{
+		Flags |= 0x02;
+	}
+	if (IsSaddled())
+	{
+		Flags |= 0x04;
+	}
+	if (IsChested())
+	{
+		Flags |= 0x08;
+	}
+	if (IsEating())
+	{
+		Flags |= 0x20;
+	}
+	if (IsRearing())
+	{
+		Flags |= 0x40;
+	}
+	if (IsMthOpen())
+	{
+		Flags |= 0x80;
+	}
+	a_Writer.WriteByte(Flags);  // Flags
+	a_Writer.WriteInt(GetHorseType());  // Type
+	int Appearance = 0;
+	Appearance |= GetHorseColor();
+	Appearance |= GetHorseStyle() << 8;
+	a_Writer.WriteInt(Appearance);  // Appearence
+	a_Writer.SkipMeta();  // Owner
+	a_Writer.WriteInt(GetHorseArmour());  // Armor
+}

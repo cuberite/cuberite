@@ -20,6 +20,8 @@ public:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual bool IsUndead(void) override { return true; }
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 

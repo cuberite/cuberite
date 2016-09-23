@@ -36,6 +36,8 @@ public:
 
 	// tolua_end
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 	int m_FuseTicks;      ///< How much ticks is left, while the tnt will explode
 };  // tolua_export

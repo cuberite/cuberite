@@ -236,3 +236,13 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+
+void cArrowEntity::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteByte(IsCritical() ? 1 : 0);  // Flags
+}
+
+
+
+

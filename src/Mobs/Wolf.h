@@ -57,6 +57,8 @@ public:
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 
 	bool    m_IsSitting;

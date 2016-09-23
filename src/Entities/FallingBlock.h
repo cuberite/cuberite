@@ -32,6 +32,8 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 	BLOCKTYPE  m_BlockType;
 	NIBBLETYPE m_BlockMeta;

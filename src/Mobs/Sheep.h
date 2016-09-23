@@ -42,6 +42,8 @@ public:
 	int GetFurColor(void) const { return m_WoolColor; }
 	void SetFurColor(int a_WoolColor) { m_WoolColor = a_WoolColor; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 	bool m_IsSheared;
 	int m_WoolColor;
