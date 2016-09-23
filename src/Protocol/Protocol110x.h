@@ -27,8 +27,4 @@ public:
 	virtual void SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
-
-protected:
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
 };
