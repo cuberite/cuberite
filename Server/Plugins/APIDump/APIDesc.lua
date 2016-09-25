@@ -3698,11 +3698,13 @@ end
 				},
 				Clear =
 				{
+					Returns = "self",
 					Notes = "Removes all parts from this object",
 				},
 				constructor =
 				{
 					{
+						Returns = { {Type = "cCompositeChat"} },
 						Notes = "Creates an empty chat message",
 					},
 					{
@@ -3718,6 +3720,7 @@ end
 								IsOptional = true,
 							},
 						},
+						Returns = { {Type = "cCompositeChat"} },
 						Notes = "Creates a chat message containing the specified text, parsed by the ParseText() function. This allows easy migration from old chat messages.",
 					},
 				},
@@ -10100,7 +10103,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMobType",
+							Type = "Globals#eMonsterType",
 						},
 					},
 					Returns =
@@ -10110,7 +10113,7 @@ a_Player:OpenWindow(Window);
 							Type = "cMonster#eFamily",
 						},
 					},
-					Notes = "Returns the mob family ({{cMonster#eFamily|mfXXX}} constants) based on the mob type ({{Globals#eMobType|mtXXX}} constants)",
+					Notes = "Returns the mob family ({{cMonster#eFamily|mfXXX}} constants) based on the mob type ({{Globals#eMonsterType|mtXXX}} constants)",
 				},
 				GetAge =
 				{
@@ -10149,10 +10152,10 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMobType",
+							Type = "Globals#eMonsterType",
 						},
 					},
-					Notes = "Returns the type of this mob ({{Globals#eMobType|mtXXX}} constant)",
+					Notes = "Returns the type of this mob ({{Globals#eMonsterType|mtXXX}} constant)",
 				},
 				GetRelativeWalkSpeed =
 				{
@@ -10219,7 +10222,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMobType",
+							Type = "Globals#eMonsterType",
 						},
 					},
 					Returns =
@@ -10228,7 +10231,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Returns the string representing the given mob type ({{Globals#eMobType|mtXXX}} constant), or empty string if unknown type.",
+					Notes = "Returns the string representing the given mob type ({{Globals#eMonsterType|mtXXX}} constant), or empty string if unknown type.",
 				},
 				MobTypeToVanillaName =
 				{
@@ -10317,10 +10320,10 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMobType",
+							Type = "Globals#eMonsterType",
 						},
 					},
-					Notes = "Returns the mob type ({{Globals#eMobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
+					Notes = "Returns the mob type ({{Globals#eMonsterType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
 				},
 			},
 			Constants =
@@ -18497,6 +18500,66 @@ World:ForEachEntity(
 				{
 					Notes = "A wither skull explosion. The SourceData param is the {{cWitherSkullEntity|wither skull entity}} object.",
 				},
+				mtCustom =
+				{
+					Notes = "Send raw data without any processing",
+				},
+				mtDeath =
+				{
+					Notes = "Denotes death of player",
+				},
+				mtError =
+				{
+					Notes = "Something could not be done (i.e. command not executed due to insufficient privilege)",
+				},
+				mtFail =
+				{
+					Notes = "Something could not be done (i.e. command not executed due to insufficient privilege)",
+				},
+				mtFailure =
+				{
+					Notes = "Something could not be done (i.e. command not executed due to insufficient privilege)",
+				},
+				mtFatal =
+				{
+					Notes = "Something catastrophic occured (i.e. plugin crash)",
+				},
+				mtInfo =
+				{
+					Notes = "Informational message (i.e. command usage)",
+				},
+				mtInformation =
+				{
+					Notes = "Informational message (i.e. command usage)",
+				},
+				mtJoin =
+				{
+					Notes = "A player has joined the server",
+				},
+				mtLeave =
+				{
+					Notes = "A player has left the server",
+				},
+				mtMaxPlusOne =
+				{
+					Notes = "The first invalid type, used for checking on LuaAPI boundaries",
+				},
+				mtPM =
+				{
+					Notes = "Player to player messaging identifier",
+				},
+				mtPrivateMessage =
+				{
+					Notes = "Player to player messaging identifier",
+				},
+				mtSuccess =
+				{
+					Notes = "Something executed successfully",
+				},
+				mtWarning =
+				{
+					Notes = "Something concerning (i.e. reload) is about to happen",
+				},
 			},
 			ConstantGroups =
 			{
@@ -18590,11 +18653,70 @@ World:ForEachEntity(
 						StringToBiome() function that can convert a string into one of these constants.
 					]],
 				},
-				eMobType =
+				eMessageType =
+				{
+					-- Need to be specified explicitly, because there's also eMonsterType using the same "mt" prefix
+					Include =
+					{
+						"mtCustom",
+						"mtDeath",
+						"mtError",
+						"mtFail",
+						"mtFailure",
+						"mtFatal",
+						"mtInfo",
+						"mtInformation",
+						"mtJoin",
+						"mtLeave",
+						"mtMaxPlusOne",
+						"mtPrivateMessage",
+						"mtPM",
+						"mtSuccess",
+						"mtWarning",
+					},
+					TextBefore = [[
+						These constants are used together with messaging functions and classes, they specify the type of
+						message being sent. The server can be configured to modify the message text (add prefixes) based
+						on the message's type.
+					]],
+				},
+				eMonsterType =
 				{
 					Include =
 					{
-						"^mt.*",
+						"mtInvalidType",
+						"mtBat",
+						"mtBlaze",
+						"mtCaveSpider",
+						"mtChicken",
+						"mtCow",
+						"mtCreeper",
+						"mtEnderDragon",
+						"mtEnderman",
+						"mtGhast",
+						"mtGiant",
+						"mtGuardian",
+						"mtHorse",
+						"mtIronGolem",
+						"mtMagmaCube",
+						"mtMooshroom",
+						"mtOcelot",
+						"mtPig",
+						"mtRabbit",
+						"mtSheep",
+						"mtSilverfish",
+						"mtSkeleton",
+						"mtSlime",
+						"mtSnowGolem",
+						"mtSpider",
+						"mtSquid",
+						"mtVillager",
+						"mtWitch",
+						"mtWither",
+						"mtWolf",
+						"mtZombie",
+						"mtZombiePigman",
+						"mtMax",
 					},
 					TextBefore = [[
 						The following constants are used for distinguishing between the individual mob types:
@@ -18604,7 +18726,7 @@ World:ForEachEntity(
 				{
 					Include = "^sl.*",
 					TextBefore = [[
-						The following constants define the block types  that are propelled outwards after an explosion.
+						The following constants define the block types that are propelled outwards after an explosion.
 					]],
 				},
 				eSpreadSource =
