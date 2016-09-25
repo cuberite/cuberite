@@ -3455,6 +3455,69 @@ static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
 
 
 
+static int tolua_cCompositeChat_new(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	cCompositeChat()
+	cCompositeChat(a_ParseText, a_MessageType)
+	*/
+
+	// Check if it's the no-param version:
+	cLuaState L(a_LuaState);
+	if (lua_isnone(a_LuaState, 2))
+	{
+		auto * res = static_cast<cCompositeChat *>(Mtolua_new(cCompositeChat()));
+		L.Push(res);
+		return 1;
+	}
+
+	// Check the second signature:
+	AString parseText;
+	if (!L.GetStackValue(2, parseText))
+	{
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid ParseText parameter (1) in cCompositeChat constructor.", &err);
+		return 0;
+	}
+	int messageTypeInt = mtCustom;
+	if (!lua_isnone(a_LuaState, 3))
+	{
+		if (!L.GetStackValue(3, messageTypeInt))
+		{
+			tolua_Error err;
+			tolua_error(a_LuaState, "Invalid type of the MessageType parameter (2) in cCompositeChat constructor.", &err);
+			return 0;
+		}
+		if ((messageTypeInt < 0) || (messageTypeInt >= mtMaxPlusOne))
+		{
+			tolua_Error err;
+			tolua_error(a_LuaState, "Invalid MessageType parameter (2) value in cCompositeChat constructor.", &err);
+			return 0;
+		}
+	}
+	L.Push(static_cast<cCompositeChat *>(Mtolua_new(cCompositeChat(parseText, static_cast<eMessageType>(messageTypeInt)))));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_new_local(lua_State * a_LuaState)
+{
+	// Use the same constructor as global, just register it for GC:
+	auto res = tolua_cCompositeChat_new(a_LuaState);
+	if (res == 1)
+	{
+		tolua_register_gc(a_LuaState, lua_gettop(a_LuaState));
+	}
+	return res;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 {
 	// function cCompositeChat:AddRunCommandPart(Message, Command, [Style])
@@ -3477,7 +3540,7 @@ static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 	}
 
 	// Add the part:
-	AString Text, Command, Style;
+	AString Text, Command, Style = "u@a";
 	L.GetStackValue(2, Text);
 	L.GetStackValue(3, Command);
 	L.GetStackValue(4, Style);
@@ -3602,6 +3665,39 @@ static int tolua_cCompositeChat_AddUrlPart(lua_State * tolua_S)
 
 
 
+static int tolua_cCompositeChat_Clear(lua_State * tolua_S)
+{
+	// function cCompositeChat:Clear()
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", nullptr);
+		return 0;
+	}
+
+	// Clear all the parts:
+	self->Clear();
+
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_ParseText(lua_State * tolua_S)
 {
 	// function cCompositeChat:ParseText(TextMessage)
@@ -3675,7 +3771,7 @@ static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
 static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 {
 	// function cCompositeChat:UnderlineUrls()
-	// Exported manually to support call-chaining (return *this)
+	// Exported manually to support call-chaining (return self)
 
 	// Check params:
 	cLuaState L(tolua_S);
@@ -3759,10 +3855,14 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");
+			tolua_function(tolua_S, "new",                   tolua_cCompositeChat_new);
+			tolua_function(tolua_S, "new_local",             tolua_cCompositeChat_new_local);
+			tolua_function(tolua_S, ".call",                 tolua_cCompositeChat_new_local);
 			tolua_function(tolua_S, "AddRunCommandPart",     tolua_cCompositeChat_AddRunCommandPart);
 			tolua_function(tolua_S, "AddSuggestCommandPart", tolua_cCompositeChat_AddSuggestCommandPart);
 			tolua_function(tolua_S, "AddTextPart",           tolua_cCompositeChat_AddTextPart);
 			tolua_function(tolua_S, "AddUrlPart",            tolua_cCompositeChat_AddUrlPart);
+			tolua_function(tolua_S, "Clear",                 tolua_cCompositeChat_Clear);
 			tolua_function(tolua_S, "ParseText",             tolua_cCompositeChat_ParseText);
 			tolua_function(tolua_S, "SetMessageType",        tolua_cCompositeChat_SetMessageType);
 			tolua_function(tolua_S, "UnderlineUrls",         tolua_cCompositeChat_UnderlineUrls);

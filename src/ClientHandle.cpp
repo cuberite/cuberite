@@ -213,7 +213,7 @@ AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a
 
 
 
-AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString &a_AdditionalData)
+AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	switch (a_ChatPrefix)
 	{
@@ -237,11 +237,9 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
 			}
 		}
+		case mtMaxPlusOne: break;
 	}
-	ASSERT(!"Unhandled chat prefix type!");
-	#ifndef __clang__
-		return "";
-	#endif
+	return "";
 }
 
 

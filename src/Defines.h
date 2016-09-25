@@ -641,6 +641,7 @@ enum eMessageType
 	mtPrivateMessage,  // Player to player messaging identifier
 	mtJoin,            // A player has joined the server
 	mtLeave,           // A player has left the server
+	mtMaxPlusOne,      // The first invalid type, used for checking on LuaAPI boundaries
 
 	// Common aliases:
 	mtFail  = mtFailure,
