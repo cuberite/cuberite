@@ -32,7 +32,7 @@ public:
 	virtual void WriteItem(const cItem & a_Value) = 0;
 	virtual void WritePosition(int a_X, int a_Y, int a_Z) = 0;
 	virtual void WriteBool(bool a_Value) = 0;
-	virtual void WriteBlockID(BLOCKTYPE a_ID, NIBBLETYPE a_Data) = 0;
+	virtual void WriteBlockType(BLOCKTYPE a_ID, NIBBLETYPE a_Data) = 0;
 	virtual void SkipMeta(void) = 0;
 
 	const int m_ProtocolVersion;

@@ -447,7 +447,7 @@ void cPawn::WriteMetadata(cMetadataWriter & a_Writer) const
 	super::WriteMetadata(a_Writer);
 	// Living flags
 	a_Writer.SkipMeta();  // Hand flags
-	a_Writer.WriteFloat(GetHealth());  // Health
+	a_Writer.WriteFloat(static_cast<float>(GetHealth()));  // Health
 	a_Writer.SkipMeta();  // Potion effect color
 	a_Writer.SkipMeta();  // Potion effect ambient
 	a_Writer.SkipMeta();  // Number of arrows

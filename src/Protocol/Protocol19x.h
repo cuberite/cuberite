@@ -268,24 +268,6 @@ protected:
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
-
-	/** Types used within metadata */
-	enum eMetadataType
-	{
-		METADATA_TYPE_BYTE              = 0,
-		METADATA_TYPE_VARINT            = 1,
-		METADATA_TYPE_FLOAT             = 2,
-		METADATA_TYPE_STRING            = 3,
-		METADATA_TYPE_CHAT              = 4,
-		METADATA_TYPE_ITEM              = 5,
-		METADATA_TYPE_BOOL              = 6,
-		METADATA_TYPE_ROTATION          = 7,
-		METADATA_TYPE_POSITION          = 8,
-		METADATA_TYPE_OPTIONAL_POSITION = 9,
-		METADATA_TYPE_DIRECTION         = 10,
-		METADATA_TYPE_OPTIONAL_UUID     = 11,
-		METADATA_TYPE_BLOCKID           = 12
-	} ;
 } ;
 
 
@@ -370,7 +352,7 @@ public:
 	virtual void WriteItem(const cItem & a_Value) override;
 	virtual void WritePosition(int a_X, int a_Y, int a_Z) override;
 	virtual void WriteBool(bool a_Value) override;
-	virtual void WriteBlockID(BLOCKTYPE a_ID, NIBBLETYPE a_Data) override;
+	virtual void WriteBlockType(BLOCKTYPE a_ID, NIBBLETYPE a_Data) override;
 	virtual void SkipMeta(void) override;
 
 protected:
@@ -393,7 +375,7 @@ protected:
 		METADATA_TYPE_OPTIONAL_POSITION = 9,
 		METADATA_TYPE_DIRECTION = 10,
 		METADATA_TYPE_OPTIONAL_UUID = 11,
-		METADATA_TYPE_BLOCKID = 12
+		METADATA_TYPE_BLOCKTYPE = 12
 	};
 } ;
 

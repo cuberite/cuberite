@@ -3951,13 +3951,13 @@ void cMetadataWriter190::WriteBool(bool a_Value)
 
 
 
-void cMetadataWriter190::WriteBlockID(BLOCKTYPE a_ID, NIBBLETYPE a_Data)
+void cMetadataWriter190::WriteBlockType(BLOCKTYPE a_ID, NIBBLETYPE a_Data)
 {
 	Int32 Value = 0;
 	Value |= a_ID << 4;
 	Value |= a_Data;
 	m_Pkt.WriteBEUInt8(m_Index++);
-	m_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
+	m_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKTYPE);
 	m_Pkt.WriteVarInt32(static_cast<UInt32>(Value));
 }
 
