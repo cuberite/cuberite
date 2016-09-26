@@ -4762,6 +4762,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static",
 				},
+				GetCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Gets the custom name of the entity. If no custom name is set, the function returns an empty string.",
+				},
 				GetEntityType =
 				{
 					Returns =
@@ -5122,6 +5132,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Updates the entity's speed based on the attachee exerting the specified force forward and sideways. Used for entities being driven by other entities attached to them - usually players driving minecarts and boats.",
 				},
+				HasCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if this entity has a custom name.",
+				},
 				Heal =
 				{
 					Params =
@@ -5169,6 +5189,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if the entity is crouched. Always false for entities that don't support crouching.",
+				},
+				IsCustomNameAlwaysVisible =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Is the custom name of this entity always visible? If not, you only see the name when you look directly at the entity.",
 				},
 				IsDestroyed =
 				{
@@ -5513,6 +5543,28 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity.",
+				},
+				SetCustomName =
+				{
+					Params =
+					{
+						{
+							Name = "CustomName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the custom name of the entity. You see the name over the entity. If you want to disable the custom name, simply set an empty string. This method has no effect on {{cPlayer}}s.",
+				},
+				SetCustomNameAlwaysVisible =
+				{
+					Params =
+					{
+						{
+							Name = "IsCustomNameAlwaysVisible",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the custom name visiblity of this entity. If it's false, you only see the name when you look directly at the entity. If it's true, you always see the custom name. This method has no effect on {{cPlayer}}s.",
 				},
 				SetGravity =
 				{
@@ -10122,16 +10174,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the age of the monster",
 				},
-				GetCustomName =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Gets the custom name of the monster. If no custom name is set, the function returns an empty string.",
-				},
 				GetMobFamily =
 				{
 					Returns =
@@ -10182,16 +10224,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family.",
 				},
-				HasCustomName =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the monster has a custom name.",
-				},
 				IsBaby =
 				{
 					Returns =
@@ -10201,16 +10233,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns true if the monster is a baby",
-				},
-				IsCustomNameAlwaysVisible =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
 				},
 				MobTypeToString =
 				{
@@ -10269,28 +10291,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the age of the monster",
-				},
-				SetCustomName =
-				{
-					Params =
-					{
-						{
-							Name = "CustomName",
-							Type = "string",
-						},
-					},
-					Notes = "Sets the custom name of the monster. You see the name over the monster. If you want to disable the custom name, simply set an empty string.",
-				},
-				SetCustomNameAlwaysVisible =
-				{
-					Params =
-					{
-						{
-							Name = "IsCustomNameAlwaysVisible",
-							Type = "boolean",
-						},
-					},
-					Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name.",
 				},
 				SetRelativeWalkSpeed =
 				{
