@@ -53,6 +53,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirLevel(0),
 	m_AirTickTimer(0),
 	m_TicksAlive(0),
+	m_CustomName(""),
+	m_CustomNameAlwaysVisible(false),
 	m_IsTicking(false),
 	m_ParentChunk(nullptr),
 	m_HeadYaw(0.0),
@@ -63,9 +65,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_Mass (0.001),  // Default 1g
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_InvulnerableTicks(0),
-	m_CustomName(""),
-	m_CustomNameAlwaysVisible(false)
+	m_InvulnerableTicks(0)
 {
 	// Assign a proper ID:
 	cCSLock Lock(m_CSCount);
