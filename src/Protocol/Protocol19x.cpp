@@ -111,7 +111,7 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol190:
 
-cProtocol190::cProtocol190(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol190::cProtocol190(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ProtocolVersion),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
@@ -3511,7 +3511,7 @@ void cProtocol190::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol191:
 
-cProtocol191::cProtocol191(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol191::cProtocol191(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ProtocolVersion, a_ServerAddress, a_ServerPort, a_State)
 {
 }
@@ -3603,7 +3603,7 @@ void cProtocol191::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol192:
 
-cProtocol192::cProtocol192(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol192::cProtocol192(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ProtocolVersion, a_ServerAddress, a_ServerPort, a_State)
 {
 }
@@ -3660,7 +3660,7 @@ void cProtocol192::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol194:
 
-cProtocol194::cProtocol194(cClientHandle * a_Client, int a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol194::cProtocol194(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ProtocolVersion, a_ServerAddress, a_ServerPort, a_State)
 {
 }
@@ -3860,7 +3860,7 @@ void cProtocol194::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 ////////////////////////////////////////////////////////////////////////////////
 // cMetadataWriter190:
 
-cMetadataWriter190::cMetadataWriter190(int a_ProtocolVersion, cPacketizer & a_Pkt, cProtocol190 & a_Protocol) :
+cMetadataWriter190::cMetadataWriter190(UInt32 a_ProtocolVersion, cPacketizer & a_Pkt, cProtocol190 & a_Protocol) :
 	super(a_ProtocolVersion),
 	m_Pkt(a_Pkt),
 	m_Protocol(a_Protocol),

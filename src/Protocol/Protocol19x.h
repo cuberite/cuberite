@@ -62,7 +62,7 @@ class cProtocol190 :
 
 public:
 
-	cProtocol190(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol190(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
@@ -281,7 +281,7 @@ class cProtocol191 :
 	typedef cProtocol190 super;
 
 public:
-	cProtocol191(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol191(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
 	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
@@ -300,7 +300,7 @@ class cProtocol192 :
 	typedef cProtocol191 super;
 
 public:
-	cProtocol192(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol192(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
@@ -318,7 +318,7 @@ class cProtocol194 :
 	typedef cProtocol192 super;
 
 public:
-	cProtocol194(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol194(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
 	virtual void SendCollectEntity   (const cEntity & a_Entity, const cPlayer & a_Player) override;
@@ -343,7 +343,7 @@ class cMetadataWriter190 :
 	typedef cMetadataWriter super;
 
 public:
-	cMetadataWriter190(int a_ProtocolVersion, cPacketizer & a_Pkt, cProtocol190 & a_Protocol);
+	cMetadataWriter190(UInt32 a_ProtocolVersion, cPacketizer & a_Pkt, cProtocol190 & a_Protocol);
 
 	virtual void WriteByte(Int8 a_Value) override;
 	virtual void WriteInt(Int32 a_Value) override;

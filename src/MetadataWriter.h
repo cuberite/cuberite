@@ -17,7 +17,7 @@
 class cMetadataWriter
 {
 public:
-	cMetadataWriter(int a_ProtocolVersion) :
+	cMetadataWriter(UInt32 a_ProtocolVersion) :
 		m_ProtocolVersion(a_ProtocolVersion)
 	{
 	}
@@ -34,5 +34,5 @@ public:
 	virtual void WriteBlockType(BLOCKTYPE a_ID, NIBBLETYPE a_Data) = 0;
 	virtual void SkipMeta(void) = 0;
 
-	const int m_ProtocolVersion;
+	const UInt32 m_ProtocolVersion;
 };

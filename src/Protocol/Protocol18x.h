@@ -54,7 +54,7 @@ class cProtocol180 :
 
 public:
 
-	cProtocol180(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol180(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;

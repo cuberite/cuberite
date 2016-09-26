@@ -51,7 +51,7 @@ typedef unsigned char Byte;
 class cProtocol
 {
 public:
-	cProtocol(cClientHandle * a_Client, int a_ProtocolVersion) :
+	cProtocol(cClientHandle * a_Client, UInt32 a_ProtocolVersion) :
 		m_Client(a_Client),
 		m_OutPacketBuffer(64 KiB),
 		m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
@@ -167,7 +167,7 @@ protected:
 	cByteBuffer m_OutPacketLenBuffer;
 
 	/** Protocol version. */
-	const int m_ProtocolVersion;
+	const UInt32 m_ProtocolVersion;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
