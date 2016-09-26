@@ -53,9 +53,9 @@ class cProtocol
 public:
 	cProtocol(cClientHandle * a_Client, int a_ProtocolVersion) :
 		m_Client(a_Client),
-		m_ProtocolVersion(a_ProtocolVersion),
 		m_OutPacketBuffer(64 KiB),
-		m_OutPacketLenBuffer(20)  // 20 bytes is more than enough for one VarInt
+		m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
+		m_ProtocolVersion(a_ProtocolVersion)
 	{
 	}
 
