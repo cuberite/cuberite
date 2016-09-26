@@ -11,7 +11,6 @@
 
 #include "ByteBuffer.h"
 #include "Defines.h"
-#include "Globals.h"
 #include "Item.h"
 #include "Protocol/ProtocolRecognizer.h"
 
