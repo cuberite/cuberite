@@ -229,10 +229,10 @@ void cFloater::WriteMetadata(cMetadataWriter & a_Writer) const
 	// 0 if none, ID + 1 if attached
 	if (GetAttachedMobID() == cEntity::INVALID_ID)
 	{
-		a_Writer.WriteInt(cEntity::INVALID_ID);
+		a_Writer.WriteInt(0);  // No attached entity
 	}
 	else
 	{
-		a_Writer.WriteInt(GetAttachedMobID() + 1);
+		a_Writer.WriteInt(static_cast<Int32>(GetAttachedMobID() + 1));  // Attached entity
 	}
 }
