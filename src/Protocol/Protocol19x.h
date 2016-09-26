@@ -358,7 +358,7 @@ public:
 protected:
 	cPacketizer & m_Pkt;
 	cProtocol190 & m_Protocol;
-	int m_Index;
+	UInt8 m_Index;
 
 	/** Types used within metadata */
 	enum eMetadataType
