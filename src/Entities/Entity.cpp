@@ -2285,7 +2285,8 @@ void cEntity::WriteMetadata(cMetadataWriter & a_Writer) const
 	a_Writer.SkipMeta();  // Is silent
 	if (a_Writer.m_ProtocolVersion >= PROTO_VERSION_1_10_0)
 	{
-		a_Writer.WriteBool(GetGravity() == 0);  // No gravity
+		const double EPS = 0.0000001;
+		a_Writer.WriteBool(std::abs(GetGravity()) < EPS);  // No gravity
 	}
 	// Subclasses add aditional metadata fields
 }
