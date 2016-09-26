@@ -1115,7 +1115,7 @@ void cMinecart::WriteMetadata(cMetadataWriter & a_Writer) const
 {
 	super::WriteMetadata(a_Writer);
 	// The following expression makes Minecarts shake more with less health or higher damage taken
-	a_Writer.WriteInt(static_cast<UInt32>((GetMaxHealth() - GetHealth()) * LastDamage() * 4));
+	a_Writer.WriteInt((GetMaxHealth() - GetHealth()) * LastDamage() * 4);
 	a_Writer.WriteInt(1);  // Shaking direction
 	a_Writer.WriteFloat(static_cast<float>(LastDamage() + 10));  // Shaking multiplier
 
