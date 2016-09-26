@@ -1910,20 +1910,17 @@ static int tolua_sha1HexString(lua_State * tolua_S)
 
 
 
-static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string, std::string >& a_StringStringMap)
+static int tolua_get_HTTPRequest_Params(lua_State * a_LuaState)
 {
-	lua_newtable(tolua_S);
-	int top = lua_gettop(tolua_S);
-
-	for (std::map<std::string, std::string>::iterator it = a_StringStringMap.begin(); it != a_StringStringMap.end(); ++it)
+	cLuaState L(a_LuaState);
+	HTTPRequest * self;
+	if (!L.GetStackValues(1, self))
 	{
-		const char * key = it->first.c_str();
-		const char * value = it->second.c_str();
-		lua_pushstring(tolua_S, key);
-		lua_pushstring(tolua_S, value);
-		lua_settable(tolua_S, top);
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		return 0;
 	}
-
+	L.Push(self->Params);
 	return 1;
 }
 
@@ -1931,40 +1928,44 @@ static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string,
 
 
 
-static int tolua_get_HTTPRequest_Params(lua_State* tolua_S)
+static int tolua_get_HTTPRequest_PostParams(lua_State * a_LuaState)
 {
-	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
-	return tolua_push_StringStringMap(tolua_S, self->Params);
-}
-
-
-
-
-
-static int tolua_get_HTTPRequest_PostParams(lua_State* tolua_S)
-{
-	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
-	return tolua_push_StringStringMap(tolua_S, self->PostParams);
-}
-
-
-
-
-
-static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
-{
-	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
-	std::map<std::string, HTTPFormData> & FormData = self->FormData;
-
-	lua_newtable(tolua_S);
-	int top = lua_gettop(tolua_S);
-
-	for (std::map<std::string, HTTPFormData>::iterator it = FormData.begin(); it != FormData.end(); ++it)
+	cLuaState L(a_LuaState);
+	HTTPRequest * self;
+	if (!L.GetStackValues(1, self))
 	{
-		lua_pushstring(tolua_S, it->first.c_str());
-		tolua_pushusertype(tolua_S, &(it->second), "HTTPFormData");
-		// lua_pushlstring(tolua_S, it->second.Value.c_str(), it->second.Value.size());  // Might contain binary data
-		lua_settable(tolua_S, top);
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		return 0;
+	}
+	L.Push(self->PostParams);
+	return 1;
+}
+
+
+
+
+
+static int tolua_get_HTTPRequest_FormData(lua_State* a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	HTTPRequest * self;
+	if (!L.GetStackValues(1, self))
+	{
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		return 0;
+	}
+
+	const auto & FormData = self->FormData;
+	lua_newtable(a_LuaState);
+	int top = lua_gettop(a_LuaState);
+	for (auto itr = FormData.cbegin(); itr != FormData.cend(); ++itr)
+	{
+		lua_pushstring(a_LuaState, itr->first.c_str());
+		tolua_pushusertype(a_LuaState, const_cast<void *>(reinterpret_cast<const void *>(&(itr->second))), "HTTPFormData");
+		// lua_pushlstring(a_LuaState, it->second.Value.c_str(), it->second.Value.size());  // Might contain binary data
+		lua_settable(a_LuaState, top);
 	}
 
 	return 1;
