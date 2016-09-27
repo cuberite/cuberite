@@ -19298,6 +19298,8 @@ end
 			{
 				cast =
 				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
 					Params =
 					{
 						{
@@ -19340,6 +19342,8 @@ end
 				},
 				type =
 				{
+					IsStatic = true,
+					IsGlobal = true,  -- Emulate a global function without a self parameter - this is called with a dot convention
 					Params =
 					{
 						{
