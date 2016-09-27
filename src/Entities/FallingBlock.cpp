@@ -88,7 +88,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	float MilliDt = a_Dt.count() * 0.001f;
-	AddSpeedY(MilliDt * -9.8f);
+	AddSpeedY(MilliDt * m_Gravity);
 	AddPosition(GetSpeed() * MilliDt);
 
 	// If not static (one billionth precision) broadcast movement

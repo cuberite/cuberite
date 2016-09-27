@@ -145,6 +145,9 @@ public:
 	static const int VOID_BOUNDARY         = -46;  ///< Y position to begin applying void damage
 	static const int FALL_DAMAGE_HEIGHT    = 4;    ///< Y difference after which fall damage is applied
 
+	static const float DEFAULT_GRAVITY;  ///< Normal speed for gravity in meters per second per second
+	static const double EPS;  ///< Epsilon value used to check if doubles are close enough to be treated as equal
+
 	/** Special ID that is considered an "invalid value", signifying no entity. */
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
