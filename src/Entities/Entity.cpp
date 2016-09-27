@@ -21,8 +21,7 @@
 
 UInt32 cEntity::m_EntityCount = 0;
 cCriticalSection cEntity::m_CSCount;
-const float cEntity::DEFAULT_GRAVITY = -9.81f;  // Meters per second per second
-const double cEntity::EPS = 0.0000001;
+const double cEntity::SPEED_EPSILON = 0.0000001;
 
 
 
@@ -38,7 +37,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_bDirtyOrientation(true),
 	m_bHasSentNoSpeed(true),
 	m_bOnGround(false),
-	m_Gravity(DEFAULT_GRAVITY),
+	m_Gravity(-9.81f),
 	m_AirDrag(0.02f),
 	m_LastPosition(a_X, a_Y, a_Z),
 	m_EntityType(a_EntityType),
@@ -350,7 +349,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::SetYawFromSpeed(void)
 {
-	if ((std::abs(m_Speed.x) < EPS) && (std::abs(m_Speed.z) < EPS))
+	if ((std::abs(m_Speed.x) < SPEED_EPSILON) && (std::abs(m_Speed.z) < SPEED_EPSILON))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetYaw(0);
@@ -366,7 +365,7 @@ void cEntity::SetYawFromSpeed(void)
 void cEntity::SetPitchFromSpeed(void)
 {
 	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z);  // Speed XZ-plane component
-	if ((std::abs(xz) < EPS) && (std::abs(m_Speed.y) < EPS))
+	if ((std::abs(xz) < SPEED_EPSILON) && (std::abs(m_Speed.y) < SPEED_EPSILON))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetPitch(0);
@@ -2285,8 +2284,7 @@ void cEntity::WriteMetadata(cMetadataWriter & a_Writer) const
 	a_Writer.SkipMeta();  // Is silent
 	if (a_Writer.m_ProtocolVersion >= PROTO_VERSION_1_10_0)
 	{
-		// If gravity is sufficiently different from the default, disable clientside gravity
-		a_Writer.WriteBool(std::abs(GetGravity() - DEFAULT_GRAVITY) > EPS);  // No gravity
+		a_Writer.SkipMeta();  // No gravity
 	}
 	// Subclasses add aditional metadata fields
 }
