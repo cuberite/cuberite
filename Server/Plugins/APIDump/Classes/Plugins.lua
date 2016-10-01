@@ -65,7 +65,7 @@ return
 				{
 					{
 						Name = "PluginStatus",
-						Type = "cPluginManager#PluginStatus",
+						Type = "cPluginManager#ePluginStatus",
 					},
 				},
 				Notes = "Returns the status of the plugin (loaded, disabled, unloaded, error, not found)",
@@ -982,7 +982,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 					cPluginManager:AddHook() function. For detailed description of each hook, see the <a href='index.html#hooks'>
 					hooks reference</a>.]],
 			},
-			PluginStatus =
+			ePluginStatus =
 			{
 				Include =
 				{

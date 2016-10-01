@@ -1830,7 +1830,7 @@ return
 						The following constants are used to signalize the datatype to read or write:
 					]],
 				},
-				MergeStrategies =
+				eMergeStrategy =
 				{
 					Include = "ms.*",
 					TextAfter = "See below for a detailed explanation of the individual merge strategies.",
@@ -4771,10 +4771,10 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					{
 						{
 							Name = "EntityType",
-							Type = "cEntity#EntityType",
+							Type = "cEntity#eEntityType",
 						},
 					},
-					Notes = "Returns the type of the entity, one of the {{cEntity#EntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call.",
+					Notes = "Returns the type of the entity, one of the {{cEntity#eEntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call.",
 				},
 				GetEquippedBoots =
 				{
@@ -5969,7 +5969,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 			},
 			ConstantGroups =
 			{
-				EntityType =
+				eEntityType =
 				{
 					Include = "et.*",
 					TextBefore = "The following constants are used to distinguish between different entity types:",
