@@ -951,6 +951,10 @@ return
 							Type = "string",
 						},
 					},
+					Returns =
+					{
+						{ Type = "boolean" },
+					},
 					Notes = "Clears current content and loads new content from the specified schematic file. Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case.",
 				},
 				LoadFromSchematicString =
@@ -961,6 +965,10 @@ return
 							Name = "SchematicData",
 							Type = "string",
 						},
+					},
+					Returns =
+					{
+						{ Type = "boolean" },
 					},
 					Notes = "Clears current content and loads new content from the specified string (assumed to contain .schematic data). Returns true if successful. Returns false and logs error if unsuccessful, old content is preserved in such a case.",
 				},
