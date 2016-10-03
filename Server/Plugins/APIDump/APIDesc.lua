@@ -3706,7 +3706,12 @@ end
 				},
 				Clear =
 				{
-					Returns = "self",
+					Returns =
+					{
+						{
+							Type = "self",
+						},
+					},
 					Notes = "Removes all parts from this object",
 				},
 				constructor =
@@ -6080,8 +6085,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the potion with the given damage is drinkable",
 				},
-			},
-		},
+			},  -- Functions
+			ConstantGroups =
+			{
+				eType =
+				{
+					Include = { "eff.*" },
+				},
+			},  -- ConstantGroups
+		},  -- cEntityEffect
+
 		cFile =
 		{
 			Desc = [[
@@ -10248,7 +10261,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#MobType",
+							Type = "Globals#eMonsterType",
 						},
 					},
 					Returns =
@@ -11075,7 +11088,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "GameMode",
-							Type = "Globals#GameMode",
+							Type = "Globals#eGameMode",
 						},
 					},
 					Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead.",
@@ -11175,7 +11188,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "GameMode",
-							Type = "Globals#GameMode",
+							Type = "Globals#eGameMode",
 						},
 					},
 					Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically.",
@@ -11763,7 +11776,7 @@ a_Player:OpenWindow(Window);
 						},
 						{
 							Name = "World",
-							Type = "cWorld*",
+							Type = "cWorld",
 							IsOptional = true,
 						},
 					},
@@ -11896,7 +11909,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "NewGameMode",
-							Type = "Globals#GameMode",
+							Type = "Globals#eGameMode",
 						},
 					},
 					Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit.",
@@ -14242,8 +14255,17 @@ end
 				{
 					Notes = "A workbench (crafting table) window",
 				},
-			},
-		},
+			},  -- Constants
+
+			ConstantGroups =
+			{
+				WindowType =
+				{
+					Include = { "wt.*" },
+				}
+			},  -- ConstantGroups
+		},  -- cWindow
+
 		cWorld =
 		{
 			Desc = [[
@@ -15865,10 +15887,10 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					Returns =
 					{
 						{
-							Type = "cScoreBoard",
+							Type = "cScoreboard",
 						},
 					},
-					Notes = "Returns the {{cScoreBoard|ScoreBoard}} object used by this world. ",
+					Notes = "Returns the {{cScoreboard|Scoreboard}} object used by this world. ",
 				},
 				GetSeed =
 				{
@@ -18235,7 +18257,7 @@ World:ForEachEntity(
 					{
 						{
 							Name = "BiomeType",
-							Type = "Globals#BiomeTypes",
+							Type = "Globals#EMCSBiome",
 						},
 					},
 					Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value. Returns biInvalidBiome if the input is not a recognized biome.",
@@ -18253,7 +18275,7 @@ World:ForEachEntity(
 					{
 						{
 							Name = "DamageType",
-							Type = "Globals#DamageType",
+							Type = "Globals#eDamageType",
 						},
 					},
 					Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value. Returns -1 if the inupt is not a recognized damage type.",
@@ -18271,10 +18293,10 @@ World:ForEachEntity(
 					{
 						{
 							Name = "Dimension",
-							Type = "Globals#WorldDimension",
+							Type = "Globals#eDimension",
 						},
 					},
-					Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value. Returns dimNotSet if the input is not a recognized dimension.",
+					Notes = "Converts a string representation to a {{Globals#eDimension|eDimension}} enumerated value. Returns dimNotSet if the input is not a recognized dimension.",
 				},
 				StringToItem =
 				{
@@ -18310,10 +18332,10 @@ World:ForEachEntity(
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#MobType",
+							Type = "eMonsterType",
 						},
 					},
-					Notes = "(<b>DEPRECATED!</b>) Please use cMonster:StringToMobType(). Converts a string representation to a {{Globals#MobType|MobType}} enumerated value",
+					Notes = "(<b>DEPRECATED!</b>) Please use cMonster:StringToMobType(). Converts a string representation to an {{Globals#eMonsterType|eMonsterType}} enumerated value",
 				},
 				StripColorCodes =
 				{
@@ -18687,6 +18709,14 @@ World:ForEachEntity(
 						message being sent. The server can be configured to modify the message text (add prefixes) based
 						on the message's type.
 					]],
+				},
+				eMobHeadType =
+				{
+					Include = "SKULL_TYPE_.*",
+				},
+				eMobHeadRotation =
+				{
+					Include = "SKULL_ROTATION_.*",
 				},
 				eMonsterType =
 				{

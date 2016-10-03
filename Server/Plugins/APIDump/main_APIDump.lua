@@ -1816,43 +1816,12 @@ end
 
 
 
-local function HandleWebAdminDump(a_Request)
-	if (a_Request.PostParams["Dump"] ~= nil) then
-		DumpApi()
-	end
-	return
-	[[
-	<p>Pressing the button will generate the API dump on the server. Note that this can take some time.</p>
-	<form method="POST"><input type="submit" name="Dump" value="Dump the API"/></form>
-	]]
-end
-
-
-
-
-
-local function HandleCmdApi(a_Split)
-	DumpApi()
-	return true
-end
-
-
-
-
-
-local function HandleCmdApiShow(a_Split, a_EntireCmd)
-	os.execute("API" .. cFile:GetPathSeparator() .. "index.html")
-	return true, "Launching the browser to show the API docs..."
-end
-
-
-
-
-
-local function HandleCmdApiCheck(a_Split, a_EntireCmd)
+--- Checks the currently undocumented symbols against an "official" undocumented symbol list
+-- Returns an array-table of strings representing the newly-undocumented symbol names
+local function CheckNewUndocumentedSymbols()
 	-- Download the official API stats on undocumented stuff:
 	-- (We need a blocking downloader, which is impossible with the current cNetwork API)
-	assert(os.execute("wget -O official_undocumented.lua http://apidocs.cuberite.org/_undocumented.lua"))
+	assert(os.execute("wget -q -O official_undocumented.lua http://apidocs.cuberite.org/_undocumented.lua"))
 	local OfficialStats = cFile:ReadWholeFile("official_undocumented.lua")
 	if (OfficialStats == "") then
 		return true, "Cannot load official stats"
@@ -1916,7 +1885,7 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 
 	-- Bail out if no items found:
 	if not(res[1]) then
-		return true, "No new undocumented functions"
+		return
 	end
 
 	-- Save any found items to a file:
@@ -1925,7 +1894,153 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	f:write("\n")
 	f:close()
 
-	return true, "Newly undocumented items: " .. #res .. "\n" .. table.concat(res, "\n")
+	return res
+end
+
+
+
+
+
+--- Checks the API description for unknown types listed in Params or Returns
+-- Returns an array-table of { Location = "cClass:function(), param #1", Type = "UnknownType" }
+-- Returns nil if no unknown types are found
+local function CheckBadTypes()
+	-- Load the API and preprocess known types:
+	local api = PrepareApi()
+	local knownTypes =
+	{
+		string = true,
+		number = true,
+		boolean = true,
+		any = true,
+		self = true,
+		table = true,
+		["function"] = true,
+		["..."] = true,
+		["SQLite DB object"] = true,
+		["<unknown>"] = true,  -- Allow "<unknown>" types, for now, until the API is properly documented
+	}
+	for _, clsDesc in ipairs(api) do
+		knownTypes[clsDesc.Name] = true  -- The class is a known type
+		for grpName, _ in pairs(clsDesc.ConstantGroups or {}) do  -- All class' enums are known types (with namespacing)
+			knownTypes[clsDesc.Name .. "#" .. grpName] = true
+		end
+		if (clsDesc.Name == "Globals") then
+			for grpName, _ in pairs(clsDesc.ConstantGroups or {}) do  -- All Globals' enums are known types without namespacing, too
+				knownTypes[grpName] = true
+			end
+		end
+	end  -- for cls - classes
+
+	-- Check types:
+	local res = {}
+	for _, clsDesc in ipairs(api) do
+		for _, fnDesc in ipairs(clsDesc.Functions or {}) do
+			local fnName = fnDesc.Name
+			local fn = fnDesc[1] and fnDesc or { fnDesc }  -- Unify the format, fn is an array of function signatures
+			for idxS, signature in ipairs(fn) do
+				for idxP, param in ipairs(signature.Params or {}) do
+					if not(knownTypes[param.Type]) then
+						table.insert(res, {
+							Location = string.format("%s:%s(), signature #%d, param #%d", clsDesc.Name, fnName, idxS, idxP),
+							Type = param.Type,
+						})
+					end
+				end  -- for param
+				if (type(signature.Returns) == "table") then
+					for idxR, ret in ipairs(signature.Returns) do
+						if not(knownTypes[ret.Type]) then
+							table.insert(res, {
+								Location = string.format("%s:%s(), signature #%d, return #%d", clsDesc.Name, fnName, idxS, idxR),
+								Type = ret.Type,
+							})
+						end
+					end  -- for ret
+				elseif not(signature.Returns) then
+				else
+					table.insert(res, {
+						Location = string.format("%s:%s(), signature #%d, return string", clsDesc.Name, fnName, idxS),
+						Type = tostring(signature.Returns),
+					})
+				end
+			end  -- for signature
+		end  -- for fn - functions
+	end  -- for cls - classes
+
+	-- If no problems found, bail out:
+	if not(res[1]) then
+		return
+	end
+
+	-- Write the problems into a file:
+	local f = io.open("UnknownTypes.lua", "w")
+	f:write("return\n{\n")
+	for _, item in ipairs(res) do
+		f:write("\t{ ", string.format("{ Location = %q, Type = %q", item.Location, item.Type), "},\n")
+	end
+	f:write("}\n")
+	f:close()
+	return res
+end
+
+
+
+
+
+local function HandleWebAdminDump(a_Request)
+	if (a_Request.PostParams["Dump"] ~= nil) then
+		DumpApi()
+	end
+	return
+	[[
+	<p>Pressing the button will generate the API dump on the server. Note that this can take some time.</p>
+	<form method="POST"><input type="submit" name="Dump" value="Dump the API"/></form>
+	]]
+end
+
+
+
+
+
+local function HandleCmdApi(a_Split)
+	DumpApi()
+	return true
+end
+
+
+
+
+
+local function HandleCmdApiShow(a_Split, a_EntireCmd)
+	os.execute("API" .. cFile:GetPathSeparator() .. "index.html")
+	return true, "Launching the browser to show the API docs..."
+end
+
+
+
+
+
+local function HandleCmdApiCheck(a_Split, a_EntireCmd)
+	-- Check the Params and Returns types:
+	LOG("Checking API for bad types...")
+	local badTypes = CheckBadTypes()
+	if (badTypes) then
+		-- Serialize into descriptions:
+		local descs = {}
+		for idx, t in ipairs(badTypes) do
+			descs[idx] = string.format("Location %q, type %q", t.Location, t.Type)
+		end
+		return true, "Found bad types:\n" .. table.concat(descs, "\n")
+	end
+
+	-- Check for new symbols that are not documented:
+	LOG("Checking API for newly undocumented symbols...")
+	local newUndocumented = CheckNewUndocumentedSymbols()
+	if (newUndocumented) then
+		return true, "Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n")
+	end
+
+	return true, "API check completed successfully"
 end
 
 
