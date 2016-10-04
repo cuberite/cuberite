@@ -96,8 +96,8 @@ return
 				Params =
 				{
 					{
-						Name = "HTTPRequest",
-						Type = "Request",
+						Name = "Request",
+						Type = "HTTPRequest",
 					},
 				},
 				Returns =

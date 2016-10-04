@@ -1254,7 +1254,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					{
 						Name = "MobType",
-						Type = "Globals#MobType",
+						Type = "eMonsterType",
 					},
 				},
 				Notes = "Returns the entity type that will be spawn by this mob spawner.",
@@ -1306,7 +1306,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					{
 						Name = "MobType",
-						Type = "Globals#MobType",
+						Type = "eMonsterType",
 					},
 				},
 				Notes = "Sets the type of the mob that will be spawned by this mob spawner.",
