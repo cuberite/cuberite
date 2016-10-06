@@ -739,7 +739,7 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	{
+	{  // TODO Use SendSpawnObject
 		cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
 		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
 		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
@@ -757,14 +757,7 @@ void cProtocol190::SendPickupSpawn(const cPickup & a_Pickup)
 		Pkt.WriteBEInt16(0);
 	}
 
-	{
-		cPacketizer Pkt(*this, 0x39);  // Entity Metadata packet
-		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
-		Pkt.WriteBEUInt8(5);  // Index 5: Item
-		Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-		WriteItem(Pkt, a_Pickup.GetItem());
-		Pkt.WriteBEUInt8(0xff);  // End of metadata
-	}
+	SendEntityMetadata(a_Pickup);
 }
 
 
@@ -1057,12 +1050,7 @@ void cProtocol190::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteBEDouble(a_Player.GetPosZ());
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	Pkt.WriteBEUInt8(6);  // Start metadata - Index 6: Health
-	Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-	Pkt.WriteBEFloat(static_cast<float>(a_Player.GetHealth()));
-	Pkt.WriteBEUInt8(2);  // Index 2: Custom name
-	Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-	Pkt.WriteString(a_Player.GetName());
+	WriteEntityMetadata(Pkt, a_Player);
 	Pkt.WriteBEUInt8(0xff);  // Metadata: end
 }
 
@@ -3520,7 +3508,22 @@ void cProtocol190::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 
 	switch (a_Entity.GetEntityType())
 	{
-		case cEntity::etPlayer: break;  // TODO?
+		case cEntity::etPlayer:
+		{
+			auto & Player = reinterpret_cast<const cPlayer &>(a_Entity);
+
+			// TODO Set player custom name to their name.
+			// Then it's possible to move the custom name of mobs to the entities
+			// and to remove the "special" player custom name.
+			a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
+			a_Pkt.WriteString(Player.GetName());
+
+			a_Pkt.WriteBEUInt8(6);  // Start metadata - Index 6: Health
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+			break;
+		}
 		case cEntity::etPickup:
 		{
 			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
@@ -4367,8 +4370,3 @@ void cProtocol194::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	Writer.Finish();
 	Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
 }
-
-
-
-
-

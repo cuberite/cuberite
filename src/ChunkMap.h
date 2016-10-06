@@ -388,7 +388,10 @@ public:
 
 	cWorld * GetWorld(void) { return m_World; }
 
-	int GetNumChunks(void);
+	size_t GetNumChunks(void);
+
+	/** Returns the number of unused dirty chunks. Those are chunks that we can save and then unload */
+	size_t GetNumUnusedDirtyChunks(void);
 
 	void ChunkValidated(void);  // Called by chunks that have become valid
 

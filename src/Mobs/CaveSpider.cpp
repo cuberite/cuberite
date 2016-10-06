@@ -19,6 +19,11 @@ cCaveSpider::cCaveSpider(void) :
 void cCaveSpider::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 
 	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
 }

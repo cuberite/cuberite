@@ -259,10 +259,10 @@ protected:
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
 	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
-	void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the mob-specific metadata for the specified mob */
-	void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);

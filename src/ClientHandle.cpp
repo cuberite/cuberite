@@ -77,11 +77,11 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_BlockDigAnimStage(-1),
 	m_BlockDigAnimSpeed(0),
 	m_BlockDigAnimX(0),
-	m_BlockDigAnimY(256),  // Invalid Y, so that the coords don't get picked up
+	m_BlockDigAnimY(cChunkDef::Height + 1),  // Invalid Y, so that the coords don't get picked up
 	m_BlockDigAnimZ(0),
 	m_HasStartedDigging(false),
 	m_LastDigBlockX(0),
-	m_LastDigBlockY(256),  // Invalid Y, so that the coords don't get picked up
+	m_LastDigBlockY(cChunkDef::Height + 1),  // Invalid Y, so that the coords don't get picked up
 	m_LastDigBlockZ(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
@@ -213,7 +213,7 @@ AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a
 
 
 
-AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString &a_AdditionalData)
+AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	switch (a_ChatPrefix)
 	{
@@ -237,11 +237,9 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
 			}
 		}
+		case mtMaxPlusOne: break;
 	}
-	ASSERT(!"Unhandled chat prefix type!");
-	#ifndef __clang__
-		return "";
-	#endif
+	return "";
 }
 
 
@@ -603,7 +601,6 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunk
 
 
 
-// Removes the client from all chunks. Used when switching worlds or destroying the player
 void cClientHandle::RemoveFromAllChunks()
 {
 	cWorld * World = m_Player->GetWorld();

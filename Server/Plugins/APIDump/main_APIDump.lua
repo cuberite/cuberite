@@ -36,6 +36,16 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 					break
 				end
 				for k, cls in pairs(Tables) do
+					if (a_DstTable[k]) then
+						-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
+						LOGWARNING(string.format(
+							"APIDump warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
+							k, FileName
+						))
+						local f = io.open("DuplicateDocs.txt", "a")
+						f:write(k, "\t", FileName)
+						f:close()
+					end
 					a_DstTable[k] = cls;
 				end
 			end  -- if (TablesFn)
@@ -145,6 +155,12 @@ local function CreateAPITables()
 			end
 		end
 	end
+
+	-- Remove the built-in Lua libraries:
+	API.debug = nil
+	API.io = nil
+	API.string = nil
+	API.table = nil
 
 	return API, Globals;
 end
@@ -505,8 +521,8 @@ local function ReadDescriptions(a_API, a_Desc)
 
 			local DoxyFunctions = {};  -- This will contain all the API functions together with their documentation
 
-			local function AddFunction(a_Name, a_Params, a_Return, a_IsStatic, a_Notes)
-				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Return = a_Return, IsStatic = a_IsStatic, Notes = a_Notes});
+			local function AddFunction(a_Name, a_Params, a_Returns, a_IsStatic, a_Notes)
+				table.insert(DoxyFunctions, {Name = a_Name, Params = a_Params, Returns = a_Returns, IsStatic = a_IsStatic, Notes = a_Notes});
 			end
 
 			if (APIDesc.Functions ~= nil) then
@@ -524,11 +540,11 @@ local function ReadDescriptions(a_API, a_Desc)
 						-- Description is available
 						if (FnDesc[1] == nil) then
 							-- Single function definition
-							AddFunction(func.Name, FnDesc.Params, FnDesc.Return, FnDesc.IsStatic, FnDesc.Notes);
+							AddFunction(func.Name, FnDesc.Params, FnDesc.Returns, FnDesc.IsStatic, FnDesc.Notes);
 						else
 							-- Multiple function overloads
 							for _, desc in ipairs(FnDesc) do
-								AddFunction(func.Name, desc.Params, desc.Return, desc.IsStatic, desc.Notes);
+								AddFunction(func.Name, desc.Params, desc.Returns, desc.IsStatic, desc.Notes);
 							end  -- for k, desc - FnDesc[]
 						end
 						FnDesc.IsExported = true;
@@ -676,13 +692,6 @@ local function ReadDescriptions(a_API, a_Desc)
 		-- Sort the functions (they may have been renamed):
 		table.sort(cls.Functions,
 			function(f1, f2)
-				if (f1.Name == f2.Name) then
-					-- Same name, either comparing the same function to itself, or two overloads, in which case compare the params
-					if ((f1.Params == nil) or (f2.Params == nil)) then
-						return 0;
-					end
-					return (f1.Params < f2.Params);
-				end
 				return (f1.Name < f2.Name);
 			end
 		);
@@ -761,7 +770,91 @@ end
 
 
 
-local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
+--- Returns a HTML string describing the (parameter) type, linking to the type's documentation, if available
+-- a_Type is the string containing the type (such as "cPlugin" or "number"), or nil
+-- a_API is the complete API description (used for searching the classnames)
+local function LinkifyType(a_Type, a_API)
+	-- Check params:
+	assert(type(a_Type) == "string")
+	assert(type(a_API) == "table")
+
+	-- If the type is a known class, return a direct link to it:
+	if (a_API[a_Type]) then
+		return "<a href=\"" .. a_Type .. ".html\">" .. a_Type .. "</a>"
+	end
+
+	-- If the type has a hash sign, it's a child enum of a class:
+	local idxColon = a_Type:find("#")
+	if (idxColon) then
+		local classType = a_Type:sub(1, idxColon - 1)
+		if (a_API[classType]) then
+			local enumType = a_Type:sub(idxColon + 1)
+			return "<a href=\"" .. classType .. ".html#" .. enumType .. "\">" .. enumType .. "</a>"
+		end
+	end
+
+	-- If the type is a ConstantGroup within the Globals, it's a global enum:
+	if ((a_API.Globals.ConstantGroups or {})[a_Type]) then
+		return "<a href=\"Globals.html#" .. a_Type .. "\">" .. a_Type .. "</a>"
+	end
+
+	-- Unknown or built-in type, output just text:
+	return a_Type
+end
+
+
+
+
+
+--- Returns an HTML string describing all function parameters (or return values)
+-- a_FnParams is an array-table or string description of the parameters
+-- a_ClassName is the name of the class for which the function is being documented (for Linkification)
+-- a_API is the complete API description (for cross-type linkification)
+local function CreateFunctionParamsDescription(a_FnParams, a_ClassName, a_API)
+	local pt = type(a_FnParams)
+	assert((pt == "string") or (pt == "table"))
+	assert(type(a_ClassName) == "string")
+	assert(type(a_API) == "table")
+
+	-- If the params description is a string (old format), just linkify it:
+	if (pt == "string") then
+		return LinkifyString(a_FnParams, a_ClassName)
+	end
+
+	-- If the params description is an empty table, give no description at all:
+	if not(a_FnParams[1]) then
+		return ""
+	end
+
+	-- The params description is a table, output the full desc:
+	local res = {"<table border=0 cellspacing=0>"}
+	local idx = 2
+	for _, param in ipairs(a_FnParams) do
+		res[idx] = "<tr><td>"
+		res[idx + 1] = param.Name or ""
+		res[idx + 2] = "</td><td><i>"
+		res[idx + 3] = LinkifyType(param.Type, a_API)
+		res[idx + 4] = "</i></td></tr>"
+		idx = idx + 5
+	end
+	res[idx] = "</tr></table>"
+	return table.concat(res)
+end
+
+
+
+
+
+--- Writes an HTML file containing the class API description for the given class
+-- a_ClassAPI is the API description of the class to output
+-- a_ClassMenu is the HTML string containing the code for the menu sidebar
+-- a_API is the complete API (for cross-type linkification)
+local function WriteHtmlClass(a_ClassAPI, a_ClassMenu, a_API)
+	-- Check params:
+	assert(type(a_ClassAPI) == "table")
+	assert(type(a_ClassMenu) == "string")
+	assert(type(a_API) == "table")
+
 	local cf, err = io.open("API/" .. a_ClassAPI.Name .. ".html", "w");
 	if (cf == nil) then
 		LOGINFO("Cannot write HTML API for class " .. a_ClassAPI.Name .. ": " .. err)
@@ -770,22 +863,28 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 
 	-- Writes a table containing all functions in the specified list, with an optional "inherited from" header when a_InheritedName is valid
 	local function WriteFunctions(a_Functions, a_InheritedName)
-		if (#a_Functions == 0) then
+		if not(a_Functions[1]) then
+			-- No functions to write
 			return;
 		end
 
-		if (a_InheritedName ~= nil) then
+		if (a_InheritedName) then
 			cf:write("<h2>Functions inherited from ", a_InheritedName, "</h2>\n");
 		end
 		cf:write("<table>\n<tr><th>Name</th><th>Parameters</th><th>Return value</th><th>Notes</th></tr>\n");
+		-- Store all function names, to create unique anchor names for all functions
+		local TableOverloadedFunctions = {}
 		for _, func in ipairs(a_Functions) do
 			local StaticClause = ""
 			if (func.IsStatic) then
 				StaticClause = "(STATIC) "
 			end
-			cf:write("<tr><td>", func.Name, "</td>\n");
-			cf:write("<td>", LinkifyString(func.Params or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
-			cf:write("<td>", LinkifyString(func.Return or "", (a_InheritedName or a_ClassAPI.Name)), "</td>\n");
+			-- Increase number by one
+			TableOverloadedFunctions[func.Name] = (TableOverloadedFunctions[func.Name] or 0) + 1
+			-- Add the anchor names as a title
+			cf:write("<tr><td id=\"", func.Name, "_", TableOverloadedFunctions[func.Name], "\" title=\"", func.Name, "_", TableOverloadedFunctions[func.Name], "\">", func.Name, "</td>\n");
+			cf:write("<td>", CreateFunctionParamsDescription(func.Params or {}, a_InheritedName or a_ClassAPI.Name, a_API), "</td>\n");
+			cf:write("<td>", CreateFunctionParamsDescription(func.Returns or {}, a_InheritedName or a_ClassAPI.Name, a_API), "</td>\n");
 			cf:write("<td>", StaticClause .. LinkifyString(func.Notes or "<i>(undocumented)</i>", (a_InheritedName or a_ClassAPI.Name)), "</td></tr>\n");
 		end
 		cf:write("</table>\n");
@@ -794,7 +893,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 	local function WriteConstantTable(a_Constants, a_Source)
 		cf:write("<table>\n<tr><th>Name</th><th>Value</th><th>Notes</th></tr>\n");
 		for _, cons in ipairs(a_Constants) do
-			cf:write("<tr><td>", cons.Name, "</td>\n");
+			cf:write("<tr><td id=\"", cons.Name, "\">", cons.Name, "</td>\n");
 			cf:write("<td>", cons.Value, "</td>\n");
 			cf:write("<td>", LinkifyString(cons.Notes or "", a_Source), "</td></tr>\n");
 		end
@@ -837,7 +936,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 
 		cf:write("<table><tr><th>Name</th><th>Type</th><th>Notes</th></tr>\n");
 		for _, var in ipairs(a_Variables) do
-			cf:write("<tr><td>", var.Name, "</td>\n");
+			cf:write("<tr><td id=\"", var.Name, "\">", var.Name, "</td>\n");
 			cf:write("<td>", LinkifyString(var.Type or "<i>(undocumented)</i>", a_InheritedName or a_ClassAPI.Name), "</td>\n");
 			cf:write("<td>", LinkifyString(var.Notes or "", a_InheritedName or a_ClassAPI.Name), "</td>\n				</tr>\n");
 		end
@@ -1027,7 +1126,7 @@ local function WriteClasses(f, a_API, a_ClassMenu)
 	]]);
 	for _, cls in ipairs(a_API) do
 		f:write("<li><a href=\"", cls.Name, ".html\">", cls.Name, "</a></li>\n");
-		WriteHtmlClass(cls, a_ClassMenu);
+		WriteHtmlClass(cls, a_ClassMenu, a_API);
 	end
 	f:write([[
 		</ul></p>
@@ -1447,6 +1546,7 @@ local function WriteZBSMethods(f, a_Methods)
 		f:write("\t\t\t[\"", func.Name, "\"] =\n")
 		f:write("\t\t\t{\n")
 		f:write("\t\t\t\ttype = \"method\",\n")
+		-- No way to indicate multiple signatures to ZBS, so don't output any params at all
 		if ((func.Notes ~= nil) and (func.Notes ~= "")) then
 			f:write("\t\t\t\tdescription = [[", CleanUpDescription(func.Notes or ""), " ]],\n")
 		end
@@ -1643,14 +1743,10 @@ local function PrepareApi()
 	-- Load the API descriptions from the Classes and Hooks subfolders:
 	-- This needs to be done each time the command is invoked because the export modifies the tables' contents
 	local apiDesc = dofile(g_PluginFolder .. "/APIDesc.lua")
-	if (apiDesc.Classes == nil) then
-		apiDesc.Classes = {};
-	end
-	if (apiDesc.Hooks == nil) then
-		apiDesc.Hooks = {};
-	end
-	LoadAPIFiles("/Classes/", apiDesc.Classes);
-	LoadAPIFiles("/Hooks/",   apiDesc.Hooks);
+	apiDesc.Classes = apiDesc.Classes or {}
+	apiDesc.Hooks = apiDesc.Hooks or {}
+	LoadAPIFiles("/Classes/", apiDesc.Classes)
+	LoadAPIFiles("/Hooks/",   apiDesc.Hooks)
 
 	-- Reset the stats:
 	g_TrackedPages = {};  -- List of tracked pages, to be checked later whether they exist. Each item is an array of referring pagenames.
@@ -1684,6 +1780,7 @@ local function PrepareApi()
 	-- Add Globals into the API:
 	Globals.Name = "Globals";
 	table.insert(API, Globals);
+	API.Globals = Globals
 
 	-- Read in the descriptions:
 	LOG("Reading descriptions...");
@@ -1719,43 +1816,12 @@ end
 
 
 
-local function HandleWebAdminDump(a_Request)
-	if (a_Request.PostParams["Dump"] ~= nil) then
-		DumpApi()
-	end
-	return
-	[[
-	<p>Pressing the button will generate the API dump on the server. Note that this can take some time.</p>
-	<form method="POST"><input type="submit" name="Dump" value="Dump the API"/></form>
-	]]
-end
-
-
-
-
-
-local function HandleCmdApi(a_Split)
-	DumpApi()
-	return true
-end
-
-
-
-
-
-local function HandleCmdApiShow(a_Split, a_EntireCmd)
-	os.execute("API" .. cFile:GetPathSeparator() .. "index.html")
-	return true, "Launching the browser to show the API docs..."
-end
-
-
-
-
-
-local function HandleCmdApiCheck(a_Split, a_EntireCmd)
+--- Checks the currently undocumented symbols against an "official" undocumented symbol list
+-- Returns an array-table of strings representing the newly-undocumented symbol names
+local function CheckNewUndocumentedSymbols()
 	-- Download the official API stats on undocumented stuff:
 	-- (We need a blocking downloader, which is impossible with the current cNetwork API)
-	assert(os.execute("wget -O official_undocumented.lua http://apidocs.cuberite.org/_undocumented.lua"))
+	assert(os.execute("wget -q -O official_undocumented.lua http://apidocs.cuberite.org/_undocumented.lua"))
 	local OfficialStats = cFile:ReadWholeFile("official_undocumented.lua")
 	if (OfficialStats == "") then
 		return true, "Cannot load official stats"
@@ -1819,7 +1885,7 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 
 	-- Bail out if no items found:
 	if not(res[1]) then
-		return true, "No new undocumented functions"
+		return
 	end
 
 	-- Save any found items to a file:
@@ -1828,7 +1894,153 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	f:write("\n")
 	f:close()
 
-	return true, "Newly undocumented items: " .. #res .. "\n" .. table.concat(res, "\n")
+	return res
+end
+
+
+
+
+
+--- Checks the API description for unknown types listed in Params or Returns
+-- Returns an array-table of { Location = "cClass:function(), param #1", Type = "UnknownType" }
+-- Returns nil if no unknown types are found
+local function CheckBadTypes()
+	-- Load the API and preprocess known types:
+	local api = PrepareApi()
+	local knownTypes =
+	{
+		string = true,
+		number = true,
+		boolean = true,
+		any = true,
+		self = true,
+		table = true,
+		["function"] = true,
+		["..."] = true,
+		["SQLite DB object"] = true,
+		["<unknown>"] = true,  -- Allow "<unknown>" types, for now, until the API is properly documented
+	}
+	for _, clsDesc in ipairs(api) do
+		knownTypes[clsDesc.Name] = true  -- The class is a known type
+		for grpName, _ in pairs(clsDesc.ConstantGroups or {}) do  -- All class' enums are known types (with namespacing)
+			knownTypes[clsDesc.Name .. "#" .. grpName] = true
+		end
+		if (clsDesc.Name == "Globals") then
+			for grpName, _ in pairs(clsDesc.ConstantGroups or {}) do  -- All Globals' enums are known types without namespacing, too
+				knownTypes[grpName] = true
+			end
+		end
+	end  -- for cls - classes
+
+	-- Check types:
+	local res = {}
+	for _, clsDesc in ipairs(api) do
+		for _, fnDesc in ipairs(clsDesc.Functions or {}) do
+			local fnName = fnDesc.Name
+			local fn = fnDesc[1] and fnDesc or { fnDesc }  -- Unify the format, fn is an array of function signatures
+			for idxS, signature in ipairs(fn) do
+				for idxP, param in ipairs(signature.Params or {}) do
+					if not(knownTypes[param.Type]) then
+						table.insert(res, {
+							Location = string.format("%s:%s(), signature #%d, param #%d", clsDesc.Name, fnName, idxS, idxP),
+							Type = param.Type,
+						})
+					end
+				end  -- for param
+				if (type(signature.Returns) == "table") then
+					for idxR, ret in ipairs(signature.Returns) do
+						if not(knownTypes[ret.Type]) then
+							table.insert(res, {
+								Location = string.format("%s:%s(), signature #%d, return #%d", clsDesc.Name, fnName, idxS, idxR),
+								Type = ret.Type,
+							})
+						end
+					end  -- for ret
+				elseif not(signature.Returns) then
+				else
+					table.insert(res, {
+						Location = string.format("%s:%s(), signature #%d, return string", clsDesc.Name, fnName, idxS),
+						Type = tostring(signature.Returns),
+					})
+				end
+			end  -- for signature
+		end  -- for fn - functions
+	end  -- for cls - classes
+
+	-- If no problems found, bail out:
+	if not(res[1]) then
+		return
+	end
+
+	-- Write the problems into a file:
+	local f = io.open("UnknownTypes.lua", "w")
+	f:write("return\n{\n")
+	for _, item in ipairs(res) do
+		f:write("\t{ ", string.format("{ Location = %q, Type = %q", item.Location, item.Type), "},\n")
+	end
+	f:write("}\n")
+	f:close()
+	return res
+end
+
+
+
+
+
+local function HandleWebAdminDump(a_Request)
+	if (a_Request.PostParams["Dump"] ~= nil) then
+		DumpApi()
+	end
+	return
+	[[
+	<p>Pressing the button will generate the API dump on the server. Note that this can take some time.</p>
+	<form method="POST"><input type="submit" name="Dump" value="Dump the API"/></form>
+	]]
+end
+
+
+
+
+
+local function HandleCmdApi(a_Split)
+	DumpApi()
+	return true
+end
+
+
+
+
+
+local function HandleCmdApiShow(a_Split, a_EntireCmd)
+	os.execute("API" .. cFile:GetPathSeparator() .. "index.html")
+	return true, "Launching the browser to show the API docs..."
+end
+
+
+
+
+
+local function HandleCmdApiCheck(a_Split, a_EntireCmd)
+	-- Check the Params and Returns types:
+	LOG("Checking API for bad types...")
+	local badTypes = CheckBadTypes()
+	if (badTypes) then
+		-- Serialize into descriptions:
+		local descs = {}
+		for idx, t in ipairs(badTypes) do
+			descs[idx] = string.format("Location %q, type %q", t.Location, t.Type)
+		end
+		return true, "Found bad types:\n" .. table.concat(descs, "\n")
+	end
+
+	-- Check for new symbols that are not documented:
+	LOG("Checking API for newly undocumented symbols...")
+	local newUndocumented = CheckNewUndocumentedSymbols()
+	if (newUndocumented) then
+		return true, "Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n")
+	end
+
+	return true, "API check completed successfully"
 end
 
 
