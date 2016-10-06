@@ -14048,10 +14048,12 @@ end
 						{
 							Name = "OnChunkAvailable",
 							Type = "function",
+							IsOptional = true,
 						},
 						{
 							Name = "OnAllChunksAvailable",
 							Type = "function",
+							IsOptional = true,
 						},
 					},
 					Notes = "Queues the specified chunks to be loaded or generated and calls the specified callbacks once they are loaded. ChunkCoordTable is an arra-table of chunk coords, each coord being a table of 2 numbers: { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ...}. When any of those chunks are made available (including being available at the start of this call), the OnChunkAvailable() callback is called. When all the chunks are available, the OnAllChunksAvailable() callback is called. The function signatures are: <pre class=\"prettyprint lang-lua\">function OnChunkAvailable(ChunkX, ChunkZ)\
