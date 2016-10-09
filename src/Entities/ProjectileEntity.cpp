@@ -413,6 +413,10 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		);
 
 		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()), HitPos);
+		if (!IsTicking())
+		{
+			return;  // We were destroyed by an override of OnHitEntity
+		}
 	}
 	// TODO: Test the entities in the neighboring chunks, too
 
