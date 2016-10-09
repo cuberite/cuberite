@@ -41,8 +41,10 @@ Implements the 1.10.x protocol classes:
 // IMPORTANT: The enum is used to automate the sequential counting of the
 // Metadata indexes. Adding a new enum value causes the following values to
 // increase their index. Therefore the ordering of the enum values is VERY important!
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wduplicate-enum"
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wduplicate-enum"
+#endif
 
 namespace Metadata
 {
@@ -272,8 +274,9 @@ namespace Metadata
 	};
 }
 
-#pragma clang diagnostic pop  // Restore ignored clang errors
-
+#ifdef __clang__
+	#pragma clang diagnostic pop  // Restore ignored clang errors
+#endif
 
 
 

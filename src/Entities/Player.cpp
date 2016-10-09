@@ -84,6 +84,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_BowCharge(0),
 	m_FloaterID(cEntity::INVALID_ID),
 	m_Team(nullptr),
+	m_bIsInBed(false),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
 	m_UUID((a_Client != nullptr) ? a_Client->GetUUID() : ""),

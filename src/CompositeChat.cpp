@@ -282,11 +282,10 @@ cLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageT
 		case mtPrivateMessage: return cLogger::llRegular;
 		case mtJoin:           return cLogger::llRegular;
 		case mtLeave:          return cLogger::llRegular;
+		case mtMaxPlusOne: break;
 	}
 	ASSERT(!"Unhandled MessageType");
-	#ifndef __clang__
-		return cLogger::llError;
-	#endif
+	return cLogger::llError;
 }
 
 

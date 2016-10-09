@@ -1315,8 +1315,9 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 {
 	/* Function signatures:
-		cPluginManager:BindCommand(Command, Permission, Function, HelpString)
-		cPluginManager.BindCommand(Command, Permission, Function, HelpString)  -- without the "self" param
+		cPluginManager:Get():BindCommand(Command, Permission, Function, HelpString)  -- regular
+		cPluginManager:BindCommand(Command, Permission, Function, HelpString)        -- static
+		cPluginManager.BindCommand(Command, Permission, Function, HelpString)        -- without the "self" param
 	*/
 	cLuaState L(a_LuaState);
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
@@ -1379,8 +1380,9 @@ static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 static int tolua_cPluginManager_BindConsoleCommand(lua_State * a_LuaState)
 {
 	/* Function signatures:
-		cPluginManager:BindConsoleCommand(Command, Function, HelpString)
-		cPluginManager.BindConsoleCommand(Command, Function, HelpString)  -- without the "self" param
+		cPluginManager:Get():BindConsoleCommand(Command, Function, HelpString)  -- regular
+		cPluginManager:BindConsoleCommand(Command, Function, HelpString)        -- static
+		cPluginManager.BindConsoleCommand(Command, Function, HelpString)        -- without the "self" param
 	*/
 
 	// Get the plugin identification out of LuaState:
@@ -1908,20 +1910,17 @@ static int tolua_sha1HexString(lua_State * tolua_S)
 
 
 
-static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string, std::string >& a_StringStringMap)
+static int tolua_get_HTTPRequest_Params(lua_State * a_LuaState)
 {
-	lua_newtable(tolua_S);
-	int top = lua_gettop(tolua_S);
-
-	for (std::map<std::string, std::string>::iterator it = a_StringStringMap.begin(); it != a_StringStringMap.end(); ++it)
+	cLuaState L(a_LuaState);
+	HTTPRequest * self;
+	if (!L.GetStackValues(1, self))
 	{
-		const char * key = it->first.c_str();
-		const char * value = it->second.c_str();
-		lua_pushstring(tolua_S, key);
-		lua_pushstring(tolua_S, value);
-		lua_settable(tolua_S, top);
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		return 0;
 	}
-
+	L.Push(self->Params);
 	return 1;
 }
 
@@ -1929,40 +1928,44 @@ static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string,
 
 
 
-static int tolua_get_HTTPRequest_Params(lua_State* tolua_S)
+static int tolua_get_HTTPRequest_PostParams(lua_State * a_LuaState)
 {
-	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
-	return tolua_push_StringStringMap(tolua_S, self->Params);
-}
-
-
-
-
-
-static int tolua_get_HTTPRequest_PostParams(lua_State* tolua_S)
-{
-	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
-	return tolua_push_StringStringMap(tolua_S, self->PostParams);
-}
-
-
-
-
-
-static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
-{
-	HTTPRequest * self = reinterpret_cast<HTTPRequest *>(tolua_tousertype(tolua_S, 1, nullptr));
-	std::map<std::string, HTTPFormData> & FormData = self->FormData;
-
-	lua_newtable(tolua_S);
-	int top = lua_gettop(tolua_S);
-
-	for (std::map<std::string, HTTPFormData>::iterator it = FormData.begin(); it != FormData.end(); ++it)
+	cLuaState L(a_LuaState);
+	HTTPRequest * self;
+	if (!L.GetStackValues(1, self))
 	{
-		lua_pushstring(tolua_S, it->first.c_str());
-		tolua_pushusertype(tolua_S, &(it->second), "HTTPFormData");
-		// lua_pushlstring(tolua_S, it->second.Value.c_str(), it->second.Value.size());  // Might contain binary data
-		lua_settable(tolua_S, top);
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		return 0;
+	}
+	L.Push(self->PostParams);
+	return 1;
+}
+
+
+
+
+
+static int tolua_get_HTTPRequest_FormData(lua_State* a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	HTTPRequest * self;
+	if (!L.GetStackValues(1, self))
+	{
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		return 0;
+	}
+
+	const auto & FormData = self->FormData;
+	lua_newtable(a_LuaState);
+	int top = lua_gettop(a_LuaState);
+	for (auto itr = FormData.cbegin(); itr != FormData.cend(); ++itr)
+	{
+		lua_pushstring(a_LuaState, itr->first.c_str());
+		tolua_pushusertype(a_LuaState, const_cast<void *>(reinterpret_cast<const void *>(&(itr->second))), "HTTPFormData");
+		// lua_pushlstring(a_LuaState, it->second.Value.c_str(), it->second.Value.size());  // Might contain binary data
+		lua_settable(a_LuaState, top);
 	}
 
 	return 1;
@@ -3453,6 +3456,69 @@ static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
 
 
 
+static int tolua_cCompositeChat_new(lua_State * a_LuaState)
+{
+	/* Function signatures:
+	cCompositeChat()
+	cCompositeChat(a_ParseText, a_MessageType)
+	*/
+
+	// Check if it's the no-param version:
+	cLuaState L(a_LuaState);
+	if (lua_isnone(a_LuaState, 2))
+	{
+		auto * res = static_cast<cCompositeChat *>(Mtolua_new(cCompositeChat()));
+		L.Push(res);
+		return 1;
+	}
+
+	// Check the second signature:
+	AString parseText;
+	if (!L.GetStackValue(2, parseText))
+	{
+		tolua_Error err;
+		tolua_error(a_LuaState, "Invalid ParseText parameter (1) in cCompositeChat constructor.", &err);
+		return 0;
+	}
+	int messageTypeInt = mtCustom;
+	if (!lua_isnone(a_LuaState, 3))
+	{
+		if (!L.GetStackValue(3, messageTypeInt))
+		{
+			tolua_Error err;
+			tolua_error(a_LuaState, "Invalid type of the MessageType parameter (2) in cCompositeChat constructor.", &err);
+			return 0;
+		}
+		if ((messageTypeInt < 0) || (messageTypeInt >= mtMaxPlusOne))
+		{
+			tolua_Error err;
+			tolua_error(a_LuaState, "Invalid MessageType parameter (2) value in cCompositeChat constructor.", &err);
+			return 0;
+		}
+	}
+	L.Push(static_cast<cCompositeChat *>(Mtolua_new(cCompositeChat(parseText, static_cast<eMessageType>(messageTypeInt)))));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cCompositeChat_new_local(lua_State * a_LuaState)
+{
+	// Use the same constructor as global, just register it for GC:
+	auto res = tolua_cCompositeChat_new(a_LuaState);
+	if (res == 1)
+	{
+		tolua_register_gc(a_LuaState, lua_gettop(a_LuaState));
+	}
+	return res;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 {
 	// function cCompositeChat:AddRunCommandPart(Message, Command, [Style])
@@ -3475,7 +3541,7 @@ static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 	}
 
 	// Add the part:
-	AString Text, Command, Style;
+	AString Text, Command, Style = "u@a";
 	L.GetStackValue(2, Text);
 	L.GetStackValue(3, Command);
 	L.GetStackValue(4, Style);
@@ -3600,6 +3666,39 @@ static int tolua_cCompositeChat_AddUrlPart(lua_State * tolua_S)
 
 
 
+static int tolua_cCompositeChat_Clear(lua_State * tolua_S)
+{
+	// function cCompositeChat:Clear()
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", nullptr);
+		return 0;
+	}
+
+	// Clear all the parts:
+	self->Clear();
+
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(L, 1);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_ParseText(lua_State * tolua_S)
 {
 	// function cCompositeChat:ParseText(TextMessage)
@@ -3673,7 +3772,7 @@ static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
 static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 {
 	// function cCompositeChat:UnderlineUrls()
-	// Exported manually to support call-chaining (return *this)
+	// Exported manually to support call-chaining (return self)
 
 	// Check params:
 	cLuaState L(tolua_S);
@@ -3757,10 +3856,14 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");
+			tolua_function(tolua_S, "new",                   tolua_cCompositeChat_new);
+			tolua_function(tolua_S, "new_local",             tolua_cCompositeChat_new_local);
+			tolua_function(tolua_S, ".call",                 tolua_cCompositeChat_new_local);
 			tolua_function(tolua_S, "AddRunCommandPart",     tolua_cCompositeChat_AddRunCommandPart);
 			tolua_function(tolua_S, "AddSuggestCommandPart", tolua_cCompositeChat_AddSuggestCommandPart);
 			tolua_function(tolua_S, "AddTextPart",           tolua_cCompositeChat_AddTextPart);
 			tolua_function(tolua_S, "AddUrlPart",            tolua_cCompositeChat_AddUrlPart);
+			tolua_function(tolua_S, "Clear",                 tolua_cCompositeChat_Clear);
 			tolua_function(tolua_S, "ParseText",             tolua_cCompositeChat_ParseText);
 			tolua_function(tolua_S, "SetMessageType",        tolua_cCompositeChat_SetMessageType);
 			tolua_function(tolua_S, "UnderlineUrls",         tolua_cCompositeChat_UnderlineUrls);

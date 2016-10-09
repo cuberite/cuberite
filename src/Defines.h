@@ -557,7 +557,7 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 {
 	int Y = a_BlockY;
 	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
-	a_BlockY = Clamp<unsigned char>(static_cast<unsigned char>(Y), 0, 255);
+	a_BlockY = Clamp<unsigned char>(static_cast<unsigned char>(Y), 0, cChunkDef::Height - 1);
 }
 
 
@@ -641,6 +641,7 @@ enum eMessageType
 	mtPrivateMessage,  // Player to player messaging identifier
 	mtJoin,            // A player has joined the server
 	mtLeave,           // A player has left the server
+	mtMaxPlusOne,      // The first invalid type, used for checking on LuaAPI boundaries
 
 	// Common aliases:
 	mtFail  = mtFailure,

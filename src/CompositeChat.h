@@ -122,24 +122,22 @@ public:
 
 	typedef std::vector<cBasePart *> cParts;
 
-	// tolua_begin
-
-	/** Creates a new empty chat message */
+	/** Creates a new empty chat message.
+	Exported manually due to the other overload needing a manual export. */
 	cCompositeChat(void);
 
 	/** Creates a new chat message and parses the text into parts.
 	Recognizes "http:" and "https:" links and @color-codes.
-	Uses ParseText() for the actual parsing. */
+	Uses ParseText() for the actual parsing.
+	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
 
-	~cCompositeChat();
+	~cCompositeChat();  // tolua_export
+
+	// The following are exported in ManualBindings in order to support chaining - they return "self" in Lua (#755)
 
 	/** Removes all parts from the object. */
 	void Clear(void);
-
-	// tolua_end
-
-	// The following are exported in ManualBindings in order to support chaining - they return *this in Lua (#755)
 
 	/** Adds a plain text part, with optional style.
 	The default style is plain white text. */
@@ -147,8 +145,6 @@ public:
 
 	/** Adds a part that is translated client-side, with the formatting parameters and optional style. */
 	void AddClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
-
-	// tolua_begin
 
 	/** Adds a part that opens an URL when clicked.
 	The default style is underlined light blue text. */
@@ -171,13 +167,13 @@ public:
 	Recognizes "http:" and "https:" URLs and @color-codes. */
 	void ParseText(const AString & a_ParseText);
 
-	/** Sets the message type, which is indicated by prefixes added to the message when serializing
-	Takes optional AdditionalMessageTypeData to set m_AdditionalMessageTypeData. See said variable for more documentation.
-	*/
-	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData = "");
-
 	/** Adds the "underline" style to each part that is an URL. */
 	void UnderlineUrls(void);
+
+	/** Sets the message type, which is indicated by prefixes added to the message when serializing
+	Takes optional AdditionalMessageTypeData to set m_AdditionalMessageTypeData. See said variable for more documentation.
+	Exported manually, because ToLua++ would generate extra return values. */
+	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData = "");
 
 	// tolua_begin
 
