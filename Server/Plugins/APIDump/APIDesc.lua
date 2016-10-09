@@ -16211,7 +16211,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets the chunk to always be ticked even when it doesn't contain any clients. IsAlwaysTicked set to true turns forced ticking on, set to false turns it off. Every call with 'true' should be paired with a later call with 'false', otherwise the ticking won't stop. Multiple actions can request ticking independently, the ticking will continue until the last call with 'false'. Note that when the chunk unloads, it loses the value of this flag.",
+					Notes = "Sets the chunk to always be ticked and loaded even when it doesn't contain any clients. IsAlwaysTicked set to true turns forced ticking on, set to false turns it off. Every call with 'true' should be paired with a later call with 'false', otherwise the ticking won't stop. Multiple actions can request ticking independently, the ticking will continue until the last call with 'false'." },
 				},
 				SetCommandBlockCommand =
 				{
