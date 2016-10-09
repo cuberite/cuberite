@@ -475,7 +475,7 @@ public:
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
-	whether it has any clients or not.
+	whether it has any clients or not. When this is set, the chunk never unloads.
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);

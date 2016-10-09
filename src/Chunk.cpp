@@ -1728,10 +1728,12 @@ void cChunk::SetAlwaysTicked(bool a_AlwaysTicked)
 	if (a_AlwaysTicked)
 	{
 		m_AlwaysTicked += 1;
+		Stay(a_AlwaysTicked);
 	}
 	else
 	{
 		m_AlwaysTicked -= 1;
+		Stay(a_AlwaysTicked);
 	}
 }
 
