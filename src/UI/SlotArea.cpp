@@ -58,6 +58,14 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		return;
 	}
 
+	if (a_Player.IsGameModeSpectator())
+	{
+		// Block the action of the player and make sure, the inventory doesn't get out of sync
+		a_Player.GetClientHandle()->SendInventorySlot(-1, -1, cItem());  // Reset the dragged item
+		SetSlot(a_SlotNum, a_Player, *GetSlot(a_SlotNum, a_Player));  // Update the current slot
+		return;
+	}
+
 	switch (a_ClickAction)
 	{
 		case caShiftLeftClick:

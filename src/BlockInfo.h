@@ -55,6 +55,9 @@ public:
 	/** Is this block solid (player cannot walk through)? */
 	bool m_IsSolid;
 
+	/** Can a spectator interact with this block */
+	bool m_UseableBySpectator;
+
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
 
@@ -81,6 +84,7 @@ public:
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
+	inline static bool IsUseableBySpectator       (BLOCKTYPE a_Type) { return Get(a_Type).m_UseableBySpectator;  }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
 	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 	inline static float GetBlockHeight            (BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
@@ -103,6 +107,7 @@ protected:
 		, m_PistonBreakable(false)
 		, m_IsSnowable(false)
 		, m_IsSolid(true)
+		, m_UseableBySpectator(false)
 		, m_FullyOccupiesVoxel(false)
 		, m_CanBeTerraformed(false)
 		, m_BlockHeight(1.0)

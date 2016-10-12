@@ -56,6 +56,8 @@ typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
 typedef cItemCallback<cMobHeadEntity>      cMobHeadCallback;
 typedef cItemCallback<cChunk>              cChunkCallback;
 
+typedef std::function<bool (cEntity *)>    cLambdaEntityCallback;
+
 
 
 
@@ -237,6 +239,7 @@ public:
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
 	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback);  // Lua-accessible
+	bool DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback);  // Lambda version
 
 	/** Calls the callback for each block entity in the specified chunk.
 	Returns true if all block entities processed, false if the callback aborted by returning true. */

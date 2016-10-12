@@ -39,7 +39,15 @@ public:
 	{
 		ASSERT(a_Entity != nullptr);
 
-		if (!a_Entity->IsPlayer() && !a_Entity->IsMob() && !a_Entity->IsMinecart() && !a_Entity->IsBoat())
+		if (
+			(
+				!a_Entity->IsPlayer() ||
+				reinterpret_cast<cPlayer *>(a_Entity)->IsGameModeSpectator()  // Spectators doesn't collide with anything
+			) &&
+			!a_Entity->IsMob() &&
+			!a_Entity->IsMinecart() &&
+			!a_Entity->IsBoat()
+		)
 		{
 			return false;
 		}

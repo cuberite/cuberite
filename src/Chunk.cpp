@@ -2052,12 +2052,21 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
 {
+	return DoWithEntityByID(a_EntityID, std::bind(&cEntityCallback::Item, &a_Callback, std::placeholders::_1), a_CallbackResult);
+}
+
+
+
+
+
+bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback, bool & a_CallbackResult)
+{
 	// The entity list is locked by the parent chunkmap's CS
 	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
 		if (((*itr)->GetUniqueID() == a_EntityID) && ((*itr)->IsTicking()))
 		{
-			a_CallbackResult = a_Callback.Item(*itr);
+			a_CallbackResult = a_Callback(*itr);
 			return true;
 		}
 	}  // for itr - m_Entitites[]

@@ -2220,6 +2220,24 @@ return
 					},
 					Notes = "Returns whether the specified block is transparent.",
 				},
+				IsUseableBySpectator =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether a spectator can interact with the specified block.",
+				},
 				RequiresSpecialTool =
 				{
 					IsStatic = true,
@@ -10948,6 +10966,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns if the player is able to fly.",
+				},
+				CanMobsTarget =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns if the player can be targeted by mobs.",
 				},
 				CloseWindow =
 				{

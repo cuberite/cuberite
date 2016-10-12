@@ -35,7 +35,7 @@ void cSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSpider::EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk)
+void cSpider::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 {
 	if (!GetWorld()->IsChunkLighted(GetChunkX(), GetChunkZ()))
 	{
@@ -48,9 +48,9 @@ void cSpider::EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk)
 		return;
 	}
 
-	if (!static_cast<cPlayer *>(a_Entity)->IsGameModeCreative() && (Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) <= 9))
+	if (a_Player->CanMobsTarget() && (Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) <= 9))
 	{
-		super::EventSeePlayer(a_Entity, a_Chunk);
+		super::EventSeePlayer(a_Player, a_Chunk);
 	}
 }
 

@@ -250,6 +250,20 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_Stats.AddValue(statMinutesPlayed, 1);
 
+	// Handle the player detach, when the player is in spectator mode
+	if (
+		(IsGameModeSpectator()) &&
+		(m_AttachedTo != nullptr) &&
+		(
+			(m_AttachedTo->IsDestroyed()) ||  // Watching entity destruction
+			(m_AttachedTo->GetHealth() <= 0) ||  // Watching entity dead
+			(IsCrouched())  // Or the player wants to be detached
+		)
+	)
+	{
+		Detach();
+	}
+
 	// Handle a frozen player
 	TickFreezeCode();
 	if (m_IsFrozen)
@@ -1233,6 +1247,16 @@ bool cPlayer::IsGameModeSpectator(void) const
 
 
 
+
+bool cPlayer::CanMobsTarget(void) const
+{
+	return IsGameModeSurvival() || IsGameModeAdventure();
+}
+
+
+
+
+
 void cPlayer::SetTeam(cTeam * a_Team)
 {
 	if (m_Team == a_Team)
@@ -1344,6 +1368,12 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 		return;
 	}
 
+	// Detach, if the player is switching from or to the spectator mode
+	if ((m_GameMode == gmSpectator) || (a_GameMode == gmSpectator))
+	{
+		Detach();
+	}
+
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
 
@@ -1379,6 +1409,13 @@ void cPlayer::SetCapabilities()
 	{
 		SetVisible(false);
 		SetCanFly(true);
+
+		// Clear the current dragging item of the player
+		if (GetWindow() != nullptr)
+		{
+			m_DraggingItem.Empty();
+			GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
+		}
 	}
 	else
 	{
@@ -2476,8 +2513,40 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 
 
 
+void cPlayer::AttachTo(cEntity * a_AttachTo)
+{
+	// Different attach, if this is a spectator
+	if (IsGameModeSpectator())
+	{
+		m_AttachedTo = a_AttachTo;
+		GetClientHandle()->SendCameraSetTo(*m_AttachedTo);
+		return;
+	}
+
+	super::AttachTo(a_AttachTo);
+}
+
+
+
+
+
 void cPlayer::Detach()
 {
+	if (m_AttachedTo == nullptr)
+	{
+		// The player is not attached to anything. Bail out.
+		return;
+	}
+
+	// Different detach, if this is a spectator
+	if (IsGameModeSpectator())
+	{
+		GetClientHandle()->SendCameraSetTo(*this);
+		TeleportToEntity(*m_AttachedTo);
+		m_AttachedTo = nullptr;
+		return;
+	}
+
 	super::Detach();
 	int PosX = POSX_TOINT;
 	int PosY = POSY_TOINT;
