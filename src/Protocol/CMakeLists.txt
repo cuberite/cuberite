@@ -9,6 +9,7 @@ SET (SRCS
 	Packetizer.cpp
 	Protocol18x.cpp
 	Protocol19x.cpp
+	Protocol110x.cpp
 	ProtocolRecognizer.cpp
 )
 
@@ -20,12 +21,14 @@ SET (HDRS
 	Protocol.h
 	Protocol18x.h
 	Protocol19x.h
+	Protocol110x.h
 	ProtocolRecognizer.h
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(Protocol19x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast -Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch-enum -Wno-error=switch")
-	set_source_files_properties(Protocol18x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=old-style-cast -Wno-error=sign-conversion -Wno-error=conversion -Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(Protocol19x.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(Protocol18x.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(Protocol110x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch")
 endif()
 
 if (NOT MSVC)

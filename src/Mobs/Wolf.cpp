@@ -263,6 +263,12 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		super::Tick(a_Dt, a_Chunk);
 	}
 
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
+
 	if (GetTarget() == nullptr)
 	{
 		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));

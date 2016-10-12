@@ -117,7 +117,7 @@ public:
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendResetTitle                 (void) override;
-	virtual void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
+	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
@@ -183,11 +183,6 @@ protected:
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
-
-	/** The dimension that was last sent to a player in a Respawn or Login packet.
-	Used to avoid Respawning into the same dimension, which confuses the client. */
-	eDimension m_LastSentDimension;
-
 
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(const char * a_Data, size_t a_Size);
@@ -260,16 +255,16 @@ protected:
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(UInt32 a_FaceInt);
+	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
 
 	/** Writes the item data into a packet. */
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
 	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
-	void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the mob-specific metadata for the specified mob */
-	void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);

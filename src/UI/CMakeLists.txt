@@ -35,8 +35,8 @@ SET (HDRS
 	WindowOwner.h)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(SlotArea.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=switch-enum -Wno-error=sign-conversion ")
-	set_source_files_properties(Window.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=conversion -Wno-error=switch-enum -Wno-error=sign-conversion ")
+	set_source_files_properties(SlotArea.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum ")
+	set_source_files_properties(Window.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum ")
 endif()
 
 if(NOT MSVC)

@@ -2713,11 +2713,28 @@ void cChunkMap::SaveAllChunks(void)
 
 
 
-int cChunkMap::GetNumChunks(void)
+size_t cChunkMap::GetNumChunks(void)
 {
 	cCSLock Lock(m_CSChunks);
-	return static_cast<int>(m_Chunks.size());  // TODO: change return value to unsigned type
+	return m_Chunks.size();
+}
 
+
+
+
+
+size_t cChunkMap::GetNumUnusedDirtyChunks(void)
+{
+	cCSLock Lock(m_CSChunks);
+	size_t res = 0;
+	for (const auto & Chunk : m_Chunks)
+	{
+		if (Chunk.second->IsValid() && Chunk.second->CanUnloadAfterSaving())
+		{
+			res += 1;
+		}
+	}
+	return res;
 }
 
 
@@ -2754,7 +2771,7 @@ void cChunkMap::QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked)
 {
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
+	cChunkPtr Chunk = GetChunk(a_ChunkX, a_ChunkZ);
 	if (Chunk != nullptr)
 	{
 		Chunk->SetAlwaysTicked(a_AlwaysTicked);

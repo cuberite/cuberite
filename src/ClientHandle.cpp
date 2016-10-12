@@ -63,6 +63,7 @@ int cClientHandle::s_ClientCount = 0;
 // cClientHandle:
 
 cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
+	m_LastSentDimension(dimNotSet),
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
@@ -77,11 +78,11 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_BlockDigAnimStage(-1),
 	m_BlockDigAnimSpeed(0),
 	m_BlockDigAnimX(0),
-	m_BlockDigAnimY(256),  // Invalid Y, so that the coords don't get picked up
+	m_BlockDigAnimY(cChunkDef::Height + 1),  // Invalid Y, so that the coords don't get picked up
 	m_BlockDigAnimZ(0),
 	m_HasStartedDigging(false),
 	m_LastDigBlockX(0),
-	m_LastDigBlockY(256),  // Invalid Y, so that the coords don't get picked up
+	m_LastDigBlockY(cChunkDef::Height + 1),  // Invalid Y, so that the coords don't get picked up
 	m_LastDigBlockZ(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
@@ -213,7 +214,7 @@ AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a
 
 
 
-AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString &a_AdditionalData)
+AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	switch (a_ChatPrefix)
 	{
@@ -237,11 +238,9 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
 			}
 		}
+		case mtMaxPlusOne: break;
 	}
-	ASSERT(!"Unhandled chat prefix type!");
-	#ifndef __clang__
-		return "";
-	#endif
+	return "";
 }
 
 
@@ -369,6 +368,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Return a server login packet
 	m_Protocol->SendLogin(*m_Player, *World);
+	m_LastSentDimension = World->GetDimension();
 
 	// Send Weather if raining:
 	if ((World->GetWeather() == 1) || (World->GetWeather() == 2))
@@ -602,7 +602,6 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunk
 
 
 
-// Removes the client from all chunks. Used when switching worlds or destroying the player
 void cClientHandle::RemoveFromAllChunks()
 {
 	cWorld * World = m_Player->GetWorld();
@@ -1268,7 +1267,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
 	// This call would remove the water, placed from the ice block handler
-	if (a_OldBlock != E_BLOCK_ICE)
+	if (!((a_OldBlock == E_BLOCK_ICE) && (ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WATER)))
 	{
 		World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 	}
@@ -1929,7 +1928,7 @@ void cClientHandle::RemoveFromWorld(void)
 	}
 	for (auto && Chunk : Chunks)
 	{
-		m_Protocol->SendUnloadChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ);
+		SendUnloadChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ);
 	}  // for itr - Chunks[]
 
 	// Here, we set last streamed values to bogus ones so everything is resent
@@ -2756,7 +2755,21 @@ void cClientHandle::SendResetTitle()
 
 void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
-	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
+	// If a_ShouldIgnoreDimensionChecks is true, we must be traveling to the same dimension
+	ASSERT((!a_ShouldIgnoreDimensionChecks) || (a_Dimension == m_LastSentDimension));
+
+	if ((!a_ShouldIgnoreDimensionChecks) && (a_Dimension == m_LastSentDimension))
+	{
+		// The client goes crazy if we send a respawn packet with the dimension of the current world
+		// So we send a temporary one first.
+		// This is not needed when the player dies, hence the a_ShouldIgnoreDimensionChecks flag.
+		// a_ShouldIgnoreDimensionChecks is true only at cPlayer::respawn, which is called after
+		// the player dies.
+		eDimension TemporaryDimension = (a_Dimension == dimOverworld) ? dimNether : dimOverworld;
+		m_Protocol->SendRespawn(TemporaryDimension);
+	}
+	m_Protocol->SendRespawn(a_Dimension);
+	m_LastSentDimension = a_Dimension;
 }
 
 

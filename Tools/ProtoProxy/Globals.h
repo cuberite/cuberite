@@ -29,9 +29,6 @@
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	// TODO: Can GCC mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
-
 	#define OBSOLETE __attribute__((deprecated))
 
 	#define ALIGN_8 __attribute__((aligned(8)))
@@ -51,9 +48,6 @@
 
 	// Explicitly mark classes as abstract (no instances can be created)
 	#define abstract
-
-	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
 
 	// Mark functions as obsolete, so that their usage results in a compile-time warning
 	#define OBSOLETE

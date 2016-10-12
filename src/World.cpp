@@ -149,7 +149,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
-	m_LastUnload(0),
+	m_LastChunkCheck(0),
 	m_LastSave(0),
 	m_SkyDarkness(0),
 	m_GameMode(gmNotSet),
@@ -453,6 +453,13 @@ void cWorld::Start(void)
 	// The presence of a configuration value overrides everything
 	// If no configuration value is found, GetDimension() is written to file and the variable is written to again to ensure that cosmic rays haven't sneakily changed its value
 	m_Dimension = StringToDimension(IniFile.GetValueSet("General", "Dimension", DimensionToString(GetDimension())));
+	int UnusedDirtyChunksCap = IniFile.GetValueSetI("General", "UnusedChunkCap", 1000);
+	if (UnusedDirtyChunksCap < 0)
+	{
+		UnusedDirtyChunksCap *= -1;
+		IniFile.SetValueI("General", "UnusedChunkCap", UnusedDirtyChunksCap);
+	}
+	m_UnusedDirtyChunksCap = static_cast<size_t>(UnusedDirtyChunksCap);
 
 	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
 	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
@@ -1057,16 +1064,22 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	TickWeather(static_cast<float>(a_Dt.count()));
 
-	if (m_WorldAge - m_LastSave > std::chrono::minutes(5))  // Save each 5 minutes
+	if (m_WorldAge - m_LastChunkCheck > std::chrono::seconds(10))
 	{
-		SaveAllChunks();
-	}
-
-	if (m_WorldAge - m_LastUnload > std::chrono::seconds(10))  // Unload every 10 seconds
-	{
+		// Unload every 10 seconds
 		UnloadUnusedChunks();
-	}
 
+		if (m_WorldAge - m_LastSave > std::chrono::minutes(5))
+		{
+			// Save every 5 minutes
+			SaveAllChunks();
+		}
+		else if (GetNumUnusedDirtyChunks() > m_UnusedDirtyChunksCap)
+		{
+			// Save if we have too many dirty unused chunks
+			SaveAllChunks();
+		}
+	}
 }
 
 
@@ -2964,7 +2977,7 @@ bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 
 void cWorld::UnloadUnusedChunks(void)
 {
-	m_LastUnload = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
+	m_LastChunkCheck = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 	m_ChunkMap->UnloadUnusedChunks();
 }
 
@@ -3596,9 +3609,18 @@ unsigned int cWorld::GetNumPlayers(void)
 
 
 
-int cWorld::GetNumChunks(void) const
+size_t cWorld::GetNumChunks(void) const
 {
 	return m_ChunkMap->GetNumChunks();
+}
+
+
+
+
+
+size_t cWorld::GetNumUnusedDirtyChunks(void) const
+{
+	return m_ChunkMap->GetNumUnusedDirtyChunks();
 }
 
 

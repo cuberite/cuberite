@@ -2882,14 +2882,18 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 			case TAG_Byte:
 			{
 				// Vanilla uses this
-				unsigned char CollarColor = a_NBT.GetByte(CollarColorIdx);
-				Monster->SetCollarColor(CollarColor);
+				Monster->SetCollarColor(a_NBT.GetByte(CollarColorIdx));
 				break;
 			}
 			case TAG_Int:
 			{
 				// Old MCS code used this, keep reading it for compatibility reasons:
 				Monster->SetCollarColor(a_NBT.GetInt(CollarColorIdx));
+				break;
+			}
+			default:
+			{
+				// No other values are interpreted
 				break;
 			}
 		}
@@ -3381,7 +3385,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 
 	// Store the chunk data:
 	m_File.Seek(static_cast<int>(ChunkSector * 4096));
-	u_long ChunkSize = htonl(static_cast<u_long>(a_Data.size()) + 1);
+	UInt32 ChunkSize = htonl(static_cast<UInt32>(a_Data.size() + 1));
 	if (m_File.Write(&ChunkSize, 4) != 4)
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], writing(1) data to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
@@ -3408,7 +3412,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	}
 
 	// Store the header:
-	ChunkSize = (static_cast<u_long>(a_Data.size()) + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size up to nearest 4KB sector, make it a sector number
+	ChunkSize = (static_cast<UInt32>(a_Data.size()) + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size up to nearest 4KB sector, make it a sector number
 	if (ChunkSize > 255)
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], the data is too large (%u KiB, maximum is 1024 KiB). Remove some entities and retry.",
@@ -3418,10 +3422,10 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	}
 
 	// Store the header info in the table
-	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
+	m_Header[LocalX + 32 * LocalZ] = htonl(static_cast<UInt32>((ChunkSector << 8) | ChunkSize));
 
 	// Set the modification time
-	m_TimeStamps[LocalX + 32 * LocalZ] =  htonl(static_cast<u_long>(time(nullptr)));
+	m_TimeStamps[LocalX + 32 * LocalZ] =  htonl(static_cast<UInt32>(time(nullptr)));
 
 	if (m_File.Seek(0) < 0)
 	{

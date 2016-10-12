@@ -558,8 +558,8 @@ std::u16string UTF8ToRawBEUTF16(const AString & a_UTF8)
 		{
 			// target is a character in range 0xFFFF - 0x10FFFF.
 			ch -= halfBase;
-			unsigned short v1 = htons((ch >> halfShift) + UNI_SUR_HIGH_START);
-			unsigned short v2 = htons((ch & halfMask) + UNI_SUR_LOW_START);
+			auto v1 = htons(static_cast<uint16_t>((ch >> halfShift) + UNI_SUR_HIGH_START));
+			auto v2 = htons(static_cast<uint16_t>((ch & halfMask) + UNI_SUR_LOW_START));
 			UTF16.push_back(static_cast<char16_t>(v1));
 			UTF16.push_back(static_cast<char16_t>(v2));
 		}

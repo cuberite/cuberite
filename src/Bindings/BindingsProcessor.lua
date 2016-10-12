@@ -25,7 +25,7 @@ Placeholders in use (i = internal ToLua++):
 	- \3 and \4: (i) Embedded C code ("<>")
 	- \5 and \6: (i) Embedded C code ("{}")
 	- \17 and \18: DoxyComment for next item ("/** ... */") via an ID lookup
-	- \19 and \20: DocyComment for previous item ("///< ... \n") via an ID lookup
+	- \19 and \20: DoxyComment for previous item ("///< ... \n") via an ID lookup
 --]]
 
 
@@ -121,7 +121,7 @@ function parser_hook(a_Code)
 			return strsub(a_Code, e) -- normally we would use 'e + 1', but we need to preserve the [^:]
 		end
 	end
-	
+
 	-- Process forward DoxyComments:
 	do
 		local b, e, comment = a_Code:find("^%s*(%b\17\18)")
@@ -135,7 +135,7 @@ function parser_hook(a_Code)
 			return strsub(a_Code, e + 1)
 		end
 	end
-	
+
 	-- Process backward DoxyComments:
 	do
 		local b, e, comment = a_Code:find("^%s*(%b\19\20)")
@@ -200,7 +200,7 @@ local function OutputLuaStateHelpers(a_Package)
 		f:write("\n\n\n\n\n")
 		f:close()
 	end
-	
+
 	-- Output the Push() and GetStackValue() function declarations:
 	do
 		local f = assert(io.open("LuaState_Declaration.inc", "w"))
@@ -342,12 +342,12 @@ local function outputClassFunctionDocs(a_File, a_Class, a_Functions)
 			return (a_Fn1.Name < a_Fn2.Name)
 		end
 	)
-	
+
 	-- If there are no functions, bail out:
 	if not(functions[1]) then
 		return
 	end
-	
+
 	-- Output the descriptions:
 	a_File:write("\t\tFunctions =\n\t\t{\n")
 	for _, fn in ipairs(functions) do
@@ -401,12 +401,12 @@ local function outputClassVariableDocs(a_File, a_Class, a_Variables)
 			return (a_Var1.Name < a_Var2.Name)
 		end
 	)
-	
+
 	-- If there are no variables, bail out:
 	if not(variables[1]) then
 		return
 	end
-	
+
 	-- Output the descriptions:
 	a_File:write("\t\tVariables =\n\t\t{\n")
 	for _, v in ipairs(variables) do
@@ -442,12 +442,12 @@ local function outputClassConstantDocs(a_File, a_Class, a_Constants, a_IgnoredCo
 			return (a_Var1.Name < a_Var2.Name)
 		end
 	)
-	
+
 	-- If there are no constants, bail out:
 	if not(constants[1]) then
 		return
 	end
-	
+
 	-- Output the descriptions:
 	a_File:write("\t\tConstants =\n\t\t{\n")
 	for _, con in ipairs(constants) do
@@ -474,14 +474,14 @@ local function outputClassEnumDocs(a_File, a_Class, a_Enums)
 	if (not(a_Enums) or not(a_Enums[1])) then
 		return
 	end
-	
+
 	-- Sort the enums by name:
 	table.sort(a_Enums,
 		function (a_Enum1, a_Enum2)
 			return (a_Enum1.name < a_Enum2.name)
 		end
 	)
-	
+
 	-- Output the enums:
 	a_File:write("\t\tEnums =\n\t\t{\n")
 	for i, enum in ipairs(a_Enums) do
@@ -540,7 +540,7 @@ local function outputClassDocs(a_Class, a_Functions, a_Variables, a_Constants, a
 	if (a_Class.DoxyComment) then
 		f:write("\t\tDesc = ", string.format("%q", a_Class.DoxyComment), ",\n")
 	end
-	
+
 	-- If the class inherits from anything, output it here:
 	local ignoredConstants = {}
 	if (a_Class.base and (a_Class.base ~= "")) then
@@ -559,19 +559,19 @@ local function outputClassDocs(a_Class, a_Functions, a_Variables, a_Constants, a
 		end
 		f:write("\t\t},\n")
 	end
-	
+
 	-- Output the functions:
 	outputClassFunctionDocs(f, a_Class, a_Functions)
-	
+
 	-- Output the variables:
 	outputClassVariableDocs(f, a_Class, a_Variables)
-	
+
 	-- Output the constants:
 	outputClassConstantDocs(f, a_Class, a_Constants, ignoredConstants)
-	
+
 	-- Output the enums:
 	outputClassEnumDocs(f, a_Class, a_Class.enums)
-	
+
 	-- Output the footer:
 	f:write("\t},\n}\n")
 	f:close()
@@ -616,7 +616,7 @@ local function genPackageDocs(a_Self)
 			f:close()
 		end
 	end
-	
+
 	applyNextDoxyComments(a_Self)
 
 	-- Generate docs for each member:
@@ -631,7 +631,7 @@ local function genPackageDocs(a_Self)
 		end
 		i = i + 1
 	end
-	
+
 	-- Output the globals' docs:
 	local functions = {}
 	local variables = {}
@@ -646,7 +646,7 @@ local function genPackageDocs(a_Self)
 	a_Self.lname = "Globals"
 	outputClassDocs(a_Self, functions, variables, constants, filenames)
 	a_Self.lname = oldName
-	
+
 	-- Output the list of docs files:
 	table.sort(filenames)
 	local f = assert(io.open("docs/_files.lua", "w"))
@@ -686,7 +686,7 @@ local function genClassDocs(a_Self, a_Filenames)
 		end
 		i = i + 1
 	end
-	
+
 	-- Output the individual docs
 	outputClassDocs(a_Self, functions, variables, constants, a_Filenames)
 end
@@ -706,7 +706,7 @@ local function parseFunctionParameters(a_Function)
 	) then
 		return {}
 	end
-	
+
 	local res = {}
 	local idx = 1
 	for _, param in ipairs(a_Function.args or {}) do
@@ -751,7 +751,7 @@ end
 
 local function genFunctionMemberDocs(a_Self, a_Functions, a_Variables, a_Constants)
 	assert(a_Self.lname)
-	
+
 	local fn = a_Functions[a_Self.lname] or {}
 	a_Functions[a_Self.lname] = fn
 
@@ -776,14 +776,14 @@ end
 
 local function genVariableMemberDocs(a_Self, a_Functions, a_Variables, a_Constants)
 	assert(a_Self.lname)
-	
+
 	local desc =
 	{
 		Name = a_Self.lname,
 		Type = a_Self.type,
 		DoxyComment = a_Self.DoxyComment,
 	}
-	
+
 	if (string.find(a_Self.type,'const%s+') or string.find(a_Self.mod, 'tolua_readonly') or string.find(a_Self.mod, 'tolua_inherits'))  then
 		a_Constants[a_Self.lname] = desc
 	else
@@ -806,7 +806,7 @@ local function generateDocs(a_Package)
 		return false, "Cannot access the docs folder: " .. msg
 	end
 	f:close()
-	
+
 	-- Generate the docs:
 	classPackage.genDocs = genPackageDocs
 	classClass.genDocs = genClassDocs
@@ -858,7 +858,7 @@ end
 function preprocess_hook(a_Package)
 	assert(a_Package)
 	assert(type(a_Package.code) == "string")
-	
+
 	-- Replace all DoxyComments with placeholders so that they aren't erased later on:
 	a_Package.code = a_Package.code
 		:gsub("/%*%*%s*(.-)%s*%*/",

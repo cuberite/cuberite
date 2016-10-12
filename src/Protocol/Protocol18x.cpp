@@ -107,8 +107,7 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
 	m_ReceivedData(32 KiB),
-	m_IsEncrypted(false),
-	m_LastSentDimension(dimNotSet)
+	m_IsEncrypted(false)
 {
 
 	// BungeeCord handling:
@@ -636,7 +635,6 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteString("default");  // Level type - wtf?
 		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
 	}
-	m_LastSentDimension = a_World.GetDimension();
 
 	// Send the spawn position:
 	{
@@ -1094,13 +1092,8 @@ void cProtocol180::SendResetTitle(void)
 
 
 
-void cProtocol180::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
+void cProtocol180::SendRespawn(eDimension a_Dimension)
 {
-	if ((m_LastSentDimension == a_Dimension) && !a_ShouldIgnoreDimensionChecks)
-	{
-		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do (unless we are respawning from death)
-		return;
-	}
 
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
@@ -1108,7 +1101,6 @@ void cProtocol180::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimens
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
 	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
 	Pkt.WriteString("default");
-	m_LastSentDimension = a_Dimension;
 }
 
 
@@ -3497,7 +3489,7 @@ void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 		{
 			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(Rabbit.GetRabbitTypeAsNumber());
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Rabbit.GetRabbitType()));
 			a_Pkt.WriteBEUInt8(0x0c);
 			a_Pkt.WriteBEInt8(Rabbit.IsBaby() ? -1 : (Rabbit.IsInLoveCooldown() ? 1 : 0));
 			break;

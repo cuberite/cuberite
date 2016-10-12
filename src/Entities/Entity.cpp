@@ -1433,19 +1433,22 @@ bool cEntity::DetectPortal()
 				}
 				m_PortalCooldownData.m_TicksDelayed = 0;
 
+				// Nether portal in the nether
 				if (GetWorld()->GetDimension() == dimNether)
 				{
 					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
 						return false;
 					}
+					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
 
 					if (IsPlayer())
 					{
 						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
-						(reinterpret_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(dimOverworld);
+						(reinterpret_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					Vector3d TargetPos = GetPosition();
@@ -1454,23 +1457,30 @@ bool cEntity::DetectPortal()
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping nether -> overworld");
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, 256);
+					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
+					new cNetherPortalScanner(this, TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
+				// Nether portal in the overworld
 				else
 				{
 					if (GetWorld()->GetLinkedNetherWorldName().empty())
 					{
 						return false;
 					}
+					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
+					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
 					if (IsPlayer())
 					{
-						reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
-						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(dimNether);
+						if (DestionationDim == dimNether)
+						{
+							reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
+						}
+
+						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					Vector3d TargetPos = GetPosition();
@@ -1479,8 +1489,8 @@ bool cEntity::DetectPortal()
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping overworld -> nether");
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, 128);
+					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
+					new cNetherPortalScanner(this, TargetWorld, TargetPos, (cChunkDef::Height / 2));
 					return true;
 				}
 			}
@@ -1491,6 +1501,7 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
+				// End portal in the end
 				if (GetWorld()->GetDimension() == dimEnd)
 				{
 
@@ -1498,37 +1509,55 @@ bool cEntity::DetectPortal()
 					{
 						return false;
 					}
+					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+					eDimension DestionationDim = DestinationWorld->GetDimension();
+
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
 					if (IsPlayer())
 					{
 						cPlayer * Player = reinterpret_cast<cPlayer *>(this);
-						Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
-						Player->GetClientHandle()->SendRespawn(dimOverworld);
+						if (Player->GetBedWorld() == DestinationWorld)
+						{
+							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+						}
+						else
+						{
+							Player->TeleportToCoords(DestinationWorld->GetSpawnX(), DestinationWorld->GetSpawnY(), DestinationWorld->GetSpawnZ());
+						}
+						Player->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
 					return MoveToWorld(TargetWorld, false);
 				}
+				// End portal in the overworld
 				else
 				{
 					if (GetWorld()->GetLinkedEndWorldName().empty())
 					{
 						return false;
 					}
+					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
+					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
 					if (IsPlayer())
 					{
-						reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
-						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(dimEnd);
+						if (DestionationDim == dimEnd)
+						{
+							reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
+						}
+						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
 					return MoveToWorld(TargetWorld, false);
 				}
 

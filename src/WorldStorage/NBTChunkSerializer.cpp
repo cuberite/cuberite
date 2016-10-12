@@ -665,8 +665,8 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case mtRabbit:
 			{
-				const cRabbit *Rabbit = reinterpret_cast<const cRabbit *>(a_Monster);
-				m_Writer.AddInt("RabbitType",      Rabbit->GetRabbitTypeAsNumber());
+				const cRabbit * Rabbit = reinterpret_cast<const cRabbit *>(a_Monster);
+				m_Writer.AddInt("RabbitType",      static_cast<Int32>(Rabbit->GetRabbitType()));
 				m_Writer.AddInt("MoreCarrotTicks", Rabbit->GetMoreCarrotTicks());
 				m_Writer.AddInt("Age",             Rabbit->GetAge());
 				break;

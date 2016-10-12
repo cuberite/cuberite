@@ -166,7 +166,7 @@ bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 	a_Area.SetBlockType(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_SPONGE);
 	for (int i = 0; i < LEAVES_CHECK_DISTANCE; i++)
 	{
-		for (int y = std::max(a_BlockY - i, 0); y <= std::min(a_BlockY + i, 255); y++)
+		for (int y = std::max(a_BlockY - i, 0); y <= std::min(a_BlockY + i, cChunkDef::Height - 1); y++)
 		{
 			for (int z = a_BlockZ - i; z <= a_BlockZ + i; z++)
 			{
