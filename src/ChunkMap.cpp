@@ -1874,6 +1874,15 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 {
+	return DoWithEntityByID(a_UniqueID, std::bind(&cEntityCallback::Item, &a_Callback, std::placeholders::_1));
+}
+
+
+
+
+
+bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cLambdaEntityCallback a_Callback)
+{
 	cCSLock Lock(m_CSChunks);
 	bool res = false;
 	for (const auto & Chunk : m_Chunks)
@@ -2762,7 +2771,7 @@ void cChunkMap::QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked)
 {
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
+	cChunkPtr Chunk = GetChunk(a_ChunkX, a_ChunkZ);
 	if (Chunk != nullptr)
 	{
 		Chunk->SetAlwaysTicked(a_AlwaysTicked);

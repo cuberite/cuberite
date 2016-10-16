@@ -167,7 +167,15 @@ public:
 			return false;
 		}
 
-		if (!a_Entity->IsMob() && !a_Entity->IsMinecart() && !a_Entity->IsPlayer() && !a_Entity->IsBoat())
+		if (
+			!a_Entity->IsMob() &&
+			!a_Entity->IsMinecart() &&
+			(
+				!a_Entity->IsPlayer() ||
+				static_cast<cPlayer *>(a_Entity)->IsGameModeSpectator()
+			) &&
+			!a_Entity->IsBoat()
+		)
 		{
 			// Not an entity that interacts with a projectile
 			return false;
@@ -413,6 +421,10 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		);
 
 		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()), HitPos);
+		if (!IsTicking())
+		{
+			return;  // We were destroyed by an override of OnHitEntity
+		}
 	}
 	// TODO: Test the entities in the neighboring chunks, too
 

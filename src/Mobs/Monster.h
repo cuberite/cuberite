@@ -72,7 +72,7 @@ public:
 	// tolua_end
 
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
-	virtual void EventSeePlayer(cEntity * a_Entity, cChunk & a_Chunk);
+	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk);
 
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);

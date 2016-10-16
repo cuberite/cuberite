@@ -107,7 +107,8 @@ return
 				Notes = "Sets the API version of the plugin. Currently unused.",
 			},
 		},
-	},
+	},  -- cPlugin
+
 	cPluginLua =
 	{
 		Desc = "(<b>OBSOLETE</b>) This class is no longer useful in the API and will be removed as soon as all core plugins are migrated away from it. The {{cPlugin}} class serves as the main plugin instance's interface.",
@@ -130,7 +131,8 @@ return
 			},
 		},
 		Inherits = "cPlugin",
-	},
+	},  -- cPluginLua
+
 	cPluginManager =
 	{
 		Desc = [[
@@ -439,21 +441,39 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			ForEachPlugin =
 			{
-				IsStatic = true,
-				Params =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "CallbackFn",
-						Type = "function",
+						{
+							Name = "CallbackFn",
+							Type = "function",
+						},
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true.",
 				},
-				Returns =
 				{
+					Params =
 					{
-						Type = "boolean",
+						{
+							Name = "CallbackFn",
+							Type = "function",
+						},
 					},
-				},
-				Notes = "Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true.",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true.",
+				}
 			},
 			Get =
 			{

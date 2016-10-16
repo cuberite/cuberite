@@ -274,6 +274,7 @@ public:
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
+	bool DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback, bool & a_CallbackResult);  // Lambda version
 
 	/** Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntity(cBlockEntityCallback & a_Callback);  // Lua-accessible
@@ -475,7 +476,7 @@ public:
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
-	whether it has any clients or not.
+	whether it has any clients or not. When this is set, the chunk never unloads.
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);

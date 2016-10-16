@@ -246,6 +246,16 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 
 
 
+void cProtocol180::SendCameraSetTo(const cEntity & a_Entity)
+{
+	cPacketizer Pkt(*this, 0x43);  // Camera Packet (Attach the camera of a player at another entity in spectator mode)
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+}
+
+
+
+
+
 void cProtocol180::SendChat(const AString & a_Message, eChatType a_Type)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -2038,6 +2048,7 @@ bool cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return true;
 				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return true;
 				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return true;
+				case 0x18: HandlePacketSpectate               (a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -2489,6 +2500,21 @@ void cProtocol180::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
 	m_Client->HandleSlotSelected(SlotNum);
+}
+
+
+
+
+
+void cProtocol180::HandlePacketSpectate(cByteBuffer &a_ByteBuffer)
+{
+	AString playerUUID;
+	if (!a_ByteBuffer.ReadUUID(playerUUID))
+	{
+		return;
+	}
+
+	m_Client->HandleSpectate(playerUUID);
 }
 
 
