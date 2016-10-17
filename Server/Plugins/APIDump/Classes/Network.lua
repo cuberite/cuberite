@@ -671,175 +671,291 @@ g_Server = nil
 		{
 			Delete =
 			{
-				IsStatic = true,
-				Params =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "URL",
-						Type = "string",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "table",
+						},
+						{
+							Name = "Headers",
+							Type = "table",
+							IsOptional = true,
+						},
+						{
+							Name = "RequestBody",
+							Type = "string",
+							IsOptional = true,
+						},
+						{
+							Name = "Options",
+							Type = "table",
+							IsOptional = true,
+						},
 					},
+					Returns =
 					{
-						Name = "Callbacks",
-						Type = "table",
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrorMessagge",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
-					{
-						Name = "Headers",
-						Type = "table",
-						IsOptional = true,
-					},
-					{
-						Name = "RequestBody",
-						Type = "string",
-						IsOptional = true,
-					},
-					{
-						Name = "Options",
-						Type = "table",
-						IsOptional = true,
-					},
+					Notes = "Starts a HTTP DELETE request. Alias for Request(\"DELETE\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 				},
-				Returns =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "IsSuccess",
-						Type = "boolean",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "function",
+						},
 					},
+					Returns =
 					{
-						Name = "ErrorMessagge",
-						Type = "string",
-						IsOptional = true,
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrorMessagge",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
+					Notes = "Starts a HTTP DELETE request. Alias for Request(\"DELETE\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 				},
-				Notes = "Starts a HTTP DELETE request. Alias for Request(\"DELETE\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 			},
 			Get =
 			{
-				IsStatic = true,
-				Params =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "URL",
-						Type = "string",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "table",
+						},
+						{
+							Name = "Headers",
+							Type = "table",
+							IsOptional = true,
+						},
+						{
+							Name = "RequestBody",
+							Type = "string",
+							IsOptional = true,
+						},
+						{
+							Name = "Options",
+							Type = "table",
+							IsOptional = true,
+						},
 					},
+					Returns =
 					{
-						Name = "Callbacks",
-						Type = "table",
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrMsg",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
-					{
-						Name = "Headers",
-						Type = "table",
-						IsOptional = true,
-					},
-					{
-						Name = "RequestBody",
-						Type = "string",
-						IsOptional = true,
-					},
-					{
-						Name = "Options",
-						Type = "table",
-						IsOptional = true,
-					},
+					Notes = "Starts a HTTP GET request. Alias for Request(\"GET\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 				},
-				Returns =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "IsSuccess",
-						Type = "boolean",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "function",
+						},
 					},
+					Returns =
 					{
-						Name = "ErrMsg",
-						Type = "string",
-						IsOptional = true,
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrMsg",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
-				},
-				Notes = "Starts a HTTP GET request. Alias for Request(\"GET\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
+					Notes = "Starts a HTTP GET request. Alias for Request(\"GET\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
+				}
 			},
 			Post =
 			{
-				IsStatic = true,
-				Params =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "URL",
-						Type = "string",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "table",
+						},
+						{
+							Name = "Headers",
+							Type = "table",
+							IsOptional = true,
+						},
+						{
+							Name = "RequestBody",
+							Type = "string",
+							IsOptional = true,
+						},
+						{
+							Name = "Options",
+							Type = "table",
+							IsOptional = true,
+						},
 					},
+					Returns =
 					{
-						Name = "Callbacks",
-						Type = "table",
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrMsg",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
-					{
-						Name = "Headers",
-						Type = "table",
-						IsOptional = true,
-					},
-					{
-						Name = "RequestBody",
-						Type = "string",
-						IsOptional = true,
-					},
-					{
-						Name = "Options",
-						Type = "table",
-						IsOptional = true,
-					},
+					Notes = "Starts a HTTP POST request. Alias for Request(\"POST\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 				},
-				Returns =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "IsSuccess",
-						Type = "boolean",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "function",
+						},
 					},
+					Returns =
 					{
-						Name = "ErrMsg",
-						Type = "string",
-						IsOptional = true,
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrMsg",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
+					Notes = "Starts a HTTP POST request. Alias for Request(\"POST\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 				},
-				Notes = "Starts a HTTP POST request. Alias for Request(\"POST\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 			},
 			Put =
 			{
-				IsStatic = true,
-				Params =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "URL",
-						Type = "string",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "table",
+						},
+						{
+							Name = "Headers",
+							Type = "table",
+							IsOptional = true,
+						},
+						{
+							Name = "RequestBody",
+							Type = "string",
+							IsOptional = true,
+						},
+						{
+							Name = "Options",
+							Type = "table",
+							IsOptional = true,
+						},
 					},
+					Returns =
 					{
-						Name = "Callbacks",
-						Type = "table",
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrMsg",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
-					{
-						Name = "Headers",
-						Type = "table",
-						IsOptional = true,
-					},
-					{
-						Name = "RequestBody",
-						Type = "string",
-						IsOptional = true,
-					},
-					{
-						Name = "Options",
-						Type = "table",
-						IsOptional = true,
-					},
+					Notes = "Starts a HTTP PUT request. Alias for Request(\"PUT\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 				},
-				Returns =
 				{
+					IsStatic = true,
+					Params =
 					{
-						Name = "IsSuccess",
-						Type = "boolean",
+						{
+							Name = "URL",
+							Type = "string",
+						},
+						{
+							Name = "Callbacks",
+							Type = "function",
+						},
 					},
+					Returns =
 					{
-						Name = "ErrMsg",
-						Type = "string",
-						IsOptional = true,
+						{
+							Name = "IsSuccess",
+							Type = "boolean",
+						},
+						{
+							Name = "ErrMsg",
+							Type = "string",
+							IsOptional = true,
+						},
 					},
+					Notes = "Starts a HTTP PUT request. Alias for Request(\"PUT\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 				},
-				Notes = "Starts a HTTP PUT request. Alias for Request(\"PUT\", ...). Returns true on succes, false and error message on immediate failure (unparsable URL etc.).",
 			},
 			Request =
 			{
