@@ -2064,7 +2064,7 @@ return
 					},
 					Notes = "Returns the {{cBlockInfo}} structure for the specified block type.",
 				},
-				GetBlockHardness =
+				GetHardness =
 				{
 					IsStatic = true,
 					Params =
