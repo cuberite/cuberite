@@ -70,6 +70,9 @@ public:
 	/** Sound when placing this block */
 	AString m_PlaceSound;
 
+	/** Block's hardness. If a player hits a block a value gets incremented every tick by the block's hardness * a multiplier (which tool are you using?, enchantings?, effects?, ...) until it is greater or equal to one. Then the block is broken. */
+	float m_Hardness;
+
 	// tolua_end
 
 	/** Associated block handler. */
@@ -89,6 +92,7 @@ public:
 	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 	inline static float GetBlockHeight            (BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
 	inline static AString GetPlaceSound           (BLOCKTYPE a_Type) { return Get(a_Type).m_PlaceSound;          }
+	inline static float GetHardness               (BLOCKTYPE a_Type) { return Get(a_Type).m_Hardness;            }
 
 	// tolua_end
 
@@ -112,6 +116,7 @@ protected:
 		, m_CanBeTerraformed(false)
 		, m_BlockHeight(1.0)
 		, m_PlaceSound("")
+		, m_Hardness(0.0F)
 		, m_Handler(nullptr)
 	{}
 

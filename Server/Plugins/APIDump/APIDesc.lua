@@ -2064,6 +2064,24 @@ return
 					},
 					Notes = "Returns the {{cBlockInfo}} structure for the specified block type.",
 				},
+				GetHardness =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block's hardness. If a player hits a block a value gets incremented every tick by the block's hardness * a multiplier (which tool are you using?, enchantings?, effects?, ...) until it is greater or equal to one. Then the block is broken.",
+				},			
 				GetBlockHeight =
 				{
 					IsStatic = true,
