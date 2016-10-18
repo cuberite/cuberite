@@ -660,6 +660,10 @@ char cItemHandler::GetMaxStackSize(void)
 	return 1;
 }
 
+
+
+
+
 bool cItemHandler::IsTool()
 {
 	// TODO: Rewrite this to list all tools specifically
