@@ -1002,11 +1002,11 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ACACIA_DOOR         ].m_Hardness = 3.0f;
 	a_Info[E_BLOCK_DARK_OAK_DOOR       ].m_Hardness = 3.0f;
 	// Synonym or ID compatibility
-	a_Info[E_BLOCK_YELLOW_FLOWER].m_Hardness = a_Info[E_BLOCK_DANDELION].m_Hardness;
-	a_Info[E_BLOCK_RED_ROSE].m_Hardness      = a_Info[E_BLOCK_FLOWER].m_Hardness;
-	a_Info[E_BLOCK_WOODEN_DOOR].m_Hardness   = a_Info[E_BLOCK_OAK_DOOR].m_Hardness;
-	a_Info[E_BLOCK_FENCE_GATE].m_Hardness    = a_Info[E_BLOCK_OAK_FENCE_GATE].m_Hardness;
-	a_Info[E_BLOCK_WOODEN_STAIRS].m_Hardness = a_Info[E_BLOCK_OAK_WOOD_STAIRS].m_Hardness;
+	a_Info[E_BLOCK_YELLOW_FLOWER       ].m_Hardness = a_Info[E_BLOCK_DANDELION      ].m_Hardness;
+	a_Info[E_BLOCK_RED_ROSE            ].m_Hardness = a_Info[E_BLOCK_FLOWER         ].m_Hardness;
+	a_Info[E_BLOCK_WOODEN_DOOR         ].m_Hardness = a_Info[E_BLOCK_OAK_DOOR       ].m_Hardness;
+	a_Info[E_BLOCK_FENCE_GATE          ].m_Hardness = a_Info[E_BLOCK_OAK_FENCE_GATE ].m_Hardness;
+	a_Info[E_BLOCK_WOODEN_STAIRS       ].m_Hardness = a_Info[E_BLOCK_OAK_WOOD_STAIRS].m_Hardness;
 }
 
 
