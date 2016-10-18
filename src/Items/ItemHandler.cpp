@@ -660,10 +660,6 @@ char cItemHandler::GetMaxStackSize(void)
 	return 1;
 }
 
-
-
-
-
 bool cItemHandler::IsTool()
 {
 	// TODO: Rewrite this to list all tools specifically
@@ -862,6 +858,19 @@ cItemHandler::FoodInfo cItemHandler::GetFoodInfo()
 {
 	return FoodInfo(0, 0);
 }
+
+
+
+
+
+
+
+
+
+float GetStrVsBlock(BLOCKTYPE a_Block) {
+	return 1.0f;
+}
+
 
 
 

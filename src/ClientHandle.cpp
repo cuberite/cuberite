@@ -1210,6 +1210,36 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
+// I know these functions don't belong here, I'm just testing something.
+
+float GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem) {
+	float strength = a_EquippedItem.GetHandler()->GetStrVsBlock(a_Block);
+	if (strength > 1.0f) {
+		int efficiencyModifier = 
+	}
+
+
+
+	return 1.0f;
+}
+
+
+
+
+
+
+float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem) {
+	float blockHardness = cBlockInfo::GetHardness(a_Block);
+	float digSpeed = GetDigSpeed();
+	float canHarvestBlockDivisor = a_EquippedItem.GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
+	LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
+	return blockHardness < 0 ? 0 : digSpeed / blockHardness / canHarvestBlockDivisor;
+}
+
+
+
+
+
 void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
 	if (
@@ -1245,6 +1275,8 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	cWorld * World = m_Player->GetWorld();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+
+	LOGD("PlayerRelativeBlockHardness: %f\n", GetPlayerRelativeBlockHardness(a_OldBlock, m_Player->GetEquippedItem()));
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
