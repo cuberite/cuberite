@@ -881,7 +881,8 @@ cItemHandler::FoodInfo cItemHandler::GetFoodInfo()
 
 
 
-float cItemHandler::GetStrVsBlock(BLOCKTYPE a_Block) {
+float cItemHandler::GetStrVsBlock(BLOCKTYPE a_Block)
+{
 	return 1.0f;
 }
 

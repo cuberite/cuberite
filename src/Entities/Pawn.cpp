@@ -446,7 +446,8 @@ void cPawn::StopEveryoneFromTargetingMe()
 
 
 
-std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects() {
+std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects()
+{
 	return m_EntityEffects;
 }
 
@@ -454,7 +455,8 @@ std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects() {
 
 
 
-cEntityEffect *cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType) {
+cEntityEffect *cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
+{
 	return m_EntityEffects.at(a_EffectType);
 }
 

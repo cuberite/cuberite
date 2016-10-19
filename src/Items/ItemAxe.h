@@ -22,10 +22,13 @@ public:
 
 	virtual float GetStrVsBlock(BLOCKTYPE a_Block)
 	{
-		if (!IsBlockMaterial_WOOD(a_Block) && !IsBlockMaterial_PLANTS(a_Block) && !IsBlockMaterial_VINE(a_Block)) {
+		if (!IsBlockMaterial_WOOD(a_Block) && !IsBlockMaterial_PLANTS(a_Block) && !IsBlockMaterial_VINE(a_Block))
+		{
 			return super::GetStrVsBlock(a_Block);
-		} else {
-			switch (m_ItemType) {
+		} else
+		{
+			switch (m_ItemType)
+			{
 				case E_ITEM_WOODEN_AXE: return 2.0f;
 				case E_ITEM_STONE_AXE:  return 4.0f;
 				case E_ITEM_IRON_AXE:   return 6.0f;

@@ -111,10 +111,13 @@ public:
 
 	virtual float GetStrVsBlock(BLOCKTYPE a_Block)
 	{
-		if (!IsBlockMaterial_IRON(a_Block) && !IsBlockMaterial_ANVIL(a_Block) && !IsBlockMaterial_ROCK(a_Block)) {
+		if (!IsBlockMaterial_IRON(a_Block) && !IsBlockMaterial_ANVIL(a_Block) && !IsBlockMaterial_ROCK(a_Block))
+		{
 			return super::GetStrVsBlock(a_Block);
-		} else {
-			switch (m_ItemType) {
+		} else
+		{
+			switch (m_ItemType)
+			{
 				case E_ITEM_WOODEN_PICKAXE: return 2.0f;
 				case E_ITEM_STONE_PICKAXE:  return 4.0f;
 				case E_ITEM_IRON_PICKAXE:   return 6.0f;
