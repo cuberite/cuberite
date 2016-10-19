@@ -56,6 +56,18 @@ public:
 		return 0;
 		#endif
 	}
+
+
+
+	virtual float GetStrVsBlock(BLOCKTYPE a_Block)
+	{
+		if (a_Block == E_BLOCK_COBWEB) {
+			return 15.0f;
+		} else {
+			return !IsBlockMaterial_PLANTS(a_Block) && !IsBlockMaterial_VINE(a_Block) && !IsBlockMaterial_CORAL(a_Block) && !IsBlockMaterial_LEAVES(a_Block) && !IsBlockMaterial_GOURD(a_Block) ? 1.0f : 1.5f;
+		}
+	}
+
 } ;
 
 

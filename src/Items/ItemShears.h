@@ -90,6 +90,14 @@ public:
 			}
 		}
 	}
+
+
+
+	virtual float GetStrVsBlock(BLOCKTYPE a_Block)
+	{
+		return !IsBlocks_WEB(a_Block) && !IsBlockMaterial_LEAVES(a_Block) ? (IsBlocks_WOOL(a_Block) ? 5.0f/*WOOL*/ : super::GetStrVsBlock(a_Block) /*none of them*/ ) : 15.0f /*WEB and LEAVES*/;
+	}
+
 } ;
 
 

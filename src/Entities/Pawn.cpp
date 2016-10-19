@@ -441,3 +441,22 @@ void cPawn::StopEveryoneFromTargetingMe()
 	}
 	ASSERT(m_TargetingMe.size() == 0);
 }
+
+
+
+
+
+std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects() {
+	return m_EntityEffects;
+}
+
+
+
+
+
+cEntityEffect *cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType) {
+	return m_EntityEffects.at(a_EffectType);
+}
+
+
+

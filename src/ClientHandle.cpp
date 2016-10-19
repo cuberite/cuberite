@@ -1209,18 +1209,62 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-
 // I know these functions don't belong here, I'm just testing something.
 
-float GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem) {
-	float strength = a_EquippedItem.GetHandler()->GetStrVsBlock(a_Block);
-	if (strength > 1.0f) {
-		int efficiencyModifier = 
+//bool cClientHandle::IsInsideOfBlock(BLOCKTYPE a_Block) {
+
+
+
+//}
+
+
+
+
+
+float cClientHandle::GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem) {
+	float f = a_EquippedItem.GetHandler()->GetStrVsBlock(a_Block);
+	if (f > 1.0f) {
+		int efficiencyModifier = a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+		if (efficiencyModifier > 0) {
+			f += (efficiencyModifier * efficiencyModifier) + 1;
+		}
 	}
 
+	if (m_Player->HasEntityEffect(cEntityEffect::effHaste)) {
+		int intensity = m_Player->GetEntityEffect(cEntityEffect::effHaste)->GetIntensity() + 1;
+		f *= 1.0f + intensity * 0.2f;
+	}
 
+	if (m_Player->HasEntityEffect(cEntityEffect::effMiningFatigue)) {
+		int intensity = m_Player->GetEntityEffect(cEntityEffect::effMiningFatigue)->GetIntensity();
+		switch (intensity) {
+			case 0:
+				f *= 0.3f;
+				break;
+			case 1:
+				f *= 0.09f;
+				break;
+			case 2:
+				f *= 0.0027f;
+				break;
+			default:
+				f *= 8.1e-4f;
+		}
+	}
 
-	return 1.0f;
+	printf("inwater: %s", (m_Player->IsSwimming() && !(a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0)) ? "true" : "false");
+	// TODO check if is swimming is the same as isinsideofmaterial(water)
+	if (m_Player->IsSwimming() && !(a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0)) {
+		f /= 5.0f;
+	}
+	
+	// TODO isonground does not work correctly. if you stand on an edge is assumes you are not on ground.
+	printf(" notonground: %s\n", !m_Player->IsOnGround()?"true":"false");
+	if (!m_Player->IsOnGround()) {
+		f /= 5.0f;
+	}
+
+	return f;
 }
 
 
@@ -1228,10 +1272,11 @@ float GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem) {
 
 
 
-float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem) {
+float cClientHandle::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem) {
 	float blockHardness = cBlockInfo::GetHardness(a_Block);
-	float digSpeed = GetDigSpeed();
-	float canHarvestBlockDivisor = a_EquippedItem.GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
+	float digSpeed = GetDigSpeed(a_Block, a_EquippedItem);
+	// TODO Implement CanHarvestBlock correctly as CanHarvestBlock2
+	float canHarvestBlockDivisor = a_EquippedItem.GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f; // not correct: e.g. hand cant harvest deadbush, but canharvestblockdivisor is 30 --> see client
 	LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return blockHardness < 0 ? 0 : digSpeed / blockHardness / canHarvestBlockDivisor;
 }

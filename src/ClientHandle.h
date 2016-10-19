@@ -371,6 +371,10 @@ public:  // tolua_export
 
 	bool IsPlayerChunkSent();
 
+	float GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem);
+
+	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem);
+
 private:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
