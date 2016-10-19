@@ -528,6 +528,9 @@ public:
 	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
 	void RemoveClientHandle(void);
 
+	/** Returns the relative block hardness for the block a_Block */
+	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block);
+
 protected:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
@@ -709,4 +712,14 @@ private:
 	/** Pins the player to a_Location until Unfreeze() is called.
 	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
 	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
+
+	/** Returns how high the liquid is in percent. Used by IsInsideOfBlock */
+	float GetLiquidHeightPercent(NIBBLETYPE a_Meta);
+
+	/** Checks if the player is inside of the block (use only for liquid!) */
+	bool IsInsideOfBlock(BLOCKTYPE a_Block);
+
+	/** Returns the dig speed using the current tool on the block a_Block */
+	float GetDigSpeed(BLOCKTYPE a_Block);
+
 } ;  // tolua_export

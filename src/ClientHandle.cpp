@@ -55,7 +55,7 @@ static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(
 
 int cClientHandle::s_ClientCount = 0;
 
-
+float cClientHandle::FASTBREAK_PERCENTAGE = 97;
 
 
 
@@ -1211,93 +1211,6 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-// I know these things don't belong here, I'm just testing something.
-
-
-
-float cClientHandle::GetLiquidHeightPercent(NIBBLETYPE a_Meta) {
-	if(a_Meta >= 8) {
-		a_Meta = 0;
-	}
-	return (float)(a_Meta + 1) / 9.0f;
-}
-
-
-
-bool cClientHandle::IsInsideOfBlock(BLOCKTYPE a_Block) {
-	BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_Player->GetPosX(), m_Player->GetStance(), m_Player->GetPosZ());
-	if (Block != a_Block) {
-		return false;
-	}
-	NIBBLETYPE Meta = m_Player->GetWorld()->GetBlockMeta(m_Player->GetPosX(), m_Player->GetStance(), m_Player->GetPosZ());
-	float f = GetLiquidHeightPercent(Meta) - 0.11111111f;
-	float f1 = (float)(m_Player->GetStance() + 1) - f;
-	bool flag = m_Player->GetStance() < f1;
-	return flag;
-}
-
-
-
-
-
-float cClientHandle::GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem) {
-	float f = a_EquippedItem.GetHandler()->GetStrVsBlock(a_Block);
-	if (f > 1.0f) {
-		int efficiencyModifier = a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
-		if (efficiencyModifier > 0) {
-			f += (efficiencyModifier * efficiencyModifier) + 1;
-		}
-	}
-
-	if (m_Player->HasEntityEffect(cEntityEffect::effHaste)) {
-		int intensity = m_Player->GetEntityEffect(cEntityEffect::effHaste)->GetIntensity() + 1;
-		f *= 1.0f + intensity * 0.2f;
-	}
-
-	if (m_Player->HasEntityEffect(cEntityEffect::effMiningFatigue)) {
-		int intensity = m_Player->GetEntityEffect(cEntityEffect::effMiningFatigue)->GetIntensity();
-		switch (intensity) {
-			case 0:
-				f *= 0.3f;
-				break;
-			case 1:
-				f *= 0.09f;
-				break;
-			case 2:
-				f *= 0.0027f;
-				break;
-			default:
-				f *= 8.1e-4f;
-		}
-	}
-
-	if ((IsInsideOfBlock(E_BLOCK_WATER) || IsInsideOfBlock(E_BLOCK_STATIONARY_WATER)) && !(a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0)) {
-		f /= 5.0f;
-	}
-	
-	if (!m_Player->IsOnGround()) {
-		f /= 5.0f;
-	}
-
-	return f;
-}
-
-
-
-
-
-
-float cClientHandle::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem) {
-	float blockHardness = cBlockInfo::GetHardness(a_Block);
-	float digSpeed = GetDigSpeed(a_Block, a_EquippedItem);
-	float canHarvestBlockDivisor = a_EquippedItem.GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
-//	LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
-	return blockHardness < 0 ? 0 : digSpeed / blockHardness / canHarvestBlockDivisor;
-}
-
-
-
-
 
 void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
@@ -1335,14 +1248,15 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	if (!m_Player->IsGameModeCreative() && !cBlockInfo::IsOneHitDig(a_OldBlock))
 	{
 		// Fix for very fast tools.
-		BreakProgress += GetPlayerRelativeBlockHardness(a_OldBlock, m_Player->GetEquippedItem());
-		printf("breakprogress: %f\n", BreakProgress);
-		if (BreakProgress < 0.977778) { // breaking a wooden door with a wooden axe
+		BreakProgress += m_Player->GetPlayerRelativeBlockHardness(a_OldBlock);
+		if (BreakProgress < FASTBREAK_PERCENTAGE) {
+				LOGD("BreakProgress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), BreakProgress, FASTBREAK_PERCENTAGE);
 		// AntiFastBreak doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY-1, a_BlockZ, m_Player);  // Bug with doors and things like that.
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player); // Bug with doors.
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player);  // Bug with doors and things like that.
 		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
-			m_Player->SendMessage("FastBreak?");
+			m_Player->SendMessage("FastBreak?"); // TODO Anticheat hook
 			return;
 		}
 	}
@@ -1354,7 +1268,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player); // Bug with doors.
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player);  // Bug with doors.
 		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
 		return;
 	}
@@ -2088,7 +2002,7 @@ void cClientHandle::Tick(float a_Dt)
 	// anticheat fastbreak
 	if (m_HasStartedDigging) {
 		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
-		BreakProgress += GetPlayerRelativeBlockHardness(Block, m_Player->GetEquippedItem());
+		BreakProgress += m_Player->GetPlayerRelativeBlockHardness(Block);
 	}
 
 	// Process received network data:

@@ -63,6 +63,8 @@ public:  // tolua_export
 	static const int MAX_VIEW_DISTANCE = 32;
 	static const int MIN_VIEW_DISTANCE = 1;
 
+	static float FASTBREAK_PERCENTAGE;
+
 	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
 	cClientHandle(const AString & a_IPString, int a_ViewDistance);
 
@@ -371,14 +373,6 @@ public:  // tolua_export
 
 	bool IsPlayerChunkSent();
 
-	float GetLiquidHeightPercent(NIBBLETYPE a_Meta);
-
-	bool IsInsideOfBlock(BLOCKTYPE a_Block);
-
-	float GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem);
-
-	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem);
-
 private:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
@@ -527,7 +521,6 @@ private:
 	cClientHandlePtr m_Self;
 
 	float BreakProgress;
-
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
