@@ -150,7 +150,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	auto settingsRepo = cpp14::make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(a_OverridesRepo));
 
 	LOG("Starting server...");
-	
+
 	cClientHandle::FASTBREAK_PERCENTAGE = settingsRepo->GetValueSetI("AntiCheat", "FastBreakPercentage", 97) / 100.0f;
 
 	m_MojangAPI = new cMojangAPI;

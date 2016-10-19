@@ -55,6 +55,7 @@ static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(
 
 int cClientHandle::s_ClientCount = 0;
 
+
 float cClientHandle::FASTBREAK_PERCENTAGE = 97;
 
 
@@ -1249,14 +1250,15 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	{
 		// Fix for very fast tools.
 		BreakProgress += m_Player->GetPlayerRelativeBlockHardness(a_OldBlock);
-		if (BreakProgress < FASTBREAK_PERCENTAGE) {
-				LOGD("BreakProgress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), BreakProgress, FASTBREAK_PERCENTAGE);
-		// AntiFastBreak doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY-1, a_BlockZ, m_Player);  // Bug with doors and things like that.
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player);  // Bug with doors and things like that.
-		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
-			m_Player->SendMessage("FastBreak?"); // TODO Anticheat hook
+		if (BreakProgress < FASTBREAK_PERCENTAGE)
+		{
+			LOGD("BreakProgress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), BreakProgress, FASTBREAK_PERCENTAGE);
+			// AntiFastBreak doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY-1, a_BlockZ, m_Player);  // Bug with doors and things like that.
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player);  // Bug with doors and things like that.
+			SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
+			m_Player->SendMessage("FastBreak?");  // TODO Anticheat hook
 			return;
 		}
 	}
@@ -1267,8 +1269,9 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player);  // Bug with doors.
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY-1, a_BlockZ, m_Player);  // Bug with doors and things like that.
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player);  // Bug with doors and things like that.
 		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
 		return;
 	}
@@ -2000,7 +2003,8 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 void cClientHandle::Tick(float a_Dt)
 {
 	// anticheat fastbreak
-	if (m_HasStartedDigging) {
+	if (m_HasStartedDigging)
+	{
 		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
 		BreakProgress += m_Player->GetPlayerRelativeBlockHardness(Block);
 	}
