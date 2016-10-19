@@ -2655,14 +2655,14 @@ float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
 
 bool cPlayer::IsInsideOfBlock(BLOCKTYPE a_Block)
 {
-	BLOCKTYPE Block = m_World->GetBlock((int)GetPosX(), (int)m_Stance, (int)GetPosZ());
+	BLOCKTYPE Block = m_World->GetBlock(static_cast<int>(GetPosX()), static_cast<int>(m_Stance), static_cast<int>(GetPosZ()));
 	if (Block != a_Block)
 	{
 		return false;
 	}
-	NIBBLETYPE Meta = GetWorld()->GetBlockMeta((int)GetPosX(), (int)m_Stance, (int)GetPosZ());
+	NIBBLETYPE Meta = GetWorld()->GetBlockMeta(static_cast<int>(GetPosX()), static_cast<int>(m_Stance), static_cast<int>(GetPosZ()));
 	float f = GetLiquidHeightPercent(Meta) - 0.11111111f;
-	float f1 = (float)(m_Stance + 1) - f;
+	float f1 = static_cast<float>(m_Stance + 1) - f;
 	bool flag = m_Stance < f1;
 	return flag;
 }
