@@ -1187,6 +1187,8 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 
+	BreakProgress = 0;
+
 	// Start dig animation
 	// TODO: calculate real animation speed
 	// TODO: Send animation packets even without receiving any other packets
@@ -1209,13 +1211,30 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-// I know these functions don't belong here, I'm just testing something.
-
-//bool cClientHandle::IsInsideOfBlock(BLOCKTYPE a_Block) {
+// I know these things don't belong here, I'm just testing something.
 
 
 
-//}
+float cClientHandle::GetLiquidHeightPercent(NIBBLETYPE a_Meta) {
+	if(a_Meta >= 8) {
+		a_Meta = 0;
+	}
+	return (float)(a_Meta + 1) / 9.0f;
+}
+
+
+
+bool cClientHandle::IsInsideOfBlock(BLOCKTYPE a_Block) {
+	BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_Player->GetPosX(), m_Player->GetStance(), m_Player->GetPosZ());
+	if (Block != a_Block) {
+		return false;
+	}
+	NIBBLETYPE Meta = m_Player->GetWorld()->GetBlockMeta(m_Player->GetPosX(), m_Player->GetStance(), m_Player->GetPosZ());
+	float f = GetLiquidHeightPercent(Meta) - 0.11111111f;
+	float f1 = (float)(m_Player->GetStance() + 1) - f;
+	bool flag = m_Player->GetStance() < f1;
+	return flag;
+}
 
 
 
@@ -1252,14 +1271,10 @@ float cClientHandle::GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem) {
 		}
 	}
 
-	printf("inwater: %s", (m_Player->IsSwimming() && !(a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0)) ? "true" : "false");
-	// TODO check if is swimming is the same as isinsideofmaterial(water)
-	if (m_Player->IsSwimming() && !(a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0)) {
+	if ((IsInsideOfBlock(E_BLOCK_WATER) || IsInsideOfBlock(E_BLOCK_STATIONARY_WATER)) && !(a_EquippedItem.m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0)) {
 		f /= 5.0f;
 	}
 	
-	// TODO isonground does not work correctly. if you stand on an edge is assumes you are not on ground.
-	printf(" notonground: %s\n", !m_Player->IsOnGround()?"true":"false");
 	if (!m_Player->IsOnGround()) {
 		f /= 5.0f;
 	}
@@ -1275,9 +1290,8 @@ float cClientHandle::GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem) {
 float cClientHandle::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem) {
 	float blockHardness = cBlockInfo::GetHardness(a_Block);
 	float digSpeed = GetDigSpeed(a_Block, a_EquippedItem);
-	// TODO Implement CanHarvestBlock correctly as CanHarvestBlock2
-	float canHarvestBlockDivisor = a_EquippedItem.GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f; // not correct: e.g. hand cant harvest deadbush, but canharvestblockdivisor is 30 --> see client
-	LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
+	float canHarvestBlockDivisor = a_EquippedItem.GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
+//	LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return blockHardness < 0 ? 0 : digSpeed / blockHardness / canHarvestBlockDivisor;
 }
 
@@ -1318,15 +1332,29 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		}
 	}
 
+	if (!m_Player->IsGameModeCreative() && !cBlockInfo::IsOneHitDig(a_OldBlock))
+	{
+		// Fix for very fast tools.
+		BreakProgress += GetPlayerRelativeBlockHardness(a_OldBlock, m_Player->GetEquippedItem());
+		printf("breakprogress: %f\n", BreakProgress);
+		if (BreakProgress < 0.977778) { // breaking a wooden door with a wooden axe
+		// AntiFastBreak doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player); // Bug with doors.
+		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
+			m_Player->SendMessage("FastBreak?");
+			return;
+		}
+	}
+
 	cWorld * World = m_Player->GetWorld();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
-
-	LOGD("PlayerRelativeBlockHardness: %f\n", GetPlayerRelativeBlockHardness(a_OldBlock, m_Player->GetEquippedItem()));
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY+1, a_BlockZ, m_Player); // Bug with doors.
 		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
 		return;
 	}
@@ -2057,6 +2085,12 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 void cClientHandle::Tick(float a_Dt)
 {
+	// anticheat fastbreak
+	if (m_HasStartedDigging) {
+		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
+		BreakProgress += GetPlayerRelativeBlockHardness(Block, m_Player->GetEquippedItem());
+	}
+
 	// Process received network data:
 	AString IncomingData;
 	{

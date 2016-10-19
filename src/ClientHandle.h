@@ -371,6 +371,10 @@ public:  // tolua_export
 
 	bool IsPlayerChunkSent();
 
+	float GetLiquidHeightPercent(NIBBLETYPE a_Meta);
+
+	bool IsInsideOfBlock(BLOCKTYPE a_Block);
+
 	float GetDigSpeed(BLOCKTYPE a_Block, cItem a_EquippedItem);
 
 	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block, cItem a_EquippedItem);
@@ -521,6 +525,8 @@ private:
 
 	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
 	cClientHandlePtr m_Self;
+
+	float BreakProgress;
 
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
