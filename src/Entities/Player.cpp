@@ -2676,7 +2676,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 	float f = GetEquippedItem().GetHandler()->GetStrVsBlock(a_Block);
 	if (f > 1.0f)
 	{
-		int efficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+		unsigned int efficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
 		if (efficiencyModifier > 0)
 		{
 			f += (efficiencyModifier * efficiencyModifier) + 1;
