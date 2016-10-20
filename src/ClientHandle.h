@@ -64,7 +64,7 @@ public:  // tolua_export
 	static const int MIN_VIEW_DISTANCE = 1;
 
 	/** The percentage how much a block has to be broken.
-	Should be a value between 0.7 (70% broken) and 1 (100% broken) depending on lag. 
+	Should be a value between 0.7 (70% broken) and 1 (100% broken) depending on lag.
 	Can be set in settings.ini [AntiCheat] FastBreakPercentage=(from 0 to 100) */
 	static float FASTBREAK_PERCENTAGE;
 

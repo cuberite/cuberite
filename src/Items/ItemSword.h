@@ -68,12 +68,12 @@ public:
 		else
 		{
 			if (
-			    IsBlockMaterialPlants(a_Block) ||
-			    IsBlockMaterialVine(a_Block)   ||
-			    IsBlockMaterialCoral(a_Block)  ||
-			    IsBlockMaterialLeaves(a_Block) ||
-			    IsBlockMaterialGourd(a_Block)
-			   )
+				IsBlockMaterialPlants(a_Block) ||
+				IsBlockMaterialVine(a_Block)   ||
+				IsBlockMaterialCoral(a_Block)  ||
+				IsBlockMaterialLeaves(a_Block) ||
+				IsBlockMaterialGourd(a_Block)
+			)
 			{
 				return 1.5f;
 			}

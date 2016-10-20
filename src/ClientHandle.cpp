@@ -1252,7 +1252,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(a_OldBlock);
 		if (m_BreakProgress < FASTBREAK_PERCENTAGE)
 		{
-			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress*100, FASTBREAK_PERCENTAGE*100);
+			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress * 100, FASTBREAK_PERCENTAGE * 100);
 			// AntiFastBreak doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // Bug with doors and things like that.
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
