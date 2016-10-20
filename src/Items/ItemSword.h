@@ -59,7 +59,7 @@ public:
 
 
 
-	virtual float GetStrVsBlock(BLOCKTYPE a_Block)
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
 	{
 		if (a_Block == E_BLOCK_COBWEB)
 		{
