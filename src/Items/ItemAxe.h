@@ -25,7 +25,8 @@ public:
 		if (!IsBlockMaterialWood(a_Block) && !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block))
 		{
 			return super::GetBlockBreakingStrength(a_Block);
-		} else
+		}
+		else
 		{
 			switch (m_ItemType)
 			{

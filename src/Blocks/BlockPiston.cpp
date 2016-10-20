@@ -133,7 +133,8 @@ void cBlockPistonHandler::PushBlocks(
 					moveBlockPos.x, moveBlockPos.y, moveBlockPos.z
 				);
 			}
-		} else
+		}
+		else
 		{
 			// Not breakable, just move it
 			a_World->SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
