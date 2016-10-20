@@ -81,9 +81,6 @@ public:
 			{
 				return 1.0f;
 			}
-
-
-			return (!IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block) && !IsBlockMaterialCoral(a_Block) && !IsBlockMaterialLeaves(a_Block) && !IsBlockMaterialGourd(a_Block)) ? 1.0f : 1.5f;
 		}
 	}
 
