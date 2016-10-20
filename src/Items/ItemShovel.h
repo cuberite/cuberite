@@ -59,24 +59,36 @@ public:
 		return false;
 	}
 
-	virtual float GetStrVsBlock(BLOCKTYPE a_Block)
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
 	{
-		if ((a_Block == E_BLOCK_CLAY) || (a_Block == E_BLOCK_DIRT) || (a_Block == E_BLOCK_FARMLAND) || (a_Block == E_BLOCK_GRASS) || (a_Block == E_BLOCK_GRAVEL) || (a_Block == E_BLOCK_MYCELIUM) || (a_Block == E_BLOCK_SAND) || (a_Block == E_BLOCK_SNOW) || (a_Block == E_BLOCK_SNOW_BLOCK) || (a_Block == E_BLOCK_SOULSAND)/* a_Block == 208 (GRASS_PATH, not implemented yet) */)
+		switch (a_Block)
 		{
-			switch (m_ItemType)
+			case E_BLOCK_CLAY:
+			case E_BLOCK_DIRT:
+			case E_BLOCK_FARMLAND:
+			case E_BLOCK_GRASS:
+			case E_BLOCK_GRAVEL:
+			case E_BLOCK_MYCELIUM:
+			case E_BLOCK_SAND:
+			case E_BLOCK_SNOW:
+			case E_BLOCK_SNOW_BLOCK:
+			case E_BLOCK_SOULSAND:
+			// Not implemented in cuberite yet.
+			case 208:
 			{
-				case E_ITEM_WOODEN_SHOVEL: return 2.0f;
-				case E_ITEM_STONE_SHOVEL:  return 4.0f;
-				case E_ITEM_IRON_SHOVEL:   return 6.0f;
-				case E_ITEM_GOLD_SHOVEL:   return 12.0f;
-				case E_ITEM_DIAMOND_SHOVEL: return 8.0f;
+				switch (m_ItemType)
+				{
+					case E_ITEM_WOODEN_SHOVEL:  return 2.0f;
+					case E_ITEM_STONE_SHOVEL:   return 4.0f;
+					case E_ITEM_IRON_SHOVEL:    return 6.0f;
+					case E_ITEM_GOLD_SHOVEL:    return 12.0f;
+					case E_ITEM_DIAMOND_SHOVEL: return 8.0f;
+				}
+				break;
 			}
-		} else
-		{
-			return super::GetStrVsBlock(a_Block);
+			default: return super::GetBlockBreakingStrength(a_Block);
 		}
-		ASSERT(!"Something is wrong here... ask mohe2015");
+		ASSERT(!"Something is wrong here... Maybe they are shovels out of a new material?");
 		return 1.0f;
 	}
-
 };

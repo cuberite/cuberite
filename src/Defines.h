@@ -511,7 +511,7 @@ inline bool IsBlockFence(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.WOOD
-inline bool IsBlockMaterial_WOOD(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -575,7 +575,7 @@ inline bool IsBlockMaterial_WOOD(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.PLANTS
-inline bool IsBlockMaterial_PLANTS(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -594,9 +594,9 @@ inline bool IsBlockMaterial_PLANTS(BLOCKTYPE a_BlockType)
 		case E_BLOCK_CARROTS:
 		case E_BLOCK_POTATOES:
 		// Blocks which don't exist in Cuberite yet.
-//  case 199:
-//  case 200:
-//  case 207:
+		case 199:
+		case 200:
+		case 207:
 		{
 			return true;
 		}
@@ -612,7 +612,7 @@ inline bool IsBlockMaterial_PLANTS(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.VINE
-inline bool IsBlockMaterial_VINE(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialVine(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -635,7 +635,7 @@ inline bool IsBlockMaterial_VINE(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.IRON
-inline bool IsBlockMaterial_IRON(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -655,9 +655,9 @@ inline bool IsBlockMaterial_IRON(BLOCKTYPE a_BlockType)
 		case E_BLOCK_HOPPER:
 		case E_BLOCK_IRON_TRAPDOOR:
 		// Blocks which don't exist in Cuberite yet.
-//  case 210:
-//  case 211:
-//  case 255:
+		case 210:
+		case 211:
+		case 255:
 		{
 			return true;
 		}
@@ -673,9 +673,9 @@ inline bool IsBlockMaterial_IRON(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.ANVIL
-inline bool IsBlockMaterial_ANVIL(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialAnvil(BLOCKTYPE a_BlockType)
 {
-	return a_BlockType == E_BLOCK_ANVIL;
+	return (a_BlockType == E_BLOCK_ANVIL);
 }
 
 
@@ -683,9 +683,9 @@ inline bool IsBlockMaterial_ANVIL(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.init.Blocks.WEB
-inline bool IsBlocks_WEB(BLOCKTYPE a_BlockType)
+inline bool IsBlocksWeb(BLOCKTYPE a_BlockType)
 {
-	return a_BlockType == E_BLOCK_COBWEB;
+	return (a_BlockType == E_BLOCK_COBWEB);
 }
 
 
@@ -693,7 +693,7 @@ inline bool IsBlocks_WEB(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.LEAVES
-inline bool IsBlockMaterial_LEAVES(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES);
 }
@@ -704,9 +704,9 @@ inline bool IsBlockMaterial_LEAVES(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.init.Blocks.WOOL
-inline bool IsBlocks_WOOL(BLOCKTYPE a_BlockType)
+inline bool IsBlocksWool(BLOCKTYPE a_BlockType)
 {
-	return a_BlockType == E_BLOCK_WOOL;
+	return (a_BlockType == E_BLOCK_WOOL);
 }
 
 
@@ -714,9 +714,21 @@ inline bool IsBlocks_WOOL(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.GOURD
-inline bool IsBlockMaterial_GOURD(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType)
 {
-	return (a_BlockType == E_BLOCK_PUMPKIN) || (a_BlockType == E_BLOCK_JACK_O_LANTERN) || (a_BlockType == E_BLOCK_MELON);
+	switch (a_BlockType)
+	{
+		case E_BLOCK_PUMPKIN:
+		case E_BLOCK_JACK_O_LANTERN:
+		case E_BLOCK_MELON:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
 }
 
 
@@ -724,7 +736,7 @@ inline bool IsBlockMaterial_GOURD(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.CORAL
-inline bool IsBlockMaterial_CORAL(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialCoral(BLOCKTYPE a_BlockType)
 {
 	return false;  // yes, there is no block in minecraft which belongs to this type.
 }
@@ -734,7 +746,7 @@ inline bool IsBlockMaterial_CORAL(BLOCKTYPE a_BlockType)
 
 
 // net.minecraft.block.material.Material.ROCK
-inline bool IsBlockMaterial_ROCK(BLOCKTYPE a_BlockType)
+inline bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -787,15 +799,15 @@ inline bool IsBlockMaterial_ROCK(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
 		case E_BLOCK_RED_SANDSTONE_SLAB:
 		// Blocks which don't exist in Cuberite yet.
-//  case 201:
-//  case 202:
-//  case 203:
-//  case 204:
-//  case 205:
-//  case 206:
-//  case 213:
-//  case 215:
-//  case 216:
+		case 201:
+		case 202:
+		case 203:
+		case 204:
+		case 205:
+		case 206:
+		case 213:
+		case 215:
+		case 216:
 		{
 			return true;
 		}

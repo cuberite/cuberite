@@ -64,9 +64,26 @@ public:
 		if (a_Block == E_BLOCK_COBWEB)
 		{
 			return 15.0f;
-		} else
+		}
+		else
 		{
-			return !IsBlockMaterial_PLANTS(a_Block) && !IsBlockMaterial_VINE(a_Block) && !IsBlockMaterial_CORAL(a_Block) && !IsBlockMaterial_LEAVES(a_Block) && !IsBlockMaterial_GOURD(a_Block) ? 1.0f : 1.5f;
+			if (
+			    IsBlockMaterialPlants(a_Block) ||
+			    IsBlockMaterialVine(a_Block)   ||
+			    IsBlockMaterialCoral(a_Block)  ||
+			    IsBlockMaterialLeaves(a_Block) ||
+			    IsBlockMaterialGourd(a_Block)
+			   )
+			{
+				return 1.5f;
+			}
+			else
+			{
+				return 1.0f;
+			}
+
+
+			return !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block) && !IsBlockMaterialCoral(a_Block) && !IsBlockMaterialLeaves(a_Block) && !IsBlockMaterialGourd(a_Block) ? 1.0f : 1.5f;
 		}
 	}
 

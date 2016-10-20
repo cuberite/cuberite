@@ -20,11 +20,11 @@ public:
 	}
 
 
-	virtual float GetStrVsBlock(BLOCKTYPE a_Block)
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
 	{
-		if (!IsBlockMaterial_WOOD(a_Block) && !IsBlockMaterial_PLANTS(a_Block) && !IsBlockMaterial_VINE(a_Block))
+		if (!IsBlockMaterialWood(a_Block) && !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block))
 		{
-			return super::GetStrVsBlock(a_Block);
+			return super::GetBlockBreakingStrength(a_Block);
 		} else
 		{
 			switch (m_ItemType)
@@ -36,7 +36,7 @@ public:
 				case E_ITEM_DIAMOND_AXE: return 8.0f;
 			}
 		}
-		ASSERT(!"Something is wrong here... ask mohe2015");
+		ASSERT(!"Something is wrong here... Maybe they are axes out of a new material?");
 		return 1.0f;
 	}
 

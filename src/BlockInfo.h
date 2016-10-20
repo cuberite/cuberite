@@ -70,7 +70,7 @@ public:
 	/** Sound when placing this block */
 	AString m_PlaceSound;
 
-	/** Block's hardness. If a player hits a block a value gets incremented every tick by the block's hardness * a multiplier (which tool are you using?, enchantings?, effects?, ...) until it is greater or equal to one. Then the block is broken. */
+	/** Block's hardness. The bigger the harder the block. */
 	float m_Hardness;
 
 	// tolua_end
@@ -116,7 +116,7 @@ protected:
 		, m_CanBeTerraformed(false)
 		, m_BlockHeight(1.0)
 		, m_PlaceSound("")
-		, m_Hardness(0.0F)
+		, m_Hardness(0.0f)
 		, m_Handler(nullptr)
 	{}
 
