@@ -370,8 +370,11 @@ inline AString BlockFaceToString(eBlockFace a_BlockFace)
 inline bool IsValidBlock(int a_BlockType)
 {
 	if (
-		(a_BlockType > -1) &&
-		(a_BlockType <= E_BLOCK_MAX_TYPE_ID)
+		(
+		 (a_BlockType > -1) &&
+		 (a_BlockType <= E_BLOCK_MAX_TYPE_ID)
+		) ||
+		(a_BlockType == 255) // the blocks 235-254 don't exist yet -> http://minecraft.gamepedia.com/Data_values#Block_IDs
 	)
 	{
 		return true;
@@ -593,10 +596,9 @@ inline bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COCOA_POD:
 		case E_BLOCK_CARROTS:
 		case E_BLOCK_POTATOES:
-		// Blocks which don't exist in Cuberite yet.
-		case 199:
-		case 200:
-		case 207:
+		case E_BLOCK_CHORUS_PLANT:
+		case E_BLOCK_CHORUS_FLOWER:
+		case E_BLOCK_BEETROOTS:
 		{
 			return true;
 		}
@@ -654,10 +656,9 @@ inline bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
 		case E_BLOCK_BLOCK_OF_REDSTONE:
 		case E_BLOCK_HOPPER:
 		case E_BLOCK_IRON_TRAPDOOR:
-		// Blocks which don't exist in Cuberite yet.
-		case 210:
-		case 211:
-		case 255:
+		case E_BLOCK_REPEATING_COMMAND_BLOCK:
+		case E_BLOCK_CHAIN_COMMAND_BLOCK:
+		case E_BLOCK_STRUCTURE_BLOCK:
 		{
 			return true;
 		}
@@ -798,16 +799,15 @@ inline bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RED_SANDSTONE_STAIRS:
 		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
 		case E_BLOCK_RED_SANDSTONE_SLAB:
-		// Blocks which don't exist in Cuberite yet.
-		case 201:
-		case 202:
-		case 203:
-		case 204:
-		case 205:
-		case 206:
-		case 213:
-		case 215:
-		case 216:
+		case E_BLOCK_PURPUR_BLOCK:
+		case E_BLOCK_PURPUR_PILLAR:
+		case E_BLOCK_PURPUR_STAIRS:
+		case E_BLOCK_PURPUR_DOUBLE_SLAB:
+		case E_BLOCK_PURPUR_SLAB:
+		case E_BLOCK_END_BRICKS:
+		case E_BLOCK_MAGMA:
+		case E_BLOCK_RED_NETHER_BRICK:
+		case E_BLOCK_BONE_BLOCK:
 		{
 			return true;
 		}

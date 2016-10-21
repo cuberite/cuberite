@@ -215,10 +215,31 @@ enum BLOCKTYPE
 	E_BLOCK_JUNGLE_DOOR = 195,
 	E_BLOCK_ACACIA_DOOR = 196,
 	E_BLOCK_DARK_OAK_DOOR = 197,
+	E_BLOCK_END_ROD = 198,
+	E_BLOCK_CHORUS_PLANT = 199,
+	E_BLOCK_CHORUS_FLOWER = 200,
+	E_BLOCK_PURPUR_BLOCK = 201,
+	E_BLOCK_PURPUR_PILLAR = 202,
+	E_BLOCK_PURPUR_STAIRS = 203,
+	E_BLOCK_PURPUR_DOUBLE_SLAB = 204,
+	E_BLOCK_PURPUR_SLAB = 205,
+	E_BLOCK_END_BRICKS = 206,
+	E_BLOCK_BEETROOTS = 207,
+	E_BLOCK_GRASS_PATH = 208,
+	E_BLOCK_END_GATEWAY = 209,
+	E_BLOCK_REPEATING_COMMAND_BLOCK = 210,
+	E_BLOCK_CHAIN_COMMAND_BLOCK = 211,
+	E_BLOCK_FROSTED_ICE = 212,
+	E_BLOCK_MAGMA = 213,
+	E_BLOCK_NETHER_WART_BLOCK = 214,
+	E_BLOCK_RED_NETHER_BRICK = 215,
+	E_BLOCK_BONE_BLOCK = 216,
+	// ...
+	E_BLOCK_STRUCTURE_BLOCK = 255,
 
-	// Keep these two as the last values. Update the last block value when adding another block
-	// IsValidBlock() depends on this
-	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_DARK_OAK_DOOR + 1,  ///< Number of individual (different) blocktypes
+	// Keep these two as the last values. Update the last block value to the last block with an id less than 255 when adding another block
+	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See http://minecraft.gamepedia.com/Data_values#Block_IDs
+	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_BONE_BLOCK + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 
 	// Synonym or ID compatibility

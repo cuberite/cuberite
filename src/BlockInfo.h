@@ -70,7 +70,7 @@ public:
 	/** Sound when placing this block */
 	AString m_PlaceSound;
 
-	/** Block's hardness. The bigger the harder the block. */
+	/** Block's hardness. The greater the value the longer the player needs to break the block. */
 	float m_Hardness;
 
 	// tolua_end

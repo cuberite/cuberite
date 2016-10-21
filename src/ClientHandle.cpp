@@ -56,7 +56,7 @@ static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(
 int cClientHandle::s_ClientCount = 0;
 
 
-float cClientHandle::FASTBREAK_PERCENTAGE = 97;
+float cClientHandle::FASTBREAK_PERCENTAGE;
 
 
 
