@@ -203,6 +203,10 @@ local g_ViolationPatterns =
 	-- We don't like "Type const *" and "Type const &". Use "const Type *" and "const Type &" instead:
 	{"const %&", "Use 'const Type &' instead of 'Type const &'"},
 	{"const %*", "Use 'const Type *' instead of 'Type const *'"},
+
+	-- Check if "else" is on the same line as a brace.
+	{"}%s*else", "else has to be on a separate line"},
+	{"else%s*{", "else has to be on a separate line"},
 }
 
 
