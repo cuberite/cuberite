@@ -11716,6 +11716,22 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sends the specified message to the player.",
 				},
+				SendMessageRaw =
+				{
+					Params =
+					{
+						{
+							Name = "Json",
+							Type = "string",
+						},
+						{
+							Name = "eChatType",
+							Type = "number",
+							IsOptional = true,
+						}
+					},
+					Notes = "Sends the specified json string to the player. The optional value eChatType (default ctChatBox) can be ctChatBox, ctSystem or ctAboveActionBar. You can use {{cJson}} to build a json string.",
+				},
 				SendMessageFailure =
 				{
 					Params =
