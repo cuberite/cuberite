@@ -2300,6 +2300,15 @@ void cClientHandle::SendChat(const cCompositeChat & a_Message)
 
 
 
+void cClientHandle::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
+{
+	m_Protocol->SendChatRaw(a_MessageRaw, a_Type);
+}
+
+
+
+
+
 void cClientHandle::SendChatAboveActionBar(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	cWorld * World = GetPlayer()->GetWorld();

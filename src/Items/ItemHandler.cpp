@@ -886,7 +886,3 @@ float cItemHandler::GetBlockBreakingStrength(BLOCKTYPE a_Block)
 	return 1.0f;
 }
 
-
-
-
-

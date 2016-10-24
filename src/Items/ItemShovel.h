@@ -73,8 +73,7 @@ public:
 			case E_BLOCK_SNOW:
 			case E_BLOCK_SNOW_BLOCK:
 			case E_BLOCK_SOULSAND:
-			// Not implemented in cuberite yet.
-			case 208:
+			case E_BLOCK_GRASS_PATH:
 			{
 				switch (m_ItemType)
 				{

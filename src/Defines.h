@@ -371,10 +371,10 @@ inline bool IsValidBlock(int a_BlockType)
 {
 	if (
 		(
-		 (a_BlockType > -1) &&
-		 (a_BlockType <= E_BLOCK_MAX_TYPE_ID)
+		(a_BlockType > -1) &&
+		(a_BlockType <= E_BLOCK_MAX_TYPE_ID)
 		) ||
-		(a_BlockType == 255) // the blocks 235-254 don't exist yet -> http://minecraft.gamepedia.com/Data_values#Block_IDs
+		(a_BlockType == 255)  // the blocks 235-254 don't exist yet -> http://minecraft.gamepedia.com/Data_values#Block_IDs
 	)
 	{
 		return true;
@@ -513,7 +513,6 @@ inline bool IsBlockFence(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.WOOD
 inline bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
@@ -577,7 +576,6 @@ inline bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.PLANTS
 inline bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
@@ -613,7 +611,6 @@ inline bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.VINE
 inline bool IsBlockMaterialVine(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
@@ -636,7 +633,6 @@ inline bool IsBlockMaterialVine(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.IRON
 inline bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
@@ -673,7 +669,6 @@ inline bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.ANVIL
 inline bool IsBlockMaterialAnvil(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_ANVIL);
@@ -683,7 +678,6 @@ inline bool IsBlockMaterialAnvil(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.init.Blocks.WEB
 inline bool IsBlocksWeb(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_COBWEB);
@@ -693,7 +687,6 @@ inline bool IsBlocksWeb(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.LEAVES
 inline bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES);
@@ -703,8 +696,6 @@ inline bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType)
 
 
 
-
-// net.minecraft.init.Blocks.WOOL
 inline bool IsBlocksWool(BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_WOOL);
@@ -714,7 +705,6 @@ inline bool IsBlocksWool(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.GOURD
 inline bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
@@ -736,7 +726,6 @@ inline bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.CORAL
 inline bool IsBlockMaterialCoral(BLOCKTYPE a_BlockType)
 {
 	return false;  // yes, there is no block in minecraft which belongs to this type.
@@ -746,7 +735,6 @@ inline bool IsBlockMaterialCoral(BLOCKTYPE a_BlockType)
 
 
 
-// net.minecraft.block.material.Material.ROCK
 inline bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
@@ -817,7 +805,6 @@ inline bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 		}
 	}
 }
-
 
 
 

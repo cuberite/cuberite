@@ -293,6 +293,20 @@ void cProtocol190::SendChat(const cCompositeChat & a_Message, eChatType a_Type, 
 
 
 
+void cProtocol190::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	// Send the json string to the client:
+	cPacketizer Pkt(*this, 0x0f);  // Chat Message packet
+	Pkt.WriteString(a_MessageRaw);
+	Pkt.WriteBEInt8(a_Type);
+}
+
+
+
+
+
 void cProtocol190::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_State == 3);  // In game mode?

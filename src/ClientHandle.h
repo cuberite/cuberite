@@ -158,6 +158,7 @@ public:  // tolua_export
 	void SendCameraSetTo                (const cEntity & a_Entity);
 	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                       (const cCompositeChat & a_Message);
+	void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type);
 	void SendChatAboveActionBar         (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatAboveActionBar         (const cCompositeChat & a_Message);
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");

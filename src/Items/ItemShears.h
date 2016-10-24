@@ -95,7 +95,21 @@ public:
 
 	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
 	{
-		return !IsBlocksWeb(a_Block) && !IsBlockMaterialLeaves(a_Block) ? (IsBlocksWool(a_Block) ? 5.0f/* WOOL */ : super::GetBlockBreakingStrength(a_Block) /* none of them */) : 15.0f /* WEB and LEAVES */;
+		if (IsBlocksWeb(a_Block) || IsBlockMaterialLeaves(a_Block))
+		{
+			return 15.0f;
+		}
+		else
+		{
+			if (IsBlocksWool(a_Block))
+			{
+				return 5.0f;
+			}
+			else
+			{
+				return super::GetBlockBreakingStrength(a_Block);
+			}
+		}
 	}
 
 } ;
