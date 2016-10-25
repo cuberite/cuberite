@@ -15437,6 +15437,10 @@ Constants =
 				{
 					Notes = "The blocktype for structure block"
 				},
+				E_BLOCK_STRUCTURE_VOID =
+				{
+					Notes = "The blocktype for structure void"
+				},
 				E_BLOCK_SUGARCANE =
 				{
 					Notes = "The blocktype for sugarcane"
