@@ -14507,8 +14507,6 @@ end
 			},
 			Constants =
 			{
-Constants =
-{
 				E_BLOCK_ACACIA_DOOR =
 				{
 					Notes = "The blocktype for acacia door"
