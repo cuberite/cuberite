@@ -15,7 +15,7 @@ function Initialize(a_Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick1);
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick2);
 	--]]
-	
+
 	local PM = cPluginManager;
 	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK,           OnPlayerUsingBlock);
 	PM:AddHook(cPluginManager.HOOK_PLAYER_USING_ITEM,            OnPlayerUsingItem);
@@ -38,24 +38,24 @@ function Initialize(a_Plugin)
 
 	-- Load the InfoReg shared library:
 	dofile(cPluginManager:GetPluginsPath() .. "/InfoReg.lua")
-	
+
 	-- Bind all the commands:
 	RegisterPluginInfoCommands();
-	
+
 	-- Bind all the console commands:
 	RegisterPluginInfoConsoleCommands();
-	
+
 	a_Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	a_Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
-	
+
 	-- TestBlockAreas()
 	-- TestSQLiteBindings()
 	-- TestExpatBindings()
 	TestPluginCalls()
-	
+
 	TestBlockAreasString()
 	TestStringBase64()
 	-- TestUUIDFromName()
@@ -63,7 +63,7 @@ function Initialize(a_Plugin)
 	TestFileExt()
 	-- TestFileLastMod()
 	TestPluginInterface()
-	
+
 	local LastSelfMod = cFile:GetLastModificationTime(a_Plugin:GetLocalFolder() .. "/Debuggers.lua")
 	LOG("Debuggers.lua last modified on " .. os.date("%Y-%m-%dT%H:%M:%S", LastSelfMod))
 
@@ -75,7 +75,7 @@ function Initialize(a_Plugin)
 		:SetMessageType(mtInfo)
 	)
 	--]]
-	
+
 	-- Test the crash in #1889:
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY,
 		function (a_CBPlayer, a_CBEntity)
@@ -87,7 +87,7 @@ function Initialize(a_Plugin)
 			)
 		end
 	)
-	
+
 	return true
 end;
 
@@ -105,7 +105,7 @@ function TestPluginInterface()
 			end
 		end
 	)
-	
+
 	cPluginManager:ForEachPlugin(
 		function (a_CBPlugin)
 			LOG("Plugin in " .. a_CBPlugin:GetFolderName() .. " has an API name of " .. a_CBPlugin:GetName() .. " and status " .. a_CBPlugin:GetStatus())
@@ -156,7 +156,7 @@ function TestPluginCalls()
 	-- Note the signature: function ReturnColorFromChar( Split, char ) ... return cChatColog.Gray ... end
 	-- The Split parameter should be a table, but it is not used in that function anyway,
 	-- so we can get away with passing nil to it.
-	
+
 	LOG("Debuggers: Calling NoSuchPlugin.FnName()...")
 	cPluginManager:CallPlugin("NoSuchPlugin", "FnName", "SomeParam")
 	LOG("Debuggers: Calling Core.NoSuchFunction()...")
@@ -177,7 +177,7 @@ end
 
 function TestBlockAreas()
 	LOG("Testing block areas...");
-	
+
 	-- Debug block area merging:
 	local BA1 = cBlockArea();
 	local BA2 = cBlockArea();
@@ -192,7 +192,7 @@ function TestBlockAreas()
 	else
 		BA1:Create(16, 16, 16);
 	end
-	
+
 	-- Debug block area cuboid filling:
 	BA1:FillRelCuboid(2, 9, 2, 8, 2, 8, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK);
 	BA1:RelLine(2, 2, 2, 9, 8, 8, cBlockArea.baTypes or cBlockArea.baMetas, E_BLOCK_SAPLING, E_META_SAPLING_BIRCH);
@@ -204,18 +204,18 @@ function TestBlockAreas()
 		BA1:SaveToSchematicFile("schematics/lt_XY.schematic");
 		BA1:MirrorXYNoMeta();
 		BA1:SaveToSchematicFile("schematics/lt_XY2.schematic");
-		
+
 		BA1:MirrorXZNoMeta();
 		BA1:SaveToSchematicFile("schematics/lt_XZ.schematic");
 		BA1:MirrorXZNoMeta();
 		BA1:SaveToSchematicFile("schematics/lt_XZ2.schematic");
-		
+
 		BA1:MirrorYZNoMeta();
 		BA1:SaveToSchematicFile("schematics/lt_YZ.schematic");
 		BA1:MirrorYZNoMeta();
 		BA1:SaveToSchematicFile("schematics/lt_YZ2.schematic");
 	end
-	
+
 	-- Debug block area rotation:
 	if (BA1:LoadFromSchematicFile("schematics/rot.schematic")) then
 		BA1:RotateCWNoMeta();
@@ -246,23 +246,23 @@ function TestBlockAreas()
 		BA1:SaveToSchematicFile("schematics/ltm_XY.schematic");
 		BA1:MirrorXY();
 		BA1:SaveToSchematicFile("schematics/ltm_XY2.schematic");
-		
+
 		BA1:MirrorXZ();
 		BA1:SaveToSchematicFile("schematics/ltm_XZ.schematic");
 		BA1:MirrorXZ();
 		BA1:SaveToSchematicFile("schematics/ltm_XZ2.schematic");
-		
+
 		BA1:MirrorYZ();
 		BA1:SaveToSchematicFile("schematics/ltm_YZ.schematic");
 		BA1:MirrorYZ();
 		BA1:SaveToSchematicFile("schematics/ltm_YZ2.schematic");
 	end
-	
+
 	LOG("Block areas test ended");
 end
 
 
-	
+
 
 
 
@@ -281,7 +281,7 @@ function TestBlockAreasString()
 	local f = io.open("schematics/StringTest.schematic", "wb")
 	f:write(Data)
 	f:close()
-	
+
 	-- Load a second area from that file:
 	local BA2 = cBlockArea()
 	if not(BA2:LoadFromSchematicFile("schematics/StringTest.schematic")) then
@@ -289,7 +289,7 @@ function TestBlockAreasString()
 		return
 	end
 	BA2:Clear()
-	
+
 	-- Load another area from a string in that file:
 	f = io.open("schematics/StringTest.schematic", "rb")
 	Data = f:read("*all")
@@ -308,11 +308,11 @@ function TestStringBase64()
 	for i = 0, 255 do
 		s = s .. string.char(i)
 	end
-	
+
 	-- Roundtrip through Base64:
 	local Base64 = Base64Encode(s)
 	local UnBase64 = Base64Decode(Base64)
-	
+
 	assert(UnBase64 == s)
 end
 
@@ -322,7 +322,7 @@ end
 
 function TestUUIDFromName()
 	LOG("Testing UUID-from-Name resolution...")
-	
+
 	-- Test by querying a few existing names, along with a non-existent one:
 	local PlayerNames =
 	{
@@ -332,7 +332,7 @@ function TestUUIDFromName()
 	}
 	-- WARNING: Blocking operation! DO NOT USE IN TICK THREAD!
 	local UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames)
-	
+
 	-- Log the results:
 	for _, name in ipairs(PlayerNames) do
 		local UUID = UUIDs[name]
@@ -342,7 +342,7 @@ function TestUUIDFromName()
 			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
 		end
 	end
-	
+
 	-- Test once more with the same players, valid-only. This should go directly from cache, so fast.
 	LOG("Testing again with the same valid players...")
 	local ValidPlayerNames =
@@ -371,7 +371,7 @@ function TestUUIDFromName()
 		"notch",  -- Valid player name, but not cached (most likely :)
 	}
 	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames3, true)
-	
+
 	-- Log the results:
 	for _, name in ipairs(PlayerNames3) do
 		local UUID = UUIDs[name]
@@ -383,7 +383,7 @@ function TestUUIDFromName()
 	end
 
 	LOG("UUID-from-Name resolution tests finished.")
-	
+
 	LOG("Performing a Name-from-UUID test...")
 	-- local NameToTest = "aloe_vera"
 	local NameToTest = "xoft"
@@ -410,7 +410,7 @@ end
 
 function TestSQLiteBindings()
 	LOG("Testing SQLite bindings...");
-	
+
 	-- Debug SQLite binding
 	local TestDB, ErrCode, ErrMsg = sqlite3.open("test.sqlite");
 	if (TestDB ~= nil) then
@@ -439,7 +439,7 @@ function TestSQLiteBindings()
 		-- This happens if for example SQLite cannot open the file (eg. a folder with the same name exists)
 		LOG("SQLite3 failed to open DB! (" .. ErrCode .. ", " .. ErrMsg ..")");
 	end
-	
+
 	LOG("SQLite bindings test ended");
 end
 
@@ -449,7 +449,7 @@ end
 
 function TestExpatBindings()
 	LOG("Testing Expat bindings...");
-	
+
 	-- Debug LuaExpat bindings:
 	local count = 0
 	callbacks = {
@@ -472,7 +472,7 @@ function TestExpatBindings()
 	p:parse("\n");
 	p:parse();  -- finishes the document
 	p:close();  -- closes the parser
-	
+
 	LOG("Expat bindings test ended");
 end
 
@@ -490,7 +490,7 @@ function OnUsingBlazeRod(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cur
 		local TempItem = cItem(Type, 1, Meta);
 		Player:SendMessage(cChatColor.LightGray .. "Block {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "}: " .. ItemToFullString(TempItem) .. " (" .. Type .. ":" .. Meta .. ")");
 	end
-	
+
 	local X, Y, Z = AddFaceDirection(BlockX, BlockY, BlockZ, BlockFace);
 	Valid, Type, Meta = Player:GetWorld():GetBlockTypeMeta(X, Y, Z);
 	if (Type == E_BLOCK_AIR) then
@@ -517,27 +517,27 @@ function OnUsingDiamond(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Curs
 
 	LOG("Size before cropping: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 	Area:DumpToRawFile("crop0.dat");
-	
+
 	Area:Crop(2, 3, 0, 0, 0, 0);
 	LOG("Size after cropping 1: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 	Area:DumpToRawFile("crop1.dat");
-	
+
 	Area:Crop(2, 3, 0, 0, 0, 0);
 	LOG("Size after cropping 2: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 	Area:DumpToRawFile("crop2.dat");
-	
+
 	Area:Expand(2, 3, 0, 0, 0, 0);
 	LOG("Size after expanding 1: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 	Area:DumpToRawFile("expand1.dat");
-	
+
 	Area:Expand(3, 2, 1, 1, 0, 0);
 	LOG("Size after expanding 2: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 	Area:DumpToRawFile("expand2.dat");
-	
+
 	Area:Crop(0, 0, 0, 0, 3, 2);
 	LOG("Size after cropping 3: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 	Area:DumpToRawFile("crop3.dat");
-	
+
 	Area:Crop(0, 0, 3, 2, 0, 0);
 	LOG("Size after cropping 4: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 	Area:DumpToRawFile("crop4.dat");
@@ -571,7 +571,7 @@ end
 function OnUsingEnderPearl(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ)
 	-- Rclk with an ender pearl saves a predefined area around the cursor into a .schematic file. Also tests area copying
 	local Area = cBlockArea();
-	if not(Area:Read(Player:GetWorld(), 
+	if not(Area:Read(Player:GetWorld(),
 		BlockX - 8, BlockX + 8, BlockY - 8, BlockY + 8, BlockZ - 8, BlockZ + 8)
 	) then
 		LOG("LUA: Area couldn't be read");
@@ -717,14 +717,14 @@ function OnTick()
 			table.remove(g_DropSpensersToActivate, i);
 		end
 	end
-	
-	
+
+
 	-- If GCOnTick > 0, do a garbage-collect and decrease by one
 	if (GCOnTick > 0) then
 		collectgarbage();
 		GCOnTick = GCOnTick - 1;
 	end
-	
+
 	return false;
 end
 
@@ -741,8 +741,8 @@ function OnWorldTick(a_World, a_Dt)
 	a_World:ForEachPlayer(
 		function(a_Player)
 			a_Player:SendMessage(
-				tostring(Tick / 10) .. 
-				" > FS: fl " .. a_Player:GetFoodLevel() .. 
+				tostring(Tick / 10) ..
+				" > FS: fl " .. a_Player:GetFoodLevel() ..
 				"; sat " .. a_Player:GetFoodSaturationLevel() ..
 				"; exh " .. a_Player:GetFoodExhaustionLevel()
 			);
@@ -782,7 +782,7 @@ end
 function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	-- Get the topmost block coord:
 	local Height = a_ChunkDesc:GetHeight(0, 0);
-	
+
 	-- Create a sign there:
 	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
 	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
@@ -827,7 +827,7 @@ end
 
 function HandleListEntitiesCmd(Split, Player)
 	local NumEntities = 0;
-	
+
 	local ListEntity = function(Entity)
 		if (Entity:IsDestroyed()) then
 			-- The entity has already been destroyed, don't list it
@@ -842,7 +842,7 @@ function HandleListEntitiesCmd(Split, Player)
 		end
 		NumEntities = NumEntities + 1;
 	end
-	
+
 	Player:SendMessage("Listing all entities...");
 	Player:GetWorld():ForEachEntity(ListEntity);
 	Player:SendMessage("List finished, " .. NumEntities .. " entities listed");
@@ -855,7 +855,7 @@ end
 
 function HandleKillEntitiesCmd(Split, Player)
 	local NumEntities = 0;
-	
+
 	local KillEntity = function(Entity)
 		-- kill everything except for players:
 		if (Entity:GetEntityType() ~= cEntity.etPlayer) then
@@ -863,7 +863,7 @@ function HandleKillEntitiesCmd(Split, Player)
 			NumEntities = NumEntities + 1;
 		end;
 	end
-	
+
 	Player:SendMessage("Killing all entities...");
 	Player:GetWorld():ForEachEntity(KillEntity);
 	Player:SendMessage("Killed " .. NumEntities .. " entities.");
@@ -900,7 +900,7 @@ function HandleTestWndCmd(a_Split, a_Player)
 		a_Player:SendMessage("Usage: /testwnd [WindowType WindowSizeX WindowSizeY]");
 		return true;
 	end
-	
+
 	-- Test out the OnClosing callback's ability to refuse to close the window
 	local attempt = 1;
 	local OnClosing = function(Window, Player, CanRefuse)
@@ -908,12 +908,12 @@ function HandleTestWndCmd(a_Split, a_Player)
 		attempt = attempt + 1;
 		return CanRefuse and (attempt <= 3);  -- refuse twice, then allow, unless CanRefuse is set to true
 	end
-	
+
 	-- Log the slot changes
 	local OnSlotChanged = function(Window, SlotNum)
 		LOG("Window \"" .. Window:GetWindowTitle() .. "\" slot " .. SlotNum .. " changed.");
 	end
-	
+
 	local Window = cLuaWindow(WindowType, WindowSizeX, WindowSizeY, "TestWnd");
 	local Item2 = cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "1=1");
 	local Item3 = cItem(E_ITEM_DIAMOND_SHOVEL);
@@ -929,13 +929,13 @@ function HandleTestWndCmd(a_Split, a_Player)
 	Window:SetSlot(a_Player, 4, Item5);
 	Window:SetOnClosing(OnClosing);
 	Window:SetOnSlotChanged(OnSlotChanged);
-	
+
 	a_Player:OpenWindow(Window);
-	
+
 	-- To make sure that the object has the correct life-management in Lua,
 	-- let's garbage-collect in the following few ticks
 	GCOnTick = 10;
-	
+
 	return true;
 end
 
@@ -1024,12 +1024,12 @@ function HandleFoodLevelCmd(a_Split, a_Player)
 		a_Player:SendMessage("Missing an argument: the food level to set");
 		return true;
 	end
-	
+
 	a_Player:SetFoodLevel(tonumber(a_Split[2]));
 	a_Player:SetFoodSaturationLevel(5);
 	a_Player:SetFoodExhaustionLevel(0);
 	a_Player:SendMessage(
-		"Food level set to " .. a_Player:GetFoodLevel() .. 
+		"Food level set to " .. a_Player:GetFoodLevel() ..
 		", saturation reset to " .. a_Player:GetFoodSaturationLevel() ..
 		" and exhaustion reset to " .. a_Player:GetFoodExhaustionLevel()
 	);
@@ -1053,17 +1053,17 @@ function HandleSpideyCmd(a_Split, a_Player)
 			World:SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COBWEB, 0);
 		end
 	};
-	
+
 	local EyePos = a_Player:GetEyePosition();
 	local LookVector = a_Player:GetLookVector();
 	LookVector:Normalize();
-	
+
 	-- Start cca 2 blocks away from the eyes
 	local Start = EyePos + LookVector + LookVector;
 	local End = EyePos + LookVector * 50;
-	
+
 	cLineBlockTracer.Trace(World, Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
-	
+
 	return true;
 end
 
@@ -1099,7 +1099,7 @@ function HandleArrowCmd(a_Split, a_Player)
 	local Speed = a_Player:GetLookVector();
 	Speed:Normalize();
 	Pos = Pos + Speed;
-	
+
 	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkArrow, a_Player, Speed * 10);
 	return true;
 end
@@ -1114,7 +1114,7 @@ function HandleFireballCmd(a_Split, a_Player)
 	local Speed = a_Player:GetLookVector();
 	Speed:Normalize();
 	Pos = Pos + Speed * 2;
-	
+
 	World:CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity.pkGhastFireball, a_Player, Speed * 10);
 	return true;
 end
@@ -1134,7 +1134,7 @@ end
 
 function HandleRemoveXp(a_Split, a_Player)
 	a_Player:SetCurrentExperience(0);
-	
+
 	return true;
 end
 
@@ -1217,7 +1217,7 @@ end
 
 function HandleSched(a_Split, a_Player)
 	local World = a_Player:GetWorld()
-	
+
 	-- Schedule a broadcast of a countdown message:
 	for i = 1, 10 do
 		World:ScheduleTask(i * 20,
@@ -1226,7 +1226,7 @@ function HandleSched(a_Split, a_Player)
 			end
 		)
 	end
-	
+
 	-- Schedule a broadcast of the final message and a note to the originating player
 	-- Note that we CANNOT use the a_Player in the callback - what if the player disconnected?
 	-- Therefore we store the player's EntityID
@@ -1246,7 +1246,7 @@ function HandleSched(a_Split, a_Player)
 			)
 		end
 	)
-	
+
 	return true
 end
 
@@ -1362,7 +1362,7 @@ end
 
 function OnPluginMessage(a_Client, a_Channel, a_Message)
 	LOGINFO("Received a plugin message from client " .. a_Client:GetUsername() .. ": channel '" .. a_Channel .. "', message '" .. a_Message .. "'");
-	
+
 	if (a_Channel == "REGISTER") then
 		if (a_Message:find("WECUI")) then
 			-- The client has WorldEditCUI mod installed, test the comm by sending a few WECUI messages:
@@ -1389,29 +1389,29 @@ function HandleChunkStay(a_Split, a_Player)
 	-- As an example of using ChunkStay, this call will load 3x3 chunks around the specified chunk coords,
 	-- then build an obsidian pillar in the middle of each one.
 	-- Once complete, the player will be teleported to the middle pillar
-	
+
 	if (#a_Split ~= 3) then
 		a_Player:SendMessageInfo("Usage: /cs <ChunkX> <ChunkZ>")
 		return true
 	end
-	
+
 	local ChunkX = tonumber(a_Split[2])
 	local ChunkZ = tonumber(a_Split[3])
 	if ((ChunkX == nil) or (ChunkZ == nil)) then
 		a_Player:SendMessageFailure("Invalid chunk coords.")
 		return true
 	end
-	
+
 	local World = a_Player:GetWorld()
 	local PlayerID = a_Player:GetUniqueID()
 	a_Player:SendMessageInfo("Loading chunks, stand by...");
-	
+
 	-- Set the wanted chunks:
 	local Chunks = {}
 	for z = -1, 1 do for x = -1, 1 do
 		table.insert(Chunks, {ChunkX + x, ChunkZ + z})
 	end end
-	
+
 	-- The function that is called when all chunks are available
 	-- Will perform the actual action with all those chunks
 	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before the chunks load
@@ -1425,7 +1425,7 @@ function HandleChunkStay(a_Split, a_Player)
 				World:SetBlock(BlockX, y, BlockZ, E_BLOCK_OBSIDIAN, 0)
 			end
 		end end
-		
+
 		-- Teleport the player there for visual inspection:
 		World:DoWithEntityByID(PlayerID,
 			function (a_CallbackPlayer)
@@ -1434,7 +1434,7 @@ function HandleChunkStay(a_Split, a_Player)
 			end
 		)
 	end
-	
+
 	-- This function will be called for each chunk that is made available
 	-- Note that the player needs to be referenced using their EntityID - in case they disconnect before the chunks load
 	local OnChunkAvailable = function(a_ChunkX, a_ChunkZ)
@@ -1445,7 +1445,7 @@ function HandleChunkStay(a_Split, a_Player)
 			end
 		)
 	end
-	
+
 	-- Process the ChunkStay:
 	World:ChunkStay(Chunks, OnChunkAvailable, OnAllChunksAvailable)
 	return true
@@ -1463,13 +1463,13 @@ function HandleCompo(a_Split, a_Player)
 	msg:AddTextPart(" rules! ")
 	msg:AddRunCommandPart("Set morning", "/time set 0")
 	a_Player:SendMessage(msg)
-	
+
 	-- Broadcast another one to the world:
 	local msg2 = cCompositeChat()
 	msg2:AddSuggestCommandPart(a_Player:GetName(), "/tell " .. a_Player:GetName() .. " ")
 	msg2:AddTextPart(" knows how to use cCompositeChat!");
 	a_Player:GetWorld():BroadcastChat(msg2)
-	
+
 	return true
 end
 
@@ -1500,7 +1500,7 @@ function HandleSetBiome(a_Split, a_Player)
 			return true
 		end
 	end
-	
+
 	local BlockX = math.floor(a_Player:GetPosX())
 	local BlockZ = math.floor(a_Player:GetPosZ())
 	a_Player:GetWorld():SetAreaBiome(BlockX - Size, BlockX + Size, BlockZ - Size, BlockZ + Size, Biome)
@@ -1526,7 +1526,7 @@ function HandleWESel(a_Split, a_Player)
 		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, the selection is not a cuboid"))
 		return true
 	end
-	
+
 	-- Get the selection:
 	local SelCuboid = cCuboid()
 	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "GetPlayerCuboidSelection", a_Player, SelCuboid)
@@ -1534,11 +1534,11 @@ function HandleWESel(a_Split, a_Player)
 		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while getting current selection"))
 		return true
 	end
-	
+
 	-- Adjust the selection:
 	local NumBlocks = tonumber(a_Split[2] or "1") or 1
 	SelCuboid:Expand(NumBlocks, NumBlocks, 0, 0, NumBlocks, NumBlocks)
-	
+
 	-- Set the selection:
 	IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
 	if not(IsSuccess) then
@@ -1571,7 +1571,7 @@ function OnProjectileHitBlock(a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Bloc
 	-- Test projectile hooks by setting the blocks they hit on fire:
 	local BlockX, BlockY, BlockZ = AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace)
 	local World = a_Projectile:GetWorld()
-	
+
 	World:SetBlock(BlockX, BlockY, BlockZ, E_BLOCK_FIRE, 0)
 end
 
@@ -1734,7 +1734,7 @@ function HandleConsoleInh(a_Split, a_FullCmd)
 	if (world == nil) then
 		return true, "Cannot test inheritance, no default world"
 	end
-	
+
 	-- Install the hook, if needed:
 	if not(isInhHookInstalled) then
 		cPluginManager:AddHook(cPluginManager.HOOK_SPAWNING_ENTITY,
@@ -1748,7 +1748,7 @@ function HandleConsoleInh(a_Split, a_FullCmd)
 		)
 		isInhHookInstalled = true
 	end
-	
+
 	-- Create the projectile:
 	LOG("Creating a " .. kindStr .. " projectile in world " .. world:GetName() .. "...")
 	local msg
@@ -1762,7 +1762,7 @@ function HandleConsoleInh(a_Split, a_FullCmd)
 				return
 			end
 			LOG("Entity created, ID #" .. entityID)
-			
+
 			-- Call a function on the newly created entity:
 			local hasExecutedCallback = false
 			world:DoWithEntityByID(
@@ -1780,11 +1780,11 @@ function HandleConsoleInh(a_Split, a_FullCmd)
 				msg = "The callback failed to execute"
 				return
 			end
-			
+
 			msg = "Inheritance test finished"
 		end
 	)
-	
+
 	return true, msg
 end
 
@@ -1798,7 +1798,7 @@ function HandleConsoleLoadChunk(a_Split)
 	if (numParams ~= 3) and (numParams ~= 4) then
 		return true, "Usage: " .. a_Split[1] .. " <ChunkX> <ChunkZ> [<WorldName>]"
 	end
-	
+
 	-- Get the chunk coords:
 	local chunkX = tonumber(a_Split[2])
 	if (chunkX == nil) then
@@ -1819,7 +1819,7 @@ function HandleConsoleLoadChunk(a_Split)
 			return true, "There's no world named '" .. a_Split[4] .. "'."
 		end
 	end
-	
+
 	-- Queue a ChunkStay for the chunk, log a message when the chunk is loaded:
 	world:ChunkStay({{chunkX, chunkZ}}, nil,
 		function()
@@ -1839,7 +1839,7 @@ function HandleConsolePrepareChunk(a_Split)
 	if (numParams ~= 3) and (numParams ~= 4) then
 		return true, "Usage: " .. a_Split[1] .. " <ChunkX> <ChunkZ> [<WorldName>]"
 	end
-	
+
 	-- Get the chunk coords:
 	local chunkX = tonumber(a_Split[2])
 	if (chunkX == nil) then
@@ -1860,7 +1860,7 @@ function HandleConsolePrepareChunk(a_Split)
 			return true, "There's no world named '" .. a_Split[4] .. "'."
 		end
 	end
-	
+
 	-- Queue the chunk for preparing, log a message when prepared:
 	world:PrepareChunk(chunkX, chunkZ,
 		function(a_CBChunkX, a_CBChunkZ)
@@ -1942,7 +1942,7 @@ function HandleConsoleTestBbox(a_Split, a_EntireCmd)
 		LOG("  {" .. intersection:GetMinX() .. ", " .. intersection:GetMinY() .. ", " .. intersection:GetMinZ() .. "}")
 		LOG("  {" .. intersection:GetMaxX() .. ", " .. intersection:GetMaxY() .. ", " .. intersection:GetMaxZ() .. "}")
 	end
-	
+
 	-- Test line intersection:
 	local lines =
 	{
@@ -1959,7 +1959,7 @@ function HandleConsoleTestBbox(a_Split, a_EntireCmd)
 		assert(coeff == coeff2)
 		assert(face == face2)
 	end
-	
+
 	return true
 end
 
@@ -1970,7 +1970,7 @@ end
 function HandleConsoleTestCall(a_Split, a_EntireCmd)
 	LOG("Testing inter-plugin calls")
 	LOG("Note: These will fail if the Core plugin is not enabled")
-	
+
 	-- Test calling the HandleConsoleWeather handler:
 	local pm = cPluginManager
 	LOG("Calling Core's HandleConsoleWeather")
@@ -1985,7 +1985,7 @@ function HandleConsoleTestCall(a_Split, a_EntireCmd)
 	else
 		LOG("FAILED")
 	end
-	
+
 	-- Test injecting some code:
 	LOG("Injecting code into the Core plugin")
 	isSuccess = pm:CallPlugin("Core", "dofile", pm:GetCurrentPlugin():GetLocalFolder() .. "/Inject.lua")
@@ -1994,7 +1994,7 @@ function HandleConsoleTestCall(a_Split, a_EntireCmd)
 	else
 		LOG("FAILED")
 	end
-	
+
 	-- Test the full capabilities of the table-passing API, using the injected function:
 	LOG("Calling injected code")
 	isSuccess = pm:CallPlugin("Core", "injectedPrintParams",
@@ -2039,14 +2039,19 @@ function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	assert(t2 == nil)
 	assert(type(msg) == "string")
 	LOG("Json parsing an invalid string: Error message returned: " .. msg)
-	
+
 	LOG("Json parsing test succeeded")
-	
+
 	LOG("Testing Json serializing...")
-	local s1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}, d = true}, {indentation = " "})
-	LOG("Serialization result: " .. (s1 or "<nil>"))
+	local s1, msg1 = cJson:Serialize({a = 1, b = "2", c = {3, "4", 5}, d = true}, {indentation = " "})
+	LOG("Serialization result: " .. (s1 or ("ERROR: " .. (msg1 or "<no message>"))))
+
+	local s2, msg2 = cJson:Serialize({valueA = 1, valueB = {3, badValue = "4", 5}, d = true}, {indentation = " "})
+	assert(not(s2), "Serialization should have failed")
+	LOG("Serialization correctly failed with message: " .. (msg2 or "<no message>"))
+
 	LOG("Json serializing test succeeded")
-	
+
 	return true
 end
 
@@ -2067,7 +2072,7 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 		end
 		Coords[i] = v
 	end
-	
+
 	-- Get the world in which to test:
 	local World
 	if (a_Split[8]) then
@@ -2078,7 +2083,7 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 	if not(World) then
 		return true, "No such world"
 	end
-	
+
 	-- Define the callbacks to use for tracing:
 	local Callbacks =
 	{
@@ -2120,7 +2125,7 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 			end
 		end
 	end
-	
+
 	-- Load the chunks and do the trace once loaded:
 	World:ChunkStay(Chunks,
 		nil,
@@ -2211,7 +2216,7 @@ function HandleConsoleUuid(a_Split, a_EntireCmd)
 	if not(playerName) then
 		return true, "Usage: uuid <PlayerName>"
 	end
-	
+
 	-- Query with cache:
 	LOG("Player " .. playerName .. ":")
 	local cachedUuid = cMojangAPI:GetUUIDFromPlayerName(playerName, true)
@@ -2220,7 +2225,7 @@ function HandleConsoleUuid(a_Split, a_EntireCmd)
 	else
 		LOG("  - in the cache: \"" .. cachedUuid .. "\"")
 	end
-	
+
 	-- Query online:
 	local onlineUuid = cMojangAPI:GetUUIDFromPlayerName(playerName, false)
 	if not(onlineUuid) then
@@ -2228,7 +2233,7 @@ function HandleConsoleUuid(a_Split, a_EntireCmd)
 	else
 		LOG("  - online: \"" .. onlineUuid .. "\"")
 	end
-	
+
 	return true
 end
 
@@ -2241,13 +2246,13 @@ function HandleConsoleBBox(a_Split)
 	local v1 = Vector3d(1, 1, 1)
 	local v2 = Vector3d(5, 5, 5)
 	local v3 = Vector3d(11, 11, 11)
-	
+
 	if (bbox:IsInside(v1)) then
 		LOG("v1 is inside bbox")
 	else
 		LOG("v1 is not inside bbox")
 	end
-	
+
 	if (bbox:IsInside(v2)) then
 		LOG("v2 is inside bbox")
 	else
@@ -2265,25 +2270,25 @@ function HandleConsoleBBox(a_Split)
 	else
 		LOG("v1*v2 is not inside bbox")
 	end
-	
+
 	if (bbox:IsInside(v2, v1)) then
 		LOG("v2*v1 is inside bbox")
 	else
 		LOG("v2*v1 is not inside bbox")
 	end
-	
+
 	if (bbox:IsInside(v1, v3)) then
 		LOG("v1*v3 is inside bbox")
 	else
 		LOG("v1*v3 is not inside bbox")
 	end
-	
+
 	if (bbox:IsInside(v2, v3)) then
 		LOG("v2*v3 is inside bbox")
 	else
 		LOG("v2*v3 is not inside bbox")
 	end
-	
+
 	return true
 end
 
@@ -2298,7 +2303,7 @@ function HandleConsoleDownload(a_Split)
 	if (not(url) or not(fnam)) then
 		return true, "Missing parameters. Usage: download <url> <filename>"
 	end
-	
+
 	local callbacks =
 	{
 		OnStatusLine = function (self, a_HttpVersion, a_Status, a_Rest)
@@ -2306,7 +2311,7 @@ function HandleConsoleDownload(a_Split)
 				LOG("Cannot download " .. url .. ", HTTP error code " .. a_Status)
 				return
 			end
-			
+
 			local f, err = io.open(fnam, "wb")
 			if not(f) then
 				LOG("Cannot download " .. url .. ", error opening the file " .. fnam .. ": " .. (err or "<no message>"))
@@ -2320,7 +2325,7 @@ function HandleConsoleDownload(a_Split)
 				self.m_File:write(a_Data)
 			end
 		end,
-		
+
 		OnBodyFinished = function (self)
 			if (self.m_File) then
 				self.m_File:close()
@@ -2328,7 +2333,7 @@ function HandleConsoleDownload(a_Split)
 			end
 		end,
 	}
-	
+
 	local isSuccess, msg = cUrlClient:Get(url, callbacks)
 	if not(isSuccess) then
 		LOG("Cannot start an URL download: " .. (msg or "<no message>"))
@@ -2353,15 +2358,15 @@ function HandleBlkCmd(a_Split, a_Player)
 			end
 		end
 	};
-	
+
 	local EyePos = a_Player:GetEyePosition();
 	local LookVector = a_Player:GetLookVector();
 	LookVector:Normalize();
-	
+
 	local End = EyePos + LookVector * 50;
-	
+
 	cLineBlockTracer.Trace(World, Callbacks, EyePos.x, EyePos.y, EyePos.z, End.x, End.y, End.z);
-	
+
 	return true;
 end
 
