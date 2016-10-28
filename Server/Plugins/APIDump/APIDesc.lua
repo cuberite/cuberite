@@ -9494,7 +9494,7 @@ end
 							Type = "string",
 						},
 					},
-					Notes = "Serializes the input table into a Json string. The options table, if present, is used to adjust the formatting of the serialized string, see below for details.",
+					Notes = "Serializes the input table into a Json string. The options table, if present, is used to adjust the formatting of the serialized string, see below for details. <br/>Returns nil and error message if the table cannot be serialized (eg. contains both an array part and a dictionary part).",
 				},
 			},
 			AdditionalInfo =
