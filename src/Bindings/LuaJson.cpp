@@ -22,6 +22,53 @@ static Json::Value JsonSerializeValue(cLuaState & a_LuaState);
 
 
 
+/** Exception thrown when the input cannot be serialized.
+Keeps track of the error message and the problematic value's path in the table.
+*/
+class CannotSerializeException:
+	public std::runtime_error
+{
+	typedef std::runtime_error Super;
+public:
+	/** Constructs a new instance of the exception based on the provided values directly. */
+	explicit CannotSerializeException(const AString & a_ValueName, const char * a_ErrorMsg):
+		Super(a_ErrorMsg),
+		m_ValueName(a_ValueName)
+	{
+	}
+
+	/** Constructs a new instance of the exception based on the provided values directly. */
+	explicit CannotSerializeException(int a_ValueIndex, const char * a_ErrorMsg):
+		Super(a_ErrorMsg),
+		m_ValueName(Printf("%d", a_ValueIndex))
+	{
+	}
+
+	/** Constructs a new instance of the exception that takes the error message and value name from the parent, and prefix the value name with the specified prefix.
+	Used for prefixing the value name's path along the call stack that lead to the main exception. */
+	explicit CannotSerializeException(const CannotSerializeException & a_Parent, const AString & a_ValueNamePrefix):
+		Super(a_Parent.what()),
+		m_ValueName(a_ValueNamePrefix + "." + a_Parent.m_ValueName)
+	{
+	}
+
+	/** Constructs a new instance of the exception that takes the error message and value name from the parent, and prefix the value name with the specified prefix.
+	Used for prefixing the value name's path along the call stack that lead to the main exception. */
+	explicit CannotSerializeException(const CannotSerializeException & a_Parent, int a_ValueNamePrefixIndex):
+		Super(a_Parent.what()),
+		m_ValueName(Printf("%d", a_ValueNamePrefixIndex) + "." + a_Parent.m_ValueName)
+	{
+	}
+
+	const AString & GetValueName() const { return m_ValueName; }
+
+protected:
+	AString m_ValueName;
+};
+
+
+
+
 
 /** Pushes the specified Json array as a table on top of the specified Lua state.
 Assumes that a_Value is an array. */
@@ -136,14 +183,36 @@ static Json::Value JsonSerializeTable(cLuaState & a_LuaState)
 		{
 			int idx;
 			a_LuaState.GetStackValue(-2, idx);
-			res[idx - 1] = JsonSerializeValue(a_LuaState);
+			try
+			{
+				res[idx - 1] = JsonSerializeValue(a_LuaState);
+			}
+			catch (const CannotSerializeException & exc)
+			{
+				throw CannotSerializeException(exc, idx);
+			}
+			catch (const std::exception & exc)  // Cannot catch Json::Exception, because it's not properly defined
+			{
+				throw CannotSerializeException(idx, exc.what());
+			}
 		}
 		else
 		{
 			AString name;
 			if (a_LuaState.GetStackValue(-2, name))
 			{
-				res[name] = JsonSerializeValue(a_LuaState);
+				try
+				{
+					res[name] = JsonSerializeValue(a_LuaState);
+				}
+				catch (const CannotSerializeException & exc)
+				{
+					throw CannotSerializeException(exc, name);
+				}
+				catch (const std::exception & exc)  // Cannot catch Json::Exception, because it's not properly defined
+				{
+					throw CannotSerializeException(name, exc.what());
+				}
 			}
 		}
 		lua_pop(a_LuaState, 1);
@@ -259,7 +328,17 @@ static int tolua_cJson_Serialize(lua_State * a_LuaState)
 
 	// Push the table to the top of the Lua stack, and call the serializing function:
 	lua_pushvalue(L, 2);
-	Json::Value root = JsonSerializeValue(L);
+	Json::Value root;
+	try
+	{
+		root = JsonSerializeValue(L);
+	}
+	catch (const CannotSerializeException & exc)
+	{
+		lua_pushnil(L);
+		L.Push(Printf("Cannot serialize into Json, value \"%s\" caused an error \"%s\"", exc.GetValueName().c_str(), exc.what()));
+		return 2;
+	}
 	lua_pop(L, 1);
 
 	// Create the writer, with all properties (optional param 3) applied to it:
