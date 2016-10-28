@@ -26,29 +26,25 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 		local FileName = Folder .. fnam;
 		-- We only want .lua files from the folder:
 		if (cFile:IsFile(FileName) and fnam:match(".*%.lua$")) then
-			local TablesFn, Err = loadfile(FileName);
-			if (type(TablesFn) ~= "function") then
-				LOGWARNING("Cannot load API descriptions from " .. FileName .. ", Lua error '" .. Err .. "'.");
-			else
-				local Tables = TablesFn();
-				if (type(Tables) ~= "table") then
-					LOGWARNING("Cannot load API descriptions from " .. FileName .. ", returned object is not a table (" .. type(Tables) .. ").");
-					break
+			local TablesFn = assert(loadfile(FileName))
+			local Tables = TablesFn()
+			if (type(Tables) ~= "table") then
+				error("Cannot load API descriptions from " .. FileName .. ", returned object is not a table (" .. type(Tables) .. ").")
+				break
+			end
+			for k, cls in pairs(Tables) do
+				if (a_DstTable[k]) then
+					-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
+					LOGWARNING(string.format(
+						"APIDump warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
+						k, FileName
+					))
+					local f = io.open("DuplicateDocs.txt", "a")
+					f:write(k, "\t", FileName)
+					f:close()
 				end
-				for k, cls in pairs(Tables) do
-					if (a_DstTable[k]) then
-						-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
-						LOGWARNING(string.format(
-							"APIDump warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
-							k, FileName
-						))
-						local f = io.open("DuplicateDocs.txt", "a")
-						f:write(k, "\t", FileName)
-						f:close()
-					end
-					a_DstTable[k] = cls;
-				end
-			end  -- if (TablesFn)
+				a_DstTable[k] = cls
+			end
 		end  -- if (is lua file)
 	end  -- for fnam - Folder[]
 end
@@ -2039,6 +2035,9 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	if (newUndocumented) then
 		return true, "Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n")
 	end
+
+	-- The check completed successfully, remove the "test failed" flag from the filesystem:
+	cFile:DeleteFile("apiCheckFailed.flag")
 
 	return true, "API check completed successfully"
 end
