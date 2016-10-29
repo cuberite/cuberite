@@ -1369,35 +1369,9 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown)
-{
-	m_NewWorld = a_World;
-	m_NewWorldPosition = a_NewPosition;
-	m_IsWorldChangeScheduled = true;
-	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
-}
-
-
-
 
 bool cEntity::DetectPortal()
 {
-	// If somebody scheduled a world change with ScheduleMoveToWorld, change worlds now.
-	if (m_IsWorldChangeScheduled)
-	{
-		m_IsWorldChangeScheduled = false;
-
-		if (m_WorldChangeSetPortalCooldown)
-		{
-			// Delay the portal check.
-			m_PortalCooldownData.m_TicksDelayed = 0;
-			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-		}
-
-		MoveToWorld(m_NewWorld, false, m_NewWorldPosition);
-		return true;
-	}
-
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
 		if (GetWorld()->GetLinkedNetherWorldName().empty() && GetWorld()->GetLinkedEndWorldName().empty())
@@ -1408,168 +1382,291 @@ bool cEntity::DetectPortal()
 	}
 	else if (GetWorld()->GetLinkedOverworldName().empty())
 	{
-		// Overworld teleportation disabled, abort
+		// Overworld teleportation disabled and we are not in an overworld, abort
 		return false;
 	}
 
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	if ((Y > 0) && (Y < cChunkDef::Height))
+	switch (GetWorld()->GetBlock(X, Y, Z))
 	{
-		switch (GetWorld()->GetBlock(X, Y, Z))
+		case E_BLOCK_NETHER_PORTAL:
 		{
-			case E_BLOCK_NETHER_PORTAL:
+			if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 			{
-				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
-				{
-					// Just exited a portal, don't teleport again
-					return false;
-				}
-
-				if (IsPlayer() && !(reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
-				{
-					// Delay teleportation for four seconds if the entity is a non-creative player
-					m_PortalCooldownData.m_TicksDelayed++;
-					return false;
-				}
-				m_PortalCooldownData.m_TicksDelayed = 0;
-
-				// Nether portal in the nether
-				if (GetWorld()->GetDimension() == dimNether)
-				{
-					if (GetWorld()->GetLinkedOverworldName().empty())
-					{
-						return false;
-					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
-
-					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
-
-					if (IsPlayer())
-					{
-						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
-						(reinterpret_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
-					}
-
-					Vector3d TargetPos = GetPosition();
-					TargetPos.x *= 8.0;
-					TargetPos.z *= 8.0;
-
-					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, cChunkDef::Height);
-					return true;
-				}
-				// Nether portal in the overworld
-				else
-				{
-					if (GetWorld()->GetLinkedNetherWorldName().empty())
-					{
-						return false;
-					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
-
-					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-					if (IsPlayer())
-					{
-						if (DestionationDim == dimNether)
-						{
-							reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
-						}
-
-						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
-					}
-
-					Vector3d TargetPos = GetPosition();
-					TargetPos.x /= 8.0;
-					TargetPos.z /= 8.0;
-
-					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, (cChunkDef::Height / 2));
-					return true;
-				}
+				// Just exited a portal, don't teleport again
+				return false;
 			}
-			case E_BLOCK_END_PORTAL:
+
+			if (IsPlayer() && !(reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
 			{
-				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
+				// Delay teleportation for four seconds if the entity is a non-creative player
+				m_PortalCooldownData.m_TicksDelayed++;
+				return false;
+			}
+			m_PortalCooldownData.m_TicksDelayed = 0;
+
+			// Nether portal in the nether
+			if (GetWorld()->GetDimension() == dimNether)
+			{
+				if (GetWorld()->GetLinkedOverworldName().empty())
 				{
 					return false;
 				}
+				cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+				eDimension DestionationDim = DestinationWorld->GetDimension();
 
-				// End portal in the end
-				if (GetWorld()->GetDimension() == dimEnd)
+				m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
+
+				if (IsPlayer())
 				{
-
-					if (GetWorld()->GetLinkedOverworldName().empty())
-					{
-						return false;
-					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
-
-
-					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-					if (IsPlayer())
-					{
-						cPlayer * Player = reinterpret_cast<cPlayer *>(this);
-						if (Player->GetBedWorld() == DestinationWorld)
-						{
-							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
-						}
-						else
-						{
-							Player->TeleportToCoords(DestinationWorld->GetSpawnX(), DestinationWorld->GetSpawnY(), DestinationWorld->GetSpawnZ());
-						}
-						Player->GetClientHandle()->SendRespawn(DestionationDim);
-					}
-
-					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
-				}
-				// End portal in the overworld
-				else
-				{
-					if (GetWorld()->GetLinkedEndWorldName().empty())
-					{
-						return false;
-					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
-
-					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-					if (IsPlayer())
-					{
-						if (DestionationDim == dimEnd)
-						{
-							reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
-						}
-						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
-					}
-
-					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
+					(reinterpret_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
 				}
 
+				Vector3d TargetPos = GetPosition();
+				TargetPos.x *= 8.0;
+				TargetPos.z *= 8.0;
+
+				cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+				ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+				LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
+				new cNetherPortalScanner(this, TargetWorld, TargetPos, cChunkDef::Height);
+				return true;
 			}
-			default: break;
+			// Nether portal in the overworld
+			else
+			{
+				if (GetWorld()->GetLinkedNetherWorldName().empty())
+				{
+					return false;
+				}
+				cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
+				eDimension DestionationDim = DestinationWorld->GetDimension();
+
+				m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+				if (IsPlayer())
+				{
+					if (DestionationDim == dimNether)
+					{
+						reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
+					}
+
+					reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
+				}
+
+				Vector3d TargetPos = GetPosition();
+				TargetPos.x /= 8.0;
+				TargetPos.z /= 8.0;
+
+				cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
+				ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+				LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
+				new cNetherPortalScanner(this, TargetWorld, TargetPos, (cChunkDef::Height / 2));
+				return true;
+			}
 		}
+		case E_BLOCK_END_PORTAL:
+		{
+			if (m_PortalCooldownData.m_ShouldPreventTeleportation)
+			{
+				return false;
+			}
+
+			// End portal in the end
+			if (GetWorld()->GetDimension() == dimEnd)
+			{
+
+				if (GetWorld()->GetLinkedOverworldName().empty())
+				{
+					return false;
+				}
+				cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+				eDimension DestionationDim = DestinationWorld->GetDimension();
+
+
+				m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+				if (IsPlayer())
+				{
+					cPlayer * Player = reinterpret_cast<cPlayer *>(this);
+					if (Player->GetBedWorld() == DestinationWorld)
+					{
+						Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+					}
+					else
+					{
+						Player->TeleportToCoords(DestinationWorld->GetSpawnX(), DestinationWorld->GetSpawnY(), DestinationWorld->GetSpawnZ());
+					}
+					Player->GetClientHandle()->SendRespawn(DestionationDim);
+				}
+
+				cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+				ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+				LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
+				return MoveToWorld(TargetWorld, false);
+			}
+			// End portal in the overworld
+			else
+			{
+				if (GetWorld()->GetLinkedEndWorldName().empty())
+				{
+					return false;
+				}
+				cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
+				eDimension DestionationDim = DestinationWorld->GetDimension();
+
+				m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+				if (IsPlayer())
+				{
+					if (DestionationDim == dimEnd)
+					{
+						reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
+					}
+					reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
+				}
+
+				cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
+				ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+				LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
+				return MoveToWorld(TargetWorld, false);
+			}
+
+		}
+		default: break;
 	}
+
+	// If we reached this line, then players are not (or no longer) standing in a portal
 
 	// Allow portals to work again
 	m_PortalCooldownData.m_ShouldPreventTeleportation = false;
+
+	// Players can teleport only after staying in a portal for 4 seconds (80 ticks)
 	m_PortalCooldownData.m_TicksDelayed = 0;
 	return false;
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+{
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World->GetSpawnX(), a_World->GetSpawnY(), a_World->GetSpawnZ()));
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
+{
+	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
+	if (World == nullptr)
+	{
+		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
+		return false;
+	}
+
+	return MoveToWorld(World, a_ShouldSendRespawn);
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition)
+{
+	return DoMoveToWorld(a_World, true, a_NewPosition);
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(const AString & a_WorldName, Vector3d a_NewPosition)
+{
+	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
+	if (World == nullptr)
+	{
+		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
+		return false;
+	}
+
+	return MoveToWorld(World, a_NewPosition);
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+{
+	return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition);
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+{
+	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
+	if (World == nullptr)
+	{
+		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
+		return false;
+	}
+
+	return MoveToWorld(World, a_ShouldSendRespawn, a_NewPosition);
+}
+
+
+
+
+
+void cEntity::SetSwimState(cChunk & a_Chunk)
+{
+	int RelY = FloorC(GetPosY() + 0.1);
+	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
+	{
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
+
+	BLOCKTYPE BlockIn;
+	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
+
+	// Check if the player is swimming:
+	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
+	{
+		// This sometimes happens on Linux machines
+		// Ref.: https://forum.cuberite.org/thread-1244.html
+		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
+			RelX, RelY, GetPosX(), GetPosZ()
+		);
+		m_IsSwimming = false;
+		m_IsSubmerged = false;
+		return;
+	}
+	m_IsSwimming = IsBlockWater(BlockIn);
+
+	// Check if the player is submerged:
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
+	m_IsSubmerged = IsBlockWater(BlockIn);
+}
+
+
+
+
+
+void cEntity::SetIsTicking(bool a_IsTicking)
+{
+	m_IsTicking = a_IsTicking;
+	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
 }
 
 
@@ -1581,6 +1678,9 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	UNUSED(a_ShouldSendRespawn);
 	ASSERT(a_World != nullptr);
 	ASSERT(IsTicking());
+
+	// Prevent the entity from teleporting back immediately, in case the destination is a portal
+	m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
 	if (GetWorld() == a_World)
 	{
@@ -1629,87 +1729,6 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
 	});
 	return true;
-}
-
-
-
-
-
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
-{
-	return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition);
-}
-
-
-
-
-
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
-{
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World->GetSpawnX(), a_World->GetSpawnY(), a_World->GetSpawnZ()));
-}
-
-
-
-
-
-bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
-{
-	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
-	if (World == nullptr)
-	{
-		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
-		return false;
-	}
-
-	return DoMoveToWorld(World, a_ShouldSendRespawn, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
-}
-
-
-
-
-
-void cEntity::SetSwimState(cChunk & a_Chunk)
-{
-	int RelY = FloorC(GetPosY() + 0.1);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
-	{
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
-		return;
-	}
-
-	BLOCKTYPE BlockIn;
-	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
-
-	// Check if the player is swimming:
-	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
-	{
-		// This sometimes happens on Linux machines
-		// Ref.: https://forum.cuberite.org/thread-1244.html
-		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
-			RelX, RelY, GetPosX(), GetPosZ()
-		);
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
-		return;
-	}
-	m_IsSwimming = IsBlockWater(BlockIn);
-
-	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
-	m_IsSubmerged = IsBlockWater(BlockIn);
-}
-
-
-
-
-
-void cEntity::SetIsTicking(bool a_IsTicking)
-{
-	m_IsTicking = a_IsTicking;
-	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
 }
 
 

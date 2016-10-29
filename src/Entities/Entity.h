@@ -407,20 +407,25 @@ public:
 	/** Teleports to the coordinates specified */
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
-	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false);
-
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
-
-	/** Moves entity to specified world, taking a world pointer */
+	/** Moves entity to specified world, taking a world pointer, and put it in spawnpoint */
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
 
-	/** Moves entity to specified world, taking a world name */
+	/** Moves entity to specified world, taking a world name, and put it in spawnpoint */
 	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 
-	// tolua_end
+	/** Moves entity to specified world, taking a world pointer, and put it in a_NewPosition */
+	bool MoveToWorld(cWorld * a_World, Vector3d a_NewPosition);
 
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+	/** Moves entity to specified world, taking a world pointer, and put it in a_NewPosition */
+	bool MoveToWorld(const AString & a_WorldName, Vector3d a_NewPosition);
+
+	/** Moves entity to specified world, taking a world pointer, and put it in a_NewPosition */
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+
+	/** Moves entity to specified world, taking a world pointer, and put it in a_NewPosition */
+	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+
+	// tolua_end
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
@@ -503,6 +508,9 @@ public:
 	void SetIsTicking(bool a_IsTicking);
 
 protected:
+
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{

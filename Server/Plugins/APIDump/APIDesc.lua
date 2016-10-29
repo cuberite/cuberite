@@ -5480,7 +5480,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world. If the value is true, the server will automatically decide what packet or sequence of respawn packets to send. Otherwise, no respawn packets are sent. Returns true on success, false otherwise. Attempts to move to the same world will be ignored, and the entity's position will not change.",
 					},
 					{
 						Params =
@@ -5501,7 +5501,47 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world. If the value is true, the server will automatically decide what packet or sequence of respawn packets to send. Otherwise, no respawn packets are sent. Returns true on success, false otherwise. Attempts to move to the same world will be ignored, and the entity's position will not change.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "Position",
+								Type = "Vector3d",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. Returns true on success, false otherwise. Attempts to move to the same world will be ignored, and the entity's position will not change.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "WorldName",
+								Type = "string",
+							},
+							{
+								Name = "Position",
+								Type = "Vector3d",
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. Returns true on success, false otherwise. Attempts to move to the same world will be ignored, and the entity's position will not change.",
 					},
 					{
 						Params =
@@ -5525,28 +5565,32 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world. <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world. If the value is true, the server will automatically decide what packet or sequence of respawn packets to send. Otherwise, no respawn packets are sent. Returns true on success, false otherwise. Attempts to move to the same world will be ignored, and the entity's position will not change.",
 					},
-				},
-				ScheduleMoveToWorld =
-				{
-					Params =
 					{
+						Params =
 						{
-							Name = "World",
-							Type = "cWorld",
+							{
+								Name = "WorldName",
+								Type = "string",
+							},
+							{
+								Name = "ShouldSendRespawn",
+								Type = "boolean",
+							},
+							{
+								Name = "Position",
+								Type = "Vector3d",
+							},
 						},
+						Returns =
 						{
-							Name = "NewPosition",
-							Type = "Vector3d",
+							{
+								Type = "boolean",
+							},
 						},
-						{
-							Name = "ShouldSetPortalCooldown",
-							Type = "boolean",
-							IsOptional = true,
-						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world. If the value is true, the server will automatically decide what packet or sequence of respawn packets to send. Otherwise, no respawn packets are sent. Returns true on success, false otherwise. Attempts to move to the same world will be ignored, and the entity's position will not change.",
 					},
-					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity.",
 				},
 				SetGravity =
 				{

@@ -370,10 +370,6 @@ public:
 	void SetVisible( bool a_bVisible);  // tolua_export
 	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
-	/** Moves the player to the specified world.
-	Returns true if successful, false on failure (world not found). */
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) override;
-
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
 
@@ -710,4 +706,8 @@ private:
 	/** Pins the player to a_Location until Unfreeze() is called.
 	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
 	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
+
+	/** Moves the player to the specified world.
+	Returns true if successful, false on failure (world not found). */
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) override;
 } ;  // tolua_export

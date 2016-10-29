@@ -354,8 +354,8 @@ void cPlayer::TickFreezeCode()
 				{
 					// If we find a position with enough space for the player
 					if (
-						(Chunk->GetBlock(Rel.x, NewY, Rel.z) == E_BLOCK_AIR) &&
-						(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z) == E_BLOCK_AIR)
+						(!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY, Rel.z))) &&
+						(!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z)))
 					)
 					{
 						// If the found position is not the same as the original
@@ -1807,89 +1807,6 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
-{
-	ASSERT(a_World != nullptr);
-	ASSERT(IsTicking());
-
-	if (GetWorld() == a_World)
-	{
-		// Don't move to same world
-		return false;
-	}
-
-	//  Ask the plugins if the player is allowed to change the world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
-	{
-		// A Plugin doesn't allow the player to change the world
-		return false;
-	}
-
-	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
-	{
-		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-		GetClientHandle()->InvalidateCachedSentChunk();
-
-		// Prevent further ticking in this world
-		SetIsTicking(false);
-
-		// Tell others we are gone
-		GetWorld()->BroadcastDestroyEntity(*this);
-
-		// Remove player from world
-		GetWorld()->RemovePlayer(this, false);
-
-		// Set position to the new position
-		SetPosition(a_NewPosition);
-		FreezeInternal(a_NewPosition, false);
-
-		// Stop all mobs from targeting this player
-		StopEveryoneFromTargetingMe();
-
-		cClientHandle * ch = this->GetClientHandle();
-		if (ch != nullptr)
-		{
-			// Send the respawn packet:
-			if (a_ShouldSendRespawn)
-			{
-				m_ClientHandle->SendRespawn(a_World->GetDimension());
-			}
-
-
-			// Update the view distance.
-			ch->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
-
-			// Send current weather of target world to player
-			if (a_World->GetDimension() == dimOverworld)
-			{
-				ch->SendWeather(a_World->GetWeather());
-			}
-		}
-
-		// Broadcast the player into the new world.
-		a_World->BroadcastSpawnEntity(*this);
-
-		// Queue add to new world and removal from the old one
-
-		SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-		cChunk * ParentChunk = this->GetParentChunk();
-
-		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-			this->GetName().c_str(),
-			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
-		);
-		ParentChunk->RemoveEntity(this);
-		a_World->AddPlayer(this, &a_OldWorld);  // New world will take over and announce client at its next tick
-	});
-
-	return true;
-}
-
-
-
-
-
 bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
 	LoadRank();
@@ -2635,4 +2552,90 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 	m_SprintingMaxSpeed = SprintMaxSpeed;
 	m_FlyingMaxSpeed = FlyingMaxpeed;
 	m_IsFlying = IsFlying;
+}
+
+
+
+
+
+bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+{
+	ASSERT(a_World != nullptr);
+	ASSERT(IsTicking());
+
+	if (GetWorld() == a_World)
+	{
+		// Don't move to same world
+		return false;
+	}
+
+	//  Ask the plugins if the player is allowed to change the world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	{
+		// A Plugin doesn't allow the player to change the world
+		return false;
+	}
+
+	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
+	{
+		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
+		GetClientHandle()->InvalidateCachedSentChunk();
+
+		// Prevent further ticking in this world
+		SetIsTicking(false);
+
+		// Tell others we are gone
+		GetWorld()->BroadcastDestroyEntity(*this);
+
+		// Remove player from world
+		GetWorld()->RemovePlayer(this, false);
+
+		// Set position to the new position
+		SetPosition(a_NewPosition);
+		FreezeInternal(a_NewPosition, false);
+
+		// Stop all mobs from targeting this player
+		StopEveryoneFromTargetingMe();
+
+		cClientHandle * ch = this->GetClientHandle();
+		if (ch != nullptr)
+		{
+			// Send the respawn packet:
+			if (a_ShouldSendRespawn)
+			{
+				m_ClientHandle->SendRespawn(a_World->GetDimension());
+			}
+
+
+			// Update the view distance.
+			ch->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
+
+			// Send current weather of target world to player
+			if (a_World->GetDimension() == dimOverworld)
+			{
+				ch->SendWeather(a_World->GetWeather());
+			}
+		}
+
+		// Broadcast the player into the new world.
+		a_World->BroadcastSpawnEntity(*this);
+
+		// Prevent the player from teleporting back immediately, in case the destination is a portal
+		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+		// Queue add to new world and removal from the old one
+
+		SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+		cChunk * ParentChunk = this->GetParentChunk();
+
+		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+			this->GetName().c_str(),
+			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
+			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+		);
+		ParentChunk->RemoveEntity(this);
+		a_World->AddPlayer(this, &a_OldWorld);  // New world will take over and announce client at its next tick
+	});
+
+	return true;
 }
