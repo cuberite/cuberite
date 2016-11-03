@@ -81,6 +81,7 @@ protected:
 	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 
@@ -181,6 +182,8 @@ public:
 	// Get functions.
 	int  GetFueledTimeLeft(void) const {return m_FueledTimeLeft; }
 	bool IsFueled (void)         const {return m_IsFueled;}
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 
 private:
 

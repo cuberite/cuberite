@@ -18,6 +18,8 @@ public:
 	CLASS_PROTODEF(cBat)
 
 	bool IsHanging(void) const {return false; }
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 

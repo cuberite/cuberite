@@ -44,6 +44,8 @@ public:
 	eRabbitType GetRabbitType()         const { return m_Type; }
 	int         GetMoreCarrotTicks()    const { return m_MoreCarrotTicks; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	eRabbitType m_Type;

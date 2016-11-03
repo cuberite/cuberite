@@ -139,3 +139,16 @@ void cWither::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+
+void cWither::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // Center head target
+	a_Writer.SkipMeta();  // Left head target
+	a_Writer.SkipMeta();  // Right head target
+	a_Writer.WriteInt(static_cast<Int32>(GetWitherInvulnerableTicks()));
+}
+
+
+
+

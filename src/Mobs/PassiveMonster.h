@@ -47,6 +47,8 @@ public:
 
 	virtual void Destroyed(void) override;
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 	/** The monster's breeding partner. */
 	cPassiveMonster * m_LovePartner;

@@ -124,3 +124,13 @@ bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+
+void cPig::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteBool(IsSaddled());  // Has saddle
+}
+
+
+
+

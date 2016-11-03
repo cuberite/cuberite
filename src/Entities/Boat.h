@@ -46,6 +46,8 @@ public:
 
 	void UpdatePaddles(bool rightPaddleUsed, bool leftPaddleUsed);
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 	int m_LastDamage;
 	int m_ForwardDirection;

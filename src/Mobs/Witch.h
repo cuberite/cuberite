@@ -20,6 +20,8 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 
 	bool IsAngry(void) const {return ((m_EMState == ATTACKING) || (m_EMState == CHASING)); }
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 

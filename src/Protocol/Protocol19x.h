@@ -22,6 +22,7 @@ Declares the 1.9.x protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+#include "../MetadataWriter.h"
 
 #ifdef _MSC_VER
 	#pragma warning(push)
@@ -57,10 +58,11 @@ class cProtocol190 :
 	public cProtocol
 {
 	typedef cProtocol super;
+	friend class cMetadataWriter190;
 
 public:
 
-	cProtocol190(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol190(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
@@ -262,34 +264,13 @@ protected:
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
 	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
-
-	/** Writes the mob-specific metadata for the specified mob */
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
+	void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
-
-	/** Types used within metadata */
-	enum eMetadataType
-	{
-		METADATA_TYPE_BYTE              = 0,
-		METADATA_TYPE_VARINT            = 1,
-		METADATA_TYPE_FLOAT             = 2,
-		METADATA_TYPE_STRING            = 3,
-		METADATA_TYPE_CHAT              = 4,
-		METADATA_TYPE_ITEM              = 5,
-		METADATA_TYPE_BOOL              = 6,
-		METADATA_TYPE_ROTATION          = 7,
-		METADATA_TYPE_POSITION          = 8,
-		METADATA_TYPE_OPTIONAL_POSITION = 9,
-		METADATA_TYPE_DIRECTION         = 10,
-		METADATA_TYPE_OPTIONAL_UUID     = 11,
-		METADATA_TYPE_BLOCKID           = 12
-	} ;
 } ;
 
 
@@ -303,7 +284,7 @@ class cProtocol191 :
 	typedef cProtocol190 super;
 
 public:
-	cProtocol191(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol191(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
 	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
@@ -322,7 +303,7 @@ class cProtocol192 :
 	typedef cProtocol191 super;
 
 public:
-	cProtocol192(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol192(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
@@ -340,7 +321,7 @@ class cProtocol194 :
 	typedef cProtocol192 super;
 
 public:
-	cProtocol194(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol194(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol190 overrides:
 	virtual void SendCollectEntity   (const cEntity & a_Entity, const cPlayer & a_Player) override;
@@ -353,6 +334,52 @@ public:
 
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
+} ;
+
+
+
+
+
+class cMetadataWriter190 :
+	public cMetadataWriter
+{
+	typedef cMetadataWriter super;
+
+public:
+	cMetadataWriter190(UInt32 a_ProtocolVersion, cPacketizer & a_Pkt, cProtocol190 & a_Protocol);
+
+	virtual void WriteByte(Int8 a_Value) override;
+	virtual void WriteInt(Int32 a_Value) override;
+	virtual void WriteFloat(float a_Value) override;
+	virtual void WriteString(const AString & a_Value) override;
+	virtual void WriteItem(const cItem & a_Value) override;
+	virtual void WritePosition(int a_X, int a_Y, int a_Z) override;
+	virtual void WriteBool(bool a_Value) override;
+	virtual void WriteBlockType(BLOCKTYPE a_ID, NIBBLETYPE a_Data) override;
+	virtual void SkipMeta(void) override;
+
+protected:
+	cPacketizer & m_Pkt;
+	cProtocol190 & m_Protocol;
+	UInt8 m_Index;
+
+	/** Types used within metadata */
+	enum eMetadataType
+	{
+		METADATA_TYPE_BYTE = 0,
+		METADATA_TYPE_VARINT = 1,
+		METADATA_TYPE_FLOAT = 2,
+		METADATA_TYPE_STRING = 3,
+		METADATA_TYPE_CHAT = 4,
+		METADATA_TYPE_ITEM = 5,
+		METADATA_TYPE_BOOL = 6,
+		METADATA_TYPE_ROTATION = 7,
+		METADATA_TYPE_POSITION = 8,
+		METADATA_TYPE_OPTIONAL_POSITION = 9,
+		METADATA_TYPE_DIRECTION = 10,
+		METADATA_TYPE_OPTIONAL_UUID = 11,
+		METADATA_TYPE_BLOCKTYPE = 12
+	};
 } ;
 
 

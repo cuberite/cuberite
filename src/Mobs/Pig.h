@@ -31,6 +31,8 @@ public:
 
 	bool IsSaddled(void) const { return m_bIsSaddled; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	bool m_bIsSaddled;

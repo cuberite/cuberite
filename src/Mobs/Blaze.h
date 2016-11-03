@@ -19,4 +19,6 @@ public:
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;

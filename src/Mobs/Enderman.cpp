@@ -209,3 +209,14 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 }
+
+
+
+
+
+void cEnderman::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteBlockType(GetCarriedBlock(), GetCarriedMeta());  // Carried block
+	a_Writer.WriteBool(IsScreaming());  // Is screaming
+}

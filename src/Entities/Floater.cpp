@@ -217,3 +217,22 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	BroadcastMovementUpdate();
 }
+
+
+
+
+
+void cFloater::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	// Hooked entity ID
+	// 0 if none, ID + 1 if attached
+	if (GetAttachedMobID() == cEntity::INVALID_ID)
+	{
+		a_Writer.WriteInt(0);  // No attached entity
+	}
+	else
+	{
+		a_Writer.WriteInt(static_cast<Int32>(GetAttachedMobID() + 1));  // Attached entity
+	}
+}

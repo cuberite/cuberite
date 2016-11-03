@@ -29,6 +29,8 @@ public:
 	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
 	// tolua_end
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 	// Position
 	Vector3d m_ParticlePos;

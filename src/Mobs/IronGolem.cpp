@@ -26,3 +26,13 @@ void cIronGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
+void cIronGolem::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // Is player created
+}
+
+
+
+

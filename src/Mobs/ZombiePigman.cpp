@@ -51,3 +51,17 @@ void cZombiePigman::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+
+void cZombiePigman::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteBool(IsBaby());  // Is baby
+	// Note: Zombie pigmen inherit zombie metadata
+	a_Writer.SkipMeta();  // Zombie type / profession
+	a_Writer.SkipMeta();  // Is converting
+	a_Writer.SkipMeta();  // Are hands up
+}
+
+
+
+

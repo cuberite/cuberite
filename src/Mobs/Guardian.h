@@ -24,6 +24,8 @@ public:
 	// Guardians do not drown (or float)
 	virtual void HandleAir(void) override {}
 	virtual void SetSwimState(cChunk & a_Chunk) override {}
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 

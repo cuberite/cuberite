@@ -38,3 +38,14 @@ AString cMagmaCube::GetSizeName(int a_Size)
 		return "small";
 	}
 }
+
+
+
+
+
+void cMagmaCube::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	// Note: This is slime metadata
+	a_Writer.WriteInt(GetSize());  // Size
+}

@@ -19,6 +19,8 @@ public:
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 

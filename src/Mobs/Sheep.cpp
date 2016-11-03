@@ -207,3 +207,19 @@ NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
 	}
 }
 
+
+
+
+
+void cSheep::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	Int8 SheepMetadata = 0;
+	SheepMetadata = static_cast<Int8>(GetFurColor());
+	if (IsSheared())
+	{
+		SheepMetadata |= 0x10;
+	}
+	a_Writer.WriteByte(SheepMetadata);  // Sheep flags (wool & sheered)
+}
+

@@ -49,3 +49,13 @@ void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_H
 
 
 
+
+void cWitherSkullEntity::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // Invulnerable / blue
+}
+
+
+
+

@@ -33,6 +33,8 @@ public:
 
 	virtual bool IsUndead(void) override { return true; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	/** The number of ticks of invulnerability left after being initially created. Zero once invulnerability has expired. */

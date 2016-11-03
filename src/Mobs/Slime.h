@@ -29,6 +29,8 @@ public:
 	Returns either "big" or "small". */
 	static AString GetSizeName(int a_Size);
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 
 	/** Size of the slime, with 1 being the smallest.

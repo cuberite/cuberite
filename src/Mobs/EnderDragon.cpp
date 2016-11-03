@@ -25,3 +25,13 @@ void cEnderDragon::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
+void cEnderDragon::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // 1.9 battle phase
+}
+
+
+
+

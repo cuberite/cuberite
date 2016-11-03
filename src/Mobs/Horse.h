@@ -40,6 +40,8 @@ public:
 		a_Items.Add(E_ITEM_GOLDEN_APPLE);
 	}
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	bool m_bHasChest, m_bIsEating, m_bIsRearing, m_bIsMouthOpen, m_bIsTame, m_bIsSaddled;

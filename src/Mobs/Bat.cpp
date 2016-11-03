@@ -14,3 +14,17 @@ cBat::cBat(void) :
 }
 
 
+
+
+
+void cBat::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	// super isn't used here because that refers to cPassiveMonster, which contains the is baby flag.
+	// Since bat doesn't extend Ageable but does extend insentient, we need to skip the ageable metadata.
+	// This is an odd special case that is caused by the differences between vanilla's entity hierarchy and
+	// Cuberite's entity hierarchy.
+	cMonster::WriteMetadata(a_Writer);
+	a_Writer.WriteByte(IsHanging() ? 1 : 0);  // Flags
+}
+
+

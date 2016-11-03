@@ -21,6 +21,7 @@
 
 UInt32 cEntity::m_EntityCount = 0;
 cCriticalSection cEntity::m_CSCount;
+const double cEntity::SPEED_EPSILON = 0.0000001;
 
 
 
@@ -53,6 +54,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirLevel(0),
 	m_AirTickTimer(0),
 	m_TicksAlive(0),
+	m_CustomName(""),
+	m_CustomNameAlwaysVisible(false),
 	m_IsTicking(false),
 	m_ParentChunk(nullptr),
 	m_HeadYaw(0.0),
@@ -346,8 +349,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::SetYawFromSpeed(void)
 {
-	const double EPS = 0.0000001;
-	if ((std::abs(m_Speed.x) < EPS) && (std::abs(m_Speed.z) < EPS))
+	if ((std::abs(m_Speed.x) < SPEED_EPSILON) && (std::abs(m_Speed.z) < SPEED_EPSILON))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetYaw(0);
@@ -362,9 +364,8 @@ void cEntity::SetYawFromSpeed(void)
 
 void cEntity::SetPitchFromSpeed(void)
 {
-	const double EPS = 0.0000001;
 	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z);  // Speed XZ-plane component
-	if ((std::abs(xz) < EPS) && (std::abs(m_Speed.y) < EPS))
+	if ((std::abs(xz) < SPEED_EPSILON) && (std::abs(m_Speed.y) < SPEED_EPSILON))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetPitch(0);
@@ -2206,6 +2207,86 @@ bool cEntity::IsTicking(void) const
 {
 	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
 	return m_IsTicking;
+}
+
+
+
+
+
+void cEntity::SetCustomName(const AString & a_CustomName)
+{
+	m_CustomName = a_CustomName;
+
+	// The maximal length is 64
+	if (a_CustomName.length() > 64)
+	{
+		m_CustomName = a_CustomName.substr(0, 64);
+	}
+
+	if (m_World != nullptr)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cEntity::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
+{
+	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
+	if (m_World != nullptr)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cEntity::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	Int8 Flags = 0;
+	if (IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	a_Writer.WriteByte(Flags);  // Flags
+	a_Writer.SkipMeta();  // Air
+	if (HasCustomName())
+	{
+		a_Writer.WriteString(GetCustomName());  // Custom name
+		a_Writer.WriteBool(IsCustomNameAlwaysVisible());  // Custom name visible
+	}
+	else
+	{
+		a_Writer.SkipMeta();  // Custom name
+		a_Writer.SkipMeta();  // Custom name visible
+	}
+	a_Writer.SkipMeta();  // Is silent
+	if (a_Writer.m_ProtocolVersion >= PROTO_VERSION_1_10_0)
+	{
+		a_Writer.SkipMeta();  // No gravity
+	}
+	// Subclasses add aditional metadata fields
 }
 
 ////////////////////////////////////////////////////////////////////////////////

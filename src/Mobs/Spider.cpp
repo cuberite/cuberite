@@ -78,3 +78,13 @@ bool cSpider::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	return true;
 }
+
+
+
+
+
+void cSpider::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // Is climbing
+}

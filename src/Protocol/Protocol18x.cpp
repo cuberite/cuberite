@@ -101,8 +101,8 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol180:
 
-cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client),
+cProtocol180::cProtocol180(cClientHandle * a_Client, UInt32 a_ProtocolVersion, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ProtocolVersion),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
@@ -3238,9 +3238,17 @@ void cProtocol180::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 	a_Pkt.WriteBEUInt8(0);  // Byte(0) + index 0
 	a_Pkt.WriteBEUInt8(Flags);
 
+	if (a_Entity.HasCustomName())
+	{
+		a_Pkt.WriteBEUInt8(0x82);
+		a_Pkt.WriteString(a_Entity.GetCustomName());
+
+		a_Pkt.WriteBEUInt8(0x03);
+		a_Pkt.WriteBool(a_Entity.IsCustomNameAlwaysVisible());
+	}
+
 	switch (a_Entity.GetEntityType())
 	{
-		case cEntity::etPlayer: break;  // TODO?
 		case cEntity::etPickup:
 		{
 			a_Pkt.WriteBEUInt8((5 << 5) | 10);  // Slot(5) + index 10
@@ -3343,16 +3351,7 @@ void cProtocol180::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_En
 
 void cProtocol180::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
-	// Living Enitiy Metadata
-	if (a_Mob.HasCustomName())
-	{
-		a_Pkt.WriteBEUInt8(0x82);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-
-		a_Pkt.WriteBEUInt8(0x03);
-		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
-	}
-
+	// Living Enitity Metadata
 	a_Pkt.WriteBEUInt8(0x66);
 	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
 

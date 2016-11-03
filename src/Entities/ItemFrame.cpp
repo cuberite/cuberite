@@ -103,3 +103,14 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
+
+void cItemFrame::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteItem(GetItem());  // Item in frame
+	a_Writer.WriteInt(GetItemRotation());  // Item rotation
+}
+
+
+
+

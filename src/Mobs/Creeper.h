@@ -27,6 +27,8 @@ public:
 	bool IsCharged(void) const {return m_bIsCharged; }
 	bool IsBurnedWithFlintAndSteel(void) const {return m_BurnedWithFlintAndSteel; }
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	bool m_bIsBlowing, m_bIsCharged, m_BurnedWithFlintAndSteel;

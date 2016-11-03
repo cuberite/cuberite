@@ -37,6 +37,8 @@ public:
 
 	// tolua_end
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	virtual void OnRightClicked(cPlayer & a_Player) override;

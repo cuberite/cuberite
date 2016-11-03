@@ -46,3 +46,13 @@ void cWitch::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
+void cWitch::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteBool(IsAngry());  // Is aggressive
+}
+
+
+
+

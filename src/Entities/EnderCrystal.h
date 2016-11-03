@@ -14,6 +14,8 @@ class cEnderCrystal :
 	// tolua_end
 	typedef cEntity super;
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 public:
 	CLASS_PROTODEF(cEnderCrystal)
 

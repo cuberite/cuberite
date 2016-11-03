@@ -37,3 +37,17 @@ void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomArmorDropItem(a_Drops, LootingLevel);
 	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
+
+
+
+
+
+void cZombie::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteBool(IsBaby());  // Is baby
+	// TODO: This actually encodes the zombie villager profession, but that isn't implemented yet.
+	a_Writer.WriteInt(IsVillagerZombie() ? 1 : 0);  // Profession
+	a_Writer.WriteBool(IsConverting());  // Is converting
+	a_Writer.SkipMeta();  // Are hands held up
+}

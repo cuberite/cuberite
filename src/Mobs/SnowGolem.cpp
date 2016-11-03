@@ -49,3 +49,13 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 }
+
+
+
+
+
+void cSnowGolem::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.SkipMeta();  // Is pumpkin removed
+}

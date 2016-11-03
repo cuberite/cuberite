@@ -705,6 +705,8 @@ protected:
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.

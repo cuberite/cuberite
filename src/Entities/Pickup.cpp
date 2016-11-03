@@ -254,3 +254,13 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 
 
 
+
+void cPickup::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteItem(GetItem());  // Item
+}
+
+
+
+

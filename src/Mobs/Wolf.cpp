@@ -402,3 +402,37 @@ void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 }
 
 
+
+
+
+void cWolf::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+
+	// Ageable fields (since wolf inherits cPassiveAgressiveMonster instead of cPassiveMonster, this isn't handled directly)
+	a_Writer.WriteBool(IsBaby());
+
+	// Tameable fields
+	Int8 WolfStatus = 0;
+	if (IsSitting())
+	{
+		WolfStatus |= 0x1;
+	}
+	if (IsAngry())
+	{
+		WolfStatus |= 0x2;
+	}
+	if (IsTame())
+	{
+		WolfStatus |= 0x4;
+	}
+	a_Writer.WriteByte(WolfStatus);  // Status
+	a_Writer.SkipMeta();  // Owner
+
+	// Wolf flags
+	a_Writer.WriteFloat(static_cast<float>(GetHealth()));  // Damage taken / tail rotation
+	a_Writer.WriteBool(IsBegging());  // Is begging
+	a_Writer.WriteInt(GetCollarColor());  // Collar color
+}
+
+

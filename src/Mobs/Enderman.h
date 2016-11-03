@@ -30,6 +30,8 @@ public:
 	/** Returns if the current sky light level is sufficient for the enderman to become aggravated */
 	bool CheckLight(void);
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 private:
 
 	bool m_bIsScreaming;

@@ -24,6 +24,9 @@ public:
 	}
 
 	CLASS_PROTODEF(cOcelot)
+
+	// TODO: When ocelots are tameable (or have types) metadata will be needed.
+	// virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 

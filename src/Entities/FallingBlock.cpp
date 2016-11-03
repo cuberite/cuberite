@@ -88,7 +88,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	float MilliDt = a_Dt.count() * 0.001f;
-	AddSpeedY(MilliDt * -9.8f);
+	AddSpeedY(MilliDt * m_Gravity);
 	AddPosition(GetSpeed() * MilliDt);
 
 	// If not static (one billionth precision) broadcast movement
@@ -96,6 +96,16 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		BroadcastMovementUpdate();
 	}
+}
+
+
+
+
+
+void cFallingBlock::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WritePosition(m_OriginalPosition.x, m_OriginalPosition.y, m_OriginalPosition.z);  // Spawn position
 }
 
 

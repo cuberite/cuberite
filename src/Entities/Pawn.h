@@ -63,6 +63,8 @@ public:
 	/** Add the monster to the list of monsters targeting this pawn. (Does not check if already in list!) */
 	void TargetingMe(cMonster * a_Monster);
 
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
+
 protected:
 	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
 	tEffectMap m_EntityEffects;

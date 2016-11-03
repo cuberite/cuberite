@@ -21,6 +21,8 @@ public:
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 
 	bool IsCharging(void) const {return false; }
+
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const override;
 } ;
 
 

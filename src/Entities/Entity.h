@@ -3,6 +3,7 @@
 
 #include "../Item.h"
 #include "../Vector3.h"
+#include "../MetadataWriter.h"
 
 
 
@@ -477,6 +478,23 @@ public:
 	/** Returns whether the entity is on ground or not */
 	virtual bool IsOnGround(void) const { return m_bOnGround; }
 
+	/** Returns true if the monster has a custom name. */
+	bool HasCustomName(void) const { return !m_CustomName.empty(); }
+
+	/** Gets the custom name of the monster. If no custom name is set, the function returns an empty string. */
+	const AString & GetCustomName(void) const { return m_CustomName; }
+
+	/** Sets the custom name of the monster. You see the name over the monster.
+	If you want to disable the custom name, simply set an empty string. */
+	void SetCustomName(const AString & a_CustomName);
+
+	/** Is the custom name of this monster always visible? If not, you only see the name when you sight the mob. */
+	bool IsCustomNameAlwaysVisible(void) const { return m_CustomNameAlwaysVisible; }
+
+	/** Sets the custom name visiblity of this monster.
+	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
+	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
+
 	// tolua_end
 
 	/** Called when the specified player right-clicks this entity */
@@ -501,6 +519,9 @@ public:
 
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
+
+	/** Writes this entity's protocol metadata */
+	virtual void WriteMetadata(cMetadataWriter & a_Writer) const;
 
 protected:
 	/** Structure storing the portal delay timer and cooldown boolean */
@@ -600,6 +621,11 @@ protected:
 	/** The number of ticks this entity has been alive for */
 	long int m_TicksAlive;
 
+	/** The entity's custom name, or an empty string */
+	AString m_CustomName;
+	/** Is the custom name visible even if not directly looking at the entity? */
+	bool m_CustomNameAlwaysVisible;
+
 
 	/** Does the actual speed-setting. The default implementation just sets the member variable value;
 	overrides can provide further processing, such as forcing players to move at the given speed. */
@@ -654,6 +680,8 @@ private:
 	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
 	While this ticks, a player can't hit this entity. */
 	int m_InvulnerableTicks;
+
+	static const double SPEED_EPSILON;  ///< Epsilon value used to check if doubles are close enough to be treated as equal
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;

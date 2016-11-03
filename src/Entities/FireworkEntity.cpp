@@ -81,3 +81,13 @@ void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_TicksToExplosion -= 1;
 }
+
+
+
+
+
+void cFireworkEntity::WriteMetadata(cMetadataWriter & a_Writer) const
+{
+	super::WriteMetadata(a_Writer);
+	a_Writer.WriteItem(GetItem());  // Firework item
+}
