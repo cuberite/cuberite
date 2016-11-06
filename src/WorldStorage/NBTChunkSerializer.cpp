@@ -215,7 +215,7 @@ void cNBTChunkSerializer::AddBrewingstandEntity(cBrewingstandEntity * a_Brewings
 void cNBTChunkSerializer::AddChestEntity(cChestEntity * a_Entity, BLOCKTYPE a_ChestType)
 {
 	m_Writer.BeginCompound("");
-		AddBasicTileEntity(a_Entity, (a_ChestType == E_BLOCK_CHEST) ? "Chest" : "TrappedChest");
+		AddBasicTileEntity(a_Entity, "Chest");
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();

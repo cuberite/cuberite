@@ -980,11 +980,22 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_ChestBlockType)
 {
 	// Check if the data has a proper type:
-	// TODO: Does vanilla use "TrappedChest" or not? MCWiki says no, but previous code says yes
-	// Ref.: http://minecraft.gamepedia.com/Trapped_Chest
-	//       https://github.com/cuberite/cuberite/blob/d0551e2e0a98a28f31a88d489d17b408e4a7d38d/src/WorldStorage/WSSAnvil.cpp#L637
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Chest") && !CheckBlockEntityType(a_NBT, a_TagIdx, "TrappedChest"))
+	// Note that older Cuberite code used "TrappedChest" for trapped chests; new code mimics vanilla and uses "Chest" throughout, but we allow migration here:
+	if (a_NBT.GetType(a_TagIdx) != TAG_Compound)
 	{
+		return nullptr;
+	}
+	int TagID = a_NBT.FindChildByName(a_TagIdx, "id");
+	if ((TagID < 0) || (a_NBT.GetType(TagID) != TAG_String))
+	{
+		return nullptr;
+	}
+	auto BlockEntityType = a_NBT.GetString(TagID);
+	if ((BlockEntityType != "Chest") && (BlockEntityType != "TrappedChest"))
+	{
+		LOGWARNING("Block entity type mismatch at {%d, %d, %d}: got \"%s\", expected \"Chest\". Chest contents will be lost.",
+			a_BlockX, a_BlockY, a_BlockZ, BlockEntityType.c_str()
+		);
 		return nullptr;
 	}
 
