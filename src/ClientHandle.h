@@ -63,6 +63,11 @@ public:  // tolua_export
 	static const int MAX_VIEW_DISTANCE = 32;
 	static const int MIN_VIEW_DISTANCE = 1;
 
+	/** The percentage how much a block has to be broken.
+	Should be a value between 0.7 (70% broken) and 1 (100% broken) depending on lag.
+	Can be set in settings.ini [AntiCheat] FastBreakPercentage=(from 0 to 100) */
+	static float FASTBREAK_PERCENTAGE;
+
 	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
 	cClientHandle(const AString & a_IPString, int a_ViewDistance);
 
@@ -519,6 +524,7 @@ private:
 	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
 	cClientHandlePtr m_Self;
 
+	float m_BreakProgress;
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);

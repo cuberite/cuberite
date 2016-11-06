@@ -59,4 +59,35 @@ public:
 		return false;
 	}
 
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
+	{
+		switch (a_Block)
+		{
+			case E_BLOCK_CLAY:
+			case E_BLOCK_DIRT:
+			case E_BLOCK_FARMLAND:
+			case E_BLOCK_GRASS:
+			case E_BLOCK_GRAVEL:
+			case E_BLOCK_MYCELIUM:
+			case E_BLOCK_SAND:
+			case E_BLOCK_SNOW:
+			case E_BLOCK_SNOW_BLOCK:
+			case E_BLOCK_SOULSAND:
+			case E_BLOCK_GRASS_PATH:
+			{
+				switch (m_ItemType)
+				{
+					case E_ITEM_WOODEN_SHOVEL:  return 2.0f;
+					case E_ITEM_STONE_SHOVEL:   return 4.0f;
+					case E_ITEM_IRON_SHOVEL:    return 6.0f;
+					case E_ITEM_GOLD_SHOVEL:    return 12.0f;
+					case E_ITEM_DIAMOND_SHOVEL: return 8.0f;
+				}
+				break;
+			}
+			default: return super::GetBlockBreakingStrength(a_Block);
+		}
+		ASSERT(!"Something is wrong here... Maybe they are shovels out of a new material?");
+		return 1.0f;
+	}
 };

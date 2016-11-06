@@ -2064,6 +2064,24 @@ return
 					},
 					Notes = "Returns the {{cBlockInfo}} structure for the specified block type.",
 				},
+				GetHardness =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the block's hardness. The bigger the harder the block.",
+				},			
 				GetBlockHeight =
 				{
 					IsStatic = true,
@@ -14489,6 +14507,1806 @@ end
 			},
 			Constants =
 			{
+				E_BLOCK_ACACIA_DOOR =
+				{
+					Notes = "The blocktype for acacia door"
+				},
+				E_BLOCK_ACACIA_FENCE =
+				{
+					Notes = "The blocktype for acacia fence"
+				},
+				E_BLOCK_ACACIA_FENCE_GATE =
+				{
+					Notes = "The blocktype for acacia fence gate"
+				},
+				E_BLOCK_ACACIA_WOOD_STAIRS =
+				{
+					Notes = "The blocktype for acacia wood stairs"
+				},
+				E_BLOCK_ACTIVATOR_RAIL =
+				{
+					Notes = "The blocktype for activator rail"
+				},
+				E_BLOCK_ACTIVE_COMPARATOR =
+				{
+					Notes = "The blocktype for active comparator"
+				},
+				E_BLOCK_AIR =
+				{
+					Notes = "The blocktype for air"
+				},
+				E_BLOCK_ANVIL =
+				{
+					Notes = "The blocktype for anvil"
+				},
+				E_BLOCK_ANVIL_HIGH_DAMAGE =
+				{
+					Notes = "The blocktype for anvil high damage"
+				},
+				E_BLOCK_ANVIL_LOW_DAMAGE =
+				{
+					Notes = "The blocktype for anvil low damage"
+				},
+				E_BLOCK_ANVIL_NO_DAMAGE =
+				{
+					Notes = "The blocktype for anvil no damage"
+				},
+				E_BLOCK_ANVIL_X =
+				{
+					Notes = "The blocktype for anvil x"
+				},
+				E_BLOCK_ANVIL_Z =
+				{
+					Notes = "The blocktype for anvil z"
+				},
+				E_BLOCK_BARRIER =
+				{
+					Notes = "The blocktype for barrier"
+				},
+				E_BLOCK_BEACON =
+				{
+					Notes = "The blocktype for beacon"
+				},
+				E_BLOCK_BED =
+				{
+					Notes = "The blocktype for bed"
+				},
+				E_BLOCK_BEDROCK =
+				{
+					Notes = "The blocktype for bedrock"
+				},
+				E_BLOCK_BED_BED_HEAD =
+				{
+					Notes = "The blocktype for bed bed head"
+				},
+				E_BLOCK_BED_OCCUPIED =
+				{
+					Notes = "The blocktype for bed occupied"
+				},
+				E_BLOCK_BED_XM =
+				{
+					Notes = "The blocktype for bed xm"
+				},
+				E_BLOCK_BED_XP =
+				{
+					Notes = "The blocktype for bed xp"
+				},
+				E_BLOCK_BED_ZM =
+				{
+					Notes = "The blocktype for bed zm"
+				},
+				E_BLOCK_BED_ZP =
+				{
+					Notes = "The blocktype for bed zp"
+				},
+				E_BLOCK_BEETROOTS =
+				{
+					Notes = "The blocktype for beetroots"
+				},
+				E_BLOCK_BIG_FLOWER =
+				{
+					Notes = "The blocktype for big flower"
+				},
+				E_BLOCK_BIRCH_DOOR =
+				{
+					Notes = "The blocktype for birch door"
+				},
+				E_BLOCK_BIRCH_FENCE =
+				{
+					Notes = "The blocktype for birch fence"
+				},
+				E_BLOCK_BIRCH_FENCE_GATE =
+				{
+					Notes = "The blocktype for birch fence gate"
+				},
+				E_BLOCK_BIRCH_WOOD_STAIRS =
+				{
+					Notes = "The blocktype for birch wood stairs"
+				},
+				E_BLOCK_BLOCK_OF_COAL =
+				{
+					Notes = "The blocktype for block of coal"
+				},
+				E_BLOCK_BLOCK_OF_REDSTONE =
+				{
+					Notes = "The blocktype for block of redstone"
+				},
+				E_BLOCK_BONE_BLOCK =
+				{
+					Notes = "The blocktype for bone block"
+				},
+				E_BLOCK_BOOKCASE =
+				{
+					Notes = "The blocktype for bookcase"
+				},
+				E_BLOCK_BREWING_STAND =
+				{
+					Notes = "The blocktype for brewing stand"
+				},
+				E_BLOCK_BRICK =
+				{
+					Notes = "The blocktype for brick"
+				},
+				E_BLOCK_BRICK_STAIRS =
+				{
+					Notes = "The blocktype for brick stairs"
+				},
+				E_BLOCK_BROWN_MUSHROOM =
+				{
+					Notes = "The blocktype for brown mushroom"
+				},
+				E_BLOCK_BURNING_FURNACE =
+				{
+					Notes = "The blocktype for burning furnace"
+				},
+				E_BLOCK_BUTTON_PRESSED =
+				{
+					Notes = "The blocktype for button pressed"
+				},
+				E_BLOCK_BUTTON_XM =
+				{
+					Notes = "The blocktype for button xm"
+				},
+				E_BLOCK_BUTTON_XP =
+				{
+					Notes = "The blocktype for button xp"
+				},
+				E_BLOCK_BUTTON_YM =
+				{
+					Notes = "The blocktype for button ym"
+				},
+				E_BLOCK_BUTTON_YP =
+				{
+					Notes = "The blocktype for button yp"
+				},
+				E_BLOCK_BUTTON_ZM =
+				{
+					Notes = "The blocktype for button zm"
+				},
+				E_BLOCK_BUTTON_ZP =
+				{
+					Notes = "The blocktype for button zp"
+				},
+				E_BLOCK_CACTUS =
+				{
+					Notes = "The blocktype for cactus"
+				},
+				E_BLOCK_CAKE =
+				{
+					Notes = "The blocktype for cake"
+				},
+				E_BLOCK_CARPET =
+				{
+					Notes = "The blocktype for carpet"
+				},
+				E_BLOCK_CARROTS =
+				{
+					Notes = "The blocktype for carrots"
+				},
+				E_BLOCK_CAULDRON =
+				{
+					Notes = "The blocktype for cauldron"
+				},
+				E_BLOCK_CHAIN_COMMAND_BLOCK =
+				{
+					Notes = "The blocktype for chain command block"
+				},
+				E_BLOCK_CHEST =
+				{
+					Notes = "The blocktype for chest"
+				},
+				E_BLOCK_CHORUS_FLOWER =
+				{
+					Notes = "The blocktype for chorus flower"
+				},
+				E_BLOCK_CHORUS_PLANT =
+				{
+					Notes = "The blocktype for chorus plant"
+				},
+				E_BLOCK_CLAY =
+				{
+					Notes = "The blocktype for clay"
+				},
+				E_BLOCK_COAL_ORE =
+				{
+					Notes = "The blocktype for coal ore"
+				},
+				E_BLOCK_COBBLESTONE =
+				{
+					Notes = "The blocktype for cobblestone"
+				},
+				E_BLOCK_COBBLESTONE_STAIRS =
+				{
+					Notes = "The blocktype for cobblestone stairs"
+				},
+				E_BLOCK_COBBLESTONE_WALL =
+				{
+					Notes = "The blocktype for cobblestone wall"
+				},
+				E_BLOCK_COBWEB =
+				{
+					Notes = "The blocktype for cobweb"
+				},
+				E_BLOCK_COCOA_POD =
+				{
+					Notes = "The blocktype for cocoa pod"
+				},
+				E_BLOCK_COMMAND_BLOCK =
+				{
+					Notes = "The blocktype for command block"
+				},
+				E_BLOCK_CRAFTING_TABLE =
+				{
+					Notes = "The blocktype for crafting table"
+				},
+				E_BLOCK_CROPS =
+				{
+					Notes = "The blocktype for crops"
+				},
+				E_BLOCK_DANDELION =
+				{
+					Notes = "The blocktype for dandelion"
+				},
+				E_BLOCK_DARK_OAK_DOOR =
+				{
+					Notes = "The blocktype for dark oak door"
+				},
+				E_BLOCK_DARK_OAK_FENCE =
+				{
+					Notes = "The blocktype for dark oak fence"
+				},
+				E_BLOCK_DARK_OAK_FENCE_GATE =
+				{
+					Notes = "The blocktype for dark oak fence gate"
+				},
+				E_BLOCK_DARK_OAK_WOOD_STAIRS =
+				{
+					Notes = "The blocktype for dark oak wood stairs"
+				},
+				E_BLOCK_DAYLIGHT_SENSOR =
+				{
+					Notes = "The blocktype for daylight sensor"
+				},
+				E_BLOCK_DEAD_BUSH =
+				{
+					Notes = "The blocktype for dead bush"
+				},
+				E_BLOCK_DETECTOR_RAIL =
+				{
+					Notes = "The blocktype for detector rail"
+				},
+				E_BLOCK_DIAMOND_BLOCK =
+				{
+					Notes = "The blocktype for diamond block"
+				},
+				E_BLOCK_DIAMOND_ORE =
+				{
+					Notes = "The blocktype for diamond ore"
+				},
+				E_BLOCK_DIRT =
+				{
+					Notes = "The blocktype for dirt"
+				},
+				E_BLOCK_DISPENSER =
+				{
+					Notes = "The blocktype for dispenser"
+				},
+				E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB =
+				{
+					Notes = "The blocktype for double red sandstone slab"
+				},
+				E_BLOCK_DOUBLE_STONE_SLAB =
+				{
+					Notes = "The blocktype for double stone slab"
+				},
+				E_BLOCK_DOUBLE_WOODEN_SLAB =
+				{
+					Notes = "The blocktype for double wooden slab"
+				},
+				E_BLOCK_DRAGON_EGG =
+				{
+					Notes = "The blocktype for dragon egg"
+				},
+				E_BLOCK_DROPPER =
+				{
+					Notes = "The blocktype for dropper"
+				},
+				E_BLOCK_EMERALD_BLOCK =
+				{
+					Notes = "The blocktype for emerald block"
+				},
+				E_BLOCK_EMERALD_ORE =
+				{
+					Notes = "The blocktype for emerald ore"
+				},
+				E_BLOCK_ENCHANTMENT_TABLE =
+				{
+					Notes = "The blocktype for enchantment table"
+				},
+				E_BLOCK_ENDER_CHEST =
+				{
+					Notes = "The blocktype for ender chest"
+				},
+				E_BLOCK_END_BRICKS =
+				{
+					Notes = "The blocktype for end bricks"
+				},
+				E_BLOCK_END_GATEWAY =
+				{
+					Notes = "The blocktype for end gateway"
+				},
+				E_BLOCK_END_PORTAL =
+				{
+					Notes = "The blocktype for end portal"
+				},
+				E_BLOCK_END_PORTAL_FRAME =
+				{
+					Notes = "The blocktype for end portal frame"
+				},
+				E_BLOCK_END_ROD =
+				{
+					Notes = "The blocktype for end rod"
+				},
+				E_BLOCK_END_STONE =
+				{
+					Notes = "The blocktype for end stone"
+				},
+				E_BLOCK_FARMLAND =
+				{
+					Notes = "The blocktype for farmland"
+				},
+				E_BLOCK_FENCE =
+				{
+					Notes = "The blocktype for fence"
+				},
+				E_BLOCK_FENCE_GATE =
+				{
+					Notes = "The blocktype for fence gate"
+				},
+				E_BLOCK_FIRE =
+				{
+					Notes = "The blocktype for fire"
+				},
+				E_BLOCK_FLOWER =
+				{
+					Notes = "The blocktype for flower"
+				},
+				E_BLOCK_FLOWER_POT =
+				{
+					Notes = "The blocktype for flower pot"
+				},
+				E_BLOCK_FROSTED_ICE =
+				{
+					Notes = "The blocktype for frosted ice"
+				},
+				E_BLOCK_FURNACE =
+				{
+					Notes = "The blocktype for furnace"
+				},
+				E_BLOCK_GLASS =
+				{
+					Notes = "The blocktype for glass"
+				},
+				E_BLOCK_GLASS_PANE =
+				{
+					Notes = "The blocktype for glass pane"
+				},
+				E_BLOCK_GLOWSTONE =
+				{
+					Notes = "The blocktype for glowstone"
+				},
+				E_BLOCK_GOLD_BLOCK =
+				{
+					Notes = "The blocktype for gold block"
+				},
+				E_BLOCK_GOLD_ORE =
+				{
+					Notes = "The blocktype for gold ore"
+				},
+				E_BLOCK_GRASS =
+				{
+					Notes = "The blocktype for grass"
+				},
+				E_BLOCK_GRASS_PATH =
+				{
+					Notes = "The blocktype for grass path"
+				},
+				E_BLOCK_GRAVEL =
+				{
+					Notes = "The blocktype for gravel"
+				},
+				E_BLOCK_HARDENED_CLAY =
+				{
+					Notes = "The blocktype for hardened clay"
+				},
+				E_BLOCK_HAY_BALE =
+				{
+					Notes = "The blocktype for hay bale"
+				},
+				E_BLOCK_HEAD =
+				{
+					Notes = "The blocktype for head"
+				},
+				E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE =
+				{
+					Notes = "The blocktype for heavy weighted pressure plate"
+				},
+				E_BLOCK_HOPPER =
+				{
+					Notes = "The blocktype for hopper"
+				},
+				E_BLOCK_HUGE_BROWN_MUSHROOM =
+				{
+					Notes = "The blocktype for huge brown mushroom"
+				},
+				E_BLOCK_HUGE_RED_MUSHROOM =
+				{
+					Notes = "The blocktype for huge red mushroom"
+				},
+				E_BLOCK_ICE =
+				{
+					Notes = "The blocktype for ice"
+				},
+				E_BLOCK_INACTIVE_COMPARATOR =
+				{
+					Notes = "The blocktype for inactive comparator"
+				},
+				E_BLOCK_INVERTED_DAYLIGHT_SENSOR =
+				{
+					Notes = "The blocktype for inverted daylight sensor"
+				},
+				E_BLOCK_IRON_BARS =
+				{
+					Notes = "The blocktype for iron bars"
+				},
+				E_BLOCK_IRON_BLOCK =
+				{
+					Notes = "The blocktype for iron block"
+				},
+				E_BLOCK_IRON_DOOR =
+				{
+					Notes = "The blocktype for iron door"
+				},
+				E_BLOCK_IRON_ORE =
+				{
+					Notes = "The blocktype for iron ore"
+				},
+				E_BLOCK_IRON_TRAPDOOR =
+				{
+					Notes = "The blocktype for iron trapdoor"
+				},
+				E_BLOCK_JACK_O_LANTERN =
+				{
+					Notes = "The blocktype for jack o lantern"
+				},
+				E_BLOCK_JUKEBOX =
+				{
+					Notes = "The blocktype for jukebox"
+				},
+				E_BLOCK_JUNGLE_DOOR =
+				{
+					Notes = "The blocktype for jungle door"
+				},
+				E_BLOCK_JUNGLE_FENCE =
+				{
+					Notes = "The blocktype for jungle fence"
+				},
+				E_BLOCK_JUNGLE_FENCE_GATE =
+				{
+					Notes = "The blocktype for jungle fence gate"
+				},
+				E_BLOCK_JUNGLE_WOOD_STAIRS =
+				{
+					Notes = "The blocktype for jungle wood stairs"
+				},
+				E_BLOCK_LADDER =
+				{
+					Notes = "The blocktype for ladder"
+				},
+				E_BLOCK_LAPIS_BLOCK =
+				{
+					Notes = "The blocktype for lapis block"
+				},
+				E_BLOCK_LAPIS_ORE =
+				{
+					Notes = "The blocktype for lapis ore"
+				},
+				E_BLOCK_LAVA =
+				{
+					Notes = "The blocktype for lava"
+				},
+				E_BLOCK_LEAVES =
+				{
+					Notes = "The blocktype for leaves"
+				},
+				E_BLOCK_LEVER =
+				{
+					Notes = "The blocktype for lever"
+				},
+				E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE =
+				{
+					Notes = "The blocktype for light weighted pressure plate"
+				},
+				E_BLOCK_LILY_PAD =
+				{
+					Notes = "The blocktype for lily pad"
+				},
+				E_BLOCK_LIT_FURNACE =
+				{
+					Notes = "The blocktype for lit furnace"
+				},
+				E_BLOCK_LOG =
+				{
+					Notes = "The blocktype for log"
+				},
+				E_BLOCK_MAGMA =
+				{
+					Notes = "The blocktype for magma"
+				},
+				E_BLOCK_MAX_TYPE_ID =
+				{
+					Notes = "The blocktype for max type id"
+				},
+				E_BLOCK_MELON =
+				{
+					Notes = "The blocktype for melon"
+				},
+				E_BLOCK_MELON_STEM =
+				{
+					Notes = "The blocktype for melon stem"
+				},
+				E_BLOCK_MINECART_TRACKS =
+				{
+					Notes = "The blocktype for minecart tracks"
+				},
+				E_BLOCK_MOB_SPAWNER =
+				{
+					Notes = "The blocktype for mob spawner"
+				},
+				E_BLOCK_MOSSY_COBBLESTONE =
+				{
+					Notes = "The blocktype for mossy cobblestone"
+				},
+				E_BLOCK_MYCELIUM =
+				{
+					Notes = "The blocktype for mycelium"
+				},
+				E_BLOCK_NETHERRACK =
+				{
+					Notes = "The blocktype for netherrack"
+				},
+				E_BLOCK_NETHER_BRICK =
+				{
+					Notes = "The blocktype for nether brick"
+				},
+				E_BLOCK_NETHER_BRICK_FENCE =
+				{
+					Notes = "The blocktype for nether brick fence"
+				},
+				E_BLOCK_NETHER_BRICK_STAIRS =
+				{
+					Notes = "The blocktype for nether brick stairs"
+				},
+				E_BLOCK_NETHER_PORTAL =
+				{
+					Notes = "The blocktype for nether portal"
+				},
+				E_BLOCK_NETHER_QUARTZ_ORE =
+				{
+					Notes = "The blocktype for nether quartz ore"
+				},
+				E_BLOCK_NETHER_WART =
+				{
+					Notes = "The blocktype for nether wart"
+				},
+				E_BLOCK_NETHER_WART_BLOCK =
+				{
+					Notes = "The blocktype for nether wart block"
+				},
+				E_BLOCK_NEW_LEAVES =
+				{
+					Notes = "The blocktype for new leaves"
+				},
+				E_BLOCK_NEW_LOG =
+				{
+					Notes = "The blocktype for new log"
+				},
+				E_BLOCK_NOTE_BLOCK =
+				{
+					Notes = "The blocktype for note block"
+				},
+				E_BLOCK_NUMBER_OF_TYPES =
+				{
+					Notes = "The blocktype for number of types"
+				},
+				E_BLOCK_OAK_DOOR =
+				{
+					Notes = "The blocktype for oak door"
+				},
+				E_BLOCK_OAK_FENCE_GATE =
+				{
+					Notes = "The blocktype for oak fence gate"
+				},
+				E_BLOCK_OAK_WOOD_STAIRS =
+				{
+					Notes = "The blocktype for oak wood stairs"
+				},
+				E_BLOCK_OBSIDIAN =
+				{
+					Notes = "The blocktype for obsidian"
+				},
+				E_BLOCK_PACKED_ICE =
+				{
+					Notes = "The blocktype for packed ice"
+				},
+				E_BLOCK_PISTON =
+				{
+					Notes = "The blocktype for piston"
+				},
+				E_BLOCK_PISTON_EXTENSION =
+				{
+					Notes = "The blocktype for piston extension"
+				},
+				E_BLOCK_PISTON_MOVED_BLOCK =
+				{
+					Notes = "The blocktype for piston moved block"
+				},
+				E_BLOCK_PLANKS =
+				{
+					Notes = "The blocktype for planks"
+				},
+				E_BLOCK_POTATOES =
+				{
+					Notes = "The blocktype for potatoes"
+				},
+				E_BLOCK_POWERED_RAIL =
+				{
+					Notes = "The blocktype for powered rail"
+				},
+				E_BLOCK_PRISMARINE_BLOCK =
+				{
+					Notes = "The blocktype for prismarine block"
+				},
+				E_BLOCK_PUMPKIN =
+				{
+					Notes = "The blocktype for pumpkin"
+				},
+				E_BLOCK_PUMPKIN_STEM =
+				{
+					Notes = "The blocktype for pumpkin stem"
+				},
+				E_BLOCK_PURPUR_BLOCK =
+				{
+					Notes = "The blocktype for purpur block"
+				},
+				E_BLOCK_PURPUR_DOUBLE_SLAB =
+				{
+					Notes = "The blocktype for purpur double slab"
+				},
+				E_BLOCK_PURPUR_PILLAR =
+				{
+					Notes = "The blocktype for purpur pillar"
+				},
+				E_BLOCK_PURPUR_SLAB =
+				{
+					Notes = "The blocktype for purpur slab"
+				},
+				E_BLOCK_PURPUR_STAIRS =
+				{
+					Notes = "The blocktype for purpur stairs"
+				},
+				E_BLOCK_QUARTZ_BLOCK =
+				{
+					Notes = "The blocktype for quartz block"
+				},
+				E_BLOCK_QUARTZ_STAIRS =
+				{
+					Notes = "The blocktype for quartz stairs"
+				},
+				E_BLOCK_RAIL =
+				{
+					Notes = "The blocktype for rail"
+				},
+				E_BLOCK_REDSTONE_LAMP_OFF =
+				{
+					Notes = "The blocktype for redstone lamp off"
+				},
+				E_BLOCK_REDSTONE_LAMP_ON =
+				{
+					Notes = "The blocktype for redstone lamp on"
+				},
+				E_BLOCK_REDSTONE_ORE =
+				{
+					Notes = "The blocktype for redstone ore"
+				},
+				E_BLOCK_REDSTONE_ORE_GLOWING =
+				{
+					Notes = "The blocktype for redstone ore glowing"
+				},
+				E_BLOCK_REDSTONE_REPEATER_OFF =
+				{
+					Notes = "The blocktype for redstone repeater off"
+				},
+				E_BLOCK_REDSTONE_REPEATER_ON =
+				{
+					Notes = "The blocktype for redstone repeater on"
+				},
+				E_BLOCK_REDSTONE_TORCH_OFF =
+				{
+					Notes = "The blocktype for redstone torch off"
+				},
+				E_BLOCK_REDSTONE_TORCH_ON =
+				{
+					Notes = "The blocktype for redstone torch on"
+				},
+				E_BLOCK_REDSTONE_WIRE =
+				{
+					Notes = "The blocktype for redstone wire"
+				},
+				E_BLOCK_RED_MUSHROOM =
+				{
+					Notes = "The blocktype for red mushroom"
+				},
+				E_BLOCK_RED_NETHER_BRICK =
+				{
+					Notes = "The blocktype for red nether brick"
+				},
+				E_BLOCK_RED_ROSE =
+				{
+					Notes = "The blocktype for red rose"
+				},
+				E_BLOCK_RED_SANDSTONE =
+				{
+					Notes = "The blocktype for red sandstone"
+				},
+				E_BLOCK_RED_SANDSTONE_SLAB =
+				{
+					Notes = "The blocktype for red sandstone slab"
+				},
+				E_BLOCK_RED_SANDSTONE_STAIRS =
+				{
+					Notes = "The blocktype for red sandstone stairs"
+				},
+				E_BLOCK_REEDS =
+				{
+					Notes = "The blocktype for reeds"
+				},
+				E_BLOCK_REPEATING_COMMAND_BLOCK =
+				{
+					Notes = "The blocktype for repeating command block"
+				},
+				E_BLOCK_SAND =
+				{
+					Notes = "The blocktype for sand"
+				},
+				E_BLOCK_SANDSTONE =
+				{
+					Notes = "The blocktype for sandstone"
+				},
+				E_BLOCK_SANDSTONE_STAIRS =
+				{
+					Notes = "The blocktype for sandstone stairs"
+				},
+				E_BLOCK_SAPLING =
+				{
+					Notes = "The blocktype for sapling"
+				},
+				E_BLOCK_SEA_LANTERN =
+				{
+					Notes = "The blocktype for sea lantern"
+				},
+				E_BLOCK_SIGN_POST =
+				{
+					Notes = "The blocktype for sign post"
+				},
+				E_BLOCK_SILVERFISH_EGG =
+				{
+					Notes = "The blocktype for silverfish egg"
+				},
+				E_BLOCK_SLIME_BLOCK =
+				{
+					Notes = "The blocktype for slime block"
+				},
+				E_BLOCK_SNOW =
+				{
+					Notes = "The blocktype for snow"
+				},
+				E_BLOCK_SNOW_BLOCK =
+				{
+					Notes = "The blocktype for snow block"
+				},
+				E_BLOCK_SOULSAND =
+				{
+					Notes = "The blocktype for soulsand"
+				},
+				E_BLOCK_SPONGE =
+				{
+					Notes = "The blocktype for sponge"
+				},
+				E_BLOCK_SPRUCE_DOOR =
+				{
+					Notes = "The blocktype for spruce door"
+				},
+				E_BLOCK_SPRUCE_FENCE =
+				{
+					Notes = "The blocktype for spruce fence"
+				},
+				E_BLOCK_SPRUCE_FENCE_GATE =
+				{
+					Notes = "The blocktype for spruce fence gate"
+				},
+				E_BLOCK_SPRUCE_WOOD_STAIRS =
+				{
+					Notes = "The blocktype for spruce wood stairs"
+				},
+				E_BLOCK_STAINED_CLAY =
+				{
+					Notes = "The blocktype for stained clay"
+				},
+				E_BLOCK_STAINED_GLASS =
+				{
+					Notes = "The blocktype for stained glass"
+				},
+				E_BLOCK_STAINED_GLASS_PANE =
+				{
+					Notes = "The blocktype for stained glass pane"
+				},
+				E_BLOCK_STAIRS_UPSIDE_DOWN =
+				{
+					Notes = "The blocktype for stairs upside down"
+				},
+				E_BLOCK_STAIRS_XM =
+				{
+					Notes = "The blocktype for stairs xm"
+				},
+				E_BLOCK_STAIRS_XP =
+				{
+					Notes = "The blocktype for stairs xp"
+				},
+				E_BLOCK_STAIRS_ZM =
+				{
+					Notes = "The blocktype for stairs zm"
+				},
+				E_BLOCK_STAIRS_ZP =
+				{
+					Notes = "The blocktype for stairs zp"
+				},
+				E_BLOCK_STANDING_BANNER =
+				{
+					Notes = "The blocktype for standing banner"
+				},
+				E_BLOCK_STATIONARY_LAVA =
+				{
+					Notes = "The blocktype for stationary lava"
+				},
+				E_BLOCK_STATIONARY_WATER =
+				{
+					Notes = "The blocktype for stationary water"
+				},
+				E_BLOCK_STICKY_PISTON =
+				{
+					Notes = "The blocktype for sticky piston"
+				},
+				E_BLOCK_STONE =
+				{
+					Notes = "The blocktype for stone"
+				},
+				E_BLOCK_STONE_BRICKS =
+				{
+					Notes = "The blocktype for stone bricks"
+				},
+				E_BLOCK_STONE_BRICK_STAIRS =
+				{
+					Notes = "The blocktype for stone brick stairs"
+				},
+				E_BLOCK_STONE_BUTTON =
+				{
+					Notes = "The blocktype for stone button"
+				},
+				E_BLOCK_STONE_PRESSURE_PLATE =
+				{
+					Notes = "The blocktype for stone pressure plate"
+				},
+				E_BLOCK_STONE_SLAB =
+				{
+					Notes = "The blocktype for stone slab"
+				},
+				E_BLOCK_STRUCTURE_BLOCK =
+				{
+					Notes = "The blocktype for structure block"
+				},
+				E_BLOCK_STRUCTURE_VOID =
+				{
+					Notes = "The blocktype for structure void"
+				},
+				E_BLOCK_SUGARCANE =
+				{
+					Notes = "The blocktype for sugarcane"
+				},
+				E_BLOCK_TALL_GRASS =
+				{
+					Notes = "The blocktype for tall grass"
+				},
+				E_BLOCK_TNT =
+				{
+					Notes = "The blocktype for tnt"
+				},
+				E_BLOCK_TORCH =
+				{
+					Notes = "The blocktype for torch"
+				},
+				E_BLOCK_TRAPDOOR =
+				{
+					Notes = "The blocktype for trapdoor"
+				},
+				E_BLOCK_TRAPPED_CHEST =
+				{
+					Notes = "The blocktype for trapped chest"
+				},
+				E_BLOCK_TRIPWIRE =
+				{
+					Notes = "The blocktype for tripwire"
+				},
+				E_BLOCK_TRIPWIRE_HOOK =
+				{
+					Notes = "The blocktype for tripwire hook"
+				},
+				E_BLOCK_VINES =
+				{
+					Notes = "The blocktype for vines"
+				},
+				E_BLOCK_WALLSIGN =
+				{
+					Notes = "The blocktype for wallsign"
+				},
+				E_BLOCK_WALL_BANNER =
+				{
+					Notes = "The blocktype for wall banner"
+				},
+				E_BLOCK_WATER =
+				{
+					Notes = "The blocktype for water"
+				},
+				E_BLOCK_WOODEN_BUTTON =
+				{
+					Notes = "The blocktype for wooden button"
+				},
+				E_BLOCK_WOODEN_DOOR =
+				{
+					Notes = "The blocktype for wooden door"
+				},
+				E_BLOCK_WOODEN_PRESSURE_PLATE =
+				{
+					Notes = "The blocktype for wooden pressure plate"
+				},
+				E_BLOCK_WOODEN_SLAB =
+				{
+					Notes = "The blocktype for wooden slab"
+				},
+				E_BLOCK_WOODEN_STAIRS =
+				{
+					Notes = "The blocktype for wooden stairs"
+				},
+				E_BLOCK_WOOL =
+				{
+					Notes = "The blocktype for wool"
+				},
+				E_BLOCK_WORKBENCH =
+				{
+					Notes = "The blocktype for workbench"
+				},
+				E_BLOCK_YELLOW_FLOWER =
+				{
+					Notes = "The blocktype for yellow flower"
+				},
+				E_ITEM_11_DISC =
+				{
+					Notes = "The itemtype for 11 disc"
+				},
+				E_ITEM_13_DISC =
+				{
+					Notes = "The itemtype for 13 disc"
+				},
+				E_ITEM_ACACIA_DOOR =
+				{
+					Notes = "The itemtype for acacia door"
+				},
+				E_ITEM_ARMOR_STAND =
+				{
+					Notes = "The itemtype for armor stand"
+				},
+				E_ITEM_ARROW =
+				{
+					Notes = "The itemtype for arrow"
+				},
+				E_ITEM_BAKED_POTATO =
+				{
+					Notes = "The itemtype for baked potato"
+				},
+				E_ITEM_BANNER =
+				{
+					Notes = "The itemtype for banner"
+				},
+				E_ITEM_BED =
+				{
+					Notes = "The itemtype for bed"
+				},
+				E_ITEM_BIRCH_DOOR =
+				{
+					Notes = "The itemtype for birch door"
+				},
+				E_ITEM_BLAZE_POWDER =
+				{
+					Notes = "The itemtype for blaze powder"
+				},
+				E_ITEM_BLAZE_ROD =
+				{
+					Notes = "The itemtype for blaze rod"
+				},
+				E_ITEM_BLOCKS_DISC =
+				{
+					Notes = "The itemtype for blocks disc"
+				},
+				E_ITEM_BOAT =
+				{
+					Notes = "The itemtype for boat"
+				},
+				E_ITEM_BONE =
+				{
+					Notes = "The itemtype for bone"
+				},
+				E_ITEM_BOOK =
+				{
+					Notes = "The itemtype for book"
+				},
+				E_ITEM_BOOK_AND_QUILL =
+				{
+					Notes = "The itemtype for book and quill"
+				},
+				E_ITEM_BOTTLE_O_ENCHANTING =
+				{
+					Notes = "The itemtype for bottle o enchanting"
+				},
+				E_ITEM_BOW =
+				{
+					Notes = "The itemtype for bow"
+				},
+				E_ITEM_BOWL =
+				{
+					Notes = "The itemtype for bowl"
+				},
+				E_ITEM_BREAD =
+				{
+					Notes = "The itemtype for bread"
+				},
+				E_ITEM_BREWING_STAND =
+				{
+					Notes = "The itemtype for brewing stand"
+				},
+				E_ITEM_BUCKET =
+				{
+					Notes = "The itemtype for bucket"
+				},
+				E_ITEM_CAKE =
+				{
+					Notes = "The itemtype for cake"
+				},
+				E_ITEM_CARROT =
+				{
+					Notes = "The itemtype for carrot"
+				},
+				E_ITEM_CARROT_ON_STICK =
+				{
+					Notes = "The itemtype for carrot on stick"
+				},
+				E_ITEM_CAT_DISC =
+				{
+					Notes = "The itemtype for cat disc"
+				},
+				E_ITEM_CAULDRON =
+				{
+					Notes = "The itemtype for cauldron"
+				},
+				E_ITEM_CHAIN_BOOTS =
+				{
+					Notes = "The itemtype for chain boots"
+				},
+				E_ITEM_CHAIN_CHESTPLATE =
+				{
+					Notes = "The itemtype for chain chestplate"
+				},
+				E_ITEM_CHAIN_HELMET =
+				{
+					Notes = "The itemtype for chain helmet"
+				},
+				E_ITEM_CHAIN_LEGGINGS =
+				{
+					Notes = "The itemtype for chain leggings"
+				},
+				E_ITEM_CHEST_MINECART =
+				{
+					Notes = "The itemtype for chest minecart"
+				},
+				E_ITEM_CHIRP_DISC =
+				{
+					Notes = "The itemtype for chirp disc"
+				},
+				E_ITEM_CLAY =
+				{
+					Notes = "The itemtype for clay"
+				},
+				E_ITEM_CLAY_BRICK =
+				{
+					Notes = "The itemtype for clay brick"
+				},
+				E_ITEM_CLOCK =
+				{
+					Notes = "The itemtype for clock"
+				},
+				E_ITEM_COAL =
+				{
+					Notes = "The itemtype for coal"
+				},
+				E_ITEM_COMPARATOR =
+				{
+					Notes = "The itemtype for comparator"
+				},
+				E_ITEM_COMPASS =
+				{
+					Notes = "The itemtype for compass"
+				},
+				E_ITEM_COOKED_CHICKEN =
+				{
+					Notes = "The itemtype for cooked chicken"
+				},
+				E_ITEM_COOKED_FISH =
+				{
+					Notes = "The itemtype for cooked fish"
+				},
+				E_ITEM_COOKED_MUTTON =
+				{
+					Notes = "The itemtype for cooked mutton"
+				},
+				E_ITEM_COOKED_PORKCHOP =
+				{
+					Notes = "The itemtype for cooked porkchop"
+				},
+				E_ITEM_COOKED_RABBIT =
+				{
+					Notes = "The itemtype for cooked rabbit"
+				},
+				E_ITEM_COOKIE =
+				{
+					Notes = "The itemtype for cookie"
+				},
+				E_ITEM_DARK_OAK_DOOR =
+				{
+					Notes = "The itemtype for dark oak door"
+				},
+				E_ITEM_DIAMOND =
+				{
+					Notes = "The itemtype for diamond"
+				},
+				E_ITEM_DIAMOND_AXE =
+				{
+					Notes = "The itemtype for diamond axe"
+				},
+				E_ITEM_DIAMOND_BOOTS =
+				{
+					Notes = "The itemtype for diamond boots"
+				},
+				E_ITEM_DIAMOND_CHESTPLATE =
+				{
+					Notes = "The itemtype for diamond chestplate"
+				},
+				E_ITEM_DIAMOND_HELMET =
+				{
+					Notes = "The itemtype for diamond helmet"
+				},
+				E_ITEM_DIAMOND_HOE =
+				{
+					Notes = "The itemtype for diamond hoe"
+				},
+				E_ITEM_DIAMOND_HORSE_ARMOR =
+				{
+					Notes = "The itemtype for diamond horse armor"
+				},
+				E_ITEM_DIAMOND_LEGGINGS =
+				{
+					Notes = "The itemtype for diamond leggings"
+				},
+				E_ITEM_DIAMOND_PICKAXE =
+				{
+					Notes = "The itemtype for diamond pickaxe"
+				},
+				E_ITEM_DIAMOND_SHOVEL =
+				{
+					Notes = "The itemtype for diamond shovel"
+				},
+				E_ITEM_DIAMOND_SWORD =
+				{
+					Notes = "The itemtype for diamond sword"
+				},
+				E_ITEM_DYE =
+				{
+					Notes = "The itemtype for dye"
+				},
+				E_ITEM_EGG =
+				{
+					Notes = "The itemtype for egg"
+				},
+				E_ITEM_EMERALD =
+				{
+					Notes = "The itemtype for emerald"
+				},
+				E_ITEM_EMPTY =
+				{
+					Notes = "The itemtype for empty"
+				},
+				E_ITEM_EMPTY_MAP =
+				{
+					Notes = "The itemtype for empty map"
+				},
+				E_ITEM_ENCHANTED_BOOK =
+				{
+					Notes = "The itemtype for enchanted book"
+				},
+				E_ITEM_ENDER_PEARL =
+				{
+					Notes = "The itemtype for ender pearl"
+				},
+				E_ITEM_EYE_OF_ENDER =
+				{
+					Notes = "The itemtype for eye of ender"
+				},
+				E_ITEM_FAR_DISC =
+				{
+					Notes = "The itemtype for far disc"
+				},
+				E_ITEM_FEATHER =
+				{
+					Notes = "The itemtype for feather"
+				},
+				E_ITEM_FERMENTED_SPIDER_EYE =
+				{
+					Notes = "The itemtype for fermented spider eye"
+				},
+				E_ITEM_FIREWORK_ROCKET =
+				{
+					Notes = "The itemtype for firework rocket"
+				},
+				E_ITEM_FIREWORK_STAR =
+				{
+					Notes = "The itemtype for firework star"
+				},
+				E_ITEM_FIRE_CHARGE =
+				{
+					Notes = "The itemtype for fire charge"
+				},
+				E_ITEM_FIRST =
+				{
+					Notes = "The itemtype for first"
+				},
+				E_ITEM_FIRST_DISC =
+				{
+					Notes = "The itemtype for first disc"
+				},
+				E_ITEM_FISHING_ROD =
+				{
+					Notes = "The itemtype for fishing rod"
+				},
+				E_ITEM_FLINT =
+				{
+					Notes = "The itemtype for flint"
+				},
+				E_ITEM_FLINT_AND_STEEL =
+				{
+					Notes = "The itemtype for flint and steel"
+				},
+				E_ITEM_FLOWER_POT =
+				{
+					Notes = "The itemtype for flower pot"
+				},
+				E_ITEM_FURNACE_MINECART =
+				{
+					Notes = "The itemtype for furnace minecart"
+				},
+				E_ITEM_GHAST_TEAR =
+				{
+					Notes = "The itemtype for ghast tear"
+				},
+				E_ITEM_GLASS_BOTTLE =
+				{
+					Notes = "The itemtype for glass bottle"
+				},
+				E_ITEM_GLISTERING_MELON =
+				{
+					Notes = "The itemtype for glistering melon"
+				},
+				E_ITEM_GLOWSTONE_DUST =
+				{
+					Notes = "The itemtype for glowstone dust"
+				},
+				E_ITEM_GOLD =
+				{
+					Notes = "The itemtype for gold"
+				},
+				E_ITEM_GOLDEN_APPLE =
+				{
+					Notes = "The itemtype for golden apple"
+				},
+				E_ITEM_GOLDEN_CARROT =
+				{
+					Notes = "The itemtype for golden carrot"
+				},
+				E_ITEM_GOLD_AXE =
+				{
+					Notes = "The itemtype for gold axe"
+				},
+				E_ITEM_GOLD_BOOTS =
+				{
+					Notes = "The itemtype for gold boots"
+				},
+				E_ITEM_GOLD_CHESTPLATE =
+				{
+					Notes = "The itemtype for gold chestplate"
+				},
+				E_ITEM_GOLD_HELMET =
+				{
+					Notes = "The itemtype for gold helmet"
+				},
+				E_ITEM_GOLD_HOE =
+				{
+					Notes = "The itemtype for gold hoe"
+				},
+				E_ITEM_GOLD_HORSE_ARMOR =
+				{
+					Notes = "The itemtype for gold horse armor"
+				},
+				E_ITEM_GOLD_LEGGINGS =
+				{
+					Notes = "The itemtype for gold leggings"
+				},
+				E_ITEM_GOLD_NUGGET =
+				{
+					Notes = "The itemtype for gold nugget"
+				},
+				E_ITEM_GOLD_PICKAXE =
+				{
+					Notes = "The itemtype for gold pickaxe"
+				},
+				E_ITEM_GOLD_SHOVEL =
+				{
+					Notes = "The itemtype for gold shovel"
+				},
+				E_ITEM_GOLD_SWORD =
+				{
+					Notes = "The itemtype for gold sword"
+				},
+				E_ITEM_GUNPOWDER =
+				{
+					Notes = "The itemtype for gunpowder"
+				},
+				E_ITEM_HEAD =
+				{
+					Notes = "The itemtype for head"
+				},
+				E_ITEM_IRON =
+				{
+					Notes = "The itemtype for iron"
+				},
+				E_ITEM_IRON_AXE =
+				{
+					Notes = "The itemtype for iron axe"
+				},
+				E_ITEM_IRON_BOOTS =
+				{
+					Notes = "The itemtype for iron boots"
+				},
+				E_ITEM_IRON_CHESTPLATE =
+				{
+					Notes = "The itemtype for iron chestplate"
+				},
+				E_ITEM_IRON_DOOR =
+				{
+					Notes = "The itemtype for iron door"
+				},
+				E_ITEM_IRON_HELMET =
+				{
+					Notes = "The itemtype for iron helmet"
+				},
+				E_ITEM_IRON_HOE =
+				{
+					Notes = "The itemtype for iron hoe"
+				},
+				E_ITEM_IRON_HORSE_ARMOR =
+				{
+					Notes = "The itemtype for iron horse armor"
+				},
+				E_ITEM_IRON_LEGGINGS =
+				{
+					Notes = "The itemtype for iron leggings"
+				},
+				E_ITEM_IRON_PICKAXE =
+				{
+					Notes = "The itemtype for iron pickaxe"
+				},
+				E_ITEM_IRON_SHOVEL =
+				{
+					Notes = "The itemtype for iron shovel"
+				},
+				E_ITEM_IRON_SWORD =
+				{
+					Notes = "The itemtype for iron sword"
+				},
+				E_ITEM_ITEM_FRAME =
+				{
+					Notes = "The itemtype for item frame"
+				},
+				E_ITEM_JUNGLE_DOOR =
+				{
+					Notes = "The itemtype for jungle door"
+				},
+				E_ITEM_LAST =
+				{
+					Notes = "The itemtype for last"
+				},
+				E_ITEM_LAST_DISC =
+				{
+					Notes = "The itemtype for last disc"
+				},
+				E_ITEM_LAST_DISC_PLUS_ONE =
+				{
+					Notes = "The itemtype for last disc plus one"
+				},
+				E_ITEM_LAVA_BUCKET =
+				{
+					Notes = "The itemtype for lava bucket"
+				},
+				E_ITEM_LEAD =
+				{
+					Notes = "The itemtype for lead"
+				},
+				E_ITEM_LEATHER =
+				{
+					Notes = "The itemtype for leather"
+				},
+				E_ITEM_LEATHER_BOOTS =
+				{
+					Notes = "The itemtype for leather boots"
+				},
+				E_ITEM_LEATHER_CAP =
+				{
+					Notes = "The itemtype for leather cap"
+				},
+				E_ITEM_LEATHER_PANTS =
+				{
+					Notes = "The itemtype for leather pants"
+				},
+				E_ITEM_LEATHER_TUNIC =
+				{
+					Notes = "The itemtype for leather tunic"
+				},
+				E_ITEM_MAGMA_CREAM =
+				{
+					Notes = "The itemtype for magma cream"
+				},
+				E_ITEM_MALL_DISC =
+				{
+					Notes = "The itemtype for mall disc"
+				},
+				E_ITEM_MAP =
+				{
+					Notes = "The itemtype for map"
+				},
+				E_ITEM_MAX_CONSECUTIVE_TYPE_ID =
+				{
+					Notes = "The itemtype for max consecutive type id"
+				},
+				E_ITEM_MELLOHI_DISC =
+				{
+					Notes = "The itemtype for mellohi disc"
+				},
+				E_ITEM_MELON_SEEDS =
+				{
+					Notes = "The itemtype for melon seeds"
+				},
+				E_ITEM_MELON_SLICE =
+				{
+					Notes = "The itemtype for melon slice"
+				},
+				E_ITEM_MILK =
+				{
+					Notes = "The itemtype for milk"
+				},
+				E_ITEM_MINECART =
+				{
+					Notes = "The itemtype for minecart"
+				},
+				E_ITEM_MINECART_WITH_COMMAND_BLOCK =
+				{
+					Notes = "The itemtype for minecart with command block"
+				},
+				E_ITEM_MINECART_WITH_HOPPER =
+				{
+					Notes = "The itemtype for minecart with hopper"
+				},
+				E_ITEM_MINECART_WITH_TNT =
+				{
+					Notes = "The itemtype for minecart with tnt"
+				},
+				E_ITEM_MUSHROOM_SOUP =
+				{
+					Notes = "The itemtype for mushroom soup"
+				},
+				E_ITEM_NAME_TAG =
+				{
+					Notes = "The itemtype for name tag"
+				},
+				E_ITEM_NETHER_BRICK =
+				{
+					Notes = "The itemtype for nether brick"
+				},
+				E_ITEM_NETHER_QUARTZ =
+				{
+					Notes = "The itemtype for nether quartz"
+				},
+				E_ITEM_NETHER_STAR =
+				{
+					Notes = "The itemtype for nether star"
+				},
+				E_ITEM_NETHER_WART =
+				{
+					Notes = "The itemtype for nether wart"
+				},
+				E_ITEM_NUMBER_OF_CONSECUTIVE_TYPES =
+				{
+					Notes = "The itemtype for number of consecutive types"
+				},
+				E_ITEM_PAINTING =
+				{
+					Notes = "The itemtype for painting"
+				},
+				E_ITEM_PAPER =
+				{
+					Notes = "The itemtype for paper"
+				},
+				E_ITEM_POISONOUS_POTATO =
+				{
+					Notes = "The itemtype for poisonous potato"
+				},
+				E_ITEM_POTATO =
+				{
+					Notes = "The itemtype for potato"
+				},
+				E_ITEM_POTION =
+				{
+					Notes = "The itemtype for potion"
+				},
+				E_ITEM_POTIONS =
+				{
+					Notes = "The itemtype for potions"
+				},
+				E_ITEM_PRISMARINE_CRYSTALS =
+				{
+					Notes = "The itemtype for prismarine crystals"
+				},
+				E_ITEM_PRISMARINE_SHARD =
+				{
+					Notes = "The itemtype for prismarine shard"
+				},
+				E_ITEM_PUMPKIN_PIE =
+				{
+					Notes = "The itemtype for pumpkin pie"
+				},
+				E_ITEM_PUMPKIN_SEEDS =
+				{
+					Notes = "The itemtype for pumpkin seeds"
+				},
+				E_ITEM_RABBITS_FOOT =
+				{
+					Notes = "The itemtype for rabbits foot"
+				},
+				E_ITEM_RABBIT_HIDE =
+				{
+					Notes = "The itemtype for rabbit hide"
+				},
+				E_ITEM_RABBIT_STEW =
+				{
+					Notes = "The itemtype for rabbit stew"
+				},
+				E_ITEM_RAW_BEEF =
+				{
+					Notes = "The itemtype for raw beef"
+				},
+				E_ITEM_RAW_CHICKEN =
+				{
+					Notes = "The itemtype for raw chicken"
+				},
+				E_ITEM_RAW_FISH =
+				{
+					Notes = "The itemtype for raw fish"
+				},
+				E_ITEM_RAW_MUTTON =
+				{
+					Notes = "The itemtype for raw mutton"
+				},
+				E_ITEM_RAW_PORKCHOP =
+				{
+					Notes = "The itemtype for raw porkchop"
+				},
+				E_ITEM_RAW_RABBIT =
+				{
+					Notes = "The itemtype for raw rabbit"
+				},
+				E_ITEM_REDSTONE_DUST =
+				{
+					Notes = "The itemtype for redstone dust"
+				},
+				E_ITEM_REDSTONE_REPEATER =
+				{
+					Notes = "The itemtype for redstone repeater"
+				},
+				E_ITEM_RED_APPLE =
+				{
+					Notes = "The itemtype for red apple"
+				},
+				E_ITEM_ROTTEN_FLESH =
+				{
+					Notes = "The itemtype for rotten flesh"
+				},
+				E_ITEM_SADDLE =
+				{
+					Notes = "The itemtype for saddle"
+				},
+				E_ITEM_SEEDS =
+				{
+					Notes = "The itemtype for seeds"
+				},
+				E_ITEM_SHEARS =
+				{
+					Notes = "The itemtype for shears"
+				},
+				E_ITEM_SIGN =
+				{
+					Notes = "The itemtype for sign"
+				},
+				E_ITEM_SLIMEBALL =
+				{
+					Notes = "The itemtype for slimeball"
+				},
+				E_ITEM_SNOWBALL =
+				{
+					Notes = "The itemtype for snowball"
+				},
+				E_ITEM_SPAWN_EGG =
+				{
+					Notes = "The itemtype for spawn egg"
+				},
+				E_ITEM_SPIDER_EYE =
+				{
+					Notes = "The itemtype for spider eye"
+				},
+				E_ITEM_SPRUCE_DOOR =
+				{
+					Notes = "The itemtype for spruce door"
+				},
+				E_ITEM_STAL_DISC =
+				{
+					Notes = "The itemtype for stal disc"
+				},
+				E_ITEM_STEAK =
+				{
+					Notes = "The itemtype for steak"
+				},
+				E_ITEM_STICK =
+				{
+					Notes = "The itemtype for stick"
+				},
+				E_ITEM_STONE_AXE =
+				{
+					Notes = "The itemtype for stone axe"
+				},
+				E_ITEM_STONE_HOE =
+				{
+					Notes = "The itemtype for stone hoe"
+				},
+				E_ITEM_STONE_PICKAXE =
+				{
+					Notes = "The itemtype for stone pickaxe"
+				},
+				E_ITEM_STONE_SHOVEL =
+				{
+					Notes = "The itemtype for stone shovel"
+				},
+				E_ITEM_STONE_SWORD =
+				{
+					Notes = "The itemtype for stone sword"
+				},
+				E_ITEM_STRAD_DISC =
+				{
+					Notes = "The itemtype for strad disc"
+				},
+				E_ITEM_STRING =
+				{
+					Notes = "The itemtype for string"
+				},
+				E_ITEM_SUGAR =
+				{
+					Notes = "The itemtype for sugar"
+				},
+				E_ITEM_SUGARCANE =
+				{
+					Notes = "The itemtype for sugarcane"
+				},
+				E_ITEM_SUGAR_CANE =
+				{
+					Notes = "The itemtype for sugar cane"
+				},
+				E_ITEM_WAIT_DISC =
+				{
+					Notes = "The itemtype for wait disc"
+				},
+				E_ITEM_WARD_DISC =
+				{
+					Notes = "The itemtype for ward disc"
+				},
+				E_ITEM_WATER_BUCKET =
+				{
+					Notes = "The itemtype for water bucket"
+				},
+				E_ITEM_WHEAT =
+				{
+					Notes = "The itemtype for wheat"
+				},
+				E_ITEM_WOODEN_AXE =
+				{
+					Notes = "The itemtype for wooden axe"
+				},
+				E_ITEM_WOODEN_DOOR =
+				{
+					Notes = "The itemtype for wooden door"
+				},
+				E_ITEM_WOODEN_HOE =
+				{
+					Notes = "The itemtype for wooden hoe"
+				},
+				E_ITEM_WOODEN_PICKAXE =
+				{
+					Notes = "The itemtype for wooden pickaxe"
+				},
+				E_ITEM_WOODEN_SHOVEL =
+				{
+					Notes = "The itemtype for wooden shovel"
+				},
+				E_ITEM_WOODEN_SWORD =
+				{
+					Notes = "The itemtype for wooden sword"
+				},
+				E_ITEM_WRITTEN_BOOK =
+				{
+					Notes = "The itemtype for written book"
+				},
 				BLOCK_FACE_BOTTOM =
 				{
 					Notes = "Please use BLOCK_FACE_YM instead. Interacting with the bottom face of the block.",
