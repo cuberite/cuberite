@@ -14,7 +14,7 @@ class cOcelot :
 
 public:
 	cOcelot(void) :
-		super("Ocelot", mtOcelot, "mob.cat.hitt", "mob.cat.hitt", 0.6, 0.8)
+		super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", 0.6, 0.8)
 	{
 	}
 

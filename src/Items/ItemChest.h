@@ -159,20 +159,6 @@ public:
 			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
 		}
 
-		// Play the placement sound:
-		AString PlaceSound = cBlockInfo::GetPlaceSound(ChestBlockType);
-		float Volume = 1.0f, Pitch = 0.8f;
-		if (PlaceSound == "dig.metal")
-		{
-			Pitch = 1.2f;
-			PlaceSound = "dig.stone";
-		}
-		else if (PlaceSound == "random.anvil_land")
-		{
-			Volume = 0.65f;
-		}
-		a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-
 		// Remove the "placed" item:
 		if (a_Player.IsGameModeSurvival())
 		{

@@ -2291,7 +2291,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 
 	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
 	{
-		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("entity.item.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}
 }
 

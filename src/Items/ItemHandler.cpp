@@ -416,29 +416,6 @@ bool cItemHandler::OnPlayerPlace(
 		return false;
 	}
 
-	// Play the placement sound for the main block:
-	for (const auto & blk: blocks)
-	{
-		// Find the main block by comparing the coords:
-		if ((blk.GetX() != a_BlockX) || (blk.GetY() != a_BlockY) || (blk.GetZ() != a_BlockZ))
-		{
-			continue;
-		}
-		AString PlaceSound = cBlockInfo::GetPlaceSound(blk.m_BlockType);
-		float Volume = 1.0f, Pitch = 0.8f;
-		if (PlaceSound == "dig.metal")
-		{
-			Pitch = 1.2f;
-			PlaceSound = "dig.stone";
-		}
-		else if (PlaceSound == "random.anvil_land")
-		{
-			Volume = 0.65f;
-		}
-		a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-		break;
-	}  // for blk - blocks[]
-
 	// Remove the "placed" item:
 	if (a_Player.IsGameModeSurvival())
 	{

@@ -35,7 +35,7 @@ public:
 
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta, false);
 		a_WorldInterface.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.6f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", x, y, z, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
 		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
@@ -46,7 +46,7 @@ public:
 					// Block hasn't change in the meantime; set its meta
 					a_World.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, a_World.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x07, false);
 					a_World.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
-					a_World.BroadcastSoundEffect("random.click", x, y, z, 0.5f, 0.5f);
+					a_World.BroadcastSoundEffect("block.stone_button.click_off", x, y, z, 0.5f, 0.5f);
 				}
 			}
 		);

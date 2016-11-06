@@ -13,7 +13,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	super("Sheep", mtSheep, "mob.sheep.say", "mob.sheep.say", 0.6, 1.3),
+	super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", 0.6, 1.3),
 	m_IsSheared(false),
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
@@ -68,7 +68,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		int NumDrops = m_World->GetTickRandomNumber(2) + 1;
 		Drops.push_back(cItem(E_BLOCK_WOOL, static_cast<char>(NumDrops), static_cast<short>(m_WoolColor)));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
-		m_World->BroadcastSoundEffect("mob.sheep.shear", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 1.0f);
+		m_World->BroadcastSoundEffect("entity.sheep.shear", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 1.0f);
 	}
 	else if ((EquippedItem.m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
 	{

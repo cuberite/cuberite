@@ -12,8 +12,8 @@
 cSlime::cSlime(int a_Size) :
 	super("Slime",
 		mtSlime,
-		Printf("mob.slime.%s", GetSizeName(a_Size).c_str()),
-		Printf("mob.slime.%s", GetSizeName(a_Size).c_str()),
+		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
+		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
 		0.6 * a_Size,
 		0.6 * a_Size
 	),
@@ -93,14 +93,11 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 
 AString cSlime::GetSizeName(int a_Size)
 {
-	if (a_Size > 1)
+	if (a_Size == 1)
 	{
-		return "big";
+		return "small_";
 	}
-	else
-	{
-		return "small";
-	}
+	return "";
 }
 
 

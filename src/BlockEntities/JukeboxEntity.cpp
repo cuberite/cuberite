@@ -64,7 +64,7 @@ bool cJukeboxEntity::PlayRecord(int a_Record)
 		EjectRecord();
 	}
 	m_Record = a_Record;
-	m_World->BroadcastSoundParticleEffect(EffectID::SFX_PLAY_MUSIC_DISC, m_PosX, m_PosY, m_PosZ, m_Record);
+	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, m_PosX, m_PosY, m_PosZ, m_Record);
 	m_World->SetBlockMeta(m_PosX, m_PosY, m_PosZ, E_META_JUKEBOX_ON);
 	return true;
 }
@@ -85,7 +85,7 @@ bool cJukeboxEntity::EjectRecord(void)
 	Drops.push_back(cItem(static_cast<short>(m_Record), 1, 0));
 	m_Record = 0;
 	m_World->SpawnItemPickups(Drops, m_PosX + 0.5, m_PosY + 1, m_PosZ + 0.5, 8);
-	m_World->BroadcastSoundParticleEffect(EffectID::SFX_PLAY_MUSIC_DISC, m_PosX, m_PosY, m_PosZ, 0);
+	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, m_PosX, m_PosY, m_PosZ, 0);
 	m_World->SetBlockMeta(m_PosX, m_PosY, m_PosZ, E_META_JUKEBOX_OFF);
 	return true;
 }

@@ -240,7 +240,7 @@ cWorld::~cWorld()
 void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
-	BroadcastSoundEffect("ambient.weather.thunder", a_BlockX, a_BlockY, a_BlockZ, 50, 1);
+	BroadcastSoundEffect("entity.lightning.thunder", a_BlockX, a_BlockY, a_BlockZ, 50, 1);
 }
 
 
@@ -1387,7 +1387,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("random.explode", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 1.0f, 0.6f);
+	BroadcastSoundEffect("entity.generic.explode", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 1.0f, 0.6f);
 
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -3440,7 +3440,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	if (a_Open != IsOpen)
 	{
 		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
-		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, a_BlockX, a_BlockY, a_BlockZ, 0);
+		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0);
 		return true;
 	}
 	return false;

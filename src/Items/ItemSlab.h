@@ -39,10 +39,6 @@ public:
 		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
-		// Prepare sound effect
-		AString PlaceSound = cBlockInfo::GetPlaceSound(static_cast<BLOCKTYPE>(m_ItemType));
-		float Volume = 1.0f, Pitch = 0.8f;
-
 		// Special slab handling - placing a slab onto another slab produces a dblslab instead:
 		BLOCKTYPE ClickedBlockType;
 		NIBBLETYPE ClickedBlockMeta;
@@ -59,7 +55,6 @@ public:
 				((ClickedBlockMeta & 0x08) == 0)
 			)
 			{
-				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
 				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
 				{
 					return false;
@@ -77,7 +72,6 @@ public:
 				((ClickedBlockMeta & 0x08) != 0)
 			)
 			{
-				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
 				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
 				{
 					return false;
@@ -101,7 +95,6 @@ public:
 			((PlaceBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
 		)
 		{
-			a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
 			if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07))
 			{
 				return false;

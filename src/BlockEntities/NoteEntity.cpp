@@ -85,16 +85,16 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_WOODEN_SLAB:
 		{
 			instrument = E_INST_DOUBLE_BASS;
-			sampleName = "note.bassattack";
+			sampleName = "block.note.bass";
 			break;
 		}
 
-		case E_BLOCK_SAND:
 		case E_BLOCK_GRAVEL:
+		case E_BLOCK_SAND:
 		case E_BLOCK_SOULSAND:
 		{
 			instrument = E_INST_SNARE_DRUM;
-			sampleName = "note.snare";
+			sampleName = "block.note.snare";
 			break;
 		}
 
@@ -107,7 +107,7 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_STAINED_GLASS_PANE:
 		{
 			instrument = E_INST_CLICKS;
-			sampleName = "note.hat";
+			sampleName = "block.note.hat";
 			break;
 		}
 
@@ -186,14 +186,14 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_YELLOW_SHULKER_BOX:
 		{
 			instrument = E_INST_BASS_DRUM;
-			sampleName = "note.bd";
+			sampleName = "block.note.basedrum";
 			break;
 		}
 
 		default:
 		{
 			instrument = E_INST_HARP_PIANO;
-			sampleName = "note.harp";
+			sampleName = "block.note.harp";
 			break;
 		}
 	}
