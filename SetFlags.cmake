@@ -86,7 +86,13 @@ macro(set_flags)
 		else()
 			add_flags_cxx("-pthread")
 		endif()
-
+	elseif (ANDROID)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++14")
+		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++14")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++14")
+		
+		add_flags_cxx("-fsigned-char")
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
 		if (${UNIX})
@@ -300,6 +306,7 @@ macro(set_exe_flags)
 				endif()
 			endif()
 			add_flags_cxx("-Wno-error=unused-command-line-argument")
+			add_flags_cxx("-Wno-documentation-unknown-command")
 		endif()
 	endif()
 

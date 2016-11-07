@@ -55,7 +55,7 @@ class cClientHandle  // tolua_export
 {  // tolua_export
 public:  // tolua_export
 
-	#if defined(ANDROID_NDK)
+	#if defined(ANDROID)
 		static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
 	#else
 		static const int DEFAULT_VIEW_DISTANCE = 10;

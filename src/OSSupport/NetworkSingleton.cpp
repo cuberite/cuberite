@@ -13,6 +13,11 @@
 #include "IPLookup.h"
 #include "HostnameLookup.h"
 
+#ifdef ANDROID
+	// For DNS server retrieval
+	#include <sys/system_properties.h>
+#endif
+
 
 
 
@@ -88,6 +93,16 @@ void cNetworkSingleton::Initialise(void)
 		LOGERROR("Failed to initialize LibEvent's DNS subsystem. The server will now terminate.");
 		abort();
 	}
+
+	#ifdef ANDROID
+		char PropertyBuffer[PROP_VALUE_MAX];
+
+		__system_property_get("net.dns1", PropertyBuffer);
+		evdns_base_nameserver_ip_add(m_DNSBase, PropertyBuffer);
+
+		__system_property_get("net.dns2", PropertyBuffer);
+		evdns_base_nameserver_ip_add(m_DNSBase, PropertyBuffer);
+	#endif
 
 	// Create the event loop thread:
 	m_HasTerminated = false;

@@ -653,9 +653,13 @@ unsigned cFile::GetLastModificationTime(const AString & a_FileName)
 	{
 		return 0;
 	}
-	#ifdef _WIN32
+	#if defined(_WIN32)
 		// Windows returns times in local time already
 		return static_cast<unsigned>(st.st_mtime);
+	#elif defined(ANDROID)
+		// Identical to Linux below, but st_mtime is an unsigned long, so cast is needed:
+		auto Time = static_cast<time_t>(st.st_mtime);
+		return static_cast<unsigned>(mktime(localtime(&Time)));
 	#else
 		// Linux returns UTC time, convert to local timezone:
 		return static_cast<unsigned>(mktime(localtime(&st.st_mtime)));

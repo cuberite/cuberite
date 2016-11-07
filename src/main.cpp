@@ -8,6 +8,20 @@
 #include <csignal>
 #include <stdlib.h>
 
+#ifdef ANDROID
+	// Workaround for Android NDK builds that do not support std::to_string
+	namespace std
+	{
+		template <typename T>
+		std::string to_string(T Value)
+		{
+			std::ostringstream TempStream;
+			TempStream << Value;
+			return TempStream.str();
+		}
+	}
+#endif
+
 #ifdef _MSC_VER
 	#include <dbghelp.h>
 #endif  // _MSC_VER
@@ -223,14 +237,11 @@ static void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_Overri
 	// Initialize LibEvent:
 	cNetworkSingleton::Get().Initialise();
 
-	#if !defined(ANDROID_NDK)
 	try
-	#endif
 	{
 		cRoot Root;
 		Root.Start(std::move(a_OverridesRepo));
 	}
-	#if !defined(ANDROID_NDK)
 	catch (std::exception & e)
 	{
 		LOGERROR("Standard exception: %s", e.what());
@@ -239,7 +250,6 @@ static void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_Overri
 	{
 		LOGERROR("Unknown exception!");
 	}
-	#endif
 
 	// Shutdown all of LibEvent:
 	cNetworkSingleton::Get().Terminate();
