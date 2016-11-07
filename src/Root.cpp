@@ -207,18 +207,16 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	{
 		m_WebAdmin->Start();
 
-		#if !defined(ANDROID_NDK)
-			LOGD("Starting InputThread...");
-			try
-			{
-				m_InputThreadRunFlag.test_and_set();
-				m_InputThread = std::thread(InputThread, std::ref(*this));
-			}
-			catch (std::system_error & a_Exception)
-			{
-				LOGERROR("cRoot::Start (std::thread) error %i: could not construct input thread; %s", a_Exception.code().value(), a_Exception.what());
-			}
-		#endif
+		LOGD("Starting InputThread...");
+		try
+		{
+			m_InputThreadRunFlag.test_and_set();
+			m_InputThread = std::thread(InputThread, std::ref(*this));
+		}
+		catch (std::system_error & a_Exception)
+		{
+			LOGERROR("cRoot::Start (std::thread) error %i: could not construct input thread; %s", a_Exception.code().value(), a_Exception.what());
+		}
 
 		LOG("Startup complete, took %ldms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
 

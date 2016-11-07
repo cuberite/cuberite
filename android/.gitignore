@@ -1,0 +1,5 @@
+/Cuberite/
+/CMakeFiles/
+/lua_native-prefix/
+/tolua_native-prefix/
+CMakeCache.txt

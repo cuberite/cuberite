@@ -43,12 +43,4 @@ endif()
 
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
-
-	if(UNIX)
-		if(NOT APPLE)
-			target_link_libraries(OSSupport rt)
-		endif()
-
-		target_link_libraries(OSSupport pthread event_core event_extra)
-	endif()
 endif()

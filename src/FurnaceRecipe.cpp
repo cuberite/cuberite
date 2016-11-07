@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-#define FURNACE_RECIPE_FILE "furnace.txt"
+#define FURNACE_RECIPE_FILE FILE_IO_PREFIX "furnace.txt"
 
 
 
@@ -70,6 +70,10 @@ void cFurnaceRecipe::ReloadRecipes(void)
 		LineNum++;
 		if (ParsingLine.empty())
 		{
+			// There is a problem here on Android. Text files transferred from another OS may have a newline representation Android's implementation of getline doesn't expect
+			// Thus, part of a newline may be left in ParsingLine. ::empty() thus thinks the string isn't empty, and the below code outputs interesting errors since it was passed a nearly empty string
+			// Ref: http://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
+			// TODO: There is a solution in the above reference, but it isn't very pretty. Fix it somehow.
 			continue;
 		}
 
