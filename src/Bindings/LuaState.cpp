@@ -2116,7 +2116,13 @@ void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 			case LUA_TBOOLEAN: Value.assign((lua_toboolean(a_LuaState, i) != 0) ? "true" : "false"); break;
 			case LUA_TLIGHTUSERDATA: Printf(Value, "%p", lua_touserdata(a_LuaState, i)); break;
 			case LUA_TNUMBER:        Printf(Value, "%f", static_cast<double>(lua_tonumber(a_LuaState, i))); break;
-			case LUA_TSTRING:        Printf(Value, "%s", lua_tostring(a_LuaState, i)); break;
+			case LUA_TSTRING:
+			{
+				size_t len;
+				const char * txt = lua_tolstring(a_LuaState, i, &len);
+				Value.assign(txt, std::min<size_t>(len, 50));  // Only log up to 50 characters of the string
+				break;
+			}
 			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
 			case LUA_TFUNCTION:      Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
 			case LUA_TUSERDATA:
