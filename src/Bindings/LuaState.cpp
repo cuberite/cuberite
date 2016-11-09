@@ -549,6 +549,8 @@ void cLuaState::Detach(void)
 
 void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a_Path)
 {
+	ASSERT_LUA_STACK_BALANCE(m_LuaState);
+
 	// Get the current path:
 	lua_getfield(m_LuaState, LUA_GLOBALSINDEX, "package");                           // Stk: <package>
 	lua_getfield(m_LuaState, -1, a_PathVariable.c_str());                            // Stk: <package> <package.path>
@@ -574,6 +576,7 @@ void cLuaState::AddPackagePath(const AString & a_PathVariable, const AString & a
 bool cLuaState::LoadFile(const AString & a_FileName, bool a_LogWarnings)
 {
 	ASSERT(IsValid());
+	ASSERT_LUA_STACK_BALANCE(m_LuaState);
 
 	// Load the file:
 	int s = luaL_loadfile(m_LuaState, a_FileName.c_str());
@@ -588,7 +591,7 @@ bool cLuaState::LoadFile(const AString & a_FileName, bool a_LogWarnings)
 	}
 
 	// Execute the globals:
-	s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+	s = lua_pcall(m_LuaState, 0, 0, 0);
 	if (s != 0)
 	{
 		if (a_LogWarnings)
@@ -609,6 +612,7 @@ bool cLuaState::LoadFile(const AString & a_FileName, bool a_LogWarnings)
 bool cLuaState::LoadString(const AString & a_StringToLoad, const AString & a_FileName, bool a_LogWarnings)
 {
 	ASSERT(IsValid());
+	ASSERT_LUA_STACK_BALANCE(m_LuaState);
 
 	// Load the file:
 	int s = luaL_loadstring(m_LuaState, a_StringToLoad.c_str());
@@ -649,6 +653,7 @@ bool cLuaState::HasFunction(const char * a_FunctionName)
 		return false;
 	}
 
+	ASSERT_LUA_STACK_BALANCE(m_LuaState);
 	lua_getglobal(m_LuaState, a_FunctionName);
 	bool res = (!lua_isnil(m_LuaState, -1) && lua_isfunction(m_LuaState, -1));
 	lua_pop(m_LuaState, 1);
@@ -1480,7 +1485,6 @@ bool cLuaState::CallFunction(int a_NumResults)
 
 	// Remove the error handler from the stack:
 	lua_remove(m_LuaState, -a_NumResults - 1);
-
 	return true;
 }
 
@@ -2101,6 +2105,7 @@ void cLuaState::LogStackValues(const char * a_Header)
 void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 {
 	// Format string consisting only of %s is used to appease the compiler
+	ASSERT_LUA_STACK_BALANCE(a_LuaState);
 	LOG("%s", (a_Header != nullptr) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
@@ -2113,7 +2118,14 @@ void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 			case LUA_TNUMBER:        Printf(Value, "%f", static_cast<double>(lua_tonumber(a_LuaState, i))); break;
 			case LUA_TSTRING:        Printf(Value, "%s", lua_tostring(a_LuaState, i)); break;
 			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
-			case LUA_TUSERDATA:      Printf(Value, "%p (%s)", lua_touserdata(a_LuaState, i), tolua_typename(a_LuaState, i)); break;
+			case LUA_TFUNCTION:      Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
+			case LUA_TUSERDATA:
+			{
+				Printf(Value, "%p (%s)", lua_touserdata(a_LuaState, i), tolua_typename(a_LuaState, i));
+				// tolua_typename pushes the string onto Lua stack, pop it off again:
+				lua_pop(a_LuaState, 1);
+				break;
+			}
 			default: break;
 		}
 		LOGD("  Idx %d: type %d (%s) %s", i, Type, lua_typename(a_LuaState, Type), Value.c_str());
@@ -2164,6 +2176,7 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 
 int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
 {
+	ASSERT_LUA_STACK_BALANCE(a_LuaState);
 	// Call the BreakIntoDebugger function, if available:
 	lua_getglobal(a_LuaState, "BreakIntoDebugger");
 	if (!lua_isfunction(a_LuaState, -1))
@@ -2176,7 +2189,6 @@ int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
 	LOGD("Calling BreakIntoDebugger()...");
 	lua_call(a_LuaState, 1, 0);
 	LOGD("Returned from BreakIntoDebugger().");
-
 	return 0;
 }
 

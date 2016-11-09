@@ -55,6 +55,48 @@ class cLuaState
 {
 public:
 
+	#ifdef _DEBUG
+		/** Asserts that the Lua stack has the same amount of entries when this object is destructed, as when it was constructed.
+		Used for checking functions that should preserve Lua stack balance. */
+		class cStackBalanceCheck
+		{
+		public:
+			cStackBalanceCheck(const char * a_FileName, int a_LineNum, lua_State * a_LuaState):
+				m_FileName(a_FileName),
+				m_LineNum(a_LineNum),
+				m_LuaState(a_LuaState),
+				m_StackPos(lua_gettop(a_LuaState))
+			{
+			}
+
+			~cStackBalanceCheck()
+			{
+				auto currStackPos = lua_gettop(m_LuaState);
+				if (currStackPos != m_StackPos)
+				{
+					LOGD("Lua stack not balanced. Expected %d items, found %d items. Stack watching started in %s:%d",
+						m_StackPos, currStackPos,
+						m_FileName.c_str(), m_LineNum
+					);
+					cLuaState::LogStackValues(m_LuaState);
+					ASSERT(!"Lua stack unbalanced");  // If this assert fires, the Lua stack is inbalanced, check the callstack / m_FileName / m_LineNum
+				}
+			}
+
+		protected:
+			const AString m_FileName;
+			int m_LineNum;
+			lua_State * m_LuaState;
+			int m_StackPos;
+		};
+
+		#define STRINGIFY2(X, Y) X##Y
+		#define STRINGIFY(X, Y) STRINGIFY2(X, Y)
+		#define ASSERT_LUA_STACK_BALANCE(LuaState) cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, LuaState)
+	#else
+		#define ASSERT_LUA_STACK_BALANCE(...)
+	#endif
+
 	/** Provides a RAII-style locking for the LuaState.
 	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
 	class cLock
@@ -654,13 +696,15 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
+		ASSERT_LUA_STACK_BALANCE(m_LuaState);
 		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{
 			// Pushing the function failed
 			return false;
 		}
-		return PushCallPop(std::forward<Args>(args)...);
+		auto res = PushCallPop(std::forward<Args>(args)...);
+		return res;
 	}
 
 	/** Retrieves a list of values from the Lua stack, starting at the specified index. */
