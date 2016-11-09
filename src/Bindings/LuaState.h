@@ -61,12 +61,18 @@ public:
 		class cStackBalanceCheck
 		{
 		public:
-			cStackBalanceCheck(const char * a_FileName, int a_LineNum, lua_State * a_LuaState):
+			cStackBalanceCheck(const char * a_FileName, int a_LineNum, lua_State * a_LuaState, bool a_ShouldLogStack = true):
 				m_FileName(a_FileName),
 				m_LineNum(a_LineNum),
 				m_LuaState(a_LuaState),
 				m_StackPos(lua_gettop(a_LuaState))
 			{
+				if (a_ShouldLogStack)
+				{
+					// DEBUG: If an unbalanced stack is reported, uncommenting the next line can help debug the imbalance
+					// cLuaState::LogStackValues(a_LuaState, Printf("Started checking Lua stack balance, currently %d items:", m_StackPos).c_str());
+					// Since LogStackValues() itself uses the balance check, we must not call it recursively
+				}
 			}
 
 			~cStackBalanceCheck()
@@ -92,7 +98,7 @@ public:
 
 		#define STRINGIFY2(X, Y) X##Y
 		#define STRINGIFY(X, Y) STRINGIFY2(X, Y)
-		#define ASSERT_LUA_STACK_BALANCE(LuaState) cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, LuaState)
+		#define ASSERT_LUA_STACK_BALANCE(...) cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, __VA_ARGS__)
 	#else
 		#define ASSERT_LUA_STACK_BALANCE(...)
 	#endif
@@ -917,7 +923,10 @@ protected:
 	/**
 	Calls the function that has been pushed onto the stack by PushFunction(),
 	with arguments pushed by PushXXX().
-	Returns true if successful, logs a warning on failure.
+	Returns true if successful, returns false and logs a warning on failure.
+	Pops the function params, the function itself and the error handler off the stack.
+	If successful, leaves a_NumReturnValues new values on Lua stack, corresponding to the return values.
+	On failure, leaves no new values on the Lua stack.
 	*/
 	bool CallFunction(int a_NumReturnValues);
 

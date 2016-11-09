@@ -1480,6 +1480,10 @@ bool cLuaState::CallFunction(int a_NumResults)
 	{
 		// The error has already been printed together with the stacktrace
 		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
+
+		// Remove the error handler and error message from the stack:
+		ASSERT(lua_gettop(m_LuaState) == 2);
+		lua_pop(m_LuaState, 2);
 		return false;
 	}
 
@@ -2105,7 +2109,7 @@ void cLuaState::LogStackValues(const char * a_Header)
 void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 {
 	// Format string consisting only of %s is used to appease the compiler
-	ASSERT_LUA_STACK_BALANCE(a_LuaState);
+	ASSERT_LUA_STACK_BALANCE(a_LuaState, false);
 	LOG("%s", (a_Header != nullptr) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
@@ -2191,7 +2195,7 @@ int cLuaState::BreakIntoDebugger(lua_State * a_LuaState)
 		lua_pop(a_LuaState, 1);
 		return 1;
 	}
-	lua_insert(a_LuaState, -2);  // Copy the string that has been passed to us
+	lua_pushvalue(a_LuaState, -2);  // Copy the string that has been passed to us
 	LOGD("Calling BreakIntoDebugger()...");
 	lua_call(a_LuaState, 1, 0);
 	LOGD("Returned from BreakIntoDebugger().");
