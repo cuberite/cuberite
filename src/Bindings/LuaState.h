@@ -55,6 +55,54 @@ class cLuaState
 {
 public:
 
+	#ifdef _DEBUG
+		/** Asserts that the Lua stack has the same amount of entries when this object is destructed, as when it was constructed.
+		Used for checking functions that should preserve Lua stack balance. */
+		class cStackBalanceCheck
+		{
+		public:
+			cStackBalanceCheck(const char * a_FileName, int a_LineNum, lua_State * a_LuaState, bool a_ShouldLogStack = true):
+				m_FileName(a_FileName),
+				m_LineNum(a_LineNum),
+				m_LuaState(a_LuaState),
+				m_StackPos(lua_gettop(a_LuaState))
+			{
+				if (a_ShouldLogStack)
+				{
+					// DEBUG: If an unbalanced stack is reported, uncommenting the next line can help debug the imbalance
+					// cLuaState::LogStackValues(a_LuaState, Printf("Started checking Lua stack balance, currently %d items:", m_StackPos).c_str());
+					// Since LogStackValues() itself uses the balance check, we must not call it recursively
+				}
+			}
+
+			~cStackBalanceCheck()
+			{
+				auto currStackPos = lua_gettop(m_LuaState);
+				if (currStackPos != m_StackPos)
+				{
+					LOGD("Lua stack not balanced. Expected %d items, found %d items. Stack watching started in %s:%d",
+						m_StackPos, currStackPos,
+						m_FileName.c_str(), m_LineNum
+					);
+					cLuaState::LogStackValues(m_LuaState);
+					ASSERT(!"Lua stack unbalanced");  // If this assert fires, the Lua stack is inbalanced, check the callstack / m_FileName / m_LineNum
+				}
+			}
+
+		protected:
+			const AString m_FileName;
+			int m_LineNum;
+			lua_State * m_LuaState;
+			int m_StackPos;
+		};
+
+		#define STRINGIFY2(X, Y) X##Y
+		#define STRINGIFY(X, Y) STRINGIFY2(X, Y)
+		#define ASSERT_LUA_STACK_BALANCE(...) cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, __VA_ARGS__)
+	#else
+		#define ASSERT_LUA_STACK_BALANCE(...)
+	#endif
+
 	/** Provides a RAII-style locking for the LuaState.
 	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
 	class cLock
@@ -654,13 +702,15 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
+		ASSERT_LUA_STACK_BALANCE(m_LuaState);
 		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{
 			// Pushing the function failed
 			return false;
 		}
-		return PushCallPop(std::forward<Args>(args)...);
+		auto res = PushCallPop(std::forward<Args>(args)...);
+		return res;
 	}
 
 	/** Retrieves a list of values from the Lua stack, starting at the specified index. */
@@ -873,7 +923,10 @@ protected:
 	/**
 	Calls the function that has been pushed onto the stack by PushFunction(),
 	with arguments pushed by PushXXX().
-	Returns true if successful, logs a warning on failure.
+	Returns true if successful, returns false and logs a warning on failure.
+	Pops the function params, the function itself and the error handler off the stack.
+	If successful, leaves a_NumReturnValues new values on Lua stack, corresponding to the return values.
+	On failure, leaves no new values on the Lua stack.
 	*/
 	bool CallFunction(int a_NumReturnValues);
 
