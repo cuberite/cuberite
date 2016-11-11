@@ -107,6 +107,29 @@ public:
 		}
 		return false;
 	}
+
+
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
+	{
+		if (!IsBlockMaterialIron(a_Block) && !IsBlockMaterialAnvil(a_Block) && !IsBlockMaterialRock(a_Block))
+		{
+			return super::GetBlockBreakingStrength(a_Block);
+		}
+		else
+		{
+			switch (m_ItemType)
+			{
+				case E_ITEM_WOODEN_PICKAXE:  return 2.0f;
+				case E_ITEM_STONE_PICKAXE:   return 4.0f;
+				case E_ITEM_IRON_PICKAXE:    return 6.0f;
+				case E_ITEM_GOLD_PICKAXE:    return 12.0f;
+				case E_ITEM_DIAMOND_PICKAXE: return 8.0f;
+			}
+		}
+		ASSERT(!"Something is wrong here... Maybe they are pickaxes out of a new material?");
+		return 1.0f;
+	}
+
 } ;
 
 

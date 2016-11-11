@@ -19,6 +19,7 @@ make -j 2 test ARGS="-V";
 
 echo "Testing..."
 cd Server/;
+touch apiCheckFailed.flag
 if [ "$TRAVIS_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
 	$CUBERITE_PATH << EOF
 load APIDump
@@ -34,6 +35,10 @@ EOF
 	if [ -f ./DuplicateDocs.txt ]; then
 		echo "ERROR: API documentation has duplicate symbol warnings:"
 		cat ./DuplicateDocs.txt
+		exit 1
+	fi
+	if [ -f ./apiCheckFailed.flag ]; then
+		echo "ERROR: API check has failed with an unknown error"
 		exit 1
 	fi
 fi

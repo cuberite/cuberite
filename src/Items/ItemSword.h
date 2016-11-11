@@ -56,6 +56,34 @@ public:
 		return 0;
 		#endif
 	}
+
+
+
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
+	{
+		if (a_Block == E_BLOCK_COBWEB)
+		{
+			return 15.0f;
+		}
+		else
+		{
+			if (
+				IsBlockMaterialPlants(a_Block) ||
+				IsBlockMaterialVine(a_Block)   ||
+				IsBlockMaterialCoral(a_Block)  ||
+				IsBlockMaterialLeaves(a_Block) ||
+				IsBlockMaterialGourd(a_Block)
+			)
+			{
+				return 1.5f;
+			}
+			else
+			{
+				return 1.0f;
+			}
+		}
+	}
+
 } ;
 
 

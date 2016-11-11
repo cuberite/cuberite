@@ -2636,3 +2636,95 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 	m_FlyingMaxSpeed = FlyingMaxpeed;
 	m_IsFlying = IsFlying;
 }
+
+
+
+
+float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
+{
+	if (a_Meta >= 8)
+	{
+		a_Meta = 0;
+	}
+	return static_cast<float>(a_Meta + 1) / 9.0f;
+}
+
+
+
+
+
+bool cPlayer::IsInsideWater()
+{
+	BLOCKTYPE Block = m_World->GetBlock(FloorC(GetPosX()), FloorC(m_Stance), FloorC(GetPosZ()));
+	if ((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
+	{
+		return false;
+	}
+	NIBBLETYPE Meta = GetWorld()->GetBlockMeta(FloorC(GetPosX()), FloorC(m_Stance), FloorC(GetPosZ()));
+	float f = GetLiquidHeightPercent(Meta) - 0.11111111f;
+	float f1 = static_cast<float>(m_Stance + 1) - f;
+	bool flag = (m_Stance < f1);
+	return flag;
+}
+
+
+
+
+
+float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
+{
+	float f = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
+	if (f > 1.0f)
+	{
+		unsigned int efficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+		if (efficiencyModifier > 0)
+		{
+			f += (efficiencyModifier * efficiencyModifier) + 1;
+		}
+	}
+
+	if (HasEntityEffect(cEntityEffect::effHaste))
+	{
+		int intensity = GetEntityEffect(cEntityEffect::effHaste)->GetIntensity() + 1;
+		f *= 1.0f + (intensity * 0.2f);
+	}
+
+	if (HasEntityEffect(cEntityEffect::effMiningFatigue))
+	{
+		int intensity = GetEntityEffect(cEntityEffect::effMiningFatigue)->GetIntensity();
+		switch (intensity)
+		{
+			case 0:  f *= 0.3f;     break;
+			case 1:  f *= 0.09f;    break;
+			case 2:  f *= 0.0027f;  break;
+			default: f *= 0.00081f; break;
+
+		}
+	}
+
+	if (IsInsideWater() && !(GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
+	{
+		f /= 5.0f;
+	}
+
+	if (!IsOnGround())
+	{
+		f /= 5.0f;
+	}
+
+	return f;
+}
+
+
+
+
+
+float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
+{
+	float blockHardness = cBlockInfo::GetHardness(a_Block);
+	float digSpeed = GetDigSpeed(a_Block);
+	float canHarvestBlockDivisor = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
+	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
+	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
+}
+

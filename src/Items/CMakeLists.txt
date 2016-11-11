@@ -55,6 +55,7 @@ SET (HDRS
 	ItemSugarcane.h
 	ItemSword.h
 	ItemThrowable.h
+	ItemAxe.h
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

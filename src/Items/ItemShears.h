@@ -90,6 +90,28 @@ public:
 			}
 		}
 	}
+
+
+
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
+	{
+		if (IsBlocksWeb(a_Block) || IsBlockMaterialLeaves(a_Block))
+		{
+			return 15.0f;
+		}
+		else
+		{
+			if (IsBlocksWool(a_Block))
+			{
+				return 5.0f;
+			}
+			else
+			{
+				return super::GetBlockBreakingStrength(a_Block);
+			}
+		}
+	}
+
 } ;
 
 

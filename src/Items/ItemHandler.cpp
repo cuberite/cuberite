@@ -56,6 +56,7 @@
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
 #include "ItemThrowable.h"
+#include "ItemAxe.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -178,6 +179,15 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_DIAMOND_SHOVEL:
 		{
 			return new cItemShovelHandler(a_ItemType);
+		}
+
+		case E_ITEM_WOODEN_AXE:
+		case E_ITEM_STONE_AXE:
+		case E_ITEM_IRON_AXE:
+		case E_ITEM_GOLD_AXE:
+		case E_ITEM_DIAMOND_AXE:
+		{
+			return new cItemAxeHandler(a_ItemType);
 		}
 
 		case E_ITEM_WOODEN_SWORD:
@@ -865,4 +875,14 @@ cItemHandler::FoodInfo cItemHandler::GetFoodInfo()
 
 
 
+
+
+
+
+
+
+float cItemHandler::GetBlockBreakingStrength(BLOCKTYPE a_Block)
+{
+	return 1.0f;
+}
 

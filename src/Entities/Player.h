@@ -256,6 +256,7 @@ public:
 	void SendMessageFatal         (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
 	void SendMessagePrivateMsg    (const AString & a_Message, const AString & a_Sender) { m_ClientHandle->SendChat(a_Message, mtPrivateMessage, a_Sender); }
 	void SendMessage              (const cCompositeChat & a_Message) { m_ClientHandle->SendChat(a_Message); }
+	void SendMessageRaw           (const AString & a_MessageRaw, eChatType a_Type = eChatType::ctChatBox) { m_ClientHandle->SendChatRaw(a_MessageRaw, a_Type); }
 
 	void SendSystemMessage        (const AString & a_Message) { m_ClientHandle->SendChatSystem(a_Message, mtCustom); }
 	void SendAboveActionBarMessage(const AString & a_Message) { m_ClientHandle->SendChatAboveActionBar(a_Message, mtCustom); }
@@ -528,6 +529,12 @@ public:
 	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
 	void RemoveClientHandle(void);
 
+	/** Returns the relative block hardness for the block a_Block.
+	The bigger it is the faster the player can break the block.
+	Returns zero if the block is instant breakable.
+	Otherwise it returns the dig speed (float GetDigSpeed(BLOCKTYPE a_Block)) divided by the block hardness (cBlockInfo::GetHardness(BLOCKTYPE a_Block)) divided by 30 if the player can harvest the block and divided by 100 if he can't. */
+	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block);
+
 protected:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
@@ -709,4 +716,19 @@ private:
 	/** Pins the player to a_Location until Unfreeze() is called.
 	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
 	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
+
+	/** Returns how high the liquid is in percent. Used by IsInsideWater */
+	float GetLiquidHeightPercent(NIBBLETYPE a_Meta);
+
+	/** Checks if the player is inside of water */
+	bool IsInsideWater();
+
+	/** Returns the dig speed using the current tool on the block a_Block.
+	Returns one if using hand.
+	If the player is using a tool that is good to break the block the value is higher.
+	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
+	In he is in water it gets divided by 5 except his tool is enchanted with aqa affinity.
+	If he is not on ground it also gets divided by 5. */
+	float GetDigSpeed(BLOCKTYPE a_Block);
+
 } ;  // tolua_export

@@ -63,6 +63,12 @@ public:
 	/** Add the monster to the list of monsters targeting this pawn. (Does not check if already in list!) */
 	void TargetingMe(cMonster * a_Monster);
 
+	/** Returns all entity effects */
+	std::map<cEntityEffect::eType, cEntityEffect *> GetEntityEffects();
+
+	/** Returns the entity effect, if it is currently applied. */
+	cEntityEffect *GetEntityEffect(cEntityEffect::eType a_EffectType);
+
 protected:
 	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
 	tEffectMap m_EntityEffects;
