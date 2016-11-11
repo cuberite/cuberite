@@ -54,7 +54,7 @@ OakPlanks, 4     = OakLog, *
 SprucePlanks, 4  = SpruceLog, *
 Stick, 4         = Planks^-1, 2:2, 2:3
 Torch, 4         = Stick, 1:2 | Coal^-1, 1:1
-TrappedChest     = TripWireHook, 1:1 | Chest, 2:1
+TrappedChest     = TripWireHook, * | Chest, *
 Workbench        = Planks^-1, 1:1, 1:2, 2:1, 2:2
 
 
@@ -65,6 +65,7 @@ Workbench        = Planks^-1, 1:1, 1:2, 2:1, 2:2
 # Blocks
 #
 Andesite, 2             = Diorite, * | Cobblestone, *
+BoneBlock               = BoneMeal, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 BookShelf               = Planks^-1, 1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2:2, 3:2
 BrickBlock              = Brick,     1:1, 1:2, 2:1, 2:2
 ChiseledQuartzBlock     = QuartzSlab, 1:1, 1:2
@@ -90,6 +91,7 @@ Leather                 = RabbitHide, 1:1, 1:2, 2:1, 2:2
 MossyCobblestone        = Cobblestone, * | Vines, *
 MossyStoneBrick         = Stonebrick, * | Vines, *
 NetherBrickBlock        = NetherBrick, 1:1, 1:2, 2:1, 2:2
+NetherWartBlock         = NetherWart, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 OrnamentSandstone       = SandstoneSlab, 1:1, 1:2
 PillarQuartzBlock, 2    = QuartzBlock, 1:1, 1:2
 PolishedAndesite, 4     = Andesite,  1:1, 1:2, 2:1, 2:2
@@ -100,6 +102,8 @@ PrismarineBricks        = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:
 PurpurBlock, 4          = PoppedChorusFruit, 1:1, 1:2, 2:1, 2:2
 PurpurPillar, 1         = PurpurSlab, 1:1, 1:2
 QuartzBlock             = NetherQuartz, 1:1, 1:2, 2:1, 2:2
+RedNetherBrick          = NetherBrick, 1:1, 2:2 | NetherWart, 1:2, 2:1
+RedNetherBrick          = NetherWart, 1:1, 2:2 | NetherBrick, 1:2, 2:1
 RedSandstone            = RedSand, 1:1, 1:2, 2:1, 2:2
 RedstoneBlock           = RedstoneDust,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 Sandstone               = Sand,      1:1, 1:2, 2:1, 2:2
@@ -244,28 +248,24 @@ WoodenSword      = Stick, 2:3 | Planks^-1,   2:1, 2:2
 #
 
 # Helmets:
-ChainmailHelmet  = Fire,      1:1, 2:1, 3:1, 1:2, 3:2
 DiamondHelmet    = Diamond,   1:1, 2:1, 3:1, 1:2, 3:2
 GoldenHelmet     = GoldIngot, 1:1, 2:1, 3:1, 1:2, 3:2
 IronHelmet       = IronIngot, 1:1, 2:1, 3:1, 1:2, 3:2
 LeatherHelmet    = Leather,   1:1, 2:1, 3:1, 1:2, 3:2
 
 # Chestplates:
-ChainmailChestplate = Fire,      1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
 DiamondChestplate   = Diamond,   1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
 GoldenChestplate    = GoldIngot, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
 IronChestplate      = IronIngot, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
 LeatherChestplate   = Leather,   1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 2:3, 3:3
 
 # Leggings:
-ChainmailLeggings = Fire,      1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
 DiamondLeggings   = Diamond,   1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
 GoldenLeggings    = GoldIngot, 1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
 IronLeggings      = IronIngot, 1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
 LeatherPants      = Leather,   1:1, 2:1, 3:1, 1:2, 3:2, 1:3, 3:3
 
 # Boots:
-ChainmailBoots   = Fire,      1:1, 3:1, 1:2, 3:2
 DiamondBoots     = Diamond,   1:1, 3:1, 1:2, 3:2
 GoldenBoots      = GoldIngot, 1:1, 3:1, 1:2, 3:2
 IronBoots        = IronIngot, 1:1, 3:1, 1:2, 3:2
@@ -349,7 +349,7 @@ GoldenApple          = RedApple, 2:2 | GoldIngot, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 
 MelonBlock           = MelonSlice, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 MelonSeeds           = MelonSlice, *
 MushroomStew         = Bowl, * | BrownMushroom, * | RedMushroom, *
-BeetrootSoup         = Bowl, 2:3  | Beetroot, 1:1, 2:1, 3:1, 1:2, 2:2, 2:3
+BeetrootSoup         = Bowl, 2:3  | Beetroot, 1:1, 1:2, 2:1, 2:2, 3:1, 3:2
 PumpkinPie           = Pumpkin, * | Sugar, * | egg, *
 PumpkinSeeds, 4      = Pumpkin, *
 RabbitStew           = Cooked Rabbit, 2:1 | Carrot, 1:2 | BakedPotato, 2:2 | BrownMushroom, 3:2 | Bowl, 2:3
@@ -389,6 +389,8 @@ Book                     = Paper, *, *, * | leather, *
 Cobblestonewall, 6       = cobblestone, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 DarkOakFence, 3          = DarkOakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
 DarkOakFenceGate         = Stick, 1:1, 1:2, 3:1, 3:2  | DarkOakPlanks, 2:1, 2:2
+EndCrystal               = Glass, 1:1, 1:2, 1:3, 2:1, 3:1, 3:2, 3:3 | EyeOfEnder, 2:2 | GhastTear, 2:3
+EndRod, 4                = BlazeRod, 1:1 | PoppedChorusFruit, 1:2
 EyeOfEnder               = EnderPearl, * | BlazePowder, *
 Fence, 3                 = OakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
 FenceGate                = Stick, 1:1, 1:2, 3:1, 3:2 | OakPlanks, 2:1, 2:2
