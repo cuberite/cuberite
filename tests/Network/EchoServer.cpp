@@ -30,7 +30,7 @@ class cEchoLinkCallbacks:
 		ASSERT(m_Link != nullptr);
 
 		// Echo the incoming data back to outgoing data:
-		LOGD("%p (%s:%d): Data received (%u bytes), echoing back.", m_Link.get(), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort(), static_cast<unsigned>(a_Size));
+		LOGD("%p (%s:%d): Data received (%u bytes), echoing back.", static_cast<void *>(m_Link.get()), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort(), static_cast<unsigned>(a_Size));
 		m_Link->Send(a_Data, a_Size);
 		LOGD("Echo queued");
 
@@ -51,7 +51,7 @@ class cEchoLinkCallbacks:
 	{
 		ASSERT(m_Link != nullptr);
 
-		LOGD("%p (%s:%d): Remote has closed the connection.", m_Link.get(), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort());
+		LOGD("%p (%s:%d): Remote has closed the connection.", static_cast<void *>(m_Link.get()), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort());
 		m_Link.reset();
 	}
 
@@ -60,7 +60,7 @@ class cEchoLinkCallbacks:
 	{
 		ASSERT(m_Link != nullptr);
 
-		LOGD("%p (%s:%d): Error %d in the cEchoLinkCallbacks: %s", m_Link.get(), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort(), a_ErrorCode, a_ErrorMsg.c_str());
+		LOGD("%p (%s:%d): Error %d in the cEchoLinkCallbacks: %s", static_cast<void *>(m_Link.get()), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort(), a_ErrorCode, a_ErrorMsg.c_str());
 		m_Link.reset();
 	}
 
