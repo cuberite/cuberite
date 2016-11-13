@@ -80,7 +80,7 @@ public:
 				int Rotation = 0;
 				if (m_BlockMeta == 1)
 				{
-					Rotation = FloorC(m_Player.GetYaw() * 16.0f / 360.0f + 0.5f) & 0x0f;
+					Rotation = FloorC(m_Player.GetYaw() * 16.0 / 360.0 + 0.5) & 0x0f;
 				}
 
 				MobHeadEntity->SetType(m_HeadType);

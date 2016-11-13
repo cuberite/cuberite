@@ -142,11 +142,11 @@ public:
 	{
 		a_Yaw += 90 + 45;  // So its not aligned with axis
 
-		if (a_Yaw > 360.f)
+		if (a_Yaw > 360)
 		{
-			a_Yaw -= 360.f;
+			a_Yaw -= 360;
 		}
-		if ((a_Yaw >= 0.f) && (a_Yaw < 90.f))
+		if ((a_Yaw >= 0) && (a_Yaw < 90))
 		{
 			return 0x04;
 		}

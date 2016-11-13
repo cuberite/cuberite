@@ -170,7 +170,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					}
 
 					Monster->SetPosition(PosX, RelY, PosZ);
-					Monster->SetYaw(Random.NextFloat() * 360.0f);
+					Monster->SetYaw(static_cast<double>(Random.NextFloat()) * 360);
 					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != cEntity::INVALID_ID)
 					{
 						EntitiesSpawned = true;

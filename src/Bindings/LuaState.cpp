@@ -1066,6 +1066,18 @@ void cLuaState::Push(double a_Value)
 
 
 
+void cLuaState::Push(float a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, static_cast<double>(a_Value));
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(int a_Value)
 {
 	ASSERT(IsValid());
@@ -1385,7 +1397,7 @@ bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
-		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
+		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, static_cast<double>(a_ReturnedVal)));
 		return true;
 	}
 	return false;

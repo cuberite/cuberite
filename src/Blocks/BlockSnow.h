@@ -91,7 +91,7 @@ public:
 
 	virtual bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
 	{
-		return a_Position.y < (cBlockInfo::GetBlockHeight(a_BlockType) * (a_BlockMeta & 7));
+		return a_Position.y < (static_cast<double>(cBlockInfo::GetBlockHeight(a_BlockType)) * (a_BlockMeta & 7));
 	}
 } ;
 

@@ -842,7 +842,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 	}
 
 	FoodInfo Info = GetFoodInfo();
-	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
+	if ((Info.FoodLevel > 0) || (Info.Saturation > 0))
 	{
 		bool Success = a_Player->Feed(Info.FoodLevel, Info.Saturation);
 
@@ -856,7 +856,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 			cFastRandom r1;
 			if (r1.NextFloat() < Chance)
 			{
-				a_Player->AddEntityEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance);
+				a_Player->AddEntityEffect(EffectType, EffectDurationTicks, EffectIntensity, static_cast<double>(Chance));
 			}
 		}
 		return Success;

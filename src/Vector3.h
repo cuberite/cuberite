@@ -49,21 +49,21 @@ public:
 
 	inline void Normalize(void)
 	{
-		double Len = 1.0 / Length();
+		T Len = static_cast<T>(1.0 / Length());
 
-		x = static_cast<T>(x * Len);
-		y = static_cast<T>(y * Len);
-		z = static_cast<T>(z * Len);
+		x = x * Len;
+		y = y * Len;
+		z = z * Len;
 	}
 
 	inline Vector3<T> NormalizeCopy(void) const
 	{
-		double Len = 1.0 / Length();
+		T Len = static_cast<T>(1.0 / Length());
 
 		return Vector3<T>(
-			static_cast<T>(x * Len),
-			static_cast<T>(y * Len),
-			static_cast<T>(z * Len)
+			x * Len,
+			y * Len,
+			z * Len
 		);
 	}
 
@@ -73,12 +73,12 @@ public:
 	Removed from LuaAPI, because Lua doesn't need distinguishing from the other overload. */
 	inline void NormalizeCopy(Vector3<T> & a_Rhs) const
 	{
-		double Len = 1.0 / Length();
+		T Len = static_cast<T>(1.0 / Length());
 
 		a_Rhs.Set(
-			static_cast<T>(x * Len),
-			static_cast<T>(y * Len),
-			static_cast<T>(z * Len)
+			x * Len,
+			y * Len,
+			z * Len
 		);
 	}
 
@@ -105,7 +105,7 @@ public:
 
 	inline double SqrLength(void) const
 	{
-		return x * x + y * y + z * z;
+		return static_cast<double>(x * x + y * y + z * z);
 	}
 
 	inline T Dot(const Vector3<T> & a_Rhs) const
@@ -315,7 +315,7 @@ public:
 			return NO_INTERSECTION;
 		}
 
-		return (a_Z - z) / (a_OtherEnd.z - z);
+		return static_cast<double>((a_Z - z) / (a_OtherEnd.z - z));
 	}
 
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Y coord.
@@ -330,7 +330,7 @@ public:
 			return NO_INTERSECTION;
 		}
 
-		return (a_Y - y) / (a_OtherEnd.y - y);
+		return static_cast<double>((a_Y - y) / (a_OtherEnd.y - y));
 	}
 
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified X coord.
@@ -345,7 +345,7 @@ public:
 			return NO_INTERSECTION;
 		}
 
-		return (a_X - x) / (a_OtherEnd.x - x);
+		return static_cast<double>((a_X - x) / (a_OtherEnd.x - x));
 	}
 
 	/** Rotates the vector 90 degrees clockwise around the vertical axis.
@@ -365,7 +365,7 @@ public:
 	}
 
 	/** The max difference between two coords for which the coords are assumed equal. */
-	static const double EPS;
+	static const T EPS;
 
 	/** Return value of LineCoeffToPlane() if the line is parallel to the plane. */
 	static const double NO_INTERSECTION;
@@ -417,7 +417,7 @@ public:
 
 
 template <typename T>
-const double Vector3<T>::EPS = 0.000001;
+const T Vector3<T>::EPS = static_cast<T>(0.000001);
 
 template <typename T>
 const double Vector3<T>::NO_INTERSECTION = 1e70;

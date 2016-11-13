@@ -589,6 +589,7 @@ public:
 	void Push(cLuaTCPLink * a_TCPLink);
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	void Push(double a_Value);
+	void Push(float a_Value);
 	void Push(int a_Value);
 	void Push(long a_Value);
 	void Push(const UInt32 a_Value);

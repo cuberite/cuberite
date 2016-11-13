@@ -18,7 +18,7 @@
 cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_Items(new cItem[a_Width * a_Height])
+	m_Items(new cItem[static_cast<size_t>(a_Width * a_Height)])
 {
 }
 
@@ -29,7 +29,7 @@ cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_Items(new cItem[a_Width * a_Height])
+	m_Items(new cItem[static_cast<size_t>(a_Width * a_Height)])
 {
 	for (int i = a_Width * a_Height - 1; i >= 0; i--)
 	{
@@ -44,7 +44,7 @@ cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
 cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
 	m_Width(a_Original.m_Width),
 	m_Height(a_Original.m_Height),
-	m_Items(new cItem[a_Original.m_Width * a_Original.m_Height])
+	m_Items(new cItem[static_cast<size_t>(a_Original.m_Width * a_Original.m_Height)])
 {
 	for (int i = m_Width * m_Height - 1; i >= 0; i--)
 	{
@@ -201,7 +201,7 @@ void cCraftingGrid::Dump(void)
 	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
 	{
 		#ifdef _DEBUG
-		int idx = x + m_Width * y;
+			int idx = x + m_Width * y;
 		#endif
 		LOGD("Slot (%d, %d): Type %d, health %d, count %d",
 			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount

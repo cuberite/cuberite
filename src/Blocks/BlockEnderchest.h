@@ -38,11 +38,11 @@ public:
 	{
 		a_Rotation += 90 + 45;  // So its not aligned with axis
 
-		if (a_Rotation > 360.f)
+		if (a_Rotation > 360)
 		{
-			a_Rotation -= 360.f;
+			a_Rotation -= 360;
 		}
-		if ((a_Rotation >= 0.f) && (a_Rotation < 90.f))
+		if ((a_Rotation >= 0) && (a_Rotation < 90))
 		{
 			return 0x4;
 		}

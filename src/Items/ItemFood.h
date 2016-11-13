@@ -59,7 +59,7 @@ public:
 			case E_ITEM_STEAK:            return FoodInfo(8, 12.8);
 		}
 		LOGWARNING("%s: Unknown food item (%d), returning zero nutrition", __FUNCTION__, m_ItemType);
-		return FoodInfo(0, 0.f);
+		return FoodInfo(0, 0);
 	}
 
 	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) override

@@ -1578,7 +1578,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		int Bookshelves = std::min(GetBookshelvesCount(a_Player.GetWorld()), 15);
 
 		cFastRandom Random;
-		int Base = (Random.GenerateRandomInteger(1, 8) + static_cast<int>(floor(static_cast<float>(Bookshelves / 2)) + Random.GenerateRandomInteger(0, Bookshelves)));
+		int Base = (Random.GenerateRandomInteger(1, 8) + static_cast<int>(floor(Bookshelves / 2) + Random.GenerateRandomInteger(0, Bookshelves)));
 		int TopSlot = std::max(Base / 3, 1);
 		int MiddleSlot = (Base * 2) / 3 + 1;
 		int BottomSlot = std::max(Base, Bookshelves * 2);
@@ -2566,8 +2566,8 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-a_Player.GetYaw(), a_Player.GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because player created
+	vY = -vY * 2 + 1;
+	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because player created
 }
 
 
