@@ -3471,6 +3471,10 @@ end
 					},
 					Notes = "Sends the specified animation of the specified entity to the client. The AnimationNumber is protocol-specific.",
 				},
+				SendHideTitle =
+				{
+					Notes = "Hides the title. This makes the title and subtitle disappear, but if you call SendTitleTimes() the same title and subtitle will appear again."
+				},
 				SendPluginMessage =
 				{
 					Params =
@@ -3485,6 +3489,54 @@ end
 						},
 					},
 					Notes = "Sends the plugin message on the specified channel.",
+				},
+				SendResetTitle =
+				{
+					Notes = "Resets and hides the title but not the subtitle."
+				},
+				SendSetSubTitle =
+				{
+					Params =
+					{
+						{
+							Name = "SubTitle",
+							Type = "cCompositeChat",
+						},
+					},
+					Notes = "Sends the subtitle to the client. Doesn't make the client display it yet, use SendTitleTimes() to show both the title and the subtitle."
+				},
+				SendSetRawSubTitle =
+				{
+					Params =
+					{
+						{
+							Name = "SubTitle",
+							Type = "string",
+						},
+					},
+					Notes = "Sends the raw subtitle to the client. Doesn't make the client display it yet, use SendTitleTimes() to show both the title and the subtitle."
+				},
+				SendSetTitle =
+				{
+					Params =
+					{
+						{
+							Name = "Title",
+							Type = "cCompositeChat",
+						},
+					},
+					Notes = "Sends the title to the client. Doesn't make the client display it yet, use SendTitleTimes() to show both the title and the subtitle."
+				},
+				SendSetRawTitle =
+				{
+					Params =
+					{
+						{
+							Name = "Title",
+							Type = "string",
+						},
+					},
+					Notes = "Sends the raw title to the client. Doesn't make the client display it yet, use SendTitleTimes() to show both the title and the subtitle."
 				},
 				SendSoundEffect =
 				{
@@ -3516,6 +3568,25 @@ end
 						},
 					},
 					Notes = "Sends a sound effect request to the client. The sound is played at the specified coords, with the specified volume (a float, 1.0 is full volume, can be more) and pitch (0-255, 63 is 100%)",
+				},
+				SendTitleTimes =
+				{
+					Params =
+					{
+						{
+							Name = "FadeInTicks",
+							Type = "number",
+						},
+						{
+							Name = "DisplayTicks",
+							Type = "number",
+						},
+						{
+							Name = "FadeOutTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Sends the request to display the title and subtitle, previously set with SendSetTitle, SendSetRawTitle, SendSetSubTitle and SendSetRawSubTitle, to the client."
 				},
 				SendTimeUpdate =
 				{
@@ -17416,3 +17487,4 @@ end
 		"__.*__",
 	},
 }
+
