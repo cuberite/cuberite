@@ -109,7 +109,7 @@ public:
 	}
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
 	{
 		if (!IsBlockMaterialIron(a_Block) && !IsBlockMaterialAnvil(a_Block) && !IsBlockMaterialRock(a_Block))
 		{

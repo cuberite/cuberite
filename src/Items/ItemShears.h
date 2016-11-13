@@ -93,7 +93,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
 	{
 		if (IsBlocksWeb(a_Block) || IsBlockMaterialLeaves(a_Block))
 		{
