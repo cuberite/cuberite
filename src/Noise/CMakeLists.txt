@@ -7,6 +7,7 @@ SET (SRCS
 )
 
 SET (HDRS
+	InterpolNoise.h
 	Noise.h
 	OctavedNoise.h
 	RidgedNoise.h

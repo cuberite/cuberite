@@ -131,6 +131,7 @@ if(${BUILD_TOOLS})
 	message("Building tools")
 	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
 	add_subdirectory(Tools/MCADefrag/)
+	add_subdirectory(Tools/NoiseSpeedTest/)
 	add_subdirectory(Tools/ProtoProxy/)
 endif()
 
