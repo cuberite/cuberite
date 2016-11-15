@@ -57,9 +57,10 @@ static void measureClassicNoise(int a_NumIterations)
 
 
 
-static void measureSimplexNoiseFloat(int a_NumIterations)
+/** Calculates the specified number of iterations of the Simplex noise.
+a_TypeStr is a string representing the DATATYPE (for logging purposes). */
+template<typename DATATYPE> static void measureSimplexNoise(int a_NumIterations, const char * a_TypeStr)
 {
-	typedef float DATATYPE;
 	cSimplexNoise<DATATYPE> noise(1);
 	DATATYPE total = 0;
 	auto timeStart = std::chrono::high_resolution_clock::now();
@@ -79,36 +80,7 @@ static void measureSimplexNoiseFloat(int a_NumIterations)
 	}
 	auto timeEnd = std::chrono::high_resolution_clock::now();
 	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeStart);
-	printf("SimplexNoise<float> took %d milliseconds, returned total %f\n", static_cast<int>(msec.count()), total);
-}
-
-
-
-
-
-static void measureSimplexNoiseDouble(int a_NumIterations)
-{
-	typedef double DATATYPE;
-	cSimplexNoise<DATATYPE> noise(1);
-	DATATYPE total = 0;
-	auto timeStart = std::chrono::high_resolution_clock::now();
-	for (int i = 0; i < a_NumIterations; ++i)
-	{
-		DATATYPE out[SIZE_X * SIZE_Y * SIZE_Z];
-		int blockX = i * 16;
-		int blockZ = i * 16;
-		DATATYPE startX = 0;
-		DATATYPE endX = 257 / 80.0f;
-		DATATYPE startY = blockX / 40.0f;
-		DATATYPE endY = (blockX + 16) / 40.0f;
-		DATATYPE startZ = blockZ / 40.0f;
-		DATATYPE endZ = (blockZ + 16) / 40.0f;
-		noise.Generate3D(out, SIZE_X, SIZE_Y, SIZE_Z, startX, endX, startY, endY, startZ, endZ);
-		total += out[0];  // Do not let the optimizer optimize the whole calculation away
-	}
-	auto timeEnd = std::chrono::high_resolution_clock::now();
-	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeStart);
-	printf("SimplexNoise<double> took %d milliseconds, returned total %f\n", static_cast<int>(msec.count()), total);
+	printf("SimplexNoise<%s> took %d milliseconds, returned total %f\n", a_TypeStr, static_cast<int>(msec.count()), total);
 }
 
 
@@ -131,10 +103,10 @@ int main(int argc, char ** argv)
 	// Perform each test twice, to account for cache-warmup:
 	measureClassicNoise(numIterations);
 	measureClassicNoise(numIterations);
-	measureSimplexNoiseFloat(numIterations);
-	measureSimplexNoiseFloat(numIterations);
-	measureSimplexNoiseDouble(numIterations);
-	measureSimplexNoiseDouble(numIterations);
+	measureSimplexNoise<float>(numIterations, "float");
+	measureSimplexNoise<float>(numIterations, "float");
+	measureSimplexNoise<double>(numIterations, "double");
+	measureSimplexNoise<double>(numIterations, "double");
 
 	// If build on Windows using MSVC, wait for a keypress before ending:
 	#ifdef _MSC_VER
