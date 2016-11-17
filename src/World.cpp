@@ -148,8 +148,8 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_IsDaylightCycleEnabled(true),
 	m_WorldAge(0),
 	m_TimeOfDay(0),
+	m_TickCount(0),
 	m_LastTimeUpdate(0),
-	m_LastChunkCheck(0),
 	m_LastSave(0),
 	m_SkyDarkness(0),
 	m_GameMode(gmNotSet),
@@ -165,6 +165,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_RedstoneSimulator(nullptr),
 	m_MaxPlayers(10),
 	m_ChunkMap(),
+	m_ExplosionLimiter(),
 	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 game-day of sunshine at server start :)
@@ -309,6 +310,15 @@ void cWorld::ChangeWeather(void)
 {
 	// In the next tick the weather will be changed
 	m_WeatherInterval = 0;
+}
+
+
+
+
+
+cExplosionLimiter & cWorld::GetExplosionLimiter()
+{
+	return m_ExplosionLimiter;
 }
 
 
@@ -460,6 +470,8 @@ void cWorld::Start(void)
 		IniFile.SetValueI("General", "UnusedChunkCap", UnusedDirtyChunksCap);
 	}
 	m_UnusedDirtyChunksCap = static_cast<size_t>(UnusedDirtyChunksCap);
+	m_ExplosionLimiter.SetExplosionsAllowedPerSecond(
+		static_cast<unsigned int>(IniFile.GetValueSetI("General", "ExplosionPerSecCap", 15)));
 
 	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
 	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
@@ -1064,7 +1076,8 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	TickWeather(static_cast<float>(a_Dt.count()));
 
-	if (m_WorldAge - m_LastChunkCheck > std::chrono::seconds(10))
+	// Perform chunk unloading and saving every 10 seconds
+	if ((m_TickCount % (10 * 20)) == 0)
 	{
 		// Unload every 10 seconds
 		UnloadUnusedChunks();
@@ -1079,6 +1092,17 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 			// Save if we have too many dirty unused chunks
 			SaveAllChunks();
 		}
+	}
+
+	if ((m_TickCount % (1 * 20)) == 0)
+	{
+		GetExplosionLimiter().ResetExplosionLimit();
+	}
+
+	m_TickCount += 1;
+	if (m_TickCount == 10000)
+	{
+		m_TickCount = 0;
 	}
 }
 
@@ -2977,7 +3001,6 @@ bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 
 void cWorld::UnloadUnusedChunks(void)
 {
-	m_LastChunkCheck = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 	m_ChunkMap->UnloadUnusedChunks();
 }
 
