@@ -2103,6 +2103,15 @@ bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
 
 
 
+void cWorld::SetMaxViewDistance(int a_MaxViewDistance)
+{
+	m_MaxViewDistance = Clamp(a_MaxViewDistance, cClientHandle::MIN_VIEW_DISTANCE, cClientHandle::MAX_VIEW_DISTANCE);
+}
+
+
+
+
+
 void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
 {
 	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_SendToClients);

@@ -1,10 +1,12 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#include <cmath>
+#include <unordered_map>
+
 #include "Player.h"
 #include "Mobs/Wolf.h"
 #include "../BoundingBox.h"
-#include <unordered_map>
 #include "../ChatColor.h"
 #include "../Server.h"
 #include "../UI/InventoryWindow.h"
@@ -18,7 +20,7 @@
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
 #include "../FastRandom.h"
-#include <cmath>
+#include "../ClientHandle.h"
 
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
@@ -1348,6 +1350,123 @@ void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 		return;
 	}
 	CloseWindow();
+}
+
+
+
+
+
+void cPlayer::SendMessage(const AString & a_Message)
+{
+	m_ClientHandle->SendChat(a_Message, mtCustom);
+}
+
+
+
+
+
+void cPlayer::SendMessageInfo(const AString & a_Message)
+{
+	m_ClientHandle->SendChat(a_Message, mtInformation);
+}
+
+
+
+
+
+void cPlayer::SendMessageFailure(const AString & a_Message)
+{
+	m_ClientHandle->SendChat(a_Message, mtFailure);
+}
+
+
+
+
+
+void cPlayer::SendMessageSuccess(const AString & a_Message)
+{
+	m_ClientHandle->SendChat(a_Message, mtSuccess);
+}
+
+
+
+
+
+void cPlayer::SendMessageWarning(const AString & a_Message)
+{
+	m_ClientHandle->SendChat(a_Message, mtWarning);
+}
+
+
+
+
+
+void cPlayer::SendMessageFatal(const AString & a_Message)
+{
+	m_ClientHandle->SendChat(a_Message, mtFailure);
+}
+
+
+
+
+
+void cPlayer::SendMessagePrivateMsg(const AString & a_Message, const AString & a_Sender)
+{
+	m_ClientHandle->SendChat(a_Message, mtPrivateMessage, a_Sender);
+}
+
+
+
+
+
+void cPlayer::SendMessage(const cCompositeChat & a_Message)
+{
+	m_ClientHandle->SendChat(a_Message);
+}
+
+
+
+
+
+void cPlayer::SendMessageRaw(const AString & a_MessageRaw, eChatType a_Type)
+{
+	m_ClientHandle->SendChatRaw(a_MessageRaw, a_Type);
+}
+
+
+
+
+
+void cPlayer::SendSystemMessage(const AString & a_Message)
+{
+	m_ClientHandle->SendChatSystem(a_Message, mtCustom);
+}
+
+
+
+
+
+void cPlayer::SendAboveActionBarMessage(const AString & a_Message)
+{
+	m_ClientHandle->SendChatAboveActionBar(a_Message, mtCustom);
+}
+
+
+
+
+
+void cPlayer::SendSystemMessage(const cCompositeChat & a_Message)
+{
+	m_ClientHandle->SendChatSystem(a_Message);
+}
+
+
+
+
+
+void cPlayer::SendAboveActionBarMessage(const cCompositeChat & a_Message)
+{
+	m_ClientHandle->SendChatAboveActionBar(a_Message);
 }
 
 

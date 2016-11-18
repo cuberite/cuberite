@@ -10,19 +10,20 @@
 #include "Entities/Player.h"
 #include "FastRandom.h"
 #include "Blocks/BlockHandler.h"
+#include "ClientHandle.h"
 
 
 
 
 
-cMap::cMap(unsigned int a_ID, cWorld * a_World)
-	: m_ID(a_ID)
-	, m_Width(cChunkDef::Width * 8)
-	, m_Height(cChunkDef::Width * 8)
-	, m_Scale(3)
-	, m_CenterX(0)
-	, m_CenterZ(0)
-	, m_World(a_World)
+cMap::cMap(unsigned int a_ID, cWorld * a_World):
+	m_ID(a_ID),
+	m_Width(cChunkDef::Width * 8),
+	m_Height(cChunkDef::Width * 8),
+	m_Scale(3),
+	m_CenterX(0),
+	m_CenterZ(0),
+	m_World(a_World)
 {
 	m_Data.assign(m_Width * m_Height, E_BASE_COLOR_TRANSPARENT);
 

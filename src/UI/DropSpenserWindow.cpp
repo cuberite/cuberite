@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "DropSpenserWindow.h"
+#include "SlotArea.h"
 
 
 

@@ -9,6 +9,8 @@
 
 #define MAX_PLAYERS 65535
 
+#include <functional>
+
 #include "Simulator/SimulatorManager.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
@@ -26,9 +28,7 @@
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 #include "FastRandom.h"
-#include "ClientHandle.h"
 #include "EffectID.h"
-#include <functional>
 
 
 
@@ -640,10 +640,7 @@ public:
 	void SetTNTShrapnelLevel(eShrapnelLevel a_Flag) { m_TNTShrapnelLevel = a_Flag; }
 
 	int GetMaxViewDistance(void) const { return m_MaxViewDistance; }
-	void SetMaxViewDistance(int a_MaxViewDistance)
-	{
-		m_MaxViewDistance = Clamp(a_MaxViewDistance, cClientHandle::MIN_VIEW_DISTANCE, cClientHandle::MAX_VIEW_DISTANCE);
-	}
+	void SetMaxViewDistance(int a_MaxViewDistance);
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }

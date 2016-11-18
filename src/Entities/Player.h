@@ -5,7 +5,6 @@
 #include "../Inventory.h"
 #include "../Defines.h"
 #include "../World.h"
-#include "../ClientHandle.h"
 
 #include "../Statistics.h"
 
@@ -248,20 +247,19 @@ public:
 
 	// tolua_begin
 
-	void SendMessage              (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtCustom); }
-	void SendMessageInfo          (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtInformation); }
-	void SendMessageFailure       (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
-	void SendMessageSuccess       (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtSuccess); }
-	void SendMessageWarning       (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtWarning); }
-	void SendMessageFatal         (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtFailure); }
-	void SendMessagePrivateMsg    (const AString & a_Message, const AString & a_Sender) { m_ClientHandle->SendChat(a_Message, mtPrivateMessage, a_Sender); }
-	void SendMessage              (const cCompositeChat & a_Message) { m_ClientHandle->SendChat(a_Message); }
-	void SendMessageRaw           (const AString & a_MessageRaw, eChatType a_Type = eChatType::ctChatBox) { m_ClientHandle->SendChatRaw(a_MessageRaw, a_Type); }
-
-	void SendSystemMessage        (const AString & a_Message) { m_ClientHandle->SendChatSystem(a_Message, mtCustom); }
-	void SendAboveActionBarMessage(const AString & a_Message) { m_ClientHandle->SendChatAboveActionBar(a_Message, mtCustom); }
-	void SendSystemMessage        (const cCompositeChat & a_Message) { m_ClientHandle->SendChatSystem(a_Message); }
-	void SendAboveActionBarMessage(const cCompositeChat & a_Message) { m_ClientHandle->SendChatAboveActionBar(a_Message); }
+	void SendMessage              (const AString & a_Message);
+	void SendMessageInfo          (const AString & a_Message);
+	void SendMessageFailure       (const AString & a_Message);
+	void SendMessageSuccess       (const AString & a_Message);
+	void SendMessageWarning       (const AString & a_Message);
+	void SendMessageFatal         (const AString & a_Message);
+	void SendMessagePrivateMsg    (const AString & a_Message, const AString & a_Sender);
+	void SendMessage              (const cCompositeChat & a_Message);
+	void SendMessageRaw           (const AString & a_MessageRaw, eChatType a_Type = eChatType::ctChatBox);
+	void SendSystemMessage        (const AString & a_Message);
+	void SendAboveActionBarMessage(const AString & a_Message);
+	void SendSystemMessage        (const cCompositeChat & a_Message);
+	void SendAboveActionBarMessage(const cCompositeChat & a_Message);
 
 	const AString & GetName(void) const { return m_PlayerName; }
 	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }

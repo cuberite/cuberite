@@ -7,6 +7,7 @@
 #include "../BlockEntities/HopperEntity.h"
 #include "HopperWindow.h"
 #include "../BlockEntities/DropperEntity.h"
+#include "SlotArea.h"
 
 
 

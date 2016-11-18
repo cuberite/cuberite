@@ -21,6 +21,7 @@
 #include "../FastRandom.h"
 #include "../BlockArea.h"
 #include "../EffectID.h"
+#include "../ClientHandle.h"
 
 
 

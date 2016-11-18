@@ -6,6 +6,7 @@
 #include "../World.h"
 #include "../FastRandom.h"
 #include "../MobSpawner.h"
+#include "../ClientHandle.h"
 #include "../Items/ItemSpawnEgg.h"
 
 
