@@ -1,7 +1,3 @@
-# Build command:
-# cmake . -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=16 -DCMAKE_BUILD_TYPE=Release -DCMAKE_ANDROID_ARCH_ABI=armeabi -DNATIVE_TOLUA_GENERATOR="" -DCMAKE_ANDROID_NDK=""
-# -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM="" may also be required on Windows
-
 cmake_minimum_required (VERSION 3.7)
 project(Cuberite)
 

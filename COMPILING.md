@@ -98,6 +98,85 @@ make -j`nproc`
 
 This will build Cuberite in release mode, which is better for almost all cases. For more `cmake` options, or for building in debug mode, see the section below.
 
+Android
+-------
+
+It is required that users obtain the latest copies of:
+
+ * The Android Native Development Kit (NDK): https://developer.android.com/ndk/downloads
+ * Lua: https://www.lua.org/download.html (download a binary)
+
+Windows users may optionally install the Ninja build system (https://github.com/ninja-build/ninja/releases) for improved build speeds.
+
+### Getting the sources ###
+
+```
+git clone --recursive https://github.com/cuberite/cuberite.git
+```
+
+### Configuration ###
+
+From the `android` subdirectory:
+
+```
+cmake . -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=16 -DCMAKE_BUILD_TYPE=Release -DCMAKE_ANDROID_ARCH_ABI=armeabi -DCMAKE_ANDROID_NDK=""
+```
+where `CMAKE_ANDROID_NDK` should be the absolute path to where the Android NDK is installed.
+
+#### Generators to use ####
+
+On Linux, the default Make is suggested. No additional parameters are required for this option.
+
+Windows users may make use of Visual Studio to compile for Android, but CMake requires the presence of Nvidia CodeWorks/Nsight Tegra, which can be a hassle to install.
+
+The easiest generator to use seems to be the NDK-bundled Make, to be specified:
+ * `-G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM=""`
+where `CMAKE_MAKE_PROGRAM` should be the absolute path to the `make` program, found under the `prebuilt/windows-*/bin` subdirectory in the NDK folder.
+
+The next easiest generator is Ninja, which additionally offers multithreaded builds, to be specified:
+ * `-G "Ninja"`
+
+#### Additional ABI options ####
+
+For additional ABI options, visit: https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARCH_ABI.html
+
+Please note that certain ABIs require specific [API levels](#api-level-requirements).
+
+#### API level requirements ####
+
+The minimum API level is 16 in the verbatim copy of this folder, due to the inclusion of position independent compilation. Additonally, API level 21 or higher is needed for 64 bit ABIs as earlier versions have no support for this architecture.
+
+To lower these requirements to run on very old devices, it is necessary to select a compatible ABI, and disable position independent code generation.
+
+### Building ###
+
+From the `android` subdirectory:
+
+```
+cmake --build .
+```
+
+If the build succeeded, an Android-launchable binary will have been generated under the `Server` directory. However, since this directory does not have any supporting files, they must be copied from the parent folder's `Server` directory.
+
+To use it in the official Android app, compress the aforementioned `Server` directory into a Zip file, and transfer it to the phone on which the app is installed.
+
+#### Using the compile script on Linux ####
+
+Linux users are entitled to use the compile script, which provides some easy to use options and also contains instructions for using the binaries in the official Android app.
+
+When running the compile script, make sure to have the necessary build tools installed and run the compile script as following:
+
+```
+NDK="path/to/ndk/root" CMAKE="path/to/cmake/executable" android/compile.sh <abi|all|clean>
+```
+
+The NDK variable must be set to the path to the NDK root, CMAKE to a call of the cmake binary used for compiling. If the cmake binary is in the PATH, a simple `CMAKE=cmake` is enough. As last parameter you either have to enter a correct ABI (see https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARCH_ABI.html) or either all or clean. Clean will cause the script to remove the android-build directory, all will compile and zip all Cuberite for all 7 ABIs and create a zip archive of the android/Server direcory for use in the official Android app. If you are unsure which ABI is required for your phone, open the official Android app and navigate to "Settings" and "Install". It will show you the required ABI. Additional parameters may be given through enviroment variables, namely TYPE="" as Release or Debug (defaults to Release) and THREADS="4" as the number of threads used for compilation (defaults to 4).
+
+### Running the executables on a device ###
+
+Note the locations to which the Zip files were transferred. Open the official Android app, and select "Settings", then "Install", and finally select the Zip files.
+
+Cuberite for Android is now ready to use.
 
 CMake on Unix-based platforms
 -----------------------------
