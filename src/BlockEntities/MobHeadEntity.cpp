@@ -5,7 +5,9 @@
 
 #include "Globals.h"
 #include "MobHeadEntity.h"
+#include "json/json.h"
 #include "../Entities/Player.h"
+#include "../ClientHandle.h"
 
 
 

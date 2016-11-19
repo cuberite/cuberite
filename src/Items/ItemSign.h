@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Blocks/BlockSignPost.h"
 #include "../Blocks/BlockWallSign.h"
+#include "../ClientHandle.h"
 
 
 

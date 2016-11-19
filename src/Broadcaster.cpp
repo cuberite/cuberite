@@ -1,13 +1,24 @@
+// Broadcaster.cpp
+
+// Implements the broadcasting interface for cWorld
 
 #include "Globals.h"
 #include "Broadcaster.h"
 #include "World.h"
 #include "Chunk.h"
+#include "ClientHandle.h"
+
+
+
+
 
 cBroadcaster::cBroadcaster(cWorld * a_World) :
 	m_World(a_World)
 {
 }
+
+
+
 
 
 void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude)
@@ -28,6 +39,9 @@ void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const
 }
 
 
+
+
+
 void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, cClientHandle * a_Exclude)
 {
 	m_World->DoWithChunkAt(a_Src,
@@ -44,4 +58,3 @@ void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const
 			return true;
 		});
 }
-

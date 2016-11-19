@@ -12,6 +12,8 @@ Implements the 1.10.x protocol classes:
 #include "Protocol110x.h"
 #include "Packetizer.h"
 
+#include "json/json.h"
+
 #include "../Root.h"
 #include "../Server.h"
 

@@ -2,6 +2,22 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Root.h"
+
+// STD lib hreaders:
+#include <iostream>
+
+// OS-specific headers:
+#if defined(_WIN32)
+	#include <psapi.h>
+#elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+	#include <signal.h>
+	#if defined(__linux__)
+		#include <fstream>
+	#elif defined(__APPLE__)
+		#include <mach/mach.h>
+	#endif
+#endif
+
 #include "Server.h"
 #include "World.h"
 #include "WebAdmin.h"
@@ -23,19 +39,7 @@
 #include "SettingsRepositoryInterface.h"
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
-
-#include <iostream>
-
-#if defined(_WIN32)
-	#include <psapi.h>
-#elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
-	#include <signal.h>
-	#if defined(__linux__)
-		#include <fstream>
-	#elif defined(__APPLE__)
-		#include <mach/mach.h>
-	#endif
-#endif
+#include "ClientHandle.h"
 
 
 

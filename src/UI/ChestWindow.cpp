@@ -7,6 +7,7 @@
 #include "ChestWindow.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../Entities/Player.h"
+#include "SlotArea.h"
 
 
 

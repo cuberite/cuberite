@@ -5,17 +5,18 @@
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 #include "../UI/BeaconWindow.h"
+#include "../ClientHandle.h"
 
 
 
 
 
-cBeaconEntity::cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-	: super(E_BLOCK_BEACON, a_BlockX, a_BlockY, a_BlockZ, 1, 1, a_World)
-	, m_IsActive(false)
-	, m_BeaconLevel(0)
-	, m_PrimaryEffect(cEntityEffect::effNoEffect)
-	, m_SecondaryEffect(cEntityEffect::effNoEffect)
+cBeaconEntity::cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	super(E_BLOCK_BEACON, a_BlockX, a_BlockY, a_BlockZ, 1, 1, a_World),
+	m_IsActive(false),
+	m_BeaconLevel(0),
+	m_PrimaryEffect(cEntityEffect::effNoEffect),
+	m_SecondaryEffect(cEntityEffect::effNoEffect)
 {
 	UpdateBeacon();
 }
