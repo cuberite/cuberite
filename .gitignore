@@ -107,4 +107,4 @@ CPackSourceConfig.cmake
 Server/cuberite_api.lua
 Server/official_undocumented.lua
 Server/NewlyUndocumented.lua
-
+Server/.luacheckrc
