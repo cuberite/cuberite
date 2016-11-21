@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2015-11-28 16:54:39",
+		ExportDate = "2016-11-23 15:08:00",
 		["GridSizeX"] = "512",
 		["GridSizeZ"] = "512",
 		["IntendedUse"] = "PieceStructures",
@@ -75,10 +75,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 				["VerticalStrategy"] = "Range|120|140",
 			},
 			BlockDefinitions =
@@ -155,10 +155,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -239,10 +239,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -374,10 +374,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -563,10 +563,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -662,10 +662,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -763,10 +763,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -960,10 +960,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -1173,10 +1173,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -1260,10 +1260,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -1344,10 +1344,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -1479,10 +1479,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{

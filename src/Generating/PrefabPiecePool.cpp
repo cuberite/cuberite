@@ -526,16 +526,15 @@ bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 	}
 
 	// Get the values:
-	int AddWeightIfSame = 0, DefaultWeight = 100, MoveToGround = 0, ShouldExpandFloor = 0;
+	int AddWeightIfSame = 0, DefaultWeight = 100, MoveToGround = 0;
 	AString DepthWeight, MergeStrategy, VerticalLimit, VerticalStrategy;
-	a_LuaState.GetNamedValue("AddWeightIfSame",   AddWeightIfSame);
-	a_LuaState.GetNamedValue("DefaultWeight",     DefaultWeight);
-	a_LuaState.GetNamedValue("DepthWeight",       DepthWeight);
-	a_LuaState.GetNamedValue("MergeStrategy",     MergeStrategy);
-	a_LuaState.GetNamedValue("MoveToGround",      MoveToGround);
-	a_LuaState.GetNamedValue("ShouldExpandFloor", ShouldExpandFloor);
-	a_LuaState.GetNamedValue("VerticalLimit",     VerticalLimit);
-	a_LuaState.GetNamedValue("VerticalStrategy",  VerticalStrategy);
+	a_LuaState.GetNamedValue("AddWeightIfSame",  AddWeightIfSame);
+	a_LuaState.GetNamedValue("DefaultWeight",    DefaultWeight);
+	a_LuaState.GetNamedValue("DepthWeight",      DepthWeight);
+	a_LuaState.GetNamedValue("MergeStrategy",    MergeStrategy);
+	a_LuaState.GetNamedValue("MoveToGround",     MoveToGround);
+	a_LuaState.GetNamedValue("VerticalLimit",    VerticalLimit);
+	a_LuaState.GetNamedValue("VerticalStrategy", VerticalStrategy);
 
 	// Apply the values:
 	a_Prefab->SetAddWeightIfSame(AddWeightIfSame);
@@ -555,7 +554,42 @@ bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 		a_Prefab->SetMergeStrategy(strategy->second);
 	}
 	a_Prefab->SetMoveToGround(MoveToGround != 0);
-	a_Prefab->SetExtendFloor(ShouldExpandFloor != 0);
+
+	AString ExpandFloorStrategyStr;
+	if (!a_LuaState.GetNamedValue("ExpandFloorStrategy", ExpandFloorStrategyStr))
+	{
+		// Check the older variant for ExpandFloorStrategy, ShouldExpandFloor:
+		int ShouldExpandFloor;
+		if (a_LuaState.GetNamedValue("ShouldExpandFloor", ShouldExpandFloor))
+		{
+			LOG("Piece \"%s\" in file \"%s\" is using the old \"ShouldExpandFloor\" attribute. Use the new \"ExpandFloorStrategy\" attribute instead for more options.",
+				a_PieceName.c_str(), a_FileName.c_str()
+			);
+			a_Prefab->SetExtendFloorStrategy((ShouldExpandFloor != 0) ? cPrefab::efsRepeatBottomTillNonAir : cPrefab::efsNone);
+		}
+	}
+	else
+	{
+		auto lcExpandFloorStrategyStr = StrToLower(ExpandFloorStrategyStr);
+		if (lcExpandFloorStrategyStr == "repeatbottomtillnonair")
+		{
+			a_Prefab->SetExtendFloorStrategy(cPrefab::efsRepeatBottomTillNonAir);
+		}
+		else if (lcExpandFloorStrategyStr == "repeatbottomtillsolid")
+		{
+			a_Prefab->SetExtendFloorStrategy(cPrefab::efsRepeatBottomTillSolid);
+		}
+		else
+		{
+			if (lcExpandFloorStrategyStr != "none")
+			{
+				LOGWARNING("Piece \"%s\" in file \"%s\" is using an unknown \"ExpandFloorStrategy\" attribute value: \"%s\"",
+					a_PieceName.c_str(), a_FileName.c_str(), ExpandFloorStrategyStr.c_str()
+				);
+			}
+			a_Prefab->SetExtendFloorStrategy(cPrefab::efsNone);
+		}
+	}
 	if (!VerticalLimit.empty())
 	{
 		if (!a_Prefab->SetVerticalLimitFromString(VerticalLimit, a_LogWarnings))

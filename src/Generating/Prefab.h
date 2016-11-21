@@ -32,6 +32,14 @@ class cPrefab :
 	public cPiece
 {
 public:
+	/** How to handle the space between the prefab bottom and the terrain top. */
+	enum eExtendFloorStrategy
+	{
+		efsNone,                    ///< No processing, the prefab is left "floating in the air"
+		efsRepeatBottomTillNonAir,  ///< Repeat the bottom-most block down until the first non-air block
+		efsRepeatBottomTillSolid,   ///< Repeat the bottom-most block down until the first solid block; non-solids are overwritten
+	};
+
 	struct sDef
 	{
 		int m_SizeX;
@@ -62,10 +70,9 @@ public:
 		/** The merge strategy to use while drawing the prefab. */
 		cBlockArea::eMergeStrategy m_MergeStrategy;
 
-		/** If set to true, the prefab will extend its lowermost blocks until a solid block is found,
-		thus creating a foundation for the prefab. This is used for houses to be "on the ground", as well as
-		nether fortresses not to float. */
-		bool m_ShouldExtendFloor;
+		/** How the prefab should handle not being on top of the ground.
+		This is used for houses to be "on the ground", as well as nether fortresses not to float. */
+		eExtendFloorStrategy m_ExtendFloorStrategy;
 
 		/** Chance of this piece being used, if no other modifier is active. */
 		int m_DefaultWeight;
@@ -143,8 +150,8 @@ public:
 	/** Sets the flag whether the prefab should be moved to ground level before being drawn. */
 	void SetMoveToGround(bool a_MoveToGround) { m_MoveToGround = a_MoveToGround; }
 
-	/** Sets the flag whether the lowest layer of the prefab should be repeated downwards until it hits a solid block. */
-	void SetExtendFloor(bool a_ShouldExtendFloor) { m_ShouldExtendFloor = a_ShouldExtendFloor; }
+	/** Sets the strategy to use between the bottom of the prefab and the terrain top. */
+	void SetExtendFloorStrategy(eExtendFloorStrategy a_Strategy) { m_ExtendFloorStrategy = a_Strategy; }
 
 	/** Sets the internal hitbox to the specified value. */
 	void SetHitBox(const cCuboid & a_HitBox) { m_HitBox = a_HitBox; }
@@ -183,10 +190,9 @@ protected:
 	/** The merge strategy to use when drawing the prefab into a block area */
 	cBlockArea::eMergeStrategy m_MergeStrategy;
 
-	/** If set to true, the prefab will extend its lowermost blocks until a solid block is found,
-	thus creating a foundation for the prefab. This is used for houses to be "on the ground", as well as
-	nether fortresses not to float. */
-	bool m_ShouldExtendFloor;
+	/** How the prefab should handle not being on top of the ground.
+	This is used for houses to be "on the ground", as well as nether fortresses not to float. */
+	eExtendFloorStrategy m_ExtendFloorStrategy;
 
 	/** Chance of this piece being used, if no other modifier is active. */
 	int m_DefaultWeight;
