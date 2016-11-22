@@ -38,11 +38,12 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
-		if (GetTarget()->IsPlayer())
+		auto currTarget = GetTarget();
+		if ((currTarget != nullptr) && currTarget->IsPlayer())
 		{
 			if (m_IsTame)
 			{
-				if ((static_cast<cPlayer*>(GetTarget())->GetUUID() == m_OwnerUUID))
+				if ((static_cast<cPlayer*>(currTarget)->GetUUID() == m_OwnerUUID))
 				{
 					SetTarget(PreviousTarget);  // Do not attack owner
 				}
@@ -63,7 +64,6 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 			NotifyAlliesOfFight(static_cast<cPawn*>(a_TDI.Attacker));
 		}
 	}
-
 
 	m_World->BroadcastEntityMetadata(*this);  // Broadcast health and possibly angry face
 	return true;
