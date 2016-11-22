@@ -465,22 +465,28 @@ private:
 
 	enum eState
 	{
-		csConnected,         ///< The client has just connected, waiting for their handshake / login
-		csAuthenticating,    ///< The client has logged in, waiting for external authentication
-		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
-		csDownloadingWorld,  ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
-		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
-		csPlaying,           ///< Normal gameplay
-		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
-		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
+		csConnected,             ///< The client has just connected, waiting for their handshake / login
+		csAuthenticating,        ///< The client has logged in, waiting for external authentication
+		csAuthenticated,         ///< The client has been authenticated, will start streaming chunks in the next tick
+		csDownloadingWorld,      ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
+		csConfirmingPos,         ///< The client has been sent the position packet, waiting for them to repeat the position back
+		csPlaying,               ///< Normal gameplay
+		csQueuedForDestruction,  ///< The client will be destroyed in the next tick (flag set when socket closed)
+		csDestroying,            ///< The client is being destroyed, don't queue any more packets / don't add to chunks
+		csDestroyed,             ///< The client has been destroyed, the destructor is to be called from the owner thread
 
 		// TODO: Add Kicking here as well
 	} ;
 
-	std::atomic<eState> m_State;
+	/* Mutex protecting m_State from concurrent writes. */
+	cCriticalSection m_CSState;
 
-	/** m_State needs to be locked in the Destroy() function so that the destruction code doesn't run twice on two different threads */
-	cCriticalSection m_CSDestroyingState;
+	/** The current (networking) state of the client.
+	Protected from concurrent writes by m_CSState; but may be read by other threads concurrently.
+	If a function depends on m_State or wants to change m_State, it needs to lock m_CSState.
+	However, if it only uses m_State for a quick bail out, or it doesn't break if the client disconnects in the middle of it,
+	it may just read m_State without locking m_CSState. */
+	std::atomic<eState> m_State;
 
 	/** If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded() */
 	bool m_ShouldCheckDownloaded;
@@ -555,6 +561,10 @@ private:
 
 	/** Called right after the instance is created to store its SharedPtr inside. */
 	void SetSelf(cClientHandlePtr a_Self);
+
+	/** Processes the data in the network input and output buffers.
+	Called by both Tick() and ServerTick(). */
+	void ProcessProtocolInOut(void);
 
 	// cTCPLink::cCallbacks overrides:
 	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;

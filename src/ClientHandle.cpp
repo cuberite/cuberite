@@ -160,30 +160,34 @@ void cClientHandle::Destroy(void)
 		m_Link.reset();
 	}
 	{
-		cCSLock Lock(m_CSDestroyingState);
+		cCSLock Lock(m_CSState);
 		if (m_State >= csDestroying)
 		{
 			// Already called
+			LOGD("%s: client %p, \"%s\" already destroyed, bailing out", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
 			return;
 		}
 		m_State = csDestroying;
 	}
 
-	LOGD("%s: client %p, \"%s\"", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
-
-	if (m_Player != nullptr)
+	LOGD("%s: destroying client %p, \"%s\" @ %s", __FUNCTION__, static_cast<void *>(this), m_Username.c_str(), m_IPString.c_str());
 	{
-		cWorld * World = m_Player->GetWorld();
-		if (World != nullptr)
-		{
-			m_Player->StopEveryoneFromTargetingMe();
-			m_Player->SetIsTicking(false);
-			World->RemovePlayer(m_Player, true);
-		}
-		m_Player->RemoveClientHandle();
+		cCSLock lock(m_CSState);
+		m_State = csDestroyed;
 	}
 
-	m_State = csDestroyed;
+	auto player = m_Player;
+	if (player != nullptr)
+	{
+		auto world = player->GetWorld();
+		if (world != nullptr)
+		{
+			player->StopEveryoneFromTargetingMe();
+			player->SetIsTicking(false);
+			world->RemovePlayer(player, true);
+		}
+		player->RemoveClientHandle();
+	}
 }
 
 
@@ -318,84 +322,100 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
-	if (m_State != csAuthenticating)
+	cWorld * World;
 	{
-		return;
+		cCSLock lock(m_CSState);
+		/*
+		LOGD("Processing authentication for client %s @ %s (%p), state = %d",
+			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load()
+		);
+		//*/
+
+		if (m_State != csAuthenticating)
+		{
+			return;
+		}
+
+		ASSERT(m_Player == nullptr);
+
+		m_Username = a_Name;
+
+		// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
+		if (m_UUID.empty())
+		{
+			m_UUID = a_UUID;
+		}
+		if (m_Properties.empty())
+		{
+			m_Properties = a_Properties;
+		}
+
+		// Send login success (if the protocol supports it):
+		m_Protocol->SendLoginSuccess();
+
+		// Spawn player (only serversided, so data is loaded)
+		m_Player = new cPlayer(m_Self, GetUsername());
+		/*
+		LOGD("Created a new cPlayer object at %p for client %s @ %s (%p)",
+			static_cast<void *>(m_Player),
+			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
+		);
+		//*/
+		InvalidateCachedSentChunk();
+		m_Self.reset();
+
+		World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
+		if (World == nullptr)
+		{
+			World = cRoot::Get()->GetDefaultWorld();
+			m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
+		}
+
+		if (m_Player->GetGameMode() == eGameMode_NotSet)
+		{
+			m_Player->LoginSetGameMode(World->GetGameMode());
+		}
+
+		m_Player->SetIP (m_IPString);
+
+		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
+		{
+			cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
+			LOGINFO("Player %s has joined the game", m_Username.c_str());
+		}
+
+		m_ConfirmPosition = m_Player->GetPosition();
+
+		// Return a server login packet
+		m_Protocol->SendLogin(*m_Player, *World);
+		m_LastSentDimension = World->GetDimension();
+
+		// Send Weather if raining:
+		if ((World->GetWeather() == 1) || (World->GetWeather() == 2))
+		{
+			m_Protocol->SendWeather(World->GetWeather());
+		}
+
+		// Send time:
+		m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay(), World->IsDaylightCycleEnabled());
+
+		// Send contents of the inventory window
+		m_Protocol->SendWholeInventory(*m_Player->GetWindow());
+
+		// Send health
+		m_Player->SendHealth();
+
+		// Send experience
+		m_Player->SendExperience();
+
+		// Send player list items
+		SendPlayerListAddPlayer(*m_Player);
+		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
+		cRoot::Get()->SendPlayerLists(m_Player);
+
+		m_Player->SetWorld(World);
+		m_State = csAuthenticated;
 	}
-
-	ASSERT(m_Player == nullptr);
-
-	m_Username = a_Name;
-
-	// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
-	if (m_UUID.empty())
-	{
-		m_UUID = a_UUID;
-	}
-	if (m_Properties.empty())
-	{
-		m_Properties = a_Properties;
-	}
-
-	// Send login success (if the protocol supports it):
-	m_Protocol->SendLoginSuccess();
-
-	// Spawn player (only serversided, so data is loaded)
-	m_Player = new cPlayer(m_Self, GetUsername());
-	InvalidateCachedSentChunk();
-	m_Self.reset();
-
-	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
-	if (World == nullptr)
-	{
-		World = cRoot::Get()->GetDefaultWorld();
-		m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
-	}
-
-	if (m_Player->GetGameMode() == eGameMode_NotSet)
-	{
-		m_Player->LoginSetGameMode(World->GetGameMode());
-	}
-
-	m_Player->SetIP (m_IPString);
-
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
-	{
-		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
-		LOGINFO("Player %s has joined the game", m_Username.c_str());
-	}
-
-	m_ConfirmPosition = m_Player->GetPosition();
-
-	// Return a server login packet
-	m_Protocol->SendLogin(*m_Player, *World);
-	m_LastSentDimension = World->GetDimension();
-
-	// Send Weather if raining:
-	if ((World->GetWeather() == 1) || (World->GetWeather() == 2))
-	{
-		m_Protocol->SendWeather(World->GetWeather());
-	}
-
-	// Send time:
-	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay(), World->IsDaylightCycleEnabled());
-
-	// Send contents of the inventory window
-	m_Protocol->SendWholeInventory(*m_Player->GetWindow());
-
-	// Send health
-	m_Player->SendHealth();
-
-	// Send experience
-	m_Player->SendExperience();
-
-	// Send player list items
-	SendPlayerListAddPlayer(*m_Player);
-	cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
-	cRoot::Get()->SendPlayerLists(m_Player);
-
-	m_Player->SetWorld(World);
-	m_State = csAuthenticated;
 
 	// Query player team
 	m_Player->UpdateTeam();
@@ -411,6 +431,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_PingStartTime = std::chrono::steady_clock::now() + std::chrono::seconds(3);  // Send the first KeepAlive packet in 3 seconds
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
+	// LOGD("Client %s @ %s (%p) has been fully authenticated", m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this));
 }
 
 
@@ -661,23 +682,38 @@ void cClientHandle::HandlePing(void)
 
 bool cClientHandle::HandleLogin(UInt32 a_ProtocolVersion, const AString & a_Username)
 {
-	// If the protocol version hasn't been set yet, set it now:
-	if (m_ProtocolVersion == 0)
 	{
-		m_ProtocolVersion = a_ProtocolVersion;
-	}
+		cCSLock lock(m_CSState);
+		if (m_State != csConnected)
+		{
+			/*
+			LOGD("Client %s @ %s (%p, state %d) has disconnected before logging in, bailing out of login",
+				a_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load()
+			);
+			//*/
+			return false;
+		}
 
-	m_Username = a_Username;
+		// LOGD("Handling login for client %s @ %s (%p), state = %d", a_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load());
 
-	// Let the plugins know about this event, they may refuse the player:
-	if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, a_ProtocolVersion, a_Username))
-	{
-		Destroy();
-		return false;
-	}
+		// If the protocol version hasn't been set yet, set it now:
+		if (m_ProtocolVersion == 0)
+		{
+			m_ProtocolVersion = a_ProtocolVersion;
+		}
+
+		m_Username = a_Username;
+
+		// Let the plugins know about this event, they may refuse the player:
+		if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, a_ProtocolVersion, a_Username))
+		{
+			Destroy();
+			return false;
+		}
+		m_State = csAuthenticating;
+	}  // lock(m_CSState)
 
 	// Schedule for authentication; until then, let the player wait (but do not block)
-	m_State = csAuthenticating;
 	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol->GetAuthServerID());
 	return true;
 }
@@ -2007,31 +2043,7 @@ void cClientHandle::Tick(float a_Dt)
 		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(Block);
 	}
 
-	// Process received network data:
-	AString IncomingData;
-	{
-		cCSLock Lock(m_CSIncomingData);
-		std::swap(IncomingData, m_IncomingData);
-	}
-	if (!IncomingData.empty())
-	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
-	}
-
-	// Send any queued outgoing data:
-	AString OutgoingData;
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		std::swap(OutgoingData, m_OutgoingData);
-	}
-	if (!OutgoingData.empty())
-	{
-		cTCPLinkPtr Link(m_Link);  // Grab a copy of the link in a multithread-safe way
-		if ((Link != nullptr))
-		{
-			Link->Send(OutgoingData.data(), OutgoingData.size());
-		}
-	}
+	ProcessProtocolInOut();
 
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
@@ -2040,17 +2052,27 @@ void cClientHandle::Tick(float a_Dt)
 		return;
 	}
 
+	// If destruction is queued, destroy now:
+	if (m_State == csQueuedForDestruction)
+	{
+		LOGD("Client %s @ %s (%p) has been queued for destruction, destroying now.",
+			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
+		);
+		Destroy();
+		return;
+	}
+
+	// Only process further if the player object is valid:
 	if (m_Player == nullptr)
 	{
 		return;
 	}
 
-
-	// Freeze the player if it is standing on a chunk not yet sent to the client
+	// Freeze the player if they are standing in a chunk not yet sent to the client
 	m_HasSentPlayerChunk = false;
 	if (m_Player->GetParentChunk() != nullptr)
 	{
-		// If the chunk is invalid, do not bother checking if it's sent to the client, it is definitely not
+		// If the chunk is invalid, it has definitely not been sent to the client yet
 		if (m_Player->GetParentChunk()->IsValid())
 		{
 			// Before iterating m_SentChunks, see if the player's coords equal m_CachedSentChunk
@@ -2075,11 +2097,14 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// If the chunk the player's in was just sent, spawn the player:
-	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
-		m_Protocol->SendPlayerMoveLook();
-		m_State = csPlaying;
-	}
+		cCSLock lock(m_CSState);
+		if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
+		{
+			m_Protocol->SendPlayerMoveLook();
+			m_State = csPlaying;
+		}
+	}  // lock(m_CSState)
 
 	// Send a ping packet:
 	if (m_State == csPlaying)
@@ -2092,7 +2117,7 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 
-	if ((m_State >= csAuthenticated) && (m_State < csDestroying))
+	if ((m_State >= csAuthenticated) && (m_State < csQueuedForDestruction))
 	{
 		// Stream 4 chunks per tick
 		for (int i = 0; i < 4; i++)
@@ -2138,40 +2163,33 @@ void cClientHandle::Tick(float a_Dt)
 
 void cClientHandle::ServerTick(float a_Dt)
 {
-	// Process received network data:
-	AString IncomingData;
-	{
-		cCSLock Lock(m_CSIncomingData);
-		std::swap(IncomingData, m_IncomingData);
-	}
-	if (!IncomingData.empty())
-	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
-	}
+	ProcessProtocolInOut();
 
-	// Send any queued outgoing data:
-	AString OutgoingData;
+	// If destruction is queued, destroy now:
+	if (m_State == csQueuedForDestruction)
 	{
-		cCSLock Lock(m_CSOutgoingData);
-		std::swap(OutgoingData, m_OutgoingData);
-	}
-	if ((m_Link != nullptr) && !OutgoingData.empty())
-	{
-		m_Link->Send(OutgoingData.data(), OutgoingData.size());
-	}
-
-	if (m_State == csAuthenticated)
-	{
-		StreamNextChunk();
-
-		// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
-		cRoot::Get()->GetServer()->ClientMovedToWorld(this);
-
-		// Add the player to the world (start ticking from there):
-		m_State = csDownloadingWorld;
-		m_Player->Initialize(*(m_Player->GetWorld()));
+		LOGD("Client %s @ %s (%p) has been queued for destruction, destroying now.",
+			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
+		);
+		Destroy();
 		return;
 	}
+
+	{
+		cCSLock lock(m_CSState);
+		if (m_State == csAuthenticated)
+		{
+			StreamNextChunk();
+
+			// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
+			cRoot::Get()->GetServer()->ClientMovedToWorld(this);
+
+			// Add the player to the world (start ticking from there):
+			m_State = csDownloadingWorld;
+			m_Player->Initialize(*(m_Player->GetWorld()));
+			return;
+		}
+	}  // lock(m_CSState)
 
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds
@@ -3138,7 +3156,7 @@ bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
 
 bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkZ)
 {
-	if (m_State >= csDestroying)
+	if (m_State >= csQueuedForDestruction)
 	{
 		return false;
 	}
@@ -3153,7 +3171,7 @@ bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkZ)
 
 void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 {
-	if (m_State >= csDestroying)
+	if (m_State >= csQueuedForDestruction)
 	{
 		return;
 	}
@@ -3207,24 +3225,22 @@ void cClientHandle::PacketError(UInt32 a_PacketType)
 void cClientHandle::SocketClosed(void)
 {
 	// The socket has been closed for any reason
+	/*
+	LOGD("SocketClosed for client %s @ %s (%p), state = %d, m_Player = %p",
+		m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load(), static_cast<void *>(m_Player)
+	);
+	//*/
 
-	if (!m_Username.empty())  // Ignore client pings
+	// Log into console, unless it's a client ping:
+	if (!m_Username.empty())
 	{
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
-	if (m_Player != nullptr)
-	{
-		m_Player->GetWorld()->QueueTask([this](cWorld & World)
-		{
-			UNUSED(World);
-			Destroy();
-		});
-	}
-	else
-	{
-		Destroy();
-	}
+
+	// Queue self for destruction:
+	cCSLock lock(m_CSState);
+	m_State = csQueuedForDestruction;
 }
 
 
@@ -3235,6 +3251,36 @@ void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 {
 	ASSERT(m_Self == nullptr);
 	m_Self = a_Self;
+}
+
+
+
+
+
+void cClientHandle::ProcessProtocolInOut(void)
+{
+	// Process received network data:
+	AString IncomingData;
+	{
+		cCSLock Lock(m_CSIncomingData);
+		std::swap(IncomingData, m_IncomingData);
+	}
+	if (!IncomingData.empty())
+	{
+		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	}
+
+	// Send any queued outgoing data:
+	AString OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+	auto link = m_Link;
+	if ((link != nullptr) && !OutgoingData.empty())
+	{
+		link->Send(OutgoingData.data(), OutgoingData.size());
+	}
 }
 
 
@@ -3266,6 +3312,11 @@ void cClientHandle::OnReceivedData(const char * a_Data, size_t a_Length)
 
 void cClientHandle::OnRemoteClosed(void)
 {
+	/*
+	LOGD("Client socket for %s @ %s has been closed.",
+		m_Username.c_str(), m_IPString.c_str()
+	);
+	//*/
 	{
 		cCSLock Lock(m_CSOutgoingData);
 		m_Link.reset();
