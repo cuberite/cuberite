@@ -1635,6 +1635,75 @@ end
 
 
 
+local function DumpLuaCheck(a_API)
+	LOG("Creating file .luacheckrc...")
+	local file = io.open(".luacheckrc", "w")
+	
+	file:write([[
+-- This file is the config file for the tool named Luacheck
+-- Documentation: http://luacheck.readthedocs.io/en/stable/index.html
+
+-- Ignore unused function and loop arguments
+unused_args = false
+
+-- Allow self defined globals
+allow_defined = true
+
+-- Ignore this functions
+ignore =
+{
+	"Initialize",  -- Plugin
+	"OnDisable",  -- Plugin
+	"RegisterPluginInfoCommands",  -- InfoReg.lua
+	"RegisterPluginInfoConsoleCommands",  -- InfoReg.lua
+	"g_PluginInfo",  -- Info.lua
+}
+
+-- Ignore files / directories
+exclude_files =
+{
+	"tests/" -- CuberitePluginChecker
+}
+
+-- All globals from cuberite (classes, enums, functions)
+globals =
+{
+]])
+	
+	-- Export all global symbols
+	for _, cls in ipairs(a_API) do
+		if cls.Name == "Globals" then
+			-- Global functions
+			for _, func in ipairs(cls.Functions) do
+				file:write("\t\"", func.Name, "\",\n")
+			end
+			
+			-- Global constants
+			for _, const in ipairs(cls.Constants) do
+				file:write("\t\"", const.Name, "\",\n")
+			end
+			
+			-- Global constants from all groups
+			for _, group in pairs(cls.ConstantGroups) do
+				for _, const in pairs(group.Constants) do
+					file:write("\t\"", const.Name, "\",\n")
+				end
+			end
+		else
+			file:write("\t\"", cls.Name, "\",\n")
+		end
+	end
+	
+	file:write("}\n")
+	file:close()
+	
+	LOG("Config file .luacheckrc created...")
+end
+
+
+
+
+
 --- Returns true if a_Descendant is declared to be a (possibly indirect) descendant of a_Base
 local function IsDeclaredDescendant(a_DescendantName, a_BaseName, a_API)
 	-- Check params:
@@ -1803,6 +1872,9 @@ local function DumpApi()
 
 	-- Dump all available API objects in format used by ZeroBraneStudio API descriptions:
 	DumpAPIZBS(API)
+	
+	-- Export the API in a format used by LuaCheck
+	DumpLuaCheck(API)
 
 	LOG("APIDump finished");
 	return true
@@ -2062,3 +2134,4 @@ function Initialize(Plugin)
 
 	return true
 end
+
