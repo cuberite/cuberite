@@ -602,6 +602,15 @@ void GetDarkoakTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		a_LogBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY + i, a_BlockZ + 1, E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
 	}
 
+	// Prevent floating trees by placing dirt under them
+	for (int i = 1; i < 5; i++)
+	{
+		a_OtherBlocks.push_back(sSetBlock(a_BlockX, a_BlockY - i, a_BlockZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY - i, a_BlockZ, E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockX, a_BlockY - i, a_BlockZ + 1, E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY - i, a_BlockZ + 1, E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+	}
+
 	// Create branches
 	for (int i = 0; i < 3; i++)
 	{
