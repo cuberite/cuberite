@@ -1031,6 +1031,28 @@ end
 
 
 
+function HandleGetPropCmd(a_Split, a_Player)
+	local item = a_Player:GetInventory():GetEquippedItem()
+	if not(item.m_DebuggersCustomProp) then
+		a_Player:SendMessage("The custom property is not set.")
+		return true
+	end
+	local dispValue = string.gsub(item.m_DebuggersCustomProp, ".",
+		function(a_Char)
+			if (a_Char < " ") then
+				return string.byte(a_Char)
+			end
+			return a_Char
+		end
+	)
+	a_Player:SendMessage(string.format("The custom property value is %d bytes: %s", string.len(item.m_DebuggersCustomProp), dispValue))
+	return true
+end
+
+
+
+
+
 function HandleHungerCmd(a_Split, a_Player)
 	a_Player:SendMessage("FoodLevel: " .. a_Player:GetFoodLevel());
 	a_Player:SendMessage("FoodSaturationLevel: " .. a_Player:GetFoodSaturationLevel());
@@ -1102,6 +1124,31 @@ function HandleSetCustomNameCmd(a_Split, a_Player, a_EntireCmd)
 	item.m_CustomName = nameToSet
 	inv:SetHotbarSlot(slotNum, item)
 	a_Player:SendMessage("Custom name set to " .. nameToSet)
+	return true
+end
+
+
+
+
+
+function HandleSetPropCmd(a_Split, a_Player, a_EntireCmd)
+	if not(a_Split[2]) then
+		a_Player:SendMessageFatal("Missing an argument: the property value to set");
+		return true
+	end
+	local valueToSet = a_EntireCmd:match("/setprop%s(.*)")
+	if not(valueToSet) then
+		a_Player:SendMessageFatal("Failed to extract the property value to set")
+		return true
+	end
+	valueToSet = valueToSet:gsub("\\([0-9][0-9][0-9])", string.char)
+
+	local inv = a_Player:GetInventory()
+	local slotNum = inv:GetEquippedSlotNum()
+	local item = inv:GetEquippedItem()
+	item.m_DebuggersCustomProp = valueToSet
+	inv:SetHotbarSlot(slotNum, item)
+	a_Player:SendMessage("Custom property set to " .. valueToSet)
 	return true
 end
 

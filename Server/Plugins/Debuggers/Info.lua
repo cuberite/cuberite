@@ -112,6 +112,12 @@ g_PluginInfo =
 			Handler = HandleGetLoreCmd,
 			HelpString = "Displays the exact Lore of currently held item (including non-printables)",
 		},
+		["/getprop"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleGetPropCmd,
+			HelpString = "Displays the custom cItem property of the currently held item",
+		},
 		["/hunger"] =
 		{
 			Permission = "debuggers",
@@ -189,6 +195,12 @@ g_PluginInfo =
 			Permission = "debuggers",
 			Handler = HandleSetLoreCmd,
 			HelpString = "Sets the lore for the item currently in hand",
+		},
+		["/setprop"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleSetPropCmd,
+			HelpString = "Sets the custom property for the item currently in hand",
 		},
 		["/spidey"] =
 		{

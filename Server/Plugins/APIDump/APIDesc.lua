@@ -2081,7 +2081,7 @@ return
 						},
 					},
 					Notes = "Returns the block's hardness. The bigger the harder the block.",
-				},			
+				},
 				GetBlockHeight =
 				{
 					IsStatic = true,
@@ -7930,7 +7930,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "cItem",
 						},
 					},
-					Notes = "Returns the currently selected item from the hotbar. Note that the returned item is read-only",
+					Notes = "Returns the currently selected item from the hotbar. Note that the returned item is read-only. Also note that the returned item is bound to the actual inventory slot - if a player moves another item into the slot, this object will update to the new item. Use a {{cItem}} constructor to make a copy if you need to store the contents of the slot.",
 				},
 				GetEquippedLeggings =
 				{
