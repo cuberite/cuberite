@@ -987,6 +987,28 @@ end;
 
 
 
+function HandleGetLoreCmd(a_Split, a_Player)
+	local item = a_Player:GetInventory():GetEquippedItem()
+	if (not(item.m_Lore) or (item.m_Lore == "")) then
+		a_Player:SendMessage("The lore is empty")
+		return true
+	end
+	local dispLore = string.gsub(item.m_Lore, ".",
+		function(a_Char)
+			if (a_Char < " ") then
+				return string.byte(a_Char)
+			end
+			return a_Char
+		end
+	)
+	a_Player:SendMessage(string.format("The lore is %d bytes: %s", string.len(item.m_Lore), dispLore))
+	return true
+end
+
+
+
+
+
 function HandleHungerCmd(a_Split, a_Player)
 	a_Player:SendMessage("FoodLevel: " .. a_Player:GetFoodLevel());
 	a_Player:SendMessage("FoodSaturationLevel: " .. a_Player:GetFoodSaturationLevel());
@@ -1034,6 +1056,32 @@ function HandleFoodLevelCmd(a_Split, a_Player)
 		" and exhaustion reset to " .. a_Player:GetFoodExhaustionLevel()
 	);
 	return true;
+end
+
+
+
+
+
+function HandleSetLoreCmd(a_Split, a_Player, a_EntireCmd)
+	if not(a_Split[2]) then
+		a_Player:SendMessageFatal("Missing an argument: the lore to set");
+		return true
+	end
+	local loreToSet = a_EntireCmd:match("/setlore%s(.*)")
+	if not(loreToSet) then
+		a_Player:SendMessageFatal("Failed to extract the lore to set")
+		return true
+	end
+	loreToSet = loreToSet:gsub("\\([0-9][0-9][0-9])", string.char)
+
+	local inv = a_Player:GetInventory()
+	local slotNum = inv:GetEquippedSlotNum()
+	local item = cItem(inv:GetEquippedItem())  -- Make a copy of the item
+	local oldLore = item.m_Lore
+	item.m_Lore = loreToSet
+	inv:SetHotbarSlot(slotNum, item)
+	a_Player:SendMessage("Lore set to " .. loreToSet)
+	return true
 end
 
 

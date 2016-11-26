@@ -100,6 +100,12 @@ g_PluginInfo =
 			Handler = HandleGCCmd,
 			HelpString = "Activates the Lua garbage collector"
 		},
+		["/getlore"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleGetLoreCmd,
+			HelpString = "Displays the Lore of currently held item",
+		},
 		["/hunger"] =
 		{
 			Permission = "debuggers",
@@ -165,6 +171,12 @@ g_PluginInfo =
 			Permission = "debuggers",
 			Handler = HandleSched,
 			HelpString = "Schedules a simple countdown using cWorld:ScheduleTask()"
+		},
+		["/setlore"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleSetLoreCmd,
+			HelpString = "Sets the lore for the item currently in hand",
 		},
 		["/spidey"] =
 		{
