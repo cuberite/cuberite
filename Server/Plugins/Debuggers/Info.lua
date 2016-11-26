@@ -100,11 +100,17 @@ g_PluginInfo =
 			Handler = HandleGCCmd,
 			HelpString = "Activates the Lua garbage collector"
 		},
+		["/getcustomname"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleGetCustomNameCmd,
+			HelpString = "Displays the exact custom name of currently held item (including non-printables)",
+		},
 		["/getlore"] =
 		{
 			Permission = "debuggers",
 			Handler = HandleGetLoreCmd,
-			HelpString = "Displays the Lore of currently held item",
+			HelpString = "Displays the exact Lore of currently held item (including non-printables)",
 		},
 		["/hunger"] =
 		{
@@ -171,6 +177,12 @@ g_PluginInfo =
 			Permission = "debuggers",
 			Handler = HandleSched,
 			HelpString = "Schedules a simple countdown using cWorld:ScheduleTask()"
+		},
+		["/setcustomname"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleSetCustomNameCmd,
+			HelpString = "Sets the custom name for the item currently in hand",
 		},
 		["/setlore"] =
 		{

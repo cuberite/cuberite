@@ -987,6 +987,28 @@ end;
 
 
 
+function HandleGetCustomNameCmd(a_Split, a_Player)
+	local item = a_Player:GetInventory():GetEquippedItem()
+	if (not(item.m_CustomName) or (item.m_CustomName == "")) then
+		a_Player:SendMessage("The custom name is empty")
+		return true
+	end
+	local dispCN = string.gsub(item.m_CustomName, ".",
+		function(a_Char)
+			if (a_Char < " ") then
+				return string.byte(a_Char)
+			end
+			return a_Char
+		end
+	)
+	a_Player:SendMessage(string.format("The custom name is %d bytes: %s", string.len(item.m_CustomName), dispCN))
+	return true
+end
+
+
+
+
+
 function HandleGetLoreCmd(a_Split, a_Player)
 	local item = a_Player:GetInventory():GetEquippedItem()
 	if (not(item.m_Lore) or (item.m_Lore == "")) then
@@ -1056,6 +1078,31 @@ function HandleFoodLevelCmd(a_Split, a_Player)
 		" and exhaustion reset to " .. a_Player:GetFoodExhaustionLevel()
 	);
 	return true;
+end
+
+
+
+
+
+function HandleSetCustomNameCmd(a_Split, a_Player, a_EntireCmd)
+	if not(a_Split[2]) then
+		a_Player:SendMessageFatal("Missing an argument: the custom name to set");
+		return true
+	end
+	local nameToSet = a_EntireCmd:match("/setcustomname%s(.*)")
+	if not(nameToSet) then
+		a_Player:SendMessageFatal("Failed to extract the custom name to set")
+		return true
+	end
+	nameToSet = nameToSet:gsub("\\([0-9][0-9][0-9])", string.char)
+
+	local inv = a_Player:GetInventory()
+	local slotNum = inv:GetEquippedSlotNum()
+	local item = cItem(inv:GetEquippedItem())  -- Make a copy of the item
+	item.m_CustomName = nameToSet
+	inv:SetHotbarSlot(slotNum, item)
+	a_Player:SendMessage("Custom name set to " .. nameToSet)
+	return true
 end
 
 
