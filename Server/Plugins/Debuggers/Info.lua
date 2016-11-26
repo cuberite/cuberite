@@ -13,7 +13,7 @@ g_PluginInfo =
 	Version = "14",
 	Date = "2014-12-11",
 	Description = [[Contains code for testing and debugging the server. Should not be enabled on a production server!]],
-	
+
 	Commands =
 	{
 		["/arr"] =
@@ -21,6 +21,12 @@ g_PluginInfo =
 			Permission = "debuggers",
 			Handler = HandleArrowCmd,
 			HelpString = "Creates an arrow going away from the player"
+		},
+		["/blk"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleBlkCmd,
+			HelpString = "Gets info about the block you are looking at"
 		},
 		["/compo"] =
 		{
@@ -172,6 +178,12 @@ g_PluginInfo =
 			Handler = HandleStarveCmd,
 			HelpString = "Sets the food level to zero"
 		},
+		["/teams"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleTeamsCmd,
+			HelpString = "List the teams"
+		},
 		["/testwnd"] =
 		{
 			Permission = "debuggers",
@@ -202,20 +214,8 @@ g_PluginInfo =
 			Handler = HandleRemoveXp,
 			HelpString = "Remove all xp"
 		},
-		["/blk"] =
-		{
-			Permission = "debuggers",
-			Handler = HandleBlkCmd,
-			HelpString = "Gets info about the block you are looking at"
-		},
-		["/teams"] =
-		{
-			Permission = "debuggers",
-			Handler = HandleTeamsCmd,
-			HelpString = "List the teams"
-		},
 	},  -- Commands
-	
+
 	ConsoleCommands =
 	{
 		["bbox"] =
@@ -223,43 +223,43 @@ g_PluginInfo =
 			Handler = HandleConsoleBBox,
 			HelpString = "Performs cBoundingBox API tests",
 		},
-		
+
 		["download"] =
 		{
 			Handler = HandleConsoleDownload,
 			HelpString = "Downloads a file from a specified URL",
 		},
-		
+
 		["hash"] =
 		{
 			Handler = HandleConsoleHash,
 			HelpString = "Tests the crypto hashing functions",
 		},
-		
+
 		["inh"] =
 		{
 			Handler = HandleConsoleInh,
 			HelpString = "Tests the bindings of the cEntity inheritance",
 		},
-		
+
 		["loadchunk"] =
 		{
 			Handler = HandleConsoleLoadChunk,
 			HelpString = "Loads the specified chunk into memory",
 		},
-		
+
 		["preparechunk"] =
 		{
 			Handler = HandleConsolePrepareChunk,
 			HelpString = "Prepares the specified chunk completely (load / gen / light)",
 		},
-		
+
 		["sched"] =
 		{
 			Handler = HandleConsoleSchedule,
 			HelpString = "Tests the world scheduling",
 		},
-		
+
 		["testbbox"] =
 		{
 			Handler = HandleConsoleTestBbox,
@@ -271,7 +271,7 @@ g_PluginInfo =
 			Handler = HandleConsoleTestCall,
 			HelpString = "Tests inter-plugin calls with various values"
 		},
-		
+
 		["testjson"] =
 		{
 			Handler = HandleConsoleTestJson,
@@ -283,19 +283,19 @@ g_PluginInfo =
 			Handler = HandleConsoleTestTracer,
 			HelpString = "Tests the cLineBlockTracer",
 		},
-		
+
 		["testurlclient"] =
 		{
 			Handler = HandleConsoleTestUrlClient,
 			HelpString = "Tests the cUrlClient",
 		},
-		
+
 		["testurlparser"] =
 		{
 			Handler = HandleConsoleTestUrlParser,
 			HelpString = "Tests the cUrlParser",
 		},
-		
+
 		["uuid"] =
 		{
 			Handler = HandleConsoleUuid,
