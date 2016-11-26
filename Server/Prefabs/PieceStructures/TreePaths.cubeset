@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2015-11-28 16:54:48",
+		ExportDate = "2016-11-23 15:08:10",
 		["AllowedBiomes"] = "Jungle, JungleM, JungleHills, JungleEdge, JungleEdgeM",
 		["GridSizeX"] = "256",
 		["GridSizeZ"] = "256",
@@ -104,10 +104,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "2",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|20|60",
 			},
 			BlockDefinitions =
@@ -475,10 +475,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "4",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|20|60",
 			},
 			BlockDefinitions =
@@ -791,10 +791,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|20|60",
 			},
 			BlockDefinitions =
@@ -1100,10 +1100,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "8:10000|9:10000",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|10|70",
 			},
 			BlockDefinitions =
@@ -1368,10 +1368,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|20|60",
 			},
 			BlockDefinitions =
@@ -1622,10 +1622,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -1738,10 +1738,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalStrategy"] = "TerrainOrOceanTop|30|40",
 			},
 			BlockDefinitions =
@@ -2116,10 +2116,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "5",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|20|60",
 			},
 			BlockDefinitions =
@@ -2466,10 +2466,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "500",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2554,10 +2554,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2642,10 +2642,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2782,10 +2782,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|20|60",
 			},
 			BlockDefinitions =
@@ -2881,10 +2881,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalLimit"] = "AboveTerrainAndOcean|20|60",
 			},
 			BlockDefinitions =
@@ -3006,10 +3006,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "2",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -3028,9 +3028,10 @@ Cubeset =
 				"l: 50: 3",  -- torch
 				"m: 19: 0",  -- sponge
 				"n: 18: 7",  -- leaves
-				"o: 18:11",  -- leaves
-				"p: 17:11",  -- tree
-				"q: 17: 7",  -- tree
+				"o: 18: 3",  -- leaves
+				"p: 18:11",  -- leaves
+				"q: 17:11",  -- tree
+				"r: 17: 7",  -- tree
 			},
 			BlockData =
 			{
@@ -3197,8 +3198,8 @@ Cubeset =
 				"mmmnoobbboonmmm",  --  6
 				"mmmnoobbboonmmm",  --  7
 				"mmmnoobbboonmmm",  --  8
-				"mmmmooooooommmm",  --  9
-				"mmmmnooooonmmmm",  -- 10
+				"mmmmoopoooommmm",  --  9
+				"mmmmnoooopnmmmm",  -- 10
 				"mmmmmmnnnmmmmmm",  -- 11
 				"mmmmmmmmmmmmmmm",  -- 12
 				"mmmmmmmmmmmmmmm",  -- 13
@@ -3207,16 +3208,16 @@ Cubeset =
 				-- Level 10
 				"mmmmmmmmmmmmmmm",  --  0
 				"mmmmmmmmmmmmmmm",  --  1
-				"mmmmm.ooo.mmmmm",  --  2
-				"mmmmnooooonmmmm",  --  3
-				"mmmnnoopoonnmmm",  --  4
-				"mm.oooopoooo.mm",  --  5
-				"mmoooobbboooomm",  --  6
-				"mmooqqbbbqqoomm",  --  7
-				"mmoooobbboooomm",  --  8
-				"mm.oooopoooo.mm",  --  9
-				"mmmnnoopoonnmmm",  -- 10
-				"mmmmnooooonmmmm",  -- 11
+				"mmmmm.poo.mmmmm",  --  2
+				"mmmmnpooponmmmm",  --  3
+				"mmmnnopqoonnmmm",  --  4
+				"mm.ooooqoooo.mm",  --  5
+				"mmooopbbboooomm",  --  6
+				"mmoorrbbbrropmm",  --  7
+				"mmpoopbbboooomm",  --  8
+				"mm.poooqoooo.mm",  --  9
+				"mmmnnooqopnnmmm",  -- 10
+				"mmmmnoopoonmmmm",  -- 11
 				"mmmmm.ooo.mmmmm",  -- 12
 				"mmmmmmmmmmmmmmm",  -- 13
 				"mmmmmmmmmmmmmmm",  -- 14
@@ -3226,15 +3227,15 @@ Cubeset =
 				"mmmmmmmmmmmmmmm",  --  1
 				"mmmmm.ooo.mmmmm",  --  2
 				"mmm.ooooooo.mmm",  --  3
-				"mmmooooooooommm",  --  4
-				"mm.ooboooboo.mm",  --  5
-				"mmooooobooooomm",  --  6
-				"mmoooobbboooomm",  --  7
-				"mmooooobooooomm",  --  8
+				"mmmpooopooopmmm",  --  4
+				"mm.oobooobop.mm",  --  5
+				"mmooooobopopomm",  --  6
+				"mmpooobbboooomm",  --  7
+				"mmooopobooooomm",  --  8
 				"mm.ooboooboo.mm",  --  9
 				"mmmooooooooommm",  -- 10
 				"mmm.ooooooo.mmm",  -- 11
-				"mmmmm.ooo.mmmmm",  -- 12
+				"mmmmm.opp.mmmmm",  -- 12
 				"mmmmmmmmmmmmmmm",  -- 13
 				"mmmmmmmmmmmmmmm",  -- 14
 
@@ -3242,12 +3243,12 @@ Cubeset =
 				"mmmmmmmmmmmmmmm",  --  0
 				"mmmmmmmmmmmmmmm",  --  1
 				"mmmmmmmmmmmmmmm",  --  2
-				"mmm.ooooooo.mmm",  --  3
-				"mmmooooooooommm",  --  4
-				"mmmooooooooommm",  --  5
-				"mmmooooboooommm",  --  6
-				"mmmooobbbooommm",  --  7
-				"mmmooooboooommm",  --  8
+				"mmm.opoooop.mmm",  --  3
+				"mmmopooooopommm",  --  4
+				"mmmppooooooommm",  --  5
+				"mmmoooobooopmmm",  --  6
+				"mmmpopbbbopommm",  --  7
+				"mmmoooobpooommm",  --  8
 				"mmmooooooooommm",  --  9
 				"mmmooooooooommm",  -- 10
 				"mmm.ooooooo.mmm",  -- 11
@@ -3263,9 +3264,9 @@ Cubeset =
 				"mmmmmooooommmmm",  --  4
 				"mmmmooooooommmm",  --  5
 				"mmmmooobooommmm",  --  6
-				"mmmmoobbboommmm",  --  7
+				"mmmmoobbbopmmmm",  --  7
 				"mmmmooobooommmm",  --  8
-				"mmmmooooooommmm",  --  9
+				"mmmmopooooommmm",  --  9
 				"mmmmmooooommmmm",  -- 10
 				"mmmmmmmmmmmmmmm",  -- 11
 				"mmmmmmmmmmmmmmm",  -- 12
@@ -3279,11 +3280,11 @@ Cubeset =
 				"mmmmm.ooo.mmmmm",  --  3
 				"mmmmmooooommmmm",  --  4
 				"mmm.ooobooo.mmm",  --  5
-				"mmmooooooooommm",  --  6
-				"mmmooboboboommm",  --  7
+				"mmmoooopoooommm",  --  6
+				"mmmoobpboboommm",  --  7
 				"mmmooooooooommm",  --  8
-				"mmm.ooobooo.mmm",  --  9
-				"mmmmmooooommmmm",  -- 10
+				"mmm.opobooo.mmm",  --  9
+				"mmmmmopoppmmmmm",  -- 10
 				"mmmmm.ooo.mmmmm",  -- 11
 				"mmmmmmmmmmmmmmm",  -- 12
 				"mmmmmmmmmmmmmmm",  -- 13
@@ -3295,12 +3296,12 @@ Cubeset =
 				"mmmmmmmmmmmmmmm",  --  2
 				"mmmmm.ooo.mmmmm",  --  3
 				"mmmmmooooommmmm",  --  4
-				"mmm.ooooooo.mmm",  --  5
-				"mmmooooooooommm",  --  6
-				"mmmooooboooommm",  --  7
+				"mmm.pooopoo.mmm",  --  5
+				"mmmoooopoooommm",  --  6
+				"mmmopooboooommm",  --  7
 				"mmmooooooooommm",  --  8
-				"mmm.ooooooo.mmm",  --  9
-				"mmmmmooooommmmm",  -- 10
+				"mmm.oooopoo.mmm",  --  9
+				"mmmmmpoooommmmm",  -- 10
 				"mmmmm.ooo.mmmmm",  -- 11
 				"mmmmmmmmmmmmmmm",  -- 12
 				"mmmmmmmmmmmmmmm",  -- 13
@@ -3313,10 +3314,10 @@ Cubeset =
 				"mmmmmmmmmmmmmmm",  --  3
 				"mmmmmmmommmmmmm",  --  4
 				"mmmmm.ooo.mmmmm",  --  5
-				"mmmmmooooommmmm",  --  6
+				"mmmmmopopommmmm",  --  6
 				"mmmmooobooommmm",  --  7
-				"mmmmmooooommmmm",  --  8
-				"mmmmm.ooo.mmmmm",  --  9
+				"mmmmmpoooommmmm",  --  8
+				"mmmmm.opo.mmmmm",  --  9
 				"mmmmmmmommmmmmm",  -- 10
 				"mmmmmmmmmmmmmmm",  -- 11
 				"mmmmmmmmmmmmmmm",  -- 12
@@ -3331,8 +3332,8 @@ Cubeset =
 				"mmmmmmmmmmmmmmm",  --  4
 				"mmmmm.ooo.mmmmm",  --  5
 				"mmmmmooooommmmm",  --  6
-				"mmmmmooooommmmm",  --  7
-				"mmmmmooooommmmm",  --  8
+				"mmmmmpoooommmmm",  --  7
+				"mmmmmooppommmmm",  --  8
 				"mmmmm.ooo.mmmmm",  --  9
 				"mmmmmmmmmmmmmmm",  -- 10
 				"mmmmmmmmmmmmmmm",  -- 11
@@ -3403,10 +3404,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10000",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -3417,9 +3418,10 @@ Cubeset =
 				"d: 65: 5",  -- ladder
 				"e: 65: 3",  -- ladder
 				"f: 18: 7",  -- leaves
-				"g: 18:11",  -- leaves
-				"h: 17:11",  -- tree
-				"i: 17: 7",  -- tree
+				"g: 18: 3",  -- leaves
+				"h: 18:11",  -- leaves
+				"i: 17:11",  -- tree
+				"j: 17: 7",  -- tree
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -3544,104 +3546,104 @@ Cubeset =
 				-- Level 9
 				"mmmmmmmmmmm",  --  0
 				"mmmmfffmmmm",  --  1
-				"mmfgggggfmm",  --  2
-				"mmgggggggmm",  --  3
-				"mfggbbbggfm",  --  4
-				"mfggbbbggfm",  --  5
-				"mfggbbbggfm",  --  6
-				"mmgggggggmm",  --  7
-				"mmfgggggfmm",  --  8
+				"mmfghhghfmm",  --  2
+				"mmghghhggmm",  --  3
+				"mfghbbbhhfm",  --  4
+				"mfghbbbhhfm",  --  5
+				"mfhhbbbhhfm",  --  6
+				"mmhgghhhgmm",  --  7
+				"mmfhhghhfmm",  --  8
 				"mmmmfffmmmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 10
-				"mmm.ggg.mmm",  --  0
-				"mmfgggggfmm",  --  1
-				"mffgghggffm",  --  2
-				".gggghgggg.",  --  3
-				"ggggbbbgggg",  --  4
-				"ggiibbbiigg",  --  5
-				"ggggbbbgggg",  --  6
-				".gggghgggg.",  --  7
-				"mffgghggffm",  --  8
-				"mmfgggggfmm",  --  9
-				"mmm.ggg.mmm",  -- 10
+				"mmm.ghg.mmm",  --  0
+				"mmfhhhhgfmm",  --  1
+				"mffhgihgffm",  --  2
+				".ggggihhhh.",  --  3
+				"hhhhbbbhhhh",  --  4
+				"hhjjbbbjjgg",  --  5
+				"hhghbbbghhh",  --  6
+				".gghgighgh.",  --  7
+				"mffggihhffm",  --  8
+				"mmfgghhhfmm",  --  9
+				"mmm.hhh.mmm",  -- 10
 
 				-- Level 11
-				"mmm.ggg.mmm",  --  0
-				"m.ggggggg.m",  --  1
-				"mgggggggggm",  --  2
-				".ggbgggbgg.",  --  3
-				"gggggbggggg",  --  4
-				"ggggbbbgggg",  --  5
-				"gggggbggggg",  --  6
-				".ggbgggbgg.",  --  7
-				"mgggggggggm",  --  8
-				"m.ggggggg.m",  --  9
-				"mmm.ggg.mmm",  -- 10
+				"mmm.hhg.mmm",  --  0
+				"m.hhghhgg.m",  --  1
+				"mhghggghhhm",  --  2
+				".hgbgggbhh.",  --  3
+				"hghghbhghhh",  --  4
+				"ghhhbbbhhhh",  --  5
+				"hhhhhbhhghh",  --  6
+				".ggbhghbgh.",  --  7
+				"mhghhgghghm",  --  8
+				"m.hhhhghg.m",  --  9
+				"mmm.hhh.mmm",  -- 10
 
 				-- Level 12
 				"mmmmmmmmmmm",  --  0
-				"m.ggggggg.m",  --  1
-				"mgggggggggm",  --  2
-				"mgggggggggm",  --  3
-				"mggggbggggm",  --  4
-				"mgggbbbgggm",  --  5
-				"mggggbggggm",  --  6
-				"mgggggggggm",  --  7
-				"mgggggggggm",  --  8
-				"m.ggggggg.m",  --  9
+				"m.ghghggg.m",  --  1
+				"mghhhgghhgm",  --  2
+				"mghhhghhhgm",  --  3
+				"mhghhbhghhm",  --  4
+				"mghgbbbghhm",  --  5
+				"mgghgbhhhhm",  --  6
+				"mhghhghhghm",  --  7
+				"mhghhhgghhm",  --  8
+				"m.gghghgh.m",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 13
 				"mmmmmmmmmmm",  --  0
 				"mmmmmmmmmmm",  --  1
-				"mmmgggggmmm",  --  2
-				"mmgggggggmm",  --  3
-				"mmgggbgggmm",  --  4
-				"mmggbbbggmm",  --  5
-				"mmgggbgggmm",  --  6
-				"mmgggggggmm",  --  7
-				"mmmgggggmmm",  --  8
+				"mmmhgghhmmm",  --  2
+				"mmggghhhgmm",  --  3
+				"mmghgbhghmm",  --  4
+				"mmggbbbghmm",  --  5
+				"mmgghbhhhmm",  --  6
+				"mmhghhhhhmm",  --  7
+				"mmmhhhhhmmm",  --  8
 				"mmmmmmmmmmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 14
 				"mmmmmmmmmmm",  --  0
-				"mmm.ggg.mmm",  --  1
-				"mmmgggggmmm",  --  2
-				"m.gggbggg.m",  --  3
-				"mgggggggggm",  --  4
-				"mggbgbgbggm",  --  5
-				"mgggggggggm",  --  6
-				"m.gggbggg.m",  --  7
-				"mmmgggggmmm",  --  8
-				"mmm.ggg.mmm",  --  9
+				"mmm.ghh.mmm",  --  1
+				"mmmhhghhmmm",  --  2
+				"m.hggbhgh.m",  --  3
+				"mghhhghhhhm",  --  4
+				"mhhbgbhbggm",  --  5
+				"mhhhghghhgm",  --  6
+				"m.hghbghh.m",  --  7
+				"mmmhhhggmmm",  --  8
+				"mmm.hhg.mmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 15
 				"mmmmmmmmmmm",  --  0
-				"mmm.ggg.mmm",  --  1
-				"mmmgggggmmm",  --  2
-				"m.ggggggg.m",  --  3
-				"mgggggggggm",  --  4
-				"mggggbggggm",  --  5
-				"mgggggggggm",  --  6
-				"m.ggggggg.m",  --  7
-				"mmmgggggmmm",  --  8
-				"mmm.ggg.mmm",  --  9
+				"mmm.ggh.mmm",  --  1
+				"mmmghghgmmm",  --  2
+				"m.ghghghh.m",  --  3
+				"mhghhhghhhm",  --  4
+				"mgghhbhhghm",  --  5
+				"mhhghhghhhm",  --  6
+				"m.ghgghhh.m",  --  7
+				"mmmhhhhhmmm",  --  8
+				"mmm.hhh.mmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 16
 				"mmmmmmmmmmm",  --  0
 				"mmmmmmmmmmm",  --  1
 				"mmmmmgmmmmm",  --  2
-				"mmm.ggg.mmm",  --  3
-				"mmmgggggmmm",  --  4
-				"mmgggbgggmm",  --  5
-				"mmmgggggmmm",  --  6
-				"mmm.ggg.mmm",  --  7
-				"mmmmmgmmmmm",  --  8
+				"mmm.hhh.mmm",  --  3
+				"mmmhhhhhmmm",  --  4
+				"mmgghbhhhmm",  --  5
+				"mmmhhhghmmm",  --  6
+				"mmm.hhg.mmm",  --  7
+				"mmmmmhmmmmm",  --  8
 				"mmmmmmmmmmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
@@ -3649,11 +3651,11 @@ Cubeset =
 				"mmmmmmmmmmm",  --  0
 				"mmmmmmmmmmm",  --  1
 				"mmmmmmmmmmm",  --  2
-				"mmm.ggg.mmm",  --  3
-				"mmmgggggmmm",  --  4
-				"mmmgggggmmm",  --  5
-				"mmmgggggmmm",  --  6
-				"mmm.ggg.mmm",  --  7
+				"mmm.hhg.mmm",  --  3
+				"mmmghghgmmm",  --  4
+				"mmmhhghgmmm",  --  5
+				"mmmhhghgmmm",  --  6
+				"mmm.hhh.mmm",  --  7
 				"mmmmmmmmmmm",  --  8
 				"mmmmmmmmmmm",  --  9
 				"mmmmmmmmmmm",  -- 10
@@ -3663,8 +3665,8 @@ Cubeset =
 				"mmmmmmmmmmm",  --  1
 				"mmmmmmmmmmm",  --  2
 				"mmmmmmmmmmm",  --  3
-				"mmmmmgmmmmm",  --  4
-				"mmmmgggmmmm",  --  5
+				"mmmmmhmmmmm",  --  4
+				"mmmmhggmmmm",  --  5
 				"mmmmmgmmmmm",  --  6
 				"mmmmmmmmmmm",  --  7
 				"mmmmmmmmmmm",  --  8
@@ -3717,10 +3719,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10000",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -3728,8 +3730,9 @@ Cubeset =
 				"a: 17: 3",  -- tree
 				"b: 18: 7",  -- leaves
 				"c: 18:11",  -- leaves
-				"d: 17:11",  -- tree
-				"e: 17: 7",  -- tree
+				"d: 18: 3",  -- leaves
+				"e: 17:11",  -- tree
+				"f: 17: 7",  -- tree
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -3856,61 +3859,61 @@ Cubeset =
 				"mmmmbbbmmmm",  --  1
 				"mmbcccccbmm",  --  2
 				"mmcccccccmm",  --  3
-				"mbccaaaccbm",  --  4
-				"mbccaaaccbm",  --  5
+				"mbdcaaacdbm",  --  4
+				"mbdcaaaccbm",  --  5
 				"mbccaaaccbm",  --  6
-				"mmcccccccmm",  --  7
-				"mmbcccccbmm",  --  8
+				"mmccdcdccmm",  --  7
+				"mmbcdcdcbmm",  --  8
 				"mmmmbbbmmmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 10
 				"mmm.ccc.mmm",  --  0
-				"mmbcccccbmm",  --  1
-				"mbbccdccbbm",  --  2
-				".ccccdcccc.",  --  3
+				"mmbccdccbmm",  --  1
+				"mbbcceccbbm",  --  2
+				".cdccecccc.",  --  3
 				"ccccaaacccc",  --  4
-				"cceeaaaeecc",  --  5
-				"ccccaaacccc",  --  6
-				".ccccdcccc.",  --  7
-				"mbbccdccbbm",  --  8
+				"ccffaaaffcc",  --  5
+				"cdccaaaccdc",  --  6
+				".ccccedccc.",  --  7
+				"mbbcceccbbm",  --  8
 				"mmbcccccbmm",  --  9
-				"mmm.ccc.mmm",  -- 10
+				"mmm.ccd.mmm",  -- 10
 
 				-- Level 11
 				"mmm.ccc.mmm",  --  0
-				"m.ccccccc.m",  --  1
-				"mcccccccccm",  --  2
-				".ccacccacc.",  --  3
+				"m.cccdccc.m",  --  1
+				"mccdccccccm",  --  2
+				".ccacccacd.",  --  3
 				"cccccaccccc",  --  4
 				"ccccaaacccc",  --  5
-				"cccccaccccc",  --  6
-				".ccacccacc.",  --  7
-				"mcccccccccm",  --  8
+				"dccccaccccc",  --  6
+				".dcacccacc.",  --  7
+				"mcdccdccccm",  --  8
 				"m.ccccccc.m",  --  9
 				"mmm.ccc.mmm",  -- 10
 
 				-- Level 12
 				"mmmmmmmmmmm",  --  0
-				"m.ccccccc.m",  --  1
-				"mcccccccccm",  --  2
+				"m.ccccccd.m",  --  1
+				"mdcdccccccm",  --  2
 				"mcccccccccm",  --  3
 				"mccccaccccm",  --  4
-				"mcccaaacccm",  --  5
-				"mccccaccccm",  --  6
+				"mdccaaacdcm",  --  5
+				"mccdcaccccm",  --  6
 				"mcccccccccm",  --  7
-				"mcccccccccm",  --  8
+				"mcdcccccccm",  --  8
 				"m.ccccccc.m",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 13
 				"mmmmmmmmmmm",  --  0
 				"mmmmmmmmmmm",  --  1
-				"mmmcccccmmm",  --  2
-				"mmcccccccmm",  --  3
-				"mmcccacccmm",  --  4
+				"mmmddccdmmm",  --  2
+				"mmccccccdmm",  --  3
+				"mmdccacccmm",  --  4
 				"mmccaaaccmm",  --  5
-				"mmcccacccmm",  --  6
+				"mmcdcacccmm",  --  6
 				"mmcccccccmm",  --  7
 				"mmmcccccmmm",  --  8
 				"mmmmmmmmmmm",  --  9
@@ -3918,27 +3921,27 @@ Cubeset =
 
 				-- Level 14
 				"mmmmmmmmmmm",  --  0
-				"mmm.ccc.mmm",  --  1
-				"mmmcccccmmm",  --  2
+				"mmm.ccd.mmm",  --  1
+				"mmmcdcccmmm",  --  2
 				"m.cccaccc.m",  --  3
-				"mcccccccccm",  --  4
-				"mccacacaccm",  --  5
-				"mcccccccccm",  --  6
-				"m.cccaccc.m",  --  7
+				"mdcccccdccm",  --  4
+				"mcdadacaccm",  --  5
+				"mccccccccdm",  --  6
+				"m.ccdaccc.m",  --  7
 				"mmmcccccmmm",  --  8
 				"mmm.ccc.mmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
 				-- Level 15
 				"mmmmmmmmmmm",  --  0
-				"mmm.ccc.mmm",  --  1
+				"mmm.dcc.mmm",  --  1
 				"mmmcccccmmm",  --  2
 				"m.ccccccc.m",  --  3
-				"mcccccccccm",  --  4
-				"mccccaccccm",  --  5
+				"mcdcdcccccm",  --  4
+				"mccccacccdm",  --  5
 				"mcccccccccm",  --  6
-				"m.ccccccc.m",  --  7
-				"mmmcccccmmm",  --  8
+				"m.dcccccc.m",  --  7
+				"mmmcccdcmmm",  --  8
 				"mmm.ccc.mmm",  --  9
 				"mmmmmmmmmmm",  -- 10
 
@@ -3948,8 +3951,8 @@ Cubeset =
 				"mmmmmcmmmmm",  --  2
 				"mmm.ccc.mmm",  --  3
 				"mmmcccccmmm",  --  4
-				"mmcccacccmm",  --  5
-				"mmmcccccmmm",  --  6
+				"mmccdacccmm",  --  5
+				"mmmcdcccmmm",  --  6
 				"mmm.ccc.mmm",  --  7
 				"mmmmmcmmmmm",  --  8
 				"mmmmmmmmmmm",  --  9
@@ -3961,7 +3964,7 @@ Cubeset =
 				"mmmmmmmmmmm",  --  2
 				"mmm.ccc.mmm",  --  3
 				"mmmcccccmmm",  --  4
-				"mmmcccccmmm",  --  5
+				"mmmcccdcmmm",  --  5
 				"mmmcccccmmm",  --  6
 				"mmm.ccc.mmm",  --  7
 				"mmmmmmmmmmm",  --  8

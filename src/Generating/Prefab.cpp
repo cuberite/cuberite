@@ -97,8 +97,8 @@ static const cPrefab::sDef g_TestPrefabDef =
 	// Merge strategy:
 	cBlockArea::msImprint,
 
-	// ShouldExtendFloor:
-	false,
+	// ExtendFloorStrategy:
+	cPrefab::efsNone,
 
 	// DefaultWeight:
 	10,
@@ -128,7 +128,7 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	),
 	m_AllowedRotations(a_Def.m_AllowedRotations),
 	m_MergeStrategy(a_Def.m_MergeStrategy),
-	m_ShouldExtendFloor(a_Def.m_ShouldExtendFloor),
+	m_ExtendFloorStrategy(a_Def.m_ExtendFloorStrategy),
 	m_DefaultWeight(a_Def.m_DefaultWeight),
 	m_AddWeightIfSame(a_Def.m_AddWeightIfSame),
 	m_MoveToGround(a_Def.m_MoveToGround)
@@ -151,7 +151,7 @@ cPrefab::cPrefab(const cBlockArea & a_Image, int a_AllowedRotations) :
 	m_Size(a_Image.GetSize()),
 	m_AllowedRotations(a_AllowedRotations),
 	m_MergeStrategy(cBlockArea::msOverwrite),
-	m_ShouldExtendFloor(false),
+	m_ExtendFloorStrategy(efsNone),
 	m_DefaultWeight(1),
 	m_AddWeightIfSame(0),
 	m_MoveToGround(false)
@@ -170,7 +170,7 @@ cPrefab::cPrefab(const cBlockArea & a_Image) :
 	m_Size(a_Image.GetSize()),
 	m_AllowedRotations(0),
 	m_MergeStrategy(cBlockArea::msOverwrite),
-	m_ShouldExtendFloor(false),
+	m_ExtendFloorStrategy(efsNone),
 	m_DefaultWeight(1),
 	m_AddWeightIfSame(0),
 	m_MoveToGround(false)
@@ -188,7 +188,7 @@ cPrefab::cPrefab(const AString & a_BlockDefinitions, const AString & a_BlockData
 	m_Size(a_SizeX, a_SizeY, a_SizeZ),
 	m_AllowedRotations(0),
 	m_MergeStrategy(cBlockArea::msOverwrite),
-	m_ShouldExtendFloor(false),
+	m_ExtendFloorStrategy(efsNone),
 	m_DefaultWeight(1),
 	m_AddWeightIfSame(0),
 	m_MoveToGround(false)
@@ -264,46 +264,94 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
-	if (m_ShouldExtendFloor)
+	switch (m_ExtendFloorStrategy)
 	{
-		int MaxX = Image.GetSizeX();
-		int MaxZ = Image.GetSizeZ();
-		for (int z = 0; z < MaxZ; z++)
+		case efsNone: break;  // Nothing needed
+		case efsRepeatBottomTillNonAir:
 		{
-			int RelZ = Placement.z + z;
-			if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
+			int MaxX = Image.GetSizeX();
+			int MaxZ = Image.GetSizeZ();
+			for (int z = 0; z < MaxZ; z++)
 			{
-				// Z coord outside the chunk
-				continue;
-			}
-			for (int x = 0; x < MaxX; x++)
-			{
-				int RelX = Placement.x + x;
-				if ((RelX < 0) || (RelX >= cChunkDef::Width))
+				int RelZ = Placement.z + z;
+				if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
 				{
-					// X coord outside the chunk
+					// Z coord outside the chunk
 					continue;
 				}
-				BLOCKTYPE BlockType;
-				NIBBLETYPE BlockMeta;
-				Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
-				if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+				for (int x = 0; x < MaxX; x++)
 				{
-					// Do not expand air nor sponge blocks
-					continue;
-				}
-				for (int y = Placement.y - 1; y >= 0; y--)
-				{
-					BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
-					if (ExistingBlock != E_BLOCK_AIR)
+					int RelX = Placement.x + x;
+					if ((RelX < 0) || (RelX >= cChunkDef::Width))
 					{
-						// End the expansion for this column, reached the end
-						break;
+						// X coord outside the chunk
+						continue;
 					}
-					a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
-				}  // for y
-			}  // for x
-		}  // for z
+					BLOCKTYPE BlockType;
+					NIBBLETYPE BlockMeta;
+					Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
+					if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+					{
+						// Do not expand air nor sponge blocks
+						continue;
+					}
+					for (int y = Placement.y - 1; y >= 0; y--)
+					{
+						BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
+						if (ExistingBlock != E_BLOCK_AIR)
+						{
+							// End the expansion for this column, reached the end
+							break;
+						}
+						a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+					}  // for y
+				}  // for x
+			}  // for z
+			break;
+		}  // efsRepeatBottomTillNonAir
+
+		case efsRepeatBottomTillSolid:
+		{
+			int MaxX = Image.GetSizeX();
+			int MaxZ = Image.GetSizeZ();
+			for (int z = 0; z < MaxZ; z++)
+			{
+				int RelZ = Placement.z + z;
+				if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
+				{
+					// Z coord outside the chunk
+					continue;
+				}
+				for (int x = 0; x < MaxX; x++)
+				{
+					int RelX = Placement.x + x;
+					if ((RelX < 0) || (RelX >= cChunkDef::Width))
+					{
+						// X coord outside the chunk
+						continue;
+					}
+					BLOCKTYPE BlockType;
+					NIBBLETYPE BlockMeta;
+					Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
+					if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+					{
+						// Do not expand air nor sponge blocks
+						continue;
+					}
+					for (int y = Placement.y - 1; y >= 0; y--)
+					{
+						BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
+						if (cBlockInfo::IsSolid(ExistingBlock))
+						{
+							// End the expansion for this column, reached the end
+							break;
+						}
+						a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+					}  // for y
+				}  // for x
+			}  // for z
+			break;
+		}  // efsRepeatBottomTillSolid
 	}
 }
 

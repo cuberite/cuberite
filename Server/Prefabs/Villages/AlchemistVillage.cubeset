@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2015-10-10 20:20:51",
+		ExportDate = "2016-11-23 15:08:03",
 		["AllowedBiomes"] = "Desert, DesertM",
 		["IntendedUse"] = "Village",
 	},
@@ -58,14 +58,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -188,14 +188,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -317,14 +317,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -472,14 +472,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -615,14 +615,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -672,7 +672,7 @@ Cubeset =
 				"aaaabfffb",  --  0
 				"agggffffm",  --  1
 				"agggbeheb",  --  2
-				"agddehhhe",  --  3
+				"aggdehhhe",  --  3
 				"beeebhhhe",  --  4
 				"ehhhhhhhe",  --  5
 				"ehhhhhhhe",  --  6
@@ -765,14 +765,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -925,14 +925,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "80",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -1103,14 +1103,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -1259,14 +1259,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -1414,14 +1414,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "80",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -1618,14 +1618,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "80",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -1831,14 +1831,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "60",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2107,14 +2107,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2264,14 +2264,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2453,14 +2453,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "80",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2649,14 +2649,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "70",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -2889,14 +2889,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "50",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -3106,14 +3106,14 @@ Cubeset =
 			Metadata =
 			{
 				["AddWeightIfSame"] = "0",
-				["IsStarting"] = "1",
 				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["ShouldExpandFloor"] = "1",
-				["DepthWeight"] = "",
-				["VerticalStrategy"] = "TerrainOrOceanTop|-16",
-				["MoveToGround"] = "1",
 				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "1",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
+				["VerticalStrategy"] = "TerrainOrOceanTop|-16",
 			},
 			BlockDefinitions =
 			{
@@ -3366,14 +3366,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
 				["AddWeightIfSame"] = "0",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "0",
+				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "50",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -3539,14 +3539,14 @@ Cubeset =
 			},
 			Metadata =
 			{
-				["DefaultWeight"] = "100",
-				["IsStarting"] = "0",
-				["AllowedRotations"] = "7",
-				["MergeStrategy"] = "msSpongePrint",
-				["DepthWeight"] = "",
-				["ShouldExpandFloor"] = "1",
-				["MoveToGround"] = "1",
 				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "1",
 			},
 			BlockDefinitions =
 			{

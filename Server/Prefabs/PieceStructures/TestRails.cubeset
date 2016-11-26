@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2015-11-28 16:54:47",
+		ExportDate = "2016-11-23 15:08:09",
 		["GridSizeX"] = "10",
 		["GridSizeZ"] = "10",
 		["IntendedUse"] = "PieceStructures",
@@ -117,10 +117,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -278,10 +278,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -421,10 +421,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "RepeatTillNonAir",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "1",
 				["VerticalStrategy"] = "TerrainOrOceanTop|1",
 			},
 			BlockDefinitions =
@@ -566,10 +566,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
@@ -709,10 +709,10 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
-				["ShouldExpandFloor"] = "0",
 			},
 			BlockDefinitions =
 			{
