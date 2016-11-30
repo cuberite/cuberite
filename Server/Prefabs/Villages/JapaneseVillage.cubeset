@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2016-11-23 15:07:49",
+		ExportDate = "2016-11-30 13:45:59",
 		["AllowedBiomes"] = "Plains, Savanna, SavannaM, SunflowerPlains",
 		["IntendedUse"] = "Village",
 	},
@@ -62,7 +62,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -88,9 +88,9 @@ Cubeset =
 				"p: 50: 1",  -- torch
 				"q: 50: 4",  -- torch
 				"r: 35:14",  -- wool
-				"s: 44: 8",  -- step
-				"t: 43: 0",  -- doublestep
-				"u: 44: 0",  -- step
+				"s: 44: 8",  -- stone_slab
+				"t: 43: 0",  -- doublestoneslab
+				"u: 44: 0",  -- stone_slab
 				"v: 17: 5",  -- tree
 			},
 			BlockData =
@@ -311,7 +311,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -333,9 +333,9 @@ Cubeset =
 				"l:124: 0",  -- redstonelampon
 				"m: 19: 0",  -- sponge
 				"n: 69: 9",  -- lever
-				"o: 44: 8",  -- step
-				"p: 43: 0",  -- doublestep
-				"q: 44: 0",  -- step
+				"o: 44: 8",  -- stone_slab
+				"p: 43: 0",  -- doublestoneslab
+				"q: 44: 0",  -- stone_slab
 			},
 			BlockData =
 			{
@@ -484,7 +484,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -497,11 +497,11 @@ Cubeset =
 				"c: 35: 0",  -- wool
 				"d:171: 0",  -- carpet
 				"e:126: 1",  -- woodenslab
-				"f: 64: 1",  -- wooddoorblock
+				"f: 64: 1",  -- woodendoorblock
 				"g: 85: 0",  -- fence
 				"h: 50: 1",  -- torch
 				"i: 50: 2",  -- torch
-				"j: 64: 9",  -- wooddoorblock
+				"j: 64: 9",  -- woodendoorblock
 				"k:126:11",  -- woodenslab
 				"l: 17: 5",  -- tree
 				"m: 19: 0",  -- sponge
@@ -635,7 +635,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -661,12 +661,12 @@ Cubeset =
 				"p: 85: 0",  -- fence
 				"q:140: 0",  -- flowerpotblock
 				"r: 50: 3",  -- torch
-				"s: 44: 8",  -- step
+				"s: 44: 8",  -- stone_slab
 				"t: 50: 1",  -- torch
 				"u: 50: 2",  -- torch
-				"v: 43: 0",  -- doublestep
-				"w: 44: 0",  -- step
-				"x: 18:10",  -- leaves
+				"v: 43: 0",  -- doublestoneslab
+				"w: 44: 0",  -- stone_slab
+				"x: 18: 2",  -- leaves
 			},
 			BlockData =
 			{
@@ -703,7 +703,7 @@ Cubeset =
 				"aaaaaccaacccacam",  -- 11
 				"acacaccacaccccam",  -- 12
 				"accaaccaccaccaam",  -- 13
-				"cccaccacaccacaam",  -- 14
+				"cccaccccaccacaam",  -- 14
 				"mmmmmmmmmmmmmmmm",  -- 15
 
 				-- Level 2
@@ -878,7 +878,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -891,9 +891,9 @@ Cubeset =
 				"c: 35: 0",  -- wool
 				"d: 50: 4",  -- torch
 				"e: 85: 0",  -- fence
-				"f: 44: 8",  -- step
-				"g: 43: 0",  -- doublestep
-				"h: 44: 0",  -- step
+				"f: 44: 8",  -- stone_slab
+				"g: 43: 0",  -- doublestoneslab
+				"h: 44: 0",  -- stone_slab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -1019,7 +1019,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1043,9 +1043,9 @@ Cubeset =
 				"m: 19: 0",  -- sponge
 				"n:124: 0",  -- redstonelampon
 				"o: 69: 9",  -- lever
-				"p: 44: 8",  -- step
-				"q: 43: 0",  -- doublestep
-				"r: 44: 0",  -- step
+				"p: 44: 8",  -- stone_slab
+				"q: 43: 0",  -- doublestoneslab
+				"r: 44: 0",  -- stone_slab
 				"s: 50: 4",  -- torch
 				"t: 50: 1",  -- torch
 				"u: 50: 3",  -- torch
@@ -1345,7 +1345,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1362,9 +1362,9 @@ Cubeset =
 				"g:135: 2",  -- whitewoodstairs
 				"h: 50: 4",  -- torch
 				"i: 85: 0",  -- fence
-				"j: 44: 8",  -- step
-				"k: 43: 0",  -- doublestep
-				"l: 44: 0",  -- step
+				"j: 44: 8",  -- stone_slab
+				"k: 43: 0",  -- doublestoneslab
+				"l: 44: 0",  -- stone_slab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -1462,7 +1462,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1480,18 +1480,18 @@ Cubeset =
 				"h: 17: 1",  -- tree
 				"i: 35: 0",  -- wool
 				"j:171:12",  -- carpet
-				"k: 64: 6",  -- wooddoorblock
+				"k: 64: 6",  -- woodendoorblock
 				"l:126: 2",  -- woodenslab
 				"m: 19: 0",  -- sponge
 				"n:135: 2",  -- whitewoodstairs
-				"o: 64: 7",  -- wooddoorblock
+				"o: 64: 7",  -- woodendoorblock
 				"p: 50: 4",  -- torch
 				"q: 85: 0",  -- fence
-				"r: 64:12",  -- wooddoorblock
+				"r: 64:12",  -- woodendoorblock
 				"s: 50: 3",  -- torch
-				"t: 44: 8",  -- step
-				"u: 43: 0",  -- doublestep
-				"v: 44: 0",  -- step
+				"t: 44: 8",  -- stone_slab
+				"u: 43: 0",  -- doublestoneslab
+				"v: 44: 0",  -- stone_slab
 			},
 			BlockData =
 			{
@@ -1669,7 +1669,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1692,10 +1692,10 @@ Cubeset =
 				"m: 19: 0",  -- sponge
 				"n: 50: 4",  -- torch
 				"o: 85: 0",  -- fence
-				"p: 44: 8",  -- step
+				"p: 44: 8",  -- stone_slab
 				"q: 35: 6",  -- wool
-				"r: 43: 0",  -- doublestep
-				"s: 44: 0",  -- step
+				"r: 43: 0",  -- doublestoneslab
+				"s: 44: 0",  -- stone_slab
 			},
 			BlockData =
 			{
@@ -1892,7 +1892,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2018,7 +2018,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2028,15 +2028,15 @@ Cubeset =
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
 				"b: 17: 1",  -- tree
-				"c: 67: 0",  -- stairs
+				"c: 67: 0",  -- stonestairs
 				"d:  5: 2",  -- planks
-				"e: 67: 2",  -- stairs
+				"e: 67: 2",  -- stonestairs
 				"f:113: 0",  -- netherbrickfence
 				"g:118: 2",  -- cauldronblock
-				"h: 67: 6",  -- stairs
-				"i: 67: 4",  -- stairs
+				"h: 67: 6",  -- stonestairs
+				"i: 67: 4",  -- stonestairs
 				"j: 87: 0",  -- netherstone
-				"k: 67: 7",  -- stairs
+				"k: 67: 7",  -- stonestairs
 				"l: 54: 5",  -- chest
 				"m: 19: 0",  -- sponge
 				"n: 61: 2",  -- furnace
@@ -2045,11 +2045,11 @@ Cubeset =
 				"q: 50: 4",  -- torch
 				"r: 50: 2",  -- torch
 				"s: 35: 0",  -- wool
-				"t: 67: 3",  -- stairs
+				"t: 67: 3",  -- stonestairs
 				"u: 50: 3",  -- torch
-				"v: 44: 8",  -- step
-				"w: 43: 0",  -- doublestep
-				"x: 44: 0",  -- step
+				"v: 44: 8",  -- stone_slab
+				"w: 43: 0",  -- doublestoneslab
+				"x: 44: 0",  -- stone_slab
 				"y: 17: 5",  -- tree
 				"z: 17: 9",  -- tree
 			},
@@ -2277,7 +2277,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2288,13 +2288,13 @@ Cubeset =
 				"a:  5: 2",  -- planks
 				"b: 17: 1",  -- tree
 				"c: 35: 0",  -- wool
-				"d: 64: 3",  -- wooddoorblock
+				"d: 64: 3",  -- woodendoorblock
 				"e: 50: 4",  -- torch
-				"f: 64: 9",  -- wooddoorblock
+				"f: 64: 9",  -- woodendoorblock
 				"g: 85: 0",  -- fence
-				"h: 44: 8",  -- step
-				"i: 43: 0",  -- doublestep
-				"j: 44: 0",  -- step
+				"h: 44: 8",  -- stone_slab
+				"i: 43: 0",  -- doublestoneslab
+				"j: 44: 0",  -- stone_slab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -2399,7 +2399,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2411,18 +2411,18 @@ Cubeset =
 				"b: 17: 9",  -- tree
 				"c: 17: 1",  -- tree
 				"d: 35: 0",  -- wool
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:171:12",  -- carpet
 				"g:135: 1",  -- whitewoodstairs
 				"h:126: 2",  -- woodenslab
 				"i:135: 2",  -- whitewoodstairs
 				"j: 50: 4",  -- torch
-				"k: 64: 9",  -- wooddoorblock
+				"k: 64: 9",  -- woodendoorblock
 				"l: 85: 0",  -- fence
 				"m: 19: 0",  -- sponge
-				"n: 44: 8",  -- step
-				"o: 43: 0",  -- doublestep
-				"p: 44: 0",  -- step
+				"n: 44: 8",  -- stone_slab
+				"o: 43: 0",  -- doublestoneslab
+				"p: 44: 0",  -- stone_slab
 			},
 			BlockData =
 			{
@@ -2547,7 +2547,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2560,14 +2560,14 @@ Cubeset =
 				"b:  4: 0",  -- cobblestone
 				"c:  8: 0",  -- water
 				"d: 13: 0",  -- gravel
-				"e: 67: 1",  -- stairs
-				"f: 67: 2",  -- stairs
-				"g: 67: 0",  -- stairs
-				"h: 67: 3",  -- stairs
+				"e: 67: 1",  -- stonestairs
+				"f: 67: 2",  -- stonestairs
+				"g: 67: 0",  -- stonestairs
+				"h: 67: 3",  -- stonestairs
 				"i: 85: 0",  -- fence
-				"j: 44: 8",  -- step
-				"k: 44: 0",  -- step
-				"l: 43: 0",  -- doublestep
+				"j: 44: 8",  -- stone_slab
+				"k: 44: 0",  -- stone_slab
+				"l: 43: 0",  -- doublestoneslab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -2751,7 +2751,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2764,9 +2764,9 @@ Cubeset =
 				"c: 13: 0",  -- gravel
 				"d:113: 0",  -- netherbrickfence
 				"e: 50: 5",  -- torch
-				"f: 44: 8",  -- step
-				"g: 44: 0",  -- step
-				"h: 43: 0",  -- doublestep
+				"f: 44: 8",  -- stone_slab
+				"g: 44: 0",  -- stone_slab
+				"h: 43: 0",  -- doublestoneslab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -2880,7 +2880,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3005,7 +3005,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3162,7 +3162,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3190,10 +3190,10 @@ Cubeset =
 				"aaaaaaaaaaaaaaaa",  --  3
 				"aaaaaaaaaaaaaaaa",  --  4
 				"aaaaaaaaaaaaaaaa",  --  5
-				"aaaaabaaaaaaaaaa",  --  6
-				"aaabbaaaaaaaaaaa",  --  7
-				"aaabbaaaaaaaaaaa",  --  8
-				"aaaabaaaaaaaaaaa",  --  9
+				"aaaaaaaaaaaaaaaa",  --  6
+				"aaaaaaaaaaaaaaaa",  --  7
+				"aaabaaaaaaaaaaaa",  --  8
+				"aaaaaaaaaaaaaaaa",  --  9
 				"aaaaaaaaaaaaaaaa",  -- 10
 				"aaaaaaaaaaaaaaaa",  -- 11
 				"aaaaaaaaaaaaaaaa",  -- 12
@@ -3207,11 +3207,11 @@ Cubeset =
 				"aaaaaaaaaaaaaaaa",  --  2
 				"aaaaaaaaaaaaaaaa",  --  3
 				"aaaaaaaaaaaaaaaa",  --  4
-				"aaabbbbaaaaaaaaa",  --  5
-				"aaaaccbaaaaaaaaa",  --  6
-				"aabcccbaaaaaaaaa",  --  7
-				"aabccabaaaaaaaaa",  --  8
-				"aabbcbaaaaaaaaaa",  --  9
+				"aaaaaaaaaaaaaaaa",  --  5
+				"aaaaccaaaaaaaaaa",  --  6
+				"aaacccaaaaaaaaaa",  --  7
+				"aabccaaaaaaaaaaa",  --  8
+				"aaaacaaaaaaaaaaa",  --  9
 				"aaaabaaaaaaaaaaa",  -- 10
 				"aaaaaaaaaaaaaaaa",  -- 11
 				"aaaaaaaaaaaaaaaa",  -- 12
@@ -3319,7 +3319,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3331,13 +3331,12 @@ Cubeset =
 				"b: 60: 7",  -- tilleddirt
 				"c: 60: 6",  -- tilleddirt
 				"d:  8: 0",  -- water
-				"e: 60: 5",  -- tilleddirt
-				"f: 43: 0",  -- doublestep
-				"g: 44: 0",  -- step
-				"h: 59: 7",  -- crops
-				"i: 83: 0",  -- reedblock
-				"j:113: 0",  -- netherbrickfence
-				"k: 50: 5",  -- torch
+				"e: 43: 0",  -- doublestoneslab
+				"f: 44: 0",  -- stone_slab
+				"g: 59: 7",  -- wheatblock
+				"h: 83: 0",  -- reedsblock
+				"i:113: 0",  -- netherbrickfence
+				"j: 50: 5",  -- torch
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -3361,65 +3360,65 @@ Cubeset =
 				"mmmmmmmmmmm",  --  0
 				"maaaaaaaaam",  --  1
 				"mabbbbbbbam",  --  2
-				"macbbbbbbam",  --  3
-				"mabbbccbbam",  --  4
-				"maccbbbbbam",  --  5
-				"macdddddaam",  --  6
-				"macbcbcbbam",  --  7
-				"macebbcbbam",  --  8
-				"maebbcbcbam",  --  9
+				"mabbbbbbbam",  --  3
+				"mabbbbbcbam",  --  4
+				"mabbbbbbcam",  --  5
+				"mabdddddaam",  --  6
+				"mabbcbbbbam",  --  7
+				"mabbbbbbcam",  --  8
+				"mabbbbbbbam",  --  9
 				"mabbbbbbbam",  -- 10
 				"maaaaaaaaam",  -- 11
 				"mmmmmmmmmmm",  -- 12
 
 				-- Level 2
 				"...........",  --  0
-				".fgggggggf.",  --  1
-				".ghhhhhhhg.",  --  2
-				".ghhhhhhhg.",  --  3
-				".ghhhhhhhg.",  --  4
-				".ghiiiiihg.",  --  5
-				".gi.....ig.",  --  6
-				".ghiiiiihg.",  --  7
-				".ghhhhhhhg.",  --  8
-				".ghhhhhhhg.",  --  9
-				".ghhhhhhhg.",  -- 10
-				".fgggggggf.",  -- 11
+				".efffffffe.",  --  1
+				".fgggggggf.",  --  2
+				".fgggggggf.",  --  3
+				".fgggggggf.",  --  4
+				".fghhhhhgf.",  --  5
+				".fh.....hf.",  --  6
+				".fghhhhhgf.",  --  7
+				".fgggggggf.",  --  8
+				".fgggggggf.",  --  9
+				".fgggggggf.",  -- 10
+				".efffffffe.",  -- 11
 				"...........",  -- 12
 
 				-- Level 3
 				"...........",  --  0
-				".j.......j.",  --  1
+				".i.......i.",  --  1
 				"...........",  --  2
 				"...........",  --  3
 				"...........",  --  4
-				"...iiiii...",  --  5
-				"..i.....i..",  --  6
-				"...iiiii...",  --  7
+				"...hhhhh...",  --  5
+				"..h.....h..",  --  6
+				"...hhhhh...",  --  7
 				"...........",  --  8
 				"...........",  --  9
 				"...........",  -- 10
-				".j.......j.",  -- 11
+				".i.......i.",  -- 11
 				"...........",  -- 12
 
 				-- Level 4
 				"...........",  --  0
-				".j.......j.",  --  1
+				".i.......i.",  --  1
 				"...........",  --  2
 				"...........",  --  3
 				"...........",  --  4
-				"...iiiii...",  --  5
-				"..i.....i..",  --  6
-				"...iiiii...",  --  7
+				"...hhhhh...",  --  5
+				"..h.....h..",  --  6
+				"...hhhhh...",  --  7
 				"...........",  --  8
 				"...........",  --  9
 				"...........",  -- 10
-				".j.......j.",  -- 11
+				".i.......i.",  -- 11
 				"...........",  -- 12
 
 				-- Level 5
 				"...........",  --  0
-				".j.......j.",  --  1
+				".i.......i.",  --  1
 				"...........",  --  2
 				"...........",  --  3
 				"...........",  --  4
@@ -3429,12 +3428,27 @@ Cubeset =
 				"...........",  --  8
 				"...........",  --  9
 				"...........",  -- 10
-				".j.......j.",  -- 11
+				".i.......i.",  -- 11
 				"...........",  -- 12
 
 				-- Level 6
+				".i.......i.",  --  0
+				"iii.....iii",  --  1
+				".i.......i.",  --  2
+				"...........",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"...........",  --  7
+				"...........",  --  8
+				"...........",  --  9
+				".i.......i.",  -- 10
+				"iii.....iii",  -- 11
+				".i.......i.",  -- 12
+
+				-- Level 7
 				".j.......j.",  --  0
-				"jjj.....jjj",  --  1
+				"j.j.....j.j",  --  1
 				".j.......j.",  --  2
 				"...........",  --  3
 				"...........",  --  4
@@ -3444,23 +3458,8 @@ Cubeset =
 				"...........",  --  8
 				"...........",  --  9
 				".j.......j.",  -- 10
-				"jjj.....jjj",  -- 11
+				"j.j.....j.j",  -- 11
 				".j.......j.",  -- 12
-
-				-- Level 7
-				".k.......k.",  --  0
-				"k.k.....k.k",  --  1
-				".k.......k.",  --  2
-				"...........",  --  3
-				"...........",  --  4
-				"...........",  --  5
-				"...........",  --  6
-				"...........",  --  7
-				"...........",  --  8
-				"...........",  --  9
-				".k.......k.",  -- 10
-				"k.k.....k.k",  -- 11
-				".k.......k.",  -- 12
 
 			},
 		},  -- Farm

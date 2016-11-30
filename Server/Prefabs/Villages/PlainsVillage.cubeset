@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2016-11-23 15:07:39",
+		ExportDate = "2016-11-30 13:45:48",
 		["AllowedBiomes"] = "Plains, Savanna, SavannaM, SunflowerPlains",
 		["IntendedUse"] = "Village",
 	},
@@ -62,7 +62,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -71,16 +71,16 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e:  5: 0",  -- planks
-				"f: 67: 3",  -- stairs
+				"f: 67: 3",  -- stonestairs
 				"g: 17: 0",  -- tree
-				"h: 64: 3",  -- wooddoorblock
-				"i: 64: 1",  -- wooddoorblock
+				"h: 64: 3",  -- woodendoorblock
+				"i: 64: 1",  -- woodendoorblock
 				"j:102: 0",  -- glasspane
-				"k: 64: 9",  -- wooddoorblock
+				"k: 64: 9",  -- woodendoorblock
 				"l: 53: 2",  -- woodstairs
 				"m: 19: 0",  -- sponge
 				"n: 53: 1",  -- woodstairs
@@ -449,7 +449,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -463,9 +463,8 @@ Cubeset =
 				"d: 60: 7",  -- tilleddirt
 				"e:  8: 0",  -- water
 				"f: 60: 6",  -- tilleddirt
-				"g: 60: 5",  -- tilleddirt
-				"h: 50: 5",  -- torch
-				"i: 59: 7",  -- crops
+				"g: 50: 5",  -- torch
+				"h: 59: 7",  -- wheatblock
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -478,8 +477,8 @@ Cubeset =
 				"aaaaaaabaaaaaaa",  --  4
 				"aaaaaaabaaaaaaa",  --  5
 				"aaaaaaabaaaaaaa",  --  6
-				"aaaaaaabaaaaaaa",  --  7
-				"aaaaaaabaaaaaaa",  --  8
+				"aaaaaaaaaaaaaaa",  --  7
+				"aaaaaaaaaaaaaaa",  --  8
 
 				-- Level 1
 				"aaaaaaamaaaaaaa",  --  0
@@ -497,22 +496,22 @@ Cubeset =
 				"cddeddc.cddeddc",  --  1
 				"cddeddc.cddeddc",  --  2
 				"cddeddc.cddeddc",  --  3
-				"cfdeddc.cdfedfc",  --  4
-				"cddeddc.cdfeddc",  --  5
+				"cddeddc.cddeddc",  --  4
+				"cddeddc.cddeddc",  --  5
 				"cddeddc.cdfeddc",  --  6
-				"cddeddc.cdgeddc",  --  7
+				"cddeddc.cddeddc",  --  7
 				"ccccccc.ccccccc",  --  8
 
 				-- Level 3
-				"h.....h.h.....h",  --  0
-				".ii.ii...ii.ii.",  --  1
-				".ii.ii...ii.ii.",  --  2
-				".ii.ii...ii.ii.",  --  3
-				".ii.ii...ii.ii.",  --  4
-				".ii.ii...ii.ii.",  --  5
-				".ii.ii...ii.ii.",  --  6
-				".ii.ii...ii.ii.",  --  7
-				"h.....h.h.....h",  --  8
+				"g.....g.g.....g",  --  0
+				".hh.hh...hh.hh.",  --  1
+				".hh.hh...hh.hh.",  --  2
+				".hh.hh...hh.hh.",  --  3
+				".hh.hh...hh.hh.",  --  4
+				".hh.hh...hh.hh.",  --  5
+				".hh.hh...hh.hh.",  --  6
+				".hh.hh...hh.hh.",  --  7
+				"g.....g.g.....g",  --  8
 
 				-- Level 4
 				"...............",  --  0
@@ -604,7 +603,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -614,22 +613,22 @@ Cubeset =
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
 				"b:  3: 0",  -- dirt
-				"c:  2: 0",  -- grass
-				"d:  5: 0",  -- planks
-				"e: 67: 2",  -- stairs
-				"f: 43: 0",  -- doublestep
-				"g: 67: 0",  -- stairs
-				"h: 67: 3",  -- stairs
+				"c:  5: 0",  -- planks
+				"d:  2: 0",  -- grass
+				"e: 67: 2",  -- stonestairs
+				"f: 43: 0",  -- doublestoneslab
+				"g: 67: 0",  -- stonestairs
+				"h: 67: 3",  -- stonestairs
 				"i: 17: 0",  -- tree
 				"j: 53: 1",  -- woodstairs
 				"k: 85: 0",  -- fence
 				"l: 53: 0",  -- woodstairs
 				"m: 19: 0",  -- sponge
-				"n: 64: 2",  -- wooddoorblock
-				"o: 64: 0",  -- wooddoorblock
+				"n: 64: 2",  -- woodendoorblock
+				"o: 64: 0",  -- woodendoorblock
 				"p:102: 0",  -- glasspane
 				"q: 72: 0",  -- woodplate
-				"r: 64: 9",  -- wooddoorblock
+				"r: 64: 9",  -- woodendoorblock
 				"s: 53: 5",  -- woodstairs
 				"t: 53: 4",  -- woodstairs
 				"u: 50: 1",  -- torch
@@ -643,37 +642,37 @@ Cubeset =
 				"maaaaammmm",  --  2
 				"maaaaabbbb",  --  3
 				"aaaaaabbbb",  --  4
-				"aaaaaabbcb",  --  5
+				"aaaaaabbbb",  --  5
 				"aaaaaabbbb",  --  6
 				"maaaaabbbb",  --  7
-				"maaaaabbcb",  --  8
+				"maaaaabbbb",  --  8
 				"maaaaammmm",  --  9
 				"mmmmmmmmmm",  -- 10
 
 				-- Level 1
 				"......mmmm",  --  0
 				".aaaaammmm",  --  1
-				".adddammmm",  --  2
-				".adddacccc",  --  3
-				"eafffacccc",  --  4
-				"gaffffcccc",  --  5
-				"hafffacccc",  --  6
-				".afffacccc",  --  7
-				".afffacccc",  --  8
+				".acccammmm",  --  2
+				".acccadddd",  --  3
+				"eafffadddd",  --  4
+				"gaffffdddd",  --  5
+				"hafffadddd",  --  6
+				".afffadddd",  --  7
+				".afffadddd",  --  8
 				".aaaaammmm",  --  9
 				"......mmmm",  -- 10
 
 				-- Level 2
 				"......mmmm",  --  0
-				".idddimmmm",  --  1
-				".djkldmmmm",  --  2
-				".d...dkkkk",  --  3
-				".d...d...k",  --  4
+				".icccimmmm",  --  1
+				".cjklcmmmm",  --  2
+				".c...ckkkk",  --  3
+				".c...c...k",  --  4
 				".n...o...k",  --  5
-				".d...d...k",  --  6
-				".dff.d...k",  --  7
-				".d...dkkkk",  --  8
-				".idddimmmm",  --  9
+				".c...c...k",  --  6
+				".cff.c...k",  --  7
+				".c...ckkkk",  --  8
+				".icccimmmm",  --  9
 				"......mmmm",  -- 10
 
 				-- Level 3
@@ -681,9 +680,9 @@ Cubeset =
 				".ipppimmmm",  --  1
 				".p.q.pmmmm",  --  2
 				".p...p....",  --  3
-				".d...d....",  --  4
+				".c...c....",  --  4
 				".r...r....",  --  5
-				".d...d....",  --  6
+				".c...c....",  --  6
 				".p...p....",  --  7
 				".p...p....",  --  8
 				".ipppimmmm",  --  9
@@ -691,42 +690,42 @@ Cubeset =
 
 				-- Level 4
 				"ls...tjmmm",  --  0
-				"lidddijmmm",  --  1
-				"ld...djmmm",  --  2
-				"ld...dj...",  --  3
-				"ldu.vdj...",  --  4
-				"ld...dj...",  --  5
-				"ldu.vdj...",  --  6
-				"ld...dj...",  --  7
-				"ld...dj...",  --  8
-				"lidddijmmm",  --  9
+				"licccijmmm",  --  1
+				"lc...cjmmm",  --  2
+				"lc...cj...",  --  3
+				"lcu.vcj...",  --  4
+				"lc...cj...",  --  5
+				"lcu.vcj...",  --  6
+				"lc...cj...",  --  7
+				"lc...cj...",  --  8
+				"licccijmmm",  --  9
 				"ls...tjmmm",  -- 10
 
 				-- Level 5
 				".ls.tj.mmm",  --  0
-				".ldddj.mmm",  --  1
-				".ld.dj.mmm",  --  2
-				".ld.dj....",  --  3
-				".ld.dj....",  --  4
-				".ld.dj....",  --  5
-				".ld.dj....",  --  6
-				".ld.dj....",  --  7
-				".ld.dj....",  --  8
-				".ldddj.mmm",  --  9
+				".lcccj.mmm",  --  1
+				".lc.cj.mmm",  --  2
+				".lc.cj....",  --  3
+				".lc.cj....",  --  4
+				".lc.cj....",  --  5
+				".lc.cj....",  --  6
+				".lc.cj....",  --  7
+				".lc.cj....",  --  8
+				".lcccj.mmm",  --  9
 				".ls.tj.mmm",  -- 10
 
 				-- Level 6
-				"..ldj..mmm",  --  0
-				"..ldj..mmm",  --  1
-				"..ldj..mmm",  --  2
-				"..ldj.....",  --  3
-				"..ldj.....",  --  4
-				"..ldj.....",  --  5
-				"..ldj.....",  --  6
-				"..ldj.....",  --  7
-				"..ldj.....",  --  8
-				"..ldj..mmm",  --  9
-				"..ldj..mmm",  -- 10
+				"..lcj..mmm",  --  0
+				"..lcj..mmm",  --  1
+				"..lcj..mmm",  --  2
+				"..lcj.....",  --  3
+				"..lcj.....",  --  4
+				"..lcj.....",  --  5
+				"..lcj.....",  --  6
+				"..lcj.....",  --  7
+				"..lcj.....",  --  8
+				"..lcj..mmm",  --  9
+				"..lcj..mmm",  -- 10
 
 			},
 		},  -- WoodenHouse9x5Fence
@@ -774,7 +773,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -785,9 +784,9 @@ Cubeset =
 				"a:  3: 0",  -- dirt
 				"b: 17: 0",  -- tree
 				"c: 60: 7",  -- tilleddirt
-				"d:  8: 0",  -- water
-				"e: 60: 6",  -- tilleddirt
-				"f: 59: 7",  -- crops
+				"d: 60: 6",  -- tilleddirt
+				"e:  8: 0",  -- water
+				"f: 59: 7",  -- wheatblock
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -804,9 +803,9 @@ Cubeset =
 				-- Level 1
 				"bbbbbbbbbb",  --  0
 				"bccccccccb",  --  1
-				"bccccccccb",  --  2
-				"bddddddddb",  --  3
-				"bccccceccb",  --  4
+				"bccccccdcb",  --  2
+				"beeeeeeeeb",  --  3
+				"bcccccdccb",  --  4
 				"bccccccccb",  --  5
 				"bbbbbbbbbb",  --  6
 
@@ -901,7 +900,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -910,17 +909,17 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
-				"e: 64: 3",  -- wooddoorblock
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
+				"e: 64: 3",  -- woodendoorblock
 				"f: 53: 3",  -- woodstairs
 				"g: 53: 1",  -- woodstairs
 				"h: 85: 0",  -- fence
 				"i: 53: 0",  -- woodstairs
 				"j: 53: 2",  -- woodstairs
 				"k:102: 0",  -- glasspane
-				"l: 64: 9",  -- wooddoorblock
+				"l: 64: 9",  -- woodendoorblock
 				"m: 19: 0",  -- sponge
 				"n: 50: 3",  -- torch
 				"o: 72: 0",  -- woodplate
@@ -1043,7 +1042,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1057,10 +1056,11 @@ Cubeset =
 				"d: 17: 0",  -- tree
 				"e: 60: 7",  -- tilleddirt
 				"f:  8: 0",  -- water
-				"g: 60: 5",  -- tilleddirt
-				"h: 85: 0",  -- fence
-				"i: 59: 7",  -- crops
-				"j: 50: 5",  -- torch
+				"g: 60: 6",  -- tilleddirt
+				"h: 60: 4",  -- tilleddirt
+				"i: 85: 0",  -- fence
+				"j: 59: 7",  -- wheatblock
+				"k: 50: 5",  -- torch
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -1095,34 +1095,34 @@ Cubeset =
 
 				-- Level 2
 				"ddddddddddddd",  --  0
-				"deefgefeefeed",  --  1
+				"deefeefeefeed",  --  1
 				"deefeefeefeed",  --  2
-				"deefeefeefeed",  --  3
+				"deefeefegfged",  --  3
 				"deefeefeefeed",  --  4
-				"deefeefeefeed",  --  5
-				"deefeefeefeed",  --  6
-				"deefeefeefeed",  --  7
+				"deefgefeefged",  --  5
+				"degfeefegfhed",  --  6
+				"deefeefeefggd",  --  7
 				"deefeefeefeed",  --  8
 				"deefeefeefeed",  --  9
 				"deefeefeefeed",  -- 10
 				"ddddddddddddd",  -- 11
 
 				-- Level 3
-				"h..h..h..h..h",  --  0
-				"hii.i..ii.iih",  --  1
-				"hii..i.ii.iih",  --  2
-				"hii.i..i..iih",  --  3
-				"hii.ii.i..iih",  --  4
-				"hii.i..ii.iih",  --  5
-				"hii.ii.ii.iih",  --  6
-				"hii....i..iih",  --  7
-				"hii..i....iih",  --  8
-				"hii.....i.iih",  --  9
-				"hii.ii.i..iih",  -- 10
-				"h..h..h..h..h",  -- 11
+				"i..i..i..i..i",  --  0
+				"ijj.j..jj.jji",  --  1
+				"ijj..j.jj.jji",  --  2
+				"ijj.j..j..jji",  --  3
+				"ijj.jj.j..jji",  --  4
+				"ijj.j..jj.jji",  --  5
+				"ijj.jj.jj.jji",  --  6
+				"ijj....j..jji",  --  7
+				"ijj..j....jji",  --  8
+				"ijj.....j.jji",  --  9
+				"ijj.jj.j..jji",  -- 10
+				"i..i..i..i..i",  -- 11
 
 				-- Level 4
-				"j..j..j..j..j",  --  0
+				"k..k..k..k..k",  --  0
 				".............",  --  1
 				".............",  --  2
 				".............",  --  3
@@ -1133,7 +1133,7 @@ Cubeset =
 				".............",  --  8
 				".............",  --  9
 				".............",  -- 10
-				"j..j..j..j..j",  -- 11
+				"k..k..k..k..k",  -- 11
 
 				-- Level 5
 				".............",  --  0
@@ -1223,7 +1223,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1231,41 +1231,42 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:  3: 0",  -- dirt
-				"b: 43: 0",  -- doublestep
-				"c:139: 0",  -- cobblestonewall
-				"d: 50: 4",  -- torch
-				"e: 50: 2",  -- torch
-				"f: 50: 1",  -- torch
-				"g: 50: 3",  -- torch
+				"a:  2: 0",  -- grass
+				"b:  3: 0",  -- dirt
+				"c: 43: 0",  -- doublestoneslab
+				"d:139: 0",  -- cobblestonewall
+				"e: 50: 4",  -- torch
+				"f: 50: 2",  -- torch
+				"g: 50: 1",  -- torch
+				"h: 50: 3",  -- torch
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
 			{
 				-- Level 0
-				"mmm",  --  0
-				"mam",  --  1
-				"mmm",  --  2
+				"aaa",  --  0
+				"aba",  --  1
+				"aaa",  --  2
 
 				-- Level 1
 				"...",  --  0
-				".b.",  --  1
+				".c.",  --  1
 				"...",  --  2
 
 				-- Level 2
 				"...",  --  0
-				".c.",  --  1
+				".d.",  --  1
 				"...",  --  2
 
 				-- Level 3
 				"...",  --  0
-				".c.",  --  1
+				".d.",  --  1
 				"...",  --  2
 
 				-- Level 4
-				".d.",  --  0
-				"ebf",  --  1
-				".g.",  --  2
+				".e.",  --  0
+				"fcg",  --  1
+				".h.",  --  2
 
 				-- Level 5
 				"...",  --  0
@@ -1323,7 +1324,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1332,16 +1333,16 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
-				"e: 67: 3",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
+				"e: 67: 3",  -- stonestairs
 				"f: 17: 0",  -- tree
 				"g:  5: 0",  -- planks
-				"h: 64: 7",  -- wooddoorblock
-				"i: 64: 1",  -- wooddoorblock
+				"h: 64: 7",  -- woodendoorblock
+				"i: 64: 1",  -- woodendoorblock
 				"j:102: 0",  -- glasspane
-				"k: 64: 9",  -- wooddoorblock
+				"k: 64: 9",  -- woodendoorblock
 				"l: 53: 2",  -- woodstairs
 				"m: 19: 0",  -- sponge
 				"n: 53: 7",  -- woodstairs
@@ -1488,7 +1489,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1501,13 +1502,13 @@ Cubeset =
 				"C: 53: 5",  -- woodstairs
 				"D: 53: 6",  -- woodstairs
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
-				"e: 43: 0",  -- doublestep
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
+				"e: 43: 0",  -- doublestoneslab
 				"f: 17: 0",  -- tree
 				"g:  5: 0",  -- planks
-				"h: 64: 3",  -- wooddoorblock
+				"h: 64: 3",  -- woodendoorblock
 				"i: 96: 8",  -- trapdoor
 				"j: 61: 2",  -- furnace
 				"k: 53: 3",  -- woodstairs
@@ -1518,7 +1519,7 @@ Cubeset =
 				"p: 53: 0",  -- woodstairs
 				"q: 47: 0",  -- bookshelf
 				"r:102: 0",  -- glasspane
-				"s: 64: 9",  -- wooddoorblock
+				"s: 64: 9",  -- woodendoorblock
 				"t: 72: 0",  -- woodplate
 				"u: 17: 4",  -- tree
 				"v: 17: 8",  -- tree
@@ -1737,7 +1738,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1746,14 +1747,14 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
 				"h:102: 0",  -- glasspane
-				"i: 64: 9",  -- wooddoorblock
+				"i: 64: 9",  -- woodendoorblock
 				"j: 53: 2",  -- woodstairs
 				"k: 53: 7",  -- woodstairs
 				"l: 50: 3",  -- torch
@@ -1872,7 +1873,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1881,14 +1882,14 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
 				"h:102: 0",  -- glasspane
-				"i: 64: 9",  -- wooddoorblock
+				"i: 64: 9",  -- woodendoorblock
 				"j: 53: 2",  -- woodstairs
 				"k: 53: 7",  -- woodstairs
 				"l: 50: 3",  -- torch
@@ -2007,7 +2008,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2016,14 +2017,14 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
 				"h:102: 0",  -- glasspane
-				"i: 64: 9",  -- wooddoorblock
+				"i: 64: 9",  -- woodendoorblock
 				"j: 53: 2",  -- woodstairs
 				"k: 53: 7",  -- woodstairs
 				"l: 53: 1",  -- woodstairs
@@ -2177,7 +2178,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2186,14 +2187,14 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
 				"h:102: 0",  -- glasspane
-				"i: 64: 9",  -- wooddoorblock
+				"i: 64: 9",  -- woodendoorblock
 				"j: 53: 2",  -- woodstairs
 				"k: 53: 0",  -- woodstairs
 				"l: 53: 1",  -- woodstairs
@@ -2345,7 +2346,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2354,12 +2355,12 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
 				"h: 53: 3",  -- woodstairs
 				"i: 85: 0",  -- fence
 				"j: 53: 2",  -- woodstairs
@@ -2367,7 +2368,7 @@ Cubeset =
 				"l: 53: 0",  -- woodstairs
 				"m: 19: 0",  -- sponge
 				"n:102: 0",  -- glasspane
-				"o: 64: 9",  -- wooddoorblock
+				"o: 64: 9",  -- woodendoorblock
 				"p: 50: 3",  -- torch
 				"q: 72: 0",  -- woodplate
 				"r: 53: 7",  -- woodstairs
@@ -2487,7 +2488,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2496,12 +2497,12 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
 				"h: 53: 3",  -- woodstairs
 				"i: 85: 0",  -- fence
 				"j: 53: 2",  -- woodstairs
@@ -2509,8 +2510,8 @@ Cubeset =
 				"l: 53: 0",  -- woodstairs
 				"m: 19: 0",  -- sponge
 				"n:102: 0",  -- glasspane
-				"o: 64: 8",  -- wooddoorblock
-				"p: 64: 9",  -- wooddoorblock
+				"o: 64: 8",  -- woodendoorblock
+				"p: 64: 9",  -- woodendoorblock
 				"q: 50: 3",  -- torch
 				"r: 72: 0",  -- woodplate
 				"s: 53: 7",  -- woodstairs
@@ -2655,7 +2656,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2665,21 +2666,21 @@ Cubeset =
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
 				"b:  3: 0",  -- dirt
-				"c: 67: 0",  -- stairs
-				"d: 67: 2",  -- stairs
-				"e: 67: 1",  -- stairs
-				"f: 43: 0",  -- doublestep
+				"c: 67: 0",  -- stonestairs
+				"d: 67: 2",  -- stonestairs
+				"e: 67: 1",  -- stonestairs
+				"f: 43: 0",  -- doublestoneslab
 				"g:  2: 0",  -- grass
 				"h: 17: 0",  -- tree
 				"i:  5: 0",  -- planks
-				"j: 64: 3",  -- wooddoorblock
+				"j: 64: 3",  -- woodendoorblock
 				"k: 53: 3",  -- woodstairs
 				"l: 85: 0",  -- fence
 				"m: 19: 0",  -- sponge
 				"n: 53: 2",  -- woodstairs
-				"o: 64: 1",  -- wooddoorblock
+				"o: 64: 1",  -- woodendoorblock
 				"p:102: 0",  -- glasspane
-				"q: 64: 9",  -- wooddoorblock
+				"q: 64: 9",  -- woodendoorblock
 				"r: 72: 0",  -- woodplate
 				"s: 53: 7",  -- woodstairs
 				"t: 50: 1",  -- torch
@@ -2854,7 +2855,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2863,13 +2864,13 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
-				"h: 64: 9",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
+				"h: 64: 9",  -- woodendoorblock
 				"i:102: 0",  -- glasspane
 				"j: 53: 2",  -- woodstairs
 				"k: 53: 7",  -- woodstairs
@@ -2989,7 +2990,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2998,17 +2999,17 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 0",  -- wooddoorblock
+				"g: 64: 0",  -- woodendoorblock
 				"h: 10: 0",  -- lava
 				"i: 54: 2",  -- chest
 				"j: 61: 2",  -- furnace
 				"k:102: 0",  -- glasspane
-				"l: 64: 9",  -- wooddoorblock
+				"l: 64: 9",  -- woodendoorblock
 				"m: 19: 0",  -- sponge
 				"n:139: 0",  -- cobblestonewall
 				"o:101: 0",  -- ironbars
@@ -3018,8 +3019,8 @@ Cubeset =
 				"s: 50: 1",  -- torch
 				"t: 53: 6",  -- woodstairs
 				"u: 53: 3",  -- woodstairs
-				"v: 43: 0",  -- doublestep
-				"w: 44: 0",  -- step
+				"v: 43: 0",  -- doublestoneslab
+				"w: 44: 0",  -- stone_slab
 			},
 			BlockData =
 			{
@@ -3186,7 +3187,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3195,14 +3196,14 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 3",  -- wooddoorblock
+				"g: 64: 3",  -- woodendoorblock
 				"h:102: 0",  -- glasspane
-				"i: 64: 9",  -- wooddoorblock
+				"i: 64: 9",  -- woodendoorblock
 				"j: 53: 2",  -- woodstairs
 				"k: 53: 7",  -- woodstairs
 				"l: 50: 3",  -- torch
@@ -3347,7 +3348,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3356,14 +3357,14 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b:170: 0",  -- haybale
-				"c: 67: 0",  -- stairs
-				"d: 67: 2",  -- stairs
-				"e: 67: 1",  -- stairs
+				"b:170: 0",  -- hayblock
+				"c: 67: 0",  -- stonestairs
+				"d: 67: 2",  -- stonestairs
+				"e: 67: 1",  -- stonestairs
 				"f: 17: 0",  -- tree
 				"g:  5: 0",  -- planks
-				"h:170: 4",  -- haybale
-				"i:170: 8",  -- haybale
+				"h:170: 4",  -- hayblock
+				"i:170: 8",  -- hayblock
 				"j: 54: 2",  -- chest
 				"k: 50: 4",  -- torch
 				"l: 53: 0",  -- woodstairs
@@ -3497,7 +3498,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3506,9 +3507,9 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e:  3: 0",  -- dirt
 				"f: 17: 0",  -- tree
 				"g:107: 0",  -- fencegate
@@ -3516,10 +3517,10 @@ Cubeset =
 				"i:  5: 0",  -- planks
 				"j:107: 6",  -- fencegate
 				"k: 85: 0",  -- fence
-				"l:170: 0",  -- haybale
+				"l:170: 0",  -- hayblock
 				"m: 19: 0",  -- sponge
-				"n:170: 4",  -- haybale
-				"o:170: 8",  -- haybale
+				"n:170: 4",  -- hayblock
+				"o:170: 8",  -- hayblock
 				"p: 50: 1",  -- torch
 				"q: 50: 2",  -- torch
 				"r: 53: 2",  -- woodstairs
@@ -3674,7 +3675,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3685,16 +3686,16 @@ Cubeset =
 				"A: 85: 0",  -- fence
 				"B:126: 8",  -- woodenslab
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 0",  -- stairs
-				"c: 67: 2",  -- stairs
-				"d: 67: 1",  -- stairs
+				"b: 67: 0",  -- stonestairs
+				"c: 67: 2",  -- stonestairs
+				"d: 67: 1",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
-				"g: 64: 1",  -- wooddoorblock
+				"g: 64: 1",  -- woodendoorblock
 				"h: 65: 3",  -- ladder
 				"i: 53: 3",  -- woodstairs
 				"j: 53: 7",  -- woodstairs
-				"k: 64: 9",  -- wooddoorblock
+				"k: 64: 9",  -- woodendoorblock
 				"l:102: 0",  -- glasspane
 				"m: 19: 0",  -- sponge
 				"n: 50: 1",  -- torch
@@ -3984,7 +3985,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -3993,17 +3994,17 @@ Cubeset =
 			{
 				".:  0: 0",  -- air
 				"a:  4: 0",  -- cobblestone
-				"b: 67: 2",  -- stairs
-				"c: 67: 1",  -- stairs
-				"d: 67: 3",  -- stairs
+				"b: 67: 2",  -- stonestairs
+				"c: 67: 1",  -- stonestairs
+				"d: 67: 3",  -- stonestairs
 				"e: 17: 0",  -- tree
 				"f:  5: 0",  -- planks
 				"g: 54: 4",  -- chest
 				"h:154: 4",  -- hopper
-				"i: 64: 0",  -- wooddoorblock
+				"i: 64: 0",  -- woodendoorblock
 				"j:102: 0",  -- glasspane
 				"k: 85: 0",  -- fence
-				"l: 64: 9",  -- wooddoorblock
+				"l: 64: 9",  -- woodendoorblock
 				"m: 19: 0",  -- sponge
 				"n: 50: 2",  -- torch
 				"o: 35: 0",  -- wool
@@ -4338,7 +4339,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -4575,7 +4576,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -5088,7 +5089,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
