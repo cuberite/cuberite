@@ -435,7 +435,12 @@ protected:
 	{
 		bool HasHadWater = false;
 		int PatternIdx = 0;
-		HEIGHTTYPE top = std::max(m_SeaLevel, a_ChunkDesc.GetHeight(a_RelX, a_RelZ));
+		HEIGHTTYPE top = a_ChunkDesc.GetHeight(a_RelX, a_RelZ);
+		if (top < m_SeaLevel)
+		{
+			top = m_SeaLevel;
+			a_ChunkDesc.SetHeight(a_RelX, a_RelZ, top - 1);
+		}
 		for (int y = top; y > 0; y--)
 		{
 			if (a_ShapeColumn[y] > 0)

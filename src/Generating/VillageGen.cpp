@@ -234,13 +234,14 @@ protected:
 		{
 			for (int x = MinX; x <= MaxX; x++)
 			{
-				if (IsBlockWater(a_Chunk.GetBlockType(x, cChunkDef::GetHeight(a_HeightMap, x, z), z)))
+				auto height = cChunkDef::GetHeight(a_HeightMap, x, z);
+				if (IsBlockWater(a_Chunk.GetBlockType(x, height, z)))
 				{
-					a_Chunk.SetBlockTypeMeta(x, cChunkDef::GetHeight(a_HeightMap, x, z), z, WaterRoadBlockType, WaterRoadBlockMeta);
+					a_Chunk.SetBlockTypeMeta(x, height, z, WaterRoadBlockType, WaterRoadBlockMeta);
 				}
 				else
 				{
-					a_Chunk.SetBlockTypeMeta(x, cChunkDef::GetHeight(a_HeightMap, x, z), z, RoadBlockType, RoadBlockMeta);
+					a_Chunk.SetBlockTypeMeta(x, height, z, RoadBlockType, RoadBlockMeta);
 				}
 			}
 		}
