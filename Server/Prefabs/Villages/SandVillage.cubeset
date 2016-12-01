@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2016-11-23 15:07:32",
+		ExportDate = "2016-11-30 13:45:41",
 		["AllowedBiomes"] = "Desert, DesertM",
 		["IntendedUse"] = "Village",
 	},
@@ -224,7 +224,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -238,8 +238,8 @@ Cubeset =
 				"d: 50: 5",  -- torch
 				"e: 26:10",  -- bedblock
 				"f: 26: 2",  -- bedblock
-				"g: 64: 1",  -- wooddoorblock
-				"h: 64: 9",  -- wooddoorblock
+				"g: 64: 1",  -- woodendoorblock
+				"h: 64: 9",  -- woodendoorblock
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -338,7 +338,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -348,11 +348,10 @@ Cubeset =
 				".:  0: 0",  -- air
 				"a: 24: 0",  -- sandstone
 				"b: 60: 7",  -- tilleddirt
-				"c:  8: 0",  -- water
-				"d: 60: 6",  -- tilleddirt
-				"e: 60: 5",  -- tilleddirt
-				"f: 50: 5",  -- torch
-				"g: 59: 7",  -- crops
+				"c: 60: 6",  -- tilleddirt
+				"d:  8: 0",  -- water
+				"e: 50: 5",  -- torch
+				"f: 59: 7",  -- wheatblock
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -370,25 +369,25 @@ Cubeset =
 
 				-- Level 1
 				"aaaaaaaaaaaaa",  --  0
-				"abbcbbabbcbba",  --  1
-				"abbcbbabbcbba",  --  2
-				"abbcbbabbcbba",  --  3
-				"abbcbbabbcbba",  --  4
-				"abbcbbabbcbba",  --  5
-				"abbcbbadbcbba",  --  6
-				"abbcbeabbcbba",  --  7
+				"abcdbbabbdbba",  --  1
+				"abbdbbabbdbba",  --  2
+				"abbdbbabbdbba",  --  3
+				"abbdbbabbdbba",  --  4
+				"abbdbbabbdbba",  --  5
+				"acbdbbabbdbba",  --  6
+				"abbdbbabbdbba",  --  7
 				"aaaaaaaaaaaaa",  --  8
 
 				-- Level 2
-				"f.....f.....f",  --  0
-				".gg.gg.gg.gg.",  --  1
-				".gg.gg.gg.gg.",  --  2
-				".gg.gg.gg.gg.",  --  3
-				".gg.gg.gg.gg.",  --  4
-				".gg.gg.gg.gg.",  --  5
-				".gg.gg.gg.gg.",  --  6
-				".gg.gg.gg.gg.",  --  7
-				"f.....f.....f",  --  8
+				"e.....e.....e",  --  0
+				".ff.ff.ff.ff.",  --  1
+				".ff.ff.ff.ff.",  --  2
+				".ff.ff.ff.ff.",  --  3
+				".ff.ff.ff.ff.",  --  4
+				".ff.ff.ff.ff.",  --  5
+				".ff.ff.ff.ff.",  --  6
+				".ff.ff.ff.ff.",  --  7
+				"e.....e.....e",  --  8
 
 			},
 		},  -- DoubleField
@@ -436,7 +435,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -448,9 +447,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -571,7 +570,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -584,10 +583,10 @@ Cubeset =
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
 				"e:128: 3",  -- sandstonestairs
-				"f: 64: 3",  -- wooddoorblock
-				"g: 64: 1",  -- wooddoorblock
+				"f: 64: 3",  -- woodendoorblock
+				"g: 64: 1",  -- woodendoorblock
 				"h:102: 0",  -- glasspane
-				"i: 64: 9",  -- wooddoorblock
+				"i: 64: 9",  -- woodendoorblock
 				"j:128: 7",  -- sandstonestairs
 				"k: 50: 3",  -- torch
 				"l: 50: 4",  -- torch
@@ -743,7 +742,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -755,9 +754,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j:128: 6",  -- sandstonestairs
@@ -875,7 +874,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -887,9 +886,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -1008,7 +1007,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1020,9 +1019,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -1166,7 +1165,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1178,9 +1177,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -1324,7 +1323,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1336,9 +1335,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -1482,7 +1481,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1494,9 +1493,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -1640,7 +1639,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1653,11 +1652,11 @@ Cubeset =
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
 				"e:128: 3",  -- sandstonestairs
-				"f: 64: 3",  -- wooddoorblock
-				"g: 64: 1",  -- wooddoorblock
+				"f: 64: 3",  -- woodendoorblock
+				"g: 64: 1",  -- woodendoorblock
 				"h:102: 0",  -- glasspane
-				"i: 64: 9",  -- wooddoorblock
-				"j: 64: 8",  -- wooddoorblock
+				"i: 64: 9",  -- woodendoorblock
+				"j: 64: 8",  -- woodendoorblock
 				"k:128: 7",  -- sandstonestairs
 				"l: 50: 3",  -- torch
 				"m: 19: 0",  -- sponge
@@ -1828,7 +1827,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1840,9 +1839,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -1961,7 +1960,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -1973,9 +1972,9 @@ Cubeset =
 				"b:128: 0",  -- sandstonestairs
 				"c:128: 2",  -- sandstonestairs
 				"d:128: 1",  -- sandstonestairs
-				"e: 64: 3",  -- wooddoorblock
+				"e: 64: 3",  -- woodendoorblock
 				"f:102: 0",  -- glasspane
-				"g: 64: 9",  -- wooddoorblock
+				"g: 64: 9",  -- woodendoorblock
 				"h:128: 7",  -- sandstonestairs
 				"i: 50: 3",  -- torch
 				"j: 50: 4",  -- torch
@@ -2119,7 +2118,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",
@@ -2133,7 +2132,7 @@ Cubeset =
 				"d: 60: 6",  -- tilleddirt
 				"e:  8: 0",  -- water
 				"f: 50: 5",  -- torch
-				"g: 59: 7",  -- crops
+				"g: 59: 7",  -- wheatblock
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -2150,9 +2149,9 @@ Cubeset =
 				-- Level 1
 				"aaaaaaaaaa",  --  0
 				"abccdcccca",  --  1
-				"accdccccca",  --  2
+				"acccccccca",  --  2
 				"aeeeeeeeea",  --  3
-				"accdccccca",  --  4
+				"acccccccca",  --  4
 				"acdcdcccca",  --  5
 				"aaaaaaaaaa",  --  6
 
@@ -2232,7 +2231,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "None",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "1",

@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2016-11-23 15:07:34",
+		ExportDate = "2016-11-30 13:45:43",
 		["GridSizeX"] = "512",
 		["GridSizeZ"] = "512",
 		["IntendedUse"] = "PieceStructures",
@@ -82,7 +82,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "5",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -90,11 +90,11 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 6",  -- netherbrickstairs
 				"c:114: 4",  -- netherbrickstairs
 				"d:114: 5",  -- netherbrickstairs
-				"e: 44:14",  -- step
+				"e: 44:14",  -- stone_slab
 				"f:114: 7",  -- netherbrickstairs
 				"m: 19: 0",  -- sponge
 			},
@@ -335,7 +335,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -343,7 +343,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 2",  -- netherbrickstairs
 				"d:114: 3",  -- netherbrickstairs
@@ -460,7 +460,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -468,7 +468,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"m: 19: 0",  -- sponge
 			},
@@ -590,7 +590,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "1:0|3:0|5:0|7:0|9:0|11:0|13:0|15:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -598,7 +598,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"m: 19: 0",  -- sponge
 			},
@@ -761,7 +761,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -769,7 +769,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 2",  -- netherbrickstairs
 				"d:114: 0",  -- netherbrickstairs
@@ -924,7 +924,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "1000",
 				["DepthWeight"] = "0:0|2:0|4:0|6:0|8:0|10:0|12:0|14:0|16:0|18:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -932,7 +932,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 0",  -- netherbrickstairs
 				"c:113: 0",  -- netherbrickfence
 				"d:114: 2",  -- netherbrickstairs
@@ -1085,7 +1085,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "500",
 				["DepthWeight"] = "4:-3000|8:-3000|12:-3000|16:-3000|20:-3000",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -1093,10 +1093,10 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 5",  -- netherbrickstairs
 				"c:114: 4",  -- netherbrickstairs
-				"d: 44:14",  -- step
+				"d: 44:14",  -- stone_slab
 				"e:114: 6",  -- netherbrickstairs
 				"f:114: 7",  -- netherbrickstairs
 				"m: 19: 0",  -- sponge
@@ -1226,7 +1226,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "1:1000",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -1234,12 +1234,12 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 7",  -- netherbrickstairs
 				"c:114: 5",  -- netherbrickstairs
 				"d:114: 4",  -- netherbrickstairs
 				"e:114: 6",  -- netherbrickstairs
-				"f: 44:14",  -- step
+				"f: 44:14",  -- stone_slab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -1433,7 +1433,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "1:0|2:0|3:0|4:0|5:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -1441,9 +1441,9 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 5",  -- netherbrickstairs
-				"c: 44:14",  -- step
+				"c: 44:14",  -- stone_slab
 				"d:114: 6",  -- netherbrickstairs
 				"e:114: 7",  -- netherbrickstairs
 				"m: 19: 0",  -- sponge
@@ -1545,7 +1545,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "1:0|2:0|3:0|4:0|5:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -1553,9 +1553,9 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 5",  -- netherbrickstairs
-				"c: 44:14",  -- step
+				"c: 44:14",  -- stone_slab
 				"d:114: 6",  -- netherbrickstairs
 				"e:114: 7",  -- netherbrickstairs
 				"m: 19: 0",  -- sponge
@@ -1650,7 +1650,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "1:0|2:0|3:0|4:0|5:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -1658,9 +1658,9 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 5",  -- netherbrickstairs
-				"c: 44:14",  -- step
+				"c: 44:14",  -- stone_slab
 				"d:114: 6",  -- netherbrickstairs
 				"e:114: 7",  -- netherbrickstairs
 				"f:114: 0",  -- netherbrickstairs
@@ -1830,7 +1830,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -1839,7 +1839,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b: 10: 0",  -- lava
 				"c:113: 0",  -- netherbrickfence
 				"m: 19: 0",  -- sponge
@@ -2048,7 +2048,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -2056,9 +2056,9 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b: 88: 0",  -- soulsand
-				"c:115: 3",  -- netherwartblock
+				"c:115: 3",  -- 115
 				"d:114: 3",  -- netherbrickstairs
 				"e:114: 0",  -- netherbrickstairs
 				"f:114: 1",  -- netherbrickstairs
@@ -2235,7 +2235,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "1:0|2:0|3:0|4:0|5:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -2243,7 +2243,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b: 52: 0",  -- mobspawner
 				"c:113: 0",  -- netherbrickfence
 				"m: 19: 0",  -- sponge
@@ -2366,7 +2366,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "1:0|3:0|5:0|7:0|9:0|11:0|13:0|15:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -2374,7 +2374,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"m: 19: 0",  -- sponge
 			},
@@ -2551,7 +2551,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -2559,7 +2559,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c: 10: 0",  -- lava
 				"m: 19: 0",  -- sponge
@@ -2834,7 +2834,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -2842,15 +2842,15 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c: 10: 0",  -- lava
 				"d:114: 2",  -- netherbrickstairs
 				"e:114: 3",  -- netherbrickstairs
 				"f:114: 7",  -- netherbrickstairs
-				"g: 44:14",  -- step
+				"g: 44:14",  -- stone_slab
 				"h:114: 6",  -- netherbrickstairs
-				"i: 44: 6",  -- step
+				"i: 44: 6",  -- stone_slab
 				"j:114: 0",  -- netherbrickstairs
 				"m: 19: 0",  -- sponge
 			},
@@ -3127,7 +3127,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -3135,7 +3135,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b: 10: 0",  -- lava
 				"c:113: 0",  -- netherbrickfence
 				"m: 19: 0",  -- sponge
@@ -3464,7 +3464,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "300",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -3472,7 +3472,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 2",  -- netherbrickstairs
 				"d:114: 3",  -- netherbrickstairs
@@ -3589,7 +3589,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "300",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -3597,7 +3597,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 2",  -- netherbrickstairs
 				"d:114: 3",  -- netherbrickstairs
@@ -3714,7 +3714,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -3722,11 +3722,11 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 4",  -- netherbrickstairs
 				"c:114: 7",  -- netherbrickstairs
 				"d:114: 5",  -- netherbrickstairs
-				"e: 44: 6",  -- step
+				"e: 44: 6",  -- stone_slab
 				"f:113: 0",  -- netherbrickfence
 				"g:114: 2",  -- netherbrickstairs
 				"h:114: 3",  -- netherbrickstairs
@@ -3894,7 +3894,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -3902,11 +3902,11 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 4",  -- netherbrickstairs
 				"c:114: 7",  -- netherbrickstairs
 				"d:114: 5",  -- netherbrickstairs
-				"e: 44: 6",  -- step
+				"e: 44: 6",  -- stone_slab
 				"f:113: 0",  -- netherbrickfence
 				"g:114: 0",  -- netherbrickstairs
 				"h:114: 1",  -- netherbrickstairs
@@ -4067,7 +4067,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "1:500",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -4075,11 +4075,11 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 5",  -- netherbrickstairs
 				"c:114: 4",  -- netherbrickstairs
 				"d:114: 6",  -- netherbrickstairs
-				"e: 44:14",  -- step
+				"e: 44:14",  -- stone_slab
 				"f:114: 7",  -- netherbrickstairs
 				"m: 19: 0",  -- sponge
 			},
@@ -4262,7 +4262,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -4270,7 +4270,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 0",  -- netherbrickstairs
 				"d:114: 1",  -- netherbrickstairs
@@ -4415,7 +4415,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -4423,7 +4423,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 0",  -- netherbrickstairs
 				"d:114: 1",  -- netherbrickstairs
@@ -4566,7 +4566,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -4574,7 +4574,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b: 54: 5",  -- chest
 				"c:113: 0",  -- netherbrickfence
 				"d:114: 0",  -- netherbrickstairs
@@ -4716,7 +4716,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "10",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -4724,7 +4724,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 7",  -- netherbrickstairs
 				"c:114: 6",  -- netherbrickstairs
 				"d:114: 4",  -- netherbrickstairs
@@ -4926,7 +4926,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "5",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -4934,7 +4934,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 7",  -- netherbrickstairs
 				"c:114: 5",  -- netherbrickstairs
 				"d:114: 4",  -- netherbrickstairs
@@ -5146,7 +5146,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -5154,10 +5154,10 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 5",  -- netherbrickstairs
 				"c:114: 4",  -- netherbrickstairs
-				"d: 44:14",  -- step
+				"d: 44:14",  -- stone_slab
 				"e:114: 6",  -- netherbrickstairs
 				"f:114: 7",  -- netherbrickstairs
 				"m: 19: 0",  -- sponge
@@ -5511,7 +5511,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -5519,7 +5519,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 0",  -- netherbrickstairs
 				"d:114: 1",  -- netherbrickstairs
@@ -5690,7 +5690,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "1:200|2:400|3:0|4:500",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -5698,7 +5698,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 2",  -- netherbrickstairs
 				"c:114: 0",  -- netherbrickstairs
 				"d:114: 1",  -- netherbrickstairs
@@ -5815,7 +5815,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "500",
 				["DepthWeight"] = "6:0|12:0|18:0",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -5823,7 +5823,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 2",  -- netherbrickstairs
 				"d:114: 3",  -- netherbrickstairs
@@ -5940,7 +5940,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -5948,7 +5948,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:113: 0",  -- netherbrickfence
 				"c:114: 2",  -- netherbrickstairs
 				"d:114: 1",  -- netherbrickstairs
@@ -6066,7 +6066,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -6074,7 +6074,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b: 54: 4",  -- chest
 				"c:113: 0",  -- netherbrickfence
 				"d:114: 2",  -- netherbrickstairs
@@ -6207,7 +6207,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -6215,7 +6215,7 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 7",  -- netherbrickstairs
 				"c:114: 6",  -- netherbrickstairs
 				"d:114: 4",  -- netherbrickstairs
@@ -6223,7 +6223,7 @@ Cubeset =
 				"f:114: 2",  -- netherbrickstairs
 				"g:114: 3",  -- netherbrickstairs
 				"h:114: 1",  -- netherbrickstairs
-				"i: 44:14",  -- step
+				"i: 44:14",  -- stone_slab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -6583,7 +6583,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "20",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
 				["IsStarting"] = "0",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -6591,13 +6591,13 @@ Cubeset =
 			BlockDefinitions =
 			{
 				".:  0: 0",  -- air
-				"a:112: 0",  -- netherbrick
+				"a:112: 0",  -- netherbrickblock
 				"b:114: 5",  -- netherbrickstairs
 				"c:114: 4",  -- netherbrickstairs
-				"d: 44:14",  -- step
+				"d: 44:14",  -- stone_slab
 				"e:114: 6",  -- netherbrickstairs
 				"f:114: 7",  -- netherbrickstairs
-				"g: 44: 6",  -- step
+				"g: 44: 6",  -- stone_slab
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
