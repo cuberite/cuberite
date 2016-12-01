@@ -28,14 +28,25 @@ public:
 		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
+		// Check if placing on something ignoring build collision to edit the correct sign later on:
+		BLOCKTYPE ClickedBlock;
+		NIBBLETYPE ClickedBlockMeta;
+		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+		bool isReplacingClickedBlock = BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision() || BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(&a_Player, ClickedBlockMeta);
+
 		// If the regular placement doesn't work, do no further processing:
 		if (!super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 		{
 			return false;
 		}
 
+		// Use isReplacingClickedBlock to make sure we will edit the right sign:
+		if (!isReplacingClickedBlock)
+		{
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		}
+
 		// After successfully placing the sign, open the sign editor for the player:
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		a_Player.GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 		return true;
 	}
