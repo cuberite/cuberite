@@ -402,16 +402,6 @@ return
 								Type = "number",
 							},
 							{
-								Name = "BlockLight",
-								Type = "number",
-								IsOptional = true,
-							},
-							{
-								Name = "BlockSkyLight",
-								Type = "number",
-								IsOptional = true,
-							},
-							{
 								Name = "MaxRelX",
 								Type = "number",
 							},
@@ -441,6 +431,16 @@ return
 							},
 							{
 								Name = "BlockMeta",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockSkyLight",
 								Type = "number",
 								IsOptional = true,
 							},
@@ -1277,16 +1277,6 @@ return
 								Type = "number",
 							},
 							{
-								Name = "BlockLight",
-								Type = "number",
-								IsOptional = true,
-							},
-							{
-								Name = "BlockSkyLight",
-								Type = "number",
-								IsOptional = true,
-							},
-							{
 								Name = "RelY1",
 								Type = "number",
 							},
@@ -1316,6 +1306,16 @@ return
 							},
 							{
 								Name = "BlockMeta",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockLight",
+								Type = "number",
+								IsOptional = true,
+							},
+							{
+								Name = "BlockSkyLight",
 								Type = "number",
 								IsOptional = true,
 							},
@@ -1677,7 +1677,7 @@ return
 							},
 							{
 								Name = "MinPoint",
-								Type = "number",
+								Type = "Vector3i",
 							},
 						},
 						Returns =
@@ -1698,7 +1698,7 @@ return
 							},
 							{
 								Name = "MinPoint",
-								Type = "number",
+								Type = "Vector3i",
 							},
 							{
 								Name = "DataTypes",
