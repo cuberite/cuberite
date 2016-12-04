@@ -1126,7 +1126,7 @@ void cBlockArea::MirrorXY(void)
 	int MaxZ = m_Size.z - 1;
 	for (int y = 0; y < m_Size.y; y++)
 	{
-		for (int z = 0; z < HalfZ; z++)
+		for (int z = 0; z <= HalfZ; z++)
 		{
 			for (int x = 0; x < m_Size.x; x++)
 			{
@@ -1164,7 +1164,7 @@ void cBlockArea::MirrorXZ(void)
 	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
 	int HalfY = m_Size.y / 2;
 	int MaxY = m_Size.y - 1;
-	for (int y = 0; y < HalfY; y++)
+	for (int y = 0; y <= HalfY; y++)
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
@@ -1208,7 +1208,7 @@ void cBlockArea::MirrorYZ(void)
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
-			for (int x = 0; x < HalfX; x++)
+			for (int x = 0; x <= HalfX; x++)
 			{
 				int Idx1 = MakeIndex(x, y, z);
 				int Idx2 = MakeIndex(MaxX - x, y, z);
