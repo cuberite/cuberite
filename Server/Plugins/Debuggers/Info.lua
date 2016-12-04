@@ -100,6 +100,12 @@ g_PluginInfo =
 			Handler = HandleGCCmd,
 			HelpString = "Activates the Lua garbage collector"
 		},
+		["/genrails"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleGenRailsCmd,
+			HelpString = "Generates rail blocks with all metas from current block towards X+",
+		},
 		["/getcustomname"] =
 		{
 			Permission = "debuggers",
