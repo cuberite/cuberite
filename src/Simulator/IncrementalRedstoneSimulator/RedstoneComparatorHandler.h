@@ -54,7 +54,14 @@ public:
 
 			virtual bool Item(cBlockEntity * a_BlockEntity) override
 			{
-				auto & Contents = static_cast<cBlockEntityWithItems *>(a_BlockEntity)->GetContents();
+				// Skip BlockEntities that don't have slots
+				auto BlockEntityWithItems = dynamic_cast<cBlockEntityWithItems *>(a_BlockEntity);
+				if (BlockEntityWithItems == nullptr)
+				{
+					return false;
+				}
+
+				auto & Contents = BlockEntityWithItems->GetContents();
 				float Fullness = 0;  // Is a floating-point type to allow later calculation to produce a non-truncated value
 
 				for (int Slot = 0; Slot != Contents.GetNumSlots(); ++Slot)
