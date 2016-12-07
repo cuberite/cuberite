@@ -191,7 +191,6 @@ public:
 	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
 	double           GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
-	const Vector3d & GetPosition  (void) const { return m_Position; }
 	double           GetPosX      (void) const { return m_Position.x; }
 	double           GetPosY      (void) const { return m_Position.y; }
 	double           GetPosZ      (void) const { return m_Position.z; }
@@ -199,7 +198,6 @@ public:
 	double           GetPitch     (void) const { return m_Rot.y;   }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
 	double           GetRoll      (void) const { return m_Rot.z;   }  // In degrees, unused in current client
 	Vector3d         GetLookVector(void) const;
-	const Vector3d & GetSpeed     (void) const { return m_Speed;   }
 	double           GetSpeedX    (void) const { return m_Speed.x; }
 	double           GetSpeedY    (void) const { return m_Speed.y; }
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
@@ -291,6 +289,12 @@ public:
 	void SetPitchFromSpeed(void);
 
 	// tolua_end
+
+	/** Exported in ManualBindings */
+	const Vector3d & GetPosition(void) const { return m_Position; }
+
+	/** Exported in ManualBindings */
+	const Vector3d & GetSpeed(void) const { return m_Speed; }
 
 	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
 	void DestroyNoScheduling(bool a_ShouldBroadcast);
