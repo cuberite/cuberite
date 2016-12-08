@@ -448,18 +448,14 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			// If rail is powered check for nearby blocks that could kick-start the minecart
 			else if ((a_RailMeta & 0x8) == 0x8)
 			{
-				BLOCKTYPE BlockSouth = m_World->GetBlock(POSX_TOINT, POSY_TOINT, static_cast<int>(ceil(GetPosZ())));
-				BLOCKTYPE BlockNorth = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
-				// Only kick-start the minecart if a block is on onee side, but not both
-				if ((!IsBlockRail(BlockNorth) && cBlockInfo::IsSolid(BlockNorth))
-					&&
-					!(!IsBlockRail(BlockSouth) && cBlockInfo::IsSolid(BlockSouth)))
+				bool IsBlockZP = IsSolidBlockAtOffset(0, 0, 1);
+				bool IsBlockZM = IsSolidBlockAtOffset(0, 0, -1);
+				// Only kick-start the minecart if a block is on one side, but not both
+				if (IsBlockZM && !IsBlockZP)
 				{
 					AddSpeedZ(AccelDecelSpeed);
 				}
-				else if (!(!IsBlockRail(BlockNorth) && cBlockInfo::IsSolid(BlockNorth))
-					&&
-					(!IsBlockRail(BlockSouth) && cBlockInfo::IsSolid(BlockSouth)))
+				else if (!IsBlockZM && IsBlockZP)
 				{
 					AddSpeedZ(AccelDecelNegSpeed);
 				}
@@ -493,18 +489,14 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			// If rail is powered check for nearby blocks that could kick-start the minecart
 			else if ((a_RailMeta & 0x8) == 0x8)
 			{
-				BLOCKTYPE BlockWest = m_World->GetBlock(static_cast<int>(ceil(GetPosX())), POSY_TOINT, POSZ_TOINT);
-				BLOCKTYPE BlockEast = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
+				bool IsBlockXP = IsSolidBlockAtOffset(1, 0, 0);
+				bool IsBlockXM = IsSolidBlockAtOffset(-1, 0, 0);
 				// Only kick-start the minecart if a block is on one side, but not both
-				if ((!IsBlockRail(BlockEast) && cBlockInfo::IsSolid(BlockEast))
-					&&
-					!(!IsBlockRail(BlockWest) && cBlockInfo::IsSolid(BlockWest)))
+				if (IsBlockXM && !IsBlockXP)
 				{
 					AddSpeedX(AccelDecelSpeed);
 				}
-				else if (!(!IsBlockRail(BlockEast) && cBlockInfo::IsSolid(BlockEast))
-					&&
-					(!IsBlockRail(BlockWest) && cBlockInfo::IsSolid(BlockWest)))
+				else if (!IsBlockXM && IsBlockXP)
 				{
 					AddSpeedX(AccelDecelNegSpeed);
 				}
@@ -736,6 +728,20 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 
 
 
+bool cMinecart::IsSolidBlockAtOffset(int a_XOffset, int a_YOffset, int a_ZOffset)
+{
+	BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT + a_XOffset, POSY_TOINT + a_YOffset, POSZ_TOINT + a_ZOffset);
+	if (IsBlockRail(Block) || !cBlockInfo::IsSolid(Block))
+	{
+		return false;
+	}
+	return true;
+}
+
+
+
+
+
 bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 {
 	switch (a_RailMeta)
@@ -744,8 +750,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (GetSpeedZ() > 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, static_cast<int>(ceil(GetPosZ())));
-				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
+				if (IsSolidBlockAtOffset(0, 0, 1))
 				{
 					// We could try to detect a block in front based purely on coordinates, but xoft made a bounding box system - why not use? :P
 					cBoundingBox bbBlock(Vector3d(POSX_TOINT, POSY_TOINT, static_cast<int>(ceil(GetPosZ()))), 0.5, 1);
@@ -761,8 +766,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 			else if (GetSpeedZ() < 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
-				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
+				if (IsSolidBlockAtOffset(0, 0, -1))
 				{
 					cBoundingBox bbBlock(Vector3d(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ() - 1), GetWidth() / 2, GetHeight());
@@ -781,8 +785,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		{
 			if (GetSpeedX() > 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock(static_cast<int>(ceil(GetPosX())), POSY_TOINT, POSZ_TOINT);
-				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
+				if (IsSolidBlockAtOffset(1, 0, 0))
 				{
 					cBoundingBox bbBlock(Vector3d(static_cast<int>(ceil(GetPosX())), POSY_TOINT, POSZ_TOINT), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX(), floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
@@ -797,8 +800,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 			else if (GetSpeedX() < 0)
 			{
-				BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
-				if (!IsBlockRail(Block) && cBlockInfo::IsSolid(Block))
+				if (IsSolidBlockAtOffset(-1, 0, 0))
 				{
 					cBoundingBox bbBlock(Vector3d(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT), 0.5, 1);
 					cBoundingBox bbMinecart(Vector3d(GetPosX() - 1, floor(GetPosY()), GetPosZ()), GetWidth() / 2, GetHeight());
@@ -815,13 +817,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_CURVED_ZM_XM:
 		{
-			BLOCKTYPE BlockXM = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
-			BLOCKTYPE BlockZM = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
+			bool IsBlockXM = IsSolidBlockAtOffset(-1, 0, 0);
+			bool IsBlockZM = IsSolidBlockAtOffset(0, 0, -1);
 
-			if (
-				((GetSpeedZ() < 0) && (!IsBlockRail(BlockZM) && cBlockInfo::IsSolid(BlockZM))) ||
-				((GetSpeedX() < 0) && (!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)))
-				)
+			if (((GetSpeedZ() < 0) && IsBlockZM) || ((GetSpeedX() < 0) && IsBlockXM))
 			{
 				SetSpeed(0, 0, 0);
 				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
@@ -832,13 +831,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_CURVED_ZM_XP:
 		{
-			BLOCKTYPE BlockXP = m_World->GetBlock(POSX_TOINT + 1, POSY_TOINT, POSZ_TOINT);
-			BLOCKTYPE BlockZM = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
+			bool IsBlockXP = IsSolidBlockAtOffset(1, 0, 0);
+			bool IsBlockZM = IsSolidBlockAtOffset(0, 0, -1);
 
-			if (
-				((GetSpeedZ() < 0) && (!IsBlockRail(BlockZM) && cBlockInfo::IsSolid(BlockZM))) ||
-				((GetSpeedX() > 0) && (!IsBlockRail(BlockXP) && cBlockInfo::IsSolid(BlockXP)))
-				)
+			if (((GetSpeedZ() < 0) &&  IsBlockZM) || ((GetSpeedX() > 0) && IsBlockXP))
 			{
 				SetSpeed(0, 0, 0);
 				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
@@ -849,13 +845,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_CURVED_ZP_XM:
 		{
-			BLOCKTYPE BlockXM = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
-			BLOCKTYPE BlockZP = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT + 1);
+			bool IsBlockXM = IsSolidBlockAtOffset(-1, 0, 0);
+			bool IsBlockZP = IsSolidBlockAtOffset(0, 0, +1);
 
-			if (
-				((GetSpeedZ() > 0) && (!IsBlockRail(BlockZP) && cBlockInfo::IsSolid(BlockZP))) ||
-				((GetSpeedX() < 0) && (!IsBlockRail(BlockXM) && cBlockInfo::IsSolid(BlockXM)))
-				)
+			if (((GetSpeedZ() > 0) && IsBlockZP) || ((GetSpeedX() < 0) && IsBlockXM))
 			{
 				SetSpeed(0, 0, 0);
 				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
@@ -866,13 +859,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_CURVED_ZP_XP:
 		{
-			BLOCKTYPE BlockXP = m_World->GetBlock(POSX_TOINT + 1, POSY_TOINT, POSZ_TOINT);
-			BLOCKTYPE BlockZP = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT + 1);
+			bool IsBlockXP = IsSolidBlockAtOffset(1, 0, 0);
+			bool IsBlockZP = IsSolidBlockAtOffset(0, 0, 1);
 
-			if (
-				((GetSpeedZ() > 0) && (!IsBlockRail(BlockZP) && cBlockInfo::IsSolid(BlockZP))) ||
-				((GetSpeedX() > 0) && (!IsBlockRail(BlockXP) && cBlockInfo::IsSolid(BlockXP)))
-				)
+			if (((GetSpeedZ() > 0) && IsBlockZP) || ((GetSpeedX() > 0) && IsBlockXP))
 			{
 				SetSpeed(0, 0, 0);
 				SetPosition(POSX_TOINT + 0.5, GetPosY(), POSZ_TOINT + 0.5);
