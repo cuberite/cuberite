@@ -445,6 +445,25 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 					AddSpeedZ(AccelDecelNegSpeed);
 				}
 			}
+			// If rail is powered check for nearby blocks that could kick-start the minecart
+			else if ((a_RailMeta & 0x8) == 0x8)
+			{
+				BLOCKTYPE BlockSouth = m_World->GetBlock(POSX_TOINT, POSY_TOINT, static_cast<int>(ceil(GetPosZ())));
+				BLOCKTYPE BlockNorth = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT - 1);
+				// Only kick-start the minecart if a block is on onee side, but not both
+				if ((!IsBlockRail(BlockNorth) && cBlockInfo::IsSolid(BlockNorth))
+					&&
+					!(!IsBlockRail(BlockSouth) && cBlockInfo::IsSolid(BlockSouth)))
+				{
+					AddSpeedZ(AccelDecelSpeed);
+				}
+				else if (!(!IsBlockRail(BlockNorth) && cBlockInfo::IsSolid(BlockNorth))
+					&&
+					(!IsBlockRail(BlockSouth) && cBlockInfo::IsSolid(BlockSouth)))
+				{
+					AddSpeedZ(AccelDecelNegSpeed);
+				}
+			}
 			break;
 		}
 		case E_META_RAIL_XM_XP:  // EASTWEST
@@ -467,6 +486,25 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 					AddSpeedX(AccelDecelSpeed);
 				}
 				else
+				{
+					AddSpeedX(AccelDecelNegSpeed);
+				}
+			}
+			// If rail is powered check for nearby blocks that could kick-start the minecart
+			else if ((a_RailMeta & 0x8) == 0x8)
+			{
+				BLOCKTYPE BlockWest = m_World->GetBlock(static_cast<int>(ceil(GetPosX())), POSY_TOINT, POSZ_TOINT);
+				BLOCKTYPE BlockEast = m_World->GetBlock(POSX_TOINT - 1, POSY_TOINT, POSZ_TOINT);
+				// Only kick-start the minecart if a block is on one side, but not both
+				if ((!IsBlockRail(BlockEast) && cBlockInfo::IsSolid(BlockEast))
+					&&
+					!(!IsBlockRail(BlockWest) && cBlockInfo::IsSolid(BlockWest)))
+				{
+					AddSpeedX(AccelDecelSpeed);
+				}
+				else if (!(!IsBlockRail(BlockEast) && cBlockInfo::IsSolid(BlockEast))
+					&&
+					(!IsBlockRail(BlockWest) && cBlockInfo::IsSolid(BlockWest)))
 				{
 					AddSpeedX(AccelDecelNegSpeed);
 				}
