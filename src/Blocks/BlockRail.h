@@ -524,6 +524,8 @@ public:
 		return a_Meta;
 	}
 
+
+
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
@@ -559,65 +561,87 @@ public:
 		return a_Meta;
 	}
 
+
+
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
-		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
-		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		// MirrorXY basically flips the ZP and ZM parts of the meta
+		if (m_BlockType == E_BLOCK_RAIL)
 		{
-			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
-			// Mirrors according to table; 0x07 == 0111.
-			// Rails can either be flat (North / South) or Ascending (Asc. East)
-			switch (a_Meta & 0x07)
+			// Basic rails can have curves and thus their meta behaves differently from specialized rails:
+			switch (a_Meta)
 			{
-				case 0x05: return 0x04 + OtherMeta;  // Asc. South  -> Asc. North
-				case 0x04: return 0x05 + OtherMeta;  // Asc. North  -> Asc. South
+				case E_META_RAIL_ASCEND_XM:    return E_META_RAIL_ASCEND_XM;
+				case E_META_RAIL_ASCEND_XP:    return E_META_RAIL_ASCEND_XP;
+				case E_META_RAIL_ASCEND_ZM:    return E_META_RAIL_ASCEND_ZP;
+				case E_META_RAIL_ASCEND_ZP:    return E_META_RAIL_ASCEND_ZM;
+				case E_META_RAIL_CURVED_ZM_XM: return E_META_RAIL_CURVED_ZP_XM;
+				case E_META_RAIL_CURVED_ZM_XP: return E_META_RAIL_CURVED_ZP_XP;
+				case E_META_RAIL_CURVED_ZP_XM: return E_META_RAIL_CURVED_ZM_XM;
+				case E_META_RAIL_CURVED_ZP_XP: return E_META_RAIL_CURVED_ZM_XP;
+				case E_META_RAIL_XM_XP:        return E_META_RAIL_XM_XP;
+				case E_META_RAIL_ZM_ZP:        return E_META_RAIL_ZM_ZP;
 			}
 		}
 		else
 		{
-			switch (a_Meta)
+			// Specialized rails don't have curves, instead they use bit 0x08 as a flag
+			NIBBLETYPE flag = a_Meta & 0x08;
+			switch (a_Meta & 0x07)
 			{
-				// Corner Directions
-				case 0x06: return 0x09;  // Northwest Cnr. -> Southwest Cnr.
-				case 0x07: return 0x08;  // Northeast Cnr. -> Southeast Cnr.
-				case 0x08: return 0x07;  // Southeast Cnr. -> Northeast Cnr.
-				case 0x09: return 0x06;  // Southwest Cnr. -> Northwest Cnr.
+				case E_META_RAIL_ASCEND_XM: return flag | E_META_RAIL_ASCEND_XM;
+				case E_META_RAIL_ASCEND_XP: return flag | E_META_RAIL_ASCEND_XP;
+				case E_META_RAIL_ASCEND_ZM: return flag | E_META_RAIL_ASCEND_ZP;
+				case E_META_RAIL_ASCEND_ZP: return flag | E_META_RAIL_ASCEND_ZM;
+				case E_META_RAIL_XM_XP:     return flag | E_META_RAIL_XM_XP;
+				case E_META_RAIL_ZM_ZP:     return flag | E_META_RAIL_ZM_ZP;
 			}
 		}
-		// To avoid a compiler warning;
+		ASSERT(!"Unknown rail meta");
 		return a_Meta;
 	}
 
+
+
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
-		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
-		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		// MirrorYZ basically flips the XP and XM parts of the meta
+		if (m_BlockType == E_BLOCK_RAIL)
 		{
-			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
-			// Mirrors according to table; 0x07 == 0111.
-			// Rails can either be flat (North / South) or Ascending (Asc. East)
-			switch (a_Meta & 0x07)
+			// Basic rails can have curves and thus their meta behaves differently from specialized rails:
+			switch (a_Meta)
 			{
-				case 0x02: return 0x03 + OtherMeta;  // Asc. East   -> Asc. West
-				case 0x03: return 0x02 + OtherMeta;  // Asc. West   -> Asc. East
+				case E_META_RAIL_ASCEND_XM:    return E_META_RAIL_ASCEND_XP;
+				case E_META_RAIL_ASCEND_XP:    return E_META_RAIL_ASCEND_XM;
+				case E_META_RAIL_ASCEND_ZM:    return E_META_RAIL_ASCEND_ZM;
+				case E_META_RAIL_ASCEND_ZP:    return E_META_RAIL_ASCEND_ZP;
+				case E_META_RAIL_CURVED_ZM_XM: return E_META_RAIL_CURVED_ZM_XP;
+				case E_META_RAIL_CURVED_ZM_XP: return E_META_RAIL_CURVED_ZM_XM;
+				case E_META_RAIL_CURVED_ZP_XM: return E_META_RAIL_CURVED_ZP_XP;
+				case E_META_RAIL_CURVED_ZP_XP: return E_META_RAIL_CURVED_ZP_XM;
+				case E_META_RAIL_XM_XP:        return E_META_RAIL_XM_XP;
+				case E_META_RAIL_ZM_ZP:        return E_META_RAIL_ZM_ZP;
 			}
 		}
 		else
 		{
-			switch (a_Meta)
+			// Specialized rails don't have curves, instead they use bit 0x08 as a flag
+			NIBBLETYPE flag = a_Meta & 0x08;
+			switch (a_Meta & 0x07)
 			{
-				// Corner Directions
-				case 0x06: return 0x07;  // Northwest Cnr. -> Northeast Cnr.
-				case 0x07: return 0x06;  // Northeast Cnr. -> Northwest Cnr.
-				case 0x08: return 0x09;  // Southeast Cnr. -> Southwest Cnr.
-				case 0x09: return 0x08;  // Southwest Cnr. -> Southeast Cnr.
+				case E_META_RAIL_ASCEND_XM: return flag | E_META_RAIL_ASCEND_XP;
+				case E_META_RAIL_ASCEND_XP: return flag | E_META_RAIL_ASCEND_XM;
+				case E_META_RAIL_ASCEND_ZM: return flag | E_META_RAIL_ASCEND_ZM;
+				case E_META_RAIL_ASCEND_ZP: return flag | E_META_RAIL_ASCEND_ZP;
+				case E_META_RAIL_XM_XP:     return flag | E_META_RAIL_XM_XP;
+				case E_META_RAIL_ZM_ZP:     return flag | E_META_RAIL_ZM_ZP;
 			}
 		}
-		// To avoid a compiler warning;
+		ASSERT(!"Unknown rail meta");
 		return a_Meta;
 	}
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

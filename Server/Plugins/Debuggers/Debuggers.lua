@@ -987,6 +987,24 @@ end;
 
 
 
+function HandleGenRailsCmd(a_Split, a_Player)
+	local MAX_RAIL_META = 9
+	local pos = a_Player:GetPosition()
+	local ba = cBlockArea:new()
+	ba:Create(2 * MAX_RAIL_META + 3, 4, 3, cBlockArea.baTypes + cBlockArea.baMetas)
+	ba:FillRelCuboid(0, 2 * MAX_RAIL_META + 2, 0, 0, 0, 2, cBlockArea.baTypes, E_BLOCK_STONE)
+	ba:FillRelCuboid(0, 2 * MAX_RAIL_META + 2, 1, 3, 0, 2, cBlockArea.baTypes, E_BLOCK_AIR)
+	for x = 0, MAX_RAIL_META do
+		ba:SetRelBlockTypeMeta(2 * x + 1, 1, 1, E_BLOCK_RAIL, x)
+	end
+	ba:Write(a_Player:GetWorld(), pos:Floor())
+	return true
+end
+
+
+
+
+
 function HandleGetCustomNameCmd(a_Split, a_Player)
 	local item = a_Player:GetInventory():GetEquippedItem()
 	if (not(item.m_CustomName) or (item.m_CustomName == "")) then
