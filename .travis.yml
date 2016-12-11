@@ -1,18 +1,29 @@
 language: cpp
-sudo: false
+
+sudo: required
+dist: trusty
 
 compiler:
 - clang
 - gcc
 
+cache:
+  ccache
+
 addons:
   apt:
-    sources:
-    - ubuntu-toolchain-r-test
     packages:
-    - g++-4.8
 
-script: ./CIbuild.sh
+before_install:
+  - |
+    if [ "$CC" = "clang" ]; then
+      export CCACHE_CPP2=yes;
+      sudo ln -s ../../bin/ccache /usr/lib/ccache/clang;
+      sudo ln -s ../../bin/ccache /usr/lib/ccache/clang++;
+    fi
+
+script:
+  ./CIbuild.sh
 
 env:
   - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
@@ -22,7 +33,9 @@ notifications:
   email:
     on_success: change
     on_failure: always
+
 branches:
   only:
     - coverity_scan
     - master
+
