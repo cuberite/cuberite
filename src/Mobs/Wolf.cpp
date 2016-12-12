@@ -12,14 +12,14 @@
 
 
 cWolf::cWolf(void) :
-	super("Wolf", mtWolf, "mob.wolf.hurt", "mob.wolf.death", 0.6, 0.8),
-	m_IsSitting(false),
-	m_IsTame(false),
-	m_IsBegging(false),
-	m_IsAngry(false),
-	m_OwnerName(""),
-	m_CollarColor(E_META_DYE_ORANGE),
-	m_NotificationCooldown(0)
+super("Wolf", mtWolf, "mob.wolf.hurt", "mob.wolf.death", 0.6, 0.8),
+m_IsSitting(false),
+m_IsTame(false),
+m_IsBegging(false),
+m_IsAngry(false),
+m_OwnerName(""),
+m_CollarColor(E_META_DYE_ORANGE),
+m_NotificationCooldown(0)
 {
 	m_RelativeWalkSpeed = 2;
 }
@@ -122,7 +122,7 @@ void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool 
 	if (
 		(a_Opponent == nullptr) || IsSitting() || (!IsTame()) ||
 		(!a_Opponent->IsPawn()) || (a_PlayerID != m_OwnerUUID)
-	)
+		)
 	{
 		return;
 	}
@@ -201,43 +201,43 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 		// Feed the wolf, restoring its health, or dye its collar:
 		switch (a_Player.GetEquippedItem().m_ItemType)
 		{
-			case E_ITEM_RAW_BEEF:
-			case E_ITEM_STEAK:
-			case E_ITEM_RAW_PORKCHOP:
-			case E_ITEM_COOKED_PORKCHOP:
-			case E_ITEM_RAW_CHICKEN:
-			case E_ITEM_COOKED_CHICKEN:
-			case E_ITEM_ROTTEN_FLESH:
+		case E_ITEM_RAW_BEEF:
+		case E_ITEM_STEAK:
+		case E_ITEM_RAW_PORKCHOP:
+		case E_ITEM_COOKED_PORKCHOP:
+		case E_ITEM_RAW_CHICKEN:
+		case E_ITEM_COOKED_CHICKEN:
+		case E_ITEM_ROTTEN_FLESH:
+		{
+			if (m_Health < m_MaxHealth)
 			{
-				if (m_Health < m_MaxHealth)
+				Heal(ItemHandler(a_Player.GetEquippedItem().m_ItemType)->GetFoodInfo().FoodLevel);
+				if (!a_Player.IsGameModeCreative())
 				{
-					Heal(ItemHandler(a_Player.GetEquippedItem().m_ItemType)->GetFoodInfo().FoodLevel);
-					if (!a_Player.IsGameModeCreative())
-					{
-						a_Player.GetInventory().RemoveOneEquippedItem();
-					}
-				}
-				break;
-			}
-			case E_ITEM_DYE:
-			{
-				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
-				{
-					SetCollarColor(a_Player.GetEquippedItem().m_ItemDamage);
-					if (!a_Player.IsGameModeCreative())
-					{
-						a_Player.GetInventory().RemoveOneEquippedItem();
-					}
-				}
-				break;
-			}
-			default:
-			{
-				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
-				{
-					SetIsSitting(!IsSitting());
+					a_Player.GetInventory().RemoveOneEquippedItem();
 				}
 			}
+			break;
+		}
+		case E_ITEM_DYE:
+		{
+			if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
+			{
+				SetCollarColor(a_Player.GetEquippedItem().m_ItemDamage);
+				if (!a_Player.IsGameModeCreative())
+				{
+					a_Player.GetInventory().RemoveOneEquippedItem();
+				}
+			}
+			break;
+		}
+		default:
+		{
+			if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
+			{
+				SetIsSitting(!IsSitting());
+			}
+		}
 		}
 	}
 
@@ -276,39 +276,39 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			switch (a_Closest_Player->GetEquippedItem().m_ItemType)
 			{
-				case E_ITEM_BONE:
-				case E_ITEM_RAW_BEEF:
-				case E_ITEM_STEAK:
-				case E_ITEM_RAW_CHICKEN:
-				case E_ITEM_COOKED_CHICKEN:
-				case E_ITEM_ROTTEN_FLESH:
-				case E_ITEM_RAW_PORKCHOP:
-				case E_ITEM_COOKED_PORKCHOP:
+			case E_ITEM_BONE:
+			case E_ITEM_RAW_BEEF:
+			case E_ITEM_STEAK:
+			case E_ITEM_RAW_CHICKEN:
+			case E_ITEM_COOKED_CHICKEN:
+			case E_ITEM_ROTTEN_FLESH:
+			case E_ITEM_RAW_PORKCHOP:
+			case E_ITEM_COOKED_PORKCHOP:
+			{
+				if (!IsBegging())
 				{
-					if (!IsBegging())
-					{
-						SetIsBegging(true);
-						m_World->BroadcastEntityMetadata(*this);
-					}
-
-					m_FinalDestination = a_Closest_Player->GetPosition();  // So that we will look at a player holding food
-
-					// Don't move to the player if the wolf is sitting.
-					if (!IsSitting())
-					{
-						MoveToPosition(a_Closest_Player->GetPosition());
-					}
-
-					break;
+					SetIsBegging(true);
+					m_World->BroadcastEntityMetadata(*this);
 				}
-				default:
+
+				m_FinalDestination = a_Closest_Player->GetPosition();  // So that we will look at a player holding food
+
+				// Don't move to the player if the wolf is sitting.
+				if (!IsSitting())
 				{
-					if (IsBegging())
-					{
-						SetIsBegging(false);
-						m_World->BroadcastEntityMetadata(*this);
-					}
+					MoveToPosition(a_Closest_Player->GetPosition());
 				}
+
+				break;
+			}
+			default:
+			{
+				if (IsBegging())
+				{
+					SetIsBegging(false);
+					m_World->BroadcastEntityMetadata(*this);
+				}
+			}
 			}
 		}
 	}
@@ -400,5 +400,3 @@ void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		cMonster::InStateIdle(a_Dt, a_Chunk);
 	}
 }
-
-
