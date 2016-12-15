@@ -142,6 +142,8 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
 {
+	ASSERT((a_ChunkX > -0x08000000) && (a_ChunkX < 0x08000000));
+	ASSERT((a_ChunkZ > -0x08000000) && (a_ChunkZ < 0x08000000));
 	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
 	m_LoadQueue.EnqueueItem(cChunkCoordsWithCallback(a_ChunkX, a_ChunkZ, a_Callback));
