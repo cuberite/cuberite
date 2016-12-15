@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2016-11-23 15:08:09",
+		ExportDate = "2016-12-03 15:53:05",
 		["GridSizeX"] = "10",
 		["GridSizeZ"] = "10",
 		["IntendedUse"] = "PieceStructures",
@@ -293,8 +293,11 @@ Cubeset =
 				"e: 27: 3",  -- poweredrail
 				"f: 27: 5",  -- poweredrail
 				"g: 50: 5",  -- torch
-				"h: 27: 4",  -- poweredrail
-				"i: 27: 1",  -- poweredrail
+				"h: 66: 0",  -- tracks
+				"i: 66: 1",  -- tracks
+				"j: 66: 8",  -- tracks
+				"k: 27: 4",  -- poweredrail
+				"l: 27: 1",  -- poweredrail
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -311,19 +314,19 @@ Cubeset =
 				-- Level 1
 				".......",  --  0
 				".cdbec.",  --  1
-				".fg..f.",  --  2
-				".b.g.b.",  --  3
-				".h...h.",  --  4
+				".fgh.f.",  --  2
+				".bij.b.",  --  3
+				".k...k.",  --  4
 				".cdbec.",  --  5
 				".......",  --  6
 
 				-- Level 2
 				".......",  --  0
-				"...i...",  --  1
+				"...l...",  --  1
 				".......",  --  2
 				".c...c.",  --  3
 				".......",  --  4
-				"...i...",  --  5
+				"...l...",  --  5
 				".......",  --  6
 
 			},
@@ -421,7 +424,7 @@ Cubeset =
 				["AllowedRotations"] = "7",
 				["DefaultWeight"] = "100",
 				["DepthWeight"] = "",
-				["ExpandFloorStrategy"] = "RepeatTillNonAir",
+				["ExpandFloorStrategy"] = "RepeatBottomTillNonAir",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
@@ -438,12 +441,12 @@ Cubeset =
 				"f: 66: 7",  -- tracks
 				"g: 66: 5",  -- tracks
 				"h: 50: 5",  -- torch
-				"i: 66: 4",  -- tracks
-				"j: 66: 9",  -- tracks
+				"i: 66: 0",  -- tracks
+				"j: 66: 1",  -- tracks
 				"k: 66: 8",  -- tracks
-				"l: 66: 1",  -- tracks
+				"l: 66: 4",  -- tracks
 				"m: 19: 0",  -- sponge
-				"n: 66: 0",  -- tracks
+				"n: 66: 9",  -- tracks
 			},
 			BlockData =
 			{
@@ -458,18 +461,18 @@ Cubeset =
 				-- Level 1
 				"......",  --  0
 				".cdbef",  --  1
-				".gh..g",  --  2
-				".b.h.b",  --  3
-				".i...i",  --  4
-				".jdbek",  --  5
+				".ghi.g",  --  2
+				".bjk.b",  --  3
+				".l...l",  --  4
+				".ndbek",  --  5
 
 				-- Level 2
 				"......",  --  0
-				"...l..",  --  1
+				"...j..",  --  1
 				"......",  --  2
-				".n...n",  --  3
+				".i...i",  --  3
 				"......",  --  4
-				"...l..",  --  5
+				"...j..",  --  5
 
 			},
 		},  -- CentralPiece
@@ -581,8 +584,11 @@ Cubeset =
 				"e: 28: 3",  -- detectorrail
 				"f: 28: 5",  -- detectorrail
 				"g: 50: 5",  -- torch
-				"h: 28: 4",  -- detectorrail
-				"i: 28: 1",  -- detectorrail
+				"h: 66: 0",  -- tracks
+				"i: 66: 1",  -- tracks
+				"j: 66: 8",  -- tracks
+				"k: 28: 4",  -- detectorrail
+				"l: 28: 1",  -- detectorrail
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -599,19 +605,19 @@ Cubeset =
 				-- Level 1
 				".......",  --  0
 				".cdbec.",  --  1
-				".fg..f.",  --  2
-				".b.g.b.",  --  3
-				".h...h.",  --  4
+				".fgh.f.",  --  2
+				".bij.b.",  --  3
+				".k...k.",  --  4
 				".cdbec.",  --  5
 				".......",  --  6
 
 				-- Level 2
 				".......",  --  0
-				"...i...",  --  1
+				"...l...",  --  1
 				".......",  --  2
 				".c...c.",  --  3
 				".......",  --  4
-				"...i...",  --  5
+				"...l...",  --  5
 				".......",  --  6
 
 			},
@@ -724,8 +730,11 @@ Cubeset =
 				"e:157: 3",  -- activatorrail
 				"f:157: 5",  -- activatorrail
 				"g: 50: 5",  -- torch
-				"h:157: 4",  -- activatorrail
-				"i:157: 1",  -- activatorrail
+				"h: 66: 0",  -- tracks
+				"i: 66: 1",  -- tracks
+				"j: 66: 8",  -- tracks
+				"k:157: 4",  -- activatorrail
+				"l:157: 1",  -- activatorrail
 				"m: 19: 0",  -- sponge
 			},
 			BlockData =
@@ -742,19 +751,19 @@ Cubeset =
 				-- Level 1
 				".......",  --  0
 				".cdbec.",  --  1
-				".fg..f.",  --  2
-				".b.g.b.",  --  3
-				".h...h.",  --  4
+				".fgh.f.",  --  2
+				".bij.b.",  --  3
+				".k...k.",  --  4
 				".cdbec.",  --  5
 				".......",  --  6
 
 				-- Level 2
 				".......",  --  0
-				"...i...",  --  1
+				"...l...",  --  1
 				".......",  --  2
 				".c...c.",  --  3
 				".......",  --  4
-				"...i...",  --  5
+				"...l...",  --  5
 				".......",  --  6
 
 			},
