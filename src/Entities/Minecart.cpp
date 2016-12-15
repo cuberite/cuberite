@@ -1250,10 +1250,15 @@ void cMinecartWithChest::Destroyed()
 	m_Contents.CopyToItems(Pickups);
 
 
-	// This makes the command not execute if the world is in the midst of destruction :)
-	GetWorld()->ScheduleTask(1, [this, Pickups](cWorld & World)
+	// Schedule the pickups creation for the next world tick
+	// This avoids a deadlock when terminating the world
+	// Note that the scheduled task may be run when this object is no longer valid, we need to store everything in the task's captured variables
+	auto posX = GetPosX();
+	auto posY = GetPosY() + 1;
+	auto posZ = GetPosZ();
+	GetWorld()->ScheduleTask(1, [Pickups, posX, posY, posZ](cWorld & World)
 	{
-		World.SpawnItemPickups(Pickups, GetPosX(), GetPosY() + 1, GetPosZ(), 4);
+		World.SpawnItemPickups(Pickups, posX, posY, posZ, 4);
 	});
 }
 
