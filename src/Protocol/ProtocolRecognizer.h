@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x"
-#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210"
+#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x, 1.11"
+#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315"
 
 
 
@@ -39,6 +39,7 @@ public:
 		PROTO_VERSION_1_9_2  = 109,
 		PROTO_VERSION_1_9_4  = 110,
 		PROTO_VERSION_1_10_0 = 210,
+		PROTO_VERSION_1_11_0 = 315,
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
@@ -61,7 +62,7 @@ public:
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) override;
+	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;

@@ -7,9 +7,10 @@
 #include "Globals.h"
 
 #include "ProtocolRecognizer.h"
-#include "Protocol18x.h"
-#include "Protocol19x.h"
-#include "Protocol110x.h"
+#include "Protocol_1_8.h"
+#include "Protocol_1_9.h"
+#include "Protocol_1_10.h"
+#include "Protocol_1_11.h"
 #include "Packetizer.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -53,7 +54,8 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_9_1:   return "1.9.1";
 		case PROTO_VERSION_1_9_2:   return "1.9.2";
 		case PROTO_VERSION_1_9_4:   return "1.9.4";
-		case PROTO_VERSION_1_10_0: return "1.10";
+		case PROTO_VERSION_1_10_0:  return "1.10";
+		case PROTO_VERSION_1_11_0:  return "1.11";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -220,10 +222,10 @@ void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSe
 
 
 
-void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
+void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendCollectEntity(a_Entity, a_Player);
+	m_Protocol->SendCollectEntity(a_Entity, a_Player, a_Count);
 }
 
 
@@ -978,8 +980,7 @@ void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 
 bool cProtocolRecognizer::TryRecognizeProtocol(void)
 {
-	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and
-	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
+	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
 
 	// Lengthed protocol, try if it has the entire initial handshake packet:
 	UInt32 PacketLen;
@@ -1045,37 +1046,42 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		case PROTO_VERSION_1_8_0:
 		{
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol_1_8_0(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_9_0:
 		{
-			m_Protocol = new cProtocol190(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol_1_9_0(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_9_1:
 		{
-			m_Protocol = new cProtocol191(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol_1_9_1(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_9_2:
 		{
-			m_Protocol = new cProtocol192(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol_1_9_2(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_9_4:
 		{
-			m_Protocol = new cProtocol194(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol_1_9_4(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_10_0:
 		{
-			m_Protocol = new cProtocol1100(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol = new cProtocol_1_10_0(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_11_0:
+		{
+			m_Protocol = new cProtocol_1_11_0(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		default:
 		{
-			LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
+			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
 				m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
 			);
 			if (NextState != 1)

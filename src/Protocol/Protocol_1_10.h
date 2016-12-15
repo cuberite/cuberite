@@ -1,11 +1,10 @@
 
-// Protocol110x.h
+// Protocol_1_10.h
 
 /*
-Declares the 1.10.x protocol classes:
-	- cProtocol1100
-		- release 1.10.0 protocol (#210)
-(others may be added later in the future for the 1.10 release series)
+Declares the 1.10 protocol classes:
+	- cProtocol_1_10
+		- release 1.10 protocol (#210), also used by 1.10.1 and 1.10.2
 */
 
 
@@ -14,15 +13,19 @@ Declares the 1.10.x protocol classes:
 
 #pragma once
 
-#include "Protocol19x.h"
+#include "Protocol_1_9.h"
 
-class cProtocol1100 :
-	public cProtocol194
+
+
+
+
+class cProtocol_1_10_0 :
+	public cProtocol_1_9_4
 {
-	typedef cProtocol194 super;
+	typedef cProtocol_1_9_4 super;
 
 public:
-	cProtocol1100(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol_1_10_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	virtual void SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 

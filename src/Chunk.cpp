@@ -2909,7 +2909,7 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
-void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
 {
 	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2917,7 +2917,7 @@ void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 		{
 			continue;
 		}
-		(*itr)->SendCollectEntity(a_Entity, a_Player);
+		(*itr)->SendCollectEntity(a_Entity, a_Player, a_Count);
 	}  // for itr - LoadedByClient[]
 }
 

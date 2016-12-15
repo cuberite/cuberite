@@ -1,15 +1,14 @@
 
-// Protocol110x.cpp
+// Protocol_1_10.cpp
 
 /*
-Implements the 1.10.x protocol classes:
-	- cProtocol1100
-		- release 1.10.0 protocol (#210)
-(others may be added later in the future for the 1.10 release series)
+Implements the 1.10 protocol classes:
+	- cProtocol_1_10_0
+		- release 1.10 protocol (#210), also used by 1.10.1 and 1.10.2
 */
 
 #include "Globals.h"
-#include "Protocol110x.h"
+#include "Protocol_1_10.h"
 #include "Packetizer.h"
 
 #include "json/json.h"
@@ -283,7 +282,7 @@ namespace Metadata
 
 
 
-cProtocol1100::cProtocol1100(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_10_0::cProtocol_1_10_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }
@@ -292,7 +291,7 @@ cProtocol1100::cProtocol1100(cClientHandle * a_Client, const AString &a_ServerAd
 
 
 
-void cProtocol1100::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -310,7 +309,7 @@ void cProtocol1100::SendSoundEffect(const AString & a_SoundName, double a_X, dou
 
 
 
-void cProtocol1100::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	cServer * Server = cRoot::Get()->GetServer();
 	AString ServerDescription = Server->GetDescription();
@@ -355,7 +354,7 @@ void cProtocol1100::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
 	using namespace Metadata;
 
@@ -552,7 +551,7 @@ void cProtocol1100::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_E
 
 
 
-void cProtocol1100::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
 	using namespace Metadata;
 
