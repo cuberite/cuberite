@@ -1638,7 +1638,7 @@ end
 local function DumpLuaCheck(a_API)
 	LOG("Creating file .luacheckrc...")
 	local file = io.open(".luacheckrc", "w")
-	
+
 	file:write([[
 -- This file is the config file for the tool named Luacheck
 -- Documentation: http://luacheck.readthedocs.io/en/stable/index.html
@@ -1669,7 +1669,7 @@ exclude_files =
 globals =
 {
 ]])
-	
+
 	-- Export all global symbols
 	for _, cls in ipairs(a_API) do
 		if cls.Name == "Globals" then
@@ -1677,12 +1677,12 @@ globals =
 			for _, func in ipairs(cls.Functions) do
 				file:write("\t\"", func.Name, "\",\n")
 			end
-			
+
 			-- Global constants
 			for _, const in ipairs(cls.Constants) do
 				file:write("\t\"", const.Name, "\",\n")
 			end
-			
+
 			-- Global constants from all groups
 			for _, group in pairs(cls.ConstantGroups) do
 				for _, const in pairs(group.Constants) do
@@ -1693,10 +1693,10 @@ globals =
 			file:write("\t\"", cls.Name, "\",\n")
 		end
 	end
-	
+
 	file:write("}\n")
 	file:close()
-	
+
 	LOG("Config file .luacheckrc created...")
 end
 
@@ -1872,7 +1872,7 @@ local function DumpApi()
 
 	-- Dump all available API objects in format used by ZeroBraneStudio API descriptions:
 	DumpAPIZBS(API)
-	
+
 	-- Export the API in a format used by LuaCheck
 	DumpLuaCheck(API)
 
@@ -1886,6 +1886,8 @@ end
 
 --- Checks the currently undocumented symbols against an "official" undocumented symbol list
 -- Returns an array-table of strings representing the newly-undocumented symbol names
+-- If no newly undocumented symbols are found, returns no value.
+-- If an error occurs, returns true and error message.
 local function CheckNewUndocumentedSymbols()
 	-- Download the official API stats on undocumented stuff:
 	-- (We need a blocking downloader, which is impossible with the current cNetwork API)
@@ -2103,9 +2105,13 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 
 	-- Check for new symbols that are not documented:
 	LOG("Checking API for newly undocumented symbols...")
-	local newUndocumented = CheckNewUndocumentedSymbols()
+	local newUndocumented, msg = CheckNewUndocumentedSymbols()
 	if (newUndocumented) then
-		return true, "Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n")
+		if (newUndocumented == true) then
+			return true, "Cannot check for new undocumented symbols: " .. (msg or "<no message>")
+		else
+			return true, "Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n")
+		end
 	end
 
 	-- The check completed successfully, remove the "test failed" flag from the filesystem:
