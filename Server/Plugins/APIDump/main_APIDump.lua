@@ -2108,9 +2108,11 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 	local newUndocumented, msg = CheckNewUndocumentedSymbols()
 	if (newUndocumented) then
 		if (newUndocumented == true) then
-			return true, "Cannot check for new undocumented symbols: " .. (msg or "<no message>")
+			LOGERROR("Cannot check for new undocumented symbols: " .. (msg or "<no message>"))
+			return true
 		else
-			return true, "Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n")
+			LOGERROR("Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n"))
+			return true
 		end
 	end
 
