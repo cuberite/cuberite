@@ -7,9 +7,10 @@ SET (SRCS
 	ChunkDataSerializer.cpp
 	MojangAPI.cpp
 	Packetizer.cpp
-	Protocol18x.cpp
-	Protocol19x.cpp
-	Protocol110x.cpp
+	Protocol_1_8.cpp
+	Protocol_1_9.cpp
+	Protocol_1_10.cpp
+	Protocol_1_11.cpp
 	ProtocolRecognizer.cpp
 )
 
@@ -19,16 +20,17 @@ SET (HDRS
 	MojangAPI.h
 	Packetizer.h
 	Protocol.h
-	Protocol18x.h
-	Protocol19x.h
-	Protocol110x.h
+	Protocol_1_8.h
+	Protocol_1_9.h
+	Protocol_1_10.h
+	Protocol_1_11.h
 	ProtocolRecognizer.h
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(Protocol19x.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
-	set_source_files_properties(Protocol18x.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
-	set_source_files_properties(Protocol110x.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch")
+	set_source_files_properties(Protocol_1_9.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(Protocol_1_8.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(Protocol_1_10.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch")
 endif()
 
 if (NOT MSVC)

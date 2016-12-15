@@ -332,7 +332,7 @@ void cChunkMap::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cChunkMap::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkZ());
@@ -341,7 +341,7 @@ void cChunkMap::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer &
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastCollectEntity(a_Entity, a_Player, a_Exclude);
+	Chunk->BroadcastCollectEntity(a_Entity, a_Player, a_Count, a_Exclude);
 }
 
 

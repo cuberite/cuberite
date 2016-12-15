@@ -9,8 +9,8 @@
 #include "ChunkDataSerializer.h"
 #include "zlib/zlib.h"
 #include "ByteBuffer.h"
-#include "Protocol18x.h"
-#include "Protocol19x.h"
+#include "Protocol_1_8.h"
+#include "Protocol_1_9.h"
 
 
 
@@ -111,7 +111,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	cByteBuffer Buffer(20);
 	if (PacketData.size() >= 256)
 	{
-		if (!cProtocol180::CompressPacket(PacketData, a_Data))
+		if (!cProtocol_1_8_0::CompressPacket(PacketData, a_Data))
 		{
 			ASSERT(!"Packet compression failed.");
 			a_Data.clear();
@@ -254,7 +254,7 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 	cByteBuffer Buffer(20);
 	if (PacketData.size() >= 256)
 	{
-		if (!cProtocol190::CompressPacket(PacketData, a_Data))
+		if (!cProtocol_1_9_0::CompressPacket(PacketData, a_Data))
 		{
 			ASSERT(!"Packet compression failed.");
 			a_Data.clear();
@@ -400,7 +400,7 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 	cByteBuffer Buffer(20);
 	if (PacketData.size() >= 256)
 	{
-		if (!cProtocol190::CompressPacket(PacketData, a_Data))
+		if (!cProtocol_1_9_0::CompressPacket(PacketData, a_Data))
 		{
 			ASSERT(!"Packet compression failed.");
 			a_Data.clear();

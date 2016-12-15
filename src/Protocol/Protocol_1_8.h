@@ -1,17 +1,10 @@
 
-// Protocol19x.h
+// Protocol_1_8.h
 
 /*
-Declares the 1.9.x protocol classes:
-	- cProtocol190
-		- release 1.9.0 protocol (#107)
-	- cProtocol191
-		- release 1.9.1 protocol (#108)
-	- cProtocol192
-		- release 1.9.2 protocol (#109)
-	- cProtocol194
-		- release 1.9.4 protocol (#110)
-(others may be added later in the future for the 1.9 release series)
+Declares the 1.8 protocol classes:
+	- cProtocol_1_8_0
+		- release 1.8 protocol (#47)
 */
 
 
@@ -53,14 +46,14 @@ namespace Json
 
 
 
-class cProtocol190 :
+class cProtocol_1_8_0 :
 	public cProtocol
 {
 	typedef cProtocol super;
 
 public:
 
-	cProtocol190(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
@@ -76,7 +69,7 @@ public:
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player) override;
+	virtual void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
@@ -194,8 +187,8 @@ protected:
 	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 
 	// Packet handlers while in the Status state (m_State == 1):
-	virtual void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
+	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
+	void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
 
 	// Packet handlers while in the Login state (m_State == 2):
 	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
@@ -205,11 +198,9 @@ protected:
 	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBoatSteer              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
-	void HandleConfirmTeleport              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
 	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
 	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
@@ -220,14 +211,12 @@ protected:
 	void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);
+	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
 	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUseItem                (cByteBuffer & a_ByteBuffer);
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketVehicleMove            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 
@@ -256,105 +245,23 @@ protected:
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
+	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
 
 	/** Writes the item data into a packet. */
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
-	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
+	/** Writes the metadata for the specified entity, not including the terminating 0x7f. */
+	void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the mob-specific metadata for the specified mob */
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
+	void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
-
-	/** Types used within metadata */
-	enum eMetadataType
-	{
-		METADATA_TYPE_BYTE              = 0,
-		METADATA_TYPE_VARINT            = 1,
-		METADATA_TYPE_FLOAT             = 2,
-		METADATA_TYPE_STRING            = 3,
-		METADATA_TYPE_CHAT              = 4,
-		METADATA_TYPE_ITEM              = 5,
-		METADATA_TYPE_BOOL              = 6,
-		METADATA_TYPE_ROTATION          = 7,
-		METADATA_TYPE_POSITION          = 8,
-		METADATA_TYPE_OPTIONAL_POSITION = 9,
-		METADATA_TYPE_DIRECTION         = 10,
-		METADATA_TYPE_OPTIONAL_UUID     = 11,
-		METADATA_TYPE_BLOCKID           = 12
-	} ;
 } ;
-
-
-
-
-
-/** The version 108 protocol, used by 1.9.1.  Uses an int rather than a byte for dimension in join game. */
-class cProtocol191 :
-	public cProtocol190
-{
-	typedef cProtocol190 super;
-
-public:
-	cProtocol191(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-
-	// cProtocol190 overrides:
-	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
-
-} ;
-
-
-
-
-
-/** The version 109 protocol, used by 1.9.2.  Same as 1.9.1, except the server list ping version number changed with the protocol number. */
-class cProtocol192 :
-	public cProtocol191
-{
-	typedef cProtocol191 super;
-
-public:
-	cProtocol192(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-
-	// cProtocol190 overrides:
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
-
-} ;
-
-
-
-
-
-/** The version 110 protocol, used by 1.9.3 and 1.9.4. */
-class cProtocol194 :
-	public cProtocol192
-{
-	typedef cProtocol192 super;
-
-public:
-	cProtocol194(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-
-	// cProtocol190 overrides:
-	virtual void SendCollectEntity   (const cEntity & a_Entity, const cPlayer & a_Player) override;
-	virtual void SendChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendEntityEffect    (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
-	virtual void SendEntityProperties(const cEntity & a_Entity) override;
-	virtual void SendPlayerMaxSpeed  (void) override;
-	virtual void SendTeleportEntity  (const cEntity & a_Entity) override;
-	virtual void SendUpdateSign      (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
-
-} ;
-
 
 
 

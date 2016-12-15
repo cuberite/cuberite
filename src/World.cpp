@@ -2446,9 +2446,9 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 
 
 
-void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastCollectEntity(a_Entity, a_Player, a_Exclude);
+	m_ChunkMap->BroadcastCollectEntity(a_Entity, a_Player, a_Count, a_Exclude);
 }
 
 
