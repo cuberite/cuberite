@@ -406,7 +406,14 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 		msg["extra"].append(Part);
 	}  // for itr - Parts[]
 
-	return msg.toStyledString();
+	#if 1
+		// Serialize as machine-readable string (no whitespace):
+		Json::FastWriter writer;
+		return writer.write(msg);
+	#else
+		// Serialize as human-readable string (pretty-printed):
+		return msg.toStyledString();
+	#endif
 }
 
 
