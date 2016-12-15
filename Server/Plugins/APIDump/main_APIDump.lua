@@ -1891,7 +1891,7 @@ end
 local function CheckNewUndocumentedSymbols()
 	-- Download the official API stats on undocumented stuff:
 	-- (We need a blocking downloader, which is impossible with the current cNetwork API)
-	assert(os.execute("wget -q -O official_undocumented.lua http://apidocs.cuberite.org/_undocumented.lua"))
+	assert(os.execute("wget -q -O official_undocumented.lua http://apidocs.cuberite.xoft.cz/_undocumented.lua"))
 	local OfficialStats = cFile:ReadWholeFile("official_undocumented.lua")
 	if (OfficialStats == "") then
 		return true, "Cannot load official stats"
