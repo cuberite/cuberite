@@ -1,35 +1,35 @@
 [submodule "MCServer/Plugins/Core"]
 	path = Server/Plugins/Core
-	url = https://github.com/mc-server/Core.git
+	url = https://github.com/cuberite/Core.git
 [submodule "MCServer/Plugins/ProtectionAreas"]
 	path = Server/Plugins/ProtectionAreas
-	url = https://github.com/mc-server/ProtectionAreas.git
+	url = https://github.com/cuberite/ProtectionAreas.git
 [submodule "MCServer/Plugins/TransAPI"]
 	path = Server/Plugins/TransAPI
-	url = https://github.com/bearbin/transapi.git
+	url = https://github.com/cuberite/transapi.git
 [submodule "MCServer/Plugins/ChunkWorx"]
 	path = Server/Plugins/ChunkWorx
-	url = https://github.com/mc-server/ChunkWorx.git
+	url = https://github.com/cuberite/ChunkWorx.git
 [submodule "MCServer/Plugins/ChatLog"]
 	path = Server/Plugins/ChatLog
-	url = https://github.com/mc-server/ChatLog.git
+	url = https://github.com/cuberite/ChatLog.git
 [submodule "MCServer/Plugins/Handy"]
 	path = Server/Plugins/Handy
-	url = https://github.com/mc-server/Handy.git
+	url = https://github.com/cuberite/Handy.git
 [submodule "MCServer/Plugins/MagicCarpet"]
 	path = Server/Plugins/MagicCarpet
-	url = https://github.com/mc-server/MagicCarpet.git
+	url = https://github.com/cuberite/MagicCarpet.git
 [submodule "lib/polarssl"]
 	path = lib/polarssl
-	url = https://github.com/mc-server/polarssl.git
+	url = https://github.com/cuberite/polarssl.git
 	ignore = dirty
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
-	url = https://github.com/mc-server/SQLiteCpp.git
+	url = https://github.com/cuberite/SQLiteCpp.git
 	ignore = dirty
 [submodule "lib/libevent"]
 	path = lib/libevent
-	url = https://github.com/mc-server/libevent.git
+	url = https://github.com/cuberite/libevent.git
 	ignore = dirty
 [submodule "lib/jsoncpp"]
 	path = lib/jsoncpp
@@ -37,7 +37,7 @@
 	ignore = dirty
 [submodule "lib/TCLAP"]
 	path = lib/TCLAP
-	url = https://github.com/mc-server/TCLAP.git
+	url = https://github.com/cuberite/TCLAP.git
 	ignore = dirty
 [submodule "lib/cmake-coverage"]
 	path = lib/cmake-coverage
