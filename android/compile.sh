@@ -70,10 +70,10 @@ case "$1" in
 	;;
 
 	all)
-		echo "Packing server.zip"
+		echo "Packing server.zip ..."
 		mkdir -p Server
-		cd ../Server
-		zip -r ../android/Server/server.zip *
+		cd $BASEDIR/../Server
+		zip -r $BASEDIR/Server/server.zip *
 
 		for arch in armeabi armeabi-v7a arm64-v8a mips mips64 x86 x86_64; do
 			echo "Doing ... $arch ..." && \
@@ -85,6 +85,12 @@ case "$1" in
 			rm Cuberite
 		done
 
+		cd $BASEDIR/Server
+		for file in server.zip armeabi.zip armeabi-v7a.zip arm64-v8a.zip mips.zip mips64.zip x86.zip x86_64.zip; do
+			echo "Generating sha1 sum for ... $file ..." && \
+			sha1sum "$file" > "$file".sha1
+		done
+
 		echo "Done! The built zip files await you in the Server/ directory"
 		exit;
 	;;
@@ -94,7 +100,7 @@ case "$1" in
 	;;
 esac
 
-mkdir -p ../android-build
-cd ../android-build
-"$CMAKE" ../android -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION="$APILEVEL" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_ANDROID_ARCH_ABI="$1" -DCMAKE_ANDROID_NDK="$NDK"
+mkdir -p $BASEDIR/../android-build
+cd $BASEDIR/../android-build
+"$CMAKE" $BASEDIR/../android -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION="$APILEVEL" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_ANDROID_ARCH_ABI="$1" -DCMAKE_ANDROID_NDK="$NDK"
 make -j "$THREADS"
