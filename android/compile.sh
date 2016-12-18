@@ -73,7 +73,7 @@ case "$1" in
 		echo "Packing server.zip ..."
 		mkdir -p Server
 		cd $BASEDIR/../Server
-		zip -r $BASEDIR/../android/Server/server.zip *
+		zip -r $BASEDIR/Server/server.zip *
 
 		for arch in armeabi armeabi-v7a arm64-v8a mips mips64 x86 x86_64; do
 			echo "Doing ... $arch ..." && \
@@ -102,5 +102,5 @@ esac
 
 mkdir -p $BASEDIR/../android-build
 cd $BASEDIR/../android-build
-"$CMAKE" ../android -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION="$APILEVEL" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_ANDROID_ARCH_ABI="$1" -DCMAKE_ANDROID_NDK="$NDK"
+"$CMAKE" $BASEDIR/../android -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION="$APILEVEL" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_ANDROID_ARCH_ABI="$1" -DCMAKE_ANDROID_NDK="$NDK"
 make -j "$THREADS"
