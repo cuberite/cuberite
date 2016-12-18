@@ -28,9 +28,8 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 
 
 cPawn::~cPawn()
-bool cPawn::OnPreWorldTravel(cWorld & a_NewWorld)
 {
-	ASSERT(m_TargetingMe.size() == 0);
+	UnsetAllTargeters();
 	return super::OnPreWorldTravel(a_NewWorld);
 }
 
@@ -40,7 +39,7 @@ bool cPawn::OnPreWorldTravel(cWorld & a_NewWorld)
 
 void cPawn::Destroyed()
 {
-	StopEveryoneFromTargetingMe();
+	UnsetAllTargeters();
 	super::Destroyed();
 }
 
@@ -221,32 +220,37 @@ void cPawn::ClearEntityEffects()
 
 
 
-void cPawn::NoLongerTargetingMe(cMonster * a_Monster)
+void cPawn::UnsetAllTargeters()
 {
-	ASSERT(IsTicking());  // Our destroy override is supposed to clear all targets before we're destroyed.
-	for (auto i = m_TargetingMe.begin(); i != m_TargetingMe.end(); ++i)
+	class Callback : public cEntityCallback
 	{
-		cMonster * Monster = *i;
-		if (Monster == a_Monster)
+	public:
+		Callback(cPawn & a_Pawn) :
+			m_Pawn(a_Pawn)
 		{
-			ASSERT(Monster->GetTarget() != this);  // The monster is notifying us it is no longer targeting us, assert if that's a lie
-			m_TargetingMe.erase(i);
-			return;
 		}
-	}
-	ASSERT(false);  // If this happens, something is wrong. Perhaps the monster never called TargetingMe() or called NoLongerTargetingMe() twice.
-}
 
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if (!a_Entity->IsMob())
+			{
+				return false;
+			}
 
+			auto Monster = static_cast<cMonster *>(a_Entity);
+			if (Monster->GetTarget() == &m_Pawn)
+			{
+				Monster->SetTarget(nullptr);
+			}
 
+			return false;
+		}
 
+	private:
+		cPawn & m_Pawn;
+	} Callback(*this);
 
-void cPawn::TargetingMe(cMonster * a_Monster)
-{
-	ASSERT(IsTicking());
-	ASSERT(m_TargetingMe.size() < 10000);
-	ASSERT(a_Monster->GetTarget() == this);
-	m_TargetingMe.push_back(a_Monster);
+	GetWorld()->ForEachEntity(Callback);
 }
 
 
@@ -417,21 +421,4 @@ void cPawn::HandleFalling(void)
 	/* Note: it is currently possible to fall through lava and still die from fall damage
 	because of the client skipping an update about the lava block. This can only be resolved by
 	somehow integrating these above checks into the tracer in HandlePhysics. */
-}
-
-
-
-
-
-void cPawn::StopEveryoneFromTargetingMe()
-{
-	std::vector<cMonster*>::iterator i = m_TargetingMe.begin();
-	while (i != m_TargetingMe.end())
-	{
-		cMonster * Monster = *i;
-		ASSERT(Monster->GetTarget() == this);
-		Monster->UnsafeUnsetTarget();
-		i = m_TargetingMe.erase(i);
-	}
-	ASSERT(m_TargetingMe.size() == 0);
 }

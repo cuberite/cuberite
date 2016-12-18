@@ -130,7 +130,7 @@ const char * cEntity::GetParentClass(void) const
 
 
 
-bool cEntity::Initialize(cWorld & a_World)
+bool cEntity::Initialize(std::unique_ptr<cEntity> a_Entity, cWorld & a_EntityWorld)
 {
 	ASSERT(a_EntityWorld.IsInTickThread());
 

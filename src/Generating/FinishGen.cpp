@@ -1483,11 +1483,11 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	double AnimalY = a_RelY;
 	double AnimalZ = static_cast<double>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ + 0.5);
 
-	cMonster * NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
+	auto NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
 	NewMob->SetHealth(NewMob->GetMaxHealth());
 	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
-	a_ChunkDesc.GetEntities().push_back(NewMob);
 	LOGD("Spawning %s #%i at {%.02f, %.02f, %.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);
+	a_ChunkDesc.GetEntities().emplace_back(std::move(NewMob));
 
 	return true;
 }

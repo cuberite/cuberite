@@ -31,7 +31,7 @@ class cEntity;
 class cClientHandle;
 class cBlockEntity;
 
-typedef std::list<cEntity *>        cEntityList;
+typedef std::vector<std::unique_ptr<cEntity>> cEntityList;
 typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 

@@ -1582,51 +1582,19 @@ void cChunkMap::RemoveChunkClient(int a_ChunkX, int a_ChunkZ, const std::shared_
 
 
 
+void cChunkMap::AddEntity(std::unique_ptr<cEntity> a_Entity)
 {
-	for (const auto & Chunk : m_Chunks)
-	{
-		Chunk.second->RemoveClient(a_Client);
-	}
-}
-
-
-
-
-
-void cChunkMap::AddEntity(cEntity * a_Entity)
-{
-	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-	if (Chunk == nullptr)  // This will assert inside GetChunk in Debug builds
-	{
-		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
-		);
-		return;
-	}
-	Chunk->AddEntity(a_Entity);
-}
-
-
-
-
 	ASSERT(GetWorld()->IsInTickThread());
 
-void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
-{
-	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 	if (Chunk == nullptr)  // This will assert inside GetChunk in Debug builds
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
+			static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
 		return;
 	}
-	if (!Chunk->HasEntity(a_Entity->GetUniqueID()))
-	{
-		Chunk->AddEntity(a_Entity);
-	}
+	Chunk->AddEntity(std::move(a_Entity));
 }
 
 
@@ -2574,10 +2542,10 @@ void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
 
 bool cChunkMap::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand)
 {
+	ASSERT(GetWorld()->IsInTickThread());
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
 
-	ASSERT(GetWorld()->IsInTickThread());
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
 	if (Chunk != nullptr)
 	{

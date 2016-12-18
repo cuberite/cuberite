@@ -131,17 +131,18 @@ cChunk::~cChunk()
 	}
 	m_BlockEntities.clear();
 
-	// Remove and destroy all entities that are not players:
-	cEntityList Entities;
-	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
-	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
+	// Remove and destroy all entities:
+	for (auto & Entity : m_Entities)
 	{
-		if (!(*itr)->IsPlayer())
+		if (Entity->IsDestroyed())
 		{
-			// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
-			(*itr)->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
-			delete *itr;
+			// Workaround to mitigate crashing in cPlayer::SaveToDisk which may try to access destroyed member variables on server stop
+			// All entities will have been destroyed in cWorld::Stop in this circumstance
+			continue;
 		}
+
+		// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
+		Entity->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
 	}
 
 	if (m_NeighborXM != nullptr)
@@ -284,9 +285,9 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 	a_Callback.ChunkData(m_ChunkData);
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (const auto & Entity : m_Entities)
 	{
-		a_Callback.Entity(*itr);
+		a_Callback.Entity(Entity.get());
 	}
 
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -483,7 +484,7 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 	}
 
 	Vector3d currentPosition;
-	for (auto entity : m_Entities)
+	for (auto & entity : m_Entities)
 	{
 		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if (entity->IsMob())
@@ -581,7 +582,7 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 			continue;
 		}
 
-		cEntity * newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
+		auto newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
 		if (newMob == nullptr)
 		{
 			continue;
@@ -605,7 +606,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	// If we are not valid, tick players and bailout
 	if (!IsValid())
 	{
-		for (auto Entity : m_Entities)
+		for (const auto & Entity : m_Entities)
 		{
 			if (Entity->IsPlayer())
 			{
@@ -630,7 +631,7 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+	for (auto itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
 		// Do not tick mobs that are detached from the world. They're either scheduled for teleportation or for removal.
 		if (!(*itr)->IsTicking())
@@ -655,20 +656,22 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 			continue;
 		}
 
-		if ((((*itr)->GetChunkX() != m_PosX) ||
-			((*itr)->GetChunkZ() != m_PosZ))
+		if (
+			((*itr)->GetChunkX() != m_PosX) ||
+			((*itr)->GetChunkZ() != m_PosZ)
 		)
 		{
-			// This block is very similar to RemoveEntity, except it uses an iterator to avoid scanning the whole m_Entities
-			// The entity moved out of the chunk, move it to the neighbor
-
 			(*itr)->SetParentChunk(nullptr);
-			MoveEntityToNewChunk(*itr);
+
 			// Mark as dirty if it was a server-generated entity:
 			if (!(*itr)->IsPlayer())
 			{
 				MarkDirty();
 			}
+
+			// The entity moved out of the chunk, move it to the neighbor
+			MoveEntityToNewChunk(std::move(*itr));
+
 			itr = m_Entities.erase(itr);
 		}
 		else
@@ -697,7 +700,7 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
+void cChunk::MoveEntityToNewChunk(std::unique_ptr<cEntity> a_Entity)
 {
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == nullptr)
@@ -711,28 +714,29 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	}
 
 	ASSERT(Neighbor != this);  // Moving into the same chunk? wtf?
-	Neighbor->AddEntity(a_Entity);
+	auto & EntityPtr = *a_Entity;
+	Neighbor->AddEntity(std::move(a_Entity));
 
 	class cMover :
 		public cClientDiffCallback
 	{
 		virtual void Removed(cClientHandle * a_Client) override
 		{
-			a_Client->SendDestroyEntity(*m_Entity);
+			a_Client->SendDestroyEntity(m_Entity);
 		}
 
 		virtual void Added(cClientHandle * a_Client) override
 		{
-			m_Entity->SpawnOn(*a_Client);
+			m_Entity.SpawnOn(*a_Client);
 		}
 
-		cEntity * m_Entity;
+		cEntity & m_Entity;
 
 	public:
-		cMover(cEntity * a_CallbackEntity) :
+		cMover(cEntity & a_CallbackEntity) :
 			m_Entity(a_CallbackEntity)
 		{}
-	} Mover(a_Entity);
+	} Mover(EntityPtr);
 
 	m_ChunkMap->CompareChunkClients(this, Neighbor, Mover);
 }
@@ -1810,15 +1814,15 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 	double PosY = a_Player.GetPosY();
 	double PosZ = a_Player.GetPosZ();
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (auto & Entity : m_Entities)
 	{
-		if ((!(*itr)->IsPickup()) && (!(*itr)->IsProjectile()))
+		if ((!Entity->IsPickup()) && (!Entity->IsProjectile()))
 		{
 			continue;  // Only pickups and projectiles can be picked up
 		}
-		float DiffX = static_cast<float>((*itr)->GetPosX() - PosX);
-		float DiffY = static_cast<float>((*itr)->GetPosY() - PosY);
-		float DiffZ = static_cast<float>((*itr)->GetPosZ() - PosZ);
+		float DiffX = static_cast<float>(Entity->GetPosX() - PosX);
+		float DiffY = static_cast<float>(Entity->GetPosY() - PosY);
+		float DiffZ = static_cast<float>(Entity->GetPosZ() - PosZ);
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
 		{
@@ -1828,13 +1832,13 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 			);
 			*/
 			MarkDirty();
-			if ((*itr)->IsPickup())
+			if (Entity->IsPickup())
 			{
-				(reinterpret_cast<cPickup *>(*itr))->CollectedBy(a_Player);
+				reinterpret_cast<cPickup *>(Entity.get())->CollectedBy(a_Player);
 			}
 			else
 			{
-				(reinterpret_cast<cProjectileEntity *>(*itr))->CollectedBy(a_Player);
+				reinterpret_cast<cProjectileEntity *>(Entity.get())->CollectedBy(a_Player);
 			}
 		}
 		else if (SqrDist < 5 * 5)
@@ -1970,34 +1974,49 @@ bool cChunk::HasAnyClients(void) const
 
 
 
-void cChunk::AddEntity(cEntity * a_Entity)
+void cChunk::AddEntity(std::unique_ptr<cEntity> a_Entity)
 {
 	if (!a_Entity->IsPlayer())
 	{
 		MarkDirty();
 	}
 
-	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
+	auto EntityPtr = a_Entity.get();
 
-	m_Entities.push_back(a_Entity);
-	ASSERT(a_Entity->GetParentChunk() == nullptr);
-	a_Entity->SetParentChunk(this);
+	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
+	m_Entities.emplace_back(std::move(a_Entity));
+
+	ASSERT(EntityPtr->GetParentChunk() == nullptr);
+	EntityPtr->SetParentChunk(this);
+	EntityPtr->SetIsTicking(true);
 }
 
 
 
 
 
-void cChunk::RemoveEntity(cEntity * a_Entity)
+void cChunk::RemoveEntity(cEntity & a_Entity)
 {
-	ASSERT(a_Entity->GetParentChunk() == this);
-	a_Entity->SetParentChunk(nullptr);
-	m_Entities.remove(a_Entity);
-	// Mark as dirty if it was a server-generated entity:
-	if (!a_Entity->IsPlayer())
+	ASSERT(a_Entity.GetParentChunk() == this);
+	ASSERT(!a_Entity.IsTicking());
+	a_Entity.SetParentChunk(nullptr);
+
+	if (!a_Entity.IsPlayer())
 	{
 		MarkDirty();
 	}
+
+	m_Entities.erase(
+		std::remove_if(
+			m_Entities.begin(),
+			m_Entities.end(),
+			[&a_Entity](const decltype(m_Entities)::value_type & a_Value)
+			{
+				return (a_Value.get() == &a_Entity);
+			}
+		),
+		m_Entities.end()
+	);
 }
 
 
@@ -2006,13 +2025,13 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 bool cChunk::HasEntity(UInt32 a_EntityID)
 {
-	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
+	for (const auto & Entity : m_Entities)
 	{
-		if ((*itr)->GetUniqueID() == a_EntityID)
+		if (Entity->GetUniqueID() == a_EntityID)
 		{
 			return true;
 		}
-	}  // for itr - m_Entities[]
+	}
 	return false;
 }
 
@@ -2023,14 +2042,14 @@ bool cChunk::HasEntity(UInt32 a_EntityID)
 bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
-	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
+	for (auto itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
 		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
-		if (a_Callback.Item(*itr))
+		if (a_Callback.Item((*itr).get()))
 		{
 			return false;
 		}
@@ -2045,7 +2064,7 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
-	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
+	for (auto itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
 		if (!(*itr)->IsTicking())
@@ -2058,7 +2077,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 			// The entity is not in the specified box
 			continue;
 		}
-		if (a_Callback.Item(*itr))
+		if (a_Callback.Item((*itr).get()))
 		{
 			return false;
 		}
@@ -2093,7 +2112,7 @@ bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
 	{
 		++itr2;
-		if (a_Callback.Item((*itr).get()))
+		if (a_Callback.Item(*itr))
 		{
 			return false;
 		}

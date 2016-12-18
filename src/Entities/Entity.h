@@ -153,7 +153,7 @@ public:
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
-	virtual bool Initialize(cWorld & a_World);
+	virtual bool Initialize(std::unique_ptr<cEntity>a_Entity, cWorld & a_EntityWorld);
 
 	// tolua_begin
 

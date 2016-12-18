@@ -930,7 +930,7 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 				// do the spawn
 				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); ++itr2)
 				{
-					SpawnMobFinalize(*itr2);
+					SpawnMobFinalize(std::move(const_cast<std::unique_ptr<cMonster> &>(*itr2)));
 				}
 			}
 		}  // for i - AllFamilies[]
@@ -1307,7 +1307,7 @@ bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback
 
 
 
-bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, std::function<bool(cChunk &)>  a_Callback)
+bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, std::function<bool(cChunk &)> a_Callback)
 {
 	struct cCallBackWrapper : cChunkCallback
 	{
@@ -1904,11 +1904,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * GetTickRandomNumber(50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * (GetTickRandomNumber(10) - 5));
 
-		cPickup * Pickup = new cPickup(
+		auto Pickup = cpp14::make_unique<cPickup>(
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
 		);
-		Pickup->Initialize(*this);
+		Pickup->Initialize(std::move(Pickup), *this);
 	}
 }
 
@@ -1925,11 +1925,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		cPickup * Pickup = new cPickup(
+		auto Pickup = cpp14::make_unique<cPickup>(
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
 		);
-		Pickup->Initialize(*this);
+		Pickup->Initialize(std::move(Pickup), *this);
 	}
 }
 
@@ -1939,9 +1939,10 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
 {
-	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
-	FallingBlock->Initialize(*this);
-	return FallingBlock->GetUniqueID();
+	auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
+	auto ID = FallingBlock->GetUniqueID();
+	FallingBlock->Initialize(std::move(FallingBlock), *this);
+	return ID;
 }
 
 
@@ -1956,9 +1957,10 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 		return cEntity::INVALID_ID;
 	}
 
-	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
-	ExpOrb->Initialize(*this);
-	return ExpOrb->GetUniqueID();
+	auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, a_Reward);
+	auto ID = ExpOrb->GetUniqueID();
+	ExpOrb->Initialize(std::move(ExpOrb), *this);
+	return ID;
 }
 
 
@@ -1967,21 +1969,23 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 
 UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
-	cMinecart * Minecart;
+	std::unique_ptr<cMinecart> Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = new cRideableMinecart     (a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
-		case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (a_X, a_Y, a_Z); break;
-		case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART:             Minecart = cpp14::make_unique<cRideableMinecart>(a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = cpp14::make_unique<cMinecartWithChest>(a_X, a_Y, a_Z); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = cpp14::make_unique<cMinecartWithFurnace>(a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = cpp14::make_unique<cMinecartWithTNT>(a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = cpp14::make_unique<cMinecartWithHopper>(a_X, a_Y, a_Z); break;
 		default:
 		{
 			return cEntity::INVALID_ID;
 		}
 	}  // switch (a_MinecartType)
-	Minecart->Initialize(*this);
-	return Minecart->GetUniqueID();
+
+	auto ID = Minecart->GetUniqueID();
+	Minecart->Initialize(std::move(Minecart), *this);
+	return ID;
 }
 
 
@@ -1990,17 +1994,13 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
 {
-	cBoat * Boat = new cBoat(a_X, a_Y, a_Z);
-	if (Boat == nullptr)
+	auto Boat = cpp14::make_unique<cBoat>(a_X, a_Y, a_Z);
+	auto ID = Boat->GetUniqueID();
+	if (!Boat->Initialize(std::move(Boat), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	if (!Boat->Initialize(*this))
-	{
-		delete Boat;
-		return cEntity::INVALID_ID;
-	}
-	return Boat->GetUniqueID();
+	return ID;
 }
 
 
@@ -2008,14 +2008,15 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
 
 UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
-	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
-	TNT->Initialize(*this);
+	auto TNT = cpp14::make_unique<cTNTEntity>(a_X, a_Y, a_Z, a_FuseTicks);
+	auto ID = TNT->GetUniqueID();
 	TNT->SetSpeed(
-		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
+		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /* -1, 0, 1 */
 		a_InitialVelocityCoeff * 2,
 		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
 	);
-	return TNT->GetUniqueID();
+	TNT->Initialize(std::move(TNT), *this);
+	return ID;
 }
 
 
@@ -2591,10 +2592,9 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 
 	// Initialise the entities:
 	cEntityList Entities;
-	std::swap(a_SetChunkData.GetEntities(), Entities);
-	for (cEntityList::iterator itr = Entities.begin(), end = Entities.end(); itr != end; ++itr)
+	for (auto & Entity : a_SetChunkData.GetEntities())
 	{
-		(*itr)->Initialize(*this);
+		Entity->Initialize(std::move(Entity), *this);
 	}
 
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
@@ -3159,8 +3159,9 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 
 
 
-void cWorld::AddEntity(cEntity * a_Entity)
+void cWorld::AddEntity(std::unique_ptr<cEntity> a_Entity)
 {
+	m_ChunkMap->AddEntity(std::move(a_Entity));
 }
 
 
@@ -3274,9 +3275,7 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby)
 {
-	cMonster * Monster = nullptr;
-
-	Monster = cMonster::NewMonsterFromType(a_MonsterType);
+	auto Monster = cMonster::NewMonsterFromType(a_MonsterType);
 	if (Monster == nullptr)
 	{
 		return cEntity::INVALID_ID;
@@ -3288,13 +3287,13 @@ UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterTyp
 		Monster->SetAge(-1);
 	}
 
-	return SpawnMobFinalize(Monster);
+	return SpawnMobFinalize(std::move(Monster));
 }
 
 
 
 
-UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
+UInt32 cWorld::SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster)
 {
 	ASSERT(a_Monster != nullptr);
 
@@ -3304,22 +3303,20 @@ UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	// A plugin doesn't agree with the spawn. bail out.
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
-		delete a_Monster;
-		a_Monster = nullptr;
 		return cEntity::INVALID_ID;
 	}
+
+	auto & Monster = *a_Monster;
 
 	// Initialize the monster into the current world.
-	if (!a_Monster->Initialize(*this))
+	if (!a_Monster->Initialize(std::move(a_Monster), *this))
 	{
-		delete a_Monster;
-		a_Monster = nullptr;
 		return cEntity::INVALID_ID;
 	}
 
-	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
+	cPluginManager::Get()->CallHookSpawnedMonster(*this, Monster);
 
-	return a_Monster->GetUniqueID();
+	return Monster.GetUniqueID();
 }
 
 
@@ -3328,18 +3325,15 @@ UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
-	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
-	if (Projectile == nullptr)
+	auto Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
+	auto ID = Projectile->GetUniqueID();
+
+	if ((Projectile == nullptr) || !Projectile->Initialize(std::move(Projectile), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	if (!Projectile->Initialize(*this))
-	{
-		delete Projectile;
-		Projectile = nullptr;
-		return cEntity::INVALID_ID;
-	}
-	return Projectile->GetUniqueID();
+
+	return ID;
 }
 
 

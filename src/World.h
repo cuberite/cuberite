@@ -276,7 +276,7 @@ public:
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
 	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
-	void AddEntity(cEntity * a_Entity);
+	void AddEntity(std::unique_ptr<cEntity> a_Entity);
 
 	/** Returns true if an entity with the specified UniqueID exists in the world.
 	Note: Only loaded chunks are considered. */
@@ -770,7 +770,7 @@ public:
 	/** Spawns a mob of the specified type. Returns the mob's UniqueID if recognized and spawned, cEntity::INVALID_ID otherwise */
 	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby = false) override;  // tolua_export
 
-	UInt32 SpawnMobFinalize(cMonster * a_Monster);
+	UInt32 SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster);
 
 	/** Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */

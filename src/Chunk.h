@@ -485,6 +485,36 @@ public:
 		return m_LoadedByClient;
 	}
 
+	std::unique_ptr<cEntity> AcquireAssociatedEntityPtr(const cEntity & a_Entity)
+	{
+		auto Iterator = std::find_if(
+			m_Entities.begin(),
+			m_Entities.end(),
+			[&a_Entity](const decltype(m_Entities)::value_type & a_Value)
+			{
+				return (a_Value.get() == &a_Entity);
+			}
+		);
+
+		if (Iterator == m_Entities.cend())
+		{
+			return nullptr;
+		}
+		else
+		{
+			auto Entity = std::move(*Iterator);
+			Entity->SetParentChunk(nullptr);
+
+			if (!Entity->IsPlayer())
+			{
+				MarkDirty();
+			}
+
+			m_Entities.erase(Iterator);
+			return Entity;
+		}
+	}
+
 private:
 
 	friend class cChunkMap;
@@ -519,8 +549,8 @@ private:
 	std::vector<Vector3i> m_ToTickBlocks;
 	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 
-	cEntityList                  m_Entities;
 	std::vector<std::weak_ptr<cClientHandle>> m_LoadedByClient;
+	std::vector<std::unique_ptr<cEntity>> m_Entities;
 	cBlockEntityList             m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
@@ -594,7 +624,7 @@ private:
 	bool GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
-	void MoveEntityToNewChunk(cEntity * a_Entity);
+	void MoveEntityToNewChunk(std::unique_ptr<cEntity> a_Entity);
 };
 
 typedef cChunk * cChunkPtr;
