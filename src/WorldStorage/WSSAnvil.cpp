@@ -459,7 +459,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	}  // for y
 	//*/
 
-	cSetChunkDataPtr SetChunkData(new cSetChunkData(
+	auto SetChunkData(cSetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockTypes, MetaData,
 		IsLightValid ? BlockLight : nullptr,
@@ -495,7 +495,16 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
 
 	cNBTChunkSerializer Serializer(a_Writer);
-	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
+	bool DataRetrivalSucceeded;
+
+	m_World->QueueTask(
+		[&Serializer, &a_Chunk, &DataRetrivalSucceeded](cWorld & a_World)
+		{
+			DataRetrivalSucceeded = a_World.GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer);
+		}
+	).wait();
+
+	if (!DataRetrivalSucceeded)
 	{
 		LOGWARNING("Cannot get chunk [%d, %d] data for NBT saving", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;

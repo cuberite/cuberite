@@ -1,5 +1,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#include "Chunk.h"
 #include "ClientHandle.h"
 #include "Server.h"
 #include "World.h"
@@ -65,11 +66,9 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
-	m_Player(nullptr),
-	m_CachedSentChunk(0, 0),
-	m_HasSentDC(false),
-	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
-	m_LastStreamedChunkZ(0x7fffffff),
+	m_ShouldDestroyPlayer(true),
+	m_Protocol(this),
+	m_Player(nullptr),  // In order to catch when client leaves before authentication
 	m_TicksSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
@@ -82,18 +81,15 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastDigBlockX(0),
 	m_LastDigBlockY(256),  // Invalid Y, so that the coords don't get picked up
 	m_LastDigBlockZ(0),
-	m_State(csConnected),
-	m_ShouldCheckDownloaded(false),
+	m_State(eState::csConnected),
+	m_ShouldRefreshSentChunks(true),
 	m_NumExplosionsThisTick(0),
 	m_NumBlockChangeInteractionsThisTick(0),
 	m_UniqueID(0),
-	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
 	m_LastPlacedSign(0, -1, 0),
 	m_ProtocolVersion(0)
 {
-	m_Protocol = new cProtocolRecognizer(this);
-
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
 	m_PingStartTime = std::chrono::steady_clock::now();
@@ -107,43 +103,31 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 
 cClientHandle::~cClientHandle()
 {
-	ASSERT(m_State == csDestroyed);  // Has Destroy() been called?
+	ASSERT(m_State == eState::csDestroyed);  // Has Destroy() been called?
 
-	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), static_cast<void *>(this));
-
-	{
-		cCSLock Lock(m_CSChunkLists);
-		m_LoadedChunks.clear();
-		m_ChunksToSend.clear();
-	}
-
-	if (m_Player != nullptr)
+	if (
+		m_ShouldDestroyPlayer &&  // If server is shutting down, m_Player is considered invalid. It will be cleaned up by cWorld
+		(m_Player != nullptr)
+	)
 	{
 		cWorld * World = m_Player->GetWorld();
-		if (World != nullptr)
-		{
-			RemoveFromAllChunks();
-			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-			if (!m_Username.empty())
+
+		// Upon clienthandle destruction, the world pointer of a valid player SHALL NOT be null.
+		// The only time where it can be null is after player construction but before cEntity::Initialize is called in the queued task in Authenticate.
+		// During this time, it is guaranteed that the clienthandle is not deleted.
+		ASSERT(World != nullptr);
+
+		World->QueueTask(
+			[this](cWorld & a_World)
 			{
-				// Send the Offline PlayerList packet:
-				World->BroadcastPlayerListRemovePlayer(*m_Player, this);
+				a_World.RemovePlayer(m_Player);
+				a_World.BroadcastPlayerListRemovePlayer(*m_Player);
+				m_Player->Destroy();
 			}
-			m_Player->DestroyNoScheduling(true);
-		}
-		delete m_Player;
-		m_Player = nullptr;
+		);
 	}
 
-	if (!m_HasSentDC)
-	{
-		SendDisconnect("Server shut down? Kthnxbai");
-	}
-
-	delete m_Protocol;
-	m_Protocol = nullptr;
-
-	LOGD("ClientHandle at %p deleted", static_cast<void *>(this));
+	LOGD("Deletied client \"%s\" at %p", GetUsername().c_str(), static_cast<void *>(this));
 }
 
 
@@ -152,35 +136,47 @@ cClientHandle::~cClientHandle()
 
 void cClientHandle::Destroy(void)
 {
+	ASSERT(cRoot::Get()->GetServer()->IsInTickThread());
+	if (!SetState(eState::csDestroying))
 	{
-		cCSLock Lock(m_CSOutgoingData);
+		// Already destroyed.
+		return;
+	}
+
+	{
+		cCSLock Lock(m_CSLink);
 		m_Link.reset();
 	}
-	{
-		cCSLock Lock(m_CSDestroyingState);
-		if (m_State >= csDestroying)
-		{
-			// Already called
-			return;
-		}
-		m_State = csDestroying;
-	}
+
+	RemoveFromWorld();
 
 	LOGD("%s: client %p, \"%s\"", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
+	SetState(eState::csDestroyed);
+}
 
-	if (m_Player != nullptr)
+
+
+
+
+bool cClientHandle::SetState(eState a_State)
+{
+	// Obtain state at a point in time to compare to a_State
+	auto ExpectedState = m_State.load();
+
+	while (
+		// Ensure that an exchange will be performed validly
+		(ExpectedState < a_State) &&
+
+		// Ensure that the current state matches what we have just verified
+		// If so, set the desired state
+		// Else, update ExpectedState to be the current value in preparation for another check and loop
+		!m_State.compare_exchange_weak(ExpectedState, a_State)
+	)
 	{
-		cWorld * World = m_Player->GetWorld();
-		if (World != nullptr)
-		{
-			m_Player->StopEveryoneFromTargetingMe();
-			m_Player->SetIsTicking(false);
-			World->RemovePlayer(m_Player, true);
-		}
-		m_Player->RemoveClientHandle();
+		continue;
 	}
 
-	m_State = csDestroyed;
+	return (ExpectedState < a_State);
 }
 
 
@@ -304,7 +300,7 @@ bool cClientHandle::IsUUIDOnline(const AString & a_UUID)
 
 void cClientHandle::Kick(const AString & a_Reason)
 {
-	if (m_State >= csAuthenticating)  // Don't log pings
+	if (IsLoggedIn())  // Don't log pings
 	{
 		LOGINFO("Kicking player %s for \"%s\"", m_Username.c_str(), StripColorCodes(a_Reason).c_str());
 	}
@@ -317,12 +313,13 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
-	if (m_State != csAuthenticating)
+	ASSERT(cRoot::Get()->GetServer()->IsInTickThread());
+
+	if (m_State != eState::csAuthenticating)
 	{
+		// TODO: is this necessary?
 		return;
 	}
-
-	ASSERT(m_Player == nullptr);
 
 	m_Username = a_Name;
 
@@ -337,107 +334,115 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	}
 
 	// Send login success (if the protocol supports it):
-	m_Protocol->SendLoginSuccess();
+	m_Protocol.SendLoginSuccess();
+
+	// Obtain a strong reference to ourselves
+	auto Client = shared_from_this();
 
 	// Spawn player (only serversided, so data is loaded)
-	m_Player = new cPlayer(m_Self, GetUsername());
-	InvalidateCachedSentChunk();
-	m_Self.reset();
+	auto Player = cpp14::make_unique<cPlayer>(Client, m_Username);
+	m_Player = Player.get();
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
 	if (World == nullptr)
 	{
 		World = cRoot::Get()->GetDefaultWorld();
-		m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
 	}
 
 	if (m_Player->GetGameMode() == eGameMode_NotSet)
 	{
 		m_Player->LoginSetGameMode(World->GetGameMode());
 	}
+	m_Player->SetIP(m_IPString);
 
-	m_Player->SetIP (m_IPString);
+	cpp14::move_on_copy_wrapper<decltype(Player)> PlayerPtr(std::move(Player));
+	World->QueueTask(
+		[World, Player = m_Player, PlayerPtr, Client](cWorld & a_World) mutable
+		{
+			// Plugins expect world to be set:
+			Player->SetWorld(World);
 
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
-	{
-		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
-		LOGINFO("Player %s has joined the game", m_Username.c_str());
-	}
+			if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*Player))
+			{
+				cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", Client->GetUsername().c_str()));
+				LOGINFO("Player %s has joined the game", Client->GetUsername().c_str());
+			}
 
-	m_ConfirmPosition = m_Player->GetPosition();
+			// Return a server login packet
+			Client->GetProtocol().SendLogin(*Player, *World);
 
-	// Return a server login packet
-	m_Protocol->SendLogin(*m_Player, *World);
+			// Send Weather if raining:
+			if ((World->GetWeather() == 1) || (World->GetWeather() == 2))
+			{
+				Client->GetProtocol().SendWeather(World->GetWeather());
+			}
 
-	// Send Weather if raining:
-	if ((World->GetWeather() == 1) || (World->GetWeather() == 2))
-	{
-		m_Protocol->SendWeather(World->GetWeather());
-	}
+			// Send time:
+			Client->GetProtocol().SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay(), World->IsDaylightCycleEnabled());
 
-	// Send time:
-	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay(), World->IsDaylightCycleEnabled());
+			// Send contents of the inventory window
+			Client->GetProtocol().SendWholeInventory(*Player->GetWindow());
 
-	// Send contents of the inventory window
-	m_Protocol->SendWholeInventory(*m_Player->GetWindow());
+			// Send health
+			Client->GetProtocol().SendHealth();
 
-	// Send health
-	m_Player->SendHealth();
+			// Send experience
+			Client->GetProtocol().SendExperience();
 
-	// Send experience
-	m_Player->SendExperience();
+			// Send player list items
+			cRoot::Get()->BroadcastPlayerListsAddPlayer(*Player);
+			cRoot::Get()->SendPlayerLists(Player);
 
-	// Send player list items
-	SendPlayerListAddPlayer(*m_Player);
-	cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
-	cRoot::Get()->SendPlayerLists(m_Player);
+			// Note: cEntity::Initialize takes ownership of the player object
+			Player->Initialize(std::move(PlayerPtr.value), *World);
 
-	m_Player->SetWorld(World);
-	m_State = csAuthenticated;
+			World->AddPlayer(Player);
+			Client->SetState(cClientHandle::eState::csAuthenticated);
 
-	// Query player team
-	m_Player->UpdateTeam();
+			// Query player team
+			Player->UpdateTeam();
 
-	// Send scoreboard data
-	World->GetScoreBoard().SendTo(*this);
+			// Send scoreboard data
+			World->GetScoreBoard().SendTo(*Client);
 
-	// Send statistics
-	SendStatistics(m_Player->GetStatManager());
+			// Send statistics
+			Client->GetProtocol().SendStatistics(Player->GetStatManager());
+
+			cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*Player);
+		}
+	);
 
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
 	m_PingStartTime = std::chrono::steady_clock::now() + std::chrono::seconds(3);  // Send the first KeepAlive packet in 3 seconds
-
-	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
 
 
 
 
 
-bool cClientHandle::StreamNextChunk(void)
+void cClientHandle::StreamAllChunks(void)
 {
-	if ((m_State < csAuthenticated) || (m_State >= csDestroying))
-	{
-		return true;
-	}
+	ASSERT((m_State >= eState::csAuthenticated) || (m_State < eState::csDestroying));
 	ASSERT(m_Player != nullptr);
+
+	if (m_Player->IsChangingWorlds())
+	{
+		// Make a best-effort attempt at bailing.
+		return;
+	}
 
 	int ChunkPosX = m_Player->GetChunkX();
 	int ChunkPosZ = m_Player->GetChunkZ();
-	if ((m_LastStreamedChunkX == ChunkPosX) && (m_LastStreamedChunkZ == ChunkPosZ))
-	{
-		// All chunks are already loaded. Abort loading.
-		return true;
-	}
+
+	std::vector<std::pair<cChunkCoords, cChunkSender::eChunkPriority>> ChunksToSend = {
+		{ cChunkCoords(ChunkPosX, ChunkPosZ), cChunkSender::E_CHUNK_PRIORITY_HIGH }
+	};
 
 	// Get the look vector and normalize it.
 	Vector3d Position = m_Player->GetEyePosition();
 	Vector3d LookVector = m_Player->GetLookVector();
 	LookVector.Normalize();
-
-	// Lock the list
-	cCSLock Lock(m_CSChunkLists);
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
 	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
@@ -462,19 +467,13 @@ bool cClientHandle::StreamNextChunk(void)
 					continue;
 				}
 
-				// If the chunk already loading / loaded -> skip
-				if (
-					(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
-					(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
-				)
-				{
-					continue;
-				}
-
-				// Unloaded chunk found -> Send it to the client.
-				Lock.Unlock();
-				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::E_CHUNK_PRIORITY_HIGH : cChunkSender::E_CHUNK_PRIORITY_MEDIUM));
-				return false;
+				// Send the chunk; StreamChunk queues a task which will abort if it has been called for the chunk already (we are part of the chunk's clientlist)
+				ChunksToSend.emplace_back(
+					std::make_pair(
+						cChunkCoords(ChunkX, ChunkZ),
+						(Range <= 2) ? cChunkSender::E_CHUNK_PRIORITY_HIGH : cChunkSender::E_CHUNK_PRIORITY_MEDIUM
+					)
+				);
 			}
 		}
 	}
@@ -483,144 +482,72 @@ bool cClientHandle::StreamNextChunk(void)
 	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
 		// For each distance add chunks in a hollow square centered around current position:
-		cChunkCoordsList CurcleChunks;
 		for (int i = -d; i <= d; ++i)
 		{
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX + d, ChunkPosZ + i));
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX - d, ChunkPosZ + i));
+			ChunksToSend.emplace_back(std::make_pair(cChunkCoords(ChunkPosX + d, ChunkPosZ + i), cChunkSender::E_CHUNK_PRIORITY_LOW));
+			ChunksToSend.emplace_back(std::make_pair(cChunkCoords(ChunkPosX - d, ChunkPosZ + i), cChunkSender::E_CHUNK_PRIORITY_LOW));
 		}
 		for (int i = -d + 1; i < d; ++i)
 		{
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ + d));
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ - d));
-		}
-
-		// For each the CurcleChunks list and send the first unloaded chunk:
-		for (cChunkCoordsList::iterator itr = CurcleChunks.begin(), end = CurcleChunks.end(); itr != end; ++itr)
-		{
-			cChunkCoords Coords = *itr;
-
-			// If the chunk already loading / loaded -> skip
-			if (
-				(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
-				(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
-			)
-			{
-				continue;
-			}
-
-			// Unloaded chunk found -> Send it to the client.
-			Lock.Unlock();
-			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::E_CHUNK_PRIORITY_LOW);
-			return false;
+			ChunksToSend.emplace_back(std::make_pair(cChunkCoords(ChunkPosZ + i, ChunkPosZ + d), cChunkSender::E_CHUNK_PRIORITY_LOW));
+			ChunksToSend.emplace_back(std::make_pair(cChunkCoords(ChunkPosZ + i, ChunkPosZ - d), cChunkSender::E_CHUNK_PRIORITY_LOW));
 		}
 	}
 
-	// All chunks are loaded -> Sets the last loaded chunk coordinates to current coordinates
-	m_LastStreamedChunkX = ChunkPosX;
-	m_LastStreamedChunkZ = ChunkPosZ;
-	return true;
-}
+	m_Player->GetWorld()->QueueTask(
+		[ChunksToSend = std::move(ChunksToSend), ClientHandle = shared_from_this()](cWorld & a_World)
+		{
+			for (const auto & Chunk : ChunksToSend)
+			{
+				if (a_World.AddChunkClient(Chunk.first.m_ChunkX, Chunk.first.m_ChunkZ, ClientHandle))
+				{
+					a_World.GetChunkSender().QueueSendChunkTo(Chunk.first.m_ChunkX, Chunk.first.m_ChunkZ, Chunk.second, ClientHandle);
 
+					// Clarification: std::partition, which cWorld::TickQueuedTasks uses, doesn't guarantee ordering
+					// However, we won't end up with a situation where a RemoveChunkClient ends up before an AddChunkClient for a chunk
+					// because UnloadChunk / RemoveChunkClient is based on our m_LoadedChunks list, which is only updated when this task to add a client has finished.
+				}
+			}
+		}
+	);
+}
 
 
 
 
 void cClientHandle::UnloadOutOfRangeChunks(void)
 {
-	int ChunkPosX = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosX()), cChunkDef::Width);
-	int ChunkPosZ = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosZ()), cChunkDef::Width);
-
-	cChunkCoordsList ChunksToRemove;
+	if (m_LoadedChunks.empty())
 	{
-		cCSLock Lock(m_CSChunkLists);
-		for (auto itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end();)
-		{
-			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
-			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
-			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
-			{
-				ChunksToRemove.push_back(*itr);
-				itr = m_LoadedChunks.erase(itr);
-			}
-			else
-			{
-				++itr;
-			}
-		}
-
-		for (auto itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
-		{
-			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
-			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
-			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
-			{
-				itr = m_ChunksToSend.erase(itr);
-			}
-			else
-			{
-				++itr;
-			}
-		}
-	}
-
-	for (cChunkCoordsList::iterator itr = ChunksToRemove.begin(); itr != ChunksToRemove.end(); ++itr)
-	{
-		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
-		SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
-	}
-}
-
-
-
-
-
-void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority)
-{
-	if (m_State >= csDestroying)
-	{
-		// Don't stream chunks to clients that are being destroyed
 		return;
 	}
 
-	cWorld * World = m_Player->GetWorld();
-	ASSERT(World != nullptr);
+	int ChunkPosX = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosX()), cChunkDef::Width);
+	int ChunkPosZ = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosZ()), cChunkDef::Width);
 
-	if (World->AddChunkClient(a_ChunkX, a_ChunkZ, this))
+	for (auto EraseItr = m_LoadedChunks.begin(); EraseItr != m_LoadedChunks.end();)
 	{
+		int DiffX = Diff(EraseItr->first.m_ChunkX, ChunkPosX);
+		int DiffZ = Diff(EraseItr->first.m_ChunkZ, ChunkPosZ);
+		if (
+			(DiffX <= m_CurrentViewDistance) &&
+			(DiffZ <= m_CurrentViewDistance) &&
+			(m_Player->GetWorld() == &EraseItr->second.get())
+		)
 		{
-			cCSLock Lock(m_CSChunkLists);
-			m_LoadedChunks.emplace(a_ChunkX, a_ChunkZ);
-			m_ChunksToSend.emplace(a_ChunkX, a_ChunkZ);
+			++EraseItr;
+			continue;
 		}
-		World->SendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, this);
-	}
-}
 
+		EraseItr->second.get().QueueTask(
+			[ChunkCoordinates = EraseItr->first, ClientHandle = shared_from_this()](cWorld & a_World)
+			{
+				a_World.RemoveChunkClient(ChunkCoordinates.m_ChunkX, ChunkCoordinates.m_ChunkZ, ClientHandle);
+			}
+		);
+		m_Protocol.SendUnloadChunk(EraseItr->first.m_ChunkX, EraseItr->first.m_ChunkZ);
 
-
-
-
-// Removes the client from all chunks. Used when switching worlds or destroying the player
-void cClientHandle::RemoveFromAllChunks()
-{
-	cWorld * World = m_Player->GetWorld();
-	if (World != nullptr)
-	{
-		World->RemoveClientFromChunks(this);
-	}
-
-	{
-		// Reset all chunk lists:
-		cCSLock Lock(m_CSChunkLists);
-		m_LoadedChunks.clear();
-		m_ChunksToSend.clear();
-		m_SentChunks.clear();
-
-		// Also reset the LastStreamedChunk coords to bogus coords,
-		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
-		m_LastStreamedChunkX = 0x7fffffff;
-		m_LastStreamedChunkZ = 0x7fffffff;
+		EraseItr = m_LoadedChunks.erase(EraseItr);
 	}
 }
 
@@ -632,26 +559,6 @@ void cClientHandle::HandleNPCTrade(int a_SlotNum)
 {
 	// TODO
 	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
-}
-
-
-
-
-
-void cClientHandle::HandlePing(void)
-{
-	// Somebody tries to retrieve information about the server
-	AString Reply;
-	const cServer & Server = *cRoot::Get()->GetServer();
-
-	Printf(Reply, "%s%s%i%s%i",
-		Server.GetDescription().c_str(),
-		cChatColor::Delimiter,
-		Server.GetNumPlayers(),
-		cChatColor::Delimiter,
-		Server.GetMaxPlayers()
-	);
-	Kick(Reply);
 }
 
 
@@ -676,8 +583,8 @@ bool cClientHandle::HandleLogin(UInt32 a_ProtocolVersion, const AString & a_User
 	}
 
 	// Schedule for authentication; until then, let the player wait (but do not block)
-	m_State = csAuthenticating;
-	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol->GetAuthServerID());
+	SetState(eState::csAuthenticating);
+	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol.GetAuthServerID());
 	return true;
 }
 
@@ -762,7 +669,7 @@ void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float 
 
 void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
 {
-	if ((m_Player == nullptr) || (m_State != csPlaying))
+	if (m_State != eState::csPlaying)
 	{
 		// The client hasn't been spawned yet and sends nonsense, we know better
 		return;
@@ -775,8 +682,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	}
 
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
-	Vector3d OldPosition = GetPlayer()->GetPosition();
-	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
+	Vector3d OldPosition = m_Player->GetPosition();
 
 	// If the player has moved too far, "repair" them:
 	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
@@ -794,7 +700,13 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 	// TODO: should do some checks to see if player is not moving through terrain
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
+	
+	if (cChunkDef::BlockToChunk(NewPosition) != cChunkDef::BlockToChunk(m_Player->GetLastPosition()))
+	{
+		m_ShouldRefreshSentChunks = true;
+	}
 
+	auto PreviousIsOnGround = m_Player->IsOnGround();
 	m_Player->SetPosition(NewPosition);
 	m_Player->SetStance(a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
@@ -996,14 +908,6 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
 	);
 
-	m_NumBlockChangeInteractionsThisTick++;
-
-	if (!CheckBlockInteractionsRate())
-	{
-		Kick("Too many blocks were destroyed per unit time - hacked client?");
-		return;
-	}
-
 	if ((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED))
 	{
 		if (a_BlockFace == BLOCK_FACE_NONE)
@@ -1042,7 +946,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		}
 	}
 
-	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	auto PlgMgr = cRoot::Get()->GetPluginManager();
 	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, static_cast<char>(a_Status)))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
@@ -1349,7 +1253,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		a_BlockFace = BLOCK_FACE_NONE;
 	}
 
-	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	auto PlgMgr = cRoot::Get()->GetPluginManager();
 	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
@@ -1375,14 +1279,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				m_Player->GetInventory().SendEquippedSlot();
 			}
 		}
-		return;
-	}
-
-	m_NumBlockChangeInteractionsThisTick++;
-
-	if (!CheckBlockInteractionsRate())
-	{
-		Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
 		return;
 	}
 
@@ -1488,6 +1384,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	// Not a command, broadcast as a message:
 	cCompositeChat Msg;
 	AString Color = m_Player->GetColor();
+
 	if (Color.length() == 3)
 	{
 		Color = AString("@") + Color[2];
@@ -1496,6 +1393,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	{
 		Color.clear();
 	}
+
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
 	Msg.ParseText(Message);
 	Msg.UnderlineUrls();
@@ -1508,7 +1406,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 
 void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	if ((m_Player == nullptr) || (m_State != csPlaying))
+	if (m_State != eState::csPlaying)
 	{
 		return;
 	}
@@ -1606,7 +1504,12 @@ void cClientHandle::HandleUpdateSign(
 	if (m_LastPlacedSign.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
 	{
 		m_LastPlacedSign.Set(0, -1, 0);
-		m_Player->GetWorld()->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+		m_Player->GetWorld()->QueueTask(
+			[=](cWorld & a_World)
+			{
+				a_World.SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+			}
+		);
 	}
 }
 
@@ -1684,11 +1587,6 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 
 void cClientHandle::HandleRespawn(void)
 {
-	if (m_Player == nullptr)
-	{
-		Destroy();
-		return;
-	}
 	m_Player->Respawn();
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -1717,24 +1615,8 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 		return true;
 	}
 
-	// Check if the player is waiting to be transferred to the World.
+	// Check if the username is connected already:
 	if (cRoot::Get()->GetServer()->IsPlayerInQueue(a_Username))
-	{
-		Kick("A player of the username is already logged in");
-		return false;
-	}
-
-	class cCallback :
-		public cPlayerListCallback
-	{
-		virtual bool Item(cPlayer * a_Player) override
-		{
-			return true;
-		}
-	} Callback;
-
-	// Check if the player is in any World.
-	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))
 	{
 		Kick("A player of the username is already logged in");
 		return false;
@@ -1793,9 +1675,9 @@ void cClientHandle::HandleEntityLeaveBed(UInt32 a_EntityID)
 		return;
 	}
 
-	cChunkInterface Interface(GetPlayer()->GetWorld()->GetChunkMap());
-	cBlockBedHandler::SetBedOccupationState(Interface, GetPlayer()->GetLastBedPos(), false);
-	GetPlayer()->SetIsInBed(false);
+	cChunkInterface Interface(m_Player->GetWorld()->GetChunkMap());
+	cBlockBedHandler::SetBedOccupationState(Interface, m_Player->GetLastBedPos(), false);
+	m_Player->SetIsInBed(false);
 }
 
 
@@ -1819,10 +1701,6 @@ void cClientHandle::HandleEntitySprinting(UInt32 a_EntityID, bool a_IsSprinting)
 
 void cClientHandle::HandleUnmount(void)
 {
-	if (m_Player == nullptr)
-	{
-		return;
-	}
 	m_Player->Detach();
 }
 
@@ -1833,6 +1711,7 @@ void cClientHandle::HandleUnmount(void)
 void cClientHandle::HandleTabCompletion(const AString & a_Text)
 {
 	AStringVector Results;
+	
 	// Get player name completions.
 	if (cRoot::Get()->GetServer()->ShouldAllowMultiWorldTabCompletion())
 	{
@@ -1843,8 +1722,9 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 		m_Player->GetWorld()->TabCompleteUserName(a_Text, Results);
 	}
 
-	// Get command completions.
+	// Get command completions
 	cRoot::Get()->GetPluginManager()->TabCompleteCommand(a_Text, Results, m_Player);
+	
 	if (Results.empty())
 	{
 		return;
@@ -1861,12 +1741,6 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 {
-	if (m_HasSentDC)
-	{
-		// This could crash the client, because they've already unloaded the world etc., and suddenly a wild packet appears (#31)
-		return;
-	}
-
 	cCSLock Lock(m_CSOutgoingData);
 	m_OutgoingData.append(a_Data, a_Size);
 }
@@ -1877,55 +1751,35 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 
 void cClientHandle::RemoveFromWorld(void)
 {
+	ASSERT(cRoot::Get()->GetServer()->IsInTickThread());
+
 	// Remove all associated chunks:
-	decltype(m_LoadedChunks) Chunks;
+	for (const auto & Chunk : m_LoadedChunks)
 	{
-		cCSLock Lock(m_CSChunkLists);
-		std::swap(Chunks, m_LoadedChunks);
-		m_ChunksToSend.clear();
+		Chunk.second.get().QueueTask(
+			[ChunkCoordinates = Chunk.first, ClientHandle = shared_from_this()](cWorld & a_World)
+			{
+				a_World.RemoveChunkClient(ChunkCoordinates.m_ChunkX, ChunkCoordinates.m_ChunkZ, ClientHandle);
+			}
+		);
+		GetProtocol().SendUnloadChunk(Chunk.first.m_ChunkX, Chunk.first.m_ChunkZ);
 	}
-	for (auto && Chunk : Chunks)
-	{
-		m_Protocol->SendUnloadChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ);
-	}  // for itr - Chunks[]
 
-	// Here, we set last streamed values to bogus ones so everything is resent
-	m_LastStreamedChunkX = 0x7fffffff;
-	m_LastStreamedChunkZ = 0x7fffffff;
+	m_LoadedChunks.clear();
 }
 
 
 
 
 
-void cClientHandle::InvalidateCachedSentChunk()
+bool cClientHandle::EnforceBlockInteractionsRate(void)
 {
-	ASSERT(m_Player != nullptr);
-	// Sets this to a junk value different from the player's current chunk, which invalidates it and
-	// ensures its value will not be used.
-	m_CachedSentChunk = cChunkCoords(m_Player->GetChunkX() + 500, m_Player->GetChunkZ());
-}
+	ASSERT(cRoot::Get()->GetServer()->IsInTickThread());
 
-
-
-
-
-bool cClientHandle::IsPlayerChunkSent()
-{
-	return m_HasSentPlayerChunk;
-}
-
-
-
-
-
-bool cClientHandle::CheckBlockInteractionsRate(void)
-{
-	ASSERT(m_Player != nullptr);
-	ASSERT(m_Player->GetWorld() != nullptr);
-
+	m_NumBlockChangeInteractionsThisTick++;
 	if (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS)
 	{
+		Kick("Too many blocks were destroyed per unit time - hacked client?");
 		return false;
 	}
 
@@ -1936,33 +1790,92 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 
 
-void cClientHandle::Tick(float a_Dt)
+void cClientHandle::ProcessQueuedIncomingData(void)
 {
-	// Process received network data:
-	AString IncomingData;
+	decltype(m_IncomingData) IncomingData;
 	{
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
 	}
+
 	if (!IncomingData.empty())
 	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+		m_Protocol.DataReceived(IncomingData.data(), IncomingData.size());
+	}
+}
+
+
+
+
+
+void cClientHandle::ProcessDataCommitQueue(void)
+{
+	if (m_DataCommitQueue.empty())
+	{
+		return;
 	}
 
-	// Send any queued outgoing data:
-	AString OutgoingData;
+	if ((m_Player == nullptr) || (m_Player->GetWorld() == nullptr))
+	{
+		Kick("Illegal packet sent - player not spawned yet - hacked client?");
+		return;
+	}
+
+	decltype(m_DataCommitQueue) DataCommitTasks;
+	std::swap(DataCommitTasks, m_DataCommitQueue);
+
+	m_Player->GetWorld()->QueueTask(
+		[DataCommitTasks = std::move(DataCommitTasks), Player = m_Player](cWorld & a_World)
+		{
+			if (Player->IsChangingWorlds() || (Player->GetWorld() != &a_World))
+			{
+				// IsChangingWorlds is true: cPlayer::m_World may be updated without warning - cannot handle this.
+				// cPlayer::m_World is unequal to a_World: player has completed world change - deal with after effect by bailing
+				return;
+			}
+
+			for (const auto & Task : DataCommitTasks)
+			{
+				Task();
+			}
+		}
+	);
+}
+
+
+
+
+
+void cClientHandle::ProcessQueuedOutgoingData(void)
+{
+	decltype(m_OutgoingData) OutgoingData;
 	{
 		cCSLock Lock(m_CSOutgoingData);
 		std::swap(OutgoingData, m_OutgoingData);
 	}
+
 	if (!OutgoingData.empty())
 	{
-		cTCPLinkPtr Link(m_Link);  // Grab a copy of the link in a multithread-safe way
-		if ((Link != nullptr))
 		{
-			Link->Send(OutgoingData.data(), OutgoingData.size());
+			cCSLock Lock(m_CSLink);
+
+			// All possible operations which reset m_Link MUST cause the clienthandle to cease to be ticked by the server
+			ASSERT(m_Link != nullptr);
+
+			m_Link->Send(OutgoingData);
 		}
 	}
+}
+
+
+
+
+
+void cClientHandle::Tick(float a_Dt)
+{
+	ProcessQueuedIncomingData();
+	ProcessQueuedOutgoingData();
+	ProcessDataCommitQueue();
 
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
@@ -1976,71 +1889,20 @@ void cClientHandle::Tick(float a_Dt)
 		return;
 	}
 
-
-	// Freeze the player if it is standing on a chunk not yet sent to the client
-	m_HasSentPlayerChunk = false;
-	if (m_Player->GetParentChunk() != nullptr)
-	{
-		// If the chunk is invalid, do not bother checking if it's sent to the client, it is definitely not
-		if (m_Player->GetParentChunk()->IsValid())
-		{
-			// Before iterating m_SentChunks, see if the player's coords equal m_CachedSentChunk
-			// If so, the chunk has been sent to the client. This is an optimization that saves an iteration of m_SentChunks.
-			if (cChunkCoords(m_Player->GetChunkX(), m_Player->GetChunkZ()) == m_CachedSentChunk)
-			{
-				m_HasSentPlayerChunk = true;
-			}
-			else
-			{
-				// This block is entered only when the player moves to a new chunk, invalidating the cached coords.
-				// Otherwise the cached coords are used.
-				cCSLock Lock(m_CSChunkLists);
-				auto itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), cChunkCoords(m_Player->GetChunkX(), m_Player->GetChunkZ()));
-				if (itr != m_SentChunks.end())
-				{
-					m_CachedSentChunk = *itr;
-					m_HasSentPlayerChunk = true;
-				}
-			}
-		}
-	}
-
-	// If the chunk the player's in was just sent, spawn the player:
-	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
-	{
-		m_Protocol->SendPlayerMoveLook();
-		m_State = csPlaying;
-	}
-
 	// Send a ping packet:
-	if (m_State == csPlaying)
+	if ((m_PingStartTime + PING_TIME_MS <= std::chrono::steady_clock::now()))
 	{
-		if ((m_PingStartTime + PING_TIME_MS <= std::chrono::steady_clock::now()))
-		{
-			m_PingID++;
-			m_PingStartTime = std::chrono::steady_clock::now();
-			m_Protocol->SendKeepAlive(m_PingID);
-		}
+		m_PingID++;
+		m_PingStartTime = std::chrono::steady_clock::now();
+		m_Protocol.SendKeepAlive(m_PingID);
 	}
 
-	if ((m_State >= csAuthenticated) && (m_State < csDestroying))
+	if (m_ShouldRefreshSentChunks && (m_State >= eState::csAuthenticated) && (m_State < eState::csDestroying))
 	{
-		// Stream 4 chunks per tick
-		for (int i = 0; i < 4; i++)
-		{
-			// Stream the next chunk
-			if (StreamNextChunk())
-			{
-				// Streaming finished. All chunks are loaded.
-				break;
-			}
-		}
+		StreamAllChunks();
+		UnloadOutOfRangeChunks();
 
-		// Unload all chunks that are out of the view distance (every 5 seconds)
-		if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
-		{
-			UnloadOutOfRangeChunks();
-		}
+		m_ShouldRefreshSentChunks = false;
 	}
 
 	// Handle block break animation:
@@ -2067,57 +1929,9 @@ void cClientHandle::Tick(float a_Dt)
 
 
 
-void cClientHandle::ServerTick(float a_Dt)
-{
-	// Process received network data:
-	AString IncomingData;
-	{
-		cCSLock Lock(m_CSIncomingData);
-		std::swap(IncomingData, m_IncomingData);
-	}
-	if (!IncomingData.empty())
-	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
-	}
-
-	// Send any queued outgoing data:
-	AString OutgoingData;
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		std::swap(OutgoingData, m_OutgoingData);
-	}
-	if ((m_Link != nullptr) && !OutgoingData.empty())
-	{
-		m_Link->Send(OutgoingData.data(), OutgoingData.size());
-	}
-
-	if (m_State == csAuthenticated)
-	{
-		StreamNextChunk();
-
-		// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
-		cRoot::Get()->GetServer()->ClientMovedToWorld(this);
-
-		// Add the player to the world (start ticking from there):
-		m_State = csDownloadingWorld;
-		m_Player->Initialize(*(m_Player->GetWorld()));
-		return;
-	}
-
-	m_TicksSinceLastPacket += 1;
-	if (m_TicksSinceLastPacket > 600)  // 30 seconds
-	{
-		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-	}
-}
-
-
-
-
-
 void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
-	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
+	m_Protocol.SendAttachEntity(a_Entity, a_Vehicle);
 }
 
 
@@ -2126,7 +1940,7 @@ void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a
 
 void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
-	m_Protocol->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType);
+	m_Protocol.SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType);
 }
 
 
@@ -2135,7 +1949,7 @@ void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 
 void cClientHandle::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
-	m_Protocol->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
+	m_Protocol.SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
 }
 
 
@@ -2144,17 +1958,7 @@ void cClientHandle::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_Bl
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	int ChunkX, ChunkZ = 0;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
-	cChunkCoords ChunkCoords = cChunkCoords(ChunkX, ChunkZ);
-
-	// Do not send block changes in chunks that weren't sent to the client yet:
-	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
-	{
-		Lock.Unlock();
-		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-	}
+	GetProtocol().SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2163,16 +1967,7 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
-	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
-
-	// Do not send block changes in chunks that weren't sent to the client yet:
-	cChunkCoords ChunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
-	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
-	{
-		Lock.Unlock();
-		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
-	}
+	GetProtocol().SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 }
 
 
@@ -2181,19 +1976,9 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
-	cWorld * World = GetPlayer()->GetWorld();
-	if (World == nullptr)
-	{
-		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
-		if (World == nullptr)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
-	}
-
-	bool ShouldUsePrefixes = World->ShouldUseChatPrefixes();
+	bool ShouldUsePrefixes = m_Player->GetWorld()->ShouldUseChatPrefixes();
 	AString Message = FormatMessageType(ShouldUsePrefixes, a_ChatPrefix, a_AdditionalData);
-	m_Protocol->SendChat(Message.append(a_Message), ctChatBox, ShouldUsePrefixes);
+	m_Protocol.SendChat(Message.append(a_Message), ctChatBox, ShouldUsePrefixes);
 }
 
 
@@ -2202,18 +1987,8 @@ void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefi
 
 void cClientHandle::SendChat(const cCompositeChat & a_Message)
 {
-	cWorld * World = GetPlayer()->GetWorld();
-	if (World == nullptr)
-	{
-		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
-		if (World == nullptr)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
-	}
-
-	bool ShouldUsePrefixes = World->ShouldUseChatPrefixes();
-	m_Protocol->SendChat(a_Message, ctChatBox, ShouldUsePrefixes);
+	bool ShouldUsePrefixes = m_Player->GetWorld()->ShouldUseChatPrefixes();
+	m_Protocol.SendChat(a_Message, ctChatBox, ShouldUsePrefixes);
 }
 
 
@@ -2222,18 +1997,8 @@ void cClientHandle::SendChat(const cCompositeChat & a_Message)
 
 void cClientHandle::SendChatAboveActionBar(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
-	cWorld * World = GetPlayer()->GetWorld();
-	if (World == nullptr)
-	{
-		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
-		if (World == nullptr)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
-	}
-
-	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
-	m_Protocol->SendChat(Message.append(a_Message), ctAboveActionBar);
+	AString Message = FormatMessageType(m_Player->GetWorld()->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
+	m_Protocol.SendChat(Message.append(a_Message), ctAboveActionBar);
 }
 
 
@@ -2242,7 +2007,7 @@ void cClientHandle::SendChatAboveActionBar(const AString & a_Message, eMessageTy
 
 void cClientHandle::SendChatAboveActionBar(const cCompositeChat & a_Message)
 {
-	m_Protocol->SendChat(a_Message, ctAboveActionBar, GetPlayer()->GetWorld()->ShouldUseChatPrefixes());
+	m_Protocol.SendChat(a_Message, ctAboveActionBar, m_Player->GetWorld()->ShouldUseChatPrefixes());
 }
 
 
@@ -2251,19 +2016,9 @@ void cClientHandle::SendChatAboveActionBar(const cCompositeChat & a_Message)
 
 void cClientHandle::SendChatSystem(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
-	cWorld * World = GetPlayer()->GetWorld();
-	if (World == nullptr)
-	{
-		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
-		if (World == nullptr)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
-	}
-
-	auto ShouldUsePrefixes = World->ShouldUseChatPrefixes();
+	auto ShouldUsePrefixes = m_Player->GetWorld()->ShouldUseChatPrefixes();
 	AString Message = FormatMessageType(ShouldUsePrefixes, a_ChatPrefix, a_AdditionalData);
-	m_Protocol->SendChat(Message.append(a_Message), ctSystem, ShouldUsePrefixes);
+	m_Protocol.SendChat(Message.append(a_Message), ctSystem, ShouldUsePrefixes);
 }
 
 
@@ -2272,49 +2027,80 @@ void cClientHandle::SendChatSystem(const AString & a_Message, eMessageType a_Cha
 
 void cClientHandle::SendChatSystem(const cCompositeChat & a_Message)
 {
-	m_Protocol->SendChat(a_Message, ctSystem, GetPlayer()->GetWorld()->ShouldUseChatPrefixes());
+	m_Protocol.SendChat(a_Message, ctSystem, m_Player->GetWorld()->ShouldUseChatPrefixes());
 }
 
 
 
 
 
-void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+void cClientHandle::SendChunkData(cWorld & a_ChunkSenderWorld, const cChunkCoords & a_ChunkCoordinates, cChunkDataSerializer & a_Serializer)
 {
-	ASSERT(m_Player != nullptr);
+	m_Protocol.SendChunkData(a_ChunkCoordinates.m_ChunkX, a_ChunkCoordinates.m_ChunkZ, a_Serializer);
 
-	// Check chunks being sent, erase them from m_ChunksToSend:
-	bool Found = false;
-	{
-		cCSLock Lock(m_CSChunkLists);
-		auto itr = m_ChunksToSend.find(cChunkCoords{a_ChunkX, a_ChunkZ});
-		if (itr != m_ChunksToSend.end())
+	cRoot::Get()->GetServer()->QueueTask(
+		[&a_ChunkSenderWorld, a_ChunkCoordinates, ClientHandle = shared_from_this()]
 		{
-			m_ChunksToSend.erase(itr);
-			Found = true;
+			// Add the chunk to the list of chunks sent to the player:
+			auto Result = ClientHandle->m_LoadedChunks.emplace(a_ChunkCoordinates, std::ref(a_ChunkSenderWorld));
+			if (Result.second || (&Result.first->second.get() != &a_ChunkSenderWorld))
+			{
+				auto Player = ClientHandle->GetPlayer();
+				if (
+					(Player->GetChunkX() == a_ChunkCoordinates.m_ChunkX) &&
+					(Player->GetChunkZ() == a_ChunkCoordinates.m_ChunkZ)
+				)
+				{
+					if (ClientHandle->m_State == eState::csAuthenticated)
+					{
+						ClientHandle->SendPlayerMoveLook();
+						ClientHandle->SetState(eState::csPlaying);
+					}
+
+					Player->GetWorld()->QueueTask(
+						[Player](cWorld & a_World)
+						{
+							auto SearchingPosition = Player->GetPosition();
+							if (SearchingPosition.y < 0)
+							{
+								SearchingPosition.y = 0;
+							}
+
+							while (SearchingPosition.y < cChunkDef::Height - 2)
+							{
+								// If we find a position with enough space for the player
+								if (a_World.GetBlock(SearchingPosition.x, SearchingPosition.y, SearchingPosition.z) == E_BLOCK_AIR)
+								{
+									if (a_World.GetBlock(SearchingPosition.x, SearchingPosition.y + 1, SearchingPosition.z) == E_BLOCK_AIR)
+									{
+										Player->TeleportToCoords(SearchingPosition);
+										break;
+									}
+									else
+									{
+										SearchingPosition.y += 2;
+									}
+								}
+								else
+								{
+									SearchingPosition.y++;
+								}
+							}
+						}
+					);
+				}
+
+				Result.first->second.get().QueueTask(
+					[a_ChunkCoordinates, ClientHandle](cWorld & a_World)
+					{
+						a_World.RemoveChunkClient(a_ChunkCoordinates.m_ChunkX, a_ChunkCoordinates.m_ChunkZ, ClientHandle);
+					}
+				);
+
+				Result.first->second = std::ref(a_ChunkSenderWorld);
+			}
 		}
-	}
-	if (!Found)
-	{
-		// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
-		// It's not a big issue anyway, just means that some chunks may be compressed several times
-		// LOGD("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
-		return;
-	}
-
-	if (m_Protocol == nullptr)
-	{
-		// TODO (#2588): investigate if and why this occurs
-		return;
-	}
-
-	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
-
-	// Add the chunk to the list of chunks sent to the player:
-	{
-		cCSLock Lock(m_CSChunkLists);
-		m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
-	}
+	);
 }
 
 
@@ -2323,7 +2109,7 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 
 void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
-	m_Protocol->SendCollectEntity(a_Entity, a_Player);
+	m_Protocol.SendCollectEntity(a_Entity, a_Player);
 }
 
 
@@ -2332,7 +2118,7 @@ void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & 
 
 void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
 {
-	m_Protocol->SendDestroyEntity(a_Entity);
+	m_Protocol.SendDestroyEntity(a_Entity);
 }
 
 
@@ -2341,7 +2127,7 @@ void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
 
 void cClientHandle::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
 {
-	m_Protocol->SendDetachEntity(a_Entity, a_PreviousVehicle);
+	m_Protocol.SendDetachEntity(a_Entity, a_PreviousVehicle);
 }
 
 
@@ -2350,14 +2136,27 @@ void cClientHandle::SendDetachEntity(const cEntity & a_Entity, const cEntity & a
 
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
-	// Destruction (Destroy()) is called when the client disconnects, not when a disconnect packet (or anything else) is sent
-	// Otherwise, the cClientHandle instance is can be unexpectedly removed from the associated player - Core/#142
-	if (!m_HasSentDC)
+	// Lemma 1: All outgoing data is queued to be sent on the server tick thread.
+	// Lemma 2: All link-closing actions will set state to destroyed.
+	// Lemma 3: A call to Destroy() is guaranteed to prevent the send queue from being processed.
+	// Corollary: Prevents situations where the client was signalled to disconnect - Kick() - and suddenly a wild packet appears (#31)
+	// Note: Kick packets are sent explicitly by flushing the queue; TODO: probably fine?
+
+	LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
+
 	{
-		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
-		m_Protocol->SendDisconnect(a_Reason);
-		m_HasSentDC = true;
+		cCSLock Lock(m_CSLink);
+		m_OutgoingData.clear();
+		m_Protocol.SendDisconnect(a_Reason);
+		ProcessQueuedOutgoingData();
 	}
+
+	cRoot::Get()->GetServer()->QueueTask(
+		[ClientHandle = shared_from_this()]
+		{
+			ClientHandle->Destroy();
+		}
+	);
 }
 
 
@@ -2367,7 +2166,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_LastPlacedSign.Set(a_BlockX, a_BlockY, a_BlockZ);
-	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
+	m_Protocol.SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -2376,7 +2175,7 @@ void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cClientHandle::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
 {
-	m_Protocol->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
+	m_Protocol.SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
 }
 
 
@@ -2385,7 +2184,7 @@ void cClientHandle::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, i
 
 void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
-	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
+	m_Protocol.SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
 }
 
 
@@ -2396,7 +2195,7 @@ void cClientHandle::SendEntityHeadLook(const cEntity & a_Entity)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 
-	m_Protocol->SendEntityHeadLook(a_Entity);
+	m_Protocol.SendEntityHeadLook(a_Entity);
 }
 
 
@@ -2407,7 +2206,7 @@ void cClientHandle::SendEntityLook(const cEntity & a_Entity)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 
-	m_Protocol->SendEntityLook(a_Entity);
+	m_Protocol.SendEntityLook(a_Entity);
 }
 
 
@@ -2416,7 +2215,7 @@ void cClientHandle::SendEntityLook(const cEntity & a_Entity)
 
 void cClientHandle::SendEntityMetadata(const cEntity & a_Entity)
 {
-	m_Protocol->SendEntityMetadata(a_Entity);
+	m_Protocol.SendEntityMetadata(a_Entity);
 }
 
 
@@ -2427,7 +2226,7 @@ void cClientHandle::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, cha
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 
-	m_Protocol->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+	m_Protocol.SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -2438,7 +2237,7 @@ void cClientHandle::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX,
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 
-	m_Protocol->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+	m_Protocol.SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -2447,7 +2246,7 @@ void cClientHandle::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX,
 
 void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
-	m_Protocol->SendEntityStatus(a_Entity, a_Status);
+	m_Protocol.SendEntityStatus(a_Entity, a_Status);
 }
 
 
@@ -2456,7 +2255,7 @@ void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 {
-	m_Protocol->SendEntityVelocity(a_Entity);
+	m_Protocol.SendEntityVelocity(a_Entity);
 }
 
 
@@ -2474,7 +2273,7 @@ void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_Blo
 	// Update the statistics:
 	m_NumExplosionsThisTick++;
 
-	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
+	m_Protocol.SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
 
 
@@ -2483,7 +2282,7 @@ void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_Blo
 
 void cClientHandle::SendGameMode(eGameMode a_GameMode)
 {
-	m_Protocol->SendGameMode(a_GameMode);
+	m_Protocol.SendGameMode(a_GameMode);
 }
 
 
@@ -2492,7 +2291,7 @@ void cClientHandle::SendGameMode(eGameMode a_GameMode)
 
 void cClientHandle::SendHealth(void)
 {
-	m_Protocol->SendHealth();
+	m_Protocol.SendHealth();
 }
 
 
@@ -2501,7 +2300,7 @@ void cClientHandle::SendHealth(void)
 
 void cClientHandle::SendHideTitle(void)
 {
-	m_Protocol->SendHideTitle();
+	m_Protocol.SendHideTitle();
 }
 
 
@@ -2510,7 +2309,7 @@ void cClientHandle::SendHideTitle(void)
 
 void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
-	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
+	m_Protocol.SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
 }
 
 
@@ -2519,7 +2318,7 @@ void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cI
 
 void cClientHandle::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
-	m_Protocol->SendMapData(a_Map, a_DataStartX, a_DataStartY);
+	m_Protocol.SendMapData(a_Map, a_DataStartX, a_DataStartY);
 }
 
 
@@ -2528,7 +2327,7 @@ void cClientHandle::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Data
 
 void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
-	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
+	m_Protocol.SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
 }
 
 
@@ -2537,7 +2336,7 @@ void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_S
 
 void cClientHandle::SendParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
 {
-	m_Protocol->SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
+	m_Protocol.SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
 }
 
 
@@ -2546,7 +2345,7 @@ void cClientHandle::SendParticleEffect(const AString & a_ParticleName, const Vec
 
 void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
-	m_Protocol->SendPickupSpawn(a_Pickup);
+	m_Protocol.SendPickupSpawn(a_Pickup);
 }
 
 
@@ -2554,7 +2353,7 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 
 void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
 {
-	m_Protocol->SendPaintingSpawn(a_Painting);
+	m_Protocol.SendPaintingSpawn(a_Painting);
 }
 
 
@@ -2563,7 +2362,7 @@ void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
 
 void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
-	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
+	m_Protocol.SendEntityAnimation(a_Entity, a_Animation);
 }
 
 
@@ -2572,7 +2371,7 @@ void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animati
 
 void cClientHandle::SendPlayerAbilities()
 {
-	m_Protocol->SendPlayerAbilities();
+	m_Protocol.SendPlayerAbilities();
 }
 
 
@@ -2581,7 +2380,7 @@ void cClientHandle::SendPlayerAbilities()
 
 void cClientHandle::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
-	m_Protocol->SendPlayerListAddPlayer(a_Player);
+	m_Protocol.SendPlayerListAddPlayer(a_Player);
 }
 
 
@@ -2590,7 +2389,7 @@ void cClientHandle::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 {
-	m_Protocol->SendPlayerListRemovePlayer(a_Player);
+	m_Protocol.SendPlayerListRemovePlayer(a_Player);
 }
 
 
@@ -2599,7 +2398,7 @@ void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 
 void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
-	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
+	m_Protocol.SendPlayerListUpdateGameMode(a_Player);
 }
 
 
@@ -2608,7 +2407,7 @@ void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 
 void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
-	m_Protocol->SendPlayerListUpdatePing(a_Player);
+	m_Protocol.SendPlayerListUpdatePing(a_Player);
 }
 
 
@@ -2617,7 +2416,7 @@ void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
 {
-	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
+	m_Protocol.SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
 
@@ -2626,7 +2425,7 @@ void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, co
 
 void cClientHandle::SendPlayerMaxSpeed(void)
 {
-	m_Protocol->SendPlayerMaxSpeed();
+	m_Protocol.SendPlayerMaxSpeed();
 }
 
 
@@ -2640,7 +2439,7 @@ void cClientHandle::SendPlayerMoveLook(void)
 		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
 	);
 	*/
-	m_Protocol->SendPlayerMoveLook();
+	m_Protocol.SendPlayerMoveLook();
 }
 
 
@@ -2649,7 +2448,7 @@ void cClientHandle::SendPlayerMoveLook(void)
 
 void cClientHandle::SendPlayerPosition(void)
 {
-	m_Protocol->SendPlayerPosition();
+	m_Protocol.SendPlayerPosition();
 }
 
 
@@ -2665,10 +2464,10 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 	}
 
 	LOGD("Spawning player \"%s\" on client \"%s\" @ %s",
-		a_Player.GetName().c_str(), GetPlayer()->GetName().c_str(), GetIPString().c_str()
+		a_Player.GetName().c_str(), m_Player->GetName().c_str(), GetIPString().c_str()
 	);
 
-	m_Protocol->SendPlayerSpawn(a_Player);
+	m_Protocol.SendPlayerSpawn(a_Player);
 }
 
 
@@ -2677,7 +2476,7 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cClientHandle::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	m_Protocol->SendPluginMessage(a_Channel, a_Message);
+	m_Protocol.SendPluginMessage(a_Channel, a_Message);
 }
 
 
@@ -2686,7 +2485,7 @@ void cClientHandle::SendPluginMessage(const AString & a_Channel, const AString &
 
 void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
-	m_Protocol->SendRemoveEntityEffect(a_Entity, a_EffectID);
+	m_Protocol.SendRemoveEntityEffect(a_Entity, a_EffectID);
 }
 
 
@@ -2695,7 +2494,7 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 void cClientHandle::SendResetTitle()
 {
-	m_Protocol->SendResetTitle();
+	m_Protocol.SendResetTitle();
 }
 
 
@@ -2704,7 +2503,7 @@ void cClientHandle::SendResetTitle()
 
 void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
-	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
+	m_Protocol.SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
 
@@ -2713,7 +2512,7 @@ void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimen
 
 void cClientHandle::SendExperience(void)
 {
-	m_Protocol->SendExperience();
+	m_Protocol.SendExperience();
 }
 
 
@@ -2722,7 +2521,7 @@ void cClientHandle::SendExperience(void)
 
 void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
-	m_Protocol->SendExperienceOrb(a_ExpOrb);
+	m_Protocol.SendExperienceOrb(a_ExpOrb);
 }
 
 
@@ -2731,7 +2530,7 @@ void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+	m_Protocol.SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
 }
 
 
@@ -2740,7 +2539,7 @@ void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AStrin
 
 void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
 {
-	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+	m_Protocol.SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
 }
 
 
@@ -2749,7 +2548,7 @@ void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString &
 
 void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
 {
-	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
+	m_Protocol.SendDisplayObjective(a_Objective, a_Display);
 }
 
 
@@ -2758,7 +2557,7 @@ void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboar
 
 void cClientHandle::SendSetSubTitle(const cCompositeChat & a_SubTitle)
 {
-	m_Protocol->SendSetSubTitle(a_SubTitle);
+	m_Protocol.SendSetSubTitle(a_SubTitle);
 }
 
 
@@ -2767,7 +2566,7 @@ void cClientHandle::SendSetSubTitle(const cCompositeChat & a_SubTitle)
 
 void cClientHandle::SendSetRawSubTitle(const AString & a_SubTitle)
 {
-	m_Protocol->SendSetRawSubTitle(a_SubTitle);
+	m_Protocol.SendSetRawSubTitle(a_SubTitle);
 }
 
 
@@ -2776,7 +2575,7 @@ void cClientHandle::SendSetRawSubTitle(const AString & a_SubTitle)
 
 void cClientHandle::SendSetTitle(const cCompositeChat & a_Title)
 {
-	m_Protocol->SendSetTitle(a_Title);
+	m_Protocol.SendSetTitle(a_Title);
 }
 
 
@@ -2785,7 +2584,7 @@ void cClientHandle::SendSetTitle(const cCompositeChat & a_Title)
 
 void cClientHandle::SendSetRawTitle(const AString & a_Title)
 {
-	m_Protocol->SendSetRawTitle(a_Title);
+	m_Protocol.SendSetRawTitle(a_Title);
 }
 
 
@@ -2794,7 +2593,7 @@ void cClientHandle::SendSetRawTitle(const AString & a_Title)
 
 void cClientHandle::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
-	m_Protocol->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
+	m_Protocol.SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
 }
 
 
@@ -2803,7 +2602,7 @@ void cClientHandle::SendSoundEffect(const AString & a_SoundName, double a_X, dou
 
 void cClientHandle::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
-	m_Protocol->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
+	m_Protocol.SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
 }
 
 
@@ -2812,7 +2611,7 @@ void cClientHandle::SendSoundParticleEffect(const EffectID a_EffectID, int a_Src
 
 void cClientHandle::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 {
-	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
+	m_Protocol.SendSpawnFallingBlock(a_FallingBlock);
 }
 
 
@@ -2821,7 +2620,7 @@ void cClientHandle::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 
 void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 {
-	m_Protocol->SendSpawnMob(a_Mob);
+	m_Protocol.SendSpawnMob(a_Mob);
 }
 
 
@@ -2830,7 +2629,7 @@ void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 
 void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
+	m_Protocol.SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
 }
 
 
@@ -2839,7 +2638,7 @@ void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType,
 
 void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)  // VehicleSubType is specific to Minecarts
 {
-	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
+	m_Protocol.SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
 }
 
 
@@ -2848,7 +2647,7 @@ void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTy
 
 void cClientHandle::SendStatistics(const cStatManager & a_Manager)
 {
-	m_Protocol->SendStatistics(a_Manager);
+	m_Protocol.SendStatistics(a_Manager);
 }
 
 
@@ -2857,7 +2656,7 @@ void cClientHandle::SendStatistics(const cStatManager & a_Manager)
 
 void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results)
 {
-	m_Protocol->SendTabCompletionResults(a_Results);
+	m_Protocol.SendTabCompletionResults(a_Results);
 }
 
 
@@ -2866,7 +2665,7 @@ void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results)
 
 void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
 {
-	m_Protocol->SendTeleportEntity(a_Entity);
+	m_Protocol.SendTeleportEntity(a_Entity);
 }
 
 
@@ -2875,7 +2674,7 @@ void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
 
 void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+	m_Protocol.SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -2884,7 +2683,7 @@ void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cClientHandle::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
 {
-	m_Protocol->SendTitleTimes(a_FadeInTicks, a_DisplayTicks, a_FadeOutTicks);
+	m_Protocol.SendTitleTimes(a_FadeInTicks, a_DisplayTicks, a_FadeOutTicks);
 }
 
 
@@ -2893,22 +2692,7 @@ void cClientHandle::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_
 
 void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
-	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
-}
-
-
-
-
-
-void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
-{
-	// Remove the chunk from the list of chunks sent to the client:
-	{
-		cCSLock Lock(m_CSChunkLists);
-		m_SentChunks.remove(cChunkCoords(a_ChunkX, a_ChunkZ));
-	}
-
-	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+	m_Protocol.SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
 }
 
 
@@ -2916,7 +2700,7 @@ void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 void cClientHandle::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
-	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
+	m_Protocol.SendUpdateBlockEntity(a_BlockEntity);
 }
 
 
@@ -2928,7 +2712,7 @@ void cClientHandle::SendUpdateSign(
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
 )
 {
-	m_Protocol->SendUpdateSign(
+	m_Protocol.SendUpdateSign(
 		a_BlockX, a_BlockY, a_BlockZ,
 		a_Line1, a_Line2, a_Line3, a_Line4
 	);
@@ -2940,7 +2724,7 @@ void cClientHandle::SendUpdateSign(
 
 void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+	m_Protocol.SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -2948,7 +2732,7 @@ void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Blo
 
 void cClientHandle::SendWeather(eWeather a_Weather)
 {
-	m_Protocol->SendWeather(a_Weather);
+	m_Protocol.SendWeather(a_Weather);
 }
 
 
@@ -2957,7 +2741,7 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 
 void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 {
-	m_Protocol->SendWholeInventory(a_Window);
+	m_Protocol.SendWholeInventory(a_Window);
 }
 
 
@@ -2966,7 +2750,7 @@ void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 
 void cClientHandle::SendWindowClose(const cWindow & a_Window)
 {
-	m_Protocol->SendWindowClose(a_Window);
+	m_Protocol.SendWindowClose(a_Window);
 }
 
 
@@ -2975,7 +2759,7 @@ void cClientHandle::SendWindowClose(const cWindow & a_Window)
 
 void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 {
-	m_Protocol->SendWindowOpen(a_Window);
+	m_Protocol.SendWindowOpen(a_Window);
 }
 
 
@@ -2984,7 +2768,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
-	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
+	m_Protocol.SendWindowProperty(a_Window, a_Property, a_Value);
 }
 
 
@@ -3011,15 +2795,19 @@ void cClientHandle::SetUsername( const AString & a_Username)
 
 void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
+	ASSERT(cRoot::Get()->GetServer()->IsInTickThread());
+	ASSERT(m_Player != nullptr);
+
 	m_RequestedViewDistance = a_ViewDistance;
 	LOGD("%s is requesting ViewDistance of %d!", GetUsername().c_str(), m_RequestedViewDistance);
 
-	// Set the current view distance based on the requested VD and world max VD:
-	cWorld * world = m_Player->GetWorld();
-	if (world != nullptr)
-	{
-		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
-	}
+	cWorld * World = m_Player->GetWorld();
+	World->QueueTask(
+		[a_ViewDistance, ClientHandle = shared_from_this()](cWorld & a_World)
+		{
+			ClientHandle->m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, a_World.GetMaxViewDistance());
+		}
+	);
 }
 
 
@@ -3029,40 +2817,6 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
 {
 	return (m_PluginChannels.find(a_PluginChannel) != m_PluginChannels.end());
-}
-
-
-
-
-
-bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkZ)
-{
-	if (m_State >= csDestroying)
-	{
-		return false;
-	}
-
-	cCSLock Lock(m_CSChunkLists);
-	return m_ChunksToSend.find(cChunkCoords(a_ChunkX, a_ChunkZ)) != m_ChunksToSend.end();
-}
-
-
-
-
-
-void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
-{
-	if (m_State >= csDestroying)
-	{
-		return;
-	}
-
-	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, static_cast<void *>(this));
-	cCSLock Lock(m_CSChunkLists);
-	if (m_ChunksToSend.find(cChunkCoords(a_ChunkX, a_ChunkZ)) == m_ChunksToSend.end())
-	{
-		m_ChunksToSend.emplace(a_ChunkX, a_ChunkZ);
-	}
 }
 
 
@@ -3107,33 +2861,18 @@ void cClientHandle::SocketClosed(void)
 {
 	// The socket has been closed for any reason
 
-	if (!m_Username.empty())  // Ignore client pings
-	{
-		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
-		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
-	}
-	if (m_Player != nullptr)
-	{
-		m_Player->GetWorld()->QueueTask([this](cWorld & World)
+	cRoot::Get()->GetServer()->QueueTask(
+		[ClientHandle = shared_from_this()]
 		{
-			UNUSED(World);
-			Destroy();
-		});
-	}
-	else
-	{
-		Destroy();
-	}
-}
+			if (!ClientHandle->GetUsername().empty())  // Ignore client pings
+			{
+				LOGD("Client %s @ %s disconnected", ClientHandle->GetUsername().c_str(), ClientHandle->GetIPString().c_str());
+				cRoot::Get()->GetPluginManager()->CallHookDisconnect(*ClientHandle, "Player disconnected");
+			}
 
-
-
-
-
-void cClientHandle::SetSelf(cClientHandlePtr a_Self)
-{
-	ASSERT(m_Self == nullptr);
-	m_Self = a_Self;
+			ClientHandle->Destroy();
+		}
+	);
 }
 
 
@@ -3142,6 +2881,7 @@ void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 
 void cClientHandle::OnLinkCreated(cTCPLinkPtr a_Link)
 {
+	cCSLock Lock(m_CSLink);
 	m_Link = a_Link;
 }
 
@@ -3165,10 +2905,6 @@ void cClientHandle::OnReceivedData(const char * a_Data, size_t a_Length)
 
 void cClientHandle::OnRemoteClosed(void)
 {
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		m_Link.reset();
-	}
 	SocketClosed();
 }
 
@@ -3181,10 +2917,6 @@ void cClientHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	LOGD("An error has occurred on client link for %s @ %s: %d (%s). Client disconnected.",
 		m_Username.c_str(), m_IPString.c_str(), a_ErrorCode, a_ErrorMsg.c_str()
 	);
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		m_Link.reset();
-	}
 	SocketClosed();
 }
 

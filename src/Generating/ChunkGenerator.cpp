@@ -15,9 +15,6 @@
 /** If the generation queue size exceeds this number, a warning will be output */
 const unsigned int QUEUE_WARNING_LIMIT = 1000;
 
-/** If the generation queue size exceeds this number, chunks with no clients will be skipped */
-const unsigned int QUEUE_SKIP_LIMIT = 500;
-
 
 
 
@@ -114,6 +111,11 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_Forc
 {
 	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
+	if (!a_ForceGenerate && m_ChunkSink->IsChunkValid(a_ChunkX, a_ChunkZ))
+	{
+		return;
+	}
+
 	{
 		cCSLock Lock(m_CS);
 
@@ -122,7 +124,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_Forc
 		{
 			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (" SIZE_T_FMT ")", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
-		m_Queue.push_back(cQueueItem{a_ChunkX, a_ChunkZ, a_ForceGenerate, a_Callback});
+		m_Queue.emplace_back(sQueueItem{ a_ChunkX, a_ChunkZ, a_Callback });
 	}
 
 	m_Event.Set();
@@ -137,20 +139,6 @@ void cChunkGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biom
 	if (m_Generator != nullptr)
 	{
 		m_Generator->GenerateBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
-	}
-}
-
-
-
-
-
-void cChunkGenerator::WaitForQueueEmpty(void)
-{
-	cCSLock Lock(m_CS);
-	while (!m_ShouldTerminate && !m_Queue.empty())
-	{
-		cCSUnlock Unlock(Lock);
-		m_evtRemoved.Wait();
 	}
 }
 
@@ -204,80 +192,39 @@ void cChunkGenerator::Execute(void)
 
 	while (!m_ShouldTerminate)
 	{
-		cCSLock Lock(m_CS);
-		while (m_Queue.empty())
+		m_Event.Wait();
+
+		decltype(m_Queue) QueuedChunks;
 		{
-			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
+			cCSLock Lock(m_CS);
+			std::swap(QueuedChunks, m_Queue);
+		}
+
+		NumChunksGenerated = 0;
+		GenerationStart = clock();
+		LastReportTick = clock();
+
+		for (const auto & Item : QueuedChunks)
+		{
+			// Display perf info once in a while:
+			if ((NumChunksGenerated > 512) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
 			{
-				/* LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-					static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC/ (clock() - GenerationStart),
+				LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
+					static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart),
 					NumChunksGenerated
-				); */
+					);
+				LastReportTick = clock();
 			}
-			cCSUnlock Unlock(Lock);
-			m_Event.Wait();
-			if (m_ShouldTerminate)
+
+			// Generate the chunk:
+			// LOGD("Generating chunk [%d, %d]", Item.m_ChunkX, Item.m_ChunkZ);
+			DoGenerate(Item.m_ChunkX, Item.m_ChunkZ);
+			if (Item.m_Callback != nullptr)
 			{
-				return;
+				Item.m_Callback->Call(Item.m_ChunkX, Item.m_ChunkZ, true);
 			}
-			NumChunksGenerated = 0;
-			GenerationStart = clock();
-			LastReportTick = clock();
+			NumChunksGenerated++;
 		}
-
-		if (m_Queue.empty())
-		{
-			// Sometimes the queue remains empty
-			// If so, we can't do any front() operations on it!
-			continue;
-		}
-
-		cQueueItem item = m_Queue.front();  // Get next chunk from the queue
-		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
-		m_Queue.erase(m_Queue.begin());  // Remove the item from the queue
-		Lock.Unlock();  // Unlock ASAP
-		m_evtRemoved.Set();
-
-		// Display perf info once in a while:
-		if ((NumChunksGenerated > 512) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
-		{
-			LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-				static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart),
-				NumChunksGenerated
-			);
-			LastReportTick = clock();
-		}
-
-		// Skip the chunk if it's already generated and regeneration is not forced. Report as success:
-		if (!item.m_ForceGenerate && m_ChunkSink->IsChunkValid(item.m_ChunkX, item.m_ChunkZ))
-		{
-			LOGD("Chunk [%d, %d] already generated, skipping generation", item.m_ChunkX, item.m_ChunkZ);
-			if (item.m_Callback != nullptr)
-			{
-				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, true);
-			}
-			continue;
-		}
-
-		// Skip the chunk if the generator is overloaded:
-		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(item.m_ChunkX, item.m_ChunkZ))
-		{
-			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
-			if (item.m_Callback != nullptr)
-			{
-				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, false);
-			}
-			continue;
-		}
-
-		// Generate the chunk:
-		// LOGD("Generating chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
-		DoGenerate(item.m_ChunkX, item.m_ChunkZ);
-		if (item.m_Callback != nullptr)
-		{
-			item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ, true);
-		}
-		NumChunksGenerated++;
 	}  // while (!bStop)
 }
 
@@ -288,7 +235,6 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_PluginInterface != nullptr);
 	ASSERT(m_ChunkSink != nullptr);
-	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
 	cChunkDesc ChunkDesc(a_ChunkX, a_ChunkZ);
 	m_PluginInterface->CallHookChunkGenerating(ChunkDesc);

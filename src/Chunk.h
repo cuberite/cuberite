@@ -88,7 +88,7 @@ public:
 		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,  // Neighbor chunks
 		cAllocationPool<cChunkData::sChunkSection> & a_Pool
 	);
-	cChunk(cChunk & other);
+
 	~cChunk();
 
 	/** Returns true iff the chunk block data is valid (loaded / generated) */
@@ -244,22 +244,21 @@ public:
 
 	int  GetHeight( int a_X, int a_Z);
 
-	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
+	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, const std::weak_ptr<cClientHandle> & a_Client);
 
 	/** Adds a client to the chunk; returns true if added, false if already there */
-	bool AddClient(cClientHandle * a_Client);
+	bool AddClient(const std::shared_ptr<cClientHandle> & a_Client);
 
 	/** Removes the specified client from the chunk; ignored if client not in chunk. */
-	void RemoveClient(cClientHandle * a_Client);
-
-	/** Returns true if the specified client is present in this chunk. */
-	bool HasClient(cClientHandle * a_Client);
+	void RemoveClient(const std::shared_ptr<cClientHandle> & a_Client);
 
 	/** Returns true if theres any client in the chunk; false otherwise */
 	bool HasAnyClients(void) const;
 
-	void AddEntity(cEntity * a_Entity);
-	void RemoveEntity(cEntity * a_Entity);
+	void AddEntity(std::unique_ptr<cEntity> a_Entity);
+
+	void RemoveEntity(cEntity & a_Entity);
+
 	bool HasEntity(UInt32 a_EntityID);
 
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
@@ -477,10 +476,13 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
-	// Makes a copy of the list
-	cClientHandleList GetAllClients(void) const
+	/** Collects and returns a list of all clients in the world who currently have this chunk. */
+	std::vector<std::shared_ptr<cClientHandle>> GetAllStrongClientPtrs(void);
+
+	/** Returns the internal data structure holding weak pointers to all clients in this chunk. */
+	auto & GetAllWeakClientPtrs(void)
 	{
-		return cClientHandleList(m_LoadedByClient.begin(), m_LoadedByClient.end());
+		return m_LoadedByClient;
 	}
 
 private:

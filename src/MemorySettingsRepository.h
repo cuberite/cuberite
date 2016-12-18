@@ -53,29 +53,26 @@ private:
 
 	struct sValue
 	{
-		sValue(AString value):
+		sValue(AString value) :
 			#ifdef _DEBUG
 				m_Type(eType::String),
 			#endif
 			m_stringValue (value)
-		{
-		}
+		{}
 
-		sValue(Int64 value):
+		sValue(Int64 value) :
 			#ifdef _DEBUG
 				m_Type(eType::Int64),
 			#endif
 			m_intValue(value)
-		{
-		}
+		{}
 
-		sValue(bool value):
+		sValue(bool value) :
 			#ifdef _DEBUG
 				m_Type(eType::Bool),
 			#endif
 			m_boolValue(value)
-		{
-		}
+		{}
 
 		AString getStringValue() const { ASSERT(m_Type == eType::String); return m_stringValue; }
 		Int64   getIntValue()    const { ASSERT(m_Type == eType::Int64);  return m_intValue;    }

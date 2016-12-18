@@ -508,11 +508,9 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 
 void cRoot::StartWorlds(void)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (const auto & World : m_WorldsByName)
 	{
-		itr->second->Start();
-		itr->second->InitializeSpawn();
-		m_PluginManager->CallHookWorldStarted(*itr->second);
+		World.second->Start();
 	}
 }
 
@@ -557,7 +555,7 @@ cWorld * cRoot::GetDefaultWorld()
 
 cWorld * cRoot::GetWorld(const AString & a_WorldName)
 {
-	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
+	auto itr = m_WorldsByName.find(a_WorldName);
 	if (itr != m_WorldsByName.end())
 	{
 		return itr->second;
@@ -572,15 +570,11 @@ cWorld * cRoot::GetWorld(const AString & a_WorldName)
 
 bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
+	for (const auto & World : m_WorldsByName)
 	{
-		++itr2;
-		if (itr->second != nullptr)
+		if (a_Callback.Item(World.second))
 		{
-			if (a_Callback.Item(itr->second))
-			{
-				return false;
-			}
+			return false;
 		}
 	}
 	return true;
@@ -674,9 +668,16 @@ void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AStri
 int cRoot::GetTotalChunkCount(void)
 {
 	int res = 0;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (const auto & World : m_WorldsByName)
 	{
-		res += itr->second->GetNumChunks();
+		int NumChunks;
+		World.second->QueueTask(
+			[&NumChunks](cWorld & a_World)
+			{
+				NumChunks = a_World.GetNumChunks();
+			}
+		).wait();
+		res += NumChunks;
 	}
 	return res;
 }
@@ -687,9 +688,9 @@ int cRoot::GetTotalChunkCount(void)
 
 void cRoot::SaveAllChunks(void)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (const auto & World : m_WorldsByName)
 	{
-		itr->second->QueueSaveAllChunks();
+		World.second->QueueSaveAllChunks();
 	}
 }
 
@@ -697,29 +698,29 @@ void cRoot::SaveAllChunks(void)
 
 void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (const auto & World : m_WorldsByName)
 	{
-		itr.second->SendPlayerList(a_DestPlayer);
-	}  // for itr - m_WorldsByName[]
+		World.second->SendPlayerList(a_DestPlayer);
+	}
 }
 
 
 
 void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (const auto & World : m_WorldsByName)
 	{
-		itr.second->BroadcastPlayerListAddPlayer(a_Player);
-	}  // for itr - m_WorldsByName[]
+		World.second->BroadcastPlayerListAddPlayer(a_Player);
+	}
 }
 
 
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (const auto & World : m_WorldsByName)
 	{
-		itr->second->BroadcastChat(a_Message, nullptr, a_ChatPrefix);
-	}  // for itr - m_WorldsByName[]
+		World.second->BroadcastChat(a_Message, nullptr, a_ChatPrefix);
+	}
 }
 
 
@@ -728,20 +729,19 @@ void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 
 void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (const auto & World : m_WorldsByName)
 	{
-		itr->second->BroadcastChat(a_Message);
-	}  // for itr - m_WorldsByName[]
+		World.second->BroadcastChat(a_Message);
+	}
 }
 
 
 
 bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
+	for (const auto & World : m_WorldsByName)
 	{
-		++itr2;
-		if (!itr->second->ForEachPlayer(a_Callback))
+		if (!World.second->ForEachPlayer(a_Callback))
 		{
 			return false;
 		}
@@ -808,9 +808,9 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end(); ++itr)
+	for (const auto & World : m_WorldsByName)
 	{
-		if (itr->second->DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
+		if (World.second->DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
 		{
 			return true;
 		}
@@ -824,7 +824,7 @@ bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback
 
 bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
-	for (auto World : m_WorldsByName)
+	for (const auto & World : m_WorldsByName)
 	{
 		if (World.second->DoWithPlayer(a_PlayerName, a_Callback))
 		{
@@ -958,16 +958,23 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	int SumNumInLighting = 0;
 	int SumNumInGenerator = 0;
 	int SumMem = 0;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (const auto & WorldEntry : m_WorldsByName)
 	{
-		cWorld * World = itr->second;
+		auto World = WorldEntry.second;
 		int NumInGenerator = World->GetGeneratorQueueLength();
 		int NumInSaveQueue = static_cast<int>(World->GetStorageSaveQueueLength());
 		int NumInLoadQueue = static_cast<int>(World->GetStorageLoadQueueLength());
 		int NumValid = 0;
 		int NumDirty = 0;
 		int NumInLighting = 0;
-		World->GetChunkStats(NumValid, NumDirty, NumInLighting);
+
+		World->QueueTask(
+			[&NumValid, &NumDirty, &NumInLighting](cWorld & a_World)
+			{
+				a_World.GetChunkStats(NumValid, NumDirty, NumInLighting);
+			}
+		).wait();
+
 		a_Output.Out("World %s:", World->GetName().c_str());
 		a_Output.Out("  Num loaded chunks: %d", NumValid);
 		a_Output.Out("  Num dirty chunks: %d", NumDirty);

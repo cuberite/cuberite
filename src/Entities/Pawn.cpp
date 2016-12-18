@@ -28,8 +28,10 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 
 
 cPawn::~cPawn()
+bool cPawn::OnPreWorldTravel(cWorld & a_NewWorld)
 {
 	ASSERT(m_TargetingMe.size() == 0);
+	return super::OnPreWorldTravel(a_NewWorld);
 }
 
 

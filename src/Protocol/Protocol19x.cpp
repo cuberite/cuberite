@@ -951,7 +951,7 @@ void cProtocol190::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto ClientHandle = a_Player.GetClientHandlePtr();
+	auto ClientHandle = a_Player.GetClientHandlePtr().lock();
 	if (ClientHandle != nullptr)
 	{
 		cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
@@ -2274,7 +2274,7 @@ void cProtocol190::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
+	m_Client->QueueDataCommit(&cClientHandle::HandleAnimation, m_Client, 0);  // Packet exists solely for arm-swing notification
 }
 
 
@@ -2292,7 +2292,7 @@ void cProtocol190::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
+	m_Client->QueueDataCommit(&cClientHandle::HandleLeftClick, m_Client, BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
 }
 
 
@@ -2312,7 +2312,13 @@ void cProtocol190::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+
+	m_Client->QueueDataCommit(
+		[Client = m_Client, BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ]
+		{
+			Client->HandleRightClick(BlockX, BlockY, BlockZ, cProtocol190::FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Client->GetPlayer()->GetEquippedItem());
+		}
+	);
 }
 
 
@@ -2324,18 +2330,24 @@ void cProtocol190::HandlePacketBoatSteer(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, RightPaddle);
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, LeftPaddle);
 
-	// Get the players vehicle
-	cPlayer * Player = m_Client->GetPlayer();
-	cEntity * Vehicle = Player->GetAttached();
-
-	if (Vehicle)
-	{
-		if (Vehicle->GetEntityType() == cEntity::etBoat)
+	m_Client->QueueDataCommit(
+		[Client = m_Client, RightPaddle, LeftPaddle]
 		{
-			auto * Boat = reinterpret_cast<cBoat *>(Vehicle);
-			Boat->UpdatePaddles(RightPaddle, LeftPaddle);
+			// Get the players vehicle
+			auto Player = Client->GetPlayer();
+			auto Vehicle = Player->GetAttached();
+
+			if (Vehicle == nullptr)
+			{
+				return;
+			}
+
+			if (Vehicle->GetEntityType() == cEntity::etBoat)
+			{
+				reinterpret_cast<cBoat *>(Vehicle)->UpdatePaddles(RightPaddle, LeftPaddle);
+			}
 		}
-	}
+	);
 }
 
 
@@ -2345,7 +2357,7 @@ void cProtocol190::HandlePacketBoatSteer(cByteBuffer & a_ByteBuffer)
 void cProtocol190::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Message);
-	m_Client->HandleChat(Message);
+	m_Client->QueueDataCommit(&cClientHandle::HandleChat, m_Client, Message);
 }
 
 
@@ -2378,21 +2390,25 @@ void cProtocol190::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 		case 0:
 		{
 			// Respawn
-			m_Client->HandleRespawn();
+			m_Client->QueueDataCommit(&cClientHandle::HandleRespawn, m_Client);
 			break;
 		}
 		case 1:
 		{
 			// Request stats
-			const cStatManager & Manager = m_Client->GetPlayer()->GetStatManager();
-			SendStatistics(Manager);
+			m_Client->QueueDataCommit(
+				[Client = m_Client]
+				{
+				Client->GetProtocol().SendStatistics(Client->GetPlayer()->GetStatManager());
+				}
+			);
 
 			break;
 		}
 		case 2:
 		{
 			// Open Inventory achievement
-			m_Client->GetPlayer()->AwardAchievement(achOpenInv);
+			m_Client->QueueDataCommit(&cPlayer::AwardAchievement, m_Client->GetPlayer(), achOpenInv);
 			break;
 		}
 	}
@@ -2420,7 +2436,7 @@ void cProtocol190::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 	{
 		return;
 	}
-	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick);
+	m_Client->QueueDataCommit(&cClientHandle::HandleCreativeInventory, m_Client, SlotNum, Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick);
 }
 
 
@@ -2435,11 +2451,11 @@ void cProtocol190::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	switch (Action)
 	{
-		case 0: m_Client->HandleEntityCrouch(PlayerID, true);     break;  // Crouch
-		case 1: m_Client->HandleEntityCrouch(PlayerID, false);    break;  // Uncrouch
-		case 2: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
-		case 3: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
-		case 4: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
+		case 0: m_Client->QueueDataCommit(&cClientHandle::HandleEntityCrouch, m_Client, PlayerID, true);     break;  // Crouch
+		case 1: m_Client->QueueDataCommit(&cClientHandle::HandleEntityCrouch, m_Client, PlayerID, false);    break;  // Uncrouch
+		case 2: m_Client->QueueDataCommit(&cClientHandle::HandleEntityLeaveBed, m_Client, PlayerID);         break;  // Leave Bed
+		case 3: m_Client->QueueDataCommit(&cClientHandle::HandleEntitySprinting, m_Client, PlayerID, true);  break;  // Start sprinting
+		case 4: m_Client->QueueDataCommit(&cClientHandle::HandleEntitySprinting, m_Client, PlayerID, false); break;  // Stop sprinting
 	}
 }
 
@@ -2460,7 +2476,7 @@ void cProtocol190::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 void cProtocol190::HandlePacketPlayer(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsOnGround);
-	// TODO: m_Client->HandlePlayerOnGround(IsOnGround);
+	// TODO: m_Client->QueueDataCommit(&cClientHandle::HandlePlayerOnGround, m_Client, IsOnGround);
 }
 
 
@@ -2484,7 +2500,7 @@ void cProtocol190::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 		CanFly = true;
 	}
 
-	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
+	m_Client->QueueDataCommit(&cClientHandle::HandlePlayerAbilities, m_Client, CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
 }
 
 
@@ -2496,7 +2512,7 @@ void cProtocol190::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  IsOnGround);
-	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
+	m_Client->QueueDataCommit(&cClientHandle::HandlePlayerLook, m_Client, Yaw, Pitch, IsOnGround);
 }
 
 
@@ -2509,7 +2525,12 @@ void cProtocol190::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
-	m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+	m_Client->QueueDataCommit(
+		[Client = m_Client, PosX, PosY, PosZ, IsOnGround]
+		{
+		Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+		}
+	);
 }
 
 
@@ -2524,7 +2545,7 @@ void cProtocol190::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
-	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+	m_Client->QueueDataCommit(&cClientHandle::HandlePlayerMoveLook, m_Client, PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
 }
 
 
@@ -2565,7 +2586,7 @@ void cProtocol190::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 void cProtocol190::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
-	m_Client->HandleSlotSelected(SlotNum);
+	m_Client->QueueDataCommit(&cClientHandle::HandleSlotSelected, m_Client, SlotNum);
 }
 
 
@@ -2580,7 +2601,7 @@ void cProtocol190::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 
 	if ((Flags & 0x2) != 0)
 	{
-		m_Client->HandleUnmount();
+		m_Client->QueueDataCommit(&cClientHandle::HandleUnmount, m_Client);
 	}
 	else if ((Flags & 0x1) != 0)
 	{
@@ -2588,7 +2609,7 @@ void cProtocol190::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 	}
 	else
 	{
-		m_Client->HandleSteerVehicle(Forward, Sideways);
+		m_Client->QueueDataCommit(&cClientHandle::HandleSteerVehicle, m_Client, Forward, Sideways);
 	}
 }
 
@@ -2607,7 +2628,7 @@ void cProtocol190::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
 	}
 
-	m_Client->HandleTabCompletion(Text);
+	m_Client->QueueDataCommit(&cClientHandle::HandleTabCompletion, m_Client, Text);
 }
 
 
@@ -2646,12 +2667,12 @@ void cProtocol190::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 		case 0:
 		{
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand)
-			m_Client->HandleUseEntity(EntityID, false);
+			m_Client->QueueDataCommit(&cClientHandle::HandleUseEntity, m_Client, EntityID, false);
 			break;
 		}
 		case 1:
 		{
-			m_Client->HandleUseEntity(EntityID, true);
+			m_Client->QueueDataCommit(&cClientHandle::HandleUseEntity, m_Client, EntityID, true);
 			break;
 		}
 		case 2:
@@ -2680,8 +2701,13 @@ void cProtocol190::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt64, Hand);
 
-	// Didn't click a block - emulate old values used with place block of -1, -1, -1 (and BLOCK_FACE_NONE).
-	m_Client->HandleRightClick(-1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->QueueDataCommit(
+		[Client = m_Client]
+		{
+			// Didn't click a block - emulate old values used with place block of -1, -1, -1 (and BLOCK_FACE_NONE).
+		Client->HandleRightClick(-1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0, Client->GetPlayer()->GetEquippedItem());
+		}
+	);
 }
 
 
@@ -2693,7 +2719,7 @@ void cProtocol190::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Enchantment);
 
-	m_Client->HandleEnchantItem(WindowID, Enchantment);
+	m_Client->QueueDataCommit(&cClientHandle::HandleEnchantItem, m_Client, WindowID, Enchantment);
 }
 
 
@@ -2709,17 +2735,23 @@ void cProtocol190::HandlePacketVehicleMove(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  pitch);
 
-	// Get the players vehicle
-	cEntity * Vehicle = m_Client->GetPlayer()->GetAttached();
+	m_Client->QueueDataCommit(
+		[Client = m_Client, xPos, yPos, zPos, yaw, pitch]
+		{
+			// Get the player's vehicle
+			auto Vehicle = Client->GetPlayer()->GetAttached();
+			if (Vehicle == nullptr)
+			{
+				return;
+			}
 
-	if (Vehicle)
-	{
-		Vehicle->SetPosX(xPos);
-		Vehicle->SetPosY(yPos);
-		Vehicle->SetPosZ(zPos);
-		Vehicle->SetYaw(yaw);
-		Vehicle->SetPitch(pitch);
-	}
+			Vehicle->SetPosX(xPos);
+			Vehicle->SetPosY(yPos);
+			Vehicle->SetPosZ(zPos);
+			Vehicle->SetYaw(yaw);
+			Vehicle->SetPitch(pitch);
+		}
+	);
 }
 
 
@@ -2771,7 +2803,7 @@ void cProtocol190::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->QueueDataCommit(&cClientHandle::HandleWindowClick, m_Client, WindowID, SlotNum, Action, Item);
 }
 
 
@@ -2781,7 +2813,7 @@ void cProtocol190::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 void cProtocol190::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
-	m_Client->HandleWindowClose(WindowID);
+	m_Client->QueueDataCommit(&cClientHandle::HandleWindowClose, m_Client, WindowID);
 }
 
 
@@ -2801,13 +2833,19 @@ void cProtocol190::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
-				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				m_Client->QueueDataCommit(&cClientHandle::HandleCommandBlockBlockChange, m_Client, BlockX, BlockY, BlockZ, Command);
 				break;
 			}
 
 			default:
 			{
-				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %u (0x%02x)", Mode, Mode), mtFailure);
+				m_Client->QueueDataCommit(
+					static_cast<void(cClientHandle::*)(const AString &, eMessageType, const AString &)>(&cClientHandle::SendChat),
+					m_Client,
+					Printf("Failure setting command block command; unhandled mode %u (0x%02x)", Mode, Mode),
+					mtFailure,
+					""
+				);
 				LOG("Unhandled MC|AdvCdm packet mode.");
 				return;
 			}
@@ -2826,19 +2864,19 @@ void cProtocol190::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect1);
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect2);
-		m_Client->HandleBeaconSelection(Effect1, Effect2);
+		m_Client->QueueDataCommit(&cClientHandle::HandleBeaconSelection, m_Client, Effect1, Effect2);
 		return;
 	}
 	else if (a_Channel == "MC|ItemName")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, ItemName);
-		m_Client->HandleAnvilItemName(ItemName);
+		m_Client->QueueDataCommit(&cClientHandle::HandleAnvilItemName, m_Client, ItemName);
 		return;
 	}
 	else if (a_Channel == "MC|TrSel")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, SlotNum);
-		m_Client->HandleNPCTrade(SlotNum);
+		m_Client->QueueDataCommit(&cClientHandle::HandleNPCTrade, m_Client, SlotNum);
 		return;
 	}
 	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());

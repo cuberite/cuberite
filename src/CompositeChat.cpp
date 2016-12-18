@@ -23,8 +23,9 @@ cCompositeChat::cCompositeChat(void) :
 
 
 
-cCompositeChat::cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType) :
-	m_MessageType(a_MessageType)
+cCompositeChat::cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData) :
+	m_MessageType(a_MessageType),
+	m_AdditionalMessageTypeData(a_AdditionalMessageTypeData)
 {
 	ParseText(a_ParseText);
 }

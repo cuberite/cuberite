@@ -66,7 +66,7 @@ private:
 				GetWindow()->BroadcastWholeWindow();
 			}
 
-			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+			m_World->QueueTask([this](cWorld & a_World) { a_World.MarkChunkDirty(GetChunkX(), GetChunkZ()); });
 		}
 	}
 

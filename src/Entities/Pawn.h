@@ -23,6 +23,8 @@ public:
 
 	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
 	~cPawn();
+
+	virtual bool OnPreWorldTravel(cWorld & a_NewWorld) override;
 	virtual void Destroyed() override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
