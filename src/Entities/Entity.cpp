@@ -132,7 +132,9 @@ const char * cEntity::GetParentClass(void) const
 
 bool cEntity::Initialize(cWorld & a_World)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this))
+	ASSERT(a_EntityWorld.IsInTickThread());
+
+	if (cPluginManager::Get()->CallHookSpawningEntity(a_EntityWorld, *this) && !IsPlayer())
 	{
 		return false;
 	}
@@ -144,15 +146,22 @@ bool cEntity::Initialize(cWorld & a_World)
 	);
 	*/
 
-	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
-	a_World.AddEntity(this);
-	ASSERT(m_World != nullptr);
+	cpp14::move_on_copy_wrapper<decltype(a_Entity)> Entity(std::move(a_Entity));
 
-	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
+	// So that entities do not appear in the middle of ticks
+	a_EntityWorld.QueueTask(
+		[Entity, &a_EntityWorld](cWorld & a_World)
+		{
+			auto & EntityPtr = *Entity.value;
 
-	// Spawn the entity on the clients:
-	a_World.BroadcastSpawnEntity(*this);
+			EntityPtr.SetWorld(&a_EntityWorld);
+			a_EntityWorld.AddEntity(std::move(Entity.value));
+
+			a_EntityWorld.BroadcastSpawnEntity(EntityPtr);
+			cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, EntityPtr);
+		}
+	);
 
 	return true;
 }
@@ -209,8 +218,7 @@ cChunk * cEntity::GetParentChunk() const
 
 void cEntity::Destroy(bool a_ShouldBroadcast)
 {
-	ASSERT(IsTicking());
-	ASSERT(GetParentChunk() != nullptr);
+	ASSERT(GetWorld()->IsInTickThread());
 	SetIsTicking(false);
 
 	if (a_ShouldBroadcast)
@@ -218,17 +226,20 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 		m_World->BroadcastDestroyEntity(*this);
 	}
 
-	cChunk * ParentChunk = GetParentChunk();
-	m_World->QueueTask([this, ParentChunk](cWorld & a_World)
-	{
-		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
-			this->GetUniqueID(), this->GetClass(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
-		);
-		ParentChunk->RemoveEntity(this);
-		delete this;
-	});
-	Destroyed();
+	// So that entities do not disappear unexpectedly during ticks
+	m_World->QueueTask(
+		[this](cWorld & a_World)
+		{
+			auto ParentChunk = GetParentChunk();
+			LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
+				GetUniqueID(), GetClass(),
+				ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+			);
+
+			Destroyed();  // TODO: rename to OnPreDestroy()
+			ParentChunk->RemoveEntity(*this);
+		}
+	);
 }
 
 

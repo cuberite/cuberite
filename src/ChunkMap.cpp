@@ -1582,10 +1582,7 @@ void cChunkMap::RemoveChunkClient(int a_ChunkX, int a_ChunkZ, const std::shared_
 
 
 
-
-void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 {
-	cCSLock Lock(m_CSChunks);
 	for (const auto & Chunk : m_Chunks)
 	{
 		Chunk.second->RemoveClient(a_Client);
@@ -1613,6 +1610,7 @@ void cChunkMap::AddEntity(cEntity * a_Entity)
 
 
 
+	ASSERT(GetWorld()->IsInTickThread());
 
 void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
 {
