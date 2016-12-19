@@ -197,10 +197,10 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<div class="upper">
 		<div class="wrapper">
 			<ul class="menu bottom_links">
-				<li><a href="http://cuberite.org/" target="_blank">Cuberite</a></li>
+				<li><a href="https://cuberite.org/" target="_blank">Cuberite</a></li>
 				<li><a href="https://forum.cuberite.org/" target="_blank">Forums</a></li>
 				<li><a href="https://builds.cuberite.org/" target="_blank">Buildserver</a></li>
-				<li><a href="http://api-docs.cuberite.org/" target="_blank">API Documentation</a></li>
+				<li><a href="https://api.cuberite.org/" target="_blank">API Documentation</a></li>
 				<li><a href="https://book.cuberite.org/" target="_blank">User's Manual</a></li>
 			</ul>
 		</div>

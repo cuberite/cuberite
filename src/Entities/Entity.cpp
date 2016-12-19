@@ -674,7 +674,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 {
 	// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
-	// Ref: http://www.minecraftwiki.net/wiki/Damage#Dealing_damage as of 2012_12_20
+	// Ref: http://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
 		case E_ITEM_WOODEN_SWORD:    return 4;
@@ -711,7 +711,7 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Effects as of 2012_12_20
+	// Ref.: http://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
 		case dtOnFire:
@@ -761,7 +761,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// Add up all armor points:
-	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Defense_points as of 2012_12_20
+	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points as of 2012_12_20
 	int ArmorValue = 0;
 	switch (GetEquippedHelmet().m_ItemType)
 	{
@@ -797,7 +797,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
-	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Mob_armor as of 2012_12_20
+	// Ref.: http://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
 	// Now ArmorValue is in [0, 20] range, which corresponds to [0, 80%] protection. Calculate the hitpoints from that:
 	return a_Damage * (ArmorValue * 4) / 100;

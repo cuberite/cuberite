@@ -5,7 +5,7 @@ Cuberite is a Minecraft-compatible multiplayer game server that is written in C+
 
 Cuberite can run on Windows, *nix and Android operating systems. This includes Android phones and tablets as well as Raspberry Pis.
 
-We currently support Release 1.8 and 1.9 Minecraft protocol versions.
+We currently support Release 1.8 - 1.10 Minecraft protocol versions.
 
 Subscribe to [the newsletter](https://cuberite.org/news/#subscribe) for important updates and project news.
 
@@ -54,8 +54,8 @@ You can also help with documentation by contributing to the [User's Manual](http
 Other Stuff
 -----------
 
-For other stuff, check out the [homepage](https://cuberite.org), the [Users' Manual](https://book.cuberite.org),
-the [forums](https://forum.cuberite.org/), and the [Plugin API](http://api-docs.cuberite.org/).
+For other stuff, check out the [homepage](https://cuberite.org/), the [Users' Manual](https://book.cuberite.org/),
+the [forums](https://forum.cuberite.org/), and the [Plugin API](https://api.cuberite.org/).
 
 [Support Us on Bountysource](https://bountysource.com/teams/cuberite)
 

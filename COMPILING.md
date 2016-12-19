@@ -15,15 +15,15 @@ Windows
 
 We use Microsoft Visual Studio for Windows compilation. It is possible to use other toolchains, but we don't test against them and they aren't supported. Visual Studio 2013 Express for Desktop is being actively used for development.
 
-You can find download links for VS2013 Express here: http://go.microsoft.com/?linkid=9832280
+You can find download links for VS2013 Express here: https://go.microsoft.com/?linkid=9832280
 
-Next, you need to download and install CMake. Download from here: http://cmake.org/cmake/resources/software.html . You should download a full installation package, so that the installer will set everything up for you (especially the paths).
+Next, you need to download and install CMake. Download from here: https://cmake.org/download/ . You should download a full installation package, so that the installer will set everything up for you (especially the paths).
 
 To contribute your changes to the source back to the repository, you need a Git client. Options are:
 
- * MsysGit: http://msysgit.github.io/
- * GitHub windows client: http://windows.github.com/
- * TortoiseGit: http://code.google.com/p/tortoisegit/
+ * Git for Windows: https://git-for-windows.github.io/
+ * GitHub Desktop: https://desktop.github.com/
+ * TortoiseGit: https://tortoisegit.org/
 
 Alternatively, if you want only to compile the source, without contributing, you can [download the sources in a ZIP file directly from GitHub](https://github.com/cuberite/cuberite/archive/master.zip).
 
@@ -50,11 +50,11 @@ In order to tinker with the code, you'll more than likely need to use the debugg
 OSX
 ---
 
-Install git from its [website](http://git-scm.com) or homebrew: `brew install git`.
+Install git from its [website](https://git-scm.com/) or homebrew: `brew install git`.
 
 Install Xcode (commandline tools are recommended) from the App Store or [the website](https://developer.apple.com/downloads).
 
-Install CMake from its [website](http://cmake.org) or homebrew: `brew install cmake`.
+Install CMake from its [website](https://cmake.org/) or homebrew: `brew install cmake`.
 
 ### Getting the sources ###
 
@@ -72,7 +72,7 @@ After doing so, run the command `xcodebuild lib/polarssl/POLARSSL.xcodeproj` in 
 Linux, FreeBSD etc.
 -------------------
 
-Install git, make, cmake and clang (or gcc), using your platform's package manager.  debian/ubuntu:
+Install git, make, cmake and clang (or gcc), using your platform's package manager. Debian/Ubuntu:
 
 ```
 sudo apt-get install git make cmake clang
@@ -96,7 +96,7 @@ cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 make -j`nproc`
 ```
 
-This will build Cuberite in release mode, which is better for almost all cases. For more `cmake` options, or for building in debug mode, see the section below.
+This will build Cuberite in release mode, which is better for almost all cases. For more `cmake` options, or for building in debug mode, see [CMake on Unix-based platforms](#cmake-on-unix-based-platforms).
 
 Android
 -------

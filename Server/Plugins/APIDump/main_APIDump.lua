@@ -271,7 +271,7 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 	f:write([[<!DOCTYPE html><html>
 		<head>
 		<title>Cuberite API - ]], HookName, [[ Hook</title>
-		<link rel="canonical" href="http://api-docs.cuberite.org/">
+		<link rel="canonical" href="https://api.cuberite.org/]], HookName, [[.html">
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -965,6 +965,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu, a_API)
 	cf:write([[<!DOCTYPE html><html>
 		<head>
 		<title>Cuberite API - ]], a_ClassAPI.Name, [[ Class</title>
+		<link rel="canonical" href="https://api.cuberite.org/]], a_ClassAPI.Name, [[.html">
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<link rel="stylesheet" type="text/css" href="prettify.css" />
 		<script src="prettify.js"></script>
@@ -1442,6 +1443,7 @@ local function DumpAPIHtml(a_API, a_Descs)
 		<html>
 		<head>
 		<title>Cuberite API - Index</title>
+		<link rel="canonical" href="https://api.cuberite.org/">
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		</head>
 		<body>
@@ -1641,7 +1643,7 @@ local function DumpLuaCheck(a_API)
 
 	file:write([[
 -- This file is the config file for the tool named Luacheck
--- Documentation: http://luacheck.readthedocs.io/en/stable/index.html
+-- Documentation: https://luacheck.readthedocs.io/en/stable/index.html
 
 -- Ignore unused function and loop arguments
 unused_args = false
@@ -1891,7 +1893,7 @@ end
 local function CheckNewUndocumentedSymbols()
 	-- Download the official API stats on undocumented stuff:
 	-- (We need a blocking downloader, which is impossible with the current cNetwork API)
-	assert(os.execute("wget -q -O official_undocumented.lua https://apidocs.cuberite.org/_undocumented.lua"))
+	assert(os.execute("wget -q -O official_undocumented.lua https://api.cuberite.org/_undocumented.lua"))
 	local OfficialStats = cFile:ReadWholeFile("official_undocumented.lua")
 	if (OfficialStats == "") then
 		return true, "Cannot load official stats"

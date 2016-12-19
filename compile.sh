@@ -186,7 +186,7 @@ The compilation and download will occur in the current directory.
 If you're updating, you should run: <Path to Cuberite>/compile.sh
 Compiling from source takes time, but it usually generates faster
 executables. If you prefer ready-to-use binaries or if you want
-more info, please visit:  http://cuberite.org/"
+more info, please visit:  https://cuberite.org/"
 
 doDependencyCheck()
 {
@@ -482,7 +482,7 @@ exit 0
 :windows_detected
 @echo off
 echo This script is not available for Windows yet, sorry.
-echo You can still download the Windows binaries from: http://cuberite.org
+echo You can still download the Windows binaries from: https://cuberite.org/
 echo You can also manually compile for Windows. See: https://github.com/cuberite/cuberite
 rem windows_exit
 exit

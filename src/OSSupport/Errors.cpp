@@ -20,7 +20,7 @@ AString GetOSErrorString( int a_ErrNo)
 
 	#else  // _WIN32
 
-	// According to http://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
+	// According to https://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
 
 	#if defined(__GLIBC__) && defined( _GNU_SOURCE) && !defined(ANDROID)  // GNU version of strerror_r()
 

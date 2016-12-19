@@ -3687,7 +3687,7 @@ end
 				<tr><td>@X</td><td>color X (X is 0 - 9 or a - f, same as dye meta</td></tr>
 				</table>
 				The following picture, taken from MineCraft Wiki, illustrates the color codes:</p>
-				<img src="http://hydra-media.cursecdn.com/minecraft.gamepedia.com/4/4c/Colors.png?version=34a0f56789a95326e1f7d82047b12232" />
+				<img src="https://hydra-media.cursecdn.com/minecraft.gamepedia.com/4/4c/Colors.png?version=34a0f56789a95326e1f7d82047b12232" />
 			]],
 			Functions =
 			{
