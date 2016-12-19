@@ -135,9 +135,9 @@ const char * cEntity::GetParentClass(void) const
 
 
 
-bool cEntity::Initialize(cWorld & a_World)
+bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this))
+	if (cPluginManager::Get()->CallHookSpawningEntity(a_EntityWorld, *this))
 	{
 		return false;
 	}
@@ -151,13 +151,13 @@ bool cEntity::Initialize(cWorld & a_World)
 
 	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
-	a_World.AddEntity(this);
+	a_EntityWorld.AddEntity(std::move(a_Self));
 	ASSERT(m_World != nullptr);
 
-	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
+	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
 	// Spawn the entity on the clients:
-	a_World.BroadcastSpawnEntity(*this);
+	a_EntityWorld.BroadcastSpawnEntity(*this);
 
 	return true;
 }
@@ -230,8 +230,10 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 			this->GetUniqueID(), this->GetClass(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
-		ParentChunk->RemoveEntity(this);
-		delete this;
+
+		// Make sure that RemoveEntity returned a valid smart pointer
+		// Also, not storing the returned pointer means automatic destruction
+		VERIFY(ParentChunk->RemoveEntity(*this));
 	});
 	Destroyed();
 }
@@ -1585,8 +1587,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
-		ParentChunk->RemoveEntity(this);
-		a_World->AddEntity(this);
+		a_World->AddEntity(ParentChunk->RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
 	});
 	return true;

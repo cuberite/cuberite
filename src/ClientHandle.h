@@ -416,6 +416,9 @@ private:
 
 	cPlayer * m_Player;
 
+	// Temporary (#3115-will-fix): maintain temporary ownership of created cPlayer objects while they are in limbo
+	std::unique_ptr<cPlayer> m_PlayerPtr;
+
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.
 	If this is equal to the coordinates of the chunk the player is currrently standing at, then this must be a sent chunk

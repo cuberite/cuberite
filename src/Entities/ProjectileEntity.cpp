@@ -260,7 +260,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 
 
 
-cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed)
+std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	Vector3d Speed;
 	if (a_Speed != nullptr)
@@ -270,15 +270,15 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 
 	switch (a_Kind)
 	{
-		case pkArrow:         return new cArrowEntity           (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkEgg:           return new cThrownEggEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkEnderPearl:    return new cThrownEnderPearlEntity(a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkSnowball:      return new cThrownSnowballEntity  (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkSplashPotion:  return new cSplashPotionEntity    (a_Creator, a_X, a_Y, a_Z, Speed, *a_Item);
-		case pkWitherSkull:   return new cWitherSkullEntity     (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkArrow:         return cpp14::make_unique<cArrowEntity>           (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkEgg:           return cpp14::make_unique<cThrownEggEntity>       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkEnderPearl:    return cpp14::make_unique<cThrownEnderPearlEntity>(a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkSnowball:      return cpp14::make_unique<cThrownSnowballEntity>  (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkGhastFireball: return cpp14::make_unique<cGhastFireballEntity>   (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkFireCharge:    return cpp14::make_unique<cFireChargeEntity>      (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkExpBottle:     return cpp14::make_unique<cExpBottleEntity>       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkSplashPotion:  return cpp14::make_unique<cSplashPotionEntity>    (a_Creator, a_X, a_Y, a_Z, Speed, *a_Item);
+		case pkWitherSkull:   return cpp14::make_unique<cWitherSkullEntity>     (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFirework:
 		{
 			ASSERT(a_Item != nullptr);
@@ -287,7 +287,7 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 				return nullptr;
 			}
 
-			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, *a_Item);
+			return cpp14::make_unique<cFireworkEntity>(a_Creator, a_X, a_Y, a_Z, *a_Item);
 		}
 		case pkFishingFloat: break;
 	}

@@ -28,7 +28,8 @@ class cEntity;
 class cClientHandle;
 class cBlockEntity;
 
-typedef std::list<cEntity *>          cEntityList;
+typedef std::unique_ptr<cEntity> OwnedEntity;
+typedef std::vector<OwnedEntity> cEntityList;
 typedef std::map<int, cBlockEntity *> cBlockEntities;
 
 
