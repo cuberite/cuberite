@@ -23,7 +23,7 @@ Useful Resources
 
  * [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki)
  * [Minecraft Protocol Wiki](http://wiki.vg/Main_Page)
- * [Lua API Documentation](http://api-docs.cuberite.org/)
+ * [Lua API Documentation](https://api.cuberite.org/)
  * [VS2013 Community Edition Download](https://www.visualstudio.com/products/visual-studio-community-vs)
 
 Setting up a Dev Environment

@@ -1236,7 +1236,7 @@ end
 						Type = "Vector3d",
 					},
 				},
-				Notes = "Returns a new Vector3d that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
+				Notes = "Returns a new Vector3d that is a {{https://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
 			},
 			Dot =
 			{
