@@ -304,8 +304,9 @@ AString & InPlaceUppercase(AString & s)
 
 AString StrToLower(const AString & s)
 {
-	AString res(s);
-	std::transform(res.begin(), res.end(), res.begin(), ::tolower);
+	AString res;
+	res.resize(s.size());
+	std::transform(s.begin(), s.end(), res.begin(), ::tolower);
 	return res;
 }
 
@@ -315,8 +316,9 @@ AString StrToLower(const AString & s)
 
 AString StrToUpper(const AString & s)
 {
-	AString res(s);
-	std::transform(res.begin(), res.end(), res.begin(), ::toupper);
+	AString res;
+	res.resize(s.size());
+	std::transform(s.begin(), s.end(), res.begin(), ::toupper);
 	return res;
 }
 
