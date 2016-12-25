@@ -85,6 +85,9 @@ extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AS
 /** Converts a stream of BE shorts into UTF-8 string; returns a_UTF8. */
 extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
 
+/** Converts a unicode character to its UTF8 representation. */
+extern AString UnicodeCharToUtf8(unsigned a_UnicodeChar);
+
 /** Converts a UTF-8 string into a UTF-16 BE string. */
 extern std::u16string UTF8ToRawBEUTF16(const AString & a_String);
 
@@ -98,8 +101,13 @@ extern AString EscapeString(const AString & a_Message);  // tolua_export
 /** Removes all control codes used by MC for colors and styles. */
 extern AString StripColorCodes(const AString & a_Message);  // tolua_export
 
-/** URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact */
-extern AString URLDecode(const AString & a_String);  // Cannot export to Lua automatically - would generated an extra return value
+/** URL-Decodes the given string.
+The first value specifies whether the decoding was successful.
+The second value is the decoded string, if successful. */
+extern std::pair<bool, AString> URLDecode(const AString & a_String);  // Exported to Lua as cUrlParser::UrlDecode()
+
+/** URL-encodes the given string. */
+extern AString URLEncode(const AString & a_Text);
 
 /** Replaces all occurrences of char a_From inside a_String with char a_To. */
 extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
@@ -112,6 +120,9 @@ extern AString Base64Encode(const AString & a_Input);  // Exported manually due 
 
 /** Reads two bytes from the specified memory location and interprets them as BigEndian short */
 extern short GetBEShort(const char * a_Mem);
+
+/** Reads two bytes from the specified memory location and interprets them as BigEndian unsigned short */
+extern unsigned short GetBEUShort(const char * a_Mem);
 
 /** Reads four bytes from the specified memory location and interprets them as BigEndian int */
 extern int GetBEInt(const char * a_Mem);

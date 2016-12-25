@@ -2112,6 +2112,66 @@ static int tolua_cUrlParser_ParseAuthorityPart(lua_State * a_LuaState)
 
 
 
+static int tolua_cUrlParser_UrlDecode(lua_State * tolua_S)
+{
+	// Check the param types:
+	cLuaState S(tolua_S);
+	if (
+		// Don't care about the first param
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the parameters:
+	AString Input;
+	S.GetStackValue(2, Input);
+
+	// Convert and return:
+	auto res = URLDecode(Input);
+	if (res.first)
+	{
+		S.Push(res.second);
+	}
+	else
+	{
+		S.Push(cLuaState::Nil);
+	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cUrlParser_UrlEncode(lua_State * tolua_S)
+{
+	// Check the param types:
+	cLuaState S(tolua_S);
+	if (
+		// Don't care about the first param
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the parameters:
+	AString Input;
+	S.GetStackValue(2, Input);
+
+	// Convert and return:
+	S.Push(URLEncode(Input));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWebAdmin_AddWebTab(lua_State * tolua_S)
 {
 	// Function signatures:
@@ -2324,28 +2384,15 @@ static int tolua_cWebAdmin_GetPage(lua_State * tolua_S)
 
 
 
-/** Binding for cWebAdmin::GetURLEncodedString.
-Manual code required because ToLua generates an extra return value */
+/** Binding for cWebAdmin::GetURLEncodedString. */
 static int tolua_cWebAdmin_GetURLEncodedString(lua_State * tolua_S)
 {
-	// Check the param types:
+	// Emit the obsoletion warning:
 	cLuaState S(tolua_S);
-	if (
-		// Don't care whether the first param is a cWebAdmin instance or class
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
-	{
-		return 0;
-	}
+	LOGWARNING("cWebAdmin:GetURLEncodedString() is obsolete, use cUrlParser:UrlEncode() instead.");
+	S.LogStackTrace();
 
-	// Get the parameters:
-	AString Input;
-	S.GetStackValue(2, Input);
-
-	// Convert and return:
-	S.Push(cWebAdmin::GetURLEncodedString(Input));
-	return 1;
+	return tolua_cUrlParser_UrlEncode(tolua_S);
 }
 
 
@@ -4042,6 +4089,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "IsKnownScheme",      tolua_cUrlParser_IsKnownScheme);
 			tolua_function(tolua_S, "Parse",              tolua_cUrlParser_Parse);
 			tolua_function(tolua_S, "ParseAuthorityPart", tolua_cUrlParser_ParseAuthorityPart);
+			tolua_function(tolua_S, "UrlDecode",          tolua_cUrlParser_UrlDecode);
+			tolua_function(tolua_S, "UrlEncode",          tolua_cUrlParser_UrlEncode);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cWebAdmin");

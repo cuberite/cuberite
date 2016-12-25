@@ -167,13 +167,22 @@ void cHTTPFormParser::ParseFormUrlEncoded(void)
 			case 1:
 			{
 				// Only name present
-				(*this)[URLDecode(ReplaceAllCharOccurrences(Components[0], '+', ' '))] = "";
+				auto name = URLDecode(ReplaceAllCharOccurrences(Components[0], '+', ' '));
+				if (name.first)
+				{
+					(*this)[name.second] = "";
+				}
 				break;
 			}
 			case 2:
 			{
 				// name=value format:
-				(*this)[URLDecode(ReplaceAllCharOccurrences(Components[0], '+', ' '))] = URLDecode(ReplaceAllCharOccurrences(Components[1], '+', ' '));
+				auto name = URLDecode(Components[0]);
+				auto value = URLDecode(Components[1]);
+				if (name.first && value.first)
+				{
+					(*this)[name.second] = value.second;
+				}
 				break;
 			}
 		}

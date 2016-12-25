@@ -13534,6 +13534,44 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 					},
 					Notes = "Parses the Authority part of the URL. Parts that are not explicitly specified in the AuthPart are returned empty, the port is returned zero. If parsing fails, the function returns nil and an error message.",
 				},
+				UrlDecode =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Text",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Decoded",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the Text, URL-decoded. Returns nil if there is a problem while decoding (invalid input).",
+				},
+				UrlEncode =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Text",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Encoded",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the Text, URL-encoded.",
+				},
 			},
 			AdditionalInfo =
 			{
