@@ -14,6 +14,42 @@
 
 
 
+/** Returns the value of the single hex digit.
+Returns 0xff on failure. */
+static unsigned char HexToDec(char a_HexChar)
+{
+	switch (a_HexChar)
+	{
+		case '0': return 0;
+		case '1': return 1;
+		case '2': return 2;
+		case '3': return 3;
+		case '4': return 4;
+		case '5': return 5;
+		case '6': return 6;
+		case '7': return 7;
+		case '8': return 8;
+		case '9': return 9;
+		case 'a': return 10;
+		case 'b': return 11;
+		case 'c': return 12;
+		case 'd': return 13;
+		case 'e': return 14;
+		case 'f': return 15;
+		case 'A': return 10;
+		case 'B': return 11;
+		case 'C': return 12;
+		case 'D': return 13;
+		case 'E': return 14;
+		case 'F': return 15;
+	}
+	return 0xff;
+}
+
+
+
+
+
 AString & AppendVPrintf(AString & str, const char * format, va_list args)
 {
 	ASSERT(format != nullptr);
@@ -353,40 +389,59 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
 	for (size_t i = 0; i < a_NumShorts; i++)
 	{
-		int c = GetBEShort(&a_RawData[i * 2]);
-		if (c < 0x80)
-		{
-			a_UTF8.push_back(static_cast<char>(c));
-		}
-		else if (c < 0x800)
-		{
-			a_UTF8.push_back(static_cast<char>(192 + c / 64));
-			a_UTF8.push_back(static_cast<char>(128 + c % 64));
-		}
-		else if (c - 0xd800 < 0x800)
-		{
-			// Error, silently drop
-		}
-		else if (c < 0x10000)
-		{
-			a_UTF8.push_back(static_cast<char>(224 + c / 4096));
-			a_UTF8.push_back(static_cast<char>(128 + (c / 64) % 64));
-			a_UTF8.push_back(static_cast<char>(128 + c % 64));
-		}
-		else if (c < 0x110000)
-		{
-			a_UTF8.push_back(static_cast<char>(240 + c / 262144));
-			a_UTF8.push_back(static_cast<char>(128 + (c / 4096) % 64));
-			a_UTF8.push_back(static_cast<char>(128 + (c / 64) % 64));
-			a_UTF8.push_back(static_cast<char>(128 + c % 64));
-		}
-		else
-		{
-			// Error, silently drop
-		}
+		a_UTF8.append(UnicodeCharToUtf8(GetBEUShort(&a_RawData[i * 2])));
 	}
 	return a_UTF8;
 }
+
+
+
+
+AString UnicodeCharToUtf8(unsigned a_UnicodeChar)
+{
+	if (a_UnicodeChar < 0x80)
+	{
+		return AString{static_cast<char>(a_UnicodeChar)};
+	}
+	else if (a_UnicodeChar < 0x800)
+	{
+		return AString
+		{
+			static_cast<char>(192 + a_UnicodeChar / 64),
+			static_cast<char>(128 + a_UnicodeChar % 64),
+		};
+	}
+	else if (a_UnicodeChar - 0xd800 < 0x800)
+	{
+		// Error
+		return AString();
+	}
+	else if (a_UnicodeChar < 0x10000)
+	{
+		return AString
+		{
+			static_cast<char>(224 + a_UnicodeChar / 4096),
+			static_cast<char>(128 + (a_UnicodeChar / 64) % 64),
+			static_cast<char>(128 + a_UnicodeChar % 64)
+		};
+	}
+	else if (a_UnicodeChar < 0x110000)
+	{
+		return AString
+		{
+			static_cast<char>(240 + a_UnicodeChar / 262144),
+			static_cast<char>(128 + (a_UnicodeChar / 4096) % 64),
+			static_cast<char>(128 + (a_UnicodeChar / 64) % 64),
+			static_cast<char>(128 + a_UnicodeChar % 64),
+		};
+	}
+	else
+	{
+		// Error
+		return AString();
+	}
+}
+
 
 
 
@@ -708,58 +763,99 @@ AString StripColorCodes(const AString & a_Message)
 
 
 
-AString URLDecode(const AString & a_String)
+std::pair<bool, AString> URLDecode(const AString & a_Text)
 {
 	AString res;
-	size_t len = a_String.length();
+	auto len = a_Text.size();
 	res.reserve(len);
 	for (size_t i = 0; i < len; i++)
 	{
-		char ch = a_String[i];
-		if ((ch != '%') || (i > len - 3))
+		if (a_Text[i] == '+')
 		{
-			res.push_back(ch);
+			res.push_back(' ');
 			continue;
 		}
-		// Decode the hex value:
-		char hi = a_String[i + 1], lo = a_String[i + 2];
-		if ((hi >= '0') && (hi <= '9'))
+		if (a_Text[i] != '%')
 		{
-			hi = hi - '0';
+			res.push_back(a_Text[i]);
+			continue;
 		}
-		else if ((hi >= 'a') && (hi <= 'f'))
+		if (i + 1 >= len)
 		{
-			hi = hi - 'a' + 10;
+			// String too short for an encoded value
+			return std::make_pair(false, AString());
 		}
-		else if ((hi >= 'A') && (hi <= 'F'))
+		if ((a_Text[i + 1] == 'u') || (a_Text[i + 1] == 'U'))
 		{
-			hi = hi - 'F' + 10;
+			// Unicode char "%u0xxxx"
+			if (i + 6 >= len)
+			{
+				return std::make_pair(false, AString());
+			}
+			if (a_Text[i + 2] != '0')
+			{
+				return std::make_pair(false, AString());
+			}
+			unsigned v1 = HexToDec(a_Text[i + 3]);
+			unsigned v2 = HexToDec(a_Text[i + 4]);
+			unsigned v3 = HexToDec(a_Text[i + 5]);
+			unsigned v4 = HexToDec(a_Text[i + 6]);
+			if ((v1 == 0xff) || (v2 == 0xff) || (v4 == 0xff) || (v3 == 0xff))
+			{
+				// Invalid hex numbers
+				return std::make_pair(false, AString());
+			}
+			res.append(UnicodeCharToUtf8((v1 << 12) | (v2 << 8) | (v3 << 4) | v4));
+			i = i + 6;
 		}
 		else
 		{
-			res.push_back(ch);
-			continue;
+			// Regular char "%xx":
+			if (i + 2 >= len)
+			{
+				return std::make_pair(false, AString());
+			}
+			auto v1 = HexToDec(a_Text[i + 1]);
+			auto v2 = HexToDec(a_Text[i + 2]);
+			if ((v1 == 0xff) || (v2 == 0xff))
+			{
+				// Invalid hex numbers
+				return std::make_pair(false, AString());
+			}
+			res.push_back(static_cast<char>((v1 << 4) | v2));
+			i = i + 2;
 		}
-		if ((lo >= '0') && (lo <= '9'))
+	}  // for i - a_Text[i]
+	return std::make_pair(true, res);
+}
+
+
+
+
+
+AString URLEncode(const AString & a_Text)
+{
+	AString res;
+	auto len = a_Text.size();
+	res.reserve(len);
+	static const char HEX[] = "0123456789abcdef";
+	for (size_t i = 0; i < len; ++i)
+	{
+		if (isalnum(a_Text[i]))
 		{
-			lo = lo - '0';
+			res.push_back(a_Text[i]);
 		}
-		else if ((lo >= 'a') && (lo <= 'f'))
+		else if (a_Text[i] == ' ')
 		{
-			lo = lo - 'a' + 10;
-		}
-		else if ((lo >= 'A') && (lo <= 'F'))
-		{
-			lo = lo - 'A' + 10;
+			res.push_back('+');
 		}
 		else
 		{
-			res.push_back(ch);
-			continue;
+			res.push_back('%');
+			res.push_back(HEX[static_cast<unsigned char>(a_Text[i]) >> 4]);
+			res.push_back(HEX[static_cast<unsigned char>(a_Text[i]) & 0x0f]);
 		}
-		res.push_back(static_cast<char>((hi << 4) | lo));
-		i += 2;
-	}  // for i - a_String[]
+	}
 	return res;
 }
 
@@ -901,6 +997,16 @@ short GetBEShort(const char * a_Mem)
 {
 	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
 	return static_cast<short>((Bytes[0] << 8) | Bytes[1]);
+}
+
+
+
+
+
+unsigned short GetBEUShort(const char * a_Mem)
+{
+	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
+	return static_cast<unsigned short>((Bytes[0] << 8) | Bytes[1]);
 }
 
 

@@ -121,6 +121,7 @@ return
 			GetURLEncodedString =
 			{
 				IsStatic = true,
+				ObsoletedBy = "cUrlParser:UrlEncode",
 				Params =
 				{
 					{
@@ -134,7 +135,7 @@ return
 						Type = "string",
 					},
 				},
-				Notes = "Returns the string given to it escaped by URL encoding, which makes the string suitable for transmission in an URL. Invalid characters are turned into \"%xy\" values.",
+				Notes = "<b>OBSOLETE</b> - use {{cUrlParser}}:UrlEncode() instead.<br/>Returns the string given to it escaped by URL encoding, which makes the string suitable for transmission in an URL. Invalid characters are turned into \"%xy\" values.",
 			},
 			Reload =
 			{
