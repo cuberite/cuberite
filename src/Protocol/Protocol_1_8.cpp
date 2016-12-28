@@ -3596,6 +3596,11 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEInt8(ZombiePigman.IsBaby() ? 1 : -1);
 			break;
 		}  // case mtZombiePigman
+
+		default:
+		{
+			break;
+		}  // default
 	}  // switch (a_Mob.GetType())
 }
 

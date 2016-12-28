@@ -3345,6 +3345,8 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 				case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
 				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
 				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
+
+				default: break;
 			}
 			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
 			{
@@ -4032,6 +4034,11 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		default:
+		{
+			break;
+		}  // default
 	}  // switch (a_Mob.GetType())
 }
 
