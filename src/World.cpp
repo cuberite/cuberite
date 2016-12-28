@@ -3862,6 +3862,11 @@ cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 	{
 		res = new cRedstoneNoopSimulator(*this);
 	}
+	else
+	{
+		LOGWARNING("[Physics] Unknown RedstoneSimulator \"%s\" in %s, using the default of \"Incremental\".", SimulatorName.c_str(), GetIniFileName().c_str());
+		res = new cIncrementalRedstoneSimulator(*this);
+	}
 
 	m_SimulatorManager->RegisterSimulator(res, 2 /* Two game ticks is a redstone tick */);
 
