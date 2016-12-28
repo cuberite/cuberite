@@ -48,6 +48,8 @@ void cPawn::Destroyed()
 
 void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	std::vector<cEntityEffect*> EffectsToTick;
+
 	// Iterate through this entity's applied effects
 	for (tEffectMap::iterator iter = m_EntityEffects.begin(); iter != m_EntityEffects.end();)
 	{
@@ -55,7 +57,8 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		cEntityEffect::eType EffectType = iter->first;
 		cEntityEffect * Effect = iter->second;
 
-		Effect->OnTick(*this);
+		// Call OnTick later to make sure the iterator won't be invalid
+		EffectsToTick.push_back(Effect);
 
 		// Iterates (must be called before any possible erasure)
 		++iter;
@@ -67,6 +70,12 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// TODO: Check for discrepancies between client and server effect values
+	}
+
+
+	for (cEntityEffect * Effect : EffectsToTick)
+	{
+		Effect->OnTick(*this);
 	}
 
 	class Pusher : public cEntityCallback
