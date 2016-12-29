@@ -90,7 +90,9 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
 	m_UUID((a_Client != nullptr) ? a_Client->GetUUID() : ""),
-	m_CustomName("")
+	m_CustomName(""),
+	m_SkinParts(0),
+	m_MainHand(mhRight)
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
 
@@ -2626,6 +2628,26 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 		pm->CallHookPlayerPlacedBlock(*this, blk);
 	}
 	return true;
+}
+
+
+
+
+
+void cPlayer::SetSkinParts(int a_Parts)
+{
+	m_SkinParts = a_Parts & spMask;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
+}
+
+
+
+
+
+void cPlayer::SetMainHand(eMainHand a_Hand)
+{
+	m_MainHand = a_Hand;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
 }
 
 

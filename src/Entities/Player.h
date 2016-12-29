@@ -499,6 +499,13 @@ public:
 	The blocks in range (a_BlockX - a_Range, a_BlockX + a_Range) are sent (NY-metric). */
 	void SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range = 1);
 
+	bool HasSkinPart(eSkinPart a_Part) const { return (m_SkinParts & a_Part) != 0; }
+	int GetSkinParts(void) const { return m_SkinParts; }
+	void SetSkinParts(int a_Parts);
+
+	eMainHand GetMainHand(void) const { return m_MainHand; }
+	void SetMainHand(eMainHand a_Hand);
+
 	// tolua_end
 
 	/** Calls the block placement hooks and places the blocks in the world.
@@ -681,6 +688,12 @@ protected:
 	AString m_UUID;
 
 	AString m_CustomName;
+
+	/** Displayed skin part bit mask */
+	int m_SkinParts;
+
+	/** The main hand of the player */
+	eMainHand m_MainHand;
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
