@@ -57,9 +57,6 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		cEntityEffect::eType EffectType = iter->first;
 		cEntityEffect * Effect = iter->second;
 
-		// Call OnTick later to make sure the iterator won't be invalid
-		EffectsToTick.push_back(Effect);
-
 		// Iterates (must be called before any possible erasure)
 		++iter;
 
@@ -67,6 +64,11 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if (Effect->GetDuration() - Effect->GetTicks() <= 0)
 		{
 			RemoveEntityEffect(EffectType);
+		}
+		// Call OnTick later to make sure the iterator won't be invalid
+		else
+		{
+			EffectsToTick.push_back(Effect);
 		}
 
 		// TODO: Check for discrepancies between client and server effect values
