@@ -48,7 +48,7 @@ void cPawn::Destroyed()
 
 void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	std::vector<cEntityEffect*> EffectsToTick;
+	std::vector<cEntityEffect *> EffectsToTick;
 
 	// Iterate through this entity's applied effects
 	for (tEffectMap::iterator iter = m_EntityEffects.begin(); iter != m_EntityEffects.end();)
@@ -73,7 +73,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 
-	for (cEntityEffect * Effect : EffectsToTick)
+	for (auto * Effect : EffectsToTick)
 	{
 		Effect->OnTick(*this);
 	}
