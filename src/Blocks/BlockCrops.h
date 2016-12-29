@@ -8,7 +8,8 @@
 
 
 
-/** Common class that takes care of carrots, potatoes and wheat */
+/** Common class that takes care of beetroots, carrots, potatoes and wheat */
+template <NIBBLETYPE RipeMeta>
 class cBlockCropsHandler :
 	public cBlockPlant
 {
@@ -23,11 +24,20 @@ public:
 	{
 		cFastRandom rand;
 
-		if (a_Meta == 0x7)
+		// Beetroots have three stages before fully grown
+		if (a_Meta >= RipeMeta)
 		{
 			// Is fully grown, drop the entire produce:
 			switch (m_BlockType)
 			{
+				case E_BLOCK_BEETROOTS:
+				{
+					char SeedCount = static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2);
+					a_Pickups.push_back(cItem(E_ITEM_BEETROOT_SEEDS, SeedCount, 0));
+					char BeetrootCount = static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3)) / 2);
+					a_Pickups.push_back(cItem(E_ITEM_BEETROOT, BeetrootCount, 0));  // [1 .. 3] with high preference of 2
+					break;
+				}
 				case E_BLOCK_CROPS:
 				{
 					a_Pickups.push_back(cItem(E_ITEM_WHEAT, 1, 0));
@@ -61,9 +71,10 @@ public:
 			// Drop 1 item of whatever is growing
 			switch (m_BlockType)
 			{
-				case E_BLOCK_CROPS:    a_Pickups.push_back(cItem(E_ITEM_SEEDS,  1, 0)); break;
-				case E_BLOCK_CARROTS:  a_Pickups.push_back(cItem(E_ITEM_CARROT, 1, 0)); break;
-				case E_BLOCK_POTATOES: a_Pickups.push_back(cItem(E_ITEM_POTATO, 1, 0)); break;
+				case E_BLOCK_BEETROOTS: a_Pickups.push_back(cItem(E_ITEM_BEETROOT_SEEDS, 1, 0)); break;
+				case E_BLOCK_CROPS:     a_Pickups.push_back(cItem(E_ITEM_SEEDS,          1, 0)); break;
+				case E_BLOCK_CARROTS:   a_Pickups.push_back(cItem(E_ITEM_CARROT,         1, 0)); break;
+				case E_BLOCK_POTATOES:  a_Pickups.push_back(cItem(E_ITEM_POTATO,         1, 0)); break;
 				default:
 				{
 					ASSERT(!"Unhandled block type");
@@ -82,7 +93,7 @@ public:
 
 		// If there is still room to grow and the plant can grow, then grow.
 		// Otherwise if the plant needs to die, then dig it up
-		if ((Meta < 7) && (Action == paGrowth))
+		if ((Meta < RipeMeta) && (Action == paGrowth))
 		{
 			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, ++Meta);
 		}

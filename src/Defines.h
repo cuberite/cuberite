@@ -173,6 +173,7 @@ enum eMobHeadType
 	SKULL_TYPE_ZOMBIE      = 2,
 	SKULL_TYPE_PLAYER      = 3,
 	SKULL_TYPE_CREEPER     = 4,
+	SKULL_TYPE_DRAGON      = 5,
 } ;
 
 
@@ -455,9 +456,30 @@ inline bool IsBlockWater(BLOCKTYPE a_BlockType)
 
 
 
+inline bool IsBlockIce(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ICE:
+		case E_BLOCK_PACKED_ICE:
+		case E_BLOCK_FROSTED_ICE:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
 inline bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType)
 {
-	return (IsBlockWater(a_BlockType) || (a_BlockType == E_BLOCK_ICE));
+	return (IsBlockWater(a_BlockType) || IsBlockIce(a_BlockType));
 }
 
 
@@ -507,6 +529,7 @@ inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
 		case E_BLOCK_FARMLAND:
+		case E_BLOCK_GRASS_PATH:
 		{
 			return true;
 		}
@@ -832,6 +855,7 @@ inline bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_MAGMA:
 		case E_BLOCK_RED_NETHER_BRICK:
 		case E_BLOCK_BONE_BLOCK:
+		case E_BLOCK_OBSERVER:
 		{
 			return true;
 		}

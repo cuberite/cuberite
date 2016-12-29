@@ -61,6 +61,7 @@ public:
 	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) override
 	{
 		return (
+			(a_Plant == E_BLOCK_BEETROOTS) ||
 			(a_Plant == E_BLOCK_CROPS) ||
 			(a_Plant == E_BLOCK_CARROTS) ||
 			(a_Plant == E_BLOCK_POTATOES) ||

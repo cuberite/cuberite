@@ -946,6 +946,7 @@ private:
 
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
+	bool m_IsBeetrootsBonemealable;
 	bool m_IsCactusBonemealable;
 	bool m_IsCarrotsBonemealable;
 	bool m_IsCropsBonemealable;

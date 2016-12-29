@@ -104,6 +104,7 @@ public:
 			case E_BLOCK_STONE_BRICK_STAIRS: return 11;
 			case E_BLOCK_OAK_WOOD_STAIRS: return 13;
 			case E_BLOCK_ACACIA_WOOD_STAIRS: return 15;
+			case E_BLOCK_PURPUR_STAIRS: return 16;
 			case E_BLOCK_DARK_OAK_WOOD_STAIRS: return 26;
 			case E_BLOCK_BRICK_STAIRS: return 28;
 			case E_BLOCK_NETHER_BRICK_STAIRS: return 35;

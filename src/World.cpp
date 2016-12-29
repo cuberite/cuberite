@@ -177,6 +177,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_MinThunderStormTicks(3600),   // 3 real-world minutes   -+
 	m_MaxCactusHeight(3),
 	m_MaxSugarcaneHeight(4),
+	m_IsBeetrootsBonemealable(true),
 	m_IsCactusBonemealable(false),
 	m_IsCarrotsBonemealable(true),
 	m_IsCropsBonemealable(true),
@@ -443,6 +444,7 @@ void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 	m_StorageCompressionFactor    = IniFile.GetValueSetI("Storage",       "CompressionFactor",           m_StorageCompressionFactor);
 	m_MaxCactusHeight             = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",             3);
 	m_MaxSugarcaneHeight          = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",          3);
+	m_IsBeetrootsBonemealable     = IniFile.GetValueSetB("Plants",        "IsBeetrootsBonemealable",     true);
 	m_IsCactusBonemealable        = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",        false);
 	m_IsCarrotsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",       true);
 	m_IsCropsBonemealable         = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",         true);
@@ -1700,6 +1702,26 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 	switch (BlockType)
 	{
+		case E_BLOCK_BEETROOTS:
+		{
+			if ((a_IsByBonemeal && !m_IsBeetrootsBonemealable) || (BlockMeta >= 3))
+			{
+				return false;
+			}
+			if (!a_IsByBonemeal)
+			{
+				++BlockMeta;
+			}
+			else
+			{
+				BlockMeta += 1;
+				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(3));
+			}
+			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
+		}
+
 		case E_BLOCK_CARROTS:
 		{
 			if ((a_IsByBonemeal && !m_IsCarrotsBonemealable) || (BlockMeta >= 7))
