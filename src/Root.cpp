@@ -303,11 +303,14 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 			m_InputThread.join();
 		}
 	#else
-		if (pthread_kill(m_InputThread.native_handle(), SIGKILL) != 0)
+		if (m_InputThread.get_id() != std::thread::id())
 		{
-			LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
-			m_TerminateEventRaised = true;
-			m_InputThread.detach();
+			if (pthread_kill(m_InputThread.native_handle(), SIGKILL) != 0)
+			{
+				LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
+				m_TerminateEventRaised = true;
+				m_InputThread.detach();
+			}
 		}
 	#endif
 
