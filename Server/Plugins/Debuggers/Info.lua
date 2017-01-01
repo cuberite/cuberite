@@ -290,6 +290,12 @@ g_PluginInfo =
 			HelpString = "Loads the specified chunk into memory",
 		},
 
+		["pluginstats"] =
+		{
+			Handler = HandleConsolePluginStats,
+			HelpString = "Shows the stats for each plugin",
+		},
+
 		["preparechunk"] =
 		{
 			Handler = HandleConsolePrepareChunk,
