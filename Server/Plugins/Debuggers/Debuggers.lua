@@ -54,7 +54,6 @@ function Initialize(a_Plugin)
 	-- TestBlockAreas()
 	-- TestSQLiteBindings()
 	-- TestExpatBindings()
-	TestPluginCalls()
 
 	TestBlockAreasString()
 	TestStringBase64()
@@ -62,10 +61,6 @@ function Initialize(a_Plugin)
 	-- TestRankMgr()
 	TestFileExt()
 	-- TestFileLastMod()
-	TestPluginInterface()
-
-	local LastSelfMod = cFile:GetLastModificationTime(a_Plugin:GetLocalFolder() .. "/Debuggers.lua")
-	LOG("Debuggers.lua last modified on " .. os.date("%Y-%m-%dT%H:%M:%S", LastSelfMod))
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
@@ -95,27 +90,6 @@ end;
 
 
 
-function TestPluginInterface()
-	cPluginManager:DoWithPlugin("Core",
-		function (a_CBPlugin)
-			if (a_CBPlugin:GetStatus() == cPluginManager.psLoaded) then
-				LOG("Core plugin was found, version " .. a_CBPlugin:GetVersion())
-			else
-				LOG("Core plugin is not loaded")
-			end
-		end
-	)
-
-	cPluginManager:ForEachPlugin(
-		function (a_CBPlugin)
-			LOG("Plugin in " .. a_CBPlugin:GetFolderName() .. " has an API name of " .. a_CBPlugin:GetName() .. " and status " .. a_CBPlugin:GetStatus())
-		end
-	)
-end
-
-
-
-
 function TestFileExt()
 	assert(cFile:ChangeFileExt("fileless_dir/", "new") == "fileless_dir/")
 	assert(cFile:ChangeFileExt("fileless_dir/", ".new") == "fileless_dir/")
@@ -138,37 +112,15 @@ end
 
 
 function TestFileLastMod()
+	local LastSelfMod = cFile:GetLastModificationTime(a_Plugin:GetLocalFolder() .. "/Debuggers.lua")
+	LOG("Debuggers.lua last modified on " .. os.date("%Y-%m-%dT%H:%M:%S", LastSelfMod))
+
 	local f = assert(io.open("test.txt", "w"))
 	f:write("test")
 	f:close()
 	local filetime = cFile:GetLastModificationTime("test.txt")
 	local ostime = os.time()
 	LOG("file time: " .. filetime .. ", OS time: " .. ostime .. ", difference: " .. ostime - filetime)
-end
-
-
-
-
-
-function TestPluginCalls()
-	-- In order to test the inter-plugin communication, we're going to call Core's ReturnColorFromChar() function
-	-- It is a rather simple function that doesn't need any tables as its params and returns a value, too
-	-- Note the signature: function ReturnColorFromChar( Split, char ) ... return cChatColog.Gray ... end
-	-- The Split parameter should be a table, but it is not used in that function anyway,
-	-- so we can get away with passing nil to it.
-
-	LOG("Debuggers: Calling NoSuchPlugin.FnName()...")
-	cPluginManager:CallPlugin("NoSuchPlugin", "FnName", "SomeParam")
-	LOG("Debuggers: Calling Core.NoSuchFunction()...")
-	cPluginManager:CallPlugin("Core", "NoSuchFunction", "SomeParam")
-	LOG("Debuggers: Calling Core.ReturnColorFromChar(..., \"8\")...")
-	local Gray = cPluginManager:CallPlugin("Core", "ReturnColorFromChar", "split", "8")
-	if (Gray ~= cChatColor.Gray) then
-		LOGWARNING("Debuggers: Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
-	else
-		LOG("Debuggers: Call succeeded")
-	end
-	LOG("Debuggers: Inter-plugin calls done.")
 end
 
 
@@ -1989,6 +1941,18 @@ function HandleConsoleLoadChunk(a_Split)
 	return true
 end
 
+
+
+
+
+function HandleConsolePluginStats(a_Split)
+	cPluginManager:ForEachPlugin(
+		function (a_CBPlugin)
+			LOG("Plugin in " .. a_CBPlugin:GetFolderName() .. " has an API name of " .. a_CBPlugin:GetName() .. " and status " .. a_CBPlugin:GetStatus())
+		end
+	)
+	return true
+end
 
 
 
