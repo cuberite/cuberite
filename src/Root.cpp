@@ -339,16 +339,17 @@ void cRoot::StopServer()
 		virtual bool Item(cPlayer * a_Player)
 		{
 			a_Player->GetClientHandlePtr()->Kick(m_ShutdownMessage);
+			m_HasSentDisconnect = true;
 			return false;
 		}
 	public:
-		cPlayerCallback(AString a_ShutdownMessage) : m_ShutdownMessage(a_ShutdownMessage) {}
-	};
+		bool m_HasSentDisconnect;
+		cPlayerCallback(AString a_ShutdownMessage) : m_ShutdownMessage(a_ShutdownMessage) { m_HasSentDisconnect = false; }
+	} PlayerCallback(m_Server->GetShutdownMessage());
 
-	if (m_Server->GetNumPlayers())
+	cRoot::Get()->ForEachPlayer(PlayerCallback);
+	if (PlayerCallback.m_HasSentDisconnect)
 	{
-		cPlayerCallback PlayerCallback((m_Server->GetShutdownMessage()));
-		cRoot::Get()->ForEachPlayer(PlayerCallback);
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 	m_TerminateEventRaised = true;
