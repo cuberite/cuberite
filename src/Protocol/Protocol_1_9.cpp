@@ -2355,12 +2355,14 @@ void cProtocol_1_9_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ViewDistance);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinFlags);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinParts);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,   MainHand);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
-	// TODO: Handle other values
+	m_Client->GetPlayer()->SetSkinParts(SkinParts);
+	m_Client->GetPlayer()->SetMainHand(static_cast<eMainHand>(MainHand));
+	// TODO: Handle chat flags and chat colors
 }
 
 
@@ -3552,9 +3554,17 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
 			a_Pkt.WriteString(Player.GetName());
 
-			a_Pkt.WriteBEUInt8(6);  // Start metadata - Index 6: Health
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Health
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			a_Pkt.WriteBEUInt8(12);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			a_Pkt.WriteBEUInt8(13);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
 			break;
 		}
 		case cEntity::etPickup:

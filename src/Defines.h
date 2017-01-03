@@ -203,6 +203,42 @@ enum eMobHeadRotation
 
 
 
+enum eHand
+{
+	hMain = 0,
+	hOff = 1,
+} ;
+
+
+
+
+
+enum eMainHand
+{
+	mhLeft = 0,
+	mhRight = 1,
+} ;
+
+
+
+
+
+enum eSkinPart
+{
+	spCape = 0x01,
+	spJacket = 0x02,
+	spLeftSleeve = 0x04,
+	spRightSleeve = 0x08,
+	spLeftPants = 0x10,
+	spRightPants = 0x20,
+	spHat = 0x40,
+	spMask = 0x7F,
+};
+
+
+
+
+
 inline const char * ClickActionToString(int a_ClickAction)
 {
 	switch (a_ClickAction)
