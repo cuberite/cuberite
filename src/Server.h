@@ -64,6 +64,8 @@ public:
 
 	const AString & GetDescription(void) const {return m_Description; }
 
+	const AString & GetShutdownMessage(void) const { return m_ShutdownMessage; }
+
 	// Player counts:
 	int  GetMaxPlayers(void) const { return m_MaxPlayers; }
 	int  GetNumPlayers(void) const;
@@ -204,6 +206,7 @@ private:
 	cRCONServer m_RCONServer;
 
 	AString m_Description;
+	AString m_ShutdownMessage;
 	AString m_FaviconData;
 	int m_MaxPlayers;
 	bool m_bIsHardcore;

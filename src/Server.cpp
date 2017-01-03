@@ -190,6 +190,7 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth)
 {
 	m_Description = a_Settings.GetValueSet("Server", "Description", "Cuberite - in C++!");
+	m_ShutdownMessage = a_Settings.GetValueSet("Server", "ShutdownMessage", "Server shutdown");
 	m_MaxPlayers  = a_Settings.GetValueSetI("Server", "MaxPlayers", 100);
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);

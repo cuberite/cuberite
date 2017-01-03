@@ -332,6 +332,22 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 void cRoot::StopServer()
 {
+	// Kick all players from the server with custom disconnect message
+	class cPlayerCallback : public cPlayerListCallback
+	{
+		AString m_ShutdownMessage;
+		virtual bool Item(cPlayer * a_Player)
+		{
+			a_Player->GetClientHandlePtr()->Kick(m_ShutdownMessage);
+			return false;
+		}
+	public:
+		cPlayerCallback(AString a_ShutdownMessage) : m_ShutdownMessage(a_ShutdownMessage) {}
+	}PlayerCallback((m_Server->GetShutdownMessage()));
+
+	cRoot::Get()->ForEachPlayer(PlayerCallback);
+	// What's a better way to do this?
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	m_TerminateEventRaised = true;
 	m_StopEvent.Set();
 	m_InputThreadRunFlag.clear();
