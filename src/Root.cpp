@@ -343,11 +343,14 @@ void cRoot::StopServer()
 		}
 	public:
 		cPlayerCallback(AString a_ShutdownMessage) : m_ShutdownMessage(a_ShutdownMessage) {}
-	} PlayerCallback((m_Server->GetShutdownMessage()));
+	};
 
-	cRoot::Get()->ForEachPlayer(PlayerCallback);
-	// What's a better way to do this?
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+	if (m_Server->GetNumPlayers())
+	{
+		cPlayerCallback PlayerCallback((m_Server->GetShutdownMessage()));
+		cRoot::Get()->ForEachPlayer(PlayerCallback);
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
 	m_TerminateEventRaised = true;
 	m_StopEvent.Set();
 	m_InputThreadRunFlag.clear();
