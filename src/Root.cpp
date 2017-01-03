@@ -343,7 +343,7 @@ void cRoot::StopServer()
 		}
 	public:
 		cPlayerCallback(AString a_ShutdownMessage) : m_ShutdownMessage(a_ShutdownMessage) {}
-	}PlayerCallback((m_Server->GetShutdownMessage()));
+	} PlayerCallback((m_Server->GetShutdownMessage()));
 
 	cRoot::Get()->ForEachPlayer(PlayerCallback);
 	// What's a better way to do this?
