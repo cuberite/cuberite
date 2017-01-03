@@ -2311,11 +2311,12 @@ void cProtocol_1_8_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ViewDistance);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinFlags);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinParts);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
-	// TODO: Handle other values
+	m_Client->GetPlayer()->SetSkinParts(SkinParts);
+	// TODO: Handle chat flags and chat colors
 }
 
 
@@ -3234,7 +3235,20 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 	switch (a_Entity.GetEntityType())
 	{
-		case cEntity::etPlayer: break;  // TODO?
+		case cEntity::etPlayer:
+		{
+			auto & Player = reinterpret_cast<const cPlayer &>(a_Entity);
+
+			// Player health (not handled since players aren't monsters)
+			a_Pkt.WriteBEUInt8(0x66);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			// Skin flags
+			a_Pkt.WriteBEUInt8(0x0A);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			break;
+		}
 		case cEntity::etPickup:
 		{
 			a_Pkt.WriteBEUInt8((5 << 5) | 10);  // Slot(5) + index 10

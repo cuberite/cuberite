@@ -11351,6 +11351,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status.",
 				},
+				GetMainHand =
+				{
+					Returns =
+					{
+						{
+							Type = "eMainHand",
+						},
+					},
+					Notes = "Returns the player's main hand.",
+				},
 				GetName =
 				{
 					Returns =
@@ -11410,6 +11420,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the player's maximum sprinting speed, relative to the game default speed. Defaults to 1.3, but plugins may modify it for faster or slower sprinting.",
+				},
+				GetSkinParts =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
 				},
 				GetStance =
 				{
@@ -11534,6 +11554,23 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns true if the player has the specified permission",
+				},
+				HasSkinPart =
+				{
+					Params =
+					{
+						{
+							Name = "Part",
+							Type = "eSkinPart",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player has the specified skin part enabled",
 				},
 				Heal =
 				{
@@ -12063,6 +12100,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously",
 				},
+				SetMainHand =
+				{
+					Params =
+					{
+						{
+							Name = "Hand",
+							Type = "eMainHand",
+						},
+					},
+					Notes = "Sets the main hand of the player.",
+				},
 				SetName =
 				{
 					Params =
@@ -12095,6 +12143,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets whether the player is sprinting or not.",
+				},
+				SetSkinParts =
+				{
+					Params =
+					{
+						{
+							Name = "Parts",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{eSkinPart}} constants.",
 				},
 				SetSprintingMaxSpeed =
 				{
@@ -16642,6 +16701,54 @@ end
 				{
 					Notes = "Something concerning (i.e. reload) is about to happen",
 				},
+				hMain =
+				{
+					Notes = "The main hand",
+				},
+				hOff =
+				{
+					Notes = "The off hand",
+				},
+				mhLeft =
+				{
+					Notes = "The left hand is the main hand",
+				},
+				mhRight =
+				{
+					Notes = "The right hand is the main hand",
+				},
+				spCape =
+				{
+					Notes = "The cape skin part",
+				},
+				spJacket =
+				{
+					Notes = "The jacket skin part",
+				},
+				spLeftSleeve =
+				{
+					Notes = "The left sleeve skin part",
+				},
+				spRightSleeve =
+				{
+					Notes = "The right sleeve skin part",
+				},
+				spLeftPants =
+				{
+					Notes = "The left pants leg skin part",
+				},
+				spRightPants =
+				{
+					Notes = "The right pants leg skin part",
+				},
+				spHat =
+				{
+					Notes = "The hat/head skin part",
+				},
+				spMask =
+				{
+					Notes = "A mask of all valid skin parts combined",
+				},
 			},
 			ConstantGroups =
 			{
@@ -16725,6 +16832,32 @@ end
 					TextBefore = [[
 						The following constants are used for the gamemode - survival, creative or adventure. Use the
 						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
+					]],
+				},
+				eHand =
+				{
+					Include =
+					{
+						"hMain",
+						"hOff",
+					},
+					TextBefore = [[
+						These constants represent the main and off hand.  Currently, these constants are not used, but
+						are provided for future use when dual-wielding is functional.  An action or item can be in the
+						main hand or the off hand.  The main hand can be either the left or the right hand - use
+						{{cPlayer}}:GetMainHand() to determine which (see {{eMainHand}}).
+					]],
+				},
+				eMainHand =
+				{
+					Include =
+					{
+						"^mh.*",
+					},
+					TextBefore = [[
+						These constants identify which hand is the main hand.  The main hand can either be the left hand
+						or the right hand.  Note that this is only visual, as the client behaves the same regardless of the
+						main hand setting.  See {{cPlayer}}:GetMainHand().
 					]],
 				},
 				EMCSBiome =
@@ -16817,6 +16950,16 @@ end
 					Include = "^sl.*",
 					TextBefore = [[
 						The following constants define the block types that are propelled outwards after an explosion.
+					]],
+				},
+				eSkinPart =
+				{
+					Include =
+					{
+						"^sp.*",
+					},
+					TextBefore = [[
+						These constants represent various skin part flags.
 					]],
 				},
 				eSpreadSource =

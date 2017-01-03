@@ -400,6 +400,14 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			a_Pkt.WriteBEUInt8(LIVING_HEALTH);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			a_Pkt.WriteBEUInt8(PLAYER_DISPLAYED_SKIN_PARTS);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			a_Pkt.WriteBEUInt8(PLAYER_MAIN_HAND);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
 			break;
 		}
 		case cEntity::etPickup:
