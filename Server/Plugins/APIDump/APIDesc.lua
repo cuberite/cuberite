@@ -16811,6 +16811,19 @@ end
 						specifically otherwise in the world.ini file.
 					]],
 				},
+				EffectID = 
+				{
+					Include = 
+					{
+						"^SFX_.*",
+						"^PARTICLE_*",
+					},
+					TextBefore = [[
+						These constants are used for effect ids. They are used in the {{cWorld}}:BroadcastSoundParticleEffect()
+						function.
+						
+					]],
+				},
 				eExplosionSource =
 				{
 					Include = "^es.*",
@@ -16996,6 +17009,21 @@ end
 				MetaValues =
 				{
 					Include = "^E_META_.*",
+				},
+				EffectID = 
+				{
+					Include = 
+					{
+						"^SOUTH.*",
+						"^NORTH.*",
+						"EAST",
+						"CENTRE",
+						"WEST",
+					},
+					TextBefore = [[
+						These constants are smoke directions ids. They are used in the {{cWorld}}:BroadcastSoundParticleEffect()
+						function.
+					]],
 				},
 			},
 		},
