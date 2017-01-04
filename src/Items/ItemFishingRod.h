@@ -35,6 +35,7 @@ public:
 	{
 		m_CanPickup = reinterpret_cast<cFloater *>(a_Entity)->CanPickup();
 		m_Pos = Vector3d(a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ());
+		m_BitePos = reinterpret_cast<cFloater *>(a_Entity)->GetBitePos();
 		m_AttachedMobID = reinterpret_cast<cFloater *>(a_Entity)->GetAttachedMobID();
 		a_Entity->Destroy(true);
 		return true;
@@ -44,11 +45,13 @@ public:
 	bool IsAttached(void)      const { return (m_AttachedMobID != cEntity::INVALID_ID); }
 	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
 	Vector3d GetPos(void)      const { return m_Pos; }
+	Vector3d GetBitePos(void)  const { return m_BitePos; }
 
 protected:
 	bool m_CanPickup;
 	UInt32 m_AttachedMobID;
 	Vector3d m_Pos;
+	Vector3d m_BitePos;
 } ;
 
 
@@ -236,9 +239,12 @@ public:
 				{
 					return true;
 				}
-				Vector3d FloaterPos = FloaterInfo.GetPos();
+				Vector3d FloaterPos = FloaterInfo.GetBitePos();
+				FloaterPos.y += 0.5f;
+				const float FISH_SPEED_MULT = 2.25f;
+
 				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
-				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y + 1, FlyDirection.z);
+				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x * FISH_SPEED_MULT, (FlyDirection.y + 1.0f) * FISH_SPEED_MULT, FlyDirection.z * FISH_SPEED_MULT);
 				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
 			}
 		}

@@ -6585,6 +6585,15 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 					},
 					Notes = "Returns the EntityID of the player who owns the floater.",
 				},
+				GetBitePos =
+				{
+					Returns =
+					{
+							Name = "BitePosition",
+							Type = "Vector3d",
+					},
+					Notes = "Returns the position of the floater just before a fish bites. If a fish hasn't bitten the floater, this function returns the position the floater was cast from.",
+				},
 			},
 			Inherits = "cEntity",
 		},
