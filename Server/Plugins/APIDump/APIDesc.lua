@@ -13061,6 +13061,16 @@ end
 					},
 					Notes = "Returns the server description set in the settings.ini.",
 				},
+				GetShutdownMessage =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the shutdown message set in the settings.ini.",
+				},
 				GetMaxPlayers =
 				{
 					Returns =
