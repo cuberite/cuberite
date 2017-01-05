@@ -58,5 +58,3 @@ For other stuff, check out the [homepage](https://cuberite.org/), the [Users' Ma
 the [forums](https://forum.cuberite.org/), and the [Plugin API](https://api.cuberite.org/).
 
 [Support Us on Bountysource](https://bountysource.com/teams/cuberite)
-
-Travis CI: [![travis build status shield](https://img.shields.io/travis/cuberite/cuberite.svg)](https://travis-ci.org/cuberite/cuberite)
