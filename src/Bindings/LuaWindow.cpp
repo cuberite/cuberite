@@ -116,7 +116,7 @@ bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 		bool res;
 		if (
 			m_OnClosing->Call(this, &a_Player, a_CanRefuse, cLuaState::Return, res) &&  // The callback succeeded
-			res                                                                        // The callback says not to close the window
+			res                                                                         // The callback says not to close the window
 		)
 		{
 			// The callback disagrees (the higher levels check the CanRefuse flag compliance)

@@ -809,7 +809,7 @@ public:
 
 	/** Returns the canon Lua state (the primary cLuaState instance that was used to create, rather than attach, the lua_State structure).
 	Returns nullptr if the canon Lua state cannot be queried. */
-	cLuaState * QueryCanonLuaState(void);
+	cLuaState * QueryCanonLuaState(void) const;
 
 	/** Outputs to log a warning about API call being unable to read its parameters from the stack,
 	logs the stack trace and stack values. */
