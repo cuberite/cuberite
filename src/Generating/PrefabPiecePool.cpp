@@ -204,6 +204,7 @@ bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString
 	// Load the file in the Lua interpreter:
 	cLuaState Lua(Printf("LoadablePiecePool %s", a_FileName.c_str()));
 	Lua.Create();
+	cLuaState::cLock lock(Lua);
 	if (!Lua.LoadString(a_Contents, a_FileName, a_LogWarnings))
 	{
 		// Reason for failure has already been logged in LoadFile()
