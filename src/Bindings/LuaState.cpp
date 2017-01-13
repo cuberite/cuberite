@@ -218,7 +218,7 @@ void cLuaState::cTrackedRef::Clear(void)
 	// Free the reference:
 	lua_State * luaState = nullptr;
 	{
-		auto cs = m_CS;
+		auto cs = m_CS.load();
 		if (cs != nullptr)
 		{
 			cCSLock Lock(*cs);
@@ -246,7 +246,7 @@ void cLuaState::cTrackedRef::Clear(void)
 
 bool cLuaState::cTrackedRef::IsValid(void)
 {
-	auto cs = m_CS;
+	auto cs = m_CS.load();
 	if (cs == nullptr)
 	{
 		return false;
@@ -261,7 +261,7 @@ bool cLuaState::cTrackedRef::IsValid(void)
 
 bool cLuaState::cTrackedRef::IsSameLuaState(cLuaState & a_LuaState)
 {
-	auto cs = m_CS;
+	auto cs = m_CS.load();
 	if (cs == nullptr)
 	{
 		return false;
@@ -285,7 +285,7 @@ bool cLuaState::cTrackedRef::IsSameLuaState(cLuaState & a_LuaState)
 
 void cLuaState::cTrackedRef::Invalidate(void)
 {
-	auto cs = m_CS;
+	auto cs = m_CS.load();
 	if (cs == nullptr)
 	{
 		// Already invalid
@@ -548,6 +548,7 @@ void cLuaState::Close(void)
 		{
 			r->Invalidate();
 		}
+		m_TrackedRefs.clear();
 	}
 
 	cCanonLuaStates::Remove(*this);
@@ -2357,6 +2358,7 @@ void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 	{
 		UnRef();
 	}
+	ASSERT(cCanonLuaStates::GetCanonState(a_LuaState)->m_CS.IsLockedByCurrentThread());
 	m_LuaState = a_LuaState;
 	lua_pushvalue(a_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
 	m_Ref = luaL_ref(a_LuaState, LUA_REGISTRYINDEX);
@@ -2370,6 +2372,7 @@ void cLuaState::cRef::UnRef(void)
 {
 	if (IsValid())
 	{
+		ASSERT(cCanonLuaStates::GetCanonState(m_LuaState)->m_CS.IsLockedByCurrentThread());
 		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
 	m_LuaState = nullptr;

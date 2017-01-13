@@ -35,6 +35,7 @@ extern "C"
 	#include "lua/src/lauxlib.h"
 }
 
+#include <atomic>
 #include "../Vector3.h"
 #include "../Defines.h"
 #include "PluginManager.h"
@@ -189,24 +190,29 @@ public:
 		}
 
 		/** Set the contained reference to the object at the specified Lua state's stack position.
-		If another reference has been previously contained, it is freed first. */
+		If another reference has been previously contained, it is Clear()-ed first. */
 		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
 
-		/** Frees the contained reference, if any. */
+		/** Frees the contained reference, if any.
+		Untracks the reference from its canon Lua state. */
 		void Clear(void);
 
-		/** Returns true if the contained reference is valid. */
+		/** Returns true if the contained reference is valid.
+		(Note that depending on this value is not thread-safe, another thread may invalidate the ref in the meantime. It is meant for quick ASSERTs only). */
 		bool IsValid(void);
 
 		/** Returns true if the reference resides in the specified Lua state.
-		Internally, compares the reference's canon Lua state. */
+		Internally, compares the reference's canon Lua state.
+		(Note that depending on this value is not thread-safe, another thread may modify the ref in the meantime. It is meant for quick ASSERTs only). */
 		bool IsSameLuaState(cLuaState & a_LuaState);
 
 	protected:
 		friend class cLuaState;
 
-		/** The mutex protecting m_Ref against multithreaded access */
-		cCriticalSection * m_CS;
+		/** The mutex protecting m_Ref against multithreaded access.
+		Actually points to the canon Lua state's m_CriticalSection.
+		Is nullptr when ref is empty (not bound). */
+		std::atomic<cCriticalSection *> m_CS;
 
 		/** Reference to the Lua callback */
 		cRef m_Ref;
@@ -254,7 +260,7 @@ public:
 		template <typename... Args>
 		bool Call(Args &&... args)
 		{
-			auto cs = m_CS;
+			auto cs = m_CS.load();
 			if (cs == nullptr)
 			{
 				return false;
@@ -336,7 +342,7 @@ public:
 		template <typename... Args>
 		bool CallTableFn(const char * a_FnName, Args &&... args)
 		{
-			auto cs = m_CS;
+			auto cs = m_CS.load();
 			if (cs == nullptr)
 			{
 				return false;
@@ -356,7 +362,7 @@ public:
 		template <typename... Args>
 		bool CallTableFnWithSelf(const char * a_FnName, Args &&... args)
 		{
-			auto cs = m_CS;
+			auto cs = m_CS.load();
 			if (cs == nullptr)
 			{
 				return false;
