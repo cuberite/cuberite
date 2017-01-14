@@ -327,6 +327,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			AllowedBlocks.push_back(E_BLOCK_HARDENED_CLAY);
 			AllowedBlocks.push_back(E_BLOCK_STAINED_CLAY);
 			AllowedBlocks.push_back(E_META_DIRT_PODZOL);
+			AllowedBlocks.push_back(E_META_DIRT_COARSE);
 
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSingleTopBlock(Seed, E_BLOCK_DEAD_BUSH, AllowedBiomes, 2, AllowedBlocks)));
 		}
