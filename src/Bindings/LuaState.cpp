@@ -2288,15 +2288,17 @@ void cLuaState::UntrackRef(cTrackedRef & a_Ref)
 		return;
 	}
 
-	// Remove the callback:
+	// Remove the callback (note that another thread may have cleared the callbacks by closing the LuaState):
 	cCSLock Lock(canonState->m_CSTrackedRefs);
 	auto & trackedRefs = canonState->m_TrackedRefs;
-	trackedRefs.erase(std::remove_if(trackedRefs.begin(), trackedRefs.end(),
-		[&a_Ref](cTrackedRef * a_StoredRef)
+	for (auto itr = trackedRefs.begin(), end = trackedRefs.end(); itr != end; ++itr)
+	{
+		if (*itr == &a_Ref)
 		{
-			return (a_StoredRef == &a_Ref);
+			trackedRefs.erase(itr);
+			break;
 		}
-	));
+	}
 }
 
 
