@@ -544,7 +544,7 @@ void cWorld::Start(void)
 	if (GetDimension() == dimOverworld)
 	{
 		AString MyNetherName = GetName() + "_nether";
-		AString MyEndName = GetName() + "_end";
+		AString MyEndName = GetName() + "_the_end";
 		if (cRoot::Get()->GetWorld(MyNetherName) == nullptr)
 		{
 			MyNetherName = "";
