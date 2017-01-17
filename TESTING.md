@@ -6,7 +6,7 @@ If you would like to help with coding instead, see `README.md` and `GETTING-STAR
 
 Here are things you can help with without being a programmer:
  - Run and test Cuberite. Report issues, bugs, crashes, and stacktraces at the [issue tracker](https://github.com/cuberite/cuberite/issues). This is best done in debug mode.
- - Test unmerged versions (known as branches or Pull Requests) which are marked with the [ingame-testing-needed](https://github.com/cuberite/cuberite/pulls?q=is%3Aopen+is%3Apr+label%3Aingame-testing-needed) label. 
+ - Test unmerged versions (known as branches or Pull Requests) which are marked with the [ingame-testing-needed](https://github.com/cuberite/cuberite/pulls?q=is%3Aopen+is%3Apr+label%3Astatus%2Fingame-testing-needed) label. 
    Note that code marked with `ingame-testing-needed` is not always available, and sometimes the above list will be empty.
 
 Please use the issue tracker search feature and make sure your issue has not been reported before!
