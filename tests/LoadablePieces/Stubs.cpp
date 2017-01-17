@@ -13,6 +13,7 @@
 #include "BlockEntities/BlockEntity.h"
 #include "Blocks/BlockHandler.h"
 #include "Generating/ChunkDesc.h"
+#include "DeadlockDetect.h"
 
 
 
@@ -266,6 +267,22 @@ bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a
 cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
 {
 	return nullptr;
+}
+
+
+
+
+
+void cDeadlockDetect::TrackCriticalSection(cCriticalSection & a_CS, const AString & a_Name)
+{
+}
+
+
+
+
+
+void cDeadlockDetect::UntrackCriticalSection(cCriticalSection & a_CS)
+{
 }
 
 

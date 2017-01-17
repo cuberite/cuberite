@@ -9,12 +9,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCriticalSection:
 
-#ifdef _DEBUG
-cCriticalSection::cCriticalSection()
+cCriticalSection::cCriticalSection():
+	m_RecursionCount(0)
 {
-	m_IsLocked = 0;
 }
-#endif  // _DEBUG
 
 
 
@@ -24,10 +22,8 @@ void cCriticalSection::Lock()
 {
 	m_Mutex.lock();
 
-	#ifdef _DEBUG
-		m_IsLocked += 1;
-		m_OwningThreadID = std::this_thread::get_id();
-	#endif  // _DEBUG
+	m_RecursionCount += 1;
+	m_OwningThreadID = std::this_thread::get_id();
 }
 
 
@@ -36,10 +32,8 @@ void cCriticalSection::Lock()
 
 void cCriticalSection::Unlock()
 {
-	#ifdef _DEBUG
-		ASSERT(m_IsLocked > 0);
-		m_IsLocked -= 1;
-	#endif  // _DEBUG
+	ASSERT(IsLockedByCurrentThread());
+	m_RecursionCount -= 1;
 
 	m_Mutex.unlock();
 }
@@ -48,10 +42,9 @@ void cCriticalSection::Unlock()
 
 
 
-#ifdef _DEBUG
 bool cCriticalSection::IsLocked(void)
 {
-	return (m_IsLocked > 0);
+	return (m_RecursionCount > 0);
 }
 
 
@@ -60,9 +53,8 @@ bool cCriticalSection::IsLocked(void)
 
 bool cCriticalSection::IsLockedByCurrentThread(void)
 {
-	return ((m_IsLocked > 0) && (m_OwningThreadID == std::this_thread::get_id()));
+	return ((m_RecursionCount > 0) && (m_OwningThreadID == std::this_thread::get_id()));
 }
-#endif  // _DEBUG
 
 
 

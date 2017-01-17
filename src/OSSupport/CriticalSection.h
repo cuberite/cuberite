@@ -9,27 +9,40 @@
 
 class cCriticalSection
 {
+	friend class cDeadlockDetect;  // Allow the DeadlockDetect to read the internals, so that it may output some statistics
+
 public:
 	void Lock(void);
 	void Unlock(void);
 
-	// IsLocked / IsLockedByCurrentThread are only used in ASSERT statements, but because of the changes with ASSERT they must always be defined
-	// The fake versions (in Release) will not effect the program in any way
-	#ifdef _DEBUG
-		cCriticalSection(void);
-		bool IsLocked(void);
-		bool IsLockedByCurrentThread(void);
-	#else
-		bool IsLocked(void) { return false; }
-		bool IsLockedByCurrentThread(void) { return false; }
-	#endif  // _DEBUG
+	cCriticalSection(void);
+
+	/** Returns true if the CS is currently locked.
+	Note that since it relies on the m_RecursionCount value, it is inherently thread-unsafe, prone to false positives.
+	Also, due to multithreading, the state can change between this when function is evaluated and the returned value is used.
+	To be used in ASSERT(IsLocked()) only. */
+	bool IsLocked(void);
+
+	/** Returns true if the CS is currently locked by the thread calling this function.
+	Note that since it relies on the m_RecursionCount value, it is inherently thread-unsafe, prone to false positives.
+	Also, due to multithreading, the state can change between this when function is evaluated and the returned value is used.
+	To be used in ASSERT(IsLockedByCurrentThread()) only. */
+	bool IsLockedByCurrentThread(void);
 
 private:
 
-	#ifdef _DEBUG
-	int           m_IsLocked;  // Number of times this CS is locked
+	/** Number of times that this CS is currently locked (levels of recursion). Zero if not locked.
+	Note that this value should be considered true only when the CS is locked; without the lock, it is UndefinedBehavior to even read it,
+	but making it std::atomic would impose too much of a runtime penalty.
+	It is only ever read without the lock in the DeadlockDetect, where the server is terminating anyway. */
+	int m_RecursionCount;
+
+	/** ID of the thread that is currently holding the CS.
+	Note that this value should be considered true only when the CS is locked; without the lock, it is UndefinedBehavior to even read it,
+	but making it std::atomic would impose too much of a runtime penalty.
+	When unlocked, the value stored here has no meaning, it may be an ID of a previous holder, or it could be any garbage.
+	It is only ever read without the lock in the DeadlockDetect, where the server is terminating anyway. */
 	std::thread::id m_OwningThreadID;
-	#endif  // _DEBUG
 
 	std::recursive_mutex m_Mutex;
 } ALIGN_8;

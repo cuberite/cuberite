@@ -32,8 +32,9 @@ cPluginManager * cPluginManager::Get(void)
 
 
 
-cPluginManager::cPluginManager(void) :
-	m_bReloadPlugins(false)
+cPluginManager::cPluginManager(cDeadlockDetect & a_DeadlockDetect) :
+	m_bReloadPlugins(false),
+	m_DeadlockDetect(a_DeadlockDetect)
 {
 }
 
@@ -98,7 +99,7 @@ void cPluginManager::RefreshPluginList(void)
 		}  // for plugin - m_Plugins[]
 		if (!hasFound)
 		{
-			m_Plugins.push_back(std::make_shared<cPluginLua>(folder));
+			m_Plugins.push_back(std::make_shared<cPluginLua>(folder, m_DeadlockDetect));
 		}
 	}  // for folder - Folders[]
 }
@@ -602,25 +603,28 @@ bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_W
 bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result)
 {
 	// Output the command being executed to log (for troubleshooting deadlocks-in-commands):
-	auto world = a_Player->GetWorld();
-	AString worldName;
-	Int64 worldAge;
-	if (world != nullptr)
+	if (a_Player != nullptr)
 	{
-		worldName = world->GetName();
-		worldAge = world->GetWorldAge();
+		auto world = a_Player->GetWorld();
+		AString worldName;
+		Int64 worldAge;
+		if (world != nullptr)
+		{
+			worldName = world->GetName();
+			worldAge = world->GetWorldAge();
+		}
+		else
+		{
+			worldName = "<no world>";
+			worldAge = 0;
+		}
+		LOG("Player %s is executing command \"%s\" in world \"%s\" at world age %lld.",
+			a_Player->GetName().c_str(),
+			a_EntireCommand.c_str(),
+			worldName.c_str(),
+			worldAge
+		);
 	}
-	else
-	{
-		worldName = "<no world>";
-		worldAge = 0;
-	}
-	LOG("Player %s is executing command \"%s\" in world \"%s\" at world age %lld.",
-		a_Player->GetName().c_str(),
-		a_EntireCommand.c_str(),
-		worldName.c_str(),
-		worldAge
-	);
 
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
 	VERIFY_HOOK;

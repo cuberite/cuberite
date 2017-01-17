@@ -27,9 +27,19 @@ class cDeadlockDetect :
 
 public:
 	cDeadlockDetect(void);
+	~cDeadlockDetect();
 
 	/** Starts the detection. Hides cIsThread's Start, because we need some initialization */
 	bool Start(int a_IntervalSec);
+
+	/** Adds the critical section for tracking.
+	Tracked CSs are listed, together with ownership details, when a deadlock is detected.
+	A tracked CS must be untracked before it is destroyed.
+	a_Name is an arbitrary name that is listed along with the CS in the output. */
+	void TrackCriticalSection(cCriticalSection & a_CS, const AString & a_Name);
+
+	/** Removes the CS from the tracking. */
+	void UntrackCriticalSection(cCriticalSection & a_CS);
 
 protected:
 	struct sWorldAge
@@ -43,6 +53,13 @@ protected:
 
 	/** Maps world name -> sWorldAge */
 	typedef std::map<AString, sWorldAge> WorldAges;
+
+	/** Protects m_TrackedCriticalSections from multithreaded access. */
+	cCriticalSection m_CS;
+
+	/** CriticalSections that are tracked (their status output on deadlock).
+	Protected against multithreaded access by m_CS. */
+	std::vector<std::pair<cCriticalSection *, AString>> m_TrackedCriticalSections;
 
 	WorldAges m_WorldAges;
 
@@ -63,6 +80,9 @@ protected:
 	a_WorldName is the name of the world whose age has triggered the detection.
 	a_WorldAge is the age (in ticks) in which the world is stuck. */
 	NORETURN void DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge);
+
+	/** Outputs a listing of the tracked CSs, together with their name and state. */
+	void ListTrackedCSs();
 } ;
 
 

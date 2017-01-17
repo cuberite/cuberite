@@ -27,6 +27,7 @@ class cPlayer;
 class cCommandOutputCallback;
 class cCompositeChat;
 class cSettingsRepositoryInterface;
+class cDeadlockDetect;
 
 typedef cItemCallback<cPlayer> cPlayerListCallback;
 typedef cItemCallback<cWorld>  cWorldListCallback;
@@ -226,10 +227,10 @@ private:
 	void LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile);
 
 	/** Starts each world's life */
-	void StartWorlds(void);
+	void StartWorlds(cDeadlockDetect & a_DeadlockDetect);
 
 	/** Stops each world's threads, so that it's safe to unload them */
-	void StopWorlds(void);
+	void StopWorlds(cDeadlockDetect & a_DeadlockDetect);
 
 	/** Unloads all worlds from memory */
 	void UnloadWorlds(void);

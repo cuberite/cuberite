@@ -46,6 +46,7 @@ class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
 class cPluginLua;
+class cDeadlockDetect;
 
 
 
@@ -821,6 +822,12 @@ public:
 	/** Outputs to log a warning about API call being unable to read its parameters from the stack,
 	logs the stack trace and stack values. */
 	void LogApiCallParamFailure(const char * a_FnName, const char * a_ParamNames);
+
+	/** Adds this object's CS to the DeadlockDetect's tracked CSs. */
+	void TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect);
+
+	/** Removes this object's CS from the DeadlockDetect's tracked CSs. */
+	void UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect);
 
 protected:
 
