@@ -453,7 +453,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			NewWorld = new cWorld(WorldName.c_str(), dimNether, LinkTo);
 		}
 		// if the world is called x_the_end
-		else if ((LowercaseName.size() > EndAppend1.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend))
+		else if ((LowercaseName.size() > EndAppend1.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend1))
 		{
 			// The world is called x_the_end, see if a world called x exists. If yes, choose it as the linked world,
 			// otherwise, choose the default world as the linked world.
@@ -467,7 +467,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			NewWorld = new cWorld(WorldName.c_str(), dimEnd, LinkTo);
 		}
 		// if the world is called x_end
-		else if ((LowercaseName.size() > EndAppend2.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend))
+		else if ((LowercaseName.size() > EndAppend2.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend2))
 		{
 			// The world is called x_end, see if a world called x exists. If yes, choose it as the linked world,
 			// otherwise, choose the default world as the linked world.
