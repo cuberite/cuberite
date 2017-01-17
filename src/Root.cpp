@@ -405,15 +405,15 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			- If a world called x exists, set it as x_nether's overworld.
 			- Otherwise set the default world as x_nether's overworld.
 
-		- If the world name is x_the_end, create a world.ini with the dimension type "end".
+		- If the world name is x_the_end or x_end, create a world.ini with the dimension type "end".
 			- If a world called x exists, set it as x_the_end's overworld.
 			- Otherwise set the default world as x_the_end's overworld.
 
-		- If the world name is x (and doesn't end with _the_end or _nether)
+		- If the world name is x (and doesn't end with _the_end, _end or _nether)
 			- Create a world.ini with a dimension type of "overworld".
 			- If a world called x_nether exists, set it as x's nether world.
 			- Otherwise set x's nether world to blank.h
-			- If a world called x_the_end  exists, set it as x's end world.
+			- If a world called x_the_end or x_end exists, set it as x's end world.
 			- Otherwise set x's nether world to blank.
 
 	*/
@@ -434,8 +434,9 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		FoundAdditionalWorlds = true;
 		cWorld * NewWorld;
 		AString LowercaseName = StrToLower(WorldName);
-		AString NetherAppend="_nether";
-		AString EndAppend="_the_end";
+		AString NetherAppend = "_nether";
+		AString EndAppend1 = "_the_end";
+		AString EndAppend2 = "_end";
 
 		// if the world is called x_nether
 		if ((LowercaseName.size() > NetherAppend.size()) && (LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
@@ -452,13 +453,27 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			NewWorld = new cWorld(WorldName.c_str(), dimNether, LinkTo);
 		}
 		// if the world is called x_the_end
-		else if ((LowercaseName.size() > EndAppend.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend.size()) == EndAppend))
+		else if ((LowercaseName.size() > EndAppend1.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend))
 		{
 			// The world is called x_the_end, see if a world called x exists. If yes, choose it as the linked world,
 			// otherwise, choose the default world as the linked world.
 			// As before, any ini settings will completely override this if an ini is already present.
 
-			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend.size());
+			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend1.size());
+			if (GetWorld(LinkTo) == nullptr)
+			{
+				LinkTo = DefaultWorldName;
+			}
+			NewWorld = new cWorld(WorldName.c_str(), dimEnd, LinkTo);
+		}
+		// if the world is called x_end
+		else if ((LowercaseName.size() > EndAppend2.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend))
+		{
+			// The world is called x_end, see if a world called x exists. If yes, choose it as the linked world,
+			// otherwise, choose the default world as the linked world.
+			// As before, any ini settings will completely override this if an ini is already present.
+
+			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend2.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
 				LinkTo = DefaultWorldName;
