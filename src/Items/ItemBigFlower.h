@@ -40,7 +40,6 @@ public:
 			return false;
 		}
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BIG_FLOWER, a_EquippedItem.m_ItemDamage & 0x07);
 		if (a_BlockY < cChunkDef::Height - 1)
 		{
