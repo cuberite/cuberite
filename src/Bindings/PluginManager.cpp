@@ -601,6 +601,27 @@ bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_W
 
 bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result)
 {
+	// Output the command being executed to log (for troubleshooting deadlocks-in-commands):
+	auto world = a_Player->GetWorld();
+	AString worldName;
+	Int64 worldAge;
+	if (world != nullptr)
+	{
+		worldName = world->GetName();
+		worldAge = world->GetWorldAge();
+	}
+	else
+	{
+		worldName = "<no world>";
+		worldAge = 0;
+	}
+	LOG("Player %s is executing command \"%s\" in world \"%s\" at world age %lld.",
+		a_Player->GetName().c_str(),
+		a_EntireCommand.c_str(),
+		worldName.c_str(),
+		worldAge
+	);
+
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
 	VERIFY_HOOK;
 

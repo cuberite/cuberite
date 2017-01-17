@@ -59,8 +59,10 @@ protected:
 	/** Checks if the world's age has changed, updates the world's stats; calls DeadlockDetected() if deadlock detected */
 	void CheckWorldAge(const AString & a_WorldName, Int64 a_Age);
 
-	/** Called when a deadlock is detected. Aborts the server. */
-	NORETURN void DeadlockDetected(void);
+	/** Called when a deadlock is detected in a world. Aborts the server.
+	a_WorldName is the name of the world whose age has triggered the detection.
+	a_WorldAge is the age (in ticks) in which the world is stuck. */
+	NORETURN void DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge);
 } ;
 
 

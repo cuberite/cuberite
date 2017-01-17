@@ -121,7 +121,7 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 		WorldAge.m_NumCyclesSame += 1;
 		if (WorldAge.m_NumCyclesSame > (m_IntervalSec * 1000) / CYCLE_MILLISECONDS)
 		{
-			DeadlockDetected();
+			DeadlockDetected(a_WorldName, a_Age);
 		}
 	}
 	else
@@ -135,9 +135,11 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 
 
 
-void cDeadlockDetect::DeadlockDetected(void)
+void cDeadlockDetect::DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge)
 {
-	LOGERROR("Deadlock detected, aborting the server");
+	LOGERROR("Deadlock detected: world %s has been stuck at age %lld. Aborting the server.",
+		a_WorldName.c_str(), static_cast<long long>(a_WorldAge)
+	);
 	ASSERT(!"Deadlock detected");
 	abort();
 }
