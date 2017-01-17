@@ -35,7 +35,7 @@ public:
 	) override
 	{
 		// Can only be placed on the floor:
-		if (a_BlockFace != BLOCK_FACE_TOP)
+		if ((a_BlockY < 0) || (a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_AIR))
 		{
 			return false;
 		}
