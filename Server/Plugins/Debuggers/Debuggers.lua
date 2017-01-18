@@ -2420,6 +2420,34 @@ end
 
 
 
+function HandleConsoleDeadlock(a_Split)
+	-- If given a parameter, assume it's a world name and simulate a deadlock in the world's tick thread
+	if (a_Split[2]) then
+		local world = cRoot:Get():GetWorld(a_Split[2])
+		if (world) then
+			world:ScheduleTask(0,
+				function()
+					-- Make a live-lock:
+					while (true) do
+					end
+				end
+			)
+			return true, "Deadlock in world tick thread for world " .. a_Split[2] .. " has been scheduled."
+		end
+		LOG("Not a world name: " .. a_Split[2] .. "; simulating a deadlock in the command execution thread instead.")
+	else
+		LOG("Simulating a deadlock in the command execution thread.")
+	end
+
+	-- Make a live-lock in the command execution thread:
+	while(true) do
+	end
+end
+
+
+
+
+
 function HandleConsoleDownload(a_Split)
 	-- Check params:
 	local url = a_Split[2]

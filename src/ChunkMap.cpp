@@ -19,6 +19,7 @@
 #include "SetChunkData.h"
 #include "Blocks/ChunkInterface.h"
 #include "Entities/Pickup.h"
+#include "DeadlockDetect.h"
 
 #ifndef _WIN32
 	#include <cstdlib>  // abs
@@ -2778,6 +2779,24 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 	}
 }
 
+
+
+
+
+
+void cChunkMap::TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect, const AString & a_WorldName)
+{
+	a_DeadlockDetect.TrackCriticalSection(m_CSChunks, Printf("World %s chunkmap", a_WorldName.c_str()));
+}
+
+
+
+
+
+void cChunkMap::UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect)
+{
+	a_DeadlockDetect.UntrackCriticalSection(m_CSChunks);
+}
 
 
 

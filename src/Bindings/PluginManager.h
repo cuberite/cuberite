@@ -26,6 +26,7 @@ class cPlugin;
 class cProjectileEntity;
 class cWorld;
 class cSettingsRepositoryInterface;
+class cDeadlockDetect;
 struct TakeDamageInfo;
 
 typedef SharedPtr<cPlugin> cPluginPtr;
@@ -413,8 +414,11 @@ private:
 	/** If set to true, all the plugins will be reloaded within the next call to Tick(). */
 	bool m_bReloadPlugins;
 
+	/** The deadlock detect in which all plugins should track their CSs. */
+	cDeadlockDetect & m_DeadlockDetect;
 
-	cPluginManager();
+
+	cPluginManager(cDeadlockDetect & a_DeadlockDetect);
 	virtual ~cPluginManager();
 
 	/** Reloads all plugins, defaulting to settings.ini for settings location */
