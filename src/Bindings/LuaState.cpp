@@ -19,6 +19,7 @@ extern "C"
 #include "LuaJson.h"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
+#include "../DeadlockDetect.h"
 
 
 
@@ -2219,6 +2220,24 @@ void cLuaState::LogApiCallParamFailure(const char * a_FnName, const char * a_Par
 	LOGWARNING("%s: Cannot read params: %s, bailing out.", a_FnName, a_ParamNames);
 	LogStackTrace();
 	LogStackValues("Values on the stack");
+}
+
+
+
+
+
+void cLuaState::TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect)
+{
+	a_DeadlockDetect.TrackCriticalSection(m_CS, Printf("cLuaState %s", m_SubsystemName.c_str()));
+}
+
+
+
+
+
+void cLuaState::UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect)
+{
+	a_DeadlockDetect.UntrackCriticalSection(m_CS);
 }
 
 

@@ -58,7 +58,7 @@ class cCompositeChat;
 class cCuboid;
 class cSetChunkData;
 class cBroadcaster;
-
+class cDeadlockDetect;
 
 typedef std::list< cPlayer * > cPlayerList;
 typedef std::list< std::pair< cPlayer *, cWorld * > > cAwaitingPlayerList;
@@ -703,11 +703,13 @@ public:
 
 	void InitializeSpawn(void);
 
-	/** Starts threads that belong to this world */
-	void Start(void);
+	/** Starts threads that belong to this world.
+	a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock. */
+	void Start(cDeadlockDetect & a_DeadlockDetect);
 
-	/** Stops threads that belong to this world (part of deinit) */
-	void Stop(void);
+	/** Stops threads that belong to this world (part of deinit).
+	a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock. */
+	void Stop(cDeadlockDetect & a_DeadlockDetect);
 
 	/** Processes the blocks queued for ticking with a delay (m_BlockTickQueue[]) */
 	void TickQueuedBlocks(void);

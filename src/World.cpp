@@ -12,6 +12,7 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "SetChunkData.h"
+#include "DeadlockDetect.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -433,8 +434,13 @@ void cWorld::InitializeSpawn(void)
 
 
 
-void cWorld::Start(void)
+void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 {
+	// Track the CSs used by this world in the deadlock detector:
+	a_DeadlockDetect.TrackCriticalSection(m_CSClients, Printf("World %s clients", m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSPlayers, Printf("World %s players", m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSTasks,   Printf("World %s tasks",   m_WorldName.c_str()));
+
 	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = 0;
@@ -603,6 +609,7 @@ void cWorld::Start(void)
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
 
 	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
+	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
 
 	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
@@ -953,7 +960,7 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 
 
 
-void cWorld::Stop(void)
+void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 {
 	// Delete the clients that have been in this world:
 	{
@@ -990,6 +997,11 @@ void cWorld::Stop(void)
 	m_Generator.Stop();
 	m_ChunkSender.Stop();
 	m_Storage.Stop();
+
+	a_DeadlockDetect.UntrackCriticalSection(m_CSClients);
+	a_DeadlockDetect.UntrackCriticalSection(m_CSPlayers);
+	a_DeadlockDetect.UntrackCriticalSection(m_CSTasks);
+	m_ChunkMap->UntrackInDeadlockDetect(a_DeadlockDetect);
 }
 
 
