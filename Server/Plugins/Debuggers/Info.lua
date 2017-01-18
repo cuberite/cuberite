@@ -266,6 +266,12 @@ g_PluginInfo =
 			HelpString = "Performs cBoundingBox API tests",
 		},
 
+		["deadlock"] =
+		{
+			Handler = HandleConsoleDeadlock,
+			HelpString = "Simulates a deadlock, either on the command execution thread, or on a world tick thread",
+		},
+
 		["download"] =
 		{
 			Handler = HandleConsoleDownload,
