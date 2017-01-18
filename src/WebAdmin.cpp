@@ -341,6 +341,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 	if (ShouldWrapInTemplate)
 	{
 		cCSLock Lock(m_CS);
+		cLuaState::cLock lock(m_TemplateScript);
 		if (m_TemplateScript.Call("ShowPage", this, &TemplateRequest, cLuaState::Return, Template))
 		{
 			cHTTPOutgoingResponse Resp;
