@@ -524,6 +524,8 @@ void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    static_cast<int>(m_GameMode));
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     static_cast<int>(m_Weather));
 
+	m_WorldAge = std::chrono::milliseconds(IniFile.GetValueSetI("General", "WorldAgeMS", 0LL));
+
 	// Load the weather frequency data:
 	if (m_Dimension == dimOverworld)
 	{
@@ -990,6 +992,7 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
 		IniFile.SetValueI("General", "Weather", static_cast<int>(m_Weather));
 		IniFile.SetValueI("General", "TimeInTicks", GetTimeOfDay());
+		IniFile.SetValueI("General", "WorldAgeMS", static_cast<Int64>(m_WorldAge.count()));
 	IniFile.WriteFile(m_IniFileName);
 
 	m_TickThread.Stop();
