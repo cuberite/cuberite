@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 {
 # NOTE: compile.sh looks for this file in order to determine if this is the Cuberite folder.
