@@ -35,12 +35,11 @@ public:
 	) override
 	{
 		// Can only be placed on the floor:
-		if (a_BlockFace != BLOCK_FACE_TOP)
+		if ((a_BlockY < 0) || (a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_AIR))
 		{
 			return false;
 		}
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BIG_FLOWER, a_EquippedItem.m_ItemDamage & 0x07);
 		if (a_BlockY < cChunkDef::Height - 1)
 		{
