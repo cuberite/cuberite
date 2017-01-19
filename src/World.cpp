@@ -2865,8 +2865,6 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
 {
-	ASSERT(IsChunkQueued(a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ()));
-
 	// Validate biomes, if needed:
 	if (!a_SetChunkData->AreBiomesValid())
 	{

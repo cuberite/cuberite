@@ -288,7 +288,6 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_PluginInterface != nullptr);
 	ASSERT(m_ChunkSink != nullptr);
-	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
 	cChunkDesc ChunkDesc(a_ChunkX, a_ChunkZ);
 	m_PluginInterface->CallHookChunkGenerating(ChunkDesc);
