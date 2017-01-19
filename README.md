@@ -16,11 +16,11 @@ There are several ways to obtain Cuberite.
 
 #### Binaries
  - The easiest method is downloading for Windows or Linux from the [Project site](https://cuberite.org/).
- - You can use the EasyInstall script for Linux, which automatically downloads the correct binary. The script is described below.
+ - You can use the EasyInstall script for Linux and macOS, which automatically downloads the correct binary. The script is described below.
  - You can also obtain a binary from the [buildserver archive](https://builds.cuberite.org/).
 
 ##### The EasyInstall script
-This Linux script will download the correct binary from the project site.
+This script will download the correct binary from the project site.
 
     sh -c "$(wget -O - https://download.cuberite.org)"
 
