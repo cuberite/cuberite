@@ -24,6 +24,8 @@ if [ "$KERNEL" = "Linux" ]; then
 	esac
 elif [ "$KERNEL" = "Darwin" ]; then
 	DOWNLOADURL="https://builds.cuberite.org/job/Cuberite%20OSX%20x64%20Master/lastSuccessfulBuild/artifact/Cuberite.tar.gz"
+elif [ "$KERNEL" = "FreeBSD" ]; then
+	DOWNLOADURL="https://builds.cuberite.org/job/Cuberite%20FreeBSD%20x64%20Master/lastSuccessfulBuild/artifact/Cuberite.tar.gz"
 else
 	echo "Unsupported kernel."
 	exit 1
