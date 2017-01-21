@@ -75,12 +75,22 @@ public:
 		}
 	}
 
+	bool IsMetaTopPart(NIBBLETYPE a_Meta)
+	{
+		return (a_Meta & 0x08) != 0;
+	}
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BlockType, BlockMeta);
-		return ((a_RelY > 0) && (IsBlockTypeOfDirt(BlockType) || ((BlockType == E_BLOCK_BIG_FLOWER) && !(BlockMeta & 0x08))) && (a_RelY < cChunkDef::Height - 1) && ((a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR) || (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_BIG_FLOWER)));
+
+		return IsBlockTypeOfDirt(BlockType) || ((BlockType == E_BLOCK_BIG_FLOWER) && !IsMetaTopPart(BlockMeta));
 	}
 
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
