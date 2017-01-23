@@ -2201,7 +2201,7 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	}
 
 	StartEncryption(DecryptedKey);
-	m_Client->HandleLogin(4, m_Client->GetUsername());
+	m_Client->HandleLogin(m_Client->GetUsername());
 }
 
 
@@ -2238,7 +2238,7 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	m_Client->HandleLogin(4, Username);
+	m_Client->HandleLogin(Username);
 }
 
 
