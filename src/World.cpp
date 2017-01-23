@@ -550,13 +550,13 @@ void cWorld::Start(void)
 			MyNetherName = "";
 		}
 		if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
- 		{
- 			MyEndName = GetName() + "_end";
- 			if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
+		{
+			MyEndName = GetName() + "_end";
+			if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
 			{
 				MyEndName = "";
 			}
- 		}
+		}
 
 		m_LinkedNetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", MyNetherName);
 		m_LinkedEndWorldName    = IniFile.GetValueSet("LinkedWorlds", "EndWorldName",    MyEndName);
