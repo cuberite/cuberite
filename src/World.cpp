@@ -553,7 +553,9 @@ void cWorld::Start(void)
  		{
  			MyEndName = GetName() + "_end";
  			if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
- 			MyEndName = "";
+			{
+				MyEndName = "";
+			}
  		}
 
 		m_LinkedNetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", MyNetherName);
