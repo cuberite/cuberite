@@ -680,7 +680,7 @@ void cClientHandle::HandlePing(void)
 
 
 
-bool cClientHandle::HandleLogin(UInt32 a_ProtocolVersion, const AString & a_Username)
+bool cClientHandle::HandleLogin(const AString & a_Username)
 {
 	{
 		cCSLock lock(m_CSState);
@@ -696,16 +696,10 @@ bool cClientHandle::HandleLogin(UInt32 a_ProtocolVersion, const AString & a_User
 
 		// LOGD("Handling login for client %s @ %s (%p), state = %d", a_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load());
 
-		// If the protocol version hasn't been set yet, set it now:
-		if (m_ProtocolVersion == 0)
-		{
-			m_ProtocolVersion = a_ProtocolVersion;
-		}
-
 		m_Username = a_Username;
 
 		// Let the plugins know about this event, they may refuse the player:
-		if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, a_ProtocolVersion, a_Username))
+		if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, m_ProtocolVersion, a_Username))
 		{
 			Destroy();
 			return false;
