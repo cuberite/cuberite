@@ -1702,45 +1702,26 @@ globals =
 	file:write([[
 -- ## Main ##
 
-function WriteTable(a_File, a_TableName)
-	a_File:write(a_TableName, " = \n{\n")
-	for _, Entry in ipairs(_G[a_TableName]) do
-		a_File:write("\t\"", Entry, "\",\n")
-	end
-	a_File:write("}\n\n")
-end
-
 -- Load plugins's luacheck
-local FilePluginLuacheck = assert(loadfile(".plugin_luacheck"))
-local PluginLuacheck = {}
-setfenv(FilePluginLuacheck, PluginLuacheck)
-FilePluginLuacheck()
+local FilePluginLuacheck = loadfile(".luacheckrc_plugin")
 
-for Option, Value in pairs(PluginLuacheck) do
-	if (type(Value) == "table") and not(_G[Option] == nil) then
-		-- Merge tables together
-		for _ , Entry in ipairs(Value) do
-			table.insert(_G[Option], Entry)
+if FilePluginLuacheck ~= nil then
+	local PluginLuacheck = {}
+	setfenv(FilePluginLuacheck, PluginLuacheck)
+	FilePluginLuacheck()
+
+	for Option, Value in pairs(PluginLuacheck) do
+		if (type(Value) == "table") and not(getfenv(1)[Option] == nil) then
+			-- Merge tables together
+			for _ , Entry in ipairs(Value) do
+				table.insert(getfenv(1)[Option], Entry)
+			end
+		else
+			-- Add a option, table or overwrite a option
+			getfenv(1)[Option] = Value
 		end
-	else
-		-- Add a option, table or overwrite a option
-		_G[Option] = Value
 	end
 end
-
--- Write to file .luacheckrc
-local FileLuacheckAll = io.open(".luacheckrc", "w")
-
--- Add options
-FileLuacheckAll:write("unused_args", " = ", tostring(unused_args), "\n\n")
-FileLuacheckAll:write("allow_defined", " = ", tostring(allow_defined), "\n\n")
-
--- Write tables
-WriteTable(FileLuacheckAll, "globals")
-WriteTable(FileLuacheckAll, "ignore")
-WriteTable(FileLuacheckAll, "exclude_files")
-
-FileLuacheckAll:close()
 ]])
 
 	file:close()
