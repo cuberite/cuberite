@@ -362,7 +362,7 @@ public:
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
 	/* Get the count of bookshelves who stand in the near of the enchanting table */
-	int GetBookshelvesCount(cWorld * a_World);
+	int GetBookshelvesCount(cWorld & a_World);
 
 protected:
 	/** Handles a click in the item slot. */
