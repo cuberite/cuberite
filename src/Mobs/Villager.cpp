@@ -121,7 +121,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 
 	// Read a 11x7x11 area:
 	Surrounding.Read(
-		m_World,
+		*m_World,
 		FloorC(GetPosX()) - 5,
 		FloorC(GetPosX()) + 6,
 		FloorC(GetPosY()) - 3,
