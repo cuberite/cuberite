@@ -391,7 +391,7 @@ void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = 0;
-	m_GameMode = eGameMode_Creative;
+	m_GameMode = eGameMode_Survival;
 
 	cIniFile IniFile;
 	if (!IniFile.ReadFile(m_IniFileName))
