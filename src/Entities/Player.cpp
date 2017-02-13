@@ -1933,7 +1933,8 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	ASSERT(a_World != nullptr);
 	ASSERT(IsTicking());
 
-	if (GetWorld() == a_World)
+	cWorld * OldWorld = GetWorld();
+	if (OldWorld == a_World)
 	{
 		// Don't move to same world
 		return false;
@@ -1946,62 +1947,85 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
-	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
+	AString UUID = GetUUID();
+	cWorld * NewWorld = a_World;
+
+	GetWorld()->QueueTask([UUID, OldWorld, NewWorld, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
 	{
-		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-		GetClientHandle()->InvalidateCachedSentChunk();
-
-		// Prevent further ticking in this world
-		SetIsTicking(false);
-
-		// Tell others we are gone
-		GetWorld()->BroadcastDestroyEntity(*this);
-
-		// Remove player from world
-		GetWorld()->RemovePlayer(this, false);
-
-		// Set position to the new position
-		SetPosition(a_NewPosition);
-		FreezeInternal(a_NewPosition, false);
-
-		// Stop all mobs from targeting this player
-		StopEveryoneFromTargetingMe();
-
-		cClientHandle * ch = this->GetClientHandle();
-		if (ch != nullptr)
+		UNUSED(a_OldWorld);
+		class cCallback : public cPlayerListCallback
 		{
-			// Send the respawn packet:
-			if (a_ShouldSendRespawn)
+			virtual bool Item(cPlayer * a_Player) override
 			{
-				m_ClientHandle->SendRespawn(a_World->GetDimension());
+				cWorld * OldWorld = a_Player->GetWorld();
+				// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
+				a_Player->GetClientHandle()->InvalidateCachedSentChunk();
+
+				// Prevent further ticking in this world
+				a_Player->SetIsTicking(false);
+
+				// Tell others we are gone
+				OldWorld->BroadcastDestroyEntity(*a_Player);
+
+				// Remove player from world
+				OldWorld->RemovePlayer(a_Player, false);
+
+				// Set position to the new position
+				a_Player->SetPosition(a_NewPosition);
+				a_Player->FreezeInternal(a_NewPosition, false);
+
+				// Stop all mobs from targeting this player
+				a_Player->StopEveryoneFromTargetingMe();
+
+				cClientHandle * ch = a_Player->GetClientHandle();
+				if (ch != nullptr)
+				{
+					// Send the respawn packet:
+					if (a_ShouldSendRespawn)
+					{
+						ch->SendRespawn(NewWorld->GetDimension());
+					}
+
+
+					// Update the view distance.
+					ch->SetViewDistance(ch->GetRequestedViewDistance());
+
+					// Send current weather of target world to player
+					if (NewWorld->GetDimension() == dimOverworld)
+					{
+						ch->SendWeather(NewWorld->GetWeather());
+					}
+				}
+
+				// Broadcast the player into the new world.
+				NewWorld->BroadcastSpawnEntity(*a_Player);
+
+				// Queue add to new world and removal from the old one
+
+				a_Player->SetWorld(NewWorld);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+				cChunk * ParentChunk = a_Player->GetParentChunk();
+
+				LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+					a_Player->GetName().c_str(),
+					OldWorld->GetName().c_str(), NewWorld->GetName().c_str(),
+					ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+				);
+				ParentChunk->RemoveEntity(a_Player);
+				NewWorld->AddPlayer(a_Player, OldWorld);  // New world will take over and announce client at its next tick
+
+				return true;
 			}
+		public:
+			cWorld * NewWorld;
+			bool a_ShouldSendRespawn;
+			Vector3d a_NewPosition;
+		} Callback;
 
+		Callback.NewWorld = NewWorld;
+		Callback.a_ShouldSendRespawn = a_ShouldSendRespawn;
+		Callback.a_NewPosition = a_NewPosition;
 
-			// Update the view distance.
-			ch->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
-
-			// Send current weather of target world to player
-			if (a_World->GetDimension() == dimOverworld)
-			{
-				ch->SendWeather(a_World->GetWeather());
-			}
-		}
-
-		// Broadcast the player into the new world.
-		a_World->BroadcastSpawnEntity(*this);
-
-		// Queue add to new world and removal from the old one
-
-		SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-		cChunk * ParentChunk = this->GetParentChunk();
-
-		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-			this->GetName().c_str(),
-			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
-		);
-		ParentChunk->RemoveEntity(this);
-		a_World->AddPlayer(this, &a_OldWorld);  // New world will take over and announce client at its next tick
+		OldWorld->DoWithPlayerByUUID(UUID, Callback);
 	});
 
 	return true;
