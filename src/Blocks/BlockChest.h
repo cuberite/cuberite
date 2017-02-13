@@ -37,7 +37,7 @@ public:
 
 		// Check if this forms a doublechest, if so, need to adjust the meta:
 		cBlockArea Area;
-		if (!Area.Read(&a_ChunkInterface, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
+		if (!Area.Read(a_ChunkInterface, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
 		{
 			return false;
 		}
@@ -75,7 +75,7 @@ public:
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		cBlockArea Area;
-		if (!Area.Read(&a_ChunkInterface, a_BlockX - 2, a_BlockX + 2, a_BlockY, a_BlockY, a_BlockZ - 2, a_BlockZ + 2))
+		if (!Area.Read(a_ChunkInterface, a_BlockX - 2, a_BlockX + 2, a_BlockY, a_BlockY, a_BlockZ - 2, a_BlockZ + 2))
 		{
 			// Cannot read the surroundings, probably at the edge of loaded chunks. Disallow.
 			return false;

@@ -434,7 +434,7 @@ void cBlockArea::SetOrigin(const Vector3i & a_Origin)
 
 
 
-bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
+bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	// Normalize the coords:
 	if (a_MinBlockX > a_MaxBlockX)
@@ -501,7 +501,7 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinB
 	cChunkDef::AbsoluteToRelative(a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
 
 	// Query block data:
-	if (!a_ForEachChunkProvider->ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
+	if (!a_ForEachChunkProvider.ForEachChunkInRect(MinChunkX, MaxChunkX, MinChunkZ, MaxChunkZ, Reader))
 	{
 		Clear();
 		return false;
@@ -514,7 +514,7 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinB
 
 
 
-bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, const cCuboid & a_Bounds, int a_DataTypes)
+bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const cCuboid & a_Bounds, int a_DataTypes)
 {
 	return Read(
 		a_ForEachChunkProvider,
@@ -529,7 +529,7 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, const cCub
 
 
 
-bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_Point1, const Vector3i & a_Point2, int a_DataTypes)
+bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_Point1, const Vector3i & a_Point2, int a_DataTypes)
 {
 	return Read(
 		a_ForEachChunkProvider,
@@ -544,7 +544,7 @@ bool cBlockArea::Read(cForEachChunkProvider * a_ForEachChunkProvider, const Vect
 
 
 
-bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+bool cBlockArea::Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
 	a_DataTypes = a_DataTypes & GetDataTypes();  // For release builds, silently cut off the datatypes that I don't have
@@ -561,14 +561,14 @@ bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_Min
 		a_MinBlockY = std::max(cChunkDef::Height - m_Size.y, 0);
 	}
 
-	return a_ForEachChunkProvider->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
+	return a_ForEachChunkProvider.WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 }
 
 
 
 
 
-bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes)
+bool cBlockArea::Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes)
 {
 	return Write(
 		a_ForEachChunkProvider,

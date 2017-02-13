@@ -36,6 +36,27 @@ public:
 
 	struct cConnector
 	{
+		enum eDirection
+		{
+			// The following values correspond to equivalent eBlockFace values:
+			dirXM   =  BLOCK_FACE_XM,  // Pointing towards the X- side of the prefab
+			dirXP   =  BLOCK_FACE_XP,  // Pointing towards the X+ side of the prefab
+			dirYM   =  BLOCK_FACE_YM,  // Pointing towards the Y- side of the prefab, doesn't change with rotation around the Y axis
+			dirYP   =  BLOCK_FACE_YP,  // Pointing towards the Y+ side of the prefab, doesn't change with rotation around the Y axis
+			dirZM   =  BLOCK_FACE_ZM,  // Pointing towards the Z- side of the prefab
+			dirZP   =  BLOCK_FACE_ZP,  // Pointing towards the Z+ side of the prefab
+
+			// Special kind of the vertical connectors (changes with rotation around the Y axis)
+			dirYM_XM_ZM = BLOCK_FACE_MAX + 1,  // Pointing towards the Y- side of the prefab, conceptually at the X- Z- corner of the block
+			dirYM_XM_ZP,                       // Pointing towards the Y- side of the prefab, conceptually at the X- Z+ corner of the block
+			dirYM_XP_ZM,                       // Pointing towards the Y- side of the prefab, conceptually at the X+ Z- corner of the block
+			dirYM_XP_ZP,                       // Pointing towards the Y- side of the prefab, conceptually at the X+ Z+ corner of the block
+			dirYP_XM_ZM,                       // Pointing towards the Y+ side of the prefab, conceptually at the X- Z- corner of the block
+			dirYP_XM_ZP,                       // Pointing towards the Y+ side of the prefab, conceptually at the X- Z+ corner of the block
+			dirYP_XP_ZM,                       // Pointing towards the Y+ side of the prefab, conceptually at the X+ Z- corner of the block
+			dirYP_XP_ZP,                       // Pointing towards the Y+ side of the prefab, conceptually at the X+ Z+ corner of the block
+		};
+
 		/** Position relative to the piece */
 		Vector3i m_Pos;
 
@@ -45,10 +66,35 @@ public:
 
 		/** Direction in which the connector is facing.
 		Will be matched by the opposite direction for the connecting connector. */
-		eBlockFace m_Direction;
+		eDirection m_Direction;
 
-		cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace a_Direction);
-		cConnector(const Vector3i & a_Pos, int a_Type, eBlockFace a_Direction);
+		cConnector(int a_X, int a_Y, int a_Z, int a_Type, eDirection a_Direction);
+		cConnector(const Vector3i & a_Pos, int a_Type, eDirection a_Direction);
+
+		/** Returns the position of the block that has the specified direction from the specified position.
+		Similar to ::AddFaceDirection() */
+		static Vector3i AddDirection(const Vector3i & a_Pos, eDirection a_Direction);
+
+		/** Returns the string representation of the direction.
+		For debugging purposes. */
+		static const char * DirectionToString(eDirection a_Direction);
+
+		/** Returns true if the specified number corresponds to a valid eDirection. */
+		static bool IsValidDirection(int a_Direction);
+
+		/** Returns the direction corresponding to the given direction rotated 180 degrees around the Y axis. */
+		static eDirection RotateDirection(eDirection a_Direction);
+
+		/** Returns the direction corresponding to the given direction rotated 90 degrees CCW around the Y axis. */
+		static eDirection RotateDirectionCCW(eDirection a_Direction);
+
+		/** Returns the direction corresponding to the given direction rotated 90 degrees CW around the Y axis. */
+		static eDirection RotateDirectionCW(eDirection a_Direction);
+
+		/** Converts the string representation of a direction into the eDirection enum value.
+		Returns true if successful, false on failure.
+		Accepts both numbers and string representations such as "x+" or "Y+X-Z+". */
+		static bool StringToDirection(const AString & a_Value, eDirection & a_Out);
 	};
 
 	typedef std::vector<cConnector> cConnectors;

@@ -28,6 +28,12 @@ g_PluginInfo =
 			Handler = HandleBlkCmd,
 			HelpString = "Gets info about the block you are looking at"
 		},
+		["/clientversion"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleClientVersionCmd,
+			HelpString = "Shows your client's protocol version",
+		},
 		["/compo"] =
 		{
 			Permission = "debuggers",

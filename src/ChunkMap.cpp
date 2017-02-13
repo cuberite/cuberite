@@ -1707,7 +1707,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	{
 		cBlockArea area;
 		a_BlocksAffected.reserve(8 * static_cast<size_t>(ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt));
-		if (!area.Read(m_World, bx - ExplosionSizeInt, static_cast<int>(ceil(a_BlockX + ExplosionSizeInt)), MinY, MaxY, bz - ExplosionSizeInt, static_cast<int>(ceil(a_BlockZ + ExplosionSizeInt))))
+		if (!area.Read(*m_World, bx - ExplosionSizeInt, static_cast<int>(ceil(a_BlockX + ExplosionSizeInt)), MinY, MaxY, bz - ExplosionSizeInt, static_cast<int>(ceil(a_BlockZ + ExplosionSizeInt))))
 		{
 			return;
 		}
@@ -1803,7 +1803,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				}  // for z
 			}  // for y
 		}  // for x
-		area.Write(m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
+		area.Write(*m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
 	}
 
 	class cTNTDamageCallback :

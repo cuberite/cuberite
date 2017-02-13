@@ -1567,6 +1567,15 @@ end
 
 
 
+function HandleClientVersionCmd(a_Split, a_Player)
+	a_Player:SendMessage("Your client version number is " .. a_Player:GetClientHandle():GetProtocolVersion() ..".")
+	return true
+end
+
+
+
+
+
 function HandleCompo(a_Split, a_Player)
 	-- Send one composite message to self:
 	local msg = cCompositeChat()

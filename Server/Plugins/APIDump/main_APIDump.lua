@@ -1696,7 +1696,34 @@ globals =
 		end
 	end
 
-	file:write("}\n")
+	file:write("}\n\n")
+
+	-- Add merge code
+	file:write([[
+-- ## Main ##
+
+-- Load plugins's luacheck
+local FilePluginLuacheck = loadfile(".luacheckrc_plugin")
+
+if FilePluginLuacheck ~= nil then
+	local PluginLuacheck = {}
+	setfenv(FilePluginLuacheck, PluginLuacheck)
+	FilePluginLuacheck()
+
+	for Option, Value in pairs(PluginLuacheck) do
+		if (type(Value) == "table") and not(getfenv(1)[Option] == nil) then
+			-- Merge tables together
+			for _ , Entry in ipairs(Value) do
+				table.insert(getfenv(1)[Option], Entry)
+			end
+		else
+			-- Add a option, table or overwrite a option
+			getfenv(1)[Option] = Value
+		end
+	end
+end
+]])
+
 	file:close()
 
 	LOG("Config file .luacheckrc created...")

@@ -375,59 +375,6 @@ void cWorld::InitializeSpawn(void)
 	int ChunkX = 0, ChunkZ = 0;
 	cChunkDef::BlockToChunk(FloorC(m_SpawnX), FloorC(m_SpawnZ), ChunkX, ChunkZ);
 	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
-
-	#ifdef TEST_LINEBLOCKTRACER
-	// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
-	class cTracerCallbacks :
-		public cBlockTracer::cCallbacks
-	{
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
-		{
-			LOGD("Block {%d, %d, %d}: %d:%d (%s)",
-				a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta,
-				ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
-			);
-			return false;
-		}
-
-		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) override
-		{
-			LOGD("Block {%d, %d, %d}: no data available",
-				a_BlockX, a_BlockY, a_BlockZ
-			);
-			return false;
-		}
-
-		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
-		{
-			LOGD("Out of world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
-			return false;
-		}
-
-		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
-		{
-			LOGD("Into world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
-			return false;
-		}
-
-		virtual void OnNoMoreHits(void) override
-		{
-			LOGD("No more hits");
-		}
-	} Callbacks;
-	LOGD("Spawn is at {%f, %f, %f}", m_SpawnX, m_SpawnY, m_SpawnZ);
-	LOGD("Tracing a line along +X:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 10, m_SpawnY, m_SpawnZ, m_SpawnX + 10, m_SpawnY, m_SpawnZ);
-	LOGD("Tracing a line along -Z:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX, m_SpawnY, m_SpawnZ + 10, m_SpawnX, m_SpawnY, m_SpawnZ - 10);
-	LOGD("Tracing a line along -Y, out of world:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX, 260, m_SpawnZ, m_SpawnX, -5, m_SpawnZ);
-	LOGD("Tracing a line along XY:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 10, m_SpawnY - 10, m_SpawnZ, m_SpawnX + 10, m_SpawnY + 10, m_SpawnZ);
-	LOGD("Tracing a line in generic direction:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 15, m_SpawnY - 5, m_SpawnZ + 7.5, m_SpawnX + 13, m_SpawnY - 10, m_SpawnZ + 8.5);
-	LOGD("Tracing tests done");
-	#endif  // TEST_LINEBLOCKTRACER
 }
 
 
@@ -444,7 +391,7 @@ void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = 0;
-	m_GameMode = eGameMode_Creative;
+	m_GameMode = eGameMode_Survival;
 
 	cIniFile IniFile;
 	if (!IniFile.ReadFile(m_IniFileName))
@@ -523,6 +470,8 @@ void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 	m_IsDaylightCycleEnabled      = IniFile.GetValueSetB("General",       "IsDaylightCycleEnabled",      true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    static_cast<int>(m_GameMode));
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     static_cast<int>(m_Weather));
+
+	m_WorldAge = std::chrono::milliseconds(IniFile.GetValueSetI("General", "WorldAgeMS", 0LL));
 
 	// Load the weather frequency data:
 	if (m_Dimension == dimOverworld)
@@ -990,6 +939,7 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
 		IniFile.SetValueI("General", "Weather", static_cast<int>(m_Weather));
 		IniFile.SetValueI("General", "TimeInTicks", GetTimeOfDay());
+		IniFile.SetValueI("General", "WorldAgeMS", static_cast<Int64>(m_WorldAge.count()));
 	IniFile.WriteFile(m_IniFileName);
 
 	m_TickThread.Stop();

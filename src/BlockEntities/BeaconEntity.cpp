@@ -32,7 +32,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 	int MaxY = std::max(GetPosY() - 1, 0);
 
 	Area.Read(
-		m_World,
+		*m_World,
 		GetPosX() - 4, GetPosX() + 4,
 		MinY, MaxY,
 		GetPosZ() - 4, GetPosZ() + 4,

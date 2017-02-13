@@ -299,7 +299,7 @@ void cPrefab::SetDefaultWeight(int a_DefaultWeight)
 
 
 
-void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type)
+void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, cPiece::cConnector::eDirection a_Direction, int a_Type)
 {
 	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));
 }
@@ -390,7 +390,7 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 		{
 			continue;
 		}
-		// Split into components: "Type: X, Y, Z: Face":
+		// Split into components: "Type: X, Y, Z: Direction":
 		AStringVector Defs = StringSplitAndTrim(*itr, ":");
 		if (Defs.size() != 3)
 		{
@@ -404,11 +404,11 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 			continue;
 		}
 
-		// Check that the BlockFace is within range:
-		int BlockFace = atoi(Defs[2].c_str());
-		if ((BlockFace < 0) || (BlockFace >= 6))
+		// Check that the Direction is valid:
+		cPiece::cConnector::eDirection Direction;
+		if (!cPiece::cConnector::StringToDirection(Defs[2], Direction))
 		{
-			LOGWARNING("Bad prefab Connector Blockface: \"%s\", skipping.", Defs[2].c_str());
+			LOGWARNING("Bad prefab Connector direction: \"%s\", skipping.", Defs[2].c_str());
 			continue;
 		}
 
@@ -416,7 +416,7 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 		m_Connectors.push_back(cPiece::cConnector(
 			atoi(Coords[0].c_str()), atoi(Coords[1].c_str()), atoi(Coords[2].c_str()),  // Connector pos
 			atoi(Defs[0].c_str()),  // Connector type
-			static_cast<eBlockFace>(BlockFace)
+			Direction
 		));
 	}  // for itr - Lines[]
 }
