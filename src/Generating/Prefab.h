@@ -132,7 +132,7 @@ public:
 	void SetAddWeightIfSame(int a_AddWeightIfSame) { m_AddWeightIfSame = a_AddWeightIfSame; }
 
 	/** Adds the specified connector to the list of connectors this piece supports. */
-	void AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type);
+	void AddConnector(int a_RelX, int a_RelY, int a_RelZ, cPiece::cConnector::eDirection a_Direction, int a_Type);
 
 	/** Returns whether the prefab should be moved Y-wise to ground before drawing, rather than staying
 	at the coords governed by the connectors. */
