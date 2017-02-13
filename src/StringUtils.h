@@ -220,10 +220,10 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 
 
 
-/** Returns an integer from a key-value string map.
-Returns a_Default if the key is not present or the value is not an int. */
+/** Returns a number (of any integer type T) from a key-value string map.
+Returns a_Default if the key is not present or the value is not a number representable in type T. */
 template <typename T>
-int GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Default)
+T GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Default)
 {
 	// Try to locate the key:
 	auto itr = a_Map.find(a_Key);

@@ -64,22 +64,22 @@ public:
 			BA.Create(len, 1, 3, cBlockArea::baTypes | cBlockArea::baMetas);
 			BA.Fill(cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_GRAVEL, 0);
 			cPrefab * RoadPiece = new cPrefab(BA, 1);
-			RoadPiece->AddConnector(0,       0, 1, BLOCK_FACE_XM, -2);
-			RoadPiece->AddConnector(len - 1, 0, 1, BLOCK_FACE_XP, -2);
+			RoadPiece->AddConnector(0,       0, 1, cPiece::cConnector::dirXM, -2);
+			RoadPiece->AddConnector(len - 1, 0, 1, cPiece::cConnector::dirXP, -2);
 			RoadPiece->SetDefaultWeight(100);
 
 			// Add the road connectors:
 			for (int x = 1; x < len; x += 12)
 			{
-				RoadPiece->AddConnector(x, 0, 0, BLOCK_FACE_ZM, 2);
-				RoadPiece->AddConnector(x, 0, 2, BLOCK_FACE_ZP, 2);
+				RoadPiece->AddConnector(x, 0, 0, cPiece::cConnector::dirZM, 2);
+				RoadPiece->AddConnector(x, 0, 2, cPiece::cConnector::dirZP, 2);
 			}
 
 			// Add the buildings connectors:
 			for (int x = 7; x < len; x += 12)
 			{
-				RoadPiece->AddConnector(x, 0, 0, BLOCK_FACE_ZM, 1);
-				RoadPiece->AddConnector(x, 0, 2, BLOCK_FACE_ZP, 1);
+				RoadPiece->AddConnector(x, 0, 0, cPiece::cConnector::dirZM, 1);
+				RoadPiece->AddConnector(x, 0, 2, cPiece::cConnector::dirZP, 1);
 			}
 			m_AllPieces.push_back(RoadPiece);
 			m_PiecesByConnector[-2].push_back(RoadPiece);

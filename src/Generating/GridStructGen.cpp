@@ -101,12 +101,13 @@ cGridStructGen::cGridStructGen(int a_Seed):
 void cGridStructGen::SetGeneratorParams(const AStringMap & a_GeneratorParams)
 {
 	ASSERT(m_Cache.empty());  // No changing the params after chunks are generated
-	m_GridSizeX         = GetStringMapInteger<int>(a_GeneratorParams, "GridSizeX",         m_GridSizeX);
-	m_GridSizeZ         = GetStringMapInteger<int>(a_GeneratorParams, "GridSizeZ",         m_GridSizeZ);
-	m_MaxOffsetX        = GetStringMapInteger<int>(a_GeneratorParams, "MaxOffsetX",        m_MaxOffsetX);
-	m_MaxOffsetZ        = GetStringMapInteger<int>(a_GeneratorParams, "MaxOffsetZ",        m_MaxOffsetZ);
-	m_MaxStructureSizeX = GetStringMapInteger<int>(a_GeneratorParams, "MaxStructureSizeX", m_MaxStructureSizeX);
-	m_MaxStructureSizeZ = GetStringMapInteger<int>(a_GeneratorParams, "MaxStructureSizeZ", m_MaxStructureSizeZ);
+	m_GridSizeX         = GetStringMapInteger<int>   (a_GeneratorParams, "GridSizeX",         m_GridSizeX);
+	m_GridSizeZ         = GetStringMapInteger<int>   (a_GeneratorParams, "GridSizeZ",         m_GridSizeZ);
+	m_MaxOffsetX        = GetStringMapInteger<int>   (a_GeneratorParams, "MaxOffsetX",        m_MaxOffsetX);
+	m_MaxOffsetZ        = GetStringMapInteger<int>   (a_GeneratorParams, "MaxOffsetZ",        m_MaxOffsetZ);
+	m_MaxStructureSizeX = GetStringMapInteger<int>   (a_GeneratorParams, "MaxStructureSizeX", m_MaxStructureSizeX);
+	m_MaxStructureSizeZ = GetStringMapInteger<int>   (a_GeneratorParams, "MaxStructureSizeZ", m_MaxStructureSizeZ);
+	m_MaxCacheSize      = GetStringMapInteger<size_t>(a_GeneratorParams, "MaxCacheSize",      m_MaxCacheSize);
 
 	// Silently fix out-of-range parameters:
 	if (m_MaxOffsetX < 1)
