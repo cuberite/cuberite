@@ -1359,7 +1359,8 @@ void cEntity::DetectCacti(void)
 		((GetPosX() - X < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
 		(((Z + 1) - GetPosZ() < w) && (GetWorld()->GetBlock(X, Y, Z + 1) == E_BLOCK_CACTUS)) ||
 		((GetPosZ() - Z < w) && (GetWorld()->GetBlock(X, Y, Z - 1) == E_BLOCK_CACTUS)) ||
-		(((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y, Z) == E_BLOCK_CACTUS))))
+		(((Y + 1) - GetPosY() < w) && (GetWorld()->GetBlock(X, Y + 1, Z) == E_BLOCK_CACTUS)) ||
+		((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y - 1, Z) == E_BLOCK_CACTUS)))
 		)
 	{
 		TakeDamage(dtCactusContact, nullptr, 1, 0);

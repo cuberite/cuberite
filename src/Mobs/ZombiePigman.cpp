@@ -2,8 +2,7 @@
 
 #include "ZombiePigman.h"
 #include "../World.h"
-
-
+#include "ClientHandle.h"
 
 
 
@@ -34,6 +33,12 @@ void cZombiePigman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 }
 
 
+void cZombiePigman::SpawnOn(cClientHandle & a_ClientHandle)
+{
+	
+		super::SpawnOn(a_ClientHandle);
+		a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_GOLD_SWORD));
+}
 
 
 
