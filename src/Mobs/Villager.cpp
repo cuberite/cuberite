@@ -199,6 +199,7 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
+		case E_BLOCK_BEETROOTS:
 		case E_BLOCK_CROPS:
 		case E_BLOCK_POTATOES:
 		case E_BLOCK_CARROTS:

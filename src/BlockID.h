@@ -235,12 +235,29 @@ enum BLOCKTYPE
 	E_BLOCK_RED_NETHER_BRICK = 215,
 	E_BLOCK_BONE_BLOCK = 216,
 	E_BLOCK_STRUCTURE_VOID = 217,
+	E_BLOCK_OBSERVER = 218,
+	E_BLOCK_WHITE_SHULKER_BOX = 219,
+	E_BLOCK_ORANGE_SHULKER_BOX = 220,
+	E_BLOCK_MAGENTA_SHULKER_BOX = 221,
+	E_BLOCK_LIGHT_BLUE_SHULKER_BOX = 222,
+	E_BLOCK_YELLOW_SHULKER_BOX = 223,
+	E_BLOCK_LIME_SHULKER_BOX = 224,
+	E_BLOCK_PINK_SHULKER_BOX = 225,
+	E_BLOCK_GRAY_SHULKER_BOX = 226,
+	E_BLOCK_LIGHT_GRAY_SHULKER_BOX = 227,
+	E_BLOCK_CYAN_SHULKER_BOX = 228,
+	E_BLOCK_PURPLE_SHULKER_BOX = 229,
+	E_BLOCK_BLUE_SHULKER_BOX = 230,
+	E_BLOCK_BROWN_SHULKER_BOX = 231,
+	E_BLOCK_GREEN_SHULKER_BOX = 232,
+	E_BLOCK_RED_SHULKER_BOX = 233,
+	E_BLOCK_BLACK_SHULKER_BOX = 234,
 	// ...
 	E_BLOCK_STRUCTURE_BLOCK = 255,
 
 	// Keep these two as the last values. Update the last block value to the last block with an id less than 255 when adding another block
 	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See http://minecraft.gamepedia.com/Data_values#Block_IDs
-	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_STRUCTURE_VOID + 1,  ///< Number of individual (different) blocktypes
+	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_BLACK_SHULKER_BOX + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 
 	// Synonym or ID compatibility
@@ -439,11 +456,32 @@ enum ENUM_ITEM_ID
 	E_ITEM_RAW_MUTTON = 423,
 	E_ITEM_COOKED_MUTTON = 424,
 	E_ITEM_BANNER = 425,
+	E_ITEM_END_CRYSTAL = 426,
 	E_ITEM_SPRUCE_DOOR = 427,
 	E_ITEM_BIRCH_DOOR = 428,
 	E_ITEM_JUNGLE_DOOR = 429,
 	E_ITEM_ACACIA_DOOR = 430,
 	E_ITEM_DARK_OAK_DOOR = 431,
+	E_ITEM_CHORUS_FRUIT = 432,
+	E_ITEM_POPPED_CHORUS_FRUIT = 433,
+	E_ITEM_BEETROOT = 434,
+	E_ITEM_BEETROOT_SEEDS = 435,
+	E_ITEM_BEETROOT_SOUP = 436,
+	E_ITEM_DRAGON_BREATH = 437,
+	E_ITEM_SPLASH_POTION = 438,
+	E_ITEM_SPECTRAL_ARROW = 439,
+	E_ITEM_TIPPED_ARROW = 440,
+	E_ITEM_LINGERING_POTION = 441,
+	E_ITEM_SHIELD = 442,
+	E_ITEM_ELYTRA = 443,
+	E_ITEM_SPRUCE_BOAT = 444,
+	E_ITEM_BIRCH_BOAT = 445,
+	E_ITEM_JUNGLE_BOAT = 446,
+	E_ITEM_ACACIA_BOAT = 447,
+	E_ITEM_DARK_OAK_BOAT = 448,
+	E_ITEM_TOTEM_OF_UNDYING = 449,
+	E_ITEM_SHULKER_SHELL = 450,
+	E_ITEM_IRON_NUGGET = 452,
 
 	// Keep these two as the last values of the consecutive list, without a number - they will get their correct number assigned automagically by C++
 	// IsValidItem() depends on this!
@@ -928,6 +966,7 @@ enum
 	E_META_HEAD_ZOMBIE   = 2,
 	E_META_HEAD_PLAYER   = 3,
 	E_META_HEAD_CREEPER  = 4,
+	E_META_HEAD_DRAGON   = 5,
 
 	// E_ITEM_RAW_FISH metas:
 	E_META_RAW_FISH_FISH       = 0,

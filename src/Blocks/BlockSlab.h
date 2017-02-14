@@ -88,7 +88,12 @@ public:
 	/** Returns true if the specified blocktype is one of the slabs handled by this handler */
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
 	{
-		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB) || (a_BlockType == E_BLOCK_RED_SANDSTONE_SLAB));
+		return (
+			(a_BlockType == E_BLOCK_WOODEN_SLAB) ||
+			(a_BlockType == E_BLOCK_STONE_SLAB) ||
+			(a_BlockType == E_BLOCK_RED_SANDSTONE_SLAB) ||
+			(a_BlockType == E_BLOCK_PURPUR_SLAB)
+		);
 	}
 
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
@@ -110,6 +115,7 @@ public:
 			case E_BLOCK_STONE_SLAB: return E_BLOCK_DOUBLE_STONE_SLAB;
 			case E_BLOCK_WOODEN_SLAB: return E_BLOCK_DOUBLE_WOODEN_SLAB;
 			case E_BLOCK_RED_SANDSTONE_SLAB: return E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB;
+			case E_BLOCK_PURPUR_SLAB: return E_BLOCK_PURPUR_DOUBLE_SLAB;
 		}
 		ASSERT(!"Unhandled slab type!");
 		return E_BLOCK_AIR;
@@ -167,6 +173,10 @@ public:
 			{
 				return 10;
 			}
+			case E_BLOCK_PURPUR_SLAB:
+			{
+				return 16;
+			}
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in slab handler!");
@@ -211,6 +221,7 @@ public:
 			case E_BLOCK_DOUBLE_STONE_SLAB: return E_BLOCK_STONE_SLAB;
 			case E_BLOCK_DOUBLE_WOODEN_SLAB: return E_BLOCK_WOODEN_SLAB;
 			case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB: return E_BLOCK_RED_SANDSTONE_SLAB;
+			case E_BLOCK_PURPUR_DOUBLE_SLAB: return E_BLOCK_PURPUR_SLAB;
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return a_BlockType;
