@@ -36,7 +36,7 @@ void cVaporizeFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ,
 	{
 		a_Chunk->SetBlock(RelX, a_BlockY, RelZ, E_BLOCK_AIR, 0);
 		a_Chunk->BroadcastSoundEffect(
-			"random.fizz",
+			"block.fire.extinguish",
 			static_cast<double>(a_BlockX),
 			static_cast<double>(a_BlockY),
 			static_cast<double>(a_BlockZ),

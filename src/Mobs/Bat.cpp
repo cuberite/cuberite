@@ -7,7 +7,7 @@
 
 
 cBat::cBat(void) :
-	super("Bat", mtBat,  "mob.bat.hurt", "mob.bat.death", 0.5, 0.9)
+	super("Bat", mtBat,  "entity.bat.hurt", "entity.bat.death", 0.5, 0.9)
 {
 	SetGravity(-2.0f);
 	SetAirDrag(0.05f);

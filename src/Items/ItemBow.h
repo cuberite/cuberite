@@ -81,7 +81,7 @@ public:
 			return;
 		}
 		a_Player->GetWorld()->BroadcastSoundEffect(
-			"random.bow",
+			"entity.arrow.shoot",
 			a_Player->GetPosX(),
 			a_Player->GetPosY(),
 			a_Player->GetPosZ(),

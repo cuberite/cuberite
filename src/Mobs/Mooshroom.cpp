@@ -14,7 +14,7 @@
 
 
 cMooshroom::cMooshroom(void) :
-	super("Mooshroom", mtMooshroom, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
+	super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3)
 {
 }
 
