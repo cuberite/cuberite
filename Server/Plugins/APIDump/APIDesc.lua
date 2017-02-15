@@ -16780,7 +16780,7 @@ end
 				E_META_HEAD_ZOMBIE =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
-},
+				},
 				esBed =
 				{
 					Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed.",

@@ -44,7 +44,7 @@ public:
 		{
 			cChunkInterface ChunkInterface(m_World.GetChunkMap());
 			cBlockDoorHandler::SetOpen(ChunkInterface, a_Position.x, a_Position.y, a_Position.z, (a_PoweringData.PowerLevel != 0));
-			m_World.BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, a_Position.x, a_Position.y, a_Position.z, 0);
+			m_World.BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_Position.x, a_Position.y, a_Position.z, 0);
 		}
 
 		return {};

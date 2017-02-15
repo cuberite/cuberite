@@ -25,7 +25,7 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 
 	// Play the opening sound:
 	m_World->BroadcastSoundEffect(
-		"random.chestopen",
+		"block.enderchest.open",
 		static_cast<double>(m_BlockX),
 		static_cast<double>(m_BlockY),
 		static_cast<double>(m_BlockZ),
@@ -48,7 +48,7 @@ cEnderChestWindow::~cEnderChestWindow()
 
 	// Play the closing sound
 	m_World->BroadcastSoundEffect(
-		"random.chestclosed",
+		"block.enderchest.close",
 		static_cast<double>(m_BlockX),
 		static_cast<double>(m_BlockY),
 		static_cast<double>(m_BlockZ),

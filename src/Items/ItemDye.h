@@ -63,7 +63,6 @@ public:
 			// Place the cocoa pod:
 			if (a_Player->PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COCOA_POD, BlockMeta))
 			{
-				a_World->BroadcastSoundEffect("dig.stone", a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 1.0f, 0.8f);
 				if (a_Player->IsGameModeSurvival())
 				{
 					a_Player->GetInventory().RemoveOneEquippedItem();

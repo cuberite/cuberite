@@ -9,7 +9,7 @@
 
 
 cGhast::cGhast(void) :
-	super("Ghast", mtGhast, "mob.ghast.scream", "mob.ghast.death", 4, 4)
+	super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", 4, 4)
 {
 }
 
