@@ -319,6 +319,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			AllowedBiomes.push_back(biMesaPlateauF);
 			AllowedBiomes.push_back(biMesaPlateauFM);
 			AllowedBiomes.push_back(biMesaPlateauM);
+			AllowedBiomes.push_back(biMegaTaiga);
 
 			// A list with all the allowed blocks that can be below the dead bush.
 			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
