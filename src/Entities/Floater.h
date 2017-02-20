@@ -27,11 +27,15 @@ public:
 	bool CanPickup(void)       const { return m_CanPickupItem; }
 	UInt32 GetOwnerID(void)       const { return m_PlayerID; }
 	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
+	Vector3d GetBitePos(void)     const { return m_BitePos; }
 	// tolua_end
 
 protected:
 	// Position
 	Vector3d m_ParticlePos;
+
+	// Position just before the floater gets pulled under by a fish
+	Vector3d m_BitePos;
 
 	// Bool needed to check if you can get a fish.
 	bool m_CanPickupItem;

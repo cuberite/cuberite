@@ -103,6 +103,7 @@ protected:
 
 cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
 	cEntity(etFloater, a_X, a_Y, a_Z, 0.2, 0.2),
+	m_BitePos(Vector3d(a_X, a_Y, a_Z)),
 	m_CanPickupItem(false),
 	m_PickupCountDown(0),
 	m_CountDownTime(a_CountDownTime),
@@ -135,6 +136,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_CountDownTime <= 0)
 			{
+				m_BitePos = GetPosition();
 				m_World->BroadcastSoundEffect("entity.bobber.splash", GetPosX(), GetPosY(), GetPosZ(), 1, 1);
 				SetPosY(GetPosY() - 1);
 				m_CanPickupItem = true;
