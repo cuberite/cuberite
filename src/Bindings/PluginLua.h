@@ -62,7 +62,7 @@ public:
 
 
 
-	cPluginLua(const AString & a_PluginDirectory);
+	cPluginLua(const AString & a_PluginDirectory, cDeadlockDetect & a_DeadlockDetect);
 	~cPluginLua();
 
 	virtual void OnDisable(void) override;
@@ -178,6 +178,9 @@ protected:
 
 	/** Hooks that the plugin has registered. */
 	cHookMap m_HookMap;
+
+	/** The DeadlockDetect object to which the plugin's CS is tracked. */
+	cDeadlockDetect & m_DeadlockDetect;
 
 
 	/** Releases all Lua references, notifies and removes all m_Resettables[] and closes the m_LuaState. */

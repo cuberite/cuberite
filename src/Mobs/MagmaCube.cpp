@@ -7,7 +7,7 @@
 
 
 cMagmaCube::cMagmaCube(int a_Size) :
-	super("MagmaCube", mtMagmaCube, Printf("mob.magmacube.%s", GetSizeName(a_Size).c_str()), Printf("mob.magmacube.%s", GetSizeName(a_Size).c_str()), 0.6 * a_Size, 0.6 * a_Size),
+	super("MagmaCube", mtMagmaCube, Printf("entity.%smagmacube.hurt", GetSizeName(a_Size).c_str()), Printf("entity.%smagmacube.death", GetSizeName(a_Size).c_str()), 0.6 * a_Size, 0.6 * a_Size),
 	m_Size(a_Size)
 {
 }
@@ -29,12 +29,9 @@ void cMagmaCube::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 AString cMagmaCube::GetSizeName(int a_Size)
 {
-	if (a_Size > 1)
+	if (a_Size == 1)
 	{
-		return "big";
+		return "small_";
 	}
-	else
-	{
-		return "small";
-	}
+	return "";
 }

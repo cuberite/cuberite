@@ -30,15 +30,18 @@ public:
 		switch (m_ItemType)
 		{
 			// Please keep alpha-sorted.
-			case E_ITEM_BAKED_POTATO:     return FoodInfo(5, 7.2);
+			case E_ITEM_BAKED_POTATO:     return FoodInfo(5, 6);
+			case E_ITEM_BEETROOT:         return FoodInfo(1, 1.2);
+			case E_ITEM_BEETROOT_SOUP:    return FoodInfo(6, 7.2);
 			case E_ITEM_BREAD:            return FoodInfo(5, 6);
 			// Carrots handled in ItemSeeds
+			case E_ITEM_CHORUS_FRUIT:     return FoodInfo(4, 2.4);
 			case E_ITEM_COOKED_CHICKEN:   return FoodInfo(6, 7.2);
 			case E_ITEM_COOKED_FISH:      return FoodInfo(5, 6);  // TODO: Add other fish types
 			case E_ITEM_COOKED_MUTTON:    return FoodInfo(6, 9.6);
 			case E_ITEM_COOKED_PORKCHOP:  return FoodInfo(8, 12.8);
 			case E_ITEM_COOKED_RABBIT:    return FoodInfo(5, 6);
-			case E_ITEM_COOKIE:           return FoodInfo(2, 0.4);
+			case E_ITEM_COOKIE:           return FoodInfo(2, 0.5);
 			// Golden apple handled in ItemGoldenApple
 			case E_ITEM_GOLDEN_CARROT:    return FoodInfo(6, 14.4);
 			case E_ITEM_MELON_SLICE:      return FoodInfo(2, 1.2);

@@ -317,7 +317,6 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 {
 	ASSERT(a_SetChunkData.IsHeightMapValid());
 	ASSERT(a_SetChunkData.AreBiomesValid());
-	ASSERT(IsQueued());
 
 	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
 	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));

@@ -14810,6 +14810,10 @@ end
 				{
 					Notes = "The blocktype for birch wood stairs"
 				},
+				E_BLOCK_BLACK_SHULKER_BOX =
+				{
+					Notes = "The blocktype for black shulker box"
+				},
 				E_BLOCK_BLOCK_OF_COAL =
 				{
 					Notes = "The blocktype for block of coal"
@@ -14817,6 +14821,10 @@ end
 				E_BLOCK_BLOCK_OF_REDSTONE =
 				{
 					Notes = "The blocktype for block of redstone"
+				},
+				E_BLOCK_BLUE_SHULKER_BOX =
+				{
+					Notes = "The blocktype for blue shulker box"
 				},
 				E_BLOCK_BONE_BLOCK =
 				{
@@ -14841,6 +14849,10 @@ end
 				E_BLOCK_BROWN_MUSHROOM =
 				{
 					Notes = "The blocktype for brown mushroom"
+				},
+				E_BLOCK_BROWN_SHULKER_BOX =
+				{
+					Notes = "The blocktype for brown shulker box"
 				},
 				E_BLOCK_BURNING_FURNACE =
 				{
@@ -14949,6 +14961,10 @@ end
 				E_BLOCK_CROPS =
 				{
 					Notes = "The blocktype for crops"
+				},
+				E_BLOCK_CYAN_SHULKER_BOX =
+				{
+					Notes = "The blocktype for cyan shulker box"
 				},
 				E_BLOCK_DANDELION =
 				{
@@ -15122,6 +15138,14 @@ end
 				{
 					Notes = "The blocktype for gravel"
 				},
+				E_BLOCK_GRAY_SHULKER_BOX =
+				{
+					Notes = "The blocktype for gray shulker box"
+				},
+				E_BLOCK_GREEN_SHULKER_BOX =
+				{
+					Notes = "The blocktype for green shulker box"
+				},
 				E_BLOCK_HARDENED_CLAY =
 				{
 					Notes = "The blocktype for hardened clay"
@@ -15230,6 +15254,14 @@ end
 				{
 					Notes = "The blocktype for lever"
 				},
+				E_BLOCK_LIGHT_BLUE_SHULKER_BOX =
+				{
+					Notes = "The blocktype for light blue shulker box"
+				},
+				E_BLOCK_LIGHT_GRAY_SHULKER_BOX =
+				{
+					Notes = "The blocktype for light gray shulker box"
+				},
 				E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE =
 				{
 					Notes = "The blocktype for light weighted pressure plate"
@@ -15238,6 +15270,10 @@ end
 				{
 					Notes = "The blocktype for lily pad"
 				},
+				E_BLOCK_LIME_SHULKER_BOX =
+				{
+					Notes = "The blocktype for lime shulker box"
+				},
 				E_BLOCK_LIT_FURNACE =
 				{
 					Notes = "The blocktype for lit furnace"
@@ -15245,6 +15281,10 @@ end
 				E_BLOCK_LOG =
 				{
 					Notes = "The blocktype for log"
+				},
+				E_BLOCK_MAGENTA_SHULKER_BOX =
+				{
+					Notes = "The blocktype for magenta shulker box"
 				},
 				E_BLOCK_MAGMA =
 				{
@@ -15338,13 +15378,25 @@ end
 				{
 					Notes = "The blocktype for oak wood stairs"
 				},
+				E_BLOCK_OBSERVER =
+				{
+					Notes = "The blocktype for observer"
+				},
 				E_BLOCK_OBSIDIAN =
 				{
 					Notes = "The blocktype for obsidian"
 				},
+				E_BLOCK_ORANGE_SHULKER_BOX =
+				{
+					Notes = "The blocktype for orange shulker box"
+				},
 				E_BLOCK_PACKED_ICE =
 				{
 					Notes = "The blocktype for packed ice"
+				},
+				E_BLOCK_PINK_SHULKER_BOX =
+				{
+					Notes = "The blocktype for pink shulker box"
 				},
 				E_BLOCK_PISTON =
 				{
@@ -15381,6 +15433,10 @@ end
 				E_BLOCK_PUMPKIN_STEM =
 				{
 					Notes = "The blocktype for pumpkin stem"
+				},
+				E_BLOCK_PURPLE_SHULKER_BOX =
+				{
+					Notes = "The blocktype for purple shulker box"
 				},
 				E_BLOCK_PURPUR_BLOCK =
 				{
@@ -15473,6 +15529,10 @@ end
 				E_BLOCK_RED_SANDSTONE_STAIRS =
 				{
 					Notes = "The blocktype for red sandstone stairs"
+				},
+				E_BLOCK_RED_SHULKER_BOX =
+				{
+					Notes = "The blocktype for red shulker box"
 				},
 				E_BLOCK_REEDS =
 				{
@@ -15674,6 +15734,10 @@ end
 				{
 					Notes = "The blocktype for water"
 				},
+				E_BLOCK_WHITE_SHULKER_BOX =
+				{
+					Notes = "The blocktype for white shulker box"
+				},
 				E_BLOCK_WOODEN_BUTTON =
 				{
 					Notes = "The blocktype for wooden button"
@@ -15706,6 +15770,10 @@ end
 				{
 					Notes = "The blocktype for yellow flower"
 				},
+				E_BLOCK_YELLOW_SHULKER_BOX =
+				{
+					Notes = "The blocktype for yellow shulker box"
+				},
 				E_ITEM_11_DISC =
 				{
 					Notes = "The itemtype for 11 disc"
@@ -15713,6 +15781,10 @@ end
 				E_ITEM_13_DISC =
 				{
 					Notes = "The itemtype for 13 disc"
+				},
+				E_ITEM_ACACIA_BOAT =
+				{
+					Notes = "The itemtype for acacia boat"
 				},
 				E_ITEM_ACACIA_DOOR =
 				{
@@ -15737,6 +15809,22 @@ end
 				E_ITEM_BED =
 				{
 					Notes = "The itemtype for bed"
+				},
+				E_ITEM_BEETROOT =
+				{
+					Notes = "The itemtype for beetroot"
+				},
+				E_ITEM_BEETROOT_SEEDS =
+				{
+					Notes = "The itemtype for beetroot seeds"
+				},
+				E_ITEM_BEETROOT_SOUP =
+				{
+					Notes = "The itemtype for betroot soup"
+				},
+				E_ITEM_BIRCH_BOAT =
+				{
+					Notes = "The itemtype for birch boat"
 				},
 				E_ITEM_BIRCH_DOOR =
 				{
@@ -15838,6 +15926,10 @@ end
 				{
 					Notes = "The itemtype for chirp disc"
 				},
+				E_ITEM_CHORUS_FRUIT =
+				{
+					Notes = "The itemtype for chorus fruit"
+				},
 				E_ITEM_CLAY =
 				{
 					Notes = "The itemtype for clay"
@@ -15885,6 +15977,10 @@ end
 				E_ITEM_COOKIE =
 				{
 					Notes = "The itemtype for cookie"
+				},
+				E_ITEM_DARK_OAK_BOAT =
+				{
+					Notes = "The itemtype for dark oak boat"
 				},
 				E_ITEM_DARK_OAK_DOOR =
 				{
@@ -15934,6 +16030,10 @@ end
 				{
 					Notes = "The itemtype for diamond sword"
 				},
+				E_ITEM_DRAGON_BREATH =
+				{
+					Notes = "The itemtype for dragon breath"
+				},
 				E_ITEM_DYE =
 				{
 					Notes = "The itemtype for dye"
@@ -15941,6 +16041,10 @@ end
 				E_ITEM_EGG =
 				{
 					Notes = "The itemtype for egg"
+				},
+				E_ITEM_ELYTRA =
+				{
+					Notes = "The itemtype for elytra"
 				},
 				E_ITEM_EMERALD =
 				{
@@ -15957,6 +16061,10 @@ end
 				E_ITEM_ENCHANTED_BOOK =
 				{
 					Notes = "The itemtype for enchanted book"
+				},
+				E_ITEM_END_CRYSTAL =
+				{
+					Notes = "The itemtype for end crystal"
 				},
 				E_ITEM_ENDER_PEARL =
 				{
@@ -16134,6 +16242,10 @@ end
 				{
 					Notes = "The itemtype for iron leggings"
 				},
+				E_ITEM_IRON_NUGGET =
+				{
+					Notes = "The itemtype for iron nugget"
+				},
 				E_ITEM_IRON_PICKAXE =
 				{
 					Notes = "The itemtype for iron pickaxe"
@@ -16149,6 +16261,10 @@ end
 				E_ITEM_ITEM_FRAME =
 				{
 					Notes = "The itemtype for item frame"
+				},
+				E_ITEM_JUNGLE_BOAT =
+				{
+					Notes = "The itemtype for jungle boat"
 				},
 				E_ITEM_JUNGLE_DOOR =
 				{
@@ -16193,6 +16309,10 @@ end
 				E_ITEM_LEATHER_TUNIC =
 				{
 					Notes = "The itemtype for leather tunic"
+				},
+				E_ITEM_LINGERING_POTION =
+				{
+					Notes = "The itemtype for lingering potion"
 				},
 				E_ITEM_MAGMA_CREAM =
 				{
@@ -16282,6 +16402,10 @@ end
 				{
 					Notes = "The itemtype for poisonous potato"
 				},
+				E_ITEM_POPPED_CHORUS_FRUIT =
+				{
+					Notes = "The itemtype for popped chorus fruit"
+				},
 				E_ITEM_POTATO =
 				{
 					Notes = "The itemtype for potato"
@@ -16292,7 +16416,7 @@ end
 				},
 				E_ITEM_POTIONS =
 				{
-					Notes = "The itemtype for potions"
+					Notes = "The itemtype for potion (obsolete, use E_ITEM_POTION instead)"
 				},
 				E_ITEM_PRISMARINE_CRYSTALS =
 				{
@@ -16374,6 +16498,14 @@ end
 				{
 					Notes = "The itemtype for shears"
 				},
+				E_ITEM_SHIELD =
+				{
+					Notes = "The itemtype for shield"
+				},
+				E_ITEM_SHULKER_SHELL =
+				{
+					Notes = "The itemtype for shulker shell"
+				},
 				E_ITEM_SIGN =
 				{
 					Notes = "The itemtype for sign"
@@ -16390,9 +16522,21 @@ end
 				{
 					Notes = "The itemtype for spawn egg"
 				},
+				E_ITEM_SPECTRAL_ARROW =
+				{
+					Notes = "The itemtype for spectral arrow"
+				},
 				E_ITEM_SPIDER_EYE =
 				{
 					Notes = "The itemtype for spider eye"
+				},
+				E_ITEM_SPLASH_POTION =
+				{
+					Notes = "The itemtype for splash potion"
+				},
+				E_ITEM_SPRUCE_BOAT =
+				{
+					Notes = "The itemtype for spruce boat"
 				},
 				E_ITEM_SPRUCE_DOOR =
 				{
@@ -16449,6 +16593,14 @@ end
 				E_ITEM_SUGAR_CANE =
 				{
 					Notes = "The itemtype for sugar cane"
+				},
+				E_ITEM_TIPPED_ARROW =
+				{
+					Notes = "The itemtype for tipped arrow"
+				},
+				E_ITEM_TOTEM_OF_UNDYING =
+				{
+					Notes = "The itemtype for totem of undying"
 				},
 				E_ITEM_WAIT_DISC =
 				{
@@ -16614,6 +16766,30 @@ end
 				{
 					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive Z direction.",
 				},
+				E_META_HEAD_CREEPER =
+				{
+					Notes = "A flag in the metadata of heads that indicates that the head is a creeper head.",
+				},
+				E_META_HEAD_DRAGON =
+				{
+					Notes = "A flag in the metadata of heads that indicates that the head is a dragon head.",
+				},
+				E_META_HEAD_PLAYER =
+				{
+					Notes = "A flag in the metadata of heads that indicates that the head is a player head.",
+				},
+				E_META_HEAD_SKELETON =
+				{
+					Notes = "A flag in the metadata of heads that indicates that the head is a skeleton head.",
+				},
+				E_META_HEAD_WITHER =
+				{
+					Notes = "A flag in the metadata of heads that indicates that the head is a wither head.",
+				},
+				E_META_HEAD_ZOMBIE =
+				{
+					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
+				},
 				esBed =
 				{
 					Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed.",
@@ -16725,6 +16901,30 @@ end
 				mhRight =
 				{
 					Notes = "The right hand is the main hand",
+				},
+				SKULL_TYPE_CREEPER =
+				{
+					Notes = "A creeper skull",
+				},
+				SKULL_TYPE_DRAGON =
+				{
+					Notes = "A dragon skull",
+				},
+				SKULL_TYPE_PLAYER =
+				{
+					Notes = "A player skull",
+				},
+				SKULL_TYPE_SKELETON =
+				{
+					Notes = "A skeleton skull",
+				},
+				SKULL_TYPE_WITHER =
+				{
+					Notes = "A wither skull",
+				},
+				SKULL_TYPE_ZOMBIE =
+				{
+					Notes = "A zombie skull",
 				},
 				spCape =
 				{

@@ -1754,6 +1754,16 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 		ParticleMap["droplet"]          = 39;
 		ParticleMap["take"]             = 40;
 		ParticleMap["mobappearance"]    = 41;
+		ParticleMap["ironcrack"]        = 42;
+		ParticleMap["blockcrack"]       = 43;
+		ParticleMap["blockdust"]        = 44;
+		ParticleMap["endRod"]           = 45;
+		ParticleMap["dragonbreath"]     = 46;
+		ParticleMap["damageIndicator"]  = 47;
+		ParticleMap["sweepAttack"]      = 48;
+		ParticleMap["fallingdust"]      = 49;
+		ParticleMap["spit"]             = 50;
+		ParticleMap["totem"]            = 51;
 	}
 
 	AString ParticleName = StrToLower(a_ParticleName);
@@ -2201,7 +2211,7 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	}
 
 	StartEncryption(DecryptedKey);
-	m_Client->HandleLogin(4, m_Client->GetUsername());
+	m_Client->HandleLogin(m_Client->GetUsername());
 }
 
 
@@ -2238,7 +2248,7 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	m_Client->HandleLogin(4, Username);
+	m_Client->HandleLogin(Username);
 }
 
 

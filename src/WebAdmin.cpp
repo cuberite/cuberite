@@ -340,7 +340,8 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 	// Try to get the template from the Lua template script
 	if (ShouldWrapInTemplate)
 	{
-		cCSLock Lock(m_CS);
+		cCSLock LockSelf(m_CS);
+		cLuaState::cLock LockTemplate(m_TemplateScript);
 		if (m_TemplateScript.Call("ShowPage", this, &TemplateRequest, cLuaState::Return, Template))
 		{
 			cHTTPOutgoingResponse Resp;

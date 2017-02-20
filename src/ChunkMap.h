@@ -38,6 +38,7 @@ class cMobCensus;
 class cMobSpawner;
 class cSetChunkData;
 class cBoundingBox;
+class cDeadlockDetect;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cChunk *                           cChunkPtr;
@@ -410,6 +411,12 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked);
+
+	/** Adds this chunkmap's CS to the DeadlockDetect's tracked CSs. */
+	void TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect, const AString & a_WorldName);
+
+	/** Removes this chunkmap's CS from the DeadlockDetect's tracked CSs. */
+	void UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect);
 
 private:
 

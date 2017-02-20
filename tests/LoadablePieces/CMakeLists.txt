@@ -88,7 +88,8 @@ endif()
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
-add_executable(LoadablePieces ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
+source_group("Data files" FILES Test.cubeset Test1.schematic)
+add_executable(LoadablePieces ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS} Test.cubeset Test1.schematic)
 target_link_libraries(LoadablePieces tolualib zlib)
 add_test(NAME LoadablePieces-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LoadablePieces)
 

@@ -37,7 +37,7 @@ public:
 
 		// Play sound
 		cFastRandom Random;
-		a_World->BroadcastSoundEffect("random.bow", a_Player->GetPosX(), a_Player->GetPosY() - a_Player->GetHeight(), a_Player->GetPosZ(), 0.5f, 0.4f / (Random.NextFloat(1.0f) * 0.4f + 0.8f));
+		a_World->BroadcastSoundEffect("entity.arrow.shoot", a_Player->GetPosX(), a_Player->GetPosY() - a_Player->GetHeight(), a_Player->GetPosZ(), 0.5f, 0.4f / (Random.NextFloat(1.0f) * 0.4f + 0.8f));
 
 		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, &a_Player->GetEquippedItem(), &Speed) == cEntity::INVALID_ID)
 		{

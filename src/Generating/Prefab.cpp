@@ -15,111 +15,6 @@ uses a prefabricate in a cBlockArea for drawing itself.
 
 
 
-#ifdef SELF_TEST
-
-// Create one static prefab to test the parser:
-static const cPrefab::sDef g_TestPrefabDef =
-{
-	// Size:
-	7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
-
-	// Hitbox (relative to bounding box):
-	0, 0, 0,  // MinX, MinY, MinZ
-	6, 5, 6,  // MaxX, MaxY, MaxZ
-
-	// Block definitions:
-	".:  0: 0\n"  /* 0 */
-	"a:112: 0\n"  /* netherbrick */
-	"b:113: 0\n"  /* netherbrickfence */,
-
-	// Block data:
-	// Level 1
-	"aaaaaaa"
-	"aaaaaaa"
-	"aaaaaaa"
-	"aaaaaaa"
-	"aaaaaaa"
-	"aaaaaaa"
-	"aaaaaaa"
-
-	// Level 2
-	"aa...aa"
-	"a.....a"
-	"......."
-	"......."
-	"......."
-	"a.....a"
-	"aa...aa"
-
-	// Level 3
-	"aa...aa"
-	"a.....a"
-	"......."
-	"......."
-	"......."
-	"a.....a"
-	"aa...aa"
-
-	// Level 4
-	"aa...aa"
-	"a.....a"
-	"......."
-	"......."
-	"......."
-	"a.....a"
-	"aa...aa"
-
-	// Level 5
-	"aabbbaa"
-	"a.....a"
-	"b.....b"
-	"b.....b"
-	"b.....b"
-	"a.....a"
-	"aabbbaa"
-
-	// Level 6
-	"aaaaaaa"
-	"a.....a"
-	"a.....a"
-	"a.....a"
-	"a.....a"
-	"a.....a"
-	"aaaaaaa",
-
-	// Connections:
-	"0: 0, 3, 2: 4\n"
-	"0: 2, 3, 0: 2\n",
-
-	// AllowedRotations:
-	7,  /* 1, 2, 3 CCW rotations */
-
-	// Merge strategy:
-	cBlockArea::msImprint,
-
-	// ExtendFloorStrategy:
-	cPrefab::efsNone,
-
-	// DefaultWeight:
-	10,
-
-	// DepthWeight:
-	"",
-
-	// AddWeightIfSame:
-	1000,
-
-	// MoveToGround:
-	false,
-};
-
-static cPrefab g_TestPrefab(g_TestPrefabDef);
-#endif
-
-
-
-
-
 cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_Size(a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
 	m_HitBox(
@@ -404,7 +299,7 @@ void cPrefab::SetDefaultWeight(int a_DefaultWeight)
 
 
 
-void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type)
+void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, cPiece::cConnector::eDirection a_Direction, int a_Type)
 {
 	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));
 }
@@ -495,7 +390,7 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 		{
 			continue;
 		}
-		// Split into components: "Type: X, Y, Z: Face":
+		// Split into components: "Type: X, Y, Z: Direction":
 		AStringVector Defs = StringSplitAndTrim(*itr, ":");
 		if (Defs.size() != 3)
 		{
@@ -509,11 +404,11 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 			continue;
 		}
 
-		// Check that the BlockFace is within range:
-		int BlockFace = atoi(Defs[2].c_str());
-		if ((BlockFace < 0) || (BlockFace >= 6))
+		// Check that the Direction is valid:
+		cPiece::cConnector::eDirection Direction;
+		if (!cPiece::cConnector::StringToDirection(Defs[2], Direction))
 		{
-			LOGWARNING("Bad prefab Connector Blockface: \"%s\", skipping.", Defs[2].c_str());
+			LOGWARNING("Bad prefab Connector direction: \"%s\", skipping.", Defs[2].c_str());
 			continue;
 		}
 
@@ -521,7 +416,7 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 		m_Connectors.push_back(cPiece::cConnector(
 			atoi(Coords[0].c_str()), atoi(Coords[1].c_str()), atoi(Coords[2].c_str()),  // Connector pos
 			atoi(Defs[0].c_str()),  // Connector type
-			static_cast<eBlockFace>(BlockFace)
+			Direction
 		));
 	}  // for itr - Lines[]
 }

@@ -35,6 +35,7 @@ extern "C"
 	#include "lua/src/lauxlib.h"
 }
 
+#include <atomic>
 #include "../Vector3.h"
 #include "../Defines.h"
 #include "PluginManager.h"
@@ -45,6 +46,7 @@ class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
 class cPluginLua;
+class cDeadlockDetect;
 
 
 
@@ -189,24 +191,29 @@ public:
 		}
 
 		/** Set the contained reference to the object at the specified Lua state's stack position.
-		If another reference has been previously contained, it is freed first. */
+		If another reference has been previously contained, it is Clear()-ed first. */
 		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
 
-		/** Frees the contained reference, if any. */
+		/** Frees the contained reference, if any.
+		Untracks the reference from its canon Lua state. */
 		void Clear(void);
 
-		/** Returns true if the contained reference is valid. */
+		/** Returns true if the contained reference is valid.
+		(Note that depending on this value is not thread-safe, another thread may invalidate the ref in the meantime. It is meant for quick ASSERTs only). */
 		bool IsValid(void);
 
 		/** Returns true if the reference resides in the specified Lua state.
-		Internally, compares the reference's canon Lua state. */
+		Internally, compares the reference's canon Lua state.
+		(Note that depending on this value is not thread-safe, another thread may modify the ref in the meantime. It is meant for quick ASSERTs only). */
 		bool IsSameLuaState(cLuaState & a_LuaState);
 
 	protected:
 		friend class cLuaState;
 
-		/** The mutex protecting m_Ref against multithreaded access */
-		cCriticalSection * m_CS;
+		/** The mutex protecting m_Ref against multithreaded access.
+		Actually points to the canon Lua state's m_CriticalSection.
+		Is nullptr when ref is empty (not bound). */
+		std::atomic<cCriticalSection *> m_CS;
 
 		/** Reference to the Lua callback */
 		cRef m_Ref;
@@ -254,7 +261,7 @@ public:
 		template <typename... Args>
 		bool Call(Args &&... args)
 		{
-			auto cs = m_CS;
+			auto cs = m_CS.load();
 			if (cs == nullptr)
 			{
 				return false;
@@ -336,7 +343,7 @@ public:
 		template <typename... Args>
 		bool CallTableFn(const char * a_FnName, Args &&... args)
 		{
-			auto cs = m_CS;
+			auto cs = m_CS.load();
 			if (cs == nullptr)
 			{
 				return false;
@@ -356,7 +363,7 @@ public:
 		template <typename... Args>
 		bool CallTableFnWithSelf(const char * a_FnName, Args &&... args)
 		{
-			auto cs = m_CS;
+			auto cs = m_CS.load();
 			if (cs == nullptr)
 			{
 				return false;
@@ -516,7 +523,8 @@ public:
 	/** Allows this object to be used in the same way as a lua_State *, for example in the LuaLib functions */
 	operator lua_State * (void) { return m_LuaState; }
 
-	/** Creates the m_LuaState, if not closed already. This state will be automatically closed in the destructor.
+	/** Creates the m_LuaState, if not created already.
+	This state will be automatically closed in the destructor.
 	The regular Lua libs are registered, but the MCS API is not registered (so that Lua can be used as
 	lite-config as well), use RegisterAPILibs() to do that. */
 	void Create(void);
@@ -809,11 +817,17 @@ public:
 
 	/** Returns the canon Lua state (the primary cLuaState instance that was used to create, rather than attach, the lua_State structure).
 	Returns nullptr if the canon Lua state cannot be queried. */
-	cLuaState * QueryCanonLuaState(void);
+	cLuaState * QueryCanonLuaState(void) const;
 
 	/** Outputs to log a warning about API call being unable to read its parameters from the stack,
 	logs the stack trace and stack values. */
 	void LogApiCallParamFailure(const char * a_FnName, const char * a_ParamNames);
+
+	/** Adds this object's CS to the DeadlockDetect's tracked CSs. */
+	void TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect);
+
+	/** Removes this object's CS from the DeadlockDetect's tracked CSs. */
+	void UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect);
 
 protected:
 

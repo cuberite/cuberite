@@ -19,6 +19,7 @@ extern "C"
 #include "LuaJson.h"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
+#include "../DeadlockDetect.h"
 
 
 
@@ -44,9 +45,69 @@ extern "C"
 const cLuaState::cRet cLuaState::Return = {};
 const cLuaState::cNil cLuaState::Nil = {};
 
-/** Each Lua state stores a pointer to its creating cLuaState in Lua globals, under this name.
-This way any cLuaState can reference the main cLuaState's TrackedCallbacks, mutex etc. */
-static const char * g_CanonLuaStateGlobalName = "_CuberiteInternal_CanonLuaState";
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cCanonLuaStates:
+
+/** Tracks the canon cLuaState instances for each lua_State pointer.
+Used for tracked refs - the ref needs to be tracked by a single cLuaState (the canon state), despite being created from a different (attached) cLuaState.
+The canon state must be available without accessing the Lua state itself (so it cannot be stored within Lua). */
+class cCanonLuaStates
+{
+public:
+	/** Returns the canon Lua state for the specified lua_State pointer. */
+	static cLuaState * GetCanonState(lua_State * a_LuaState)
+	{
+		auto & inst = GetInstance();
+		cCSLock lock(inst.m_CS);
+		auto itr = inst.m_CanonStates.find(a_LuaState);
+		if (itr == inst.m_CanonStates.end())
+		{
+			return nullptr;
+		}
+		return itr->second;
+	}
+
+	/** Adds a new canon cLuaState instance to the map.
+	Used when a new Lua state is created, this informs the map that a new canon Lua state should be tracked. */
+	static void Add(cLuaState & a_LuaState)
+	{
+		auto & inst = GetInstance();
+		cCSLock lock(inst.m_CS);
+		ASSERT(inst.m_CanonStates.find(a_LuaState) == inst.m_CanonStates.end());
+		inst.m_CanonStates[a_LuaState.operator lua_State *()] = &a_LuaState;
+	}
+
+	/** Removes the bindings between the specified canon state and its lua_State pointer.
+	Used when a Lua state is being closed. */
+	static void Remove(cLuaState & a_LuaState)
+	{
+		auto & inst = GetInstance();
+		cCSLock lock(inst.m_CS);
+		auto itr = inst.m_CanonStates.find(a_LuaState);
+		ASSERT(itr != inst.m_CanonStates.end());
+		inst.m_CanonStates.erase(itr);
+	}
+
+protected:
+	/** The mutex protecting m_CanonStates against multithreaded access. */
+	cCriticalSection m_CS;
+
+	/** Map of lua_State pointers to their canon cLuaState instances. */
+	std::map<lua_State *, cLuaState *> m_CanonStates;
+
+
+	/** Returns the singleton instance of this class. */
+	static cCanonLuaStates & GetInstance(void)
+	{
+		static cCanonLuaStates canonLuaStates;
+		return canonLuaStates;
+	}
+};
 
 
 
@@ -158,7 +219,7 @@ void cLuaState::cTrackedRef::Clear(void)
 	// Free the reference:
 	lua_State * luaState = nullptr;
 	{
-		auto cs = m_CS;
+		auto cs = m_CS.load();
 		if (cs != nullptr)
 		{
 			cCSLock Lock(*cs);
@@ -186,7 +247,7 @@ void cLuaState::cTrackedRef::Clear(void)
 
 bool cLuaState::cTrackedRef::IsValid(void)
 {
-	auto cs = m_CS;
+	auto cs = m_CS.load();
 	if (cs == nullptr)
 	{
 		return false;
@@ -201,7 +262,7 @@ bool cLuaState::cTrackedRef::IsValid(void)
 
 bool cLuaState::cTrackedRef::IsSameLuaState(cLuaState & a_LuaState)
 {
-	auto cs = m_CS;
+	auto cs = m_CS.load();
 	if (cs == nullptr)
 	{
 		return false;
@@ -225,7 +286,7 @@ bool cLuaState::cTrackedRef::IsSameLuaState(cLuaState & a_LuaState)
 
 void cLuaState::cTrackedRef::Invalidate(void)
 {
-	auto cs = m_CS;
+	auto cs = m_CS.load();
 	if (cs == nullptr)
 	{
 		// Already invalid
@@ -426,10 +487,7 @@ void cLuaState::Create(void)
 	luaL_openlibs(m_LuaState);
 	m_IsOwned = true;
 	cLuaStateTracker::Add(*this);
-
-	// Add the CanonLuaState value into the Lua state, so that we can get it from anywhere:
-	lua_pushlightuserdata(m_LuaState, reinterpret_cast<void *>(this));
-	lua_setglobal(m_LuaState, g_CanonLuaStateGlobalName);
+	cCanonLuaStates::Add(*this);
 }
 
 
@@ -491,8 +549,10 @@ void cLuaState::Close(void)
 		{
 			r->Invalidate();
 		}
+		m_TrackedRefs.clear();
 	}
 
+	cCanonLuaStates::Remove(*this);
 	cLuaStateTracker::Del(*this);
 	lua_close(m_LuaState);
 	m_LuaState = nullptr;
@@ -2146,15 +2206,9 @@ void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 
 
 
-cLuaState * cLuaState::QueryCanonLuaState(void)
+cLuaState * cLuaState::QueryCanonLuaState(void) const
 {
-	// Get the CanonLuaState global from Lua:
-	auto cb = WalkToNamedGlobal(g_CanonLuaStateGlobalName);
-	if (!cb.IsValid())
-	{
-		return nullptr;
-	}
-	return reinterpret_cast<cLuaState *>(lua_touserdata(m_LuaState, -1));
+	return cCanonLuaStates::GetCanonState(m_LuaState);
 }
 
 
@@ -2166,6 +2220,24 @@ void cLuaState::LogApiCallParamFailure(const char * a_FnName, const char * a_Par
 	LOGWARNING("%s: Cannot read params: %s, bailing out.", a_FnName, a_ParamNames);
 	LogStackTrace();
 	LogStackValues("Values on the stack");
+}
+
+
+
+
+
+void cLuaState::TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect)
+{
+	a_DeadlockDetect.TrackCriticalSection(m_CS, Printf("cLuaState %s", m_SubsystemName.c_str()));
+}
+
+
+
+
+
+void cLuaState::UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect)
+{
+	a_DeadlockDetect.UntrackCriticalSection(m_CS);
 }
 
 
@@ -2235,15 +2307,17 @@ void cLuaState::UntrackRef(cTrackedRef & a_Ref)
 		return;
 	}
 
-	// Remove the callback:
+	// Remove the callback (note that another thread may have cleared the callbacks by closing the LuaState):
 	cCSLock Lock(canonState->m_CSTrackedRefs);
 	auto & trackedRefs = canonState->m_TrackedRefs;
-	trackedRefs.erase(std::remove_if(trackedRefs.begin(), trackedRefs.end(),
-		[&a_Ref](cTrackedRef * a_StoredRef)
+	for (auto itr = trackedRefs.begin(), end = trackedRefs.end(); itr != end; ++itr)
+	{
+		if (*itr == &a_Ref)
 		{
-			return (a_StoredRef == &a_Ref);
+			trackedRefs.erase(itr);
+			break;
 		}
-	));
+	}
 }
 
 
@@ -2305,6 +2379,7 @@ void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 	{
 		UnRef();
 	}
+	ASSERT(cCanonLuaStates::GetCanonState(a_LuaState)->m_CS.IsLockedByCurrentThread());
 	m_LuaState = a_LuaState;
 	lua_pushvalue(a_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
 	m_Ref = luaL_ref(a_LuaState, LUA_REGISTRYINDEX);
@@ -2318,6 +2393,7 @@ void cLuaState::cRef::UnRef(void)
 {
 	if (IsValid())
 	{
+		ASSERT(cCanonLuaStates::GetCanonState(m_LuaState)->m_CS.IsLockedByCurrentThread());
 		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
 	m_LuaState = nullptr;

@@ -95,19 +95,19 @@ cPiece::cConnector cPiece::RotateMoveConnector(const cConnector & a_Connector, i
 		case 1:
 		{
 			// 1 CCW rotation:
-			res.m_Direction = RotateBlockFaceCCW(res.m_Direction);
+			res.m_Direction = cConnector::RotateDirectionCCW(res.m_Direction);
 			break;
 		}
 		case 2:
 		{
 			// 2 rotations ( = axis flip):
-			res.m_Direction = MirrorBlockFaceY(res.m_Direction);
+			res.m_Direction = cConnector::RotateDirection(res.m_Direction);
 			break;
 		}
 		case 3:
 		{
 			// 1 CW rotation:
-			res.m_Direction = RotateBlockFaceCW(res.m_Direction);
+			res.m_Direction = cConnector::RotateDirectionCW(res.m_Direction);
 			break;
 		}
 	}
@@ -159,7 +159,7 @@ cCuboid cPiece::RotateMoveHitBox(int a_NumCCWRotations, int a_MoveX, int a_MoveY
 ////////////////////////////////////////////////////////////////////////////////
 // cPiece::cConnector:
 
-cPiece::cConnector::cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace a_Direction) :
+cPiece::cConnector::cConnector(int a_X, int a_Y, int a_Z, int a_Type, eDirection a_Direction) :
 	m_Pos(a_X, a_Y, a_Z),
 	m_Type(a_Type),
 	m_Direction(a_Direction)
@@ -170,11 +170,252 @@ cPiece::cConnector::cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace
 
 
 
-cPiece::cConnector::cConnector(const Vector3i & a_Pos, int a_Type, eBlockFace a_Direction) :
+cPiece::cConnector::cConnector(const Vector3i & a_Pos, int a_Type, eDirection a_Direction) :
 	m_Pos(a_Pos),
 	m_Type(a_Type),
 	m_Direction(a_Direction)
 {
+}
+
+
+
+
+
+Vector3i cPiece::cConnector::AddDirection(const Vector3i & a_Pos, eDirection a_Direction)
+{
+	switch (a_Direction)
+	{
+		case dirXM:       return Vector3i(a_Pos.x - 1, a_Pos.y,     a_Pos.z);
+		case dirXP:       return Vector3i(a_Pos.x + 1, a_Pos.y,     a_Pos.z);
+		case dirYM:       return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
+		case dirYP:       return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
+		case dirZM:       return Vector3i(a_Pos.x,     a_Pos.y,     a_Pos.z - 1);
+		case dirZP:       return Vector3i(a_Pos.x,     a_Pos.y,     a_Pos.z + 1);
+		case dirYM_XM_ZM: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
+		case dirYM_XM_ZP: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
+		case dirYM_XP_ZM: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
+		case dirYM_XP_ZP: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
+		case dirYP_XM_ZM: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
+		case dirYP_XM_ZP: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
+		case dirYP_XP_ZM: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
+		case dirYP_XP_ZP: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
+	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown connector direction");
+		return a_Pos;
+	#endif
+}
+
+
+
+
+
+const char * cPiece::cConnector::DirectionToString(eDirection a_Direction)
+{
+	switch (a_Direction)
+	{
+		case dirXM:       return "x-";
+		case dirXP:       return "x+";
+		case dirYM:       return "y-";
+		case dirYP:       return "y+";
+		case dirZM:       return "z-";
+		case dirZP:       return "z+";
+		case dirYM_XM_ZM: return "y-x-z-";
+		case dirYM_XM_ZP: return "y-x-z+";
+		case dirYM_XP_ZM: return "y-x+z-";
+		case dirYM_XP_ZP: return "y-x+z+";
+		case dirYP_XM_ZM: return "y+x-z-";
+		case dirYP_XM_ZP: return "y+x-z+";
+		case dirYP_XP_ZM: return "y+x+z-";
+		case dirYP_XP_ZP: return "y+x+z+";
+	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown connector direction");
+		return "<unknown>";
+	#endif
+}
+
+
+
+
+
+bool cPiece::cConnector::IsValidDirection(int a_Direction)
+{
+	switch (a_Direction)
+	{
+		case dirXM:
+		case dirXP:
+		case dirYM:
+		case dirYP:
+		case dirZM:
+		case dirZP:
+		case dirYM_XM_ZM:
+		case dirYM_XM_ZP:
+		case dirYM_XP_ZM:
+		case dirYM_XP_ZP:
+		case dirYP_XM_ZM:
+		case dirYP_XM_ZP:
+		case dirYP_XP_ZM:
+		case dirYP_XP_ZP:
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+cPiece::cConnector::eDirection cPiece::cConnector::RotateDirection(eDirection a_Direction)
+{
+	// 180-degree rotation:
+	switch (a_Direction)
+	{
+		case dirXM:       return dirXP;
+		case dirXP:       return dirXM;
+		case dirYM:       return dirYM;
+		case dirYP:       return dirYP;
+		case dirZM:       return dirZM;
+		case dirZP:       return dirZP;
+		case dirYM_XM_ZM: return dirYM_XP_ZP;
+		case dirYM_XM_ZP: return dirYM_XP_ZM;
+		case dirYM_XP_ZM: return dirYM_XM_ZP;
+		case dirYM_XP_ZP: return dirYM_XM_ZM;
+		case dirYP_XM_ZM: return dirYP_XP_ZP;
+		case dirYP_XM_ZP: return dirYP_XP_ZM;
+		case dirYP_XP_ZM: return dirYP_XM_ZP;
+		case dirYP_XP_ZP: return dirYP_XM_ZM;
+	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown connector direction");
+		return a_Direction;
+	#endif
+}
+
+
+
+
+
+cPiece::cConnector::eDirection cPiece::cConnector::RotateDirectionCCW(eDirection a_Direction)
+{
+	// 90 degrees CCW rotation:
+	switch (a_Direction)
+	{
+		case dirXM:       return dirZP;
+		case dirXP:       return dirZM;
+		case dirYM:       return dirYM;
+		case dirYP:       return dirYP;
+		case dirZM:       return dirXM;
+		case dirZP:       return dirXP;
+		case dirYM_XM_ZM: return dirYM_XM_ZP;
+		case dirYM_XM_ZP: return dirYM_XP_ZP;
+		case dirYM_XP_ZM: return dirYM_XM_ZM;
+		case dirYM_XP_ZP: return dirYM_XP_ZM;
+		case dirYP_XM_ZM: return dirYP_XM_ZP;
+		case dirYP_XM_ZP: return dirYP_XP_ZP;
+		case dirYP_XP_ZM: return dirYP_XM_ZM;
+		case dirYP_XP_ZP: return dirYP_XP_ZM;
+	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown connector direction");
+		return a_Direction;
+	#endif
+}
+
+
+
+
+
+cPiece::cConnector::eDirection cPiece::cConnector::RotateDirectionCW(eDirection a_Direction)
+{
+	// 90 degrees CW rotation:
+	switch (a_Direction)
+	{
+		case dirXM:       return dirZM;
+		case dirXP:       return dirZP;
+		case dirYM:       return dirYM;
+		case dirYP:       return dirYP;
+		case dirZM:       return dirXP;
+		case dirZP:       return dirXM;
+		case dirYM_XM_ZM: return dirYM_XP_ZM;
+		case dirYM_XM_ZP: return dirYM_XM_ZM;
+		case dirYM_XP_ZM: return dirYM_XP_ZP;
+		case dirYM_XP_ZP: return dirYM_XM_ZP;
+		case dirYP_XM_ZM: return dirYP_XP_ZM;
+		case dirYP_XM_ZP: return dirYP_XM_ZM;
+		case dirYP_XP_ZM: return dirYP_XP_ZP;
+		case dirYP_XP_ZP: return dirYP_XM_ZP;
+	}
+	#if !defined(__clang__)
+		ASSERT(!"Unknown connector direction");
+		return a_Direction;
+	#endif
+}
+
+
+
+
+
+bool cPiece::cConnector::StringToDirection(const AString & a_Value, eDirection & a_Out)
+{
+	// First try converting as a number:
+	int dirInt;
+	if (StringToInteger(a_Value, dirInt))
+	{
+		if (!IsValidDirection(dirInt))
+		{
+			return false;
+		}
+		a_Out = static_cast<eDirection>(dirInt);
+		return true;
+	}
+
+	// Compare to string representation:
+	static const struct
+	{
+		const char * m_String;
+		eDirection m_Value;
+	} StringDirections[] =
+	{
+		{"x-", dirXM},
+		{"x+", dirXP},
+		{"y-", dirYM},
+		{"y+", dirYP},
+		{"z-", dirZM},
+		{"z+", dirZP},
+		{"y-x-z-", dirYM_XM_ZM},
+		{"y-x-z+", dirYM_XM_ZP},
+		{"y-x+z-", dirYM_XP_ZM},
+		{"y-x+z+", dirYM_XP_ZP},
+		{"y+x-z-", dirYP_XM_ZM},
+		{"y+x-z+", dirYP_XM_ZP},
+		{"y+x+z-", dirYP_XP_ZM},
+		{"y+x+z+", dirYP_XP_ZP},
+
+		// Alternate names, with slashes:
+		{"y-/x-/z-", dirYM_XM_ZM},
+		{"y-/x-/z+", dirYM_XM_ZP},
+		{"y-/x+/z-", dirYM_XP_ZM},
+		{"y-/x+/z+", dirYM_XP_ZP},
+		{"y+/x-/z-", dirYP_XM_ZM},
+		{"y+/x-/z+", dirYP_XM_ZP},
+		{"y+/x+/z-", dirYP_XP_ZM},
+		{"y+/x+/z+", dirYP_XP_ZP},
+	};
+	auto lcValue = StrToLower(a_Value);
+	for (size_t i = 0; i < ARRAYCOUNT(StringDirections); i++)
+	{
+		if (strcmp(lcValue.c_str(), StringDirections[i].m_String) == 0)
+		{
+			a_Out = StringDirections[i].m_Value;
+			return true;
+		}
+	}
+
+	// Not understood, failure:
+	return false;
 }
 
 
@@ -332,26 +573,35 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 )
 {
 	// Translation of direction - direction -> number of CCW rotations needed:
-	// You need DirectionRotationTable[rot1][rot2] CCW turns to connect rot1 to rot2 (they are opposite)
-	static const int DirectionRotationTable[6][6] =
+	// You need DirectionRotationTable[rot2][rot1] CCW turns to connect rot1 to rot2 (they are opposite)
+	// -1 if not possible
+	static const int DirectionRotationTable[14][14] =
 	{
-		/*         YM, YP, ZM, ZP, XM, XP */
-		/* YM */ { 0,  0,  0,  0,  0,  0},
-		/* YP */ { 0,  0,  0,  0,  0,  0},
-		/* ZM */ { 0,  0,  2,  0,  1,  3},
-		/* ZP */ { 0,  0,  0,  2,  3,  1},
-		/* XM */ { 0,  0,  3,  1,  2,  0},
-		/* XP */ { 0,  0,  1,  3,  0,  2},
+		/*              YM, YP, ZM, ZP, XM, XP, YM-XM-ZM, YM-XM-ZP, YM-XP-ZM, YM-XP-ZP, YP-XM-ZM, YP-XM-ZP, YP-XP-ZM, YP-XP-ZP */
+		/* YM */       { 0, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
+		/* YP */       {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
+		/* ZM */       {-1, -1,  2,  0,  1,  3,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
+		/* ZP */       {-1, -1,  0,  2,  3,  1,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
+		/* XM */       {-1, -1,  3,  1,  2,  0,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
+		/* XP */       {-1, -1,  1,  3,  0,  2,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
+		/* YM-XM-ZM */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        0,        3,        1,        2},
+		/* YM-XM-ZP */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        1,        0,        2,        3},
+		/* YM-XP-ZM */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        3,        2,        0,        1},
+		/* YM-XP-ZP */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        2,        1,        3,        0},
+		/* YP-XM-ZM */ {-1, -1, -1, -1, -1, -1,        0,        3,        1,        2,       -1,       -1,       -1,       -1},
+		/* YP-XM-ZP */ {-1, -1, -1, -1, -1, -1,        1,        0,        2,        3,       -1,       -1,       -1,       -1},
+		/* YP-XP-ZM */ {-1, -1, -1, -1, -1, -1,        3,        2,        0,        1,       -1,       -1,       -1,       -1},
+		/* YP-XP-ZP */ {-1, -1, -1, -1, -1, -1,        2,        1,        3,        0,       -1,       -1,       -1,       -1},
 	};
 
 	// Get a list of available connections:
+	ASSERT(a_Connector.m_Direction < ARRAYCOUNT(DirectionRotationTable));
 	const int * RotTable = DirectionRotationTable[a_Connector.m_Direction];
 	cConnections Connections;
 	int WantedConnectorType = -a_Connector.m_Type;
 	cPieces AvailablePieces = m_PiecePool.GetPiecesWithConnector(WantedConnectorType);
 	Connections.reserve(AvailablePieces.size());
-	Vector3i ConnPos = a_Connector.m_Pos;  // The position at which the new connector should be placed - 1 block away from the connector
-	AddFaceDirection(ConnPos.x, ConnPos.y, ConnPos.z, a_Connector.m_Direction);
+	Vector3i ConnPos = cPiece::cConnector::AddDirection(a_Connector.m_Pos, a_Connector.m_Direction);  // The position at which the new connector should be placed - 1 block away from the current connector
 	int WeightTotal = 0;
 	for (cPieces::iterator itrP = AvailablePieces.begin(), endP = AvailablePieces.end(); itrP != endP; ++itrP)
 	{
@@ -372,8 +622,9 @@ bool cPieceGenerator::TryPlacePieceAtConnector(
 				continue;
 			}
 			// This is a same-type connector, find out how to rotate to it:
+			ASSERT(itrC->m_Direction < ARRAYCOUNT(DirectionRotationTable[0]));
 			int NumCCWRotations = RotTable[itrC->m_Direction];
-			if (!(*itrP)->CanRotateCCW(NumCCWRotations))
+			if ((NumCCWRotations < 0) || !(*itrP)->CanRotateCCW(NumCCWRotations))
 			{
 				// Doesn't support this rotation
 				continue;
@@ -482,7 +733,7 @@ void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors 
 			idx,
 			itr->m_Connector.m_Pos.x, itr->m_Connector.m_Pos.y, itr->m_Connector.m_Pos.z,
 			itr->m_Connector.m_Type,
-			BlockFaceToString(itr->m_Connector.m_Direction).c_str(),
+			cPiece::cConnector::DirectionToString(itr->m_Connector.m_Direction),
 			itr->m_Piece->GetDepth()
 		);
 	}  // for itr - a_ConnectorPool[]

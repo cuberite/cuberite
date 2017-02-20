@@ -33,10 +33,12 @@ extern "C"
 ////////////////////////////////////////////////////////////////////////////////
 // cPluginLua:
 
-cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
+cPluginLua::cPluginLua(const AString & a_PluginDirectory, cDeadlockDetect & a_DeadlockDetect) :
 	cPlugin(a_PluginDirectory),
-	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str()))
+	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str())),
+	m_DeadlockDetect(a_DeadlockDetect)
 {
+	m_LuaState.TrackInDeadlockDetect(a_DeadlockDetect);
 }
 
 
@@ -46,6 +48,7 @@ cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
 cPluginLua::~cPluginLua()
 {
 	Close();
+	m_LuaState.UntrackInDeadlockDetect(m_DeadlockDetect);
 }
 
 

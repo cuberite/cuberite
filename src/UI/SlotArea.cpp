@@ -1576,7 +1576,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 	if (cItem::IsEnchantable(Item.m_ItemType) && Item.m_Enchantments.IsEmpty())
 	{
-		int Bookshelves = std::min(GetBookshelvesCount(a_Player.GetWorld()), 15);
+		int Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15);
 
 		cFastRandom Random;
 		int Base = (Random.GenerateRandomInteger(1, 8) + static_cast<int>(floor(static_cast<float>(Bookshelves / 2)) + Random.GenerateRandomInteger(0, Bookshelves)));
@@ -1600,7 +1600,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 
 
-int cSlotAreaEnchanting::GetBookshelvesCount(cWorld * a_World)
+int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 {
 	int Bookshelves = 0;
 	cBlockArea Area;

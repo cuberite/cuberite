@@ -60,7 +60,7 @@ protected:
 	/** Contents of the non-inventory part */
 	cItemGrid m_Contents;
 
-	/** The Lua state that has opened the window and owns the m_LuaRef */
+	/** The canon Lua state that has opened the window and owns the m_LuaRef */
 	cLuaState * m_LuaState;
 
 	/** The Lua callback to call when the window is closing for any player */

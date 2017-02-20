@@ -113,12 +113,14 @@ private:
 			case E_BLOCK_BEACON:
 			case E_BLOCK_BEDROCK:
 			case E_BLOCK_BREWING_STAND:
+			case E_BLOCK_CHAIN_COMMAND_BLOCK:
 			case E_BLOCK_CHEST:
 			case E_BLOCK_COMMAND_BLOCK:
 			case E_BLOCK_DAYLIGHT_SENSOR:
 			case E_BLOCK_DISPENSER:
 			case E_BLOCK_DROPPER:
 			case E_BLOCK_ENCHANTMENT_TABLE:
+			case E_BLOCK_END_GATEWAY:
 			case E_BLOCK_END_PORTAL:
 			case E_BLOCK_END_PORTAL_FRAME:
 			// Notice the lack of an E_BLOCK_ENDER_CHEST here; its because ender chests can totally be pushed / pulled in MCS :)
@@ -132,7 +134,9 @@ private:
 			case E_BLOCK_NOTE_BLOCK:
 			case E_BLOCK_OBSIDIAN:
 			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_REPEATING_COMMAND_BLOCK:
 			case E_BLOCK_STANDING_BANNER:
+			case E_BLOCK_STRUCTURE_BLOCK:
 			case E_BLOCK_TRAPPED_CHEST:
 			case E_BLOCK_WALL_BANNER:
 			{

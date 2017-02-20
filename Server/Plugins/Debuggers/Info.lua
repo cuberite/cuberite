@@ -28,6 +28,12 @@ g_PluginInfo =
 			Handler = HandleBlkCmd,
 			HelpString = "Gets info about the block you are looking at"
 		},
+		["/clientversion"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleClientVersionCmd,
+			HelpString = "Shows your client's protocol version",
+		},
 		["/compo"] =
 		{
 			Permission = "debuggers",
@@ -264,6 +270,12 @@ g_PluginInfo =
 		{
 			Handler = HandleConsoleBBox,
 			HelpString = "Performs cBoundingBox API tests",
+		},
+
+		["deadlock"] =
+		{
+			Handler = HandleConsoleDeadlock,
+			HelpString = "Simulates a deadlock, either on the command execution thread, or on a world tick thread",
 		},
 
 		["download"] =

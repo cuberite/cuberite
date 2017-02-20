@@ -108,3 +108,6 @@ Server/cuberite_api.lua
 Server/official_undocumented.lua
 Server/NewlyUndocumented.lua
 Server/.luacheckrc
+
+# compile.sh folder
+build-cuberite

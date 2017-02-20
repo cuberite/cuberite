@@ -8,7 +8,7 @@
 
 
 cIronGolem::cIronGolem(void) :
-	super("IronGolem", mtIronGolem, "mob.irongolem.hit", "mob.irongolem.death", 1.4, 2.9)
+	super("IronGolem", mtIronGolem, "entity.irongolem.hurt", "entity.irongolem.death", 1.4, 2.9)
 {
 }
 

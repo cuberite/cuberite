@@ -67,13 +67,13 @@ public:
 			case E_BLOCK_DIRT:
 			case E_BLOCK_FARMLAND:
 			case E_BLOCK_GRASS:
+			case E_BLOCK_GRASS_PATH:
 			case E_BLOCK_GRAVEL:
 			case E_BLOCK_MYCELIUM:
 			case E_BLOCK_SAND:
 			case E_BLOCK_SNOW:
 			case E_BLOCK_SNOW_BLOCK:
 			case E_BLOCK_SOULSAND:
-			case E_BLOCK_GRASS_PATH:
 			{
 				switch (m_ItemType)
 				{

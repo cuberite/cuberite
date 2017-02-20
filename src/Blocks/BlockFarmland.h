@@ -48,6 +48,7 @@ public:
 		BLOCKTYPE UpperBlock = (a_RelY >= cChunkDef::Height - 1) ? static_cast<BLOCKTYPE>(E_BLOCK_AIR) : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
 		switch (UpperBlock)
 		{
+			case E_BLOCK_BEETROOTS:
 			case E_BLOCK_CROPS:
 			case E_BLOCK_POTATOES:
 			case E_BLOCK_CARROTS:
@@ -109,7 +110,7 @@ public:
 		cBlockArea Area;
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-		if (!Area.Read(a_Chunk.GetWorld(), BlockX - 4, BlockX + 4, a_RelY, a_RelY + 1, BlockZ - 4, BlockZ + 4))
+		if (!Area.Read(*a_Chunk.GetWorld(), BlockX - 4, BlockX + 4, a_RelY, a_RelY + 1, BlockZ - 4, BlockZ + 4))
 		{
 			// Too close to the world edge, cannot check surroundings
 			return false;
@@ -131,6 +132,7 @@ public:
 	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) override
 	{
 		return (
+			(a_Plant == E_BLOCK_BEETROOTS) ||
 			(a_Plant == E_BLOCK_CROPS) ||
 			(a_Plant == E_BLOCK_CARROTS) ||
 			(a_Plant == E_BLOCK_POTATOES) ||

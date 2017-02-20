@@ -12,7 +12,7 @@
 
 
 cVillager::cVillager(eVillagerType VillagerType) :
-	super("Villager", mtVillager, "", "", 0.6, 1.8),
+	super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", 0.6, 1.8),
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
 	m_VillagerAction(false)
@@ -121,7 +121,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 
 	// Read a 11x7x11 area:
 	Surrounding.Read(
-		m_World,
+		*m_World,
 		FloorC(GetPosX()) - 5,
 		FloorC(GetPosX()) + 6,
 		FloorC(GetPosY()) - 3,
@@ -199,6 +199,7 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
+		case E_BLOCK_BEETROOTS:
 		case E_BLOCK_CROPS:
 		case E_BLOCK_POTATOES:
 		case E_BLOCK_CARROTS:

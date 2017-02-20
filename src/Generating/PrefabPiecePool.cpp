@@ -204,6 +204,7 @@ bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString
 	// Load the file in the Lua interpreter:
 	cLuaState Lua(Printf("LoadablePiecePool %s", a_FileName.c_str()));
 	Lua.Create();
+	cLuaState::cLock lock(Lua);
 	if (!Lua.LoadString(a_Contents, a_FileName, a_LogWarnings))
 	{
 		// Reason for failure has already been logged in LoadFile()
@@ -486,17 +487,23 @@ bool cPrefabPiecePool::ReadConnectorsCubesetVer1(
 			break;
 		}
 		int Type = 0, RelX = 0, RelY = 0, RelZ = 0;
-		eBlockFace Direction = BLOCK_FACE_NONE;
+		AString DirectionStr;
+		cPiece::cConnector::eDirection Direction = cPiece::cConnector::dirYM;
 		if (
 			!a_LuaState.GetNamedValue("Type",      Type) ||
 			!a_LuaState.GetNamedValue("RelX",      RelX) ||
 			!a_LuaState.GetNamedValue("RelY",      RelY) ||
 			!a_LuaState.GetNamedValue("RelZ",      RelZ) ||
-			!a_LuaState.GetNamedValue("Direction", Direction)
+			!a_LuaState.GetNamedValue("Direction", DirectionStr) ||
+			!cPiece::cConnector::StringToDirection(DirectionStr, Direction)
 		)
 		{
-			CONDWARNING(a_LogWarnings, "Piece %s in file %s has a malformed Connector at index %d. Skipping the connector.", a_PieceName.c_str(), a_FileName.c_str(), idx);
+			CONDWARNING(a_LogWarnings, "Piece %s in file %s has a malformed Connector at index %d ({%d, %d, %d}, type %d, direction %s). Skipping the connector.",
+				a_PieceName.c_str(), a_FileName.c_str(), idx, RelX, RelY, RelZ, Type, DirectionStr.c_str()
+			);
 			res = false;
+			lua_pop(a_LuaState, 1);  // stk: [Connectors]
+			idx += 1;
 			continue;
 		}
 		a_Prefab->AddConnector(RelX, RelY, RelZ, Direction, Type);

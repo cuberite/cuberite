@@ -10,7 +10,7 @@
 
 
 cGuardian::cGuardian(void) :
-	super("Guardian", mtGuardian, "mob.guardian.idle", "mob.guardian.death", 0.875, 0.8)
+	super("Guardian", mtGuardian, "entity.guardian.hurt", "entity.guardian.death", 0.875, 0.8)
 {
 }
 

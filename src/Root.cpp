@@ -182,7 +182,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	LoadWorlds(*settingsRepo, IsNewIniFile);
 
 	LOGD("Loading plugin manager...");
-	m_PluginManager = new cPluginManager();
+	m_PluginManager = new cPluginManager(dd);
 	m_PluginManager->ReloadPluginsNow(*settingsRepo);
 
 	LOGD("Loading MonsterConfig...");
@@ -193,7 +193,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_Authenticator.Start(*settingsRepo);
 
 	LOGD("Starting worlds...");
-	StartWorlds();
+	StartWorlds(dd);
 
 	if (settingsRepo->GetValueSetB("DeadlockDetect", "Enabled", true))
 	{
@@ -248,7 +248,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	dd.Stop();
 
 	LOGD("Stopping world threads...");
-	StopWorlds();
+	StopWorlds(dd);
 
 	LOGD("Stopping authenticator...");
 	m_Authenticator.Stop();
@@ -486,11 +486,11 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 
 
 
-void cRoot::StartWorlds(void)
+void cRoot::StartWorlds(cDeadlockDetect & a_DeadlockDetect)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		itr->second->Start();
+		itr->second->Start(a_DeadlockDetect);
 		itr->second->InitializeSpawn();
 		m_PluginManager->CallHookWorldStarted(*itr->second);
 	}
@@ -500,11 +500,11 @@ void cRoot::StartWorlds(void)
 
 
 
-void cRoot::StopWorlds(void)
+void cRoot::StopWorlds(cDeadlockDetect & a_DeadlockDetect)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		itr->second->Stop();
+		itr->second->Stop(a_DeadlockDetect);
 	}
 }
 

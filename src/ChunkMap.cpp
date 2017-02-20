@@ -19,6 +19,7 @@
 #include "SetChunkData.h"
 #include "Blocks/ChunkInterface.h"
 #include "Entities/Pickup.h"
+#include "DeadlockDetect.h"
 
 #ifndef _WIN32
 	#include <cstdlib>  // abs
@@ -1706,7 +1707,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	{
 		cBlockArea area;
 		a_BlocksAffected.reserve(8 * static_cast<size_t>(ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt));
-		if (!area.Read(m_World, bx - ExplosionSizeInt, static_cast<int>(ceil(a_BlockX + ExplosionSizeInt)), MinY, MaxY, bz - ExplosionSizeInt, static_cast<int>(ceil(a_BlockZ + ExplosionSizeInt))))
+		if (!area.Read(*m_World, bx - ExplosionSizeInt, static_cast<int>(ceil(a_BlockX + ExplosionSizeInt)), MinY, MaxY, bz - ExplosionSizeInt, static_cast<int>(ceil(a_BlockZ + ExplosionSizeInt))))
 		{
 			return;
 		}
@@ -1802,7 +1803,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				}  // for z
 			}  // for y
 		}  // for x
-		area.Write(m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
+		area.Write(*m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
 	}
 
 	class cTNTDamageCallback :
@@ -2778,6 +2779,24 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 	}
 }
 
+
+
+
+
+
+void cChunkMap::TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect, const AString & a_WorldName)
+{
+	a_DeadlockDetect.TrackCriticalSection(m_CSChunks, Printf("World %s chunkmap", a_WorldName.c_str()));
+}
+
+
+
+
+
+void cChunkMap::UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect)
+{
+	a_DeadlockDetect.UntrackCriticalSection(m_CSChunks);
+}
 
 
 

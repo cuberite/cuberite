@@ -259,7 +259,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
 			a_NearChunk->BroadcastSoundEffect(
-				"random.fizz",
+				"block.lava.extinguish",
 				static_cast<double>(BlockX),
 				static_cast<double>(a_RelY),
 				static_cast<double>(BlockZ),
@@ -281,7 +281,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
 			a_NearChunk->BroadcastSoundEffect(
-				"random.fizz",
+				"block.lava.extinguish",
 				static_cast<double>(BlockX),
 				static_cast<double>(a_RelY),
 				static_cast<double>(BlockZ),

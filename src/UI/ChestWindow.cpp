@@ -27,7 +27,7 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("random.chestopen", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
+	m_World->BroadcastSoundEffect("block.chest.open", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
 
 	// Send out the chest-open packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, a_Chest->GetBlockType());
@@ -51,7 +51,7 @@ cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_Secon
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("random.chestopen", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
+	m_World->BroadcastSoundEffect("block.chest.open", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
 
 	// Send out the chest-open packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, a_PrimaryChest->GetBlockType());
@@ -66,7 +66,7 @@ cChestWindow::~cChestWindow()
 	// Send out the chest-close packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, m_PrimaryChest->GetBlockType());
 
-	m_World->BroadcastSoundEffect("random.chestclosed", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
+	m_World->BroadcastSoundEffect("block.chest.close", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
 }
 
 

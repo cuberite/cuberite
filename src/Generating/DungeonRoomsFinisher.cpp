@@ -203,6 +203,7 @@ protected:
 			{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
 			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
 			{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
+			{ cItem(E_ITEM_GOLD),                1,         4,         2 },
 			{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
 			{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
 			{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
@@ -211,10 +212,16 @@ protected:
 			{ cItem(E_ITEM_GUNPOWDER),           1,         4,        10 },
 			{ cItem(E_ITEM_STRING),              1,         4,        10 },
 			{ cItem(E_ITEM_REDSTONE_DUST),       1,         4,        10 },
+			{ cItem(E_ITEM_COAL),                1,         4,        10 },
+			{ cItem(E_ITEM_BONE),                1,         4,        10 },
+			{ cItem(E_ITEM_ROTTEN_FLESH),        1,         4,        10 },
 			{ cItem(E_ITEM_SADDLE),              1,         1,        10 },
 			{ cItem(E_ITEM_BUCKET),              1,         1,        10 },
 			{ cItem(E_ITEM_BREAD),               1,         1,        10 },
 			{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
+			{ cItem(E_ITEM_BEETROOT_SEEDS),      2,         4,        10 },
+			{ cItem(E_ITEM_MELON_SEEDS),         2,         4,        10 },
+			{ cItem(E_ITEM_PUMPKIN_SEEDS),       2,         4,        10 },
 		} ;
 
 		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));

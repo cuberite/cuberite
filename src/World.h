@@ -58,7 +58,7 @@ class cCompositeChat;
 class cCuboid;
 class cSetChunkData;
 class cBroadcaster;
-
+class cDeadlockDetect;
 
 typedef std::list< cPlayer * > cPlayerList;
 typedef std::list< std::pair< cPlayer *, cWorld * > > cAwaitingPlayerList;
@@ -703,11 +703,13 @@ public:
 
 	void InitializeSpawn(void);
 
-	/** Starts threads that belong to this world */
-	void Start(void);
+	/** Starts threads that belong to this world.
+	a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock. */
+	void Start(cDeadlockDetect & a_DeadlockDetect);
 
-	/** Stops threads that belong to this world (part of deinit) */
-	void Stop(void);
+	/** Stops threads that belong to this world (part of deinit).
+	a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock. */
+	void Stop(cDeadlockDetect & a_DeadlockDetect);
 
 	/** Processes the blocks queued for ticking with a delay (m_BlockTickQueue[]) */
 	void TickQueuedBlocks(void);
@@ -895,8 +897,11 @@ private:
 	bool m_BroadcastAchievementMessages;
 
 	bool   m_IsDaylightCycleEnabled;
-	// std::chrono::milliseconds is guaranteed to be good for 292 years by the standard.
-	std::chrono::milliseconds  m_WorldAge;
+
+	/** The age of the world.
+	Monotonic, always increasing each game tick, persistent across server restart. */
+	std::chrono::milliseconds m_WorldAge;
+
 	std::chrono::milliseconds  m_TimeOfDay;
 	cTickTimeLong  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
 	cTickTimeLong  m_LastChunkCheck;        // The last WorldAge (in ticks) in which unloading and possibly saving was triggered
@@ -941,6 +946,7 @@ private:
 
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
+	bool m_IsBeetrootsBonemealable;
 	bool m_IsCactusBonemealable;
 	bool m_IsCarrotsBonemealable;
 	bool m_IsCropsBonemealable;

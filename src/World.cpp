@@ -12,6 +12,7 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "SetChunkData.h"
+#include "DeadlockDetect.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -176,6 +177,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_MinThunderStormTicks(3600),   // 3 real-world minutes   -+
 	m_MaxCactusHeight(3),
 	m_MaxSugarcaneHeight(4),
+	m_IsBeetrootsBonemealable(true),
 	m_IsCactusBonemealable(false),
 	m_IsCarrotsBonemealable(true),
 	m_IsCropsBonemealable(true),
@@ -238,7 +240,7 @@ cWorld::~cWorld()
 void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
-	BroadcastSoundEffect("ambient.weather.thunder", a_BlockX, a_BlockY, a_BlockZ, 50, 1);
+	BroadcastSoundEffect("entity.lightning.thunder", a_BlockX, a_BlockY, a_BlockZ, 50, 1);
 }
 
 
@@ -374,71 +376,23 @@ void cWorld::InitializeSpawn(void)
 	int ChunkX = 0, ChunkZ = 0;
 	cChunkDef::BlockToChunk(FloorC(m_SpawnX), FloorC(m_SpawnZ), ChunkX, ChunkZ);
 	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
-
-	#ifdef TEST_LINEBLOCKTRACER
-	// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
-	class cTracerCallbacks :
-		public cBlockTracer::cCallbacks
-	{
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
-		{
-			LOGD("Block {%d, %d, %d}: %d:%d (%s)",
-				a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta,
-				ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
-			);
-			return false;
-		}
-
-		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) override
-		{
-			LOGD("Block {%d, %d, %d}: no data available",
-				a_BlockX, a_BlockY, a_BlockZ
-			);
-			return false;
-		}
-
-		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
-		{
-			LOGD("Out of world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
-			return false;
-		}
-
-		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
-		{
-			LOGD("Into world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
-			return false;
-		}
-
-		virtual void OnNoMoreHits(void) override
-		{
-			LOGD("No more hits");
-		}
-	} Callbacks;
-	LOGD("Spawn is at {%f, %f, %f}", m_SpawnX, m_SpawnY, m_SpawnZ);
-	LOGD("Tracing a line along +X:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 10, m_SpawnY, m_SpawnZ, m_SpawnX + 10, m_SpawnY, m_SpawnZ);
-	LOGD("Tracing a line along -Z:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX, m_SpawnY, m_SpawnZ + 10, m_SpawnX, m_SpawnY, m_SpawnZ - 10);
-	LOGD("Tracing a line along -Y, out of world:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX, 260, m_SpawnZ, m_SpawnX, -5, m_SpawnZ);
-	LOGD("Tracing a line along XY:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 10, m_SpawnY - 10, m_SpawnZ, m_SpawnX + 10, m_SpawnY + 10, m_SpawnZ);
-	LOGD("Tracing a line in generic direction:");
-	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 15, m_SpawnY - 5, m_SpawnZ + 7.5, m_SpawnX + 13, m_SpawnY - 10, m_SpawnZ + 8.5);
-	LOGD("Tracing tests done");
-	#endif  // TEST_LINEBLOCKTRACER
 }
 
 
 
 
 
-void cWorld::Start(void)
+void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 {
+	// Track the CSs used by this world in the deadlock detector:
+	a_DeadlockDetect.TrackCriticalSection(m_CSClients, Printf("World %s clients", m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSPlayers, Printf("World %s players", m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSTasks,   Printf("World %s tasks",   m_WorldName.c_str()));
+
 	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = 0;
-	m_GameMode = eGameMode_Creative;
+	m_GameMode = eGameMode_Survival;
 
 	cIniFile IniFile;
 	if (!IniFile.ReadFile(m_IniFileName))
@@ -490,6 +444,7 @@ void cWorld::Start(void)
 	m_StorageCompressionFactor    = IniFile.GetValueSetI("Storage",       "CompressionFactor",           m_StorageCompressionFactor);
 	m_MaxCactusHeight             = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",             3);
 	m_MaxSugarcaneHeight          = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",          3);
+	m_IsBeetrootsBonemealable     = IniFile.GetValueSetB("Plants",        "IsBeetrootsBonemealable",     true);
 	m_IsCactusBonemealable        = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",        false);
 	m_IsCarrotsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",       true);
 	m_IsCropsBonemealable         = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",         true);
@@ -517,6 +472,8 @@ void cWorld::Start(void)
 	m_IsDaylightCycleEnabled      = IniFile.GetValueSetB("General",       "IsDaylightCycleEnabled",      true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    static_cast<int>(m_GameMode));
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     static_cast<int>(m_Weather));
+
+	m_WorldAge = std::chrono::milliseconds(IniFile.GetValueSetI("General", "WorldAgeMS", 0LL));
 
 	// Load the weather frequency data:
 	if (m_Dimension == dimOverworld)
@@ -603,6 +560,7 @@ void cWorld::Start(void)
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
 
 	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
+	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
 
 	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
@@ -953,7 +911,7 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 
 
 
-void cWorld::Stop(void)
+void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 {
 	// Delete the clients that have been in this world:
 	{
@@ -983,6 +941,7 @@ void cWorld::Stop(void)
 		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
 		IniFile.SetValueI("General", "Weather", static_cast<int>(m_Weather));
 		IniFile.SetValueI("General", "TimeInTicks", GetTimeOfDay());
+		IniFile.SetValueI("General", "WorldAgeMS", static_cast<Int64>(m_WorldAge.count()));
 	IniFile.WriteFile(m_IniFileName);
 
 	m_TickThread.Stop();
@@ -990,6 +949,11 @@ void cWorld::Stop(void)
 	m_Generator.Stop();
 	m_ChunkSender.Stop();
 	m_Storage.Stop();
+
+	a_DeadlockDetect.UntrackCriticalSection(m_CSClients);
+	a_DeadlockDetect.UntrackCriticalSection(m_CSPlayers);
+	a_DeadlockDetect.UntrackCriticalSection(m_CSTasks);
+	m_ChunkMap->UntrackInDeadlockDetect(a_DeadlockDetect);
 }
 
 
@@ -1423,7 +1387,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("random.explode", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 1.0f, 0.6f);
+	BroadcastSoundEffect("entity.generic.explode", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 1.0f, 0.6f);
 
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -1738,6 +1702,26 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 	switch (BlockType)
 	{
+		case E_BLOCK_BEETROOTS:
+		{
+			if ((a_IsByBonemeal && !m_IsBeetrootsBonemealable) || (BlockMeta >= 3))
+			{
+				return false;
+			}
+			if (!a_IsByBonemeal)
+			{
+				++BlockMeta;
+			}
+			else
+			{
+				BlockMeta += 1;
+				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(3));
+			}
+			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			return true;
+		}
+
 		case E_BLOCK_CARROTS:
 		{
 			if ((a_IsByBonemeal && !m_IsCarrotsBonemealable) || (BlockMeta >= 7))
@@ -2853,8 +2837,6 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
 {
-	ASSERT(IsChunkQueued(a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ()));
-
 	// Validate biomes, if needed:
 	if (!a_SetChunkData->AreBiomesValid())
 	{
@@ -3458,7 +3440,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	if (a_Open != IsOpen)
 	{
 		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
-		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_DOOR_OPEN_CLOSE, a_BlockX, a_BlockY, a_BlockZ, 0);
+		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0);
 		return true;
 	}
 	return false;
