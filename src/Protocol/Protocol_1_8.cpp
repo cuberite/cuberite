@@ -1707,9 +1707,8 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 
 int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 {
-	static bool IsInitialized = false;
 	static std::map<AString, int> ParticleMap;
-	if (!IsInitialized)
+	if (ParticleMap.empty())
 	{
 		// Initialize the ParticleMap:
 		ParticleMap["explode"]          = 0;
@@ -1733,7 +1732,7 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 		ParticleMap["dripwater"]        = 18;
 		ParticleMap["driplava"]         = 19;
 		ParticleMap["angryvillager"]    = 20;
-		ParticleMap["happyVillager"]    = 21;
+		ParticleMap["happyvillager"]    = 21;
 		ParticleMap["townaura"]         = 22;
 		ParticleMap["note"]             = 23;
 		ParticleMap["portal"]           = 24;
@@ -1754,16 +1753,13 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 		ParticleMap["droplet"]          = 39;
 		ParticleMap["take"]             = 40;
 		ParticleMap["mobappearance"]    = 41;
-		ParticleMap["ironcrack"]        = 42;
-		ParticleMap["blockcrack"]       = 43;
-		ParticleMap["blockdust"]        = 44;
-		ParticleMap["endRod"]           = 45;
-		ParticleMap["dragonbreath"]     = 46;
-		ParticleMap["damageIndicator"]  = 47;
-		ParticleMap["sweepAttack"]      = 48;
-		ParticleMap["fallingdust"]      = 49;
-		ParticleMap["spit"]             = 50;
-		ParticleMap["totem"]            = 51;
+		ParticleMap["dragonbreath"]     = 42;
+		ParticleMap["endrod"]           = 43;
+		ParticleMap["damageindicator"]  = 44;
+		ParticleMap["sweepattack"]      = 45;
+		ParticleMap["fallingdust"]      = 46;
+		ParticleMap["totem"]            = 47;
+		ParticleMap["spit"]             = 48;
 	}
 
 	AString ParticleName = StrToLower(a_ParticleName);
