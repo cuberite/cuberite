@@ -187,3 +187,51 @@ void cProtocol_1_11_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 
 
+cProtocol_1_11_1::cProtocol_1_11_1(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+{
+}
+
+
+
+
+
+void cProtocol_1_11_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite 1.11.1";
+	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_11_1;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	// Serialize the response into a packet:
+	Json::FastWriter Writer;
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Writer.write(ResponseValue));
+}
