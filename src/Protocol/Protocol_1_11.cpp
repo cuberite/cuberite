@@ -36,7 +36,7 @@ Implements the 1.11 protocol classes:
 
 
 
-cProtocol_1_11_0::cProtocol_1_11_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_11_0::cProtocol_1_11_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }
@@ -49,7 +49,7 @@ void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Entity, const cPlayer
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x0d);  // Collect Item packet
+	cPacketizer Pkt(*this, 0x48);  // Collect Item packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
@@ -87,12 +87,15 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
+	cPacketizer Pkt(*this, 0x03);  // Spawn Mob packet
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
-	Pkt.WriteFPInt(a_Mob.GetPosX());
-	Pkt.WriteFPInt(a_Mob.GetPosY());
-	Pkt.WriteFPInt(a_Mob.GetPosZ());
+	Pkt.WriteBEDouble(a_Mob.GetPosX());
+	Pkt.WriteBEDouble(a_Mob.GetPosY());
+	Pkt.WriteBEDouble(a_Mob.GetPosZ());
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
@@ -100,7 +103,7 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
-	Pkt.WriteBEUInt8(0x7f);  // Metadata terminator
+	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
 }
 
 
@@ -187,7 +190,7 @@ void cProtocol_1_11_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 
 
-cProtocol_1_11_1::cProtocol_1_11_1(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_11_1::cProtocol_1_11_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }

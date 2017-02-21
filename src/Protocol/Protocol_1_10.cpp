@@ -282,7 +282,7 @@ namespace Metadata
 
 
 
-cProtocol_1_10_0::cProtocol_1_10_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_10_0::cProtocol_1_10_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }
