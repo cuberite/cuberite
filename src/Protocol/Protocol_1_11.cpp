@@ -36,7 +36,7 @@ Implements the 1.11 protocol classes:
 
 
 
-cProtocol_1_11_0::cProtocol_1_11_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_11_0::cProtocol_1_11_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }
@@ -49,7 +49,7 @@ void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Entity, const cPlayer
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x0d);  // Collect Item packet
+	cPacketizer Pkt(*this, 0x48);  // Collect Item packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
@@ -87,12 +87,15 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
+	cPacketizer Pkt(*this, 0x03);  // Spawn Mob packet
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
-	Pkt.WriteFPInt(a_Mob.GetPosX());
-	Pkt.WriteFPInt(a_Mob.GetPosY());
-	Pkt.WriteFPInt(a_Mob.GetPosZ());
+	Pkt.WriteBEDouble(a_Mob.GetPosX());
+	Pkt.WriteBEDouble(a_Mob.GetPosY());
+	Pkt.WriteBEDouble(a_Mob.GetPosZ());
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
@@ -100,7 +103,7 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
-	Pkt.WriteBEUInt8(0x7f);  // Metadata terminator
+	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
 }
 
 
@@ -187,3 +190,51 @@ void cProtocol_1_11_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 
 
+cProtocol_1_11_1::cProtocol_1_11_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+{
+}
+
+
+
+
+
+void cProtocol_1_11_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite 1.11.1";
+	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_11_1;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	// Serialize the response into a packet:
+	Json::FastWriter Writer;
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Writer.write(ResponseValue));
+}

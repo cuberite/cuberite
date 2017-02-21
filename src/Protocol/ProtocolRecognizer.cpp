@@ -56,6 +56,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_9_4:   return "1.9.4";
 		case PROTO_VERSION_1_10_0:  return "1.10";
 		case PROTO_VERSION_1_11_0:  return "1.11";
+		case PROTO_VERSION_1_11_1:  return "1.11.1";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -1077,6 +1078,11 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		case PROTO_VERSION_1_11_0:
 		{
 			m_Protocol = new cProtocol_1_11_0(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_11_1:
+		{
+			m_Protocol = new cProtocol_1_11_1(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		default:

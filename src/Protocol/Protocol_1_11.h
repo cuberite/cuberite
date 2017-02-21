@@ -39,3 +39,18 @@ protected:
 	virtual void HandlePacketBlockPlace   (cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 };
+
+
+
+
+
+class cProtocol_1_11_1 :
+	public cProtocol_1_11_0
+{
+	typedef cProtocol_1_11_0 super;
+
+public:
+	cProtocol_1_11_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+};
