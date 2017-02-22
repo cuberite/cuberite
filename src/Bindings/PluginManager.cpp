@@ -111,7 +111,7 @@ void cPluginManager::RefreshPluginList(void)
 void cPluginManager::ReloadPluginsNow(void)
 {
 	cIniFile a_SettingsIni;
-	a_SettingsIni.ReadFile("settings.ini");
+	a_SettingsIni.ReadFile(cRoot::Get()->m_SettingsFile);
 	ReloadPluginsNow(a_SettingsIni);
 }
 

@@ -58,6 +58,8 @@ public:
 
 	void Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo);
 
+	std::string m_SettingsFile;
+
 	/** Stops the server, as if "/stop" was typed in the console. */
 	void StopServer();
 
