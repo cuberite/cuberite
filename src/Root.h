@@ -52,13 +52,12 @@ public:
 	static bool m_TerminateEventRaised;
 	static bool m_RunAsService;
 
+	AString m_SettingsFilename;
 
 	cRoot(void);
 	~cRoot();
 
 	void Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo);
-
-	AString m_SettingsFile;
 
 	/** Stops the server, as if "/stop" was typed in the console. */
 	void StopServer();
