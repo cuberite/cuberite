@@ -383,7 +383,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		// Parse the comand line args:
 		TCLAP::CmdLine cmd("Cuberite");
 		TCLAP::ValueArg<int> slotsArg    ("s", "max-players",         "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
-		TCLAP::ValueArg<std::string> confArg  ("c", "config-file",         "Config file to use", false, "settings.ini", "string", cmd);
+		TCLAP::ValueArg<AString> confArg ("c", "config-file",         "Config file to use", false, "settings.ini", "string", cmd);
 		TCLAP::MultiArg<int> portsArg    ("p", "port",                "The port number the server should listen to", false, "port", cmd);
 		TCLAP::SwitchArg commLogArg      ("",  "log-comm",            "Log server client communications to file", cmd);
 		TCLAP::SwitchArg commLogInArg    ("",  "log-comm-in",         "Log inbound server client communications to file", cmd);
@@ -398,7 +398,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
 		if (confArg.isSet())
 		{
-			std::string conf_file = confArg.getValue();
+			AString conf_file = confArg.getValue();
 			repo->AddValue("Server", "ConfigFile", conf_file);
 		}
 		if (slotsArg.isSet())
