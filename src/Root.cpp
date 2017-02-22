@@ -144,7 +144,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_SettingsFile = "settings.ini";
 	if (a_OverridesRepo->HasValue("Server","ConfigFile"))
 	{
-	m_SettingsFile = a_OverridesRepo->GetValue("Server","ConfigFile");
+		m_SettingsFile = a_OverridesRepo->GetValue("Server","ConfigFile");
 	}
 
 	auto IniFile = cpp14::make_unique<cIniFile>();
