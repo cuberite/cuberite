@@ -52,6 +52,7 @@ public:
 	static bool m_TerminateEventRaised;
 	static bool m_RunAsService;
 
+	/** which ini file to load settings from, default is settings.ini */
 	AString m_SettingsFilename;
 
 	cRoot(void);
