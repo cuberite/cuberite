@@ -3,12 +3,17 @@
 *.exp
 *.lib
 *.ini
+BACKERS
+buildinfo*
+CONTRIBUTORS
 Cuberite
 Cuberite_debug
 CommLogs/
 GalExports/
 GalExportWeb/
 GalleryWeb/
+itemblacklist
+LICENSE
 logs
 players
 world*
@@ -30,9 +35,13 @@ motd.txt
 *.deuser
 *.dmp
 *.xml
-mcserver_api.lua
-cuberite_api.lua
 DuplicateDocs.txt
+
+# APIDump-generated status files:
+cuberite_api.lua
+official_undocumented.lua
+NewlyUndocumented.lua
+.luacheckrc
 
 # Ignore the webadmin certs / privkey, so that no-one commits theirs by accident:
 webadmin/httpscert.crt
