@@ -261,6 +261,11 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 		if (a_IsDoubleTall)
 		{
 			a_ChunkDesc.SetBlockTypeMeta(x, Top + 2, z, E_BLOCK_BIG_FLOWER, 8);
+			a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(Top + 2));
+		}
+		else
+		{
+			a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(Top + 1));
 		}
 	}
 
@@ -550,12 +555,14 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 					NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? 2 : 3;
 					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
 					a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, 8);
+					a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y + 1));
 				}
 			}
 			else
 			{
 				NIBBLETYPE meta = (m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 2) + 1;
 				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, meta);
+				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y));
 			}
 		}
 	}
