@@ -163,10 +163,8 @@ void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Setti
 	a_Settings.AddKeyName("Plugins");
 	a_Settings.AddKeyComment("Plugins", " Plugin=Debuggers");
 	a_Settings.AddKeyComment("Plugins", " Plugin=HookNotify");
-	a_Settings.AddKeyComment("Plugins", " Plugin=ChunkWorx");
 	a_Settings.AddKeyComment("Plugins", " Plugin=APIDump");
 	a_Settings.AddValue("Plugins", "Plugin", "Core");
-	a_Settings.AddValue("Plugins", "Plugin", "TransAPI");
 	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
 }
 

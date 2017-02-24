@@ -1,24 +1,12 @@
-[submodule "MCServer/Plugins/Core"]
+[submodule "Server/Plugins/Core"]
 	path = Server/Plugins/Core
 	url = https://github.com/cuberite/Core.git
-[submodule "MCServer/Plugins/ProtectionAreas"]
+[submodule "Server/Plugins/ProtectionAreas"]
 	path = Server/Plugins/ProtectionAreas
 	url = https://github.com/cuberite/ProtectionAreas.git
-[submodule "MCServer/Plugins/TransAPI"]
-	path = Server/Plugins/TransAPI
-	url = https://github.com/cuberite/transapi.git
-[submodule "MCServer/Plugins/ChunkWorx"]
-	path = Server/Plugins/ChunkWorx
-	url = https://github.com/cuberite/ChunkWorx.git
-[submodule "MCServer/Plugins/ChatLog"]
+[submodule "Server/Plugins/ChatLog"]
 	path = Server/Plugins/ChatLog
 	url = https://github.com/cuberite/ChatLog.git
-[submodule "MCServer/Plugins/Handy"]
-	path = Server/Plugins/Handy
-	url = https://github.com/cuberite/Handy.git
-[submodule "MCServer/Plugins/MagicCarpet"]
-	path = Server/Plugins/MagicCarpet
-	url = https://github.com/cuberite/MagicCarpet.git
 [submodule "lib/polarssl"]
 	path = lib/polarssl
 	url = https://github.com/cuberite/polarssl.git
