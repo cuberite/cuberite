@@ -501,15 +501,20 @@ void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
 	if (GetDimension() == dimOverworld)
 	{
 		AString MyNetherName = GetName() + "_nether";
-		AString MyEndName = GetName() + "_end";
+		AString MyEndName = GetName() + "_the_end";
 		if (cRoot::Get()->GetWorld(MyNetherName) == nullptr)
 		{
 			MyNetherName = "";
 		}
 		if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
 		{
-			MyEndName = "";
+			MyEndName = GetName() + "_end";
+			if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
+			{
+				MyEndName = "";
+			}
 		}
+
 		m_LinkedNetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", MyNetherName);
 		m_LinkedEndWorldName    = IniFile.GetValueSet("LinkedWorlds", "EndWorldName",    MyEndName);
 	}
