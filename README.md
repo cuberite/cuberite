@@ -22,7 +22,7 @@ There are several ways to obtain Cuberite.
 ##### The EasyInstall script
 This script will download the correct binary from the project site.
 
-    sh -c "$(wget -O - https://download.cuberite.org)"
+    curl -sSfL https://download.cuberite.org | sh
 
 #### Compiling
  - You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
