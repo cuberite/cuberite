@@ -4,7 +4,7 @@ COMPILING
 To compile Cuberite from source, you need the following set of software:
 
  * CMake
- * Platform-specific make tool \(windows would be MSVC, linux/macos GNU make, etc.\)
+ * Platform-specific make tool \(Windows would be MSVC, Linux/macOS GNU make, etc.\)
  * C compiler
  * modern C++ compiler and linker
 
