@@ -108,6 +108,16 @@ if(MSVC OR MSVC_IDE)
 	endif()
 endif()
 
+# Check for gcc version 4.8 or greater
+if(CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
+    message(FATAL_ERROR "You need at least GCC version 4.8!")
+endif()
+
+# Check for clang version 3.4 or greater
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
+    message(FATAL_ERROR "You need at least Clang version 3.4!")
+endif()
+
 set(BUILD_TOOLS OFF CACHE BOOL "")
 set(SELF_TEST OFF CACHE BOOL "")
 
