@@ -10,7 +10,7 @@
 #pragma once
 
 #include <unordered_set>
-#include "PieceGenerator.h"
+#include "PiecePool.h"
 #include "Prefab.h"
 
 

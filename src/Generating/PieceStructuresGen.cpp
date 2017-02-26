@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "PieceStructuresGen.h"
 #include "PrefabStructure.h"
+#include "PieceGeneratorBFSTree.h"
 #include "IniFile.h"
 #include "../Stopwatch.h"
 
@@ -13,6 +14,114 @@
 
 
 
+
+class cPieceStructuresGen::cGen:
+	public cGridStructGen
+{
+	typedef cGridStructGen Super;
+
+public:
+	cGen(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, int a_SeaLevel, const AString & a_Name):
+		Super(a_Seed),
+		m_BiomeGen(a_BiomeGen),
+		m_HeightGen(a_HeightGen),
+		m_SeaLevel(a_SeaLevel),
+		m_Name(a_Name),
+		m_MaxDepth(5)
+	{
+	}
+
+
+
+	/** Loads the piecepool from a file.
+	Returns true on success, logs warning and returns false on failure. */
+	bool LoadFromFile(const AString & a_FileName)
+	{
+		// Load the piecepool from the file, log any warnings:
+		if (!m_PiecePool.LoadFromFile(a_FileName, true))
+		{
+			return false;
+		}
+		if (NoCaseCompare(m_PiecePool.GetIntendedUse(), "PieceStructures") != 0)
+		{
+			LOGWARNING("PieceStructures generator: File %s is intended for use in \"%s\", rather than piece structures. Loading the file, but the generator may behave unexpectedly.",
+				a_FileName.c_str(), m_PiecePool.GetIntendedUse().c_str()
+			);
+		}
+		m_PiecePool.AssignGens(m_Seed, m_BiomeGen, m_HeightGen, m_SeaLevel);
+
+		// Apply generator params from the piecepool (in the metadata) into the generator:
+		auto & generatorParams = m_PiecePool.GetAllMetadata();
+		SetGeneratorParams(generatorParams);
+		m_MaxDepth = GetStringMapInteger<int>(generatorParams, "MaxDepth", m_MaxDepth);
+
+		return true;
+	}
+
+
+
+	// cGridStructGen overrides:
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override
+	{
+		cStopwatch sw(Printf("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_GridX, a_GridZ));
+		cPlacedPieces outPieces;
+		cPieceGeneratorBFSTree pg(m_PiecePool, m_Seed);
+		pg.PlacePieces(a_OriginX, a_OriginZ, m_MaxDepth, outPieces);
+		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(outPieces), m_HeightGen);
+	}
+
+
+protected:
+
+	/** The type used for storing a connection from one piece to another, while building the piece tree. */
+	struct cConnection
+	{
+		cPiece * m_Piece;                  // The piece being connected
+		cPiece::cConnector m_Connector;    // The piece's connector being used (relative non-rotated coords)
+		int m_NumCCWRotations;             // Number of rotations necessary to match the two connectors
+		int m_Weight;                      // Relative chance that this connection will be chosen
+
+		cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations, int a_Weight);
+	};
+	typedef std::vector<cConnection> cConnections;
+
+
+	/** The type used for storing a pool of connectors that will be attempted to expand by another piece. */
+	struct cFreeConnector
+	{
+		cPlacedPiece * m_Piece;
+		cPiece::cConnector m_Connector;
+
+		cFreeConnector(cPlacedPiece * a_Piece, const cPiece::cConnector & a_Connector);
+	};
+	typedef std::vector<cFreeConnector> cFreeConnectors;
+
+	/** The underlying biome generator that defines whether the structure is created or not */
+	cBiomeGenPtr m_BiomeGen;
+
+	/** The underlying height generator, used to position the prefabs crossing chunk borders if they are set to FitGround. */
+	cTerrainHeightGenPtr m_HeightGen;
+
+	/** The world's sea level, if available. Used for some cVerticalStrategy descendants. */
+	int m_SeaLevel;
+
+	/** The name that is used for reporting. */
+	AString m_Name;
+
+	/** All available prefabs. */
+	cPrefabPiecePool m_PiecePool;
+
+	/** Maximum depth of the generated piece tree. */
+	int m_MaxDepth;
+};
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cPieceStructuresGen:
 
 cPieceStructuresGen::cPieceStructuresGen(int a_Seed):
 	m_Seed(a_Seed)
@@ -67,62 +176,6 @@ void cPieceStructuresGen::GenFinish(cChunkDesc & a_Chunk)
 	}
 }
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cPieceStructuresGen::cGen:
-
-cPieceStructuresGen::cGen::cGen(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, int a_SeaLevel, const AString & a_Name):
-	Super(a_Seed),
-	m_BiomeGen(a_BiomeGen),
-	m_HeightGen(a_HeightGen),
-	m_SeaLevel(a_SeaLevel),
-	m_Name(a_Name),
-	m_MaxDepth(5)
-{
-}
-
-
-
-
-
-bool cPieceStructuresGen::cGen::LoadFromFile(const AString & a_FileName)
-{
-	// Load the piecepool from the file, log any warnings:
-	if (!m_Pool.LoadFromFile(a_FileName, true))
-	{
-		return false;
-	}
-	if (NoCaseCompare(m_Pool.GetIntendedUse(), "PieceStructures") != 0)
-	{
-		LOGWARNING("PieceStructures generator: File %s is intended for use in \"%s\", rather than piece structures. Loading the file, but the generator may behave unexpectedly.",
-			a_FileName.c_str(), m_Pool.GetIntendedUse().c_str()
-		);
-	}
-	m_Pool.AssignGens(m_Seed, m_BiomeGen, m_HeightGen, m_SeaLevel);
-
-	// Apply generator params from the piecepool (in the metadata) into the generator:
-	auto & generatorParams = m_Pool.GetAllMetadata();
-	SetGeneratorParams(generatorParams);
-	m_MaxDepth = GetStringMapInteger<int>(generatorParams, "MaxDepth", m_MaxDepth);
-
-	return true;
-}
-
-
-
-
-
-cGridStructGen::cStructurePtr cPieceStructuresGen::cGen::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
-{
-	cStopwatch sw(Printf("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_GridX, a_GridZ));
-	cBFSPieceGenerator pg(m_Pool, m_Seed);
-	cPlacedPieces outPieces;
-	pg.PlacePieces(a_OriginX, a_OriginZ, m_MaxDepth, outPieces);
-	return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, outPieces, m_HeightGen);
-}
 
 
 

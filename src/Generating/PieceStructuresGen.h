@@ -40,40 +40,9 @@ public:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 protected:
-	class cGen:
-		public cGridStructGen
-	{
-		typedef cGridStructGen Super;
-	public:
-		cGen(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, int a_SeaLevel, const AString & a_Name);
-
-		/** Loads the piecepool from a file.
-		Returns true on success, logs warning and returns false on failure. */
-		bool LoadFromFile(const AString & a_FileName);
-
-		// cGridStructGen overrides:
-		virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
-
-	protected:
-
-		/** The underlying biome generator that defines whether the structure is created or not */
-		cBiomeGenPtr m_BiomeGen;
-
-		/** The underlying height generator, used to position the prefabs crossing chunk borders if they are set to FitGround. */
-		cTerrainHeightGenPtr m_HeightGen;
-
-		/** The world's sea level, if available. Used for some cVerticalStrategy descendants. */
-		int m_SeaLevel;
-
-		/** The name that is used for reporting. */
-		AString m_Name;
-
-		/** All available prefabs. */
-		cPrefabPiecePool m_Pool;
-
-		/** Maximum depth of the generated piece tree. */
-		int m_MaxDepth;
-	};
+	/** The generator doing the work for a single prefab set.
+	Forward-declared so that its implementation changes don't affect the header. */
+	class cGen;
 
 	typedef SharedPtr<cGen> cGenPtr;
 	typedef std::vector<cGenPtr> cGenPtrs;

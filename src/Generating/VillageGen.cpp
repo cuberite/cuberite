@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "VillageGen.h"
-#include "PieceGenerator.h"
+#include "PieceGeneratorBFSTree.h"
 
 
 
@@ -133,7 +133,7 @@ public:
 		m_HeightGen(a_HeightGen)
 	{
 		// Generate the pieces for this village; don't care about the Y coord:
-		cBFSPieceGenerator pg(*this, a_Seed);
+		cPieceGeneratorBFSTree pg(*this, a_Seed);
 		pg.PlacePieces(a_OriginX, a_OriginZ, a_MaxRoadDepth + 1, m_Pieces);
 		if (m_Pieces.empty())
 		{
@@ -141,10 +141,6 @@ public:
 		}
 	}
 
-	~cVillage()
-	{
-		cPieceGenerator::FreePieces(m_Pieces);
-	}
 
 protected:
 	/** Seed for the random functions */
@@ -193,7 +189,7 @@ protected:
 			{
 				PlacePieceOnGround(**itr);
 			}
-			Prefab.Draw(a_Chunk, *itr);
+			Prefab.Draw(a_Chunk, itr->get());
 		}  // for itr - m_PlacedPieces[]
 	}
 
@@ -304,11 +300,11 @@ protected:
 	void MoveAllDescendants(cPlacedPieces & a_PlacedPieces, size_t a_Pivot, int a_HeightDifference)
 	{
 		size_t num = a_PlacedPieces.size();
-		cPlacedPiece * Pivot = a_PlacedPieces[a_Pivot];
+		auto & Pivot = a_PlacedPieces[a_Pivot];
 		for (size_t i = a_Pivot + 1; i < num; i++)
 		{
 			if (
-				(a_PlacedPieces[i]->GetParent() == Pivot) &&  // It is a direct dependant of the pivot
+				(a_PlacedPieces[i]->GetParent() == Pivot.get()) &&  // It is a direct dependant of the pivot
 				!(static_cast<const cPrefab &>(a_PlacedPieces[i]->GetPiece())).ShouldMoveToGround()  // It attaches strictly by connectors
 			)
 			{

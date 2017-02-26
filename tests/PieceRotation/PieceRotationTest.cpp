@@ -5,7 +5,7 @@
 #include "Globals.h"
 #include <exception>
 #include <map>
-#include "Generating/PieceGenerator.h"
+#include "Generating/PiecePool.h"
 
 
 
