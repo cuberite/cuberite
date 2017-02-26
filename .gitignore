@@ -2,13 +2,7 @@ build/
 nbproject/
 ipch/
 Win32/
-MCServer
-Server/Cuberite
-Server/buildinfo
-Server/CONTRIBUTORS
-Server/LICENSE
-Server/Licenses
-Server/itemblacklist
+Cuberite
 Tools/MCADefrag/MCADefrag
 Tools/ProtoProxy/ProtoProxy
 Testing/
@@ -102,12 +96,6 @@ ReleaseProfile/
 *.dir/
 CPackConfig.cmake
 CPackSourceConfig.cmake
-
-# APIDump-generated status files:
-Server/cuberite_api.lua
-Server/official_undocumented.lua
-Server/NewlyUndocumented.lua
-Server/.luacheckrc
 
 # compile.sh folder
 build-cuberite
