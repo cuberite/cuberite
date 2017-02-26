@@ -10,7 +10,7 @@
 #pragma once
 
 #include "GridStructGen.h"
-#include "PieceGenerator.h"
+#include "PiecePool.h"
 
 
 
@@ -25,11 +25,9 @@ public:
 	cPrefabStructure(
 		int a_GridX, int a_GridZ,
 		int a_OriginX, int a_OriginZ,
-		cPlacedPieces & a_Pieces,
+		cPlacedPieces && a_Pieces,
 		cTerrainHeightGenPtr a_HeightGen
 	);
-
-	virtual ~cPrefabStructure();
 
 protected:
 	/** The pieces placed by the generator. */

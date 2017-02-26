@@ -18,7 +18,8 @@ SET (SRCS
 	HeiGen.cpp
 	MineShafts.cpp
 	Noise3DGenerator.cpp
-	PieceGenerator.cpp
+	PieceGeneratorBFSTree.cpp
+	PiecePool.cpp
 	PieceStructuresGen.cpp
 	Prefab.cpp
 	PrefabPiecePool.cpp
@@ -51,7 +52,8 @@ SET (HDRS
 	IntGen.h
 	MineShafts.h
 	Noise3DGenerator.h
-	PieceGenerator.h
+	PieceGeneratorBFSTree.h
+	PiecePool.h
 	PieceStructuresGen.h
 	Prefab.h
 	PrefabPiecePool.h

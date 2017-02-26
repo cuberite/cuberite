@@ -17,7 +17,7 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.cpp
 
 	${CMAKE_SOURCE_DIR}/src/Generating/ChunkDesc.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/PieceGenerator.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.cpp
@@ -47,7 +47,7 @@ set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.h
 
 	${CMAKE_SOURCE_DIR}/src/Generating/ChunkDesc.h
-	${CMAKE_SOURCE_DIR}/src/Generating/PieceGenerator.h
+	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.h

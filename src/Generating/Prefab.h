@@ -14,7 +14,7 @@ declared in this file as well; the Gallery server exports areas in this format.
 
 #pragma once
 
-#include "PieceGenerator.h"
+#include "PiecePool.h"
 #include "../BlockArea.h"
 
 
