@@ -10,6 +10,10 @@
 ..\Server\items.ini
 ..\Server\monsters.ini
 ..\Server\buildinfo.txt
+..\Server\README.txt
+..\Server\favicon.png
+..\CONTRIBUTORS
+..\LICENSE
 Cuberite*debug.cmd
 *.example.ini
 ThirdPartyLicenses
