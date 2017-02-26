@@ -62,7 +62,7 @@ public:
 			case E_BLOCK_BONE_BLOCK:
 			case E_BLOCK_BLOCK_OF_COAL:
 			case E_BLOCK_BLOCK_OF_REDSTONE:
-			case E_ITEM_BREWING_STAND:
+			case E_BLOCK_BREWING_STAND:
 			case E_BLOCK_BRICK:
 			case E_BLOCK_BRICK_STAIRS:
 			case E_BLOCK_CAULDRON:
@@ -113,7 +113,6 @@ public:
 			case E_BLOCK_STONE_BRICK_STAIRS:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			case E_BLOCK_STONE_SLAB:
-
 			{
 				return PickaxeLevel() >= 1;
 			}
