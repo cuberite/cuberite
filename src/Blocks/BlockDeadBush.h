@@ -42,6 +42,21 @@ public:
 		UNUSED(a_Meta);
 		return 0;
 	}
+
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		if ((!a_Player->IsGameModeCreative()) && (a_Player->GetEquippedItem().m_ItemType != E_ITEM_SHEARS))
+		{
+			cFastRandom random;
+			int chance = random.NextInt(3);
+			if (chance != 0)
+			{
+				cItems Pickups;
+				Pickups.push_back(cItem(E_ITEM_STICK, static_cast<char>(chance), 0));
+				a_WorldInterface.SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
+			}
+		}
+	}
 } ;
 
 
