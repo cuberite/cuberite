@@ -56,6 +56,7 @@ public:
 		switch (a_BlockType)
 		{
 			case E_BLOCK_COBWEB:
+			case E_BLOCK_DEAD_BUSH:
 			case E_BLOCK_VINES:
 			{
 				return true;

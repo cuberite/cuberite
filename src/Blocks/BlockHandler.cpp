@@ -473,6 +473,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 				case E_BLOCK_COCOA_POD:
 				case E_BLOCK_CROPS:
 				case E_BLOCK_DARK_OAK_DOOR:
+				case E_BLOCK_DEAD_BUSH:
 				case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
 				case E_BLOCK_DOUBLE_STONE_SLAB:
 				case E_BLOCK_DOUBLE_WOODEN_SLAB:
