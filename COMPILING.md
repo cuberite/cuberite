@@ -4,7 +4,7 @@ COMPILING
 To compile Cuberite from source, you need the following set of software:
 
  * CMake
- * Platform-specific make tool \(windows would be MSVC, linux/osx GNU make, etc.\)
+ * Platform-specific make tool \(Windows would be MSVC, Linux/macOS GNU make, etc.\)
  * C compiler
  * modern C++ compiler and linker
 
@@ -47,7 +47,7 @@ To make Visual Studio produce the version with the best performance, you will ne
 
 In order to tinker with the code, you'll more than likely need to use the debugging features of your IDE. To make them the easiest to use, you should switch to the Debug configuration - this provides the highest level of information while debugging, for the price of the executable being 2 - 10 times slower. Go to menu Build -> Configuration Manager, and in the opened dialog, change the top left combo box (Active solution configuration) to Debug. Close the dialog and build the solution. The resulting executable is called `Cuberite_debug.exe` in the `Server` folder.
 
-OSX
+macOS
 ---
 
 Install git from its [website](https://git-scm.com/) or homebrew: `brew install git`.

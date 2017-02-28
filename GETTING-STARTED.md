@@ -32,7 +32,7 @@ Setting up a Dev Environment
 Requirements
 ------------
 
-**Linux/BSD/Solaris/OSX:**
+**Linux/BSD/Solaris/macOS:**
 
 You'll need the basic C++ build tools:
 
@@ -82,7 +82,7 @@ Note that there is a script file, $/src/CheckBasicStyle.lua, that can check some
 How to Build
 ------------------
 
-**Linux/BSD/Solaris/OSX:**
+**Linux/BSD/Solaris/macOS:**
 
 Follow the instructions in [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md). You probably want to build in debug mode (when you're developing) for console alerts and debugging capability, even though it's much slower for everyday use.
 
