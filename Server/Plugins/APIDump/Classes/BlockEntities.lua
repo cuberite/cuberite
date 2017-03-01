@@ -1068,6 +1068,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			},
 			IsRecordItem =
 			{
+				IsStatic = true,
 				Params =
 				{
 					{
