@@ -13174,6 +13174,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 			{
 				CompressStringGZIP =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -13191,6 +13192,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				},
 				CompressStringZLIB =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -13212,6 +13214,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				},
 				InflateString =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -13229,6 +13232,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				},
 				UncompressStringGZIP =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -13246,6 +13250,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				},
 				UncompressStringZLIB =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
