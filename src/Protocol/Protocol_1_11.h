@@ -38,6 +38,9 @@ protected:
 
 	virtual void HandlePacketBlockPlace   (cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
 };
 
 

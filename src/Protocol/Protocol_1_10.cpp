@@ -865,7 +865,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtZombie:
 		{
 			auto & Zombie = reinterpret_cast<const cZombie &>(a_Mob);
-			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
+			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Zombie.IsBaby());
 

@@ -28,9 +28,10 @@ SET (HDRS
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(Protocol_1_9.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
-	set_source_files_properties(Protocol_1_8.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch-enum -Wno-error=switch")
+	set_source_files_properties(Protocol_1_9.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch")
+	set_source_files_properties(Protocol_1_8.cpp  PROPERTIES COMPILE_FLAGS "-Wno-error=switch")
 	set_source_files_properties(Protocol_1_10.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch")
+	set_source_files_properties(Protocol_1_11.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=switch")
 endif()
 
 if (NOT MSVC)
