@@ -4877,13 +4877,14 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				GetClassStatic =
 				{
+					IsStatic = true,
 					Returns =
 					{
 						{
 							Type = "string",
 						},
 					},
-					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function. Is static",
+					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function.",
 				},
 				GetEntityType =
 				{
@@ -12639,6 +12640,7 @@ a_Player:OpenWindow(Window);
 				},
 				GetProtocolVersionTextFromInt =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
