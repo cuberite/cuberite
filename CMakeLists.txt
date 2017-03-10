@@ -106,19 +106,18 @@ if(MSVC OR MSVC_IDE)
 		set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
 	else() # VC12+, assuming C++11 supported.
 	endif()
-endif()
+else()  # GCC or Clang, so get compiler version directly since CMAKE_CXX_COMPILER_VERSION is only available in CMake 2.8.8 and later
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE DUMPED_COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-# Get compiler version directly. CMAKE_CXX_COMPILER_VERSION only available in CMake 2.8.8
-execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE DUMPED_COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+	# Check for gcc version 4.8 or greater
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND DUMPED_COMPILER_VERSION VERSION_LESS "4.8")
+		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 4.8 is needed")
+	endif()
 
-# Check for gcc version 4.8 or greater
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND DUMPED_COMPILER_VERSION VERSION_LESS "4.8")
-    message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 4.8 is needed")
-endif()
-
-# Check for clang version 3.4 or greater
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND DUMPED_COMPILER_VERSION VERSION_LESS "3.4")
-    message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 3.4 is needed")
+	# Check for clang version 3.4 or greater
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND DUMPED_COMPILER_VERSION VERSION_LESS "3.4")
+		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 3.4 is needed")
+	endif()
 endif()
 
 set(BUILD_TOOLS OFF CACHE BOOL "")
