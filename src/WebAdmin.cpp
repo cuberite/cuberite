@@ -260,6 +260,7 @@ bool cWebAdmin::LoadIniFile(void)
 		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
 		m_IniFile.AddHeaderComment(" [User:admin]");
 		m_IniFile.AddHeaderComment(" Password=admin");
+		m_IniFile.AddHeaderComment(" Please restart Cuberite to apply changes made in this file!");
 		m_IniFile.SetValue("WebAdmin", "Ports", DEFAULT_WEBADMIN_PORTS);
 		m_IniFile.WriteFile("webadmin.ini");
 	}
