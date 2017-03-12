@@ -248,7 +248,8 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		m_Server->Shutdown();
 	}  
 	
-	if (!m_Server->Start()) {
+	if (!m_Server->Start())
+	{
 		m_TerminateEventRaised = true;
 	}
 
