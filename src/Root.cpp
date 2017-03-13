@@ -247,10 +247,10 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
 	}  // if (m_Server->Start()
-    else
-    {
-        cRoot::m_TerminateEventRaised = true;
-    }
+	else
+	{
+		cRoot::m_TerminateEventRaised = true;
+	}
 
 	delete m_MojangAPI; m_MojangAPI = nullptr;
 
