@@ -517,6 +517,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_CROPS               ].m_IsSolid = false;
 	a_Info[E_BLOCK_DANDELION           ].m_IsSolid = false;
 	a_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSolid = false;
+	a_Info[E_BLOCK_DEAD_BUSH           ].m_IsSolid = false;
 	a_Info[E_BLOCK_END_GATEWAY         ].m_IsSolid = false;
 	a_Info[E_BLOCK_END_PORTAL          ].m_IsSolid = false;
 	a_Info[E_BLOCK_END_ROD             ].m_IsSolid = false;
