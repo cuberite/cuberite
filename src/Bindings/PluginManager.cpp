@@ -68,7 +68,7 @@ void cPluginManager::RefreshPluginList(void)
 	AStringVector Folders;
 	for (auto & item: Contents)
 	{
-		if ((item == ".") || (item == "..") || (!cFile::IsFolder(PluginsPath + item)))
+		if (!cFile::IsFolder(PluginsPath + item))
 		{
 			// We only want folders, and don't want "." or ".."
 			continue;
