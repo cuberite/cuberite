@@ -61,11 +61,11 @@ return
 					{
 						{
 							Name = "BoxMin",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "BoxMax",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "LineStart",
@@ -139,11 +139,11 @@ return
 					{
 						{
 							Name = "Min",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "Max",
-							Type = "number",
+							Type = "Vector3d",
 						},
 					},
 					Returns =
@@ -418,11 +418,11 @@ return
 					{
 						{
 							Name = "OtherBoxMin",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "OtherBoxMax",
-							Type = "number",
+							Type = "Vector3d",
 						},
 					},
 					Returns =
@@ -439,11 +439,11 @@ return
 					{
 						{
 							Name = "Min",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "Max",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "Point",
@@ -464,11 +464,11 @@ return
 					{
 						{
 							Name = "Min",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "Max",
-							Type = "number",
+							Type = "Vector3d",
 						},
 						{
 							Name = "X",
