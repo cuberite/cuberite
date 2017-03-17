@@ -270,6 +270,7 @@ int cStructGenTrees::GetNumTrees(
 			case biMesaBryce:            Add =   4; break;
 			case biMesaPlateauFM:        Add =  12; break;
 			case biMesaPlateauM:         Add =  12; break;
+			default: break;
 		}
 		NumTrees += Add;
 	}
