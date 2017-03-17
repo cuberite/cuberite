@@ -247,6 +247,13 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
 	}  // if (m_Server->Start()
+	else
+	{
+		cRoot::m_TerminateEventRaised = true;
+		#ifdef _WIN32
+			EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
+		#endif
+	}
 
 	delete m_MojangAPI; m_MojangAPI = nullptr;
 
