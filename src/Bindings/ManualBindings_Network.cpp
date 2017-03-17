@@ -106,14 +106,6 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 		return 1;
 	}
 
-	// Check validity:
-	if ((port < 0) || (port > 65535))
-	{
-		LOGWARNING("cNetwork:CreateUDPEndpoint() called with invalid port (%d), failing the request.", port);
-		S.LogStackTrace();
-		S.Push(false);
-		return 1;
-	}
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Create the LuaUDPEndpoint glue class:
