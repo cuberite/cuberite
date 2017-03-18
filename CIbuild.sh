@@ -17,11 +17,14 @@ echo "Building..."
 make -j 2;
 make -j 2 test ARGS="-V";
 
+# Create .gdbinit in home directory. Switches off the confirmation on quit
+echo -e "define hook-quit\n\tset confirm off\nend\n" > ~/.gdbinit
+
 echo "Testing..."
 cd Server/;
 touch apiCheckFailed.flag
 if [ "$TRAVIS_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
-	$CUBERITE_PATH << EOF
+	gdb -return-child-result -ex run -ex "bt" -ex "info threads" -ex "thread apply all bt" -ex "quit" --args $CUBERITE_PATH << EOF
 load APIDump
 apicheck
 restart
