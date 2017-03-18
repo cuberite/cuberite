@@ -98,6 +98,12 @@ public:
 		cBoat * Boat = new cBoat(x + 0.5, y + 0.5, z + 0.5);
 		Boat->Initialize(*a_World);
 
+		// Remove boat from players hand
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+
 		return true;
 	}
 } ;
