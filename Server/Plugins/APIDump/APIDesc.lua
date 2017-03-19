@@ -2277,6 +2277,11 @@ return
 			},
 			Variables =
 			{
+				m_BlockHeight =
+				{
+					Type = "number",
+					Notes = "The height of the block, a value between 0.0 and 1.0",
+				},
 				m_CanBeTerraformed =
 				{
 					Type = "bool",
@@ -2286,6 +2291,11 @@ return
 				{
 					Type = "bool",
 					Notes = "Does this block fully occupy its voxel - is it a 'full' block?",
+				},
+				m_Hardness =
+				{
+					Type = "number",
+					Notes = "The greater the value the longer the player needs to break the block.",
 				},
 				m_IsSnowable =
 				{
@@ -11411,7 +11421,7 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the name that is used in the playerlist.",
 				},
-				GetResolvedPermissions =
+				GetRestrictions =
 				{
 					Returns =
 					{
@@ -11419,7 +11429,7 @@ a_Player:OpenWindow(Window);
 							Type = "table",
 						},
 					},
-					Notes = "Returns all the player's permissions, as an array-table of strings.",
+					Notes = "Returns an array-table of all the restrictions that the player has assigned to them.",
 				},
 				GetSprintingMaxSpeed =
 				{
@@ -13988,6 +13998,51 @@ end
 					},
 					Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 				},
+				Base64Decode =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{ Type = "string" },
+					},
+					Notes = "Decodes a Base64-encoded string into the raw data.",
+				},
+				Base64Encode =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{ Type = "string" },
+					},
+					Notes = "Encodes a string into Base64.",
+				},
+				BiomeToString =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{ Type = "string" },
+					},
+					Notes = "Translates biome enum into biome string. Returns empty string on failure (unknown biome).",
+				},
 				BlockFaceToString =
 				{
 					Params =
@@ -14082,6 +14137,23 @@ end
 					},
 					Notes = "Converts the {{Globals#eDamageType|DamageType}} to a string representation ",
 				},
+				DimensionToString =
+				{
+					Params =
+					{
+						{
+							Name = "Dimension",
+							Type = "eDimension",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Converts an {{Globals#eDimension|eDimension}} to a string value. Returns Overworld on failure.",
+				},
 				EscapeString =
 				{
 					Params =
@@ -14149,6 +14221,21 @@ end
 					},
 					Notes = "Returns the item that has been read from the specified INI file value. If the value is not present in the INI file, the DefaultValue is stored in the file and parsed as the result. Returns empty item if the value cannot be parsed. ",
 				},
+				GetSnowStartHeight =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{ Type = "number" },
+					},
+					Notes = "Returns the height at which snow will start falling in the {{Globals#EMCSBiome|Biome}}. Check functions IsBiomeCold and IsBiomeVeryCold for more informations.",
+				},
 				GetTime =
 				{
 					Returns =
@@ -14158,6 +14245,21 @@ end
 						},
 					},
 					Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)",
+				},
+				IsBiomeCold =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{ Type = "boolean" },
+					},
+					Notes = "Returns true if the biome is cold (has snow and snowfall at higher elevations but not at regular heights). Doesn't report Very Cold biomes, use IsBiomeVeryCold() for those.",
 				},
 				IsBiomeNoDownfall =
 				{
@@ -14175,6 +14277,40 @@ end
 						},
 					},
 					Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms.",
+				},
+				IsBiomeOcean =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is an ocean biome.",
+				},
+				IsBiomeVeryCold =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is very cold (has snow on ground everywhere, turns top water to ice, has snowfall instead of rain everywhere). Doesn't report mildly cold biomes (where it snows above certain elevation), use IsBiomeCold() for those.",
 				},
 				IsValidBlock =
 				{
@@ -14473,6 +14609,23 @@ end
 						},
 					},
 					Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string",
+				},
+				ReverseBlockFace =
+				{
+					Params =
+					{
+						{
+							Name = "BlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the reversed {{Globals#eBlockFace|eBlockFace}}.",
 				},
 				RotateBlockFaceCCW =
 				{
