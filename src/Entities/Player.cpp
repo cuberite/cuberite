@@ -1042,6 +1042,10 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	m_bVisible = false;  // So new clients don't see the player
 
+	// Detach player from object / entity. If the player dies, the server still says
+	// that the player is attached to the entity / object
+	Detach();
+
 	// Puke out all the items
 	cItems Pickups;
 	m_Inventory.CopyToItems(Pickups);
