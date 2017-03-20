@@ -114,6 +114,7 @@ public:
 
 		switch (m_ItemType)
 		{
+			case E_ITEM_BEETROOT_SOUP:
 			case E_ITEM_MUSHROOM_SOUP:
 			case E_ITEM_RABBIT_STEW:
 			{
