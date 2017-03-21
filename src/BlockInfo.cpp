@@ -338,6 +338,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_TNT                 ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TALL_GRASS          ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TORCH               ].m_OneHitDig = true;
+	a_Info[E_BLOCK_TRIPWIRE_HOOK       ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TRIPWIRE            ].m_OneHitDig = true;
 
 

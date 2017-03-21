@@ -31,14 +31,22 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_ACTIVE_COMPARATOR:
 		case E_BLOCK_BEETROOTS:
+		case E_BLOCK_BIG_FLOWER:
 		case E_BLOCK_BROWN_MUSHROOM:
 		case E_BLOCK_CACTUS:
 		case E_BLOCK_COBWEB:
 		case E_BLOCK_CROPS:
 		case E_BLOCK_DEAD_BUSH:
+		case E_BLOCK_DETECTOR_RAIL:
+		case E_BLOCK_INACTIVE_COMPARATOR:
 		case E_BLOCK_LILY_PAD:
+		case E_BLOCK_POWERED_RAIL:
 		case E_BLOCK_RAIL:
+		case E_BLOCK_REDSTONE_REPEATER_OFF:
+		case E_BLOCK_REDSTONE_REPEATER_ON:
 		case E_BLOCK_REDSTONE_TORCH_OFF:
 		case E_BLOCK_REDSTONE_TORCH_ON:
 		case E_BLOCK_REDSTONE_WIRE:
@@ -48,6 +56,8 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SUGARCANE:
 		case E_BLOCK_TALL_GRASS:
 		case E_BLOCK_TORCH:
+		case E_BLOCK_TRIPWIRE_HOOK:
+		case E_BLOCK_TRIPWIRE:
 		case E_BLOCK_YELLOW_FLOWER:
 		{
 			return true;
