@@ -253,7 +253,10 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIREWORK_ROCKET:
 		{
-			// TODO: Add the fireworks entity
+			if (SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkFirework, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0), &SlotItem) != cEntity::INVALID_ID)
+			{
+				m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			}
 			break;
 		}
 
