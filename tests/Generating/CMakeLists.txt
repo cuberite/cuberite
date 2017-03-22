@@ -112,10 +112,24 @@ add_test(NAME PieceRotation-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} C
 
 
 
+# PieceGeneratorBFSTree test:
+add_executable(PieceGeneratorBFSTree
+	PieceGeneratorBFSTreeTest.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.h
+)
+target_link_libraries(PieceGeneratorBFSTree GeneratorTestingSupport)
+add_test(NAME PieceGeneratorBFSTree-test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Server/Prefabs/PieceStructures COMMAND PieceGeneratorBFSTree)
+
+
+
+
+
 # Put the projects into solution folders (MSVC):
 set_target_properties(
 	GeneratorTestingSupport
 	LoadablePieces
+	PieceGeneratorBFSTree
 	PieceRotation
 	PROPERTIES FOLDER Tests/Generating
 )
