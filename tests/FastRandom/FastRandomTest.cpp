@@ -7,6 +7,9 @@
 #include "FastRandom.h"
 
 
+
+
+
 static void TestInts(void)
 {
 	cFastRandom rnd;
@@ -24,12 +27,15 @@ static void TestInts(void)
 		sum += v;
 	}
 	double avg = static_cast<double>(sum) / ITER;
-	printf("avg: %f\n", avg);
+	LOG("avg: %f", avg);
 	for (int i = 0; i < BUCKETS; i++)
 	{
-		printf("  bucket %d: %d\n", i, Counts[i]);
+		LOG("  bucket %d: %d", i, Counts[i]);
 	}
 }
+
+
+
 
 
 static void TestFloats(void)
@@ -49,23 +55,65 @@ static void TestFloats(void)
 		sum += v;
 	}
 	sum = sum / ITER;
-	printf("avg: %f\n", sum);
+	LOG("avg: %f", sum);
 	for (int i = 0; i < BUCKETS; i++)
 	{
-		printf("  bucket %d: %d\n", i, Counts[i]);
+		LOG("  bucket %d: %d", i, Counts[i]);
 	}
 }
 
 
+
+
+
+/** Checks whether re-creating the cFastRandom class produces the same initial number over and over (#2935) */
+static void TestReCreation(void)
+{
+	const int ITER = 10000;
+	int lastVal = 0;
+	int numSame = 0;
+	int maxNumSame = 0;
+	for (int i = 0; i < ITER; ++i)
+	{
+		cFastRandom rnd;
+		int val = rnd.NextInt(10);
+		if (val == lastVal)
+		{
+			numSame += 1;
+		}
+		else
+		{
+			if (numSame > maxNumSame)
+			{
+				maxNumSame = numSame;
+			}
+			numSame = 0;
+			lastVal = val;
+		}
+	}
+	if (numSame > maxNumSame)
+	{
+		maxNumSame = numSame;
+	}
+	LOG("Out of %d creations, there was a chain of at most %d same numbers generated.", ITER, maxNumSame);
+}
+
+
+
+
+
 int main(void)
 {
-	LOGD("FastRandom Test started");
+	LOG("FastRandom Test started");
 
-	LOGD("Testing ints");
+	LOG("Testing ints");
 	TestInts();
 
-	LOGD("Testing floats");
+	LOG("Testing floats");
 	TestFloats();
+
+	LOG("Testing re-creation");
+	TestReCreation();
 
 	LOG("FastRandom test finished");
 }
