@@ -25,7 +25,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		// Feed the player:
 		FoodInfo Info = GetFoodInfo();
 		a_Player->Feed(Info.FoodLevel, Info.Saturation);
