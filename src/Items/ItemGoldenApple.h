@@ -21,7 +21,7 @@ public:
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
 		// If player in creative mode, don't feed them:
-		if(a_Player->IsGameModeCreative())
+		if (a_Player->IsGameModeCreative())
 		{
 			return false;
 		}
