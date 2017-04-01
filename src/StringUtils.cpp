@@ -374,11 +374,17 @@ size_t RateCompareString(const AString & s1, const AString & s2)
 
 void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith)
 {
+	// find always returns the current position for an empty needle; prevent endless loop
+	if (iNeedle.empty())
+	{
+		return;
+	}
+
 	size_t pos1 = iHayStack.find(iNeedle);
 	while (pos1 != AString::npos)
 	{
 		iHayStack.replace( pos1, iNeedle.size(), iReplaceWith);
-		pos1 = iHayStack.find(iNeedle, pos1);
+		pos1 = iHayStack.find(iNeedle, pos1 + iReplaceWith.size());
 	}
 }
 
