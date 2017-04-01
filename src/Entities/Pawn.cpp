@@ -27,7 +27,7 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 
 
 
-cPawn::~cPawn()
+bool cPawn::OnPreWorldTravel(cWorld & a_NewWorld)
 {
 	UnsetAllTargeters();
 	return super::OnPreWorldTravel(a_NewWorld);

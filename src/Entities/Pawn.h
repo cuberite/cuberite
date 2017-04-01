@@ -22,8 +22,13 @@ public:
 	CLASS_PROTODEF(cPawn)
 
 	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
+<<<<<<< HEAD
 	~cPawn();
 
+=======
+
+	virtual bool OnPreWorldTravel(cWorld & a_NewWorld) override;
+>>>>>>> origin/fixes
 	virtual void Destroyed() override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
