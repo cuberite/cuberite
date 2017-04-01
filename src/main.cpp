@@ -391,6 +391,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		TCLAP::SwitchArg crashDumpFull   ("",  "crash-dump-full",     "Crashdumps created by the server will contain full server memory", cmd);
 		TCLAP::SwitchArg crashDumpGlobals("",  "crash-dump-globals",  "Crashdumps created by the server will contain the global variables' values", cmd);
 		TCLAP::SwitchArg noBufArg        ("",  "no-output-buffering", "Disable output buffering", cmd);
+		TCLAP::SwitchArg noFileLogArg    ("",  "no-log-file",         "Disable logging to file", cmd);
 		TCLAP::SwitchArg runAsServiceArg ("d", "service",             "Run as a service on Windows, or daemon on UNIX like systems", cmd);
 		cmd.parse(argc, argv);
 
@@ -412,6 +413,10 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 			{
 				repo->AddValue("Server", "Ports", std::to_string(port));
 			}
+		}
+		if (noFileLogArg.getValue())
+		{
+			repo->AddValue("Server", "DisableLogFile", true);
 		}
 		if (commLogArg.getValue())
 		{
