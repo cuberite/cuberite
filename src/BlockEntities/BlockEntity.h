@@ -9,7 +9,7 @@
 #define BLOCKENTITY_PROTODEF(classname) \
 	virtual bool IsA(const char * a_ClassName) const override \
 	{ \
-		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
+		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName))); \
 	} \
 	virtual const char * GetClass(void) const override \
 	{ \
