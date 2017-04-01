@@ -2013,7 +2013,7 @@ void cEntity::Detach(void)
 
 bool cEntity::IsA(const char * a_ClassName) const
 {
-	return (strcmp(a_ClassName, "cEntity") == 0);
+	return ((a_ClassName != nullptr) && (strcmp(a_ClassName, "cEntity") == 0));
 }
 
 
