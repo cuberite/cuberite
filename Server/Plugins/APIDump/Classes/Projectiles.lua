@@ -26,7 +26,7 @@ return
 			},
 			GetBlockHit =
 			{
-				Desc = "Gets the block arrow is in",
+				Notes = "Returns the coords of the block into which the arrow is stuck. Undefined if the arrow is still moving.",
 				Returns =
 				{
 					{
