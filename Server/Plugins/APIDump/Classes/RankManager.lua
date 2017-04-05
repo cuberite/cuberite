@@ -626,6 +626,22 @@ return
 				},
 				Notes = "Removes the specified rank. If ReplacementRankName is given, the players that have RankName will get their rank set to ReplacementRankName. If it isn't given, or is an invalid rank, the players will be removed from the manager, their ranks will be unset completely. Logs an info message and does nothing if the rank is not found.",
 			},
+			RemoveRestrictionFromGroup =
+			{
+				IsStatic = true,
+				Params =
+				{
+					{
+						Name = "Restriction",
+						Type = "string",
+					},
+					{
+						Name = "GroupName",
+						Type = "string",
+					},
+				},
+				Notes = "Removes the specified restriction from the specified group.",
+			},
 			RenameGroup =
 			{
 				IsStatic = true,
