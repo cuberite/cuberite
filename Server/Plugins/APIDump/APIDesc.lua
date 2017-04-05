@@ -14175,27 +14175,6 @@ end
 					},
 					Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash",
 				},
-				GetChar =
-				{
-					Params =
-					{
-						{
-							Name = "Input",
-							Type = "string",
-						},
-						{
-							Name = "Index",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "(<b>OBSOLETE</b>, use standard Lua string.sub() instead) Returns one character from the string, specified by index. ",
-				},
 				GetIniItemSet =
 				{
 					Params =
