@@ -2722,7 +2722,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			SetShouldUseChatPrefixes =
 			{
-				Returns =
+				Params =
 				{
 					{
 						Name = "ShouldUseChatPrefixes",

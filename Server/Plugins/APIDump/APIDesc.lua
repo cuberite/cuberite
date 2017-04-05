@@ -9550,6 +9550,7 @@ end
 			{
 				Parse =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -9567,6 +9568,7 @@ end
 				},
 				Serialize =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -12620,6 +12622,7 @@ a_Player:OpenWindow(Window);
 				},
 				GetPhysicalRAMUsage =
 				{
+					IsStatic = true,
 					Returns =
 					{
 						{
@@ -12698,6 +12701,7 @@ a_Player:OpenWindow(Window);
 				},
 				GetVirtualRAMUsage =
 				{
+					IsStatic = true,
 					Returns =
 					{
 						{
