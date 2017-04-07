@@ -11451,7 +11451,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
+					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
 				},
 				GetStance =
 				{
@@ -12175,7 +12175,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{eSkinPart}} constants.",
+					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
 				},
 				SetSprintingMaxSpeed =
 				{
@@ -17197,7 +17197,7 @@ end
 						These constants represent the main and off hand.  Currently, these constants are not used, but
 						are provided for future use when dual-wielding is functional.  An action or item can be in the
 						main hand or the off hand.  The main hand can be either the left or the right hand - use
-						{{cPlayer}}:GetMainHand() to determine which (see {{eMainHand}}).
+						{{cPlayer}}:GetMainHand() to determine which (see {{Globals#eMainHand|eMainHand}}).
 					]],
 				},
 				eMainHand =

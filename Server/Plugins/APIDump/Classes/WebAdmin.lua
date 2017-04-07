@@ -23,7 +23,7 @@ return
 						Type = "function",
 					},
 				},
-				Notes = "Adds a new web tab to webadmin. The tab uses \"Title\" as its display string and is identified in the URL using the UrlPath (https://server.domain.com/webadmin/{PluginName}/{UrlPath}). The HandlerFn is the callback function that is called when the admin accesses the page, it has the following signature:<br/><pre class=\"prettyprint lang-lua\">function ({{a_Request|HTTPRequest}}, a_UrlPath)<br/>  return Content, ContentType<br/>end</pre> URLPath must not contain a '/', the recommendation is to use only 7-bit-clean ASCII character set.",
+				Notes = "Adds a new web tab to webadmin. The tab uses \"Title\" as its display string and is identified in the URL using the UrlPath (https://server.domain.com/webadmin/{PluginName}/{UrlPath}). The HandlerFn is the callback function that is called when the admin accesses the page, it has the following signature:<br/><pre class=\"prettyprint lang-lua\">function ({{HTTPRequest|a_Request}}, a_UrlPath)<br/>  return Content, ContentType<br/>end</pre> URLPath must not contain a '/', the recommendation is to use only 7-bit-clean ASCII character set.",
 			},
 			GetAllWebTabs =
 			{
