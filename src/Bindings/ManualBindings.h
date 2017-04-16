@@ -13,7 +13,6 @@
 
 
 
-
 // fwd:
 struct tolua_Error;
 
@@ -98,8 +97,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -161,8 +164,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -224,8 +231,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -290,8 +301,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -355,8 +370,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -427,14 +446,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool res = false;
-				if (!m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
 				{
-					LOGWARNING("Failed to call Lua callback");
-					m_LuaState.LogStackTrace();
-					return true;  // Abort enumeration
+					return res;
 				}
-
-				return res;
+				// An error occurred
+				return true;
 			}
 		} Callback(L, FnRef);
 
@@ -495,8 +512,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool res = false;  // By default continue the enumeration
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
-				return res;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+				{
+					return res;
+				}
+				// An error occurred
+				return true;
 			}
 		} Callback(L, FnRef);
 
@@ -553,8 +574,12 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool res = false;  // By default continue the enumeration
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
-				return res;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+				{
+					return res;
+				}
+				// An error occurred
+				return true;
 			}
 		} Callback(L, FnRef);
 

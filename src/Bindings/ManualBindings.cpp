@@ -1237,8 +1237,12 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 		{
 			UNUSED(a_Plugin);
 			bool ret = false;
-			m_LuaState.Call(m_FnRef, a_Command, a_Permission, a_HelpString, cLuaState::Return, ret);
-			return ret;
+			if (m_LuaState.Call(m_FnRef, a_Command, a_Permission, a_HelpString, cLuaState::Return, ret))
+			{
+				return ret;
+			}
+			// An error occurred
+			return true;
 		}
 		cLuaState & m_LuaState;
 		cLuaState::cRef & m_FnRef;
@@ -1296,8 +1300,12 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 			UNUSED(a_Plugin);
 			UNUSED(a_Permission);
 			bool ret = false;
-			m_LuaState.Call(m_FnRef, a_Command, a_HelpString, cLuaState::Return, ret);
-			return ret;
+			if (m_LuaState.Call(m_FnRef, a_Command, a_HelpString, cLuaState::Return, ret))
+			{
+				return ret;
+			}
+			// An error occurred
+			return true;
 		}
 		cLuaState & m_LuaState;
 		cLuaState::cRef & m_FnRef;
