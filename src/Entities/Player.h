@@ -139,6 +139,12 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
+	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
+	void LoginSetGameMode(eGameMode a_GameMode);
+
+	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
+	void SetCapabilities();
+
 	// tolua_begin
 
 	/** Prevent the player from moving and lock him into a_Location. */
@@ -173,12 +179,6 @@ public:
 	Updates the gamemode on the client (sends the packet)
 	*/
 	void SetGameMode(eGameMode a_GameMode);
-
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
-
-	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
-	void SetCapabilities();
 
 	/** Returns true if the player is in Creative mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeCreative(void) const;

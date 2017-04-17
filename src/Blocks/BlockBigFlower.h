@@ -18,6 +18,11 @@ public:
 	{
 	}
 
+	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
+	{
+		return (((a_Meta & E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) != 0) || (a_Meta & E_META_BIG_FLOWER_LARGE_FERN) != 0);
+	}
+
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
@@ -54,7 +59,13 @@ public:
 		NIBBLETYPE FlowerMeta = Meta & 0x7;
 		if (!a_Player->IsGameModeCreative())
 		{
-			if (((FlowerMeta == 2) || (FlowerMeta == 3)) && (a_Player->GetEquippedItem().m_ItemType == E_ITEM_SHEARS))
+			if (
+				(a_Player->GetEquippedItem().m_ItemType == E_ITEM_SHEARS) &&
+				(
+					(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
+					(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
+				)
+			)
 			{
 				MTRand r1;
 				if (r1.randInt(10) == 5)
@@ -72,6 +83,17 @@ public:
 				}
 				a_Player->UseEquippedItem();
 			}
+		}
+
+		if (
+			(a_Player->GetEquippedItem().m_ItemType != E_ITEM_SHEARS) &&
+			(
+				(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
+				(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
+			)
+		)
+		{
+			a_ChunkInterface.SetBlock(a_BlockX, a_BlockY, a_BlockZ, 0, 0);
 		}
 	}
 

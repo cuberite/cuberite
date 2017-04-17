@@ -2245,16 +2245,16 @@ end
 				{
 					{
 						Name = "Other",
-						Type = "Vector3d",
+						Type = "Vector3i",
 					},
 				},
 				Returns =
 				{
 					{
-						Type = "Vector3d",
+						Type = "Vector3i",
 					},
 				},
-				Notes = "Returns a new Vector3d that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
+				Notes = "Returns a new Vector3i that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
 			},
 			Dot =
 			{
@@ -2262,7 +2262,7 @@ end
 				{
 					{
 						Name = "Other",
-						Type = "Vector3d",
+						Type = "Vector3i",
 					},
 				},
 				Returns =
