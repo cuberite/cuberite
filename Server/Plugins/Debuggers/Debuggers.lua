@@ -2173,6 +2173,16 @@ function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	assert(type(msg) == "string")
 	LOG("Json parsing an invalid string: Error message returned: " .. msg)
 
+	local isSuccess, t3
+	isSuccess, t3, msg = pcall(cJson.Parse, cJson, nil)
+	if (isSuccess) then
+		LOG(string.format("Json parsing a 'nil' produced a %s and a %s, msg is %s.",
+			type(t3), type(msg), msg or "<nil>"
+		))
+	else
+		LOG("Json parsing a 'nil' raised an error")
+	end
+
 	LOG("Json parsing test succeeded")
 
 	LOG("Testing Json serializing...")
