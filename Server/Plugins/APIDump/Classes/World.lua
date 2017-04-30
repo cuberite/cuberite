@@ -3125,7 +3125,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 					{
 						Name = "MonsterType",
-						Type = "cMonster",
+						Type = "eMonsterType",
 					},
 					{
 						Name = "IsBaby",
