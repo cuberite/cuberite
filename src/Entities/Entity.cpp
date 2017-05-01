@@ -1352,6 +1352,11 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 void cEntity::DetectCacti(void)
 {
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
+	// Basic bounds checking.
+	if ((Y < 0) || (Y > 256))
+	{
+		return;
+	}
 	double w = m_Width / 2;
 	if (
 		((Y > 0) && (Y < cChunkDef::Height)) &&
