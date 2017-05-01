@@ -114,8 +114,8 @@ public:
 	const AString & GetName(void) const  { return m_Name; }
 	void SetName(const AString & a_Name) { m_Name = a_Name; }
 
-	int GetVersion(void) const     { return m_Version; }
-	void SetVersion(int a_Version) { m_Version = a_Version; }
+	double GetVersion(void) const     { return m_Version; }
+	void SetVersion(double a_Version) { m_Version = a_Version; }
 
 	/** Returns the name of the folder (in the Plugins folder) from which the plugin is loaded. */
 	const AString & GetFolderName(void) const {return m_FolderName; }
@@ -142,7 +142,7 @@ protected:
 	/** The name of the plugin, used to identify the plugin in the system and for inter-plugin calls. */
 	AString m_Name;
 
-	int m_Version;
+	double m_Version;
 
 	/** Name of the folder (in the Plugins folder) from which the plugin is loaded. */
 	AString m_FolderName;
