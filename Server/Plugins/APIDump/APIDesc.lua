@@ -2128,6 +2128,12 @@ return
 							Type = "number",
 						},
 					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
 					Notes = "Returns the name of the sound that is played when placing the block of this type.",
 				},
 				GetSpreadLightFalloff =
@@ -2255,24 +2261,6 @@ return
 						},
 					},
 					Notes = "Returns whether a spectator can interact with the specified block.",
-				},
-				RequiresSpecialTool =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns whether the specified block requires a special tool to drop resources.",
 				},
 			},
 			Variables =
@@ -5141,16 +5129,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the roll (sideways rotation) of the entity. Currently unused.",
 				},
-				GetRot =
-				{
-					Returns =
-					{
-						{
-							Type = "Vector3f",
-						},
-					},
-					Notes = "(OBSOLETE) Returns the entire rotation vector (Yaw, Pitch, Roll)",
-				},
 				GetSpeed =
 				{
 					Returns =
@@ -5818,17 +5796,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Sets the roll (sideways rotation) of the entity. Currently unused.",
-				},
-				SetRot =
-				{
-					Params =
-					{
-						{
-							Name = "Rotation",
-							Type = "Vector3f",
-						},
-					},
-					Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)",
 				},
 				SetSpeed =
 				{
@@ -8559,6 +8526,12 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsLoreEmpty =
 				{
 					Notes = "Returns if the lore of the cItem is empty.",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
 				},
 				IsSameType =
 				{
@@ -12641,16 +12614,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the cPluginManager object.",
 				},
-				GetPrimaryServerVersion =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the servers primary server version.",
-				},
 				GetProtocolVersionTextFromInt =
 				{
 					IsStatic = true,
@@ -12751,17 +12714,6 @@ a_Player:OpenWindow(Window);
 				SaveAllChunks =
 				{
 					Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved.",
-				},
-				SetPrimaryServerVersion =
-				{
-					Params =
-					{
-						{
-							Name = "Protocol Version",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the servers PrimaryServerVersion to the given protocol number.",
 				},
 			},
 			AdditionalInfo =

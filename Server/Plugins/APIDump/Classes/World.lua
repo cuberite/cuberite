@@ -433,7 +433,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. Returns true on success, or false if the chunk is not loaded or invalid coords.",
 			},
 			DoExplosionAt =
 			{
@@ -1424,6 +1430,12 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "eWeather",
 					},
 				},
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
 				Notes = "Returns the default weather interval for the specific weather type. Returns -1 for any unknown weather.",
 			},
 			GetDimension =
@@ -2272,41 +2284,6 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			{
 				Notes = "Queues all chunks to be saved in the world storage thread",
 			},
-			QueueSetBlock =
-			{
-				Params =
-				{
-					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-					{
-						Name = "BlockType",
-						Type = "number",
-					},
-					{
-						Name = "BlockMeta",
-						Type = "number",
-					},
-					{
-						Name = "TickDelay",
-						Type = "number",
-					},
-				},
-				Notes = [[
-					Queues the block to be set to the specified blocktype and meta after the specified amount of game
-					ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are
-					handled correctly.
-				]],
-			},
 			QueueTask =
 			{
 				Params =
@@ -2850,7 +2827,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Opens or closes a trapdoor at the specific coordinates.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Opens or closes a trapdoor at the specific coordinates. Returns true on success, false if there is no trapdoor or it's already in the requested state.",
 			},
 			SetWeather =
 			{
@@ -3167,6 +3150,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
+				Returns =
+				{
+					{
+						Name = "EntityID",
+						Type = "number",
+					},
+				},
 				Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value.",
 			},
 			TryGetHeight =
@@ -3261,6 +3251,12 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			VillagersShouldHarvestCrops =
 			{
 				Notes = "Returns true if villagers can harvest crops.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
 			},
 			WakeUpSimulators =
 			{
