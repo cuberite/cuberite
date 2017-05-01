@@ -622,12 +622,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "string",
 					},
 				},
-				Returns =
-				{
-					{
-						Type = "string",
-					},
-				},
 				Notes = "Sets the command",
 			},
 		},
@@ -759,17 +753,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 					},
 				},
 				Notes = "Adjusts the block coords to where the dropspenser items materialize",
-			},
-			SetRedstonePower =
-			{
-				Params =
-				{
-					{
-						Name = "IsPowered",
-						Type = "boolean",
-					},
-				},
-				Notes = "Sets the redstone status of the dropspenser. If the redstone power goes from off to on, the dropspenser will be activated",
 			},
 		},
 		Constants =
