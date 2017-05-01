@@ -1772,7 +1772,18 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							// No pickups for air
 							break;
 						}
-
+						case E_BLOCK_GRASS:
+						{
+							// Change the grass block to dirt
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_DIRT);
+							// Do not break, we want the default case to run so the block is destroyed
+						}
+						case E_BLOCK_STONE:
+						{
+							// Change the stone block to cobblestone
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_COBBLESTONE);
+							// Do not break, we want the default case to run so the block is destroyed
+						}
 						default:
 						{
 							if (m_World->GetTickRandomNumber(100) <= 25)  // 25% chance of pickups
