@@ -3912,6 +3912,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetOutputBlockPos", tolua_cHopperEntity_GetOutputBlockPos);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cIniFile");
+			tolua_constant(tolua_S, "noID", cIniFile::noID);
+		tolua_endmodule(tolua_S);
+
 		tolua_beginmodule(tolua_S, "cItemGrid");
 			tolua_function(tolua_S, "GetSlotCoords", Lua_ItemGrid_GetSlotCoords);
 		tolua_endmodule(tolua_S);
