@@ -453,7 +453,16 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	else if (split[0] == "reload")
 	{
-		cPluginManager::Get()->ReloadPlugins();
+		if (split.size() > 1)
+		{
+			cPluginManager::Get()->UnloadPlugin(split[1]);
+			a_Output.Out("Plugin unloaded scheduled");
+			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
+		}
+		else
+		{
+			cPluginManager::Get()->ReloadPlugins();
+		}
 		a_Output.Finished();
 		return;
 	}
