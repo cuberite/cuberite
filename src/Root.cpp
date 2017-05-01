@@ -230,6 +230,12 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		// Save the current time
 		m_StartTime = std::chrono::steady_clock::now();
 
+		int test = 5;
+		if (test > 0)
+		{
+			abort();
+		}
+
 		#ifdef _WIN32
 			EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
