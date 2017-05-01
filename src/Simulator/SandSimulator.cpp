@@ -43,7 +43,7 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		BLOCKTYPE BlockBelow = (itr->y > 0) ? a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z) : E_BLOCK_AIR;
+		BLOCKTYPE BlockBelow = (itr->y > 0) ? static_cast<BLOCKTYPE>(a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z)) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 		if (CanStartFallingThrough(BlockBelow))
 		{
 			if (m_IsInstantFall)

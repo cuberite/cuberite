@@ -140,7 +140,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
 
 			// If the pickup is on the bottommost block position, make it think the void is made of air: (#131)
-			BLOCKTYPE BlockBelow = (BlockY > 0) ? CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
+			BLOCKTYPE BlockBelow = (BlockY > 0) ? static_cast<BLOCKTYPE>(CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ)) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 			BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
 
 			if (
