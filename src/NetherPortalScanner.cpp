@@ -20,6 +20,17 @@ cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_
 	m_Position(a_DestPosition),
 	m_MaxY(a_MaxY)
 {
+	if (m_World->GetDimension() == eDimension::dimNether)
+	{
+		m_Position.x = round(m_Position.x / 8);
+		m_Position.z = round(m_Position.z / 8);
+	}
+	else if (m_World->GetDimension() == eDimension::dimOverworld)
+	{
+		m_Position.x = round(m_Position.x * 8);
+		m_Position.z = round(m_Position.z * 8);
+	}
+
 	int MinX = FloorC((m_Position.x - SearchRadius) / cChunkDef::Width);
 	int MinZ = FloorC((m_Position.z - SearchRadius) / cChunkDef::Width);
 	int MaxX = CeilC((m_Position.x + SearchRadius) / cChunkDef::Width);
