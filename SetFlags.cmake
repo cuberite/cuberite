@@ -79,11 +79,11 @@ macro(set_flags)
 		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
 		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
 
+		add_flags_cxx("-stdlib=libc++")
+		add_flags_lnk("-stdlib=libc++")
+
 		#on os x clang adds pthread for us but we need to add it for gcc
-		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			add_flags_cxx("-stdlib=libc++")
-			add_flags_lnk("-stdlib=libc++")
-		else()
+		if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			add_flags_cxx("-pthread")
 		endif()
 	elseif (ANDROID)
