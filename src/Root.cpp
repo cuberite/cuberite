@@ -204,7 +204,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	if (settingsRepo->GetValueSetB("DeadlockDetect", "Enabled", true))
 	{
 		LOGD("Starting deadlock detector...");
-		dd.Start(settingsRepo->GetValueSetI("DeadlockDetect", "IntervalSec", 20));
+		dd.Start(settingsRepo->GetValueSetI("DeadlockDetect", "IntervalSec", 120));
 	}
 
 	settingsRepo->Flush();
