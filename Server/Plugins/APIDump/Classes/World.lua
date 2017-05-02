@@ -2910,7 +2910,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Spawns a boat at the specific coordinates. Returns the entity ID of the new boat, or {{cEntity#NO_ID|cEntity.NO_ID}} if no boat was created.",
+				Notes = "Spawns a boat at the specific coordinates. Returns the EntityID of the new boat, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no boat was created.",
 			},
 			SpawnExperienceOrb =
 			{
@@ -2940,7 +2940,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward",
+				Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward. Returns the EntityID of the new experience orb, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no experience orb was created.",
 			},
 			SpawnFallingBlock =
 			{
@@ -2974,7 +2974,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Spawns a {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta",
+				Notes = "Spawns a {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta. Returns the EntityID of the new falling block, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no falling block was created.",
 			},
 			SpawnItemPickups =
 			{
@@ -3088,7 +3088,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Spawns a minecart at the specific coordinates. MinecartType is the item type of the minecart. If the minecart is an empty minecart then the given Item (default: empty) is the block to be displayed inside the minecart, and BlockHeight (default: 1) is the relative distance of the block from the minecart. Returns the entity ID of the new minecart, or {{cEntity#NO_ID|cEntity.NO_ID}} if no minecart was created.",
+				Notes = "Spawns a minecart at the specific coordinates. MinecartType is the item type of the minecart. If the minecart is an empty minecart then the given Item (default: empty) is the block to be displayed inside the minecart, and BlockHeight (default: 1) is the relative distance of the block from the minecart. Returns the EntityID of the new minecart, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no minecart was created.",
 			},
 			SpawnMob =
 			{
@@ -3123,7 +3123,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Spawns the specified type of mob at the specified coords. If the Baby parameter is true, the mob will be a baby. Returns the EntityID of the creates entity, or -1 on failure. ",
+				Notes = "Spawns the specified type of mob at the specified coords. If the Baby parameter is true, the mob will be a baby. Returns the EntityID of the created entity, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} on failure.",
 			},
 			SpawnPrimedTNT =
 			{
@@ -3157,7 +3157,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value.",
+				Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value. Returns the EntityID of the new spawned primed tnt, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no primed tnt was created.",
 			},
 			TryGetHeight =
 			{
