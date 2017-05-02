@@ -2183,7 +2183,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
 		);
-		Pickup->Initialize(*this);
+		if (!Pickup->Initialize(*this))
+		{
+			delete Pickup;
+			Pickup = nullptr;
+		}
 	}
 }
 
@@ -2204,7 +2208,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
 		);
-		Pickup->Initialize(*this);
+		if (!Pickup->Initialize(*this))
+		{
+			delete Pickup;
+			Pickup = nullptr;
+		}
 	}
 }
 
@@ -2215,7 +2223,12 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
 {
 	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
-	FallingBlock->Initialize(*this);
+	if (!FallingBlock->Initialize(*this))
+	{
+		delete FallingBlock;
+		FallingBlock = nullptr;
+		return cEntity::INVALID_ID;
+	}
 	return FallingBlock->GetUniqueID();
 }
 
@@ -2232,7 +2245,12 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 	}
 
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
-	ExpOrb->Initialize(*this);
+	if (!ExpOrb->Initialize(*this))
+	{
+		delete ExpOrb;
+		ExpOrb = nullptr;
+		return cEntity::INVALID_ID;
+	}
 	return ExpOrb->GetUniqueID();
 }
 
@@ -2255,7 +2273,12 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 			return cEntity::INVALID_ID;
 		}
 	}  // switch (a_MinecartType)
-	Minecart->Initialize(*this);
+	if (!Minecart->Initialize(*this))
+	{
+		delete Minecart;
+		Minecart = nullptr;
+		return cEntity::INVALID_ID;
+	}
 	return Minecart->GetUniqueID();
 }
 
@@ -2273,6 +2296,7 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
 	if (!Boat->Initialize(*this))
 	{
 		delete Boat;
+		Boat = nullptr;
 		return cEntity::INVALID_ID;
 	}
 	return Boat->GetUniqueID();
@@ -2284,7 +2308,12 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
 UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
-	TNT->Initialize(*this);
+	if (!TNT->Initialize(*this))
+	{
+		delete TNT;
+		TNT = nullptr;
+		return cEntity::INVALID_ID;
+	}
 	TNT->SetSpeed(
 		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
 		a_InitialVelocityCoeff * 2,
@@ -2878,7 +2907,11 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	std::swap(a_SetChunkData.GetEntities(), Entities);
 	for (cEntityList::iterator itr = Entities.begin(), end = Entities.end(); itr != end; ++itr)
 	{
-		(*itr)->Initialize(*this);
+		if (!(*itr)->Initialize(*this))
+		{
+			delete *itr;
+			*itr = nullptr;
+		}
 	}
 
 	// If a client is requesting this chunk, send it to them:
