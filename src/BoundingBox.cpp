@@ -206,6 +206,9 @@ bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Line1, const Vector3d
 
 bool cBoundingBox::CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Line1, const Vector3d & a_Line2, double & a_LineCoeff, eBlockFace & a_Face)
 {
+	a_LineCoeff = 0.0f;
+	a_Face = BLOCK_FACE_NONE;
+	return true;
 	if (IsInside(a_Min, a_Max, a_Line1))
 	{
 		// The starting point is inside the bounding box.
