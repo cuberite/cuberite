@@ -192,6 +192,16 @@ public:
 
 	/** Returns the list of ports on which the webadmin is configured to listen. */
 	AString GetPorts(void) const { return StringsConcat(m_Ports, ','); }
+
+	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style). */
+	static AString GetBaseURL(const AString & a_URL);
+
+	/** Returns the content type from the file extension.
+	If the extension isn't in the list, the function returns an empty string. */
+	static AString GetContentTypeFromFileExt(const AString & a_FileExtension);
+
+	/** Escapes text passed into it, so it can be embedded into html. */
+	static AString GetHTMLEscapedString(const AString & a_Input);
 	// tolua_end
 
 	/** Adds a new WebTab handler.
@@ -212,25 +222,12 @@ public:
 	Exported in ManualBindings.cpp */
 	bool DelWebTab(const AString & a_UrlPath);
 
-	/** Escapes text passed into it, so it can be embedded into html.
-	Exported to Lua in ManualBindings.cpp. */
-	static AString GetHTMLEscapedString(const AString & a_Input);
-
 	/** Escapes the string for use in an URL
 	Exported to Lua in ManualBindings.cpp. */
 	static AString GetURLEncodedString(const AString & a_Input);
 
-	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style).
-	Exported to Lua in ManualBindings.cpp. */
-	static AString GetBaseURL(const AString & a_URL);
-
 	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
 	static AString GetBaseURL(const AStringVector & a_URLSplit);
-
-	/** Returns the content type from the file extension.
-	If the extension isn't in the list, the function returns an empty string.
-	Exported to Lua in ManualBindings.cpp. */
-	static AString GetContentTypeFromFileExt(const AString & a_FileExtension);
 
 protected:
 

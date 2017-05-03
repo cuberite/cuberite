@@ -49,8 +49,13 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 		case E_BLOCK_STONE_PRESSURE_PLATE:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE: return cpp14::make_unique<cPressurePlateHandler>(a_World);
 
+		case E_BLOCK_ACACIA_FENCE_GATE:
+		case E_BLOCK_BIRCH_FENCE_GATE:
+		case E_BLOCK_DARK_OAK_FENCE_GATE:
 		case E_BLOCK_FENCE_GATE:
 		case E_BLOCK_IRON_TRAPDOOR:
+		case E_BLOCK_JUNGLE_FENCE_GATE:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
 		case E_BLOCK_TRAPDOOR: return cpp14::make_unique<cSmallGateHandler>(a_World);
 
 		case E_BLOCK_REDSTONE_LAMP_OFF:

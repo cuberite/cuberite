@@ -433,7 +433,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. Returns true on success, or false if the chunk is not loaded or invalid coords.",
 			},
 			DoExplosionAt =
 			{
@@ -1112,6 +1118,23 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Calls the specified callback for each furnace in the chunk. Returns true if all furnaces in the chunk have been processed (including when there are zero furnaces), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}})</pre> The callback should return false or no value to continue with the next furnace, or true to abort the enumeration.",
 			},
+			ForEachLoadedChunk =
+			{
+				Params =
+				{
+					{
+						Name = "CallbackFunction",
+						Type = "function",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Calls the specified callback for each loaded chunk in the world. Returns true if all chunks have been processed, or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback(ChunkX, ChunkZ)</pre> The callback should return false or no value to continue with the next chunk, or true to abort the enumeration.",
+			},
 			ForEachPlayer =
 			{
 				Params =
@@ -1405,6 +1428,12 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						Name = "Weather",
 						Type = "eWeather",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "number",
 					},
 				},
 				Notes = "Returns the default weather interval for the specific weather type. Returns -1 for any unknown weather.",
@@ -2255,41 +2284,6 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			{
 				Notes = "Queues all chunks to be saved in the world storage thread",
 			},
-			QueueSetBlock =
-			{
-				Params =
-				{
-					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-					{
-						Name = "BlockType",
-						Type = "number",
-					},
-					{
-						Name = "BlockMeta",
-						Type = "number",
-					},
-					{
-						Name = "TickDelay",
-						Type = "number",
-					},
-				},
-				Notes = [[
-					Queues the block to be set to the specified blocktype and meta after the specified amount of game
-					ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are
-					handled correctly.
-				]],
-			},
 			QueueTask =
 			{
 				Params =
@@ -2705,7 +2699,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			SetShouldUseChatPrefixes =
 			{
-				Returns =
+				Params =
 				{
 					{
 						Name = "ShouldUseChatPrefixes",
@@ -2833,7 +2827,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Opens or closes a trapdoor at the specific coordinates.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Opens or closes a trapdoor at the specific coordinates. Returns true on success, false if there is no trapdoor or it's already in the requested state.",
 			},
 			SetWeather =
 			{
@@ -3108,7 +3108,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 					{
 						Name = "MonsterType",
-						Type = "cMonster",
+						Type = "eMonsterType",
 					},
 					{
 						Name = "IsBaby",
@@ -3147,6 +3147,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 					{
 						Name = "InitialVelocityCoeff",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "EntityID",
 						Type = "number",
 					},
 				},
@@ -3244,6 +3251,12 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			VillagersShouldHarvestCrops =
 			{
 				Notes = "Returns true if villagers can harvest crops.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
 			},
 			WakeUpSimulators =
 			{

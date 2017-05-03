@@ -2243,90 +2243,6 @@ static int tolua_cWebAdmin_GetAllWebTabs(lua_State * tolua_S)
 
 
 
-/** Binding for cWebAdmin::GetBaseURL.
-Manual code required because ToLua generates an extra return value */
-static int tolua_cWebAdmin_GetBaseURL(lua_State * tolua_S)
-{
-	// Check the param types:
-	cLuaState S(tolua_S);
-	if (
-		// Don't care whether the first param is a cWebAdmin instance or class
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
-	{
-		return 0;
-	}
-
-	// Get the parameters:
-	AString Input;
-	S.GetStackValue(2, Input);
-
-	// Convert and return:
-	S.Push(cWebAdmin::GetBaseURL(Input));
-	return 1;
-}
-
-
-
-
-
-/** Binding for cWebAdmin::GetContentTypeFromFileExt.
-Manual code required because ToLua generates an extra return value */
-static int tolua_cWebAdmin_GetContentTypeFromFileExt(lua_State * tolua_S)
-{
-	// Check the param types:
-	cLuaState S(tolua_S);
-	if (
-		// Don't care whether the first param is a cWebAdmin instance or class
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
-	{
-		return 0;
-	}
-
-	// Get the parameters:
-	AString Input;
-	S.GetStackValue(2, Input);
-
-	// Convert and return:
-	S.Push(cWebAdmin::GetContentTypeFromFileExt(Input));
-	return 1;
-}
-
-
-
-
-
-/** Binding for cWebAdmin::GetHTMLEscapedString.
-Manual code required because ToLua generates an extra return value */
-static int tolua_cWebAdmin_GetHTMLEscapedString(lua_State * tolua_S)
-{
-	// Check the param types:
-	cLuaState S(tolua_S);
-	if (
-		// Don't care whether the first param is a cWebAdmin instance or class
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
-	{
-		return 0;
-	}
-
-	// Get the parameters:
-	AString Input;
-	S.GetStackValue(2, Input);
-
-	// Convert and return:
-	S.Push(cWebAdmin::GetHTMLEscapedString(Input));
-	return 1;
-}
-
-
-
-
-
 /** Binding for cWebAdmin::GetPage. */
 static int tolua_cWebAdmin_GetPage(lua_State * tolua_S)
 {
@@ -4096,9 +4012,6 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cWebAdmin");
 			tolua_function(tolua_S, "AddWebTab",                 tolua_cWebAdmin_AddWebTab);
 			tolua_function(tolua_S, "GetAllWebTabs",             tolua_cWebAdmin_GetAllWebTabs);
-			tolua_function(tolua_S, "GetBaseURL",                tolua_cWebAdmin_GetBaseURL);
-			tolua_function(tolua_S, "GetContentTypeFromFileExt", tolua_cWebAdmin_GetContentTypeFromFileExt);
-			tolua_function(tolua_S, "GetHTMLEscapedString",      tolua_cWebAdmin_GetHTMLEscapedString);
 			tolua_function(tolua_S, "GetPage",                   tolua_cWebAdmin_GetPage);
 			tolua_function(tolua_S, "GetURLEncodedString",       tolua_cWebAdmin_GetURLEncodedString);
 		tolua_endmodule(tolua_S);
