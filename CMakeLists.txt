@@ -250,7 +250,7 @@ endif()
 add_subdirectory(lib/jsoncpp/)
 add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
-add_subdirectory(lib/tolua++/)
+add_subdirectory(lib/tolua++/ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/sqlite/)
 add_subdirectory(lib/SQLiteCpp/)
 add_subdirectory(lib/expat/)
@@ -305,7 +305,7 @@ if (MSVC)
 	)
 	set_target_properties(
 		luaproxy
-		tolua
+		luaexe
 		PROPERTIES FOLDER Support
 	)
 
