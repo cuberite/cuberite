@@ -305,7 +305,6 @@ if (MSVC)
 	)
 	set_target_properties(
 		luaproxy
-		luaexe
 		PROPERTIES FOLDER Support
 	)
 
