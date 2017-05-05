@@ -1947,7 +1947,7 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 ////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaBrewingstand:
 cSlotAreaBrewingstand::cSlotAreaBrewingstand(cBrewingstandEntity * a_Brewingstand, cWindow & a_ParentWindow) :
-	cSlotArea(4, a_ParentWindow),
+	cSlotArea(5, a_ParentWindow),
 	m_Brewingstand(a_Brewingstand)
 {
 	m_Brewingstand->GetContents().AddListener(*this);
@@ -1975,100 +1975,101 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 		return;
 	}
 
-	if ((a_SlotNum >= 0) && (a_SlotNum < 3))
+	if (GetSlot(a_SlotNum, a_Player) == nullptr)
 	{
-		bool bAsync = false;
-		if (GetSlot(a_SlotNum, a_Player) == nullptr)
-		{
-			LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
-			return;
-		}
+		LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
+		return;
+	}
 
-		cItem Slot(*GetSlot(a_SlotNum, a_Player));
-		if (!Slot.IsSameType(a_ClickedItem))
-		{
-			LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
-			LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
-			LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
-			bAsync = true;
-		}
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
 
+	if ((a_SlotNum >= 0) && (a_SlotNum <= 2))
+	{
+		// Bottle slots
+		switch (a_ClickAction)
+		{
+			case caLeftClick:
+			case caRightClick:
+			{
+				if (BR->IsBottle(Slot))
+				{
+					HandleBrewedItem(a_Player, Slot);
+				}
+				if (!DraggingItem.IsEmpty() && !BR->IsBottle(DraggingItem))
+				{
+					// Deny placing a invalid item into the bottle slot
+					return;
+				}
+				break;
+			}
+			case caShiftLeftClick:
+			case caShiftRightClick:
+			{
+				if (BR->IsBottle(Slot))
+				{
+					HandleBrewedItem(a_Player, Slot);
+				}
+				super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				break;
+			}
+			default:
+			{
+				if (!DraggingItem.IsEmpty() && !BR->IsBottle(DraggingItem))
+				{
+					// Deny placing a invalid item into the bottle slot
+					return;
+				}
+				break;
+			}
+		}
+	}
+
+	if ((a_SlotNum == 3) && !DraggingItem.IsEmpty())
+	{
+		// Ingredient slot
 		switch (a_ClickAction)
 		{
 			case caShiftLeftClick:
 			case caShiftRightClick:
 			{
-				HandleBrewedItem(a_Player);
-				ShiftClicked(a_Player, a_SlotNum, Slot);
-				return;
-			}
-			case caMiddleClick:
-			{
-				MiddleClicked(a_Player, a_SlotNum);
-				return;
-			}
-			case caDropKey:
-			case caCtrlDropKey:
-			{
-				DropClicked(a_Player, a_SlotNum, (a_SlotNum == caCtrlDropKey));
-				Slot.m_ItemCount = Slot.m_ItemCount - GetSlot(a_SlotNum, a_Player)->m_ItemCount;
-				HandleBrewedItem(a_Player);
-				return;
+				super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				break;
 			}
 			default:
 			{
+				if (!BR->IsIngredient(DraggingItem))
+				{
+					// Deny placing a invalid item into the ingredient slot
+					return;
+				}
 				break;
 			}
 		}
+	}
 
-		cItem & DraggingItem = a_Player.GetDraggingItem();
-		if (!DraggingItem.IsEmpty())
+	if ((a_SlotNum == 4) && !DraggingItem.IsEmpty())
+	{
+		// Fuel slot
+		switch (a_ClickAction)
 		{
-			super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
-			return;
-		}
-		else
-		{
-			switch (a_ClickAction)
+			case caShiftLeftClick:
+			case caShiftRightClick:
 			{
-				case caDblClick:
+				super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				break;
+			}
+			default:
+			{
+				if (!BR->IsFuel(DraggingItem))
 				{
-					DblClicked(a_Player, a_SlotNum);
+					// Deny placing a invalid item into the fuel slot
 					return;
 				}
-				case caLeftClick:
-				{
-					DraggingItem = Slot;
-					HandleBrewedItem(a_Player);
-					Slot.Empty();
-					break;
-				}
-				case caRightClick:
-				{
-					DraggingItem = Slot.CopyOne();
-					DraggingItem.m_ItemCount = static_cast<char>(static_cast<float>(Slot.m_ItemCount) / 2.f + 0.5f);
-					Slot.m_ItemCount -= DraggingItem.m_ItemCount;
-
-					if (Slot.m_ItemCount <= 0)
-					{
-						Slot.Empty();
-					}
-					HandleBrewedItem(a_Player);
-					break;
-				}
-				default:
-				{
-					ASSERT(!"Unhandled click type!");
-				}
+				break;
 			}
 		}
-
-		SetSlot(a_SlotNum, a_Player, Slot);
-		if (bAsync)
-		{
-			m_ParentWindow.BroadcastWholeWindow();
-		}
-		return;
 	}
 
 	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
@@ -2078,9 +2079,13 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 
 
 
-void cSlotAreaBrewingstand::HandleBrewedItem(cPlayer & a_Player)
+void cSlotAreaBrewingstand::HandleBrewedItem(cPlayer & a_Player, const cItem & a_ClickedItem)
 {
-	a_Player.AwardAchievement(achBrewPotion);
+	// Award an achievement if the item is not a water bottle (is a real brewed potion)
+	if (a_ClickedItem.m_ItemDamage > 0)
+	{
+		a_Player.AwardAchievement(achBrewPotion);
+	}
 }
 
 

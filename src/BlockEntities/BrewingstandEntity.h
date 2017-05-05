@@ -27,8 +27,9 @@ public:
 		bsMiddleBottle      = 1,  // Middle bottle slot number
 		bsRightBottle       = 2,  // Right bottle slot number
 		bsIngredient        = 3,  // Top ingredient slot number
+		bsFuel              = 4,  // Top left fuel slot number
 
-		ContentsWidth       = 4,
+		ContentsWidth       = 5,
 		ContentsHeight      = 1,
 	};
 
@@ -59,6 +60,9 @@ public:
 	/** Returns the time that the current items has been brewing, in ticks */
 	short GetTimeBrewed(void) { return m_TimeBrewed; }
 
+	/** Returns the remaining fuel that is left. */
+	short GetRemainingFuel(void) { return m_RemainingFuel; }
+
 	/** Returns the item in the left bottle slot  */
 	const cItem & GetLeftBottleSlot(void) const { return GetSlot(bsLeftBottle); }
 
@@ -70,6 +74,9 @@ public:
 
 	/** Returns the item in the ingredient slot  */
 	const cItem & GetIndgredientSlot(void) const { return GetSlot(bsIngredient); }
+
+	/** Returns the item in the fuel slot. */
+	const cItem & GetFuelSlot(void) const { return GetSlot(bsFuel); }
 
 	/** Get the expected result item for the given slot number */
 	const cItem & GetResultItem(int a_SlotNumber) { return m_Results[a_SlotNumber]; }
@@ -86,16 +93,22 @@ public:
 	/** Sets the item in the ingredient slot  */
 	void SetIngredientSlot(const cItem & a_Item) { SetSlot(bsIngredient, a_Item); }
 
+	/** Sets the item in the fuel slot  */
+	void SetFuelSlot(const cItem & a_Item) { SetSlot(bsFuel, a_Item); }
+
 	// tolua_end
 
 	/** Sets the current brewing time. Will be called if the brewing stand gets loaded from the world. */
-	void setTimeBrewed(short a_TimeBrewed);
+	void SetTimeBrewed(short a_TimeBrewed) { m_TimeBrewed = a_TimeBrewed; }
+
+	/** Sets the remaining fuel. Will be called if the brewing stand gets loaded from the world. */
+	void SetRemainingFuel(short a_RemainingFuel) { m_RemainingFuel = a_RemainingFuel; }
 
 	/** Starts the brewing proccess. Will be called if the brewing stand gets loaded from the world. */
 	void ContinueBrewing(void);
 
 	/** Gets the recipes. Will be called if the brewing stand gets loaded from the world. */
-	void GetRecipes(void);
+	void LoadRecipes(void);
 protected:
 
 	/** Block meta of the block currently represented by this entity */
@@ -118,6 +131,9 @@ protected:
 
 	/** Amount of ticks that the current item has been brewed */
 	short m_TimeBrewed;
+
+	/** The remaining fuel for the brewing stand. It's the amount of brewing operations that can be done. */
+	short m_RemainingFuel;
 
 	/** Sends the specified progressbar value to all clients of the window */
 	void BroadcastProgress(short a_ProgressbarID, short a_Value);
