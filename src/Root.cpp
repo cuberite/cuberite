@@ -119,6 +119,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	auto fileLogListenerRet = MakeFileListener();
 	if (!fileLogListenerRet.first)
 	{
+		m_TerminateEventRaised = true;
 		LOGERROR("Failed to open log file, aborting");
 		return;
 	}
