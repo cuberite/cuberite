@@ -39,7 +39,10 @@ public:
 	bool IsIngredient(const cItem & a_Ingredient) const;
 
 	/** Returns true if the item is a bottle / potion, false if not. */
-	bool IsBottle(const cItem & a_Bottle) const;
+	bool IsBottle(const cItem & a_Item) const;
+
+	/** Returns true if the item is the fuel, false if not. */
+	bool IsFuel(const cItem & a_Item) const;
 private:
 	void ClearRecipes(void);
 
