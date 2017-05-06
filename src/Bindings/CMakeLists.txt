@@ -147,9 +147,9 @@ if (NOT MSVC)
 	else()
 		ADD_CUSTOM_COMMAND(
 			OUTPUT ${BINDING_OUTPUTS}
-			COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+			COMMAND luaexe BindingsProcessor.lua
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			DEPENDS ${BINDING_DEPENDENCIES} tolua
+			DEPENDS ${BINDING_DEPENDENCIES} luaexe
 		)
 	endif()
 endif ()
