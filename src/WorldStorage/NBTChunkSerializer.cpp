@@ -205,6 +205,7 @@ void cNBTChunkSerializer::AddBrewingstandEntity(cBrewingstandEntity * a_Brewings
 			AddItemGrid(a_Brewingstand->GetContents());
 		m_Writer.EndList();
 		m_Writer.AddShort("BrewTime", a_Brewingstand->GetTimeBrewed());
+		m_Writer.AddShort("Fuel", a_Brewingstand->GetRemainingFuel());
 	m_Writer.EndCompound();
 }
 

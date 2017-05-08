@@ -96,7 +96,12 @@ public:
 
 		// Spawn block at water level
 		cBoat * Boat = new cBoat(x + 0.5, y + 0.5, z + 0.5);
-		Boat->Initialize(*a_World);
+		if (!Boat->Initialize(*a_World))
+		{
+			delete Boat;
+			Boat = nullptr;
+			return false;
+		}
 
 		// Remove boat from players hand
 		if (!a_Player->IsGameModeCreative())

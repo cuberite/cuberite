@@ -944,6 +944,14 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 
 	std::unique_ptr<cBrewingstandEntity> Brewingstand(new cBrewingstandEntity(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, m_World));
 
+	// Fuel has to be loaded at first, because of slot events:
+	int Fuel = a_NBT.FindChildByName(a_TagIdx, "Fuel");
+	if (Fuel >= 0)
+	{
+		Int16 tb = a_NBT.GetShort(Fuel);
+		Brewingstand->SetRemainingFuel(tb);
+	}
+
 	// Load slots:
 	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
@@ -964,11 +972,11 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 	if (BrewTime >= 0)
 	{
 		Int16 tb = a_NBT.GetShort(BrewTime);
-		Brewingstand->setTimeBrewed(tb);
+		Brewingstand->SetTimeBrewed(tb);
 	}
 
 	// Restart brewing:
-	Brewingstand->GetRecipes();
+	Brewingstand->LoadRecipes();
 	Brewingstand->ContinueBrewing();
 	return Brewingstand.release();
 }

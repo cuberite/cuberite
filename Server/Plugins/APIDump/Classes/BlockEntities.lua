@@ -441,6 +441,26 @@ return
 				},
 				Notes = "Returns the item in the right bottle slot",
 			},
+			GetFuelSlot =
+			{
+				Returns =
+				{
+					{
+						Type = "cItem",
+					},
+				},
+				Notes = "Returns the item in the top left fuel slot",
+			},
+			GetRemainingFuel =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Returns the remaining fuel that is left. It's the amount of brewing operations that can be done (20 for one blaze powder).",
+			},
 			GetTimeBrewed =
 			{
 				Returns =
@@ -495,6 +515,17 @@ return
 				},
 				Notes = "Sets the item in the right bottle slot",
 			},
+			SetFuelSlot =
+			{
+				Params =
+				{
+					{
+						Name = "FuelSlot",
+						Type = "cItem",
+					},
+				},
+				Notes = "Sets the item in the top left fuel slot",
+			},
 		},
 		Constants =
 		{
@@ -513,6 +544,10 @@ return
 			bsRightBottle =
 			{
 				Notes = "Index of the right bottle slot",
+			},
+			bsFuel =
+			{
+				Notes = "Index of the top left fuel slot",
 			},
 			ContentsHeight =
 			{

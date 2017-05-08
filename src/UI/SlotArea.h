@@ -479,7 +479,7 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
 	/** Called after an item has been brewed to handle statistics etc. */
-	void HandleBrewedItem(cPlayer & a_Player);
+	void HandleBrewedItem(cPlayer & a_Player, const cItem & a_ClickedItem);
 } ;
 
 

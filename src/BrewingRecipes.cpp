@@ -285,3 +285,11 @@ bool cBrewingRecipes::IsBottle(const cItem & a_Item) const
 
 
 
+bool cBrewingRecipes::IsFuel(const cItem & a_Item) const
+{
+	return (a_Item.m_ItemType == E_ITEM_BLAZE_POWDER);
+}
+
+
+
+
