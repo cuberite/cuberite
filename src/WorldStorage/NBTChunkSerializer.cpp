@@ -421,6 +421,7 @@ void cNBTChunkSerializer::AddBoatEntity(cBoat * a_Boat)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Boat, "Boat");
+		m_Writer.AddString("Type", cBoat::MaterialToString(a_Boat->GetMaterial()));
 	m_Writer.EndCompound();
 }
 

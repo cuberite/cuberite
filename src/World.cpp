@@ -2282,9 +2282,9 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 
 
-UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
+UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material)
 {
-	cBoat * Boat = new cBoat(a_X, a_Y, a_Z);
+	cBoat * Boat = new cBoat(a_X, a_Y, a_Z, a_Material);
 	if (Boat == nullptr)
 	{
 		return cEntity::INVALID_ID;

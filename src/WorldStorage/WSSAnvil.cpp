@@ -1659,10 +1659,16 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cBoat> Boat = cpp14::make_unique<cBoat>(0, 0, 0);
+	std::unique_ptr<cBoat> Boat = cpp14::make_unique<cBoat>(0, 0, 0, cBoat::bmOak);
 	if (!LoadEntityBaseFromNBT(*Boat.get(), a_NBT, a_TagIdx))
 	{
 		return;
+	}
+
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Type");
+	if (TypeIdx > 0)
+	{
+		Boat->SetMaterial(cBoat::StringToMaterial(a_NBT.GetString(TypeIdx)));
 	}
 	a_Entities.push_back(Boat.release());
 }

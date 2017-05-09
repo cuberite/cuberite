@@ -523,7 +523,7 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEInt8(BOAT_TYPE);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetType()));
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
 
 			a_Pkt.WriteBEInt8(BOAT_RIGHT_PADDLE_TURNING);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
