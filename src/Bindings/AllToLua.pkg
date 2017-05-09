@@ -70,6 +70,7 @@ $cfile "../Protocol/MojangAPI.h"
 
 // Entities:
 $cfile "../Entities/Entity.h"
+$cfile "../Entities/Boat.h"
 $cfile "../Entities/Pawn.h"
 $cfile "../Entities/ProjectileEntity.h"
 $cfile "../Entities/ArrowEntity.h"

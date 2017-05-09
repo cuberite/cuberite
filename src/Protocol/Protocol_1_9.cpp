@@ -3686,7 +3686,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 			a_Pkt.WriteBEInt8(8);  // Index 9: Type
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetType()));
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
 
 			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
 			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);

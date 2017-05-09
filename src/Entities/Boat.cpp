@@ -13,10 +13,10 @@
 
 
 
-cBoat::cBoat(double a_X, double a_Y, double a_Z) :
+cBoat::cBoat(double a_X, double a_Y, double a_Z, eMaterial a_Material) :
 	super(etBoat, a_X, a_Y, a_Z, 0.98, 0.7),
 	m_LastDamage(0), m_ForwardDirection(0),
-	m_DamageTaken(0.0f), m_Type(0),
+	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
 {
 	SetMass(20.0f);
@@ -55,7 +55,7 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 			if (TDI.Attacker->IsPlayer())
 			{
 				cItems Pickups;
-				Pickups.Add(cItem(E_ITEM_BOAT));
+				Pickups.Add(MaterialToItem(m_Material));
 				m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 0, 0, 0, true);
 			}
 		}
@@ -169,3 +169,106 @@ void cBoat::UpdatePaddles(bool a_RightPaddleUsed, bool a_LeftPaddleUsed)
 
 	m_World->BroadcastEntityMetadata(*this);
 }
+
+
+
+
+
+cBoat::eMaterial cBoat::ItemToMaterial(const cItem & a_Item)
+{
+	switch (a_Item.m_ItemType)
+	{
+		case E_ITEM_BOAT:          return bmOak;
+		case E_ITEM_SPRUCE_BOAT:   return bmSpruce;
+		case E_ITEM_BIRCH_BOAT:    return bmBirch;
+		case E_ITEM_JUNGLE_BOAT:   return bmJungle;
+		case E_ITEM_ACACIA_BOAT:   return bmAcacia;
+		case E_ITEM_DARK_OAK_BOAT: return bmDarkOak;
+		default:
+		{
+			LOGWARNING("%s: Item type not handled %d.", __FUNCTION__, a_Item.m_ItemType);
+			return cBoat::bmOak;
+		}
+	}
+}
+
+
+
+
+
+AString cBoat::MaterialToString(eMaterial a_Material)
+{
+	switch (a_Material)
+	{
+		case bmOak:     return "oak";
+		case bmSpruce:  return "spruce";
+		case bmBirch:   return "birch";
+		case bmJungle:  return "jungle";
+		case bmAcacia:  return "acacia";
+		case bmDarkOak: return "dark_oak";
+	}
+	ASSERT(!"Unhandled boat material");
+	#ifndef __clang__
+		return "oak";
+	#endif
+}
+
+
+
+
+
+cBoat::eMaterial cBoat::StringToMaterial(const AString & a_Material)
+{
+	if (a_Material == "oak")
+	{
+		return bmOak;
+	}
+	else if (a_Material == "spruce")
+	{
+		return bmSpruce;
+	}
+	else if (a_Material == "birch")
+	{
+		return bmBirch;
+	}
+	else if (a_Material == "jungle")
+	{
+		return bmJungle;
+	}
+	else if (a_Material == "acacia")
+	{
+		return bmAcacia;
+	}
+	else if (a_Material == "dark_oak")
+	{
+		return bmDarkOak;
+	}
+	else
+	{
+		return bmOak;
+	}
+}
+
+
+
+
+
+cItem cBoat::MaterialToItem(eMaterial a_Material)
+{
+	switch (a_Material)
+	{
+		case bmOak:     return cItem(E_ITEM_BOAT);
+		case bmSpruce:  return cItem(E_ITEM_SPRUCE_BOAT);
+		case bmBirch:   return cItem(E_ITEM_BIRCH_BOAT);
+		case bmJungle:  return cItem(E_ITEM_JUNGLE_BOAT);
+		case bmAcacia:  return cItem(E_ITEM_ACACIA_BOAT);
+		case bmDarkOak: return cItem(E_ITEM_DARK_OAK_BOAT);
+	}
+	#ifndef __clang__
+		return cItem(E_ITEM_BOAT);
+	#endif
+}
+
+
+
+

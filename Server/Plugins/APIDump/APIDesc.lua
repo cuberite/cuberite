@@ -11009,6 +11009,149 @@ a_Player:OpenWindow(Window);
 			},
 			Inherits = "cEntity",
 		},
+		cBoat =
+		{
+			Desc = [[
+				This class represents a boat. This entity can be spawned by using {{cWorld#SpawnBoat_1|cWorld:SpawnBoat}}.
+			]],
+			Functions =
+			{
+				GetMaterial =
+				{
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the material of the boat.",
+				},
+				MaterialToString =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the boat material as a string.",
+				},
+				ItemToMaterial =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the eMaterial that should be used for a boat created from the specified item. Returns bmOak if not a boat item.",
+				},
+				MaterialToItem =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the boat item of the boat material",
+				},
+				StringToMaterial =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the boat material for the passed string. Returns oak if not valid.",
+				},
+				SetMaterial =
+				{
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Set the material of the boat.",
+				},
+			},
+			Constants =
+			{
+				bmOak =
+				{
+					Notes = "",
+				},
+				bmSpruce =
+				{
+					Notes = "",
+				},
+				bmBirch =
+				{
+					Notes = "",
+				},
+				bmJungle =
+				{
+					Notes = "",
+				},
+				bmAcacia =
+				{
+					Notes = "",
+				},
+				bmDarkOak =
+				{
+					Notes = "",
+				},
+			},
+			ConstantGroups =
+			{
+				eMaterial =
+				{
+					Include = "bm.*",
+					TextBefore = "These constans are the different wood materials of the boat.",
+				},
+			},
+			Inherits = "cEntity",
+		},
 		cPickup =
 		{
 			Desc = [[
