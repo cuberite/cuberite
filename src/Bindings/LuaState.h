@@ -573,22 +573,16 @@ public:
 	}
 
 	// Push a const value onto the stack (keep alpha-sorted):
+	// Note that these functions will make a copy of the actual value, because Lua doesn't have the concept
+	// of "const", and there would be lifetime management problems if they didn't.
 	void Push(const AString & a_String);
 	void Push(const AStringMap & a_Dictionary);
 	void Push(const AStringVector & a_Vector);
-	void Push(const cCraftingGrid * a_Grid);
-	void Push(const cCraftingRecipe * a_Recipe);
 	void Push(const char * a_Value);
-	void Push(const cItems & a_Items);
 	void Push(const cNil & a_Nil);
-	void Push(const cPlayer * a_Player);
 	void Push(const cRef & a_Ref);
-	void Push(const HTTPRequest * a_Request);
-	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(const Vector3d & a_Vector);
-	void Push(const Vector3d * a_Vector);
 	void Push(const Vector3i & a_Vector);
-	void Push(const Vector3i * a_Vector);
 
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
