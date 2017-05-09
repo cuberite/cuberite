@@ -1710,7 +1710,7 @@ public:
 	) override
 	{
 		AString content, contentType;
-		return m_Callback.Call(&a_Request, a_UrlPath, cLuaState::Return, a_Content, a_ContentType);
+		return m_Callback.Call(const_cast<HTTPRequest *>(&a_Request), a_UrlPath, cLuaState::Return, a_Content, a_ContentType);
 	}
 };
 
