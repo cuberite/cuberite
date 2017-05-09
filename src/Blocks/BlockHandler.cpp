@@ -187,7 +187,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BEACON:                return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
-		case E_BLOCK_BEETROOTS:             return new cBlockCropsHandler<4>        (a_BlockType);  // 4 stages of growth
+		case E_BLOCK_BEETROOTS:             return new cBlockCropsHandler<3>        (a_BlockType);  // 4 stages of growth
 		case E_BLOCK_BIG_FLOWER:            return new cBlockBigFlowerHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_DOOR:            return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_BIRCH_FENCE_GATE:      return new cBlockFenceGateHandler       (a_BlockType);
@@ -197,7 +197,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_BROWN_MUSHROOM:        return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_CACTUS:                return new cBlockCactusHandler          (a_BlockType);
 		case E_BLOCK_CAKE:                  return new cBlockCakeHandler            (a_BlockType);
-		case E_BLOCK_CARROTS:               return new cBlockCropsHandler<8>        (a_BlockType);  // 8 stages of growth
+		case E_BLOCK_CARROTS:               return new cBlockCropsHandler<7>        (a_BlockType);  // 8 stages of growth
 		case E_BLOCK_CARPET:                return new cBlockCarpetHandler          (a_BlockType);
 		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);
 		case E_BLOCK_CHAIN_COMMAND_BLOCK:   return new cBlockCommandBlockHandler    (a_BlockType);
@@ -210,7 +210,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBBLESTONE:           return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_COBWEB:                return new cBlockCobWebHandler          (a_BlockType);
-		case E_BLOCK_CROPS:                 return new cBlockCropsHandler<8>        (a_BlockType);  // 8 stages of growth
+		case E_BLOCK_CROPS:                 return new cBlockCropsHandler<7>        (a_BlockType);  // 8 stages of growth
 		case E_BLOCK_DARK_OAK_DOOR:         return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_DARK_OAK_FENCE_GATE:   return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_DARK_OAK_WOOD_STAIRS:  return new cBlockStairsHandler          (a_BlockType);
@@ -278,7 +278,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler;
 		case E_BLOCK_PLANKS:                return new cBlockPlanksHandler          (a_BlockType);
-		case E_BLOCK_POTATOES:              return new cBlockCropsHandler<8>        (a_BlockType);  // 8 stages of growth
+		case E_BLOCK_POTATOES:              return new cBlockCropsHandler<7>        (a_BlockType);  // 8 stages of growth
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_PUMPKIN:               return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
