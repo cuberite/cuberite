@@ -1109,16 +1109,15 @@ end
 	cTracer =
 	{
 		Desc = [[
-			A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is
-			tracing what block a player is looking at, but you can do more with it if you want.</p>
-			<p>
-			The cTracer is still a work in progress and is not documented at all.</p>
-			<p>
-			See also the {{cLineBlockTracer}} class for an alternative approach using callbacks.
+			This class is <b>OBSOLETE</b>, do not use it.
+			See the {{cLineBlockTracer}} class for the replacement.
 		]],
 		Functions =
 		{
-
+			Trace =
+			{
+				Notes = "<b>OBSOLETE</b>, use the {{cLineBlockTracer}} class instead.",
+			},
 		},
 	},
 	Vector3d =

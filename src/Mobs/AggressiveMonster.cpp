@@ -5,7 +5,7 @@
 
 #include "../World.h"
 #include "../Entities/Player.h"
-#include "../Tracer.h"
+#include "../LineBlockTracer.h"
 
 
 
@@ -70,17 +70,20 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		CheckEventSeePlayer(a_Chunk);
 	}
 
-	if (GetTarget() == nullptr)
+	auto target = GetTarget();
+	if (target == nullptr)
 	{
 		return;
 	}
 
-	cTracer LineOfSight(GetWorld());
+	// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
 	Vector3d MyHeadPosition = GetPosition() + Vector3d(0, GetHeight(), 0);
-	Vector3d AttackDirection(GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
-
-
-	if (TargetIsInRange() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())) && (GetHealth() > 0.0))
+	Vector3d TargetPosition = target->GetPosition() + Vector3d(0, target->GetHeight(), 0);
+	if (
+		TargetIsInRange() &&
+		cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetPosition, cLineBlockTracer::losAirWaterLava) &&
+		(GetHealth() > 0.0)
+	)
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
 		Attack(a_Dt);

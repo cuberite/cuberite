@@ -13,6 +13,7 @@
 #include "Generating/ChunkDesc.h"
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
+#include "LineBlockTracer.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -49,11 +50,6 @@
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
-
-#include "Tracer.h"
-
-// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
-#include "LineBlockTracer.h"
 
 #ifndef _WIN32
 	#include <stdlib.h>
@@ -3190,11 +3186,8 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallb
 
 
 
-// TODO: This interface is dangerous!
 cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {
-	cTracer LineOfSight(this);
-
 	double ClosestDistance = a_SightLimit;
 	cPlayer * ClosestPlayer = nullptr;
 
@@ -3208,22 +3201,23 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 		Vector3f Pos = (*itr)->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 
-		if (Distance < ClosestDistance)
+		// If the player is too far, skip them:
+		if (Distance > ClosestDistance)
 		{
-			if (a_CheckLineOfSight)
-			{
-				if (!LineOfSight.Trace(a_Pos, (Pos - a_Pos), static_cast<int>((Pos - a_Pos).Length())))
-				{
-					ClosestDistance = Distance;
-					ClosestPlayer = *itr;
-				}
-			}
-			else
-			{
-				ClosestDistance = Distance;
-				ClosestPlayer = *itr;
-			}
+			continue;
 		}
+
+		// Check LineOfSight, if requested:
+		if (
+			a_CheckLineOfSight &&
+			!cLineBlockTracer::LineOfSightTrace(*this, a_Pos, Pos, cLineBlockTracer::losAirWater)
+		)
+		{
+			continue;
+		}
+
+		ClosestDistance = Distance;
+		ClosestPlayer = *itr;
 	}
 	return ClosestPlayer;
 }

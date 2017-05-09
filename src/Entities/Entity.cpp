@@ -9,7 +9,7 @@
 #include "../Chunk.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Bindings/PluginManager.h"
-#include "../Tracer.h"
+#include "../LineBlockTracer.h"
 #include "Player.h"
 #include "Items/ItemHandler.h"
 #include "../FastRandom.h"
@@ -1071,29 +1071,38 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Get water direction
 	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
-	m_WaterSpeed *= 0.9f;  // Reduce speed each tick
+	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
 	switch (WaterDir)
 	{
 		case X_PLUS:
+		{
 			m_WaterSpeed.x = 0.2f;
 			m_bOnGround = false;
 			break;
+		}
 		case X_MINUS:
+		{
 			m_WaterSpeed.x = -0.2f;
 			m_bOnGround = false;
 			break;
+		}
 		case Z_PLUS:
+		{
 			m_WaterSpeed.z = 0.2f;
 			m_bOnGround = false;
 			break;
+		}
 		case Z_MINUS:
+		{
 			m_WaterSpeed.z = -0.2f;
 			m_bOnGround = false;
 			break;
-
-	default:
-		break;
+		}
+		default:
+		{
+			break;
+		}
 	}
 
 	if (fabs(m_WaterSpeed.x) < 0.05)
@@ -1110,59 +1119,53 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (NextSpeed.SqrLength() > 0.0f)
 	{
-		cTracer Tracer(GetWorld());
-		// Distance traced is an integer, so we round up from the distance we should go (Speed * Delta), else we will encounter collision detection failurse
-		int DistanceToTrace = CeilC((NextSpeed * DtSec.count()).SqrLength()) * 2;
-		bool HasHit = Tracer.Trace(NextPos, NextSpeed, DistanceToTrace);
-
-		if (HasHit)
+		Vector3d HitCoords;
+		Vector3i HitBlockCoords;
+		eBlockFace HitBlockFace;
+		if (cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, NextPos + NextSpeed, HitCoords, HitBlockCoords, HitBlockFace))
 		{
-			// Oh noez! We hit something: verify that the (hit position - current) was smaller or equal to the (position that we should travel without obstacles - current)
-			// This is because previously, we traced with a length that was rounded up (due to integer limitations), and in the case that something was hit, we don't want to overshoot our projected movement
-			if ((Tracer.RealHit - NextPos).SqrLength() <= (NextSpeed * DtSec.count()).SqrLength())
+			// Set our position to where the block was hit, minus a bit:
+			// TODO: The real entity's m_Width should be taken into account here
+			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
+			if (HitBlockFace == BLOCK_FACE_YM)
 			{
-				// Block hit was within our projected path
-				// Begin by stopping movement in the direction that we hit something. The Normal is the line perpendicular to a 2D face and in this case, stores what block face was hit through either -1 or 1.
-				// For example: HitNormal.y = -1 : BLOCK_FACE_YM; HitNormal.y = 1 : BLOCK_FACE_YP
-				if (Tracer.HitNormal.x != 0.0f)
-				{
-					NextSpeed.x = 0.0f;
-				}
-				if (Tracer.HitNormal.y != 0.0f)
-				{
-					NextSpeed.y = 0.0f;
-				}
-				if (Tracer.HitNormal.z != 0.0f)
-				{
-					NextSpeed.z = 0.0f;
-				}
+				// We hit the ground, adjust the position to the top of the block:
+				m_bOnGround = true;
+				NextPos.y = HitBlockCoords.y + 1;
+			}
 
-				// Now, set our position to the hit block (i.e. move part way along our intended trajectory)
-				NextPos.Set(Tracer.RealHit.x, Tracer.RealHit.y, Tracer.RealHit.z);
-				NextPos.x += Tracer.HitNormal.x * 0.1;
-				NextPos.y += Tracer.HitNormal.y * 0.05;
-				NextPos.z += Tracer.HitNormal.z * 0.1;
-
-				if (Tracer.HitNormal.y == 1.0f)  // Hit BLOCK_FACE_YP, we are on the ground
+			// Avoid movement in the direction of the blockface that has been hit:
+			switch (HitBlockFace)
+			{
+				case BLOCK_FACE_XM:
+				case BLOCK_FACE_XP:
 				{
-					m_bOnGround = true;
-					NextPos.y = FloorC(NextPos.y);  // we clamp the height to 0 cos otherwise we'll constantly be slightly above the block
+					NextSpeed.x = 0;
+					break;
+				}
+				case BLOCK_FACE_YM:
+				case BLOCK_FACE_YP:
+				{
+					NextSpeed.y = 0;
+					break;
+				}
+				case BLOCK_FACE_ZM:
+				case BLOCK_FACE_ZP:
+				{
+					NextSpeed.z = 0;
+					break;
+				}
+				default:
+				{
+					break;
 				}
 			}
-			else
-			{
-				// We have hit a block but overshot our intended trajectory, move normally, safe in the warm cocoon of knowledge that we won't appear to teleport forwards on clients,
-				// and that this piece of software will come to be hailed as the epitome of performance and functionality in C++, never before seen, and of such a like that will never
-				// be henceforth seen again in the time of programmers and man alike
-				// </&sensationalist>
-				NextPos += (NextSpeed * DtSec.count());
-			}
 		}
-		else
-		{
-			// We didn't hit anything, so move =]
-			NextPos += (NextSpeed * DtSec.count());
-		}
+	}
+	else
+	{
+		// We didn't hit anything, so move =]
+		NextPos += (NextSpeed * DtSec.count());
 	}
 
 	SetPosition(NextPos);

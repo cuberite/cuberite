@@ -13,6 +13,12 @@
 
 
 
+#include "Defines.h"
+
+
+
+
+
 // fwd: World.h
 class cWorld;
 
@@ -34,7 +40,7 @@ public:
 		/** Called on each block encountered along the path, including the first block (path start)
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) = 0;
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) = 0;
 
 		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
 		When this callback returns true, the tracing is aborted.
