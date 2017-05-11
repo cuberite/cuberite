@@ -1838,6 +1838,44 @@ end
 
 
 
+function HandleConsoleHitTrace(a_Split)
+	local world = cRoot:Get():GetDefaultWorld()
+	local s = Vector3d(0, 70, 0)
+	local e = Vector3d(100, 75, 100)
+	if (tonumber(a_Split[2])) then
+		s.x = tonumber(a_Split[2])
+	end
+	if (tonumber(a_Split[3])) then
+		s.y = tonumber(a_Split[3])
+	end
+	if (tonumber(a_Split[4])) then
+		s.z = tonumber(a_Split[4])
+	end
+	if (tonumber(a_Split[5])) then
+		e.x = tonumber(a_Split[5])
+	end
+	if (tonumber(a_Split[6])) then
+		e.y = tonumber(a_Split[6])
+	end
+	if (tonumber(a_Split[7])) then
+		e.z = tonumber(a_Split[7])
+	end
+	local res, hitCoords, hitBlockCoords, hitBlockFace = cLineBlockTracer:FirstSolidHitTrace(world, s, e)
+	if (res) then
+		return true, string.format("The line hits block {%d, %d, %d} at point {%f, %f, %f}, face %s",
+			hitBlockCoords.x, hitBlockCoords.y, hitBlockCoords.z,
+			hitCoords.x, hitCoords.y, hitCoords.z,
+			BlockFaceToString(hitBlockFace)
+		)
+	else
+		return true, "The two points specified don't have a solid block between them."
+	end
+end
+
+
+
+
+
 --- Monitors the state of the "inh" entity-spawning hook
 -- if false, the hook is installed before the "inh" command processing
 local isInhHookInstalled = false
@@ -1948,6 +1986,40 @@ function HandleConsoleLoadChunk(a_Split)
 		end
 	)
 	return true
+end
+
+
+
+
+
+function HandleConsoleLosTrace(a_Split)
+	local world = cRoot:Get():GetDefaultWorld()
+	local s = Vector3d(0, 70, 0)
+	local e = Vector3d(100, 75, 100)
+	if (tonumber(a_Split[2])) then
+		s.x = tonumber(a_Split[2])
+	end
+	if (tonumber(a_Split[3])) then
+		s.y = tonumber(a_Split[3])
+	end
+	if (tonumber(a_Split[4])) then
+		s.z = tonumber(a_Split[4])
+	end
+	if (tonumber(a_Split[5])) then
+		e.x = tonumber(a_Split[5])
+	end
+	if (tonumber(a_Split[6])) then
+		e.y = tonumber(a_Split[6])
+	end
+	if (tonumber(a_Split[7])) then
+		e.z = tonumber(a_Split[7])
+	end
+	local res = cLineBlockTracer:LineOfSightTrace(world, s, e, cLineBlockTracer.losAir)
+	if (res) then
+		return true, "The two points can see each other."
+	else
+		return true, "The two points cannot see each other"
+	end
 end
 
 

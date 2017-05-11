@@ -2605,7 +2605,7 @@ public:
 	{
 	}
 
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
 		if (!m_Callbacks->CallTableFn(
@@ -2678,6 +2678,202 @@ public:
 protected:
 	cLuaState::cTableRefPtr m_Callbacks;
 } ;
+
+
+
+
+
+static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
+{
+	/* Supported function signatures:
+	cLineBlockTracer:FirstSolidHitTrace(World, StartX, StartY, StartZ, EndX, EndY, EndZ) -> bool, [Vector3d, Vector3i, eBlockFace]  // Canonical
+	cLineBlockTracer:FirstSolidHitTrace(World, Start, End) -> bool, [Vector3d, Vector3i, eBlockFace]                                // Canonical
+	cLineBlockTracer.FirstSolidHitTrace(World, StartX, StartY, StartZ, EndX, EndY, EndZ) -> bool, [Vector3d, Vector3i, eBlockFace]
+	cLineBlockTracer.FirstSolidHitTrace(World, Start, End) -> bool, [Vector3d, Vector3i, eBlockFace]
+	*/
+
+	// If the first param is the cLineBlockTracer class, shift param index by one:
+	int idx = 1;
+	tolua_Error err;
+	if (tolua_isusertable(tolua_S, 1, "cLineBlockTracer", 0, &err))
+	{
+		idx = 2;
+	}
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(idx, "cWorld")
+	)
+	{
+		return 0;
+	}
+
+	if (L.IsParamNumber(idx + 1))
+	{
+		// This is the number variant of the call:
+		if (
+			!L.CheckParamNumber(idx + 1, idx + 6) ||
+			!L.CheckParamEnd(idx + 7)
+		)
+		{
+			return 0;
+		}
+		// Get the params:
+		cWorld * world;
+		double startX, startY, startZ;
+		double endX, endY, endZ;
+		if (!L.GetStackValues(idx, world, startX, startY, startZ, endX, endY, endZ))
+		{
+			LOGWARNING("cLineBlockTracer:FirstSolidHitTrace(): Cannot read parameters, aborting the trace.");
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		Vector3d hitCoords;
+		Vector3i hitBlockCoords;
+		eBlockFace hitBlockFace;
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, Vector3d(startX, startY, startZ), Vector3d(endX, endY, endZ), hitCoords, hitBlockCoords, hitBlockFace);
+		L.Push(isHit);
+		if (!isHit)
+		{
+			return 1;
+		}
+		L.Push(hitCoords);
+		L.Push(hitBlockCoords);
+		L.Push(hitBlockFace);
+		return 4;
+	}
+
+	if (L.IsParamUserType(idx + 1, "Vector3<double>"))
+	{
+		// This is the Vector3d-based variant of the call:
+		if (
+			!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+			!L.CheckParamEnd(idx + 3)
+		)
+		{
+			return 0;
+		}
+		// Get the params:
+		cWorld * world;
+		Vector3d * start;
+		Vector3d * end;
+		if (!L.GetStackValues(idx, world, start, end))
+		{
+			LOGWARNING("cLineBlockTracer:FirstSolidHitTrace(): Cannot read parameters, aborting the trace.");
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		Vector3d hitCoords;
+		Vector3i hitBlockCoords;
+		eBlockFace hitBlockFace;
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, start, end, hitCoords, hitBlockCoords, hitBlockFace);
+		L.Push(isHit);
+		if (!isHit)
+		{
+			return 1;
+		}
+		L.Push(hitCoords);
+		L.Push(hitBlockCoords);
+		L.Push(hitBlockFace);
+		return 4;
+	}
+
+	tolua_error(L, "cLineBlockTracer:FirstSolidHitTrace(): Invalid parameters, expected either a set of coords, or two Vector3d's", nullptr);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
+{
+	/* Supported function signatures:
+	cLineBlockTracer:LineOfSightTrace(World, StartX, StartY, StartZ, EndX, EndY, EndZ, Sight) -> bool  // Canonical
+	cLineBlockTracer:LineOfSightTrace(World, Start, End, Sight) -> bool                                // Canonical
+	cLineBlockTracer.LineOfSightTrace(World, StartX, StartY, StartZ, EndX, EndY, EndZ, Sight) -> bool
+	cLineBlockTracer.LineOfSightTrace(World, Start, End, Sight) -> bool
+	*/
+
+	// If the first param is the cLineBlockTracer class, shift param index by one:
+	int idx = 1;
+	tolua_Error err;
+	if (tolua_isusertable(tolua_S, 1, "cLineBlockTracer", 0, &err))
+	{
+		idx = 2;
+	}
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(idx, "cWorld")
+	)
+	{
+		return 0;
+	}
+
+	if (L.IsParamNumber(idx + 1))
+	{
+		// This is the number variant of the call:
+		if (
+			!L.CheckParamNumber(idx + 1, idx + 6) ||
+			// Optional param lineOfSight is not checked
+			!L.CheckParamEnd(idx + 8)
+		)
+		{
+			return 0;
+		}
+		// Get the params:
+		cWorld * world;
+		double startX, startY, startZ;
+		double endX, endY, endZ;
+		if (!L.GetStackValues(idx, world, startX, startY, startZ, endX, endY, endZ))
+		{
+			LOGWARNING("cLineBlockTracer:LineOfSightTrace(): Cannot read parameters, aborting the trace.");
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		int lineOfSight = cLineBlockTracer::losAir | cLineBlockTracer::losWater;
+		L.GetStackValue(idx + 7, lineOfSight);
+		L.Push(cLineBlockTracer::LineOfSightTrace(*world, Vector3d(startX, startY, startZ), Vector3d(endX, endY, endZ), lineOfSight));
+		return 1;
+	}
+
+	if (L.IsParamUserType(idx + 1, "Vector3<double>"))
+	{
+		// This is the Vector3d-based variant of the call:
+		if (
+			!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+			// Optional param lineOfSight is not checked
+			!L.CheckParamEnd(idx + 4)
+		)
+		{
+			return 0;
+		}
+		// Get the params:
+		cWorld * world;
+		Vector3d * start;
+		Vector3d * end;
+		if (!L.GetStackValues(idx, world, start, end))
+		{
+			LOGWARNING("cLineBlockTracer:LineOfSightTrace(): Cannot read parameters, aborting the trace.");
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		int lineOfSight = cLineBlockTracer::losAirWater;
+		L.GetStackValue(idx + 7, lineOfSight);
+		L.Push(cLineBlockTracer::LineOfSightTrace(*world, start, end, lineOfSight));
+		return 1;
+	}
+
+	tolua_error(L, "cLineBlockTracer:LineOfSightTrace(): Invalid parameters, expected either a set of coords, or two Vector3d's", nullptr);
+	return 0;
+}
 
 
 
@@ -3917,7 +4113,13 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cLineBlockTracer");
-			tolua_function(tolua_S, "Trace", tolua_cLineBlockTracer_Trace);
+			tolua_function(tolua_S, "FirstSolidHitTrace", tolua_cLineBlockTracer_FirstSolidHitTrace);
+			tolua_function(tolua_S, "LineOfSightTrace",   tolua_cLineBlockTracer_LineOfSightTrace);
+			tolua_function(tolua_S, "Trace",              tolua_cLineBlockTracer_Trace);
+
+			tolua_constant(tolua_S, "losAir",   cLineBlockTracer::losAir);
+			tolua_constant(tolua_S, "losWater", cLineBlockTracer::losWater);
+			tolua_constant(tolua_S, "losLava",  cLineBlockTracer::losLava);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cLuaWindow");

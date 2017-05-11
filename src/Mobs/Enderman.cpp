@@ -3,7 +3,7 @@
 
 #include "Enderman.h"
 #include "../Entities/Player.h"
-#include "../Tracer.h"
+#include "../LineBlockTracer.h"
 
 
 
@@ -29,9 +29,8 @@ public:
 			return false;
 		}
 
-		Vector3d Direction = m_EndermanPos - a_Player->GetPosition();
-
-		// Don't check players who are more then SightDistance (64) blocks away
+		// Don't check players who are more than SightDistance (64) blocks away
+		auto Direction = m_EndermanPos - a_Player->GetPosition();
 		if (Direction.Length() > m_SightDistance)
 		{
 			return false;
@@ -43,19 +42,16 @@ public:
 			return false;
 		}
 
-
-		Vector3d LookVector = a_Player->GetLookVector();
-		double dot = Direction.Dot(LookVector);
-
-		// 0.09 rad ~ 5 degrees
 		// If the player's crosshair is within 5 degrees of the enderman, it counts as looking
-		if (dot <= cos(0.09))
+		auto LookVector = a_Player->GetLookVector();
+		auto dot = Direction.Dot(LookVector);
+		if (dot <= cos(0.09))  // 0.09 rad ~ 5 degrees
 		{
 			return false;
 		}
 
-		cTracer LineOfSight(a_Player->GetWorld());
-		if (LineOfSight.Trace(m_EndermanPos, Direction, static_cast<int>(Direction.Length())))
+		// TODO: Check if endermen are angered through water in Vanilla
+		if (!cLineBlockTracer::LineOfSightTrace(*a_Player->GetWorld(), m_EndermanPos, a_Player->GetPosition(), cLineBlockTracer::losAirWater))
 		{
 			// No direct line of sight
 			return false;

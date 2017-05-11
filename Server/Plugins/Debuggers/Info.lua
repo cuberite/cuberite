@@ -290,6 +290,12 @@ g_PluginInfo =
 			HelpString = "Tests the crypto hashing functions",
 		},
 
+		["hittrace"] =
+		{
+			Handler = HandleConsoleHitTrace,
+			HelpString = "Tests the FirstSolidHit trace",
+		},
+
 		["inh"] =
 		{
 			Handler = HandleConsoleInh,
@@ -300,6 +306,12 @@ g_PluginInfo =
 		{
 			Handler = HandleConsoleLoadChunk,
 			HelpString = "Loads the specified chunk into memory",
+		},
+
+		["lostrace"] =
+		{
+			Handler = HandleConsoleLosTrace,
+			HelpString = "Tests a LineOfSight trace",
 		},
 
 		["pluginstats"] =
