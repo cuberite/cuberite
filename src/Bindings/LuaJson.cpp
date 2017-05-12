@@ -177,11 +177,11 @@ static Json::Value JsonSerializeTable(cLuaState & a_LuaState)
 {
 	Json::Value res;
 	lua_pushnil(a_LuaState);
+	int idx = 0;
 	while (lua_next(a_LuaState, -2) != 0)
 	{
 		if (lua_type(a_LuaState, -2) == LUA_TNUMBER)
 		{
-			int idx;
 			a_LuaState.GetStackValue(-2, idx);
 			try
 			{
