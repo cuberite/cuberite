@@ -169,7 +169,7 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 {
 	auto timer = evtimer_new(a_Self->m_EventBase, SignalizeStartup, a_Self);
-	timeval timeout{0};  // Zero timeout - execute immediately
+	timeval timeout{0,0};  // Zero timeout - execute immediately
 	evtimer_add(timer, &timeout);
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
 }
