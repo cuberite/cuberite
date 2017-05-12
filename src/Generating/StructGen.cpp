@@ -272,9 +272,9 @@ int cStructGenTrees::GetNumTrees(
 			case biDesert:
 			case biDesertM:
 			case biRiver:
-			case biHell:
+//			case biHell:
 			case biNether:
-			case biSky:
+//			case biSky:
 			case biEnd:
 			case biFrozenOcean:
 			case biFrozenRiver:
