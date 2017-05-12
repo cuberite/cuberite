@@ -72,7 +72,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			for (HEIGHTTYPE y = cChunkDef::Height - 1; y >= 0; y--)
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
 			{
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
 				{
@@ -216,11 +216,10 @@ int cStructGenTrees::GetNumTrees(
 	int NumTrees = 0;
 	for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		int Add = 0;
+		int Add;
 		switch (cChunkDef::GetBiome(a_Biomes, x, z))
-		{
+		{ // enumerate all values for when new biomes are added but forgotten here:
 			case biOcean:                Add =   2; break;
-			case biDesert:               Add =   0; break;
 			case biPlains:               Add =   1; break;
 			case biExtremeHills:         Add =   3; break;
 			case biForest:               Add =  30; break;
@@ -250,7 +249,6 @@ int cStructGenTrees::GetNumTrees(
 			case biMesaPlateauF:         Add =   8; break;
 			case biMesaPlateau:          Add =   8; break;
 			case biSunflowerPlains:      Add =   1; break;
-			case biDesertM:              Add =   0; break;
 			case biExtremeHillsM:        Add =   4; break;
 			case biFlowerForest:         Add =  30; break;
 			case biTaigaM:               Add =  30; break;
@@ -270,6 +268,27 @@ int cStructGenTrees::GetNumTrees(
 			case biMesaBryce:            Add =   4; break;
 			case biMesaPlateauFM:        Add =  12; break;
 			case biMesaPlateauM:         Add =  12; break;
+			// No trees here:
+			case biDesert:
+			case biDesertM:
+			case biRiver:
+			case biHell:
+			case biNether:
+			case biSky:
+			case biEnd:
+			case biFrozenOcean:
+			case biFrozenRiver:
+			case biBeach:
+			case biDesertHills:
+			case biDeepOcean:
+			case biStoneBeach:
+			case biColdBeach:
+			// values in the enumeration but not expected:
+			case biInvalidBiome:
+			case biNumBiomes:
+			case biVariant:
+			case biNumVariantBiomes:
+			                             Add =   0; break;
 		}
 		NumTrees += Add;
 	}

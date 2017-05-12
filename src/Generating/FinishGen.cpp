@@ -587,9 +587,11 @@ bool cFinishGenVines::IsJungleVariant(EMCSBiome a_Biome)
 		{
 			return true;
 		}
+    default:
+		{
+			return false;
+		}
 	}
-
-	return false;
 }
 
 
