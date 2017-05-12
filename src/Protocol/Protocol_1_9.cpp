@@ -3353,6 +3353,19 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 				case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
 				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
 				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
+				// enumerate unsupported types
+				case cEntityEffect::effNoEffect:
+				case cEntityEffect::effHaste:
+				case cEntityEffect::effMiningFatigue:
+				case cEntityEffect::effNausea:
+				case cEntityEffect::effResistance:
+				case cEntityEffect::effBlindness:
+				case cEntityEffect::effHunger:
+				case cEntityEffect::effWither:
+				case cEntityEffect::effHealthBoost:
+				case cEntityEffect::effAbsorption:
+				case cEntityEffect::effSaturation:
+					break;
 			}
 			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
 			{
@@ -4048,6 +4061,21 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		// No special data for the following
+		case mtCaveSpider:
+		case mtSpider:
+		case mtBlaze:
+		case mtEnderDragon: // ought to have tag_int: DragonPhase: A number indicating the dragon's current state. Valid values are: 0=circling, 1=strafing (preparing to shoot a fireball), 2=flying to the portal to land (part of transition to landed state), 3=landing on the portal (part of transition to landed state), 4=taking off from the portal (part of transition out of landed state), 5=landed, performing breath attack, 6=landed, looking for a player for breath attack, 7=landed, roar before beginning breath attack, 8=charging player, 9=flying to portal to die, 10=hovering with no AI (default when using the /summon command).
+		case mtGiant:
+		case mtGuardian:
+		case mtIronGolem: // ought to have a tag_byte: PlayerCreated: 1 or 0 (true/false) - true if this golem was created by a player. If true, the golem will never attack the player.
+		case mtMooshroom:	// Really, no attempt to treat like a cow?
+		case mtSilverfish:
+		case mtSnowGolem:	// ought to have a tag_byte:  Pumpkin : 1 or 0 (true/false) - whether it has a pumpkin on its head or not.
+		case mtSquid:
+		case mtInvalidType:	// surpress compiler warning
+			break;
 	}  // switch (a_Mob.GetType())
 }
 
