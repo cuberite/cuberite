@@ -95,7 +95,7 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 	}
 
 	// Read the params:
-	UInt16 port;
+	int port;
 	cLuaState::cTableRefPtr callbacks;
 	if (!S.GetStackValues(2, port, callbacks))
 	{
