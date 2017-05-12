@@ -835,12 +835,15 @@ void cCubicNoise::CalcFloorFrac(
 
 	NOISE_DATATYPE val = a_Start;
 	NOISE_DATATYPE dif = (a_End - a_Start) / (a_Size - 1);
-	for (int i = 0; i < a_Size; i++)
+	int i = 0;
+	do
 	{
 		a_Floor[i] = FAST_FLOOR(val);
 		a_Frac[i] = val - a_Floor[i];
 		val += dif;
+		i++;
 	}
+	while (i < a_Size);
 
 	// Mark up the same floor values into a_Same / a_NumSame:
 	int CurFloor = a_Floor[0];
