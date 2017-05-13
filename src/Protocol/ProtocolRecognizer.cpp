@@ -1157,7 +1157,7 @@ void cProtocolRecognizer::SendPingStatusResponse(void)
 	// Version:
 	Json::Value Version;
 	Version["name"] = "Cuberite " MCS_CLIENT_VERSIONS;
-	Version["protocol"] = 0;  // Force client to think this is an invalid version (no other good default)
+	Version["protocol"] = MCS_LATEST_PROTOCOL_VERSION;
 
 	// Players:
 	Json::Value Players;
@@ -1179,7 +1179,7 @@ void cProtocolRecognizer::SendPingStatusResponse(void)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet

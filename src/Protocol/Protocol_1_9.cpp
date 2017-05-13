@@ -2162,7 +2162,7 @@ void cProtocol_1_9_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet
@@ -4156,7 +4156,7 @@ void cProtocol_1_9_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet
@@ -4213,7 +4213,7 @@ void cProtocol_1_9_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet
@@ -4270,7 +4270,7 @@ void cProtocol_1_9_4::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet
