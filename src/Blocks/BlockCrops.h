@@ -29,7 +29,7 @@ public:
 		cFastRandom rand;
 
 		// If not fully grown, drop the "seed" of whatever is growing:
-		if (a_Meta < (RipeMeta - 1))
+		if (a_Meta < RipeMeta)
 		{
 			switch (m_BlockType)
 			{
@@ -97,7 +97,7 @@ public:
 
 		// If there is still room to grow and the plant can grow, then grow.
 		// Otherwise if the plant needs to die, then dig it up
-		if ((Meta < (RipeMeta - 1)) && (Action == paGrowth))
+		if ((Meta < RipeMeta) && (Action == paGrowth))
 		{
 			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, ++Meta);
 		}

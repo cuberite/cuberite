@@ -6004,6 +6004,10 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 			},
 			Constants =
 			{
+				INVALID_ID =
+				{
+					Notes = "Special value of an entity ID, indicating a failure. Used primarily in functions that create entities when the entity cannot be created.",
+				},
 				etBoat =
 				{
 					Notes = "The entity is a {{cBoat}}",
@@ -10922,12 +10926,95 @@ a_Player:OpenWindow(Window);
 			},
 			Inherits = "cEntity",
 		},
+		cExpOrb =
+		{
+			Desc = [[
+				This class represents an experience orb. This entity can be spawned by using {{cWorld#SpawnExperienceOrb_1|cWorld:SpawnExperienceOrb}}.
+				It's also spawned when a monster is killed or a player is mining coal. The default lifetime of an experience orb is 5 mins.
+			]],
+			Functions =
+			{
+				GetAge =
+				{
+					Returns =
+					{
+						{
+							Type = "number"
+						},
+					},
+					Notes = "Returns the number of ticks that this experience orb has existed.",
+				},
+				SetAge =
+				{
+					Params =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Sets the experience orb's age, in ticks.",
+				},
+				GetReward =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the experience amount.",
+				},
+				SetReward =
+				{
+					Params =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Sets the experience amount.",
+				},
+			},
+			Inherits = "cEntity",
+		},
+		cFallingBlock =
+		{
+			Desc = [[
+				This class represents a falling block. This entity can be spawned by using {{cWorld#SpawnFallingBlock_1|cWorld:SpawnFallingBlock}}.
+			]],
+			Functions =
+			{
+				GetBlockType =
+				{
+					Returns =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						}
+					},
+					Notes = "Returns the block type of the falling block.",
+				},
+				GetBlockMeta =
+				{
+					Returns =
+					{
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						}
+					},
+					Notes = "Returns the block meta of the falling block.",
+				},
+			},
+			Inherits = "cEntity",
+		},
 		cPickup =
 		{
 			Desc = [[
 				This class represents a pickup entity (an item that the player or mobs can pick up). It is also
 				commonly known as "drops". With this class you could create your own "drop" or modify those
-				created automatically.
+				created automatically. The default lifetime of a pickup is 5 mins.
 			]],
 			Functions =
 			{

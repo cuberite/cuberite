@@ -298,7 +298,7 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 	f:write(LinkifyString(a_Hook.Desc, HookName));
 	f:write("</p>\n<hr /><h1>Callback function</h1>\n<p>The default name for the callback function is ");
 	f:write(a_Hook.DefaultFnName, ". It has the following signature:\n");
-	f:write("<pre class=\"prettyprint lang-lua\">function ", HookName, "(");
+	f:write("<pre class=\"prettyprint lang-lua\">function My", HookName, "(");
 	if (a_Hook.Params == nil) then
 		a_Hook.Params = {};
 	end

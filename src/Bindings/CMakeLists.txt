@@ -94,8 +94,10 @@ set(BINDING_DEPENDENCIES
 	../Enchantments.h
 	../Entities/ArrowEntity.h
 	../Entities/Entity.h
+	../Entities/ExpOrb.h
 	../Entities/EntityEffect.h
 	../Entities/ExpBottleEntity.h
+	../Entities/FallingBlock.h
 	../Entities/FireChargeEntity.h
 	../Entities/FireworkEntity.h
 	../Entities/Floater.h

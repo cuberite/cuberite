@@ -25,17 +25,21 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
+	// tolua_begin
+
 	/** Returns the number of ticks that this entity has existed */
-	int GetAge(void) const { return std::chrono::duration_cast<cTickTime>(m_Timer).count(); }     // tolua_export
+	int GetAge(void) const { return std::chrono::duration_cast<cTickTime>(m_Timer).count(); }
 
 	/** Set the number of ticks that this entity has existed */
-	void SetAge(int a_Age) { m_Timer = cTickTime(a_Age); }  // tolua_export
+	void SetAge(int a_Age) { m_Timer = cTickTime(a_Age); }
 
 	/** Get the exp amount */
-	int GetReward(void) const { return m_Reward; }  // tolua_export
+	int GetReward(void) const { return m_Reward; }
 
 	/** Set the exp amount */
-	void SetReward(int a_Reward) { m_Reward = a_Reward; }  // tolua_export
+	void SetReward(int a_Reward) { m_Reward = a_Reward; }
+
+	// tolua_end
 
 protected:
 	int m_Reward;
