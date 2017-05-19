@@ -2958,8 +2958,6 @@ void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_Block
 
 void cChunk::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client)
 {
-	bool t = IsOneOf<>(1);
-	ASSERT(t);
 	cBlockEntity * Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
 	if (Entity == nullptr)
 	{
