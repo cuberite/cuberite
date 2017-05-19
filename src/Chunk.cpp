@@ -1684,6 +1684,7 @@ void cChunk::AddBlockEntityClean(cBlockEntity * a_BlockEntity)
 {
 	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
 	auto Result = m_BlockEntities.insert({ Idx, a_BlockEntity });
+	UNUSED(Result);
 	ASSERT(Result.second);  // No block entity already at this position
 }
 
@@ -2074,18 +2075,28 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callbac
 
 
 // Helper function - there's probably a better place for this
-template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
+
+template <BLOCKTYPE, BLOCKTYPE...> bool IsOneOfImpl(BLOCKTYPE, std::false_type);
+template <class> bool IsOneOfImpl(BLOCKTYPE, std::true_type);
+
+template <BLOCKTYPE ... Types>
 bool IsOneOf(BLOCKTYPE x)
 {
-	return ((x == Head) || (IsOneOf<Tail...>(x)));
+	return IsOneOfImpl<Types ...>(x,
+		std::integral_constant<bool, sizeof...(Types) == 0>()
+	);
 }
 
-// Base case
-template <BLOCKTYPE ... tNil>
-typename std::enable_if<sizeof...(tNil) == 0, bool>::type
-	IsOneOf(BLOCKTYPE x)
+template <class = void>
+bool IsOneOfImpl(BLOCKTYPE x, std::true_type)
 {
 	return false;
+}
+
+template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
+bool IsOneOfImpl(BLOCKTYPE x, std::false_type)
+{
+	return ((x == Head) || (IsOneOf<Tail...>(x)));
 }
 
 
