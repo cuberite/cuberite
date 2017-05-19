@@ -125,22 +125,22 @@ cChunk::~cChunk()
 
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		delete *itr;
+		delete KeyPair.second;
 	}
 	m_BlockEntities.clear();
 
 	// Remove and destroy all entities that are not players:
 	cEntityList Entities;
 	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
-	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
+	for (auto Entity : Entities)
 	{
-		if (!(*itr)->IsPlayer())
+		if (!Entity->IsPlayer())
 		{
 			// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
-			(*itr)->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
-			delete *itr;
+			Entity->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
+			delete Entity;
 		}
 	}
 
@@ -298,14 +298,14 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 	a_Callback.ChunkData(m_ChunkData);
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (auto Entity : m_Entities)
 	{
-		a_Callback.Entity(*itr);
+		a_Callback.Entity(Entity);
 	}
 
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		a_Callback.BlockEntity(*itr);
+		a_Callback.BlockEntity(KeyPair.second);
 	}
 }
 
@@ -335,27 +335,32 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		delete *itr;
+		delete KeyPair.second;
 	}
 	m_BlockEntities.clear();
-	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
+	for (cBlockEntity * Block : a_SetChunkData.GetBlockEntities())
+	{
+		AddBlockEntityClean(Block);
+	}
+	a_SetChunkData.GetBlockEntities().clear();
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG
-		for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+		for (auto & KeyPair : m_BlockEntities)
 		{
-			BLOCKTYPE EntityBlockType = (*itr)->GetBlockType();
-			BLOCKTYPE WorldBlockType = GetBlock((*itr)->GetRelX(), (*itr)->GetPosY(), (*itr)->GetRelZ());
+			cBlockEntity * Block = KeyPair.second;
+			BLOCKTYPE EntityBlockType = Block->GetBlockType();
+			BLOCKTYPE WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
 			ASSERT(WorldBlockType == EntityBlockType);
-		}  // for itr - m_BlockEntities
+		}  // for KeyPair - m_BlockEntities
 	#endif  // _DEBUG
 
 	// Set all block entities' World variable:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		(*itr)->SetWorld(m_World);
+		KeyPair.second->SetWorld(m_World);
 	}
 
 	// Create block entities that the loader didn't load; fill them with defaults
@@ -457,18 +462,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
-	{
-		if (
-			((*itr)->GetPosX() == a_BlockX) &&
-			((*itr)->GetPosY() == a_BlockY) &&
-			((*itr)->GetPosZ() == a_BlockZ)
-		)
-		{
-			return true;
-		}
-	}  // for itr - m_BlockEntities[]
-	return false;
+	return GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ) != nullptr;
 }
 
 
@@ -638,9 +632,9 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	TickBlocks();
 
 	// Tick all block entities in this chunk:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
+		m_IsDirty = KeyPair.second->Tick(a_Dt, *this) | m_IsDirty;
 	}
 
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
@@ -1382,7 +1376,7 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back(cBlockEntity::CreateByBlockType(
+							AddBlockEntityClean(cBlockEntity::CreateByBlockType(
 								BlockType, GetMeta(x, y, z),
 								x + m_PosX * Width, y, z + m_PosZ * Width, m_World
 							));
@@ -1513,7 +1507,8 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_MOB_SPAWNER:
 		case E_BLOCK_BREWING_STAND:
 		{
-			AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			// Fast set block has already marked dirty
+			AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 	}  // switch (a_BlockType)
@@ -1663,13 +1658,11 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
 
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
+	cBlockEntity * Block = GetBlockEntity(wp.x, wp.y, wp.z);
+	if (Block != nullptr)
 	{
-		if (((*itr)->GetPosX() == wp.x) && ((*itr)->GetPosY() == wp.y) && ((*itr)->GetPosZ() == wp.z))
-		{
-			(*itr)->SendTo(*a_Client);
-		}
-	}  // for itr - m_BlockEntities
+		Block->SendTo(*a_Client);
+	}
 }
 
 
@@ -1679,7 +1672,18 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 void cChunk::AddBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
-	m_BlockEntities.push_back(a_BlockEntity);
+	AddBlockEntityClean(a_BlockEntity);
+}
+
+
+
+
+
+void cChunk::AddBlockEntityClean(cBlockEntity * a_BlockEntity)
+{
+	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
+	auto Result = m_BlockEntities.insert({ Idx, a_BlockEntity });
+	ASSERT(Result.second);  // No block entity already at this position
 }
 
 
@@ -1694,19 +1698,11 @@ cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ASSERT(a_BlockZ >= m_PosZ * cChunkDef::Width);
 	ASSERT(a_BlockZ < m_PosZ * cChunkDef::Width + cChunkDef::Width);
 
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
-	{
-		if (
-			((*itr)->GetPosX() == a_BlockX) &&
-			((*itr)->GetPosY() == a_BlockY) &&
-			((*itr)->GetPosZ() == a_BlockZ)
-		)
-		{
-			return *itr;
-		}
-	}  // for itr - m_BlockEntities[]
+	int RelX = a_BlockX - m_PosX * cChunkDef::Width;
+	int RelZ = a_BlockZ - m_PosZ * cChunkDef::Width;
 
-	return nullptr;
+	auto itr = m_BlockEntities.find(MakeIndex(RelX, a_BlockY, RelZ));
+	return itr == m_BlockEntities.end() ? nullptr : itr->second;
 }
 
 
@@ -1837,25 +1833,23 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	// Also sends update packets to all clients in the chunk
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	auto Entity = GetBlockEntity(a_PosX, a_PosY, a_PosZ);
+	if (Entity == nullptr)
 	{
-		if (
-			((*itr)->GetPosX() == a_PosX) &&
-			((*itr)->GetPosY() == a_PosY) &&
-			((*itr)->GetPosZ() == a_PosZ) &&
-			(
-				((*itr)->GetBlockType() == E_BLOCK_WALLSIGN) ||
-				((*itr)->GetBlockType() == E_BLOCK_SIGN_POST)
-			)
-		)
-		{
-			MarkDirty();
-			reinterpret_cast<cSignEntity *>(*itr)->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
-			m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
-			return true;
-		}
-	}  // for itr - m_BlockEntities[]
-	return false;
+		return false;  // Not a block entity
+	}
+	if ((Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
+		(Entity->GetBlockType() != E_BLOCK_SIGN_POST)
+	)
+	{
+		return false;  // Not a sign
+	}
+
+	MarkDirty();
+	auto Sign = static_cast<cSignEntity *>(Entity);
+	Sign->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
+	m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
+	return true;
 }
 
 
@@ -1865,7 +1859,9 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
-	m_BlockEntities.remove(a_BlockEntity);
+	ASSERT(a_BlockEntity != nullptr);
+	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
+	m_BlockEntities.erase(Idx);
 }
 
 
@@ -2618,31 +2614,24 @@ bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlower
 bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	auto Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (Entity == nullptr)
 	{
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		switch ((*itr)->GetBlockType())
-		{
-			case E_BLOCK_WALLSIGN:
-			case E_BLOCK_SIGN_POST:
-			{
-				a_Line1 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(0);
-				a_Line2 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(1);
-				a_Line3 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(2);
-				a_Line4 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(3);
-				return true;
-			}
-		}  // switch (BlockType)
+		return false;  // Not a block entity
+	}
+	if ((Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
+		(Entity->GetBlockType() != E_BLOCK_SIGN_POST)
+		)
+	{
+		return false;  // Not a sign
+	}
 
-		// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-		return false;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	auto Sign = static_cast<cSignEntity *>(Entity);
+	a_Line1 = Sign->GetLine(0);
+	a_Line2 = Sign->GetLine(1);
+	a_Line3 = Sign->GetLine(2);
+	a_Line4 = Sign->GetLine(3);
+	return true;
 }
 
 
