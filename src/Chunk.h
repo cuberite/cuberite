@@ -303,6 +303,12 @@ public:
 	/** Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true */
 	bool ForEachFurnace(cFurnaceCallback & a_Callback);  // Lua-accessible
 
+	/** Calls the callback for the tyEntity at the specified coords; returns false if there's no such block entity at those coords, true if found
+	tBlocktype is a list of the blocktypes to be called. If no BLOCKTYPE template arguments are given the callback is called for any block entity
+	Accessible only from within Chunk.cpp */
+	template <class tyEntity, BLOCKTYPE... tBlocktype>
+	bool GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cItemCallback<tyEntity>& a_Callback);
+
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
 

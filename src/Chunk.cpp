@@ -2193,26 +2193,31 @@ bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 
 
 
-bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback)
+template <class tyEntity, BLOCKTYPE... tBlocktype>
+bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cItemCallback<tyEntity>& a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	cBlockEntity * Block = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (Block == nullptr)
 	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
+		return false;  // No block entity here
+	}
+	if ((sizeof...(tBlocktype) != 0) &&  // Let empty list mean all block entities
+		(!IsOneOf<tBlocktype...>(Block->GetBlockType()))
+	)
+	{
+		return false;  // Not any of the given tBlocktypes
+	}
+	return !a_Callback.Item(static_cast<tyEntity *>(Block));
+}
 
-		if (a_Callback.Item(*itr))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
 
-	// Not found:
-	return false;
+
+
+
+bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback)
+{
+	return GenericDoWithBlockEntityAt<cBlockEntity>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2220,30 +2225,9 @@ bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_BEACON)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cBeaconEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cBeaconEntity,
+		E_BLOCK_BEACON
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2252,30 +2236,9 @@ bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 
 bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_BREWING_STAND)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cBrewingstandEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cBrewingstandEntity,
+		E_BLOCK_BREWING_STAND
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2284,30 +2247,10 @@ bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBre
 
 bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST))  // Trapped chests use normal chests' handlers
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cChestEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cChestEntity,
+		E_BLOCK_CHEST,
+		E_BLOCK_TRAPPED_CHEST
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2316,30 +2259,9 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 
 bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_DISPENSER)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cDispenserEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cDispenserEntity,
+		E_BLOCK_DISPENSER
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2348,30 +2270,9 @@ bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispen
 
 bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_DROPPER)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cDropperEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cDropperEntity,
+		E_BLOCK_DROPPER
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2380,30 +2281,10 @@ bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperC
 
 bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if (((*itr)->GetBlockType() != E_BLOCK_DISPENSER) && ((*itr)->GetBlockType() != E_BLOCK_DROPPER))
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cDropSpenserEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cDropSpenserEntity,
+		E_BLOCK_DISPENSER,
+		E_BLOCK_DROPPER
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2412,38 +2293,10 @@ bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDrop
 
 bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		switch ((*itr)->GetBlockType())
-		{
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_LIT_FURNACE:
-			{
-				break;
-			}
-			default:
-			{
-				// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-				return false;
-			}
-		}  // switch (BlockType)
-
-		// The correct block entity is here,
-		if (a_Callback.Item(reinterpret_cast<cFurnaceEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cFurnaceEntity,
+		E_BLOCK_FURNACE,
+		E_BLOCK_LIT_FURNACE
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2452,30 +2305,9 @@ bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 
 bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_NOTE_BLOCK)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cNoteEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cNoteEntity,
+		E_BLOCK_NOTE_BLOCK
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2484,30 +2316,9 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 
 bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_COMMAND_BLOCK)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here,
-		if (a_Callback.Item(reinterpret_cast<cCommandBlockEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cCommandBlockEntity,
+		E_BLOCK_COMMAND_BLOCK
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2516,30 +2327,9 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_HEAD)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here,
-		if (a_Callback.Item(reinterpret_cast<cMobHeadEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cMobHeadEntity,
+		E_BLOCK_HEAD
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2548,30 +2338,9 @@ bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 
 bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_FLOWER_POT)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cFlowerPotEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cFlowerPotEntity,
+		E_BLOCK_FLOWER_POT
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
