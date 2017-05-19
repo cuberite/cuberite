@@ -2077,7 +2077,7 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callbac
 // Helper function - there's probably a better place for this
 
 template <BLOCKTYPE, BLOCKTYPE...> bool IsOneOfImpl(BLOCKTYPE, std::false_type);
-template <class> bool IsOneOfImpl(BLOCKTYPE, std::true_type);
+template <class = void> bool IsOneOfImpl(BLOCKTYPE, std::true_type);
 
 template <BLOCKTYPE ... Types>
 bool IsOneOf(BLOCKTYPE x)
@@ -2087,7 +2087,7 @@ bool IsOneOf(BLOCKTYPE x)
 	);
 }
 
-template <class = void>
+template <class>
 bool IsOneOfImpl(BLOCKTYPE x, std::true_type)
 {
 	return false;
@@ -2958,6 +2958,8 @@ void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_Block
 
 void cChunk::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client)
 {
+	bool t = IsOneOf<>(1);
+	ASSERT(t);
 	cBlockEntity * Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
 	if (Entity == nullptr)
 	{
