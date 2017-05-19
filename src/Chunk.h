@@ -276,6 +276,12 @@ public:
 	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
 	bool DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback, bool & a_CallbackResult);  // Lambda version
 
+	/** Calls the callback for each tyEntity; returns true if all block entities processed, false if the callback aborted by returning true
+	tBlocktype is a list of the blocktypes convertible to tyEntity which are to be called. If no block type is given the callback is called for every block entity
+	Accessible only from within Chunk.cpp */
+	template <class tyEntity, BLOCKTYPE... tBlocktype>
+	bool GenericForEachBlockEntity(cItemCallback<tyEntity>& a_Callback);
+
 	/** Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntity(cBlockEntityCallback & a_Callback);  // Lua-accessible
 

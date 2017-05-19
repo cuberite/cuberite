@@ -15,6 +15,7 @@
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/BrewingstandEntity.h"
 #include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/DispenserEntity.h"
 #include "BlockEntities/DropperEntity.h"
 #include "BlockEntities/FlowerPotEntity.h"
@@ -2072,18 +2073,52 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callbac
 
 
 
-bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
+// Helper function - there's probably a better place for this
+template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
+bool IsOneOf(BLOCKTYPE x)
+{
+	return ((x == Head) || (IsOneOf<Tail...>(x)));
+}
+
+// Base case
+template <BLOCKTYPE ... tNil>
+typename std::enable_if<sizeof...(tNil) == 0, bool>::type
+	IsOneOf(BLOCKTYPE x)
+{
+	return false;
+}
+
+
+
+
+
+template <class tyEntity, BLOCKTYPE... tBlocktype>
+bool cChunk::GenericForEachBlockEntity(cItemCallback<tyEntity>& a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		++itr2;
-		if (a_Callback.Item(*itr))
+		cBlockEntity * Block = KeyPair.second;
+		if ((sizeof...(tBlocktype) == 0) ||  // Let empty list mean all block entities
+			(IsOneOf<tBlocktype...>(Block->GetBlockType()))
+		)
 		{
-			return false;
+			if (a_Callback.Item(static_cast<tyEntity *>(Block)))
+			{
+				return false;
+			}
 		}
-	}  // for itr - m_BlockEntitites[]
+	}  // for KeyPair - m_BlockEntitites[]
 	return true;
+}
+
+
+
+
+
+bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
+{
+	return GenericForEachBlockEntity<cBlockEntity>(a_Callback);
 }
 
 
@@ -2092,16 +2127,9 @@ bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
 
 bool cChunk::ForEachBrewingstand(cBrewingstandCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (a_Callback.Item(reinterpret_cast<cBrewingstandEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cBrewingstandEntity,
+		E_BLOCK_BREWING_STAND
+	>(a_Callback);
 }
 
 
@@ -2110,20 +2138,9 @@ bool cChunk::ForEachBrewingstand(cBrewingstandCallback & a_Callback)
 
 bool cChunk::ForEachChest(cChestCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if ((*itr)->GetBlockType() != E_BLOCK_CHEST)
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cChestEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cChestEntity,
+		E_BLOCK_CHEST
+	>(a_Callback);
 }
 
 
@@ -2132,20 +2149,9 @@ bool cChunk::ForEachChest(cChestCallback & a_Callback)
 
 bool cChunk::ForEachDispenser(cDispenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if ((*itr)->GetBlockType() != E_BLOCK_DISPENSER)
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cDispenserEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cDispenserEntity,
+		E_BLOCK_DISPENSER
+	>(a_Callback);
 }
 
 
@@ -2154,20 +2160,9 @@ bool cChunk::ForEachDispenser(cDispenserCallback & a_Callback)
 
 bool cChunk::ForEachDropper(cDropperCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if ((*itr)->GetBlockType() != E_BLOCK_DROPPER)
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cDropperEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cDropperEntity,
+		E_BLOCK_DROPPER
+	>(a_Callback);
 }
 
 
@@ -2176,20 +2171,10 @@ bool cChunk::ForEachDropper(cDropperCallback & a_Callback)
 
 bool cChunk::ForEachDropSpenser(cDropSpenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetBlockType() != E_BLOCK_DISPENSER) && ((*itr)->GetBlockType() != E_BLOCK_DROPPER))
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cDropSpenserEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cDropSpenserEntity,
+		E_BLOCK_DISPENSER,
+		E_BLOCK_DROPPER
+	>(a_Callback);
 }
 
 
@@ -2198,28 +2183,10 @@ bool cChunk::ForEachDropSpenser(cDropSpenserCallback & a_Callback)
 
 bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		switch ((*itr)->GetBlockType())
-		{
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_LIT_FURNACE:
-			{
-				break;
-			}
-			default:
-			{
-				continue;
-			}
-		}
-		if (a_Callback.Item(reinterpret_cast<cFurnaceEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cFurnaceEntity,
+		E_BLOCK_FURNACE,
+		E_BLOCK_LIT_FURNACE
+	>(a_Callback);
 }
 
 
