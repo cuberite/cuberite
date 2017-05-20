@@ -177,7 +177,7 @@ public:
 	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
 
 	/** Returns if this mob last target was a player to avoid destruction on player quit */
-	const bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
+	bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
 
 protected:
 
