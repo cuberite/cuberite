@@ -945,6 +945,7 @@ void cMonster::SetTarget (cPawn * a_NewTarget)
 		ASSERT(a_NewTarget->IsTicking());
 		// Notify the new target that we are now targeting it.
 		m_Target->TargetingMe(this);
+		m_LastTargetWasAPlayer = m_Target->IsPlayer();
 	}
 
 }

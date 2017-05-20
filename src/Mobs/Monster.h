@@ -176,6 +176,9 @@ public:
 	*/
 	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
 
+	/** Returns if this mob last target was a player to avoid destruction on player quit */
+	const bool IsLastTargetWasAPlayer() const { return m_LastTargetWasAPlayer; }
+
 protected:
 
 	/** The pathfinder instance handles pathfinding for this monster. */
@@ -250,6 +253,8 @@ protected:
 
 	int m_Age;
 	int m_AgingTimer;
+
+	bool m_LastTargetWasAPlayer;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);

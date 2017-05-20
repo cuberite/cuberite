@@ -1149,8 +1149,8 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 			{
 				Monster->Tick(m_Dt, *(a_Entity->GetParentChunk()));
 			}
-			// Destroy far hostile mobs
-			else if ((Monster->GetMobFamily() == cMonster::eFamily::mfHostile))
+			// Destroy far hostile mobs except if last target was a player
+			else if ((Monster->GetMobFamily() == cMonster::eFamily::mfHostile) && !Monster->IsLastTargetWasAPlayer() )
 			{
 				if (Monster->GetMobType() != eMonsterType::mtWolf)
 				{
