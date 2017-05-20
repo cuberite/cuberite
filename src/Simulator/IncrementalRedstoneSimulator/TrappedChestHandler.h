@@ -42,7 +42,7 @@ public:
 			{
 			}
 
-			virtual ~cGetTrappedChestPlayers()
+			virtual ~cGetTrappedChestPlayers() override
 			{
 			}
 

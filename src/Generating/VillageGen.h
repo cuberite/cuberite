@@ -47,7 +47,7 @@ protected:
 	typedef std::vector<SharedPtr<cVillagePiecePool> > cVillagePiecePools;
 
 	/** The noise used for generating random numbers */
-	cNoise m_Noise;
+	cNoise m_RandNoise;
 
 	/** Maximum depth of the generator tree */
 	int m_MaxDepth;

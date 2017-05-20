@@ -24,7 +24,7 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_TimesToTame(TameTimes),
 	m_TameAttemptTimes(0),
 	m_RearTickCount(0),
-	m_Speed(20.0)
+	m_MaxSpeed(20.0)
 {
 }
 
@@ -183,6 +183,6 @@ void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
 	if ((m_bIsTame) && (m_bIsSaddled))
 	{
-		super::HandleSpeedFromAttachee(a_Forward * m_Speed, a_Sideways * m_Speed);
+		super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
 	}
 }

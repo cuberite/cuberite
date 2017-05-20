@@ -27,7 +27,7 @@ class cNoise3DGenerator :
 
 public:
 	cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator);
-	virtual ~cNoise3DGenerator();
+	virtual ~cNoise3DGenerator() override;
 
 	virtual void Initialize(cIniFile & a_IniFile) override;
 	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;

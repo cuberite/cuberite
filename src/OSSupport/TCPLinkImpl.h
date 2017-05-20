@@ -44,7 +44,7 @@ public:
 	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen);
 
 	/** Destroys the LibEvent handle representing the link. */
-	~cTCPLinkImpl();
+	virtual ~cTCPLinkImpl() override;
 
 	/** Queues a connection request to the specified host.
 	a_ConnectCallbacks must be valid.

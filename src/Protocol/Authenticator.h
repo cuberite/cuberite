@@ -37,7 +37,7 @@ class cAuthenticator :
 
 public:
 	cAuthenticator(void);
-	~cAuthenticator();
+	virtual ~cAuthenticator() override;
 
 	/** (Re-)read server and address from INI: */
 	void ReadSettings(cSettingsRepositoryInterface & a_Settings);

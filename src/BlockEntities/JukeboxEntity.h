@@ -20,7 +20,7 @@ public:
 	BLOCKENTITY_PROTODEF(cJukeboxEntity)
 
 	cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	virtual ~cJukeboxEntity();
+	virtual ~cJukeboxEntity() override;
 
 	// tolua_begin
 

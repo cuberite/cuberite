@@ -33,7 +33,7 @@ public:
 	cHTTPServerConnection(cHTTPServer & a_HTTPServer);
 
 	// Force a virtual destructor in all descendants
-	virtual ~cHTTPServerConnection();
+	virtual ~cHTTPServerConnection() override;
 
 	/** Sends HTTP status code together with a_Reason (used for HTTP errors).
 	Sends the a_Reason as the body as well, so that browsers display it.
