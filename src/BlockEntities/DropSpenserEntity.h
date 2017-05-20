@@ -40,7 +40,7 @@ public:
 	BLOCKENTITY_PROTODEF(cDropSpenserEntity)
 
 	cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	virtual ~cDropSpenserEntity();
+	virtual ~cDropSpenserEntity() override;
 
 	// cBlockEntity overrides:
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

@@ -44,7 +44,7 @@ public:
 	*/
 	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
-	~cMonster();
+	virtual ~cMonster() override;
 
 	virtual void Destroyed() override;
 

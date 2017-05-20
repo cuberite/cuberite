@@ -231,7 +231,6 @@ cRoughRavines::cRoughRavines(
 	int a_GridSize, int a_MaxOffset
 ) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 64),
-	m_Seed(a_Seed),
 	m_MaxSize(a_MaxSize),
 	m_MinSize(a_MinSize),
 	m_MaxCenterWidth(a_MaxCenterWidth),

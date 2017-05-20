@@ -35,7 +35,7 @@ public:
 	/** Creates a new instance of the link, attached to the specified plugin and wrapping the callbacks that are in the specified referenced table. */
 	cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks, cLuaServerHandleWPtr a_Server);
 
-	~cLuaTCPLink();
+	virtual ~cLuaTCPLink() override;
 
 	/** Sends the data contained in the string to the remote peer.
 	Returns true if successful, false on immediate failure (queueing the data failed or link not available). */

@@ -21,7 +21,7 @@ public:
 	BLOCKENTITY_PROTODEF(cEnderChestEntity)
 
 	cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	virtual ~cEnderChestEntity();
+	virtual ~cEnderChestEntity() override;
 
 	// cBlockEntity overrides:
 	virtual bool UsedBy(cPlayer * a_Player) override;

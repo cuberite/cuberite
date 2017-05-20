@@ -26,7 +26,6 @@ public:
 protected:
 	class cRavine;  // fwd: Ravines.cpp
 
-	cNoise m_Noise;
 	int    m_Size;  // Max size, in blocks, of the ravines generated
 
 

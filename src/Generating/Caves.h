@@ -69,7 +69,6 @@ class cStructGenWormNestCaves :
 public:
 	cStructGenWormNestCaves(int a_Seed, int a_Size = 64, int a_Grid = 96, int a_MaxOffset = 128) :
 		super(a_Seed, a_Grid, a_Grid, a_MaxOffset, a_MaxOffset, a_Size, a_Size, 100),
-		m_Noise(a_Seed),
 		m_Size(a_Size),
 		m_MaxOffset(a_MaxOffset),
 		m_Grid(a_Grid)
@@ -79,7 +78,6 @@ public:
 protected:
 	class cCaveSystem;  // fwd: Caves.cpp
 
-	cNoise       m_Noise;
 	int          m_Size;  // relative size of the cave systems' caves. Average number of blocks of each initial tunnel
 	int          m_MaxOffset;  // maximum offset of the cave nest origin from the grid cell the nest belongs to
 	int          m_Grid;  // average spacing of the nests

@@ -1293,7 +1293,6 @@ cStructGenMineShafts::cStructGenMineShafts(
 	int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
 ) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSystemSize, a_MaxSystemSize, 100),
-	m_Noise(a_Seed),
 	m_GridSize(a_GridSize),
 	m_MaxSystemSize(a_MaxSystemSize),
 	m_ProbLevelCorridor(std::max(0, a_ChanceCorridor)),

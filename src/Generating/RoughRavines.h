@@ -33,8 +33,6 @@ public:
 	);
 
 protected:
-	int m_Seed;
-
 	/** Maximum size of the ravine, in each of the X / Z axis */
 	int m_MaxSize;
 

@@ -49,7 +49,7 @@ class cBioGenCache :
 
 public:
 	cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize);
-	virtual ~cBioGenCache();
+	virtual ~cBioGenCache() override;
 
 protected:
 

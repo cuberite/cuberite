@@ -54,7 +54,7 @@ class cLightingThread :
 public:
 
 	cLightingThread(void);
-	~cLightingThread();
+	virtual ~cLightingThread() override;
 
 	bool Start(cWorld * a_World);
 
