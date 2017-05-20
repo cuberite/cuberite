@@ -101,6 +101,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
 	, m_Target(nullptr)
+	, m_WasLastTargetAPlayer(false)
 {
 	if (!a_ConfigName.empty())
 	{
