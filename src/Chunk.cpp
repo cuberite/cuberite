@@ -341,11 +341,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 		delete KeyPair.second;
 	}
 	m_BlockEntities.clear();
-	for (cBlockEntity * Block : a_SetChunkData.GetBlockEntities())
-	{
-		AddBlockEntityClean(Block);
-	}
-	a_SetChunkData.GetBlockEntities().clear();
+	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG
@@ -463,7 +459,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	return GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ) != nullptr;
+	return (GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ) != nullptr);
 }
 
 
@@ -1704,7 +1700,7 @@ cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 	int RelZ = a_BlockZ - m_PosZ * cChunkDef::Width;
 
 	auto itr = m_BlockEntities.find(MakeIndex(RelX, a_BlockY, RelZ));
-	return itr == m_BlockEntities.end() ? nullptr : itr->second;
+	return (itr == m_BlockEntities.end()) ? nullptr : itr->second;
 }
 
 
@@ -1840,7 +1836,8 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 	{
 		return false;  // Not a block entity
 	}
-	if ((Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
+	if (
+		(Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
 		(Entity->GetBlockType() != E_BLOCK_SIGN_POST)
 	)
 	{
@@ -2074,35 +2071,6 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callbac
 
 
 
-// Helper function - there's probably a better place for this
-
-template <BLOCKTYPE, BLOCKTYPE...> bool IsOneOfImpl(BLOCKTYPE, std::false_type);
-template <class = void> bool IsOneOfImpl(BLOCKTYPE, std::true_type);
-
-template <BLOCKTYPE ... Types>
-bool IsOneOf(BLOCKTYPE x)
-{
-	return IsOneOfImpl<Types ...>(x,
-		std::integral_constant<bool, sizeof...(Types) == 0>()
-	);
-}
-
-template <class>
-bool IsOneOfImpl(BLOCKTYPE x, std::true_type)
-{
-	return false;
-}
-
-template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
-bool IsOneOfImpl(BLOCKTYPE x, std::false_type)
-{
-	return ((x == Head) || (IsOneOf<Tail...>(x)));
-}
-
-
-
-
-
 template <class tyEntity, BLOCKTYPE... tBlocktype>
 bool cChunk::GenericForEachBlockEntity(cItemCallback<tyEntity>& a_Callback)
 {
@@ -2110,7 +2078,8 @@ bool cChunk::GenericForEachBlockEntity(cItemCallback<tyEntity>& a_Callback)
 	for (auto & KeyPair : m_BlockEntities)
 	{
 		cBlockEntity * Block = KeyPair.second;
-		if ((sizeof...(tBlocktype) == 0) ||  // Let empty list mean all block entities
+		if (
+			(sizeof...(tBlocktype) == 0) ||  // Let empty list mean all block entities
 			(IsOneOf<tBlocktype...>(Block->GetBlockType()))
 		)
 		{
@@ -2213,7 +2182,8 @@ bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ
 	{
 		return false;  // No block entity here
 	}
-	if ((sizeof...(tBlocktype) != 0) &&  // Let empty list mean all block entities
+	if (
+		(sizeof...(tBlocktype) != 0) &&  // Let empty list mean all block entities
 		(!IsOneOf<tBlocktype...>(Block->GetBlockType()))
 	)
 	{
@@ -2366,9 +2336,10 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 	{
 		return false;  // Not a block entity
 	}
-	if ((Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
+	if (
+		(Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
 		(Entity->GetBlockType() != E_BLOCK_SIGN_POST)
-		)
+	)
 	{
 		return false;  // Not a sign
 	}

@@ -277,7 +277,7 @@ public:
 	bool DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback, bool & a_CallbackResult);  // Lambda version
 
 	/** Calls the callback for each tyEntity; returns true if all block entities processed, false if the callback aborted by returning true
-	tBlocktype is a list of the blocktypes convertible to tyEntity which are to be called. If no block type is given the callback is called for every block entity
+	tBlocktypes are all blocktypes convertible to tyEntity which are to be called. If no block type is given the callback is called for every block entity
 	Accessible only from within Chunk.cpp */
 	template <class tyEntity, BLOCKTYPE... tBlocktype>
 	bool GenericForEachBlockEntity(cItemCallback<tyEntity>& a_Callback);
@@ -536,7 +536,7 @@ private:
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;
 	cEntityList                  m_Entities;
-	std::map<int, cBlockEntity *> m_BlockEntities;
+	cBlockEntities               m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
 	int m_StayCount;

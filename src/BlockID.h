@@ -1212,3 +1212,46 @@ extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const c
 
 
 
+template <BLOCKTYPE, BLOCKTYPE...> bool IsOneOfImpl(BLOCKTYPE, std::false_type);
+template <class = void> bool IsOneOfImpl(BLOCKTYPE, std::true_type);
+
+
+/** Returns true if the BLOCKTYPE x is equal to any of the variadic template arguments.
+
+Some example usage:
+\code
+	IsOneOf<>(E_BLOCK_AIR)                           == false
+	IsOneOf<E_BLOCK_AIR>(E_BLOCK_DIRT)               == false
+	IsOneOf<E_BLOCK_AIR, E_BLOCK_DIRT>(E_BLOCK_DIRT) == true
+\endcode
+The implementation is ugly but it is equivalent to this C++17 fold expression:
+\code
+	((x == Types) || ...)
+\endcode
+Just written to be valid without fold expressions or SFINAE. */
+template <BLOCKTYPE ... Types>
+bool IsOneOf(BLOCKTYPE x)
+{
+	return IsOneOfImpl<Types ...>(x,
+		std::integral_constant<bool, sizeof...(Types) == 0>()
+	);
+}
+
+/** The base case of IsOneOf, dealing with the empty parameter pack by always returning false.
+Do not use directly, instead use IsOneOf. */
+template <class>
+bool IsOneOfImpl(BLOCKTYPE x, std::true_type)
+{
+	return false;
+}
+
+/** Recursive IsOneOf case where the variadic Types are not empty.
+Do not use directly, instead use IsOneOf. */
+template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
+bool IsOneOfImpl(BLOCKTYPE x, std::false_type)
+{
+	return ((x == Head) || (IsOneOf<Tail...>(x)));
+}
+
+
+

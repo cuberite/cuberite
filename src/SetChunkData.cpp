@@ -34,7 +34,7 @@ cSetChunkData::cSetChunkData(
 	const cChunkDef::HeightMap * a_HeightMap,
 	const cChunkDef::BiomeMap * a_Biomes,
 	cEntityList && a_Entities,
-	cBlockEntityList && a_BlockEntities,
+	cBlockEntities && a_BlockEntities,
 	bool a_ShouldMarkDirty
 ) :
 	m_ChunkX(a_ChunkX),
@@ -119,23 +119,21 @@ void cSetChunkData::CalculateHeightMap(void)
 
 void cSetChunkData::RemoveInvalidBlockEntities(void)
 {
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
+	for (cBlockEntities::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 	{
-		BLOCKTYPE EntityBlockType = (*itr)->GetBlockType();
-		BLOCKTYPE WorldBlockType = cChunkDef::GetBlock(m_BlockTypes, (*itr)->GetRelX(), (*itr)->GetPosY(), (*itr)->GetRelZ());
+		cBlockEntity * BlockEntity = itr->second;
+		BLOCKTYPE EntityBlockType = BlockEntity->GetBlockType();
+		BLOCKTYPE WorldBlockType = cChunkDef::GetBlock(m_BlockTypes, BlockEntity->GetRelX(), BlockEntity->GetPosY(), BlockEntity->GetRelZ());
 		if (EntityBlockType != WorldBlockType)
 		{
 			// Bad blocktype, remove the block entity:
 			LOGD("Block entity blocktype mismatch at {%d, %d, %d}: entity for blocktype %s(%d) in block %s(%d). Deleting the block entity.",
-				(*itr)->GetPosX(), (*itr)->GetPosY(), (*itr)->GetPosZ(),
+				BlockEntity->GetPosX(), BlockEntity->GetPosY(), BlockEntity->GetPosZ(),
 				ItemTypeToString(EntityBlockType).c_str(), EntityBlockType,
 				ItemTypeToString(WorldBlockType).c_str(),  WorldBlockType
 			);
-			cBlockEntityList::iterator itr2 = itr;
-			++itr2;
-			delete *itr;
-			m_BlockEntities.erase(itr);
-			itr = itr2;
+			delete BlockEntity;
+			itr = m_BlockEntities.erase(itr);
 		}
 		else
 		{
