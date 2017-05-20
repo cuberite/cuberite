@@ -675,7 +675,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		// Add the BlockEntity to the loaded data:
 		auto Idx = cChunkDef::MakeIndex(be->GetRelX(), be->GetPosY(), be->GetRelZ());
 		a_BlockEntities.insert({ Idx, be.get() });
-		// Release after inserting incase it throws.
+		// Release after inserting in case it throws.
 		be.release();
 	}  // for Child - tag children
 }
