@@ -100,6 +100,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
+	, m_WasLastTargetAPlayer(false)
 	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
@@ -945,6 +946,7 @@ void cMonster::SetTarget (cPawn * a_NewTarget)
 		ASSERT(a_NewTarget->IsTicking());
 		// Notify the new target that we are now targeting it.
 		m_Target->TargetingMe(this);
+		m_WasLastTargetAPlayer = m_Target->IsPlayer();
 	}
 
 }
