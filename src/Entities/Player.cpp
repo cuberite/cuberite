@@ -74,8 +74,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_IsCrouched(false),
 	m_IsSprinting(false),
 	m_IsFlying(false),
-	m_IsSwimming(false),
-	m_IsSubmerged(false),
 	m_IsFishing(false),
 	m_CanFly(false),
 	m_EatingFinishTick(-1),
@@ -95,6 +93,9 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_MainHand(mhRight)
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
+
+	m_IsSwimming = false;
+	m_IsSubmerged = false;
 
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;

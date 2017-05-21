@@ -45,7 +45,7 @@ public:
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
-	virtual ~cProtocolRecognizer();
+	virtual ~cProtocolRecognizer() override;
 
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);

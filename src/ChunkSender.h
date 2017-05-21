@@ -57,7 +57,7 @@ class cChunkSender:
 	typedef cIsThread super;
 public:
 	cChunkSender(cWorld & a_World);
-	~cChunkSender();
+	virtual ~cChunkSender() override;
 
 	enum eChunkPriority
 	{

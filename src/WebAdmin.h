@@ -157,7 +157,7 @@ public:
 
 
 	cWebAdmin(void);
-	virtual ~cWebAdmin();
+	virtual ~cWebAdmin() override;
 
 	/** Initializes the object. Returns true if successfully initialized and ready to start */
 	bool Init(void);

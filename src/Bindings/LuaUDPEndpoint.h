@@ -31,7 +31,7 @@ public:
 	/** Creates a new instance of the endpoint, wrapping the callbacks that are in the specified table. */
 	cLuaUDPEndpoint(cLuaState::cTableRefPtr && a_Callbacks);
 
-	~cLuaUDPEndpoint();
+	virtual ~cLuaUDPEndpoint() override;
 
 	/** Opens the endpoint so that it starts listening for incoming data on the specified port.
 	a_Self is the shared pointer to self that the object keeps to keep itself alive for as long as it needs (for Lua). */

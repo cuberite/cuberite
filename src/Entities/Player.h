@@ -43,7 +43,7 @@ public:
 
 	virtual bool Initialize(cWorld & a_World) override;
 
-	virtual ~cPlayer();
+	virtual ~cPlayer() override;
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
@@ -645,8 +645,6 @@ protected:
 	bool m_IsCrouched;
 	bool m_IsSprinting;
 	bool m_IsFlying;
-	bool m_IsSwimming;
-	bool m_IsSubmerged;
 	bool m_IsFishing;
 
 	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.

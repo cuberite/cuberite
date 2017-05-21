@@ -62,7 +62,7 @@ class cWorldStorage :
 public:
 
 	cWorldStorage(void);
-	~cWorldStorage();
+	virtual ~cWorldStorage() override;
 
 	/** Queues a chunk to be loaded, asynchronously.
 	The callback, if specified, will be called with the result of the load operation. */

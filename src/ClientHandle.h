@@ -71,7 +71,7 @@ public:  // tolua_export
 	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
 	cClientHandle(const AString & a_IPString, int a_ViewDistance);
 
-	virtual ~cClientHandle();
+	virtual ~cClientHandle() override;
 
 	const AString & GetIPString(void) const { return m_IPString; }  // tolua_export
 

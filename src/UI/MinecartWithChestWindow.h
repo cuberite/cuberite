@@ -53,7 +53,7 @@ public:
 	}
 
 
-	~cMinecartWithChestWindow()
+	virtual ~cMinecartWithChestWindow() override
 	{
 		m_ChestCart->GetWorld()->BroadcastSoundEffect("block.chest.close", m_ChestCart->GetPosX(), m_ChestCart->GetPosY(), m_ChestCart->GetPosZ(), 1, 1);
 	}

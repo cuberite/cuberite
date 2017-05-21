@@ -82,7 +82,6 @@ protected:
 
 cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
 	super(a_Seed, a_Size, a_Size, a_Size, a_Size, a_Size * 2, a_Size * 2, 100),
-	m_Noise(a_Seed),
 	m_Size(a_Size)
 {
 }

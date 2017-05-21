@@ -51,7 +51,7 @@ class cWSSAnvil :
 public:
 
 	cWSSAnvil(cWorld * a_World, int a_CompressionFactor);
-	virtual ~cWSSAnvil();
+	virtual ~cWSSAnvil() override;
 
 protected:
 

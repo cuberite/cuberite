@@ -42,7 +42,7 @@ public:
 	cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title);
 
 	// tolua_begin
-	virtual ~cLuaWindow();
+	virtual ~cLuaWindow() override;
 
 	/** Returns the internal representation of the contents that are manipulated by Lua */
 	cItemGrid & GetContents(void) { return m_Contents; }

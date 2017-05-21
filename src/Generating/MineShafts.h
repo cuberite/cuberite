@@ -34,7 +34,6 @@ protected:
 	friend class cMineShaftStaircase;
 	class cMineShaftSystem;  // fwd: MineShafts.cpp
 
-	cNoise m_Noise;
 	int    m_GridSize;            ///< Average spacing of the systems
 	int    m_MaxSystemSize;       ///< Maximum blcok size of a mineshaft system
 	int    m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor

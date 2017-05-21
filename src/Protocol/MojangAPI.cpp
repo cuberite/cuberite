@@ -215,7 +215,7 @@ public:
 	{
 	}
 
-	~cUpdateThread()
+	virtual ~cUpdateThread() override
 	{
 		// Notify the thread that it should stop:
 		m_ShouldTerminate = true;

@@ -38,7 +38,7 @@ public:
 	/** Constructor used for normal operation */
 	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
 
-	virtual ~cFurnaceEntity();
+	virtual ~cFurnaceEntity() override;
 
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;

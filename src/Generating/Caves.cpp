@@ -127,7 +127,7 @@ public:
 	int m_BlockZ;
 
 	cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise);
-	~cCaveSystem();
+	virtual ~cCaveSystem() override;
 
 protected:
 	int m_Size;

@@ -109,7 +109,7 @@ public:
 
 
 	cChunkGenerator (void);
-	~cChunkGenerator();
+	virtual ~cChunkGenerator() override;
 
 	bool Start(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
 	void Stop(void);

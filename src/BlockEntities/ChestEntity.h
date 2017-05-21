@@ -33,7 +33,7 @@ public:
 	/** Constructor used for normal operation */
 	cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type);
 
-	virtual ~cChestEntity();
+	virtual ~cChestEntity() override;
 
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;

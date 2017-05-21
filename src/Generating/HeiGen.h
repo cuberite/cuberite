@@ -29,7 +29,7 @@ class cHeiGenCache :
 {
 public:
 	cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, size_t a_CacheSize);
-	~cHeiGenCache();
+	virtual ~cHeiGenCache() override;
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;

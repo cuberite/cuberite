@@ -27,7 +27,7 @@ class cDeadlockDetect :
 
 public:
 	cDeadlockDetect(void);
-	~cDeadlockDetect();
+	virtual ~cDeadlockDetect() override;
 
 	/** Starts the detection. Hides cIsThread's Start, because we need some initialization */
 	bool Start(int a_IntervalSec);

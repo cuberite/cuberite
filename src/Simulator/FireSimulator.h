@@ -20,7 +20,7 @@ class cFireSimulator :
 {
 public:
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
-	~cFireSimulator();
+	virtual ~cFireSimulator() override;
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
