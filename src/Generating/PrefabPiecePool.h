@@ -50,7 +50,7 @@ public:
 	cPrefabPiecePool(const AString & a_FileName, bool a_LogWarnings);
 
 	/** Destroys the pool, freeing all pieces. */
-	~cPrefabPiecePool();
+	virtual ~cPrefabPiecePool() override;
 
 	/** Removes and frees all pieces from this pool. */
 	void Clear(void);

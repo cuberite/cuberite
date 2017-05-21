@@ -64,7 +64,7 @@ public:
 	}
 
 
-	virtual ~cListAllocationPool()
+	virtual ~cListAllocationPool() override
 	{
 		while (!m_FreeList.empty())
 		{

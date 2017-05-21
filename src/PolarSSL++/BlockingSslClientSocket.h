@@ -23,7 +23,7 @@ class cBlockingSslClientSocket :
 public:
 	cBlockingSslClientSocket(void);
 
-	~cBlockingSslClientSocket(void)
+	virtual ~cBlockingSslClientSocket(void) override
 	{
 		Disconnect();
 	}

@@ -40,7 +40,7 @@ public:
 	/** Constructor used for normal operation */
 	cBrewingstandEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
 
-	virtual ~cBrewingstandEntity();
+	virtual ~cBrewingstandEntity() override;
 
 	//  cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;

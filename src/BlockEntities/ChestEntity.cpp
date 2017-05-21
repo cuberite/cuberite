@@ -5,6 +5,7 @@
 #include "../Item.h"
 #include "../Entities/Player.h"
 #include "../UI/ChestWindow.h"
+#include "../ClientHandle.h"
 
 
 
@@ -35,10 +36,8 @@ cChestEntity::~cChestEntity()
 
 void cChestEntity::SendTo(cClientHandle & a_Client)
 {
-	// The chest entity doesn't need anything sent to the client when it's created / gets in the viewdistance
-	// All the actual handling is in the cWindow UI code that gets called when the chest is rclked
-
-	UNUSED(a_Client);
+	// Send a dummy "number of players with chest open" packet to make the chest visible:
+	a_Client.SendBlockAction(m_PosX, m_PosY, m_PosZ, 1, 0, m_BlockType);
 }
 
 

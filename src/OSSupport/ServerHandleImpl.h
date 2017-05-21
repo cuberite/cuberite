@@ -39,7 +39,7 @@ class cServerHandleImpl:
 
 public:
 	/** Closes the server, dropping all the connections. */
-	~cServerHandleImpl();
+	virtual ~cServerHandleImpl() override;
 
 	/** Creates a new server instance listening on the specified port.
 	Both IPv4 and IPv6 interfaces are used, if possible.

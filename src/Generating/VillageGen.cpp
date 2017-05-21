@@ -336,7 +336,7 @@ cVillageGen::cVillageGen(
 	const AStringVector & a_PrefabsToLoad
 ) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
-	m_Noise(a_Seed + 1000),
+	m_RandNoise(a_Seed + 1000),
 	m_MaxDepth(a_MaxDepth),
 	m_MaxSize(a_MaxSize),
 	m_MinDensity(a_MinDensity),
@@ -399,7 +399,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	{
 		return cStructurePtr();
 	}
-	auto rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 11;
+	auto rnd = m_RandNoise.IntNoise2DInt(a_OriginX, a_OriginZ) / 11;
 	auto pool = availablePools[static_cast<size_t>(rnd) % availablePools.size()];
 	rnd /= 137;
 

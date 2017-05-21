@@ -54,7 +54,7 @@ public:
 
 	cInventory(cPlayer & a_Owner);
 
-	virtual ~cInventory() {}
+	virtual ~cInventory() override {}
 
 	// tolua_begin
 

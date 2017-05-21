@@ -22,7 +22,7 @@ public:
 	CLASS_PROTODEF(cPawn)
 
 	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
-	~cPawn();
+	virtual ~cPawn() override;
 	virtual void Destroyed() override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
