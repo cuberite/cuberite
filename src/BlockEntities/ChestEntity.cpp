@@ -40,8 +40,9 @@ void cChestEntity::SendTo(cClientHandle & a_Client)
 	// The chest entity doesn't need anything sent to the client when it's created / gets in the viewdistance
 	// All the actual handling is in the cWindow UI code that gets called when the chest is rclked
 
-	//Temporary fix for invisible chests (#3479, #3403)
-	if (a_Client.GetProtocolVersion() >= cProtocolRecognizer::PROTO_VERSION_1_9_0) {
+	// Temporary fix for invisible chests (#3479, #3403)
+	if (a_Client.GetProtocolVersion() >= cProtocolRecognizer::PROTO_VERSION_1_9_0)
+	{
 		a_Client.SendUpdateBlockEntity(*this);
 	}
 }
