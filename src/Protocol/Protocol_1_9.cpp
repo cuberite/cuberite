@@ -1526,7 +1526,6 @@ void cProtocol_1_9_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_CHEST:         Action = 0; break;  // Not a valid action in Minecraft protocol, but fixes invisible chests (#3479, #3403)
 		case E_BLOCK_MOB_SPAWNER:   Action = 1; break;  // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK: Action = 2; break;  // Update command block text
 		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
