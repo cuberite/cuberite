@@ -145,6 +145,23 @@ public:
 
 
 
+/** Handles the shield of each player */
+class cSlotAreaShield :
+	public cSlotAreaInventoryBase
+{
+	typedef cSlotAreaInventoryBase super;
+
+public:
+	cSlotAreaShield(cWindow & a_ParentWindow) :
+		cSlotAreaInventoryBase(cInventory::invShieldCount, cInventory::invShieldOffset, a_ParentWindow)
+	{
+	}
+};
+
+
+
+
+
 /** Handles the armor area of the player's inventory */
 class cSlotAreaArmor :
 	public cSlotAreaInventoryBase

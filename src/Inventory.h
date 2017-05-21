@@ -43,11 +43,13 @@ public:
 		invArmorCount      = 4,
 		invInventoryCount  = 9 * 3,
 		invHotbarCount     = 9,
+		invShieldCount     = 1,
 
 		invArmorOffset     = 0,
 		invInventoryOffset = invArmorOffset     + invArmorCount,
 		invHotbarOffset    = invInventoryOffset + invInventoryCount,
-		invNumSlots        = invHotbarOffset    + invHotbarCount
+		invShieldOffset    = invHotbarOffset    + invHotbarCount,
+		invNumSlots        = invShieldOffset    + invShieldCount
 	} ;
 
 	// tolua_end
@@ -124,11 +126,13 @@ public:
 	const cItem & GetArmorSlot(int a_ArmorSlotNum) const;
 	const cItem & GetInventorySlot(int a_InventorySlotNum) const;
 	const cItem & GetHotbarSlot(int a_HotBarSlotNum) const;
+	const cItem & GetShieldSlot() const;
 	const cItem & GetEquippedItem(void) const;
 	void          SetSlot(int a_SlotNum, const cItem & a_Item);
 	void          SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item);
 	void          SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item);
 	void          SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
+	void          SetShieldSlot(const cItem & a_Item);
 
 	void          SetEquippedSlotNum(int a_SlotNum);
 	int           GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
@@ -170,6 +174,7 @@ protected:
 	cItemGrid m_ArmorSlots;
 	cItemGrid m_InventorySlots;
 	cItemGrid m_HotbarSlots;
+	cItemGrid m_ShieldSlots;
 
 	int m_EquippedSlotNum;
 
