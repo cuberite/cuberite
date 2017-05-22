@@ -7970,6 +7970,16 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Returns the specified hotbar slot contents. Note that the returned item is read-only",
 				},
+				GetShieldSlot =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns current item in shield slot. Note that the returned item is read-only",
+				},				
 				GetInventoryGrid =
 				{
 					Returns =
@@ -8177,6 +8187,17 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified hotbar slot contents",
 				},
+				SetShieldSlot =
+				{
+					Params =
+					{
+						{
+							Name = "cItem",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the shield slot content",
+				},				
 				SetInventorySlot =
 				{
 					Params =
@@ -8221,7 +8242,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invHotbarCount =
 				{
 					Notes = "Number of slots in the Hotbar part",
-				},
+				},			
 				invHotbarOffset =
 				{
 					Notes = "Starting slot number of the Hotbar part",
@@ -8233,6 +8254,14 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invInventoryOffset =
 				{
 					Notes = "Starting slot number of the main inventory part",
+				},
+				invShieldCount =
+				{
+					Notes = "Number of slots in the Shield part",
+				},
+				invShieldOffset =
+				{
+					Notes = "Starting slot number of the Shield part",
 				},
 				invNumSlots =
 				{

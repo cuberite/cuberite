@@ -140,7 +140,7 @@ public:
 	void          SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item);
 	/** Puts a_Item item in a_InventorySlotNum slot number in inventory slots */
 	void          SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item);
-	/** Puts a_Item item in a_InventorySlotNum slot number in hotbar slots */
+	/** Puts a_Item item in a_HotBarSlotNum slot number in hotbar slots */
 	void          SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
 	/** Sets current item in shield slot */
 	void          SetShieldSlot(const cItem & a_Item);
