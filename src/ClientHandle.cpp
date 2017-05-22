@@ -1530,7 +1530,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 	}
 	// Charge bow when it's in slot off-hand / shield
-	if ((a_BlockFace == BLOCK_FACE_NONE && m_Player->GetInventory().GetShieldSlot().m_ItemType == E_ITEM_BOW))
+	if ((a_BlockFace == BLOCK_FACE_NONE) && (m_Player->GetInventory().GetShieldSlot().m_ItemType == E_ITEM_BOW))
 	{
 		m_Player->StartChargingBow();
 	}
