@@ -28,39 +28,40 @@ static const struct
 	eMonsterType m_Type;
 	const char * m_lcName;
 	const char * m_VanillaName;
+	const char * m_VanillaNameNBT;
 } g_MobTypeNames[] =
 {
-	{mtBat,          "bat",          "Bat"},
-	{mtBlaze,        "blaze",        "Blaze"},
-	{mtCaveSpider,   "cavespider",   "CaveSpider"},
-	{mtChicken,      "chicken",      "Chicken"},
-	{mtCow,          "cow",          "Cow"},
-	{mtCreeper,      "creeper",      "Creeper"},
-	{mtEnderman,     "enderman",     "Enderman"},
-	{mtEnderDragon,  "enderdragon",  "EnderDragon"},
-	{mtGhast,        "ghast",        "Ghast"},
-	{mtGiant,        "giant",        "Giant"},
-	{mtGuardian,     "guardian",     "Guardian"},
-	{mtHorse,        "horse",        "EntityHorse"},
-	{mtIronGolem,    "irongolem",    "VillagerGolem"},
-	{mtMagmaCube,    "magmacube",    "LavaSlime"},
-	{mtMooshroom,    "mooshroom",    "MushroomCow"},
-	{mtOcelot,       "ocelot",       "Ozelot"},
-	{mtPig,          "pig",          "Pig"},
-	{mtRabbit,       "rabbit",       "Rabbit"},
-	{mtSheep,        "sheep",        "Sheep"},
-	{mtSilverfish,   "silverfish",   "Silverfish"},
-	{mtSkeleton,     "skeleton",     "Skeleton"},
-	{mtSlime,        "slime",        "Slime"},
-	{mtSnowGolem,    "snowgolem",    "SnowMan"},
-	{mtSpider,       "spider",       "Spider"},
-	{mtSquid,        "squid",        "Squid"},
-	{mtVillager,     "villager",     "Villager"},
-	{mtWitch,        "witch",        "Witch"},
-	{mtWither,       "wither",       "WitherBoss"},
-	{mtWolf,         "wolf",         "Wolf"},
-	{mtZombie,       "zombie",       "Zombie"},
-	{mtZombiePigman, "zombiepigman", "PigZombie"},
+	{mtBat,          "bat",          "Bat",             "bat"},
+	{mtBlaze,        "blaze",        "Blaze",           "blaze"},
+	{mtCaveSpider,   "cavespider",   "CaveSpider",      "cave_spider"},
+	{mtChicken,      "chicken",      "Chicken",         "chicken"},
+	{mtCow,          "cow",          "Cow",             "cow"},
+	{mtCreeper,      "creeper",      "Creeper",         "creeper"},
+	{mtEnderman,     "enderman",     "Enderman",        "enderman"},
+	{mtEnderDragon,  "enderdragon",  "EnderDragon",     "ender_dragon"},
+	{mtGhast,        "ghast",        "Ghast",           "ghast"},
+	{mtGiant,        "giant",        "Giant",           "giant"},
+	{mtGuardian,     "guardian",     "Guardian",        "guardian"},
+	{mtHorse,        "horse",        "EntityHorse",     "horse"},
+	{mtIronGolem,    "irongolem",    "VillagerGolem",   "iron_golem"},
+	{mtMagmaCube,    "magmacube",    "LavaSlime",       "magma_cube"},
+	{mtMooshroom,    "mooshroom",    "MushroomCow",     "mooshroom"},
+	{mtOcelot,       "ocelot",       "Ozelot",          "ocelot"},
+	{mtPig,          "pig",          "Pig",             "pig"},
+	{mtRabbit,       "rabbit",       "Rabbit",          "rabbit"},
+	{mtSheep,        "sheep",        "Sheep",           "sheep"},
+	{mtSilverfish,   "silverfish",   "Silverfish",      "silverfish"},
+	{mtSkeleton,     "skeleton",     "Skeleton",        "skeleton"},
+	{mtSlime,        "slime",        "Slime",           "slime"},
+	{mtSnowGolem,    "snowgolem",    "SnowMan",         "snow_golem"},
+	{mtSpider,       "spider",       "Spider",          "spider"},
+	{mtSquid,        "squid",        "Squid",           "squid"},
+	{mtVillager,     "villager",     "Villager",        "villager"},
+	{mtWitch,        "witch",        "Witch",           "witch"},
+	{mtWither,       "wither",       "WitherBoss",      "wither"},
+	{mtWolf,         "wolf",         "Wolf",            "wolf"},
+	{mtZombie,       "zombie",       "Zombie",          "zombie"},
+	{mtZombiePigman, "zombiepigman", "PigZombie",       "zombie_pigman"},
 } ;
 
 
@@ -826,6 +827,25 @@ AString cMonster::MobTypeToVanillaName(eMonsterType a_MobType)
 
 
 
+AString cMonster::MobTypeToVanillaNBT(eMonsterType a_MobType)
+{
+	// Mob types aren't sorted, so we need to search linearly:
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	{
+		if (g_MobTypeNames[i].m_Type == a_MobType)
+		{
+			return g_MobTypeNames[i].m_VanillaNameNBT;
+		}
+	}
+
+	// Not found:
+	return "";
+}
+
+
+
+
+
 eMonsterType cMonster::StringToMobType(const AString & a_Name)
 {
 	AString lcName = StrToLower(a_Name);
@@ -843,6 +863,15 @@ eMonsterType cMonster::StringToMobType(const AString & a_Name)
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
 	{
 		if (strcmp(StrToLower(g_MobTypeNames[i].m_VanillaName).c_str(), lcName.c_str()) == 0)
+		{
+			return g_MobTypeNames[i].m_Type;
+		}
+	}
+
+	// Search in NBT name
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	{
+		if (strcmp(StrToLower(g_MobTypeNames[i].m_VanillaNameNBT).c_str(), lcName.c_str()) == 0)
 		{
 			return g_MobTypeNames[i].m_Type;
 		}

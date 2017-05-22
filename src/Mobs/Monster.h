@@ -160,6 +160,9 @@ public:
 
 	// tolua_end
 
+	/**  Translates the MobType enum to the vanilla nbt name */
+	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);
+
 	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
 	void SetTarget (cPawn * a_NewTarget);
 
