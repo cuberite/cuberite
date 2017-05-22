@@ -2995,9 +2995,11 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 					{
 						if ((NBT.GetType(entitytag) == TAG_String) && (NBT.GetName(entitytag) == "id"))
 						{
-							eMonsterType MonsterType = cMonster::StringToMobType(NBT.GetString(entitytag));
-							// No special method here to convert to the numeric damage value; just cast to the given ID
+							AString NBTName = NBT.GetString(entitytag);
+							ReplaceString(NBTName, "minecraft:", "");
+							eMonsterType MonsterType = cMonster::StringToMobType(NBTName);
 							a_Item.m_ItemDamage = static_cast<short>(MonsterType);
+
 						}
 					}
 				}
@@ -3395,7 +3397,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		if (MonsterType != eMonsterType::mtInvalidType)
 		{
 			Writer.BeginCompound("EntityTag");
-			Writer.AddString("id", cMonster::MobTypeToVanillaName(MonsterType));
+			Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
 			Writer.EndCompound();
 		}
 	}
