@@ -7978,7 +7978,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "cItem",
 						},
 					},
-					Notes = "Returns current item in shield slot. Note that the returned item is read-only",
+					Notes = "Returns current item in shield slot.",
 				},				
 				GetInventoryGrid =
 				{
@@ -8192,7 +8192,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					Params =
 					{
 						{
-							Name = "cItem",
+							Name = "Item",
 							Type = "cItem",
 						},
 					},
@@ -8242,7 +8242,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invHotbarCount =
 				{
 					Notes = "Number of slots in the Hotbar part",
-				},			
+				},
 				invHotbarOffset =
 				{
 					Notes = "Starting slot number of the Hotbar part",
