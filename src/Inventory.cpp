@@ -21,6 +21,7 @@ cInventory::cInventory(cPlayer & a_Owner) :
 	m_ArmorSlots    (1, 4),  // 1 x 4 slots
 	m_InventorySlots(9, 3),  // 9 x 3 slots
 	m_HotbarSlots   (9, 1),  // 9 x 1 slots
+	m_ShieldSlots   (1, 1),  // 1 x 1 slots
 	m_Owner(a_Owner)
 {
 	// Ask each ItemGrid to report changes to us:
@@ -40,6 +41,7 @@ void cInventory::Clear(void)
 	m_ArmorSlots.Clear();
 	m_InventorySlots.Clear();
 	m_HotbarSlots.Clear();
+	m_ShieldSlots.Clear();
 }
 
 
@@ -178,7 +180,12 @@ int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 
 int cInventory::RemoveItem(const cItem & a_ItemStack)
 {
-	int RemovedItems = m_HotbarSlots.RemoveItem(a_ItemStack);
+	int RemovedItems = m_ShieldSlots.RemoveItem(a_ItemStack);
+
+	if (RemovedItems < a_ItemStack.m_ItemCount)
+	{
+		RemovedItems += m_HotbarSlots.RemoveItem(a_ItemStack);
+	}
 
 	if (RemovedItems < a_ItemStack.m_ItemCount)
 	{
@@ -214,7 +221,8 @@ int cInventory::HowManyItems(const cItem & a_Item)
 	return
 		m_ArmorSlots.HowManyItems(a_Item) +
 		m_InventorySlots.HowManyItems(a_Item) +
-		m_HotbarSlots.HowManyItems(a_Item);
+		m_HotbarSlots.HowManyItems(a_Item) +
+		m_ShieldSlots.HowManyItems(a_Item);
 }
 
 
@@ -274,6 +282,15 @@ void cInventory::SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item)
 void cInventory::SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item)
 {
 	m_HotbarSlots.SetSlot(a_HotBarSlotNum, a_Item);
+}
+
+
+
+
+
+void cInventory::SetShieldSlot(const cItem & a_Item)
+{
+	m_ShieldSlots.SetSlot(0, a_Item);
 }
 
 
@@ -348,6 +365,15 @@ const cItem & cInventory::GetHotbarSlot(int a_SlotNum) const
 		return m_HotbarSlots.GetSlot(0);
 	}
 	return m_HotbarSlots.GetSlot(a_SlotNum);
+}
+
+
+
+
+
+const cItem & cInventory::GetShieldSlot() const
+{
+	return m_ShieldSlots.GetSlot(0);
 }
 
 
@@ -617,13 +643,18 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 		a_Value.append(JSON_Item);
 	}
 
-	// The hotbar is the last:
+	// The hotbar:
 	for (int i = 0; i < invHotbarCount; i++)
 	{
 		Json::Value JSON_Item;
 		m_HotbarSlots.GetSlot(i).GetJson(JSON_Item);
 		a_Value.append(JSON_Item);
 	}
+
+	// Shield slot is the last
+	Json::Value JSON_Item;
+	m_ShieldSlots.GetSlot(0).GetJson(JSON_Item);
+	a_Value.append(JSON_Item);
 }
 
 
@@ -678,8 +709,14 @@ const cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotN
 		a_GridSlotNum = a_SlotNum;
 		return &m_InventorySlots;
 	}
-	a_GridSlotNum = a_SlotNum - invInventoryCount;
-	return &m_HotbarSlots;
+	a_SlotNum -= invInventoryCount;
+	if (a_SlotNum < invHotbarCount)
+	{
+		a_GridSlotNum = a_SlotNum;
+		return &m_HotbarSlots;
+	}
+	a_GridSlotNum = a_SlotNum - invHotbarCount;
+	return &m_ShieldSlots;
 }
 
 
@@ -701,8 +738,14 @@ cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum)
 		a_GridSlotNum = a_SlotNum;
 		return &m_InventorySlots;
 	}
-	a_GridSlotNum = a_SlotNum - invInventoryCount;
-	return &m_HotbarSlots;
+	a_SlotNum -= invInventoryCount;
+	if (a_SlotNum < invHotbarCount)
+	{
+		a_GridSlotNum = a_SlotNum;
+		return &m_HotbarSlots;
+	}
+	a_GridSlotNum = a_SlotNum - invHotbarCount;
+	return &m_ShieldSlots;
 }
 
 

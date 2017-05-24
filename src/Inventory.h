@@ -43,11 +43,13 @@ public:
 		invArmorCount      = 4,
 		invInventoryCount  = 9 * 3,
 		invHotbarCount     = 9,
+		invShieldCount     = 1,      // Number of slots in shield slots grid
 
 		invArmorOffset     = 0,
 		invInventoryOffset = invArmorOffset     + invArmorCount,
 		invHotbarOffset    = invInventoryOffset + invInventoryCount,
-		invNumSlots        = invHotbarOffset    + invHotbarCount
+		invShieldOffset    = invHotbarOffset    + invHotbarCount,     // Offset where shield slots start
+		invNumSlots        = invShieldOffset    + invShieldCount
 	} ;
 
 	// tolua_end
@@ -120,17 +122,31 @@ public:
 
 	// tolua_begin
 
+	/** Returns current item in a_SlotNum slot */
 	const cItem & GetSlot(int a_SlotNum) const;
+	/** Returns current item in a_ArmorSlotNum in armor slots */
 	const cItem & GetArmorSlot(int a_ArmorSlotNum) const;
+	/** Returns current item in a_ArmorSlotNum in inventory slots */
 	const cItem & GetInventorySlot(int a_InventorySlotNum) const;
+	/** Returns current item in a_ArmorSlotNum in hotbar slots */
 	const cItem & GetHotbarSlot(int a_HotBarSlotNum) const;
+	/** Returns current item in shield slot */
+	const cItem & GetShieldSlot() const;
+	/** Returns current equiped item */
 	const cItem & GetEquippedItem(void) const;
+	/** Puts a_Item item in a_SlotNum slot number */
 	void          SetSlot(int a_SlotNum, const cItem & a_Item);
+	/** Puts a_Item item in a_ArmorSlotNum slot number in armor slots */
 	void          SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item);
+	/** Puts a_Item item in a_InventorySlotNum slot number in inventory slots */
 	void          SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item);
+	/** Puts a_Item item in a_HotBarSlotNum slot number in hotbar slots */
 	void          SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
-
+	/** Sets current item in shield slot */
+	void          SetShieldSlot(const cItem & a_Item);
+	/** Sets equiped item to the a_SlotNum slot number */
 	void          SetEquippedSlotNum(int a_SlotNum);
+	/** Returns slot number of equiped item */
 	int           GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
 
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
@@ -170,6 +186,7 @@ protected:
 	cItemGrid m_ArmorSlots;
 	cItemGrid m_InventorySlots;
 	cItemGrid m_HotbarSlots;
+	cItemGrid m_ShieldSlots;
 
 	int m_EquippedSlotNum;
 

@@ -19,6 +19,7 @@ cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
 	m_SlotAreas.push_back(new cSlotAreaArmor(*this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.push_back(new cSlotAreaShield(*this));
 }
 
 
