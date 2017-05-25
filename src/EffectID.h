@@ -1,6 +1,8 @@
 #pragma once
 
-enum class EffectID : Int32
+// tolua_begin
+
+enum EffectID
 {
 	SFX_RANDOM_DISPENSER_DISPENSE = 1000,
 	SFX_RANDOM_DISPENSER_DISPENSE_FAIL = 1001,
@@ -52,7 +54,7 @@ enum class EffectID : Int32
 	PARTICLE_ENDERDRAGON_GROWL = 3001,
 };
 
-enum class SmokeDirection : Int32
+enum SmokeDirection
 {
 	SOUTH_EAST = 0,
 	SOUTH = 1,
@@ -64,3 +66,5 @@ enum class SmokeDirection : Int32
 	NORTH = 7,
 	NORTH_WEST = 8,
 };
+
+// tolua_end

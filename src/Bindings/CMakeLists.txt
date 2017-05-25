@@ -91,6 +91,7 @@ set(BINDING_DEPENDENCIES
 	../CraftingRecipes.h
 	../Cuboid.h
 	../Defines.h
+	../EffectID.h
 	../Enchantments.h
 	../Entities/Boat.h
 	../Entities/ArrowEntity.h
