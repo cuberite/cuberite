@@ -3087,7 +3087,8 @@ static int tolua_cRoot_GetBrewingRecipe(lua_State * tolua_S)
 	}
 
 	// Push the output item
-	L.Push(Recipe->Output.get());
+	cItem & OutItem = const_cast<cItem &>(Recipe->Output);
+	L.Push(&OutItem);
 	return 1;
 }
 
