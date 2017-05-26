@@ -1562,7 +1562,11 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	{
 		Color.clear();
 	}
-	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
+	Msg.AddTextPart("<");
+	Msg.ParseText(m_Player->GetPrefix());
+	Msg.AddTextPart(m_Player->GetName(), Color);
+	Msg.ParseText(m_Player->GetSuffix());
+	Msg.AddTextPart("> ");
 	Msg.ParseText(Message);
 	Msg.UnderlineUrls();
 	cRoot::Get()->BroadcastChat(Msg);
