@@ -126,7 +126,12 @@ void cChestEntity::ScanNeighbours()
 		public cChestCallback
 	{
 	public:
-		cChestEntity * m_Neighbour = nullptr;
+		cChestEntity * m_Neighbour;
+
+		cFindNeighbour() :
+			m_Neighbour(nullptr)
+		{
+		}
 
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
