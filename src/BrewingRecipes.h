@@ -44,6 +44,8 @@ public:
 	/** Returns true if the item is the fuel, false if not. */
 	bool IsFuel(const cItem & a_Item) const;
 private:
+	using cRecipes = std::vector<std::unique_ptr<cBrewingRecipes::cRecipe>>;
+
 	void ClearRecipes(void);
 
 	/** Parses the recipe contained in the line, adds it to m_pState's recipes.
@@ -52,8 +54,6 @@ private:
 
 	/** Parses an item string, returns true if successful. */
 	bool ParseItem(const AString & a_String, cItem & a_Item);
-
-	using cRecipes = std::vector<std::unique_ptr<cBrewingRecipes::cRecipe>>;
 
 	/** The collection of parsed recipes.
 	GetRecipeFrom may cache splash variants of recipes here but the observable behaviour is constant, so this should be mutable. */

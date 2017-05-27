@@ -168,7 +168,10 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 
 		auto FoundRecipe = std::find_if(m_Recipes.cbegin(), m_Recipes.cend(), [&](const std::unique_ptr<cRecipe>& a_Recipe)
 		{
-			return ((a_Recipe->Input.m_ItemDamage == SplashItemDamage) && (a_Recipe->Ingredient.IsEqual(a_Ingredient)));
+			return (
+				(a_Recipe->Input.m_ItemDamage == SplashItemDamage) &&
+				(a_Recipe->Ingredient.IsEqual(a_Ingredient))
+			);
 		});
 
 		if (FoundRecipe == m_Recipes.cend())
