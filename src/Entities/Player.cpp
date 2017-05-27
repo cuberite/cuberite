@@ -1828,6 +1828,24 @@ AString cPlayer::GetColor(void) const
 
 
 
+AString cPlayer::GetPrefix(void) const
+{
+	return m_MsgPrefix;
+}
+
+
+
+
+
+AString cPlayer::GetSuffix(void) const
+{
+	return m_MsgSuffix;
+}
+
+
+
+
+
 AString cPlayer::GetPlayerListName(void) const
 {
 	const AString & Color = GetColor();

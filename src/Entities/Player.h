@@ -285,6 +285,12 @@ public:
 	The returned value either is empty, or includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
 
+	/** Returns the player name prefix, may contain @ format directives */
+	AString GetPrefix(void) const;
+
+	/** Returns the player name suffix, may contain @ format directives */
+	AString GetSuffix(void) const;
+
 	/** Returns the name that is used in the playerlist. */
 	AString GetPlayerListName(void) const;
 
