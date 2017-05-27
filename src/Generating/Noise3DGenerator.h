@@ -61,9 +61,6 @@ protected:
 	/** Generates the 3D noise array used for terrain generation; a_Noise is of ChunkData-size */
 	void GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DATATYPE * a_Noise);
 
-	/** Updates heightmap based on the chunk's contents */
-	void UpdateHeightmap(cChunkDesc & a_ChunkDesc);
-
 	/** Composes terrain - adds dirt, grass and sand */
 	void ComposeTerrain(cChunkDesc & a_ChunkDesc);
 } ;
