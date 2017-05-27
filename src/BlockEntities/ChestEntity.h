@@ -39,9 +39,17 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 
-	/** Opens a new chest window for this chest.
-	Scans for neighbors to open a double chest window, if appropriate. */
-	void OpenNewWindow(void);
+	/** Search horizontally adjacent blocks for neighbouring chests and links them together. */
+	void ScanNeighbours();
+
+	/** Opens a new chest window where this is the primary chest and any neighbour is the secondary. */
+	void OpenNewWindow();
+
+	/** Forces any players to close the owned window. */
+	void DestroyWindow();
+
+	/** Returns true if the chest should not be accessible by players. */
+	bool IsBlocked();
 
 	/** Gets the number of players who currently have this chest open */
 	int GetNumberOfPlayers(void) const { return m_NumActivePlayers; }
@@ -53,6 +61,9 @@ private:
 
 	/** Number of players who currently have this chest open */
 	int m_NumActivePlayers;
+
+	/** Neighbouring chest that links to form a double chest */
+	cChestEntity * m_Neighbour;
 
 	/** cItemGrid::cListener overrides: */
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
