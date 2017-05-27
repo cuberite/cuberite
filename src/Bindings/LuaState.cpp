@@ -1454,8 +1454,12 @@ bool cLuaState::CallFunction(int a_NumResults)
 		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
 
 		// Remove the error handler and error message from the stack:
-		ASSERT(lua_gettop(m_LuaState) == 2);
-		lua_pop(m_LuaState, 2);
+		auto top = lua_gettop(m_LuaState);
+		if (top != 2)
+		{
+			LogStackValues(Printf("The Lua stack is in an unexpected state, expected two values there, but got %d", top).c_str());
+		}
+		lua_pop(m_LuaState, top);
 		return false;
 	}
 
