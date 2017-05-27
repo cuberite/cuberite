@@ -34,6 +34,12 @@ g_PluginInfo =
 			Handler = HandleClientVersionCmd,
 			HelpString = "Shows your client's protocol version",
 		},
+		["/come"] =
+		{
+			Permission = "debuggers.come",
+			Handler = HandleComeCmd,
+			HelpString = "Instruct the mob you're looking at to navigate to your position",
+		},
 		["/compo"] =
 		{
 			Permission = "debuggers",
