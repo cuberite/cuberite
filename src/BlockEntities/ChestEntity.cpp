@@ -137,22 +137,17 @@ void cChestEntity::ScanNeighbours()
 
 	// Scan horizontally adjacent blocks for any neighbouring chest:
 	cFindNeighbour FindNeighbour;
-	cWorld * World = this->m_World;
-	int PosX = this->m_PosX;
-	int PosY = this->m_PosY;
-	int PosZ = this->m_PosZ;
 	if (
-		World->DoWithChestAt(PosX - 1, PosY, PosZ,     FindNeighbour) ||
-		World->DoWithChestAt(PosX + 1, PosY, PosZ,     FindNeighbour) ||
-		World->DoWithChestAt(PosX,     PosY, PosZ - 1, FindNeighbour) ||
-		World->DoWithChestAt(PosX,     PosY, PosZ + 1, FindNeighbour)
+		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     FindNeighbour) ||
+		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     FindNeighbour) ||
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ - 1, FindNeighbour) ||
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ + 1, FindNeighbour)
 	)
 	{
-		cChestEntity * Neighbour = FindNeighbour.m_Neighbour;
-		this->m_Neighbour = Neighbour;
-		Neighbour->m_Neighbour = this;
+		m_Neighbour = FindNeighbour.m_Neighbour;
+		m_Neighbour->m_Neighbour = this;
 		// Force neighbour's window shut. Does Mojang server do this or should a double window open?
-		Neighbour->DestroyWindow();
+		m_Neighbour->DestroyWindow();
 	}
 }
 
