@@ -149,20 +149,21 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		return;
 	}
 
-
-	if (m_JumpCoolDown == 0)
+	if (m_JumpCoolDown <= 0)
 	{
 		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
-			if (((IsOnGround()) && (GetSpeed().SqrLength() == 0.0f)) ||
-			(IsSwimming()))
+			if (
+				(IsOnGround() && (GetSpeed().SqrLength() <= 0.5)) ||  // If walking on the ground, we need to slow down first, otherwise we miss the jump
+				IsSwimming()
+			)
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
-				// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
 				AddPosY(1.6);  // Jump!!
+				SetSpeedY(1);
 				SetSpeedX(3.2 * (m_NextWayPointPosition.x - GetPosition().x));  // Move forward in a preset speed.
-				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error and 1.6 and 3.2 are perfect.
+				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error
 			}
 		}
 	}
@@ -172,7 +173,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 	}
 
 	Vector3d Distance = m_NextWayPointPosition - GetPosition();
-	if ((Distance.x != 0.0f) || (Distance.z != 0.0f))
+	if ((std::abs(Distance.x) > 0.05) || (std::abs(Distance.z) > 0.05))
 	{
 		Distance.y = 0;
 		Distance.Normalize();

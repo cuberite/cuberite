@@ -208,10 +208,10 @@ protected:
 	/** Returns whether or not the target is close enough for attack. */
 	bool TargetIsInRange(void) { ASSERT(m_Target != nullptr); return ((m_Target->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
 
-	/** Returns if a monster can reach a given height by jumping. */
-	inline bool DoesPosYRequireJump(int a_PosY)
+	/** Returns whether the monster needs to jump to reach a given height. */
+	inline bool DoesPosYRequireJump(double a_PosY)
 	{
-		return ((a_PosY > POSY_TOINT));
+		return (a_PosY > GetPosY() + 0.8);  // Assume that differences up to 0.8 blocks can be walked instead of jumped
 	}
 
 	/** Move in a straight line to the next waypoint in the path, will jump if needed. */
