@@ -31,7 +31,7 @@ public:
 	virtual bool Item(cEntity * a_Entity) override
 	{
 		ASSERT(a_Entity->IsTicking());
-		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()))
+		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()) || !a_Entity->IsOnGround())
 		{
 			return false;
 		}
@@ -59,6 +59,12 @@ public:
 
 			if (Item.m_ItemCount <= 0)
 			{
+				/* Experimental: show animation pickups getting together */
+				int DiffX = FloorC(m_Pickup->GetPosX() * 32.0) - FloorC(EntityPos.x * 32.0);
+				int DiffY = FloorC(m_Pickup->GetPosY() * 32.0) - FloorC(EntityPos.y * 32.0);
+				int DiffZ = FloorC(m_Pickup->GetPosZ() * 32.0) - FloorC(EntityPos.z * 32.0);
+				a_Entity->GetWorld()->BroadcastEntityRelMove(*a_Entity, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ));
+				/* End of experimental animation */
 				a_Entity->Destroy();
 			}
 			else
@@ -159,7 +165,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			// Try to combine the pickup with adjacent same-item pickups:
-			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine if already full
+			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()) && this->IsOnGround())  // Don't combine if already full or not on ground
 			{
 				// By using a_Chunk's ForEachEntity() instead of cWorld's, pickups don't combine across chunk boundaries.
 				// That is a small price to pay for not having to traverse the entire world for each entity.
