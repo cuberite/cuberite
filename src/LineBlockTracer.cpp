@@ -122,7 +122,11 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
 			eBlockFace Face;  // Face hit
-			VERIFY(bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face));
+			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
+			{
+				// Math rounding errors have caused the calculation to miss the block completely, assume immediate hit
+				LineCoeff = 0;
+			}
 			m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
 			return true;
 		}
