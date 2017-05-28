@@ -1122,12 +1122,14 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3d HitCoords;
 		Vector3i HitBlockCoords;
 		eBlockFace HitBlockFace;
-		if (cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, NextPos + NextSpeed, HitCoords, HitBlockCoords, HitBlockFace))
+		Vector3d wantNextPos = NextPos + NextSpeed * DtSec.count();
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
+		if (isHit)
 		{
 			// Set our position to where the block was hit, minus a bit:
 			// TODO: The real entity's m_Width should be taken into account here
 			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
-			if (HitBlockFace == BLOCK_FACE_YM)
+			if (HitBlockFace == BLOCK_FACE_YP)
 			{
 				// We hit the ground, adjust the position to the top of the block:
 				m_bOnGround = true;
@@ -1161,11 +1163,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 			}
 		}
-	}
-	else
-	{
-		// We didn't hit anything, so move =]
-		NextPos += (NextSpeed * DtSec.count());
+		else
+		{
+			// We didn't hit anything, so move:
+			NextPos += (NextSpeed * DtSec.count());
+		}
 	}
 
 	SetPosition(NextPos);
