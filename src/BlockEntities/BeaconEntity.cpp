@@ -297,7 +297,7 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 		// if (a_Player->GetWindow() != Window)
 		// -> Because mojang doesn't send a 'close window' packet when you click the cancel button in the beacon inventory ...
 		{
-			a_Player->OpenWindow(Window);
+			a_Player->OpenWindow(*Window);
 		}
 	}
 	return true;
