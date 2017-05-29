@@ -1135,14 +1135,6 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				// We hit the ground, adjust the position to the top of the block:
 				m_bOnGround = true;
 				NextPos.y = HitBlockCoords.y + 1;
-
-				// If this is a pickup and it hits the ground then stop it
-				if (GetEntityType() == eEntityType::etPickup)
-				{
-					NextSpeed.x = 0.0;
-					NextSpeed.y = 0.0;
-					NextSpeed.z = 0.0;
-				}
 			}
 
 			// Avoid movement in the direction of the blockface that has been hit:
