@@ -39,7 +39,7 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 
-	/** Search horizontally adjacent blocks for neighbouring chests and links them together. */
+	/** Search horizontally adjacent blocks for neighbouring chests of the same type and links them together. */
 	void ScanNeighbours();
 
 	/** Opens a new chest window where this is the primary chest and any neighbour is the secondary. */
@@ -72,9 +72,19 @@ private:
 		ASSERT(a_Grid == &m_Contents);
 		if (m_World != nullptr)
 		{
-			if (GetWindow() != nullptr)
+			cWindow * Window = GetWindow();
+			if (
+				(Window == nullptr) &&
+				(m_Neighbour != nullptr)
+			)
 			{
-				GetWindow()->BroadcastWholeWindow();
+				// Neighbour might own the window
+				Window = m_Neighbour->GetWindow();
+			}
+
+			if (Window != nullptr)
+			{
+				Window->BroadcastWholeWindow();
 			}
 
 			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
