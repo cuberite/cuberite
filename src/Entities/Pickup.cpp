@@ -165,7 +165,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			// Try to combine the pickup with adjacent same-item pickups:
-			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()) && this->IsOnGround())  // Don't combine if already full or not on ground
+			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()) && IsOnGround())  // Don't combine if already full or not on ground
 			{
 				// By using a_Chunk's ForEachEntity() instead of cWorld's, pickups don't combine across chunk boundaries.
 				// That is a small price to pay for not having to traverse the entire world for each entity.
