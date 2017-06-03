@@ -139,7 +139,7 @@ void cChestEntity::ScanNeighbours()
 		{
 			if (a_Chest->GetBlockType() != m_ChestType)
 			{
-				// Don't neighbour with the wrong type of chest
+				// Neighboring block is not the same type of chest
 				return true;
 			}
 			m_Neighbour = a_Chest;
