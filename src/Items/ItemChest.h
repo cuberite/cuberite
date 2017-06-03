@@ -154,7 +154,7 @@ public:
 		}
 
 		// Adjust the existing chest, if any:
-		if (NeighborIdx > 0)
+		if (NeighborIdx != -1)
 		{
 			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
 		}

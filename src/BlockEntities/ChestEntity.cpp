@@ -127,21 +127,28 @@ void cChestEntity::ScanNeighbours()
 	{
 	public:
 		cChestEntity * m_Neighbour;
+		BLOCKTYPE      m_ChestType;
 
-		cFindNeighbour() :
-			m_Neighbour(nullptr)
+		cFindNeighbour(BLOCKTYPE a_ChestType) :
+			m_Neighbour(nullptr),
+			m_ChestType(a_ChestType)
 		{
 		}
 
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
+			if (a_Chest->GetBlockType() != m_ChestType)
+			{
+				// Neighboring block is not the same type of chest
+				return true;
+			}
 			m_Neighbour = a_Chest;
 			return false;
 		}
 	};
 
-	// Scan horizontally adjacent blocks for any neighbouring chest:
-	cFindNeighbour FindNeighbour;
+	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
+	cFindNeighbour FindNeighbour(m_BlockType);
 	if (
 		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     FindNeighbour) ||
 		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     FindNeighbour) ||
