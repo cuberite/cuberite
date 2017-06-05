@@ -28,7 +28,6 @@
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
-#include "FastRandom.h"
 #include "EffectID.h"
 
 
@@ -801,8 +800,8 @@ public:
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
 	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 
-	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
-	int GetTickRandomNumber(int a_Range) { return static_cast<int>(m_TickRand.randInt(a_Range)); }
+	/** Returns a random number in range [0 .. a_Range]. */
+	int GetTickRandomNumber(int a_Range);
 
 	/** Appends all usernames starting with a_Text (case-insensitive) into Results */
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
@@ -879,9 +878,6 @@ private:
 
 	/** The dimension of the world, used by the client to provide correct lighting scheme */
 	eDimension m_Dimension;
-
-	/** This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe) */
-	MTRand m_TickRand;
 
 	bool m_IsSpawnExplicitlySet;
 	double m_SpawnX;

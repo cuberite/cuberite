@@ -34,7 +34,7 @@ void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;  // Babies don't lay eggs
 	}
 
-	if ((m_EggDropTimer == 6000) && (m_World->GetTickRandomNumber(1) == 0))
+	if ((m_EggDropTimer == 6000) && GetRandomProvider().RandBool())
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;

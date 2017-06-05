@@ -37,22 +37,22 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		cFastRandom rand;
+		auto & rand = GetRandomProvider();
 
 		// There is a chance to drop a sapling that varies depending on the type of leaf broken.
 		// TODO: Take into account fortune for sapling drops.
-		int chance;
+		double chance = 0.0;
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_JUNGLE))
 		{
 			// Jungle leaves have a 2.5% chance of dropping a sapling.
-			chance = rand.NextInt(40);
+			chance = 0.025;
 		}
 		else
 		{
 			// Other leaves have a 5% chance of dropping a sapling.
-			chance = rand.NextInt(20);
+			chance = 0.05;
 		}
-		if (chance == 0)
+		if (rand.RandBool(chance))
 		{
 			a_Pickups.push_back(
 				cItem(
@@ -66,7 +66,7 @@ public:
 		// 0.5 % chance of dropping an apple, if the leaves' type is Apple Leaves
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
-			if (rand.NextInt(200) == 0)
+			if (rand.RandBool(0.005))
 			{
 				a_Pickups.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
 			}

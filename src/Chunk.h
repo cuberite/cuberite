@@ -27,7 +27,6 @@ namespace Json
 class cWorld;
 class cClientHandle;
 class cServer;
-class MTRand;
 class cPlayer;
 class cChunkMap;
 class cBeaconEntity;
@@ -609,7 +608,7 @@ private:
 	bool GrowTallGrass      (int a_RelX, int a_RelY, int a_RelZ);
 
 	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
-	bool GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
+	bool GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(cEntity * a_Entity);

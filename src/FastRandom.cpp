@@ -1,7 +1,7 @@
 
 // FastRandom.cpp
 
-// Implements the cFastRandom class representing a fast random number generator
+#include <mutex>
 
 #include "Globals.h"
 #include "FastRandom.h"
@@ -13,109 +13,50 @@
 #elif defined (_MSC_VER)
 	#define ATTRIBUTE_TLS static __declspec(thread)
 #else
-	#error "Unknown thread local storage qualifier"
+	#define ATTRIBUTE_TLS thread_local
 #endif
 
-static unsigned int GetRandomSeed()
+// This list allows deletion of elements as if they had static storage duration
+static std::mutex CSDeleteList;
+static std::list<std::unique_ptr<MTRand>> DeleteList;
+
+
+
+
+
+/** Some compilers don't support thread_local for non-POD types, this is purely a work around for that restriction.
+There should be minimal overhead for the non-initializing case and all thread's instances are deleted properly. */
+MTRand & GetRandomProvider()
 {
-	ATTRIBUTE_TLS bool SeedCounterInitialized = 0;
-	ATTRIBUTE_TLS unsigned int SeedCounter = 0;
+	ATTRIBUTE_TLS MTRand * LocalPtr = nullptr;
+	if (LocalPtr == nullptr)
+	{
+		cRandomDeviceSeeder seeder;
+		auto NewInstance = cpp14::make_unique<MTRand>(seeder);
+		auto TempPtr = NewInstance.get();
+
+		std::lock_guard<std::mutex> Lock(CSDeleteList);
+		DeleteList.push_front(std::move(NewInstance));
+		LocalPtr = TempPtr;  // Set after push_back so LocalPtr won't dangle if it throws
+	}
+	return *LocalPtr;
+}
+
+
+
+
+
+UInt32 Detail::GetRandomSeed()
+{
+	ATTRIBUTE_TLS bool SeedCounterInitialized = false;
+	ATTRIBUTE_TLS UInt32 SeedCounter = 0;
 
 	if (!SeedCounterInitialized)
 	{
 		std::random_device rd;
-		std::uniform_int_distribution<unsigned int> dist;
+		std::uniform_int_distribution<UInt32> dist;
 		SeedCounter = dist(rd);
 		SeedCounterInitialized = true;
 	}
 	return ++SeedCounter;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cFastRandom:
-
-
-
-
-
-cFastRandom::cFastRandom(void) :
-	m_LinearRand(GetRandomSeed())
-{
-}
-
-
-
-
-
-int cFastRandom::NextInt(int a_Range)
-{
-	std::uniform_int_distribution<> distribution(0, a_Range - 1);
-	return distribution(m_LinearRand);
-}
-
-
-
-
-
-
-float cFastRandom::NextFloat(float a_Range)
-{
-	std::uniform_real_distribution<float> distribution(0, a_Range);
-	return distribution(m_LinearRand);
-}
-
-
-
-
-
-
-int cFastRandom::GenerateRandomInteger(int a_Begin, int a_End)
-{
-	std::uniform_int_distribution<> distribution(a_Begin, a_End);
-	return distribution(m_LinearRand);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// MTRand:
-
-MTRand::MTRand() :
-	m_MersenneRand(GetRandomSeed())
-{
-}
-
-
-
-
-
-int MTRand::randInt(int a_Range)
-{
-	std::uniform_int_distribution<> distribution(0, a_Range);
-	return distribution(m_MersenneRand);
-}
-
-
-
-
-
-int MTRand::randInt()
-{
-	std::uniform_int_distribution<> distribution(0, std::numeric_limits<int>::max());
-	return distribution(m_MersenneRand);
-}
-
-
-
-
-
-double MTRand::rand(double a_Range)
-{
-	std::uniform_real_distribution<> distribution(0, a_Range);
-	return distribution(m_MersenneRand);
 }

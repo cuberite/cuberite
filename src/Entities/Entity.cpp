@@ -495,12 +495,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			int Chance = static_cast<int>(ThornsLevel * 15);
 
-			cFastRandom Random;
-			int RandomValue = Random.GenerateRandomInteger(0, 100);
+			auto & Random = GetRandomProvider();
 
-			if (RandomValue <= Chance)
+			if (Random.RandBool(Chance / 100.0))
 			{
-				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.GenerateRandomInteger(1, 4), 0);
+				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
 			}
 		}
 
@@ -574,8 +573,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			TotalEPF = 25;
 		}
 
-		cFastRandom Random;
-		float RandomValue = Random.GenerateRandomInteger(50, 100) * 0.01f;
+		float RandomValue = GetRandomProvider().RandReal(0.5f, 1.0f);
 
 		TotalEPF = ceil(TotalEPF * RandomValue);
 

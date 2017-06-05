@@ -174,7 +174,7 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	cItems Pickups;
 	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
 
-	const int PickupSpeed = m_World->GetTickRandomNumber(4) + 2;  // At least 2, at most 6
+	const int PickupSpeed = GetRandomProvider().RandInt(2, 6);  // At least 2, at most 6
 	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
 	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{

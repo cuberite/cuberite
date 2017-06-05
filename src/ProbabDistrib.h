@@ -20,8 +20,7 @@ Usage:
 
 
 
-// fwd:
-class MTRand;
+#include "FastRandom.h"
 
 
 

@@ -162,7 +162,7 @@ protected:
 		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width - 1);
 		int RelEndX   = Clamp(a_EndX - BlockX,   0, cChunkDef::Width);
 		int RelEndZ   = Clamp(a_EndZ - BlockZ,   0, cChunkDef::Width);
-		cFastRandom rnd;
+		auto & rnd = GetRandomProvider();
 		for (int y = a_StartY; y < a_EndY; y++)
 		{
 			for (int z = RelStartZ; z < RelEndZ; z++)
@@ -171,7 +171,7 @@ protected:
 				{
 					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
 					{
-						BLOCKTYPE BlockType = (rnd.NextInt(101) < 75) ? a_DstBlockType1 : a_DstBlockType2;
+						BLOCKTYPE BlockType = rnd.RandBool(0.75) ? a_DstBlockType1 : a_DstBlockType2;
 						a_ChunkDesc.SetBlockType(x, y, z, BlockType);
 					}
 				}  // for x
