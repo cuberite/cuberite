@@ -20,6 +20,12 @@ public:
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
+		// Don't feed player if they are in creative mode:
+		if (a_Player->IsGameModeCreative())
+		{
+			return false;
+		}
+
 		// Feed the player:
 		FoodInfo Info = GetFoodInfo();
 		a_Player->Feed(Info.FoodLevel, Info.Saturation);
