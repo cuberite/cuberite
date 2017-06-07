@@ -23,6 +23,12 @@ public:
 		// Feed the player:
 		FoodInfo Info = GetFoodInfo();
 		a_Player->Feed(Info.FoodLevel, Info.Saturation);
+		
+		// If player in creative mode, don't feed them:
+		if (a_Player->IsGameModeCreative())
+		{
+			return false;
+		}
 
 		// Add the effects:
 		a_Player->AddEntityEffect(cEntityEffect::effAbsorption, 2400, 0);
