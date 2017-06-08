@@ -1019,6 +1019,11 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		default:
+		{
+			break;
+		}
 	}  // switch (a_Mob.GetType())
 }
 

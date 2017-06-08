@@ -72,7 +72,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			for (HEIGHTTYPE y = cChunkDef::Height - 1; y >= 0; y--)
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; ; y--)
 			{
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
 				{
@@ -270,6 +270,7 @@ int cStructGenTrees::GetNumTrees(
 			case biMesaBryce:            Add =   4; break;
 			case biMesaPlateauFM:        Add =  12; break;
 			case biMesaPlateauM:         Add =  12; break;
+			default: break;
 		}
 		NumTrees += Add;
 	}
