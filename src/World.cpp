@@ -810,7 +810,7 @@ eWeather cWorld::ChooseNewWeather()
 		case eWeather_Rain:
 		{
 			// 1 / 8 chance of turning into a thunderstorm
-			return GetRandomProvider().RandBool(1.0 / 8) ? eWeather_ThunderStorm : eWeather_Sunny;
+			return GetRandomProvider().RandBool(0.125) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}
 

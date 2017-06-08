@@ -1,12 +1,16 @@
 
 // FastRandom.cpp
 
-#include <mutex>
 
 #include "Globals.h"
 #include "FastRandom.h"
 
+#include <mutex>
 #include <random>
+
+#ifdef __clang__
+	#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
 
 #if defined (__GNUC__)
 	#define ATTRIBUTE_TLS static __thread
@@ -24,10 +28,10 @@ static std::list<std::unique_ptr<MTRand>> DeleteList;
 
 
 
-/** Some compilers don't support thread_local for non-POD types, this is purely a work around for that restriction.
-There should be minimal overhead for the non-initializing case and all thread's instances are deleted properly. */
 MTRand & GetRandomProvider()
 {
+	// Some compilers don't support thread_local for non-POD types, this is purely a work around for that restriction.
+	// There should be minimal overhead for the non-initializing case and all thread's instances are deleted properly.
 	ATTRIBUTE_TLS MTRand * LocalPtr = nullptr;
 	if (LocalPtr == nullptr)
 	{

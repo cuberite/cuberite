@@ -28,7 +28,7 @@ namespace Detail
 	/** Returns a low quality seed. */
 	UInt32 GetRandomSeed();
 
-	/** Aliases true_type if Char is a signed/unsigned/unspecified variant of char. */
+	/** Aliases true_type if Char is any variant of char ignoring signed-ness. */
 	template <class Char>
 	using IsChar = typename std::is_same<typename std::make_signed<Char>::type, signed char>::type;
 
@@ -36,7 +36,11 @@ namespace Detail
 	struct cUniformImpl :
 		public std::conditional<
 			IsChar<IntType>::value,
-			std::uniform_int_distribution<unsigned short>,
+			typename std::conditional<  // Match signed-ness of IntType
+				std::is_signed<IntType>::value,
+				std::uniform_int_distribution<short>,
+				std::uniform_int_distribution<unsigned short>
+			>::type,
 			std::uniform_int_distribution<IntType>
 		>
 	{
@@ -57,7 +61,7 @@ class cRandomWrapper
 {
 public:
 	/** Initialize with a low quality seed. */
-	cRandomWrapper() :
+	cRandomWrapper():
 		m_Engine(Detail::GetRandomSeed())
 	{
 	}
@@ -65,7 +69,7 @@ public:
 
 	/** Initialize with a SeedSequence. */
 	template <class SeedSeq>
-	cRandomWrapper(SeedSeq & a_SeedSeq) :
+	cRandomWrapper(SeedSeq & a_SeedSeq):
 		m_Engine(a_SeedSeq)
 	{
 	}
@@ -82,7 +86,7 @@ public:
 			(a_Min >= std::numeric_limits<IntType>::min())
 		);
 		Detail::cUniform<IntType> dist(
-			static_cast<IntType>(a_Min), 
+			static_cast<IntType>(a_Min),
 			static_cast<IntType>(a_Max)
 		);
 		return static_cast<IntType>(dist(m_Engine));
@@ -153,7 +157,7 @@ public:
 
 
 
-	/** Return a random bool with the given probabitlity of being true. */
+	/** Return a random bool with the given probability of being true. */
 	bool RandBool(double a_TrueProbability = 0.5)
 	{
 		std::bernoulli_distribution dist(a_TrueProbability);

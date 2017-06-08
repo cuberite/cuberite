@@ -26,7 +26,7 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Drop seeds, sometimes
-		if (GetRandomProvider().RandBool(1.0/8))
+		if (GetRandomProvider().RandBool(0.125))
 		{
 			a_Pickups.push_back(cItem(E_ITEM_SEEDS, 1, 0));
 		}

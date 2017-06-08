@@ -121,7 +121,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		if (GetRandomProvider().RandBool(1.0/600))
+		if (GetRandomProvider().RandBool(1.0/600.0))
 		{
 			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
 			{

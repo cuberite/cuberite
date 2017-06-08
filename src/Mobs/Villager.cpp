@@ -32,7 +32,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer())
 	{
-		if (GetRandomProvider().RandBool(1.0/6))
+		if (GetRandomProvider().RandBool(1.0/6.0))
 		{
 			m_World->BroadcastEntityStatus(*this, esVillagerAngry);
 		}
