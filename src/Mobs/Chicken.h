@@ -26,6 +26,8 @@ public:
 
 	virtual void HandleFalling(void) override;
 
+	virtual void HandleFalling(void) override;
+
 private:
 
 	int m_EggDropTimer;
