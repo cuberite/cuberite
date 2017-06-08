@@ -368,7 +368,18 @@ void cLightingThread::PrepareSkyLight(void)
 		for (int x = 1; x < cChunkDef::Width * 3 - 1; x++)
 		{
 			int idx = BaseZ + x;
-			int Current   = m_HeightMap[idx] + 1;
+			// Find the lowest block in this column that receives full sunlight (go through transparent blocks):
+			int Current = m_HeightMap[idx];
+			ASSERT(Current < cChunkDef::Height);
+			while (
+				(Current >= 0) &&
+				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer])
+			)
+			{
+				Current -= 1;  // Sunlight goes down unchanged through this block
+			}
+			Current += 1;  // Point to the last sunlit block, rather than the first non-transparent one
+			// The other neighbors don't need transparent-block-checking. At worst we'll have a few dud seeds above the ground.
 			int Neighbor1 = m_HeightMap[idx + 1] + 1;  // X + 1
 			int Neighbor2 = m_HeightMap[idx - 1] + 1;  // X - 1
 			int Neighbor3 = m_HeightMap[idx + cChunkDef::Width * 3] + 1;  // Z + 1
