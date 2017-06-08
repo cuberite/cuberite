@@ -101,9 +101,17 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 
 	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
 	{
-		if (static_cast<cPlayer *>(GetTarget())->GetUUID() == m_OwnerUUID)
+		cPlayer * Player = static_cast<cPlayer *>(GetTarget());
+		if (Player->GetUUID() == m_OwnerUUID)
 		{
 			SetTarget(nullptr);
+			return false;
+		}
+		else if (Player->GetHealth() == 0)
+		{
+			SetTarget(nullptr);
+			SetIsAngry(false);
+			m_World->BroadcastEntityMetadata(*this);  // Broadcast health and possibly angry face
 			return false;
 		}
 	}
