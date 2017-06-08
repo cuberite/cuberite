@@ -1050,12 +1050,10 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		int BlockZ = a_BlockZ;
 		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
 
-		if ((BlockY < 0) || (BlockY >= cChunkDef::Height))
-		{
-			return;
-		}
-
-		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough())
+		if (
+			cChunkDef::IsValidHeight(BlockY) &&
+			cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough()
+		)
 		{
 			a_BlockX = BlockX;
 			a_BlockY = BlockY;
@@ -1385,12 +1383,15 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		if ((a_BlockX != -1) && (a_BlockY >= 0) && (a_BlockZ != -1))
 		{
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			if (a_BlockY < cChunkDef::Height - 1)
+			if (cChunkDef::IsValidHeight(a_BlockY))
+			{
+				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			}
+			if (cChunkDef::IsValidHeight(a_BlockY + 1))
 			{
 				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
 			}
-			if (a_BlockY > 0)
+			if (cChunkDef::IsValidHeight(a_BlockY - 1))
 			{
 				World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
 			}
@@ -1418,12 +1419,15 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			if (a_BlockFace != BLOCK_FACE_NONE)
 			{
 				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-				if (a_BlockY < cChunkDef::Height - 1)
+				if (cChunkDef::IsValidHeight(a_BlockY))
+				{
+					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+				}
+				if (cChunkDef::IsValidHeight(a_BlockY + 1))
 				{
 					World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
 				}
-				if (a_BlockY > 1)
+				if (cChunkDef::IsValidHeight(a_BlockY - 1))
 				{
 					World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
 				}
