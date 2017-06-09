@@ -350,6 +350,12 @@ g_PluginInfo =
 			HelpString = "Tests inter-plugin calls with various values"
 		},
 
+		["testerr"] =
+		{
+			Handler = HandleConsoleTestErr,
+			HelpString = "Tests the server's ability to recover from errors in callbacks (GH #3733)",
+		},
+
 		["testjson"] =
 		{
 			Handler = HandleConsoleTestJson,
