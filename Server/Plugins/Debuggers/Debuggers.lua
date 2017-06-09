@@ -2279,6 +2279,18 @@ end
 
 
 
+function HandleConsoleTestErr(a_Split, a_EntireCmd)
+	cRoot:Get():GetDefaultWorld():ForEachEntity(
+		function (a_CBEntity)
+			error("This error should not abort the server")
+		end
+	)
+end
+
+
+
+
+
 function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	LOG("Testing Json parsing...")
 	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5], "d": true }]])

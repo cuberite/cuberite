@@ -1455,11 +1455,11 @@ bool cLuaState::CallFunction(int a_NumResults)
 
 		// Remove the error handler and error message from the stack:
 		auto top = lua_gettop(m_LuaState);
-		if (top != 2)
+		if (top < 2)
 		{
-			LogStackValues(Printf("The Lua stack is in an unexpected state, expected two values there, but got %d", top).c_str());
+			LogStackValues(Printf("The Lua stack is in an unexpected state, expected at least two values there, but got %d", top).c_str());
 		}
-		lua_pop(m_LuaState, top);
+		lua_pop(m_LuaState, std::min(2, top));
 		return false;
 	}
 
