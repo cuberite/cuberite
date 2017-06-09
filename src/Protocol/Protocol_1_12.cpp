@@ -1203,6 +1203,18 @@ void cProtocol_1_12::SendAttachEntity(const cEntity & a_Entity, const cEntity & 
 
 
 
+void cProtocol_1_12::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, 0x42);  // Set passangers packet
+	Pkt.WriteVarInt32(a_PreviousVehicle.GetUniqueID());
+	Pkt.WriteVarInt32(0);  // No passangers
+}
+
+
+
+
+
 void cProtocol_1_12::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?

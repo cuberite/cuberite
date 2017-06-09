@@ -32,6 +32,7 @@ public:
 	virtual void SendCameraSetTo(const cEntity & a_Entity) override;
 	virtual void SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
 	virtual void SendDestroyEntity(const cEntity & a_Entity) override;
+	virtual void SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	virtual void SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
 	virtual void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
