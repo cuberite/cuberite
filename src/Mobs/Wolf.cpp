@@ -179,7 +179,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 
-			if (GetRandomProvider().RandBool(1.0 / 8))
+			if (GetRandomProvider().RandBool(0.125))
 			{
 				// Taming succeeded
 				SetMaxHealth(20);

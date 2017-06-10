@@ -1125,7 +1125,7 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel)
 {
 	auto & r1 = GetRandomProvider();
-	if (r1.RandBool((5 + a_LootingLevel)/200.0))
+	if (r1.RandBool((5 + a_LootingLevel) / 200.0))
 	{
 		size_t Rare = r1.RandInt<size_t>(a_Items.Size() - 1);
 		a_Drops.push_back(a_Items.at(Rare));

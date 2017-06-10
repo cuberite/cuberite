@@ -75,11 +75,11 @@ void cThrownEggEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cThrownEggEntity::TrySpawnChicken(const Vector3d & a_HitPos)
 {
 	auto & Random = GetRandomProvider();
-	if (Random.RandBool(1.0 / 8))
+	if (Random.RandBool(0.125))
 	{
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
 	}
-	else if (Random.RandBool(1.0 / 33))
+	else if (Random.RandBool(1.0 / 33.0))
 	{
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);

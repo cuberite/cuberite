@@ -8,10 +8,6 @@
 #include <mutex>
 #include <random>
 
-#ifdef __clang__
-	#pragma clang diagnostic ignored "-Wglobal-constructors"
-#endif
-
 #if defined (__GNUC__)
 	#define ATTRIBUTE_TLS static __thread
 #elif defined (_MSC_VER)
@@ -19,10 +15,6 @@
 #else
 	#define ATTRIBUTE_TLS thread_local
 #endif
-
-// This list allows deletion of elements as if they had static storage duration
-static std::mutex CSDeleteList;
-static std::list<std::unique_ptr<MTRand>> DeleteList;
 
 
 
@@ -35,6 +27,10 @@ MTRand & GetRandomProvider()
 	ATTRIBUTE_TLS MTRand * LocalPtr = nullptr;
 	if (LocalPtr == nullptr)
 	{
+		// This list allows deletion of elements as if they had static storage duration
+		static std::mutex CSDeleteList;
+		static std::list<std::unique_ptr<MTRand>> DeleteList;
+
 		cRandomDeviceSeeder seeder;
 		auto NewInstance = cpp14::make_unique<MTRand>(seeder);
 		auto TempPtr = NewInstance.get();

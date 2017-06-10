@@ -77,7 +77,7 @@ protected:
 	{
 		// Plant can grow if it has the required amount of light, and it passes a random chance based on surrounding blocks
 		PlantAction Action = HasEnoughLight(a_Chunk, a_RelX, a_RelY, a_RelZ);
-		if ((Action == paGrowth) && !GetRandomProvider().RandBool(1.0/GetGrowthChance(a_Chunk, a_RelX, a_RelY, a_RelZ)))
+		if ((Action == paGrowth) && !GetRandomProvider().RandBool(1.0 / GetGrowthChance(a_Chunk, a_RelX, a_RelY, a_RelZ)))
 		{
 			Action = paStay;
 		}
