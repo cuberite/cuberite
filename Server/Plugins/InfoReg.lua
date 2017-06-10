@@ -59,7 +59,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 	-- A verb was specified, look it up in the subcommands table:
 	local Subcommand = a_CmdInfo.Subcommands[Verb]
 	if (Subcommand == nil) then
-		if (a_Level > 1) then
+		if (a_Level + 1 > 1) then
 			-- This is a true subcommand, display the message and make MCS think the command was handled
 			-- Otherwise we get weird behavior: for "/cmd verb" we get "unknown command /cmd" although "/cmd" is valid
 			if (a_Player == nil) then
