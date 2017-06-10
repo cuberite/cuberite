@@ -81,13 +81,14 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 		end
 	end
 
-	-- If the handler is not valid, check the next sublevel:
-	if (Subcommand.Handler == nil) then
-		if (Subcommand.Subcommands == nil) then
-			LOG("Cannot find handler for command " .. a_CmdString .. " " .. Verb)
-			return false
-		end
+	-- First check if the subcommand has subcommands
+	if (Subcommand.Subcommands ~= nil) then
+		-- Next sublevel
 		return MultiCommandHandler(a_Split, a_Player, a_CmdString .. " " .. Verb, Subcommand, a_Level + 1, a_EntireCommand)
+	elseif (Subcommand.Handler == nil) then
+		-- Subcommand has no subcommands and the handler is not found, report error
+		LOGWARNING("Cannot find handler for command " .. a_CmdString .. " " .. Verb)
+		return false
 	end
 
 	-- Execute:
