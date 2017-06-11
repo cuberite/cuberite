@@ -468,6 +468,24 @@ MagentaDye, 4 = BlueDye, *   | WhiteDye, * | RedDye, *, *
 
 
 
+#******************************************************#
+# Concrete Powder:
+#
+White_Concrete_Powder         = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | BoneMeal, 2:2
+Orange_Concrete_Powder        = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | OrangeDye, 2:2
+Magenta_Concrete_Powder       = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | MagentaDye, 2:2
+Light_Blue_Concrete_Powder    = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | LightBlueDye, 2:2
+Yellow_Concrete_Powder        = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | YellowDye, 2:2
+Lime_Concrete_Powder          = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | LimeDye, 2:2
+Pink_Concrete_Powder          = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | PinkDye, 2:2
+Gray_Concrete_Powder          = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | GrayDye, 2:2
+Light_Gray_Concrete_Powder    = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | LightGrayDye, 2:2
+Cyan_Concrete_Powder          = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | CyanDye, 2:2
+Blue_Concrete_Powder          = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | BlueDye, 2:2
+Brown_Concrete_Powder         = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | BrownDye, 2:2
+Green_Concrete_Powder         = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | GreenDye, 2:2
+Red_Concrete_Powder           = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | RedDye, 2:2
+Black_Concrete_Powder         = Sand, 1:1, 3:1, 1:3, 3:3 | Gravel, 2:1, 1:2, 3:2, 2:3 | BlackDye, 2:2
 
 #******************************************************#
 # Colored shulker boxes:

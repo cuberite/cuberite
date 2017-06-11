@@ -43,6 +43,9 @@
 # Smelting recipes
 
 Beef                = Steak
+BlackTerracotta     = BlackGlazedTerracotta
+BlueTerracotta      = BlueGlazedTerracotta
+BrownTerracotta     = BrownGlazedTerracotta
 Cactus              = CactusGreen
 ChainmailBoots      = IronNugget
 ChainmailChestplate = IronNugget
@@ -55,6 +58,7 @@ ClayBlock           = HardenedClay
 CoalOre             = Coal
 Cobblestone         = Stone
 CrackedStonebrick   = Stonebrick
+CyanTerracotta      = CyanGlazedTerracotta
 DiamondOre          = Diamond
 EmeraldOre          = Emerald
 Fish                = CookedFish
@@ -69,6 +73,8 @@ GoldPants           = GoldNugget
 GoldPickaxe         = GoldNugget
 GoldShovel          = GoldNugget
 GoldSword           = GoldNugget
+GrayTerracotta      = GrayGlazedTerracotta
+GreenTerracotta     = GreenGlazedTerracotta
 IronOre             = IronIngot
 IronAxe             = IronNugget
 IronBoots           = IronNugget
@@ -81,20 +87,29 @@ IronPickaxe         = IronNugget
 IronShovel          = IronNugget
 IronSword           = IronNugget
 LapisOre            = LapisLazuli
+LightBlueTerracotta = LightBlueGlazedTerracotta
+LightGrayTerracotta = LightGrayGlazedTerracotta
+LimeTerracotta      = LimeGlazedTerracotta
 Log                 = CharCoal
 Log2                = CharCoal
+MagentaTerracotta   = MagentaGlazedTerracotta
 Mutton              = CookedMutton
 NetherQuartzOre     = NetherQuartz
 Netherrack          = NetherBrick
+OrangeTerracotta    = OrangeGlazedTerracotta
+PinkTerracotta      = PinkGlazedTerracotta
 Porkchop            = CookedPorkchop
 Potato              = BakedPotato
+PurpleTerracotta    = PurpleGlazedTerracotta
 Rabbit              = CookedRabbit
+RedTerracotta       = RedGlazedTerracotta
 RedstoneOre         = Redstone
 Salmon              = CookedSalmon
 Sand                = Glass
 StoneBrick          = CrackedStoneBricks
 WetSponge           = Sponge
-
+WhiteTerracotta     = WhiteGlazedTerracotta
+YellowTerracotta    = YellowGlazedTerracotta
 
 
 
