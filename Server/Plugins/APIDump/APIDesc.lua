@@ -11062,8 +11062,8 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "Item",
-							Type = "cItem",
+							Name = "Material",
+							Type = "cBoat#eMaterial",
 						},
 					},
 					Returns =
