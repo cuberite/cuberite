@@ -1454,7 +1454,7 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 				case 0x03: HandlePacketChatMessage(a_ByteBuffer); return true;
 				case 0x04: HandlePacketClientStatus(a_ByteBuffer); return true;
 				case 0x05: HandlePacketClientSettings(a_ByteBuffer); return true;
-				case 0x06: break;  // Confirm transaction - not used in MCS
+				case 0x06: break;  // Confirm transaction - not used in Cuberite
 				case 0x07: HandlePacketEnchantItem(a_ByteBuffer); return true;
 				case 0x08: HandlePacketWindowClick(a_ByteBuffer); return true;
 				case 0x09: HandlePacketWindowClose(a_ByteBuffer); return true;

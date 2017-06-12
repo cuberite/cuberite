@@ -1,11 +1,11 @@
 
-// Protocol_1_11.h
+// Protocol_1_12.h
 
 /*
-Declares the 1.11 protocol classes:
+Declares the 1.12 protocol classes:
 	- cProtocol_1_12
-		- release 1.11 protocol (#315)
-(others may be added later in the future for the 1.11 release series)
+		- release 1.12 protocol (#335)
+(others may be added later in the future for the 1.12 release series)
 */
 
 
