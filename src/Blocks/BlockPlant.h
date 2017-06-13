@@ -75,10 +75,9 @@ protected:
 	*/
 	virtual PlantAction CanGrow(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 	{
-		cFastRandom rand;
 		// Plant can grow if it has the required amount of light, and it passes a random chance based on surrounding blocks
 		PlantAction Action = HasEnoughLight(a_Chunk, a_RelX, a_RelY, a_RelZ);
-		if ((Action == paGrowth) && (rand.NextInt(GetGrowthChance(a_Chunk, a_RelX, a_RelY, a_RelZ)) != 0))
+		if ((Action == paGrowth) && !GetRandomProvider().RandBool(1.0 / GetGrowthChance(a_Chunk, a_RelX, a_RelY, a_RelZ)))
 		{
 			Action = paStay;
 		}

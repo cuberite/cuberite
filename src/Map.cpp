@@ -306,10 +306,8 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 
 		if (GetDimension() == dimNether)
 		{
-			cFastRandom Random;
-
 			// TODO 2014-02-19 xdot: Refine
-			Rot = Random.NextInt(16);
+			Rot = GetRandomProvider().RandInt(15);
 		}
 		else
 		{
