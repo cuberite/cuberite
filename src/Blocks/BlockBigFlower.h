@@ -46,7 +46,7 @@ public:
 		{
 			a_Pickups.push_back(cItem(E_ITEM_SEEDS));
 		}
-		else if (Meta != E_META_BIG_FLOWER_LARGE_FERM)
+		else if (Meta != E_META_BIG_FLOWER_LARGE_FERN)
 		{
 			a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, Meta));
 		}
