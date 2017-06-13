@@ -41,16 +41,18 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	auto & Random = GetRandomProvider();
+
 	if (!m_bIsMouthOpen)
 	{
-		if (m_World->GetTickRandomNumber(50) == 25)
+		if (Random.RandBool(0.02))
 		{
 			m_bIsMouthOpen = true;
 		}
 	}
 	else
 	{
-		if (m_World->GetTickRandomNumber(10) == 5)
+		if (Random.RandBool(0.10))
 		{
 			m_bIsMouthOpen = false;
 		}
@@ -60,7 +62,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_TameAttemptTimes < m_TimesToTame)
 		{
-			if (m_World->GetTickRandomNumber(50) == 25)
+			if (Random.RandBool(0.02))
 			{
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_EAST));
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_WEST));

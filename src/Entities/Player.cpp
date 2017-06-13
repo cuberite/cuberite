@@ -1069,9 +1069,9 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		{
 			case dtRangedAttack: DamageText = "was shot"; break;
 			case dtLightning: DamageText = "was plasmified by lightining"; break;
-			case dtFalling: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "fell to death" : "hit the ground too hard"; break;
+			case dtFalling: DamageText = GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard"; break;
 			case dtDrowning: DamageText = "drowned"; break;
-			case dtSuffocating: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "git merge'd into a block" : "fused with a block"; break;
+			case dtSuffocating: DamageText = GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block"; break;
 			case dtStarving: DamageText = "forgot the importance of food"; break;
 			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
 			case dtLavaContact: DamageText = "was melted by lava"; break;
@@ -2295,18 +2295,17 @@ void cPlayer::UseEquippedItem(int a_Amount)
 	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
 	if (UnbreakingLevel > 0)
 	{
-		int chance;
+		double chance = 0.0;
 		if (ItemCategory::IsArmor(Item.m_ItemType))
 		{
-			chance = 60 + (40 / (UnbreakingLevel + 1));
+			chance = 0.6 + (0.4 / (UnbreakingLevel + 1));
 		}
 		else
 		{
-			chance = 100 / (UnbreakingLevel + 1);
+			chance = 1.0 / (UnbreakingLevel + 1);
 		}
 
-		cFastRandom Random;
-		if (Random.NextInt(101) <= chance)
+		if (GetRandomProvider().RandBool(chance))
 		{
 			return;
 		}

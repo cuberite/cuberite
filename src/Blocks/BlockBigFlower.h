@@ -71,8 +71,7 @@ public:
 				)
 			)
 			{
-				MTRand r1;
-				if (r1.randInt(10) == 5)
+				if (GetRandomProvider().RandBool(0.10))
 				{
 					cItems Pickups;
 					if (FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)

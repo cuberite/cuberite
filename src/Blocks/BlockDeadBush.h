@@ -46,11 +46,10 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Drop 0-3 sticks
-		cFastRandom random;
-		int chance = random.NextInt(3);
+		char chance = GetRandomProvider().RandInt<char>(3);
 		if (chance != 0)
 		{
-			a_Pickups.push_back(cItem(E_ITEM_STICK, static_cast<char>(chance), 0));
+			a_Pickups.emplace_back(E_ITEM_STICK, chance, 0);
 		}
 	}
 
@@ -74,7 +73,7 @@ public:
 			// Spawn the pickups:
 			if (!Drops.empty())
 			{
-				MTRand r1;
+				auto & r1 = GetRandomProvider();
 
 				// Mid-block position first
 				double MicroX, MicroY, MicroZ;
@@ -83,8 +82,8 @@ public:
 				MicroZ = a_BlockZ + 0.5;
 
 				// Add random offset second
-				MicroX += r1.rand(1) - 0.5;
-				MicroZ += r1.rand(1) - 0.5;
+				MicroX += r1.RandReal<double>(-0.5, 0.5);
+				MicroZ += r1.RandReal<double>(-0.5, 0.5);
 
 				a_WorldInterface.SpawnItemPickups(Drops, MicroX, MicroY, MicroZ);
 			}

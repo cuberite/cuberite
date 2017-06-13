@@ -15,7 +15,6 @@
 class cWorld;
 class cWorldInterface;
 class cItem;
-class MTRand;
 class cChunkStay;
 class cChunk;
 class cPlayer;
@@ -362,7 +361,7 @@ public:
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 
 	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
-	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
+	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
 
 	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the sugarcane grew inside this call */
 	int GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
