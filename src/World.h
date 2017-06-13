@@ -22,6 +22,7 @@
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
+#include "Entities/Boat.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
 #include "MapManager.h"
@@ -453,7 +454,7 @@ public:
 
 	/** Spawns a boat at the given coordinates.
 	Returns the UniqueID of the spawned boat, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnBoat(double a_X, double a_Y, double a_Z);
+	UInt32 SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material);
 
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */

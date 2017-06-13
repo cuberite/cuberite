@@ -15,7 +15,8 @@
 #include "../ItemGrid.h"
 
 
-
+class cPlayer;
+typedef cItemCallback<cPlayer> cPlayerListCallback;
 
 
 /** A window that has been created by a Lua plugin and is handled entirely by that plugin

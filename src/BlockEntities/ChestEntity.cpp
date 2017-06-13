@@ -13,21 +13,33 @@
 
 cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type) :
 	super(a_Type, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
-	m_NumActivePlayers(0)
+	m_NumActivePlayers(0),
+	m_Neighbour(nullptr)
 {
+	int ChunkX = 0, ChunkZ = 0;
+	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
+	if (
+		(m_World != nullptr) &&
+		m_World->IsChunkValid(ChunkX, ChunkZ)
+	)
+	{
+		ScanNeighbours();
+	}
 }
-
 
 
 
 
 cChestEntity::~cChestEntity()
 {
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
+	if (m_Neighbour != nullptr)
 	{
-		Window->OwnerDestroyed();
+		// Neighbour may share a window with us, force the window shut
+		m_Neighbour->DestroyWindow();
+		m_Neighbour->m_Neighbour = nullptr;
 	}
+
+	DestroyWindow();
 }
 
 
@@ -46,12 +58,42 @@ void cChestEntity::SendTo(cClientHandle & a_Client)
 
 bool cChestEntity::UsedBy(cPlayer * a_Player)
 {
+	if (IsBlocked())
+	{
+		// Obstruction, don't open
+		return true;
+	}
+
+	if (m_Neighbour == nullptr)
+	{
+		ScanNeighbours();
+	}
+
+	// The primary chest should be the one with lesser X or Z coord:
+	cChestEntity * PrimaryChest = this;
+	if (m_Neighbour != nullptr)
+	{
+		if (m_Neighbour->IsBlocked())
+		{
+			// Obstruction, don't open
+			return true;
+		}
+
+		if (
+			(m_Neighbour->GetPosX() > GetPosX()) ||
+			(m_Neighbour->GetPosZ() > GetPosZ())
+		)
+		{
+			PrimaryChest = m_Neighbour;
+		}
+	}
+
 	// If the window is not created, open it anew:
-	cWindow * Window = GetWindow();
+	cWindow * Window = PrimaryChest->GetWindow();
 	if (Window == nullptr)
 	{
-		OpenNewWindow();
-		Window = GetWindow();
+		PrimaryChest->OpenNewWindow();
+		Window = PrimaryChest->GetWindow();
 	}
 
 	// Open the window for the player:
@@ -59,7 +101,7 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow(Window);
+			a_Player->OpenWindow(*Window);
 		}
 	}
 
@@ -77,62 +119,94 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cChestEntity::OpenNewWindow(void)
+void cChestEntity::ScanNeighbours()
 {
-	// TODO: cats are an obstruction
-	if ((GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
-	{
-		// Obstruction, don't open
-		return;
-	}
-
-	// Callback for opening together with neighbor chest:
-	class cOpenDouble :
+	// Callback for finding neighbouring chest:
+	class cFindNeighbour :
 		public cChestCallback
 	{
-		cChestEntity * m_ThisChest;
 	public:
-		cOpenDouble(cChestEntity * a_ThisChest) :
-			m_ThisChest(a_ThisChest)
+		cChestEntity * m_Neighbour;
+		BLOCKTYPE      m_ChestType;
+
+		cFindNeighbour(BLOCKTYPE a_ChestType) :
+			m_Neighbour(nullptr),
+			m_ChestType(a_ChestType)
 		{
 		}
 
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
-			if ((a_Chest->GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
+			if (a_Chest->GetBlockType() != m_ChestType)
 			{
-				// Obstruction, don't open
-				return false;
+				// Neighboring block is not the same type of chest
+				return true;
 			}
-
-			// The primary chest should eb the one with lesser X or Z coord:
-			cChestEntity * Primary = a_Chest;
-			cChestEntity * Secondary = m_ThisChest;
-			if (
-				(Primary->GetPosX() > Secondary->GetPosX()) ||
-				(Primary->GetPosZ() > Secondary->GetPosZ())
-			)
-			{
-				std::swap(Primary, Secondary);
-			}
-			m_ThisChest->OpenWindow(new cChestWindow(Primary, Secondary));
+			m_Neighbour = a_Chest;
 			return false;
 		}
-	} ;
+	};
 
-	// Scan neighbors for adjacent chests:
-	cOpenDouble OpenDbl(this);
+	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
+	cFindNeighbour FindNeighbour(m_BlockType);
 	if (
-		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     OpenDbl) ||
-		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     OpenDbl) ||
-		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ - 1, OpenDbl) ||
-		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ + 1, OpenDbl)
+		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     FindNeighbour) ||
+		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     FindNeighbour) ||
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ - 1, FindNeighbour) ||
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ + 1, FindNeighbour)
 	)
 	{
-		// The double-chest window has been opened in the callback
-		return;
+		m_Neighbour = FindNeighbour.m_Neighbour;
+		m_Neighbour->m_Neighbour = this;
+		// Force neighbour's window shut. Does Mojang server do this or should a double window open?
+		m_Neighbour->DestroyWindow();
 	}
+}
 
-	// There is no chest neighbor, open a single-chest window:
-	OpenWindow(new cChestWindow(this));
+
+
+
+
+void cChestEntity::OpenNewWindow(void)
+{
+	if (m_Neighbour != nullptr)
+	{
+		ASSERT(  // This should be the primary chest
+			(m_Neighbour->GetPosX() < GetPosX()) ||
+			(m_Neighbour->GetPosZ() < GetPosZ())
+		);
+		OpenWindow(new cChestWindow(this, m_Neighbour));
+	}
+	else
+	{
+		// There is no chest neighbour, open a single-chest window:
+		OpenWindow(new cChestWindow(this));
+	}
+}
+
+
+
+
+
+void cChestEntity::DestroyWindow()
+{
+	cWindow * Window = GetWindow();
+	if (Window != nullptr)
+	{
+		Window->OwnerDestroyed();
+		CloseWindow();
+	}
+}
+
+
+
+
+
+bool cChestEntity::IsBlocked()
+{
+	// TODO: cats are an obstruction
+	return (
+		(GetPosY() >= cChunkDef::Height - 1) ||
+		!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()))
+	);
 }

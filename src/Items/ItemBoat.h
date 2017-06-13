@@ -95,7 +95,7 @@ public:
 		}
 
 		// Spawn block at water level
-		cBoat * Boat = new cBoat(x + 0.5, y + 0.5, z + 0.5);
+		cBoat * Boat = new cBoat(x + 0.5, y + 0.5, z + 0.5, cBoat::ItemToMaterial(a_Player->GetEquippedItem()));
 		if (!Boat->Initialize(*a_World))
 		{
 			delete Boat;

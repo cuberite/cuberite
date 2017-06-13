@@ -4,8 +4,10 @@
 
 #include "Globals.h"
 #include "LuaWindow.h"
+#include "../Entities/Player.h"
 #include "../UI/SlotArea.h"
 #include "PluginLua.h"
+#include "Root.h"
 #include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
 
 
@@ -50,6 +52,24 @@ cLuaWindow::cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType,
 cLuaWindow::~cLuaWindow()
 {
 	m_Contents.RemoveListener(*this);
+
+	// Close open lua window from players, to avoid dangling pointers
+	class cPlayerCallback : public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * a_Player)
+		{
+			if (a_Player->GetWindow() == m_LuaWindow)
+			{
+				a_Player->CloseWindow(false);
+			}
+			return false;
+		}
+		cLuaWindow * m_LuaWindow;
+	public:
+		cPlayerCallback(cLuaWindow & a_LuaWindow) { m_LuaWindow = &a_LuaWindow; }
+	} PlayerCallback(*this);
+
+	cRoot::Get()->ForEachPlayer(PlayerCallback);
 
 	// Must delete slot areas now, because they are referencing this->m_Contents and would try to access it in cWindow's
 	// destructor, when the member is already gone.

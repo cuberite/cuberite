@@ -7970,6 +7970,16 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Returns the specified hotbar slot contents. Note that the returned item is read-only",
 				},
+				GetShieldSlot =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns current item in shield slot.",
+				},				
 				GetInventoryGrid =
 				{
 					Returns =
@@ -8177,6 +8187,17 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified hotbar slot contents",
 				},
+				SetShieldSlot =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the shield slot content",
+				},				
 				SetInventorySlot =
 				{
 					Params =
@@ -8233,6 +8254,14 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invInventoryOffset =
 				{
 					Notes = "Starting slot number of the main inventory part",
+				},
+				invShieldCount =
+				{
+					Notes = "Number of slots in the Shield part",
+				},
+				invShieldOffset =
+				{
+					Notes = "Starting slot number of the Shield part",
 				},
 				invNumSlots =
 				{
@@ -11009,6 +11038,149 @@ a_Player:OpenWindow(Window);
 			},
 			Inherits = "cEntity",
 		},
+		cBoat =
+		{
+			Desc = [[
+				This class represents a boat. This entity can be spawned by using {{cWorld#SpawnBoat_1|cWorld:SpawnBoat}}.
+			]],
+			Functions =
+			{
+				GetMaterial =
+				{
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the material of the boat.",
+				},
+				MaterialToString =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the boat material as a string.",
+				},
+				ItemToMaterial =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the eMaterial that should be used for a boat created from the specified item. Returns bmOak if not a boat item.",
+				},
+				MaterialToItem =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the boat item of the boat material",
+				},
+				StringToMaterial =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the boat material for the passed string. Returns oak if not valid.",
+				},
+				SetMaterial =
+				{
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Set the material of the boat.",
+				},
+			},
+			Constants =
+			{
+				bmOak =
+				{
+					Notes = "",
+				},
+				bmSpruce =
+				{
+					Notes = "",
+				},
+				bmBirch =
+				{
+					Notes = "",
+				},
+				bmJungle =
+				{
+					Notes = "",
+				},
+				bmAcacia =
+				{
+					Notes = "",
+				},
+				bmDarkOak =
+				{
+					Notes = "",
+				},
+			},
+			ConstantGroups =
+			{
+				eMaterial =
+				{
+					Include = "bm.*",
+					TextBefore = "These constans are the different wood materials of the boat.",
+				},
+			},
+			Inherits = "cEntity",
+		},
 		cPickup =
 		{
 			Desc = [[
@@ -11260,6 +11432,26 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
+				},
+				GetPrefix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
+				},
+				GetSuffix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
 				},
 				GetCurrentXp =
 				{

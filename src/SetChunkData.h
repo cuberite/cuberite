@@ -24,7 +24,7 @@ public:
 
 	/** Constructs a new instance based on data existing elsewhere, will copy all the memory. Prefer to use the
 	other constructor as much as possible.
-	Will move the entity and blockentity lists into the internal storage, and invalidate a_Entities and
+	Will move the entity list and blockentities into the internal storage, and invalidate a_Entities and
 	a_BlockEntities.
 	When passing an lvalue, a_Entities and a_BlockEntities must be explicitly converted to an rvalue beforehand
 	with std::move().
@@ -44,7 +44,7 @@ public:
 		const cChunkDef::HeightMap * a_HeightMap,
 		const cChunkDef::BiomeMap * a_Biomes,
 		cEntityList && a_Entities,
-		cBlockEntityList && a_BlockEntities,
+		cBlockEntities && a_BlockEntities,
 		bool a_ShouldMarkDirty
 	);
 
@@ -73,7 +73,7 @@ public:
 	cEntityList & GetEntities(void) { return m_Entities; }
 
 	/** Returns the internal storage for block entities, read-write. */
-	cBlockEntityList & GetBlockEntities(void) { return m_BlockEntities; }
+	cBlockEntities & GetBlockEntities(void) { return m_BlockEntities; }
 
 	/** Returns whether both light arrays stored in this object are valid. */
 	bool IsLightValid(void) const { return m_IsLightValid; }
@@ -108,7 +108,7 @@ protected:
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap m_Biomes;
 	cEntityList m_Entities;
-	cBlockEntityList m_BlockEntities;
+	cBlockEntities m_BlockEntities;
 
 	bool m_IsLightValid;
 	bool m_IsHeightMapValid;

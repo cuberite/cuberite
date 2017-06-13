@@ -1010,6 +1010,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NextPos.y += 0.5;
 		}
 
+		m_bHasSentNoSpeed = false;  // this unlocks movement sending to client in BroadcastMovementUpdate function
 		m_bOnGround = true;
 
 		/*
@@ -1122,12 +1123,14 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3d HitCoords;
 		Vector3i HitBlockCoords;
 		eBlockFace HitBlockFace;
-		if (cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, NextPos + NextSpeed, HitCoords, HitBlockCoords, HitBlockFace))
+		Vector3d wantNextPos = NextPos + NextSpeed * DtSec.count();
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
+		if (isHit)
 		{
 			// Set our position to where the block was hit, minus a bit:
 			// TODO: The real entity's m_Width should be taken into account here
 			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
-			if (HitBlockFace == BLOCK_FACE_YM)
+			if (HitBlockFace == BLOCK_FACE_YP)
 			{
 				// We hit the ground, adjust the position to the top of the block:
 				m_bOnGround = true;
@@ -1161,11 +1164,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 			}
 		}
-	}
-	else
-	{
-		// We didn't hit anything, so move =]
-		NextPos += (NextSpeed * DtSec.count());
+		else
+		{
+			// We didn't hit anything, so move:
+			NextPos += (NextSpeed * DtSec.count());
+		}
 	}
 
 	SetPosition(NextPos);
@@ -1913,35 +1916,39 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			m_bHasSentNoSpeed = false;
 		}
 
-		// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-		int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
-		int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
-		int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
-
-		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
+		// Only send movement if speed is not 0 and 'no speed' was sent to client
+		if (!m_bHasSentNoSpeed)
 		{
-			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
+			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
+			int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
+			int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
+			int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
+
+			if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 			{
-				// Difference within Byte limitations, use a relative move packet
-				if (m_bDirtyOrientation)
+				if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
 				{
-					m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
-					m_bDirtyOrientation = false;
+					// Difference within Byte limitations, use a relative move packet
+					if (m_bDirtyOrientation)
+					{
+						m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+						m_bDirtyOrientation = false;
+					}
+					else
+					{
+						m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+					}
+					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
+					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
+					m_LastSentPosition = GetPosition();
 				}
 				else
 				{
-					m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+					// Too big a movement, do a teleport
+					m_World->BroadcastTeleportEntity(*this, a_Exclude);
+					m_LastSentPosition = GetPosition();  // See above
+					m_bDirtyOrientation = false;
 				}
-				// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
-				// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
-				m_LastSentPosition = GetPosition();
-			}
-			else
-			{
-				// Too big a movement, do a teleport
-				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_LastSentPosition = GetPosition();  // See above
-				m_bDirtyOrientation = false;
 			}
 		}
 

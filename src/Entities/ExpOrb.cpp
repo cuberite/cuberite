@@ -12,6 +12,7 @@ cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
+	SetGravity(0);
 }
 
 
@@ -25,6 +26,7 @@ cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
+	SetGravity(0);
 }
 
 
@@ -44,28 +46,30 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5));
-	if ((a_ClosestPlayer != nullptr) && (!a_ClosestPlayer->IsGameModeSpectator()))
+	// Check player proximity no more than twice per second
+	if ((m_TicksAlive % 10) == 0)
 	{
-		Vector3f a_PlayerPos(a_ClosestPlayer->GetPosition());
-		a_PlayerPos.y++;
-		Vector3f a_Distance(a_PlayerPos - GetPosition());
-		double Distance(a_Distance.Length());
-		if (Distance < 0.1f)
+		cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5, false));
+		if ((a_ClosestPlayer != nullptr) && (!a_ClosestPlayer->IsGameModeSpectator()))
 		{
-			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
-			a_ClosestPlayer->DeltaExperience(m_Reward);
+			Vector3f a_PlayerPos(a_ClosestPlayer->GetPosition());
+			a_PlayerPos.y++;
+			Vector3f a_Distance(a_PlayerPos - GetPosition());
+			double Distance(a_Distance.Length());
+			if (Distance < 0.5f)
+			{
+				LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
+				a_ClosestPlayer->DeltaExperience(m_Reward);
 
-			m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+				m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
-			Destroy();
+				Destroy(true);
+				return;
+			}
+			SetSpeedX((a_PlayerPos.x - GetPosition().x) * 2.0);
+			SetSpeedY((a_PlayerPos.y - GetPosition().y) * 2.0);
+			SetSpeedZ((a_PlayerPos.z - GetPosition().z) * 2.0);
 		}
-		a_Distance.Normalize();
-		a_Distance *= (static_cast<float>(5.5 - Distance));
-		SetSpeedX( a_Distance.x);
-		SetSpeedY( a_Distance.y);
-		SetSpeedZ( a_Distance.z);
-		BroadcastMovementUpdate();
 	}
 	HandlePhysics(a_Dt, a_Chunk);
 

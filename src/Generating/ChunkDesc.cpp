@@ -573,23 +573,27 @@ void cChunkDesc::RandomFillRelCuboid(
 
 cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 {
+	auto Idx = cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ);
+	auto itr = m_BlockEntities.find(Idx);
+
+	if (itr != m_BlockEntities.end())
+	{
+		// Already in the list:
+		cBlockEntity * BlockEntity = itr->second;
+		if (BlockEntity->GetBlockType() == GetBlockType(a_RelX, a_RelY, a_RelZ))
+		{
+			// Correct type, already present. Return it:
+			return BlockEntity;
+		}
+		else
+		{
+			// Wrong type, the block type has been overwritten. Erase and create new:
+			m_BlockEntities.erase(itr);
+		}
+	}
+
 	int AbsX = a_RelX + m_ChunkX * cChunkDef::Width;
 	int AbsZ = a_RelZ + m_ChunkZ * cChunkDef::Width;
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
-	{
-		if (((*itr)->GetPosX() == AbsX) && ((*itr)->GetPosY() == a_RelY) && ((*itr)->GetPosZ() == AbsZ))
-		{
-			// Already in the list:
-			if ((*itr)->GetBlockType() != GetBlockType(a_RelX, a_RelY, a_RelZ))
-			{
-				// Wrong type, the block type has been overwritten. Erase and create new:
-				m_BlockEntities.erase(itr);
-				break;
-			}
-			// Correct type, already present. Return it:
-			return *itr;
-		}
-	}  // for itr - m_BlockEntities[]
 
 	// The block entity is not created yet, try to create it and add to list:
 	cBlockEntity * be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), AbsX, a_RelY, AbsZ);
@@ -598,7 +602,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 		// No block entity for this block type
 		return nullptr;
 	}
-	m_BlockEntities.push_back(be);
+	m_BlockEntities.insert({ Idx, be });
 	return be;
 }
 

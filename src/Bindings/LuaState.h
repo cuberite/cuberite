@@ -105,6 +105,41 @@ public:
 		#define ASSERT_LUA_STACK_BALANCE(...)
 	#endif
 
+
+	/** Makes sure that the Lua state's stack has the same number of elements on destruction as it had on construction of this object (RAII).
+	Can only remove elements, if there are less than expected, throws. */
+	class cStackBalancePopper
+	{
+	public:
+		cStackBalancePopper(cLuaState & a_LuaState):
+			m_LuaState(a_LuaState),
+			m_Count(lua_gettop(a_LuaState))
+		{
+		}
+
+		~cStackBalancePopper()
+		{
+			auto curTop = lua_gettop(m_LuaState);
+			if (curTop > m_Count)
+			{
+				// There are some leftover elements, adjust the stack:
+				m_LuaState.LogStackValues(Printf("Re-balancing Lua stack, expected %d values, got %d:", m_Count, curTop).c_str());
+				lua_pop(m_LuaState, curTop - m_Count);
+			}
+			else if (curTop < m_Count)
+			{
+				// This is an irrecoverable error, rather than letting the Lua engine crash undefinedly later on, abort now:
+				LOGERROR("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop);
+				throw std::runtime_error(Printf("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop));
+			}
+		}
+
+	protected:
+		cLuaState & m_LuaState;
+		int m_Count;
+	};
+
+
 	/** Provides a RAII-style locking for the LuaState.
 	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
 	class cLock
@@ -704,7 +739,7 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
-		ASSERT_LUA_STACK_BALANCE(m_LuaState);
+		cStackBalancePopper balancer(*this);
 		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{

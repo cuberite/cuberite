@@ -276,6 +276,12 @@ public:
 	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
 	bool DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callback, bool & a_CallbackResult);  // Lambda version
 
+	/** Calls the callback for each tyEntity; returns true if all block entities processed, false if the callback aborted by returning true
+	tBlocktypes are all blocktypes convertible to tyEntity which are to be called. If no block type is given the callback is called for every block entity
+	Accessible only from within Chunk.cpp */
+	template <class tyEntity, BLOCKTYPE... tBlocktype>
+	bool GenericForEachBlockEntity(cItemCallback<tyEntity>& a_Callback);
+
 	/** Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntity(cBlockEntityCallback & a_Callback);  // Lua-accessible
 
@@ -296,6 +302,12 @@ public:
 
 	/** Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true */
 	bool ForEachFurnace(cFurnaceCallback & a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the tyEntity at the specified coords; returns false if there's no such block entity at those coords, true if found
+	tBlocktype is a list of the blocktypes to be called. If no BLOCKTYPE template arguments are given the callback is called for any block entity
+	Accessible only from within Chunk.cpp */
+	template <class tyEntity, BLOCKTYPE... tBlocktype>
+	bool GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cItemCallback<tyEntity>& a_Callback);
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
@@ -524,7 +536,7 @@ private:
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;
 	cEntityList                  m_Entities;
-	cBlockEntityList             m_BlockEntities;
+	cBlockEntities               m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
 	int m_StayCount;
@@ -566,7 +578,10 @@ private:
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
 
-	/** Creates a block entity for each block that needs a block entity and doesn't have one in the list */
+	/** Add a block entity to the chunk without marking the chunk dirty */
+	void AddBlockEntityClean(cBlockEntity * a_BlockEntity);
+
+	/** Creates a block entity for each block that needs a block entity and doesn't have one already */
 	void CreateBlockEntities(void);
 
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */

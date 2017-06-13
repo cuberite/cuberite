@@ -269,7 +269,7 @@ protected:
 	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the block entity data for the specified block entity into the packet. */
-	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
+	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 
 	/** Types used within metadata */
 	enum eMetadataType

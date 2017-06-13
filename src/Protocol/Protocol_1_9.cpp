@@ -2995,9 +2995,11 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 					{
 						if ((NBT.GetType(entitytag) == TAG_String) && (NBT.GetName(entitytag) == "id"))
 						{
-							eMonsterType MonsterType = cMonster::StringToMobType(NBT.GetString(entitytag));
-							// No special method here to convert to the numeric damage value; just cast to the given ID
+							AString NBTName = NBT.GetString(entitytag);
+							ReplaceString(NBTName, "minecraft:", "");
+							eMonsterType MonsterType = cMonster::StringToMobType(NBTName);
 							a_Item.m_ItemDamage = static_cast<short>(MonsterType);
+
 						}
 					}
 				}
@@ -3395,7 +3397,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		if (MonsterType != eMonsterType::mtInvalidType)
 		{
 			Writer.BeginCompound("EntityTag");
-			Writer.AddString("id", cMonster::MobTypeToVanillaName(MonsterType));
+			Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
 			Writer.EndCompound();
 		}
 	}
@@ -3499,7 +3501,9 @@ void cProtocol_1_9_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
 			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
 			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+			Writer.BeginCompound("SpawnData");
+				Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+			Writer.EndCompound();
 			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			Writer.AddString("id", "MobSpawner");
 			break;
@@ -3686,7 +3690,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 			a_Pkt.WriteBEInt8(8);  // Index 9: Type
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetType()));
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
 
 			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
 			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);

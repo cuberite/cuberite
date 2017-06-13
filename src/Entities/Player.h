@@ -229,7 +229,7 @@ public:
 	// tolua_begin
 
 	/** Opens the specified window; closes the current one first using CloseWindow() */
-	void OpenWindow(cWindow * a_Window);
+	void OpenWindow(cWindow & a_Window);
 
 	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true */
 	void CloseWindow(bool a_CanRefuse = true);
@@ -284,6 +284,12 @@ public:
 	/** Returns the full color code to use for this player, based on their rank.
 	The returned value either is empty, or includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
+
+	/** Returns the player name prefix, may contain @ format directives */
+	AString GetPrefix(void) const;
+
+	/** Returns the player name suffix, may contain @ format directives */
+	AString GetSuffix(void) const;
 
 	/** Returns the name that is used in the playerlist. */
 	AString GetPlayerListName(void) const;

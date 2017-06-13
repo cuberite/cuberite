@@ -92,6 +92,7 @@ set(BINDING_DEPENDENCIES
 	../Cuboid.h
 	../Defines.h
 	../Enchantments.h
+	../Entities/Boat.h
 	../Entities/ArrowEntity.h
 	../Entities/Entity.h
 	../Entities/ExpOrb.h

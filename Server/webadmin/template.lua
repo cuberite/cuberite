@@ -88,7 +88,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<title>]] .. Title .. [[</title>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="/style.css">
-	<link rel="icon" href="/favicon.ico">
+	<link rel="icon" href="/favicon.png">
 </head>
 <body>
 <div class="contention push25">

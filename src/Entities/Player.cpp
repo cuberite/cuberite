@@ -1310,15 +1310,15 @@ cTeam * cPlayer::UpdateTeam(void)
 
 
 
-void cPlayer::OpenWindow(cWindow * a_Window)
+void cPlayer::OpenWindow(cWindow & a_Window)
 {
-	if (a_Window != m_CurrentWindow)
+	if (&a_Window != m_CurrentWindow)
 	{
 		CloseWindow(false);
 	}
-	a_Window->OpenedByPlayer(*this);
-	m_CurrentWindow = a_Window;
-	a_Window->SendWholeWindow(*GetClientHandle());
+	a_Window.OpenedByPlayer(*this);
+	m_CurrentWindow = &a_Window;
+	a_Window.SendWholeWindow(*GetClientHandle());
 }
 
 
@@ -1822,6 +1822,24 @@ AString cPlayer::GetColor(void) const
 
 	// Return the color, including the delimiter:
 	return cChatColor::Delimiter + m_MsgNameColorCode;
+}
+
+
+
+
+
+AString cPlayer::GetPrefix(void) const
+{
+	return m_MsgPrefix;
+}
+
+
+
+
+
+AString cPlayer::GetSuffix(void) const
+{
+	return m_MsgSuffix;
 }
 
 

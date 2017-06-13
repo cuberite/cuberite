@@ -1212,3 +1212,31 @@ extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const c
 
 
 
+/** Base case for IsOneOf to handle empty template aguments. */
+template <class = void>
+bool IsOneOf(BLOCKTYPE a_BlockType)
+{
+	return false;
+}
+
+
+/** Returns true if a_BlockType is equal to any of the variadic template arguments.
+Some example usage:
+\code
+	IsOneOf<>(E_BLOCK_AIR)                           == false
+	IsOneOf<E_BLOCK_AIR>(E_BLOCK_DIRT)               == false
+	IsOneOf<E_BLOCK_AIR, E_BLOCK_DIRT>(E_BLOCK_DIRT) == true
+\endcode
+The implementation is ugly but it is equivalent to this C++17 fold expression:
+\code
+	((a_BlockType == Types) || ...)
+\endcode
+Just written to be valid without fold expressions or SFINAE. */
+template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
+bool IsOneOf(BLOCKTYPE a_BlockType)
+{
+	return ((a_BlockType == Head) || (IsOneOf<Tail...>(a_BlockType)));
+}
+
+
+

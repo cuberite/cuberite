@@ -65,7 +65,7 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow(Window);
+			a_Player->OpenWindow(*Window);
 		}
 	}
 
@@ -141,7 +141,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			Recipe = m_CurrentBrewingRecipes[i];
-			m_Contents.SetSlot(i, Recipe->Output->CopyOne());
+			m_Contents.SetSlot(i, Recipe->Output.CopyOne());
 		}
 
 		// Brewing process completed
@@ -243,7 +243,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		if (m_CurrentBrewingRecipes[i] != nullptr)
 		{
 			Recipe = m_CurrentBrewingRecipes[i];
-			if (Recipe->Ingredient->IsEqual(GetSlot(bsIngredient)) && Recipe->Input->IsEqual(GetSlot(i)))
+			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) && Recipe->Input.IsEqual(GetSlot(i)))
 			{
 				Stop = false;
 				continue;
@@ -255,7 +255,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		{
 			// Found a brewing recipe for the items
 			m_CurrentBrewingRecipes[i] = Recipe;
-			m_Results[i] = Recipe->Output->CopyOne();
+			m_Results[i] = Recipe->Output.CopyOne();
 			Stop = false;
 		}
 	}
@@ -330,7 +330,7 @@ void cBrewingstandEntity::LoadRecipes(void)
 		if (Recipe != nullptr)
 		{
 			m_CurrentBrewingRecipes[i] = Recipe;
-			m_Results[i] = Recipe->Output->CopyOne();
+			m_Results[i] = Recipe->Output.CopyOne();
 		}
 	}
 }
