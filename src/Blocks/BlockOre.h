@@ -20,19 +20,19 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		cFastRandom Random;
+		auto & Random = GetRandomProvider();
 
 		switch (m_BlockType)
 		{
 			case E_BLOCK_LAPIS_ORE:
 			{
-				a_Pickups.push_back(cItem(E_ITEM_DYE, static_cast<char>(4 + Random.NextInt(5)), 4));
+				a_Pickups.emplace_back(E_ITEM_DYE, Random.RandInt<char>(4, 8), 4);
 				break;
 			}
 			case E_BLOCK_REDSTONE_ORE:
 			case E_BLOCK_REDSTONE_ORE_GLOWING:
 			{
-				a_Pickups.push_back(cItem(E_ITEM_REDSTONE_DUST, static_cast<char>(4 + Random.NextInt(2)), 0));
+				a_Pickups.emplace_back(E_ITEM_REDSTONE_DUST,  Random.RandInt<char>(4, 5), 0);
 				break;
 			}
 			case E_BLOCK_DIAMOND_ORE:
@@ -84,7 +84,7 @@ public:
 			return;
 		}
 
-		cFastRandom Random;
+		auto & Random = GetRandomProvider();
 		int Reward = 0;
 
 		switch (m_BlockType)
@@ -93,27 +93,27 @@ public:
 			case E_BLOCK_LAPIS_ORE:
 			{
 				// Lapis and nether quartz get 2 - 5 experience
-				Reward = Random.NextInt(4) + 2;
+				Reward = Random.RandInt(2, 5);
 				break;
 			}
 			case E_BLOCK_REDSTONE_ORE:
 			case E_BLOCK_REDSTONE_ORE_GLOWING:
 			{
 				// Redstone gets 1 - 5 experience
-				Reward = Random.NextInt(5) + 1;
+				Reward = Random.RandInt(1, 5);
 				break;
 			}
 			case E_BLOCK_DIAMOND_ORE:
 			case E_BLOCK_EMERALD_ORE:
 			{
 				// Diamond and emerald get 3 - 7 experience
-				Reward = Random.NextInt(5) + 3;
+				Reward = Random.RandInt(3, 7);
 				break;
 			}
 			case E_BLOCK_COAL_ORE:
 			{
 				// Coal gets 0 - 2 experience
-				Reward = Random.NextInt(3);
+				Reward = Random.RandInt(2);
 				break;
 			}
 

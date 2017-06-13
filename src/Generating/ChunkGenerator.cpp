@@ -59,8 +59,7 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 	}
 	else
 	{
-		MTRand rnd;
-		m_Seed = rnd.randInt();
+		m_Seed = GetRandomProvider().RandInt();
 		LOGINFO("Chosen a new random seed for world: %d", m_Seed);
 		a_IniFile.SetValueI("Seed", "Seed", m_Seed);
 	}

@@ -70,12 +70,12 @@ public:
 		}
 
 		// Grass spreads to adjacent dirt blocks:
-		cFastRandom rand;
+		auto & rand = GetRandomProvider();
 		for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
 		{
-			int OfsX = rand.NextInt(3) - 1;  // [-1 .. 1]
-			int OfsY = rand.NextInt(5) - 3;  // [-3 .. 1]
-			int OfsZ = rand.NextInt(3) - 1;  // [-1 .. 1]
+			int OfsX = rand.RandInt(-1, 1);
+			int OfsY = rand.RandInt(-3, 1);
+			int OfsZ = rand.RandInt(-1, 1);
 
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;

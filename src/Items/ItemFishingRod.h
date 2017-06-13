@@ -108,6 +108,8 @@ public:
 			return false;
 		}
 
+		auto & Random = GetRandomProvider();
+
 		if (a_Player->IsFishing())
 		{
 			cFloaterCallback FloaterInfo;
@@ -122,10 +124,10 @@ public:
 			else if (FloaterInfo.CanPickup())
 			{
 				cItems Drops;
-				int ItemCategory = a_World->GetTickRandomNumber(99);
+				int ItemCategory = Random.RandInt(99);
 				if (ItemCategory <= 4)  // Treasures 5%
 				{
-					int Treasure = a_World->GetTickRandomNumber(5);
+					int Treasure = Random.RandInt(5);
 					switch (Treasure)
 					{
 						case 0:
@@ -140,7 +142,7 @@ public:
 						}
 						case 2:
 						{
-							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, static_cast<short>(a_World->GetTickRandomNumber(50))));  // Fishing rod with durability. TODO: Enchantments on it
+							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(50)));  // Fishing rod with durability. TODO: Enchantments on it
 							break;
 						}
 						case 3:
@@ -164,14 +166,14 @@ public:
 				}
 				else if (ItemCategory <= 14)  // Junk 10%
 				{
-					int Junk = a_World->GetTickRandomNumber(70);
+					int Junk = Random.RandInt(70);
 					if (Junk <= 1)
 					{
 						Drops.Add(cItem(E_ITEM_DYE, 10, 0));
 					}
 					else if (Junk <= 4)
 					{
-						Drops.Add(cItem(E_ITEM_BOW, 1, static_cast<short>(a_World->GetTickRandomNumber(64))));
+						Drops.Add(cItem(E_ITEM_BOW, 1, Random.RandInt<short>(64)));
 					}
 					else if (Junk <= 9)
 					{
@@ -214,7 +216,7 @@ public:
 				}
 				else  // Fish
 				{
-					int FishType = a_World->GetTickRandomNumber(99);
+					int FishType = Random.RandInt(99);
 					if (FishType <= 1)  // Clownfish has a 2% chance of spawning
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
@@ -250,7 +252,7 @@ public:
 		}
 		else
 		{
-			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), static_cast<int>(100 + static_cast<unsigned int>(a_World->GetTickRandomNumber(800)) - (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
+			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), (Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
 			if (!Floater->Initialize(*a_World))
 			{
 				delete Floater;

@@ -100,8 +100,7 @@ bool cProbabDistrib::SetDefString(const AString & a_DefString)
 
 int cProbabDistrib::Random(MTRand & a_Rand) const
 {
-	int v = a_Rand.randInt(m_Sum);
-	return MapValue(v);
+	return MapValue(a_Rand.RandInt(m_Sum));
 }
 
 

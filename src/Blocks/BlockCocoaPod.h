@@ -30,9 +30,7 @@ public:
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		cFastRandom Random;
-
-		if (Random.NextInt(5) == 0)
+		if (GetRandomProvider().RandBool(0.20))
 		{
 			NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 			NIBBLETYPE TypeMeta = Meta & 0x03;

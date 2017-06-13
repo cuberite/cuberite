@@ -128,6 +128,8 @@ void cFloater::SpawnOn(cClientHandle & a_Client)
 
 void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	auto & Random = GetRandomProvider();
+
 	HandlePhysics(a_Dt, a_Chunk);
 	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT))
 		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSX_TOINT) == 0))
@@ -141,13 +143,13 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				SetPosY(GetPosY() - 1);
 				m_CanPickupItem = true;
 				m_PickupCountDown = 20;
-				m_CountDownTime = 100 + m_World->GetTickRandomNumber(800);
+				m_CountDownTime = Random.RandInt(100, 900);
 				LOGD("Floater %i can be picked up", GetUniqueID());
 			}
 			else if (m_CountDownTime == 20)  // Calculate the position where the particles should spawn and start producing them.
 			{
 				LOGD("Started producing particles for floater %i", GetUniqueID());
-				m_ParticlePos.Set(GetPosX() + (-4 + m_World->GetTickRandomNumber(8)), GetPosY(), GetPosZ() + (-4 + m_World->GetTickRandomNumber(8)));
+				m_ParticlePos.Set(GetPosX() + Random.RandInt(-4, 4), GetPosY(), GetPosZ() + Random.RandInt(-4, 4));
 				m_World->GetBroadcaster().BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
 			}
 			else if (m_CountDownTime < 20)
@@ -159,14 +161,14 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_CountDownTime--;
 			if (m_World->GetHeight(POSX_TOINT, POSZ_TOINT) == POSY_TOINT)
 			{
-				if (m_World->IsWeatherWet() && m_World->GetTickRandomNumber(3) == 0)  // 25% chance of an extra countdown when being rained on.
+				if (m_World->IsWeatherWet() && Random.RandBool(0.25))  // 25% chance of an extra countdown when being rained on.
 				{
 					m_CountDownTime--;
 				}
 			}
 			else  // if the floater is underground it has a 50% chance of not decreasing the countdown.
 			{
-				if (m_World->GetTickRandomNumber(1) == 0)
+				if (Random.RandBool())
 				{
 					m_CountDownTime++;
 				}

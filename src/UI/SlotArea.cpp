@@ -1003,8 +1003,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	NIBBLETYPE BlockMeta;
 	a_Player.GetWorld()->GetBlockTypeMeta(PosX, PosY, PosZ, Block, BlockMeta);
 
-	cFastRandom Random;
-	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && (Random.NextFloat(1.0F) < 0.12F))
+	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
 	{
 		NIBBLETYPE Orientation = BlockMeta & 0x3;
 		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
@@ -1578,8 +1577,8 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 	{
 		int Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15);
 
-		cFastRandom Random;
-		int Base = (Random.GenerateRandomInteger(1, 8) + static_cast<int>(floor(static_cast<float>(Bookshelves / 2)) + Random.GenerateRandomInteger(0, Bookshelves)));
+		auto & Random = GetRandomProvider();
+		int Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
 		int TopSlot = std::max(Base / 3, 1);
 		int MiddleSlot = (Base * 2) / 3 + 1;
 		int BottomSlot = std::max(Base, Bookshelves * 2);

@@ -526,7 +526,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 	if (!Pickups.empty())
 	{
-		MTRand r1;
+		auto & r1 = GetRandomProvider();
 
 		// Mid-block position first
 		double MicroX, MicroY, MicroZ;
@@ -535,8 +535,8 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		MicroZ = a_BlockZ + 0.5;
 
 		// Add random offset second
-		MicroX += r1.rand(1) - 0.5;
-		MicroZ += r1.rand(1) - 0.5;
+		MicroX += r1.RandReal<double>(-0.5, 0.5);
+		MicroZ += r1.RandReal<double>(-0.5, 0.5);
 
 		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}

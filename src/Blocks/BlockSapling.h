@@ -37,16 +37,16 @@ public:
 		// Only grow if we have the right amount of light
 		if (Light > 8)
 		{
-			cFastRandom random;
+			auto & random = GetRandomProvider();
 			// Only grow if we are in the right growth stage and have the right amount of space around them.
-			if (((Meta & 0x08) != 0) && (random.NextInt(99) < 45) && CanGrowAt(a_Chunk, a_RelX, a_RelY, a_RelZ, Meta))
+			if (((Meta & 0x08) != 0) && random.RandBool(0.45) && CanGrowAt(a_Chunk, a_RelX, a_RelY, a_RelZ, Meta))
 			{
 				int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 				int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 				a_Chunk.GetWorld()->GrowTree(BlockX, a_RelY, BlockZ);
 			}
 			// Only move to the next growth stage if we haven't gone there yet
-			else if (((Meta & 0x08) == 0) && (random.NextInt(99) < 45))
+			else if (((Meta & 0x08) == 0) && random.RandBool(0.45))
 			{
 				a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x08);
 			}
