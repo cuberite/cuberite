@@ -28,10 +28,10 @@ public:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if (Meta & 0x8)
 		{
-      if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_BIG_FLOWER)
-      {
-			  super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY - 1, a_BlockZ, a_CanDrop);
-      }
+			if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_BIG_FLOWER)
+			{
+				super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY - 1, a_BlockZ, a_CanDrop);
+			}
 		}
 		else
 		{
@@ -43,13 +43,13 @@ public:
 	{
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
 		if (Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
-    {
-      a_Pickups.push_back(cItem(E_ITEM_SEEDS)); 
-    }
-    else if (Meta != E_META_BIG_FLOWER_LARGE_FERM)
-    {
-		  a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, Meta));
-    }
+		{
+			a_Pickups.push_back(cItem(E_ITEM_SEEDS));
+		}
+		else if (Meta != E_META_BIG_FLOWER_LARGE_FERM)
+		{
+			a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, Meta));
+		}
 	}
 
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
