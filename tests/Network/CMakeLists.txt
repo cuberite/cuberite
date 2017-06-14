@@ -12,7 +12,7 @@ set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/HostnameLookup.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/IPLookup.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/ISThread.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/IsThread.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkInterfaceEnum.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkLookup.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.cpp
@@ -30,9 +30,10 @@ set (Network_SRCS
 set (Network_HDRS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/GetAddressInfoError.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/HostnameLookup.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/IPLookup.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/ISThread.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/IsThread.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Network.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkLookup.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.h

@@ -25,6 +25,7 @@ SET (HDRS
 	Errors.h
 	Event.h
 	File.h
+	GetAddressInfoError.h
 	GZipFile.h
 	HostnameLookup.h
 	IPLookup.h

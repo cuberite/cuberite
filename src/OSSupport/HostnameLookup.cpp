@@ -6,20 +6,7 @@
 #include "Globals.h"
 #include "HostnameLookup.h"
 #include "NetworkSingleton.h"
-
-
-
-
-
-static const char * ErrorString(int a_ErrorCode)
-{
-	// Avoid the windows API wide character version
-#ifdef _WIN32
-	return gai_strerrorA(a_ErrorCode);
-#else
-	return gai_strerror(a_ErrorCode);
-#endif
-}
+#include "GetAddressInfoError.h"
 
 
 
