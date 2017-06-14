@@ -17,7 +17,7 @@ inline AString ErrorString(int a_ErrorCode)
 			a_ErrorCode,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 			ErrorStr,
-			GAI_STRERROR_BUFFER_SIZE,
+			sizeof(ErrorStr) - 1,
 			nullptr
 		);
 
