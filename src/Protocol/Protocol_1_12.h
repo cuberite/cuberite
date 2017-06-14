@@ -53,6 +53,8 @@ public:
 	virtual void SendRespawn(eDimension a_Dimension) override;
 	virtual void SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
 	virtual void SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendSetRawSubTitle(const AString & a_SubTitle) override;
+	virtual void SendSetRawTitle(const AString & a_Title) override;
 	virtual void SendSpawnMob(const cMonster & a_Mob) override;
 	virtual void SendTeleportEntity(const cEntity & a_Entity) override;
 	virtual void SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;

@@ -5,7 +5,7 @@ Cuberite is a Minecraft-compatible multiplayer game server that is written in C+
 
 Cuberite can run on Windows, *nix and Android operating systems. This includes Android phones and tablets as well as Raspberry Pis.
 
-We currently support Release 1.8 - 1.11 Minecraft protocol versions.
+We currently support Release 1.8 - 1.12 Minecraft protocol versions.
 
 Subscribe to [the newsletter](https://cuberite.org/news/#subscribe) for important updates and project news.
 

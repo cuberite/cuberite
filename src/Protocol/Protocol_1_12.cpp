@@ -1287,6 +1287,34 @@ void cProtocol_1_12::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_
 
 
 
+void cProtocol_1_12::SendSetRawTitle(const AString & a_Title)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x47);  // Title packet
+	Pkt.WriteVarInt32(0);  // Set title
+
+	Pkt.WriteString(a_Title);
+}
+
+
+
+
+
+void cProtocol_1_12::SendSetRawSubTitle(const AString & a_SubTitle)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x47);  // Title packet
+	Pkt.WriteVarInt32(1);  // Set subtitle
+
+	Pkt.WriteString(a_SubTitle);
+}
+
+
+
+
+
 void cProtocol_1_12::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
 {
 	ASSERT(m_State == 3);  // In game mode?
