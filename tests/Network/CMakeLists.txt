@@ -12,10 +12,13 @@ set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/HostnameLookup.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/IPLookup.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/ISThread.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkInterfaceEnum.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkLookup.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/Queue.cpp
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CtrDrbgContext.cpp
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CryptoKey.cpp
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/EntropyContext.cpp
@@ -29,10 +32,13 @@ set (Network_HDRS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/HostnameLookup.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/IPLookup.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/ISThread.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Network.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkLookup.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/Queue.h
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CtrDrbgContext.h
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CryptoKey.h
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/EntropyContext.h

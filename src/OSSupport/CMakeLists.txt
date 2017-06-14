@@ -12,6 +12,7 @@ SET (SRCS
 	IPLookup.cpp
 	IsThread.cpp
 	NetworkInterfaceEnum.cpp
+	NetworkLookup.cpp
 	NetworkSingleton.cpp
 	ServerHandleImpl.cpp
 	StackTrace.cpp
@@ -29,6 +30,7 @@ SET (HDRS
 	IPLookup.h
 	IsThread.h
 	Network.h
+	NetworkLookup.h
 	NetworkSingleton.h
 	Queue.h
 	ServerHandleImpl.h
