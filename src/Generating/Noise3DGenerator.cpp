@@ -236,7 +236,7 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 		}
 	}
 
-	UpdateHeightmap(a_ChunkDesc);
+	a_ChunkDesc.UpdateHeightmap();
 	ComposeTerrain (a_ChunkDesc);
 }
 
@@ -293,28 +293,6 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	);
 
 	// DEBUG: Debug3DNoise(a_OutNoise, 17, 257, 17, Printf("Chunk_%d_%d_lerp", a_ChunkX, a_ChunkZ));
-}
-
-
-
-
-
-void cNoise3DGenerator::UpdateHeightmap(cChunkDesc & a_ChunkDesc)
-{
-	for (int z = 0; z < cChunkDef::Width; z++)
-	{
-		for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
-			{
-				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
-				{
-					a_ChunkDesc.SetHeight(x, z, y);
-					break;
-				}
-			}  // for y
-		}  // for x
-	}  // for z
 }
 
 
