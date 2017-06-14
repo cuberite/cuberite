@@ -1733,7 +1733,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			else
 			{
-				BlockMeta += random.RandInt(2, 5);
+				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1768,7 +1768,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			else
 			{
-				BlockMeta += random.RandInt(2, 5);
+				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1791,7 +1791,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				}
 				else
 				{
-					BlockMeta += random.RandInt(2, 5);
+					BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
 					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1823,7 +1823,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			else
 			{
-				BlockMeta += random.RandInt(2, 5);
+				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1846,7 +1846,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				}
 				else
 				{
-					BlockMeta += random.RandInt(2, 5);
+					BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
 					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
