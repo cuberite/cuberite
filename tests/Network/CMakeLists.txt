@@ -18,7 +18,6 @@ set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/Queue.cpp
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CtrDrbgContext.cpp
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/CryptoKey.cpp
 	${CMAKE_SOURCE_DIR}/src/PolarSSL++/EntropyContext.cpp

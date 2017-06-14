@@ -51,12 +51,12 @@ void cIPLookup::Lookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr 
 		char ServInfo[NI_MAXSERV];
 
 		ErrCode = getnameinfo(
-			reinterpret_cast<sockaddr *>(&sa), salen,
+			reinterpret_cast<sockaddr *>(&sa),
+			static_cast<socklen_t>(salen),
 			Hostname, sizeof(Hostname),
 			ServInfo, sizeof(ServInfo),
 			0
 		);
-		
 		Lookup->Callback(ErrCode, Hostname);
 	});
 }

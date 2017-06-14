@@ -97,7 +97,7 @@ void cNetworkSingleton::Terminate(void)
 
 	// Wait for the lookup thread to stop
 	m_LookupThread.Stop();
-	
+
 	// Wait for the LibEvent event loop to terminate:
 	event_base_loopbreak(m_EventBase);
 	m_EventLoopThread.join();

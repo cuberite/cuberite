@@ -45,7 +45,7 @@ void cHostnameLookup::Lookup(const AString & a_Hostname, cNetwork::cResolveNameC
 		int ErrCode = getaddrinfo(Lookup->m_Hostname.c_str(), nullptr, &hints, &Result);
 
 		Lookup->Callback(ErrCode, Result);
-	});	
+	});
 }
 
 

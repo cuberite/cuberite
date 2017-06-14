@@ -80,13 +80,13 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 
 	public:
 
-		cHostnameCallback(cTCPLinkImplPtr a_Link, UInt16 a_Port):
+		cHostnameCallback(cTCPLinkImplPtr a_Link, UInt16 a_ConnectPort):
 			m_Link(std::move(a_Link)),
-			m_Port(a_Port),
+			m_Port(a_ConnectPort),
 			m_IsConnecting(false)
 		{
 		}
-		
+
 		void DoConnect(const sockaddr * a_IP, int size)
 		{
 			// Make sure connect is only completed once
@@ -100,7 +100,7 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 				else
 				{
 					m_Link->GetCallbacks()->OnError(ErrCode, evutil_socket_error_to_string(ErrCode));
-				}				
+				}
 			}
 		}
 

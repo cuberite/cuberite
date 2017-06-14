@@ -27,3 +27,4 @@ inline AString ErrorString(int a_ErrorCode)
 		return gai_strerror(a_ErrorCode);
 	#endif
 }
+
