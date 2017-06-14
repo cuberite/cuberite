@@ -32,7 +32,7 @@ public:
 	virtual void SendCameraSetTo(const cEntity & a_Entity) override;
 	virtual void SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
 	virtual void SendDestroyEntity(const cEntity & a_Entity) override;
-	virtual void SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
+	virtual void SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
 	virtual void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
@@ -40,8 +40,8 @@ public:
 	virtual void SendEntityLook(const cEntity & a_Entity) override;
 	virtual void SendEntityMetadata(const cEntity & a_Entity) override;
 	virtual void SendEntityProperties(const cEntity & a_Entity) override;
-	virtual void SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)override;
-	virtual void SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)override;
+	virtual void SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
+	virtual void SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntityVelocity(const cEntity & a_Entity) override;
 	virtual void SendExperience(void) override;
 	virtual void SendHealth(void) override;
