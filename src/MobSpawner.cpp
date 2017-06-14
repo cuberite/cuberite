@@ -112,7 +112,8 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 	{
 		std::set<eMonsterType>::iterator itr = allowedMobs.begin();
 
-		std::advance(itr, GetRandomProvider().RandInt<size_t>(allowedMobsSize - 1));
+		using DiffType = decltype(itr)::difference_type;
+		std::advance(itr, GetRandomProvider().RandInt<DiffType>(allowedMobsSize - 1));
 
 		return *itr;
 	}
