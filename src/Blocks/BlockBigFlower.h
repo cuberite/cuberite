@@ -36,7 +36,7 @@ public:
 		{
 			++AlternateY;
 		}
-
+		// also destroy the other block if it has a valid height and is a big flower
 		if (cChunkDef::IsValidHeight(AlternateY) && a_ChunkInterface.GetBlock(a_BlockX, AlternateY, a_BlockZ) == E_BLOCK_BIG_FLOWER)
 		{
 			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop);
