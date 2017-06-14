@@ -310,13 +310,10 @@ if (MSVC)
 		ADD_CUSTOM_COMMAND(
 			OUTPUT ${BINDING_OUTPUTS}
 
-			# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/Server/lua51.dll ./lua51.dll
-
 			# Regenerate bindings:
-			COMMAND tolua -L BindingsProcessor.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+			COMMAND luaexe BindingsProcessor.lua
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
-			DEPENDS ${BINDINGS_DEPENDENCIES} tolua
+			DEPENDS ${BINDINGS_DEPENDENCIES} luaexe
 		)
 	endif()
 endif()

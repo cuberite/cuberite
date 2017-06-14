@@ -32,7 +32,7 @@ class cLuaChunkStay
 public:
 	cLuaChunkStay();
 
-	~cLuaChunkStay() { }
+	virtual ~cLuaChunkStay() override { }
 
 	/** Adds chunks in the specified Lua table.
 	Can be called only once.

@@ -219,7 +219,7 @@ local function LinkifyString(a_String, a_Referrer)
 
 	--- Creates the HTML for the specified link and title
 	local function CreateLink(Link, Title)
-		if (Link:sub(1, 7) == "http://") then
+		if ((Link:sub(1, 7) == "http://") or (Link:sub(1, 8) == "https://")) then
 			-- The link is a full absolute URL, do not modify, do not track:
 			return "<a href=\"" .. Link .. "\">" .. Title .. "</a>";
 		end
@@ -298,7 +298,7 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 	f:write(LinkifyString(a_Hook.Desc, HookName));
 	f:write("</p>\n<hr /><h1>Callback function</h1>\n<p>The default name for the callback function is ");
 	f:write(a_Hook.DefaultFnName, ". It has the following signature:\n");
-	f:write("<pre class=\"prettyprint lang-lua\">function ", HookName, "(");
+	f:write("<pre class=\"prettyprint lang-lua\">function My", HookName, "(");
 	if (a_Hook.Params == nil) then
 		a_Hook.Params = {};
 	end

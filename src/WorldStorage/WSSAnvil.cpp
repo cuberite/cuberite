@@ -417,7 +417,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 	// Load the entities from NBT:
 	cEntityList      Entities;
-	cBlockEntityList BlockEntities;
+	cBlockEntities   BlockEntities;
 	LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
 	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), BlockTypes, MetaData);
 
@@ -639,7 +639,7 @@ void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 
 
-void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas)
+void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List))
 	{
@@ -673,7 +673,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		}
 
 		// Add the BlockEntity to the loaded data:
-		a_BlockEntities.push_back(be.release());
+		auto Idx = cChunkDef::MakeIndex(be->GetRelX(), be->GetPosY(), be->GetRelZ());
+		a_BlockEntities.insert({ Idx, be.get() });
+		// Release after inserting in case it throws.
+		be.release();
 	}  // for Child - tag children
 }
 
@@ -944,6 +947,14 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 
 	std::unique_ptr<cBrewingstandEntity> Brewingstand(new cBrewingstandEntity(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, m_World));
 
+	// Fuel has to be loaded at first, because of slot events:
+	int Fuel = a_NBT.FindChildByName(a_TagIdx, "Fuel");
+	if (Fuel >= 0)
+	{
+		Int16 tb = a_NBT.GetShort(Fuel);
+		Brewingstand->SetRemainingFuel(tb);
+	}
+
 	// Load slots:
 	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
@@ -964,11 +975,11 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 	if (BrewTime >= 0)
 	{
 		Int16 tb = a_NBT.GetShort(BrewTime);
-		Brewingstand->setTimeBrewed(tb);
+		Brewingstand->SetTimeBrewed(tb);
 	}
 
 	// Restart brewing:
-	Brewingstand->GetRecipes();
+	Brewingstand->LoadRecipes();
 	Brewingstand->ContinueBrewing();
 	return Brewingstand.release();
 }
@@ -1648,10 +1659,16 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cBoat> Boat = cpp14::make_unique<cBoat>(0, 0, 0);
+	std::unique_ptr<cBoat> Boat = cpp14::make_unique<cBoat>(0, 0, 0, cBoat::bmOak);
 	if (!LoadEntityBaseFromNBT(*Boat.get(), a_NBT, a_TagIdx))
 	{
 		return;
+	}
+
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Type");
+	if (TypeIdx > 0)
+	{
+		Boat->SetMaterial(cBoat::StringToMaterial(a_NBT.GetString(TypeIdx)));
 	}
 	a_Entities.push_back(Boat.release());
 }

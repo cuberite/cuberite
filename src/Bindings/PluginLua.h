@@ -63,7 +63,7 @@ public:
 
 
 	cPluginLua(const AString & a_PluginDirectory, cDeadlockDetect & a_DeadlockDetect);
-	~cPluginLua();
+	virtual ~cPluginLua() override;
 
 	virtual void OnDisable(void) override;
 	virtual bool Load(void) override;

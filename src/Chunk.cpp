@@ -15,6 +15,7 @@
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/BrewingstandEntity.h"
 #include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/DispenserEntity.h"
 #include "BlockEntities/DropperEntity.h"
 #include "BlockEntities/FlowerPotEntity.h"
@@ -125,22 +126,22 @@ cChunk::~cChunk()
 
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		delete *itr;
+		delete KeyPair.second;
 	}
 	m_BlockEntities.clear();
 
 	// Remove and destroy all entities that are not players:
 	cEntityList Entities;
 	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
-	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
+	for (auto Entity : Entities)
 	{
-		if (!(*itr)->IsPlayer())
+		if (!Entity->IsPlayer())
 		{
 			// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
-			(*itr)->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
-			delete *itr;
+			Entity->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
+			delete Entity;
 		}
 	}
 
@@ -298,14 +299,14 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 	a_Callback.ChunkData(m_ChunkData);
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (auto Entity : m_Entities)
 	{
-		a_Callback.Entity(*itr);
+		a_Callback.Entity(Entity);
 	}
 
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		a_Callback.BlockEntity(*itr);
+		a_Callback.BlockEntity(KeyPair.second);
 	}
 }
 
@@ -335,27 +336,28 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		delete *itr;
+		delete KeyPair.second;
 	}
 	m_BlockEntities.clear();
 	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG
-		for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+		for (auto & KeyPair : m_BlockEntities)
 		{
-			BLOCKTYPE EntityBlockType = (*itr)->GetBlockType();
-			BLOCKTYPE WorldBlockType = GetBlock((*itr)->GetRelX(), (*itr)->GetPosY(), (*itr)->GetRelZ());
+			cBlockEntity * Block = KeyPair.second;
+			BLOCKTYPE EntityBlockType = Block->GetBlockType();
+			BLOCKTYPE WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
 			ASSERT(WorldBlockType == EntityBlockType);
-		}  // for itr - m_BlockEntities
+		}  // for KeyPair - m_BlockEntities
 	#endif  // _DEBUG
 
 	// Set all block entities' World variable:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		(*itr)->SetWorld(m_World);
+		KeyPair.second->SetWorld(m_World);
 	}
 
 	// Create block entities that the loader didn't load; fill them with defaults
@@ -457,18 +459,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
-	{
-		if (
-			((*itr)->GetPosX() == a_BlockX) &&
-			((*itr)->GetPosY() == a_BlockY) &&
-			((*itr)->GetPosZ() == a_BlockZ)
-		)
-		{
-			return true;
-		}
-	}  // for itr - m_BlockEntities[]
-	return false;
+	return (GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ) != nullptr);
 }
 
 
@@ -516,14 +507,19 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 
 void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ)
 {
-	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
-	int Random = m_World->GetTickRandomNumber(0x00ffffff);
-	a_X =   Random % (a_MaxX * 2);
-	a_Y =  (Random / (a_MaxX * 2)) % (a_MaxY * 2);
-	a_Z = ((Random / (a_MaxX * 2)) / (a_MaxY * 2)) % (a_MaxZ * 2);
-	a_X /= 2;
-	a_Y /= 2;
-	a_Z /= 2;
+	ASSERT(
+		(a_MaxX > 0) && (a_MaxY > 0) && (a_MaxZ > 0) &&
+		(a_MaxX <= std::numeric_limits<int>::max() / a_MaxY) &&  // a_MaxX * a_MaxY doesn't overflow
+		(a_MaxX * a_MaxY <= std::numeric_limits<int>::max() / a_MaxZ)  // a_MaxX * a_MaxY * a_MaxZ doesn't overflow
+	);
+
+	// MTRand gives an inclusive range [0, Max] but this gives the exclusive range [0, Max)
+	int OverallMax = (a_MaxX - 1) * (a_MaxY - 1) * (a_MaxZ - 1);
+	int Random = m_World->GetTickRandomNumber(OverallMax);
+
+	a_X =   Random % a_MaxX;
+	a_Y =  (Random / a_MaxX) % a_MaxY;
+	a_Z = ((Random / a_MaxX) / a_MaxY) % a_MaxZ;
 }
 
 
@@ -638,9 +634,9 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	TickBlocks();
 
 	// Tick all block entities in this chunk:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
+		m_IsDirty = KeyPair.second->Tick(a_Dt, *this) | m_IsDirty;
 	}
 
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
@@ -857,7 +853,7 @@ void cChunk::TickBlocks(void)
 void cChunk::ApplyWeatherToTop()
 {
 	if (
-		(m_World->GetTickRandomNumber(100) != 0) ||
+		(GetRandomProvider().RandBool(0.99)) ||
 		(
 			(m_World->GetWeather() != eWeather_Rain) &&
 			(m_World->GetWeather() != eWeather_ThunderStorm)
@@ -941,8 +937,10 @@ void cChunk::ApplyWeatherToTop()
 
 
 
-bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
+bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
+	auto & Random = GetRandomProvider();
+
 	// Convert the stem BlockType into produce BlockType
 	BLOCKTYPE ProduceType;
 	switch (a_BlockType)
@@ -978,7 +976,7 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 	// Pick a direction in which to place the produce:
 	int x = 0, z = 0;
-	int CheckType = a_TickRandom.randInt(3);  // The index to the neighbors array which should be checked for emptiness
+	int CheckType = Random.RandInt(3);  // The index to the neighbors array which should be checked for emptiness
 	switch (CheckType)
 	{
 		case 0: x =  1; break;
@@ -1010,7 +1008,7 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		case E_BLOCK_FARMLAND:
 		{
 			// Place a randomly-facing produce:
-			NIBBLETYPE Meta = (ProduceType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(a_TickRandom.randInt(4) % 4);
+			NIBBLETYPE Meta = (ProduceType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(Random.RandInt(4) % 4);
 			LOGD("Growing melon / pumpkin at {%d, %d, %d} (<%d, %d> from stem), overwriting %s, growing on top of %s, meta %d",
 				a_RelX + x + m_PosX * cChunkDef::Width, a_RelY, a_RelZ + z + m_PosZ * cChunkDef::Width,
 				x, z,
@@ -1382,7 +1380,7 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back(cBlockEntity::CreateByBlockType(
+							AddBlockEntityClean(cBlockEntity::CreateByBlockType(
 								BlockType, GetMeta(x, y, z),
 								x + m_PosX * Width, y, z + m_PosZ * Width, m_World
 							));
@@ -1513,7 +1511,8 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_MOB_SPAWNER:
 		case E_BLOCK_BREWING_STAND:
 		{
-			AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			// Fast set block has already marked dirty
+			AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 	}  // switch (a_BlockType)
@@ -1663,13 +1662,11 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
 
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
+	cBlockEntity * Block = GetBlockEntity(wp.x, wp.y, wp.z);
+	if (Block != nullptr)
 	{
-		if (((*itr)->GetPosX() == wp.x) && ((*itr)->GetPosY() == wp.y) && ((*itr)->GetPosZ() == wp.z))
-		{
-			(*itr)->SendTo(*a_Client);
-		}
-	}  // for itr - m_BlockEntities
+		Block->SendTo(*a_Client);
+	}
 }
 
 
@@ -1679,7 +1676,19 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 void cChunk::AddBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
-	m_BlockEntities.push_back(a_BlockEntity);
+	AddBlockEntityClean(a_BlockEntity);
+}
+
+
+
+
+
+void cChunk::AddBlockEntityClean(cBlockEntity * a_BlockEntity)
+{
+	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
+	auto Result = m_BlockEntities.insert({ Idx, a_BlockEntity });
+	UNUSED(Result);
+	ASSERT(Result.second);  // No block entity already at this position
 }
 
 
@@ -1694,19 +1703,11 @@ cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ASSERT(a_BlockZ >= m_PosZ * cChunkDef::Width);
 	ASSERT(a_BlockZ < m_PosZ * cChunkDef::Width + cChunkDef::Width);
 
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
-	{
-		if (
-			((*itr)->GetPosX() == a_BlockX) &&
-			((*itr)->GetPosY() == a_BlockY) &&
-			((*itr)->GetPosZ() == a_BlockZ)
-		)
-		{
-			return *itr;
-		}
-	}  // for itr - m_BlockEntities[]
+	int RelX = a_BlockX - m_PosX * cChunkDef::Width;
+	int RelZ = a_BlockZ - m_PosZ * cChunkDef::Width;
 
-	return nullptr;
+	auto itr = m_BlockEntities.find(MakeIndex(RelX, a_BlockY, RelZ));
+	return (itr == m_BlockEntities.end()) ? nullptr : itr->second;
 }
 
 
@@ -1837,25 +1838,24 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	// Also sends update packets to all clients in the chunk
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	auto Entity = GetBlockEntity(a_PosX, a_PosY, a_PosZ);
+	if (Entity == nullptr)
 	{
-		if (
-			((*itr)->GetPosX() == a_PosX) &&
-			((*itr)->GetPosY() == a_PosY) &&
-			((*itr)->GetPosZ() == a_PosZ) &&
-			(
-				((*itr)->GetBlockType() == E_BLOCK_WALLSIGN) ||
-				((*itr)->GetBlockType() == E_BLOCK_SIGN_POST)
-			)
-		)
-		{
-			MarkDirty();
-			reinterpret_cast<cSignEntity *>(*itr)->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
-			m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
-			return true;
-		}
-	}  // for itr - m_BlockEntities[]
-	return false;
+		return false;  // Not a block entity
+	}
+	if (
+		(Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
+		(Entity->GetBlockType() != E_BLOCK_SIGN_POST)
+	)
+	{
+		return false;  // Not a sign
+	}
+
+	MarkDirty();
+	auto Sign = static_cast<cSignEntity *>(Entity);
+	Sign->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
+	m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
+	return true;
 }
 
 
@@ -1865,7 +1865,9 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
-	m_BlockEntities.remove(a_BlockEntity);
+	ASSERT(a_BlockEntity != nullptr);
+	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
+	m_BlockEntities.erase(Idx);
 }
 
 
@@ -2076,18 +2078,34 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cLambdaEntityCallback a_Callbac
 
 
 
-bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
+template <class tyEntity, BLOCKTYPE... tBlocktype>
+bool cChunk::GenericForEachBlockEntity(cItemCallback<tyEntity>& a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		++itr2;
-		if (a_Callback.Item(*itr))
+		cBlockEntity * Block = KeyPair.second;
+		if (
+			(sizeof...(tBlocktype) == 0) ||  // Let empty list mean all block entities
+			(IsOneOf<tBlocktype...>(Block->GetBlockType()))
+		)
 		{
-			return false;
+			if (a_Callback.Item(static_cast<tyEntity *>(Block)))
+			{
+				return false;
+			}
 		}
-	}  // for itr - m_BlockEntitites[]
+	}  // for KeyPair - m_BlockEntitites[]
 	return true;
+}
+
+
+
+
+
+bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
+{
+	return GenericForEachBlockEntity<cBlockEntity>(a_Callback);
 }
 
 
@@ -2096,16 +2114,9 @@ bool cChunk::ForEachBlockEntity(cBlockEntityCallback & a_Callback)
 
 bool cChunk::ForEachBrewingstand(cBrewingstandCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (a_Callback.Item(reinterpret_cast<cBrewingstandEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cBrewingstandEntity,
+		E_BLOCK_BREWING_STAND
+	>(a_Callback);
 }
 
 
@@ -2114,20 +2125,9 @@ bool cChunk::ForEachBrewingstand(cBrewingstandCallback & a_Callback)
 
 bool cChunk::ForEachChest(cChestCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if ((*itr)->GetBlockType() != E_BLOCK_CHEST)
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cChestEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cChestEntity,
+		E_BLOCK_CHEST
+	>(a_Callback);
 }
 
 
@@ -2136,20 +2136,9 @@ bool cChunk::ForEachChest(cChestCallback & a_Callback)
 
 bool cChunk::ForEachDispenser(cDispenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if ((*itr)->GetBlockType() != E_BLOCK_DISPENSER)
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cDispenserEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cDispenserEntity,
+		E_BLOCK_DISPENSER
+	>(a_Callback);
 }
 
 
@@ -2158,20 +2147,9 @@ bool cChunk::ForEachDispenser(cDispenserCallback & a_Callback)
 
 bool cChunk::ForEachDropper(cDropperCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if ((*itr)->GetBlockType() != E_BLOCK_DROPPER)
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cDropperEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cDropperEntity,
+		E_BLOCK_DROPPER
+	>(a_Callback);
 }
 
 
@@ -2180,20 +2158,10 @@ bool cChunk::ForEachDropper(cDropperCallback & a_Callback)
 
 bool cChunk::ForEachDropSpenser(cDropSpenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetBlockType() != E_BLOCK_DISPENSER) && ((*itr)->GetBlockType() != E_BLOCK_DROPPER))
-		{
-			continue;
-		}
-		if (a_Callback.Item(reinterpret_cast<cDropSpenserEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+	return GenericForEachBlockEntity<cDropSpenserEntity,
+		E_BLOCK_DISPENSER,
+		E_BLOCK_DROPPER
+	>(a_Callback);
 }
 
 
@@ -2202,28 +2170,33 @@ bool cChunk::ForEachDropSpenser(cDropSpenserCallback & a_Callback)
 
 bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 {
+	return GenericForEachBlockEntity<cFurnaceEntity,
+		E_BLOCK_FURNACE,
+		E_BLOCK_LIT_FURNACE
+	>(a_Callback);
+}
+
+
+
+
+
+template <class tyEntity, BLOCKTYPE... tBlocktype>
+bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cItemCallback<tyEntity>& a_Callback)
+{
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	cBlockEntity * Block = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (Block == nullptr)
 	{
-		++itr2;
-		switch ((*itr)->GetBlockType())
-		{
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_LIT_FURNACE:
-			{
-				break;
-			}
-			default:
-			{
-				continue;
-			}
-		}
-		if (a_Callback.Item(reinterpret_cast<cFurnaceEntity *>(*itr)))
-		{
-			return false;
-		}
-	}  // for itr - m_BlockEntitites[]
-	return true;
+		return false;  // No block entity here
+	}
+	if (
+		(sizeof...(tBlocktype) != 0) &&  // Let empty list mean all block entities
+		(!IsOneOf<tBlocktype...>(Block->GetBlockType()))
+	)
+	{
+		return false;  // Not any of the given tBlocktypes
+	}
+	return !a_Callback.Item(static_cast<tyEntity *>(Block));
 }
 
 
@@ -2232,24 +2205,7 @@ bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 
 bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-
-		if (a_Callback.Item(*itr))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cBlockEntity>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2257,30 +2213,9 @@ bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_BEACON)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cBeaconEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cBeaconEntity,
+		E_BLOCK_BEACON
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2289,30 +2224,9 @@ bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 
 bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_BREWING_STAND)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cBrewingstandEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cBrewingstandEntity,
+		E_BLOCK_BREWING_STAND
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2321,30 +2235,10 @@ bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBre
 
 bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST))  // Trapped chests use normal chests' handlers
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cChestEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cChestEntity,
+		E_BLOCK_CHEST,
+		E_BLOCK_TRAPPED_CHEST
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2353,30 +2247,9 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 
 bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_DISPENSER)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cDispenserEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cDispenserEntity,
+		E_BLOCK_DISPENSER
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2385,30 +2258,9 @@ bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispen
 
 bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_DROPPER)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cDropperEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cDropperEntity,
+		E_BLOCK_DROPPER
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2417,30 +2269,10 @@ bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperC
 
 bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if (((*itr)->GetBlockType() != E_BLOCK_DISPENSER) && ((*itr)->GetBlockType() != E_BLOCK_DROPPER))
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cDropSpenserEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cDropSpenserEntity,
+		E_BLOCK_DISPENSER,
+		E_BLOCK_DROPPER
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2449,38 +2281,10 @@ bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDrop
 
 bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		switch ((*itr)->GetBlockType())
-		{
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_LIT_FURNACE:
-			{
-				break;
-			}
-			default:
-			{
-				// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-				return false;
-			}
-		}  // switch (BlockType)
-
-		// The correct block entity is here,
-		if (a_Callback.Item(reinterpret_cast<cFurnaceEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cFurnaceEntity,
+		E_BLOCK_FURNACE,
+		E_BLOCK_LIT_FURNACE
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2489,30 +2293,9 @@ bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 
 bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_NOTE_BLOCK)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cNoteEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cNoteEntity,
+		E_BLOCK_NOTE_BLOCK
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2521,30 +2304,9 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 
 bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_COMMAND_BLOCK)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here,
-		if (a_Callback.Item(reinterpret_cast<cCommandBlockEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cCommandBlockEntity,
+		E_BLOCK_COMMAND_BLOCK
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2553,30 +2315,9 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_HEAD)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here,
-		if (a_Callback.Item(reinterpret_cast<cMobHeadEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cMobHeadEntity,
+		E_BLOCK_HEAD
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2585,30 +2326,9 @@ bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 
 bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback)
 {
-	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		if ((*itr)->GetBlockType() != E_BLOCK_FLOWER_POT)
-		{
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
-		}
-
-		// The correct block entity is here
-		if (a_Callback.Item(reinterpret_cast<cFlowerPotEntity *>(*itr)))
-		{
-			return false;
-		}
-		return true;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	return GenericDoWithBlockEntityAt<cFlowerPotEntity,
+		E_BLOCK_FLOWER_POT
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2618,31 +2338,25 @@ bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlower
 bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	auto Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (Entity == nullptr)
 	{
-		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
-		{
-			continue;
-		}
-		switch ((*itr)->GetBlockType())
-		{
-			case E_BLOCK_WALLSIGN:
-			case E_BLOCK_SIGN_POST:
-			{
-				a_Line1 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(0);
-				a_Line2 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(1);
-				a_Line3 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(2);
-				a_Line4 = reinterpret_cast<cSignEntity *>(*itr)->GetLine(3);
-				return true;
-			}
-		}  // switch (BlockType)
+		return false;  // Not a block entity
+	}
+	if (
+		(Entity->GetBlockType() != E_BLOCK_WALLSIGN) &&
+		(Entity->GetBlockType() != E_BLOCK_SIGN_POST)
+	)
+	{
+		return false;  // Not a sign
+	}
 
-		// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-		return false;
-	}  // for itr - m_BlockEntitites[]
-
-	// Not found:
-	return false;
+	auto Sign = static_cast<cSignEntity *>(Entity);
+	a_Line1 = Sign->GetLine(0);
+	a_Line2 = Sign->GetLine(1);
+	a_Line3 = Sign->GetLine(2);
+	a_Line4 = Sign->GetLine(3);
+	return true;
 }
 
 

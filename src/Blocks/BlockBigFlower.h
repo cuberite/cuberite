@@ -18,29 +18,43 @@ public:
 	{
 	}
 
+	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
+	{
+		return (((a_Meta & E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) != 0) || (a_Meta & E_META_BIG_FLOWER_LARGE_FERN) != 0);
+	}
+
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		int AlternateY  = a_BlockY;
+
 		if (Meta & 0x8)
 		{
-			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY - 1, a_BlockZ, a_CanDrop);
+			--AlternateY;
 		}
 		else
 		{
+			++AlternateY;
+		}
+		// also destroy the other block if it has a valid height and is a big flower
+		if (cChunkDef::IsValidHeight(AlternateY) && a_ChunkInterface.GetBlock(a_BlockX, AlternateY, a_BlockZ) == E_BLOCK_BIG_FLOWER)
+		{
 			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop);
+			a_ChunkInterface.FastSetBlock(a_BlockX, AlternateY, a_BlockZ, E_BLOCK_AIR, 0);
 		}
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
-
-		if ((Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) || (Meta == E_META_BIG_FLOWER_LARGE_FERN))
+		if (Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
-			return;
+			a_Pickups.push_back(cItem(E_ITEM_SEEDS));
 		}
-
-		a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, Meta));
+		else if (Meta != E_META_BIG_FLOWER_LARGE_FERN)
+		{
+			a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, Meta));
+		}
 	}
 
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
@@ -54,10 +68,15 @@ public:
 		NIBBLETYPE FlowerMeta = Meta & 0x7;
 		if (!a_Player->IsGameModeCreative())
 		{
-			if (((FlowerMeta == 2) || (FlowerMeta == 3)) && (a_Player->GetEquippedItem().m_ItemType == E_ITEM_SHEARS))
+			if (
+				(a_Player->GetEquippedItem().m_ItemType == E_ITEM_SHEARS) &&
+				(
+					(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
+					(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
+				)
+			)
 			{
-				MTRand r1;
-				if (r1.randInt(10) == 5)
+				if (GetRandomProvider().RandBool(0.10))
 				{
 					cItems Pickups;
 					if (FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
@@ -72,6 +91,17 @@ public:
 				}
 				a_Player->UseEquippedItem();
 			}
+		}
+
+		if (
+			(a_Player->GetEquippedItem().m_ItemType != E_ITEM_SHEARS) &&
+			(
+				(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
+				(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
+			)
+		)
+		{
+			a_ChunkInterface.SetBlock(a_BlockX, a_BlockY, a_BlockZ, 0, 0);
 		}
 	}
 

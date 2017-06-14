@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PieceGenerator.h"
+#include "PiecePool.h"
 
 
 

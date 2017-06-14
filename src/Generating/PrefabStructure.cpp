@@ -14,22 +14,13 @@
 cPrefabStructure::cPrefabStructure(
 	int a_GridX, int a_GridZ,
 	int a_OriginX, int a_OriginZ,
-	cPlacedPieces & a_Pieces,
+	cPlacedPieces && a_Pieces,
 	cTerrainHeightGenPtr a_HeightGen
 ):
 	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
-	m_Pieces(a_Pieces),
+	m_Pieces(std::move(a_Pieces)),
 	m_HeightGen(a_HeightGen)
 {
-}
-
-
-
-
-
-cPrefabStructure::~cPrefabStructure()
-{
-	cPieceGenerator::FreePieces(m_Pieces);
 }
 
 
@@ -47,7 +38,7 @@ void cPrefabStructure::DrawIntoChunk(cChunkDesc & a_Chunk)
 		{
 			PlacePieceOnGround(**itr);
 		}
-		Prefab.Draw(a_Chunk, *itr);
+		Prefab.Draw(a_Chunk, itr->get());
 	}  // for itr - m_PlacedPieces[]
 }
 

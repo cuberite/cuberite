@@ -28,39 +28,40 @@ static const struct
 	eMonsterType m_Type;
 	const char * m_lcName;
 	const char * m_VanillaName;
+	const char * m_VanillaNameNBT;
 } g_MobTypeNames[] =
 {
-	{mtBat,          "bat",          "Bat"},
-	{mtBlaze,        "blaze",        "Blaze"},
-	{mtCaveSpider,   "cavespider",   "CaveSpider"},
-	{mtChicken,      "chicken",      "Chicken"},
-	{mtCow,          "cow",          "Cow"},
-	{mtCreeper,      "creeper",      "Creeper"},
-	{mtEnderman,     "enderman",     "Enderman"},
-	{mtEnderDragon,  "enderdragon",  "EnderDragon"},
-	{mtGhast,        "ghast",        "Ghast"},
-	{mtGiant,        "giant",        "Giant"},
-	{mtGuardian,     "guardian",     "Guardian"},
-	{mtHorse,        "horse",        "EntityHorse"},
-	{mtIronGolem,    "irongolem",    "VillagerGolem"},
-	{mtMagmaCube,    "magmacube",    "LavaSlime"},
-	{mtMooshroom,    "mooshroom",    "MushroomCow"},
-	{mtOcelot,       "ocelot",       "Ozelot"},
-	{mtPig,          "pig",          "Pig"},
-	{mtRabbit,       "rabbit",       "Rabbit"},
-	{mtSheep,        "sheep",        "Sheep"},
-	{mtSilverfish,   "silverfish",   "Silverfish"},
-	{mtSkeleton,     "skeleton",     "Skeleton"},
-	{mtSlime,        "slime",        "Slime"},
-	{mtSnowGolem,    "snowgolem",    "SnowMan"},
-	{mtSpider,       "spider",       "Spider"},
-	{mtSquid,        "squid",        "Squid"},
-	{mtVillager,     "villager",     "Villager"},
-	{mtWitch,        "witch",        "Witch"},
-	{mtWither,       "wither",       "WitherBoss"},
-	{mtWolf,         "wolf",         "Wolf"},
-	{mtZombie,       "zombie",       "Zombie"},
-	{mtZombiePigman, "zombiepigman", "PigZombie"},
+	{mtBat,          "bat",          "Bat",             "bat"},
+	{mtBlaze,        "blaze",        "Blaze",           "blaze"},
+	{mtCaveSpider,   "cavespider",   "CaveSpider",      "cave_spider"},
+	{mtChicken,      "chicken",      "Chicken",         "chicken"},
+	{mtCow,          "cow",          "Cow",             "cow"},
+	{mtCreeper,      "creeper",      "Creeper",         "creeper"},
+	{mtEnderman,     "enderman",     "Enderman",        "enderman"},
+	{mtEnderDragon,  "enderdragon",  "EnderDragon",     "ender_dragon"},
+	{mtGhast,        "ghast",        "Ghast",           "ghast"},
+	{mtGiant,        "giant",        "Giant",           "giant"},
+	{mtGuardian,     "guardian",     "Guardian",        "guardian"},
+	{mtHorse,        "horse",        "EntityHorse",     "horse"},
+	{mtIronGolem,    "irongolem",    "VillagerGolem",   "iron_golem"},
+	{mtMagmaCube,    "magmacube",    "LavaSlime",       "magma_cube"},
+	{mtMooshroom,    "mooshroom",    "MushroomCow",     "mooshroom"},
+	{mtOcelot,       "ocelot",       "Ozelot",          "ocelot"},
+	{mtPig,          "pig",          "Pig",             "pig"},
+	{mtRabbit,       "rabbit",       "Rabbit",          "rabbit"},
+	{mtSheep,        "sheep",        "Sheep",           "sheep"},
+	{mtSilverfish,   "silverfish",   "Silverfish",      "silverfish"},
+	{mtSkeleton,     "skeleton",     "Skeleton",        "skeleton"},
+	{mtSlime,        "slime",        "Slime",           "slime"},
+	{mtSnowGolem,    "snowgolem",    "SnowMan",         "snow_golem"},
+	{mtSpider,       "spider",       "Spider",          "spider"},
+	{mtSquid,        "squid",        "Squid",           "squid"},
+	{mtVillager,     "villager",     "Villager",        "villager"},
+	{mtWitch,        "witch",        "Witch",           "witch"},
+	{mtWither,       "wither",       "WitherBoss",      "wither"},
+	{mtWolf,         "wolf",         "Wolf",            "wolf"},
+	{mtZombie,       "zombie",       "Zombie",          "zombie"},
+	{mtZombiePigman, "zombiepigman", "PigZombie",       "zombie_pigman"},
 } ;
 
 
@@ -100,6 +101,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
+	, m_WasLastTargetAPlayer(false)
 	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
@@ -147,20 +149,21 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		return;
 	}
 
-
-	if (m_JumpCoolDown == 0)
+	if (m_JumpCoolDown <= 0)
 	{
 		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
-			if (((IsOnGround()) && (GetSpeed().SqrLength() == 0.0f)) ||
-			(IsSwimming()))
+			if (
+				(IsOnGround() && (GetSpeed().SqrLength() <= 0.5)) ||  // If walking on the ground, we need to slow down first, otherwise we miss the jump
+				IsSwimming()
+			)
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
-				// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
 				AddPosY(1.6);  // Jump!!
+				SetSpeedY(1);
 				SetSpeedX(3.2 * (m_NextWayPointPosition.x - GetPosition().x));  // Move forward in a preset speed.
-				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error and 1.6 and 3.2 are perfect.
+				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error
 			}
 		}
 	}
@@ -170,7 +173,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 	}
 
 	Vector3d Distance = m_NextWayPointPosition - GetPosition();
-	if ((Distance.x != 0.0f) || (Distance.z != 0.0f))
+	if ((std::abs(Distance.x) > 0.05) || (std::abs(Distance.z) > 0.05))
 	{
 		Distance.y = 0;
 		Distance.Normalize();
@@ -509,7 +512,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtOcelot:
 		case mtWolf:
 		{
-			Reward = m_World->GetTickRandomNumber(2) + 1;
+			Reward = GetRandomProvider().RandInt(1, 3);
 			break;
 		}
 
@@ -528,7 +531,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtSlime:
 		case mtMagmaCube:
 		{
-			Reward = 6 + (m_World->GetTickRandomNumber(2));
+			Reward = GetRandomProvider().RandInt(6, 8);
 			break;
 		}
 		case mtBlaze:
@@ -654,13 +657,15 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_IdleInterval > std::chrono::seconds(1))
 	{
+		auto & Random = GetRandomProvider();
+
 		// At this interval the results are predictable
-		int rem = m_World->GetTickRandomNumber(6) + 1;
+		int rem = Random.RandInt(1, 7);
 		m_IdleInterval -= std::chrono::seconds(1);  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
-		Dist.x = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
-		Dist.z = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
+		Dist.x = static_cast<double>(Random.RandInt(-5, 5));
+		Dist.z = static_cast<double>(Random.RandInt(-5, 5));
 
 		if ((Dist.SqrLength() > 2)  && (rem >= 3))
 		{
@@ -825,6 +830,25 @@ AString cMonster::MobTypeToVanillaName(eMonsterType a_MobType)
 
 
 
+AString cMonster::MobTypeToVanillaNBT(eMonsterType a_MobType)
+{
+	// Mob types aren't sorted, so we need to search linearly:
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	{
+		if (g_MobTypeNames[i].m_Type == a_MobType)
+		{
+			return g_MobTypeNames[i].m_VanillaNameNBT;
+		}
+	}
+
+	// Not found:
+	return "";
+}
+
+
+
+
+
 eMonsterType cMonster::StringToMobType(const AString & a_Name)
 {
 	AString lcName = StrToLower(a_Name);
@@ -842,6 +866,15 @@ eMonsterType cMonster::StringToMobType(const AString & a_Name)
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
 	{
 		if (strcmp(StrToLower(g_MobTypeNames[i].m_VanillaName).c_str(), lcName.c_str()) == 0)
+		{
+			return g_MobTypeNames[i].m_Type;
+		}
+	}
+
+	// Search in NBT name
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	{
+		if (strcmp(StrToLower(g_MobTypeNames[i].m_VanillaNameNBT).c_str(), lcName.c_str()) == 0)
 		{
 			return g_MobTypeNames[i].m_Type;
 		}
@@ -945,6 +978,7 @@ void cMonster::SetTarget (cPawn * a_NewTarget)
 		ASSERT(a_NewTarget->IsTicking());
 		// Notify the new target that we are now targeting it.
 		m_Target->TargetingMe(this);
+		m_WasLastTargetAPlayer = m_Target->IsPlayer();
 	}
 
 }
@@ -973,7 +1007,7 @@ cPawn * cMonster::GetTarget ()
 
 cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
-	cFastRandom Random;
+	auto & Random = GetRandomProvider();
 	cMonster * toReturn = nullptr;
 
 	// Create the mob entity
@@ -981,23 +1015,23 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			toReturn = new cMagmaCube(1 << Random.NextInt(3));  // Size 1, 2 or 4
+			toReturn = new cMagmaCube(1 << Random.RandInt(2));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
+			toReturn = new cSlime(1 << Random.RandInt(2));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
+			toReturn = new cSkeleton(false);
 			break;
 		}
 		case mtVillager:
 		{
-			int VillagerType = Random.NextInt(6);
+			int VillagerType = Random.RandInt(6);
 			if (VillagerType == 6)
 			{
 				// Give farmers a better chance of spawning
@@ -1010,10 +1044,10 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtHorse:
 		{
 			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
-			int HorseType = Random.NextInt(8);
-			int HorseColor = Random.NextInt(7);
-			int HorseStyle = Random.NextInt(5);
-			int HorseTameTimes = Random.NextInt(6) + 1;
+			int HorseType = Random.RandInt(7);
+			int HorseColor = Random.RandInt(6);
+			int HorseStyle = Random.RandInt(4);
+			int HorseTameTimes = Random.RandInt(1, 6);
 
 			if ((HorseType == 5) || (HorseType == 6) || (HorseType == 7))
 			{
@@ -1065,11 +1099,10 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
-	MTRand r1;
-	int Count = static_cast<int>(static_cast<unsigned int>(r1.randInt()) % (a_Max + 1 - a_Min) + a_Min);
+	auto Count = GetRandomProvider().RandInt<char>(static_cast<char>(a_Min), static_cast<char>(a_Max));
 	if (Count > 0)
 	{
-		a_Drops.push_back(cItem(a_Item, static_cast<char>(Count), a_ItemHealth));
+		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
 	}
 }
 
@@ -1079,9 +1112,7 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth)
 {
-	MTRand r1;
-	int Count = r1.randInt() % 1000;
-	if (Count < (a_Chance * 10))
+	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
 		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
 	}
@@ -1093,11 +1124,10 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 
 void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel)
 {
-	MTRand r1;
-	unsigned int Count = static_cast<unsigned int>(static_cast<unsigned long>(r1.randInt()) % 200);
-	if (Count < (5 + a_LootingLevel))
+	auto & r1 = GetRandomProvider();
+	if (r1.RandBool((5 + a_LootingLevel) / 200.0))
 	{
-		size_t Rare = static_cast<size_t>(r1.randInt()) % a_Items.Size();
+		size_t Rare = r1.RandInt<size_t>(a_Items.Size() - 1);
 		a_Drops.push_back(a_Items.at(Rare));
 	}
 }
@@ -1108,8 +1138,11 @@ void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigne
 
 void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
-	MTRand r1;
-	if (r1.randInt() % 200 < ((m_DropChanceHelmet * 200) + (a_LootingLevel * 2)))
+	auto & r1 = GetRandomProvider();
+
+	double LootingBonus = a_LootingLevel / 100.0;
+
+	if (r1.RandBool(m_DropChanceHelmet + LootingBonus))
 	{
 		if (!GetEquippedHelmet().IsEmpty())
 		{
@@ -1117,7 +1150,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 		}
 	}
 
-	if (r1.randInt() % 200 < ((m_DropChanceChestplate * 200) + (a_LootingLevel * 2)))
+	if (r1.RandBool(m_DropChanceChestplate + LootingBonus))
 	{
 		if (!GetEquippedChestplate().IsEmpty())
 		{
@@ -1125,7 +1158,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 		}
 	}
 
-	if (r1.randInt() % 200 < ((m_DropChanceLeggings * 200) + (a_LootingLevel * 2)))
+	if (r1.RandBool(m_DropChanceLeggings + LootingBonus))
 	{
 		if (!GetEquippedLeggings().IsEmpty())
 		{
@@ -1133,7 +1166,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 		}
 	}
 
-	if (r1.randInt() % 200 < ((m_DropChanceBoots * 200) + (a_LootingLevel * 2)))
+	if (r1.RandBool(m_DropChanceBoots + LootingBonus))
 	{
 		if (!GetEquippedBoots().IsEmpty())
 		{
@@ -1148,8 +1181,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 
 void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
-	MTRand r1;
-	if (r1.randInt() % 200 < ((m_DropChanceWeapon * 200) + (a_LootingLevel * 2)))
+	if (GetRandomProvider().RandBool(m_DropChanceWeapon + (a_LootingLevel / 100.0)))
 	{
 		if (!GetEquippedWeapon().IsEmpty())
 		{

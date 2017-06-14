@@ -16,6 +16,8 @@ Implements the 1.10 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 
+#include "../WorldStorage/FastNBT.h"
+
 #include "../Entities/Boat.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
@@ -29,6 +31,12 @@ Implements the 1.10 protocol classes:
 #include "../Entities/SplashPotionEntity.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
+
+#include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/MobSpawnerEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 
 #include "Bindings/PluginManager.h"
 
@@ -343,7 +351,7 @@ void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet
@@ -511,11 +519,11 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEInt8(BOAT_LAST_HIT_TIME);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteBEInt32(Boat.GetLastDamage());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
 
 			a_Pkt.WriteBEInt8(BOAT_FORWARD_DIRECTION);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteBEInt32(Boat.GetForwardDirection());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
 
 			a_Pkt.WriteBEInt8(BOAT_DAMAGE_TAKEN);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
@@ -523,7 +531,7 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEInt8(BOAT_TYPE);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteBEInt32(Boat.GetType());
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
 
 			a_Pkt.WriteBEInt8(BOAT_RIGHT_PADDLE_TURNING);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
@@ -553,6 +561,112 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			break;
 		}
 	}
+}
+
+
+
+
+
+void cProtocol_1_10_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
+{
+	cFastNBTWriter Writer;
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_BEACON:
+		{
+			auto & BeaconEntity = reinterpret_cast<const cBeaconEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BeaconEntity.GetPosX());
+			Writer.AddInt("y", BeaconEntity.GetPosY());
+			Writer.AddInt("z", BeaconEntity.GetPosZ());
+			Writer.AddInt("Primary", BeaconEntity.GetPrimaryEffect());
+			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
+			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
+			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+
+		case E_BLOCK_COMMAND_BLOCK:
+		{
+			auto & CommandBlockEntity = reinterpret_cast<const cCommandBlockEntity &>(a_BlockEntity);
+			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
+			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
+			Writer.AddInt("x", CommandBlockEntity.GetPosX());
+			Writer.AddInt("y", CommandBlockEntity.GetPosY());
+			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			// You can set custom names for windows in Vanilla
+			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+			Writer.AddString("CustomName", "@");
+			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			if (!CommandBlockEntity.GetLastOutput().empty())
+			{
+				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
+			}
+			break;
+		}
+
+		case E_BLOCK_HEAD:
+		{
+			auto & MobHeadEntity = reinterpret_cast<const cMobHeadEntity &>(a_BlockEntity);
+			Writer.AddInt("x", MobHeadEntity.GetPosX());
+			Writer.AddInt("y", MobHeadEntity.GetPosY());
+			Writer.AddInt("z", MobHeadEntity.GetPosZ());
+			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
+			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
+			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+			// The new Block Entity format for a Mob Head. See: http://minecraft.gamepedia.com/Head#Block_entity
+			Writer.BeginCompound("Owner");
+			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID());
+			Writer.AddString("Name", MobHeadEntity.GetOwnerName());
+			Writer.BeginCompound("Properties");
+			Writer.BeginList("textures", TAG_Compound);
+			Writer.BeginCompound("");
+			Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
+			Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
+			Writer.EndCompound();
+			Writer.EndList();
+			Writer.EndCompound();
+			Writer.EndCompound();
+			break;
+		}
+
+		case E_BLOCK_FLOWER_POT:
+		{
+			auto & FlowerPotEntity = reinterpret_cast<const cFlowerPotEntity &>(a_BlockEntity);
+			Writer.AddInt("x", FlowerPotEntity.GetPosX());
+			Writer.AddInt("y", FlowerPotEntity.GetPosY());
+			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
+			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
+			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
+			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+
+		case E_BLOCK_MOB_SPAWNER:
+		{
+			auto & MobSpawnerEntity = reinterpret_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
+			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
+			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
+			Writer.BeginCompound("SpawnData");
+				Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+			Writer.EndCompound();
+			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+			Writer.AddString("id", "MobSpawner");
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
+
+	Writer.Finish();
+	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
 }
 
 

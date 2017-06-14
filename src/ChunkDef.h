@@ -31,8 +31,8 @@ class cEntity;
 class cClientHandle;
 class cBlockEntity;
 
-typedef std::list<cEntity *>        cEntityList;
-typedef std::list<cBlockEntity *>   cBlockEntityList;
+typedef std::list<cEntity *>          cEntityList;
+typedef std::map<int, cBlockEntity *> cBlockEntities;
 
 
 

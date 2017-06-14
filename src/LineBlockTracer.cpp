@@ -8,6 +8,7 @@
 #include "Vector3.h"
 #include "World.h"
 #include "Chunk.h"
+#include "BoundingBox.h"
 
 
 
@@ -31,7 +32,7 @@ cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
 	m_CurrentX(0),
 	m_CurrentY(0),
 	m_CurrentZ(0),
-	m_CurrentFace(0)
+	m_CurrentFace(BLOCK_FACE_NONE)
 {
 }
 
@@ -43,6 +44,101 @@ bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Call
 {
 	cLineBlockTracer Tracer(a_World, a_Callbacks);
 	return Tracer.Trace(a_Start.x, a_Start.y, a_Start.z, a_End.x, a_End.y, a_End.z);
+}
+
+
+
+
+
+bool cLineBlockTracer::LineOfSightTrace(cWorld & a_World, const Vector3d & a_Start, const Vector3d & a_End, int a_Sight)
+{
+	static class LineOfSightCallbacks:
+		public cLineBlockTracer::cCallbacks
+	{
+		bool m_IsAirOpaque;
+		bool m_IsWaterOpaque;
+		bool m_IsLavaOpaque;
+	public:
+		LineOfSightCallbacks(bool a_IsAirOpaque, bool a_IsWaterOpaque, bool a_IsLavaOpaque):
+			m_IsAirOpaque(a_IsAirOpaque),
+			m_IsWaterOpaque(a_IsWaterOpaque),
+			m_IsLavaOpaque(a_IsLavaOpaque)
+		{}
+
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		{
+			switch (a_BlockType)
+			{
+				case E_BLOCK_AIR:              return m_IsAirOpaque;
+				case E_BLOCK_LAVA:             return m_IsLavaOpaque;
+				case E_BLOCK_STATIONARY_LAVA:  return m_IsLavaOpaque;
+				case E_BLOCK_STATIONARY_WATER: return m_IsWaterOpaque;
+				case E_BLOCK_WATER:            return m_IsWaterOpaque;
+				default: return true;
+			}
+		}
+	} callbacks(
+		(a_Sight & losAir) == 0,
+		(a_Sight & losWater) == 0,
+		(a_Sight & losLava) == 0
+	);
+	return Trace(a_World, callbacks, a_Start, a_End);
+}
+
+
+
+
+
+bool cLineBlockTracer::FirstSolidHitTrace(
+	cWorld & a_World,
+	const Vector3d & a_Start, const Vector3d & a_End,
+	Vector3d & a_HitCoords,
+	Vector3i & a_HitBlockCoords, eBlockFace & a_HitBlockFace
+)
+{
+	class cSolidHitCallbacks:
+		public cCallbacks
+	{
+	public:
+		cSolidHitCallbacks(const Vector3d & a_CBStart, const Vector3d & a_CBEnd, Vector3d & a_CBHitCoords, Vector3i & a_CBHitBlockCoords, eBlockFace & a_CBHitBlockFace):
+			m_Start(a_CBStart),
+			m_End(a_CBEnd),
+			m_HitCoords(a_CBHitCoords),
+			m_HitBlockCoords(a_CBHitBlockCoords),
+			m_HitBlockFace(a_CBHitBlockFace)
+		{
+		}
+
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		{
+			if (!cBlockInfo::IsSolid(a_BlockType))
+			{
+				return false;
+			}
+
+			// We hit a solid block, calculate the exact hit coords and abort trace:
+			m_HitBlockCoords.Set(a_BlockX, a_BlockY, a_BlockZ);
+			m_HitBlockFace = a_EntryFace;
+			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
+			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
+			eBlockFace Face;  // Face hit
+			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
+			{
+				// Math rounding errors have caused the calculation to miss the block completely, assume immediate hit
+				LineCoeff = 0;
+			}
+			m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
+			return true;
+		}
+
+	protected:
+		const Vector3d & m_Start;
+		const Vector3d & m_End;
+		Vector3d & m_HitCoords;
+		Vector3i & m_HitBlockCoords;
+		eBlockFace & m_HitBlockFace;
+	} callbacks(a_Start, a_End, a_HitCoords, a_HitBlockCoords, a_HitBlockFace);
+	return !Trace(a_World, callbacks, a_Start, a_End);
 }
 
 

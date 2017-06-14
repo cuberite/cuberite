@@ -22,12 +22,12 @@
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
+#include "Entities/Boat.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
-#include "FastRandom.h"
 #include "EffectID.h"
 
 
@@ -453,7 +453,7 @@ public:
 
 	/** Spawns a boat at the given coordinates.
 	Returns the UniqueID of the spawned boat, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnBoat(double a_X, double a_Y, double a_Z);
+	UInt32 SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material);
 
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
@@ -800,8 +800,8 @@ public:
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
 	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 
-	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
-	int GetTickRandomNumber(int a_Range) { return static_cast<int>(m_TickRand.randInt(a_Range)); }
+	/** Returns a random number in range [0 .. a_Range]. */
+	int GetTickRandomNumber(int a_Range);
 
 	/** Appends all usernames starting with a_Text (case-insensitive) into Results */
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
@@ -878,9 +878,6 @@ private:
 
 	/** The dimension of the world, used by the client to provide correct lighting scheme */
 	eDimension m_Dimension;
-
-	/** This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe) */
-	MTRand m_TickRand;
 
 	bool m_IsSpawnExplicitlySet;
 	double m_SpawnX;
@@ -1034,7 +1031,7 @@ private:
 
 
 	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
-	virtual ~cWorld();
+	virtual ~cWorld() override;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 

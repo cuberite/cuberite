@@ -222,6 +222,11 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		}
 
 		case E_ITEM_BOAT:
+		case E_ITEM_SPRUCE_BOAT:
+		case E_ITEM_BIRCH_BOAT:
+		case E_ITEM_JUNGLE_BOAT:
+		case E_ITEM_ACACIA_BOAT:
+		case E_ITEM_DARK_OAK_BOAT:
 		{
 			Vector3d SpawnPos;
 			if (IsBlockWater(DispBlock))
@@ -244,7 +249,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			SpawnPos += GetShootVector(Meta) * 0.8;  // A boat is bigger than one block. Add the shoot vector to put it outside the dispenser.
 			SpawnPos += Vector3d(0.5, 0.5, 0.5);
 
-			if (m_World->SpawnBoat(SpawnPos.x, SpawnPos.y, SpawnPos.z))
+			if (m_World->SpawnBoat(SpawnPos.x, SpawnPos.y, SpawnPos.z, cBoat::ItemToMaterial(SlotItem)))
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}

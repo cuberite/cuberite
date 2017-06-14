@@ -34,7 +34,7 @@ public:
 	wrapping the (listen-) callbacks that are in the specified table. */
 	cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_Callbacks);
 
-	~cLuaServerHandle();
+	virtual ~cLuaServerHandle() override;
 
 	/** Called by cNetwork::Listen()'s binding.
 	Sets the server handle around which this instance is wrapped, and a self SharedPtr for link management. */

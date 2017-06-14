@@ -24,7 +24,7 @@ class cEnderChestWindow :
 public:
 	cEnderChestWindow(cEnderChestEntity * a_EnderChest);
 
-	~cEnderChestWindow();
+	virtual ~cEnderChestWindow() override;
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 

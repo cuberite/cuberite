@@ -864,44 +864,11 @@ void cLuaState::Push(const AStringVector & a_Vector)
 
 
 
-void cLuaState::Push(const cCraftingGrid * a_Grid)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cCraftingGrid *>(a_Grid)), "cCraftingGrid");
-}
-
-
-
-
-
-void cLuaState::Push(const cCraftingRecipe * a_Recipe)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cCraftingRecipe *>(a_Recipe)), "cCraftingRecipe");
-}
-
-
-
-
-
 void cLuaState::Push(const char * a_Value)
 {
 	ASSERT(IsValid());
 
 	tolua_pushstring(m_LuaState, a_Value);
-}
-
-
-
-
-
-void cLuaState::Push(const cItems & a_Items)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cItems *>(&a_Items)), "cItems");
 }
 
 
@@ -919,17 +886,6 @@ void cLuaState::Push(const cNil & a_Nil)
 
 
 
-void cLuaState::Push(const cPlayer * a_Player)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<cPlayer *>(a_Player)), "cPlayer");
-}
-
-
-
-
-
 void cLuaState::Push(const cLuaState::cRef & a_Ref)
 {
 	ASSERT(IsValid());
@@ -941,44 +897,11 @@ void cLuaState::Push(const cLuaState::cRef & a_Ref)
 
 
 
-void cLuaState::Push(const HTTPRequest * a_Request)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<HTTPRequest *>(a_Request)), "HTTPRequest");
-}
-
-
-
-
-
-void cLuaState::Push(const HTTPTemplateRequest * a_Request)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<HTTPTemplateRequest *>(a_Request)), "HTTPTemplateRequest");
-}
-
-
-
-
-
 void cLuaState::Push(const Vector3d & a_Vector)
 {
 	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3d *>(&a_Vector)), "Vector3<double>");
-}
-
-
-
-
-
-void cLuaState::Push(const Vector3d * a_Vector)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3d *>(a_Vector)), "Vector3<double>");
+	auto c = new Vector3d(a_Vector);
+	tolua_pushusertype_and_takeownership(m_LuaState, c, "Vector3<double>");
 }
 
 
@@ -988,19 +911,8 @@ void cLuaState::Push(const Vector3d * a_Vector)
 void cLuaState::Push(const Vector3i & a_Vector)
 {
 	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3i *>(&a_Vector)), "Vector3<int>");
-}
-
-
-
-
-
-void cLuaState::Push(const Vector3i * a_Vector)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, reinterpret_cast<void *>(const_cast<Vector3i *>(a_Vector)), "Vector3<int>");
+	auto c = new Vector3i(a_Vector);
+	tolua_pushusertype_and_takeownership(m_LuaState, c, "Vector3<int>");
 }
 
 
@@ -1542,8 +1454,12 @@ bool cLuaState::CallFunction(int a_NumResults)
 		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
 
 		// Remove the error handler and error message from the stack:
-		ASSERT(lua_gettop(m_LuaState) == 2);
-		lua_pop(m_LuaState, 2);
+		auto top = lua_gettop(m_LuaState);
+		if (top < 2)
+		{
+			LogStackValues(Printf("The Lua stack is in an unexpected state, expected at least two values there, but got %d", top).c_str());
+		}
+		lua_pop(m_LuaState, std::min(2, top));
 		return false;
 	}
 

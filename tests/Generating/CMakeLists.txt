@@ -17,7 +17,7 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.cpp
 
 	${CMAKE_SOURCE_DIR}/src/Generating/ChunkDesc.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/PieceGenerator.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.cpp
@@ -47,7 +47,7 @@ set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.h
 
 	${CMAKE_SOURCE_DIR}/src/Generating/ChunkDesc.h
-	${CMAKE_SOURCE_DIR}/src/Generating/PieceGenerator.h
+	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.h
@@ -65,8 +65,7 @@ set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.h
 )
 
-set (SRCS
-	PieceRotationTest.cpp
+set (STUBS
 	Stubs.cpp
 	LuaState_Typedefs.inc
 	LuaState_Declaration.inc
@@ -86,17 +85,51 @@ if (MSVC)
 	list (APPEND SHARED_HDRS ${CMAKE_SOURCE_DIR}/src/LeakFinder.h   ${CMAKE_SOURCE_DIR}/src/StackWalker.h)
 endif()
 
-source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
-source_group("Sources" FILES ${SRCS})
-add_executable(PieceRotation ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(PieceRotation tolualib zlib)
+add_library(GeneratorTestingSupport STATIC ${SHARED_SRCS} ${SHARED_HDRS} ${STUBS})
+target_link_libraries(GeneratorTestingSupport tolualib zlib)
+source_group("Stubs" FILES ${STUBS})
+
+
+
+
+
+# LoadablePieces test:
+source_group("Data files" FILES Test.cubeset Test1.schematic)
+add_executable(LoadablePieces LoadablePieces.cpp Test.cubeset Test1.schematic)
+target_link_libraries(LoadablePieces GeneratorTestingSupport)
+add_test(NAME LoadablePieces-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LoadablePieces)
+
+
+
+
+
+# PieceRotation test:
+add_executable(PieceRotation PieceRotationTest.cpp)
+target_link_libraries(PieceRotation GeneratorTestingSupport)
 add_test(NAME PieceRotation-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND PieceRotation)
+
+
+
+
+
+# PieceGeneratorBFSTree test:
+add_executable(PieceGeneratorBFSTree
+	PieceGeneratorBFSTreeTest.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.h
+)
+target_link_libraries(PieceGeneratorBFSTree GeneratorTestingSupport)
+add_test(NAME PieceGeneratorBFSTree-test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Server/Prefabs/PieceStructures COMMAND PieceGeneratorBFSTree)
+
 
 
 
 
 # Put the projects into solution folders (MSVC):
 set_target_properties(
+	GeneratorTestingSupport
+	LoadablePieces
+	PieceGeneratorBFSTree
 	PieceRotation
-	PROPERTIES FOLDER Tests
+	PROPERTIES FOLDER Tests/Generating
 )

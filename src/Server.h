@@ -127,6 +127,9 @@ public:
 	/** Returns true if authentication has been turned on in server settings. */
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }  // tolua_export
 
+	/** Returns true if limit for number of block changes per tick by a player has been turned on in server settings. */
+	bool ShouldLimitPlayerBlockChanges(void) const { return m_ShouldLimitPlayerBlockChanges; }
+
 	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
 	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
 	bool ShouldLoadOfflinePlayerData(void) const { return m_ShouldLoadOfflinePlayerData; }
@@ -223,6 +226,9 @@ private:
 	/** If true, players will be online-authenticated agains Mojang servers.
 	This setting is the same as the "online-mode" setting in Vanilla. */
 	bool m_ShouldAuthenticate;
+
+	/** True if limit for number of block changes per tick by a player should be enabled. */
+	bool m_ShouldLimitPlayerBlockChanges;
 
 	/** True if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
 	This allows transitions from an offline (no-auth) server to an online one.

@@ -11,6 +11,7 @@
 #include "Protocol_1_9.h"
 #include "Protocol_1_10.h"
 #include "Protocol_1_11.h"
+#include "Protocol_1_12.h"
 #include "Packetizer.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -57,6 +58,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_10_0:  return "1.10";
 		case PROTO_VERSION_1_11_0:  return "1.11";
 		case PROTO_VERSION_1_11_1:  return "1.11.1";
+		case PROTO_VERSION_1_12:    return "1.12";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -1088,6 +1090,11 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Protocol = new cProtocol_1_11_1(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
+		case PROTO_VERSION_1_12:
+		{
+			m_Protocol = new cProtocol_1_12(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
@@ -1160,7 +1167,7 @@ void cProtocolRecognizer::SendPingStatusResponse(void)
 	// Version:
 	Json::Value Version;
 	Version["name"] = "Cuberite " MCS_CLIENT_VERSIONS;
-	Version["protocol"] = 0;  // Force client to think this is an invalid version (no other good default)
+	Version["protocol"] = MCS_LATEST_PROTOCOL_VERSION;
 
 	// Players:
 	Json::Value Players;
@@ -1182,7 +1189,7 @@ void cProtocolRecognizer::SendPingStatusResponse(void)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet

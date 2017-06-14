@@ -50,7 +50,7 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, char a_CBEntryFace) override
+			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{
@@ -95,8 +95,13 @@ public:
 		}
 
 		// Spawn block at water level
-		cBoat * Boat = new cBoat(x + 0.5, y + 0.5, z + 0.5);
-		Boat->Initialize(*a_World);
+		cBoat * Boat = new cBoat(x + 0.5, y + 0.5, z + 0.5, cBoat::ItemToMaterial(a_Player->GetEquippedItem()));
+		if (!Boat->Initialize(*a_World))
+		{
+			delete Boat;
+			Boat = nullptr;
+			return false;
+		}
 
 		// Remove boat from players hand
 		if (!a_Player->IsGameModeCreative())

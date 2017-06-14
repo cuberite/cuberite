@@ -127,8 +127,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				Callback.Baby->InheritFromParents(this, m_LovePartner);
 			}
 
-			cFastRandom Random;
-			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, 1 + Random.NextInt(6));
+			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
 
 			m_LovePartner->ResetLoveMode();
 			ResetLoveMode();

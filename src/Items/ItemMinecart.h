@@ -73,7 +73,12 @@ public:
 				return false;
 			}
 		}  // switch (m_ItemType)
-		Minecart->Initialize(*a_World);
+		if (!Minecart->Initialize(*a_World))
+		{
+			delete Minecart;
+			Minecart = nullptr;
+			return false;
+		}
 
 		if (!a_Player->IsGameModeCreative())
 		{

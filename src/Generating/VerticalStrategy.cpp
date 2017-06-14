@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "VerticalStrategy.h"
+#include "../Noise/Noise.h"
 
 
 

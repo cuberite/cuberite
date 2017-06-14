@@ -196,7 +196,7 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 			{
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
@@ -241,7 +241,7 @@ public:
 			NIBBLETYPE m_ReplacedBlockMeta;
 			eBlockFace m_EntryFace;
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, char a_CBEntryFace) override
+			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{
@@ -250,7 +250,7 @@ public:
 					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
 					if (!cFluidSimulator::CanWashAway(a_CBBlockType) && !IsBlockLiquid(a_CBBlockType))
 					{
-						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, static_cast<eBlockFace>(a_CBEntryFace));  // Was an unwashawayable block, can't overwrite it!
+						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}
 					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);  // (Block could be washed away, replace it)
 					return true;  // Abort tracing
@@ -263,7 +263,8 @@ public:
 		Vector3d Start(a_Player->GetEyePosition());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
-		// cTracer::Trace returns true when whole line was traversed. By returning true from the callback when we hit something, we ensure that this never happens if liquid could be placed
+		// cLineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
+		// we ensure that this never happens if liquid could be placed
 		// Use this to judge whether the position is valid
 		if (!Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
 		{

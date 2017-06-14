@@ -9,7 +9,7 @@
 #include "../Chunk.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Bindings/PluginManager.h"
-#include "../Tracer.h"
+#include "../LineBlockTracer.h"
 #include "Player.h"
 #include "Items/ItemHandler.h"
 #include "../FastRandom.h"
@@ -495,12 +495,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			int Chance = static_cast<int>(ThornsLevel * 15);
 
-			cFastRandom Random;
-			int RandomValue = Random.GenerateRandomInteger(0, 100);
+			auto & Random = GetRandomProvider();
 
-			if (RandomValue <= Chance)
+			if (Random.RandBool(Chance / 100.0))
 			{
-				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.GenerateRandomInteger(1, 4), 0);
+				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
 			}
 		}
 
@@ -574,8 +573,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			TotalEPF = 25;
 		}
 
-		cFastRandom Random;
-		float RandomValue = Random.GenerateRandomInteger(50, 100) * 0.01f;
+		float RandomValue = GetRandomProvider().RandReal(0.5f, 1.0f);
 
 		TotalEPF = ceil(TotalEPF * RandomValue);
 
@@ -1010,6 +1008,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NextPos.y += 0.5;
 		}
 
+		m_bHasSentNoSpeed = false;  // this unlocks movement sending to client in BroadcastMovementUpdate function
 		m_bOnGround = true;
 
 		/*
@@ -1071,29 +1070,38 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Get water direction
 	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
-	m_WaterSpeed *= 0.9f;  // Reduce speed each tick
+	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
 	switch (WaterDir)
 	{
 		case X_PLUS:
+		{
 			m_WaterSpeed.x = 0.2f;
 			m_bOnGround = false;
 			break;
+		}
 		case X_MINUS:
+		{
 			m_WaterSpeed.x = -0.2f;
 			m_bOnGround = false;
 			break;
+		}
 		case Z_PLUS:
+		{
 			m_WaterSpeed.z = 0.2f;
 			m_bOnGround = false;
 			break;
+		}
 		case Z_MINUS:
+		{
 			m_WaterSpeed.z = -0.2f;
 			m_bOnGround = false;
 			break;
-
-	default:
-		break;
+		}
+		default:
+		{
+			break;
+		}
 	}
 
 	if (fabs(m_WaterSpeed.x) < 0.05)
@@ -1110,57 +1118,53 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (NextSpeed.SqrLength() > 0.0f)
 	{
-		cTracer Tracer(GetWorld());
-		// Distance traced is an integer, so we round up from the distance we should go (Speed * Delta), else we will encounter collision detection failurse
-		int DistanceToTrace = CeilC((NextSpeed * DtSec.count()).SqrLength()) * 2;
-		bool HasHit = Tracer.Trace(NextPos, NextSpeed, DistanceToTrace);
-
-		if (HasHit)
+		Vector3d HitCoords;
+		Vector3i HitBlockCoords;
+		eBlockFace HitBlockFace;
+		Vector3d wantNextPos = NextPos + NextSpeed * DtSec.count();
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
+		if (isHit)
 		{
-			// Oh noez! We hit something: verify that the (hit position - current) was smaller or equal to the (position that we should travel without obstacles - current)
-			// This is because previously, we traced with a length that was rounded up (due to integer limitations), and in the case that something was hit, we don't want to overshoot our projected movement
-			if ((Tracer.RealHit - NextPos).SqrLength() <= (NextSpeed * DtSec.count()).SqrLength())
+			// Set our position to where the block was hit, minus a bit:
+			// TODO: The real entity's m_Width should be taken into account here
+			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
+			if (HitBlockFace == BLOCK_FACE_YP)
 			{
-				// Block hit was within our projected path
-				// Begin by stopping movement in the direction that we hit something. The Normal is the line perpendicular to a 2D face and in this case, stores what block face was hit through either -1 or 1.
-				// For example: HitNormal.y = -1 : BLOCK_FACE_YM; HitNormal.y = 1 : BLOCK_FACE_YP
-				if (Tracer.HitNormal.x != 0.0f)
-				{
-					NextSpeed.x = 0.0f;
-				}
-				if (Tracer.HitNormal.y != 0.0f)
-				{
-					NextSpeed.y = 0.0f;
-				}
-				if (Tracer.HitNormal.z != 0.0f)
-				{
-					NextSpeed.z = 0.0f;
-				}
-
-				// Now, set our position to the hit block (i.e. move part way along our intended trajectory)
-				NextPos.Set(Tracer.RealHit.x, Tracer.RealHit.y, Tracer.RealHit.z);
-				NextPos.x += Tracer.HitNormal.x * 0.1;
-				NextPos.y += Tracer.HitNormal.y * 0.05;
-				NextPos.z += Tracer.HitNormal.z * 0.1;
-
-				if (Tracer.HitNormal.y == 1.0f)  // Hit BLOCK_FACE_YP, we are on the ground
-				{
-					m_bOnGround = true;
-					NextPos.y = FloorC(NextPos.y);  // we clamp the height to 0 cos otherwise we'll constantly be slightly above the block
-				}
+				// We hit the ground, adjust the position to the top of the block:
+				m_bOnGround = true;
+				NextPos.y = HitBlockCoords.y + 1;
 			}
-			else
+
+			// Avoid movement in the direction of the blockface that has been hit:
+			switch (HitBlockFace)
 			{
-				// We have hit a block but overshot our intended trajectory, move normally, safe in the warm cocoon of knowledge that we won't appear to teleport forwards on clients,
-				// and that this piece of software will come to be hailed as the epitome of performance and functionality in C++, never before seen, and of such a like that will never
-				// be henceforth seen again in the time of programmers and man alike
-				// </&sensationalist>
-				NextPos += (NextSpeed * DtSec.count());
+				case BLOCK_FACE_XM:
+				case BLOCK_FACE_XP:
+				{
+					NextSpeed.x = 0;
+					break;
+				}
+				case BLOCK_FACE_YM:
+				case BLOCK_FACE_YP:
+				{
+					NextSpeed.y = 0;
+					break;
+				}
+				case BLOCK_FACE_ZM:
+				case BLOCK_FACE_ZP:
+				{
+					NextSpeed.z = 0;
+					break;
+				}
+				default:
+				{
+					break;
+				}
 			}
 		}
 		else
 		{
-			// We didn't hit anything, so move =]
+			// We didn't hit anything, so move:
 			NextPos += (NextSpeed * DtSec.count());
 		}
 	}
@@ -1910,35 +1914,39 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			m_bHasSentNoSpeed = false;
 		}
 
-		// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-		int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
-		int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
-		int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
-
-		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
+		// Only send movement if speed is not 0 and 'no speed' was sent to client
+		if (!m_bHasSentNoSpeed)
 		{
-			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
+			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
+			int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
+			int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
+			int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
+
+			if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 			{
-				// Difference within Byte limitations, use a relative move packet
-				if (m_bDirtyOrientation)
+				if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
 				{
-					m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
-					m_bDirtyOrientation = false;
+					// Difference within Byte limitations, use a relative move packet
+					if (m_bDirtyOrientation)
+					{
+						m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+						m_bDirtyOrientation = false;
+					}
+					else
+					{
+						m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+					}
+					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
+					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
+					m_LastSentPosition = GetPosition();
 				}
 				else
 				{
-					m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+					// Too big a movement, do a teleport
+					m_World->BroadcastTeleportEntity(*this, a_Exclude);
+					m_LastSentPosition = GetPosition();  // See above
+					m_bDirtyOrientation = false;
 				}
-				// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
-				// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
-				m_LastSentPosition = GetPosition();
-			}
-			else
-			{
-				// Too big a movement, do a teleport
-				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_LastSentPosition = GetPosition();  // See above
-				m_bDirtyOrientation = false;
 			}
 		}
 
@@ -2013,7 +2021,7 @@ void cEntity::Detach(void)
 
 bool cEntity::IsA(const char * a_ClassName) const
 {
-	return (strcmp(a_ClassName, "cEntity") == 0);
+	return ((a_ClassName != nullptr) && (strcmp(a_ClassName, "cEntity") == 0));
 }
 
 

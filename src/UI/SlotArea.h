@@ -145,6 +145,23 @@ public:
 
 
 
+/** Handles the shield of each player */
+class cSlotAreaShield :
+	public cSlotAreaInventoryBase
+{
+	typedef cSlotAreaInventoryBase super;
+
+public:
+	cSlotAreaShield(cWindow & a_ParentWindow) :
+		cSlotAreaInventoryBase(cInventory::invShieldCount, cInventory::invShieldOffset, a_ParentWindow)
+	{
+	}
+};
+
+
+
+
+
 /** Handles the armor area of the player's inventory */
 class cSlotAreaArmor :
 	public cSlotAreaInventoryBase
@@ -178,7 +195,7 @@ class cSlotAreaItemGrid :
 public:
 	cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow);
 
-	virtual ~cSlotAreaItemGrid();
+	virtual ~cSlotAreaItemGrid() override;
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
@@ -324,7 +341,7 @@ class cSlotAreaBeacon :
 
 public:
 	cSlotAreaBeacon(cBeaconEntity * a_Beacon, cWindow & a_ParentWindow);
-	virtual ~cSlotAreaBeacon();
+	virtual ~cSlotAreaBeacon() override;
 
 	static bool IsPlaceableItem(short a_ItemType);
 
@@ -436,7 +453,7 @@ class cSlotAreaFurnace :
 public:
 	cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow);
 
-	virtual ~cSlotAreaFurnace();
+	virtual ~cSlotAreaFurnace() override;
 
 	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
@@ -466,7 +483,7 @@ class cSlotAreaBrewingstand :
 public:
 	cSlotAreaBrewingstand(cBrewingstandEntity * a_Brewingstand, cWindow & a_ParentWindow);
 
-	virtual ~cSlotAreaBrewingstand();
+	virtual ~cSlotAreaBrewingstand() override;
 
 	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
@@ -479,7 +496,7 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
 	/** Called after an item has been brewed to handle statistics etc. */
-	void HandleBrewedItem(cPlayer & a_Player);
+	void HandleBrewedItem(cPlayer & a_Player, const cItem & a_ClickedItem);
 } ;
 
 

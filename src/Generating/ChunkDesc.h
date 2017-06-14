@@ -215,7 +215,7 @@ public:
 	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *(reinterpret_cast<BlockNibbleBytes *>(m_BlockArea.GetBlockMetas())); }
 	inline cChunkDef::HeightMap &    GetHeightMap             (void) { return m_HeightMap; }
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
-	inline cBlockEntityList &        GetBlockEntities         (void) { return m_BlockEntities; }
+	inline cBlockEntities &          GetBlockEntities         (void) { return m_BlockEntities; }
 
 	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
@@ -233,7 +233,7 @@ private:
 	cBlockArea              m_BlockArea;
 	cChunkDef::HeightMap    m_HeightMap;
 	cEntityList             m_Entities;       // Individual entities are NOT owned by this object!
-	cBlockEntityList        m_BlockEntities;  // Individual block entities are NOT owned by this object!
+	cBlockEntities          m_BlockEntities;  // Individual block entities are NOT owned by this object!
 
 	bool m_bUseDefaultBiomes;
 	bool m_bUseDefaultHeight;

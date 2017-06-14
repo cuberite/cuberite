@@ -70,8 +70,8 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 
 	if (m_Size != 1)
 	{
-		cFastRandom Random;
-		int SpawnAmount = 2 + Random.NextInt(3);
+		auto & Random = GetRandomProvider();
+		int SpawnAmount = Random.RandInt(2, 4);
 
 		for (int i = 0; i < SpawnAmount; ++i)
 		{
@@ -80,7 +80,7 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 
 			cSlime * NewSlime = new cSlime(m_Size / 2);
 			NewSlime->SetPosition(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ);
-			NewSlime->SetYaw(Random.NextFloat(1.0f) * 360.0f);
+			NewSlime->SetYaw(Random.RandReal(360.0f));
 			m_World->SpawnMobFinalize(NewSlime);
 		}
 	}

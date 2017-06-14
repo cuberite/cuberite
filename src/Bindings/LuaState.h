@@ -105,6 +105,41 @@ public:
 		#define ASSERT_LUA_STACK_BALANCE(...)
 	#endif
 
+
+	/** Makes sure that the Lua state's stack has the same number of elements on destruction as it had on construction of this object (RAII).
+	Can only remove elements, if there are less than expected, throws. */
+	class cStackBalancePopper
+	{
+	public:
+		cStackBalancePopper(cLuaState & a_LuaState):
+			m_LuaState(a_LuaState),
+			m_Count(lua_gettop(a_LuaState))
+		{
+		}
+
+		~cStackBalancePopper()
+		{
+			auto curTop = lua_gettop(m_LuaState);
+			if (curTop > m_Count)
+			{
+				// There are some leftover elements, adjust the stack:
+				m_LuaState.LogStackValues(Printf("Re-balancing Lua stack, expected %d values, got %d:", m_Count, curTop).c_str());
+				lua_pop(m_LuaState, curTop - m_Count);
+			}
+			else if (curTop < m_Count)
+			{
+				// This is an irrecoverable error, rather than letting the Lua engine crash undefinedly later on, abort now:
+				LOGERROR("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop);
+				throw std::runtime_error(Printf("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop));
+			}
+		}
+
+	protected:
+		cLuaState & m_LuaState;
+		int m_Count;
+	};
+
+
 	/** Provides a RAII-style locking for the LuaState.
 	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
 	class cLock
@@ -573,22 +608,16 @@ public:
 	}
 
 	// Push a const value onto the stack (keep alpha-sorted):
+	// Note that these functions will make a copy of the actual value, because Lua doesn't have the concept
+	// of "const", and there would be lifetime management problems if they didn't.
 	void Push(const AString & a_String);
 	void Push(const AStringMap & a_Dictionary);
 	void Push(const AStringVector & a_Vector);
-	void Push(const cCraftingGrid * a_Grid);
-	void Push(const cCraftingRecipe * a_Recipe);
 	void Push(const char * a_Value);
-	void Push(const cItems & a_Items);
 	void Push(const cNil & a_Nil);
-	void Push(const cPlayer * a_Player);
 	void Push(const cRef & a_Ref);
-	void Push(const HTTPRequest * a_Request);
-	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(const Vector3d & a_Vector);
-	void Push(const Vector3d * a_Vector);
 	void Push(const Vector3i & a_Vector);
-	void Push(const Vector3i * a_Vector);
 
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
@@ -710,7 +739,7 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
-		ASSERT_LUA_STACK_BALANCE(m_LuaState);
+		cStackBalancePopper balancer(*this);
 		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{

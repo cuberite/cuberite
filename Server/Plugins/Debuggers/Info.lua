@@ -34,6 +34,12 @@ g_PluginInfo =
 			Handler = HandleClientVersionCmd,
 			HelpString = "Shows your client's protocol version",
 		},
+		["/come"] =
+		{
+			Permission = "debuggers.come",
+			Handler = HandleComeCmd,
+			HelpString = "Instruct the mob you're looking at to navigate to your position",
+		},
 		["/compo"] =
 		{
 			Permission = "debuggers",
@@ -290,6 +296,12 @@ g_PluginInfo =
 			HelpString = "Tests the crypto hashing functions",
 		},
 
+		["hittrace"] =
+		{
+			Handler = HandleConsoleHitTrace,
+			HelpString = "Tests the FirstSolidHit trace",
+		},
+
 		["inh"] =
 		{
 			Handler = HandleConsoleInh,
@@ -300,6 +312,12 @@ g_PluginInfo =
 		{
 			Handler = HandleConsoleLoadChunk,
 			HelpString = "Loads the specified chunk into memory",
+		},
+
+		["lostrace"] =
+		{
+			Handler = HandleConsoleLosTrace,
+			HelpString = "Tests a LineOfSight trace",
 		},
 
 		["pluginstats"] =
@@ -330,6 +348,12 @@ g_PluginInfo =
 		{
 			Handler = HandleConsoleTestCall,
 			HelpString = "Tests inter-plugin calls with various values"
+		},
+
+		["testerr"] =
+		{
+			Handler = HandleConsoleTestErr,
+			HelpString = "Tests the server's ability to recover from errors in callbacks (GH #3733)",
 		},
 
 		["testjson"] =

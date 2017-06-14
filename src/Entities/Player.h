@@ -43,7 +43,7 @@ public:
 
 	virtual bool Initialize(cWorld & a_World) override;
 
-	virtual ~cPlayer();
+	virtual ~cPlayer() override;
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
@@ -139,6 +139,12 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
+	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
+	void LoginSetGameMode(eGameMode a_GameMode);
+
+	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
+	void SetCapabilities();
+
 	// tolua_begin
 
 	/** Prevent the player from moving and lock him into a_Location. */
@@ -173,12 +179,6 @@ public:
 	Updates the gamemode on the client (sends the packet)
 	*/
 	void SetGameMode(eGameMode a_GameMode);
-
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
-
-	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
-	void SetCapabilities();
 
 	/** Returns true if the player is in Creative mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeCreative(void) const;
@@ -229,7 +229,7 @@ public:
 	// tolua_begin
 
 	/** Opens the specified window; closes the current one first using CloseWindow() */
-	void OpenWindow(cWindow * a_Window);
+	void OpenWindow(cWindow & a_Window);
 
 	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true */
 	void CloseWindow(bool a_CanRefuse = true);
@@ -284,6 +284,12 @@ public:
 	/** Returns the full color code to use for this player, based on their rank.
 	The returned value either is empty, or includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
+
+	/** Returns the player name prefix, may contain @ format directives */
+	AString GetPrefix(void) const;
+
+	/** Returns the player name suffix, may contain @ format directives */
+	AString GetSuffix(void) const;
 
 	/** Returns the name that is used in the playerlist. */
 	AString GetPlayerListName(void) const;
@@ -645,8 +651,6 @@ protected:
 	bool m_IsCrouched;
 	bool m_IsSprinting;
 	bool m_IsFlying;
-	bool m_IsSwimming;
-	bool m_IsSubmerged;
 	bool m_IsFishing;
 
 	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.

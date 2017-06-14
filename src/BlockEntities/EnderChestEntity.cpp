@@ -6,6 +6,7 @@
 #include "../Item.h"
 #include "../Entities/Player.h"
 #include "../UI/EnderChestWindow.h"
+#include "../ClientHandle.h"
 
 
 
@@ -34,6 +35,16 @@ cEnderChestEntity::~cEnderChestEntity()
 
 
 
+void cEnderChestEntity::SendTo(cClientHandle & a_Client)
+{
+	// Send a dummy "number of players with chest open" packet to make the chest visible:
+	a_Client.SendBlockAction(m_PosX, m_PosY, m_PosZ, 1, 0, m_BlockType);
+}
+
+
+
+
+
 bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// TODO: cats are an obstruction
@@ -55,7 +66,7 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow(Window);
+			a_Player->OpenWindow(*Window);
 		}
 	}
 	return true;

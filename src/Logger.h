@@ -27,14 +27,26 @@ public:
 	{
 		public:
 
+		cAttachment() : m_listener(nullptr) {}
 		cAttachment(cAttachment && a_other)
 			: m_listener(a_other.m_listener)
 		{
+			a_other.m_listener = nullptr;
 		}
 
 		~cAttachment()
 		{
-			cLogger::GetInstance().DetachListener(m_listener);
+			if (m_listener != nullptr)
+			{
+				cLogger::GetInstance().DetachListener(m_listener);
+			}
+		}
+
+		cAttachment & operator=(cAttachment && a_other)
+		{
+			m_listener = a_other.m_listener;
+			a_other.m_listener = nullptr;
+			return *this;
 		}
 
 		private:

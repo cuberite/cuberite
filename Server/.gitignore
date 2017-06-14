@@ -5,6 +5,7 @@
 *.ini
 Cuberite
 Cuberite_debug
+luaexe
 CommLogs/
 GalExports/
 GalExportWeb/

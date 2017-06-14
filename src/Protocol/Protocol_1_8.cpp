@@ -2140,7 +2140,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::StyledWriter Writer;
+	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
 	cPacketizer Pkt(*this, 0x00);  // Response packet

@@ -35,7 +35,7 @@ public:
 	If a_Port is 0, the OS is free to assign any port number it likes to the endpoint. */
 	cUDPEndpointImpl(UInt16 a_Port, cUDPEndpoint::cCallbacks & a_Callbacks);
 
-	~cUDPEndpointImpl();
+	virtual ~cUDPEndpointImpl() override;
 
 	// cUDPEndpoint overrides:
 	virtual void Close(void) override;

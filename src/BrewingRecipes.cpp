@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BrewingRecipes.h"
-#include "Item.h"
 
 #include <fstream>
 
@@ -12,34 +11,12 @@
 
 
 
-typedef std::vector<std::unique_ptr<cBrewingRecipes::cRecipe>> RecipeList;
-
-
-
-
-
-struct cBrewingRecipes::sBrewingRecipeState
-{
-	RecipeList Recipes;
-};
-
-
 
 
 
 cBrewingRecipes::cBrewingRecipes()
-	: m_pState(new sBrewingRecipeState)
 {
 	ReloadRecipes();
-}
-
-
-
-
-
-cBrewingRecipes::~cBrewingRecipes()
-{
-	ClearRecipes();
 }
 
 
@@ -68,7 +45,7 @@ void cBrewingRecipes::ReloadRecipes(void)
 		size_t FirstCommentSymbol = ParsingLine.find('#');
 		if (FirstCommentSymbol != AString::npos)
 		{
-			ParsingLine.erase(ParsingLine.begin() += static_cast<long>(FirstCommentSymbol), ParsingLine.end());
+			ParsingLine.erase(FirstCommentSymbol);
 		}
 
 		if (ParsingLine.empty())
@@ -78,26 +55,20 @@ void cBrewingRecipes::ReloadRecipes(void)
 		AddRecipeFromLine(ParsingLine, LineNum);
 	}  // while (getline(ParsingLine))
 
-	LOG("Loaded " SIZE_T_FMT " brewing recipes", m_pState->Recipes.size());
+	LOG("Loaded " SIZE_T_FMT " brewing recipes", m_Recipes.size());
 }
 
 
 
 
 
-void cBrewingRecipes::AddRecipeFromLine(const AString & a_Line, unsigned int a_LineNum)
+void cBrewingRecipes::AddRecipeFromLine(AString a_Line, unsigned int a_LineNum)
 {
-	AString Line(a_Line);
-	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
+	a_Line.erase(std::remove_if(a_Line.begin(), a_Line.end(), isspace), a_Line.end());
 
-	short InputDamage;
-	short OutputDamage;
+	auto Recipe = cpp14::make_unique<cRecipe>();
 
-	std::unique_ptr<cItem> InputItem = cpp14::make_unique<cItem>();
-	std::unique_ptr<cItem> IngredientItem = cpp14::make_unique<cItem>();
-	std::unique_ptr<cItem> OutputItem = cpp14::make_unique<cItem>();
-
-	const AStringVector & InputAndIngredient = StringSplit(Line, "+");
+	const AStringVector & InputAndIngredient = StringSplit(a_Line, "+");
 
 	if (InputAndIngredient.size() != 2)
 	{
@@ -114,39 +85,28 @@ void cBrewingRecipes::AddRecipeFromLine(const AString & a_Line, unsigned int a_L
 		return;
 	}
 
-	if (!ParseItem(IngredientAndOutput[0], *IngredientItem))
+	if (!ParseItem(IngredientAndOutput[0], Recipe->Ingredient))
 	{
 		LOGWARNING("brewing.txt: Parsing of the item didn't worked.");
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
 
-	if (!StringToInteger<short>(InputAndIngredient[0], InputDamage))
+	if (!StringToInteger<short>(InputAndIngredient[0], Recipe->Input.m_ItemDamage))
 	{
 		LOGWARNING("brewing.txt: line %d: Cannot parse the damage value for the input item\"%s\".", a_LineNum, InputAndIngredient[0].c_str());
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
 
-	if (!StringToInteger<short>(IngredientAndOutput[1], OutputDamage))
+	if (!StringToInteger<short>(IngredientAndOutput[1], Recipe->Output.m_ItemDamage))
 	{
 		LOGWARNING("brewing.txt: line %d: Cannot parse the damage value for the output item\"%s\".", a_LineNum, IngredientAndOutput[1].c_str());
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
 
-	// The items has always the same type
-	InputItem->m_ItemType = E_ITEM_POTION;
-	InputItem->m_ItemDamage = InputDamage;
-
-	OutputItem->m_ItemType = E_ITEM_POTION;
-	OutputItem->m_ItemDamage = OutputDamage;
-
-	std::unique_ptr<cRecipe> Recipe = cpp14::make_unique<cRecipe>();
-	Recipe->Input = std::move(InputItem);
-	Recipe->Output = std::move(OutputItem);
-	Recipe->Ingredient = std::move(IngredientItem);
-	m_pState->Recipes.push_back(std::move(Recipe));
+	m_Recipes.push_back(std::move(Recipe));
 }
 
 
@@ -164,7 +124,7 @@ bool cBrewingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 
 void cBrewingRecipes::ClearRecipes(void)
 {
-	m_pState->Recipes.clear();
+	m_Recipes.clear();
 }
 
 
@@ -173,9 +133,9 @@ void cBrewingRecipes::ClearRecipes(void)
 
 const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_Input, const cItem & a_Ingredient) const
 {
-	for (auto & Recipe : m_pState->Recipes)
+	for (const auto & Recipe : m_Recipes)
 	{
-		if ((Recipe->Input->IsEqual(a_Input)) && (Recipe->Ingredient->IsEqual(a_Ingredient)))
+		if ((Recipe->Input.IsEqual(a_Input)) && (Recipe->Ingredient.IsEqual(a_Ingredient)))
 		{
 			return Recipe.get();
 		}
@@ -187,22 +147,15 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 		if (a_Input.m_ItemDamage & 0x2000)
 		{
 			// Create new recipe and add it to list
-			std::unique_ptr<cItem> InputItem = cpp14::make_unique<cItem>();
-			std::unique_ptr<cItem> IngredientItem = cpp14::make_unique<cItem>();
-			std::unique_ptr<cItem> OutputItem = cpp14::make_unique<cItem>();
+			auto Recipe = cpp14::make_unique<cRecipe>();
 
-			InputItem->m_ItemType = E_ITEM_POTION;
-			InputItem->m_ItemDamage = a_Input.m_ItemDamage;
-			OutputItem->m_ItemType = E_ITEM_POTION;
-			OutputItem->m_ItemDamage = a_Input.m_ItemDamage + 8192;
-			IngredientItem->m_ItemType = E_ITEM_GUNPOWDER;
+			Recipe->Input.m_ItemType = a_Input.m_ItemDamage;
+			Recipe->Output.m_ItemDamage = a_Input.m_ItemDamage + 8192;
+			Recipe->Ingredient.m_ItemType = E_ITEM_GUNPOWDER;
 
-			std::unique_ptr<cRecipe> Recipe = cpp14::make_unique<cRecipe>();
-			Recipe->Input = std::move(InputItem);
-			Recipe->Output = std::move(OutputItem);
-			Recipe->Ingredient = std::move(IngredientItem);
-			m_pState->Recipes.push_back(std::move(Recipe));
-			return Recipe.get();
+			auto RecipePtr = Recipe.get();
+			m_Recipes.push_back(std::move(Recipe));
+			return RecipePtr;
 		}
 		return nullptr;
 	}
@@ -210,41 +163,32 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 	// Check for splash potion
 	if (a_Input.m_ItemDamage & 0x4000)
 	{
-		const std::unique_ptr<cRecipe> * FoundRecipe = nullptr;
 		// Search for the drinkable potion, the ingredients are the same
 		short SplashItemDamage = a_Input.m_ItemDamage - 8192;
 
-		for (auto & Recipe : m_pState->Recipes)
+		auto FoundRecipe = std::find_if(m_Recipes.cbegin(), m_Recipes.cend(), [&](const std::unique_ptr<cRecipe>& a_Recipe)
 		{
-			if ((Recipe->Input->m_ItemDamage == SplashItemDamage) && (Recipe->Ingredient->IsEqual(a_Ingredient)))
-			{
-				FoundRecipe = &Recipe;
-				break;
-			}
-		}
+			return (
+				(a_Recipe->Input.m_ItemDamage == SplashItemDamage) &&
+				(a_Recipe->Ingredient.IsEqual(a_Ingredient))
+			);
+		});
 
-		if (FoundRecipe == nullptr)
+		if (FoundRecipe == m_Recipes.cend())
 		{
 			return nullptr;
 		}
 
 		// Create new recipe and add it to list
-		std::unique_ptr<cItem> InputItem = cpp14::make_unique<cItem>();
-		std::unique_ptr<cItem> IngredientItem = cpp14::make_unique<cItem>();
-		std::unique_ptr<cItem> OutputItem = cpp14::make_unique<cItem>();
+		auto Recipe = cpp14::make_unique<cRecipe>();
 
-		InputItem->m_ItemType = E_ITEM_POTION;
-		InputItem->m_ItemDamage = a_Input.m_ItemDamage;
-		OutputItem->m_ItemType = E_ITEM_POTION;
-		OutputItem->m_ItemDamage = (*FoundRecipe)->Output->m_ItemDamage + 8192;
-		IngredientItem->m_ItemType = (*FoundRecipe)->Ingredient->m_ItemType;
+		Recipe->Input.m_ItemDamage = a_Input.m_ItemDamage;
+		Recipe->Output.m_ItemDamage = (*FoundRecipe)->Output.m_ItemDamage + 8192;
+		Recipe->Ingredient.m_ItemType = (*FoundRecipe)->Ingredient.m_ItemType;
 
-		std::unique_ptr<cRecipe> Recipe = cpp14::make_unique<cRecipe>();
-		Recipe->Input = std::move(InputItem);
-		Recipe->Output = std::move(OutputItem);
-		Recipe->Ingredient = std::move(IngredientItem);
-		m_pState->Recipes.push_back(std::move(Recipe));
-		return Recipe.get();
+		auto RecipePtr = Recipe.get();
+		m_Recipes.push_back(std::move(Recipe));
+		return RecipePtr;
 	}
 	return nullptr;
 }
@@ -262,9 +206,9 @@ bool cBrewingRecipes::IsIngredient(const cItem & a_Ingredient) const
 		return true;
 	}
 
-	for (auto & Recipe : m_pState->Recipes)
+	for (const auto & Recipe : m_Recipes)
 	{
-		if (Recipe->Ingredient->IsEqual(a_Ingredient))
+		if (Recipe->Ingredient.IsEqual(a_Ingredient))
 		{
 			return true;
 		}
@@ -281,6 +225,14 @@ bool cBrewingRecipes::IsBottle(const cItem & a_Item) const
 	return (a_Item.m_ItemType == E_ITEM_POTION);
 }
 
+
+
+
+
+bool cBrewingRecipes::IsFuel(const cItem & a_Item) const
+{
+	return (a_Item.m_ItemType == E_ITEM_BLAZE_POWDER);
+}
 
 
 

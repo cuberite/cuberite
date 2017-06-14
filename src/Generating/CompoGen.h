@@ -116,7 +116,7 @@ class cCompoGenCache :
 {
 public:
 	cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
-	~cCompoGenCache();
+	virtual ~cCompoGenCache() override;
 
 	// cTerrainCompositionGen override:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;

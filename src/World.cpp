@@ -13,6 +13,7 @@
 #include "Generating/ChunkDesc.h"
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
+#include "LineBlockTracer.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -49,11 +50,6 @@
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
-
-#include "Tracer.h"
-
-// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
-#include "LineBlockTracer.h"
 
 #ifndef _WIN32
 	#include <stdlib.h>
@@ -249,22 +245,20 @@ void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 
 int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 {
+	auto & Random = GetRandomProvider();
 	switch (a_Weather)
 	{
 		case eWeather_Sunny:
 		{
-			auto dif = m_MaxSunnyTicks - m_MinSunnyTicks + 1;
-			return m_MinSunnyTicks + (m_TickRand.randInt() % dif);
+			return Random.RandInt(m_MinSunnyTicks, m_MaxSunnyTicks);
 		}
 		case eWeather_Rain:
 		{
-			auto dif = m_MaxRainTicks - m_MinRainTicks + 1;
-			return m_MinRainTicks + (m_TickRand.randInt() % dif);
+			return Random.RandInt(m_MinRainTicks, m_MaxRainTicks);
 		}
 		case eWeather_ThunderStorm:
 		{
-			auto dif = m_MaxThunderStormTicks - m_MinThunderStormTicks + 1;
-			return m_MinThunderStormTicks + (m_TickRand.randInt() % dif);
+			return Random.RandInt(m_MinThunderStormTicks, m_MaxThunderStormTicks);
 		}
 	}
 
@@ -816,7 +810,7 @@ eWeather cWorld::ChooseNewWeather()
 		case eWeather_Rain:
 		{
 			// 1 / 8 chance of turning into a thunderstorm
-			return ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
+			return GetRandomProvider().RandBool(0.125) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}
 
@@ -1078,7 +1072,7 @@ void cWorld::TickWeather(float a_Dt)
 	if (m_Weather == eWeather_ThunderStorm)
 	{
 		// 0.5% chance per tick of thunderbolt
-		if (m_TickRand.randInt() % 199 == 0)
+		if (GetRandomProvider().RandBool(0.005))
 		{
 			CastThunderbolt(0, 0, 0);  // TODO: find random positions near players to cast thunderbolts.
 		}
@@ -1153,8 +1147,8 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 			{
 				Monster->Tick(m_Dt, *(a_Entity->GetParentChunk()));
 			}
-			// Destroy far hostile mobs
-			else if ((Monster->GetMobFamily() == cMonster::eFamily::mfHostile))
+			// Destroy far hostile mobs except if last target was a player
+			else if ((Monster->GetMobFamily() == cMonster::eFamily::mfHostile) && !Monster->WasLastTargetAPlayer())
 			{
 				if (Monster->GetMobType() != eMonsterType::mtWolf)
 				{
@@ -1701,7 +1695,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal)
 {
-	cFastRandom random;
+	auto & random = GetRandomProvider();
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1739,7 +1733,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			else
 			{
-				BlockMeta += random.NextInt(4) + 2;
+				BlockMeta += random.RandInt(2, 5);
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1774,7 +1768,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			else
 			{
-				BlockMeta += random.NextInt(4) + 2;
+				BlockMeta += random.RandInt(2, 5);
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1797,7 +1791,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				}
 				else
 				{
-					BlockMeta += random.NextInt(4) + 2;
+					BlockMeta += random.RandInt(2, 5);
 					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1829,7 +1823,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			else
 			{
-				BlockMeta += random.NextInt(4) + 2;
+				BlockMeta += random.RandInt(2, 5);
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1852,7 +1846,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				}
 				else
 				{
-					BlockMeta += random.NextInt(4) + 2;
+					BlockMeta += random.RandInt(2, 5);
 					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
@@ -1888,14 +1882,14 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				{
 					++GrowState;
 				}
-				else if (random.NextInt(99) < 45)
+				else if (random.RandBool(0.45))
 				{
 					++GrowState;
 				}
 
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 3 | TypeMeta));
 			}
-			else if (random.NextInt(99) < 45)
+			else if (random.RandBool(0.45))
 			{
 				GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
 			}
@@ -1909,12 +1903,12 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			MTRand r1;
+			auto & r1 = GetRandomProvider();
 			for (int i = 0; i < 60; i++)
 			{
-				int OfsX = static_cast<int>(r1.randInt(3) + r1.randInt(3) + r1.randInt(3) + r1.randInt(3)) / 2 - 3;
-				int OfsY = static_cast<int>(r1.randInt(3) + r1.randInt(3)) - 3;
-				int OfsZ = static_cast<int>(r1.randInt(3) + r1.randInt(3) + r1.randInt(3) + r1.randInt(3)) / 2 - 3;
+				int OfsX = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
+				int OfsY = r1.RandInt(3) + r1.RandInt(3) - 3;
+				int OfsZ = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
 				BLOCKTYPE Ground = GetBlock(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ);
 				if (Ground != E_BLOCK_GRASS)
 				{
@@ -1927,7 +1921,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				}
 				BLOCKTYPE  SpawnType;
 				NIBBLETYPE SpawnMeta = 0;
-				switch (r1.randInt(10))
+				switch (r1.RandInt(10))
 				{
 					case 0:  SpawnType = E_BLOCK_YELLOW_FLOWER; break;
 					case 1:  SpawnType = E_BLOCK_RED_ROSE;      break;
@@ -2035,8 +2029,7 @@ int cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocks
 
 bool cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
 {
-	MTRand Rand;
-	return m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, Rand);
+	return m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType);
 }
 
 
@@ -2166,6 +2159,7 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
 {
+	auto & Random = GetRandomProvider();
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
@@ -2175,15 +2169,19 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		float SpeedX = static_cast<float>(a_FlyAwaySpeed * (GetTickRandomNumber(10) - 5));
-		float SpeedY = static_cast<float>(a_FlyAwaySpeed * GetTickRandomNumber(50));
-		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * (GetTickRandomNumber(10) - 5));
+		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
+		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
+		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
 
 		cPickup * Pickup = new cPickup(
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
 		);
-		Pickup->Initialize(*this);
+		if (!Pickup->Initialize(*this))
+		{
+			delete Pickup;
+			Pickup = nullptr;
+		}
 	}
 }
 
@@ -2204,7 +2202,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
 		);
-		Pickup->Initialize(*this);
+		if (!Pickup->Initialize(*this))
+		{
+			delete Pickup;
+			Pickup = nullptr;
+		}
 	}
 }
 
@@ -2215,7 +2217,12 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
 {
 	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
-	FallingBlock->Initialize(*this);
+	if (!FallingBlock->Initialize(*this))
+	{
+		delete FallingBlock;
+		FallingBlock = nullptr;
+		return cEntity::INVALID_ID;
+	}
 	return FallingBlock->GetUniqueID();
 }
 
@@ -2232,7 +2239,12 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 	}
 
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
-	ExpOrb->Initialize(*this);
+	if (!ExpOrb->Initialize(*this))
+	{
+		delete ExpOrb;
+		ExpOrb = nullptr;
+		return cEntity::INVALID_ID;
+	}
 	return ExpOrb->GetUniqueID();
 }
 
@@ -2255,7 +2267,12 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 			return cEntity::INVALID_ID;
 		}
 	}  // switch (a_MinecartType)
-	Minecart->Initialize(*this);
+	if (!Minecart->Initialize(*this))
+	{
+		delete Minecart;
+		Minecart = nullptr;
+		return cEntity::INVALID_ID;
+	}
 	return Minecart->GetUniqueID();
 }
 
@@ -2263,9 +2280,9 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 
 
-UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
+UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material)
 {
-	cBoat * Boat = new cBoat(a_X, a_Y, a_Z);
+	cBoat * Boat = new cBoat(a_X, a_Y, a_Z, a_Material);
 	if (Boat == nullptr)
 	{
 		return cEntity::INVALID_ID;
@@ -2273,6 +2290,7 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
 	if (!Boat->Initialize(*this))
 	{
 		delete Boat;
+		Boat = nullptr;
 		return cEntity::INVALID_ID;
 	}
 	return Boat->GetUniqueID();
@@ -2284,11 +2302,17 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z)
 UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
-	TNT->Initialize(*this);
+	if (!TNT->Initialize(*this))
+	{
+		delete TNT;
+		TNT = nullptr;
+		return cEntity::INVALID_ID;
+	}
+	auto & Random = GetRandomProvider();
 	TNT->SetSpeed(
-		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
+		a_InitialVelocityCoeff * Random.RandInt(-1, 1),
 		a_InitialVelocityCoeff * 2,
-		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
+		a_InitialVelocityCoeff * Random.RandInt(-1, 1)
 	);
 	return TNT->GetUniqueID();
 }
@@ -2878,7 +2902,11 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	std::swap(a_SetChunkData.GetEntities(), Entities);
 	for (cEntityList::iterator itr = Entities.begin(), end = Entities.end(); itr != end; ++itr)
 	{
-		(*itr)->Initialize(*this);
+		if (!(*itr)->Initialize(*this))
+		{
+			delete *itr;
+			*itr = nullptr;
+		}
 	}
 
 	// If a client is requesting this chunk, send it to them:
@@ -3157,11 +3185,8 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallb
 
 
 
-// TODO: This interface is dangerous!
 cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {
-	cTracer LineOfSight(this);
-
 	double ClosestDistance = a_SightLimit;
 	cPlayer * ClosestPlayer = nullptr;
 
@@ -3175,22 +3200,23 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 		Vector3f Pos = (*itr)->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 
-		if (Distance < ClosestDistance)
+		// If the player is too far, skip them:
+		if (Distance > ClosestDistance)
 		{
-			if (a_CheckLineOfSight)
-			{
-				if (!LineOfSight.Trace(a_Pos, (Pos - a_Pos), static_cast<int>((Pos - a_Pos).Length())))
-				{
-					ClosestDistance = Distance;
-					ClosestPlayer = *itr;
-				}
-			}
-			else
-			{
-				ClosestDistance = Distance;
-				ClosestPlayer = *itr;
-			}
+			continue;
 		}
+
+		// Check LineOfSight, if requested:
+		if (
+			a_CheckLineOfSight &&
+			!cLineBlockTracer::LineOfSightTrace(*this, a_Pos, Pos, cLineBlockTracer::losAirWater)
+		)
+		{
+			continue;
+		}
+
+		ClosestDistance = Distance;
+		ClosestPlayer = *itr;
 	}
 	return ClosestPlayer;
 }
@@ -3760,6 +3786,15 @@ UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cPr
 		return cEntity::INVALID_ID;
 	}
 	return Projectile->GetUniqueID();
+}
+
+
+
+
+
+int cWorld::GetTickRandomNumber(int a_Range)
+{
+	return GetRandomProvider().RandInt(a_Range);
 }
 
 

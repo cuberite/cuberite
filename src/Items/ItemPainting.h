@@ -71,7 +71,12 @@ public:
 			};
 
 			cPainting * Painting = new cPainting(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
-			Painting->Initialize(*a_World);
+			if (!Painting->Initialize(*a_World))
+			{
+				delete Painting;
+				Painting = nullptr;
+				return false;
+			}
 
 			if (!a_Player->IsGameModeCreative())
 			{

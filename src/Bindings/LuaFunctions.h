@@ -11,9 +11,4 @@ inline unsigned int GetTime()
 	return static_cast<unsigned int>(std::chrono::seconds(time(0)).count());
 }
 
-inline std::string GetChar( std::string & a_Str, unsigned int a_Idx)
-{
-	return std::string(1, a_Str[ a_Idx ]);
-}
-
 // tolua_end

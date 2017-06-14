@@ -74,8 +74,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_IsCrouched(false),
 	m_IsSprinting(false),
 	m_IsFlying(false),
-	m_IsSwimming(false),
-	m_IsSubmerged(false),
 	m_IsFishing(false),
 	m_CanFly(false),
 	m_EatingFinishTick(-1),
@@ -95,6 +93,9 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_MainHand(mhRight)
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
+
+	m_IsSwimming = false;
+	m_IsSubmerged = false;
 
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -1068,9 +1069,9 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		{
 			case dtRangedAttack: DamageText = "was shot"; break;
 			case dtLightning: DamageText = "was plasmified by lightining"; break;
-			case dtFalling: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "fell to death" : "hit the ground too hard"; break;
+			case dtFalling: DamageText = GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard"; break;
 			case dtDrowning: DamageText = "drowned"; break;
-			case dtSuffocating: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "git merge'd into a block" : "fused with a block"; break;
+			case dtSuffocating: DamageText = GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block"; break;
 			case dtStarving: DamageText = "forgot the importance of food"; break;
 			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
 			case dtLavaContact: DamageText = "was melted by lava"; break;
@@ -1309,15 +1310,15 @@ cTeam * cPlayer::UpdateTeam(void)
 
 
 
-void cPlayer::OpenWindow(cWindow * a_Window)
+void cPlayer::OpenWindow(cWindow & a_Window)
 {
-	if (a_Window != m_CurrentWindow)
+	if (&a_Window != m_CurrentWindow)
 	{
 		CloseWindow(false);
 	}
-	a_Window->OpenedByPlayer(*this);
-	m_CurrentWindow = a_Window;
-	a_Window->SendWholeWindow(*GetClientHandle());
+	a_Window.OpenedByPlayer(*this);
+	m_CurrentWindow = &a_Window;
+	a_Window.SendWholeWindow(*GetClientHandle());
 }
 
 
@@ -1827,6 +1828,24 @@ AString cPlayer::GetColor(void) const
 
 
 
+AString cPlayer::GetPrefix(void) const
+{
+	return m_MsgPrefix;
+}
+
+
+
+
+
+AString cPlayer::GetSuffix(void) const
+{
+	return m_MsgSuffix;
+}
+
+
+
+
+
 AString cPlayer::GetPlayerListName(void) const
 {
 	const AString & Color = GetColor();
@@ -2276,18 +2295,17 @@ void cPlayer::UseEquippedItem(int a_Amount)
 	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
 	if (UnbreakingLevel > 0)
 	{
-		int chance;
+		double chance = 0.0;
 		if (ItemCategory::IsArmor(Item.m_ItemType))
 		{
-			chance = 60 + (40 / (UnbreakingLevel + 1));
+			chance = 0.6 + (0.4 / (UnbreakingLevel + 1));
 		}
 		else
 		{
-			chance = 100 / (UnbreakingLevel + 1);
+			chance = 1.0 / (UnbreakingLevel + 1);
 		}
 
-		cFastRandom Random;
-		if (Random.NextInt(101) <= chance)
+		if (GetRandomProvider().RandBool(chance))
 		{
 			return;
 		}

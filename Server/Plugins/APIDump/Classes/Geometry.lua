@@ -977,52 +977,103 @@ return
 	{
 		Desc = [[
 This class provides an easy-to-use interface for tracing lines through individual
-blocks in the world. It will call the provided callbacks according to what events it encounters along the
-way.</p>
-<p>
-For the Lua API, there's only one static function exported that takes all the parameters necessary to do
-the tracing. The Callbacks parameter is a table containing all the functions that will be called upon the
-various events. See below for further information.
+blocks in the world. It can either be used to call the provided callbacks according
+to what events it encounters along the way, or there are shortcut functions used for
+the most popular tracing reasons - line of sight and solid hits.
 		]],
 		Functions =
 		{
+			FirstSolidHitTrace =
+			{
+				{
+					IsStatic = true,
+					Params =
+					{
+						{ Name = "World",  Type = "cWorld" },
+						{ Name = "StartX", Type = "number" },
+						{ Name = "StartY", Type = "number" },
+						{ Name = "StartZ", Type = "number" },
+						{ Name = "EndX",   Type = "number" },
+						{ Name = "EndY",   Type = "number" },
+						{ Name = "EndZ",   Type = "number" },
+					},
+					Returns =
+					{
+						{ Name = "HasHitSolid",    Type = "boolean" },
+						{ Name = "HitCoords",      Type = "Vector3d" },
+						{ Name = "HitBlockCoords", Type = "Vector3i" },
+						{ Name = "HitBlockFace",   Type = "eBlockFace" },
+					},
+					Notes = "If the specified line hits a solid block, return true and the coordinates / face of the first such solid block hit. Returns false if there's no solid block on that line.",
+				},
+				{
+					IsStatic = true,
+					Params =
+					{
+						{ Name = "World", Type = "cWorld" },
+						{ Name = "Start", Type = "Vector3d" },
+						{ Name = "End",   Type = "Vector3d" },
+					},
+					Returns =
+					{
+						{ Name = "HasHitSolid",    Type = "boolean" },
+						{ Name = "HitCoords",      Type = "Vector3d" },
+						{ Name = "HitBlockCoords", Type = "Vector3i" },
+						{ Name = "HitBlockFace",   Type = "eBlockFace" },
+					},
+					Notes = "If the specified line hits a solid block, return true and the coordinates / face of the first such solid block hit. Returns false if there's no solid block on that line.",
+				},
+			},  -- FirstSolidHitTrace
+			LineOfSightTrace =
+			{
+				{
+					IsStatic = true,
+					Params =
+					{
+						{ Name = "World",  Type = "cWorld" },
+						{ Name = "StartX", Type = "number" },
+						{ Name = "StartY", Type = "number" },
+						{ Name = "StartZ", Type = "number" },
+						{ Name = "EndX",   Type = "number" },
+						{ Name = "EndY",   Type = "number" },
+						{ Name = "EndZ",   Type = "number" },
+						{ Name = "Sight",  Type = "number" },
+					},
+					Returns =
+					{
+						{ Name = "CanSee", Type = "boolean" },
+					},
+					Notes = "Returns true if the two points specified are within line of sight of each other. The Sight parameter specifies which blocks are considered transparent for the trace, it is a combination of {{cLineBlockTracer#eLineOfSight|losXXX}} values added together."
+				},
+				{
+					IsStatic = true,
+					Params =
+					{
+						{ Name = "World", Type = "cWorld" },
+						{ Name = "Start", Type = "Vector3d" },
+						{ Name = "End",   Type = "Vector3d" },
+						{ Name = "Sight", Type = "number" },
+					},
+					Returns =
+					{
+						{ Name = "CanSee", Type = "boolean" },
+					},
+					Notes = "Returns true if the two points specified are within line of sight of each other. The Sight parameter specifies which blocks are considered transparent for the trace, it is a combination of {{cLineBlockTracer#eLineOfSight|losXXX}} values added together."
+				},
+			},  -- LineOfSightTrace
 			Trace =
 			{
 				IsStatic = true,
 				Params =
 				{
-					{
-						Name = "World",
-						Type = "cWorld",
-					},
-					{
-						Name = "Callbacks",
-						Type = "table",
-					},
-					{
-						Name = "StartX",
-						Type = "number",
-					},
-					{
-						Name = "StartY",
-						Type = "number",
-					},
-					{
-						Name = "StartZ",
-						Type = "number",
-					},
-					{
-						Name = "EndX",
-						Type = "number",
-					},
-					{
-						Name = "EndY",
-						Type = "number",
-					},
-					{
-						Name = "EndZ",
-						Type = "number",
-					},
+					{ Name = "World",     Type = "cWorld" },
+					{ Name = "Callbacks", Type = "table" },
+					{ Name = "StartX",    Type = "number" },
+					{ Name = "StartY",    Type = "number" },
+					{ Name = "StartZ",    Type = "number" },
+					{ Name = "EndX",      Type = "number" },
+					{ Name = "EndY",      Type = "number" },
+					{ Name = "EndZ",      Type = "number" },
 				},
 				Returns =
 				{
@@ -1031,6 +1082,29 @@ various events. See below for further information.
 					},
 				},
 				Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
+			},
+		},
+		Constants =
+		{
+			losAir =
+			{
+				Notes = "LineOfSight tracing can 'see' through air blocks.",
+			},
+			losWater =
+			{
+				Notes = "LineOfSight tracing can 'see' through water blocks.",
+			},
+			losLava =
+			{
+				Notes = "LineOfSight tracing can 'see' through lava blocks.",
+			},
+		},
+		ConstantGroups =
+		{
+			eLineOfSight =
+			{
+				Include = "los.*",
+				TextBefore = "The following constants are used to speficy which blocks are see-through when tracing a LineOfSight trace. Add them together to make up the Sight parameter.",
 			},
 		},
 		AdditionalInfo =
@@ -1109,16 +1183,15 @@ end
 	cTracer =
 	{
 		Desc = [[
-			A cTracer object is used to trace lines in the world. One thing you can use the cTracer for, is
-			tracing what block a player is looking at, but you can do more with it if you want.</p>
-			<p>
-			The cTracer is still a work in progress and is not documented at all.</p>
-			<p>
-			See also the {{cLineBlockTracer}} class for an alternative approach using callbacks.
+			This class is <b>OBSOLETE</b>, do not use it.
+			See the {{cLineBlockTracer}} class for the replacement.
 		]],
 		Functions =
 		{
-
+			Trace =
+			{
+				Notes = "<b>OBSOLETE</b>, use the {{cLineBlockTracer}} class instead.",
+			},
 		},
 	},
 	Vector3d =
@@ -2245,16 +2318,16 @@ end
 				{
 					{
 						Name = "Other",
-						Type = "Vector3d",
+						Type = "Vector3i",
 					},
 				},
 				Returns =
 				{
 					{
-						Type = "Vector3d",
+						Type = "Vector3i",
 					},
 				},
-				Notes = "Returns a new Vector3d that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
+				Notes = "Returns a new Vector3i that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
 			},
 			Dot =
 			{
@@ -2262,7 +2335,7 @@ end
 				{
 					{
 						Name = "Other",
-						Type = "Vector3d",
+						Type = "Vector3i",
 					},
 				},
 				Returns =

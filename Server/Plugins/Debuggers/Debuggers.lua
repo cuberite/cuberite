@@ -1576,6 +1576,56 @@ end
 
 
 
+function HandleComeCmd(a_Split, a_Player)
+	-- Find the first solid block under the player (in case they are flying):
+	local playerWorld = a_Player:GetWorld()
+	local playerPos = a_Player:GetPosition()
+	local toPos = Vector3i(playerPos)
+	if (toPos.y < 1) then
+		a_Player:SendMessageFailure("Cannot navigate to you, you're too low in the world")
+		return true
+	end
+	while not(cBlockInfo:IsSolid(playerWorld:GetBlock(toPos.x, toPos.y, toPos.z))) do
+		if (toPos.y <= 0) then
+			a_Player:SendMessageFailure("Cannot navigate to you, there's no solid block below you")
+			return true
+		end
+		toPos.y = toPos.y - 1
+	end
+
+	-- Find the mob to navigate:
+	local mob
+	local playerLook = a_Player:GetLookVector():NormalizeCopy()
+	local maxDot = 0
+	playerWorld:ForEachEntity(
+		function (a_CBEntity)
+			local dir = (a_CBEntity:GetPosition() - playerPos)
+			dir:Normalize()
+			local dot = dir:Dot(playerLook)
+			if (dot > maxDot) then
+				maxDot = dot
+				mob = a_CBEntity
+			end
+		end
+	)
+	if not(mob) then
+		a_Player:SendMessageFailure("Cannot navigate to you, there's no mob this way")
+		return true
+	end
+
+	mob:MoveToPosition(Vector3d(toPos))
+	a_Player:SendMessageSuccess((
+		string.format("Navigating the %s to position {%d, %d, %d}",
+			cMonster:MobTypeToString(mob:GetMobType()), toPos.x, toPos.y, toPos.z
+		)
+	))
+	return true
+end
+
+
+
+
+
 function HandleCompo(a_Split, a_Player)
 	-- Send one composite message to self:
 	local msg = cCompositeChat()
@@ -1838,6 +1888,44 @@ end
 
 
 
+function HandleConsoleHitTrace(a_Split)
+	local world = cRoot:Get():GetDefaultWorld()
+	local s = Vector3d(0, 70, 0)
+	local e = Vector3d(100, 75, 100)
+	if (tonumber(a_Split[2])) then
+		s.x = tonumber(a_Split[2])
+	end
+	if (tonumber(a_Split[3])) then
+		s.y = tonumber(a_Split[3])
+	end
+	if (tonumber(a_Split[4])) then
+		s.z = tonumber(a_Split[4])
+	end
+	if (tonumber(a_Split[5])) then
+		e.x = tonumber(a_Split[5])
+	end
+	if (tonumber(a_Split[6])) then
+		e.y = tonumber(a_Split[6])
+	end
+	if (tonumber(a_Split[7])) then
+		e.z = tonumber(a_Split[7])
+	end
+	local res, hitCoords, hitBlockCoords, hitBlockFace = cLineBlockTracer:FirstSolidHitTrace(world, s, e)
+	if (res) then
+		return true, string.format("The line hits block {%d, %d, %d} at point {%f, %f, %f}, face %s",
+			hitBlockCoords.x, hitBlockCoords.y, hitBlockCoords.z,
+			hitCoords.x, hitCoords.y, hitCoords.z,
+			BlockFaceToString(hitBlockFace)
+		)
+	else
+		return true, "The two points specified don't have a solid block between them."
+	end
+end
+
+
+
+
+
 --- Monitors the state of the "inh" entity-spawning hook
 -- if false, the hook is installed before the "inh" command processing
 local isInhHookInstalled = false
@@ -1948,6 +2036,40 @@ function HandleConsoleLoadChunk(a_Split)
 		end
 	)
 	return true
+end
+
+
+
+
+
+function HandleConsoleLosTrace(a_Split)
+	local world = cRoot:Get():GetDefaultWorld()
+	local s = Vector3d(0, 70, 0)
+	local e = Vector3d(100, 75, 100)
+	if (tonumber(a_Split[2])) then
+		s.x = tonumber(a_Split[2])
+	end
+	if (tonumber(a_Split[3])) then
+		s.y = tonumber(a_Split[3])
+	end
+	if (tonumber(a_Split[4])) then
+		s.z = tonumber(a_Split[4])
+	end
+	if (tonumber(a_Split[5])) then
+		e.x = tonumber(a_Split[5])
+	end
+	if (tonumber(a_Split[6])) then
+		e.y = tonumber(a_Split[6])
+	end
+	if (tonumber(a_Split[7])) then
+		e.z = tonumber(a_Split[7])
+	end
+	local res = cLineBlockTracer:LineOfSightTrace(world, s, e, cLineBlockTracer.losAir)
+	if (res) then
+		return true, "The two points can see each other."
+	else
+		return true, "The two points cannot see each other"
+	end
 end
 
 
@@ -2157,6 +2279,18 @@ end
 
 
 
+function HandleConsoleTestErr(a_Split, a_EntireCmd)
+	cRoot:Get():GetDefaultWorld():ForEachEntity(
+		function (a_CBEntity)
+			error("This error should not abort the server")
+		end
+	)
+end
+
+
+
+
+
 function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	LOG("Testing Json parsing...")
 	local t1 = cJson:Parse([[{"a": 1, "b": "2", "c": [3, "4", 5], "d": true }]])
@@ -2172,6 +2306,16 @@ function HandleConsoleTestJson(a_Split, a_EntireCmd)
 	assert(t2 == nil)
 	assert(type(msg) == "string")
 	LOG("Json parsing an invalid string: Error message returned: " .. msg)
+
+	local isSuccess, t3
+	isSuccess, t3, msg = pcall(cJson.Parse, cJson, nil)
+	if (isSuccess) then
+		LOG(string.format("Json parsing a 'nil' produced a %s and a %s, msg is %s.",
+			type(t3), type(msg), msg or "<nil>"
+		))
+	else
+		LOG("Json parsing a 'nil' raised an error")
+	end
 
 	LOG("Json parsing test succeeded")
 

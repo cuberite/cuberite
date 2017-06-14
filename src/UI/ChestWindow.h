@@ -25,7 +25,7 @@ public:
 
 	cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest);
 
-	~cChestWindow();
+	virtual ~cChestWindow() override;
 
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
 

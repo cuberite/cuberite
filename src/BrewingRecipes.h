@@ -5,7 +5,7 @@
 
 
 
-class cItem;
+#include "Item.h"
 
 
 
@@ -15,21 +15,21 @@ class cBrewingRecipes
 {
 public:
 	cBrewingRecipes(void);
-	~cBrewingRecipes();
 
 	void ReloadRecipes(void);
 
 	struct cRecipe
 	{
-		cRecipe() {}
-		cRecipe(cRecipe &&) {}
+		cRecipe()
+		{
+			// These items always have the same type
+			Input.m_ItemType = E_ITEM_POTION;
+			Output.m_ItemType = E_ITEM_POTION;
+		}
 
-		cRecipe(const cRecipe&) = delete;
-		cRecipe & operator=(const cRecipe&) = delete;
-
-		std::unique_ptr<cItem> Input;
-		std::unique_ptr<cItem> Output;
-		std::unique_ptr<cItem> Ingredient;
+		cItem Input;
+		cItem Output;
+		cItem Ingredient;
 	};
 
 	/** Returns a recipe for the specified input, nullptr if no recipe found */
@@ -39,17 +39,23 @@ public:
 	bool IsIngredient(const cItem & a_Ingredient) const;
 
 	/** Returns true if the item is a bottle / potion, false if not. */
-	bool IsBottle(const cItem & a_Bottle) const;
+	bool IsBottle(const cItem & a_Item) const;
+
+	/** Returns true if the item is the fuel, false if not. */
+	bool IsFuel(const cItem & a_Item) const;
 private:
+	using cRecipes = std::vector<std::unique_ptr<cBrewingRecipes::cRecipe>>;
+
 	void ClearRecipes(void);
 
 	/** Parses the recipe contained in the line, adds it to m_pState's recipes.
 	Logs a warning to the console on input error. */
-	void AddRecipeFromLine(const AString & a_Line, unsigned int a_LineNum);
+	void AddRecipeFromLine(AString a_Line, unsigned int a_LineNum);
 
 	/** Parses an item string, returns true if successful. */
 	bool ParseItem(const AString & a_String, cItem & a_Item);
 
-	struct sBrewingRecipeState;
-	std::unique_ptr<sBrewingRecipeState> m_pState;
+	/** The collection of parsed recipes.
+	GetRecipeFrom may cache splash variants of recipes here but the observable behaviour is constant, so this should be mutable. */
+	mutable cRecipes m_Recipes;
 };

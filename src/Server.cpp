@@ -17,6 +17,7 @@
 #include "WebAdmin.h"
 #include "Protocol/ProtocolRecognizer.h"
 #include "CommandOutput.h"
+#include "FastRandom.h"
 
 #include "IniFile.h"
 #include "Vector3.h"
@@ -218,9 +219,9 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_ShouldAuthenticate = a_ShouldAuth;
 	if (m_ShouldAuthenticate)
 	{
-		MTRand mtrand1;
-		unsigned int r1 = (mtrand1.randInt() % 1147483647) + 1000000000;
-		unsigned int r2 = (mtrand1.randInt() % 1147483647) + 1000000000;
+		auto & rand = GetRandomProvider();
+		unsigned int r1 = rand.RandInt<unsigned int>(1000000000U, 0x7fffffffU);
+		unsigned int r2 = rand.RandInt<unsigned int>(1000000000U, 0x7fffffffU);
 		std::ostringstream sid;
 		sid << std::hex << r1;
 		sid << std::hex << r2;
@@ -236,6 +237,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	}
 
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);
+	m_ShouldLimitPlayerBlockChanges = a_Settings.GetValueSetB("AntiCheat", "LimitPlayerBlockChanges", true);
 	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
 	m_ShouldLoadNamedPlayerData   = a_Settings.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 

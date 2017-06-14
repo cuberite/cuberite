@@ -31,17 +31,15 @@ void cBrewingstandWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlay
 
 	if (a_ClickedArea == m_SlotAreas[0])
 	{
-		// Brewing stand Area
-		if ((a_Slot >= 0) && (a_Slot < 3))
+		if ((a_Slot >= 0) && (a_Slot <= 4))
 		{
-			// Bottle slots
+			// Brewing stand Area
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 		}
 		else
 		{
-			// Ingredient slot
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */
 			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
@@ -50,7 +48,7 @@ void cBrewingstandWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlay
 	else
 	{
 		cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
-		if ((BR->IsBottle(a_ItemStack)) || (BR->IsIngredient(a_ItemStack)))
+		if ((BR->IsBottle(a_ItemStack)) || (BR->IsIngredient(a_ItemStack)) || BR->IsFuel(a_ItemStack))
 		{
 			AreasInOrder.push_back(m_SlotAreas[0]);  /* brewing stand Area */
 		}

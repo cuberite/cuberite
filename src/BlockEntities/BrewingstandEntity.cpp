@@ -24,7 +24,8 @@ cBrewingstandEntity::cBrewingstandEntity(int a_BlockX, int a_BlockY, int a_Block
 	m_BlockMeta(a_BlockMeta),
 	m_IsDestroyed(false),
 	m_IsBrewing(false),
-	m_TimeBrewed(0)
+	m_TimeBrewed(0),
+	m_RemainingFuel(0)
 {
 	m_Contents.AddListener(*this);
 	for (int i = 0; i < 3; i++)
@@ -64,7 +65,7 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow(Window);
+			a_Player->OpenWindow(*Window);
 		}
 	}
 
@@ -76,6 +77,7 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 	{
 		BroadcastProgress(0, 0);
 	}
+	BroadcastProgress(1, m_RemainingFuel);
 	return true;
 }
 
@@ -95,12 +97,11 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// The necessary brewing time, has been reached
 	if (m_TimeBrewed >= m_NeedBrewingTime)
 	{
-		const cBrewingRecipes::cRecipe * Recipe = nullptr;
 		BroadcastProgress(0, 0);
 		m_IsBrewing = false;
 		m_TimeBrewed = 0;
 
-		// Return if the hook has been canceled
+		// Return if the hook has been cancelled
 		if (cPluginManager::Get()->CallHookBrewingCompleting(*m_World, *this))
 		{
 			return false;
@@ -111,7 +112,27 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Ingredient.m_ItemCount -= 1;
 		m_Contents.SetSlot(bsIngredient, Ingredient);
 
+		// Fuel slot
+		m_RemainingFuel--;
+		if (m_RemainingFuel <= 0)
+		{
+			if (!m_Contents.GetSlot(bsFuel).IsEmpty())
+			{
+				cItem Fuel = m_Contents.GetSlot(bsFuel);
+				Fuel.m_ItemCount -= 1;
+				m_Contents.SetSlot(bsFuel, Fuel);
+				m_RemainingFuel = 20;
+				BroadcastProgress(1, m_RemainingFuel);
+			}
+		}
+		else
+		{
+			BroadcastProgress(1, m_RemainingFuel);
+		}
+
+
 		// Loop over all bottle slots and update available bottles
+		const cBrewingRecipes::cRecipe * Recipe = nullptr;
 		for (int i = 0; i < 3; i++)
 		{
 			if (m_Contents.GetSlot(i).IsEmpty() || (m_CurrentBrewingRecipes[i] == nullptr))
@@ -120,12 +141,11 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			Recipe = m_CurrentBrewingRecipes[i];
-			m_Contents.SetSlot(i, Recipe->Output->CopyOne());
+			m_Contents.SetSlot(i, Recipe->Output.CopyOne());
 		}
 
 		// Brewing process completed
 		cPluginManager::Get()->CallHookBrewingCompleted(*m_World, *this);
-
 		return true;
 	}
 
@@ -174,6 +194,26 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	ASSERT(a_ItemGrid == &m_Contents);
 
+	// Check for fuel
+	if (m_RemainingFuel <= 0)
+	{
+		if (GetSlot(bsFuel).IsEmpty())
+		{
+			// No remaining fuel stop brewing and bail out
+			m_IsBrewing = false;
+			return;
+		}
+		else
+		{
+			// Fuel is available, refill
+			m_RemainingFuel = 20;
+			BroadcastProgress(1, m_RemainingFuel);
+			cItem Fuel = m_Contents.GetSlot(bsFuel);
+			Fuel.m_ItemCount -= 1;
+			m_Contents.SetSlot(bsFuel, Fuel);
+		}
+	}
+
 	// Check if still a item is in the ingredient slot
 	if (GetSlot(bsIngredient).IsEmpty())
 	{
@@ -203,7 +243,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		if (m_CurrentBrewingRecipes[i] != nullptr)
 		{
 			Recipe = m_CurrentBrewingRecipes[i];
-			if (Recipe->Ingredient->IsEqual(GetSlot(bsIngredient)) && Recipe->Input->IsEqual(GetSlot(i)))
+			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) && Recipe->Input.IsEqual(GetSlot(i)))
 			{
 				Stop = false;
 				continue;
@@ -215,7 +255,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		{
 			// Found a brewing recipe for the items
 			m_CurrentBrewingRecipes[i] = Recipe;
-			m_Results[i] = Recipe->Output->CopyOne();
+			m_Results[i] = Recipe->Output.CopyOne();
 			Stop = false;
 		}
 	}
@@ -258,19 +298,10 @@ void cBrewingstandEntity::UpdateProgressBars(bool a_ForceUpdate)
 
 
 
-void cBrewingstandEntity::setTimeBrewed(short a_TimeBrewed)
-{
-	m_TimeBrewed = a_TimeBrewed;
-}
-
-
-
-
-
 void cBrewingstandEntity::ContinueBrewing(void)
 {
 	// Continue brewing if number is greater than 0
-	if (m_TimeBrewed > 0)
+	if ((m_TimeBrewed > 0) && (m_RemainingFuel > 0))
 	{
 		m_IsBrewing = true;
 	}
@@ -280,9 +311,9 @@ void cBrewingstandEntity::ContinueBrewing(void)
 
 
 
-void cBrewingstandEntity::GetRecipes(void)
+void cBrewingstandEntity::LoadRecipes(void)
 {
-	if (GetSlot(3).IsEmpty())
+	if (GetSlot(bsIngredient).IsEmpty())
 	{
 		return;
 	}
@@ -299,7 +330,7 @@ void cBrewingstandEntity::GetRecipes(void)
 		if (Recipe != nullptr)
 		{
 			m_CurrentBrewingRecipes[i] = Recipe;
-			m_Results[i] = Recipe->Output->CopyOne();
+			m_Results[i] = Recipe->Output.CopyOne();
 		}
 	}
 }

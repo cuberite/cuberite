@@ -2128,6 +2128,12 @@ return
 							Type = "number",
 						},
 					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
 					Notes = "Returns the name of the sound that is played when placing the block of this type.",
 				},
 				GetSpreadLightFalloff =
@@ -2256,27 +2262,14 @@ return
 					},
 					Notes = "Returns whether a spectator can interact with the specified block.",
 				},
-				RequiresSpecialTool =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns whether the specified block requires a special tool to drop resources.",
-				},
 			},
 			Variables =
 			{
+				m_BlockHeight =
+				{
+					Type = "number",
+					Notes = "The height of the block, a value between 0.0 and 1.0",
+				},
 				m_CanBeTerraformed =
 				{
 					Type = "bool",
@@ -2286,6 +2279,11 @@ return
 				{
 					Type = "bool",
 					Notes = "Does this block fully occupy its voxel - is it a 'full' block?",
+				},
+				m_Hardness =
+				{
+					Type = "number",
+					Notes = "The greater the value the longer the player needs to break the block.",
 				},
 				m_IsSnowable =
 				{
@@ -5131,16 +5129,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the roll (sideways rotation) of the entity. Currently unused.",
 				},
-				GetRot =
-				{
-					Returns =
-					{
-						{
-							Type = "Vector3f",
-						},
-					},
-					Notes = "(OBSOLETE) Returns the entire rotation vector (Yaw, Pitch, Roll)",
-				},
 				GetSpeed =
 				{
 					Returns =
@@ -5809,17 +5797,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Sets the roll (sideways rotation) of the entity. Currently unused.",
 				},
-				SetRot =
-				{
-					Params =
-					{
-						{
-							Name = "Rotation",
-							Type = "Vector3f",
-						},
-					},
-					Notes = "Sets the entire rotation vector (Yaw, Pitch, Roll)",
-				},
 				SetSpeed =
 				{
 					{
@@ -6027,6 +6004,10 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 			},
 			Constants =
 			{
+				INVALID_ID =
+				{
+					Notes = "Special value of an entity ID, indicating a failure. Used primarily in functions that create entities when the entity cannot be created.",
+				},
 				etBoat =
 				{
 					Notes = "The entity is a {{cBoat}}",
@@ -7989,6 +7970,16 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Returns the specified hotbar slot contents. Note that the returned item is read-only",
 				},
+				GetShieldSlot =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns current item in shield slot.",
+				},				
 				GetInventoryGrid =
 				{
 					Returns =
@@ -8196,6 +8187,17 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified hotbar slot contents",
 				},
+				SetShieldSlot =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the shield slot content",
+				},				
 				SetInventorySlot =
 				{
 					Params =
@@ -8252,6 +8254,14 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				invInventoryOffset =
 				{
 					Notes = "Starting slot number of the main inventory part",
+				},
+				invShieldCount =
+				{
+					Notes = "Number of slots in the Shield part",
+				},
+				invShieldOffset =
+				{
+					Notes = "Starting slot number of the Shield part",
 				},
 				invNumSlots =
 				{
@@ -8549,6 +8559,12 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsLoreEmpty =
 				{
 					Notes = "Returns if the lore of the cItem is empty.",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
 				},
 				IsSameType =
 				{
@@ -9540,6 +9556,7 @@ end
 			{
 				Parse =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -9557,6 +9574,7 @@ end
 				},
 				Serialize =
 				{
+					IsStatic = true,
 					Params =
 					{
 						{
@@ -10937,12 +10955,238 @@ a_Player:OpenWindow(Window);
 			},
 			Inherits = "cEntity",
 		},
+		cExpOrb =
+		{
+			Desc = [[
+				This class represents an experience orb. This entity can be spawned by using {{cWorld#SpawnExperienceOrb_1|cWorld:SpawnExperienceOrb}}.
+				It's also spawned when a monster is killed or a player is mining coal. The default lifetime of an experience orb is 5 mins.
+			]],
+			Functions =
+			{
+				GetAge =
+				{
+					Returns =
+					{
+						{
+							Type = "number"
+						},
+					},
+					Notes = "Returns the number of ticks that this experience orb has existed.",
+				},
+				SetAge =
+				{
+					Params =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Sets the experience orb's age, in ticks.",
+				},
+				GetReward =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the experience amount.",
+				},
+				SetReward =
+				{
+					Params =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Sets the experience amount.",
+				},
+			},
+			Inherits = "cEntity",
+		},
+		cFallingBlock =
+		{
+			Desc = [[
+				This class represents a falling block. This entity can be spawned by using {{cWorld#SpawnFallingBlock_1|cWorld:SpawnFallingBlock}}.
+			]],
+			Functions =
+			{
+				GetBlockType =
+				{
+					Returns =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						}
+					},
+					Notes = "Returns the block type of the falling block.",
+				},
+				GetBlockMeta =
+				{
+					Returns =
+					{
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						}
+					},
+					Notes = "Returns the block meta of the falling block.",
+				},
+			},
+			Inherits = "cEntity",
+		},
+		cBoat =
+		{
+			Desc = [[
+				This class represents a boat. This entity can be spawned by using {{cWorld#SpawnBoat_1|cWorld:SpawnBoat}}.
+			]],
+			Functions =
+			{
+				GetMaterial =
+				{
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the material of the boat.",
+				},
+				MaterialToString =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "string",
+						},
+					},
+					Notes = "Returns the boat material as a string.",
+				},
+				ItemToMaterial =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the eMaterial that should be used for a boat created from the specified item. Returns bmOak if not a boat item.",
+				},
+				MaterialToItem =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the boat item of the boat material",
+				},
+				StringToMaterial =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Returns the boat material for the passed string. Returns oak if not valid.",
+				},
+				SetMaterial =
+				{
+					Params =
+					{
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
+					},
+					Notes = "Set the material of the boat.",
+				},
+			},
+			Constants =
+			{
+				bmOak =
+				{
+					Notes = "",
+				},
+				bmSpruce =
+				{
+					Notes = "",
+				},
+				bmBirch =
+				{
+					Notes = "",
+				},
+				bmJungle =
+				{
+					Notes = "",
+				},
+				bmAcacia =
+				{
+					Notes = "",
+				},
+				bmDarkOak =
+				{
+					Notes = "",
+				},
+			},
+			ConstantGroups =
+			{
+				eMaterial =
+				{
+					Include = "bm.*",
+					TextBefore = "These constans are the different wood materials of the boat.",
+				},
+			},
+			Inherits = "cEntity",
+		},
 		cPickup =
 		{
 			Desc = [[
 				This class represents a pickup entity (an item that the player or mobs can pick up). It is also
 				commonly known as "drops". With this class you could create your own "drop" or modify those
-				created automatically.
+				created automatically. The default lifetime of a pickup is 5 mins.
 			]],
 			Functions =
 			{
@@ -11189,6 +11433,26 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
 				},
+				GetPrefix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
+				},
+				GetSuffix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
+				},
 				GetCurrentXp =
 				{
 					Returns =
@@ -11411,7 +11675,7 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the name that is used in the playerlist.",
 				},
-				GetResolvedPermissions =
+				GetRestrictions =
 				{
 					Returns =
 					{
@@ -11419,7 +11683,7 @@ a_Player:OpenWindow(Window);
 							Type = "table",
 						},
 					},
-					Notes = "Returns all the player's permissions, as an array-table of strings.",
+					Notes = "Returns an array-table of all the restrictions that the player has assigned to them.",
 				},
 				GetSprintingMaxSpeed =
 				{
@@ -11439,7 +11703,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
+					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
 				},
 				GetStance =
 				{
@@ -12163,7 +12427,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{eSkinPart}} constants.",
+					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
 				},
 				SetSprintingMaxSpeed =
 				{
@@ -12610,6 +12874,7 @@ a_Player:OpenWindow(Window);
 				},
 				GetPhysicalRAMUsage =
 				{
+					IsStatic = true,
 					Returns =
 					{
 						{
@@ -12627,16 +12892,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the cPluginManager object.",
-				},
-				GetPrimaryServerVersion =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the servers primary server version.",
 				},
 				GetProtocolVersionTextFromInt =
 				{
@@ -12688,6 +12943,7 @@ a_Player:OpenWindow(Window);
 				},
 				GetVirtualRAMUsage =
 				{
+					IsStatic = true,
 					Returns =
 					{
 						{
@@ -12737,17 +12993,6 @@ a_Player:OpenWindow(Window);
 				SaveAllChunks =
 				{
 					Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved.",
-				},
-				SetPrimaryServerVersion =
-				{
-					Params =
-					{
-						{
-							Name = "Protocol Version",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the servers PrimaryServerVersion to the given protocol number.",
 				},
 			},
 			AdditionalInfo =
@@ -13988,6 +14233,51 @@ end
 					},
 					Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 				},
+				Base64Decode =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{ Type = "string" },
+					},
+					Notes = "Decodes a Base64-encoded string into the raw data.",
+				},
+				Base64Encode =
+				{
+					Params =
+					{
+						{
+							Name = "Input",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{ Type = "string" },
+					},
+					Notes = "Encodes a string into Base64.",
+				},
+				BiomeToString =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{ Type = "string" },
+					},
+					Notes = "Translates biome enum into biome string. Returns empty string on failure (unknown biome).",
+				},
 				BlockFaceToString =
 				{
 					Params =
@@ -14082,6 +14372,23 @@ end
 					},
 					Notes = "Converts the {{Globals#eDamageType|DamageType}} to a string representation ",
 				},
+				DimensionToString =
+				{
+					Params =
+					{
+						{
+							Name = "Dimension",
+							Type = "eDimension",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Converts an {{Globals#eDimension|eDimension}} to a string value. Returns Overworld on failure.",
+				},
 				EscapeString =
 				{
 					Params =
@@ -14098,27 +14405,6 @@ end
 						},
 					},
 					Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash",
-				},
-				GetChar =
-				{
-					Params =
-					{
-						{
-							Name = "Input",
-							Type = "string",
-						},
-						{
-							Name = "Index",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "(<b>OBSOLETE</b>, use standard Lua string.sub() instead) Returns one character from the string, specified by index. ",
 				},
 				GetIniItemSet =
 				{
@@ -14149,6 +14435,21 @@ end
 					},
 					Notes = "Returns the item that has been read from the specified INI file value. If the value is not present in the INI file, the DefaultValue is stored in the file and parsed as the result. Returns empty item if the value cannot be parsed. ",
 				},
+				GetSnowStartHeight =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{ Type = "number" },
+					},
+					Notes = "Returns the height at which snow will start falling in the {{Globals#EMCSBiome|Biome}}. Check functions IsBiomeCold and IsBiomeVeryCold for more informations.",
+				},
 				GetTime =
 				{
 					Returns =
@@ -14158,6 +14459,21 @@ end
 						},
 					},
 					Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)",
+				},
+				IsBiomeCold =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{ Type = "boolean" },
+					},
+					Notes = "Returns true if the biome is cold (has snow and snowfall at higher elevations but not at regular heights). Doesn't report Very Cold biomes, use IsBiomeVeryCold() for those.",
 				},
 				IsBiomeNoDownfall =
 				{
@@ -14175,6 +14491,40 @@ end
 						},
 					},
 					Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms.",
+				},
+				IsBiomeOcean =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is an ocean biome.",
+				},
+				IsBiomeVeryCold =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is very cold (has snow on ground everywhere, turns top water to ice, has snowfall instead of rain everywhere). Doesn't report mildly cold biomes (where it snows above certain elevation), use IsBiomeCold() for those.",
 				},
 				IsValidBlock =
 				{
@@ -14473,6 +14823,23 @@ end
 						},
 					},
 					Notes = "Replaces *each* occurence of to-be-replaced-string in full-string with to-replace-string",
+				},
+				ReverseBlockFace =
+				{
+					Params =
+					{
+						{
+							Name = "BlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the reversed {{Globals#eBlockFace|eBlockFace}}.",
 				},
 				RotateBlockFaceCCW =
 				{
@@ -17061,7 +17428,7 @@ end
 						These constants represent the main and off hand.  Currently, these constants are not used, but
 						are provided for future use when dual-wielding is functional.  An action or item can be in the
 						main hand or the off hand.  The main hand can be either the left or the right hand - use
-						{{cPlayer}}:GetMainHand() to determine which (see {{eMainHand}}).
+						{{cPlayer}}:GetMainHand() to determine which (see {{Globals#eMainHand|eMainHand}}).
 					]],
 				},
 				eMainHand =
