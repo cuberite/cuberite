@@ -26,35 +26,25 @@ class cBlockEntityWithItems :
 	// tolua_begin
 	public cBlockEntityWindowOwner
 {
-	typedef cBlockEntity super;
+	typedef cBlockEntity Super;
 
 public:
 	// tolua_end
 
 	BLOCKENTITY_PROTODEF(cBlockEntityWithItems)
 
+
 	cBlockEntityWithItems(
 		BLOCKTYPE a_BlockType,                      // Type of the block that the entity represents
+		NIBBLETYPE a_BlockMeta,                     // Meta of the block that the entity represents
 		int a_BlockX, int a_BlockY, int a_BlockZ,   // Position of the block entity
 		int a_ItemGridWidth, int a_ItemGridHeight,  // Dimensions of the ItemGrid
 		cWorld * a_World                            // Optional world to assign to the entity
-	) :
-		super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, a_World),
-		cBlockEntityWindowOwner(this),
-		m_Contents(a_ItemGridWidth, a_ItemGridHeight)
-	{
-		m_Contents.AddListener(*this);
-	}
+	);
 
-	virtual void Destroy(void) override
-	{
-		// Drop the contents as pickups:
-		ASSERT(m_World != nullptr);
-		cItems Pickups;
-		m_Contents.CopyToItems(Pickups);
-		m_Contents.Clear();
-		m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);  // Spawn in centre of block
-	}
+	// cBlockEntity overrides:
+	virtual void Destroy(void) override;
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 
 	// tolua_begin
 
@@ -76,20 +66,7 @@ protected:
 	cItemGrid m_Contents;
 
 	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
-	{
-		UNUSED(a_SlotNum);
-		ASSERT(a_Grid == &m_Contents);
-		if (m_World != nullptr)
-		{
-			if (GetWindow() != nullptr)
-			{
-				GetWindow()->BroadcastWholeWindow();
-			}
-
-			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-		}
-	}
+	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
 } ;  // tolua_export
 
 

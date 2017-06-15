@@ -13,9 +13,10 @@
 
 
 
-cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_DISPENSER, a_BlockX, a_BlockY, a_BlockZ, a_World)
+cDispenserEntity::cDispenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World)
 {
+	ASSERT(a_BlockType == E_BLOCK_DISPENSER);
 }
 
 
@@ -309,9 +310,9 @@ Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE a_Meta)
 
 
 
-bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_BucketItemType)
+bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_ResultingBucketItemType)
 {
-	cItem LiquidBucket(a_BucketItemType, 1);
+	cItem LiquidBucket(a_ResultingBucketItemType, 1);
 	if (m_Contents.GetSlot(a_SlotNum).m_ItemCount == 1)
 	{
 		// Special case: replacing one empty bucket with one full bucket

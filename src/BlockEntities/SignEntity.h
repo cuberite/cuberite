@@ -19,7 +19,7 @@
 class cSignEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity super;
+	typedef cBlockEntity Super;
 
 public:
 
@@ -28,7 +28,7 @@ public:
 	BLOCKENTITY_PROTODEF(cSignEntity)
 
 	/** Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be nullptr */
-	cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
+	cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	// tolua_begin
 
@@ -43,6 +43,8 @@ public:
 
 	// tolua_end
 
+	// cBlockEntity overrides:
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 

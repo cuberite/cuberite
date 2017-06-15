@@ -12,10 +12,25 @@
 
 
 
-cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World) :
-	super(a_BlockType, a_X, a_Y, a_Z, a_World)
+cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World)
 {
-	ASSERT((a_Y >= 0) && (a_Y < cChunkDef::Height));
+	ASSERT((a_BlockType ==  E_BLOCK_WALLSIGN) || (a_BlockType == E_BLOCK_SIGN_POST));
+	ASSERT(cChunkDef::IsValidHeight(a_BlockY));
+}
+
+
+
+
+
+void cSignEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cSignEntity &>(a_Src);
+	for (size_t i = 0; i < ARRAYCOUNT(m_Line); ++i)
+	{
+		m_Line[i] = src.m_Line[i];
+	}
 }
 
 

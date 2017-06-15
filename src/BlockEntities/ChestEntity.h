@@ -17,7 +17,7 @@ class cClientHandle;
 class cChestEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems super;
+	typedef cBlockEntityWithItems Super;
 
 public:
 	enum
@@ -31,11 +31,12 @@ public:
 	BLOCKENTITY_PROTODEF(cChestEntity)
 
 	/** Constructor used for normal operation */
-	cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type);
+	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	virtual ~cChestEntity() override;
 
 	// cBlockEntity overrides:
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 

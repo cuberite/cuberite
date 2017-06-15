@@ -9,7 +9,7 @@
 #define BLOCKENTITY_PROTODEF(classname) \
 	virtual bool IsA(const char * a_ClassName) const override \
 	{ \
-		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName))); \
+		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || Super::IsA(a_ClassName))); \
 	} \
 	virtual const char * GetClass(void) const override \
 	{ \
@@ -21,7 +21,7 @@
 	} \
 	virtual const char * GetParentClass(void) const override \
 	{ \
-		return super::GetClass(); \
+		return Super::GetClass(); \
 	}
 
 
@@ -40,13 +40,14 @@ class cWorld;
 class cBlockEntity
 {
 protected:
-	cBlockEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	cBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 		m_PosX(a_BlockX),
 		m_PosY(a_BlockY),
 		m_PosZ(a_BlockZ),
 		m_RelX(a_BlockX - cChunkDef::Width * FAST_FLOOR_DIV(a_BlockX, cChunkDef::Width)),
 		m_RelZ(a_BlockZ - cChunkDef::Width * FAST_FLOOR_DIV(a_BlockZ, cChunkDef::Width)),
 		m_BlockType(a_BlockType),
+		m_BlockMeta(a_BlockMeta),
 		m_World(a_World)
 	{
 	}
@@ -67,6 +68,15 @@ public:
 	If a_World is valid, then the entity is created bound to that world
 	Returns nullptr for unknown block types. */
 	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = nullptr);
+
+	/** Makes an exact copy of this block entity, except for its m_World (set to nullptr), and at a new position.
+	Uses CopyFrom() to copy the properties. */
+	cBlockEntity * Clone(int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Copies all properties of a_Src into this entity, except for its m_World and location.
+	Each non-abstract descendant should override to copy its specific properties, and call
+	Super::CopyFrom(a_Src) to copy the common ones. */
+	virtual void CopyFrom(const cBlockEntity & a_Src);
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
@@ -124,7 +134,13 @@ protected:
 	/** Position relative to the chunk, used to speed up ticking */
 	int m_RelX, m_RelZ;
 
+	/** The blocktype representing this particular instance in the world.
+	Mainly used for multi-block-type entities, such as furnaces / lit furnaces. */
 	BLOCKTYPE m_BlockType;
+
+	/** The block meta representing this particular instance in the world
+	Mainly used for directional entities, such as dispensers. */
+	NIBBLETYPE m_BlockMeta;
 
 	cWorld * m_World;
 } ;  // tolua_export

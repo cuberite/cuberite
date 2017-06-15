@@ -13,12 +13,26 @@
 
 
 
-cMobSpawnerEntity::cMobSpawnerEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-	: super(E_BLOCK_MOB_SPAWNER, a_BlockX, a_BlockY, a_BlockZ, a_World)
-	, m_Entity(mtPig)
-	, m_SpawnDelay(100)
-	, m_IsActive(false)
+cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Entity(mtPig),
+	m_SpawnDelay(100),
+	m_IsActive(false)
 {
+	ASSERT(a_BlockType == E_BLOCK_MOB_SPAWNER);
+}
+
+
+
+
+
+void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cMobSpawnerEntity &>(a_Src);
+	m_Entity = src.m_Entity;
+	m_IsActive = src.m_IsActive;
+	m_SpawnDelay = src.m_SpawnDelay;
 }
 
 

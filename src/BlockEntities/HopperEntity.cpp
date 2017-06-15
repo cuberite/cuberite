@@ -17,11 +17,12 @@
 
 
 
-cHopperEntity::cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_HOPPER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
 	m_LastMoveItemsOutTick(0)
 {
+	ASSERT(a_BlockType == E_BLOCK_HOPPER);
 }
 
 
@@ -52,16 +53,28 @@ bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, i
 
 
 
+void cHopperEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cHopperEntity &>(a_Src);
+	m_LastMoveItemsInTick = src.m_LastMoveItemsInTick;
+	m_LastMoveItemsOutTick = src.m_LastMoveItemsOutTick;
+}
+
+
+
+
+
 bool cHopperEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
 
-	bool res = false;
-	res = MoveItemsIn  (a_Chunk, CurrentTick) || res;
-	res = MovePickupsIn(a_Chunk, CurrentTick) || res;
-	res = MoveItemsOut (a_Chunk, CurrentTick) || res;
-	return res;
+	bool isDirty = false;
+	isDirty = MoveItemsIn  (a_Chunk, CurrentTick) || isDirty;
+	isDirty = MovePickupsIn(a_Chunk, CurrentTick) || isDirty;
+	isDirty = MoveItemsOut (a_Chunk, CurrentTick) || isDirty;
+	return isDirty;
 }
 
 

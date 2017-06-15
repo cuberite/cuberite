@@ -20,7 +20,7 @@
 class cMobHeadEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity super;
+	typedef cBlockEntity Super;
 
 public:
 
@@ -29,7 +29,7 @@ public:
 	BLOCKENTITY_PROTODEF(cMobHeadEntity)
 
 	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
-	cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	// tolua_begin
 
@@ -65,6 +65,8 @@ public:
 
 	// tolua_end
 
+	// cBlockEntity overrides:
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
