@@ -19,19 +19,14 @@
 
 
 
-cBrewingstandEntity::cBrewingstandEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World) :
-	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
-	m_BlockMeta(a_BlockMeta),
+cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_IsDestroyed(false),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
 	m_RemainingFuel(0)
 {
 	m_Contents.AddListener(*this);
-	for (int i = 0; i < 3; i++)
-	{
-		m_Results[i] = cItem{};
-	}
 }
 
 
@@ -52,33 +47,41 @@ cBrewingstandEntity::~cBrewingstandEntity()
 
 
 
-bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
+void cBrewingstandEntity::Destroy()
 {
-	cWindow * Window = GetWindow();
-	if (Window == nullptr)
-	{
-		OpenWindow(new cBrewingstandWindow(m_PosX, m_PosY, m_PosZ, this));
-		Window = GetWindow();
-	}
+	m_IsDestroyed = true;
+	Super::Destroy();
+}
 
-	if (Window != nullptr)
-	{
-		if (a_Player->GetWindow() != Window)
-		{
-			a_Player->OpenWindow(*Window);
-		}
-	}
 
-	if (m_IsBrewing)
+
+
+
+void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cBrewingstandEntity &>(a_Src);
+	m_IsBrewing = src.m_IsBrewing;
+	for (size_t i = 0; i < ARRAYCOUNT(m_CurrentBrewingRecipes); ++i)
 	{
-		BroadcastProgress(0, m_NeedBrewingTime - m_TimeBrewed);
+		m_CurrentBrewingRecipes[i] = src.m_CurrentBrewingRecipes[i];
 	}
-	else
+	for (size_t i = 0; i < ARRAYCOUNT(m_Results); ++i)
 	{
-		BroadcastProgress(0, 0);
+		m_Results[i] = src.m_Results[i];
 	}
-	BroadcastProgress(1, m_RemainingFuel);
-	return true;
+	m_TimeBrewed = src.m_TimeBrewed;
+	m_RemainingFuel = src.m_RemainingFuel;
+}
+
+
+
+
+
+void cBrewingstandEntity::SendTo(cClientHandle & a_Client)
+{
+	// Nothing needs to be sent
+	UNUSED(a_Client);
 }
 
 
@@ -159,10 +162,33 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cBrewingstandEntity::SendTo(cClientHandle & a_Client)
+bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
-	// Nothing needs to be sent
-	UNUSED(a_Client);
+	cWindow * Window = GetWindow();
+	if (Window == nullptr)
+	{
+		OpenWindow(new cBrewingstandWindow(m_PosX, m_PosY, m_PosZ, this));
+		Window = GetWindow();
+	}
+
+	if (Window != nullptr)
+	{
+		if (a_Player->GetWindow() != Window)
+		{
+			a_Player->OpenWindow(*Window);
+		}
+	}
+
+	if (m_IsBrewing)
+	{
+		BroadcastProgress(0, m_NeedBrewingTime - m_TimeBrewed);
+	}
+	else
+	{
+		BroadcastProgress(0, 0);
+	}
+	BroadcastProgress(1, m_RemainingFuel);
+	return true;
 }
 
 
@@ -185,7 +211,7 @@ void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value
 
 void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
-	super::OnSlotChanged(a_ItemGrid, a_SlotNum);
+	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 
 	if (m_IsDestroyed)
 	{

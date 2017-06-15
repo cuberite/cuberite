@@ -11,8 +11,8 @@
 
 
 
-cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type) :
-	super(a_Type, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_NumActivePlayers(0),
 	m_Neighbour(nullptr)
 {
@@ -40,6 +40,21 @@ cChestEntity::~cChestEntity()
 	}
 
 	DestroyWindow();
+}
+
+
+
+
+
+void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cChestEntity &>(a_Src);
+	m_Contents.CopyFrom(src.m_Contents);
+
+	// Reset the neighbor and player count, there's no sense in copying these:
+	m_Neighbour = nullptr;
+	m_NumActivePlayers = 0;
 }
 
 

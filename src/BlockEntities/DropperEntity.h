@@ -19,7 +19,7 @@
 class cDropperEntity :
 	public cDropSpenserEntity
 {
-	typedef cDropSpenserEntity super;
+	typedef cDropSpenserEntity Super;
 
 public:
 
@@ -28,7 +28,7 @@ public:
 	BLOCKENTITY_PROTODEF(cDropperEntity)
 
 	/** Constructor used for normal operation */
-	cDropperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cDropperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 protected:
 	// cDropSpenserEntity overrides:

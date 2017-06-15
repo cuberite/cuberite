@@ -5,6 +5,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 SET (SRCS
 	BeaconEntity.cpp
 	BlockEntity.cpp
+	BlockEntityWithItems.cpp
 	BrewingstandEntity.cpp
 	ChestEntity.cpp
 	CommandBlockEntity.cpp

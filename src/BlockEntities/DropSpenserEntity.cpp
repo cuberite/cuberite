@@ -15,8 +15,8 @@
 
 
 
-cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_ShouldDropSpense(false)
 {
 }
@@ -107,6 +107,18 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 void cDropSpenserEntity::Activate(void)
 {
 	m_ShouldDropSpense = true;
+}
+
+
+
+
+
+void cDropSpenserEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cDropSpenserEntity &>(a_Src);
+	m_Contents.CopyFrom(src.m_Contents);
+	m_ShouldDropSpense = src.m_ShouldDropSpense;
 }
 
 

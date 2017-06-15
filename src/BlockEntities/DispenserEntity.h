@@ -11,7 +11,7 @@
 class cDispenserEntity :
 	public cDropSpenserEntity
 {
-	typedef cDropSpenserEntity super;
+	typedef cDropSpenserEntity Super;
 
 public:
 
@@ -20,7 +20,7 @@ public:
 	BLOCKENTITY_PROTODEF(cDispenserEntity)
 
 	/** Constructor used for normal operation */
-	cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cDispenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	// tolua_begin
 
@@ -38,7 +38,7 @@ private:
 	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
 
 	/** If such a bucket can fit, adds it to m_Contents and returns true */
-	bool ScoopUpLiquid(int a_SlotNum, short a_BucketItemType);
+	bool ScoopUpLiquid(int a_SlotNum, short a_ResultingBucketItemType);
 
 	/** If the a_BlockInFront can be washed away by liquid and the empty bucket can fit,
 	does the m_Contents processing and returns true. Returns false otherwise. */
