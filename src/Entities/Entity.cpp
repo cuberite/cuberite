@@ -19,15 +19,21 @@
 
 
 
-UInt32 cEntity::m_EntityCount = 0;
-cCriticalSection cEntity::m_CSCount;
+static UInt32 GetNextUniqueID(void)
+{
+	static std::atomic<UInt32> counter(1);
+	return counter.fetch_add(1);
+}
 
 
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// cEntity:
 
 cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height):
-	m_UniqueID(INVALID_ID),  // Proper ID will be assigned later in the constructor code
+	m_UniqueID(GetNextUniqueID()),
 	m_Health(1),
 	m_MaxHealth(1),
 	m_AttachedTo(nullptr),
@@ -65,10 +71,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
-	// Assign a proper ID:
-	cCSLock Lock(m_CSCount);
-	m_EntityCount++;
-	m_UniqueID = m_EntityCount;
 }
 
 
