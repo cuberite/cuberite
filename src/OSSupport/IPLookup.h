@@ -21,12 +21,9 @@
 class cIPLookup
 {
 public:
-	/** Creates the lookup object. Doesn't start the lookup yet. */
-	cIPLookup(cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 
-	/** Starts the lookup.
-	Returns true if lookup started successfully, false on failure (invalid IP format etc.) */
-	bool Lookup(const AString & a_IP);
+	/** Creates a lookup object and schedules the lookup. */
+	static void Lookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 
 protected:
 
@@ -36,9 +33,11 @@ protected:
 	/** The IP that was queried (needed for the callbacks). */
 	AString m_IP;
 
+	/** Creates the lookup object. Doesn't start the lookup yet. */
+	cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 
 	/** Callback that is called by LibEvent when there's an event for the request. */
-	static void Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void * a_Addresses, void * a_Self);
+	void Callback(int a_Result, const char * a_Address);
 };
 typedef SharedPtr<cIPLookup> cIPLookupPtr;
 typedef std::vector<cIPLookupPtr> cIPLookupPtrs;

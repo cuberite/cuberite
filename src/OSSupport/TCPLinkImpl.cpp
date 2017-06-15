@@ -70,41 +70,75 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 	res->m_Callbacks->OnLinkCreated(res);
 	res->Enable(res);
 
-	// If a_Host is an IP address, schedule a connection immediately:
-	sockaddr_storage sa;
-	int salen = static_cast<int>(sizeof(sa));
-	if (evutil_parse_sockaddr_port(a_Host.c_str(), reinterpret_cast<sockaddr *>(&sa), &salen) == 0)
+	// Callback to connect after performing lookup:
+	class cHostnameCallback :
+		public cNetwork::cResolveNameCallbacks
 	{
-		// Insert the correct port:
-		if (sa.ss_family == AF_INET6)
+		cTCPLinkImplPtr m_Link;
+		UInt16 m_Port;
+		bool m_IsConnecting;
+
+	public:
+
+		cHostnameCallback(cTCPLinkImplPtr a_Link, UInt16 a_ConnectPort):
+			m_Link(std::move(a_Link)),
+			m_Port(a_ConnectPort),
+			m_IsConnecting(false)
 		{
-			reinterpret_cast<sockaddr_in6 *>(&sa)->sin6_port = htons(a_Port);
-		}
-		else
-		{
-			reinterpret_cast<sockaddr_in *>(&sa)->sin_port = htons(a_Port);
 		}
 
-		// Queue the connect request:
-		if (bufferevent_socket_connect(res->m_BufferEvent, reinterpret_cast<sockaddr *>(&sa), salen) == 0)
+		void DoConnect(const sockaddr * a_IP, int size)
 		{
-			// Success
-			return res;
+			// Make sure connect is only completed once
+			if (!m_IsConnecting)
+			{
+				int ErrCode = bufferevent_socket_connect(m_Link->m_BufferEvent, a_IP, size);
+				if (ErrCode == 0)
+				{
+					m_IsConnecting = true;
+				}
+				else
+				{
+					m_Link->GetCallbacks()->OnError(ErrCode, evutil_socket_error_to_string(ErrCode));
+				}
+			}
 		}
-		// Failure
-		cNetworkSingleton::Get().RemoveLink(res.get());
-		return nullptr;
-	}
 
-	// a_Host is a hostname, connect after a lookup:
-	if (bufferevent_socket_connect_hostname(res->m_BufferEvent, cNetworkSingleton::Get().GetDNSBase(), AF_UNSPEC, a_Host.c_str(), a_Port) == 0)
-	{
-		// Success
-		return res;
-	}
-	// Failure
-	cNetworkSingleton::Get().RemoveLink(res.get());
-	return nullptr;
+		virtual bool OnNameResolvedV4(const AString & a_Name, const sockaddr_in * a_IP) override
+		{
+			sockaddr_in Addr = *a_IP;
+			Addr.sin_port = htons(m_Port);
+			DoConnect(reinterpret_cast<const sockaddr *>(&Addr), sizeof(Addr));
+			return false;  // Don't care about recieving ip as string
+		}
+
+		virtual bool OnNameResolvedV6(const AString & a_Name, const sockaddr_in6 * a_IP) override
+		{
+			sockaddr_in6 Addr = *a_IP;
+			Addr.sin6_port = htons(m_Port);
+			DoConnect(reinterpret_cast<const sockaddr *>(&Addr), sizeof(Addr));
+			return false;  // Don't care about recieving ip as string
+		}
+
+		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
+		{
+			m_Link->GetCallbacks()->OnError(a_ErrorCode, a_ErrorMsg);
+			cNetworkSingleton::Get().RemoveLink(m_Link.get());
+		}
+
+		// Don't need to do anything for these
+		virtual void OnFinished() override
+		{
+		}
+
+		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) override
+		{
+		}
+	};
+
+	// Schedule the host query
+	cNetwork::HostnameToIP(a_Host, std::make_shared<cHostnameCallback>(res, a_Port));
+	return res;
 }
 
 

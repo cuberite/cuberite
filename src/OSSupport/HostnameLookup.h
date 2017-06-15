@@ -12,7 +12,6 @@
 #pragma once
 
 #include "Network.h"
-#include <event2/util.h>
 
 
 
@@ -22,13 +21,13 @@
 class cHostnameLookup
 {
 public:
-	/** Creates the lookup object. Doesn't start the lookup yet. */
-	cHostnameLookup(cNetwork::cResolveNameCallbacksPtr a_Callbacks);
-
-	/** Starts the lookup. */
-	void Lookup(const AString & a_Hostname);
+	/** Creates a lookup object and schedules the lookup. */
+	static void Lookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 
 protected:
+
+	/** Creates the lookup object. Doesn't start the lookup yet. */
+	cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 
 	/** The callbacks to call for resolved names / errors. */
 	cNetwork::cResolveNameCallbacksPtr m_Callbacks;
@@ -36,7 +35,7 @@ protected:
 	/** The hostname that was queried (needed for the callbacks). */
 	AString m_Hostname;
 
-	static void Callback(int a_ErrCode, struct evutil_addrinfo * a_Addr, void * a_Self);
+	void Callback(int a_ErrCode, struct addrinfo * a_Addr);
 };
 typedef SharedPtr<cHostnameLookup> cHostnameLookupPtr;
 typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;
