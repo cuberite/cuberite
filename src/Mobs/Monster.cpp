@@ -512,7 +512,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtOcelot:
 		case mtWolf:
 		{
-			Reward = m_World->GetTickRandomNumber(2) + 1;
+			Reward = GetRandomProvider().RandInt(1, 3);
 			break;
 		}
 
@@ -531,7 +531,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtSlime:
 		case mtMagmaCube:
 		{
-			Reward = 6 + (m_World->GetTickRandomNumber(2));
+			Reward = GetRandomProvider().RandInt(6, 8);
 			break;
 		}
 		case mtBlaze:
@@ -657,13 +657,15 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_IdleInterval > std::chrono::seconds(1))
 	{
+		auto & Random = GetRandomProvider();
+
 		// At this interval the results are predictable
-		int rem = m_World->GetTickRandomNumber(6) + 1;
+		int rem = Random.RandInt(1, 7);
 		m_IdleInterval -= std::chrono::seconds(1);  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
-		Dist.x = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
-		Dist.z = static_cast<double>(m_World->GetTickRandomNumber(10)) - 5.0;
+		Dist.x = static_cast<double>(Random.RandInt(-5, 5));
+		Dist.z = static_cast<double>(Random.RandInt(-5, 5));
 
 		if ((Dist.SqrLength() > 2)  && (rem >= 3))
 		{
@@ -1005,7 +1007,7 @@ cPawn * cMonster::GetTarget ()
 
 cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
-	cFastRandom Random;
+	auto & Random = GetRandomProvider();
 	cMonster * toReturn = nullptr;
 
 	// Create the mob entity
@@ -1013,23 +1015,23 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			toReturn = new cMagmaCube(1 << Random.NextInt(3));  // Size 1, 2 or 4
+			toReturn = new cMagmaCube(1 << Random.RandInt(2));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
+			toReturn = new cSlime(1 << Random.RandInt(2));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
+			toReturn = new cSkeleton(false);
 			break;
 		}
 		case mtVillager:
 		{
-			int VillagerType = Random.NextInt(6);
+			int VillagerType = Random.RandInt(6);
 			if (VillagerType == 6)
 			{
 				// Give farmers a better chance of spawning
@@ -1042,10 +1044,10 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtHorse:
 		{
 			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
-			int HorseType = Random.NextInt(8);
-			int HorseColor = Random.NextInt(7);
-			int HorseStyle = Random.NextInt(5);
-			int HorseTameTimes = Random.NextInt(6) + 1;
+			int HorseType = Random.RandInt(7);
+			int HorseColor = Random.RandInt(6);
+			int HorseStyle = Random.RandInt(4);
+			int HorseTameTimes = Random.RandInt(1, 6);
 
 			if ((HorseType == 5) || (HorseType == 6) || (HorseType == 7))
 			{
@@ -1097,11 +1099,10 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
-	MTRand r1;
-	int Count = static_cast<int>(static_cast<unsigned int>(r1.randInt()) % (a_Max + 1 - a_Min) + a_Min);
+	auto Count = GetRandomProvider().RandInt<char>(static_cast<char>(a_Min), static_cast<char>(a_Max));
 	if (Count > 0)
 	{
-		a_Drops.push_back(cItem(a_Item, static_cast<char>(Count), a_ItemHealth));
+		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
 	}
 }
 
@@ -1111,9 +1112,7 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth)
 {
-	MTRand r1;
-	int Count = r1.randInt() % 1000;
-	if (Count < (a_Chance * 10))
+	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
 		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
 	}
@@ -1125,11 +1124,10 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 
 void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel)
 {
-	MTRand r1;
-	unsigned int Count = static_cast<unsigned int>(static_cast<unsigned long>(r1.randInt()) % 200);
-	if (Count < (5 + a_LootingLevel))
+	auto & r1 = GetRandomProvider();
+	if (r1.RandBool((5 + a_LootingLevel) / 200.0))
 	{
-		size_t Rare = static_cast<size_t>(r1.randInt()) % a_Items.Size();
+		size_t Rare = r1.RandInt<size_t>(a_Items.Size() - 1);
 		a_Drops.push_back(a_Items.at(Rare));
 	}
 }
@@ -1140,8 +1138,11 @@ void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigne
 
 void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
-	MTRand r1;
-	if (r1.randInt() % 200 < ((m_DropChanceHelmet * 200) + (a_LootingLevel * 2)))
+	auto & r1 = GetRandomProvider();
+
+	double LootingBonus = a_LootingLevel / 100.0;
+
+	if (r1.RandBool(m_DropChanceHelmet + LootingBonus))
 	{
 		if (!GetEquippedHelmet().IsEmpty())
 		{
@@ -1149,7 +1150,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 		}
 	}
 
-	if (r1.randInt() % 200 < ((m_DropChanceChestplate * 200) + (a_LootingLevel * 2)))
+	if (r1.RandBool(m_DropChanceChestplate + LootingBonus))
 	{
 		if (!GetEquippedChestplate().IsEmpty())
 		{
@@ -1157,7 +1158,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 		}
 	}
 
-	if (r1.randInt() % 200 < ((m_DropChanceLeggings * 200) + (a_LootingLevel * 2)))
+	if (r1.RandBool(m_DropChanceLeggings + LootingBonus))
 	{
 		if (!GetEquippedLeggings().IsEmpty())
 		{
@@ -1165,7 +1166,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 		}
 	}
 
-	if (r1.randInt() % 200 < ((m_DropChanceBoots * 200) + (a_LootingLevel * 2)))
+	if (r1.RandBool(m_DropChanceBoots + LootingBonus))
 	{
 		if (!GetEquippedBoots().IsEmpty())
 		{
@@ -1180,8 +1181,7 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLe
 
 void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel)
 {
-	MTRand r1;
-	if (r1.randInt() % 200 < ((m_DropChanceWeapon * 200) + (a_LootingLevel * 2)))
+	if (GetRandomProvider().RandBool(m_DropChanceWeapon + (a_LootingLevel / 100.0)))
 	{
 		if (!GetEquippedWeapon().IsEmpty())
 		{

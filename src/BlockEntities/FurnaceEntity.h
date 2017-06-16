@@ -18,7 +18,7 @@ class cClientHandle;
 class cFurnaceEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems super;
+	typedef cBlockEntityWithItems Super;
 
 public:
 	enum
@@ -36,19 +36,16 @@ public:
 	BLOCKENTITY_PROTODEF(cFurnaceEntity)
 
 	/** Constructor used for normal operation */
-	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
+	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	virtual ~cFurnaceEntity() override;
 
 	// cBlockEntity overrides:
+	virtual void Destroy() override;
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
-	virtual void Destroy() override
-	{
-		m_IsDestroyed = true;
-		super::Destroy();
-	}
 
 	/** Restarts cooking
 	Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active
@@ -106,10 +103,8 @@ public:
 		m_IsLoading = a_IsLoading;
 	}
 
-protected:
 
-	/** Block meta of the block currently represented by this entity */
-	NIBBLETYPE m_BlockMeta;
+protected:
 
 	/** The recipe for the current input slot */
 	const cFurnaceRecipe::cRecipe * m_CurrentRecipe;

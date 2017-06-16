@@ -507,14 +507,19 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 
 void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ)
 {
-	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
-	int Random = m_World->GetTickRandomNumber(0x00ffffff);
-	a_X =   Random % (a_MaxX * 2);
-	a_Y =  (Random / (a_MaxX * 2)) % (a_MaxY * 2);
-	a_Z = ((Random / (a_MaxX * 2)) / (a_MaxY * 2)) % (a_MaxZ * 2);
-	a_X /= 2;
-	a_Y /= 2;
-	a_Z /= 2;
+	ASSERT(
+		(a_MaxX > 0) && (a_MaxY > 0) && (a_MaxZ > 0) &&
+		(a_MaxX <= std::numeric_limits<int>::max() / a_MaxY) &&  // a_MaxX * a_MaxY doesn't overflow
+		(a_MaxX * a_MaxY <= std::numeric_limits<int>::max() / a_MaxZ)  // a_MaxX * a_MaxY * a_MaxZ doesn't overflow
+	);
+
+	// MTRand gives an inclusive range [0, Max] but this gives the exclusive range [0, Max)
+	int OverallMax = (a_MaxX * a_MaxY * a_MaxZ) - 1;
+	int Random = m_World->GetTickRandomNumber(OverallMax);
+
+	a_X =   Random % a_MaxX;
+	a_Y =  (Random / a_MaxX) % a_MaxY;
+	a_Z = ((Random / a_MaxX) / a_MaxY) % a_MaxZ;
 }
 
 
@@ -848,7 +853,7 @@ void cChunk::TickBlocks(void)
 void cChunk::ApplyWeatherToTop()
 {
 	if (
-		(m_World->GetTickRandomNumber(100) != 0) ||
+		(GetRandomProvider().RandBool(0.99)) ||
 		(
 			(m_World->GetWeather() != eWeather_Rain) &&
 			(m_World->GetWeather() != eWeather_ThunderStorm)
@@ -932,8 +937,10 @@ void cChunk::ApplyWeatherToTop()
 
 
 
-bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
+bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
+	auto & Random = GetRandomProvider();
+
 	// Convert the stem BlockType into produce BlockType
 	BLOCKTYPE ProduceType;
 	switch (a_BlockType)
@@ -969,7 +976,7 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 	// Pick a direction in which to place the produce:
 	int x = 0, z = 0;
-	int CheckType = a_TickRandom.randInt(3);  // The index to the neighbors array which should be checked for emptiness
+	int CheckType = Random.RandInt(3);  // The index to the neighbors array which should be checked for emptiness
 	switch (CheckType)
 	{
 		case 0: x =  1; break;
@@ -1001,7 +1008,7 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		case E_BLOCK_FARMLAND:
 		{
 			// Place a randomly-facing produce:
-			NIBBLETYPE Meta = (ProduceType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(a_TickRandom.randInt(4) % 4);
+			NIBBLETYPE Meta = (ProduceType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(Random.RandInt(4) % 4);
 			LOGD("Growing melon / pumpkin at {%d, %d, %d} (<%d, %d> from stem), overwriting %s, growing on top of %s, meta %d",
 				a_RelX + x + m_PosX * cChunkDef::Width, a_RelY, a_RelZ + z + m_PosZ * cChunkDef::Width,
 				x, z,

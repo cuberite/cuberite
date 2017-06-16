@@ -332,9 +332,9 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		return false;
 	}
 
-	cFastRandom Random;
-	int ModifiedEnchantmentLevel = a_NumXPLevels + static_cast<int>(Random.NextFloat(static_cast<float>(Enchantability / 4))) + static_cast<int>(Random.NextFloat(static_cast<float>(Enchantability / 4))) + 1;
-	float RandomBonus = 1.0F + (Random.NextFloat(1) + Random.NextFloat(1) - 1.0F) * 0.15F;
+	auto & Random = GetRandomProvider();
+	int ModifiedEnchantmentLevel = a_NumXPLevels + Random.RandInt(Enchantability / 4) + Random.RandInt(Enchantability / 4) + 1;
+	float RandomBonus = 1.0F + (Random.RandReal() + Random.RandReal() - 1.0F) * 0.15F;
 	int FinalEnchantmentLevel = static_cast<int>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments Enchantments;
@@ -352,12 +352,10 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Checking for conflicting enchantments
 	cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment1);
 
-	float NewEnchantmentLevel = static_cast<float>(a_NumXPLevels);
-
 	// Next Enchantment (Second)
-	NewEnchantmentLevel = NewEnchantmentLevel / 2;
-	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if (Enchantments.empty() || (Random.NextFloat(100) > SecondEnchantmentChance))
+	float NewEnchantmentLevel = a_NumXPLevels / 2.0f;
+	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
+	if (Enchantments.empty() || !Random.RandBool(SecondEnchantmentChance))
 	{
 		return true;
 	}
@@ -370,9 +368,9 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment2);
 
 	// Next Enchantment (Third)
-	NewEnchantmentLevel = NewEnchantmentLevel / 2;
-	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if (Enchantments.empty() || (Random.NextFloat(100) > ThirdEnchantmentChance))
+	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
+	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
+	if (Enchantments.empty() || !Random.RandBool(ThirdEnchantmentChance))
 	{
 		return true;
 	}
@@ -385,9 +383,9 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment3);
 
 	// Next Enchantment (Fourth)
-	NewEnchantmentLevel = NewEnchantmentLevel / 2;
-	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if (Enchantments.empty() || (Random.NextFloat(100) > FourthEnchantmentChance))
+	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
+	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
+	if (Enchantments.empty() || !Random.RandBool(FourthEnchantmentChance))
 	{
 		return true;
 	}

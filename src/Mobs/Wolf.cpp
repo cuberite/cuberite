@@ -138,7 +138,7 @@ void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool 
 		// If a player is asking for help and we already have a target,
 		// there's a 50% chance of helping and a 50% chance of doing nothing
 		// This helps spread a wolf pack's targets over several mobs
-		else if (m_World->GetTickRandomNumber(9)> 4)
+		else if (GetRandomProvider().RandBool())
 		{
 			return;
 		}
@@ -179,7 +179,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 
-			if (m_World->GetTickRandomNumber(7) == 0)
+			if (GetRandomProvider().RandBool(0.125))
 			{
 				// Taming succeeded
 				SetMaxHealth(20);

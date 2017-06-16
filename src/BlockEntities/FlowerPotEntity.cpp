@@ -13,16 +13,45 @@
 
 
 
-cFlowerPotEntity::cFlowerPotEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_FLOWER_POT, a_BlockX, a_BlockY, a_BlockZ, a_World)
+cFlowerPotEntity::cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World)
 {
+	ASSERT(a_BlockType == E_BLOCK_FLOWER_POT);
 }
 
 
 
 
 
-// It don't do anything when 'used'
+void cFlowerPotEntity::Destroy(void)
+{
+	// Drop the contents as pickups:
+	if (!m_Item.IsEmpty())
+	{
+		ASSERT(m_World != nullptr);
+		cItems Pickups;
+		Pickups.Add(m_Item);
+		m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);
+
+		m_Item.Empty();
+	}
+}
+
+
+
+
+
+void cFlowerPotEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cFlowerPotEntity &>(a_Src);
+	m_Item = src.m_Item;
+}
+
+
+
+
+
 bool cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 {
 	if (IsItemInPot())
@@ -50,24 +79,6 @@ bool cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 void cFlowerPotEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateBlockEntity(*this);
-}
-
-
-
-
-
-void cFlowerPotEntity::Destroy(void)
-{
-	// Drop the contents as pickups:
-	if (!m_Item.IsEmpty())
-	{
-		ASSERT(m_World != nullptr);
-		cItems Pickups;
-		Pickups.Add(m_Item);
-		m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);
-
-		m_Item.Empty();
-	}
 }
 
 

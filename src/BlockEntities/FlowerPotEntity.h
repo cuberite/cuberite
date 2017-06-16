@@ -20,7 +20,7 @@
 class cFlowerPotEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity super;
+	typedef cBlockEntity Super;
 
 public:
 
@@ -29,9 +29,8 @@ public:
 	BLOCKENTITY_PROTODEF(cFlowerPotEntity)
 
 	/** Creates a new flowerpot entity at the specified block coords. a_World may be nullptr */
-	cFlowerPotEntity(int a_BlocX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
-	virtual void Destroy(void) override;
 
 	// tolua_begin
 
@@ -46,7 +45,9 @@ public:
 
 	// tolua_end
 
-	/** Called when the player is using the entity; returns true if it was a successful use, return false if it should be treated as a normal block */
+	// cBlockEntity overrides:
+	virtual void Destroy(void) override;
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 

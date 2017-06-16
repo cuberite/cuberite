@@ -861,8 +861,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 		float Chance;
 		if (Success && GetEatEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance))
 		{
-			cFastRandom r1;
-			if (r1.NextFloat() < Chance)
+			if (GetRandomProvider().RandBool(Chance))
 			{
 				a_Player->AddEntityEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance);
 			}

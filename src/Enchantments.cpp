@@ -1012,14 +1012,12 @@ void cEnchantments::CheckEnchantmentConflictsFromVector(cWeightedEnchantments & 
 
 cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments)
 {
-	cFastRandom Random;
-
 	int AllWeights = 0;
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
 		AllWeights += (*it).m_Weight;
 	}
-	int RandomNumber = Random.GenerateRandomInteger(0, AllWeights - 1);
+	int RandomNumber = GetRandomProvider().RandInt(AllWeights - 1);
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
 		RandomNumber -= (*it).m_Weight;

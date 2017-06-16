@@ -13,12 +13,26 @@
 
 
 
-cMobSpawnerEntity::cMobSpawnerEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
-	: super(E_BLOCK_MOB_SPAWNER, a_BlockX, a_BlockY, a_BlockZ, a_World)
-	, m_Entity(mtPig)
-	, m_SpawnDelay(100)
-	, m_IsActive(false)
+cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Entity(mtPig),
+	m_SpawnDelay(100),
+	m_IsActive(false)
 {
+	ASSERT(a_BlockType == E_BLOCK_MOB_SPAWNER);
+}
+
+
+
+
+
+void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cMobSpawnerEntity &>(a_Src);
+	m_Entity = src.m_Entity;
+	m_IsActive = src.m_IsActive;
+	m_SpawnDelay = src.m_SpawnDelay;
 }
 
 
@@ -107,7 +121,7 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMobSpawnerEntity::ResetTimer(void)
 {
-	m_SpawnDelay = static_cast<short>(200 + m_World->GetTickRandomNumber(600));
+	m_SpawnDelay = GetRandomProvider().RandInt<short>(200, 800);
 	m_World->BroadcastBlockEntity(m_PosX, m_PosY, m_PosZ);
 }
 
@@ -138,7 +152,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 		virtual bool Item(cChunk * a_Chunk)
 		{
-			cFastRandom Random;
+			auto & Random = GetRandomProvider();
 
 			bool EntitiesSpawned = false;
 			for (size_t i = 0; i < 4; i++)
@@ -148,9 +162,9 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					break;
 				}
 
-				int RelX = static_cast<int>(m_RelX + static_cast<double>(Random.NextFloat() - Random.NextFloat()) * 4.0);
-				int RelY = m_RelY + Random.NextInt(3) - 1;
-				int RelZ = static_cast<int>(m_RelZ + static_cast<double>(Random.NextFloat() - Random.NextFloat()) * 4.0);
+				int RelX = m_RelX + static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0);
+				int RelY = m_RelY + Random.RandInt(-1, 1);
+				int RelZ = m_RelZ + static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0);
 
 				cChunk * Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelX, RelZ);
 				if ((Chunk == nullptr) || !Chunk->IsValid())
@@ -171,7 +185,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					}
 
 					Monster->SetPosition(PosX, RelY, PosZ);
-					Monster->SetYaw(Random.NextFloat() * 360.0f);
+					Monster->SetYaw(Random.RandReal(360.0f));
 					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != cEntity::INVALID_ID)
 					{
 						EntitiesSpawned = true;

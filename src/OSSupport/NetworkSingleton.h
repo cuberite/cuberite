@@ -13,8 +13,10 @@
 
 #pragma once
 
+#include <atomic>
 #include <event2/event.h>
 #include "Network.h"
+#include "NetworkLookup.h"
 #include "CriticalSection.h"
 #include "Event.h"
 
@@ -24,19 +26,12 @@
 
 // fwd:
 struct event_base;
-struct evdns_base;
 class cTCPLinkImpl;
 typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
 typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
 class cServerHandleImpl;
 typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
 typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
-class cHostnameLookup;
-typedef SharedPtr<cHostnameLookup> cHostnameLookupPtr;
-typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;
-class cIPLookup;
-typedef SharedPtr<cIPLookup> cIPLookupPtr;
-typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
 
 
 
@@ -63,24 +58,8 @@ public:
 	/** Returns the main LibEvent handle for event registering. */
 	event_base * GetEventBase(void) { return m_EventBase; }
 
-	/** Returns the LibEvent handle for DNS lookups. */
-	evdns_base * GetDNSBase(void) { return m_DNSBase; }
-
-	/** Adds the specified hostname lookup to m_HostnameLookups.
-	Used by the underlying lookup implementation when a new lookup is initiated. */
-	void AddHostnameLookup(cHostnameLookupPtr a_HostnameLookup);
-
-	/** Removes the specified hostname lookup from m_HostnameLookups.
-	Used by the underlying lookup implementation when the lookup is finished. */
-	void RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup);
-
-	/** Adds the specified IP lookup to M_IPLookups.
-	Used by the underlying lookup implementation when a new lookup is initiated. */
-	void AddIPLookup(cIPLookupPtr a_IPLookup);
-
-	/** Removes the specified IP lookup from m_IPLookups.
-	Used by the underlying lookup implementation when the lookup is finished. */
-	void RemoveIPLookup(const cIPLookup * a_IPLookup);
+	/** Returns the thread used to perform hostname and IP lookups */
+	cNetworkLookup & GetLookupThread() { return m_LookupThread; }
 
 	/** Adds the specified link to m_Connections.
 	Used by the underlying link implementation when a new link is created. */
@@ -104,32 +83,26 @@ protected:
 	/** The main LibEvent container for driving the event loop. */
 	event_base * m_EventBase;
 
-	/** The LibEvent handle for doing DNS lookups. */
-	evdns_base * m_DNSBase;
-
 	/** Container for all client connections, including ones with pending-connect. */
 	cTCPLinkImplPtrs m_Connections;
 
 	/** Container for all servers that are currently active. */
 	cServerHandleImplPtrs m_Servers;
 
-	/** Container for all pending hostname lookups. */
-	cHostnameLookupPtrs m_HostnameLookups;
-
-	/** Container for all pending IP lookups. */
-	cIPLookupPtrs m_IPLookups;
-
 	/** Mutex protecting all containers against multithreaded access. */
 	cCriticalSection m_CS;
 
 	/** Set to true if Terminate has been called. */
-	volatile bool m_HasTerminated;
+	std::atomic<bool> m_HasTerminated;
 
 	/** The thread in which the main LibEvent loop runs. */
 	std::thread m_EventLoopThread;
 
 	/** Event that is signalled once the startup is finished and the LibEvent loop is running. */
 	cEvent m_StartupEvent;
+
+	/** The thread on which hostname and ip address lookup is performed. */
+	cNetworkLookup m_LookupThread;
 
 
 	/** Converts LibEvent-generated log events into log messages in MCS log. */

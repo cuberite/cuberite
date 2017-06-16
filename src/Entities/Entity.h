@@ -32,7 +32,12 @@
 #define POSZ_TOINT FloorC(GetPosZ())
 #define POS_TOINT  GetPosition().Floor()
 
-#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) { return; }
+#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) \
+	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); \
+	if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
+	{ \
+		return; \
+	}
 
 
 
@@ -517,9 +522,6 @@ protected:
 		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
 		bool m_ShouldPreventTeleportation;
 	};
-
-	static cCriticalSection m_CSCount;
-	static UInt32 m_EntityCount;
 
 	/** Measured in meters / second (m / s) */
 	Vector3d m_Speed;
