@@ -73,6 +73,22 @@ void cItemGrid::GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const
 
 
 
+void cItemGrid::CopyFrom(const cItemGrid & a_Src)
+{
+	ASSERT(m_Width == a_Src.m_Width);
+	ASSERT(m_Height == a_Src.m_Height);
+	for (int i = m_NumSlots - 1; i >= 0; --i)
+	{
+		m_Slots[i] = a_Src.m_Slots[i];
+	}
+
+	// The listeners are not copied
+}
+
+
+
+
+
 const cItem & cItemGrid::GetSlot(int a_X, int a_Y) const
 {
 	return GetSlot(GetSlotNum(a_X, a_Y));

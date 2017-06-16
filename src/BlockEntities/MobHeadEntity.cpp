@@ -13,13 +13,29 @@
 
 
 
-cMobHeadEntity::cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_HEAD, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
 	m_Type(SKULL_TYPE_SKELETON),
 	m_Rotation(SKULL_ROTATION_NORTH)
 {
+	ASSERT(a_BlockType == E_BLOCK_HEAD);
 }
 
+
+
+
+
+void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cMobHeadEntity &>(a_Src);
+	m_OwnerName = src.m_OwnerName;
+	m_OwnerTexture = src.m_OwnerTexture;
+	m_OwnerTextureSignature = src.m_OwnerTextureSignature;
+	m_OwnerUUID = src.m_OwnerUUID;
+	m_Rotation = src.m_Rotation;
+	m_Type = src.m_Type;
+}
 
 
 

@@ -23,9 +23,8 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World) :
-	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
-	m_BlockMeta(a_BlockMeta),
+cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
 	m_IsDestroyed(false),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
@@ -56,36 +55,40 @@ cFurnaceEntity::~cFurnaceEntity()
 
 
 
-bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
+void cFurnaceEntity::Destroy()
 {
-	cWindow * Window = GetWindow();
-	if (Window == nullptr)
-	{
-		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));
-		Window = GetWindow();
-	}
-
-	if (Window != nullptr)
-	{
-		if (a_Player->GetWindow() != Window)
-		{
-			a_Player->OpenWindow(*Window);
-		}
-	}
-
-	UpdateProgressBars(true);
-	return true;
+	m_IsDestroyed = true;
+	Super::Destroy();
 }
 
 
 
 
 
-bool cFurnaceEntity::ContinueCooking(void)
+void cFurnaceEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	UpdateInput();
-	UpdateFuel();
-	return m_IsCooking;
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cFurnaceEntity &>(a_Src);
+	m_Contents.CopyFrom(src.m_Contents);
+	m_CurrentRecipe = src.m_CurrentRecipe;
+	m_FuelBurnTime = src.m_FuelBurnTime;
+	m_IsCooking = src.m_IsCooking;
+	m_IsDestroyed = src.m_IsDestroyed;
+	m_IsLoading = src.m_IsLoading;
+	m_LastInput = src.m_LastInput;
+	m_NeedCookTime = src.m_NeedCookTime;
+	m_TimeBurned = src.m_TimeBurned;
+	m_TimeCooked = src.m_TimeCooked;
+}
+
+
+
+
+
+void cFurnaceEntity::SendTo(cClientHandle & a_Client)
+{
+	// Nothing needs to be sent
+	UNUSED(a_Client);
 }
 
 
@@ -134,10 +137,36 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cFurnaceEntity::SendTo(cClientHandle & a_Client)
+bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
-	// Nothing needs to be sent
-	UNUSED(a_Client);
+	cWindow * Window = GetWindow();
+	if (Window == nullptr)
+	{
+		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));
+		Window = GetWindow();
+	}
+
+	if (Window != nullptr)
+	{
+		if (a_Player->GetWindow() != Window)
+		{
+			a_Player->OpenWindow(*Window);
+		}
+	}
+
+	UpdateProgressBars(true);
+	return true;
+}
+
+
+
+
+
+bool cFurnaceEntity::ContinueCooking(void)
+{
+	UpdateInput();
+	UpdateFuel();
+	return m_IsCooking;
 }
 
 
@@ -208,7 +237,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 
 void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
-	super::OnSlotChanged(a_ItemGrid, a_SlotNum);
+	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 
 	if (m_IsDestroyed)
 	{

@@ -11,13 +11,14 @@
 
 
 
-cBeaconEntity::cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	super(E_BLOCK_BEACON, a_BlockX, a_BlockY, a_BlockZ, 1, 1, a_World),
+cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
 	m_PrimaryEffect(cEntityEffect::effNoEffect),
 	m_SecondaryEffect(cEntityEffect::effNoEffect)
 {
+	ASSERT(a_BlockType == E_BLOCK_BEACON);
 	UpdateBeacon();
 }
 
@@ -268,6 +269,30 @@ void cBeaconEntity::GiveEffects(void)
 
 
 
+void cBeaconEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cBeaconEntity &>(a_Src);
+	m_BeaconLevel = src.m_BeaconLevel;
+	m_Contents.CopyFrom(src.m_Contents);
+	m_IsActive = src.m_IsActive;
+	m_PrimaryEffect = src.m_PrimaryEffect;
+	m_SecondaryEffect = src.m_SecondaryEffect;
+}
+
+
+
+
+
+void cBeaconEntity::SendTo(cClientHandle & a_Client)
+{
+	a_Client.SendUpdateBlockEntity(*this);
+}
+
+
+
+
+
 bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// Update the beacon every 4 seconds
@@ -301,15 +326,6 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 	return true;
-}
-
-
-
-
-
-void cBeaconEntity::SendTo(cClientHandle & a_Client)
-{
-	a_Client.SendUpdateBlockEntity(*this);
 }
 
 

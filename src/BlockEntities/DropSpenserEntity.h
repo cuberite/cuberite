@@ -26,7 +26,7 @@ class cClientHandle;
 class cDropSpenserEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems super;
+	typedef cBlockEntityWithItems Super;
 
 public:
 	enum
@@ -39,10 +39,11 @@ public:
 
 	BLOCKENTITY_PROTODEF(cDropSpenserEntity)
 
-	cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cDropSpenserEntity() override;
 
 	// cBlockEntity overrides:
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
