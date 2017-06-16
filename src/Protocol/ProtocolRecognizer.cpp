@@ -70,56 +70,59 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 
 void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 {
-	if (m_Protocol == nullptr)
+	if (m_Protocol != nullptr)
 	{
-		if (!m_Buffer.Write(a_Data, a_Size))
-		{
-			m_Client->Kick("Unsupported protocol version");
-			return;
-		}
-
-		if (m_InPingForUnrecognizedVersion)
-		{
-			// We already know the verison; handle it here.
-			UInt32 PacketLen;
-			UInt32 PacketID;
-			if (!m_Buffer.ReadVarInt32(PacketLen))
-			{
-				return;
-			}
-			if (!m_Buffer.ReadVarInt32(PacketID))
-			{
-				return;
-			}
-			ASSERT(PacketID == 0x01);  // Ping packet
-			ASSERT(PacketLen == 9);  // Payload of the packet ID and a UInt64
-
-			Int64 Data;
-			if (!m_Buffer.ReadBEInt64(Data))
-			{
-				return;
-			}
-
-			cPacketizer Pkt(*this, 0x01);  // Pong packet
-			Pkt.WriteBEInt64(Data);
-			return;
-		}
-
-		if (!TryRecognizeProtocol())
-		{
-			return;
-		}
-
-		// The protocol has just been recognized, dump the whole m_Buffer contents into it for parsing:
-		AString Dump;
-		m_Buffer.ResetRead();
-		m_Buffer.ReadAll(Dump);
-		m_Protocol->DataReceived(Dump.data(), Dump.size());
-	}
-	else
-	{
+		// Protocol was already recognized, send to the handler:
 		m_Protocol->DataReceived(a_Data, a_Size);
+		return;
 	}
+
+	if (!m_Buffer.Write(a_Data, a_Size))
+	{
+		m_Client->Kick("Unsupported protocol version");
+		return;
+	}
+
+	if (m_InPingForUnrecognizedVersion)
+	{
+		// We already know the verison; handle it here.
+		UInt32 PacketLen;
+		UInt32 PacketID;
+		if (!m_Buffer.ReadVarInt32(PacketLen))
+		{
+			return;
+		}
+		if (!m_Buffer.ReadVarInt32(PacketID))
+		{
+			return;
+		}
+		if ((PacketID != 0x01) || (PacketLen != 9))
+		{
+			// Not a Ping packet
+			return;
+		}
+
+		Int64 Data;
+		if (!m_Buffer.ReadBEInt64(Data))
+		{
+			return;
+		}
+
+		cPacketizer Pkt(*this, 0x01);  // Pong packet
+		Pkt.WriteBEInt64(Data);
+		return;
+	}
+
+	if (!TryRecognizeProtocol())
+	{
+		return;
+	}
+
+	// The protocol has just been recognized, dump the whole m_Buffer contents into it for parsing:
+	AString Dump;
+	m_Buffer.ResetRead();
+	m_Buffer.ReadAll(Dump);
+	m_Protocol->DataReceived(Dump.data(), Dump.size());
 }
 
 
