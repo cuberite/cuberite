@@ -149,6 +149,7 @@ void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 	timeval timeout{};  // Zero timeout - execute immediately
 	evtimer_add(timer, &timeout);
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
+	event_free(timer);
 }
 
 
