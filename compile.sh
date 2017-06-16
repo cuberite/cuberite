@@ -56,7 +56,7 @@ errorArguments ()
 	echo "options:"
 	echo "  -m  The compilation mode. Either \"Release\" or \"Debug\". Defaults to \"$DEFAULT_BUILDTYPE\""
 	echo '  -t  The number of threads to use for compiling'
-	echo '      If unspecified, a "smart guess" is attempted (Currently simply picks 2)'
+	echo '      If unspecified, a "smart guess" is attempted'
 	echo '  -b  The branch to compile. (Currently unused and pinned to MASTER)'
 	echo '  -n  Prevent interactive mode'
 	echo '  -d  Dry run. Print the chosen settings and exit'
@@ -361,7 +361,13 @@ fi
 
 autoChooseThreads()
 {
-	echo "$DEFAULT_THREADS" # Todo choose based on system info, and fallback to DEFAULT_THREADS.
+	KERNEL=$(uname -s)
+
+	if [ "$KERNEL" = "Linux" ] || [ "$KERNEL" = "Darwin" ]; then
+		echo $(getconf _NPROCESSORS_ONLN)
+	else
+		echo "$DEFAULT_THREADS"
+	fi
 }
 
 if [ $STATE_INTERACTIVE -eq 1 ]; then
