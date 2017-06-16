@@ -18,6 +18,7 @@ SET (SRCS
 	StackTrace.cpp
 	TCPLinkImpl.cpp
 	UDPEndpointImpl.cpp
+	WinStackWalker.cpp
 )
 
 SET (HDRS
@@ -38,6 +39,7 @@ SET (HDRS
 	StackTrace.h
 	TCPLinkImpl.h
 	UDPEndpointImpl.h
+	WinStackWalker.h
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

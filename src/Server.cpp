@@ -34,22 +34,6 @@ extern "C"
 
 
 
-/** Enable the memory leak finder - needed for the "dumpmem" server command:
-Synchronize this with main.cpp - the leak finder needs initialization before it can be used to dump memory
-_X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
-and we haven't had a memory leak for over a year anyway. */
-// #define ENABLE_LEAK_FINDER
-
-#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	#pragma warning(push)
-	#pragma warning(disable:4100)
-	#include "LeakFinder.h"
-	#pragma warning(pop)
-#endif
-
-
-
-
 
 typedef std::list< cClientHandle* > ClientList;
 
@@ -535,23 +519,6 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
-	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	else if (split[0].compare("dumpmem") == 0)
-	{
-		LeakFinderXmlOutput Output("memdump.xml");
-		DumpUsedMemory(&Output);
-		return;
-	}
-
-	else if (split[0].compare("killmem") == 0)
-	{
-		for (;;)
-		{
-			new char[100 * 1024 * 1024];  // Allocate and leak 100 MiB in a loop -> fill memory and kill MCS
-		}
-	}
-	#endif
-
 	else if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output, a_Cmd))
 	{
 		a_Output.Finished();
@@ -637,10 +604,6 @@ void cServer::BindBuiltInConsoleCommands(void)
 	PlgMgr->BindConsoleCommand("load",            nullptr, handler, "Adds and enables the specified plugin");
 	PlgMgr->BindConsoleCommand("unload",          nullptr, handler, "Disables the specified plugin");
 	PlgMgr->BindConsoleCommand("destroyentities", nullptr, handler, "Destroys all entities in all worlds");
-
-	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	PlgMgr->BindConsoleCommand("dumpmem", nullptr, handler, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
-	#endif
 }
 
 
