@@ -106,7 +106,7 @@ void cHostnameLookup::Callback(int a_ErrCode, addrinfo * a_Addr)
 	// If only unsupported families were reported, call the Error handler:
 	if (!HasResolved)
 	{
-		m_Callbacks->OnError(EAI_NODATA, ErrorString(EAI_NODATA));
+		m_Callbacks->OnError(EAI_NONAME, ErrorString(EAI_NONAME));
 	}
 	else
 	{
