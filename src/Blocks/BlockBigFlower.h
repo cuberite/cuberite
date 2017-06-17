@@ -58,7 +58,11 @@ public:
 
 		if (a_BlockMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
-			a_Pickups.push_back(cItem(E_ITEM_SEEDS));
+			// Double tall grass has 1 in 24 chance to drop seeds
+			if (GetRandomProvider().RandBool(1.0 / 24.0))
+			{
+				a_Pickups.push_back(cItem(E_ITEM_SEEDS));
+			}
 		}
 		else if (a_BlockMeta != E_META_BIG_FLOWER_LARGE_FERN)
 		{
