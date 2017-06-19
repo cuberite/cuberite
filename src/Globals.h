@@ -49,7 +49,13 @@
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
 	#define SIZE_T_FMT_HEX "%Ix"
 
-	#define NORETURN      __declspec(noreturn)
+	#define NORETURN __declspec(noreturn)
+	#if (_MSC_VER < 1910)
+		// MSVC 2013 (and possibly 2015?) have no idea about "noexcept(false)"
+		#define NO_THROW throw(...)
+	#else
+		#define NO_THROW noexcept(false)
+	#endif
 
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
@@ -93,7 +99,8 @@
 		#define SIZE_T_FMT_HEX "%zx"
 	#endif
 
-	#define NORETURN      __attribute((__noreturn__))
+	#define NORETURN __attribute((__noreturn__))
+	#define NO_THROW noexcept(false)
 
 #else
 
