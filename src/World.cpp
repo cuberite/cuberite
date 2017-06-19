@@ -3905,15 +3905,16 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
 	AString SimulatorSectionName;
 	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
-	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "Vanilla");
+
+	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
+	AString DefaultSimulatorName = ((GetDimension() == dimNether) && IsWater) ? "Vaporise" : "Vanilla";
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, DefaultSimulatorName);
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Vanilla\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
-		SimulatorName = "Vanilla";
+		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"%s\".", SimulatorNameKey.c_str(), GetIniFileName().c_str(), DefaultSimulatorName.c_str());
+		SimulatorName = DefaultSimulatorName;
 	}
-
 	cFluidSimulator * res = nullptr;
-	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
 	int Rate = 1;
 	if (
 		(NoCaseCompare(SimulatorName, "vaporize") == 0) ||
