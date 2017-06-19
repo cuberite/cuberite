@@ -1139,7 +1139,7 @@ bool cChunk::GrowTallGrass(int a_RelX, int a_RelY, int a_RelZ)
 		default:                      return false;
 	}
 	return UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_BIG_FLOWER, LargeFlowerMeta) &&
-		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, 8);
+		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, 0x8 | LargeFlowerMeta);
 }
 
 

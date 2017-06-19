@@ -49,7 +49,10 @@ public:
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
 		if (Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
-			a_Pickups.push_back(cItem(E_ITEM_SEEDS));
+			if (GetRandomProvider().RandBool(1.0 / 24.0))
+			{
+				a_Pickups.push_back(cItem(E_ITEM_SEEDS));
+			}
 		}
 		else if (Meta != E_META_BIG_FLOWER_LARGE_FERN)
 		{
