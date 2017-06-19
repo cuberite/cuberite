@@ -21,6 +21,7 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/File.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/GZipFile.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
 
 	${CMAKE_SOURCE_DIR}/src/WorldStorage/FastNBT.cpp
 	${CMAKE_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.cpp
@@ -51,6 +52,7 @@ set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/File.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/GZipFile.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
 
 	${CMAKE_SOURCE_DIR}/src/WorldStorage/FastNBT.h
 	${CMAKE_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.h
@@ -67,11 +69,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 
-if (MSVC)
-	# Add the MSVC-specific LeakFinder sources:
-	list (APPEND SHARED_SRCS ${CMAKE_SOURCE_DIR}/src/LeakFinder.cpp ${CMAKE_SOURCE_DIR}/src/StackWalker.cpp)
-	list (APPEND SHARED_HDRS ${CMAKE_SOURCE_DIR}/src/LeakFinder.h   ${CMAKE_SOURCE_DIR}/src/StackWalker.h)
-endif()
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})

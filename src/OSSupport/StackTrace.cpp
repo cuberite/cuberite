@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "StackTrace.h"
 #ifdef _WIN32
-	#include "../StackWalker.h"
+	#include "WinStackWalker.h"
 #elif !defined(ANDROID)  // The Android NDK has no execinfo header
 	#ifdef __GLIBC__
 		#include <execinfo.h>
@@ -21,10 +21,8 @@
 void PrintStackTrace(void)
 {
 	#ifdef _WIN32
-		// Reuse the StackWalker from the LeakFinder project already bound to MCS
-		// Define a subclass of the StackWalker that outputs everything to stdout
-		class PrintingStackWalker :
-			public StackWalker
+		class PrintingStackWalker:
+			public WinStackWalker
 		{
 			virtual void OnOutput(LPCSTR szText) override
 			{

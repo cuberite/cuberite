@@ -71,27 +71,6 @@ bool cRoot::m_RunAsService = false;
 
 
 
-/** If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window
-_X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
-and we haven't had a memory leak for over a year anyway.
-Synchronize this with Server.cpp to enable the "dumpmem" console command. */
-// #define ENABLE_LEAK_FINDER
-
-
-
-
-
-#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	#pragma warning(push)
-	#pragma warning(disable:4100)
-	#include "LeakFinder.h"
-	#pragma warning(pop)
-#endif
-
-
-
-
-
 #ifndef _DEBUG
 static void NonCtrlHandler(int a_Signal)
 {
@@ -470,10 +449,6 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 
 int main(int argc, char ** argv)
 {
-	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-		InitLeakFinder();
-	#endif
-
 	// Magic code to produce dump-files on Windows if the server crashes:
 	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)  // 32-bit Windows app compiled in MSVC
 		HINSTANCE hDbgHelp = LoadLibrary(L"DBGHELP.DLL");
@@ -571,10 +546,5 @@ int main(int argc, char ** argv)
 			UniversalMain(ParseArguments(argc, argv));
 		}
 	}
-
-	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-		DeinitLeakFinder();
-	#endif
-
 	return EXIT_SUCCESS;
 }
