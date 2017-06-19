@@ -26,34 +26,47 @@ public:
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		int AlternateY  = a_BlockY;
 
-		if (Meta & 0x8)
+		if (IsMetaTopPart(Meta))
 		{
-			--AlternateY;
+			int BottomY = a_BlockY - 1;
+			// This is the top half, drop from the bottom half as it has the flower type meta
+			if (cChunkDef::IsValidHeight(BottomY) && a_ChunkInterface.GetBlock(a_BlockX, BottomY, a_BlockZ) == E_BLOCK_BIG_FLOWER)
+			{
+				super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, BottomY, a_BlockZ, a_CanDrop);
+				a_ChunkInterface.FastSetBlock(a_BlockX, BottomY, a_BlockZ, E_BLOCK_AIR, 0);
+			}
 		}
 		else
 		{
-			++AlternateY;
-		}
-		// also destroy the other block if it has a valid height and is a big flower
-		if (cChunkDef::IsValidHeight(AlternateY) && a_ChunkInterface.GetBlock(a_BlockX, AlternateY, a_BlockZ) == E_BLOCK_BIG_FLOWER)
-		{
+			int TopY = a_BlockY + 1;
+			// This is the bottom half, it has the flower type meta
 			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop);
-			a_ChunkInterface.FastSetBlock(a_BlockX, AlternateY, a_BlockZ, E_BLOCK_AIR, 0);
+			if (cChunkDef::IsValidHeight(TopY) && a_ChunkInterface.GetBlock(a_BlockX, TopY, a_BlockZ) == E_BLOCK_BIG_FLOWER)
+			{
+				a_ChunkInterface.FastSetBlock(a_BlockX, TopY, a_BlockZ, E_BLOCK_AIR, 0);
+			}
 		}
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		NIBBLETYPE Meta = a_BlockMeta & 0x7;
-		if (Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
+		if (IsMetaTopPart(a_BlockMeta))
 		{
-			a_Pickups.push_back(cItem(E_ITEM_SEEDS));
+			return;  // No way to tell flower type for top block
 		}
-		else if (Meta != E_META_BIG_FLOWER_LARGE_FERN)
+
+		if (a_BlockMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
-			a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, Meta));
+			// Double tall grass has 1 in 24 chance to drop seeds
+			if (GetRandomProvider().RandBool(1.0 / 24.0))
+			{
+				a_Pickups.push_back(cItem(E_ITEM_SEEDS));
+			}
+		}
+		else if (a_BlockMeta != E_META_BIG_FLOWER_LARGE_FERN)
+		{
+			a_Pickups.push_back(cItem(E_BLOCK_BIG_FLOWER, 1, a_BlockMeta));
 		}
 	}
 
