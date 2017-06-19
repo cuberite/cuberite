@@ -9,6 +9,7 @@
 #include "FastNBT.h"
 #include "EnchantmentSerializer.h"
 #include "zlib/zlib.h"
+#include "json/json.h"
 #include "../World.h"
 #include "../BlockID.h"
 #include "../Item.h"
@@ -858,6 +859,36 @@ void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a
 
 
 
+AString cWSSAnvil::DecodeSignLine(const AString & a_Line)
+{
+	if (a_Line.empty())
+	{
+		return AString();
+	}
+	if (a_Line[0] != '{')
+	{
+		return a_Line;
+	}
+
+	// Try to parse the JSON:
+	Json::Value root;
+	Json::Reader reader;
+	if (!reader.parse(a_Line, root, false) || !root.isObject())
+	{
+		return a_Line;
+	}
+	const auto & txt = root["text"];
+	if (txt.isString())
+	{
+		return txt.asString();
+	}
+	return a_Line;
+}
+
+
+
+
+
 bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the given tag is a compound:
@@ -1413,25 +1444,25 @@ cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Text1");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(0, a_NBT.GetString(currentLine));
+		Sign->SetLine(0, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text2");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(1, a_NBT.GetString(currentLine));
+		Sign->SetLine(1, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text3");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(2, a_NBT.GetString(currentLine));
+		Sign->SetLine(2, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text4");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(3, a_NBT.GetString(currentLine));
+		Sign->SetLine(3, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	return Sign.release();
