@@ -153,6 +153,8 @@ protected:
 	To be compared in perf benchmarks. */
 	void PrepareBlockLight2(void);
 
+	void PrepareBlockLight3();
+
 	/** Calculates light in the light array specified, using stored seeds */
 	void CalcLight(NIBBLETYPE * a_Light);
 
