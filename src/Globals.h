@@ -60,6 +60,24 @@
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
 
+	#ifdef _DEBUG
+		// Override the "new" operator to include file and line specification for debugging memory leaks
+		// Ref.: https://social.msdn.microsoft.com/Forums/en-US/ebc7dd7a-f3c6-49f1-8a60-e381052f21b6/debugging-memory-leaks?forum=vcgeneral#53f0cc89-62fe-45e8-bbf0-56b89f2a1901
+		// This causes MSVC Debug runs to produce a report upon program exit, that contains memory-leaks
+		// together with the file:line information about where the memory was allocated.
+		// Note that this doesn't work with placement-new, which needs to temporarily #undef the macro
+		// (See AllocationPool.h for an example).
+		#ifdef _DEBUG
+			#define _CRTDBG_MAP_ALLOC
+			#include <stdlib.h>
+			#include <crtdbg.h>
+			#define DEBUG_CLIENTBLOCK   new(_CLIENT_BLOCK, __FILE__, __LINE__)
+			#define new DEBUG_CLIENTBLOCK
+			// For some reason this works magically - each "new X" gets replaced as "new(_CLIENT_BLOCK, "file", line) X"
+			// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
+		#endif
+	#endif
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
