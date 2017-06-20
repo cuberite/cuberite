@@ -35,15 +35,10 @@ public:
 		if ((Block == E_BLOCK_LEAVES) || (Block == E_BLOCK_NEW_LEAVES))
 		{
 			cItems Drops;
-			cBlockHandler * Handler = cBlockInfo::GetHandler(Block);
-
-			Handler->ConvertToPickups(Drops, BlockMeta);
 			Drops.Add(Block, 1, BlockMeta & 3);
 			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
-			a_Player->UseEquippedItem();
 			return true;
 		}
 
@@ -68,7 +63,7 @@ public:
 
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
-		return 0;
+		return 1;
 	}
 
 
@@ -79,17 +74,6 @@ public:
 		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
 
 		super::OnBlockDestroyed(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ);
-		switch (Block)
-		{
-			case E_BLOCK_COBWEB:
-			case E_BLOCK_DEAD_BUSH:
-			case E_BLOCK_TRIPWIRE:
-			case E_BLOCK_VINES:
-			case E_BLOCK_WOOL:
-			{
-				a_Player->UseEquippedItem();
-			}
-		}
 	}
 
 
@@ -100,16 +84,13 @@ public:
 		{
 			return 15.0f;
 		}
+		else if (IsBlocksWool(a_Block))
+		{
+			return 5.0f;
+		}
 		else
 		{
-			if (IsBlocksWool(a_Block))
-			{
-				return 5.0f;
-			}
-			else
-			{
-				return super::GetBlockBreakingStrength(a_Block);
-			}
+			return super::GetBlockBreakingStrength(a_Block);
 		}
 	}
 

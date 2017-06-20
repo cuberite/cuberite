@@ -73,9 +73,15 @@ public:
 	{
 		switch (a_BlockType)
 		{
-			case E_BLOCK_GLASS:
-			case E_BLOCK_STAINED_GLASS:
 			case E_BLOCK_CHEST:
+			case E_BLOCK_ENDER_CHEST:
+			case E_BLOCK_GLASS:
+			case E_BLOCK_PISTON:
+			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_STAINED_GLASS:
+			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_TRAPPED_CHEST:
 			{
 				// You can't attach a vine to this solid blocks.
