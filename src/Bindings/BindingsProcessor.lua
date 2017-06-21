@@ -951,8 +951,9 @@ end
 --- Installs a hook that is called by ToLua++ for each instantiation of classEnumerate
 -- The hook is used to fix DoxyComments in enums
 local function installEnumHook()
+	--Hook for normal enums
 	local oldEnumerate = Enumerate
-	Enumerate = function (a_Name, a_Body, a_VarName)
+	Enumerate = function (a_Name, a_Body, a_VarName, a_Type)
 		-- We need to remove the DoxyComment items from the enum
 		-- otherwise ToLua++ parser would make an enum value out of them
 		a_Body = string.gsub(a_Body, ",[%s\n]*}", "\n}") -- eliminate last ','
@@ -977,7 +978,39 @@ local function installEnumHook()
 				enumValues[numEnumValues] = txt
 			end
 		end
-		local res = oldEnumerate(a_Name, "{" .. table.concat(enumValues, ",") .. "}", a_VarName)
+		local res = oldEnumerate(a_Name, "{" .. table.concat(enumValues, ",") .. "}", a_VarName, a_Type)
+		res.DoxyComments = doxyComments
+		return res
+	end
+
+	--Hook for scoped enums
+	local oldScopedEnum = ScopedEnum
+	ScopedEnum = function (a_Name, a_Body, a_VarName, a_Type)
+		-- We need to remove the DoxyComment items from the enum class
+		-- otherwise ToLua++ parser would make an enum value out of them
+		a_Body = string.gsub(a_Body, ",[%s\n]*}", "\n}") -- eliminate last ','
+		local t = split(strsub(a_Body, 2, -2), ',') -- eliminate braces
+		local doxyComments = {}
+		local enumValues = {}
+		local numEnumValues = 0
+		for _, txt in ipairs(t) do
+			txt = txt:gsub("(%b\17\18)",
+				function (a_CommentID)
+					doxyComments[numEnumValues + 1] = g_ForwardDoxyComments[tonumber(a_CommentID:sub(2, -2))]
+					return ""
+				end
+			):gsub("(%b\19\20)",
+				function (a_CommentID)
+					doxyComments[numEnumValues] = g_BackwardDoxyComments[tonumber(a_CommentID:sub(2, -2))]
+					return ""
+				end
+			)
+			if (txt ~= "") then
+				numEnumValues = numEnumValues + 1
+				enumValues[numEnumValues] = txt
+			end
+		end
+		local res = oldScopedEnum(a_Name, "{" .. table.concat(enumValues, ",") .. "}", a_VarName, a_Type)
 		res.DoxyComments = doxyComments
 		return res
 	end

@@ -12252,6 +12252,249 @@ end
 			},  -- ConstantGroups
 		},  -- cWindow
 
+		EffectID =
+		{
+			Desc = [[
+				An enumeration of sound and particle effects which can be used with
+				{{cWorld#BroadcastSoundParticleEffect|BroadcastSoundParticleEffect}}.
+			]],
+			Constants =
+			{
+				SFX_RANDOM_DISPENSER_DISPENSE =
+				{
+					Notes = "Sound of droper/dispenser releasing an item",
+				},
+				SFX_RANDOM_DISPENSER_DISPENSE_FAIL =
+				{
+					Notes = "Sound of a droper/dispenser activated without items",
+				},
+				SFX_RANDOM_DISPENSER_SHOOT =
+				{
+					Notes = "Sound of a dispenser shooting",
+				},
+				SFX_RANDOM_ENDER_EYE_LAUNCH =
+				{
+					Notes = "Sound of an ender eye launch"
+				},
+				SFX_RANDOM_FIREWORK_SHOT =
+				{
+					Notes = "Sound of a firework shot",
+				},
+				SFX_RANDOM_IRON_DOOR_OPEN =
+				{
+					Notes = "Sound of an iron door opening",
+				},
+				SFX_RANDOM_WOODEN_DOOR_OPEN =
+				{
+					Notes = "Sound of a wooden door opening"
+				},
+				SFX_RANDOM_WOODEN_TRAPDOOR_OPEN =
+				{
+					Notes = "Sound of a wooden trapdoor opening"
+				},
+				SFX_RANDOM_FENCE_GATE_OPEN =
+				{
+					Notes = "Sound of a fence gate opening",
+				},
+				SFX_RANDOM_FIRE_EXTINGUISH =
+				{
+					Notes = "Sound of a fire extinguishing",
+				},
+				SFX_RANDOM_PLAY_MUSIC_DISC =
+				{
+					Notes = "Starts playing a music disc. Needs an accompanting music disc ID",
+				},
+				SFX_RANDOM_IRON_DOOR_CLOSE =
+				{
+					Notes = "Sound of an iron door closing",
+				},
+				SFX_RANDOM_WOODEN_DOOR_CLOSE =
+				{
+					Notes = "Sound of a wooden door closing",
+				},
+				SFX_RANDOM_WOODEN_TRAPDOOR_CLOSE =
+				{
+					Notes = "Sound of a trapdoor closing",
+				},
+				SFX_RANDOM_FENCE_GATE_CLOSE =
+				{
+					Notes = "Sound of a fence gate closing",
+				},
+				SFX_MOB_GHAST_WARN =
+				{
+					Notes = "Sound of a ghast warning cry",
+				},
+				SFX_MOB_GHAST_SHOOT =
+				{
+					Notes = "Sound of a ghast shooting",
+				},
+				SFX_MOB_ENDERDRAGON_SHOOT =
+				{
+					Notes = "Sound of the enderdragon shooting",
+				},
+				SFX_MOB_BLAZE_SHOOT =
+				{
+					Notes = "Sound of a blaze shooting",
+				},
+				SFX_MOB_ZOMBIE_WOOD =
+				{
+					Notes = "Sound of a zombie attacking a wooden door",
+				},
+				SFX_MOB_ZOMBIE_METAL =
+				{
+					Notes = "Sound of a zombie attacking a metal door",
+				},
+				SFX_MOB_ZOMBIE_WOOD_BREAK =
+				{
+					Notes = "Sound of a zombie breaking a wooden door",
+				},
+				SFX_MOB_WITHER_BREAK_BLOCK =
+				{
+					Notes = "Sound of a wither breaking blocks",
+				},
+				SFX_MOB_WITHER_SPAWN =
+				{
+					Notes = "Sound of a wither spawning",
+				},
+				SFX_MOB_WITHER_SHOOT =
+				{
+					Notes = "Sound of a wither shooting",
+				},
+				SFX_MOB_BAT_TAKEOFF =
+				{
+					Notes = "Sound of a bat taking off",
+				},
+				SFX_MOB_ZOMBIE_INFECT =
+				{
+					Notes = "Sound of a zombie infecting a villager",
+				},
+				SFX_MOB_ZOMBIE_UNFECT =
+				{
+					Notes = "Sound of a zombie villager converting to villager",
+				},
+				SFX_MOB_ENDERDRAGON_DEATH =
+				{
+					Notes = "Sound of the dragon releasing dragon breath",
+				},
+				SFX_RANDOM_ANVIL_BREAK =
+				{
+					Notes = "Sound of an anvil breaking",
+				},
+				SFX_RANDOM_ANVIL_USE =
+				{
+					Notes = "Sound of using an anvil",
+				},
+				SFX_RANDOM_ANVIL_LAND =
+				{
+					Notes = "Sound of a falling anvil landing",
+				},
+				SFX_RANDOM_PORTAL_TRAVEL =
+				{
+					Notes = "Sound of travelling through a portal",
+				},
+				SFX_RANDOM_CHORUS_FLOWER_GROW =
+				{
+					Notes = "Sound of a growing chorus flower",
+				},
+				SFX_RANDOM_CHORUS_FLOWER_DEATH =
+				{
+					Notes = "Sound of a dieing chorus flower",
+				},
+				SFX_RANDOM_BREWING_STAND_BREW =
+				{
+					Notes = "Sound of an active brewing stand",
+				},
+				SFX_RANDOM_IRON_TRAPDOOR_OPEN =
+				{
+					Notes = "Sound of an iron trapdoor opening",
+				},
+				SFX_RANDOM_IRON_TRAPDOOR_CLOSE =
+				{
+					Notes = "Sound of an iron trapdoor closing",
+				},
+				PARTICLE_SMOKE =
+				{
+					Notes = "Spawns 10 smoke particles, e.g. from a fire.  Needs a {{SmokeDirection|SmokeDirection}}",
+				},
+				PARTICLE_BLOCK_BREAK =
+				{
+					Notes = "Block break particle and sound.  Needs a BlockID",
+				},
+				PARTICLE_SPLASH_POTION =
+				{
+					Notes = "Splash potion particles and glass break sound.  Needs a PotionID",
+				},
+				PARTICLE_EYE_OF_ENDER =
+				{
+					Notes = "Eye of ender entity break particles and sound",
+				},
+				PARTICLE_MOBSPAWN =
+				{
+					Notes = "Mob spawn particle effect: smoke and flames",
+				},
+				PARTICLE_HAPPY_VILLAGER =
+				{
+					Notes = "Happy villager/bonemeal particles.  Number of particles may be given or 0 for default of 15",
+				},
+				PARTICLE_DRAGON_BREATH =
+				{
+					Notes = "Dragon breath particle effect",
+				},
+				PARTICLE_END_GATEWAY_SPAWN =
+				{
+					Notes = "End gateway spawn particle effect",
+				},
+				PARTICLE_ENDERDRAGON_GROWL =
+				{
+					Notes = "Ender dragon growl particle effect",
+				},
+			},
+		},
+		SmokeDirection =
+		{
+			Desc = [[
+				An enumeration of the direction spawned smoke will drift in as it floats up.
+			]],
+			Constants =
+			{
+				SOUTH_EAST =
+				{
+					Notes = "Smoke drifts south-east",
+				},
+				SOUTH =
+				{
+					Notes = "Smoke drifts south",
+				},
+				SOUTH_WEST =
+				{
+					Notes = "Smoke drifts south-west",
+				},
+				EAST =
+				{
+					Notes = "Smoke drifts east",
+				},
+				CENTRE =
+				{
+					Notes = "Smoke does not drift",
+				},
+				WEST =
+				{
+					Notes = "Smoke drifts west",
+				},
+				NORTH_EAST =
+				{
+					Notes = "Smoke drifts north-east",
+				},
+				NORTH =
+				{
+					Notes = "Smoke drifts north",
+				},
+				NORTH_WEST =
+				{
+					Notes = "Smoke drifts west",
+				},
+			}
+		},
 		Globals =
 		{
 			Desc = [[
