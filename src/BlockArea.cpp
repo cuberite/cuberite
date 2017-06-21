@@ -633,7 +633,7 @@ void cBlockArea::CopyTo(cBlockArea & a_Into) const
 		ClearBlockEntities(*(a_Into.m_BlockEntities));
 		for (const auto & keyPair: *m_BlockEntities)
 		{
-			auto & pos = keyPair.second->GetPos();
+			const auto & pos = keyPair.second->GetPos();
 			a_Into.m_BlockEntities->insert({keyPair.first, keyPair.second->Clone(pos.x, pos.y, pos.z)});
 		}
 	}
@@ -1708,7 +1708,7 @@ void cBlockArea::SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a
 		}
 		if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 		{
-			auto meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
+			NIBBLETYPE meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
 			m_BlockEntities->insert({idx, cBlockEntity::CreateByBlockType(a_BlockType, meta, a_RelX, a_RelY, a_RelZ)});
 		}
 	}
@@ -2623,12 +2623,14 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			break;
 		}  // case msMask
 
+		#ifndef __clang  // Clang complains about a default case in a switch with all cases covered
 		default:
 		{
 			LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
 			ASSERT(!"Unknown block area merge strategy");
 			return;
 		}
+		#endif
 	}  // switch (a_Strategy)
 
 	if (HasBlockEntities())
@@ -2705,7 +2707,7 @@ void cBlockArea::MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cB
 			}
 		}
 		// No BE found in a_Src, insert a new empty one:
-		auto meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
+		NIBBLETYPE meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
 		m_BlockEntities->insert({idx, cBlockEntity::CreateByBlockType(type, meta, x, y, z)});
 	}  // for x, z, y
 }
@@ -2741,7 +2743,7 @@ void cBlockArea::RescanBlockEntities(void)
 			continue;
 		}
 		// Create a new BE for this block:
-		auto meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
+		NIBBLETYPE meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
 		m_BlockEntities->insert({idx, cBlockEntity::CreateByBlockType(type, meta, x, y, z)});
 	}  // for x, z, y
 }

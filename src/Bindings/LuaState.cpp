@@ -1776,7 +1776,7 @@ bool cLuaState::CheckParamSelf(const char * a_SelfClassName)
 	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
 	AString ErrMsg = Printf(
 		"Error in function '%s'. The 'self' parameter is not of the expected type, \"instance of %s\". Make sure you're using the correct calling convention (obj:fn() instead of obj.fn()).",
-		(entry.name != nullptr) ? entry.name : "?", a_SelfClassName
+		(entry.name != nullptr) ? entry.name : "<unknown>", a_SelfClassName
 	);
 	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 	return false;
