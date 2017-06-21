@@ -95,7 +95,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastPlacedSign(0, -1, 0),
 	m_ProtocolVersion(0)
 {
-	m_Protocol = new cProtocolRecognizer(this);
+	m_Protocol = cpp14::make_unique<cProtocolRecognizer>(this);
 
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
@@ -143,8 +143,7 @@ cClientHandle::~cClientHandle()
 		SendDisconnect("Server shut down? Kthnxbai");
 	}
 
-	delete m_Protocol;
-	m_Protocol = nullptr;
+	m_Protocol.reset();
 
 	LOGD("ClientHandle at %p deleted", static_cast<void *>(this));
 }
@@ -171,12 +170,13 @@ void cClientHandle::Destroy(void)
 	}
 
 	LOGD("%s: destroying client %p, \"%s\" @ %s", __FUNCTION__, static_cast<void *>(this), m_Username.c_str(), m_IPString.c_str());
+	auto player = m_Player;
+	m_Self.reset();
 	{
 		cCSLock lock(m_CSState);
-		m_State = csDestroyed;
+		m_State = csDestroyed;  // Tick thread is allowed to call destructor async at any time after this
 	}
 
-	auto player = m_Player;
 	if (player != nullptr)
 	{
 		auto world = player->GetWorld();
