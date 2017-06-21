@@ -1,15 +1,11 @@
 #pragma once
 
-// The following hackery is to allow typed C++ enum for C++ code, yet have ToLua process the values.
-// ToLua doesn't understand typed enums, so we use preprocessor to hide it from ToLua.
 
-
-static const BLOCKTYPE
-#if 0
 // tolua_begin
-enum BLOCKTYPE
+
+
+enum ENUM_BLOCK_ID : BLOCKTYPE
 {
-#endif
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
 	E_BLOCK_GRASS = 2,
@@ -265,20 +261,14 @@ enum BLOCKTYPE
 	E_BLOCK_RED_ROSE = E_BLOCK_FLOWER,
 	E_BLOCK_WOODEN_DOOR = E_BLOCK_OAK_DOOR,
 	E_BLOCK_FENCE_GATE = E_BLOCK_OAK_FENCE_GATE,
-	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS
-
-#if 0
-}
-#endif
-	;
-// tolua_end
+	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS,
+};
 
 
 
 
 
-// tolua_begin
-enum ENUM_ITEM_ID
+enum ENUM_ITEM_ID : short
 {
 	E_ITEM_EMPTY = -1,
 
@@ -514,10 +504,10 @@ enum ENUM_ITEM_ID
 
 
 
-enum
+enum ENUM_BLOCK_META : NIBBLETYPE
 {
-	// Please keep this list alpha-sorted by the blocktype / itemtype part
-	// then number-sorted for the same block / item
+	// Please keep this list alpha-sorted by the blocktype part
+	// then number-sorted for the same block
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Block metas:
@@ -912,6 +902,16 @@ enum
 	E_META_WOOL_GREEN      = 13,
 	E_META_WOOL_RED        = 14,
 	E_META_WOOL_BLACK      = 15,
+};
+
+
+
+
+
+enum ENUM_ITEM_META : short
+{
+	// Please keep this list alpha-sorted by the itemtype part
+	// then number-sorted for the same item
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Item metas:
