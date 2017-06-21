@@ -9,6 +9,7 @@
 #include "FastNBT.h"
 #include "EnchantmentSerializer.h"
 #include "zlib/zlib.h"
+#include "json/json.h"
 #include "../World.h"
 #include "../BlockID.h"
 #include "../Item.h"
@@ -858,7 +859,37 @@ void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a
 
 
 
-bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const char * a_ExpectedType, int a_BlockX, int a_BlockY, int a_BlockZ)
+AString cWSSAnvil::DecodeSignLine(const AString & a_Line)
+{
+	if (a_Line.empty())
+	{
+		return AString();
+	}
+	if (a_Line[0] != '{')
+	{
+		return a_Line;
+	}
+
+	// Try to parse the JSON:
+	Json::Value root;
+	Json::Reader reader;
+	if (!reader.parse(a_Line, root, false) || !root.isObject())
+	{
+		return a_Line;
+	}
+	const auto & txt = root["text"];
+	if (txt.isString())
+	{
+		return txt.asString();
+	}
+	return a_Line;
+}
+
+
+
+
+
+bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the given tag is a compound:
 	if (a_NBT.GetType(a_TagIdx) != TAG_Compound)
@@ -874,12 +905,24 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 	}
 
 	// Compare the value:
-	if (strncmp(a_NBT.GetData(TagID), a_ExpectedType, static_cast<size_t>(a_NBT.GetDataLength(TagID))) == 0)
+	for (const auto & et: a_ExpectedTypes)
 	{
-		return true;
+		if (strncmp(a_NBT.GetData(TagID), et.c_str(), static_cast<size_t>(a_NBT.GetDataLength(TagID))) == 0)
+		{
+			return true;
+		}
 	}
-	LOGWARNING("Block entity type mismatch: exp \"%s\", got \"%s\". The block entity at {%d, %d, %d} will lose all its properties.",
-		a_ExpectedType,
+
+	// Expectation not met, output an error into the log:
+	AString expectedTypes;
+	for (const auto & et : a_ExpectedTypes)
+	{
+		expectedTypes.append(", \"");
+		expectedTypes.append(et);
+		expectedTypes.push_back('\"');
+	}
+	LOGWARNING("Block entity type mismatch: exp %s, got \"%s\". The block entity at {%d, %d, %d} will lose all its properties.",
+		expectedTypes.c_str() + 2,  // Skip the first ", " that is extra in the string
 		AString(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID))).c_str(),
 		a_BlockX, a_BlockY, a_BlockZ
 	);
@@ -893,7 +936,8 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Beacon", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({"Beacon", "minecraft:beacon"});
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -935,7 +979,8 @@ cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagI
 cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Brewingstand", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Brewingstand", "minecraft:brewing_stand" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -993,21 +1038,9 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 {
 	// Check if the data has a proper type:
 	// Note that older Cuberite code used "TrappedChest" for trapped chests; new code mimics vanilla and uses "Chest" throughout, but we allow migration here:
-	if (a_NBT.GetType(a_TagIdx) != TAG_Compound)
+	static const AStringVector expectedTypes({ "Chest", "TrappedChest", "minecraft:chest" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
-		return nullptr;
-	}
-	int TagID = a_NBT.FindChildByName(a_TagIdx, "id");
-	if ((TagID < 0) || (a_NBT.GetType(TagID) != TAG_String))
-	{
-		return nullptr;
-	}
-	auto BlockEntityType = a_NBT.GetString(TagID);
-	if ((BlockEntityType != "Chest") && (BlockEntityType != "TrappedChest"))
-	{
-		LOGWARNING("Block entity type mismatch at {%d, %d, %d}: got \"%s\", expected \"Chest\". Chest contents will be lost.",
-			a_BlockX, a_BlockY, a_BlockZ, BlockEntityType.c_str()
-		);
 		return nullptr;
 	}
 
@@ -1028,7 +1061,8 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Control", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Control", "minecraft:command_block" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1065,7 +1099,8 @@ cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int 
 cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Trap", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Trap", "minecraft:dispenser" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1087,7 +1122,8 @@ cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_T
 cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Dropper", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Dropper", "minecraft:dropper" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1109,7 +1145,8 @@ cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_Tag
 cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "FlowerPot", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "FlowerPot", "minecraft:flower_pot" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1147,7 +1184,8 @@ cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_T
 cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Furnace", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Furnace", "minecraft:furnace" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1203,10 +1241,56 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 
 
 
+cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({ "Hopper", "minecraft:hopper" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	{
+		return nullptr;
+	}
+
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return nullptr;  // Make it an empty hopper - the chunk loader will provide an empty cHopperEntity for this
+	}
+	auto Hopper = cpp14::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
+	return Hopper.release();
+}
+
+
+
+
+
+cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({ "RecordPlayer", "minecraft:jukebox" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	{
+		return nullptr;
+	}
+
+	auto Jukebox = cpp14::make_unique<cJukeboxEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
+	if (Record >= 0)
+	{
+		Jukebox->SetRecord(a_NBT.GetInt(Record));
+	}
+	return Jukebox.release();
+}
+
+
+
+
+
 cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "MobSpawner", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "MobSpawner", "minecraft:mob_spawner" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1251,53 +1335,11 @@ cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_
 
 
 
-cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Hopper", a_BlockX, a_BlockY, a_BlockZ))
-	{
-		return nullptr;
-	}
-
-	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
-	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
-	{
-		return nullptr;  // Make it an empty hopper - the chunk loader will provide an empty cHopperEntity for this
-	}
-	auto Hopper = cpp14::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
-	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
-	return Hopper.release();
-}
-
-
-
-
-
-cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "RecordPlayer", a_BlockX, a_BlockY, a_BlockZ))
-	{
-		return nullptr;
-	}
-
-	auto Jukebox = cpp14::make_unique<cJukeboxEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
-	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
-	if (Record >= 0)
-	{
-		Jukebox->SetRecord(a_NBT.GetInt(Record));
-	}
-	return Jukebox.release();
-}
-
-
-
-
-
 cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Skull", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Skull", "minecraft:skull" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1369,7 +1411,8 @@ cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_Tag
 cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Music", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Music", "minecraft:noteblock" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1390,7 +1433,8 @@ cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_T
 cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Sign", a_BlockX, a_BlockY, a_BlockZ))
+	static const AStringVector expectedTypes({ "Sign", "minecraft:sign" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
 	{
 		return nullptr;
 	}
@@ -1400,25 +1444,25 @@ cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Text1");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(0, a_NBT.GetString(currentLine));
+		Sign->SetLine(0, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text2");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(1, a_NBT.GetString(currentLine));
+		Sign->SetLine(1, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text3");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(2, a_NBT.GetString(currentLine));
+		Sign->SetLine(2, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text4");
 	if (currentLine >= 0)
 	{
-		Sign->SetLine(3, a_NBT.GetString(currentLine));
+		Sign->SetLine(3, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
 	return Sign.release();
