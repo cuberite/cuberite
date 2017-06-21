@@ -788,6 +788,10 @@ public:
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);
 
+	/** Returns true if the first parameter is an instance of the expected class name.
+	Returns false and logs a special warning ("wrong calling convention") if not. */
+	bool CheckParamSelf(const char * a_SelfClassName);
+
 	bool IsParamUserType(int a_Param, AString a_UserType);
 
 	bool IsParamNumber(int a_Param);

@@ -16,6 +16,7 @@ SET (SRCS
 	LuaUDPEndpoint.cpp
 	LuaWindow.cpp
 	ManualBindings.cpp
+	ManualBindings_BlockArea.cpp
 	ManualBindings_Network.cpp
 	ManualBindings_RankManager.cpp
 	ManualBindings_World.cpp

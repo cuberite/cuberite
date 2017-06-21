@@ -408,7 +408,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 {
 	if ((a_DataTypes & (cBlockArea::baTypes | cBlockArea::baMetas)) != (cBlockArea::baTypes | cBlockArea::baMetas))
 	{
-		LOGWARNING("cChunk::WriteBlockArea(): unsupported datatype request, can write only types + metas (0x%x), requested 0x%x. Ignoring.",
+		LOGWARNING("cChunk::WriteBlockArea(): unsupported datatype request, can write only types + metas together (0x%x), requested 0x%x. Ignoring.",
 			(cBlockArea::baTypes | cBlockArea::baMetas), a_DataTypes & (cBlockArea::baTypes | cBlockArea::baMetas)
 		);
 		return;
@@ -420,16 +420,16 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	int BlockEndX   = std::min(a_MinBlockX + a_Area.GetSizeX(), (m_PosX + 1) * cChunkDef::Width);
 	int BlockStartZ = std::max(a_MinBlockZ, m_PosZ * cChunkDef::Width);
 	int BlockEndZ   = std::min(a_MinBlockZ + a_Area.GetSizeZ(), (m_PosZ + 1) * cChunkDef::Width);
-	int SizeX = BlockEndX - BlockStartX;
+	int SizeX = BlockEndX - BlockStartX;  // Size of the union
 	int SizeZ = BlockEndZ - BlockStartZ;
-	int OffX = BlockStartX - m_PosX * cChunkDef::Width;
-	int OffZ = BlockStartZ - m_PosZ * cChunkDef::Width;
-	int BaseX = BlockStartX - a_MinBlockX;
-	int BaseZ = BlockStartZ - a_MinBlockZ;
 	int SizeY = std::min(a_Area.GetSizeY(), cChunkDef::Height - a_MinBlockY);
+	int OffX = BlockStartX - m_PosX * cChunkDef::Width;  // Offset within the chunk where the union starts
+	int OffZ = BlockStartZ - m_PosZ * cChunkDef::Width;
+	int BaseX = BlockStartX - a_MinBlockX;  // Offset within the area where the union starts
+	int BaseZ = BlockStartZ - a_MinBlockZ;
 
-	// TODO: Improve this by not calling FastSetBlock() and doing the processing here
-	// so that the heightmap is touched only once for each column.
+	// Copy blocktype and blockmeta:
+	// TODO: Right now each changed block is transmitted to all clients as a separate packet. Optimize this for larger areas.
 	BLOCKTYPE *  AreaBlockTypes = a_Area.GetBlockTypes();
 	NIBBLETYPE * AreaBlockMetas = a_Area.GetBlockMetas();
 	for (int y = 0; y < SizeY; y++)
@@ -451,6 +451,50 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			}  // for x
 		}  // for z
 	}  // for y
+
+	// Erase all affected block entities:
+	cCuboid affectedArea(OffX, a_MinBlockY, OffZ, OffX + SizeX - 1, a_MinBlockY + SizeY - 1, OffZ + SizeZ - 1);
+	for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
+	{
+		if (affectedArea.IsInside(itr->second->GetPos()))
+		{
+			itr = m_BlockEntities.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}
+
+	// Clone block entities from a_Area into this chunk:
+	if ((a_DataTypes & cBlockArea::baBlockEntities) != 0)
+	{
+		for (const auto & keyPair: a_Area.GetBlockEntities())
+		{
+			auto & be = keyPair.second;
+			auto posX = be->GetPosX() + a_MinBlockX;
+			auto posY = be->GetPosY() + a_MinBlockY;
+			auto posZ = be->GetPosZ() + a_MinBlockZ;
+			if (
+				(posX < m_PosX * cChunkDef::Width) || (posX >= m_PosX * cChunkDef::Width + cChunkDef::Width) ||
+				(posZ < m_PosZ * cChunkDef::Width) || (posZ >= m_PosZ * cChunkDef::Width + cChunkDef::Width)
+			)
+			{
+				continue;
+			}
+			// This block entity is inside the chunk, clone it (and remove any that is there currently):
+			auto idx = MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width);
+			auto itr = m_BlockEntities.find(idx);
+			if (itr != m_BlockEntities.end())
+			{
+				m_BlockEntities.erase(itr);
+			}
+			auto clone = be->Clone(posX, posY, posZ);
+			clone->SetWorld(m_World);
+			AddBlockEntityClean(clone);
+			BroadcastBlockEntity(posX, posY, posZ);
+		}
+	}
 }
 
 

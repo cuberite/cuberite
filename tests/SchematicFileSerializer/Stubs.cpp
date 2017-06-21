@@ -7,6 +7,7 @@
 #include "Globals.h"
 #include "BlockInfo.h"
 #include "Blocks/BlockHandler.h"
+#include "BlockEntities/BlockEntity.h"
 
 
 
@@ -187,6 +188,40 @@ bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a
 	return true;
 }
 
+
+
+
+
+bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
+{
+	return false;
+}
+
+
+
+
+
+void cBlockEntity::SetPos(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+}
+
+
+
+
+
+cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	return nullptr;
+}
+
+
+
+
+
+cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
+{
+	return nullptr;
+}
 
 
 
