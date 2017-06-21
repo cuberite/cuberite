@@ -23,7 +23,7 @@ cNetworkSingleton::cNetworkSingleton() :
 
 
 
-cNetworkSingleton::~cNetworkSingleton()
+cNetworkSingleton::~cNetworkSingleton() CAN_THROW
 {
 	// Check that Terminate has been called already:
 	ASSERT(m_HasTerminated);

@@ -52,9 +52,9 @@
 	#define NORETURN __declspec(noreturn)
 	#if (_MSC_VER < 1910)
 		// MSVC 2013 (and possibly 2015?) have no idea about "noexcept(false)"
-		#define NO_THROW throw(...)
+		#define CAN_THROW throw(...)
 	#else
-		#define NO_THROW noexcept(false)
+		#define CAN_THROW noexcept(false)
 	#endif
 
 	// Use non-standard defines in <cmath>
@@ -118,7 +118,7 @@
 	#endif
 
 	#define NORETURN __attribute((__noreturn__))
-	#define NO_THROW noexcept(false)
+	#define CAN_THROW noexcept(false)
 
 #else
 
