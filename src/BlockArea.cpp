@@ -2623,7 +2623,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			break;
 		}  // case msMask
 
-		#ifndef __clang  // Clang complains about a default case in a switch with all cases covered
+		#ifndef __clang__  // Clang complains about a default case in a switch with all cases covered
 		default:
 		{
 			LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
