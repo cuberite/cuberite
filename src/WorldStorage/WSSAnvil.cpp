@@ -1474,228 +1474,143 @@ cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx
 
 void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, size_t a_IDTagLength)
 {
-	if (strncmp(a_IDTag, "Boat", a_IDTagLength) == 0)
+	typedef void (cWSSAnvil::*EntityLoaderFunc)(cEntityList &, const cParsedNBT &, int a_EntityTagIdx);
+	typedef std::map<AString, EntityLoaderFunc> EntityLoaderMap;
+	static const EntityLoaderMap EntityTypeToFunction
 	{
-		LoadBoatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "EnderCrystal", a_IDTagLength) == 0)
+		{ "Boat",                          &cWSSAnvil::LoadBoatFromNBT },
+		{ "minecraft:boat",                &cWSSAnvil::LoadBoatFromNBT },
+		{ "EnderCrystal",                  &cWSSAnvil::LoadEnderCrystalFromNBT },
+		{ "minecraft:ender_crystal",       &cWSSAnvil::LoadEnderCrystalFromNBT },
+		{ "FallingBlock",                  &cWSSAnvil::LoadFallingBlockFromNBT },
+		{ "minecraft:falling_block",       &cWSSAnvil::LoadFallingBlockFromNBT },
+		{ "Minecart",                      &cWSSAnvil::LoadOldMinecartFromNBT },
+		{ "MinecartChest",                 &cWSSAnvil::LoadMinecartCFromNBT },
+		{ "minecraft:chest_minecart",      &cWSSAnvil::LoadMinecartCFromNBT },
+		{ "MinecartFurnace",               &cWSSAnvil::LoadMinecartFFromNBT },
+		{ "minecraft:furnace_minecart",    &cWSSAnvil::LoadMinecartFFromNBT },
+		{ "MinecartTNT",                   &cWSSAnvil::LoadMinecartTFromNBT },
+		{ "minecraft:tnt_minecart",        &cWSSAnvil::LoadMinecartTFromNBT },
+		{ "MinecartHopper",                &cWSSAnvil::LoadMinecartHFromNBT },
+		{ "minecraft:hopper_minecart",     &cWSSAnvil::LoadMinecartHFromNBT },
+		{ "MinecartRideable",              &cWSSAnvil::LoadMinecartRFromNBT },
+		{ "minecraft:minecart",            &cWSSAnvil::LoadMinecartRFromNBT },
+		{ "Item",                          &cWSSAnvil::LoadPickupFromNBT },
+		{ "minecraft:item",                &cWSSAnvil::LoadPickupFromNBT },
+		{ "Painting",                      &cWSSAnvil::LoadPaintingFromNBT },
+		{ "minecraft:painting",            &cWSSAnvil::LoadPaintingFromNBT },
+		{ "PrimedTnt",                     &cWSSAnvil::LoadTNTFromNBT },
+		{ "minecraft:tnt",                 &cWSSAnvil::LoadTNTFromNBT },
+		{ "XPOrb",                         &cWSSAnvil::LoadExpOrbFromNBT },
+		{ "minecraft:xp_orb",              &cWSSAnvil::LoadExpOrbFromNBT },
+		{ "ItemFrame",                     &cWSSAnvil::LoadItemFrameFromNBT },
+		{ "minecraft:item_frame",          &cWSSAnvil::LoadItemFrameFromNBT },
+		{ "Arrow",                         &cWSSAnvil::LoadArrowFromNBT },
+		{ "minecraft:arrow",               &cWSSAnvil::LoadArrowFromNBT },
+		{ "SplashPotion",                  &cWSSAnvil::LoadSplashPotionFromNBT },
+		{ "minecraft:potion",              &cWSSAnvil::LoadSplashPotionFromNBT },
+		{ "Snowball",                      &cWSSAnvil::LoadSnowballFromNBT },
+		{ "minecraft:snowball",            &cWSSAnvil::LoadSnowballFromNBT },
+		{ "Egg",                           &cWSSAnvil::LoadEggFromNBT },
+		{ "minecraft:egg",                 &cWSSAnvil::LoadEggFromNBT },
+		{ "Fireball",                      &cWSSAnvil::LoadFireballFromNBT },
+		{ "minecraft:fireball",            &cWSSAnvil::LoadFireballFromNBT },
+		{ "SmallFireball",                 &cWSSAnvil::LoadFireChargeFromNBT },
+		{ "minecraft:small_fireball",      &cWSSAnvil::LoadFireChargeFromNBT },
+		{ "ThrownEnderpearl",              &cWSSAnvil::LoadThrownEnderpearlFromNBT },
+		{ "minecraft:ender_pearl",         &cWSSAnvil::LoadThrownEnderpearlFromNBT },
+		{ "Bat",                           &cWSSAnvil::LoadBatFromNBT },
+		{ "minecraft:bat",                 &cWSSAnvil::LoadBatFromNBT },
+		{ "Blaze",                         &cWSSAnvil::LoadBlazeFromNBT },
+		{ "minecraft:blaze",               &cWSSAnvil::LoadBlazeFromNBT },
+		{ "CaveSpider",                    &cWSSAnvil::LoadCaveSpiderFromNBT },
+		{ "minecraft:cave_spider",         &cWSSAnvil::LoadCaveSpiderFromNBT },
+		{ "Chicken",                       &cWSSAnvil::LoadChickenFromNBT },
+		{ "minecraft:chicken",             &cWSSAnvil::LoadChickenFromNBT },
+		{ "Cow",                           &cWSSAnvil::LoadCowFromNBT },
+		{ "minecraft:cow",                 &cWSSAnvil::LoadCowFromNBT },
+		{ "Creeper",                       &cWSSAnvil::LoadCreeperFromNBT },
+		{ "minecraft:creeper",             &cWSSAnvil::LoadCreeperFromNBT },
+		{ "EnderDragon",                   &cWSSAnvil::LoadEnderDragonFromNBT },
+		{ "minecraft:ender_dragon",        &cWSSAnvil::LoadEnderDragonFromNBT },
+		{ "Enderman",                      &cWSSAnvil::LoadEndermanFromNBT },
+		{ "minecraft:enderman",            &cWSSAnvil::LoadEndermanFromNBT },
+		{ "Ghast",                         &cWSSAnvil::LoadGhastFromNBT },
+		{ "minecraft:ghast",               &cWSSAnvil::LoadGhastFromNBT },
+		{ "Giant",                         &cWSSAnvil::LoadGiantFromNBT },
+		{ "minecraft:giant",               &cWSSAnvil::LoadGiantFromNBT },
+		{ "Guardian",                      &cWSSAnvil::LoadGuardianFromNBT },
+		{ "minecraft:guardian",            &cWSSAnvil::LoadGuardianFromNBT },
+		{ "Horse",                         &cWSSAnvil::LoadHorseFromNBT },
+		{ "minecraft:horse",               &cWSSAnvil::LoadHorseFromNBT },
+		{ "Villager",                      &cWSSAnvil::LoadVillagerFromNBT },
+		{ "minecraft:villager",            &cWSSAnvil::LoadVillagerFromNBT },
+		{ "VillagerGolem",                 &cWSSAnvil::LoadIronGolemFromNBT },
+		{ "minecraft:villager_golem",      &cWSSAnvil::LoadIronGolemFromNBT },
+		{ "LavaSlime",                     &cWSSAnvil::LoadMagmaCubeFromNBT },
+		{ "minecraft:magma_cube",          &cWSSAnvil::LoadMagmaCubeFromNBT },
+		{ "MushroomCow",                   &cWSSAnvil::LoadMooshroomFromNBT },
+		{ "minecraft:mooshroom",           &cWSSAnvil::LoadMooshroomFromNBT },
+		{ "Ozelot",                        &cWSSAnvil::LoadOcelotFromNBT },
+		{ "minecraft:ocelot",              &cWSSAnvil::LoadOcelotFromNBT },
+		{ "Pig",                           &cWSSAnvil::LoadPigFromNBT },
+		{ "minecraft:pig",                 &cWSSAnvil::LoadPigFromNBT },
+		{ "Rabbit",                        &cWSSAnvil::LoadRabbitFromNBT },
+		{ "minecraft:rabbit",              &cWSSAnvil::LoadRabbitFromNBT },
+		{ "Sheep",                         &cWSSAnvil::LoadSheepFromNBT },
+		{ "minecraft:sheep",               &cWSSAnvil::LoadSheepFromNBT },
+		{ "Silverfish",                    &cWSSAnvil::LoadSilverfishFromNBT },
+		{ "minecraft:silverfish",          &cWSSAnvil::LoadSilverfishFromNBT },
+		{ "Skeleton",                      &cWSSAnvil::LoadSkeletonFromNBT },
+		{ "minecraft:skeleton",            &cWSSAnvil::LoadSkeletonFromNBT },
+		{ "Slime",                         &cWSSAnvil::LoadSlimeFromNBT },
+		{ "minecraft:slime",               &cWSSAnvil::LoadSlimeFromNBT },
+		{ "SnowMan",                       &cWSSAnvil::LoadSnowGolemFromNBT },
+		{ "minecraft:snowman",             &cWSSAnvil::LoadSnowGolemFromNBT },
+		{ "Spider",                        &cWSSAnvil::LoadSpiderFromNBT },
+		{ "minecraft:spider",              &cWSSAnvil::LoadSpiderFromNBT },
+		{ "Squid",                         &cWSSAnvil::LoadSquidFromNBT },
+		{ "minecraft:squid",               &cWSSAnvil::LoadSquidFromNBT },
+		{ "Witch",                         &cWSSAnvil::LoadWitchFromNBT },
+		{ "minecraft:witch",               &cWSSAnvil::LoadWitchFromNBT },
+		{ "WitherBoss",                    &cWSSAnvil::LoadWitherFromNBT },
+		{ "minecraft:wither",              &cWSSAnvil::LoadWitherFromNBT },
+		{ "Wolf",                          &cWSSAnvil::LoadWolfFromNBT },
+		{ "minecraft:wolf",                &cWSSAnvil::LoadWolfFromNBT },
+		{ "Zombie",                        &cWSSAnvil::LoadZombieFromNBT },
+		{ "minecraft:zombie",              &cWSSAnvil::LoadZombieFromNBT },
+		{ "PigZombie",                     &cWSSAnvil::LoadPigZombieFromNBT },
+		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadPigZombieFromNBT },
+	};
+
+	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
+	if (it != EntityTypeToFunction.end())
 	{
-		LoadEnderCrystalFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "FallingBlock", a_IDTagLength) == 0)
-	{
-		LoadFallingBlockFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Minecart", a_IDTagLength) == 0)
-	{
-		// It is a minecart, old style, find out the type:
-		int TypeTag = a_NBT.FindChildByName(a_EntityTagIdx, "Type");
-		if ((TypeTag < 0) || (a_NBT.GetType(TypeTag) != TAG_Int))
-		{
-			return;
-		}
-		switch (a_NBT.GetInt(TypeTag))
-		{
-			case 0: LoadMinecartRFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Rideable minecart
-			case 1: LoadMinecartCFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with chest
-			case 2: LoadMinecartFFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with furnace
-			case 3: LoadMinecartTFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with TNT
-			case 4: LoadMinecartHFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with Hopper
-		}
-	}
-	else if (strncmp(a_IDTag, "MinecartRideable", a_IDTagLength) == 0)
-	{
-		LoadMinecartRFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "MinecartChest", a_IDTagLength) == 0)
-	{
-		LoadMinecartCFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "MinecartFurnace", a_IDTagLength) == 0)
-	{
-		LoadMinecartFFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "MinecartTNT", a_IDTagLength) == 0)
-	{
-		LoadMinecartTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "MinecartHopper", a_IDTagLength) == 0)
-	{
-		LoadMinecartHFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Item", a_IDTagLength) == 0)
-	{
-		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Painting", a_IDTagLength) == 0)
-	{
-		LoadPaintingFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
-	{
-		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "XPOrb", a_IDTagLength) == 0)
-	{
-		LoadExpOrbFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "ItemFrame", a_IDTagLength) == 0)
-	{
-		LoadItemFrameFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Arrow", a_IDTagLength) == 0)
-	{
-		LoadArrowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "SplashPotion", a_IDTagLength) == 0)
-	{
-		LoadSplashPotionFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Snowball", a_IDTagLength) == 0)
-	{
-		LoadSnowballFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Egg", a_IDTagLength) == 0)
-	{
-		LoadEggFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Fireball", a_IDTagLength) == 0)
-	{
-		LoadFireballFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "SmallFireball", a_IDTagLength) == 0)
-	{
-		LoadFireChargeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "ThrownEnderpearl", a_IDTagLength) == 0)
-	{
-		LoadThrownEnderpearlFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Bat", a_IDTagLength) == 0)
-	{
-		LoadBatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Blaze", a_IDTagLength) == 0)
-	{
-		LoadBlazeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "CaveSpider", a_IDTagLength) == 0)
-	{
-		LoadCaveSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Chicken", a_IDTagLength) == 0)
-	{
-		LoadChickenFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Cow", a_IDTagLength) == 0)
-	{
-		LoadCowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Creeper", a_IDTagLength) == 0)
-	{
-		LoadCreeperFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "EnderDragon", a_IDTagLength) == 0)
-	{
-		LoadEnderDragonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Enderman", a_IDTagLength) == 0)
-	{
-		LoadEndermanFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Ghast", a_IDTagLength) == 0)
-	{
-		LoadGhastFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Giant", a_IDTagLength) == 0)
-	{
-		LoadGiantFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Guardian", a_IDTagLength) == 0)
-	{
-		LoadGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Horse", a_IDTagLength) == 0)
-	{
-		LoadHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Villager", a_IDTagLength) == 0)
-	{
-		LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "VillagerGolem", a_IDTagLength) == 0)
-	{
-		LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "LavaSlime", a_IDTagLength) == 0)
-	{
-		LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "MushroomCow", a_IDTagLength) == 0)
-	{
-		LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Ozelot", a_IDTagLength) == 0)
-	{
-		LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Pig", a_IDTagLength) == 0)
-	{
-		LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Rabbit", a_IDTagLength) == 0)
-	{
-		LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Sheep", a_IDTagLength) == 0)
-	{
-		LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Silverfish", a_IDTagLength) == 0)
-	{
-		LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Skeleton", a_IDTagLength) == 0)
-	{
-		LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Slime", a_IDTagLength) == 0)
-	{
-		LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "SnowMan", a_IDTagLength) == 0)
-	{
-		LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Spider", a_IDTagLength) == 0)
-	{
-		LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Squid", a_IDTagLength) == 0)
-	{
-		LoadSquidFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Witch", a_IDTagLength) == 0)
-	{
-		LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "WitherBoss", a_IDTagLength) == 0)
-	{
-		LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Wolf", a_IDTagLength) == 0)
-	{
-		LoadWolfFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "Zombie", a_IDTagLength) == 0)
-	{
-		LoadZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-	}
-	else if (strncmp(a_IDTag, "PigZombie", a_IDTagLength) == 0)
-	{
-		LoadPigZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		(this->*it->second)(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 	// TODO: other entities
+}
+
+
+
+
+
+void cWSSAnvil::LoadOldMinecartFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	// It is a minecart, old style, find out the type:
+	int TypeTag = a_NBT.FindChildByName(a_TagIdx, "Type");
+	if ((TypeTag < 0) || (a_NBT.GetType(TypeTag) != TAG_Int))
+	{
+		return;
+	}
+	switch (a_NBT.GetInt(TypeTag))
+	{
+		case 0: LoadMinecartRFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Rideable minecart
+		case 1: LoadMinecartCFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Minecart with chest
+		case 2: LoadMinecartFFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Minecart with furnace
+		case 3: LoadMinecartTFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Minecart with TNT
+		case 4: LoadMinecartHFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Minecart with Hopper
+	}
 }
 
 
@@ -3167,15 +3082,25 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	float DropChance[5];
-	if (!LoadFloatsListFromNBT(DropChance, 5, a_NBT, a_NBT.FindChildByName(a_TagIdx, "DropChances")))
+	if (LoadFloatsListFromNBT(DropChance, 5, a_NBT, a_NBT.FindChildByName(a_TagIdx, "DropChances")))
 	{
-		return false;
+		a_Monster.SetDropChanceWeapon(DropChance[0]);
+		a_Monster.SetDropChanceHelmet(DropChance[1]);
+		a_Monster.SetDropChanceChestplate(DropChance[2]);
+		a_Monster.SetDropChanceLeggings(DropChance[3]);
+		a_Monster.SetDropChanceBoots(DropChance[4]);
 	}
-	a_Monster.SetDropChanceWeapon(DropChance[0]);
-	a_Monster.SetDropChanceHelmet(DropChance[1]);
-	a_Monster.SetDropChanceChestplate(DropChance[2]);
-	a_Monster.SetDropChanceLeggings(DropChance[3]);
-	a_Monster.SetDropChanceBoots(DropChance[4]);
+	if (LoadFloatsListFromNBT(DropChance, 2, a_NBT, a_NBT.FindChildByName(a_TagIdx, "HandDropChances")))
+	{
+		a_Monster.SetDropChanceWeapon(DropChance[0]);
+	}
+	if (LoadFloatsListFromNBT(DropChance, 4, a_NBT, a_NBT.FindChildByName(a_TagIdx, "ArmorDropChances")))
+	{
+		a_Monster.SetDropChanceHelmet(DropChance[0]);
+		a_Monster.SetDropChanceChestplate(DropChance[1]);
+		a_Monster.SetDropChanceLeggings(DropChance[2]);
+		a_Monster.SetDropChanceBoots(DropChance[3]);
+	}
 
 	int LootTag = a_NBT.FindChildByName(a_TagIdx, "CanPickUpLoot");
 	if (LootTag > 0)
