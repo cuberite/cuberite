@@ -143,7 +143,18 @@ int cManualBindings::ApiParamError(lua_State * a_LuaState, const char * a_MsgFor
 	va_list argp;
 	va_start(argp, a_MsgFormat);
 	AString msg;
+
+	#ifdef __clang__
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wformat-nonliteral"
+	#endif
+
 	AppendVPrintf(msg, a_MsgFormat, argp);
+
+	#ifdef __clang__
+		#pragma clang diagnostic pop
+	#endif
+
 	va_end(argp);
 	AString errorMsg = Printf("%s: %s", (entry.name != nullptr) ? entry.name : "<unknown function>", msg.c_str());
 
