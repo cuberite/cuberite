@@ -335,7 +335,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 						Type = "boolean",
 					},
 				},
-				Notes = "Calls the CallbackFn for the specified plugin, if found. A plugin can be found even if it is currently unloaded, disabled or errored, the callback should check the plugin status. If the plugin is not found, this function returns false, otherwise it returns the bool value that the callback has returned. The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre>",
+				Notes = "Calls the CallbackFn for the specified plugin, if found. A plugin can be found even if it is currently unloaded, disabled or errored, the callback should check the plugin status. If the plugin is not found, this function returns false, otherwise it returns the bool value that the callback has returned. The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre>Note: If an error occurs in the callback, this function returns true.",
 			},
 			ExecuteCommand =
 			{
@@ -420,7 +420,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 						Type = "boolean",
 					},
 				},
-				Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function(Command, Permission, HelpString)</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true.",
+				Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function(Command, Permission, HelpString)</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true. Note: If an error occurs in the callback, this function returns false.",
 			},
 			ForEachConsoleCommand =
 			{
@@ -437,7 +437,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 						Type = "boolean",
 					},
 				},
-				Notes = "Calls the CallbackFn function for each command that has been bound using BindConsoleCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function (Command, HelpString)</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true.",
+				Notes = "Calls the CallbackFn function for each command that has been bound using BindConsoleCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function (Command, HelpString)</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true. Note: If an error occurs in the callback, this function returns false.",
 			},
 			ForEachPlugin =
 			{
@@ -456,7 +456,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 							Type = "boolean",
 						},
 					},
-					Notes = "Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true.",
+					Notes = "Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true. Note: If an error occurs in the callback, this function returns false.",
 				},
 				{
 					Params =
@@ -472,7 +472,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 							Type = "boolean",
 						},
 					},
-					Notes = "Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true.",
+					Notes = "Calls the CallbackFn function for each plugin that is currently discovered by Cuberite (including disabled, unloaded and errrored plugins). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function ({{cPlugin|Plugin}})</pre> If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true. Note: If an error occurs in the callback, this function returns false.",
 				}
 			},
 			Get =
