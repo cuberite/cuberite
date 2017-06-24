@@ -507,7 +507,7 @@ bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinB
 	ASSERT(cChunkDef::IsValidHeight(a_MinBlockY));
 	ASSERT(cChunkDef::IsValidHeight(a_MaxBlockY));
 	ASSERT(a_MinBlockX <= a_MaxBlockX);
-	ASSERT(a_MinBlockY <= a_MaxBlockX);
+	ASSERT(a_MinBlockY <= a_MaxBlockY);
 	ASSERT(a_MinBlockZ <= a_MaxBlockZ);
 
 	// Include the Max coords:
@@ -3020,7 +3020,7 @@ void cBlockArea::cChunkReader::BlockEntity(cBlockEntity * a_BlockEntity)
 	auto areaX = a_BlockEntity->GetPosX() - m_Area.m_Origin.x;
 	auto areaY = a_BlockEntity->GetPosY() - m_Area.m_Origin.y;
 	auto areaZ = a_BlockEntity->GetPosZ() - m_Area.m_Origin.z;
-	int Idx = cChunkDef::MakeIndex(areaX, areaY, areaZ);
+	int Idx = m_Area.MakeIndex(areaX, areaY, areaZ);
 	m_Area.m_BlockEntities->insert({Idx, a_BlockEntity->Clone(areaX, areaY, areaZ)});
 }
 
