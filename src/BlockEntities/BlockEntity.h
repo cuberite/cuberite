@@ -64,6 +64,14 @@ public:
 		m_World = a_World;
 	}
 
+	/** Updates the internally stored position.
+	Note that this should not ever be used for world-contained block entities, it is meant only for when BEs in a cBlockArea are manipulated.
+	Asserts when the block entity is assigned to a world. */
+	void SetPos(int a_NewBlockX, int a_NewBlockY, int a_NewBlockZ);
+
+	/** Returns true if the specified blocktype is supposed to have an associated block entity. */
+	static bool IsBlockEntityBlockType(BLOCKTYPE a_BlockType);
+
 	/** Creates a new block entity for the specified block type
 	If a_World is valid, then the entity is created bound to that world
 	Returns nullptr for unknown block types. */

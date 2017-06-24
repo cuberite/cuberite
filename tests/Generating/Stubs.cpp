@@ -288,3 +288,29 @@ void cDeadlockDetect::UntrackCriticalSection(cCriticalSection & a_CS)
 
 
 
+
+void cBlockEntity::SetPos(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+}
+
+
+
+
+
+bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
+{
+	return false;
+}
+
+
+
+
+
+cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	return nullptr;
+}
+
+
+
+

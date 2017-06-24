@@ -1762,6 +1762,30 @@ bool cLuaState::CheckParamEnd(int a_Param)
 
 
 
+bool cLuaState::CheckParamSelf(const char * a_SelfClassName)
+{
+	tolua_Error tolua_err;
+	if (tolua_isusertype(m_LuaState, 1, a_SelfClassName, 0, &tolua_err) && !lua_isnil(m_LuaState, 1))
+	{
+		return true;
+	}
+
+	// Not the correct parameter
+	lua_Debug entry;
+	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+	AString ErrMsg = Printf(
+		"Error in function '%s'. The 'self' parameter is not of the expected type, \"instance of %s\". Make sure you're using the correct calling convention (obj:fn() instead of obj.fn()).",
+		(entry.name != nullptr) ? entry.name : "<unknown>", a_SelfClassName
+	);
+	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+	return false;
+}
+
+
+
+
+
 bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
 {
 	ASSERT(IsValid());
