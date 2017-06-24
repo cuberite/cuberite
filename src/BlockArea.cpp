@@ -733,37 +733,39 @@ void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY
 	{
 		CropNibbles(m_BlockSkyLight, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
 	}
-
-	auto maxX = m_Size.x - a_SubMaxX;
-	auto maxY = m_Size.y - a_SubMaxY;
-	auto maxZ = m_Size.z - a_SubMaxZ;
-
-	// Move and crop block Entities:
-	cBlockEntities oldBE;
-	std::swap(oldBE, *m_BlockEntities);
-	for (const auto & keyPair: oldBE)
+	if (HasBlockEntities())
 	{
-		auto & be = keyPair.second;
-		auto posX = be->GetPosX();
-		auto posY = be->GetPosY();
-		auto posZ = be->GetPosZ();
-		if (
-			(posX < a_AddMinX) || (posX >= maxX) ||
-			(posY < a_AddMinY) || (posY >= maxY) ||
-			(posZ < a_AddMinZ) || (posZ >= maxZ)
-		)
+		auto maxX = m_Size.x - a_SubMaxX;
+		auto maxY = m_Size.y - a_SubMaxY;
+		auto maxZ = m_Size.z - a_SubMaxZ;
+
+		// Move and crop block Entities:
+		cBlockEntities oldBE;
+		std::swap(oldBE, *m_BlockEntities);
+		for (const auto & keyPair: oldBE)
 		{
-			// The block entity is out of new coord range, remove it:
-			delete be;
-		}
-		else
-		{
-			// The block entity is within the new coords, recalculate its coords to match the new area:
-			posX -= a_AddMinX;
-			posY -= a_AddMinY;
-			posZ -= a_AddMinZ;
-			be->SetPos(posX, posY, posZ);
-			m_BlockEntities->insert({MakeIndex(posX, posY, posZ), std::move(be)});
+			auto & be = keyPair.second;
+			auto posX = be->GetPosX();
+			auto posY = be->GetPosY();
+			auto posZ = be->GetPosZ();
+			if (
+				(posX < a_AddMinX) || (posX >= maxX) ||
+				(posY < a_AddMinY) || (posY >= maxY) ||
+				(posZ < a_AddMinZ) || (posZ >= maxZ)
+			)
+			{
+				// The block entity is out of new coord range, remove it:
+				delete be;
+			}
+			else
+			{
+				// The block entity is within the new coords, recalculate its coords to match the new area:
+				posX -= a_AddMinX;
+				posY -= a_AddMinY;
+				posZ -= a_AddMinZ;
+				be->SetPos(posX, posY, posZ);
+				m_BlockEntities->insert({MakeIndex(posX, posY, posZ), std::move(be)});
+			}
 		}
 	}
 
@@ -795,18 +797,20 @@ void cBlockArea::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMa
 	{
 		ExpandNibbles(m_BlockSkyLight, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
 	}
-
-	// Move block entities:
-	cBlockEntities oldBE;
-	std::swap(oldBE, *m_BlockEntities);
-	for (const auto & keyPair: oldBE)
+	if (HasBlockEntities())
 	{
-		auto & be = keyPair.second;
-		auto posX = be->GetPosX() + a_SubMinX;
-		auto posY = be->GetPosY() + a_SubMinY;
-		auto posZ = be->GetPosZ() + a_SubMinZ;
-		be->SetPos(posX, posY, posZ);
-		m_BlockEntities->insert({MakeIndex(posX, posY, posZ), std::move(be)});
+		// Move block entities:
+		cBlockEntities oldBE;
+		std::swap(oldBE, *m_BlockEntities);
+		for (const auto & keyPair: oldBE)
+		{
+			auto & be = keyPair.second;
+			auto posX = be->GetPosX() + a_SubMinX;
+			auto posY = be->GetPosY() + a_SubMinY;
+			auto posZ = be->GetPosZ() + a_SubMinZ;
+			be->SetPos(posX, posY, posZ);
+			m_BlockEntities->insert({MakeIndex(posX, posY, posZ), std::move(be)});
+		}
 	}
 
 	m_Origin.Move(-a_SubMinX, -a_SubMinY, -a_SubMinZ);
