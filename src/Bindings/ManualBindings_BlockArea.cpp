@@ -590,6 +590,12 @@ static int tolua_cBlockArea_RelLine(lua_State * a_LuaState)
 	{
 		return cManualBindings::ApiParamError(a_LuaState, "Invalid baDataTypes combination (%d).", dataTypes);
 	}
+	if ((self->GetDataTypes() & dataTypes) != dataTypes)
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "Requested datatypes not present in the cBlockArea. Got only 0x%02x, requested 0x%02x",
+			self->GetDataTypes(), dataTypes
+		);
+	}
 
 	// Draw the line:
 	self->RelLine(p1, p2, dataTypes, blockType, blockMeta, blockLight, blockSkyLight);
