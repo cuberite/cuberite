@@ -17180,6 +17180,134 @@ end
 				{
 					Notes = "The player has swapped their held item with the item in their offhand slot (1.9)",
 				},
+				E_META_CONCRETE_BLACK =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is black.",
+				},
+				E_META_CONCRETE_BLUE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is blue.",
+				},
+				E_META_CONCRETE_BROWN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is brown.",
+				},
+				E_META_CONCRETE_CYAN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is cyan.",
+				},
+				E_META_CONCRETE_GRAY =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is gray.",
+				},
+				E_META_CONCRETE_GREEN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is green.",
+				},
+				E_META_CONCRETE_LIGHTBLUE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light blue.",
+				},
+				E_META_CONCRETE_LIGHTGRAY =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light gray.",
+				},
+				E_META_CONCRETE_LIGHTGREEN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light green.",
+				},
+				E_META_CONCRETE_MAGENTA =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is magenta.",
+				},
+				E_META_CONCRETE_ORANGE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is orange.",
+				},
+				E_META_CONCRETE_PINK =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is pink.",
+				},
+				E_META_CONCRETE_POWDER_BLACK =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is black.",
+				},
+				E_META_CONCRETE_POWDER_BLUE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is blue.",
+				},
+				E_META_CONCRETE_POWDER_BROWN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is brown.",
+				},
+				E_META_CONCRETE_POWDER_CYAN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is cyan.",
+				},
+				E_META_CONCRETE_POWDER_GRAY =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is gray.",
+				},
+				E_META_CONCRETE_POWDER_GREEN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is green.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTBLUE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light blue.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTGRAY =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light gray.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTGREEN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light green.",
+				},
+				E_META_CONCRETE_POWDER_MAGENTA =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is magenta.",
+				},
+				E_META_CONCRETE_POWDER_ORANGE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is orange.",
+				},
+				E_META_CONCRETE_POWDER_PINK =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is pink.",
+				},
+				E_META_CONCRETE_POWDER_PURPLE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is purple.",
+				},
+				E_META_CONCRETE_POWDER_RED =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is red.",
+				},
+				E_META_CONCRETE_POWDER_WHITE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is white.",
+				},
+				E_META_CONCRETE_POWDER_YELLOW =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is yellow.",
+				},
+				E_META_CONCRETE_PURPLE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is purple.",
+				},
+				E_META_CONCRETE_RED =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is red.",
+				},
+				E_META_CONCRETE_WHITE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is white.",
+				},
+				E_META_CONCRETE_YELLOW =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is yellow.",
+				},
 				E_META_DROPSPENSER_ACTIVATED =
 				{
 					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is currently activated. If this flag is set, the block must be unpowered first and powered again to shoot the next item.",
