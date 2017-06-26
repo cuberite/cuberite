@@ -132,46 +132,6 @@ int cManualBindings::lua_do_error(lua_State * L, const char * a_pFormat, ...)
 
 
 
-int cManualBindings::ApiParamError(lua_State * a_LuaState, const char * a_MsgFormat, ...)
-{
-	// Retrieve current function name
-	lua_Debug entry;
-	VERIFY(lua_getstack(a_LuaState, 0, &entry));
-	VERIFY(lua_getinfo(a_LuaState, "n", &entry));
-
-	// Compose the error message:
-	va_list argp;
-	va_start(argp, a_MsgFormat);
-	AString msg;
-
-	#ifdef __clang__
-		#pragma clang diagnostic push
-		#pragma clang diagnostic ignored "-Wformat-nonliteral"
-	#endif
-
-	AppendVPrintf(msg, a_MsgFormat, argp);
-
-	#ifdef __clang__
-		#pragma clang diagnostic pop
-	#endif
-
-	va_end(argp);
-	AString errorMsg = Printf("%s: %s", (entry.name != nullptr) ? entry.name : "<unknown function>", msg.c_str());
-
-	// Log everything into the console:
-	LOGWARNING("%s", errorMsg.c_str());
-	// cLuaState::LogStackTrace(a_LuaState);  // Do NOT log stack trace, it is already output as part of the Lua error handling
-	cLuaState::LogStackValues(a_LuaState, "Parameters on the stack");
-
-	// Raise Lua error:
-	lua_pushstring(a_LuaState, errorMsg.c_str());
-	return lua_error(a_LuaState);
-}
-
-
-
-
-
 // Lua bound functions with special return types
 static int tolua_Clamp(lua_State * tolua_S)
 {

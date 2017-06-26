@@ -52,11 +52,6 @@ public:
 	static int tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Error * a_pToLuaError);
 	static int lua_do_error(lua_State * L, const char * a_pFormat, ...);
 
-	/** Formats and prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
-	To be used for bindings when they detect bad parameters.
-	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
-	static int ApiParamError(lua_State * a_LuaState, const char * a_MsgFormat, ...);
-
 
 	/** Binds the DoWith(ItemName) functions of regular classes. */
 	template <
