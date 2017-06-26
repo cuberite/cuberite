@@ -162,7 +162,7 @@ return
 						},
 						{
 							Name = "DataTypes",
-							Type = "string",
+							Type = "number",
 						},
 					},
 					Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Any previous contents are lost.",
@@ -186,7 +186,7 @@ return
 						},
 						{
 							Name = "DataTypes",
-							Type = "string",
+							Type = "number",
 						},
 					},
 					Notes = "Creates a new area of the specified size and contents. Origin is set to all zeroes. BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.",
@@ -374,7 +374,7 @@ return
 				{
 					{
 						Name = "DataTypes",
-						Type = "string",
+						Type = "number",
 					},
 					{
 						Name = "BlockType",
@@ -410,7 +410,7 @@ return
 						},
 						{
 							Name = "DataTypes",
-							Type = "string",
+							Type = "number",
 						},
 						{
 							Name = "BlockType",
@@ -463,7 +463,7 @@ return
 						},
 						{
 							Name = "DataTypes",
-							Type = "string",
+							Type = "number",
 						},
 						{
 							Name = "BlockType",
@@ -1053,7 +1053,9 @@ return
 					},
 					Returns =
 					{
-						Type = "boolean",
+						{
+							Type = "boolean",
+						},
 					},
 					Notes = "Returns true if the specified absolute coords are within the area.",
 				},
@@ -1067,7 +1069,9 @@ return
 					},
 					Returns =
 					{
-						Type = "boolean",
+						{
+							Type = "boolean",
+						},
 					},
 					Notes = "Returns true if the specified absolute coords are within the area.",
 				},
@@ -1075,6 +1079,7 @@ return
 
 			IsValidDataTypeCombination =
 			{
+				IsStatic = true,
 				Params =
 				{
 					{
@@ -1084,7 +1089,9 @@ return
 				},
 				Returns =
 				{
-					Type = "boolean",
+					{
+						Type = "boolean",
+					},
 				},
 				Notes = "Returns true if the specified combination of datatypes (ba* constants added together) is valid. Most combinations are valid, but for example baBlockEntities without baTypes is an invalid combination.",
 			},  -- IsValidDataTypeCombination
@@ -1109,7 +1116,9 @@ return
 					},
 					Returns =
 					{
-						Type = "boolean",
+						{
+							Type = "boolean",
+						}
 					},
 					Notes = "Returns true if the specified relative coords are within the area.",
 				},
@@ -1123,7 +1132,9 @@ return
 					},
 					Returns =
 					{
-						Type = "boolean",
+						{
+							Type = "boolean",
+						}
 					},
 					Notes = "Returns true if the specified relative coords are within the area.",
 				},
@@ -1485,7 +1496,7 @@ return
 						},
 						{
 							Name = "DataTypes",
-							Type = "string",
+							Type = "number",
 						},
 						{
 							Name = "BlockType",

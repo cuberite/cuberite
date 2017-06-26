@@ -841,7 +841,7 @@ static int GetRelBlock(lua_State * a_LuaState)
 
 	// Get the block info:
 	L.Push((self->*Fn)(coords.x, coords.y, coords.z));
-	return 0;
+	return 1;
 }
 
 
@@ -957,6 +957,105 @@ static int SetRelBlock(lua_State * a_LuaState)
 
 
 
+static int tolua_cBlockArea_SetBlockTypeMeta(lua_State * a_LuaState)
+{
+	// Check the common params:
+	cLuaState L(a_LuaState);
+	if (!L.CheckParamSelf("cBlockArea"))
+	{
+		return 0;
+	}
+
+	// Read the common params:
+	cBlockArea * self;
+	if (!L.GetStackValues(1, self))
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "Cannot read the 'self' param.");
+	}
+
+	// Check if block types and metas are present:
+	if (!self->HasBlockTypes() || !self->HasBlockMetas())
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "The area doesn't contain the datatypes baTypes and baMetas.");
+	}
+
+	// Read the overloaded params:
+	Vector3i coords;
+	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
+	if (!self->IsValidCoords(coords))
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "The coords ({%d, %d, %d}) are out of range ({%d, %d, %d} - {%d, %d, %d}).",
+			coords.x, coords.y, coords.z,
+			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
+			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		);
+	}
+
+	BLOCKTYPE block;
+	NIBBLETYPE meta;
+	if (!L.GetStackValues(idx, block, meta))
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "Bad number for block type or meta type.");
+	}
+
+	// Set block type and meta:
+	self->SetBlockTypeMeta(coords.x, coords.y, coords.z, block, meta);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
+{
+	// Check the common params:
+	cLuaState L(a_LuaState);
+	if (!L.CheckParamSelf("cBlockArea"))
+	{
+		return 0;
+	}
+
+	// Read the common params:
+	cBlockArea * self;
+	if (!L.GetStackValues(1, self))
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "Cannot read the 'self' param.");
+	}
+
+	// Check if block types and metas are present:
+	if (!self->HasBlockTypes() || !self->HasBlockMetas())
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "The area doesn't contain the datatypes baTypes and baMetas.");
+	}
+
+	// Read the overloaded params:
+	Vector3i coords;
+	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
+	if (!self->IsValidRelCoords(coords))
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "The coords ({%d, %d, %d}) are out of range ({%d, %d, %d}).",
+			coords.x, coords.y, coords.z,
+			self->GetSizeX(), self->GetSizeY(), self->GetSizeZ()
+		);
+	}
+
+	BLOCKTYPE block;
+	NIBBLETYPE meta;
+	if (!L.GetStackValues(idx, block, meta))
+	{
+		return cManualBindings::ApiParamError(a_LuaState, "Bad number for block type or meta type.");
+	}
+
+	// Set block type and meta:
+	self->SetRelBlockTypeMeta(coords.x, coords.y, coords.z, block, meta);
+	return 0;
+}
+
+
+
+
+
 void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 {
 	tolua_beginmodule(a_LuaState, nullptr);
@@ -990,10 +1089,12 @@ void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 			tolua_function(a_LuaState, "SetBlockMeta",            SetBlock<NIBBLETYPE, cBlockArea::baMetas,    &cBlockArea::SetRelBlockMeta>);
 			tolua_function(a_LuaState, "SetBlockLight",           SetBlock<NIBBLETYPE, cBlockArea::baLight,    &cBlockArea::SetRelBlockLight>);
 			tolua_function(a_LuaState, "SetBlockSkyLight",        SetBlock<NIBBLETYPE, cBlockArea::baSkyLight, &cBlockArea::SetRelBlockSkyLight>);
+			tolua_function(a_LuaState, "SetBlockTypeMeta",        tolua_cBlockArea_SetBlockTypeMeta);
 			tolua_function(a_LuaState, "SetRelBlockType",         SetRelBlock<BLOCKTYPE,  cBlockArea::baTypes,    &cBlockArea::SetRelBlockType>);
 			tolua_function(a_LuaState, "SetRelBlockMeta",         SetRelBlock<NIBBLETYPE, cBlockArea::baMetas,    &cBlockArea::SetRelBlockMeta>);
 			tolua_function(a_LuaState, "SetRelBlockLight",        SetRelBlock<NIBBLETYPE, cBlockArea::baLight,    &cBlockArea::SetRelBlockLight>);
 			tolua_function(a_LuaState, "SetRelBlockSkyLight",     SetRelBlock<NIBBLETYPE, cBlockArea::baSkyLight, &cBlockArea::SetRelBlockSkyLight>);
+			tolua_function(a_LuaState, "SetRelBlockTypeMeta",     tolua_cBlockArea_SetRelBlockTypeMeta);
 			tolua_function(a_LuaState, "Write",                   tolua_cBlockArea_Write);
 		tolua_endmodule(a_LuaState);
 	tolua_endmodule(a_LuaState);
