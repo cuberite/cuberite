@@ -792,6 +792,10 @@ public:
 	Returns false and logs a special warning ("wrong calling convention") if not. */
 	bool CheckParamSelf(const char * a_SelfClassName);
 
+	/** Returns true if the first parameter is the expected class (static).
+	Returns false and logs a special warning ("wrong calling convention") if not. */
+	bool CheckParamStaticSelf(const char * a_SelfClassName);
+
 	bool IsParamUserType(int a_Param, AString a_UserType);
 
 	bool IsParamNumber(int a_Param);
@@ -807,6 +811,11 @@ public:
 
 	/** Logs all items in the current stack trace to the server console */
 	static void LogStackTrace(lua_State * a_LuaState, int a_StartingDepth = 0);
+
+	/** Formats and prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	To be used for bindings when they detect bad parameters.
+	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
+	int ApiParamError(const char * a_MsgFormat, ...);
 
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);
