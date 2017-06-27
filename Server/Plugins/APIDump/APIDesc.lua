@@ -7420,7 +7420,8 @@ This class represents a 2D array of items. It is used as the underlying storage 
 						The following code tries to add 32 sticks to a player's main inventory:
 <pre class="prettyprint lang-lua">
 local Items = cItem(E_ITEM_STICK, 32);
-local PlayerMainInventory = Player:GetInventorySlots();  -- PlayerMainInventory is of type cItemGrid
+local PlayerInventory = Player:GetInventory();
+local PlayerMainInventory = PlayerInventory:GetInventoryGrid();  -- PlayerMainInventory is of type cItemGrid
 local NumAdded = PlayerMainInventory:AddItem(Items);
 if (NumAdded == Items.m_ItemCount) then
   -- All the sticks did fit
@@ -7437,7 +7438,8 @@ end
 					Contents = [[
 						The following code damages the helmet in the player's armor and destroys it if it reaches max damage:
 <pre class="prettyprint lang-lua">
-local PlayerArmor = Player:GetArmorSlots();  -- PlayerArmor is of type cItemGrid
+local PlayerInventory = Player:GetInventory();
+local PlayerArmor = PlayerInventory:GetArmorGrid();  -- PlayerArmor is of type cItemGrid
 if (PlayerArmor:DamageItem(0)) then  -- Helmet is at SlotNum 0
   -- The helmet has reached max damage, destroy it:
   PlayerArmor:EmptySlot(0);
