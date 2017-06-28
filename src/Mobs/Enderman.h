@@ -29,6 +29,8 @@ public:
 
 	/** Returns if the current sky light level is sufficient for the enderman to become aggravated */
 	bool CheckLight(void);
+	/** Returns if the enderman gets hit by the rain */
+	bool CheckRain(void);
 
 private:
 
