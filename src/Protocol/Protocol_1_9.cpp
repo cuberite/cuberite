@@ -2666,7 +2666,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 		case 0:
 		{
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
-			if (Hand == 0)  // TODO: implement handle off-hand (1) actions
+			if (Hand == hMain)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
 			{
 				m_Client->HandleUseEntity(EntityID, false);
 			}
