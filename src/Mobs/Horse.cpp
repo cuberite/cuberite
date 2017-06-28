@@ -4,6 +4,7 @@
 #include "../World.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
+#include "Broadcaster.h"
 
 
 
@@ -24,7 +25,7 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_TimesToTame(TameTimes),
 	m_TameAttemptTimes(0),
 	m_RearTickCount(0),
-	m_MaxSpeed(20.0)
+	m_MaxSpeed(14.0)
 {
 }
 
@@ -75,7 +76,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			// TODO: emit hearts here
+			m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 			m_bIsTame = true;
 		}
 	}
@@ -104,23 +105,28 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
-	if (!m_bIsSaddled && m_bIsTame)
+	if (m_bIsTame)
 	{
-		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
+		if (!m_bIsSaddled)
 		{
-			// Saddle the horse:
-			if (!a_Player.IsGameModeCreative())
+			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
 			{
-				a_Player.GetInventory().RemoveOneEquippedItem();
+				// Saddle the horse:
+				if (!a_Player.IsGameModeCreative())
+				{
+					a_Player.GetInventory().RemoveOneEquippedItem();
+				}
+				m_bIsSaddled = true;
+				m_World->BroadcastEntityMetadata(*this);
 			}
-			m_bIsSaddled = true;
-			m_World->BroadcastEntityMetadata(*this);
+			else
+			{
+				a_Player.AttachTo(this);
+			}
 		}
-		else if (!a_Player.GetEquippedItem().IsEmpty())
+		else
 		{
-			// The horse doesn't like being hit, make it rear:
-			m_bIsRearing = true;
-			m_RearTickCount = 0;
+			a_Player.AttachTo(this);
 		}
 	}
 	else
