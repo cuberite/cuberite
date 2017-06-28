@@ -159,6 +159,15 @@ bool cEntity::Initialize(cWorld & a_World)
 	// Spawn the entity on the clients:
 	a_World.BroadcastSpawnEntity(*this);
 
+	// If has any mob leashed broadcast every leashed entity to this
+	if (HasAnyMobLeashed())
+	{
+		for (auto LeashedMob : m_LeashedMobs)
+		{
+			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
+
 	return true;
 }
 
@@ -217,6 +226,14 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	ASSERT(IsTicking());
 	ASSERT(GetParentChunk() != nullptr);
 	SetIsTicking(false);
+
+	// Unleash leashed mobs
+	for (auto LeashedMob : m_LeashedMobs)
+	{
+		LeashedMob->SetUnleashed(true);
+		m_World->BroadcastUnleashEntity(*LeashedMob);
+	}
+	m_LeashedMobs.clear();
 
 	if (a_ShouldBroadcast)
 	{
@@ -2244,3 +2261,38 @@ void cEntity::SetPosition(const Vector3d & a_Position)
 
 
 
+
+void cEntity::AddLeashedMob(cMonster * a_Monster, bool broadcast)
+{
+	// Not there already
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) == m_LeashedMobs.end());
+
+	LOGD("Adding mob to entity's leashed list");
+	a_Monster->SetLeashedTo(this);
+	m_LeashedMobs.push_back(a_Monster);
+
+	if (broadcast)
+	{
+		m_World->BroadcastLeashEntity(*a_Monster, *this);
+	}
+}
+
+
+
+
+void cEntity::RemoveLeashedMob(cMonster * a_Monster, bool a_DropPickup, bool broadcast)
+{
+	ASSERT(a_Monster->GetLeashedTo() == this);
+
+	// Must exists
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
+
+	LOGD("Removing mob from entity's leashed list");
+	a_Monster->SetUnleashed(a_DropPickup);
+	m_LeashedMobs.remove(a_Monster);
+
+	if (broadcast)
+	{
+		m_World->BroadcastUnleashEntity(*a_Monster);
+	}
+}

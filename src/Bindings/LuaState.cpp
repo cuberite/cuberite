@@ -982,6 +982,7 @@ void cLuaState::Push(cEntity * a_Entity)
 			case cEntity::etExpOrb:
 			case cEntity::etItemFrame:
 			case cEntity::etPainting:
+			case cEntity::etLeashKnot:
 			{
 				// Push the generic entity class type:
 				tolua_pushusertype(m_LuaState, a_Entity, "cEntity");

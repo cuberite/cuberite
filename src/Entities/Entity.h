@@ -46,6 +46,7 @@ class cWorld;
 class cClientHandle;
 class cPlayer;
 class cChunk;
+class cMonster;
 
 
 
@@ -88,6 +89,7 @@ public:
 		etFloater,
 		etItemFrame,
 		etPainting,
+		etLeashKnot,
 
 		// Common variations
 		etMob = etMonster,  // DEPRECATED, use etMonster instead!
@@ -177,6 +179,7 @@ public:
 	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb);       }
 	bool IsFloater     (void) const { return (m_EntityType == etFloater);      }
 	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
+	bool IsLeashKnot   (void) const { return (m_EntityType == etLeashKnot);    }
 	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
 
 	/** Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true) */
@@ -265,7 +268,7 @@ public:
 	bool IsTicking(void) const;
 
 	/** Destroys the entity and schedules it for memory freeing; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet */
-	void Destroy(bool a_ShouldBroadcast = true);
+	virtual void Destroy(bool a_ShouldBroadcast = true);
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
 	void TakeDamage(cEntity & a_Attacker);
@@ -511,6 +514,15 @@ public:
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
 
+	/** Adds a mob to the leashed list of mobs */
+	void AddLeashedMob(cMonster * a_Monster, bool broadcast = true);
+
+	/** Removes a mob to the leashed list of mobs */
+	void RemoveLeashedMob(cMonster * a_Monster, bool dropPickup, bool broadcast = true);
+
+	/** Returs whether the entity has any mob leashed to */
+	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
+
 protected:
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
@@ -660,6 +672,12 @@ private:
 	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
 	While this ticks, a player can't hit this entity. */
 	int m_InvulnerableTicks;
+
+	typedef std::list<cMonster *> cMonsterList;
+
+	/** List of leashed mobs to this entity */
+	cMonsterList m_LeashedMobs;
+
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;

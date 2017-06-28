@@ -621,6 +621,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_IRON:                 return 64;
 		case E_ITEM_IRON_NUGGET:          return 64;
 		case E_ITEM_ITEM_FRAME:           return 64;
+		case E_ITEM_LEAD:                 return 64;
 		case E_ITEM_LEATHER:              return 64;
 		case E_ITEM_MAGMA_CREAM:          return 64;
 		case E_ITEM_MAP:                  return 64;

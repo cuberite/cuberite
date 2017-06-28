@@ -147,6 +147,8 @@ bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
 
 void cCreeper::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_FLINT_AND_STEEL))
 	{
 		if (!a_Player.IsGameModeCreative())

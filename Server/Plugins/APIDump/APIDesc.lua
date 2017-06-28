@@ -3430,6 +3430,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is an item frame.",
 				},
+				IsLeashKnot =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is a leash knot.",
+				},
 				IsMinecart =
 				{
 					Returns =
@@ -4102,7 +4112,11 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etItemFrame =
 				{
-					Notes = "",
+					Notes = "The entity is a item frame",
+				},
+				etLeashKnot =
+				{
+					Notes = "The entity is a leash knot",
 				},
 				etMinecart =
 				{

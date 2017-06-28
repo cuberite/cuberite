@@ -37,6 +37,7 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/LeashKnot.h"
 #include "../Entities/Painting.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
@@ -555,6 +556,22 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 		m_Writer.AddByte("CanPickUpLoot", (a_Monster->CanPickUpLoot())? 1 : 0);
 		m_Writer.AddString("CustomName", a_Monster->GetCustomName());
 		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_Monster->IsCustomNameAlwaysVisible()));
+
+		// Mob was leashed
+		if (a_Monster->IsLeashed())
+		{
+			m_Writer.AddByte("Leashed", 1);
+			m_Writer.BeginCompound("Leash");
+			const cPassiveMonster *PassiveMonster = reinterpret_cast<const cPassiveMonster *>(a_Monster);
+			if (PassiveMonster->GetLeashedTo()->IsLeashKnot())
+			{
+				m_Writer.AddDouble("X", PassiveMonster->GetLeashedTo()->GetPosX());
+				m_Writer.AddDouble("Y", PassiveMonster->GetLeashedTo()->GetPosY());
+				m_Writer.AddDouble("Z", PassiveMonster->GetLeashedTo()->GetPosZ());
+			}
+			m_Writer.EndCompound();
+		}
+
 		switch (a_Monster->GetMobType())
 		{
 			case mtBat:
@@ -820,8 +837,13 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 	m_Writer.EndCompound();
 }
 
-
-
+void cNBTChunkSerializer::AddLeashKnotEntity(cLeashKnot * a_LeashKnot)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_LeashKnot, "LeashKnot");
+		AddHangingEntity(a_LeashKnot);
+	m_Writer.EndCompound();
+}
 
 
 void cNBTChunkSerializer::AddPaintingEntity(cPainting * a_Painting)
@@ -935,6 +957,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etTNT:          AddTNTEntity         (reinterpret_cast<cTNTEntity *>       (a_Entity)); break;
 		case cEntity::etExpOrb:       AddExpOrbEntity      (reinterpret_cast<cExpOrb *>          (a_Entity)); break;
 		case cEntity::etItemFrame:    AddItemFrameEntity   (reinterpret_cast<cItemFrame *>       (a_Entity)); break;
+		case cEntity::etLeashKnot:    AddLeashKnotEntity   (reinterpret_cast<cLeashKnot *>       (a_Entity)); break;
 		case cEntity::etPainting:     AddPaintingEntity    (reinterpret_cast<cPainting *>        (a_Entity)); break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
 		case cEntity::etFloater: return;  // Floaters aren't saved either

@@ -46,6 +46,8 @@ public:
 
 	virtual ~cMonster() override;
 
+	virtual void Destroy(bool a_ShouldBroadcast = true) override;
+
 	virtual void Destroyed() override;
 
 	CLASS_PROTODEF(cMonster)
@@ -73,6 +75,27 @@ public:
 
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
 	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk);
+
+	/** Returns whether the mob can be leashed. */
+	bool CanBeLeashed() const { return m_CanBeLeashed; }
+
+	/** Sets whether the mob ban be leashed, for extensibility in plugins */
+	void SetCanBeLeashed(bool a_CanBeLeashed) { m_CanBeLeashed = a_CanBeLeashed; }
+
+	/** Returns whether the monster is leashed to an entity. */
+	virtual bool IsLeashed() const { return (m_LeashedTo != nullptr); }
+
+	/** Leash the monster to a entity. */
+	void SetLeashedTo(cEntity * a_Entity);
+
+	/** Unleash the monster from a entity. */
+	void SetUnleashed(bool a_DropPickup);
+
+	/** Returns the entity to where is leashed this mob, returns nullptr if it's not leashed */
+	cEntity * GetLeashedTo() const { return m_LeashedTo; }
+
+	/** Sets entity position to where is leashed this mob */
+	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = pos; }
 
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
@@ -274,8 +297,23 @@ protected:
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
+	/** Entity leashed to */
+	cEntity * m_LeashedTo;
+
+	/** Entity pos leashed to, for leash knots */
+	Vector3d * m_LeashToPos;
+
+	/** Mob has ben leashed or unleashed in current player action. Avoids double actions on horses. */
+	bool m_IsLeadActionJustDone;
+
+	/** Determines whether a monster can be leashed */
+	bool m_CanBeLeashed;
+
 private:
 	/** A pointer to the entity this mobile is aiming to reach */
 	cPawn * m_Target;
+
+	/** Leash calculations inside Tick function */
+	void CalcLeashActions();
 
 } ;  // tolua_export

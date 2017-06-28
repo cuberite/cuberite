@@ -52,10 +52,12 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/LeashKnot.h"
 #include "../Entities/Painting.h"
 
 #include "../Protocol/MojangAPI.h"
 #include "Server.h"
+#include "BoundingBox.h"
 
 
 
@@ -1505,6 +1507,8 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:xp_orb",              &cWSSAnvil::LoadExpOrbFromNBT },
 		{ "ItemFrame",                     &cWSSAnvil::LoadItemFrameFromNBT },
 		{ "minecraft:item_frame",          &cWSSAnvil::LoadItemFrameFromNBT },
+		{ "LeashKnot",                     &cWSSAnvil::LoadLeashKnotFromNBT },
+		{ "minecraft:leash_knot",          &cWSSAnvil::LoadLeashKnotFromNBT },
 		{ "Arrow",                         &cWSSAnvil::LoadArrowFromNBT },
 		{ "minecraft:arrow",               &cWSSAnvil::LoadArrowFromNBT },
 		{ "SplashPotion",                  &cWSSAnvil::LoadSplashPotionFromNBT },
@@ -1917,6 +1921,23 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.push_back(ItemFrame.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadLeashKnotFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::unique_ptr<cLeashKnot> LeashKnot = cpp14::make_unique<cLeashKnot>(BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
+	if (!LoadEntityBaseFromNBT(*LeashKnot.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	LoadHangingFromNBT(*LeashKnot.get(), a_NBT, a_TagIdx);
+
+	a_Entities.push_back(LeashKnot.release());
 }
 
 
@@ -3120,6 +3141,58 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 	{
 		bool CustomNameVisible = (a_NBT.GetByte(CustomNameVisibleTag) == 1);
 		a_Monster.SetCustomNameAlwaysVisible(CustomNameVisible);
+	}
+
+	// Leashed to a knot
+	bool Leashed;
+	int LeashedIdx = a_NBT.FindChildByName(a_TagIdx, "Leashed");
+	if (LeashedIdx >= 0)
+	{
+		Leashed = a_NBT.GetByte(LeashedIdx);
+
+		if (Leashed)
+		{
+			int LeashIdx = a_NBT.FindChildByName(a_TagIdx, "Leash");
+			if (LeashIdx >= 0)
+			{
+				double PosX = 0.0, PosY = 0.0, PosZ = 0.0;
+				bool KnotPosPresent = true;
+				int LeashDataLine = a_NBT.FindChildByName(LeashIdx, "X");
+				if (LeashDataLine >= 0)
+				{
+					PosX = a_NBT.GetDouble(LeashDataLine);
+				}
+				else
+				{
+					KnotPosPresent = false;
+				}
+				LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Y");
+				if (LeashDataLine >= 0)
+				{
+					PosY = a_NBT.GetDouble(LeashDataLine);
+				}
+				else
+				{
+					KnotPosPresent = false;
+				}
+				LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Z");
+				if (LeashDataLine >= 0)
+				{
+					PosZ = a_NBT.GetDouble(LeashDataLine);
+				}
+				else
+				{
+					KnotPosPresent = false;
+				}
+				if (KnotPosPresent)
+				{
+					// Set leash pos for the mob
+					LOGD("The mob was leashed to position %f, %f, %f", PosX, PosY, PosZ);
+					cPassiveMonster * PassiveMonster = static_cast<cPassiveMonster *>(&a_Monster);
+					PassiveMonster->SetLeashToPos(new Vector3d(PosX, PosY, PosZ));
+				}
+			}
+		}
 	}
 
 	return true;

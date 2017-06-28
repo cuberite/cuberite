@@ -125,24 +125,28 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 	}
 	else
 	{
-		if (m_Attachee != nullptr)
+		// Check if leashed / unleashed to player before try to ride
+		if (!m_IsLeadActionJustDone)
 		{
-			if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
+			if (m_Attachee != nullptr)
 			{
-				a_Player.Detach();
-				return;
+				if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
+				{
+					a_Player.Detach();
+					return;
+				}
+
+				if (m_Attachee->IsPlayer())
+				{
+					return;
+				}
+
+				m_Attachee->Detach();
 			}
 
-			if (m_Attachee->IsPlayer())
-			{
-				return;
-			}
-
-			m_Attachee->Detach();
+			m_TameAttemptTimes++;
+			a_Player.AttachTo(this);
 		}
-
-		m_TameAttemptTimes++;
-		a_Player.AttachTo(this);
 	}
 }
 

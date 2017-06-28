@@ -10,11 +10,18 @@
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
+#include "BoundingBox.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"
 
 #include "PathFinder.h"
+
+
+
+
+// Ticks to wait to do leash calculations
+#define LEASH_ACTIONS_TICK_STEP 10
 
 
 
@@ -102,6 +109,10 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
 	, m_WasLastTargetAPlayer(false)
+	, m_LeashedTo(nullptr)
+	, m_LeashToPos(nullptr)
+	, m_IsLeadActionJustDone(false)
+	, m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive)
 	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
@@ -123,6 +134,27 @@ cMonster::~cMonster()
 
 
 
+void cMonster::Destroy(bool a_ShouldBroadcast)
+{
+	if (IsLeashed())
+	{
+		cEntity * LeashedTo = GetLeashedTo();
+		LeashedTo->RemoveLeashedMob(this, false, a_ShouldBroadcast);
+
+		// Remove leash knot if there are no more mobs leashed to
+		if (!LeashedTo->HasAnyMobLeashed() && LeashedTo->IsLeashKnot())
+		{
+			LeashedTo->Destroy();
+		}
+	}
+
+	super::Destroy(a_ShouldBroadcast);
+}
+
+
+
+
+
 void cMonster::Destroyed()
 {
 	SetTarget(nullptr);  // Tell them we're no longer targeting them.
@@ -136,6 +168,11 @@ void cMonster::Destroyed()
 void cMonster::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnMob(*this);
+
+	if (IsLeashed())
+	{
+		a_Client.SendLeashEntity(*this, *this->GetLeashedTo());
+	}
 }
 
 
@@ -350,6 +387,12 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		case ATTACKING: break;
 	}  // switch (m_EMState)
 
+	// Leash calculations
+	if ((m_TicksAlive % LEASH_ACTIONS_TICK_STEP) == 0)
+	{
+		CalcLeashActions();
+	}
+
 	BroadcastMovementUpdate();
 
 	if (m_AgingTimer > 0)
@@ -359,6 +402,55 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			SetAge(1);
 			m_World->BroadcastEntityMetadata(*this);
+		}
+	}
+}
+
+
+
+
+
+void cMonster::CalcLeashActions()
+{
+	// This mob just spotted in the world and should be leashed to a leash knot, so it tries until knot is found
+	if (!IsLeashed() && (m_LeashToPos != nullptr))
+	{
+		LOGD("Mob was leashed to pos %f, %f, %f, looking for leash knot...", m_LeashToPos->x, m_LeashToPos->y, m_LeashToPos->z);
+
+		class LookForKnots : public cEntityCallback
+		{
+		public:
+			cMonster * m_Monster;
+
+			LookForKnots(cMonster * a_Monster) :
+				m_Monster(a_Monster)
+			{
+			}
+
+			virtual bool Item(cEntity * a_Entity) override
+			{
+				if (a_Entity->IsLeashKnot())
+				{
+					LOGD("Leash Sknot found");
+					a_Entity->AddLeashedMob(m_Monster);
+				}
+				return false;
+			}
+		} Callback(this);
+		m_World->ForEachEntityInBox(cBoundingBox(m_LeashToPos, 0.5, 1), Callback);
+	}
+	else if (IsLeashed())  // Mob is leashed to an entity
+	{
+		// TODO: leashed mobs in vanilla can move around up to 5 blocks distance from leash origin
+		MoveToPosition(m_LeashedTo->GetPosition());
+
+		// If distance to target > 10 break lead
+		Vector3f a_Distance(m_LeashedTo->GetPosition() - GetPosition());
+		double Distance(a_Distance.Length());
+		if (Distance > 10.0)
+		{
+			LOGD("Lead broken (distance)");
+			m_LeashedTo->RemoveLeashedMob(this, false);
 		}
 	}
 }
@@ -581,6 +673,27 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
+	}
+
+	// Using leads
+	m_IsLeadActionJustDone = false;
+	if (IsLeashed() && (GetLeashedTo() == &a_Player))  // a player can only unleash a mob leashed to him
+	{
+		a_Player.RemoveLeashedMob(this, !a_Player.IsGameModeCreative());
+	}
+	else if (IsLeashed())
+	{
+		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
+		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
+	}
+	else if (CanBeLeashed() && EquippedItem.m_ItemType == E_ITEM_LEAD)
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+		a_Player.AddLeashedMob(this);
+
 	}
 }
 
@@ -1293,4 +1406,38 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 cMonster::eFamily cMonster::GetMobFamily(void) const
 {
 	return FamilyFromType(m_MobType);
+}
+
+
+
+
+
+void cMonster::SetLeashedTo(cEntity * a_Entity)
+{
+	m_LeashedTo = a_Entity;
+
+	m_IsLeadActionJustDone = true;
+	LOGD("Mob leashed");
+}
+
+
+
+
+
+void cMonster::SetUnleashed(bool a_DropPickup)
+{
+	ASSERT(this->GetLeashedTo() != nullptr);
+
+	m_LeashedTo = nullptr;
+
+	// Drop pickup leash?
+	if (a_DropPickup)
+	{
+		cItems Pickups;
+		Pickups.Add(cItem(E_ITEM_LEAD, 1, 0));
+		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
+	}
+
+	m_IsLeadActionJustDone = true;
+	LOGD("Mob unleashed");
 }
