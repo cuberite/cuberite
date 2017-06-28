@@ -433,6 +433,7 @@ void cMonster::CalcLeashActions()
 				{
 					LOGD("Leash Sknot found");
 					a_Entity->AddLeashedMob(m_Monster);
+					m_Monster->SetLeashToPos(nullptr);
 				}
 				return false;
 			}
@@ -686,7 +687,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
 		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
 	}
-	else if (CanBeLeashed() && EquippedItem.m_ItemType == E_ITEM_LEAD)
+	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEAD))
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
