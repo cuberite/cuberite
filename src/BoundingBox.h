@@ -27,6 +27,7 @@ public:
 	cBoundingBox(double a_MinX, double a_MaxX, double a_MinY, double a_MaxY, double a_MinZ, double a_MaxZ);
 	cBoundingBox(const Vector3d & a_Min, const Vector3d & a_Max);
 	cBoundingBox(const Vector3d & a_Pos, double a_Radius, double a_Height);
+	cBoundingBox(const Vector3d & a_Pos, double a_Radius, double a_Height, double a_VerticalOffset);
 	cBoundingBox(const Vector3d & a_Pos, double a_CubeLength);
 	cBoundingBox(const cBoundingBox & a_Orig);
 

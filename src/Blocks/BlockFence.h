@@ -97,7 +97,7 @@ public:
 				return false;
 			}
 		} Callback(LeashKnot, a_Player, AlreadyExistsAKnot);
-		a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(LeashKnot->GetPosition(), 8, 8), Callback);
+		a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(LeashKnot->GetPosition(), 8, 8, -4), Callback);
 
 		// New knot? needs to init and produce sound effect
 		if (!AlreadyExistsAKnot)

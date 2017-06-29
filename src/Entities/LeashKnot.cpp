@@ -75,7 +75,7 @@ void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 			return false;
 		}
 	} Callback(this, &a_Player);
-	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), Callback);
+	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), Callback);
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
 }
