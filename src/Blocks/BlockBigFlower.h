@@ -20,7 +20,8 @@ public:
 
 	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
 	{
-		return (((a_Meta & E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) != 0) || (a_Meta & E_META_BIG_FLOWER_LARGE_FERN) != 0);
+		NIBBLETYPE FlowerMeta = a_Meta & 0x07;
+		return ((FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) || (FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN));
 	}
 
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
