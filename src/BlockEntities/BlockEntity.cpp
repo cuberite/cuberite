@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "BeaconEntity.h"
+#include "BedEntity.h"
 #include "BlockEntity.h"
 #include "BrewingstandEntity.h"
 #include "ChestEntity.h"
@@ -42,6 +43,7 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		case E_BLOCK_BEACON:
+		case E_BLOCK_BED:
 		case E_BLOCK_BREWING_STAND:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
@@ -75,6 +77,7 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 	switch (a_BlockType)
 	{
 		case E_BLOCK_BEACON:        return new cBeaconEntity      (a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World);
+		case E_BLOCK_BED:           return new cBedEntity         (a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_BREWING_STAND: return new cBrewingstandEntity(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_CHEST:         return new cChestEntity       (a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_COMMAND_BLOCK: return new cCommandBlockEntity(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World);

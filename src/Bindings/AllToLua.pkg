@@ -100,6 +100,7 @@ $cfile "../Mobs/Monster.h"
 // Block entities:
 $cfile "../BlockEntities/BlockEntity.h"
 $cfile "../BlockEntities/BeaconEntity.h"
+$cfile "../BlockEntities/BedEntity.h"
 $cfile "../BlockEntities/BlockEntityWithItems.h"
 $cfile "../BlockEntities/BrewingstandEntity.h"
 $cfile "../BlockEntities/ChestEntity.h"

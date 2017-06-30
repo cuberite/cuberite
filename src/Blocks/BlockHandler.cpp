@@ -463,7 +463,6 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 			{
 				case E_BLOCK_ACACIA_DOOR:
 				case E_BLOCK_ACTIVE_COMPARATOR:
-				case E_BLOCK_BED:
 				case E_BLOCK_BEETROOTS:
 				case E_BLOCK_BIRCH_DOOR:
 				case E_BLOCK_BREWING_STAND:
@@ -512,8 +511,18 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 					ConvertToPickups(Pickups, Meta);
 					break;
 				}
+				case E_BLOCK_BED:
+				{
+					// Need to access the bed entity to get the color for the item damage
+					ConvertToPickups(a_Digger, Pickups, Meta, a_BlockX, a_BlockY, a_BlockZ);
+				}
 				default: Pickups.Add(m_BlockType, 1, Meta); break;
 			}
+		}
+		else if (m_BlockType == E_BLOCK_BED)
+		{
+			// Need to access the bed entity to get the color for the item damage
+			ConvertToPickups(a_Digger, Pickups, Meta, a_BlockX, a_BlockY, a_BlockZ);
 		}
 		else
 		{

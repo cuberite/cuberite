@@ -155,6 +155,46 @@ return
 		},
 		Inherits = "cBlockEntityWithItems",
 	},
+	cBedEntity =
+	{
+		Desc = [[
+			A bed entity is a {{cBlockEntity}} descendant that represents a bed in the world.
+		]],
+		Functions =
+		{
+			GetColor =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Returns the color of the bed.",
+			},
+			SetColor =
+			{
+				Params =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Set the color of the bed. A value between 0 - 15. The wool meta color values can be used.",
+			},
+			IsHead =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if this bed entity is the head.",
+			},
+		},
+		Inherits = "cBlockEntity",
+	},
 	cBlockEntity =
 	{
 		Desc = [[
