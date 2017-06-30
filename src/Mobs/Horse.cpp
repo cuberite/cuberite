@@ -129,7 +129,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 			a_Player.AttachTo(this);
 		}
 	}
-	else
+	else if (a_Player.GetEquippedItem().IsEmpty())
 	{
 		if (m_Attachee != nullptr)
 		{
@@ -149,6 +149,12 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 
 		m_TameAttemptTimes++;
 		a_Player.AttachTo(this);
+	}
+	else
+	{
+		m_bIsRearing = true;
+		m_RearTickCount = 0;
+		m_World->BroadcastSoundEffect("entity.horse.angry", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 }
 
