@@ -1357,6 +1357,15 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 
 void cEntity::DetectCacti(void)
 {
+	if (
+		IsPlayer() &&
+		((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator())
+	)
+	{
+		// Ignore Cacti if the entity is player in creative or spectator mode
+		return;
+	}
+
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	double w = m_Width / 2;
 	if (
