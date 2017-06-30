@@ -13497,6 +13497,10 @@ end
 				{
 					Notes = "The blocktype for birch wood stairs"
 				},
+				E_BLOCK_BLACK_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for black terracotta"
+				},
 				E_BLOCK_BLACK_SHULKER_BOX =
 				{
 					Notes = "The blocktype for black shulker box"
@@ -13508,6 +13512,10 @@ end
 				E_BLOCK_BLOCK_OF_REDSTONE =
 				{
 					Notes = "The blocktype for block of redstone"
+				},
+				E_BLOCK_BLUE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for blue glazed terracotta"
 				},
 				E_BLOCK_BLUE_SHULKER_BOX =
 				{
@@ -13532,6 +13540,10 @@ end
 				E_BLOCK_BRICK_STAIRS =
 				{
 					Notes = "The blocktype for brick stairs"
+				},
+				E_BLOCK_BROWN_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for brown glazed terracotta"
 				},
 				E_BLOCK_BROWN_MUSHROOM =
 				{
@@ -13641,6 +13653,14 @@ end
 				{
 					Notes = "The blocktype for command block"
 				},
+				E_BLOCK_CONCRETE =
+				{
+					Notes = "The blocktype for concrete"
+				},
+				E_BLOCK_CONCRETE_POWDER =
+				{
+					Notes = "The blocktype for concrete powder"
+				},
 				E_BLOCK_CRAFTING_TABLE =
 				{
 					Notes = "The blocktype for crafting table"
@@ -13648,6 +13668,10 @@ end
 				E_BLOCK_CROPS =
 				{
 					Notes = "The blocktype for crops"
+				},
+				E_BLOCK_CYAN_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for cyan glazed terracotta"
 				},
 				E_BLOCK_CYAN_SHULKER_BOX =
 				{
@@ -13825,9 +13849,17 @@ end
 				{
 					Notes = "The blocktype for gravel"
 				},
+				E_BLOCK_GRAY_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for gray glazed terracotta"
+				},
 				E_BLOCK_GRAY_SHULKER_BOX =
 				{
 					Notes = "The blocktype for gray shulker box"
+				},
+				E_BLOCK_GREEN_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for green glazed terracotta"
 				},
 				E_BLOCK_GREEN_SHULKER_BOX =
 				{
@@ -13941,9 +13973,17 @@ end
 				{
 					Notes = "The blocktype for lever"
 				},
+				E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for light blue glazed terracotta"
+				},
 				E_BLOCK_LIGHT_BLUE_SHULKER_BOX =
 				{
 					Notes = "The blocktype for light blue shulker box"
+				},
+				E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for light gray glazed terracotta"
 				},
 				E_BLOCK_LIGHT_GRAY_SHULKER_BOX =
 				{
@@ -13957,6 +13997,10 @@ end
 				{
 					Notes = "The blocktype for lily pad"
 				},
+				E_BLOCK_LIME_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for lime glazed terracotta"
+				},
 				E_BLOCK_LIME_SHULKER_BOX =
 				{
 					Notes = "The blocktype for lime shulker box"
@@ -13968,6 +14012,10 @@ end
 				E_BLOCK_LOG =
 				{
 					Notes = "The blocktype for log"
+				},
+				E_BLOCK_MAGENTA_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for magenta glazed terracotta"
 				},
 				E_BLOCK_MAGENTA_SHULKER_BOX =
 				{
@@ -14073,6 +14121,10 @@ end
 				{
 					Notes = "The blocktype for obsidian"
 				},
+				E_BLOCK_ORANGE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for orange glazed terracota"
+				},
 				E_BLOCK_ORANGE_SHULKER_BOX =
 				{
 					Notes = "The blocktype for orange shulker box"
@@ -14080,6 +14132,10 @@ end
 				E_BLOCK_PACKED_ICE =
 				{
 					Notes = "The blocktype for packed ice"
+				},
+				E_BLOCK_PINK_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for pink glazed terracotta"
 				},
 				E_BLOCK_PINK_SHULKER_BOX =
 				{
@@ -14120,6 +14176,10 @@ end
 				E_BLOCK_PUMPKIN_STEM =
 				{
 					Notes = "The blocktype for pumpkin stem"
+				},
+				E_BLOCK_PURPLE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for purple glazed terracotta"
 				},
 				E_BLOCK_PURPLE_SHULKER_BOX =
 				{
@@ -14192,6 +14252,10 @@ end
 				E_BLOCK_REDSTONE_WIRE =
 				{
 					Notes = "The blocktype for redstone wire"
+				},
+				E_BLOCK_RED_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for red glazed terracotta"
 				},
 				E_BLOCK_RED_MUSHROOM =
 				{
@@ -14421,6 +14485,10 @@ end
 				{
 					Notes = "The blocktype for water"
 				},
+				E_BLOCK_WHITE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for white glazed terracotta"
+				},
 				E_BLOCK_WHITE_SHULKER_BOX =
 				{
 					Notes = "The blocktype for white shulker box"
@@ -14456,6 +14524,10 @@ end
 				E_BLOCK_YELLOW_FLOWER =
 				{
 					Notes = "The blocktype for yellow flower"
+				},
+				E_BLOCK_YELLOW_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for yellow glazed terracotta"
 				},
 				E_BLOCK_YELLOW_SHULKER_BOX =
 				{
@@ -15420,6 +15492,134 @@ end
 				DIG_STATUS_SWAP_ITEM_IN_HAND =
 				{
 					Notes = "The player has swapped their held item with the item in their offhand slot (1.9)",
+				},
+				E_META_CONCRETE_BLACK =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is black.",
+				},
+				E_META_CONCRETE_BLUE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is blue.",
+				},
+				E_META_CONCRETE_BROWN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is brown.",
+				},
+				E_META_CONCRETE_CYAN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is cyan.",
+				},
+				E_META_CONCRETE_GRAY =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is gray.",
+				},
+				E_META_CONCRETE_GREEN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is green.",
+				},
+				E_META_CONCRETE_LIGHTBLUE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light blue.",
+				},
+				E_META_CONCRETE_LIGHTGRAY =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light gray.",
+				},
+				E_META_CONCRETE_LIGHTGREEN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light green.",
+				},
+				E_META_CONCRETE_MAGENTA =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is magenta.",
+				},
+				E_META_CONCRETE_ORANGE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is orange.",
+				},
+				E_META_CONCRETE_PINK =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is pink.",
+				},
+				E_META_CONCRETE_POWDER_BLACK =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is black.",
+				},
+				E_META_CONCRETE_POWDER_BLUE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is blue.",
+				},
+				E_META_CONCRETE_POWDER_BROWN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is brown.",
+				},
+				E_META_CONCRETE_POWDER_CYAN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is cyan.",
+				},
+				E_META_CONCRETE_POWDER_GRAY =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is gray.",
+				},
+				E_META_CONCRETE_POWDER_GREEN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is green.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTBLUE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light blue.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTGRAY =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light gray.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTGREEN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light green.",
+				},
+				E_META_CONCRETE_POWDER_MAGENTA =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is magenta.",
+				},
+				E_META_CONCRETE_POWDER_ORANGE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is orange.",
+				},
+				E_META_CONCRETE_POWDER_PINK =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is pink.",
+				},
+				E_META_CONCRETE_POWDER_PURPLE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is purple.",
+				},
+				E_META_CONCRETE_POWDER_RED =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is red.",
+				},
+				E_META_CONCRETE_POWDER_WHITE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is white.",
+				},
+				E_META_CONCRETE_POWDER_YELLOW =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is yellow.",
+				},
+				E_META_CONCRETE_PURPLE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is purple.",
+				},
+				E_META_CONCRETE_RED =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is red.",
+				},
+				E_META_CONCRETE_WHITE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is white.",
+				},
+				E_META_CONCRETE_YELLOW =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is yellow.",
 				},
 				E_META_DROPSPENSER_ACTIVATED =
 				{
