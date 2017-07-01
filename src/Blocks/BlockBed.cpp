@@ -4,6 +4,9 @@
 #include "BroadcastInterface.h"
 #include "Entities/../World.h"
 #include "Entities/Player.h"
+#include "../BoundingBox.h"
+#include "../Mobs/Monster.h"
+#include "../Entities/Entity.h"
 
 
 
@@ -32,6 +35,22 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 		}
 	}
 }
+
+
+
+
+
+class cFindMobs :
+	public cEntityCallback
+{
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		return (
+			(a_Entity->GetEntityType() == cEntity::etMonster) &&
+			(static_cast<cMonster*>(a_Entity)->GetMobFamily() == cMonster::mfHostile)
+		);
+	}
+};
 
 
 
@@ -88,14 +107,23 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
 		a_WorldInterface.DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
 	}
+	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: http://minecraft.gamepedia.com/Bed#Sleeping
+	{
+		a_Player->SendMessageFailure("You can only sleep at night");
+	}
 	else
 	{
-		if (a_WorldInterface.GetTimeOfDay() > 13000)
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		if ((Meta & 0x4) == 0x4)
 		{
-			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-			if ((Meta & 0x4) == 0x4)
+			a_Player->SendMessageFailure("This bed is occupied");
+		}
+		else
+		{
+			cFindMobs FindMobs;
+			if (!a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(a_Player->GetPosition() - Vector3i(0, 5, 0), 8, 10), FindMobs))
 			{
-				a_Player->SendMessageFailure("This bed is occupied");
+				a_Player->SendMessageFailure("You may not rest now, there are monsters nearby");
 			}
 			else
 			{
@@ -132,10 +160,6 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 				}
 			}
-		}
-		else
-		{
-			a_Player->SendMessageFailure("You can only sleep at night");
 		}
 	}
 	return true;
