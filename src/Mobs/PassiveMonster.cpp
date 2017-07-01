@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "BoundingBox.h"
+#include "../Items/ItemSpawnEgg.h"
 
 
 
@@ -223,13 +224,14 @@ void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
+	const cItem & EquippedItem = a_Player.GetEquippedItem();
+
 	// If a player holding breeding items right-clicked me, go into love mode
 	if ((m_LoveCooldown == 0) && !IsInLove() && !IsBaby())
 	{
-		short HeldItem = a_Player.GetEquippedItem().m_ItemType;
 		cItems Items;
 		GetBreedingItems(Items);
-		if (Items.ContainsType(HeldItem))
+		if (Items.ContainsType(EquippedItem.m_ItemType))
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -237,6 +239,22 @@ void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 			}
 			m_LoveTimer = 20 * 30;  // half a minute
 			m_World->BroadcastEntityStatus(*this, esMobInLove);
+		}
+	}
+	// If a player holding my spawn egg right-clicked me, spawn a new baby
+	if (EquippedItem.m_ItemType == E_ITEM_SPAWN_EGG)
+	{
+		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
+		if (
+			(MonsterType == m_MobType) &&
+			(GetWorld()->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
+		)
+		{
+			if (!a_Player.IsGameModeCreative())
+			{
+				// The mob was spawned, "use" the item:
+				a_Player.GetInventory().RemoveOneEquippedItem();
+			}
 		}
 	}
 }
