@@ -769,6 +769,24 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Ocelot.IsBaby());
+
+			Int8 OcelotStatus = 0;
+			if (Ocelot.IsSitting())
+			{
+				OcelotStatus |= 0x1;
+			}
+			if (Ocelot.IsTame())
+			{
+				OcelotStatus |= 0x4;
+			}
+			a_Pkt.WriteBEUInt8(TAMEABLE_ANIMAL_STATUS);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEInt8(OcelotStatus);
+
+			a_Pkt.WriteBEUInt8(OCELOT_TYPE);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Ocelot.GetOcelotType()));
+
 			break;
 		}  // case mtOcelot
 

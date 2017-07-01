@@ -247,7 +247,7 @@ void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
 		if (
 			(MonsterType == m_MobType) &&
-			(GetWorld()->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
+			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
 		)
 		{
 			if (!a_Player.IsGameModeCreative())
