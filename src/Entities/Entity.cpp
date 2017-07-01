@@ -911,7 +911,10 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_TicksSinceLastVoidDamage = 0;
 		}
 
-		if (IsMob() || IsPlayer() || IsPickup() || IsExpOrb())
+		if (
+			IsMob() || IsPickup() || IsExpOrb() ||
+			(IsPlayer() && !((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator()))
+		)
 		{
 			DetectCacti();
 		}
@@ -1357,15 +1360,6 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 
 void cEntity::DetectCacti(void)
 {
-	if (
-		IsPlayer() &&
-		((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator())
-	)
-	{
-		// Ignore Cacti if the entity is player in creative or spectator mode
-		return;
-	}
-
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	double w = m_Width / 2;
 	if (
