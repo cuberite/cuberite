@@ -26,6 +26,7 @@ extern "C"
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 
+const std::string LUA_FILE_SUFFIX = ".lua";
 
 
 
@@ -113,7 +114,7 @@ bool cPluginLua::Load(void)
 	bool HasInfoLua = false;
 	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)
 	{
-		if (itr->rfind(".lua") != AString::npos)
+		if (itr->rfind(LUA_FILE_SUFFIX) == itr->size() - LUA_FILE_SUFFIX.size())
 		{
 			if (*itr == "Info.lua")
 			{
