@@ -670,7 +670,18 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case mtOcelot:
 			{
-				m_Writer.AddInt("Age", reinterpret_cast<const cOcelot *>(a_Monster)->GetAge());
+				const auto *Ocelot = reinterpret_cast<const cOcelot *>(a_Monster);
+				if (!Ocelot->GetOwnerName().empty())
+				{
+					m_Writer.AddString("Owner", Ocelot->GetOwnerName());
+				}
+				if (!Ocelot->GetOwnerUUID().empty())
+				{
+					m_Writer.AddString("OwnerUUID", Ocelot->GetOwnerUUID());
+				}
+				m_Writer.AddByte("Sitting",     Ocelot->IsSitting() ? 1 : 0);
+				m_Writer.AddInt ("CatType",     Ocelot->GetOcelotType());
+				m_Writer.AddInt ("Age",         Ocelot->GetAge());
 				break;
 			}
 			case mtPig:

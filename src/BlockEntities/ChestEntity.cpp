@@ -226,8 +226,8 @@ class cFindSittingCat :
 	{
 		return (
 			(a_Entity->GetEntityType() == cEntity::etMonster) &&
-			(static_cast<cMonster*>(a_Entity)->GetMobType() == eMonsterType::mtOcelot) &&
-			(static_cast<cOcelot*>(a_Entity)->IsSitting())
+			(static_cast<cMonster *>(a_Entity)->GetMobType() == eMonsterType::mtOcelot) &&
+			(static_cast<cOcelot *>(a_Entity)->IsSitting())
 		);
 	}
 };
@@ -242,7 +242,10 @@ bool cChestEntity::IsBlocked()
 	return (
 		(GetPosY() >= cChunkDef::Height - 1) ||
 		!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
-		((GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()) == E_BLOCK_AIR) && !GetWorld()->ForEachEntityInBox(cBoundingBox(Vector3d(GetPosX(), GetPosY() + 1, GetPosZ()), 1, 1), FindSittingCat))
+		(
+			(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()) == E_BLOCK_AIR) && 
+			!GetWorld()->ForEachEntityInBox(cBoundingBox(Vector3d(GetPosX(), GetPosY() + 1, GetPosZ()), 1, 1), FindSittingCat)
+		)
 	);
 }
 

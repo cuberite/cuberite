@@ -129,7 +129,7 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 	if (!IsTame())
 	{
 		if (
-			IsBegging() && 
+			IsBegging() &&
 			((a_Player.GetPosition() - GetPosition()).Length() <= 3)
 		)
 		{

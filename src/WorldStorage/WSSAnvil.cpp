@@ -2496,6 +2496,27 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
+	std::pair<AString, AString> OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
+	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
+	{
+		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);
+		Monster->SetIsTame(true);
+	}
+
+	int TypeIdx  = a_NBT.FindChildByName(a_TagIdx, "CatType");
+	if (TypeIdx > 0)
+	{
+		int Type = a_NBT.GetInt(TypeIdx);
+		Monster->SetOcelotType(Type);
+	}
+
+	int SittingIdx = a_NBT.FindChildByName(a_TagIdx, "Sitting");
+	if ((SittingIdx > 0) && (a_NBT.GetType(SittingIdx) == TAG_Byte))
+	{
+		bool Sitting = ((a_NBT.GetByte(SittingIdx) == 1) ? true : false);
+		Monster->SetIsSitting(Sitting);
+	}
+
 	int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
 	if (AgeableIdx > 0)
 	{
@@ -2876,7 +2897,12 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		return;
 	}
 
-	LoadWolfOwner(*Monster.get(), a_NBT, a_TagIdx);
+	std::pair<AString, AString> OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
+	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
+	{
+		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);
+		Monster->SetIsTame(true);
+	}
 
 	int SittingIdx = a_NBT.FindChildByName(a_TagIdx, "Sitting");
 	if ((SittingIdx > 0) && (a_NBT.GetType(SittingIdx) == TAG_Byte))
@@ -3009,7 +3035,7 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 
 
-void cWSSAnvil::LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_TagIdx)
+std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	// Load the owner information. OwnerUUID or Owner may be specified, possibly both:
 	AString OwnerUUID, OwnerName;
@@ -3026,19 +3052,19 @@ void cWSSAnvil::LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_Ta
 	if (OwnerName.empty() && OwnerUUID.empty())
 	{
 		// There is no owner, bail out:
-		return;
+		return std::pair<AString, AString>("", "");
 	}
 
 	// Convert name to UUID, if needed:
 	if (OwnerUUID.empty())
 	{
-		// This wolf has only playername stored (pre-1.7.6), look up the UUID
+		// This entity has only playername stored (pre-1.7.6), look up the UUID
 		// The lookup is blocking, but we're running in a separate thread, so it's ok
 		OwnerUUID = cRoot::Get()->GetMojangAPI().GetUUIDFromPlayerName(OwnerName);
 		if (OwnerUUID.empty())
 		{
-			// Not a known player, un-tame the wolf by bailing out
-			return;
+			// Not a known player, un-tame the entity by bailing out
+			return std::pair<AString, AString>("", "");
 		}
 	}
 	else
@@ -3054,13 +3080,12 @@ void cWSSAnvil::LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_Ta
 		OwnerName = cRoot::Get()->GetMojangAPI().GetPlayerNameFromUUID(OwnerUUID);
 		if (OwnerName.empty())
 		{
-			// Not a known player, un-tame the wolf by bailing out
-			return;
+			// Not a known player, un-tame the entity by bailing out
+			return std::pair<AString, AString>("", "");
 		}
 	}
 
-	a_Wolf.SetOwner(OwnerName, OwnerUUID);
-	a_Wolf.SetIsTame(true);
+	return std::pair<AString, AString>(OwnerName, OwnerUUID);
 }
 
 
