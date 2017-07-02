@@ -237,6 +237,16 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		AddSpeedX(Distance.x);
 		AddSpeedZ(Distance.z);
 	}
+
+	// Speed up leashed mobs getting far from player
+	if (IsLeashed() && GetLeashedTo()->IsPlayer())
+	{
+		Distance = GetLeashedTo()->GetPosition() - GetPosition();
+		Distance.Normalize();
+		AddSpeedX(Distance.x);
+		AddSpeedZ(Distance.z);
+	}
+
 }
 
 
