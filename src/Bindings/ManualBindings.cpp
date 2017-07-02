@@ -3684,6 +3684,57 @@ static int tolua_cEntity_GetSpeed(lua_State * tolua_S)
 
 
 
+static int tolua_cColor_Set(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	cColor * self = reinterpret_cast<cColor *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (
+		!L.CheckParamNumber(2) ||
+		!L.CheckParamNumber(3) ||
+		!L.CheckParamNumber(4)
+	)
+	{
+		// TODO: Print a warning?
+		return 0;
+	}
+	if (self == nullptr)
+	{
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		return 0;
+	}
+
+	self->SetRed(lua_tonumber(tolua_S, 2));
+	self->SetGreen(lua_tonumber(tolua_S, 3));
+	self->SetBlue(lua_tonumber(tolua_S, 4));
+	return 0;
+}
+
+
+
+
+
+static int tolua_cColor_Get(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	cColor * self = reinterpret_cast<cColor *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		return 0;
+	}
+
+	L.Push(self->GetRed());
+	L.Push(self->GetGreen());
+	L.Push(self->GetBlue());
+	return 3;
+}
+
+
+
+
+
 void cManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
@@ -3693,10 +3744,12 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_usertype(tolua_S, "cLineBlockTracer");
 		tolua_usertype(tolua_S, "cStringCompression");
 		tolua_usertype(tolua_S, "cUrlParser");
+		tolua_usertype(tolua_S, "cColor");
 		tolua_cclass(tolua_S, "cCryptoHash",        "cCryptoHash",        "", nullptr);
 		tolua_cclass(tolua_S, "cLineBlockTracer",   "cLineBlockTracer",   "", nullptr);
 		tolua_cclass(tolua_S, "cStringCompression", "cStringCompression", "", nullptr);
 		tolua_cclass(tolua_S, "cUrlParser",         "cUrlParser",         "", nullptr);
+		tolua_cclass(tolua_S, "cColor",             "cColor",             "", nullptr);
 
 		// Globals:
 		tolua_function(tolua_S, "Clamp",                 tolua_Clamp);
@@ -3725,6 +3778,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cColor");
+			tolua_function(tolua_S, "Set", tolua_cColor_Set);
+			tolua_function(tolua_S, "Get", tolua_cColor_Get);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");
