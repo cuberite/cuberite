@@ -558,18 +558,29 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_Monster->IsCustomNameAlwaysVisible()));
 
 		// Mob was leashed
-		if (a_Monster->IsLeashed())
+		if (a_Monster->IsLeashed() || (a_Monster->GetLeashToPos() != nullptr))
 		{
 			m_Writer.AddByte("Leashed", 1);
-			m_Writer.BeginCompound("Leash");
-			const cPassiveMonster *PassiveMonster = reinterpret_cast<const cPassiveMonster *>(a_Monster);
-			if (PassiveMonster->GetLeashedTo()->IsLeashKnot())
+
+			const Vector3d * LeashedToPos = nullptr;
+
+			if (a_Monster->GetLeashToPos() != nullptr)
 			{
-				m_Writer.AddDouble("X", PassiveMonster->GetLeashedTo()->GetPosX());
-				m_Writer.AddDouble("Y", PassiveMonster->GetLeashedTo()->GetPosY());
-				m_Writer.AddDouble("Z", PassiveMonster->GetLeashedTo()->GetPosZ());
+				LeashedToPos = a_Monster->GetLeashToPos();
 			}
-			m_Writer.EndCompound();
+			else if (a_Monster->GetLeashedTo()->IsLeashKnot())
+			{
+				LeashedToPos = & a_Monster->GetLeashedTo()->GetPosition();
+			}
+
+			if (LeashedToPos != nullptr)
+			{
+				m_Writer.BeginCompound("Leash");
+				m_Writer.AddDouble("X", LeashedToPos->x);
+				m_Writer.AddDouble("Y", LeashedToPos->y);
+				m_Writer.AddDouble("Z", LeashedToPos->z);
+				m_Writer.EndCompound();
+			}
 		}
 
 		switch (a_Monster->GetMobType())

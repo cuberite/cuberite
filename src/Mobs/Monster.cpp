@@ -319,7 +319,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	bool a_IsFollowingPath = false;
 	if (m_PathfinderActivated)
 	{
-		if (ReachedFinalDestination())
+		if (ReachedFinalDestination() || (m_LeashToPos != nullptr))
 		{
 			StopMovingToPosition();  // Simply sets m_PathfinderActivated to false.
 		}

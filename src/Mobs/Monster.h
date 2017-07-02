@@ -97,6 +97,9 @@ public:
 	/** Sets entity position to where is leashed this mob */
 	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = pos; }
 
+	/** Gets entity position to where mob should be leashed */
+	Vector3d * GetLeashToPos() const { return m_LeashToPos; }
+
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
 
