@@ -12,9 +12,9 @@ void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
 }
 
 
-cBlockInfo::cBlockInfoArray cBlockInfo::Initialize()
+cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 {
-	cBlockInfoArray Info;
+	cBlockInfoArray & Info = *this;
 
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
@@ -930,13 +930,8 @@ cBlockInfo::cBlockInfoArray cBlockInfo::Initialize()
 	Info[E_BLOCK_RED_SHULKER_BOX              ].m_Hardness = 0.2f;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_Hardness = 0.2f;
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_Hardness = -1.0f;
-
-	#if defined(_MSC_VER) && (_MSC_VER < 1900)
-		return std::move(Info);
-	#else
-		return Info;
-	#endif
 }
+
 
 
 

@@ -20,12 +20,7 @@ public:
 
 	/** This accessor makes sure that the cBlockInfo structures are properly initialized exactly once.
 	It does so by using the C++ singleton approximation - storing the actual singleton as the function's static variable. */
-	static cBlockInfo & Get(BLOCKTYPE a_Type)
-	{
-		static cBlockInfoArray ms_Info = Initialize();
-		return ms_Info[a_Type];
-	}
-
+	static cBlockInfo & Get(BLOCKTYPE a_Type);
 
 	/** How much light do the blocks emit on their own? */
 	NIBBLETYPE m_LightValue;
@@ -115,13 +110,32 @@ public:
 		, m_Handler()
 	{}
 
-protected:
+private:
 	/** Storage for all the BlockInfo structures. */
-	using cBlockInfoArray = std::array<cBlockInfo, 256>;
-
-	/** Initializes the specified BlockInfo structures with block-specific values. */
-	static cBlockInfoArray Initialize();
+	class cBlockInfoArray;
 };  // tolua_export
+
+
+
+
+
+class cBlockInfo::cBlockInfoArray:
+	public std::array<cBlockInfo, 256>
+{
+public:
+	/** Initializes the contained BlockInfo structures with block-specific values. */
+	cBlockInfoArray();
+};
+
+
+
+
+
+inline cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
+{
+	static cBlockInfoArray ms_Info;
+	return ms_Info[a_Type];
+}
 
 
 
