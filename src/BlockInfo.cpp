@@ -931,7 +931,11 @@ cBlockInfo::cBlockInfoArray cBlockInfo::Initialize()
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_Hardness = 0.2f;
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_Hardness = -1.0f;
 
-	return Info;
+	#if defined(_MSC_VER) && (_MSC_VER < 1900)
+		return std::move(Info);
+	#else
+		return Info;
+	#endif
 }
 
 
