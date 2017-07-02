@@ -928,7 +928,10 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_TicksSinceLastVoidDamage = 0;
 		}
 
-		if (IsMob() || IsPlayer() || IsPickup() || IsExpOrb())
+		if (
+			IsMob() || IsPickup() || IsExpOrb() ||
+			(IsPlayer() && !((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator()))
+		)
 		{
 			DetectCacti();
 		}

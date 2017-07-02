@@ -64,6 +64,7 @@ public:
 		switch (a_Block)
 		{
 			case E_BLOCK_CLAY:
+			case E_BLOCK_CONCRETE_POWDER:
 			case E_BLOCK_DIRT:
 			case E_BLOCK_FARMLAND:
 			case E_BLOCK_GRASS:

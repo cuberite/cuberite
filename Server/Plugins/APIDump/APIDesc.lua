@@ -12266,6 +12266,249 @@ end
 			},  -- ConstantGroups
 		},  -- cWindow
 
+		EffectID =
+		{
+			Desc = [[
+				An enumeration of sound and particle effects which can be used with
+				{{cWorld#BroadcastSoundParticleEffect|BroadcastSoundParticleEffect}}.
+			]],
+			Constants =
+			{
+				SFX_RANDOM_DISPENSER_DISPENSE =
+				{
+					Notes = "Sound of droper/dispenser releasing an item",
+				},
+				SFX_RANDOM_DISPENSER_DISPENSE_FAIL =
+				{
+					Notes = "Sound of a droper/dispenser activated without items",
+				},
+				SFX_RANDOM_DISPENSER_SHOOT =
+				{
+					Notes = "Sound of a dispenser shooting",
+				},
+				SFX_RANDOM_ENDER_EYE_LAUNCH =
+				{
+					Notes = "Sound of an ender eye launch"
+				},
+				SFX_RANDOM_FIREWORK_SHOT =
+				{
+					Notes = "Sound of a firework shot",
+				},
+				SFX_RANDOM_IRON_DOOR_OPEN =
+				{
+					Notes = "Sound of an iron door opening",
+				},
+				SFX_RANDOM_WOODEN_DOOR_OPEN =
+				{
+					Notes = "Sound of a wooden door opening"
+				},
+				SFX_RANDOM_WOODEN_TRAPDOOR_OPEN =
+				{
+					Notes = "Sound of a wooden trapdoor opening"
+				},
+				SFX_RANDOM_FENCE_GATE_OPEN =
+				{
+					Notes = "Sound of a fence gate opening",
+				},
+				SFX_RANDOM_FIRE_EXTINGUISH =
+				{
+					Notes = "Sound of a fire extinguishing",
+				},
+				SFX_RANDOM_PLAY_MUSIC_DISC =
+				{
+					Notes = "Starts playing a music disc. Needs an accompanting music disc ID",
+				},
+				SFX_RANDOM_IRON_DOOR_CLOSE =
+				{
+					Notes = "Sound of an iron door closing",
+				},
+				SFX_RANDOM_WOODEN_DOOR_CLOSE =
+				{
+					Notes = "Sound of a wooden door closing",
+				},
+				SFX_RANDOM_WOODEN_TRAPDOOR_CLOSE =
+				{
+					Notes = "Sound of a trapdoor closing",
+				},
+				SFX_RANDOM_FENCE_GATE_CLOSE =
+				{
+					Notes = "Sound of a fence gate closing",
+				},
+				SFX_MOB_GHAST_WARN =
+				{
+					Notes = "Sound of a ghast warning cry",
+				},
+				SFX_MOB_GHAST_SHOOT =
+				{
+					Notes = "Sound of a ghast shooting",
+				},
+				SFX_MOB_ENDERDRAGON_SHOOT =
+				{
+					Notes = "Sound of the enderdragon shooting",
+				},
+				SFX_MOB_BLAZE_SHOOT =
+				{
+					Notes = "Sound of a blaze shooting",
+				},
+				SFX_MOB_ZOMBIE_WOOD =
+				{
+					Notes = "Sound of a zombie attacking a wooden door",
+				},
+				SFX_MOB_ZOMBIE_METAL =
+				{
+					Notes = "Sound of a zombie attacking a metal door",
+				},
+				SFX_MOB_ZOMBIE_WOOD_BREAK =
+				{
+					Notes = "Sound of a zombie breaking a wooden door",
+				},
+				SFX_MOB_WITHER_BREAK_BLOCK =
+				{
+					Notes = "Sound of a wither breaking blocks",
+				},
+				SFX_MOB_WITHER_SPAWN =
+				{
+					Notes = "Sound of a wither spawning",
+				},
+				SFX_MOB_WITHER_SHOOT =
+				{
+					Notes = "Sound of a wither shooting",
+				},
+				SFX_MOB_BAT_TAKEOFF =
+				{
+					Notes = "Sound of a bat taking off",
+				},
+				SFX_MOB_ZOMBIE_INFECT =
+				{
+					Notes = "Sound of a zombie infecting a villager",
+				},
+				SFX_MOB_ZOMBIE_UNFECT =
+				{
+					Notes = "Sound of a zombie villager converting to villager",
+				},
+				SFX_MOB_ENDERDRAGON_DEATH =
+				{
+					Notes = "Sound of the dragon releasing dragon breath",
+				},
+				SFX_RANDOM_ANVIL_BREAK =
+				{
+					Notes = "Sound of an anvil breaking",
+				},
+				SFX_RANDOM_ANVIL_USE =
+				{
+					Notes = "Sound of using an anvil",
+				},
+				SFX_RANDOM_ANVIL_LAND =
+				{
+					Notes = "Sound of a falling anvil landing",
+				},
+				SFX_RANDOM_PORTAL_TRAVEL =
+				{
+					Notes = "Sound of travelling through a portal",
+				},
+				SFX_RANDOM_CHORUS_FLOWER_GROW =
+				{
+					Notes = "Sound of a growing chorus flower",
+				},
+				SFX_RANDOM_CHORUS_FLOWER_DEATH =
+				{
+					Notes = "Sound of a dieing chorus flower",
+				},
+				SFX_RANDOM_BREWING_STAND_BREW =
+				{
+					Notes = "Sound of an active brewing stand",
+				},
+				SFX_RANDOM_IRON_TRAPDOOR_OPEN =
+				{
+					Notes = "Sound of an iron trapdoor opening",
+				},
+				SFX_RANDOM_IRON_TRAPDOOR_CLOSE =
+				{
+					Notes = "Sound of an iron trapdoor closing",
+				},
+				PARTICLE_SMOKE =
+				{
+					Notes = "Spawns 10 smoke particles, e.g. from a fire.  Needs a {{SmokeDirection|SmokeDirection}}",
+				},
+				PARTICLE_BLOCK_BREAK =
+				{
+					Notes = "Block break particle and sound.  Needs a BlockID",
+				},
+				PARTICLE_SPLASH_POTION =
+				{
+					Notes = "Splash potion particles and glass break sound.  Needs a PotionID",
+				},
+				PARTICLE_EYE_OF_ENDER =
+				{
+					Notes = "Eye of ender entity break particles and sound",
+				},
+				PARTICLE_MOBSPAWN =
+				{
+					Notes = "Mob spawn particle effect: smoke and flames",
+				},
+				PARTICLE_HAPPY_VILLAGER =
+				{
+					Notes = "Happy villager/bonemeal particles.  Number of particles may be given or 0 for default of 15",
+				},
+				PARTICLE_DRAGON_BREATH =
+				{
+					Notes = "Dragon breath particle effect",
+				},
+				PARTICLE_END_GATEWAY_SPAWN =
+				{
+					Notes = "End gateway spawn particle effect",
+				},
+				PARTICLE_ENDERDRAGON_GROWL =
+				{
+					Notes = "Ender dragon growl particle effect",
+				},
+			},
+		},
+		SmokeDirection =
+		{
+			Desc = [[
+				An enumeration of the direction spawned smoke will drift in as it floats up.
+			]],
+			Constants =
+			{
+				SOUTH_EAST =
+				{
+					Notes = "Smoke drifts south-east",
+				},
+				SOUTH =
+				{
+					Notes = "Smoke drifts south",
+				},
+				SOUTH_WEST =
+				{
+					Notes = "Smoke drifts south-west",
+				},
+				EAST =
+				{
+					Notes = "Smoke drifts east",
+				},
+				CENTRE =
+				{
+					Notes = "Smoke does not drift",
+				},
+				WEST =
+				{
+					Notes = "Smoke drifts west",
+				},
+				NORTH_EAST =
+				{
+					Notes = "Smoke drifts north-east",
+				},
+				NORTH =
+				{
+					Notes = "Smoke drifts north",
+				},
+				NORTH_WEST =
+				{
+					Notes = "Smoke drifts west",
+				},
+			}
+		},
 		Globals =
 		{
 			Desc = [[
@@ -13268,6 +13511,10 @@ end
 				{
 					Notes = "The blocktype for birch wood stairs"
 				},
+				E_BLOCK_BLACK_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for black terracotta"
+				},
 				E_BLOCK_BLACK_SHULKER_BOX =
 				{
 					Notes = "The blocktype for black shulker box"
@@ -13279,6 +13526,10 @@ end
 				E_BLOCK_BLOCK_OF_REDSTONE =
 				{
 					Notes = "The blocktype for block of redstone"
+				},
+				E_BLOCK_BLUE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for blue glazed terracotta"
 				},
 				E_BLOCK_BLUE_SHULKER_BOX =
 				{
@@ -13303,6 +13554,10 @@ end
 				E_BLOCK_BRICK_STAIRS =
 				{
 					Notes = "The blocktype for brick stairs"
+				},
+				E_BLOCK_BROWN_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for brown glazed terracotta"
 				},
 				E_BLOCK_BROWN_MUSHROOM =
 				{
@@ -13412,6 +13667,14 @@ end
 				{
 					Notes = "The blocktype for command block"
 				},
+				E_BLOCK_CONCRETE =
+				{
+					Notes = "The blocktype for concrete"
+				},
+				E_BLOCK_CONCRETE_POWDER =
+				{
+					Notes = "The blocktype for concrete powder"
+				},
 				E_BLOCK_CRAFTING_TABLE =
 				{
 					Notes = "The blocktype for crafting table"
@@ -13419,6 +13682,10 @@ end
 				E_BLOCK_CROPS =
 				{
 					Notes = "The blocktype for crops"
+				},
+				E_BLOCK_CYAN_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for cyan glazed terracotta"
 				},
 				E_BLOCK_CYAN_SHULKER_BOX =
 				{
@@ -13596,9 +13863,17 @@ end
 				{
 					Notes = "The blocktype for gravel"
 				},
+				E_BLOCK_GRAY_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for gray glazed terracotta"
+				},
 				E_BLOCK_GRAY_SHULKER_BOX =
 				{
 					Notes = "The blocktype for gray shulker box"
+				},
+				E_BLOCK_GREEN_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for green glazed terracotta"
 				},
 				E_BLOCK_GREEN_SHULKER_BOX =
 				{
@@ -13712,9 +13987,17 @@ end
 				{
 					Notes = "The blocktype for lever"
 				},
+				E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for light blue glazed terracotta"
+				},
 				E_BLOCK_LIGHT_BLUE_SHULKER_BOX =
 				{
 					Notes = "The blocktype for light blue shulker box"
+				},
+				E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for light gray glazed terracotta"
 				},
 				E_BLOCK_LIGHT_GRAY_SHULKER_BOX =
 				{
@@ -13728,6 +14011,10 @@ end
 				{
 					Notes = "The blocktype for lily pad"
 				},
+				E_BLOCK_LIME_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for lime glazed terracotta"
+				},
 				E_BLOCK_LIME_SHULKER_BOX =
 				{
 					Notes = "The blocktype for lime shulker box"
@@ -13739,6 +14026,10 @@ end
 				E_BLOCK_LOG =
 				{
 					Notes = "The blocktype for log"
+				},
+				E_BLOCK_MAGENTA_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for magenta glazed terracotta"
 				},
 				E_BLOCK_MAGENTA_SHULKER_BOX =
 				{
@@ -13844,6 +14135,10 @@ end
 				{
 					Notes = "The blocktype for obsidian"
 				},
+				E_BLOCK_ORANGE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for orange glazed terracota"
+				},
 				E_BLOCK_ORANGE_SHULKER_BOX =
 				{
 					Notes = "The blocktype for orange shulker box"
@@ -13851,6 +14146,10 @@ end
 				E_BLOCK_PACKED_ICE =
 				{
 					Notes = "The blocktype for packed ice"
+				},
+				E_BLOCK_PINK_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for pink glazed terracotta"
 				},
 				E_BLOCK_PINK_SHULKER_BOX =
 				{
@@ -13891,6 +14190,10 @@ end
 				E_BLOCK_PUMPKIN_STEM =
 				{
 					Notes = "The blocktype for pumpkin stem"
+				},
+				E_BLOCK_PURPLE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for purple glazed terracotta"
 				},
 				E_BLOCK_PURPLE_SHULKER_BOX =
 				{
@@ -13963,6 +14266,10 @@ end
 				E_BLOCK_REDSTONE_WIRE =
 				{
 					Notes = "The blocktype for redstone wire"
+				},
+				E_BLOCK_RED_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for red glazed terracotta"
 				},
 				E_BLOCK_RED_MUSHROOM =
 				{
@@ -14192,6 +14499,10 @@ end
 				{
 					Notes = "The blocktype for water"
 				},
+				E_BLOCK_WHITE_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for white glazed terracotta"
+				},
 				E_BLOCK_WHITE_SHULKER_BOX =
 				{
 					Notes = "The blocktype for white shulker box"
@@ -14227,6 +14538,10 @@ end
 				E_BLOCK_YELLOW_FLOWER =
 				{
 					Notes = "The blocktype for yellow flower"
+				},
+				E_BLOCK_YELLOW_GLAZED_TERRACOTTA =
+				{
+					Notes = "The blocktype for yellow glazed terracotta"
 				},
 				E_BLOCK_YELLOW_SHULKER_BOX =
 				{
@@ -15191,6 +15506,134 @@ end
 				DIG_STATUS_SWAP_ITEM_IN_HAND =
 				{
 					Notes = "The player has swapped their held item with the item in their offhand slot (1.9)",
+				},
+				E_META_CONCRETE_BLACK =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is black.",
+				},
+				E_META_CONCRETE_BLUE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is blue.",
+				},
+				E_META_CONCRETE_BROWN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is brown.",
+				},
+				E_META_CONCRETE_CYAN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is cyan.",
+				},
+				E_META_CONCRETE_GRAY =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is gray.",
+				},
+				E_META_CONCRETE_GREEN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is green.",
+				},
+				E_META_CONCRETE_LIGHTBLUE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light blue.",
+				},
+				E_META_CONCRETE_LIGHTGRAY =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light gray.",
+				},
+				E_META_CONCRETE_LIGHTGREEN =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is light green.",
+				},
+				E_META_CONCRETE_MAGENTA =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is magenta.",
+				},
+				E_META_CONCRETE_ORANGE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is orange.",
+				},
+				E_META_CONCRETE_PINK =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is pink.",
+				},
+				E_META_CONCRETE_POWDER_BLACK =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is black.",
+				},
+				E_META_CONCRETE_POWDER_BLUE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is blue.",
+				},
+				E_META_CONCRETE_POWDER_BROWN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is brown.",
+				},
+				E_META_CONCRETE_POWDER_CYAN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is cyan.",
+				},
+				E_META_CONCRETE_POWDER_GRAY =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is gray.",
+				},
+				E_META_CONCRETE_POWDER_GREEN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is green.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTBLUE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light blue.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTGRAY =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light gray.",
+				},
+				E_META_CONCRETE_POWDER_LIGHTGREEN =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is light green.",
+				},
+				E_META_CONCRETE_POWDER_MAGENTA =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is magenta.",
+				},
+				E_META_CONCRETE_POWDER_ORANGE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is orange.",
+				},
+				E_META_CONCRETE_POWDER_PINK =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is pink.",
+				},
+				E_META_CONCRETE_POWDER_PURPLE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is purple.",
+				},
+				E_META_CONCRETE_POWDER_RED =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is red.",
+				},
+				E_META_CONCRETE_POWDER_WHITE =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is white.",
+				},
+				E_META_CONCRETE_POWDER_YELLOW =
+				{
+					Notes = "A flag in the metadata of concete powder that indicates that the concrete powder is yellow.",
+				},
+				E_META_CONCRETE_PURPLE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is purple.",
+				},
+				E_META_CONCRETE_RED =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is red.",
+				},
+				E_META_CONCRETE_WHITE =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is white.",
+				},
+				E_META_CONCRETE_YELLOW =
+				{
+					Notes = "A flag in the metadata of concete that indicates that the concrete is yellow.",
 				},
 				E_META_DROPSPENSER_ACTIVATED =
 				{

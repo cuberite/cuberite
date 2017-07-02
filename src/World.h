@@ -4,7 +4,7 @@
 #ifndef _WIN32
 	#include "BlockID.h"
 #else
-	enum ENUM_ITEM_ID;
+	enum ENUM_ITEM_ID : short;
 #endif
 
 #define MAX_PLAYERS 65535

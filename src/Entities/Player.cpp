@@ -976,6 +976,18 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		AddFoodExhaustion(0.3f);
 		SendHealth();
 
+		// Damage armor
+		short ArmorDamage = static_cast<short>(a_TDI.RawDamage / 4);
+		if (ArmorDamage == 0)
+		{
+			ArmorDamage = 1;
+		}
+		m_Inventory.DamageItem(cInventory::invArmorOffset + 0, ArmorDamage);
+		m_Inventory.DamageItem(cInventory::invArmorOffset + 1, ArmorDamage);
+		m_Inventory.DamageItem(cInventory::invArmorOffset + 2, ArmorDamage);
+		m_Inventory.DamageItem(cInventory::invArmorOffset + 3, ArmorDamage);
+
+		// Tell the wolves
 		if (a_TDI.Attacker != nullptr)
 		{
 			if (a_TDI.Attacker->IsPawn())
