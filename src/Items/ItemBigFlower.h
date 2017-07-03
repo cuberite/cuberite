@@ -49,18 +49,15 @@ public:
 		BLOCKTYPE TopType;
 		NIBBLETYPE TopMeta;
 		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY + 1, a_BlockZ, TopType, TopMeta);
-		auto TopHandler = BlockHandler(TopType);
+		cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
-		if (
-			!TopHandler->DoesIgnoreBuildCollision() &&
-			!TopHandler->DoesIgnoreBuildCollision(&a_Player, TopMeta)
-		)
+		if (!BlockHandler(TopType)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY + 1, a_BlockZ }, a_Player, TopMeta))
 		{
 			return false;
 		}
 
-		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY,     a_BlockZ, E_BLOCK_BIG_FLOWER,  a_EquippedItem.m_ItemDamage & 0x07);
-		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_BIG_FLOWER, (a_EquippedItem.m_ItemDamage & 0x07) | 0x08);
+		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY,     a_BlockZ, E_BLOCK_BIG_FLOWER, a_EquippedItem.m_ItemDamage & 0x07);
+		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
 		return true;
 	}
 };

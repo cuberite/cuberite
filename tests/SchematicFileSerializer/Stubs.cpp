@@ -148,7 +148,7 @@ bool cBlockHandler::IsClickedThrough(void)
 
 
 
-bool cBlockHandler::DoesIgnoreBuildCollision(void)
+bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta)
 {
 	return (m_BlockType == E_BLOCK_AIR);
 }
