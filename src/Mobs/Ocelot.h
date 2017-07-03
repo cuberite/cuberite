@@ -33,7 +33,7 @@ public:
 	bool    IsBegging     (void) const { return m_IsBegging; }
 	AString GetOwnerName  (void) const { return m_OwnerName; }
 	AString GetOwnerUUID  (void) const { return m_OwnerUUID; }
-	int     GetOcelotType (void) const  {return m_Type; }
+	int     GetOcelotType (void) const {return m_Type; }
 
 	// Set functions
 	void SetIsSitting  (bool a_IsSitting)   { m_IsSitting = a_IsSitting; }
@@ -52,6 +52,7 @@ protected:
 	bool      m_IsTame;
 	bool      m_IsBegging;
 	int       m_Type;
+	int       m_CheckPlayerTickCount;
 	AString   m_OwnerName;
 	AString   m_OwnerUUID;
 } ;

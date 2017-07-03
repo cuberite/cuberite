@@ -36,29 +36,38 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!IsTame() && !IsBaby())
 	{
-		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), 10);
-		if (a_Closest_Player != nullptr)
+		if (m_CheckPlayerTickCount == 23)
 		{
-			cItems Items;
-			GetBreedingItems(Items);
-			if (Items.ContainsType(a_Closest_Player->GetEquippedItem().m_ItemType))
+			cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), 10, true);
+			if (a_Closest_Player != nullptr)
 			{
-				if (!IsBegging())
+				cItems Items;
+				GetBreedingItems(Items);
+				if (Items.ContainsType(a_Closest_Player->GetEquippedItem().m_ItemType))
 				{
-					SetIsBegging(true);
-					m_World->BroadcastEntityMetadata(*this);
-				}
+					if (!IsBegging())
+					{
+						SetIsBegging(true);
+						m_World->BroadcastEntityMetadata(*this);
+					}
 
-				MoveToPosition(a_Closest_Player->GetPosition());
-			}
-			else
-			{
-				if (IsBegging())
+					MoveToPosition(a_Closest_Player->GetPosition());
+				}
+				else
 				{
-					SetIsBegging(false);
-					m_World->BroadcastEntityMetadata(*this);
+					if (IsBegging())
+					{
+						SetIsBegging(false);
+						m_World->BroadcastEntityMetadata(*this);
+					}
 				}
 			}
+
+			m_CheckPlayerTickCount = 0;
+		}
+		else
+		{
+			m_CheckPlayerTickCount++;
 		}
 	}
 
@@ -182,7 +191,7 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 void cOcelot::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	super::SpawnOn(a_ClientHandle);
-	if (GetRandomProvider().RandBool(1.0 / 7.0))
+	if (!IsBaby() && GetRandomProvider().RandBool(1.0 / 7.0))
 	{
 		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
 		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
