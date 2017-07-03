@@ -3052,7 +3052,7 @@ std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT,
 	if (OwnerName.empty() && OwnerUUID.empty())
 	{
 		// There is no owner, bail out:
-		return std::pair<AString, AString>("", "");
+		return std::pair<AString, AString>();
 	}
 
 	// Convert name to UUID, if needed:
@@ -3064,7 +3064,7 @@ std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT,
 		if (OwnerUUID.empty())
 		{
 			// Not a known player, un-tame the entity by bailing out
-			return std::pair<AString, AString>("", "");
+			return std::pair<AString, AString>();
 		}
 	}
 	else
@@ -3081,11 +3081,11 @@ std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT,
 		if (OwnerName.empty())
 		{
 			// Not a known player, un-tame the entity by bailing out
-			return std::pair<AString, AString>("", "");
+			return std::pair<AString, AString>();
 		}
 	}
 
-	return std::pair<AString, AString>(OwnerName, OwnerUUID);
+	return std::make_pair(OwnerName, OwnerUUID);
 }
 
 
