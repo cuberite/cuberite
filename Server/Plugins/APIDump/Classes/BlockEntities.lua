@@ -182,7 +182,7 @@ return
 				},
 				Notes = "Set the color of the bed. A value between 0 - 15. The wool meta color values can be used.",
 			},
-			IsHead =
+			IsPillowBlock =
 			{
 				Returns =
 				{
@@ -190,7 +190,7 @@ return
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if this bed entity is the head.",
+				Notes = "Returns true if this is the pillow block, it has then the meta 8.",
 			},
 		},
 		Inherits = "cBlockEntity",

@@ -31,8 +31,8 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 			a_ChunkInterface.FastSetBlock(ThisPos - Direction, E_BLOCK_AIR, 0);
 
 			// Then destroy the bed entity
-			Vector3i HeadPos(ThisPos - Direction);
-			a_ChunkInterface.SetBlock(HeadPos.x, HeadPos.y, HeadPos.z, E_BLOCK_AIR, 0);
+			Vector3i PillowPos(ThisPos - Direction);
+			a_ChunkInterface.SetBlock(PillowPos.x, PillowPos.y, PillowPos.z, E_BLOCK_AIR, 0);
 		}
 	}
 	else
@@ -54,7 +54,6 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 
 
 
-
 class cFindMobs :
 	public cEntityCallback
 {
@@ -66,8 +65,6 @@ class cFindMobs :
 		);
 	}
 };
-
-
 
 
 
@@ -188,12 +185,6 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, const sSetBlock & a_BlockChange)
 {
-	bool IsHead = false;
-	if (a_BlockChange.m_BlockMeta & 0x08)
-	{
-		IsHead = true;
-	}
-
 	class cBedColor :
 		public cBedCallback
 	{

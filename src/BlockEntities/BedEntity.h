@@ -30,8 +30,8 @@ public:
 	/** Set the color of the bed. */
 	void SetColor(short a_Color) { m_Color = a_Color; }
 
-	/** Returns true if this bed block has the meta for head set */
-	bool IsHead(void) { return ((m_BlockMeta & 0x08) == 0x08); }
+	/** Returns true if this is the pillow block, it has then the meta 8. */
+	bool IsPillowBlock(void) { return ((m_BlockMeta & 0x08) == 0x08); }
 
 	// tolua_end
 
