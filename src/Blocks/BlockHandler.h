@@ -110,8 +110,11 @@ public:
 
 	/** Checks if the player can build "inside" this block.
 	For example blocks placed "on" snow will be placed at the same position. So: Snow ignores Build collision
+	@param a_Pos Position of the block
+	@param a_Player Player trying to build on the block
+	@param a_Meta Meta value of the block currently at a_Pos
 	*/
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, Vector3i a_RelPos, cPlayer & a_Player, NIBBLETYPE a_Meta);
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta);
 
 	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
 	Default: true */
