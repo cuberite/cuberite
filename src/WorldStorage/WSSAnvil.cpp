@@ -987,19 +987,16 @@ cBlockEntity * cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx,
 		return nullptr;
 	}
 
-	auto Bed = cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	// Use color red as default
+	short Color = E_META_WOOL_RED;
 
-	int Color = a_NBT.FindChildByName(a_TagIdx, "color");
-	if (Color >= 0)
+	int ColorIDx = a_NBT.FindChildByName(a_TagIdx, "color");
+	if (ColorIDx >= 0)
 	{
-		Bed->SetColor(static_cast<short>(a_NBT.GetInt(Color)));
-	}
-	else
-	{
-		// No color found, use color red as default
-		Bed->SetColor(E_META_WOOL_RED);
+		Color = static_cast<short>(a_NBT.GetInt(ColorIDx));
 	}
 
+	auto Bed = cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World, Color);
 	return Bed.release();
 }
 

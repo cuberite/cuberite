@@ -204,17 +204,6 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 	};
 	cBedColor BedCallback(a_Player->GetEquippedItem().m_ItemDamage);
 	a_Player->GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), BedCallback);
-
-	int posX = a_BlockChange.GetX();
-	int posY = a_BlockChange.GetY();
-	int posZ = a_BlockChange.GetZ();
-
-	// If the bed entity is send immediately, the client (maybe) still has not the bed.
-	// Fix that by delaying the broadcast of the bed entity by a tick:
-	a_Player->GetWorld()->ScheduleTask(1, [posX, posY, posZ](cWorld & a_World)
-	{
-		a_World.BroadcastBlockEntity(posX, posY, posZ);
-	});
 }
 
 

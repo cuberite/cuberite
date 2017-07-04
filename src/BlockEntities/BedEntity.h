@@ -20,7 +20,7 @@ public:
 
 	BLOCKENTITY_PROTODEF(cBedEntity)
 
-	cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, short a_Color = E_META_WOOL_RED);
 
 	// tolua_begin
 
@@ -28,7 +28,7 @@ public:
 	short GetColor(void) const { return m_Color; }
 
 	/** Set the color of the bed. */
-	void SetColor(short a_Color) { m_Color = a_Color; }
+	void SetColor(short a_Color);
 
 	/** Returns true if this is the pillow block, it has then the meta 8. */
 	bool IsPillowBlock(void) { return ((m_BlockMeta & 0x08) == 0x08); }
@@ -43,4 +43,3 @@ public:
 private:
 	short m_Color;
 };  // tolua_export
-

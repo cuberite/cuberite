@@ -9,9 +9,9 @@
 #include "../ClientHandle.h"
 #include "../Blocks/BlockBed.h"
 
-cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, short a_Color):
 	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
-	m_Color(0)
+	m_Color(a_Color)
 {
 	ASSERT(a_BlockType == E_BLOCK_BED);
 }
@@ -34,4 +34,23 @@ void cBedEntity::CopyFrom(const cBlockEntity & a_Src)
 void cBedEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateBlockEntity(*this);
+}
+
+
+
+
+
+void cBedEntity::SetColor(short a_Color)
+{
+	m_Color = a_Color;
+	int posX = m_PosX;
+	int posY = m_PosY;
+	int posZ = m_PosZ;
+
+	// If the bed entity is send immediately, the client (maybe) still has not the bed.
+	// Fix that by delaying the broadcast of the bed entity by a tick:
+	m_World->ScheduleTask(1, [posX, posY, posZ](cWorld & a_World)
+	{
+		a_World.BroadcastBlockEntity(posX, posY, posZ);
+	});
 }
