@@ -141,7 +141,7 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else
 	{
 		// Detect if fence is destroyed. Get block at knot position and check if its solid
-		BLOCKTYPE BlockID = m_World->GetBlock(static_cast<int>(GetPosX()), static_cast<int>(GetPosY()), static_cast<int>(GetPosZ()));
+		BLOCKTYPE BlockID = m_World->GetBlock(FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()));
 		if (!cBlockInfo::IsSolid(BlockID))
 		{
 			m_ShouldSelfDestroy = true;

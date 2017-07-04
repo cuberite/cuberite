@@ -111,7 +111,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_WasLastTargetAPlayer(false)
 	, m_LeashedTo(nullptr)
 	, m_LeashToPos(nullptr)
-	, m_IsLeadActionJustDone(false)
+	, m_IsLeashActionJustDone(false)
 	, m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive)
 	, m_Target(nullptr)
 {
@@ -687,7 +687,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	}
 
 	// Using leads
-	m_IsLeadActionJustDone = false;
+	m_IsLeashActionJustDone = false;
 	if (IsLeashed() && (GetLeashedTo() == &a_Player))  // a player can only unleash a mob leashed to him
 	{
 		a_Player.RemoveLeashedMob(this, !a_Player.IsGameModeCreative());
@@ -1427,7 +1427,7 @@ void cMonster::SetLeashedTo(cEntity * a_Entity)
 {
 	m_LeashedTo = a_Entity;
 
-	m_IsLeadActionJustDone = true;
+	m_IsLeashActionJustDone = true;
 	LOGD("Mob leashed");
 }
 
@@ -1449,6 +1449,6 @@ void cMonster::SetUnleashed(bool a_DropPickup)
 		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
 	}
 
-	m_IsLeadActionJustDone = true;
+	m_IsLeashActionJustDone = true;
 	LOGD("Mob unleashed");
 }

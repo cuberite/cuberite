@@ -1704,7 +1704,6 @@ void cClientHandle::HandleUpdateSign(
 void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 {
 	// TODO: Let plugins interfere via a hook
-	LOGD("Use entity %d", a_TargetEntityID);
 
 	// If the player is a spectator, let him spectate
 	if (m_Player->IsGameModeSpectator() && a_IsLeftClick)

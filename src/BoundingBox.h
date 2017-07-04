@@ -27,7 +27,12 @@ public:
 	cBoundingBox(double a_MinX, double a_MaxX, double a_MinY, double a_MaxY, double a_MinZ, double a_MaxZ);
 	cBoundingBox(const Vector3d & a_Min, const Vector3d & a_Max);
 	cBoundingBox(const Vector3d & a_Pos, double a_Radius, double a_Height);
+
+	/** Constructor that allows to define a bounding box given a center point (a_Pos), an horizontal radius (a_Radius),
+	a height starting from given center point (a_Height) and a vertical offset (a_VerticalOffset) to adjust the vertical starting point.
+	For example: cBoundingBox([0, 0, 0], 6, 6, -3) would create a bounding cube from (-3, -3, -3) to (3, 3, 3).	*/
 	cBoundingBox(const Vector3d & a_Pos, double a_Radius, double a_Height, double a_VerticalOffset);
+
 	cBoundingBox(const Vector3d & a_Pos, double a_CubeLength);
 	cBoundingBox(const cBoundingBox & a_Orig);
 

@@ -83,7 +83,7 @@ public:
 	void SetCanBeLeashed(bool a_CanBeLeashed) { m_CanBeLeashed = a_CanBeLeashed; }
 
 	/** Returns whether the monster is leashed to an entity. */
-	virtual bool IsLeashed() const { return (m_LeashedTo != nullptr); }
+	bool IsLeashed() const { return (m_LeashedTo != nullptr); }
 
 	/** Leash the monster to a entity. */
 	void SetLeashedTo(cEntity * a_Entity);
@@ -307,7 +307,7 @@ protected:
 	Vector3d * m_LeashToPos;
 
 	/** Mob has ben leashed or unleashed in current player action. Avoids double actions on horses. */
-	bool m_IsLeadActionJustDone;
+	bool m_IsLeashActionJustDone;
 
 	/** Determines whether a monster can be leashed */
 	bool m_CanBeLeashed;

@@ -132,7 +132,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 	else if (a_Player.GetEquippedItem().IsEmpty())
 	{
 		// Check if leashed / unleashed to player before try to ride
-		if (!m_IsLeadActionJustDone)
+		if (!m_IsLeashActionJustDone)
 		{
 			if (m_Attachee != nullptr)
 			{
