@@ -19,20 +19,8 @@ public:
 	/** Returns the associated BlockInfo structure for the specified block type. */
 
 	/** This accessor makes sure that the cBlockInfo structures are properly initialized exactly once.
-	It does so by using the C++ singleton approximation - storing the actual singleton as the function's static variable.
-	It works only if it is called for the first time before the app spawns other threads. */
-	static cBlockInfo & Get(BLOCKTYPE a_Type)
-	{
-		static cBlockInfo ms_Info[256];
-		static bool IsBlockInfoInitialized = false;
-		if (!IsBlockInfoInitialized)
-		{
-			cBlockInfo::Initialize(ms_Info);
-			IsBlockInfoInitialized = true;
-		}
-		return ms_Info[a_Type];
-	}
-
+	It does so by using the C++ singleton approximation - storing the actual singleton as the function's static variable. */
+	static cBlockInfo & Get(BLOCKTYPE a_Type);
 
 	/** How much light do the blocks emit on their own? */
 	NIBBLETYPE m_LightValue;
@@ -75,8 +63,14 @@ public:
 
 	// tolua_end
 
+	/** Custom deleter allows cBlockHandler to be an incomplete type. */
+	struct sHandlerDeleter
+	{
+		void operator () (cBlockHandler * a_Handler);
+	};
+
 	/** Associated block handler. */
-	cBlockHandler * m_Handler;
+	std::unique_ptr<cBlockHandler, sHandlerDeleter> m_Handler;
 
 	// tolua_begin
 
@@ -96,11 +90,7 @@ public:
 
 	// tolua_end
 
-	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler;             }
-
-protected:
-	/** Storage for all the BlockInfo structures. */
-	typedef cBlockInfo cBlockInfoArray[256];
+	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler.get();       }
 
 	/** Creates a default BlockInfo structure, initializes all values to their defaults */
 	cBlockInfo()
@@ -115,17 +105,37 @@ protected:
 		, m_FullyOccupiesVoxel(false)
 		, m_CanBeTerraformed(false)
 		, m_BlockHeight(1.0)
-		, m_PlaceSound("")
+		, m_PlaceSound()
 		, m_Hardness(0.0f)
-		, m_Handler(nullptr)
+		, m_Handler()
 	{}
 
-	/** Cleans up the stored values */
-	~cBlockInfo();
-
-	/** Initializes the specified BlockInfo structures with block-specific values. */
-	static void Initialize(cBlockInfoArray & a_BlockInfos);
+private:
+	/** Storage for all the BlockInfo structures. */
+	class cBlockInfoArray;
 };  // tolua_export
+
+
+
+
+
+class cBlockInfo::cBlockInfoArray:
+	public std::array<cBlockInfo, 256>
+{
+public:
+	/** Initializes the contained BlockInfo structures with block-specific values. */
+	cBlockInfoArray();
+};
+
+
+
+
+
+inline cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
+{
+	static cBlockInfoArray ms_Info;
+	return ms_Info[a_Type];
+}
 
 
 
@@ -134,7 +144,7 @@ protected:
 // Shortcut to get the blockhandler for a specific block
 inline cBlockHandler * BlockHandler(BLOCKTYPE a_BlockType)
 {
-	return cBlockInfo::Get(a_BlockType).m_Handler;
+	return cBlockInfo::Get(a_BlockType).m_Handler.get();
 }
 
 

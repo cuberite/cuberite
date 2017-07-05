@@ -63,6 +63,9 @@ Implements the 1.9 protocol classes:
 /** The slot number that the client uses to indicate "outside the window". */
 static const Int16 SLOT_NUM_OUTSIDE = -999;
 
+/** Value for main hand in Hand parameter for Protocol 1.9. */
+static const UInt32 MAIN_HAND = 0;
+
 
 
 
@@ -2665,8 +2668,11 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 	{
 		case 0:
 		{
-			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand)
-			m_Client->HandleUseEntity(EntityID, false);
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
+			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
+			{
+				m_Client->HandleUseEntity(EntityID, false);
+			}
 			break;
 		}
 		case 1:

@@ -101,7 +101,7 @@ protected:
 				// If the chunk we are trying to get the block information from is loaded
 				if (a_Chunk.UnboundedRelGetBlock(a_RelX + x, a_RelY, a_RelZ + z, Block, Meta))
 				{
-					cBlockHandler * Handler = cBlockInfo::Get(Block).m_Handler;
+					cBlockHandler * Handler = BlockHandler(Block);
 
 					// If the block affects growth, add to the adjustment
 					if (Handler->CanSustainPlant(m_BlockType))
