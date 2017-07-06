@@ -3704,9 +3704,9 @@ static int tolua_cColor_Set(lua_State * tolua_S)
 		return 0;
 	}
 
-	self->SetRed(lua_tonumber(tolua_S, 2));
-	self->SetGreen(lua_tonumber(tolua_S, 3));
-	self->SetBlue(lua_tonumber(tolua_S, 4));
+	self->SetRed(static_cast<unsigned char>(lua_tointeger(tolua_S, 2)));
+	self->SetGreen(static_cast<unsigned char>(lua_tointeger(tolua_S, 3)));
+	self->SetBlue(static_cast<unsigned char>(lua_tointeger(tolua_S, 4)));
 	return 0;
 }
 
