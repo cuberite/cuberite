@@ -1730,6 +1730,56 @@ end
 				},
 			},
 		},
+		cColor =
+		{
+			Desc = [[
+				Encapsulates a RGB color, e.g. for armor.
+			]],
+			Functions =
+			{
+				Set =
+				{
+					Params =
+					{
+						{
+							Name = "Red",
+							Type = "number"
+						},
+						{
+							Name = "Green",
+							Type = "number"
+						},
+						{
+							Name = "Blue",
+							Type = "number"
+						},
+					},
+					Returns =
+					{
+					},
+					Notes = "Sets the color's red, green, and blue components. Values range from 0 to 255."
+				},
+				Get =
+				{
+					Params =
+					{
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+						{
+							Type = "number",
+						},
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's red, green, and blue components, respectively."
+				},
+			}
+		},
 		cCompositeChat =
 		{
 			Desc = [[
