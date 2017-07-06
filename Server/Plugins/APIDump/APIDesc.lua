@@ -1761,12 +1761,15 @@ end
 					Returns =
 					{
 						{
+							Name = "Red",
 							Type = "number",
 						},
 						{
+							Name = "Green",
 							Type = "number",
 						},
 						{
+							Name = "Blue",
 							Type = "number",
 						},
 					},

@@ -3688,7 +3688,7 @@ static int tolua_cColor_Set(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
 
-	if (!L.CheckParamNumber(2, 4) || !L.CheckParamSelf("cColor"))
+	if (!L.CheckParamSelf("cColor") || !L.CheckParamNumber(2, 4))
 	{
 		return 0;
 	}
@@ -3697,7 +3697,7 @@ static int tolua_cColor_Set(lua_State * tolua_S)
 	unsigned char r, g, b;
 	if (!L.GetStackValues(2, r, g, b))
 	{
-		return L.ApiParamError("Cannot read the RGB parameters");
+		return L.ApiParamError("Cannot read the parameters");
 	}
 
 	self->SetColor(r, g, b);
@@ -3731,16 +3731,16 @@ void cManualBindings::Bind(lua_State * tolua_S)
 	tolua_beginmodule(tolua_S, nullptr);
 
 		// Create the new classes:
+		tolua_usertype(tolua_S, "cColor");
 		tolua_usertype(tolua_S, "cCryptoHash");
 		tolua_usertype(tolua_S, "cLineBlockTracer");
 		tolua_usertype(tolua_S, "cStringCompression");
 		tolua_usertype(tolua_S, "cUrlParser");
-		tolua_usertype(tolua_S, "cColor");
+		tolua_cclass(tolua_S, "cColor",             "cColor",             "", nullptr);
 		tolua_cclass(tolua_S, "cCryptoHash",        "cCryptoHash",        "", nullptr);
 		tolua_cclass(tolua_S, "cLineBlockTracer",   "cLineBlockTracer",   "", nullptr);
 		tolua_cclass(tolua_S, "cStringCompression", "cStringCompression", "", nullptr);
 		tolua_cclass(tolua_S, "cUrlParser",         "cUrlParser",         "", nullptr);
-		tolua_cclass(tolua_S, "cColor",             "cColor",             "", nullptr);
 
 		// Globals:
 		tolua_function(tolua_S, "Clamp",                 tolua_Clamp);
@@ -3772,8 +3772,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cColor");
-			tolua_function(tolua_S, "Set", tolua_cColor_Set);
 			tolua_function(tolua_S, "Get", tolua_cColor_Get);
+			tolua_function(tolua_S, "Set", tolua_cColor_Set);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");
