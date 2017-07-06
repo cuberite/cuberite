@@ -3712,12 +3712,11 @@ static int tolua_cColor_Get(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
 
-	cColor * self = reinterpret_cast<cColor *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	if (!L.CheckParamSelf("cColor"))
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
 		return 0;
 	}
+	cColor * self = reinterpret_cast<cColor *>(tolua_tousertype(tolua_S, 1, nullptr));
 
 	L.Push(self->GetRed(), self->GetGreen(), self->GetBlue());
 	return 3;
