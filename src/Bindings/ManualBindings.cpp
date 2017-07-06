@@ -3688,25 +3688,19 @@ static int tolua_cColor_Set(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
 
-	cColor * self = reinterpret_cast<cColor *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (
-		!L.CheckParamNumber(2) ||
-		!L.CheckParamNumber(3) ||
-		!L.CheckParamNumber(4)
-	)
+	if (!L.CheckParamNumber(2, 4) || !L.CheckParamSelf("cColor"))
 	{
-		// TODO: Print a warning?
 		return 0;
 	}
-	if (self == nullptr)
+	cColor * self = reinterpret_cast<cColor *>(tolua_tousertype(tolua_S, 1, nullptr));
+
+	unsigned char r, g, b;
+	if (!L.GetStackValues(2, r, g, b))
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
-		return 0;
+		return L.ApiParamError("Cannot read the RGB parameters");
 	}
 
-	self->SetRed(static_cast<unsigned char>(lua_tointeger(tolua_S, 2)));
-	self->SetGreen(static_cast<unsigned char>(lua_tointeger(tolua_S, 3)));
-	self->SetBlue(static_cast<unsigned char>(lua_tointeger(tolua_S, 4)));
+	self->SetColor(r, g, b);
 	return 0;
 }
 
@@ -3725,9 +3719,7 @@ static int tolua_cColor_Get(lua_State * tolua_S)
 		return 0;
 	}
 
-	L.Push(self->GetRed());
-	L.Push(self->GetGreen());
-	L.Push(self->GetBlue());
+	L.Push(self->GetRed(), self->GetGreen(), self->GetBlue());
 	return 3;
 }
 

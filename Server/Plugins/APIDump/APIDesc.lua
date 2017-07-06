@@ -1754,16 +1754,10 @@ end
 							Type = "number"
 						},
 					},
-					Returns =
-					{
-					},
 					Notes = "Sets the color's red, green, and blue components. Values range from 0 to 255."
 				},
 				Get =
 				{
-					Params =
-					{
-					},
 					Returns =
 					{
 						{
