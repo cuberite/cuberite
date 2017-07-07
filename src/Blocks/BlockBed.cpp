@@ -1,3 +1,6 @@
+
+// BlockBed.cpp
+
 #include "Globals.h"
 #include "BlockBed.h"
 
@@ -7,6 +10,7 @@
 #include "../BoundingBox.h"
 #include "../Mobs/Monster.h"
 #include "../Entities/Entity.h"
+#include "../BlockEntities/BedEntity.h"
 
 
 
@@ -16,14 +20,19 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	Vector3i ThisPos( a_BlockX, a_BlockY, a_BlockZ);
-	Vector3i Direction = MetaDataToDirection( OldMeta & 0x3);
+	Vector3i ThisPos(a_BlockX, a_BlockY, a_BlockZ);
+	Vector3i Direction = MetaDataToDirection(OldMeta & 0x3);
 	if (OldMeta & 0x8)
 	{
 		// Was pillow
 		if (a_ChunkInterface.GetBlock(ThisPos - Direction) == E_BLOCK_BED)
 		{
+			// First replace the bed with air
 			a_ChunkInterface.FastSetBlock(ThisPos - Direction, E_BLOCK_AIR, 0);
+
+			// Then destroy the bed entity
+			Vector3i PillowPos(ThisPos - Direction);
+			a_ChunkInterface.SetBlock(PillowPos.x, PillowPos.y, PillowPos.z, E_BLOCK_AIR, 0);
 		}
 	}
 	else
@@ -31,7 +40,12 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 		// Was foot end
 		if (a_ChunkInterface.GetBlock(ThisPos + Direction) == E_BLOCK_BED)
 		{
+			// First replace the bed with air
 			a_ChunkInterface.FastSetBlock(ThisPos + Direction, E_BLOCK_AIR, 0);
+
+			// Then destroy the bed entity
+			Vector3i FootPos(ThisPos + Direction);
+			a_ChunkInterface.SetBlock(FootPos.x, FootPos.y, FootPos.z, E_BLOCK_AIR, 0);
 		}
 	}
 }
@@ -169,4 +183,48 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 
 
+void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, const sSetBlock & a_BlockChange)
+{
+	class cBedColor :
+		public cBedCallback
+	{
+	public:
+		short m_Color;
 
+		cBedColor(short a_Color) :
+			m_Color(a_Color)
+		{
+		}
+
+		virtual bool Item(cBedEntity * a_Bed) override
+		{
+			a_Bed->SetColor(m_Color);
+			return true;
+		}
+	};
+	cBedColor BedCallback(a_Player->GetEquippedItem().m_ItemDamage);
+	a_Player->GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), BedCallback);
+}
+
+
+
+
+
+void cBlockBedHandler::ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	class cBedColor :
+		public cBedCallback
+	{
+	public:
+		short m_Color = E_META_WOOL_RED;
+
+		virtual bool Item(cBedEntity * a_Bed) override
+		{
+			m_Color = a_Bed->GetColor();
+			return true;
+		}
+	};
+	cBedColor BedCallback;
+	a_Digger->GetWorld()->DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
+	a_Pickups.Add(cItem(E_ITEM_BED, 1, BedCallback.m_Color));
+}

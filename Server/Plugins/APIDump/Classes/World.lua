@@ -505,6 +505,35 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "If there is a beacon at the specified coords, calls the CallbackFunction with the {{cBeaconEntity}} parameter representing the beacon. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBeaconEntity|BeaconEntity}})</pre> The function returns false if there is no beacon, or if there is, it returns the bool value that the callback has returned.",
 			},
+			DoWithBedAt =
+			{
+				Params =
+				{
+					{
+						Name = "BlockX",
+						Type = "number",
+					},
+					{
+						Name = "BlockY",
+						Type = "number",
+					},
+					{
+						Name = "BlockZ",
+						Type = "number",
+					},
+					{
+						Name = "CallbackFunction",
+						Type = "function",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "If there is a bed at the specified coords, calls the CallbackFunction with the {{cBedEntity}} parameter representing the bed. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBedEntity|cBedEntity}})</pre> The function returns false if there is no bed, or if there is, it returns the bool value that the callback has returned.",
+			},
 			DoWithBlockEntityAt =
 			{
 				Params =

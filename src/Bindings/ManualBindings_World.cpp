@@ -639,6 +639,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ChunkStay",                  tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoExplosionAt",              tolua_cWorld_DoExplosionAt);
 			tolua_function(tolua_S, "DoWithBeaconAt",             DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);
+			tolua_function(tolua_S, "DoWithBedAt",                DoWithXYZ<cWorld, cBedEntity,          &cWorld::DoWithBedAt>);
 			tolua_function(tolua_S, "DoWithBlockEntityAt",        DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
 			tolua_function(tolua_S, "DoWithBrewingstandAt",       DoWithXYZ<cWorld, cBrewingstandEntity, &cWorld::DoWithBrewingstandAt>);
 			tolua_function(tolua_S, "DoWithChestAt",              DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);

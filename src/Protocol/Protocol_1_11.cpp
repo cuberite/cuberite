@@ -30,6 +30,7 @@ Implements the 1.11 protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 
 #include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
@@ -418,6 +419,17 @@ void cProtocol_1_11_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
 			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
 			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+
+		case E_BLOCK_BED:
+		{
+			auto & BedEntity = reinterpret_cast<const cBedEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BedEntity.GetPosX());
+			Writer.AddInt("y", BedEntity.GetPosY());
+			Writer.AddInt("z", BedEntity.GetPosZ());
+			Writer.AddInt("color", BedEntity.GetColor());
+			Writer.AddString("id", "Bed");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
 

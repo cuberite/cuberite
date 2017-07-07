@@ -1269,6 +1269,33 @@ void cProtocol_1_12::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
+void cProtocol_1_12::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x09);  // Update tile entity packet
+	Pkt.WritePosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
+
+	Byte Action = 0;
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_MOB_SPAWNER:   Action = 1;  break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2;  break;  // Update command block text
+		case E_BLOCK_BEACON:        Action = 3;  break;  // Update beacon entity
+		case E_BLOCK_HEAD:          Action = 4;  break;  // Update Mobhead entity
+		case E_BLOCK_FLOWER_POT:    Action = 5;  break;  // Update flower pot
+		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
+		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+	}
+	Pkt.WriteBEUInt8(Action);
+
+	WriteBlockEntity(Pkt, a_BlockEntity);
+}
+
+
+
+
+
 void cProtocol_1_12::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_State == 3);  // In game mode?
