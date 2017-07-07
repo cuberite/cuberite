@@ -2496,7 +2496,7 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
-	std::pair<AString, AString> OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
+	auto OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
 	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
 	{
 		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);
@@ -2507,7 +2507,7 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	if (TypeIdx > 0)
 	{
 		int Type = a_NBT.GetInt(TypeIdx);
-		Monster->SetOcelotType(Type);
+		Monster->SetCatType(static_cast<cOcelot::eCatType>(Type));
 	}
 
 	int SittingIdx = a_NBT.FindChildByName(a_TagIdx, "Sitting");
@@ -2897,7 +2897,7 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		return;
 	}
 
-	std::pair<AString, AString> OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
+	auto OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
 	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
 	{
 		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);

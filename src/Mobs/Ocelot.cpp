@@ -16,7 +16,7 @@ cOcelot::cOcelot(void) :
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
-	m_Type(0),
+	m_CatType(ctWildOcelot),
 	m_OwnerName("")
 {
 }
@@ -151,7 +151,9 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 					a_Player.GetInventory().RemoveOneEquippedItem();
 				}
 
-				if (GetRandomProvider().RandBool(1.0 / 3.0))
+				auto & Random = GetRandomProvider();
+
+				if (Random.RandBool(1.0 / 3.0))
 				{
 					// Taming succeeded
 					SetIsBegging(false);
@@ -159,7 +161,7 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 					SetMaxHealth(20);
 					SetIsTame(true);
 					SetOwner(a_Player.GetName(), a_Player.GetUUID());
-					SetOcelotType(GetRandomProvider().RandInt<int>(1, 3));
+					SetCatType(static_cast<eCatType>(Random.RandInt<int>(1, 3)));
 					m_World->BroadcastEntityStatus(*this, esWolfTamed);
 					m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 				}
