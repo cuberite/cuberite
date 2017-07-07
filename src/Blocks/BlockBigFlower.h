@@ -18,19 +18,39 @@ public:
 	{
 	}
 
-	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
 	{
-		return (((a_Meta & E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) != 0) || (a_Meta & E_META_BIG_FLOWER_LARGE_FERN) != 0);
+		if (IsMetaTopPart(a_Meta))
+		{
+			BLOCKTYPE BottomType;
+			if (
+				(a_Pos.y < 1) ||
+				!a_ChunkInterface.GetBlockTypeMeta(a_Pos.x, a_Pos.y - 1, a_Pos.z, BottomType, a_Meta) ||
+				(BottomType != E_BLOCK_BIG_FLOWER)
+			)
+			{
+				// Can't find the flower meta so assume grass
+				return true;
+			}
+		}
+
+		NIBBLETYPE FlowerMeta = a_Meta & 0x07;
+		return (
+			(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
+			(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
+		);
 	}
 
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		int AlternateY  = a_BlockY;
+		int BottomY     = a_BlockY;
 
 		if (Meta & 0x8)
 		{
 			--AlternateY;
+			--BottomY;
 		}
 		else
 		{
@@ -39,13 +59,18 @@ public:
 		// also destroy the other block if it has a valid height and is a big flower
 		if (cChunkDef::IsValidHeight(AlternateY) && a_ChunkInterface.GetBlock(a_BlockX, AlternateY, a_BlockZ) == E_BLOCK_BIG_FLOWER)
 		{
-			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop);
+			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, BottomY, a_BlockZ, a_CanDrop);
 			a_ChunkInterface.FastSetBlock(a_BlockX, AlternateY, a_BlockZ, E_BLOCK_AIR, 0);
 		}
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
+		if (IsMetaTopPart(a_BlockMeta))
+		{
+			return;  // No way to tell flower type
+		}
+
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
 		if (Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
