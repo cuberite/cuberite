@@ -1880,6 +1880,19 @@ AString cPlayer::GetPlayerListName(void) const
 
 
 
+void cPlayer::SetDraggingItem(const cItem & a_Item)
+{
+	if (GetWindow() != nullptr)
+	{
+		m_DraggingItem = a_Item;
+		GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
+	}
+}
+
+
+
+
+
 void cPlayer::TossEquippedItem(char a_Amount)
 {
 	cItems Drops;
