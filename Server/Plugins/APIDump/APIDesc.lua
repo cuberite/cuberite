@@ -1881,7 +1881,26 @@ end
 					},
 					Notes = "Sets the color's blue component."
 				},
-			}
+			},
+			Constants =
+			{
+				COLOR_LIMIT =
+				{
+					Notes = "The upper bound (exclusive) for a color component",
+				},
+				COLOR_MAX =
+				{
+					Notes = "The maximum value for a color component",
+				},
+				COLOR_MIN =
+				{
+					Notes = "The minimum value for a color component",
+				},
+				COLOR_NONE =
+				{
+					Notes = "A constant denoting the color is invalid (note: use IsValid)",
+				},
+			},
 		},
 		cCompositeChat =
 		{
