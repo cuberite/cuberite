@@ -9503,6 +9503,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
 				},
+				GetDraggingItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item the player is dragging in a UI window."
+				},
 				GetPrefix =
 				{
 					Returns =
@@ -10339,6 +10349,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the custom name for this player. If you want to disable the custom name, simply set an empty string. The custom name will be used in the tab-list, in the player nametag and in the tab-completion.",
+				},
+				SetDraggingItem =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the item that the player is dragging in a UI window. If no UI window is open, this function does nothing."
 				},
 				SetFlying =
 				{
