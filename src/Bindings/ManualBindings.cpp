@@ -3297,6 +3297,24 @@ static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
 
 
 
+static int tolua_cColor_GetColor(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cColor"))
+	{
+		return 0;
+	}
+	cColor * self = reinterpret_cast<cColor *>(tolua_tousertype(tolua_S, 1, nullptr));
+
+	L.Push(self->GetRed(), self->GetGreen(), self->GetBlue());
+	return 3;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_new(lua_State * a_LuaState)
 {
 	/* Function signatures:
@@ -3725,6 +3743,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cColor");
+			tolua_function(tolua_S, "GetColor", tolua_cColor_GetColor);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");
