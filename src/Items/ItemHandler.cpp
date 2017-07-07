@@ -357,14 +357,11 @@ bool cItemHandler::OnPlayerPlace(
 	NIBBLETYPE ClickedBlockMeta;
 
 	a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+	cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
 	// Check if the block ignores build collision (water, grass etc.):
-	if (
-		BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision() ||
-		BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(&a_Player, ClickedBlockMeta)
-	)
+	if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
 	{
-		cChunkInterface ChunkInterface(a_World.GetChunkMap());
 		BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ);
 	}
 	else
@@ -383,10 +380,7 @@ bool cItemHandler::OnPlayerPlace(
 
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (
-			!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision() &&
-			!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(&a_Player, PlaceMeta)
-			)
+		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, PlaceMeta))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it

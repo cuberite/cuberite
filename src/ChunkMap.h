@@ -19,6 +19,7 @@ class cChunkStay;
 class cChunk;
 class cPlayer;
 class cBeaconEntity;
+class cBedEntity;
 class cBrewingstandEntity;
 class cChestEntity;
 class cDispenserEntity;
@@ -44,6 +45,7 @@ typedef cChunk *                           cChunkPtr;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBlockEntity>        cBlockEntityCallback;
 typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
+typedef cItemCallback<cBedEntity>          cBedCallback;
 typedef cItemCallback<cBrewingstandEntity> cBrewingstandCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
 typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
@@ -276,6 +278,10 @@ public:
 	/** Calls the callback for the beacon at the specified coords.
 	Returns false if there's no beacon at those coords, true if found. */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the bed at the specified coords.
+	Returns false if there's no bed at those coords, true if found. */
+	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
 	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback);  // Lua-acessible

@@ -80,6 +80,10 @@ public:
 	/** Called when the item is mined to convert it into pickups. Pickups may specify multiple items. Appends items to a_Pickups, preserves its original contents */
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 
+	/** Called when the item is mined to convert it into pickups. Pickups may specify multiple items. Appends items to a_Pickups, preserves its original contents.
+	Overloaded method with coords and digger, for blocks that needs to access the block entity, e.g. a bed */
+	virtual void ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) {}
+
 	/** Handles the dropping, but not destruction, of a block based on what ConvertTo(Verbatim)Pickups() returns, including the spawning of pickups and alertion of plugins
 	@param a_Digger The entity causing the drop; it may be nullptr
 	@param a_CanDrop Informs the handler whether the block should be dropped at all. One example when this is false is when stone is destroyed by hand
@@ -110,16 +114,11 @@ public:
 
 	/** Checks if the player can build "inside" this block.
 	For example blocks placed "on" snow will be placed at the same position. So: Snow ignores Build collision
+	@param a_Pos Position of the block
+	@param a_Player Player trying to build on the block
+	@param a_Meta Meta value of the block currently at a_Pos
 	*/
-	virtual bool DoesIgnoreBuildCollision(void);
-
-	/** Similar to DoesIgnoreBuildCollision(void), but is used for cases where block's meta or
-	player's item-in-hand is needed to determine collision (thin snow) */
-	virtual bool DoesIgnoreBuildCollision(cPlayer *, NIBBLETYPE a_Meta)
-	{
-		UNUSED(a_Meta);
-		return DoesIgnoreBuildCollision();
-	}
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta);
 
 	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
 	Default: true */

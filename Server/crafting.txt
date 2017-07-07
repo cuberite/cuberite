@@ -383,7 +383,6 @@ AcaciaFenceGate          = Stick, 1:1, 1:2, 3:1, 3:2 | AcaciaPlanks, 2:1, 2:2
 Anvil                    = IronBlock, 1:1, 2:1, 3:1 | IronIngot, 2:2, 1:3, 2:3, 3:3
 ArmorStand               = Stick, 1:1, 1:3, 2:1, 2:2, 3:1, 3:3 | StoneSlab, 2:3
 Beacon                   = Glass, 1:1, 1:2, 2:1, 3:1, 3:2 | Obsidian, 1:3, 2:3, 3:3 | NetherStar, 2:2
-Bed                      = Planks^-1, 1:2, 2:2, 3:2 | Wool^-1, 1:1, 2:1, 3:1
 BirchFence, 3            = BirchPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
 BirchFenceGate           = Stick, 1:1, 1:2, 3:1, 3:2 | BirchPlanks, 2:1, 2:2
 Bookandquill             = Book, * | feather, * | inksac, *
@@ -949,3 +948,24 @@ FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye 
 FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
 FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
 FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, *
+
+
+
+#******************************************************#
+# Bed different colors
+Bed^0                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^0, 1:1, 2:1, 3:1
+Bed^1                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^1, 1:1, 2:1, 3:1
+Bed^2                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^2, 1:1, 2:1, 3:1
+Bed^3                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^3, 1:1, 2:1, 3:1
+Bed^4                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^4, 1:1, 2:1, 3:1
+Bed^5                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^5, 1:1, 2:1, 3:1
+Bed^6                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^6, 1:1, 2:1, 3:1
+Bed^7                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^7, 1:1, 2:1, 3:1
+Bed^8                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^8, 1:1, 2:1, 3:1
+Bed^9                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^9, 1:1, 2:1, 3:1
+Bed^10                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^10, 1:1, 2:1, 3:1
+Bed^11                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^11, 1:1, 2:1, 3:1
+Bed^12                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^12, 1:1, 2:1, 3:1
+Bed^13                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^13, 1:1, 2:1, 3:1
+Bed^14                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^14, 1:1, 2:1, 3:1
+Bed^15                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^15, 1:1, 2:1, 3:1
