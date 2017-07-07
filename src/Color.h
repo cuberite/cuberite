@@ -14,7 +14,7 @@ class cColor
 {
 public:
 
-	enum
+	enum eColorLimits : unsigned int
 	{
 		COLOR_MIN = 0,
 		COLOR_MAX = 255,
@@ -54,5 +54,5 @@ public:
 
 	unsigned int m_Color;
 
-};
+}; // tolua_export
 // tolua_end
