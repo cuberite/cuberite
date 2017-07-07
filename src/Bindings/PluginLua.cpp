@@ -113,8 +113,8 @@ bool cPluginLua::Load(void)
 	bool HasInfoLua = false;
 	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)
 	{
-		size_t FormatStart = itr->find_last_of('.');
-		if ((FormatStart != std::string::npos) && (itr->substr(FormatStart) == ".lua"))
+		size_t ExtensionStart = itr->find_last_of('.');
+		if ((ExtensionStart != std::string::npos) && (itr->substr(ExtensionStart) == ".lua"))
 		{
 			if (*itr == "Info.lua")
 			{
