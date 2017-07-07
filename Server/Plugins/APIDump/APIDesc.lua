@@ -1737,7 +1737,80 @@ end
 			]],
 			Functions =
 			{
-				Set =
+				Clear =
+				{
+					Notes = "Resets the color to uninitialized."
+				},
+				constructor =
+				{
+					{
+						Returns = { {Type="cColor"} },
+						Notes = "Creates an uninitialized cColor",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Red",
+								Type = "number",
+							},
+							{
+								Name = "Green",
+								Type = "number",
+							},
+							{
+								Name = "Blue",
+								Type = "number",
+							},
+						},
+						Returns = { {Type="cColor"} },
+						Notes = "Creates the specified cColor. All components must be between 0 and 255, inclusive.",
+					},
+				},
+				GetRed =
+				{
+					Returns =
+					{
+						{
+							Name = "Red",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's red component."
+				},
+				GetGreen =
+				{
+					Returns =
+					{
+						{
+							Name = "Green",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's green component."
+				},
+				GetBlue =
+				{
+					Returns =
+					{
+						{
+							Name = "Blue",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's blue component."
+				},
+				IsValid =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean"
+						},
+					},
+					Notes = "True if the color is valid, false if the color has not been set yet."
+				},
+				SetColor =
 				{
 					Params =
 					{
@@ -1756,24 +1829,38 @@ end
 					},
 					Notes = "Sets the color's red, green, and blue components. Values range from 0 to 255."
 				},
-				Get =
+				SetRed =
 				{
-					Returns =
+					Params =
 					{
 						{
 							Name = "Red",
 							Type = "number",
 						},
+					},
+					Notes = "Sets the color's red component."
+				},
+				SetGreen =
+				{
+					Params =
+					{
 						{
 							Name = "Green",
 							Type = "number",
 						},
+					},
+					Notes = "Sets the color's green component."
+				},
+				SetBlue =
+				{
+					Params =
+					{
 						{
 							Name = "Blue",
 							Type = "number",
 						},
 					},
-					Notes = "Returns the color's red, green, and blue components, respectively."
+					Notes = "Sets the color's blue component."
 				},
 			}
 		},
