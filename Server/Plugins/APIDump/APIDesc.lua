@@ -1767,6 +1767,25 @@ end
 						Notes = "Creates the specified cColor. All components must be between 0 and 255, inclusive.",
 					},
 				},
+				GetColor =
+				{
+					Returns =
+					{
+						{
+							Name = "Red",
+							Type = "number",
+						},
+						{
+							Name = "Green",
+							Type = "number",
+						},
+						{
+							Name = "Blue",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's red, green, and blue components, respectively."
+				},
 				GetRed =
 				{
 					Returns =
