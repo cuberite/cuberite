@@ -359,18 +359,6 @@ cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_Cac
 
 
 
-cCompoGenCache::~cCompoGenCache()
-{
-	delete[] m_CacheData;
-	m_CacheData = nullptr;
-	delete[] m_CacheOrder;
-	m_CacheOrder = nullptr;
-}
-
-
-
-
-
 void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	#ifdef _DEBUG

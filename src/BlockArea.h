@@ -32,10 +32,6 @@ class cCuboid;
 // tolua_begin
 class cBlockArea
 {
-	// tolua_end
-	DISALLOW_COPY_AND_ASSIGN(cBlockArea);
-	// tolua_begin
-
 public:
 
 	/** What data is to be queried (bit-mask) */
@@ -62,9 +58,6 @@ public:
 		msSimpleCompare,
 		msMask,
 	} ;
-
-	cBlockArea(void);
-	~cBlockArea();
 
 	/** Returns true if the datatype combination is valid.
 	Invalid combinations include BlockEntities without BlockTypes. */
@@ -363,10 +356,10 @@ public:
 
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/** Returns the internal pointer to the block types */
-	BLOCKTYPE *  GetBlockTypes   (void) const { return m_BlockTypes; }
-	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one byte per block!
-	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one byte per block!
-	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight; }  // NOTE: one byte per block!
+	BLOCKTYPE *  GetBlockTypes   (void) const { return m_BlockTypes.get();    }
+	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas.get();    }  // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight.get();    }  // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
 	size_t       GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
 	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 
@@ -416,7 +409,8 @@ protected:
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
 	} ;
 
-	typedef NIBBLETYPE * NIBBLEARRAY;
+	using NIBBLEARRAY = std::unique_ptr<NIBBLETYPE[]>;
+	using BLOCKARRAY = std::unique_ptr<BLOCKTYPE[]>;
 
 
 	Vector3i m_Origin;
@@ -426,15 +420,23 @@ protected:
 	cBlockArea doesn't use this value in any way. */
 	Vector3i m_WEOffset;
 
-	BLOCKTYPE *  m_BlockTypes;
-	NIBBLETYPE * m_BlockMetas;     // Each meta is stored as a separate byte for faster access
-	NIBBLETYPE * m_BlockLight;     // Each light value is stored as a separate byte for faster access
-	NIBBLETYPE * m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
+	BLOCKARRAY  m_BlockTypes;
+	NIBBLEARRAY m_BlockMetas;     // Each meta is stored as a separate byte for faster access
+	NIBBLEARRAY m_BlockLight;     // Each light value is stored as a separate byte for faster access
+	NIBBLEARRAY m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
+
+	/** Deleter to clear the block entities before deleting the container. */
+	struct sBlockEntitiesDeleter
+	{
+		void operator () (cBlockEntities * a_BlockEntities);
+	};
+
+	using cBlockEntitiesPtr = std::unique_ptr<cBlockEntities, sBlockEntitiesDeleter>;
 
 	/** The block entities contained within the area.
 	Only valid if the area was created / read with the baBlockEntities flag.
 	The block entities are owned by this object. */
-	std::unique_ptr<cBlockEntities> m_BlockEntities;
+	cBlockEntitiesPtr m_BlockEntities;
 
 	/** Clears the data stored and prepares a fresh new block area with the specified dimensions */
 	bool SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes);

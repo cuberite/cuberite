@@ -27,7 +27,6 @@ public:
 	cCraftingGrid(const cCraftingGrid & a_Original);
 	cCraftingGrid(int a_Width, int a_Height);  // tolua_export
 	cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height);
-	~cCraftingGrid();
 
 	// tolua_begin
 	int     GetWidth (void) const {return m_Width; }
@@ -45,16 +44,16 @@ public:
 
 	// tolua_end
 
-	cItem * GetItems(void) const {return m_Items; }
+	cItem * GetItems(void) const {return m_Items.get(); }
 
 	/** Copies internal contents into the item array specified. Assumes that the array has the same dimensions as self */
 	void  CopyToItems(cItem * a_Items) const;
 
 protected:
 
-	int     m_Width;
-	int     m_Height;
-	cItem * m_Items;
+	int                      m_Width;
+	int                      m_Height;
+	std::unique_ptr<cItem[]> m_Items;
 } ;  // tolua_export
 
 

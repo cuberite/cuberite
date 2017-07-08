@@ -29,7 +29,7 @@ class cHeiGenCache :
 {
 public:
 	cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, size_t a_CacheSize);
-	virtual ~cHeiGenCache() override;
+	virtual ~cHeiGenCache() override = default;
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
@@ -50,9 +50,9 @@ protected:
 	cTerrainHeightGenPtr m_HeiGenToCache;
 
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
-	size_t       m_CacheSize;
-	size_t *     m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
-	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
+	size_t                        m_CacheSize;
+	std::unique_ptr<size_t[]>     m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	std::unique_ptr<sCacheData[]> m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
 
 	// Cache statistics
 	size_t m_NumHits;

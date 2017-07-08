@@ -52,16 +52,6 @@ cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay
 
 
 
-cDelayedFluidSimulatorChunkData::~cDelayedFluidSimulatorChunkData()
-{
-	delete[] m_Slots;
-	m_Slots = nullptr;
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cDelayedFluidSimulator:
 
