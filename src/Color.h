@@ -51,8 +51,8 @@ public:
 
 	/** Resets the color */
 	void Clear() { m_Color = static_cast<unsigned int>(COLOR_NONE); }
+	// tolua_end
 
 	unsigned int m_Color;
 
 };  // tolua_export
-// tolua_end

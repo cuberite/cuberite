@@ -1745,7 +1745,7 @@ end
 				{
 					{
 						Returns = { {Type="cColor"} },
-						Notes = "Creates an uninitialized cColor",
+						Notes = "Creates an uninitialized cColor. Each component must be between 0 and 255, inclusive.",
 					},
 					{
 						Params =
@@ -1857,7 +1857,7 @@ end
 							Type = "number",
 						},
 					},
-					Notes = "Sets the color's red component."
+					Notes = "Sets the color's red component. Must be between 0 and 255, inclusive."
 				},
 				SetGreen =
 				{
@@ -1868,7 +1868,7 @@ end
 							Type = "number",
 						},
 					},
-					Notes = "Sets the color's green component."
+					Notes = "Sets the color's green component. Must be between 0 and 255, inclusive."
 				},
 				SetBlue =
 				{
@@ -1879,7 +1879,7 @@ end
 							Type = "number",
 						},
 					},
-					Notes = "Sets the color's blue component."
+					Notes = "Sets the color's blue component. Must be between 0 and 255, inclusive."
 				},
 			},
 			Constants =
