@@ -167,6 +167,9 @@ protected:
 
 	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
 	cByteBuffer m_OutPacketLenBuffer;
+	
+	/** Forge protocol handshaking */
+	cForgeHandshake m_ForgeHandshake;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;

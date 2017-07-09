@@ -7,7 +7,7 @@
 
 #include "json/json.h"
 
-void ForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
+void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
 {
 	// modinfo:
 	// TODO: only send if mods enabled
