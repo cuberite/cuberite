@@ -11,6 +11,7 @@
 #include "FastNBT.h"
 
 #include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
@@ -191,6 +192,18 @@ void cNBTChunkSerializer::AddBeaconEntity(cBeaconEntity * a_Entity)
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddBedEntity(cBedEntity * a_Entity)
+{
+	m_Writer.BeginCompound("");
+	AddBasicTileEntity(a_Entity, "Bed");
+	m_Writer.AddInt("color", a_Entity->GetColor());
 	m_Writer.EndCompound();
 }
 
@@ -1004,6 +1017,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	switch (a_Entity->GetBlockType())
 	{
 		case E_BLOCK_BEACON:        AddBeaconEntity      (reinterpret_cast<cBeaconEntity *>      (a_Entity)); break;
+		case E_BLOCK_BED:           AddBedEntity         (reinterpret_cast<cBedEntity *>         (a_Entity)); break;
 		case E_BLOCK_BREWING_STAND: AddBrewingstandEntity(reinterpret_cast<cBrewingstandEntity *>(a_Entity)); break;
 		case E_BLOCK_CHEST:         AddChestEntity       (reinterpret_cast<cChestEntity *>       (a_Entity), a_Entity->GetBlockType()); break;
 		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity(reinterpret_cast<cCommandBlockEntity *>(a_Entity)); break;

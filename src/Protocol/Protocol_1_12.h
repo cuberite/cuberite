@@ -60,6 +60,7 @@ public:
 	virtual void SendTeleportEntity(const cEntity & a_Entity) override;
 	virtual void SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
 	virtual void SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
+	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 	virtual void SendUnleashEntity(const cEntity & a_Entity) override;
 protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;

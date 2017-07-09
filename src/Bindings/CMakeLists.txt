@@ -66,6 +66,7 @@ set(BINDING_DEPENDENCIES
 	../BiomeDef.h
 	../BlockArea.h
 	../BlockEntities/BeaconEntity.h
+	../BlockEntities/BedEntity.h
 	../BlockEntities/BlockEntity.h
 	../BlockEntities/BlockEntityWithItems.h
 	../BlockEntities/BrewingstandEntity.h

@@ -13,6 +13,7 @@
 #include "zlib/zlib.h"
 #include "Defines.h"
 #include "BlockEntities/BeaconEntity.h"
+#include "BlockEntities/BedEntity.h"
 #include "BlockEntities/BrewingstandEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
@@ -1183,7 +1184,7 @@ bool cChunk::GrowTallGrass(int a_RelX, int a_RelY, int a_RelZ)
 		default:                      return false;
 	}
 	return UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_BIG_FLOWER, LargeFlowerMeta) &&
-		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, 0x8 | LargeFlowerMeta);
+		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
 }
 
 
@@ -1404,6 +1405,7 @@ void cChunk::CreateBlockEntities(void)
 				switch (BlockType)
 				{
 					case E_BLOCK_BEACON:
+					case E_BLOCK_BED:
 					case E_BLOCK_TRAPPED_CHEST:
 					case E_BLOCK_CHEST:
 					case E_BLOCK_COMMAND_BLOCK:
@@ -1537,6 +1539,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	switch (a_BlockType)
 	{
 		case E_BLOCK_BEACON:
+		case E_BLOCK_BED:
 		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
@@ -2262,6 +2265,15 @@ bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
+
+
+
+bool cChunk::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback)
+{
+	return GenericDoWithBlockEntityAt<cBedEntity,
+		E_BLOCK_BED
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
 
 
 

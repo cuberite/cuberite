@@ -85,21 +85,23 @@ extern "C" int luaopen_lxp(lua_State * a_LuaState)
 
 
 
-cBlockInfo::~cBlockInfo()
+void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
 {
+	delete a_Handler;
 }
 
 
 
 
 
-void cBlockInfo::Initialize(cBlockInfo::cBlockInfoArray & a_BlockInfos)
+cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 {
+	cBlockInfoArray & BlockInfos = *this;
 	// The piece-loading code uses the handlers for rotations, so we need valid handlers
 	// Insert dummy handlers:
-	for (size_t i = 0; i < ARRAYCOUNT(a_BlockInfos); i++)
+	for (size_t i = 0; i < BlockInfos.size(); i++)
 	{
-		a_BlockInfos[i].m_Handler = new cBlockHandler(static_cast<BLOCKTYPE>(i));
+		BlockInfos[i].m_Handler.reset(new cBlockHandler(static_cast<BLOCKTYPE>(i)));
 	}
 }
 
@@ -220,7 +222,7 @@ bool cBlockHandler::IsClickedThrough(void)
 
 
 
-bool cBlockHandler::DoesIgnoreBuildCollision(void)
+bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta)
 {
 	return (m_BlockType == E_BLOCK_AIR);
 }

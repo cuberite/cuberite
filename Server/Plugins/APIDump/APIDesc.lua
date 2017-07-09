@@ -15507,6 +15507,10 @@ end
 				{
 					Notes = "The player has swapped their held item with the item in their offhand slot (1.9)",
 				},
+				E_META_BIG_FLOWER_TOP =
+				{
+					Notes = "The metadata of a big flower block that indicates it is the top block.",
+				},
 				E_META_CONCRETE_BLACK =
 				{
 					Notes = "A flag in the metadata of concete that indicates that the concrete is black.",

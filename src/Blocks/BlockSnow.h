@@ -41,9 +41,9 @@ public:
 		return true;
 	}
 
-	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
 	{
-		if ((a_Player->GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (a_Meta < 7))
+		if ((a_Player.GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (a_Meta < 7))
 		{
 			return true;  // If a player is holding a (thin) snow block and it's size can be increased, return collision ignored
 		}
