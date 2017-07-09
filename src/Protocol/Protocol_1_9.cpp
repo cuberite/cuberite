@@ -130,7 +130,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 		
 		if (Params[1] == "FML") {
 			LOG("Forge client connected!");
-			m_ForgeHandshake.setIsForgeClient(true);
+			m_Client->m_ForgeHandshake.setIsForgeClient(true);
 		} else if (Params.size() == 4) {
 			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord()) {
 				// BungeeCord handling:
@@ -714,7 +714,7 @@ void cProtocol_1_9_0::SendLoginSuccess(void)
 		Pkt.WriteString(m_Client->GetUsername());
 	}
 	
-	m_ForgeHandshake.onLoginSuccess(m_Client);
+	m_Client->m_ForgeHandshake.onLoginSuccess(m_Client);
 }
 
 
@@ -2178,7 +2178,7 @@ void cProtocol_1_9_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
-	m_ForgeHandshake.augmentServerListPing(ResponseValue);
+	m_Client->m_ForgeHandshake.augmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -4180,7 +4180,7 @@ void cProtocol_1_9_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
-	m_ForgeHandshake.augmentServerListPing(ResponseValue);
+	m_Client->m_ForgeHandshake.augmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -4238,7 +4238,7 @@ void cProtocol_1_9_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
-	m_ForgeHandshake.augmentServerListPing(ResponseValue);
+	m_Client->m_ForgeHandshake.augmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -4296,7 +4296,7 @@ void cProtocol_1_9_4::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
-	m_ForgeHandshake.augmentServerListPing(ResponseValue);
+	m_Client->m_ForgeHandshake.augmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());

@@ -16,7 +16,7 @@
 #include "../Map.h"
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
-#include "ForgeHandshake.h"
+#include "../ClientHandle.h"
 
 #include <array>
 
@@ -65,7 +65,7 @@ public:
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 	void ForgeDataReceived(const char * a_Data, size_t a_Size)
 	{
-		m_ForgeHandshake.DataReceived(a_Data, a_Size);
+		m_Client->m_ForgeHandshake.DataReceived(a_Data, a_Size);
 	}
 
 	// Sending stuff to clients (alphabetically sorted):
@@ -171,9 +171,6 @@ protected:
 
 	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
 	cByteBuffer m_OutPacketLenBuffer;
-	
-	/** Forge protocol handshaking */
-	cForgeHandshake m_ForgeHandshake;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;

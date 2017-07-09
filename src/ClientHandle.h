@@ -21,6 +21,7 @@
 #include "json/json.h"
 #include "ChunkSender.h"
 #include "EffectID.h"
+#include "Protocol/ForgeHandshake.h"
 
 
 #include <array>
@@ -376,6 +377,8 @@ public:  // tolua_export
 	void InvalidateCachedSentChunk();
 
 	bool IsPlayerChunkSent();
+	
+	cForgeHandshake m_ForgeHandshake;
 
 private:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
