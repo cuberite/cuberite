@@ -134,7 +134,7 @@ public:
 	static size_t GetVarIntSize(UInt32 a_Value);
 
 protected:
-	char * m_Buffer;
+	std::unique_ptr<char[]> m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer
 
 	size_t m_DataStart;  // Where the data starts in the ringbuffer

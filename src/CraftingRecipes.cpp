@@ -56,16 +56,6 @@ cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
 
 
 
-cCraftingGrid::~cCraftingGrid()
-{
-	delete[] m_Items;
-	m_Items = nullptr;
-}
-
-
-
-
-
 cItem & cCraftingGrid::GetItem(int x, int y) const
 {
 	// Accessible through scripting, must verify parameters:

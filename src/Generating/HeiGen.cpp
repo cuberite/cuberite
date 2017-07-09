@@ -123,18 +123,6 @@ cHeiGenCache::cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, size_t a_CacheS
 
 
 
-cHeiGenCache::~cHeiGenCache()
-{
-	delete[] m_CacheData;
-	m_CacheData = nullptr;
-	delete[] m_CacheOrder;
-	m_CacheOrder = nullptr;
-}
-
-
-
-
-
 void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 {
 	/*

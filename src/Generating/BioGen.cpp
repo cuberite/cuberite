@@ -70,18 +70,6 @@ cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize) :
 
 
 
-cBioGenCache::~cBioGenCache()
-{
-	delete[] m_CacheData;
-	m_CacheData = nullptr;
-	delete[] m_CacheOrder;
-	m_CacheOrder = nullptr;
-}
-
-
-
-
-
 void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
