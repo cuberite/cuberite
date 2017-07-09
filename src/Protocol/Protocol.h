@@ -63,6 +63,10 @@ public:
 
 	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
+	void ForgeDataReceived(const char * a_Data, size_t a_Size)
+	{
+		m_ForgeHandshake.DataReceived(a_Data, a_Size);
+	}
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;

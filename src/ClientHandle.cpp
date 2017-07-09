@@ -852,6 +852,10 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 	{
 		UnregisterPluginChannels(BreakApartPluginChannels(a_Message));
 	}
+	else if (a_Channel == "FML|HS")
+	{
+		m_Protocol->ForgeDataReceived(a_Message.c_str(), a_Message.size());
+	}
 	else if (!HasPluginChannel(a_Channel))
 	{
 		// Ignore if client sent something but didn't register the channel first

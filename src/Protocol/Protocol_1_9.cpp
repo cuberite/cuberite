@@ -130,7 +130,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 		
 		if (Params[1] == "FML") {
 			LOG("Forge client connected!");
-			m_ForgeHandshake.isForgeClient = true;
+			m_ForgeHandshake.setIsForgeClient(true);
 		} else if (Params.size() == 4) {
 			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord()) {
 				// BungeeCord handling:
