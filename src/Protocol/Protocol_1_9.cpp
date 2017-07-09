@@ -130,7 +130,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 		
 		if (Params[1] == "FML") {
 			LOG("Forge client connected!");
-			// TODO
+			m_ForgeHandshake.isForgeClient = true;
 		} else if (Params.size() == 4) {
 			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord()) {
 				// BungeeCord handling:
@@ -712,6 +712,21 @@ void cProtocol_1_9_0::SendLoginSuccess(void)
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
 		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(m_Client->GetUUID()));
 		Pkt.WriteString(m_Client->GetUsername());
+	}
+	
+	if (m_ForgeHandshake.isForgeClient) {
+		AStringVector channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
+		AString channelsString;
+		
+		for (AStringVector::iterator itr = channels.begin(); itr != channels.end(); ++itr)
+		{
+			channelsString.append(*itr);
+			channelsString.push_back('\0');
+		}
+		
+		m_Client->SendPluginMessage("REGISTER", channelsString);
+		//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
+		// TODO: send ServerHello
 	}
 }
 
