@@ -9,12 +9,13 @@
 #include "json/json.h"
 #include "../ClientHandle.h"
 
-cForgeHandshake::cForgeHandshake()
+cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_Client(client), m_isForgeClient(false), m_stage(UNKNOWN)
 {
-	LOG("Initializing new cForgeHandshake %p", static_cast<void *>(this));
-	isForgeClient = false;
-	stage = UNKNOWN;
 }
+
+
+
+
 
 void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
 {
@@ -34,13 +35,13 @@ void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
 void cForgeHandshake::setIsForgeClient(bool flag)
 {
 	LOG("Setting isForgeClient = %d of %p", flag, static_cast<void *>(this));
-	isForgeClient = flag;
+	m_isForgeClient = flag;
 }
 
 
-void cForgeHandshake::onLoginSuccess(cClientHandle * Client)
+void cForgeHandshake::onLoginSuccess()
 {
-	if (isForgeClient) {
+	if (m_isForgeClient) {
 		AStringVector channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
 		AString channelsString;
 		
@@ -50,15 +51,15 @@ void cForgeHandshake::onLoginSuccess(cClientHandle * Client)
 			channelsString.push_back('\0');
 		}
 		
-		Client->SendPluginMessage("REGISTER", channelsString);
+		m_Client->SendPluginMessage("REGISTER", channelsString);
 		//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
 		
-		stage = START;
-		SendServerHello(Client);
+		m_stage = START;
+		SendServerHello();
 	}
 }
 
-void cForgeHandshake::SendServerHello(cClientHandle * Client)
+void cForgeHandshake::SendServerHello()
 {
 	AString message;
 	message.push_back(Discriminator_ServerHello); // Discriminator	Byte	Always 0 for ServerHello
@@ -69,15 +70,15 @@ void cForgeHandshake::SendServerHello(cClientHandle * Client)
 	message.push_back('\0');
 	message.push_back('\0');
 	
-	stage = HELLO;
-	Client->SendPluginMessage("FML|HS", message);
+	m_stage = HELLO;
+	m_Client->SendPluginMessage("FML|HS", message);
 }
 
 void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 {
 	/// XXX TODO: fix this, there are two cForgeHandshake instances, one in cProtocolRecognizer another in cProtocol_1_9 (both inherit cProtocol),
 	// and the wrong one has the Forge client set, so it is not recognized here!
-	if (!isForgeClient) {
+	if (!m_isForgeClient) {
 		LOG("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size);
 		return;
 	}
@@ -91,7 +92,7 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 	
 	int discriminator = a_Data[0];
 	
-	switch (stage)
+	switch (m_stage)
 	{
 		case HELLO:
 		{
@@ -105,27 +106,31 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 						LOG("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
 						if (fmlProtocolVersion != 2) {
 							LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
-							stage = ERROR;
+							m_stage = ERROR;
 						}
 					}
 					else
 					{
 						LOG("Unexpectedly short ClientHello received");
-						stage = ERROR;
+						m_stage = ERROR;
 					}
 					
 					break;
 				}
 					
 				case Discriminator_ModList:
+				{
 					LOG("Received ModList");
 					// TODO: parse client ModList
+					
 					// TODO: send server ModList
+					
 					break;
+				}
 					
 				default:
-					LOG("Unexpected Forge packet %d received in %d stage", discriminator, stage);
-					stage = ERROR;
+					LOG("Unexpected Forge packet %d received in %d stage", discriminator, m_stage);
+					m_stage = ERROR;
 					return;
 			}
 		}

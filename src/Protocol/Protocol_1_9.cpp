@@ -714,7 +714,7 @@ void cProtocol_1_9_0::SendLoginSuccess(void)
 		Pkt.WriteString(m_Client->GetUsername());
 	}
 	
-	m_Client->m_ForgeHandshake.onLoginSuccess(m_Client);
+	m_Client->m_ForgeHandshake.onLoginSuccess();
 }
 
 
