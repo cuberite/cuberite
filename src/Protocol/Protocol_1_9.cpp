@@ -714,20 +714,7 @@ void cProtocol_1_9_0::SendLoginSuccess(void)
 		Pkt.WriteString(m_Client->GetUsername());
 	}
 	
-	if (m_ForgeHandshake.isForgeClient) {
-		AStringVector channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
-		AString channelsString;
-		
-		for (AStringVector::iterator itr = channels.begin(); itr != channels.end(); ++itr)
-		{
-			channelsString.append(*itr);
-			channelsString.push_back('\0');
-		}
-		
-		m_Client->SendPluginMessage("REGISTER", channelsString);
-		//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
-		// TODO: send ServerHello
-	}
+	m_ForgeHandshake.onLoginSuccess(m_Client);
 }
 
 
