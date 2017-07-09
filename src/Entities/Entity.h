@@ -515,10 +515,10 @@ public:
 	void SetIsTicking(bool a_IsTicking);
 
 	/** Adds a mob to the leashed list of mobs */
-	void AddLeashedMob(cMonster * a_Monster, bool broadcast = true);
+	void AddLeashedMob(cMonster * a_Monster, bool a_ShouldBroadcast = true);
 
 	/** Removes a mob to the leashed list of mobs */
-	void RemoveLeashedMob(cMonster * a_Monster, bool dropPickup, bool broadcast = true);
+	void RemoveLeashedMob(cMonster * a_Monster, bool dropPickup, bool a_ShouldBroadcast = true);
 
 	/** Returs whether the entity has any mob leashed to */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }

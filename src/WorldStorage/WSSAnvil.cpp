@@ -3144,58 +3144,61 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 	}
 
 	// Leashed to a knot
-	bool Leashed;
 	int LeashedIdx = a_NBT.FindChildByName(a_TagIdx, "Leashed");
-	if (LeashedIdx >= 0)
+	if ((LeashedIdx >= 0) && a_NBT.GetByte(LeashedIdx))
 	{
-		Leashed = a_NBT.GetByte(LeashedIdx);
-
-		if (Leashed)
-		{
-			int LeashIdx = a_NBT.FindChildByName(a_TagIdx, "Leash");
-			if (LeashIdx >= 0)
-			{
-				double PosX = 0.0, PosY = 0.0, PosZ = 0.0;
-				bool KnotPosPresent = true;
-				int LeashDataLine = a_NBT.FindChildByName(LeashIdx, "X");
-				if (LeashDataLine >= 0)
-				{
-					PosX = a_NBT.GetDouble(LeashDataLine);
-				}
-				else
-				{
-					KnotPosPresent = false;
-				}
-				LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Y");
-				if (LeashDataLine >= 0)
-				{
-					PosY = a_NBT.GetDouble(LeashDataLine);
-				}
-				else
-				{
-					KnotPosPresent = false;
-				}
-				LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Z");
-				if (LeashDataLine >= 0)
-				{
-					PosZ = a_NBT.GetDouble(LeashDataLine);
-				}
-				else
-				{
-					KnotPosPresent = false;
-				}
-				if (KnotPosPresent)
-				{
-					// Set leash pos for the mob
-					LOGD("The mob was leashed to position %f, %f, %f", PosX, PosY, PosZ);
-					cPassiveMonster * PassiveMonster = static_cast<cPassiveMonster *>(&a_Monster);
-					PassiveMonster->SetLeashToPos(new Vector3d(PosX, PosY, PosZ));
-				}
-			}
-		}
+		LoadLeashToPosition(a_Monster, a_NBT, a_TagIdx);
 	}
 
 	return true;
+}
+
+
+
+
+
+void cWSSAnvil::LoadLeashToPosition(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int LeashIdx = a_NBT.FindChildByName(a_TagIdx, "Leash");
+	if (LeashIdx < 0)
+	{
+		return;
+	}
+
+	double PosX = 0.0, PosY = 0.0, PosZ = 0.0;
+	bool KnotPosPresent = true;
+	int LeashDataLine = a_NBT.FindChildByName(LeashIdx, "X");
+	if (LeashDataLine >= 0)
+	{
+		PosX = a_NBT.GetDouble(LeashDataLine);
+	}
+	else
+	{
+		KnotPosPresent = false;
+	}
+	LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Y");
+	if (LeashDataLine >= 0)
+	{
+		PosY = a_NBT.GetDouble(LeashDataLine);
+	}
+	else
+	{
+		KnotPosPresent = false;
+	}
+	LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Z");
+	if (LeashDataLine >= 0)
+	{
+		PosZ = a_NBT.GetDouble(LeashDataLine);
+	}
+	else
+	{
+		KnotPosPresent = false;
+	}
+	if (KnotPosPresent)
+	{
+		// Set leash pos for the mob
+		a_Monster.SetLeashToPos(new Vector3d(PosX, PosY, PosZ));
+	}
 }
 
 

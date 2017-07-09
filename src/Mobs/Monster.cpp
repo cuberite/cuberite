@@ -425,14 +425,12 @@ void cMonster::CalcLeashActions()
 	// This mob just spotted in the world and should be leashed to a leash knot, so it tries until knot is found
 	if (!IsLeashed() && (m_LeashToPos != nullptr))
 	{
-		LOGD("Mob was leashed to pos %f, %f, %f, looking for leash knot...", m_LeashToPos->x, m_LeashToPos->y, m_LeashToPos->z);
-
-		class LookForKnots : public cEntityCallback
+		class LookForKnot : public cEntityCallback
 		{
 		public:
 			cMonster * m_Monster;
 
-			LookForKnots(cMonster * a_Monster) :
+			LookForKnot(cMonster * a_Monster) :
 				m_Monster(a_Monster)
 			{
 			}
@@ -441,7 +439,6 @@ void cMonster::CalcLeashActions()
 			{
 				if (a_Entity->IsLeashKnot())
 				{
-					LOGD("Leash Sknot found");
 					a_Entity->AddLeashedMob(m_Monster);
 					m_Monster->SetLeashToPos(nullptr);
 				}
@@ -455,12 +452,12 @@ void cMonster::CalcLeashActions()
 		// TODO: leashed mobs in vanilla can move around up to 5 blocks distance from leash origin
 		MoveToPosition(m_LeashedTo->GetPosition());
 
-		// If distance to target > 10 break lead
+		// If distance to target > 10 break leash
 		Vector3f a_Distance(m_LeashedTo->GetPosition() - GetPosition());
 		double Distance(a_Distance.Length());
 		if (Distance > 10.0)
 		{
-			LOGD("Lead broken (distance)");
+			LOGD("Leash broken (distance)");
 			m_LeashedTo->RemoveLeashedMob(this, false);
 		}
 	}
@@ -686,7 +683,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		}
 	}
 
-	// Using leads
+	// Using leashes
 	m_IsLeashActionJustDone = false;
 	if (IsLeashed() && (GetLeashedTo() == &a_Player))  // a player can only unleash a mob leashed to him
 	{
@@ -1428,7 +1425,6 @@ void cMonster::SetLeashedTo(cEntity * a_Entity)
 	m_LeashedTo = a_Entity;
 
 	m_IsLeashActionJustDone = true;
-	LOGD("Mob leashed");
 }
 
 
@@ -1450,5 +1446,4 @@ void cMonster::SetUnleashed(bool a_DropPickup)
 	}
 
 	m_IsLeashActionJustDone = true;
-	LOGD("Mob unleashed");
 }

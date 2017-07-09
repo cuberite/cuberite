@@ -19,7 +19,6 @@ cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, double a_X, double a_Y, double a_
 	m_ShouldSelfDestroy(false),
 	m_TicksToSelfDestroy(20 * 1)
 {
-	LOGD("Leash knot created.");
 }
 
 
@@ -30,16 +29,29 @@ void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
-	// Check leashed nearby mobs to tight them to this knot
+	TieNearbyMobs(a_Player, true);
+
+	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
+}
+
+
+
+
+
+void cLeashKnot::TieNearbyMobs(cPlayer & a_Player, bool a_ShouldBroadCast)
+{
+	// Check leashed nearby mobs to tie them to this knot
 	class LookForLeasheds : public cEntityCallback
 	{
 	public:
 		cLeashKnot * m_Knot;
 		cPlayer * m_Player;
+		bool m_ShouldBroadcast;
 
-		LookForLeasheds(cLeashKnot * a_Knot, cPlayer * a_PlayerLeashedTo) :
+		LookForLeasheds(cLeashKnot * a_Knot, cPlayer * a_PlayerLeashedTo, bool a_ShouldBroadcast) :
 			m_Knot(a_Knot),
-			m_Player(a_PlayerLeashedTo)
+			m_Player(a_PlayerLeashedTo),
+			m_ShouldBroadcast(a_ShouldBroadcast)
 		{
 		}
 
@@ -71,13 +83,13 @@ void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 
 			// All conditions met, unleash from player and leash to fence
 			PotentialLeashed->GetLeashedTo()->RemoveLeashedMob(PotentialLeashed, false, false);
-			m_Knot->AddLeashedMob(PotentialLeashed);
+			m_Knot->AddLeashedMob(PotentialLeashed, m_ShouldBroadcast);
 			return false;
 		}
-	} Callback(this, &a_Player);
-	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), Callback);
+	} LookForLeashedsCallback(this, &a_Player, a_ShouldBroadCast);
 
-	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
+	// taking world from player (instead from this) because this can be called before entity was initialized
+	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), LookForLeashedsCallback);
 }
 
 
@@ -136,15 +148,6 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			Destroy();
 			m_World->BroadcastSoundEffect("entity.leashknot.break", GetPosX(), GetPosY(), GetPosZ(), 1, 1);
-		}
-	}
-	else
-	{
-		// Detect if fence is destroyed. Get block at knot position and check if its solid
-		BLOCKTYPE BlockID = m_World->GetBlock(FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()));
-		if (!cBlockInfo::IsSolid(BlockID))
-		{
-			m_ShouldSelfDestroy = true;
 		}
 	}
 }

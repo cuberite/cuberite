@@ -239,6 +239,9 @@ protected:
 	/** Loads monster common data from the NBT compound; returns true if successful */
 	bool LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx);
 
+	/** Loads the position to where is leashed the monster */
+	void LoadLeashToPosition(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx);
+
 	/** Loads projectile common data from the NBT compound; returns true if successful */
 	bool LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIx);
 

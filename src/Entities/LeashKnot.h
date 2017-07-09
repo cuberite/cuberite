@@ -21,6 +21,11 @@ public:
 
 	cLeashKnot(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
 
+	/** Looks for mobs leashed to a player and ties them to this knot */
+	void TieNearbyMobs(cPlayer & a_Player, bool a_ShouldBroadCast);
+
+	void SetShouldSelfDestroy() { m_ShouldSelfDestroy = true; };
+
 private:
 
 	virtual void OnRightClicked(cPlayer & a_Player) override;
