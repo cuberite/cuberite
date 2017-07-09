@@ -393,12 +393,22 @@ void cProtocol_1_12::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	// Description:
 	Json::Value Description;
 	Description["text"] = ServerDescription.c_str();
-
+	
+	// modinfo:
+	// TODO: only send if mods enabled
+	Json::Value Modinfo;
+	Modinfo["type"] = "FML";
+	
+	Json::Value ModList(Json::arrayValue);
+	// TODO: customizable modList
+	Modinfo["modList"] = ModList;
+	
 	// Create the response:
 	Json::Value ResponseValue;
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	ResponseValue["modinfo"] = Modinfo;
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
