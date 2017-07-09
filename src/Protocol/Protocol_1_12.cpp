@@ -10,6 +10,7 @@ Implements the 1.12 protocol classes:
 #include "Protocol_1_12.h"
 #include "ProtocolRecognizer.h"
 #include "Packetizer.h"
+#include "ForgeHandshake.h"
 
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
@@ -394,21 +395,13 @@ void cProtocol_1_12::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	Json::Value Description;
 	Description["text"] = ServerDescription.c_str();
 	
-	// modinfo:
-	// TODO: only send if mods enabled
-	Json::Value Modinfo;
-	Modinfo["type"] = "FML";
-	
-	Json::Value ModList(Json::arrayValue);
-	// TODO: customizable modList
-	Modinfo["modList"] = ModList;
-	
 	// Create the response:
 	Json::Value ResponseValue;
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
-	ResponseValue["modinfo"] = Modinfo;
+	ForgeHandshake::augmentServerListPing(ResponseValue);
+	
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
