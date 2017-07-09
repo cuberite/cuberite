@@ -76,8 +76,6 @@ void cForgeHandshake::SendServerHello()
 
 void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 {
-	/// XXX TODO: fix this, there are two cForgeHandshake instances, one in cProtocolRecognizer another in cProtocol_1_9 (both inherit cProtocol),
-	// and the wrong one has the Forge client set, so it is not recognized here!
 	if (!m_isForgeClient) {
 		LOG("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size);
 		return;
@@ -124,7 +122,17 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 					// TODO: parse client ModList
 					
 					// TODO: send server ModList
+					AString serverModList;
+					/*
+					serverModList.push_back(Discriminator_ModList);
+					serverModList.push_back('\0'); // TODO: number of mods varint
+					// TODO: array of strings of mod name and version
+					// TODO: this should match ModList sent in status packet
+					 */
+					serverModList.assign(a_Data, a_Size); // just echoing back client's mods for now
+					// TODO: fix
 					
+					m_Client->SendPluginMessage("FML|HS", serverModList);
 					break;
 				}
 					
