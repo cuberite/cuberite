@@ -99,12 +99,14 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			{
 				case Discriminator_ClientHello:
 				{
-					LOG("Received ClientHello");
 					if (a_Size == 2)
 					{
 						int fmlProtocolVersion = a_Data[1];
-						LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
-						stage = ERROR;
+						LOG("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
+						if (fmlProtocolVersion != 2) {
+							LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
+							stage = ERROR;
+						}
 					}
 					else
 					{
