@@ -16,6 +16,7 @@
 #include "../Map.h"
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
+#include "ForgeHandshake.h"
 
 #include <array>
 
