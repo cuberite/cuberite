@@ -121,18 +121,34 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 	m_ReceivedData(32 KiB),
 	m_IsEncrypted(false)
 {
-
-	// BungeeCord handling:
-	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
-	// hostname\00ip-address\00uuid\00profile-properties-as-json
+	
 	AStringVector Params;
-	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
-	{
-		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+	SplitZeroTerminatedStrings(a_ServerAddress, Params);
+	
+	if (Params.size() >= 2) {
 		m_ServerAddress = Params[0];
-		m_Client->SetIPString(Params[1]);
-		m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
-		m_Client->SetProperties(Params[3]);
+		
+		if (Params[1] == "FML") {
+			LOG("Forge client connected!");
+			// TODO
+		} else if (Params.size() == 4) {
+			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord()) {
+				// BungeeCord handling:
+				// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+				// hostname\00ip-address\00uuid\00profile-properties-as-json
+				
+				LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+				
+				m_Client->SetIPString(Params[1]);
+				m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
+				m_Client->SetProperties(Params[3]);
+			} else {
+				LOG("BungeeCord is disabled, but client sent additional data, set AllowBungeeCord=1 if you want to allow it");
+			}
+		} else {
+			LOG("Unknown additional data sent in server address (BungeeCord/FML?): %zu parameters", Params.size());
+			// TODO: support FML + BungeeCord? (what parameters does it send in that case?) https://github.com/SpigotMC/BungeeCord/issues/899
+		}
 	}
 
 	// Create the comm log file, if so requested:
