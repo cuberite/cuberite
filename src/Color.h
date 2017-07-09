@@ -54,5 +54,5 @@ public:
 
 	unsigned int m_Color;
 
-}; // tolua_export
+};  // tolua_export
 // tolua_end
