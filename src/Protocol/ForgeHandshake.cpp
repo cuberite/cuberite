@@ -38,6 +38,22 @@ void cForgeHandshake::onLoginSuccess(cClientHandle * Client)
 		
 		Client->SendPluginMessage("REGISTER", channelsString);
 		//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
-		// TODO: send ServerHello
+		
+		SendServerHello(Client);
 	}
+}
+
+void cForgeHandshake::SendServerHello(cClientHandle * Client)
+{
+	AString message;
+	message.push_back('\0'); // Discriminator	Byte	Always 0 for ServerHello
+	message.push_back('\2'); // FML protocol Version	Byte	Determined from NetworkRegistery. Currently 2.
+	// Dimension TODO
+	message.push_back('\0');
+	message.push_back('\0');
+	message.push_back('\0');
+	message.push_back('\0');
+	
+	
+	Client->SendPluginMessage("FML|HS", message);
 }
