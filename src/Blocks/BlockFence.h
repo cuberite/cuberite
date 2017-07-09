@@ -24,7 +24,7 @@ public:
 		cLeashKnot * LeashKnot = nullptr;
 
 		// Check if already exists a knot there
-		LookForKnot CallbackFindKnot = LookForKnot(&LeashKnot);
+		LookForKnot CallbackFindKnot(&LeashKnot);
 		bool AlreadyExistsAKnot = !a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(new Vector3d(a_BlockX, a_BlockY, a_BlockZ), 0.5, 1), CallbackFindKnot);
 
 		// Reuse / create the leash knot
@@ -74,7 +74,7 @@ public:
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		cLeashKnot * LeashKnotFound = nullptr;
-		LookForKnot CallbackFindKnot = LookForKnot(&LeashKnotFound);
+		LookForKnot CallbackFindKnot(&LeashKnotFound);
 		a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(new Vector3d(a_BlockX, a_BlockY, a_BlockZ), 2.0, 1), CallbackFindKnot);
 
 		if (LeashKnotFound != nullptr)

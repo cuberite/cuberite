@@ -24,7 +24,7 @@ public:
 	/** Looks for mobs leashed to a player and ties them to this knot */
 	void TieNearbyMobs(cPlayer & a_Player, bool a_ShouldBroadCast);
 
-	void SetShouldSelfDestroy() { m_ShouldSelfDestroy = true; };
+	void SetShouldSelfDestroy() { m_ShouldSelfDestroy = true; }
 
 private:
 
