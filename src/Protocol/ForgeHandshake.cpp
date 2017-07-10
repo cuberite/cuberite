@@ -8,7 +8,7 @@
 #include "json/json.h"
 #include "../ClientHandle.h"
 
-cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false), m_Client(client), m_stage(UNKNOWN)
+cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false), m_Errored(false), m_Client(client)
 {
 }
 
@@ -71,7 +71,6 @@ void cForgeHandshake::SendServerHello()
 	message.push_back('\0');
 	message.push_back('\0');
 	
-	m_stage = HELLO;
 	m_Client->SendPluginMessage("FML|HS", message);
 }
 
@@ -81,6 +80,8 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 		LOG("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size);
 		return;
 	}
+	
+	// TODO: handle errors
 	
 	LOG("Received Forge data: %zu bytes: %s", a_Size, a_Data);
 	
@@ -143,7 +144,6 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			AString serverModList;
 			buf.ReadAll(serverModList);
 			
-			m_stage = WAITINGCACK;
 			m_Client->SendPluginMessage("FML|HS", serverModList);
 			break;
 		}
@@ -215,7 +215,7 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 		}
 			
 		default:
-			LOG("Unexpected Forge packet %d received in %d stage", discriminator, m_stage);
+			LOG("Unexpected Forge packet %d received", discriminator);
 			SetError();
 			return;
 	}
@@ -226,6 +226,5 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 
 
 void cForgeHandshake::SetError() {
-	m_stage = ERROR;
-	//TODO if (m_CSLock.IsLocked()) m_CSLock.Unlock();
+	m_Errored = true;
 }

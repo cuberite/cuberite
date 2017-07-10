@@ -29,24 +29,13 @@ public:
 	
 private:
 	void SetError();
+	bool m_Errored;
 	
 	cClientHandle * m_Client;
 	
 	const AString * m_Name;
 	const AString * m_UUID;
 	const Json::Value * m_Properties;
-	
-	
-	enum Stage
-	{
-		UNKNOWN,
-		START,
-		HELLO,
-		WAITINGCACK,
-		COMPLETE,
-		DONE,
-		ERROR,
-	} m_stage;
 	
 	enum
 	{
