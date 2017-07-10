@@ -52,7 +52,7 @@ private:
 		Discriminator_ClientHello = 1,
 		Discriminator_ModList = 2,
 		Discriminator_RegistryData = 3,
-		Discriminator_HandshakeReset = 254,
-		Discriminator_HandshakeAck = 255,
+		Discriminator_HandshakeReset = -2,
+		Discriminator_HandshakeAck = -1,
 	};
 };
