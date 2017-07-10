@@ -404,7 +404,10 @@ public:
 	void SendExperience(void);
 
 	/** In UI windows, get the item that the player is dragging */
-	cItem & GetDraggingItem(void) {return m_DraggingItem; }
+	cItem & GetDraggingItem(void) {return m_DraggingItem; }  // tolua_export
+
+	/** In UI windows, set the item that the player is dragging */
+	void SetDraggingItem(const cItem & a_Item);  // tolua_export
 
 	// In UI windows, when inventory-painting:
 	/** Clears the list of slots that are being inventory-painted. To be used by cWindow only */
