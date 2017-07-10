@@ -323,7 +323,6 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
-	cWorld * World;
 	{
 		cCSLock lock(m_CSState);
 		/*
@@ -354,11 +353,23 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		// Send login success (if the protocol supports it):
 		m_Protocol->SendLoginSuccess();
 		
-		if (m_ForgeHandshake.m_isForgeClient) {		
+		if (m_ForgeHandshake.m_isForgeClient) {
 			m_ForgeHandshake.BeginForgeHandshake();
 			// TODO: only continue below after Forge handshake completes!
 		}
+		
+		PostAuthenticate(a_Name, a_UUID, a_Properties);
+	}
+}
 
+
+
+
+
+void cClientHandle::PostAuthenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
+{
+	cWorld * World;
+	{
 		// Spawn player (only serversided, so data is loaded)
 		m_Player = new cPlayer(m_Self, GetUsername());
 		/*

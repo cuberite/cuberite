@@ -534,6 +534,9 @@ private:
 	cClientHandlePtr m_Self;
 
 	float m_BreakProgress;
+	
+	/** Finish logging the user in after authenticating. */
+	void PostAuthenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
