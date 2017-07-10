@@ -9365,11 +9365,11 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "SetLifetime",
+							Name = "LifeTimeInTicks",
 							Type = "number",
 						},
 					},
-					Notes = "Sets the total lifespan of this pickup before it despawns, in ticks.",
+					Notes = "Sets the total lifespan of this pickup before it despawns, in ticks. Does not reset the age of the pickup, use SetAge(0). If new lifetime is less than the current age, pickup will despawn.",
 				},
 			},
 			Inherits = "cEntity",
