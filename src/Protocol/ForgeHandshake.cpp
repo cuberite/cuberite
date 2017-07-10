@@ -146,6 +146,7 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 					AString serverModList;
 					buf.ReadAll(serverModList);
 					
+					m_stage = WAITINGCACK;
 					m_Client->SendPluginMessage("FML|HS", serverModList);
 					break;
 				}
@@ -157,8 +158,33 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			}
 		}
 			
+		case WAITINGCACK:
+		{
+			switch (discriminator)
+			{
+				case Discriminator_HandshakeAck:
+				{
+					if (a_Size != 2)
+					{
+						LOG("Unexpected HandshakeAck packet length: %zu", a_Size);
+						m_stage = ERROR;
+						break;
+					}
+					
+					int phase = a_Data[1];
+					LOG("Received client HandshakeAck with phase=%d", phase);
+					// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
+					break;
+				}
+				default:
+					LOG("Unknown packet received in WAITINGCACK: %d", discriminator);
+			}
+			break;
+		}
+			
 		default:
 		{
+			LOG("Forge client/server state invalidated: %d", m_stage);
 		}
 	}
 }
