@@ -35,9 +35,13 @@ void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
 
 
 
-void cForgeHandshake::BeginForgeHandshake()
+void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	ASSERT(m_isForgeClient);
+	
+	m_Name = &a_Name;
+	m_UUID = &a_UUID;
+	m_Properties = &a_Properties;
 	
 	AStringVector channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
 	AString channelsString;
@@ -49,7 +53,6 @@ void cForgeHandshake::BeginForgeHandshake()
 	}
 	
 	m_Client->SendPluginMessage("REGISTER", channelsString);
-	//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
 }
 
 
@@ -156,6 +159,8 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			int phase = a_Data[1];
 			LOG("Received client HandshakeAck with phase=%d", phase);
 			// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
+			
+			m_Client->PostAuthenticate(*m_Name, *m_UUID, *m_Properties);
 		}
 			
 		default:
