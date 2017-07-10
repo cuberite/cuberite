@@ -161,7 +161,7 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			LOG("Received client HandshakeAck with phase=%d", phase);
 			// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
 			
-			m_Client->PostAuthenticate(*m_Name, *m_UUID, *m_Properties);
+			m_Client->FinishAuthenticate(*m_Name, *m_UUID, *m_Properties);
 		}
 			
 		default:

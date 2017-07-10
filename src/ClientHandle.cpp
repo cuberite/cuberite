@@ -359,7 +359,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		}
 		else
 		{
-			PostAuthenticate(a_Name, a_UUID, a_Properties);
+			FinishAuthenticate(a_Name, a_UUID, a_Properties);
 		}
 	}
 }
@@ -368,7 +368,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 
 
-void cClientHandle::PostAuthenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
+void cClientHandle::FinishAuthenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	cWorld * World;
 	{
