@@ -353,6 +353,11 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 		// Send login success (if the protocol supports it):
 		m_Protocol->SendLoginSuccess();
+		
+		if (m_ForgeHandshake.m_isForgeClient) {		
+			m_ForgeHandshake.BeginForgeHandshake();
+			// TODO: only continue below after Forge handshake completes!
+		}
 
 		// Spawn player (only serversided, so data is loaded)
 		m_Player = new cPlayer(m_Self, GetUsername());

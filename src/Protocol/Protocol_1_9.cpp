@@ -130,7 +130,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 		
 		if (Params[1] == "FML") {
 			LOG("Forge client connected!");
-			m_Client->m_ForgeHandshake.setIsForgeClient(true);
+			m_Client->m_ForgeHandshake.m_isForgeClient = true;
 		} else if (Params.size() == 4) {
 			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord()) {
 				// BungeeCord handling:
@@ -713,8 +713,6 @@ void cProtocol_1_9_0::SendLoginSuccess(void)
 		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(m_Client->GetUUID()));
 		Pkt.WriteString(m_Client->GetUsername());
 	}
-	
-	m_Client->m_ForgeHandshake.onLoginSuccess();
 }
 
 

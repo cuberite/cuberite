@@ -9,7 +9,7 @@
 #include "json/json.h"
 #include "../ClientHandle.h"
 
-cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_Client(client), m_isForgeClient(false), m_stage(UNKNOWN)
+cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false), m_Client(client), m_stage(UNKNOWN)
 {
 }
 
@@ -32,31 +32,28 @@ void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
 	ResponseValue["modinfo"] = Modinfo;
 }
 
-void cForgeHandshake::setIsForgeClient(bool flag)
-{
-	LOG("Setting isForgeClient = %d of %p", flag, static_cast<void *>(this));
-	m_isForgeClient = flag;
-}
 
 
-void cForgeHandshake::onLoginSuccess()
+
+
+void cForgeHandshake::BeginForgeHandshake()
 {
-	if (m_isForgeClient) {
-		AStringVector channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
-		AString channelsString;
-		
-		for (AStringVector::iterator itr = channels.begin(); itr != channels.end(); ++itr)
-		{
-			channelsString.append(*itr);
-			channelsString.push_back('\0');
-		}
-		
-		m_Client->SendPluginMessage("REGISTER", channelsString);
-		//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
-		
-		m_stage = START;
-		SendServerHello();
+	ASSERT(m_isForgeClient);
+	
+	AStringVector channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
+	AString channelsString;
+	
+	for (AStringVector::iterator itr = channels.begin(); itr != channels.end(); ++itr)
+	{
+		channelsString.append(*itr);
+		channelsString.push_back('\0');
 	}
+	
+	m_Client->SendPluginMessage("REGISTER", channelsString);
+	//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
+	
+	m_stage = START;
+	SendServerHello();
 }
 
 void cForgeHandshake::SendServerHello()
