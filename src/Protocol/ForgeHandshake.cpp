@@ -53,6 +53,7 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 	}
 	
 	m_Client->SendPluginMessage("REGISTER", channelsString);
+	SendServerHello();
 }
 
 
