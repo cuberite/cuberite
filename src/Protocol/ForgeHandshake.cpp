@@ -133,11 +133,11 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 				{ "forge", "14.21.1.2387.mcp-XXX" },
 				{ "ironchest", "1.12-7.0.31.818" },
 			};
-			int modCount = sizeof(mods) / sizeof(mods[0]);
+			UInt32 modCount = sizeof(mods) / sizeof(mods[0]);
 			
 			buf.WriteBEInt8(Discriminator_ModList);
 			buf.WriteVarInt32(modCount);
-			for (int i = 0; i < modCount; ++i) {
+			for (size_t i = 0; i < modCount; ++i) {
 				buf.WriteVarUTF8String(mods[i].name);
 				buf.WriteVarUTF8String(mods[i].version);
 			}
@@ -170,9 +170,9 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 					// TODO: send real registry data
 					bool hasMore = false;
 					AString registryName = "potions";
-					int numIDs = 0;
-					int numSubstitutions = 0;
-					int numDummies = 0;
+					UInt32 numIDs = 0;
+					UInt32 numSubstitutions = 0;
+					UInt32 numDummies = 0;
 					
 					buf.WriteBool(hasMore);
 					buf.WriteVarUTF8String(registryName);
