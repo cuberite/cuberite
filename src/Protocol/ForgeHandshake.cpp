@@ -3,9 +3,8 @@
 
 // Implements Forge protocol handshaking
 
-#include "ForgeHandshake.h"
-
 #include "Globals.h"
+#include "ForgeHandshake.h"
 #include "json/json.h"
 #include "../ClientHandle.h"
 
@@ -53,8 +52,19 @@ void cForgeHandshake::BeginForgeHandshake()
 	//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
 	
 	m_stage = START;
+	LOG("BeginForgeHandshake lock1");
+	m_CSLock.Lock();
+	
 	SendServerHello();
+	
+	LOG("BeginForgeHandshake lock2");
+	m_CSLock.Lock();
+	// wait until received
 }
+
+
+
+
 
 void cForgeHandshake::SendServerHello()
 {
@@ -97,13 +107,13 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 				LOG("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
 				if (fmlProtocolVersion != 2) {
 					LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
-					m_stage = ERROR;
+					SetError();
 				}
 			}
 			else
 			{
 				LOG("Unexpectedly short ClientHello received");
-				m_stage = ERROR;
+				SetError();
 			}
 			
 			break;
@@ -149,19 +159,32 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			if (a_Size != 2)
 			{
 				LOG("Unexpected HandshakeAck packet length: %zu", a_Size);
-				m_stage = ERROR;
+				SetError();
 				break;
 			}
 			
 			int phase = a_Data[1];
 			LOG("Received client HandshakeAck with phase=%d", phase);
 			// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
+			
+			// continue
+			LOG("Continuing");
+			m_CSLock.Unlock();
 			break;
 		}
 			
 		default:
 			LOG("Unexpected Forge packet %d received in %d stage", discriminator, m_stage);
-			m_stage = ERROR;
+			SetError();
 			return;
 	}
+}
+
+
+
+
+
+void cForgeHandshake::SetError() {
+	m_stage = ERROR;
+	//TODO if (m_CSLock.IsLocked()) m_CSLock.Unlock();
 }
