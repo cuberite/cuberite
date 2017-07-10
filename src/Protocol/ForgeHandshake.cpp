@@ -90,101 +90,81 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 	
 	int discriminator = a_Data[0];
 	
-	switch (m_stage)
+	switch (discriminator)
 	{
-		case HELLO:
+		case Discriminator_ClientHello:
 		{
-			switch (discriminator)
+			if (a_Size == 2)
 			{
-				case Discriminator_ClientHello:
-				{
-					if (a_Size == 2)
-					{
-						int fmlProtocolVersion = a_Data[1];
-						LOG("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
-						if (fmlProtocolVersion != 2) {
-							LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
-							m_stage = ERROR;
-						}
-					}
-					else
-					{
-						LOG("Unexpectedly short ClientHello received");
-						m_stage = ERROR;
-					}
-					
-					break;
-				}
-					
-				case Discriminator_ModList:
-				{
-					LOG("Received ModList");
-					// TODO: parse client ModList
-					
-					// Send server ModList
-					
-					cByteBuffer buf(1024); // TODO: max size?
-					
-					// TODO: allow plugins to register mods, for now, using based on what my test client sent
-					struct {
-						AString name;
-						AString version;
-					} mods[] = {
-						{ "minecraft", "1.12" },
-						{ "FML", "8.0.99.999.forge" },
-						{ "forge", "14.21.1.2387.mcp-XXX" },
-						{ "ironchest", "1.12-7.0.31.818" },
-					};
-					int modCount = sizeof(mods) / sizeof(mods[0]);
-					
-					buf.WriteBEInt8(Discriminator_ModList);
-					buf.WriteVarInt32(modCount);
-					for (int i = 0; i < modCount; ++i) {
-						buf.WriteVarUTF8String(mods[i].name);
-						buf.WriteVarUTF8String(mods[i].version);
-					}
-					AString serverModList;
-					buf.ReadAll(serverModList);
-					
-					m_stage = WAITINGCACK;
-					m_Client->SendPluginMessage("FML|HS", serverModList);
-					break;
-				}
-					
-				default:
-					LOG("Unexpected Forge packet %d received in %d stage", discriminator, m_stage);
+				int fmlProtocolVersion = a_Data[1];
+				LOG("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
+				if (fmlProtocolVersion != 2) {
+					LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
 					m_stage = ERROR;
-					return;
+				}
 			}
+			else
+			{
+				LOG("Unexpectedly short ClientHello received");
+				m_stage = ERROR;
+			}
+			
+			break;
 		}
 			
-		case WAITINGCACK:
+		case Discriminator_ModList:
 		{
-			switch (discriminator)
-			{
-				case Discriminator_HandshakeAck:
-				{
-					if (a_Size != 2)
-					{
-						LOG("Unexpected HandshakeAck packet length: %zu", a_Size);
-						m_stage = ERROR;
-						break;
-					}
-					
-					int phase = a_Data[1];
-					LOG("Received client HandshakeAck with phase=%d", phase);
-					// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
-					break;
-				}
-				default:
-					LOG("Unknown packet received in WAITINGCACK: %d", discriminator);
+			LOG("Received ModList");
+			// TODO: parse client ModList
+			
+			// Send server ModList
+			
+			cByteBuffer buf(1024); // TODO: max size?
+			
+			// TODO: allow plugins to register mods, for now, using based on what my test client sent
+			struct {
+				AString name;
+				AString version;
+			} mods[] = {
+				{ "minecraft", "1.12" },
+				{ "FML", "8.0.99.999.forge" },
+				{ "forge", "14.21.1.2387.mcp-XXX" },
+				{ "ironchest", "1.12-7.0.31.818" },
+			};
+			int modCount = sizeof(mods) / sizeof(mods[0]);
+			
+			buf.WriteBEInt8(Discriminator_ModList);
+			buf.WriteVarInt32(modCount);
+			for (int i = 0; i < modCount; ++i) {
+				buf.WriteVarUTF8String(mods[i].name);
+				buf.WriteVarUTF8String(mods[i].version);
 			}
+			AString serverModList;
+			buf.ReadAll(serverModList);
+			
+			m_stage = WAITINGCACK;
+			m_Client->SendPluginMessage("FML|HS", serverModList);
+			break;
+		}
+			
+		case Discriminator_HandshakeAck:
+		{
+			if (a_Size != 2)
+			{
+				LOG("Unexpected HandshakeAck packet length: %zu", a_Size);
+				m_stage = ERROR;
+				break;
+			}
+			
+			int phase = a_Data[1];
+			LOG("Received client HandshakeAck with phase=%d", phase);
+			// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
 			break;
 		}
 			
 		default:
-		{
-			LOG("Forge client/server state invalidated: %d", m_stage);
-		}
+			LOG("Unexpected Forge packet %d received in %d stage", discriminator, m_stage);
+			m_stage = ERROR;
+			return;
 	}
 }
