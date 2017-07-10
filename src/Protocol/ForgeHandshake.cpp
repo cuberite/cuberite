@@ -169,7 +169,7 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 					
 					// TODO: send real registry data
 					bool hasMore = false;
-					AString registryName = "nothing";
+					AString registryName = "potions";
 					int numIDs = 0;
 					int numSubstitutions = 0;
 					int numDummies = 0;
