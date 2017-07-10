@@ -50,16 +50,6 @@ void cForgeHandshake::BeginForgeHandshake()
 	
 	m_Client->SendPluginMessage("REGISTER", channelsString);
 	//m_Client->RegisterPluginChannels(channels); // private and only adds to internal data structures, not sending messages
-	
-	m_stage = START;
-	LOG("BeginForgeHandshake lock1");
-	m_CSLock.Lock();
-	
-	SendServerHello();
-	
-	LOG("BeginForgeHandshake lock2");
-	m_CSLock.Lock();
-	// wait until received
 }
 
 
@@ -166,11 +156,6 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			int phase = a_Data[1];
 			LOG("Received client HandshakeAck with phase=%d", phase);
 			// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
-			
-			// continue
-			LOG("Continuing");
-			m_CSLock.Unlock();
-			break;
 		}
 			
 		default:
