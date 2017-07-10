@@ -37,7 +37,8 @@ private:
 	const Json::Value * m_Properties;
 	
 	
-	enum Stage {
+	enum Stage
+	{
 		UNKNOWN,
 		START,
 		HELLO,
@@ -47,12 +48,27 @@ private:
 		ERROR,
 	} m_stage;
 	
-	enum {
+	enum
+	{
 		Discriminator_ServerHello = 0,
 		Discriminator_ClientHello = 1,
 		Discriminator_ModList = 2,
 		Discriminator_RegistryData = 3,
 		Discriminator_HandshakeReset = -2,
 		Discriminator_HandshakeAck = -1,
+	};
+	
+	enum
+	{
+		ClientPhase_WAITINGSERVERDATA = 2,
+		ClientPhase_WAITINGSERVERCOMPLETE = 3,
+		ClientPhase_PENDINGCOMPLETE = 4,
+		ClientPhase_COMPLETE = 5,
+	};
+	
+	enum
+	{
+		ServerPhase_WAITINGCACK = 2,
+		ServerPhase_COMPLETE = 3,
 	};
 };

@@ -159,9 +159,59 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			
 			int phase = a_Data[1];
 			LOG("Received client HandshakeAck with phase=%d", phase);
-			// TODO: if phase=2 WAITINGSERVERDATA then send RegistryData
 			
-			m_Client->FinishAuthenticate(*m_Name, *m_UUID, *m_Properties);
+			switch (phase)
+			{
+				case ClientPhase_WAITINGSERVERDATA:
+				{
+					cByteBuffer buf(1024);
+					buf.WriteBEInt8(Discriminator_RegistryData);
+					
+					// TODO: send real registry data
+					bool hasMore = false;
+					AString registryName = "nothing";
+					int numIDs = 0;
+					int numSubstitutions = 0;
+					int numDummies = 0;
+					
+					buf.WriteBool(hasMore);
+					buf.WriteVarUTF8String(registryName);
+					buf.WriteVarInt32(numIDs);
+					buf.WriteVarInt32(numSubstitutions);
+					buf.WriteVarInt32(numDummies);
+					
+					AString registryData;
+					buf.ReadAll(registryData);
+					m_Client->SendPluginMessage("FML|HS", registryData);
+					break;
+				}
+					
+				case ClientPhase_WAITINGSERVERCOMPLETE:
+				{
+					LOG("Client finished receiving registry data; acknowledging");
+					
+					
+					AString ack;
+					ack.push_back(Discriminator_HandshakeAck);
+					ack.push_back(ServerPhase_WAITINGCACK);
+					m_Client->SendPluginMessage("FML|HS", ack);
+					break;
+				}
+					
+				case ClientPhase_PENDINGCOMPLETE:
+				{
+					LOG("Client is pending completion; sending complete ack");
+					
+					AString ack;
+					ack.push_back(Discriminator_HandshakeAck);
+					ack.push_back(ServerPhase_COMPLETE);
+					m_Client->SendPluginMessage("FML|HS", ack);
+					
+					// Now finish logging in
+					m_Client->FinishAuthenticate(*m_Name, *m_UUID, *m_Properties);
+					break;
+				}
+			}
 		}
 			
 		default:
