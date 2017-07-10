@@ -9260,6 +9260,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+				CanCombine =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean"
+						}
+					},
+					Notes = "Returns whether this pickup is allowed to combine with other similar pickups.",
+				},
 				CollectedBy =
 				{
 					Params =
@@ -9298,6 +9308,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the item represented by this pickup",
 				},
+				GetLifetime =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the total length of this pickup's lifespan, in ticks.",
+				},
 				IsCollected =
 				{
 					Returns =
@@ -9328,6 +9348,28 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the pickup's age, in ticks.",
+				},
+				SetCanCombine =
+				{
+					Params =
+					{
+						{
+							Name = "CanCombine",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether this pickup is allowed to combine with other similar pickups.",
+				},
+				SetLifetime =
+				{
+					Params =
+					{
+						{
+							Name = "SetLifetime",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the total lifespan of this pickup before it despawns, in ticks.",
 				},
 			},
 			Inherits = "cEntity",

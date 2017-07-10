@@ -380,6 +380,66 @@ return
 				Notes = "Queues the specified chunks to be loaded or generated and calls the specified callbacks once they are loaded. ChunkCoordTable is an arra-table of chunk coords, each coord being a table of 2 numbers: { {Chunk1x, Chunk1z}, {Chunk2x, Chunk2z}, ...}. When any of those chunks are made available (including being available at the start of this call), the OnChunkAvailable() callback is called. When all the chunks are available, the OnAllChunksAvailable() callback is called. The function signatures are: <pre class=\"prettyprint lang-lua\">function OnChunkAvailable(ChunkX, ChunkZ)\
 function OnAllChunksAvailable()</pre> All return values from the callbacks are ignored.",
 			},
+			CreatePickup =
+			{
+				Params =
+				{
+					{
+						Name = "PosX",
+						Type = "number",
+					},
+					{
+						Name = "PosY",
+						Type = "number",
+					},
+					{
+						Name = "PosZ",
+						Type = "number",
+					},
+					{
+						Name = "Item",
+						Type = "cItem",
+					},
+					{
+						Name = "SpeedX",
+						Type = "number",
+						IsOptional = true,
+						Notes = "Speed along X coordinate to spawn with. Default is 0.",
+					},
+					{
+						Name = "SpeedY",
+						Type = "number",
+						IsOptional = true,
+						Notes = "Speed along Y coordinate to spawn with. Default is 0.",
+					},
+					{
+						Name = "SpeedZ",
+						Type = "number",
+						IsOptional = true,
+						Notes = "Speed along Z coordinate to spawn with. Default is 0.",
+					},
+					{
+						Name = "LifetimeTicks",
+						Type = "number",
+						IsOptional = true,
+						Notes = "Length of the pickups lifetime, in ticks. Default 5 minutes (6000 ticks)",
+					},
+					{
+						Name = "CanCombine",
+						Type = "boolean",
+						IsOptional = true,
+						Notes = "Whether this pickup is allowed to combine with other similar pickups.",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "EntityID",
+						Type = "number",
+					}
+				},
+				Notes = "Creates a pickup entity of the given item at the given position with the given speed, and returns the entities unique ID."
+			},
 			CreateProjectile =
 			{
 				Params =
