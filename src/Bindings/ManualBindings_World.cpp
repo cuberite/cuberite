@@ -443,9 +443,6 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 			{
 				m_LuaState.Call(m_Callback, a_CBChunkX, a_CBChunkZ, a_IsSuccess);
 			}
-
-			// This is the last reference of this object, we must delete it so that it doesn't leak:
-			delete this;
 		}
 
 	protected:
