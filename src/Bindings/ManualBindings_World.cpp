@@ -430,28 +430,23 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 		public cChunkCoordCallback
 	{
 	public:
-		cCallback(lua_State * a_LuaState):
-			m_LuaState(a_LuaState),
-			m_Callback(m_LuaState, 4)
+		cCallback(cLuaState & a_LuaState)
 		{
+			m_Callback.RefStack(a_LuaState, 4);
 		}
 
 		// cChunkCoordCallback override:
 		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
 		{
-			if (m_Callback.IsValid())
-			{
-				m_LuaState.Call(m_Callback, a_CBChunkX, a_CBChunkZ, a_IsSuccess);
-			}
+			m_Callback.Call(a_CBChunkX, a_CBChunkZ, a_IsSuccess);
 		}
 
 	protected:
-		cLuaState m_LuaState;
-		cLuaState::cRef m_Callback;
+		cLuaState::cOptionalCallback m_Callback;
 	};
 
 	// Call the chunk preparation:
-	world->PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cCallback>(tolua_S));
+	world->PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cCallback>(L));
 	return 0;
 }
 
