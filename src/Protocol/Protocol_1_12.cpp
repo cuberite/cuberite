@@ -1296,6 +1296,26 @@ void cProtocol_1_12::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
+void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
+{
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	m_Client->GetPlayer()->SendMessageInfo("The green crafting book feature is not implemented yet.");
+}
+
+
+
+
+
+void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
+{
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	m_Client->GetPlayer()->SendMessageInfo("The new advancements are not implemented.");
+}
+
+
+
+
+
 void cProtocol_1_12::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1526,9 +1546,9 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 				case 0x14: HandlePacketBlockDig(a_ByteBuffer); return true;
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
 				case 0x16: HandlePacketSteerVehicle(a_ByteBuffer); return true;
-				case 0x17: break;  // Crafting Book Data - not yet implemented
+				case 0x17: HandlePacketCraftingBookData(a_ByteBuffer); return true;
 				case 0x18: break;  // Resource pack status - not yet implemented
-				case 0x19: break;  // Advancement Tab - not yet implemented
+				case 0x19: HandlePacketAdvancementTab(a_ByteBuffer); return true;
 				case 0x1a: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x1b: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 				case 0x1c: HandlePacketUpdateSign(a_ByteBuffer); return true;
