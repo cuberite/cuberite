@@ -413,11 +413,26 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 		return 0;
 	}
 
+	// Wrap the Lua callback inside a C++ callback class:
+	class cCallback:
+		public cChunkCoordCallback
+	{
+	public:
+		// cChunkCoordCallback override:
+		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
+		{
+			m_LuaCallback.Call(a_CBChunkX, a_CBChunkZ, a_IsSuccess);
+		}
+
+		cLuaState::cOptionalCallback m_LuaCallback;
+	};
+
 	// Read the params:
 	cWorld * world = nullptr;
 	int chunkX = 0;
 	int chunkZ = 0;
-	L.GetStackValues(1, world, chunkX, chunkZ);
+	auto Callback = cpp14::make_unique<cCallback>();
+	L.GetStackValues(1, world, chunkX, chunkZ, Callback->m_LuaCallback);
 	if (world == nullptr)
 	{
 		LOGWARNING("World:PrepareChunk(): invalid world parameter");
@@ -425,28 +440,8 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 		return 0;
 	}
 
-	// Wrap the Lua callback inside a C++ callback class:
-	class cCallback:
-		public cChunkCoordCallback
-	{
-	public:
-		cCallback(cLuaState & a_LuaState)
-		{
-			m_Callback.RefStack(a_LuaState, 4);
-		}
-
-		// cChunkCoordCallback override:
-		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
-		{
-			m_Callback.Call(a_CBChunkX, a_CBChunkZ, a_IsSuccess);
-		}
-
-	protected:
-		cLuaState::cOptionalCallback m_Callback;
-	};
-
 	// Call the chunk preparation:
-	world->PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cCallback>(L));
+	world->PrepareChunk(chunkX, chunkZ, std::move(Callback));
 	return 0;
 }
 
