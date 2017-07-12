@@ -212,6 +212,7 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 					break;
 				}
 			}
+			break;
 		}
 			
 		default:
