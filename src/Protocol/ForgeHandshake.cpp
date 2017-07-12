@@ -89,6 +89,16 @@ void cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 	buf.ReadVarInt32(numMods);
 	
 	LOG("ParseModList numMods = %d", numMods);
+	
+	for (size_t i = 0; i < numMods; ++i)
+	{
+		AString name, version;
+		buf.ReadVarUTF8String(name);
+		buf.ReadVarUTF8String(version);
+		
+		LOG("ParseModList name=%s, version=%s", name.c_str(), version.c_str());
+		// TODO: add to map and return, AStringPairs?
+	}
 }
 
 void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
