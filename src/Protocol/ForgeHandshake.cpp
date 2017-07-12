@@ -74,6 +74,23 @@ void cForgeHandshake::SendServerHello()
 	m_Client->SendPluginMessage("FML|HS", message);
 }
 
+void cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
+{
+	cByteBuffer buf(a_Size);
+	buf.Write(a_Data, a_Size);
+	
+	Int8 discriminator;
+	buf.ReadBEInt8(discriminator);
+	LOG("ParseModList disc = %d", discriminator);
+	
+	ASSERT(discriminator == 2);
+	
+	UInt32 numMods;
+	buf.ReadVarInt32(numMods);
+	
+	LOG("ParseModList numMods = %d", numMods);
+}
+
 void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (!m_isForgeClient) {
@@ -118,6 +135,7 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 		{
 			LOG("Received ModList");
 			// TODO: parse client ModList
+			ParseModList(a_Data, a_Size);
 			
 			// Send server ModList
 			
