@@ -97,8 +97,8 @@ public:
 
 
 	/** Return a random IntType in the range [0, a_Max]. */
-	template <class IntType = int, class ArgType>
-	IntType RandInt(ArgType a_Max)
+	template <class IntType = int>
+	IntType RandInt(IntType a_Max)
 	{
 		ASSERT((a_Max >= 0) && (a_Max <= std::numeric_limits<IntType>::max()));
 		Detail::cUniform<IntType> dist(IntType(0), static_cast<IntType>(a_Max));
