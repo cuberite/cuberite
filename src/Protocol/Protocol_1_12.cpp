@@ -1299,7 +1299,7 @@ void cProtocol_1_12::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
 	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
-	m_Client->GetPlayer()->SendMessageInfo("The feature crafing book (green) is not implemented.");
+	m_Client->GetPlayer()->SendMessageInfo("The green crafting book feature is not implemented yet.");
 }
 
 
