@@ -74,21 +74,23 @@ void cForgeHandshake::SendServerHello()
 	m_Client->SendPluginMessage("FML|HS", message);
 }
 
-void cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
+AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 {
 	cByteBuffer buf(a_Size);
 	buf.Write(a_Data, a_Size);
 	
 	Int8 discriminator;
 	buf.ReadBEInt8(discriminator);
-	LOG("ParseModList disc = %d", discriminator);
+	//LOG("ParseModList disc = %d", discriminator);
 	
 	ASSERT(discriminator == 2);
 	
 	UInt32 numMods;
 	buf.ReadVarInt32(numMods);
 	
-	LOG("ParseModList numMods = %d", numMods);
+	//LOG("ParseModList numMods = %d", numMods);
+	
+	AStringMap mods;
 	
 	for (size_t i = 0; i < numMods; ++i)
 	{
@@ -96,9 +98,12 @@ void cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 		buf.ReadVarUTF8String(name);
 		buf.ReadVarUTF8String(version);
 		
-		LOG("ParseModList name=%s, version=%s", name.c_str(), version.c_str());
-		// TODO: add to map and return, AStringPairs?
+		mods.insert(std::pair<AString, AString>(name, version));
+		
+		//LOG("ParseModList name=%s, version=%s", name.c_str(), version.c_str());
 	}
+	
+	return mods;
 }
 
 void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
@@ -144,8 +149,19 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 		case Discriminator_ModList:
 		{
 			LOG("Received ModList");
-			// TODO: parse client ModList
-			ParseModList(a_Data, a_Size);
+			
+			AStringMap clientMods = ParseModList(a_Data, a_Size);
+			AString clientModsString;
+			for (auto& item: clientMods)
+			{
+				clientModsString.append(item.first);
+				clientModsString.append("@");
+				clientModsString.append(item.second);
+				clientModsString.append(", ");
+			}
+			
+			LOG("Client connected with %zu mods: %s", clientMods.size(), clientModsString.c_str());
+			// TODO: call API to let plugins reject mods?
 			
 			// Send server ModList
 			

@@ -25,7 +25,7 @@ public:
 	void SendServerHello();
 	void DataReceived(const char * a_Data, size_t a_Size);
 	
-	void ParseModList(const char * a_Data, size_t a_Size);
+	AStringMap ParseModList(const char * a_Data, size_t a_Size);
 	
 	bool m_isForgeClient;
 	
