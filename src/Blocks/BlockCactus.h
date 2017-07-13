@@ -36,7 +36,7 @@ public:
 			return false;
 		}
 
-		// Check surroundings. Cacti may ONLY be surrounded by air
+		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
 		static const struct
 		{
 			int x, z;

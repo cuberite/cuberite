@@ -1144,24 +1144,32 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		if (UnboundedRelGetBlockType(a_RelX, Top + i, a_RelZ, BlockType) && (BlockType == E_BLOCK_AIR))
 		{
 			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_CACTUS, 0);
-			if (
-				(
-					UnboundedRelGetBlockType(a_RelX + 1, Top + i, a_RelZ, BlockType) &&
-					(cBlockInfo::IsSolid(BlockType) || (BlockType == E_BLOCK_LAVA) || (BlockType == E_BLOCK_STATIONARY_LAVA))
-				) ||
-				(
-					UnboundedRelGetBlockType(a_RelX - 1, Top + i, a_RelZ, BlockType) &&
-					(cBlockInfo::IsSolid(BlockType) || (BlockType == E_BLOCK_LAVA) || (BlockType == E_BLOCK_STATIONARY_LAVA))
-				) ||
-				(
-					UnboundedRelGetBlockType(a_RelX, Top + i, a_RelZ + 1, BlockType) &&
-					(cBlockInfo::IsSolid(BlockType) || (BlockType == E_BLOCK_LAVA) || (BlockType == E_BLOCK_STATIONARY_LAVA))
-				) ||
-				(
-					UnboundedRelGetBlockType(a_RelX, Top + i, a_RelZ - 1, BlockType) &&
-					(cBlockInfo::IsSolid(BlockType) || (BlockType == E_BLOCK_LAVA) || (BlockType == E_BLOCK_STATIONARY_LAVA))
+
+			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
+			static const struct
+			{
+				int x, y;
+			} Coords[] =
+			{
+				{-1,  0},
+				{ 1,  0},
+				{ 0, -1},
+				{ 0,  1},
+			} ;
+			for (auto & Coord : Coords)
+			{
+				if (
+					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + 1, a_RelZ + Coord.y, BlockType) &&
+					(
+						cBlockInfo::IsSolid(BlockType) ||
+						(BlockType == E_BLOCK_LAVA) ||
+						(BlockType == E_BLOCK_STATIONARY_LAVA)
+					)
 				)
-			)
+				{
+					return false;
+				}
+			}  // for i - Coords[]
 			{
 				GetWorld()->DigBlock(a_RelX + GetPosX() * cChunkDef::Width, Top + i, a_RelZ + GetPosZ() * cChunkDef::Width);
 			}
