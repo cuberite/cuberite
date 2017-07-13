@@ -45,12 +45,12 @@ bool cMobSpawner::CheckPackCenter(BLOCKTYPE a_BlockType)
 
 
 
-void cMobSpawner::addIfAllowed(eMonsterType toAdd, std::set<eMonsterType>& toAddIn)
+void cMobSpawner::addIfAllowed(eMonsterType toAdd, std::vector<eMonsterType> & toAddIn)
 {
 	std::set<eMonsterType>::iterator itr = m_AllowedTypes.find(toAdd);
 	if (itr != m_AllowedTypes.end())
 	{
-		toAddIn.insert(toAdd);
+		toAddIn.push_back(toAdd);
 	}
 }
 
@@ -60,7 +60,7 @@ void cMobSpawner::addIfAllowed(eMonsterType toAdd, std::set<eMonsterType>& toAdd
 
 eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 {
-	std::set<eMonsterType> allowedMobs;
+	std::vector<eMonsterType> allowedMobs;
 
 	if ((a_Biome == biMushroomIsland) || (a_Biome == biMushroomShore))
 	{
@@ -111,9 +111,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 	size_t allowedMobsSize = allowedMobs.size();
 	if (allowedMobsSize > 0)
 	{
-		auto itr = allowedMobs.begin();
-		std::advance(itr, GetRandomProvider().RandInt(allowedMobsSize - 1));
-		return *itr;
+		return allowedMobs[GetRandomProvider().RandInt(allowedMobsSize - 1)];
 	}
 	return mtInvalidType;
 }
