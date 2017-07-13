@@ -13616,6 +13616,130 @@ end
 			},
 			Constants =
 			{
+				caLeftClick =
+				{
+					Notes = "Left click on a slot",
+				},
+				caRightClick =
+				{
+					Notes = "Right click on a slot",
+				},
+				caShiftLeftClick =
+				{
+					Notes = "Shift + left click on a slot",
+				},
+				caShiftRightClick =
+				{
+					Notes = "Shift + right click on a slot",
+				},
+				caNumber1 =
+				{
+					Notes = "Number key 1",
+				},
+				caNumber2 =
+				{
+					Notes = "Number key 2",
+				},
+				caNumber3 =
+				{
+					Notes = "Number key 3",
+				},
+				caNumber4 =
+				{
+					Notes = "Number key 4",
+				},
+				caNumber5 =
+				{
+					Notes = "Number key 5",
+				},
+				caNumber6 =
+				{
+					Notes = "Number key 6",
+				},
+				caNumber7 =
+				{
+					Notes = "Number key 7",
+				},
+				caNumber8 =
+				{
+					Notes = "Number key 8",
+				},
+				caNumber9 =
+				{
+					Notes = "Number key 9",
+				},
+				caMiddleClick =
+				{
+					Notes = "Middle click, only valid for creative players",
+				},
+				caDropKey =
+				{
+					Notes = "Drop a single item",
+				},
+				caCtrlDropKey =
+				{
+					Notes = "Drop a full stack",
+				},
+				caLeftClickOutside =
+				{
+					Notes = "Left click outside of inventory",
+				},
+				caRightClickOutside =
+				{
+					Notes = "Right click outside of inventory",
+				},
+				caLeftClickOutsideHoldNothing =
+				{
+					Notes = "Left click outside inventory holding nothing",
+				},
+				caRightClickOutsideHoldNothing =
+				{
+					Notes = "Right click outside inventory holding nothing",
+				},
+				caLeftPaintBegin =
+				{
+					Notes = "Begining of left click paint drag action",
+				},
+				caRightPaintBegin =
+				{
+					Notes = "Begining of right click paint drag action",
+				},
+				caMiddlePaintBegin =
+				{
+					Notes = "Begining of middle click paint drag action, only valid for creative players",
+				},
+				caLeftPaintProgress =
+				{
+					Notes = "Add slot for left click paint drag action",
+				},
+				caRightPaintProgress =
+				{
+					Notes = "Add slot for right click paint drag action",
+				},
+				caMiddlePaintProgress =
+				{
+					Notes = "Add slot for middle click paint drag action, only valid for creative players",
+				},
+				caLeftPaintEnd =
+				{
+					Notes = "End of left click paint drag action",
+				},
+				caRightPaintEnd =
+				{
+					Notes = "End of right click paint drag action",
+				},
+				caMiddlePaintEnd =
+				{
+					Notes = "End of middle click paint drag action, only valid for creative players",
+				},
+				caDblClick =
+				{
+					Notes = "Double click action",
+				},
+				caUnknown =
+				{
+					Notes = "Unknown click action"
+				},
 				E_BLOCK_ACACIA_DOOR =
 				{
 					Notes = "The blocktype for acacia door"
