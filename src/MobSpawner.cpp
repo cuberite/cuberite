@@ -107,14 +107,12 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 		}
 	}
 
+	// Pick a random mob from the options:
 	size_t allowedMobsSize = allowedMobs.size();
 	if (allowedMobsSize > 0)
 	{
-		std::set<eMonsterType>::iterator itr = allowedMobs.begin();
-
-		using DiffType = decltype(itr)::difference_type;
-		std::advance(itr, GetRandomProvider().RandInt<DiffType>(allowedMobsSize - 1));
-
+		auto itr = allowedMobs.begin();
+		std::advance(itr, GetRandomProvider().RandInt(allowedMobsSize - 1));
 		return *itr;
 	}
 	return mtInvalidType;
