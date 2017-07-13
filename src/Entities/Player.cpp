@@ -2643,6 +2643,64 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 
 bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 {
+	// Check to see if any entity intersects any block being placed
+	class DoesIntersectBlock : public cEntityCallback
+	{
+	public:
+		const sSetBlockVector & m_Blocks;
+
+		// The distance inside the block the entity can still be.
+		const double EPSILON = 0.05;
+
+		DoesIntersectBlock(const sSetBlockVector & a_Blocks) :
+			m_Blocks(a_Blocks)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+			for (auto blk: m_Blocks)
+			{
+				cBoundingBox BlockBox(
+					blk.GetX() + EPSILON,
+					blk.GetX() + 1.0 - EPSILON,
+					blk.GetY() + EPSILON,
+					blk.GetY() + 1.0 - EPSILON,
+					blk.GetZ() + EPSILON,
+					blk.GetZ() + 1.0 - EPSILON
+				);
+				if (EntBox.DoesIntersect(BlockBox))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	} Callback(a_Blocks);
+
+	// Compute the bounding box of the blocks to be placed
+	double MaxDouble = std::numeric_limits<double>::max();
+	double MinDouble = std::numeric_limits<double>::min();
+	Vector3d BlocksMin(MaxDouble, MaxDouble, MaxDouble);
+	Vector3d BlocksMax(MinDouble, MinDouble, MinDouble);
+	for (auto blk: a_Blocks)
+	{
+		BlocksMin = BlocksMin.Min(blk.GetPos());
+		BlocksMax = BlocksMax.Max(blk.GetPos() + Vector3d(1, 1, 1));
+	}
+	cBoundingBox PlacingBounds(BlocksMin, BlocksMax);
+
+	if (!m_World->ForEachEntityInBox(PlacingBounds, Callback))
+	{
+		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
+		for (auto blk2: a_Blocks)
+		{
+			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), this);
+		}
+		return false;
+	}
+
 	// Call the "placing" hooks; if any fail, abort:
 	cPluginManager * pm = cPluginManager::Get();
 	for (auto blk: a_Blocks)
