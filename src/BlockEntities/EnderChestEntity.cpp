@@ -7,6 +7,8 @@
 #include "../Entities/Player.h"
 #include "../UI/EnderChestWindow.h"
 #include "../ClientHandle.h"
+#include "../Mobs/Ocelot.h"
+#include "../BoundingBox.h"
 
 
 
@@ -46,10 +48,36 @@ void cEnderChestEntity::SendTo(cClientHandle & a_Client)
 
 
 
+class cFindSittingCat :
+	public cEntityCallback
+{
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		return (
+			(a_Entity->GetEntityType() == cEntity::etMonster) &&
+			(static_cast<cMonster *>(a_Entity)->GetMobType() == eMonsterType::mtOcelot) &&
+			(static_cast<cOcelot *>(a_Entity)->IsSitting())
+		);
+	}
+};
+
+
+
+
+
 bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
-	// TODO: cats are an obstruction
-	if ((GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
+	cFindSittingCat FindSittingCat;
+	if (
+		(GetPosY() < cChunkDef::Height - 1) &&
+		(
+			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+			(
+				(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()) == E_BLOCK_AIR) &&
+				!GetWorld()->ForEachEntityInBox(cBoundingBox(Vector3d(GetPosX(), GetPosY() + 1, GetPosZ()), 1, 1), FindSittingCat)
+			)
+		)
+	)
 	{
 		// Obstruction, don't open
 		return false;

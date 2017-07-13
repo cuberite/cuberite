@@ -240,11 +240,13 @@ bool cChestEntity::IsBlocked()
 {
 	cFindSittingCat FindSittingCat;
 	return (
-		(GetPosY() >= cChunkDef::Height - 1) ||
-		!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+		(GetPosY() < cChunkDef::Height - 1) &&
 		(
-			(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()) == E_BLOCK_AIR) &&
-			!GetWorld()->ForEachEntityInBox(cBoundingBox(Vector3d(GetPosX(), GetPosY() + 1, GetPosZ()), 1, 1), FindSittingCat)
+			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+			(
+				(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()) == E_BLOCK_AIR) &&
+				!GetWorld()->ForEachEntityInBox(cBoundingBox(Vector3d(GetPosX(), GetPosY() + 1, GetPosZ()), 1, 1), FindSittingCat)
+			)
 		)
 	);
 }
