@@ -550,6 +550,15 @@ bool cPluginLua::OnLogin(cClientHandle & a_Client, UInt32 a_ProtocolVersion, con
 
 
 
+bool cPluginLua::OnPlayerForgeMods(cClientHandle & a_Client, AStringMap & a_Mods)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FORGE_MODS, &a_Client, &a_Mods);
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_ANIMATION, &a_Player, a_Animation);
@@ -1083,7 +1092,8 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_WEATHER_CHANGED:              return "OnWeatherChanged";
 		case cPluginManager::HOOK_WEATHER_CHANGING:             return "OnWeatherChanging";
 		case cPluginManager::HOOK_WORLD_TICK:                   return "OnWorldTick";
-
+		case cPluginManager::HOOK_PLAYER_FORGE_MODS:            return "OnPlayerForgeMods";
+			
 		case cPluginManager::HOOK_NUM_HOOKS:
 		{
 			// Satisfy a warning that all enum values should be used in a switch

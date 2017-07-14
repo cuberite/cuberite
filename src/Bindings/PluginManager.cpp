@@ -789,6 +789,25 @@ bool cPluginManager::CallHookLogin(cClientHandle & a_Client, UInt32 a_ProtocolVe
 
 
 
+bool cPluginManager::CallHookPlayerForgeMods(cClientHandle & a_Client, AStringMap & a_Mods)
+{
+	FIND_HOOK(HOOK_PLAYER_FORGE_MODS)
+	VERIFY_HOOK;
+	
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerForgeMods(a_Client, a_Mods))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 
 bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {

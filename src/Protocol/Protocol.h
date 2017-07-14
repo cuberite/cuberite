@@ -65,7 +65,7 @@ public:
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 	void ForgeDataReceived(const char * a_Data, size_t a_Size)
 	{
-		m_Client->m_ForgeHandshake.DataReceived(a_Data, a_Size);
+		m_Client->m_ForgeHandshake.DataReceived(m_Client, a_Data, a_Size);
 	}
 
 	// Sending stuff to clients (alphabetically sorted):

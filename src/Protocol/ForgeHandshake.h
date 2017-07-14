@@ -23,7 +23,7 @@ public:
 	void BeginForgeHandshake(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 	
 	void SendServerHello();
-	void DataReceived(const char * a_Data, size_t a_Size);
+	void DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
 	
 	AStringMap ParseModList(const char * a_Data, size_t a_Size);
 	

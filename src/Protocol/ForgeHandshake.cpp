@@ -6,7 +6,9 @@
 #include "Globals.h"
 #include "ForgeHandshake.h"
 #include "json/json.h"
+#include "../Bindings/PluginManager.h"
 #include "../ClientHandle.h"
+#include "../Root.h"
 
 cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false), m_Errored(false), m_Client(client)
 {
@@ -106,7 +108,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 	return mods;
 }
 
-void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
+void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
 	if (!m_isForgeClient) {
 		LOG("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size);
@@ -161,7 +163,13 @@ void cForgeHandshake::DataReceived(const char * a_Data, size_t a_Size)
 			}
 			
 			LOG("Client connected with %zu mods: %s", clientMods.size(), clientModsString.c_str());
-			// TODO: call API to let plugins reject mods?
+			// Let the plugins know about this event, they may refuse the player:
+			if (cRoot::Get()->GetPluginManager()->CallHookPlayerForgeMods(*a_Client, clientMods))
+			{
+				LOG("Modded client refused by plugin");
+				SetError();
+				return;
+			}
 			
 			// Send server ModList
 			
