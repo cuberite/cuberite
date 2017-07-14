@@ -1,15 +1,21 @@
 
 #pragma once
 
-#include "../Vector3.h"
-
 class cWorld;
 class cChunk;
+class cCuboid;
 
 
 
 
 
+/** Base class for all block-based physics simulators (such as fluid, fire, falling blocks etc.).
+Each descendant provides an implementation of what needs to be done on each world tick.
+The descendant may choose to do all processing in a single call for the entire world (Simulate())
+or do per-chunk calculations (SimulateChunk()).
+Whenever a block is changed, the WakeUp() or WakeUpArea() functions are called to notify all simulators.
+The functions add all affected blocks and all their direct neighbors using the AddBlock() function. The simulator
+may update its internal state based on this call. */
 class cSimulator
 {
 public:
@@ -33,8 +39,16 @@ public:
 	}
 
 	/** Called when a block changes */
-	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
+	void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
 
+	/** Does the same processing as WakeUp, but for all blocks within the specified area.
+	Has better performance than calling WakeUp for each block individually, due to neighbor-checking.
+	All chunks intersected by the area should be valid (outputs a warning if not).
+	Note that, unlike WakeUp(), this call adds blocks not only face-neighboring, but also edge-neighboring and
+	corner-neighboring the specified area. So far none of the simulators care about that. */
+	void WakeUpArea(const cCuboid & a_Area);
+
+	/** Returns true if the specified block type is "interesting" for this simulator. */
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) = 0;
 
 protected:

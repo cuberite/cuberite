@@ -1305,7 +1305,7 @@ void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
 {
-	return m_ChunkMap->WakeUpSimulatorsInArea(a_MinBlockX, a_MaxBlockX, a_MinBlockY, a_MaxBlockY, a_MinBlockZ, a_MaxBlockZ);
+	m_SimulatorManager->WakeUpArea(cCuboid(a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ));
 }
 
 

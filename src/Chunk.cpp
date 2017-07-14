@@ -430,7 +430,6 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	int BaseZ = BlockStartZ - a_MinBlockZ;
 
 	// Copy blocktype and blockmeta:
-	// TODO: Right now each changed block is transmitted to all clients as a separate packet. Optimize this for larger areas.
 	BLOCKTYPE *  AreaBlockTypes = a_Area.GetBlockTypes();
 	NIBBLETYPE * AreaBlockMetas = a_Area.GetBlockMetas();
 	for (int y = 0; y < SizeY; y++)

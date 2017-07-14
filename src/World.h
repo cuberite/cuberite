@@ -432,7 +432,7 @@ public:
 	Returns true if all chunks have been processed.
 	Prefer cBlockArea::Write() instead, this is the internal implementation; cBlockArea does error checking, too.
 	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.
-	*/
+	Doesn't wake up simulators, use WakeUpSimulatorsInArea() for that. */
 	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) override;
 
 	// tolua_begin
