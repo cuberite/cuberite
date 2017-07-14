@@ -1920,7 +1920,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		}
 
 		// Only send movement if speed is not 0 and 'no speed' was sent to client
-		if (!m_bHasSentNoSpeed)
+		if (!m_bHasSentNoSpeed || IsPlayer())
 		{
 			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
 			int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);

@@ -1730,6 +1730,178 @@ end
 				},
 			},
 		},
+		cColor =
+		{
+			Desc = [[
+				Encapsulates a RGB color, e.g. for armor.
+			]],
+			Functions =
+			{
+				Clear =
+				{
+					Notes = "Resets the color to uninitialized."
+				},
+				constructor =
+				{
+					{
+						Returns = { {Type="cColor"} },
+						Notes = "Creates an uninitialized cColor. Each component must be between 0 and 255, inclusive.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Red",
+								Type = "number",
+							},
+							{
+								Name = "Green",
+								Type = "number",
+							},
+							{
+								Name = "Blue",
+								Type = "number",
+							},
+						},
+						Returns = { {Type="cColor"} },
+						Notes = "Creates the specified cColor. All components must be between 0 and 255, inclusive.",
+					},
+				},
+				GetColor =
+				{
+					Returns =
+					{
+						{
+							Name = "Red",
+							Type = "number",
+						},
+						{
+							Name = "Green",
+							Type = "number",
+						},
+						{
+							Name = "Blue",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's red, green, and blue components, respectively."
+				},
+				GetRed =
+				{
+					Returns =
+					{
+						{
+							Name = "Red",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's red component."
+				},
+				GetGreen =
+				{
+					Returns =
+					{
+						{
+							Name = "Green",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's green component."
+				},
+				GetBlue =
+				{
+					Returns =
+					{
+						{
+							Name = "Blue",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color's blue component."
+				},
+				IsValid =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean"
+						},
+					},
+					Notes = "True if the color is valid, false if the color has not been set yet."
+				},
+				SetColor =
+				{
+					Params =
+					{
+						{
+							Name = "Red",
+							Type = "number"
+						},
+						{
+							Name = "Green",
+							Type = "number"
+						},
+						{
+							Name = "Blue",
+							Type = "number"
+						},
+					},
+					Notes = "Sets the color's red, green, and blue components. Values range from 0 to 255."
+				},
+				SetRed =
+				{
+					Params =
+					{
+						{
+							Name = "Red",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the color's red component. Must be between 0 and 255, inclusive."
+				},
+				SetGreen =
+				{
+					Params =
+					{
+						{
+							Name = "Green",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the color's green component. Must be between 0 and 255, inclusive."
+				},
+				SetBlue =
+				{
+					Params =
+					{
+						{
+							Name = "Blue",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the color's blue component. Must be between 0 and 255, inclusive."
+				},
+			},
+			Constants =
+			{
+				COLOR_LIMIT =
+				{
+					Notes = "The upper bound (exclusive) for a color component",
+				},
+				COLOR_MAX =
+				{
+					Notes = "The maximum value for a color component",
+				},
+				COLOR_MIN =
+				{
+					Notes = "The minimum value for a color component",
+				},
+				COLOR_NONE =
+				{
+					Notes = "A constant denoting the color is invalid (note: use IsValid)",
+				},
+			},
+		},
 		cCompositeChat =
 		{
 			Desc = [[
@@ -9260,6 +9432,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+				CanCombine =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean"
+						}
+					},
+					Notes = "Returns whether this pickup is allowed to combine with other similar pickups.",
+				},
 				CollectedBy =
 				{
 					Params =
@@ -9298,6 +9480,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the item represented by this pickup",
 				},
+				GetLifetime =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the total length of this pickup's lifespan, in ticks.",
+				},
 				IsCollected =
 				{
 					Returns =
@@ -9328,6 +9520,28 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the pickup's age, in ticks.",
+				},
+				SetCanCombine =
+				{
+					Params =
+					{
+						{
+							Name = "CanCombine",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether this pickup is allowed to combine with other similar pickups.",
+				},
+				SetLifetime =
+				{
+					Params =
+					{
+						{
+							Name = "LifeTimeInTicks",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the total lifespan of this pickup before it despawns, in ticks. Does not reset the age of the pickup, use SetAge(0). If new lifetime is less than the current age, pickup will despawn.",
 				},
 			},
 			Inherits = "cEntity",
@@ -9502,6 +9716,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
+				},
+				GetDraggingItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item the player is dragging in a UI window."
 				},
 				GetPrefix =
 				{
@@ -10339,6 +10563,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the custom name for this player. If you want to disable the custom name, simply set an empty string. The custom name will be used in the tab-list, in the player nametag and in the tab-completion.",
+				},
+				SetDraggingItem =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the item that the player is dragging in a UI window. If no UI window is open, this function does nothing."
 				},
 				SetFlying =
 				{
@@ -13381,6 +13616,130 @@ end
 			},
 			Constants =
 			{
+				caLeftClick =
+				{
+					Notes = "Left click on a slot",
+				},
+				caRightClick =
+				{
+					Notes = "Right click on a slot",
+				},
+				caShiftLeftClick =
+				{
+					Notes = "Shift + left click on a slot",
+				},
+				caShiftRightClick =
+				{
+					Notes = "Shift + right click on a slot",
+				},
+				caNumber1 =
+				{
+					Notes = "Number key 1",
+				},
+				caNumber2 =
+				{
+					Notes = "Number key 2",
+				},
+				caNumber3 =
+				{
+					Notes = "Number key 3",
+				},
+				caNumber4 =
+				{
+					Notes = "Number key 4",
+				},
+				caNumber5 =
+				{
+					Notes = "Number key 5",
+				},
+				caNumber6 =
+				{
+					Notes = "Number key 6",
+				},
+				caNumber7 =
+				{
+					Notes = "Number key 7",
+				},
+				caNumber8 =
+				{
+					Notes = "Number key 8",
+				},
+				caNumber9 =
+				{
+					Notes = "Number key 9",
+				},
+				caMiddleClick =
+				{
+					Notes = "Middle click, only valid for creative players",
+				},
+				caDropKey =
+				{
+					Notes = "Drop a single item",
+				},
+				caCtrlDropKey =
+				{
+					Notes = "Drop a full stack",
+				},
+				caLeftClickOutside =
+				{
+					Notes = "Left click outside of inventory",
+				},
+				caRightClickOutside =
+				{
+					Notes = "Right click outside of inventory",
+				},
+				caLeftClickOutsideHoldNothing =
+				{
+					Notes = "Left click outside inventory holding nothing",
+				},
+				caRightClickOutsideHoldNothing =
+				{
+					Notes = "Right click outside inventory holding nothing",
+				},
+				caLeftPaintBegin =
+				{
+					Notes = "Begining of left click paint drag action",
+				},
+				caRightPaintBegin =
+				{
+					Notes = "Begining of right click paint drag action",
+				},
+				caMiddlePaintBegin =
+				{
+					Notes = "Begining of middle click paint drag action, only valid for creative players",
+				},
+				caLeftPaintProgress =
+				{
+					Notes = "Add slot for left click paint drag action",
+				},
+				caRightPaintProgress =
+				{
+					Notes = "Add slot for right click paint drag action",
+				},
+				caMiddlePaintProgress =
+				{
+					Notes = "Add slot for middle click paint drag action, only valid for creative players",
+				},
+				caLeftPaintEnd =
+				{
+					Notes = "End of left click paint drag action",
+				},
+				caRightPaintEnd =
+				{
+					Notes = "End of right click paint drag action",
+				},
+				caMiddlePaintEnd =
+				{
+					Notes = "End of middle click paint drag action, only valid for creative players",
+				},
+				caDblClick =
+				{
+					Notes = "Double click action",
+				},
+				caUnknown =
+				{
+					Notes = "Unknown click action"
+				},
 				E_BLOCK_ACACIA_DOOR =
 				{
 					Notes = "The blocktype for acacia door"

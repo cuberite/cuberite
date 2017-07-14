@@ -40,8 +40,9 @@ public:
 		Vector3d EntityPos = a_Entity->GetPosition();
 		double Distance = (EntityPos - m_Position).Length();
 
-		cItem & Item = static_cast<cPickup *>(a_Entity)->GetItem();
-		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()))
+		cPickup * OtherPickup = static_cast<cPickup *>(a_Entity);
+		cItem & Item = OtherPickup->GetItem();
+		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()) && OtherPickup->CanCombine())
 		{
 			short CombineCount = Item.m_ItemCount;
 			if ((CombineCount + m_Pickup->GetItem().m_ItemCount) > Item.GetMaxStackSize())
@@ -66,6 +67,9 @@ public:
 				a_Entity->GetWorld()->BroadcastEntityRelMove(*a_Entity, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ));
 				/* End of experimental animation */
 				a_Entity->Destroy();
+
+				// Reset the timer
+				m_Pickup->SetAge(0);
 			}
 			else
 			{
@@ -92,12 +96,14 @@ protected:
 
 
 
-cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
+cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
 	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
 	, m_Timer(0)
 	, m_Item(a_Item)
 	, m_bCollected(false)
 	, m_bIsPlayerCreated(IsPlayerCreated)
+	, m_bCanCombine(a_CanCombine)
+	, m_Lifetime(cTickTime(a_LifetimeTicks))
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
@@ -165,7 +171,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			// Try to combine the pickup with adjacent same-item pickups:
-			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()) && IsOnGround())  // Don't combine if already full or not on ground
+			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()) && IsOnGround() && CanCombine())  // Don't combine if already full or not on ground
 			{
 				// By using a_Chunk's ForEachEntity() instead of cWorld's, pickups don't combine across chunk boundaries.
 				// That is a small price to pay for not having to traverse the entire world for each entity.
@@ -188,7 +194,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (m_Timer > std::chrono::minutes(5))  // 5 minutes
+	if (m_Timer > m_Lifetime)
 	{
 		Destroy(true);
 		return;
