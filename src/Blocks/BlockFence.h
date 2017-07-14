@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "BlockID.h"
+#include "../BoundingBox.h"
 
 
 
@@ -37,36 +38,36 @@ public:
 		// For each solid neighbor, the hitbox extends that way
 		if (XMSolid)
 		{
-		        PlacementBox = PlacementBox.Union(cBoundingBox(0, 0.5, 0, FENCE_HEIGHT, MIN_COORD, MAX_COORD));
+			PlacementBox = PlacementBox.Union(cBoundingBox(0, 0.5, 0, FENCE_HEIGHT, MIN_COORD, MAX_COORD));
 		}
 		if (XPSolid)
 		{
-		        PlacementBox = PlacementBox.Union(cBoundingBox(0.5, 1.0, 0, FENCE_HEIGHT, MIN_COORD, MAX_COORD));
+			PlacementBox = PlacementBox.Union(cBoundingBox(0.5, 1.0, 0, FENCE_HEIGHT, MIN_COORD, MAX_COORD));
 		}
 		if (ZMSolid)
-	        {
+		{
 			PlacementBox = PlacementBox.Union(cBoundingBox(MIN_COORD, MAX_COORD, 0, FENCE_HEIGHT, 0.0, 0.5));
 		}
 		if (ZPSolid)
-	        {
+		{
 			PlacementBox = PlacementBox.Union(cBoundingBox(MIN_COORD, MAX_COORD, 0, FENCE_HEIGHT, 0.5, 1.0));
 		}
 
 		// For each corner, fill in the corner
 		if (XMSolid && ZMSolid)
-	        {
+		{
 			PlacementBox = PlacementBox.Union(cBoundingBox(0, 0.5, 0, FENCE_HEIGHT, 0, 0.5));
 		}
 		if (XPSolid && ZMSolid)
-	        {
+		{
 			PlacementBox = PlacementBox.Union(cBoundingBox(0.5, 1.0, 0, FENCE_HEIGHT, 0, 0.5));
 		}
 		if (XPSolid && ZPSolid)
-	        {
+		{
 			PlacementBox = PlacementBox.Union(cBoundingBox(0.5, 1.0, 0, FENCE_HEIGHT, 0.5, 1.0));
 		}
 		if (XMSolid && ZPSolid)
-	        {
+		{
 			PlacementBox = PlacementBox.Union(cBoundingBox(0, 0.5, 0, FENCE_HEIGHT, 0.5, 1.0));
 		}
 

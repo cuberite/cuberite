@@ -620,7 +620,7 @@ bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a
 cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
 {
 	if (!cBlockInfo::IsSolid(m_BlockType))
-        {
+	{
 		// Non-solid things can be placed within entities
 		return cBoundingBox(0, 0, 0, 0, 0, 0);
 	}

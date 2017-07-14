@@ -2669,13 +2669,13 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 				int y = blk.GetY();
 				int z = blk.GetZ();
 				cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
-				        m_World->GetBlock(x - 1, y, z),
+					m_World->GetBlock(x - 1, y, z),
 					m_World->GetBlock(x + 1, y, z),
 					m_World->GetBlock(x, y - 1, z),
 					m_World->GetBlock(x, y + 1, z),
 					m_World->GetBlock(x, y, z - 1),
 					m_World->GetBlock(x, y, z + 1)
-			        );
+				);
 				BlockBox.Move(x, y, z);
 
 				// Put in a little bit of wiggle room
@@ -2705,13 +2705,15 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 			m_World->GetBlock(x, y + 1, z),
 			m_World->GetBlock(x, y, z - 1),
 			m_World->GetBlock(x, y, z + 1)
-	        );
+		);
 		BlockBox.Move(x, y, z);
 
 		if (HasInitializedBounds)
 		{
 			PlacingBounds = PlacingBounds.Union(BlockBox);
-		} else {
+		}
+		else
+		{
 			PlacingBounds = BlockBox;
 			HasInitializedBounds = true;
 		}
