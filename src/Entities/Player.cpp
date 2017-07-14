@@ -2641,55 +2641,10 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 
 
 
-bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
+bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 {
-	// Check to see if any entity intersects any block being placed
-	class DoesIntersectBlock : public cEntityCallback
-	{
-	public:
-		const sSetBlockVector & m_Blocks;
-		cWorld * m_World;
-
-		// The distance inside the block the entity can still be.
-		const double EPSILON = 0.05;
-
-		DoesIntersectBlock(const sSetBlockVector & a_Blocks, cWorld * a_World) :
-			m_Blocks(a_Blocks)
-			, m_World(a_World)
-		{
-		}
-
-		virtual bool Item(cEntity * a_Entity) override
-		{
-			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
-			for (auto blk: m_Blocks)
-			{
-				cBlockHandler * BlockHandler = cBlockInfo::GetHandler(blk.m_BlockType);
-				int x = blk.GetX();
-				int y = blk.GetY();
-				int z = blk.GetZ();
-				cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
-					m_World->GetBlock(x - 1, y, z),
-					m_World->GetBlock(x + 1, y, z),
-					m_World->GetBlock(x, y - 1, z),
-					m_World->GetBlock(x, y + 1, z),
-					m_World->GetBlock(x, y, z - 1),
-					m_World->GetBlock(x, y, z + 1)
-				);
-				BlockBox.Move(x, y, z);
-
-				// Put in a little bit of wiggle room
-				BlockBox.Expand(-EPSILON, -EPSILON, -EPSILON);
-				if (EntBox.DoesIntersect(BlockBox))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-	} Callback(a_Blocks, m_World);
-
 	// Compute the bounding box for each block to be placed
+	std::vector<cBoundingBox> PlacementBoxes;
 	cBoundingBox PlacingBounds(0, 0, 0, 0, 0, 0);
 	bool HasInitializedBounds = false;
 	for (auto blk: a_Blocks)
@@ -2708,6 +2663,8 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 		);
 		BlockBox.Move(x, y, z);
 
+		PlacementBoxes.push_back(BlockBox);
+
 		if (HasInitializedBounds)
 		{
 			PlacingBounds = PlacingBounds.Union(BlockBox);
@@ -2719,8 +2676,55 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 		}
 	}
 
+	// Check to see if any entity intersects any block being placed
+	class DoesIntersectBlock : public cEntityCallback
+	{
+	public:
+		const std::vector<cBoundingBox> & m_BoundingBoxes;
+		cWorld * m_World;
+
+		// The distance inside the block the entity can still be.
+		const double EPSILON = 0.0005;
+
+		DoesIntersectBlock(const std::vector<cBoundingBox> & a_BoundingBoxes, cWorld * a_World) :
+			m_BoundingBoxes(a_BoundingBoxes),
+			m_World(a_World)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+			for (auto BlockBox: m_BoundingBoxes)
+			{
+
+				// Put in a little bit of wiggle room
+				BlockBox.Expand(-EPSILON, -EPSILON, -EPSILON);
+				if (EntBox.DoesIntersect(BlockBox))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	} Callback(PlacementBoxes, m_World);
+
 	// See if any entities in that bounding box collide with anyone
 	if (!m_World->ForEachEntityInBox(PlacingBounds, Callback))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+
+
+
+bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
+{
+	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
 	{
 		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
 		for (auto blk2: a_Blocks)
