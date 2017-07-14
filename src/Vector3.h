@@ -184,26 +184,6 @@ public:
 		);
 	}
 
-	/** Returns a new vector with each coordinate set to the min */
-	inline Vector3<T> Min(const Vector3<T> & a_Other) const
-	{
-		return Vector3<T>(
-			std::min(x, a_Other.x),
-			std::min(y, a_Other.y),
-			std::min(z, a_Other.z)
-		);
-	}
-
-	/** Returns a new vector with each coordinate set to the max */
-	inline Vector3<T> Max(const Vector3<T> & a_Other) const
-	{
-		return Vector3<T>(
-			std::max(x, a_Other.x),
-			std::max(y, a_Other.y),
-			std::max(z, a_Other.z)
-		);
-	}
-
 	// tolua_end
 
 	inline bool operator != (const Vector3<T> & a_Rhs) const
