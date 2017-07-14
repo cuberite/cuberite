@@ -2648,12 +2648,14 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 	{
 	public:
 		const sSetBlockVector & m_Blocks;
+		cWorld * m_World;
 
 		// The distance inside the block the entity can still be.
 		const double EPSILON = 0.05;
 
-		DoesIntersectBlock(const sSetBlockVector & a_Blocks) :
+		DoesIntersectBlock(const sSetBlockVector & a_Blocks, cWorld * a_World) :
 			m_Blocks(a_Blocks)
+			, m_World(a_World)
 		{
 		}
 
@@ -2662,14 +2664,22 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
 			for (auto blk: m_Blocks)
 			{
-				cBoundingBox BlockBox(
-					blk.GetX() + EPSILON,
-					blk.GetX() + 1.0 - EPSILON,
-					blk.GetY() + EPSILON,
-					blk.GetY() + 1.0 - EPSILON,
-					blk.GetZ() + EPSILON,
-					blk.GetZ() + 1.0 - EPSILON
-				);
+				cBlockHandler * BlockHandler = cBlockInfo::GetHandler(blk.m_BlockType);
+				int x = blk.GetX();
+				int y = blk.GetY();
+				int z = blk.GetZ();
+				cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
+				        m_World->GetBlock(x - 1, y, z),
+					m_World->GetBlock(x + 1, y, z),
+					m_World->GetBlock(x, y - 1, z),
+					m_World->GetBlock(x, y + 1, z),
+					m_World->GetBlock(x, y, z - 1),
+					m_World->GetBlock(x, y, z + 1)
+			        );
+				BlockBox.Move(x, y, z);
+
+				// Put in a little bit of wiggle room
+				BlockBox.Expand(-EPSILON, -EPSILON, -EPSILON);
 				if (EntBox.DoesIntersect(BlockBox))
 				{
 					return true;
@@ -2677,20 +2687,37 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 			}
 			return false;
 		}
-	} Callback(a_Blocks);
+	} Callback(a_Blocks, m_World);
 
-	// Compute the bounding box of the blocks to be placed
-	double MaxDouble = std::numeric_limits<double>::max();
-	double MinDouble = std::numeric_limits<double>::min();
-	Vector3d BlocksMin(MaxDouble, MaxDouble, MaxDouble);
-	Vector3d BlocksMax(MinDouble, MinDouble, MinDouble);
+	// Compute the bounding box for each block to be placed
+	cBoundingBox PlacingBounds(0, 0, 0, 0, 0, 0);
+	bool HasInitializedBounds = false;
 	for (auto blk: a_Blocks)
 	{
-		BlocksMin = BlocksMin.Min(blk.GetPos());
-		BlocksMax = BlocksMax.Max(blk.GetPos() + Vector3d(1, 1, 1));
-	}
-	cBoundingBox PlacingBounds(BlocksMin, BlocksMax);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(blk.m_BlockType);
+		int x = blk.GetX();
+		int y = blk.GetY();
+		int z = blk.GetZ();
+		cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
+			m_World->GetBlock(x - 1, y, z),
+			m_World->GetBlock(x + 1, y, z),
+			m_World->GetBlock(x, y - 1, z),
+			m_World->GetBlock(x, y + 1, z),
+			m_World->GetBlock(x, y, z - 1),
+			m_World->GetBlock(x, y, z + 1)
+	        );
+		BlockBox.Move(x, y, z);
 
+		if (HasInitializedBounds)
+		{
+			PlacingBounds = PlacingBounds.Union(BlockBox);
+		} else {
+			PlacingBounds = BlockBox;
+			HasInitializedBounds = true;
+		}
+	}
+
+	// See if any entities in that bounding box collide with anyone
 	if (!m_World->ForEachEntityInBox(PlacingBounds, Callback))
 	{
 		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:

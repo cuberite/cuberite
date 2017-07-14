@@ -119,10 +119,10 @@ cBoundingBox cBoundingBox::Union(const cBoundingBox & a_Other)
 {
 	return cBoundingBox(
 		std::min(m_Min.x, a_Other.m_Min.x),
-		std::min(m_Min.y, a_Other.m_Min.y),
-		std::min(m_Min.z, a_Other.m_Min.z),
 		std::max(m_Max.x, a_Other.m_Max.x),
+		std::min(m_Min.y, a_Other.m_Min.y),
 		std::max(m_Max.y, a_Other.m_Max.y),
+		std::min(m_Min.z, a_Other.m_Min.z),
 		std::max(m_Max.z, a_Other.m_Max.z)
 	);
 }
