@@ -2676,6 +2676,8 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 		}
 	}
 
+	cWorld * World = GetWorld();
+
 	// Check to see if any entity intersects any block being placed
 	class DoesIntersectBlock : public cEntityCallback
 	{
@@ -2707,10 +2709,10 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 			}
 			return false;
 		}
-	} Callback(PlacementBoxes, m_World);
+	} Callback(PlacementBoxes, World);
 
 	// See if any entities in that bounding box collide with anyone
-	if (!m_World->ForEachEntityInBox(PlacingBounds, Callback))
+	if (!World->ForEachEntityInBox(PlacingBounds, Callback))
 	{
 		return true;
 	}
