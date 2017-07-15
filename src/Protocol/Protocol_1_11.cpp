@@ -586,7 +586,7 @@ void cProtocol_1_11_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
-	m_Client->m_ForgeHandshake.augmentServerListPing(ResponseValue);
+	m_Client->m_ForgeHandshake.AugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -1210,7 +1210,7 @@ void cProtocol_1_11_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
-	m_Client->m_ForgeHandshake.augmentServerListPing(ResponseValue);
+	m_Client->m_ForgeHandshake.AugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());

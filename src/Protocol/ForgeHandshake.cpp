@@ -18,7 +18,7 @@ cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false)
 
 
 
-void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
+void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
 {
 	UInt32 ProtocolVersion = m_Client->GetProtocolVersion();
 	
