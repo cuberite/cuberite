@@ -11,10 +11,6 @@
 class cForgeMods
 {
 public:
-	cForgeMods(AStringMap a);
-	
-	static const cForgeMods & Unmodded(void);
-	
 	// TODO: can tolua++ bridge AStringMap (etc.) as a Lua table? or non-fixedsize arrays?
 
 	/** Returns the number of Forge mods. */
@@ -31,10 +27,14 @@ public:
 
 	/** Returns the version of the Forge mod at the given index. */
 	const AString & GetModVersionAt(size_t i) const;
-
+	// tolua_end
+	
+	cForgeMods(AStringMap a);
+	
+	static const cForgeMods & Unmodded(void);
+	
 private:
 	AStringMap m_Mods;
 	AStringVector m_ModNames;
 	AStringVector m_ModVersions;
-};
-// tolua_end
+} ; // tolua_export

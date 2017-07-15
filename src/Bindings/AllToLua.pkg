@@ -69,6 +69,7 @@ $cfile "../MapManager.h"
 $cfile "../Scoreboard.h"
 $cfile "../Statistics.h"
 $cfile "../Protocol/MojangAPI.h"
+$cfile "../Protocol/ForgeMods.h"
 
 // Entities:
 $cfile "../Entities/Entity.h"
