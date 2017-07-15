@@ -87,7 +87,7 @@ public:
 	bool IsHardcore(void) const { return m_bIsHardcore; }
 
 	// tolua_end
-	
+
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
@@ -219,7 +219,7 @@ private:
 	AString m_FaviconData;
 	int m_MaxPlayers;
 	bool m_bIsHardcore;
-	
+
 	// TODO: std::map<int, cForgeMods &> data structure?
 	cForgeMods m_ForgeMods_1_8_0;
 	cForgeMods m_ForgeMods_1_9_0;

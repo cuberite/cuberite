@@ -393,7 +393,7 @@ void cProtocol_1_12::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	// Description:
 	Json::Value Description;
 	Description["text"] = ServerDescription.c_str();
-	
+
 	// Create the response:
 	Json::Value ResponseValue;
 	ResponseValue["version"] = Version;
