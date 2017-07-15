@@ -419,6 +419,199 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 
 
 
+int cItem::AddEnchantment(int a_EnchantmentID, int a_Level, bool a_WithBook)
+{
+	int OurLevel = m_Enchantments.GetLevel(a_EnchantmentID);
+	int Multiplier = cEnchantments::GetMultiplier(a_EnchantmentID, a_WithBook);
+	int NewLevel = 0;
+	if (OurLevel > a_Level)
+	{
+		// They don't add anything to us
+		NewLevel = OurLevel;
+	}
+	else if (OurLevel == a_Level)
+	{
+		// Bump it by 1
+		NewLevel = OurLevel + 1;
+	}
+	else
+	{
+		// Take the sacrifice's level
+		NewLevel = a_Level;
+	}
+	int LevelCap = cEnchantments::GetLevelCap(a_EnchantmentID);
+	if (NewLevel > LevelCap)
+	{
+		NewLevel = LevelCap;
+	}
+
+	m_Enchantments.SetLevel(a_EnchantmentID, NewLevel);
+	return NewLevel * Multiplier;
+}
+
+
+
+
+
+bool cItem::CanHaveEnchantment(int a_EnchantmentID)
+{
+	if (m_ItemType == E_ITEM_ENCHANTED_BOOK)
+	{
+		// Enchanted books can take anything
+		return true;
+	}
+
+	// The organization here is based on the summary at:
+	// http://minecraft.gamepedia.com/Enchanting
+	// as of July 2017 (Minecraft 1.12).
+
+	// Hand tool enchantments
+	std::set<int> SwordEnchantments =
+	{
+		cEnchantments::enchBaneOfArthropods,
+		cEnchantments::enchFireAspect,
+		cEnchantments::enchKnockback,
+		cEnchantments::enchLooting,
+		cEnchantments::enchSharpness,
+		cEnchantments::enchSmite,
+		cEnchantments::enchUnbreaking
+	};
+	std::set<int> AxeEnchantments =
+	{
+		cEnchantments::enchBaneOfArthropods,
+		cEnchantments::enchEfficiency,
+		cEnchantments::enchFortune,
+		cEnchantments::enchSharpness,
+		cEnchantments::enchSilkTouch,
+		cEnchantments::enchSmite,
+		cEnchantments::enchUnbreaking
+	};
+	std::set<int> ToolEnchantments =
+	{
+		cEnchantments::enchEfficiency,
+		cEnchantments::enchFortune,
+		cEnchantments::enchSilkTouch,
+		cEnchantments::enchUnbreaking
+	};
+	std::set<int> ShearEnchantments =
+	{
+		cEnchantments::enchEfficiency,
+		cEnchantments::enchUnbreaking
+	};
+	std::set<int> BowEnchantments =
+	{
+		cEnchantments::enchFlame,
+		cEnchantments::enchInfinity,
+		cEnchantments::enchPower,
+		cEnchantments::enchPunch
+	};
+	std::set<int> FishingEnchantments =
+	{
+		cEnchantments::enchLuckOfTheSea,
+		cEnchantments::enchLure
+	};
+	std::set<int> MiscEnchantments =
+	{
+		cEnchantments::enchUnbreaking
+	};
+
+	if (ItemCategory::IsSword(m_ItemType))
+	{
+		return SwordEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (ItemCategory::IsAxe(m_ItemType))
+	{
+		return AxeEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (ItemCategory::IsPickaxe(m_ItemType) || ItemCategory::IsShovel(m_ItemType))
+	{
+		return ToolEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (m_ItemType == E_ITEM_SHEARS)
+	{
+		return ShearEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (m_ItemType == E_ITEM_BOW)
+	{
+		return BowEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (m_ItemType == E_ITEM_FISHING_ROD)
+	{
+		return FishingEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (ItemCategory::IsHoe(m_ItemType) || (m_ItemType == E_ITEM_FLINT_AND_STEEL) || (m_ItemType == E_ITEM_CARROT_ON_STICK) || (m_ItemType == E_ITEM_SHIELD))
+	{
+		return MiscEnchantments.count(a_EnchantmentID) > 0;
+	}
+
+	// Armor enchantments
+	std::set<int> ArmorEnchantments =
+	{
+		cEnchantments::enchBlastProtection,
+		cEnchantments::enchFireProtection,
+		cEnchantments::enchProjectileProtection,
+		cEnchantments::enchProtection,
+		cEnchantments::enchThorns,
+		cEnchantments::enchUnbreaking
+	};
+	std::set<int> HatOnlyEnchantments =
+	{
+		cEnchantments::enchAquaAffinity,
+		cEnchantments::enchRespiration
+	};
+	std::set<int> BootOnlyEnchantments =
+	{
+		cEnchantments::enchDepthStrider,
+		cEnchantments::enchFeatherFalling
+	};
+
+	if (ItemCategory::IsBoots(m_ItemType))
+	{
+		return (BootOnlyEnchantments.count(a_EnchantmentID) > 0) || (ArmorEnchantments.count(a_EnchantmentID) > 0);
+	}
+	if (ItemCategory::IsHelmet(m_ItemType))
+	{
+		return (HatOnlyEnchantments.count(a_EnchantmentID) > 0) || (ArmorEnchantments.count(a_EnchantmentID) > 0);
+	}
+	if (ItemCategory::IsArmor(m_ItemType))
+	{
+		return ArmorEnchantments.count(a_EnchantmentID) > 0;
+	}
+	return false;
+}
+
+
+
+
+
+int cItem::AddEnchantmentsFromItem(cItem & a_Other)
+{
+	bool WithBook = (a_Other.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+
+	// Consider each enchantment seperately
+	int EnchantingCost = 0;
+	for (auto & Enchantment : a_Other.m_Enchantments)
+	{
+		if (CanHaveEnchantment(Enchantment.first))
+		{
+			if (!m_Enchantments.IsCompatibleWith(Enchantment.first))
+			{
+				// Cost of incompatible enchantments
+				EnchantingCost += 1;
+			}
+			else
+			{
+				EnchantingCost += AddEnchantment(Enchantment.first, Enchantment.second, WithBook);
+			}
+		}
+	}
+	return EnchantingCost;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cItems:
 

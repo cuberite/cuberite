@@ -45,6 +45,7 @@ public:
 
 	enum eEnchantment
 	{
+		// Currently missing: Frost walker, curse of binding, sweeping edge, mending, and curse of vanishing.
 		enchProtection           = 0,
 		enchFireProtection       = 1,
 		enchFeatherFalling       = 2,
@@ -71,6 +72,9 @@ public:
 		enchLuckOfTheSea         = 61,
 		enchLure                 = 62,
 	} ;
+
+	/** A vector of all of the mutually-exclusive sets of enchantments */
+	static const std::vector<std::set<int> > IncompatibleEnchantments;
 
 	/** Creates an empty enchantments container */
 	cEnchantments(void);
@@ -103,6 +107,9 @@ public:
 	/** Returns true if there are no enchantments */
 	bool IsEmpty(void) const;
 
+	/** Returns true if all of our enchantments are compatible with the other enchantment */
+	bool IsCompatibleWith(int a_EnchantmentID) const;
+
 	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name not found; case insensitive */
 	static int StringToEnchantmentID(const AString & a_EnchantmentName);
 
@@ -110,6 +117,12 @@ public:
 	bool operator ==(const cEnchantments & a_Other) const;
 
 	// tolua_end
+
+	/** Get the XP cost multiplier for the enchantment (for anvils) */
+	static int GetMultiplier(int a_EnchantmentID, bool WithBook);
+
+	/** Get the maximum level the enchantment can have */
+	static int GetLevelCap(int a_EnchantmentID);
 
 	/** Add enchantment weights from item to the vector */
 	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
@@ -149,6 +162,12 @@ protected:
 
 	/** Currently stored enchantments */
 	cMap m_Enchantments;
+
+public:
+	/** Make this class iterable */
+	cMap::iterator begin() { return m_Enchantments.begin(); };
+	cMap::iterator end()   { return m_Enchantments.end(); };
+
 } ;  // tolua_export
 
 

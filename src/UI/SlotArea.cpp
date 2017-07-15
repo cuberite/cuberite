@@ -1069,6 +1069,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
 		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SendSlot(a_Player, this, 2);
 		return;
 	}
 
@@ -1091,6 +1092,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SendSlot(a_Player, this, 2);
 				return;
 			}
 
@@ -1114,6 +1116,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SendSlot(a_Player, this, 2);
 				return;
 			}
 
@@ -1136,7 +1139,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				}
 			}
 
-			// TODO: Add enchantments.
+			// Add the enchantments from the sacrifice to the target
+			int EnchantmentCost = Input.AddEnchantmentsFromItem(SecondInput);
+			NeedExp += EnchantmentCost;
 		}
 	}
 
@@ -1165,8 +1170,6 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 		Input.m_CustomName = RepairedItemName;
 	}
-
-	// TODO: Add enchantment exp cost.
 
 	m_MaximumCost = RepairCost + NeedExp;
 
@@ -1198,6 +1201,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	SetSlot(2, a_Player, Input);
 	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost), a_Player);
+	m_ParentWindow.SendSlot(a_Player, this, 2);
 }
 
 

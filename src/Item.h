@@ -201,6 +201,15 @@ public:
 	Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already). */
 	bool EnchantByXPLevels(int a_NumXPLevels);  // tolua_export
 
+	/** Adds this specific enchantment to this item, returning the cost */
+	int AddEnchantment(int a_EnchantmentID, int a_Level, bool a_WithBook);
+
+	/** Adds the enchantments on a_Other to this item, returning the
+	XP cost of the transfer. */
+	int AddEnchantmentsFromItem(cItem & a_Other);  // tolua_export
+
+	bool CanHaveEnchantment(int a_EnchantmentID);
+
 	// tolua_begin
 
 	short          m_ItemType;
