@@ -13,20 +13,15 @@ class cTripwireHookHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	cTripwireHookHandler(cWorld & a_World) :
-		super(a_World)
-	{
-	}
-
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_QueryBlockType);
 		UNUSED(a_QueryPosition);
 
-		return (GetPowerLevel(a_Position, a_BlockType, a_Meta) == 15) ? 15 : 0;
+		return (GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 15) ? 15 : 0;
 	}
 
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_BlockType);
 
@@ -40,7 +35,7 @@ public:
 			NIBBLETYPE Meta;
 
 			AddFaceDirection(Position.x, Position.y, Position.z, FaceToGoTowards);
-			m_World.GetBlockTypeMeta(Position.x, Position.y, Position.z, Type, Meta);
+			a_World.GetBlockTypeMeta(Position.x, Position.y, Position.z, Type, Meta);
 
 			if (Type == E_BLOCK_TRIPWIRE)
 			{
@@ -63,7 +58,7 @@ public:
 					bool m_FoundPlayer;
 				} TripwireCallback;
 
-				if (!m_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), TripwireCallback))
+				if (!a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), TripwireCallback))
 				{
 					FoundActivated = true;
 				}
@@ -91,11 +86,11 @@ public:
 		return 0;
 	}
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating hooky the tripwire hook (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto Power = GetPowerLevel(a_Position, a_BlockType, a_Meta);
+		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
 		NIBBLETYPE Meta;
 		if (Power == 0)
 		{
@@ -119,15 +114,16 @@ public:
 
 		if (Meta != a_Meta)
 		{
-			m_World.SetBlockMeta(a_Position, Meta);
+			a_World.SetBlockMeta(a_Position, Meta);
 			return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
 		}
 
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		UNUSED(a_Position);
