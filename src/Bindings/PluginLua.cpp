@@ -550,9 +550,9 @@ bool cPluginLua::OnLogin(cClientHandle & a_Client, UInt32 a_ProtocolVersion, con
 
 
 
-bool cPluginLua::OnPlayerForgeMods(cClientHandle & a_Client, AStringMap & a_Mods)
+bool cPluginLua::OnPlayerForgeMods(cClientHandle & a_Client)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FORGE_MODS, &a_Client, &a_Mods);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FORGE_MODS, &a_Client);
 }
 
 

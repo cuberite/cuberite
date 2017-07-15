@@ -172,7 +172,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			m_Client->m_ForgeMods = new cForgeMods(clientMods);
 			
 			// Let the plugins know about this event, they may refuse the player:
-			if (cRoot::Get()->GetPluginManager()->CallHookPlayerForgeMods(*a_Client, clientMods))
+			if (cRoot::Get()->GetPluginManager()->CallHookPlayerForgeMods(*a_Client))
 			{
 				LOG("Modded client refused by plugin");
 				SetError();
