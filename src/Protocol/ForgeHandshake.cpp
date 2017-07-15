@@ -20,6 +20,11 @@ cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false)
 
 void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
 {
+	UInt32 ProtocolVersion = m_Client->GetProtocolVersion();
+	
+	LOG("Received server ping from version: %d", ProtocolVersion);
+	// TODO: pass ProtocolVersion to allow different mods per version
+	
 	// modinfo:
 	// TODO: only send if mods enabled
 	Json::Value Modinfo;
