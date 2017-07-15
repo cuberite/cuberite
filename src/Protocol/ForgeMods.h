@@ -38,6 +38,8 @@ public:
 	
 	AStringMap GetMods() { return m_Mods; }
 	
+	bool IsModded() { return m_Mods.size() != 0; }
+	
 private:
 	AStringMap m_Mods;
 	AStringVector m_ModNames;
