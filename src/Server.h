@@ -72,7 +72,8 @@ public:
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
-	void RegisterForgeMod(int a_Protocol, AString & a_ModName, AString & a_ModVersion);
+	void RegisterForgeMod(AString & a_ModName, AString & a_ModVersion);
+	void RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_Protocol);
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */

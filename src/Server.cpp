@@ -254,34 +254,28 @@ int cServer::GetNumPlayers(void) const
 
 
 
-
-void cServer::RegisterForgeMod(int a_Protocol, AString & a_Name, AString & a_Version)
+void cServer::RegisterForgeMod(AString & a_Name, AString & a_Version)
 {
 	// TODO: refactor
-	switch(a_Protocol)
-	{
-		case cProtocolRecognizer::PROTO_VERSION_1_8_0: m_ForgeMods_1_8_0.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_0: m_ForgeMods_1_9_0.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_1: m_ForgeMods_1_9_1.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_2: m_ForgeMods_1_9_2.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_4: m_ForgeMods_1_9_4.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_10_0: m_ForgeMods_1_10_0.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_11_0: m_ForgeMods_1_11_0.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_11_1: m_ForgeMods_1_11_1.Add(a_Name, a_Version); break;
-		case cProtocolRecognizer::PROTO_VERSION_1_12: m_ForgeMods_1_12.Add(a_Name, a_Version); break;
-		case 0:
-		default:
-			m_ForgeMods_1_8_0.Add(a_Name, a_Version);
-			m_ForgeMods_1_9_0.Add(a_Name, a_Version);
-			m_ForgeMods_1_9_1.Add(a_Name, a_Version);
-			m_ForgeMods_1_9_2.Add(a_Name, a_Version);
-			m_ForgeMods_1_9_4.Add(a_Name, a_Version);
-			m_ForgeMods_1_10_0.Add(a_Name, a_Version);
-			m_ForgeMods_1_11_0.Add(a_Name, a_Version);
-			m_ForgeMods_1_11_1.Add(a_Name, a_Version);
-			m_ForgeMods_1_12.Add(a_Name, a_Version);
-			break;
-	}
+	m_ForgeMods_1_8_0.Add(a_Name, a_Version);
+	m_ForgeMods_1_9_0.Add(a_Name, a_Version);
+	m_ForgeMods_1_9_1.Add(a_Name, a_Version);
+	m_ForgeMods_1_9_2.Add(a_Name, a_Version);
+	m_ForgeMods_1_9_4.Add(a_Name, a_Version);
+	m_ForgeMods_1_10_0.Add(a_Name, a_Version);
+	m_ForgeMods_1_11_0.Add(a_Name, a_Version);
+	m_ForgeMods_1_11_1.Add(a_Name, a_Version);
+	m_ForgeMods_1_12.Add(a_Name, a_Version);
+}
+
+
+
+
+
+void cServer::RegisterForgeModForProtocol(AString & a_Name, AString & a_Version, UInt32 a_Protocol)
+{
+	cForgeMods & mods = GetRegisteredForgeMods(a_Protocol);
+	mods.Add(a_Name, a_Version);
 }
 
 
