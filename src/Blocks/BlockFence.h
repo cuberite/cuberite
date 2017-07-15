@@ -21,11 +21,8 @@ public:
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
-		cLeashKnot * LeashKnot = nullptr;
-
-		// Check if already exists a knot there
-		LookForKnot CallbackFindKnot(&LeashKnot);
-		bool AlreadyExistsAKnot = !a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(new Vector3d(a_BlockX, a_BlockY, a_BlockZ), 0.5, 1), CallbackFindKnot);
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(*a_Player->GetWorld(), { a_BlockX, a_BlockY, a_BlockZ });
+		auto KnotAlreadyExists = (LeashKnot != nullptr);
 
 		// Reuse / create the leash knot
 		if (LeashKnot == nullptr)
@@ -34,10 +31,10 @@ public:
 		}
 
 		// Check leashed nearby mobs to leash them to the knot
-		LeashKnot->TieNearbyMobs(*a_Player, AlreadyExistsAKnot);
+		LeashKnot->TiePlayersLeashedMobs(*a_Player, KnotAlreadyExists);
 
 		// New knot? needs to init and produce sound effect
-		if (!AlreadyExistsAKnot)
+		if (!KnotAlreadyExists)
 		{
 			// Only put the knot in the world if any mob has been leashed to
 			if (LeashKnot->HasAnyMobLeashed())
@@ -73,38 +70,12 @@ public:
 
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		cLeashKnot * LeashKnotFound = nullptr;
-		LookForKnot CallbackFindKnot(&LeashKnotFound);
-		a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(new Vector3d(a_BlockX, a_BlockY, a_BlockZ), 2.0, 1), CallbackFindKnot);
-
-		if (LeashKnotFound != nullptr)
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(*a_Player->GetWorld(), { a_BlockX, a_BlockY, a_BlockZ });
+		if (LeashKnot != nullptr)
 		{
-			LeashKnotFound->SetShouldSelfDestroy();
+			LeashKnot->SetShouldSelfDestroy();
 		}
 	}
-
-protected:
-
-	class LookForKnot : public cEntityCallback
-	{
-	public:
-		cLeashKnot ** m_LeashKnot;
-
-		LookForKnot(cLeashKnot ** a_LeashKnot) :
-			m_LeashKnot(a_LeashKnot)
-		{
-		}
-
-		virtual bool Item(cEntity * a_Entity) override
-		{
-			if (a_Entity->IsLeashKnot())
-			{
-				*m_LeashKnot = reinterpret_cast<cLeashKnot *>(a_Entity);
-				return true;  // this makes ForEachEntityInBox call to return false, so we can know if a knot was found
-			}
-			return false;
-		}
-	};
 
 };
 

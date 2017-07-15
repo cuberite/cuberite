@@ -76,10 +76,11 @@ public:
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
 	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk);
 
+	// tolua_begin
 	/** Returns whether the mob can be leashed. */
 	bool CanBeLeashed() const { return m_CanBeLeashed; }
 
-	/** Sets whether the mob ban be leashed, for extensibility in plugins */
+	/** Sets whether the mob can be leashed, for extensibility in plugins */
 	void SetCanBeLeashed(bool a_CanBeLeashed) { m_CanBeLeashed = a_CanBeLeashed; }
 
 	/** Returns whether the monster is leashed to an entity. */
@@ -88,17 +89,18 @@ public:
 	/** Leash the monster to a entity. */
 	void SetLeashedTo(cEntity * a_Entity);
 
-	/** Unleash the monster from a entity. */
-	void SetUnleashed(bool a_DropPickup);
+	/** Unleash the monster from an entity. */
+	void SetUnleashed(bool a_ShouldDropPickup);
 
-	/** Returns the entity to where is leashed this mob, returns nullptr if it's not leashed */
+	/** Returns the entity to where this mob is leashed, returns nullptr if it's not leashed */
 	cEntity * GetLeashedTo() const { return m_LeashedTo; }
+	// tolua_end
 
 	/** Sets entity position to where is leashed this mob */
-	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = pos; }
+	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = std::unique_ptr<Vector3d>(pos); }
 
 	/** Gets entity position to where mob should be leashed */
-	Vector3d * GetLeashToPos() const { return m_LeashToPos; }
+	Vector3d * GetLeashToPos() const { return m_LeashToPos.get(); }
 
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
@@ -303,8 +305,8 @@ protected:
 	/** Entity leashed to */
 	cEntity * m_LeashedTo;
 
-	/** Entity pos leashed to, for leash knots */
-	Vector3d * m_LeashToPos;
+	/** Entity pos where this mob was leashed to. Used when deserializing the chunk in order to make the mob find the leash knot. */
+	std::unique_ptr<Vector3d> m_LeashToPos;
 
 	/** Mob has ben leashed or unleashed in current player action. Avoids double actions on horses. */
 	bool m_IsLeashActionJustDone;

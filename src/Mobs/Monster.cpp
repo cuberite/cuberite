@@ -16,6 +16,7 @@
 #include "../FastRandom.h"
 
 #include "PathFinder.h"
+#include "../Entities/LeashKnot.h"
 
 
 
@@ -422,32 +423,18 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMonster::CalcLeashActions()
 {
-	// This mob just spotted in the world and should be leashed to a leash knot, so it tries until knot is found
+	// This mob just spotted in the world and [m_LeashToPos not null] shows that should be leashed to a leash knot at m_LeashToPos.
+	// This keeps trying until knot is found
 	if (!IsLeashed() && (m_LeashToPos != nullptr))
 	{
-		class LookForKnot : public cEntityCallback
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(*m_World, { FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z) });
+		if (LeashKnot != nullptr)
 		{
-		public:
-			cMonster * m_Monster;
-
-			LookForKnot(cMonster * a_Monster) :
-				m_Monster(a_Monster)
-			{
-			}
-
-			virtual bool Item(cEntity * a_Entity) override
-			{
-				if (a_Entity->IsLeashKnot())
-				{
-					a_Entity->AddLeashedMob(m_Monster);
-					m_Monster->SetLeashToPos(nullptr);
-				}
-				return false;
-			}
-		} Callback(this);
-		m_World->ForEachEntityInBox(cBoundingBox(m_LeashToPos, 0.5, 1), Callback);
+			LeashKnot->AddLeashedMob(this);
+			SetLeashToPos(nullptr);
+		}
 	}
-	else if (IsLeashed())  // Mob is leashed to an entity
+	else if (IsLeashed())  // Mob is already leashed to an entity: follow it.
 	{
 		// TODO: leashed mobs in vanilla can move around up to 5 blocks distance from leash origin
 		MoveToPosition(m_LeashedTo->GetPosition());
@@ -1431,14 +1418,14 @@ void cMonster::SetLeashedTo(cEntity * a_Entity)
 
 
 
-void cMonster::SetUnleashed(bool a_DropPickup)
+void cMonster::SetUnleashed(bool a_ShouldDropPickup)
 {
 	ASSERT(this->GetLeashedTo() != nullptr);
 
 	m_LeashedTo = nullptr;
 
 	// Drop pickup leash?
-	if (a_DropPickup)
+	if (a_ShouldDropPickup)
 	{
 		cItems Pickups;
 		Pickups.Add(cItem(E_ITEM_LEAD, 1, 0));

@@ -8508,6 +8508,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+				CanBeLeashed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the mob can be leashed.",
+				},
 				FamilyFromType =
 				{
 					IsStatic = true,
@@ -8546,6 +8556,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Gets the custom name of the monster. If no custom name is set, the function returns an empty string.",
+				},
+				GetLeashedTo =
+				{
+					Returns =
+					{
+						{
+							Name = "LeashedTo",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Returns the entity to where this mob is leashed, returns nullptr if it's not leashed",
 				},
 				GetMobFamily =
 				{
@@ -8627,6 +8648,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
 				},
+				IsLeashed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the monster is leashed to an entity.",
+				},				
 				MobTypeToString =
 				{
 					IsStatic = true,
@@ -8685,6 +8716,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the age of the monster",
 				},
+				SetCanBeLeashed =
+				{
+					Params =
+					{
+						{
+							Name = "CanBeLeashed",
+							Type = "boolean",
+						}
+					},
+					Notes = "Sets whether the mob can be leashed, for extensibility in plugins"
+				},
 				SetCustomName =
 				{
 					Params =
@@ -8706,6 +8748,28 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name.",
+				},
+				SetLeashedTo =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Leash the monster to a entity.",
+				},
+				SetUnleashed =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldDropPickup",
+							Type = "boolean",
+						},
+					},
+					Notes = "Unleash the monster from an entity.",
 				},
 				SetRelativeWalkSpeed =
 				{

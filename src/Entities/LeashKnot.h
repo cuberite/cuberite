@@ -22,9 +22,12 @@ public:
 	cLeashKnot(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
 
 	/** Looks for mobs leashed to a player and ties them to this knot */
-	void TieNearbyMobs(cPlayer & a_Player, bool a_ShouldBroadCast);
+	void TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadCast);
 
 	void SetShouldSelfDestroy() { m_ShouldSelfDestroy = true; }
+
+	/** Returns the leash knot entity representing the knot at the specified position. Returns nullptr if there's no knot. */
+	static cLeashKnot * FindKnotAtPos(cWorld & a_World, Vector3i a_BlockPos);
 
 private:
 

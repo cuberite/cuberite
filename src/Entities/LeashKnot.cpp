@@ -29,7 +29,7 @@ void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
-	TieNearbyMobs(a_Player, true);
+	TiePlayersLeashedMobs(a_Player, true);
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
 }
@@ -38,7 +38,7 @@ void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cLeashKnot::TieNearbyMobs(cPlayer & a_Player, bool a_ShouldBroadCast)
+void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadCast)
 {
 	// Check leashed nearby mobs to tie them to this knot
 	class LookForLeasheds : public cEntityCallback
@@ -150,6 +150,40 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_World->BroadcastSoundEffect("entity.leashknot.break", GetPosX(), GetPosY(), GetPosZ(), 1, 1);
 		}
 	}
+}
+
+
+
+
+
+cLeashKnot * cLeashKnot::FindKnotAtPos(cWorld & a_World, Vector3i a_BlockPos)
+{
+	cLeashKnot * LeashKnot = nullptr;
+
+	class LookForKnot : public cEntityCallback
+	{
+	public:
+		cLeashKnot ** m_LeashKnot;
+
+		LookForKnot(cLeashKnot ** a_LeashKnot) :
+			m_LeashKnot(a_LeashKnot)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if (a_Entity->IsLeashKnot())
+			{
+				*m_LeashKnot = reinterpret_cast<cLeashKnot *>(a_Entity);
+				return true;
+			}
+			return false;
+		}
+	} CallbackFindKnot(&LeashKnot);
+
+	a_World.ForEachEntityInBox(cBoundingBox(a_BlockPos, 0.5, 1), CallbackFindKnot);
+
+	return LeashKnot;
 }
 
 
