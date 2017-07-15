@@ -29,9 +29,14 @@ public:
 	const AString & GetModVersionAt(size_t i) const;
 	// tolua_end
 	
+	cForgeMods();
 	cForgeMods(AStringMap a);
 	
 	static const cForgeMods & Unmodded(void);
+	
+	void Add(AString & a_Name, AString & a_Version);
+	
+	AStringMap GetMods() { return m_Mods; }
 	
 private:
 	AStringMap m_Mods;

@@ -255,6 +255,57 @@ int cServer::GetNumPlayers(void) const
 
 
 
+void cServer::RegisterForgeMod(int a_Protocol, AString & a_Name, AString & a_Version)
+{
+	// TODO: refactor
+	switch(a_Protocol)
+	{
+		case cProtocolRecognizer::PROTO_VERSION_1_8_0: m_ForgeMods_1_8_0.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_0: m_ForgeMods_1_9_0.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_1: m_ForgeMods_1_9_1.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_2: m_ForgeMods_1_9_2.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_4: m_ForgeMods_1_9_4.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_10_0: m_ForgeMods_1_10_0.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_11_0: m_ForgeMods_1_11_0.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_11_1: m_ForgeMods_1_11_1.Add(a_Name, a_Version); break;
+		case cProtocolRecognizer::PROTO_VERSION_1_12: m_ForgeMods_1_12.Add(a_Name, a_Version); break;
+		case 0:
+		default:
+			m_ForgeMods_1_8_0.Add(a_Name, a_Version);
+			m_ForgeMods_1_9_0.Add(a_Name, a_Version);
+			m_ForgeMods_1_9_1.Add(a_Name, a_Version);
+			m_ForgeMods_1_9_2.Add(a_Name, a_Version);
+			m_ForgeMods_1_9_4.Add(a_Name, a_Version);
+			m_ForgeMods_1_10_0.Add(a_Name, a_Version);
+			m_ForgeMods_1_11_0.Add(a_Name, a_Version);
+			m_ForgeMods_1_11_1.Add(a_Name, a_Version);
+			m_ForgeMods_1_12.Add(a_Name, a_Version);
+			break;
+	}
+}
+
+
+
+
+cForgeMods & cServer::GetRegisteredForgeMods(UInt32 a_Protocol)
+{
+	switch(a_Protocol)
+	{
+		case cProtocolRecognizer::PROTO_VERSION_1_8_0: return m_ForgeMods_1_8_0;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_0: return m_ForgeMods_1_9_0;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_1: return m_ForgeMods_1_9_1;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_2: return m_ForgeMods_1_9_2;
+		case cProtocolRecognizer::PROTO_VERSION_1_9_4: return m_ForgeMods_1_9_4;
+		case cProtocolRecognizer::PROTO_VERSION_1_10_0: return m_ForgeMods_1_10_0;
+		case cProtocolRecognizer::PROTO_VERSION_1_11_0: return m_ForgeMods_1_11_0;
+		case cProtocolRecognizer::PROTO_VERSION_1_11_1: return m_ForgeMods_1_11_1;
+		default:
+		case cProtocolRecognizer::PROTO_VERSION_1_12: return  m_ForgeMods_1_12;
+	}
+}
+
+
+
 
 bool cServer::IsPlayerInQueue(AString a_Username)
 {

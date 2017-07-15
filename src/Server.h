@@ -12,6 +12,7 @@
 #include "RCONServer.h"
 #include "OSSupport/IsThread.h"
 #include "OSSupport/Network.h"
+#include "Protocol/ForgeMods.h"
 
 #ifdef _MSC_VER
 	#pragma warning(push)
@@ -70,6 +71,8 @@ public:
 	int  GetMaxPlayers(void) const { return m_MaxPlayers; }
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
+	
+	void RegisterForgeMod(int a_Protocol, AString & a_ModName, AString & a_ModVersion);
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */
@@ -83,7 +86,7 @@ public:
 	bool IsHardcore(void) const { return m_bIsHardcore; }
 
 	// tolua_end
-
+	
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
@@ -147,7 +150,9 @@ public:
 	/** Returns true if usernames should be completed across worlds. This is read
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
-
+	
+	cForgeMods & GetRegisteredForgeMods(UInt32 a_Protocol);
+	
 private:
 
 	friend class cRoot;  // so cRoot can create and destroy cServer
@@ -213,7 +218,19 @@ private:
 	AString m_FaviconData;
 	int m_MaxPlayers;
 	bool m_bIsHardcore;
-
+	
+	// TODO: std::map<int, cForgeMods &> data structure?
+	cForgeMods m_ForgeMods_1_8_0;
+	cForgeMods m_ForgeMods_1_9_0;
+	cForgeMods m_ForgeMods_1_9_1;
+	cForgeMods m_ForgeMods_1_9_2;
+	cForgeMods m_ForgeMods_1_9_4;
+	cForgeMods m_ForgeMods_1_10_0;
+	cForgeMods m_ForgeMods_1_10_1;
+	cForgeMods m_ForgeMods_1_11_0;
+	cForgeMods m_ForgeMods_1_11_1;
+	cForgeMods m_ForgeMods_1_12;
+	
 	/** True - allow same username to login more than once False - only once */
 	bool m_bAllowMultiLogin;
 

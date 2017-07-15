@@ -6,6 +6,14 @@
 #include "Globals.h"
 #include "ForgeMods.h"
 
+cForgeMods::cForgeMods()
+{
+}
+
+
+
+
+
 cForgeMods::cForgeMods(AStringMap a):m_Mods(a)
 {
 	for (auto const & item: a)
@@ -20,8 +28,7 @@ cForgeMods::cForgeMods(AStringMap a):m_Mods(a)
 
 const cForgeMods & cForgeMods::Unmodded(void)
 {
-	static AStringMap empty;
-	static cForgeMods unmodded(empty);
+	static cForgeMods unmodded;
 	
 	return unmodded;
 }
@@ -64,4 +71,14 @@ const AString & cForgeMods::GetModNameAt(size_t i) const
 const AString & cForgeMods::GetModVersionAt(size_t i) const
 {
 	return m_ModVersions[i];
+}
+
+
+
+
+void cForgeMods::Add(AString & a_Name, AString & a_Version)
+{
+	m_ModNames.push_back(a_Name);
+	m_ModVersions.push_back(a_Version);
+	m_Mods.insert(std::make_pair(a_Name, a_Version));
 }

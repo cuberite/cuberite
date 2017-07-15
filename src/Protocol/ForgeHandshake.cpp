@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "ForgeHandshake.h"
 #include "json/json.h"
+#include "../Server.h"
 #include "../Bindings/PluginManager.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -23,7 +24,6 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
 	UInt32 ProtocolVersion = m_Client->GetProtocolVersion();
 	
 	LOG("Received server ping from version: %d", ProtocolVersion);
-	// TODO: pass ProtocolVersion to allow different mods per version
 	
 	// modinfo:
 	// TODO: only send if mods enabled
@@ -31,7 +31,17 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
 	Modinfo["type"] = "FML";
 
 	Json::Value ModList(Json::arrayValue);
-	// TODO: customizable modList
+	
+	cForgeMods & mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
+	
+	for (auto& item: mods.GetMods())
+	{
+		Json::Value Mod;
+		Mod["modid"] = item.first;
+		Mod["version"] = item.second;
+		ModList.append(Mod);
+	}
+	
 	Modinfo["modList"] = ModList;
 
 	// Augment the response:
