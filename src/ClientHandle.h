@@ -93,8 +93,6 @@ public:  // tolua_export
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
 	
-	const cForgeMods & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : cForgeMods::Unmodded(); }   // tolua_export
-
 	/** Sets the player's properties, such as skin image and signature.
 	Used mainly by BungeeCord compatibility code - property querying is done on the BungeeCord server
 	and the results are passed to MCS running in offline mode. */
@@ -267,6 +265,9 @@ public:  // tolua_export
 
 	/** Returns the client brand received in the MC|Brand plugin message or set by a plugin. */
 	const AString & GetClientBrand(void) const { return m_ClientBrand; }
+	
+	/** Returns the Forge mods installed on the client. */
+	const cForgeMods & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : cForgeMods::Unmodded(); }
 
 	// tolua_end
 
