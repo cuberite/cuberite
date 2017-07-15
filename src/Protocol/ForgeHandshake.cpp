@@ -163,6 +163,14 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			}
 			
 			LOG("Client connected with %zu mods: %s", clientMods.size(), clientModsString.c_str());
+			
+			if (m_Client->m_ForgeMods != nullptr)
+			{
+				delete m_Client->m_ForgeMods;
+			}
+			
+			m_Client->m_ForgeMods = new cForgeMods(clientMods);
+			
 			// Let the plugins know about this event, they may refuse the player:
 			if (cRoot::Get()->GetPluginManager()->CallHookPlayerForgeMods(*a_Client, clientMods))
 			{

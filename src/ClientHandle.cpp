@@ -65,6 +65,7 @@ float cClientHandle::FASTBREAK_PERCENTAGE;
 
 cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_ForgeHandshake(this),
+	m_ForgeMods(0),
 	m_LastSentDimension(dimNotSet),
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
@@ -137,6 +138,11 @@ cClientHandle::~cClientHandle()
 		}
 		delete m_Player;
 		m_Player = nullptr;
+	}
+	
+	if (m_ForgeMods != nullptr)
+	{
+		delete m_ForgeMods;
 	}
 
 	if (!m_HasSentDC)

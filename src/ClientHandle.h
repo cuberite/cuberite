@@ -22,6 +22,7 @@
 #include "ChunkSender.h"
 #include "EffectID.h"
 #include "Protocol/ForgeHandshake.h"
+#include "Protocol/ForgeMods.h"
 
 
 #include <array>
@@ -91,6 +92,8 @@ public:  // tolua_export
 	void SetUUID(const AString & a_UUID) { ASSERT(a_UUID.size() == 32); m_UUID = a_UUID; }
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
+	
+	const cForgeMods & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : cForgeMods::Unmodded(); }   // tolua_export
 
 	/** Sets the player's properties, such as skin image and signature.
 	Used mainly by BungeeCord compatibility code - property querying is done on the BungeeCord server
@@ -379,6 +382,8 @@ public:  // tolua_export
 	bool IsPlayerChunkSent();
 	
 	cForgeHandshake m_ForgeHandshake;
+	
+	cForgeMods * m_ForgeMods;
 
 private:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
@@ -388,7 +393,7 @@ private:
 	friend class cServer;  // Needs access to SetSelf()
 	
 	friend class cForgeHandshake;   // Needs access to PostAuthenticate()
-
+	
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 

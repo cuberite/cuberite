@@ -14,6 +14,7 @@ SET (SRCS
 	Protocol_1_12.cpp
 	ProtocolRecognizer.cpp
 	ForgeHandshake.cpp
+	ForgeMods.cpp
 )
 
 SET (HDRS
@@ -29,6 +30,7 @@ SET (HDRS
 	Protocol_1_12.h
 	ProtocolRecognizer.h
 	ForgeHandshake.h
+	ForgeMods.h
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
