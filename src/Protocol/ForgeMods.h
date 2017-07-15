@@ -32,10 +32,9 @@ public:
 	/** Returns the version of the Forge mod at the given index. */
 	const AString & GetModVersionAt(size_t i) const;
 
-	// tolua_end
-	
 private:
 	AStringMap m_Mods;
 	AStringVector m_ModNames;
 	AStringVector m_ModVersions;
 };
+// tolua_end
