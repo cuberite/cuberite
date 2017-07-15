@@ -268,7 +268,16 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
 {
-	int FinalDamage = a_RawDamage - GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	int ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	int EnchantmentCover = GetEnchantmentCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	int FinalDamage = a_RawDamage - ArmorCover - EnchantmentCover;
+	if ((FinalDamage == 0) && (a_RawDamage > 0))
+	{
+		// Nobody's invincible
+		FinalDamage = 1;
+	}
+	ApplyArmorDamage(ArmorCover);
+
 	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
 }
 
@@ -278,7 +287,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount)
 {
-	class cNotifyWolves : public cEntityCallback
+	class cFindEntity : public cEntityCallback
 	{
 	public:
 
@@ -300,8 +309,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_Ra
 			}
 
 
-			int FinalDamage = m_RawDamage - m_Entity->GetArmorCoverAgainst(Attacker, m_DamageType, m_RawDamage);
-			m_Entity->TakeDamage(m_DamageType, Attacker, m_RawDamage, FinalDamage, m_KnockbackAmount);
+			m_Entity->TakeDamage(m_DamageType, Attacker, m_RawDamage, m_KnockbackAmount);
 			return true;
 		}
 	} Callback;
@@ -517,117 +525,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
 	}
 
-	if (IsPlayer())
-	{
-		double TotalEPF = 0.0;
-		double EPFProtection = 0.00;
-		double EPFFireProtection = 0.00;
-		double EPFBlastProtection = 0.00;
-		double EPFProjectileProtection = 0.00;
-		double EPFFeatherFalling = 0.00;
-
-		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
-		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
-		{
-			const cItem & Item = ArmorItems[i];
-			int Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection));
-			if (Level > 0)
-			{
-				EPFProtection += (6 + Level * Level) * 0.75 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection));
-			if (Level > 0)
-			{
-				EPFFireProtection += (6 + Level * Level) * 1.25 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling));
-			if (Level > 0)
-			{
-				EPFFeatherFalling += (6 + Level * Level) * 2.5 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection));
-			if (Level > 0)
-			{
-				EPFBlastProtection += (6 + Level * Level) * 1.5 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection));
-			if (Level > 0)
-			{
-				EPFProjectileProtection += (6 + Level * Level) * 1.5 / 3;
-			}
-
-		}
-
-		TotalEPF = EPFProtection + EPFFireProtection + EPFFeatherFalling + EPFBlastProtection + EPFProjectileProtection;
-
-		EPFProtection = EPFProtection / TotalEPF;
-		EPFFireProtection = EPFFireProtection / TotalEPF;
-		EPFFeatherFalling = EPFFeatherFalling / TotalEPF;
-		EPFBlastProtection = EPFBlastProtection / TotalEPF;
-		EPFProjectileProtection = EPFProjectileProtection / TotalEPF;
-
-		if (TotalEPF > 25)
-		{
-			TotalEPF = 25;
-		}
-
-		float RandomValue = GetRandomProvider().RandReal(0.5f, 1.0f);
-
-		TotalEPF = ceil(TotalEPF * RandomValue);
-
-		if (TotalEPF > 20)
-		{
-			TotalEPF = 20;
-		}
-
-		EPFProtection = TotalEPF * EPFProtection;
-		EPFFireProtection = TotalEPF * EPFFireProtection;
-		EPFFeatherFalling = TotalEPF * EPFFeatherFalling;
-		EPFBlastProtection = TotalEPF * EPFBlastProtection;
-		EPFProjectileProtection = TotalEPF * EPFProjectileProtection;
-
-		int RemovedDamage = 0;
-
-		if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtAdmin))
-		{
-			RemovedDamage += CeilC(EPFProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if ((a_TDI.DamageType == dtFalling) || (a_TDI.DamageType == dtEnderPearl))
-		{
-			RemovedDamage += CeilC(EPFFeatherFalling * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.DamageType == dtBurning)
-		{
-			RemovedDamage += CeilC(EPFFireProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.DamageType == dtExplosion)
-		{
-			RemovedDamage += CeilC(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.DamageType == dtProjectile)
-		{
-			RemovedDamage += CeilC(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.FinalDamage < RemovedDamage)
-		{
-			RemovedDamage = 0;
-		}
-
-		a_TDI.FinalDamage -= RemovedDamage;
-	}
-
 	m_Health -= static_cast<short>(a_TDI.FinalDamage);
-
-	// TODO: Apply damage to armor
 
 	m_Health = std::max(m_Health, 0);
 
@@ -708,6 +606,15 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 
 
+void cEntity::ApplyArmorDamage(int DamageBlocked)
+{
+	// cEntities don't necessarily have armor to damage.
+	return;
+}
+
+
+
+
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
@@ -717,6 +624,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtOnFire:
 		case dtSuffocating:
 		case dtDrowning:  // TODO: This one could be a special case - in various MC versions (PC vs XBox) it is and isn't armor-protected
+		case dtEnderPearl:
 		case dtStarving:
 		case dtInVoid:
 		case dtPoisoning:
@@ -734,7 +642,6 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtCactusContact:
 		case dtLavaContact:
 		case dtFireContact:
-		case dtEnderPearl:
 		case dtExplosion:
 		{
 			return true;
@@ -744,6 +651,49 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 	#ifndef __clang__
 		return false;
 	#endif
+}
+
+
+
+
+
+int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+{
+	int TotalEPF = 0.0;
+
+	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+	for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
+	{
+		const cItem & Item = ArmorItems[i];
+
+		if ((a_DamageType != dtInVoid) && (a_DamageType != dtAdmin) && (a_DamageType != dtStarving))
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection)) * 1;
+		}
+
+		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact))
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection)) * 2;
+		}
+
+		if ((a_DamageType == dtFalling) || (a_DamageType == dtEnderPearl))
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling)) * 3;
+		}
+
+		if (a_DamageType == dtExplosion)
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection)) * 2;
+		}
+
+		// Note: Also blocks against fire charges, etc.
+		if (a_DamageType == dtProjectile)
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection)) * 2;
+		}
+	}
+	int CappedEPF = std::min(20, TotalEPF);
+	return a_Damage * CappedEPF / 25.0;
 }
 
 
@@ -761,15 +711,16 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// Add up all armor points:
-	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points as of 2012_12_20
+	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points
 	int ArmorValue = 0;
+	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
 	{
 		case E_ITEM_LEATHER_CAP:    ArmorValue += 1; break;
 		case E_ITEM_GOLD_HELMET:    ArmorValue += 2; break;
 		case E_ITEM_CHAIN_HELMET:   ArmorValue += 2; break;
 		case E_ITEM_IRON_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; break;
+		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; Toughness += 2; break;
 	}
 	switch (GetEquippedChestplate().m_ItemType)
 	{
@@ -777,7 +728,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case E_ITEM_GOLD_CHESTPLATE:    ArmorValue += 5; break;
 		case E_ITEM_CHAIN_CHESTPLATE:   ArmorValue += 5; break;
 		case E_ITEM_IRON_CHESTPLATE:    ArmorValue += 6; break;
-		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; break;
+		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; Toughness += 2; break;
 	}
 	switch (GetEquippedLeggings().m_ItemType)
 	{
@@ -785,7 +736,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case E_ITEM_GOLD_LEGGINGS:    ArmorValue += 3; break;
 		case E_ITEM_CHAIN_LEGGINGS:   ArmorValue += 4; break;
 		case E_ITEM_IRON_LEGGINGS:    ArmorValue += 5; break;
-		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; break;
+		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; Toughness += 2; break;
 	}
 	switch (GetEquippedBoots().m_ItemType)
 	{
@@ -793,14 +744,14 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case E_ITEM_GOLD_BOOTS:    ArmorValue += 1; break;
 		case E_ITEM_CHAIN_BOOTS:   ArmorValue += 1; break;
 		case E_ITEM_IRON_BOOTS:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; break;
+		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; Toughness += 2; break;
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
 	// Ref.: http://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
-	// Now ArmorValue is in [0, 20] range, which corresponds to [0, 80%] protection. Calculate the hitpoints from that:
-	return a_Damage * (ArmorValue * 4) / 100;
+	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
+	return a_Damage * std::min(20.0, Reduction) / 25.0;
 }
 
 
