@@ -9,13 +9,12 @@
 
 #pragma once
 
-	// tolua_begin
-
+// tolua_begin
 class cColor
 {
 public:
 
-	enum : unsigned int
+	enum eColorLimits : unsigned int
 	{
 		COLOR_MIN = 0,
 		COLOR_MAX = 255,
@@ -28,6 +27,7 @@ public:
 	/** Returns whether the color is a valid color */
 	bool IsValid() const { return m_Color != COLOR_NONE; }
 
+
 	/** Changes the color */
 	void SetColor(unsigned char a_Red, unsigned char a_Green, unsigned char a_Blue);
 
@@ -35,10 +35,10 @@ public:
 	void SetRed(unsigned char a_Red);
 
 	/** Alters the green value of the color */
-	void SetGreen(unsigned char a_Red);
+	void SetGreen(unsigned char a_Green);
 
 	/** Alters the blue value of the color */
-	void SetBlue(unsigned char a_Red);
+	void SetBlue(unsigned char a_Blue);
 
 	/** Returns the red value of the color */
 	unsigned char GetRed() const;
@@ -55,4 +55,4 @@ public:
 
 	unsigned int m_Color;
 
-};
+};  // tolua_export

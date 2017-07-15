@@ -22,6 +22,7 @@ class cItemGrid;
 class cProjectileEntity;
 class cHangingEntity;
 class cWolf;
+class cOcelot;
 
 
 
@@ -231,8 +232,9 @@ protected:
 	void LoadZombieFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPigZombieFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
-	/** Loads the wolf's owner information from the NBT into the specified wolf entity. */
-	void LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_TagIdx);
+	/** Loads the owner name and UUID from the entity at the specified NBT tag.
+	Returns a pair of {name, uuid}. If the entity is not owned, both are empty strings. */
+	std::pair<AString, AString> LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads entity common data from the NBT compound; returns true if successful */
 	bool LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx);

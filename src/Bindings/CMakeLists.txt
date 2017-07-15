@@ -89,6 +89,7 @@ set(BINDING_DEPENDENCIES
 	../ChatColor.h
 	../ChunkDef.h
 	../ClientHandle.h
+	../Color.h
 	../CompositeChat.h
 	../CraftingRecipes.h
 	../Cuboid.h

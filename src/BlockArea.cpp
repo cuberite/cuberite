@@ -2787,7 +2787,7 @@ void cBlockArea::RemoveNonMatchingBlockEntities(void)
 
 cBlockArea::cChunkReader::cChunkReader(cBlockArea & a_Area) :
 	m_Area(a_Area),
-	m_AreaBounds(cCuboid(a_Area.GetOrigin(), a_Area.GetOrigin() + a_Area.GetSize())),
+	m_AreaBounds(cCuboid(a_Area.GetOrigin(), a_Area.GetOrigin() + a_Area.GetSize() - Vector3i(1, 1, 1))),
 	m_Origin(a_Area.m_Origin.x, a_Area.m_Origin.y, a_Area.m_Origin.z),
 	m_CurrentChunkX(0),
 	m_CurrentChunkZ(0)

@@ -70,6 +70,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_EAST));
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_WEST));
 
+				m_World->BroadcastSoundEffect("entity.horse.angry", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 1.0f);
 				m_Attachee->Detach();
 				m_bIsRearing = true;
 			}
