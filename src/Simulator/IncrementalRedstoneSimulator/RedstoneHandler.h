@@ -12,16 +12,8 @@ class cRedstoneHandler
 {
 public:
 
-	cRedstoneHandler(cWorld & a_World) :
-		m_World(a_World)
-	{
-	}
-
-public:
-
-	// Disable the copy constructor and assignment operator
-	cRedstoneHandler(const cRedstoneHandler &) = delete;
-	cRedstoneHandler & operator=(const cRedstoneHandler &) = delete;
+	cRedstoneHandler() = default;
+	DISALLOW_COPY_AND_ASSIGN(cRedstoneHandler);
 
 	struct PoweringData
 	{
@@ -63,44 +55,44 @@ public:
 		}
 	};
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) = 0;
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) = 0;
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) = 0;
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) = 0;
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const = 0;
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const = 0;
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const = 0;
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const = 0;
 
 	// Force a virtual destructor
 	virtual ~cRedstoneHandler() {}
 
 protected:
 
-	cWorld & m_World;
-
 	template <class Container>
-	static const Container StaticAppend(const Container && a_Lhs, const Container && a_Rhs)
+	static Container StaticAppend(const Container & a_Lhs, const Container & a_Rhs)
 	{
 		Container ToReturn = a_Lhs;
 		std::copy(a_Rhs.begin(), a_Rhs.end(), std::back_inserter(ToReturn));
 		return ToReturn;
 	}
 
-	inline static const Vector3i OffsetYP()
+	inline static Vector3i OffsetYP()
 	{
 		return Vector3i(0, 1, 0);
 	}
 
-	inline static const Vector3i OffsetYM()
+	inline static Vector3i OffsetYM()
 	{
 		return Vector3i(0, -1, 0);
 	}
 
-	static const cVector3iArray GetAdjustedRelatives(const Vector3i & a_Position, const cVector3iArray & a_Relatives)
+	static cVector3iArray GetAdjustedRelatives(Vector3i a_Position, cVector3iArray a_Relatives)
 	{
-		cVector3iArray Adjusted = a_Relatives;
-		std::for_each(Adjusted.begin(), Adjusted.end(), [a_Position](cVector3iArray::value_type & a_Entry) { a_Entry += a_Position; });
-		return Adjusted;
+		for (auto & Entry : a_Relatives)
+		{
+			Entry += a_Position;
+		}
+		return a_Relatives;
 	}
 
-	inline static const cVector3iArray GetRelativeAdjacents()
+	inline static cVector3iArray GetRelativeAdjacents()
 	{
 		return
 		{
@@ -115,7 +107,7 @@ protected:
 		};
 	}
 
-	inline static const cVector3iArray GetRelativeLaterals()
+	inline static cVector3iArray GetRelativeLaterals()
 	{
 		return
 		{

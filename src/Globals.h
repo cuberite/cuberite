@@ -175,10 +175,10 @@ template class SizeChecker<UInt16, 2>;
 template class SizeChecker<UInt8,  1>;
 
 // A macro to disallow the copy constructor and operator = functions
-// This should be used in the private: declarations for any class that shouldn't allow copying itself
+// This should be used in the declarations for any class that shouldn't allow copying itself
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-	TypeName(const TypeName &); \
-	void operator =(const TypeName &)
+	TypeName(const TypeName &) = delete; \
+	TypeName & operator =(const TypeName &) = delete
 
 // A macro that is used to mark unused local variables, to avoid pedantic warnings in gcc / clang / MSVC
 // Note that in MSVC it requires the full type of X to be known
@@ -227,7 +227,6 @@ template class SizeChecker<UInt8,  1>;
 	#include <cstring>
 	#include <pthread.h>
 	#include <semaphore.h>
-	#include <errno.h>
 	#include <fcntl.h>
 	#include <unistd.h>
 #endif

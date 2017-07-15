@@ -13,22 +13,17 @@ class cPressurePlateHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	cPressurePlateHandler(cWorld & a_World) :
-		super(a_World)
-	{
-	}
-
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
 
-		return static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->GetCachedPowerData(a_Position).PowerLevel;
+		return static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->GetCachedPowerData(a_Position).PowerLevel;
 	}
 
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 
@@ -56,7 +51,7 @@ public:
 			unsigned int m_NumberOfEntities;
 			bool m_FoundPlayer;
 		} PressurePlateCallback;
-		m_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), PressurePlateCallback);
+		a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), PressurePlateCallback);
 
 		switch (a_BlockType)
 		{
@@ -84,25 +79,26 @@ public:
 		}
 	}
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		UNUSED(a_PoweringData.PowerLevel);
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto Power = GetPowerLevel(a_Position, a_BlockType, a_Meta);
-		auto PreviousPower = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_BlockType, Power));
+		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
+		auto PreviousPower = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_BlockType, Power));
 
 		if (Power != PreviousPower.PowerLevel)
 		{
-			m_World.SetBlockMeta(a_Position, (Power == 0) ? E_META_PRESSURE_PLATE_RAISED : E_META_PRESSURE_PLATE_DEPRESSED);
+			a_World.SetBlockMeta(a_Position, (Power == 0) ? E_META_PRESSURE_PLATE_RAISED : E_META_PRESSURE_PLATE_DEPRESSED);
 			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
 		}
 
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
