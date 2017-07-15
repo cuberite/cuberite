@@ -19,7 +19,7 @@ class cForgeHandshake
 public:
 	cForgeHandshake(cClientHandle * client);
 	
-	void AugmentServerListPing(const char * ProtocolVersion, Json::Value & ResponseValue);
+	void augmentServerListPing(Json::Value & ResponseValue);
 	void BeginForgeHandshake(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 	
 	void SendServerHello();

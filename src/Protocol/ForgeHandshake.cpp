@@ -18,11 +18,10 @@ cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false)
 
 
 
-void cForgeHandshake::AugmentServerListPing(const char * ProtocolVersion, Json::Value & ResponseValue)
+void cForgeHandshake::augmentServerListPing(Json::Value & ResponseValue)
 {
 	// modinfo:
 	// TODO: only send if mods enabled
-	// TODO: pass ProtocolVersion to allow different mods from versions
 	Json::Value Modinfo;
 	Modinfo["type"] = "FML";
 
