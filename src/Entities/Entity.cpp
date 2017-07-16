@@ -693,7 +693,7 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 		}
 	}
 	int CappedEPF = std::min(20, TotalEPF);
-	return a_Damage * CappedEPF / 25.0;
+	return static_cast<int>(a_Damage * CappedEPF / 25.0);
 }
 
 
@@ -751,7 +751,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	// Ref.: http://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
 	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
-	return a_Damage * std::min(20.0, Reduction) / 25.0;
+	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
 }
 
 
