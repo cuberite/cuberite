@@ -73,9 +73,6 @@ public:
 		enchLure                 = 62,
 	} ;
 
-	/** A vector of all of the mutually-exclusive sets of enchantments */
-	static const std::vector<std::set<int> > IncompatibleEnchantments;
-
 	/** Creates an empty enchantments container */
 	cEnchantments(void);
 
@@ -122,7 +119,7 @@ public:
 	static int GetMultiplier(int a_EnchantmentID, bool WithBook);
 
 	/** Get the maximum level the enchantment can have */
-	static int GetLevelCap(int a_EnchantmentID);
+	static unsigned int GetLevelCap(int a_EnchantmentID);
 
 	/** Add enchantment weights from item to the vector */
 	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
@@ -165,10 +162,16 @@ protected:
 
 public:
 	/** Make this class iterable */
-	cMap::iterator begin() { return m_Enchantments.begin(); };
-	cMap::iterator end()   { return m_Enchantments.end(); };
+	cMap::iterator begin() { return m_Enchantments.begin(); }
+	cMap::iterator end()   { return m_Enchantments.end(); }
 
-} ;  // tolua_export
+private:
+	/** A vector of all of the mutually-exclusive sets of enchantments */
+	std::vector<std::set<int> > m_IncompatibleEnchantments;
+
+	/** Constructs the IncompatibleEnchantments table */
+	void BuildTable(void);
+};  // tolua_export
 
 
 

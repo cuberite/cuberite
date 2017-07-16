@@ -419,11 +419,11 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 
 
 
-int cItem::AddEnchantment(int a_EnchantmentID, int a_Level, bool a_WithBook)
+int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_WithBook)
 {
-	int OurLevel = m_Enchantments.GetLevel(a_EnchantmentID);
+	unsigned int OurLevel = m_Enchantments.GetLevel(a_EnchantmentID);
 	int Multiplier = cEnchantments::GetMultiplier(a_EnchantmentID, a_WithBook);
-	int NewLevel = 0;
+	unsigned int NewLevel = 0;
 	if (OurLevel > a_Level)
 	{
 		// They don't add anything to us
@@ -439,14 +439,14 @@ int cItem::AddEnchantment(int a_EnchantmentID, int a_Level, bool a_WithBook)
 		// Take the sacrifice's level
 		NewLevel = a_Level;
 	}
-	int LevelCap = cEnchantments::GetLevelCap(a_EnchantmentID);
+	unsigned int LevelCap = cEnchantments::GetLevelCap(a_EnchantmentID);
 	if (NewLevel > LevelCap)
 	{
 		NewLevel = LevelCap;
 	}
 
 	m_Enchantments.SetLevel(a_EnchantmentID, NewLevel);
-	return NewLevel * Multiplier;
+	return static_cast<int>(NewLevel) * Multiplier;
 }
 
 

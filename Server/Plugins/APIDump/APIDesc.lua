@@ -2696,6 +2696,23 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored",
 				},
+				IsCompatibleWith =
+				{
+					Params =
+					{
+						{
+							Name = "EnchantmentNumID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean"
+						},
+					},
+					Notes = "Returns true if the specified enchantment is not mutually exclusive with any of the enchantments stored by the object.",
+				},
 				IsEmpty =
 				{
 					Returns =
@@ -6552,6 +6569,24 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						},
 					},
 					Notes = "Adds the specified amount to the item count. Returns self (useful for chaining).",
+				},
+				AddEnchantmentsFromItem =
+				{
+					Params =
+					{
+						{
+							Name = "Sacrifice",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "LevelCost",
+							Type = "number",
+						},
+					},
+					Notes = "Adds the enchantments from the sacrificial item to this item, returning the cost as if this were an anvil.",
 				},
 				Clear =
 				{

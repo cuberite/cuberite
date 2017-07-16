@@ -202,7 +202,7 @@ public:
 	bool EnchantByXPLevels(int a_NumXPLevels);  // tolua_export
 
 	/** Adds this specific enchantment to this item, returning the cost */
-	int AddEnchantment(int a_EnchantmentID, int a_Level, bool a_WithBook);
+	int AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_WithBook);
 
 	/** Adds the enchantments on a_Other to this item, returning the
 	XP cost of the transfer. */

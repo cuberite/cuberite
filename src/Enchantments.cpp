@@ -14,7 +14,7 @@
 
 cEnchantments::cEnchantments(void)
 {
-	// Nothing needed yet, but the constructor needs to be declared and impemented in order to be usable
+	BuildTable();
 }
 
 
@@ -24,6 +24,33 @@ cEnchantments::cEnchantments(void)
 cEnchantments::cEnchantments(const AString & a_StringSpec)
 {
 	AddFromString(a_StringSpec);
+	BuildTable();
+}
+
+
+
+
+
+void cEnchantments::BuildTable()
+{
+	// Each group represents a mutually exclusive set
+	m_IncompatibleEnchantments =
+	{
+		// Armor
+		{ enchProtection, enchFireProtection, enchBlastProtection, enchProjectileProtection },
+
+		// Tool
+		{ enchFortune, enchSilkTouch },
+
+		// Sword
+		{ enchSharpness, enchSmite, enchBaneOfArthropods },
+
+		// Boots
+		// {enchDepthStrider, enchFrostWalker},
+
+		// Bow
+		// {enchInfinity, enchMending}
+	};
 }
 
 
@@ -167,7 +194,7 @@ bool cEnchantments::IsEmpty(void) const
 
 
 
-int cEnchantments::GetLevelCap(int a_EnchantmentID)
+unsigned int cEnchantments::GetLevelCap(int a_EnchantmentID)
 {
 	switch (a_EnchantmentID)
 	{
@@ -197,6 +224,8 @@ int cEnchantments::GetLevelCap(int a_EnchantmentID)
 	case enchLuckOfTheSea:         return 3;
 	case enchLure:                 return 3;
 	}
+	LOGWARNING("Unknown enchantment ID %d", a_EnchantmentID);
+	return 0;
 }
 
 
@@ -269,30 +298,9 @@ int cEnchantments::GetMultiplier(int a_EnchantmentID, bool WithBook)
 		case enchLure:                 return 4;
 		}
 	}
+	LOGWARNING("Unknown enchantment ID %d", a_EnchantmentID);
+	return 0;
 }
-
-
-
-
-
-// Each group represents a mutually exclusive set
-const std::vector<std::set<int> > cEnchantments::IncompatibleEnchantments =
-{
-	// Armor
-	{ enchProtection, enchFireProtection, enchBlastProtection, enchProjectileProtection },
-
-	// Tool
-	{ enchFortune, enchSilkTouch },
-
-	// Sword
-	{ enchSharpness, enchSmite, enchBaneOfArthropods },
-
-	// Boots
-	// {enchDepthStrider, enchFrostWalker},
-
-	// Bow
-	// {enchInfinity, enchMending}
-};
 
 
 
@@ -300,7 +308,7 @@ const std::vector<std::set<int> > cEnchantments::IncompatibleEnchantments =
 
 bool cEnchantments::IsCompatibleWith(int a_EnchantmentID) const
 {
-	for (auto mutex: IncompatibleEnchantments)
+	for (auto mutex: m_IncompatibleEnchantments)
 	{
 		if (mutex.count(a_EnchantmentID) != 0)
 		{
