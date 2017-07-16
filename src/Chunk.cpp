@@ -1148,7 +1148,7 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
 			static const struct
 			{
-				int x, y;
+				int x, z;
 			} Coords[] =
 			{
 				{-1,  0},
@@ -1159,7 +1159,7 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 			for (auto & Coord : Coords)
 			{
 				if (
-					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + 1, a_RelZ + Coord.y, BlockType) &&
+					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + 1, a_RelZ + Coord.z, BlockType) &&
 					(
 						cBlockInfo::IsSolid(BlockType) ||
 						(BlockType == E_BLOCK_LAVA) ||
