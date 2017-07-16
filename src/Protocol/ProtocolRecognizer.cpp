@@ -83,46 +83,58 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 		return;
 	}
 
-	if (m_InPingForUnrecognizedVersion)
+	if (!m_InPingForUnrecognizedVersion)
 	{
-		// We already know the verison; handle it here.
+		if (TryRecognizeProtocol())
+		{
+			// The protocol has just been recognized, dump the whole m_Buffer contents into it for parsing:
+			AString Dump;
+			m_Buffer.ResetRead();
+			m_Buffer.ReadAll(Dump);
+			m_Protocol->DataReceived(Dump.data(), Dump.size());
+			return;
+		}
+		else
+		{
+			m_Buffer.ResetRead();
+		}
+	}
+
+	if (!m_InPingForUnrecognizedVersion)
+	{
+		return;
+	}
+
+	// Handle server list ping packets
+	for (;;)
+	{
 		UInt32 PacketLen;
 		UInt32 PacketID;
-		if (!m_Buffer.ReadVarInt32(PacketLen))
+		if (
+			!m_Buffer.ReadVarInt32(PacketLen) ||
+			!m_Buffer.CanReadBytes(PacketLen) ||
+			!m_Buffer.ReadVarInt32(PacketID)
+		)
 		{
-			return;
-		}
-		if (!m_Buffer.ReadVarInt32(PacketID))
-		{
-			return;
-		}
-		if ((PacketID != 0x01) || (PacketLen != 9))
-		{
-			// Not a Ping packet
-			return;
+			// Not enough data
+			m_Buffer.ResetRead();
+			break;
 		}
 
-		Int64 Data;
-		if (!m_Buffer.ReadBEInt64(Data))
+		if ((PacketID == 0x00) && (PacketLen == 1))  // Request packet
 		{
+			HandlePacketStatusRequest();
+		}
+		else if ((PacketID == 0x01) && (PacketLen == 9))  // Ping packet
+		{
+			HandlePacketStatusPing();
+		}
+		else
+		{
+			m_Client->Kick("Server list ping failed, unrecognized packet");
 			return;
 		}
-
-		cPacketizer Pkt(*this, 0x01);  // Pong packet
-		Pkt.WriteBEInt64(Data);
-		return;
 	}
-
-	if (!TryRecognizeProtocol())
-	{
-		return;
-	}
-
-	// The protocol has just been recognized, dump the whole m_Buffer contents into it for parsing:
-	AString Dump;
-	m_Buffer.ResetRead();
-	m_Buffer.ReadAll(Dump);
-	m_Protocol->DataReceived(Dump.data(), Dump.size());
 }
 
 
@@ -1108,20 +1120,6 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			else
 			{
 				m_InPingForUnrecognizedVersion = true;
-
-				UInt32 PacketLen;
-				UInt32 PacketID;
-				if (!m_Buffer.ReadVarInt32(PacketLen))
-				{
-					return false;
-				}
-				if (!m_Buffer.ReadVarInt32(PacketID))
-				{
-					return false;
-				}
-				ASSERT(PacketID == 0x00);  // Request packet
-				ASSERT(PacketLen == 1);  // No payload except for packet ID
-				SendPingStatusResponse();
 			}
 			return false;
 		}
@@ -1155,7 +1153,7 @@ void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
 
 
 
-void cProtocolRecognizer::SendPingStatusResponse(void)
+void cProtocolRecognizer::HandlePacketStatusRequest(void)
 {
 	cServer * Server = cRoot::Get()->GetServer();
 	AString ServerDescription = Server->GetDescription();
@@ -1196,6 +1194,21 @@ void cProtocolRecognizer::SendPingStatusResponse(void)
 	Pkt.WriteString(Response);
 }
 
+
+
+
+
+void cProtocolRecognizer::HandlePacketStatusPing()
+{
+	Int64 Timestamp;
+	if (!m_Buffer.ReadBEInt64(Timestamp))
+	{
+		return;
+	}
+
+	cPacketizer Pkt(*this, 0x01);  // Pong packet
+	Pkt.WriteBEInt64(Timestamp);
+}
 
 
 
