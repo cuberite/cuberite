@@ -36,7 +36,7 @@ public:
 			return false;
 		}
 
-		// Check surroundings. Cacti may ONLY be surrounded by air
+		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
 		static const struct
 		{
 			int x, z;
@@ -53,7 +53,11 @@ public:
 			NIBBLETYPE BlockMeta;
 			if (
 				a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta) &&
-				cBlockInfo::IsSolid(BlockType)
+				(
+					cBlockInfo::IsSolid(BlockType) ||
+					(BlockType == E_BLOCK_LAVA) ||
+					(BlockType == E_BLOCK_STATIONARY_LAVA)
+				)
 			)
 			{
 				return false;
