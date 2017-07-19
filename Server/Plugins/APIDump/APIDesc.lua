@@ -4284,7 +4284,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etItemFrame =
 				{
-					Notes = "The entity is a item frame",
+					Notes = "The entity is an item frame",
 				},
 				etLeashKnot =
 				{
@@ -8566,7 +8566,7 @@ a_Player:OpenWindow(Window);
 							Type = "cEntity",
 						},
 					},
-					Notes = "Returns the entity to where this mob is leashed, returns nullptr if it's not leashed",
+					Notes = "Returns the entity to where this mob is leashed, returns nil if it's not leashed",
 				},
 				GetMobFamily =
 				{
@@ -8749,28 +8749,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name.",
 				},
-				SetLeashedTo =
-				{
-					Params =
-					{
-						{
-							Name = "Entity",
-							Type = "cEntity",
-						},
-					},
-					Notes = "Leash the monster to a entity.",
-				},
-				SetUnleashed =
-				{
-					Params =
-					{
-						{
-							Name = "ShouldDropPickup",
-							Type = "boolean",
-						},
-					},
-					Notes = "Unleash the monster from an entity.",
-				},
 				SetRelativeWalkSpeed =
 				{
 					Params =
@@ -8800,7 +8778,7 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the mob type ({{Globals#eMonsterType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
-				},
+				},			
 			},
 			Constants =
 			{

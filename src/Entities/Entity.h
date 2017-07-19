@@ -489,6 +489,15 @@ public:
 	/** Returns whether the entity is on ground or not */
 	virtual bool IsOnGround(void) const { return m_bOnGround; }
 
+	/** Adds a mob to the leashed list of mobs */
+	void AddLeashedMob(cMonster * a_Monster, bool a_ShouldBroadcast = true);
+
+	/** Removes a mob to the leashed list of mobs */
+	void RemoveLeashedMob(cMonster * a_Monster, bool dropPickup, bool a_ShouldBroadcast = true);
+
+	/** Returs whether the entity has any mob leashed to */
+	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
+
 	// tolua_end
 
 	/** Called when the specified player right-clicks this entity */
@@ -513,15 +522,6 @@ public:
 
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
-
-	/** Adds a mob to the leashed list of mobs */
-	void AddLeashedMob(cMonster * a_Monster, bool a_ShouldBroadcast = true);
-
-	/** Removes a mob to the leashed list of mobs */
-	void RemoveLeashedMob(cMonster * a_Monster, bool dropPickup, bool a_ShouldBroadcast = true);
-
-	/** Returs whether the entity has any mob leashed to */
-	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
 protected:
 	/** Structure storing the portal delay timer and cooldown boolean */

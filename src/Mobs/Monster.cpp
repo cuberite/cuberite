@@ -1407,7 +1407,7 @@ cMonster::eFamily cMonster::GetMobFamily(void) const
 
 
 
-void cMonster::SetLeashedTo(cEntity * a_Entity)
+void cMonster::LeashTo(cEntity * a_Entity)
 {
 	m_LeashedTo = a_Entity;
 
@@ -1418,14 +1418,14 @@ void cMonster::SetLeashedTo(cEntity * a_Entity)
 
 
 
-void cMonster::SetUnleashed(bool a_ShouldDropPickup)
+void cMonster::Unleash(bool a_ShouldDropLeashPickup)
 {
 	ASSERT(this->GetLeashedTo() != nullptr);
 
 	m_LeashedTo = nullptr;
 
 	// Drop pickup leash?
-	if (a_ShouldDropPickup)
+	if (a_ShouldDropLeashPickup)
 	{
 		cItems Pickups;
 		Pickups.Add(cItem(E_ITEM_LEAD, 1, 0));

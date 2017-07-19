@@ -86,15 +86,15 @@ public:
 	/** Returns whether the monster is leashed to an entity. */
 	bool IsLeashed() const { return (m_LeashedTo != nullptr); }
 
-	/** Leash the monster to a entity. */
-	void SetLeashedTo(cEntity * a_Entity);
-
-	/** Unleash the monster from an entity. */
-	void SetUnleashed(bool a_ShouldDropPickup);
-
 	/** Returns the entity to where this mob is leashed, returns nullptr if it's not leashed */
 	cEntity * GetLeashedTo() const { return m_LeashedTo; }
 	// tolua_end
+
+	/** Leash the monster to a entity. */
+	void LeashTo(cEntity * a_Entity);
+
+	/** Unleash the monster from an entity. */
+	void Unleash(bool a_ShouldDropLeashPickup);
 
 	/** Sets entity position to where is leashed this mob */
 	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = std::unique_ptr<Vector3d>(pos); }
