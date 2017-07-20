@@ -118,7 +118,7 @@ public:
 		virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) {}
 	};
 
-	typedef SharedPtr<cVerticalStrategy> cVerticalStrategyPtr;
+	typedef std::shared_ptr<cVerticalStrategy> cVerticalStrategyPtr;
 
 
 	/** Base class (interface) for the vertical limit of piece placement.
@@ -145,7 +145,7 @@ public:
 		virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) {}
 	};
 
-	typedef SharedPtr<cVerticalLimit> cVerticalLimitPtr;
+	typedef std::shared_ptr<cVerticalLimit> cVerticalLimitPtr;
 
 
 	/** The strategy used for vertical placement of this piece when it is used as a starting piece. */

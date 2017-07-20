@@ -36,7 +36,7 @@ cSslContext::~cSslContext()
 
 
 
-int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & a_CtrDrbg)
+int cSslContext::Initialize(bool a_IsClient, const std::shared_ptr<cCtrDrbgContext> & a_CtrDrbg)
 {
 	// Check double-initialization:
 	if (m_IsValid)

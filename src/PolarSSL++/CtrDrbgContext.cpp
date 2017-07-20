@@ -21,7 +21,7 @@ cCtrDrbgContext::cCtrDrbgContext(void) :
 
 
 
-cCtrDrbgContext::cCtrDrbgContext(const SharedPtr<cEntropyContext> & a_EntropyContext) :
+cCtrDrbgContext::cCtrDrbgContext(const std::shared_ptr<cEntropyContext> & a_EntropyContext) :
 	m_EntropyContext(a_EntropyContext),
 	m_IsValid(false)
 {
