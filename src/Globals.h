@@ -87,8 +87,6 @@
 	#define OBSOLETE __attribute__((deprecated))
 
 	// Some portability macros :)
-	#define stricmp strcasecmp
-
 	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 	#if defined(_WIN32)
