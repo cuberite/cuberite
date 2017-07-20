@@ -146,8 +146,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		m_IsFlying = true;
 		m_bVisible = false;
 	}
-
-	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
 
 
@@ -182,9 +180,6 @@ cPlayer::~cPlayer(void)
 	}
 
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
-
-	// Notify the server that the player is being destroyed
-	cRoot::Get()->GetServer()->PlayerDestroying(this);
 
 	SaveToDisk();
 
