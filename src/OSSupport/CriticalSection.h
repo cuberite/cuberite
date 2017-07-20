@@ -45,7 +45,7 @@ private:
 	std::thread::id m_OwningThreadID;
 
 	std::recursive_mutex m_Mutex;
-} ALIGN_8;
+};
 
 
 
