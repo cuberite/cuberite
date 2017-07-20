@@ -38,10 +38,6 @@
 
 	#define OBSOLETE __declspec(deprecated)
 
-	// No alignment needed in MSVC
-	#define ALIGN_8
-	#define ALIGN_16
-
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
@@ -89,9 +85,6 @@
 	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
-
-	#define ALIGN_8 __attribute__((aligned(8)))
-	#define ALIGN_16 __attribute__((aligned(16)))
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
