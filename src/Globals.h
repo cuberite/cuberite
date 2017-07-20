@@ -145,14 +145,10 @@ typedef unsigned char Byte;
 typedef Byte ColourID;
 
 
-// If you get an error about specialization check the size of integral types
-template <typename T, size_t Size, bool x = sizeof(T) == Size>
-class SizeChecker;
-
 template <typename T, size_t Size>
-class SizeChecker<T, Size, true>
+class SizeChecker
 {
-	T v;
+	static_assert(sizeof(T) == Size, "Check the size of integral types");
 };
 
 template class SizeChecker<Int64, 8>;
