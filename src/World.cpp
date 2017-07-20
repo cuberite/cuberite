@@ -2889,7 +2889,7 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
+void cWorld::QueueSetChunkData(cSetChunkDataPtr a_SetChunkData)
 {
 	// Validate biomes, if needed:
 	if (!a_SetChunkData->AreBiomesValid())
@@ -2908,7 +2908,7 @@ void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
 	// Store a copy of the data in the queue:
 	// TODO: If the queue is too large, wait for it to get processed. Not likely, though.
 	cCSLock Lock(m_CSSetChunkDataQueue);
-	m_SetChunkDataQueue.push_back(a_SetChunkData);
+	m_SetChunkDataQueue.push_back(std::move(a_SetChunkData));
 }
 
 
@@ -4092,7 +4092,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 		true
 	));
 	SetChunkData->RemoveInvalidBlockEntities();
-	m_World->QueueSetChunkData(SetChunkData);
+	m_World->QueueSetChunkData(std::move(SetChunkData));
 }
 
 

@@ -270,8 +270,8 @@ public:
 		Use a smart pointer for a copyable object. */
 		cTrackedRef(cTrackedRef &&) = delete;
 	};
-	typedef UniquePtr<cTrackedRef> cTrackedRefPtr;
-	typedef SharedPtr<cTrackedRef> cTrackedRefSharedPtr;
+	typedef std::unique_ptr<cTrackedRef> cTrackedRefPtr;
+	typedef std::shared_ptr<cTrackedRef> cTrackedRefSharedPtr;
 
 
 	/** Represents a stored callback to Lua that C++ code can call.
@@ -324,8 +324,8 @@ public:
 		Use cCallbackPtr for a copyable object. */
 		cCallback(cCallback &&) = delete;
 	};
-	typedef UniquePtr<cCallback> cCallbackPtr;
-	typedef SharedPtr<cCallback> cCallbackSharedPtr;
+	typedef std::unique_ptr<cCallback> cCallbackPtr;
+	typedef std::shared_ptr<cCallback> cCallbackSharedPtr;
 
 
 	/** Same thing as cCallback, but GetStackValue() won't fail if the callback value is nil.
@@ -354,7 +354,7 @@ public:
 		Use cCallbackPtr for a copyable object. */
 		cOptionalCallback(cOptionalCallback &&) = delete;
 	};
-	typedef UniquePtr<cOptionalCallback> cOptionalCallbackPtr;
+	typedef std::unique_ptr<cOptionalCallback> cOptionalCallbackPtr;
 
 
 	/** Represents a stored Lua table with callback functions that C++ code can call.
@@ -416,7 +416,7 @@ public:
 		Returns true on success, false on failure (not a table at the specified stack pos). */
 		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
 	};
-	typedef UniquePtr<cTableRef> cTableRefPtr;
+	typedef std::unique_ptr<cTableRef> cTableRefPtr;
 
 
 	/** Represents a parameter that is optional - calling a GetStackValue() with this object will not fail if the value on the Lua stack is nil.
@@ -539,7 +539,7 @@ public:
 		/** The stack index where the table resides in the Lua state. */
 		int m_StackPos;
 	};
-	typedef UniquePtr<cStackTable> cStackTablePtr;
+	typedef std::unique_ptr<cStackTable> cStackTablePtr;
 
 
 	/** Creates a new instance. The LuaState is not initialized.

@@ -37,7 +37,7 @@ protected:
 
 	void Callback(int a_ErrCode, struct addrinfo * a_Addr);
 };
-typedef SharedPtr<cHostnameLookup> cHostnameLookupPtr;
+typedef std::shared_ptr<cHostnameLookup> cHostnameLookupPtr;
 typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;
 
 

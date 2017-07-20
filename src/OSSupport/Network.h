@@ -15,15 +15,15 @@
 
 // fwd:
 class cTCPLink;
-typedef SharedPtr<cTCPLink> cTCPLinkPtr;
+typedef std::shared_ptr<cTCPLink> cTCPLinkPtr;
 typedef std::vector<cTCPLinkPtr> cTCPLinkPtrs;
 class cServerHandle;
-typedef SharedPtr<cServerHandle> cServerHandlePtr;
+typedef std::shared_ptr<cServerHandle> cServerHandlePtr;
 typedef std::vector<cServerHandlePtr> cServerHandlePtrs;
 class cCryptoKey;
-typedef SharedPtr<cCryptoKey> cCryptoKeyPtr;
+typedef std::shared_ptr<cCryptoKey> cCryptoKeyPtr;
 class cX509Cert;
-typedef SharedPtr<cX509Cert> cX509CertPtr;
+typedef std::shared_ptr<cX509Cert> cX509CertPtr;
 
 
 
@@ -61,7 +61,7 @@ public:
 		/** Called when an error is detected on the connection. */
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 	};
-	typedef SharedPtr<cCallbacks> cCallbacksPtr;
+	typedef std::shared_ptr<cCallbacks> cCallbacksPtr;
 
 
 	// Force a virtual destructor for all descendants:
@@ -215,7 +215,7 @@ protected:
 	}
 };
 
-typedef SharedPtr<cUDPEndpoint> cUDPEndpointPtr;
+typedef std::shared_ptr<cUDPEndpoint> cUDPEndpointPtr;
 
 
 
@@ -238,7 +238,7 @@ public:
 		/** Called when the Connect call fails. */
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 	};
-	typedef SharedPtr<cConnectCallbacks> cConnectCallbacksPtr;
+	typedef std::shared_ptr<cConnectCallbacks> cConnectCallbacksPtr;
 
 
 	/** Callbacks used when listening for incoming connections as a server. */
@@ -262,7 +262,7 @@ public:
 		/** Called when the socket fails to listen on the specified port. */
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 	};
-	typedef SharedPtr<cListenCallbacks> cListenCallbacksPtr;
+	typedef std::shared_ptr<cListenCallbacks> cListenCallbacksPtr;
 
 
 	/** Callbacks used when resolving names to IPs. */
@@ -298,7 +298,7 @@ public:
 		Only called if there was no error reported. */
 		virtual void OnFinished(void) = 0;
 	};
-	typedef SharedPtr<cResolveNameCallbacks> cResolveNameCallbacksPtr;
+	typedef std::shared_ptr<cResolveNameCallbacks> cResolveNameCallbacksPtr;
 
 
 	/** Queues a TCP connection to be made to the specified host.

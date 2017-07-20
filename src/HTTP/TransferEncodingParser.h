@@ -11,7 +11,7 @@
 
 // fwd:
 class cTransferEncodingParser;
-typedef SharedPtr<cTransferEncodingParser> cTransferEncodingParserPtr;
+typedef std::shared_ptr<cTransferEncodingParser> cTransferEncodingParserPtr;
 
 
 

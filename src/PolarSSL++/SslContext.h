@@ -44,7 +44,7 @@ public:
 
 	/** Initializes the context for use as a server or client.
 	Returns 0 on success, PolarSSL error on failure. */
-	int Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & a_CtrDrbg = SharedPtr<cCtrDrbgContext>());
+	int Initialize(bool a_IsClient, const std::shared_ptr<cCtrDrbgContext> & a_CtrDrbg = {});
 
 	/** Returns true if the object has been initialized properly. */
 	bool IsValid(void) const { return m_IsValid; }
@@ -98,7 +98,7 @@ protected:
 	bool m_IsValid;
 
 	/** The random generator to use */
-	SharedPtr<cCtrDrbgContext> m_CtrDrbg;
+	std::shared_ptr<cCtrDrbgContext> m_CtrDrbg;
 
 	/** The SSL context that PolarSSL uses. */
 	ssl_context m_Ssl;

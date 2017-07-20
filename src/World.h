@@ -39,7 +39,7 @@ class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
-typedef SharedPtr<cClientHandle> cClientHandlePtr;
+typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
@@ -63,7 +63,7 @@ class cDeadlockDetect;
 typedef std::list< cPlayer * > cPlayerList;
 typedef std::list< std::pair< cPlayer *, cWorld * > > cAwaitingPlayerList;
 
-typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
+typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
 typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 typedef cItemCallback<cPlayer>             cPlayerListCallback;
@@ -237,7 +237,7 @@ public:
 
 	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
 	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
-	void QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData);
+	void QueueSetChunkData(cSetChunkDataPtr a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,

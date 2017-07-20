@@ -18,7 +18,7 @@
 
 // fwd:
 class cUDPEndpointImpl;
-typedef SharedPtr<cUDPEndpointImpl> cUDPEndpointImplPtr;
+typedef std::shared_ptr<cUDPEndpointImpl> cUDPEndpointImplPtr;
 
 
 

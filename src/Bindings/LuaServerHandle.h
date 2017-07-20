@@ -18,10 +18,10 @@
 
 // fwd:
 class cLuaTCPLink;
-typedef SharedPtr<cLuaTCPLink> cLuaTCPLinkPtr;
+typedef std::shared_ptr<cLuaTCPLink> cLuaTCPLinkPtr;
 typedef std::vector<cLuaTCPLinkPtr> cLuaTCPLinkPtrs;
 class cLuaServerHandle;
-typedef SharedPtr<cLuaServerHandle> cLuaServerHandlePtr;
+typedef std::shared_ptr<cLuaServerHandle> cLuaServerHandlePtr;
 
 
 
