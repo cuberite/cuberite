@@ -3028,7 +3028,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "number",
 						},
 					},
-					Notes = "Applies durability to the armor, as if the armor blocked the given amount of damage.",
+					Notes = "Lowers armor durability, as if the armor blocked the given amount of damage.",
 				},
 				ArmorCoversAgainst =
 				{

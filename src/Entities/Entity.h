@@ -320,7 +320,7 @@ public:
 	/** Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover */
 	virtual int GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
 
-	/** Returns the hitpoints that the current enchantments would cover */
+	/** Returns the hitpoints that the currently equipped armor's enchantments would cover */
 	virtual int GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
 
 	/** Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit */
