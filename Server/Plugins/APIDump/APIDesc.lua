@@ -3048,6 +3048,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Schedules the entity to be destroyed; if ShouldBroadcast is not present or set to true, broadcasts the DestroyEntity packet",
 				},
+				DoesPreventBlockPlacement =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if this entity doesn't allow blocks to be placed intersecting the entity.",
+				},
 				GetAirLevel =
 				{
 					Returns =

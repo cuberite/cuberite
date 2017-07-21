@@ -2656,8 +2656,8 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 		cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
 			m_World->GetBlock(x - 1, y, z),
 			m_World->GetBlock(x + 1, y, z),
-			m_World->GetBlock(x, y - 1, z),
-			m_World->GetBlock(x, y + 1, z),
+			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock(x, y - 1, z),
+			(y == cChunkDef::Height - 1) ? E_BLOCK_AIR : m_World->GetBlock(x, y + 1, z),
 			m_World->GetBlock(x, y, z - 1),
 			m_World->GetBlock(x, y, z + 1)
 		);
@@ -2696,6 +2696,10 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 
 		virtual bool Item(cEntity * a_Entity) override
 		{
+			if (!a_Entity->DoesPreventBlockPlacement())
+			{
+				return false;
+			}
 			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
 			for (auto BlockBox: m_BoundingBoxes)
 			{

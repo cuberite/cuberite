@@ -36,6 +36,8 @@ public:
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
+	bool DoesPreventBlockPlacement(void) const override { return false; }
+
 	/** Returns whether this pickup is allowed to combine with other similar pickups */
 	bool CanCombine(void) const { return m_bCanCombine; }  // tolua_export
 
