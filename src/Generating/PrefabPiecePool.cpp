@@ -372,7 +372,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 
 
 
-UniquePtr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
+std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 	const AString & a_FileName,
 	cLuaState & a_LuaState,
 	const AString & a_PieceName,

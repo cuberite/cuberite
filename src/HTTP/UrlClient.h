@@ -86,7 +86,7 @@ public:
 		for such a response; instead, the redirect is silently attempted. */
 		virtual void OnRedirecting(const AString & a_NewLocation) {}
 	};
-	typedef UniquePtr<cCallbacks> cCallbacksPtr;
+	typedef std::unique_ptr<cCallbacks> cCallbacksPtr;
 
 
 	/** Used for HTTP status codes. */

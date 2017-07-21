@@ -540,7 +540,7 @@ void cWebAdmin::AddWebTab(
 	const AString & a_Title,
 	const AString & a_UrlPath,
 	const AString & a_PluginName,
-	SharedPtr<cWebAdmin::cWebTabCallback> a_Callback
+	std::shared_ptr<cWebAdmin::cWebTabCallback> a_Callback
 )
 {
 	cCSLock lock(m_CS);

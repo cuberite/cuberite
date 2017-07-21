@@ -392,6 +392,7 @@ void cBlockHandler::OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface 
 
 void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, const sSetBlock & a_BlockChange)
 {
+	OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta);
 }
 
 
