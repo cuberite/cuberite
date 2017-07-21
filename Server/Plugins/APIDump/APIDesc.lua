@@ -6575,21 +6575,23 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					Params =
 					{
 						{
-							name = "Enchantment ID",
-							type = "number",
+							Name = "Enchantment ID",
+							Type = "number",
 						},
 						{
-							name = "Level",
-							type = "number",
+							Name = "Level",
+							Type = "number",
 						},
 						{
-							name = "WithBook",
-							type = "boolean",
+							Name = "WithBook",
+							Type = "boolean",
 						},
 					},
 					Returns =
 					{
-						Type = "number",
+						{
+							Type = "number",
+						},
 					},
 					Notes = "Adds the given enchantment at the given level to this item, following anvil enchantment combining rules. Returns the XP level cost of the addition.",
 				},
