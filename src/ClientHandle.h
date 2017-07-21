@@ -44,7 +44,7 @@ class cWorld;
 class cCompositeChat;
 class cStatManager;
 class cClientHandle;
-typedef SharedPtr<cClientHandle> cClientHandlePtr;
+typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
 
 

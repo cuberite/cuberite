@@ -14,12 +14,7 @@ class cRedstoneToggleHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	cRedstoneToggleHandler(cWorld & a_World) :
-		super(a_World)
-	{
-	}
-
-	inline static const Vector3i GetPositionAttachedTo(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	inline static Vector3i GetPositionAttachedTo(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		switch (a_BlockType)
 		{
@@ -68,18 +63,19 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_QueryBlockType);
 		if ((GetPositionAttachedTo(a_Position, a_BlockType, a_Meta) == a_QueryPosition) || cIncrementalRedstoneSimulator::IsMechanism(a_QueryBlockType))
 		{
-			return GetPowerLevel(a_Position, a_BlockType, a_Meta);
+			return GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
 		}
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_Position);
 
 		switch (a_BlockType)
@@ -95,14 +91,15 @@ public:
 		}
 	}
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating templatio<> the lever/button (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);

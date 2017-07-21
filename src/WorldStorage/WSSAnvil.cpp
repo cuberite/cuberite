@@ -470,7 +470,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		std::move(Entities), std::move(BlockEntities),
 		false
 	));
-	m_World->QueueSetChunkData(SetChunkData);
+	m_World->QueueSetChunkData(std::move(SetChunkData));
 	return true;
 }
 

@@ -18,7 +18,7 @@
 
 // fwd:
 class cLuaUDPEndpoint;
-typedef SharedPtr<cLuaUDPEndpoint> cLuaUDPEndpointPtr;
+typedef std::shared_ptr<cLuaUDPEndpoint> cLuaUDPEndpointPtr;
 
 
 
