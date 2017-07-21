@@ -104,7 +104,7 @@ public:
 	/** Returns true if there are no enchantments */
 	bool IsEmpty(void) const;
 
-	/** Returns true if all of our enchantments are compatible with the other enchantment */
+	/** Returns true if all of our enchantments are compatible with the specified enchantment */
 	bool IsCompatibleWith(int a_EnchantmentID) const;
 
 	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name not found; case insensitive */
@@ -116,7 +116,7 @@ public:
 	// tolua_end
 
 	/** Get the XP cost multiplier for the enchantment (for anvils) */
-	static int GetMultiplier(int a_EnchantmentID, bool WithBook);
+	static int GetXPCostMultiplier(int a_EnchantmentID, bool WithBook);
 
 	/** Get the maximum level the enchantment can have */
 	static unsigned int GetLevelCap(int a_EnchantmentID);
@@ -164,13 +164,6 @@ public:
 	/** Make this class iterable */
 	cMap::iterator begin() { return m_Enchantments.begin(); }
 	cMap::iterator end()   { return m_Enchantments.end(); }
-
-private:
-	/** A vector of all of the mutually-exclusive sets of enchantments */
-	std::vector<std::set<int> > m_IncompatibleEnchantments;
-
-	/** Constructs the IncompatibleEnchantments table */
-	void BuildTable(void);
 };  // tolua_export
 
 

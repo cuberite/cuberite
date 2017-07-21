@@ -6570,12 +6570,35 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Adds the specified amount to the item count. Returns self (useful for chaining).",
 				},
+				AddEnchantment =
+				{
+					Params =
+					{
+						{
+							name = "Enchantment ID",
+							type = "number",
+						},
+						{
+							name = "Level",
+							type = "number",
+						},
+						{
+							name = "WithBook",
+							type = "boolean",
+						},
+					},
+					Returns =
+					{
+						Type = "number",
+					},
+					Notes = "Adds the given enchantment at the given level to this item, following anvil enchantment combining rules. Returns the XP level cost of the addition.",
+				},
 				AddEnchantmentsFromItem =
 				{
 					Params =
 					{
 						{
-							Name = "Sacrifice",
+							Name = "Additive",
 							Type = "cItem",
 						},
 					},

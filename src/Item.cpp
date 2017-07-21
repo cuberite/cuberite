@@ -422,7 +422,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_WithBook)
 {
 	unsigned int OurLevel = m_Enchantments.GetLevel(a_EnchantmentID);
-	int Multiplier = cEnchantments::GetMultiplier(a_EnchantmentID, a_WithBook);
+	int Multiplier = cEnchantments::GetXPCostMultiplier(a_EnchantmentID, a_WithBook);
 	unsigned int NewLevel = 0;
 	if (OurLevel > a_Level)
 	{
@@ -466,7 +466,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 	// as of July 2017 (Minecraft 1.12).
 
 	// Hand tool enchantments
-	std::set<int> SwordEnchantments =
+	static const std::set<int> SwordEnchantments =
 	{
 		cEnchantments::enchBaneOfArthropods,
 		cEnchantments::enchFireAspect,
@@ -476,7 +476,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 		cEnchantments::enchSmite,
 		cEnchantments::enchUnbreaking
 	};
-	std::set<int> AxeEnchantments =
+	static const std::set<int> AxeEnchantments =
 	{
 		cEnchantments::enchBaneOfArthropods,
 		cEnchantments::enchEfficiency,
@@ -486,31 +486,31 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 		cEnchantments::enchSmite,
 		cEnchantments::enchUnbreaking
 	};
-	std::set<int> ToolEnchantments =
+	static const std::set<int> ToolEnchantments =
 	{
 		cEnchantments::enchEfficiency,
 		cEnchantments::enchFortune,
 		cEnchantments::enchSilkTouch,
 		cEnchantments::enchUnbreaking
 	};
-	std::set<int> ShearEnchantments =
+	static const std::set<int> ShearEnchantments =
 	{
 		cEnchantments::enchEfficiency,
 		cEnchantments::enchUnbreaking
 	};
-	std::set<int> BowEnchantments =
+	static const std::set<int> BowEnchantments =
 	{
 		cEnchantments::enchFlame,
 		cEnchantments::enchInfinity,
 		cEnchantments::enchPower,
 		cEnchantments::enchPunch
 	};
-	std::set<int> FishingEnchantments =
+	static const std::set<int> FishingEnchantments =
 	{
 		cEnchantments::enchLuckOfTheSea,
 		cEnchantments::enchLure
 	};
-	std::set<int> MiscEnchantments =
+	static const std::set<int> MiscEnchantments =
 	{
 		cEnchantments::enchUnbreaking
 	};
@@ -545,7 +545,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 	}
 
 	// Armor enchantments
-	std::set<int> ArmorEnchantments =
+	static const std::set<int> ArmorEnchantments =
 	{
 		cEnchantments::enchBlastProtection,
 		cEnchantments::enchFireProtection,
@@ -554,12 +554,12 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 		cEnchantments::enchThorns,
 		cEnchantments::enchUnbreaking
 	};
-	std::set<int> HatOnlyEnchantments =
+	static const std::set<int> HatOnlyEnchantments =
 	{
 		cEnchantments::enchAquaAffinity,
 		cEnchantments::enchRespiration
 	};
-	std::set<int> BootOnlyEnchantments =
+	static const std::set<int> BootOnlyEnchantments =
 	{
 		cEnchantments::enchDepthStrider,
 		cEnchantments::enchFeatherFalling
