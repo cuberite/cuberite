@@ -33,7 +33,7 @@ public:
 	cCtrDrbgContext(void);
 
 	/** Constructs the context with the specified entropy context. */
-	cCtrDrbgContext(const SharedPtr<cEntropyContext> & a_EntropyContext);
+	cCtrDrbgContext(const std::shared_ptr<cEntropyContext> & a_EntropyContext);
 
 	/** Initializes the context.
 	a_Custom is optional additional data to use for entropy, nullptr is accepted.
@@ -45,7 +45,7 @@ public:
 
 protected:
 	/** The entropy source used for generating the random */
-	SharedPtr<cEntropyContext> m_EntropyContext;
+	std::shared_ptr<cEntropyContext> m_EntropyContext;
 
 	/** The random generator context */
 	ctr_drbg_context m_CtrDrbg;

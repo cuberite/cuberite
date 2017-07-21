@@ -68,7 +68,7 @@ public:
 protected:
 	int m_Seed;
 
-	SharedPtr<cProtIntGen> m_Gen;
+	std::shared_ptr<cProtIntGen> m_Gen;
 };
 
 

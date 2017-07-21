@@ -29,25 +29,48 @@
 
 
 
+const cRedstoneHandler * cIncrementalRedstoneSimulator::GetComponentHandler(BLOCKTYPE a_BlockType)
+{
+	struct sComponents:
+		public std::array<std::unique_ptr<cRedstoneHandler>, 256>
+	{
+		sComponents()
+		{
+			for (size_t i = 0; i != 256; ++i)
+			{
+				(*this)[i] = cIncrementalRedstoneSimulator::CreateComponent(static_cast<BLOCKTYPE>(i));
+			}
+		}
+	};
 
-std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent(cWorld & a_World, BLOCKTYPE a_BlockType, cIncrementalRedstoneSimulatorChunkData * a_Data)
+
+	static sComponents Components;
+	return Components[a_BlockType].get();
+}
+
+
+
+
+
+
+std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
 		case E_BLOCK_ACTIVATOR_RAIL:
 		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_POWERED_RAIL: return cpp14::make_unique<cPoweredRailHandler>(a_World);
+		case E_BLOCK_POWERED_RAIL: return cpp14::make_unique<cPoweredRailHandler>();
 
 		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_INACTIVE_COMPARATOR: return cpp14::make_unique<cRedstoneComparatorHandler>(a_World);
+		case E_BLOCK_INACTIVE_COMPARATOR: return cpp14::make_unique<cRedstoneComparatorHandler>();
 
 		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER: return cpp14::make_unique<cDropSpenserHandler>(a_World);
+		case E_BLOCK_DROPPER: return cpp14::make_unique<cDropSpenserHandler>();
 
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE: return cpp14::make_unique<cPressurePlateHandler>(a_World);
+		case E_BLOCK_WOODEN_PRESSURE_PLATE: return cpp14::make_unique<cPressurePlateHandler>();
 
 		case E_BLOCK_ACACIA_FENCE_GATE:
 		case E_BLOCK_BIRCH_FENCE_GATE:
@@ -56,41 +79,41 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_JUNGLE_FENCE_GATE:
 		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_TRAPDOOR: return cpp14::make_unique<cSmallGateHandler>(a_World);
+		case E_BLOCK_TRAPDOOR: return cpp14::make_unique<cSmallGateHandler>();
 
 		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON: return cpp14::make_unique<cRedstoneLampHandler>(a_World);
+		case E_BLOCK_REDSTONE_LAMP_ON: return cpp14::make_unique<cRedstoneLampHandler>();
 
 		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON: return cpp14::make_unique<cRedstoneRepeaterHandler>(a_World);
+		case E_BLOCK_REDSTONE_REPEATER_ON: return cpp14::make_unique<cRedstoneRepeaterHandler>();
 
 		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON: return cpp14::make_unique<cRedstoneTorchHandler>(a_World);
+		case E_BLOCK_REDSTONE_TORCH_ON: return cpp14::make_unique<cRedstoneTorchHandler>();
 
 		case E_BLOCK_PISTON:
-		case E_BLOCK_STICKY_PISTON: return cpp14::make_unique<cPistonHandler>(a_World);
+		case E_BLOCK_STICKY_PISTON: return cpp14::make_unique<cPistonHandler>();
 
 		case E_BLOCK_LEVER:
 		case E_BLOCK_STONE_BUTTON:
-		case E_BLOCK_WOODEN_BUTTON: return cpp14::make_unique<cRedstoneToggleHandler>(a_World);
+		case E_BLOCK_WOODEN_BUTTON: return cpp14::make_unique<cRedstoneToggleHandler>();
 
-		case E_BLOCK_BLOCK_OF_REDSTONE: return cpp14::make_unique<cRedstoneBlockHandler>(a_World);
-		case E_BLOCK_COMMAND_BLOCK: return cpp14::make_unique<cCommandBlockHandler>(a_World);
-		case E_BLOCK_NOTE_BLOCK: return cpp14::make_unique<cNoteBlockHandler>(a_World);
-		case E_BLOCK_REDSTONE_WIRE: return cpp14::make_unique<cRedstoneWireHandler>(a_World);
-		case E_BLOCK_TNT: return cpp14::make_unique<cTNTHandler>(a_World);
-		case E_BLOCK_TRAPPED_CHEST: return cpp14::make_unique<cTrappedChestHandler>(a_World);
-		case E_BLOCK_TRIPWIRE_HOOK: return cpp14::make_unique<cTripwireHookHandler>(a_World);
+		case E_BLOCK_BLOCK_OF_REDSTONE: return cpp14::make_unique<cRedstoneBlockHandler>();
+		case E_BLOCK_COMMAND_BLOCK: return cpp14::make_unique<cCommandBlockHandler>();
+		case E_BLOCK_NOTE_BLOCK: return cpp14::make_unique<cNoteBlockHandler>();
+		case E_BLOCK_REDSTONE_WIRE: return cpp14::make_unique<cRedstoneWireHandler>();
+		case E_BLOCK_TNT: return cpp14::make_unique<cTNTHandler>();
+		case E_BLOCK_TRAPPED_CHEST: return cpp14::make_unique<cTrappedChestHandler>();
+		case E_BLOCK_TRIPWIRE_HOOK: return cpp14::make_unique<cTripwireHookHandler>();
 		default:
 		{
 			if (cBlockDoorHandler::IsDoorBlockType(a_BlockType))
 			{
-				return cpp14::make_unique<cDoorHandler>(a_World);
+				return cpp14::make_unique<cDoorHandler>();
 			}
 
 			if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
 			{
-				return cpp14::make_unique<cSolidBlockHandler>(a_World);
+				return cpp14::make_unique<cSolidBlockHandler>();
 			}
 			return nullptr;
 		}
@@ -129,7 +152,7 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 			continue;
 		}
 
-		auto CurrentHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, CurrentBlock, &m_Data);
+		auto CurrentHandler = GetComponentHandler(CurrentBlock);
 		if (CurrentHandler == nullptr)  // Block at CurrentPosition doesn't have a corresponding redstone handler
 		{
 			// Clean up cached PowerData for CurrentPosition
@@ -139,7 +162,7 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 		}
 
 		cRedstoneHandler::PoweringData Power;
-		for (const auto & Location : CurrentHandler->GetValidSourcePositions(CurrentLocation, CurrentBlock, CurrentMeta))
+		for (const auto & Location : CurrentHandler->GetValidSourcePositions(m_World, CurrentLocation, CurrentBlock, CurrentMeta))
 		{
 			if (!cChunk::IsValidHeight(Location.y))
 			{
@@ -149,18 +172,18 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 			NIBBLETYPE PotentialMeta;
 			m_World.GetBlockTypeMeta(Location.x, Location.y, Location.z, PotentialBlock, PotentialMeta);
 
-			auto PotentialSourceHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, PotentialBlock, &m_Data);
+			auto PotentialSourceHandler = GetComponentHandler(PotentialBlock);
 			if (PotentialSourceHandler == nullptr)
 			{
 				continue;
 			}
 
-			decltype(Power) PotentialPower(PotentialBlock, PotentialSourceHandler->GetPowerDeliveredToPosition(Location, PotentialBlock, PotentialMeta, CurrentLocation, CurrentBlock));
+			decltype(Power) PotentialPower(PotentialBlock, PotentialSourceHandler->GetPowerDeliveredToPosition(m_World, Location, PotentialBlock, PotentialMeta, CurrentLocation, CurrentBlock));
 			Power = std::max(Power, PotentialPower);
 		}
 
 		// Inform the handler to update
-		cVector3iArray Updates = CurrentHandler->Update(CurrentLocation, CurrentBlock, CurrentMeta, Power);
+		cVector3iArray Updates = CurrentHandler->Update(m_World, CurrentLocation, CurrentBlock, CurrentMeta, Power);
 		WorkQueue.insert(WorkQueue.end(), Updates.begin(), Updates.end());
 
 		if (IsAlwaysTicked(CurrentBlock))

@@ -74,7 +74,7 @@ public:
 		/** Returns the cost of keeping this structure in the cache */
 		virtual size_t GetCacheCost(void) const { return 1; }
 	} ;
-	typedef SharedPtr<cStructure> cStructurePtr;
+	typedef std::shared_ptr<cStructure> cStructurePtr;
 	typedef std::list<cStructurePtr> cStructurePtrs;
 
 

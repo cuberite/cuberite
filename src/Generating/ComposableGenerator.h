@@ -30,11 +30,11 @@ class cTerrainShapeGen;
 class cTerrainHeightGen;
 class cTerrainCompositionGen;
 class cFinishGen;
-typedef SharedPtr<cBiomeGen>              cBiomeGenPtr;
-typedef SharedPtr<cTerrainShapeGen>       cTerrainShapeGenPtr;
-typedef SharedPtr<cTerrainHeightGen>      cTerrainHeightGenPtr;
-typedef SharedPtr<cTerrainCompositionGen> cTerrainCompositionGenPtr;
-typedef SharedPtr<cFinishGen>             cFinishGenPtr;
+typedef std::shared_ptr<cBiomeGen>              cBiomeGenPtr;
+typedef std::shared_ptr<cTerrainShapeGen>       cTerrainShapeGenPtr;
+typedef std::shared_ptr<cTerrainHeightGen>      cTerrainHeightGenPtr;
+typedef std::shared_ptr<cTerrainCompositionGen> cTerrainCompositionGenPtr;
+typedef std::shared_ptr<cFinishGen>             cFinishGenPtr;
 
 
 

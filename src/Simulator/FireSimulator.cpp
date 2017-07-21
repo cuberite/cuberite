@@ -145,6 +145,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
 		}
 		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
+		++itr;
 	}  // for itr - Data[]
 }
 
