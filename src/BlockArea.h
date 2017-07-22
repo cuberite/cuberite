@@ -119,10 +119,12 @@ public:
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 
-	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all. */
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
 	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas | baBlockEntities);
 
-	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all. */
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
 	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes = baTypes | baMetas | baBlockEntities);
 
 	// tolua_begin
@@ -320,6 +322,8 @@ public:
 	const Vector3i & GetOrigin(void) const { return m_Origin; }
 
 	// tolua_begin
+
+	cCuboid GetBounds(void) const;
 
 	int GetSizeX(void) const { return m_Size.x; }
 	int GetSizeY(void) const { return m_Size.y; }
