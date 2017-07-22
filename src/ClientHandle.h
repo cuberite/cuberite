@@ -268,6 +268,9 @@ public:  // tolua_export
 	
 	/** Returns the Forge mods installed on the client. */
 	const cForgeMods & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : cForgeMods::Unmodded(); }
+	
+	/** Returns true if the client is modded with Forge. */
+	bool IsModded(void) const { return m_ForgeHandshake.m_isForgeClient; }
 
 	// tolua_end
 
