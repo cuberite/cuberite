@@ -18,7 +18,7 @@
 
 // fwd:
 class cLuaServerHandle;
-typedef WeakPtr<cLuaServerHandle> cLuaServerHandleWPtr;
+typedef std::weak_ptr<cLuaServerHandle> cLuaServerHandleWPtr;
 
 
 

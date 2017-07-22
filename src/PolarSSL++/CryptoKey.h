@@ -69,7 +69,7 @@ protected:
 	pk_context * GetInternal(void) { return &m_Pk; }
 } ;
 
-typedef SharedPtr<cCryptoKey> cCryptoKeyPtr;
+typedef std::shared_ptr<cCryptoKey> cCryptoKeyPtr;
 
 
 

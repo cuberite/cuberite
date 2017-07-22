@@ -84,8 +84,8 @@ public:
 	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
 	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
 
-	static void ExtendPiston(Vector3i a_BlockPos, cWorld * a_World);
-	static void RetractPiston(Vector3i a_BlockPos, cWorld * a_World);
+	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
+	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -154,13 +154,13 @@ private:
 
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
 	static bool CanPushBlock(
-		const Vector3i & a_BlockPos, cWorld * a_World, bool a_RequirePushable,
+		const Vector3i & a_BlockPos, cWorld & a_World, bool a_RequirePushable,
 		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 
 	/** Moves a list of blocks in a specific direction */
 	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
-		cWorld * a_World, const Vector3i & a_PushDir
+		cWorld & a_World, const Vector3i & a_PushDir
 	);
 } ;
 

@@ -70,6 +70,18 @@ void cSimulatorManager::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk 
 
 
 
+void cSimulatorManager::WakeUpArea(const cCuboid & a_Area)
+{
+	for (cSimulators::iterator itr = m_Simulators.begin(); itr != m_Simulators.end(); ++itr)
+	{
+		itr->first->WakeUpArea(a_Area);
+	}
+}
+
+
+
+
+
 void cSimulatorManager::RegisterSimulator(cSimulator * a_Simulator, int a_Rate)
 {
 	m_Simulators.push_back(std::make_pair(a_Simulator, a_Rate));

@@ -44,7 +44,7 @@ public:
 
 protected:
 	class cVillage;  // fwd: VillageGen.cpp
-	typedef std::vector<SharedPtr<cVillagePiecePool> > cVillagePiecePools;
+	typedef std::vector<std::shared_ptr<cVillagePiecePool>> cVillagePiecePools;
 
 	/** The noise used for generating random numbers */
 	cNoise m_RandNoise;

@@ -329,11 +329,9 @@ AString StrToUpper(const AString & s)
 int NoCaseCompare(const AString & s1, const AString & s2)
 {
 	#ifdef _MSC_VER
-		// MSVC has stricmp that compares case-insensitive:
 		return _stricmp(s1.c_str(), s2.c_str());
 	#else
-		// Do it the hard way - convert both strings to lowercase:
-		return StrToLower(s1).compare(StrToLower(s2));
+		return strcasecmp(s1.c_str(), s2.c_str());
 	#endif  // else _MSC_VER
 }
 

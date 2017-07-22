@@ -38,10 +38,6 @@
 
 	#define OBSOLETE __declspec(deprecated)
 
-	// No alignment needed in MSVC
-	#define ALIGN_8
-	#define ALIGN_16
-
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
@@ -89,12 +85,6 @@
 	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
-
-	#define ALIGN_8 __attribute__((aligned(8)))
-	#define ALIGN_16 __attribute__((aligned(16)))
-
-	// Some portability macros :)
-	#define stricmp strcasecmp
 
 	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
@@ -154,14 +144,10 @@ typedef unsigned char Byte;
 typedef Byte ColourID;
 
 
-// If you get an error about specialization check the size of integral types
-template <typename T, size_t Size, bool x = sizeof(T) == Size>
-class SizeChecker;
-
 template <typename T, size_t Size>
-class SizeChecker<T, Size, true>
+class SizeChecker
 {
-	T v;
+	static_assert(sizeof(T) == Size, "Check the size of integral types");
 };
 
 template class SizeChecker<Int64, 8>;
@@ -175,10 +161,10 @@ template class SizeChecker<UInt16, 2>;
 template class SizeChecker<UInt8,  1>;
 
 // A macro to disallow the copy constructor and operator = functions
-// This should be used in the private: declarations for any class that shouldn't allow copying itself
+// This should be used in the declarations for any class that shouldn't allow copying itself
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-	TypeName(const TypeName &); \
-	void operator =(const TypeName &)
+	TypeName(const TypeName &) = delete; \
+	TypeName & operator =(const TypeName &) = delete
 
 // A macro that is used to mark unused local variables, to avoid pedantic warnings in gcc / clang / MSVC
 // Note that in MSVC it requires the full type of X to be known
@@ -227,7 +213,6 @@ template class SizeChecker<UInt8,  1>;
 	#include <cstring>
 	#include <pthread.h>
 	#include <semaphore.h>
-	#include <errno.h>
 	#include <fcntl.h>
 	#include <unistd.h>
 #endif
@@ -421,11 +406,6 @@ template class SizeChecker<UInt8,  1>;
 #ifdef SELF_TEST
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
-
-// Unified ptr types from before C++11. Also no silly undercores.
-#define SharedPtr std::shared_ptr
-#define WeakPtr std::weak_ptr
-#define UniquePtr std::unique_ptr
 
 
 

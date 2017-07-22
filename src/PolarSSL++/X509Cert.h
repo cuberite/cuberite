@@ -34,7 +34,7 @@ protected:
 	x509_crt * GetInternal(void) { return &m_Cert; }
 } ;
 
-typedef SharedPtr<cX509Cert> cX509CertPtr;
+typedef std::shared_ptr<cX509Cert> cX509CertPtr;
 
 
 
