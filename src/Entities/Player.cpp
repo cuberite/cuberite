@@ -2683,14 +2683,12 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 	{
 	public:
 		const std::vector<cBoundingBox> & m_BoundingBoxes;
-		cWorld * m_World;
 
 		// The distance inside the block the entity can still be.
 		const double EPSILON = 0.0005;
 
-		DoesIntersectBlock(const std::vector<cBoundingBox> & a_BoundingBoxes, cWorld * a_World) :
-			m_BoundingBoxes(a_BoundingBoxes),
-			m_World(a_World)
+		DoesIntersectBlock(const std::vector<cBoundingBox> & a_BoundingBoxes) :
+			m_BoundingBoxes(a_BoundingBoxes)
 		{
 		}
 
@@ -2713,7 +2711,7 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 			}
 			return false;
 		}
-	} Callback(PlacementBoxes, World);
+	} Callback(PlacementBoxes);
 
 	// See if any entities in that bounding box collide with anyone
 	if (!World->ForEachEntityInBox(PlacingBounds, Callback))
