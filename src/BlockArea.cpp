@@ -2704,7 +2704,7 @@ void cBlockArea::MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cB
 		{
 			auto srcIdx = a_Src.MakeIndex(srcX, srcY, srcZ);
 			auto itrSrc = a_Src.m_BlockEntities->find(srcIdx);
-			if (itrSrc == a_Src.m_BlockEntities->end())
+			if (itrSrc != a_Src.m_BlockEntities->end())
 			{
 				m_BlockEntities->insert({idx, itrSrc->second->Clone(x, y, z)});
 				continue;
