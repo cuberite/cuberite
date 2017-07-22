@@ -279,8 +279,13 @@ int cEnchantments::GetXPCostMultiplier(int a_EnchantmentID, bool WithBook)
 
 
 
-bool cEnchantments::IsCompatibleWith(int a_EnchantmentID) const
+bool cEnchantments::CanAddEnchantment(int a_EnchantmentID) const
 {
+	if (GetLevel(a_EnchantmentID) > 0)
+	{
+		return true;
+	}
+
 	static const std::vector<std::set<int> > IncompatibleEnchantments =
 	{
 		// Armor

@@ -584,7 +584,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 
 
 
-int cItem::AddEnchantmentsFromItem(cItem & a_Other)
+int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
 {
 	bool WithBook = (a_Other.m_ItemType == E_ITEM_ENCHANTED_BOOK);
 
@@ -594,7 +594,7 @@ int cItem::AddEnchantmentsFromItem(cItem & a_Other)
 	{
 		if (CanHaveEnchantment(Enchantment.first))
 		{
-			if (!m_Enchantments.IsCompatibleWith(Enchantment.first))
+			if (!m_Enchantments.CanAddEnchantment(Enchantment.first))
 			{
 				// Cost of incompatible enchantments
 				EnchantingCost += 1;

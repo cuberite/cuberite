@@ -104,8 +104,8 @@ public:
 	/** Returns true if there are no enchantments */
 	bool IsEmpty(void) const;
 
-	/** Returns true if all of our enchantments are compatible with the specified enchantment */
-	bool IsCompatibleWith(int a_EnchantmentID) const;
+	/** Returns true if the given enchantment could be legally added to this object. Note that adding the enchantment may not actually increase the level. */
+	bool CanAddEnchantment(int a_EnchantmentID) const;
 
 	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name not found; case insensitive */
 	static int StringToEnchantmentID(const AString & a_EnchantmentName);
@@ -162,8 +162,8 @@ protected:
 
 public:
 	/** Make this class iterable */
-	cMap::iterator begin() { return m_Enchantments.begin(); }
-	cMap::iterator end()   { return m_Enchantments.end(); }
+	cMap::const_iterator begin() const { return m_Enchantments.begin(); }
+	cMap::const_iterator end()   const { return m_Enchantments.end(); }
 };  // tolua_export
 
 

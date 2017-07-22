@@ -2696,7 +2696,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored",
 				},
-				IsCompatibleWith =
+				CanAddEnchantment =
 				{
 					Params =
 					{
@@ -6593,7 +6593,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "number",
 						},
 					},
-					Notes = "Adds the given enchantment at the given level to this item, following anvil enchantment combining rules. Returns the XP level cost of the addition.",
+					Notes = "Adds the given enchantment at the given level to this item, following anvil enchantment combining rules. Returns the XP level cost of the addition. WithBook specifies whether to use the XP multiplier for books or the multiplier used for other items, if true it uses the multiplier for books.",
 				},
 				AddEnchantmentsFromItem =
 				{
@@ -6611,7 +6611,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "number",
 						},
 					},
-					Notes = "Adds the enchantments from the sacrificial item to this item, returning the cost as if this were an anvil.",
+					Notes = "Adds the enchantments from the specified item to this item, returning the cost as if this were an anvil.",
 				},
 				Clear =
 				{
