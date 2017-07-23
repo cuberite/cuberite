@@ -121,7 +121,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 	m_ReceivedData(32 KiB),
 	m_IsEncrypted(false)
 {
-	
+
 	AStringVector Params;
 	SplitZeroTerminatedStrings(a_ServerAddress, Params);
 	

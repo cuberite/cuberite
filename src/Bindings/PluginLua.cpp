@@ -1093,7 +1093,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_WEATHER_CHANGED:              return "OnWeatherChanged";
 		case cPluginManager::HOOK_WEATHER_CHANGING:             return "OnWeatherChanging";
 		case cPluginManager::HOOK_WORLD_TICK:                   return "OnWorldTick";
-			
+
 		case cPluginManager::HOOK_NUM_HOOKS:
 		{
 			// Satisfy a warning that all enum values should be used in a switch

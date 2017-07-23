@@ -92,7 +92,7 @@ public:  // tolua_export
 	void SetUUID(const AString & a_UUID) { ASSERT(a_UUID.size() == 32); m_UUID = a_UUID; }
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
-	
+
 	/** Sets the player's properties, such as skin image and signature.
 	Used mainly by BungeeCord compatibility code - property querying is done on the BungeeCord server
 	and the results are passed to MCS running in offline mode. */

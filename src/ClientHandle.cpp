@@ -355,7 +355,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		{
 			m_Properties = a_Properties;
 		}
-		
+
 		// Send login success (if the protocol supports it):
 		m_Protocol->SendLoginSuccess();
 		
