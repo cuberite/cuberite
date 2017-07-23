@@ -71,16 +71,16 @@ public:
 	int  GetMaxPlayers(void) const { return m_MaxPlayers; }
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
-	
+
 	/** Add a Forge mod name/version to the server ping list. */
 	void RegisterForgeMod(AString & a_ModName, AString & a_ModVersion);
 
 	/** Add a Forge mod name/version to the server ping list for one protocol version. */
 	void RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
-	
+
 	/** Remove a Forge mod name/version from the server ping list. */
 	void UnregisterForgeMod(AString & a_ModName);
-	
+
 	/** Remove a Forge mod name/version to the server ping list for one protocol version. */
 	void UnregisterForgeModForProtocol(AString & a_ModName, UInt32 a_ProtocolVersionNumber);
 
@@ -160,9 +160,9 @@ public:
 	/** Returns true if usernames should be completed across worlds. This is read
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
-	
+
 	cForgeMods & GetRegisteredForgeMods(UInt32 a_Protocol);
-	
+
 private:
 
 	friend class cRoot;  // so cRoot can create and destroy cServer
@@ -240,7 +240,7 @@ private:
 	cForgeMods m_ForgeMods_1_11_0;
 	cForgeMods m_ForgeMods_1_11_1;
 	cForgeMods m_ForgeMods_1_12;
-	
+
 	/** True - allow same username to login more than once False - only once */
 	bool m_bAllowMultiLogin;
 

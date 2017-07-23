@@ -124,10 +124,10 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 
 	AStringVector Params;
 	SplitZeroTerminatedStrings(a_ServerAddress, Params);
-	
+
 	if (Params.size() >= 2) {
 		m_ServerAddress = Params[0];
-		
+
 		if (Params[1] == "FML") {
 			LOG("Forge client connected!");
 			m_Client->m_ForgeHandshake.m_isForgeClient = true;
@@ -136,9 +136,9 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 				// BungeeCord handling:
 				// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
 				// hostname\00ip-address\00uuid\00profile-properties-as-json
-				
+
 				LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
-				
+
 				m_Client->SetIPString(Params[1]);
 				m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
 				m_Client->SetProperties(Params[3]);

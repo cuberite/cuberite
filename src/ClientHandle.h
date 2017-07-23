@@ -265,10 +265,10 @@ public:  // tolua_export
 
 	/** Returns the client brand received in the MC|Brand plugin message or set by a plugin. */
 	const AString & GetClientBrand(void) const { return m_ClientBrand; }
-	
+
 	/** Returns the Forge mods installed on the client. */
 	const cForgeMods & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : cForgeMods::Unmodded(); }
-	
+
 	/** Returns true if the client is modded with Forge. */
 	bool IsModded(void) const { return m_ForgeHandshake.m_isForgeClient; }
 
@@ -384,9 +384,9 @@ public:  // tolua_export
 	void InvalidateCachedSentChunk();
 
 	bool IsPlayerChunkSent();
-	
+
 	cForgeHandshake m_ForgeHandshake;
-	
+
 	cForgeMods * m_ForgeMods;
 
 private:
@@ -395,9 +395,9 @@ private:
 	eDimension m_LastSentDimension;
 
 	friend class cServer;  // Needs access to SetSelf()
-	
+
 	friend class cForgeHandshake;   // Needs access to PostAuthenticate()
-	
+
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 
@@ -544,7 +544,7 @@ private:
 	cClientHandlePtr m_Self;
 
 	float m_BreakProgress;
-	
+
 	/** Finish logging the user in after authenticating. */
 	void FinishAuthenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 

@@ -29,7 +29,7 @@ cForgeMods::cForgeMods(AStringMap a):m_Mods(a)
 const cForgeMods & cForgeMods::Unmodded(void)
 {
 	static cForgeMods unmodded;
-	
+
 	return unmodded;
 }
 
@@ -93,10 +93,10 @@ void cForgeMods::Remove(AString & a_Name)
 	if (it != m_ModNames.end())
 	{
 		size_t index = std::distance(m_ModNames.begin(), it);
-		
+
 		m_ModNames.erase(m_ModNames.begin() + index);
 		m_ModVersions.erase(m_ModVersions.begin() + index);
 	}
-	
+
 	m_Mods.erase(a_Name);
 }

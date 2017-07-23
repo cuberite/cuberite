@@ -139,7 +139,7 @@ cClientHandle::~cClientHandle()
 		delete m_Player;
 		m_Player = nullptr;
 	}
-	
+
 	if (m_ForgeMods != nullptr)
 	{
 		delete m_ForgeMods;
@@ -358,7 +358,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 		// Send login success (if the protocol supports it):
 		m_Protocol->SendLoginSuccess();
-		
+
 		if (m_ForgeHandshake.m_isForgeClient)
 		{
 			m_ForgeHandshake.BeginForgeHandshake(a_Name, a_UUID, a_Properties);
