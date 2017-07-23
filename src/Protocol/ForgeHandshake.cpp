@@ -204,10 +204,10 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			// Send server-side Forge mods registered by plugins
 			auto &serverMods = m_Client->GetForgeMods();
 
-			UInt32 modCount = serverMods.GetNumMods();
+			size_t modCount = serverMods.GetNumMods();
 
 			buf.WriteBEInt8(Discriminator_ModList);
-			buf.WriteVarInt32(modCount);
+			buf.WriteVarInt32(static_cast<UInt32>(modCount));
 			for (size_t i = 0; i < modCount; ++i) {
 				buf.WriteVarUTF8String(serverMods.GetModNameAt(i));
 				buf.WriteVarUTF8String(serverMods.GetModVersionAt(i));

@@ -92,7 +92,7 @@ void cForgeMods::Remove(AString & a_Name)
 	auto it = std::find(m_ModNames.begin(), m_ModNames.end(), a_Name);
 	if (it != m_ModNames.end())
 	{
-		size_t index = std::distance(m_ModNames.begin(), it);
+		auto index = std::distance(m_ModNames.begin(), it);
 
 		m_ModNames.erase(m_ModNames.begin() + index);
 		m_ModVersions.erase(m_ModVersions.begin() + index);
