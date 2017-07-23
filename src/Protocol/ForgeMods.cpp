@@ -16,7 +16,7 @@ cForgeMods::cForgeMods()
 
 cForgeMods::cForgeMods(AStringMap a):m_Mods(a)
 {
-	for (auto const & item: a)
+	for (const auto & item: a)
 	{
 		m_ModNames.push_back(item.first);
 		m_ModVersions.push_back(item.second);

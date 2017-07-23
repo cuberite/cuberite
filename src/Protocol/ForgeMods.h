@@ -46,4 +46,4 @@ private:
 	AStringMap m_Mods;
 	AStringVector m_ModNames;
 	AStringVector m_ModVersions;
-} ; // tolua_export
+} ;  // tolua_export

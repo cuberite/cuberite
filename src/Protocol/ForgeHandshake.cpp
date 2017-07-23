@@ -19,12 +19,12 @@ cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false)
 
 
 
-void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
+void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 {
 	UInt32 ProtocolVersion = m_Client->GetProtocolVersion();
-	cForgeMods & mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
+	cForgeMods & Mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
 
-	if (!mods.HasMods())
+	if (!Mods.HasMods())
 	{
 		return;
 	}
@@ -37,7 +37,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
 
 	Json::Value ModList(Json::arrayValue);
 
-	for (auto& item: mods.GetMods())
+	for (auto & item: Mods.GetMods())
 	{
 		Json::Value Mod;
 		Mod["modid"] = item.first;
@@ -48,7 +48,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
 	Modinfo["modList"] = ModList;
 
 	// Augment the response:
-	ResponseValue["modinfo"] = Modinfo;
+	a_ResponseValue["modinfo"] = Modinfo;
 }
 
 
@@ -83,8 +83,10 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 void cForgeHandshake::SendServerHello()
 {
 	AString message;
-	message.push_back(Discriminator_ServerHello); // Discriminator	Byte	Always 0 for ServerHello
-	message.push_back('\2'); // FML protocol Version	Byte	Determined from NetworkRegistery. Currently 2.
+	// Discriminator | Byte | Always 0 for ServerHello
+	message.push_back(Discriminator_ServerHello);
+	// FML protocol Version | Byte | Determined from NetworkRegistery. Currently 2.
+	message.push_back('\2');
 	// Dimension TODO
 	message.push_back('\0');
 	message.push_back('\0');
@@ -101,14 +103,11 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	Int8 discriminator;
 	buf.ReadBEInt8(discriminator);
-	//LOG("ParseModList disc = %d", discriminator);
 
 	ASSERT(discriminator == 2);
 
 	UInt32 numMods;
 	buf.ReadVarInt32(numMods);
-
-	//LOG("ParseModList numMods = %d", numMods);
 
 	AStringMap mods;
 
@@ -120,7 +119,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 		mods.insert(std::pair<AString, AString>(name, version));
 
-		//LOG("ParseModList name=%s, version=%s", name.c_str(), version.c_str());
+		LOGD("ParseModList name=%s, version=%s", name.c_str(), version.c_str());
 	}
 
 	return mods;
@@ -128,16 +127,16 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
-	if (!m_isForgeClient) {
+	if (!m_isForgeClient)
+	{
 		LOG("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size);
 		return;
 	}
 
-	// TODO: handle errors
+	LOGD("Received Forge data: %zu bytes: %s", a_Size, a_Data);
 
-	LOG("Received Forge data: %zu bytes: %s", a_Size, a_Data);
-
-	if (a_Size <= 1) {
+	if (a_Size <= 1)
+	{
 		LOG("Received unexpectedly short Forge data (%zu bytes)", a_Size);
 		return;
 	}
@@ -151,8 +150,9 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			if (a_Size == 2)
 			{
 				int fmlProtocolVersion = a_Data[1];
-				LOG("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
-				if (fmlProtocolVersion != 2) {
+				LOGD("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
+				if (fmlProtocolVersion != 2)
+				{
 					LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
 					SetError();
 				}
@@ -168,11 +168,11 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 		case Discriminator_ModList:
 		{
-			LOG("Received ModList");
+			LOGD("Received ModList");
 
 			AStringMap clientMods = ParseModList(a_Data, a_Size);
 			AString clientModsString;
-			for (auto& item: clientMods)
+			for (auto & item: clientMods)
 			{
 				clientModsString.append(item.first);
 				clientModsString.append("@");
@@ -199,7 +199,8 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 			// Send server ModList
 
-			cByteBuffer buf(1024); // TODO: max size?
+			// TODO: max size?
+			cByteBuffer buf(1024);
 
 			// Send server-side Forge mods registered by plugins
 			auto &serverMods = m_Client->GetForgeMods();
@@ -208,7 +209,8 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 			buf.WriteBEInt8(Discriminator_ModList);
 			buf.WriteVarInt32(static_cast<UInt32>(modCount));
-			for (size_t i = 0; i < modCount; ++i) {
+			for (size_t i = 0; i < modCount; ++i)
+			{
 				buf.WriteVarUTF8String(serverMods.GetModNameAt(i));
 				buf.WriteVarUTF8String(serverMods.GetModVersionAt(i));
 			}
@@ -229,7 +231,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			}
 
 			int phase = a_Data[1];
-			LOG("Received client HandshakeAck with phase=%d", phase);
+			LOGD("Received client HandshakeAck with phase=%d", phase);
 
 			switch (phase)
 			{
@@ -260,7 +262,6 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 				case ClientPhase_WAITINGSERVERCOMPLETE:
 				{
 					LOG("Client finished receiving registry data; acknowledging");
-
 
 					AString ack;
 					ack.push_back(Discriminator_HandshakeAck);
@@ -297,6 +298,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 
 
-void cForgeHandshake::SetError() {
+void cForgeHandshake::SetError()
+{
 	m_Errored = true;
 }
