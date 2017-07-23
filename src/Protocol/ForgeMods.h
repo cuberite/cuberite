@@ -1,7 +1,7 @@
 
 // ForgeMods.h
 
-// Data structure listing the Forge mods name and versions
+// Data structure listing the Forge mods name and versions.
 
 #pragma once
 
@@ -16,7 +16,7 @@ public:
 	/** Returns the number of Forge mods. */
 	size_t GetNumMods(void) const;
 	
-	/** Returns true if the mod name is installed. */
+	/** Returns true if the mod with the given name is installed. */
 	bool HasMod(AString & name) const;
 	
 	/** Returns the version of the mod name given. */
