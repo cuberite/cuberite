@@ -28,9 +28,9 @@ cForgeMods::cForgeMods(AStringMap a):m_Mods(a)
 
 const cForgeMods & cForgeMods::Unmodded(void)
 {
-	static cForgeMods unmodded;
+	static cForgeMods Unmodded;
 
-	return unmodded;
+	return Unmodded;
 }
 
 

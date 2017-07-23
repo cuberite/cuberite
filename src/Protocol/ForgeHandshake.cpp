@@ -63,16 +63,16 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 	m_UUID = &a_UUID;
 	m_Properties = &a_Properties;
 
-	AStringVector channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
-	AString channelsString;
+	AStringVector Channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
+	AString ChannelsString;
 
-	for (AStringVector::iterator itr = channels.begin(); itr != channels.end(); ++itr)
+	for (AStringVector::iterator itr = Channels.begin(); itr != Channels.end(); ++itr)
 	{
-		channelsString.append(*itr);
-		channelsString.push_back('\0');
+		ChannelsString.append(*itr);
+		ChannelsString.push_back('\0');
 	}
 
-	m_Client->SendPluginMessage("REGISTER", channelsString);
+	m_Client->SendPluginMessage("REGISTER", ChannelsString);
 	SendServerHello();
 }
 
@@ -82,47 +82,47 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 
 void cForgeHandshake::SendServerHello()
 {
-	AString message;
+	AString Message;
 	// Discriminator | Byte | Always 0 for ServerHello
-	message.push_back(Discriminator_ServerHello);
+	Message.push_back(Discriminator_ServerHello);
 	// FML protocol Version | Byte | Determined from NetworkRegistery. Currently 2.
-	message.push_back('\2');
+	Message.push_back('\2');
 	// Dimension TODO
-	message.push_back('\0');
-	message.push_back('\0');
-	message.push_back('\0');
-	message.push_back('\0');
+	Message.push_back('\0');
+	Message.push_back('\0');
+	Message.push_back('\0');
+	Message.push_back('\0');
 
-	m_Client->SendPluginMessage("FML|HS", message);
+	m_Client->SendPluginMessage("FML|HS", Message);
 }
 
 AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 {
-	cByteBuffer buf(a_Size);
-	buf.Write(a_Data, a_Size);
+	cByteBuffer Buf(a_Size);
+	Buf.Write(a_Data, a_Size);
 
-	Int8 discriminator;
-	buf.ReadBEInt8(discriminator);
+	Int8 Discriminator;
+	Buf.ReadBEInt8(Discriminator);
 
-	ASSERT(discriminator == 2);
+	ASSERT(Discriminator == 2);
 
-	UInt32 numMods;
-	buf.ReadVarInt32(numMods);
+	UInt32 NumMods;
+	Buf.ReadVarInt32(NumMods);
 
-	AStringMap mods;
+	AStringMap Mods;
 
-	for (size_t i = 0; i < numMods; ++i)
+	for (size_t i = 0; i < NumMods; ++i)
 	{
-		AString name, version;
-		buf.ReadVarUTF8String(name);
-		buf.ReadVarUTF8String(version);
+		AString Name, Version;
+		Buf.ReadVarUTF8String(Name);
+		Buf.ReadVarUTF8String(Version);
 
-		mods.insert(std::pair<AString, AString>(name, version));
+		Mods.insert(std::pair<AString, AString>(Name, Version));
 
-		LOGD("ParseModList name=%s, version=%s", name.c_str(), version.c_str());
+		LOGD("ParseModList name=%s, version=%s", Name.c_str(), Version.c_str());
 	}
 
-	return mods;
+	return Mods;
 }
 
 void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
@@ -141,19 +141,19 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		return;
 	}
 
-	int discriminator = a_Data[0];
+	int Discriminator = a_Data[0];
 
-	switch (discriminator)
+	switch (Discriminator)
 	{
 		case Discriminator_ClientHello:
 		{
 			if (a_Size == 2)
 			{
-				int fmlProtocolVersion = a_Data[1];
-				LOGD("Received ClientHello with FML protocol version %d", fmlProtocolVersion);
-				if (fmlProtocolVersion != 2)
+				int FmlProtocolVersion = a_Data[1];
+				LOGD("Received ClientHello with FML protocol version %d", FmlProtocolVersion);
+				if (FmlProtocolVersion != 2)
 				{
-					LOG("Unsupported FML client protocol version received in ClientHello: %d", fmlProtocolVersion);
+					LOG("Unsupported FML client protocol version received in ClientHello: %d", FmlProtocolVersion);
 					SetError();
 				}
 			}
@@ -170,24 +170,24 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		{
 			LOGD("Received ModList");
 
-			AStringMap clientMods = ParseModList(a_Data, a_Size);
-			AString clientModsString;
-			for (auto & item: clientMods)
+			AStringMap ClientMods = ParseModList(a_Data, a_Size);
+			AString ClientModsString;
+			for (auto & item: ClientMods)
 			{
-				clientModsString.append(item.first);
-				clientModsString.append("@");
-				clientModsString.append(item.second);
-				clientModsString.append(", ");
+				ClientModsString.append(item.first);
+				ClientModsString.append("@");
+				ClientModsString.append(item.second);
+				ClientModsString.append(", ");
 			}
 
-			LOG("Client connected with %zu mods: %s", clientMods.size(), clientModsString.c_str());
+			LOG("Client connected with %zu mods: %s", ClientMods.size(), ClientModsString.c_str());
 
 			if (m_Client->m_ForgeMods != nullptr)
 			{
 				delete m_Client->m_ForgeMods;
 			}
 
-			m_Client->m_ForgeMods = new cForgeMods(clientMods);
+			m_Client->m_ForgeMods = new cForgeMods(ClientMods);
 
 			// Let the plugins know about this event, they may refuse the player:
 			if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client))
@@ -200,24 +200,24 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			// Send server ModList
 
 			// TODO: max size?
-			cByteBuffer buf(1024);
+			cByteBuffer Buf(1024);
 
 			// Send server-side Forge mods registered by plugins
-			auto &serverMods = m_Client->GetForgeMods();
+			auto &ServerMods = m_Client->GetForgeMods();
 
-			size_t modCount = serverMods.GetNumMods();
+			size_t ModCount = ServerMods.GetNumMods();
 
-			buf.WriteBEInt8(Discriminator_ModList);
-			buf.WriteVarInt32(static_cast<UInt32>(modCount));
-			for (size_t i = 0; i < modCount; ++i)
+			Buf.WriteBEInt8(Discriminator_ModList);
+			Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
+			for (size_t i = 0; i < ModCount; ++i)
 			{
-				buf.WriteVarUTF8String(serverMods.GetModNameAt(i));
-				buf.WriteVarUTF8String(serverMods.GetModVersionAt(i));
+				Buf.WriteVarUTF8String(ServerMods.GetModNameAt(i));
+				Buf.WriteVarUTF8String(ServerMods.GetModVersionAt(i));
 			}
-			AString serverModList;
-			buf.ReadAll(serverModList);
+			AString ServerModList;
+			Buf.ReadAll(ServerModList);
 
-			m_Client->SendPluginMessage("FML|HS", serverModList);
+			m_Client->SendPluginMessage("FML|HS", ServerModList);
 			break;
 		}
 
@@ -230,32 +230,32 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 				break;
 			}
 
-			int phase = a_Data[1];
-			LOGD("Received client HandshakeAck with phase=%d", phase);
+			int Phase = a_Data[1];
+			LOGD("Received client HandshakeAck with phase=%d", Phase);
 
-			switch (phase)
+			switch (Phase)
 			{
 				case ClientPhase_WAITINGSERVERDATA:
 				{
-					cByteBuffer buf(1024);
-					buf.WriteBEInt8(Discriminator_RegistryData);
+					cByteBuffer Buf(1024);
+					Buf.WriteBEInt8(Discriminator_RegistryData);
 
 					// TODO: send real registry data
-					bool hasMore = false;
-					AString registryName = "potions";
-					UInt32 numIDs = 0;
-					UInt32 numSubstitutions = 0;
-					UInt32 numDummies = 0;
+					bool HasMore = false;
+					AString RegistryName = "potions";
+					UInt32 NumIDs = 0;
+					UInt32 NumSubstitutions = 0;
+					UInt32 NumDummies = 0;
 
-					buf.WriteBool(hasMore);
-					buf.WriteVarUTF8String(registryName);
-					buf.WriteVarInt32(numIDs);
-					buf.WriteVarInt32(numSubstitutions);
-					buf.WriteVarInt32(numDummies);
+					Buf.WriteBool(HasMore);
+					Buf.WriteVarUTF8String(RegistryName);
+					Buf.WriteVarInt32(NumIDs);
+					Buf.WriteVarInt32(NumSubstitutions);
+					Buf.WriteVarInt32(NumDummies);
 
-					AString registryData;
-					buf.ReadAll(registryData);
-					m_Client->SendPluginMessage("FML|HS", registryData);
+					AString RegistryData;
+					Buf.ReadAll(RegistryData);
+					m_Client->SendPluginMessage("FML|HS", RegistryData);
 					break;
 				}
 
@@ -263,10 +263,10 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 				{
 					LOG("Client finished receiving registry data; acknowledging");
 
-					AString ack;
-					ack.push_back(Discriminator_HandshakeAck);
-					ack.push_back(ServerPhase_WAITINGCACK);
-					m_Client->SendPluginMessage("FML|HS", ack);
+					AString Ack;
+					Ack.push_back(Discriminator_HandshakeAck);
+					Ack.push_back(ServerPhase_WAITINGCACK);
+					m_Client->SendPluginMessage("FML|HS", Ack);
 					break;
 				}
 
@@ -274,10 +274,10 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 				{
 					LOG("Client is pending completion; sending complete ack");
 
-					AString ack;
-					ack.push_back(Discriminator_HandshakeAck);
-					ack.push_back(ServerPhase_COMPLETE);
-					m_Client->SendPluginMessage("FML|HS", ack);
+					AString Ack;
+					Ack.push_back(Discriminator_HandshakeAck);
+					Ack.push_back(ServerPhase_COMPLETE);
+					m_Client->SendPluginMessage("FML|HS", Ack);
 
 					// Now finish logging in
 					m_Client->FinishAuthenticate(*m_Name, *m_UUID, *m_Properties);
@@ -288,7 +288,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		}
 
 		default:
-			LOG("Unexpected Forge packet %d received", discriminator);
+			LOG("Unexpected Forge packet %d received", Discriminator);
 			SetError();
 			return;
 	}
