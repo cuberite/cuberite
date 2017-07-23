@@ -1952,6 +1952,18 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 
 
 
+cCuboid cBlockArea::GetBounds(void) const
+{
+	return cCuboid(
+		m_Origin.x, m_Origin.y, m_Origin.z,
+		m_Origin.x + m_Size.x - 1, m_Origin.y + m_Size.y - 1, m_Origin.z + m_Size.z - 1
+	);
+}
+
+
+
+
+
 size_t cBlockArea::CountNonAirBlocks(void) const
 {
 	// Check if blocktypes are valid:
@@ -2704,7 +2716,7 @@ void cBlockArea::MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cB
 		{
 			auto srcIdx = a_Src.MakeIndex(srcX, srcY, srcZ);
 			auto itrSrc = a_Src.m_BlockEntities->find(srcIdx);
-			if (itrSrc == a_Src.m_BlockEntities->end())
+			if (itrSrc != a_Src.m_BlockEntities->end())
 			{
 				m_BlockEntities->insert({idx, itrSrc->second->Clone(x, y, z)});
 				continue;

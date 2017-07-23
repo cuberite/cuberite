@@ -430,7 +430,6 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	int BaseZ = BlockStartZ - a_MinBlockZ;
 
 	// Copy blocktype and blockmeta:
-	// TODO: Right now each changed block is transmitted to all clients as a separate packet. Optimize this for larger areas.
 	BLOCKTYPE *  AreaBlockTypes = a_Area.GetBlockTypes();
 	NIBBLETYPE * AreaBlockMetas = a_Area.GetBlockMetas();
 	for (int y = 0; y < SizeY; y++)
@@ -1119,7 +1118,7 @@ int cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 
 int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 {
-	// Check the total height of the sugarcane blocks here:
+	// Check the total height of the cacti blocks here:
 	int Top = a_RelY + 1;
 	while (
 		(Top < cChunkDef::Height) &&
@@ -1142,11 +1141,38 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 	for (int i = 0; i < ToGrow; i++)
 	{
 		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
+		if (UnboundedRelGetBlockType(a_RelX, Top + i, a_RelZ, BlockType) && (BlockType == E_BLOCK_AIR))
 		{
-			// TODO: Check the surrounding blocks, if they aren't air, break the cactus block into pickups (and continue breaking blocks above in the next loop iterations)
 			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_CACTUS, 0);
+
+			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
+			static const struct
+			{
+				int x, z;
+			} Coords[] =
+			{
+				{-1,  0},
+				{ 1,  0},
+				{ 0, -1},
+				{ 0,  1},
+			} ;
+			for (auto & Coord : Coords)
+			{
+				if (
+					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + 1, a_RelZ + Coord.z, BlockType) &&
+					(
+						cBlockInfo::IsSolid(BlockType) ||
+						(BlockType == E_BLOCK_LAVA) ||
+						(BlockType == E_BLOCK_STATIONARY_LAVA)
+					)
+				)
+				{
+					return false;
+				}
+			}  // for i - Coords[]
+			{
+				GetWorld()->DigBlock(a_RelX + GetPosX() * cChunkDef::Width, Top + i, a_RelZ + GetPosZ() * cChunkDef::Width);
+			}
 		}
 		else
 		{

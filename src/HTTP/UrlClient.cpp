@@ -16,7 +16,7 @@
 
 // fwd:
 class cSchemeHandler;
-typedef SharedPtr<cSchemeHandler> cSchemeHandlerPtr;
+typedef std::shared_ptr<cSchemeHandler> cSchemeHandlerPtr;
 
 
 
@@ -40,7 +40,7 @@ public:
 	{
 		// Create a new instance of cUrlClientRequest, wrapped in a SharedPtr, so that it has a controlled lifetime.
 		// Cannot use std::make_shared, because the constructor is not public
-		SharedPtr<cUrlClientRequest> ptr (new cUrlClientRequest(
+		std::shared_ptr<cUrlClientRequest> ptr (new cUrlClientRequest(
 			a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 		));
 		return ptr->DoRequest(ptr);
@@ -128,10 +128,10 @@ protected:
 
 	/** SharedPtr to self, so that this object can keep itself alive for as long as it needs,
 	and pass self as callbacks to cNetwork functions. */
-	SharedPtr<cUrlClientRequest> m_Self;
+	std::shared_ptr<cUrlClientRequest> m_Self;
 
 	/** The handler that "talks" the protocol specified in m_UrlScheme, handles all the sending and receiving. */
-	SharedPtr<cSchemeHandler> m_SchemeHandler;
+	std::shared_ptr<cSchemeHandler> m_SchemeHandler;
 
 	/** The link handling the request. */
 	cTCPLinkPtr m_Link;
@@ -161,7 +161,7 @@ protected:
 	}
 
 
-	std::pair<bool, AString> DoRequest(SharedPtr<cUrlClientRequest> a_Self);
+	std::pair<bool, AString> DoRequest(std::shared_ptr<cUrlClientRequest> a_Self);
 
 
 	// cNetwork::cConnectCallbacks override: TCP link connected:
@@ -569,7 +569,7 @@ void cUrlClientRequest::OnRemoteClosed()
 
 
 
-std::pair<bool, AString> cUrlClientRequest::DoRequest(SharedPtr<cUrlClientRequest> a_Self)
+std::pair<bool, AString> cUrlClientRequest::DoRequest(std::shared_ptr<cUrlClientRequest> a_Self)
 {
 	// We need a shared pointer to self, care must be taken not to pass any other ptr:
 	ASSERT(a_Self.get() == this);

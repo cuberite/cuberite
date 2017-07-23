@@ -638,15 +638,28 @@ return
 				Returns =
 				{
 					{
-						Name = "BLOCKTYPE",
+						Name = "BlockType",
 						Type = "number",
 					},
 					{
-						Name = "NIBBLETYPE",
+						Name = "BlockMeta",
 						Type = "number",
 					},
 				},
 				Notes = "Returns the block type and meta at the specified absolute coords",
+			},
+
+			GetBounds =
+			{
+				Params = {},
+				Returns =
+				{
+					{
+						Name = "Bounds",
+						Type = "cCuboid",
+					}
+				},
+				Notes = "Returns the {{cCuboid|cuboid}} that specifies the original coords of the world from which the area was read. Basically constructs a {{cCuboid}} out of GetOrigin() and GetOrigin() + GetCoordRange().",
 			},
 
 			GetCoordRange =

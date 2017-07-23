@@ -190,7 +190,7 @@ protected:
 	Returns the prefab on success, nullptr on failure.
 	a_PieceName is the identification of the piece, used for logging only.
 	If a_LogWarnings is true, logs a warning to console when loading fails. */
-	UniquePtr<cPrefab> LoadPrefabFromCubesetVer1(
+	std::unique_ptr<cPrefab> LoadPrefabFromCubesetVer1(
 		const AString & a_FileName,
 		cLuaState & a_LuaState,
 		const AString & a_PieceName,

@@ -58,13 +58,13 @@ protected :
 	eMonsterType ChooseMobType(EMCSBiome a_Biome);
 
 	/** Adds toAdd into toAddIn, if toAdd is in m_AllowedTypes */
-	void addIfAllowed(eMonsterType toAdd, std::set<eMonsterType> & toAddIn);
+	void addIfAllowed(eMonsterType toAdd, std::vector<eMonsterType> & toAddIn);
 
 	cMonster::eFamily m_MonsterFamily;
 	std::set<eMonsterType> m_AllowedTypes;
 	bool m_NewPack;
 	eMonsterType m_MobType;
-	std::set<cMonster*> m_Spawned;
+	std::set<cMonster *> m_Spawned;
 } ;
 
 

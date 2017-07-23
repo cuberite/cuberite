@@ -29,7 +29,7 @@ class cSettingsRepositoryInterface;
 class cDeadlockDetect;
 struct TakeDamageInfo;
 
-typedef SharedPtr<cPlugin> cPluginPtr;
+typedef std::shared_ptr<cPlugin> cPluginPtr;
 typedef std::vector<cPluginPtr> cPluginPtrs;
 
 
@@ -188,7 +188,7 @@ public:
 		) = 0;
 	};
 
-	typedef SharedPtr<cCommandHandler> cCommandHandlerPtr;
+	typedef std::shared_ptr<cCommandHandler> cCommandHandlerPtr;
 
 
 	/** The interface used for enumerating and extern-calling plugins */

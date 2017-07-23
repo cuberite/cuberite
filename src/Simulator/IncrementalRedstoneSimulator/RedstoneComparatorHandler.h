@@ -13,12 +13,7 @@ class cRedstoneComparatorHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	cRedstoneComparatorHandler(cWorld & a_World) :
-		super(a_World)
-	{
-	}
-
-	unsigned char GetFrontPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel)
+	unsigned char GetFrontPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel) const
 	{
 		if (cBlockComparatorHandler::IsInSubtractionMode(a_Meta))
 		{
@@ -32,15 +27,19 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
+		auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 
-		return (cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) == a_QueryPosition) ? static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->GetCachedPowerData(a_Position).PowerLevel : 0;
+		return (
+			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) == a_QueryPosition) ?
+			ChunkData->GetCachedPowerData(a_Position).PowerLevel : 0
+		);
 	}
 
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
@@ -77,36 +76,33 @@ public:
 		} CCB;
 
 		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x3);
-		m_World.DoWithBlockEntityAt(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, CCB);
+		a_World.DoWithBlockEntityAt(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, CCB);
 		auto RearPower = CCB.m_SignalStrength;
+		auto RearType = a_World.GetBlock(RearCoordinate);
 
-		auto PotentialSourceHandler = cIncrementalRedstoneSimulator::CreateComponent(m_World, m_World.GetBlock(RearCoordinate), static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData());
+		auto PotentialSourceHandler = cIncrementalRedstoneSimulator::GetComponentHandler(RearType);
 		if (PotentialSourceHandler != nullptr)
 		{
-			BLOCKTYPE Type;
-			NIBBLETYPE Meta;
-			if (m_World.GetBlockTypeMeta(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, Type, Meta))
-			{
-				RearPower = std::max(CCB.m_SignalStrength, PotentialSourceHandler->GetPowerDeliveredToPosition(RearCoordinate, Type, Meta, a_Position, a_BlockType));
-			}
+			NIBBLETYPE RearMeta = a_World.GetBlockMeta(RearCoordinate);
+			RearPower = std::max(CCB.m_SignalStrength, PotentialSourceHandler->GetPowerDeliveredToPosition(a_World, RearCoordinate, RearType, RearMeta, a_Position, a_BlockType));
 		}
 
 		return RearPower;
 	}
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// Note that a_PoweringData here contains the maximum * side * power level, as specified by GetValidSourcePositions
 		// LOGD("Evaluating ALU the comparator (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-		auto Data = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData();
+		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 		auto DelayInfo = Data->GetMechanismDelayInfo(a_Position);
 
 		// Delay is used here to prevent an infinite loop (#3168)
 		if (DelayInfo == nullptr)
 		{
-			auto RearPower = GetPowerLevel(a_Position, a_BlockType, a_Meta);
-			auto FrontPower = GetFrontPowerLevel(a_Position, a_BlockType, a_Meta, a_PoweringData.PowerLevel, RearPower);
-			auto PreviousFrontPower = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, FrontPower));
+			auto RearPower = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
+			auto FrontPower = GetFrontPowerLevel(a_World, a_Position, a_BlockType, a_Meta, a_PoweringData.PowerLevel, RearPower);
+			auto PreviousFrontPower = Data->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, FrontPower));
 
 			bool ShouldBeOn = (RearPower > 0);  // Provide visual indication by examining * rear * power level
 			bool ShouldUpdate = (FrontPower != PreviousFrontPower.PowerLevel);  // "Business logic" (:P) - determine by examining *side* power levels
@@ -124,7 +120,7 @@ public:
 
 			if (DelayTicks == 0)
 			{
-				m_World.SetBlockMeta(a_Position, ShouldPowerOn ? (a_Meta | 0x8) : (a_Meta & 0x7));
+				a_World.SetBlockMeta(a_Position, ShouldPowerOn ? (a_Meta | 0x8) : (a_Meta & 0x7));
 				Data->m_MechanismDelays.erase(a_Position);
 
 				// Assume that an update (to front power) is needed.
@@ -138,8 +134,9 @@ public:
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_BlockType);
 		return cVector3iArray {cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, false), cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, true)};
 	}
