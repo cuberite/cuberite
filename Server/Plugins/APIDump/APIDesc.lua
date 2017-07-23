@@ -8657,6 +8657,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns whether the monster is leashed to an entity.",
+				},
+				LeashTo =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						}
+					},
+					Notes = "Leash the monster to an entity.",
 				},				
 				MobTypeToString =
 				{
@@ -8778,7 +8789,18 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the mob type ({{Globals#eMonsterType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
-				},			
+				},
+				Unleash =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldDropLeashPickup",
+							Type = "boolean",
+						},
+					},
+					Notes = "Unleash the monster.",
+				},
 			},
 			Constants =
 			{

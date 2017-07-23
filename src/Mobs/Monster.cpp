@@ -140,7 +140,7 @@ void cMonster::Destroy(bool a_ShouldBroadcast)
 	if (IsLeashed())
 	{
 		cEntity * LeashedTo = GetLeashedTo();
-		LeashedTo->RemoveLeashedMob(this, false, a_ShouldBroadcast);
+		Unleash(false, a_ShouldBroadcast);
 
 		// Remove leash knot if there are no more mobs leashed to
 		if (!LeashedTo->HasAnyMobLeashed() && LeashedTo->IsLeashKnot())
@@ -430,7 +430,7 @@ void cMonster::CalcLeashActions()
 		auto LeashKnot = cLeashKnot::FindKnotAtPos(*m_World, { FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z) });
 		if (LeashKnot != nullptr)
 		{
-			LeashKnot->AddLeashedMob(this);
+			LeashTo(LeashKnot);
 			SetLeashToPos(nullptr);
 		}
 	}
@@ -445,7 +445,7 @@ void cMonster::CalcLeashActions()
 		if (Distance > 10.0)
 		{
 			LOGD("Leash broken (distance)");
-			m_LeashedTo->RemoveLeashedMob(this, false);
+			Unleash(false);
 		}
 	}
 }
@@ -674,7 +674,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	m_IsLeashActionJustDone = false;
 	if (IsLeashed() && (GetLeashedTo() == &a_Player))  // a player can only unleash a mob leashed to him
 	{
-		a_Player.RemoveLeashedMob(this, !a_Player.IsGameModeCreative());
+		Unleash(!a_Player.IsGameModeCreative());
 	}
 	else if (IsLeashed())
 	{
@@ -687,8 +687,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
-		a_Player.AddLeashedMob(this);
-
+		LeashTo(&a_Player);
 	}
 }
 
@@ -1407,9 +1406,16 @@ cMonster::eFamily cMonster::GetMobFamily(void) const
 
 
 
-void cMonster::LeashTo(cEntity * a_Entity)
+void cMonster::LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast)
 {
 	m_LeashedTo = a_Entity;
+
+	a_Entity->AddLeashedMob(this);
+
+	if (a_ShouldBroadcast)
+	{
+		m_World->BroadcastLeashEntity(*this, *a_Entity);
+	}
 
 	m_IsLeashActionJustDone = true;
 }
@@ -1418,18 +1424,27 @@ void cMonster::LeashTo(cEntity * a_Entity)
 
 
 
-void cMonster::Unleash(bool a_ShouldDropLeashPickup)
+void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast, bool a_ShouldRemoveFromEntity)
 {
 	ASSERT(this->GetLeashedTo() != nullptr);
 
+	if (a_ShouldRemoveFromEntity)
+	{
+		m_LeashedTo->RemoveLeashedMob(this);
+	}
+
 	m_LeashedTo = nullptr;
 
-	// Drop pickup leash?
 	if (a_ShouldDropLeashPickup)
 	{
 		cItems Pickups;
 		Pickups.Add(cItem(E_ITEM_LEAD, 1, 0));
 		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
+	}
+
+	if (a_ShouldBroadcast)
+	{
+		m_World->BroadcastUnleashEntity(*this);
 	}
 
 	m_IsLeashActionJustDone = true;

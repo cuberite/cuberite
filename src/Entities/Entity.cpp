@@ -230,8 +230,7 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	// Unleash leashed mobs
 	for (auto LeashedMob : m_LeashedMobs)
 	{
-		LeashedMob->Unleash(true);
-		m_World->BroadcastUnleashEntity(*LeashedMob);
+		LeashedMob->Unleash(true, true, false);
 	}
 	m_LeashedMobs.clear();
 
@@ -2265,35 +2264,23 @@ void cEntity::SetPosition(const Vector3d & a_Position)
 
 
 
-void cEntity::AddLeashedMob(cMonster * a_Monster, bool a_ShouldBroadcast)
+void cEntity::AddLeashedMob(cMonster * a_Monster)
 {
 	// Not there already
 	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) == m_LeashedMobs.end());
 
-	a_Monster->LeashTo(this);
 	m_LeashedMobs.push_back(a_Monster);
-
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastLeashEntity(*a_Monster, *this);
-	}
 }
 
 
 
 
-void cEntity::RemoveLeashedMob(cMonster * a_Monster, bool a_DropPickup, bool a_ShouldBroadcast)
+void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 {
 	ASSERT(a_Monster->GetLeashedTo() == this);
 
 	// Must exists
 	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
 
-	a_Monster->Unleash(a_DropPickup);
 	m_LeashedMobs.remove(a_Monster);
-
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastUnleashEntity(*a_Monster);
-	}
 }

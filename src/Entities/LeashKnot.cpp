@@ -82,8 +82,8 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadCas
 			}
 
 			// All conditions met, unleash from player and leash to fence
-			PotentialLeashed->GetLeashedTo()->RemoveLeashedMob(PotentialLeashed, false, false);
-			m_Knot->AddLeashedMob(PotentialLeashed, m_ShouldBroadcast);
+			PotentialLeashed->Unleash(false, false);
+			PotentialLeashed->LeashTo(m_Knot, m_ShouldBroadcast);
 			return false;
 		}
 	} LookForLeashedsCallback(this, &a_Player, a_ShouldBroadCast);
