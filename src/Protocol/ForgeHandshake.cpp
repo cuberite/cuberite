@@ -24,7 +24,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
 	UInt32 ProtocolVersion = m_Client->GetProtocolVersion();
 	cForgeMods & mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
 	
-	if (!mods.IsModded())
+	if (!mods.HasMods())
 	{
 		return;
 	}
