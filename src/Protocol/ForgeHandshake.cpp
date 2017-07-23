@@ -201,23 +201,16 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			
 			cByteBuffer buf(1024); // TODO: max size?
 			
-			// TODO: allow plugins to register mods, for now, using based on what my test client sent
-			struct {
-				AString name;
-				AString version;
-			} mods[] = {
-				{ "minecraft", "1.12" },
-				{ "FML", "8.0.99.999.forge" },
-				{ "forge", "14.21.1.2387.mcp-XXX" },
-				{ "ironchest", "1.12-7.0.31.818" },
-			};
-			UInt32 modCount = sizeof(mods) / sizeof(mods[0]);
+			// Send server-side Forge mods registered by plugins
+			auto &serverMods = m_Client->GetForgeMods();
+			
+			UInt32 modCount = serverMods.GetNumMods();
 			
 			buf.WriteBEInt8(Discriminator_ModList);
 			buf.WriteVarInt32(modCount);
 			for (size_t i = 0; i < modCount; ++i) {
-				buf.WriteVarUTF8String(mods[i].name);
-				buf.WriteVarUTF8String(mods[i].version);
+				buf.WriteVarUTF8String(serverMods.GetModNameAt(i));
+				buf.WriteVarUTF8String(serverMods.GetModVersionAt(i));
 			}
 			AString serverModList;
 			buf.ReadAll(serverModList);
