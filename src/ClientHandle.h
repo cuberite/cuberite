@@ -270,7 +270,7 @@ public:  // tolua_export
 	const cForgeMods & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : cForgeMods::Unmodded(); }
 
 	/** Returns true if the client is modded with Forge. */
-	bool IsModded(void) const { return m_ForgeHandshake.m_isForgeClient; }
+	bool IsModded(void) const { return m_ForgeHandshake.m_IsForgeClient; }
 
 	// tolua_end
 

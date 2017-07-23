@@ -27,7 +27,7 @@ public:
 
 	AStringMap ParseModList(const char * a_Data, size_t a_Size);
 
-	bool m_isForgeClient;
+	bool m_IsForgeClient;
 
 private:
 	void SetError();

@@ -11,7 +11,7 @@
 #include "../ClientHandle.h"
 #include "../Root.h"
 
-cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_isForgeClient(false), m_Errored(false), m_Client(client)
+cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_IsForgeClient(false), m_Errored(false), m_Client(client)
 {
 }
 
@@ -57,7 +57,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 
 void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
-	ASSERT(m_isForgeClient);
+	ASSERT(m_IsForgeClient);
 
 	m_Name = &a_Name;
 	m_UUID = &a_UUID;
@@ -127,7 +127,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
-	if (!m_isForgeClient)
+	if (!m_IsForgeClient)
 	{
 		LOG("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size);
 		return;

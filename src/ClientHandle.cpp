@@ -359,7 +359,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		// Send login success (if the protocol supports it):
 		m_Protocol->SendLoginSuccess();
 
-		if (m_ForgeHandshake.m_isForgeClient)
+		if (m_ForgeHandshake.m_IsForgeClient)
 		{
 			m_ForgeHandshake.BeginForgeHandshake(a_Name, a_UUID, a_Properties);
 		}
