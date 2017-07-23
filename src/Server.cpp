@@ -310,7 +310,7 @@ void cServer::UnregisterForgeModForProtocol(AString &a_ModName, UInt32 a_Protoco
 
 cForgeMods & cServer::GetRegisteredForgeMods(UInt32 a_Protocol)
 {
-	switch(a_Protocol)
+	switch (a_Protocol)
 	{
 		case cProtocolRecognizer::PROTO_VERSION_1_8_0: return m_ForgeMods_1_8_0;
 		case cProtocolRecognizer::PROTO_VERSION_1_9_0: return m_ForgeMods_1_9_0;
