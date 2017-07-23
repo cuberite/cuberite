@@ -11797,6 +11797,40 @@ end
 					},
 					Notes = "Returns true if the specified player is queued to be transferred to a World.",
 				},
+				RegisterForgeMod =
+				{
+					Params =
+					{
+						{
+							Name = "ModName",
+							Type = "string",
+						},
+						{
+							Name = "ModVersion",
+							Type = "string",
+						},
+					},
+					Notes = "Add a Forge mod name/version to the server ping list.",
+				},
+				RegisterForgeModForProtocol =
+				{
+					Params =
+					{
+						{
+							Name = "ModName",
+							Type = "string",
+						},
+						{
+							Name = "ModVersion",
+							Type = "string",
+						},
+						{
+							Name = "ProtocolVersionNumber",
+							Type = "number",
+						},
+					},
+					Notes = "Add a Forge mod name/version to the server ping list for all protocol versions.",
+				},
 				SetMaxPlayers =
 				{
 					Params =

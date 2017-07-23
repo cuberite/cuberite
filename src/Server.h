@@ -72,8 +72,11 @@ public:
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
+	/** Add a Forge mod name/version to the server ping list. */
 	void RegisterForgeMod(AString & a_ModName, AString & a_ModVersion);
-	void RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_Protocol);
+
+	/** Add a Forge mod name/version to the server ping list for one protocol version. */
+	void RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */

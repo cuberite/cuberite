@@ -272,10 +272,10 @@ void cServer::RegisterForgeMod(AString & a_Name, AString & a_Version)
 
 
 
-void cServer::RegisterForgeModForProtocol(AString & a_Name, AString & a_Version, UInt32 a_Protocol)
+void cServer::RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
 {
-	cForgeMods & mods = GetRegisteredForgeMods(a_Protocol);
-	mods.Add(a_Name, a_Version);
+	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
+	mods.Add(a_ModName, a_ModVersion);
 }
 
 
