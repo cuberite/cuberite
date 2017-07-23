@@ -11852,6 +11852,32 @@ end
 					},
 					Notes = "Returns true iff the server is set to authenticate players (\"online mode\").",
 				},
+				UnregisterForgeMod =
+				{
+					Params =
+					{
+						{
+							Name = "ModName",
+							Type = "string",
+						},
+					},
+					Notes = "Remove a Forge mod name/version from the server ping list.",
+				},
+				UnregisterForgeModForProtocol =
+				{
+					Params =
+					{
+						{
+							Name = "ModName",
+							Type = "string",
+						},
+						{
+							Name = "ProtocolVersionNumber",
+							Type = "number",
+						},
+					},
+					Notes = "Remove a Forge mod name/version from the server ping list.",
+				},
 			},
 		},
 		cStringCompression =

@@ -281,6 +281,33 @@ void cServer::RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVe
 
 
 
+
+void cServer::UnregisterForgeMod(AString &a_Name)
+{
+	// TODO: refactor
+	m_ForgeMods_1_8_0.Remove(a_Name);
+	m_ForgeMods_1_9_0.Remove(a_Name);
+	m_ForgeMods_1_9_1.Remove(a_Name);
+	m_ForgeMods_1_9_2.Remove(a_Name);
+	m_ForgeMods_1_9_4.Remove(a_Name);
+	m_ForgeMods_1_10_0.Remove(a_Name);
+	m_ForgeMods_1_11_0.Remove(a_Name);
+	m_ForgeMods_1_11_1.Remove(a_Name);
+	m_ForgeMods_1_12.Remove(a_Name);
+}
+
+
+
+
+void cServer::UnregisterForgeModForProtocol(AString &a_ModName, UInt32 a_ProtocolVersionNumber)
+{
+	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
+	mods.Remove(a_ModName);
+}
+
+
+
+
 cForgeMods & cServer::GetRegisteredForgeMods(UInt32 a_Protocol)
 {
 	switch(a_Protocol)

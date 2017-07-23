@@ -77,6 +77,12 @@ public:
 
 	/** Add a Forge mod name/version to the server ping list for one protocol version. */
 	void RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
+	
+	/** Remove a Forge mod name/version from the server ping list. */
+	void UnregisterForgeMod(AString & a_ModName);
+	
+	/** Remove a Forge mod name/version to the server ping list for one protocol version. */
+	void UnregisterForgeModForProtocol(AString & a_ModName, UInt32 a_ProtocolVersionNumber);
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */

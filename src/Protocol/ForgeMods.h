@@ -36,6 +36,8 @@ public:
 	
 	void Add(AString & a_Name, AString & a_Version);
 	
+	void Remove(AString & a_Name);
+	
 	AStringMap GetMods() { return m_Mods; }
 	
 	bool IsModded() { return m_Mods.size() != 0; }
