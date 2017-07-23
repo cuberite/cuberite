@@ -32,7 +32,6 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & ResponseValue)
 	LOG("Received server ping from version: %d", ProtocolVersion);
 	
 	// modinfo:
-	// TODO: only send if mods enabled
 	Json::Value Modinfo;
 	Modinfo["type"] = "FML";
 
