@@ -50,6 +50,7 @@ class cCompositeChat;
 class cSetChunkData;
 class cBroadcaster;
 class cDeadlockDetect;
+class cUUID;
 
 typedef std::list< cPlayer * > cPlayerList;
 typedef std::list< std::pair< cPlayer *, cWorld * > > cAwaitingPlayerList;
@@ -280,8 +281,8 @@ public:
 	cPlayer * FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 
 	/** Finds the player over his uuid and calls the callback */
-	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
-	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallback a_Callback);  // Lambda version
+	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cLambdaPlayerCallback a_Callback);  // Lambda version
 
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 

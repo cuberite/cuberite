@@ -7,6 +7,7 @@
 #include "EnchantmentSerializer.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
+#include "../UUID.h"
 #include "FastNBT.h"
 
 #include "../BlockEntities/BeaconEntity.h"
@@ -374,7 +375,7 @@ void cNBTChunkSerializer::AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 
 		// The new Block Entity format for a Mob Head. See: http://minecraft.gamepedia.com/Head#Block_entity
 		m_Writer.BeginCompound("Owner");
-			m_Writer.AddString("Id", a_MobHead->GetOwnerUUID());
+			m_Writer.AddString("Id", a_MobHead->GetOwnerUUID().ToShortString());
 			m_Writer.AddString("Name", a_MobHead->GetOwnerName());
 			m_Writer.BeginCompound("Properties");
 				m_Writer.BeginList("textures", TAG_Compound);
@@ -644,9 +645,9 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				{
 					m_Writer.AddString("Owner", Wolf->GetOwnerName());
 				}
-				if (!Wolf->GetOwnerUUID().empty())
+				if (!Wolf->GetOwnerUUID().IsNil())
 				{
-					m_Writer.AddString("OwnerUUID", Wolf->GetOwnerUUID());
+					m_Writer.AddString("OwnerUUID", Wolf->GetOwnerUUID().ToShortString());
 				}
 				m_Writer.AddByte("Sitting",     Wolf->IsSitting() ? 1 : 0);
 				m_Writer.AddByte("Angry",       Wolf->IsAngry() ? 1 : 0);
@@ -674,9 +675,9 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				{
 					m_Writer.AddString("Owner", Ocelot->GetOwnerName());
 				}
-				if (!Ocelot->GetOwnerUUID().empty())
+				if (!Ocelot->GetOwnerUUID().IsNil())
 				{
-					m_Writer.AddString("OwnerUUID", Ocelot->GetOwnerUUID());
+					m_Writer.AddString("OwnerUUID", Ocelot->GetOwnerUUID().ToShortString());
 				}
 				m_Writer.AddByte("Sitting",     Ocelot->IsSitting() ? 1 : 0);
 				m_Writer.AddInt ("CatType",     Ocelot->GetOcelotType());

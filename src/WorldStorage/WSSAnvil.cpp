@@ -1386,12 +1386,13 @@ cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	int ownerLine = a_NBT.FindChildByName(a_TagIdx, "Owner");
 	if (ownerLine >= 0)
 	{
-		AString OwnerName, OwnerUUID, OwnerTexture, OwnerTextureSignature;
+		AString OwnerName, OwnerTexture, OwnerTextureSignature;
+		cUUID OwnerUUID;
 
 		currentLine = a_NBT.FindChildByName(ownerLine, "Id");
 		if (currentLine >= 0)
 		{
-			OwnerUUID = a_NBT.GetString(currentLine);
+			OwnerUUID.FromString(a_NBT.GetString(currentLine));
 		}
 
 		currentLine = a_NBT.FindChildByName(ownerLine, "Name");
@@ -2494,7 +2495,7 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	}
 
 	auto OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
-	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
+	if (!OwnerInfo.first.empty() && !OwnerInfo.second.IsNil())
 	{
 		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);
 		Monster->SetIsTame(true);
@@ -2895,7 +2896,7 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	}
 
 	auto OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
-	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
+	if (!OwnerInfo.first.empty() && !OwnerInfo.second.IsNil())
 	{
 		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);
 		Monster->SetIsTame(true);
@@ -3032,42 +3033,38 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 
 
-std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx)
+std::pair<AString, cUUID> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	// Load the owner information. OwnerUUID or Owner may be specified, possibly both:
-	AString OwnerUUID, OwnerName;
+	AString OwnerName;
+	cUUID OwnerUUID;
 	int OwnerUUIDIdx = a_NBT.FindChildByName(a_TagIdx, "OwnerUUID");
 	if (OwnerUUIDIdx > 0)
 	{
-		OwnerUUID = a_NBT.GetString(OwnerUUIDIdx);
+		OwnerUUID.FromString(a_NBT.GetString(OwnerUUIDIdx));
 	}
 	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
 	if (OwnerIdx > 0)
 	{
 		OwnerName = a_NBT.GetString(OwnerIdx);
 	}
-	if (OwnerName.empty() && OwnerUUID.empty())
+	if (OwnerName.empty() && OwnerUUID.IsNil())
 	{
 		// There is no owner, bail out:
-		return std::pair<AString, AString>();
+		return {};
 	}
 
 	// Convert name to UUID, if needed:
-	if (OwnerUUID.empty())
+	if (OwnerUUID.IsNil())
 	{
 		// This entity has only playername stored (pre-1.7.6), look up the UUID
 		// The lookup is blocking, but we're running in a separate thread, so it's ok
 		OwnerUUID = cRoot::Get()->GetMojangAPI().GetUUIDFromPlayerName(OwnerName);
-		if (OwnerUUID.empty())
+		if (OwnerUUID.IsNil())
 		{
 			// Not a known player, un-tame the entity by bailing out
-			return std::pair<AString, AString>();
+			return {};
 		}
-	}
-	else
-	{
-		// Normalize the UUID:
-		OwnerUUID = cMojangAPI::MakeUUIDShort(OwnerUUID);
 	}
 
 	// Convert UUID to name, if needed:
@@ -3078,11 +3075,11 @@ std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT,
 		if (OwnerName.empty())
 		{
 			// Not a known player, un-tame the entity by bailing out
-			return std::pair<AString, AString>();
+			return {};
 		}
 	}
 
-	return std::make_pair(OwnerName, OwnerUUID);
+	return { OwnerName, OwnerUUID };
 }
 
 
