@@ -3039,6 +3039,17 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Adds the specified amount of speed in the Z axis direction.",
 				},
+				ApplyArmorDamage =
+				{
+					Params =
+					{
+						{
+							Name = "DamageBlocked",
+							Type = "number",
+						},
+					},
+					Notes = "Lowers armor durability, as if the armor blocked the given amount of damage.",
+				},
 				ArmorCoversAgainst =
 				{
 					Params =
@@ -3143,6 +3154,31 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function.",
+				},
+				GetEnchantmentCoverAgainst =
+				{
+					Params =
+					{
+						{
+							Name = "AttackerEntity",
+							Type = "cEntity",
+						},
+						{
+							Name = "DamageType",
+							Type = "eDamageType",
+						},
+						{
+							Name = "RawDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of hitpoints out of RawDamage that the enchantments on the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage.",
 				},
 				GetEntityType =
 				{
