@@ -96,6 +96,10 @@ void cForgeHandshake::SendServerHello()
 	m_Client->SendPluginMessage("FML|HS", Message);
 }
 
+
+
+
+
 AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 {
 	cByteBuffer Buf(a_Size);
@@ -124,6 +128,10 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	return Mods;
 }
+
+
+
+
 
 void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
