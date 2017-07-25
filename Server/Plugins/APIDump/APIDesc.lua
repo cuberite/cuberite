@@ -1476,7 +1476,7 @@ end
 					},
 					Notes = "Returns true if the client has registered to receive messages on the specified plugin channel.",
 				},
-				IsModded =
+				IsForgeClient =
 				{
 					Returns =
 					{
