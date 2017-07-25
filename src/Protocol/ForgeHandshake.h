@@ -23,47 +23,36 @@ class cForgeHandshake
 public:
 	cForgeHandshake(cClientHandle * client);
 
+	/** Add the registered Forge mods to the server ping list packet. */
 	void AugmentServerListPing(Json::Value & ResponseValue);
+
+	/** Begin the Forge Modloader Handshake (FML|HS) sequence. */
 	void BeginForgeHandshake(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
+	/** Send the ServerHello packet in the Forge handshake. */
 	void SendServerHello();
+
+	/** Process received data from the client advancing the Forge handshake. */
 	void DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
 
-	AStringMap ParseModList(const char * a_Data, size_t a_Size);
-
+	/** True if the client advertised itself as a Forge client. */
 	bool m_IsForgeClient;
 
 private:
+	/** Parse the client ModList packet of installed Forge mods and versions. */
+	AStringMap ParseModList(const char * a_Data, size_t a_Size);
+
+	/** Set the Forge handshake to an errored state. */
 	void SetError();
+
+	/** True if the Forge handshake is in an errored state. */
 	bool m_Errored;
 
+	/** The client handle undergoing this Forge handshake. */
 	cClientHandle * m_Client;
 
+	/** Values saved from BeginForgeHandshake() for continuing the normal handshake after Forge completes. */
 	const AString * m_Name;
 	const AString * m_UUID;
 	const Json::Value * m_Properties;
-
-	enum
-	{
-		Discriminator_ServerHello = 0,
-		Discriminator_ClientHello = 1,
-		Discriminator_ModList = 2,
-		Discriminator_RegistryData = 3,
-		Discriminator_HandshakeReset = -2,
-		Discriminator_HandshakeAck = -1,
-	};
-
-	enum
-	{
-		ClientPhase_WAITINGSERVERDATA = 2,
-		ClientPhase_WAITINGSERVERCOMPLETE = 3,
-		ClientPhase_PENDINGCOMPLETE = 4,
-		ClientPhase_COMPLETE = 5,
-	};
-
-	enum
-	{
-		ServerPhase_WAITINGCACK = 2,
-		ServerPhase_COMPLETE = 3,
-	};
 };

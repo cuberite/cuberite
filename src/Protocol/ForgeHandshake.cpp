@@ -11,6 +11,38 @@
 #include "../ClientHandle.h"
 #include "../Root.h"
 
+
+/** Discriminator byte values prefixing the FML|HS packets to determine their type. */
+enum
+{
+	Discriminator_ServerHello = 0,
+	Discriminator_ClientHello = 1,
+	Discriminator_ModList = 2,
+	Discriminator_RegistryData = 3,
+	Discriminator_HandshakeReset = -2,
+	Discriminator_HandshakeAck = -1,
+};
+
+/** Client handshake state phases. */
+enum
+{
+	ClientPhase_WAITINGSERVERDATA = 2,
+	ClientPhase_WAITINGSERVERCOMPLETE = 3,
+	ClientPhase_PENDINGCOMPLETE = 4,
+	ClientPhase_COMPLETE = 5,
+};
+
+/** Server handshake state phases. */
+enum
+{
+	ServerPhase_WAITINGCACK = 2,
+	ServerPhase_COMPLETE = 3,
+};
+
+
+
+
+
 cForgeHandshake::cForgeHandshake(cClientHandle *client) :
 	m_IsForgeClient(false),
 	m_Errored(false),
