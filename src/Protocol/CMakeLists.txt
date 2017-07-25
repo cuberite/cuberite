@@ -5,6 +5,8 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 SET (SRCS
 	Authenticator.cpp
 	ChunkDataSerializer.cpp
+	ForgeHandshake.cpp
+	ForgeMods.cpp
 	MojangAPI.cpp
 	Packetizer.cpp
 	Protocol_1_8.cpp
@@ -13,13 +15,13 @@ SET (SRCS
 	Protocol_1_11.cpp
 	Protocol_1_12.cpp
 	ProtocolRecognizer.cpp
-	ForgeHandshake.cpp
-	ForgeMods.cpp
 )
 
 SET (HDRS
 	Authenticator.h
 	ChunkDataSerializer.h
+	ForgeHandshake.h
+	ForgeMods.h
 	MojangAPI.h
 	Packetizer.h
 	Protocol.h
@@ -29,8 +31,6 @@ SET (HDRS
 	Protocol_1_11.h
 	Protocol_1_12.h
 	ProtocolRecognizer.h
-	ForgeHandshake.h
-	ForgeMods.h
 )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
