@@ -14,6 +14,10 @@ namespace Json
 }
 class cClientHandle;
 
+
+
+
+
 class cForgeHandshake
 {
 public:

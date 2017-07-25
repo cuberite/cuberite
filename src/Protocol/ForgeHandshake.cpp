@@ -302,9 +302,11 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		}
 
 		default:
+		{
 			LOG("Unexpected Forge packet %d received", Discriminator);
 			SetError();
 			return;
+		}
 	}
 }
 
