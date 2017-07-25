@@ -211,8 +211,10 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
 			for (size_t i = 0; i < ModCount; ++i)
 			{
-				Buf.WriteVarUTF8String(ServerMods.GetModNameAt(i));
-				Buf.WriteVarUTF8String(ServerMods.GetModVersionAt(i));
+				const AString & name = ServerMods.GetModNameAt(i);
+				const AString & version = ServerMods.GetModVersion(name);
+				Buf.WriteVarUTF8String(name);
+				Buf.WriteVarUTF8String(version);
 			}
 			AString ServerModList;
 			Buf.ReadAll(ServerModList);

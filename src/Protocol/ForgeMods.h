@@ -20,13 +20,11 @@ public:
 	bool HasMod(AString & name) const;
 
 	/** Returns the version of the mod name given. */
-	const AString & GetModVersion(AString & name) const;
+	const AString & GetModVersion(const AString & name) const;
 
 	/** Returns the name of the Forge mod at the given index. */
 	const AString & GetModNameAt(size_t i) const;
 
-	/** Returns the version of the Forge mod at the given index. */
-	const AString & GetModVersionAt(size_t i) const;
 	// tolua_end
 
 	cForgeMods();
@@ -45,5 +43,4 @@ public:
 private:
 	AStringMap m_Mods;
 	AStringVector m_ModNames;
-	AStringVector m_ModVersions;
 } ;  // tolua_export

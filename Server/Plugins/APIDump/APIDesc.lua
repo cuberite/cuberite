@@ -4881,23 +4881,6 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 					Notes = "Returns the version of the mod name given.",
 
 				},
-				GetModVersionAt =
-				{
-					Params =
-					{
-						{
-							Name = "i",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the version of the Forge mod at the given index.",
-				},
 				GetNumMods =
 				{
 					Returns =
