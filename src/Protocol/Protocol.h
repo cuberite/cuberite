@@ -63,6 +63,8 @@ public:
 
 	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
+
+	/** Called when client sends some data over the FML|HS plugin channel */
 	void ForgeDataReceived(const char * a_Data, size_t a_Size)
 	{
 		m_Client->m_ForgeHandshake.DataReceived(m_Client, a_Data, a_Size);
