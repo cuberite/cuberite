@@ -105,18 +105,19 @@ void cForgeHandshake::SendServerHello()
 
 AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 {
+	AStringMap Mods;
+
+	if (a_Size < 4)
+	{
+		LOG("ParseModList invalid packet, missing length (size=%zu)", a_Size);
+		return Mods;
+	}
+
 	cByteBuffer Buf(a_Size);
 	Buf.Write(a_Data, a_Size);
 
-	Int8 Discriminator;
-	Buf.ReadBEInt8(Discriminator);
-
-	ASSERT(Discriminator == 2);
-
 	UInt32 NumMods;
 	Buf.ReadVarInt32(NumMods);
-
-	AStringMap Mods;
 
 	for (size_t i = 0; i < NumMods; ++i)
 	{
@@ -181,7 +182,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		{
 			LOGD("Received ModList");
 
-			AStringMap ClientMods = ParseModList(a_Data, a_Size);
+			AStringMap ClientMods = ParseModList(a_Data + 1, a_Size - 1);
 			AString ClientModsString;
 			for (auto & item: ClientMods)
 			{
