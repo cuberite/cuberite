@@ -161,7 +161,7 @@ public:
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
 
-	cForgeMods & GetRegisteredForgeMods(UInt32 a_Protocol);
+	cForgeMods & GetRegisteredForgeMods(const UInt32 a_Protocol);
 
 private:
 
@@ -229,17 +229,8 @@ private:
 	int m_MaxPlayers;
 	bool m_bIsHardcore;
 
-	// TODO: std::map<int, cForgeMods &> data structure?
-	cForgeMods m_ForgeMods_1_8_0;
-	cForgeMods m_ForgeMods_1_9_0;
-	cForgeMods m_ForgeMods_1_9_1;
-	cForgeMods m_ForgeMods_1_9_2;
-	cForgeMods m_ForgeMods_1_9_4;
-	cForgeMods m_ForgeMods_1_10_0;
-	cForgeMods m_ForgeMods_1_10_1;
-	cForgeMods m_ForgeMods_1_11_0;
-	cForgeMods m_ForgeMods_1_11_1;
-	cForgeMods m_ForgeMods_1_12;
+	/** Map of protocol version to Forge mods for that version. */
+	std::map<UInt32, cForgeMods> m_ForgeModsByVersion;
 
 	/** True - allow same username to login more than once False - only once */
 	bool m_bAllowMultiLogin;

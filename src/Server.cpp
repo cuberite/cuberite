@@ -220,6 +220,25 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
 	}
 
+	int Versions[] =
+	{
+		// TODO: better way to get all supported versions from cProtocolRecognizer?
+		cProtocolRecognizer::PROTO_VERSION_1_8_0,
+		cProtocolRecognizer::PROTO_VERSION_1_9_0,
+		cProtocolRecognizer::PROTO_VERSION_1_9_1,
+		cProtocolRecognizer::PROTO_VERSION_1_9_2,
+		cProtocolRecognizer::PROTO_VERSION_1_9_4,
+		cProtocolRecognizer::PROTO_VERSION_1_10_0,
+		cProtocolRecognizer::PROTO_VERSION_1_11_0,
+		cProtocolRecognizer::PROTO_VERSION_1_11_1,
+		cProtocolRecognizer::PROTO_VERSION_1_12,
+	};
+	for (size_t i = 0; i < sizeof(Versions) / sizeof(Versions[0]); ++i)
+	{
+		cForgeMods Mods;
+		m_ForgeModsByVersion.insert(std::make_pair(Versions[i], Mods));
+	}
+
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);
 	m_ShouldLimitPlayerBlockChanges = a_Settings.GetValueSetB("AntiCheat", "LimitPlayerBlockChanges", true);
 	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
@@ -256,16 +275,10 @@ int cServer::GetNumPlayers(void) const
 
 void cServer::RegisterForgeMod(AString & a_Name, AString & a_Version)
 {
-	// TODO: refactor
-	m_ForgeMods_1_8_0.Add(a_Name, a_Version);
-	m_ForgeMods_1_9_0.Add(a_Name, a_Version);
-	m_ForgeMods_1_9_1.Add(a_Name, a_Version);
-	m_ForgeMods_1_9_2.Add(a_Name, a_Version);
-	m_ForgeMods_1_9_4.Add(a_Name, a_Version);
-	m_ForgeMods_1_10_0.Add(a_Name, a_Version);
-	m_ForgeMods_1_11_0.Add(a_Name, a_Version);
-	m_ForgeMods_1_11_1.Add(a_Name, a_Version);
-	m_ForgeMods_1_12.Add(a_Name, a_Version);
+	for (auto & it : m_ForgeModsByVersion)
+	{
+		it.second.Add(a_Name, a_Version);
+	}
 }
 
 
@@ -284,16 +297,10 @@ void cServer::RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVe
 
 void cServer::UnregisterForgeMod(AString &a_Name)
 {
-	// TODO: refactor
-	m_ForgeMods_1_8_0.Remove(a_Name);
-	m_ForgeMods_1_9_0.Remove(a_Name);
-	m_ForgeMods_1_9_1.Remove(a_Name);
-	m_ForgeMods_1_9_2.Remove(a_Name);
-	m_ForgeMods_1_9_4.Remove(a_Name);
-	m_ForgeMods_1_10_0.Remove(a_Name);
-	m_ForgeMods_1_11_0.Remove(a_Name);
-	m_ForgeMods_1_11_1.Remove(a_Name);
-	m_ForgeMods_1_12.Remove(a_Name);
+	for (auto & it : m_ForgeModsByVersion)
+	{
+		it.second.Remove(a_Name);
+	}
 }
 
 
@@ -308,21 +315,13 @@ void cServer::UnregisterForgeModForProtocol(AString &a_ModName, UInt32 a_Protoco
 
 
 
-cForgeMods & cServer::GetRegisteredForgeMods(UInt32 a_Protocol)
+cForgeMods & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 {
-	switch (a_Protocol)
-	{
-		case cProtocolRecognizer::PROTO_VERSION_1_8_0: return m_ForgeMods_1_8_0;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_0: return m_ForgeMods_1_9_0;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_1: return m_ForgeMods_1_9_1;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_2: return m_ForgeMods_1_9_2;
-		case cProtocolRecognizer::PROTO_VERSION_1_9_4: return m_ForgeMods_1_9_4;
-		case cProtocolRecognizer::PROTO_VERSION_1_10_0: return m_ForgeMods_1_10_0;
-		case cProtocolRecognizer::PROTO_VERSION_1_11_0: return m_ForgeMods_1_11_0;
-		case cProtocolRecognizer::PROTO_VERSION_1_11_1: return m_ForgeMods_1_11_1;
-		default:
-		case cProtocolRecognizer::PROTO_VERSION_1_12: return  m_ForgeMods_1_12;
-	}
+	auto it = m_ForgeModsByVersion.find(a_Protocol);
+
+	ASSERT(it != m_ForgeModsByVersion.end());
+
+	return it->second;
 }
 
 
