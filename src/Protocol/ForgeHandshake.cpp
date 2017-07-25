@@ -11,7 +11,10 @@
 #include "../ClientHandle.h"
 #include "../Root.h"
 
-cForgeHandshake::cForgeHandshake(cClientHandle *client) : m_IsForgeClient(false), m_Errored(false), m_Client(client)
+cForgeHandshake::cForgeHandshake(cClientHandle *client) :
+	m_IsForgeClient(false),
+	m_Errored(false),
+	m_Client(client)
 {
 }
 
