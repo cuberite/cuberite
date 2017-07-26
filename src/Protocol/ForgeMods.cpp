@@ -42,7 +42,7 @@ size_t cForgeMods::GetNumMods(void) const
 
 
 
-bool cForgeMods::HasMod(AString & name) const
+bool cForgeMods::HasMod(const AString & name) const
 {
 	return m_Mods.find(name) != m_Mods.end();
 }
@@ -67,7 +67,7 @@ const AString & cForgeMods::GetModNameAt(size_t i) const
 
 
 
-void cForgeMods::Add(AString & a_Name, AString & a_Version)
+void cForgeMods::Add(const AString & a_Name, const AString & a_Version)
 {
 	m_ModNames.push_back(a_Name);
 	m_Mods.insert({a_Name, a_Version});
@@ -77,7 +77,7 @@ void cForgeMods::Add(AString & a_Name, AString & a_Version)
 
 
 
-void cForgeMods::Remove(AString & a_Name)
+void cForgeMods::Remove(const AString & a_Name)
 {
 	auto it = std::find(m_ModNames.begin(), m_ModNames.end(), a_Name);
 	if (it != m_ModNames.end())

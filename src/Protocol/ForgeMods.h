@@ -17,7 +17,7 @@ public:
 	size_t GetNumMods(void) const;
 
 	/** Returns true if the mod with the given name is installed. */
-	bool HasMod(AString & name) const;
+	bool HasMod(const AString & name) const;
 
 	/** Returns the version of the mod name given. */
 	const AString & GetModVersion(const AString & name) const;
@@ -32,9 +32,9 @@ public:
 
 	static const cForgeMods & Unmodded(void);
 
-	void Add(AString & a_Name, AString & a_Version);
+	void Add(const AString & a_Name, const AString & a_Version);
 
-	void Remove(AString & a_Name);
+	void Remove(const AString & a_Name);
 
 	AStringMap GetMods() { return m_Mods; }
 
