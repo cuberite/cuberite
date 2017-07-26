@@ -149,13 +149,26 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 	Buf.Write(a_Data, a_Size);
 
 	UInt32 NumMods;
-	Buf.ReadVarInt32(NumMods);
+	if (!Buf.ReadVarInt32(NumMods))
+	{
+		LOG("ParseModList failed to read mod count");
+		return Mods;
+	}
 
 	for (size_t i = 0; i < NumMods; ++i)
 	{
 		AString Name, Version;
-		Buf.ReadVarUTF8String(Name);
-		Buf.ReadVarUTF8String(Version);
+		if (!Buf.ReadVarUTF8String(Name))
+		{
+			LOG("ParseModList failed to read mod name at i=%zu", i);
+			break;
+		}
+
+		if (!Buf.ReadVarUTF8String(Version))
+		{
+			LOG("ParseModList failed to read mod version at i=%zu", i);
+			break;
+		}
 
 		Mods.insert({Name, Version});
 
