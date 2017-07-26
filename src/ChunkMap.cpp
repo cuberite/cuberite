@@ -715,7 +715,7 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callb
 }
 
 
-bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback)
+bool cChunkMap::DoWithChunkAt(const Vector3i & a_BlockPos, std::function<bool(cChunk &)> a_Callback)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
@@ -740,17 +740,17 @@ bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)>
 
 
 
-void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cChunkMap::WakeUpSimulators(const Vector3i & a_Block)
 {
 	cCSLock Lock(m_CSChunks);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_Block.x, a_Block.z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return;
 	}
-	m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
+	m_World->GetSimulatorManager()->WakeUp(a_Block, Chunk);
 }
 
 
@@ -1140,7 +1140,7 @@ void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_B
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
 		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta, a_SendToClients);
-		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
+		m_World->GetSimulatorManager()->WakeUp(Vector3i(a_BlockX, a_BlockY, a_BlockZ), Chunk);
 	}
 	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
@@ -1361,7 +1361,7 @@ bool cChunkMap::DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 		}
 
 		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
-		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, DestChunk);
+		m_World->GetSimulatorManager()->WakeUp(Vector3i(a_BlockX, a_BlockY, a_BlockZ), DestChunk);
 	}
 
 	return true;
@@ -1822,8 +1822,8 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
 	m_World->GetSimulatorManager()->WakeUpArea(cCuboid(
-		bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1,
-		bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1
+		Vector3i(bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1),
+		Vector3i(bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1)
 	));
 }
 

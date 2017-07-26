@@ -109,10 +109,10 @@ public:
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
 
 	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
-	bool DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback);
+	bool DoWithChunkAt(const Vector3i & a_BlockPos, std::function<bool(cChunk &)> a_Callback);
 
 	/** Wakes up simulators for the specified block */
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void WakeUpSimulators(const Vector3i & a_Block);
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);

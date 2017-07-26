@@ -493,10 +493,10 @@ public:
 	double GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
-	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void WakeUpSimulators(const Vector3i & a_Block) override;
 
 	/** Wakes up the simulators for the specified area of blocks */
-	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
+	void WakeUpSimulatorsInArea(const Vector3i & a_Min, const Vector3i & a_Max);
 
 	// tolua_end
 

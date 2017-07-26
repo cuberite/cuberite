@@ -73,6 +73,6 @@ public:
 	virtual int GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Wakes up the simulators for the specified block */
-	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	virtual void WakeUpSimulators(const Vector3i & a_Block) = 0;
 
 };

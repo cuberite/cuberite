@@ -39,7 +39,7 @@ public:
 	}
 
 	/** Called when a block changes */
-	void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
+	void WakeUp(const Vector3i & a_Block, cChunk * a_Chunk);
 
 	/** Does the same processing as WakeUp, but for all blocks within the specified area.
 	Has better performance than calling WakeUp for each block individually, due to neighbor-checking.

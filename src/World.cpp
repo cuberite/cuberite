@@ -1294,18 +1294,18 @@ void cWorld::UpdateSkyDarkness(void)
 
 
 
-void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::WakeUpSimulators(const Vector3i & a_Block)
 {
-	return m_ChunkMap->WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->WakeUpSimulators(a_Block);
 }
 
 
 
 
 
-void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
+void cWorld::WakeUpSimulatorsInArea(const Vector3i & a_Min, const Vector3i & a_Max)
 {
-	m_SimulatorManager->WakeUpArea(cCuboid(a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ));
+	m_SimulatorManager->WakeUpArea(cCuboid(a_Min, a_Max));
 }
 
 

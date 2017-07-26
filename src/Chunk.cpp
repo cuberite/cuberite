@@ -453,7 +453,10 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	}  // for y
 
 	// Erase all affected block entities:
-	cCuboid affectedArea(OffX, a_MinBlockY, OffZ, OffX + SizeX - 1, a_MinBlockY + SizeY - 1, OffZ + SizeZ - 1);
+	cCuboid affectedArea(
+		Vector3i(OffX, a_MinBlockY, OffZ),
+		Vector3i(OffX + SizeX - 1, a_MinBlockY + SizeY - 1, OffZ + SizeZ - 1)
+	);
 	for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 	{
 		if (affectedArea.IsInside(itr->second->GetPos()))

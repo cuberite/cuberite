@@ -19,20 +19,20 @@
 
 
 
-void cSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
+void cSimulator::WakeUp(const Vector3i & a_Block, cChunk * a_Chunk)
 {
-	AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk);
-	AddBlock(a_BlockX - 1, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 1, a_BlockZ));
-	AddBlock(a_BlockX + 1, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 1, a_BlockZ));
-	AddBlock(a_BlockX, a_BlockY, a_BlockZ - 1, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 1));
-	AddBlock(a_BlockX, a_BlockY, a_BlockZ + 1, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ + 1));
-	if (a_BlockY > 0)
+	AddBlock(a_Block.x, a_Block.y, a_Block.z, a_Chunk);
+	AddBlock(a_Block.x - 1, a_Block.y, a_Block.z, a_Chunk->GetNeighborChunk(a_Block.x - 1, a_Block.z));
+	AddBlock(a_Block.x + 1, a_Block.y, a_Block.z, a_Chunk->GetNeighborChunk(a_Block.x + 1, a_Block.z));
+	AddBlock(a_Block.x, a_Block.y, a_Block.z - 1, a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z - 1));
+	AddBlock(a_Block.x, a_Block.y, a_Block.z + 1, a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z + 1));
+	if (a_Block.y > 0)
 	{
-		AddBlock(a_BlockX, a_BlockY - 1, a_BlockZ, a_Chunk);
+		AddBlock(a_Block.x, a_Block.y - 1, a_Block.z, a_Chunk);
 	}
-	if (a_BlockY < cChunkDef::Height - 1)
+	if (a_Block.y < cChunkDef::Height - 1)
 	{
-		AddBlock(a_BlockX, a_BlockY + 1, a_BlockZ, a_Chunk);
+		AddBlock(a_Block.x, a_Block.y + 1, a_Block.z, a_Chunk);
 	}
 }
 
