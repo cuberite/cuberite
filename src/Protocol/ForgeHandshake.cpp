@@ -228,10 +228,10 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 			if (m_Client->m_ForgeMods != nullptr)
 			{
-				delete m_Client->m_ForgeMods;
+				m_Client->m_ForgeMods.reset();
 			}
 
-			m_Client->m_ForgeMods = new cForgeMods(ClientMods);
+			m_Client->m_ForgeMods = cpp14::make_unique<cForgeMods>(ClientMods);
 
 			// Let the plugins know about this event, they may refuse the player:
 			if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client))

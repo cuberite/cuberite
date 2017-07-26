@@ -387,7 +387,7 @@ public:  // tolua_export
 
 	cForgeHandshake m_ForgeHandshake;
 
-	cForgeMods * m_ForgeMods;
+	std::unique_ptr<cForgeMods> m_ForgeMods;
 
 private:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.

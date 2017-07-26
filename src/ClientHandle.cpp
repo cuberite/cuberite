@@ -142,7 +142,7 @@ cClientHandle::~cClientHandle()
 
 	if (m_ForgeMods != nullptr)
 	{
-		delete m_ForgeMods;
+		m_ForgeMods.reset();
 	}
 
 	if (!m_HasSentDC)
