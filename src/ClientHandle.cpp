@@ -673,7 +673,7 @@ void cClientHandle::HandlePing(void)
 	AString Reply;
 	const cServer & Server = *cRoot::Get()->GetServer();
 
-	Printf(Reply, "%s%s%i%s%i",
+	Printf(Reply, "%s%s" SIZE_T_FMT "%s" SIZE_T_FMT,
 		Server.GetDescription().c_str(),
 		cChatColor::Delimiter,
 		Server.GetNumPlayers(),
