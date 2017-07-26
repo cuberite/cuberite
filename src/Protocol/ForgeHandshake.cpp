@@ -98,12 +98,12 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 	m_UUID = &a_UUID;
 	m_Properties = &a_Properties;
 
-	AStringVector Channels = { "FML|HS", "FML", "FML|MP", "FML", "FORGE" };
+	std::array<AString, 5> Channels{{ "FML|HS", "FML", "FML|MP", "FML", "FORGE" }};
 	AString ChannelsString;
 
-	for (AStringVector::iterator itr = Channels.begin(); itr != Channels.end(); ++itr)
+	for (auto & Channel: Channels)
 	{
-		ChannelsString.append(*itr);
+		ChannelsString.append(Channel);
 		ChannelsString.push_back('\0');
 	}
 
