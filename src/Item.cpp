@@ -228,14 +228,14 @@ void cItem::FromJson(const Json::Value & a_Value)
 
 
 
-bool cItem::IsEnchantable(short a_ItemType, bool a_WithBook)
+bool cItem::IsEnchantable(short a_ItemType, bool a_FromBook)
 {
 	if (
 		ItemCategory::IsAxe(a_ItemType) ||
 		ItemCategory::IsSword(a_ItemType) ||
 		ItemCategory::IsShovel(a_ItemType) ||
 		ItemCategory::IsPickaxe(a_ItemType) ||
-		(a_WithBook && ItemCategory::IsHoe(a_ItemType)) ||
+		(a_FromBook && ItemCategory::IsHoe(a_ItemType)) ||
 		ItemCategory::IsArmor(a_ItemType)
 	)
 	{
@@ -255,7 +255,7 @@ bool cItem::IsEnchantable(short a_ItemType, bool a_WithBook)
 		case E_ITEM_SHEARS:
 		case E_ITEM_FLINT_AND_STEEL:
 		{
-			return a_WithBook;
+			return a_FromBook;
 		}
 	}
 
@@ -419,10 +419,10 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 
 
 
-int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_WithBook)
+int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_FromBook)
 {
 	unsigned int OurLevel = m_Enchantments.GetLevel(a_EnchantmentID);
-	int Multiplier = cEnchantments::GetXPCostMultiplier(a_EnchantmentID, a_WithBook);
+	int Multiplier = cEnchantments::GetXPCostMultiplier(a_EnchantmentID, a_FromBook);
 	unsigned int NewLevel = 0;
 	if (OurLevel > a_Level)
 	{
@@ -586,7 +586,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 
 int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
 {
-	bool WithBook = (a_Other.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+	bool FromBook = (a_Other.m_ItemType == E_ITEM_ENCHANTED_BOOK);
 
 	// Consider each enchantment seperately
 	int EnchantingCost = 0;
@@ -601,7 +601,7 @@ int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
 			}
 			else
 			{
-				EnchantingCost += AddEnchantment(Enchantment.first, Enchantment.second, WithBook);
+				EnchantingCost += AddEnchantment(Enchantment.first, Enchantment.second, FromBook);
 			}
 		}
 	}

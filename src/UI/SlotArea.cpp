@@ -730,7 +730,6 @@ void cSlotAreaCrafting::UpdateRecipe(cPlayer & a_Player)
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
 	SetSlot(0, a_Player, Recipe.GetResult());
-	m_ParentWindow.SendSlot(a_Player, this, 0);
 }
 
 
@@ -1069,7 +1068,6 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
 		m_ParentWindow.SetProperty(0, 0, a_Player);
-		m_ParentWindow.SendSlot(a_Player, this, 2);
 		return;
 	}
 
@@ -1092,7 +1090,6 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0, a_Player);
-				m_ParentWindow.SendSlot(a_Player, this, 2);
 				return;
 			}
 
@@ -1116,7 +1113,6 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0, a_Player);
-				m_ParentWindow.SendSlot(a_Player, this, 2);
 				return;
 			}
 
@@ -1201,7 +1197,6 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	SetSlot(2, a_Player, Input);
 	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost), a_Player);
-	m_ParentWindow.SendSlot(a_Player, this, 2);
 }
 
 
@@ -2526,6 +2521,8 @@ void cSlotAreaTemporary::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem 
 	}
 
 	itr->second[static_cast<size_t>(a_SlotNum)] = a_Item;
+
+	m_ParentWindow.SendSlot(a_Player, this, a_SlotNum);
 }
 
 

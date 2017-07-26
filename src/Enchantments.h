@@ -115,8 +115,11 @@ public:
 
 	// tolua_end
 
-	/** Get the XP cost multiplier for the enchantment (for anvils) */
-	static int GetXPCostMultiplier(int a_EnchantmentID, bool WithBook);
+	/** Get the XP cost multiplier for the enchantment (for anvils).
+	If FromBook is true, then this function returns the XP multiplier if
+	the enchantment is coming from a book, otherwise it returns the normal
+	item multiplier. */
+	static int GetXPCostMultiplier(int a_EnchantmentID, bool FromBook);
 
 	/** Get the maximum level the enchantment can have */
 	static unsigned int GetLevelCap(int a_EnchantmentID);
