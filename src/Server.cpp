@@ -628,6 +628,7 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const ASt
 {
 	cCSLock Lock(m_CSClients);
 
+	// Check max players condition within lock (expect server and authenticator thread to both call here)
 	if (GetNumPlayers() >= GetMaxPlayers())
 	{
 		KickUser(a_ClientID, "The server is currently full :(" "\n" "Try again later?");

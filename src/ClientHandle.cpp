@@ -179,6 +179,7 @@ void cClientHandle::Destroy(void)
 
 	if (player != nullptr)
 	{
+		// Atomically decrement player count (in world or server thread)
 		cRoot::Get()->GetServer()->PlayerDestroyed();
 
 		auto world = player->GetWorld();
@@ -324,6 +325,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
+	// Atomically increment player count (in server thread)
 	cRoot::Get()->GetServer()->PlayerCreated();
 
 	cWorld * World;
@@ -1873,7 +1875,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 	if (cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
 	{
-		Kick("Denied.");
+		Kick("Entry denied by plugin");
 		return false;
 	}
 
