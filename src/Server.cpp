@@ -236,7 +236,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	for (size_t i = 0; i < sizeof(Versions) / sizeof(Versions[0]); ++i)
 	{
 		cForgeMods Mods;
-		m_ForgeModsByVersion.insert(std::make_pair(Versions[i], Mods));
+		m_ForgeModsByVersion.insert({Versions[i], Mods});
 	}
 
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);

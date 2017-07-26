@@ -157,7 +157,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 		Buf.ReadVarUTF8String(Name);
 		Buf.ReadVarUTF8String(Version);
 
-		Mods.insert(std::pair<AString, AString>(Name, Version));
+		Mods.insert({Name, Version});
 
 		LOGD("ParseModList name=%s, version=%s", Name.c_str(), Version.c_str());
 	}

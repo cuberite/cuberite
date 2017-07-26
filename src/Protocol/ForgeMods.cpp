@@ -70,7 +70,7 @@ const AString & cForgeMods::GetModNameAt(size_t i) const
 void cForgeMods::Add(AString & a_Name, AString & a_Version)
 {
 	m_ModNames.push_back(a_Name);
-	m_Mods.insert(std::make_pair(a_Name, a_Version));
+	m_Mods.insert({a_Name, a_Version});
 }
 
 
