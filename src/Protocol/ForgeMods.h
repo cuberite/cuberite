@@ -28,7 +28,7 @@ public:
 	// tolua_end
 
 	cForgeMods();
-	cForgeMods(AStringMap a);
+	cForgeMods(const AStringMap & a);
 
 	static const cForgeMods & Unmodded(void);
 

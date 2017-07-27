@@ -14,7 +14,7 @@ cForgeMods::cForgeMods()
 
 
 
-cForgeMods::cForgeMods(AStringMap a):m_Mods(a)
+cForgeMods::cForgeMods(const AStringMap & a):m_Mods(a)
 {
 	for (const auto & item: a)
 	{
