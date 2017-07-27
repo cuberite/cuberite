@@ -199,12 +199,12 @@ bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, 
 	m_DiffY = m_EndY - m_StartY;
 	m_DiffZ = m_EndZ - m_StartZ;
 
-	// The actual trace is handled with ChunkMapCS locked by calling our Item() for the specified chunk
+	// The actual trace is handled with ChunkMapCS locked by calling our ChunkCallback for the specified chunk
 	int BlockX = FloorC(m_StartX);
 	int BlockZ = FloorC(m_StartZ);
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
-	return m_World->DoWithChunk(ChunkX, ChunkZ, *this);
+	return m_World->DoWithChunk(ChunkX, ChunkZ, [this](cChunk & a_Chunk) { return ChunkCallback(&a_Chunk); });
 }
 
 
@@ -308,7 +308,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 
 
 
-bool cLineBlockTracer::Item(cChunk * a_Chunk)
+bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 {
 	ASSERT((m_CurrentY >= 0) && (m_CurrentY < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
 

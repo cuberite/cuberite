@@ -11,12 +11,13 @@
 
 
 
+#include "FunctionRef.h"
 #include "Map.h"
 
 
 
 
-typedef cItemCallback<cMap> cMapCallback;
+using cMapCallback = cFunctionRef<bool(cMap &)>;
 
 
 
@@ -41,7 +42,7 @@ public:
 	/** Calls the callback for the map with the specified ID.
 	Returns true if the map was found and the callback called, false if map not found.
 	Callback return value is ignored. */
-	bool DoWithMap(UInt32 a_ID, cMapCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithMap(UInt32 a_ID, cMapCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Ticks each registered map */
 	void TickMaps(void);

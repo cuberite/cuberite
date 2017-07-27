@@ -62,42 +62,30 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
 	)
 	{
-		// Use a callback to set the properties of the mob head block entity:
-		class cCallback : public cBlockEntityCallback
-		{
-			cPlayer & m_Player;
-			eMobHeadType m_HeadType;
-			NIBBLETYPE m_BlockMeta;
+		auto HeadType = static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage);
+		auto BlockMeta = static_cast<NIBBLETYPE>(a_BlockFace);
 
-			virtual bool Item(cBlockEntity * a_BlockEntity)
+		// Use a callback to set the properties of the mob head block entity:
+		a_World.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, [&](cBlockEntity & a_BlockEntity)
 			{
-				if (a_BlockEntity->GetBlockType() != E_BLOCK_HEAD)
+				if (a_BlockEntity.GetBlockType() != E_BLOCK_HEAD)
 				{
 					return false;
 				}
-				auto MobHeadEntity = static_cast<cMobHeadEntity *>(a_BlockEntity);
+				auto & MobHeadEntity = static_cast<cMobHeadEntity &>(a_BlockEntity);
 
 				int Rotation = 0;
-				if (m_BlockMeta == 1)
+				if (BlockMeta == 1)
 				{
-					Rotation = FloorC(m_Player.GetYaw() * 16.0f / 360.0f + 0.5f) & 0x0f;
+					Rotation = FloorC(a_Player.GetYaw() * 16.0f / 360.0f + 0.5f) & 0x0f;
 				}
 
-				MobHeadEntity->SetType(m_HeadType);
-				MobHeadEntity->SetRotation(static_cast<eMobHeadRotation>(Rotation));
-				MobHeadEntity->GetWorld()->BroadcastBlockEntity(MobHeadEntity->GetPosX(), MobHeadEntity->GetPosY(), MobHeadEntity->GetPosZ());
+				MobHeadEntity.SetType(HeadType);
+				MobHeadEntity.SetRotation(static_cast<eMobHeadRotation>(Rotation));
+				MobHeadEntity.GetWorld()->BroadcastBlockEntity(MobHeadEntity.GetPosX(), MobHeadEntity.GetPosY(), MobHeadEntity.GetPosZ());
 				return false;
 			}
-
-		public:
-			cCallback (cPlayer & a_CBPlayer, eMobHeadType a_HeadType, NIBBLETYPE a_BlockMeta) :
-				m_Player(a_CBPlayer),
-				m_HeadType(a_HeadType),
-				m_BlockMeta(a_BlockMeta)
-			{}
-		};
-		cCallback Callback(a_Player, static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage), static_cast<NIBBLETYPE>(a_BlockFace));
-		a_World.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
+		);
 	}
 
 
@@ -243,24 +231,16 @@ public:
 			// If it is a mob head, check the correct head type using the block entity:
 			if (BlockType == E_BLOCK_HEAD)
 			{
-				class cHeadCallback: public cBlockEntityCallback
-				{
-					virtual bool Item(cBlockEntity * a_Entity) override
+				bool IsWitherHead = false;
+				a_World.DoWithBlockEntityAt(BlockX, BlockY, BlockZ, [&](cBlockEntity & a_Entity)
 					{
-						ASSERT(a_Entity->GetBlockType() == E_BLOCK_HEAD);
-						cMobHeadEntity * MobHead = static_cast<cMobHeadEntity *>(a_Entity);
-						m_IsWitherHead = (MobHead->GetType() == SKULL_TYPE_WITHER);
+						ASSERT(a_Entity.GetBlockType() == E_BLOCK_HEAD);
+						auto & MobHead = static_cast<cMobHeadEntity &>(a_Entity);
+						IsWitherHead = (MobHead.GetType() == SKULL_TYPE_WITHER);
 						return true;
 					}
-				public:
-					cHeadCallback(void):
-						m_IsWitherHead(false)
-					{
-					}
-					bool m_IsWitherHead;
-				} callback;
-				a_World.DoWithBlockEntityAt(BlockX, BlockY, BlockZ, callback);
-				if (!callback.m_IsWitherHead)
+				);
+				if (!IsWitherHead)
 				{
 					return false;
 				}
@@ -287,25 +267,18 @@ public:
 	/** Awards the achievement to all players close to the specified point. */
 	void AwardSpawnWitherAchievement(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		class cPlayerCallback : public cPlayerListCallback
-		{
-			Vector3f m_Pos;
-
-			virtual bool Item(cPlayer * a_Player)
+		Vector3f Pos{ static_cast<float>(a_BlockX), static_cast<float>(a_BlockY), static_cast<float>(a_BlockZ) };
+		a_World.ForEachPlayer([=](cPlayer & a_Player)
 			{
 				// If player is close, award achievement:
-				double Dist = (a_Player->GetPosition() - m_Pos).Length();
+				double Dist = (a_Player.GetPosition() - Pos).Length();
 				if (Dist < 50.0)
 				{
-					a_Player->AwardAchievement(achSpawnWither);
+					a_Player.AwardAchievement(achSpawnWither);
 				}
 				return false;
 			}
-
-		public:
-			cPlayerCallback(const Vector3f & a_Pos) : m_Pos(a_Pos) {}
-		} PlayerCallback(Vector3f(static_cast<float>(a_BlockX), static_cast<float>(a_BlockY), static_cast<float>(a_BlockZ)));
-		a_World.ForEachPlayer(PlayerCallback);
+		);
 	}
 
 
