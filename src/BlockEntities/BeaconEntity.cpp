@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
@@ -195,33 +195,21 @@ void cBeaconEntity::UpdateBeacon(void)
 			GetWindow()->SetProperty(0, m_BeaconLevel);
 		}
 
-		class cPlayerCallback :
-			public cPlayerListCallback
-		{
-		public:
-			cPlayerCallback(Vector3d a_Position):
-				m_Position(a_Position)
+		Vector3d BeaconPosition(m_PosX, m_PosY, m_PosZ);
+		GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
 			{
-			}
-
-			virtual bool Item(cPlayer * a_Player)
-			{
-				Vector3d Distance = m_Position - a_Player->GetPosition();
+				Vector3d Distance = BeaconPosition - a_Player.GetPosition();
 				if (
 					(std::abs(Distance.y) <= 14) &&
 					(std::abs(Distance.x) <= 20) &&
 					(std::abs(Distance.z) <= 20)
 				)
 				{
-					a_Player->AwardAchievement(eStatistic::achFullBeacon);
+					a_Player.AwardAchievement(eStatistic::achFullBeacon);
 				}
 				return false;
 			}
-
-		private:
-			Vector3d m_Position;
-		} PlayerCallback(Vector3d(m_PosX, m_PosY, m_PosZ));
-		GetWorld()->ForEachPlayer(PlayerCallback);
+		);
 	}
 }
 
@@ -249,46 +237,28 @@ void cBeaconEntity::GiveEffects(void)
 		SecondaryEffect = m_SecondaryEffect;
 	}
 
-	class cPlayerCallback : public cPlayerListCallback
-	{
-		int m_Radius;
-		Vector3d m_Position;
-		cEntityEffect::eType m_PrimaryEffect, m_SecondaryEffect;
-		short m_EffectLevel;
-
-		virtual bool Item(cPlayer * a_Player)
+	Vector3d BeaconPosition(m_PosX, m_PosY, m_PosZ);
+	GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
 		{
-			Vector3d PlayerPosition = Vector3d(a_Player->GetPosition());
-			if (PlayerPosition.y > m_Position.y)
+			auto PlayerPosition = a_Player.GetPosition();
+			if (PlayerPosition.y > BeaconPosition.y)
 			{
-				PlayerPosition.y = m_Position.y;
+				PlayerPosition.y = BeaconPosition.y;
 			}
 
 			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
-			if ((PlayerPosition - m_Position).Length() <= m_Radius)
+			if ((PlayerPosition - BeaconPosition).Length() <= Radius)
 			{
-				a_Player->AddEntityEffect(m_PrimaryEffect, 180, m_EffectLevel);
+				a_Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
 
 				if (m_SecondaryEffect != cEntityEffect::effNoEffect)
 				{
-					a_Player->AddEntityEffect(m_SecondaryEffect, 180, 0);
+					a_Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
 				}
 			}
 			return false;
 		}
-
-	public:
-		cPlayerCallback(int a_Radius, Vector3d a_Position, cEntityEffect::eType a_PrimaryEffect, cEntityEffect::eType a_SecondaryEffect, short a_EffectLevel):
-			m_Radius(a_Radius),
-			m_Position(a_Position),
-			m_PrimaryEffect(a_PrimaryEffect),
-			m_SecondaryEffect(a_SecondaryEffect),
-			m_EffectLevel(a_EffectLevel)
-		{
-		}
-
-	} PlayerCallback(Radius, Vector3d(m_PosX, m_PosY, m_PosZ), m_PrimaryEffect, SecondaryEffect, EffectLevel);
-	GetWorld()->ForEachPlayer(PlayerCallback);
+	);
 }
 
 

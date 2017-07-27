@@ -15,7 +15,7 @@
 
 
 class cPlayer;
-typedef cItemCallback<cPlayer> cPlayerListCallback;
+typedef cFunctionRef<bool(cPlayer &)> cPlayerListCallback;
 
 
 /** A window that has been created by a Lua plugin and is handled entirely by that plugin

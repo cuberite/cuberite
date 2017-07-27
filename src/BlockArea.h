@@ -17,13 +17,14 @@
 #include "ForEachChunkProvider.h"
 #include "ChunkDataCallback.h"
 #include "Cuboid.h"
+#include "FunctionRef.h"
 
 
 
 
 // fwd:
 class cCuboid;
-
+using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 
 
 
@@ -376,18 +377,18 @@ public:
 	/** Calls the callback for the block entity at the specified coords.
 	Returns false if there is no block entity at those coords, or the block area doesn't have baBlockEntities.
 	Returns the value that the callback has returned if there is a block entity. */
-	bool DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cItemCallback<cBlockEntity> & a_Callback);
+	bool DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cBlockEntityCallback a_Callback);
 
 	/** Calls the callback for the block entity at the specified coords.
 	Returns false if there is no block entity at those coords.
 	Returns the value that the callback has returned if there is a block entity. */
-	bool DoWithBlockEntityAt   (int a_BlockX, int a_BlockY, int a_BlockZ, cItemCallback<cBlockEntity> & a_Callback);
+	bool DoWithBlockEntityAt   (int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);
 
 	/** Calls the callback for all the block entities.
 	If the callback returns true, aborts the enumeration and returns false.
 	If the callback returns true, continues with the next BE.
 	Returns true if all block entities have been enumerated (including the case when there is none or the area is without baBlockEntities). */
-	bool ForEachBlockEntity(cItemCallback<cBlockEntity> & a_Callback);
+	bool ForEachBlockEntity(cBlockEntityCallback a_Callback);
 
 	/** Direct read-only access to block entities. */
 	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }

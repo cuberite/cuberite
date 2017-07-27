@@ -120,27 +120,17 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 	int RelX = BlockX - (ChunkX * cChunkDef::Width);
 	int RelZ = BlockZ - (ChunkZ * cChunkDef::Width);
 
-	class cCalculatePixelCb :
-		public cChunkCallback
-	{
-		cMap * m_Map;
+	ASSERT(m_World != nullptr);
 
-		int m_RelX, m_RelZ;
-
-		ColorID m_PixelData;
-
-	public:
-		cCalculatePixelCb(cMap * a_Map, int a_RelX, int a_RelZ)
-			: m_Map(a_Map), m_RelX(a_RelX), m_RelZ(a_RelZ), m_PixelData(E_BASE_COLOR_TRANSPARENT) {}
-
-		virtual bool Item(cChunk * a_Chunk) override
+	ColorID PixelData;
+	m_World->DoWithChunk(ChunkX, ChunkZ, [&](cChunk & a_Chunk)
 		{
-			if (!a_Chunk->IsValid())
+			if (!a_Chunk.IsValid())
 			{
 				return false;
 			}
 
-			if (m_Map->GetDimension() == dimNether)
+			if (GetDimension() == dimNether)
 			{
 				// TODO 2014-02-22 xdot: Nether maps
 
@@ -151,22 +141,22 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			BLOCKTYPE TargetBlock;
 			NIBBLETYPE TargetMeta;
 
-			auto Height = a_Chunk->GetHeight(m_RelX, m_RelZ);
+			auto Height = a_Chunk.GetHeight(RelX, RelZ);
 			auto ChunkHeight = cChunkDef::Height;
-			a_Chunk->GetBlockTypeMeta(m_RelX, Height, m_RelZ, TargetBlock, TargetMeta);
+			a_Chunk.GetBlockTypeMeta(RelX, Height, RelZ, TargetBlock, TargetMeta);
 			auto ColourID = BlockHandler(TargetBlock)->GetMapBaseColourID(TargetMeta);
 
 			if (IsBlockWater(TargetBlock))
 			{
 				ChunkHeight /= 4;
-				while (((--Height) != -1) && IsBlockWater(a_Chunk->GetBlock(m_RelX, Height, m_RelZ)))
+				while (((--Height) != -1) && IsBlockWater(a_Chunk.GetBlock(RelX, Height, RelZ)))
 				{
 					continue;
 				}
 			}
 			else if (ColourID == 0)
 			{
-				while (((--Height) != -1) && ((ColourID = BlockHandler(a_Chunk->GetBlock(m_RelX, Height, m_RelZ))->GetMapBaseColourID(a_Chunk->GetMeta(m_RelX, Height, m_RelZ))) == 0))
+				while (((--Height) != -1) && ((ColourID = BlockHandler(a_Chunk.GetBlock(RelX, Height, RelZ))->GetMapBaseColourID(a_Chunk.GetMeta(RelX, Height, RelZ))) == 0))
 				{
 					continue;
 				}
@@ -174,20 +164,12 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 
 			// Multiply base color ID by 4 and add brightness ID
 			const int BrightnessIDSize = static_cast<int>(BrightnessID.size());
-			m_PixelData = ColourID * 4 + BrightnessID[static_cast<size_t>(Clamp<int>((BrightnessIDSize * Height) / ChunkHeight, 0, BrightnessIDSize - 1))];
+			PixelData = ColourID * 4 + BrightnessID[static_cast<size_t>(Clamp<int>((BrightnessIDSize * Height) / ChunkHeight, 0, BrightnessIDSize - 1))];
 			return false;
 		}
+	);
 
-		ColorID GetPixelData(void) const
-		{
-			return m_PixelData;
-		}
-	} CalculatePixelCb(this, RelX, RelZ);
-
-	ASSERT(m_World != nullptr);
-	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);
-
-	SetPixel(a_X, a_Z, CalculatePixelCb.GetPixelData());
+	SetPixel(a_X, a_Z, PixelData);
 
 	return true;
 }

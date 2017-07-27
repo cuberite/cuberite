@@ -10,8 +10,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // cPlayerLookCheck
-class cPlayerLookCheck :
-	public cPlayerListCallback
+class cPlayerLookCheck
 {
 public:
 	cPlayerLookCheck(Vector3d a_EndermanPos, int a_SightDistance) :
@@ -21,29 +20,29 @@ public:
 	{
 	}
 
-	virtual bool Item(cPlayer * a_Player) override
+	bool operator () (cPlayer & a_Player)
 	{
 		// Don't check players who cannot be targeted
-		if (!a_Player->CanMobsTarget())
+		if (!a_Player.CanMobsTarget())
 		{
 			return false;
 		}
 
 		// Don't check players who are more than SightDistance (64) blocks away
-		auto Direction = m_EndermanPos - a_Player->GetPosition();
+		auto Direction = m_EndermanPos - a_Player.GetPosition();
 		if (Direction.Length() > m_SightDistance)
 		{
 			return false;
 		}
 
 		// Don't check if the player has a pumpkin on his head
-		if (a_Player->GetEquippedHelmet().m_ItemType == E_BLOCK_PUMPKIN)
+		if (a_Player.GetEquippedHelmet().m_ItemType == E_BLOCK_PUMPKIN)
 		{
 			return false;
 		}
 
 		// If the player's crosshair is within 5 degrees of the enderman, it counts as looking
-		auto LookVector = a_Player->GetLookVector();
+		auto LookVector = a_Player.GetLookVector();
 		auto dot = Direction.Dot(LookVector);
 		if (dot <= cos(0.09))  // 0.09 rad ~ 5 degrees
 		{
@@ -51,13 +50,13 @@ public:
 		}
 
 		// TODO: Check if endermen are angered through water in Vanilla
-		if (!cLineBlockTracer::LineOfSightTrace(*a_Player->GetWorld(), m_EndermanPos, a_Player->GetPosition(), cLineBlockTracer::losAirWater))
+		if (!cLineBlockTracer::LineOfSightTrace(*a_Player.GetWorld(), m_EndermanPos, a_Player.GetPosition(), cLineBlockTracer::losAirWater))
 		{
 			// No direct line of sight
 			return false;
 		}
 
-		m_Player = a_Player;
+		m_Player = &a_Player;
 		return true;
 	}
 

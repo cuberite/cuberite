@@ -39,26 +39,7 @@ public:
 
 			if (Type == E_BLOCK_TRIPWIRE)
 			{
-				class cTripwireCallback :
-					public cEntityCallback
-				{
-				public:
-					cTripwireCallback(void) :
-						m_NumberOfEntities(0),
-						m_FoundPlayer(false)
-					{
-					}
-
-					virtual bool Item(cEntity * a_Entity) override
-					{
-						return true;
-					}
-
-					unsigned int m_NumberOfEntities;
-					bool m_FoundPlayer;
-				} TripwireCallback;
-
-				if (!a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), TripwireCallback))
+				if (!a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), [](cEntity &) { return true; }))
 				{
 					FoundActivated = true;
 				}

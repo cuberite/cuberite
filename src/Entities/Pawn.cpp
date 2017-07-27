@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Pawn.h"
@@ -80,49 +80,37 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Effect->OnTick(*this);
 	}
 
-	class Pusher : public cEntityCallback
-	{
-	public:
-		cEntity * m_Pusher;
-
-		Pusher(cEntity * a_Pusher) :
-			m_Pusher(a_Pusher)
-		{
-		}
-
-		virtual bool Item(cEntity * a_Entity) override
-		{
-			if (a_Entity->GetUniqueID() == m_Pusher->GetUniqueID())
-			{
-				return false;
-			}
-
-			// we only push other mobs, boats and minecarts
-			if ((a_Entity->GetEntityType() != etMonster) && (a_Entity->GetEntityType() != etMinecart) && (a_Entity->GetEntityType() != etBoat))
-			{
-				return false;
-			}
-
-			// do not push a boat / minecart you're sitting in
-			if (m_Pusher->IsAttachedTo(a_Entity))
-			{
-				return false;
-			}
-
-			Vector3d v3Delta = a_Entity->GetPosition() - m_Pusher->GetPosition();
-			v3Delta.y = 0.0;  // we only push sideways
-			v3Delta *= 1.0 / (v3Delta.Length() + 0.01);  // we push harder if we're close
-			// QUESTION: is there an additional multiplier for this? current shoving seems a bit weak
-
-			a_Entity->AddSpeed(v3Delta);
-			return false;
-		}
-	} Callback(this);
-
 	// Spectators cannot push entities around
-	if ((!IsPlayer()) || (!reinterpret_cast<cPlayer *>(this)->IsGameModeSpectator()))
+	if ((!IsPlayer()) || (!static_cast<cPlayer *>(this)->IsGameModeSpectator()))
 	{
-		m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), GetWidth(), GetHeight()), Callback);
+		m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), GetWidth(), GetHeight()), [=](cEntity & a_Entity)
+			{
+				if (a_Entity.GetUniqueID() == GetUniqueID())
+				{
+					return false;
+				}
+
+				// we only push other mobs, boats and minecarts
+				if ((a_Entity.GetEntityType() != etMonster) && (a_Entity.GetEntityType() != etMinecart) && (a_Entity.GetEntityType() != etBoat))
+				{
+					return false;
+				}
+
+				// do not push a boat / minecart you're sitting in
+				if (IsAttachedTo(&a_Entity))
+				{
+					return false;
+				}
+
+				Vector3d v3Delta = a_Entity.GetPosition() - GetPosition();
+				v3Delta.y = 0.0;  // we only push sideways
+				v3Delta *= 1.0 / (v3Delta.Length() + 0.01);  // we push harder if we're close
+				// QUESTION: is there an additional multiplier for this? current shoving seems a bit weak
+
+				a_Entity.AddSpeed(v3Delta);
+				return false;
+			}
+		);
 	}
 
 	super::Tick(a_Dt, a_Chunk);

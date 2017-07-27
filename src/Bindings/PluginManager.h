@@ -3,6 +3,7 @@
 
 
 #include "Defines.h"
+#include "FunctionRef.h"
 
 
 
@@ -193,7 +194,7 @@ public:
 
 
 	/** The interface used for enumerating and extern-calling plugins */
-	typedef cItemCallback<cPlugin> cPluginCallback;
+	using cPluginCallback = cFunctionRef<bool(cPlugin &)>;
 
 	typedef std::list<cPlugin *> PluginList;
 
@@ -370,18 +371,18 @@ public:
 
 	/** Calls the specified callback with the plugin object of the specified plugin.
 	Returns false if plugin not found, otherwise returns the value that the callback has returned. */
-	bool DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback);
+	bool DoWithPlugin(const AString & a_PluginName, cPluginCallback a_Callback);
 
 	/** Calls the specified callback for each plugin in m_Plugins.
 	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true. */
-	bool ForEachPlugin(cPluginCallback & a_Callback);
+	bool ForEachPlugin(cPluginCallback a_Callback);
 
 	/** Returns the name of the folder (cPlugin::GetFolderName()) from which the specified plugin was loaded. */
 	AString GetPluginFolderName(const AString & a_PluginName);  // tolua_export
 
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
-	static AString GetPluginsPath(void) { return FILE_IO_PREFIX + AString("Plugins"); }  // tolua_export
+	static AString GetPluginsPath(void) { return FILE_IO_PREFIX "Plugins"; }  // tolua_export
 
 private:
 	friend class cRoot;

@@ -126,8 +126,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntityCollisionCallback:
 
-class cProjectileEntityCollisionCallback :
-	public cEntityCallback
+class cProjectileEntityCollisionCallback
 {
 public:
 	cProjectileEntityCollisionCallback(cProjectileEntity * a_Projectile, const Vector3d & a_Pos, const Vector3d & a_NextPos) :
@@ -140,11 +139,11 @@ public:
 	}
 
 
-	virtual bool Item(cEntity * a_Entity) override
+	bool operator () (cEntity & a_Entity)
 	{
 		if (
-			(a_Entity == m_Projectile) ||          // Do not check collisions with self
-			(a_Entity->GetUniqueID() == m_Projectile->GetCreatorUniqueID())  // Do not check whoever shot the projectile
+			(&a_Entity == m_Projectile) ||          // Do not check collisions with self
+			(a_Entity.GetUniqueID() == m_Projectile->GetCreatorUniqueID())  // Do not check whoever shot the projectile
 		)
 		{
 			// Don't check creator only for the first 5 ticks so that projectiles can collide with the creator
@@ -154,7 +153,7 @@ public:
 			}
 		}
 
-		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+		cBoundingBox EntBox(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
 
 		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding box with a hairline.
 		// The results should be good enough for our purposes
@@ -168,20 +167,20 @@ public:
 		}
 
 		if (
-			!a_Entity->IsMob() &&
-			!a_Entity->IsMinecart() &&
+			!a_Entity.IsMob() &&
+			!a_Entity.IsMinecart() &&
 			(
-				!a_Entity->IsPlayer() ||
-				static_cast<cPlayer *>(a_Entity)->IsGameModeSpectator()
+				!a_Entity.IsPlayer() ||
+				static_cast<cPlayer &>(a_Entity).IsGameModeSpectator()
 			) &&
-			!a_Entity->IsBoat()
+			!a_Entity.IsBoat()
 		)
 		{
 			// Not an entity that interacts with a projectile
 			return false;
 		}
 
-		if (cPluginManager::Get()->CallHookProjectileHitEntity(*m_Projectile, *a_Entity))
+		if (cPluginManager::Get()->CallHookProjectileHitEntity(*m_Projectile, a_Entity))
 		{
 			// A plugin disagreed.
 			return false;
@@ -191,7 +190,7 @@ public:
 		{
 			// The entity is closer than anything we've stored so far, replace it as the potential victim
 			m_MinCoeff = LineCoeff;
-			m_HitEntity = a_Entity;
+			m_HitEntity = &a_Entity;
 		}
 
 		// Don't break the enumeration, we want all the entities
@@ -327,20 +326,13 @@ void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hi
 	// If we were created by a player and we hit a pawn, notify attacking player's wolves
 	if (a_EntityHit.IsPawn() && (GetCreatorName() != ""))
 	{
-		class cNotifyWolves : public cEntityCallback
-		{
-		public:
-			cPawn * m_EntityHit;
-
-			virtual bool Item(cEntity * a_Hitter) override
+		auto EntityHit = static_cast<cPawn *>(&a_EntityHit);
+		m_World->DoWithEntityByID(GetCreatorUniqueID(), [=](cEntity & a_Hitter)
 			{
-				static_cast<cPlayer*>(a_Hitter)->NotifyNearbyWolves(m_EntityHit, true);
+				static_cast<cPlayer&>(a_Hitter).NotifyNearbyWolves(EntityHit, true);
 				return true;
 			}
-		} Callback;
-
-		Callback.m_EntityHit = static_cast<cPawn*>(&a_EntityHit);
-		m_World->DoWithEntityByID(GetCreatorUniqueID(), Callback);
+		);
 	}
 }
 
