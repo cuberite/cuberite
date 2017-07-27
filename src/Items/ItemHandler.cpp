@@ -828,7 +828,6 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
-	UNUSED(a_Item);
 	if (!a_Player->IsGameModeCreative())
 	{
 		a_Player->GetInventory().RemoveOneEquippedItem();
