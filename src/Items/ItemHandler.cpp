@@ -826,15 +826,6 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 
 
-bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance)
-{
-	return false;
-}
-
-
-
-
-
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	UNUSED(a_Item);
@@ -843,24 +834,10 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 		a_Player->GetInventory().RemoveOneEquippedItem();
 	}
 
-	FoodInfo Info = GetFoodInfo();
+	FoodInfo Info = GetFoodInfo(a_Item);
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
 	{
-		bool Success = a_Player->Feed(Info.FoodLevel, Info.Saturation);
-
-		// Give effects
-		cEntityEffect::eType EffectType;
-		int EffectDurationTicks;
-		short EffectIntensity;
-		float Chance;
-		if (Success && GetEatEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance))
-		{
-			if (GetRandomProvider().RandBool(Chance))
-			{
-				a_Player->AddEntityEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance);
-			}
-		}
-		return Success;
+		return a_Player->Feed(Info.FoodLevel, Info.Saturation);
 	}
 	return false;
 }
@@ -869,8 +846,9 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 
 
 
-cItemHandler::FoodInfo cItemHandler::GetFoodInfo()
+cItemHandler::FoodInfo cItemHandler::GetFoodInfo(const cItem * a_Item)
 {
+	UNUSED(a_Item);
 	return FoodInfo(0, 0);
 }
 
