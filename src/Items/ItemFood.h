@@ -39,8 +39,8 @@ public:
 			FoodInfo(5, 6.0),  // Cooked fish
 			FoodInfo(6, 9.6),  // Cooked salmon
 		};
-		static const size_t NumRawFishInfos = sizeof(RawFishInfos) / sizeof(FoodInfo);
-		static const size_t NumCookedFishInfos = sizeof(CookedFishInfos) / sizeof(FoodInfo);
+		static const short NumRawFishInfos = sizeof(RawFishInfos) / sizeof(FoodInfo);
+		static const short NumCookedFishInfos = sizeof(CookedFishInfos) / sizeof(FoodInfo);
 
 		switch (m_ItemType)
 		{
