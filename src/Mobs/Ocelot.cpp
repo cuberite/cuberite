@@ -6,6 +6,7 @@
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
 #include "Broadcaster.h"
+#include "../BoundingBox.h"
 
 
 
@@ -198,6 +199,33 @@ void cOcelot::SpawnOn(cClientHandle & a_ClientHandle)
 		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
 		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
 	}
+}
+
+
+
+
+
+class cFindSittingCat :
+	public cEntityCallback
+{
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		return (
+			(a_Entity->GetEntityType() == cEntity::etMonster) &&
+			(static_cast<cMonster *>(a_Entity)->GetMobType() == eMonsterType::mtOcelot) &&
+			(static_cast<cOcelot *>(a_Entity)->IsSitting())
+		);
+	}
+};
+
+
+
+
+
+bool cOcelot::IsCatSittingOnBlock(cWorld * a_World, const Vector3d & a_BlockPosition)
+{
+	cFindSittingCat FindSittingCat;
+	return a_World->ForEachEntityInBox(cBoundingBox(Vector3d(a_BlockPosition.x, a_BlockPosition.y + 1, a_BlockPosition.z), 1, 1), FindSittingCat);
 }
 
 

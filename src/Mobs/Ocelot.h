@@ -54,6 +54,8 @@ public:
 	}
 	void SetCatType (eCatType a_CatType)    { m_CatType = a_CatType; }
 
+	static bool IsCatSittingOnBlock(cWorld * a_World, const Vector3d & a_BlockPosition);
+
 protected:
 
 	bool      m_IsSitting;
