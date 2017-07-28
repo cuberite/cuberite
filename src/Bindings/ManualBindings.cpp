@@ -3148,12 +3148,10 @@ static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 		return 0;
 	}
 
-	cServer * Server = reinterpret_cast<cServer *>(tolua_tousertype(L, 1, nullptr));
+	cServer * Server;
 	AString Name, Version;
 	UInt32 Protocol;
-	L.GetStackValue(2, Name);
-	L.GetStackValue(3, Version);
-	L.GetStackValue(4, Protocol);
+	L.GetStackValues(1, Server, Name, Version, Protocol);
 
 	if (!Server->RegisterForgeMod(Name, Version, Protocol))
 	{
