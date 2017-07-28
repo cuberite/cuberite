@@ -3172,7 +3172,7 @@ static int tolua_cScoreboard_GetTeamNames(lua_State * L)
 	if (
 		!S.CheckParamUserType(1, "cScoreboard") ||
 		!S.CheckParamEnd(2)
-		)
+	)
 	{
 		return 0;
 	}
