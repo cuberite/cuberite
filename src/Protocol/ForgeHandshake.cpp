@@ -66,12 +66,10 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 
 	LOG("Received server ping from version: %d", ProtocolVersion);
 
-	// modinfo:
 	Json::Value Modinfo;
 	Modinfo["type"] = "FML";
 
 	Json::Value ModList(Json::arrayValue);
-
 	for (auto & item: Mods.GetMods())
 	{
 		Json::Value Mod;
@@ -79,10 +77,8 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 		Mod["version"] = item.second;
 		ModList.append(Mod);
 	}
-
 	Modinfo["modList"] = ModList;
 
-	// Augment the response:
 	a_ResponseValue["modinfo"] = Modinfo;
 }
 
@@ -100,7 +96,6 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 
 	std::array<AString, 5> Channels{{ "FML|HS", "FML", "FML|MP", "FML", "FORGE" }};
 	AString ChannelsString;
-
 	for (auto & Channel: Channels)
 	{
 		ChannelsString.append(Channel);
@@ -147,7 +142,6 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	cByteBuffer Buf(a_Size);
 	Buf.Write(a_Data, a_Size);
-
 	UInt32 NumMods;
 	if (!Buf.ReadVarInt32(NumMods))
 	{
@@ -163,13 +157,11 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 			LOGD("ParseModList failed to read mod name at i=" SIZE_T_FMT, i);
 			break;
 		}
-
 		if (!Buf.ReadVarUTF8String(Version))
 		{
 			LOGD("ParseModList failed to read mod version at i=" SIZE_T_FMT, i);
 			break;
 		}
-
 		Mods.insert({Name, Version});
 	}
 
@@ -187,7 +179,6 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		LOG("Received unexpected Forge data from non-Forge client (" SIZE_T_FMT " bytes)", a_Size);
 		return;
 	}
-
 	LOGD("Received Forge data: " SIZE_T_FMT " bytes: %s", a_Size, a_Data);
 
 	if (a_Size <= 1)
