@@ -13,14 +13,14 @@
 
 
 /** Discriminator byte values prefixing the FML|HS packets to determine their type. */
-enum
+enum Discriminator: signed char
 {
-	Discriminator_ServerHello = 0,
-	Discriminator_ClientHello = 1,
-	Discriminator_ModList = 2,
-	Discriminator_RegistryData = 3,
-	Discriminator_HandshakeReset = -2,
-	Discriminator_HandshakeAck = -1,
+	ServerHello = 0,
+	ClientHello = 1,
+	ModList = 2,
+	RegistryData = 3,
+	HandshakeReset = -2,
+	HandshakeAck = -1,
 };
 
 /** Client handshake state phases. */
@@ -119,7 +119,7 @@ void cForgeHandshake::SendServerHello()
 {
 	AString Message;
 	// Discriminator | Byte | Always 0 for ServerHello
-	Message.push_back(Discriminator_ServerHello);
+	Message.push_back(Discriminator::ServerHello);
 	// FML protocol Version | Byte | Determined from NetworkRegistery. Currently 2.
 	Message.push_back('\2');
 	// Dimension TODO
@@ -202,7 +202,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 	switch (Discriminator)
 	{
-		case Discriminator_ClientHello:
+		case Discriminator::ClientHello:
 		{
 			if (a_Size == 2)
 			{
@@ -223,7 +223,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			break;
 		}
 
-		case Discriminator_ModList:
+		case Discriminator::ModList:
 		{
 			LOGD("Received ModList");
 
@@ -264,7 +264,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 			size_t ModCount = ServerMods.GetNumMods();
 
-			Buf.WriteBEInt8(Discriminator_ModList);
+			Buf.WriteBEInt8(Discriminator::ModList);
 			Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
 			for (size_t i = 0; i < ModCount; ++i)
 			{
@@ -280,7 +280,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 			break;
 		}
 
-		case Discriminator_HandshakeAck:
+		case Discriminator::HandshakeAck:
 		{
 			if (a_Size != 2)
 			{
@@ -297,7 +297,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 				case ClientPhase_WAITINGSERVERDATA:
 				{
 					cByteBuffer Buf(1024);
-					Buf.WriteBEInt8(Discriminator_RegistryData);
+					Buf.WriteBEInt8(Discriminator::RegistryData);
 
 					// TODO: send real registry data
 					bool HasMore = false;
@@ -323,7 +323,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 					LOG("Client finished receiving registry data; acknowledging");
 
 					AString Ack;
-					Ack.push_back(Discriminator_HandshakeAck);
+					Ack.push_back(Discriminator::HandshakeAck);
 					Ack.push_back(ServerPhase_WAITINGCACK);
 					m_Client->SendPluginMessage("FML|HS", Ack);
 					break;
@@ -334,7 +334,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 					LOG("Client is pending completion; sending complete ack");
 
 					AString Ack;
-					Ack.push_back(Discriminator_HandshakeAck);
+					Ack.push_back(Discriminator::HandshakeAck);
 					Ack.push_back(ServerPhase_COMPLETE);
 					m_Client->SendPluginMessage("FML|HS", Ack);
 
