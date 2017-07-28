@@ -106,6 +106,8 @@ public:
 	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
 	virtual bool OnPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual bool OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity) override;
+	virtual bool OnPlayerEditedBook         (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned) override;
+	virtual bool OnPlayerEditingBook        (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned) override;
 	virtual bool OnPlayerShooting           (cPlayer & a_Player) override;
 	virtual bool OnPlayerSpawned            (cPlayer & a_Player) override;
 	virtual bool OnEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) override;

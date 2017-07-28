@@ -13,7 +13,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
 #include "Color.h"
-
+#include "BookContent.h"
 
 
 
@@ -109,6 +109,7 @@ public:
 		m_RepairCost = 0;
 		m_FireworkItem.EmptyData();
 		m_ItemColor.Clear();
+		m_BookContent.Clear();
 	}
 
 
@@ -119,6 +120,8 @@ public:
 		m_ItemDamage = 0;
 		m_RepairCost = 0;
 		m_ItemColor.Clear();
+		m_BookContent.Clear();
+		m_Enchantments.Clear();
 	}
 
 
@@ -230,6 +233,7 @@ public:
 	int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;
 	cColor         m_ItemColor;
+	cBookContent   m_BookContent;
 };
 // tolua_end
 

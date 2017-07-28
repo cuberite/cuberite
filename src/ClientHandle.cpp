@@ -2295,6 +2295,15 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
+void cClientHandle::SendOpenBook(const short a_Hand)
+{
+	m_Protocol->SendOpenBook(a_Hand);
+}
+
+
+
+
+
 void cClientHandle::SendCameraSetTo(const cEntity & a_Entity)
 {
 	m_Protocol->SendCameraSetTo(a_Entity);

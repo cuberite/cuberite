@@ -29,6 +29,7 @@ class cWorld;
 class cSettingsRepositoryInterface;
 class cDeadlockDetect;
 struct TakeDamageInfo;
+class cBookContent;
 
 typedef std::shared_ptr<cPlugin> cPluginPtr;
 typedef std::vector<cPluginPtr> cPluginPtrs;
@@ -117,6 +118,8 @@ public:
 		HOOK_PLAYER_PLACING_BLOCK,
 		HOOK_PLAYER_RIGHT_CLICK,
 		HOOK_PLAYER_RIGHT_CLICKING_ENTITY,
+		HOOK_PLAYER_EDITING_BOOK,
+		HOOK_PLAYER_EDITED_BOOK,
 		HOOK_PLAYER_SHOOTING,
 		HOOK_PLAYER_SPAWNED,
 		HOOK_ENTITY_TELEPORT,
@@ -264,6 +267,8 @@ public:
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
+	bool CallHookPlayerEditedBook         (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned);
+	bool CallHookPlayerEditingBook        (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned);
 	bool CallHookPlayerShooting           (cPlayer & a_Player);
 	bool CallHookPlayerSpawned            (cPlayer & a_Player);
 	bool CallHookPlayerTossingItem        (cPlayer & a_Player);

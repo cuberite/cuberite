@@ -56,6 +56,7 @@
 #include "ItemSword.h"
 #include "ItemThrowable.h"
 #include "ItemAxe.h"
+#include "ItemWrittenBook.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -153,6 +154,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
+		case E_ITEM_WRITTEN_BOOK:        return new cItemWrittenBookHandler(a_ItemType);
 
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:

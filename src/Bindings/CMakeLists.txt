@@ -143,6 +143,7 @@ set(BINDING_DEPENDENCIES
 	../Vector3.h
 	../WebAdmin.h
 	../World.h
+	../BookContent.h
 )
 
 if (NOT MSVC)

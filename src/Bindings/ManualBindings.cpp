@@ -3967,6 +3967,62 @@ static int tolua_cEntity_GetSpeed(lua_State * tolua_S)
 
 
 
+static int tolua_cBookContent_GetPages(lua_State * tolua_S)
+{
+	// cBookContent::GetPages() -> table of strings
+
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cBookContent"))
+	{
+		return 0;
+	}
+
+	cBookContent * BookContent = reinterpret_cast<cBookContent *>(tolua_tousertype(tolua_S, 1, nullptr));
+	L.Push(BookContent->GetPages());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cBookContent_SetPages(lua_State * tolua_S)
+{
+	// cBookContent::SetPages(table)
+
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cBookContent") ||
+		!L.CheckParamTable(2))
+	{
+		return 0;
+	}
+
+	cBookContent * BookContent = reinterpret_cast<cBookContent *>(tolua_tousertype(tolua_S, 1, nullptr));
+
+	// Convert the input table into AStringVector:
+	AStringVector Pages;
+	int NumPages = luaL_getn(L, 2);
+	Pages.reserve(static_cast<size_t>(NumPages));
+	for (int i = 1; i <= NumPages; i++)
+	{
+		lua_rawgeti(L, 2, i);
+		AString Page;
+		L.GetStackValue(-1, Page);
+		if (!Page.empty())
+		{
+			Pages.push_back(Page);
+		}
+		lua_pop(L, 1);
+	}
+	BookContent->SetPages(Pages);
+	return 0;
+}
+
+
+
+
+
 void cManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
@@ -4192,6 +4248,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_variable(tolua_S, "FormData",   tolua_get_HTTPRequest_FormData,   nullptr);
 			tolua_variable(tolua_S, "Params",     tolua_get_HTTPRequest_Params,     nullptr);
 			tolua_variable(tolua_S, "PostParams", tolua_get_HTTPRequest_PostParams, nullptr);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cBookContent");
+			tolua_function(tolua_S, "GetPages", tolua_cBookContent_GetPages);
+			tolua_function(tolua_S, "SetPages", tolua_cBookContent_SetPages);
 		tolua_endmodule(tolua_S);
 
 		BindNetwork(tolua_S);

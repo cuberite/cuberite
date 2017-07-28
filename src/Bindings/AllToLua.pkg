@@ -72,6 +72,8 @@ $cfile "../Scoreboard.h"
 $cfile "../Statistics.h"
 $cfile "../Protocol/MojangAPI.h"
 $cfile "../UUID.h"
+$cfile "../BookContent.h"
+
 
 // Entities:
 $cfile "../Entities/Entity.h"

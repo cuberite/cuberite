@@ -712,6 +712,24 @@ bool cPluginLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Ent
 
 
 
+bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITED_BOOK, &a_Player, &a_BookContent, a_IsSigned);
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerEditingBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITING_BOOK, &a_Player, &a_BookContent, a_IsSigned);
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerShooting(cPlayer & a_Player)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_SHOOTING, &a_Player);
@@ -1070,6 +1088,8 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
+		case cPluginManager::HOOK_PLAYER_EDITED_BOOK:           return "OnPlayerEditedBook";
+		case cPluginManager::HOOK_PLAYER_EDITING_BOOK:          return "OnPlayerSigningdBook";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";
 		case cPluginManager::HOOK_PLAYER_SPAWNED:               return "OnPlayerSpawned";
 		case cPluginManager::HOOK_PLAYER_TOSSING_ITEM:          return "OnPlayerTossingItem";
