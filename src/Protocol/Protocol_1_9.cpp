@@ -2949,7 +2949,9 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, a_Metadata.data(), std::max<size_t>(a_Metadata.size(), 1024), 16);
-		LOGWARNING("Cannot parse NBT item metadata: (" SIZE_T_FMT " bytes)\n%s", a_Metadata.size(), HexDump.c_str());
+		LOGWARNING("Cannot parse NBT item metadata: %s at (" SIZE_T_FMT " / " SIZE_T_FMT " bytes)\n%s",
+			NBT.GetErrorCode().message().c_str(), NBT.GetErrorPos(), a_Metadata.size(), HexDump.c_str()
+		);
 		return;
 	}
 
