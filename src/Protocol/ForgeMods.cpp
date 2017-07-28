@@ -67,10 +67,18 @@ const AString & cForgeMods::GetModNameAt(size_t i) const
 
 
 
-void cForgeMods::Add(const AString & a_Name, const AString & a_Version)
+bool cForgeMods::Add(const AString & a_Name, const AString & a_Version)
 {
+	auto ret = m_Mods.insert({a_Name, a_Version});
+
+	if (!ret.second)
+	{
+		return false;
+	}
+
 	m_ModNames.push_back(a_Name);
-	m_Mods.insert({a_Name, a_Version});
+
+	return true;
 }
 
 

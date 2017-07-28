@@ -32,7 +32,7 @@ public:
 
 	static const cForgeMods & Unmodded(void);
 
-	void Add(const AString & a_Name, const AString & a_Version);
+	bool Add(const AString & a_Name, const AString & a_Version);
 
 	void Remove(const AString & a_Name);
 

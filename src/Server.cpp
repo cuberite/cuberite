@@ -275,10 +275,13 @@ int cServer::GetNumPlayers(void) const
 
 void cServer::RegisterForgeMod(AString & a_Name, AString & a_Version)
 {
+	bool success = false;
 	for (auto & it : m_ForgeModsByVersion)
 	{
-		it.second.Add(a_Name, a_Version);
+		success |= it.second.Add(a_Name, a_Version);
 	}
+
+	(void) success;  // TODO: raise Lua exception in manual binding
 }
 
 
@@ -288,7 +291,9 @@ void cServer::RegisterForgeMod(AString & a_Name, AString & a_Version)
 void cServer::RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
 {
 	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
-	mods.Add(a_ModName, a_ModVersion);
+	bool success = mods.Add(a_ModName, a_ModVersion);
+
+	(void) success;  // TODO: raise Lua exception in manual binding
 }
 
 
