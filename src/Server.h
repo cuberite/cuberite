@@ -72,11 +72,13 @@ public:
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 
+	// tolua_end
 	/** Add a Forge mod to the server ping list. */
-	void RegisterForgeMod(AString & a_ModName, AString & a_ModVersion);
+	bool RegisterForgeMod(AString & a_ModName, AString & a_ModVersion);
 
 	/** Add a Forge mod to the server ping list for one protocol version. */
-	void RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
+	bool RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
+	// tolua_begin
 
 	/** Remove a Forge mod from the server ping list. */
 	void UnregisterForgeMod(AString & a_ModName);

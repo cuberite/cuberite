@@ -32,6 +32,7 @@
 #include "../Generating/ChunkDesc.h"
 #include "../LineBlockTracer.h"
 #include "../CompositeChat.h"
+#include "../Server.h"
 #include "../StringCompression.h"
 #include "../CommandOutput.h"
 #include "../BuildInfo.h"
@@ -3134,13 +3135,76 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 
 
 
+static int tolua_cServer_RegisterForgeModForProtocol(lua_State * a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamUserType(1, "cServer") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamNumber(4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	cServer * Server = reinterpret_cast<cServer *>(tolua_tousertype(L, 1, nullptr));
+	AString Name, Version;
+	UInt32 Protocol;
+	L.GetStackValue(2, Name);
+	L.GetStackValue(3, Version);
+	L.GetStackValue(4, Protocol);
+
+	if (!Server->RegisterForgeModForProtocol(Name, Version, Protocol))
+	{
+		tolua_error(L, "duplicate Forge mod name registration", nullptr);
+		return 0;
+	}
+
+	return 1;
+}
+
+
+
+
+
+static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamUserType(1, "cServer") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamEnd(4)
+		)
+	{
+		return 0;
+	}
+
+	cServer * Server = reinterpret_cast<cServer *>(tolua_tousertype(L, 1, nullptr));
+	AString Name, Version;
+	L.GetStackValue(2, Name);
+	L.GetStackValue(3, Version);
+
+	if (!Server->RegisterForgeMod(Name, Version))
+	{
+		tolua_error(L, "duplicate Forge mod name registration", nullptr);
+		return 0;
+	}
+
+	return 1;
+}
+
+
+
+
+
 static int tolua_cScoreboard_GetTeamNames(lua_State * L)
 {
 	cLuaState S(L);
 	if (
 		!S.CheckParamUserType(1, "cScoreboard") ||
 		!S.CheckParamEnd(2)
-	)
+		)
 	{
 		return 0;
 	}
@@ -3883,6 +3947,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachObjective", ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
 			tolua_function(tolua_S, "ForEachTeam",      ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
 			tolua_function(tolua_S, "GetTeamNames",     tolua_cScoreboard_GetTeamNames);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cServer");
+			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
+			tolua_function(tolua_S, "RegisterForgeModForProtocol", tolua_cServer_RegisterForgeModForProtocol);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");
