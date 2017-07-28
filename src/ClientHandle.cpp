@@ -140,10 +140,7 @@ cClientHandle::~cClientHandle()
 		m_Player = nullptr;
 	}
 
-	if (m_ForgeMods != nullptr)
-	{
-		m_ForgeMods.reset();
-	}
+	m_ForgeMods.reset();
 
 	if (!m_HasSentDC)
 	{
