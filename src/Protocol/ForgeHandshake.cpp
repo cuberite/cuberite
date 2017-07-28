@@ -141,7 +141,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	if (a_Size < 4)
 	{
-		LOG("ParseModList invalid packet, missing length (size=%zu)", a_Size);
+		LOG("ParseModList invalid packet, missing length (size=" SIZE_T_FMT ")", a_Size);
 		return Mods;
 	}
 
@@ -160,13 +160,13 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 		AString Name, Version;
 		if (!Buf.ReadVarUTF8String(Name))
 		{
-			LOG("ParseModList failed to read mod name at i=%zu", i);
+			LOG("ParseModList failed to read mod name at i=" SIZE_T_FMT, i);
 			break;
 		}
 
 		if (!Buf.ReadVarUTF8String(Version))
 		{
-			LOG("ParseModList failed to read mod version at i=%zu", i);
+			LOG("ParseModList failed to read mod version at i=" SIZE_T_FMT, i);
 			break;
 		}
 
@@ -186,15 +186,15 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 {
 	if (!m_IsForgeClient)
 	{
-		LOG("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size);
+		LOG("Received unexpected Forge data from non-Forge client (" SIZE_T_FMT " bytes)", a_Size);
 		return;
 	}
 
-	LOGD("Received Forge data: %zu bytes: %s", a_Size, a_Data);
+	LOGD("Received Forge data: " SIZE_T_FMT " bytes: %s", a_Size, a_Data);
 
 	if (a_Size <= 1)
 	{
-		LOG("Received unexpectedly short Forge data (%zu bytes)", a_Size);
+		LOG("Received unexpectedly short Forge data (" SIZE_T_FMT " bytes)", a_Size);
 		return;
 	}
 
@@ -237,7 +237,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 				ClientModsString.append(", ");
 			}
 
-			LOG("Client connected with %zu mods: %s", ClientMods.size(), ClientModsString.c_str());
+			LOG("Client connected with " SIZE_T_FMT " mods: %s", ClientMods.size(), ClientModsString.c_str());
 
 			if (m_Client->m_ForgeMods != nullptr)
 			{
@@ -284,7 +284,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		{
 			if (a_Size != 2)
 			{
-				LOG("Unexpected HandshakeAck packet length: %zu", a_Size);
+				LOG("Unexpected HandshakeAck packet length: " SIZE_T_FMT "", a_Size);
 				SetError();
 				break;
 			}

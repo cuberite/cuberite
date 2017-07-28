@@ -155,7 +155,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 		}
 		else
 		{
-			LOG("Unknown additional data sent in server address (BungeeCord/FML?): %zu parameters", Params.size());
+			LOG("Unknown additional data sent in server address (BungeeCord/FML?): " SIZE_T_FMT " parameters", Params.size());
 			// TODO: support FML + BungeeCord? (what parameters does it send in that case?) https://github.com/SpigotMC/BungeeCord/issues/899
 		}
 	}
