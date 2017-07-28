@@ -29,6 +29,7 @@
 #include "BlockEnderchest.h"
 #include "BlockEntity.h"
 #include "BlockFarmland.h"
+#include "BlockFence.h"
 #include "BlockFenceGate.h"
 #include "BlockFire.h"
 #include "BlockFlower.h"
@@ -181,6 +182,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 	{
 		// Block handlers, alphabetically sorted:
 		case E_BLOCK_ACACIA_DOOR:                   return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_ACACIA_FENCE:                  return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_ACACIA_FENCE_GATE:             return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_ACACIA_WOOD_STAIRS:            return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:                return new cBlockRailHandler            (a_BlockType);
@@ -190,6 +192,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_BEETROOTS:                     return new cBlockCropsHandler<3>        (a_BlockType);  // 4 stages of growth
 		case E_BLOCK_BIG_FLOWER:                    return new cBlockBigFlowerHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_DOOR:                    return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_BIRCH_FENCE:                   return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_BIRCH_FENCE_GATE:              return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:             return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BREWING_STAND:                 return new cBlockBrewingStandHandler    (a_BlockType);
@@ -212,6 +215,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBWEB:                        return new cBlockCobWebHandler          (a_BlockType);
 		case E_BLOCK_CROPS:                         return new cBlockCropsHandler<7>        (a_BlockType);  // 8 stages of growth
 		case E_BLOCK_DARK_OAK_DOOR:                 return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_DARK_OAK_FENCE:                return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_DARK_OAK_FENCE_GATE:           return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_DARK_OAK_WOOD_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_DEAD_BUSH:                     return new cBlockDeadBushHandler        (a_BlockType);
@@ -227,6 +231,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_ENCHANTMENT_TABLE:             return new cBlockEnchantmentTableHandler(a_BlockType);
 		case E_BLOCK_ENDER_CHEST:                   return new cBlockEnderchestHandler      (a_BlockType);
 		case E_BLOCK_FARMLAND:                      return new cBlockFarmlandHandler        (a_BlockType);
+		case E_BLOCK_FENCE:                         return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_FROSTED_ICE:                   return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_FIRE:                          return new cBlockFireHandler            (a_BlockType);
 		case E_BLOCK_FLOWER_POT:                    return new cBlockFlowerPotHandler       (a_BlockType);
@@ -249,6 +254,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_JACK_O_LANTERN:                return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_JUKEBOX:                       return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_JUNGLE_DOOR:                   return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_JUNGLE_FENCE:                  return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_JUNGLE_FENCE_GATE:             return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_JUNGLE_WOOD_STAIRS:            return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_LADDER:                        return new cBlockLadderHandler          (a_BlockType);
@@ -264,6 +270,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_MELON_STEM:                    return new cBlockStemsHandler           (a_BlockType);
 		case E_BLOCK_MOB_SPAWNER:                   return new cBlockMobSpawnerHandler      (a_BlockType);
 		case E_BLOCK_MYCELIUM:                      return new cBlockMyceliumHandler        (a_BlockType);
+		case E_BLOCK_NETHER_BRICK_FENCE:            return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_NETHER_BRICK_STAIRS:           return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NETHER_PORTAL:                 return new cBlockPortalHandler          (a_BlockType);
 		case E_BLOCK_NETHER_WART:                   return new cBlockNetherWartHandler      (a_BlockType);
@@ -308,6 +315,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SNOW:                          return new cBlockSnowHandler            (a_BlockType);
 		case E_BLOCK_SLIME_BLOCK:                   return new cBlockSlimeHandler           (a_BlockType);
 		case E_BLOCK_SPRUCE_DOOR:                   return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_SPRUCE_FENCE:                  return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_SPRUCE_FENCE_GATE:             return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:            return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STAINED_GLASS:                 return new cBlockGlassHandler           (a_BlockType);
@@ -555,7 +563,6 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
-
 bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
 {
 	return true;
@@ -605,6 +612,20 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 {
 	return a_Position.y < cBlockInfo::GetBlockHeight(a_BlockType);
+}
+
+
+
+
+
+cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+{
+	if (!cBlockInfo::IsSolid(m_BlockType))
+	{
+		// Non-solid things can be placed within entities
+		return cBoundingBox(0, 0, 0, 0, 0, 0);
+	}
+	return cBoundingBox(0, 1, 0, cBlockInfo::GetBlockHeight(m_BlockType), 0, 1);
 }
 
 

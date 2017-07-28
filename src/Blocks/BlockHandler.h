@@ -3,6 +3,8 @@
 
 #include "../Defines.h"
 
+#include "../BoundingBox.h"
+
 
 
 
@@ -29,6 +31,11 @@ public:
 	/** Called when the block gets ticked either by a random tick or by a queued tick.
 	Note that the coords are chunk-relative! */
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+
+	/** Returns the relative bounding box that must be entity-free in
+	order for the block to be placed. a_XM, a_XP, etc. stand for the
+	blocktype of the minus-X neighbor, the positive-X neighbor, etc. */
+	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP);
 
 	/** Called before a block is placed into a world.
 	The handler should return true to allow placement, false to refuse.

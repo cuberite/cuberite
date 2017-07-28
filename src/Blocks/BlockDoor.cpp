@@ -106,6 +106,16 @@ void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, c
 
 
 
+cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+{
+	// Doors can be placed inside the player
+	return cBoundingBox(0, 0, 0, 0, 0, 0);
+}
+
+
+
+
+
 NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 {
 	if (a_Meta & 0x08)

@@ -108,9 +108,25 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 
 
+cBoundingBox::cBoundingBox(double, double, double, double, double, double)
+{
+}
+
+
+
+
 
 cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 {
+}
+
+
+
+
+
+cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+{
+	return cBoundingBox(0, 0, 0, 0, 0, 0);
 }
 
 
