@@ -1303,9 +1303,9 @@ void cWorld::WakeUpSimulators(const Vector3i & a_Block)
 
 
 
-void cWorld::WakeUpSimulatorsInArea(const Vector3i & a_Min, const Vector3i & a_Max)
+void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
 {
-	m_SimulatorManager->WakeUpArea(cCuboid(a_Min, a_Max));
+	m_SimulatorManager->WakeUpArea(a_Area);
 }
 
 

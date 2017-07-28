@@ -29,6 +29,7 @@
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 #include "EffectID.h"
+#include "Cuboid.h"
 
 
 
@@ -496,7 +497,21 @@ public:
 	virtual void WakeUpSimulators(const Vector3i & a_Block) override;
 
 	/** Wakes up the simulators for the specified area of blocks */
-	void WakeUpSimulatorsInArea(const Vector3i & a_Min, const Vector3i & a_Max);
+	void WakeUpSimulatorsInArea(const cCuboid & a_Area);
+
+	// DEPRECATED
+	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		LOGWARNING("cWorld::WakeUpSimulators(int, int, int) is deprecated, use cWorld::WakeUpSimulators(Vector3i) instead.");
+		WakeUpSimulators(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	};
+
+	// DEPRECATED
+	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
+	{
+		LOGWARNING("cWorld::WakeUpSimulatorsInArea(int, int, int) is deprecated, use cWorld::WakeUpSimulatorsInArea(Vector3i) instead.");
+		WakeUpSimulatorsInArea(cCuboid(Vector3i(a_MinBlockX, a_MinBlockY, a_MinBlockZ), Vector3i(a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ)));
+	};
 
 	// tolua_end
 

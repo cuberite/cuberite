@@ -115,11 +115,11 @@ cChunkPtr cChunkMap::GetChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-cChunkPtr cChunkMap::GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
+cChunkPtr cChunkMap::GetChunkNoGen(const cChunkCoords & a_Chunk)
 {
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());  // m_CSChunks should already be locked by the operation that called us
 
-	auto Chunk = ConstructChunk(a_ChunkX, a_ChunkZ);
+	auto Chunk = ConstructChunk(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 	if (Chunk == nullptr)
 	{
 		return nullptr;
@@ -127,7 +127,7 @@ cChunkPtr cChunkMap::GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
 	if (!Chunk->IsValid() && !Chunk->IsQueued())
 	{
 		Chunk->SetPresence(cChunk::cpQueued);
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
+		m_World->GetStorage().QueueLoadChunk(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 	}
 
 	return Chunk;
@@ -743,9 +743,8 @@ bool cChunkMap::DoWithChunkAt(const Vector3i & a_BlockPos, std::function<bool(cC
 void cChunkMap::WakeUpSimulators(const Vector3i & a_Block)
 {
 	cCSLock Lock(m_CSChunks);
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_Block.x, a_Block.z, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
+	cChunkCoords ChunkCoord = cChunkDef::BlockToChunk(a_Block);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkCoord);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return;
