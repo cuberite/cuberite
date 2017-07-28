@@ -273,22 +273,9 @@ int cServer::GetNumPlayers(void) const
 
 
 
-bool cServer::RegisterForgeMod(AString & a_Name, AString & a_Version)
-{
-	bool success = false;
-	for (auto & it : m_ForgeModsByVersion)
-	{
-		success |= it.second.Add(a_Name, a_Version);
-	}
-
-	return success;
-}
 
 
-
-
-
-bool cServer::RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
+bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
 {
 	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
 	bool success = mods.Add(a_ModName, a_ModVersion);
@@ -300,18 +287,7 @@ bool cServer::RegisterForgeModForProtocol(AString & a_ModName, AString & a_ModVe
 
 
 
-void cServer::UnregisterForgeMod(AString &a_Name)
-{
-	for (auto & it : m_ForgeModsByVersion)
-	{
-		it.second.Remove(a_Name);
-	}
-}
-
-
-
-
-void cServer::UnregisterForgeModForProtocol(AString &a_ModName, UInt32 a_ProtocolVersionNumber)
+void cServer::UnregisterForgeMod(AString &a_ModName, UInt32 a_ProtocolVersionNumber)
 {
 	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
 	mods.Remove(a_ModName);

@@ -11828,27 +11828,12 @@ end
 							Name = "ModVersion",
 							Type = "string",
 						},
-					},
-					Notes = "Add a Forge mod name/version to the server ping list.",
-				},
-				RegisterForgeModForProtocol =
-				{
-					Params =
-					{
-						{
-							Name = "ModName",
-							Type = "string",
-						},
-						{
-							Name = "ModVersion",
-							Type = "string",
-						},
 						{
 							Name = "ProtocolVersionNumber",
 							Type = "number",
 						},
 					},
-					Notes = "Add a Forge mod name/version to the server ping list for all protocol versions.",
+					Notes = "Add a Forge mod name/version to the server ping list.",
 				},
 				SetMaxPlayers =
 				{
@@ -11871,18 +11856,7 @@ end
 					},
 					Notes = "Returns true iff the server is set to authenticate players (\"online mode\").",
 				},
-				UnregisterForgeMod =
-				{
-					Params =
-					{
-						{
-							Name = "ModName",
-							Type = "string",
-						},
-					},
-					Notes = "Remove a Forge mod name/version from the server ping list.",
-				},
-				UnregisterForgeModForProtocol =
+				UnregisterForgeMod
 				{
 					Params =
 					{

@@ -3135,7 +3135,7 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 
 
 
-static int tolua_cServer_RegisterForgeModForProtocol(lua_State * a_LuaState)
+static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 {
 	cLuaState L(a_LuaState);
 	if (
@@ -3155,37 +3155,7 @@ static int tolua_cServer_RegisterForgeModForProtocol(lua_State * a_LuaState)
 	L.GetStackValue(3, Version);
 	L.GetStackValue(4, Protocol);
 
-	if (!Server->RegisterForgeModForProtocol(Name, Version, Protocol))
-	{
-		tolua_error(L, "duplicate Forge mod name registration", nullptr);
-		return 0;
-	}
-
-	return 1;
-}
-
-
-
-
-
-static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
-{
-	cLuaState L(a_LuaState);
-	if (
-		!L.CheckParamUserType(1, "cServer") ||
-		!L.CheckParamString(2, 3) ||
-		!L.CheckParamEnd(4)
-		)
-	{
-		return 0;
-	}
-
-	cServer * Server = reinterpret_cast<cServer *>(tolua_tousertype(L, 1, nullptr));
-	AString Name, Version;
-	L.GetStackValue(2, Name);
-	L.GetStackValue(3, Version);
-
-	if (!Server->RegisterForgeMod(Name, Version))
+	if (!Server->RegisterForgeMod(Name, Version, Protocol))
 	{
 		tolua_error(L, "duplicate Forge mod name registration", nullptr);
 		return 0;
@@ -3951,7 +3921,6 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cServer");
 			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
-			tolua_function(tolua_S, "RegisterForgeModForProtocol", tolua_cServer_RegisterForgeModForProtocol);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");
