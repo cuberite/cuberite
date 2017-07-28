@@ -21,18 +21,18 @@
 
 void cSimulator::WakeUp(const Vector3i & a_Block, cChunk * a_Chunk)
 {
-	AddBlock(a_Block.x, a_Block.y, a_Block.z, a_Chunk);
-	AddBlock(a_Block.x - 1, a_Block.y, a_Block.z, a_Chunk->GetNeighborChunk(a_Block.x - 1, a_Block.z));
-	AddBlock(a_Block.x + 1, a_Block.y, a_Block.z, a_Chunk->GetNeighborChunk(a_Block.x + 1, a_Block.z));
-	AddBlock(a_Block.x, a_Block.y, a_Block.z - 1, a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z - 1));
-	AddBlock(a_Block.x, a_Block.y, a_Block.z + 1, a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z + 1));
+	AddBlock(a_Block, a_Chunk);
+	AddBlock(a_Block + Vector3i(-1, 0, 0), a_Chunk->GetNeighborChunk(a_Block.x - 1, a_Block.z));
+	AddBlock(a_Block + Vector3i( 1, 0, 0), a_Chunk->GetNeighborChunk(a_Block.x + 1, a_Block.z));
+	AddBlock(a_Block + Vector3i(0, 0, -1), a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z - 1));
+	AddBlock(a_Block + Vector3i(0, 0,  1), a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z + 1));
 	if (a_Block.y > 0)
 	{
-		AddBlock(a_Block.x, a_Block.y - 1, a_Block.z, a_Chunk);
+		AddBlock(a_Block + Vector3i(0, -1, 0), a_Chunk);
 	}
 	if (a_Block.y < cChunkDef::Height - 1)
 	{
-		AddBlock(a_Block.x, a_Block.y + 1, a_Block.z, a_Chunk);
+		AddBlock(a_Block + Vector3i(0, 1, 0), a_Chunk);
 	}
 }
 
@@ -48,12 +48,11 @@ void cSimulator::WakeUpArea(const cCuboid & a_Area)
 	area.ClampY(0, cChunkDef::Height - 1);
 
 	// Add all blocks, in a per-chunk manner:
-	int chunkStartX, chunkStartZ, chunkEndX, chunkEndZ;
-	cChunkDef::BlockToChunk(area.p1.x, area.p1.z, chunkStartX, chunkStartZ);
-	cChunkDef::BlockToChunk(area.p2.x, area.p2.z, chunkEndX,   chunkEndZ);
-	for (int cz = chunkStartZ; cz <= chunkEndZ; ++cz)
+	cChunkCoords ChunkStart = cChunkDef::BlockToChunk(area.p1);
+	cChunkCoords ChunkEnd = cChunkDef::BlockToChunk(area.p2);
+	for (int cz = ChunkStart.m_ChunkZ; cz <= ChunkEnd.m_ChunkZ; ++cz)
 	{
-		for (int cx = chunkStartX; cx <= chunkEndX; ++cx)
+		for (int cx = ChunkStart.m_ChunkX; cx <= ChunkEnd.m_ChunkX; ++cx)
 		{
 			m_World.DoWithChunk(cx, cz, [this, &area](cChunk & a_CBChunk) -> bool
 				{
