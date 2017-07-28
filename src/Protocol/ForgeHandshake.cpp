@@ -171,6 +171,155 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 
 
+void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
+{
+	if (a_Size == 2)
+	{
+		int FmlProtocolVersion = a_Data[1];
+		LOGD("Received ClientHello with FML protocol version %d", FmlProtocolVersion);
+		if (FmlProtocolVersion != 2)
+		{
+			LOG("Unsupported FML client protocol version received in ClientHello: %d", FmlProtocolVersion);
+			SetError();
+		}
+	}
+	else
+	{
+		LOG("Unexpectedly short ClientHello received");
+		SetError();
+	}
+}
+
+
+
+
+void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
+{
+	LOGD("Received ModList");
+
+	AStringMap ClientMods = ParseModList(a_Data + 1, a_Size - 1);
+	AString ClientModsString;
+	for (auto & item: ClientMods)
+	{
+		ClientModsString.append(item.first);
+		ClientModsString.append("@");
+		ClientModsString.append(item.second);
+		ClientModsString.append(", ");
+	}
+
+	LOG("Client connected with " SIZE_T_FMT " mods: %s", ClientMods.size(), ClientModsString.c_str());
+
+	if (m_Client->m_ForgeMods != nullptr)
+	{
+		m_Client->m_ForgeMods.reset();
+	}
+
+	m_Client->m_ForgeMods = cpp14::make_unique<cForgeMods>(ClientMods);
+
+	// Let the plugins know about this event, they may refuse the player:
+	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client))
+	{
+		LOG("Modded client refused by plugin");
+		SetError();
+		return;
+	}
+
+	// Send server ModList
+
+	// TODO: max size?
+	cByteBuffer Buf(1024);
+
+	// Send server-side Forge mods registered by plugins
+	auto &ServerMods = m_Client->GetForgeMods();
+
+	size_t ModCount = ServerMods.GetNumMods();
+
+	Buf.WriteBEInt8(Discriminator::ModList);
+	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
+	for (size_t i = 0; i < ModCount; ++i)
+	{
+		const AString & name = ServerMods.GetModNameAt(i);
+		const AString & version = ServerMods.GetModVersion(name);
+		Buf.WriteVarUTF8String(name);
+		Buf.WriteVarUTF8String(version);
+	}
+	AString ServerModList;
+	Buf.ReadAll(ServerModList);
+
+	m_Client->SendPluginMessage("FML|HS", ServerModList);
+}
+
+
+
+
+void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
+{
+	if (a_Size != 2)
+	{
+		LOG("Unexpected HandshakeAck packet length: " SIZE_T_FMT "", a_Size);
+		SetError();
+		return;
+	}
+
+	int Phase = a_Data[1];
+	LOGD("Received client HandshakeAck with phase=%d", Phase);
+
+	switch (Phase)
+	{
+		case ClientPhase_WAITINGSERVERDATA:
+		{
+			cByteBuffer Buf(1024);
+			Buf.WriteBEInt8(Discriminator::RegistryData);
+
+			// TODO: send real registry data
+			bool HasMore = false;
+			AString RegistryName = "potions";
+			UInt32 NumIDs = 0;
+			UInt32 NumSubstitutions = 0;
+			UInt32 NumDummies = 0;
+
+			Buf.WriteBool(HasMore);
+			Buf.WriteVarUTF8String(RegistryName);
+			Buf.WriteVarInt32(NumIDs);
+			Buf.WriteVarInt32(NumSubstitutions);
+			Buf.WriteVarInt32(NumDummies);
+
+			AString RegistryData;
+			Buf.ReadAll(RegistryData);
+			m_Client->SendPluginMessage("FML|HS", RegistryData);
+			break;
+		}
+
+		case ClientPhase_WAITINGSERVERCOMPLETE:
+		{
+			LOG("Client finished receiving registry data; acknowledging");
+
+			AString Ack;
+			Ack.push_back(Discriminator::HandshakeAck);
+			Ack.push_back(ServerPhase_WAITINGCACK);
+			m_Client->SendPluginMessage("FML|HS", Ack);
+			break;
+		}
+
+		case ClientPhase_PENDINGCOMPLETE:
+		{
+			LOG("Client is pending completion; sending complete ack");
+
+			AString Ack;
+			Ack.push_back(Discriminator::HandshakeAck);
+			Ack.push_back(ServerPhase_COMPLETE);
+			m_Client->SendPluginMessage("FML|HS", Ack);
+
+			// Now finish logging in
+			m_Client->FinishAuthenticate(*m_Name, *m_UUID, *m_Properties);
+			break;
+		}
+	}
+}
+
+
+
+
 
 void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
@@ -192,148 +341,16 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 	switch (Discriminator)
 	{
 		case Discriminator::ClientHello:
-		{
-			if (a_Size == 2)
-			{
-				int FmlProtocolVersion = a_Data[1];
-				LOGD("Received ClientHello with FML protocol version %d", FmlProtocolVersion);
-				if (FmlProtocolVersion != 2)
-				{
-					LOG("Unsupported FML client protocol version received in ClientHello: %d", FmlProtocolVersion);
-					SetError();
-				}
-			}
-			else
-			{
-				LOG("Unexpectedly short ClientHello received");
-				SetError();
-			}
-
+			HandleClientHello(a_Client, a_Data, a_Size);
 			break;
-		}
 
 		case Discriminator::ModList:
-		{
-			LOGD("Received ModList");
-
-			AStringMap ClientMods = ParseModList(a_Data + 1, a_Size - 1);
-			AString ClientModsString;
-			for (auto & item: ClientMods)
-			{
-				ClientModsString.append(item.first);
-				ClientModsString.append("@");
-				ClientModsString.append(item.second);
-				ClientModsString.append(", ");
-			}
-
-			LOG("Client connected with " SIZE_T_FMT " mods: %s", ClientMods.size(), ClientModsString.c_str());
-
-			if (m_Client->m_ForgeMods != nullptr)
-			{
-				m_Client->m_ForgeMods.reset();
-			}
-
-			m_Client->m_ForgeMods = cpp14::make_unique<cForgeMods>(ClientMods);
-
-			// Let the plugins know about this event, they may refuse the player:
-			if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client))
-			{
-				LOG("Modded client refused by plugin");
-				SetError();
-				return;
-			}
-
-			// Send server ModList
-
-			// TODO: max size?
-			cByteBuffer Buf(1024);
-
-			// Send server-side Forge mods registered by plugins
-			auto &ServerMods = m_Client->GetForgeMods();
-
-			size_t ModCount = ServerMods.GetNumMods();
-
-			Buf.WriteBEInt8(Discriminator::ModList);
-			Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
-			for (size_t i = 0; i < ModCount; ++i)
-			{
-				const AString & name = ServerMods.GetModNameAt(i);
-				const AString & version = ServerMods.GetModVersion(name);
-				Buf.WriteVarUTF8String(name);
-				Buf.WriteVarUTF8String(version);
-			}
-			AString ServerModList;
-			Buf.ReadAll(ServerModList);
-
-			m_Client->SendPluginMessage("FML|HS", ServerModList);
+			HandleModList(a_Client, a_Data, a_Size);
 			break;
-		}
 
 		case Discriminator::HandshakeAck:
-		{
-			if (a_Size != 2)
-			{
-				LOG("Unexpected HandshakeAck packet length: " SIZE_T_FMT "", a_Size);
-				SetError();
-				break;
-			}
-
-			int Phase = a_Data[1];
-			LOGD("Received client HandshakeAck with phase=%d", Phase);
-
-			switch (Phase)
-			{
-				case ClientPhase_WAITINGSERVERDATA:
-				{
-					cByteBuffer Buf(1024);
-					Buf.WriteBEInt8(Discriminator::RegistryData);
-
-					// TODO: send real registry data
-					bool HasMore = false;
-					AString RegistryName = "potions";
-					UInt32 NumIDs = 0;
-					UInt32 NumSubstitutions = 0;
-					UInt32 NumDummies = 0;
-
-					Buf.WriteBool(HasMore);
-					Buf.WriteVarUTF8String(RegistryName);
-					Buf.WriteVarInt32(NumIDs);
-					Buf.WriteVarInt32(NumSubstitutions);
-					Buf.WriteVarInt32(NumDummies);
-
-					AString RegistryData;
-					Buf.ReadAll(RegistryData);
-					m_Client->SendPluginMessage("FML|HS", RegistryData);
-					break;
-				}
-
-				case ClientPhase_WAITINGSERVERCOMPLETE:
-				{
-					LOG("Client finished receiving registry data; acknowledging");
-
-					AString Ack;
-					Ack.push_back(Discriminator::HandshakeAck);
-					Ack.push_back(ServerPhase_WAITINGCACK);
-					m_Client->SendPluginMessage("FML|HS", Ack);
-					break;
-				}
-
-				case ClientPhase_PENDINGCOMPLETE:
-				{
-					LOG("Client is pending completion; sending complete ack");
-
-					AString Ack;
-					Ack.push_back(Discriminator::HandshakeAck);
-					Ack.push_back(ServerPhase_COMPLETE);
-					m_Client->SendPluginMessage("FML|HS", Ack);
-
-					// Now finish logging in
-					m_Client->FinishAuthenticate(*m_Name, *m_UUID, *m_Properties);
-					break;
-				}
-			}
+			HandleHandshakeAck(a_Client, a_Data, a_Size);
 			break;
-		}
 
 		default:
 		{

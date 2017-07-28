@@ -39,6 +39,10 @@ public:
 	bool m_IsForgeClient;
 
 private:
+	void HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+	void HandleModList(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+	void HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+
 	/** Parse the client ModList packet of installed Forge mods and versions. */
 	AStringMap ParseModList(const char * a_Data, size_t a_Size);
 
