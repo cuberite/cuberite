@@ -274,6 +274,18 @@ public:  // tolua_export
 
 	// tolua_end
 
+	/** Add the Forge mod list to the server ping response. */
+	void ForgeAugmentServerListPing(Json::Value & a_Response)
+	{
+		m_ForgeHandshake.AugmentServerListPing(a_Response);
+	}
+
+	/** Mark a client connection as using Forge. Set by the protocol. */
+	void SetIsForgeClient()
+	{
+		m_ForgeHandshake.m_IsForgeClient = true;
+	}
+
 	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
 	bool WantsSendChunk(int a_ChunkX, int a_ChunkZ);
 
@@ -385,11 +397,13 @@ public:  // tolua_export
 
 	bool IsPlayerChunkSent();
 
+private:
+	/** Forge handshake state machine. */
 	cForgeHandshake m_ForgeHandshake;
 
+	/** Forge mods and versions installed on this client, if any. */
 	std::unique_ptr<cForgeMods> m_ForgeMods;
 
-private:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
