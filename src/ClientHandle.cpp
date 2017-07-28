@@ -876,7 +876,7 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 	}
 	else if (a_Channel == "FML|HS")
 	{
-		m_Protocol->ForgeDataReceived(a_Message.c_str(), a_Message.size());
+		m_ForgeHandshake.DataReceived(this, a_Message.c_str(), a_Message.size());
 	}
 	else if (!HasPluginChannel(a_Channel))
 	{

@@ -64,12 +64,6 @@ public:
 	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 
-	/** Called when client sends some data over the FML|HS plugin channel */
-	void ForgeDataReceived(const char * a_Data, size_t a_Size)
-	{
-		m_Client->m_ForgeHandshake.DataReceived(m_Client, a_Data, a_Size);
-	}
-
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) = 0;
