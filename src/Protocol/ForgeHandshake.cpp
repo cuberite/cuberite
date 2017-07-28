@@ -43,10 +43,10 @@ enum
 
 
 
-cForgeHandshake::cForgeHandshake(cClientHandle *client) :
+cForgeHandshake::cForgeHandshake(cClientHandle *a_Client) :
 	m_IsForgeClient(false),
 	m_Errored(false),
-	m_Client(client)
+	m_Client(a_Client)
 {
 }
 
