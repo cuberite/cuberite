@@ -398,12 +398,6 @@ public:  // tolua_export
 	bool IsPlayerChunkSent();
 
 private:
-	/** Forge handshake state machine. */
-	cForgeHandshake m_ForgeHandshake;
-
-	/** Forge mods and versions installed on this client, if any. */
-	std::unique_ptr<cForgeMods> m_ForgeMods;
-
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
@@ -414,6 +408,12 @@ private:
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
+
+	/** Forge handshake state machine. */
+	cForgeHandshake m_ForgeHandshake;
+
+	/** Forge mods and versions installed on this client, if any. */
+	std::unique_ptr<cForgeMods> m_ForgeMods;
 
 	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
 	int m_CurrentViewDistance;

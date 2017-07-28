@@ -64,9 +64,9 @@ float cClientHandle::FASTBREAK_PERCENTAGE;
 // cClientHandle:
 
 cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
+	m_LastSentDimension(dimNotSet),
 	m_ForgeHandshake(this),
 	m_ForgeMods(nullptr),
-	m_LastSentDimension(dimNotSet),
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
