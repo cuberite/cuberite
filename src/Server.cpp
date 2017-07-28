@@ -118,7 +118,6 @@ void cServer::cTickThread::Execute(void)
 
 cServer::cServer(void) :
 	m_PlayerCount(0),
-	m_PlayerCountDiff(0),
 	m_ClientViewDistance(0),
 	m_bIsConnected(false),
 	m_bRestarting(false),
@@ -148,24 +147,18 @@ void cServer::ClientMovedToWorld(const cClientHandle * a_Client)
 
 
 
-void cServer::PlayerCreated(const cPlayer * a_Player)
+void cServer::PlayerCreated()
 {
-	UNUSED(a_Player);
-	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
-	cCSLock Lock(m_CSPlayerCountDiff);
-	m_PlayerCountDiff += 1;
+	m_PlayerCount++;
 }
 
 
 
 
 
-void cServer::PlayerDestroying(const cPlayer * a_Player)
+void cServer::PlayerDestroyed()
 {
-	UNUSED(a_Player);
-	// To avoid deadlocks, the player count is not handled directly, but rather posted onto the tick thread
-	cCSLock Lock(m_CSPlayerCountDiff);
-	m_PlayerCountDiff -= 1;
+	m_PlayerCount--;
 }
 
 
@@ -176,11 +169,9 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 {
 	m_Description = a_Settings.GetValueSet("Server", "Description", "Cuberite - in C++!");
 	m_ShutdownMessage = a_Settings.GetValueSet("Server", "ShutdownMessage", "Server shutdown");
-	m_MaxPlayers  = a_Settings.GetValueSetI("Server", "MaxPlayers", 100);
+	m_MaxPlayers = static_cast<size_t>(a_Settings.GetValueSetI("Server", "MaxPlayers", 100));
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
-	m_PlayerCount = 0;
-	m_PlayerCountDiff = 0;
 
 	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 
@@ -265,16 +256,6 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 
 
-int cServer::GetNumPlayers(void) const
-{
-	cCSLock Lock(m_CSPlayerCount);
-	return m_PlayerCount;
-}
-
-
-
-
-
 bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
 {
 	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
@@ -352,17 +333,6 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 
 bool cServer::Tick(float a_Dt)
 {
-	// Apply the queued playercount adjustments (postponed to avoid deadlocks)
-	int PlayerCountDiff = 0;
-	{
-		cCSLock Lock(m_CSPlayerCountDiff);
-		std::swap(PlayerCountDiff, m_PlayerCountDiff);
-	}
-	{
-		cCSLock Lock(m_CSPlayerCount);
-		m_PlayerCount += PlayerCountDiff;
-	}
-
 	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
 	cPluginManager::Get()->Tick(a_Dt);
 
@@ -709,6 +679,14 @@ void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	cCSLock Lock(m_CSClients);
+
+	// Check max players condition within lock (expect server and authenticator thread to both call here)
+	if (GetNumPlayers() >= GetMaxPlayers())
+	{
+		KickUser(a_ClientID, "The server is currently full :(" "\n" "Try again later?");
+		return;
+	}
+
 	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUniqueID() == a_ClientID)

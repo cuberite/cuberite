@@ -183,6 +183,9 @@ void cClientHandle::Destroy(void)
 
 	if (player != nullptr)
 	{
+		// Atomically decrement player count (in world or server thread)
+		cRoot::Get()->GetServer()->PlayerDestroyed();
+
 		auto world = player->GetWorld();
 		if (world != nullptr)
 		{
@@ -326,6 +329,9 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
+	// Atomically increment player count (in server thread)
+	cRoot::Get()->GetServer()->PlayerCreated();
+
 	{
 		cCSLock lock(m_CSState);
 		/*
@@ -684,11 +690,14 @@ void cClientHandle::HandleNPCTrade(int a_SlotNum)
 
 void cClientHandle::HandlePing(void)
 {
+	/* TODO: unused function, handles Legacy Server List Ping
+	http://wiki.vg/Protocol#Legacy_Server_List_Ping suggests that servers SHOULD handle this packet */
+
 	// Somebody tries to retrieve information about the server
 	AString Reply;
 	const cServer & Server = *cRoot::Get()->GetServer();
 
-	Printf(Reply, "%s%s%i%s%i",
+	Printf(Reply, "%s%s" SIZE_T_FMT "%s" SIZE_T_FMT,
 		Server.GetDescription().c_str(),
 		cChatColor::Delimiter,
 		Server.GetNumPlayers(),
@@ -1886,17 +1895,14 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
 	if (a_Username.length() > 16)
 	{
-		Kick("Your username is too long(>16 characters)");
+		Kick("Your username is too long (>16 characters)");
 		return false;
 	}
 
-	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
+	if (cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
 	{
-		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
-		{
-			Kick("The server is currently full :(-- Try again later");
-			return false;
-		}
+		Kick("Entry denied by plugin");
+		return false;
 	}
 
 	return CheckMultiLogin(a_Username);

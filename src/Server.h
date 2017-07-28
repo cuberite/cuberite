@@ -68,9 +68,9 @@ public:
 	const AString & GetShutdownMessage(void) const { return m_ShutdownMessage; }
 
 	// Player counts:
-	int  GetMaxPlayers(void) const { return m_MaxPlayers; }
-	int  GetNumPlayers(void) const;
-	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
+	size_t GetMaxPlayers(void) const { return m_MaxPlayers; }
+	size_t GetNumPlayers(void) const { return m_PlayerCount; }
+	void SetMaxPlayers(size_t a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 
 	// tolua_end
 	/** Add a Forge mod to the server ping list. */
@@ -115,17 +115,14 @@ public:
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 
-	/** Called by cClientHandle's destructor; stop m_SocketThreads from calling back into a_Client */
-	void ClientDestroying(const cClientHandle * a_Client);
-
 	/** Don't tick a_Client anymore, it will be ticked from its cPlayer instead */
 	void ClientMovedToWorld(const cClientHandle * a_Client);
 
 	/** Notifies the server that a player was created; the server uses this to adjust the number of players */
-	void PlayerCreated(const cPlayer * a_Player);
+	void PlayerCreated();
 
 	/** Notifies the server that a player is being destroyed; the server uses this to adjust the number of players */
-	void PlayerDestroying(const cPlayer * a_Player);
+	void PlayerDestroyed();
 
 	/** Returns base64 encoded favicon data (obtained from favicon.png) */
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
@@ -193,17 +190,8 @@ private:
 	/** Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick(). */
 	cClientHandles m_ClientsToRemove;
 
-	/** Protects m_PlayerCount against multithreaded access. */
-	mutable cCriticalSection m_CSPlayerCount;
-
 	/** Number of players currently playing in the server. */
-	int m_PlayerCount;
-
-	/** Protects m_PlayerCountDiff against multithreaded access. */
-	cCriticalSection m_CSPlayerCountDiff;
-
-	/** Adjustment to m_PlayerCount to be applied in the Tick thread. */
-	int m_PlayerCountDiff;
+	std::atomic_size_t m_PlayerCount;
 
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
@@ -222,7 +210,7 @@ private:
 	AString m_Description;
 	AString m_ShutdownMessage;
 	AString m_FaviconData;
-	int m_MaxPlayers;
+	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
 
 	/** Map of protocol version to Forge mods for that version. */

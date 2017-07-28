@@ -190,9 +190,9 @@ public:
 	void FromJson(const Json::Value & a_Value);
 
 	/** Returns true if the specified item type is enchantable.
-	If WithBook is true, the function is used in the anvil inventory with book enchantments.
+	If FromBook is true, the function is used in the anvil inventory with book enchantments.
 	So it checks the "only book enchantments" too. Example: You can only enchant a hoe with a book. */
-	static bool IsEnchantable(short a_ItemType, bool a_WithBook = false);  // tolua_export
+	static bool IsEnchantable(short a_ItemType, bool a_FromBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
 	int GetEnchantability();  // tolua_export
@@ -200,6 +200,19 @@ public:
 	/** Randomly enchants the item using the specified number of XP levels.
 	Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already). */
 	bool EnchantByXPLevels(int a_NumXPLevels);  // tolua_export
+
+	/** Adds this specific enchantment to this item, returning the cost.
+	FromBook specifies whether the enchantment should be treated as coming
+	from a book. If true, then the cost returned uses the book values, if
+	false it uses the normal item multipliers. */
+	int AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_FromBook);  // tolua_export
+
+	/** Adds the enchantments on a_Other to this item, returning the
+	XP cost of the transfer. */
+	int AddEnchantmentsFromItem(const cItem & a_Other);  // tolua_export
+
+	/** Returns whether or not this item is allowed to have the given enchantment. Note: Does not check whether the enchantment is exclusive with the current enchantments on the item. */
+	bool CanHaveEnchantment(int a_EnchantmentID);
 
 	// tolua_begin
 
