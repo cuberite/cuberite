@@ -141,7 +141,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	if (a_Size < 4)
 	{
-		LOG("ParseModList invalid packet, missing length (size=" SIZE_T_FMT ")", a_Size);
+		LOGD("ParseModList invalid packet, missing length (size=" SIZE_T_FMT ")", a_Size);
 		return Mods;
 	}
 
@@ -151,7 +151,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 	UInt32 NumMods;
 	if (!Buf.ReadVarInt32(NumMods))
 	{
-		LOG("ParseModList failed to read mod count");
+		LOGD("ParseModList failed to read mod count");
 		return Mods;
 	}
 
@@ -160,19 +160,17 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 		AString Name, Version;
 		if (!Buf.ReadVarUTF8String(Name))
 		{
-			LOG("ParseModList failed to read mod name at i=" SIZE_T_FMT, i);
+			LOGD("ParseModList failed to read mod name at i=" SIZE_T_FMT, i);
 			break;
 		}
 
 		if (!Buf.ReadVarUTF8String(Version))
 		{
-			LOG("ParseModList failed to read mod version at i=" SIZE_T_FMT, i);
+			LOGD("ParseModList failed to read mod version at i=" SIZE_T_FMT, i);
 			break;
 		}
 
 		Mods.insert({Name, Version});
-
-		LOGD("ParseModList name=%s, version=%s", Name.c_str(), Version.c_str());
 	}
 
 	return Mods;
