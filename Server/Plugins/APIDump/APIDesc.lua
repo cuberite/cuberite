@@ -1353,7 +1353,7 @@ end
 					Returns =
 					{
 						{
-							Type = "AStringMap",
+							Type = "table",
 						},
 					},
 					Notes = "Returns the Forge mods installed on the client.",
