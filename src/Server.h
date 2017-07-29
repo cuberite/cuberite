@@ -155,7 +155,7 @@ public:
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
 
 	/** Get the Forge mods registered for a given protocol. */
-	cForgeMods & GetRegisteredForgeMods(const UInt32 a_Protocol);
+	AStringMap & GetRegisteredForgeMods(const UInt32 a_Protocol);
 
 private:
 
@@ -215,7 +215,7 @@ private:
 	bool m_bIsHardcore;
 
 	/** Map of protocol version to Forge mods for that version. */
-	std::map<UInt32, cForgeMods> m_ForgeModsByVersion;
+	std::map<UInt32, AStringMap> m_ForgeModsByVersion;
 
 	/** True - allow same username to login more than once False - only once */
 	bool m_bAllowMultiLogin;

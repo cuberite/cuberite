@@ -239,10 +239,9 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
 {
-	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
-	bool success = mods.Add(a_ModName, a_ModVersion);
+	AStringMap & Mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
 
-	return success;
+	return Mods.insert({a_ModName, a_ModVersion}).second;
 }
 
 
@@ -251,20 +250,25 @@ bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt
 
 void cServer::UnregisterForgeMod(AString &a_ModName, UInt32 a_ProtocolVersionNumber)
 {
-	cForgeMods & mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
-	mods.Remove(a_ModName);
+	AStringMap & Mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
+
+	auto it = Mods.find(a_ModName);
+	if (it != Mods.end())
+	{
+		Mods.erase(it);
+	}
 }
 
 
 
 
-cForgeMods & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
+AStringMap & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 {
 	auto it = m_ForgeModsByVersion.find(a_Protocol);
 
 	if (it == m_ForgeModsByVersion.end())
 	{
-		cForgeMods mods;
+		AStringMap mods;
 		m_ForgeModsByVersion.insert({a_Protocol, mods});
 		return m_ForgeModsByVersion.find(a_Protocol)->second;
 	}

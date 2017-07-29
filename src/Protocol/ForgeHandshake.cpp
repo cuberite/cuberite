@@ -57,9 +57,9 @@ cForgeHandshake::cForgeHandshake(cClientHandle *a_Client) :
 void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 {
 	UInt32 ProtocolVersion = m_Client->GetProtocolVersion();
-	cForgeMods & Mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
+	AStringMap & Mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
 
-	if (!Mods.HasMods())
+	if (Mods.size() == 0)
 	{
 		return;
 	}
@@ -70,7 +70,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 	Modinfo["type"] = "FML";
 
 	Json::Value ModList(Json::arrayValue);
-	for (auto & item: Mods.GetMods())
+	for (auto & item: Mods)
 	{
 		Json::Value Mod;
 		Mod["modid"] = item.first;
