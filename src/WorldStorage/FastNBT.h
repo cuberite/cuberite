@@ -134,7 +134,7 @@ class cNBTParseErrorCategory final:
 {
 	cNBTParseErrorCategory() = default;
 public:
-	/** Catagory name */
+	/** Category name */
 	virtual const char * name() const NOEXCEPT override
 	{
 		return "NBT parse error";
@@ -155,7 +155,7 @@ public:
 
 
 
-// The following is required to make an error_code constructable from an eNBTParseError
+// The following is required to make an error_code constructible from an eNBTParseError
 inline std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
 {
 	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
