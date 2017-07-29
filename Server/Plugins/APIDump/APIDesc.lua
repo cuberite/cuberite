@@ -11926,7 +11926,7 @@ end
 					},
 					Notes = "Returns true iff the server is set to authenticate players (\"online mode\").",
 				},
-				UnregisterForgeMod
+				UnregisterForgeMod =
 				{
 					Params =
 					{
