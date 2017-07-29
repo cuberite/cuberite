@@ -24,19 +24,19 @@ enum class Discriminator: Int8
 };
 
 /** Client handshake state phases. */
-enum
+enum class ClientPhase: Int8
 {
-	ClientPhase_WAITINGSERVERDATA = 2,
-	ClientPhase_WAITINGSERVERCOMPLETE = 3,
-	ClientPhase_PENDINGCOMPLETE = 4,
-	ClientPhase_COMPLETE = 5,
+	WAITINGSERVERDATA = 2,
+	WAITINGSERVERCOMPLETE = 3,
+	PENDINGCOMPLETE = 4,
+	COMPLETE = 5,
 };
 
 /** Server handshake state phases. */
-enum
+enum class ServerPhase: Int8
 {
-	ServerPhase_WAITINGCACK = 2,
-	ServerPhase_COMPLETE = 3,
+	WAITINGCACK = 2,
+	COMPLETE = 3,
 };
 
 
@@ -266,7 +266,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 
 	switch (Phase)
 	{
-		case ClientPhase_WAITINGSERVERDATA:
+		case static_cast<Int8>(ClientPhase::WAITINGSERVERDATA):
 		{
 			cByteBuffer Buf(1024);
 			Buf.WriteBEInt8(static_cast<Int8>(Discriminator::RegistryData));
@@ -290,24 +290,24 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 			break;
 		}
 
-		case ClientPhase_WAITINGSERVERCOMPLETE:
+		case static_cast<Int8>(ClientPhase::WAITINGSERVERCOMPLETE):
 		{
 			LOG("Client finished receiving registry data; acknowledging");
 
 			AString Ack;
 			Ack.push_back(static_cast<Int8>(Discriminator::HandshakeAck));
-			Ack.push_back(ServerPhase_WAITINGCACK);
+			Ack.push_back(static_cast<Int8>(ServerPhase::WAITINGCACK));
 			m_Client->SendPluginMessage("FML|HS", Ack);
 			break;
 		}
 
-		case ClientPhase_PENDINGCOMPLETE:
+		case static_cast<Int8>(ClientPhase::PENDINGCOMPLETE):
 		{
 			LOG("Client is pending completion; sending complete ack");
 
 			AString Ack;
 			Ack.push_back(static_cast<Int8>(Discriminator::HandshakeAck));
-			Ack.push_back(ServerPhase_COMPLETE);
+			Ack.push_back(static_cast<Int8>(ServerPhase::COMPLETE));
 			m_Client->SendPluginMessage("FML|HS", Ack);
 
 			// Now finish logging in
