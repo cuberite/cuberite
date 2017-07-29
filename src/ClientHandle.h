@@ -267,7 +267,7 @@ public:  // tolua_export
 	const AString & GetClientBrand(void) const { return m_ClientBrand; }
 
 	/** Returns the Forge mods installed on the client. */
-	const cForgeMods & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : cForgeMods::Unmodded(); }
+	const AStringMap & GetForgeMods(void) const { return m_ForgeMods ? *m_ForgeMods : *new AStringMap(); }  // TODO: fix memory leak
 
 	/** Returns true if the client is modded with Forge. */
 	bool IsForgeClient(void) const { return m_ForgeHandshake.m_IsForgeClient; }
@@ -413,7 +413,7 @@ private:
 	cForgeHandshake m_ForgeHandshake;
 
 	/** Forge mods and versions installed on this client, if any. */
-	std::unique_ptr<cForgeMods> m_ForgeMods;
+	std::unique_ptr<AStringMap> m_ForgeMods;
 
 	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
 	int m_CurrentViewDistance;
