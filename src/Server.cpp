@@ -211,25 +211,6 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
 	}
 
-	int Versions[] =
-	{
-		// TODO: better way to get all supported versions from cProtocolRecognizer?
-		cProtocolRecognizer::PROTO_VERSION_1_8_0,
-		cProtocolRecognizer::PROTO_VERSION_1_9_0,
-		cProtocolRecognizer::PROTO_VERSION_1_9_1,
-		cProtocolRecognizer::PROTO_VERSION_1_9_2,
-		cProtocolRecognizer::PROTO_VERSION_1_9_4,
-		cProtocolRecognizer::PROTO_VERSION_1_10_0,
-		cProtocolRecognizer::PROTO_VERSION_1_11_0,
-		cProtocolRecognizer::PROTO_VERSION_1_11_1,
-		cProtocolRecognizer::PROTO_VERSION_1_12,
-	};
-	for (size_t i = 0; i < sizeof(Versions) / sizeof(Versions[0]); ++i)
-	{
-		cForgeMods Mods;
-		m_ForgeModsByVersion.insert({Versions[i], Mods});
-	}
-
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);
 	m_ShouldLimitPlayerBlockChanges = a_Settings.GetValueSetB("AntiCheat", "LimitPlayerBlockChanges", true);
 	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
@@ -281,7 +262,12 @@ cForgeMods & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 {
 	auto it = m_ForgeModsByVersion.find(a_Protocol);
 
-	ASSERT(it != m_ForgeModsByVersion.end());
+	if (it == m_ForgeModsByVersion.end())
+	{
+		cForgeMods mods;
+		m_ForgeModsByVersion.insert({a_Protocol, mods});
+		return m_ForgeModsByVersion.find(a_Protocol)->second;
+	}
 
 	return it->second;
 }
