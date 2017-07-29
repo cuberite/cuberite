@@ -22,7 +22,6 @@
 #include "ChunkSender.h"
 #include "EffectID.h"
 #include "Protocol/ForgeHandshake.h"
-#include "Protocol/ForgeMods.h"
 
 
 #include <array>
