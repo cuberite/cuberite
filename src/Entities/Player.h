@@ -485,6 +485,9 @@ public:
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 
+	/** Whether placing the given blocks would intersect any entitiy */
+	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
+
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */

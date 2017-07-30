@@ -146,8 +146,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		m_IsFlying = true;
 		m_bVisible = false;
 	}
-
-	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
 
 
@@ -182,9 +180,6 @@ cPlayer::~cPlayer(void)
 	}
 
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
-
-	// Notify the server that the player is being destroyed
-	cRoot::Get()->GetServer()->PlayerDestroying(this);
 
 	SaveToDisk();
 
@@ -2646,8 +2641,103 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 
 
 
+bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
+{
+	// Compute the bounding box for each block to be placed
+	std::vector<cBoundingBox> PlacementBoxes;
+	cBoundingBox PlacingBounds(0, 0, 0, 0, 0, 0);
+	bool HasInitializedBounds = false;
+	for (auto blk: a_Blocks)
+	{
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(blk.m_BlockType);
+		int x = blk.GetX();
+		int y = blk.GetY();
+		int z = blk.GetZ();
+		cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
+			m_World->GetBlock(x - 1, y, z),
+			m_World->GetBlock(x + 1, y, z),
+			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock(x, y - 1, z),
+			(y == cChunkDef::Height - 1) ? E_BLOCK_AIR : m_World->GetBlock(x, y + 1, z),
+			m_World->GetBlock(x, y, z - 1),
+			m_World->GetBlock(x, y, z + 1)
+		);
+		BlockBox.Move(x, y, z);
+
+		PlacementBoxes.push_back(BlockBox);
+
+		if (HasInitializedBounds)
+		{
+			PlacingBounds = PlacingBounds.Union(BlockBox);
+		}
+		else
+		{
+			PlacingBounds = BlockBox;
+			HasInitializedBounds = true;
+		}
+	}
+
+	cWorld * World = GetWorld();
+
+	// Check to see if any entity intersects any block being placed
+	class DoesIntersectBlock : public cEntityCallback
+	{
+	public:
+		const std::vector<cBoundingBox> & m_BoundingBoxes;
+
+		// The distance inside the block the entity can still be.
+		const double EPSILON = 0.0005;
+
+		DoesIntersectBlock(const std::vector<cBoundingBox> & a_BoundingBoxes) :
+			m_BoundingBoxes(a_BoundingBoxes)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if (!a_Entity->DoesPreventBlockPlacement())
+			{
+				return false;
+			}
+			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+			for (auto BlockBox: m_BoundingBoxes)
+			{
+
+				// Put in a little bit of wiggle room
+				BlockBox.Expand(-EPSILON, -EPSILON, -EPSILON);
+				if (EntBox.DoesIntersect(BlockBox))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	} Callback(PlacementBoxes);
+
+	// See if any entities in that bounding box collide with anyone
+	if (!World->ForEachEntityInBox(PlacingBounds, Callback))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+
+
+
 bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 {
+	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
+	{
+		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
+		for (auto blk2: a_Blocks)
+		{
+			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), this);
+		}
+		return false;
+	}
+
 	// Call the "placing" hooks; if any fail, abort:
 	cPluginManager * pm = cPluginManager::Get();
 	for (auto blk: a_Blocks)
