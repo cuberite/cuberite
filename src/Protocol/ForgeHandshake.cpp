@@ -217,7 +217,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	m_Client->m_ForgeMods = cpp14::make_unique<AStringMap>(ClientMods);
 
 	// Let the plugins know about this event, they may refuse the player:
-	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client))
+	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client, ClientMods))
 	{
 		LOG("Modded client refused by plugin");
 		SetError();

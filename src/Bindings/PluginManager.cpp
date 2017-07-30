@@ -789,14 +789,14 @@ bool cPluginManager::CallHookLogin(cClientHandle & a_Client, UInt32 a_ProtocolVe
 
 
 
-bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client)
+bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client, AStringMap & a_Mods)
 {
 	FIND_HOOK(HOOK_LOGIN_FORGE)
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnLoginForge(a_Client))
+		if ((*itr)->OnLoginForge(a_Client, a_Mods))
 		{
 			return true;
 		}

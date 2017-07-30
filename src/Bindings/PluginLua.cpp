@@ -550,9 +550,9 @@ bool cPluginLua::OnLogin(cClientHandle & a_Client, UInt32 a_ProtocolVersion, con
 
 
 
-bool cPluginLua::OnLoginForge(cClientHandle & a_Client)
+bool cPluginLua::OnLoginForge(cClientHandle & a_Client, const AStringMap & a_Mods)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_LOGIN_FORGE, &a_Client);
+	return CallSimpleHooks(cPluginManager::HOOK_LOGIN_FORGE, &a_Client, a_Mods);
 }
 
 
