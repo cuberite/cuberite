@@ -64,7 +64,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 		return;
 	}
 
-	LOG("Received server ping from version: %d", ProtocolVersion);
+	LOGD("Received server ping from version: %d", ProtocolVersion);
 
 	Json::Value Modinfo;
 	Modinfo["type"] = "FML";
@@ -292,7 +292,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 
 		case ClientPhase_WAITINGSERVERCOMPLETE:
 		{
-			LOG("Client finished receiving registry data; acknowledging");
+			LOGD("Client finished receiving registry data; acknowledging");
 
 			AString Ack;
 			Ack.push_back(Discriminator_HandshakeAck);
@@ -303,7 +303,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 
 		case ClientPhase_PENDINGCOMPLETE:
 		{
-			LOG("Client is pending completion; sending complete ack");
+			LOGD("Client is pending completion; sending complete ack");
 
 			AString Ack;
 			Ack.push_back(Discriminator_HandshakeAck);
