@@ -403,7 +403,7 @@ private:
 
 	friend class cServer;  // Needs access to SetSelf()
 
-	friend class cForgeHandshake;   // Needs access to PostAuthenticate()
+	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
