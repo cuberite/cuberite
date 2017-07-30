@@ -131,7 +131,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 
 		if (Params[1] == "FML")
 		{
-			LOG("Forge client connected!");
+			LOGD("Forge client connected!");
 			m_Client->SetIsForgeClient();
 		}
 		else if (Params.size() == 4)
