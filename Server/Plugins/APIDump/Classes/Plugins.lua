@@ -816,6 +816,14 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when the player starts eating a held item. Plugins may abort the eating.",
 			},
+			HOOK_PLAYER_EDITED_BOOK =
+			{
+				Notes = "This hook is called whenever a {{cPlayer|player}} has edited a book.",
+			},
+			HOOK_PLAYER_EDITING_BOOK =
+			{
+				Notes = "This hook is called whenever a {{cPlayer|player}} is editing a book."
+			},
 			HOOK_PLAYER_FISHED =
 			{
 				Notes = "Called when the player reels the fishing rod back in, after the server decides the player's fishing reward.",
