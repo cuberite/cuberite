@@ -2344,6 +2344,34 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 
 
 
+static int tolua_cClientHandle_GetForgeMods(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cClientHandle") ||
+		!S.CheckParamEnd(2)
+		)
+	{
+		return 0;
+	}
+	cClientHandle * Client = reinterpret_cast<cClientHandle *>(tolua_tousertype(L, 1, nullptr));
+	if (Client == nullptr)
+	{
+		LOGWARNING("ClientHandle is nil in cClientHandle:GetForgeMods()");
+		S.LogStackTrace();
+		return 0;
+	}
+	AStringMap Mods = Client->GetForgeMods();
+
+	S.Push(Client->GetForgeMods());
+	return 0;
+}
+
+
+
+
+
+
 static int tolua_cMojangAPI_AddPlayerNameToUUIDMapping(lua_State * L)
 {
 	cLuaState S(L);
@@ -3775,6 +3803,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
+			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cColor");

@@ -12,7 +12,6 @@
 #include "RCONServer.h"
 #include "OSSupport/IsThread.h"
 #include "OSSupport/Network.h"
-#include "Protocol/ForgeMods.h"
 
 #ifdef _MSC_VER
 	#pragma warning(push)
