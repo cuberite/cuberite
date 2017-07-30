@@ -19,6 +19,7 @@ It directly outputs a string containing the serialized NBT data.
 
 #pragma once
 
+#include <system_error>
 #include "../Endianness.h"
 
 
@@ -107,6 +108,72 @@ public:
 
 
 
+enum class eNBTParseError
+{
+	npSuccess = 0,
+	npNeedBytes,
+	npNoTopLevelCompound,
+	npCompoundImbalancedTag,
+	npStringMissingLength,
+	npStringInvalidLength,
+	npListMissingType,
+	npListMissingLength,
+	npListInvalidLength,
+	npSimpleMissing,
+	npArrayMissingLength,
+	npArrayInvalidLength,
+	npUnknownTag,
+};
+
+
+
+
+
+class cNBTParseErrorCategory final:
+	public std::error_category
+{
+	cNBTParseErrorCategory() = default;
+public:
+	/** Category name */
+	virtual const char * name() const NOEXCEPT override
+	{
+		return "NBT parse error";
+	}
+
+	/** Maps a parse error code to an error message */
+	virtual AString message(int a_Condition) const override;
+
+	/** Returns the canonical error category instance. */
+	static const cNBTParseErrorCategory & Get()
+	{
+		static cNBTParseErrorCategory Category;
+		return Category;
+	}
+};
+
+
+
+
+
+// The following is required to make an error_code constructible from an eNBTParseError
+inline std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
+{
+	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
+}
+
+namespace std
+{
+	template <>
+	struct is_error_code_enum<eNBTParseError>:
+		public std::true_type
+	{
+	};
+}
+
+
+
+
+
 /** Parses and contains the parsed data
 Also implements data accessor functions for tree traversal and value getters
 The data pointer passed in the constructor is assumed to be valid throughout the object's life. Care must be taken not to initialize from a temporary.
@@ -120,10 +187,16 @@ class cParsedNBT
 public:
 	cParsedNBT(const char * a_Data, size_t a_Length);
 
-	bool IsValid(void) const {return m_IsValid; }
+	bool IsValid(void) const { return (m_Error == eNBTParseError::npSuccess); }
+
+	/** Returns the error code for the parsing of the NBT data. */
+	std::error_code GetErrorCode() const { return m_Error; }
+
+	/** Returns the position where an error occurred while parsing. */
+	size_t GetErrorPos() const { return m_Pos; }
 
 	/** Returns the root tag of the hierarchy. */
-	int GetRoot(void) const {return 0; }
+	int GetRoot(void) const { return 0; }
 
 	/** Returns the first child of the specified tag, or -1 if none / not applicable. */
 	int GetFirstChild (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; }
@@ -257,16 +330,16 @@ protected:
 	const char *             m_Data;
 	size_t                   m_Length;
 	std::vector<cFastNBTTag> m_Tags;
-	bool                     m_IsValid;  // True if parsing succeeded
+	eNBTParseError           m_Error;  // npSuccess if parsing succeeded
 
 	// Used while parsing:
 	size_t m_Pos;
 
-	bool Parse(void);
-	bool ReadString(size_t & a_StringStart, size_t & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
-	bool ReadCompound(void);  // Reads the latest tag as a compound
-	bool ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
-	bool ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
+	eNBTParseError Parse(void);
+	eNBTParseError ReadString(size_t & a_StringStart, size_t & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
+	eNBTParseError ReadCompound(void);  // Reads the latest tag as a compound
+	eNBTParseError ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
+	eNBTParseError ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
 } ;
 
 
