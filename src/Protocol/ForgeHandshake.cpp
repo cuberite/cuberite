@@ -13,31 +13,31 @@
 
 
 /** Discriminator byte values prefixing the FML|HS packets to determine their type. */
-enum Discriminator: signed char
+namespace Discriminator
 {
-	Discriminator_ServerHello = 0,
-	Discriminator_ClientHello = 1,
-	Discriminator_ModList = 2,
-	Discriminator_RegistryData = 3,
-	Discriminator_HandshakeReset = -2,
-	Discriminator_HandshakeAck = -1,
-};
+	static const Int8 ServerHello = 0;
+	static const Int8 ClientHello = 1;
+	static const Int8 ModList = 2;
+	static const Int8 RegistryData = 3;
+	// static const Int8 HandshakeReset = -2;
+	static const Int8 HandshakeAck = -1;
+}
 
 /** Client handshake state phases. */
-enum
+namespace ClientPhase
 {
-	ClientPhase_WAITINGSERVERDATA = 2,
-	ClientPhase_WAITINGSERVERCOMPLETE = 3,
-	ClientPhase_PENDINGCOMPLETE = 4,
-	ClientPhase_COMPLETE = 5,
-};
+	static const Int8 WAITINGSERVERDATA = 2;
+	static const Int8 WAITINGSERVERCOMPLETE = 3;
+	static const Int8 PENDINGCOMPLETE = 4;
+	// static const Int8 COMPLETE = 5;
+}
 
 /** Server handshake state phases. */
-enum
+namespace ServerPhase
 {
-	ServerPhase_WAITINGCACK = 2,
-	ServerPhase_COMPLETE = 3,
-};
+	static const Int8 WAITINGCACK = 2;
+	static const Int8 COMPLETE = 3;
+}
 
 
 
@@ -114,7 +114,7 @@ void cForgeHandshake::SendServerHello()
 {
 	AString Message;
 	// Discriminator | Byte | Always 0 for ServerHello
-	Message.push_back(Discriminator_ServerHello);
+	Message.push_back(Discriminator::ServerHello);
 	// FML protocol Version | Byte | Determined from NetworkRegistery. Currently 2.
 	Message.push_back('\2');
 	// Dimension TODO
@@ -234,7 +234,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 
 	size_t ModCount = ServerMods.size();
 
-	Buf.WriteBEInt8(Discriminator_ModList);
+	Buf.WriteBEInt8(Discriminator::ModList);
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
 	for (auto & item: ServerMods)
 	{
@@ -266,10 +266,10 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 
 	switch (Phase)
 	{
-		case ClientPhase_WAITINGSERVERDATA:
+		case ClientPhase::WAITINGSERVERDATA:
 		{
 			cByteBuffer Buf(1024);
-			Buf.WriteBEInt8(Discriminator_RegistryData);
+			Buf.WriteBEInt8(Discriminator::RegistryData);
 
 			// TODO: send real registry data
 			bool HasMore = false;
@@ -290,24 +290,24 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 			break;
 		}
 
-		case ClientPhase_WAITINGSERVERCOMPLETE:
+		case ClientPhase::WAITINGSERVERCOMPLETE:
 		{
 			LOGD("Client finished receiving registry data; acknowledging");
 
 			AString Ack;
-			Ack.push_back(Discriminator_HandshakeAck);
-			Ack.push_back(ServerPhase_WAITINGCACK);
+			Ack.push_back(Discriminator::HandshakeAck);
+			Ack.push_back(ServerPhase::WAITINGCACK);
 			m_Client->SendPluginMessage("FML|HS", Ack);
 			break;
 		}
 
-		case ClientPhase_PENDINGCOMPLETE:
+		case ClientPhase::PENDINGCOMPLETE:
 		{
 			LOGD("Client is pending completion; sending complete ack");
 
 			AString Ack;
-			Ack.push_back(Discriminator_HandshakeAck);
-			Ack.push_back(ServerPhase_COMPLETE);
+			Ack.push_back(Discriminator::HandshakeAck);
+			Ack.push_back(ServerPhase::COMPLETE);
 			m_Client->SendPluginMessage("FML|HS", Ack);
 
 			// Now finish logging in
@@ -340,15 +340,15 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 	switch (Discriminator)
 	{
-		case Discriminator_ClientHello:
+		case Discriminator::ClientHello:
 			HandleClientHello(a_Client, a_Data, a_Size);
 			break;
 
-		case Discriminator_ModList:
+		case Discriminator::ModList:
 			HandleModList(a_Client, a_Data, a_Size);
 			break;
 
-		case Discriminator_HandshakeAck:
+		case Discriminator::HandshakeAck:
 			HandleHandshakeAck(a_Client, a_Data, a_Size);
 			break;
 
