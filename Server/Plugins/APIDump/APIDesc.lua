@@ -7081,7 +7081,7 @@ This class contains the information for a signed or writeable book: The author, 
 							Type = "string",
 						},
 					},
-					Notes = "Add a page to the end of the book. Note: A page can be a json string",
+					Notes = "Add a page to the end of the book. Note: If it's a written book, the page can be a json string",
 				},
 				GetPages =
 				{
