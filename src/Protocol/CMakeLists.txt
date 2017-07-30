@@ -6,6 +6,7 @@ SET (SRCS
 	Authenticator.cpp
 	ChunkDataSerializer.cpp
 	ForgeHandshake.cpp
+	ForgeMods.cpp
 	MojangAPI.cpp
 	Packetizer.cpp
 	Protocol_1_8.cpp
@@ -20,6 +21,7 @@ SET (HDRS
 	Authenticator.h
 	ChunkDataSerializer.h
 	ForgeHandshake.h
+	ForgeMods.h
 	MojangAPI.h
 	Packetizer.h
 	Protocol.h

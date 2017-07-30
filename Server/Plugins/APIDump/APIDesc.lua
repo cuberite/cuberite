@@ -1353,7 +1353,7 @@ end
 					Returns =
 					{
 						{
-							Type = "table",
+							Type = "cForgeMods",
 						},
 					},
 					Notes = "Returns the Forge mods installed on the client.",
@@ -4901,6 +4901,77 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 				},
 			},
 			Inherits = "cEntity",
+		},
+		cForgeMods =
+		{
+			Desc = [[
+				Data structure listing the Forge mods name and versions.
+			]],
+			Functions =
+			{
+				GetModNameAt =
+				{
+					Params =
+					{
+						{
+							Name = "i",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the name of the Forge mod at the given index.",
+				},
+				GetModVersion =
+				{
+					Params =
+					{
+						{
+							Name = "name",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the version of the mod name given.",
+
+				},
+				GetNumMods =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of Forge mods.",
+				},
+				HasMod =
+				{
+					Params =
+					{
+						{
+							Name = "name",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the mod with the given name is installed.",
+				},
+			},
 		},
 		cHangingEntity =
 		{

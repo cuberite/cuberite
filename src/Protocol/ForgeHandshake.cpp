@@ -214,7 +214,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 		m_Client->m_ForgeMods.reset();
 	}
 
-	m_Client->m_ForgeMods = cpp14::make_unique<AStringMap>(ClientMods);
+	m_Client->m_ForgeMods = cpp14::make_unique<cForgeMods>(ClientMods);
 
 	// Let the plugins know about this event, they may refuse the player:
 	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client))
@@ -232,14 +232,14 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	// Send server-side Forge mods registered by plugins
 	auto &ServerMods = m_Client->GetForgeMods();
 
-	size_t ModCount = ServerMods.size();
+	size_t ModCount = ServerMods.GetNumMods();
 
 	Buf.WriteBEInt8(Discriminator_ModList);
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
-	for (auto & item: ServerMods)
+	for (size_t i = 0; i < ModCount; ++i)
 	{
-		const AString & name = item.first;
-		const AString & version = item.second;
+		const AString & name = ServerMods.GetModNameAt(i);
+		const AString & version = ServerMods.GetModVersion(name);
 		Buf.WriteVarUTF8String(name);
 		Buf.WriteVarUTF8String(version);
 	}

@@ -131,6 +131,7 @@ set(BINDING_DEPENDENCIES
 	../Mobs/MonsterTypes.h
 	../OSSupport/File.h
 	../Protocol/MojangAPI.h
+	../Protocol/ForgeMods.h
 	../Root.h
 	../Scoreboard.h
 	../Server.h
