@@ -94,7 +94,7 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 	m_UUID = a_UUID;
 	m_Properties = a_Properties;
 
-	std::array<AString, 5> Channels{{ "FML|HS", "FML", "FML|MP", "FML", "FORGE" }};
+	static const std::array<AString, 5> Channels{{ "FML|HS", "FML", "FML|MP", "FML", "FORGE" }};
 	AString ChannelsString;
 	for (auto & Channel: Channels)
 	{
