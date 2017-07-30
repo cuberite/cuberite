@@ -3187,7 +3187,7 @@ static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 		return 0;
 	}
 
-	return 1;
+	return 0;
 }
 
 
