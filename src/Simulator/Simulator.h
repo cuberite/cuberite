@@ -58,7 +58,10 @@ protected:
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) = 0;
 
 	/** Called to simulate a new block */
-	virtual void AddBlock(const Vector3i & a_Block, cChunk * a_Chunk) { AddBlock(a_Block.x, a_Block.y, a_Block.z, a_Chunk); };
+	virtual void AddBlock(const Vector3i & a_Block, cChunk * a_Chunk)
+	{
+		AddBlock(a_Block.x, a_Block.y, a_Block.z, a_Chunk);
+	}
 
 	cWorld & m_World;
 } ;

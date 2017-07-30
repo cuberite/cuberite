@@ -119,7 +119,7 @@ public:
 	{
 		LOGWARNING("cChunkMap::WakeUpSimulators(int, int, int) is deprecated, use cChunkMap::WakeUpSimulators(Vector3i) instead.");
 		WakeUpSimulators(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
-	};
+	}
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
@@ -493,7 +493,11 @@ private:
 	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
-	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ) { return GetChunkNoGen(cChunkCoords(a_ChunkX, a_ChunkZ)); };  // Deprecated in favor of the vector version
+	// Deprecated in favor of the vector version
+	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
+	{
+		return GetChunkNoGen(cChunkCoords(a_ChunkX, a_ChunkZ));
+	}
 	cChunkPtr GetChunkNoGen(const cChunkCoords & a_Chunk);
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */

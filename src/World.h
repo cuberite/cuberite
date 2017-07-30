@@ -503,7 +503,7 @@ public:
 	{
 		LOGWARNING("cWorld::WakeUpSimulators(int, int, int) is deprecated, use cWorld::WakeUpSimulators(Vector3i) instead.");
 		WakeUpSimulators({a_BlockX, a_BlockY, a_BlockZ});
-	};
+	}
 
 	// DEPRECATED, use vector-parametered version instead
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
