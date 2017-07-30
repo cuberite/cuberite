@@ -2364,7 +2364,7 @@ static int tolua_cClientHandle_GetForgeMods(lua_State * L)
 	AStringMap Mods = Client->GetForgeMods();
 
 	S.Push(Client->GetForgeMods());
-	return 0;
+	return 1;
 }
 
 
