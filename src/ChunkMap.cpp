@@ -743,8 +743,7 @@ bool cChunkMap::DoWithChunkAt(const Vector3i & a_BlockPos, std::function<bool(cC
 void cChunkMap::WakeUpSimulators(const Vector3i & a_Block)
 {
 	cCSLock Lock(m_CSChunks);
-	cChunkCoords ChunkCoord = cChunkDef::BlockToChunk(a_Block);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkCoord);
+	cChunkPtr Chunk = GetChunkNoGen(cChunkDef::BlockToChunk(a_Block));
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return;
@@ -1139,7 +1138,7 @@ void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_B
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
 		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta, a_SendToClients);
-		m_World->GetSimulatorManager()->WakeUp(Vector3i(a_BlockX, a_BlockY, a_BlockZ), Chunk);
+		m_World->GetSimulatorManager()->WakeUp({a_BlockX, a_BlockY, a_BlockZ}, Chunk);
 	}
 	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
@@ -1360,7 +1359,7 @@ bool cChunkMap::DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 		}
 
 		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
-		m_World->GetSimulatorManager()->WakeUp(Vector3i(a_BlockX, a_BlockY, a_BlockZ), DestChunk);
+		m_World->GetSimulatorManager()->WakeUp({a_BlockX, a_BlockY, a_BlockZ}, DestChunk);
 	}
 
 	return true;
@@ -1821,8 +1820,8 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
 	m_World->GetSimulatorManager()->WakeUpArea(cCuboid(
-		Vector3i(bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1),
-		Vector3i(bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1)
+		{bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1},
+		{bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1}
 	));
 }
 

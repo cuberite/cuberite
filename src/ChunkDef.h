@@ -132,7 +132,7 @@ public:
 	/** Converts relative block coordinates into absolute coordinates with a known chunk location */
 	inline static Vector3i RelativeToAbsolute(const Vector3i & a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
 	{
-		return Vector3i(a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width);
+		return {a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width};
 	}
 
 	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
@@ -152,12 +152,12 @@ public:
 	{
 		// This version is deprecated in favor of the vector version
 		// If you're developing new code, use the other version.
-		cChunkCoords ChunkCoords = BlockToChunk(Vector3i(a_X, 0, a_Z));
+		auto ChunkCoords = BlockToChunk({a_X, 0, a_Z});
 		a_ChunkX = ChunkCoords.m_ChunkX;
 		a_ChunkZ = ChunkCoords.m_ChunkZ;
 	}
 
-	/** The Y coordinate is ignored */
+	/** The Y coordinate of a_Pos is ignored */
 	inline static cChunkCoords BlockToChunk(const Vector3i & a_Pos)
 	{
 		cChunkCoords Chunk(a_Pos.x / Width, a_Pos.z / Width);

@@ -1303,6 +1303,16 @@ void cWorld::WakeUpSimulators(const Vector3i & a_Block)
 
 
 
+void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
+{
+	LOGWARNING("cWorld::WakeUpSimulatorsInArea(int, int, int) is deprecated, use cWorld::WakeUpSimulatorsInArea(Vector3i) instead.");
+	WakeUpSimulatorsInArea(cCuboid({a_MinBlockX, a_MinBlockY, a_MinBlockZ}, {a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ}));
+}
+
+
+
+
+
 void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
 {
 	m_SimulatorManager->WakeUpArea(a_Area);

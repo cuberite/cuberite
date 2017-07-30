@@ -114,7 +114,7 @@ public:
 	/** Wakes up simulators for the specified block */
 	void WakeUpSimulators(const Vector3i & a_Block);
 
-	// DEPRECATED
+	// DEPRECATED, use the vector-parametered version instead.
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		LOGWARNING("cChunkMap::WakeUpSimulators(int, int, int) is deprecated, use cChunkMap::WakeUpSimulators(Vector3i) instead.");

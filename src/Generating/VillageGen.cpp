@@ -128,7 +128,10 @@ public:
 		m_Noise(a_Seed),
 		m_MaxSize(a_MaxSize),
 		m_Density(a_Density),
-		m_Borders(Vector3i(a_OriginX - a_MaxSize, 0, a_OriginZ - a_MaxSize), Vector3i(a_OriginX + a_MaxSize, cChunkDef::Height - 1, a_OriginZ + a_MaxSize)),
+		m_Borders(
+			{a_OriginX - a_MaxSize, 0, a_OriginZ - a_MaxSize},
+			{a_OriginX + a_MaxSize, cChunkDef::Height - 1, a_OriginZ + a_MaxSize}
+		),
 		m_Prefabs(a_Prefabs),
 		m_HeightGen(a_HeightGen)
 	{

@@ -134,9 +134,9 @@ local function functionDescMatchesDocs(a_FunctionDesc, a_FunctionDoc)
 	if (not(a_FunctionDesc.Params) or (a_FunctionDesc.Params == "")) then
 		numParams = 0
 	else
-		for a,b in pairs(a_FunctionDesc.Params) do
+		for _, Param in pairs(a_FunctionDesc.Params) do
 			numParams = numParams + 1
-			if b.IsOptional then
+			if Param.IsOptional then
 				numOptionalParams = numOptionalParams + 1
 			end
 		end
