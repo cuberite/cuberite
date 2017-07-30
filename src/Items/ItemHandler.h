@@ -127,10 +127,7 @@ public:
 	} ;
 
 	/** Returns the FoodInfo for this item. (FoodRecovery and Saturation) */
-	virtual FoodInfo GetFoodInfo();
-
-	/** If this function returns true, it sets the arguments to a effect who will be activated when you eat the item. */
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance);
+	virtual FoodInfo GetFoodInfo(const cItem * a_Item);
 
 	/** Lets the player eat a selected item. Returns true if the player ate the item */
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item);
