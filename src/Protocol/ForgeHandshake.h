@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stddef.h>
+#include "json/json.h"
 
 // fwd:
 namespace Json
@@ -56,7 +57,7 @@ private:
 	cClientHandle * m_Client;
 
 	/** Values saved from BeginForgeHandshake() for continuing the normal handshake after Forge completes. */
-	const AString * m_Name;
-	const AString * m_UUID;
-	const Json::Value * m_Properties;
+	AString m_Name;
+	AString m_UUID;
+	Json::Value m_Properties;
 };

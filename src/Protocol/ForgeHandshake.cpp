@@ -90,8 +90,8 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString 
 {
 	ASSERT(m_IsForgeClient);
 
-	m_Name = &a_Name;
-	m_UUID = &a_UUID;
+	m_Name = a_Name;
+	m_UUID = a_UUID;
 	m_Properties = &a_Properties;
 
 	std::array<AString, 5> Channels{{ "FML|HS", "FML", "FML|MP", "FML", "FORGE" }};
@@ -311,7 +311,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 			m_Client->SendPluginMessage("FML|HS", Ack);
 
 			// Now finish logging in
-			m_Client->FinishAuthenticate(*m_Name, *m_UUID, *m_Properties);
+			m_Client->FinishAuthenticate(m_Name, m_UUID, m_Properties);
 			break;
 		}
 	}
