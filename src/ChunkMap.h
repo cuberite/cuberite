@@ -493,12 +493,13 @@ private:
 	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
+	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
+
 	// Deprecated in favor of the vector version
 	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
 	{
 		return GetChunkNoGen(cChunkCoords(a_ChunkX, a_ChunkZ));
 	}
-	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);

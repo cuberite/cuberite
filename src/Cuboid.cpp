@@ -222,7 +222,7 @@ bool cCuboid::IsSorted(void) const
 
 
 
-void cCuboid::Engulf(const Vector3i & a_Point)
+void cCuboid::Engulf(Vector3i a_Point)
 {
 	if (a_Point.x < p1.x)
 	{

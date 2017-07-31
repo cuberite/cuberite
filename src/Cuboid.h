@@ -42,7 +42,7 @@ public:
 	Assumes both cuboids are sorted. */
 	bool DoesIntersect(const cCuboid & a_Other) const;
 
-	bool IsInside(const Vector3i & v) const
+	bool IsInside(Vector3i v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&
@@ -60,7 +60,7 @@ public:
 		);
 	}
 
-	bool IsInside( const Vector3d & v) const
+	bool IsInside(Vector3d v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&
@@ -94,7 +94,7 @@ public:
 	bool IsSorted(void) const;
 
 	/** If needed, expands the cuboid so that it contains the specified point. Assumes sorted. Doesn't contract. */
-	void Engulf(const Vector3i & a_Point);
+	void Engulf(Vector3i a_Point);
 } ;
 // tolua_end
 
