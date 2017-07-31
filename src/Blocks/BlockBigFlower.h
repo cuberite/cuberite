@@ -85,7 +85,7 @@ public:
 		}
 	}
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if (Meta & 0x8)
@@ -94,10 +94,10 @@ public:
 		}
 
 		NIBBLETYPE FlowerMeta = Meta & 0x7;
-		if (!a_Player->IsGameModeCreative())
+		if (!a_Player.IsGameModeCreative())
 		{
 			if (
-				(a_Player->GetEquippedItem().m_ItemType == E_ITEM_SHEARS) &&
+				(a_Player.GetEquippedItem().m_ItemType == E_ITEM_SHEARS) &&
 				(
 					(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
 					(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
@@ -117,12 +117,12 @@ public:
 					}
 					a_WorldInterface.SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
 				}
-				a_Player->UseEquippedItem();
+				a_Player.UseEquippedItem();
 			}
 		}
 
 		if (
-			(a_Player->GetEquippedItem().m_ItemType != E_ITEM_SHEARS) &&
+			(a_Player.GetEquippedItem().m_ItemType != E_ITEM_SHEARS) &&
 			(
 				(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
 				(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)

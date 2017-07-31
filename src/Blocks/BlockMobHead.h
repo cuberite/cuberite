@@ -22,9 +22,9 @@ public:
 		// The drop spawn is in the OnDestroyedByPlayer method
 	}
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		if (a_Player->IsGameModeCreative())
+		if (a_Player.IsGameModeCreative())
 		{
 			// No drops in creative mode
 			return;

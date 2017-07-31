@@ -20,7 +20,7 @@ public:
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -41,7 +41,7 @@ public:
 		{
 			return false;
 		}
-		double yaw = a_Player->GetYaw();
+		double yaw = a_Player.GetYaw();
 		if (
 			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
 			(Area.GetRelBlockType(2, 0, 1) == m_BlockType)
