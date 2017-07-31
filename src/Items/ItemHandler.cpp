@@ -395,9 +395,9 @@ bool cItemHandler::OnPlayerPlace(
 		// Handler refused the placement, send that information back to the client:
 		for (const auto & blk: blocks)
 		{
-			a_World.SendBlockTo(blk.GetX(), blk.GetY(), blk.GetZ(), &a_Player);
+			a_World.SendBlockTo(blk.GetX(), blk.GetY(), blk.GetZ(), a_Player);
 		}
-		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, &a_Player);
+		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;
 	}

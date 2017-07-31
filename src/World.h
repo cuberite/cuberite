@@ -482,7 +482,7 @@ public:
 
 	// tolua_begin
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
-	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player) override;
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
 
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */

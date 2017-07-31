@@ -104,7 +104,7 @@ public:
 		}
 
 		// Sends the slab back to the client. It's to refuse a doubleslab placement. */
-		a_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *a_Player);
 	}
 
 	/** Converts the single-slab blocktype to its equivalent double-slab blocktype */

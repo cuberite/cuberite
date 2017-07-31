@@ -87,18 +87,18 @@ void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, c
 {
 	UNUSED(a_ChunkInterface);
 
-	a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+	a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *a_Player);
 	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	if (Meta & 0x8)
 	{
 		// Current block is top of the door
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, *a_Player);
 	}
 	else
 	{
 		// Current block is bottom of the door
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, *a_Player);
 	}
 }
 

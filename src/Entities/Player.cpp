@@ -2733,7 +2733,7 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
 		for (auto blk2: a_Blocks)
 		{
-			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), this);
+			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
 		}
 		return false;
 	}
@@ -2747,7 +2747,7 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
 			for (auto blk2: a_Blocks)
 			{
-				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), this);
+				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
 			}
 			return false;
 		}
