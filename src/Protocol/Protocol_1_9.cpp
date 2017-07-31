@@ -2937,6 +2937,13 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 			return;
 		}
 
+		cPlayer & Player = *m_Client->GetPlayer();
+		if (Player.GetEquippedItem().m_ItemType != E_ITEM_BOOK_AND_QUILL)
+		{
+			// Equipped item is not a writeable book
+			return;
+		}
+
 		// Skip item count (1 byte) and item damage (2 bytes)
 		a_ByteBuffer.SkipRead(3);
 
@@ -2958,8 +2965,6 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 			cBookContent::ParseFromNBT(0, BookItem.m_BookContent, NBT);
 		}
 
-		cPlayer & Player = *m_Client->GetPlayer();
-
 		// If true, player has clicked on the sign button
 		bool IsSigned = (BookItem.m_ItemType == E_ITEM_WRITTEN_BOOK) ? true : false;
 
@@ -2974,7 +2979,7 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 
 		cInventory & inv = Player.GetInventory();
 		inv.SetHotbarSlot(inv.GetEquippedSlotNum(), BookItem);
-		SendWholeInventory(*Player.GetWindow());  // TODO: Use SendSlot
+		Player.GetInventory().SendEquippedSlot();
 		return;
 	}
 	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
