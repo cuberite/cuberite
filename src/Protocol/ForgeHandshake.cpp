@@ -209,12 +209,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 
 	LOG("Client connected with " SIZE_T_FMT " mods: %s", ClientMods.size(), ClientModsString.c_str());
 
-	if (m_Client->m_ForgeMods != nullptr)
-	{
-		m_Client->m_ForgeMods.reset();
-	}
-
-	m_Client->m_ForgeMods = cpp14::make_unique<AStringMap>(ClientMods);
+	m_Client->m_ForgeMods = ClientMods;
 
 	// Let the plugins know about this event, they may refuse the player:
 	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client, ClientMods))
