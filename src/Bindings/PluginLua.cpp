@@ -595,6 +595,24 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITED_BOOK, &a_Player, &a_BookContent, a_IsSigned);
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerEditingBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITING_BOOK, &a_Player, &a_BookContent, a_IsSigned);
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FOOD_LEVEL_CHANGE, &a_Player, a_NewFoodLevel);
@@ -706,24 +724,6 @@ bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_Bloc
 bool cPluginLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY, &a_Player, &a_Entity);
-}
-
-
-
-
-
-bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
-{
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITED_BOOK, &a_Player, &a_BookContent, a_IsSigned);
-}
-
-
-
-
-
-bool cPluginLua::OnPlayerEditingBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
-{
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITING_BOOK, &a_Player, &a_BookContent, a_IsSigned);
 }
 
 

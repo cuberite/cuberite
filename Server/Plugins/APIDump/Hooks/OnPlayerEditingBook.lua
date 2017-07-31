@@ -13,6 +13,7 @@ return
 		{
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player that is editing the book" },
 			{ Name = "BookContent", Type = "{{cBookContent}}", Notes = "The class that contains the current info of the book" },
+			{ Name = "IsSigned", Type = "boolean", Notes = "Player is signing the book" },
 		},
 		Returns = [[
 			If the function returns false or no value, Cuberite calls other plugins with this event. If the function returns true,

@@ -6936,6 +6936,11 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			},
 			Variables =
 			{
+				m_BookContent =
+				{
+					Type = "{{cBookContent|cBookContent}}",
+					Notes = "If it's a written or a writeable book, it contains the information of the book: Author, title and pages",
+				},
 				m_CustomName =
 				{
 					Type = "string",
@@ -6970,11 +6975,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				{
 					Type = "number",
 					Notes = "The repair cost of the item. The anvil need this value",
-				},
-				m_BookContent =
-				{
-					Type = "{{cBookContent|cBookContent}}",
-					Notes = "If it's a written or a writeable book, it contains the information of the book: Author, title and pages",
 				},
 			},
 			AdditionalInfo =

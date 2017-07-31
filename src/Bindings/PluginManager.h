@@ -256,6 +256,8 @@ public:
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
 	bool CallHookPlayerEating             (cPlayer & a_Player);
+	bool CallHookPlayerEditedBook         (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned);
+	bool CallHookPlayerEditingBook        (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward);
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
@@ -267,8 +269,6 @@ public:
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
-	bool CallHookPlayerEditedBook         (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned);
-	bool CallHookPlayerEditingBook        (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned);
 	bool CallHookPlayerShooting           (cPlayer & a_Player);
 	bool CallHookPlayerSpawned            (cPlayer & a_Player);
 	bool CallHookPlayerTossingItem        (cPlayer & a_Player);

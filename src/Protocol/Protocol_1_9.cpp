@@ -2958,23 +2958,23 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 			cBookContent::ParseFromNBT(0, BookItem.m_BookContent, NBT);
 		}
 
-		cPlayer * Player = m_Client->GetPlayer();
+		cPlayer & Player = *m_Client->GetPlayer();
 
 		// If true, player has clicked on the sign button
 		bool IsSigned = (BookItem.m_ItemType == E_ITEM_WRITTEN_BOOK) ? true : false;
 
-		if (cRoot::Get()->GetPluginManager()->CallHookPlayerEditingBook(*Player, BookItem.m_BookContent, IsSigned))
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerEditingBook(Player, BookItem.m_BookContent, IsSigned))
 		{
 			// Plugin denied the editing of the book
 			return;
 		}
 
 		// Book has been edited, inform plugins
-		cRoot::Get()->GetPluginManager()->CallHookPlayerEditedBook(*Player, BookItem.m_BookContent, IsSigned);
+		cRoot::Get()->GetPluginManager()->CallHookPlayerEditedBook(Player, BookItem.m_BookContent, IsSigned);
 
-		cInventory & inv = Player->GetInventory();
+		cInventory & inv = Player.GetInventory();
 		inv.SetHotbarSlot(inv.GetEquippedSlotNum(), BookItem);
-		SendWholeInventory(*Player->GetWindow());  // TODO: Use SendSlot
+		SendWholeInventory(*Player.GetWindow());  // TODO: Use SendSlot
 		return;
 	}
 	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
