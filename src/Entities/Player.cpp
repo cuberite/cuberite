@@ -2761,7 +2761,7 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 	for (auto blk: a_Blocks)
 	{
 		cBlockHandler * newBlock = BlockHandler(blk.m_BlockType);
-		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, this, blk);
+		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
 	}
 
 	// Call the "placed" hooks:
