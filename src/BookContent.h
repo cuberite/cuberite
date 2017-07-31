@@ -42,9 +42,6 @@ public:
 	/** Returns a AStringVector ref to the pages. Used in ManualBindings and for saving the book */
 	const AStringVector & GetPages(void) const { return m_Pages; }
 
-	/** Set the pages. Used in ManualBindings */
-	void SetPages(const AStringVector & a_Pages) { m_Pages = a_Pages; }
-
 	/** Read the book content from nbt. The boolean a_SaveAsJson is optional. If a player creates a book, the text should be in a json string */
 	static void ParseFromNBT(int TagTag, cBookContent & a_BookContent, const cParsedNBT & a_NBT, bool a_SaveAsJson = false);
 

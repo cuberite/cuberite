@@ -3972,11 +3972,13 @@ static int tolua_cBookContent_GetPages(lua_State * tolua_S)
 	// cBookContent::GetPages() -> table of strings
 
 	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("cBookContent"))
+	if (
+		!L.CheckParamSelf("cBookContent") ||
+		!L.CheckParamEnd(2)
+	)
 	{
 		return 0;
 	}
-
 	cBookContent * BookContent = reinterpret_cast<cBookContent *>(tolua_tousertype(tolua_S, 1, nullptr));
 	L.Push(BookContent->GetPages());
 	return 1;
@@ -3993,29 +3995,23 @@ static int tolua_cBookContent_SetPages(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamSelf("cBookContent") ||
-		!L.CheckParamTable(2))
+		!L.CheckParamTable(2) ||
+		!L.CheckParamEnd(3)
+	)
 	{
 		return 0;
 	}
-
 	cBookContent * BookContent = reinterpret_cast<cBookContent *>(tolua_tousertype(tolua_S, 1, nullptr));
-
-	// Convert the input table into AStringVector:
-	AStringVector Pages;
-	int NumPages = luaL_getn(L, 2);
-	Pages.reserve(static_cast<size_t>(NumPages));
-	for (int i = 1; i <= NumPages; i++)
-	{
-		lua_rawgeti(L, 2, i);
-		AString Page;
-		L.GetStackValue(-1, Page);
-		if (!Page.empty())
+	cLuaState::cStackTablePtr Pages;
+	L.GetStackValue(2, Pages);
+	Pages->ForEachArrayElement([=](cLuaState & a_LuaState, int a_Index) -> bool
 		{
-			Pages.push_back(Page);
+			AString Page;
+			a_LuaState.GetStackValue(-1, Page);
+			BookContent->AddPage(Page);
+			return false;
 		}
-		lua_pop(L, 1);
-	}
-	BookContent->SetPages(Pages);
+	);
 	return 0;
 }
 
