@@ -24,7 +24,7 @@ Here are the conventions:
  * Function parameters that are coordinates should be passed using an appropriate storage container, and not as three separate arguments.
   - e.g. for a block position, Vector3i. For an entity position, Vector3d. For a chunk coordinate, cChunkCoords.
   - For a 3-dimensional box of blocks, use cCuboid. For an axis-aligned bounding box, use cBoundingBox.
- * Parameters smaller than 4 elements (e.g. Vector3, cChunkCoords) should be passed by reference. All other parameters should be passed by const reference, where applicable.
+ * Parameters smaller than 4 elements (e.g. Vector3, cChunkCoords) should be passed by value. All other parameters should be passed by const reference, where applicable.
   - `Foo(Vector3d a_Param1, const cCuboid & a_Param2)`
   - See the discussion in issue #3853
  * Put spaces after commas. `Vector3d(1, 2, 3)` instead of `Vector3d(1,2,3)`
