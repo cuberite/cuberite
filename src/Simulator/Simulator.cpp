@@ -19,7 +19,7 @@
 
 
 
-void cSimulator::WakeUp(const Vector3i & a_Block, cChunk * a_Chunk)
+void cSimulator::WakeUp(Vector3i a_Block, cChunk * a_Chunk)
 {
 	AddBlock(a_Block, a_Chunk);
 	AddBlock(a_Block + Vector3i(-1, 0, 0), a_Chunk->GetNeighborChunk(a_Block.x - 1, a_Block.z));

@@ -58,7 +58,7 @@ void cSimulatorManager::SimulateChunk(std::chrono::milliseconds a_Dt, int a_Chun
 
 
 
-void cSimulatorManager::WakeUp(const Vector3i & a_Block, cChunk * a_Chunk)
+void cSimulatorManager::WakeUp(Vector3i a_Block, cChunk * a_Chunk)
 {
 	for (cSimulators::iterator itr = m_Simulators.begin(); itr != m_Simulators.end(); ++itr)
 	{

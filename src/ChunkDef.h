@@ -158,7 +158,7 @@ public:
 	}
 
 	/** The Y coordinate of a_Pos is ignored */
-	inline static cChunkCoords BlockToChunk(const Vector3i & a_Pos)
+	inline static cChunkCoords BlockToChunk(Vector3i a_Pos)
 	{
 		cChunkCoords Chunk(a_Pos.x / Width, a_Pos.z / Width);
 		if ((a_Pos.x < 0) && (a_Pos.x % Width != 0))

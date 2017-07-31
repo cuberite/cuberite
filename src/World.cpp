@@ -1294,7 +1294,7 @@ void cWorld::UpdateSkyDarkness(void)
 
 
 
-void cWorld::WakeUpSimulators(const Vector3i & a_Block)
+void cWorld::WakeUpSimulators(Vector3i a_Block)
 {
 	return m_ChunkMap->WakeUpSimulators(a_Block);
 }

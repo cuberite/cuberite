@@ -39,7 +39,7 @@ public:
 	}
 
 	/** Called when a block changes */
-	void WakeUp(const Vector3i & a_Block, cChunk * a_Chunk);
+	void WakeUp(Vector3i a_Block, cChunk * a_Chunk);
 
 	/** Does the same processing as WakeUp, but for all blocks within the specified area.
 	Has better performance than calling WakeUp for each block individually, due to neighbor-checking.
@@ -58,7 +58,7 @@ protected:
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) = 0;
 
 	/** Called to simulate a new block */
-	virtual void AddBlock(const Vector3i & a_Block, cChunk * a_Chunk)
+	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	{
 		AddBlock(a_Block.x, a_Block.y, a_Block.z, a_Chunk);
 	}

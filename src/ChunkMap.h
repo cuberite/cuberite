@@ -109,10 +109,10 @@ public:
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
 
 	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
-	bool DoWithChunkAt(const Vector3i & a_BlockPos, std::function<bool(cChunk &)> a_Callback);
+	bool DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback);
 
 	/** Wakes up simulators for the specified block */
-	void WakeUpSimulators(const Vector3i & a_Block);
+	void WakeUpSimulators(Vector3i a_Block);
 
 	// DEPRECATED, use the vector-parametered version instead.
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
@@ -498,7 +498,7 @@ private:
 	{
 		return GetChunkNoGen(cChunkCoords(a_ChunkX, a_ChunkZ));
 	}
-	cChunkPtr GetChunkNoGen(const cChunkCoords & a_Chunk);
+	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);

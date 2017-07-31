@@ -493,7 +493,7 @@ public:
 	double GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
-	virtual void WakeUpSimulators(const Vector3i & a_Block) override;
+	virtual void WakeUpSimulators(Vector3i a_Block) override;
 
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(const cCuboid & a_Area);

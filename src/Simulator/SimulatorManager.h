@@ -36,7 +36,7 @@ public:
 	void SimulateChunk(std::chrono::milliseconds a_DT, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk);
 
 	/* Called when a single block changes, wakes all simulators up for the block and its face-neighbors. */
-	void WakeUp(const Vector3i & a_Block, cChunk * a_Chunk);
+	void WakeUp(Vector3i a_Block, cChunk * a_Chunk);
 
 	/** Does the same processing as WakeUp, but for all blocks within the specified area.
 	Has better performance than calling WakeUp for each block individually, due to neighbor-checking.
