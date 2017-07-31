@@ -21,6 +21,12 @@ Here are the conventions:
   - `ThisIsAProperFunction()` `This_is_bad()` `this_is_bad()` `GoodVariableName` `badVariableName`.
  * All member variables start with `m_`, all function parameters start with `a_`, all class names start with `c`.
   - `class cMonster { int m_Health; int DecreaseHealth(int a_Amount); }`
+ * Function parameters that are coordinates should be passed using an appropriate storage container, and not as three separate arguments.
+  - e.g. for a block position, Vector3i. For an entity position, Vector3d. For a chunk coordinate, cChunkCoords.
+  - For a 3-dimensional box of blocks, use cCuboid. For an axis-aligned bounding box, use cBoundingBox.
+ * Parameters smaller than 4 elements (e.g. Vector3, cChunkCoords) should be passed by reference. All other parameters should be passed by const reference, where applicable.
+  - `Foo(Vector3d a_Param1, const cCuboid & a_Param2)`
+  - See the discussion in issue #3853
  * Put spaces after commas. `Vector3d(1, 2, 3)` instead of `Vector3d(1,2,3)`
  * Put spaces before and after every operator.
   - `a = b + c;`
