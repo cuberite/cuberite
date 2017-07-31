@@ -2385,7 +2385,7 @@ bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
 
 
 
-void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
+void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 {
 	m_ChunkMap->SendBlockTo(a_X, a_Y, a_Z, a_Player);
 }
