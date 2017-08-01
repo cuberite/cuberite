@@ -185,7 +185,7 @@ void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const char * a
 	}
 	else
 	{
-		LOG("Unexpectedly short ClientHello received");
+		LOG("Received unexpected length of ClientHello: " SIZE_T_FMT, a_Size);
 		SetError();
 	}
 }
