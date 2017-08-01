@@ -225,7 +225,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	cByteBuffer Buf(1024);
 
 	// Send server-side Forge mods registered by plugins
-	auto &ServerMods = m_Client->GetForgeMods();
+	auto & ServerMods = m_Client->GetForgeMods();
 
 	size_t ModCount = ServerMods.size();
 
