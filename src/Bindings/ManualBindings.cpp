@@ -2348,19 +2348,14 @@ static int tolua_cClientHandle_GetForgeMods(lua_State * L)
 {
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cClientHandle") ||
+		!S.CheckParamSelf("cClientHandle") ||
 		!S.CheckParamEnd(2)
 		)
 	{
 		return 0;
 	}
 	cClientHandle * Client = reinterpret_cast<cClientHandle *>(tolua_tousertype(L, 1, nullptr));
-	if (Client == nullptr)
-	{
-		LOGWARNING("ClientHandle is nil in cClientHandle:GetForgeMods()");
-		S.LogStackTrace();
-		return 0;
-	}
+
 	AStringMap Mods = Client->GetForgeMods();
 
 	S.Push(Client->GetForgeMods());
@@ -3167,7 +3162,7 @@ static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 {
 	cLuaState L(a_LuaState);
 	if (
-		!L.CheckParamUserType(1, "cServer") ||
+		!L.CheckParamSelf("cServer") ||
 		!L.CheckParamString(2, 3) ||
 		!L.CheckParamNumber(4) ||
 		!L.CheckParamEnd(5)
