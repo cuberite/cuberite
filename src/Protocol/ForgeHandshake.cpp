@@ -347,17 +347,9 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 	switch (Discriminator)
 	{
-		case Discriminator::ClientHello:
-			HandleClientHello(a_Client, a_Data, a_Size);
-			break;
-
-		case Discriminator::ModList:
-			HandleModList(a_Client, a_Data, a_Size);
-			break;
-
-		case Discriminator::HandshakeAck:
-			HandleHandshakeAck(a_Client, a_Data, a_Size);
-			break;
+		case Discriminator::ClientHello:  HandleClientHello(a_Client, a_Data, a_Size); break;
+		case Discriminator::ModList:      HandleModList(a_Client, a_Data, a_Size); break;
+		case Discriminator::HandshakeAck: HandleHandshakeAck(a_Client, a_Data, a_Size); break;
 
 		default:
 		{
