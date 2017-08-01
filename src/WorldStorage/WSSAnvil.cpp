@@ -804,7 +804,17 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 		int Lore = a_NBT.FindChildByName(DisplayTag, "Lore");
 		if ((Lore > 0) && (a_NBT.GetType(Lore) == TAG_String))
 		{
-			a_Item.m_Lore = a_NBT.GetString(Lore);
+			// Legacy string lore
+			a_Item.m_LoreTable = StringSplit(a_NBT.GetString(Lore), "`");
+		}
+		else if ((Lore > 0) && (a_NBT.GetType(Lore) == TAG_List))
+		{
+			// Lore table
+			a_Item.m_LoreTable.clear();
+			for (int loretag = a_NBT.GetFirstChild(Lore); loretag >= 0; loretag = a_NBT.GetNextSibling(loretag))  // Loop through array of strings
+			{
+				a_Item.m_LoreTable.push_back(a_NBT.GetString(loretag));
+			}
 		}
 	}
 

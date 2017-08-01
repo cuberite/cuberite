@@ -347,6 +347,58 @@ static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
 
 
 
+static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
+{
+	// Maintain legacy m_Lore variable as Lore table split by ` (grave-accent)
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cItem"))
+	{
+		return 0;
+	}
+
+	cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	AString LoreString = StringJoin(Self->m_LoreTable, "`");
+
+	L.Push(LoreString);
+
+	LOGWARNING("Warning in read from variable 'cItem.m_Lore': m_Lore is deprecated. Please use m_LoreTable");
+	L.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
+{
+	// Maintain legacy m_Lore variable as Lore table split by ` (grave-accent)
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cItem") ||
+		!L.CheckParamString(2)
+		)
+	{
+		return 0;
+	}
+
+	cItem * Self = nullptr;
+	AString LoreString;
+	L.GetStackValues(1, Self, LoreString);
+
+	Self->m_LoreTable = StringSplit(LoreString, "`");
+
+	LOGWARNING("Warning in write to variable 'cItem.m_Lore': m_Lore is deprecated. Please use m_LoreTable");
+	L.LogStackTrace(0);
+	return 0;
+}
+
+
+
+
+
 /* method: Trace of class  cTracer */
 static int tolua_cTracer_Trace(lua_State * a_LuaState)
 {
@@ -498,6 +550,10 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_beginmodule(tolua_S, "cBlockInfo");
 		tolua_function(tolua_S, "GetPlaceSound", tolua_cBlockInfo_GetPlaceSound);
 		tolua_variable(tolua_S, "m_PlaceSound", tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
+	tolua_endmodule(tolua_S);
+
+	tolua_beginmodule(tolua_S, "cItem");
+		tolua_variable(tolua_S, "m_Lore", tolua_get_cItem_m_Lore, tolua_set_cItem_m_Lore);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cTracer");

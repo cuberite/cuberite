@@ -6693,7 +6693,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							},
 							{
 								Name = "Lore",
-								Type = "string",
+								Type = "table",
 								IsOptional = true,
 							},
 						},
@@ -6947,10 +6947,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					Type = "number",
 					Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants",
 				},
-				m_Lore =
+				m_LoreTable =
 				{
-					Type = "string",
-					Notes = "The lore for an item. Line breaks are represented by the ` character.",
+					Type = "table",
+					Notes = "The lore for an item. Represented as an array table of lines.",
 				},
 				m_RepairCost =
 				{

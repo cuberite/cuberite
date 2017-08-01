@@ -107,7 +107,7 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 		((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)) ||
 		(a_Item.m_RepairCost > 0) ||
 		(a_Item.m_CustomName != "") ||
-		(a_Item.m_Lore != "")
+		(!a_Item.m_LoreTable.empty())
 	)
 	{
 		m_Writer.BeginCompound("tag");
@@ -116,16 +116,23 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 				m_Writer.AddInt("RepairCost", a_Item.m_RepairCost);
 			}
 
-			if ((a_Item.m_CustomName != "") || (a_Item.m_Lore != ""))
+			if ((a_Item.m_CustomName != "") || (!a_Item.m_LoreTable.empty()))
 			{
 				m_Writer.BeginCompound("display");
 				if (a_Item.m_CustomName != "")
 				{
 					m_Writer.AddString("Name", a_Item.m_CustomName);
 				}
-				if (a_Item.m_Lore != "")
+				if (!a_Item.m_LoreTable.empty())
 				{
-					m_Writer.AddString("Lore", a_Item.m_Lore);
+					m_Writer.BeginList("Lore", TAG_String);
+
+					for (const auto & Line : a_Item.m_LoreTable)
+					{
+						m_Writer.AddString("", Line);
+					}
+
+					m_Writer.EndList();
 				}
 				m_Writer.EndCompound();
 			}
