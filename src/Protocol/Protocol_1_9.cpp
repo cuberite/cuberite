@@ -2953,6 +2953,7 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 		cParsedNBT NBT(BookData.c_str(), BookData.size());
 
 		cItem BookItem;
+		bool IsSigned = true;
 		if (a_Channel == "MC|BSign")
 		{
 			BookItem = cItem(E_ITEM_WRITTEN_BOOK);
@@ -2961,12 +2962,10 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 		}
 		else
 		{
+			IsSigned = false;
 			BookItem = cItem(E_ITEM_BOOK_AND_QUILL);
 			cBookContent::ParseFromNBT(0, BookItem.m_BookContent, NBT);
 		}
-
-		// If true, player has clicked on the sign button
-		bool IsSigned = (BookItem.m_ItemType == E_ITEM_WRITTEN_BOOK) ? true : false;
 
 		if (cRoot::Get()->GetPluginManager()->CallHookPlayerEditingBook(Player, BookItem.m_BookContent, IsSigned))
 		{
