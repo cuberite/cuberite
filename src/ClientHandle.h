@@ -21,6 +21,7 @@
 #include "json/json.h"
 #include "ChunkSender.h"
 #include "EffectID.h"
+#include "ScoreboardAttachee.h"
 
 
 #include <array>
@@ -50,8 +51,9 @@ typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
 
 
-class cClientHandle  // tolua_export
-	: public cTCPLink::cCallbacks
+class cClientHandle :  // tolua_export
+	public cTCPLink::cCallbacks,
+	public cScoreboardAttachee
 {  // tolua_export
 public:  // tolua_export
 
@@ -80,6 +82,8 @@ public:  // tolua_export
 	void SetIPString(const AString & a_IPString) { m_IPString = a_IPString; }
 
 	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
+
+	cScoreboard & GetScoreBoard(void) { return m_Scoreboard; }  // tolua_export
 
 	/** Returns the player's UUID, as used by the protocol, in the short form (no dashes) */
 	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
@@ -168,7 +172,7 @@ public:  // tolua_export
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void SendDisconnect                 (const AString & a_Reason);
-	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
+	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
 	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
@@ -207,8 +211,8 @@ public:  // tolua_export
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResetTitle                 (void);  // tolua_export
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
-	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
-	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
+	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
 	void SendSetRawSubTitle             (const AString & a_SubTitle);  // tolua_export
 	void SendSetTitle                   (const cCompositeChat & a_Title);  // tolua_export
@@ -424,6 +428,9 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
+
+	/** Personalized per-player scoreboards */
+	cScoreboard m_Scoreboard;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.

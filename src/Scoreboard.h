@@ -14,6 +14,7 @@
 
 
 class cObjective;
+class cScoreboardAttachee;
 class cTeam;
 class cWorld;
 
@@ -60,7 +61,7 @@ public:
 
 public:
 
-	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type, cWorld * a_World);
+	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type, cScoreboardAttachee * a_Attachee);
 
 	// tolua_begin
 
@@ -113,7 +114,10 @@ private:
 
 	eType m_Type;
 
-	cWorld * m_World;
+	// We're either attached to the world or to a specific client handle
+	/*cWorld * m_World;
+	  cClientHandle * m_ClientHandle;*/
+	cScoreboardAttachee * m_Attachee;
 
 	friend class cScoreboardSerializer;
 
@@ -222,7 +226,7 @@ public:
 
 public:
 
-	cScoreboard(cWorld * a_World);
+	cScoreboard(cScoreboardAttachee * a_Attachee);
 
 	// tolua_begin
 
@@ -278,6 +282,8 @@ public:
 
 	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
 
+	//void SetClientHandle(cClientHandle * a_ClientHandle) { m_ClientHandle = a_ClientHandle; }
+
 
 private:
 
@@ -294,7 +300,10 @@ private:
 	cCriticalSection m_CSTeams;
 	cTeamMap m_Teams;
 
-	cWorld * m_World;
+	// We're either attached to the world or to a specific client handle
+	/*cWorld * m_World;
+	  cClientHandle * m_ClientHandle;*/
+	cScoreboardAttachee * m_Attachee;
 
 	cObjective * m_Display[dsCount];
 

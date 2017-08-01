@@ -93,7 +93,8 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
 	m_LastPlacedSign(0, -1, 0),
-	m_ProtocolVersion(0)
+	m_ProtocolVersion(0),
+	m_Scoreboard(this)
 {
 	m_Protocol = cpp14::make_unique<cProtocolRecognizer>(this);
 
@@ -427,7 +428,14 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_Player->UpdateTeam();
 
 	// Send scoreboard data
-	World->GetScoreBoard().SendTo(*this);
+	if (false)//World->UseGlobalScoreBoard())
+	{
+		World->GetScoreBoard().SendTo(*this);
+	}
+	else
+	{
+		m_Scoreboard.SendTo(*this);
+	}
 
 	// Send statistics
 	SendStatistics(m_Player->GetStatManager());
