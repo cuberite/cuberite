@@ -20,13 +20,13 @@ public:
 	void SetAuthor(const AString & a_Author) { m_Author = a_Author; }
 
 	/** Returns the author of the book */
-	const AString GetAuthor(void) const { return m_Author; }
+	const AString & GetAuthor(void) const { return m_Author; }
 
 	/** Set the title of the book */
 	void SetTitle(const AString & a_Title) { m_Title = a_Title; }
 
 	/** Returns the title of the book */
-	const AString GetTitle(void) const { return m_Title; }
+	const AString & GetTitle(void) const { return m_Title; }
 
 	/** Add a page to the end of the book */
 	void AddPage(const AString & a_Page) { m_Pages.emplace_back(a_Page); }
@@ -42,7 +42,7 @@ public:
 	/** Returns a AStringVector ref to the pages. Used in ManualBindings and for saving the book */
 	const AStringVector & GetPages(void) const { return m_Pages; }
 
-	/** Read the book content from nbt. The boolean a_SaveAsJson is optional. If a player creates a book, the text should be in a json string */
+	/** Read the book content from nbt. The boolean a_SaveAsJson is optional. If the book is signed, the text should be in a json string */
 	static void ParseFromNBT(int TagTag, cBookContent & a_BookContent, const cParsedNBT & a_NBT, bool a_SaveAsJson = false);
 
 	/** Write book content to nbt */
