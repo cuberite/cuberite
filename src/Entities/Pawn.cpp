@@ -55,7 +55,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// Copies values to prevent pesky wrong accesses and erasures
 		cEntityEffect::eType EffectType = iter->first;
-		cEntityEffect * Effect = iter->second;
+		cEntityEffect * Effect = iter->second.get();
 
 		// Iterates (must be called before any possible erasure)
 		++iter;
@@ -157,6 +157,15 @@ bool cPawn::IsFireproof(void) const
 
 
 
+bool cPawn::IsInvisible() const
+{
+	return HasEntityEffect(cEntityEffect::effInvisibility);
+}
+
+
+
+
+
 void cPawn::HandleAir(void)
 {
 	if (IsSubmerged() && HasEntityEffect(cEntityEffect::effWaterBreathing))
@@ -188,9 +197,10 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 	}
 	a_Duration = static_cast<int>(a_Duration * a_DistanceModifier);
 
-	m_EntityEffects[a_EffectType] = cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier);
+	auto Res = m_EntityEffects.emplace(a_EffectType, cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier));
 	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, static_cast<short>(a_Duration));
-	m_EntityEffects[a_EffectType]->OnActivate(*this);
+	cEntityEffect * Effect = Res.first->second.get();
+	Effect->OnActivate(*this);
 }
 
 
@@ -200,9 +210,14 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 void cPawn::RemoveEntityEffect(cEntityEffect::eType a_EffectType)
 {
 	m_World->BroadcastRemoveEntityEffect(*this, a_EffectType);
-	m_EntityEffects[a_EffectType]->OnDeactivate(*this);
-	delete m_EntityEffects[a_EffectType];
-	m_EntityEffects.erase(a_EffectType);
+	auto itr = m_EntityEffects.find(a_EffectType);
+	if (itr != m_EntityEffects.end())
+	{
+		// Erase from effect map before calling OnDeactivate to allow metadata broadcasts (e.g. for invisibility effect)
+		auto Effect = std::move(itr->second);
+		m_EntityEffects.erase(itr);
+		Effect->OnDeactivate(*this);
+	}
 }
 
 
@@ -459,16 +474,22 @@ void cPawn::StopEveryoneFromTargetingMe()
 
 std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects()
 {
-	return m_EntityEffects;
+	std::map<cEntityEffect::eType, cEntityEffect *> Effects;
+	for (auto & Effect : m_EntityEffects)
+	{
+		Effects.insert({ Effect.first, Effect.second.get() });
+	}
+	return Effects;
 }
 
 
 
 
 
-cEntityEffect *cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
+cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
 {
-	return m_EntityEffects.at(a_EffectType);
+	auto itr = m_EntityEffects.find(a_EffectType);
+	return (itr != m_EntityEffects.end()) ? itr->second.get() : nullptr;
 }
 
 

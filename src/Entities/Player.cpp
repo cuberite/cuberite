@@ -2966,15 +2966,17 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 		}
 	}
 
-	if (HasEntityEffect(cEntityEffect::effHaste))
+	auto Haste = GetEntityEffect(cEntityEffect::effHaste);
+	if (Haste != nullptr)
 	{
-		int intensity = GetEntityEffect(cEntityEffect::effHaste)->GetIntensity() + 1;
+		int intensity = Haste->GetIntensity() + 1;
 		f *= 1.0f + (intensity * 0.2f);
 	}
 
-	if (HasEntityEffect(cEntityEffect::effMiningFatigue))
+	auto MiningFatigue = GetEntityEffect(cEntityEffect::effMiningFatigue);
+	if (MiningFatigue != nullptr)
 	{
-		int intensity = GetEntityEffect(cEntityEffect::effMiningFatigue)->GetIntensity();
+		int intensity = MiningFatigue->GetIntensity();
 		switch (intensity)
 		{
 			case 0:  f *= 0.3f;     break;
