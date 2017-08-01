@@ -2354,7 +2354,8 @@ static int tolua_cClientHandle_GetForgeMods(lua_State * L)
 	{
 		return 0;
 	}
-	cClientHandle * Client = reinterpret_cast<cClientHandle *>(tolua_tousertype(L, 1, nullptr));
+	cClientHandle * Client;
+	S.GetStackValue(1, Client);
 
 	AStringMap Mods = Client->GetForgeMods();
 
