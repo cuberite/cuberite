@@ -29,7 +29,7 @@ namespace ClientPhase
 	static const Int8 WAITINGSERVERDATA = 2;
 	static const Int8 WAITINGSERVERCOMPLETE = 3;
 	static const Int8 PENDINGCOMPLETE = 4;
-	// static const Int8 COMPLETE = 5;
+	static const Int8 COMPLETE = 5;
 }
 
 /** Server handshake state phases. */
@@ -305,8 +305,20 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 			Ack.push_back(ServerPhase::COMPLETE);
 			m_Client->SendPluginMessage("FML|HS", Ack);
 
+			break;
+		}
+
+		case ClientPhase::COMPLETE:
+		{
 			// Now finish logging in
 			m_Client->FinishAuthenticate(m_Name, m_UUID, m_Properties);
+			break;
+		}
+
+		default:
+		{
+			LOG("Received unknown phase in Forge handshake acknowledgement: %d", Phase);
+			SetError();
 			break;
 		}
 	}
