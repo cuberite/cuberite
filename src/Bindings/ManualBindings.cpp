@@ -3798,8 +3798,9 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cClientHandle");
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
-			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
+
 			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
+			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cColor");
