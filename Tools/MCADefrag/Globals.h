@@ -239,5 +239,8 @@ public:
 } ;
 
 
+#include "BiomeDef.h"
+
+
 
 
