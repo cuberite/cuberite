@@ -1044,7 +1044,6 @@ void cProtocol_1_9_0::SendPlayerMoveLook(void)
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
 	Pkt.WriteBEUInt8(0);
 	Pkt.WriteVarInt32(++m_OutstandingTeleportId);
-	LOG("Sent PlayerMoveLook Y=%f TPID=%d", Player->GetPosY(), m_OutstandingTeleportId);
 
 	// This teleport ID hasn't been confirmed yet
 	m_IsTeleportIdConfirmed = false;
@@ -2417,8 +2416,6 @@ void cProtocol_1_9_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_9_0::HandleConfirmTeleport(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, TeleportID);
-	// We don't actually validate that this packet is sent or anything yet, but it still needs to be read.
-	LOG("Got teleport confirm TPID=%d", TeleportID);
 
 	// Can we stop throwing away packets?
 	if (TeleportID == m_OutstandingTeleportId)
@@ -2524,7 +2521,6 @@ void cProtocol_1_9_0::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 {
-	LOG("Got player pos packet");
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
@@ -2542,7 +2538,6 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 {
-	LOG("Got player pos look packet");
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
