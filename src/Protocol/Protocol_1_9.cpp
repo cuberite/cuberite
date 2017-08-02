@@ -119,7 +119,9 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
 	m_ReceivedData(32 KiB),
-	m_IsEncrypted(false)
+	m_IsEncrypted(false),
+	m_IsTeleportIdConfirmed(true),
+	m_OutstandingTeleportId(0)
 {
 
 	// BungeeCord handling:
@@ -2417,7 +2419,7 @@ void cProtocol_1_9_0::HandleConfirmTeleport(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, TeleportID);
 
-	// Can we stop throwing away packets?
+	// Can we stop throwing away incoming player position packets?
 	if (TeleportID == m_OutstandingTeleportId)
 	{
 		m_IsTeleportIdConfirmed = true;

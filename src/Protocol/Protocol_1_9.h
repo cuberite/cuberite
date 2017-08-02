@@ -174,8 +174,8 @@ protected:
 	UInt32 m_State;
 
 	/** The current teleport ID, and whether it has been confirmed by the client */
-	Int32 m_OutstandingTeleportId;
 	bool m_IsTeleportIdConfirmed;
+	Int32 m_OutstandingTeleportId;
 
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
