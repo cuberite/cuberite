@@ -118,10 +118,10 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
-	m_ReceivedData(32 KiB),
-	m_IsEncrypted(false),
 	m_IsTeleportIdConfirmed(true),
-	m_OutstandingTeleportId(0)
+	m_OutstandingTeleportId(0),
+	m_ReceivedData(32 KiB),
+	m_IsEncrypted(false)
 {
 
 	// BungeeCord handling:
