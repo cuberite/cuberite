@@ -9,7 +9,6 @@
 #include "Entities/Player.h"
 #include "../BoundingBox.h"
 #include "../Mobs/Monster.h"
-#include "../Entities/Entity.h"
 #include "../BlockEntities/BedEntity.h"
 
 

@@ -11,7 +11,6 @@
 #include "../Server.h"
 #include "../UI/InventoryWindow.h"
 #include "../UI/WindowOwner.h"
-#include "../World.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"

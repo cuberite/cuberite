@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "NetherPortalScanner.h"
-#include "Vector3.h"
 #include "Entities/Entity.h"
 #include "World.h"
 

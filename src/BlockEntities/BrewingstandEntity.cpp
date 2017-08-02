@@ -5,7 +5,6 @@
 #include "../Bindings/PluginManager.h"
 #include "../UI/BrewingstandWindow.h"
 #include "../Entities/Player.h"
-#include "../Root.h"
 #include "../Chunk.h"
 
 

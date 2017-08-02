@@ -7,7 +7,6 @@
 #include "BeaconWindow.h"
 #include "SlotArea.h"
 #include "../BlockEntities/BeaconEntity.h"
-#include "../Entities/Player.h"
 #include "../ClientHandle.h"
 
 

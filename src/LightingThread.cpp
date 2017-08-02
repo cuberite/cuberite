@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "LightingThread.h"
 #include "ChunkMap.h"
-#include "ChunkStay.h"
 #include "World.h"
 
 

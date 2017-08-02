@@ -4,7 +4,6 @@
 
 #include "Globals.h"
 #include "BoundingBox.h"
-#include "Defines.h"
 
 
 
