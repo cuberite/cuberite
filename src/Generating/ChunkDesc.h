@@ -10,7 +10,6 @@
 #pragma once
 
 #include "../BlockArea.h"
-#include "../ChunkDef.h"
 #include "../Cuboid.h"
 
 

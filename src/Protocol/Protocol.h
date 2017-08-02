@@ -17,7 +17,6 @@
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
 
-#include <array>
 
 
 

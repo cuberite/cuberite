@@ -211,7 +211,6 @@ template class SizeChecker<UInt8,  1>;
 	#include <dirent.h>
 	#include <errno.h>
 	#include <iostream>
-	#include <cstdio>
 	#include <cstring>
 	#include <pthread.h>
 	#include <semaphore.h>
@@ -256,6 +255,9 @@ template class SizeChecker<UInt8,  1>;
 #include <random>
 #include <type_traits>
 #include <atomic>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 
 
@@ -479,8 +481,9 @@ using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 
 
 // Common headers (part 2, with macros):
-#include "ChunkDef.h"
+#include "Vector3.h"
 #include "BiomeDef.h"
+#include "ChunkDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
 

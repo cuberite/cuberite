@@ -35,8 +35,6 @@ extern "C"
 	#include "lua/src/lauxlib.h"
 }
 
-#include <atomic>
-#include "../Vector3.h"
 #include "../Defines.h"
 #include "PluginManager.h"
 #include "LuaState_Typedefs.inc"
