@@ -12,9 +12,9 @@ static inline bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int 
 {
 	ASSERT(a_Min1 <= a_Max1);
 	ASSERT(a_Min2 <= a_Max2);
-	return !(
-		(a_Min1 > a_Max1) ||
-		(a_Max1 < a_Min2)
+	return (
+		(a_Min1 <= a_Max1) &&
+		(a_Max1 >= a_Min2)
 	);
 }
 
