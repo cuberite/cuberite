@@ -61,14 +61,14 @@ void cBlockPistonHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Bloc
 
 
 bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
-	cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
 	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
 {
 	a_BlockType = m_BlockType;
-	a_BlockMeta = RotationPitchToMetaData(a_Player->GetYaw(), a_Player->GetPitch());
+	a_BlockMeta = RotationPitchToMetaData(a_Player.GetYaw(), a_Player.GetPitch());
 	return true;
 }
 
@@ -319,7 +319,7 @@ cBlockPistonHeadHandler::cBlockPistonHeadHandler(void) :
 
 
 
-void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 
@@ -331,7 +331,7 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 	if ((Block == E_BLOCK_STICKY_PISTON) || (Block == E_BLOCK_PISTON))
 	{
 		a_ChunkInterface.DigBlock(a_WorldInterface, blockPos.x, blockPos.y, blockPos.z);
-		if (a_Player->IsGameModeCreative())
+		if (a_Player.IsGameModeCreative())
 		{
 			return;  // No pickups if creative
 		}

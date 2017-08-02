@@ -43,7 +43,7 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 
 
 
-bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	UNUSED(a_WorldInterface);
 	UNUSED(a_BlockFace);
@@ -65,7 +65,7 @@ bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		case E_BLOCK_OAK_DOOR:
 		{
 			ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-			a_Player->GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player.GetClientHandle());
 			break;
 		}
 		// Prevent iron door from opening on player click
@@ -83,7 +83,7 @@ bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
-void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
 	UNUSED(a_ChunkInterface);
 

@@ -362,7 +362,7 @@ bool cItemHandler::OnPlayerPlace(
 	// Check if the block ignores build collision (water, grass etc.):
 	if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
 	{
-		BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ);
+		BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 	}
 	else
 	{
@@ -395,9 +395,9 @@ bool cItemHandler::OnPlayerPlace(
 		// Handler refused the placement, send that information back to the client:
 		for (const auto & blk: blocks)
 		{
-			a_World.SendBlockTo(blk.GetX(), blk.GetY(), blk.GetZ(), &a_Player);
+			a_World.SendBlockTo(blk.GetX(), blk.GetY(), blk.GetZ(), a_Player);
 		}
-		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, &a_Player);
+		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;
 	}
@@ -815,7 +815,7 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 	cBlockHandler * BlockH = BlockHandler(static_cast<BLOCKTYPE>(m_ItemType));
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
-		ChunkInterface, a_Player,
+		ChunkInterface, *a_Player,
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 		a_CursorX, a_CursorY, a_CursorZ,
 		a_BlockType, a_BlockMeta

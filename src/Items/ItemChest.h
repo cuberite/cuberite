@@ -54,7 +54,7 @@ public:
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
 		if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
 		{
-			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ);
+			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
 		else
 		{

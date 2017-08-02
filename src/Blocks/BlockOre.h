@@ -68,17 +68,17 @@ public:
 		}
 	}
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		super::OnDestroyedByPlayer(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
-		if (a_Player->IsGameModeCreative())
+		if (a_Player.IsGameModeCreative())
 		{
 			// Don't drop XP when the player is in creative mode.
 			return;
 		}
 
-		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
+		if (a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
 		{
 			// Don't drop XP when the ore is mined with the Silk Touch enchantment
 			return;
