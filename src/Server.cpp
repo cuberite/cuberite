@@ -239,7 +239,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
 {
-	AStringMap & Mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
+	auto & Mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
 
 	return Mods.insert({a_ModName, a_ModVersion}).second;
 }
@@ -250,7 +250,7 @@ bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt
 
 void cServer::UnregisterForgeMod(AString &a_ModName, UInt32 a_ProtocolVersionNumber)
 {
-	AStringMap & Mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
+	auto & Mods = GetRegisteredForgeMods(a_ProtocolVersionNumber);
 
 	auto it = Mods.find(a_ModName);
 	if (it != Mods.end())

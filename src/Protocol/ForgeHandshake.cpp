@@ -56,8 +56,8 @@ cForgeHandshake::cForgeHandshake(cClientHandle *a_Client) :
 
 void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 {
-	UInt32 ProtocolVersion = m_Client->GetProtocolVersion();
-	AStringMap & Mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
+	auto ProtocolVersion = m_Client->GetProtocolVersion();
+	auto & Mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
 
 	if (Mods.size() == 0)
 	{
@@ -197,7 +197,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 {
 	LOGD("Received ModList");
 
-	AStringMap ClientMods = ParseModList(a_Data + 1, a_Size - 1);
+	auto ClientMods = ParseModList(a_Data + 1, a_Size - 1);
 	AString ClientModsString;
 	for (auto & item: ClientMods)
 	{
@@ -227,7 +227,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	// Send server-side Forge mods registered by plugins
 	auto & ServerMods = m_Client->GetForgeMods();
 
-	size_t ModCount = ServerMods.size();
+	auto ModCount = ServerMods.size();
 
 	Buf.WriteBEInt8(Discriminator::ModList);
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
@@ -256,7 +256,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 		return;
 	}
 
-	int Phase = a_Data[1];
+	auto Phase = a_Data[1];
 	LOGD("Received client HandshakeAck with phase=%d", Phase);
 
 	switch (Phase)
@@ -343,7 +343,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 		return;
 	}
 
-	int Discriminator = a_Data[0];
+	auto Discriminator = a_Data[0];
 
 	switch (Discriminator)
 	{
