@@ -39,9 +39,6 @@ class cFlowerPotEntity;
 class cFallingBlock;
 class cMinecart;
 class cMinecartWithChest;
-class cMinecartWithFurnace;
-class cMinecartWithTNT;
-class cMinecartWithHopper;
 class cMonster;
 class cPickup;
 class cItemGrid;
@@ -51,7 +48,6 @@ class cExpOrb;
 class cHangingEntity;
 class cItemFrame;
 class cPainting;
-class cEntityEffect;
 
 
 

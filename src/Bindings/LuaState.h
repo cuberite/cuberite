@@ -45,7 +45,6 @@ extern "C"
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
-class cPluginLua;
 class cDeadlockDetect;
 
 

@@ -11,7 +11,7 @@
 
 
 class cClientHandle;
-class cWorld;
+
 
 
 // tolua_begin

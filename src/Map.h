@@ -22,7 +22,6 @@
 class cClientHandle;
 class cWorld;
 class cPlayer;
-class cItemFrame;
 class cMap;
 
 

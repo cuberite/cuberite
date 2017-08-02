@@ -9,12 +9,6 @@
 
 
 
-// fwd:
-class cChunk;
-
-
-
-
 
 /** This class is used to collect the list of mobs for each family
 */

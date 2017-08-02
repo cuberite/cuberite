@@ -26,8 +26,6 @@ class cExpOrb;
 class cPlayer;
 class cEntity;
 class cWindow;
-class cInventory;
-class cPawn;
 class cPickup;
 class cPainting;
 class cWorld;

@@ -9,7 +9,6 @@ class cItems;
 typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
 
 
-class cMonster;
 class cPlayer;
 
 
