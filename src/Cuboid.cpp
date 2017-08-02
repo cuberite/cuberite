@@ -8,12 +8,13 @@
 
 
 /** Returns true if the two specified intervals have a non-empty union */
-static bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int a_Max2)
+static inline bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int a_Max2)
 {
-	return (
-		((a_Min1 >= a_Min2) && (a_Min1 <= a_Max2)) ||  // Start of first  interval is within the second interval
-		((a_Max1 >= a_Min2) && (a_Max1 <= a_Max2)) ||  // End   of first  interval is within the second interval
-		((a_Min2 >= a_Min1) && (a_Min2 <= a_Max1))     // Start of second interval is within the first interval
+	ASSERT(a_Min1 <= a_Max1);
+	ASSERT(a_Min2 <= a_Max2);
+	return !(
+		(a_Min1 > a_Max1) ||
+		(a_Max1 < a_Min2)
 	);
 }
 
