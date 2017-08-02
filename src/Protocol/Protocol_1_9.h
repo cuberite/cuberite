@@ -173,6 +173,10 @@ protected:
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
 
+	/** The current teleport ID, and whether it has been confirmed by the client */
+	bool m_IsTeleportIdConfirmed;
+	UInt32 m_OutstandingTeleportId;
+
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
 
