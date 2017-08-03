@@ -69,6 +69,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
 	m_Player(nullptr),
+	m_Scoreboard(this),
 	m_CachedSentChunk(0, 0),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
@@ -93,8 +94,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
 	m_LastPlacedSign(0, -1, 0),
-	m_ProtocolVersion(0),
-	m_Scoreboard(this)
+	m_ProtocolVersion(0)
 {
 	m_Protocol = cpp14::make_unique<cProtocolRecognizer>(this);
 

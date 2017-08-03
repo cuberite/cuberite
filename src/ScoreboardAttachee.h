@@ -9,6 +9,8 @@
 class cScoreboardAttachee
 {
 public:
+	virtual ~cScoreboardAttachee() {}
+
 	enum eScoreAction : Byte
 	{
 		saCreateOrUpdate = 0,
