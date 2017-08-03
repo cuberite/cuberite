@@ -363,7 +363,7 @@ static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
 
 	L.Push(LoreString);
 
-	LOGWARNING("Warning in read from variable 'cItem.m_Lore': m_Lore is deprecated. Please use m_LoreTable");
+	LOGWARNING("cItem.m_Lore is deprecated, use cItem.m_LoreTable instead");
 	L.LogStackTrace(0);
 	return 1;
 }
@@ -390,7 +390,7 @@ static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
 
 	Self->m_LoreTable = StringSplit(LoreString, "`");
 
-	LOGWARNING("Warning in write to variable 'cItem.m_Lore': m_Lore is deprecated. Please use m_LoreTable");
+	LOGWARNING("cItem.m_Lore is deprecated, use cItem.m_LoreTable instead");
 	L.LogStackTrace(0);
 	return 0;
 }
