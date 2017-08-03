@@ -224,10 +224,7 @@ bool cChestEntity::IsBlocked()
 		(GetPosY() < cChunkDef::Height - 1) &&
 		(
 			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
-			(
-				(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()) == E_BLOCK_AIR) &&
-				!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
-			)
+			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
 		)
 	);
 }

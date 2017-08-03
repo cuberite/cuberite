@@ -222,10 +222,10 @@ class cFindSittingCat :
 
 
 
-bool cOcelot::IsCatSittingOnBlock(cWorld * a_World, const Vector3d & a_BlockPosition)
+bool cOcelot::IsCatSittingOnBlock(cWorld * a_World, Vector3d a_BlockPosition)
 {
 	cFindSittingCat FindSittingCat;
-	return a_World->ForEachEntityInBox(cBoundingBox(Vector3d(a_BlockPosition.x, a_BlockPosition.y + 1, a_BlockPosition.z), 1, 1), FindSittingCat);
+	return a_World->ForEachEntityInBox(cBoundingBox(Vector3d(a_BlockPosition.x, a_BlockPosition.y + 1, a_BlockPosition.z), 1), FindSittingCat);
 }
 
 
