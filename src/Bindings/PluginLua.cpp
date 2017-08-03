@@ -1080,6 +1080,8 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK:        return "OnPlayerBreakingBlock";
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
 		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";
+		case cPluginManager::HOOK_PLAYER_EDITED_BOOK:           return "OnPlayerEditedBook";
+		case cPluginManager::HOOK_PLAYER_EDITING_BOOK:          return "OnPlayerSigningdBook";
 		case cPluginManager::HOOK_PLAYER_JOINED:                return "OnPlayerJoined";
 		case cPluginManager::HOOK_PLAYER_LEFT_CLICK:            return "OnPlayerLeftClick";
 		case cPluginManager::HOOK_PLAYER_MOVING:                return "OnPlayerMoving";
@@ -1088,8 +1090,6 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
-		case cPluginManager::HOOK_PLAYER_EDITED_BOOK:           return "OnPlayerEditedBook";
-		case cPluginManager::HOOK_PLAYER_EDITING_BOOK:          return "OnPlayerSigningdBook";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";
 		case cPluginManager::HOOK_PLAYER_SPAWNED:               return "OnPlayerSpawned";
 		case cPluginManager::HOOK_PLAYER_TOSSING_ITEM:          return "OnPlayerTossingItem";

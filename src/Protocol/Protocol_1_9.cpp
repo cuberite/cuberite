@@ -3066,6 +3066,12 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 		return;
 	}
 
+	if ((a_Item.m_ItemType == E_ITEM_WRITTEN_BOOK) || (a_Item.m_ItemType == E_ITEM_BOOK_AND_QUILL))
+	{
+		cBookContent::ParseFromNBT(0, a_Item.m_BookContent, NBT);
+		return;
+	}
+
 	// Load enchantments and custom display names from the NBT data:
 	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
 	{
