@@ -10,7 +10,6 @@
 #include "zlib/zlib.h"
 #include "json/json.h"
 #include "../World.h"
-#include "../BlockID.h"
 #include "../Item.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"

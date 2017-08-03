@@ -3,7 +3,6 @@
 
 #include "BlockHandler.h"
 #include "../FastRandom.h"
-#include "../BlockInfo.h"
 #include "Root.h"
 #include "Bindings/PluginManager.h"
 

@@ -2,7 +2,6 @@
 #pragma once
 
 #include "Entities/Entity.h"
-#include "ChunkDef.h"
 #include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"

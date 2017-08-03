@@ -1,12 +1,6 @@
 
 #pragma once
 
-#ifndef _WIN32
-	#include "BlockID.h"
-#else
-	enum ENUM_ITEM_ID : short;
-#endif
-
 #define MAX_PLAYERS 65535
 
 #include <functional>
@@ -15,7 +9,6 @@
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
-#include "Vector3.h"
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"

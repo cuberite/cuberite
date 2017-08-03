@@ -1,8 +1,6 @@
 
 #include "Globals.h"
 
-#include <cmath>
-
 #include "Path.h"
 #include "../Chunk.h"
 

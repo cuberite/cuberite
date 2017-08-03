@@ -1,7 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include <cmath>
 #include <unordered_map>
 
 #include "Player.h"
@@ -17,7 +16,6 @@
 #include "../Root.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
-#include "../Vector3.h"
 #include "../FastRandom.h"
 #include "../ClientHandle.h"
 
