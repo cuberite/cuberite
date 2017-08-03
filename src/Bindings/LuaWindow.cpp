@@ -227,7 +227,8 @@ void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eC
 		// Plugin can stop a click
 		if (m_OnClicked->Call(this, a_SlotNum, a_ClickAction))
 		{
-			// TODO: They cancelled the click, so we have to re-send the actual slot data.
+			// Tell the client the actual state of the window
+			SendWholeWindow(*a_Player.GetClientHandle());
 			return;
 		}
 	}
