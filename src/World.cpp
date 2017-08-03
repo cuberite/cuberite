@@ -1032,15 +1032,18 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		// Unload every 10 seconds
 		UnloadUnusedChunks();
 
-		if (m_WorldAge - m_LastSave > std::chrono::minutes(5))
+		if (IsSavingEnabled())
 		{
-			// Save every 5 minutes
-			SaveAllChunks();
-		}
-		else if (GetNumUnusedDirtyChunks() > m_UnusedDirtyChunksCap)
-		{
-			// Save if we have too many dirty unused chunks
-			SaveAllChunks();
+			if (m_WorldAge - m_LastSave > std::chrono::minutes(5))
+			{
+				// Save every 5 minutes
+				SaveAllChunks();
+			}
+			else if (GetNumUnusedDirtyChunks() > m_UnusedDirtyChunksCap)
+			{
+				// Save if we have too many dirty unused chunks
+				SaveAllChunks();
+			}
 		}
 	}
 }
