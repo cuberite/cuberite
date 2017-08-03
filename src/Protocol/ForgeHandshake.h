@@ -47,9 +47,6 @@ private:
 	/** Parse the client ModList packet of installed Forge mods and versions. */
 	AStringMap ParseModList(const char * a_Data, size_t a_Size);
 
-	/** Set the Forge handshake to an errored state. */
-	void SetError();
-
 	/** True if the Forge handshake is in an errored state. */
 	bool m_Errored;
 
