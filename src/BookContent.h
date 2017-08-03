@@ -39,6 +39,11 @@ public:
 
 	// tolua_end
 
+	void ClearPages(void)
+	{
+		m_Pages.clear();
+	}
+
 	/** Returns a AStringVector ref to the pages. Used in ManualBindings and for saving the book */
 	const AStringVector & GetPages(void) const { return m_Pages; }
 

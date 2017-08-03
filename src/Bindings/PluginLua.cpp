@@ -595,7 +595,7 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, const cBookContent & a_BookContent, bool a_IsSigned)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITED_BOOK, &a_Player, &a_BookContent, a_IsSigned);
 }
@@ -604,7 +604,7 @@ bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, cBookContent & a_BookCon
 
 
 
-bool cPluginLua::OnPlayerEditingBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+bool cPluginLua::OnPlayerEditingBook(cPlayer & a_Player, const cBookContent & a_BookContent, bool a_IsSigned)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITING_BOOK, &a_Player, &a_BookContent, a_IsSigned);
 }
@@ -1081,7 +1081,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
 		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";
 		case cPluginManager::HOOK_PLAYER_EDITED_BOOK:           return "OnPlayerEditedBook";
-		case cPluginManager::HOOK_PLAYER_EDITING_BOOK:          return "OnPlayerSigningdBook";
+		case cPluginManager::HOOK_PLAYER_EDITING_BOOK:          return "OnPlayerEditingBook";
 		case cPluginManager::HOOK_PLAYER_JOINED:                return "OnPlayerJoined";
 		case cPluginManager::HOOK_PLAYER_LEFT_CLICK:            return "OnPlayerLeftClick";
 		case cPluginManager::HOOK_PLAYER_MOVING:                return "OnPlayerMoving";

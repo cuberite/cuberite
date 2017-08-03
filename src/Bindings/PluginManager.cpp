@@ -885,7 +885,7 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerEditedBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+bool cPluginManager::CallHookPlayerEditedBook(cPlayer & a_Player, const cBookContent & a_BookContent, bool a_IsSigned)
 {
 	FIND_HOOK(HOOK_PLAYER_EDITED_BOOK);
 	VERIFY_HOOK;
@@ -904,7 +904,7 @@ bool cPluginManager::CallHookPlayerEditedBook(cPlayer & a_Player, cBookContent &
 
 
 
-bool cPluginManager::CallHookPlayerEditingBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
+bool cPluginManager::CallHookPlayerEditingBook(cPlayer & a_Player, const cBookContent & a_BookContent, bool a_IsSigned)
 {
 	FIND_HOOK(HOOK_PLAYER_EDITING_BOOK);
 	VERIFY_HOOK;

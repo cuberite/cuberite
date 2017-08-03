@@ -4007,6 +4007,7 @@ static int tolua_cBookContent_SetPages(lua_State * tolua_S)
 	cBookContent * BookContent = nullptr;
 	cLuaState::cStackTablePtr Pages;
 	L.GetStackValues(1, BookContent, Pages);
+	BookContent->ClearPages();
 	Pages->ForEachArrayElement([=](cLuaState & a_LuaState, int a_Index) -> bool
 		{
 			AString Page;
