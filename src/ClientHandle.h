@@ -85,6 +85,8 @@ public:  // tolua_export
 
 	cScoreboard & GetScoreBoard(void) { return m_Scoreboard; }  // tolua_export
 
+	void SetShouldUseGlobalScoreBoard(bool a_ShouldUseGlobal) { m_ShouldUseGlobalScoreboard = a_ShouldUseGlobal; }  // tolua_export
+
 	/** Returns the player's UUID, as used by the protocol, in the short form (no dashes) */
 	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
 
@@ -211,8 +213,8 @@ public:  // tolua_export
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResetTitle                 (void);  // tolua_export
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
-	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, eScoreActions a_Mode) override;
+	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, eObjectiveActions a_Mode) override;
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
 	void SendSetRawSubTitle             (const AString & a_SubTitle);  // tolua_export
 	void SendSetTitle                   (const cCompositeChat & a_Title);  // tolua_export
@@ -494,6 +496,10 @@ private:
 	However, if it only uses m_State for a quick bail out, or it doesn't break if the client disconnects in the middle of it,
 	it may just read m_State without locking m_CSState. */
 	std::atomic<eState> m_State;
+
+	/** If set to false before authenticate(), then sends the personal
+	scoreboard to the client instead of the global scoreboard. */
+	bool m_ShouldUseGlobalScoreboard;
 
 	/** If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded() */
 	bool m_ShouldCheckDownloaded;

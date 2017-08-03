@@ -95,18 +95,7 @@ void cObjective::Reset(void)
 {
 	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
 	{
-		m_Attachee->SendScoreUpdate(m_Name, it->first, 0, 1);
-		/*if (m_World != nullptr)
-		{
-			ASSERT(m_ClientHandle == nullptr);
-			m_World->BroadcastScoreUpdate(m_Name, it->first, 0, 1);
-		}
-		else
-		{
-			ASSERT(m_World == nullptr);
-			m_ClientHandle->SendScoreUpdate(m_Name, it->first, 0, 1);
-			}*/
-		//m_World->BroadcastScoreUpdate(m_Name, it->first, 0, 1);
+		m_Attachee->SendScoreUpdate(m_Name, it->first, 0, eScoreActions::SCORE_REMOVE);
 	}
 
 	m_Scores.clear();
@@ -138,18 +127,7 @@ void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
 {
 	m_Scores[a_Name] = a_Score;
 
-	m_Attachee->SendScoreUpdate(m_Name, a_Name, a_Score, 0);
-	//m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, 0);
-	/*if (m_World != nullptr)
-	{
-		ASSERT(m_ClientHandle == nullptr);
-		m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, 0);
-	}
-	else
-	{
-		ASSERT(m_World == nullptr);
-		m_ClientHandle->SendScoreUpdate(m_Name, a_Name, a_Score, 0);
-		}*/
+	m_Attachee->SendScoreUpdate(m_Name, a_Name, a_Score, eScoreActions::SCORE_CREATE_OR_UPDATE);
 }
 
 
@@ -160,18 +138,7 @@ void cObjective::ResetScore(const AString & a_Name)
 {
 	m_Scores.erase(a_Name);
 
-	m_Attachee->SendScoreUpdate(m_Name, a_Name, 0, 1);
-	//m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, 1);
-	/*if (m_World != nullptr)
-	{
-		ASSERT(m_ClientHandle == nullptr);
-		m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, 1);
-	}
-	else
-	{
-		ASSERT(m_World == nullptr);
-		m_ClientHandle->SendScoreUpdate(m_Name, a_Name, 0, 1);
-		}*/
+	m_Attachee->SendScoreUpdate(m_Name, a_Name, 0, eScoreActions::SCORE_REMOVE);
 }
 
 
@@ -210,18 +177,7 @@ void cObjective::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
 
-	m_Attachee->SendScoreboardObjective(m_Name, m_DisplayName, 2);
-	//m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, 2);
-	/*if (m_World != nullptr)
-	{
-		ASSERT(m_ClientHandle == nullptr);
-		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, 2);
-	}
-	else
-	{
-		ASSERT(m_World == nullptr);
-		m_ClientHandle->SendScoreboardObjective(m_Name, m_DisplayName, 2);
-		}*/
+	m_Attachee->SendScoreboardObjective(m_Name, m_DisplayName, eObjectiveActions::OBJECTIVE_UPDATE_DISPLAY);
 }
 
 
@@ -230,11 +186,11 @@ void cObjective::SetDisplayName(const AString & a_Name)
 
 void cObjective::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, 0);
+	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, eObjectiveActions::OBJECTIVE_CREATE);
 
 	for (cScoreMap::const_iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
 	{
-		a_Client.SendScoreUpdate(m_Name, it->first, it->second, 0);
+		a_Client.SendScoreUpdate(m_Name, it->first, it->second, eScoreActions::SCORE_CREATE_OR_UPDATE);
 	}
 }
 
@@ -339,18 +295,7 @@ cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AStrin
 	if (Status.second)
 	{
 		ASSERT(m_Attachee != nullptr);
-		m_Attachee->SendScoreboardObjective(a_Name, a_DisplayName, 0);
-		//m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, 0);
-		/*if (m_World != nullptr)
-		{
-			ASSERT(m_ClientHandle == nullptr);
-			m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, 0);
-		}
-		else
-		{
-			ASSERT(m_World == nullptr);
-			m_ClientHandle->SendScoreboardObjective(a_Name, a_DisplayName, 0);
-			}*/
+		m_Attachee->SendScoreboardObjective(a_Name, a_DisplayName, eObjectiveActions::OBJECTIVE_CREATE);
 
 		return &Status.first->second;
 	}
@@ -375,17 +320,7 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 		return false;
 	}
 
-	m_Attachee->SendScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
-	/*if (m_World != nullptr)
-	{
-		ASSERT(m_ClientHandle == nullptr);
-		m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
-	}
-	else
-	{
-		ASSERT(m_World == nullptr);
-		m_ClientHandle->SendScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
-		}*/
+	m_Attachee->SendScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), eObjectiveActions::OBJECTIVE_REMOVE);
 
 	for (unsigned int i = 0; i < static_cast<unsigned int>(dsCount); ++i)
 	{
@@ -533,18 +468,6 @@ void cScoreboard::SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot)
 	m_Display[a_Slot] = a_Objective;
 
 	m_Attachee->SendDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
-	//ASSERT(m_World != nullptr);
-	//m_World->BroadcastDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
-	/*if (m_World != nullptr)
-	{
-		ASSERT(m_ClientHandle == nullptr);
-		m_World->BroadcastDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
-	}
-	else
-	{
-		ASSERT(m_World == nullptr);
-		m_ClientHandle->SendDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
-		}*/
 }
 
 
