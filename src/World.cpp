@@ -2700,7 +2700,7 @@ void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 
 
-void cWorld::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, eObjectiveActions a_Mode)
+void cWorld::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, eObjectiveAction a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2718,7 +2718,7 @@ void cWorld::SendScoreboardObjective(const AString & a_Name, const AString & a_D
 
 
 
-void cWorld::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, eScoreActions a_Mode)
+void cWorld::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, eScoreAction a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)

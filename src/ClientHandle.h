@@ -213,8 +213,8 @@ public:  // tolua_export
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResetTitle                 (void);  // tolua_export
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
-	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, eScoreActions a_Mode) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, eObjectiveActions a_Mode) override;
+	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, eScoreAction a_Mode) override;
+	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, eObjectiveAction a_Mode) override;
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
 	void SendSetRawSubTitle             (const AString & a_SubTitle);  // tolua_export
 	void SendSetTitle                   (const cCompositeChat & a_Title);  // tolua_export
