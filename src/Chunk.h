@@ -15,18 +15,10 @@
 
 
 
-namespace Json
-{
-	class Value;
-};
-
-
-
 
 
 class cWorld;
 class cClientHandle;
-class cServer;
 class cPlayer;
 class cChunkMap;
 class cBeaconEntity;
@@ -42,9 +34,6 @@ class cNoteEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
 class cBlockArea;
-class cPawn;
-class cPickup;
-class cChunkDataSerializer;
 class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;

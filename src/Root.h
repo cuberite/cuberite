@@ -14,7 +14,6 @@
 
 
 // fwd:
-class cThread;
 class cMonsterConfig;
 class cBrewingRecipes;
 class cCraftingRecipes;

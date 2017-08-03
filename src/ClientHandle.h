@@ -29,9 +29,7 @@
 
 // fwd:
 class cChunkDataSerializer;
-class cInventory;
 class cMonster;
-class cPawn;
 class cExpOrb;
 class cPainting;
 class cPickup;
@@ -39,8 +37,6 @@ class cPlayer;
 class cProtocol;
 class cWindow;
 class cFallingBlock;
-class cItemHandler;
-class cWorld;
 class cCompositeChat;
 class cStatManager;
 class cClientHandle;
