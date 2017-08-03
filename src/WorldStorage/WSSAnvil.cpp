@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
-#include "FastNBT.h"
 #include "EnchantmentSerializer.h"
 #include "zlib/zlib.h"
 #include "json/json.h"
@@ -34,7 +33,6 @@
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 
-#include "../Mobs/Monster.h"
 #include "../Mobs/IncludeAllMonsters.h"
 
 #include "../Entities/Boat.h"

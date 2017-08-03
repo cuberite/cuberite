@@ -9,7 +9,6 @@
 #include "Entities/Player.h"
 #include "Entities/Minecart.h"
 #include "Inventory.h"
-#include "EffectID.h"
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"

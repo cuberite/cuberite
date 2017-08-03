@@ -118,6 +118,8 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
+	m_IsTeleportIdConfirmed(true),
+	m_OutstandingTeleportId(0),
 	m_ReceivedData(32 KiB),
 	m_IsEncrypted(false)
 {
@@ -1068,7 +1070,10 @@ void cProtocol_1_9_0::SendPlayerMoveLook(void)
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
 	Pkt.WriteBEUInt8(0);
-	Pkt.WriteVarInt32(0);  // Teleport ID - not implemented here
+	Pkt.WriteVarInt32(++m_OutstandingTeleportId);
+
+	// This teleport ID hasn't been confirmed yet
+	m_IsTeleportIdConfirmed = false;
 }
 
 
@@ -2439,7 +2444,12 @@ void cProtocol_1_9_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_9_0::HandleConfirmTeleport(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, TeleportID);
-	// We don't actually validate that this packet is sent or anything yet, but it still needs to be read.
+
+	// Can we stop throwing away incoming player position packets?
+	if (TeleportID == m_OutstandingTeleportId)
+	{
+		m_IsTeleportIdConfirmed = true;
+	}
 }
 
 
@@ -2543,7 +2553,11 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
-	m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+
+	if (m_IsTeleportIdConfirmed)
+	{
+		m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+	}
 }
 
 
@@ -2558,7 +2572,11 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
-	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+
+	if (m_IsTeleportIdConfirmed)
+	{
+		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+	}
 }
 
 
