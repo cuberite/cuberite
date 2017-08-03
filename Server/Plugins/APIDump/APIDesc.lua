@@ -6938,7 +6938,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			{
 				m_BookContent =
 				{
-					Type = "{{cBookContent}}",
+					Type = "cBookContent",
 					Notes = "If it's a written or a writeable book, it contains the information of the book: Author, title and pages",
 				},
 				m_CustomName =

@@ -595,7 +595,7 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, const cBookContent & a_BookContent, bool a_IsSigned)
+bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITED_BOOK, &a_Player, &a_BookContent, a_IsSigned);
 }
@@ -604,7 +604,7 @@ bool cPluginLua::OnPlayerEditedBook(cPlayer & a_Player, const cBookContent & a_B
 
 
 
-bool cPluginLua::OnPlayerEditingBook(cPlayer & a_Player, const cBookContent & a_BookContent, bool a_IsSigned)
+bool cPluginLua::OnPlayerEditingBook(cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_EDITING_BOOK, &a_Player, &a_BookContent, a_IsSigned);
 }
