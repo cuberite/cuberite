@@ -86,6 +86,19 @@ cLuaWindow::~cLuaWindow()
 
 
 
+void cLuaWindow::SetOnClicked(cLuaState::cCallbackPtr && a_OnClicked)
+{
+	// Only one Lua state can be a cLuaWindow object callback:
+	ASSERT(a_OnClicked->IsSameLuaState(*m_LuaState));
+
+	// Store the new reference, releasing the old one if appropriate:
+	m_OnClicked = std::move(a_OnClicked);
+}
+
+
+
+
+
 void cLuaWindow::SetOnClosing(cLuaState::cCallbackPtr && a_OnClosing)
 {
 	// Only one Lua state can be a cLuaWindow object callback:
@@ -201,6 +214,25 @@ void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	{
 		m_OnSlotChanged->Call(this, a_SlotNum);
 	}
+}
+
+
+
+
+
+void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	if (m_OnClicked != nullptr)
+	{
+		// Plugin can stop a click
+		if (m_OnClicked->Call(this, a_SlotNum, a_ClickAction))
+		{
+			// TODO: They cancelled the click, so we have to re-send the actual slot data.
+			return;
+		}
+	}
+
+	cWindow::Clicked(a_Player, a_WindowID, a_SlotNum, a_ClickAction, a_ClickedItem);
 }
 
 

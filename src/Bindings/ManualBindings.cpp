@@ -3817,6 +3817,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "new",              tolua_cLuaWindow_new);
 			tolua_function(tolua_S, "new_local",        tolua_cLuaWindow_new_local);
 			tolua_function(tolua_S, ".call",            tolua_cLuaWindow_new_local);
+			tolua_function(tolua_S, "SetOnClicked",     tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnClicked>);
 			tolua_function(tolua_S, "SetOnClosing",     tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnClosing>);
 			tolua_function(tolua_S, "SetOnSlotChanged", tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnSlotChanged>);
 		tolua_endmodule(tolua_S);
