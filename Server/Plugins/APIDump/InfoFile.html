@@ -34,7 +34,10 @@
 
 			<p>Last, but not least, we want to make a plugin repository on the web in the future, a repository that would store plugins, their descriptions, comments. It makes sense that the centralized information can be parsed by the repository automatically, so that advanced things, such as searching for a plugin based on a command, or determining whether two plugins collide command-wise, are possible.</p>
 
-			<p>After this file format has been devised, a tool has been written that allows for an easy generation of the documentation for the plugin in various formats. It outputs the documentation in a format that is perfect for pasting into the forum. It generates documentation in a Markup format to use in README.md on GitHub and similar sites. The clever thing is that you don't need to keep all those formats in sync manually - you edit the Info.lua file and this tool will re-generate the documentation for you.</p>
+			<p>A tool has been written that allows for an easy generation of the documentation for the plugin in various formats. It outputs the documentation in a format that is perfect for pasting into the forum. It generates documentation in a Markup format to use in README.md on GitHub and similar sites. The clever thing is that you don't need to keep all those formats in sync manually - you edit the Info.lua file and this tool will re-generate the documentation for you.
+			<br>
+			To generate documentation for the plugin, activate the InfoDump plugin on a cuberite server with your plugin installed, and use the webadmin interface to "Dump" the plugin information. This will create a README.md suitable for uploading to your git repo, and a forum_info.txt, which can be copy-pasted into a forum post. (<strong>Caution</strong>: either the InfoDump plugin or cuberite's forums are broken: pasting the contents of forum_info.txt may not be properly formated!)
+			</p>
 
 			<p>So to sum up, the Info.lua file contains the plugins' commands, console commands, their permissions and possibly the overall plugin documentation, in a structured manner that can be parsed by a program, yet is human readable and editable.</p>
 
