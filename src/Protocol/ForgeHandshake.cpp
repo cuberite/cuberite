@@ -53,10 +53,11 @@ cForgeHandshake::cForgeHandshake(cClientHandle *a_Client) :
 
 
 
-#define SET_HANDSHAKE_ERROR(...) { \
-	LOGD("Forge handshake error:"); \
-	LOGD(__VA_ARGS__); \
-	m_Errored = true; \
+
+void cForgeHandshake::SetError(const AString & message)
+{
+	LOGD("Forge handshake error: %s", message.c_str());
+	m_Errored = true;
 }
 
 
@@ -145,7 +146,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	if (a_Size < 4)
 	{
-		SET_HANDSHAKE_ERROR("ParseModList invalid packet, missing length (size=" SIZE_T_FMT ")", a_Size);
+		SetError(Printf("ParseModList invalid packet, missing length (size=" SIZE_T_FMT ")", a_Size));
 		return Mods;
 	}
 
@@ -154,7 +155,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 	UInt32 NumMods;
 	if (!Buf.ReadVarInt32(NumMods))
 	{
-		SET_HANDSHAKE_ERROR("ParseModList failed to read mod count");
+		SetError("ParseModList failed to read mod count");
 		return Mods;
 	}
 
@@ -163,12 +164,12 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 		AString Name, Version;
 		if (!Buf.ReadVarUTF8String(Name))
 		{
-			SET_HANDSHAKE_ERROR("ParseModList failed to read mod name at i = " SIZE_T_FMT, i);
+			SetError(Printf("ParseModList failed to read mod name at i = " SIZE_T_FMT, i));
 			break;
 		}
 		if (!Buf.ReadVarUTF8String(Version))
 		{
-			SET_HANDSHAKE_ERROR("ParseModList failed to read mod version at i = " SIZE_T_FMT, i);
+			SetError(Printf("ParseModList failed to read mod version at i = " SIZE_T_FMT, i));
 			break;
 		}
 		Mods.insert({Name, Version});
@@ -188,12 +189,12 @@ void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const char * a
 		LOGD("Received ClientHello with FML protocol version %d", FmlProtocolVersion);
 		if (FmlProtocolVersion != 2)
 		{
-			SET_HANDSHAKE_ERROR("Unsupported FML client protocol version received in ClientHello: %d", FmlProtocolVersion);
+			SetError(Printf("Unsupported FML client protocol version received in ClientHello: %d", FmlProtocolVersion));
 		}
 	}
 	else
 	{
-		SET_HANDSHAKE_ERROR("Received unexpected length of ClientHello: " SIZE_T_FMT, a_Size);
+		SetError(Printf("Received unexpected length of ClientHello: " SIZE_T_FMT, a_Size));
 	}
 }
 
@@ -221,7 +222,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	// Let the plugins know about this event, they may refuse the player:
 	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client, ClientMods))
 	{
-		SET_HANDSHAKE_ERROR("Modded client refused by plugin");
+		SetError("Modded client refused by plugin");
 		return;
 	}
 
@@ -257,7 +258,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 {
 	if (a_Size != 2)
 	{
-		SET_HANDSHAKE_ERROR("Unexpected HandshakeAck packet length: " SIZE_T_FMT "", a_Size);
+		SetError(Printf("Unexpected HandshakeAck packet length: " SIZE_T_FMT "", a_Size));
 		return;
 	}
 
@@ -322,7 +323,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 
 		default:
 		{
-			SET_HANDSHAKE_ERROR("Received unknown phase in Forge handshake acknowledgement: %d", Phase);
+			SetError(Printf("Received unknown phase in Forge handshake acknowledgement: %d", Phase));
 			break;
 		}
 	}
@@ -336,14 +337,14 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 {
 	if (!m_IsForgeClient)
 	{
-		SET_HANDSHAKE_ERROR("Received unexpected Forge data from non-Forge client (" SIZE_T_FMT " bytes)", a_Size);
+		SetError(Printf("Received unexpected Forge data from non-Forge client (" SIZE_T_FMT " bytes)", a_Size));
 		return;
 	}
 	LOGD("Received Forge data: " SIZE_T_FMT " bytes: %s", a_Size, a_Data);
 
 	if (a_Size <= 1)
 	{
-		SET_HANDSHAKE_ERROR("Received unexpectedly short Forge data (" SIZE_T_FMT " bytes)", a_Size);
+		SetError(Printf("Received unexpectedly short Forge data (" SIZE_T_FMT " bytes)", a_Size));
 		return;
 	}
 
@@ -357,7 +358,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 		default:
 		{
-			SET_HANDSHAKE_ERROR("Unexpected Forge packet %d received", Discriminator);
+			SetError(Printf("Unexpected Forge packet %d received", Discriminator));
 			return;
 		}
 	}
