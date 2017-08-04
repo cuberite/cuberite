@@ -2967,7 +2967,8 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 			cBookContent::ParseFromNBT(0, BookItem.m_BookContent, NBT);
 		}
 
-		if (cRoot::Get()->GetPluginManager()->CallHookPlayerEditingBook(Player, BookItem.m_BookContent, IsSigned))
+		// The equipped item contains the old book content
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerEditingBook(Player, Player.GetEquippedItem().m_BookContent, BookItem.m_BookContent, IsSigned))
 		{
 			// Plugin denied the editing of the book
 			return;

@@ -95,8 +95,8 @@ public:
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerDestroyed          (cPlayer & a_Player) override;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) override;
-	virtual bool OnPlayerEditedBook         (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned) override;
-	virtual bool OnPlayerEditingBook        (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned) override;
+	virtual bool OnPlayerEditedBook         (cPlayer & a_Player, const cBookContent & a_NewContent, bool a_IsSigned) override;
+	virtual bool OnPlayerEditingBook        (cPlayer & a_Player, const cBookContent & a_OriginalContent, cBookContent & a_NewContent, bool a_IsSigned) override;
 	virtual bool OnPlayerFished             (cPlayer & a_Player, const cItems & a_Reward) override;
 	virtual bool OnPlayerFishing            (cPlayer & a_Player, cItems & a_Reward) override;
 	virtual bool OnPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel) override;

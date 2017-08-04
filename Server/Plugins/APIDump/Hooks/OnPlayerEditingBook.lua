@@ -12,7 +12,8 @@ return
 		Params =
 		{
 			{ Name = "Player", Type = "cPlayer", Notes = "The player that is editing the book" },
-			{ Name = "BookContent", Type = "cBookContent", Notes = "The class that contains the current info of the book" },
+			{ Name = "OriginalContent", Type = "cBookContent", Notes = "Contains the original content of the book" },
+			{ Name = "NewContent", Type = "cBookContent", Notes = "Contains the new content of the book" },
 			{ Name = "IsSigned", Type = "boolean", Notes = "Player is signing the book" },
 		},
 		Returns = [[

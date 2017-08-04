@@ -74,8 +74,8 @@ public:
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerDestroyed          (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) = 0;
-	virtual bool OnPlayerEditedBook         (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned) = 0;
-	virtual bool OnPlayerEditingBook        (cPlayer & a_Player, cBookContent & a_BookContent, bool a_IsSigned) = 0;
+	virtual bool OnPlayerEditedBook         (cPlayer & a_Player, const cBookContent & a_NewContent, bool a_IsSigned) = 0;
+	virtual bool OnPlayerEditingBook        (cPlayer & a_Player, const cBookContent & a_OriginalContent, cBookContent & a_NewContent, bool a_IsSigned) = 0;
 	virtual bool OnPlayerFished             (cPlayer & a_Player, const cItems & a_Reward) = 0;
 	virtual bool OnPlayerFishing            (cPlayer & a_Player, cItems & a_Reward) = 0;
 	virtual bool OnPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel) = 0;
