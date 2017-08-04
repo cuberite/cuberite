@@ -6948,7 +6948,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				},
 				m_Enchantments =
 				{
-					Type = "{{cEnchantments|cEnchantments}}",
+					Type = "cEnchantments",
 					Notes = "The enchantments of the item.",
 				},
 				m_ItemCount =

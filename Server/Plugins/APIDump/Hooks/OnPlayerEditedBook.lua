@@ -11,8 +11,8 @@ return
 		]],
 		Params =
 		{
-			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player that edited the book" },
-			{ Name = "BookContent", Type = "{{cBookContent}}", Notes = "The class that contains the current info of the book" },
+			{ Name = "Player", Type = "cPlayer", Notes = "The player that edited the book" },
+			{ Name = "BookContent", Type = "cBookContent", Notes = "The class that contains the current info of the book" },
 			{ Name = "IsSigned", Type = "boolean", Notes = "Player has signed the book" },
 		},
 		Returns = [[
