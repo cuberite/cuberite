@@ -52,7 +52,7 @@ public:
 			DoIntervalsIntersect(p1.x, p2.x, a_Other.p1.x, a_Other.p2.x) &&
 			DoIntervalsIntersect(p1.y, p2.y, a_Other.p1.y, a_Other.p2.y) &&
 			DoIntervalsIntersect(p1.z, p2.z, a_Other.p1.z, a_Other.p2.z)
-			);
+		);
 	}
 
 	bool IsInside(const Vector3i & v) const
