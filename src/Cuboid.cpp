@@ -81,23 +81,6 @@ int cCuboid::GetVolume(void) const
 
 
 
-bool cCuboid::DoesIntersect(const cCuboid & a_Other) const
-{
-	ASSERT(IsSorted());
-	ASSERT(a_Other.IsSorted());
-
-	// In order for cuboids to intersect, each of their coord intervals need to intersect
-	return (
-		DoIntervalsIntersect(p1.x, p2.x, a_Other.p1.x, a_Other.p2.x) &&
-		DoIntervalsIntersect(p1.y, p2.y, a_Other.p1.y, a_Other.p2.y) &&
-		DoIntervalsIntersect(p1.z, p2.z, a_Other.p1.z, a_Other.p2.z)
-	);
-}
-
-
-
-
-
 bool cCuboid::IsCompletelyInside(const cCuboid & a_Outer) const
 {
 	ASSERT(IsSorted());
