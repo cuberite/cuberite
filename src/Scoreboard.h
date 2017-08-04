@@ -115,8 +115,6 @@ private:
 	eType m_Type;
 
 	// We're either attached to the world or to a specific client handle
-	/*cWorld * m_World;
-	  cClientHandle * m_ClientHandle;*/
 	cScoreboardAttachee * m_Attachee;
 
 	friend class cScoreboardSerializer;
@@ -282,8 +280,6 @@ public:
 
 	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
 
-	//void SetClientHandle(cClientHandle * a_ClientHandle) { m_ClientHandle = a_ClientHandle; }
-
 
 private:
 
@@ -301,8 +297,6 @@ private:
 	cTeamMap m_Teams;
 
 	// We're either attached to the world or to a specific client handle
-	/*cWorld * m_World;
-	  cClientHandle * m_ClientHandle;*/
 	cScoreboardAttachee * m_Attachee;
 
 	cObjective * m_Display[dsCount];

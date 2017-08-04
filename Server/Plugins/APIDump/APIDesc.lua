@@ -1714,7 +1714,7 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "This should be in a HOOK_LOGIN call. If true (default), then when the player joins they will be sent the world scoreboard. If false, then the player will be initialized with the personal scoreboard.",
+					Notes = "This should be called in a HOOK_LOGIN call. If true (default), then when the player joins they will be initialized with their world's scoreboard. If false, then the player will be initialized with their personal scoreboard.",
 				},
 				SetUsername =
 				{
