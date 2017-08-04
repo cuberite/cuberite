@@ -156,7 +156,7 @@ Commands =
 
 		<p>The permission element specifies that the command is only available with the specified permission. Note that the permission for subcommand's parent isn't checked when the subcommand is called. This means that specifying the permission for a command that has subcommands has no effect whatsoever, but is discouraged because we may add processing for that in the future.</p>
 
-		<p>The Category string is only used for generating the documentation. Specifying different categories will result in commands grouped together, not specifying a category will place that command in the "General" category. Categories are optional.</p>
+		<p>The optional Categories table provides descriptions for command categories in the generated documentation. The documentation generator will group the commands by their specified Category ("General" by default) and each category will have the specified description written to it.</p>
 
 		<p>The ParameterCombinations table is used only for generating the documentation, it lists the various combinations of parameters that the command supports. It's worth specifying even if the command supports only one combination, because that combination will get documented this way.</p>
 
