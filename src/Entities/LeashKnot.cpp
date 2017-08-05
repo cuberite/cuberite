@@ -156,7 +156,7 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-cLeashKnot * cLeashKnot::FindKnotAtPos(cWorld & a_World, Vector3i a_BlockPos)
+cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
 {
 	cLeashKnot * LeashKnot = nullptr;
 
@@ -181,7 +181,7 @@ cLeashKnot * cLeashKnot::FindKnotAtPos(cWorld & a_World, Vector3i a_BlockPos)
 		}
 	} CallbackFindKnot(&LeashKnot);
 
-	a_World.ForEachEntityInBox(cBoundingBox(a_BlockPos, 0.5, 1), CallbackFindKnot);
+	a_WorldInterface.ForEachEntityInBox(cBoundingBox(a_BlockPos, 0.5, 1), CallbackFindKnot);
 
 	return LeashKnot;
 }

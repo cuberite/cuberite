@@ -19,12 +19,6 @@
 
 
 
-// fwd: "UI/Window.h"
-class cWindow;
-
-
-
-
 
 // tolua_begin
 class cPluginLua :

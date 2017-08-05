@@ -36,16 +36,6 @@ Declares the 1.8 protocol classes:
 
 
 
-// fwd:
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 class cProtocol_1_8_0 :
 	public cProtocol
 {

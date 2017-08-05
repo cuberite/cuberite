@@ -59,7 +59,7 @@ protected:
 	rsa_context * GetInternal(void) { return &m_Rsa; }
 } ;
 
-typedef SharedPtr<cRsaPrivateKey> cRsaPrivateKeyPtr;
+typedef std::shared_ptr<cRsaPrivateKey> cRsaPrivateKeyPtr;
 
 
 

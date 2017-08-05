@@ -3,7 +3,6 @@
 
 #include "../Entities/Pawn.h"
 #include "../Defines.h"
-#include "../BlockID.h"
 #include "../Item.h"
 #include "../Enchantments.h"
 #include "MonsterTypes.h"
@@ -11,7 +10,7 @@
 
 
 class cClientHandle;
-class cWorld;
+
 
 
 // tolua_begin
@@ -77,6 +76,7 @@ public:
 	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk);
 
 	// tolua_begin
+
 	/** Returns whether the mob can be leashed. */
 	bool CanBeLeashed() const { return m_CanBeLeashed; }
 
@@ -89,12 +89,17 @@ public:
 	/** Leash the monster to an entity. */
 	void LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast = true);
 
-	/** Unleash the monster. */
-	void Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast = true, bool a_ShouldRemoveFromEntity = true);
+	/** Unleash the monster. Overload for the Unleash(bool, bool, bool) function for plugins */
+	void Unleash(bool a_ShouldDropLeashPickup);
 
 	/** Returns the entity to where this mob is leashed, returns nullptr if it's not leashed */
 	cEntity * GetLeashedTo() const { return m_LeashedTo; }
+
 	// tolua_end
+
+	/** Unleash the monster. The a_ShouldRemoveFromEntity parameter should always be true in order to remove the mob from the entity
+	to where it was leashed, except when it's called from the cEntity:Destroy, where it is already removed and therefore should always be false.*/
+	void Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast, bool a_ShouldRemoveFromEntity = true);
 
 	/** Sets entity position to where is leashed this mob */
 	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = std::unique_ptr<Vector3d>(pos); }
@@ -287,6 +292,18 @@ protected:
 
 	bool m_WasLastTargetAPlayer;
 
+	/** Entity leashed to */
+	cEntity * m_LeashedTo;
+
+	/** Entity pos where this mob was leashed to. Used when deserializing the chunk in order to make the mob find the leash knot. */
+	std::unique_ptr<Vector3d> m_LeashToPos;
+
+	/** Mob has ben leashed or unleashed in current player action. Avoids double actions on horses. */
+	bool m_IsLeashActionJustDone;
+
+	/** Determines whether a monster can be leashed */
+	bool m_CanBeLeashed;
+
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
 
@@ -301,18 +318,6 @@ protected:
 
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
-
-	/** Entity leashed to */
-	cEntity * m_LeashedTo;
-
-	/** Entity pos where this mob was leashed to. Used when deserializing the chunk in order to make the mob find the leash knot. */
-	std::unique_ptr<Vector3d> m_LeashToPos;
-
-	/** Mob has ben leashed or unleashed in current player action. Avoids double actions on horses. */
-	bool m_IsLeashActionJustDone;
-
-	/** Determines whether a monster can be leashed */
-	bool m_CanBeLeashed;
 
 private:
 	/** A pointer to the entity this mobile is aiming to reach */

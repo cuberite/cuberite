@@ -1,15 +1,11 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "BlockID.h"
 #include "World.h"
-#include "ChunkDef.h"
 #include "ClientHandle.h"
 #include "Server.h"
-#include "Item.h"
 #include "Root.h"
 #include "IniFile.h"
-#include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
@@ -19,7 +15,6 @@
 #include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
-#include "Entities/Boat.h"
 #include "Entities/ExpOrb.h"
 #include "Entities/FallingBlock.h"
 #include "Entities/Minecart.h"
@@ -31,7 +26,6 @@
 #include "BlockEntities/BeaconEntity.h"
 
 // Simulators:
-#include "Simulator/SimulatorManager.h"
 #include "Simulator/FloodyFluidSimulator.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
@@ -1305,7 +1299,7 @@ void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
 {
-	return m_ChunkMap->WakeUpSimulatorsInArea(a_MinBlockX, a_MaxBlockX, a_MinBlockY, a_MaxBlockY, a_MinBlockZ, a_MaxBlockZ);
+	m_SimulatorManager->WakeUpArea(cCuboid(a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ));
 }
 
 
@@ -2385,7 +2379,7 @@ bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
 
 
 
-void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
+void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 {
 	m_ChunkMap->SendBlockTo(a_X, a_Y, a_Z, a_Player);
 }
@@ -2907,7 +2901,7 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
+void cWorld::QueueSetChunkData(cSetChunkDataPtr a_SetChunkData)
 {
 	// Validate biomes, if needed:
 	if (!a_SetChunkData->AreBiomesValid())
@@ -2926,7 +2920,7 @@ void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
 	// Store a copy of the data in the queue:
 	// TODO: If the queue is too large, wait for it to get processed. Not likely, though.
 	cCSLock Lock(m_CSSetChunkDataQueue);
-	m_SetChunkDataQueue.push_back(a_SetChunkData);
+	m_SetChunkDataQueue.push_back(std::move(a_SetChunkData));
 }
 
 
@@ -4110,7 +4104,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 		true
 	));
 	SetChunkData->RemoveInvalidBlockEntities();
-	m_World->QueueSetChunkData(SetChunkData);
+	m_World->QueueSetChunkData(std::move(SetChunkData));
 }
 
 

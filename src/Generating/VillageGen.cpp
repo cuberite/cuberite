@@ -381,7 +381,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	{
 		auto biome = Biomes[i];
 		availablePools.erase(std::remove_if(availablePools.begin(), availablePools.end(),
-			[biome](SharedPtr<cPrefabPiecePool> a_Pool)
+			[biome](std::shared_ptr<cVillagePiecePool> & a_Pool)
 			{
 				return !a_Pool->IsBiomeAllowed(biome);
 			}),

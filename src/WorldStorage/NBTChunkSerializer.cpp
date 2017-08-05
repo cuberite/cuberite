@@ -5,7 +5,6 @@
 #include "Globals.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
-#include "../BlockID.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
 #include "FastNBT.h"

@@ -4,6 +4,8 @@
 #include "HangingEntity.h"
 
 
+class cWorldInterface;
+
 
 
 
@@ -27,7 +29,7 @@ public:
 	void SetShouldSelfDestroy() { m_ShouldSelfDestroy = true; }
 
 	/** Returns the leash knot entity representing the knot at the specified position. Returns nullptr if there's no knot. */
-	static cLeashKnot * FindKnotAtPos(cWorld & a_World, Vector3i a_BlockPos);
+	static cLeashKnot * FindKnotAtPos(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos);
 
 private:
 

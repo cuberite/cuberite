@@ -39,7 +39,7 @@ protected:
 	/** Callback that is called by LibEvent when there's an event for the request. */
 	void Callback(int a_Result, const char * a_Address);
 };
-typedef SharedPtr<cIPLookup> cIPLookupPtr;
+typedef std::shared_ptr<cIPLookup> cIPLookupPtr;
 typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
 
 

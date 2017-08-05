@@ -145,8 +145,6 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
-	void SendPingStatusResponse(void);
-
 protected:
 	/** The recognized protocol */
 	cProtocol * m_Protocol;
@@ -157,6 +155,9 @@ protected:
 	/** Is a server list ping for an unrecognized version currently occuring? */
 	bool m_InPingForUnrecognizedVersion;
 
+	// Packet handlers while in status state (m_InPingForUnrecognizedVersion == true)
+	void HandlePacketStatusRequest();
+	void HandlePacketStatusPing();
 
 	/** Tries to recognize protocol based on m_Buffer contents; returns true if recognized */
 	bool TryRecognizeProtocol(void);

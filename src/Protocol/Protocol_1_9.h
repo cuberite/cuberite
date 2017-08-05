@@ -42,16 +42,6 @@ Declares the 1.9 protocol classes:
 
 
 
-// fwd:
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 class cProtocol_1_9_0 :
 	public cProtocol
 {
@@ -174,6 +164,10 @@ protected:
 
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
+
+	/** The current teleport ID, and whether it has been confirmed by the client */
+	bool m_IsTeleportIdConfirmed;
+	UInt32 m_OutstandingTeleportId;
 
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;

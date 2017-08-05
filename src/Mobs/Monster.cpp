@@ -1449,3 +1449,12 @@ void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast, boo
 
 	m_IsLeashActionJustDone = true;
 }
+
+
+
+
+
+void cMonster::Unleash(bool a_ShouldDropLeashPickup)
+{
+	Unleash(a_ShouldDropLeashPickup, true, true);
+}

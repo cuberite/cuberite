@@ -6,7 +6,6 @@
 #include "Root.h"
 #include "Entities/Player.h"
 #include "Item.h"
-#include "Entities/Pickup.h"
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
@@ -786,48 +785,6 @@ void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
-{
-	// Limit the Y coords:
-	a_MinBlockY = std::max(a_MinBlockY, 0);
-	a_MaxBlockY = std::min(a_MaxBlockY, cChunkDef::Height - 1);
-
-	cSimulatorManager * SimMgr = m_World->GetSimulatorManager();
-	int MinChunkX, MinChunkZ, MaxChunkX, MaxChunkZ;
-	cChunkDef::BlockToChunk(a_MinBlockX, a_MinBlockZ, MinChunkX, MinChunkZ);
-	cChunkDef::BlockToChunk(a_MaxBlockX, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
-	cCSLock Lock(m_CSChunks);
-	for (int z = MinChunkZ; z <= MaxChunkZ; z++)
-	{
-		int MinZ = std::max(a_MinBlockZ, z * cChunkDef::Width);
-		int MaxZ = std::min(a_MaxBlockZ, z * cChunkDef::Width + cChunkDef::Width - 1);
-		for (int x = MinChunkX; x <= MaxChunkX; x++)
-		{
-			cChunkPtr Chunk = GetChunkNoGen(x, z);
-			if ((Chunk == nullptr) || !Chunk->IsValid())
-			{
-				continue;
-			}
-			int MinX = std::max(a_MinBlockX, x * cChunkDef::Width);
-			int MaxX = std::min(a_MaxBlockX, x * cChunkDef::Width + cChunkDef::Width - 1);
-			for (int BlockY = a_MinBlockY; BlockY <= a_MaxBlockY; BlockY++)
-			{
-				for (int BlockZ = MinZ; BlockZ <= MaxZ; BlockZ++)
-				{
-					for (int BlockX = MinX; BlockX <= MaxX; BlockX++)
-					{
-						SimMgr->WakeUp(BlockX, BlockY, BlockZ, Chunk);
-					}  // for BlockX
-				}  // for BlockZ
-			}  // for BlockY
-		}  // for x - chunks
-	}  // for z = chunks
-}
-
-
-
-
-
 void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSChunks);
@@ -1442,7 +1399,7 @@ bool cChunkMap::DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
+void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);
@@ -1451,7 +1408,7 @@ void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
 	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
 	if ((Chunk != nullptr) && (Chunk->IsValid()))
 	{
-		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player->GetClientHandle());
+		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player.GetClientHandle());
 	}
 }
 
@@ -1892,11 +1849,10 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	ForEachEntity(TNTDamageCallback);
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
-	WakeUpSimulatorsInArea(
-		bx - ExplosionSizeInt - 1, bx + ExplosionSizeInt + 1,
-		MinY, MaxY,
-		bz - ExplosionSizeInt - 1, bz + ExplosionSizeInt + 1
-	);
+	m_World->GetSimulatorManager()->WakeUpArea(cCuboid(
+		bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1,
+		bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1
+	));
 }
 
 

@@ -15,9 +15,6 @@ prefer calls to GetRandomProvider over creating new instances.
 
 
 #pragma once
-#include <random>
-#include <type_traits>
-#include <limits>
 
 
 
@@ -77,8 +74,8 @@ public:
 
 
 	/** Return a random IntType in the range [a_Min, a_Max]. */
-	template <class IntType = int, class ArgType>
-	IntType RandInt(ArgType a_Min, ArgType a_Max)
+	template <class IntType = int>
+	IntType RandInt(IntType a_Min, IntType a_Max)
 	{
 		ASSERT(
 			(a_Max >= a_Min) &&
@@ -97,8 +94,8 @@ public:
 
 
 	/** Return a random IntType in the range [0, a_Max]. */
-	template <class IntType = int, class ArgType>
-	IntType RandInt(ArgType a_Max)
+	template <class IntType = int>
+	IntType RandInt(IntType a_Max)
 	{
 		ASSERT((a_Max >= 0) && (a_Max <= std::numeric_limits<IntType>::max()));
 		Detail::cUniform<IntType> dist(IntType(0), static_cast<IntType>(a_Max));
@@ -122,8 +119,8 @@ public:
 
 
 	/** Return a random RealType in the range [a_Min, a_Max). */
-	template <class RealType = float, class ArgType>
-	RealType RandReal(ArgType a_Min, ArgType a_Max)
+	template <class RealType = float>
+	RealType RandReal(RealType a_Min, RealType a_Max)
 	{
 		std::uniform_real_distribution<RealType> dist(a_Min, a_Max);
 		return dist(m_Engine);
@@ -134,8 +131,8 @@ public:
 
 
 	/** Return a random RealType in the range [0, a_Max). */
-	template <class RealType = float, class ArgType>
-	RealType RandReal(ArgType a_Max)
+	template <class RealType = float>
+	RealType RandReal(RealType a_Max)
 	{
 		std::uniform_real_distribution<RealType> dist(RealType(0), a_Max);
 		return dist(m_Engine);

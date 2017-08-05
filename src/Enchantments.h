@@ -45,6 +45,7 @@ public:
 
 	enum eEnchantment
 	{
+		// Currently missing: Frost walker, curse of binding, sweeping edge, mending, and curse of vanishing.
 		enchProtection           = 0,
 		enchFireProtection       = 1,
 		enchFeatherFalling       = 2,
@@ -103,6 +104,9 @@ public:
 	/** Returns true if there are no enchantments */
 	bool IsEmpty(void) const;
 
+	/** Returns true if the given enchantment could be legally added to this object. Note that adding the enchantment may not actually increase the level. */
+	bool CanAddEnchantment(int a_EnchantmentID) const;
+
 	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name not found; case insensitive */
 	static int StringToEnchantmentID(const AString & a_EnchantmentName);
 
@@ -110,6 +114,15 @@ public:
 	bool operator ==(const cEnchantments & a_Other) const;
 
 	// tolua_end
+
+	/** Get the XP cost multiplier for the enchantment (for anvils).
+	If FromBook is true, then this function returns the XP multiplier if
+	the enchantment is coming from a book, otherwise it returns the normal
+	item multiplier. */
+	static int GetXPCostMultiplier(int a_EnchantmentID, bool FromBook);
+
+	/** Get the maximum level the enchantment can have */
+	static unsigned int GetLevelCap(int a_EnchantmentID);
 
 	/** Add enchantment weights from item to the vector */
 	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel);
@@ -149,7 +162,12 @@ protected:
 
 	/** Currently stored enchantments */
 	cMap m_Enchantments;
-} ;  // tolua_export
+
+public:
+	/** Make this class iterable */
+	cMap::const_iterator begin() const { return m_Enchantments.begin(); }
+	cMap::const_iterator end()   const { return m_Enchantments.end(); }
+};  // tolua_export
 
 
 

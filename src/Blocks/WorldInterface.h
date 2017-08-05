@@ -9,7 +9,6 @@ class cItems;
 typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
 
 
-class cMonster;
 class cPlayer;
 
 
@@ -47,10 +46,15 @@ public:
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) = 0;
 
 	/** Sends the block on those coords to the player */
-	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer * a_Player) = 0;
+	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;
+
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true.
+	If any chunk in the box is missing, ignores the entities in that chunk silently. */
+	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback) = 0;
 
 	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
 

@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <atomic>
 #include "OSSupport/Network.h"
 #include "CallbackSslContext.h"
 

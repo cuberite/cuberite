@@ -12,11 +12,6 @@ class cRedstoneWireHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	cRedstoneWireHandler(cWorld & a_World) :
-		super(a_World)
-	{
-	}
-
 	inline static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block)
 	{
 		switch (a_Block)
@@ -32,26 +27,26 @@ public:
 		}
 	}
 
-	const cVector3iArray GetTerracingConnectionOffsets(const Vector3i & a_Position)
+	cVector3iArray GetTerracingConnectionOffsets(cWorld & a_World, const Vector3i & a_Position) const
 	{
 		cVector3iArray RelativePositions;
-		auto YPTerraceBlock = m_World.GetBlock(a_Position + OffsetYP());
+		auto YPTerraceBlock = a_World.GetBlock(a_Position + OffsetYP());
 		bool IsYPTerracingBlocked = cBlockInfo::IsSolid(YPTerraceBlock) && !cBlockInfo::IsTransparent(YPTerraceBlock);
 
 		for (const auto & Adjacent : GetRelativeLaterals())
 		{
 			if (
 				!IsYPTerracingBlocked &&
-				(m_World.GetBlock(a_Position + Adjacent + OffsetYP()) == E_BLOCK_REDSTONE_WIRE)
+				(a_World.GetBlock(a_Position + Adjacent + OffsetYP()) == E_BLOCK_REDSTONE_WIRE)
 				)
 			{
 				RelativePositions.emplace_back(Adjacent + OffsetYP());
 			}
-			auto YMTerraceBlock = m_World.GetBlock(a_Position + Adjacent);
+			auto YMTerraceBlock = a_World.GetBlock(a_Position + Adjacent);
 			if (
 				// IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
 				(!cBlockInfo::IsSolid(YMTerraceBlock) || cBlockInfo::IsTransparent(YMTerraceBlock)) &&
-				(m_World.GetBlock(a_Position + Adjacent + OffsetYM()) == E_BLOCK_REDSTONE_WIRE)
+				(a_World.GetBlock(a_Position + Adjacent + OffsetYM()) == E_BLOCK_REDSTONE_WIRE)
 			)
 			{
 				RelativePositions.emplace_back(Adjacent + OffsetYM());
@@ -61,7 +56,7 @@ public:
 		return RelativePositions;
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		if (a_QueryPosition == (a_Position + OffsetYP()))
 		{
@@ -80,9 +75,9 @@ public:
 			Vector3i PotentialOffset;
 			bool FoundOneBorderingMechanism = false;
 
-			for (const auto & Offset : StaticAppend(GetRelativeLaterals(), GetTerracingConnectionOffsets(a_Position)))
+			for (const auto & Offset : StaticAppend(GetRelativeLaterals(), GetTerracingConnectionOffsets(a_World, a_Position)))
 			{
-				if (IsDirectlyConnectingMechanism(m_World.GetBlock(Offset + a_Position)))
+				if (IsDirectlyConnectingMechanism(a_World.GetBlock(Offset + a_Position)))
 				{
 					if (FoundOneBorderingMechanism)
 					{
@@ -105,32 +100,34 @@ public:
 		return (a_Meta != 0) ? --a_Meta : a_Meta;
 	}
 
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		return a_Meta;
 	}
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		UNUSED(a_BlockType);
 		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_PoweringData.PowerLevel);
 
 		if (a_Meta != a_PoweringData.PowerLevel)
 		{
-			m_World.SetBlockMeta(a_Position, a_PoweringData.PowerLevel);
-			return GetAdjustedRelatives(a_Position, StaticAppend(StaticAppend(GetRelativeLaterals(), GetTerracingConnectionOffsets(a_Position)), cVector3iArray{ OffsetYM() }));
+			a_World.SetBlockMeta(a_Position, a_PoweringData.PowerLevel);
+			return GetAdjustedRelatives(a_Position, StaticAppend(StaticAppend(GetRelativeLaterals(), GetTerracingConnectionOffsets(a_World, a_Position)), cVector3iArray{ OffsetYM() }));
 		}
 
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 
-		return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeAdjacents(), GetTerracingConnectionOffsets(a_Position)));
+		return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeAdjacents(), GetTerracingConnectionOffsets(a_World, a_Position)));
 	}
 };

@@ -33,8 +33,9 @@ public:
 		}
 	}
 
-	virtual FoodInfo GetFoodInfo(void) override
+	virtual FoodInfo GetFoodInfo(const cItem * a_Item) override
 	{
+		UNUSED(a_Item);
 		switch (m_ItemType)
 		{
 			case E_ITEM_CARROT: return FoodInfo(3, 3.6);

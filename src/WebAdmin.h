@@ -24,14 +24,6 @@
 
 
 
-// fwd:
-class cEvent;
-class cWebPlugin;
-
-
-
-
-
 // tolua_begin
 struct HTTPFormData
 {
@@ -142,9 +134,9 @@ public:
 		AString m_Title;
 		AString m_UrlPath;
 		AString m_PluginName;
-		SharedPtr<cWebTabCallback> m_Callback;
+		std::shared_ptr<cWebTabCallback> m_Callback;
 
-		cWebTab(const AString & a_Title, const AString & a_UrlPath, const AString & a_PluginName, SharedPtr<cWebTabCallback> a_Callback):
+		cWebTab(const AString & a_Title, const AString & a_UrlPath, const AString & a_PluginName, std::shared_ptr<cWebTabCallback> a_Callback):
 			m_Title(a_Title),
 			m_UrlPath(a_UrlPath),
 			m_PluginName(a_PluginName),
@@ -152,7 +144,7 @@ public:
 		{
 		}
 	};
-	typedef SharedPtr<cWebTab> cWebTabPtr;
+	typedef std::shared_ptr<cWebTab> cWebTabPtr;
 	typedef std::vector<cWebTabPtr> cWebTabPtrs;
 
 
@@ -214,7 +206,7 @@ public:
 		const AString & a_Title,
 		const AString & a_UrlPath,
 		const AString & a_PluginName,
-		SharedPtr<cWebTabCallback> a_Callback
+		std::shared_ptr<cWebTabCallback> a_Callback
 	);
 
 	/** Removes the WebTab with the specified URL path.

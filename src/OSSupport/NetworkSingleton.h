@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include <atomic>
 #include <event2/event.h>
 #include "Network.h"
 #include "NetworkLookup.h"
@@ -27,10 +26,10 @@
 // fwd:
 struct event_base;
 class cTCPLinkImpl;
-typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
+typedef std::shared_ptr<cTCPLinkImpl> cTCPLinkImplPtr;
 typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
 class cServerHandleImpl;
-typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
+typedef std::shared_ptr<cServerHandleImpl> cServerHandleImplPtr;
 typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
 
 

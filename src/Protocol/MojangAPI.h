@@ -183,7 +183,7 @@ protected:
 	cCriticalSection m_CSRankMgr;
 
 	/** The thread that periodically updates the stale data in the DB from the Mojang servers. */
-	SharedPtr<cUpdateThread> m_UpdateThread;
+	std::shared_ptr<cUpdateThread> m_UpdateThread;
 
 
 	/** Loads the caches from a disk storage. */

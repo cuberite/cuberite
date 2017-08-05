@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "Vector3.h"
 #include "Defines.h"
 
 
@@ -35,6 +34,8 @@ public:
 
 	cBoundingBox(const Vector3d & a_Pos, double a_CubeLength);
 	cBoundingBox(const cBoundingBox & a_Orig);
+
+	cBoundingBox & operator=(const cBoundingBox & a_Other);
 
 	/** Moves the entire boundingbox by the specified offset */
 	void Move(double a_OffX, double a_OffY, double a_OffZ);

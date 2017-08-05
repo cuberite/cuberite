@@ -2,7 +2,6 @@
 #pragma once
 
 #include "../Item.h"
-#include "../Vector3.h"
 
 
 
@@ -143,12 +142,12 @@ public:
 	static const int BURN_TICKS_PER_DAMAGE = 20;   ///< Ticks to wait between damaging an entity when it is burning
 	static const int BURN_DAMAGE           = 1;    ///< Damage to deal when the entity is burning
 
-	static const int BURN_TICKS            = 200;  ///< Ticks to keep an entity burning after it has stood in lava / fire
+	static const int BURN_TICKS            = 160;  ///< Ticks to keep an entity burning after it has stood in lava / fire
 
 	static const int MAX_AIR_LEVEL         = 300;  ///< Maximum air an entity can have
 	static const int DROWNING_TICKS        = 20;   ///< Number of ticks per heart of damage
 
-	static const int VOID_BOUNDARY         = -46;  ///< Y position to begin applying void damage
+	static const int VOID_BOUNDARY         = -64;  ///< Y position to begin applying void damage
 	static const int FALL_DAMAGE_HEIGHT    = 4;    ///< Y difference after which fall damage is applied
 
 	/** Special ID that is considered an "invalid value", signifying no entity. */
@@ -193,6 +192,9 @@ public:
 
 	/** Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent). */
 	virtual const char * GetParentClass(void) const;
+
+	/** Returns whether blocks can be placed intersecting this entities' hitbox */
+	virtual bool DoesPreventBlockPlacement(void) const { return true; }
 
 	cWorld * GetWorld(void) const { return m_World; }
 
@@ -323,6 +325,9 @@ public:
 	/** Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover */
 	virtual int GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
 
+	/** Returns the hitpoints that the currently equipped armor's enchantments would cover */
+	virtual int GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
+
 	/** Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit */
 	virtual double GetKnockbackAmountAgainst(const cEntity & a_Receiver);
 
@@ -340,6 +345,9 @@ public:
 
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
+
+	/** Applies damage to the armor after the armor blocked the given amount */
+	virtual void ApplyArmorDamage(int DamageBlocked);
 
 	// tolua_end
 

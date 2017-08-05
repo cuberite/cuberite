@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <atomic>
 #include "LuaState.h"
 #include "../UI/Window.h"
 #include "../ItemGrid.h"

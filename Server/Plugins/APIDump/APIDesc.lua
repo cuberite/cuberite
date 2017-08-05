@@ -2696,6 +2696,23 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the level of the specified enchantment stored in this object; 0 if not stored",
 				},
+				CanAddEnchantment =
+				{
+					Params =
+					{
+						{
+							Name = "EnchantmentNumID",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean"
+						},
+					},
+					Notes = "Returns true if the specified enchantment is not mutually exclusive with any of the enchantments stored by the object.",
+				},
 				IsEmpty =
 				{
 					Returns =
@@ -3019,6 +3036,17 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Adds the specified amount of speed in the Z axis direction.",
 				},
+				ApplyArmorDamage =
+				{
+					Params =
+					{
+						{
+							Name = "DamageBlocked",
+							Type = "number",
+						},
+					},
+					Notes = "Lowers armor durability, as if the armor blocked the given amount of damage.",
+				},
 				ArmorCoversAgainst =
 				{
 					Params =
@@ -3047,6 +3075,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Schedules the entity to be destroyed; if ShouldBroadcast is not present or set to true, broadcasts the DestroyEntity packet",
+				},
+				DoesPreventBlockPlacement =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if this entity doesn't allow blocks to be placed intersecting the entity.",
 				},
 				GetAirLevel =
 				{
@@ -3123,6 +3161,31 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function.",
+				},
+				GetEnchantmentCoverAgainst =
+				{
+					Params =
+					{
+						{
+							Name = "AttackerEntity",
+							Type = "cEntity",
+						},
+						{
+							Name = "DamageType",
+							Type = "eDamageType",
+						},
+						{
+							Name = "RawDamage",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of hitpoints out of RawDamage that the enchantments on the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage.",
 				},
 				GetEntityType =
 				{
@@ -6567,6 +6630,49 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Adds the specified amount to the item count. Returns self (useful for chaining).",
 				},
+				AddEnchantment =
+				{
+					Params =
+					{
+						{
+							Name = "Enchantment ID",
+							Type = "number",
+						},
+						{
+							Name = "Level",
+							Type = "number",
+						},
+						{
+							Name = "FromBook",
+							Type = "boolean",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Adds the given enchantment at the given level to this item, following anvil enchantment combining rules. Returns the XP level cost of the addition. FromBook specifies whether to use the XP multiplier for books or the multiplier used for other items, if true it uses the multiplier for books.",
+				},
+				AddEnchantmentsFromItem =
+				{
+					Params =
+					{
+						{
+							Name = "Additive",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "LevelCost",
+							Type = "number",
+						},
+					},
+					Notes = "Adds the enchantments from the specified item to this item, returning the cost as if this were an anvil.",
+				},
 				Clear =
 				{
 					Notes = "Resets the instance to an empty item",
@@ -6771,7 +6877,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "number",
 						},
 						{
-							Name = "WithBook",
+							Name = "FromBook",
 							Type = "boolean",
 						},
 					},
@@ -6781,7 +6887,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the specified item type is enchantable. If WithBook is true, the function is used in the anvil inventory with book enchantments. So it checks the \"only book enchantments\" too. Example: You can only enchant a hoe with a book.",
+					Notes = "Returns true if the specified item type is enchantable. If FromBook is true, the function is used in the anvil inventory with book enchantments. So it checks the \"only book enchantments\" too. Example: You can only enchant a hoe with a book.",
 				},
 				IsEqual =
 				{

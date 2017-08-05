@@ -66,7 +66,7 @@ protected:
 	cTerrainHeightGenPtr m_HeightGen;
 };
 
-typedef SharedPtr<cTerrainHeightToShapeGen> cTerrainHeightToShapeGenPtr;
+typedef std::shared_ptr<cTerrainHeightToShapeGen> cTerrainHeightToShapeGenPtr;
 
 
 
