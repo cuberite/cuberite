@@ -877,9 +877,9 @@ void cLuaState::Push(const char * a_Value)
 
 void cLuaState::Push(const cItem & a_Item)
 {
-        ASSERT(IsValid());
-        auto c = new cItem(a_Item);
-        tolua_pushusertype_and_takeownership(m_LuaState, c, "cItem");
+	ASSERT(IsValid());
+	auto c = new cItem(a_Item);
+	tolua_pushusertype_and_takeownership(m_LuaState, c, "cItem");
 }
 
 
