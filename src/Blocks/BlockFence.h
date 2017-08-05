@@ -137,7 +137,8 @@ public:
 
 private:
 
-	void FindKnotAndDestroy(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) {
+	void FindKnotAndDestroy(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
 		auto LeashKnot = cLeashKnot::FindKnotAtPos(a_WorldInterface, { a_BlockX, a_BlockY, a_BlockZ });
 		if (LeashKnot != nullptr)
 		{

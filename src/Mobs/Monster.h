@@ -98,7 +98,7 @@ public:
 	// tolua_end
 
 	/** Unleash the monster. The a_ShouldRemoveFromEntity parameter should always be true in order to remove the mob from the entity
-	to where it was leashed, except when it's called from the cEntity:Destroy, where it is already removed and therefore should always be false.*/
+	to where it was leashed, except when it's called from the cEntity:Destroy, where it is already removed and therefore should always be false. */
 	void Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast, bool a_ShouldRemoveFromEntity = true);
 
 	/** Sets entity position to where is leashed this mob */
