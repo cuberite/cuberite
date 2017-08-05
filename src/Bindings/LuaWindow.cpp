@@ -9,7 +9,7 @@
 #include "PluginLua.h"
 #include "Root.h"
 #include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
-
+#include "ClientHandle.h"
 
 
 
@@ -225,10 +225,11 @@ void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eC
 	if (m_OnClicked != nullptr)
 	{
 		// Plugin can stop a click
-		if (m_OnClicked->Call(this, &a_Player, a_SlotNum, a_ClickAction))
+		if (m_OnClicked->Call(this, &a_Player, a_SlotNum, a_ClickAction, a_ClickedItem))
 		{
 			// Tell the client the actual state of the window
-			SendWholeWindow(*a_Player.GetClientHandle());
+			a_Player.GetClientHandle()->SendInventorySlot(-1, -1, a_Player.GetDraggingItem());
+			BroadcastWholeWindow();
 			return;
 		}
 	}
