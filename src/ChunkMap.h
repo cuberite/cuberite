@@ -6,6 +6,8 @@
 #pragma once
 
 
+#include <functional>
+
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 
