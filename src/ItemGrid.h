@@ -48,6 +48,11 @@ public:
 	/** Converts slot number into XY coords; sets coords to -1 on invalid slot number. Exported in ManualBindings.cpp */
 	void GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const;
 
+	/** Copies all items from a_Src to this grid.
+	Both grids must be the same size (asserts).
+	Doesn't copy the listeners. */
+	void CopyFrom(const cItemGrid & a_Src);
+
 	// tolua_begin
 
 	// Retrieve slots by coords or slot number; Logs warning and returns the first slot on invalid coords / slotnum
@@ -156,6 +161,12 @@ public:
 
 	// tolua_end
 
+
+	/** Returns true if slot coordinates lie within the grid. */
+	bool IsValidSlotCoords(int a_X, int a_Y) const;
+
+	/** Returns true if slot number is within the grid. */
+	bool IsValidSlotNum(int a_SlotNum) const;
 
 	/** Generates random loot from the specified loot probability table, with a chance of enchanted books added.
 	A total of a_NumSlots are taken by the loot.

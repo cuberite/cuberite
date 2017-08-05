@@ -68,6 +68,7 @@ public:
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
+	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
 	// tolua_begin
 
@@ -229,7 +230,7 @@ public:
 	// tolua_begin
 
 	/** Opens the specified window; closes the current one first using CloseWindow() */
-	void OpenWindow(cWindow * a_Window);
+	void OpenWindow(cWindow & a_Window);
 
 	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true */
 	void CloseWindow(bool a_CanRefuse = true);
@@ -404,7 +405,10 @@ public:
 	void SendExperience(void);
 
 	/** In UI windows, get the item that the player is dragging */
-	cItem & GetDraggingItem(void) {return m_DraggingItem; }
+	cItem & GetDraggingItem(void) {return m_DraggingItem; }  // tolua_export
+
+	/** In UI windows, set the item that the player is dragging */
+	void SetDraggingItem(const cItem & a_Item);  // tolua_export
 
 	// In UI windows, when inventory-painting:
 	/** Clears the list of slots that are being inventory-painted. To be used by cWindow only */
@@ -480,6 +484,9 @@ public:
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
+
+	/** Whether placing the given blocks would intersect any entitiy */
+	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
 
 	// tolua_begin
 

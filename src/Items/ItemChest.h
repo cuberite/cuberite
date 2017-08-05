@@ -51,13 +51,10 @@ public:
 		BLOCKTYPE ClickedBlock;
 		NIBBLETYPE ClickedBlockMeta;
 		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
-		if (
-			BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision() ||
-			BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(&a_Player, ClickedBlockMeta)
-		)
+		cChunkInterface ChunkInterface(a_World.GetChunkMap());
+		if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
 		{
-			cChunkInterface ChunkInterface(a_World.GetChunkMap());
-			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ);
+			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
 		else
 		{
@@ -75,10 +72,7 @@ public:
 
 			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 			// No need to do combinability (dblslab) checks, client will do that here.
-			if (
-				!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision() &&
-				!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(&a_Player, PlaceMeta)
-			)
+			if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
 			{
 				// Tried to place a block into another?
 				// Happens when you place a block aiming at side of block with a torch on it or stem beside it
@@ -154,7 +148,7 @@ public:
 		}
 
 		// Adjust the existing chest, if any:
-		if (NeighborIdx > 0)
+		if (NeighborIdx != -1)
 		{
 			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
 		}

@@ -9,9 +9,6 @@
 
 #pragma once
 
-#include "Vector3.h"
-#include "BiomeDef.h"
-
 
 
 
@@ -402,6 +399,9 @@ struct sSetBlock
 
 	/** Returns the absolute Z coord of the stored block. */
 	int GetZ(void) const { return m_RelZ + cChunkDef::Width * m_ChunkZ; }
+
+	/** Returns the absolute position of the stored block. */
+	Vector3i GetPos(void) const { return Vector3i(GetX(), GetY(), GetZ()); }
 };
 
 typedef std::list<sSetBlock> sSetBlockList;

@@ -3,7 +3,6 @@
 
 #include "FireSimulator.h"
 #include "../World.h"
-#include "../BlockID.h"
 #include "../Defines.h"
 #include "../Chunk.h"
 #include "Root.h"
@@ -145,6 +144,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
 		}
 		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
+		++itr;
 	}  // for itr - Data[]
 }
 
@@ -301,7 +301,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
 	/*
-	if (m_World.GetTickRandomNumber(10000) > 100)
+	if (GetRandomProvider().RandBool(0.99))
 	{
 		// Make the chance to spread 100x smaller
 		return;
@@ -317,7 +317,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 				// No need to check the coords for equality with the parent block,
 				// it cannot catch fire anyway (because it's not an air block)
 
-				if (m_World.GetTickRandomNumber(MAX_CHANCE_FLAMMABILITY) > m_Flammability)
+				if (!GetRandomProvider().RandBool(m_Flammability * (1.0 / MAX_CHANCE_FLAMMABILITY)))
 				{
 					continue;
 				}
@@ -381,7 +381,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 			return;
 		}
 
-		bool ShouldReplaceFuel = (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance);
+		bool ShouldReplaceFuel = (GetRandomProvider().RandBool(m_ReplaceFuelChance * (1.0 / MAX_CHANCE_REPLACE_FUEL)));
 		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsX, Y, AbsZ, ssFireSpread))
 		{
 			Neighbour->SetBlock(X, Y, Z, E_BLOCK_FIRE, 0);

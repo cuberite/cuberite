@@ -16,6 +16,7 @@ SET (SRCS
 	LuaUDPEndpoint.cpp
 	LuaWindow.cpp
 	ManualBindings.cpp
+	ManualBindings_BlockArea.cpp
 	ManualBindings_Network.cpp
 	ManualBindings_RankManager.cpp
 	ManualBindings_World.cpp
@@ -65,6 +66,7 @@ set(BINDING_DEPENDENCIES
 	../BiomeDef.h
 	../BlockArea.h
 	../BlockEntities/BeaconEntity.h
+	../BlockEntities/BedEntity.h
 	../BlockEntities/BlockEntity.h
 	../BlockEntities/BlockEntityWithItems.h
 	../BlockEntities/BrewingstandEntity.h
@@ -87,10 +89,12 @@ set(BINDING_DEPENDENCIES
 	../ChatColor.h
 	../ChunkDef.h
 	../ClientHandle.h
+	../Color.h
 	../CompositeChat.h
 	../CraftingRecipes.h
 	../Cuboid.h
 	../Defines.h
+	../EffectID.h
 	../Enchantments.h
 	../Entities/Boat.h
 	../Entities/ArrowEntity.h

@@ -242,12 +242,15 @@ void cWindow::Clicked(
 			// Nothing needed
 			return;
 		}
-		case caLeftPaintBegin:     OnPaintBegin   (a_Player);            return;
-		case caRightPaintBegin:    OnPaintBegin   (a_Player);            return;
-		case caLeftPaintProgress:  OnPaintProgress(a_Player, a_SlotNum); return;
-		case caRightPaintProgress: OnPaintProgress(a_Player, a_SlotNum); return;
-		case caLeftPaintEnd:       OnLeftPaintEnd (a_Player);            return;
-		case caRightPaintEnd:      OnRightPaintEnd(a_Player);            return;
+		case caLeftPaintBegin:      OnPaintBegin    (a_Player);            return;
+		case caRightPaintBegin:     OnPaintBegin    (a_Player);            return;
+		case caMiddlePaintBegin:    OnPaintBegin    (a_Player);            return;
+		case caLeftPaintProgress:   OnPaintProgress (a_Player, a_SlotNum); return;
+		case caRightPaintProgress:  OnPaintProgress (a_Player, a_SlotNum); return;
+		case caMiddlePaintProgress: OnPaintProgress (a_Player, a_SlotNum); return;
+		case caLeftPaintEnd:        OnLeftPaintEnd  (a_Player);            return;
+		case caRightPaintEnd:       OnRightPaintEnd (a_Player);            return;
+		case caMiddlePaintEnd:      OnMiddlePaintEnd(a_Player);            return;
 		default:
 		{
 			break;
@@ -643,9 +646,33 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 
 
 
-int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums)
+void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 {
-	if (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size())
+	if (!a_Player.IsGameModeCreative())
+	{
+		// Midle click paint is only valid for creative mode
+		return;
+	}
+
+	// Fill available slots with full stacks of the dragging item
+	const auto & DraggingItem = a_Player.GetDraggingItem();
+	auto StackSize = ItemHandler(DraggingItem.m_ItemType)->GetMaxStackSize();
+	if (0 < DistributeItemToSlots(a_Player, DraggingItem, StackSize, a_Player.GetInventoryPaintSlots(), false))
+	{
+		// If any items were distibuted, set dragging item empty
+		a_Player.GetDraggingItem().Empty();
+	}
+
+	SendWholeWindow(*a_Player.GetClientHandle());
+}
+
+
+
+
+
+int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
+{
+	if (a_LimitItems && (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size()))
 	{
 		LOGWARNING("%s: Distributing less items (%d) than slots (" SIZE_T_FMT  ")", __FUNCTION__, static_cast<int>(a_Item.m_ItemCount), a_SlotNums.size());
 		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now

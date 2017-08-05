@@ -13,6 +13,7 @@
 #include "zlib/zlib.h"
 #include "Defines.h"
 #include "BlockEntities/BeaconEntity.h"
+#include "BlockEntities/BedEntity.h"
 #include "BlockEntities/BrewingstandEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
@@ -408,7 +409,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 {
 	if ((a_DataTypes & (cBlockArea::baTypes | cBlockArea::baMetas)) != (cBlockArea::baTypes | cBlockArea::baMetas))
 	{
-		LOGWARNING("cChunk::WriteBlockArea(): unsupported datatype request, can write only types + metas (0x%x), requested 0x%x. Ignoring.",
+		LOGWARNING("cChunk::WriteBlockArea(): unsupported datatype request, can write only types + metas together (0x%x), requested 0x%x. Ignoring.",
 			(cBlockArea::baTypes | cBlockArea::baMetas), a_DataTypes & (cBlockArea::baTypes | cBlockArea::baMetas)
 		);
 		return;
@@ -420,16 +421,15 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	int BlockEndX   = std::min(a_MinBlockX + a_Area.GetSizeX(), (m_PosX + 1) * cChunkDef::Width);
 	int BlockStartZ = std::max(a_MinBlockZ, m_PosZ * cChunkDef::Width);
 	int BlockEndZ   = std::min(a_MinBlockZ + a_Area.GetSizeZ(), (m_PosZ + 1) * cChunkDef::Width);
-	int SizeX = BlockEndX - BlockStartX;
+	int SizeX = BlockEndX - BlockStartX;  // Size of the union
 	int SizeZ = BlockEndZ - BlockStartZ;
-	int OffX = BlockStartX - m_PosX * cChunkDef::Width;
-	int OffZ = BlockStartZ - m_PosZ * cChunkDef::Width;
-	int BaseX = BlockStartX - a_MinBlockX;
-	int BaseZ = BlockStartZ - a_MinBlockZ;
 	int SizeY = std::min(a_Area.GetSizeY(), cChunkDef::Height - a_MinBlockY);
+	int OffX = BlockStartX - m_PosX * cChunkDef::Width;  // Offset within the chunk where the union starts
+	int OffZ = BlockStartZ - m_PosZ * cChunkDef::Width;
+	int BaseX = BlockStartX - a_MinBlockX;  // Offset within the area where the union starts
+	int BaseZ = BlockStartZ - a_MinBlockZ;
 
-	// TODO: Improve this by not calling FastSetBlock() and doing the processing here
-	// so that the heightmap is touched only once for each column.
+	// Copy blocktype and blockmeta:
 	BLOCKTYPE *  AreaBlockTypes = a_Area.GetBlockTypes();
 	NIBBLETYPE * AreaBlockMetas = a_Area.GetBlockMetas();
 	for (int y = 0; y < SizeY; y++)
@@ -451,6 +451,50 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			}  // for x
 		}  // for z
 	}  // for y
+
+	// Erase all affected block entities:
+	cCuboid affectedArea(OffX, a_MinBlockY, OffZ, OffX + SizeX - 1, a_MinBlockY + SizeY - 1, OffZ + SizeZ - 1);
+	for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
+	{
+		if (affectedArea.IsInside(itr->second->GetPos()))
+		{
+			itr = m_BlockEntities.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}
+
+	// Clone block entities from a_Area into this chunk:
+	if ((a_DataTypes & cBlockArea::baBlockEntities) != 0)
+	{
+		for (const auto & keyPair: a_Area.GetBlockEntities())
+		{
+			auto & be = keyPair.second;
+			auto posX = be->GetPosX() + a_MinBlockX;
+			auto posY = be->GetPosY() + a_MinBlockY;
+			auto posZ = be->GetPosZ() + a_MinBlockZ;
+			if (
+				(posX < m_PosX * cChunkDef::Width) || (posX >= m_PosX * cChunkDef::Width + cChunkDef::Width) ||
+				(posZ < m_PosZ * cChunkDef::Width) || (posZ >= m_PosZ * cChunkDef::Width + cChunkDef::Width)
+			)
+			{
+				continue;
+			}
+			// This block entity is inside the chunk, clone it (and remove any that is there currently):
+			auto idx = MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width);
+			auto itr = m_BlockEntities.find(idx);
+			if (itr != m_BlockEntities.end())
+			{
+				m_BlockEntities.erase(itr);
+			}
+			auto clone = be->Clone(posX, posY, posZ);
+			clone->SetWorld(m_World);
+			AddBlockEntityClean(clone);
+			BroadcastBlockEntity(posX, posY, posZ);
+		}
+	}
 }
 
 
@@ -507,14 +551,19 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 
 void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ)
 {
-	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
-	int Random = m_World->GetTickRandomNumber(0x00ffffff);
-	a_X =   Random % (a_MaxX * 2);
-	a_Y =  (Random / (a_MaxX * 2)) % (a_MaxY * 2);
-	a_Z = ((Random / (a_MaxX * 2)) / (a_MaxY * 2)) % (a_MaxZ * 2);
-	a_X /= 2;
-	a_Y /= 2;
-	a_Z /= 2;
+	ASSERT(
+		(a_MaxX > 0) && (a_MaxY > 0) && (a_MaxZ > 0) &&
+		(a_MaxX <= std::numeric_limits<int>::max() / a_MaxY) &&  // a_MaxX * a_MaxY doesn't overflow
+		(a_MaxX * a_MaxY <= std::numeric_limits<int>::max() / a_MaxZ)  // a_MaxX * a_MaxY * a_MaxZ doesn't overflow
+	);
+
+	// MTRand gives an inclusive range [0, Max] but this gives the exclusive range [0, Max)
+	int OverallMax = (a_MaxX * a_MaxY * a_MaxZ) - 1;
+	int Random = m_World->GetTickRandomNumber(OverallMax);
+
+	a_X =   Random % a_MaxX;
+	a_Y =  (Random / a_MaxX) % a_MaxY;
+	a_Z = ((Random / a_MaxX) / a_MaxY) % a_MaxZ;
 }
 
 
@@ -848,7 +897,7 @@ void cChunk::TickBlocks(void)
 void cChunk::ApplyWeatherToTop()
 {
 	if (
-		(m_World->GetTickRandomNumber(100) != 0) ||
+		(GetRandomProvider().RandBool(0.99)) ||
 		(
 			(m_World->GetWeather() != eWeather_Rain) &&
 			(m_World->GetWeather() != eWeather_ThunderStorm)
@@ -932,8 +981,10 @@ void cChunk::ApplyWeatherToTop()
 
 
 
-bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
+bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
+	auto & Random = GetRandomProvider();
+
 	// Convert the stem BlockType into produce BlockType
 	BLOCKTYPE ProduceType;
 	switch (a_BlockType)
@@ -969,7 +1020,7 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 	// Pick a direction in which to place the produce:
 	int x = 0, z = 0;
-	int CheckType = a_TickRandom.randInt(3);  // The index to the neighbors array which should be checked for emptiness
+	int CheckType = Random.RandInt(3);  // The index to the neighbors array which should be checked for emptiness
 	switch (CheckType)
 	{
 		case 0: x =  1; break;
@@ -1001,7 +1052,7 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		case E_BLOCK_FARMLAND:
 		{
 			// Place a randomly-facing produce:
-			NIBBLETYPE Meta = (ProduceType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(a_TickRandom.randInt(4) % 4);
+			NIBBLETYPE Meta = (ProduceType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(Random.RandInt(4) % 4);
 			LOGD("Growing melon / pumpkin at {%d, %d, %d} (<%d, %d> from stem), overwriting %s, growing on top of %s, meta %d",
 				a_RelX + x + m_PosX * cChunkDef::Width, a_RelY, a_RelZ + z + m_PosZ * cChunkDef::Width,
 				x, z,
@@ -1067,7 +1118,7 @@ int cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 
 int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 {
-	// Check the total height of the sugarcane blocks here:
+	// Check the total height of the cacti blocks here:
 	int Top = a_RelY + 1;
 	while (
 		(Top < cChunkDef::Height) &&
@@ -1090,11 +1141,38 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 	for (int i = 0; i < ToGrow; i++)
 	{
 		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
+		if (UnboundedRelGetBlockType(a_RelX, Top + i, a_RelZ, BlockType) && (BlockType == E_BLOCK_AIR))
 		{
-			// TODO: Check the surrounding blocks, if they aren't air, break the cactus block into pickups (and continue breaking blocks above in the next loop iterations)
 			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_CACTUS, 0);
+
+			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
+			static const struct
+			{
+				int x, z;
+			} Coords[] =
+			{
+				{-1,  0},
+				{ 1,  0},
+				{ 0, -1},
+				{ 0,  1},
+			} ;
+			for (auto & Coord : Coords)
+			{
+				if (
+					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + 1, a_RelZ + Coord.z, BlockType) &&
+					(
+						cBlockInfo::IsSolid(BlockType) ||
+						(BlockType == E_BLOCK_LAVA) ||
+						(BlockType == E_BLOCK_STATIONARY_LAVA)
+					)
+				)
+				{
+					return false;
+				}
+			}  // for i - Coords[]
+			{
+				GetWorld()->DigBlock(a_RelX + GetPosX() * cChunkDef::Width, Top + i, a_RelZ + GetPosZ() * cChunkDef::Width);
+			}
 		}
 		else
 		{
@@ -1132,7 +1210,7 @@ bool cChunk::GrowTallGrass(int a_RelX, int a_RelY, int a_RelZ)
 		default:                      return false;
 	}
 	return UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_BIG_FLOWER, LargeFlowerMeta) &&
-		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, 8);
+		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
 }
 
 
@@ -1353,6 +1431,7 @@ void cChunk::CreateBlockEntities(void)
 				switch (BlockType)
 				{
 					case E_BLOCK_BEACON:
+					case E_BLOCK_BED:
 					case E_BLOCK_TRAPPED_CHEST:
 					case E_BLOCK_CHEST:
 					case E_BLOCK_COMMAND_BLOCK:
@@ -1486,6 +1565,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	switch (a_BlockType)
 	{
 		case E_BLOCK_BEACON:
+		case E_BLOCK_BED:
 		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
@@ -2227,6 +2307,15 @@ bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
+
+
+
+bool cChunk::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback)
+{
+	return GenericDoWithBlockEntityAt<cBedEntity,
+		E_BLOCK_BED
+	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
 
 
 

@@ -1,8 +1,6 @@
 
 #include "Globals.h"
 
-#include <cmath>
-
 #include "Path.h"
 #include "../Chunk.h"
 
@@ -148,7 +146,7 @@ bool cPath::StepOnce()
 	// Check if we have a new NearestPoint.
 	if ((m_Destination - CurrentCell->m_Location).Length() < 5)
 	{
-		if (m_Rand.NextInt(4) == 0)
+		if (GetRandomProvider().RandBool(0.25))
 		{
 			m_NearestPointToTarget = CurrentCell;
 		}

@@ -1,11 +1,7 @@
 
 #pragma once
 
-#include <set>
-#include "BlockID.h"
-#include "ChunkDef.h"
 #include "Chunk.h"
-#include "FastRandom.h"
 #include "Mobs/Monster.h"  // This is a side-effect of keeping Mobfamily inside Monster class. I'd prefer to keep both (Mobfamily and Monster) inside a "Monster" namespace MG TODO : do it
 
 
@@ -59,14 +55,13 @@ protected :
 	eMonsterType ChooseMobType(EMCSBiome a_Biome);
 
 	/** Adds toAdd into toAddIn, if toAdd is in m_AllowedTypes */
-	void addIfAllowed(eMonsterType toAdd, std::set<eMonsterType> & toAddIn);
+	void addIfAllowed(eMonsterType toAdd, std::vector<eMonsterType> & toAddIn);
 
 	cMonster::eFamily m_MonsterFamily;
 	std::set<eMonsterType> m_AllowedTypes;
 	bool m_NewPack;
 	eMonsterType m_MobType;
-	std::set<cMonster*> m_Spawned;
-	cFastRandom m_Random;
+	std::set<cMonster *> m_Spawned;
 } ;
 
 

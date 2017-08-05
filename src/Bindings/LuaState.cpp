@@ -1454,8 +1454,12 @@ bool cLuaState::CallFunction(int a_NumResults)
 		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
 
 		// Remove the error handler and error message from the stack:
-		ASSERT(lua_gettop(m_LuaState) == 2);
-		lua_pop(m_LuaState, 2);
+		auto top = lua_gettop(m_LuaState);
+		if (top < 2)
+		{
+			LogStackValues(Printf("The Lua stack is in an unexpected state, expected at least two values there, but got %d", top).c_str());
+		}
+		lua_pop(m_LuaState, std::min(2, top));
 		return false;
 	}
 
@@ -1758,6 +1762,56 @@ bool cLuaState::CheckParamEnd(int a_Param)
 
 
 
+bool cLuaState::CheckParamSelf(const char * a_SelfClassName)
+{
+	tolua_Error tolua_err;
+	if (tolua_isusertype(m_LuaState, 1, a_SelfClassName, 0, &tolua_err) && !lua_isnil(m_LuaState, 1))
+	{
+		return true;
+	}
+
+	// Not the correct parameter
+	lua_Debug entry;
+	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+	AString ErrMsg = Printf(
+		"Error in function '%s'. The 'self' parameter is not of the expected type, \"instance of %s\". " \
+		"Make sure you're using the correct calling convention (obj:fn() instead of obj.fn()).",
+		(entry.name != nullptr) ? entry.name : "<unknown>", a_SelfClassName
+	);
+	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+	return false;
+}
+
+
+
+
+
+bool cLuaState::CheckParamStaticSelf(const char * a_SelfClassName)
+{
+	tolua_Error tolua_err;
+	if (tolua_isusertable(m_LuaState, 1, a_SelfClassName, 0, &tolua_err) && !lua_isnil(m_LuaState, 1))
+	{
+		return true;
+	}
+
+	// Not the correct parameter
+	lua_Debug entry;
+	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+	AString ErrMsg = Printf(
+		"Error in function '%s'. The 'self' parameter is not of the expected type, \"class %s\". " \
+		"Make sure you're using the correct calling convention (cClassName:fn() instead of cClassName.fn() or obj:fn()).",
+		(entry.name != nullptr) ? entry.name : "<unknown>", a_SelfClassName
+	);
+	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+	return false;
+}
+
+
+
+
+
 bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
 {
 	ASSERT(IsValid());
@@ -1829,6 +1883,46 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 		depth++;
 	}
 	LOGWARNING("Stack trace end");
+}
+
+
+
+
+
+int cLuaState::ApiParamError(const char * a_MsgFormat, ...)
+{
+	// Retrieve current function name
+	lua_Debug entry;
+	VERIFY(lua_getstack(m_LuaState, 0, &entry));
+	VERIFY(lua_getinfo(m_LuaState, "n", &entry));
+
+	// Compose the error message:
+	va_list argp;
+	va_start(argp, a_MsgFormat);
+	AString msg;
+
+	#ifdef __clang__
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wformat-nonliteral"
+	#endif
+
+	AppendVPrintf(msg, a_MsgFormat, argp);
+
+	#ifdef __clang__
+		#pragma clang diagnostic pop
+	#endif
+
+	va_end(argp);
+	AString errorMsg = Printf("%s: %s", (entry.name != nullptr) ? entry.name : "<unknown function>", msg.c_str());
+
+	// Log everything into the console:
+	LOGWARNING("%s", errorMsg.c_str());
+	// cLuaState::LogStackTrace(a_LuaState);  // Do NOT log stack trace, it is already output as part of the Lua error handling
+	LogStackValues(m_LuaState, "Parameters on the stack");
+
+	// Raise Lua error:
+	lua_pushstring(m_LuaState, errorMsg.c_str());
+	return lua_error(m_LuaState);
 }
 
 

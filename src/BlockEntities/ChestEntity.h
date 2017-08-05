@@ -17,7 +17,7 @@ class cClientHandle;
 class cChestEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems super;
+	typedef cBlockEntityWithItems Super;
 
 public:
 	enum
@@ -31,15 +31,16 @@ public:
 	BLOCKENTITY_PROTODEF(cChestEntity)
 
 	/** Constructor used for normal operation */
-	cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type);
+	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	virtual ~cChestEntity() override;
 
 	// cBlockEntity overrides:
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 
-	/** Search horizontally adjacent blocks for neighbouring chests and links them together. */
+	/** Search horizontally adjacent blocks for neighbouring chests of the same type and links them together. */
 	void ScanNeighbours();
 
 	/** Opens a new chest window where this is the primary chest and any neighbour is the secondary. */
@@ -72,9 +73,19 @@ private:
 		ASSERT(a_Grid == &m_Contents);
 		if (m_World != nullptr)
 		{
-			if (GetWindow() != nullptr)
+			cWindow * Window = GetWindow();
+			if (
+				(Window == nullptr) &&
+				(m_Neighbour != nullptr)
+			)
 			{
-				GetWindow()->BroadcastWholeWindow();
+				// Neighbour might own the window
+				Window = m_Neighbour->GetWindow();
+			}
+
+			if (Window != nullptr)
+			{
+				Window->BroadcastWholeWindow();
 			}
 
 			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());

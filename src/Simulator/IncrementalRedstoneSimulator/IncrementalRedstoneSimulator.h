@@ -158,9 +158,12 @@ public:
 	}
 
 	cIncrementalRedstoneSimulatorChunkData * GetChunkData() { return &m_Data; }
-	static std::unique_ptr<cRedstoneHandler> CreateComponent(cWorld & a_World, BLOCKTYPE a_BlockType, cIncrementalRedstoneSimulatorChunkData * a_Data);
+
+	static const cRedstoneHandler * GetComponentHandler(BLOCKTYPE a_BlockType);
 
 private:
+
+	static std::unique_ptr<cRedstoneHandler> CreateComponent(BLOCKTYPE a_BlockType);
 
 	// oh yea its crazy time
 	cIncrementalRedstoneSimulatorChunkData m_Data;

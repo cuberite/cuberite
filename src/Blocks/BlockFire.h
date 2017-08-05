@@ -232,7 +232,7 @@ public:
 		return (FoundFrameZP && FoundFrameZM);
 	}
 
-	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}

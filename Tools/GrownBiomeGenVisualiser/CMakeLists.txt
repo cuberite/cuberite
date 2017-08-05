@@ -49,6 +49,7 @@ set(SHARED_OSS_SRC
 	../../src/OSSupport/File.cpp
 	../../src/OSSupport/IsThread.cpp
 	../../src/OSSupport/StackTrace.cpp
+	../../src/OSSupport/WinStackWalker.cpp
 )
 
 set(SHARED_OSS_HDR
@@ -57,12 +58,9 @@ set(SHARED_OSS_HDR
 	../../src/OSSupport/File.h
 	../../src/OSSupport/IsThread.h
 	../../src/OSSupport/StackTrace.h
+	../../src/OSSupport/WinStackWalker.h
 )
 
-if(WIN32)
-	list (APPEND SHARED_OSS_SRC ../../src/StackWalker.cpp)
-	list (APPEND SHARED_OSS_HDR ../../src/StackWalker.h)
-endif()
 
 flatten_files(SHARED_OSS_SRC)
 flatten_files(SHARED_OSS_HDR)

@@ -12,14 +12,15 @@
 class cJukeboxEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity super;
+	typedef cBlockEntity Super;
+
 public:
 
 	// tolua_end
 
 	BLOCKENTITY_PROTODEF(cJukeboxEntity)
 
-	cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cJukeboxEntity() override;
 
 	// tolua_begin
@@ -44,6 +45,8 @@ public:
 
 	// tolua_end
 
+	// cBlockEntity overrides:
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
 

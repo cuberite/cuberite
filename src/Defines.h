@@ -1,9 +1,6 @@
 
 #pragma once
 
-#include <limits>
-#include <cmath>
-
 
 
 
@@ -99,10 +96,13 @@ enum eClickAction
 	caRightClickOutsideHoldNothing,
 	caLeftPaintBegin,
 	caRightPaintBegin,
+	caMiddlePaintBegin,
 	caLeftPaintProgress,
 	caRightPaintProgress,
+	caMiddlePaintProgress,
 	caLeftPaintEnd,
 	caRightPaintEnd,
+	caMiddlePaintEnd,
 	caDblClick,
 	// Add new actions here
 	caUnknown = 255,
@@ -266,10 +266,13 @@ inline const char * ClickActionToString(int a_ClickAction)
 		case caRightClickOutsideHoldNothing: return "caRightClickOutsideHoldNothing";
 		case caLeftPaintBegin:               return "caLeftPaintBegin";
 		case caRightPaintBegin:              return "caRightPaintBegin";
+		case caMiddlePaintBegin:             return "caMiddlePaintBegin";
 		case caLeftPaintProgress:            return "caLeftPaintProgress";
 		case caRightPaintProgress:           return "caRightPaintProgress";
+		case caMiddlePaintProgress:          return "caMiddlePaintProgress";
 		case caLeftPaintEnd:                 return "caLeftPaintEnd";
 		case caRightPaintEnd:                return "caRightPaintEnd";
+		case caMiddlePaintEnd:               return "caMiddlePaintEnd";
 		case caDblClick:                     return "caDblClick";
 
 		case caUnknown:                      return "caUnknown";

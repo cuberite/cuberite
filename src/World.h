@@ -1,12 +1,6 @@
 
 #pragma once
 
-#ifndef _WIN32
-	#include "BlockID.h"
-#else
-	enum ENUM_ITEM_ID;
-#endif
-
 #define MAX_PLAYERS 65535
 
 #include <functional>
@@ -15,7 +9,6 @@
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
-#include "Vector3.h"
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"
@@ -28,7 +21,6 @@
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
-#include "FastRandom.h"
 #include "EffectID.h"
 
 
@@ -40,12 +32,10 @@ class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
-typedef SharedPtr<cClientHandle> cClientHandlePtr;
+typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
-class cBlockEntity;
-class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
 class cBeaconEntity;
 class cBrewingstandEntity;
@@ -64,7 +54,7 @@ class cDeadlockDetect;
 typedef std::list< cPlayer * > cPlayerList;
 typedef std::list< std::pair< cPlayer *, cWorld * > > cAwaitingPlayerList;
 
-typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
+typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
 typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 typedef cItemCallback<cPlayer>             cPlayerListCallback;
@@ -238,7 +228,7 @@ public:
 
 	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
 	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
-	void QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData);
+	void QueueSetChunkData(cSetChunkDataPtr a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -433,7 +423,7 @@ public:
 	Returns true if all chunks have been processed.
 	Prefer cBlockArea::Write() instead, this is the internal implementation; cBlockArea does error checking, too.
 	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.
-	*/
+	Doesn't wake up simulators, use WakeUpSimulatorsInArea() for that. */
 	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) override;
 
 	// tolua_begin
@@ -443,6 +433,9 @@ public:
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) override;
+
+	/** Spawns a single pickup containing the specified item. */
+	virtual UInt32 SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f, int a_LifetimeTicks = 6000, bool a_CanCombine = true) override;
 
 	/** Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
@@ -480,7 +473,7 @@ public:
 
 	// tolua_begin
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
-	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player) override;
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
 
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */
@@ -536,6 +529,9 @@ public:
 
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Exported in ManualBindings.cpp
+
+	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
+	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
 	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback);  // Lua-acessible
@@ -801,8 +797,8 @@ public:
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
 	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 
-	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
-	int GetTickRandomNumber(int a_Range) { return static_cast<int>(m_TickRand.randInt(a_Range)); }
+	/** Returns a random number in range [0 .. a_Range]. */
+	int GetTickRandomNumber(int a_Range);
 
 	/** Appends all usernames starting with a_Text (case-insensitive) into Results */
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
@@ -879,9 +875,6 @@ private:
 
 	/** The dimension of the world, used by the client to provide correct lighting scheme */
 	eDimension m_Dimension;
-
-	/** This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe) */
-	MTRand m_TickRand;
 
 	bool m_IsSpawnExplicitlySet;
 	double m_SpawnX;

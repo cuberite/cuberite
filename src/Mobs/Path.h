@@ -178,7 +178,6 @@ private:
 	double m_HalfWidth;
 	int m_StepsLeft;
 	cPathCell * m_NearestPointToTarget;
-	cFastRandom m_Rand;
 
 	/* Control fields */
 	ePathFinderStatus m_Status;

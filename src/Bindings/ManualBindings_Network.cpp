@@ -5,7 +5,6 @@
 // Also implements the cUrlClient bindings
 
 #include "Globals.h"
-#include "LuaTCPLink.h"
 #include "ManualBindings.h"
 #include "tolua++/include/tolua++.h"
 #include "LuaState.h"
@@ -30,7 +29,7 @@ static int tolua_cNetwork_Connect(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamString(2) ||
 		!S.CheckParamNumber(3) ||
 		!S.CheckParamTable(4) ||
@@ -46,20 +45,13 @@ static int tolua_cNetwork_Connect(lua_State * L)
 	cLuaState::cTableRefPtr callbacks;
 	if (!S.GetStackValues(2, host, port, callbacks))
 	{
-		LOGWARNING("cNetwork::Connect() cannot read its parameters, failing the request.");
-		S.LogStackTrace();
-		S.LogStackValues("Values on the stack");
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Cannot read parameters.");
 	}
 
 	// Check validity:
 	if ((port < 0) || (port > 65535))
 	{
-		LOGWARNING("cNetwork:Connect() called with invalid port (%d), failing the request.", port);
-		S.LogStackTrace();
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", port);
 	}
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
@@ -85,7 +77,7 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamNumber(2) ||
 		!S.CheckParamTable(3) ||
 		!S.CheckParamEnd(4)
@@ -95,30 +87,23 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 	}
 
 	// Read the params:
-	UInt16 port;
+	int port;
 	cLuaState::cTableRefPtr callbacks;
 	if (!S.GetStackValues(2, port, callbacks))
 	{
-		LOGWARNING("cNetwork:CreateUDPEndpoint() cannot read its parameters, failing the request.");
-		S.LogStackTrace();
-		S.LogStackValues("Values on the stack");
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Cannot read parameters");
 	}
 
 	// Check validity:
 	if ((port < 0) || (port > 65535))
 	{
-		LOGWARNING("cNetwork:CreateUDPEndpoint() called with invalid port (%d), failing the request.", port);
-		S.LogStackTrace();
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", port);
 	}
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Create the LuaUDPEndpoint glue class:
 	auto endpoint = std::make_shared<cLuaUDPEndpoint>(std::move(callbacks));
-	endpoint->Open(port, endpoint);
+	endpoint->Open(static_cast<UInt16>(port), endpoint);
 
 	// Register the endpoint to be garbage-collected by Lua:
 	tolua_pushusertype(L, endpoint.get(), "cUDPEndpoint");
@@ -141,7 +126,7 @@ static int tolua_cNetwork_EnumLocalIPAddresses(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -165,7 +150,7 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamString(2) ||
 		!S.CheckParamTable(3) ||
 		!S.CheckParamEnd(4)
@@ -179,18 +164,13 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 	cLuaState::cTableRefPtr callbacks;
 	if (!S.GetStackValues(2, host, callbacks))
 	{
-		LOGWARNING("cNetwork::HostnameToIP() cannot read its parameters, failing the request.");
-		S.LogStackTrace();
-		S.LogStackValues("Values on the stack");
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Cannot read parameters.");
 	}
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Try to look up:
 	bool res = cNetwork::HostnameToIP(host, std::make_shared<cLuaNameLookup>(host, std::move(callbacks)));
 	S.Push(res);
-
 	return 1;
 }
 
@@ -206,7 +186,7 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamString(2) ||
 		!S.CheckParamTable(3) ||
 		!S.CheckParamEnd(4)
@@ -220,18 +200,13 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 	cLuaState::cTableRefPtr callbacks;
 	if (!S.GetStackValues(2, ip, callbacks))
 	{
-		LOGWARNING("cNetwork::IPToHostname() cannot read its parameters, failing the request.");
-		S.LogStackTrace();
-		S.LogStackValues("Values on the stack");
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Cannot read parameters.");
 	}
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Try to look up:
 	bool res = cNetwork::IPToHostName(ip, std::make_shared<cLuaNameLookup>(ip, std::move(callbacks)));
 	S.Push(res);
-
 	return 1;
 }
 
@@ -247,7 +222,7 @@ static int tolua_cNetwork_Listen(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamNumber(2) ||
 		!S.CheckParamTable(3) ||
 		!S.CheckParamEnd(4)
@@ -261,20 +236,13 @@ static int tolua_cNetwork_Listen(lua_State * L)
 	cLuaState::cTableRefPtr callbacks;
 	if (!S.GetStackValues(2, port, callbacks))
 	{
-		LOGWARNING("cNetwork::Listen() cannot read its parameters, failing the request.");
-		S.LogStackTrace();
-		S.LogStackValues("Values on the stack");
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Cannot read parameters");
 	}
 
 	// Check the validity:
 	if ((port < 0) || (port > 65535))
 	{
-		LOGWARNING("cNetwork:Listen() called with invalid port (%d), failing the request.", port);
-		S.LogStackTrace();
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", port);
 	}
 	auto port16 = static_cast<UInt16>(port);
 
@@ -304,7 +272,8 @@ static int tolua_cNetwork_Listen(lua_State * L)
 Close the server and let it deallocate on its own (it's in a SharedPtr). */
 static int tolua_collect_cServerHandle(lua_State * L)
 {
-	cLuaServerHandle * Srv = static_cast<cLuaServerHandle *>(tolua_tousertype(L, 1, nullptr));
+	auto Srv = static_cast<cLuaServerHandle *>(tolua_tousertype(L, 1, nullptr));
+	ASSERT(Srv != nullptr);
 	Srv->Release();
 	return 0;
 }
@@ -321,7 +290,7 @@ static int tolua_cServerHandle_Close(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cServerHandle") ||
+		!S.CheckParamSelf("cServerHandle") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -329,14 +298,8 @@ static int tolua_cServerHandle_Close(lua_State * L)
 	}
 
 	// Get the server handle:
-	cLuaServerHandle * Srv;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cServerHandle:Close(): invalid server handle object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+	auto Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+	ASSERT(Srv != nullptr);  // Checked by CheckParamSelf()
 
 	// Close it:
 	Srv->Close();
@@ -355,7 +318,7 @@ static int tolua_cServerHandle_IsListening(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cServerHandle") ||
+		!S.CheckParamSelf("cServerHandle") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -363,16 +326,10 @@ static int tolua_cServerHandle_IsListening(lua_State * L)
 	}
 
 	// Get the server handle:
-	cLuaServerHandle * Srv;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cServerHandle:IsListening(): invalid server handle object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+	auto Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+	ASSERT(Srv != nullptr);  // Checked by CheckParamSelf()
 
-	// Close it:
+	// Query it:
 	S.Push(Srv->IsListening());
 	return 1;
 }
@@ -392,7 +349,7 @@ static int tolua_cTCPLink_Close(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -400,16 +357,10 @@ static int tolua_cTCPLink_Close(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:Close(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
-	// CLose the link:
+	// Close the link:
 	Link->Close();
 	return 0;
 }
@@ -426,7 +377,7 @@ static int tolua_cTCPLink_GetLocalIP(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -434,14 +385,8 @@ static int tolua_cTCPLink_GetLocalIP(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:GetLocalIP(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the IP:
 	S.Push(Link->GetLocalIP());
@@ -460,7 +405,7 @@ static int tolua_cTCPLink_GetLocalPort(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -468,14 +413,8 @@ static int tolua_cTCPLink_GetLocalPort(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:GetLocalPort(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the Port:
 	S.Push(Link->GetLocalPort());
@@ -494,7 +433,7 @@ static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -502,14 +441,8 @@ static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:GetRemoteIP(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the IP:
 	S.Push(Link->GetRemoteIP());
@@ -528,7 +461,7 @@ static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -536,14 +469,8 @@ static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:GetRemotePort(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the Port:
 	S.Push(Link->GetRemotePort());
@@ -562,7 +489,7 @@ static int tolua_cTCPLink_Send(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamString(2) ||
 		!S.CheckParamEnd(3)
 	)
@@ -571,14 +498,8 @@ static int tolua_cTCPLink_Send(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:Send(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the data to send:
 	AString Data;
@@ -601,7 +522,7 @@ static int tolua_cTCPLink_Shutdown(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -609,14 +530,8 @@ static int tolua_cTCPLink_Shutdown(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:Shutdown(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Shutdown the link:
 	Link->Shutdown();
@@ -635,15 +550,14 @@ static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 
 	// Get the link:
 	cLuaState S(L);
-	if (lua_isnil(L, 1))
+	if (!S.CheckParamSelf("cTCPLink"))
 	{
-		LOGWARNING("cTCPLink:StartTLSClient(): invalid link object. Stack trace:");
-		S.LogStackTrace();
 		return 0;
 	}
 	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
-	// Read the params:
+	// Read the (optional) params:
 	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword;
 	S.GetStackValues(2, OwnCert, OwnPrivKey, OwnPrivKeyPassword);
 
@@ -669,7 +583,7 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamString(2, 4) ||
 		// Param 5 is optional, don't check
 		!S.CheckParamEnd(6)
@@ -679,14 +593,8 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 	}
 
 	// Get the link:
-	cLuaTCPLink * Link;
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cTCPLink:StartTLSServer(): invalid link object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Read the params:
 	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData;
@@ -714,9 +622,9 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 Close the endpoint and let it deallocate on its own (it's in a SharedPtr). */
 static int tolua_collect_cUDPEndpoint(lua_State * L)
 {
-	LOGD("Lua: Collecting cUDPEndpoint");
-	cLuaUDPEndpoint * Endpoint = static_cast<cLuaUDPEndpoint *>(tolua_tousertype(L, 1, nullptr));
-	Endpoint->Release();
+	auto endpoint = static_cast<cLuaUDPEndpoint *>(tolua_tousertype(L, 1, nullptr));
+	ASSERT(endpoint != nullptr);
+	endpoint->Release();
 	return 0;
 }
 
@@ -732,7 +640,7 @@ static int tolua_cUDPEndpoint_Close(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cUDPEndpoint") ||
+		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -740,16 +648,11 @@ static int tolua_cUDPEndpoint_Close(lua_State * L)
 	}
 
 	// Get the endpoint:
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cUDPEndpoint:Close(): invalid endpoint object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	auto Endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	ASSERT(endpoint != nullptr);
 
 	// Close it:
-	Endpoint->Close();
+	endpoint->Close();
 	return 0;
 }
 
@@ -765,7 +668,7 @@ static int tolua_cUDPEndpoint_EnableBroadcasts(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cUDPEndpoint") ||
+		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -773,16 +676,11 @@ static int tolua_cUDPEndpoint_EnableBroadcasts(lua_State * L)
 	}
 
 	// Get the endpoint:
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cUDPEndpoint:EnableBroadcasts(): invalid endpoint object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	auto Endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	ASSERT(endpoint != nullptr);
 
 	// Enable the broadcasts:
-	Endpoint->EnableBroadcasts();
+	endpoint->EnableBroadcasts();
 	return 0;
 }
 
@@ -798,7 +696,7 @@ static int tolua_cUDPEndpoint_GetPort(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cUDPEndpoint") ||
+		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -806,16 +704,11 @@ static int tolua_cUDPEndpoint_GetPort(lua_State * L)
 	}
 
 	// Get the endpoint:
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cUDPEndpoint:GetPort(): invalid endpoint object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	auto Endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	ASSERT(endpoint != nullptr);
 
 	// Get the Port:
-	S.Push(Endpoint->GetPort());
+	S.Push(endpoint->GetPort());
 	return 1;
 }
 
@@ -831,7 +724,7 @@ static int tolua_cUDPEndpoint_IsOpen(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cUDPEndpoint") ||
+		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -839,16 +732,11 @@ static int tolua_cUDPEndpoint_IsOpen(lua_State * L)
 	}
 
 	// Get the endpoint:
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cUDPEndpoint:IsListening(): invalid server handle object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	auto Endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	ASSERT(endpoint != nullptr);
 
 	// Close it:
-	S.Push(Endpoint->IsOpen());
+	S.Push(endpoint->IsOpen());
 	return 1;
 }
 
@@ -860,11 +748,11 @@ static int tolua_cUDPEndpoint_IsOpen(lua_State * L)
 static int tolua_cUDPEndpoint_Send(lua_State * L)
 {
 	// Function signature:
-	// LinkInstance:Send(DataString)
+	// Endpoint:Send(DataString)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cUDPEndpoint") ||
+		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamString(2, 3) ||
 		!S.CheckParamNumber(4) ||
 		!S.CheckParamEnd(5)
@@ -874,30 +762,22 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 	}
 
 	// Get the link:
-	if (lua_isnil(L, 1))
-	{
-		LOGWARNING("cUDPEndpoint:Send(): invalid endpoint object. Stack trace:");
-		S.LogStackTrace();
-		return 0;
-	}
-	auto Endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	ASSERT(endpoint != nullptr);
 
 	// Get the data to send:
-	AString Data, RemotePeer;
-	int RemotePort = 0;
-	S.GetStackValues(2, Data, RemotePeer, RemotePort);
+	AString data, remotePeer;
+	int remotePort = 0;
+	S.GetStackValues(2, data, remotePeer, remotePort);
 
 	// Check the port:
-	if ((RemotePort < 0) || (RemotePort > USHRT_MAX))
+	if ((remotePort < 0) || (remotePort > USHRT_MAX))
 	{
-		LOGWARNING("cUDPEndpoint:Send() called with invalid port (%d), failing.", RemotePort);
-		S.LogStackTrace();
-		S.Push(false);
-		return 1;
+		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", remotePort);
 	}
 
 	// Send the data:
-	S.Push(Endpoint->Send(Data, RemotePeer, static_cast<UInt16>(RemotePort)));
+	S.Push(endpoint->Send(data, remotePeer, static_cast<UInt16>(remotePort)));
 	return 1;
 }
 
@@ -1078,20 +958,14 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 	cLuaState::cCallbackPtr onCompleteBodyCallback;
 	if (!L.GetStackValues(a_UrlStackIdx, url))
 	{
-		L.LogApiCallParamFailure("cUrlClient:Request()", Printf("URL (%d)", a_UrlStackIdx).c_str());
-		L.Push(false);
-		L.Push("Invalid params");
-		return 2;
+		return L.ApiParamError("Cannot read URL parameter at idx %d", a_UrlStackIdx);
 	}
 	cUrlClient::cCallbacksPtr urlClientCallbacks;
 	if (lua_istable(L, a_UrlStackIdx + 1))
 	{
 		if (!L.GetStackValue(a_UrlStackIdx + 1, callbacks))
 		{
-			L.LogApiCallParamFailure("cUrlClient:Request()", Printf("CallbacksTable (%d)", a_UrlStackIdx + 1).c_str());
-			L.Push(false);
-			L.Push("Invalid Callbacks param");
-			return 2;
+			return L.ApiParamError("Cannot read the CallbacksTable parameter at idx %d", a_UrlStackIdx + 1);
 		}
 		urlClientCallbacks = cpp14::make_unique<cFullUrlClientCallbacks>(std::move(callbacks));
 	}
@@ -1099,26 +973,17 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 	{
 		if (!L.GetStackValue(a_UrlStackIdx + 1, onCompleteBodyCallback))
 		{
-			L.LogApiCallParamFailure("cUrlClient:Request()", Printf("CallbacksFn (%d)", a_UrlStackIdx + 1).c_str());
-			L.Push(false);
-			L.Push("Invalid OnCompleteBodyCallback param");
-			return 2;
+			return L.ApiParamError("Cannot read the CallbackFn parameter at idx %d", a_UrlStackIdx + 1);
 		}
 		urlClientCallbacks = cpp14::make_unique<cSimpleUrlClientCallbacks>(std::move(onCompleteBodyCallback));
 	}
 	else
 	{
-		L.LogApiCallParamFailure("cUrlClient:Request()", Printf("Callbacks (%d)", a_UrlStackIdx + 1).c_str());
-		L.Push(false);
-		L.Push("Invalid OnCompleteBodyCallback param");
-		return 2;
+		L.ApiParamError("Invalid Callbacks parameter at %d, expected a table or function, got %s", a_UrlStackIdx + 1, L.GetTypeText(a_UrlStackIdx + 1).c_str());
 	}
 	if (!L.GetStackValues(a_UrlStackIdx + 2, cLuaState::cOptionalParam<AStringMap>(headers), cLuaState::cOptionalParam<AString>(requestBody), cLuaState::cOptionalParam<AStringMap>(options)))
 	{
-		L.LogApiCallParamFailure("cUrlClient:Request()", Printf("Header, Body or Options (%d, %d, %d)", a_UrlStackIdx + 2, a_UrlStackIdx + 3, a_UrlStackIdx + 4).c_str());
-		L.Push(false);
-		L.Push("Invalid params");
-		return 2;
+		L.ApiParamError("Cannot read the Header, Body or Options parameter at idx %d, %d, %d.", a_UrlStackIdx + 2, a_UrlStackIdx + 3, a_UrlStackIdx + 4);
 	}
 
 	// Make the request:
@@ -1207,7 +1072,9 @@ static int tolua_cUrlClient_Request(lua_State * a_LuaState)
 
 	// Check that the Method param is a string:
 	cLuaState L(a_LuaState);
-	if (!L.CheckParamString(2))
+	if (
+		!L.CheckParamStaticSelf("cUrlClient") ||
+		!L.CheckParamString(2))
 	{
 		return 0;
 	}
@@ -1216,10 +1083,7 @@ static int tolua_cUrlClient_Request(lua_State * a_LuaState)
 	AString method;
 	if (!L.GetStackValue(2, method))
 	{
-		L.LogApiCallParamFailure("cUrlClient:Request", "Method (2)");
-		L.Push(cLuaState::Nil);
-		L.Push("Invalid params");
-		return 2;
+		L.ApiParamError("Cannot read the Method parameter");
 	}
 	return tolua_cUrlClient_Request_Common(a_LuaState, method, 3);
 }

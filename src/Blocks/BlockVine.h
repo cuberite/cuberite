@@ -16,7 +16,7 @@ public:
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -73,9 +73,15 @@ public:
 	{
 		switch (a_BlockType)
 		{
-			case E_BLOCK_GLASS:
-			case E_BLOCK_STAINED_GLASS:
 			case E_BLOCK_CHEST:
+			case E_BLOCK_ENDER_CHEST:
+			case E_BLOCK_GLASS:
+			case E_BLOCK_PISTON:
+			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_STAINED_GLASS:
+			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_TRAPPED_CHEST:
 			{
 				// You can't attach a vine to this solid blocks.
@@ -157,7 +163,7 @@ public:
 		}
 	}
 
-	virtual bool DoesIgnoreBuildCollision(void) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}

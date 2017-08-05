@@ -2,7 +2,6 @@
 #pragma once
 
 #include "Entities/Entity.h"
-#include "ChunkDef.h"
 #include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"
@@ -15,22 +14,14 @@
 
 
 
-namespace Json
-{
-	class Value;
-};
-
-
-
 
 
 class cWorld;
 class cClientHandle;
-class cServer;
-class MTRand;
 class cPlayer;
 class cChunkMap;
 class cBeaconEntity;
+class cBedEntity;
 class cBrewingstandEntity;
 class cBoundingBox;
 class cChestEntity;
@@ -42,9 +33,6 @@ class cNoteEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
 class cBlockArea;
-class cPawn;
-class cPickup;
-class cChunkDataSerializer;
 class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
@@ -54,6 +42,7 @@ class cSetChunkData;
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
+typedef cItemCallback<cBedEntity>          cBedCallback;
 typedef cItemCallback<cBrewingstandEntity> cBrewingstandCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
 typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
@@ -317,6 +306,9 @@ public:
 
 	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
 	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
+	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
@@ -609,7 +601,7 @@ private:
 	bool GrowTallGrass      (int a_RelX, int a_RelY, int a_RelZ);
 
 	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
-	bool GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
+	bool GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(cEntity * a_Entity);

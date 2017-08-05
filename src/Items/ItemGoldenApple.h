@@ -20,9 +20,10 @@ public:
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
-		// Feed the player:
-		FoodInfo Info = GetFoodInfo();
-		a_Player->Feed(Info.FoodLevel, Info.Saturation);
+		if (!super::EatItem(a_Player, a_Item))
+		{
+			return false;
+		}
 
 		// Add the effects:
 		a_Player->AddEntityEffect(cEntityEffect::effAbsorption, 2400, 0);
@@ -36,20 +37,14 @@ public:
 			a_Player->AddEntityEffect(cEntityEffect::effFireResistance, 6000, 0);
 		}
 
-		a_Player->GetInventory().RemoveOneEquippedItem();
 		return true;
 	}
 
 
-	virtual FoodInfo GetFoodInfo(void) override
+	virtual FoodInfo GetFoodInfo(const cItem * a_Item) override
 	{
+		UNUSED(a_Item);
 		return FoodInfo(4, 9.6);
-	}
-
-
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) override
-	{
-		return false;
 	}
 
 };

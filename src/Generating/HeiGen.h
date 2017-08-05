@@ -79,7 +79,7 @@ public:
 	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
 
 protected:
-	typedef SharedPtr<cHeiGenCache> cHeiGenCachePtr;
+	typedef std::shared_ptr<cHeiGenCache> cHeiGenCachePtr;
 	typedef std::vector<cHeiGenCachePtr> cHeiGenCachePtrs;
 
 

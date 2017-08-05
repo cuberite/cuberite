@@ -21,6 +21,7 @@ class cEntity;
 class cBlockEntity;
 class cBoat;
 class cBeaconEntity;
+class cBedEntity;
 class cBrewingstandEntity;
 class cChestEntity;
 class cCommandBlockEntity;
@@ -38,9 +39,6 @@ class cFlowerPotEntity;
 class cFallingBlock;
 class cMinecart;
 class cMinecartWithChest;
-class cMinecartWithFurnace;
-class cMinecartWithTNT;
-class cMinecartWithHopper;
 class cMonster;
 class cPickup;
 class cItemGrid;
@@ -50,7 +48,6 @@ class cExpOrb;
 class cHangingEntity;
 class cItemFrame;
 class cPainting;
-class cEntityEffect;
 
 
 
@@ -98,6 +95,7 @@ protected:
 	// Block entities:
 	void AddBasicTileEntity   (cBlockEntity *        a_Entity, const char * a_EntityTypeID);
 	void AddBeaconEntity      (cBeaconEntity *       a_Entity);
+	void AddBedEntity         (cBedEntity *          a_Entity);
 	void AddBrewingstandEntity(cBrewingstandEntity * a_Brewingstand);
 	void AddChestEntity       (cChestEntity *        a_Entity, BLOCKTYPE a_ChestType);
 	void AddDispenserEntity   (cDispenserEntity *    a_Entity);

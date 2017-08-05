@@ -15,7 +15,6 @@
 #include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
 #include "AnvilWindow.h"
-#include "Window.h"
 #include "../CraftingRecipes.h"
 #include "../Root.h"
 #include "../FastRandom.h"
@@ -730,7 +729,6 @@ void cSlotAreaCrafting::UpdateRecipe(cPlayer & a_Player)
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
 	SetSlot(0, a_Player, Recipe.GetResult());
-	m_ParentWindow.SendSlot(a_Player, this, 0);
 }
 
 
@@ -1003,8 +1001,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	NIBBLETYPE BlockMeta;
 	a_Player.GetWorld()->GetBlockTypeMeta(PosX, PosY, PosZ, Block, BlockMeta);
 
-	cFastRandom Random;
-	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && (Random.NextFloat(1.0F) < 0.12F))
+	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
 	{
 		NIBBLETYPE Orientation = BlockMeta & 0x3;
 		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
@@ -1137,7 +1134,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				}
 			}
 
-			// TODO: Add enchantments.
+			// Add the enchantments from the sacrifice to the target
+			int EnchantmentCost = Input.AddEnchantmentsFromItem(SecondInput);
+			NeedExp += EnchantmentCost;
 		}
 	}
 
@@ -1166,8 +1165,6 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 		Input.m_CustomName = RepairedItemName;
 	}
-
-	// TODO: Add enchantment exp cost.
 
 	m_MaximumCost = RepairCost + NeedExp;
 
@@ -1578,8 +1575,8 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 	{
 		int Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15);
 
-		cFastRandom Random;
-		int Base = (Random.GenerateRandomInteger(1, 8) + static_cast<int>(floor(static_cast<float>(Bookshelves / 2)) + Random.GenerateRandomInteger(0, Bookshelves)));
+		auto & Random = GetRandomProvider();
+		int Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
 		int TopSlot = std::max(Base / 3, 1);
 		int MiddleSlot = (Base * 2) / 3 + 1;
 		int BottomSlot = std::max(Base, Bookshelves * 2);
@@ -2523,6 +2520,8 @@ void cSlotAreaTemporary::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem 
 	}
 
 	itr->second[static_cast<size_t>(a_SlotNum)] = a_Item;
+
+	m_ParentWindow.SendSlot(a_Player, this, a_SlotNum);
 }
 
 

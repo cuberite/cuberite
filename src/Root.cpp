@@ -116,14 +116,19 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 	auto consoleLogListener = MakeConsoleListener(m_RunAsService);
 	auto consoleAttachment = cLogger::GetInstance().AttachListener(std::move(consoleLogListener));
-	auto fileLogListenerRet = MakeFileListener();
-	if (!fileLogListenerRet.first)
+
+	cLogger::cAttachment fileAttachment;
+	if (!a_OverridesRepo->HasValue("Server","DisableLogFile"))
 	{
-		m_TerminateEventRaised = true;
-		LOGERROR("Failed to open log file, aborting");
-		return;
+		auto fileLogListenerRet = MakeFileListener();
+		if (!fileLogListenerRet.first)
+		{
+			m_TerminateEventRaised = true;
+			LOGERROR("Failed to open log file, aborting");
+			return;
+		}
+		fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
 	}
-	auto fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
 
 	LOG("--- Started Log ---");
 

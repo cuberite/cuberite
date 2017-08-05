@@ -20,7 +20,7 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override;
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -84,8 +84,8 @@ public:
 	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
 	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
 
-	static void ExtendPiston(Vector3i a_BlockPos, cWorld * a_World);
-	static void RetractPiston(Vector3i a_BlockPos, cWorld * a_World);
+	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
+	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -154,13 +154,13 @@ private:
 
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
 	static bool CanPushBlock(
-		const Vector3i & a_BlockPos, cWorld * a_World, bool a_RequirePushable,
+		const Vector3i & a_BlockPos, cWorld & a_World, bool a_RequirePushable,
 		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 
 	/** Moves a list of blocks in a specific direction */
 	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
-		cWorld * a_World, const Vector3i & a_PushDir
+		cWorld & a_World, const Vector3i & a_PushDir
 	);
 } ;
 
@@ -176,7 +176,7 @@ class cBlockPistonHeadHandler :
 public:
 	cBlockPistonHeadHandler(void);
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{

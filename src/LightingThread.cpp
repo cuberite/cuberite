@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "LightingThread.h"
 #include "ChunkMap.h"
-#include "ChunkStay.h"
 #include "World.h"
 
 
@@ -361,6 +360,12 @@ void cLightingThread::PrepareSkyLight(void)
 	memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
 	m_NumSeeds = 0;
 
+	// Fill the top of the chunk with all-light:
+	if (m_MaxHeight < cChunkDef::Height - 1)
+	{
+		std::fill(m_SkyLight + (m_MaxHeight + 1) * BlocksPerYLayer, m_SkyLight + ARRAYCOUNT(m_SkyLight), 15);
+	}
+
 	// Walk every column that has all XZ neighbors
 	for (int z = 1; z < cChunkDef::Width * 3 - 1; z++)
 	{
@@ -368,15 +373,26 @@ void cLightingThread::PrepareSkyLight(void)
 		for (int x = 1; x < cChunkDef::Width * 3 - 1; x++)
 		{
 			int idx = BaseZ + x;
-			int Current   = m_HeightMap[idx] + 1;
+			// Find the lowest block in this column that receives full sunlight (go through transparent blocks):
+			int Current = m_HeightMap[idx];
+			ASSERT(Current < cChunkDef::Height);
+			while (
+				(Current >= 0) &&
+				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer])
+			)
+			{
+				Current -= 1;  // Sunlight goes down unchanged through this block
+			}
+			Current += 1;  // Point to the last sunlit block, rather than the first non-transparent one
+			// The other neighbors don't need transparent-block-checking. At worst we'll have a few dud seeds above the ground.
 			int Neighbor1 = m_HeightMap[idx + 1] + 1;  // X + 1
 			int Neighbor2 = m_HeightMap[idx - 1] + 1;  // X - 1
 			int Neighbor3 = m_HeightMap[idx + cChunkDef::Width * 3] + 1;  // Z + 1
 			int Neighbor4 = m_HeightMap[idx - cChunkDef::Width * 3] + 1;  // Z - 1
 			int MaxNeighbor = std::max(std::max(Neighbor1, Neighbor2), std::max(Neighbor3, Neighbor4));  // Maximum of the four neighbors
 
-			// Fill the column from the top down to Current with all-light:
-			for (int y = cChunkDef::Height - 1, Index = idx + y * BlocksPerYLayer; y >= Current; y--, Index -= BlocksPerYLayer)
+			// Fill the column from m_MaxHeight to Current with all-light:
+			for (int y = m_MaxHeight, Index = idx + y * BlocksPerYLayer; y >= Current; y--, Index -= BlocksPerYLayer)
 			{
 				m_SkyLight[Index] = 15;
 			}
@@ -403,43 +419,7 @@ void cLightingThread::PrepareSkyLight(void)
 
 
 
-void cLightingThread::PrepareBlockLight(void)
-{
-	// Clear seeds:
-	memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
-	memset(m_IsSeed2, 0, sizeof(m_IsSeed2));
-	m_NumSeeds = 0;
-
-	// Walk every column that has all XZ neighbors, make a seed for each light-emitting block:
-	for (int z = 1; z < cChunkDef::Width * 3 - 1; z++)
-	{
-		int BaseZ = z * cChunkDef::Width * 3;
-		for (int x = 1; x < cChunkDef::Width * 3 - 1; x++)
-		{
-			int idx = BaseZ + x;
-			for (int y = m_HeightMap[idx], Index = idx + y * BlocksPerYLayer; y >= 0; y--, Index -= BlocksPerYLayer)
-			{
-				if (cBlockInfo::GetLightValue(m_BlockTypes[Index]) == 0)
-				{
-					continue;
-				}
-
-				// Add current block as a seed:
-				m_IsSeed1[Index] = true;
-				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(Index);
-
-				// Light it up:
-				m_BlockLight[Index] = cBlockInfo::GetLightValue(m_BlockTypes[Index]);
-			}
-		}
-	}
-}
-
-
-
-
-
-void cLightingThread::PrepareBlockLight2(void)
+void cLightingThread::PrepareBlockLight()
 {
 	// Clear seeds:
 	memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
@@ -447,35 +427,20 @@ void cLightingThread::PrepareBlockLight2(void)
 	m_NumSeeds = 0;
 
 	// Add each emissive block into the seeds:
-	for (int y = 0; y < m_MaxHeight; y++)
+	for (int Idx = 0; Idx < (m_MaxHeight * BlocksPerYLayer); ++Idx)
 	{
-		int BaseY = y * BlocksPerYLayer;  // Partial offset into m_BlockTypes for the Y coord
-		for (int z = 1; z < cChunkDef::Width * 3 - 1; z++)
+		if (cBlockInfo::GetLightValue(m_BlockTypes[Idx]) == 0)
 		{
-			int HBaseZ = z * cChunkDef::Width * 3;  // Partial offset into m_Heightmap for the Z coord
-			int BaseZ = BaseY + HBaseZ;  // Partial offset into m_BlockTypes for the Y and Z coords
-			for (int x = 1; x < cChunkDef::Width * 3 - 1; x++)
-			{
-				int idx = BaseZ + x;
-				if (y > m_HeightMap[HBaseZ + x])
-				{
-					// We're above the heightmap, ignore the block
-					continue;
-				}
-				if (cBlockInfo::GetLightValue(m_BlockTypes[idx]) == 0)
-				{
-					// Not a light-emissive block
-					continue;
-				}
-
-				// Add current block as a seed:
-				m_IsSeed1[idx] = true;
-				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(idx);
-
-				// Light it up:
-				m_BlockLight[idx] = cBlockInfo::GetLightValue(m_BlockTypes[idx]);
-			}
+			// Not a light-emissive block
+			continue;
 		}
+
+		// Add current block as a seed:
+		m_IsSeed1[Idx] = true;
+		m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(Idx);
+
+		// Light it up:
+		m_BlockLight[Idx] = cBlockInfo::GetLightValue(m_BlockTypes[Idx]);
 	}
 }
 
@@ -521,7 +486,6 @@ void cLightingThread::CalcLightStep(
 		UInt32 SeedIdx = static_cast<UInt32>(a_SeedIdxIn[i]);
 		int SeedX = SeedIdx % (cChunkDef::Width * 3);
 		int SeedZ = (SeedIdx / (cChunkDef::Width * 3)) % (cChunkDef::Width * 3);
-		int SeedY = SeedIdx / BlocksPerYLayer;
 
 		// Propagate seed:
 		if (SeedX < cChunkDef::Width * 3 - 1)
@@ -540,13 +504,13 @@ void cLightingThread::CalcLightStep(
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx - cChunkDef::Width * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedY < cChunkDef::Height - 1)
+		if (SeedIdx < (cChunkDef::Height - 1) * BlocksPerYLayer)
 		{
-			PropagateLight(a_Light, SeedIdx, SeedIdx + cChunkDef::Width * cChunkDef::Width * 3 * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
+			PropagateLight(a_Light, SeedIdx, SeedIdx + BlocksPerYLayer, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedY > 0)
+		if (SeedIdx >= BlocksPerYLayer)
 		{
-			PropagateLight(a_Light, SeedIdx, SeedIdx - cChunkDef::Width * cChunkDef::Width * 3 * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
+			PropagateLight(a_Light, SeedIdx, SeedIdx - BlocksPerYLayer, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
 	}  // for i - a_SeedIdxIn[]
 	a_NumSeedsOut = NumSeedsOut;

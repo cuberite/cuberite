@@ -1,7 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include <cmath>
 #include <unordered_map>
 
 #include "Player.h"
@@ -11,14 +10,12 @@
 #include "../Server.h"
 #include "../UI/InventoryWindow.h"
 #include "../UI/WindowOwner.h"
-#include "../World.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../Root.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
-#include "../Vector3.h"
 #include "../FastRandom.h"
 #include "../ClientHandle.h"
 
@@ -146,8 +143,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		m_IsFlying = true;
 		m_bVisible = false;
 	}
-
-	cRoot::Get()->GetServer()->PlayerCreated(this);
 }
 
 
@@ -182,9 +177,6 @@ cPlayer::~cPlayer(void)
 	}
 
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
-
-	// Notify the server that the player is being destroyed
-	cRoot::Get()->GetServer()->PlayerDestroying(this);
 
 	SaveToDisk();
 
@@ -940,6 +932,22 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 
 
+void cPlayer::ApplyArmorDamage(int DamageBlocked)
+{
+	short ArmorDamage = static_cast<short>(DamageBlocked / 4);
+	if (ArmorDamage == 0)
+	{
+		ArmorDamage = 1;
+	}
+	m_Inventory.DamageItem(cInventory::invArmorOffset + 0, ArmorDamage);
+	m_Inventory.DamageItem(cInventory::invArmorOffset + 1, ArmorDamage);
+	m_Inventory.DamageItem(cInventory::invArmorOffset + 2, ArmorDamage);
+	m_Inventory.DamageItem(cInventory::invArmorOffset + 3, ArmorDamage);
+}
+
+
+
+
 
 bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
@@ -976,6 +984,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		AddFoodExhaustion(0.3f);
 		SendHealth();
 
+		// Tell the wolves
 		if (a_TDI.Attacker != nullptr)
 		{
 			if (a_TDI.Attacker->IsPawn())
@@ -1069,9 +1078,9 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		{
 			case dtRangedAttack: DamageText = "was shot"; break;
 			case dtLightning: DamageText = "was plasmified by lightining"; break;
-			case dtFalling: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "fell to death" : "hit the ground too hard"; break;
+			case dtFalling: DamageText = GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard"; break;
 			case dtDrowning: DamageText = "drowned"; break;
-			case dtSuffocating: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "git merge'd into a block" : "fused with a block"; break;
+			case dtSuffocating: DamageText = GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block"; break;
 			case dtStarving: DamageText = "forgot the importance of food"; break;
 			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
 			case dtLavaContact: DamageText = "was melted by lava"; break;
@@ -1310,15 +1319,15 @@ cTeam * cPlayer::UpdateTeam(void)
 
 
 
-void cPlayer::OpenWindow(cWindow * a_Window)
+void cPlayer::OpenWindow(cWindow & a_Window)
 {
-	if (a_Window != m_CurrentWindow)
+	if (&a_Window != m_CurrentWindow)
 	{
 		CloseWindow(false);
 	}
-	a_Window->OpenedByPlayer(*this);
-	m_CurrentWindow = a_Window;
-	a_Window->SendWholeWindow(*GetClientHandle());
+	a_Window.OpenedByPlayer(*this);
+	m_CurrentWindow = &a_Window;
+	a_Window.SendWholeWindow(*GetClientHandle());
 }
 
 
@@ -1868,6 +1877,19 @@ AString cPlayer::GetPlayerListName(void) const
 
 
 
+void cPlayer::SetDraggingItem(const cItem & a_Item)
+{
+	if (GetWindow() != nullptr)
+	{
+		m_DraggingItem = a_Item;
+		GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
+	}
+}
+
+
+
+
+
 void cPlayer::TossEquippedItem(char a_Amount)
 {
 	cItems Drops;
@@ -2295,18 +2317,17 @@ void cPlayer::UseEquippedItem(int a_Amount)
 	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
 	if (UnbreakingLevel > 0)
 	{
-		int chance;
+		double chance = 0.0;
 		if (ItemCategory::IsArmor(Item.m_ItemType))
 		{
-			chance = 60 + (40 / (UnbreakingLevel + 1));
+			chance = 0.6 + (0.4 / (UnbreakingLevel + 1));
 		}
 		else
 		{
-			chance = 100 / (UnbreakingLevel + 1);
+			chance = 1.0 / (UnbreakingLevel + 1);
 		}
 
-		cFastRandom Random;
-		if (Random.NextInt(101) <= chance)
+		if (GetRandomProvider().RandBool(chance))
 		{
 			return;
 		}
@@ -2617,8 +2638,103 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 
 
 
+bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
+{
+	// Compute the bounding box for each block to be placed
+	std::vector<cBoundingBox> PlacementBoxes;
+	cBoundingBox PlacingBounds(0, 0, 0, 0, 0, 0);
+	bool HasInitializedBounds = false;
+	for (auto blk: a_Blocks)
+	{
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(blk.m_BlockType);
+		int x = blk.GetX();
+		int y = blk.GetY();
+		int z = blk.GetZ();
+		cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
+			m_World->GetBlock(x - 1, y, z),
+			m_World->GetBlock(x + 1, y, z),
+			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock(x, y - 1, z),
+			(y == cChunkDef::Height - 1) ? E_BLOCK_AIR : m_World->GetBlock(x, y + 1, z),
+			m_World->GetBlock(x, y, z - 1),
+			m_World->GetBlock(x, y, z + 1)
+		);
+		BlockBox.Move(x, y, z);
+
+		PlacementBoxes.push_back(BlockBox);
+
+		if (HasInitializedBounds)
+		{
+			PlacingBounds = PlacingBounds.Union(BlockBox);
+		}
+		else
+		{
+			PlacingBounds = BlockBox;
+			HasInitializedBounds = true;
+		}
+	}
+
+	cWorld * World = GetWorld();
+
+	// Check to see if any entity intersects any block being placed
+	class DoesIntersectBlock : public cEntityCallback
+	{
+	public:
+		const std::vector<cBoundingBox> & m_BoundingBoxes;
+
+		// The distance inside the block the entity can still be.
+		const double EPSILON = 0.0005;
+
+		DoesIntersectBlock(const std::vector<cBoundingBox> & a_BoundingBoxes) :
+			m_BoundingBoxes(a_BoundingBoxes)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if (!a_Entity->DoesPreventBlockPlacement())
+			{
+				return false;
+			}
+			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+			for (auto BlockBox: m_BoundingBoxes)
+			{
+
+				// Put in a little bit of wiggle room
+				BlockBox.Expand(-EPSILON, -EPSILON, -EPSILON);
+				if (EntBox.DoesIntersect(BlockBox))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	} Callback(PlacementBoxes);
+
+	// See if any entities in that bounding box collide with anyone
+	if (!World->ForEachEntityInBox(PlacingBounds, Callback))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+
+
+
 bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 {
+	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
+	{
+		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
+		for (auto blk2: a_Blocks)
+		{
+			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
+		}
+		return false;
+	}
+
 	// Call the "placing" hooks; if any fail, abort:
 	cPluginManager * pm = cPluginManager::Get();
 	for (auto blk: a_Blocks)
@@ -2628,7 +2744,7 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
 			for (auto blk2: a_Blocks)
 			{
-				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), this);
+				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
 			}
 			return false;
 		}
@@ -2642,7 +2758,7 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 	for (auto blk: a_Blocks)
 	{
 		cBlockHandler * newBlock = BlockHandler(blk.m_BlockType);
-		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, this, blk);
+		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
 	}
 
 	// Call the "placed" hooks:
@@ -2847,15 +2963,17 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 		}
 	}
 
-	if (HasEntityEffect(cEntityEffect::effHaste))
+	auto Haste = GetEntityEffect(cEntityEffect::effHaste);
+	if (Haste != nullptr)
 	{
-		int intensity = GetEntityEffect(cEntityEffect::effHaste)->GetIntensity() + 1;
+		int intensity = Haste->GetIntensity() + 1;
 		f *= 1.0f + (intensity * 0.2f);
 	}
 
-	if (HasEntityEffect(cEntityEffect::effMiningFatigue))
+	auto MiningFatigue = GetEntityEffect(cEntityEffect::effMiningFatigue);
+	if (MiningFatigue != nullptr)
 	{
-		int intensity = GetEntityEffect(cEntityEffect::effMiningFatigue)->GetIntensity();
+		int intensity = MiningFatigue->GetIntensity();
 		switch (intensity)
 		{
 			case 0:  f *= 0.3f;     break;

@@ -21,12 +21,12 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
 	{
-		cFastRandom rand;
+		auto & rand = GetRandomProvider();
 
 		if (a_Meta == 0x3)
 		{
 			// Fully grown, drop the entire produce:
-			a_Pickups.push_back(cItem(E_ITEM_NETHER_WART, static_cast<char>(1 + (rand.NextInt(3) + rand.NextInt(3))) / 2, 0));
+			a_Pickups.emplace_back(E_ITEM_NETHER_WART, 1 + (rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2, 0);
 		}
 		else
 		{

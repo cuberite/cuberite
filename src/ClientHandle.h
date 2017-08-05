@@ -11,8 +11,6 @@
 
 #include "OSSupport/Network.h"
 #include "Defines.h"
-#include "Vector3.h"
-#include "ChunkDef.h"
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
 #include "Map.h"
@@ -23,15 +21,12 @@
 #include "EffectID.h"
 
 
-#include <array>
-#include <atomic>
+
 
 
 // fwd:
 class cChunkDataSerializer;
-class cInventory;
 class cMonster;
-class cPawn;
 class cExpOrb;
 class cPainting;
 class cPickup;
@@ -39,12 +34,10 @@ class cPlayer;
 class cProtocol;
 class cWindow;
 class cFallingBlock;
-class cItemHandler;
-class cWorld;
 class cCompositeChat;
 class cStatManager;
 class cClientHandle;
-typedef SharedPtr<cClientHandle> cClientHandlePtr;
+typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
 
 
@@ -405,7 +398,7 @@ private:
 	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
 	cChunkCoordsList                                   m_SentChunks;    // Chunks that are currently sent to the client
 
-	cProtocol * m_Protocol;
+	std::unique_ptr<cProtocol> m_Protocol;
 
 	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;

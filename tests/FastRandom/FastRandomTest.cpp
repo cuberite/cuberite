@@ -15,14 +15,13 @@ static void TestInts(void)
 	cFastRandom rnd;
 	int sum = 0;
 	const int BUCKETS = 8;
-	int Counts[BUCKETS];
-	memset(Counts, 0, sizeof(Counts));
+	int Counts[BUCKETS] = {0};
 	const int ITER = 10000;
 	for (int i = 0; i < ITER; i++)
 	{
-		int v = rnd.NextInt(1000);
+		int v = rnd.RandInt(1000);
 		assert_test(v >= 0);
-		assert_test(v < 1000);
+		assert_test(v <= 1000);
 		Counts[v % BUCKETS]++;
 		sum += v;
 	}
@@ -43,12 +42,11 @@ static void TestFloats(void)
 	cFastRandom rnd;
 	float sum = 0;
 	const int BUCKETS = 8;
-	int Counts[BUCKETS];
-	memset(Counts, 0, sizeof(Counts));
+	int Counts[BUCKETS] = {0};
 	const int ITER = 10000;
 	for (int i = 0; i < ITER; i++)
 	{
-		float v = rnd.NextFloat(1000);
+		float v = rnd.RandReal(1000.0f);
 		assert_test(v >= 0);
 		assert_test(v <= 1000);
 		Counts[static_cast<int>(v) % BUCKETS]++;
@@ -76,7 +74,7 @@ static void TestReCreation(void)
 	for (int i = 0; i < ITER; ++i)
 	{
 		cFastRandom rnd;
-		int val = rnd.NextInt(10);
+		int val = rnd.RandInt(9);
 		if (val == lastVal)
 		{
 			numSame += 1;

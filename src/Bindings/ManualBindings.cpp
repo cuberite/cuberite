@@ -5,7 +5,6 @@
 #undef TOLUA_TEMPLATE_BIND
 #include <sstream>
 #include <iomanip>
-#include <array>
 #include "tolua++/include/tolua++.h"
 #include "polarssl/md5.h"
 #include "polarssl/sha1.h"
@@ -31,7 +30,6 @@
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../Generating/ChunkDesc.h"
 #include "../LineBlockTracer.h"
-#include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
 #include "../StringCompression.h"
 #include "../CommandOutput.h"
@@ -3199,324 +3197,6 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 
 
 
-static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * tolua_S)
-{
-	// function cBlockArea::GetBlockTypeMeta()
-	// Exported manually because tolua generates extra input params for the outputs
-
-	cLuaState L(tolua_S);
-	if (
-		!L.CheckParamUserType(1, "cBlockArea") ||
-		!L.CheckParamNumber  (2, 4)
-	)
-	{
-		return 0;
-	}
-
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetRelBlockTypeMeta'", nullptr);
-		return 0;
-	}
-	int BlockX = static_cast<int>(tolua_tonumber(tolua_S, 2, 0));
-	int BlockY = static_cast<int>(tolua_tonumber(tolua_S, 3, 0));
-	int BlockZ = static_cast<int>(tolua_tonumber(tolua_S, 4, 0));
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	self->GetBlockTypeMeta(BlockX, BlockY, BlockZ, BlockType, BlockMeta);
-	tolua_pushnumber(tolua_S, BlockType);
-	tolua_pushnumber(tolua_S, BlockMeta);
-	return 2;
-}
-
-
-
-
-
-static int tolua_cBlockArea_GetOrigin(lua_State * tolua_S)
-{
-	// function cBlockArea::GetOrigin()
-	// Returns all three coords of the origin point
-	// Exported manually because there's no direct C++ equivalent,
-	// plus tolua would generate extra input params for the outputs
-
-	cLuaState L(tolua_S);
-	if (!L.CheckParamUserType(1, "cBlockArea"))
-	{
-		return 0;
-	}
-
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetOrigin'", nullptr);
-		return 0;
-	}
-
-	// Push the three origin coords:
-	lua_pushnumber(tolua_S, self->GetOriginX());
-	lua_pushnumber(tolua_S, self->GetOriginY());
-	lua_pushnumber(tolua_S, self->GetOriginZ());
-	return 3;
-}
-
-
-
-
-
-static int tolua_cBlockArea_GetNonAirCropRelCoords(lua_State * tolua_S)
-{
-	// function cBlockArea::GetNonAirCropRelCoords()
-	// Exported manually because tolua would generate extra input params for the outputs
-
-	cLuaState L(tolua_S);
-	if (!L.CheckParamUserType(1, "cBlockArea"))
-	{
-		return 0;
-	}
-
-	cBlockArea * self = nullptr;
-	BLOCKTYPE IgnoreBlockType = E_BLOCK_AIR;
-	L.GetStackValues(1, self, IgnoreBlockType);
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetNonAirCropRelCoords'", nullptr);
-		return 0;
-	}
-
-	// Calculate the crop coords:
-	int MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ;
-	self->GetNonAirCropRelCoords(MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ, IgnoreBlockType);
-
-	// Push the six crop coords:
-	L.Push(MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ);
-	return 6;
-}
-
-
-
-
-
-static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * tolua_S)
-{
-	// function cBlockArea::GetRelBlockTypeMeta()
-	// Exported manually because tolua generates extra input params for the outputs
-
-	cLuaState L(tolua_S);
-	if (
-		!L.CheckParamUserType(1, "cBlockArea") ||
-		!L.CheckParamNumber  (2, 4)
-	)
-	{
-		return 0;
-	}
-
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetRelBlockTypeMeta'", nullptr);
-		return 0;
-	}
-	int BlockX = static_cast<int>(tolua_tonumber(tolua_S, 2, 0));
-	int BlockY = static_cast<int>(tolua_tonumber(tolua_S, 3, 0));
-	int BlockZ = static_cast<int>(tolua_tonumber(tolua_S, 4, 0));
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	self->GetRelBlockTypeMeta(BlockX, BlockY, BlockZ, BlockType, BlockMeta);
-	tolua_pushnumber(tolua_S, BlockType);
-	tolua_pushnumber(tolua_S, BlockMeta);
-	return 2;
-}
-
-
-
-
-
-static int tolua_cBlockArea_GetSize(lua_State * tolua_S)
-{
-	// function cBlockArea::GetSize()
-	// Returns all three sizes of the area
-	// Exported manually because there's no direct C++ equivalent,
-	// plus tolua would generate extra input params for the outputs
-
-	cLuaState L(tolua_S);
-	if (!L.CheckParamUserType(1, "cBlockArea"))
-	{
-		return 0;
-	}
-
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetSize'", nullptr);
-		return 0;
-	}
-
-	// Push the three origin coords:
-	lua_pushnumber(tolua_S, self->GetSizeX());
-	lua_pushnumber(tolua_S, self->GetSizeY());
-	lua_pushnumber(tolua_S, self->GetSizeZ());
-	return 3;
-}
-
-
-
-
-
-static int tolua_cBlockArea_GetCoordRange(lua_State * tolua_S)
-{
-	// function cBlockArea::GetCoordRange()
-	// Returns all three sizes of the area, miuns one, so that they represent the maximum coord value
-	// Exported manually because there's no direct C++ equivalent,
-	// plus tolua would generate extra input params for the outputs
-
-	cLuaState L(tolua_S);
-	if (!L.CheckParamUserType(1, "cBlockArea"))
-	{
-		return 0;
-	}
-
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetSize'", nullptr);
-		return 0;
-	}
-
-	// Push the three origin coords:
-	lua_pushnumber(tolua_S, self->GetSizeX() - 1);
-	lua_pushnumber(tolua_S, self->GetSizeY() - 1);
-	lua_pushnumber(tolua_S, self->GetSizeZ() - 1);
-	return 3;
-}
-
-
-
-
-
-static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
-{
-	// function cBlockArea::LoadFromSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerializer.cpp
-	cLuaState L(tolua_S);
-	if (
-		!L.CheckParamUserType(1, "cBlockArea") ||
-		!L.CheckParamString  (2) ||
-		!L.CheckParamEnd     (3)
-	)
-	{
-		return 0;
-	}
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::LoadFromSchematicFile'", nullptr);
-		return 0;
-	}
-
-	AString Filename = tolua_tostring(tolua_S, 2, 0);
-	bool res = cSchematicFileSerializer::LoadFromSchematicFile(*self, Filename);
-	tolua_pushboolean(tolua_S, res);
-	return 1;
-}
-
-
-
-
-
-static int tolua_cBlockArea_LoadFromSchematicString(lua_State * tolua_S)
-{
-	// function cBlockArea::LoadFromSchematicString
-	// Exported manually because function has been moved to SchematicFileSerializer.cpp
-	cLuaState L(tolua_S);
-	if (
-		!L.CheckParamUserType(1, "cBlockArea") ||
-		!L.CheckParamString  (2) ||
-		!L.CheckParamEnd     (3)
-	)
-	{
-		return 0;
-	}
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::LoadFromSchematicFile'", nullptr);
-		return 0;
-	}
-
-	AString Data;
-	L.GetStackValue(2, Data);
-	bool res = cSchematicFileSerializer::LoadFromSchematicString(*self, Data);
-	tolua_pushboolean(tolua_S, res);
-	return 1;
-}
-
-
-
-
-
-static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
-{
-	// function cBlockArea::SaveToSchematicFile
-	// Exported manually because function has been moved to SchematicFileSerializer.cpp
-	cLuaState L(tolua_S);
-	if (
-		!L.CheckParamUserType(1, "cBlockArea") ||
-		!L.CheckParamString  (2) ||
-		!L.CheckParamEnd     (3)
-	)
-	{
-		return 0;
-	}
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::SaveToSchematicFile'", nullptr);
-		return 0;
-	}
-	AString Filename = tolua_tostring(tolua_S, 2, 0);
-	bool res = cSchematicFileSerializer::SaveToSchematicFile(*self, Filename);
-	tolua_pushboolean(tolua_S, res);
-	return 1;
-}
-
-
-
-
-
-static int tolua_cBlockArea_SaveToSchematicString(lua_State * tolua_S)
-{
-	// function cBlockArea::SaveToSchematicString
-	// Exported manually because function has been moved to SchematicFileSerializer.cpp
-	cLuaState L(tolua_S);
-	if (
-		!L.CheckParamUserType(1, "cBlockArea") ||
-		!L.CheckParamEnd     (2)
-	)
-	{
-		return 0;
-	}
-	cBlockArea * self = reinterpret_cast<cBlockArea *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
-	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea::SaveToSchematicFile'", nullptr);
-		return 0;
-	}
-
-	AString Data;
-	if (cSchematicFileSerializer::SaveToSchematicString(*self, Data))
-	{
-		L.Push(Data);
-		return 1;
-	}
-	return 0;
-}
-
-
-
-
-
 static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 {
 	/* Function signatures:
@@ -3610,6 +3290,24 @@ static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
 	self->GetBlockTypeMeta(relX, relY, relZ, blockType, blockMeta);
 	L.Push(blockType, blockMeta);
 	return 2;
+}
+
+
+
+
+
+static int tolua_cColor_GetColor(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	cColor * self;
+	if (!L.CheckParamSelf("cColor") || !L.GetStackValue(1, self))
+	{
+		return 0;
+	}
+
+	L.Push(self->GetRed(), self->GetGreen(), self->GetBlue());
+	return 3;
 }
 
 
@@ -4031,19 +3729,6 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "Base64Decode",          tolua_Base64Decode);
 		tolua_function(tolua_S, "md5",                   tolua_md5_obsolete);  // OBSOLETE, use cCryptoHash.md5() instead
 
-		tolua_beginmodule(tolua_S, "cBlockArea");
-			tolua_function(tolua_S, "GetBlockTypeMeta",        tolua_cBlockArea_GetBlockTypeMeta);
-			tolua_function(tolua_S, "GetCoordRange",           tolua_cBlockArea_GetCoordRange);
-			tolua_function(tolua_S, "GetOrigin",               tolua_cBlockArea_GetOrigin);
-			tolua_function(tolua_S, "GetNonAirCropRelCoords",  tolua_cBlockArea_GetNonAirCropRelCoords);
-			tolua_function(tolua_S, "GetRelBlockTypeMeta",     tolua_cBlockArea_GetRelBlockTypeMeta);
-			tolua_function(tolua_S, "GetSize",                 tolua_cBlockArea_GetSize);
-			tolua_function(tolua_S, "LoadFromSchematicFile",   tolua_cBlockArea_LoadFromSchematicFile);
-			tolua_function(tolua_S, "LoadFromSchematicString", tolua_cBlockArea_LoadFromSchematicString);
-			tolua_function(tolua_S, "SaveToSchematicFile",     tolua_cBlockArea_SaveToSchematicFile);
-			tolua_function(tolua_S, "SaveToSchematicString",   tolua_cBlockArea_SaveToSchematicString);
-		tolua_endmodule(tolua_S);
-
 		tolua_beginmodule(tolua_S, "cBoundingBox");
 			tolua_function(tolua_S, "CalcLineIntersection", tolua_cBoundingBox_CalcLineIntersection);
 			tolua_function(tolua_S, "Intersect",            tolua_cBoundingBox_Intersect);
@@ -4057,6 +3742,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cColor");
+			tolua_function(tolua_S, "GetColor", tolua_cColor_GetColor);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");
@@ -4228,6 +3917,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		BindNetwork(tolua_S);
 		BindRankManager(tolua_S);
 		BindWorld(tolua_S);
+		BindBlockArea(tolua_S);
 
 	tolua_endmodule(tolua_S);
 }

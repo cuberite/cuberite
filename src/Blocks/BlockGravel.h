@@ -18,8 +18,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		cFastRandom Random;
-		if (Random.NextInt(10) == 0)
+		if (GetRandomProvider().RandBool(0.10))
 		{
 			a_Pickups.Add(E_ITEM_FLINT, 1, 0);
 		}

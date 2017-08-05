@@ -35,8 +35,9 @@ extern "C"
 	#include "lua/src/lauxlib.h"
 }
 
-#include <atomic>
-#include "../Vector3.h"
+
+#include <functional>
+
 #include "../Defines.h"
 #include "PluginManager.h"
 #include "LuaState_Typedefs.inc"
@@ -45,7 +46,6 @@ extern "C"
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
-class cPluginLua;
 class cDeadlockDetect;
 
 
@@ -77,7 +77,7 @@ public:
 				}
 			}
 
-			~cStackBalanceCheck()
+			~cStackBalanceCheck() CAN_THROW
 			{
 				auto currStackPos = lua_gettop(m_LuaState);
 				if (currStackPos != m_StackPos)
@@ -104,6 +104,41 @@ public:
 	#else
 		#define ASSERT_LUA_STACK_BALANCE(...)
 	#endif
+
+
+	/** Makes sure that the Lua state's stack has the same number of elements on destruction as it had on construction of this object (RAII).
+	Can only remove elements, if there are less than expected, throws. */
+	class cStackBalancePopper
+	{
+	public:
+		cStackBalancePopper(cLuaState & a_LuaState):
+			m_LuaState(a_LuaState),
+			m_Count(lua_gettop(a_LuaState))
+		{
+		}
+
+		~cStackBalancePopper() CAN_THROW
+		{
+			auto curTop = lua_gettop(m_LuaState);
+			if (curTop > m_Count)
+			{
+				// There are some leftover elements, adjust the stack:
+				m_LuaState.LogStackValues(Printf("Re-balancing Lua stack, expected %d values, got %d:", m_Count, curTop).c_str());
+				lua_pop(m_LuaState, curTop - m_Count);
+			}
+			else if (curTop < m_Count)
+			{
+				// This is an irrecoverable error, rather than letting the Lua engine crash undefinedly later on, abort now:
+				LOGERROR("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop);
+				throw std::runtime_error(Printf("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop));
+			}
+		}
+
+	protected:
+		cLuaState & m_LuaState;
+		int m_Count;
+	};
+
 
 	/** Provides a RAII-style locking for the LuaState.
 	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
@@ -235,8 +270,8 @@ public:
 		Use a smart pointer for a copyable object. */
 		cTrackedRef(cTrackedRef &&) = delete;
 	};
-	typedef UniquePtr<cTrackedRef> cTrackedRefPtr;
-	typedef SharedPtr<cTrackedRef> cTrackedRefSharedPtr;
+	typedef std::unique_ptr<cTrackedRef> cTrackedRefPtr;
+	typedef std::shared_ptr<cTrackedRef> cTrackedRefSharedPtr;
 
 
 	/** Represents a stored callback to Lua that C++ code can call.
@@ -289,8 +324,8 @@ public:
 		Use cCallbackPtr for a copyable object. */
 		cCallback(cCallback &&) = delete;
 	};
-	typedef UniquePtr<cCallback> cCallbackPtr;
-	typedef SharedPtr<cCallback> cCallbackSharedPtr;
+	typedef std::unique_ptr<cCallback> cCallbackPtr;
+	typedef std::shared_ptr<cCallback> cCallbackSharedPtr;
 
 
 	/** Same thing as cCallback, but GetStackValue() won't fail if the callback value is nil.
@@ -319,7 +354,7 @@ public:
 		Use cCallbackPtr for a copyable object. */
 		cOptionalCallback(cOptionalCallback &&) = delete;
 	};
-	typedef UniquePtr<cOptionalCallback> cOptionalCallbackPtr;
+	typedef std::unique_ptr<cOptionalCallback> cOptionalCallbackPtr;
 
 
 	/** Represents a stored Lua table with callback functions that C++ code can call.
@@ -381,7 +416,7 @@ public:
 		Returns true on success, false on failure (not a table at the specified stack pos). */
 		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
 	};
-	typedef UniquePtr<cTableRef> cTableRefPtr;
+	typedef std::unique_ptr<cTableRef> cTableRefPtr;
 
 
 	/** Represents a parameter that is optional - calling a GetStackValue() with this object will not fail if the value on the Lua stack is nil.
@@ -441,7 +476,7 @@ public:
 			std::swap(m_StackLen, a_Src.m_StackLen);
 		}
 
-		~cStackValue()
+		~cStackValue() CAN_THROW
 		{
 			if (m_LuaState != nullptr)
 			{
@@ -504,7 +539,7 @@ public:
 		/** The stack index where the table resides in the Lua state. */
 		int m_StackPos;
 	};
-	typedef UniquePtr<cStackTable> cStackTablePtr;
+	typedef std::unique_ptr<cStackTable> cStackTablePtr;
 
 
 	/** Creates a new instance. The LuaState is not initialized.
@@ -704,7 +739,7 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
-		ASSERT_LUA_STACK_BALANCE(m_LuaState);
+		cStackBalancePopper balancer(*this);
 		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
 		{
@@ -753,6 +788,14 @@ public:
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);
 
+	/** Returns true if the first parameter is an instance of the expected class name.
+	Returns false and logs a special warning ("wrong calling convention") if not. */
+	bool CheckParamSelf(const char * a_SelfClassName);
+
+	/** Returns true if the first parameter is the expected class (static).
+	Returns false and logs a special warning ("wrong calling convention") if not. */
+	bool CheckParamStaticSelf(const char * a_SelfClassName);
+
 	bool IsParamUserType(int a_Param, AString a_UserType);
 
 	bool IsParamNumber(int a_Param);
@@ -768,6 +811,11 @@ public:
 
 	/** Logs all items in the current stack trace to the server console */
 	static void LogStackTrace(lua_State * a_LuaState, int a_StartingDepth = 0);
+
+	/** Formats and prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	To be used for bindings when they detect bad parameters.
+	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
+	int ApiParamError(const char * a_MsgFormat, ...);
 
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);

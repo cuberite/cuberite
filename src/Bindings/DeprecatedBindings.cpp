@@ -6,7 +6,6 @@
 #include "tolua++/include/tolua++.h"
 
 
-#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "LuaState.h"

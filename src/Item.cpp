@@ -41,22 +41,42 @@ short cItem::GetMaxDamage(void) const
 	switch (m_ItemType)
 	{
 		case E_ITEM_BOW:             return 384;
+		case E_ITEM_CHAIN_BOOTS:     return 196;
+		case E_ITEM_CHAIN_CHESTPLATE:return 241;
+		case E_ITEM_CHAIN_HELMET:    return 166;
+		case E_ITEM_CHAIN_LEGGINGS:  return 226;
 		case E_ITEM_DIAMOND_AXE:     return 1561;
+		case E_ITEM_DIAMOND_BOOTS:   return 430;
+		case E_ITEM_DIAMOND_CHESTPLATE: return 529;
+		case E_ITEM_DIAMOND_HELMET:  return 364;
 		case E_ITEM_DIAMOND_HOE:     return 1561;
+		case E_ITEM_DIAMOND_LEGGINGS:return 496;
 		case E_ITEM_DIAMOND_PICKAXE: return 1561;
 		case E_ITEM_DIAMOND_SHOVEL:  return 1561;
 		case E_ITEM_DIAMOND_SWORD:   return 1561;
 		case E_ITEM_FLINT_AND_STEEL: return 64;
 		case E_ITEM_GOLD_AXE:        return 32;
+		case E_ITEM_GOLD_BOOTS:      return 92;
+		case E_ITEM_GOLD_CHESTPLATE: return 113;
+		case E_ITEM_GOLD_HELMET:     return 78;
 		case E_ITEM_GOLD_HOE:        return 32;
+		case E_ITEM_GOLD_LEGGINGS:   return 106;
 		case E_ITEM_GOLD_PICKAXE:    return 32;
 		case E_ITEM_GOLD_SHOVEL:     return 32;
 		case E_ITEM_GOLD_SWORD:      return 32;
 		case E_ITEM_IRON_AXE:        return 250;
+		case E_ITEM_IRON_BOOTS:      return 196;
+		case E_ITEM_IRON_CHESTPLATE: return 241;
+		case E_ITEM_IRON_HELMET:     return 166;
 		case E_ITEM_IRON_HOE:        return 250;
+		case E_ITEM_IRON_LEGGINGS:   return 226;
 		case E_ITEM_IRON_PICKAXE:    return 250;
 		case E_ITEM_IRON_SHOVEL:     return 250;
 		case E_ITEM_IRON_SWORD:      return 250;
+		case E_ITEM_LEATHER_BOOTS:   return 66;
+		case E_ITEM_LEATHER_CAP:     return 55;
+		case E_ITEM_LEATHER_PANTS:   return 76;
+		case E_ITEM_LEATHER_TUNIC:   return 81;
 		case E_ITEM_SHEARS:          return 250;
 		case E_ITEM_STONE_AXE:       return 131;
 		case E_ITEM_STONE_HOE:       return 131;
@@ -208,14 +228,14 @@ void cItem::FromJson(const Json::Value & a_Value)
 
 
 
-bool cItem::IsEnchantable(short a_ItemType, bool a_WithBook)
+bool cItem::IsEnchantable(short a_ItemType, bool a_FromBook)
 {
 	if (
 		ItemCategory::IsAxe(a_ItemType) ||
 		ItemCategory::IsSword(a_ItemType) ||
 		ItemCategory::IsShovel(a_ItemType) ||
 		ItemCategory::IsPickaxe(a_ItemType) ||
-		(a_WithBook && ItemCategory::IsHoe(a_ItemType)) ||
+		(a_FromBook && ItemCategory::IsHoe(a_ItemType)) ||
 		ItemCategory::IsArmor(a_ItemType)
 	)
 	{
@@ -235,7 +255,7 @@ bool cItem::IsEnchantable(short a_ItemType, bool a_WithBook)
 		case E_ITEM_SHEARS:
 		case E_ITEM_FLINT_AND_STEEL:
 		{
-			return a_WithBook;
+			return a_FromBook;
 		}
 	}
 
@@ -332,9 +352,9 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		return false;
 	}
 
-	cFastRandom Random;
-	int ModifiedEnchantmentLevel = a_NumXPLevels + static_cast<int>(Random.NextFloat(static_cast<float>(Enchantability / 4))) + static_cast<int>(Random.NextFloat(static_cast<float>(Enchantability / 4))) + 1;
-	float RandomBonus = 1.0F + (Random.NextFloat(1) + Random.NextFloat(1) - 1.0F) * 0.15F;
+	auto & Random = GetRandomProvider();
+	int ModifiedEnchantmentLevel = a_NumXPLevels + Random.RandInt(Enchantability / 4) + Random.RandInt(Enchantability / 4) + 1;
+	float RandomBonus = 1.0F + (Random.RandReal() + Random.RandReal() - 1.0F) * 0.15F;
 	int FinalEnchantmentLevel = static_cast<int>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments Enchantments;
@@ -352,12 +372,10 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Checking for conflicting enchantments
 	cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment1);
 
-	float NewEnchantmentLevel = static_cast<float>(a_NumXPLevels);
-
 	// Next Enchantment (Second)
-	NewEnchantmentLevel = NewEnchantmentLevel / 2;
-	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if (Enchantments.empty() || (Random.NextFloat(100) > SecondEnchantmentChance))
+	float NewEnchantmentLevel = a_NumXPLevels / 2.0f;
+	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
+	if (Enchantments.empty() || !Random.RandBool(SecondEnchantmentChance))
 	{
 		return true;
 	}
@@ -370,9 +388,9 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment2);
 
 	// Next Enchantment (Third)
-	NewEnchantmentLevel = NewEnchantmentLevel / 2;
-	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if (Enchantments.empty() || (Random.NextFloat(100) > ThirdEnchantmentChance))
+	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
+	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
+	if (Enchantments.empty() || !Random.RandBool(ThirdEnchantmentChance))
 	{
 		return true;
 	}
@@ -385,9 +403,9 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment3);
 
 	// Next Enchantment (Fourth)
-	NewEnchantmentLevel = NewEnchantmentLevel / 2;
-	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50 * 100;
-	if (Enchantments.empty() || (Random.NextFloat(100) > FourthEnchantmentChance))
+	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
+	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
+	if (Enchantments.empty() || !Random.RandBool(FourthEnchantmentChance))
 	{
 		return true;
 	}
@@ -395,6 +413,199 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	m_Enchantments.AddFromString(Enchantment4.ToString());
 
 	return true;
+}
+
+
+
+
+
+int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_FromBook)
+{
+	unsigned int OurLevel = m_Enchantments.GetLevel(a_EnchantmentID);
+	int Multiplier = cEnchantments::GetXPCostMultiplier(a_EnchantmentID, a_FromBook);
+	unsigned int NewLevel = 0;
+	if (OurLevel > a_Level)
+	{
+		// They don't add anything to us
+		NewLevel = OurLevel;
+	}
+	else if (OurLevel == a_Level)
+	{
+		// Bump it by 1
+		NewLevel = OurLevel + 1;
+	}
+	else
+	{
+		// Take the sacrifice's level
+		NewLevel = a_Level;
+	}
+	unsigned int LevelCap = cEnchantments::GetLevelCap(a_EnchantmentID);
+	if (NewLevel > LevelCap)
+	{
+		NewLevel = LevelCap;
+	}
+
+	m_Enchantments.SetLevel(a_EnchantmentID, NewLevel);
+	return static_cast<int>(NewLevel) * Multiplier;
+}
+
+
+
+
+
+bool cItem::CanHaveEnchantment(int a_EnchantmentID)
+{
+	if (m_ItemType == E_ITEM_ENCHANTED_BOOK)
+	{
+		// Enchanted books can take anything
+		return true;
+	}
+
+	// The organization here is based on the summary at:
+	// http://minecraft.gamepedia.com/Enchanting
+	// as of July 2017 (Minecraft 1.12).
+
+	// Hand tool enchantments
+	static const std::set<int> SwordEnchantments =
+	{
+		cEnchantments::enchBaneOfArthropods,
+		cEnchantments::enchFireAspect,
+		cEnchantments::enchKnockback,
+		cEnchantments::enchLooting,
+		cEnchantments::enchSharpness,
+		cEnchantments::enchSmite,
+		cEnchantments::enchUnbreaking
+	};
+	static const std::set<int> AxeEnchantments =
+	{
+		cEnchantments::enchBaneOfArthropods,
+		cEnchantments::enchEfficiency,
+		cEnchantments::enchFortune,
+		cEnchantments::enchSharpness,
+		cEnchantments::enchSilkTouch,
+		cEnchantments::enchSmite,
+		cEnchantments::enchUnbreaking
+	};
+	static const std::set<int> ToolEnchantments =
+	{
+		cEnchantments::enchEfficiency,
+		cEnchantments::enchFortune,
+		cEnchantments::enchSilkTouch,
+		cEnchantments::enchUnbreaking
+	};
+	static const std::set<int> ShearEnchantments =
+	{
+		cEnchantments::enchEfficiency,
+		cEnchantments::enchUnbreaking
+	};
+	static const std::set<int> BowEnchantments =
+	{
+		cEnchantments::enchFlame,
+		cEnchantments::enchInfinity,
+		cEnchantments::enchPower,
+		cEnchantments::enchPunch
+	};
+	static const std::set<int> FishingEnchantments =
+	{
+		cEnchantments::enchLuckOfTheSea,
+		cEnchantments::enchLure
+	};
+	static const std::set<int> MiscEnchantments =
+	{
+		cEnchantments::enchUnbreaking
+	};
+
+	if (ItemCategory::IsSword(m_ItemType))
+	{
+		return SwordEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (ItemCategory::IsAxe(m_ItemType))
+	{
+		return AxeEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (ItemCategory::IsPickaxe(m_ItemType) || ItemCategory::IsShovel(m_ItemType))
+	{
+		return ToolEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (m_ItemType == E_ITEM_SHEARS)
+	{
+		return ShearEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (m_ItemType == E_ITEM_BOW)
+	{
+		return BowEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (m_ItemType == E_ITEM_FISHING_ROD)
+	{
+		return FishingEnchantments.count(a_EnchantmentID) > 0;
+	}
+	if (ItemCategory::IsHoe(m_ItemType) || (m_ItemType == E_ITEM_FLINT_AND_STEEL) || (m_ItemType == E_ITEM_CARROT_ON_STICK) || (m_ItemType == E_ITEM_SHIELD))
+	{
+		return MiscEnchantments.count(a_EnchantmentID) > 0;
+	}
+
+	// Armor enchantments
+	static const std::set<int> ArmorEnchantments =
+	{
+		cEnchantments::enchBlastProtection,
+		cEnchantments::enchFireProtection,
+		cEnchantments::enchProjectileProtection,
+		cEnchantments::enchProtection,
+		cEnchantments::enchThorns,
+		cEnchantments::enchUnbreaking
+	};
+	static const std::set<int> HatOnlyEnchantments =
+	{
+		cEnchantments::enchAquaAffinity,
+		cEnchantments::enchRespiration
+	};
+	static const std::set<int> BootOnlyEnchantments =
+	{
+		cEnchantments::enchDepthStrider,
+		cEnchantments::enchFeatherFalling
+	};
+
+	if (ItemCategory::IsBoots(m_ItemType))
+	{
+		return (BootOnlyEnchantments.count(a_EnchantmentID) > 0) || (ArmorEnchantments.count(a_EnchantmentID) > 0);
+	}
+	if (ItemCategory::IsHelmet(m_ItemType))
+	{
+		return (HatOnlyEnchantments.count(a_EnchantmentID) > 0) || (ArmorEnchantments.count(a_EnchantmentID) > 0);
+	}
+	if (ItemCategory::IsArmor(m_ItemType))
+	{
+		return ArmorEnchantments.count(a_EnchantmentID) > 0;
+	}
+	return false;
+}
+
+
+
+
+
+int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
+{
+	bool FromBook = (a_Other.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+
+	// Consider each enchantment seperately
+	int EnchantingCost = 0;
+	for (auto & Enchantment : a_Other.m_Enchantments)
+	{
+		if (CanHaveEnchantment(Enchantment.first))
+		{
+			if (!m_Enchantments.CanAddEnchantment(Enchantment.first))
+			{
+				// Cost of incompatible enchantments
+				EnchantingCost += 1;
+			}
+			else
+			{
+				EnchantingCost += AddEnchantment(Enchantment.first, Enchantment.second, FromBook);
+			}
+		}
+	}
+	return EnchantingCost;
 }
 
 

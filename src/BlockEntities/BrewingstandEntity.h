@@ -18,7 +18,7 @@ class cClientHandle;
 class cBrewingstandEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems super;
+	typedef cBlockEntityWithItems Super;
 
 public:
 	enum
@@ -38,19 +38,16 @@ public:
 	BLOCKENTITY_PROTODEF(cBrewingstandEntity)
 
 	/** Constructor used for normal operation */
-	cBrewingstandEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
+	cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	virtual ~cBrewingstandEntity() override;
 
 	//  cBlockEntity overrides:
+	virtual void Destroy() override;
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
-	virtual void Destroy() override
-	{
-		m_IsDestroyed = true;
-		super::Destroy();
-	}
 
 	// tolua_begin
 
@@ -109,10 +106,9 @@ public:
 
 	/** Gets the recipes. Will be called if the brewing stand gets loaded from the world. */
 	void LoadRecipes(void);
-protected:
 
-	/** Block meta of the block currently represented by this entity */
-	NIBBLETYPE m_BlockMeta;
+
+protected:
 
 	/** Set to true when the brewing stand entity has been destroyed to prevent the block being set again */
 	bool m_IsDestroyed;
@@ -127,7 +123,7 @@ protected:
 	const cBrewingRecipes::cRecipe * m_CurrentBrewingRecipes[3] = {};
 
 	/** Result items for the  bottle inputs */
-	cItem m_Results[3] = {};
+	cItem m_Results[3];
 
 	/** Amount of ticks that the current item has been brewed */
 	short m_TimeBrewed;

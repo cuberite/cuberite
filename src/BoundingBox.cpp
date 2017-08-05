@@ -4,7 +4,6 @@
 
 #include "Globals.h"
 #include "BoundingBox.h"
-#include "Defines.h"
 
 
 
@@ -54,6 +53,17 @@ cBoundingBox::cBoundingBox(const cBoundingBox & a_Orig) :
 	m_Min(a_Orig.m_Min),
 	m_Max(a_Orig.m_Max)
 {
+}
+
+
+
+
+
+cBoundingBox & cBoundingBox::operator=(const cBoundingBox & a_Other)
+{
+	m_Min = a_Other.m_Min;
+	m_Max = a_Other.m_Max;
+	return *this;
 }
 
 
@@ -119,10 +129,10 @@ cBoundingBox cBoundingBox::Union(const cBoundingBox & a_Other)
 {
 	return cBoundingBox(
 		std::min(m_Min.x, a_Other.m_Min.x),
-		std::min(m_Min.y, a_Other.m_Min.y),
-		std::min(m_Min.z, a_Other.m_Min.z),
 		std::max(m_Max.x, a_Other.m_Max.x),
+		std::min(m_Min.y, a_Other.m_Min.y),
 		std::max(m_Max.y, a_Other.m_Max.y),
+		std::min(m_Min.z, a_Other.m_Min.z),
 		std::max(m_Max.z, a_Other.m_Max.z)
 	);
 }

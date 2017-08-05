@@ -5,12 +5,12 @@
 #include "Globals.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
-#include "../BlockID.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
 #include "FastNBT.h"
 
 #include "../BlockEntities/BeaconEntity.h"
+#include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
@@ -190,6 +190,18 @@ void cNBTChunkSerializer::AddBeaconEntity(cBeaconEntity * a_Entity)
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddBedEntity(cBedEntity * a_Entity)
+{
+	m_Writer.BeginCompound("");
+	AddBasicTileEntity(a_Entity, "Bed");
+	m_Writer.AddInt("color", a_Entity->GetColor());
 	m_Writer.EndCompound();
 }
 
@@ -657,7 +669,18 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case mtOcelot:
 			{
-				m_Writer.AddInt("Age", reinterpret_cast<const cOcelot *>(a_Monster)->GetAge());
+				const auto *Ocelot = reinterpret_cast<const cOcelot *>(a_Monster);
+				if (!Ocelot->GetOwnerName().empty())
+				{
+					m_Writer.AddString("Owner", Ocelot->GetOwnerName());
+				}
+				if (!Ocelot->GetOwnerUUID().empty())
+				{
+					m_Writer.AddString("OwnerUUID", Ocelot->GetOwnerUUID());
+				}
+				m_Writer.AddByte("Sitting",     Ocelot->IsSitting() ? 1 : 0);
+				m_Writer.AddInt ("CatType",     Ocelot->GetOcelotType());
+				m_Writer.AddInt ("Age",         Ocelot->GetAge());
 				break;
 			}
 			case mtPig:
@@ -970,6 +993,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	switch (a_Entity->GetBlockType())
 	{
 		case E_BLOCK_BEACON:        AddBeaconEntity      (reinterpret_cast<cBeaconEntity *>      (a_Entity)); break;
+		case E_BLOCK_BED:           AddBedEntity         (reinterpret_cast<cBedEntity *>         (a_Entity)); break;
 		case E_BLOCK_BREWING_STAND: AddBrewingstandEntity(reinterpret_cast<cBrewingstandEntity *>(a_Entity)); break;
 		case E_BLOCK_CHEST:         AddChestEntity       (reinterpret_cast<cChestEntity *>       (a_Entity), a_Entity->GetBlockType()); break;
 		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity(reinterpret_cast<cCommandBlockEntity *>(a_Entity)); break;

@@ -32,7 +32,6 @@ Chunks from m_PostponedQueue are moved back into m_Queue when their neighbors ge
 #pragma once
 
 #include "OSSupport/IsThread.h"
-#include "ChunkDef.h"
 #include "ChunkStay.h"
 
 
@@ -148,10 +147,6 @@ protected:
 
 	/** Uses m_BlockTypes to initialize the m_BlockLight[] data; fills in seeds for the blocklight */
 	void PrepareBlockLight(void);
-
-	/** Same as PrepareBlockLight(), but uses a different traversal scheme; possibly better perf cache-wise.
-	To be compared in perf benchmarks. */
-	void PrepareBlockLight2(void);
 
 	/** Calculates light in the light array specified, using stored seeds */
 	void CalcLight(NIBBLETYPE * a_Light);

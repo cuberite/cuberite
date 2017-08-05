@@ -6,13 +6,15 @@
 #include "../Entities/Player.h"
 #include "../UI/ChestWindow.h"
 #include "../ClientHandle.h"
+#include "../Mobs/Ocelot.h"
+#include "../BoundingBox.h"
 
 
 
 
 
-cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type) :
-	super(a_Type, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_NumActivePlayers(0),
 	m_Neighbour(nullptr)
 {
@@ -40,6 +42,21 @@ cChestEntity::~cChestEntity()
 	}
 
 	DestroyWindow();
+}
+
+
+
+
+
+void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cChestEntity &>(a_Src);
+	m_Contents.CopyFrom(src.m_Contents);
+
+	// Reset the neighbor and player count, there's no sense in copying these:
+	m_Neighbour = nullptr;
+	m_NumActivePlayers = 0;
 }
 
 
@@ -101,7 +118,7 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow(Window);
+			a_Player->OpenWindow(*Window);
 		}
 	}
 
@@ -127,21 +144,28 @@ void cChestEntity::ScanNeighbours()
 	{
 	public:
 		cChestEntity * m_Neighbour;
+		BLOCKTYPE      m_ChestType;
 
-		cFindNeighbour() :
-			m_Neighbour(nullptr)
+		cFindNeighbour(BLOCKTYPE a_ChestType) :
+			m_Neighbour(nullptr),
+			m_ChestType(a_ChestType)
 		{
 		}
 
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
+			if (a_Chest->GetBlockType() != m_ChestType)
+			{
+				// Neighboring block is not the same type of chest
+				return true;
+			}
 			m_Neighbour = a_Chest;
 			return false;
 		}
 	};
 
-	// Scan horizontally adjacent blocks for any neighbouring chest:
-	cFindNeighbour FindNeighbour;
+	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
+	cFindNeighbour FindNeighbour(m_BlockType);
 	if (
 		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     FindNeighbour) ||
 		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     FindNeighbour) ||
@@ -195,11 +219,36 @@ void cChestEntity::DestroyWindow()
 
 
 
+class cFindSittingCat :
+	public cEntityCallback
+{
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		return (
+			(a_Entity->GetEntityType() == cEntity::etMonster) &&
+			(static_cast<cMonster *>(a_Entity)->GetMobType() == eMonsterType::mtOcelot) &&
+			(static_cast<cOcelot *>(a_Entity)->IsSitting())
+		);
+	}
+};
+
+
+
+
+
 bool cChestEntity::IsBlocked()
 {
-	// TODO: cats are an obstruction
+	cFindSittingCat FindSittingCat;
 	return (
 		(GetPosY() >= cChunkDef::Height - 1) ||
-		!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()))
+		!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+		(
+			(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ()) == E_BLOCK_AIR) &&
+			!GetWorld()->ForEachEntityInBox(cBoundingBox(Vector3d(GetPosX(), GetPosY() + 1, GetPosZ()), 1, 1), FindSittingCat)
+		)
 	);
 }
+
+
+
+

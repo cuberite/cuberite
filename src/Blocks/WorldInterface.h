@@ -9,7 +9,6 @@ class cItems;
 typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
 
 
-class cMonster;
 class cPlayer;
 
 
@@ -33,6 +32,8 @@ public:
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) = 0;
 
+	virtual UInt32 SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f, int a_LifetimeTicks = 6000, bool a_CanCombine = true) = 0;
+
 	/** Spawns a mob of the specified type.
 	Returns the mob's UniqueID if recognized and spawned, or cEntity::INVALID_ID on failure. */
 	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby) = 0;
@@ -45,7 +46,7 @@ public:
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) = 0;
 
 	/** Sends the block on those coords to the player */
-	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer * a_Player) = 0;
+	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;

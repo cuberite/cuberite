@@ -18,9 +18,11 @@ set(SHARED_SRC
 	../../src/OSSupport/CriticalSection.cpp
 	../../src/OSSupport/File.cpp
 	../../src/OSSupport/StackTrace.cpp
+	../../src/OSSupport/WinStackWalker.cpp
 	../../src/Noise/Noise.cpp
 	../../src/StringUtils.cpp
 )
+
 set(SHARED_HDR
 	../../src/Noise/Noise.h
 	../../src/Noise/OctavedNoise.h
@@ -28,13 +30,10 @@ set(SHARED_HDR
 	../../src/OSSupport/CriticalSection.h
 	../../src/OSSupport/File.h
 	../../src/OSSupport/StackTrace.h
+	../../src/OSSupport/WinStackWalker.h
 	../../src/StringUtils.h
 )
 
-if(WIN32)
-	list (APPEND SHARED_SRC ../../src/StackWalker.cpp)
-	list (APPEND SHARED_HDR ../../src/StackWalker.h)
-endif()
 
 source_group("Shared" FILES ${SHARED_SRC} ${SHARED_HDR})
 

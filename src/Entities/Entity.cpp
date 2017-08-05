@@ -19,15 +19,21 @@
 
 
 
-UInt32 cEntity::m_EntityCount = 0;
-cCriticalSection cEntity::m_CSCount;
+static UInt32 GetNextUniqueID(void)
+{
+	static std::atomic<UInt32> counter(1);
+	return counter.fetch_add(1);
+}
 
 
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// cEntity:
 
 cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height):
-	m_UniqueID(INVALID_ID),  // Proper ID will be assigned later in the constructor code
+	m_UniqueID(GetNextUniqueID()),
 	m_Health(1),
 	m_MaxHealth(1),
 	m_AttachedTo(nullptr),
@@ -65,10 +71,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
-	// Assign a proper ID:
-	cCSLock Lock(m_CSCount);
-	m_EntityCount++;
-	m_UniqueID = m_EntityCount;
 }
 
 
@@ -266,7 +268,16 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
 {
-	int FinalDamage = a_RawDamage - GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	int ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	int EnchantmentCover = GetEnchantmentCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	int FinalDamage = a_RawDamage - ArmorCover - EnchantmentCover;
+	if ((FinalDamage == 0) && (a_RawDamage > 0))
+	{
+		// Nobody's invincible
+		FinalDamage = 1;
+	}
+	ApplyArmorDamage(ArmorCover);
+
 	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
 }
 
@@ -276,7 +287,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount)
 {
-	class cNotifyWolves : public cEntityCallback
+	class cFindEntity : public cEntityCallback
 	{
 	public:
 
@@ -298,8 +309,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_Ra
 			}
 
 
-			int FinalDamage = m_RawDamage - m_Entity->GetArmorCoverAgainst(Attacker, m_DamageType, m_RawDamage);
-			m_Entity->TakeDamage(m_DamageType, Attacker, m_RawDamage, FinalDamage, m_KnockbackAmount);
+			m_Entity->TakeDamage(m_DamageType, Attacker, m_RawDamage, m_KnockbackAmount);
 			return true;
 		}
 	} Callback;
@@ -495,12 +505,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			int Chance = static_cast<int>(ThornsLevel * 15);
 
-			cFastRandom Random;
-			int RandomValue = Random.GenerateRandomInteger(0, 100);
+			auto & Random = GetRandomProvider();
 
-			if (RandomValue <= Chance)
+			if (Random.RandBool(Chance / 100.0))
 			{
-				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.GenerateRandomInteger(1, 4), 0);
+				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
 			}
 		}
 
@@ -516,118 +525,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
 	}
 
-	if (IsPlayer())
-	{
-		double TotalEPF = 0.0;
-		double EPFProtection = 0.00;
-		double EPFFireProtection = 0.00;
-		double EPFBlastProtection = 0.00;
-		double EPFProjectileProtection = 0.00;
-		double EPFFeatherFalling = 0.00;
-
-		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
-		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
-		{
-			const cItem & Item = ArmorItems[i];
-			int Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection));
-			if (Level > 0)
-			{
-				EPFProtection += (6 + Level * Level) * 0.75 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection));
-			if (Level > 0)
-			{
-				EPFFireProtection += (6 + Level * Level) * 1.25 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling));
-			if (Level > 0)
-			{
-				EPFFeatherFalling += (6 + Level * Level) * 2.5 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection));
-			if (Level > 0)
-			{
-				EPFBlastProtection += (6 + Level * Level) * 1.5 / 3;
-			}
-
-			Level = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection));
-			if (Level > 0)
-			{
-				EPFProjectileProtection += (6 + Level * Level) * 1.5 / 3;
-			}
-
-		}
-
-		TotalEPF = EPFProtection + EPFFireProtection + EPFFeatherFalling + EPFBlastProtection + EPFProjectileProtection;
-
-		EPFProtection = EPFProtection / TotalEPF;
-		EPFFireProtection = EPFFireProtection / TotalEPF;
-		EPFFeatherFalling = EPFFeatherFalling / TotalEPF;
-		EPFBlastProtection = EPFBlastProtection / TotalEPF;
-		EPFProjectileProtection = EPFProjectileProtection / TotalEPF;
-
-		if (TotalEPF > 25)
-		{
-			TotalEPF = 25;
-		}
-
-		cFastRandom Random;
-		float RandomValue = Random.GenerateRandomInteger(50, 100) * 0.01f;
-
-		TotalEPF = ceil(TotalEPF * RandomValue);
-
-		if (TotalEPF > 20)
-		{
-			TotalEPF = 20;
-		}
-
-		EPFProtection = TotalEPF * EPFProtection;
-		EPFFireProtection = TotalEPF * EPFFireProtection;
-		EPFFeatherFalling = TotalEPF * EPFFeatherFalling;
-		EPFBlastProtection = TotalEPF * EPFBlastProtection;
-		EPFProjectileProtection = TotalEPF * EPFProjectileProtection;
-
-		int RemovedDamage = 0;
-
-		if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtAdmin))
-		{
-			RemovedDamage += CeilC(EPFProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if ((a_TDI.DamageType == dtFalling) || (a_TDI.DamageType == dtEnderPearl))
-		{
-			RemovedDamage += CeilC(EPFFeatherFalling * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.DamageType == dtBurning)
-		{
-			RemovedDamage += CeilC(EPFFireProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.DamageType == dtExplosion)
-		{
-			RemovedDamage += CeilC(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.DamageType == dtProjectile)
-		{
-			RemovedDamage += CeilC(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
-		}
-
-		if (a_TDI.FinalDamage < RemovedDamage)
-		{
-			RemovedDamage = 0;
-		}
-
-		a_TDI.FinalDamage -= RemovedDamage;
-	}
-
 	m_Health -= static_cast<short>(a_TDI.FinalDamage);
-
-	// TODO: Apply damage to armor
 
 	m_Health = std::max(m_Health, 0);
 
@@ -708,6 +606,15 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 
 
+void cEntity::ApplyArmorDamage(int DamageBlocked)
+{
+	// cEntities don't necessarily have armor to damage.
+	return;
+}
+
+
+
+
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
@@ -717,6 +624,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtOnFire:
 		case dtSuffocating:
 		case dtDrowning:  // TODO: This one could be a special case - in various MC versions (PC vs XBox) it is and isn't armor-protected
+		case dtEnderPearl:
 		case dtStarving:
 		case dtInVoid:
 		case dtPoisoning:
@@ -734,7 +642,6 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtCactusContact:
 		case dtLavaContact:
 		case dtFireContact:
-		case dtEnderPearl:
 		case dtExplosion:
 		{
 			return true;
@@ -744,6 +651,49 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 	#ifndef __clang__
 		return false;
 	#endif
+}
+
+
+
+
+
+int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+{
+	int TotalEPF = 0.0;
+
+	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+	for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
+	{
+		const cItem & Item = ArmorItems[i];
+
+		if ((a_DamageType != dtInVoid) && (a_DamageType != dtAdmin) && (a_DamageType != dtStarving))
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection)) * 1;
+		}
+
+		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact))
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection)) * 2;
+		}
+
+		if ((a_DamageType == dtFalling) || (a_DamageType == dtEnderPearl))
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling)) * 3;
+		}
+
+		if (a_DamageType == dtExplosion)
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection)) * 2;
+		}
+
+		// Note: Also blocks against fire charges, etc.
+		if (a_DamageType == dtProjectile)
+		{
+			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection)) * 2;
+		}
+	}
+	int CappedEPF = std::min(20, TotalEPF);
+	return static_cast<int>(a_Damage * CappedEPF / 25.0);
 }
 
 
@@ -761,15 +711,16 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// Add up all armor points:
-	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points as of 2012_12_20
+	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points
 	int ArmorValue = 0;
+	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
 	{
 		case E_ITEM_LEATHER_CAP:    ArmorValue += 1; break;
 		case E_ITEM_GOLD_HELMET:    ArmorValue += 2; break;
 		case E_ITEM_CHAIN_HELMET:   ArmorValue += 2; break;
 		case E_ITEM_IRON_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; break;
+		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; Toughness += 2; break;
 	}
 	switch (GetEquippedChestplate().m_ItemType)
 	{
@@ -777,7 +728,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case E_ITEM_GOLD_CHESTPLATE:    ArmorValue += 5; break;
 		case E_ITEM_CHAIN_CHESTPLATE:   ArmorValue += 5; break;
 		case E_ITEM_IRON_CHESTPLATE:    ArmorValue += 6; break;
-		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; break;
+		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; Toughness += 2; break;
 	}
 	switch (GetEquippedLeggings().m_ItemType)
 	{
@@ -785,7 +736,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case E_ITEM_GOLD_LEGGINGS:    ArmorValue += 3; break;
 		case E_ITEM_CHAIN_LEGGINGS:   ArmorValue += 4; break;
 		case E_ITEM_IRON_LEGGINGS:    ArmorValue += 5; break;
-		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; break;
+		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; Toughness += 2; break;
 	}
 	switch (GetEquippedBoots().m_ItemType)
 	{
@@ -793,14 +744,14 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 		case E_ITEM_GOLD_BOOTS:    ArmorValue += 1; break;
 		case E_ITEM_CHAIN_BOOTS:   ArmorValue += 1; break;
 		case E_ITEM_IRON_BOOTS:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; break;
+		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; Toughness += 2; break;
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
 	// Ref.: http://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
-	// Now ArmorValue is in [0, 20] range, which corresponds to [0, 80%] protection. Calculate the hitpoints from that:
-	return a_Damage * (ArmorValue * 4) / 100;
+	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
+	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
 }
 
 
@@ -911,7 +862,10 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_TicksSinceLastVoidDamage = 0;
 		}
 
-		if (IsMob() || IsPlayer() || IsPickup() || IsExpOrb())
+		if (
+			IsMob() || IsPickup() || IsExpOrb() ||
+			(IsPlayer() && !((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator()))
+		)
 		{
 			DetectCacti();
 		}
@@ -1010,6 +964,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NextPos.y += 0.5;
 		}
 
+		m_bHasSentNoSpeed = false;  // this unlocks movement sending to client in BroadcastMovementUpdate function
 		m_bOnGround = true;
 
 		/*
@@ -1915,35 +1870,39 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			m_bHasSentNoSpeed = false;
 		}
 
-		// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-		int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
-		int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
-		int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
-
-		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
+		// Only send movement if speed is not 0 and 'no speed' was sent to client
+		if (!m_bHasSentNoSpeed || IsPlayer())
 		{
-			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
+			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
+			int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
+			int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
+			int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
+
+			if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 			{
-				// Difference within Byte limitations, use a relative move packet
-				if (m_bDirtyOrientation)
+				if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
 				{
-					m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
-					m_bDirtyOrientation = false;
+					// Difference within Byte limitations, use a relative move packet
+					if (m_bDirtyOrientation)
+					{
+						m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+						m_bDirtyOrientation = false;
+					}
+					else
+					{
+						m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+					}
+					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
+					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
+					m_LastSentPosition = GetPosition();
 				}
 				else
 				{
-					m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+					// Too big a movement, do a teleport
+					m_World->BroadcastTeleportEntity(*this, a_Exclude);
+					m_LastSentPosition = GetPosition();  // See above
+					m_bDirtyOrientation = false;
 				}
-				// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
-				// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
-				m_LastSentPosition = GetPosition();
-			}
-			else
-			{
-				// Too big a movement, do a teleport
-				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_LastSentPosition = GetPosition();  // See above
-				m_bDirtyOrientation = false;
 			}
 		}
 

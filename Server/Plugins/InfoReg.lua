@@ -59,7 +59,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 	-- A verb was specified, look it up in the subcommands table:
 	local Subcommand = a_CmdInfo.Subcommands[Verb]
 	if (Subcommand == nil) then
-		if (a_Level > 1) then
+		if (a_Level + 1 > 1) then
 			-- This is a true subcommand, display the message and make MCS think the command was handled
 			-- Otherwise we get weird behavior: for "/cmd verb" we get "unknown command /cmd" although "/cmd" is valid
 			if (a_Player == nil) then
@@ -81,13 +81,14 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 		end
 	end
 
-	-- If the handler is not valid, check the next sublevel:
-	if (Subcommand.Handler == nil) then
-		if (Subcommand.Subcommands == nil) then
-			LOG("Cannot find handler for command " .. a_CmdString .. " " .. Verb)
-			return false
-		end
+	-- First check if the subcommand has subcommands
+	if (Subcommand.Subcommands ~= nil) then
+		-- Next sublevel
 		return MultiCommandHandler(a_Split, a_Player, a_CmdString .. " " .. Verb, Subcommand, a_Level + 1, a_EntireCommand)
+	elseif (Subcommand.Handler == nil) then
+		-- Subcommand has no subcommands and the handler is not found, report error
+		LOGWARNING("Cannot find handler for command " .. a_CmdString .. " " .. Verb)
+		return false
 	end
 
 	-- Execute:

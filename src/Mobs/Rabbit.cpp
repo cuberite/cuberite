@@ -10,8 +10,8 @@
 
 
 cRabbit::cRabbit(void) :
-	cRabbit(static_cast<eRabbitType>(cFastRandom().NextInt(
-		static_cast<UInt8>(eRabbitType::SaltAndPepper) + 1  // Max possible Rabbit-Type
+	cRabbit(static_cast<eRabbitType>(GetRandomProvider().RandInt<UInt8>(
+		static_cast<UInt8>(eRabbitType::SaltAndPepper)  // Max possible Rabbit-Type
 	)), 0)
 {
 }

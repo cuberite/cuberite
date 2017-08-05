@@ -3,7 +3,6 @@
 
 #include "../Entities/Pawn.h"
 #include "../Defines.h"
-#include "../BlockID.h"
 #include "../Item.h"
 #include "../Enchantments.h"
 #include "MonsterTypes.h"
@@ -11,7 +10,7 @@
 
 
 class cClientHandle;
-class cWorld;
+
 
 
 // tolua_begin

@@ -9,10 +9,22 @@
 
 
 
-cNoteEntity::cNoteEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_NOTE_BLOCK, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
 	m_Pitch(0)
 {
+	ASSERT(a_BlockType == E_BLOCK_NOTE_BLOCK);
+}
+
+
+
+
+
+void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cNoteEntity &>(a_Src);
+	m_Pitch = src.m_Pitch;
 }
 
 
@@ -115,11 +127,9 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_BLACK_SHULKER_BOX:
 		case E_BLOCK_BLOCK_OF_COAL:
 		case E_BLOCK_BLUE_SHULKER_BOX:
-		case E_BLOCK_BONE_BLOCK:
 		case E_BLOCK_BRICK:
 		case E_BLOCK_BRICK_STAIRS:
 		case E_BLOCK_BROWN_SHULKER_BOX:
-		case E_BLOCK_CLAY:
 		case E_BLOCK_COAL_ORE:
 		case E_BLOCK_COBBLESTONE:
 		case E_BLOCK_COBBLESTONE_STAIRS:
@@ -187,6 +197,41 @@ void cNoteEntity::MakeSound(void)
 		{
 			instrument = E_INST_BASS_DRUM;
 			sampleName = "block.note.basedrum";
+			break;
+		}
+
+		case E_BLOCK_CLAY:
+		{
+			instrument = E_INST_FLUTE;
+			sampleName = "block.note.flute";
+			break;
+		}
+
+		case E_BLOCK_GOLD_BLOCK:
+		{
+			instrument = E_INST_BELL;
+			sampleName = "block.note.bell";
+			break;
+		}
+
+		case E_BLOCK_WOOL:
+		{
+			instrument = E_INST_GUITAR;
+			sampleName = "block.note.guitar";
+			break;
+		}
+
+		case E_BLOCK_PACKED_ICE:
+		{
+			instrument = E_INST_CHIME;
+			sampleName = "block.note.chime";
+			break;
+		}
+
+		case E_BLOCK_BONE_BLOCK:
+		{
+			instrument = E_INST_XYLOPHONE;
+			sampleName = "block.note.xylophone";
 			break;
 		}
 

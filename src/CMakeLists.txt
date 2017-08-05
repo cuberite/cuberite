@@ -202,10 +202,6 @@ if (NOT MSVC)
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
 
-	# Add the MSVC-specific LeakFinder sources:
-	list (APPEND SRCS LeakFinder.cpp StackWalker.cpp)
-	list (APPEND HDRS LeakFinder.h StackWalker.h MemoryLeak.h)
-
 	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 
 	# Add all subfolders as solution-folders:
@@ -257,9 +253,6 @@ else ()
 	# CMake cannot "remove" the precompiled header flags, so we use a dummy precompiled header compatible with just this one file:
 	SET_SOURCE_FILES_PROPERTIES(
 		Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS "/Yc\"string.h\" /Fp\"$(IntDir)/Bindings.pch\""
-	)
-	SET_SOURCE_FILES_PROPERTIES(
-		"StackWalker.cpp LeakFinder.cpp" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
 	)
 	list(APPEND SOURCE "Resources/Cuberite.rc")
 

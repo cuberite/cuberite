@@ -3,7 +3,6 @@
 
 #include "SandSimulator.h"
 #include "../World.h"
-#include "../BlockID.h"
 #include "../Defines.h"
 #include "../Entities/FallingBlock.h"
 #include "../Chunk.h"
@@ -83,15 +82,19 @@ bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
-		case E_BLOCK_SAND:
-		case E_BLOCK_GRAVEL:
 		case E_BLOCK_ANVIL:
+		case E_BLOCK_CONCRETE_POWDER:
 		case E_BLOCK_DRAGON_EGG:
+		case E_BLOCK_GRAVEL:
+		case E_BLOCK_SAND:
 		{
 			return true;
 		}
+		default:
+		{
+			return false;
+		}
 	}
-	return false;
 }
 
 

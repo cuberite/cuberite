@@ -413,11 +413,26 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 		return 0;
 	}
 
+	// Wrap the Lua callback inside a C++ callback class:
+	class cCallback:
+		public cChunkCoordCallback
+	{
+	public:
+		// cChunkCoordCallback override:
+		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
+		{
+			m_LuaCallback.Call(a_CBChunkX, a_CBChunkZ, a_IsSuccess);
+		}
+
+		cLuaState::cOptionalCallback m_LuaCallback;
+	};
+
 	// Read the params:
 	cWorld * world = nullptr;
 	int chunkX = 0;
 	int chunkZ = 0;
-	L.GetStackValues(1, world, chunkX, chunkZ);
+	auto Callback = cpp14::make_unique<cCallback>();
+	L.GetStackValues(1, world, chunkX, chunkZ, Callback->m_LuaCallback);
 	if (world == nullptr)
 	{
 		LOGWARNING("World:PrepareChunk(): invalid world parameter");
@@ -425,36 +440,8 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 		return 0;
 	}
 
-	// Wrap the Lua callback inside a C++ callback class:
-	class cCallback:
-		public cChunkCoordCallback
-	{
-	public:
-		cCallback(lua_State * a_LuaState):
-			m_LuaState(a_LuaState),
-			m_Callback(m_LuaState, 4)
-		{
-		}
-
-		// cChunkCoordCallback override:
-		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
-		{
-			if (m_Callback.IsValid())
-			{
-				m_LuaState.Call(m_Callback, a_CBChunkX, a_CBChunkZ, a_IsSuccess);
-			}
-
-			// This is the last reference of this object, we must delete it so that it doesn't leak:
-			delete this;
-		}
-
-	protected:
-		cLuaState m_LuaState;
-		cLuaState::cRef m_Callback;
-	};
-
 	// Call the chunk preparation:
-	world->PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cCallback>(tolua_S));
+	world->PrepareChunk(chunkX, chunkZ, std::move(Callback));
 	return 0;
 }
 
@@ -639,6 +626,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ChunkStay",                  tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoExplosionAt",              tolua_cWorld_DoExplosionAt);
 			tolua_function(tolua_S, "DoWithBeaconAt",             DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);
+			tolua_function(tolua_S, "DoWithBedAt",                DoWithXYZ<cWorld, cBedEntity,          &cWorld::DoWithBedAt>);
 			tolua_function(tolua_S, "DoWithBlockEntityAt",        DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
 			tolua_function(tolua_S, "DoWithBrewingstandAt",       DoWithXYZ<cWorld, cBrewingstandEntity, &cWorld::DoWithBrewingstandAt>);
 			tolua_function(tolua_S, "DoWithChestAt",              DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);

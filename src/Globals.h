@@ -38,10 +38,6 @@
 
 	#define OBSOLETE __declspec(deprecated)
 
-	// No alignment needed in MSVC
-	#define ALIGN_8
-	#define ALIGN_16
-
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
@@ -49,10 +45,35 @@
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
 	#define SIZE_T_FMT_HEX "%Ix"
 
-	#define NORETURN      __declspec(noreturn)
+	#define NORETURN __declspec(noreturn)
+	#if (_MSC_VER < 1900)  // noexcept support was added in VS 2015
+		#define NOEXCEPT  throw()
+		#define CAN_THROW throw(...)
+	#else
+		#define NOEXCEPT  noexcept
+		#define CAN_THROW noexcept(false)
+	#endif
 
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
+
+	#ifdef _DEBUG
+		// Override the "new" operator to include file and line specification for debugging memory leaks
+		// Ref.: https://social.msdn.microsoft.com/Forums/en-US/ebc7dd7a-f3c6-49f1-8a60-e381052f21b6/debugging-memory-leaks?forum=vcgeneral#53f0cc89-62fe-45e8-bbf0-56b89f2a1901
+		// This causes MSVC Debug runs to produce a report upon program exit, that contains memory-leaks
+		// together with the file:line information about where the memory was allocated.
+		// Note that this doesn't work with placement-new, which needs to temporarily #undef the macro
+		// (See AllocationPool.h for an example).
+		#ifdef _DEBUG
+			#define _CRTDBG_MAP_ALLOC
+			#include <stdlib.h>
+			#include <crtdbg.h>
+			#define DEBUG_CLIENTBLOCK   new(_CLIENT_BLOCK, __FILE__, __LINE__)
+			#define new DEBUG_CLIENTBLOCK
+			// For some reason this works magically - each "new X" gets replaced as "new(_CLIENT_BLOCK, "file", line) X"
+			// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
+		#endif
+	#endif
 
 #elif defined(__GNUC__)
 
@@ -65,12 +86,6 @@
 	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
-
-	#define ALIGN_8 __attribute__((aligned(8)))
-	#define ALIGN_16 __attribute__((aligned(16)))
-
-	// Some portability macros :)
-	#define stricmp strcasecmp
 
 	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
@@ -93,7 +108,9 @@
 		#define SIZE_T_FMT_HEX "%zx"
 	#endif
 
-	#define NORETURN      __attribute((__noreturn__))
+	#define NORETURN __attribute((__noreturn__))
+	#define NOEXCEPT  noexcept
+	#define CAN_THROW noexcept(false)
 
 #else
 
@@ -129,14 +146,10 @@ typedef unsigned char Byte;
 typedef Byte ColourID;
 
 
-// If you get an error about specialization check the size of integral types
-template <typename T, size_t Size, bool x = sizeof(T) == Size>
-class SizeChecker;
-
 template <typename T, size_t Size>
-class SizeChecker<T, Size, true>
+class SizeChecker
 {
-	T v;
+	static_assert(sizeof(T) == Size, "Check the size of integral types");
 };
 
 template class SizeChecker<Int64, 8>;
@@ -150,10 +163,10 @@ template class SizeChecker<UInt16, 2>;
 template class SizeChecker<UInt8,  1>;
 
 // A macro to disallow the copy constructor and operator = functions
-// This should be used in the private: declarations for any class that shouldn't allow copying itself
+// This should be used in the declarations for any class that shouldn't allow copying itself
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-	TypeName(const TypeName &); \
-	void operator =(const TypeName &)
+	TypeName(const TypeName &) = delete; \
+	TypeName & operator =(const TypeName &) = delete
 
 // A macro that is used to mark unused local variables, to avoid pedantic warnings in gcc / clang / MSVC
 // Note that in MSVC it requires the full type of X to be known
@@ -198,11 +211,9 @@ template class SizeChecker<UInt8,  1>;
 	#include <dirent.h>
 	#include <errno.h>
 	#include <iostream>
-	#include <cstdio>
 	#include <cstring>
 	#include <pthread.h>
 	#include <semaphore.h>
-	#include <errno.h>
 	#include <fcntl.h>
 	#include <unistd.h>
 #endif
@@ -241,7 +252,12 @@ template class SizeChecker<UInt8,  1>;
 #include <set>
 #include <queue>
 #include <limits>
-#include <chrono>
+#include <random>
+#include <type_traits>
+#include <atomic>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 
 
@@ -397,11 +413,6 @@ template class SizeChecker<UInt8,  1>;
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
-// Unified ptr types from before C++11. Also no silly undercores.
-#define SharedPtr std::shared_ptr
-#define WeakPtr std::weak_ptr
-#define UniquePtr std::unique_ptr
-
 
 
 
@@ -470,8 +481,9 @@ using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 
 
 // Common headers (part 2, with macros):
-#include "ChunkDef.h"
+#include "Vector3.h"
 #include "BiomeDef.h"
+#include "ChunkDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
 

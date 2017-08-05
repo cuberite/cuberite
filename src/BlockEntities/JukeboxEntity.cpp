@@ -10,10 +10,11 @@
 
 
 
-cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_JUKEBOX, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
 	m_Record(0)
 {
+	ASSERT(a_BlockType == E_BLOCK_JUKEBOX);
 }
 
 
@@ -22,6 +23,17 @@ cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld 
 
 cJukeboxEntity::~cJukeboxEntity()
 {
+}
+
+
+
+
+
+void cJukeboxEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cJukeboxEntity &>(a_Src);
+	m_Record = src.m_Record;
 }
 
 

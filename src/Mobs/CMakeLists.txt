@@ -20,6 +20,7 @@ SET (SRCS
 	MagmaCube.cpp
 	Monster.cpp
 	Mooshroom.cpp
+	Ocelot.cpp
 	PassiveAggressiveMonster.cpp
 	PassiveMonster.cpp
 	Path.cpp

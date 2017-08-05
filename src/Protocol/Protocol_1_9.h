@@ -42,16 +42,6 @@ Declares the 1.9 protocol classes:
 
 
 
-// fwd:
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 class cProtocol_1_9_0 :
 	public cProtocol
 {
@@ -173,6 +163,10 @@ protected:
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
 
+	/** The current teleport ID, and whether it has been confirmed by the client */
+	bool m_IsTeleportIdConfirmed;
+	UInt32 m_OutstandingTeleportId;
+
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
 
@@ -269,7 +263,7 @@ protected:
 	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the block entity data for the specified block entity into the packet. */
-	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
+	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 
 	/** Types used within metadata */
 	enum eMetadataType

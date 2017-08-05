@@ -32,7 +32,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer())
 	{
-		if (m_World->GetTickRandomNumber(5) == 3)
+		if (GetRandomProvider().RandBool(1.0 / 6.0))
 		{
 			m_World->BroadcastEntityStatus(*this, esVillagerAngry);
 		}
@@ -90,7 +90,7 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Don't always try to do a special action. Each tick has 1% to do a special action.
-	if (m_World->GetTickRandomNumber(99) != 0)
+	if (GetRandomProvider().RandBool(0.99))
 	{
 		return;
 	}
@@ -150,7 +150,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 
 			m_VillagerAction = true;
 			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - 5, static_cast<int>(GetPosY()) + Y - 3, static_cast<int>(GetPosZ()) + Z - 5);
-			MoveToPosition(Vector3f(static_cast<float>(m_CropsPos.x + 0.5), static_cast<float>(m_CropsPos.y), static_cast<float>(m_CropsPos.z + 0.5)));
+			MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
 			return;
 		}  // for Y loop.
 	}  // Repeat the procces 5 times.

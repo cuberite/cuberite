@@ -3,7 +3,6 @@
 
 #include "Globals.h"
 #include "StructGen.h"
-#include "../BlockID.h"
 #include "Trees.h"
 #include "../BlockArea.h"
 #include "../LinearUpscale.h"
@@ -67,21 +66,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 		}  // for z
 	}  // for x
 
-	// Update the heightmap:
-	for (int x = 0; x < cChunkDef::Width; x++)
-	{
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			for (HEIGHTTYPE y = cChunkDef::Height - 1; y >= 0; y--)
-			{
-				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
-				{
-					a_ChunkDesc.SetHeight(x, z, y);
-					break;
-				}
-			}  // for y
-		}  // for z
-	}  // for x
+	a_ChunkDesc.UpdateHeightmap();
 }
 
 

@@ -15,8 +15,8 @@
 
 
 
-cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_ShouldDropSpense(false)
 {
 }
@@ -113,6 +113,18 @@ void cDropSpenserEntity::Activate(void)
 
 
 
+void cDropSpenserEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = reinterpret_cast<const cDropSpenserEntity &>(a_Src);
+	m_Contents.CopyFrom(src.m_Contents);
+	m_ShouldDropSpense = src.m_ShouldDropSpense;
+}
+
+
+
+
+
 bool cDropSpenserEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
@@ -153,7 +165,7 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow(Window);
+			a_Player->OpenWindow(*Window);
 		}
 	}
 	return true;
@@ -174,7 +186,7 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	cItems Pickups;
 	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
 
-	const int PickupSpeed = m_World->GetTickRandomNumber(4) + 2;  // At least 2, at most 6
+	const int PickupSpeed = GetRandomProvider().RandInt(2, 6);  // At least 2, at most 6
 	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
 	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{

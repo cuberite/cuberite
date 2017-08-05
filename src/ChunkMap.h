@@ -6,6 +6,8 @@
 #pragma once
 
 
+#include <functional>
+
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 
@@ -13,13 +15,12 @@
 
 
 class cWorld;
-class cWorldInterface;
 class cItem;
-class MTRand;
 class cChunkStay;
 class cChunk;
 class cPlayer;
 class cBeaconEntity;
+class cBedEntity;
 class cBrewingstandEntity;
 class cChestEntity;
 class cDispenserEntity;
@@ -30,9 +31,6 @@ class cNoteEntity;
 class cCommandBlockEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
-class cPawn;
-class cPickup;
-class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
@@ -45,6 +43,7 @@ typedef cChunk *                           cChunkPtr;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBlockEntity>        cBlockEntityCallback;
 typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
+typedef cItemCallback<cBedEntity>          cBedCallback;
 typedef cItemCallback<cBrewingstandEntity> cBrewingstandCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
 typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
@@ -112,9 +111,6 @@ public:
 
 	/** Wakes up simulators for the specified block */
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
-
-	/** Wakes up the simulators for the specified area of blocks */
-	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
@@ -193,7 +189,7 @@ public:
 	/** Sends the block at the specified coords to the specified player.
 	Uses a blockchange packet to send the block.
 	If the relevant chunk isn't loaded, doesn't do anything. */
-	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer * a_Player);
+	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player);
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -277,6 +273,10 @@ public:
 	/** Calls the callback for the beacon at the specified coords.
 	Returns false if there's no beacon at those coords, true if found. */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the bed at the specified coords.
+	Returns false if there's no bed at those coords, true if found. */
+	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
 	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback);  // Lua-acessible
@@ -362,7 +362,7 @@ public:
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 
 	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
-	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
+	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
 
 	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the sugarcane grew inside this call */
 	int GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);

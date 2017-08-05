@@ -6,7 +6,6 @@
 #include "Root.h"
 #include "Entities/Player.h"
 #include "Item.h"
-#include "Entities/Pickup.h"
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
@@ -757,48 +756,6 @@ void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
-{
-	// Limit the Y coords:
-	a_MinBlockY = std::max(a_MinBlockY, 0);
-	a_MaxBlockY = std::min(a_MaxBlockY, cChunkDef::Height - 1);
-
-	cSimulatorManager * SimMgr = m_World->GetSimulatorManager();
-	int MinChunkX, MinChunkZ, MaxChunkX, MaxChunkZ;
-	cChunkDef::BlockToChunk(a_MinBlockX, a_MinBlockZ, MinChunkX, MinChunkZ);
-	cChunkDef::BlockToChunk(a_MaxBlockX, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
-	cCSLock Lock(m_CSChunks);
-	for (int z = MinChunkZ; z <= MaxChunkZ; z++)
-	{
-		int MinZ = std::max(a_MinBlockZ, z * cChunkDef::Width);
-		int MaxZ = std::min(a_MaxBlockZ, z * cChunkDef::Width + cChunkDef::Width - 1);
-		for (int x = MinChunkX; x <= MaxChunkX; x++)
-		{
-			cChunkPtr Chunk = GetChunkNoGen(x, z);
-			if ((Chunk == nullptr) || !Chunk->IsValid())
-			{
-				continue;
-			}
-			int MinX = std::max(a_MinBlockX, x * cChunkDef::Width);
-			int MaxX = std::min(a_MaxBlockX, x * cChunkDef::Width + cChunkDef::Width - 1);
-			for (int BlockY = a_MinBlockY; BlockY <= a_MaxBlockY; BlockY++)
-			{
-				for (int BlockZ = MinZ; BlockZ <= MaxZ; BlockZ++)
-				{
-					for (int BlockX = MinX; BlockX <= MaxX; BlockX++)
-					{
-						SimMgr->WakeUp(BlockX, BlockY, BlockZ, Chunk);
-					}  // for BlockX
-				}  // for BlockZ
-			}  // for BlockY
-		}  // for x - chunks
-	}  // for z = chunks
-}
-
-
-
-
-
 void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSChunks);
@@ -1413,7 +1370,7 @@ bool cChunkMap::DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
+void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);
@@ -1422,7 +1379,7 @@ void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
 	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
 	if ((Chunk != nullptr) && (Chunk->IsValid()))
 	{
-		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player->GetClientHandle());
+		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player.GetClientHandle());
 	}
 }
 
@@ -1735,7 +1692,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 						case E_BLOCK_TNT:
 						{
 							// Activate the TNT, with a random fuse between 10 to 30 game ticks
-							int FuseTime = 10 + m_World->GetTickRandomNumber(20);
+							int FuseTime = GetRandomProvider().RandInt(10, 30);
 							m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
 							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
 							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
@@ -1775,7 +1732,8 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 						default:
 						{
-							if (m_World->GetTickRandomNumber(100) <= 25)  // 25% chance of pickups
+							auto & Random = GetRandomProvider();
+							if (Random.RandBool(0.25))  // 25% chance of pickups
 							{
 								cItems Drops;
 								cBlockHandler * Handler = BlockHandler(Block);
@@ -1783,7 +1741,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
 								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
 							}
-							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20))  // 20% chance of flinging stuff around
+							else if ((m_World->GetTNTShrapnelLevel() > slNone) && Random.RandBool(0.20))  // 20% chance of flinging stuff around
 							{
 								// If the block is shrapnel-able, make a falling block entity out of it:
 								if (
@@ -1862,11 +1820,10 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	ForEachEntity(TNTDamageCallback);
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
-	WakeUpSimulatorsInArea(
-		bx - ExplosionSizeInt - 1, bx + ExplosionSizeInt + 1,
-		MinY, MaxY,
-		bz - ExplosionSizeInt - 1, bz + ExplosionSizeInt + 1
-	);
+	m_World->GetSimulatorManager()->WakeUpArea(cCuboid(
+		bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1,
+		bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1
+	));
 }
 
 
@@ -2035,6 +1992,24 @@ bool cChunkMap::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeacon
 		return false;
 	}
 	return Chunk->DoWithBeaconAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cChunkMap::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback)
+{
+	int ChunkX, ChunkZ;
+	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cCSLock Lock(m_CSChunks);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
@@ -2516,7 +2491,7 @@ void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
 
 
 
-bool cChunkMap::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand)
+bool cChunkMap::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
@@ -2525,7 +2500,7 @@ bool cChunkMap::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCK
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
 	if (Chunk != nullptr)
 	{
-		return Chunk->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_Rand);
+		return Chunk->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType);
 	}
 	return false;
 }

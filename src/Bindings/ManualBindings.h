@@ -41,6 +41,10 @@ protected:
 	Implemented in ManualBindings_World.cpp. */
 	static void BindWorld(lua_State * tolua_S);
 
+	/** Binds the manually implemented cBlockArea API functions to tlua_S.
+	Implemented in ManualBindings_BlockArea.cpp. */
+	static void BindBlockArea(lua_State * tolua_S);
+
 
 public:
 	// Helper functions:
@@ -243,10 +247,11 @@ public:
 
 
 
+	/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that don't need to check their coords. */
 	template <
-		class Ty1,
-		class Ty2,
-		bool (Ty1::*DoWithFn)(int, int, int, cItemCallback<Ty2> &)
+		class SELF,
+		class ITEM,
+		bool (SELF::*DoWithFn)(int, int, int, cItemCallback<ITEM> &)
 	>
 	static int DoWithXYZ(lua_State * tolua_S)
 	{
@@ -262,7 +267,7 @@ public:
 		}
 
 		// Get parameters:
-		Ty1 * Self = nullptr;
+		SELF * Self = nullptr;
 		int BlockX = 0;
 		int BlockY = 0;
 		int BlockZ = 0;
@@ -277,7 +282,7 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
 		}
 
-		class cLuaCallback : public cItemCallback<Ty2>
+		class cLuaCallback : public cItemCallback<ITEM>
 		{
 		public:
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
@@ -287,7 +292,81 @@ public:
 			}
 
 		private:
-			virtual bool Item(Ty2 * a_Item) override
+			virtual bool Item(ITEM * a_Item) override
+			{
+				bool ret = false;
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
+				return ret;
+			}
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+		} Callback(L, FnRef);
+
+		// Call the DoWith function:
+		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, Callback);
+
+		// Push the result as the return value:
+		L.Push(res);
+		return 1;
+	}
+
+
+
+
+
+	/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that need to check their coords. */
+	template <
+		class SELF,
+		class ITEM,
+		bool (SELF::*DoWithFn)(int, int, int, cItemCallback<ITEM> &),
+		bool (SELF::*CoordCheckFn)(int, int, int) const
+	>
+	static int DoWithXYZ(lua_State * tolua_S)
+	{
+		// Check params:
+		cLuaState L(tolua_S);
+		if (
+			!L.CheckParamNumber(2, 4) ||
+			!L.CheckParamFunction(5) ||
+			!L.CheckParamEnd(6)
+		)
+		{
+			return 0;
+		}
+
+		// Get parameters:
+		SELF * Self = nullptr;
+		int BlockX = 0;
+		int BlockY = 0;
+		int BlockZ = 0;
+		cLuaState::cRef FnRef;
+		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
+		if (Self == nullptr)
+		{
+			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+		}
+		if (!FnRef.IsValid())
+		{
+			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
+		}
+		if (!(Self->*CoordCheckFn)(BlockX, BlockY, BlockZ))
+		{
+			return lua_do_error(tolua_S, Printf("Error in function call '#funcname#': The provided coordinates ({%d, %d, %d}) are not valid",
+				BlockX, BlockY, BlockZ
+			).c_str());
+		}
+
+		class cLuaCallback : public cItemCallback<ITEM>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
+			{
+			}
+
+		private:
+			virtual bool Item(ITEM * a_Item) override
 			{
 				bool ret = false;
 				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);

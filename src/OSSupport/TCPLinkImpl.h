@@ -22,9 +22,9 @@
 
 // fwd:
 class cServerHandleImpl;
-typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
+typedef std::shared_ptr<cServerHandleImpl> cServerHandleImplPtr;
 class cTCPLinkImpl;
-typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
+typedef std::shared_ptr<cTCPLinkImpl> cTCPLinkImplPtr;
 typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
 
 
@@ -79,8 +79,8 @@ protected:
 
 	// fwd:
 	class cLinkTlsContext;
-	typedef SharedPtr<cLinkTlsContext> cLinkTlsContextPtr;
-	typedef WeakPtr<cLinkTlsContext> cLinkTlsContextWPtr;
+	typedef std::shared_ptr<cLinkTlsContext> cLinkTlsContextPtr;
+	typedef std::weak_ptr<cLinkTlsContext> cLinkTlsContextWPtr;
 
 	/** Wrapper around cSslContext that is used when this link is being encrypted by SSL. */
 	class cLinkTlsContext :

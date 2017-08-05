@@ -13,14 +13,14 @@ class cEnderChestEntity :
 	public cBlockEntity,
 	public cBlockEntityWindowOwner
 {
-	typedef cBlockEntity super;
+	typedef cBlockEntity Super;
 
 public:
 	// tolua_end
 
 	BLOCKENTITY_PROTODEF(cEnderChestEntity)
 
-	cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cEnderChestEntity() override;
 
 	// cBlockEntity overrides:

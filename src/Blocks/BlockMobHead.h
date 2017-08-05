@@ -22,9 +22,9 @@ public:
 		// The drop spawn is in the OnDestroyedByPlayer method
 	}
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		if (a_Player->IsGameModeCreative())
+		if (a_Player.IsGameModeCreative())
 		{
 			// No drops in creative mode
 			return;
@@ -42,7 +42,7 @@ public:
 
 				cItems Pickups;
 				Pickups.Add(E_ITEM_HEAD, 1, static_cast<short>(MobHeadEntity->GetType()));
-				MTRand r1;
+				auto & r1 = GetRandomProvider();
 
 				// Mid-block position first
 				double MicroX, MicroY, MicroZ;
@@ -51,8 +51,8 @@ public:
 				MicroZ = MobHeadEntity->GetPosZ() + 0.5;
 
 				// Add random offset second
-				MicroX += r1.rand(1) - 0.5;
-				MicroZ += r1.rand(1) - 0.5;
+				MicroX += r1.RandReal<double>(-0.5, 0.5);
+				MicroZ += r1.RandReal<double>(-0.5, 0.5);
 
 				MobHeadEntity->GetWorld()->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 				return false;

@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Sheep.h"
-#include "../BlockID.h"
 #include "../Entities/Player.h"
 #include "../World.h"
 #include "../EffectID.h"
@@ -65,8 +64,8 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		a_Player.UseEquippedItem();
 
 		cItems Drops;
-		int NumDrops = m_World->GetTickRandomNumber(2) + 1;
-		Drops.push_back(cItem(E_BLOCK_WOOL, static_cast<char>(NumDrops), static_cast<short>(m_WoolColor)));
+		char NumDrops = GetRandomProvider().RandInt<char>(1, 3);
+		Drops.emplace_back(E_BLOCK_WOOL, NumDrops, static_cast<short>(m_WoolColor));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 		m_World->BroadcastSoundEffect("entity.sheep.shear", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 1.0f);
 	}
@@ -121,7 +120,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		if (m_World->GetTickRandomNumber(600) == 1)
+		if (GetRandomProvider().RandBool(1.0 / 600.0))
 		{
 			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
 			{
@@ -167,8 +166,7 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 			return;
 		}
 	}
-	cFastRandom Random;
-	SetFurColor((Random.NextInt(100) < 50) ? Parent1->GetFurColor() : Parent2->GetFurColor());
+	SetFurColor(GetRandomProvider().RandBool() ? Parent1->GetFurColor() : Parent2->GetFurColor());
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -178,8 +176,7 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 
 NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
 {
-	cFastRandom Random;
-	int Chance = Random.NextInt(101);
+	int Chance = GetRandomProvider().RandInt(100);
 
 	if (Chance <= 81)
 	{

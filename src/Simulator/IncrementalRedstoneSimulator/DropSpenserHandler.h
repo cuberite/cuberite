@@ -13,11 +13,6 @@ class cDropSpenserHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	cDropSpenserHandler(cWorld & a_World) :
-		super(a_World)
-	{
-	}
-
 	inline static bool IsActivated(NIBBLETYPE a_Meta)
 	{
 		return (a_Meta & E_META_DROPSPENSER_ACTIVATED) != 0;
@@ -34,8 +29,9 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
@@ -44,15 +40,16 @@ public:
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		return 0;
 	}
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating spencer the dropspenser (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 		bool IsPoweredNow = (a_PoweringData.PowerLevel > 0);
@@ -70,20 +67,21 @@ public:
 				}
 			} DrSpSP;
 
-			m_World.DoWithDropSpenserAt(a_Position.x, a_Position.y, a_Position.z, DrSpSP);
+			a_World.DoWithDropSpenserAt(a_Position.x, a_Position.y, a_Position.z, DrSpSP);
 		}
 
 		// Update the internal dropspenser state if necessary
 		if (IsPoweredNow != WasPoweredPreviously)
 		{
-			m_World.SetBlockMeta(a_Position, SetActivationState(a_Meta, IsPoweredNow));
+			a_World.SetBlockMeta(a_Position, SetActivationState(a_Meta, IsPoweredNow));
 		}
 
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 

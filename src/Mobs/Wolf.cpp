@@ -138,7 +138,7 @@ void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool 
 		// If a player is asking for help and we already have a target,
 		// there's a 50% chance of helping and a 50% chance of doing nothing
 		// This helps spread a wolf pack's targets over several mobs
-		else if (m_World->GetTickRandomNumber(9)> 4)
+		else if (GetRandomProvider().RandBool())
 		{
 			return;
 		}
@@ -169,17 +169,20 @@ void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool 
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
+	const cItem & EquippedItem = a_Player.GetEquippedItem();
+	const int EquippedItemType = EquippedItem.m_ItemType;
+
 	if (!IsTame() && !IsAngry())
 	{
 		// If the player is holding a bone, try to tame the wolf:
-		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_BONE)
+		if (EquippedItemType == E_ITEM_BONE)
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 
-			if (m_World->GetTickRandomNumber(7) == 0)
+			if (GetRandomProvider().RandBool(0.125))
 			{
 				// Taming succeeded
 				SetMaxHealth(20);
@@ -199,7 +202,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	else if (IsTame())
 	{
 		// Feed the wolf, restoring its health, or dye its collar:
-		switch (a_Player.GetEquippedItem().m_ItemType)
+		switch (EquippedItemType)
 		{
 			case E_ITEM_RAW_BEEF:
 			case E_ITEM_STEAK:
@@ -211,7 +214,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				if (m_Health < m_MaxHealth)
 				{
-					Heal(ItemHandler(a_Player.GetEquippedItem().m_ItemType)->GetFoodInfo().FoodLevel);
+					Heal(ItemHandler(EquippedItemType)->GetFoodInfo(&EquippedItem).FoodLevel);
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();
@@ -223,7 +226,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
 				{
-					SetCollarColor(a_Player.GetEquippedItem().m_ItemDamage);
+					SetCollarColor(EquippedItem.m_ItemDamage);
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();

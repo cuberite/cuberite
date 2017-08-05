@@ -20,8 +20,6 @@
 
 
 // fwd:
-class cHTTPMessage;
-class cHTTPRequestParser;
 class cHTTPIncomingRequest;
 class cHTTPServerConnection;
 

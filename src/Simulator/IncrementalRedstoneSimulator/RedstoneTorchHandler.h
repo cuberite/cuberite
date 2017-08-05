@@ -11,17 +11,12 @@ class cRedstoneTorchHandler : public cRedstoneHandler
 {
 public:
 
-	cRedstoneTorchHandler(cWorld & a_World) :
-		cRedstoneHandler(a_World)
-	{
-	}
-
 	inline static bool IsOn(BLOCKTYPE a_Block)
 	{
 		return (a_Block == E_BLOCK_REDSTONE_TORCH_ON);
 	}
 
-	inline static const Vector3i GetOffsetAttachedTo(const Vector3i & a_Position, NIBBLETYPE a_Meta)
+	inline static Vector3i GetOffsetAttachedTo(const Vector3i & a_Position, NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
 		{
@@ -38,7 +33,7 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		if (
 			IsOn(a_BlockType) &&
@@ -51,16 +46,16 @@ public:
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		return IsOn(a_BlockType) ? 15 : 0;
 	}
 
-	virtual cVector3iArray Update(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) override
+	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating torchy the redstone torch (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto Data = static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData();
+		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 		auto DelayInfo = Data->GetMechanismDelayInfo(a_Position);
 
 		if (DelayInfo == nullptr)
@@ -79,7 +74,7 @@ public:
 
 			if (DelayTicks == 0)
 			{
-				m_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, ShouldPowerOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF, a_Meta);
+				a_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, ShouldPowerOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF, a_Meta);
 				Data->m_MechanismDelays.erase(a_Position);
 
 				cVector3iArray RelativePositions = GetRelativeAdjacents();
@@ -91,8 +86,9 @@ public:
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
+		UNUSED(a_World);
 		UNUSED(a_BlockType);
 		return { (a_Position + GetOffsetAttachedTo(a_Position, a_Meta)) };
 	}
