@@ -119,7 +119,6 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		Damage += ExtraDamage;
 	}
 
-	// int KnockbackAmount = 1;
 	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
 	double KnockbackAmount = 11 + 10 * PunchLevel;
 	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
