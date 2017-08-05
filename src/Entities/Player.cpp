@@ -1321,10 +1321,16 @@ cTeam * cPlayer::UpdateTeam(void)
 
 void cPlayer::OpenWindow(cWindow & a_Window)
 {
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerOpeningWindow(*this, a_Window))
+	{
+		return;
+	}
+
 	if (&a_Window != m_CurrentWindow)
 	{
 		CloseWindow(false);
 	}
+
 	a_Window.OpenedByPlayer(*this);
 	m_CurrentWindow = &a_Window;
 	a_Window.SendWholeWindow(*GetClientHandle());

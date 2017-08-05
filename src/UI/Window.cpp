@@ -285,12 +285,6 @@ void cWindow::Clicked(
 
 void cWindow::OpenedByPlayer(cPlayer & a_Player)
 {
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerOpeningWindow(a_Player, *this))
-	{
-		// Plugin can cancel opening window
-		return;
-	}
-
 	{
 		cCSLock Lock(m_CS);
 		// If player is already in OpenedBy remove player first
