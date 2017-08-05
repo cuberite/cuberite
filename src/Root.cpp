@@ -709,6 +709,21 @@ void cRoot::SaveAllChunks(void)
 
 
 
+
+
+// TODO: Does this need to be run through a queue for thread safety? (or, make SetSavingEnabled atomic)
+void cRoot::SetSavingEnabled(bool a_SavingEnabled)
+{
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	{
+		itr->second->SetSavingEnabled(a_SavingEnabled);
+	}
+}
+
+
+
+
+
 void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 {
 	for (const auto & itr : m_WorldsByName)

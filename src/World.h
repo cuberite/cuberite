@@ -111,6 +111,9 @@ public:
 
 	// tolua_begin
 
+	bool GetSavingEnabled(void) const { return m_SavingEnabled; }
+	void SetSavingEnabled(bool a_SavingEnabled) { m_SavingEnabled = a_SavingEnabled; }
+
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 
 	/** Is the daylight cycle enabled? */
@@ -881,6 +884,8 @@ private:
 	AString m_StorageSchema;
 
 	int m_StorageCompressionFactor;
+
+	bool m_SavingEnabled;
 
 	/** The dimension of the world, used by the client to provide correct lighting scheme */
 	eDimension m_Dimension;

@@ -135,6 +135,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 #else
 	m_StorageCompressionFactor(6),
 #endif
+	m_SavingEnabled(true),
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
 	m_SpawnX(0),
@@ -218,11 +219,14 @@ cWorld::~cWorld()
 
 	m_Storage.WaitForFinish();
 
-	// Unload the scoreboard
-	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
-	Serializer.Save();
+	if (GetSavingEnabled())
+	{
+		// Unload the scoreboard
+		cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+		Serializer.Save();
 
-	m_MapManager.SaveMapData();
+		m_MapManager.SaveMapData();
+	}
 
 	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
 	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
@@ -1032,18 +1036,15 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		// Unload every 10 seconds
 		UnloadUnusedChunks();
 
-		if (IsSavingEnabled())
+		if (m_WorldAge - m_LastSave > std::chrono::minutes(5))
 		{
-			if (m_WorldAge - m_LastSave > std::chrono::minutes(5))
-			{
-				// Save every 5 minutes
-				SaveAllChunks();
-			}
-			else if (GetNumUnusedDirtyChunks() > m_UnusedDirtyChunksCap)
-			{
-				// Save if we have too many dirty unused chunks
-				SaveAllChunks();
-			}
+			// Save every 5 minutes
+			SaveAllChunks();
+		}
+		else if (GetNumUnusedDirtyChunks() > m_UnusedDirtyChunksCap)
+		{
+			// Save if we have too many dirty unused chunks
+			SaveAllChunks();
 		}
 	}
 }
@@ -2959,7 +2960,9 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	);
 
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
-	if (a_SetChunkData.ShouldMarkDirty())
+	// If saving is disabled, then the chunk was marked dirty so it will get
+	// saved if saving is later enabled.
+	if (a_SetChunkData.ShouldMarkDirty() && GetSavingEnabled())
 	{
 		m_Storage.QueueSaveChunk(ChunkX, ChunkZ);
 	}
@@ -3567,8 +3570,11 @@ bool cWorld::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 
 void cWorld::SaveAllChunks(void)
 {
-	m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
-	m_ChunkMap->SaveAllChunks();
+	if (GetSavingEnabled())
+	{
+		m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
+		m_ChunkMap->SaveAllChunks();
+	}
 }
 
 
