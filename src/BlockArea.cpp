@@ -12,7 +12,6 @@
 #include "BlockArea.h"
 #include "OSSupport/GZipFile.h"
 #include "Blocks/BlockHandler.h"
-#include "Cuboid.h"
 #include "ChunkData.h"
 #include "BlockEntities/BlockEntity.h"
 

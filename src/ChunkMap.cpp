@@ -6,7 +6,6 @@
 #include "Root.h"
 #include "Entities/Player.h"
 #include "Item.h"
-#include "Entities/Pickup.h"
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"

@@ -7,7 +7,6 @@
 
 #include "CompoGenBiomal.h"
 
-#include "ComposableGenerator.h"
 #include "../IniFile.h"
 #include "../Noise/Noise.h"
 #include "../LinearUpscale.h"

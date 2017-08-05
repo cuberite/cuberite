@@ -24,14 +24,6 @@
 
 
 
-// fwd:
-class cEvent;
-class cWebPlugin;
-
-
-
-
-
 // tolua_begin
 struct HTTPFormData
 {

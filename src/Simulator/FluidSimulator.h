@@ -4,7 +4,6 @@
 #include "Simulator.h"
 
 
-class cChunk;
 class cWorld;
 
 

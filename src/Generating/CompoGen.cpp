@@ -9,7 +9,6 @@
 
 #include "Globals.h"
 #include "CompoGen.h"
-#include "../BlockID.h"
 #include "../Item.h"
 #include "../LinearUpscale.h"
 #include "../IniFile.h"

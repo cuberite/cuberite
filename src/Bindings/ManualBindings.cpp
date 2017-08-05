@@ -5,7 +5,6 @@
 #undef TOLUA_TEMPLATE_BIND
 #include <sstream>
 #include <iomanip>
-#include <array>
 #include "tolua++/include/tolua++.h"
 #include "polarssl/md5.h"
 #include "polarssl/sha1.h"

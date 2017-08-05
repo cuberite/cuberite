@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include <atomic>
 #include <event2/event.h>
 #include "Network.h"
 #include "NetworkLookup.h"

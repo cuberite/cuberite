@@ -17,7 +17,6 @@
 
 
 // fwd:
-class cPluginLua;
 class cChunkMap;
 
 

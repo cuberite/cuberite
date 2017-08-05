@@ -33,7 +33,6 @@
 
 
 // fwd:
-class cPlayer;
 class cClientHandle;
 typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 typedef std::list<cClientHandlePtr> cClientHandlePtrs;

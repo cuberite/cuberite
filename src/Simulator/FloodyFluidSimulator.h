@@ -16,13 +16,6 @@
 
 
 
-// fwd:
-class cBlockArea;
-
-
-
-
-
 class cFloodyFluidSimulator :
 	public cDelayedFluidSimulator
 {

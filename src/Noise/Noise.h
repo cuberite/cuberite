@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <cmath>
-
 /** The datatype used by all the noise generators. */
 typedef float NOISE_DATATYPE;
 

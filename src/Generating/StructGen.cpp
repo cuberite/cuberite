@@ -3,7 +3,6 @@
 
 #include "Globals.h"
 #include "StructGen.h"
-#include "../BlockID.h"
 #include "Trees.h"
 #include "../BlockArea.h"
 #include "../LinearUpscale.h"

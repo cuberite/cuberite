@@ -11,10 +11,7 @@
 
 
 #pragma once
-#ifndef WORLDSTORAGE_H_INCLUDED
-#define WORLDSTORAGE_H_INCLUDED
 
-#include "../ChunkDef.h"
 #include "../OSSupport/IsThread.h"
 #include "../OSSupport/Queue.h"
 
@@ -112,12 +109,6 @@ protected:
 	/** Saves one chunk from the queue (if any queued); returns true if there are more chunks in the save queue */
 	bool SaveOneChunk(void);
 } ;
-
-
-
-
-
-#endif  // WORLDSTORAGE_H_INCLUDED
 
 
 

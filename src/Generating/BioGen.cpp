@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "BioGen.h"
-#include <chrono>
 #include <iostream>
 #include "IntGen.h"
 #include "ProtIntGen.h"

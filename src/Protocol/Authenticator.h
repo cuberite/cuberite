@@ -18,8 +18,7 @@ class cSettingsRepositoryInterface;
 
 
 
-// fwd: "cRoot.h"
-class cRoot;
+
 
 namespace Json
 {

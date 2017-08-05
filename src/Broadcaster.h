@@ -1,8 +1,6 @@
 
 class cWorld;
 
-#include <array>
-
 class cBroadcaster
 {
 

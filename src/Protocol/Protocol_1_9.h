@@ -42,16 +42,6 @@ Declares the 1.9 protocol classes:
 
 
 
-// fwd:
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 class cProtocol_1_9_0 :
 	public cProtocol
 {
