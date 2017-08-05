@@ -12,7 +12,6 @@ namespace Json
 	class Value;
 };
 
-class cClientHandle;
 class cPlayer;
 
 

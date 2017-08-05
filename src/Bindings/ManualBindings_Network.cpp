@@ -5,7 +5,6 @@
 // Also implements the cUrlClient bindings
 
 #include "Globals.h"
-#include "LuaTCPLink.h"
 #include "ManualBindings.h"
 #include "tolua++/include/tolua++.h"
 #include "LuaState.h"

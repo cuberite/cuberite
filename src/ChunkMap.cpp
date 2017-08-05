@@ -6,7 +6,6 @@
 #include "Root.h"
 #include "Entities/Player.h"
 #include "Item.h"
-#include "Entities/Pickup.h"
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
@@ -1371,7 +1370,7 @@ bool cChunkMap::DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
+void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);
@@ -1380,7 +1379,7 @@ void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
 	cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
 	if ((Chunk != nullptr) && (Chunk->IsValid()))
 	{
-		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player->GetClientHandle());
+		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player.GetClientHandle());
 	}
 }
 

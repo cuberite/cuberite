@@ -1,12 +1,6 @@
 
 #pragma once
 
-#ifndef _WIN32
-	#include "BlockID.h"
-#else
-	enum ENUM_ITEM_ID : short;
-#endif
-
 #define MAX_PLAYERS 65535
 
 #include <functional>
@@ -15,7 +9,6 @@
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
-#include "Vector3.h"
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"
@@ -44,8 +37,6 @@ typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
-class cBlockEntity;
-class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
 class cBeaconEntity;
 class cBrewingstandEntity;
@@ -484,7 +475,7 @@ public:
 
 	// tolua_begin
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
-	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player) override;
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
 
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */

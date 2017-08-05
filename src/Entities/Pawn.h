@@ -29,6 +29,7 @@ public:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual bool IsFireproof(void) const override;
+	virtual bool IsInvisible() const override;
 	virtual void HandleAir(void) override;
 	virtual void HandleFalling(void);
 
@@ -66,11 +67,11 @@ public:
 	/** Returns all entity effects */
 	std::map<cEntityEffect::eType, cEntityEffect *> GetEntityEffects();
 
-	/** Returns the entity effect, if it is currently applied. */
-	cEntityEffect *GetEntityEffect(cEntityEffect::eType a_EffectType);
+	/** Returns the entity effect, if it is currently applied or nullptr if not. */
+	cEntityEffect * GetEntityEffect(cEntityEffect::eType a_EffectType);
 
 protected:
-	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
+	typedef std::map<cEntityEffect::eType, std::unique_ptr<cEntityEffect>> tEffectMap;
 	tEffectMap m_EntityEffects;
 
 	double m_LastGroundHeight;

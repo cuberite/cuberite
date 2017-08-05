@@ -15,7 +15,6 @@
 #include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
 #include "AnvilWindow.h"
-#include "Window.h"
 #include "../CraftingRecipes.h"
 #include "../Root.h"
 #include "../FastRandom.h"

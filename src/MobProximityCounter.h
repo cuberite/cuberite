@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <set>
-
 class cChunk;
 class cEntity;
 

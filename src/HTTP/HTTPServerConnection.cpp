@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "HTTPServerConnection.h"
 #include "HTTPMessage.h"
-#include "HTTPMessageParser.h"
 #include "HTTPServer.h"
 
 

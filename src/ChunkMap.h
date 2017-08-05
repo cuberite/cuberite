@@ -6,6 +6,8 @@
 #pragma once
 
 
+#include <functional>
+
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 
@@ -13,7 +15,6 @@
 
 
 class cWorld;
-class cWorldInterface;
 class cItem;
 class cChunkStay;
 class cChunk;
@@ -30,9 +31,6 @@ class cNoteEntity;
 class cCommandBlockEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
-class cPawn;
-class cPickup;
-class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
@@ -191,7 +189,7 @@ public:
 	/** Sends the block at the specified coords to the specified player.
 	Uses a blockchange packet to send the block.
 	If the relevant chunk isn't loaded, doesn't do anything. */
-	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer * a_Player);
+	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player);
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);

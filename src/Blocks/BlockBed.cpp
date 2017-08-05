@@ -9,7 +9,6 @@
 #include "Entities/Player.h"
 #include "../BoundingBox.h"
 #include "../Mobs/Monster.h"
-#include "../Entities/Entity.h"
 #include "../BlockEntities/BedEntity.h"
 
 
@@ -114,7 +113,7 @@ private:
 
 
 
-bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	if (a_WorldInterface.GetDimension() != dimOverworld)
 	{
@@ -123,21 +122,21 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 	}
 	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: http://minecraft.gamepedia.com/Bed#Sleeping
 	{
-		a_Player->SendMessageFailure("You can only sleep at night");
+		a_Player.SendMessageFailure("You can only sleep at night");
 	}
 	else
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if ((Meta & 0x4) == 0x4)
 		{
-			a_Player->SendMessageFailure("This bed is occupied");
+			a_Player.SendMessageFailure("This bed is occupied");
 		}
 		else
 		{
 			cFindMobs FindMobs;
-			if (!a_Player->GetWorld()->ForEachEntityInBox(cBoundingBox(a_Player->GetPosition() - Vector3i(0, 5, 0), 8, 10), FindMobs))
+			if (!a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(a_Player.GetPosition() - Vector3i(0, 5, 0), 8, 10), FindMobs))
 			{
-				a_Player->SendMessageFailure("You may not rest now, there are monsters nearby");
+				a_Player.SendMessageFailure("You may not rest now, there are monsters nearby");
 			}
 			else
 			{
@@ -146,7 +145,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 				if ((Meta & 0x8) == 0x8)
 				{
 					// Is pillow
-					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
+					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_BlockX, a_BlockY, a_BlockZ);
 				}
 				else
 				{
@@ -156,14 +155,14 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					PillowDirection = MetaDataToDirection(Meta & 0x3);
 					if (a_ChunkInterface.GetBlock(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 					{
-						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z);
+						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z);
 					}
 				}
 
-				a_Player->SetBedPos(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
-				SetBedOccupationState(a_ChunkInterface, a_Player->GetLastBedPos(), true);
-				a_Player->SetIsInBed(true);
-				a_Player->SendMessageSuccess("Home position set successfully");
+				a_Player.SetBedPos(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+				SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
+				a_Player.SetIsInBed(true);
+				a_Player.SendMessageSuccess("Home position set successfully");
 
 				cTimeFastForwardTester Tester;
 				if (a_WorldInterface.ForEachPlayer(Tester))
@@ -183,7 +182,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 
 
-void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, const sSetBlock & a_BlockChange)
+void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
 	class cBedColor :
 		public cBedCallback
@@ -202,8 +201,8 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 			return true;
 		}
 	};
-	cBedColor BedCallback(a_Player->GetEquippedItem().m_ItemDamage);
-	a_Player->GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), BedCallback);
+	cBedColor BedCallback(a_Player.GetEquippedItem().m_ItemDamage);
+	a_Player.GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), BedCallback);
 }
 
 

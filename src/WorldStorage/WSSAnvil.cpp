@@ -6,12 +6,10 @@
 #include "Globals.h"
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
-#include "FastNBT.h"
 #include "EnchantmentSerializer.h"
 #include "zlib/zlib.h"
 #include "json/json.h"
 #include "../World.h"
-#include "../BlockID.h"
 #include "../Item.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
@@ -34,7 +32,6 @@
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 
-#include "../Mobs/Monster.h"
 #include "../Mobs/IncludeAllMonsters.h"
 
 #include "../Entities/Boat.h"

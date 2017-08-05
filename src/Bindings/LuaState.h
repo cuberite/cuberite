@@ -35,8 +35,9 @@ extern "C"
 	#include "lua/src/lauxlib.h"
 }
 
-#include <atomic>
-#include "../Vector3.h"
+
+#include <functional>
+
 #include "../Defines.h"
 #include "PluginManager.h"
 #include "LuaState_Typedefs.inc"
@@ -45,7 +46,6 @@ extern "C"
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
-class cPluginLua;
 class cDeadlockDetect;
 
 

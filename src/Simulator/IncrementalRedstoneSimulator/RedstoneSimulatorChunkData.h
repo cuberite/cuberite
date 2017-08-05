@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "Vector3.h"
 #include "RedstoneHandler.h"
 #include "../RedstoneSimulator.h"
 #include <unordered_map>
