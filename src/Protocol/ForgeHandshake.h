@@ -44,6 +44,7 @@ private:
 	void HandleModList(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
 	void HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
 
+	/** Set errored state to prevent further handshake message processing. */
 	void SetError(const AString & message);
 
 	/** Parse the client ModList packet of installed Forge mods and versions. */
