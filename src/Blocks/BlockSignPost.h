@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../Entities/Player.h"
 #include "Chunk.h"
 
 
