@@ -8,8 +8,6 @@
 #include "Simulator/SandSimulator.h"
 #include "Simulator/RedstoneSimulator.h"
 
-#include "Blocks/GetHandlerCompileTimeTemplate.h"
-
 #include "ChunkMap.h"
 
 
