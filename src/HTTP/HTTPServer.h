@@ -11,7 +11,6 @@
 
 #include "../OSSupport/Network.h"
 #include "../IniFile.h"
-#include "PolarSSL++/RsaPrivateKey.h"
 #include "PolarSSL++/CryptoKey.h"
 #include "PolarSSL++/X509Cert.h"
 
