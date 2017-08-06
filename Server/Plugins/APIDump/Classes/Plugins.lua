@@ -840,6 +840,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when the player has moved and the movement is now being applied.",
 			},
+			HOOK_PLAYER_OPENING_WINDOW =
+			{
+				Notes = "Called when the player is about to open a window. The plugin can return true to cancel the window opening.",
+			},
 			HOOK_PLAYER_PLACED_BLOCK =
 			{
 				Notes = "Called when the player has just placed a block",
