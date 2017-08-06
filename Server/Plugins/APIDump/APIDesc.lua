@@ -8086,10 +8086,10 @@ This class is used by plugins wishing to display a custom window to the player, 
 					Contents = [[
 						This callback, settable via the SetOnClicked() function, will be called when the player clicks a slot in the window. The callback can cancel the click.</p>
 <pre class="prettyprint lang-lua">
-function OnWindowClicked(a_Window, a_Player, a_SlotNum, a_ClickAction)
+function OnWindowClicked(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
 </pre>
 						<p>
-						The a_Window parameter is the cLuaWindow object representing the window, a_Player is the player who made the click, a_SlotNum is the slot the player clicked, and a_ClickAction is the type of click the player made. If the function returns true, the click is cancelled (internally, the server resends the window slots to the player to keep the player in sync).
+						The a_Window parameter is the cLuaWindow object representing the window, a_Player is the player who made the click, a_SlotNum is the slot the player clicked, a_ClickAction is the type of click the player made, and a_ClickedItem is the item the player clicked on, if applicable. If the function returns true, the click is cancelled (internally, the server resends the window slots to the player to keep the player in sync).
 					]],
 				},
 				{
@@ -8134,7 +8134,7 @@ local OnSlotChanged = function(Window, SlotNum)
 end
 
 -- Prevent shift-clicking:
-local OnClicked = function(Window, ClickingPlayer, SlotNum, ClickAction)
+local OnClicked = function(Window, ClickingPlayer, SlotNum, ClickAction, ClickedItem)
 	if ClickAction == caShiftLeftClick then
 		return true
 	end
