@@ -4,10 +4,8 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "BlockHandler.h"
 #include "MetaRotator.h"
 #include "ChunkInterface.h"
-#include "../World.h"
 #include "../Entities/Entity.h"
 
 

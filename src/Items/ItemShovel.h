@@ -5,7 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 
-#include "../Blocks/BlockHandler.h"
+
 #include "../BlockInServerPluginInterface.h"
 
 

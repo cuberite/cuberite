@@ -2,9 +2,7 @@
 #pragma once
 
 #include "../Entities/Pawn.h"
-#include "../Defines.h"
 #include "../Item.h"
-#include "../Enchantments.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
 

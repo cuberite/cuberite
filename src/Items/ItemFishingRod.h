@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "../Bindings/PluginManager.h"
 #include "../Entities/Floater.h"
 #include "../Entities/Entity.h"
 #include "../Item.h"

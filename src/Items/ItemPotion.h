@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../Entities/EntityEffect.h"
-#include "../Entities/SplashPotionEntity.h"
+
 
 class cItemPotionHandler:
 	public cItemHandler

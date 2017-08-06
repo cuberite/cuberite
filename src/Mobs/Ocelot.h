@@ -2,7 +2,6 @@
 #pragma once
 
 #include "PassiveMonster.h"
-#include "../Entities/Entity.h"
 
 
 
