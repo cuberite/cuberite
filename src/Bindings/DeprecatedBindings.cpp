@@ -351,12 +351,12 @@ static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
 {
 	// Maintain legacy m_Lore variable as Lore table split by ` (grave-accent)
 	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("cItem"))
+	if (!L.CheckParamSelf("const cItem"))
 	{
 		return 0;
 	}
 
-	cItem * Self = nullptr;
+	const cItem * Self = nullptr;
 	L.GetStackValue(1, Self);
 
 	AString LoreString = StringJoin(Self->m_LoreTable, "`");

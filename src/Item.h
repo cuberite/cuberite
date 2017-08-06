@@ -220,7 +220,12 @@ public:
 	short          m_ItemDamage;
 	cEnchantments  m_Enchantments;
 	AString        m_CustomName;
-	AStringVector  m_LoreTable;
+
+	// tolua_end
+
+	AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
+
+	// tolua_begin
 
 	int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;

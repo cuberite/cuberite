@@ -2562,13 +2562,13 @@ static int tolua_get_cItem_m_LoreTable(lua_State * tolua_S)
 {
 	// Check params:
 	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("cItem"))
+	if (!L.CheckParamSelf("const cItem"))
 	{
 		return 0;
 	}
 
 	// Get the params:
-	cItem * Self = nullptr;
+	const cItem * Self = nullptr;
 	L.GetStackValue(1, Self);
 
 	// Push the result:
