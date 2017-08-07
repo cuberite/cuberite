@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Sheep.h"
-#include "../BlockID.h"
 #include "../Entities/Player.h"
 #include "../World.h"
 #include "../EffectID.h"

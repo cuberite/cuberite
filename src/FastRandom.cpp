@@ -5,9 +5,6 @@
 #include "Globals.h"
 #include "FastRandom.h"
 
-#include <mutex>
-#include <random>
-
 #if defined (__GNUC__)
 	#define ATTRIBUTE_TLS static __thread
 #elif defined (_MSC_VER)

@@ -6,7 +6,6 @@
 #include "Globals.h"
 
 #include "DistortedHeightmap.h"
-#include "../OSSupport/File.h"
 #include "../IniFile.h"
 #include "../LinearUpscale.h"
 

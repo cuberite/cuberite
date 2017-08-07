@@ -1,15 +1,11 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "BlockID.h"
 #include "World.h"
-#include "ChunkDef.h"
 #include "ClientHandle.h"
 #include "Server.h"
-#include "Item.h"
 #include "Root.h"
 #include "IniFile.h"
-#include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
@@ -19,7 +15,6 @@
 #include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
-#include "Entities/Boat.h"
 #include "Entities/ExpOrb.h"
 #include "Entities/FallingBlock.h"
 #include "Entities/Minecart.h"
@@ -31,7 +26,6 @@
 #include "BlockEntities/BeaconEntity.h"
 
 // Simulators:
-#include "Simulator/SimulatorManager.h"
 #include "Simulator/FloodyFluidSimulator.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
@@ -2395,7 +2389,7 @@ bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
 
 
 
-void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
+void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 {
 	m_ChunkMap->SendBlockTo(a_X, a_Y, a_Z, a_Player);
 }

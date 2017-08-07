@@ -11,7 +11,6 @@
 
 #include "Blocks/BlockPluginInterface.h"
 #include "World.h"
-#include "Root.h"
 #include "Bindings/PluginManager.h"
 
 

@@ -25,20 +25,101 @@ static const int MAX_LIST_ITEMS = 10000;
 
 #ifdef _MSC_VER
 	// Dodge a C4127 (conditional expression is constant) for this specific macro usage
-	#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while ((false, false))
+	#define PROPAGATE_ERROR(X) do { auto Err = (X); if (Err != eNBTParseError::npSuccess) return Err; } while ((false, false))
 #else
-	#define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while (false)
+	#define PROPAGATE_ERROR(X) do { auto Err = (X); if (Err != eNBTParseError::npSuccess) return Err; } while (false)
 #endif
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cNBTParseErrorCategory:
+
+AString cNBTParseErrorCategory::message(int a_Condition) const
+{
+	switch (static_cast<eNBTParseError>(a_Condition))
+	{
+		case eNBTParseError::npSuccess:
+		{
+			return "Parsing succeded";
+		}
+		case eNBTParseError::npNeedBytes:
+		{
+			return "Expected more data";
+		}
+		case eNBTParseError::npNoTopLevelCompound:
+		{
+			return "No top level compound tag";
+		}
+		case eNBTParseError::npStringMissingLength:
+		{
+			return "Expected a string length but had insufficient data";
+		}
+		case eNBTParseError::npStringInvalidLength:
+		{
+			return "String length invalid";
+		}
+		case eNBTParseError::npCompoundImbalancedTag:
+		{
+			return "Compound tag was unmatched at end of file";
+		}
+		case eNBTParseError::npListMissingType:
+		{
+			return "Expected a list type but had insuffiecient data";
+		}
+		case eNBTParseError::npListMissingLength:
+		{
+			return "Expected a list length but had insufficient data";
+		}
+		case eNBTParseError::npListInvalidLength:
+		{
+			return "List length invalid";
+		}
+		case eNBTParseError::npSimpleMissing:
+		{
+			return "Expected a numeric type but had insufficient data";
+		}
+		case eNBTParseError::npArrayMissingLength:
+		{
+			return "Expected an array length but had insufficient data";
+		}
+		case eNBTParseError::npArrayInvalidLength:
+		{
+			return "Array length invalid";
+		}
+		case eNBTParseError::npUnknownTag:
+		{
+			return "Unknown tag";
+		}
+
+		#ifdef __clang__
+			#pragma clang diagnostic push
+			#pragma clang diagnostic ignored "-Wcovered-switch-default"
+			#pragma clang diagnostic ignored "-Wunreachable-code"
+		#endif
+
+		default:
+		{
+			return "<unrecognized error>";
+		}
+
+		#ifdef __clang__
+			#pragma clang diagnostic pop
+		#endif
+	}
+}
+
+
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // cParsedNBT:
 
-#define NEEDBYTES(N) \
+#define NEEDBYTES(N, ERR) \
 	if (m_Length - m_Pos < static_cast<size_t>(N)) \
 	{ \
-		return false; \
+		return ERR; \
 	}
 
 
@@ -50,57 +131,55 @@ cParsedNBT::cParsedNBT(const char * a_Data, size_t a_Length) :
 	m_Length(a_Length),
 	m_Pos(0)
 {
-	m_IsValid = Parse();
+	m_Error = Parse();
 }
 
 
 
 
 
-bool cParsedNBT::Parse(void)
+eNBTParseError cParsedNBT::Parse(void)
 {
 	if (m_Length < 3)
 	{
 		// Data too short
-		return false;
+		return eNBTParseError::npNeedBytes;
 	}
 	if (m_Data[0] != TAG_Compound)
 	{
 		// The top-level tag must be a Compound
-		return false;
+		return eNBTParseError::npNoTopLevelCompound;
 	}
 
 	m_Tags.reserve(NBT_RESERVE_SIZE);
 
-	m_Tags.push_back(cFastNBTTag(TAG_Compound, -1));
+	m_Tags.emplace_back(TAG_Compound, -1);
 
 	m_Pos = 1;
 
-	RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
-	RETURN_FALSE_IF_FALSE(ReadCompound());
-
-	return true;
+	PROPAGATE_ERROR(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
+	return ReadCompound();
 }
 
 
 
 
 
-bool cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringLen)
+eNBTParseError cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringLen)
 {
-	NEEDBYTES(2);
+	NEEDBYTES(2, eNBTParseError::npStringMissingLength);
 	a_StringStart = m_Pos + 2;
 	a_StringLen = static_cast<size_t>(GetBEShort(m_Data + m_Pos));
-	NEEDBYTES(2 + a_StringLen);
+	NEEDBYTES(2 + a_StringLen, eNBTParseError::npStringInvalidLength);
 	m_Pos += 2 + a_StringLen;
-	return true;
+	return eNBTParseError::npSuccess;
 }
 
 
 
 
 
-bool cParsedNBT::ReadCompound(void)
+eNBTParseError cParsedNBT::ReadCompound(void)
 {
 	ASSERT(m_Tags.size() > 0);
 
@@ -109,11 +188,11 @@ bool cParsedNBT::ReadCompound(void)
 	int PrevSibling = -1;
 	for (;;)
 	{
-		NEEDBYTES(1);
+		NEEDBYTES(1, eNBTParseError::npCompoundImbalancedTag);
 		const char TagTypeNum = m_Data[m_Pos];
 		if ((TagTypeNum < TAG_Min) || (TagTypeNum > TAG_Max))
 		{
-			return false;
+			return eNBTParseError::npUnknownTag;
 		}
 		eTagType TagType = static_cast<eTagType>(TagTypeNum);
 		m_Pos++;
@@ -121,7 +200,7 @@ bool cParsedNBT::ReadCompound(void)
 		{
 			break;
 		}
-		m_Tags.push_back(cFastNBTTag(TagType, static_cast<int>(ParentIdx), PrevSibling));
+		m_Tags.emplace_back(TagType, static_cast<int>(ParentIdx), PrevSibling);
 		if (PrevSibling >= 0)
 		{
 			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = static_cast<int>(m_Tags.size()) - 1;
@@ -131,28 +210,28 @@ bool cParsedNBT::ReadCompound(void)
 			m_Tags[ParentIdx].m_FirstChild = static_cast<int>(m_Tags.size()) - 1;
 		}
 		PrevSibling = static_cast<int>(m_Tags.size()) - 1;
-		RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
-		RETURN_FALSE_IF_FALSE(ReadTag());
+		PROPAGATE_ERROR(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
+		PROPAGATE_ERROR(ReadTag());
 	}  // while (true)
 	m_Tags[ParentIdx].m_LastChild = PrevSibling;
-	return true;
+	return eNBTParseError::npSuccess;
 }
 
 
 
 
 
-bool cParsedNBT::ReadList(eTagType a_ChildrenType)
+eNBTParseError cParsedNBT::ReadList(eTagType a_ChildrenType)
 {
 	// Reads the latest tag as a list of items of type a_ChildrenType
 
 	// Read the count:
-	NEEDBYTES(4);
+	NEEDBYTES(4, eNBTParseError::npListMissingLength);
 	int Count = GetBEInt(m_Data + m_Pos);
 	m_Pos += 4;
 	if ((Count < 0) || (Count > MAX_LIST_ITEMS))
 	{
-		return false;
+		return eNBTParseError::npListInvalidLength;
 	}
 
 	// Read items:
@@ -161,7 +240,7 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 	int PrevSibling = -1;
 	for (int i = 0; i < Count; i++)
 	{
-		m_Tags.push_back(cFastNBTTag(a_ChildrenType, static_cast<int>(ParentIdx), PrevSibling));
+		m_Tags.emplace_back(a_ChildrenType, static_cast<int>(ParentIdx), PrevSibling);
 		if (PrevSibling >= 0)
 		{
 			m_Tags[static_cast<size_t>(PrevSibling)].m_NextSibling = static_cast<int>(m_Tags.size()) - 1;
@@ -171,10 +250,10 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 			m_Tags[ParentIdx].m_FirstChild = static_cast<int>(m_Tags.size()) - 1;
 		}
 		PrevSibling = static_cast<int>(m_Tags.size()) - 1;
-		RETURN_FALSE_IF_FALSE(ReadTag());
+		PROPAGATE_ERROR(ReadTag());
 	}  // for (i)
 	m_Tags[ParentIdx].m_LastChild = PrevSibling;
-	return true;
+	return eNBTParseError::npSuccess;
 }
 
 
@@ -184,14 +263,14 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 #define CASE_SIMPLE_TAG(TAGTYPE, LEN) \
 	case TAG_##TAGTYPE: \
 	{ \
-		NEEDBYTES(LEN); \
+		NEEDBYTES(LEN, eNBTParseError::npSimpleMissing); \
 		Tag.m_DataStart = m_Pos; \
 		Tag.m_DataLength = LEN; \
 		m_Pos += LEN; \
-		return true; \
+		return eNBTParseError::npSuccess; \
 	}
 
-bool cParsedNBT::ReadTag(void)
+eNBTParseError cParsedNBT::ReadTag(void)
 {
 	cFastNBTTag & Tag = m_Tags.back();
 	switch (Tag.m_Type)
@@ -210,52 +289,52 @@ bool cParsedNBT::ReadTag(void)
 
 		case TAG_ByteArray:
 		{
-			NEEDBYTES(4);
+			NEEDBYTES(4, eNBTParseError::npArrayMissingLength);
 			int len = GetBEInt(m_Data + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
 				// Invalid length
-				return false;
+				return eNBTParseError::npArrayInvalidLength;
 			}
-			NEEDBYTES(len);
+			NEEDBYTES(len, eNBTParseError::npArrayInvalidLength);
 			Tag.m_DataLength = static_cast<size_t>(len);
 			Tag.m_DataStart = m_Pos;
 			m_Pos += static_cast<size_t>(len);
-			return true;
+			return eNBTParseError::npSuccess;
 		}
 
 		case TAG_List:
 		{
-			NEEDBYTES(1);
+			NEEDBYTES(1, eNBTParseError::npListMissingType);
 			eTagType ItemType = static_cast<eTagType>(m_Data[m_Pos]);
 			m_Pos++;
-			RETURN_FALSE_IF_FALSE(ReadList(ItemType));
-			return true;
+			PROPAGATE_ERROR(ReadList(ItemType));
+			return eNBTParseError::npSuccess;
 		}
 
 		case TAG_Compound:
 		{
-			RETURN_FALSE_IF_FALSE(ReadCompound());
-			return true;
+			PROPAGATE_ERROR(ReadCompound());
+			return eNBTParseError::npSuccess;
 		}
 
 		case TAG_IntArray:
 		{
-			NEEDBYTES(4);
+			NEEDBYTES(4, eNBTParseError::npArrayMissingLength);
 			int len = GetBEInt(m_Data + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
 				// Invalid length
-				return false;
+				return eNBTParseError::npArrayInvalidLength;
 			}
 			len *= 4;
-			NEEDBYTES(len);
+			NEEDBYTES(len, eNBTParseError::npArrayInvalidLength);
 			Tag.m_DataLength = static_cast<size_t>(len);
 			Tag.m_DataStart = m_Pos;
 			m_Pos += static_cast<size_t>(len);
-			return true;
+			return eNBTParseError::npSuccess;
 		}
 
 		#if !defined(__clang__)
@@ -263,7 +342,7 @@ bool cParsedNBT::ReadTag(void)
 		#endif
 		case TAG_Min:
 		{
-			return false;
+			return eNBTParseError::npUnknownTag;
 		}
 	}  // switch (iType)
 }

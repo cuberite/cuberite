@@ -21,8 +21,6 @@ class cItemGrid;
 
 class cProjectileEntity;
 class cHangingEntity;
-class cWolf;
-class cOcelot;
 
 
 

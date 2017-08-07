@@ -3,13 +3,9 @@
 
 #include "LoggerListeners.h"
 
-#include <chrono>
-
 #if defined(_WIN32)
 	#include <io.h>  // Needed for _isatty(), not available on Linux
 	#include <time.h>
-#elif defined(__linux)
-	#include <unistd.h>  // Needed for isatty() on Linux
 #endif
 
 

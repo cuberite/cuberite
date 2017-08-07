@@ -11,27 +11,20 @@
 
 #include "OSSupport/Network.h"
 #include "Defines.h"
-#include "Vector3.h"
-#include "ChunkDef.h"
-#include "ByteBuffer.h"
 #include "Scoreboard.h"
 #include "Map.h"
-#include "Enchantments.h"
 #include "UI/SlotArea.h"
 #include "json/json.h"
 #include "ChunkSender.h"
 #include "EffectID.h"
 
 
-#include <array>
-#include <atomic>
+
 
 
 // fwd:
 class cChunkDataSerializer;
-class cInventory;
 class cMonster;
-class cPawn;
 class cExpOrb;
 class cPainting;
 class cPickup;
@@ -39,8 +32,6 @@ class cPlayer;
 class cProtocol;
 class cWindow;
 class cFallingBlock;
-class cItemHandler;
-class cWorld;
 class cCompositeChat;
 class cStatManager;
 class cClientHandle;

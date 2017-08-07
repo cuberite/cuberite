@@ -2,7 +2,6 @@
 #pragma once
 
 #include "../Item.h"
-#include "../Vector3.h"
 
 
 
@@ -190,6 +189,9 @@ public:
 
 	/** Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent). */
 	virtual const char * GetParentClass(void) const;
+
+	/** Returns whether blocks can be placed intersecting this entities' hitbox */
+	virtual bool DoesPreventBlockPlacement(void) const { return true; }
 
 	cWorld * GetWorld(void) const { return m_World; }
 

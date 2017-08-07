@@ -16,7 +16,6 @@ cPieceGenerator instance.
 
 #include "ComposableGenerator.h"
 #include "PrefabPiecePool.h"
-#include "GridStructGen.h"
 
 
 

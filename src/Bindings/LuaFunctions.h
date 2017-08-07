@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Logger.h"
 #include <time.h>
-#include <chrono>
 // tolua_begin
 
 inline unsigned int GetTime()

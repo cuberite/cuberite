@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "../World.h"
 #include "../Blocks/BlockPiston.h"
 #include "MetaRotator.h"
 
@@ -24,7 +23,7 @@ public:
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
+		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -33,7 +32,7 @@ public:
 		a_BlockType = m_BlockType;
 
 		// FIXME: Do not use cPiston class for furnace placement!
-		a_BlockMeta = cBlockPistonHandler::RotationPitchToMetaData(a_Player->GetYaw(), 0);
+		a_BlockMeta = cBlockPistonHandler::RotationPitchToMetaData(a_Player.GetYaw(), 0);
 
 		return true;
 	}

@@ -3,7 +3,6 @@
 // Implements the helper functions for converting Block ID string to int etc.
 
 #include "Globals.h"
-#include "BlockID.h"
 #include "IniFile.h"
 #include "Item.h"
 #include "Mobs/Monster.h"

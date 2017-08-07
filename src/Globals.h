@@ -46,10 +46,11 @@
 	#define SIZE_T_FMT_HEX "%Ix"
 
 	#define NORETURN __declspec(noreturn)
-	#if (_MSC_VER < 1910)
-		// MSVC 2013 (and possibly 2015?) have no idea about "noexcept(false)"
+	#if (_MSC_VER < 1900)  // noexcept support was added in VS 2015
+		#define NOEXCEPT  throw()
 		#define CAN_THROW throw(...)
 	#else
+		#define NOEXCEPT  noexcept
 		#define CAN_THROW noexcept(false)
 	#endif
 
@@ -108,6 +109,7 @@
 	#endif
 
 	#define NORETURN __attribute((__noreturn__))
+	#define NOEXCEPT  noexcept
 	#define CAN_THROW noexcept(false)
 
 #else
@@ -209,7 +211,6 @@ template class SizeChecker<UInt8,  1>;
 	#include <dirent.h>
 	#include <errno.h>
 	#include <iostream>
-	#include <cstdio>
 	#include <cstring>
 	#include <pthread.h>
 	#include <semaphore.h>
@@ -251,7 +252,12 @@ template class SizeChecker<UInt8,  1>;
 #include <set>
 #include <queue>
 #include <limits>
-#include <chrono>
+#include <random>
+#include <type_traits>
+#include <atomic>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 
 
@@ -475,8 +481,9 @@ using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 
 
 // Common headers (part 2, with macros):
-#include "ChunkDef.h"
+#include "Vector3.h"
 #include "BiomeDef.h"
+#include "ChunkDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
 

@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "Defines.h"
 
 class cFastNBTWriter;
 class cParsedNBT;
