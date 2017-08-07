@@ -7,7 +7,6 @@
 #include "Mobs/Monster.h"
 #include "Root.h"
 #include "World.h"
-#include "ChunkDef.h"
 #include "Bindings/PluginManager.h"
 #include "ChatColor.h"
 #include "Entities/Player.h"
@@ -20,7 +19,6 @@
 #include "FastRandom.h"
 
 #include "IniFile.h"
-#include "Vector3.h"
 
 #include <fstream>
 #include <sstream>

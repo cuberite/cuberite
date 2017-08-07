@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "Vector3.h"
 #include "Defines.h"
 
 

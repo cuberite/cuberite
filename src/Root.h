@@ -6,15 +6,12 @@
 #include "HTTP/HTTPServer.h"
 #include "Defines.h"
 #include "RankManager.h"
-#include <thread>
-#include <atomic>
 
 
 
 
 
 // fwd:
-class cThread;
 class cMonsterConfig;
 class cBrewingRecipes;
 class cCraftingRecipes;

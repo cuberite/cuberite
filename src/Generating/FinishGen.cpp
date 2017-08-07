@@ -10,7 +10,6 @@
 #include "Globals.h"
 
 #include "FinishGen.h"
-#include "../BlockID.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
 #include "../World.h"

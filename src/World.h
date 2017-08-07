@@ -1,12 +1,6 @@
 
 #pragma once
 
-#ifndef _WIN32
-	#include "BlockID.h"
-#else
-	enum ENUM_ITEM_ID : short;
-#endif
-
 #define MAX_PLAYERS 65535
 
 #include <functional>
@@ -15,7 +9,6 @@
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
-#include "Vector3.h"
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"
@@ -43,8 +36,6 @@ typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
-class cBlockEntity;
-class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
 class cBeaconEntity;
 class cBrewingstandEntity;

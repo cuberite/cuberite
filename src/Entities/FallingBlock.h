@@ -6,12 +6,6 @@
 
 
 
-class cPlayer;
-class cItem;
-
-
-
-
 
 // tolua_begin
 

@@ -6,6 +6,8 @@
 #pragma once
 
 
+#include <functional>
+
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 
@@ -13,7 +15,6 @@
 
 
 class cWorld;
-class cWorldInterface;
 class cItem;
 class cChunkStay;
 class cChunk;
@@ -30,9 +31,6 @@ class cNoteEntity;
 class cCommandBlockEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
-class cPawn;
-class cPickup;
-class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;

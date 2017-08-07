@@ -2,23 +2,13 @@
 #pragma once
 
 #include "Entities/Entity.h"
-#include "ChunkDef.h"
 #include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/RedstoneSimulator.h"
 
-#include "Blocks/GetHandlerCompileTimeTemplate.h"
-
 #include "ChunkMap.h"
-
-
-
-namespace Json
-{
-	class Value;
-};
 
 
 
@@ -26,7 +16,6 @@ namespace Json
 
 class cWorld;
 class cClientHandle;
-class cServer;
 class cPlayer;
 class cChunkMap;
 class cBeaconEntity;
@@ -42,9 +31,6 @@ class cNoteEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
 class cBlockArea;
-class cPawn;
-class cPickup;
-class cChunkDataSerializer;
 class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;

@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "World.h"
-#include "ChunkDef.h"
 #include "ClientHandle.h"
 #include "Server.h"
 #include "Root.h"

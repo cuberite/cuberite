@@ -13,13 +13,6 @@
 
 
 
-// fwd:
-class cBlockArea;
-
-
-
-
-
 class cVanillaFluidSimulator :
 	public cFloodyFluidSimulator
 {

@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "../World.h"
 #include "../Blocks/BlockPiston.h"
 #include "MetaRotator.h"
 

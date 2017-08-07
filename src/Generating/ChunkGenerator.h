@@ -19,7 +19,6 @@ If the generator queue is overloaded, the generator skips chunks with no clients
 #pragma once
 
 #include "../OSSupport/IsThread.h"
-#include "../ChunkDef.h"
 
 
 

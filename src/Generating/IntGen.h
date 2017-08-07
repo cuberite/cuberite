@@ -30,7 +30,6 @@ by using templates.
 #pragma once
 
 #include <tuple>
-#include "../BiomeDef.h"
 #include "../Noise/Noise.h"
 
 
