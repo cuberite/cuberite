@@ -138,6 +138,7 @@ SET (HDRS
 	RCONServer.h
 	Root.h
 	Scoreboard.h
+	ScoreboardAttachee.h
 	Server.h
 	SetChunkData.h
 	SettingsRepositoryInterface.h

@@ -68,6 +68,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
 	m_Player(nullptr),
+	m_Scoreboard(this),
 	m_CachedSentChunk(0, 0),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
@@ -426,7 +427,14 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_Player->UpdateTeam();
 
 	// Send scoreboard data
-	World->GetScoreBoard().SendTo(*this);
+	if (m_ShouldUseGlobalScoreboard)
+	{
+		World->GetScoreBoard().SendTo(*this);
+	}
+	else
+	{
+		m_Scoreboard.SendTo(*this);
+	}
 
 	// Send statistics
 	SendStatistics(m_Player->GetStatManager());
@@ -2865,7 +2873,7 @@ void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, eObjectiveAction a_Mode)
 {
 	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
 }
@@ -2874,7 +2882,7 @@ void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AStrin
 
 
 
-void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, eScoreAction a_Mode)
 {
 	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
 }

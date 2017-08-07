@@ -79,11 +79,11 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 
 
 
-cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type, cWorld * a_World)
+cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type, cScoreboardAttachee * a_Attachee)
 	: m_DisplayName(a_DisplayName)
 	, m_Name(a_Name)
 	, m_Type(a_Type)
-	, m_World(a_World)
+	, m_Attachee(a_Attachee)
 {
 }
 
@@ -95,7 +95,7 @@ void cObjective::Reset(void)
 {
 	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
 	{
-		m_World->BroadcastScoreUpdate(m_Name, it->first, 0, 1);
+		m_Attachee->SendScoreUpdate(m_Name, it->first, 0, cScoreboardAttachee::saRemove);
 	}
 
 	m_Scores.clear();
@@ -127,7 +127,7 @@ void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
 {
 	m_Scores[a_Name] = a_Score;
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, 0);
+	m_Attachee->SendScoreUpdate(m_Name, a_Name, a_Score, cScoreboardAttachee::saCreateOrUpdate);
 }
 
 
@@ -138,7 +138,7 @@ void cObjective::ResetScore(const AString & a_Name)
 {
 	m_Scores.erase(a_Name);
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, 1);
+	m_Attachee->SendScoreUpdate(m_Name, a_Name, 0, cScoreboardAttachee::saRemove);
 }
 
 
@@ -177,7 +177,7 @@ void cObjective::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
 
-	m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, 2);
+	m_Attachee->SendScoreboardObjective(m_Name, m_DisplayName, cScoreboardAttachee::objUpdateDisplay);
 }
 
 
@@ -186,11 +186,11 @@ void cObjective::SetDisplayName(const AString & a_Name)
 
 void cObjective::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, 0);
+	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, cScoreboardAttachee::objCreate);
 
 	for (cScoreMap::const_iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
 	{
-		a_Client.SendScoreUpdate(m_Name, it->first, it->second, 0);
+		a_Client.SendScoreUpdate(m_Name, it->first, it->second, cScoreboardAttachee::saCreateOrUpdate);
 	}
 }
 
@@ -274,7 +274,7 @@ size_t cTeam::GetNumPlayers(void) const
 
 
 
-cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
+cScoreboard::cScoreboard(cScoreboardAttachee * a_Attachee) : m_Attachee(a_Attachee)
 {
 	for (int i = 0; i < static_cast<int>(dsCount); ++i)
 	{
@@ -288,14 +288,14 @@ cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 
 cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
 {
-	cObjective Objective(a_Name, a_DisplayName, a_Type, m_World);
+	cObjective Objective(a_Name, a_DisplayName, a_Type, m_Attachee);
 
 	std::pair<cObjectiveMap::iterator, bool> Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
 
 	if (Status.second)
 	{
-		ASSERT(m_World != nullptr);
-		m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, 0);
+		ASSERT(m_Attachee != nullptr);
+		m_Attachee->SendScoreboardObjective(a_Name, a_DisplayName, cScoreboardAttachee::objCreate);
 
 		return &Status.first->second;
 	}
@@ -320,8 +320,7 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 		return false;
 	}
 
-	ASSERT(m_World != nullptr);
-	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
+	m_Attachee->SendScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), cScoreboardAttachee::objRemove);
 
 	for (unsigned int i = 0; i < static_cast<unsigned int>(dsCount); ++i)
 	{
@@ -468,8 +467,7 @@ void cScoreboard::SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot)
 {
 	m_Display[a_Slot] = a_Objective;
 
-	ASSERT(m_World != nullptr);
-	m_World->BroadcastDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
+	m_Attachee->SendDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
 }
 
 

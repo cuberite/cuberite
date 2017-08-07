@@ -1409,6 +1409,16 @@ end
 					},
 					Notes = "Returns the view distance that the player request, not the used view distance.",
 				},
+				GetScoreBoard =
+				{
+					Returns =
+					{
+						{
+							Type = "cScoreboard",
+						},
+					},
+					Notes = "Returns the personalized scoreboard for this client. NOTE: This scoreboard should never be used when the world scoreboard for the world the player is in is also in use (never use both at the same time).",
+				},
 				GetUniqueID =
 				{
 					Returns =
@@ -1694,6 +1704,17 @@ end
 						},
 					},
 					Notes = "Sets the locale that Cuberite keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects).",
+				},
+				SetShouldUseGlobalScoreBoard =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldUseGlobalScoreBoard",
+							Type = "boolean",
+						},
+					},
+					Notes = "This should be called in a HOOK_LOGIN call. If true (default), then when the player joins they will be initialized with their world's scoreboard. If false, then the player will be initialized with their personal scoreboard.",
 				},
 				SetUsername =
 				{
@@ -11435,7 +11456,7 @@ end
 		cScoreboard =
 		{
 			Desc = [[
-				This class manages the objectives and teams of a single world.
+				This class manages objectives and teams of a scoreboard. Every world has a scoreboard, as well as every cClientHandle. Only one of these should be used - a server should either use the per-world scoreboard or the personalized per-client scoreboard, never both at the same time. For the personalized per-client scoreboard, the only functional objective type is the dummy objective.
 			]],
 			Functions =
 			{

@@ -3402,6 +3402,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
 			},
 		},
+		Constants =
+		{
+			__cScoreboardAttachee__ =
+			{
+				Notes = "cScoreboardAttachee parent",
+			},
+		},
 		AdditionalInfo =
 		{
 			{
