@@ -7,6 +7,7 @@
 #include "ForgeHandshake.h"
 #include "json/json.h"
 #include "../Server.h"
+#include "../ByteBuffer.h"
 #include "../Bindings/PluginManager.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
