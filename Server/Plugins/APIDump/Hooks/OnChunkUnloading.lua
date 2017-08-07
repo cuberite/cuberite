@@ -8,7 +8,7 @@ return
 			Cuberite calls this function when a chunk is about to be unloaded from the memory. A plugin may
 			force Cuberite to keep the chunk in memory by returning true.</p>
 			<p>
-			CAUTION: Preventing the server from unloading too many chunks will cause the server to use too much RAM, which will adversly affect both performance and stability (i.e. your computer will get slow and crash). Return true sparingly.
+			CAUTION: Preventing the server from unloading chunks can cause the server to use too much RAM, which will adversly affect both performance and stability (i.e. your computer will get slow and crash). Return true sparingly.
 		]],
 		Params =
 		{
