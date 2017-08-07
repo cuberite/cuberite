@@ -1990,7 +1990,7 @@ void cProtocol_1_12_1::SendScoreboardObjective(const AString & a_Name, const ASt
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x42);  // Scoreboard objective packet
+	cPacketizer Pkt(*this, 0x42);  // Scoreboard Objective packet
 	Pkt.WriteString(a_Name);
 	Pkt.WriteBEUInt8(a_Mode);
 	if ((a_Mode == 0) || (a_Mode == 2))
@@ -2278,7 +2278,7 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x0f: HandlePacketPlayerLook(a_ByteBuffer); return true;
 				case 0x10: HandlePacketVehicleMove(a_ByteBuffer); return true;
 				case 0x11: HandlePacketBoatSteer(a_ByteBuffer); return true;
-				case 0x12: break;  // Unknown
+				case 0x12: break;  // Craft Recipe Request - not yet implemented
 				case 0x13: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
 				case 0x14: HandlePacketBlockDig(a_ByteBuffer); return true;
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
