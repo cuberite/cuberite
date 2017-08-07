@@ -874,6 +874,9 @@ private:
 
 	AString m_WorldName;
 
+	/** The path to the root directory for the world files */
+	AString m_DataPath;
+
 	/** The name of the overworld that portals in this world should link to.
 	Only has effect if this world is a Nether or End world. */
 	AString m_LinkedOverworldName;
@@ -1041,7 +1044,7 @@ private:
 	cSetChunkDataPtrs m_SetChunkDataQueue;
 
 
-	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
+	cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
 	virtual ~cWorld() override;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);

@@ -396,16 +396,16 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		a_Settings.AddValue("Worlds", "DefaultWorld", "world");
 		a_Settings.AddValue("Worlds", "World", "world_nether");
 		a_Settings.AddValue("Worlds", "World", "world_the_end");
-		m_pDefaultWorld = new cWorld("world");
+		m_pDefaultWorld = new cWorld("world", "world");
 		m_WorldsByName["world"] = m_pDefaultWorld;
-		m_WorldsByName["world_nether"] = new cWorld("world_nether", dimNether, "world");
-		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", dimEnd, "world");
+		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", dimNether, "world");
+		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", dimEnd, "world");
 		return;
 	}
 
 	// First get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
-	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
+	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str(), DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 	auto Worlds = a_Settings.GetValues("Worlds");
 
@@ -469,7 +469,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), dimNether, LinkTo);
+			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str(), dimNether, LinkTo);
 		}
 		// if the world is called x_the_end
 		else if ((LowercaseName.size() > EndAppend1.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend1))
@@ -483,7 +483,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), dimEnd, LinkTo);
+			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str(), dimEnd, LinkTo);
 		}
 		// if the world is called x_end
 		else if ((LowercaseName.size() > EndAppend2.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend2))
@@ -497,11 +497,11 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), dimEnd, LinkTo);
+			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str(), dimEnd, LinkTo);
 		}
 		else
 		{
-			NewWorld = new cWorld(WorldName.c_str());
+			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str());
 		}
 		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds

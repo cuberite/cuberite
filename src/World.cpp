@@ -125,10 +125,11 @@ void cWorld::cTickThread::Execute(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_LinkedOverworldName) :
+cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimension a_Dimension, const AString & a_LinkedOverworldName) :
 	m_WorldName(a_WorldName),
+	m_DataPath(a_DataPath),
 	m_LinkedOverworldName(a_LinkedOverworldName),
-	m_IniFileName(m_WorldName + "/world.ini"),
+	m_IniFileName(m_DataPath + "/world.ini"),
 	m_StorageSchema("Default"),
 #ifdef __arm__
 	m_StorageCompressionFactor(0),
@@ -200,10 +201,11 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
-	cFile::CreateFolder(FILE_IO_PREFIX + m_WorldName);
+	// TODO: Recursive descent
+	cFile::CreateFolder(FILE_IO_PREFIX + m_DataPath);
 
 	// Load the scoreboard
-	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+	cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
 	Serializer.Load();
 }
 
@@ -222,7 +224,7 @@ cWorld::~cWorld()
 	if (GetSavingEnabled())
 	{
 		// Unload the scoreboard
-		cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
 		Serializer.Save();
 
 		m_MapManager.SaveMapData();
