@@ -471,7 +471,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 	}
 
 	// The organization here is based on the summary at:
-	// http://minecraft.gamepedia.com/Enchanting
+	// https://minecraft.gamepedia.com/Enchanting
 	// as of July 2017 (Minecraft 1.12).
 
 	// Hand tool enchantments

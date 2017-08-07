@@ -1630,7 +1630,7 @@ function HandleCompo(a_Split, a_Player)
 	-- Send one composite message to self:
 	local msg = cCompositeChat()
 	msg:AddTextPart("Hello! ", "b@e")  -- bold yellow
-	msg:AddUrlPart("Cuberite", "http://cuberite.org")
+	msg:AddUrlPart("Cuberite", "https://cuberite.org")
 	msg:AddTextPart(" rules! ")
 	msg:AddRunCommandPart("Set morning", "/time set 0")
 	a_Player:SendMessage(msg)
@@ -1728,7 +1728,7 @@ function OnPlayerJoined(a_Player)
 	-- Test composite chat chaining:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "http://cuberite.org", "u@2")
+		:AddUrlPart(a_Player:GetName(), "https://cuberite.org", "u@2")
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")
 		:AddRunCommandPart(" SetDay", "/time set 0")
 	)
@@ -2454,12 +2454,12 @@ function HandleConsoleTestUrlParser(a_Split, a_EntireCmd)
 		"https://github.com",
 		"ftp://anonymous:user@example.com@ftp.cuberite.org:9921/releases/2015/2015-12-25.zip",
 		"ftp://anonymous:user:name:with:colons@example.com@ftp.cuberite.org:9921",
-		"http://google.com/",
-		"http://google.com/?q=cuberite",
-		"http://google.com/search?q=cuberite",
-		"http://google.com/some/search?q=cuberite#results",
-		"http://google.com/?q=cuberite#results",
-		"http://google.com/#results",
+		"https://google.com/",
+		"https://google.com/?q=cuberite",
+		"https://google.com/search?q=cuberite",
+		"https://google.com/some/search?q=cuberite#results",
+		"https://google.com/?q=cuberite#results",
+		"https://google.com/#results",
 		"ftp://cuberite.org:9921/releases/2015/2015-12-25.zip",
 		"mailto:support@cuberite.org",
 	}

@@ -579,7 +579,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 {
 	// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
-	// Ref: http://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
+	// Ref: https://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
 		case E_ITEM_WOODEN_SWORD:    return 4;
@@ -625,7 +625,7 @@ void cEntity::ApplyArmorDamage(int DamageBlocked)
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Ref.: http://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
 		case dtOnFire:
@@ -718,7 +718,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// Add up all armor points:
-	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points
+	// Ref.: https://minecraft.gamepedia.com/Armor#Defense_points
 	int ArmorValue = 0;
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
@@ -755,7 +755,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
-	// Ref.: http://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
 	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
 	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
@@ -1706,7 +1706,7 @@ void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 void cEntity::HandleAir(void)
 {
-	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
+	// Ref.: https://minecraft.gamepedia.com/Chunk_format
 	// See if the entity is /submerged/ water (block above is water)
 	// Get the type of block the entity is standing in:
 

@@ -380,7 +380,7 @@ void cNBTChunkSerializer::AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 		m_Writer.AddByte  ("SkullType", a_MobHead->GetType() & 0xFF);
 		m_Writer.AddByte  ("Rot",       a_MobHead->GetRotation() & 0xFF);
 
-		// The new Block Entity format for a Mob Head. See: http://minecraft.gamepedia.com/Head#Block_entity
+		// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
 		m_Writer.BeginCompound("Owner");
 			m_Writer.AddString("Id", a_MobHead->GetOwnerUUID());
 			m_Writer.AddString("Name", a_MobHead->GetOwnerName());
