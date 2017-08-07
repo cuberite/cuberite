@@ -2228,3 +2228,98 @@ void cProtocol_1_12_1::SendEntityEffect(const cEntity & a_Entity, int a_EffectID
 
 
 
+
+bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+{
+	switch (m_State)
+	{
+		case 1:
+		{
+			// Status
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
+				case 0x01: HandlePacketStatusPing(a_ByteBuffer); return true;
+			}
+			break;
+		}
+
+		case 2:
+		{
+			// Login
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
+				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return true;
+			}
+			break;
+		}
+
+		case 3:
+		{
+			// Game
+			switch (a_PacketType)
+			{
+				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+				case 0x01: HandlePacketTabComplete(a_ByteBuffer); return true;
+				case 0x02: HandlePacketChatMessage(a_ByteBuffer); return true;
+				case 0x03: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x04: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x05: break;  // Confirm transaction - not used in Cuberite
+				case 0x06: HandlePacketEnchantItem(a_ByteBuffer); return true;
+				case 0x07: HandlePacketWindowClick(a_ByteBuffer); return true;
+				case 0x08: HandlePacketWindowClose(a_ByteBuffer); return true;
+				case 0x09: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x0a: HandlePacketUseEntity(a_ByteBuffer); return true;
+				case 0x0b: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x0c: HandlePacketPlayer(a_ByteBuffer); return true;
+				case 0x0d: HandlePacketPlayerPos(a_ByteBuffer); return true;
+				case 0x0e: HandlePacketPlayerPosLook(a_ByteBuffer); return true;
+				case 0x0f: HandlePacketPlayerLook(a_ByteBuffer); return true;
+				case 0x10: HandlePacketVehicleMove(a_ByteBuffer); return true;
+				case 0x11: HandlePacketBoatSteer(a_ByteBuffer); return true;
+				case 0x12: break;  // Unknown
+				case 0x13: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+				case 0x14: HandlePacketBlockDig(a_ByteBuffer); return true;
+				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
+				case 0x16: HandlePacketSteerVehicle(a_ByteBuffer); return true;
+				case 0x17: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+				case 0x18: break;  // Resource pack status - not yet implemented
+				case 0x19: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+				case 0x1a: HandlePacketSlotSelect(a_ByteBuffer); return true;
+				case 0x1b: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x1c: HandlePacketUpdateSign(a_ByteBuffer); return true;
+				case 0x1d: HandlePacketAnimation(a_ByteBuffer); return true;
+				case 0x1e: HandlePacketSpectate(a_ByteBuffer); return true;
+				case 0x1f: HandlePacketBlockPlace(a_ByteBuffer); return true;
+				case 0x20: HandlePacketUseItem(a_ByteBuffer); return true;
+			}
+			break;
+		}
+		default:
+		{
+			// Received a packet in an unknown state, report:
+			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
+
+			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
+
+			// Switch to a state when all further packets are silently ignored:
+			m_State = 255;
+			return false;
+		}
+		case 255:
+		{
+			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
+			// Do not output anything (the caller will do that for us), just return failure
+			return false;
+		}
+	}  // switch (m_State)
+
+	// Unknown packet type, report to the ClientHandle:
+	m_Client->PacketUnknown(a_PacketType);
+	return false;
+}
+
+
+
+

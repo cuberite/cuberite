@@ -118,6 +118,7 @@ public:
 	virtual void SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
 
 protected:
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 };
 
