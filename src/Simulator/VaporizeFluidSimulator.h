@@ -25,7 +25,7 @@ public:
 	cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 
 	// cSimulator overrides:
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
 	virtual void Simulate(float a_Dt) override;
 } ;
 

@@ -73,7 +73,7 @@ void cSimulator::WakeUpArea(const cCuboid & a_Area)
 						{
 							for (int x = startX; x <= endX; ++x)
 							{
-								AddBlock(x, y, z, &a_CBChunk);
+								AddBlock({x, y, z}, &a_CBChunk);
 							}  // for x
 						}  // for z
 					}  // for y

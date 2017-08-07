@@ -1492,7 +1492,7 @@ void cChunk::WakeUpSimulators(void)
 				// The redstone sim takes multiple blocks, use the inbuilt checker
 				if (RedstoneSimulator->IsAllowedBlock(Block))
 				{
-					RedstoneSimulator->AddBlock(BlockX, y, BlockZ, this);
+					RedstoneSimulator->AddBlock({BlockX, y, BlockZ}, this);
 					continue;
 				}
 
@@ -1500,12 +1500,12 @@ void cChunk::WakeUpSimulators(void)
 				{
 					case E_BLOCK_WATER:
 					{
-						WaterSimulator->AddBlock(BlockX, y, BlockZ, this);
+						WaterSimulator->AddBlock({BlockX, y, BlockZ}, this);
 						break;
 					}
 					case E_BLOCK_LAVA:
 					{
-						LavaSimulator->AddBlock(BlockX, y, BlockZ, this);
+						LavaSimulator->AddBlock({BlockX, y, BlockZ}, this);
 						break;
 					}
 					default:
