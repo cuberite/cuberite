@@ -8048,7 +8048,7 @@ This class is used by plugins wishing to display a custom window to the player, 
 							Type = "function",
 						},
 					},
-					Notes = "Sets the function that the window will call when it is about to process a click from a player. See below for the signature of the callback function.",
+					Notes = "Sets the function that the window will call when it is about to process a click from a player. See {{#additionalinfo_1|below}} for the signature of the callback function.",
 				},
 				SetOnClosing =
 				{
