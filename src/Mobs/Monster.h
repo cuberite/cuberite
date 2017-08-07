@@ -2,11 +2,11 @@
 #pragma once
 
 #include "../Entities/Pawn.h"
-#include "../Item.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
 
 
+class cItem;
 class cClientHandle;
 
 

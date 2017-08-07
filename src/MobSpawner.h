@@ -7,12 +7,6 @@
 
 
 
-// fwd:
-class cChunk;
-
-
-
-
 
 /** This class is used to determine which monster can be spawned in which place
 it is essentially static (eg. Squids spawn in water, Zombies spawn in dark places)

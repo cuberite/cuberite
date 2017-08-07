@@ -6,9 +6,9 @@
 #include "BlockEntity.h"
 #include "MetaRotator.h"
 #include "ChunkInterface.h"
-#include "../Entities/Entity.h"
 
 
+class cEntity;
 class cPlayer;
 class cWorldInterface;
 
