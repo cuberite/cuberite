@@ -5,6 +5,8 @@
 Declares the 1.12 protocol classes:
 	- cProtocol_1_12
 		- release 1.12 protocol (#335)
+	- cProtocol_1_12_1
+		- release 1.12.1 protocol (#338)
 (others may be added later in the future for the 1.12 release series)
 */
 
@@ -116,6 +118,7 @@ public:
 	virtual void SendTeleportEntity(const cEntity & a_Entity) override;
 	virtual void SendEntityProperties(const cEntity & a_Entity) override;
 	virtual void SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
+	virtual void SendPlayerMaxSpeed(void) override;
 
 protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;

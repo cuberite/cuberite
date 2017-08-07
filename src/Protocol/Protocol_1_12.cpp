@@ -2229,6 +2229,36 @@ void cProtocol_1_12_1::SendEntityEffect(const cEntity & a_Entity, int a_EffectID
 
 
 
+
+void cProtocol_1_12_1::SendPlayerMaxSpeed(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x4e);  // Entity Properties
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteVarInt32(Player->GetUniqueID());
+	Pkt.WriteBEInt32(1);  // Count
+	Pkt.WriteString("generic.movementSpeed");
+	// The default game speed is 0.1, multiply that value by the relative speed:
+	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
+	if (Player->IsSprinting())
+	{
+		Pkt.WriteVarInt32(1);  // Modifier count
+		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
+		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
+		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
+		Pkt.WriteBEUInt8(2);
+	}
+	else
+	{
+		Pkt.WriteVarInt32(0);  // Modifier count
+	}
+}
+
+
+
+
+
 bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	switch (m_State)
