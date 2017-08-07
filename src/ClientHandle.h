@@ -12,7 +12,6 @@
 #include "OSSupport/Network.h"
 #include "Defines.h"
 #include "Scoreboard.h"
-#include "Map.h"
 #include "UI/SlotArea.h"
 #include "json/json.h"
 #include "ChunkSender.h"
@@ -34,6 +33,7 @@ class cWindow;
 class cFallingBlock;
 class cCompositeChat;
 class cStatManager;
+class cMap;
 class cClientHandle;
 typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 

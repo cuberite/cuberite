@@ -12,8 +12,10 @@
 #include "ProjectileEntity.h"
 #include "EntityEffect.h"
 #include "../World.h"
-#include "Entity.h"
 
+
+
+class cEntity;
 
 
 
