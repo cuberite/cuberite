@@ -160,17 +160,17 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 		return Mods;
 	}
 
-	for (size_t i = 0; i < NumMods; ++i)
+	for (UInt32 i = 0; i < NumMods; ++i)
 	{
 		AString Name, Version;
 		if (!Buf.ReadVarUTF8String(Name))
 		{
-			SetError(Printf("ParseModList failed to read mod name at i = " SIZE_T_FMT, i));
+			SetError(Printf("ParseModList failed to read mod name at i = %d", i));
 			break;
 		}
 		if (!Buf.ReadVarUTF8String(Version))
 		{
-			SetError(Printf("ParseModList failed to read mod version at i = " SIZE_T_FMT, i));
+			SetError(Printf("ParseModList failed to read mod version at i = %d", i));
 			break;
 		}
 		Mods.insert({Name, Version});
