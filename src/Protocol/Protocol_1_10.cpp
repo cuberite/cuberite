@@ -15,6 +15,7 @@ Implements the 1.10 protocol classes:
 
 #include "../Root.h"
 #include "../Server.h"
+#include "../ClientHandle.h"
 
 #include "../WorldStorage/FastNBT.h"
 
