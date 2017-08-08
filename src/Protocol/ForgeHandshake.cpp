@@ -147,7 +147,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	if (a_Size < 4)
 	{
-		SetError(Printf("ParseModList invalid packet, missing length (size=" SIZE_T_FMT ")", a_Size));
+		SetError(Printf("ParseModList invalid packet, missing length (size = " SIZE_T_FMT ")", a_Size));
 		return Mods;
 	}
 
