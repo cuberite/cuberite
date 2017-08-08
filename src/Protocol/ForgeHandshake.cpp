@@ -70,7 +70,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 	auto ProtocolVersion = m_Client->GetProtocolVersion();
 	auto & Mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
 
-	if (Mods.size() == 0)
+	if (Mods.empty())
 	{
 		return;
 	}
