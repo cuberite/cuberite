@@ -2196,7 +2196,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 	// Load the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), &m_Stats);
 	StatSerializer.Load();
 
 	LOGD("Player %s was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
@@ -2294,7 +2294,7 @@ bool cPlayer::SaveToDisk()
 
 	// Save the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
 		LOGWARNING("Could not save stats for player %s", GetName().c_str());

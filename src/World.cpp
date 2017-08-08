@@ -201,8 +201,7 @@ cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimensi
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
-	// TODO: Recursive descent
-	cFile::CreateFolder(FILE_IO_PREFIX + m_DataPath);
+	cFile::CreateFolderRecursive(FILE_IO_PREFIX + m_DataPath);
 
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
