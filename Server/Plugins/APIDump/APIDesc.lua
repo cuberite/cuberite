@@ -15592,6 +15592,10 @@ end
 				{
 					Notes = "The itemtype for lead"
 				},
+				E_ITEM_LEASH =
+				{
+					Notes = "The itemtype for lead (E_ITEM_LEAD synonym)"
+				},				
 				E_ITEM_LEATHER =
 				{
 					Notes = "The itemtype for leather"
