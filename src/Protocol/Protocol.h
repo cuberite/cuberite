@@ -11,7 +11,6 @@
 #pragma once
 
 #include "../Defines.h"
-#include "../Endianness.h"
 #include "../Scoreboard.h"
 #include "../Map.h"
 #include "../ByteBuffer.h"

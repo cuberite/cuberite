@@ -11,10 +11,8 @@
 
 #include "OSSupport/Network.h"
 #include "Defines.h"
-#include "ByteBuffer.h"
 #include "Scoreboard.h"
 #include "Map.h"
-#include "Enchantments.h"
 #include "UI/SlotArea.h"
 #include "json/json.h"
 #include "ChunkSender.h"

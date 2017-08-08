@@ -10,7 +10,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../Items/ItemHandler.h"
 #include "ChunkInterface.h"
 #include "../Entities/Player.h"
 
