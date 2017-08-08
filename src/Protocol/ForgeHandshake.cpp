@@ -230,15 +230,15 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	// Send server ModList
 
 	// Send server-side Forge mods registered by plugins
-	auto & ServerMods = m_Client->GetForgeMods();
+	const auto & ServerMods = m_Client->GetForgeMods();
 
-	auto ModCount = ServerMods.size();
+	const auto ModCount = ServerMods.size();
 
 	cByteBuffer Buf(256 * ModCount);
 
 	Buf.WriteBEInt8(Discriminator::ModList);
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
-	for (auto & item: ServerMods)
+	for (const auto & item: ServerMods)
 	{
 		const AString & name = item.first;
 		const AString & version = item.second;
