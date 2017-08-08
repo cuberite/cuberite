@@ -261,7 +261,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 	}
 
 	auto Phase = a_Data[1];
-	LOGD("Received client HandshakeAck with phase=%d", Phase);
+	LOGD("Received client HandshakeAck with phase = %d", Phase);
 
 	switch (Phase)
 	{
