@@ -473,7 +473,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			// otherwise, choose the default world as the linked world.
 			// As before, any ini settings will completely override this if an ini is already present.
 
-			AString LinkTo = WorldName.substr(0, WorldName.size() - NetherAppend.size());
+			LinkTo = WorldName.substr(0, WorldName.size() - NetherAppend.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
 				LinkTo = DefaultWorldName;
@@ -487,7 +487,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			// otherwise, choose the default world as the linked world.
 			// As before, any ini settings will completely override this if an ini is already present.
 
-			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend1.size());
+			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend1.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
 				LinkTo = DefaultWorldName;
@@ -501,7 +501,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			// otherwise, choose the default world as the linked world.
 			// As before, any ini settings will completely override this if an ini is already present.
 
-			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend2.size());
+			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend2.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
 				LinkTo = DefaultWorldName;
