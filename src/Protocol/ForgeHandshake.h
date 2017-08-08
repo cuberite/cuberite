@@ -18,6 +18,9 @@ class cClientHandle;
 class cForgeHandshake
 {
 public:
+	/** True if the client advertised itself as a Forge client. */
+	bool m_IsForgeClient;
+
 	cForgeHandshake(cClientHandle * client);
 
 	/** Add the registered Forge mods to the server ping list packet. */
@@ -32,20 +35,7 @@ public:
 	/** Process received data from the client advancing the Forge handshake. */
 	void DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
 
-	/** True if the client advertised itself as a Forge client. */
-	bool m_IsForgeClient;
-
 private:
-	void HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
-	void HandleModList(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
-	void HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
-
-	/** Set errored state to prevent further handshake message processing. */
-	void SetError(const AString & message);
-
-	/** Parse the client ModList packet of installed Forge mods and versions. */
-	AStringMap ParseModList(const char * a_Data, size_t a_Size);
-
 	/** True if the Forge handshake is in an errored state. */
 	bool m_Errored;
 
@@ -56,4 +46,14 @@ private:
 	AString m_Name;
 	AString m_UUID;
 	Json::Value m_Properties;
+
+	void HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+	void HandleModList(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+	void HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+
+	/** Set errored state to prevent further handshake message processing. */
+	void SetError(const AString & message);
+
+	/** Parse the client ModList packet of installed Forge mods and versions. */
+	AStringMap ParseModList(const char * a_Data, size_t a_Size);
 };
