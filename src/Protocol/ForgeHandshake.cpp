@@ -229,13 +229,12 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 
 	// Send server ModList
 
-	// TODO: max size?
-	cByteBuffer Buf(1024);
-
 	// Send server-side Forge mods registered by plugins
 	auto & ServerMods = m_Client->GetForgeMods();
 
 	auto ModCount = ServerMods.size();
+
+	cByteBuffer Buf(256 * ModCount);
 
 	Buf.WriteBEInt8(Discriminator::ModList);
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
