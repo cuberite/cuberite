@@ -240,10 +240,8 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
 	for (const auto & item: ServerMods)
 	{
-		const AString & name = item.first;
-		const AString & version = item.second;
-		Buf.WriteVarUTF8String(name);
-		Buf.WriteVarUTF8String(version);
+		Buf.WriteVarUTF8String(item.first);   // name
+		Buf.WriteVarUTF8String(item.second);  // version
 	}
 	AString ServerModList;
 	Buf.ReadAll(ServerModList);
