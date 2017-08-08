@@ -333,7 +333,6 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 
 void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
-	LOGD("Received Forge data: " SIZE_T_FMT " bytes: %s", a_Size, a_Data);
 	if (!m_IsForgeClient)
 	{
 		SetError(Printf("Received unexpected Forge data from non-Forge client (" SIZE_T_FMT " bytes)", a_Size));
