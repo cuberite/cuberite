@@ -2356,8 +2356,6 @@ static int tolua_cClientHandle_GetForgeMods(lua_State * L)
 	cClientHandle * Client;
 	S.GetStackValue(1, Client);
 
-	auto Mods = Client->GetForgeMods();
-
 	S.Push(Client->GetForgeMods());
 	return 1;
 }
