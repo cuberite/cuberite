@@ -113,7 +113,7 @@ void cLeashKnot::GetDrops(cItems & a_Items, cEntity * a_Killer)
 {
 	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !static_cast<cPlayer *>(a_Killer)->IsGameModeCreative())
 	{
-		a_Items.push_back(cItem(E_ITEM_LEAD));
+		a_Items.push_back(cItem(E_ITEM_LEASH));
 	}
 }
 
@@ -158,32 +158,26 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
 {
-	cLeashKnot * LeashKnot = nullptr;
-
 	class LookForKnot : public cEntityCallback
 	{
 	public:
-		cLeashKnot ** m_LeashKnot;
-
-		LookForKnot(cLeashKnot ** a_LeashKnot) :
-			m_LeashKnot(a_LeashKnot)
-		{
-		}
+		cLeashKnot * m_LeashKnot = nullptr;
 
 		virtual bool Item(cEntity * a_Entity) override
 		{
 			if (a_Entity->IsLeashKnot())
 			{
-				*m_LeashKnot = reinterpret_cast<cLeashKnot *>(a_Entity);
+				m_LeashKnot = reinterpret_cast<cLeashKnot *>(a_Entity);
 				return true;
 			}
 			return false;
 		}
-	} CallbackFindKnot(&LeashKnot);
+
+	} CallbackFindKnot;
 
 	a_WorldInterface.ForEachEntityInBox(cBoundingBox(a_BlockPos, 0.5, 1), CallbackFindKnot);
 
-	return LeashKnot;
+	return CallbackFindKnot.m_LeashKnot;
 }
 
 

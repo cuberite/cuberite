@@ -424,7 +424,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cMonster::CalcLeashActions()
 {
 	// This mob just spotted in the world and [m_LeashToPos not null] shows that should be leashed to a leash knot at m_LeashToPos.
-	// This keeps trying until knot is found
+	// This keeps trying until knot is found. Leash knot may be in a different chunk that needn't or can't be loaded yet.
 	if (!IsLeashed() && (m_LeashToPos != nullptr))
 	{
 		auto LeashKnot = cLeashKnot::FindKnotAtPos(*m_World, { FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z) });
@@ -681,7 +681,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
 		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
 	}
-	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEAD))
+	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEASH))
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
@@ -1408,6 +1408,12 @@ cMonster::eFamily cMonster::GetMobFamily(void) const
 
 void cMonster::LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast)
 {
+	// Do nothing if already leashed
+	if (m_LeashedTo != nullptr)
+	{
+		return;
+	}
+
 	m_LeashedTo = a_Entity;
 
 	a_Entity->AddLeashedMob(this);
@@ -1424,21 +1430,22 @@ void cMonster::LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast)
 
 
 
-void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast, bool a_ShouldRemoveFromEntity)
+void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast)
 {
-	ASSERT(this->GetLeashedTo() != nullptr);
-
-	if (a_ShouldRemoveFromEntity)
+	// Do nothing if not leashed
+	if (m_LeashedTo == nullptr)
 	{
-		m_LeashedTo->RemoveLeashedMob(this);
+		return;
 	}
+
+	m_LeashedTo->RemoveLeashedMob(this);
 
 	m_LeashedTo = nullptr;
 
 	if (a_ShouldDropLeashPickup)
 	{
 		cItems Pickups;
-		Pickups.Add(cItem(E_ITEM_LEAD, 1, 0));
+		Pickups.Add(cItem(E_ITEM_LEASH, 1, 0));
 		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
 	}
 
@@ -1456,5 +1463,5 @@ void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast, boo
 
 void cMonster::Unleash(bool a_ShouldDropLeashPickup)
 {
-	Unleash(a_ShouldDropLeashPickup, true, true);
+	Unleash(a_ShouldDropLeashPickup, true);
 }

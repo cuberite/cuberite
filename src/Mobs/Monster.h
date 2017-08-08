@@ -89,7 +89,7 @@ public:
 	/** Leash the monster to an entity. */
 	void LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast = true);
 
-	/** Unleash the monster. Overload for the Unleash(bool, bool, bool) function for plugins */
+	/** Unleash the monster. Overload for the Unleash(bool, bool) function for plugins */
 	void Unleash(bool a_ShouldDropLeashPickup);
 
 	/** Returns the entity to where this mob is leashed, returns nullptr if it's not leashed */
@@ -97,9 +97,8 @@ public:
 
 	// tolua_end
 
-	/** Unleash the monster. The a_ShouldRemoveFromEntity parameter should always be true in order to remove the mob from the entity
-	to where it was leashed, except when it's called from the cEntity:Destroy, where it is already removed and therefore should always be false. */
-	void Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast, bool a_ShouldRemoveFromEntity = true);
+	/** Unleash the monster. */
+	void Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast);
 
 	/** Sets entity position to where is leashed this mob */
 	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = std::unique_ptr<Vector3d>(pos); }

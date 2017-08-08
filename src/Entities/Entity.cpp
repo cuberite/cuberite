@@ -228,11 +228,10 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	SetIsTicking(false);
 
 	// Unleash leashed mobs
-	for (auto LeashedMob : m_LeashedMobs)
+	while (!m_LeashedMobs.empty())
 	{
-		LeashedMob->Unleash(true, true, false);
+		m_LeashedMobs.front()->Unleash(true, true);
 	}
-	m_LeashedMobs.clear();
 
 	if (a_ShouldBroadcast)
 	{
