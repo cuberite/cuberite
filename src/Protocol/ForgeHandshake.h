@@ -9,10 +9,6 @@
 #include "json/json.h"
 
 // fwd:
-namespace Json
-{
-	class Value;
-}
 class cClientHandle;
 
 
