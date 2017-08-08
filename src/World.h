@@ -19,6 +19,7 @@
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"
+#include "IniFile.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
@@ -888,7 +889,8 @@ private:
 
 	int m_StorageCompressionFactor;
 
-	bool m_SavingEnabled;
+	/** Whether or not writing chunks to disk is currently enabled */
+	std::atomic<bool> m_SavingEnabled;
 
 	/** The dimension of the world, used by the client to provide correct lighting scheme */
 	eDimension m_Dimension;

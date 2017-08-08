@@ -457,6 +457,10 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		AString EndAppend1 = "_the_end";
 		AString EndAppend2 = "_end";
 
+		// The default world is an overworld with no links
+		eDimension Dimension = dimOverworld;
+		AString LinkTo = "";
+
 		// if the world is called x_nether
 		if ((LowercaseName.size() > NetherAppend.size()) && (LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
 		{
@@ -469,7 +473,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str(), dimNether, LinkTo);
+			Dimension = dimNether;
 		}
 		// if the world is called x_the_end
 		else if ((LowercaseName.size() > EndAppend1.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend1))
@@ -483,7 +487,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str(), dimEnd, LinkTo);
+			Dimension = dimEnd;
 		}
 		// if the world is called x_end
 		else if ((LowercaseName.size() > EndAppend2.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend2))
@@ -497,12 +501,9 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str(), dimEnd, LinkTo);
+			Dimension = dimEnd;
 		}
-		else
-		{
-			NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str());
-		}
+		NewWorld = new cWorld(WorldName.c_str(), WorldName.c_str(), Dimension, LinkTo);
 		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds
 
@@ -711,7 +712,6 @@ void cRoot::SaveAllChunks(void)
 
 
 
-// TODO: Does this need to be run through a queue for thread safety? (or, make SetSavingEnabled atomic)
 void cRoot::SetSavingEnabled(bool a_SavingEnabled)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
