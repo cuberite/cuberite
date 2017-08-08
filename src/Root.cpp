@@ -396,7 +396,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		a_Settings.AddValue("Worlds", "DefaultWorld", "world");
 		a_Settings.AddValue("Worlds", "World", "world_nether");
 		a_Settings.AddValue("Worlds", "World", "world_the_end");
-		m_pDefaultWorld = new cWorld("world", "world");
+		m_pDefaultWorld = new cWorld("world", "world_overworld");
 		m_WorldsByName["world"] = m_pDefaultWorld;
 		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", dimNether, "world");
 		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", dimEnd, "world");

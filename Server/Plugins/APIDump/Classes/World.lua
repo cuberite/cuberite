@@ -1450,6 +1450,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true.",
 			},
+			GetDataPath =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns the path to the root of the world data.",
+			},
 			GetDefaultWeatherInterval =
 			{
 				Params =

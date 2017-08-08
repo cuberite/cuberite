@@ -637,6 +637,9 @@ public:
 	/** Returns the name of the world */
 	const AString & GetName(void) const { return m_WorldName; }
 
+	/** Returns the data path to the world data */
+	const AString & GetDataPath(void) const { return m_DataPath; }
+
 	/** Returns the name of the world.ini file used by this world */
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
 

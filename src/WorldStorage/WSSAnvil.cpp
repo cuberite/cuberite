@@ -86,7 +86,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
 	AString fnam;
-	Printf(fnam, "%s%clevel.dat", a_World->GetName().c_str(), cFile::PathSeparator);
+	Printf(fnam, "%s%clevel.dat", a_World->GetDataPath().c_str(), cFile::PathSeparator);
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
@@ -181,7 +181,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 {
 	// Construct the filename for offloading:
 	AString OffloadFileName;
-	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetName().c_str(), cFile::PathSeparator, cFile::PathSeparator);
+	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator, cFile::PathSeparator);
 	cFile::CreateFolder(FILE_IO_PREFIX + OffloadFileName);
 	auto t = time(nullptr);
 	struct tm stm;
@@ -287,7 +287,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 
 	// Load it anew:
 	AString FileName;
-	Printf(FileName, "%s%cregion", m_World->GetName().c_str(), cFile::PathSeparator);
+	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator);
 	cFile::CreateFolder(FILE_IO_PREFIX + FileName);
 	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
