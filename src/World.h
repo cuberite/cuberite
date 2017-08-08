@@ -112,7 +112,10 @@ public:
 
 	// tolua_begin
 
+	/** Get whether saving chunks is enabled */
 	bool GetSavingEnabled(void) const { return m_SavingEnabled; }
+
+	/** Set whether saving chunks is enabled */
 	void SetSavingEnabled(bool a_SavingEnabled) { m_SavingEnabled = a_SavingEnabled; }
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
