@@ -396,7 +396,10 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		a_Settings.AddValue("Worlds", "DefaultWorld", "world");
 		a_Settings.AddValue("Worlds", "World", "world_nether");
 		a_Settings.AddValue("Worlds", "World", "world_the_end");
-		m_pDefaultWorld = new cWorld("world", "Worlds/overworld");
+		a_Settings.AddValue("WorldPaths", "world", "world");
+		a_Settings.AddValue("WorldPaths", "world_nether", "world_nether");
+		a_Settings.AddValue("WorldPaths", "world_the_end", "world_the_end");
+		m_pDefaultWorld = new cWorld("world", "world");
 		m_WorldsByName["world"] = m_pDefaultWorld;
 		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", dimNether, "world");
 		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", dimEnd, "world");
@@ -405,7 +408,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 
 	// First get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
-	AString DefaultWorldPath = a_Settings.GetValue("WorldPaths", DefaultWorldName, DefaultWorldName);
+	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
 	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str(), DefaultWorldPath.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 	auto Worlds = a_Settings.GetValues("Worlds");
@@ -454,7 +457,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		FoundAdditionalWorlds = true;
 		cWorld * NewWorld;
 		AString LowercaseName = StrToLower(WorldName);
-		AString WorldPath = a_Settings.GetValue("WorldPaths", WorldName, WorldName);
+		AString WorldPath = a_Settings.GetValueSet("WorldPaths", WorldName, WorldName);
 		AString NetherAppend = "_nether";
 		AString EndAppend1 = "_the_end";
 		AString EndAppend2 = "_end";
