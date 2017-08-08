@@ -71,8 +71,10 @@ public:
 	void SetMaxPlayers(size_t a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 
 	// tolua_end
+
 	/** Add a Forge mod to the server ping list. */
 	bool RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
+
 	// tolua_begin
 
 	/** Remove a Forge mod to the server ping list. */
