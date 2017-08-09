@@ -155,7 +155,7 @@ public:
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
 
 	/** Get the Forge mods registered for a given protocol. */
-	AStringMap & GetRegisteredForgeMods(const UInt32 a_Protocol);
+	const AStringMap & GetRegisteredForgeMods(const UInt32 a_Protocol);
 
 private:
 
@@ -255,6 +255,9 @@ private:
 
 
 	cServer(void);
+
+	/** Get the Forge mods registered for a given protocol, for modification */
+	AStringMap & RegisteredForgeMods(const UInt32 a_Protocol);
 
 	/** Loads, or generates, if missing, RSA keys for protocol encryption */
 	void PrepareKeys(void);
