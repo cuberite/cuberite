@@ -200,15 +200,25 @@ void cObjective::SendTo(cClientHandle & a_Client)
 
 cTeam::cTeam(
 	const AString & a_Name, const AString & a_DisplayName,
-	const AString & a_Prefix, const AString & a_Suffix
+	const AString & a_Prefix, const AString & a_Suffix,
+	cWorld * a_World
 )
-	: m_AllowsFriendlyFire(true)
+	: m_World(a_World)
+	, m_AllowsFriendlyFire(true)
 	, m_CanSeeFriendlyInvisible(false)
 	, m_DisplayName(a_DisplayName)
 	, m_Name(a_Name)
 	, m_Prefix(a_Prefix)
 	, m_Suffix(a_Suffix)
+	, m_Color(-1)
 {
+}
+
+
+
+void cTeam::SetColor(int a_Color)
+{
+	m_Color = a_Color; m_World->BroadcastTeam(*this, 2 /* Update team */);
 }
 
 
@@ -217,6 +227,7 @@ cTeam::cTeam(
 
 bool cTeam::AddPlayer(const AString & a_Name)
 {
+	m_World->BroadcastTeamChangeMembership(m_Name, true, {a_Name});
 	return m_Players.insert(a_Name).second;
 }
 
@@ -226,6 +237,7 @@ bool cTeam::AddPlayer(const AString & a_Name)
 
 bool cTeam::RemovePlayer(const AString & a_Name)
 {
+	m_World->BroadcastTeamChangeMembership(m_Name, false, {a_Name});
 	return m_Players.erase(a_Name) > 0;
 }
 
@@ -365,9 +377,10 @@ cTeam * cScoreboard::RegisterTeam(
 	const AString & a_Prefix, const AString & a_Suffix
 )
 {
-	cTeam Team(a_Name, a_DisplayName, a_Prefix, a_Suffix);
+	cTeam Team(a_Name, a_DisplayName, a_Prefix, a_Suffix, m_World);
 
 	std::pair<cTeamMap::iterator, bool> Status = m_Teams.insert(cNamedTeam(a_Name, Team));
+	m_World->BroadcastTeam(Team, 0 /* Create team */);
 
 	return Status.second ? &Status.first->second : nullptr;
 }

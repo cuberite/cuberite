@@ -133,7 +133,8 @@ public:
 
 	cTeam(
 		const AString & a_Name, const AString & a_DisplayName,
-		const AString & a_Prefix, const AString & a_Suffix
+		const AString & a_Prefix, const AString & a_Suffix,
+		cWorld * a_World
 	);
 
 	// tolua_begin
@@ -172,6 +173,11 @@ public:
 	void SetPrefix(const AString & a_Prefix) { m_Prefix = a_Prefix; }
 	void SetSuffix(const AString & a_Suffix) { m_Suffix = a_Suffix; }
 
+	void SetColor(int a_Color);
+	int GetColor(void) const { return m_Color; }
+
+	std::set<AString> GetMembers(void) const { return m_Players; }
+
 	// tolua_end
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
@@ -183,6 +189,8 @@ private:
 
 	typedef std::set<AString> cPlayerNameSet;
 
+	cWorld * m_World;
+
 	bool m_AllowsFriendlyFire;
 	bool m_CanSeeFriendlyInvisible;
 
@@ -193,6 +201,8 @@ private:
 	AString m_Suffix;
 
 	cPlayerNameSet m_Players;
+
+	int m_Color;
 
 	friend class cScoreboardSerializer;
 

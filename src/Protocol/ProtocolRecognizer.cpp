@@ -856,6 +856,20 @@ void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Resul
 
 
 
+void cProtocolRecognizer::SendTeams(const cTeam & a_Team, Byte a_Mode)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendTeams(a_Team, a_Mode);
+}
+
+
+void cProtocolRecognizer::SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendTeamChangeMembership(a_TeamName, a_IsAdding, a_Delta);
+}
+
+
 void cProtocolRecognizer::SendTeleportEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != nullptr);

@@ -629,6 +629,15 @@ void cProtocol_1_8_0::SendKeepAlive(UInt32 a_PingID)
 
 
 
+void cProtocol_1_8_0::SendTeams(const cTeam & a_Team, Byte a_Mode)
+{
+	// Unimplemented
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:

@@ -2892,6 +2892,24 @@ void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboar
 
 
 
+void cClientHandle::SendTeams(const cTeam & a_Team, Byte a_Mode)
+{
+	m_Protocol->SendTeams(a_Team, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta)
+{
+	m_Protocol->SendTeamChangeMembership(a_TeamName, a_IsAdding, a_Delta);
+}
+
+
+
+
+
 void cClientHandle::SendSetSubTitle(const cCompositeChat & a_SubTitle)
 {
 	m_Protocol->SendSetSubTitle(a_SubTitle);

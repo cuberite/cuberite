@@ -1334,6 +1334,77 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_12::SendTeams(const cTeam & a_Team, Byte a_Mode)
+{
+	cPacketizer Pkt(*this, 0x43);
+	Pkt.WriteString(a_Team.GetName());
+	Pkt.WriteBEUInt8(a_Mode);  // Action
+
+	LOG("Sending Teams packet with mode %d", a_Mode);
+	if (a_Mode == 0)
+	{
+		std::set<AString> TeamPlayers = a_Team.GetMembers();
+		Pkt.WriteString(a_Team.GetDisplayName());
+		Pkt.WriteString(a_Team.GetPrefix());
+		Pkt.WriteString(a_Team.GetSuffix());
+		Pkt.WriteBEUInt8(0);  // Friendly flags
+		Pkt.WriteString("always");  // Name tag visibility
+		Pkt.WriteString("always");  // Collision rule
+		Pkt.WriteBEInt8(static_cast<Int8>(a_Team.GetColor()));  // Color
+		//Pkt.WriteVarInt32(1);  // Number of entities
+		//Pkt.WriteString("fred");
+		Pkt.WriteVarInt32(static_cast<UInt32>(TeamPlayers.size()));  // Number of entities
+		// Member entity list
+		for (auto name : TeamPlayers)
+		{
+			Pkt.WriteString(name);
+		}
+	}
+	else if (a_Mode == 2)
+	{
+		Pkt.WriteString(a_Team.GetDisplayName());
+		Pkt.WriteString(a_Team.GetPrefix());
+		Pkt.WriteString(a_Team.GetSuffix());
+		Pkt.WriteBEUInt8(0);  // Friendly flags
+		Pkt.WriteString("always");  // Name tag visibility
+		Pkt.WriteString("always");  // Collision rule
+		Pkt.WriteBEInt8(static_cast<Int8>(a_Team.GetColor()));  // Color
+	}
+	else
+	{
+		// Unknown mode!
+	}
+}
+
+
+
+
+
+void cProtocol_1_12::SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta)
+{
+	cPacketizer Pkt(*this, 0x43);
+	Pkt.WriteString(a_TeamName);
+	if (a_IsAdding)
+	{
+		Pkt.WriteBEUInt8(3);
+	}
+	else
+	{
+		Pkt.WriteBEUInt8(4);
+	}
+
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Delta.size()));
+	for (auto name : a_Delta)
+	{
+		LOG("Sending %s", name.c_str());
+		Pkt.WriteString(name);
+	}
+}
+
+
+
+
+
 void cProtocol_1_12::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_State == 3);  // In game mode?
