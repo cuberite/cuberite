@@ -165,13 +165,13 @@ public:
 	const AString & GetPrefix(void) const { return m_Prefix; }
 	const AString & GetSuffix(void) const { return m_Suffix; }
 
-	void SetFriendlyFire(bool a_Flag)            { m_AllowsFriendlyFire      = a_Flag; }
-	void SetCanSeeFriendlyInvisible(bool a_Flag) { m_CanSeeFriendlyInvisible = a_Flag; }
+	void SetFriendlyFire(bool a_Flag);
+	void SetCanSeeFriendlyInvisible(bool a_Flag);
 
 	void SetDisplayName(const AString & a_Name);
 
-	void SetPrefix(const AString & a_Prefix) { m_Prefix = a_Prefix; }
-	void SetSuffix(const AString & a_Suffix) { m_Suffix = a_Suffix; }
+	void SetPrefix(const AString & a_Prefix);
+	void SetSuffix(const AString & a_Suffix);
 
 	void SetColor(int a_Color);
 	int GetColor(void) const { return m_Color; }

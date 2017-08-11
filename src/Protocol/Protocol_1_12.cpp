@@ -1351,8 +1351,6 @@ void cProtocol_1_12::SendTeams(const cTeam & a_Team, Byte a_Mode)
 		Pkt.WriteString("always");  // Name tag visibility
 		Pkt.WriteString("always");  // Collision rule
 		Pkt.WriteBEInt8(static_cast<Int8>(a_Team.GetColor()));  // Color
-		//Pkt.WriteVarInt32(1);  // Number of entities
-		//Pkt.WriteString("fred");
 		Pkt.WriteVarInt32(static_cast<UInt32>(TeamPlayers.size()));  // Number of entities
 		// Member entity list
 		for (auto name : TeamPlayers)

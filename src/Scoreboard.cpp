@@ -218,7 +218,48 @@ cTeam::cTeam(
 
 void cTeam::SetColor(int a_Color)
 {
-	m_Color = a_Color; m_World->BroadcastTeam(*this, 2 /* Update team */);
+	m_Color = a_Color;
+	m_World->BroadcastTeam(*this, 2 /* Update team */);
+}
+
+
+
+
+
+void cTeam::SetPrefix(const AString & a_Prefix)
+{
+	m_Prefix = a_Prefix;
+	m_World->BroadcastTeam(*this, 2);
+}
+
+
+
+
+
+void cTeam::SetSuffix(const AString & a_Suffix)
+{
+	m_Suffix = a_Suffix;
+	m_World->BroadcastTeam(*this, 2);
+}
+
+
+
+
+
+void cTeam::SetFriendlyFire(bool a_Flag)
+{
+	m_AllowsFriendlyFire = a_Flag;
+	m_World->BroadcastTeam(*this, 2);
+}
+
+
+
+
+
+void cTeam::SetCanSeeFriendlyInvisible(bool a_Flag)
+{
+	m_CanSeeFriendlyInvisible = a_Flag;
+	m_World->BroadcastTeam(*this, 2);
 }
 
 
@@ -258,8 +299,7 @@ bool cTeam::HasPlayer(const AString & a_Name) const
 
 void cTeam::Reset(void)
 {
-	// TODO 2014-01-22 xdot: Inform online players
-
+	m_World->BroadcastTeamChangeMembership(m_Name, false, m_Players);
 	m_Players.clear();
 }
 
@@ -269,8 +309,7 @@ void cTeam::Reset(void)
 void cTeam::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
-
-	// TODO 2014-03-01 xdot: Update clients
+	m_World->BroadcastTeam(*this, 2 /* Update team */);
 }
 
 
@@ -300,6 +339,11 @@ cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 
 cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
 {
+	if (m_Objectives.count(a_Name) > 0)
+	{
+		return nullptr;
+	}
+
 	cObjective Objective(a_Name, a_DisplayName, a_Type, m_World);
 
 	std::pair<cObjectiveMap::iterator, bool> Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
@@ -399,6 +443,8 @@ bool cScoreboard::RemoveTeam(const AString & a_Name)
 	{
 		return false;
 	}
+
+	m_World->BroadcastTeam(it->second, 1 /* Remove team */);
 
 	m_Teams.erase(it);
 
@@ -584,6 +630,11 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
 	{
 		it->second.SendTo(a_Client);
+	}
+
+	for (auto team : m_Teams)
+	{
+		a_Client.SendTeams(team.second, 2);
 	}
 
 	for (int i = 0; i < static_cast<int>(dsCount); ++i)
