@@ -5,6 +5,7 @@
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../Items/ItemHandler.h"
 #include "../World.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
@@ -1100,8 +1101,14 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
 	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
+	auto MaxStackSize = ItemHandler(a_Item)->GetMaxStackSize();
 	if (Count > 0)
 	{
+		while (Count > MaxStackSize)
+		{
+			a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
+			Count -= MaxStackSize;
+		}
 		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
 	}
 }
