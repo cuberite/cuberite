@@ -2046,7 +2046,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
 		ParentChunk->RemoveEntity(this);
-
 		a_World->AddPlayer(this, &a_OldWorld);  // New world will take over and announce client at its next tick
 	});
 
