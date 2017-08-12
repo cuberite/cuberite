@@ -1196,7 +1196,7 @@ void cPlayer::Respawn(void)
 
 	if (GetWorld() != m_SpawnWorld)
 	{
-		MoveToWorld(m_SpawnWorld, false, GetLastBedPos());
+		ScheduleMoveToWorld(m_SpawnWorld, GetLastBedPos(), false);
 	}
 	else
 	{
@@ -1993,18 +1993,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
 	{
-		if (a_OldWorld.GetName() != GetWorld()->GetName())
-		{
-			// We got moved by someone else since this function was
-			// queued, abort!
-			LOGWARNING("Player \"%s\" has already been moved from world \"%s\", and is now in world \"%s\"",
-				GetName().c_str(),
-				a_OldWorld.GetName().c_str(),
-				GetWorld()->GetName().c_str()
-			);
-			return;
-		}
-
 		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
 		GetClientHandle()->InvalidateCachedSentChunk();
 
@@ -2058,6 +2046,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
 		ParentChunk->RemoveEntity(this);
+
 		a_World->AddPlayer(this, &a_OldWorld);  // New world will take over and announce client at its next tick
 	});
 
