@@ -1993,6 +1993,18 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
 	{
+		if (a_OldWorld.GetName() != GetWorld()->GetName())
+		{
+			// We got moved by someone else since this function was
+			// queued, abort!
+			LOGWARNING("Player \"%s\" has already been moved from world \"%s\", and is now in world \"%s\"",
+				GetName().c_str(),
+				a_OldWorld.GetName().c_str(),
+				GetWorld()->GetName().c_str()
+			);
+			return;
+		}
+
 		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
 		GetClientHandle()->InvalidateCachedSentChunk();
 
