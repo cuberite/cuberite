@@ -1101,14 +1101,14 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
 	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
-	auto MaxStackSize = ItemHandler(a_Item)->GetMaxStackSize();
+	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(a_Item)->GetMaxStackSize());
+	while (Count > MaxStackSize)
+	{
+		a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
+		Count -= MaxStackSize;
+	}
 	if (Count > 0)
 	{
-		while (Count > MaxStackSize)
-		{
-			a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
-			Count -= MaxStackSize;
-		}
 		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
 	}
 }
