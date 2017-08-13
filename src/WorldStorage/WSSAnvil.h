@@ -10,7 +10,6 @@
 
 #include "WorldStorage.h"
 #include "FastNBT.h"
-#include "../Mobs/Monster.h"
 
 
 
@@ -18,7 +17,7 @@
 
 // fwd: ItemGrid.h
 class cItemGrid;
-
+class cMonster;
 class cProjectileEntity;
 class cHangingEntity;
 

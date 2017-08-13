@@ -38,7 +38,18 @@ public:
 
 	/** Returns true if the cuboids have at least one voxel in common. Both coords are considered inclusive.
 	Assumes both cuboids are sorted. */
-	bool DoesIntersect(const cCuboid & a_Other) const;
+	inline bool DoesIntersect(const cCuboid & a_Other) const
+	{
+		ASSERT(IsSorted());
+		ASSERT(a_Other.IsSorted());
+
+		// In order for cuboids to intersect, each of their coord intervals need to intersect
+		return (
+			DoIntervalsIntersect(p1.x, p2.x, a_Other.p1.x, a_Other.p2.x) &&
+			DoIntervalsIntersect(p1.y, p2.y, a_Other.p1.y, a_Other.p2.y) &&
+			DoIntervalsIntersect(p1.z, p2.z, a_Other.p1.z, a_Other.p2.z)
+		);
+	}
 
 	bool IsInside(Vector3i v) const
 	{
@@ -93,6 +104,17 @@ public:
 
 	/** If needed, expands the cuboid so that it contains the specified point. Assumes sorted. Doesn't contract. */
 	void Engulf(Vector3i a_Point);
+
+private:
+
+	/** Returns true if the two specified intervals have a non-empty union */
+	inline static bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int a_Max2)
+	{
+		ASSERT(a_Min1 <= a_Max1);
+		ASSERT(a_Min2 <= a_Max2);
+		return ((a_Min1 <= a_Max2) && (a_Max1 >= a_Min2));
+	}
+
 } ;
 // tolua_end
 
