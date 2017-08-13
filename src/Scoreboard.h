@@ -285,6 +285,9 @@ public:
 	/** Send this scoreboard to the specified client */
 	void SendTo(cClientHandle & a_Client);
 
+	/** Tell the specified client to forget all about us */
+	void RemoveFrom(cClientHandle & a_Client);
+
 	cTeam * QueryPlayerTeam(const AString & a_Name);  // WARNING: O(n logn)
 
 	/** Execute callback for each objective with the specified type

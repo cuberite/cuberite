@@ -653,6 +653,27 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 
 
 
+void cScoreboard::RemoveFrom(cClientHandle & a_Client)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	// Remove every objective
+	for (auto objective : m_Objectives)
+	{
+		a_Client.SendScoreboardObjective(objective.second.GetName(), "", cObjective::uaRemove);
+	}
+
+	// Remove every team
+	for (auto team : m_Teams)
+	{
+		a_Client.SendTeams(team.second, 1 /* Remove */);
+	}
+}
+
+
+
+
+
 size_t cScoreboard::GetNumObjectives(void) const
 {
 	return m_Objectives.size();

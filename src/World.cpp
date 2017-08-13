@@ -3117,6 +3117,9 @@ void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
 	cClientHandle * Client = a_Player->GetClientHandle();
 	if (Client != nullptr)
 	{
+		// Reset the player's scoreboard
+		GetScoreBoard().RemoveFrom(*Client);
+
 		Client->RemoveFromWorld();
 		m_ChunkMap->RemoveClientFromChunks(Client);
 		cCSLock Lock(m_CSClients);
@@ -4052,6 +4055,9 @@ void cWorld::AddQueuedPlayers(void)
 			m_ChunkMap->AddEntityIfNotPresent(Player);
 			ASSERT(!Player->IsTicking());
 			Player->SetIsTicking(true);
+
+			// Tell the player all about our scoreboard
+			GetScoreBoard().SendTo(*Player->GetClientHandle());
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSPlayers)
 

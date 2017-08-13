@@ -1358,6 +1358,10 @@ void cProtocol_1_12::SendTeams(const cTeam & a_Team, Byte a_Mode)
 			Pkt.WriteString(name);
 		}
 	}
+	else if (a_Mode == 1)
+	{
+		// Removal has no fields
+	}
 	else if (a_Mode == 2)
 	{
 		Pkt.WriteString(a_Team.GetDisplayName());
