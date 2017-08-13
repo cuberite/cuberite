@@ -202,7 +202,7 @@ return
 							Type = "string",
 						},
 					},
-					Notes = "Returns the name of the sound that is played when placing the block of this type.",
+					Notes = "(<b>DEPRECATED</b>) Not used by cuberite internally and always returns an empty string.",
 				},
 				GetSpreadLightFalloff =
 				{
@@ -377,16 +377,6 @@ return
 				{
 					Type = "bool",
 					Notes = "Can a piston break this block?",
-				},
-				m_PlaceSound =
-				{
-					Type = "string",
-					Notes = "The name of the sound that is placed when a block is placed.",
-				},
-				m_RequiresSpecialTool =
-				{
-					Type = "bool",
-					Notes = "Does this block require a tool to drop?",
 				},
 				m_SpreadLightFalloff =
 				{
