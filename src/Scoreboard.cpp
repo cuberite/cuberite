@@ -95,7 +95,7 @@ void cObjective::Reset(void)
 {
 	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
 	{
-		m_World->BroadcastScoreUpdate(m_Name, it->first, 0, 1);
+		m_World->BroadcastScoreUpdate(m_Name, it->first, 0, cScoreboard::uaRemove);
 	}
 
 	m_Scores.clear();
@@ -127,7 +127,7 @@ void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
 {
 	m_Scores[a_Name] = a_Score;
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, 0);
+	m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, cScoreboard::uaUpsert);
 }
 
 
@@ -138,7 +138,7 @@ void cObjective::ResetScore(const AString & a_Name)
 {
 	m_Scores.erase(a_Name);
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, 1);
+	m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, cScoreboard::uaRemove);
 }
 
 
@@ -177,7 +177,7 @@ void cObjective::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
 
-	m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, 2);
+	m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaUpdateText);
 }
 
 
@@ -190,7 +190,7 @@ void cObjective::SendTo(cClientHandle & a_Client)
 
 	for (cScoreMap::const_iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
 	{
-		a_Client.SendScoreUpdate(m_Name, it->first, it->second, 0);
+		a_Client.SendScoreUpdate(m_Name, it->first, it->second, cScoreboard::uaUpsert);
 	}
 }
 
@@ -351,7 +351,7 @@ cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AStrin
 	if (Status.second)
 	{
 		ASSERT(m_World != nullptr);
-		m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, 0);
+		m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, cObjective::uaCreate);
 
 		return &Status.first->second;
 	}
@@ -377,7 +377,7 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 	}
 
 	ASSERT(m_World != nullptr);
-	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
+	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), cObjective::uaRemove);
 
 	for (unsigned int i = 0; i < static_cast<unsigned int>(dsCount); ++i)
 	{

@@ -52,6 +52,13 @@ public:
 		otStatEntityKilledBy
 	};
 
+	enum eUpdateAction
+	{
+		uaCreate = 0,
+		uaRemove = 1,
+		uaUpdateText = 2
+	};
+
 	// tolua_end
 
 	static AString TypeToString(eType a_Type);
@@ -225,6 +232,12 @@ public:
 		dsName,
 
 		dsCount
+	};
+
+	enum eUpdateAction
+	{
+		uaUpsert = 0,
+		uaRemove = 1
 	};
 
 	// tolua_end
