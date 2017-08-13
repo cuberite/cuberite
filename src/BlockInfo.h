@@ -55,9 +55,6 @@ public:
 	/** Block height */
 	float m_BlockHeight;
 
-	/** Sound when placing this block */
-	AString m_PlaceSound;
-
 	/** Block's hardness. The greater the value the longer the player needs to break the block. */
 	float m_Hardness;
 
@@ -85,7 +82,6 @@ public:
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
 	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 	inline static float GetBlockHeight            (BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
-	inline static AString GetPlaceSound           (BLOCKTYPE a_Type) { return Get(a_Type).m_PlaceSound;          }
 	inline static float GetHardness               (BLOCKTYPE a_Type) { return Get(a_Type).m_Hardness;            }
 
 	// tolua_end
@@ -105,7 +101,6 @@ public:
 		, m_FullyOccupiesVoxel(false)
 		, m_CanBeTerraformed(false)
 		, m_BlockHeight(1.0)
-		, m_PlaceSound()
 		, m_Hardness(0.0f)
 		, m_Handler()
 	{}

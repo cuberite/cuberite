@@ -343,7 +343,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	Vector3d Heading(0, 0, 0);
 	if (a_Attacker != nullptr)
 	{
-		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 16 : 11);
+		Heading = a_Attacker->GetLookVector();
 	}
 
 	TDI.Knockback = Heading * a_KnockbackAmount;
@@ -532,21 +532,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	// Add knockback:
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != nullptr))
 	{
-		int KnockbackLevel = static_cast<int>(a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback));  // More common enchantment
-		if (KnockbackLevel < 1)
-		{
-			// We support punch on swords and vice versa! :)
-			KnockbackLevel = static_cast<int>(a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch));
-		}
-
-		Vector3d AdditionalSpeed(0, 0, 0);
-		switch (KnockbackLevel)
-		{
-			case 1: AdditionalSpeed.Set(5, 0.3, 5); break;
-			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
-			default: break;
-		}
-		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
+		AddSpeed(a_TDI.Knockback);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -761,9 +747,19 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 {
 	// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
+	double Knockback = 11;
 
-	// TODO: Enchantments
-	return 1;
+	// If we're sprinting, bump up the knockback
+	if (IsSprinting())
+	{
+		Knockback = 16;
+	}
+
+	// Check for knockback enchantments (punch only applies to shot arrows)
+	unsigned int KnockbackLevel = GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
+	Knockback += 10 * KnockbackLevel;
+
+	return Knockback;
 }
 
 

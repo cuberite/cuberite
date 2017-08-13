@@ -291,6 +291,62 @@ tolua_lerror:
 
 
 
+static int tolua_cBlockInfo_GetPlaceSound(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamStaticSelf("cBlockInfo") ||
+		!L.CheckParamNumber(2)
+	)
+	{
+		return 0;
+	}
+
+	L.Push("");
+	LOGWARNING("cBlockInfo:GetPlaceSound() is deprecated");
+	L.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
+static int tolua_get_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("const cBlockInfo"))
+	{
+		return 0;
+	}
+
+	L.Push("");
+	LOGWARNING("cBlockInfo.m_PlaceSound is deprecated");
+	L.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cBlockInfo"))
+	{
+		return 0;
+	}
+
+	LOGWARNING("cBlockInfo.m_PlaceSound is deprecated");
+	L.LogStackTrace(0);
+	return 0;
+}
+
+
+
+
+
 /* method: Trace of class  cTracer */
 static int tolua_cTracer_Trace(lua_State * a_LuaState)
 {
@@ -438,6 +494,11 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_array(tolua_S, "g_BlockFullyOccupiesVoxel",  tolua_get_AllToLua_g_BlockFullyOccupiesVoxel,  nullptr);
 
 	tolua_function(tolua_S, "StringToMobType", tolua_AllToLua_StringToMobType00);
+
+	tolua_beginmodule(tolua_S, "cBlockInfo");
+		tolua_function(tolua_S, "GetPlaceSound", tolua_cBlockInfo_GetPlaceSound);
+		tolua_variable(tolua_S, "m_PlaceSound", tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
+	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cTracer");
 		tolua_function(tolua_S, "Trace", tolua_cTracer_Trace);
