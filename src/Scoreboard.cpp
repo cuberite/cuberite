@@ -105,6 +105,20 @@ void cObjective::Reset(void)
 
 
 
+AStringVector cObjective::GetPlayers(void) const
+{
+	AStringVector Players;
+	for (auto player : m_Scores)
+	{
+		Players.push_back(player.first);
+	}
+	return Players;
+}
+
+
+
+
+
 cObjective::Score cObjective::GetScore(const AString & a_Name) const
 {
 	cScoreMap::const_iterator it = m_Scores.find(a_Name);
@@ -116,6 +130,18 @@ cObjective::Score cObjective::GetScore(const AString & a_Name) const
 	else
 	{
 		return it->second;
+	}
+}
+
+
+
+
+
+void cObjective::SetAllScores(cObjective::Score a_Score)
+{
+	for (auto it : m_Scores)
+	{
+		it.second = a_Score;
 	}
 }
 

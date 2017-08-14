@@ -82,6 +82,9 @@ public:
 	/** Returns the score of the specified player */
 	Score GetScore(const AString & a_Name) const;
 
+	/** Sets the score of all tracked players */
+	void SetAllScores(Score a_Score);
+
 	/** Sets the score of the specified player */
 	void SetScore(const AString & a_Name, Score a_Score);
 
@@ -97,6 +100,9 @@ public:
 	void SetDisplayName(const AString & a_Name);
 
 	// tolua_end
+
+	/** Returns a set of all players */
+	AStringVector GetPlayers(void) const; // Exported in ManualBindings.cpp
 
 	/** Send this objective to the specified client */
 	void SendTo(cClientHandle & a_Client);
@@ -280,7 +286,7 @@ public:
 	// tolua_end
 
 	/** Retrieves the list of team names */
-	AStringVector GetTeamNames();
+	AStringVector GetTeamNames();  // Exported in ManualBindings.cpp
 
 	/** Send this scoreboard to the specified client */
 	void SendTo(cClientHandle & a_Client);
