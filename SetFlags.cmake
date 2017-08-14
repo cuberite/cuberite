@@ -109,6 +109,7 @@ macro(set_flags)
 
 		if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
 			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fomit-frame-pointer")
+			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fomit-frame-pointer")
 		endif()
 
 		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
