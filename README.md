@@ -1,4 +1,5 @@
-Cuberite [![Build Status](https://img.shields.io/travis/cuberite/cuberite/master.svg?style=flat)](https://travis-ci.org/cuberite/cuberite) 
+Cuberite [![Build Status](https://img.shields.io/travis/cuberite/cuberite/master.svg?style=flat)](https://travis-ci.org/cuberite/cuberite) [![Circle Ci Build Status](https://circleci.com/gh/cuberite/cuberite.svg?&style=shield
+)](https://circleci.com/gh/cuberite/cuberite)
 ========
 
 Cuberite is a Minecraft-compatible multiplayer game server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API. Cuberite is compatible with the vanilla Minecraft client.
