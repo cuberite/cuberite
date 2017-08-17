@@ -614,6 +614,7 @@ public:
 	void Push(const AStringMap & a_Dictionary);
 	void Push(const AStringVector & a_Vector);
 	void Push(const char * a_Value);
+	void Push(const cItem & a_Item);
 	void Push(const cNil & a_Nil);
 	void Push(const cRef & a_Ref);
 	void Push(const Vector3d & a_Vector);
