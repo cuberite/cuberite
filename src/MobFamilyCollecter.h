@@ -1,16 +1,7 @@
 
 #pragma once
 
-#include <map>
-#include <set>
-#include "BlockID.h"
 #include "Mobs/Monster.h"  // This is a side-effect of keeping Mobfamily inside Monster class. I'd prefer to keep both (Mobfamily and Monster) inside a "Monster" namespace MG TODO : do it
-
-
-
-
-// fwd:
-class cChunk;
 
 
 

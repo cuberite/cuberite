@@ -95,6 +95,7 @@ AString cNBTParseErrorCategory::message(int a_Condition) const
 		#ifdef __clang__
 			#pragma clang diagnostic push
 			#pragma clang diagnostic ignored "-Wcovered-switch-default"
+			#pragma clang diagnostic ignored "-Wunreachable-code"
 		#endif
 
 		default:

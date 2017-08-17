@@ -6,7 +6,6 @@
 #include "Root.h"
 #include "Entities/Player.h"
 #include "Item.h"
-#include "Entities/Pickup.h"
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
@@ -115,11 +114,11 @@ cChunkPtr cChunkMap::GetChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-cChunkPtr cChunkMap::GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
+cChunkPtr cChunkMap::GetChunkNoGen(cChunkCoords a_Chunk)
 {
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());  // m_CSChunks should already be locked by the operation that called us
 
-	auto Chunk = ConstructChunk(a_ChunkX, a_ChunkZ);
+	auto Chunk = ConstructChunk(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 	if (Chunk == nullptr)
 	{
 		return nullptr;
@@ -127,7 +126,7 @@ cChunkPtr cChunkMap::GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
 	if (!Chunk->IsValid() && !Chunk->IsQueued())
 	{
 		Chunk->SetPresence(cChunk::cpQueued);
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
+		m_World->GetStorage().QueueLoadChunk(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 	}
 
 	return Chunk;
@@ -740,17 +739,15 @@ bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)>
 
 
 
-void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cChunkMap::WakeUpSimulators(Vector3i a_Block)
 {
 	cCSLock Lock(m_CSChunks);
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(cChunkDef::BlockToChunk(a_Block));
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return;
 	}
-	m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
+	m_World->GetSimulatorManager()->WakeUp(a_Block, Chunk);
 }
 
 
@@ -1140,7 +1137,7 @@ void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_B
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
 		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta, a_SendToClients);
-		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
+		m_World->GetSimulatorManager()->WakeUp({a_BlockX, a_BlockY, a_BlockZ}, Chunk);
 	}
 	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
@@ -1361,7 +1358,7 @@ bool cChunkMap::DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 		}
 
 		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
-		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, DestChunk);
+		m_World->GetSimulatorManager()->WakeUp({a_BlockX, a_BlockY, a_BlockZ}, DestChunk);
 	}
 
 	return true;
@@ -1822,8 +1819,8 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
 	m_World->GetSimulatorManager()->WakeUpArea(cCuboid(
-		bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1,
-		bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1
+		{bx - ExplosionSizeInt - 1, MinY, bz - ExplosionSizeInt - 1},
+		{bx + ExplosionSizeInt + 1, MaxY, bz + ExplosionSizeInt + 1}
 	));
 }
 

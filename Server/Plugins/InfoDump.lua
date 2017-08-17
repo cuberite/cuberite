@@ -306,7 +306,7 @@ local function WriteCommandsCategoryForum(a_Category, f)
 	if (CategoryName == "") then
 		CategoryName = "General"
 	end
-	f:write("\n[size=Large]", ForumizeString(a_Category.DisplayName or CategoryName), "[/size]\n")
+	f:write("\n[size=large]", ForumizeString(a_Category.DisplayName or CategoryName), "[/size]\n")
 
 	-- Write description:
 	if (a_Category.Description ~= "") then
@@ -377,7 +377,7 @@ local function DumpCommandsForum(a_PluginInfo, f)
 		return
 	end
 
-	f:write("\n[size=X-Large]Commands[/size]\n")
+	f:write("\n[size=x-large]Commands[/size]\n")
 
 	-- Dump per-category commands:
 	for idx, cat in ipairs(Categories) do
@@ -425,7 +425,7 @@ local function DumpAdditionalInfoForum(a_PluginInfo, f)
 
 	for idx, info in ipairs(a_PluginInfo.AdditionalInfo) do
 		if ((info.Title ~= nil) and (info.Contents ~= nil)) then
-			f:write("\n[size=X-Large]", ForumizeString(info.Title), "[/size]\n")
+			f:write("\n[size=x-large]", ForumizeString(info.Title), "[/size]\n")
 			f:write(ForumizeString(info.Contents), "\n")
 		end
 	end
@@ -530,7 +530,7 @@ local function DumpPermissionsForum(a_PluginInfo, f)
 	end
 
 	-- Dump the permissions:
-	f:write("\n[size=X-Large]Permissions[/size]\n[list]\n")
+	f:write("\n[size=x-large]Permissions[/size]\n[list]\n")
 	for idx, perm in ipairs(Permissions) do
 		f:write("  - [color=red]", perm.Name, "[/color] - ")
 		f:write(ForumizeString(perm.Info.Description or ""))

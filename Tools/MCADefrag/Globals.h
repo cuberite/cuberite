@@ -187,7 +187,10 @@ typedef unsigned char Byte;
 #include <map>
 #include <algorithm>
 #include <memory>
-
+#include <atomic>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 
 
@@ -237,6 +240,9 @@ public:
 	virtual bool Item(Type * a_Type) = 0;
 	virtual ~cItemCallback() {}
 } ;
+
+
+#include "BiomeDef.h"
 
 
 

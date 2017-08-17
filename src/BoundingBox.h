@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "Vector3.h"
 #include "Defines.h"
 
 
@@ -25,9 +24,9 @@ class cBoundingBox
 {
 public:
 	cBoundingBox(double a_MinX, double a_MaxX, double a_MinY, double a_MaxY, double a_MinZ, double a_MaxZ);
-	cBoundingBox(const Vector3d & a_Min, const Vector3d & a_Max);
-	cBoundingBox(const Vector3d & a_Pos, double a_Radius, double a_Height);
-	cBoundingBox(const Vector3d & a_Pos, double a_CubeLength);
+	cBoundingBox(Vector3d a_Min, Vector3d a_Max);
+	cBoundingBox(Vector3d a_Pos, double a_Radius, double a_Height);
+	cBoundingBox(Vector3d a_Pos, double a_CubeLength);
 	cBoundingBox(const cBoundingBox & a_Orig);
 
 	cBoundingBox & operator=(const cBoundingBox & a_Other);
@@ -36,7 +35,7 @@ public:
 	void Move(double a_OffX, double a_OffY, double a_OffZ);
 
 	/** Moves the entire boundingbox by the specified offset */
-	void Move(const Vector3d & a_Off);
+	void Move(Vector3d a_Off);
 
 	/** Expands the bounding box by the specified amount in each direction (so the box becomes larger by 2 * Expand in each direction) */
 	void Expand(double a_ExpandX, double a_ExpandY, double a_ExpandZ);
@@ -48,7 +47,7 @@ public:
 	cBoundingBox Union(const cBoundingBox & a_Other);
 
 	/** Returns true if the point is inside the bounding box */
-	bool IsInside(const Vector3d & a_Point);
+	bool IsInside(Vector3d a_Point);
 
 	/** Returns true if the point is inside the bounding box */
 	bool IsInside(double a_X, double a_Y, double a_Z);
@@ -57,13 +56,13 @@ public:
 	bool IsInside(cBoundingBox & a_Other);
 
 	/** Returns true if a boundingbox specified by a_Min and a_Max is inside this bounding box */
-	bool IsInside(const Vector3d & a_Min, const Vector3d & a_Max);
+	bool IsInside(Vector3d a_Min, Vector3d a_Max);
 
 	/** Returns true if the specified point is inside the bounding box specified by its min / max corners */
-	static bool IsInside(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_Point);
+	static bool IsInside(Vector3d a_Min, Vector3d a_Max, Vector3d a_Point);
 
 	/** Returns true if the specified point is inside the bounding box specified by its min / max corners */
-	static bool IsInside(const Vector3d & a_Min, const Vector3d & a_Max, double a_X, double a_Y, double a_Z);
+	static bool IsInside(Vector3d a_Min, Vector3d a_Max, double a_X, double a_Y, double a_Z);
 
 	// tolua_end
 
@@ -71,13 +70,13 @@ public:
 	Also calculates the distance along the line in which the intersection occurs, and the face hit (BLOCK_FACE_ constants)
 	Only forward collisions (a_LineCoeff >= 0) are returned.
 	Exported to Lua manually, because ToLua++ would generate needless input params (a_LineCoeff, a_Face). */
-	bool CalcLineIntersection(const Vector3d & a_LinePoint1, const Vector3d & a_LinePoint2, double & a_LineCoeff, eBlockFace & a_Face) const;
+	bool CalcLineIntersection(Vector3d a_LinePoint1, Vector3d a_LinePoint2, double & a_LineCoeff, eBlockFace & a_Face) const;
 
 	/** Returns true if the specified bounding box is intersected by the line specified by its two points
 	Also calculates the distance along the line in which the intersection occurs, and the face hit (BLOCK_FACE_ constants)
 	Only forward collisions (a_LineCoeff >= 0) are returned.
 	Exported to Lua manually, because ToLua++ would generate needless input params (a_LineCoeff, a_Face). */
-	static bool CalcLineIntersection(const Vector3d & a_Min, const Vector3d & a_Max, const Vector3d & a_LinePoint1, const Vector3d & a_LinePoint2, double & a_LineCoeff, eBlockFace & a_Face);
+	static bool CalcLineIntersection(Vector3d a_Min, Vector3d a_Max, Vector3d a_LinePoint1, Vector3d a_LinePoint2, double & a_LineCoeff, eBlockFace & a_Face);
 
 	/** Calculates the intersection of the two bounding boxes; returns true if nonempty.
 	Exported manually, because ToLua++ would generate needless input params (a_Intersection). */
@@ -93,8 +92,8 @@ public:
 	double GetMaxY(void) const { return m_Max.y; }
 	double GetMaxZ(void) const { return m_Max.z; }
 
-	const Vector3d & GetMin(void) const { return m_Min; }
-	const Vector3d & GetMax(void) const { return m_Max; }
+	Vector3d GetMin(void) const { return m_Min; }
+	Vector3d GetMax(void) const { return m_Max; }
 
 	// tolua_end
 

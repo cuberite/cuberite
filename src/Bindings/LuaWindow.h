@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <atomic>
 #include "LuaState.h"
 #include "../UI/Window.h"
 #include "../ItemGrid.h"
@@ -50,6 +49,10 @@ public:
 
 	// tolua_end
 
+	/** Sets the Lua callback to call when the player clicks on the window.
+	The window can stop the click from propogating. */
+	void SetOnClicked(cLuaState::cCallbackPtr && a_OnClicked);
+
 	/** Sets the Lua callback function to call when the window is about to close */
 	void SetOnClosing(cLuaState::cCallbackPtr && a_OnClosing);
 
@@ -63,6 +66,9 @@ protected:
 
 	/** The canon Lua state that has opened the window and owns the m_LuaRef */
 	cLuaState * m_LuaState;
+
+	/** The Lua callback to call when the player clicked on a slot */
+	cLuaState::cCallbackPtr m_OnClicked;
 
 	/** The Lua callback to call when the window is closing for any player */
 	cLuaState::cCallbackPtr m_OnClosing;
@@ -81,6 +87,11 @@ protected:
 
 	// cWindow overrides:
 	virtual void OpenedByPlayer(cPlayer & a_Player) override;
+	virtual void Clicked(
+		cPlayer & a_Player, int a_WindowID,
+		short a_SlotNum, eClickAction a_ClickAction,
+		const cItem & a_ClickedItem
+	) override;
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
 	virtual void Destroy(void) override;
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;

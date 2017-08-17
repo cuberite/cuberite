@@ -2,8 +2,8 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "../World.h"
-#include "../Entities/Player.h"
+
+
 
 class cItemPickaxeHandler :
 	public cItemHandler

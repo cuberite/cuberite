@@ -1,7 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include <cmath>
 #include <unordered_map>
 
 #include "Player.h"
@@ -11,14 +10,12 @@
 #include "../Server.h"
 #include "../UI/InventoryWindow.h"
 #include "../UI/WindowOwner.h"
-#include "../World.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../Root.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
-#include "../Vector3.h"
 #include "../FastRandom.h"
 #include "../ClientHandle.h"
 
@@ -1324,10 +1321,16 @@ cTeam * cPlayer::UpdateTeam(void)
 
 void cPlayer::OpenWindow(cWindow & a_Window)
 {
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerOpeningWindow(*this, a_Window))
+	{
+		return;
+	}
+
 	if (&a_Window != m_CurrentWindow)
 	{
 		CloseWindow(false);
 	}
+
 	a_Window.OpenedByPlayer(*this);
 	m_CurrentWindow = &a_Window;
 	a_Window.SendWholeWindow(*GetClientHandle());
@@ -2966,15 +2969,17 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 		}
 	}
 
-	if (HasEntityEffect(cEntityEffect::effHaste))
+	auto Haste = GetEntityEffect(cEntityEffect::effHaste);
+	if (Haste != nullptr)
 	{
-		int intensity = GetEntityEffect(cEntityEffect::effHaste)->GetIntensity() + 1;
+		int intensity = Haste->GetIntensity() + 1;
 		f *= 1.0f + (intensity * 0.2f);
 	}
 
-	if (HasEntityEffect(cEntityEffect::effMiningFatigue))
+	auto MiningFatigue = GetEntityEffect(cEntityEffect::effMiningFatigue);
+	if (MiningFatigue != nullptr)
 	{
-		int intensity = GetEntityEffect(cEntityEffect::effMiningFatigue)->GetIntensity();
+		int intensity = MiningFatigue->GetIntensity();
 		switch (intensity)
 		{
 			case 0:  f *= 0.3f;     break;

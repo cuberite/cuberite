@@ -15,7 +15,6 @@
 #pragma once
 
 #include "ForEachChunkProvider.h"
-#include "Vector3.h"
 #include "ChunkDataCallback.h"
 #include "Cuboid.h"
 

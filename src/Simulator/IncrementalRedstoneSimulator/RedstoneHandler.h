@@ -2,7 +2,6 @@
 #pragma once
 
 #include "World.h"
-#include "Vector3.h"
 
 
 

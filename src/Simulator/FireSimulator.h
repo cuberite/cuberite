@@ -2,7 +2,6 @@
 #pragma once
 
 #include "Simulator.h"
-#include "../BlockEntities/BlockEntity.h"
 
 
 
@@ -44,7 +43,7 @@ protected:
 	int m_ReplaceFuelChance;
 
 
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
 
 	/** Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels */
 	int GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);

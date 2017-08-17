@@ -12,7 +12,6 @@
 #include "BlockArea.h"
 #include "OSSupport/GZipFile.h"
 #include "Blocks/BlockHandler.h"
-#include "Cuboid.h"
 #include "ChunkData.h"
 #include "BlockEntities/BlockEntity.h"
 
@@ -1955,8 +1954,8 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 cCuboid cBlockArea::GetBounds(void) const
 {
 	return cCuboid(
-		m_Origin.x, m_Origin.y, m_Origin.z,
-		m_Origin.x + m_Size.x - 1, m_Origin.y + m_Size.y - 1, m_Origin.z + m_Size.z - 1
+		m_Origin,
+		m_Origin + m_Size - Vector3i(1, 1, 1)
 	);
 }
 

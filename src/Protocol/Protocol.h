@@ -11,23 +11,19 @@
 #pragma once
 
 #include "../Defines.h"
-#include "../Endianness.h"
 #include "../Scoreboard.h"
-#include "../Map.h"
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
 
-#include <array>
 
 
 
 
+class cMap;
 class cExpOrb;
 class cPlayer;
 class cEntity;
 class cWindow;
-class cInventory;
-class cPawn;
 class cPickup;
 class cPainting;
 class cWorld;

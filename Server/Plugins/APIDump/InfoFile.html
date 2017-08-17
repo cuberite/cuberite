@@ -20,6 +20,7 @@
 				<li><a href="#Commands">Commands table</a></li>
 				<li><a href="#ConsoleCommands">ConsoleCommands table</a></li>
 				<li><a href="#Permissions">Permissions table</a></li>
+				<li><a href="#Categories">Categories table</a></li>
 				<li><a href="#Using">Using the file in code</a></li>
 				<li><a href="#Examples">Examples</a></li>
 			</ul>
@@ -34,7 +35,10 @@
 
 			<p>Last, but not least, we want to make a plugin repository on the web in the future, a repository that would store plugins, their descriptions, comments. It makes sense that the centralized information can be parsed by the repository automatically, so that advanced things, such as searching for a plugin based on a command, or determining whether two plugins collide command-wise, are possible.</p>
 
-			<p>After this file format has been devised, a tool has been written that allows for an easy generation of the documentation for the plugin in various formats. It outputs the documentation in a format that is perfect for pasting into the forum. It generates documentation in a Markup format to use in README.md on GitHub and similar sites. The clever thing is that you don't need to keep all those formats in sync manually - you edit the Info.lua file and this tool will re-generate the documentation for you.</p>
+			<p>A tool has been written that allows for an easy generation of the documentation for the plugin in various formats. It outputs the documentation in a format that is perfect for pasting into the forum. It generates documentation in a Markup format to use in README.md on GitHub and similar sites. The clever thing is that you don't need to keep all those formats in sync manually - you edit the Info.lua file and this tool will re-generate the documentation for you.
+			<br>
+			To generate documentation for the plugin, activate the DumpInfo plugin on a cuberite server with your plugin installed, and use the webadmin interface to "Dump" the plugin information. This will create a README.md suitable for uploading to your git repo, and a forum_info.txt, which can be copy-pasted into a forum post.
+			</p>
 
 			<p>So to sum up, the Info.lua file contains the plugins' commands, console commands, their permissions and possibly the overall plugin documentation, in a structured manner that can be parsed by a program, yet is human readable and editable.</p>
 
@@ -56,6 +60,7 @@ g_PluginInfo =
 	Commands = {},
 	ConsoleCommands = {},
 	Permissions = {},
+	Categories = {},
 }
 </pre>
 			<p>As you can see, the structure is pretty straightforward. Note that the order of the elements inside the table is not important (Lua property).</p>
@@ -115,6 +120,7 @@ Commands =
 	["/cmd2"] =
 	{
 		Alias = {"/c2", "//c2" },
+		Category = "Something",
 		Subcommands =
 		{
 			sub1 =  -- This declares a "/cmd2 sub1" command
@@ -149,6 +155,8 @@ Commands =
 		<p>Although it may seem overwhelming at first, there is a "method to this madness". Each element of the Commands table defines one command. Most commands start with a slash, so the special Lua syntax for table elements with non-standard names needs to be applied (<code>["/cmd1"] =</code>). The command can either specify subcommands, or a handler function (specifying both is UndefinedBehavior). Subcommands uses the same structure as the entire Commands table, recursively.</p>
 
 		<p>The permission element specifies that the command is only available with the specified permission. Note that the permission for subcommand's parent isn't checked when the subcommand is called. This means that specifying the permission for a command that has subcommands has no effect whatsoever, but is discouraged because we may add processing for that in the future.</p>
+
+		<p>The optional Categories table provides descriptions for command categories in the generated documentation. The documentation generator will group the commands by their specified Category ("General" by default) and each category will have the specified description written to it.</p>
 
 		<p>The ParameterCombinations table is used only for generating the documentation, it lists the various combinations of parameters that the command supports. It's worth specifying even if the command supports only one combination, because that combination will get documented this way.</p>
 
@@ -215,6 +223,24 @@ Permissions =
 
 			<p>The RecommendedGroup element lists, in plain English, the intended groups for which the permission should be enabled on a typical server. Plugin authors are advised to create reasonable defaults, prefering security to openness, so that admins using these settings blindly don't expose their servers to malicious users.</p>
 
+
+			<hr />
+			<a name="Categories"><h2>Categories</h2></a>
+
+			<p>The optional Categories table provides descriptions for categories in the generated documentation. Commands can have categories with or without category descriptions in this table. The documentation generator will output a table of listed categories along with their description.</p>
+<pre class="prettyprint lang-lua">
+Categories = 
+{
+	General =
+	{
+		Description = "A general, yet somehow vague description of the default category."
+	},
+	Something =
+	{
+		Description = "Some descriptive words which form sentences pertaining to this set of commands use and goals."
+	},
+},
+</pre>			
 
 			<hr />
 			<a name="Using"><h2>Using the file in code</h2></a>

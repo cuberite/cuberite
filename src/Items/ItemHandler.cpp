@@ -1,7 +1,6 @@
 
 #include "Globals.h"
 #include "ItemHandler.h"
-#include "../Item.h"
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../FastRandom.h"

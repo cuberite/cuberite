@@ -31,9 +31,9 @@ public:
 		return IsRedstone(a_BlockType);
 	}
 
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override
+	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override
 	{
-		m_Data.WakeUp({ a_BlockX, a_BlockY, a_BlockZ });
+		m_Data.WakeUp(a_Block);
 	}
 
 	/** Returns if a block is a mechanism (something that accepts power and does something)

@@ -1,16 +1,17 @@
 
 #pragma once
 
-#include "BroadcastInterface.h"
+
 #include "../Mobs/MonsterTypes.h"
 
-class cItems;
 
 typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
-
-
-class cMonster;
+class cBroadcastInterface;
+class cItems;
 class cPlayer;
+
+
+
 
 
 class cWorldInterface
@@ -73,6 +74,6 @@ public:
 	virtual int GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Wakes up the simulators for the specified block */
-	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	virtual void WakeUpSimulators(Vector3i a_Block) = 0;
 
 };

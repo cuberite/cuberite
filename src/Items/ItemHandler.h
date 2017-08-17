@@ -3,8 +3,6 @@
 
 #include "../Defines.h"
 #include "../Item.h"
-#include "../Entities/EntityEffect.h"
-#include "../Blocks/BlockPluginInterface.h"
 
 
 
@@ -13,6 +11,7 @@
 // fwd:
 class cWorld;
 class cPlayer;
+class cBlockPluginInterface;
 
 
 

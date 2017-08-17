@@ -2,7 +2,6 @@
 #include "Globals.h"
 
 #include "../World.h"
-#include "../BlockID.h"
 #include "../Defines.h"
 #include "../Chunk.h"
 #include "../Cuboid.h"
@@ -19,20 +18,20 @@
 
 
 
-void cSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
+void cSimulator::WakeUp(Vector3i a_Block, cChunk * a_Chunk)
 {
-	AddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk);
-	AddBlock(a_BlockX - 1, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX - 1, a_BlockZ));
-	AddBlock(a_BlockX + 1, a_BlockY, a_BlockZ, a_Chunk->GetNeighborChunk(a_BlockX + 1, a_BlockZ));
-	AddBlock(a_BlockX, a_BlockY, a_BlockZ - 1, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ - 1));
-	AddBlock(a_BlockX, a_BlockY, a_BlockZ + 1, a_Chunk->GetNeighborChunk(a_BlockX, a_BlockZ + 1));
-	if (a_BlockY > 0)
+	AddBlock(a_Block, a_Chunk);
+	AddBlock(a_Block + Vector3i(-1, 0, 0), a_Chunk->GetNeighborChunk(a_Block.x - 1, a_Block.z));
+	AddBlock(a_Block + Vector3i( 1, 0, 0), a_Chunk->GetNeighborChunk(a_Block.x + 1, a_Block.z));
+	AddBlock(a_Block + Vector3i(0, 0, -1), a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z - 1));
+	AddBlock(a_Block + Vector3i(0, 0,  1), a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z + 1));
+	if (a_Block.y > 0)
 	{
-		AddBlock(a_BlockX, a_BlockY - 1, a_BlockZ, a_Chunk);
+		AddBlock(a_Block + Vector3i(0, -1, 0), a_Chunk);
 	}
-	if (a_BlockY < cChunkDef::Height - 1)
+	if (a_Block.y < cChunkDef::Height - 1)
 	{
-		AddBlock(a_BlockX, a_BlockY + 1, a_BlockZ, a_Chunk);
+		AddBlock(a_Block + Vector3i(0, 1, 0), a_Chunk);
 	}
 }
 
@@ -48,12 +47,11 @@ void cSimulator::WakeUpArea(const cCuboid & a_Area)
 	area.ClampY(0, cChunkDef::Height - 1);
 
 	// Add all blocks, in a per-chunk manner:
-	int chunkStartX, chunkStartZ, chunkEndX, chunkEndZ;
-	cChunkDef::BlockToChunk(area.p1.x, area.p1.z, chunkStartX, chunkStartZ);
-	cChunkDef::BlockToChunk(area.p2.x, area.p2.z, chunkEndX,   chunkEndZ);
-	for (int cz = chunkStartZ; cz <= chunkEndZ; ++cz)
+	cChunkCoords ChunkStart = cChunkDef::BlockToChunk(area.p1);
+	cChunkCoords ChunkEnd = cChunkDef::BlockToChunk(area.p2);
+	for (int cz = ChunkStart.m_ChunkZ; cz <= ChunkEnd.m_ChunkZ; ++cz)
 	{
-		for (int cx = chunkStartX; cx <= chunkEndX; ++cx)
+		for (int cx = ChunkStart.m_ChunkX; cx <= ChunkEnd.m_ChunkX; ++cx)
 		{
 			m_World.DoWithChunk(cx, cz, [this, &area](cChunk & a_CBChunk) -> bool
 				{
@@ -74,7 +72,7 @@ void cSimulator::WakeUpArea(const cCuboid & a_Area)
 						{
 							for (int x = startX; x <= endX; ++x)
 							{
-								AddBlock(x, y, z, &a_CBChunk);
+								AddBlock({x, y, z}, &a_CBChunk);
 							}  // for x
 						}  // for z
 					}  // for y

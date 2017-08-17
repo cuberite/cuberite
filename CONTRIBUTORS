@@ -1,4 +1,9 @@
-Many people have contributed to Cuberite, and this list attempts to broadcast at least some of them.
+This file contains all known copyright holders of this software, as far as is
+practically possible to ascertain.
+
+If you contribute to this software you must add yourself to this file, to
+indicate your agreement to license your contributions according to the license
+as provided in the LICENSE file.
 
 Altenius
 BasedDoge (Donated AlchemistVillage prefabs)
@@ -50,9 +55,7 @@ tonibm19
 UltraCoderRU
 Warmist
 WebFreak001
+williamhatcher (Helped with API documentation updates and bug fixes)
 worktycho
 xoft (Mattes Dolak/madmaxoft on GH)
 Yeeeeezus (Donated AlchemistVillage prefabs)
-
-Please add yourself to this list if you contribute to the official Cuberite project
-and license your work under the Apache License 2.0
