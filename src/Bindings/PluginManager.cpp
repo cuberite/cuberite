@@ -999,6 +999,25 @@ bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a
 
 
 
+bool cPluginManager::CallHookPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window)
+{
+	FIND_HOOK(HOOK_PLAYER_OPENING_WINDOW);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerOpeningWindow(a_Player, a_Window))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
 	FIND_HOOK(HOOK_PLAYER_PLACED_BLOCK);

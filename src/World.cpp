@@ -1288,9 +1288,9 @@ void cWorld::UpdateSkyDarkness(void)
 
 
 
-void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::WakeUpSimulators(Vector3i a_Block)
 {
-	return m_ChunkMap->WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->WakeUpSimulators(a_Block);
 }
 
 
@@ -1299,7 +1299,17 @@ void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
 {
-	m_SimulatorManager->WakeUpArea(cCuboid(a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ));
+	LOGWARNING("cWorld::WakeUpSimulatorsInArea(int, int, int) is deprecated, use cWorld::WakeUpSimulatorsInArea(Vector3i) instead.");
+	WakeUpSimulatorsInArea(cCuboid({a_MinBlockX, a_MinBlockY, a_MinBlockZ}, {a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ}));
+}
+
+
+
+
+
+void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
+{
+	m_SimulatorManager->WakeUpArea(a_Area);
 }
 
 
@@ -3204,7 +3214,7 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallb
 
 
 
-cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
+cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {
 	double ClosestDistance = a_SightLimit;
 	cPlayer * ClosestPlayer = nullptr;

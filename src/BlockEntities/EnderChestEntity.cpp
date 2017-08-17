@@ -7,6 +7,7 @@
 #include "../Entities/Player.h"
 #include "../UI/EnderChestWindow.h"
 #include "../ClientHandle.h"
+#include "../Mobs/Ocelot.h"
 
 
 
@@ -48,8 +49,13 @@ void cEnderChestEntity::SendTo(cClientHandle & a_Client)
 
 bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
-	// TODO: cats are an obstruction
-	if ((GetPosY() < cChunkDef::Height - 1) && !cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
+	if (
+		(GetPosY() < cChunkDef::Height - 1) &&
+		(
+			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
+		)
+	)
 	{
 		// Obstruction, don't open
 		return false;

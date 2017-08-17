@@ -54,6 +54,9 @@ public:
 	}
 	void SetCatType (eCatType a_CatType)    { m_CatType = a_CatType; }
 
+	/** Returns true if there's a cat sitting above the given position */
+	static bool IsCatSittingOnBlock(cWorld * a_World, Vector3d a_BlockPosition);
+
 protected:
 
 	bool      m_IsSitting;

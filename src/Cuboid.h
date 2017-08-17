@@ -13,16 +13,14 @@ public:
 	Vector3i p1, p2;
 
 	cCuboid(void) {}
-	cCuboid(const cCuboid & a_Cuboid) : p1(a_Cuboid.p1), p2(a_Cuboid.p2) {}
 	cCuboid(const Vector3i & a_p1, const Vector3i & a_p2) : p1(a_p1), p2(a_p2) {}
 	cCuboid(int a_X1, int a_Y1, int a_Z1) : p1(a_X1, a_Y1, a_Z1), p2(a_X1, a_Y1, a_Z1) {}
-	cCuboid(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2) : p1(a_X1, a_Y1, a_Z1), p2(a_X2, a_Y2, a_Z2) {}
 
-	// tolua_end
-
-	cCuboid & operator =(cCuboid a_Other);
-
-	// tolua_begin
+	// DEPRECATED, use cCuboid(Vector3i, Vector3i) instead
+	cCuboid(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2) : p1(a_X1, a_Y1, a_Z1), p2(a_X2, a_Y2, a_Z2)
+	{
+		LOGWARNING("cCuboid(int, int, int, int, int, int) constructor is deprecated, use cCuboid(Vector3i, Vector3i) constructor instead.");
+	}
 
 	void Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2);
 	void Assign(const cCuboid & a_SrcCuboid);
@@ -53,7 +51,7 @@ public:
 		);
 	}
 
-	bool IsInside(const Vector3i & v) const
+	bool IsInside(Vector3i v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&
@@ -71,7 +69,7 @@ public:
 		);
 	}
 
-	bool IsInside( const Vector3d & v) const
+	bool IsInside(Vector3d v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&
@@ -105,7 +103,7 @@ public:
 	bool IsSorted(void) const;
 
 	/** If needed, expands the cuboid so that it contains the specified point. Assumes sorted. Doesn't contract. */
-	void Engulf(const Vector3i & a_Point);
+	void Engulf(Vector3i a_Point);
 
 private:
 
