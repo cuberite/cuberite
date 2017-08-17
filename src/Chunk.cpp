@@ -453,7 +453,10 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	}  // for y
 
 	// Erase all affected block entities:
-	cCuboid affectedArea(OffX, a_MinBlockY, OffZ, OffX + SizeX - 1, a_MinBlockY + SizeY - 1, OffZ + SizeZ - 1);
+	cCuboid affectedArea(
+		{OffX, a_MinBlockY, OffZ},
+		{OffX + SizeX - 1, a_MinBlockY + SizeY - 1, OffZ + SizeZ - 1}
+	);
 	for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 	{
 		if (affectedArea.IsInside(itr->second->GetPos()))
@@ -1489,7 +1492,7 @@ void cChunk::WakeUpSimulators(void)
 				// The redstone sim takes multiple blocks, use the inbuilt checker
 				if (RedstoneSimulator->IsAllowedBlock(Block))
 				{
-					RedstoneSimulator->AddBlock(BlockX, y, BlockZ, this);
+					RedstoneSimulator->AddBlock({BlockX, y, BlockZ}, this);
 					continue;
 				}
 
@@ -1497,12 +1500,12 @@ void cChunk::WakeUpSimulators(void)
 				{
 					case E_BLOCK_WATER:
 					{
-						WaterSimulator->AddBlock(BlockX, y, BlockZ, this);
+						WaterSimulator->AddBlock({BlockX, y, BlockZ}, this);
 						break;
 					}
 					case E_BLOCK_LAVA:
 					{
-						LavaSimulator->AddBlock(BlockX, y, BlockZ, this);
+						LavaSimulator->AddBlock({BlockX, y, BlockZ}, this);
 						break;
 					}
 					default:

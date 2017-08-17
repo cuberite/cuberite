@@ -40,13 +40,13 @@ class cChunkGenerator;  // The thread responsible for generating chunks
 class cBeaconEntity;
 class cBrewingstandEntity;
 class cChestEntity;
+class cCuboid;
 class cDispenserEntity;
 class cFlowerPotEntity;
 class cFurnaceEntity;
 class cNoteEntity;
 class cMobHeadEntity;
 class cCompositeChat;
-class cCuboid;
 class cSetChunkData;
 class cBroadcaster;
 class cDeadlockDetect;
@@ -277,7 +277,7 @@ public:
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
-	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
+	cPlayer * FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
@@ -412,11 +412,11 @@ public:
 	// tolua_begin
 
 	// Vector3i variants:
-	void       FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta); }
-	BLOCKTYPE  GetBlock    (const Vector3i & a_Pos) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z); }
-	NIBBLETYPE GetBlockMeta(const Vector3i & a_Pos) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z); }
-	void       SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData); }
-	NIBBLETYPE GetBlockBlockLight(const Vector3i & a_Pos) { return GetBlockBlockLight( a_Pos.x, a_Pos.y, a_Pos.z); }
+	void       FastSetBlock(Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta); }
+	BLOCKTYPE  GetBlock    (Vector3i a_Pos) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z); }
+	NIBBLETYPE GetBlockMeta(Vector3i a_Pos) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z); }
+	void       SetBlockMeta(Vector3i a_Pos, NIBBLETYPE a_MetaData) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData); }
+	NIBBLETYPE GetBlockBlockLight(Vector3i a_Pos) { return GetBlockBlockLight( a_Pos.x, a_Pos.y, a_Pos.z); }
 	// tolua_end
 
 	/** Writes the block area into the specified coords.
@@ -484,9 +484,19 @@ public:
 	double GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
-	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void WakeUpSimulators(Vector3i a_Block) override;
 
 	/** Wakes up the simulators for the specified area of blocks */
+	void WakeUpSimulatorsInArea(const cCuboid & a_Area);
+
+	// DEPRECATED, use vector-parametered version instead
+	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		LOGWARNING("cWorld::WakeUpSimulators(int, int, int) is deprecated, use cWorld::WakeUpSimulators(Vector3i) instead.");
+		WakeUpSimulators({a_BlockX, a_BlockY, a_BlockZ});
+	}
+
+	// DEPRECATED, use vector-parametered version instead
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
 	// tolua_end

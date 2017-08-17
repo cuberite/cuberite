@@ -27,6 +27,7 @@ class cBlockEntity;
 class cEntity;
 class cClientHandle;
 class cBlockEntity;
+class cChunkCoords;
 
 typedef std::list<cEntity *>          cEntityList;
 typedef std::map<int, cBlockEntity *> cBlockEntities;
@@ -46,6 +47,25 @@ typedef unsigned char NIBBLETYPE;
 typedef unsigned char HEIGHTTYPE;
 
 // tolua_end
+
+
+
+
+
+class cChunkCoords
+{
+public:
+	int m_ChunkX;
+	int m_ChunkZ;
+
+	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
+
+	bool operator == (const cChunkCoords & a_Other) const
+	{
+		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
+	}
+} ;
+
 
 
 
@@ -107,9 +127,9 @@ public:
 	}
 
 	/** Converts relative block coordinates into absolute coordinates with a known chunk location */
-	inline static Vector3i RelativeToAbsolute(const Vector3i & a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
+	inline static Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
 	{
-		return Vector3i(a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width);
+		return {a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width};
 	}
 
 	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
@@ -127,16 +147,26 @@ public:
 	/** Converts absolute block coords to chunk coords: */
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
 	{
-		a_ChunkX = a_X / Width;
-		if ((a_X < 0) && (a_X % Width != 0))
+		// This version is deprecated in favor of the vector version
+		// If you're developing new code, use the other version.
+		auto ChunkCoords = BlockToChunk({a_X, 0, a_Z});
+		a_ChunkX = ChunkCoords.m_ChunkX;
+		a_ChunkZ = ChunkCoords.m_ChunkZ;
+	}
+
+	/** The Y coordinate of a_Pos is ignored */
+	inline static cChunkCoords BlockToChunk(Vector3i a_Pos)
+	{
+		cChunkCoords Chunk(a_Pos.x / Width, a_Pos.z / Width);
+		if ((a_Pos.x < 0) && (a_Pos.x % Width != 0))
 		{
-			a_ChunkX--;
+			Chunk.m_ChunkX--;
 		}
-		a_ChunkZ = a_Z / cChunkDef::Width;
-		if ((a_Z < 0) && (a_Z % Width != 0))
+		if ((a_Pos.z < 0) && (a_Pos.z % Width != 0))
 		{
-			a_ChunkZ--;
+			Chunk.m_ChunkZ--;
 		}
+		return Chunk;
 	}
 
 
@@ -406,24 +436,6 @@ struct sSetBlock
 
 typedef std::list<sSetBlock> sSetBlockList;
 typedef std::vector<sSetBlock> sSetBlockVector;
-
-
-
-
-
-class cChunkCoords
-{
-public:
-	int m_ChunkX;
-	int m_ChunkZ;
-
-	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
-
-	bool operator == (const cChunkCoords & a_Other) const
-	{
-		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
-	}
-} ;
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
 typedef std::vector<cChunkCoords> cChunkCoordsVector;

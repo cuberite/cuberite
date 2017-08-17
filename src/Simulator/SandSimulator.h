@@ -59,7 +59,7 @@ protected:
 
 	int  m_TotalBlocks;    // Total number of blocks currently in the queue for simulating
 
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
 
 	/** Performs the instant fall of the block - removes it from top, Finishes it at the bottom */
 	void DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);

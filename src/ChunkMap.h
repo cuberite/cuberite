@@ -110,7 +110,14 @@ public:
 	bool DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback);
 
 	/** Wakes up simulators for the specified block */
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void WakeUpSimulators(Vector3i a_Block);
+
+	// DEPRECATED, use the vector-parametered version instead.
+	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		LOGWARNING("cChunkMap::WakeUpSimulators(int, int, int) is deprecated, use cChunkMap::WakeUpSimulators(Vector3i) instead.");
+		WakeUpSimulators(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	}
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
@@ -484,7 +491,13 @@ private:
 	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
-	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ);
+	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
+
+	// Deprecated in favor of the vector version
+	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
+	{
+		return GetChunkNoGen(cChunkCoords(a_ChunkX, a_ChunkZ));
+	}
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);

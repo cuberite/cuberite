@@ -218,16 +218,16 @@ bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 
 
 
-void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
+void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 {
 	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
 
-	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_BlockY, RelZ);
+	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
+	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
 	if (!IsAllowedBlock(BlockType))
 	{
 		return;
@@ -237,15 +237,15 @@ void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 	cFireSimulatorChunkData & ChunkData = a_Chunk->GetFireSimulatorData();
 	for (cCoordWithIntList::iterator itr = ChunkData.begin(), end = ChunkData.end(); itr != end; ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
+		if ((itr->x == RelX) && (itr->y == a_Block.y) && (itr->z == RelZ))
 		{
 			// Already present, skip adding
 			return;
 		}
 	}  // for itr - ChunkData[]
 
-	FLOG("FS: Adding block {%d, %d, %d}", a_BlockX, a_BlockY, a_BlockZ);
-	ChunkData.push_back(cCoordWithInt(RelX, a_BlockY, RelZ, 100));
+	FLOG("FS: Adding block {%d, %d, %d}", a_Block.x, a_Block.y, a_Block.z);
+	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ, 100));
 }
 
 

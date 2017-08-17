@@ -10,13 +10,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCuboid:
 
-cCuboid & cCuboid::operator =(cCuboid a_Other)
-{
-	std::swap(p1, a_Other.p1);
-	std::swap(p2, a_Other.p2);
-	return *this;
-}
-
 
 
 
@@ -198,7 +191,7 @@ bool cCuboid::IsSorted(void) const
 
 
 
-void cCuboid::Engulf(const Vector3i & a_Point)
+void cCuboid::Engulf(Vector3i a_Point)
 {
 	if (a_Point.x < p1.x)
 	{
