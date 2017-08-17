@@ -108,6 +108,8 @@ macro(set_flags)
 		endif()
 
 		if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
+			# mbed TLS uses the frame pointer's register in inline assembly:
+			# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
 			set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fomit-frame-pointer")
 			set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fomit-frame-pointer")
 		endif()
