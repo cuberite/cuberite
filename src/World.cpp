@@ -136,7 +136,7 @@ cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimensi
 #else
 	m_StorageCompressionFactor(6),
 #endif
-	m_SavingEnabled(true),
+	m_IsSavingEnabled(true),
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
 	m_SpawnX(0),
@@ -220,7 +220,7 @@ cWorld::~cWorld()
 
 	m_Storage.WaitForFinish();
 
-	if (GetSavingEnabled())
+	if (IsSavingEnabled())
 	{
 		// Unload the scoreboard
 		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
@@ -2963,7 +2963,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
 	// If saving is disabled, then the chunk was marked dirty so it will get
 	// saved if saving is later enabled.
-	if (a_SetChunkData.ShouldMarkDirty() && GetSavingEnabled())
+	if (a_SetChunkData.ShouldMarkDirty() && IsSavingEnabled())
 	{
 		m_Storage.QueueSaveChunk(ChunkX, ChunkZ);
 	}
@@ -3571,7 +3571,7 @@ bool cWorld::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 
 void cWorld::SaveAllChunks(void)
 {
-	if (GetSavingEnabled())
+	if (IsSavingEnabled())
 	{
 		m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 		m_ChunkMap->SaveAllChunks();

@@ -113,10 +113,10 @@ public:
 	// tolua_begin
 
 	/** Get whether saving chunks is enabled */
-	bool GetSavingEnabled(void) const { return m_SavingEnabled; }
+	bool IsSavingEnabled(void) const { return m_IsSavingEnabled; }
 
 	/** Set whether saving chunks is enabled */
-	void SetSavingEnabled(bool a_SavingEnabled) { m_SavingEnabled = a_SavingEnabled; }
+	void SetSavingEnabled(bool a_IsSavingEnabled) { m_IsSavingEnabled = a_IsSavingEnabled; }
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 
@@ -881,7 +881,7 @@ private:
 
 	AString m_WorldName;
 
-	/** The path to the root directory for the world files */
+	/** The path to the root directory for the world files. Does not including trailing path specifier. */
 	AString m_DataPath;
 
 	/** The name of the overworld that portals in this world should link to.
@@ -896,7 +896,7 @@ private:
 	int m_StorageCompressionFactor;
 
 	/** Whether or not writing chunks to disk is currently enabled */
-	std::atomic<bool> m_SavingEnabled;
+	std::atomic<bool> m_IsSavingEnabled;
 
 	/** The dimension of the world, used by the client to provide correct lighting scheme */
 	eDimension m_Dimension;
