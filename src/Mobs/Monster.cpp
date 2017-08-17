@@ -629,6 +629,7 @@ void cMonster::CheckEventLostPlayer(void)
 void cMonster::EventSeePlayer(cPlayer * a_SeenPlayer, cChunk & a_Chunk)
 {
 	UNUSED(a_Chunk);
+	this->SpawnOn(*(a_SeenPlayer->GetClientHandle()));
 	SetTarget(a_SeenPlayer);
 }
 

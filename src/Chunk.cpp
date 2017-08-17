@@ -2036,6 +2036,22 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
 
+	// Send entities info to player to fix invisible entities #3696
+	if (a_Entity->IsPlayer())
+	{
+		LOGD("Adding player to chunk");
+
+		for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+		{
+			if ((*itr)->IsPawn())
+			{
+				cPlayer * player = reinterpret_cast<cPlayer *>(a_Entity);
+				(*itr)->SpawnOn(*(player->GetClientHandle()));
+			}
+			++itr;
+		}
+	}
+
 	m_Entities.push_back(a_Entity);
 	ASSERT(a_Entity->GetParentChunk() == nullptr);
 	a_Entity->SetParentChunk(this);
