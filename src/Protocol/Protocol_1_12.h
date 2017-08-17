@@ -57,7 +57,7 @@ public:
 	virtual void SendSetRawTitle(const AString & a_Title) override;
 	virtual void SendSpawnMob(const cMonster & a_Mob) override;
 	virtual void SendTeleportEntity(const cEntity & a_Entity) override;
-	virtual void SendTeams(const cTeam & a_Team, Byte a_Mode) override;
+	virtual void SendTeam(const cTeam & a_Team, Byte a_Mode) override;
 	virtual void SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta) override;
 	virtual void SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
 	virtual void SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;

@@ -631,6 +631,7 @@ protected:
 
 	/** Called once per tick to set IsSwimming and IsSubmerged */
 	virtual void SetSwimState(cChunk & a_Chunk);
+	Vector3d m_LastSentPosition;
 
 private:
 
@@ -651,7 +652,7 @@ private:
 
 	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
 	Only updated if cEntity::BroadcastMovementUpdate() is called! */
-	Vector3d m_LastSentPosition;
+	//Vector3d m_LastSentPosition;
 
 	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;

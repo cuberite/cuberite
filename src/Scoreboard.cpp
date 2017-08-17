@@ -173,7 +173,6 @@ void cObjective::ResetScore(const AString & a_Name)
 
 cObjective::Score cObjective::AddScore(const AString & a_Name, cObjective::Score a_Delta)
 {
-	// TODO 2014-01-19 xdot: Potential optimization - Reuse iterator
 	Score NewScore = m_Scores[a_Name] + a_Delta;
 
 	SetScore(a_Name, NewScore);
@@ -187,7 +186,6 @@ cObjective::Score cObjective::AddScore(const AString & a_Name, cObjective::Score
 
 cObjective::Score cObjective::SubScore(const AString & a_Name, cObjective::Score a_Delta)
 {
-	// TODO 2014-01-19 xdot: Potential optimization - Reuse iterator
 	Score NewScore = m_Scores[a_Name] - a_Delta;
 
 	SetScore(a_Name, NewScore);
@@ -245,7 +243,7 @@ cTeam::cTeam(
 void cTeam::SetColor(int a_Color)
 {
 	m_Color = a_Color;
-	m_World->BroadcastTeam(*this, 2 /* Update team */);
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -255,7 +253,7 @@ void cTeam::SetColor(int a_Color)
 void cTeam::SetPrefix(const AString & a_Prefix)
 {
 	m_Prefix = a_Prefix;
-	m_World->BroadcastTeam(*this, 2);
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -265,7 +263,7 @@ void cTeam::SetPrefix(const AString & a_Prefix)
 void cTeam::SetSuffix(const AString & a_Suffix)
 {
 	m_Suffix = a_Suffix;
-	m_World->BroadcastTeam(*this, 2);
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -275,7 +273,7 @@ void cTeam::SetSuffix(const AString & a_Suffix)
 void cTeam::SetFriendlyFire(bool a_Flag)
 {
 	m_AllowsFriendlyFire = a_Flag;
-	m_World->BroadcastTeam(*this, 2);
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -285,7 +283,7 @@ void cTeam::SetFriendlyFire(bool a_Flag)
 void cTeam::SetCanSeeFriendlyInvisible(bool a_Flag)
 {
 	m_CanSeeFriendlyInvisible = a_Flag;
-	m_World->BroadcastTeam(*this, 2);
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -335,7 +333,7 @@ void cTeam::Reset(void)
 void cTeam::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
-	m_World->BroadcastTeam(*this, 2 /* Update team */);
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -450,7 +448,7 @@ cTeam * cScoreboard::RegisterTeam(
 	cTeam Team(a_Name, a_DisplayName, a_Prefix, a_Suffix, m_World);
 
 	std::pair<cTeamMap::iterator, bool> Status = m_Teams.insert(cNamedTeam(a_Name, Team));
-	m_World->BroadcastTeam(Team, 0 /* Create team */);
+	m_World->BroadcastTeam(Team, cTeam::paCreateTeam);
 
 	return Status.second ? &Status.first->second : nullptr;
 }
@@ -470,7 +468,7 @@ bool cScoreboard::RemoveTeam(const AString & a_Name)
 		return false;
 	}
 
-	m_World->BroadcastTeam(it->second, 1 /* Remove team */);
+	m_World->BroadcastTeam(it->second, cTeam::paRemoveTeam);
 
 	m_Teams.erase(it);
 
@@ -660,7 +658,7 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 
 	for (auto team : m_Teams)
 	{
-		a_Client.SendTeams(team.second, 2);
+		a_Client.SendTeam(team.second, cTeam::paUpdateTeam);
 	}
 
 	for (int i = 0; i < static_cast<int>(dsCount); ++i)
@@ -692,7 +690,7 @@ void cScoreboard::RemoveFrom(cClientHandle & a_Client)
 	// Remove every team
 	for (auto team : m_Teams)
 	{
-		a_Client.SendTeams(team.second, 1 /* Remove */);
+		a_Client.SendTeam(team.second, cTeam::paRemoveTeam);
 	}
 }
 

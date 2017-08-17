@@ -208,6 +208,8 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	{
 		return;
 	}
+	// TODO: Fix the discrepency here.
+	LOG("Current position: Z=%f, LastSentPos: Z=%f", GetPosZ(), m_LastSentPosition.z);
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
 	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());

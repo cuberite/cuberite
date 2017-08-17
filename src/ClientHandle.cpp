@@ -2892,9 +2892,9 @@ void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboar
 
 
 
-void cClientHandle::SendTeams(const cTeam & a_Team, Byte a_Mode)
+void cClientHandle::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
 {
-	m_Protocol->SendTeams(a_Team, a_Mode);
+	m_Protocol->SendTeam(a_Team, a_Mode);
 }
 
 

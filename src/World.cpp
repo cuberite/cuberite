@@ -2748,7 +2748,7 @@ void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard:
 
 
 
-void cWorld::BroadcastTeam(const cTeam & a_Team, Byte a_Mode)
+void cWorld::BroadcastTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2758,7 +2758,7 @@ void cWorld::BroadcastTeam(const cTeam & a_Team, Byte a_Mode)
 		{
 			continue;
 		}
-		ch->SendTeams(a_Team, a_Mode);
+		ch->SendTeam(a_Team, a_Mode);
 	}
 }
 

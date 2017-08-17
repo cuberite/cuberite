@@ -3859,7 +3859,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cObjective");
 			tolua_function(tolua_S, "GetPlayers", tolua_cObjective_GetPlayers);
-			tolua_endmodule(tolua_S);
+		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlayer");
 			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);

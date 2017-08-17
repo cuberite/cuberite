@@ -52,6 +52,7 @@ public:
 		otStatEntityKilledBy
 	};
 
+	// For the "Scoreboard Objective" packet
 	enum eUpdateAction
 	{
 		uaCreate = 0,
@@ -102,7 +103,7 @@ public:
 	// tolua_end
 
 	/** Returns a set of all players */
-	AStringVector GetPlayers(void) const; // Exported in ManualBindings.cpp
+	AStringVector GetPlayers(void) const;  // Exported in ManualBindings.cpp
 
 	/** Send this objective to the specified client */
 	void SendTo(cClientHandle & a_Client);
@@ -141,6 +142,13 @@ private:
 class cTeam
 {
 public:
+
+	enum eProtocolAction
+	{
+		paCreateTeam = 0,
+		paRemoveTeam = 1,
+		paUpdateTeam = 2
+	};
 
 	// tolua_end
 
@@ -237,9 +245,27 @@ public:
 		dsSidebar,
 		dsName,
 
+		dsTeamBlack,
+		dsTeamDarkBlue,
+		dsTeamDarkGreen,
+		dsTeamDarkAqua,
+		dsTeamDarkRed,
+		dsTeamDarkPurple,
+		dsTeamGold,
+		dsTeamGray,
+		dsTeamDarkGray,
+		dsTeamBlue,
+		dsTeamGreen,
+		dsTeamAqua,
+		dsTeamRed,
+		dsTeamLightPurple,
+		dsTeamYellow,
+		dsTeamWhite,
+
 		dsCount
 	};
 
+	// For the "Update Score" packet
 	enum eUpdateAction
 	{
 		uaUpsert = 0,

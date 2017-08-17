@@ -1334,7 +1334,7 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_12::SendTeams(const cTeam & a_Team, Byte a_Mode)
+void cProtocol_1_12::SendTeam(const cTeam & a_Team, Byte a_Mode)
 {
 	cPacketizer Pkt(*this, 0x43);
 	Pkt.WriteString(a_Team.GetName());
