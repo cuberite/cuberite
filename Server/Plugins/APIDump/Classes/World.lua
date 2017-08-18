@@ -1688,16 +1688,6 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns the number of unused dirty chunks. That's the number of chunks that we can save and then unload.",
 			},
-			GetSavingEnabled =
-			{
-				Returns =
-				{
-					{
-						Type = "boolean",
-					},
-				},
-				Notes = "Returns whether or not saving chunk data is enabled. If disabled, the world will keep dirty chunks in memory forever, and will simply regenerate non-dirty chunks that are unloaded.",
-			},
 			GetScoreBoard =
 			{
 				Returns =
@@ -2136,6 +2126,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Returns whether PVP is enabled in the world settings.",
+			},
+			IsSavingEnabled =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns whether or not saving chunk data is enabled. If disabled, the world will keep dirty chunks in memory forever, and will simply regenerate non-dirty chunks that are unloaded.",
 			},
 			IsTrapdoorOpen =
 			{
