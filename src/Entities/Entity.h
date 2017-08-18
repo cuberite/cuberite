@@ -210,6 +210,8 @@ public:
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
 	double           GetWidth     (void) const { return m_Width;   }
 
+	/** Returns the last position we sent to all the clients. Use this to
+	initialize clients with our position. */
 	Vector3d GetLastSentPos(void) const { return m_LastSentPosition; }
 
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
