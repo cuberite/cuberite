@@ -19,7 +19,10 @@ cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int 
 	m_SecondaryEffect(cEntityEffect::effNoEffect)
 {
 	ASSERT(a_BlockType == E_BLOCK_BEACON);
-	UpdateBeacon();
+	if (m_World != nullptr)
+	{
+		UpdateBeacon();
+	}
 }
 
 

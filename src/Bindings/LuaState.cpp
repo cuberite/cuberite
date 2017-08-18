@@ -1151,6 +1151,37 @@ bool cLuaState::GetStackValue(int a_StackPos, AStringMap & a_Value)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, AStringVector & a_Value)
+{
+	// Retrieve all values in an array of string table:
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	cStackTable tbl(*this, a_StackPos);
+	bool isValid = true;
+	tbl.ForEachArrayElement([&](cLuaState & a_LuaState, int a_Index)
+		{
+			AString tempStr;
+			if (a_LuaState.GetStackValue(-1, tempStr))
+			{
+				a_Value.push_back(std::move(tempStr));
+			}
+			else
+			{
+				isValid = false;
+				return true;
+			}
+			return false;
+		}
+	);
+	return isValid;
+}
+
+
+
+
+
 bool cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);

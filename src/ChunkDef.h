@@ -29,7 +29,8 @@ class cClientHandle;
 class cBlockEntity;
 class cChunkCoords;
 
-typedef std::list<cEntity *>          cEntityList;
+typedef std::unique_ptr<cEntity> OwnedEntity;
+typedef std::vector<OwnedEntity> cEntityList;
 typedef std::map<int, cBlockEntity *> cBlockEntities;
 
 

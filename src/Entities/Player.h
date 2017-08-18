@@ -41,7 +41,7 @@ public:
 
 	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
 
-	virtual bool Initialize(cWorld & a_World) override;
+	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_World) override;
 
 	virtual ~cPlayer() override;
 

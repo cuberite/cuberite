@@ -37,7 +37,7 @@ public :
 	// return true if there is at least one allowed type
 	bool CanSpawnAnything(void);
 
-	typedef const std::set<cMonster *> tSpawnedContainer;
+	typedef const std::set<std::unique_ptr<cMonster>> tSpawnedContainer;
 	tSpawnedContainer & getSpawned(void);
 
 	/** Returns true if specified type of mob can spawn on specified block */
@@ -55,7 +55,7 @@ protected :
 	std::set<eMonsterType> m_AllowedTypes;
 	bool m_NewPack;
 	eMonsterType m_MobType;
-	std::set<cMonster *> m_Spawned;
+	std::set<std::unique_ptr<cMonster>> m_Spawned;
 } ;
 
 
