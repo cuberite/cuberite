@@ -2847,9 +2847,6 @@ void cClientHandle::SendResetTitle()
 
 void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
-	// If a_ShouldIgnoreDimensionChecks is true, we must be traveling to the same dimension
-	ASSERT((!a_ShouldIgnoreDimensionChecks) || (a_Dimension == m_LastSentDimension));
-
 	if ((!a_ShouldIgnoreDimensionChecks) && (a_Dimension == m_LastSentDimension))
 	{
 		// The client goes crazy if we send a respawn packet with the dimension of the current world
