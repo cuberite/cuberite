@@ -15,6 +15,7 @@ cWither::cWither(void) :
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
+	SetHealth(GetMaxHealth() / 3);
 }
 
 
@@ -24,18 +25,6 @@ cWither::cWither(void) :
 bool cWither::IsArmored(void) const
 {
 	return GetHealth() <= (GetMaxHealth() / 2);
-}
-
-
-
-
-
-bool cWither::Initialize(cWorld & a_World)
-{
-	// Set health before BroadcastSpawnEntity()
-	SetHealth(GetMaxHealth() / 3);
-
-	return super::Initialize(a_World);
 }
 
 

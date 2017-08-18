@@ -133,7 +133,7 @@ cClientHandle::~cClientHandle()
 			}
 			m_Player->DestroyNoScheduling(true);
 		}
-		delete m_Player;
+		m_PlayerPtr.reset();
 		m_Player = nullptr;
 	}
 
@@ -157,8 +157,12 @@ void cClientHandle::Destroy(void)
 		cCSLock Lock(m_CSOutgoingData);
 		m_Link.reset();
 	}
+
+	// Temporary (#3115-will-fix): variable to keep track of whether the client authenticated and had the opportunity to have ownership transferred to the world
+	bool WasAddedToWorld = false;
 	{
 		cCSLock Lock(m_CSState);
+		WasAddedToWorld = (m_State >= csAuthenticated);
 		if (m_State >= csDestroying)
 		{
 			// Already called
@@ -186,7 +190,23 @@ void cClientHandle::Destroy(void)
 		{
 			player->StopEveryoneFromTargetingMe();
 			player->SetIsTicking(false);
-			world->RemovePlayer(player, true);
+
+			if (WasAddedToWorld)
+			{
+				// If ownership was transferred, our own smart pointer should be unset
+				ASSERT(!m_PlayerPtr);
+
+				m_PlayerPtr = world->RemovePlayer(*player, true);
+
+				// And RemovePlayer should have returned a valid smart pointer
+				ASSERT(m_PlayerPtr);
+			}
+			else
+			{
+				// If ownership was not transferred, our own smart pointer should be valid and RemovePlayer's should not
+				ASSERT(m_PlayerPtr);
+				ASSERT(!world->IsPlayerReferencedInWorldOrChunk(*player));
+			}
 		}
 		player->RemoveClientHandle();
 	}
@@ -359,7 +379,8 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		m_Protocol->SendLoginSuccess();
 
 		// Spawn player (only serversided, so data is loaded)
-		m_Player = new cPlayer(m_Self, GetUsername());
+		m_PlayerPtr = cpp14::make_unique<cPlayer>(m_Self, GetUsername());
+		m_Player = m_PlayerPtr.get();
 		/*
 		LOGD("Created a new cPlayer object at %p for client %s @ %s (%p)",
 			static_cast<void *>(m_Player),
@@ -2203,7 +2224,7 @@ void cClientHandle::ServerTick(float a_Dt)
 
 			// Add the player to the world (start ticking from there):
 			m_State = csDownloadingWorld;
-			m_Player->Initialize(*(m_Player->GetWorld()));
+			m_Player->Initialize(std::move(m_PlayerPtr), *(m_Player->GetWorld()));
 			return;
 		}
 	}  // lock(m_CSState)

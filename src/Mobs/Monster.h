@@ -168,13 +168,13 @@ public:
 	void UnsafeUnsetTarget();
 
 	/** Returns the current target. */
-	cPawn * GetTarget ();
+	cPawn * GetTarget();
 
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
 	Asserts and returns null if mob type is not specified
 	*/
-	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
+	static std::unique_ptr<cMonster> NewMonsterFromType(eMonsterType a_MobType);
 
 	/** Returns if this mob last target was a player to avoid destruction on player quit */
 	bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
@@ -203,7 +203,11 @@ protected:
 	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS); }
 
 	/** Returns whether or not the target is close enough for attack. */
-	bool TargetIsInRange(void) { ASSERT(m_Target != nullptr); return ((m_Target->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
+	bool TargetIsInRange(void)
+	{
+		ASSERT(GetTarget() != nullptr);
+		return ((GetTarget()->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
+	}
 
 	/** Returns whether the monster needs to jump to reach a given height. */
 	inline bool DoesPosYRequireJump(double a_PosY)
@@ -272,7 +276,9 @@ protected:
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
 private:
-	/** A pointer to the entity this mobile is aiming to reach */
+	/** A pointer to the entity this mobile is aiming to reach.
+	The validity of this pointer SHALL be guaranteed by the pointee;
+	it MUST be reset when the pointee changes worlds or is destroyed. */
 	cPawn * m_Target;
 
 } ;  // tolua_export

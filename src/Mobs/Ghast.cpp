@@ -39,17 +39,14 @@ bool cGhast::Attack(std::chrono::milliseconds a_Dt)
 		// Setting this higher gives us more wiggle room for attackrate
 		Vector3d Speed = GetLookVector() * 20;
 		Speed.y = Speed.y + 1;
-		cGhastFireballEntity * GhastBall = new cGhastFireballEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-		if (GhastBall == nullptr)
+
+		auto GhastBall = cpp14::make_unique<cGhastFireballEntity>(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
+		auto GhastBallPtr = GhastBall.get();
+		if (!GhastBallPtr->Initialize(std::move(GhastBall), *m_World))
 		{
 			return false;
 		}
-		if (!GhastBall->Initialize(*m_World))
-		{
-			delete GhastBall;
-			GhastBall = nullptr;
-			return false;
-		}
+
 		ResetAttackCooldown();
 		return true;
 	}
