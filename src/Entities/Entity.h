@@ -210,6 +210,8 @@ public:
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
 	double           GetWidth     (void) const { return m_Width;   }
 
+	Vector3d GetLastSentPos(void) const { return m_LastSentPosition; }
+
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
 
