@@ -1775,16 +1775,20 @@ void cChunk::AddBlockEntityClean(cBlockEntity * a_BlockEntity)
 
 cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	// Check that the query coords are within chunk bounds:
-	ASSERT(a_BlockX >= m_PosX * cChunkDef::Width);
-	ASSERT(a_BlockX < m_PosX * cChunkDef::Width + cChunkDef::Width);
-	ASSERT(a_BlockZ >= m_PosZ * cChunkDef::Width);
-	ASSERT(a_BlockZ < m_PosZ * cChunkDef::Width + cChunkDef::Width);
-
 	int RelX = a_BlockX - m_PosX * cChunkDef::Width;
 	int RelZ = a_BlockZ - m_PosZ * cChunkDef::Width;
 
-	auto itr = m_BlockEntities.find(MakeIndex(RelX, a_BlockY, RelZ));
+	if (
+		!IsValidWidth (RelX)     ||
+		!IsValidHeight(a_BlockY) ||
+		!IsValidWidth (RelZ)
+	)
+	{
+		// Coordinates are outside outside the world, no block entities here
+		return nullptr;
+	}
+
+	auto itr = m_BlockEntities.find(MakeIndexNoCheck(RelX, a_BlockY, RelZ));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second;
 }
 
