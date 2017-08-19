@@ -916,11 +916,17 @@ void cChunk::ApplyWeatherToTop()
 	int X = m_World->GetTickRandomNumber(15);
 	int Z = m_World->GetTickRandomNumber(15);
 
-	// TODO: Check light levels, don't snow over when the BlockLight is higher than (7?)
 	int Height = GetHeight(X, Z);
 
 	if (GetSnowStartHeight(GetBiomeAt(X, Z)) > Height)
 	{
+		return;
+	}
+
+	if (GetBlockLight(X, Height, Z) > 10)
+	{
+		// Snow only generates on blocks with a block light level of 10 or less.
+		// Ref: https://minecraft.gamepedia.com/Snow_(layer)#Snowfall
 		return;
 	}
 
