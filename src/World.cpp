@@ -999,9 +999,10 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		for (auto & Entity : m_EntitiesToAdd)
 		{
 			Entity->SetWorld(this);
-			m_ChunkMap->AddEntity(Entity);
-			ASSERT(!Entity->IsTicking());
-			Entity->SetIsTicking(true);
+			auto EntityPtr = Entity.get();
+			m_ChunkMap->AddEntity(std::move(Entity));
+			ASSERT(!EntityPtr->IsTicking());
+			EntityPtr->SetIsTicking(true);
 		}
 		m_EntitiesToAdd.clear();
 	}
@@ -1114,7 +1115,7 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 				// do the spawn
 				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); ++itr2)
 				{
-					SpawnMobFinalize(*itr2);
+					SpawnMobFinalize(std::move(const_cast<std::unique_ptr<cMonster> &>(*itr2)));
 				}
 			}
 		}  // for i - AllFamilies[]
@@ -1288,9 +1289,9 @@ void cWorld::UpdateSkyDarkness(void)
 
 
 
-void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::WakeUpSimulators(Vector3i a_Block)
 {
-	return m_ChunkMap->WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->WakeUpSimulators(a_Block);
 }
 
 
@@ -1299,7 +1300,17 @@ void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
 {
-	m_SimulatorManager->WakeUpArea(cCuboid(a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ));
+	LOGWARNING("cWorld::WakeUpSimulatorsInArea(int, int, int) is deprecated, use cWorld::WakeUpSimulatorsInArea(Vector3i) instead.");
+	WakeUpSimulatorsInArea(cCuboid({a_MinBlockX, a_MinBlockY, a_MinBlockZ}, {a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ}));
+}
+
+
+
+
+
+void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
+{
+	m_SimulatorManager->WakeUpArea(a_Area);
 }
 
 
@@ -1550,7 +1561,7 @@ bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback
 
 
 
-bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, std::function<bool(cChunk &)>  a_Callback)
+bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, std::function<bool(cChunk &)> a_Callback)
 {
 	struct cCallBackWrapper : cChunkCallback
 	{
@@ -2176,15 +2187,12 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
 
-		cPickup * Pickup = new cPickup(
+		auto Pickup = cpp14::make_unique<cPickup>(
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
 		);
-		if (!Pickup->Initialize(*this))
-		{
-			delete Pickup;
-			Pickup = nullptr;
-		}
+		auto PickupPtr = Pickup.get();
+		PickupPtr->Initialize(std::move(Pickup), *this);
 	}
 }
 
@@ -2201,15 +2209,12 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		cPickup * Pickup = new cPickup(
+		auto Pickup = cpp14::make_unique<cPickup>(
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
 		);
-		if (!Pickup->Initialize(*this))
-		{
-			delete Pickup;
-			Pickup = nullptr;
-		}
+		auto PickupPtr = Pickup.get();
+		PickupPtr->Initialize(std::move(Pickup), *this);
 	}
 }
 
@@ -2219,14 +2224,13 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 UInt32 cWorld::SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
 {
-	cPickup * Pickup = new cPickup(a_PosX, a_PosY, a_PosZ, a_Item, false, a_SpeedX, a_SpeedY, a_SpeedZ, a_LifetimeTicks, a_CanCombine);
-	if (!Pickup->Initialize(*this))
+	auto Pickup = cpp14::make_unique<cPickup>(a_PosX, a_PosY, a_PosZ, a_Item, false, a_SpeedX, a_SpeedY, a_SpeedZ, a_LifetimeTicks, a_CanCombine);
+	auto PickupPtr = Pickup.get();
+	if (!PickupPtr->Initialize(std::move(Pickup), *this))
 	{
-		delete Pickup;
-		Pickup = nullptr;
 		return cEntity::INVALID_ID;
 	}
-	return Pickup->GetUniqueID();
+	return PickupPtr->GetUniqueID();
 }
 
 
@@ -2235,14 +2239,14 @@ UInt32 cWorld::SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, cons
 
 UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
 {
-	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
-	if (!FallingBlock->Initialize(*this))
+	auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
+	auto FallingBlockPtr = FallingBlock.get();
+	auto ID = FallingBlock->GetUniqueID();
+	if (!FallingBlockPtr->Initialize(std::move(FallingBlock), *this))
 	{
-		delete FallingBlock;
-		FallingBlock = nullptr;
 		return cEntity::INVALID_ID;
 	}
-	return FallingBlock->GetUniqueID();
+	return ID;
 }
 
 
@@ -2257,14 +2261,13 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 		return cEntity::INVALID_ID;
 	}
 
-	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
-	if (!ExpOrb->Initialize(*this))
+	auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, a_Reward);
+	auto ExpOrbPtr = ExpOrb.get();
+	if (!ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
 	{
-		delete ExpOrb;
-		ExpOrb = nullptr;
 		return cEntity::INVALID_ID;
 	}
-	return ExpOrb->GetUniqueID();
+	return ExpOrbPtr->GetUniqueID();
 }
 
 
@@ -2273,26 +2276,26 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 
 UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
-	cMinecart * Minecart;
+	std::unique_ptr<cMinecart> Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = new cRideableMinecart     (a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
-		case E_ITEM_CHEST_MINECART:       Minecart = new cMinecartWithChest    (a_X, a_Y, a_Z); break;
-		case E_ITEM_FURNACE_MINECART:     Minecart = new cMinecartWithFurnace  (a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_TNT:    Minecart = new cMinecartWithTNT      (a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART:             Minecart = cpp14::make_unique<cRideableMinecart>(a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = cpp14::make_unique<cMinecartWithChest>(a_X, a_Y, a_Z); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = cpp14::make_unique<cMinecartWithFurnace>(a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = cpp14::make_unique<cMinecartWithTNT>(a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = cpp14::make_unique<cMinecartWithHopper>(a_X, a_Y, a_Z); break;
 		default:
 		{
 			return cEntity::INVALID_ID;
 		}
 	}  // switch (a_MinecartType)
-	if (!Minecart->Initialize(*this))
+
+	auto MinecartPtr = Minecart.get();
+	if (!MinecartPtr->Initialize(std::move(Minecart), *this))
 	{
-		delete Minecart;
-		Minecart = nullptr;
 		return cEntity::INVALID_ID;
 	}
-	return Minecart->GetUniqueID();
+	return MinecartPtr->GetUniqueID();
 }
 
 
@@ -2301,18 +2304,13 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material)
 {
-	cBoat * Boat = new cBoat(a_X, a_Y, a_Z, a_Material);
-	if (Boat == nullptr)
+	auto Boat = cpp14::make_unique<cBoat>(a_X, a_Y, a_Z, a_Material);
+	auto BoatPtr = Boat.get();
+	if (!BoatPtr->Initialize(std::move(Boat), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	if (!Boat->Initialize(*this))
-	{
-		delete Boat;
-		Boat = nullptr;
-		return cEntity::INVALID_ID;
-	}
-	return Boat->GetUniqueID();
+	return BoatPtr->GetUniqueID();
 }
 
 
@@ -2320,20 +2318,20 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_
 
 UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
-	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
-	if (!TNT->Initialize(*this))
+	auto TNT = cpp14::make_unique<cTNTEntity>(a_X, a_Y, a_Z, a_FuseTicks);
+	auto TNTPtr = TNT.get();
+	if (!TNTPtr->Initialize(std::move(TNT), *this))
 	{
-		delete TNT;
-		TNT = nullptr;
 		return cEntity::INVALID_ID;
 	}
+
 	auto & Random = GetRandomProvider();
-	TNT->SetSpeed(
+	TNTPtr->SetSpeed(
 		a_InitialVelocityCoeff * Random.RandInt(-1, 1),
 		a_InitialVelocityCoeff * 2,
 		a_InitialVelocityCoeff * Random.RandInt(-1, 1)
 	);
-	return TNT->GetUniqueID();
+	return TNTPtr->GetUniqueID();
 }
 
 
@@ -2938,7 +2936,7 @@ void cWorld::QueueSetChunkData(cSetChunkDataPtr a_SetChunkData)
 	// Store a copy of the data in the queue:
 	// TODO: If the queue is too large, wait for it to get processed. Not likely, though.
 	cCSLock Lock(m_CSSetChunkDataQueue);
-	m_SetChunkDataQueue.push_back(std::move(a_SetChunkData));
+	m_SetChunkDataQueue.emplace_back(std::move(a_SetChunkData));
 }
 
 
@@ -2953,15 +2951,10 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	m_ChunkMap->SetChunkData(a_SetChunkData);
 
 	// Initialize the entities (outside the m_ChunkMap's CS, to fix FS #347):
-	cEntityList Entities;
-	std::swap(a_SetChunkData.GetEntities(), Entities);
-	for (cEntityList::iterator itr = Entities.begin(), end = Entities.end(); itr != end; ++itr)
+	for (auto & Entity : a_SetChunkData.GetEntities())
 	{
-		if (!(*itr)->Initialize(*this))
-		{
-			delete *itr;
-			*itr = nullptr;
-		}
+		auto EntityPtr = Entity.get();
+		EntityPtr->Initialize(std::move(Entity), *this);
 	}
 
 	// If a client is requesting this chunk, send it to them:
@@ -3082,39 +3075,41 @@ void cWorld::CollectPickupsByPlayer(cPlayer & a_Player)
 
 
 
-void cWorld::AddPlayer(cPlayer * a_Player, cWorld * a_OldWorld)
+void cWorld::AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld)
 {
 	cCSLock Lock(m_CSPlayersToAdd);
-	m_PlayersToAdd.emplace_back(a_Player, a_OldWorld);
+	m_PlayersToAdd.emplace_back(std::move(a_Player), a_OldWorld);
 }
 
 
 
 
 
-void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
+std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveFromChunk)
 {
+	std::unique_ptr<cPlayer> PlayerPtr;
+
 	if (a_RemoveFromChunk)
 	{
 		// To prevent iterator invalidations when an entity goes through a portal and calls this function whilst being ticked by cChunk
 		// we should not change cChunk's entity list if asked not to
-		m_ChunkMap->RemoveEntity(a_Player);
+		PlayerPtr = std::unique_ptr<cPlayer>(static_cast<cPlayer *>(m_ChunkMap->RemoveEntity(a_Player).release()));
 	}
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
-		m_PlayersToAdd.remove_if([&](const std::pair< cPlayer *, cWorld * > & value) -> bool
+		m_PlayersToAdd.remove_if([&](const decltype(m_PlayersToAdd)::value_type & value) -> bool
 		{
-			return (value.first == a_Player);
+			return (value.first.get() == &a_Player);
 		});
 	}
 	{
 		cCSLock Lock(m_CSPlayers);
-		LOGD("Removing player %s from world \"%s\"", a_Player->GetName().c_str(), m_WorldName.c_str());
-		m_Players.remove(a_Player);
+		LOGD("Removing player %s from world \"%s\"", a_Player.GetName().c_str(), m_WorldName.c_str());
+		m_Players.remove(&a_Player);
 	}
 
 	// Remove the player's client from the list of clients to be ticked:
-	cClientHandle * Client = a_Player->GetClientHandle();
+	cClientHandle * Client = a_Player.GetClientHandle();
 	if (Client != nullptr)
 	{
 		// Reset the player's scoreboard
@@ -3125,7 +3120,61 @@ void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
 		cCSLock Lock(m_CSClients);
 		m_ClientsToRemove.push_back(Client);
 	}
+
+	return PlayerPtr;
 }
+
+
+
+
+
+#ifdef _DEBUG
+bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
+{
+	if (m_ChunkMap->RemoveEntity(a_Player) != nullptr)
+	{
+		return true;
+	}
+
+	{
+		cCSLock Lock(m_CSPlayersToAdd);
+		if (std::find_if(
+			m_PlayersToAdd.begin(), m_PlayersToAdd.end(),
+			[&a_Player](const cAwaitingPlayerList::value_type & Item) { return Item.first.get() == &a_Player; }) != m_PlayersToAdd.end()
+		)
+		{
+			return true;
+		}
+	}
+
+	{
+		cCSLock Lock(m_CSPlayers);
+		if (std::find(m_Players.begin(), m_Players.end(), &a_Player) != m_Players.end())
+		{
+			return true;
+		}
+	}
+
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		if (std::find(m_ClientsToAdd.begin(), m_ClientsToAdd.end(), a_Player.GetClientHandlePtr()) != m_ClientsToAdd.end())
+		{
+			return true;
+		}
+	}
+
+	{
+		cCSLock Lock(m_CSClients);
+		if (std::find(m_Clients.begin(), m_Clients.end(), a_Player.GetClientHandlePtr()) != m_Clients.end())
+		{
+			return true;
+		}
+	}
+
+	// Assume OK if in ClientsToRemove or PlayersToRemove
+	return false;
+}
+#endif
 
 
 
@@ -3243,7 +3292,7 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallb
 
 
 
-cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
+cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {
 	double ClosestDistance = a_SightLimit;
 	cPlayer * ClosestPlayer = nullptr;
@@ -3342,11 +3391,11 @@ bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cLambdaEntityCallback a_Callbac
 	// First check the entities-to-add:
 	{
 		cCSLock Lock(m_CSEntitiesToAdd);
-		for (auto & ent: m_EntitiesToAdd)
+		for (const auto & ent: m_EntitiesToAdd)
 		{
 			if (ent->GetUniqueID() == a_UniqueID)
 			{
-				a_Callback(ent);
+				a_Callback(ent.get());
 				return true;
 			}
 		}  // for ent - m_EntitiesToAdd[]
@@ -3639,11 +3688,11 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 
 
 
-void cWorld::AddEntity(cEntity * a_Entity)
+void cWorld::AddEntity(OwnedEntity a_Entity)
 {
 	a_Entity->SetWorld(this);
 	cCSLock Lock(m_CSEntitiesToAdd);
-	m_EntitiesToAdd.push_back(a_Entity);
+	m_EntitiesToAdd.emplace_back(std::move(a_Entity));
 }
 
 
@@ -3778,9 +3827,7 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby)
 {
-	cMonster * Monster = nullptr;
-
-	Monster = cMonster::NewMonsterFromType(a_MonsterType);
+	auto Monster = cMonster::NewMonsterFromType(a_MonsterType);
 	if (Monster == nullptr)
 	{
 		return cEntity::INVALID_ID;
@@ -3792,13 +3839,13 @@ UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterTyp
 		Monster->SetAge(-1);
 	}
 
-	return SpawnMobFinalize(Monster);
+	return SpawnMobFinalize(std::move(Monster));
 }
 
 
 
 
-UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
+UInt32 cWorld::SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster)
 {
 	ASSERT(a_Monster != nullptr);
 
@@ -3808,22 +3855,20 @@ UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	// A plugin doesn't agree with the spawn. bail out.
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
-		delete a_Monster;
-		a_Monster = nullptr;
 		return cEntity::INVALID_ID;
 	}
+
+	auto & Monster = *a_Monster;
 
 	// Initialize the monster into the current world.
-	if (!a_Monster->Initialize(*this))
+	if (!Monster.Initialize(std::move(a_Monster), *this))
 	{
-		delete a_Monster;
-		a_Monster = nullptr;
 		return cEntity::INVALID_ID;
 	}
 
-	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
+	cPluginManager::Get()->CallHookSpawnedMonster(*this, Monster);
 
-	return a_Monster->GetUniqueID();
+	return Monster.GetUniqueID();
 }
 
 
@@ -3832,18 +3877,19 @@ UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
-	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
+	auto Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == nullptr)
 	{
 		return cEntity::INVALID_ID;
 	}
-	if (!Projectile->Initialize(*this))
+
+	auto ProjectilePtr = Projectile.get();
+	if (!ProjectilePtr->Initialize(std::move(Projectile), *this))
 	{
-		delete Projectile;
-		Projectile = nullptr;
 		return cEntity::INVALID_ID;
 	}
-	return Projectile->GetUniqueID();
+
+	return ProjectilePtr->GetUniqueID();
 }
 
 
@@ -4039,44 +4085,50 @@ void cWorld::AddQueuedPlayers(void)
 		std::swap(PlayersToAdd, m_PlayersToAdd);
 	}
 
+	// Temporary (#3115-will-fix): store pointers to player objects after ownership transferral
+	std::vector<std::pair<cPlayer *, cWorld *>> AddedPlayerPtrs;
+	AddedPlayerPtrs.reserve(PlayersToAdd.size());
+
 	// Add all the players in the grabbed list:
 	{
 		cCSLock Lock(m_CSPlayers);
 		for (auto & AwaitingPlayer : PlayersToAdd)
 		{
 			auto & Player = AwaitingPlayer.first;
-			ASSERT(std::find(m_Players.begin(), m_Players.end(), Player) == m_Players.end());  // Is it already in the list? HOW?
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), Player.get()) == m_Players.end());  // Is it already in the list? HOW?
 			LOGD("Adding player %s to world \"%s\".", Player->GetName().c_str(), m_WorldName.c_str());
 
-			m_Players.push_back(Player);
+			m_Players.push_back(Player.get());
 			Player->SetWorld(this);
 
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
-			m_ChunkMap->AddEntityIfNotPresent(Player);
-			ASSERT(!Player->IsTicking());
-			Player->SetIsTicking(true);
-
-			// Tell the player all about our scoreboard
-			GetScoreBoard().SendTo(*Player->GetClientHandle());
+			auto PlayerPtr = Player.get();
+			m_ChunkMap->AddEntityIfNotPresent(std::move(Player));
+			ASSERT(!PlayerPtr->IsTicking());
+			PlayerPtr->SetIsTicking(true);
+			AddedPlayerPtrs.emplace_back(PlayerPtr, AwaitingPlayer.second);
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSPlayers)
 
 	// Add all the players' clienthandles:
 	{
 		cCSLock Lock(m_CSClients);
-		for (auto & AwaitingPlayer : PlayersToAdd)
+		for (auto & AwaitingPlayer : AddedPlayerPtrs)
 		{
 			auto & Player = AwaitingPlayer.first;
 			cClientHandlePtr Client = Player->GetClientHandlePtr();
 			if (Client != nullptr)
 			{
+				// Tell the player all about our scoreboard
+				GetScoreBoard().SendTo(*Client);
+
 				m_Clients.push_back(Client);
 			}
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSClients)
 
 	// Stream chunks to all eligible clients:
-	for (auto & AwaitingPlayer : PlayersToAdd)
+	for (auto & AwaitingPlayer : AddedPlayerPtrs)
 	{
 		auto & Player = AwaitingPlayer.first;
 		cClientHandle * Client = Player->GetClientHandle();
@@ -4089,7 +4141,7 @@ void cWorld::AddQueuedPlayers(void)
 	}  // for itr - PlayersToAdd[]
 
 	// Call EntityChangedWorld callback on all eligible clients
-	for (auto & AwaitingPlayer : PlayersToAdd)
+	for (auto & AwaitingPlayer : AddedPlayerPtrs)
 	{
 		if (AwaitingPlayer.second != nullptr)
 		{
@@ -4119,14 +4171,14 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	cSetChunkDataPtr SetChunkData(new cSetChunkData(
+	auto SetChunkData = cpp14::make_unique<cSetChunkData>(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
 		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed
 		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
 		std::move(a_ChunkDesc.GetEntities()), std::move(a_ChunkDesc.GetBlockEntities()),
 		true
-	));
+	);
 	SetChunkData->RemoveInvalidBlockEntities();
 	m_World->QueueSetChunkData(std::move(SetChunkData));
 }

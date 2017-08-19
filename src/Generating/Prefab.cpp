@@ -18,8 +18,8 @@ uses a prefabricate in a cBlockArea for drawing itself.
 cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_Size(a_Def.m_SizeX, a_Def.m_SizeY, a_Def.m_SizeZ),
 	m_HitBox(
-		a_Def.m_HitboxMinX, a_Def.m_HitboxMinY, a_Def.m_HitboxMinZ,
-		a_Def.m_HitboxMaxX, a_Def.m_HitboxMaxY, a_Def.m_HitboxMaxZ
+		{a_Def.m_HitboxMinX, a_Def.m_HitboxMinY, a_Def.m_HitboxMinZ},
+		{a_Def.m_HitboxMaxX, a_Def.m_HitboxMaxY, a_Def.m_HitboxMaxZ}
 	),
 	m_AllowedRotations(a_Def.m_AllowedRotations),
 	m_MergeStrategy(a_Def.m_MergeStrategy),

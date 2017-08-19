@@ -110,7 +110,14 @@ public:
 	bool DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback);
 
 	/** Wakes up simulators for the specified block */
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void WakeUpSimulators(Vector3i a_Block);
+
+	// DEPRECATED, use the vector-parametered version instead.
+	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		LOGWARNING("cChunkMap::WakeUpSimulators(int, int, int) is deprecated, use cChunkMap::WakeUpSimulators(Vector3i) instead.");
+		WakeUpSimulators(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	}
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
@@ -207,17 +214,18 @@ public:
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
-	void AddEntity(cEntity * a_Entity);
+	void AddEntity(OwnedEntity a_Entity);
 
 	/** Adds the entity to its appropriate chunk, if the entity is not already added.
 	Takes ownership of the entity pointer */
-	void AddEntityIfNotPresent(cEntity * a_Entity);
+	void AddEntityIfNotPresent(OwnedEntity a_Entity);
 
 	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(UInt32 a_EntityID);
 
-	/** Removes the entity from its appropriate chunk */
-	void RemoveEntity(cEntity * a_Entity);
+	/** Removes the entity from its appropriate chunk
+	Returns an owning reference to the found entity. */
+	OwnedEntity RemoveEntity(cEntity & a_Entity);
 
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
@@ -484,7 +492,13 @@ private:
 	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
-	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ);
+	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
+
+	// Deprecated in favor of the vector version
+	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
+	{
+		return GetChunkNoGen(cChunkCoords(a_ChunkX, a_ChunkZ));
+	}
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);

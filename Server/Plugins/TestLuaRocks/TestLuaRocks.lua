@@ -20,14 +20,14 @@ local http = require("socket.http");
 
 
 
-LOGINFO("Trying to download a webpage...");
-local body, code, headers = http.request('https://forum.cuberite.org/');
-LOG("code: " .. tostring(code));
-LOG("headers: ");
+LOGINFO("Trying to download a webpage...")
+local body, code, headers = http.request('https://forum.cuberite.org/')
+LOG("code: " .. tostring(code))
+LOG("headers: ")
 for k, v in pairs(headers or {}) do
-	LOG("  " .. k .. ": " .. v);
+	LOG("  " .. k .. ": " .. v)
 end
-LOG("body length: " .. string.len(body));
+LOG("body length: " .. string.len(body))
 
 
 
@@ -35,15 +35,15 @@ LOG("body length: " .. string.len(body));
 
 function Initialize(a_Plugin)
 	if (socket == nil) then
-		LOG("LuaSocket not found");
+		LOGWARNING("LuaSocket not found")
 	else
-		LOG("LuaSocket loaded");
+		LOG("LuaSocket loaded")
 	end
 	if (log30 == nil) then
-		LOG("30log not found");
+		LOGWARNING("30log not found")
 	else
-		LOG("30log loaded");
+		LOG("30log loaded")
 	end
-	LOGINFO("Preventing plugin load so that it may be requested again from the webadmin.");
-	return false;
+	LOGINFO("Reload plugin from console or webadmin to rerun tests.")
+	return false
 end

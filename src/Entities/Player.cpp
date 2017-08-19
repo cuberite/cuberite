@@ -149,12 +149,12 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 
 
 
-bool cPlayer::Initialize(cWorld & a_World)
+bool cPlayer::Initialize(OwnedEntity a_Self, cWorld & a_World)
 {
 	UNUSED(a_World);
 	ASSERT(GetWorld() != nullptr);
 	ASSERT(GetParentChunk() == nullptr);
-	GetWorld()->AddPlayer(this);
+	GetWorld()->AddPlayer(std::unique_ptr<cPlayer>(static_cast<cPlayer *>(a_Self.release())));
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
 
@@ -1198,7 +1198,7 @@ void cPlayer::Respawn(void)
 
 	if (GetWorld() != m_SpawnWorld)
 	{
-		MoveToWorld(m_SpawnWorld, false, GetLastBedPos());
+		ScheduleMoveToWorld(m_SpawnWorld, GetLastBedPos(), false);
 	}
 	else
 	{
@@ -1323,10 +1323,16 @@ cTeam * cPlayer::UpdateTeam(void)
 
 void cPlayer::OpenWindow(cWindow & a_Window)
 {
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerOpeningWindow(*this, a_Window))
+	{
+		return;
+	}
+
 	if (&a_Window != m_CurrentWindow)
 	{
 		CloseWindow(false);
 	}
+
 	a_Window.OpenedByPlayer(*this);
 	m_CurrentWindow = &a_Window;
 	a_Window.SendWholeWindow(*GetClientHandle());
@@ -2005,7 +2011,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		GetWorld()->BroadcastDestroyEntity(*this);
 
 		// Remove player from world
-		GetWorld()->RemovePlayer(this, false);
+		// Make sure that RemovePlayer didn't return a valid smart pointer, due to the second parameter being false
+		// We remain valid and not destructed after this call
+		VERIFY(!GetWorld()->RemovePlayer(*this, false));
 
 		// Set position to the new position
 		SetPosition(a_NewPosition);
@@ -2047,8 +2055,10 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
-		ParentChunk->RemoveEntity(this);
-		a_World->AddPlayer(this, &a_OldWorld);  // New world will take over and announce client at its next tick
+
+		// New world will take over and announce client at its next tick
+		auto PlayerPtr = static_cast<cPlayer *>(ParentChunk->RemoveEntity(*this).release());
+		a_World->AddPlayer(std::unique_ptr<cPlayer>(PlayerPtr), &a_OldWorld);
 	});
 
 	return true;

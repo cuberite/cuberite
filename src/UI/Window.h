@@ -113,7 +113,7 @@ public:
 	void GetSlots(cPlayer & a_Player, cItems & a_Slots) const;
 
 	/** Handles a click event from a player */
-	void Clicked(
+	virtual void Clicked(
 		cPlayer & a_Player, int a_WindowID,
 		short a_SlotNum, eClickAction a_ClickAction,
 		const cItem & a_ClickedItem
