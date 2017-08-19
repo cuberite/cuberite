@@ -13,24 +13,6 @@
 
 
 
-/*AString cObjective::TypeToString(eType a_Type)
-{
-	return a_Type;
-}
-
-
-
-
-
-cObjective::eType cObjective::StringToType(const AString & a_Name)
-{
-	return a_Name;
-}*/
-
-
-
-
-
 AString cObjective::TypeToString(eType a_Type)
 {
 	switch (a_Type.m_Criteria)
@@ -88,57 +70,27 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 		return it->second;
 	}
 
-	// TODO: Achievement is unimplemented (and, removed in MC 1.12, so maybe it shouldn't be implemented) - lkolbly 08/2017
+
+	// TODO: "achievement" is unimplemented (and, removed in MC 1.12, so maybe it shouldn't be implemented) - lkolbly 08/2017
+
 
 	// Some require converting entity names
-	// TODO: This is a slow way to compare strings, but it's an uncommon operation
-	LOG("First few chars are %s", a_Name.substr(0, 16).c_str());
 	if (a_Name.substr(0, 16) == "stat.killEntity.")
 	{
-		LOG("Creating stat of type killEntity");
 		AString Entity = a_Name.substr(16);
-		LOG("Entity name = %s, ID = %d", Entity.c_str(), static_cast<int>(cMonster::StringToMobType(Entity)));
-		return eType(otStatEntityKill, static_cast<int>(cMonster::StringToMobType(Entity)));
+		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
+		return eType(otStatEntityKill, static_cast<int>(MonsterType));
 	}
 	if (a_Name.substr(0, 20) == "stat.entityKilledBy.")
 	{
-		AString Entity = a_Name.substr(16);
-		return eType(otStatEntityKill, static_cast<int>(cMonster::StringToMobType(Entity)));
+		AString Entity = a_Name.substr(20);
+		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
+		return eType(otStatEntityKill, static_cast<int>(MonsterType));
 	}
 
 	// TODO: Handle other cases
+	LOGWARNING("Could not parse cObjective criteria '%s', returning otDummy", a_Name.c_str());
 	return otDummy;
-
-#if 0
-	static struct
-	{
-		eType m_Type;
-		const char * m_String;
-	} TypeMap [] =
-	{
-		{otDummy,              "dummy"              },
-		{otDeathCount,         "deathCount"         },
-		{otPlayerKillCount,    "playerKillCount"    },
-		{otTotalKillCount,     "totalKillCount"     },
-		{otHealth,             "health"             },
-		{otAchievement,        "achievement"        },
-		{otStat,               "stat"               },
-		{otStatItemCraft,      "stat.craftItem"     },
-		{otStatItemUse,        "stat.useItem"       },
-		{otStatItemBreak,      "stat.breakItem"     },
-		{otStatBlockMine,      "stat.mineBlock"     },
-		{otStatEntityKill,     "stat.killEntity"    },
-		{otStatEntityKilledBy, "stat.entityKilledBy"}
-	};
-	for (size_t i = 0; i < ARRAYCOUNT(TypeMap); i++)
-	{
-		if (NoCaseCompare(TypeMap[i].m_String, a_Name) == 0)
-		{
-			return TypeMap[i].m_Type;
-		}
-	}  // for i - TypeMap[]
-	return otDummy;
-#endif
 }
 
 

@@ -57,13 +57,14 @@ public:
 		eType(eCriteria a_Criteria) : m_Criteria(a_Criteria), m_SubCriteria(0) {}
 		eType(eCriteria a_Criteria, int a_SubCriteria) : m_Criteria(a_Criteria), m_SubCriteria(a_SubCriteria) {}
 
-		bool operator==(eType a_Other) { return m_Criteria == a_Other.m_Criteria && m_SubCriteria == a_Other.m_SubCriteria; }
+		bool operator==(eType a_Other)
+		{
+			return (m_Criteria == a_Other.m_Criteria) && (m_SubCriteria == a_Other.m_SubCriteria);
+		}
 
 		eCriteria m_Criteria;
 		int m_SubCriteria;
 	};
-
-	//typedef AString eType;
 
 	// For the "Scoreboard Objective" packet
 	enum eUpdateAction
