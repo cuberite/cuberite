@@ -457,10 +457,14 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtSilverfish:
 					{
 						a_TDI.RawDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
-						// TODO: Add slowness effect
+						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
+						// increasing the max duration by 0.5 seconds each level
+						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
+						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
+						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
-					};
+					}
 					default: break;
 				}
 			}
@@ -489,7 +493,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtMagmaCube:
 					{
 						break;
-					};
+					}
 					default: StartBurning(BurnTicks * 20);
 				}
 			}
