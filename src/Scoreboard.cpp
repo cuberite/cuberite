@@ -13,23 +13,51 @@
 
 
 
+/*AString cObjective::TypeToString(eType a_Type)
+{
+	return a_Type;
+}
+
+
+
+
+
+cObjective::eType cObjective::StringToType(const AString & a_Name)
+{
+	return a_Name;
+}*/
+
+
+
+
+
 AString cObjective::TypeToString(eType a_Type)
 {
-	switch (a_Type)
+	switch (a_Type.m_Criteria)
 	{
 		case otDummy:              return "dummy";
 		case otDeathCount:         return "deathCount";
 		case otPlayerKillCount:    return "playerKillCount";
 		case otTotalKillCount:     return "totalKillCount";
 		case otHealth:             return "health";
-		case otAchievement:        return "achievement";
+		case otAchievement:        return "achievement";  // DEPRECATED
+
+		// These all have extra things after the dot
 		case otStat:               return "stat";
 		case otStatItemCraft:      return "stat.craftItem";
 		case otStatItemUse:        return "stat.useItem";
 		case otStatItemBreak:      return "stat.breakItem";
 		case otStatBlockMine:      return "stat.mineBlock";
-		case otStatEntityKill:     return "stat.killEntity";
-		case otStatEntityKilledBy: return "stat.entityKilledBy";
+
+		// Have to convert the entity ID to a name
+		case otStatEntityKill:
+		{
+			return "stat.killEntity." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(a_Type.m_SubCriteria));
+		}
+		case otStatEntityKilledBy:
+		{
+			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(a_Type.m_SubCriteria));
+		}
 
 		// clang optimisises this line away then warns that it has done so.
 		#if !defined(__clang__)
@@ -45,6 +73,43 @@ AString cObjective::TypeToString(eType a_Type)
 
 cObjective::eType cObjective::StringToType(const AString & a_Name)
 {
+	// For some, we don't have to do any further processing
+	static const std::map<AString, eType> SimpleCriteria =
+	{
+		{"dummy", otDummy},
+		{"deathCount", otDeathCount},
+		{"playerKillCount", otPlayerKillCount},
+		{"totalKillCount", otTotalKillCount},
+		{"health", otHealth}
+	};
+	auto it = SimpleCriteria.find(a_Name);
+	if (it != SimpleCriteria.end())
+	{
+		return it->second;
+	}
+
+	// TODO: Achievement is unimplemented (and, removed in MC 1.12, so maybe it shouldn't be implemented) - lkolbly 08/2017
+
+	// Some require converting entity names
+	// TODO: This is a slow way to compare strings, but it's an uncommon operation
+	LOG("First few chars are %s", a_Name.substr(0, 16).c_str());
+	if (a_Name.substr(0, 16) == "stat.killEntity.")
+	{
+		LOG("Creating stat of type killEntity");
+		AString Entity = a_Name.substr(16);
+		LOG("Entity name = %s, ID = %d", Entity.c_str(), static_cast<int>(cMonster::StringToMobType(Entity)));
+		return eType(otStatEntityKill, static_cast<int>(cMonster::StringToMobType(Entity)));
+	}
+	if (a_Name.substr(0, 20) == "stat.entityKilledBy.")
+	{
+		AString Entity = a_Name.substr(16);
+		return eType(otStatEntityKill, static_cast<int>(cMonster::StringToMobType(Entity)));
+	}
+
+	// TODO: Handle other cases
+	return otDummy;
+
+#if 0
 	static struct
 	{
 		eType m_Type;
@@ -73,6 +138,7 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 		}
 	}  // for i - TypeMap[]
 	return otDummy;
+#endif
 }
 
 
@@ -93,9 +159,9 @@ cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cO
 
 void cObjective::Reset(void)
 {
-	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
+	for (auto it : m_Scores)
 	{
-		m_World->BroadcastScoreUpdate(m_Name, it->first, 0, cScoreboard::uaRemove);
+		m_World->BroadcastScoreUpdate(m_Name, it.first, 0, cScoreboard::uaRemove);
 	}
 
 	m_Scores.clear();
@@ -139,11 +205,11 @@ cObjective::Score cObjective::GetScore(const AString & a_Name) const
 
 void cObjective::SetAllScores(cObjective::Score a_Score)
 {
-	for (auto it : m_Scores)
+	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
 	{
-		it.second = a_Score;
+		it->second = a_Score;
 
-		m_World->BroadcastScoreUpdate(m_Name, it.first, a_Score, cScoreboard::uaUpsert);
+		m_World->BroadcastScoreUpdate(m_Name, it->first, a_Score, cScoreboard::uaUpsert);
 	}
 }
 
@@ -214,9 +280,9 @@ void cObjective::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, 0);
 
-	for (cScoreMap::const_iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
+	for (auto it : m_Scores)
 	{
-		a_Client.SendScoreUpdate(m_Name, it->first, it->second, cScoreboard::uaUpsert);
+		a_Client.SendScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaUpsert);
 	}
 }
 
@@ -653,9 +719,9 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 {
 	cCSLock Lock(m_CSObjectives);
 
-	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
+	for (auto it : m_Objectives)
 	{
-		it->second.SendTo(a_Client);
+		it.second.SendTo(a_Client);
 	}
 
 	for (auto team : m_Teams)
