@@ -446,9 +446,6 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	// Query player team
 	m_Player->UpdateTeam();
 
-	// Send scoreboard data (sent by cWorld)
-	//World->GetScoreBoard().SendTo(*this);
-
 	// Send statistics
 	SendStatistics(m_Player->GetStatManager());
 

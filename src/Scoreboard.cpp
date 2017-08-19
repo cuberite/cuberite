@@ -142,6 +142,8 @@ void cObjective::SetAllScores(cObjective::Score a_Score)
 	for (auto it : m_Scores)
 	{
 		it.second = a_Score;
+
+		m_World->BroadcastScoreUpdate(m_Name, it.first, a_Score, cScoreboard::uaUpsert);
 	}
 }
 
