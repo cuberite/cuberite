@@ -67,11 +67,11 @@ void cNBTChunkSerializer::Finish(void)
 		m_Writer.EndList();
 	}
 
-	// If light not valid, reset it to all zeroes:
+	// If light not valid, reset it to defaults:
 	if (!m_IsLightValid)
 	{
-		memset(m_BlockLight,    0, sizeof(m_BlockLight));
-		memset(m_BlockSkyLight, 0, sizeof(m_BlockSkyLight));
+		m_Data.FillBlockLight(0x00);
+		m_Data.FillSkyLight(0x0f);
 	}
 
 	// Check if "Entity" and "TileEntities" lists exists. MCEdit requires this.
