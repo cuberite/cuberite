@@ -213,7 +213,7 @@ public:  // tolua_export
 	void SendStatistics                 (const cStatManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
 	void SendTeam                       (const cTeam & a_Team, cTeam::eProtocolAction a_Mode);
-	void SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta);
+	void SendTeamChangeMembership       (const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta);
 	void SendTeleportEntity             (const cEntity & a_Entity);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export

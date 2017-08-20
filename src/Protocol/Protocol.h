@@ -131,7 +131,7 @@ public:
 	virtual void SendStatistics                 (const cStatManager & a_Manager) = 0;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
 	virtual void SendTeam                       (const cTeam & a_Team, Byte a_Mode) = 0;
-	virtual void SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta) = 0;
+	virtual void SendTeamChangeMembership       (const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta) = 0;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) = 0;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;

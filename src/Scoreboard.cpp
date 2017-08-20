@@ -230,7 +230,7 @@ void cObjective::SetDisplayName(const AString & a_Name)
 
 void cObjective::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, 0);
+	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, uaCreate);
 
 	for (auto it : m_Scores)
 	{

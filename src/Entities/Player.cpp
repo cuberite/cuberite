@@ -208,7 +208,6 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	{
 		return;
 	}
-
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
 	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());

@@ -173,14 +173,11 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginCompound("DisplaySlots");
 
-	cObjective * Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsList);
-	a_Writer.AddString("slot_0", (Objective == nullptr) ? "" : Objective->GetName());
-
-	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsSidebar);
-	a_Writer.AddString("slot_1", (Objective == nullptr) ? "" : Objective->GetName());
-
-	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsName);
-	a_Writer.AddString("slot_2", (Objective == nullptr) ? "" : Objective->GetName());
+	for (int DisplaySlot = 0; DisplaySlot < cScoreboard::dsCount; ++DisplaySlot)
+	{
+		cObjective * Objective = m_ScoreBoard->GetObjectiveIn(static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
+		a_Writer.AddString(Printf("slot_%d", DisplaySlot), (Objective == nullptr) ? "" : Objective->GetName());
+	}
 
 	a_Writer.EndCompound();  // DisplaySlots
 
@@ -341,28 +338,14 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 		return false;
 	}
 
-	int CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_0");
-	if (CurrLine >= 0)
+	for (int DisplaySlot = 0; DisplaySlot < cScoreboard::dsCount; ++DisplaySlot)
 	{
-		AString Name = a_NBT.GetString(CurrLine);
-
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsList);
-	}
-
-	CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_1");
-	if (CurrLine >= 0)
-	{
-		AString Name = a_NBT.GetString(CurrLine);
-
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsSidebar);
-	}
-
-	CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_2");
-	if (CurrLine >= 0)
-	{
-		AString Name = a_NBT.GetString(CurrLine);
-
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsName);
+		int CurrLine = a_NBT.FindChildByName(DisplaySlots, Printf("slot_%d", DisplaySlot));
+		if (CurrLine >= 0)
+		{
+			AString Name = a_NBT.GetString(CurrLine);
+			m_ScoreBoard->SetDisplay(Name, static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
+		}
 	}
 
 	return true;
