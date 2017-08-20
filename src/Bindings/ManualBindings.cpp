@@ -11,11 +11,6 @@
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
-#include "../Root.h"
-#include "../World.h"
-#include "../Entities/Player.h"
-#include "../WebAdmin.h"
-#include "../ClientHandle.h"
 #include "../BlockArea.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -28,14 +23,20 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
-#include "../Generating/ChunkDesc.h"
-#include "../LineBlockTracer.h"
-#include "../CompositeChat.h"
-#include "../StringCompression.h"
-#include "../CommandOutput.h"
-#include "../BuildInfo.h"
-#include "../HTTP/UrlParser.h"
 #include "../BoundingBox.h"
+#include "../BuildInfo.h"
+#include "../ClientHandle.h"
+#include "../CommandOutput.h"
+#include "../CompositeChat.h"
+#include "../Entities/Player.h"
+#include "../Generating/ChunkDesc.h"
+#include "../HTTP/UrlParser.h"
+#include "../Item.h"
+#include "../LineBlockTracer.h"
+#include "../Root.h"
+#include "../StringCompression.h"
+#include "../WebAdmin.h"
+#include "../World.h"
 
 
 
@@ -2557,6 +2558,57 @@ static int tolua_cMojangAPI_MakeUUIDShort(lua_State * L)
 
 
 
+static int tolua_get_cItem_m_LoreTable(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("const cItem"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	const cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Push the result:
+	L.Push(Self->m_LoreTable);
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cItem_m_LoreTable(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cItem") ||
+		!L.CheckParamTable(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Set the value:
+	Self->m_LoreTable.clear();
+	if (!L.GetStackValue(2, Self->m_LoreTable))
+	{
+		return L.ApiParamError("cItem.m_LoreTable: Could not read value as an array of strings");
+	}
+	return 0;
+}
+
+
+
+
+
 static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 {
 	tolua_Error tolua_err;
@@ -3798,6 +3850,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetOutputBlockPos", tolua_cHopperEntity_GetOutputBlockPos);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cItem");
+			tolua_variable(tolua_S, "m_LoreTable", tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
+		tolua_endmodule(tolua_S);
+
 		tolua_beginmodule(tolua_S, "cItemGrid");
 			tolua_function(tolua_S, "GetSlotCoords", Lua_ItemGrid_GetSlotCoords);
 		tolua_endmodule(tolua_S);
@@ -3816,6 +3872,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "new",              tolua_cLuaWindow_new);
 			tolua_function(tolua_S, "new_local",        tolua_cLuaWindow_new_local);
 			tolua_function(tolua_S, ".call",            tolua_cLuaWindow_new_local);
+			tolua_function(tolua_S, "SetOnClicked",     tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnClicked>);
 			tolua_function(tolua_S, "SetOnClosing",     tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnClosing>);
 			tolua_function(tolua_S, "SetOnSlotChanged", tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnSlotChanged>);
 		tolua_endmodule(tolua_S);

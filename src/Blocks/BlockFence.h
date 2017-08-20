@@ -81,33 +81,30 @@ public:
 		auto LeashKnot = cLeashKnot::FindKnotAtPos(*a_Player.GetWorld(), { a_BlockX, a_BlockY, a_BlockZ });
 		auto KnotAlreadyExists = (LeashKnot != nullptr);
 
-		// Reuse / create the leash knot
-		if (LeashKnot == nullptr)
+		if (KnotAlreadyExists)
 		{
-			LeashKnot = new cLeashKnot(a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			// Check leashed nearby mobs to leash them to the knot
+			LeashKnot->TiePlayersLeashedMobs(a_Player, KnotAlreadyExists);
 		}
-
-		// Check leashed nearby mobs to leash them to the knot
-		LeashKnot->TiePlayersLeashedMobs(a_Player, KnotAlreadyExists);
-
 		// New knot? needs to init and produce sound effect
-		if (!KnotAlreadyExists)
+		else
 		{
+			auto NewLeashKnot = cpp14::make_unique<cLeashKnot>(a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto NewLeashKnotPtr = NewLeashKnot.get();
+
+			NewLeashKnotPtr->TiePlayersLeashedMobs(a_Player, KnotAlreadyExists);
+
 			// Only put the knot in the world if any mob has been leashed to
-			if (LeashKnot->HasAnyMobLeashed())
+			if (NewLeashKnotPtr->HasAnyMobLeashed())
 			{
-				if (!LeashKnot->Initialize(*a_Player.GetWorld()))
+				if (!NewLeashKnotPtr->Initialize(std::move(NewLeashKnot), *a_Player.GetWorld()))
 				{
-					delete LeashKnot;
-					LeashKnot = nullptr;
 					return false;
 				}
 				a_Player.GetWorld()->BroadcastSoundEffect("entity.leashknot.place", a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), 1, 1);
 			}
 			else
 			{
-				delete LeashKnot;
-				LeashKnot = nullptr;
 				return false;
 			}
 		}

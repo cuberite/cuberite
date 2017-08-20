@@ -135,9 +135,9 @@ const char * cEntity::GetParentClass(void) const
 
 
 
-bool cEntity::Initialize(cWorld & a_World)
+bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this))
+	if (cPluginManager::Get()->CallHookSpawningEntity(a_EntityWorld, *this))
 	{
 		return false;
 	}
@@ -151,13 +151,13 @@ bool cEntity::Initialize(cWorld & a_World)
 
 	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
-	a_World.AddEntity(this);
+	a_EntityWorld.AddEntity(std::move(a_Self));
 	ASSERT(m_World != nullptr);
 
-	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
+	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
 	// Spawn the entity on the clients:
-	a_World.BroadcastSpawnEntity(*this);
+	a_EntityWorld.BroadcastSpawnEntity(*this);
 
 	// If has any mob leashed broadcast every leashed entity to this
 	if (HasAnyMobLeashed())
@@ -245,8 +245,10 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 			this->GetUniqueID(), this->GetClass(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
-		ParentChunk->RemoveEntity(this);
-		delete this;
+
+		// Make sure that RemoveEntity returned a valid smart pointer
+		// Also, not storing the returned pointer means automatic destruction
+		VERIFY(ParentChunk->RemoveEntity(*this));
 	});
 	Destroyed();
 }
@@ -358,7 +360,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	Vector3d Heading(0, 0, 0);
 	if (a_Attacker != nullptr)
 	{
-		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 16 : 11);
+		Heading = a_Attacker->GetLookVector();
 	}
 
 	TDI.Knockback = Heading * a_KnockbackAmount;
@@ -547,21 +549,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	// Add knockback:
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != nullptr))
 	{
-		int KnockbackLevel = static_cast<int>(a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback));  // More common enchantment
-		if (KnockbackLevel < 1)
-		{
-			// We support punch on swords and vice versa! :)
-			KnockbackLevel = static_cast<int>(a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch));
-		}
-
-		Vector3d AdditionalSpeed(0, 0, 0);
-		switch (KnockbackLevel)
-		{
-			case 1: AdditionalSpeed.Set(5, 0.3, 5); break;
-			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
-			default: break;
-		}
-		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
+		AddSpeed(a_TDI.Knockback);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -776,9 +764,19 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 {
 	// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
+	double Knockback = 11;
 
-	// TODO: Enchantments
-	return 1;
+	// If we're sprinting, bump up the knockback
+	if (IsSprinting())
+	{
+		Knockback = 16;
+	}
+
+	// Check for knockback enchantments (punch only applies to shot arrows)
+	unsigned int KnockbackLevel = GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
+	Knockback += 10 * KnockbackLevel;
+
+	return Knockback;
 }
 
 
@@ -1600,8 +1598,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
-		ParentChunk->RemoveEntity(this);
-		a_World->AddEntity(this);
+		a_World->AddEntity(ParentChunk->RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
 	});
 	return true;

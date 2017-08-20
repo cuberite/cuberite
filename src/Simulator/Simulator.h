@@ -39,7 +39,7 @@ public:
 	}
 
 	/** Called when a block changes */
-	void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
+	void WakeUp(Vector3i a_Block, cChunk * a_Chunk);
 
 	/** Does the same processing as WakeUp, but for all blocks within the specified area.
 	Has better performance than calling WakeUp for each block individually, due to neighbor-checking.
@@ -55,7 +55,7 @@ protected:
 	friend class cChunk;  // Calls AddBlock() in its WakeUpSimulators() function, to speed things up
 
 	/** Called to simulate a new block */
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) = 0;
+	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) = 0;
 
 	cWorld & m_World;
 } ;

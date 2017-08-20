@@ -159,7 +159,7 @@ public:
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
-	virtual bool Initialize(cWorld & a_World);
+	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
 	// tolua_begin
 
@@ -687,8 +687,6 @@ private:
 	cMonsterList m_LeashedMobs;
 
 } ;  // tolua_export
-
-typedef std::list<cEntity *> cEntityList;
 
 
 

@@ -78,9 +78,9 @@ cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Flu
 
 
 
-void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
+void cDelayedFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 {
-	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	if ((a_Block.y < 0) || (a_Block.y >= cChunkDef::Height))
 	{
 		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
 		return;
@@ -91,9 +91,9 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 		return;
 	}
 
-	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_BlockY, RelZ);
+	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
+	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
 	if (BlockType != m_FluidBlock)
 	{
 		return;
@@ -104,7 +104,7 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
 
 	// Add, if not already present:
-	if (!Slot.Add(RelX, a_BlockY, RelZ))
+	if (!Slot.Add(RelX, a_Block.y, RelZ))
 	{
 		return;
 	}

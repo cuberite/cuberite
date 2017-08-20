@@ -2911,14 +2911,10 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 						}
 						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
-							AString Lore;
-
 							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								a_Item.m_LoreTable.push_back(NBT.GetString(loretag));
 							}
-
-							a_Item.m_Lore = Lore;
 						}
 						else if ((NBT.GetType(displaytag) == TAG_Int) && (NBT.GetName(displaytag) == "color"))
 						{
@@ -3107,15 +3103,9 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		{
 			Writer.BeginList("Lore", TAG_String);
 
-			AStringVector Decls = StringSplit(a_Item.m_Lore, "`");
-			for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
+			for (const auto & Line : a_Item.m_LoreTable)
 			{
-				if (itr->empty())
-				{
-					// The decl is empty (two `s), ignore
-					continue;
-				}
-				Writer.AddString("", itr->c_str());
+				Writer.AddString("", Line);
 			}
 
 			Writer.EndList();

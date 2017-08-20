@@ -12,7 +12,6 @@
 
 #include "../Defines.h"
 #include "../Scoreboard.h"
-#include "../Map.h"
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
 
@@ -20,6 +19,7 @@
 
 
 
+class cMap;
 class cExpOrb;
 class cPlayer;
 class cEntity;

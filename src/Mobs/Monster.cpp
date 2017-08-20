@@ -5,6 +5,7 @@
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../Items/ItemHandler.h"
 #include "../World.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
@@ -1103,7 +1104,7 @@ void cMonster::UnsafeUnsetTarget()
 
 
 
-cPawn * cMonster::GetTarget ()
+cPawn * cMonster::GetTarget()
 {
 	return m_Target;
 }
@@ -1112,29 +1113,25 @@ cPawn * cMonster::GetTarget ()
 
 
 
-cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
+std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
 	auto & Random = GetRandomProvider();
-	cMonster * toReturn = nullptr;
 
 	// Create the mob entity
 	switch (a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			toReturn = new cMagmaCube(1 << Random.RandInt(2));  // Size 1, 2 or 4
-			break;
+			return cpp14::make_unique<cMagmaCube>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(1 << Random.RandInt(2));  // Size 1, 2 or 4
-			break;
+			return cpp14::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton(false);
-			break;
+			return cpp14::make_unique<cSkeleton>(false);
 		}
 		case mtVillager:
 		{
@@ -1145,8 +1142,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				VillagerType = 0;
 			}
 
-			toReturn = new cVillager(static_cast<cVillager::eVillagerType>(VillagerType));
-			break;
+			return cpp14::make_unique<cVillager>(static_cast<cVillager::eVillagerType>(VillagerType));
 		}
 		case mtHorse:
 		{
@@ -1162,42 +1158,41 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				HorseType = 0;
 			}
 
-			toReturn = new cHorse(HorseType, HorseColor, HorseStyle, HorseTameTimes);
-			break;
+			return cpp14::make_unique<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
 		}
 
-		case mtBat:           toReturn = new cBat();                      break;
-		case mtBlaze:         toReturn = new cBlaze();                    break;
-		case mtCaveSpider:    toReturn = new cCaveSpider();               break;
-		case mtChicken:       toReturn = new cChicken();                  break;
-		case mtCow:           toReturn = new cCow();                      break;
-		case mtCreeper:       toReturn = new cCreeper();                  break;
-		case mtEnderDragon:   toReturn = new cEnderDragon();              break;
-		case mtEnderman:      toReturn = new cEnderman();                 break;
-		case mtGhast:         toReturn = new cGhast();                    break;
-		case mtGiant:         toReturn = new cGiant();                    break;
-		case mtGuardian:      toReturn = new cGuardian();                 break;
-		case mtIronGolem:     toReturn = new cIronGolem();                break;
-		case mtMooshroom:     toReturn = new cMooshroom();                break;
-		case mtOcelot:        toReturn = new cOcelot();                   break;
-		case mtPig:           toReturn = new cPig();                      break;
-		case mtRabbit:        toReturn = new cRabbit();                   break;
-		case mtSheep:         toReturn = new cSheep();                    break;
-		case mtSilverfish:    toReturn = new cSilverfish();               break;
-		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
-		case mtSpider:        toReturn = new cSpider();                   break;
-		case mtSquid:         toReturn = new cSquid();                    break;
-		case mtWitch:         toReturn = new cWitch();                    break;
-		case mtWither:	      toReturn = new cWither();                   break;
-		case mtWolf:          toReturn = new cWolf();                     break;
-		case mtZombie:        toReturn = new cZombie(false);              break;  // TODO: Infected zombie parameter
-		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
+		case mtBat:           return cpp14::make_unique<cBat>();
+		case mtBlaze:         return cpp14::make_unique<cBlaze>();
+		case mtCaveSpider:    return cpp14::make_unique<cCaveSpider>();
+		case mtChicken:       return cpp14::make_unique<cChicken>();
+		case mtCow:           return cpp14::make_unique<cCow>();
+		case mtCreeper:       return cpp14::make_unique < cCreeper>();
+		case mtEnderDragon:   return cpp14::make_unique<cEnderDragon>();
+		case mtEnderman:      return cpp14::make_unique<cEnderman>();
+		case mtGhast:         return cpp14::make_unique<cGhast>();
+		case mtGiant:         return cpp14::make_unique<cGiant>();
+		case mtGuardian:      return cpp14::make_unique<cGuardian>();
+		case mtIronGolem:     return cpp14::make_unique<cIronGolem>();
+		case mtMooshroom:     return cpp14::make_unique<cMooshroom>();
+		case mtOcelot:        return cpp14::make_unique<cOcelot>();
+		case mtPig:           return cpp14::make_unique<cPig>();
+		case mtRabbit:        return cpp14::make_unique<cRabbit>();
+		case mtSheep:         return cpp14::make_unique<cSheep>();
+		case mtSilverfish:    return cpp14::make_unique<cSilverfish>();
+		case mtSnowGolem:     return cpp14::make_unique<cSnowGolem>();
+		case mtSpider:        return cpp14::make_unique<cSpider>();
+		case mtSquid:         return cpp14::make_unique<cSquid>();
+		case mtWitch:         return cpp14::make_unique<cWitch>();
+		case mtWither:        return cpp14::make_unique<cWither>();
+		case mtWolf:          return cpp14::make_unique<cWolf>();
+		case mtZombie:        return cpp14::make_unique<cZombie>(false);  // TODO: Infected zombie parameter
+		case mtZombiePigman:  return cpp14::make_unique<cZombiePigman>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
+			return nullptr;
 		}
 	}
-	return toReturn;
 }
 
 
@@ -1206,7 +1201,13 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
-	auto Count = GetRandomProvider().RandInt<char>(static_cast<char>(a_Min), static_cast<char>(a_Max));
+	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
+	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(a_Item)->GetMaxStackSize());
+	while (Count > MaxStackSize)
+	{
+		a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
+		Count -= MaxStackSize;
+	}
 	if (Count > 0)
 	{
 		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);

@@ -129,14 +129,17 @@ end
 -- a_FunctionDoc is a single documentation item for a function, as loaded from ToLua++'s parser
 local function functionDescMatchesDocs(a_FunctionDesc, a_FunctionDoc)
 	-- Check the number of parameters:
-	local numParams
+	local numParams = 0
 	local numOptionalParams = 0
 	if (not(a_FunctionDesc.Params) or (a_FunctionDesc.Params == "")) then
 		numParams = 0
 	else
-		_, numParams = string.gsub(a_FunctionDesc.Params, ",", "")
-		numParams = numParams + 1
-		_, numOptionalParams = string.gsub(a_FunctionDesc.Params, "%b[]", "")
+		for _, Param in pairs(a_FunctionDesc.Params) do
+			numParams = numParams + 1
+			if Param.IsOptional then
+				numOptionalParams = numOptionalParams + 1
+			end
+		end
 	end
 	local numDocParams = #(a_FunctionDoc.Params)
 	if ((numDocParams > numParams) or (numDocParams < numParams - numOptionalParams)) then

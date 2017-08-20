@@ -41,7 +41,6 @@ public:
 		m_ItemCount(0),
 		m_ItemDamage(0),
 		m_CustomName(""),
-		m_Lore(""),
 		m_RepairCost(0),
 		m_FireworkItem(),
 		m_ItemColor()
@@ -56,14 +55,14 @@ public:
 		short a_ItemDamage = 0,
 		const AString & a_Enchantments = "",
 		const AString & a_CustomName = "",
-		const AString & a_Lore = ""
+		const AStringVector & a_LoreTable = {}
 	) :
 		m_ItemType    (a_ItemType),
 		m_ItemCount   (a_ItemCount),
 		m_ItemDamage  (a_ItemDamage),
 		m_Enchantments(a_Enchantments),
 		m_CustomName  (a_CustomName),
-		m_Lore        (a_Lore),
+		m_LoreTable   (a_LoreTable),
 		m_RepairCost  (0),
 		m_FireworkItem(),
 		m_ItemColor()
@@ -106,7 +105,7 @@ public:
 		m_ItemDamage = 0;
 		m_Enchantments.Clear();
 		m_CustomName = "";
-		m_Lore = "";
+		m_LoreTable.clear();
 		m_RepairCost = 0;
 		m_FireworkItem.EmptyData();
 		m_ItemColor.Clear();
@@ -137,7 +136,7 @@ public:
 			(m_ItemDamage == a_Item.m_ItemDamage) &&
 			(m_Enchantments == a_Item.m_Enchantments) &&
 			(m_CustomName == a_Item.m_CustomName) &&
-			(m_Lore == a_Item.m_Lore) &&
+			(m_LoreTable == a_Item.m_LoreTable) &&
 			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem)
 		);
 	}
@@ -151,12 +150,12 @@ public:
 
 	bool IsBothNameAndLoreEmpty(void) const
 	{
-		return (m_CustomName.empty() && m_Lore.empty());
+		return (m_CustomName.empty() && m_LoreTable.empty());
 	}
 
 
 	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
-	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }
+	bool IsLoreEmpty(void) const { return (m_LoreTable.empty()); }
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
 	cItem CopyOne(void) const;
@@ -221,7 +220,12 @@ public:
 	short          m_ItemDamage;
 	cEnchantments  m_Enchantments;
 	AString        m_CustomName;
-	AString        m_Lore;
+
+	// tolua_end
+
+	AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
+
+	// tolua_begin
 
 	int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;

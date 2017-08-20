@@ -12,7 +12,6 @@
 #include "OSSupport/Network.h"
 #include "Defines.h"
 #include "Scoreboard.h"
-#include "Map.h"
 #include "UI/SlotArea.h"
 #include "json/json.h"
 #include "ChunkSender.h"
@@ -34,6 +33,7 @@ class cWindow;
 class cFallingBlock;
 class cCompositeChat;
 class cStatManager;
+class cMap;
 class cClientHandle;
 typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
@@ -417,6 +417,9 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
+
+	// Temporary (#3115-will-fix): maintain temporary ownership of created cPlayer objects while they are in limbo
+	std::unique_ptr<cPlayer> m_PlayerPtr;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.

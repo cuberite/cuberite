@@ -60,11 +60,11 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 				Pos.x, Pos.y, Pos.z, ItemTypeToString(BlockType).c_str(), ItemTypeToString(BlockBelow).c_str()
 			);
 			*/
-			cFallingBlock * FallingBlock = new cFallingBlock(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
-			if (!FallingBlock->Initialize(m_World))
+
+			auto FallingBlock = cpp14::make_unique<cFallingBlock>(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
+			auto FallingBlockPtr = FallingBlock.get();
+			if (!FallingBlockPtr->Initialize(std::move(FallingBlock), m_World))
 			{
-				delete FallingBlock;
-				FallingBlock = nullptr;
 				continue;
 			}
 			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
@@ -101,15 +101,15 @@ bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 
 
 
-void cSandSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
+void cSandSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 {
 	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
-	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
-	if (!IsAllowedBlock(a_Chunk->GetBlock(RelX, a_BlockY, RelZ)))
+	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
+	if (!IsAllowedBlock(a_Chunk->GetBlock(RelX, a_Block.y, RelZ)))
 	{
 		return;
 	}
@@ -118,14 +118,14 @@ void cSandSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 	cSandSimulatorChunkData & ChunkData = a_Chunk->GetSandSimulatorData();
 	for (cSandSimulatorChunkData::iterator itr = ChunkData.begin(); itr != ChunkData.end(); ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
+		if ((itr->x == RelX) && (itr->y == a_Block.y) && (itr->z == RelZ))
 		{
 			return;
 		}
 	}
 
 	m_TotalBlocks += 1;
-	ChunkData.push_back(cCoordWithInt(RelX, a_BlockY, RelZ));
+	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ));
 }
 
 

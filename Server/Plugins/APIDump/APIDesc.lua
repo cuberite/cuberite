@@ -202,7 +202,7 @@ return
 							Type = "string",
 						},
 					},
-					Notes = "Returns the name of the sound that is played when placing the block of this type.",
+					Notes = "(<b>DEPRECATED</b>) Not used by cuberite internally and always returns an empty string.",
 				},
 				GetSpreadLightFalloff =
 				{
@@ -377,16 +377,6 @@ return
 				{
 					Type = "bool",
 					Notes = "Can a piston break this block?",
-				},
-				m_PlaceSound =
-				{
-					Type = "string",
-					Notes = "The name of the sound that is placed when a block is placed.",
-				},
-				m_RequiresSpecialTool =
-				{
-					Type = "bool",
-					Notes = "Does this block require a tool to drop?",
 				},
 				m_SpreadLightFalloff =
 				{
@@ -6717,7 +6707,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							},
 							{
 								Name = "Lore",
-								Type = "string",
+								Type = "table",
 								IsOptional = true,
 							},
 						},
@@ -6971,10 +6961,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					Type = "number",
 					Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants",
 				},
-				m_Lore =
+				m_LoreTable =
 				{
-					Type = "string",
-					Notes = "The lore for an item. Line breaks are represented by the ` character.",
+					Type = "table",
+					Notes = "The lore for an item. Represented as an array table of lines.",
 				},
 				m_RepairCost =
 				{
@@ -8053,6 +8043,17 @@ This class is used by plugins wishing to display a custom window to the player, 
 					},
 					Notes = "Returns the cItemGrid object representing the internal storage in this window",
 				},
+				SetOnClicked =
+				{
+					Params =
+					{
+						{
+							Name = "OnClickedCallback",
+							Type = "function",
+						},
+					},
+					Notes = "Sets the function that the window will call when it is about to process a click from a player. See {{#additionalinfo_1|below}} for the signature of the callback function.",
+				},
 				SetOnClosing =
 				{
 					Params =
@@ -8085,6 +8086,17 @@ This class is used by plugins wishing to display a custom window to the player, 
 					]],
 				},
 				{
+					Header = "OnClicked Callback",
+					Contents = [[
+						This callback, settable via the SetOnClicked() function, will be called when the player clicks a slot in the window. The callback can cancel the click.</p>
+<pre class="prettyprint lang-lua">
+function OnWindowClicked(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
+</pre>
+						<p>
+						The a_Window parameter is the cLuaWindow object representing the window, a_Player is the player who made the click, a_SlotNum is the slot the player clicked, a_ClickAction is the type of click the player made, and a_ClickedItem is the item the player clicked on, if applicable. If the function returns true, the click is cancelled (internally, the server resends the window slots to the player to keep the player in sync).
+					]],
+				},
+				{
 					Header = "OnClosing Callback",
 					Contents = [[
 						This callback, settable via the SetOnClosing() function, will be called when the player tries to close the window, or the window is closed for any other reason (such as a player disconnecting).</p>
@@ -8110,7 +8122,7 @@ function OnWindowSlotChanged(a_Window, a_SlotNum)
 				{
 					Header = "Example",
 					Contents = [[
-						This example is taken from the Debuggers plugin, used to test the API functionality. It opens a window and refuse to close it 3 times. It also logs slot changes to the server console.
+						This example is taken from the Debuggers plugin, used to test the API functionality. It opens a window and refuse to close it 3 times. It also logs slot changes to the server console and prevents shift-clicking in the window.
 <pre class="prettyprint lang-lua">
 -- Callback that refuses to close the window twice, then allows:
 local Attempt = 1;
@@ -8125,10 +8137,18 @@ local OnSlotChanged = function(Window, SlotNum)
 	LOG("Window \"" .. Window:GetWindowTitle() .. "\" slot " .. SlotNum .. " changed.");
 end
 
+-- Prevent shift-clicking:
+local OnClicked = function(Window, ClickingPlayer, SlotNum, ClickAction, ClickedItem)
+	if ClickAction == caShiftLeftClick then
+		return true
+	end
+end
+
 -- Set window contents:
 -- a_Player is a cPlayer object received from the outside of this code fragment
 local Window = cLuaWindow(cWindow.wtHopper, 3, 3, "TestWnd");
 Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
+Window:SetOnClicked(OnClicked);
 Window:SetOnClosing(OnClosing);
 Window:SetOnSlotChanged(OnSlotChanged);
 
