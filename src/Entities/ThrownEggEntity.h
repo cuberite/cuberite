@@ -33,12 +33,12 @@ public:
 protected:
 
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
-	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
+	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	// Randomly decides whether to spawn a chicken where the egg lands.
-	void TrySpawnChicken(const Vector3d & a_HitPos);
+	void TrySpawnChicken(Vector3d a_HitPos);
 
 private:
 

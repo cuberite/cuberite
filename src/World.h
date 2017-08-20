@@ -455,7 +455,7 @@ public:
 
 	/** Spawns a boat at the given coordinates.
 	Returns the UniqueID of the spawned boat, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material);
+	UInt32 SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material);
 
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
@@ -464,7 +464,7 @@ public:
 	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration.
 	Initial velocity is given based on the relative coefficient provided.
 	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
+	UInt32 SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
 
 	// tolua_end
 

@@ -16,7 +16,7 @@ public:
 		return (a_Block == E_BLOCK_REDSTONE_TORCH_ON);
 	}
 
-	inline static Vector3i GetOffsetAttachedTo(const Vector3i & a_Position, NIBBLETYPE a_Meta)
+	inline static Vector3i GetOffsetAttachedTo(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
 		{
@@ -33,7 +33,7 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		if (
 			IsOn(a_BlockType) &&
@@ -46,12 +46,12 @@ public:
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		return IsOn(a_BlockType) ? 15 : 0;
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating torchy the redstone torch (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -86,7 +86,7 @@ public:
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_BlockType);

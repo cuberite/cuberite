@@ -60,8 +60,8 @@ protected:
 
 
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
-	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
+	virtual void OnHitEntity    (cEntity & a_EntityHit, Vector3d a_HitPos) override;
 	virtual void Tick           (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
 	{
 		if (m_DestroyTimer > 0)
@@ -81,7 +81,7 @@ protected:
 
 	/** Splashes the potion, fires its particle effects and sounds
 	@param a_HitPos     The position where the potion will splash */
-	void Splash(const Vector3d & a_HitPos);
+	void Splash(Vector3d a_HitPos);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 

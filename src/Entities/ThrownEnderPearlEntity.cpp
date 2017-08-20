@@ -19,7 +19,7 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X
 
 
 
-void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	// TODO: Tweak a_HitPos based on block face.
 	TeleportCreator(a_HitPos);
@@ -31,7 +31,7 @@ void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockF
 
 
 
-void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	int TotalDamage = 0;
 	// TODO: If entity is Ender Crystal, destroy it
@@ -67,7 +67,7 @@ void cThrownEnderPearlEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Ch
 
 
 
-void cThrownEnderPearlEntity::TeleportCreator(const Vector3d & a_HitPos)
+void cThrownEnderPearlEntity::TeleportCreator(Vector3d a_HitPos)
 {
 	if (m_CreatorData.m_Name.empty())
 	{
