@@ -3655,6 +3655,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is an item frame.",
 				},
+				IsLeashKnot =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is a leash knot.",
+				},
 				IsMinecart =
 				{
 					Returns =
@@ -4327,7 +4337,11 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etItemFrame =
 				{
-					Notes = "",
+					Notes = "The entity is an item frame",
+				},
+				etLeashKnot =
+				{
+					Notes = "The entity is a leash knot",
 				},
 				etMinecart =
 				{
@@ -8620,6 +8634,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+				CanBeLeashed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the mob can be leashed.",
+				},
 				FamilyFromType =
 				{
 					IsStatic = true,
@@ -8658,6 +8682,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Gets the custom name of the monster. If no custom name is set, the function returns an empty string.",
+				},
+				GetLeashedTo =
+				{
+					Returns =
+					{
+						{
+							Name = "LeashedTo",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Returns the entity to where this mob is leashed, returns nil if it's not leashed",
 				},
 				GetMobFamily =
 				{
@@ -8739,6 +8774,27 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
 				},
+				IsLeashed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the monster is leashed to an entity.",
+				},
+				LeashTo =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						}
+					},
+					Notes = "Leash the monster to an entity.",
+				},				
 				MobTypeToString =
 				{
 					IsStatic = true,
@@ -8797,6 +8853,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the age of the monster",
 				},
+				SetCanBeLeashed =
+				{
+					Params =
+					{
+						{
+							Name = "CanBeLeashed",
+							Type = "boolean",
+						}
+					},
+					Notes = "Sets whether the mob can be leashed, for extensibility in plugins"
+				},
 				SetCustomName =
 				{
 					Params =
@@ -8848,6 +8915,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the mob type ({{Globals#eMonsterType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
+				},
+				Unleash =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldDropLeashPickup",
+							Type = "boolean",
+						},
+					},
+					Notes = "Unleash the monster.",
 				},
 			},
 			Constants =
@@ -15534,6 +15612,10 @@ end
 				{
 					Notes = "The itemtype for lead"
 				},
+				E_ITEM_LEASH =
+				{
+					Notes = "The itemtype for lead (E_ITEM_LEAD synonym)"
+				},				
 				E_ITEM_LEATHER =
 				{
 					Notes = "The itemtype for leather"

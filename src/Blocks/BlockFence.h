@@ -3,7 +3,10 @@
 
 #include "BlockHandler.h"
 #include "../BoundingBox.h"
-
+#include "../EffectID.h"
+#include "Entities/LeashKnot.h"
+#include "BoundingBox.h"
+#include "../Mobs/PassiveMonster.h"
 
 
 
@@ -72,6 +75,63 @@ public:
 
 		return PlacementBox;
 	}
+
+	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	{
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(*a_Player.GetWorld(), { a_BlockX, a_BlockY, a_BlockZ });
+		auto KnotAlreadyExists = (LeashKnot != nullptr);
+
+		if (KnotAlreadyExists)
+		{
+			// Check leashed nearby mobs to leash them to the knot
+			LeashKnot->TiePlayersLeashedMobs(a_Player, KnotAlreadyExists);
+		}
+		// New knot? needs to init and produce sound effect
+		else
+		{
+			auto NewLeashKnot = cpp14::make_unique<cLeashKnot>(a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto NewLeashKnotPtr = NewLeashKnot.get();
+
+			NewLeashKnotPtr->TiePlayersLeashedMobs(a_Player, KnotAlreadyExists);
+
+			// Only put the knot in the world if any mob has been leashed to
+			if (NewLeashKnotPtr->HasAnyMobLeashed())
+			{
+				if (!NewLeashKnotPtr->Initialize(std::move(NewLeashKnot), *a_Player.GetWorld()))
+				{
+					return false;
+				}
+				a_Player.GetWorld()->BroadcastSoundEffect("entity.leashknot.place", a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), 1, 1);
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	{
+		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+	}
+
+	virtual bool IsUseable(void) override
+	{
+		return true;
+	}
+
+	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(a_WorldInterface, { a_BlockX, a_BlockY, a_BlockZ });
+
+		if (LeashKnot != nullptr)
+		{
+			LeashKnot->SetShouldSelfDestroy();
+		}
+	}
+
 };
 
 
