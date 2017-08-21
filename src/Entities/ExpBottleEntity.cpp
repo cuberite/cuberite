@@ -8,7 +8,7 @@
 
 
 
-cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
+cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, Vector3d a_Speed) :
 	super(pkExpBottle, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 {
 	SetSpeed(a_Speed);
@@ -18,7 +18,7 @@ cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, 
 
 
 
-cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, Vector3d a_Pos, const Vector3d & a_Speed) :
+cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed) :
 	super(pkExpBottle, a_Creator, a_Pos.x, a_Pos.y, a_Pos.z, 0.25, 0.25)
 {
 	SetSpeed(a_Speed);

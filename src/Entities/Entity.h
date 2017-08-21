@@ -232,7 +232,7 @@ public:
 	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 
 	/** Sets the speed of the entity, measured in m / sec */
-	void SetSpeed(const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
+	void SetSpeed(Vector3d a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
 
 	/** Sets the speed in the X axis, leaving the other speed components intact. Measured in m / sec. */
 	void SetSpeedX(double a_SpeedX);
