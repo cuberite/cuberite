@@ -15,17 +15,17 @@ Windows
 
 We use Microsoft Visual Studio for Windows compilation. It is possible to use other toolchains, but we don't test against them and they aren't supported. Visual Studio 2013 Express for Desktop is being actively used for development.
 
-You can find download links for VS2013 Express here: https://go.microsoft.com/?linkid=9832280
+You can find download links for VS2013 Express [here][1].
 
-Next, you need to download and install [CMake][1]. You should download a full installation package, so that the installer will set everything up for you (especially the paths).
+Next, you need to download and install [CMake][2]. You should download a full installation package, so that the installer will set everything up for you (especially the paths).
 
 To contribute your changes to the source back to the repository, you need a Git client. Options are:
 
- - [Git for Windows][2]
- - [GitHub Desktop][3]
- - [TortoiseGit][4]
+ - [Git for Windows][3]
+ - [GitHub Desktop][4]
+ - [TortoiseGit][5]
 
-Alternatively, if you want only to compile the source, without contributing, you can [download the sources in a ZIP file directly from GitHub][5].
+Alternatively, if you want only to compile the source, without contributing, you can [download the sources in a ZIP file directly from GitHub][6].
 
 If you're using Git to get the source, use the following command to set up the local workspace correctly:
 
@@ -50,11 +50,11 @@ In order to tinker with the code, you'll more than likely need to use the debugg
 macOS
 -----
 
- - Install git from its [website][6] or homebrew: `brew install git`.
+ - Install git from its [website][7] or homebrew: `brew install git`.
 
- - Install Xcode (commandline tools are recommended) from the App Store or [the website][7].
+ - Install Xcode (commandline tools are recommended) from the App Store or [the website][8].
 
- - Install CMake from its [website][8] or homebrew: `brew install cmake`.
+ - Install CMake from its [website][9] or homebrew: `brew install cmake`.
 
 ### Getting the Source
 
@@ -103,10 +103,10 @@ Android
 
 It is required that users obtain the latest copies of:
 
- - [The Android Native Development Kit (NDK)][9]
- - [Lua (download a binary)][10]
+ - [The Android Native Development Kit (NDK)][10]
+ - [Lua (download a binary)][11]
 
-Windows users may optionally install the [Ninja build system][11] for improved build speeds.
+Windows users may optionally install the [Ninja build system][12] for improved build speeds.
 
 ### Getting the Source
 
@@ -248,14 +248,15 @@ Forces the build to use 32 bit builds on *nix systems. Define as ON to enable. D
 ###### NO_NATIVE_OPTIMIZATION
 Disables optimizations for the build host. This is important when building on a different machine from the one you will run Cuberite on as the build machine may support instructions the final machine does not. This flag only has any effect on linux. Define as ON to enable. Define as OFF to disable.
 
-[1]: https://cmake.org/download/
-[2]: https://git-for-windows.github.io/
-[3]: https://desktop.github.com/
-[4]: https://tortoisegit.org/
-[5]: https://github.com/cuberite/cuberite/archive/master.zip
-[6]: https://git-scm.com/
-[7]: https://developer.apple.com/downloads
-[8]: https://cmake.org/
-[9]: https://developer.android.com/ndk/downloads/index.html
-[10]: https://www.lua.org/download.html
-[11]: https://github.com/ninja-build/ninja/releases
+[1]: https://www.visualstudio.com/downloads/
+[2]: https://cmake.org/download/
+[3]: https://git-for-windows.github.io/
+[4]: https://desktop.github.com/
+[5]: https://tortoisegit.org/
+[6]: https://github.com/cuberite/cuberite/archive/master.zip
+[7]: https://git-scm.com/
+[8]: https://developer.apple.com/downloads
+[9]: https://cmake.org/
+[10]: https://developer.android.com/ndk/downloads/index.html
+[11]: https://www.lua.org/download.html
+[12]: https://github.com/ninja-build/ninja/releases
