@@ -122,7 +122,7 @@ public:
 		return true;
 	}
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		auto LeashKnot = cLeashKnot::FindKnotAtPos(a_WorldInterface, { a_BlockX, a_BlockY, a_BlockZ });
 
