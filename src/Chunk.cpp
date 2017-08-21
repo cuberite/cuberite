@@ -2683,6 +2683,28 @@ void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_V
 
 
 
+void cChunk::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	for (auto ClientHandle : m_LoadedByClient)
+	{
+		ClientHandle->SendLeashEntity(a_Entity, a_EntityLeashedTo);
+	}
+}
+
+
+
+
+void cChunk::BroadcastUnleashEntity(const cEntity & a_Entity)
+{
+	for (auto ClientHandle : m_LoadedByClient)
+	{
+		ClientHandle->SendUnleashEntity(a_Entity);
+	}
+}
+
+
+
+
 
 void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
