@@ -159,6 +159,15 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	// Spawn the entity on the clients:
 	a_EntityWorld.BroadcastSpawnEntity(*this);
 
+	// If has any mob leashed broadcast every leashed entity to this
+	if (HasAnyMobLeashed())
+	{
+		for (auto LeashedMob : m_LeashedMobs)
+		{
+			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
+
 	return true;
 }
 
@@ -217,6 +226,12 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	ASSERT(IsTicking());
 	ASSERT(GetParentChunk() != nullptr);
 	SetIsTicking(false);
+
+	// Unleash leashed mobs
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(true, true);
+	}
 
 	if (a_ShouldBroadcast)
 	{
@@ -457,10 +472,14 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtSilverfish:
 					{
 						a_TDI.RawDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
-						// TODO: Add slowness effect
+						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
+						// increasing the max duration by 0.5 seconds each level
+						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
+						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
+						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
-					};
+					}
 					default: break;
 				}
 			}
@@ -489,7 +508,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtMagmaCube:
 					{
 						break;
-					};
+					}
 					default: StartBurning(BurnTicks * 20);
 				}
 			}
@@ -2195,3 +2214,24 @@ void cEntity::SetPosition(const Vector3d & a_Position)
 
 
 
+
+void cEntity::AddLeashedMob(cMonster * a_Monster)
+{
+	// Not there already
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) == m_LeashedMobs.end());
+
+	m_LeashedMobs.push_back(a_Monster);
+}
+
+
+
+
+void cEntity::RemoveLeashedMob(cMonster * a_Monster)
+{
+	ASSERT(a_Monster->GetLeashedTo() == this);
+
+	// Must exists
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
+
+	m_LeashedMobs.remove(a_Monster);
+}

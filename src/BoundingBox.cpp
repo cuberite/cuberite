@@ -39,6 +39,16 @@ cBoundingBox::cBoundingBox(Vector3d a_Pos, double a_Radius, double a_Height) :
 
 
 
+cBoundingBox::cBoundingBox(Vector3d a_Pos, double a_Radius, double a_Height, double a_VerticalOffset) :
+	m_Min(a_Pos.x - a_Radius, a_Pos.y + a_VerticalOffset, a_Pos.z - a_Radius),
+	m_Max(a_Pos.x + a_Radius, a_Pos.y + a_VerticalOffset + a_Height, a_Pos.z + a_Radius)
+{
+}
+
+
+
+
+
 cBoundingBox::cBoundingBox(Vector3d a_Pos, double a_CubeLength) :
 	m_Min(a_Pos.x - a_CubeLength / 2, a_Pos.y - a_CubeLength / 2, a_Pos.z - a_CubeLength / 2),
 	m_Max(a_Pos.x + a_CubeLength / 2, a_Pos.y + a_CubeLength / 2, a_Pos.z + a_CubeLength / 2)

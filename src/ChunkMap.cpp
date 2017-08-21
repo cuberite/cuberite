@@ -275,6 +275,35 @@ void cChunkMap::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & 
 
 
 
+void cChunkMap::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	cCSLock Lock(m_CSChunks);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkZ());
+	if (Chunk == nullptr)
+	{
+		return;
+	}
+	Chunk->BroadcastLeashEntity(a_Entity, a_EntityLeashedTo);
+}
+
+
+
+
+
+void cChunkMap::BroadcastUnleashEntity(const cEntity & a_Entity)
+{
+	cCSLock Lock(m_CSChunks);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkZ());
+	if (Chunk == nullptr)
+	{
+		return;
+	}
+	Chunk->BroadcastUnleashEntity(a_Entity);
+}
+
+
+
+
 
 void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {

@@ -916,11 +916,17 @@ void cChunk::ApplyWeatherToTop()
 	int X = m_World->GetTickRandomNumber(15);
 	int Z = m_World->GetTickRandomNumber(15);
 
-	// TODO: Check light levels, don't snow over when the BlockLight is higher than (7?)
 	int Height = GetHeight(X, Z);
 
 	if (GetSnowStartHeight(GetBiomeAt(X, Z)) > Height)
 	{
+		return;
+	}
+
+	if (GetBlockLight(X, Height, Z) > 10)
+	{
+		// Snow only generates on blocks with a block light level of 10 or less.
+		// Ref: https://minecraft.gamepedia.com/Snow_(layer)#Snowfall
 		return;
 	}
 
@@ -2678,6 +2684,28 @@ void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_V
 	{
 		ClientHandle->SendAttachEntity(a_Entity, a_Vehicle);
 	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+void cChunk::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	for (auto ClientHandle : m_LoadedByClient)
+	{
+		ClientHandle->SendLeashEntity(a_Entity, a_EntityLeashedTo);
+	}
+}
+
+
+
+
+void cChunk::BroadcastUnleashEntity(const cEntity & a_Entity)
+{
+	for (auto ClientHandle : m_LoadedByClient)
+	{
+		ClientHandle->SendUnleashEntity(a_Entity);
+	}
 }
 
 
