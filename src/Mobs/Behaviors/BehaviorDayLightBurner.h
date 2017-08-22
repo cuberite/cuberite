@@ -1,16 +1,20 @@
 #pragma once
 
+// mobTodo I just need vector3d
+#include "../../World.h"
+
 // fwds
 class cMonster;
 class cEntity;
 class cChunk;
-class Vector3d;
 
 class cBehaviorDayLightBurner
 {
+public:
     cBehaviorDayLightBurner(cMonster * a_Parent);
 
-    bool WouldBurnAt(Vector3d & a_Location, cChunk & a_Chunk);
+    void Tick(cChunk & a_Chunk, bool WouldBurn);
+    bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
 
     // Functions our host Monster should invoke:
     void Tick();

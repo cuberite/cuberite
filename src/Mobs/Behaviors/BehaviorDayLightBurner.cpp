@@ -2,9 +2,10 @@
 
 #include "BehaviorDayLightBurner.h"
 #include "../Monster.h"
-#include "../../World.h"
 #include "../../Entities/Player.h"
 #include "../../Entities/Entity.h"
+
+#include "../../Chunk.h"
 
 cBehaviorDayLightBurner::cBehaviorDayLightBurner(cMonster * a_Parent) : m_Parent(a_Parent)
 {
@@ -13,7 +14,7 @@ cBehaviorDayLightBurner::cBehaviorDayLightBurner(cMonster * a_Parent) : m_Parent
 
 void cBehaviorDayLightBurner::Tick(cChunk & a_Chunk, bool WouldBurn)
 {
-    int RelY = POSY_TOINT;
+    int RelY = static_cast<int>(m_Parent->GetPosY());
     if ((RelY < 0) || (RelY >= cChunkDef::Height))
     {
         // Outside the world
@@ -21,21 +22,21 @@ void cBehaviorDayLightBurner::Tick(cChunk & a_Chunk, bool WouldBurn)
     }
     if (!a_Chunk.IsLightValid())
     {
-        m_World->QueueLightChunk(GetChunkX(), GetChunkZ());
+        m_Parent->GetWorld()->QueueLightChunk(m_Parent->GetChunkX(), m_Parent->GetChunkZ());
         return;
     }
 
-    if (!IsOnFire() && WouldBurn)
+    if (!m_Parent->IsOnFire() && WouldBurn)
     {
         // Burn for 100 ticks, then decide again
-        StartBurning(100);
+        m_Parent->StartBurning(100);
     }
 }
 
 
 
 
-bool cBehaviorDayLightBurner::WouldBurnAt(Vector3d & a_Location, cChunk & a_Chunk)
+bool cBehaviorDayLightBurner::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 {
     int RelY = FloorC(a_Location.y);
     if (RelY <= 0)
@@ -57,11 +58,11 @@ bool cBehaviorDayLightBurner::WouldBurnAt(Vector3d & a_Location, cChunk & a_Chun
 
     if (
         (Chunk->GetBlock(Rel.x, Rel.y, Rel.z) != E_BLOCK_SOULSAND) &&  // Not on soulsand
-        (GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
-        GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
+        (m_Parent->GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
+        m_Parent->GetWorld()->IsWeatherSunnyAt(static_cast<int>(m_Parent->GetPosX()), static_cast<int>(m_Parent->GetPosZ()))        // Not raining
     )
     {
-        int MobHeight = static_cast<int>(a_Location.y) + round(GetHeight()) - 1;  // The height of the mob head
+        int MobHeight = static_cast<int>(a_Location.y) + static_cast<int>(round(m_Parent->GetHeight())) - 1;  // The height of the mob head
         if (MobHeight >= cChunkDef::Height)
         {
             return true;

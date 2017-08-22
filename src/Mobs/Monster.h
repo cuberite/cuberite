@@ -17,6 +17,7 @@ class cBehaviorBreeder;
 class cBehaviorChaser;
 class cBehaviorStriker;
 class cBehaviorWanderer;
+class cBehaviorDayLightBurner;
 
 // tolua_begin
 class cMonster :
@@ -225,7 +226,7 @@ public:
     virtual cBehaviorChaser * GetBehaviorChaser();
     virtual cBehaviorStriker * GetBehaviorStriker();
     virtual cBehaviorWanderer * GetBehaviorWanderer();
-    virtual cBehaviorWanderer * GetBehaviorDaylightBurner();
+    virtual cBehaviorDayLightBurner * GetBehaviorDayLightBurner();
 
     // Polymorphic behavior functions ("Skin-specific")
     virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);
@@ -311,8 +312,6 @@ public:
     bool m_CanPickUpLoot;
     int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
-    void HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn);
-    bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
     double m_RelativeWalkSpeed;
 
     int m_Age;

@@ -19,7 +19,6 @@ cBehaviorItemFollower::cBehaviorItemFollower(cMonster * a_Parent) :
 
 bool cBehaviorItemFollower::ActiveTick()
 {
-    cWorld * World = m_Parent->GetWorld();
     cItems FollowedItems;
     m_Parent->GetFollowedItems(FollowedItems);
     if (FollowedItems.Size() > 0)
