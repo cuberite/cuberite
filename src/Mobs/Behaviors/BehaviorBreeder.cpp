@@ -14,7 +14,7 @@ cBehaviorBreeder::cBehaviorBreeder(cMonster * a_Parent) :
     m_LovePartner(nullptr),
     m_LoveTimer(0),
     m_LoveCooldown(0),
-    m_MatingTimer(0),
+    m_MatingTimer(0)
 {
     m_Parent = a_Parent;
     ASSERT(m_Parent != nullptr);
@@ -62,7 +62,7 @@ bool cBehaviorBreeder::ActiveTick()
             }
 
             cFastRandom Random;
-            World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, 1 + Random.NextInt(6));
+            World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, 1 + (Random.RandInt() % 6));
 
             m_LovePartner->GetBehaviorBreeder()->ResetLoveMode();
             ResetLoveMode();
@@ -169,7 +169,9 @@ void cBehaviorBreeder::OnRightClicked(cPlayer & a_Player)
     if ((m_LoveCooldown == 0) && !IsInLove() && !m_Parent->IsBaby())
     {
         short HeldItem = a_Player.GetEquippedItem().m_ItemType;
-        if (m_BreedingItems.ContainsType(HeldItem))
+        cItems BreedingItems;
+        m_Parent->GetFollowedItems(BreedingItems);
+        if (BreedingItems.ContainsType(HeldItem))
         {
             if (!a_Player.IsGameModeCreative())
             {

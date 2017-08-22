@@ -107,7 +107,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
     , m_DropChanceBoots(0.085f)
     , m_CanPickUpLoot(true)
     , m_TicksSinceLastDamaged(100)
-    , m_BurnsInDaylight(false)
     , m_RelativeWalkSpeed(1)
     , m_Age(1)
     , m_AgingTimer(20 * 60 * 20)  // about 20 minutes
@@ -349,7 +348,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
                     2. I was not hurt by a player recently.
                     Then STOP. */
                     if (
-                        m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
+                        (GetBehaviorDaylightBurner() != nullptr) && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
                         WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
                         !WouldBurnAt(GetPosition(), *Chunk)
                     )
@@ -1178,7 +1177,16 @@ cBehaviorWanderer * cMonster::GetBehaviorWanderer()
 
 
 
-void cMonster::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2)
+cBehaviorWanderer * cMonster::GetBehaviorDaylightBurner()
+{
+    return nullptr;
+}
+
+
+
+
+
+void cMonster::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 {
     UNUSED(a_Parent1);
     UNUSED(a_Parent2);
@@ -1408,36 +1416,6 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingL
         {
             a_Drops.push_back(GetEquippedWeapon());
         }
-    }
-}
-
-
-
-
-
-void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
-{
-    if (!m_BurnsInDaylight)
-    {
-        return;
-    }
-
-    int RelY = POSY_TOINT;
-    if ((RelY < 0) || (RelY >= cChunkDef::Height))
-    {
-        // Outside the world
-        return;
-    }
-    if (!a_Chunk.IsLightValid())
-    {
-        m_World->QueueLightChunk(GetChunkX(), GetChunkZ());
-        return;
-    }
-
-    if (!IsOnFire() && WouldBurn)
-    {
-        // Burn for 100 ticks, then decide again
-        StartBurning(100);
     }
 }
 

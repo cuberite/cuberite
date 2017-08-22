@@ -9,7 +9,7 @@ class cBehaviorAggressive
 {
 
 public:
-    cBehaviorAggressive(cMonster * a_Parent, int a_MinimumLight);
+    cBehaviorAggressive(cMonster * a_Parent);
 
     // cBehaviorAggressive(cMonster * a_Parent, bool a_HatesPlayer);
     // TODO agression toward specific players, and specific mobtypes, etc

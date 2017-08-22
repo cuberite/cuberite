@@ -145,9 +145,6 @@ public:
     void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
     void ResetAttackCooldown();
 
-    /** Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick */
-    void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
-
     double GetRelativeWalkSpeed(void) const { return m_RelativeWalkSpeed; }  // tolua_export
     void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
 
@@ -228,9 +225,10 @@ public:
     virtual cBehaviorChaser * GetBehaviorChaser();
     virtual cBehaviorStriker * GetBehaviorStriker();
     virtual cBehaviorWanderer * GetBehaviorWanderer();
+    virtual cBehaviorWanderer * GetBehaviorDaylightBurner();
 
     // Polymorphic behavior functions ("Skin-specific")
-    virtual void InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2);
+    virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);
     virtual void GetFollowedItems(cItems & a_Items);
     virtual void GetBreedingItems(cItems & a_Items);
 
@@ -315,7 +313,6 @@ public:
 
     void HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn);
     bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
-    bool m_BurnsInDaylight;
     double m_RelativeWalkSpeed;
 
     int m_Age;

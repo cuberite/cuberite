@@ -346,7 +346,7 @@ if (NOT MSVC)
 	target_link_libraries(${CMAKE_PROJECT_NAME}
 		OSSupport HTTPServer Bindings Items Blocks Noise
 		Protocol Generating WorldStorage
-		Mobs Entities Simulator IncrementalRedstoneSimulator
+		Mobs Behaviors Entities Simulator IncrementalRedstoneSimulator
 		BlockEntities UI PolarSSL++
 	)
 endif ()
