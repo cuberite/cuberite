@@ -201,7 +201,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 			} Callback(this);
 
-			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), Callback);
+			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), Callback);
 		}
 
 		m_LoveTimer--;

@@ -1252,6 +1252,30 @@ void cProtocol_1_12::SendScoreUpdate(const AString & a_Objective, const AString 
 
 
 
+void cProtocol_1_12::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, 0x3c);  // Set Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt32(a_EntityLeashedTo.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol_1_12::SendUnleashEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, 0x3c);  // Set Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEInt32(-1);  // Unleash a_Entity
+}
+
+
+
+
+
 void cProtocol_1_12::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:

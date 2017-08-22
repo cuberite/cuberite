@@ -638,6 +638,34 @@ void cProtocol_1_8_0::SendTeam(const cTeam & a_Team, Byte a_Mode)
 
 
 
+void cProtocol_1_8_0::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt32(a_EntityLeashedTo.GetUniqueID());
+	Pkt.WriteBool(true);
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendUnleashEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEInt32(-1);
+	Pkt.WriteBool(true);
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:

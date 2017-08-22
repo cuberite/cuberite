@@ -27,16 +27,23 @@ template <typename T> inline bool IsAllValue(const T * a_Array, size_t a_NumElem
 
 
 
-cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool) :
-#if __cplusplus < 201103L
-	// auto_ptr style interface for memory management
-	m_IsOwner(true),
-#endif
+cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool):
+	m_Sections(),
 	m_Pool(a_Pool)
+{
+}
+
+
+
+
+
+cChunkData::cChunkData(cChunkData && a_Other):
+	m_Pool(a_Other.m_Pool)
 {
 	for (size_t i = 0; i < NumSections; i++)
 	{
-		m_Sections[i] = nullptr;
+		m_Sections[i] = a_Other.m_Sections[i];
+		a_Other.m_Sections[i] = nullptr;
 	}
 }
 
@@ -46,17 +53,29 @@ cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool) :
 
 cChunkData::~cChunkData()
 {
-	#if __cplusplus < 201103L
-		// auto_ptr style interface for memory management
-		if (!m_IsOwner)
-		{
-			return;
-		}
-	#endif
-	for (size_t i = 0; i < NumSections; i++)
+	Clear();
+}
+
+
+
+
+
+void cChunkData::Assign(const cChunkData & a_Other)
+{
+	// If assigning to self, no-op
+	if (&a_Other == this)
 	{
-		Free(m_Sections[i]);
-		m_Sections[i] = nullptr;
+		return;
+	}
+
+	Clear();
+	for (size_t i = 0; i < NumSections; ++i)
+	{
+		if (a_Other.m_Sections[i] != nullptr)
+		{
+			m_Sections[i] = Allocate();
+			*m_Sections[i] = *a_Other.m_Sections[i];
+		}
 	}
 }
 
@@ -64,85 +83,28 @@ cChunkData::~cChunkData()
 
 
 
-#if __cplusplus < 201103L
-	// auto_ptr style interface for memory management
-	cChunkData::cChunkData(const cChunkData & a_Other) :
-		m_IsOwner(true),
-		m_Pool(a_Other.m_Pool)
+void cChunkData::Assign(cChunkData && a_Other)
+{
+	if (&a_Other == this)
 	{
-		// Move contents and ownership from a_Other to this, pointer-wise:
-		for (size_t i = 0; i < NumSections; i++)
-		{
-			m_Sections[i] = a_Other.m_Sections[i];
-		}
-		a_Other.m_IsOwner = false;
+		return;
 	}
 
-
-
-
-
-	cChunkData & cChunkData::operator =(const cChunkData & a_Other)
+	if (&m_Pool != &a_Other.m_Pool)
 	{
-		// If assigning to self, no-op
-		if (&a_Other == this)
-		{
-			return *this;
-		}
-
-		// Free any currently held contents:
-		if (m_IsOwner)
-		{
-			for (size_t i = 0; i < NumSections; i++)
-			{
-				Free(m_Sections[i]);
-				m_Sections[i] = nullptr;
-			}
-		}
-
-		// Move contents and ownership from a_Other to this, pointer-wise:
-		m_IsOwner = true;
-		for (size_t i = 0; i < NumSections; i++)
-		{
-			m_Sections[i] = a_Other.m_Sections[i];
-		}
-		a_Other.m_IsOwner = false;
-		ASSERT(&m_Pool == &a_Other.m_Pool);
-		return *this;
+		// Cannot transfer the memory, do a copy instead
+		const cChunkData & CopyOther = a_Other;
+		Assign(CopyOther);
+		return;
 	}
 
-#else
-
-	// unique_ptr style interface for memory management
-	cChunkData::cChunkData(cChunkData && other) :
-	m_Pool(other.m_Pool)
+	Clear();
+	for (size_t i = 0; i < NumSections; i++)
 	{
-		for (size_t i = 0; i < NumSections; i++)
-		{
-			m_Sections[i] = other.m_Sections[i];
-			other.m_Sections[i] = nullptr;
-		}
+		m_Sections[i] = a_Other.m_Sections[i];
+		a_Other.m_Sections[i] = nullptr;
 	}
-
-
-
-
-
-	cChunkData & cChunkData::operator =(cChunkData && other)
-	{
-		if (&other != this)
-		{
-			ASSERT(&m_Pool == &other.m_Pool);
-			for (size_t i = 0; i < NumSections; i++)
-			{
-				Free(m_Sections[i]);
-				m_Sections[i] = other.m_Sections[i];
-				other.m_Sections[i] = nullptr;
-			}
-		}
-		return *this;
-	}
-#endif
+}
 
 
 
@@ -325,18 +287,45 @@ NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 
 
 
-cChunkData cChunkData::Copy(void) const
+const cChunkData::sChunkSection * cChunkData::GetSection(size_t a_SectionNum) const
 {
-	cChunkData copy(m_Pool);
-	for (size_t i = 0; i < NumSections; i++)
+	if (a_SectionNum < NumSections)
+	{
+		return m_Sections[a_SectionNum];
+	}
+	ASSERT(!"cChunkData::GetSection: section index out of range");
+	return nullptr;
+}
+
+
+
+
+
+UInt16 cChunkData::GetSectionBitmask() const
+{
+	static_assert(NumSections <= 16U, "cChunkData::GetSectionBitmask needs a bigger data type");
+	UInt16 Res = 0U;
+	for (size_t i = 0U; i < NumSections; ++i)
+	{
+		Res |= ((m_Sections[i] != nullptr) << i);
+	}
+	return Res;
+}
+
+
+
+
+
+void cChunkData::Clear()
+{
+	for (size_t i = 0; i < NumSections; ++i)
 	{
 		if (m_Sections[i] != nullptr)
 		{
-			copy.m_Sections[i] = copy.Allocate();
-			*copy.m_Sections[i] = *m_Sections[i];
+			Free(m_Sections[i]);
+			m_Sections[i] = nullptr;
 		}
 	}
-	return copy;
 }
 
 
@@ -563,6 +552,23 @@ void cChunkData::SetSkyLight(const NIBBLETYPE * a_Src)
 		memset(m_Sections[i]->m_BlockMetas, 0x00, sizeof(m_Sections[i]->m_BlockMetas));
 		memset(m_Sections[i]->m_BlockLight, 0x00, sizeof(m_Sections[i]->m_BlockLight));
 	}  // for i - m_Sections[]
+}
+
+
+
+
+
+UInt32 cChunkData::NumPresentSections() const
+{
+	UInt32 Ret = 0U;
+	for (size_t i = 0; i < NumSections; i++)
+	{
+		if (m_Sections[i] != nullptr)
+		{
+			++Ret;
+		}
+	}
+	return Ret;
 }
 
 

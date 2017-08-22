@@ -2246,6 +2246,24 @@ void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a
 
 
 
+void cClientHandle::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	m_Protocol->SendLeashEntity(a_Entity, a_EntityLeashedTo);
+}
+
+
+
+
+
+void cClientHandle::SendUnleashEntity(const cEntity & a_Entity)
+{
+	m_Protocol->SendUnleashEntity(a_Entity);
+}
+
+
+
+
+
 void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
 	m_Protocol->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType);

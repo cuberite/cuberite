@@ -2503,6 +2503,24 @@ void cWorld::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_P
 
 
 
+void cWorld::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	m_ChunkMap->BroadcastLeashEntity(a_Entity, a_EntityLeashedTo);
+}
+
+
+
+
+
+void cWorld::BroadcastUnleashEntity(const cEntity & a_Entity)
+{
+	m_ChunkMap->BroadcastUnleashEntity(a_Entity);
+}
+
+
+
+
+
 void cWorld::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration, a_Exclude);

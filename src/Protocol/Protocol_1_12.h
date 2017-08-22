@@ -48,6 +48,7 @@ public:
 	virtual void SendExperience(void) override;
 	virtual void SendHealth(void) override;
 	virtual void SendHideTitle(void) override;
+	virtual void SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendPlayerMaxSpeed(void) override;
 	virtual void SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID) override;
@@ -64,6 +65,7 @@ public:
 	virtual void SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
 	virtual void SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
+	virtual void SendUnleashEntity(const cEntity & a_Entity) override;
 protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer);

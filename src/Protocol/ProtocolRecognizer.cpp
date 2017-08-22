@@ -468,6 +468,26 @@ void cProtocolRecognizer::SendKeepAlive(UInt32 a_PingID)
 
 
 
+void cProtocolRecognizer::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendLeashEntity(a_Entity, a_EntityLeashedTo);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendUnleashEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendUnleashEntity(a_Entity);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	ASSERT(m_Protocol != nullptr);
