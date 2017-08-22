@@ -11,6 +11,7 @@ class cClientHandle;
 
 
 //Behavior fwds
+class cPassiveMonster;
 class cBehaviorAggressive;
 class cBehaviorBreeder;
 class cBehaviorChaser;
@@ -226,9 +227,10 @@ public:
     virtual cBehaviorStriker * GetBehaviorStriker();
     virtual cBehaviorWanderer * GetBehaviorWanderer();
 
-    // Polymorphic behavior functions
-    virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);
+    // Polymorphic behavior functions ("Skin-specific")
+    virtual void InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2);
     virtual void GetFollowedItems(cItems & a_Items);
+    virtual void GetBreedingItems(cItems & a_Items);
 
 protected:
 

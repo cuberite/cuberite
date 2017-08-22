@@ -3,20 +3,16 @@
 // Makes the mob follow specific held items
 
 class cBehaviorItemFollower;
-class iBehaviorItemFollower;
-
 //fwds
 class cMonster;
 class cItems;
 
-
-
-
-
 class cBehaviorItemFollower
 {
 public:
-    cBehaviorItemFollower(cMonster * a_Parent);
+    cBehaviorItemFollower(cMonster * a_Parent, cItems & a_Items);
+
+    void GetBreedingItems(cItems & a_Items);
 
     // Functions our host Monster should invoke:
     bool ActiveTick();

@@ -8,19 +8,18 @@
 
 
 class cGhast :
-	public cAggressiveMonster
+    public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+    typedef cAggressiveMonster super;
 
 public:
-	cGhast(void);
+    cGhast(void);
 
-	CLASS_PROTODEF(cGhast)
+    CLASS_PROTODEF(cGhast)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
+    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 
-	bool IsCharging(void) const {return false; }
+    bool IsCharging(void) const {return false; }
 } ;
 
 

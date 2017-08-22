@@ -1167,12 +1167,16 @@ cBehaviorWanderer * cMonster::GetBehaviorWanderer()
 
 
 
-void cMonster::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
+void cMonster::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2)
 {
     UNUSED(a_Parent1);
     UNUSED(a_Parent2);
     return;
 }
+
+
+
+
 
 void cMonster::GetFollowedItems(cItems & a_Items)
 {
@@ -1182,6 +1186,11 @@ void cMonster::GetFollowedItems(cItems & a_Items)
 
 
 
+
+void cMonster::GetBreedingItems(cItems & a_Items)
+{
+    return GetFollowedItems();
+}
 
 std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {

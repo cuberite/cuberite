@@ -9,7 +9,7 @@
 
 
 cBlaze::cBlaze(void) :
-    super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", 0.6, 1.8)
+    super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", 0.6, 1.8, 15)
 {
     SetGravity(-8.0f);
     SetAirDrag(0.05f);

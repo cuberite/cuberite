@@ -8,17 +8,17 @@
 
 
 class cSilverfish :
-	public cAggressiveMonster
+    public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+    typedef cAggressiveMonster super;
 
 public:
-	cSilverfish(void) :
-		super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", 0.3, 0.7)
-	{
-	}
+    cSilverfish(void) :
+        super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", 0.3, 0.7, 15)
+    {
+    }
 
-	CLASS_PROTODEF(cSilverfish)
+    CLASS_PROTODEF(cSilverfish)
 } ;
 
 

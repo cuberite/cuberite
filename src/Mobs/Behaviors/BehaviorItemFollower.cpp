@@ -21,7 +21,7 @@ bool cBehaviorItemFollower::ActiveTick()
 {
     cWorld * World = m_Parent->GetWorld();
     cItems FollowedItems;
-    m_ParentInterface->GetFollowedItems(FollowedItems);
+    m_Parent->GetFollowedItems(FollowedItems);
     if (FollowedItems.Size() > 0)
     {
         cPlayer * a_Closest_Player = m_Parent->GetNearestPlayer();

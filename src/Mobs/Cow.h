@@ -8,22 +8,22 @@
 
 
 class cCow :
-	public cPassiveMonster
+    public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+    typedef cPassiveMonster super;
 
 public:
-	cCow();
+    cCow();
 
-	CLASS_PROTODEF(cCow)
+    CLASS_PROTODEF(cCow)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void OnRightClicked(cPlayer & a_Player) override;
+    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+    virtual void OnRightClicked(cPlayer & a_Player) override;
 
-	virtual void GetFollowedItems(cItems & a_Items) override
-	{
-		a_Items.Add(E_ITEM_WHEAT);
-	}
+    virtual void GetFollowedItems(cItems & a_Items) override
+    {
+        a_Items.Add(E_ITEM_WHEAT);
+    }
 
 } ;
 
