@@ -326,7 +326,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
             MoveToPosition(GetTarget()->GetPosition());
             if (TargetIsInRange())
             {
-                Attack(a_Dt);
+                // Attack(a_Dt); mobTodo
             }
         }
     }

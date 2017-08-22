@@ -1115,6 +1115,15 @@ cPawn * cMonster::GetTarget()
 
 
 
+bool cMonster::IsPathFinderActivated() const
+{
+    return m_PathfinderActivated;
+}
+
+
+
+
+
 cBehaviorAggressive * cMonster::GetBehaviorAggressive()
 {
     return nullptr;
