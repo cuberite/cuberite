@@ -277,6 +277,12 @@ endif()
 # (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
 include(lib/polarssl.cmake EXCLUDE_FROM_ALL)
 
+if(NOT MSVC AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
+	# mbed TLS uses the frame pointer's register in inline assembly:
+	# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
+	target_compile_options(mbedtls PUBLIC -fomit-frame-pointer)
+endif()
+
 set_exe_flags()
 
 add_subdirectory(src)
