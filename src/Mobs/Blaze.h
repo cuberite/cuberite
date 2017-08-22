@@ -8,15 +8,14 @@
 
 
 class cBlaze :
-	public cAggressiveMonster
+    public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+    typedef cAggressiveMonster super;
 
 public:
-	cBlaze(void);
+    cBlaze(void);
 
-	CLASS_PROTODEF(cBlaze)
+    CLASS_PROTODEF(cBlaze)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
+    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 } ;

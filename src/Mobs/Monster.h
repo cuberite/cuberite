@@ -10,6 +10,12 @@ class cItem;
 class cClientHandle;
 
 
+//Behavior fwds
+class cBehaviorAggressive;
+class cBehaviorBreeder;
+class cBehaviorChaser;
+class cBehaviorStriker;
+class cBehaviorWanderer;
 
 // tolua_begin
 class cMonster :
