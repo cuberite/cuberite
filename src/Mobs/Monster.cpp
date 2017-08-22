@@ -1174,6 +1174,11 @@ void cMonster::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
     return;
 }
 
+void cMonster::GetFollowedItems(cItems & a_Items)
+{
+    return;
+}
+
 
 
 

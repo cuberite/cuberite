@@ -16,14 +16,13 @@ class cItems;
 class cBehaviorItemFollower
 {
 public:
-	cBehaviorItemFollower(iBehaviorItemFollower * a_Parent);
+    cBehaviorItemFollower(cMonster * a_Parent);
 
-	// Functions our host Monster should invoke:
-	bool ActiveTick();
+    // Functions our host Monster should invoke:
+    bool ActiveTick();
 
 
 private:
-	/** Our parent */
-	iBehaviorItemFollower * m_ParentInterface;
-	cMonster * m_Parent;
+    /** Our parent */
+    cMonster * m_Parent;
 };

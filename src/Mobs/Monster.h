@@ -228,6 +228,7 @@ public:
 
     // Polymorphic behavior functions
     virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);
+    virtual void GetFollowedItems(cItems & a_Items);
 
 protected:
 
