@@ -84,6 +84,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
     : super(etMonster, a_Width, a_Height)
     , m_EMState(IDLE)
     , m_EMPersonality(AGGRESSIVE)
+    , m_NearestPlayerIsStale(true)
     , m_PathFinder(a_Width, a_Height)
     , m_PathfinderActivated(false)
     , m_JumpCoolDown(0)
@@ -282,6 +283,7 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+    m_NearestPlayerIsStale = true;
     super::Tick(a_Dt, a_Chunk);
     if (!IsTicking())
     {
@@ -1191,6 +1193,29 @@ void cMonster::GetBreedingItems(cItems & a_Items)
 {
     return GetFollowedItems(a_Items);
 }
+
+
+
+
+
+cPlayer * cMonster::GetNearestPlayer()
+{
+    if (m_NearestPlayerIsStale)
+    {
+        // TODO: Rewrite this to use cWorld's DoWithPlayers()
+        m_NearestPlayer = GetWorld()->FindClosestPlayer(GetPosition(), static_cast<float>(GetSightDistance()));
+        m_NearestPlayerIsStale = false;
+    }
+    if ((m_NearestPlayer != nullptr) && (!m_NearestPlayer->IsTicking()))
+    {
+        m_NearestPlayer = nullptr;
+    }
+    return m_NearestPlayer;
+}
+
+
+
+
 
 std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {

@@ -232,7 +232,15 @@ public:
     virtual void GetFollowedItems(cItems & a_Items);
     virtual void GetBreedingItems(cItems & a_Items);
 
-protected:
+    cPlayer * GetNearestPlayer();
+
+    protected:
+
+    /** Whether or not m_NearestPlayer is stale. Always true at the beginning of a tick.
+    When true, GetNearestPlayer() actually searches for a player, updates m_NearestPlayer, and sets it to false.
+    otherwise it returns m_NearestPlayer. This means we only perform 1 search per tick. */
+    bool m_NearestPlayerIsStale;
+    cPlayer * m_NearestPlayer;
 
     /** The pathfinder instance handles pathfinding for this monster. */
     cPathFinder m_PathFinder;
