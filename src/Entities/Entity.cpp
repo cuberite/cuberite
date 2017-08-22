@@ -1173,6 +1173,12 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
+	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
+	if (m_IsWorldChangeScheduled)
+	{
+		return;
+	}
+
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
