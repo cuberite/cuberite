@@ -39,7 +39,6 @@ public:
 
     // tolua_end
 
-    enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
     enum MPersonality{PASSIVE, AGGRESSIVE, COWARDLY} m_EMPersonality;
 
     /** Creates the mob object.
@@ -120,10 +119,6 @@ public:
 
     virtual void EventLosePlayer(void);
     virtual void CheckEventLostPlayer(void);
-
-    virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
-    virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
-    virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
     int GetAttackRate() { return static_cast<int>(m_AttackRate); }
     void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
