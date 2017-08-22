@@ -9,23 +9,23 @@ class cBehaviorAggressive
 {
 
 public:
-	cBehaviorAggressive(cMonster * a_Parent, int a_MinimumLight);
+    cBehaviorAggressive(cMonster * a_Parent, int a_MinimumLight);
 
-	// cBehaviorAggressive(cMonster * a_Parent, bool a_HatesPlayer);
-	// TODO agression toward specific players, and specific mobtypes, etc
-	// Agression under specific conditions (nighttime, etc)
+    // cBehaviorAggressive(cMonster * a_Parent, bool a_HatesPlayer);
+    // TODO agression toward specific players, and specific mobtypes, etc
+    // Agression under specific conditions (nighttime, etc)
 
-	// Functions our host Monster should invoke:
-	bool ActiveTick();
-	void Destroyed();
+    // Functions our host Monster should invoke:
+    bool ActiveTick();
+    void Destroyed();
 
 private:
-	cPawn * FindNewTarget();
+    cPawn * FindNewTarget();
 
-	// Our parent
-	cMonster * m_Parent;
-	cBehaviorChaser * m_ParentChaser;
+    // Our parent
+    cMonster * m_Parent;
+    cBehaviorChaser * m_ParentChaser;
 
-	// The mob we want to attack
-	cPawn * m_Target;
+    // The mob we want to attack
+    cPawn * m_Target;
 };
