@@ -7,7 +7,7 @@
 
 
 cBehaviorItemFollower::cBehaviorItemFollower(cMonster * a_Parent) :
-    m_ParentInterface(a_ParentInterface)
+    m_Parent(a_Parent)
 {
     m_Parent = a_Parent;
     ASSERT(m_Parent != nullptr);

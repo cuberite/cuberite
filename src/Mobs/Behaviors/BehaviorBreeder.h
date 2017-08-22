@@ -17,7 +17,7 @@ class cBehaviorBreeder
 {
 
 public:
-    cBehaviorBreeder(cMonster * a_Parent, cItems & a_BreedingItems);
+    cBehaviorBreeder(cMonster * a_Parent);
 
     // Functions our host Monster should invoke:
     void Tick();

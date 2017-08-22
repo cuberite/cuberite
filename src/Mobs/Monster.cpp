@@ -1189,7 +1189,7 @@ void cMonster::GetFollowedItems(cItems & a_Items)
 
 void cMonster::GetBreedingItems(cItems & a_Items)
 {
-    return GetFollowedItems();
+    return GetFollowedItems(a_Items);
 }
 
 std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)

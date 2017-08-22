@@ -10,7 +10,7 @@ class cItems;
 class cBehaviorItemFollower
 {
 public:
-    cBehaviorItemFollower(cMonster * a_Parent, cItems & a_Items);
+    cBehaviorItemFollower(cMonster * a_Parent);
 
     void GetBreedingItems(cItems & a_Items);
 
