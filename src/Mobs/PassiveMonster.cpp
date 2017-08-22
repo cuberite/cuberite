@@ -11,7 +11,7 @@
 
 cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
     super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height),
-    m_BehaviorBreeder(this), m_BehaviorItemFollower(this), m_BehaviorCoward(this)
+    m_BehaviorBreeder(this), m_BehaviorItemFollower(this), m_BehaviorCoward(this), m_BehaviorWanderer(this)
 {
     m_EMPersonality = PASSIVE;
 }
@@ -116,7 +116,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
         {
             break;
         }
-        if (super::m_BehaviorWanderer.ActiveTick(a_Dt, a_Chunk))
+        if (m_BehaviorWanderer.ActiveTick(a_Dt, a_Chunk))
         {
             break;
         }

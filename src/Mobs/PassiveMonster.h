@@ -5,6 +5,7 @@
 #include "Behaviors/BehaviorBreeder.h"
 #include "Behaviors/BehaviorItemFollower.h"
 #include "Behaviors/BehaviorCoward.h"
+#include "Behaviors/BehaviorWanderer.h"
 
 
 typedef std::string AString;
@@ -31,4 +32,5 @@ private:
     cBehaviorBreeder m_BehaviorBreeder;
     cBehaviorItemFollower m_BehaviorItemFollower;
     cBehaviorCoward m_BehaviorCoward;
+    cBehaviorWanderer m_BehaviorWanderer;
 };

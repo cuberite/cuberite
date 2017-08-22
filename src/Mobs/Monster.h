@@ -220,6 +220,7 @@ public:
     /** Returns if this mob last target was a player to avoid destruction on player quit */
     bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
 
+    bool IsPathFinderActivated() const { return m_p
     // Behavior getters
     virtual cBehaviorAggressive * GetBehaviorAggressive();
     virtual cBehaviorBreeder * GetBehaviorBreeder();
