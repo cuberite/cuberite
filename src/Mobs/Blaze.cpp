@@ -32,6 +32,7 @@ void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 // mobTODO
+/*
 bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 {
     if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
@@ -53,4 +54,4 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
         return true;
     }
     return false;
-}
+}*/
