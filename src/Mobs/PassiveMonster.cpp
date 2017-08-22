@@ -83,18 +83,18 @@ void cPassiveMonster::Destroyed()
 
 
 
-cBehaviorBreeder & cPassiveMonster::GetBehaviorBreeder()
+cBehaviorBreeder * cPassiveMonster::GetBehaviorBreeder()
 {
-    return m_BehaviorBreeder;
+    return &m_BehaviorBreeder;
 }
 
 
 
 
 
-const cBehaviorBreeder & cPassiveMonster::GetBehaviorBreeder() const
+const cBehaviorBreeder * cPassiveMonster::GetBehaviorBreeder() const
 {
-    return static_cast<const cBehaviorBreeder &>(m_BehaviorBreeder);
+    return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
 }
 
 

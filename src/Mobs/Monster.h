@@ -129,6 +129,7 @@ public:
     void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
     void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
     void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
+    int GetSightDistance() { return m_SightDistance; }
 
     float GetDropChanceWeapon() { return m_DropChanceWeapon; }
     float GetDropChanceHelmet() { return m_DropChanceHelmet; }

@@ -25,6 +25,8 @@ public:
 
     virtual void Destroyed(void) override;
 
+    virtual cBehaviorBreeder * GetBehaviorBreeder() override;
+    virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
     cBehaviorBreeder m_BehaviorBreeder;
     cBehaviorItemFollower m_BehaviorItemFollower;
