@@ -122,7 +122,7 @@ public:
 	or newly not displayed. */
 	void SetIsDisplayed(bool a_IsDisplayed);
 
-	bool IsDisplayed(void) { return m_DisplayCount > 0; };
+	bool IsDisplayed(void) { return m_DisplayCount > 0; }
 
 	/** Returns a set of all players */
 	AStringVector GetPlayers(void) const;  // Exported in ManualBindings.cpp
