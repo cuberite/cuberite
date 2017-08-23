@@ -35,7 +35,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & Pickups, NIBBLETYPE Meta) override {}
 
-	virtual void ConvertToPickups(cWorldInterface & a_WorldInterface, cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	// Bed specific helper functions
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
