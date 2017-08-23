@@ -85,7 +85,7 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 	{
 		AString Entity = a_Name.substr(20);
 		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return eType(otStatEntityKill, static_cast<int>(MonsterType));
+		return eType(otStatEntityKilledBy, static_cast<int>(MonsterType));
 	}
 
 	// TODO: Handle other cases
