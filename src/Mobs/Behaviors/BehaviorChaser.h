@@ -13,14 +13,15 @@ class cBehaviorStriker;
 The mob may possess this trait and not attack anyone or only attack when provoked.
 Unlike most traits, this one has several forms, and therefore it is an abstract type
 You should use one of its derived classes, and you cannot use it directly. */
-class cBehaviorChaser
+class cBehaviorChaser : public cBehavior
 {
 
 public:
 	cBehaviorChaser(cMonster * a_Parent);
 
 	// Functions our host Monster should invoke:
-	bool Tick() override;
+	bool IsControlDesired() override;
+	void Tick() override;
 	void Destroyed() override;
 	void PostTick() override;
 

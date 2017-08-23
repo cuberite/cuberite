@@ -23,8 +23,18 @@ cBehaviorChaser::cBehaviorChaser(cMonster * a_Parent) :
 
 
 
+bool cBehaviorChaser::IsControlDesired()
+{
+	// If we have a target, we have something to do! Return true and control the mob Ticks.
+	// Otherwise return false.
+	return (GetTarget() != nullptr);
+}
 
-bool cBehaviorChaser::Tick()
+
+
+
+
+void cBehaviorChaser::Tick()
 {
 	// Stop targeting out of range targets
 	if (GetTarget() != nullptr)
@@ -45,10 +55,8 @@ bool cBehaviorChaser::Tick()
 				// Not important now, but important for future extensibility, e.g.
 				// cow chases wheat but using the netherman approacher to teleport around.
 			}
-			return true;
 		}
 	}
-	return false;
 }
 
 void cBehaviorChaser::ApproachTarget()
@@ -146,6 +154,7 @@ bool cBehaviorChaser::TargetIsInStrikeRange()
 		Attack(a_Dt);
 	}
 	*/
+
 	return ((m_Target->GetPosition() - m_Parent->GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
 }
 

@@ -8,6 +8,7 @@
 
 bool cBehavior::IsControlDesired()
 {
+	LOGD("ERROR: Probably forgot to implement  cBehavior::IsControlDesired but implement  cBehavior::Tick");
 	return false;
 }
 

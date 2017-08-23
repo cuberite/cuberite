@@ -115,10 +115,6 @@ public:
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 
-	int GetAttackRate() { return static_cast<int>(m_AttackRate); }
-	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
-	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
-	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
 	int GetSightDistance() { return m_SightDistance; }
 
@@ -255,13 +251,6 @@ public:
 	/** Returns if the ultimate, final destination has been reached. */
 	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS); }
 
-	/** Returns whether or not the target is close enough for attack. */
-	bool TargetIsInRange(void)
-	{
-		ASSERT(GetTarget() != nullptr);
-		return ((GetTarget()->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
-	}
-
 	/** Returns whether the monster needs to jump to reach a given height. */
 	inline bool DoesPosYRequireJump(double a_PosY)
 	{
@@ -289,11 +278,7 @@ public:
 	AString m_SoundHurt;
 	AString m_SoundDeath;
 
-	float m_AttackRate;
-	int m_AttackDamage;
-	int m_AttackRange;
-	int m_AttackCoolDownTicksLeft;
-	int m_SightDistance;
+	int m_SightDistance; // mobTodo what to do with this?
 
 	float m_DropChanceWeapon;
 	float m_DropChanceHelmet;
@@ -301,7 +286,6 @@ public:
 	float m_DropChanceLeggings;
 	float m_DropChanceBoots;
 	bool m_CanPickUpLoot;
-	int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
 	double m_RelativeWalkSpeed;
 

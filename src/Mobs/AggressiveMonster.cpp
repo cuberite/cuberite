@@ -34,10 +34,10 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	for (;;)
 	{
 		m_BehaviorAggressive.Tick();
-		if (BehaviorChaser->ActiveTick())
+		/*if (BehaviorChaser->Tick())
 		{
 			break;
-		}
+		}*/
 		if ((BehaviorWanderer != nullptr) && BehaviorWanderer->ActiveTick(a_Dt, a_Chunk))
 		{
 			break;
