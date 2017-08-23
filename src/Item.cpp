@@ -258,6 +258,10 @@ void cItem::FromJson(const Json::Value & a_Value)
 		{
 			m_BookContent.SetAuthor(a_Value.get("author", "").asString());
 			m_BookContent.SetTitle(a_Value.get("title", "").asString());
+			if (m_ItemType == E_ITEM_WRITTEN_BOOK)
+			{
+				m_BookContent.SetIsSigned(true);
+			}
 			if (a_Value.isMember("pages"))
 			{
 				for (Json::Value::ArrayIndex i = 0; i != a_Value["pages"].size(); i++)

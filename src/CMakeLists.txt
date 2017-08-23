@@ -85,6 +85,7 @@ SET (HDRS
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockTracer.h
+	BookContent.h
 	BrewingRecipes.h
 	Broadcaster.h
 	BoundingBox.h
@@ -154,7 +155,6 @@ SET (HDRS
 	VoronoiMap.h
 	WebAdmin.h
 	World.h
-	BookContent.h
 	XMLParser.h
 )
 

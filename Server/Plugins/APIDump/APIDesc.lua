@@ -7022,10 +7022,37 @@ local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 		cBookContent =
 		{
 			Desc = [[
-This class contains the information for a signed or writeable book: The author, title and the pages. A page of the writeable book is a simple string. For a signed book it can be a json string. For the json string use {{cCompositeChat}} to create a page and then the function {{cCompositeChat#CreateJsonString_1|CreateJsonString}} to get the json string.
+This class contains the information for a signed or writeable book: The author, title and the pages. A page of the writeable book is a simple string. For a signed book it can be a json string. Use {{cCompositeChat}} to create a more complex page with formatting.
 ]],
 			Functions =
 			{
+				AddPage =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Page",
+								Type = "string",
+							},
+						},
+						Notes = "Add a page to the end of the book",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Page",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Add a page to the end of the book. For signed book saves it as json string, otherwise as simple string",
+					}
+				},
+				Clear =
+				{
+					Notes = "Clears the whole book",
+				},
 				constructor =
 				{
 					Returns =
@@ -7035,6 +7062,62 @@ This class contains the information for a signed or writeable book: The author, 
 						},
 					},
 					Notes = "Creates a empty book",
+				},
+				GetAuthor =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the author of the book",
+				},
+				GetTitle =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the title of the book",
+				},
+				GetPage =
+				{
+					Params =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the page at the given index, can be a json string or a simple string. Note: one-based",
+				},
+				GetPages =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns the pages of the book as a table",
+				},
+				IsEmpty =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the book has no author, title and no pages",
 				},
 				SetAuthor =
 				{
@@ -7047,15 +7130,49 @@ This class contains the information for a signed or writeable book: The author, 
 					},
 					Notes = "Set the author of the book",
 				},
-				GetAuthor =
+				SetPage =
 				{
-					Returns =
 					{
+						Params =
 						{
-							Type = "string",
+							{
+								Name = "Index",
+								Type = "number",
+							},
+							{
+								Name = "Page",
+								Type = "string",
+							},
 						},
+						Notes = "Set's the page at the given index. Note: one-based",
 					},
-					Notes = "Get the author of the book",
+					{
+						Params =
+						{
+							{
+								Name = "Index",
+								Type = "number",
+							},
+							{
+								Name = "Page",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Set's the page at the given index. For signed book saves it as json string, otherwise as simple string. Note: one-based",
+					},
+				},
+				SetPages =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Pages",
+								Type = "table",
+							},
+						},
+						Notes = "Sets all pages of the book. A entry can be a string or a {{cCompositeChat}}",
+					},
 				},
 				SetTitle =
 				{
@@ -7067,62 +7184,6 @@ This class contains the information for a signed or writeable book: The author, 
 						},
 					},
 					Notes = "Set the title of the book",
-				},
-				GetTitle =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the title of the book",
-				},
-				AddPage =
-				{
-					Params =
-					{
-						{
-							Name = "Page",
-							Type = "string",
-						},
-					},
-					Notes = "Add a page to the end of the book. Note: If it's a written book, the page can be a json string",
-				},
-				GetPages =
-				{
-					Returns =
-					{
-						{
-							Type = "table",
-						},
-					},
-					Notes = "Returns the pages of the book as a table",
-				},
-				SetPages =
-				{
-					Params =
-					{
-						{
-							Name = "Pages",
-							Type = "table",
-						},
-					},
-					Notes = "Set the pages of the book",
-				},
-				Clear =
-				{
-					Notes = "Clears the whole book",
-				},
-				IsEmpty =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the book has no author, title and no pages",
 				},
 			},
 		},

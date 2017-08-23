@@ -80,8 +80,16 @@ void cBookContent::WriteToNBTCompound(const cBookContent & a_BookContent, cFastN
 		return;
 	}
 
-	a_Writer.AddString("author", a_BookContent.GetAuthor());
-	a_Writer.AddString("title", a_BookContent.GetTitle());
+	if (!a_BookContent.GetAuthor().empty())
+	{
+		a_Writer.AddString("author", a_BookContent.GetAuthor());
+
+	}
+	if (!a_BookContent.GetTitle().empty())
+	{
+		a_Writer.AddString("title", a_BookContent.GetTitle());
+
+	}
 	a_Writer.BeginList("pages", TAG_String);
 	for (const auto & Page : a_BookContent.GetPages())
 	{
