@@ -225,6 +225,6 @@ void cBlockBedHandler::ConvertToPickups(cWorldInterface & a_WorldInterface, cEnt
 		}
 	};
 	cBedColor BedCallback;
-        a_WorldInterface.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
+	a_WorldInterface.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
 	a_Pickups.Add(cItem(E_ITEM_BED, 1, BedCallback.m_Color));
 }
