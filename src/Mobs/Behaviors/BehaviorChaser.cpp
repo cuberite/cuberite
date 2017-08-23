@@ -36,6 +36,8 @@ bool cBehaviorChaser::IsControlDesired()
 
 void cBehaviorChaser::Tick()
 {
+	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == GetWorld())));
+
 	// Stop targeting out of range targets
 	if (GetTarget() != nullptr)
 	{

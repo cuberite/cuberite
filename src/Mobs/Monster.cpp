@@ -97,10 +97,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
-	, m_AttackRate(3)
-	, m_AttackDamage(1)
-	, m_AttackRange(1)
-	, m_AttackCoolDownTicksLeft(0)
 	, m_SightDistance(25)
 	, m_DropChanceWeapon(0.085f)
 	, m_DropChanceHelmet(0.085f)
@@ -108,7 +104,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_DropChanceLeggings(0.085f)
 	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
-	, m_TicksSinceLastDamaged(100)
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
@@ -293,12 +288,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	GET_AND_VERIFY_CURRENT_CHUNK(Chunk, POSX_TOINT, POSZ_TOINT);
-
-	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == GetWorld())));
-	if (m_AttackCoolDownTicksLeft > 0)
-	{
-		m_AttackCoolDownTicksLeft -= 1;
-	}
 
 	if (m_Health <= 0)
 	{
