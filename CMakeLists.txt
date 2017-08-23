@@ -1,4 +1,4 @@
-# This is the top-level CMakeLists.txt file for the Cuberite project
+﻿# This is the top-level CMakeLists.txt file for the Cuberite project
 #
 # Use CMake to generate the build files for your platform
 #
@@ -209,8 +209,8 @@ link_directories(lib/jsoncpp/src/lib_json)
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/SQLiteCpp/CMakeLists.txt)
 	message(FATAL_ERROR "SQLiteCpp is missing in folder lib/SQLiteCpp. Have you initialized the submodules / downloaded the extra libraries?")
 endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/polarssl/CMakeLists.txt)
-	message(FATAL_ERROR "PolarSSL is missing in folder lib/polarssl. Have you initialized the submodules / downloaded the extra libraries?")
+if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/mbedtls/CMakeLists.txt)
+	message(FATAL_ERROR "mbedTLS is missing in folder lib/mbedtls. Have you initialized the submodules / downloaded the extra libraries?")
 endif()
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/libevent/CMakeLists.txt)
 	message(FATAL_ERROR "LibEvent is missing in folder lib/libevent. Have you initialized and updated the submodules / downloaded the extra libraries?")
@@ -274,8 +274,8 @@ if (WIN32)
 endif()
 
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
-# (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
-include(lib/polarssl.cmake EXCLUDE_FROM_ALL)
+# (mbedTLS also has test and example programs in their CMakeLists.txt, we don't want those)
+include(lib/mbedtls.cmake EXCLUDE_FROM_ALL)
 
 if(NOT MSVC AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
 	# mbed TLS uses the frame pointer's register in inline assembly:
@@ -302,7 +302,9 @@ if (MSVC)
 		jsoncpp_lib_static
 		lua
 		luaexpat
+		mbedcrypto
 		mbedtls
+		mbedx509
 		sqlite
 		SQLiteCpp
 		tolualib

@@ -17,7 +17,7 @@ Implements the 1.9 protocol classes:
 #include "json/json.h"
 #include "Protocol_1_9.h"
 #include "ChunkDataSerializer.h"
-#include "PolarSSL++/Sha1Checksum.h"
+#include "mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 
 #include "../ClientHandle.h"

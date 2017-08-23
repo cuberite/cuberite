@@ -59,7 +59,7 @@ void cSslHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size
 			// The link may have closed while processing the data, bail out:
 			return;
 		}
-		else if (NumRead == POLARSSL_ERR_NET_WANT_READ)
+		else if (NumRead == MBEDTLS_ERR_SSL_WANT_READ)
 		{
 			// SSL requires us to send data to peer first, do so by "sending" empty data:
 			SendData(nullptr, 0);

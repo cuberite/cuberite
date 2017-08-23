@@ -197,8 +197,8 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 		int res = m_Ssl.WritePlain(Data, a_NumBytes);
 		if (res < 0)
 		{
-			ASSERT(res != POLARSSL_ERR_NET_WANT_READ);   // This should never happen with callback-based SSL
-			ASSERT(res != POLARSSL_ERR_NET_WANT_WRITE);  // This should never happen with callback-based SSL
+			ASSERT(res != MBEDTLS_ERR_SSL_WANT_READ);   // This should never happen with callback-based SSL
+			ASSERT(res != MBEDTLS_ERR_SSL_WANT_WRITE);  // This should never happen with callback-based SSL
 			Printf(m_LastErrorText, "Data cannot be written to SSL context: -0x%x", -res);
 			return false;
 		}
@@ -272,7 +272,7 @@ int cBlockingSslClientSocket::ReceiveEncrypted(unsigned char * a_Buffer, size_t 
 	// If we got disconnected, report an error after processing all data:
 	if (!m_IsConnected && m_IncomingData.empty())
 	{
-		return POLARSSL_ERR_NET_RECV_FAILED;
+		return MBEDTLS_ERR_NET_RECV_FAILED;
 	}
 
 	// Copy the data from the incoming buffer into the specified space:
@@ -291,12 +291,12 @@ int cBlockingSslClientSocket::SendEncrypted(const unsigned char * a_Buffer, size
 	cTCPLinkPtr Socket(m_Socket);  // Make a copy so that multiple threads don't race on deleting the socket.
 	if (Socket == nullptr)
 	{
-		return POLARSSL_ERR_NET_SEND_FAILED;
+		return MBEDTLS_ERR_NET_SEND_FAILED;
 	}
 	if (!Socket->Send(a_Buffer, a_NumBytes))
 	{
-		// PolarSSL's net routines distinguish between connection reset and general failure, we don't need to
-		return POLARSSL_ERR_NET_SEND_FAILED;
+		// mbedTLS's net routines distinguish between connection reset and general failure, we don't need to
+		return MBEDTLS_ERR_NET_SEND_FAILED;
 	}
 	return static_cast<int>(a_NumBytes);
 }

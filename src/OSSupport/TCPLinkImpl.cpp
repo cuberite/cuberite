@@ -1,4 +1,4 @@
-
+﻿
 // TCPLinkImpl.cpp
 
 // Implements the cTCPLinkImpl class implementing the TCP link functionality
@@ -245,10 +245,7 @@ AString cTCPLinkImpl::StartTLSClient(
 	{
 		return "TLS is already active on this link";
 	}
-	if (
-		((a_OwnCert == nullptr) && (a_OwnPrivKey != nullptr)) ||
-		((a_OwnCert != nullptr) && (a_OwnPrivKey != nullptr))
-	)
+	if ((a_OwnCert == nullptr) != (a_OwnPrivKey == nullptr))
 	{
 		return "Either provide both the certificate and private key, or neither";
 	}
@@ -659,7 +656,7 @@ int cTCPLinkImpl::cLinkTlsContext::ReceiveEncrypted(unsigned char * a_Buffer, si
 	// If there's nothing queued in the buffer, report empty buffer:
 	if (m_EncryptedData.empty())
 	{
-		return POLARSSL_ERR_NET_WANT_READ;
+		return MBEDTLS_ERR_SSL_WANT_READ;
 	}
 
 	// Copy as much data as possible to the provided buffer:

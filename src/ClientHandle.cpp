@@ -1,4 +1,4 @@
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+﻿#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ClientHandle.h"
 #include "Server.h"
@@ -33,7 +33,7 @@
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
 
-#include "polarssl/md5.h"
+#include "mbedtls/md5.h"
 
 
 

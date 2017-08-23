@@ -1,4 +1,4 @@
-
+﻿
 // MojangAPI.cpp
 
 // Implements the cMojangAPI class representing the various API points provided by Mojang's webservices, and a cache for their results
@@ -9,7 +9,7 @@
 #include "SQLiteCpp/Statement.h"
 #include "../IniFile.h"
 #include "json/json.h"
-#include "PolarSSL++/BlockingSslClientSocket.h"
+#include "mbedTLS++/BlockingSslClientSocket.h"
 #include "../RankManager.h"
 #include "../OSSupport/IsThread.h"
 #include "../Root.h"
@@ -452,13 +452,13 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 	{
 		int ret = Socket.Receive(buf, sizeof(buf));
 
-		if ((ret == POLARSSL_ERR_NET_WANT_READ) || (ret == POLARSSL_ERR_NET_WANT_WRITE))
+		if ((ret == MBEDTLS_ERR_SSL_WANT_READ) || (ret == MBEDTLS_ERR_SSL_WANT_WRITE))
 		{
 			// This value should never be returned, it is handled internally by cBlockingSslClientSocket
 			LOGWARNING("%s: SSL reading failed internally", __FUNCTION__);
 			return false;
 		}
-		if (ret == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY)
+		if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
 		{
 			break;
 		}

@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ManualBindings.h"
@@ -6,8 +6,8 @@
 #include <sstream>
 #include <iomanip>
 #include "tolua++/include/tolua++.h"
-#include "polarssl/md5.h"
-#include "polarssl/sha1.h"
+#include "mbedtls/md5.h"
+#include "mbedtls/sha1.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
@@ -1837,7 +1837,7 @@ static int tolua_md5(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	md5(SourceString, len, Output);
+	mbedtls_md5(SourceString, len, Output);
 	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output), ARRAYCOUNT(Output));
 	return 1;
 }
@@ -1868,7 +1868,7 @@ static int tolua_md5HexString(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	md5(SourceString, len, md5Output);
+	mbedtls_md5(SourceString, len, md5Output);
 
 	// Convert the md5 checksum to hex string:
 	std::stringstream Output;
@@ -1895,7 +1895,7 @@ static int tolua_sha1(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	sha1(SourceString, len, Output);
+	mbedtls_sha1(SourceString, len, Output);
 	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output), ARRAYCOUNT(Output));
 	return 1;
 }
@@ -1914,7 +1914,7 @@ static int tolua_sha1HexString(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	sha1(SourceString, len, sha1Output);
+	mbedtls_sha1(SourceString, len, sha1Output);
 
 	// Convert the sha1 checksum to hex string:
 	std::stringstream Output;

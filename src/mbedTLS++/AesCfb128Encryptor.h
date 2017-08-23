@@ -1,4 +1,4 @@
-
+﻿
 // AesCfb128Encryptor.h
 
 // Declares the cAesCfb128Encryptor class encrypting data using AES CFB-128
@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "polarssl/aes.h"
+#include "mbedtls/aes.h"
 
 
 
@@ -32,7 +32,7 @@ public:
 	bool IsValid(void) const { return m_IsValid; }
 
 protected:
-	aes_context m_Aes;
+	mbedtls_aes_context m_Aes;
 
 	/** The InitialVector, used by the CFB mode encryption */
 	Byte m_IV[16];
