@@ -10,6 +10,7 @@
 #include "../IniFile.h"
 #include "json/json.h"
 #include "mbedTLS++/BlockingSslClientSocket.h"
+#include "mbedTLS++/SslConfig.h"
 #include "../RankManager.h"
 #include "../OSSupport/IsThread.h"
 #include "../Root.h"
@@ -39,9 +40,9 @@ const int MAX_PER_QUERY = 100;
 
 
 /** Returns the CA certificates that should be trusted for Mojang-related connections. */
-static const AString & GetCACerts(void)
+static cX509CertPtr GetCACerts(void)
 {
-	static const AString Cert(
+	static const char CertString[] =
 		// GeoTrust root CA cert
 		// Currently used for signing *.mojang.com's cert
 		// Exported from Mozilla Firefox's built-in CA repository
@@ -140,9 +141,33 @@ static const AString & GetCACerts(void)
 		"VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY\n"
 		"WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=\n"
 		"-----END CERTIFICATE-----\n"
-	);
+	;
 
-	return Cert;
+	static auto X509Cert = [&]()
+	{
+		auto Cert = std::make_shared<cX509Cert>();
+		VERIFY(0 == Cert->Parse(CertString, sizeof(CertString)));
+		return Cert;
+	}();
+
+	return X509Cert;
+}
+
+
+
+
+
+/** Returns the config to be used for secure requests. */
+static std::shared_ptr<const cSslConfig> GetSslConfig()
+{
+	static const std::shared_ptr<const cSslConfig> Config = []()
+	{
+		auto Conf = cSslConfig::MakeDefaultConfig(true);
+		Conf->SetCACerts(GetCACerts());
+		Conf->SetAuthMode(eSslAuthMode::Required);
+		return Conf;
+	}();
+	return Config;
 }
 
 
@@ -432,7 +457,8 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 {
 	// Connect the socket:
 	cBlockingSslClientSocket Socket;
-	Socket.SetTrustedRootCertsFromString(GetCACerts(), a_ServerName);
+	Socket.SetSslConfig(GetSslConfig());
+	Socket.SetExpectedPeerName(a_ServerName);
 	if (!Socket.Connect(a_ServerName, 443))
 	{
 		LOGWARNING("%s: Can't connect to %s: %s", __FUNCTION__, a_ServerName.c_str(), Socket.GetLastErrorText().c_str());
