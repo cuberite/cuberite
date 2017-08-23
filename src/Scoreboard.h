@@ -116,6 +116,14 @@ public:
 
 	// tolua_end
 
+	/** If true, increments the number of slots we're displayed in.
+	if false, decrements the number. In either case, handles broadcasting
+	the objective to the world if the objective is either newly displayed
+	or newly not displayed. */
+	void SetIsDisplayed(bool a_IsDisplayed);
+
+	bool IsDisplayed(void) { return m_DisplayCount > 0; };
+
 	/** Returns a set of all players */
 	AStringVector GetPlayers(void) const;  // Exported in ManualBindings.cpp
 
@@ -142,6 +150,9 @@ private:
 	eType m_Type;
 
 	cWorld * m_World;
+
+	/** A count of how many slots we're being displayed in */
+	int m_DisplayCount;
 
 	friend class cScoreboardSerializer;
 

@@ -102,7 +102,47 @@ cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cO
 	, m_Name(a_Name)
 	, m_Type(a_Type)
 	, m_World(a_World)
+	, m_DisplayCount(0)
 {
+}
+
+
+
+
+
+void cObjective::SetIsDisplayed(bool a_IsDisplayed)
+{
+	if (a_IsDisplayed)
+	{
+		m_DisplayCount++;
+	}
+	else
+	{
+		ASSERT(m_DisplayCount > 0);
+		m_DisplayCount--;
+	}
+
+	// If we just started being displayed, tell clients about us
+	if (a_IsDisplayed && m_DisplayCount == 1)
+	{
+		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaCreate);
+
+		for (auto it : m_Scores)
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaUpsert);
+		}
+	}
+
+	// If we aren't displayed anymore, tell clients to forget about us
+	if (m_DisplayCount == 0)
+	{
+		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaRemove);
+
+		for (auto it : m_Scores)
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaRemove);
+		}
+	}
 }
 
 
@@ -111,9 +151,12 @@ cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cO
 
 void cObjective::Reset(void)
 {
-	for (auto it : m_Scores)
+	if (IsDisplayed())
 	{
-		m_World->BroadcastScoreUpdate(m_Name, it.first, 0, cScoreboard::uaRemove);
+		for (auto it : m_Scores)
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it.first, 0, cScoreboard::uaRemove);
+		}
 	}
 
 	m_Scores.clear();
@@ -161,7 +204,10 @@ void cObjective::SetAllScores(cObjective::Score a_Score)
 	{
 		it->second = a_Score;
 
-		m_World->BroadcastScoreUpdate(m_Name, it->first, a_Score, cScoreboard::uaUpsert);
+		if (IsDisplayed())
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it->first, a_Score, cScoreboard::uaUpsert);
+		}
 	}
 }
 
@@ -173,7 +219,10 @@ void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
 {
 	m_Scores[a_Name] = a_Score;
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, cScoreboard::uaUpsert);
+	if (IsDisplayed())
+	{
+		m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, cScoreboard::uaUpsert);
+	}
 }
 
 
@@ -184,7 +233,10 @@ void cObjective::ResetScore(const AString & a_Name)
 {
 	m_Scores.erase(a_Name);
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, cScoreboard::uaRemove);
+	if (IsDisplayed())
+	{
+		m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, cScoreboard::uaRemove);
+	}
 }
 
 
@@ -221,7 +273,10 @@ void cObjective::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
 
-	m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaUpdateText);
+	if (IsDisplayed())
+	{
+		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaUpdateText);
+	}
 }
 
 
@@ -230,6 +285,12 @@ void cObjective::SetDisplayName(const AString & a_Name)
 
 void cObjective::SendTo(cClientHandle & a_Client)
 {
+	if (!IsDisplayed())
+	{
+		// If this objective isn't displayed, we don't have to send it
+		return;
+	}
+
 	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, uaCreate);
 
 	for (auto it : m_Scores)
@@ -569,7 +630,16 @@ void cScoreboard::SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot)
 
 void cScoreboard::SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot)
 {
+	if (m_Display[a_Slot] != nullptr)
+	{
+		m_Display[a_Slot]->SetIsDisplayed(false);
+	}
+
 	m_Display[a_Slot] = a_Objective;
+	if (m_Display[a_Slot] != nullptr)
+	{
+		m_Display[a_Slot]->SetIsDisplayed(true);
+	}
 
 	ASSERT(m_World != nullptr);
 	m_World->BroadcastDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
