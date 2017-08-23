@@ -123,7 +123,7 @@ void cObjective::SetIsDisplayed(bool a_IsDisplayed)
 	}
 
 	// If we just started being displayed, tell clients about us
-	if (a_IsDisplayed && m_DisplayCount == 1)
+	if (a_IsDisplayed && (m_DisplayCount == 1))
 	{
 		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaCreate);
 
