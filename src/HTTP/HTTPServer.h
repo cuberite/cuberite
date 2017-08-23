@@ -70,11 +70,8 @@ protected:
 	/** The callbacks to call for various events */
 	cCallbacks * m_Callbacks;
 
-	/** The server certificate to use for the SSL connections */
-	cX509CertPtr m_Cert;
-
-	/** The private key for m_Cert. */
-	cCryptoKeyPtr m_CertPrivKey;
+	/** Configuration for server ssl connections. */
+	std::shared_ptr<const cSslConfig> m_SslConfig;
 
 
 	/** Called by cHTTPServerListenCallbacks when there's a new incoming connection.

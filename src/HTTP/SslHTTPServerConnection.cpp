@@ -1,4 +1,4 @@
-
+﻿
 // SslHTTPConnection.cpp
 
 // Implements the cSslHTTPServerConnection class representing a HTTP connection made over a SSL link
@@ -11,14 +11,18 @@
 
 
 
-cSslHTTPServerConnection::cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey) :
+cSslHTTPServerConnection::cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, std::shared_ptr<const cSslConfig> a_Config):
 	super(a_HTTPServer),
-	m_Ssl(64000),
-	m_Cert(a_Cert),
-	m_PrivateKey(a_PrivateKey)
+	m_Ssl(64000)
 {
-	m_Ssl.Initialize(false);
-	m_Ssl.SetOwnCert(a_Cert, a_PrivateKey);
+	if (a_Config != nullptr)
+	{
+		m_Ssl.Initialize(a_Config);
+	}
+	else
+	{
+		m_Ssl.Initialize(false);
+	}
 }
 
 

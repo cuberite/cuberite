@@ -1,4 +1,4 @@
-
+﻿
 // SslHTTPServerConnection.h
 
 // Declares the cSslHTTPServerConnection class representing a HTTP connection made over an SSL link
@@ -24,18 +24,12 @@ class cSslHTTPServerConnection :
 public:
 	/** Creates a new connection on the specified server.
 	Sends the specified cert as the server certificate, uses the private key for decryption. */
-	cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey);
+	cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, std::shared_ptr<const cSslConfig> a_Config);
 
 	virtual ~cSslHTTPServerConnection() override;
 
 protected:
 	cBufferedSslContext m_Ssl;
-
-	/** The certificate to send to the client */
-	cX509CertPtr m_Cert;
-
-	/** The private key used for the certificate */
-	cCryptoKeyPtr m_PrivateKey;
 
 	// cHTTPConnection overrides:
 	virtual void OnReceivedData(const char * a_Data, size_t a_Size) override;  // Data is received from the client
