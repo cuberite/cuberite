@@ -17,7 +17,7 @@
 
 class cX509Cert
 {
-	friend class cSslContext;
+	friend class cSslConfig;
 
 public:
 	cX509Cert(void);

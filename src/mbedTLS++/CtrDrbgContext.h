@@ -24,7 +24,7 @@ class cEntropyContext;
 
 class cCtrDrbgContext
 {
-	friend class cSslContext;
+	friend class cSslConfig;
 	friend class cRsaPrivateKey;
 	friend class cCryptoKey;
 

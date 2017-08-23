@@ -21,6 +21,7 @@ set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CtrDrbgContext.cpp
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CryptoKey.cpp
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/EntropyContext.cpp
+	${CMAKE_SOURCE_DIR}/src/mbedTLS++/SslConfig.cpp
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/SslContext.cpp
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/X509Cert.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
@@ -42,6 +43,7 @@ set (Network_HDRS
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CtrDrbgContext.h
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CryptoKey.h
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/EntropyContext.h
+	${CMAKE_SOURCE_DIR}/src/mbedTLS++/SslConfig.h
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/SslContext.h
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/X509Cert.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h
