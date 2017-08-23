@@ -61,8 +61,7 @@ public:
 
 	virtual void HandleFalling(void) override;
 
-	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mob accordingly
-	Currently, the mob will only start moving to a new position after the position it is currently going to is reached. */
+	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mob accordingly. */
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 
 	// tolua_begin
