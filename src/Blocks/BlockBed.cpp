@@ -209,7 +209,7 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 
 
 
-void cBlockBedHandler::ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockBedHandler::ConvertToPickups(cWorldInterface & a_WorldInterface, cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	class cBedColor :
 		public cBedCallback
@@ -219,11 +219,12 @@ void cBlockBedHandler::ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, 
 
 		virtual bool Item(cBedEntity * a_Bed) override
 		{
+			LOG("Got bed color");
 			m_Color = a_Bed->GetColor();
 			return true;
 		}
 	};
 	cBedColor BedCallback;
-	a_Digger->GetWorld()->DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
+        a_WorldInterface.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
 	a_Pickups.Add(cItem(E_ITEM_BED, 1, BedCallback.m_Color));
 }
