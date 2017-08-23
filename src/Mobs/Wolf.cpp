@@ -395,13 +395,3 @@ void cWolf::TickFollowPlayer()
 }
 
 
-
-void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
-{
-    if (!IsTame())
-    {
-        cMonster::InStateIdle(a_Dt, a_Chunk);
-    }
-}
-
-

@@ -3576,7 +3576,8 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
         {
             auto & Witch = reinterpret_cast<const cWitch &>(a_Mob);
             a_Pkt.WriteBEUInt8(0x15);
-            a_Pkt.WriteBEUInt8(Witch.IsAngry() ? 1 : 0);
+            // a_Pkt.WriteBEUInt8(Witch.IsAngry() ? 1 : 0); // mobTodo
+            a_Pkt.WriteBEUInt8(0);
             break;
         }  // case mtWitch
 

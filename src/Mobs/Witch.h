@@ -18,8 +18,7 @@ public:
 	CLASS_PROTODEF(cWitch)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-
-	bool IsAngry(void) const {return ((m_EMState == ATTACKING) || (m_EMState == CHASING)); }
+	bool IsAngry() const { return false; }
 } ;
 
 

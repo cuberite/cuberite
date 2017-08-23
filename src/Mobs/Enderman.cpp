@@ -98,67 +98,6 @@ void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
-{
-	if (GetTarget() != nullptr)
-	{
-		return;
-	}
-
-	cPlayerLookCheck Callback(GetPosition(), m_SightDistance);
-	if (m_World->ForEachPlayer(Callback))
-	{
-		return;
-	}
-
-	ASSERT(Callback.GetPlayer() != nullptr);
-
-	if (!CheckLight())
-	{
-		// Insufficient light for enderman to become aggravated
-		// TODO: Teleport to a suitable location
-		return;
-	}
-
-	if (!Callback.GetPlayer()->CanMobsTarget())
-	{
-		return;
-	}
-
-	// Target the player
-	cMonster::EventSeePlayer(Callback.GetPlayer(), a_Chunk);
-	m_EMState = CHASING;
-	m_bIsScreaming = true;
-	GetWorld()->BroadcastEntityMetadata(*this);
-}
-
-
-
-
-
-void cEnderman::CheckEventLostPlayer(void)
-{
-	super::CheckEventLostPlayer();
-	if (!CheckLight())
-	{
-		EventLosePlayer();
-	}
-}
-
-
-
-
-
-void cEnderman::EventLosePlayer()
-{
-	super::EventLosePlayer();
-	m_bIsScreaming = false;
-	GetWorld()->BroadcastEntityMetadata(*this);
-}
-
-
-
-
 
 bool cEnderman::CheckLight()
 {
@@ -197,7 +136,7 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Take damage when touching water, drowning damage seems to be most appropriate
 	if (CheckRain() || IsSwimming())
 	{
-		EventLosePlayer();
+		// EventLosePlayer(); //mobTodo
 		TakeDamage(dtDrowning, nullptr, 1, 0);
 		// TODO teleport to a safe location
 	}

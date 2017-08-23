@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Behavior.h"
+
 // Makes the mob run away from any other mob that damages it
 
 //fwds
@@ -14,7 +16,7 @@ public:
 	cBehaviorCoward(cMonster * a_Parent);
 
 	// Functions our host Monster should invoke:
-	bool ActiveTick();
+	bool Tick();
 	void DoTakeDamage(TakeDamageInfo & a_TDI);
 
 

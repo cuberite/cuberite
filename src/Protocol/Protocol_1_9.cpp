@@ -4018,7 +4018,8 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			auto & Witch = reinterpret_cast<const cWitch &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);  // Index 11: Is angry
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Witch.IsAngry());
+			// a_Pkt.WriteBool(Witch.IsAngry()); // mobTodo
+			a_Pkt.WriteBool(0);
 			break;
 		}  // case mtWitch
 

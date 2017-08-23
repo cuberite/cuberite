@@ -8,18 +8,17 @@
 
 
 class cSpider :
-	public cAggressiveMonster
+    public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+    typedef cAggressiveMonster super;
 
 public:
-	cSpider(void);
+    cSpider(void);
 
-	CLASS_PROTODEF(cSpider)
+    CLASS_PROTODEF(cSpider)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void EventSeePlayer(cPlayer *, cChunk & a_Chunk) override;
-	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
+    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+    virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 } ;
 
 

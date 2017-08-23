@@ -17,7 +17,7 @@ cBehaviorCoward::cBehaviorCoward(cMonster * a_Parent) :
 
 
 
-bool cBehaviorCoward::ActiveTick()
+bool cBehaviorCoward::Tick()
 {
 	if (m_Attacker == nullptr)
 	{

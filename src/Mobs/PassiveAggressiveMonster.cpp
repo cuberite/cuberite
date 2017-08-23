@@ -26,23 +26,13 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	// mobtodo remove this class altogether
 	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
 	{
 		if (static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
 		{
-			m_EMState = CHASING;
+		   //  m_EMState = CHASING;
 		}
 	}
 	return true;
 }
-
-
-
-
-
-void cPassiveAggressiveMonster::EventSeePlayer(cPlayer *, cChunk & a_Chunk)
-{
-	// don't do anything, neutral mobs don't react to just seeing the player
-}
-
-

@@ -55,8 +55,6 @@ public:
     @param a_IsPlayerInvolved Whether the fighter a player or a wolf. */
     void ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
-    virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-
 protected:
 
     bool    m_IsSitting;

@@ -7,33 +7,33 @@
 
 
 cBehaviorItemFollower::cBehaviorItemFollower(cMonster * a_Parent) :
-    m_Parent(a_Parent)
+	m_Parent(a_Parent)
 {
-    m_Parent = a_Parent;
-    ASSERT(m_Parent != nullptr);
+	m_Parent = a_Parent;
+	ASSERT(m_Parent != nullptr);
 }
 
 
 
 
 
-bool cBehaviorItemFollower::ActiveTick()
+bool cBehaviorItemFollower::Tick()
 {
-    cItems FollowedItems;
-    m_Parent->GetFollowedItems(FollowedItems);
-    if (FollowedItems.Size() > 0)
-    {
-        cPlayer * a_Closest_Player = m_Parent->GetNearestPlayer();
-        if (a_Closest_Player != nullptr)
-        {
-            cItem EquippedItem = a_Closest_Player->GetEquippedItem();
-            if (FollowedItems.ContainsType(EquippedItem))
-            {
-                Vector3d PlayerPos = a_Closest_Player->GetPosition();
-                m_Parent->MoveToPosition(PlayerPos);
-                return true;  // We took control of the monster, prevent other Behaviors from doing so
-            }
-        }
-    }
-    return false;
+	cItems FollowedItems;
+	m_Parent->GetFollowedItems(FollowedItems);
+	if (FollowedItems.Size() > 0)
+	{
+		cPlayer * a_Closest_Player = m_Parent->GetNearestPlayer();
+		if (a_Closest_Player != nullptr)
+		{
+			cItem EquippedItem = a_Closest_Player->GetEquippedItem();
+			if (FollowedItems.ContainsType(EquippedItem))
+			{
+				Vector3d PlayerPos = a_Closest_Player->GetPosition();
+				m_Parent->MoveToPosition(PlayerPos);
+				return true;  // We took control of the monster, prevent other Behaviors from doing so
+			}
+		}
+	}
+	return false;
 }

@@ -78,7 +78,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
         {
             break;
         }
-        if (m_BehaviorBreeder.ActiveTick())
+        if (m_BehaviorBreeder.Tick())
         {
             break;
         }
@@ -95,7 +95,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
         break;
     }
 
-    m_BehaviorBreeder.Tick();
+    m_BehaviorBreeder.PostTick();
 }
 
 

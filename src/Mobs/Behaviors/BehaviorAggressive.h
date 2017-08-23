@@ -1,31 +1,40 @@
-// The mob is agressive toward specific mobtypes, or toward the player.
-// This Behavior has a dependency on BehaviorChaser.
 #pragma once
+
+
+class cBehaviorAggressive;
+
+#include "Behavior.h"
+
 class cPawn;
 class cMonster;
 class cBehaviorChaser;
 
-class cBehaviorAggressive
+
+
+
+
+/** The mob is agressive toward specific mobtypes, or toward the player.
+This Behavior has a dependency on BehaviorChaser. */
+class cBehaviorAggressive : public cBehavior
 {
 
 public:
-    cBehaviorAggressive(cMonster * a_Parent);
+	cBehaviorAggressive(cMonster * a_Parent);
 
-    // cBehaviorAggressive(cMonster * a_Parent, bool a_HatesPlayer);
-    // TODO agression toward specific players, and specific mobtypes, etc
-    // Agression under specific conditions (nighttime, etc)
+	// cBehaviorAggressive(cMonster * a_Parent, bool a_HatesPlayer);
+	// TODO agression toward specific players, and specific mobtypes, etc
+	// Agression under specific conditions (nighttime, etc)
 
-    // Functions our host Monster should invoke:
-    bool ActiveTick();
-    void Destroyed();
+	// Functions our host Monster should invoke:
+	void PreTick() override;
 
 private:
-    cPawn * FindNewTarget();
+	cPawn * FindNewTarget();
 
-    // Our parent
-    cMonster * m_Parent;
-    cBehaviorChaser * m_ParentChaser;
+	// Our parent
+	cMonster * m_Parent;
+	cBehaviorChaser * m_ParentChaser;
 
-    // The mob we want to attack
-    cPawn * m_Target;
+	// The mob we want to attack
+	cPawn * m_Target;
 };
