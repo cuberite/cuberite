@@ -2,10 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BehaviorChaser.h"
+#include "BehaviorStriker.h"
 #include "../Monster.h"
 #include "../../Entities/Pawn.h"
-#include "BehaviorStriker.h"
-
+#include "../../Entities/Player.h"
 
 
 
@@ -15,7 +15,7 @@ cBehaviorChaser::cBehaviorChaser(cMonster * a_Parent) :
   , m_AttackDamage(1)
   , m_AttackRange(1)
   , m_AttackCoolDownTicksLeft(0)
-  , m_TicksSinceLastDamaged(50)
+  , m_TicksSinceLastDamaged(100)
 {
 	ASSERT(m_Parent != nullptr);
 }
@@ -36,8 +36,7 @@ bool cBehaviorChaser::IsControlDesired()
 
 void cBehaviorChaser::Tick()
 {
-	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == GetWorld())));
-
+	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == m_Parent->GetWorld())));
 	// Stop targeting out of range targets
 	if (GetTarget() != nullptr)
 	{
@@ -71,10 +70,33 @@ void cBehaviorChaser::ApproachTarget()
 
 void cBehaviorChaser::PostTick()
 {
-	++m_TicksSinceLastDamaged;
+	if (m_TicksSinceLastDamaged < 100)
+	{
+		++m_TicksSinceLastDamaged;
+	}
+
 	if (m_AttackCoolDownTicksLeft > 0)
 	{
 		m_AttackCoolDownTicksLeft -= 1;
+	}
+}
+
+
+
+
+
+void cBehaviorChaser::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
+	{
+		if (
+			(!a_TDI.Attacker->IsPlayer()) ||
+			(static_cast<cPlayer *>(a_TDI.Attacker)->CanMobsTarget())
+		)
+		{
+			SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
+		}
+		m_TicksSinceLastDamaged = 0;
 	}
 }
 
@@ -194,7 +216,7 @@ void cBehaviorChaser::StrikeTarget()
 		cBehaviorStriker * Striker = m_Parent->GetBehaviorStriker();
 		if (Striker != nullptr)
 		{
-			Striker->Strike(m_Target);
+			// Striker->Strike(m_Target); //mobTodo
 		}
 		ResetStrikeCooldown();
 	}

@@ -17,7 +17,30 @@ cBehaviorItemFollower::cBehaviorItemFollower(cMonster * a_Parent) :
 
 
 
-bool cBehaviorItemFollower::Tick()
+bool cBehaviorItemFollower::IsControlDesired()
+{
+	cItems FollowedItems;
+	m_Parent->GetFollowedItems(FollowedItems);
+	if (FollowedItems.Size() > 0)
+	{
+		cPlayer * a_Closest_Player = m_Parent->GetNearestPlayer();
+		if (a_Closest_Player != nullptr)
+		{
+			cItem EquippedItem = a_Closest_Player->GetEquippedItem();
+			if (FollowedItems.ContainsType(EquippedItem))
+			{
+				return true;  // We take control of the monster. Now it'll call our tick
+			}
+		}
+	}
+	return false;
+}
+
+
+
+
+
+void cBehaviorItemFollower::Tick()
 {
 	cItems FollowedItems;
 	m_Parent->GetFollowedItems(FollowedItems);
@@ -31,9 +54,7 @@ bool cBehaviorItemFollower::Tick()
 			{
 				Vector3d PlayerPos = a_Closest_Player->GetPosition();
 				m_Parent->MoveToPosition(PlayerPos);
-				return true;  // We took control of the monster, prevent other Behaviors from doing so
 			}
 		}
 	}
-	return false;
 }

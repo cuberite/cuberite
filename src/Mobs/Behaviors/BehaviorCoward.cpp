@@ -16,12 +16,20 @@ cBehaviorCoward::cBehaviorCoward(cMonster * a_Parent) :
 
 
 
+bool cBehaviorCoward::IsControlDesired()
+{
+	return (m_Attacker != nullptr); //mobTodo probably not so safe pointer (and cChaser m_Target too)
+}
 
-bool cBehaviorCoward::Tick()
+
+
+
+
+void cBehaviorCoward::Tick()
 {
 	if (m_Attacker == nullptr)
 	{
-		return false;
+		return;
 	}
 
 	// TODO NOT SAFE
@@ -29,14 +37,12 @@ bool cBehaviorCoward::Tick()
 	{
 		// We lost the attacker
 		m_Attacker = nullptr;
-		return false;
 	}
 
 	Vector3d newloc = m_Parent->GetPosition();
 	newloc.x = (m_Attacker->GetPosition().x < newloc.x)? (newloc.x + m_Parent->GetSightDistance()): (newloc.x - m_Parent->GetSightDistance());
 	newloc.z = (m_Attacker->GetPosition().z < newloc.z)? (newloc.z + m_Parent->GetSightDistance()): (newloc.z - m_Parent->GetSightDistance());
 	m_Parent->MoveToPosition(newloc);
-	return true;
 }
 
 

@@ -32,15 +32,6 @@ void cBehaviorAggressive::PreTick()
 
 
 
-void cBehaviorAggressive::Destroyed()
-{
-	m_ParentChaser->SetTarget(nullptr);
-}
-
-
-
-
-
 cPawn * cBehaviorAggressive::FindNewTarget()
 {
 	cPlayer * Closest = m_Parent->GetNearestPlayer();

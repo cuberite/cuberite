@@ -1,5 +1,6 @@
 #pragma once
 
+struct TakeDamageInfo;
 class cBehavior
 {
 public:
@@ -9,7 +10,10 @@ public:
 	virtual void Tick();
 	virtual void PostTick();
 	virtual void PreTick();
+
+
 	virtual void onRightClicked();
 	virtual void Destroyed();
-	virtual ~cBehavior() = 0;
+	virtual void DoTakeDamage(TakeDamageInfo & a_TDI);
+	virtual ~cBehavior() {}
 };

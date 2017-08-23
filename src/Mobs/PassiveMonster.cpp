@@ -10,10 +10,10 @@
 
 
 cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
-    super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height),
-    m_BehaviorBreeder(this), m_BehaviorItemFollower(this), m_BehaviorCoward(this), m_BehaviorWanderer(this)
+	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height),
+	m_BehaviorBreeder(this), m_BehaviorItemFollower(this), m_BehaviorCoward(this), m_BehaviorWanderer(this)
 {
-    m_EMPersonality = PASSIVE;
+	m_EMPersonality = PASSIVE;
 }
 
 
@@ -31,12 +31,12 @@ cPassiveMonster::~cPassiveMonster()
 
 bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-    if (!super::DoTakeDamage(a_TDI))
-    {
-        return false;
-    }
-    m_BehaviorCoward.DoTakeDamage(a_TDI);
-    return true;
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+	m_BehaviorCoward.DoTakeDamage(a_TDI);
+	return true;
 }
 
 
@@ -45,8 +45,8 @@ bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cPassiveMonster::Destroyed()
 {
-    m_BehaviorBreeder.Destroyed();
-    super::Destroyed();
+	m_BehaviorBreeder.Destroyed();
+	super::Destroyed();
 }
 
 
@@ -55,7 +55,7 @@ void cPassiveMonster::Destroyed()
 
 cBehaviorBreeder * cPassiveMonster::GetBehaviorBreeder()
 {
-    return &m_BehaviorBreeder;
+	return &m_BehaviorBreeder;
 }
 
 
@@ -64,38 +64,38 @@ cBehaviorBreeder * cPassiveMonster::GetBehaviorBreeder()
 
 const cBehaviorBreeder * cPassiveMonster::GetBehaviorBreeder() const
 {
-    return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
+	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
 }
 
 
 void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-    super::Tick(a_Dt, a_Chunk);
+	super::Tick(a_Dt, a_Chunk);
 
-    for (;;)
-    {
-        if (m_BehaviorCoward.ActiveTick())
-        {
-            break;
-        }
-        if (m_BehaviorBreeder.Tick())
-        {
-            break;
-        }
-        if (m_BehaviorItemFollower.ActiveTick())
-        {
-            break;
-        }
-        if (m_BehaviorWanderer.ActiveTick(a_Dt, a_Chunk))
-        {
-            break;
-        }
+	for (;;)
+	{
+		/*if (m_BehaviorCoward.Tick())
+		{
+			break;
+		}
+		if (m_BehaviorBreeder.Tick())
+		{
+			break;
+		}
+		if (m_BehaviorItemFollower.Tick())
+		{
+			break;
+		}
+		if (m_BehaviorWanderer.ActiveTick(a_Dt, a_Chunk))
+		{
+			break;
+		}*/
 
-        ASSERT(!"Not a single Behavior took control, this is not normal. ");
-        break;
-    }
+		ASSERT(!"Not a single Behavior took control, this is not normal. ");
+		break;
+	}
 
-    m_BehaviorBreeder.PostTick();
+	m_BehaviorBreeder.PostTick();
 }
 
 
@@ -104,6 +104,6 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 {
-    super::OnRightClicked(a_Player);
-    m_BehaviorBreeder.OnRightClicked(a_Player);
+	super::OnRightClicked(a_Player);
+	m_BehaviorBreeder.OnRightClicked(a_Player);
 }

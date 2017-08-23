@@ -10,14 +10,15 @@ class cItems;
 class cEntity;
 struct TakeDamageInfo;
 
-class cBehaviorCoward
+class cBehaviorCoward : cBehavior
 {
 public:
 	cBehaviorCoward(cMonster * a_Parent);
 
 	// Functions our host Monster should invoke:
-	bool Tick();
-	void DoTakeDamage(TakeDamageInfo & a_TDI);
+	bool IsControlDesired() override;
+	void Tick() override;
+	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 
 private:

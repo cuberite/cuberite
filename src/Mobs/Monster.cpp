@@ -300,10 +300,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (m_TicksSinceLastDamaged < 100)
-	{
-		++m_TicksSinceLastDamaged;
-	}
 	if ((GetTarget() != nullptr))
 	{
 		ASSERT(GetTarget()->IsTicking());
@@ -338,9 +334,12 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					Then STOP. */
 					if (
 							//mobTodo emstate
-						(GetBehaviorDayLightBurner() != nullptr) && (m_TicksSinceLastDamaged >= 100) &&
+						/* (GetBehaviorDayLightBurner() != nullptr) && (m_TicksSinceLastDamaged >= 100) &&
 						GetBehaviorDayLightBurner()->WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
-						!(GetBehaviorDayLightBurner()->WouldBurnAt(GetPosition(), *Chunk))
+						!(GetBehaviorDayLightBurner()->WouldBurnAt(GetPosition(), *Chunk)) */
+							1 == 0
+
+							// This logic should probably be in chaser
 					)
 					{
 						// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
@@ -524,22 +523,14 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+
 	if (!m_SoundHurt.empty() && (m_Health > 0))
 	{
 		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 
-	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
-	{
-		if (
-			(!a_TDI.Attacker->IsPlayer()) ||
-			(static_cast<cPlayer *>(a_TDI.Attacker)->CanMobsTarget())
-		)
-		{
-			SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
-		}
-		m_TicksSinceLastDamaged = 0;
-	}
+	//mobTodo call all interested behaviors
+
 	return true;
 }
 
@@ -659,15 +650,6 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		}
 		LeashTo(&a_Player);
 	}
-}
-
-
-
-
-
-void cMonster::ResetAttackCooldown()
-{
-	m_AttackCoolDownTicksLeft = static_cast<int>(3 * 20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every 3 seconds
 }
 
 

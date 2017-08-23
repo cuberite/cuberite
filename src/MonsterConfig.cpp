@@ -3,6 +3,7 @@
 
 #include "MonsterConfig.h"
 #include "Mobs/Monster.h"
+#include "Mobs/Behaviors/BehaviorChaser.h"
 #include "IniFile.h"
 
 
@@ -90,11 +91,18 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	{
 		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			a_Monster->SetAttackDamage (itr->m_AttackDamage);
-			a_Monster->SetAttackRange  (itr->m_AttackRange);
-			a_Monster->SetSightDistance(itr->m_SightDistance);
-			a_Monster->SetAttackRate   (static_cast<float>(itr->m_AttackRate));
+			cBehaviorChaser * Chaser = a_Monster->GetBehaviorChaser();
+
+			// mobTodo chaser is kind of "attacker", not really chaser?
+			if (Chaser != nullptr)
+			{
+				Chaser->SetAttackDamage (itr->m_AttackDamage);
+				Chaser->SetAttackRange  (itr->m_AttackRange);
+				Chaser->SetAttackRate   (static_cast<float>(itr->m_AttackRate));
+			}
+
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
+			a_Monster->SetSightDistance(itr->m_SightDistance);
 			a_Monster->SetIsFireproof  (itr->m_IsFireproof);
 			return;
 		}

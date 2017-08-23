@@ -9,7 +9,7 @@ class cBehaviorItemFollower;
 class cMonster;
 class cItems;
 
-class cBehaviorItemFollower
+class cBehaviorItemFollower : public cBehavior
 {
 public:
 	cBehaviorItemFollower(cMonster * a_Parent);
@@ -17,7 +17,8 @@ public:
 	void GetBreedingItems(cItems & a_Items);
 
 	// Functions our host Monster should invoke:
-	void Tick();
+	bool IsControlDesired() override;
+	void Tick() override;
 
 
 private:

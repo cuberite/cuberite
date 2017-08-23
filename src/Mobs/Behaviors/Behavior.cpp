@@ -79,3 +79,13 @@ void cBehavior::Destroyed()
 	LOGD("ERROR: Called Destroyed on a behavior that doesn't have one.");
 	ASSERT(1 == 0);
 }
+
+
+
+
+void cBehavior::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	UNUSED(a_TDI);
+	LOGD("ERROR: Called DoTakeDamage on a behavior that doesn't have one.");
+	ASSERT(1 == 0);
+}

@@ -66,7 +66,7 @@ void cBehaviorBreeder::Tick()
 
 			m_LovePartner->GetBehaviorBreeder()->ResetLoveMode();
 			ResetLoveMode();
-		}d
+		}
 	}
 }
 

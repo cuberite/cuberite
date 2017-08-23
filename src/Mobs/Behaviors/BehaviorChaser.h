@@ -24,6 +24,7 @@ public:
 	void Tick() override;
 	void Destroyed() override;
 	void PostTick() override;
+	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 	// Our host monster will call these once it loads its config file
 	void SetAttackRate(float a_AttackRate);
@@ -35,11 +36,9 @@ public:
 
 	/** Sets the target. */
 	void SetTarget(cPawn * a_Target);
-
-	virtual ~cBehaviorChaser();
 protected:
 	void ApproachTarget();
-	// virtual void ApproachTarget() = 0;
+	// virtual void ApproachTarget() = 0; //mobTodo
 private:
 
 	/** Our parent */
