@@ -1,4 +1,4 @@
-
+﻿
 // BlockingSslClientSocket.cpp
 
 // Implements the cBlockingSslClientSocket class representing a blocking TCP socket with client SSL encryption over it
@@ -125,7 +125,16 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 	}
 
 	// Initialize the SSL:
-	int ret = m_Ssl.Initialize(true);
+	int ret = 0;
+	if (m_Config != nullptr)
+	{
+		ret = m_Ssl.Initialize(m_Config);
+	}
+	else
+	{
+		ret = m_Ssl.Initialize(true);
+	}
+
 	if (ret != 0)
 	{
 		Printf(m_LastErrorText, "SSL initialization failed: -0x%x", -ret);
@@ -133,9 +142,9 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 	}
 
 	// If we have been assigned a trusted CA root cert store, push it into the SSL context:
-	if (m_CACerts.get() != nullptr)
+	if (!m_ExpectedPeerName.empty())
 	{
-		m_Ssl.SetCACerts(m_CACerts, m_ExpectedPeerName);
+		m_Ssl.SetExpectedPeerName(m_ExpectedPeerName);
 	}
 
 	ret = m_Ssl.Handshake();
@@ -153,28 +162,37 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 
 
 
-bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_CACerts, const AString & a_ExpectedPeerName)
+void cBlockingSslClientSocket::SetExpectedPeerName(AString a_ExpectedPeerName)
 {
+	ASSERT(!m_IsConnected);  // Must be called before connect
+
 	// Warn if used multiple times, but don't signal an error:
-	if (m_CACerts.get() != nullptr)
+	if (!m_ExpectedPeerName.empty())
 	{
 		LOGWARNING(
-			"SSL: Trying to set multiple trusted CA root cert stores, only the last one will be used. Name: %s",
+			"SSL: Trying to set multiple expected peer names, only the last one will be used. Name: %s",
 			a_ExpectedPeerName.c_str()
 		);
 	}
 
-	// Parse the cert:
-	m_CACerts.reset(new cX509Cert);
-	int ret = m_CACerts->Parse(a_CACerts.data(), a_CACerts.size());
-	if (ret < 0)
-	{
-		Printf(m_LastErrorText, "CA cert parsing failed: -0x%x", -ret);
-		return false;
-	}
-	m_ExpectedPeerName = a_ExpectedPeerName;
+	m_ExpectedPeerName = std::move(a_ExpectedPeerName);
+}
 
-	return true;
+
+
+
+
+void cBlockingSslClientSocket::SetSslConfig(std::shared_ptr<const cSslConfig> a_Config)
+{
+	ASSERT(!m_IsConnected);  // Must be called before connect
+
+	// Warn if used multiple times, but don't signal an error:
+	if (m_Config != nullptr)
+	{
+		LOGWARNING("SSL: Trying to set multiple configurations, only the last one will be used.");
+	}
+
+	m_Config = std::move(a_Config);
 }
 
 
