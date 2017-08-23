@@ -38,9 +38,6 @@ protected:
 	/** The InitialVector, used by the CFB mode decryption */
 	Byte m_IV[16];
 
-	/** Current offset in the m_IV, used by the CFB mode decryption */
-	size_t m_IVOffset;
-
 	/** Indicates whether the object has been initialized with the Key / IV */
 	bool m_IsValid;
 } ;
