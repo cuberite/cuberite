@@ -84,7 +84,7 @@ public:
 	bool IsLeashed() const { return (m_LeashedTo != nullptr); }
 
 	/** Leash the monster to an entity. */
-	void LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast = true);
+	void LeashTo(cEntity & a_Entity, bool a_ShouldBroadcast = true);
 
 	/** Unleash the monster. Overload for the Unleash(bool, bool) function for plugins */
 	void Unleash(bool a_ShouldDropLeashPickup);
