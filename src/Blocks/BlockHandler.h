@@ -140,7 +140,7 @@ public:
 	and wakes up all simulators on the block. */
 	virtual void Check(cChunkInterface & ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 
-	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: http://minecraft.gamepedia.com/Map_item_format */
+	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: https://minecraft.gamepedia.com/Map_item_format */
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta);
 
 	/** Rotates a given block meta counter-clockwise. Default: no change

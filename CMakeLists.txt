@@ -19,7 +19,7 @@ if (POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
 endif()
 
-# Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
+# Without this, the MSVC variable isn't defined for MSVC builds ( https://cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
 # Enable the support for solution folders in MSVC
@@ -94,7 +94,7 @@ else()
 endif()
 
 # We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
-# Adapted from http://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
+# Adapted from https://web.archive.org/web/https://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
 if(MSVC OR MSVC_IDE)
 	if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
 		message(FATAL_ERROR "The project requires C++11 features. "

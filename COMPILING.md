@@ -1,12 +1,12 @@
-COMPILING
-=========
+Compiling Cuberite
+==================
 
 To compile Cuberite from source, you need the following set of software:
 
- * CMake
- * Platform-specific make tool \(Windows would be MSVC, Linux/macOS GNU make, etc.\)
- * C compiler
- * modern C++ compiler and linker
+ - CMake
+ - Platform-specific make tool (Windows would be MSVC, Linux/macOS GNU make, etc.)
+ - C compiler
+ - Modern C++ compiler and linker
 
 To contribute code, you also need a Git client.
 
@@ -15,17 +15,17 @@ Windows
 
 We use Microsoft Visual Studio for Windows compilation. It is possible to use other toolchains, but we don't test against them and they aren't supported. Visual Studio 2013 Express for Desktop is being actively used for development.
 
-You can find download links for VS2013 Express here: https://go.microsoft.com/?linkid=9832280
+You can find download links for VS2013 Express [here][1].
 
-Next, you need to download and install CMake. Download from here: https://cmake.org/download/ . You should download a full installation package, so that the installer will set everything up for you (especially the paths).
+Next, you need to download and install [CMake][2]. You should download a full installation package, so that the installer will set everything up for you (especially the paths).
 
 To contribute your changes to the source back to the repository, you need a Git client. Options are:
 
- * Git for Windows: https://git-for-windows.github.io/
- * GitHub Desktop: https://desktop.github.com/
- * TortoiseGit: https://tortoisegit.org/
+ - [Git for Windows][3]
+ - [GitHub Desktop][4]
+ - [TortoiseGit][5]
 
-Alternatively, if you want only to compile the source, without contributing, you can [download the sources in a ZIP file directly from GitHub](https://github.com/cuberite/cuberite/archive/master.zip).
+Alternatively, if you want only to compile the source, without contributing, you can [download the sources in a ZIP file directly from GitHub][6].
 
 If you're using Git to get the source, use the following command to set up the local workspace correctly:
 
@@ -39,30 +39,30 @@ Finally, open the newly created file, `Cuberite.sln`, in your Visual Studio.
 
 If you want to run Cuberite from within VS, you need to first make sure that it will be run with the correct home folder. Normally this happens automatically, but for some Visual Studio versions the process doesn't stick. Right-click on the Cuberite project in the Solution Explorer tool window, and select Properties. In the dialog, navigate to Configuration properties -> Debugging in the tree on the left, then make sure the value `Working Directory` is set to `../Server`. If you don't do this, the server won't be able to find crafting recipes, item names or plugins.
 
-### Release configuration ###
+### Release Configuration
 
 To make Visual Studio produce the version with the best performance, you will need to select a Release configuration. Go to menu Build -> Configuration Manager, and in the opened dialog, change the top left combo box (Active solution configuration) to Release. Close the dialog and build the solution. The resulting executable is called `Cuberite.exe` in the `Server` folder.
 
-### Debug configuration ###
+### Debug Configuration
 
 In order to tinker with the code, you'll more than likely need to use the debugging features of your IDE. To make them the easiest to use, you should switch to the Debug configuration - this provides the highest level of information while debugging, for the price of the executable being 2 - 10 times slower. Go to menu Build -> Configuration Manager, and in the opened dialog, change the top left combo box (Active solution configuration) to Debug. Close the dialog and build the solution. The resulting executable is called `Cuberite_debug.exe` in the `Server` folder.
 
 macOS
----
+-----
 
-Install git from its [website](https://git-scm.com/) or homebrew: `brew install git`.
+ - Install git from its [website][7] or homebrew: `brew install git`.
 
-Install Xcode (commandline tools are recommended) from the App Store or [the website](https://developer.apple.com/downloads).
+ - Install Xcode (commandline tools are recommended) from the App Store or [the website][8].
 
-Install CMake from its [website](https://cmake.org/) or homebrew: `brew install cmake`.
+ - Install CMake from its [website][9] or homebrew: `brew install cmake`.
 
-### Getting the sources ###
+### Getting the Source
 
 ```
 git clone --recursive https://github.com/cuberite/cuberite.git
 ```
 
-### Building ###
+### Building
 
 Follow the instructions at [CMake on Unix-based platforms](#cmake-on-unix-based-platforms), using Xcode as cmake's generator. If no generator is specified, CMake will use the Makefile generator, in which case you must build with the `make` command.
 
@@ -79,13 +79,13 @@ sudo apt-get install git make cmake clang
 ```
 Ensure that you have modern C++ compiler and linker (Clang 3.4+, GCC 4.8+, or VS 2013+).
 
-### Getting the source ###
+### Getting the Source
 
 ```
 git clone --recursive https://github.com/cuberite/cuberite.git
 ```
 
-### Building ###
+### Building
 
 Run the following commands to build Cuberite:
 
@@ -103,18 +103,18 @@ Android
 
 It is required that users obtain the latest copies of:
 
- * The Android Native Development Kit (NDK): https://developer.android.com/ndk/downloads
- * Lua: https://www.lua.org/download.html (download a binary)
+ - [The Android Native Development Kit (NDK)][10]
+ - [Lua (download a binary)][11]
 
-Windows users may optionally install the Ninja build system (https://github.com/ninja-build/ninja/releases) for improved build speeds.
+Windows users may optionally install the [Ninja build system][12] for improved build speeds.
 
-### Getting the sources ###
+### Getting the Source
 
 ```
 git clone --recursive https://github.com/cuberite/cuberite.git
 ```
 
-### Configuration ###
+### Configuration
 
 From the `android` subdirectory:
 
@@ -123,7 +123,7 @@ cmake . -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=16 -DCMAKE_BUILD_TYPE
 ```
 where `CMAKE_ANDROID_NDK` should be the absolute path to where the Android NDK is installed.
 
-#### Generators to use ####
+#### Generators to Use
 
 On Linux, the default Make is suggested. No additional parameters are required for this option.
 
@@ -136,19 +136,19 @@ where `CMAKE_MAKE_PROGRAM` should be the absolute path to the `make` program, fo
 The next easiest generator is Ninja, which additionally offers multithreaded builds, to be specified:
  * `-G "Ninja"`
 
-#### Additional ABI options ####
+#### Additional ABI Options
 
 For additional ABI options, visit: https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARCH_ABI.html
 
 Please note that certain ABIs require specific [API levels](#api-level-requirements).
 
-#### API level requirements ####
+#### API Level Requirements
 
 The minimum API level is 16 in the verbatim copy of this folder, due to the inclusion of position independent compilation. Additonally, API level 21 or higher is needed for 64 bit ABIs as earlier versions have no support for this architecture.
 
 To lower these requirements to run on very old devices, it is necessary to select a compatible ABI, and disable position independent code generation.
 
-### Building ###
+### Building
 
 From the `android` subdirectory:
 
@@ -160,7 +160,7 @@ If the build succeeded, an Android-launchable binary will have been generated un
 
 To use it in the official Android app, compress the aforementioned `Server` directory into a Zip file, and transfer it to the phone on which the app is installed.
 
-#### Using the compile script on Linux ####
+#### Using the Compile Script on Linux
 
 Linux users are entitled to use the compile script, which provides some easy to use options and also contains instructions for using the binaries in the official Android app.
 
@@ -172,7 +172,7 @@ NDK="path/to/ndk/root" CMAKE="path/to/cmake/executable" android/compile.sh <abi|
 
 The NDK variable must be set to the path to the NDK root, CMAKE to a call of the cmake binary used for compiling. If the cmake binary is in the PATH, a simple `CMAKE=cmake` is enough. As last parameter you either have to enter a correct ABI (see https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARCH_ABI.html) or either all or clean. Clean will cause the script to remove the android-build directory, all will compile and zip all Cuberite for all 7 ABIs and create a zip archive of the android/Server direcory for use in the official Android app. If you are unsure which ABI is required for your phone, open the official Android app and navigate to "Settings" and "Install". It will show you the required ABI. Additional parameters may be given through enviroment variables, namely TYPE="" as Release or Debug (defaults to Release) and THREADS="4" as the number of threads used for compilation (defaults to 4).
 
-### Running the executables on a device ###
+### Running the Executables on a Device
 
 Note the locations to which the Zip files were transferred. Open the official Android app, and select "Settings", then "Install", and finally select the Zip files.
 
@@ -181,7 +181,7 @@ Cuberite for Android is now ready to use.
 CMake on Unix-based platforms
 -----------------------------
 
-### Release Mode ###
+### Release Mode
 
 Release mode is preferred for almost all cases, it has much better speed and less console spam. However, if you are developing Cuberite actively, debug mode might be better.
 
@@ -197,7 +197,7 @@ NOTE: CMake can generate project files for many different programs, such as Xcod
 
 The executable will be built in the `cuberite/Server` folder and will be named `Cuberite`.
 
-### Debug Mode ###
+### Debug Mode
 
 Debug mode is useful if you want more debugging information about Cuberite while it's running or if you want to use a debugger like GDB to debug issues and crashes.
 
@@ -213,7 +213,7 @@ NOTE: CMake can generate project files for many different programs, such as Xcod
 
 The executable will be built in the `cuberite/Server` folder and will be named `Cuberite_debug`.
 
-### 32 Bit Mode switch ###
+### 32 Bit Mode Switch
 
 This is useful if you want to compile Cuberite on an x64 (64-bit Intel) machine but want to use on an x86 (32-bit Intel) machine. This switch can be used with debug or release mode. Simply add:
 
@@ -221,7 +221,7 @@ This is useful if you want to compile Cuberite on an x64 (64-bit Intel) machine 
 
 to your cmake command and 32 bit will be forced.
 
-### Compiling for another computer of the same architecture ###
+### Compiling for Another Computer of the Same Architecture
 
 When cross-compiling for another computer of the same architecture it is important to set the NO_NATIVE_OPTIMIZATION flag. This tells the compiler not to optimise for your machine. This switch can be used with debug or release mode. To enable, simply add:
 
@@ -229,7 +229,7 @@ When cross-compiling for another computer of the same architecture it is importa
 
 to your cmake command.
 
-### List of all build flags ###
+### List of All Build Flags
 
 Cuberite's build process supports a large number of flags for customising the builds. Use these flags by adding `-DFlag_name=Value` to the cmake configuration command. For example to enable test generation using the `SELF_TEST` flag add: `-DSELF_TEST=ON`
 
@@ -247,3 +247,16 @@ Forces the build to use 32 bit builds on *nix systems. Define as ON to enable. D
 
 ###### NO_NATIVE_OPTIMIZATION
 Disables optimizations for the build host. This is important when building on a different machine from the one you will run Cuberite on as the build machine may support instructions the final machine does not. This flag only has any effect on linux. Define as ON to enable. Define as OFF to disable.
+
+[1]: https://www.visualstudio.com/downloads/
+[2]: https://cmake.org/download/
+[3]: https://git-for-windows.github.io/
+[4]: https://desktop.github.com/
+[5]: https://tortoisegit.org/
+[6]: https://github.com/cuberite/cuberite/archive/master.zip
+[7]: https://git-scm.com/
+[8]: https://developer.apple.com/downloads
+[9]: https://cmake.org/
+[10]: https://developer.android.com/ndk/downloads/index.html
+[11]: https://www.lua.org/download.html
+[12]: https://github.com/ninja-build/ninja/releases
