@@ -306,7 +306,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// They MUST NOT control mob movement or interefere with the main Tick.
 	for (cBehavior * Behavior : PreTickBehaviors)
 	{
-		Behavior->PreTick();
+		Behavior->PreTick(a_Dt, a_Chunk);
 	}
 
 	// Note 1: Each monster tick, at most one Behavior executes its Tick method.
@@ -320,7 +320,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Stop at the first one that says yes.
 		for (cBehavior * Behavior : TickBehaviors)
 		{
-			if (Behavior->IsControlDesired())
+			if (Behavior->IsControlDesired(a_Dt, a_Chunk))
 			{
 				m_NewTickControllingBehavior = Behavior;
 				break;
@@ -331,7 +331,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// The Behavior asking for control is the same as the behavior from last tick.
 			// Nothing special, just tick it.
-			m_CurrentTickControllingBehavior->Tick();
+			m_CurrentTickControllingBehavior->Tick(a_Dt, a_Chunk);
 		}
 		else
 		{
@@ -345,7 +345,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Make the current controlling behavior clean up
 	if (m_TickControllingBehaviorState == OldControlEnding)
 	{
-		if (m_CurrentTickControllingBehavior->ControlEnding())
+		if (m_CurrentTickControllingBehavior->ControlEnding(a_Dt, a_Chunk))
 		{
 			// The current behavior told us it is ready for letting go of control
 			m_TickControllingBehaviorState = NewControlStarting;
@@ -360,7 +360,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Make the new controlling behavior set up
 	else if (m_TickControllingBehaviorState == NewControlStarting)
 	{
-		if (m_NewTickControllingBehavior->ControlStarting())
+		if (m_NewTickControllingBehavior->ControlStarting(a_Dt, a_Chunk))
 		{
 			// The new behavior told us it is ready for taking control
 			// The new behavior is now the current behavior. Next tick it will execute its Tick.
@@ -380,7 +380,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// They MUST NOT control mob movement or interefere with the main Tick.
 	for (cBehavior * Behavior : PostTickBehaviors)
 	{
-		Behavior->PostTick();
+		Behavior->PostTick(a_Dt, a_Chunk);
 	}
 
 	bool a_IsFollowingPath = false;

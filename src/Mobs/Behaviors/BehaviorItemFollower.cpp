@@ -17,8 +17,10 @@ cBehaviorItemFollower::cBehaviorItemFollower(cMonster * a_Parent) :
 
 
 
-bool cBehaviorItemFollower::IsControlDesired()
+bool cBehaviorItemFollower::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	cItems FollowedItems;
 	m_Parent->GetFollowedItems(FollowedItems);
 	if (FollowedItems.Size() > 0)
@@ -40,8 +42,10 @@ bool cBehaviorItemFollower::IsControlDesired()
 
 
 
-void cBehaviorItemFollower::Tick()
+void cBehaviorItemFollower::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	cItems FollowedItems;
 	m_Parent->GetFollowedItems(FollowedItems);
 	if (FollowedItems.Size() > 0)

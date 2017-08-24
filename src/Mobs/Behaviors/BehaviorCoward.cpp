@@ -16,8 +16,10 @@ cBehaviorCoward::cBehaviorCoward(cMonster * a_Parent) :
 
 
 
-bool cBehaviorCoward::IsControlDesired()
+bool cBehaviorCoward::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	return (m_Attacker != nullptr); //mobTodo probably not so safe pointer (and cChaser m_Target too)
 }
 
@@ -25,8 +27,10 @@ bool cBehaviorCoward::IsControlDesired()
 
 
 
-void cBehaviorCoward::Tick()
+void cBehaviorCoward::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	if (m_Attacker == nullptr)
 	{
 		return;

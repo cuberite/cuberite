@@ -24,8 +24,10 @@ cBehaviorBreeder::cBehaviorBreeder(cMonster * a_Parent) :
 
 
 
-void cBehaviorBreeder::Tick()
+void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	cWorld * World = m_Parent->GetWorld();
 	// if we have a partner, mate
 	if (m_LovePartner != nullptr)
@@ -74,8 +76,10 @@ void cBehaviorBreeder::Tick()
 
 
 
-void cBehaviorBreeder::PostTick()
+void cBehaviorBreeder::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	if (m_MatingTimer > 0)
 	{
 		m_MatingTimer--;
@@ -94,8 +98,10 @@ void cBehaviorBreeder::PostTick()
 
 
 
-bool cBehaviorBreeder::IsControlDesired()
+bool cBehaviorBreeder::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	cWorld * World = m_Parent->GetWorld();
 
 	// if we have a love partner, we should control the mob

@@ -23,8 +23,10 @@ cBehaviorChaser::cBehaviorChaser(cMonster * a_Parent) :
 
 
 
-bool cBehaviorChaser::IsControlDesired()
+bool cBehaviorChaser::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	// If we have a target, we have something to do! Return true and control the mob Ticks.
 	// Otherwise return false.
 	return (GetTarget() != nullptr);
@@ -34,8 +36,10 @@ bool cBehaviorChaser::IsControlDesired()
 
 
 
-void cBehaviorChaser::Tick()
+void cBehaviorChaser::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	/*
 	 * 	if ((GetTarget() != nullptr))
 	{
@@ -83,7 +87,7 @@ void cBehaviorChaser::ApproachTarget()
 
 
 
-void cBehaviorChaser::PostTick()
+void cBehaviorChaser::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_TicksSinceLastDamaged < 100)
 	{

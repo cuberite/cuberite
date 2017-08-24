@@ -19,7 +19,7 @@ cBehaviorAggressive::cBehaviorAggressive(cMonster * a_Parent) : m_Parent(a_Paren
 
 
 
-void cBehaviorAggressive::PreTick()
+void cBehaviorAggressive::PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// Target something new if we have no target
 	if (m_ParentChaser->GetTarget() == nullptr)
