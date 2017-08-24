@@ -431,7 +431,7 @@ void cMonster::CalcLeashActions()
 		auto LeashKnot = cLeashKnot::FindKnotAtPos(*m_World, { FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z) });
 		if (LeashKnot != nullptr)
 		{
-			LeashTo(LeashKnot);
+			LeashTo(*LeashKnot);
 			SetLeashToPos(nullptr);
 		}
 	}
@@ -688,7 +688,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
-		LeashTo(&a_Player);
+		LeashTo(a_Player);
 	}
 }
 
@@ -1407,7 +1407,7 @@ cMonster::eFamily cMonster::GetMobFamily(void) const
 
 
 
-void cMonster::LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast)
+void cMonster::LeashTo(cEntity & a_Entity, bool a_ShouldBroadcast)
 {
 	// Do nothing if already leashed
 	if (m_LeashedTo != nullptr)
@@ -1415,13 +1415,13 @@ void cMonster::LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast)
 		return;
 	}
 
-	m_LeashedTo = a_Entity;
+	m_LeashedTo = &a_Entity;
 
-	a_Entity->AddLeashedMob(this);
+	a_Entity.AddLeashedMob(this);
 
 	if (a_ShouldBroadcast)
 	{
-		m_World->BroadcastLeashEntity(*this, *a_Entity);
+		m_World->BroadcastLeashEntity(*this, a_Entity);
 	}
 
 	m_IsLeashActionJustDone = true;
