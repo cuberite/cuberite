@@ -66,6 +66,11 @@ public:
 		int m_SubCriteria;
 	};
 
+	static eType StringToType(const AString & a_Name);
+	static AString TypeToString(eType a_Type);
+
+	// tolua_end
+
 	// For the "Scoreboard Objective" packet
 	enum eUpdateAction
 	{
@@ -73,12 +78,6 @@ public:
 		uaRemove = 1,
 		uaUpdateText = 2
 	};
-
-	static eType StringToType(const AString & a_Name);
-
-	// tolua_end
-
-	static AString TypeToString(eType a_Type);
 
 public:
 
@@ -168,14 +167,14 @@ class cTeam
 {
 public:
 
+	// tolua_end
+
 	enum eProtocolAction
 	{
 		paCreateTeam = 0,
 		paRemoveTeam = 1,
 		paUpdateTeam = 2
 	};
-
-	// tolua_end
 
 	cTeam(
 		const AString & a_Name, const AString & a_DisplayName,
@@ -290,14 +289,14 @@ public:
 		dsCount
 	};
 
+	// tolua_end
+
 	// For the "Update Score" packet
 	enum eUpdateAction
 	{
 		uaUpsert = 0,
 		uaRemove = 1
 	};
-
-	// tolua_end
 
 
 public:

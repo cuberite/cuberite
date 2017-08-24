@@ -9086,7 +9086,7 @@ a_Player:OpenWindow(Window);
 		cObjective =
 		{
 			Desc = [[
-				This class represents a single scoreboard objective.
+				This class represents a single scoreboard objective. Note that the term "player" is used loosely here to mean "item that the objective is tracking," to match the Vanilla minecraft documentation, but a "player" does not need to be the username of an actual player.
 			]],
 			Functions =
 			{
@@ -9095,11 +9095,11 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "player",
 							Type = "string",
 						},
 						{
-							Name = "number",
+							Name = "ScoreToAdd",
 							Type = "number",
 						},
 					},
@@ -9132,12 +9132,22 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the internal name of the objective.",
 				},
+				GetPlayers =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns all of the players this objective is tracking",
+				},
 				GetScore =
 				{
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "player",
 							Type = "string",
 						},
 					},
@@ -9170,18 +9180,29 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "player",
 							Type = "string",
 						},
 					},
 					Notes = "Reset the score of the specified player.",
+				},
+				SetAllScores =
+				{
+					Params =
+					{
+						{
+							Name = "Score",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the score of every player this objective tracks to the given score",
 				},
 				SetDisplayName =
 				{
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "DisplayName",
 							Type = "string",
 						},
 					},
@@ -9192,7 +9213,7 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "player",
 							Type = "string",
 						},
 						{
@@ -9202,16 +9223,33 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the score of the specified player.",
 				},
+				StringToType =
+				{
+					Params =
+					{
+						{
+							Name = "TypeString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "<unknown>",
+						},
+					},
+					Notes = "(STATIC) Converts a Vanilla minecraft objective criteria string to an internal eType.",
+				},
 				SubScore =
 				{
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "player",
 							Type = "string",
 						},
 						{
-							Name = "number",
+							Name = "ScoreToSubtract",
 							Type = "number",
 						},
 					},
@@ -9223,6 +9261,23 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Subtracts a value from the score of the specified player and returns the new value.",
+				},
+				TypeToString =
+				{
+					Params =
+					{
+						{
+							Name = "Type",
+							Type = "<unknown>",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "(STATIC) Converts an internal objective eType to a Vanilla minecraft objective criteria string",
 				},
 			},
 			Constants =
@@ -11551,7 +11606,7 @@ end
 						},
 						{
 							Name = "Value",
-							Type = "<unknown>",
+							Type = "number",
 						},
 					},
 					Notes = "Adds a value to all player scores of the specified objective type.",
@@ -11792,6 +11847,70 @@ end
 				dsSidebar =
 				{
 					Notes = "",
+				},
+				dsTeamAqua =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamBlack =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamBlue =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamDarkAqua =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamDarkBlue =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamDarkGray =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamDarkGreen =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamDarkPurple =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamDarkRed =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamGold =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamGray =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamGreen =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamLightPurple =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamRed =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamWhite =
+				{
+					Notes = "The sidebar for team aqua",
+				},
+				dsTeamYellow =
+				{
+					Notes = "The sidebar for team aqua",
 				},
 			},
 		},
@@ -12072,6 +12191,16 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 					},
 					Notes = "Returns whether players can see invisible teammates.",
 				},
+				GetColor =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color ID of the team",
+				},
 				GetDisplayName =
 				{
 					Returns =
@@ -12170,6 +12299,17 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 					},
 					Notes = "Set whether players can see invisible teammates.",
+				},
+				SetColor =
+				{
+					Params =
+					{
+						{
+							Name = "Color",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the color ID of the team (0 to 15)",
 				},
 				SetDisplayName =
 				{
