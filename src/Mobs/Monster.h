@@ -329,11 +329,14 @@ private:
 	/** Leash calculations inside Tick function */
 	void CalcLeashActions();
 
+	std::vector<cBehavior*> PreTickBehaviors;
 	std::vector<cBehavior*> TickBehaviors;
+	std::vector<cBehavior*> PostTickBehaviors;
 	std::vector<cBehavior*> OnDestroyBehaviors;
 	std::vector<cBehavior*> OnRightClickBehaviors;
 
 	cBehavior * m_CurrentTickControllingBehavior;
-	enum TickState{ControlStarting, ControlEnding, Normal} m_TickControllingBehaviorState;
+	cBehavior * m_NewTickControllingBehavior;
+	enum TickState{NewControlStarting, OldControlEnding, Normal} m_TickControllingBehaviorState;
 
 } ;  // tolua_export

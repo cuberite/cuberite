@@ -114,6 +114,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive)
 	, m_Target(nullptr)
 	, m_CurrentTickControllingBehavior(nullptr)
+	, m_NewTickControllingBehavior(nullptr)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -300,17 +301,86 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if ((GetTarget() != nullptr))
+	// All behaviors can execute PostTick and PreTick.
+	// These are for bookkeeping or passive actions like laying eggs.
+	// They MUST NOT control mob movement or interefere with the main Tick.
+	for (cBehavior * Behavior : PreTickBehaviors)
 	{
-		ASSERT(GetTarget()->IsTicking());
+		Behavior->PreTick();
+	}
 
-		if (GetTarget()->IsPlayer())
+	// Note 1: Each monster tick, at most one Behavior executes its Tick method.
+	// Note 2: Each monster tick, exactly one of these is executed:
+	// ControlStarting, Tick, ControlEnding
+
+	// If we're in a regular tick cycle
+	if (m_TickControllingBehaviorState == Normal)
+	{
+		// ask the behaviors sequentially if they are interested in controlling this mob
+		// Stop at the first one that says yes.
+		for (cBehavior * Behavior : TickBehaviors)
 		{
-			if (!static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
+			if (Behavior->IsControlDesired())
 			{
-				SetTarget(nullptr);
+				m_NewTickControllingBehavior = Behavior;
+				break;
 			}
 		}
+		ASSERT(m_NewTickControllingBehavior != nullptr); // it's not OK if no one asks for control
+		if (m_CurrentTickControllingBehavior == m_NewTickControllingBehavior)
+		{
+			// The Behavior asking for control is the same as the behavior from last tick.
+			// Nothing special, just tick it.
+			m_CurrentTickControllingBehavior->Tick();
+		}
+		else
+		{
+			// The behavior asking for control is not the same as the behavior from last tick.
+			// Begin the control swapping process.
+			m_TickControllingBehaviorState = OldControlEnding;
+		}
+
+	}
+
+	// Make the current controlling behavior clean up
+	if (m_TickControllingBehaviorState == OldControlEnding)
+	{
+		if (m_CurrentTickControllingBehavior->ControlEnding())
+		{
+			// The current behavior told us it is ready for letting go of control
+			m_TickControllingBehaviorState = NewControlStarting;
+		}
+		else
+		{
+			// The current behavior is not ready for releasing control. We'll execute ControlEnding
+			// next tick too.
+			m_TickControllingBehaviorState = OldControlEnding;
+		}
+	}
+	// Make the new controlling behavior set up
+	else if (m_TickControllingBehaviorState == NewControlStarting)
+	{
+		if (m_NewTickControllingBehavior->ControlStarting())
+		{
+			// The new behavior told us it is ready for taking control
+			// The new behavior is now the current behavior. Next tick it will execute its Tick.
+			m_TickControllingBehaviorState = Normal;
+			m_CurrentTickControllingBehavior = m_NewTickControllingBehavior;
+		}
+		else
+		{
+			// The new behavior is not ready for taking control.
+			// We'll execute ControlStarting next tick too.
+			m_TickControllingBehaviorState = NewControlStarting;
+		}
+	}
+
+	// All behaviors can execute PostTick and PreTick.
+	// These are for bookkeeping or passive actions like laying eggs.
+	// They MUST NOT control mob movement or interefere with the main Tick.
+	for (cBehavior * Behavior : PostTickBehaviors)
+	{
+		Behavior->PostTick();
 	}
 
 	bool a_IsFollowingPath = false;

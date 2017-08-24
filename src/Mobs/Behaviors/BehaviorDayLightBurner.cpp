@@ -12,8 +12,9 @@ cBehaviorDayLightBurner::cBehaviorDayLightBurner(cMonster * a_Parent) : m_Parent
 	ASSERT(m_Parent != nullptr);
 }
 
-void cBehaviorDayLightBurner::PostTick(cChunk & a_Chunk, bool WouldBurn)
+void cBehaviorDayLightBurner::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	// mobTodo WouldBurn
 	int RelY = static_cast<int>(m_Parent->GetPosY());
 	if ((RelY < 0) || (RelY >= cChunkDef::Height))
 	{

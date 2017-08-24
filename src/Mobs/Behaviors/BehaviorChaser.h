@@ -20,10 +20,10 @@ public:
 	cBehaviorChaser(cMonster * a_Parent);
 
 	// Functions our host Monster should invoke:
-	bool IsControlDesired() override;
-	void Tick() override;
+	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void Destroyed() override;
-	void PostTick() override;
+	void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 	// Our host monster will call these once it loads its config file

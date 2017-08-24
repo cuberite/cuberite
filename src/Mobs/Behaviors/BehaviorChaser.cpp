@@ -36,6 +36,21 @@ bool cBehaviorChaser::IsControlDesired()
 
 void cBehaviorChaser::Tick()
 {
+	/*
+	 * 	if ((GetTarget() != nullptr))
+	{
+		ASSERT(GetTarget()->IsTicking());
+
+		if (GetTarget()->IsPlayer())
+		{
+			if (!static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
+			{
+				SetTarget(nullptr);
+			}
+		}
+	} //mobTodo copied from monster.cpp
+	 * */
+
 	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == m_Parent->GetWorld())));
 	// Stop targeting out of range targets
 	if (GetTarget() != nullptr)

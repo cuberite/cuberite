@@ -6,8 +6,10 @@
 
 
 
-bool cBehavior::IsControlDesired()
+bool cBehavior::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	LOGD("ERROR: Probably forgot to implement  cBehavior::IsControlDesired but implement  cBehavior::Tick");
 	return false;
 }
@@ -16,8 +18,10 @@ bool cBehavior::IsControlDesired()
 
 
 
-bool cBehavior::ControlStarting()
+bool cBehavior::ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	return true;
 }
 
@@ -25,8 +29,10 @@ bool cBehavior::ControlStarting()
 
 
 
-bool cBehavior::ControlEnding()
+bool cBehavior::ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	return true;
 }
 
@@ -34,8 +40,10 @@ bool cBehavior::ControlEnding()
 
 
 
-void cBehavior::Tick()
+void cBehavior::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	LOGD("ERROR: Called a TICK on a behavior that doesn't have one.");
 	ASSERT(1 == 0);
 }
@@ -44,8 +52,10 @@ void cBehavior::Tick()
 
 
 
-void cBehavior::PostTick()
+void cBehavior::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	LOGD("ERROR: Called a PostTick on a behavior that doesn't have one.");
 	ASSERT(1 == 0);
 }
@@ -54,8 +64,10 @@ void cBehavior::PostTick()
 
 
 
-void cBehavior::PreTick()
+void cBehavior::PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
 	LOGD("ERROR: Called a PreTick on a behavior that doesn't have one.");
 	ASSERT(1 == 0);
 }

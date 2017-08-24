@@ -26,7 +26,7 @@ public:
 	// Agression under specific conditions (nighttime, etc)
 
 	// Functions our host Monster should invoke:
-	void PreTick() override;
+	void PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 private:
 	cPawn * FindNewTarget();

@@ -1,6 +1,7 @@
 #pragma once
 
 // The mob will wander around
+#include <chrono>
 
 class cMonster;
 class cEntity;

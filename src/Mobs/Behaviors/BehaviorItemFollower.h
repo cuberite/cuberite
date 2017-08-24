@@ -17,8 +17,8 @@ public:
 	void GetBreedingItems(cItems & a_Items);
 
 	// Functions our host Monster should invoke:
-	bool IsControlDesired() override;
-	void Tick() override;
+	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 
 private:

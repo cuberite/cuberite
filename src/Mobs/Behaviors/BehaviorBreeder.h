@@ -21,9 +21,9 @@ public:
 	cBehaviorBreeder(cMonster * a_Parent);
 
 	// Functions our host Monster should invoke:
-	bool IsControlDesired() override;
-	void Tick() override;
-	void PostTick() override;
+	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void OnRightClicked(cPlayer & a_Player);
 	void Destroyed() override;
 
