@@ -167,6 +167,27 @@ class cTeam
 {
 public:
 
+	enum eColor
+	{
+		teamInvalid = -1,
+		teamBlack = 0,
+		teamDarkBlue,
+		teamDarkGreen,
+		teamDarkAqua,
+		teamDarkRed,
+		teamDarkPurple,
+		teamGold,
+		teamGray,
+		teamDarkGray,
+		teamBlue,
+		teamGreen,
+		teamAqua,
+		teamRed,
+		teamLightPurple,
+		teamYellow,
+		teamWhite
+	};
+
 	// tolua_end
 
 	enum eProtocolAction
@@ -218,8 +239,8 @@ public:
 	void SetPrefix(const AString & a_Prefix);
 	void SetSuffix(const AString & a_Suffix);
 
-	void SetColor(int a_Color);
-	int GetColor(void) const { return m_Color; }
+	void SetColor(eColor a_Color);
+	eColor GetColor(void) const { return m_Color; }
 
 	// tolua_end
 
@@ -247,7 +268,7 @@ private:
 
 	cPlayerNameSet m_Players;
 
-	int m_Color;
+	eColor m_Color;
 
 	friend class cScoreboardSerializer;
 
@@ -268,25 +289,10 @@ public:
 		dsList = 0,
 		dsSidebar,
 		dsName,
+		dsSidebarTeamOffset,  // Add this to the cTeam::eColor to get the enum for that team
 
-		dsTeamBlack,
-		dsTeamDarkBlue,
-		dsTeamDarkGreen,
-		dsTeamDarkAqua,
-		dsTeamDarkRed,
-		dsTeamDarkPurple,
-		dsTeamGold,
-		dsTeamGray,
-		dsTeamDarkGray,
-		dsTeamBlue,
-		dsTeamGreen,
-		dsTeamAqua,
-		dsTeamRed,
-		dsTeamLightPurple,
-		dsTeamYellow,
-		dsTeamWhite,
-
-		dsCount
+		// Taking into account the team colors
+		dsCount = 19
 	};
 
 	// tolua_end

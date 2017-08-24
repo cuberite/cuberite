@@ -315,13 +315,13 @@ cTeam::cTeam(
 	, m_Name(a_Name)
 	, m_Prefix(a_Prefix)
 	, m_Suffix(a_Suffix)
-	, m_Color(-1)
+	, m_Color(teamInvalid)
 {
 }
 
 
 
-void cTeam::SetColor(int a_Color)
+void cTeam::SetColor(eColor a_Color)
 {
 	m_Color = a_Color;
 	m_World->BroadcastTeam(*this, paUpdateTeam);
@@ -455,9 +455,6 @@ cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AStrin
 
 	if (Status.second)
 	{
-		ASSERT(m_World != nullptr);
-		m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, cObjective::uaCreate);
-
 		return &Status.first->second;
 	}
 	else
@@ -480,9 +477,6 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 	{
 		return false;
 	}
-
-	ASSERT(m_World != nullptr);
-	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), cObjective::uaRemove);
 
 	for (unsigned int i = 0; i < static_cast<unsigned int>(dsCount); ++i)
 	{
@@ -743,7 +737,10 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 
 	for (auto it : m_Objectives)
 	{
-		it.second.SendTo(a_Client);
+		if (it.second.IsDisplayed())
+		{
+			it.second.SendTo(a_Client);
+		}
 	}
 
 	for (auto team : m_Teams)
@@ -774,7 +771,10 @@ void cScoreboard::RemoveFrom(cClientHandle & a_Client)
 	// Remove every objective
 	for (auto objective : m_Objectives)
 	{
-		a_Client.SendScoreboardObjective(objective.second.GetName(), "", cObjective::uaRemove);
+		if (objective.second.IsDisplayed())
+		{
+			a_Client.SendScoreboardObjective(objective.second.GetName(), "", cObjective::uaRemove);
+		}
 	}
 
 	// Remove every team
