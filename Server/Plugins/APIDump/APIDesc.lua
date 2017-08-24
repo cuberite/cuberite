@@ -2183,7 +2183,7 @@ function OnPlayerJoined(a_Player)
 	-- Send an example composite chat message to the player:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "http://cuberite.org", "u@2")  -- Colored underlined link
+		:AddUrlPart(a_Player:GetName(), "https://cuberite.org", "u@2")  -- Colored underlined link
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")       -- Underlined suggest-command
 		:AddRunCommandPart(" SetDay", "/time set 0")                 -- Regular text that will execute command when clicked
 		:SetMessageType(mtJoin)                                      -- It is a join-message
@@ -10559,7 +10559,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Sends the specified message to the player (shows above action bar, doesn't show for < 1.8 clients).",
+					Notes = "Sends the specified message to the player (shows above action bar).",
 				},
 				SendBlocksAround =
 				{
@@ -10706,7 +10706,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Sends the specified message to the player (doesn't show for < 1.8 clients).",
+					Notes = "Sends the specified message to the player.",
 				},
 				SetBedPos =
 				{
@@ -16912,7 +16912,7 @@ end
 		{
 			Desc = [[
 				This class provides an interface to the XML parser,
-				{{http://matthewwild.co.uk/projects/luaexpat/|LuaExpat}}. It provides a SAX interface with an
+				{{https://matthewwild.co.uk/projects/luaexpat/|LuaExpat}}. It provides a SAX interface with an
 				incremental XML parser.</p>
 				<p>
 				With an event-based API like SAX the XML document can be fed to the parser in chunks, and the
@@ -16921,7 +16921,7 @@ end
 				parsing of huge documents can benefit from this piecemeal operation.</p>
 				<p>
 				See the online
-				{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}} for details
+				{{https://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}} for details
 				on how to work with this parser. The code examples below should provide some basic help, too.
 			]],
 			Functions =
@@ -16973,7 +16973,7 @@ end
 						The callbacks table passed to the new() function specifies the Lua functions that the parser
 						calls upon various events. The following table lists the most common functions used, for a
 						complete list see the online
-						{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.</p>
+						{{https://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.</p>
 						<table>
 						<tr><th>Function name</th><th>Parameters</th><th>Notes</th></tr>
 						<tr><td>CharacterData</td><td>Parser, string</td><td>Called when the parser recognizes a raw string inside the element</td></tr>
@@ -16987,7 +16987,7 @@ end
 					Contents = [[
 						The XMLParser object returned by lxp.new provides the functions needed to parse the XML. The
 						following list provides the most commonly used ones, for a complete list see the online
-						{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.
+						{{https://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.
 						<ul>
 							<li>close() - closes the parser, freeing all memory used by it.</li>
 							<li>getCallbacks() - returns the callbacks table for this parser.</li>
@@ -17191,7 +17191,7 @@ end
 			Desc = [[
 				This class represents the tolua bridge between the Lua API and Cuberite. It supports some low
 				level operations and queries on the objects. See also the tolua++'s documentation at
-				{{http://www.codenix.com/~tolua/tolua++.html#utilities}}. Normally you shouldn't use any of these
+				{{https://www8.cs.umu.se/kurser/TDBD12/VT04/lab/lua/tolua++.html#utilities}}. Normally you shouldn't use any of these
 				functions except for type()
 			]],
 			Functions =

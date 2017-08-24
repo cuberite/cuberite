@@ -11,7 +11,7 @@ cStatInfo cStatInfo::ms_Info[statCount] =
 {
 	// The order must match the order of enum eStatistic
 
-	// http://minecraft.gamepedia.com/Achievements
+	// https://minecraft.gamepedia.com/Achievements
 
 	/*             Type          |      Name            |  Prerequisite      */
 	cStatInfo(achOpenInv,           "achievement.openInventory"),
@@ -48,7 +48,7 @@ cStatInfo cStatInfo::ms_Info[statCount] =
 	cStatInfo(achBreedCow,          "achievement.breedCow",           achKillCow),
 	cStatInfo(achThrowDiamonds,     "achievement.diamondsToYou",      achDiamonds),
 
-	// http://minecraft.gamepedia.com/Statistics
+	// https://minecraft.gamepedia.com/Statistics
 
 	/*             Type         |     Name          */
 	cStatInfo(statGamesQuit,      "stat.leaveGame"),

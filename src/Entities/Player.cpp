@@ -2372,7 +2372,7 @@ void cPlayer::TickBurning(cChunk & a_Chunk)
 
 void cPlayer::HandleFood(void)
 {
-	// Ref.: http://minecraft.gamepedia.com/Hunger
+	// Ref.: https://minecraft.gamepedia.com/Hunger
 
 	if (IsGameModeCreative() || IsGameModeSpectator())
 	{

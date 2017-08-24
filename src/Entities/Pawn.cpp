@@ -197,6 +197,13 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 	}
 	a_Duration = static_cast<int>(a_Duration * a_DistanceModifier);
 
+	// If we already have the effect, we have to deactivate it or else it will act cumulatively
+	auto ExistingEffect = m_EntityEffects.find(a_EffectType);
+	if (ExistingEffect != m_EntityEffects.end())
+	{
+		ExistingEffect->second->OnDeactivate(*this);
+	}
+
 	auto Res = m_EntityEffects.emplace(a_EffectType, cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier));
 	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, static_cast<short>(a_Duration));
 	cEntityEffect * Effect = Res.first->second.get();
