@@ -222,9 +222,9 @@ public:
 	void SetColor(int a_Color);
 	int GetColor(void) const { return m_Color; }
 
-	std::set<AString> GetMembers(void) const { return m_Players; }
-
 	// tolua_end
+
+	std::set<AString> GetMembers(void) const { return m_Players; }
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
