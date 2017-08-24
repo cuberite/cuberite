@@ -8,6 +8,7 @@
 
 void cBehaviorItemFollower::AttachToMonster(cMonster & a_Parent)
 {
+	LOGD("mobDebug - Behavior ItemFollower: Attach");
 	m_Parent = &a_Parent;
 	m_Parent->AttachTickBehavior(this);
 }
@@ -43,6 +44,7 @@ bool cBehaviorItemFollower::IsControlDesired(std::chrono::milliseconds a_Dt, cCh
 
 void cBehaviorItemFollower::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	LOGD("mobDebug - Behavior ItemFollower: Tick");
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 	cItems FollowedItems;

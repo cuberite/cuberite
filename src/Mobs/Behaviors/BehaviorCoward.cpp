@@ -16,10 +16,9 @@ cBehaviorCoward::cBehaviorCoward() :
 
 void cBehaviorCoward::AttachToMonster(cMonster & a_Parent)
 {
+	LOGD("mobDebug - Behavior Coward: Attach");
 	m_Parent = &a_Parent;
 	m_Parent->AttachTickBehavior(this);
-	m_Parent->AttachDestroyBehavior(this);
-	m_Parent->AttachPostTickBehavior(this);
 	m_Parent->AttachDoTakeDamageBehavior(this);
 }
 
@@ -40,6 +39,7 @@ bool cBehaviorCoward::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & 
 
 void cBehaviorCoward::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	LOGD("mobDebug - Behavior Coward: Tick");
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 	if (m_Attacker == nullptr)
@@ -66,6 +66,7 @@ void cBehaviorCoward::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cBehaviorCoward::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	LOGD("mobDebug - Behavior Coward: DoTakeDamage");
 	if ((a_TDI.Attacker != m_Parent) && (a_TDI.Attacker != nullptr))
 	{
 		m_Attacker = a_TDI.Attacker;

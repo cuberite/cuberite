@@ -18,7 +18,7 @@ class cBehaviorChaser : public cBehavior
 
 public:
 	cBehaviorChaser();
-	void AttachToMonster(cMonster & a_Parent) override;
+	void AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker);
 
 	// Functions our host Monster should invoke:
 	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -44,6 +44,7 @@ private:
 
 	/** Our parent */
 	cMonster * m_Parent;
+	cBehaviorStriker * m_ParentStriker;
 
 	// The mob we want to attack
 	cPawn * m_Target;

@@ -23,9 +23,10 @@ cBehaviorChaser::cBehaviorChaser() :
 
 
 
-void cBehaviorChaser::AttachToMonster(cMonster & a_Parent)
+void cBehaviorChaser::AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker)
 {
 	m_Parent = &a_Parent;
+	m_ParentStriker = &a_ParentStriker;
 	m_Parent->AttachTickBehavior(this);
 	m_Parent->AttachDestroyBehavior(this);
 	m_Parent->AttachPostTickBehavior(this);
@@ -245,7 +246,7 @@ void cBehaviorChaser::StrikeTarget()
 {
 	if (m_AttackCoolDownTicksLeft != 0)
 	{
-		cBehaviorStriker * Striker = m_Parent->GetBehaviorStriker();
+		cBehaviorStriker * Striker = m_ParentStriker;
 		if (Striker != nullptr)
 		{
 			// Striker->Strike(m_Target); //mobTodo

@@ -12,7 +12,7 @@ class cChunk;
 class cBehaviorDayLightBurner : cBehavior
 {
 public:
-	void AttachToMonster(cMonster & a_Parent) override;
+	void AttachToMonster(cMonster & a_Parent);
 
 	void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);

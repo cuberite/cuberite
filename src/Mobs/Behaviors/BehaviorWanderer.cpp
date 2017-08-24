@@ -15,6 +15,7 @@ cBehaviorWanderer::cBehaviorWanderer() : m_IdleInterval(0)
 
 void cBehaviorWanderer::AttachToMonster(cMonster & a_Parent)
 {
+	LOGD("mobDebug - Behavior Wanderer: Attach");
 	m_Parent = &a_Parent;
 	m_Parent->AttachTickBehavior(this);
 }
@@ -38,6 +39,7 @@ bool cBehaviorWanderer::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk 
 
 void cBehaviorWanderer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	LOGD("mobDebug - Behavior Wanderer: Tick");
 	if (m_Parent->IsPathFinderActivated())
 	{
 		return;  // Still getting there

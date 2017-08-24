@@ -23,6 +23,7 @@ cBehaviorBreeder::cBehaviorBreeder() :
 
 void cBehaviorBreeder::AttachToMonster(cMonster & a_Parent)
 {
+	LOGD("mobDebug - Behavior Breeder: Attach");
 	m_Parent = &a_Parent;
 	m_Parent->AttachTickBehavior(this);
 	m_Parent->AttachPostTickBehavior(this);
@@ -36,6 +37,7 @@ void cBehaviorBreeder::AttachToMonster(cMonster & a_Parent)
 
 void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	LOGD("mobDebug - Behavior Breeder: Tick");
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 	cWorld * World = m_Parent->GetWorld();
@@ -88,6 +90,7 @@ void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cBehaviorBreeder::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	LOGD("mobDebug - Behavior Breeder: PostTick");
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 	if (m_MatingTimer > 0)
@@ -179,6 +182,7 @@ bool cBehaviorBreeder::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk &
 
 void cBehaviorBreeder::Destroyed()
 {
+	LOGD("mobDebug - Behavior Breeder: Destroyed");
 	if (m_LovePartner != nullptr)
 	{
 		m_LovePartner->GetBehaviorBreeder()->ResetLoveMode();

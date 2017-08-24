@@ -205,13 +205,10 @@ public:
 	bool IsPathFinderActivated() const;
 
 	// Behavior getters (most are probably not used. mobTodo - cleanup most of them)
-	virtual cBehaviorAggressive * GetBehaviorAggressive();
 	virtual cBehaviorBreeder * GetBehaviorBreeder();
 	virtual const cBehaviorBreeder * GetBehaviorBreeder() const;
 	virtual cBehaviorChaser * GetBehaviorChaser();
-	virtual cBehaviorStriker * GetBehaviorStriker();
-	virtual cBehaviorWanderer * GetBehaviorWanderer();
-	virtual cBehaviorDayLightBurner * GetBehaviorDayLightBurner();
+	virtual cBehaviorDayLightBurner * GetBehaviorDayLightBurner(); // mobTodo this is probably temporary
 
 	// Polymorphic behavior functions ("Skin-specific")
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);

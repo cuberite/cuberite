@@ -50,23 +50,6 @@ void cPassiveMonster::Destroyed()
 
 
 
-
-
-cBehaviorBreeder * cPassiveMonster::GetBehaviorBreeder()
-{
-	return &m_BehaviorBreeder;
-}
-
-
-
-
-
-const cBehaviorBreeder * cPassiveMonster::GetBehaviorBreeder() const
-{
-	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
-}
-
-
 void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);

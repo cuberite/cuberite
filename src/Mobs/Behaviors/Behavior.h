@@ -9,8 +9,6 @@ class cMonster;
 class cBehavior
 {
 public:
-	virtual void AttachToMonster(cMonster & a_Parent) = 0;
-
 	// Tick-related
 	virtual bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual bool ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);

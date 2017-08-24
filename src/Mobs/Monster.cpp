@@ -115,6 +115,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_Target(nullptr)
 	, m_CurrentTickControllingBehavior(nullptr)
 	, m_NewTickControllingBehavior(nullptr)
+	, m_TickControllingBehaviorState(Normal)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -290,6 +291,7 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	// LOGD("mobDebug - Monster tick begins");
 	m_NearestPlayerIsStale = true;
 	super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
@@ -315,6 +317,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// They MUST NOT control mob movement or interefere with the main Tick.
 	for (cBehavior * Behavior : m_AttachedPreTickBehaviors)
 	{
+		// LOGD("mobDebug - preTick");
+		ASSERT(Behavior != nullptr);
 		Behavior->PreTick(a_Dt, a_Chunk);
 	}
 
@@ -327,6 +331,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// ask the behaviors sequentially if they are interested in controlling this mob
 		// Stop at the first one that says yes.
+		m_NewTickControllingBehavior = nullptr;
 		for (cBehavior * Behavior : m_AttachedTickBehaviors)
 		{
 			if (Behavior->IsControlDesired(a_Dt, a_Chunk))
@@ -340,7 +345,13 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// The Behavior asking for control is the same as the behavior from last tick.
 			// Nothing special, just tick it.
+			// LOGD("mobDebug - Tick");
 			m_CurrentTickControllingBehavior->Tick(a_Dt, a_Chunk);
+		}
+		else if (m_CurrentTickControllingBehavior == nullptr)
+		{
+			// first behavior to ever control
+			m_TickControllingBehaviorState = NewControlStarting;
 		}
 		else
 		{
@@ -354,6 +365,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Make the current controlling behavior clean up
 	if (m_TickControllingBehaviorState == OldControlEnding)
 	{
+		ASSERT(m_CurrentTickControllingBehavior != nullptr);
 		if (m_CurrentTickControllingBehavior->ControlEnding(a_Dt, a_Chunk))
 		{
 			// The current behavior told us it is ready for letting go of control
@@ -369,6 +381,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Make the new controlling behavior set up
 	else if (m_TickControllingBehaviorState == NewControlStarting)
 	{
+		ASSERT(m_NewTickControllingBehavior != nullptr);
 		if (m_NewTickControllingBehavior->ControlStarting(a_Dt, a_Chunk))
 		{
 			// The new behavior told us it is ready for taking control
@@ -389,6 +402,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// They MUST NOT control mob movement or interefere with the main Tick.
 	for (cBehavior * Behavior : m_AttachedPostTickBehaviors)
 	{
+		// LOGD("mobDebug - PostTick");
 		Behavior->PostTick(a_Dt, a_Chunk);
 	}
 
@@ -463,6 +477,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_World->BroadcastEntityMetadata(*this);
 		}
 	}
+	LOGD("mobDebug - Monster tick ends");
 }
 
 
@@ -608,7 +623,11 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 
-	//mobTodo call all interested behaviors
+	for (cBehavior * Behavior : m_AttachedDoTakeDamageBehaviors)
+	{
+		ASSERT(Behavior != nullptr);
+		Behavior->DoTakeDamage(a_TDI);
+	}
 
 	return true;
 }
@@ -1015,15 +1034,6 @@ bool cMonster::IsPathFinderActivated() const
 
 
 
-cBehaviorAggressive * cMonster::GetBehaviorAggressive()
-{
-	return nullptr;
-}
-
-
-
-
-
 cBehaviorBreeder * cMonster::GetBehaviorBreeder()
 {
 	return nullptr;
@@ -1043,24 +1053,6 @@ const cBehaviorBreeder * cMonster::GetBehaviorBreeder() const
 
 
 cBehaviorChaser * cMonster::GetBehaviorChaser()
-{
-	return nullptr;
-}
-
-
-
-
-
-cBehaviorStriker * cMonster::GetBehaviorStriker()
-{
-	return nullptr;
-}
-
-
-
-
-
-cBehaviorWanderer * cMonster::GetBehaviorWanderer()
 {
 	return nullptr;
 }
