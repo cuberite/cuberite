@@ -9,16 +9,29 @@
 
 
 
-cBehaviorChaser::cBehaviorChaser(cMonster * a_Parent) :
-	m_Parent(a_Parent)
-  , m_AttackRate(3)
+cBehaviorChaser::cBehaviorChaser() :
+	m_AttackRate(3)
   , m_AttackDamage(1)
   , m_AttackRange(1)
   , m_AttackCoolDownTicksLeft(0)
   , m_TicksSinceLastDamaged(100)
 {
-	ASSERT(m_Parent != nullptr);
+
 }
+
+
+
+
+
+void cBehaviorChaser::AttachToMonster(cMonster & a_Parent)
+{
+	m_Parent = &a_Parent;
+	m_Parent->AttachTickBehavior(this);
+	m_Parent->AttachDestroyBehavior(this);
+	m_Parent->AttachPostTickBehavior(this);
+	m_Parent->AttachDoTakeDamageBehavior(this);
+}
+
 
 
 

@@ -4,18 +4,43 @@
 #include "../../Chunk.h"
 #include "../../World.h"
 
-cBehaviorWanderer::cBehaviorWanderer(cMonster * a_Parent)
-	: m_Parent(a_Parent)
-	, m_IdleInterval(0)
+cBehaviorWanderer::cBehaviorWanderer() : m_IdleInterval(0)
 {
-	ASSERT(m_Parent != nullptr);
+
 }
 
-bool cBehaviorWanderer::ActiveTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+
+
+
+
+void cBehaviorWanderer::AttachToMonster(cMonster & a_Parent)
+{
+	m_Parent = &a_Parent;
+	m_Parent->AttachTickBehavior(this);
+}
+
+
+
+
+
+bool cBehaviorWanderer::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	// Wandering behavior always happily accepts control.
+	// It should therefore be the last one attached to a monster.
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
+	return true;
+}
+
+
+
+
+
+void cBehaviorWanderer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_Parent->IsPathFinderActivated())
 	{
-		return true;  // Still getting there
+		return;  // Still getting there
 	}
 
 	m_IdleInterval += a_Dt;
@@ -38,7 +63,7 @@ bool cBehaviorWanderer::ActiveTick(std::chrono::milliseconds a_Dt, cChunk & a_Ch
 			cChunk * Chunk = a_Chunk.GetNeighborChunk(static_cast<int>(Destination.x), static_cast<int>(Destination.z));
 			if ((Chunk == nullptr) || !Chunk->IsValid())
 			{
-				return true;
+				return;
 			}
 
 			BLOCKTYPE BlockType;
@@ -56,5 +81,4 @@ bool cBehaviorWanderer::ActiveTick(std::chrono::milliseconds a_Dt, cChunk & a_Ch
 			}
 		}
 	}
-	return true;
 }

@@ -9,15 +9,25 @@
 #include "../../Item.h"
 #include "../../BoundingBox.h"
 
-cBehaviorBreeder::cBehaviorBreeder(cMonster * a_Parent) :
-	m_Parent(a_Parent),
+cBehaviorBreeder::cBehaviorBreeder() :
 	m_LovePartner(nullptr),
 	m_LoveTimer(0),
 	m_LoveCooldown(0),
 	m_MatingTimer(0)
 {
-	m_Parent = a_Parent;
-	ASSERT(m_Parent != nullptr);
+}
+
+
+
+
+
+void cBehaviorBreeder::AttachToMonster(cMonster & a_Parent)
+{
+	m_Parent = &a_Parent;
+	m_Parent->AttachTickBehavior(this);
+	m_Parent->AttachPostTickBehavior(this);
+	m_Parent->AttachRightClickBehavior(this);
+	m_Parent->AttachDestroyBehavior(this);
 }
 
 

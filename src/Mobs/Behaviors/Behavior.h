@@ -2,11 +2,16 @@
 
 struct TakeDamageInfo;
 class cChunk;
+class cPlayer;
+class cMonster;
 #include <chrono>
 
 class cBehavior
 {
 public:
+	virtual void AttachToMonster(cMonster & a_Parent) = 0;
+
+	// Tick-related
 	virtual bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual bool ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual bool ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
@@ -14,8 +19,8 @@ public:
 	virtual void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
-
-	virtual void onRightClicked();
+	// Other
+	virtual void OnRightClicked(cPlayer & a_Player);
 	virtual void Destroyed();
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI);
 	virtual ~cBehavior() {}

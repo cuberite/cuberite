@@ -18,13 +18,14 @@ class cBehaviorBreeder : public cBehavior
 {
 
 public:
-	cBehaviorBreeder(cMonster * a_Parent);
+	cBehaviorBreeder();
+	void AttachToMonster(cMonster & a_Parent) override;
 
 	// Functions our host Monster should invoke:
 	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	void OnRightClicked(cPlayer & a_Player);
+	void OnRightClicked(cPlayer & a_Player) override;
 	void Destroyed() override;
 
 	/** Returns the partner which the monster is currently mating with. */

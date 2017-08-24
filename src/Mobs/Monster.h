@@ -220,6 +220,14 @@ public:
 
 	cPlayer * GetNearestPlayer();
 
+	// These should only be called from cBehavior::attachToMonster
+	void AttachPreTickBehavior(cBehavior * a_Behavior);
+	void AttachPostTickBehavior(cBehavior * a_Behavior);
+	void AttachTickBehavior(cBehavior * a_Behavior);
+	void AttachDestroyBehavior(cBehavior * a_Behavior);
+	void AttachRightClickBehavior(cBehavior * a_Behavior);
+	void AttachDoTakeDamageBehavior(cBehavior * a_Behavior);
+
 	protected:
 
 	/** Whether or not m_NearestPlayer is stale. Always true at the beginning of a tick.
@@ -328,11 +336,12 @@ private:
 	/** Leash calculations inside Tick function */
 	void CalcLeashActions();
 
-	std::vector<cBehavior*> PreTickBehaviors;
-	std::vector<cBehavior*> TickBehaviors;
-	std::vector<cBehavior*> PostTickBehaviors;
-	std::vector<cBehavior*> OnDestroyBehaviors;
-	std::vector<cBehavior*> OnRightClickBehaviors;
+	std::vector<cBehavior*> m_AttachedPreTickBehaviors;
+	std::vector<cBehavior*> m_AttachedTickBehaviors;
+	std::vector<cBehavior*> m_AttachedPostTickBehaviors;
+	std::vector<cBehavior*> m_AttachedDestroyBehaviors;
+	std::vector<cBehavior*> m_AttachedOnRightClickBehaviors;
+	std::vector<cBehavior*> m_AttachedDoTakeDamageBehaviors;
 
 	cBehavior * m_CurrentTickControllingBehavior;
 	cBehavior * m_NewTickControllingBehavior;

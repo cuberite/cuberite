@@ -7,10 +7,19 @@
 
 #include "../../Chunk.h"
 
-cBehaviorDayLightBurner::cBehaviorDayLightBurner(cMonster * a_Parent) : m_Parent(a_Parent)
+
+
+
+
+void cBehaviorDayLightBurner::AttachToMonster(cMonster & a_Parent)
 {
-	ASSERT(m_Parent != nullptr);
+	m_Parent = &a_Parent;
+	m_Parent->AttachPostTickBehavior(this);
 }
+
+
+
+
 
 void cBehaviorDayLightBurner::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {

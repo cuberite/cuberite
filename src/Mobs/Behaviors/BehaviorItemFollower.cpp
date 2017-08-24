@@ -6,11 +6,10 @@
 #include "../../Entities/Player.h"
 
 
-cBehaviorItemFollower::cBehaviorItemFollower(cMonster * a_Parent) :
-	m_Parent(a_Parent)
+void cBehaviorItemFollower::AttachToMonster(cMonster & a_Parent)
 {
-	m_Parent = a_Parent;
-	ASSERT(m_Parent != nullptr);
+	m_Parent = &a_Parent;
+	m_Parent->AttachTickBehavior(this);
 }
 
 

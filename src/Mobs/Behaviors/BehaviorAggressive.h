@@ -19,7 +19,7 @@ class cBehaviorAggressive : public cBehavior
 {
 
 public:
-	cBehaviorAggressive(cMonster * a_Parent);
+	void AttachToMonster(cMonster & a_Parent) override;
 
 	// cBehaviorAggressive(cMonster * a_Parent, bool a_HatesPlayer);
 	// TODO agression toward specific players, and specific mobtypes, etc

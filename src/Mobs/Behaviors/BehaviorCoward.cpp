@@ -6,12 +6,23 @@
 #include "../../Entities/Player.h"
 #include "../../Entities/Entity.h"
 
-cBehaviorCoward::cBehaviorCoward(cMonster * a_Parent) :
-	m_Parent(a_Parent),
+cBehaviorCoward::cBehaviorCoward() :
 	m_Attacker(nullptr)
 {
-	ASSERT(m_Parent != nullptr);
 }
+
+
+
+
+void cBehaviorCoward::AttachToMonster(cMonster & a_Parent)
+{
+	m_Parent = &a_Parent;
+	m_Parent->AttachTickBehavior(this);
+	m_Parent->AttachDestroyBehavior(this);
+	m_Parent->AttachPostTickBehavior(this);
+	m_Parent->AttachDoTakeDamageBehavior(this);
+}
+
 
 
 

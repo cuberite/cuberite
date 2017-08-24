@@ -12,7 +12,7 @@ class cItems;
 class cBehaviorItemFollower : public cBehavior
 {
 public:
-	cBehaviorItemFollower(cMonster * a_Parent);
+	void AttachToMonster(cMonster & a_Parent) override;
 
 	void GetBreedingItems(cItems & a_Items);
 

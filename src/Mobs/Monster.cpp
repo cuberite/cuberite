@@ -137,6 +137,9 @@ cMonster::~cMonster()
 
 void cMonster::Destroy(bool a_ShouldBroadcast)
 {
+	//mobtodo Destroy vs Destroyed
+
+	// mobTodo behavior for leash
 	if (IsLeashed())
 	{
 		cEntity * LeashedTo = GetLeashedTo();
@@ -158,6 +161,11 @@ void cMonster::Destroy(bool a_ShouldBroadcast)
 
 void cMonster::Destroyed()
 {
+	for (cBehavior * Behavior : m_AttachedDestroyBehaviors)
+	{
+		Behavior->Destroyed();
+	}
+
 	SetTarget(nullptr);  // Tell them we're no longer targeting them.
 	super::Destroyed();
 }
@@ -182,6 +190,7 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 {
+	UNUSED(a_Chunk);
 	if ((m_NextWayPointPosition - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS)
 	{
 		return;
@@ -304,7 +313,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// All behaviors can execute PostTick and PreTick.
 	// These are for bookkeeping or passive actions like laying eggs.
 	// They MUST NOT control mob movement or interefere with the main Tick.
-	for (cBehavior * Behavior : PreTickBehaviors)
+	for (cBehavior * Behavior : m_AttachedPreTickBehaviors)
 	{
 		Behavior->PreTick(a_Dt, a_Chunk);
 	}
@@ -318,7 +327,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// ask the behaviors sequentially if they are interested in controlling this mob
 		// Stop at the first one that says yes.
-		for (cBehavior * Behavior : TickBehaviors)
+		for (cBehavior * Behavior : m_AttachedTickBehaviors)
 		{
 			if (Behavior->IsControlDesired(a_Dt, a_Chunk))
 			{
@@ -378,7 +387,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// All behaviors can execute PostTick and PreTick.
 	// These are for bookkeeping or passive actions like laying eggs.
 	// They MUST NOT control mob movement or interefere with the main Tick.
-	for (cBehavior * Behavior : PostTickBehaviors)
+	for (cBehavior * Behavior : m_AttachedPostTickBehaviors)
 	{
 		Behavior->PostTick(a_Dt, a_Chunk);
 	}
@@ -691,6 +700,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
+	// mobTodo put this in a behavior?
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
 	{
@@ -701,6 +711,12 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		}
 	}
 
+	for (cBehavior * Behavior : m_AttachedOnRightClickBehaviors)
+	{
+		Behavior->OnRightClicked(a_Player);
+	}
+
+	// mobTodo put this in a behavior?
 	// Using leashes
 	m_IsLeashActionJustDone = false;
 	if (IsLeashed() && (GetLeashedTo() == &a_Player))  // a player can only unleash a mob leashed to him
@@ -1295,6 +1311,62 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingL
 	}
 }
 
+
+
+void cMonster::AttachPreTickBehavior(cBehavior * a_Behavior)
+{
+	ASSERT(a_Behavior != nullptr);
+	m_AttachedPreTickBehaviors.push_back(a_Behavior);
+}
+
+
+
+
+
+void cMonster::AttachPostTickBehavior(cBehavior * a_Behavior)
+{
+	ASSERT(a_Behavior != nullptr);
+	m_AttachedPostTickBehaviors.push_back(a_Behavior);
+}
+
+
+
+
+
+void cMonster::AttachTickBehavior(cBehavior * a_Behavior)
+{
+	ASSERT(a_Behavior != nullptr);
+	m_AttachedTickBehaviors.push_back(a_Behavior);
+}
+
+
+
+
+
+void cMonster::AttachDestroyBehavior(cBehavior * a_Behavior)
+{
+	ASSERT(a_Behavior != nullptr);
+	m_AttachedDestroyBehaviors.push_back(a_Behavior);
+}
+
+
+
+
+
+void cMonster::AttachRightClickBehavior(cBehavior * a_Behavior)
+{
+	ASSERT(a_Behavior != nullptr);
+	m_AttachedOnRightClickBehaviors.push_back(a_Behavior);
+}
+
+
+
+
+
+void cMonster::AttachDoTakeDamageBehavior(cBehavior * a_Behavior)
+{
+	m_AttachedDoTakeDamageBehaviors.push_back(a_Behavior);
+}
 
 
 

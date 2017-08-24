@@ -1,8 +1,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Behavior.h"
-
-
+#include "../Monster.h"
 
 
 
@@ -76,7 +75,7 @@ void cBehavior::PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cBehavior::onRightClicked()
+void cBehavior::OnRightClicked(cPlayer & a_Player)
 {
 	LOGD("ERROR: Called onRightClicked on a behavior that doesn't have one.");
 	ASSERT(1 == 0);

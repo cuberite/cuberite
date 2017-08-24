@@ -17,7 +17,8 @@ class cBehaviorChaser : public cBehavior
 {
 
 public:
-	cBehaviorChaser(cMonster * a_Parent);
+	cBehaviorChaser();
+	void AttachToMonster(cMonster & a_Parent) override;
 
 	// Functions our host Monster should invoke:
 	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
