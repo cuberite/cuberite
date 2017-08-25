@@ -1363,7 +1363,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
 	)
 	{
-		int MobHeight = FloorC(a_Location.y + GetHeight());  // The block Y coord of the mob's head
+		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
 		if (MobHeight >= cChunkDef::Height)
 		{
 			return true;
