@@ -13,12 +13,10 @@ set -e
 # Constants:
 DEFAULT_BUILDTYPE="Release" # Other options: "Debug"
 DEFAULT_BRANCH="master"     # Other options: None currently
-DEFAULT_THREADS=2
 
 # Constants not modifiable through command line:
 UPSTREAM_REPO="origin"
 UPSTREAM_LINK="https://github.com/cuberite/cuberite.git"
-DRY_RUN="no"
 
 #=================== Error functions ===================
 
@@ -56,10 +54,12 @@ errorArguments ()
 	echo "options:"
 	echo "  -m  The compilation mode. Either \"Release\" or \"Debug\". Defaults to \"$DEFAULT_BUILDTYPE\""
 	echo '  -t  The number of threads to use for compiling'
-	echo '      If unspecified, a "smart guess" is attempted'
+	echo "      If unspecified, at most $MAX_DEFAULT_THREADS threads are used. The special value CORES attempts to set the number of"
+	echo '      threads to the number of computer cores.'
 	echo '  -b  The branch to compile. (Currently unused and pinned to MASTER)'
-	echo '  -n  Prevent interactive mode'
-	echo '  -d  Dry run. Print the chosen settings and exit'
+	echo '  -n yes: Prevent interactive mode. Unnecessary in combination with other arguments.'
+	echo '          Use without any other argument to build with the default settings.'
+	echo '  -d yes: Dry run. Print the chosen settings and exit'
 	echo
 	echo "Usage examples:"
 	echo "  ./compile.sh"
@@ -115,7 +115,7 @@ echoErr () # Echo to stderr.
 
 
 STATE_INTERACTIVE=1 # Interactive, unless one or more command line options are passed.
-while getopts ":m:t:b:" name; do
+while getopts ":m:t:b:d:n:" name; do
 	value=$OPTARG
 	STATE_INTERACTIVE=0
 	case "$name" in
@@ -131,6 +131,8 @@ while getopts ":m:t:b:" name; do
 		if [ ! -z "$CHOICE_THREADS" ]; then errorArguments; fi # Argument duplication.
 		if [ "$value" -gt 0 ] 2>/dev/null; then # If a positive integer.
 			CHOICE_THREADS="$value"
+		elif [ "$value" = "CORES" ]; then
+			CHOICE_THREADS="CORES"
 		else
 			errorArguments
 		fi
@@ -140,9 +142,13 @@ while getopts ":m:t:b:" name; do
 		CHOICE_BRANCH=1 # Only used for dupe checking, overridden below.
 		echoErr "Warning: The -b option is currently unused, it was ignored"
 	;;
+	d)
+		if [ ! -z "$DRY_RUN" ]; then errorArguments; fi # Argument duplication.
+		DRY_RUN="yes"
+	;;
 	n)
-		if [ "$dummy" = "1" ]; then errorArguments; fi # Argument duplication.
-		dummy=1
+		if [ "$dummy" = "1" ]; then errorArguments; fi # Argument duplication. 
+		dummy=1 # we just want to disable interactive mode, passing an argument already did this. No need to do anything.
 	;;
 	*)
 		errorArguments
@@ -150,6 +156,7 @@ while getopts ":m:t:b:" name; do
 	esac
 done
 
+if [ -z "$DRY_RUN" ]; then DRY_RUN="no"; fi
 
 #=================== Dependency checks and greeting ===================
 
@@ -344,45 +351,63 @@ if [ $STATE_INTERACTIVE -eq 1 ]; then
 		r|N)
 			CHOICE_BUILDTYPE="Release"
 			;;
-		""|N)
-			CHOICE_BUILDTYPE="$DEFAULT_BUILDTYPE"
-			;;
 		*)
 			errorInput
 			;;
 	esac
-elif [ -z "$CHOICE_BUILDTYPE" ]; then
-	CHOICE_BUILDTYPE="$DEFAULT_BUILDTYPE" # Non interactive mode with no buildtype specified.
+fi
+
+if [ -z "$CHOICE_BUILDTYPE" ]; then # No buildtype specified.
+	CHOICE_BUILDTYPE="$DEFAULT_BUILDTYPE" 
 fi
 
 
 #=================== Choice: Thread amount ===================
 
 
-autoChooseThreads()
+
+numberOfCores()
 {
 	KERNEL=$(uname -s)
 
 	if [ "$KERNEL" = "Linux" ] || [ "$KERNEL" = "Darwin" ]; then
 		echo $(getconf _NPROCESSORS_ONLN)
 	else
-		echo "$DEFAULT_THREADS"
+		echo "unknown"
 	fi
 }
 
-if [ $STATE_INTERACTIVE -eq 1 ]; then
-	printf %s "Enter the number of threads to use. Leave empty for an automatic choice: "
-	read CHOICE_THREADS
-	if [ "$CHOICE_THREADS" = "" ] 2> /dev/null; then
-		CHOICE_THREADS=`autoChooseThreads`
-	elif [ "$CHOICE_THREADS" -lt 0 ] 2> /dev/null; then
-		errorInput
-	fi	
+CORE_COUNT=`numberOfCores`
 
-elif [ -z "$CHOICE_THREADS" ]; then .
-	CHOICE_THREADS=`autoChooseThreads` # Non interactive mode with no thread amount specified.
+if [ $STATE_INTERACTIVE -eq 1 ]; then
+	echo "Choose the number of compilation threads."
+
+	if [ "$CORE_COUNT" = "unknown" ]; then
+		printf %s "Could not detect the number of cores. "
+	elif [ "$CORE_COUNT" -eq 1 ]; then
+		echo "You have 1 core."
+	else
+		echo "You have $CORE_COUNT cores."
+	fi
+	
+	echo "If you have enough RAM, it is wise to choose a number as high as your core count. "
+	echo "Otherwise choose lower. Raspberry Pis should choose 1. If in doubt, choose 1."
+	printf %s "Please enter the number of compilation threads to use (Default: 1): "
+	read CHOICE_THREADS
 fi
 
+if [ -z "$CHOICE_THREADS" ] 2> /dev/null; then
+	CHOICE_THREADS=1
+elif [ "$CHOICE_THREADS" = "CORES" ] 2> /dev/null; then
+	if [ $CORE_COUNT = "unknown" ]; then
+		CHOICE_THREADS=1
+		echo "WARNING: could not detect number of cores. Using 1 thread." >&2
+	else
+		CHOICE_THREADS="$CORE_COUNT"
+	fi
+elif [ "$CHOICE_THREADS" -lt 0 ] 2> /dev/null; then
+	errorInput
+fi
 
 #=================== Print settings summary  ===================
 
@@ -393,18 +418,27 @@ else
 	previousCompilation="Detected. This should make fetching and compiling faster."
 fi
 
-# Ask the user's permission to connect to the net.
+CORE_WARNING=""
+if [ "$CORE_COUNT" != "unknown" ] && [ "$CORE_COUNT" -lt "$CHOICE_THREADS" ]; then
+	CORE_WARNING=" - Warning: More threads than cores."
+fi
+
 echo ""
 echoInt "#### Settings Summary ####"
 echo "Build Type:           " "$CHOICE_BUILDTYPE"
 echo "Branch:               " "$CHOICE_BRANCH" "(Currently the only choice)"
-echo "Compilation threads:  " "$CHOICE_THREADS"
+echo "Compilation threads:  " "$CHOICE_THREADS$CORE_WARNING"
+echo "Cores:                " "$CORE_COUNT"
 echo "Previous compilation: " "$previousCompilation"
 echo "Upstream Link:        " "$UPSTREAM_LINK"
 echo "Upstream Repo:        " "$UPSTREAM_REPO"
 
-if [ "$DRY_RUN" = "yes" ]; then exit 0; fi
+if [ "$DRY_RUN" = "yes" ]; then 
+	echo "This is a dry run. Exiting now."
+	exit 0;
+fi
 
+# Ask the user's permission to connect to the net.
 if [ $STATE_INTERACTIVE -eq 1 ]; then
 	echo
 	echo "After pressing ENTER, the script will connect to $UPSTREAM_LINK"
