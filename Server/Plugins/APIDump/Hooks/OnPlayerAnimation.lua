@@ -2,13 +2,13 @@ return
 {
 	HOOK_PLAYER_ANIMATION =
 	{
-		CalledWhen = "A client has sent an Animation packet (0x12)",
+		CalledWhen = "A client has sent an Animation packet",
 		DefaultFnName = "OnPlayerAnimation",  -- also used as pagename
 		Desc = [[
-			This hook is called when the server receives an Animation packet (0x12) from the client.</p>
+			This hook is called when the server receives an Animation packet from the client.</p>
 			<p>
 			For the list of animations that are sent by the client, see the
-			<a href="http://wiki.vg/Protocol#0x12">Protocol wiki</a>.
+			<a href="http://wiki.vg/Protocol#Animation_.28clientbound.29">Protocol wiki</a>.
 		]],
 		Params =
 		{

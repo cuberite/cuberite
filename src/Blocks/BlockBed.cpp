@@ -120,7 +120,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
 		a_WorldInterface.DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
 	}
-	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: http://minecraft.gamepedia.com/Bed#Sleeping
+	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
 	{
 		a_Player.SendMessageFailure("You can only sleep at night");
 	}
@@ -209,7 +209,7 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 
 
 
-void cBlockBedHandler::ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockBedHandler::ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	class cBedColor :
 		public cBedCallback
@@ -224,6 +224,6 @@ void cBlockBedHandler::ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, 
 		}
 	};
 	cBedColor BedCallback;
-	a_Digger->GetWorld()->DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
+	a_WorldInterface.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
 	a_Pickups.Add(cItem(E_ITEM_BED, 1, BedCallback.m_Color));
 }

@@ -12,17 +12,18 @@ class cSpawnPrepareCallback :
 	public cChunkCoordCallback
 {
 public:
-	cSpawnPrepareCallback(cSpawnPrepare & a_SpawnPrepare) :
-		m_SpawnPrepare(a_SpawnPrepare)
+	cSpawnPrepareCallback(std::shared_ptr<cSpawnPrepare> a_SpawnPrepare) :
+		m_SpawnPrepare(std::move(a_SpawnPrepare))
 	{
+		ASSERT(m_SpawnPrepare != nullptr);
 	}
 protected:
 
-	cSpawnPrepare & m_SpawnPrepare;
+	std::shared_ptr<cSpawnPrepare> m_SpawnPrepare;
 
 	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
 	{
-		m_SpawnPrepare.PreparedChunkCallback(a_ChunkX, a_ChunkZ);
+		m_SpawnPrepare->PreparedChunkCallback(a_ChunkX, a_ChunkZ);
 	}
 };
 
@@ -30,7 +31,7 @@ protected:
 
 
 
-cSpawnPrepare::cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance, int a_FirstIdx):
+cSpawnPrepare::cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance, int a_FirstIdx, sMakeSharedTag):
 	m_World(a_World),
 	m_SpawnChunkX(a_SpawnChunkX),
 	m_SpawnChunkZ(a_SpawnChunkZ),
@@ -55,18 +56,18 @@ void cSpawnPrepare::PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_Spa
 	// Queue the initial chunks:
 	int MaxIdx = a_PrepareDistance * a_PrepareDistance;
 	int maxQueue = std::min(MaxIdx - 1, 100);  // Number of chunks to queue at once
-	cSpawnPrepare prep(a_World, a_SpawnChunkX, a_SpawnChunkZ, a_PrepareDistance, maxQueue);
+	auto prep = std::make_shared<cSpawnPrepare>(a_World, a_SpawnChunkX, a_SpawnChunkZ, a_PrepareDistance, maxQueue, sMakeSharedTag{});
 	for (int i = 0; i < maxQueue; i++)
 	{
 		int chunkX, chunkZ;
-		prep.DecodeChunkCoords(i, chunkX, chunkZ);
+		prep->DecodeChunkCoords(i, chunkX, chunkZ);
 		a_World.PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(prep));
 	}  // for i
 
 	// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
 	if (MaxIdx > 0)
 	{
-		prep.m_EvtFinished.Wait();
+		prep->m_EvtFinished.Wait();
 	}
 }
 
@@ -108,7 +109,7 @@ void cSpawnPrepare::PreparedChunkCallback(int a_ChunkX, int a_ChunkZ)
 	{
 		int chunkX, chunkZ;
 		DecodeChunkCoords(m_NextIdx, chunkX, chunkZ);
-		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(*this));
+		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(shared_from_this()));
 		m_NextIdx += 1;
 	}
 

@@ -56,8 +56,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_TicksSinceLastVoidDamage(0),
 	m_IsSwimming(false),
 	m_IsSubmerged(false),
-	m_AirLevel(0),
-	m_AirTickTimer(0),
+	m_AirLevel(MAX_AIR_LEVEL),
+	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
 	m_IsTicking(false),
 	m_ParentChunk(nullptr),
@@ -159,6 +159,15 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	// Spawn the entity on the clients:
 	a_EntityWorld.BroadcastSpawnEntity(*this);
 
+	// If has any mob leashed broadcast every leashed entity to this
+	if (HasAnyMobLeashed())
+	{
+		for (auto LeashedMob : m_LeashedMobs)
+		{
+			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
+
 	return true;
 }
 
@@ -217,6 +226,12 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	ASSERT(IsTicking());
 	ASSERT(GetParentChunk() != nullptr);
 	SetIsTicking(false);
+
+	// Unleash leashed mobs
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(true, true);
+	}
 
 	if (a_ShouldBroadcast)
 	{
@@ -457,10 +472,14 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtSilverfish:
 					{
 						a_TDI.RawDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
-						// TODO: Add slowness effect
+						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
+						// increasing the max duration by 0.5 seconds each level
+						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
+						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
+						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
-					};
+					}
 					default: break;
 				}
 			}
@@ -489,7 +508,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtMagmaCube:
 					{
 						break;
-					};
+					}
 					default: StartBurning(BurnTicks * 20);
 				}
 			}
@@ -560,7 +579,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 {
 	// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
-	// Ref: http://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
+	// Ref: https://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
 		case E_ITEM_WOODEN_SWORD:    return 4;
@@ -606,7 +625,7 @@ void cEntity::ApplyArmorDamage(int DamageBlocked)
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Ref.: http://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
 		case dtOnFire:
@@ -699,7 +718,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// Add up all armor points:
-	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points
+	// Ref.: https://minecraft.gamepedia.com/Armor#Defense_points
 	int ArmorValue = 0;
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
@@ -736,7 +755,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
-	// Ref.: http://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
 	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
 	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
@@ -1154,6 +1173,12 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
+	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
+	if (m_IsWorldChangeScheduled)
+	{
+		return;
+	}
+
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
@@ -1687,7 +1712,7 @@ void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 void cEntity::HandleAir(void)
 {
-	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
+	// Ref.: https://minecraft.gamepedia.com/Chunk_format
 	// See if the entity is /submerged/ water (block above is water)
 	// Get the type of block the entity is standing in:
 
@@ -2195,3 +2220,24 @@ void cEntity::SetPosition(const Vector3d & a_Position)
 
 
 
+
+void cEntity::AddLeashedMob(cMonster * a_Monster)
+{
+	// Not there already
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) == m_LeashedMobs.end());
+
+	m_LeashedMobs.push_back(a_Monster);
+}
+
+
+
+
+void cEntity::RemoveLeashedMob(cMonster * a_Monster)
+{
+	ASSERT(a_Monster->GetLeashedTo() == this);
+
+	// Must exists
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
+
+	m_LeashedMobs.remove(a_Monster);
+}

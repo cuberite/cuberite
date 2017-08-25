@@ -274,55 +274,28 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 
 
 
-AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
+cUUID cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 {
 	// Online UUIDs are always version 4 (random)
 	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
 	// This guarantees that they will never collide with an online UUID and can be distinguished.
-	// Proper format for a version 3 UUID is:
-	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
-	// Note that we generate a short UUID (without the dashes)
 
 	// First make the username lowercase:
 	AString lcUsername = StrToLower(a_Username);
 
-	// Generate an md5 checksum, and use it as base for the ID:
-	unsigned char MD5[16];
-	md5(reinterpret_cast<const unsigned char *>(lcUsername.c_str()), lcUsername.length(), MD5);
-	MD5[6] &= 0x0f;  // Need to trim to 4 bits only...
-	MD5[8] &= 0x0f;  // ... otherwise %01x overflows into two chars
-	return Printf("%02x%02x%02x%02x%02x%02x3%01x%02x8%01x%02x%02x%02x%02x%02x%02x%02x",
-		MD5[0],  MD5[1],  MD5[2],  MD5[3],
-		MD5[4],  MD5[5],  MD5[6],  MD5[7],
-		MD5[8],  MD5[9],  MD5[10], MD5[11],
-		MD5[12], MD5[13], MD5[14], MD5[15]
-	);
+	return cUUID::GenerateVersion3(lcUsername);
 }
 
 
 
 
 
-bool cClientHandle::IsUUIDOnline(const AString & a_UUID)
+bool cClientHandle::IsUUIDOnline(const cUUID & a_UUID)
 {
 	// Online UUIDs are always version 4 (random)
 	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
 	// This guarantees that they will never collide with an online UUID and can be distinguished.
-	// The version-specifying char is at pos #12 of raw UUID, pos #14 in dashed-UUID.
-	switch (a_UUID.size())
-	{
-		case 32:
-		{
-			// This is the UUID format without dashes, the version char is at pos #12:
-			return (a_UUID[12] == '4');
-		}
-		case 36:
-		{
-			// This is the UUID format with dashes, the version char is at pos #14:
-			return (a_UUID[14] == '4');
-		}
-	}
-	return false;
+	return (a_UUID.Version() == 4);
 }
 
 
@@ -342,7 +315,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
+void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
 {
 	// Atomically increment player count (in server thread)
 	cRoot::Get()->GetServer()->PlayerCreated();
@@ -366,7 +339,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		m_Username = a_Name;
 
 		// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
-		if (m_UUID.empty())
+		if (m_UUID.IsNil())
 		{
 			m_UUID = a_UUID;
 		}
@@ -1661,7 +1634,7 @@ void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 
 
 
-void cClientHandle::HandleSpectate(const AString & a_PlayerUUID)
+void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 {
 	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [=](cPlayer * a_ToSpectate)
 	{
@@ -2243,6 +2216,24 @@ void cClientHandle::ServerTick(float a_Dt)
 void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
+}
+
+
+
+
+
+void cClientHandle::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	m_Protocol->SendLeashEntity(a_Entity, a_EntityLeashedTo);
+}
+
+
+
+
+
+void cClientHandle::SendUnleashEntity(const cEntity & a_Entity)
+{
+	m_Protocol->SendUnleashEntity(a_Entity);
 }
 
 

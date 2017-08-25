@@ -258,7 +258,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 				},
 				Returns =
@@ -276,7 +276,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 				},
 				Returns =
@@ -303,7 +303,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 				},
 				Returns =
@@ -322,7 +322,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 				},
 				Returns =
@@ -340,7 +340,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 				},
 				Returns =
@@ -502,7 +502,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 				},
 				Returns =
@@ -604,7 +604,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 				},
 				Notes = "Removes the player's rank; the player's left without a rank. Note that this doesn't change the {{cPlayer}} instances for the already connected players, you need to update all the instances manually. No action if the player has no rank assigned to them already.",
@@ -699,7 +699,7 @@ return
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 					{
 						Name = "PlayerName",

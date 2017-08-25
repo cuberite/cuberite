@@ -50,10 +50,12 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/LeashKnot.h"
 #include "../Entities/Painting.h"
 
 #include "../Protocol/MojangAPI.h"
 #include "Server.h"
+#include "BoundingBox.h"
 
 
 
@@ -1396,12 +1398,13 @@ cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	int ownerLine = a_NBT.FindChildByName(a_TagIdx, "Owner");
 	if (ownerLine >= 0)
 	{
-		AString OwnerName, OwnerUUID, OwnerTexture, OwnerTextureSignature;
+		AString OwnerName, OwnerTexture, OwnerTextureSignature;
+		cUUID OwnerUUID;
 
 		currentLine = a_NBT.FindChildByName(ownerLine, "Id");
 		if (currentLine >= 0)
 		{
-			OwnerUUID = a_NBT.GetString(currentLine);
+			OwnerUUID.FromString(a_NBT.GetString(currentLine));
 		}
 
 		currentLine = a_NBT.FindChildByName(ownerLine, "Name");
@@ -1540,6 +1543,8 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:xp_orb",              &cWSSAnvil::LoadExpOrbFromNBT },
 		{ "ItemFrame",                     &cWSSAnvil::LoadItemFrameFromNBT },
 		{ "minecraft:item_frame",          &cWSSAnvil::LoadItemFrameFromNBT },
+		{ "LeashKnot",                     &cWSSAnvil::LoadLeashKnotFromNBT },
+		{ "minecraft:leash_knot",          &cWSSAnvil::LoadLeashKnotFromNBT },
 		{ "Arrow",                         &cWSSAnvil::LoadArrowFromNBT },
 		{ "minecraft:arrow",               &cWSSAnvil::LoadArrowFromNBT },
 		{ "SplashPotion",                  &cWSSAnvil::LoadSplashPotionFromNBT },
@@ -1952,6 +1957,24 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.emplace_back(std::move(ItemFrame));
+}
+
+
+
+
+
+void cWSSAnvil::LoadLeashKnotFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	auto LeashKnot = cpp14::make_unique<cLeashKnot>(BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
+
+	if (!LoadEntityBaseFromNBT(*LeashKnot.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	LoadHangingFromNBT(*LeashKnot.get(), a_NBT, a_TagIdx);
+
+	a_Entities.emplace_back(std::move(LeashKnot));
 }
 
 
@@ -2504,7 +2527,7 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	}
 
 	auto OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
-	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
+	if (!OwnerInfo.first.empty() && !OwnerInfo.second.IsNil())
 	{
 		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);
 		Monster->SetIsTame(true);
@@ -2905,7 +2928,7 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	}
 
 	auto OwnerInfo = LoadEntityOwner(a_NBT, a_TagIdx);
-	if (!OwnerInfo.first.empty() && !OwnerInfo.second.empty())
+	if (!OwnerInfo.first.empty() && !OwnerInfo.second.IsNil())
 	{
 		Monster->SetOwner(OwnerInfo.first, OwnerInfo.second);
 		Monster->SetIsTame(true);
@@ -3042,42 +3065,38 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 
 
-std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx)
+std::pair<AString, cUUID> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	// Load the owner information. OwnerUUID or Owner may be specified, possibly both:
-	AString OwnerUUID, OwnerName;
+	AString OwnerName;
+	cUUID OwnerUUID;
 	int OwnerUUIDIdx = a_NBT.FindChildByName(a_TagIdx, "OwnerUUID");
 	if (OwnerUUIDIdx > 0)
 	{
-		OwnerUUID = a_NBT.GetString(OwnerUUIDIdx);
+		OwnerUUID.FromString(a_NBT.GetString(OwnerUUIDIdx));
 	}
 	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
 	if (OwnerIdx > 0)
 	{
 		OwnerName = a_NBT.GetString(OwnerIdx);
 	}
-	if (OwnerName.empty() && OwnerUUID.empty())
+	if (OwnerName.empty() && OwnerUUID.IsNil())
 	{
 		// There is no owner, bail out:
-		return std::pair<AString, AString>();
+		return {};
 	}
 
 	// Convert name to UUID, if needed:
-	if (OwnerUUID.empty())
+	if (OwnerUUID.IsNil())
 	{
 		// This entity has only playername stored (pre-1.7.6), look up the UUID
 		// The lookup is blocking, but we're running in a separate thread, so it's ok
 		OwnerUUID = cRoot::Get()->GetMojangAPI().GetUUIDFromPlayerName(OwnerName);
-		if (OwnerUUID.empty())
+		if (OwnerUUID.IsNil())
 		{
 			// Not a known player, un-tame the entity by bailing out
-			return std::pair<AString, AString>();
+			return {};
 		}
-	}
-	else
-	{
-		// Normalize the UUID:
-		OwnerUUID = cMojangAPI::MakeUUIDShort(OwnerUUID);
 	}
 
 	// Convert UUID to name, if needed:
@@ -3088,11 +3107,11 @@ std::pair<AString, AString> cWSSAnvil::LoadEntityOwner(const cParsedNBT & a_NBT,
 		if (OwnerName.empty())
 		{
 			// Not a known player, un-tame the entity by bailing out
-			return std::pair<AString, AString>();
+			return {};
 		}
 	}
 
-	return std::make_pair(OwnerName, OwnerUUID);
+	return { OwnerName, OwnerUUID };
 }
 
 
@@ -3182,7 +3201,62 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 		a_Monster.SetCustomNameAlwaysVisible(CustomNameVisible);
 	}
 
+	// Leashed to a knot
+	int LeashedIdx = a_NBT.FindChildByName(a_TagIdx, "Leashed");
+	if ((LeashedIdx >= 0) && a_NBT.GetByte(LeashedIdx))
+	{
+		LoadLeashToPosition(a_Monster, a_NBT, a_TagIdx);
+	}
+
 	return true;
+}
+
+
+
+
+
+void cWSSAnvil::LoadLeashToPosition(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int LeashIdx = a_NBT.FindChildByName(a_TagIdx, "Leash");
+	if (LeashIdx < 0)
+	{
+		return;
+	}
+
+	double PosX = 0.0, PosY = 0.0, PosZ = 0.0;
+	bool KnotPosPresent = true;
+	int LeashDataLine = a_NBT.FindChildByName(LeashIdx, "X");
+	if (LeashDataLine >= 0)
+	{
+		PosX = a_NBT.GetDouble(LeashDataLine);
+	}
+	else
+	{
+		KnotPosPresent = false;
+	}
+	LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Y");
+	if (LeashDataLine >= 0)
+	{
+		PosY = a_NBT.GetDouble(LeashDataLine);
+	}
+	else
+	{
+		KnotPosPresent = false;
+	}
+	LeashDataLine = a_NBT.FindChildByName(LeashIdx, "Z");
+	if (LeashDataLine >= 0)
+	{
+		PosZ = a_NBT.GetDouble(LeashDataLine);
+	}
+	else
+	{
+		KnotPosPresent = false;
+	}
+	if (KnotPosPresent)
+	{
+		// Set leash pos for the mob
+		a_Monster.SetLeashToPos(new Vector3d(PosX, PosY, PosZ));
+	}
 }
 
 

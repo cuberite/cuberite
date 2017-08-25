@@ -117,7 +117,7 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 
 
 
-void cWolf::ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved)
+void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved)
 {
 	if (
 		(a_Opponent == nullptr) || IsSitting() || (!IsTame()) ||

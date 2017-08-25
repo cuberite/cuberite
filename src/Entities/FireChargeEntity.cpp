@@ -50,7 +50,7 @@ void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hi
 
 	if (!a_EntityHit.IsFireproof())
 	{
-		// TODO Damage Entity with 5 damage(from http://minecraft.gamepedia.com/Blaze#Blaze_fireball)
+		// TODO Damage Entity with 5 damage(from https://minecraft.gamepedia.com/Blaze#Blaze_fireball)
 		a_EntityHit.StartBurning(5 * 20);  // 5 seconds of burning
 	}
 }

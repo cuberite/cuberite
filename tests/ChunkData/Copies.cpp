@@ -27,7 +27,8 @@ int main(int argc, char** argv)
 		buffer.SetBlock(3, 1, 4, 0xDE);
 		buffer.SetMeta(3, 1, 4, 0xA);
 	
-		cChunkData copy = buffer.Copy();
+		cChunkData copy(Pool);
+		copy.Assign(buffer);
 		testassert(copy.GetBlock(3, 1, 4) == 0xDE);
 		testassert(copy.GetMeta(3, 1, 4) == 0xA);
 	
