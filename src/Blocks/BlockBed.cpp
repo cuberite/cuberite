@@ -120,7 +120,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
 		a_WorldInterface.DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
 	}
-	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: http://minecraft.gamepedia.com/Bed#Sleeping
+	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
 	{
 		a_Player.SendMessageFailure("You can only sleep at night");
 	}

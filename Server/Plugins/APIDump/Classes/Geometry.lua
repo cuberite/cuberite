@@ -2327,7 +2327,7 @@ end
 						Type = "Vector3i",
 					},
 				},
-				Notes = "Returns a new Vector3i that is a {{http://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
+				Notes = "Returns a new Vector3i that is a {{https://en.wikipedia.org/wiki/Cross_product|cross product}} of this vector and the specified vector.",
 			},
 			Dot =
 			{

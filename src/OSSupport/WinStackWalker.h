@@ -3,7 +3,7 @@
 // Declares the stack walking for Windows binaries
 
 /*
-LICENSE (http://www.opensource.org/licenses/bsd-license.php)
+LICENSE (https://www.opensource.org/licenses/bsd-license.php)
 
 Copyright (c) 2005-2010, Jochen Kalmbach
 All rights reserved.

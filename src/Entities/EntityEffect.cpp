@@ -23,7 +23,7 @@ cEntityEffect::eType cEntityEffect::GetPotionEffectType(short a_ItemDamage)
 {
 	// Lowest four bits
 	// Potion effect bits are different from entity effect values
-	// For reference: http://minecraft.gamepedia.com/Data_values#.22Potion_effect.22_bits
+	// For reference: https://minecraft.gamepedia.com/Data_values#.22Potion_effect.22_bits
 	switch (a_ItemDamage & 0x0f)
 	{
 		case 0x01: return cEntityEffect::effRegeneration;
@@ -112,9 +112,9 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 	SplashCoeff = IsPotionDrinkable(a_ItemDamage) ? 1 : 0.75;
 
 	// Ref.:
-	//   http://minecraft.gamepedia.com/Data_values#.22Tier.22_bit
-	//   http://minecraft.gamepedia.com/Data_values#.22Extended_duration.22_bit
-	//   http://minecraft.gamepedia.com/Data_values#.22Splash_potion.22_bit
+	//   https://minecraft.gamepedia.com/Data_values#.22Tier.22_bit
+	//   https://minecraft.gamepedia.com/Data_values#.22Extended_duration.22_bit
+	//   https://minecraft.gamepedia.com/Data_values#.22Splash_potion.22_bit
 
 	return static_cast<int>(base * TierCoeff * ExtCoeff * SplashCoeff);
 }
@@ -126,7 +126,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 bool cEntityEffect::IsPotionDrinkable(short a_ItemDamage)
 {
 	// Drinkable potion if 13th lowest bit is set
-	// Ref.: http://minecraft.gamepedia.com/Potions#Data_value_table
+	// Ref.: https://minecraft.gamepedia.com/Potions#Data_value_table
 	return ((a_ItemDamage & 0x2000) != 0);
 }
 
