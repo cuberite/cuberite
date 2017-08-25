@@ -41,7 +41,7 @@ public:
 
 	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
 
-	virtual bool Initialize(cWorld & a_World) override;
+	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_World) override;
 
 	virtual ~cPlayer() override;
 
@@ -97,12 +97,12 @@ public:
 	float GetXpPercentage(void);
 
 	/** Calculates the amount of XP needed for a given level
-	Ref: http://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.gamepedia.com/XP
 	*/
 	static int XpForLevel(int a_Level);
 
 	/** Inverse of XpForLevel
-	Ref: http://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.gamepedia.com/XP
 	values are as per this with pre-calculations
 	*/
 	static int CalcLevelFromXp(int a_CurrentXp);

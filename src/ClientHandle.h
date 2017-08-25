@@ -12,7 +12,6 @@
 #include "OSSupport/Network.h"
 #include "Defines.h"
 #include "Scoreboard.h"
-#include "Map.h"
 #include "UI/SlotArea.h"
 #include "json/json.h"
 #include "ChunkSender.h"
@@ -35,6 +34,7 @@ class cWindow;
 class cFallingBlock;
 class cCompositeChat;
 class cStatManager;
+class cMap;
 class cClientHandle;
 typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
@@ -180,6 +180,7 @@ public:  // tolua_export
 	void SendHealth                     (void);
 	void SendHideTitle                  (void);   // tolua_export
 	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
 	void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
@@ -217,6 +218,7 @@ public:  // tolua_export
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
 	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
+	void SendUnleashEntity              (const cEntity & a_Entity);
 	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
@@ -441,6 +443,9 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
+
+	// Temporary (#3115-will-fix): maintain temporary ownership of created cPlayer objects while they are in limbo
+	std::unique_ptr<cPlayer> m_PlayerPtr;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.

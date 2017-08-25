@@ -19,7 +19,7 @@ if (POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
 endif()
 
-# Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
+# Without this, the MSVC variable isn't defined for MSVC builds ( https://cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
 # Enable the support for solution folders in MSVC
@@ -94,7 +94,7 @@ else()
 endif()
 
 # We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
-# Adapted from http://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
+# Adapted from https://web.archive.org/web/https://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
 if(MSVC OR MSVC_IDE)
 	if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
 		message(FATAL_ERROR "The project requires C++11 features. "
@@ -276,6 +276,12 @@ endif()
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
 # (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
 include(lib/polarssl.cmake EXCLUDE_FROM_ALL)
+
+if(NOT MSVC AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
+	# mbed TLS uses the frame pointer's register in inline assembly:
+	# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
+	target_compile_options(mbedtls PUBLIC -fomit-frame-pointer)
+endif()
 
 set_exe_flags()
 

@@ -76,12 +76,12 @@ cChestWindow::~cChestWindow()
 bool cChestWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 {
 	m_PrimaryChest->SetNumberOfPlayers(m_PrimaryChest->GetNumberOfPlayers() - 1);
-	m_PrimaryChest->GetWorld()->WakeUpSimulators(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosY(), m_PrimaryChest->GetPosZ());
+	m_PrimaryChest->GetWorld()->WakeUpSimulators(m_PrimaryChest->GetPos());
 
 	if (m_SecondaryChest != nullptr)
 	{
 		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() - 1);
-		m_SecondaryChest->GetWorld()->WakeUpSimulators(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosY(), m_SecondaryChest->GetPosZ());
+		m_SecondaryChest->GetWorld()->WakeUpSimulators(m_SecondaryChest->GetPos());
 	}
 
 	cWindow::ClosedByPlayer(a_Player, a_CanRefuse);
@@ -95,12 +95,12 @@ bool cChestWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 void cChestWindow::OpenedByPlayer(cPlayer & a_Player)
 {
 	m_PrimaryChest->SetNumberOfPlayers(m_PrimaryChest->GetNumberOfPlayers() + 1);
-	m_PrimaryChest->GetWorld()->WakeUpSimulators(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosY(), m_PrimaryChest->GetPosZ());
+	m_PrimaryChest->GetWorld()->WakeUpSimulators(m_PrimaryChest->GetPos());
 
 	if (m_SecondaryChest != nullptr)
 	{
 		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() + 1);
-		m_SecondaryChest->GetWorld()->WakeUpSimulators(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosY(), m_SecondaryChest->GetPosZ());
+		m_SecondaryChest->GetWorld()->WakeUpSimulators(m_SecondaryChest->GetPos());
 	}
 
 	cWindow::OpenedByPlayer(a_Player);

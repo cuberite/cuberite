@@ -105,7 +105,7 @@ public:
 		}
 
 		// Search for water in a close proximity:
-		// Ref.: http://minecraft.gamepedia.com/Farmland#Hydrated_Farmland_Tiles
+		// Ref.: https://minecraft.gamepedia.com/Farmland#Hydration
 		// TODO: Rewrite this to use the chunk and its neighbors directly
 		cBlockArea Area;
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;

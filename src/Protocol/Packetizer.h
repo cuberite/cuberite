@@ -11,7 +11,10 @@
 #pragma once
 
 #include "Protocol.h"
-#include "../ByteBuffer.h"
+
+
+
+class cByteBuffer;
 
 
 

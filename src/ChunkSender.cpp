@@ -257,7 +257,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	{
 		return;
 	}
-	cChunkDataSerializer Data(m_BlockTypes, m_BlockMetas, m_BlockLight, m_BlockSkyLight, m_BiomeMap, m_World.GetDimension());
+	cChunkDataSerializer Data(m_Data, m_BiomeMap, m_World.GetDimension());
 
 	for (const auto client : a_Clients)
 	{
@@ -271,6 +271,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 		}  // for itr - m_Packets[]
 
 	}
+	m_Data.Clear();
 	m_BlockEntities.clear();
 
 	// TODO: Send entity spawn packets

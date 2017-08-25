@@ -251,14 +251,13 @@ public:
 		}
 		else
 		{
-			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), (Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
-			if (!Floater->Initialize(*a_World))
+			auto Floater = cpp14::make_unique<cFloater>(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), (Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
+			auto FloaterPtr = Floater.get();
+			if (!FloaterPtr->Initialize(std::move(Floater), *a_World))
 			{
-				delete Floater;
-				Floater = nullptr;
 				return false;
 			}
-			a_Player->SetIsFishing(true, Floater->GetUniqueID());
+			a_Player->SetIsFishing(true, FloaterPtr->GetUniqueID());
 		}
 		return true;
 	}

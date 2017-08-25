@@ -109,6 +109,7 @@ set(BINDING_DEPENDENCIES
 	../Entities/GhastFireballEntity.h
 	../Entities/HangingEntity.h
 	../Entities/ItemFrame.h
+	../Entities/LeashKnot.h
 	../Entities/Pawn.h
 	../Entities/Player.h
 	../Entities/Painting.h

@@ -629,6 +629,34 @@ void cProtocol_1_8_0::SendKeepAlive(UInt32 a_PingID)
 
 
 
+void cProtocol_1_8_0::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt32(a_EntityLeashedTo.GetUniqueID());
+	Pkt.WriteBool(true);
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendUnleashEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEInt32(-1);
+	Pkt.WriteBool(true);
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
@@ -2884,14 +2912,10 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 						}
 						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
-							AString Lore;
-
 							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent / backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								a_Item.m_LoreTable.push_back(NBT.GetString(loretag));
 							}
-
-							a_Item.m_Lore = Lore;
 						}
 						else if ((NBT.GetType(displaytag) == TAG_Int) && (NBT.GetName(displaytag) == "color"))
 						{
@@ -3080,15 +3104,9 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		{
 			Writer.BeginList("Lore", TAG_String);
 
-			AStringVector Decls = StringSplit(a_Item.m_Lore, "`");
-			for (AStringVector::const_iterator itr = Decls.begin(), end = Decls.end(); itr != end; ++itr)
+			for (const auto & Line : a_Item.m_LoreTable)
 			{
-				if (itr->empty())
-				{
-					// The decl is empty (two `s), ignore
-					continue;
-				}
-				Writer.AddString("", itr->c_str());
+				Writer.AddString("", Line);
 			}
 
 			Writer.EndList();
@@ -3164,7 +3182,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 
-			// The new Block Entity format for a Mob Head. See: http://minecraft.gamepedia.com/Head#Block_entity
+			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
 			Writer.BeginCompound("Owner");
 				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID());
 				Writer.AddString("Name", MobHeadEntity.GetOwnerName());

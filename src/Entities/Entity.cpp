@@ -135,9 +135,9 @@ const char * cEntity::GetParentClass(void) const
 
 
 
-bool cEntity::Initialize(cWorld & a_World)
+bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this))
+	if (cPluginManager::Get()->CallHookSpawningEntity(a_EntityWorld, *this))
 	{
 		return false;
 	}
@@ -151,13 +151,22 @@ bool cEntity::Initialize(cWorld & a_World)
 
 	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
-	a_World.AddEntity(this);
+	a_EntityWorld.AddEntity(std::move(a_Self));
 	ASSERT(m_World != nullptr);
 
-	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
+	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
 	// Spawn the entity on the clients:
-	a_World.BroadcastSpawnEntity(*this);
+	a_EntityWorld.BroadcastSpawnEntity(*this);
+
+	// If has any mob leashed broadcast every leashed entity to this
+	if (HasAnyMobLeashed())
+	{
+		for (auto LeashedMob : m_LeashedMobs)
+		{
+			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
 
 	return true;
 }
@@ -218,6 +227,12 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	ASSERT(GetParentChunk() != nullptr);
 	SetIsTicking(false);
 
+	// Unleash leashed mobs
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(true, true);
+	}
+
 	if (a_ShouldBroadcast)
 	{
 		m_World->BroadcastDestroyEntity(*this);
@@ -230,8 +245,10 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 			this->GetUniqueID(), this->GetClass(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
-		ParentChunk->RemoveEntity(this);
-		delete this;
+
+		// Make sure that RemoveEntity returned a valid smart pointer
+		// Also, not storing the returned pointer means automatic destruction
+		VERIFY(ParentChunk->RemoveEntity(*this));
 	});
 	Destroyed();
 }
@@ -343,7 +360,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	Vector3d Heading(0, 0, 0);
 	if (a_Attacker != nullptr)
 	{
-		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 16 : 11);
+		Heading = a_Attacker->GetLookVector();
 	}
 
 	TDI.Knockback = Heading * a_KnockbackAmount;
@@ -455,10 +472,14 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtSilverfish:
 					{
 						a_TDI.RawDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
-						// TODO: Add slowness effect
+						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
+						// increasing the max duration by 0.5 seconds each level
+						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
+						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
+						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
-					};
+					}
 					default: break;
 				}
 			}
@@ -487,7 +508,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtMagmaCube:
 					{
 						break;
-					};
+					}
 					default: StartBurning(BurnTicks * 20);
 				}
 			}
@@ -532,21 +553,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	// Add knockback:
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != nullptr))
 	{
-		int KnockbackLevel = static_cast<int>(a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback));  // More common enchantment
-		if (KnockbackLevel < 1)
-		{
-			// We support punch on swords and vice versa! :)
-			KnockbackLevel = static_cast<int>(a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch));
-		}
-
-		Vector3d AdditionalSpeed(0, 0, 0);
-		switch (KnockbackLevel)
-		{
-			case 1: AdditionalSpeed.Set(5, 0.3, 5); break;
-			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
-			default: break;
-		}
-		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
+		AddSpeed(a_TDI.Knockback);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -572,7 +579,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 {
 	// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
-	// Ref: http://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
+	// Ref: https://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
 		case E_ITEM_WOODEN_SWORD:    return 4;
@@ -618,7 +625,7 @@ void cEntity::ApplyArmorDamage(int DamageBlocked)
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Ref.: http://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
 		case dtOnFire:
@@ -711,7 +718,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// Add up all armor points:
-	// Ref.: http://minecraft.gamepedia.com/Armor#Defense_points
+	// Ref.: https://minecraft.gamepedia.com/Armor#Defense_points
 	int ArmorValue = 0;
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
@@ -748,7 +755,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
-	// Ref.: http://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
 	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
 	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
@@ -761,9 +768,19 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 {
 	// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
+	double Knockback = 11;
 
-	// TODO: Enchantments
-	return 1;
+	// If we're sprinting, bump up the knockback
+	if (IsSprinting())
+	{
+		Knockback = 16;
+	}
+
+	// Check for knockback enchantments (punch only applies to shot arrows)
+	unsigned int KnockbackLevel = GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
+	Knockback += 10 * KnockbackLevel;
+
+	return Knockback;
 }
 
 
@@ -1156,6 +1173,12 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
+	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
+	if (m_IsWorldChangeScheduled)
+	{
+		return;
+	}
+
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
@@ -1585,8 +1608,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
 		);
-		ParentChunk->RemoveEntity(this);
-		a_World->AddEntity(this);
+		a_World->AddEntity(ParentChunk->RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
 	});
 	return true;
@@ -1690,7 +1712,7 @@ void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 void cEntity::HandleAir(void)
 {
-	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
+	// Ref.: https://minecraft.gamepedia.com/Chunk_format
 	// See if the entity is /submerged/ water (block above is water)
 	// Get the type of block the entity is standing in:
 
@@ -2198,3 +2220,24 @@ void cEntity::SetPosition(const Vector3d & a_Position)
 
 
 
+
+void cEntity::AddLeashedMob(cMonster * a_Monster)
+{
+	// Not there already
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) == m_LeashedMobs.end());
+
+	m_LeashedMobs.push_back(a_Monster);
+}
+
+
+
+
+void cEntity::RemoveLeashedMob(cMonster * a_Monster)
+{
+	ASSERT(a_Monster->GetLeashedTo() == this);
+
+	// Must exists
+	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
+
+	m_LeashedMobs.remove(a_Monster);
+}

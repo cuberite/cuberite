@@ -17,6 +17,7 @@ SET (SRCS
 	GhastFireballEntity.cpp
 	HangingEntity.cpp
 	ItemFrame.cpp
+	LeashKnot.cpp
 	Minecart.cpp
 	Painting.cpp
 	Pawn.cpp
@@ -45,6 +46,7 @@ SET (HDRS
 	GhastFireballEntity.h
 	HangingEntity.h
 	ItemFrame.h
+	LeashKnot.h
 	Minecart.h
 	Painting.h
 	Pawn.h

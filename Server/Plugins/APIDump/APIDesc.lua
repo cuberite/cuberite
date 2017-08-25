@@ -202,7 +202,7 @@ return
 							Type = "string",
 						},
 					},
-					Notes = "Returns the name of the sound that is played when placing the block of this type.",
+					Notes = "(<b>DEPRECATED</b>) Not used by cuberite internally and always returns an empty string.",
 				},
 				GetSpreadLightFalloff =
 				{
@@ -377,16 +377,6 @@ return
 				{
 					Type = "bool",
 					Notes = "Can a piston break this block?",
-				},
-				m_PlaceSound =
-				{
-					Type = "string",
-					Notes = "The name of the sound that is placed when a block is placed.",
-				},
-				m_RequiresSpecialTool =
-				{
-					Type = "bool",
-					Notes = "Does this block require a tool to drop?",
 				},
 				m_SpreadLightFalloff =
 				{
@@ -2213,7 +2203,7 @@ function OnPlayerJoined(a_Player)
 	-- Send an example composite chat message to the player:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "http://cuberite.org", "u@2")  -- Colored underlined link
+		:AddUrlPart(a_Player:GetName(), "https://cuberite.org", "u@2")  -- Colored underlined link
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")       -- Underlined suggest-command
 		:AddRunCommandPart(" SetDay", "/time set 0")                 -- Regular text that will execute command when clicked
 		:SetMessageType(mtJoin)                                      -- It is a join-message
@@ -3685,6 +3675,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is an item frame.",
 				},
+				IsLeashKnot =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is a leash knot.",
+				},
 				IsMinecart =
 				{
 					Returns =
@@ -4357,7 +4357,11 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etItemFrame =
 				{
-					Notes = "",
+					Notes = "The entity is an item frame",
+				},
+				etLeashKnot =
+				{
+					Notes = "The entity is a leash knot",
 				},
 				etMinecart =
 				{
@@ -6723,7 +6727,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							},
 							{
 								Name = "Lore",
-								Type = "string",
+								Type = "table",
 								IsOptional = true,
 							},
 						},
@@ -6977,10 +6981,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					Type = "number",
 					Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants",
 				},
-				m_Lore =
+				m_LoreTable =
 				{
-					Type = "string",
-					Notes = "The lore for an item. Line breaks are represented by the ` character.",
+					Type = "table",
+					Notes = "The lore for an item. Represented as an array table of lines.",
 				},
 				m_RepairCost =
 				{
@@ -8059,6 +8063,17 @@ This class is used by plugins wishing to display a custom window to the player, 
 					},
 					Notes = "Returns the cItemGrid object representing the internal storage in this window",
 				},
+				SetOnClicked =
+				{
+					Params =
+					{
+						{
+							Name = "OnClickedCallback",
+							Type = "function",
+						},
+					},
+					Notes = "Sets the function that the window will call when it is about to process a click from a player. See {{#additionalinfo_1|below}} for the signature of the callback function.",
+				},
 				SetOnClosing =
 				{
 					Params =
@@ -8091,6 +8106,17 @@ This class is used by plugins wishing to display a custom window to the player, 
 					]],
 				},
 				{
+					Header = "OnClicked Callback",
+					Contents = [[
+						This callback, settable via the SetOnClicked() function, will be called when the player clicks a slot in the window. The callback can cancel the click.</p>
+<pre class="prettyprint lang-lua">
+function OnWindowClicked(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
+</pre>
+						<p>
+						The a_Window parameter is the cLuaWindow object representing the window, a_Player is the player who made the click, a_SlotNum is the slot the player clicked, a_ClickAction is the type of click the player made, and a_ClickedItem is the item the player clicked on, if applicable. If the function returns true, the click is cancelled (internally, the server resends the window slots to the player to keep the player in sync).
+					]],
+				},
+				{
 					Header = "OnClosing Callback",
 					Contents = [[
 						This callback, settable via the SetOnClosing() function, will be called when the player tries to close the window, or the window is closed for any other reason (such as a player disconnecting).</p>
@@ -8116,7 +8142,7 @@ function OnWindowSlotChanged(a_Window, a_SlotNum)
 				{
 					Header = "Example",
 					Contents = [[
-						This example is taken from the Debuggers plugin, used to test the API functionality. It opens a window and refuse to close it 3 times. It also logs slot changes to the server console.
+						This example is taken from the Debuggers plugin, used to test the API functionality. It opens a window and refuse to close it 3 times. It also logs slot changes to the server console and prevents shift-clicking in the window.
 <pre class="prettyprint lang-lua">
 -- Callback that refuses to close the window twice, then allows:
 local Attempt = 1;
@@ -8131,10 +8157,18 @@ local OnSlotChanged = function(Window, SlotNum)
 	LOG("Window \"" .. Window:GetWindowTitle() .. "\" slot " .. SlotNum .. " changed.");
 end
 
+-- Prevent shift-clicking:
+local OnClicked = function(Window, ClickingPlayer, SlotNum, ClickAction, ClickedItem)
+	if ClickAction == caShiftLeftClick then
+		return true
+	end
+end
+
 -- Set window contents:
 -- a_Player is a cPlayer object received from the outside of this code fragment
 local Window = cLuaWindow(cWindow.wtHopper, 3, 3, "TestWnd");
 Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
+Window:SetOnClicked(OnClicked);
 Window:SetOnClosing(OnClosing);
 Window:SetOnSlotChanged(OnSlotChanged);
 
@@ -8620,6 +8654,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+				CanBeLeashed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the mob can be leashed.",
+				},
 				FamilyFromType =
 				{
 					IsStatic = true,
@@ -8658,6 +8702,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Gets the custom name of the monster. If no custom name is set, the function returns an empty string.",
+				},
+				GetLeashedTo =
+				{
+					Returns =
+					{
+						{
+							Name = "LeashedTo",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Returns the entity to where this mob is leashed, returns nil if it's not leashed",
 				},
 				GetMobFamily =
 				{
@@ -8739,6 +8794,27 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
 				},
+				IsLeashed =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the monster is leashed to an entity.",
+				},
+				LeashTo =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						}
+					},
+					Notes = "Leash the monster to an entity.",
+				},				
 				MobTypeToString =
 				{
 					IsStatic = true,
@@ -8797,6 +8873,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the age of the monster",
 				},
+				SetCanBeLeashed =
+				{
+					Params =
+					{
+						{
+							Name = "CanBeLeashed",
+							Type = "boolean",
+						}
+					},
+					Notes = "Sets whether the mob can be leashed, for extensibility in plugins"
+				},
 				SetCustomName =
 				{
 					Params =
@@ -8848,6 +8935,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the mob type ({{Globals#eMonsterType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
+				},
+				Unleash =
+				{
+					Params =
+					{
+						{
+							Name = "ShouldDropLeashPickup",
+							Type = "boolean",
+						},
+					},
+					Notes = "Unleash the monster.",
 				},
 			},
 			Constants =
@@ -10481,7 +10579,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Sends the specified message to the player (shows above action bar, doesn't show for < 1.8 clients).",
+					Notes = "Sends the specified message to the player (shows above action bar).",
 				},
 				SendBlocksAround =
 				{
@@ -10628,7 +10726,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Sends the specified message to the player (doesn't show for < 1.8 clients).",
+					Notes = "Sends the specified message to the player.",
 				},
 				SetBedPos =
 				{
@@ -15568,6 +15666,10 @@ end
 				{
 					Notes = "The itemtype for lead"
 				},
+				E_ITEM_LEASH =
+				{
+					Notes = "The itemtype for lead (E_ITEM_LEAD synonym)"
+				},				
 				E_ITEM_LEATHER =
 				{
 					Notes = "The itemtype for leather"
@@ -16864,7 +16966,7 @@ end
 		{
 			Desc = [[
 				This class provides an interface to the XML parser,
-				{{http://matthewwild.co.uk/projects/luaexpat/|LuaExpat}}. It provides a SAX interface with an
+				{{https://matthewwild.co.uk/projects/luaexpat/|LuaExpat}}. It provides a SAX interface with an
 				incremental XML parser.</p>
 				<p>
 				With an event-based API like SAX the XML document can be fed to the parser in chunks, and the
@@ -16873,7 +16975,7 @@ end
 				parsing of huge documents can benefit from this piecemeal operation.</p>
 				<p>
 				See the online
-				{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}} for details
+				{{https://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}} for details
 				on how to work with this parser. The code examples below should provide some basic help, too.
 			]],
 			Functions =
@@ -16925,7 +17027,7 @@ end
 						The callbacks table passed to the new() function specifies the Lua functions that the parser
 						calls upon various events. The following table lists the most common functions used, for a
 						complete list see the online
-						{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.</p>
+						{{https://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.</p>
 						<table>
 						<tr><th>Function name</th><th>Parameters</th><th>Notes</th></tr>
 						<tr><td>CharacterData</td><td>Parser, string</td><td>Called when the parser recognizes a raw string inside the element</td></tr>
@@ -16939,7 +17041,7 @@ end
 					Contents = [[
 						The XMLParser object returned by lxp.new provides the functions needed to parse the XML. The
 						following list provides the most commonly used ones, for a complete list see the online
-						{{http://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.
+						{{https://matthewwild.co.uk/projects/luaexpat/manual.html#parser|LuaExpat documentation}}.
 						<ul>
 							<li>close() - closes the parser, freeing all memory used by it.</li>
 							<li>getCallbacks() - returns the callbacks table for this parser.</li>
@@ -17143,7 +17245,7 @@ end
 			Desc = [[
 				This class represents the tolua bridge between the Lua API and Cuberite. It supports some low
 				level operations and queries on the objects. See also the tolua++'s documentation at
-				{{http://www.codenix.com/~tolua/tolua++.html#utilities}}. Normally you shouldn't use any of these
+				{{https://www8.cs.umu.se/kurser/TDBD12/VT04/lab/lua/tolua++.html#utilities}}. Normally you shouldn't use any of these
 				functions except for type()
 			]],
 			Functions =

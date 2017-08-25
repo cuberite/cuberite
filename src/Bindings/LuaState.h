@@ -614,6 +614,7 @@ public:
 	void Push(const AStringMap & a_Dictionary);
 	void Push(const AStringVector & a_Vector);
 	void Push(const char * a_Value);
+	void Push(const cItem & a_Item);
 	void Push(const cNil & a_Nil);
 	void Push(const cRef & a_Ref);
 	void Push(const Vector3d & a_Vector);
@@ -639,6 +640,7 @@ public:
 	// Enum values are checked for their allowed values and fail if the value is not assigned.
 	bool GetStackValue(int a_StackPos, AString & a_Value);
 	bool GetStackValue(int a_StackPos, AStringMap & a_Value);
+	bool GetStackValue(int a_StackPos, AStringVector & a_Value);
 	bool GetStackValue(int a_StackPos, bool & a_Value);
 	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
@@ -663,7 +665,7 @@ public:
 	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * unused = nullptr)
 	{
 		UNUSED(unused);
-		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: http://pgl.yoyo.org/luai/i/lua_isnumber
+		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: https://pgl.yoyo.org/luai/i/lua_isnumber
 		{
 			return false;
 		}

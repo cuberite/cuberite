@@ -3,7 +3,6 @@
 
 #include "../Defines.h"
 #include "../Item.h"
-#include "../Blocks/BlockPluginInterface.h"
 
 
 
@@ -12,6 +11,7 @@
 // fwd:
 class cWorld;
 class cPlayer;
+class cBlockPluginInterface;
 
 
 

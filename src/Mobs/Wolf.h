@@ -2,9 +2,9 @@
 #pragma once
 
 #include "PassiveAggressiveMonster.h"
-#include "../Entities/Entity.h"
 
 
+class cEntity;
 
 
 

@@ -101,3 +101,37 @@ protected:
 
 
 
+/** A simple implementation of the cChunkDataCallback interface that just copies the cChunkData */
+class cChunkDataCopyCollector :
+	public cChunkDataCallback
+{
+public:
+	struct MemCallbacks:
+		cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
+	{
+		virtual void OnStartUsingReserve() override {}
+		virtual void OnEndUsingReserve() override {}
+		virtual void OnOutOfReserve() override {}
+	};
+
+	cChunkDataCopyCollector():
+		m_Pool(cpp14::make_unique<MemCallbacks>()),
+		m_Data(m_Pool)
+	{
+	}
+
+
+	cListAllocationPool<cChunkData::sChunkSection, cChunkData::NumSections> m_Pool;  // Keep 1 chunk worth of reserve
+	cChunkData m_Data;
+
+protected:
+
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
+	{
+		m_Data.Assign(a_ChunkBuffer);
+	}
+};
+
+
+
+

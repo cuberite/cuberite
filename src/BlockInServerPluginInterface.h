@@ -10,11 +10,10 @@
 #pragma once
 
 #include "Blocks/BlockPluginInterface.h"
-#include "World.h"
 #include "Bindings/PluginManager.h"
 
 
-
+class cWorld;
 
 
 class cBlockInServerPluginInterface :

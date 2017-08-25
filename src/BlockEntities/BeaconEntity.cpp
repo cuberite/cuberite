@@ -19,7 +19,10 @@ cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int 
 	m_SecondaryEffect(cEntityEffect::effNoEffect)
 {
 	ASSERT(a_BlockType == E_BLOCK_BEACON);
-	UpdateBeacon();
+	if (m_World != nullptr)
+	{
+		UpdateBeacon();
+	}
 }
 
 
@@ -184,16 +187,42 @@ void cBeaconEntity::UpdateBeacon(void)
 		m_IsActive = (m_BeaconLevel > 0);
 	}
 
-	if (m_BeaconLevel != OldBeaconLevel)
+	if ((m_BeaconLevel != OldBeaconLevel) && (m_BeaconLevel == 4))
 	{
 		// Send window update:
 		if (GetWindow() != nullptr)
 		{
 			GetWindow()->SetProperty(0, m_BeaconLevel);
 		}
-	}
 
-	// TODO: Add achievement
+		class cPlayerCallback :
+			public cPlayerListCallback
+		{
+		public:
+			cPlayerCallback(Vector3d a_Position):
+				m_Position(a_Position)
+			{
+			}
+
+			virtual bool Item(cPlayer * a_Player)
+			{
+				Vector3d Distance = m_Position - a_Player->GetPosition();
+				if (
+					(std::abs(Distance.y) <= 14) &&
+					(std::abs(Distance.x) <= 20) &&
+					(std::abs(Distance.z) <= 20)
+				)
+				{
+					a_Player->AwardAchievement(eStatistic::achFullBeacon);
+				}
+				return false;
+			}
+
+		private:
+			Vector3d m_Position;
+		} PlayerCallback(Vector3d(m_PosX, m_PosY, m_PosZ));
+		GetWorld()->ForEachPlayer(PlayerCallback);
+	}
 }
 
 
@@ -223,21 +252,20 @@ void cBeaconEntity::GiveEffects(void)
 	class cPlayerCallback : public cPlayerListCallback
 	{
 		int m_Radius;
-		int m_PosX, m_PosY, m_PosZ;
+		Vector3d m_Position;
 		cEntityEffect::eType m_PrimaryEffect, m_SecondaryEffect;
 		short m_EffectLevel;
 
 		virtual bool Item(cPlayer * a_Player)
 		{
 			Vector3d PlayerPosition = Vector3d(a_Player->GetPosition());
-			if (PlayerPosition.y > static_cast<double>(m_PosY))
+			if (PlayerPosition.y > m_Position.y)
 			{
-				PlayerPosition.y = static_cast<double>(m_PosY);
+				PlayerPosition.y = m_Position.y;
 			}
 
 			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
-			Vector3d BeaconPosition = Vector3d(m_PosX, m_PosY, m_PosZ);
-			if ((PlayerPosition - BeaconPosition).Length() <= m_Radius)
+			if ((PlayerPosition - m_Position).Length() <= m_Radius)
 			{
 				a_Player->AddEntityEffect(m_PrimaryEffect, 180, m_EffectLevel);
 
@@ -250,18 +278,16 @@ void cBeaconEntity::GiveEffects(void)
 		}
 
 	public:
-		cPlayerCallback(int a_Radius, int a_PosX, int a_PosY, int a_PosZ, cEntityEffect::eType a_PrimaryEffect, cEntityEffect::eType a_SecondaryEffect, short a_EffectLevel):
+		cPlayerCallback(int a_Radius, Vector3d a_Position, cEntityEffect::eType a_PrimaryEffect, cEntityEffect::eType a_SecondaryEffect, short a_EffectLevel):
 			m_Radius(a_Radius),
-			m_PosX(a_PosX),
-			m_PosY(a_PosY),
-			m_PosZ(a_PosZ),
+			m_Position(a_Position),
 			m_PrimaryEffect(a_PrimaryEffect),
 			m_SecondaryEffect(a_SecondaryEffect),
 			m_EffectLevel(a_EffectLevel)
 		{
 		}
 
-	} PlayerCallback(Radius, m_PosX, m_PosY, m_PosZ, m_PrimaryEffect, SecondaryEffect, EffectLevel);
+	} PlayerCallback(Radius, Vector3d(m_PosX, m_PosY, m_PosZ), m_PrimaryEffect, SecondaryEffect, EffectLevel);
 	GetWorld()->ForEachPlayer(PlayerCallback);
 }
 

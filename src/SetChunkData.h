@@ -115,11 +115,3 @@ protected:
 	bool m_AreBiomesValid;
 	bool m_ShouldMarkDirty;
 };
-
-typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
-typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
-
-
-
-
-

@@ -158,7 +158,12 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 		}
 		if (!IsLoreEmpty())
 		{
-			a_OutValue["Lore"] = m_Lore;
+			auto & LoreArray = (a_OutValue["Lore"] = Json::Value(Json::arrayValue));
+
+			for (const auto & Line : m_LoreTable)
+			{
+				LoreArray.append(Line);
+			}
 		}
 
 		if (m_ItemColor.IsValid())
@@ -196,7 +201,11 @@ void cItem::FromJson(const Json::Value & a_Value)
 		m_Enchantments.Clear();
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
 		m_CustomName = a_Value.get("Name", "").asString();
-		m_Lore = a_Value.get("Lore", "").asString();
+		auto Lore = a_Value.get("Lore", Json::arrayValue);
+		for (auto & Line : Lore)
+		{
+			m_LoreTable.push_back(Line.asString());
+		}
 
 		int red = a_Value.get("Color_Red", -1).asInt();
 		int green = a_Value.get("Color_Green", -1).asInt();
@@ -462,7 +471,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 	}
 
 	// The organization here is based on the summary at:
-	// http://minecraft.gamepedia.com/Enchanting
+	// https://minecraft.gamepedia.com/Enchanting
 	// as of July 2017 (Minecraft 1.12).
 
 	// Hand tool enchantments

@@ -668,6 +668,15 @@ bool cPluginLua::OnEntityTeleport(cEntity & a_Entity, const Vector3d & a_OldPosi
 
 
 
+bool cPluginLua::OnPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_OPENING_WINDOW, &a_Player, &a_Window);
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_PLACED_BLOCK,
@@ -1066,6 +1075,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_JOINED:                return "OnPlayerJoined";
 		case cPluginManager::HOOK_PLAYER_LEFT_CLICK:            return "OnPlayerLeftClick";
 		case cPluginManager::HOOK_PLAYER_MOVING:                return "OnPlayerMoving";
+		case cPluginManager::HOOK_PLAYER_OPENING_WINDOW:        return "OnPlayerOpeningWindow";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:          return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";

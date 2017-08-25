@@ -3353,53 +3353,77 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			WakeUpSimulators =
 			{
-				Params =
 				{
+					Params =
 					{
-						Name = "BlockX",
-						Type = "number",
+						{
+							Name = "Block",
+							Type = "Vector3i",
+						},
 					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
+					Notes = "Wakes up the simulators for the specified block.",
 				},
-				Notes = "Wakes up the simulators for the specified block.",
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Wakes up the simulators for the specified block. (DEPRECATED, use vector-parametered version)",
+				},
 			},
 			WakeUpSimulatorsInArea =
 			{
-				Params =
 				{
+					Params =
 					{
-						Name = "MinBlockX",
-						Type = "number",
+						{
+							Name = "Area",
+							Type = "cCuboid",
+						},
 					},
-					{
-						Name = "MaxBlockX",
-						Type = "number",
-					},
-					{
-						Name = "MinBlockY",
-						Type = "number",
-					},
-					{
-						Name = "MaxBlockY",
-						Type = "number",
-					},
-					{
-						Name = "MinBlockZ",
-						Type = "number",
-					},
-					{
-						Name = "MaxBlockZ",
-						Type = "number",
-					},
+					Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
 				},
-				Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
+				{
+					Params =
+					{
+						{
+							Name = "MinBlockX",
+							Type = "number",
+						},
+						{
+							Name = "MaxBlockX",
+							Type = "number",
+						},
+						{
+							Name = "MinBlockY",
+							Type = "number",
+						},
+						{
+							Name = "MaxBlockY",
+							Type = "number",
+						},
+						{
+							Name = "MinBlockZ",
+							Type = "number",
+						},
+						{
+							Name = "MaxBlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive). (DEPRECATED, use vector-parametered version)",
+				},
 			},
 		},
 		AdditionalInfo =

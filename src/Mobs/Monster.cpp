@@ -5,16 +5,25 @@
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../Items/ItemHandler.h"
 #include "../World.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
+#include "BoundingBox.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"
 
 #include "PathFinder.h"
+#include "../Entities/LeashKnot.h"
+
+
+
+
+// Ticks to wait to do leash calculations
+#define LEASH_ACTIONS_TICK_STEP 10
 
 
 
@@ -102,6 +111,10 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_Age(1)
 	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
 	, m_WasLastTargetAPlayer(false)
+	, m_LeashedTo(nullptr)
+	, m_LeashToPos(nullptr)
+	, m_IsLeashActionJustDone(false)
+	, m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive)
 	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
@@ -123,6 +136,27 @@ cMonster::~cMonster()
 
 
 
+void cMonster::Destroy(bool a_ShouldBroadcast)
+{
+	if (IsLeashed())
+	{
+		cEntity * LeashedTo = GetLeashedTo();
+		Unleash(false, a_ShouldBroadcast);
+
+		// Remove leash knot if there are no more mobs leashed to
+		if (!LeashedTo->HasAnyMobLeashed() && LeashedTo->IsLeashKnot())
+		{
+			LeashedTo->Destroy();
+		}
+	}
+
+	super::Destroy(a_ShouldBroadcast);
+}
+
+
+
+
+
 void cMonster::Destroyed()
 {
 	SetTarget(nullptr);  // Tell them we're no longer targeting them.
@@ -136,6 +170,11 @@ void cMonster::Destroyed()
 void cMonster::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnMob(*this);
+
+	if (IsLeashed())
+	{
+		a_Client.SendLeashEntity(*this, *this->GetLeashedTo());
+	}
 }
 
 
@@ -200,6 +239,16 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		AddSpeedX(Distance.x);
 		AddSpeedZ(Distance.z);
 	}
+
+	// Speed up leashed mobs getting far from player
+	if (IsLeashed() && GetLeashedTo()->IsPlayer())
+	{
+		Distance = GetLeashedTo()->GetPosition() - GetPosition();
+		Distance.Normalize();
+		AddSpeedX(Distance.x);
+		AddSpeedZ(Distance.z);
+	}
+
 }
 
 
@@ -282,7 +331,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	bool a_IsFollowingPath = false;
 	if (m_PathfinderActivated)
 	{
-		if (ReachedFinalDestination())
+		if (ReachedFinalDestination() || (m_LeashToPos != nullptr))
 		{
 			StopMovingToPosition();  // Simply sets m_PathfinderActivated to false.
 		}
@@ -350,6 +399,12 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		case ATTACKING: break;
 	}  // switch (m_EMState)
 
+	// Leash calculations
+	if ((m_TicksAlive % LEASH_ACTIONS_TICK_STEP) == 0)
+	{
+		CalcLeashActions();
+	}
+
 	BroadcastMovementUpdate();
 
 	if (m_AgingTimer > 0)
@@ -359,6 +414,39 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			SetAge(1);
 			m_World->BroadcastEntityMetadata(*this);
+		}
+	}
+}
+
+
+
+
+
+void cMonster::CalcLeashActions()
+{
+	// This mob just spotted in the world and [m_LeashToPos not null] shows that should be leashed to a leash knot at m_LeashToPos.
+	// This keeps trying until knot is found. Leash knot may be in a different chunk that needn't or can't be loaded yet.
+	if (!IsLeashed() && (m_LeashToPos != nullptr))
+	{
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(*m_World, { FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z) });
+		if (LeashKnot != nullptr)
+		{
+			LeashTo(*LeashKnot);
+			SetLeashToPos(nullptr);
+		}
+	}
+	else if (IsLeashed())  // Mob is already leashed to an entity: follow it.
+	{
+		// TODO: leashed mobs in vanilla can move around up to 5 blocks distance from leash origin
+		MoveToPosition(m_LeashedTo->GetPosition());
+
+		// If distance to target > 10 break leash
+		Vector3f a_Distance(m_LeashedTo->GetPosition() - GetPosition());
+		double Distance(a_Distance.Length());
+		if (Distance > 10.0)
+		{
+			LOGD("Leash broken (distance)");
+			Unleash(false);
 		}
 	}
 }
@@ -581,6 +669,26 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
+	}
+
+	// Using leashes
+	m_IsLeashActionJustDone = false;
+	if (IsLeashed() && (GetLeashedTo() == &a_Player))  // a player can only unleash a mob leashed to him
+	{
+		Unleash(!a_Player.IsGameModeCreative());
+	}
+	else if (IsLeashed())
+	{
+		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
+		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
+	}
+	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEASH))
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+		LeashTo(a_Player);
 	}
 }
 
@@ -996,7 +1104,7 @@ void cMonster::UnsafeUnsetTarget()
 
 
 
-cPawn * cMonster::GetTarget ()
+cPawn * cMonster::GetTarget()
 {
 	return m_Target;
 }
@@ -1005,29 +1113,25 @@ cPawn * cMonster::GetTarget ()
 
 
 
-cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
+std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
 	auto & Random = GetRandomProvider();
-	cMonster * toReturn = nullptr;
 
 	// Create the mob entity
 	switch (a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			toReturn = new cMagmaCube(1 << Random.RandInt(2));  // Size 1, 2 or 4
-			break;
+			return cpp14::make_unique<cMagmaCube>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(1 << Random.RandInt(2));  // Size 1, 2 or 4
-			break;
+			return cpp14::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton(false);
-			break;
+			return cpp14::make_unique<cSkeleton>(false);
 		}
 		case mtVillager:
 		{
@@ -1038,8 +1142,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				VillagerType = 0;
 			}
 
-			toReturn = new cVillager(static_cast<cVillager::eVillagerType>(VillagerType));
-			break;
+			return cpp14::make_unique<cVillager>(static_cast<cVillager::eVillagerType>(VillagerType));
 		}
 		case mtHorse:
 		{
@@ -1055,42 +1158,41 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				HorseType = 0;
 			}
 
-			toReturn = new cHorse(HorseType, HorseColor, HorseStyle, HorseTameTimes);
-			break;
+			return cpp14::make_unique<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
 		}
 
-		case mtBat:           toReturn = new cBat();                      break;
-		case mtBlaze:         toReturn = new cBlaze();                    break;
-		case mtCaveSpider:    toReturn = new cCaveSpider();               break;
-		case mtChicken:       toReturn = new cChicken();                  break;
-		case mtCow:           toReturn = new cCow();                      break;
-		case mtCreeper:       toReturn = new cCreeper();                  break;
-		case mtEnderDragon:   toReturn = new cEnderDragon();              break;
-		case mtEnderman:      toReturn = new cEnderman();                 break;
-		case mtGhast:         toReturn = new cGhast();                    break;
-		case mtGiant:         toReturn = new cGiant();                    break;
-		case mtGuardian:      toReturn = new cGuardian();                 break;
-		case mtIronGolem:     toReturn = new cIronGolem();                break;
-		case mtMooshroom:     toReturn = new cMooshroom();                break;
-		case mtOcelot:        toReturn = new cOcelot();                   break;
-		case mtPig:           toReturn = new cPig();                      break;
-		case mtRabbit:        toReturn = new cRabbit();                   break;
-		case mtSheep:         toReturn = new cSheep();                    break;
-		case mtSilverfish:    toReturn = new cSilverfish();               break;
-		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
-		case mtSpider:        toReturn = new cSpider();                   break;
-		case mtSquid:         toReturn = new cSquid();                    break;
-		case mtWitch:         toReturn = new cWitch();                    break;
-		case mtWither:	      toReturn = new cWither();                   break;
-		case mtWolf:          toReturn = new cWolf();                     break;
-		case mtZombie:        toReturn = new cZombie(false);              break;  // TODO: Infected zombie parameter
-		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
+		case mtBat:           return cpp14::make_unique<cBat>();
+		case mtBlaze:         return cpp14::make_unique<cBlaze>();
+		case mtCaveSpider:    return cpp14::make_unique<cCaveSpider>();
+		case mtChicken:       return cpp14::make_unique<cChicken>();
+		case mtCow:           return cpp14::make_unique<cCow>();
+		case mtCreeper:       return cpp14::make_unique < cCreeper>();
+		case mtEnderDragon:   return cpp14::make_unique<cEnderDragon>();
+		case mtEnderman:      return cpp14::make_unique<cEnderman>();
+		case mtGhast:         return cpp14::make_unique<cGhast>();
+		case mtGiant:         return cpp14::make_unique<cGiant>();
+		case mtGuardian:      return cpp14::make_unique<cGuardian>();
+		case mtIronGolem:     return cpp14::make_unique<cIronGolem>();
+		case mtMooshroom:     return cpp14::make_unique<cMooshroom>();
+		case mtOcelot:        return cpp14::make_unique<cOcelot>();
+		case mtPig:           return cpp14::make_unique<cPig>();
+		case mtRabbit:        return cpp14::make_unique<cRabbit>();
+		case mtSheep:         return cpp14::make_unique<cSheep>();
+		case mtSilverfish:    return cpp14::make_unique<cSilverfish>();
+		case mtSnowGolem:     return cpp14::make_unique<cSnowGolem>();
+		case mtSpider:        return cpp14::make_unique<cSpider>();
+		case mtSquid:         return cpp14::make_unique<cSquid>();
+		case mtWitch:         return cpp14::make_unique<cWitch>();
+		case mtWither:        return cpp14::make_unique<cWither>();
+		case mtWolf:          return cpp14::make_unique<cWolf>();
+		case mtZombie:        return cpp14::make_unique<cZombie>(false);  // TODO: Infected zombie parameter
+		case mtZombiePigman:  return cpp14::make_unique<cZombiePigman>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
+			return nullptr;
 		}
 	}
-	return toReturn;
 }
 
 
@@ -1099,7 +1201,13 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
-	auto Count = GetRandomProvider().RandInt<char>(static_cast<char>(a_Min), static_cast<char>(a_Max));
+	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
+	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(a_Item)->GetMaxStackSize());
+	while (Count > MaxStackSize)
+	{
+		a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
+		Count -= MaxStackSize;
+	}
 	if (Count > 0)
 	{
 		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
@@ -1293,4 +1401,68 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 cMonster::eFamily cMonster::GetMobFamily(void) const
 {
 	return FamilyFromType(m_MobType);
+}
+
+
+
+
+
+void cMonster::LeashTo(cEntity & a_Entity, bool a_ShouldBroadcast)
+{
+	// Do nothing if already leashed
+	if (m_LeashedTo != nullptr)
+	{
+		return;
+	}
+
+	m_LeashedTo = &a_Entity;
+
+	a_Entity.AddLeashedMob(this);
+
+	if (a_ShouldBroadcast)
+	{
+		m_World->BroadcastLeashEntity(*this, a_Entity);
+	}
+
+	m_IsLeashActionJustDone = true;
+}
+
+
+
+
+
+void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast)
+{
+	// Do nothing if not leashed
+	if (m_LeashedTo == nullptr)
+	{
+		return;
+	}
+
+	m_LeashedTo->RemoveLeashedMob(this);
+
+	m_LeashedTo = nullptr;
+
+	if (a_ShouldDropLeashPickup)
+	{
+		cItems Pickups;
+		Pickups.Add(cItem(E_ITEM_LEASH, 1, 0));
+		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
+	}
+
+	if (a_ShouldBroadcast)
+	{
+		m_World->BroadcastUnleashEntity(*this);
+	}
+
+	m_IsLeashActionJustDone = true;
+}
+
+
+
+
+
+void cMonster::Unleash(bool a_ShouldDropLeashPickup)
+{
+	Unleash(a_ShouldDropLeashPickup, true);
 }

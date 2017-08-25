@@ -1,15 +1,17 @@
 
 #pragma once
 
-#include "BroadcastInterface.h"
+
 #include "../Mobs/MonsterTypes.h"
 
-class cItems;
 
 typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
-
-
+class cBroadcastInterface;
+class cItems;
 class cPlayer;
+
+
+
 
 
 class cWorldInterface
@@ -51,6 +53,11 @@ public:
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;
 
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true.
+	If any chunk in the box is missing, ignores the entities in that chunk silently. */
+	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback) = 0;
+
 	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
 
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
@@ -72,6 +79,6 @@ public:
 	virtual int GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Wakes up the simulators for the specified block */
-	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	virtual void WakeUpSimulators(Vector3i a_Block) = 0;
 
 };

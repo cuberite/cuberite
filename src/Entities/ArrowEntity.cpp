@@ -119,23 +119,9 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		Damage += ExtraDamage;
 	}
 
-	// int KnockbackAmount = 1;
 	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
-	if (PunchLevel > 0)
-	{
-		Vector3d LookVector = GetLookVector();
-		Vector3f FinalSpeed = Vector3f(0, 0, 0);
-		switch (PunchLevel)
-		{
-			case 1: FinalSpeed = LookVector * Vector3d(5, 0.3, 5); break;
-			case 2: FinalSpeed = LookVector * Vector3d(8, 0.3, 8); break;
-			default: break;
-		}
-		a_EntityHit.SetSpeed(FinalSpeed);
-	}
-
-	// a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);  // TODO fix knockback.
-	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, 0);  // Until knockback is fixed.
+	double KnockbackAmount = 11 + 10 * PunchLevel;
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
 
 	if (IsOnFire() && !a_EntityHit.IsSubmerged() && !a_EntityHit.IsSwimming())
 	{
