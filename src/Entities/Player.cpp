@@ -80,7 +80,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_IsChargingBow(false),
 	m_BowCharge(0),
 	m_FloaterID(cEntity::INVALID_ID),
-	m_Team(nullptr),
 	m_bIsInBed(false),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
@@ -968,13 +967,9 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		cPlayer * Attacker = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
 
-		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
+		if (!GetWorld()->GetScoreboard().AreOnSameTeam(GetName(), Attacker->GetName()))
 		{
-			if (!m_Team->AllowsFriendlyFire())
-			{
-				// Friendly fire is disabled
-				return false;
-			}
+			return false;
 		}
 	}
 
@@ -1269,50 +1264,6 @@ bool cPlayer::IsGameModeSpectator(void) const
 bool cPlayer::CanMobsTarget(void) const
 {
 	return IsGameModeSurvival() || IsGameModeAdventure();
-}
-
-
-
-
-
-void cPlayer::SetTeam(cTeam * a_Team)
-{
-	if (m_Team == a_Team)
-	{
-		return;
-	}
-
-	if (m_Team)
-	{
-		m_Team->RemovePlayer(GetName());
-	}
-
-	m_Team = a_Team;
-
-	if (m_Team)
-	{
-		m_Team->AddPlayer(GetName());
-	}
-}
-
-
-
-
-
-cTeam * cPlayer::UpdateTeam(void)
-{
-	if (m_World == nullptr)
-	{
-		SetTeam(nullptr);
-	}
-	else
-	{
-		cScoreboard & Scoreboard = m_World->GetScoreboard();
-
-		SetTeam(Scoreboard.QueryPlayerTeam(GetName()));
-	}
-
-	return m_Team;
 }
 
 

@@ -365,6 +365,10 @@ public:
 	the given username is not a member of a team. */
 	cTeam * QueryPlayerTeam(const AString & a_Name);  // WARNING: O(n logn)
 
+	/** Returns whether the two named players are both on the same team.
+	Returns false if both players are on no team. */
+	bool AreOnSameTeam(const AString & a_Player1, const AString & a_Player2);
+
 	/** Execute callback for each objective with the specified type
 	Returns true if all objectives processed, false if the callback aborted by returning true. */
 	bool ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback & a_Callback);

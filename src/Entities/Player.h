@@ -198,16 +198,7 @@ public:
 
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
-	/** Returns the associated team, nullptr if none */
-	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
-
-	/** Sets the player team, nullptr if none */
-	void SetTeam(cTeam * a_Team);
-
 	// tolua_end
-
-	/** Forces the player to query the scoreboard for his team */
-	cTeam * UpdateTeam(void);
 
 	/** Return the associated statistic and achievement manager. */
 	cStatManager & GetStatManager() { return m_Stats; }
@@ -676,8 +667,6 @@ protected:
 	int  m_BowCharge;
 
 	UInt32 m_FloaterID;
-
-	cTeam * m_Team;
 
 	cStatManager m_Stats;
 

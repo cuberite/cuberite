@@ -443,9 +443,6 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		m_State = csAuthenticated;
 	}
 
-	// Query player team
-	m_Player->UpdateTeam();
-
 	// Send statistics
 	SendStatistics(m_Player->GetStatManager());
 

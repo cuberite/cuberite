@@ -609,6 +609,22 @@ cTeam * cScoreboard::QueryPlayerTeam(const AString & a_Name)
 
 
 
+bool cScoreboard::AreOnSameTeam(const AString & a_Player1, const AString & a_Player2)
+{
+	cTeam * Team1 = QueryPlayerTeam(a_Player1);
+	if (Team1 == nullptr)
+	{
+		return false;
+	}
+
+	cTeam * Team2 = QueryPlayerTeam(a_Player2);
+	return Team1 == Team2;
+}
+
+
+
+
+
 void cScoreboard::SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot)
 {
 	ASSERT(a_Slot < dsCount);
