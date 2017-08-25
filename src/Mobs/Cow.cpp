@@ -6,13 +6,15 @@
 
 
 
-cCow::cCow(void) : super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3)
+cCow::cCow(void) :
+	super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3),
+	m_BehaviorItemReplacer(E_ITEM_BUCKET, E_ITEM_MILK)
 {
 	m_BehaviorBreeder.AttachToMonster(*this);
 	m_BehaviorCoward.AttachToMonster(*this);
 	m_BehaviorItemFollower.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
-	// mobTodo Behavior itemReplacer for the bucket
+	m_BehaviorItemReplacer.AttachToMonster(*this);
 }
 
 
@@ -34,22 +36,7 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-/*
- * mobTodo behavior iTemReplacer
- * void cCow::OnRightClicked(cPlayer & a_Player)
-{
-	super::OnRightClicked(a_Player);
 
-	short HeldItem = a_Player.GetEquippedItem().m_ItemType;
-	if (HeldItem == E_ITEM_BUCKET)
-	{
-		if (!a_Player.IsGameModeCreative())
-		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-			a_Player.GetInventory().AddItem(E_ITEM_MILK);
-		}
-	}
-}*/
 
 
 

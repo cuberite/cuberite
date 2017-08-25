@@ -4,14 +4,7 @@
 class cBehaviorAggressive;
 
 #include "Behavior.h"
-
-class cPawn;
-class cMonster;
 class cBehaviorChaser;
-
-
-
-
 
 /** The mob is agressive toward specific mobtypes, or toward the player.
 This Behavior has a dependency on BehaviorChaser. */

@@ -13,6 +13,7 @@ SET (SRCS
     BehaviorCoward.cpp
     BehaviorItemDropper.cpp
     BehaviorItemFollower.cpp
+    BehaviorItemReplacer.cpp
     BehaviorStriker.cpp
     BehaviorWanderer.cpp
 )
@@ -26,6 +27,7 @@ SET (HDRS
     BehaviorCoward.h
     BehaviorItemDropper.h
     BehaviorItemFollower.h
+    BehaviorItemReplacer.h
     BehaviorStriker.h
     BehaviorWanderer.h
 )

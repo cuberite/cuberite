@@ -4,6 +4,11 @@ struct TakeDamageInfo;
 class cChunk;
 class cPlayer;
 class cMonster;
+class cPawn;
+class cWorld;
+class cItems;
+class cEntity;
+struct TakeDamageInfo;
 #include <chrono>
 
 class cBehavior

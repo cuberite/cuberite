@@ -4,10 +4,6 @@
 #include <chrono>
 #include "Behavior.h"
 
-class cMonster;
-class cEntity;
-class cChunk;
-
 class cBehaviorWanderer : cBehavior
 {
 

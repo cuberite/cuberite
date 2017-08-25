@@ -4,11 +4,6 @@
 #include "Behavior.h"
 #include "../../World.h"
 
-// fwds
-class cMonster;
-class cEntity;
-class cChunk;
-
 class cBehaviorDayLightBurner : cBehavior
 {
 public:

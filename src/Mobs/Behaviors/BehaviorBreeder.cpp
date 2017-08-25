@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BehaviorBreeder.h"
@@ -23,7 +22,6 @@ cBehaviorBreeder::cBehaviorBreeder() :
 
 void cBehaviorBreeder::AttachToMonster(cMonster & a_Parent)
 {
-	LOGD("mobDebug - Behavior Breeder: Attach");
 	m_Parent = &a_Parent;
 	m_Parent->AttachTickBehavior(this);
 	m_Parent->AttachPostTickBehavior(this);

@@ -3,9 +3,6 @@
 class cBehaviorChaser;
 
 #include "Behavior.h"
-
-class cMonster;
-class cPawn;
 class cBehaviorStriker;
 
 

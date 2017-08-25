@@ -4,15 +4,6 @@ class cBehaviorBreeder;
 
 #include "Behavior.h"
 
-class cWorld;
-class cMonster;
-class cPlayer;
-class cItems;
-
-
-
-
-
 /** Grants breeding capabilities to the mob. */
 class cBehaviorBreeder : public cBehavior
 {

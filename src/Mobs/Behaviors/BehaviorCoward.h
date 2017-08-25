@@ -4,11 +4,6 @@
 
 // Makes the mob run away from any other mob that damages it
 
-//fwds
-class cMonster;
-class cItems;
-class cEntity;
-struct TakeDamageInfo;
 
 class cBehaviorCoward : cBehavior
 {

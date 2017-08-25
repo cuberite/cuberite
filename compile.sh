@@ -13,7 +13,6 @@ set -e
 # Constants:
 DEFAULT_BUILDTYPE="Release" # Other options: "Debug"
 DEFAULT_BRANCH="master"     # Other options: None currently
-DEFAULT_THREADS=2
 
 # Constants not modifiable through command line:
 UPSTREAM_REPO="origin"
