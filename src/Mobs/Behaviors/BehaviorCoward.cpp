@@ -41,19 +41,16 @@ bool cBehaviorCoward::ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
-	m_Parent->SetSpeed(m_Parent->GetSpeed() * 2);
+	m_Parent->SetRelativeWalkSpeed(m_Parent->GetRelativeWalkSpeed() * 2);
 	return true;
 }
-
-
-
 
 
 bool cBehaviorCoward::ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
-	m_Parent->SetSpeed(m_Parent->GetSpeed() / 2);
+	m_Parent->SetRelativeWalkSpeed(m_Parent->GetRelativeWalkSpeed() / 2);
 	return true;
 }
 
