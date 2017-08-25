@@ -12356,6 +12356,77 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 					Notes = "Sets the suffix appended to the names of the members of this team.",
 				},
 			},
+			Constants =
+			{
+				teamInvalid =
+				{
+					Notes = "Placeholder for teams which are not associated with a color.",
+				},
+				teamBlack =
+				{
+					Notes = "",
+				},
+				teamDarkBlue =
+				{
+					Notes = "",
+				},
+				teamDarkGreen =
+				{
+					Notes = "",
+				},
+				teamDarkAqua =
+				{
+					Notes = "",
+				},
+				teamDarkRed =
+				{
+					Notes = "",
+				},
+				teamDarkPurple =
+				{
+					Notes = "",
+				},
+				teamGold =
+				{
+					Notes = "",
+				},
+				teamGray =
+				{
+					Notes = "",
+				},
+				teamDarkGray =
+				{
+					Notes = "",
+				},
+				teamBlue =
+				{
+					Notes = "",
+				},
+				teamGreen =
+				{
+					Notes = "",
+				},
+				teamAqua =
+				{
+					Notes = "",
+				},
+				teamRed =
+				{
+					Notes = "",
+				},
+				teamLightPurple =
+				{
+					Notes = "",
+				},
+				teamYellow =
+				{
+					Notes = "",
+				},
+				teamWhite =
+				{
+					Notes = "",
+				},
+			},
 		},
 		cTNTEntity =
 		{
