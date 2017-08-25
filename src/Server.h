@@ -39,6 +39,7 @@ typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cCommandOutputCallback;
 class cSettingsRepositoryInterface;
+class cUUID;
 
 
 namespace Json
@@ -101,7 +102,7 @@ public:
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
 	/** Authenticates the specified user, called by cAuthenticator */
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 
