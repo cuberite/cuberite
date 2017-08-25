@@ -2967,7 +2967,7 @@ void cClientHandle::SendSetRawTitle(const AString & a_Title)
 void cClientHandle::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	LOG("SendSoundEffect with double args is deprecated, use version with vector position parameter.");
-        SendSoundEffect(a_SoundName, {a_X, a_Y, a_Z}, a_Volume, a_Pitch);
+	SendSoundEffect(a_SoundName, {a_X, a_Y, a_Z}, a_Volume, a_Pitch);
 }
 
 

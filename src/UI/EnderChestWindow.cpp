@@ -24,7 +24,7 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 	// Play the opening sound:
 	m_World->BroadcastSoundEffect(
 		"block.enderchest.open",
-	        m_Block,
+		m_Block,
 		1,
 		1
 	);
@@ -45,7 +45,7 @@ cEnderChestWindow::~cEnderChestWindow()
 	// Play the closing sound
 	m_World->BroadcastSoundEffect(
 		"block.enderchest.close",
-	        m_Block,
+		m_Block,
 		1, 1
 	);
 }
