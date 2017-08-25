@@ -51,6 +51,34 @@ return
 				Params =
 				{
 					{
+						Name = "Block",
+						Type = "Vector3i",
+					},
+					{
+						Name = "ActionByte1",
+						Type = "number",
+					},
+					{
+						Name = "ActionByte2",
+						Type = "number",
+					},
+					{
+						Name = "BlockType",
+						Type = "number",
+					},
+					{
+						Name = "ExcludeClient",
+						Type = "cClientHandle",
+						IsOptional = true,
+					},
+				},
+				Notes = "Broadcasts the BlockAction packet to all clients who have the appropriate chunk loaded (except ExcludeClient). The contents of the packet are specified by the parameters for the call, the blocktype needn't match the actual block that is present in the world data at the specified location.",
+			},
+			BroadcastBlockAction =
+			{
+				Params =
+				{
+					{
 						Name = "BlockX",
 						Type = "number",
 					},
@@ -80,7 +108,7 @@ return
 						IsOptional = true,
 					},
 				},
-				Notes = "Broadcasts the BlockAction packet to all clients who have the appropriate chunk loaded (except ExcludeClient). The contents of the packet are specified by the parameters for the call, the blocktype needn't match the actual block that is present in the world data at the specified location.",
+				Notes = "Broadcasts the BlockAction packet to all clients who have the appropriate chunk loaded (except ExcludeClient). The contents of the packet are specified by the parameters for the call, the blocktype needn't match the actual block that is present in the world data at the specified location. (DEPRECATED)",
 			},
 			BroadcastChat =
 			{
@@ -276,6 +304,34 @@ return
 						Type = "string",
 					},
 					{
+						Name = "Position",
+						Type = "Vector3d",
+					},
+					{
+						Name = "Volume",
+						Type = "number",
+					},
+					{
+						Name = "Pitch",
+						Type = "number",
+					},
+					{
+						Name = "ExcludeClient",
+						Type = "cClientHandle",
+						IsOptional = true,
+					},
+				},
+				Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient",
+			},
+			BroadcastSoundEffect =
+			{
+				Params =
+				{
+					{
+						Name = "SoundName",
+						Type = "string",
+					},
+					{
 						Name = "X",
 						Type = "number",
 					},
@@ -301,7 +357,7 @@ return
 						IsOptional = true,
 					},
 				},
-				Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient",
+				Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient (DEPRECATED, use vector-parametered version instead)",
 			},
 			BroadcastSoundParticleEffect =
 			{
@@ -340,6 +396,17 @@ return
 				Params =
 				{
 					{
+						Name = "Position",
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Creates a thunderbolt at the specified coords",
+			},
+			CastThunderbolt =
+			{
+				Params =
+				{
+					{
 						Name = "X",
 						Type = "number",
 					},
@@ -352,7 +419,7 @@ return
 						Type = "number",
 					},
 				},
-				Notes = "Creates a thunderbolt at the specified coords",
+				Notes = "Creates a thunderbolt at the specified coords (DEPRECATED, use vector-parametered version instead)",
 			},
 			ChangeWeather =
 			{
