@@ -9086,7 +9086,7 @@ a_Player:OpenWindow(Window);
 		cObjective =
 		{
 			Desc = [[
-				This class represents a single scoreboard objective. Note that the term "player" is used loosely here to mean "item that the objective is tracking," to match the Vanilla minecraft documentation, but a "player" does not need to be the username of an actual player.
+				This class represents a single scoreboard objective. Objectives act as a map, mapping arbitrary strings to scores. To associate a score with a player, for example in the tab list or in the over-head scores, the key should be the player's username.
 			]],
 			Functions =
 			{
@@ -9095,7 +9095,7 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "player",
+							Name = "key",
 							Type = "string",
 						},
 						{
@@ -9132,7 +9132,7 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the internal name of the objective.",
 				},
-				GetPlayers =
+				GetKeys =
 				{
 					Returns =
 					{
@@ -9140,14 +9140,14 @@ a_Player:OpenWindow(Window);
 							Type = "table",
 						},
 					},
-					Notes = "Returns all of the players this objective is tracking",
+					Notes = "Returns all of the keys this objective is tracking as an array of strings.",
 				},
 				GetScore =
 				{
 					Params =
 					{
 						{
-							Name = "player",
+							Name = "key",
 							Type = "string",
 						},
 					},
@@ -9158,7 +9158,7 @@ a_Player:OpenWindow(Window);
 							Type = "<unknown>",
 						},
 					},
-					Notes = "Returns the score of the specified player.",
+					Notes = "Returns the score of the specified key.",
 				},
 				GetType =
 				{
@@ -9180,11 +9180,11 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "player",
+							Name = "key",
 							Type = "string",
 						},
 					},
-					Notes = "Reset the score of the specified player.",
+					Notes = "Reset the score of the specified key.",
 				},
 				SetAllScores =
 				{
@@ -9213,7 +9213,7 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "player",
+							Name = "key",
 							Type = "string",
 						},
 						{
@@ -9221,7 +9221,7 @@ a_Player:OpenWindow(Window);
 							Type = "<unknown>",
 						},
 					},
-					Notes = "Sets the score of the specified player.",
+					Notes = "Sets the score of the specified key.",
 				},
 				StringToType =
 				{
@@ -9245,7 +9245,7 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "player",
+							Name = "key",
 							Type = "string",
 						},
 						{
@@ -9260,7 +9260,7 @@ a_Player:OpenWindow(Window);
 							Type = "<unknown>",
 						},
 					},
-					Notes = "Subtracts a value from the score of the specified player and returns the new value.",
+					Notes = "Subtracts a value from the score of the specified key and returns the new value.",
 				},
 				TypeToString =
 				{
@@ -11592,7 +11592,7 @@ end
 			]],
 			Functions =
 			{
-				AddPlayerScore =
+				AddToScore =
 				{
 					Params =
 					{
@@ -11749,7 +11749,7 @@ end
 							Type = "cObjective",
 						},
 					},
-					Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, nil on error.",
+					Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, or nil if an error occurred or if an objective with the given name already exists.",
 				},
 				RegisterTeam =
 				{
