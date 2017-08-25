@@ -403,7 +403,6 @@ if [ $STATE_INTERACTIVE -eq 1 ]; then
 		printf %s "Otherwise choose less. Leave empty to choose $DEFAULT_THREADS: "
 	fi
 
-	# DEF
 	read CHOICE_THREADS
 fi
 
