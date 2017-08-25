@@ -14,8 +14,8 @@
 
 
 
-cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard):
-	m_ScoreBoard(a_ScoreBoard)
+cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_Scoreboard):
+	m_Scoreboard(a_Scoreboard)
 {
 	AString DataPath;
 	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator);
@@ -103,7 +103,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("Objectives", TAG_Compound);
 
-	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_Scoreboard->m_Objectives.begin(); it != m_Scoreboard->m_Objectives.end(); ++it)
 	{
 		const cObjective & Objective = it->second;
 
@@ -121,7 +121,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("PlayerScores", TAG_Compound);
 
-	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_Scoreboard->m_Objectives.begin(); it != m_Scoreboard->m_Objectives.end(); ++it)
 	{
 		const cObjective & Objective = it->second;
 
@@ -142,7 +142,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("Teams", TAG_Compound);
 
-	for (cScoreboard::cTeamMap::const_iterator it = m_ScoreBoard->m_Teams.begin(); it != m_ScoreBoard->m_Teams.end(); ++it)
+	for (cScoreboard::cTeamMap::const_iterator it = m_Scoreboard->m_Teams.begin(); it != m_Scoreboard->m_Teams.end(); ++it)
 	{
 		const cTeam & Team = it->second;
 
@@ -175,7 +175,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	for (int DisplaySlot = 0; DisplaySlot < cScoreboard::dsCount; ++DisplaySlot)
 	{
-		cObjective * Objective = m_ScoreBoard->GetObjectiveIn(static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
+		cObjective * Objective = m_Scoreboard->GetObjectiveIn(static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
 		a_Writer.AddString(Printf("slot_%d", DisplaySlot), (Objective == nullptr) ? "" : Objective->GetName());
 	}
 
@@ -226,7 +226,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 
 		cObjective::eType Type = cObjective::StringToType(CriteriaName);
 
-		m_ScoreBoard->RegisterObjective(Name, DisplayName, Type);
+		m_Scoreboard->RegisterObjective(Name, DisplayName, Type);
 	}
 
 	int PlayerScores = a_NBT.FindChildByName(Data, "PlayerScores");
@@ -259,7 +259,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			ObjectiveName = a_NBT.GetString(CurrLine);
 		}
 
-		cObjective * Objective = m_ScoreBoard->GetObjective(ObjectiveName);
+		cObjective * Objective = m_Scoreboard->GetObjective(ObjectiveName);
 
 		if (Objective)
 		{
@@ -315,7 +315,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			CanSeeFriendlyInvisible = (a_NBT.GetInt(CurrLine) != 0);
 		}
 
-		cTeam * Team = m_ScoreBoard->RegisterTeam(Name, DisplayName, Prefix, Suffix);
+		cTeam * Team = m_Scoreboard->RegisterTeam(Name, DisplayName, Prefix, Suffix);
 
 		Team->SetFriendlyFire(AllowsFriendlyFire);
 		Team->SetCanSeeFriendlyInvisible(CanSeeFriendlyInvisible);
@@ -344,7 +344,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 		if (CurrLine >= 0)
 		{
 			AString Name = a_NBT.GetString(CurrLine);
-			m_ScoreBoard->SetDisplay(Name, static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
+			m_Scoreboard->SetDisplay(Name, static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
 		}
 	}
 

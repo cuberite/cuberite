@@ -1678,7 +1678,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns the number of unused dirty chunks. That's the number of chunks that we can save and then unload.",
 			},
-			GetScoreBoard =
+			GetScoreboard =
 			{
 				Returns =
 				{

@@ -1138,7 +1138,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	m_Stats.AddValue(statDeaths);
 
-	m_World->GetScoreBoard().AddToScore(GetName(), cObjective::otDeathCount, 1);
+	m_World->GetScoreboard().AddToScore(GetName(), cObjective::otDeathCount, 1);
 }
 
 
@@ -1147,13 +1147,13 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 void cPlayer::Killed(cEntity * a_Victim)
 {
-	cScoreboard & ScoreBoard = m_World->GetScoreBoard();
+	cScoreboard & Scoreboard = m_World->GetScoreboard();
 
 	if (a_Victim->IsPlayer())
 	{
 		m_Stats.AddValue(statPlayerKills);
 
-		ScoreBoard.AddToScore(GetName(), cObjective::otPlayerKillCount, 1);
+		Scoreboard.AddToScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
 	else if (a_Victim->IsMob())
 	{
@@ -1165,7 +1165,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 		m_Stats.AddValue(statMobKills);
 	}
 
-	ScoreBoard.AddToScore(GetName(), cObjective::otTotalKillCount, 1);
+	Scoreboard.AddToScore(GetName(), cObjective::otTotalKillCount, 1);
 }
 
 
@@ -1307,7 +1307,7 @@ cTeam * cPlayer::UpdateTeam(void)
 	}
 	else
 	{
-		cScoreboard & Scoreboard = m_World->GetScoreBoard();
+		cScoreboard & Scoreboard = m_World->GetScoreboard();
 
 		SetTeam(Scoreboard.QueryPlayerTeam(GetName()));
 	}

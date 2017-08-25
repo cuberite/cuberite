@@ -3131,7 +3131,7 @@ std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveF
 	if (Client != nullptr)
 	{
 		// Reset the player's scoreboard
-		GetScoreBoard().RemoveFrom(*Client);
+		GetScoreboard().RemoveFrom(*Client);
 
 		Client->RemoveFromWorld();
 		m_ChunkMap->RemoveClientFromChunks(Client);
@@ -4138,7 +4138,7 @@ void cWorld::AddQueuedPlayers(void)
 			if (Client != nullptr)
 			{
 				// Tell the player all about our scoreboard
-				GetScoreBoard().SendTo(*Client);
+				GetScoreboard().SendTo(*Client);
 
 				m_Clients.push_back(Client);
 			}

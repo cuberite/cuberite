@@ -644,7 +644,7 @@ public:
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
 
 	/** Returns the associated scoreboard instance. */
-	cScoreboard & GetScoreBoard(void) { return m_Scoreboard; }
+	cScoreboard & GetScoreboard(void) { return m_Scoreboard; }
 
 	/** Returns the associated map manager instance. */
 	cMapManager & GetMapManager(void) { return m_MapManager; }
