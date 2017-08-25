@@ -232,8 +232,8 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 		return;
 	}
 
-	a_World.BroadcastBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 0, pistonMeta, pistonBlock);
-	a_World.BroadcastSoundEffect("block.piston.extend", a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 0.5f, 0.7f);
+	a_World.BroadcastBlockAction(a_BlockPos, 0, pistonMeta, pistonBlock);
+	a_World.BroadcastSoundEffect("block.piston.extend", a_BlockPos, 0.5f, 0.7f);
 
 	PushBlocks(blocksPushed, a_World, pushDir);
 
@@ -276,8 +276,8 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 	a_World.SetBlock(extensionPos.x, extensionPos.y, extensionPos.z, E_BLOCK_AIR, 0);
 
 	a_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta & ~(8));
-	a_World.BroadcastBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 1, pistonMeta & ~(8), pistonBlock);
-	a_World.BroadcastSoundEffect("block.piston.contract", a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, 0.5f, 0.7f);
+	a_World.BroadcastBlockAction(a_BlockPos, 1, pistonMeta & ~(8), pistonBlock);
+	a_World.BroadcastSoundEffect("block.piston.contract", a_BlockPos, 0.5f, 0.7f);
 
 	if (!IsSticky(pistonBlock))
 	{

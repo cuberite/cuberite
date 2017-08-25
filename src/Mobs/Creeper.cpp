@@ -132,7 +132,7 @@ bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
 
 	if (!m_bIsBlowing)
 	{
-		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosition(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 
@@ -155,7 +155,7 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.UseEquippedItem();
 		}
-		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosition(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 		m_BurnedWithFlintAndSteel = true;

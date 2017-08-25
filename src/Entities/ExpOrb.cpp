@@ -61,7 +61,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
 				a_ClosestPlayer->DeltaExperience(m_Reward);
 
-				m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+				m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
 				Destroy(true);
 				return;

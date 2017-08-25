@@ -70,7 +70,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_EAST));
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_WEST));
 
-				m_World->BroadcastSoundEffect("entity.horse.angry", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 1.0f);
+				m_World->BroadcastSoundEffect("entity.horse.angry", GetPosition(), 1.0f, 1.0f);
 				m_Attachee->Detach();
 				m_bIsRearing = true;
 			}
@@ -159,7 +159,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 	{
 		m_bIsRearing = true;
 		m_RearTickCount = 0;
-		m_World->BroadcastSoundEffect("entity.horse.angry", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
+		m_World->BroadcastSoundEffect("entity.horse.angry", GetPosition(), 1.0f, 0.8f);
 	}
 }
 

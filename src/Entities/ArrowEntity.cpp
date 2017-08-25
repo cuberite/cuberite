@@ -88,7 +88,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	m_HitBlockPos = Vector3i(X, Y, Z);
 
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("entity.arrow.hit", static_cast<double>(X), static_cast<double>(Y), static_cast<double>(Z), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("entity.arrow.hit", BlockHit, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
 	if ((m_World->GetBlock(Hit) == E_BLOCK_TNT) && IsOnFire())
 	{
@@ -129,7 +129,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	}
 
 	// Broadcast successful hit sound
-	GetWorld()->BroadcastSoundEffect("entity.arrow.hit_player", GetPosX(), GetPosY(), GetPosZ(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect("entity.arrow.hit_player", GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
 	Destroy();
 }
@@ -154,7 +154,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		}
 
 		GetWorld()->BroadcastCollectEntity(*this, a_Dest, 1);
-		GetWorld()->BroadcastSoundEffect("entity.item.pickup", GetPosX(), GetPosY(), GetPosZ(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		GetWorld()->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
 }

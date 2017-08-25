@@ -101,7 +101,7 @@ public:
 				{
 					return false;
 				}
-				a_Player.GetWorld()->BroadcastSoundEffect("entity.leashknot.place", a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), 1, 1);
+				a_Player.GetWorld()->BroadcastSoundEffect("entity.leashknot.place", a_Player.GetPosition(), 1, 1);
 			}
 			else
 			{

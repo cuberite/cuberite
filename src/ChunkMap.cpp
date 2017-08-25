@@ -305,12 +305,12 @@ void cChunkMap::BroadcastUnleashEntity(const cEntity & a_Entity)
 
 
 
-void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastBlockAction(Vector3i a_Block, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
 	int x, z, ChunkX, ChunkZ;
-	x = a_BlockX;
-	z = a_BlockZ;
+	x = a_Block.x;
+	z = a_Block.z;
 	cChunkDef::BlockToChunk(x, z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
@@ -318,7 +318,7 @@ void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType, a_Exclude);
+	Chunk->BroadcastBlockAction(a_Block, a_Byte1, a_Byte2, a_BlockType, a_Exclude);
 }
 
 
@@ -605,19 +605,19 @@ void cChunkMap::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_Effe
 
 
 
-void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(FloorC(std::floor(a_X)), FloorC(std::floor(a_Z)), ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(FloorC(std::floor(a_Position.x)), FloorC(std::floor(a_Position.z)), ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch, a_Exclude);
+	Chunk->BroadcastSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch, a_Exclude);
 }
 
 
@@ -659,18 +659,18 @@ void cChunkMap::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a
 
 
 
-void cChunkMap::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastThunderbolt(Vector3i a_Block, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_Block.x, a_Block.z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+	Chunk->BroadcastThunderbolt(a_Block, a_Exclude);
 }
 
 

@@ -16,9 +16,7 @@
 cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 	cWindow(wtChest, (a_Chest->GetBlockType() == E_BLOCK_CHEST) ? "Chest" : "Trapped Chest"),
 	m_World(a_Chest->GetWorld()),
-	m_BlockX(a_Chest->GetPosX()),
-	m_BlockY(a_Chest->GetPosY()),
-	m_BlockZ(a_Chest->GetPosZ()),
+	m_Block(a_Chest->GetPos()),
 	m_PrimaryChest(a_Chest),
 	m_SecondaryChest(nullptr)
 {
@@ -27,10 +25,10 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("block.chest.open", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
+	m_World->BroadcastSoundEffect("block.chest.open", m_Block, 1, 1);
 
 	// Send out the chest-open packet:
-	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, a_Chest->GetBlockType());
+	m_World->BroadcastBlockAction(m_Block, 1, 1, a_Chest->GetBlockType());
 }
 
 
@@ -40,9 +38,7 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest) :
 	cWindow(wtChest, (a_PrimaryChest->GetBlockType() == E_BLOCK_CHEST) ? "Double Chest" : "Double Trapped Chest"),
 	m_World(a_PrimaryChest->GetWorld()),
-	m_BlockX(a_PrimaryChest->GetPosX()),
-	m_BlockY(a_PrimaryChest->GetPosY()),
-	m_BlockZ(a_PrimaryChest->GetPosZ()),
+	m_Block(a_PrimaryChest->GetPos()),
 	m_PrimaryChest(a_PrimaryChest),
 	m_SecondaryChest(a_SecondaryChest)
 {
@@ -51,10 +47,10 @@ cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_Secon
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("block.chest.open", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
+	m_World->BroadcastSoundEffect("block.chest.open", m_Block, 1, 1);
 
 	// Send out the chest-open packet:
-	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, a_PrimaryChest->GetBlockType());
+	m_World->BroadcastBlockAction(m_Block, 1, 1, a_PrimaryChest->GetBlockType());
 }
 
 
@@ -64,9 +60,9 @@ cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_Secon
 cChestWindow::~cChestWindow()
 {
 	// Send out the chest-close packet:
-	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, m_PrimaryChest->GetBlockType());
+	m_World->BroadcastBlockAction(m_Block, 1, 0, m_PrimaryChest->GetBlockType());
 
-	m_World->BroadcastSoundEffect("block.chest.close", static_cast<double>(m_BlockX), static_cast<double>(m_BlockY), static_cast<double>(m_BlockZ), 1, 1);
+	m_World->BroadcastSoundEffect("block.chest.close", m_Block, 1, 1);
 }
 
 
