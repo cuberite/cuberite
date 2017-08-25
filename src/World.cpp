@@ -2728,7 +2728,7 @@ void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString 
 
 
 
-void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
+void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Key, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2738,7 +2738,7 @@ void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a
 		{
 			continue;
 		}
-		ch->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+		ch->SendScoreUpdate(a_Objective, a_Key, a_Score, a_Mode);
 	}
 }
 

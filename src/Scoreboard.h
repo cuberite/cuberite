@@ -121,13 +121,13 @@ public:
 	or newly not displayed. */
 	void SetIsDisplayed(bool a_IsDisplayed);
 
-	bool IsDisplayed(void) { return m_DisplayCount > 0; }
+	bool IsDisplayed(void) const { return m_DisplayCount > 0; }
 
 	/** Returns a set of all players */
 	AStringVector GetKeys(void) const;  // Exported in ManualBindings.cpp
 
 	/** Send this objective to the specified client */
-	void SendTo(cClientHandle & a_Client);
+	void SendTo(cClientHandle & a_Client) const;
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{

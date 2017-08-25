@@ -2898,7 +2898,7 @@ void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode)
 {
 	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
 }
@@ -2907,9 +2907,9 @@ void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AStrin
 
 
 
-void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Key, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
-	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+	m_Protocol->SendScoreUpdate(a_Objective, a_Key, a_Score, a_Mode);
 }
 
 

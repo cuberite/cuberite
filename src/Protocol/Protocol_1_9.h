@@ -112,8 +112,8 @@ public:
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
-	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode) override;
+	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode) override;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) override;
 	virtual void SendSetRawSubTitle             (const AString & a_SubTitle) override;
@@ -126,7 +126,7 @@ public:
 	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
 	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
-	virtual void SendTeam                       (const cTeam & a_Team, Byte a_Mode) override { /* Unimplemented */ }
+	virtual void SendTeam                       (const cTeam & a_Team, cTeam::eProtocolAction a_Mode) override { /* Unimplemented */ }
 	virtual void SendTeamChangeMembership       (const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta) override { /* Unimplemented */ }
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;

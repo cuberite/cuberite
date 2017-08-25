@@ -204,7 +204,7 @@ public:
 	void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode);
-	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode);
+	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Key, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode);
 	void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void BroadcastTeam                       (const cTeam & a_Team, cTeam::eProtocolAction a_Mode);
 	void BroadcastTeamChangeMembership       (const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta);

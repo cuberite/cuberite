@@ -1190,7 +1190,7 @@ void cProtocol_1_12::SendHealth(void)
 
 
 
-void cProtocol_1_12::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocol_1_12::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1233,7 +1233,7 @@ void cProtocol_1_12::SendDetachEntity(const cEntity & a_Entity, const cEntity & 
 
 
 
-void cProtocol_1_12::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocol_1_12::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1358,7 +1358,7 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_12::SendTeam(const cTeam & a_Team, Byte a_Mode)
+void cProtocol_1_12::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
 {
 	cPacketizer Pkt(*this, 0x43);
 	Pkt.WriteString(a_Team.GetName());
@@ -2083,7 +2083,7 @@ void cProtocol_1_12_1::SendHealth(void)
 
 
 
-void cProtocol_1_12_1::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocol_1_12_1::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -2126,7 +2126,7 @@ void cProtocol_1_12_1::SendDetachEntity(const cEntity & a_Entity, const cEntity 
 
 
 
-void cProtocol_1_12_1::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocol_1_12_1::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 

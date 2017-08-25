@@ -127,7 +127,7 @@ void cObjective::SetIsDisplayed(bool a_IsDisplayed)
 	{
 		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaCreate);
 
-		for (auto it : m_Scores)
+		for (const auto & it : m_Scores)
 		{
 			m_World->BroadcastScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaUpsert);
 		}
@@ -138,7 +138,7 @@ void cObjective::SetIsDisplayed(bool a_IsDisplayed)
 	{
 		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaRemove);
 
-		for (auto it : m_Scores)
+		for (const auto & it : m_Scores)
 		{
 			m_World->BroadcastScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaRemove);
 		}
@@ -182,7 +182,7 @@ AStringVector cObjective::GetKeys(void) const
 
 cObjective::Score cObjective::GetScore(const AString & a_Key) const
 {
-	cScoreMap::const_iterator it = m_Scores.find(a_Key);
+	auto it = m_Scores.find(a_Key);
 
 	if (it == m_Scores.end())
 	{
@@ -200,13 +200,13 @@ cObjective::Score cObjective::GetScore(const AString & a_Key) const
 
 void cObjective::SetAllScores(cObjective::Score a_Score)
 {
-	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
+	for (auto & it : m_Scores)
 	{
-		it->second = a_Score;
+		it.second = a_Score;
 
 		if (IsDisplayed())
 		{
-			m_World->BroadcastScoreUpdate(m_Name, it->first, a_Score, cScoreboard::uaUpsert);
+			m_World->BroadcastScoreUpdate(m_Name, it.first, a_Score, cScoreboard::uaUpsert);
 		}
 	}
 }
@@ -283,7 +283,7 @@ void cObjective::SetDisplayName(const AString & a_Name)
 
 
 
-void cObjective::SendTo(cClientHandle & a_Client)
+void cObjective::SendTo(cClientHandle & a_Client) const
 {
 	if (!IsDisplayed())
 	{
@@ -293,7 +293,7 @@ void cObjective::SendTo(cClientHandle & a_Client)
 
 	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, uaCreate);
 
-	for (auto it : m_Scores)
+	for (const auto & it : m_Scores)
 	{
 		a_Client.SendScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaUpsert);
 	}
@@ -393,7 +393,7 @@ bool cTeam::RemovePlayer(const AString & a_Name)
 
 bool cTeam::HasPlayer(const AString & a_Name) const
 {
-	cPlayerNameSet::const_iterator it = m_Players.find(a_Name);
+	const auto & it = m_Players.find(a_Name);
 
 	return it != m_Players.end();
 }
@@ -451,7 +451,7 @@ cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AStrin
 
 	cObjective Objective(a_Name, a_DisplayName, a_Type, m_World);
 
-	std::pair<cObjectiveMap::iterator, bool> Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
+	auto Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
 
 	if (Status.second)
 	{
@@ -471,7 +471,7 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 {
 	cCSLock Lock(m_CSObjectives);
 
-	cObjectiveMap::iterator it = m_Objectives.find(a_Name);
+	auto it = m_Objectives.find(a_Name);
 
 	if (it == m_Objectives.end())
 	{
@@ -499,7 +499,7 @@ cObjective * cScoreboard::GetObjective(const AString & a_Name)
 {
 	cCSLock Lock(m_CSObjectives);
 
-	cObjectiveMap::iterator it = m_Objectives.find(a_Name);
+	auto it = m_Objectives.find(a_Name);
 
 	if (it == m_Objectives.end())
 	{
@@ -536,7 +536,7 @@ bool cScoreboard::RemoveTeam(const AString & a_Name)
 {
 	cCSLock Lock(m_CSTeams);
 
-	cTeamMap::iterator it = m_Teams.find(a_Name);
+	auto it = m_Teams.find(a_Name);
 
 	if (it == m_Teams.end())
 	{
@@ -558,7 +558,7 @@ cTeam * cScoreboard::GetTeam(const AString & a_Name)
 {
 	cCSLock Lock(m_CSTeams);
 
-	cTeamMap::iterator it = m_Teams.find(a_Name);
+	auto it = m_Teams.find(a_Name);
 
 	if (it == m_Teams.end())
 	{
@@ -594,11 +594,11 @@ cTeam * cScoreboard::QueryPlayerTeam(const AString & a_Name)
 {
 	cCSLock Lock(m_CSTeams);
 
-	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
+	for (auto & it : m_Teams)
 	{
-		if (it->second.HasPlayer(a_Name))
+		if (it.second.HasPlayer(a_Name))
 		{
-			return &it->second;
+			return &it.second;
 		}
 	}
 
@@ -735,7 +735,7 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 {
 	cCSLock Lock(m_CSObjectives);
 
-	for (auto it : m_Objectives)
+	for (const auto & it : m_Objectives)
 	{
 		if (it.second.IsDisplayed())
 		{
@@ -743,7 +743,7 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 		}
 	}
 
-	for (auto team : m_Teams)
+	for (const auto & team : m_Teams)
 	{
 		a_Client.SendTeam(team.second, cTeam::paUpdateTeam);
 	}
@@ -769,7 +769,7 @@ void cScoreboard::RemoveFrom(cClientHandle & a_Client)
 	cCSLock Lock(m_CSObjectives);
 
 	// Remove every objective
-	for (auto objective : m_Objectives)
+	for (const auto & objective : m_Objectives)
 	{
 		if (objective.second.IsDisplayed())
 		{
@@ -778,7 +778,7 @@ void cScoreboard::RemoveFrom(cClientHandle & a_Client)
 	}
 
 	// Remove every team
-	for (auto team : m_Teams)
+	for (const auto & team : m_Teams)
 	{
 		a_Client.SendTeam(team.second, cTeam::paRemoveTeam);
 	}

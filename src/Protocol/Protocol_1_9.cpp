@@ -1191,7 +1191,7 @@ void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol_1_9_0::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocol_1_9_0::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1209,7 +1209,7 @@ void cProtocol_1_9_0::SendScoreboardObjective(const AString & a_Name, const AStr
 
 
 
-void cProtocol_1_9_0::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocol_1_9_0::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
