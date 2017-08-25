@@ -249,11 +249,7 @@ void cNoteEntity::MakeSound(void)
 	float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f));
 	m_World->BroadcastSoundEffect(
 		sampleName,
-		{
-			static_cast<double>(m_PosX),
-			static_cast<double>(m_PosY),
-			static_cast<double>(m_PosZ)
-		},
+		Vector3d(m_PosX, m_PosY, m_PosZ),
 		3.0f,
 		calcPitch
 	);

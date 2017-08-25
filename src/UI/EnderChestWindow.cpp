@@ -15,7 +15,7 @@
 cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 	cWindow(wtChest, "Ender Chest"),
 	m_World(a_EnderChest->GetWorld()),
-	m_Block(a_EnderChest->GetPos())
+	m_BlockPos(a_EnderChest->GetPos())
 {
 	m_SlotAreas.push_back(new cSlotAreaEnderChest(a_EnderChest, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
@@ -24,13 +24,13 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 	// Play the opening sound:
 	m_World->BroadcastSoundEffect(
 		"block.enderchest.open",
-		m_Block,
+		m_BlockPos,
 		1,
 		1
 	);
 
 	// Send out the chest-open packet:
-	m_World->BroadcastBlockAction(m_Block, 1, 1, E_BLOCK_ENDER_CHEST);
+	m_World->BroadcastBlockAction(m_BlockPos, 1, 1, E_BLOCK_ENDER_CHEST);
 }
 
 
@@ -40,12 +40,12 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 cEnderChestWindow::~cEnderChestWindow()
 {
 	// Send out the chest-close packet:
-	m_World->BroadcastBlockAction(m_Block, 1, 0, E_BLOCK_ENDER_CHEST);
+	m_World->BroadcastBlockAction(m_BlockPos, 1, 0, E_BLOCK_ENDER_CHEST);
 
 	// Play the closing sound
 	m_World->BroadcastSoundEffect(
 		"block.enderchest.close",
-		m_Block,
+		m_BlockPos,
 		1, 1
 	);
 }
