@@ -11848,69 +11848,9 @@ end
 				{
 					Notes = "",
 				},
-				dsTeamAqua =
+				dsSidebarTeamOffset =
 				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamBlack =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamBlue =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamDarkAqua =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamDarkBlue =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamDarkGray =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamDarkGreen =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamDarkPurple =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamDarkRed =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamGold =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamGray =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamGreen =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamLightPurple =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamRed =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamWhite =
-				{
-					Notes = "The sidebar for team aqua",
-				},
-				dsTeamYellow =
-				{
-					Notes = "The sidebar for team aqua",
+					Notes = "Add this to the team color (see cTeam::GetColor()) to get the appropriate display slot ID for the sidebar of that team. Note that the team must have been assigned a valid color using SetColor().",
 				},
 			},
 		},
