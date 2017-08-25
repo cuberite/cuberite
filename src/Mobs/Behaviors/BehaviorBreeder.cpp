@@ -90,7 +90,6 @@ void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cBehaviorBreeder::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	LOGD("mobDebug - Behavior Breeder: PostTick");
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 	if (m_MatingTimer > 0)

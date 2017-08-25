@@ -210,7 +210,7 @@ public:
 	virtual cBehaviorChaser * GetBehaviorChaser();
 	virtual cBehaviorDayLightBurner * GetBehaviorDayLightBurner(); // mobTodo this is probably temporary
 
-	// Polymorphic behavior functions ("Skin-specific")
+	// Polymorphic behavior functions
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);
 	virtual void GetFollowedItems(cItems & a_Items);
 	virtual void GetBreedingItems(cItems & a_Items);

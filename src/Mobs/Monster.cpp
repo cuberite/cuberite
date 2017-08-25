@@ -417,7 +417,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// mobToDo fix dont care
 			// Note that m_NextWayPointPosition is actually returned by GetNextWayPoint)
-			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, false))
+			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, true))
 			{
 				case ePathFinderStatus::PATH_FOUND:
 				{
@@ -477,7 +477,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_World->BroadcastEntityMetadata(*this);
 		}
 	}
-	LOGD("mobDebug - Monster tick ends");
 }
 
 

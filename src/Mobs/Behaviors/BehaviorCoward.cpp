@@ -37,9 +37,32 @@ bool cBehaviorCoward::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & 
 
 
 
+bool cBehaviorCoward::ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
+	m_Parent->SetSpeed(m_Parent->GetSpeed() * 2);
+	return true;
+}
+
+
+
+
+
+bool cBehaviorCoward::ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
+	m_Parent->SetSpeed(m_Parent->GetSpeed() / 2);
+	return true;
+}
+
+
+
+
+
 void cBehaviorCoward::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	LOGD("mobDebug - Behavior Coward: Tick");
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 	if (m_Attacker == nullptr)
@@ -52,6 +75,7 @@ void cBehaviorCoward::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// We lost the attacker
 		m_Attacker = nullptr;
+		return;
 	}
 
 	Vector3d newloc = m_Parent->GetPosition();

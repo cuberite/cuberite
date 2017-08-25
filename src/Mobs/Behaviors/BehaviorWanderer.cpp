@@ -39,7 +39,6 @@ bool cBehaviorWanderer::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk 
 
 void cBehaviorWanderer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	LOGD("mobDebug - Behavior Wanderer: Tick");
 	if (m_Parent->IsPathFinderActivated())
 	{
 		return;  // Still getting there
