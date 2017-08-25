@@ -1547,6 +1547,7 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
 		case E_BLOCK_HEAD:          Action = 4; break;  // Update Mobhead entity
 		case E_BLOCK_FLOWER_POT:    Action = 5; break;  // Update flower pot
+		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteBEUInt8(Action);
