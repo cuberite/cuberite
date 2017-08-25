@@ -227,11 +227,11 @@ cWorld::~cWorld()
 
 
 
-/*void cWorld::CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	LOG("CastThunderbolt(int, int, int) is deprecated, use CastThunderbolt(Vector3i) instead");
 	CastThunderbolt({a_BlockX, a_BlockY, a_BlockZ});
-}*/
+}
 
 
 
@@ -2432,11 +2432,11 @@ void cWorld::BroadcastBlockAction(Vector3i a_Block, Byte a_Byte1, Byte a_Byte2, 
 
 
 
-/*void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
-LOG("DEPRECATED");
+	LOG("BroadcastBlockAction with integer position is deprecated, use vector-parametered version instead.");
 	m_ChunkMap->BroadcastBlockAction({a_BlockX, a_BlockY, a_BlockZ}, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
-}*/
+}
 
 
 
@@ -2793,10 +2793,11 @@ void cWorld::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Positi
 
 
 
-/*void cWorld::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cWorld::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
+	LOG("BroadcastSoundEffect with double position arguments is deprecated, use vector-parametered version instead.");
 	BroadcastSoundEffect(a_SoundName, {a_X, a_Y, a_Z}, a_Volume, a_Pitch, a_Exclude);
-}*/
+}
 
 
 
@@ -2833,16 +2834,6 @@ void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHand
 		ch->SendTeleportEntity(a_Entity);
 	}
 }
-
-
-
-
-
-/*void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
-{
-	LOG("BroadcastThunderbolt(int, int, int) is deprecated, use BroadcastThunderbolt(Vector3i) instead.");
-	BroadcastThunderbolt({a_BlockX, a_BlockY, a_BlockZ}, a_Exclude);
-}*/
 
 
 
