@@ -4,7 +4,7 @@
 # The time for a brewing recipe is always 20 seconds (400 ticks).
 #
 # Minecraft-Wiki Brewing:
-# http://minecraft.gamepedia.com/Brewing
+# https://minecraft.gamepedia.com/Brewing
 #
 # A brewing recipe has this format:
 # Data Value + Ingredient = Potion

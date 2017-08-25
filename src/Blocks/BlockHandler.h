@@ -88,8 +88,8 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 
 	/** Called when the item is mined to convert it into pickups. Pickups may specify multiple items. Appends items to a_Pickups, preserves its original contents.
-	Overloaded method with coords and digger, for blocks that needs to access the block entity, e.g. a bed */
-	virtual void ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) {}
+	Overloaded method with coords and world interface for blocks that needs to access the block entity, e.g. a bed. */
+	virtual void ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) {}
 
 	/** Handles the dropping, but not destruction, of a block based on what ConvertTo(Verbatim)Pickups() returns, including the spawning of pickups and alertion of plugins
 	@param a_Digger The entity causing the drop; it may be nullptr
@@ -140,7 +140,7 @@ public:
 	and wakes up all simulators on the block. */
 	virtual void Check(cChunkInterface & ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 
-	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: http://minecraft.gamepedia.com/Map_item_format */
+	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: https://minecraft.gamepedia.com/Map_item_format */
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta);
 
 	/** Rotates a given block meta counter-clockwise. Default: no change

@@ -431,7 +431,7 @@ void cMonster::CalcLeashActions()
 		auto LeashKnot = cLeashKnot::FindKnotAtPos(*m_World, { FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z) });
 		if (LeashKnot != nullptr)
 		{
-			LeashTo(LeashKnot);
+			LeashTo(*LeashKnot);
 			SetLeashToPos(nullptr);
 		}
 	}
@@ -688,7 +688,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
-		LeashTo(&a_Player);
+		LeashTo(a_Player);
 	}
 }
 
@@ -1363,17 +1363,17 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
 	)
 	{
-		int MobHeight = FloorC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
+		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
 		if (MobHeight >= cChunkDef::Height)
 		{
 			return true;
 		}
-		// Start with the highest block and scan down to the mob's head.
+		// Start with the highest block and scan down to just above the mob's head.
 		// If a non transparent is found, return false (do not burn). Otherwise return true.
 		// Note that this loop is not a performance concern as transparent blocks are rare and the loop almost always bailes out
 		// instantly.(An exception is e.g. standing under a long column of glass).
 		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
-		while (CurrentBlock >= MobHeight)
+		while (CurrentBlock > MobHeight)
 		{
 			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
 			if (
@@ -1407,7 +1407,7 @@ cMonster::eFamily cMonster::GetMobFamily(void) const
 
 
 
-void cMonster::LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast)
+void cMonster::LeashTo(cEntity & a_Entity, bool a_ShouldBroadcast)
 {
 	// Do nothing if already leashed
 	if (m_LeashedTo != nullptr)
@@ -1415,13 +1415,13 @@ void cMonster::LeashTo(cEntity * a_Entity, bool a_ShouldBroadcast)
 		return;
 	}
 
-	m_LeashedTo = a_Entity;
+	m_LeashedTo = &a_Entity;
 
-	a_Entity->AddLeashedMob(this);
+	a_Entity.AddLeashedMob(this);
 
 	if (a_ShouldBroadcast)
 	{
-		m_World->BroadcastLeashEntity(*this, *a_Entity);
+		m_World->BroadcastLeashEntity(*this, a_Entity);
 	}
 
 	m_IsLeashActionJustDone = true;

@@ -1,4 +1,4 @@
-
+﻿
 // ItemBow.h
 
 // Declares the cItemBowHandler class representing the itemhandler for bows
@@ -91,16 +91,15 @@ public:
 			}
 			else
 			{
-				Arrow->SetPickupState(cArrowEntity::psNoPickup);
+				ArrowPtr->SetPickupState(cArrowEntity::psNoPickup);
 			}
-
 
 			a_Player->UseEquippedItem();
 		}
 
 		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchFlame) > 0)
 		{
-			Arrow->StartBurning(100);
+			ArrowPtr->StartBurning(100);
 		}
 	}
 } ;

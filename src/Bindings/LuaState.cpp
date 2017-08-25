@@ -20,6 +20,7 @@ extern "C"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../DeadlockDetect.h"
+#include "../UUID.h"
 
 
 
@@ -1410,6 +1411,40 @@ bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, cUUID & a_Value)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	tolua_Error tolua_Err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cUUID", 0, &tolua_Err))
+	{
+		// Found a cUUID, copy into output value
+		cUUID * PtrUUID = nullptr;
+		GetStackValue(a_StackPos, PtrUUID);
+		if (PtrUUID == nullptr)
+		{
+			return false;
+		}
+		a_Value = *PtrUUID;
+		return true;
+	}
+
+	// Try to get a string and parse as a UUID into the output
+	AString StrUUID;
+	if (!GetStackValue(a_StackPos, StrUUID))
+	{
+		return false;
+	}
+	return a_Value.FromString(StrUUID);
+}
+
+
+
+
+
 cLuaState::cStackValue cLuaState::WalkToValue(const AString & a_Name)
 {
 	// There needs to be at least one value on the stack:
@@ -1778,6 +1813,47 @@ bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 	}  // for i - Param
 
 	// All params checked ok
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CheckParamUUID(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+
+	cUUID tempUUID;
+	AString tempStr;
+	// Accept either a cUUID or a string that contains a valid UUID
+	for (int i = a_StartParam; i <= a_EndParam; ++i)
+	{
+		tolua_Error err;
+		if (tolua_isusertype(m_LuaState, i, "cUUID", 0, &err) && !lua_isnil(m_LuaState, i))
+		{
+			continue;
+		}
+
+		if (!tolua_iscppstring(m_LuaState, i, 0, &err))
+		{
+			ApiParamError("Failed to read parameter #%d. UUID expected, got %s", i, GetTypeText(i).c_str());
+			return false;
+		}
+
+		// Check string is a valid UUID
+		GetStackValue(i, tempStr);
+		if (!tempUUID.FromString(tempStr))
+		{
+			ApiParamError("Failed to read parameter #%d. UUID expected, got non-UUID string:\n\t\"%s\"", i, tempStr.c_str());
+			return false;
+		}
+	}
 	return true;
 }
 

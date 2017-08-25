@@ -7,6 +7,7 @@
 #include "tolua++/include/tolua++.h"
 #include "../World.h"
 #include "../Broadcaster.h"
+#include "../UUID.h"
 #include "ManualBindings.h"
 #include "LuaState.h"
 #include "PluginLua.h"
@@ -200,6 +201,53 @@ static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
 	World->DoExplosionAt(ExplosionSize, BlockX, BlockY, BlockZ, CanCauseFire, SourceType, SourceData);
 
 	return 0;
+}
+
+
+
+
+
+static int tolua_cWorld_DoWithPlayerByUUID(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamUUID(2) ||
+		!L.CheckParamFunction(3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	cWorld * Self;
+	cUUID PlayerUUID;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, PlayerUUID, FnRef);
+
+	if (PlayerUUID.IsNil())
+	{
+		return L.ApiParamError("Expected a non-nil UUID for parameter #1");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #2");
+	}
+
+	// Call the function:
+	bool res = Self->DoWithPlayerByUUID(PlayerUUID, [&](cPlayer * a_Player)
+		{
+			bool ret = false;
+			L.Call(FnRef, a_Player, cLuaState::Return, ret);
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
 }
 
 
@@ -640,7 +688,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithMobHeadAt",            DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",          DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithPlayer",               DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
-			tolua_function(tolua_S, "DoWithPlayerByUUID",         DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayerByUUID>);
+			tolua_function(tolua_S, "DoWithPlayerByUUID",         tolua_cWorld_DoWithPlayerByUUID);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",        DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk",  ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
 			tolua_function(tolua_S, "ForEachBrewingstandInChunk", ForEachInChunk<cWorld, cBrewingstandEntity, &cWorld::ForEachBrewingstandInChunk>);

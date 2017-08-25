@@ -57,7 +57,7 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 // The following template has been modified from code available at
-// http://www.codeproject.com/Articles/1847/C-Wrappers-for-the-Expat-XML-Parser
+// https://www.codeproject.com/Articles/1847/C-Wrappers-for-the-Expat-XML-Parser
 // It uses templates to remove the virtual function call penalty (both size and speed) for each callback
 
 /* Usage:

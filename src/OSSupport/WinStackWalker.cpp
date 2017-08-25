@@ -5,7 +5,7 @@
 
 
 /*
-LICENSE (http://www.opensource.org/licenses/bsd-license.php)
+LICENSE (https://www.opensource.org/licenses/bsd-license.php)
 
 Copyright (c) 2005-2010, Jochen Kalmbach
 All rights reserved.
@@ -504,7 +504,7 @@ private:
 		pGMI = (tGMI)GetProcAddress(hPsapi, "GetModuleInformation");
 		if ((pEPM == nullptr) || (pGMFNE == nullptr) || (pGMBN == nullptr) || (pGMI == nullptr))
 		{
-			// we couldn´t find all functions
+			// we couldn't find all functions
 			FreeLibrary(hPsapi);
 			return FALSE;
 		}
@@ -850,11 +850,11 @@ BOOL WinStackWalker::LoadModules()
 				strcat_s(szSymPath, nSymPathLen, "SRV*");
 				strcat_s(szSymPath, nSymPathLen, szTemp);
 				strcat_s(szSymPath, nSymPathLen, "\\websymbols");
-				strcat_s(szSymPath, nSymPathLen, "*http://msdl.microsoft.com/download/symbols;");
+				strcat_s(szSymPath, nSymPathLen, "*https://msdl.microsoft.com/download/symbols;");
 			}
 			else
 			{
-				strcat_s(szSymPath, nSymPathLen, "SRV*c:\\websymbols*http://msdl.microsoft.com/download/symbols;");
+				strcat_s(szSymPath, nSymPathLen, "SRV*c:\\websymbols*https://msdl.microsoft.com/download/symbols;");
 			}
 		}
 	}  // if SymBuildPath
