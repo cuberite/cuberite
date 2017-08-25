@@ -6,9 +6,11 @@
 
 #include "Globals.h"
 #include "BlockInfo.h"
+#include "UUID.h"
 #include "Bindings.h"
 #include "Bindings/DeprecatedBindings.h"
 #include "Bindings/LuaJson.h"
+#include "Bindings/LuaState.h"
 #include "Bindings/ManualBindings.h"
 #include "BlockEntities/BlockEntity.h"
 #include "Blocks/BlockHandler.h"
@@ -327,6 +329,24 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return nullptr;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int, cUUID *&)
+{
+	return false;
+}
+
+
+
+
+
+bool cUUID::FromString(const AString&)
+{
+	return false;
 }
 
 

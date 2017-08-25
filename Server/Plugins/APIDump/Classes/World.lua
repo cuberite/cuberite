@@ -18,7 +18,7 @@ return
 			Each world runs several separate threads used for various housekeeping purposes, the most important
 			of those is the Tick thread. This thread updates the game logic 20 times per second, and it is
 			the thread where all the gameplay actions are evaluated. Liquid physics, entity interactions,
-			player ovement etc., all are applied in this thread.</p>
+			player movement etc., all are applied in this thread.</p>
 			<p>
 			Additional threads include the generation thread (generates new chunks as needed, storage thread
 			(saves and loads chunk from the disk), lighting thread (updates block light values) and the
@@ -901,7 +901,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				{
 					{
 						Name = "PlayerUUID",
-						Type = "string",
+						Type = "cUUID",
 					},
 					{
 						Name = "CallbackFunction",

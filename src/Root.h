@@ -25,6 +25,7 @@ class cCommandOutputCallback;
 class cCompositeChat;
 class cSettingsRepositoryInterface;
 class cDeadlockDetect;
+class cUUID;
 
 typedef cItemCallback<cPlayer> cPlayerListCallback;
 typedef cItemCallback<cWorld>  cWorldListCallback;
@@ -123,7 +124,7 @@ public:
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
 	/** Called by cAuthenticator to auth the specified user */
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
 	/** Executes commands queued in the command queue */
 	void TickCommands(void);
@@ -141,7 +142,7 @@ public:
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds the player over his uuid and calls the callback */
-	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds the player using it's complete username and calls the callback */
 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);
