@@ -112,7 +112,7 @@ public:
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode) override;
+	virtual void SendScoreboardObjective        (const cObjective & a_Objective, cObjective::eUpdateAction a_Mode) override;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode) override;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) override;

@@ -1191,16 +1191,16 @@ void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol_1_9_0::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode)
+void cProtocol_1_9_0::SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x3f);  // Scoreboard objective packet
-	Pkt.WriteString(a_Name);
+	Pkt.WriteString(a_Objective.GetName());
 	Pkt.WriteBEUInt8(a_Mode);
-	if ((a_Mode == 0) || (a_Mode == 2))
+	if ((a_Mode == cObjective::uaCreate) || (a_Mode == cObjective::uaUpdateText))
 	{
-		Pkt.WriteString(a_DisplayName);
+		Pkt.WriteString(a_Objective.GetDisplayName());
 		Pkt.WriteString("integer");
 	}
 }

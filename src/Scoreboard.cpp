@@ -125,7 +125,7 @@ void cObjective::SetIsDisplayed(bool a_IsDisplayed)
 	// If we just started being displayed, tell clients about us
 	if (a_IsDisplayed && (m_DisplayCount == 1))
 	{
-		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaCreate);
+		m_World->BroadcastScoreboardObjective(*this, uaCreate);
 
 		for (const auto & it : m_Scores)
 		{
@@ -136,7 +136,7 @@ void cObjective::SetIsDisplayed(bool a_IsDisplayed)
 	// If we aren't displayed anymore, tell clients to forget about us
 	if (m_DisplayCount == 0)
 	{
-		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaRemove);
+		m_World->BroadcastScoreboardObjective(*this, uaRemove);
 
 		for (const auto & it : m_Scores)
 		{
@@ -275,7 +275,7 @@ void cObjective::SetDisplayName(const AString & a_Name)
 
 	if (IsDisplayed())
 	{
-		m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, uaUpdateText);
+		m_World->BroadcastScoreboardObjective(*this, uaUpdateText);
 	}
 }
 
@@ -291,7 +291,7 @@ void cObjective::SendTo(cClientHandle & a_Client) const
 		return;
 	}
 
-	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, uaCreate);
+	a_Client.SendScoreboardObjective(*this, uaCreate);
 
 	for (const auto & it : m_Scores)
 	{
@@ -789,7 +789,7 @@ void cScoreboard::RemoveFrom(cClientHandle & a_Client)
 	{
 		if (objective.second.IsDisplayed())
 		{
-			a_Client.SendScoreboardObjective(objective.second.GetName(), "", cObjective::uaRemove);
+			a_Client.SendScoreboardObjective(objective.second, cObjective::uaRemove);
 		}
 	}
 

@@ -2710,7 +2710,7 @@ void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 
 
-void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode)
+void cWorld::BroadcastScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2720,7 +2720,7 @@ void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString 
 		{
 			continue;
 		}
-		ch->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+		ch->SendScoreboardObjective(a_Objective, a_Mode);
 	}
 }
 

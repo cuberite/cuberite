@@ -116,7 +116,7 @@ public:
 	virtual void SendRespawn                    (eDimension a_Dimension) = 0;
 	virtual void SendExperience                 (void) = 0;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) = 0;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode) = 0;
+	virtual void SendScoreboardObjective        (const cObjective & a_Objective, cObjective::eUpdateAction a_Mode) = 0;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode) = 0;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) = 0;
 	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) = 0;

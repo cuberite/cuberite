@@ -54,7 +54,7 @@ public:
 	virtual void SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendResetTitle(void) override;
 	virtual void SendRespawn(eDimension a_Dimension) override;
-	virtual void SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode) override;
+	virtual void SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode) override;
 	virtual void SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode) override;
 	virtual void SendSetRawSubTitle(const AString & a_SubTitle) override;
 	virtual void SendSetRawTitle(const AString & a_Title) override;
@@ -107,7 +107,7 @@ public:
 	virtual void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendExperience(void) override;
 	virtual void SendHealth(void) override;
-	virtual void SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode) override;
+	virtual void SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode) override;
 	virtual void SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle) override;
 	virtual void SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode) override;

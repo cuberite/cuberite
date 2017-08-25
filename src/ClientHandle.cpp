@@ -2895,9 +2895,9 @@ void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eUpdateAction a_Mode)
+void cClientHandle::SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
-	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+	m_Protocol->SendScoreboardObjective(a_Objective, a_Mode);
 }
 
 

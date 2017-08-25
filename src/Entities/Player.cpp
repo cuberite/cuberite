@@ -967,9 +967,13 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		cPlayer * Attacker = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
 
-		if (!GetWorld()->GetScoreboard().AreOnSameTeam(GetName(), Attacker->GetName()))
+		if (GetWorld()->GetScoreboard().AreOnSameTeam(GetName(), Attacker->GetName()))
 		{
-			return false;
+			cTeam * Team = GetWorld()->GetScoreboard().QueryPlayerTeam(GetName());
+			if (!Team->AllowsFriendlyFire())
+			{
+				return false;
+			}
 		}
 	}
 
