@@ -13,7 +13,6 @@ set -e
 # Constants:
 DEFAULT_BUILDTYPE="Release" # Other options: "Debug"
 DEFAULT_BRANCH="master"     # Other options: None currently
-MAX_DEFAULT_THREADS=2
 
 # Constants not modifiable through command line:
 UPSTREAM_REPO="origin"
@@ -380,37 +379,29 @@ numberOfCores()
 
 CORE_COUNT=`numberOfCores`
 
-# DEFAULT_THREADS=1 if CORE_COUNT unknown. Otherwise
-# DEFAULT_THREADS=min{MAX_DEFAULT_THREADS, CORE_COUNT}
-if [ "$CORE_COUNT" = "unknown" ]; then
-	DEFAULT_THREADS=1
-elif [ "$CORE_COUNT" -ge "$MAX_DEFAULT_THREADS" ]; then
-	DEFAULT_THREADS="$MAX_DEFAULT_THREADS"
-else 
-	DEFAULT_THREADS="$CORE_COUNT"
-fi
-
 if [ $STATE_INTERACTIVE -eq 1 ]; then
-	echo "Enter the number of compilation threads to use."
+	echo "Choose the number of compilation threads."
 
 	if [ "$CORE_COUNT" = "unknown" ]; then
-		printf %s "Could not detect the number of cores. Leave empty to choose $DEFAULT_THREADS: "
+		printf %s "Could not detect the number of cores. "
 	elif [ "$CORE_COUNT" -eq 1 ]; then
-		echo "You have 1 core. That may be a wise choice."
-		printf %s "Leave empty to choose $DEFAULT_THREADS: "	
+		echo "You have 1 core."
 	else
-		echo "You have $CORE_COUNT cores. That may be a wise choice if you have enough RAM,"
-		printf %s "Otherwise choose less. Leave empty to choose $DEFAULT_THREADS: "
+		echo "You have $CORE_COUNT cores."
 	fi
-
+	
+	echo "If you have enough RAM, it is wise to choose a number as high as your core count. "
+	echo "Otherwise choose lower. Raspberry Pis should choose 1. If in doubt, choose 1."
+	printf %s "Please enter the number of compilation threads to use (Default: 1): "
 	read CHOICE_THREADS
 fi
 
 if [ -z "$CHOICE_THREADS" ] 2> /dev/null; then
-	CHOICE_THREADS="$DEFAULT_THREADS"
+	CHOICE_THREADS=1
 elif [ "$CHOICE_THREADS" = "CORES" ] 2> /dev/null; then
 	if [ $CORE_COUNT = "unknown" ]; then
-		CHOICE_THREADS="$DEFAULT_THREADS"
+		CHOICE_THREADS=1
+		echo "WARNING: could not detect number of cores. Using 1 thread." >&2
 	else
 		CHOICE_THREADS="$CORE_COUNT"
 	fi
