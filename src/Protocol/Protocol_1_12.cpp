@@ -1396,7 +1396,7 @@ void cProtocol_1_12::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mod
 		std::set<AString> TeamPlayers = a_Team.GetMembers();
 		Pkt.WriteVarInt32(static_cast<UInt32>(TeamPlayers.size()));  // Number of entities
 		// Member entity list
-		for (auto name : TeamPlayers)
+		for (const auto & name : TeamPlayers)
 		{
 			Pkt.WriteString(name);
 		}
@@ -1421,7 +1421,7 @@ void cProtocol_1_12::SendTeamChangeMembership(const AString & a_TeamName, bool a
 	}
 
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Delta.size()));
-	for (auto name : a_Delta)
+	for (const auto & name : a_Delta)
 	{
 		Pkt.WriteString(name);
 	}
