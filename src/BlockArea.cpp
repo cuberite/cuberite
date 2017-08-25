@@ -1,4 +1,4 @@
-
+﻿
 // BlockArea.cpp
 
 // NOTE: compile.sh checks for this file in order to determine if this is the Cuberite folder.
@@ -2239,7 +2239,7 @@ int cBlockArea::MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 
 
 
-bool cBlockArea::DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cBlockEntityCallback a_Callback)
+bool cBlockArea::DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, const cBlockEntityCallback & a_Callback)
 {
 	ASSERT(IsValidRelCoords(a_RelX, a_RelY, a_RelZ));
 	if (!HasBlockEntities())
@@ -2259,7 +2259,7 @@ bool cBlockArea::DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cBlo
 
 
 
-bool cBlockArea::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
+bool cBlockArea::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockEntityCallback & a_Callback)
 {
 	return DoWithBlockEntityRelAt(a_BlockX - m_Origin.x, a_BlockY - m_Origin.y, a_BlockZ - m_Origin.z, a_Callback);
 }
@@ -2268,7 +2268,7 @@ bool cBlockArea::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
+bool cBlockArea::ForEachBlockEntity(const cBlockEntityCallback & a_Callback)
 {
 	if (!HasBlockEntities())
 	{

@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "PluginManager.h"
@@ -1975,7 +1975,7 @@ bool cPluginManager::IsValidHookType(int a_HookType)
 
 
 
-bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback a_Callback)
+bool cPluginManager::DoWithPlugin(const AString & a_PluginName, const cPluginCallback & a_Callback)
 {
 	// TODO: Implement locking for plugins
 	for (auto & plugin: m_Plugins)
@@ -1992,7 +1992,7 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 
 
 
-bool cPluginManager::ForEachPlugin(cPluginCallback a_Callback)
+bool cPluginManager::ForEachPlugin(const cPluginCallback & a_Callback)
 {
 	// TODO: Implement locking for plugins
 	for (auto & plugin: m_Plugins)

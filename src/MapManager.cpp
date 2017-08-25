@@ -1,4 +1,4 @@
-
+﻿
 // MapManager.cpp
 
 #include "Globals.h"
@@ -22,7 +22,7 @@ cMapManager::cMapManager(cWorld * a_World)
 
 
 
-bool cMapManager::DoWithMap(UInt32 a_ID, cMapCallback a_Callback)
+bool cMapManager::DoWithMap(UInt32 a_ID, const cMapCallback & a_Callback)
 {
 	cCSLock Lock(m_CS);
 	cMap * Map = GetMapData(a_ID);

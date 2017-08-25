@@ -1,4 +1,4 @@
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+﻿#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Window.h"
 #include "WindowOwner.h"
@@ -362,7 +362,7 @@ void cWindow::OwnerDestroyed()
 
 
 
-bool cWindow::ForEachPlayer(cPlayerListCallback a_Callback)
+bool cWindow::ForEachPlayer(const cPlayerListCallback & a_Callback)
 {
 	cCSLock Lock(m_CS);
 	for (auto & Player : m_OpenedBy)
@@ -379,7 +379,7 @@ bool cWindow::ForEachPlayer(cPlayerListCallback a_Callback)
 
 
 
-bool cWindow::ForEachClient(cClientHandleCallback a_Callback)
+bool cWindow::ForEachClient(cClientHandleCallback & a_Callback)
 {
 	cCSLock Lock(m_CS);
 	for (auto & Player : m_OpenedBy)

@@ -1311,7 +1311,7 @@ void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
 
 
 
-bool cWorld::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback a_Callback)
+bool cWorld::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, const cBlockEntityCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachBlockEntityInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1320,7 +1320,7 @@ bool cWorld::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityC
 
 
 
-bool cWorld::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback a_Callback)
+bool cWorld::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, const cBrewingstandCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachBrewingstandInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1329,7 +1329,7 @@ bool cWorld::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstan
 
 
 
-bool cWorld::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Callback)
+bool cWorld::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, const cChestCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachChestInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1338,7 +1338,7 @@ bool cWorld::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Ca
 
 
 
-bool cWorld::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback a_Callback)
+bool cWorld::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, const cDispenserCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachDispenserInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1347,7 +1347,7 @@ bool cWorld::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallb
 
 
 
-bool cWorld::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback a_Callback)
+bool cWorld::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, const cDropperCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachDropperInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1356,7 +1356,7 @@ bool cWorld::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback 
 
 
 
-bool cWorld::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback a_Callback)
+bool cWorld::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, const cDropSpenserCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachDropSpenserInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1365,7 +1365,7 @@ bool cWorld::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserC
 
 
 
-bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback)
+bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, const cFurnaceCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachFurnaceInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1420,7 +1420,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 
 
 
-bool cWorld::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
+bool cWorld::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockEntityCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1429,7 +1429,7 @@ bool cWorld::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 
 
-bool cWorld::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback)
+bool cWorld::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBeaconCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithBeaconAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1438,7 +1438,7 @@ bool cWorld::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 
 
 
-bool cWorld::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback)
+bool cWorld::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBedCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1447,7 +1447,7 @@ bool cWorld::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback 
 
 
 
-bool cWorld::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback)
+bool cWorld::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBrewingstandCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithBrewingstandAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1456,7 +1456,7 @@ bool cWorld::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBre
 
 
 
-bool cWorld::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback)
+bool cWorld::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cChestCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithChestAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1465,7 +1465,7 @@ bool cWorld::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 
 
 
-bool cWorld::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback)
+bool cWorld::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDispenserCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithDispenserAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1474,7 +1474,7 @@ bool cWorld::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispen
 
 
 
-bool cWorld::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback)
+bool cWorld::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDropperCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithDropperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1483,7 +1483,7 @@ bool cWorld::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperC
 
 
 
-bool cWorld::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback)
+bool cWorld::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDropSpenserCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithDropSpenserAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1492,7 +1492,7 @@ bool cWorld::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDrop
 
 
 
-bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback)
+bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cFurnaceCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithFurnaceAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1501,7 +1501,7 @@ bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 
 
 
-bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
+bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cNoteBlockCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1510,7 +1510,7 @@ bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 
 
 
-bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback)
+bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cCommandBlockCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1519,7 +1519,7 @@ bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
-bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback)
+bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cMobHeadCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1528,7 +1528,7 @@ bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 
 
 
-bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback)
+bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cFlowerPotCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -1546,7 +1546,7 @@ bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 
 
-bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callback)
+bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, const cChunkCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -1555,7 +1555,7 @@ bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callback)
 
 
 
-bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
+bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, const cChunkCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithChunkAt(a_BlockPos, a_Callback);
 }
@@ -3129,7 +3129,7 @@ bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
 
 
 
-bool cWorld::ForEachPlayer(cPlayerListCallback a_Callback)
+bool cWorld::ForEachPlayer(const cPlayerListCallback & a_Callback)
 {
 	// Calls the callback for each player in the list
 	cCSLock Lock(m_CSPlayers);
@@ -3147,7 +3147,7 @@ bool cWorld::ForEachPlayer(cPlayerListCallback a_Callback)
 
 
 
-bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
+bool cWorld::DoWithPlayer(const AString & a_PlayerName, const cPlayerListCallback & a_Callback)
 {
 	// Calls the callback for the specified player in the list
 	cCSLock Lock(m_CSPlayers);
@@ -3166,7 +3166,7 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Ca
 
 
 
-bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback a_Callback)
+bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, const cPlayerListCallback & a_Callback)
 {
 	cPlayer * BestMatch = nullptr;
 	size_t BestRating = 0;
@@ -3202,7 +3202,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 
 
-bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback)
+bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, const cPlayerListCallback & a_Callback)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (auto & Player : m_Players)
@@ -3277,7 +3277,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 
 
 
-bool cWorld::ForEachEntity(cEntityCallback a_Callback)
+bool cWorld::ForEachEntity(const cEntityCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachEntity(a_Callback);
 }
@@ -3286,7 +3286,7 @@ bool cWorld::ForEachEntity(cEntityCallback a_Callback)
 
 
 
-bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_Callback)
+bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, const cEntityCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachEntityInChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
@@ -3295,7 +3295,7 @@ bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_
 
 
 
-bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback)
+bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, const cEntityCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachEntityInBox(a_Box, a_Callback);
 }
@@ -3304,7 +3304,7 @@ bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Ca
 
 
 
-bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback)
+bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, const cEntityCallback & a_Callback)
 {
 	// First check the entities-to-add:
 	{
@@ -3545,7 +3545,7 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 
 
-bool cWorld::ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback)
+bool cWorld::ForEachLoadedChunk(const std::function<bool(int, int)> & a_Callback)
 {
 	return m_ChunkMap->ForEachLoadedChunk(a_Callback);
 }
@@ -3576,7 +3576,7 @@ void cWorld::QueueSaveAllChunks(void)
 void cWorld::QueueTask(std::function<void(cWorld &)> a_Task)
 {
 	cCSLock Lock(m_CSTasks);
-	m_Tasks.emplace_back(0, a_Task);
+	m_Tasks.emplace_back(0, std::move(a_Task));
 }
 
 
@@ -3590,7 +3590,7 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 	// Insert the task into the list of scheduled tasks
 	{
 		cCSLock Lock(m_CSTasks);
-		m_Tasks.emplace_back(TargetTick, a_Task);
+		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
 	}
 }
 

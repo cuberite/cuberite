@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ChunkMap.h"
@@ -731,7 +731,7 @@ bool cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, i
 
 
 
-bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callback)
+bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, const cChunkCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
@@ -743,7 +743,7 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callbac
 }
 
 
-bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
+bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, const cChunkCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
@@ -1583,7 +1583,7 @@ OwnedEntity cChunkMap::RemoveEntity(cEntity & a_Entity)
 
 
 
-bool cChunkMap::ForEachEntity(cEntityCallback a_Callback)
+bool cChunkMap::ForEachEntity(const cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	for (const auto & Chunk : m_Chunks)
@@ -1600,7 +1600,7 @@ bool cChunkMap::ForEachEntity(cEntityCallback a_Callback)
 
 
 
-bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_Callback)
+bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, const cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1615,7 +1615,7 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 
 
-bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback)
+bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, const cEntityCallback & a_Callback)
 {
 	// Calculate the chunk range for the box:
 	int MinChunkX = FloorC(a_Box.GetMinX() / cChunkDef::Width);
@@ -1824,7 +1824,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 
 
-bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback)
+bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, const cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	bool res = false;
@@ -1842,7 +1842,7 @@ bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback)
 
 
 
-bool cChunkMap::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback a_Callback)
+bool cChunkMap::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, const cBlockEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1857,7 +1857,7 @@ bool cChunkMap::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEnti
 
 
 
-bool cChunkMap::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback a_Callback)
+bool cChunkMap::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, const cBrewingstandCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1872,7 +1872,7 @@ bool cChunkMap::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewings
 
 
 
-bool cChunkMap::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Callback)
+bool cChunkMap::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, const cChestCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1887,7 +1887,7 @@ bool cChunkMap::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a
 
 
 
-bool cChunkMap::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback a_Callback)
+bool cChunkMap::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, const cDispenserCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1902,7 +1902,7 @@ bool cChunkMap::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCa
 
 
 
-bool cChunkMap::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback a_Callback)
+bool cChunkMap::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, const cDropperCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1917,7 +1917,7 @@ bool cChunkMap::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallba
 
 
 
-bool cChunkMap::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback a_Callback)
+bool cChunkMap::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, const cDropSpenserCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1932,7 +1932,7 @@ bool cChunkMap::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpens
 
 
 
-bool cChunkMap::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback)
+bool cChunkMap::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, const cFurnaceCallback & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
@@ -1947,7 +1947,7 @@ bool cChunkMap::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallba
 
 
 
-bool cChunkMap::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
+bool cChunkMap::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockEntityCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -1965,7 +1965,7 @@ bool cChunkMap::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cB
 
 
 
-bool cChunkMap::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback)
+bool cChunkMap::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBeaconCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -1983,7 +1983,7 @@ bool cChunkMap::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeacon
 
 
 
-bool cChunkMap::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback)
+bool cChunkMap::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBedCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2001,7 +2001,7 @@ bool cChunkMap::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallba
 
 
 
-bool cChunkMap::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback)
+bool cChunkMap::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBrewingstandCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2019,7 +2019,7 @@ bool cChunkMap::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-bool cChunkMap::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback)
+bool cChunkMap::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cChestCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2037,7 +2037,7 @@ bool cChunkMap::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCa
 
 
 
-bool cChunkMap::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback)
+bool cChunkMap::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDispenserCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2055,7 +2055,7 @@ bool cChunkMap::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDis
 
 
 
-bool cChunkMap::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback)
+bool cChunkMap::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDropperCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2073,7 +2073,7 @@ bool cChunkMap::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropp
 
 
 
-bool cChunkMap::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback)
+bool cChunkMap::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDropSpenserCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2091,7 +2091,7 @@ bool cChunkMap::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cD
 
 
 
-bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback)
+bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cFurnaceCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2108,7 +2108,7 @@ bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurna
 
 
 
-bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
+bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cNoteBlockCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2125,7 +2125,7 @@ bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNot
 
 
 
-bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback)
+bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cCommandBlockCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2143,7 +2143,7 @@ bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback)
+bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cMobHeadCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2161,7 +2161,7 @@ bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHe
 
 
 
-bool cChunkMap::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback)
+bool cChunkMap::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cFlowerPotCallback & a_Callback)
 {
 	int ChunkX, ChunkZ;
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
@@ -2399,7 +2399,7 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 
 
 
-bool cChunkMap::ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback)
+bool cChunkMap::ForEachLoadedChunk(const std::function<bool(int, int)> & a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
 	for (const auto & Chunk : m_Chunks)

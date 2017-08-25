@@ -1,4 +1,4 @@
-
+﻿
 // Scoreboard.cpp
 
 // Implementation of a scoreboard that keeps track of specified objectives
@@ -487,7 +487,7 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 
 
-bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback a_Callback)
+bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, const cObjectiveCallback & a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -509,7 +509,7 @@ bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallb
 
 
 
-bool cScoreboard::ForEachObjective(cObjectiveCallback a_Callback)
+bool cScoreboard::ForEachObjective(const cObjectiveCallback & a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -528,7 +528,7 @@ bool cScoreboard::ForEachObjective(cObjectiveCallback a_Callback)
 
 
 
-bool cScoreboard::ForEachTeam(cTeamCallback a_Callback)
+bool cScoreboard::ForEachTeam(const cTeamCallback & a_Callback)
 {
 	cCSLock Lock(m_CSTeams);
 

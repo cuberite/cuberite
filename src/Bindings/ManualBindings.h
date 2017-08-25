@@ -57,7 +57,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*DoWithFn)(const AString &, cFunctionRef<bool(Ty2 &)>)
+		bool (Ty1::*DoWithFn)(const AString &, const std::function<bool(Ty2 &)> &)
 	>
 	static int DoWith(lua_State * tolua_S)
 	{
@@ -111,7 +111,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*DoWithFn)(const AString &, cFunctionRef<bool(Ty2 &)>)
+		bool (Ty1::*DoWithFn)(const AString &, const std::function<bool(Ty2 &)> &)
 	>
 	static int StaticDoWith(lua_State * tolua_S)
 	{
@@ -159,7 +159,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*DoWithFn)(UInt32, cFunctionRef<bool(Ty2 &)>)
+		bool (Ty1::*DoWithFn)(UInt32, const std::function<bool(Ty2 &)> &)
 	>
 	static int DoWithID(lua_State * tolua_S)
 	{
@@ -209,7 +209,7 @@ public:
 	template <
 		class SELF,
 		class ITEM,
-		bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>)
+		bool (SELF::*DoWithFn)(int, int, int, const std::function<bool(ITEM &)> &)
 	>
 	static int DoWithXYZ(lua_State * tolua_S)
 	{
@@ -262,7 +262,7 @@ public:
 	template <
 		class SELF,
 		class ITEM,
-		bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>),
+		bool (SELF::*DoWithFn)(int, int, int, const std::function<bool(ITEM &)> &),
 		bool (SELF::*CoordCheckFn)(int, int, int) const
 	>
 	static int DoWithXYZ(lua_State * tolua_S)
@@ -321,7 +321,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(int, int, cFunctionRef<bool(Ty2 &)>)
+		bool (Ty1::*ForEachFn)(int, int, const std::function<bool(Ty2 &)> &)
 	>
 	static int ForEachInChunk(lua_State * tolua_S)
 	{
@@ -372,7 +372,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(const cBoundingBox &, cFunctionRef<bool(Ty2 &)>)
+		bool (Ty1::*ForEachFn)(const cBoundingBox &, const std::function<bool(Ty2 &)> &)
 	>
 	static int ForEachInBox(lua_State * tolua_S)
 	{
@@ -430,7 +430,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(cFunctionRef<bool(Ty2 &)>)
+		bool (Ty1::*ForEachFn)(const std::function<bool(Ty2 &)> &)
 	>
 	static int ForEach(lua_State * tolua_S)
 	{
@@ -479,7 +479,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(cFunctionRef<bool(Ty2 &)>)
+		bool (Ty1::*ForEachFn)(const std::function<bool(Ty2 &)> &)
 	>
 	static int StaticForEach(lua_State * tolua_S)
 	{

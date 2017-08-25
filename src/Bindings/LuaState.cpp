@@ -1,4 +1,4 @@
-
+﻿
 // LuaState.cpp
 
 // Implements the cLuaState class representing the wrapper over lua_State *, provides associated helper functions
@@ -379,7 +379,7 @@ cLuaState::cStackTable::cStackTable(cLuaState & a_LuaState, int a_StackPos):
 
 
 
-void cLuaState::cStackTable::ForEachArrayElement(cFunctionRef<bool(cLuaState & a_LuaState, int a_Index)> a_ElementCallback) const
+void cLuaState::cStackTable::ForEachArrayElement(std::function<bool(cLuaState & a_LuaState, int a_Index)> a_ElementCallback) const
 {
 	auto numElements = luaL_getn(m_LuaState, m_StackPos);
 	#ifdef _DEBUG
@@ -404,7 +404,7 @@ void cLuaState::cStackTable::ForEachArrayElement(cFunctionRef<bool(cLuaState & a
 
 
 
-void cLuaState::cStackTable::ForEachElement(cFunctionRef<bool(cLuaState & a_LuaState)> a_ElementCallback) const
+void cLuaState::cStackTable::ForEachElement(std::function<bool(cLuaState & a_LuaState)> a_ElementCallback) const
 {
 	#ifdef _DEBUG
 		auto stackTop = lua_gettop(m_LuaState);

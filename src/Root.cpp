@@ -578,7 +578,7 @@ cWorld * cRoot::GetWorld(const AString & a_WorldName)
 
 
 
-bool cRoot::ForEachWorld(cWorldListCallback a_Callback)
+bool cRoot::ForEachWorld(const cWorldListCallback & a_Callback)
 {
 	for (auto & World : m_WorldsByName)
 	{
@@ -743,7 +743,7 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 
 
 
-bool cRoot::ForEachPlayer(cPlayerListCallback a_Callback)
+bool cRoot::ForEachPlayer(const cPlayerListCallback & a_Callback)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
@@ -760,7 +760,7 @@ bool cRoot::ForEachPlayer(cPlayerListCallback a_Callback)
 
 
 
-bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
+bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, const cPlayerListCallback & a_Callback)
 {
 	class cCallback
 	{
@@ -814,7 +814,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 
 
-bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback)
+bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, const cPlayerListCallback & a_Callback)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end(); ++itr)
 	{
@@ -830,7 +830,7 @@ bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a
 
 
 
-bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
+bool cRoot::DoWithPlayer(const AString & a_PlayerName, const cPlayerListCallback & a_Callback)
 {
 	for (auto World : m_WorldsByName)
 	{

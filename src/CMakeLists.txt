@@ -112,7 +112,6 @@ SET (HDRS
 	FastRandom.h
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
-	FunctionRef.h
 	Globals.h
 	IniFile.h
 	Inventory.h

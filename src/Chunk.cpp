@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #ifndef _WIN32
@@ -2114,7 +2114,7 @@ bool cChunk::HasEntity(UInt32 a_EntityID)
 
 
 
-bool cChunk::ForEachEntity(cEntityCallback a_Callback)
+bool cChunk::ForEachEntity(const cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (const auto & Entity : m_Entities)
@@ -2131,7 +2131,7 @@ bool cChunk::ForEachEntity(cEntityCallback a_Callback)
 
 
 
-bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback)
+bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, const cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (const auto & Entity : m_Entities)
@@ -2158,7 +2158,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Ca
 
 
 
-bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, bool & a_CallbackResult)
+bool cChunk::DoWithEntityByID(UInt32 a_EntityID, const cEntityCallback & a_Callback, bool & a_CallbackResult)
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (const auto & Entity : m_Entities)
@@ -2177,7 +2177,7 @@ bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, boo
 
 
 template <class tyEntity, BLOCKTYPE... tBlocktype>
-bool cChunk::GenericForEachBlockEntity(cFunctionRef<bool(tyEntity &)> a_Callback)
+bool cChunk::GenericForEachBlockEntity(const std::function<bool(tyEntity &)> & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
 	for (auto & KeyPair : m_BlockEntities)
@@ -2201,7 +2201,7 @@ bool cChunk::GenericForEachBlockEntity(cFunctionRef<bool(tyEntity &)> a_Callback
 
 
 
-bool cChunk::ForEachBlockEntity(cBlockEntityCallback a_Callback)
+bool cChunk::ForEachBlockEntity(const cBlockEntityCallback & a_Callback)
 {
 	return GenericForEachBlockEntity<cBlockEntity>(a_Callback);
 }
@@ -2210,7 +2210,7 @@ bool cChunk::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 
 
 
-bool cChunk::ForEachBrewingstand(cBrewingstandCallback a_Callback)
+bool cChunk::ForEachBrewingstand(const cBrewingstandCallback & a_Callback)
 {
 	return GenericForEachBlockEntity<cBrewingstandEntity,
 		E_BLOCK_BREWING_STAND
@@ -2221,7 +2221,7 @@ bool cChunk::ForEachBrewingstand(cBrewingstandCallback a_Callback)
 
 
 
-bool cChunk::ForEachChest(cChestCallback a_Callback)
+bool cChunk::ForEachChest(const cChestCallback & a_Callback)
 {
 	return GenericForEachBlockEntity<cChestEntity,
 		E_BLOCK_CHEST
@@ -2232,7 +2232,7 @@ bool cChunk::ForEachChest(cChestCallback a_Callback)
 
 
 
-bool cChunk::ForEachDispenser(cDispenserCallback a_Callback)
+bool cChunk::ForEachDispenser(const cDispenserCallback & a_Callback)
 {
 	return GenericForEachBlockEntity<cDispenserEntity,
 		E_BLOCK_DISPENSER
@@ -2243,7 +2243,7 @@ bool cChunk::ForEachDispenser(cDispenserCallback a_Callback)
 
 
 
-bool cChunk::ForEachDropper(cDropperCallback a_Callback)
+bool cChunk::ForEachDropper(const cDropperCallback & a_Callback)
 {
 	return GenericForEachBlockEntity<cDropperEntity,
 		E_BLOCK_DROPPER
@@ -2254,7 +2254,7 @@ bool cChunk::ForEachDropper(cDropperCallback a_Callback)
 
 
 
-bool cChunk::ForEachDropSpenser(cDropSpenserCallback a_Callback)
+bool cChunk::ForEachDropSpenser(const cDropSpenserCallback & a_Callback)
 {
 	return GenericForEachBlockEntity<cDropSpenserEntity,
 		E_BLOCK_DISPENSER,
@@ -2266,7 +2266,7 @@ bool cChunk::ForEachDropSpenser(cDropSpenserCallback a_Callback)
 
 
 
-bool cChunk::ForEachFurnace(cFurnaceCallback a_Callback)
+bool cChunk::ForEachFurnace(const cFurnaceCallback & a_Callback)
 {
 	return GenericForEachBlockEntity<cFurnaceEntity,
 		E_BLOCK_FURNACE,
@@ -2279,7 +2279,7 @@ bool cChunk::ForEachFurnace(cFurnaceCallback a_Callback)
 
 
 template <class tyEntity, BLOCKTYPE... tBlocktype>
-bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFunctionRef<bool(tyEntity &)> a_Callback)
+bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, const std::function<bool(tyEntity &)> & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
 	cBlockEntity * Block = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
@@ -2301,7 +2301,7 @@ bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ
 
 
 
-bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
+bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockEntityCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBlockEntity>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
@@ -2309,7 +2309,7 @@ bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 
 
-bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback)
+bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBeaconCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBeaconEntity,
 		E_BLOCK_BEACON
@@ -2319,7 +2319,7 @@ bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 
 
 
-bool cChunk::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback)
+bool cChunk::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBedCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBedEntity,
 		E_BLOCK_BED
@@ -2329,7 +2329,7 @@ bool cChunk::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback 
 
 
 
-bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback)
+bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cBrewingstandCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBrewingstandEntity,
 		E_BLOCK_BREWING_STAND
@@ -2340,7 +2340,7 @@ bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBre
 
 
 
-bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback)
+bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cChestCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cChestEntity,
 		E_BLOCK_CHEST,
@@ -2352,7 +2352,7 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 
 
 
-bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback)
+bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDispenserCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cDispenserEntity,
 		E_BLOCK_DISPENSER
@@ -2363,7 +2363,7 @@ bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispen
 
 
 
-bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback)
+bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDropperCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cDropperEntity,
 		E_BLOCK_DROPPER
@@ -2374,7 +2374,7 @@ bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperC
 
 
 
-bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback)
+bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cDropSpenserCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cDropSpenserEntity,
 		E_BLOCK_DISPENSER,
@@ -2386,7 +2386,7 @@ bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDrop
 
 
 
-bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback)
+bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cFurnaceCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cFurnaceEntity,
 		E_BLOCK_FURNACE,
@@ -2398,7 +2398,7 @@ bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 
 
 
-bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
+bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cNoteBlockCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cNoteEntity,
 		E_BLOCK_NOTE_BLOCK
@@ -2409,7 +2409,7 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 
 
 
-bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback)
+bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cCommandBlockCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cCommandBlockEntity,
 		E_BLOCK_COMMAND_BLOCK
@@ -2420,7 +2420,7 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 
 
 
-bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback)
+bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cMobHeadCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cMobHeadEntity,
 		E_BLOCK_HEAD
@@ -2431,7 +2431,7 @@ bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 
 
 
-bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback)
+bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cFlowerPotCallback & a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cFlowerPotEntity,
 		E_BLOCK_FLOWER_POT
