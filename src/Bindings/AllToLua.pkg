@@ -17,13 +17,15 @@ inheritance doesn't work properly (#1789).
 $#include "../Globals.h"
 
 // Typedefs from Globals.h, so that we don't have to process that file:
-typedef long long Int64;
-typedef int       Int32;
-typedef short     Int16;
+typedef signed long long Int64;
+typedef signed int       Int32;
+typedef signed short     Int16;
+typedef signed char      Int8;
 
 typedef unsigned long long UInt64;
 typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
+typedef unsigned char      UInt8;
 
 
 $cfile "../Vector3.h"
@@ -69,6 +71,7 @@ $cfile "../MapManager.h"
 $cfile "../Scoreboard.h"
 $cfile "../Statistics.h"
 $cfile "../Protocol/MojangAPI.h"
+$cfile "../UUID.h"
 
 // Entities:
 $cfile "../Entities/Entity.h"

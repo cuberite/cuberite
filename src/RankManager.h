@@ -14,7 +14,7 @@
 
 
 
-
+class cUUID;
 class cMojangAPI;
 
 
@@ -58,22 +58,22 @@ public:
 
 	/** Returns the name of the rank that the specified player has assigned to them.
 	If the player has no rank assigned, returns an empty string (NOT the default rank). */
-	AString GetPlayerRankName(const AString & a_PlayerUUID);
+	AString GetPlayerRankName(const cUUID & a_PlayerUUID);
 
 	/** Returns the last name that the specified player has.
 	An empty string is returned if the player isn't in the database. */
-	AString GetPlayerName(const AString & a_PlayerUUID);
+	AString GetPlayerName(const cUUID & a_PlayerUUID);
 
 	/** Returns the names of Groups that the specified player has assigned to them. */
-	AStringVector GetPlayerGroups(const AString & a_PlayerUUID);
+	AStringVector GetPlayerGroups(const cUUID & a_PlayerUUID);
 
 	/** Returns the permissions that the specified player has assigned to them.
 	If the player has no rank assigned to them, returns the default rank's permissions. */
-	AStringVector GetPlayerPermissions(const AString & a_PlayerUUID);
+	AStringVector GetPlayerPermissions(const cUUID & a_PlayerUUID);
 
 	/** Returns the restrictions that the specified player has assigned to them.
 	If the player has no rank assigned to them, returns the default rank's restrictions. */
-	AStringVector GetPlayerRestrictions(const AString & a_PlayerUUID);
+	AStringVector GetPlayerRestrictions(const cUUID & a_PlayerUUID);
 
 	/** Returns the names of groups that the specified rank has assigned to it.
 	Returns an empty vector if the rank doesn't exist. */
@@ -95,8 +95,8 @@ public:
 	Returns an empty vector if the rank doesn't exist. Any non-existent groups are ignored. */
 	AStringVector GetRankRestrictions(const AString & a_RankName);
 
-	/** Returns the short uuids of all defined players. The returned players are ordered by their name (NOT their UUIDs). */
-	AStringVector GetAllPlayerUUIDs(void);
+	/** Returns the uuids of all defined players. The returned players are ordered by their name (NOT their UUIDs). */
+	std::vector<cUUID> GetAllPlayerUUIDs(void);
 
 	/** Returns the names of all defined ranks. */
 	AStringVector GetAllRanks(void);
@@ -116,7 +116,7 @@ public:
 	/** Returns the message visuals (prefix, postfix, color) for the specified player.
 	Returns true if the visuals were read from the DB, false if not (player not found etc). */
 	bool GetPlayerMsgVisuals(
-		const AString & a_PlayerUUID,
+		const cUUID & a_PlayerUUID,
 		AString & a_MsgPrefix,
 		AString & a_MsgSuffix,
 		AString & a_MsgNameColorCode
@@ -199,13 +199,13 @@ public:
 	Note that this doesn't change the cPlayer if the player is already connected, you need to update all the
 	cPlayer instances manually.
 	The PlayerName is provided for reference, so that GetRankPlayerNames() can work. */
-	void SetPlayerRank(const AString & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName);
+	void SetPlayerRank(const cUUID & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName);
 
 	/** Removes the player's rank assignment. The player is left without a rank.
 	Note that this doesn't change the cPlayer instances for the already connected players, you need to update
 	all the instances manually.
 	No action if the player has no rank assigned to them already. */
-	void RemovePlayerRank(const AString & a_PlayerUUID);
+	void RemovePlayerRank(const cUUID & a_PlayerUUID);
 
 	/** Sets the message visuals of an existing rank. No action if the rank name is not found. */
 	void SetRankVisuals(
@@ -231,7 +231,7 @@ public:
 	bool GroupExists(const AString & a_GroupName);
 
 	/** Returns true iff the specified player has a rank assigned to them in the DB. */
-	bool IsPlayerRankSet(const AString & a_PlayerUUID);
+	bool IsPlayerRankSet(const cUUID & a_PlayerUUID);
 
 	/** Returns true iff the specified rank contains the specified group. */
 	bool IsGroupInRank(const AString & a_GroupName, const AString & a_RankName);
@@ -243,7 +243,7 @@ public:
 	bool IsRestrictionInGroup(const AString & a_Restriction, const AString & a_GroupName);
 
 	/** Called by cMojangAPI whenever the playername-uuid pairing is discovered. Updates the DB. */
-	void NotifyNameUUID(const AString & a_PlayerName, const AString & a_UUID);
+	void NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UUID);
 
 	/** Sets the specified rank as the default rank.
 	Returns true on success, false on failure (rank not found). */
@@ -257,7 +257,7 @@ public:
 	void ClearPlayerRanks(void);
 
 	/** Updates the playername that is saved with this uuid. Returns false if a error occurred */
-	bool UpdatePlayerName(const AString & a_PlayerUUID, const AString & a_NewPlayerName);
+	bool UpdatePlayerName(const cUUID & a_PlayerUUID, const AString & a_NewPlayerName);
 
 protected:
 

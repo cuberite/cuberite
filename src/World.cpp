@@ -10,6 +10,7 @@
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
 #include "LineBlockTracer.h"
+#include "UUID.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -3280,7 +3281,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 
 
-bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback)
 {
 	return DoWithPlayerByUUID(a_PlayerUUID, std::bind(&cPlayerListCallback::Item, &a_Callback, std::placeholders::_1));
 }
@@ -3289,7 +3290,7 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallbac
 
 
 
-bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallback a_Callback)
+bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cLambdaPlayerCallback a_Callback)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)

@@ -17,6 +17,10 @@
 class cByteBuffer;
 
 
+// fwd:
+class cUUID;
+
+
 
 
 
@@ -134,7 +138,7 @@ public:
 	void WriteFPInt(double a_Value);
 
 	/** Writes the specified UUID as a 128-bit BigEndian integer. */
-	void WriteUUID(const AString & a_UUID);
+	void WriteUUID(const cUUID & a_UUID);
 
 	UInt32 GetPacketType(void) const { return m_PacketType; }
 

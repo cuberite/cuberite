@@ -54,7 +54,8 @@ void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 {
 	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
 	{
-		m_OwnerName = m_OwnerUUID = m_OwnerTexture = m_OwnerTextureSignature = "";
+		m_OwnerName = m_OwnerTexture = m_OwnerTextureSignature = "";
+		m_OwnerUUID = cUUID{};
 	}
 	m_Type = a_Type;
 	m_World->BroadcastBlockEntity(m_PosX, m_PosY, m_PosZ);
@@ -102,7 +103,7 @@ void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 
 
 
-void cMobHeadEntity::SetOwner(const AString & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature)
+void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature)
 {
 	if (m_Type != SKULL_TYPE_PLAYER)
 	{

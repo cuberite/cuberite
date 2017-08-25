@@ -50,6 +50,7 @@ class cCompositeChat;
 class cSetChunkData;
 class cBroadcaster;
 class cDeadlockDetect;
+class cUUID;
 
 typedef std::list< cPlayer * > cPlayerList;
 typedef std::list< std::pair< std::unique_ptr<cPlayer>, cWorld * > > cAwaitingPlayerList;
@@ -289,8 +290,8 @@ public:
 	cPlayer * FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 
 	/** Finds the player over his uuid and calls the callback */
-	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
-	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallback a_Callback);  // Lambda version
+	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cLambdaPlayerCallback a_Callback);  // Lambda version
 
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
@@ -550,7 +551,7 @@ public:
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
-	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback);  // Exported in ManualBindings.cpp
+	virtual bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback) override;  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
 	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback);  // Lua-acessible

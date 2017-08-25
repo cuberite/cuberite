@@ -1363,17 +1363,17 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
 	)
 	{
-		int MobHeight = FloorC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
+		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
 		if (MobHeight >= cChunkDef::Height)
 		{
 			return true;
 		}
-		// Start with the highest block and scan down to the mob's head.
+		// Start with the highest block and scan down to just above the mob's head.
 		// If a non transparent is found, return false (do not burn). Otherwise return true.
 		// Note that this loop is not a performance concern as transparent blocks are rare and the loop almost always bailes out
 		// instantly.(An exception is e.g. standing under a long column of glass).
 		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
-		while (CurrentBlock >= MobHeight)
+		while (CurrentBlock > MobHeight)
 		{
 			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
 			if (

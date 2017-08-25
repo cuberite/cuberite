@@ -6,6 +6,7 @@
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../UUID.h"
 
 #include "../IniFile.h"
 #include "json/json.h"
@@ -119,11 +120,11 @@ void cAuthenticator::Execute(void)
 		Lock.Unlock();
 
 		AString NewUserName = UserName;
-		AString UUID;
+		cUUID UUID;
 		Json::Value Properties;
 		if (AuthWithYggdrasil(NewUserName, ServerID, UUID, Properties))
 		{
-			LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.c_str());
+			LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.ToShortString().c_str());
 			cRoot::Get()->AuthenticateUser(ClientID, NewUserName, UUID, Properties);
 		}
 		else
@@ -137,7 +138,7 @@ void cAuthenticator::Execute(void)
 
 
 
-bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID, Json::Value & a_Properties)
+bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties)
 {
 	LOGD("Trying to authenticate user %s", a_UserName.c_str());
 
@@ -192,8 +193,12 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		return false;
 	}
 	a_UserName = root.get("name", "Unknown").asString();
-	a_UUID = cMojangAPI::MakeUUIDShort(root.get("id", "").asString());
 	a_Properties = root["properties"];
+	if (!a_UUID.FromString(root.get("id", "").asString()))
+	{
+		LOGWARNING("cAuthenticator: Recieved invalid UUID format");
+		return false;
+	}
 
 	// Store the player's profile in the MojangAPI caches:
 	cRoot::Get()->GetMojangAPI().AddPlayerProfile(a_UserName, a_UUID, a_Properties);
