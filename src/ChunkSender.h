@@ -51,7 +51,7 @@ class cChunkSender;
 
 class cChunkSender:
 	public cIsThread,
-	public cChunkDataSeparateCollector
+	public cChunkDataCopyCollector
 {
 	typedef cIsThread super;
 public:

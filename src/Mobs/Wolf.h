@@ -2,6 +2,7 @@
 #pragma once
 
 #include "PassiveAggressiveMonster.h"
+#include "../UUID.h"
 
 
 class cEntity;
@@ -31,7 +32,7 @@ public:
 	bool    IsBegging     (void) const { return m_IsBegging; }
 	bool    IsAngry       (void) const { return m_IsAngry; }
 	AString GetOwnerName  (void) const { return m_OwnerName; }
-	AString GetOwnerUUID  (void) const { return m_OwnerUUID; }
+	cUUID   GetOwnerUUID  (void) const { return m_OwnerUUID; }
 	int     GetCollarColor(void) const { return m_CollarColor; }
 
 	// Set functions
@@ -40,7 +41,7 @@ public:
 	void SetIsBegging  (bool a_IsBegging)   { m_IsBegging = a_IsBegging; }
 	void SetIsAngry    (bool a_IsAngry)     { m_IsAngry = a_IsAngry; }
 	void SetCollarColor(int a_CollarColor)  { m_CollarColor = a_CollarColor; }
-	void SetOwner      (const AString & a_NewOwnerName, const AString & a_NewOwnerUUID)
+	void SetOwner      (const AString & a_NewOwnerName, const cUUID & a_NewOwnerUUID)
 	{
 		m_OwnerName = a_NewOwnerName;
 		m_OwnerUUID = a_NewOwnerUUID;
@@ -48,12 +49,12 @@ public:
 
 	/** Notfies the wolf of a nearby fight.
 	The wolf may then decide to attack a_Opponent.
-	If a_IsPlayer is true, then the player whose ID is a_PlayerID is fighting a_Opponent
-	If false, then a wolf owned by the player whose ID is a_PlayerID is fighting a_Opponent
-	@param a_PlayerID The ID of the fighting player, or the ID of the owner whose wolf is fighting.
+	If a_IsPlayerInvolved is true, then the player whose UUID is a_PlayerUUID is fighting a_Opponent
+	If false, then a wolf owned by the player whose UUID is a_PlayerUUID is fighting a_Opponent
+	@param a_PlayerUUID The UUID of the fighting player, or the UUID of the owner whose wolf is fighting.
 	@param a_Opponent The opponent who is being faught.
 	@param a_IsPlayerInvolved Whether the fighter a player or a wolf. */
-	void ReceiveNearbyFightInfo(AString a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
+	void ReceiveNearbyFightInfo(const cUUID & a_PlayerUUID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
@@ -64,7 +65,7 @@ protected:
 	bool    m_IsBegging;
 	bool    m_IsAngry;
 	AString m_OwnerName;
-	AString m_OwnerUUID;
+	cUUID   m_OwnerUUID;
 	int     m_CollarColor;
 	int     m_NotificationCooldown;
 } ;

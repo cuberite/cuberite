@@ -1,4 +1,5 @@
-Cuberite [![Build Status](https://img.shields.io/travis/cuberite/cuberite/master.svg?style=flat)](https://travis-ci.org/cuberite/cuberite) [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/1930.svg)](https://scan.coverity.com/projects/1930)
+Cuberite [![Build Status](https://img.shields.io/travis/cuberite/cuberite/master.svg?style=flat)](https://travis-ci.org/cuberite/cuberite) [![Circle CI Build Status](https://circleci.com/gh/cuberite/cuberite.svg?&style=shield
+)](https://circleci.com/gh/cuberite/cuberite) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/cuberite/cuberite?svg=true)](https://ci.appveyor.com/project/madmaxoft/mcserver)
 ========
 
 Cuberite is a Minecraft-compatible multiplayer game server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API. Cuberite is compatible with the vanilla Minecraft client.
@@ -7,58 +8,76 @@ Cuberite can run on Windows, *nix and Android operating systems. This includes A
 
 We currently support Release 1.8 - 1.12.1 Minecraft protocol versions.
 
-Subscribe to [the newsletter](https://cuberite.org/news/#subscribe) for important updates and project news.
+Subscribe to [the newsletter][1] for important updates and project news.
 
 Installation
 ------------
 
 There are several ways to obtain Cuberite.
 
-#### Binaries
+### Binaries
 
-- The easiest method is downloading for Windows or Linux from the [Project site](https://cuberite.org/).
-- You can use the EasyInstall script for Linux and macOS, which automatically downloads the correct binary. The script is described below.
-- You can also obtain a binary from the [buildserver archive](https://builds.cuberite.org/).
+ - The easiest method is downloading for Windows or Linux from the [website][2].
+ - You can use the EasyInstall script for Linux and macOS, which automatically downloads the correct binary. The script is described below.
+ - You can also obtain a binary from the [buildserver archive][3].
 
-##### The EasyInstall script
+#### The EasyInstall script
 
 This script will download the correct binary from the project site.
 
     curl -sSfL https://download.cuberite.org | sh
 
-#### Compiling
+### Compiling
 
-- You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
-- You can also compile manually. See [COMPILING.md](https://github.com/cuberite/cuberite/blob/master/COMPILING.md).
+ - You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
+ - You can also compile manually. See [COMPILING.md][4].
 
 Compiling may provide better performance (1.5-3x as fast) and it supports more operating systems.
 
-##### The compile.sh script
+#### The compile.sh script
+
 This script downloads the source code and compiles it. The script is smart enough to notify you of missing dependencies and instructing you on how to install them. The script doesn't work for Windows.
 
     sh -c "$(wget -O - https://compile.cuberite.org)"
 
-#### Hosted services
+### Hosted services
 
-- Hosted Cuberite is available via [Gamocosm](https://gamocosm.com/).
+ - Hosted Cuberite is available via [Gamocosm][5].
 
 Contributing
 ------------
 
 Cuberite is licensed under the Apache License V2, and we welcome anybody to fork and submit a Pull Request back with their changes, and if you want to join as a permanent member we can add you to the team.
 
-Cuberite is developed in C++ and Lua. To contribute code, please check out [GETTING-STARTED.md](https://github.com/cuberite/cuberite/blob/master/GETTING-STARTED.md) and [CONTRIBUTING.md](https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md) for more details.
+Cuberite is developed in C++ and Lua. To contribute code, please check out [GETTING-STARTED.md][6] and [CONTRIBUTING.md][7] for more details.
 
-Plugins are written in Lua. You can contribute by developing plugins and submitting them to [the forum](https://forum.cuberite.org/forum-2.html). Please check out our [plugin introduction guide](http://api-docs.cuberite.org/Writing-a-Cuberite-plugin.html) for more info.
+Plugins are written in Lua. You can contribute by developing plugins and submitting them to the [plugin repository][8] or the [forum][9]. Please check out our [plugin introduction guide][10] for more info.
 
-If you are not a programmer, you can help by testing Cuberite and reporting bugs. See [TESTING.md](https://github.com/cuberite/cuberite/blob/master/TESTING.md) for details.
+If you are not a programmer, you can help by testing Cuberite and reporting bugs. See [TESTING.md][11] for details.
 
-You can also help with documentation by contributing to the [User's Manual](https://github.com/cuberite/users-manual).
+You can also help with documentation by contributing to the [User's Manual][12].
 
 Other Stuff
 -----------
 
-For other stuff, check out the [homepage](https://cuberite.org/), the [Users' Manual](https://book.cuberite.org/),
-the [forums](https://forum.cuberite.org/), and the [Plugin API](https://api.cuberite.org/).
+For other stuff, check out the [homepage][13], the [Users' Manual][14], the [forums][15], and the [Plugin API][16].
 
-[Support Us on Bountysource](https://bountysource.com/teams/cuberite)
+[Support Us on Bountysource][17]
+
+[1]: https://cuberite.org/news/#subscribe
+[2]: https://cuberite.org/
+[3]: https://builds.cuberite.org/
+[4]: https://github.com/cuberite/cuberite/blob/master/COMPILING.md
+[5]: https://gamocosm.com/
+[6]: https://github.com/cuberite/cuberite/blob/master/GETTING-STARTED.md
+[7]: https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md
+[8]: https://plugins.cuberite.org/
+[9]: https://forum.cuberite.org/forum-2.html
+[10]: https://api.cuberite.org/Writing-a-Cuberite-plugin.html
+[11]: https://github.com/cuberite/cuberite/blob/master/TESTING.md
+[12]: https://github.com/cuberite/users-manual
+[13]: https://cuberite.org/
+[14]: https://book.cuberite.org/
+[15]: https://forum.cuberite.org/
+[16]: https://api.cuberite.org/
+[17]: https://bountysource.com/teams/cuberite

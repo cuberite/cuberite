@@ -20,6 +20,7 @@ extern "C"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../DeadlockDetect.h"
+#include "../UUID.h"
 
 
 
@@ -993,6 +994,7 @@ void cLuaState::Push(cEntity * a_Entity)
 			case cEntity::etExpOrb:
 			case cEntity::etItemFrame:
 			case cEntity::etPainting:
+			case cEntity::etLeashKnot:
 			{
 				// Push the generic entity class type:
 				tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
@@ -1135,6 +1137,37 @@ bool cLuaState::GetStackValue(int a_StackPos, AStringMap & a_Value)
 			if (a_LuaState.GetStackValues(-2, key, val))
 			{
 				a_Value[key] = val;
+			}
+			else
+			{
+				isValid = false;
+				return true;
+			}
+			return false;
+		}
+	);
+	return isValid;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, AStringVector & a_Value)
+{
+	// Retrieve all values in an array of string table:
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	cStackTable tbl(*this, a_StackPos);
+	bool isValid = true;
+	tbl.ForEachArrayElement([&](cLuaState & a_LuaState, int a_Index)
+		{
+			AString tempStr;
+			if (a_LuaState.GetStackValue(-1, tempStr))
+			{
+				a_Value.push_back(std::move(tempStr));
 			}
 			else
 			{
@@ -1372,6 +1405,40 @@ bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cUUID & a_Value)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	tolua_Error tolua_Err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cUUID", 0, &tolua_Err))
+	{
+		// Found a cUUID, copy into output value
+		cUUID * PtrUUID = nullptr;
+		GetStackValue(a_StackPos, PtrUUID);
+		if (PtrUUID == nullptr)
+		{
+			return false;
+		}
+		a_Value = *PtrUUID;
+		return true;
+	}
+
+	// Try to get a string and parse as a UUID into the output
+	AString StrUUID;
+	if (!GetStackValue(a_StackPos, StrUUID))
+	{
+		return false;
+	}
+	return a_Value.FromString(StrUUID);
 }
 
 
@@ -1746,6 +1813,47 @@ bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 	}  // for i - Param
 
 	// All params checked ok
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CheckParamUUID(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+
+	cUUID tempUUID;
+	AString tempStr;
+	// Accept either a cUUID or a string that contains a valid UUID
+	for (int i = a_StartParam; i <= a_EndParam; ++i)
+	{
+		tolua_Error err;
+		if (tolua_isusertype(m_LuaState, i, "cUUID", 0, &err) && !lua_isnil(m_LuaState, i))
+		{
+			continue;
+		}
+
+		if (!tolua_iscppstring(m_LuaState, i, 0, &err))
+		{
+			ApiParamError("Failed to read parameter #%d. UUID expected, got %s", i, GetTypeText(i).c_str());
+			return false;
+		}
+
+		// Check string is a valid UUID
+		GetStackValue(i, tempStr);
+		if (!tempUUID.FromString(tempStr))
+		{
+			ApiParamError("Failed to read parameter #%d. UUID expected, got non-UUID string:\n\t\"%s\"", i, tempStr.c_str());
+			return false;
+		}
+	}
 	return true;
 }
 

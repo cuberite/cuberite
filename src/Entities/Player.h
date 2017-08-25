@@ -8,6 +8,8 @@
 
 #include "../Statistics.h"
 
+#include "../UUID.h"
+
 
 
 
@@ -41,7 +43,7 @@ public:
 
 	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
 
-	virtual bool Initialize(cWorld & a_World) override;
+	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_World) override;
 
 	virtual ~cPlayer() override;
 
@@ -97,12 +99,12 @@ public:
 	float GetXpPercentage(void);
 
 	/** Calculates the amount of XP needed for a given level
-	Ref: http://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.gamepedia.com/XP
 	*/
 	static int XpForLevel(int a_Level);
 
 	/** Inverse of XpForLevel
-	Ref: http://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.gamepedia.com/XP
 	values are as per this with pre-calculations
 	*/
 	static int CalcLevelFromXp(int a_CurrentXp);
@@ -488,13 +490,13 @@ public:
 	/** Whether placing the given blocks would intersect any entitiy */
 	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
 
+	/** Returns the UUID that has been read from the client, or nil if not available. */
+	const cUUID & GetUUID(void) const { return m_UUID; }  // Exported in ManualBindings.cpp
+
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
-
-	/** Returns the UUID (short format) that has been read from the client, or empty string if not available. */
-	const AString & GetUUID(void) const { return m_UUID; }
 
 	/** (Re)loads the rank and permissions from the cRankManager.
 	Expects the m_UUID member to be valid.
@@ -694,9 +696,9 @@ protected:
 	*/
 	bool m_bIsTeleporting;
 
-	/** The short UUID (no dashes) of the player, as read from the ClientHandle.
-	If no ClientHandle is given, the UUID is initialized to empty. */
-	AString m_UUID;
+	/** The UUID of the player, as read from the ClientHandle.
+	If no ClientHandle is given, the UUID is nil. */
+	cUUID m_UUID;
 
 	AString m_CustomName;
 
@@ -731,7 +733,7 @@ protected:
 
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
-	AString GetUUIDFileName(const AString & a_UUID);
+	AString GetUUIDFileName(const cUUID & a_UUID);
 
 private:
 

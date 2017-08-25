@@ -109,6 +109,7 @@ set(BINDING_DEPENDENCIES
 	../Entities/GhastFireballEntity.h
 	../Entities/HangingEntity.h
 	../Entities/ItemFrame.h
+	../Entities/LeashKnot.h
 	../Entities/Pawn.h
 	../Entities/Player.h
 	../Entities/Painting.h
@@ -138,6 +139,7 @@ set(BINDING_DEPENDENCIES
 	../StringUtils.h
 	../Tracer.h
 	../UI/Window.h
+	../UUID.h
 	../Vector3.h
 	../WebAdmin.h
 	../World.h

@@ -60,11 +60,11 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 				Pos.x, Pos.y, Pos.z, ItemTypeToString(BlockType).c_str(), ItemTypeToString(BlockBelow).c_str()
 			);
 			*/
-			cFallingBlock * FallingBlock = new cFallingBlock(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
-			if (!FallingBlock->Initialize(m_World))
+
+			auto FallingBlock = cpp14::make_unique<cFallingBlock>(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
+			auto FallingBlockPtr = FallingBlock.get();
+			if (!FallingBlockPtr->Initialize(std::move(FallingBlock), m_World))
 			{
-				delete FallingBlock;
-				FallingBlock = nullptr;
 				continue;
 			}
 			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);

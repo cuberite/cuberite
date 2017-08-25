@@ -275,6 +275,35 @@ void cChunkMap::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & 
 
 
 
+void cChunkMap::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	cCSLock Lock(m_CSChunks);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkZ());
+	if (Chunk == nullptr)
+	{
+		return;
+	}
+	Chunk->BroadcastLeashEntity(a_Entity, a_EntityLeashedTo);
+}
+
+
+
+
+
+void cChunkMap::BroadcastUnleashEntity(const cEntity & a_Entity)
+{
+	cCSLock Lock(m_CSChunks);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkZ());
+	if (Chunk == nullptr)
+	{
+		return;
+	}
+	Chunk->BroadcastUnleashEntity(a_Entity);
+}
+
+
+
+
 
 void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
@@ -1495,38 +1524,38 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cChunkMap::AddEntity(cEntity * a_Entity)
+void cChunkMap::AddEntity(OwnedEntity a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 	if (Chunk == nullptr)  // This will assert inside GetChunk in Debug builds
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
+			static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
 		return;
 	}
-	Chunk->AddEntity(a_Entity);
+	Chunk->AddEntity(std::move(a_Entity));
 }
 
 
 
 
 
-void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
+void cChunkMap::AddEntityIfNotPresent(OwnedEntity a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
 	cChunkPtr Chunk = GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 	if (Chunk == nullptr)  // This will assert inside GetChunk in Debug builds
 	{
 		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			static_cast<void *>(a_Entity), a_Entity->GetClass(), a_Entity->GetUniqueID()
+			static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
 		return;
 	}
 	if (!Chunk->HasEntity(a_Entity->GetUniqueID()))
 	{
-		Chunk->AddEntity(a_Entity);
+		Chunk->AddEntity(std::move(a_Entity));
 	}
 }
 
@@ -1551,17 +1580,18 @@ bool cChunkMap::HasEntity(UInt32 a_UniqueID)
 
 
 
-void cChunkMap::RemoveEntity(cEntity * a_Entity)
+OwnedEntity cChunkMap::RemoveEntity(cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = a_Entity->GetParentChunk();
+	cChunkPtr Chunk = a_Entity.GetParentChunk();
 
-	// Even if a chunk is not valid, it may still contain entities such as players; make sure to remove them (#1190)
 	if (Chunk == nullptr)
 	{
-		return;
+		return nullptr;
 	}
-	Chunk->RemoveEntity(a_Entity);
+
+	// Remove the entity no matter whether the chunk itself is valid or not (#1190)
+	return Chunk->RemoveEntity(a_Entity);
 }
 
 

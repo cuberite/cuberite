@@ -33,7 +33,7 @@ public:
 	bool DoesAcceptInput(void) const { return m_DoesAcceptInput; }
 
 	/** Converts a raw 160-bit SHA1 digest into a Java Hex representation
-	According to http://wiki.vg/wiki/index.php?title=Protocol_Encryption&oldid=2802
+	According to http://wiki.vg/Protocol_Encryption
 	*/
 	static void DigestToJava(const Checksum & a_Digest, AString & a_JavaOut);
 

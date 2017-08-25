@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "SetChunkData.h"
 #include "BlockEntities/BlockEntity.h"
+#include "Entities/Entity.h"
 
 
 

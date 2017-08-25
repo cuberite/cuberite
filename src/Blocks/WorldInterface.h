@@ -28,6 +28,8 @@ public:
 
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0;
 
+	virtual bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback) = 0;
+
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) = 0;
 
@@ -52,6 +54,11 @@ public:
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;
+
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true.
+	If any chunk in the box is missing, ignores the entities in that chunk silently. */
+	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback) = 0;
 
 	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
 

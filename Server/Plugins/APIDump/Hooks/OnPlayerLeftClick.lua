@@ -19,7 +19,7 @@ return
 			<p>
 			The client sends the left-click packet for several other occasions, such as dropping the held item
 			(Q keypress) or shooting an arrow. This is reflected in the Status code. Consult the
-			<a href="http://wiki.vg/Protocol#0x0E">protocol documentation</a> for details on the actions.
+			<a href="http://wiki.vg/Protocol#Player_Digging">protocol documentation</a> for details on the actions.
 		]],
 		Params =
 		{

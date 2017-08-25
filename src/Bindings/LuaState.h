@@ -640,6 +640,7 @@ public:
 	// Enum values are checked for their allowed values and fail if the value is not assigned.
 	bool GetStackValue(int a_StackPos, AString & a_Value);
 	bool GetStackValue(int a_StackPos, AStringMap & a_Value);
+	bool GetStackValue(int a_StackPos, AStringVector & a_Value);
 	bool GetStackValue(int a_StackPos, bool & a_Value);
 	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
@@ -658,13 +659,14 @@ public:
 	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);
 	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
+	bool GetStackValue(int a_StackPos, cUUID & a_Value);
 
 	// template to catch all of the various c++ integral types without overload conflicts
 	template <class T>
 	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * unused = nullptr)
 	{
 		UNUSED(unused);
-		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: http://pgl.yoyo.org/luai/i/lua_isnumber
+		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: https://pgl.yoyo.org/luai/i/lua_isnumber
 		{
 			return false;
 		}
@@ -785,6 +787,10 @@ public:
 
 	/** Returns true if the specified parameters on the stack are functions or nils; also logs warning if not */
 	bool CheckParamFunctionOrNil(int a_StartParam, int a_EndParam = -1);
+
+	/** Returns true if the specified parameters on the stack are UUIDs; also logs warning if not
+	Accepts either cUUID instances or strings that contain UUIDs */
+	bool CheckParamUUID(int a_StartParam, int a_EndParam = -1);
 
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);

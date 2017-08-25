@@ -2,7 +2,7 @@
 ::
 :: Profiling using a MSVC standalone profiler
 ::
-:: See http://www.codeproject.com/Articles/144643/Profiling-of-C-Applications-in-Visual-Studio-for-F for details
+:: See https://www.codeproject.com/Articles/144643/Profiling-of-C-Applications-in-Visual-Studio-for-F for details
 ::
 
 
@@ -48,7 +48,7 @@ if errorlevel 1 goto haderror
 cd %outputdir%
 
 :: generate the report files (.csv)
-%pt%\vsperfreport /summary:all %output% /symbolpath:"srv*C:\Programovani\Symbols*http://msdl.microsoft.com/download/symbols" 
+%pt%\vsperfreport /summary:all %output% /symbolpath:"srv*C:\Programovani\Symbols*https://msdl.microsoft.com/download/symbols" 
 if errorlevel 1 goto haderror
 
 

@@ -270,7 +270,7 @@ enum ENUM_BLOCK_ID : BLOCKTYPE
 	E_BLOCK_STRUCTURE_BLOCK = 255,
 
 	// Keep these two as the last values. Update the last block value to the last block with an id less than 255 when adding another block
-	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See http://minecraft.gamepedia.com/Data_values#Block_IDs
+	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.gamepedia.com/Data_values#Block_IDs
 	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 
@@ -459,6 +459,7 @@ enum ENUM_ITEM_ID : short
 	E_ITEM_GOLD_HORSE_ARMOR = 418,
 	E_ITEM_DIAMOND_HORSE_ARMOR = 419,
 	E_ITEM_LEAD = 420,
+	E_ITEM_LEASH = E_ITEM_LEAD,
 	E_ITEM_NAME_TAG = 421,
 	E_ITEM_MINECART_WITH_COMMAND_BLOCK = 422,
 	E_ITEM_RAW_MUTTON = 423,

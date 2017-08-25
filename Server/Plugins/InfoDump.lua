@@ -727,7 +727,7 @@ local function LoadLFS()
 
 	If you don't have luarocks installed, you need to install them using your OS's package manager, usually:
 		sudo apt-get install luarocks (Ubuntu / Debian)
-	On windows, a binary distribution can be downloaded from the LuaRocks homepage, http://luarocks.org/en/Download
+	On windows, a binary distribution can be downloaded from the LuaRocks homepage, https://github.com/luarocks/luarocks/wiki/Download
 	]])
 
 		print("Original error text: ", err)

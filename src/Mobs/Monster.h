@@ -43,6 +43,8 @@ public:
 
 	virtual ~cMonster() override;
 
+	virtual void Destroy(bool a_ShouldBroadcast = true) override;
+
 	virtual void Destroyed() override;
 
 	CLASS_PROTODEF(cMonster)
@@ -59,8 +61,7 @@ public:
 
 	virtual void HandleFalling(void) override;
 
-	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mob accordingly
-	Currently, the mob will only start moving to a new position after the position it is currently going to is reached. */
+	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mob accordingly. */
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 
 	// tolua_begin
@@ -70,6 +71,37 @@ public:
 
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
 	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk);
+
+	// tolua_begin
+
+	/** Returns whether the mob can be leashed. */
+	bool CanBeLeashed() const { return m_CanBeLeashed; }
+
+	/** Sets whether the mob can be leashed, for extensibility in plugins */
+	void SetCanBeLeashed(bool a_CanBeLeashed) { m_CanBeLeashed = a_CanBeLeashed; }
+
+	/** Returns whether the monster is leashed to an entity. */
+	bool IsLeashed() const { return (m_LeashedTo != nullptr); }
+
+	/** Leash the monster to an entity. */
+	void LeashTo(cEntity & a_Entity, bool a_ShouldBroadcast = true);
+
+	/** Unleash the monster. Overload for the Unleash(bool, bool) function for plugins */
+	void Unleash(bool a_ShouldDropLeashPickup);
+
+	/** Returns the entity to where this mob is leashed, returns nullptr if it's not leashed */
+	cEntity * GetLeashedTo() const { return m_LeashedTo; }
+
+	// tolua_end
+
+	/** Unleash the monster. */
+	void Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast);
+
+	/** Sets entity position to where is leashed this mob */
+	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = std::unique_ptr<Vector3d>(pos); }
+
+	/** Gets entity position to where mob should be leashed */
+	Vector3d * GetLeashToPos() const { return m_LeashToPos.get(); }
 
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
@@ -168,13 +200,13 @@ public:
 	void UnsafeUnsetTarget();
 
 	/** Returns the current target. */
-	cPawn * GetTarget ();
+	cPawn * GetTarget();
 
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
 	Asserts and returns null if mob type is not specified
 	*/
-	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
+	static std::unique_ptr<cMonster> NewMonsterFromType(eMonsterType a_MobType);
 
 	/** Returns if this mob last target was a player to avoid destruction on player quit */
 	bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
@@ -203,7 +235,11 @@ protected:
 	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS); }
 
 	/** Returns whether or not the target is close enough for attack. */
-	bool TargetIsInRange(void) { ASSERT(m_Target != nullptr); return ((m_Target->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
+	bool TargetIsInRange(void)
+	{
+		ASSERT(GetTarget() != nullptr);
+		return ((GetTarget()->GetPosition() - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
+	}
 
 	/** Returns whether the monster needs to jump to reach a given height. */
 	inline bool DoesPosYRequireJump(double a_PosY)
@@ -256,6 +292,18 @@ protected:
 
 	bool m_WasLastTargetAPlayer;
 
+	/** Entity leashed to */
+	cEntity * m_LeashedTo;
+
+	/** Entity pos where this mob was leashed to. Used when deserializing the chunk in order to make the mob find the leash knot. */
+	std::unique_ptr<Vector3d> m_LeashToPos;
+
+	/** Mob has ben leashed or unleashed in current player action. Avoids double actions on horses. */
+	bool m_IsLeashActionJustDone;
+
+	/** Determines whether a monster can be leashed */
+	bool m_CanBeLeashed;
+
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
 
@@ -272,7 +320,12 @@ protected:
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
 private:
-	/** A pointer to the entity this mobile is aiming to reach */
+	/** A pointer to the entity this mobile is aiming to reach.
+	The validity of this pointer SHALL be guaranteed by the pointee;
+	it MUST be reset when the pointee changes worlds or is destroyed. */
 	cPawn * m_Target;
+
+	/** Leash calculations inside Tick function */
+	void CalcLeashActions();
 
 } ;  // tolua_export

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "PassiveMonster.h"
+#include "../UUID.h"
 
 
 
@@ -40,14 +41,14 @@ public:
 	bool     IsTame        (void) const override { return m_IsTame; }
 	bool     IsBegging     (void) const { return m_IsBegging; }
 	AString  GetOwnerName  (void) const { return m_OwnerName; }
-	AString  GetOwnerUUID  (void) const { return m_OwnerUUID; }
+	cUUID    GetOwnerUUID  (void) const { return m_OwnerUUID; }
 	eCatType GetOcelotType (void) const { return m_CatType; }
 
 	// Set functions
 	void SetIsSitting  (bool a_IsSitting)   { m_IsSitting = a_IsSitting; }
 	void SetIsTame     (bool a_IsTame)      { m_IsTame = a_IsTame; }
 	void SetIsBegging  (bool a_IsBegging)   { m_IsBegging = a_IsBegging; }
-	void SetOwner      (const AString & a_NewOwnerName, const AString & a_NewOwnerUUID)
+	void SetOwner      (const AString & a_NewOwnerName, const cUUID & a_NewOwnerUUID)
 	{
 		m_OwnerName = a_NewOwnerName;
 		m_OwnerUUID = a_NewOwnerUUID;
@@ -66,7 +67,7 @@ protected:
 	/** Only check for a nearby player holding the breeding items every 23 ticks. */
 	int       m_CheckPlayerTickCount;
 	AString   m_OwnerName;
-	AString   m_OwnerUUID;
+	cUUID     m_OwnerUUID;
 } ;
 
 
