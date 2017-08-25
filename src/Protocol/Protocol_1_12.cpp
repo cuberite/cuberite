@@ -1668,6 +1668,7 @@ void cProtocol_1_12_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
