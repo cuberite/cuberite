@@ -166,7 +166,7 @@ void cObjective::Reset(void)
 
 
 
-AStringVector cObjective::GetPlayers(void) const
+AStringVector cObjective::GetKeys(void) const
 {
 	AStringVector Players;
 	for (auto player : m_Scores)
@@ -180,9 +180,9 @@ AStringVector cObjective::GetPlayers(void) const
 
 
 
-cObjective::Score cObjective::GetScore(const AString & a_Name) const
+cObjective::Score cObjective::GetScore(const AString & a_Key) const
 {
-	cScoreMap::const_iterator it = m_Scores.find(a_Name);
+	cScoreMap::const_iterator it = m_Scores.find(a_Key);
 
 	if (it == m_Scores.end())
 	{
@@ -215,13 +215,13 @@ void cObjective::SetAllScores(cObjective::Score a_Score)
 
 
 
-void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
+void cObjective::SetScore(const AString & a_Key, cObjective::Score a_Score)
 {
-	m_Scores[a_Name] = a_Score;
+	m_Scores[a_Key] = a_Score;
 
 	if (IsDisplayed())
 	{
-		m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, cScoreboard::uaUpsert);
+		m_World->BroadcastScoreUpdate(m_Name, a_Key, a_Score, cScoreboard::uaUpsert);
 	}
 }
 
@@ -229,13 +229,13 @@ void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
 
 
 
-void cObjective::ResetScore(const AString & a_Name)
+void cObjective::ResetScore(const AString & a_Key)
 {
-	m_Scores.erase(a_Name);
+	m_Scores.erase(a_Key);
 
 	if (IsDisplayed())
 	{
-		m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, cScoreboard::uaRemove);
+		m_World->BroadcastScoreUpdate(m_Name, a_Key, 0, cScoreboard::uaRemove);
 	}
 }
 
@@ -243,11 +243,11 @@ void cObjective::ResetScore(const AString & a_Name)
 
 
 
-cObjective::Score cObjective::AddScore(const AString & a_Name, cObjective::Score a_Delta)
+cObjective::Score cObjective::AddScore(const AString & a_Key, cObjective::Score a_Delta)
 {
-	Score NewScore = m_Scores[a_Name] + a_Delta;
+	Score NewScore = m_Scores[a_Key] + a_Delta;
 
-	SetScore(a_Name, NewScore);
+	SetScore(a_Key, NewScore);
 
 	return NewScore;
 }
@@ -256,11 +256,11 @@ cObjective::Score cObjective::AddScore(const AString & a_Name, cObjective::Score
 
 
 
-cObjective::Score cObjective::SubScore(const AString & a_Name, cObjective::Score a_Delta)
+cObjective::Score cObjective::SubScore(const AString & a_Key, cObjective::Score a_Delta)
 {
-	Score NewScore = m_Scores[a_Name] - a_Delta;
+	Score NewScore = m_Scores[a_Key] - a_Delta;
 
-	SetScore(a_Name, NewScore);
+	SetScore(a_Key, NewScore);
 
 	return NewScore;
 }
@@ -714,7 +714,7 @@ bool cScoreboard::ForEachTeam(cTeamCallback & a_Callback)
 
 
 
-void cScoreboard::AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value)
+void cScoreboard::AddToScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value)
 {
 	cCSLock Lock(m_CSObjectives);
 

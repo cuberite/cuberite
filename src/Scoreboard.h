@@ -93,23 +93,23 @@ public:
 	/** Resets the objective */
 	void Reset(void);
 
-	/** Returns the score of the specified player */
-	Score GetScore(const AString & a_Name) const;
+	/** Returns the score of the specified key */
+	Score GetScore(const AString & a_Key) const;
 
-	/** Sets the score of all tracked players */
+	/** Sets the score of all tracked keys */
 	void SetAllScores(Score a_Score);
 
-	/** Sets the score of the specified player */
-	void SetScore(const AString & a_Name, Score a_Score);
+	/** Sets the score of the specified key */
+	void SetScore(const AString & a_Key, Score a_Score);
 
-	/** Resets the score of the specified player */
-	void ResetScore(const AString & a_Name);
+	/** Resets the score of the specified key */
+	void ResetScore(const AString & a_Key);
 
 	/** Adds a_Delta and returns the new score */
-	Score AddScore(const AString & a_Name, Score a_Delta);
+	Score AddScore(const AString & a_Key, Score a_Delta);
 
 	/** Subtracts a_Delta and returns the new score */
-	Score SubScore(const AString & a_Name, Score a_Delta);
+	Score SubScore(const AString & a_Key, Score a_Delta);
 
 	void SetDisplayName(const AString & a_Name);
 
@@ -124,7 +124,7 @@ public:
 	bool IsDisplayed(void) { return m_DisplayCount > 0; }
 
 	/** Returns a set of all players */
-	AStringVector GetPlayers(void) const;  // Exported in ManualBindings.cpp
+	AStringVector GetKeys(void) const;  // Exported in ManualBindings.cpp
 
 	/** Send this objective to the specified client */
 	void SendTo(cClientHandle & a_Client);
@@ -136,8 +136,6 @@ public:
 
 
 private:
-
-	typedef std::pair<AString, Score> cTrackedPlayer;
 
 	typedef std::map<AString, Score> cScoreMap;
 
@@ -329,15 +327,28 @@ public:
 	/** Retrieves the team with the specified name, nullptr if not found */
 	cTeam * GetTeam(const AString & a_Name);
 
+	/** Sets the given display slot to display the given objective. */
 	void SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot);
 
+	/** Set the objective displayed in the given display slot, given the
+	actual objective. */
+	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
+
+	/** Returns a pointer to the objective that is being displayed in the
+	given display slot. If the given display slot is empty, nullptr is
+	returned. */
 	cObjective * GetObjectiveIn(eDisplaySlot a_Slot);
 
+	/** Return number of registered objectives. */
 	size_t GetNumObjectives(void) const;
 
+	/** Return number of registered teams. */
 	size_t GetNumTeams(void) const;
 
-	void AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value = 1);
+	/** Adds the given score to the given key in all objectives matching
+	the given criteria. For example, one could add 1 to every playerKills
+	objective for "bob". */
+	void AddToScore(const AString & a_Key, cObjective::eType a_Type, cObjective::Score a_Value = 1);
 
 	// tolua_end
 
@@ -350,6 +361,8 @@ public:
 	/** Tell the specified client to forget all about us */
 	void RemoveFrom(cClientHandle & a_Client);
 
+	/** Return a pointer to the team the player is currently on. nullptr if
+	the given username is not a member of a team. */
 	cTeam * QueryPlayerTeam(const AString & a_Name);  // WARNING: O(n logn)
 
 	/** Execute callback for each objective with the specified type
@@ -363,9 +376,6 @@ public:
 	/** Execute callback for each team.
 	Returns true if all teams have been processed, false if the callback aborted by returning true. */
 	bool ForEachTeam(cTeamCallback & a_Callback);  // Exported in ManualBindings.cpp
-
-	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
-
 
 private:
 

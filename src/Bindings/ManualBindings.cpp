@@ -3053,7 +3053,7 @@ static int tolua_cLuaWindow_new_local(lua_State * tolua_S)
 
 
 
-static int tolua_cObjective_GetPlayers(lua_State * tolua_S)
+static int tolua_cObjective_GetKeys(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
@@ -3066,10 +3066,10 @@ static int tolua_cObjective_GetPlayers(lua_State * tolua_S)
 
 	// Get the groups:
 	cObjective * Objective = reinterpret_cast<cObjective *>(tolua_tousertype(tolua_S, 1, nullptr));
-	AStringVector Players = Objective->GetPlayers();
+	AStringVector Keys = Objective->GetKeys();
 
 	// Push the results:
-	S.Push(Players);
+	S.Push(Keys);
 	return 1;
 }
 
@@ -3915,7 +3915,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cObjective");
-			tolua_function(tolua_S, "GetPlayers", tolua_cObjective_GetPlayers);
+			tolua_function(tolua_S, "GetKeys", tolua_cObjective_GetKeys);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlayer");
