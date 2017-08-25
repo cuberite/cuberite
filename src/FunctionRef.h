@@ -1,9 +1,5 @@
-
+﻿
 #pragma once
-
-// Guard against macro new
-#pragma push_macro("new")
-#undef new
 
 // Declared only so it can be partially specialized
 template <class Signature>
@@ -19,16 +15,11 @@ public:
 	template <class FunctionObject>
 	cFunctionRef(FunctionObject && a_FunctionObject)
 	{
-		static_assert(  // Ensure function object is callable with signature Ret(Args...)
-			std::is_convertible<
-				decltype(a_FunctionObject(std::forward<Args>(std::declval<Args>())...)),
-				Ret
-			>::value,
-			"Function object does not have a compatible call operator"
-		);
-
+		// Store an opaque reference to the object.
 		m_CallableData = &a_FunctionObject;
-		m_CallFunction = &ObjectFunctionCaller<typename std::remove_reference<FunctionObject>::type>;
+
+		// Along with a function that knows how to call the object.
+		m_CallFunction = &ObjectFunctionCaller<FunctionObject>;
 	}
 
 	/** Call the referenced function object */
@@ -40,10 +31,14 @@ public:
 private:
 
 	/** Function that performs the call. */
-	template <class T>
+	template <class ObjectType>
 	static Ret ObjectFunctionCaller(void * a_Callable, Args...  a_Args)
 	{
-		auto & Object = *static_cast<T *>(a_Callable);
+		// Convert opaque reference to the concrete type.
+		using ObjectPtr = typename std::add_pointer<ObjectType>::type;
+		auto & Object = *static_cast<ObjectPtr>(a_Callable);
+
+		// Forward the call down to the object.
 		return Object(std::forward<Args>(a_Args)...);
 	}
 
@@ -52,11 +47,8 @@ private:
 	/** Type erased reference to a callable. */
 	void * m_CallableData;
 
-	/** Function pointer to call the erased function. */
+	/** Function that knows how to call the type erased reference. */
 	cCallFunction m_CallFunction;
 };
-
-
-#pragma pop_macro("new")
 
 
