@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stddef.h>
+#include "UUID.h"
 #include "json/json.h"
 
 // fwd:
@@ -27,7 +28,7 @@ public:
 	void AugmentServerListPing(Json::Value & ResponseValue);
 
 	/** Begin the Forge Modloader Handshake (FML|HS) sequence. */
-	void BeginForgeHandshake(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
+	void BeginForgeHandshake(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
 	/** Send the ServerHello packet in the Forge handshake. */
 	void SendServerHello();
@@ -44,7 +45,7 @@ private:
 
 	/** Values saved from BeginForgeHandshake() for continuing the normal handshake after Forge completes. */
 	AString m_Name;
-	AString m_UUID;
+	cUUID m_UUID;
 	Json::Value m_Properties;
 
 	void HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size);

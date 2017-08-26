@@ -366,7 +366,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, c
 
 
 
-void cClientHandle::FinishAuthenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
+void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
 {
 	cWorld * World;
 	{

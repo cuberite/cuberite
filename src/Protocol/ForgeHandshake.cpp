@@ -97,7 +97,7 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 
 
 
-void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
+void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
 {
 	ASSERT(m_IsForgeClient);
 
