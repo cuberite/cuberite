@@ -1200,7 +1200,11 @@ void cProtocol_1_12::SendScoreboardObjective(const cObjective & a_Objective, cOb
 	if ((a_Mode == cObjective::uaCreate) || (a_Mode == cObjective::uaUpdateText))
 	{
 		Pkt.WriteString(a_Objective.GetDisplayName());
-		Pkt.WriteString("integer");
+		switch (a_Objective.GetDisplayType())
+		{
+		case cObjective::dispInteger: Pkt.WriteString("integer"); break;
+		case cObjective::dispHearts:  Pkt.WriteString("hearts"); break;
+		}
 	}
 }
 
@@ -2093,7 +2097,11 @@ void cProtocol_1_12_1::SendScoreboardObjective(const cObjective & a_Objective, c
 	if ((a_Mode == cObjective::uaCreate) || (a_Mode == cObjective::uaUpdateText))
 	{
 		Pkt.WriteString(a_Objective.GetDisplayName());
-		Pkt.WriteString("integer");
+		switch (a_Objective.GetDisplayType())
+		{
+		case cObjective::dispInteger: Pkt.WriteString("integer"); break;
+		case cObjective::dispHearts:  Pkt.WriteString("hearts"); break;
+		}
 	}
 }
 

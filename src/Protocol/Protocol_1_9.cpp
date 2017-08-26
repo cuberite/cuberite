@@ -1205,7 +1205,11 @@ void cProtocol_1_9_0::SendScoreboardObjective(const cObjective & a_Objective, cO
 	if ((a_Mode == cObjective::uaCreate) || (a_Mode == cObjective::uaUpdateText))
 	{
 		Pkt.WriteString(a_Objective.GetDisplayName());
-		Pkt.WriteString("integer");
+		switch (a_Objective.GetDisplayType())
+		{
+		case cObjective::dispInteger: Pkt.WriteString("integer"); break;
+		case cObjective::dispHearts:  Pkt.WriteString("hearts"); break;
+		}
 	}
 }
 
