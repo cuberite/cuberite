@@ -215,7 +215,7 @@ private:
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
 
-	/** Map of protocol version to Forge mods for that version. */
+	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
 	std::map<UInt32, AStringMap> m_ForgeModsByVersion;
 
 	/** True - allow same username to login more than once False - only once */
