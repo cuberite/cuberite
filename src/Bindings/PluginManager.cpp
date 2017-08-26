@@ -808,7 +808,6 @@ bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client, AStringMap & a
 
 
 
-
 bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	FIND_HOOK(HOOK_PLAYER_ANIMATION);
