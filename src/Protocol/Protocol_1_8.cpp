@@ -1202,7 +1202,6 @@ void cProtocol_1_8_0::SendScoreboardObjective(const cObjective & a_Objective, cO
 		{
 		case cObjective::dispInteger: Pkt.WriteString("integer"); break;
 		case cObjective::dispHearts:  Pkt.WriteString("hearts"); break;
-		default:                      Pkt.WriteString("integer"); break;
 		}
 	}
 }

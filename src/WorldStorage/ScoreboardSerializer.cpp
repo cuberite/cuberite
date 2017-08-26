@@ -113,6 +113,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 		a_Writer.AddString("DisplayName", Objective.GetDisplayName());
 		a_Writer.AddString("Name", it->first);
+		a_Writer.AddString("RenderType", (Objective.GetDisplayType() == cObjective::dispHearts) ? "hearts" : "integer");
 
 		a_Writer.EndCompound();
 	}
@@ -204,7 +205,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 
 	for (int Child = a_NBT.GetFirstChild(Objectives); Child >= 0; Child = a_NBT.GetNextSibling(Child))
 	{
-		AString CriteriaName, DisplayName, Name;
+		AString CriteriaName, DisplayName, Name, RenderType;
 
 		int CurrLine = a_NBT.FindChildByName(Child, "CriteriaName");
 		if (CurrLine >= 0)
@@ -224,9 +225,19 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			Name = a_NBT.GetString(CurrLine);
 		}
 
+		CurrLine = a_NBT.FindChildByName(Child, "RenderType");
+		if (CurrLine >= 0)
+		{
+			RenderType = a_NBT.GetString(CurrLine);
+		}
+
 		cObjective::eType Type = cObjective::StringToType(CriteriaName);
 
-		m_Scoreboard->RegisterObjective(Name, DisplayName, Type);
+		cObjective * Objective = m_Scoreboard->RegisterObjective(Name, DisplayName, Type);
+		if (RenderType == "hearts")
+		{
+			Objective->SetDisplayType(cObjective::dispHearts);
+		}
 	}
 
 	int PlayerScores = a_NBT.FindChildByName(Data, "PlayerScores");
