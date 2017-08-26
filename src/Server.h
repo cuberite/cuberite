@@ -155,7 +155,7 @@ public:
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
 
-	/** Get the Forge mods registered for a given protocol. */
+	/** Get the Forge mods (map of ModName -> ModVersionString) registered for a given protocol. */
 	const AStringMap & GetRegisteredForgeMods(const UInt32 a_Protocol);
 
 private:
