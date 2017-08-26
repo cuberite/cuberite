@@ -11,6 +11,8 @@
 
 
 
+// fwd:
+class cUUID;
 
 
 /** An object that can store incoming bytes and lets its clients read the bytes sequentially
@@ -68,7 +70,7 @@ public:
 	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool ReadLEInt          (int & a_Value);
 	bool ReadPosition64     (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
-	bool ReadUUID           (AString & a_Value);  // UUID without dashes
+	bool ReadUUID           (cUUID & a_Value);
 
 	/** Reads VarInt, assigns it to anything that can be assigned from an UInt64 (unsigned short, char, Byte, double, ...) */
 	template <typename T> bool ReadVarInt(T & a_Value)

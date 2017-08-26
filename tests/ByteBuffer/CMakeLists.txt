@@ -19,6 +19,7 @@ set (SHARED_HDRS
 
 set (SRCS
 	ByteBufferTest.cpp
+	Stubs.cpp
 )
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})

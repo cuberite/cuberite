@@ -659,6 +659,7 @@ public:
 	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);
 	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
+	bool GetStackValue(int a_StackPos, cUUID & a_Value);
 
 	// template to catch all of the various c++ integral types without overload conflicts
 	template <class T>
@@ -786,6 +787,10 @@ public:
 
 	/** Returns true if the specified parameters on the stack are functions or nils; also logs warning if not */
 	bool CheckParamFunctionOrNil(int a_StartParam, int a_EndParam = -1);
+
+	/** Returns true if the specified parameters on the stack are UUIDs; also logs warning if not
+	Accepts either cUUID instances or strings that contain UUIDs */
+	bool CheckParamUUID(int a_StartParam, int a_EndParam = -1);
 
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);

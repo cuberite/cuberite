@@ -14,11 +14,9 @@
 
 #include "../OSSupport/IsThread.h"
 
+// fwd:
+class cUUID;
 class cSettingsRepositoryInterface;
-
-
-
-
 
 namespace Json
 {
@@ -90,7 +88,7 @@ private:
 
 	/** Returns true if the user authenticated okay, false on error
 	Returns the case-corrected username, UUID, and properties (eg. skin). */
-	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID, Json::Value & a_Properties);
+	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties);
 };
 
 
