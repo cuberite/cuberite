@@ -1398,7 +1398,7 @@ void cProtocol_1_12::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mod
 
 	if (a_Mode == 0)
 	{
-		std::set<AString> TeamPlayers = a_Team.GetMembers();
+	        auto TeamPlayers = a_Team.GetMembers();
 		Pkt.WriteVarInt32(static_cast<UInt32>(TeamPlayers.size()));  // Number of entities
 		// Member entity list
 		for (const auto & name : TeamPlayers)
