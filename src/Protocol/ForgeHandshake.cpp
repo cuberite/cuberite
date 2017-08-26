@@ -124,15 +124,14 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const cUUID & 
 void cForgeHandshake::SendServerHello()
 {
 	AString Message;
+	cByteBuffer Buf(6);
 	// Discriminator | Byte | Always 0 for ServerHello
-	Message.push_back(Discriminator::ServerHello);
+	Buf.WriteBEInt8(Discriminator::ServerHello);
 	// FML protocol Version | Byte | Determined from NetworkRegistery. Currently 2.
-	Message.push_back('\2');
+	Buf.WriteBEInt8(2);
 	// Dimension TODO
-	Message.push_back('\0');
-	Message.push_back('\0');
-	Message.push_back('\0');
-	Message.push_back('\0');
+	Buf.WriteBEInt32(0);
+	Buf.ReadAll(Message);
 
 	m_Client->SendPluginMessage("FML|HS", Message);
 }
