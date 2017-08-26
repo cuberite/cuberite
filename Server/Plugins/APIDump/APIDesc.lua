@@ -8650,7 +8650,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMonsterType",
+							Type = "eMonsterType",
 						},
 					},
 					Returns =
@@ -8710,7 +8710,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMonsterType",
+							Type = "eMonsterType",
 						},
 					},
 					Notes = "Returns the type of this mob ({{Globals#eMonsterType|mtXXX}} constant)",
@@ -8801,7 +8801,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMonsterType",
+							Type = "eMonsterType",
 						},
 					},
 					Returns =
@@ -8819,7 +8819,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMonsterType",
+							Type = "eMonsterType",
 						},
 					},
 					Returns =
@@ -8910,7 +8910,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "MobType",
-							Type = "Globals#eMonsterType",
+							Type = "eMonsterType",
 						},
 					},
 					Notes = "Returns the mob type ({{Globals#eMonsterType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized.",
@@ -9976,7 +9976,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "GameMode",
-							Type = "Globals#eGameMode",
+							Type = "eGameMode",
 						},
 					},
 					Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead.",
@@ -10076,7 +10076,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "GameMode",
-							Type = "Globals#eGameMode",
+							Type = "eGameMode",
 						},
 					},
 					Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically.",
@@ -10861,7 +10861,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "NewGameMode",
-							Type = "Globals#eGameMode",
+							Type = "eGameMode",
 						},
 					},
 					Notes = "Sets the gamemode for the player. The new gamemode overrides the world's default gamemode, unless it is set to gmInherit.",
@@ -13831,7 +13831,7 @@ end
 					{
 						{
 							Name = "BiomeType",
-							Type = "Globals#EMCSBiome",
+							Type = "EMCSBiome",
 						},
 					},
 					Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value. Returns biInvalidBiome if the input is not a recognized biome.",
@@ -13849,7 +13849,7 @@ end
 					{
 						{
 							Name = "DamageType",
-							Type = "Globals#eDamageType",
+							Type = "eDamageType",
 						},
 					},
 					Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value. Returns -1 if the inupt is not a recognized damage type.",
@@ -13867,7 +13867,7 @@ end
 					{
 						{
 							Name = "Dimension",
-							Type = "Globals#eDimension",
+							Type = "eDimension",
 						},
 					},
 					Notes = "Converts a string representation to a {{Globals#eDimension|eDimension}} enumerated value. Returns dimNotSet if the input is not a recognized dimension.",
