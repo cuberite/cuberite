@@ -209,10 +209,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 	AString ClientModsString;
 	for (auto & item: ClientMods)
 	{
-		ClientModsString.append(item.first);
-		ClientModsString.append("@");
-		ClientModsString.append(item.second);
-		ClientModsString.append(", ");
+		AppendPrintf(ClientModsString, "%s@%s, ", item.first.c_str(), item.second.c_str());
 	}
 
 	LOG("Client connected with " SIZE_T_FMT " mods: %s", ClientMods.size(), ClientModsString.c_str());
