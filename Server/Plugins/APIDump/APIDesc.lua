@@ -11852,6 +11852,124 @@ end
 					Notes = "Add this to the team color (see cTeam::GetColor()) to get the appropriate display slot ID for the sidebar of that team. Note that the team must have been assigned a valid color using SetColor().",
 				},
 			},
+			AdditionalInfo =  -- Paragraphs to be exported after the function definitions table
+			{
+				{
+					Header = "Short Tutorial",
+					Contents = [[
+						In order to display some plugin-defined value next (for example) each player's name in the tablist, the plugin must create an objective, set it to display in the tablist, and then fill the objective with each player's scores:
+<pre class="prettyprint lang-lua">
+-- Note that the scoreboard only applies to this world. If a player leaves the world, they won't see it anymore.
+local Scoreboard = World:GetScoreboard()
+
+-- RegisterObjective takes the internal name, the display name, and the type. Use StringToType to convert a Vanilla type string to an internal eType.
+local Objective = Scoreboard:RegisterObjective("tablistObjective", "Tablist Objective", cObjective:StringToType("dummy"))
+
+-- Assigns the objective to the given display slot. Each display slot can only be attached to one objective.
+Scoreboard:SetDisplay(Objective, cScoreboard:dsList)
+
+-- This is identical to the previous line:
+--Scoreboard:SetDisplay("tablistObjective", cScoreboard:dsList)
+
+... later ...
+
+-- We want to associate some numbers with some players:
+local Objective = World:GetScoreboard():GetObjective("tablistObjective")
+
+-- Also, we could have done this, to retrieve the objective in the list slot:
+--local Objective = World:GetScoreboard():GetObjectiveIn(cScoreboard:dsList)
+
+-- Now, actually set the numbers for some players:
+Objective:SetScore("ashlie", 5) -- Set's player "ashlie"'s score to 5.
+Objective:SetScore("barbara", 6)
+Objective:SetAllScores(7) -- This sets ashlie's and barbara's scores to 7. Notably, it does not set the scores of keys not being tracked.
+Objective:AddScore("charlene", 1) -- Charlene's previous score defaults to 0, because she was not tracked when SetAllScores was called.
+Objective:SetScore("toxic_overload", 5) -- toxic_overload isn't logged in and isn't even a real player, but we can still set his score. It will just never be displayed.
+Objective:GetScore("danielle") -- Returns 0.
+</pre>
+
+Scoreboards also have the concept of teams, which can be used to implement things like teammate invisibility and friendly fire:
+<pre class="prettyprint lang-lua">
+local Scoreboard = World:GetScoreboard()
+
+-- Make two teams
+local FightTeam = Scoreboard:RegisterTeam("fightTeam", "The Fight Club", "", "")
+local BreakfastTeam = Scoreboard:RegisterTeam("breakfastTeam", "The Breakfast Club", "", "")
+
+-- Add some players to them. Again, note that the strings are usernames, but they don't have to be valid usernames.
+FightTeam:AddPlayer("eva")
+FightTeam:AddPlayer("frances")
+BreakfastTeam:AddPlayer("gwyneth")
+BreakfastTeam:AddPlayer("hera")
+
+-- A player may only be one a single team!
+--FightTeam:AddPlayer("gwyneth") -- gwyneth is already on the BreakfastTeam.
+
+-- FightTeam should allow friendly fire. By default it doesn't.
+FightTeam:SetFriendlyFire(true)
+BreakfastTeam:AllowsFriendlyFire() -- Returns false
+</pre>
+
+Note that both of those teams were not assigned to a team color. Team colors only apply when it comes to the colored sidebars. The colored sidebars are sidebars visible only to a specific team. The team-specific sidebar overrides the world sidebar for players on the team (so you can have a default sidebar, and a team-specific sidebar).
+<pre class="prettyprint lang-lua">
+-- Continuing from above
+
+-- Set the color for FightTeam. Don't set a color for BreakfastTeam.
+FightTeam:SetColor(cTeam:teamBlack)
+
+-- Build a default global sidebar
+local TeamScores = Scoreboard:RegisterObjective("teamScores", "Team Scores", cObjective:StringToType("dummy"))
+Scoreboard:SetDisplay("teamScores", cScoreboard:dsSidebar)
+
+TeamScores:SetScore("ivy", 5)
+TeamScores:SetScore("juliet", 6)
+TeamScores:SetScore("kira", -5) -- Negative scores are valid
+
+-- At this point, every player in the world will see a sidebar that looks like:
+--
+-- Team Scores
+-- juliet   6
+-- ivy      5
+-- kira    -1
+--
+-- Note the heading is the display name of the objective, and the sorting is decreasing by score.
+
+-- Now we build another scoreboard, just for FightTeam.
+local FightScores = Scoreboard:RegisterObjective("fightScores", "Fight Scores", cObjective:StringToType("dummy"))
+
+-- In order to set the scoreboard for the team sidebar, we add the team sidebar offset to the team color.
+Scoreboard:SetDisplay(FightScores, cScoreboard:dsSidebarTeamOffset + FightTeam:GetColor())
+
+FightScores:SetScore("linda", 5)
+FightScores:SetScore("macey", 6)
+FightScores:SetScore("nora", -1)
+
+-- Now, players on FightTeam will see the most recently created sidebar, while everyone else will still see the old sidebar.
+-- Note that the players on the FightTeam sidebar have no relation to the players that are actually members of the team.
+</pre>
+
+Note that, above, the objective names were generally usernames. However, this does not have to be the case. You can create up to 16 (each one needs a color, and there are only 16 colors) per-player sidebars like this:
+<pre class="prettyprint lang-lua">
+function BuildPlayerSidebar(Player, PlayerNumber)
+	-- PlayerNumber must be unique and between 0 and 15, inclusive.
+
+	-- First, create an objective
+	local Objective = Scoreboard:RegisterObjective(Player:GetName(), "Status", cObjective:StringToType("dummy"))
+
+	-- Create a team and assign the player to it
+	local Team = Scoreboard:RegisterTeam(Player:GetName(), "", "", "")
+	Team:SetColor(PlayerNumber) -- This is why PlayerNumber has to be between 0 and 15
+	Team:AddPlayer(Player:GetName())
+
+	-- Fill up the sidebar
+	Objective:SetScore("Hello, "..Player:GetName(), 15)
+	Objective:SetScore("Today is Friday!", 14)
+	Objective:SetScore("You're winning! §2✔", 13) -- That's a green checkmark, using Minecraft's chat colors
+end
+</pre>
+					]],
+				},
+			},
 		},
 		cServer =
 		{
