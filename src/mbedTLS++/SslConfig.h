@@ -1,4 +1,4 @@
-﻿
+
 #pragma once
 
 #include "mbedtls/ssl.h"
@@ -75,7 +75,7 @@ public:
 
 	/** Returns the default config for client connections. */
 	static std::shared_ptr<const cSslConfig> GetDefaultClientConfig();
-	
+
 	/** Returns the default config for server connections. */
 	static std::shared_ptr<const cSslConfig> GetDefaultServerConfig();
 

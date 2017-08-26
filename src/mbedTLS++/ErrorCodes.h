@@ -1,5 +1,5 @@
-﻿
-/** Error codes from mbedtls/net_sockets.h */
+
+/** Error codes from mbedtls net_sockets.h */
 // TODO: Replace with std::error_code
 
 #define MBEDTLS_ERR_NET_SOCKET_FAILED    -0x0042  /**< Failed to open a socket. */
@@ -13,3 +13,6 @@
 #define MBEDTLS_ERR_NET_UNKNOWN_HOST     -0x0052  /**< Failed to get an IP address for the given hostname. */
 #define MBEDTLS_ERR_NET_BUFFER_TOO_SMALL -0x0043  /**< Buffer is too small to hold the data. */
 #define MBEDTLS_ERR_NET_INVALID_CONTEXT  -0x0045  /**< The context is invalid, eg because it was free()ed. */
+
+
+

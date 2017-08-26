@@ -21,6 +21,7 @@
 // fwd:
 class cHTTPIncomingRequest;
 class cHTTPServerConnection;
+class cSslConfig;
 
 
 

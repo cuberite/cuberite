@@ -1,4 +1,4 @@
-﻿
+
 #include "Globals.h"
 
 #include "mbedTLS++/SslConfig.h"
@@ -7,7 +7,13 @@
 #include "CryptoKey.h"
 #include "X509Cert.h"
 
-#ifdef _DEBUG
+
+// This allows us to debug SSL and certificate problems, but produce way too much output,
+// so it's disabled until someone needs it
+// #define ENABLE_SSL_DEBUG_MSG
+
+
+#if defined(_DEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
 	#include "mbedtls/debug.h"
 
 
@@ -89,7 +95,7 @@
 			return 0;
 		}
 	}
-#endif  // _DEBUG
+#endif  // defined(_DEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
 
 
 
@@ -235,21 +241,21 @@ std::shared_ptr<cSslConfig> cSslConfig::MakeDefaultConfig(bool a_IsClient)
 	Ret->SetAuthMode(eSslAuthMode::None);  // We cannot verify because we don't have a CA chain
 
 	#ifdef _DEBUG
-		/*
-		// These functions allow us to debug SSL and certificate problems, but produce way too much output,
-		// so they're disabled until someone needs them
-		Ret->SetDebugCallback(&SSLDebugMessage, nullptr);
-		Ret->SetVerifyCallback(SSLVerifyCert, nullptr);
-		mbedtls_debug_set_threshold(2);
-		*/
-		
+		#ifdef ENABLE_SSL_DEBUG_MSG
+			Ret->SetDebugCallback(&SSLDebugMessage, nullptr);
+			Ret->SetVerifyCallback(SSLVerifyCert, nullptr);
+			mbedtls_debug_set_threshold(2);
+		#endif
+
 		/*
 		// Set ciphersuite to the easiest one to decode, so that the connection can be wireshark-decoded:
-		Ret->SetCipherSuites({ 
-			MBEDTLS_TLS_RSA_WITH_RC4_128_MD5,
-			MBEDTLS_TLS_RSA_WITH_RC4_128_SHA,
-			MBEDTLS_TLS_RSA_WITH_AES_128_CBC_SHA
-		});
+		Ret->SetCipherSuites(
+			{
+				MBEDTLS_TLS_RSA_WITH_RC4_128_MD5,
+				MBEDTLS_TLS_RSA_WITH_RC4_128_SHA,
+				MBEDTLS_TLS_RSA_WITH_AES_128_CBC_SHA
+			}
+		);
 		*/
 	#endif
 
