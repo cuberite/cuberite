@@ -74,12 +74,12 @@ public:
 	// tolua_end
 
 	/** Add a Forge mod to the server ping list. */
-	bool RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
+	bool RegisterForgeMod(const AString & a_ModName, const AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
 
 	// tolua_begin
 
 	/** Remove a Forge mod to the server ping list. */
-	void UnregisterForgeMod(AString & a_ModName, UInt32 a_ProtocolVersionNumber);
+	void UnregisterForgeMod(const AString & a_ModName, UInt32 a_ProtocolVersionNumber);
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */

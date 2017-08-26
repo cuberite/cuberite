@@ -235,7 +235,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 
 
-bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
+bool cServer::RegisterForgeMod(const AString & a_ModName, const AString & a_ModVersion, UInt32 a_ProtocolVersionNumber)
 {
 	auto & Mods = RegisteredForgeMods(a_ProtocolVersionNumber);
 
@@ -246,7 +246,7 @@ bool cServer::RegisterForgeMod(AString & a_ModName, AString & a_ModVersion, UInt
 
 
 
-void cServer::UnregisterForgeMod(AString &a_ModName, UInt32 a_ProtocolVersionNumber)
+void cServer::UnregisterForgeMod(const AString & a_ModName, UInt32 a_ProtocolVersionNumber)
 {
 	auto & Mods = RegisteredForgeMods(a_ProtocolVersionNumber);
 
