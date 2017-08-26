@@ -33,7 +33,6 @@
 #include "../HTTP/UrlParser.h"
 #include "../Item.h"
 #include "../LineBlockTracer.h"
-#include "../CompositeChat.h"
 #include "../Server.h"
 #include "../Root.h"
 #include "../StringCompression.h"
