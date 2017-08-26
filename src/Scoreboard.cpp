@@ -283,6 +283,20 @@ void cObjective::SetDisplayName(const AString & a_Name)
 
 
 
+void cObjective::SetDisplayType(eDisplayType a_DisplayType)
+{
+	m_DisplayType = a_DisplayType;
+
+	if (IsDisplayed())
+	{
+		m_World->BroadcastScoreboardObjective(*this, uaUpdateText);
+	}
+}
+
+
+
+
+
 void cObjective::SendTo(cClientHandle & a_Client) const
 {
 	if (!IsDisplayed())

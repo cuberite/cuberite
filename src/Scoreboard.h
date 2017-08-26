@@ -31,6 +31,12 @@ public:
 
 	typedef int Score;
 
+	enum eDisplayType
+	{
+		dispInteger = 0,
+		dispHearts
+	};
+
 	enum eCriteria
 	{
 		otDummy,
@@ -113,6 +119,10 @@ public:
 
 	void SetDisplayName(const AString & a_Name);
 
+	/** Whether, in the list slot, to display as integers or hearts */
+	void SetDisplayType(eDisplayType a_DisplayType);
+	eDisplayType GetDisplayType(void) const { return m_DisplayType; }
+
 	// tolua_end
 
 	/** If true, increments the number of slots we're displayed in.
@@ -143,6 +153,9 @@ private:
 
 	AString m_DisplayName;
 	AString m_Name;
+
+	/** (for list slots) whether to display as an integer or as hearts */
+	eDisplayType m_DisplayType;
 
 	eType m_Type;
 

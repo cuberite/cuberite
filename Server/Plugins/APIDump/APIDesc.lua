@@ -9121,6 +9121,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the display name of the objective. This name will be shown to the connected players.",
 				},
+				GetDisplayType =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns whether to display as integers or as hearts in the tablist",
+				},
 				GetName =
 				{
 					Returns =
@@ -9206,6 +9216,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the display name of the objective.",
+				},
+				SetDisplayType =
+				{
+					Params =
+					{
+						{
+							Name = "DisplayType",
+							Type = "number",
+						},
+					},
+					Notes = "Sets whether the tablist shows this objective using hearts or integers.",
 				},
 				SetScore =
 				{
@@ -9330,6 +9351,15 @@ a_Player:OpenWindow(Window);
 					Notes = "",
 				},
 				otTotalKillCount =
+				{
+					Notes = "",
+				},
+
+				dispInteger =
+				{
+					Notes = "",
+				},
+				dispHearts =
 				{
 					Notes = "",
 				},
@@ -11866,7 +11896,7 @@ local Scoreboard = World:GetScoreboard()
 local Objective = Scoreboard:RegisterObjective("tablistObjective", "Tablist Objective", cObjective:StringToType("dummy"))
 
 -- Assigns the objective to the given display slot. Each display slot can only be attached to one objective.
-Scoreboard:SetDisplay(Objective, cScoreboard:dsList)
+Scoreboard:SetDisplay(Objective, cScoreboard.dsList)
 
 -- This is identical to the previous line:
 --Scoreboard:SetDisplay("tablistObjective", cScoreboard:dsList)
@@ -11915,11 +11945,11 @@ Note that both of those teams were not assigned to a team color. Team colors onl
 -- Continuing from above
 
 -- Set the color for FightTeam. Don't set a color for BreakfastTeam.
-FightTeam:SetColor(cTeam:teamBlack)
+FightTeam:SetColor(cTeam.teamBlack)
 
 -- Build a default global sidebar
 local TeamScores = Scoreboard:RegisterObjective("teamScores", "Team Scores", cObjective:StringToType("dummy"))
-Scoreboard:SetDisplay("teamScores", cScoreboard:dsSidebar)
+Scoreboard:SetDisplay("teamScores", cScoreboard.dsSidebar)
 
 TeamScores:SetScore("ivy", 5)
 TeamScores:SetScore("juliet", 6)
@@ -11938,7 +11968,7 @@ TeamScores:SetScore("kira", -5) -- Negative scores are valid
 local FightScores = Scoreboard:RegisterObjective("fightScores", "Fight Scores", cObjective:StringToType("dummy"))
 
 -- In order to set the scoreboard for the team sidebar, we add the team sidebar offset to the team color.
-Scoreboard:SetDisplay(FightScores, cScoreboard:dsSidebarTeamOffset + FightTeam:GetColor())
+Scoreboard:SetDisplay(FightScores, cScoreboard.dsSidebarTeamOffset + FightTeam:GetColor())
 
 FightScores:SetScore("linda", 5)
 FightScores:SetScore("macey", 6)
