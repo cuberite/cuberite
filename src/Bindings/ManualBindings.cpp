@@ -2380,6 +2380,7 @@ static int tolua_cClientHandle_GetForgeMods(lua_State * L)
 	S.GetStackValue(1, Client);
 
 	S.Push(Client->GetForgeMods());
+	return 1;
 }
 
 
@@ -2437,8 +2438,6 @@ static int tolua_cClientHandle_GenerateOfflineUUID(lua_State * tolua_S)
 
 
 
-<<<<<<< HEAD
-=======
 static int tolua_cClientHandle_IsUUIDOnline(lua_State * tolua_S)
 {
 	// Check the params:
@@ -2519,7 +2518,6 @@ static int tolua_cMobHeadEntity_GetOwnerUUID(lua_State * tolua_S)
 
 
 
->>>>>>> master
 
 static int tolua_cMojangAPI_AddPlayerNameToUUIDMapping(lua_State * L)
 {
@@ -4060,20 +4058,14 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cClientHandle");
-<<<<<<< HEAD
-			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
-			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
-
-			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
-			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
-=======
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE",   cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE",   cClientHandle::MIN_VIEW_DISTANCE);
+
+			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
 			tolua_function(tolua_S, "SendPluginMessage",   tolua_cClientHandle_SendPluginMessage);
 			tolua_function(tolua_S, "GetUUID",             tolua_cClientHandle_GetUUID);
 			tolua_function(tolua_S, "GenerateOfflineUUID", tolua_cClientHandle_GenerateOfflineUUID);
 			tolua_function(tolua_S, "IsUUIDOnline",        tolua_cClientHandle_IsUUIDOnline);
->>>>>>> master
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cColor");
