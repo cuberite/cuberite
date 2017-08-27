@@ -56,8 +56,85 @@ public:
 
 	virtual ~cProtocol() {}
 
+	/** A list of all outgoing packets */
+	enum eOutgoingPackets
+	{
+		sendAttachEntity = 0,
+		sendBlockAction,
+		sendBlockBreakAnim,
+		sendBlockChange,
+		sendBlockChanges,
+		sendCameraSetTo,
+		sendChatRaw,
+		sendCollectEntity,
+		sendDestroyEntity,
+		sendDisconnectDuringLogin,
+		sendDisconnectDuringGame,
+		sendEditSign,
+		sendEntityEffect,
+		sendEntityEquipment,
+		sendEntityHeadLook,
+		sendEntityLook,
+		sendEntityMeta,
+		sendEntityProperties,
+		sendEntityRelMove,
+		sendEntityRelMoveLook,
+		sendEntityStatus,
+		sendEntityVelocity,
+		sendExplosion,
+		sendGameMode,
+		sendHealth,
+		sendTitle,
+		sendInventorySlot,
+		sendKeepAlive,
+		sendLeashEntity,
+		// Login?
+		sendPaintingSpawn,
+		sendMapData,
+		// SendPickupSpawn?
+		sendPlayerAbilities,
+		sendEntityAnimation,
+		sendParticleEffect,
+		sendPlayerList,
+		sendPlayerMaxSpeed,
+		sendPlayerMoveLook,
+		sendPlayerSpawn,
+		sendPluginMessage,
+		sendRemoveEntityEffect,
+		sendResetTitle,
+		sendRespawn,
+		sendExperience,
+		sendExperienceOrb,
+		sendScoreboardObjective,
+		sendScoreUpdate,
+		sendDisplayObjective,
+		sendSoundEffect,
+		sendSoundParticleEffect,
+		// SpawnFallingBlock?
+		sendSpawnMob,
+		// SpawnObject?
+		// SpawnVehicle?
+		sendStatistics,
+		sendTabCompletion,
+		sendTeleportEntity,
+		// Thunderbolt?
+		sendTimeUpdate,
+		sendUnloadChunk,
+		sendUpdateBlockEntity,
+		sendUpdateSign,
+		sendUseBed,
+		sendWeather,
+		sendWindowItems,
+		sendWindowClose,
+		sendWindowOpen,
+		sendWindowProperty
+	};
+
 	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
+
+	/** Called to figure out a packet ID */
+	virtual int GetPacketId(eOutgoingPackets a_Packet) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;

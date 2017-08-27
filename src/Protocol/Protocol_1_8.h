@@ -45,6 +45,9 @@ public:
 
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
+	/** Nobody inherits 1.8, so it doesn't use this method */
+	virtual int GetPacketId(eOutgoingPackets a_Packet) override { return 0; };
+
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 

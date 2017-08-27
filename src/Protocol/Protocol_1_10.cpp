@@ -303,7 +303,7 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x19);  // Named sound effect packet
+	cPacketizer Pkt(*this, GetPacketId(sendSoundEffect));  // Named sound effect packet
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(FloorC(a_X * 8.0));

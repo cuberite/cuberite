@@ -342,7 +342,7 @@ void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Entity, const cPlayer
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x48);  // Collect Item packet
+	cPacketizer Pkt(*this, GetPacketId(sendCollectEntity));  // Collect Item packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
@@ -356,7 +356,7 @@ void cProtocol_1_11_0::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(4);  // Hide title
 }
 
@@ -368,7 +368,7 @@ void cProtocol_1_11_0::SendResetTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(5);  // Reset title
 }
 
@@ -380,7 +380,7 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x03);  // Spawn Mob packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnMob));  // Spawn Mob packet
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
