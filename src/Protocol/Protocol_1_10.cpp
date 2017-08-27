@@ -619,7 +619,7 @@ void cProtocol_1_10_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 
 			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
 			Writer.BeginCompound("Owner");
-			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID());
+			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
 			Writer.AddString("Name", MobHeadEntity.GetOwnerName());
 			Writer.BeginCompound("Properties");
 			Writer.BeginList("textures", TAG_Compound);

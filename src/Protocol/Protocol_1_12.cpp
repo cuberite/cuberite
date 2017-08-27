@@ -1125,6 +1125,30 @@ void cProtocol_1_12::SendEntityMetadata(const cEntity & a_Entity)
 
 
 
+void cProtocol_1_12::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, 0x3c);  // Set Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt32(a_EntityLeashedTo.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol_1_12::SendUnleashEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, 0x3c);  // Set Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEInt32(-1);  // Unleash a_Entity
+}
+
+
+
+
+
 void cProtocol_1_12::SendEntityVelocity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1246,30 +1270,6 @@ void cProtocol_1_12::SendScoreUpdate(const AString & a_Objective, const AString 
 	{
 		Pkt.WriteVarInt32(static_cast<UInt32>(a_Score));
 	}
-}
-
-
-
-
-
-void cProtocol_1_12::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
-{
-	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x3c);  // Set Attach Entity packet
-	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEUInt32(a_EntityLeashedTo.GetUniqueID());
-}
-
-
-
-
-
-void cProtocol_1_12::SendUnleashEntity(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x3c);  // Set Attach Entity packet
-	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt32(-1);  // Unleash a_Entity
 }
 
 
@@ -1939,6 +1939,30 @@ void cProtocol_1_12_1::SendEntityMetadata(const cEntity & a_Entity)
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityMetadata(Pkt, a_Entity);
 	Pkt.WriteBEUInt8(0xff);  // The termination byte
+}
+
+
+
+
+
+void cProtocol_1_12_1::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, 0x3d);  // Set Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt32(a_EntityLeashedTo.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol_1_12_1::SendUnleashEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, 0x3d);  // Set Attach Entity packet
+	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEInt32(-1);  // Unleash a_Entity
 }
 
 

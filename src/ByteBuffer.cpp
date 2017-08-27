@@ -7,6 +7,7 @@
 
 #include "ByteBuffer.h"
 #include "Endianness.h"
+#include "UUID.h"
 #include "OSSupport/IsThread.h"
 
 
@@ -27,16 +28,6 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 
 #define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false;  // Check if at least Num bytes can be read from  the buffer, return false if not
 #define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false;  // Check if at least Num bytes can be written to the buffer, return false if not
-
-
-
-
-
-static char ValueToHexDigit(UInt8 digit)
-{
-	ASSERT(digit < 16);
-	return "0123456789abcdef"[digit];
-}
 
 
 
@@ -506,22 +497,17 @@ bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 
 
 
-bool cByteBuffer::ReadUUID(AString & a_Value)
+bool cByteBuffer::ReadUUID(cUUID & a_Value)
 {
 	CHECK_THREAD
 
-	if (!ReadString(a_Value, 16))
+	std::array<Byte, 16> UUIDBuf;
+	if (!ReadBuf(UUIDBuf.data(), UUIDBuf.size()))
 	{
 		return false;
 	}
 
-	a_Value.resize(32);
-	for (unsigned int i = 15; i < 16; i--)
-	{
-		a_Value[i * 2 + 1] = ValueToHexDigit(a_Value[i] & 0xf);
-		a_Value[i * 2] = ValueToHexDigit(static_cast<UInt8>(a_Value[i]) >> 4);
-	}
-
+	a_Value.FromRaw(UUIDBuf);
 	return true;
 }
 

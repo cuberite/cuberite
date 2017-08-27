@@ -101,6 +101,8 @@ public:
 	virtual void SendCameraSetTo(const cEntity & a_Entity) override;
 	virtual void SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendEntityMetadata(const cEntity & a_Entity) override;
+	virtual void SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
+	virtual void SendUnleashEntity(const cEntity & a_Entity) override;
 	virtual void SendEntityVelocity(const cEntity & a_Entity) override;
 	virtual void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendExperience(void) override;

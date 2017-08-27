@@ -22,6 +22,7 @@ Implements the 1.8 protocol classes:
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
 #include "../Statistics.h"
+#include "../UUID.h"
 
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
@@ -118,7 +119,11 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 		m_ServerAddress = Params[0];
 		m_Client->SetIPString(Params[1]);
-		m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
+
+		cUUID UUID;
+		UUID.FromString(Params[2]);
+		m_Client->SetUUID(UUID);
+
 		m_Client->SetProperties(Params[3]);
 	}
 
@@ -705,7 +710,7 @@ void cProtocol_1_8_0::SendLoginSuccess(void)
 
 	{
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(m_Client->GetUUID()));
+		Pkt.WriteString(m_Client->GetUUID().ToLongString());
 		Pkt.WriteString(m_Client->GetUsername());
 	}
 }
@@ -1071,7 +1076,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
-	Pkt.WriteUUID(cMojangAPI::MakeUUIDShort(a_Player.GetUUID()));
+	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteFPInt(a_Player.GetPosX());
 	Pkt.WriteFPInt(a_Player.GetPosY() + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
 	Pkt.WriteFPInt(a_Player.GetPosZ());
@@ -1542,6 +1547,7 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
 		case E_BLOCK_HEAD:          Action = 4; break;  // Update Mobhead entity
 		case E_BLOCK_FLOWER_POT:    Action = 5; break;  // Update flower pot
+		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteBEUInt8(Action);
@@ -2551,7 +2557,7 @@ void cProtocol_1_8_0::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketSpectate(cByteBuffer &a_ByteBuffer)
 {
-	AString playerUUID;
+	cUUID playerUUID;
 	if (!a_ByteBuffer.ReadUUID(playerUUID))
 	{
 		return;
@@ -3183,7 +3189,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 
 			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
 			Writer.BeginCompound("Owner");
-				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID());
+				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
 				Writer.AddString("Name", MobHeadEntity.GetOwnerName());
 				Writer.BeginCompound("Properties");
 					Writer.BeginList("textures", TAG_Compound);

@@ -10,6 +10,7 @@
 
 #include "BlockEntity.h"
 #include "Defines.h"
+#include "UUID.h"
 
 
 
@@ -42,9 +43,6 @@ public:
 	/** Set the player for mob heads with player type */
 	void SetOwner(const cPlayer & a_Owner);
 
-	/** Sets the player components for the mob heads with player type. */
-	void SetOwner(const AString & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature);
-
 	/** Returns the type of the mob head */
 	eMobHeadType GetType(void) const { return m_Type; }
 
@@ -54,9 +52,6 @@ public:
 	/** Returns the player name of the mob head */
 	AString GetOwnerName(void) const { return m_OwnerName; }
 
-	/** Returns the player UUID of the mob head */
-	AString GetOwnerUUID(void) const { return m_OwnerUUID; }
-
 	/** Returns the texture of the mob head */
 	AString GetOwnerTexture(void) const { return m_OwnerTexture; }
 
@@ -64,6 +59,15 @@ public:
 	AString GetOwnerTextureSignature(void) const { return m_OwnerTextureSignature; }
 
 	// tolua_end
+
+	/** Sets the player components for the mob heads with player type. */
+	void SetOwner(
+		const cUUID & a_OwnerUUID, const AString & a_OwnerName,
+		const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature
+	);  // Exported in ManualBindings.cpp
+
+	/** Returns the player UUID of the mob head */
+	cUUID GetOwnerUUID(void) const { return m_OwnerUUID; }  // Exported in ManualBindings.cpp
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
@@ -76,7 +80,7 @@ private:
 	eMobHeadRotation m_Rotation;
 
 	AString m_OwnerName;
-	AString m_OwnerUUID;
+	cUUID   m_OwnerUUID;
 	AString m_OwnerTexture;
 	AString m_OwnerTextureSignature;
 } ;  // tolua_export

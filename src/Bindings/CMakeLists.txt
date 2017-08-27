@@ -139,6 +139,7 @@ set(BINDING_DEPENDENCIES
 	../StringUtils.h
 	../Tracer.h
 	../UI/Window.h
+	../UUID.h
 	../Vector3.h
 	../WebAdmin.h
 	../World.h
