@@ -30,10 +30,10 @@ private:
 	cBehaviorBreeder m_BehaviorBreeder;
 	cBehaviorItemFollower m_BehaviorItemFollower;
 	cBehaviorCoward m_BehaviorCoward;
-	cBehaviorItemReplacer m_BehaviorWanderer;
+	cBehaviorWanderer m_BehaviorWanderer;
 
 	// Non tick controlling behaviors
-	cBehaviorWanderer m_BehaviorItemReplacer;
+	cBehaviorItemReplacer m_BehaviorItemReplacer;
 } ;
 
 

@@ -74,17 +74,17 @@ bool cBehaviorDayLightBurner::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		m_Parent->GetWorld()->IsWeatherSunnyAt(static_cast<int>(m_Parent->GetPosX()), static_cast<int>(m_Parent->GetPosZ()))        // Not raining
 	)
 	{
-		int MobHeight = static_cast<int>(a_Location.y) + static_cast<int>(round(m_Parent->GetHeight())) - 1;  // The height of the mob head
+		int MobHeight = CeilC(a_Location.y + m_Parent->GetHeight()) - 1;   // The height of the mob head
 		if (MobHeight >= cChunkDef::Height)
 		{
 			return true;
 		}
-		// Start with the highest block and scan down to the mob's head.
+		// Start with the highest block and scan down to just abovethe mob's head.
 		// If a non transparent is found, return false (do not burn). Otherwise return true.
 		// Note that this loop is not a performance concern as transparent blocks are rare and the loop almost always bailes out
 		// instantly.(An exception is e.g. standing under a long column of glass).
 		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
-		while (CurrentBlock >= MobHeight)
+		while (CurrentBlock > MobHeight)
 		{
 			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
 			if (
