@@ -2837,9 +2837,13 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	int Type = a_NBT.GetInt(TypeIdx);
+	int CareerIdx = a_NBT.FindChildByName(a_TagIdx, "Career");
+	if (CareerIdx < 0)
+	{
+		return;
+	}
 
-	std::unique_ptr<cVillager> Monster = cpp14::make_unique<cVillager>(cVillager::eVillagerType(Type));
+	std::unique_ptr<cVillager> Monster = cpp14::make_unique<cVillager>(cVillager::VillagerCareer(a_NBT.GetInt(TypeIdx)), 1U);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;

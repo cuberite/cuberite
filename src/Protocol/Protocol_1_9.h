@@ -135,6 +135,7 @@ public:
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void SendVillagerTradeList          (const cWindow &, const std::vector<VillagerTradeOffer> &) override;
 	virtual void SendWeather                    (eWeather a_Weather) override;
 	virtual void SendWholeInventory             (const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;

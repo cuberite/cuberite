@@ -666,7 +666,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 
 int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
-	int TotalEPF = 0.0;
+	int TotalEPF = 0;
 
 	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 	for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)

@@ -17,6 +17,7 @@
 #include "UI/AnvilWindow.h"
 #include "UI/BeaconWindow.h"
 #include "UI/EnchantingWindow.h"
+#include "UI/VillagerTradeWindow.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
@@ -670,8 +671,14 @@ void cClientHandle::RemoveFromAllChunks()
 
 void cClientHandle::HandleNPCTrade(int a_SlotNum)
 {
-	// TODO
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	auto CurrentWindow = GetPlayer()->GetWindow();
+	if ((CurrentWindow == nullptr) || CurrentWindow->GetWindowType() != cWindow::WindowType::wtVillagerTrade)
+	{
+		Kick("Received trade selection when no trade in progress - hacked client?");
+		return;
+	}
+
+	static_cast<cVillagerTradeWindow *>(CurrentWindow)->PlayerChangedTradeOffer(*GetPlayer(), static_cast<unsigned>(a_SlotNum));
 }
 
 
@@ -3109,6 +3116,11 @@ void cClientHandle::SendUpdateSign(
 void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+void cClientHandle::SendVillagerTradeList(const cWindow & TradeWindow, const std::vector<VillagerTradeOffer> & TradeOffers)
+{
+	m_Protocol->SendVillagerTradeList(TradeWindow, TradeOffers);
 }
 
 

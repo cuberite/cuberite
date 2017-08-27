@@ -12859,7 +12859,7 @@ end
 				{
 					Notes = "An inventory window",
 				},
-				wtNPCTrade =
+				wtVillagerTrade =
 				{
 					Notes = "A villager trade window",
 				},

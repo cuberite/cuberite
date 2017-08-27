@@ -1597,6 +1597,15 @@ void cProtocol_1_8_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 
 
 
+void cProtocol_1_8_0::SendVillagerTradeList(const cWindow &, const std::vector<VillagerTradeOffer> &)
+{
+	// Unimplemented
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendWeather(eWeather a_Weather)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -3577,7 +3586,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		{
 			auto & Villager = reinterpret_cast<const cVillager &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x50);
-			a_Pkt.WriteBEInt32(Villager.GetVilType());
+			a_Pkt.WriteBEInt32(static_cast<Int32>(cVillager::VillagerCareerToProfession(Villager.GetCareer())));
 			a_Pkt.WriteBEUInt8(0x0c);
 			a_Pkt.WriteBEInt8(Villager.IsBaby() ? -1 : 0);
 			break;

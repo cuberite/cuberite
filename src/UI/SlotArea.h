@@ -22,6 +22,7 @@ class cChestEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cMinecartWithChest;
+class cVillager;
 class cCraftingRecipe;
 class cWorld;
 
@@ -238,7 +239,7 @@ protected:
 	cItemMap m_Items;
 
 	/** Returns the pointer to the slot array for the player specified. */
-	cItem * GetPlayerSlots(cPlayer & a_Player);
+	cItem * GetPlayerSlots(const cPlayer & a_Player);
 } ;
 
 
@@ -498,7 +499,7 @@ protected:
 
 	/** Called after an item has been brewed to handle statistics etc. */
 	void HandleBrewedItem(cPlayer & a_Player, const cItem & a_ClickedItem);
-} ;
+};
 
 
 
@@ -520,3 +521,48 @@ protected:
 
 
 
+
+class cSlotAreaVillagerTrade :
+	public cSlotAreaTemporary
+{
+	typedef cSlotAreaTemporary super;
+
+public:
+	cSlotAreaVillagerTrade(cVillager & Villager, cWindow & a_ParentWindow);
+
+	/** Handles player interaction with a given trade.
+	Sets appropriate item counts based on input counts and output types. */
+	void UpdateTrade(const cPlayer &);
+
+protected:
+
+	enum SlotIndices : unsigned
+	{
+		PrimaryDesire = 0,
+		SecondaryDesire = 1,
+		Recompense = 2
+	};
+
+	/** Override to respond to attempted trades.
+	Updates primary and secondary desire counts, assuming that they are correctly set for the given trade.
+	Informs the associated villager of the transaction. */
+	virtual void SetSlot(int, cPlayer &, const cItem &) override;
+
+	/** Override to toss all items in the trading window on player exit. */
+	virtual void OnPlayerRemoved(cPlayer &) override;
+
+	/** Override to update the trade items and inform the associated villager of the trading status. */
+	virtual void Clicked(cPlayer &, int, eClickAction, const cItem &) override;
+
+	/** Override to disable transferral of the compensation item to an already populated hotbar slot.
+	Default behaviour when destination hotbar slot is populated is to swap the source and destination, but this is not possible since the compensation slot cannot be backfilled. */
+	virtual void NumberClicked(cPlayer &, int, eClickAction) override;
+
+	/** Override to disable double-click behaviour for the compensation slot. */
+	virtual void DblClicked(cPlayer &, int) override;
+
+	/** Override to prevent distribution of items into the trading window. */
+	virtual void DistributeStack(cItem &, cPlayer &, bool, bool, bool) override {}
+
+	cVillager & m_Villager;
+};

@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "SlotArea.h"
 #include "../Entities/Player.h"
+#include "../Mobs/Villager.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
 #include "../BlockEntities/ChestEntity.h"
@@ -15,6 +16,7 @@
 #include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
 #include "AnvilWindow.h"
+#include "VillagerTradeWindow.h"
 #include "../CraftingRecipes.h"
 #include "../Root.h"
 #include "../FastRandom.h"
@@ -235,14 +237,9 @@ void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_
 
 void cSlotArea::DblClicked(cPlayer & a_Player, int a_SlotNum)
 {
+	// Assume single-click was sent first
+
 	cItem & Dragging = a_Player.GetDraggingItem();
-	if (Dragging.IsEmpty())
-	{
-		// Move the item in the dblclicked slot into hand:
-		Dragging = *GetSlot(a_SlotNum, a_Player);
-		cItem EmptyItem;
-		SetSlot(a_SlotNum, a_Player, EmptyItem);
-	}
 	if (Dragging.IsEmpty())
 	{
 		LOGD("%s DblClicked with an empty hand over empty slot, ignoring", a_Player.GetName().c_str());
@@ -2217,6 +2214,216 @@ void cSlotAreaMinecartWithChest::SetSlot(int a_SlotNum, cPlayer & a_Player, cons
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaVillagerTrade:
+
+cSlotAreaVillagerTrade::cSlotAreaVillagerTrade(cVillager & Villager, cWindow & ParentWindow) :
+	cSlotAreaTemporary(3, ParentWindow),
+	m_Villager(Villager)
+{
+}
+
+
+
+
+
+void cSlotAreaVillagerTrade::UpdateTrade(const cPlayer & TradingPlayer)
+{
+	const auto & Contents = GetPlayerSlots(TradingPlayer);
+	const auto & Trade = m_Villager.GetTradeOffer(
+		static_cast<cVillagerTradeWindow *>(&m_ParentWindow)->GetPlayerTradeOfferIndex(TradingPlayer),
+		Contents[SlotIndices::PrimaryDesire],
+		Contents[SlotIndices::SecondaryDesire]
+	);
+	const auto TransactionMultiplier = cVillager::GetTransactionMultiplier(Trade, Contents[SlotIndices::PrimaryDesire], Contents[SlotIndices::SecondaryDesire]);
+
+	if (TransactionMultiplier != 0)
+	{
+		cItem Recompense(Trade.Recompense);
+		Recompense.m_ItemCount *= TransactionMultiplier;
+		Contents[SlotIndices::Recompense] = Recompense;
+	}
+	else
+	{
+		Contents[SlotIndices::Recompense].Empty();
+	}
+}
+
+
+
+
+
+void cSlotAreaVillagerTrade::SetSlot(int ActionIndex, cPlayer & TradingPlayer, const cItem & Item)
+{
+	const auto & Contents = GetPlayerSlots(TradingPlayer);
+	const auto & RecompenseSlot = Contents[SlotIndices::Recompense];
+
+	if ((ActionIndex == SlotIndices::Recompense) && !RecompenseSlot.IsEmpty())
+	{
+		// Player clicked recompense slot. Slot was populated, meaning the trade can go ahead.
+		// Note that parameter Item holds the new remaining count of compensation items (if any)
+
+		auto & Trade = m_Villager.GetTradeOffer(
+			static_cast<cVillagerTradeWindow *>(&m_ParentWindow)->GetPlayerTradeOfferIndex(TradingPlayer),
+			Contents[SlotIndices::PrimaryDesire],
+			Contents[SlotIndices::SecondaryDesire]
+		);
+		const auto ActualTransactionMultiplier = static_cast<unsigned>((RecompenseSlot.m_ItemCount - Item.m_ItemCount) / Trade.Recompense.m_ItemCount);
+
+		if (ActualTransactionMultiplier == 0)
+		{
+			// Not strictly needed in terms of preserving item count integrity but nothing will change so exit early
+			// Prevents associated villager from responding to a "trade" with no items exchanged
+			return;
+		}
+
+		if (Contents[SlotIndices::PrimaryDesire].IsEmpty())
+		{
+			// (Given that a trade can be made), player must have placed primary desire into secondary slot
+
+			ASSERT(Trade.SecondaryDesire.IsEmpty());
+			Contents[SlotIndices::SecondaryDesire].m_ItemCount -= Trade.PrimaryDesire.m_ItemCount * static_cast<char>(ActualTransactionMultiplier);
+		}
+		else
+		{
+			// Primary\secondary desire\offer slots match up respectively
+
+			Contents[SlotIndices::PrimaryDesire].m_ItemCount -= Trade.PrimaryDesire.m_ItemCount * static_cast<char>(ActualTransactionMultiplier);
+			Contents[SlotIndices::SecondaryDesire].m_ItemCount -= Trade.SecondaryDesire.m_ItemCount * static_cast<char>(ActualTransactionMultiplier);
+		}
+
+		m_Villager.HandleTransaction(Trade, ActualTransactionMultiplier);
+	}
+
+	super::SetSlot(ActionIndex, TradingPlayer, Item);
+}
+
+
+
+
+
+void cSlotAreaVillagerTrade::OnPlayerRemoved(cPlayer & Player)
+{
+	TossItems(Player, SlotIndices::PrimaryDesire, SlotIndices::SecondaryDesire);
+	super::OnPlayerRemoved(Player);
+}
+
+
+
+
+
+void cSlotAreaVillagerTrade::Clicked(cPlayer & Player, int SlotNumber, eClickAction ClickAction, const cItem & ClickedItem)
+{
+	auto & DraggingItem = Player.GetDraggingItem();
+	if (
+		(SlotNumber == SlotIndices::Recompense) &&
+		((ClickAction == eClickAction::caLeftClick) || (ClickAction == eClickAction::caRightClick))
+	)
+	{
+		cItem RecompenseSlot = *GetSlot(SlotIndices::Recompense, Player);
+		if (RecompenseSlot.IsEmpty())
+		{
+			// No trade possible right now
+			return;
+		}
+
+		// Single clicking on recompense slot should transfer one transaction's worth of items to the hand
+		// As long as there is no dragging item or the dragging item is of the same type as the compensation
+
+		const auto MoveCount = m_Villager.GetTradeOffer(
+			static_cast<cVillagerTradeWindow *>(&m_ParentWindow)->GetPlayerTradeOfferIndex(Player),
+			*GetSlot(SlotIndices::PrimaryDesire, Player),
+			*GetSlot(SlotIndices::SecondaryDesire, Player)
+		).Recompense.m_ItemCount;
+		if (DraggingItem.IsEmpty())
+		{
+			DraggingItem = RecompenseSlot;
+			DraggingItem.m_ItemCount = MoveCount;
+			RecompenseSlot.m_ItemCount -= MoveCount;
+			SetSlot(SlotIndices::Recompense, Player, RecompenseSlot);  // Perform transaction
+		}
+		else if (DraggingItem.IsEqual(RecompenseSlot))
+		{
+			if (DraggingItem.GetMaxStackSize() < (DraggingItem.m_ItemCount + MoveCount))
+			{
+				return;
+			}
+
+			DraggingItem.m_ItemCount += MoveCount;
+			RecompenseSlot.m_ItemCount -= MoveCount;
+			SetSlot(SlotIndices::Recompense, Player, RecompenseSlot);  // Perform transaction
+		}
+
+		return;
+	}
+
+	super::Clicked(Player, SlotNumber, ClickAction, ClickedItem);
+	UpdateTrade(Player);
+
+	if (GetSlot(SlotIndices::Recompense, Player)->IsEmpty())
+	{
+		m_Villager.HandleTradeUnavailable();
+	}
+	else
+	{
+		m_Villager.HandleTradeAvailable();
+	}
+}
+
+
+
+
+
+void cSlotAreaVillagerTrade::NumberClicked(cPlayer & Player, int SlotNumber, eClickAction ClickAction)
+{
+	if (SlotNumber != SlotIndices::Recompense)
+	{
+		super::NumberClicked(Player, SlotNumber, ClickAction);
+		return;
+	}
+
+	int HotbarSlotIndex = static_cast<int>(ClickAction - caNumber1);
+	cItem HotbarSlot(Player.GetInventory().GetHotbarSlot(HotbarSlotIndex));
+	cItem RecompenseSlot(*GetSlot(SlotNumber, Player));
+
+	if (!HotbarSlot.IsEmpty())
+	{
+		// Prevent items being inserted into trade compensation slot
+		return;
+	}
+
+	const auto MoveCount = m_Villager.GetTradeOffer(
+		static_cast<cVillagerTradeWindow *>(&m_ParentWindow)->GetPlayerTradeOfferIndex(Player),
+		*GetSlot(SlotIndices::PrimaryDesire, Player),
+		*GetSlot(SlotIndices::SecondaryDesire, Player)
+	).Recompense.m_ItemCount;
+
+	HotbarSlot = RecompenseSlot;
+	HotbarSlot.m_ItemCount = MoveCount;
+	RecompenseSlot.m_ItemCount -= MoveCount;
+
+	Player.GetInventory().SetHotbarSlot(HotbarSlotIndex, HotbarSlot);
+	SetSlot(SlotNumber, Player, RecompenseSlot);
+}
+
+
+
+
+
+void cSlotAreaVillagerTrade::DblClicked(cPlayer & Player, int SlotNumber)
+{
+	if (SlotNumber == SlotIndices::Recompense)
+	{
+		return;
+	}
+
+	super::DblClicked(Player, SlotNumber);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaInventoryBase:
 
 cSlotAreaInventoryBase::cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow) :
@@ -2579,7 +2786,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 
 
 
-cItem * cSlotAreaTemporary::GetPlayerSlots(cPlayer & a_Player)
+cItem * cSlotAreaTemporary::GetPlayerSlots(const cPlayer & a_Player)
 {
 	cItemMap::iterator itr = m_Items.find(a_Player.GetUniqueID());
 	if (itr == m_Items.end())
