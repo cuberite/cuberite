@@ -796,6 +796,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when a Login packet is sent to the client, before the client is queued for authentication.",
 			},
+			HOOK_LOGIN_FORGE =
+			{
+				Notes = "Called when a Forge client has sent its ModList to the server, during the login handshake.",
+			},
 			HOOK_PLAYER_ANIMATION =
 			{
 				Notes = "Called when a client send the Animation packet.",
