@@ -21,7 +21,7 @@ public:
 	inline Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
 
 
-	#if 0  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
+	#ifdef TOLUA_EXPOSITION  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
 		Vector3(const Vector3<float>  & a_Rhs);
 		Vector3(const Vector3<double> & a_Rhs);
 		Vector3(const Vector3<int>    & a_Rhs);
