@@ -1,0 +1,32 @@
+body {
+	background: #245A48;
+	background: linear-gradient(220deg, #245d33, #24575D) fixed;
+}
+body, h2 {
+	color: #F4F7F6;
+}
+#navigation, #footer {
+	background: none;
+	box-shadow: none;
+}
+#intro-body,
+#main-body {
+	text-align: center;
+}
+
+/* Tablet/Mobile Design */
+
+@media (max-width: 60em) {
+	#navigation,
+	#footer {
+		background: #2E7158;
+	}
+	#navigation {
+		background: linear-gradient(200deg, #245d33, #24575D);
+		box-shadow: 0 0.188em 0.375em rgba(0, 0, 0, .1);
+	}
+	#footer {
+		background: linear-gradient(220deg, #245d33, #24575D);
+		box-shadow: 0 -0.188em 0.375em rgba(0, 0, 0, .1);
+	}
+}
