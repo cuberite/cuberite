@@ -28,8 +28,11 @@ public:
 	/** How much light do the blocks consume? */
 	NIBBLETYPE m_SpreadLightFalloff;
 
-	/** Is a block completely transparent? (light doesn't get decreased(?)) */
+	/** Is a block completely transparent to blocklight? (light doesn't get decreased(?)) */
 	bool m_Transparent;
+
+	/** Does a block disperse sky light? (only relevant for transparent blocks) */
+	bool m_SkylightDispersant;
 
 	/** Is a block destroyed after a single hit? */
 	bool m_OneHitDig;
@@ -74,6 +77,10 @@ public:
 	inline static NIBBLETYPE GetLightValue        (BLOCKTYPE a_Type) { return Get(a_Type).m_LightValue;          }
 	inline static NIBBLETYPE GetSpreadLightFalloff(BLOCKTYPE a_Type) { return Get(a_Type).m_SpreadLightFalloff;  }
 	inline static bool IsTransparent              (BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;         }
+	inline static bool IsSkylightDispersant       (BLOCKTYPE a_Type)
+	{
+		return ((Get(a_Type).m_SkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
+	}
 	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
@@ -93,6 +100,7 @@ public:
 		: m_LightValue(0x00)
 		, m_SpreadLightFalloff(0x0f)
 		, m_Transparent(false)
+		, m_SkylightDispersant(false)
 		, m_OneHitDig(false)
 		, m_PistonBreakable(false)
 		, m_IsSnowable(false)
