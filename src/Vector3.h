@@ -21,18 +21,17 @@ public:
 	inline Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
 
 
-	// Hardcoded copy constructors (tolua++ does not support function templates .. yet)
-	Vector3(const Vector3<float>  & a_Rhs) : x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
-	Vector3(const Vector3<double> & a_Rhs) : x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
-	Vector3(const Vector3<int>    & a_Rhs) : x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
+	#if 0  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
+		Vector3(const Vector3<float>  & a_Rhs);
+		Vector3(const Vector3<double> & a_Rhs);
+		Vector3(const Vector3<int>    & a_Rhs);
+	#endif
 
 
 	// tolua_end
-	template <typename _T>
-	Vector3(const Vector3<_T> & a_Rhs) : x(a_Rhs.x), y(a_Rhs.y), z(a_Rhs.z) {}
-
-	template <typename _T>
-	Vector3(const Vector3<_T> * a_Rhs) : x(a_Rhs->x), y(a_Rhs->y), z(a_Rhs->z) {}
+	// Conversion constructors where U is not the same as T leaving the copy-constructor implicitly generated
+	template <typename U, typename = typename std::enable_if<!std::is_same<U, T>::value>::type>
+	Vector3(const Vector3<U> & a_Rhs): x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
 	// tolua_begin
 
 	inline void Set(T a_x, T a_y, T a_z)
@@ -111,9 +110,9 @@ public:
 	/** Updates each coord to its absolute value */
 	inline void Abs()
 	{
-		x = (x < 0) ? -x : x;
-		y = (y < 0) ? -y : y;
-		z = (z < 0) ? -z : z;
+		x = std::abs(x);
+		y = std::abs(y);
+		z = std::abs(z);
 	}
 
 	/** Clamps each coord into the specified range. */
@@ -152,7 +151,7 @@ public:
 
 	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const
 	{
-		return (Abs(x - a_Rhs.x) < a_Eps) && (Abs(y - a_Rhs.y) < a_Eps) && (Abs(z - a_Rhs.z) < a_Eps);
+		return (std::abs(x - a_Rhs.x) < a_Eps) && (std::abs(y - a_Rhs.y) < a_Eps) && (std::abs(z - a_Rhs.z) < a_Eps);
 	}
 
 	inline void Move(T a_X, T a_Y, T a_Z)
@@ -229,14 +228,6 @@ public:
 		z *= a_v;
 	}
 
-	inline Vector3<T> & operator = (const Vector3<T> & a_Rhs)
-	{
-		x = a_Rhs.x;
-		y = a_Rhs.y;
-		z = a_Rhs.z;
-		return *this;
-	}
-
 	// tolua_begin
 
 	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
@@ -305,7 +296,7 @@ public:
 	*/
 	inline double LineCoeffToXYPlane(const Vector3<T> & a_OtherEnd, T a_Z) const
 	{
-		if (Abs(z - a_OtherEnd.z) < EPS)
+		if (std::abs(z - a_OtherEnd.z) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -320,7 +311,7 @@ public:
 	*/
 	inline double LineCoeffToXZPlane(const Vector3<T> & a_OtherEnd, T a_Y) const
 	{
-		if (Abs(y - a_OtherEnd.y) < EPS)
+		if (std::abs(y - a_OtherEnd.y) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -335,7 +326,7 @@ public:
 	*/
 	inline double LineCoeffToYZPlane(const Vector3<T> & a_OtherEnd, T a_X) const
 	{
-		if (Abs(x - a_OtherEnd.x) < EPS)
+		if (std::abs(x - a_OtherEnd.x) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -364,16 +355,6 @@ public:
 
 	/** Return value of LineCoeffToPlane() if the line is parallel to the plane. */
 	static const double NO_INTERSECTION;
-
-protected:
-
-	/** Returns the absolute value of the given argument.
-	Templatized because the standard library differentiates between abs() and fabs(). */
-	static T Abs(T a_Value)
-	{
-		return (a_Value < 0) ? -a_Value : a_Value;
-	}
-
 };
 // tolua_end
 
