@@ -164,79 +164,6 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 
 
 
-int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
-{
-	switch (a_Packet)
-	{
-	case sendAttachEntity: return 0x40;
-	case sendBlockAction: return 0x0a;
-	case sendBlockBreakAnim: return 0x08;
-	case sendBlockChange: return 0x0b;
-	case sendBlockChanges: return 0x10;
-	case sendCameraSetTo: return 0x36;
-	case sendChatRaw: return 0x0f;
-	case sendCollectEntity: return 0x49;
-	case sendDestroyEntity: return 0x30;
-	case sendDisconnectDuringLogin: return 0x0;
-	case sendDisconnectDuringGame: return 0x1a;
-	case sendEditSign: return 0x2a;
-	case sendEntityEffect: return 0x4c;
-	case sendEntityEquipment: return 0x3c;
-	case sendEntityHeadLook: return 0x34;
-	case sendEntityLook: return 0x27;
-	case sendEntityMeta: return 0x39;
-	case sendEntityProperties: return 0x4b;
-	case sendEntityRelMove: return 0x25;
-	case sendEntityRelMoveLook: return 0x26;
-	case sendEntityStatus: return 0x1b;
-	case sendEntityVelocity: return 0x3b;
-	case sendExplosion: return 0x1c;
-	case sendGameMode: return 0x1e;
-	case sendHealth: return 0x3e;
-	case sendTitle: return 0x45;
-	case sendInventorySlot: return 0x16;
-	case sendKeepAlive: return 0x1f;
-	case sendLeashEntity: return 0x3a;
-	case sendPaintingSpawn: return 0x04;
-	case sendMapData: return 0x24;
-	case sendPlayerAbilities: return 0x2b;
-	case sendEntityAnimation: return 0x06;
-	case sendParticleEffect: return 0x22;
-	case sendPlayerList: return 0x2d;
-	case sendPlayerMaxSpeed: return 0x4b;
-	case sendPlayerMoveLook: return 0x2e;
-	case sendPlayerSpawn: return 0x05;
-	case sendPluginMessage: return 0x18;
-	case sendRemoveEntityEffect: return 0x31;
-	case sendRespawn: return 0x33;
-	case sendExperience: return 0x3d;
-	case sendExperienceOrb: return 0x01;
-	case sendScoreboardObjective: return 0x3f;
-	case sendScoreUpdate: return 0x42;
-	case sendDisplayObjective: return 0x38;
-	case sendSoundEffect: return 0x19;
-	case sendSoundParticleEffect: return 0x21;
-	case sendSpawnMob: return 0x03;
-	case sendStatistics: return 0x07;
-	case sendTabCompletion: return 0x0e;
-	case sendTeleportEntity: return 0x4a;
-	case sendTimeUpdate: return 0x44;
-	case sendUnloadChunk: return 0x1d;
-	case sendUpdateBlockEntity: return 0x09;
-	case sendUpdateSign: return 0x46;
-	case sendUseBed: return 0x2f;
-	case sendWeather: return 0x1e;
-	case sendWindowItems: return 0x14;
-	case sendWindowClose: return 0x12;
-	case sendWindowOpen: return 0x13;
-	case sendWindowProperty: return 0x15;
-	}
-}
-
-
-
-
-
 void cProtocol_1_9_0::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
@@ -4356,23 +4283,6 @@ void cProtocol_1_9_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 cProtocol_1_9_4::cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
-}
-
-
-
-
-
-int cProtocol_1_9_4::GetPacketId(eOutgoingPackets a_Packet)
-{
-	switch (a_Packet)
-	{
-	case sendCollectEntity: return 0x48;
-	case sendEntityEffect: return 0x4b;
-	case sendEntityProperties: return 0x4a;
-	case sendPlayerMaxSpeed: return 0x4a;
-	case sendTeleportEntity: return 0x49;
-	default: super::GetPacketId(a_Packet);
-	}
 }
 
 

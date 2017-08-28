@@ -323,44 +323,6 @@ cProtocol_1_12::cProtocol_1_12(cClientHandle * a_Client, const AString & a_Serve
 
 
 
-int cProtocol_1_12::GetPacketId(eOutgoingPackets a_Packet)
-{
-	switch (a_Packet)
-	{
-	case sendAttachEntity: return 0x42;
-	case sendScoreUpdate: return 0x44;
-	case sendLeashEntity: return 0x3c;
-	case sendEntityRelMove: return 0x26;
-	case sendEntityRelMoveLook: return 0x27;
-	case sendEntityLook: return 0x28;
-	case sendDestroyEntity: return 0x31;
-	case sendRemoveEntityEffect: return 0x32;
-	case sendRespawn: return 0x34;
-	case sendEntityHeadLook: return 0x35;
-	case sendCameraSetTo: return 0x38;
-	case sendDisplayObjective: return 0x3a;
-	case sendEntityMeta: return 0x3b;
-	case sendEntityVelocity: return 0x3d;
-	case sendEntityEquipment: return 0x3e;
-	case sendExperience: return 0x3f;
-	case sendHealth: return 0x40;
-	case sendScoreboardObjective: return 0x41;
-	case sendUpdateBlockEntity: return 0x09;
-	case sendTimeUpdate: return 0x46;
-	case sendTitle: return 0x47;
-	case sendCollectEntity: return 0x4a;
-	case sendTeleportEntity: return 0x4b;
-	case sendEntityProperties: return 0x4d;
-	case sendPlayerMaxSpeed: return 0x4d;
-	case sendEntityEffect: return 0x4e;
-	default: super::GetPacketId(a_Packet);
-	}
-}
-
-
-
-
-
 void cProtocol_1_12::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1228,42 +1190,6 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 cProtocol_1_12_1::cProtocol_1_12_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
-}
-
-
-
-
-
-int cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
-{
-	switch (a_Packet)
-	{
-	case sendRespawn: return 0x35;
-	case sendPlayerList: return 0x2e;
-	case sendPlayerAbilities: return 0x2c;
-	case sendPlayerMoveLook: return 0x2f;
-	case sendUseBed: return 0x30;
-	case sendDestroyEntity: return 0x32;
-	case sendRemoveEntityEffect: return 0x33;
-	case sendEntityHeadLook: return 0x36;
-	case sendCameraSetTo: return 0x39;
-	case sendDisplayObjective: return 0x3b;
-	case sendEntityMeta: return 0x3c;
-	case sendEntityVelocity: return 0x3e;
-	case sendExperience: return 0x40;
-	case sendHealth: return 0x41;
-	case sendScoreboardObjective: return 0x42;
-	case sendAttachEntity: return 0x43;
-	case sendScoreUpdate: return 0x45;
-	case sendTimeUpdate: return 0x47;
-	case sendTitle: return 0x48;
-	case sendCollectEntity: return 0x4b;
-	case sendTeleportEntity: return 0x4c;
-	case sendEntityProperties: return 0x4e;
-	case sendEntityEffect: return 0x4f;
-	case sendPlayerMaxSpeed: return 0x4e;
-	default: super::GetPacketId(a_Packet);
-	}
 }
 
 
