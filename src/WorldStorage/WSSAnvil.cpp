@@ -515,23 +515,25 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
-	size_t SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
-	size_t SliceSizeNibble = SliceSizeBlock / 2;
-	const char * BlockTypes    = reinterpret_cast<const char *>(Serializer.m_BlockTypes);
-	const char * BlockMetas    = reinterpret_cast<const char *>(Serializer.m_BlockMetas);
-	#ifdef DEBUG_SKYLIGHT
-		const char * BlockLight  = reinterpret_cast<const char *>(Serializer.m_BlockSkyLight);
-	#else
-		const char * BlockLight  = reinterpret_cast<const char *>(Serializer.m_BlockLight);
-	#endif
-	const char * BlockSkyLight = reinterpret_cast<const char *>(Serializer.m_BlockSkyLight);
-	for (int Y = 0; Y < 16; Y++)
+	for (size_t Y = 0; Y != cChunkData::NumSections; ++Y)
 	{
+		auto Section = Serializer.m_Data.GetSection(Y);
+		if (Section == nullptr)
+		{
+			continue;
+		}
+
 		a_Writer.BeginCompound("");
-		a_Writer.AddByteArray("Blocks",     BlockTypes    + static_cast<unsigned int>(Y) * SliceSizeBlock,  SliceSizeBlock);
-		a_Writer.AddByteArray("Data",       BlockMetas    + static_cast<unsigned int>(Y) * SliceSizeNibble, SliceSizeNibble);
-		a_Writer.AddByteArray("SkyLight",   BlockSkyLight + static_cast<unsigned int>(Y) * SliceSizeNibble, SliceSizeNibble);
-		a_Writer.AddByteArray("BlockLight", BlockLight    + static_cast<unsigned int>(Y) * SliceSizeNibble, SliceSizeNibble);
+		a_Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(Section->m_BlockTypes), ARRAYCOUNT(Section->m_BlockTypes));
+		a_Writer.AddByteArray("Data",   reinterpret_cast<const char *>(Section->m_BlockMetas), ARRAYCOUNT(Section->m_BlockMetas));
+
+		#ifdef DEBUG_SKYLIGHT
+			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight), ARRAYCOUNT(Section->m_BlockSkyLight));
+		#else
+			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockLight),    ARRAYCOUNT(Section->m_BlockLight));
+		#endif
+
+		a_Writer.AddByteArray("SkyLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight), ARRAYCOUNT(Section->m_BlockSkyLight));
 		a_Writer.AddByte("Y", static_cast<unsigned char>(Y));
 		a_Writer.EndCompound();
 	}

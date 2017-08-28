@@ -422,6 +422,129 @@ void cChunkData::CopySkyLight(NIBBLETYPE * a_Dest) const
 
 
 
+void cChunkData::FillBlockTypes(BLOCKTYPE a_Value)
+{
+	// If needed, allocate any missing sections
+	if (a_Value != 0x00)
+	{
+		for (auto & Section : m_Sections)
+		{
+			if (Section == nullptr)
+			{
+				Section = Allocate();
+				std::fill(std::begin(Section->m_BlockMetas),    std::end(Section->m_BlockMetas),    0x00);
+				std::fill(std::begin(Section->m_BlockLight),    std::end(Section->m_BlockLight),    0x00);
+				std::fill(std::begin(Section->m_BlockSkyLight), std::end(Section->m_BlockSkyLight), 0xff);
+			}
+		}
+	}
+
+	for (auto Section : m_Sections)
+	{
+		if (Section != nullptr)
+		{
+			std::fill(std::begin(Section->m_BlockTypes), std::end(Section->m_BlockTypes), a_Value);
+		}
+	}
+}
+
+
+
+
+
+void cChunkData::FillMetas(NIBBLETYPE a_Value)
+{
+	// If needed, allocate any missing sections
+	if (a_Value != 0x00)
+	{
+		for (auto & Section : m_Sections)
+		{
+			if (Section == nullptr)
+			{
+				Section = Allocate();
+				std::fill(std::begin(Section->m_BlockTypes),    std::end(Section->m_BlockTypes),    0x00);
+				std::fill(std::begin(Section->m_BlockLight),    std::end(Section->m_BlockLight),    0x00);
+				std::fill(std::begin(Section->m_BlockSkyLight), std::end(Section->m_BlockSkyLight), 0xff);
+			}
+		}
+	}
+
+	NIBBLETYPE NewMeta = static_cast<NIBBLETYPE>((a_Value << 4) | a_Value);
+	for (auto Section : m_Sections)
+	{
+		if (Section != nullptr)
+		{
+			std::fill(std::begin(Section->m_BlockMetas), std::end(Section->m_BlockMetas), NewMeta);
+		}
+	}
+}
+
+
+
+
+
+void cChunkData::FillBlockLight(NIBBLETYPE a_Value)
+{
+	// If needed, allocate any missing sections
+	if (a_Value != 0x00)
+	{
+		for (auto & Section : m_Sections)
+		{
+			if (Section == nullptr)
+			{
+				Section = Allocate();
+				std::fill(std::begin(Section->m_BlockTypes), std::end(Section->m_BlockTypes), 0x00);
+				std::fill(std::begin(Section->m_BlockMetas), std::end(Section->m_BlockMetas), 0x00);
+				std::fill(std::begin(Section->m_BlockSkyLight), std::end(Section->m_BlockSkyLight), 0xff);
+			}
+		}
+	}
+
+	NIBBLETYPE NewLight = static_cast<NIBBLETYPE>((a_Value << 4) | a_Value);
+	for (auto Section : m_Sections)
+	{
+		if (Section != nullptr)
+		{
+			std::fill(std::begin(Section->m_BlockLight), std::end(Section->m_BlockLight), NewLight);
+		}
+	}
+}
+
+
+
+
+
+void cChunkData::FillSkyLight(NIBBLETYPE a_Value)
+{
+	// If needed, allocate any missing sections
+	if (a_Value != 0x0f)
+	{
+		for (auto & Section : m_Sections)
+		{
+			if (Section == nullptr)
+			{
+				Section = Allocate();
+				std::fill(std::begin(Section->m_BlockTypes), std::end(Section->m_BlockTypes), 0x00);
+				std::fill(std::begin(Section->m_BlockMetas), std::end(Section->m_BlockMetas), 0x00);
+				std::fill(std::begin(Section->m_BlockLight), std::end(Section->m_BlockLight), 0x00);
+			}
+		}
+	}
+
+	NIBBLETYPE NewSkyLight = static_cast<NIBBLETYPE>((a_Value << 4) | a_Value);
+	for (auto Section : m_Sections)
+	{
+		if (Section != nullptr)
+		{
+			std::fill(std::begin(Section->m_BlockSkyLight), std::end(Section->m_BlockSkyLight), NewSkyLight);
+		}
+	}
+}
+
+
+
+
+
 void cChunkData::SetBlockTypes(const BLOCKTYPE * a_Src)
 {
 	ASSERT(a_Src != nullptr);

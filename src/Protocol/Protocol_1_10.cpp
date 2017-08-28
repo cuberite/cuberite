@@ -15,6 +15,7 @@ Implements the 1.10 protocol classes:
 
 #include "../Root.h"
 #include "../Server.h"
+#include "../ClientHandle.h"
 
 #include "../WorldStorage/FastNBT.h"
 
@@ -346,6 +347,7 @@ void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
