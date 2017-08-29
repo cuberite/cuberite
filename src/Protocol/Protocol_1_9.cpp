@@ -1519,7 +1519,7 @@ void cProtocol_1_9_0::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x02);  // Spawn Global Entity packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnGlobalEntity));  // Spawn Global Entity packet
 	Pkt.WriteVarInt32(0);  // EntityID = 0, always
 	Pkt.WriteBEUInt8(1);  // Type = Thunderbolt
 	Pkt.WriteBEDouble(a_BlockX);
