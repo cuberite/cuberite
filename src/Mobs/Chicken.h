@@ -1,34 +1,38 @@
 #pragma once
 
 #include "PassiveMonster.h"
-
+#include "Behaviors/BehaviorItemDropper.h"
 
 
 
 
 class cChicken :
-    public cPassiveMonster
+	public cMonster
 {
-    typedef cPassiveMonster super;
+	typedef cMonster super;
 
 public:
-    cChicken(void);
+	cChicken(void);
 
-    CLASS_PROTODEF(cChicken)
+	CLASS_PROTODEF(cChicken)
 
-    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-    virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 
-    virtual void GetFollowedItems(cItems & a_Items) override
-    {
-        a_Items.Add(E_ITEM_SEEDS);
-    }
+	virtual void GetFollowedItems(cItems & a_Items) override
+	{
+		a_Items.Add(E_ITEM_SEEDS);
+	}
 
-    virtual void HandleFalling(void) override;
+	virtual void HandleFalling(void) override;
 
 private:
+	// Tick controlling behaviors
+	cBehaviorBreeder m_BehaviorBreeder;
+	cBehaviorItemFollower m_BehaviorItemFollower;
+	cBehaviorCoward m_BehaviorCoward;
+	cBehaviorWanderer m_BehaviorWanderer;
 
-    int m_EggDropTimer;
+	cBehaviorItemDropper m_BehaviorItemDropper;
 } ;
 
 
