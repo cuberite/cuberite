@@ -1353,12 +1353,13 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown)
+void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
 	m_NewWorld = a_World;
 	m_NewWorldPosition = a_NewPosition;
 	m_IsWorldChangeScheduled = true;
 	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
+	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
 }
 
 
@@ -1378,7 +1379,7 @@ bool cEntity::DetectPortal()
 			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 		}
 
-		MoveToWorld(m_NewWorld, false, m_NewWorldPosition);
+		MoveToWorld(m_NewWorld, m_WorldChangeSendRespawn, m_NewWorldPosition);
 		return true;
 	}
 

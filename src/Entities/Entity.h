@@ -428,7 +428,7 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false);
+	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false);
 
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
@@ -592,6 +592,7 @@ protected:
 	/** State variables for ScheduleMoveToWorld. */
 	bool m_IsWorldChangeScheduled;
 	bool m_WorldChangeSetPortalCooldown;
+	bool m_WorldChangeSendRespawn;
 	cWorld * m_NewWorld;
 	Vector3d m_NewWorldPosition;
 
