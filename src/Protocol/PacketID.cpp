@@ -7,7 +7,7 @@
 
 
 
-int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
+UInt32 cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 {
 	switch (a_Packet)
 	{
@@ -87,7 +87,7 @@ int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 
 
 
-int cProtocol_1_9_4::GetPacketId(eOutgoingPackets a_Packet)
+UInt32 cProtocol_1_9_4::GetPacketId(eOutgoingPackets a_Packet)
 {
 	switch (a_Packet)
 	{
@@ -105,7 +105,7 @@ int cProtocol_1_9_4::GetPacketId(eOutgoingPackets a_Packet)
 
 
 
-int cProtocol_1_12::GetPacketId(eOutgoingPackets a_Packet)
+UInt32 cProtocol_1_12::GetPacketId(eOutgoingPackets a_Packet)
 {
 	switch (a_Packet)
 	{
@@ -145,7 +145,7 @@ int cProtocol_1_12::GetPacketId(eOutgoingPackets a_Packet)
 
 
 
-int cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
+UInt32 cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
 {
 	switch (a_Packet)
 	{

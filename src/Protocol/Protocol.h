@@ -132,7 +132,7 @@ public:
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 
 	/** Called to figure out a packet ID */
-	virtual int GetPacketId(eOutgoingPackets a_Packet) = 0;
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;

@@ -53,7 +53,7 @@ public:
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
 
 	/** GetPacketId is implemented in each protocol version class */
-	virtual int GetPacketId(eOutgoingPackets a_Packet) override { return 0; };
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override { return 0; }
 
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
