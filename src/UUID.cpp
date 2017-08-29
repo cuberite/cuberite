@@ -68,11 +68,11 @@ static Byte FromHexDigit(char a_Hex)
 	}
 	if (('a' <= a_Hex) && (a_Hex <= 'f'))
 	{
-		return static_cast<Byte>(a_Hex - 'a');
+		return static_cast<Byte>(10 + (a_Hex - 'a'));
 	}
 	if (('A' <= a_Hex) && (a_Hex <= 'F'))
 	{
-		return static_cast<Byte>(a_Hex - 'A');
+		return static_cast<Byte>(10 + (a_Hex - 'A'));
 	}
 	return 0xff;
 }

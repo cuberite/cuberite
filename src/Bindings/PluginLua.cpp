@@ -550,6 +550,15 @@ bool cPluginLua::OnLogin(cClientHandle & a_Client, UInt32 a_ProtocolVersion, con
 
 
 
+bool cPluginLua::OnLoginForge(cClientHandle & a_Client, const AStringMap & a_Mods)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_LOGIN_FORGE, &a_Client, a_Mods);
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_ANIMATION, &a_Player, a_Animation);
@@ -1059,6 +1068,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
 		case cPluginManager::HOOK_LOGIN:                        return "OnLogin";
+		case cPluginManager::HOOK_LOGIN_FORGE:                  return "OnLoginForge";
 		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK:        return "OnPlayerBreakingBlock";
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
 		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";

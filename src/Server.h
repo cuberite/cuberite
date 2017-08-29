@@ -71,6 +71,16 @@ public:
 	size_t GetNumPlayers(void) const { return m_PlayerCount; }
 	void SetMaxPlayers(size_t a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 
+	// tolua_end
+
+	/** Add a Forge mod to the server ping list. */
+	bool RegisterForgeMod(const AString & a_ModName, const AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
+
+	// tolua_begin
+
+	/** Remove a Forge mod to the server ping list. */
+	void UnregisterForgeMod(const AString & a_ModName, UInt32 a_ProtocolVersionNumber);
+
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */
 	bool IsPlayerInQueue(AString a_Username);
@@ -145,6 +155,9 @@ public:
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
 
+	/** Get the Forge mods (map of ModName -> ModVersionString) registered for a given protocol. */
+	const AStringMap & GetRegisteredForgeMods(const UInt32 a_Protocol);
+
 private:
 
 	friend class cRoot;  // so cRoot can create and destroy cServer
@@ -202,6 +215,9 @@ private:
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
 
+	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
+	std::map<UInt32, AStringMap> m_ForgeModsByVersion;
+
 	/** True - allow same username to login more than once False - only once */
 	bool m_bAllowMultiLogin;
 
@@ -240,6 +256,9 @@ private:
 
 
 	cServer(void);
+
+	/** Get the Forge mods registered for a given protocol, for modification */
+	AStringMap & RegisteredForgeMods(const UInt32 a_Protocol);
 
 	/** Loads, or generates, if missing, RSA keys for protocol encryption */
 	void PrepareKeys(void);

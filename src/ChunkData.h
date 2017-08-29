@@ -80,6 +80,18 @@ public:
 	/** Copies the skylight data into the specified flat array. */
 	void CopySkyLight  (NIBBLETYPE * a_Dest) const;
 
+	/** Fills the chunk with the specified block. */
+	void FillBlockTypes(BLOCKTYPE a_Value);
+
+	/** Fills the chunk with the specified meta value. */
+	void FillMetas     (NIBBLETYPE a_Value);
+
+	/** Fills the chunk with the specified block light. */
+	void FillBlockLight(NIBBLETYPE a_Value);
+
+	/** Fills the chunk with the specified sky light. */
+	void FillSkyLight  (NIBBLETYPE a_Value);
+
 	/** Copies the blocktype data from the specified flat array into the internal representation.
 	Allocates sections that are needed for the operation.
 	Requires that a_Src is a valid pointer. */
