@@ -16,6 +16,11 @@
 cMooshroom::cMooshroom(void) :
 	super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3)
 {
+	m_EMPersonality = PASSIVE;
+	m_BehaviorBreeder.AttachToMonster(*this);
+	m_BehaviorCoward.AttachToMonster(*this);
+	m_BehaviorItemFollower.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
 }
 
 
@@ -39,6 +44,7 @@ void cMooshroom::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cMooshroom::OnRightClicked(cPlayer & a_Player)
 {
+	// mobTodo Behaviors
 	switch (a_Player.GetEquippedItem().m_ItemType)
 	{
 		case E_ITEM_BUCKET:
@@ -73,3 +79,20 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 	}
 }
 
+
+
+
+
+cBehaviorBreeder * cMooshroom::GetBehaviorBreeder()
+{
+	return &m_BehaviorBreeder;
+}
+
+
+
+
+
+const cBehaviorBreeder * cMooshroom::GetBehaviorBreeder() const
+{
+	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
+}

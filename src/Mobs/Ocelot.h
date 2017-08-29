@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "PassiveMonster.h"
+#include "Monster.h"
 #include "../UUID.h"
 
 
@@ -9,9 +9,9 @@
 
 
 class cOcelot :
-	public cPassiveMonster
+	public cMonster
 {
-	typedef cPassiveMonster super;
+	typedef cMonster super;
 
 public:
 

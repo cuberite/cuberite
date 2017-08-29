@@ -14,6 +14,11 @@ cRabbit::cRabbit(void) :
 		static_cast<UInt8>(eRabbitType::SaltAndPepper)  // Max possible Rabbit-Type
 	)), 0)
 {
+	m_EMPersonality = PASSIVE;
+	m_BehaviorBreeder.AttachToMonster(*this);
+	m_BehaviorCoward.AttachToMonster(*this);
+	m_BehaviorItemFollower.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
 }
 
 
@@ -45,3 +50,20 @@ void cRabbit::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 }
 
+
+
+
+
+cBehaviorBreeder * cRabbit::GetBehaviorBreeder()
+{
+	return &m_BehaviorBreeder;
+}
+
+
+
+
+
+const cBehaviorBreeder * cRabbit::GetBehaviorBreeder() const
+{
+	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
+}

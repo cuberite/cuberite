@@ -1,8 +1,11 @@
 #pragma once
 
-#include "PassiveMonster.h"
+#include "Behaviors/BehaviorBreeder.h"
+#include "Behaviors/BehaviorItemFollower.h"
+#include "Behaviors/BehaviorCoward.h"
+#include "Behaviors/BehaviorWanderer.h"
 #include "Behaviors/BehaviorItemDropper.h"
-
+#include "Monster.h"
 
 
 

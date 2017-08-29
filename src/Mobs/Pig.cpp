@@ -13,6 +13,11 @@ cPig::cPig(void) :
 	super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", 0.9, 0.9),
 	m_bIsSaddled(false)
 {
+	m_EMPersonality = PASSIVE;
+	m_BehaviorBreeder.AttachToMonster(*this);
+	m_BehaviorCoward.AttachToMonster(*this);
+	m_BehaviorItemFollower.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
 }
 
 
@@ -40,6 +45,9 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 void cPig::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
+
+	// Behavior note: saddling is pig-specific. It is not transferrable to other mobs.
+	// Therefore saddling is not a standalone behavior and is hardcoded into the pig.
 
 	if (m_bIsSaddled)
 	{
@@ -91,6 +99,9 @@ void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	// Behavior note: saddling is pig-specific. It is not transferrable to other mobs.
+	// Therefore saddling is not a standalone behavior and is hardcoded into the pig.
+
 	// If the attachee player is holding a carrot-on-stick, let them drive this pig:
 	if (m_bIsSaddled && (m_Attachee != nullptr))
 	{
@@ -121,6 +132,23 @@ bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 	return true;
 }
 
+
+
+
+
+cBehaviorBreeder * cPig::GetBehaviorBreeder()
+{
+	return &m_BehaviorBreeder;
+}
+
+
+
+
+
+const cBehaviorBreeder * cPig::GetBehaviorBreeder() const
+{
+	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
+}
 
 
 

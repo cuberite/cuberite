@@ -1,16 +1,16 @@
-
 #pragma once
 
-#include "PassiveMonster.h"
 
-
-
-
+#include "Behaviors/BehaviorBreeder.h"
+#include "Behaviors/BehaviorItemFollower.h"
+#include "Behaviors/BehaviorCoward.h"
+#include "Behaviors/BehaviorWanderer.h"
+#include "Monster.h"
 
 class cPig :
-	public cPassiveMonster
+	public cMonster
 {
-	typedef cPassiveMonster super;
+	typedef cMonster super;
 
 public:
 	cPig(void);
@@ -30,8 +30,14 @@ public:
 	}
 
 	bool IsSaddled(void) const { return m_bIsSaddled; }
-
+	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
+	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
+	// Tick controlling behaviors
+	cBehaviorBreeder m_BehaviorBreeder;
+	cBehaviorItemFollower m_BehaviorItemFollower;
+	cBehaviorCoward m_BehaviorCoward;
+	cBehaviorWanderer m_BehaviorWanderer;
 
 	bool m_bIsSaddled;
 

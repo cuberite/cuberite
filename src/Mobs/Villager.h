@@ -1,16 +1,21 @@
 
 #pragma once
 
-#include "PassiveMonster.h"
+#include "Monster.h"
 #include "Blocks/ChunkInterface.h"
 
+#include "Behaviors/BehaviorBreeder.h"
+#include "Behaviors/BehaviorItemFollower.h"
+#include "Behaviors/BehaviorCoward.h"
+#include "Behaviors/BehaviorWanderer.h"
+#include "Monster.h"
 
 
 
 class cVillager :
-	public cPassiveMonster
+	public cMonster
 {
-	typedef cPassiveMonster super;
+	typedef cMonster super;
 
 public:
 
@@ -53,6 +58,12 @@ public:
 	bool     DoesHaveActionActivated(void) const { return m_VillagerAction; }
 
 private:
+	// Tick controlling behaviors
+	cBehaviorBreeder m_BehaviorBreeder;
+	cBehaviorItemFollower m_BehaviorItemFollower;
+	cBehaviorCoward m_BehaviorCoward;
+	cBehaviorWanderer m_BehaviorWanderer;
+
 
 	int m_ActionCountDown;
 	int m_Type;

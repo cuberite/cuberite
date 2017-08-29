@@ -2,9 +2,9 @@
 
 #include "Behaviors/BehaviorBreeder.h"
 #include "Behaviors/BehaviorItemFollower.h"
-#include "Behaviors/BehaviorItemReplacer.h"
 #include "Behaviors/BehaviorCoward.h"
 #include "Behaviors/BehaviorWanderer.h"
+#include "Behaviors/BehaviorItemReplacer.h"
 #include "Monster.h"
 
 class cCow : public cMonster

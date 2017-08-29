@@ -1,16 +1,16 @@
 
 #pragma once
 
-#include "PassiveMonster.h"
+#include "Monster.h"
 
 
 
 
 
 class cBat :
-	public cPassiveMonster
+	public cMonster
 {
-	typedef cPassiveMonster super;
+	typedef cMonster super;
 
 public:
 	cBat(void);

@@ -1,16 +1,18 @@
 
 #pragma once
 
-#include "PassiveMonster.h"
-
-
+#include "Behaviors/BehaviorBreeder.h"
+#include "Behaviors/BehaviorItemFollower.h"
+#include "Behaviors/BehaviorCoward.h"
+#include "Behaviors/BehaviorWanderer.h"
+#include "Monster.h"
 
 
 
 class cSheep :
-	public cPassiveMonster
+	public cMonster
 {
-	typedef cPassiveMonster super;
+	typedef cMonster super;
 
 public:
 
@@ -41,12 +43,23 @@ public:
 
 	int GetFurColor(void) const { return m_WoolColor; }
 	void SetFurColor(int a_WoolColor) { m_WoolColor = a_WoolColor; }
-
+	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
+	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
-	bool m_IsSheared;
-	int m_WoolColor;
+
+	// Tick controlling behaviors
+	cBehaviorBreeder m_BehaviorBreeder;
+	cBehaviorItemFollower m_BehaviorItemFollower;
+	cBehaviorCoward m_BehaviorCoward;
+	cBehaviorWanderer m_BehaviorWanderer;
+
+	// mobTodo transfer this to a behavior
 	int m_TimeToStopEating;
 
+	// Behavior note: These are ship-specific things not transferrable to other mobs.
+	// Therefore they do not need a Behavior and can stay hardcoded in the sheep.
+	bool m_IsSheared;
+	int m_WoolColor;
 } ;
 
 

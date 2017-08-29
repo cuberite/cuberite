@@ -10,6 +10,7 @@ cCow::cCow(void) :
 	super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3),
 	m_BehaviorItemReplacer(E_ITEM_BUCKET, E_ITEM_MILK)
 {
+	m_EMPersonality = PASSIVE;
 	m_BehaviorBreeder.AttachToMonster(*this);
 	m_BehaviorCoward.AttachToMonster(*this);
 	m_BehaviorItemFollower.AttachToMonster(*this);
@@ -31,12 +32,6 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_LEATHER);
 	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
 }
-
-
-
-
-
-
 
 
 

@@ -6,7 +6,6 @@
 #include "../EffectID.h"
 #include "Entities/LeashKnot.h"
 #include "BoundingBox.h"
-#include "../Mobs/PassiveMonster.h"
 
 
 

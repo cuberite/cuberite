@@ -20,6 +20,7 @@ cOcelot::cOcelot(void) :
 	m_CatType(ctWildOcelot),
 	m_OwnerName("")
 {
+	m_EMPersonality = PASSIVE;
 }
 
 

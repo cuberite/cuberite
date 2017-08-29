@@ -1,8 +1,11 @@
 
 #pragma once
 
-#include "PassiveMonster.h"
-
+#include "Behaviors/BehaviorBreeder.h"
+#include "Behaviors/BehaviorItemFollower.h"
+#include "Behaviors/BehaviorCoward.h"
+#include "Behaviors/BehaviorWanderer.h"
+#include "Monster.h"
 
 
 
@@ -23,9 +26,9 @@ enum class eRabbitType : UInt8
 
 
 class cRabbit :
-	public cPassiveMonster
+	public cMonster
 {
-	typedef cPassiveMonster super;
+	typedef cMonster super;
 
 public:
 	cRabbit();
@@ -44,7 +47,14 @@ public:
 	eRabbitType GetRabbitType()         const { return m_Type; }
 	int         GetMoreCarrotTicks()    const { return m_MoreCarrotTicks; }
 
+	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
+	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
+	// Tick controlling behaviors
+	cBehaviorBreeder m_BehaviorBreeder;
+	cBehaviorItemFollower m_BehaviorItemFollower;
+	cBehaviorCoward m_BehaviorCoward;
+	cBehaviorWanderer m_BehaviorWanderer;
 
 	eRabbitType m_Type;
 	int m_MoreCarrotTicks;  // Ticks until the Rabbit eat planted Carrots
