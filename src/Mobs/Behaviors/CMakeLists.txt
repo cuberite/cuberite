@@ -7,8 +7,9 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 SET (SRCS
     Behavior.cpp
     BehaviorAggressive.cpp
-    BehaviorChaser.cpp
     BehaviorBreeder.cpp
+    BehaviorChaser.cpp
+    BehaviorDoNothing.cpp
     BehaviorDayLightBurner.cpp
     BehaviorCoward.cpp
     BehaviorItemDropper.cpp
@@ -21,8 +22,9 @@ SET (SRCS
 SET (HDRS
     Behavior.h
     BehaviorAggressive.h
-    BehaviorChaser.h
     BehaviorBreeder.h
+    BehaviorChaser.h
+    BehaviorDoNothing.h
     BehaviorDayLightBurner.h
     BehaviorCoward.h
     BehaviorItemDropper.h

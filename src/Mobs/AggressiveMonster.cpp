@@ -16,7 +16,7 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height)
 {
 	m_EMPersonality = AGGRESSIVE;
-	ASSERT(GetBehaviorChaser() != nullptr);
+	m_BehaviorWanderer.AttachToMonster(*this);
 }
 
 

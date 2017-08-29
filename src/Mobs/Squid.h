@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Monster.h"
+#include "Behaviors/BehaviorDoNothing.h"
 
 
 
@@ -24,6 +25,9 @@ public:
 	// Squids do not drown (or float)
 	virtual void HandleAir(void) override {}
 	virtual void SetSwimState(cChunk & a_Chunk) override {}
+
+private:
+	cBehaviorDoNothing m_BehaviorDoNothing;
 } ;
 
 

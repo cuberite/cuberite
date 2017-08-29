@@ -12,6 +12,7 @@ cSquid::cSquid(void) :
 	super("Squid", mtSquid, "entity.squid.hurt", "entity.squid.death", 0.95, 0.95)
 {
 	m_EMPersonality = PASSIVE;
+	m_BehaviorDoNothing.AttachToMonster(*this);
 }
 
 

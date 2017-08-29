@@ -4,6 +4,7 @@
 #include "../Entities/Pawn.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
+#include "Behaviors/BehaviorWanderer.h"
 #include <vector>
 
 class cItem;
