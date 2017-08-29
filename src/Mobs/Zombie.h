@@ -7,9 +7,9 @@
 
 
 class cZombie :
-	public cAggressiveMonster
+	public cMonster
 {
-	typedef cAggressiveMonster super;
+	typedef cMonster super;
 
 public:
 	cZombie(bool a_IsVillagerZombie);

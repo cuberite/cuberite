@@ -26,6 +26,7 @@ SET (SRCS
 	PathFinder.cpp
 	Pig.cpp
 	Rabbit.cpp
+	MobPointer.cpp
 	Sheep.cpp
 	Skeleton.cpp
 	Slime.cpp
@@ -65,6 +66,7 @@ SET (HDRS
 	PathFinder.h
 	Pig.h
 	Rabbit.h
+	MobPointer.h
 	Sheep.h
 	Silverfish.h
 	Skeleton.h

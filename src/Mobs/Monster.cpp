@@ -112,7 +112,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_LeashToPos(nullptr)
 	, m_IsLeashActionJustDone(false)
 	, m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive)
-	, m_Target(nullptr)
+	, m_LookingAt(nullptr)
 	, m_CurrentTickControllingBehavior(nullptr)
 	, m_NewTickControllingBehavior(nullptr)
 	, m_TickControllingBehaviorState(Normal)
@@ -129,7 +129,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 
 cMonster::~cMonster()
 {
-	ASSERT(GetTarget() == nullptr);
+
 }
 
 
@@ -167,7 +167,6 @@ void cMonster::Destroyed()
 		Behavior->Destroyed();
 	}
 
-	SetTarget(nullptr);  // Tell them we're no longer targeting them.
 	super::Destroyed();
 }
 
@@ -519,9 +518,10 @@ void cMonster::CalcLeashActions()
 void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 {
 	Vector3d BodyDistance;
-	if (!a_IsFollowingPath && (GetTarget() != nullptr))
+	cPawn * LookingAt = m_LookingAt.GetPointer();
+	if (!a_IsFollowingPath && (LookingAt != nullptr))
 	{
-		BodyDistance = GetTarget()->GetPosition() - GetPosition();
+		BodyDistance = LookingAt->GetPosition() - GetPosition();
 	}
 	else
 	{
@@ -533,15 +533,15 @@ void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 	SetYaw(BodyRotation);
 
 	Vector3d HeadDistance;
-	if (GetTarget() != nullptr)
+	if (LookingAt != nullptr)
 	{
-		if (GetTarget()->IsPlayer())  // Look at a player
+		if (LookingAt->IsPlayer())  // Look at a player
 		{
-			HeadDistance = GetTarget()->GetPosition() - GetPosition();
+			HeadDistance = LookingAt->GetPosition() - GetPosition();
 		}
 		else  // Look at some other entity
 		{
-			HeadDistance = GetTarget()->GetPosition() - GetPosition();
+			HeadDistance = LookingAt->GetPosition() - GetPosition();
 			// HeadDistance.y = GetTarget()->GetPosY() + GetHeight();
 		}
 	}
@@ -975,16 +975,19 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-/** Sets the target. */
-void cMonster::SetTarget (cPawn * a_NewTarget)
+
+void cMonster::SetLookingAt(cPawn * a_NewTarget)
 {
+	m_LookingAt = a_NewTarget;
+
+	/*
 	ASSERT((a_NewTarget == nullptr) || (IsTicking()));
-	if (m_Target == a_NewTarget)
+	if (m_LookingAt == a_NewTarget)
 	{
 		return;
 	}
-	cPawn * OldTarget = m_Target;
-	m_Target = a_NewTarget;
+	cPawn * OldTarget = m_LookingAt;
+	m_LookingAt = a_NewTarget;
 
 	if (OldTarget != nullptr)
 	{
@@ -998,28 +1001,9 @@ void cMonster::SetTarget (cPawn * a_NewTarget)
 		// Notify the new target that we are now targeting it.
 		m_Target->TargetingMe(this);
 		m_WasLastTargetAPlayer = m_Target->IsPlayer();
-	}
+	}*/
 
 }
-
-
-
-
-
-void cMonster::UnsafeUnsetTarget()
-{
-	m_Target = nullptr;
-}
-
-
-
-
-
-cPawn * cMonster::GetTarget()
-{
-	return m_Target;
-}
-
 
 
 

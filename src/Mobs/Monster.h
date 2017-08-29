@@ -5,6 +5,7 @@
 #include "MonsterTypes.h"
 #include "PathFinder.h"
 #include "Behaviors/BehaviorWanderer.h"
+#include "MobPointer.h"
 #include <vector>
 
 class cItem;
@@ -185,14 +186,7 @@ public:
 	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);
 
 	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
-	void SetTarget (cPawn * a_NewTarget);
-
-	/** Unset the target without notifying the target entity. Do not use this, use SetTarget(nullptr) instead.
-	This is only used by cPawn internally. */
-	void UnsafeUnsetTarget();
-
-	/** Returns the current target. */
-	cPawn * GetTarget();
+	void SetLookingAt(cPawn * a_NewTarget);
 
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
@@ -326,10 +320,8 @@ public:
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
 private:
-	/** A pointer to the entity this mobile is aiming to reach.
-	The validity of this pointer SHALL be guaranteed by the pointee;
-	it MUST be reset when the pointee changes worlds or is destroyed. */
-	cPawn * m_Target;
+	/** A pointer to the entity this mobile is lookingAt */
+	cMobPointer m_LookingAt;
 
 	/** Leash calculations inside Tick function */
 	void CalcLeashActions();

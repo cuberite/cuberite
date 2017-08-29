@@ -239,7 +239,9 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	}
 
 	cChunk * ParentChunk = GetParentChunk();
-	m_World->QueueTask([this, ParentChunk](cWorld & a_World)
+	// Destroy the entity after two seconds, to give time for all raw pointers such as m_Target
+	// to de-target this entity. This is a temporary solution.
+	m_World->ScheduleTask(40, [this, ParentChunk](cWorld & a_World)
 	{
 		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
 			this->GetUniqueID(), this->GetClass(),
