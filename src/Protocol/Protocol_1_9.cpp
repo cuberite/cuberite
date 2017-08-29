@@ -706,7 +706,7 @@ void cProtocol_1_9_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the Join Game packet:
 	{
 		cServer * Server = cRoot::Get()->GetServer();
-		cPacketizer Pkt(*this, 0x23);  // Join Game packet
+		cPacketizer Pkt(*this, GetPacketId(sendJoinGame));  // Join Game packet
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteBEInt8(static_cast<Int8>(a_World.GetDimension()));
@@ -718,13 +718,13 @@ void cProtocol_1_9_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 
 	// Send the spawn position:
 	{
-		cPacketizer Pkt(*this, 0x43);  // Spawn Position packet
+		cPacketizer Pkt(*this, GetPacketId(sendSpawnPosition));  // Spawn Position packet
 		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
 	{
-		cPacketizer Pkt(*this, 0x0d);  // Server difficulty packet
+		cPacketizer Pkt(*this, GetPacketId(sendDifficulty));  // Server difficulty packet
 		Pkt.WriteBEInt8(1);
 	}
 
@@ -4171,10 +4171,10 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the Join Game packet:
 	{
 		cServer * Server = cRoot::Get()->GetServer();
-		cPacketizer Pkt(*this, 0x23);  // Join Game packet
+		cPacketizer Pkt(*this, GetPacketId(sendJoinGame));  // Join Game packet
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
-		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
+		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));  // This is the change from 1.9.0 (Int8 to Int32)
 		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");  // Level type - wtf?
@@ -4183,13 +4183,13 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 
 	// Send the spawn position:
 	{
-		cPacketizer Pkt(*this, 0x43);  // Spawn Position packet
+		cPacketizer Pkt(*this, GetPacketId(sendSpawnPosition));  // Spawn Position packet
 		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
 	{
-		cPacketizer Pkt(*this, 0x0d);  // Server difficulty packet
+		cPacketizer Pkt(*this, GetPacketId(sendDifficulty));  // Server difficulty packet
 		Pkt.WriteBEInt8(1);
 	}
 

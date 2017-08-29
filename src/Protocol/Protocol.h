@@ -68,6 +68,7 @@ public:
 		sendChatRaw,
 		sendCollectEntity,
 		sendDestroyEntity,
+		sendDifficulty,
 		sendDisconnectDuringLogin,
 		sendDisconnectDuringGame,
 		sendEditSign,
@@ -88,7 +89,8 @@ public:
 		sendInventorySlot,
 		sendKeepAlive,
 		sendLeashEntity,
-		// Login?
+		sendJoinGame,
+		sendSpawnPosition,
 		sendPaintingSpawn,
 		sendMapData,
 		// SendPickupSpawn?
@@ -101,7 +103,6 @@ public:
 		sendPlayerSpawn,
 		sendPluginMessage,
 		sendRemoveEntityEffect,
-		sendResetTitle,
 		sendRespawn,
 		sendExperience,
 		sendExperienceOrb,

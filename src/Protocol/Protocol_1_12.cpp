@@ -985,41 +985,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 
 
-void cProtocol_1_12::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
-{
-	// Send the Join Game packet:
-	{
-		cServer * Server = cRoot::Get()->GetServer();
-		cPacketizer Pkt(*this, 0x23);  // Join Game packet
-		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
-		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
-		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
-		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
-		Pkt.WriteString("default");  // Level type - wtf?
-		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
-	}
-
-	// Send the spawn position:
-	{
-		cPacketizer Pkt(*this, 0x45);  // Spawn Position packet
-		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
-	}
-
-	// Send the server difficulty:
-	{
-		cPacketizer Pkt(*this, 0x0d);  // Server difficulty packet
-		Pkt.WriteBEInt8(1);
-	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
-}
-
-
-
-
-
 void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
 	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
@@ -1071,7 +1036,7 @@ void cProtocol_1_12::SendResetTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendResetTitle));  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(5);  // Reset title
 }
 
@@ -1235,41 +1200,6 @@ void cProtocol_1_12_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	Json::FastWriter Writer;
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Writer.write(ResponseValue));
-}
-
-
-
-
-
-void cProtocol_1_12_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
-{
-	// Send the Join Game packet:
-	{
-		cServer * Server = cRoot::Get()->GetServer();
-		cPacketizer Pkt(*this, 0x23);  // Join Game packet
-		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
-		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
-		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
-		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
-		Pkt.WriteString("default");  // Level type - wtf?
-		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
-	}
-
-	// Send the spawn position:
-	{
-		cPacketizer Pkt(*this, 0x46);  // Spawn Position packet
-		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
-	}
-
-	// Send the server difficulty:
-	{
-		cPacketizer Pkt(*this, 0x0d);  // Server difficulty packet
-		Pkt.WriteBEInt8(1);
-	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
 }
 
 

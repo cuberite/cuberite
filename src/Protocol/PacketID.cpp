@@ -20,6 +20,7 @@ int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 	case sendChatRaw:               return 0x0f;
 	case sendCollectEntity:         return 0x49;
 	case sendDestroyEntity:         return 0x30;
+	case sendDifficulty:            return 0x0d;
 	case sendDisconnectDuringGame:  return 0x1a;
 	case sendDisconnectDuringLogin: return 0x0;
 	case sendDisplayObjective:      return 0x38;
@@ -41,6 +42,7 @@ int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 	case sendGameMode:              return 0x1e;
 	case sendHealth:                return 0x3e;
 	case sendInventorySlot:         return 0x16;
+	case sendJoinGame:              return 0x23;
 	case sendKeepAlive:             return 0x1f;
 	case sendLeashEntity:           return 0x3a;
 	case sendMapData:               return 0x24;
@@ -56,6 +58,7 @@ int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 	case sendRespawn:               return 0x33;
 	case sendScoreboardObjective:   return 0x3f;
 	case sendScoreUpdate:           return 0x42;
+	case sendSpawnPosition:         return 0x43;
 	case sendSoundEffect:           return 0x19;
 	case sendSoundParticleEffect:   return 0x21;
 	case sendSpawnMob:              return 0x03;
@@ -74,6 +77,8 @@ int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 	case sendWindowOpen:            return 0x13;
 	case sendWindowProperty:        return 0x15;
 	}
+	LOGWARNING("Retrieving packet ID for unknown packet type %d!", a_Packet);
+	return 0;
 }
 
 
@@ -90,7 +95,7 @@ int cProtocol_1_9_4::GetPacketId(eOutgoingPackets a_Packet)
 	case sendPlayerMaxSpeed:   return 0x4a;
 	case sendTeleportEntity:   return 0x49;
 
-	default: super::GetPacketId(a_Packet);
+	default: return super::GetPacketId(a_Packet);
 	}
 }
 
@@ -124,12 +129,13 @@ int cProtocol_1_12::GetPacketId(eOutgoingPackets a_Packet)
 	case sendRespawn:             return 0x34;
 	case sendScoreboardObjective: return 0x41;
 	case sendScoreUpdate:         return 0x44;
+	case sendSpawnPosition:       return 0x45;
 	case sendTeleportEntity:      return 0x4b;
 	case sendTimeUpdate:          return 0x46;
 	case sendTitle:               return 0x47;
 	case sendUpdateBlockEntity:   return 0x09;
 
-	default: super::GetPacketId(a_Packet);
+	default: return super::GetPacketId(a_Packet);
 	}
 }
 
@@ -161,11 +167,12 @@ int cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
 	case sendRespawn:             return 0x35;
 	case sendScoreboardObjective: return 0x42;
 	case sendScoreUpdate:         return 0x45;
+	case sendSpawnPosition:       return 0x46;
 	case sendUseBed:              return 0x30;
 	case sendTeleportEntity:      return 0x4c;
 	case sendTimeUpdate:          return 0x47;
 	case sendTitle:               return 0x48;
 
-	default: super::GetPacketId(a_Packet);
+	default: return super::GetPacketId(a_Packet);
 	}
 }

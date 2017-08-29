@@ -34,7 +34,6 @@ public:
 
 	virtual void SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
 	virtual void SendHideTitle(void) override;
-	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendResetTitle(void) override;
 	virtual void SendSpawnMob(const cMonster & a_Mob) override;
 	virtual void SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
@@ -61,8 +60,6 @@ public:
 	cProtocol_1_12_1(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	virtual int GetPacketId(eOutgoingPackets a_Packet) override;
-
-	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 
 protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
