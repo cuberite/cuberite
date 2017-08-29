@@ -161,6 +161,7 @@ int cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
 	case sendEntityVelocity:      return 0x3e;
 	case sendExperience:          return 0x40;
 	case sendHealth:              return 0x41;
+	case sendLeashEntity:         return 0x3d;
 	case sendPlayerList:          return 0x2e;
 	case sendPlayerAbilities:     return 0x2c;
 	case sendPlayerMaxSpeed:      return 0x4e;
