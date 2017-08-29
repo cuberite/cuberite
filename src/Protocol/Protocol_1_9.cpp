@@ -816,7 +816,7 @@ void cProtocol_1_9_0::SendPickupSpawn(const cPickup & a_Pickup)
 	ASSERT(m_State == 3);  // In game mode?
 
 	{  // TODO Use SendSpawnObject
-		cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+		cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
 		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 		Pkt.WriteBEUInt64(0);
@@ -1353,7 +1353,7 @@ void cProtocol_1_9_0::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 	Pkt.WriteVarInt32(a_FallingBlock.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -1412,7 +1412,7 @@ void cProtocol_1_9_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectTyp
 		FixItemFramePositions(a_ObjectData, PosX, PosZ, Yaw);
 	}
 
-	cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -1437,7 +1437,7 @@ void cProtocol_1_9_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Vehicle
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);

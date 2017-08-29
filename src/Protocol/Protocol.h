@@ -108,6 +108,7 @@ public:
 		sendExperienceOrb,
 		sendScoreboardObjective,
 		sendScoreUpdate,
+		sendSpawnObject,
 		sendDisplayObjective,
 		sendSoundEffect,
 		sendSoundParticleEffect,

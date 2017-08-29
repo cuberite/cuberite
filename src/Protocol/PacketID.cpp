@@ -58,6 +58,7 @@ int cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 	case sendRespawn:               return 0x33;
 	case sendScoreboardObjective:   return 0x3f;
 	case sendScoreUpdate:           return 0x42;
+	case sendSpawnObject:           return 0x00;
 	case sendSpawnPosition:         return 0x43;
 	case sendSoundEffect:           return 0x19;
 	case sendSoundParticleEffect:   return 0x21;
