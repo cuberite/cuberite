@@ -92,10 +92,10 @@ protected:
 		AStringVector m_Groups;
 
 		/** Assigned by ResolveUserUUIDs(), contains the online (Mojang) UUID of the player. */
-		AString m_UUID;
+		cUUID m_UUID;
 
 		/** Assigned by ResolveUserUUIDs(), contains the offline (generated) UUID of the player. */
-		AString m_OfflineUUID;
+		cUUID m_OfflineUUID;
 
 
 		sUser(void) {}
@@ -282,15 +282,15 @@ protected:
 		m_MojangAPI.GetUUIDsFromPlayerNames(PlayerNames);
 
 		// Assign the UUIDs back to players, remove those not resolved:
-		for (sUserMap::iterator itr = m_Users.begin(); itr != m_Users.end(); ++itr)
+		for (auto & User : m_Users)
 		{
-			AString UUID = m_MojangAPI.GetUUIDFromPlayerName(itr->second.m_Name);
-			if (UUID.empty())
+			cUUID UUID = m_MojangAPI.GetUUIDFromPlayerName(User.second.m_Name);
+			if (UUID.IsNil())
 			{
-				LOGWARNING("RankMigrator: Cannot resolve player %s to online UUID, player will be left unranked in online mode", itr->second.m_Name.c_str());
+				LOGWARNING("RankMigrator: Cannot resolve player %s to online UUID, player will be left unranked in online mode", User.second.m_Name.c_str());
 			}
-			itr->second.m_UUID = UUID;
-			itr->second.m_OfflineUUID = cClientHandle::GenerateOfflineUUID(itr->second.m_Name);
+			User.second.m_UUID = UUID;
+			User.second.m_OfflineUUID = cClientHandle::GenerateOfflineUUID(User.second.m_Name);
 		}
 	}
 
@@ -469,7 +469,7 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 
 
 
-AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
+AString cRankManager::GetPlayerRankName(const cUUID & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
@@ -477,7 +477,7 @@ AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT Rank.Name FROM Rank LEFT JOIN PlayerRank ON Rank.RankID = PlayerRank.RankID WHERE PlayerRank.PlayerUUID = ?");
-		stmt.bind(1, a_PlayerUUID);
+		stmt.bind(1, a_PlayerUUID.ToShortString());
 		// executeStep returns false on no data
 		if (!stmt.executeStep())
 		{
@@ -497,7 +497,7 @@ AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 
 
 
-AString cRankManager::GetPlayerName(const AString & a_PlayerUUID)
+AString cRankManager::GetPlayerName(const cUUID & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
@@ -506,7 +506,7 @@ AString cRankManager::GetPlayerName(const AString & a_PlayerUUID)
 	{
 		// Prepare the DB statement:
 		SQLite::Statement stmt(m_DB, "SELECT PlayerName FROM PlayerRank WHERE PlayerUUID = ?");
-		stmt.bind(1, a_PlayerUUID);
+		stmt.bind(1, a_PlayerUUID.ToShortString());
 
 		if (stmt.executeStep())
 		{
@@ -524,7 +524,7 @@ AString cRankManager::GetPlayerName(const AString & a_PlayerUUID)
 
 
 
-AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
+AStringVector cRankManager::GetPlayerGroups(const cUUID & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
@@ -539,7 +539,7 @@ AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 				"LEFT JOIN PlayerRank ON PlayerRank.RankID = RankPermGroup.RankID "
 			"WHERE PlayerRank.PlayerUUID = ?"
 		);
-		stmt.bind(1, a_PlayerUUID);
+		stmt.bind(1, a_PlayerUUID.ToShortString());
 
 		// Execute and get results:
 		while (stmt.executeStep())
@@ -558,7 +558,7 @@ AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 
 
 
-AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
+AStringVector cRankManager::GetPlayerPermissions(const cUUID & a_PlayerUUID)
 {
 	AString Rank = GetPlayerRankName(a_PlayerUUID);
 	if (Rank.empty())
@@ -572,7 +572,7 @@ AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 
 
 
-AStringVector cRankManager::GetPlayerRestrictions(const AString & a_PlayerUUID)
+AStringVector cRankManager::GetPlayerRestrictions(const cUUID & a_PlayerUUID)
 {
 	AString Rank = GetPlayerRankName(a_PlayerUUID);
 	if (Rank.empty())
@@ -739,18 +739,24 @@ AStringVector cRankManager::GetRankRestrictions(const AString & a_RankName)
 
 
 
-AStringVector cRankManager::GetAllPlayerUUIDs(void)
+std::vector<cUUID> cRankManager::GetAllPlayerUUIDs(void)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
 
-	AStringVector res;
+	cUUID tempUUID;
+	std::vector<cUUID> res;
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT PlayerUUID FROM PlayerRank ORDER BY PlayerName COLLATE NOCASE");
 		while (stmt.executeStep())
 		{
-			res.push_back(stmt.getColumn(0).getText());
+			if (!tempUUID.FromString(stmt.getColumn(0).getText()))
+			{
+				// Invalid UUID, ignore
+				continue;
+			}
+			res.push_back(tempUUID);
 		}
 	}
 	catch (const SQLite::Exception & ex)
@@ -881,7 +887,7 @@ AStringVector cRankManager::GetAllPermissionsRestrictions(void)
 
 
 bool cRankManager::GetPlayerMsgVisuals(
-	const AString & a_PlayerUUID,
+	const cUUID & a_PlayerUUID,
 	AString & a_MsgPrefix,
 	AString & a_MsgSuffix,
 	AString & a_MsgNameColorCode
@@ -1746,10 +1752,12 @@ bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewN
 
 
 
-void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName)
+void cRankManager::SetPlayerRank(const cUUID & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
+
+	AString StrUUID = a_PlayerUUID.ToShortString();
 
 	try
 	{
@@ -1771,7 +1779,7 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 			SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET RankID = ?, PlayerName = ? WHERE PlayerUUID = ?");
 			stmt.bind(1, RankID);
 			stmt.bind(2, a_PlayerName);
-			stmt.bind(3, a_PlayerUUID);
+			stmt.bind(3, StrUUID);
 			if (stmt.exec() > 0)
 			{
 				// Successfully updated the player's rank
@@ -1782,7 +1790,7 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 		// The player is not yet in the DB, add them:
 		SQLite::Statement stmt(m_DB, "INSERT INTO PlayerRank (RankID, PlayerUUID, PlayerName) VALUES (?, ?, ?)");
 		stmt.bind(1, RankID);
-		stmt.bind(2, a_PlayerUUID);
+		stmt.bind(2, StrUUID);
 		stmt.bind(3, a_PlayerName);
 		if (stmt.exec() > 0)
 		{
@@ -1791,13 +1799,13 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 		}
 
 		LOGWARNING("%s: Failed to set player UUID %s to rank %s.",
-			__FUNCTION__, a_PlayerUUID.c_str(), a_RankName.c_str()
+			__FUNCTION__, StrUUID.c_str(), a_RankName.c_str()
 		);
 	}
 	catch (const SQLite::Exception & ex)
 	{
 		LOGWARNING("%s: Failed to set player UUID %s to rank %s: %s",
-			__FUNCTION__, a_PlayerUUID.c_str(), a_RankName.c_str(), ex.what()
+			__FUNCTION__, StrUUID.c_str(), a_RankName.c_str(), ex.what()
 		);
 	}
 }
@@ -1806,21 +1814,23 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 
 
 
-void cRankManager::RemovePlayerRank(const AString & a_PlayerUUID)
+void cRankManager::RemovePlayerRank(const cUUID & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
 
+	AString StrUUID = a_PlayerUUID.ToShortString();
+
 	try
 	{
 		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank WHERE PlayerUUID = ?");
-		stmt.bind(1, a_PlayerUUID);
+		stmt.bind(1, StrUUID);
 		stmt.exec();
 	}
 	catch (const SQLite::Exception & ex)
 	{
 		LOGWARNING("%s: Failed to remove rank from player UUID %s: %s",
-			__FUNCTION__, a_PlayerUUID.c_str(), ex.what()
+			__FUNCTION__, StrUUID.c_str(), ex.what()
 		);
 	}
 }
@@ -1948,15 +1958,17 @@ bool cRankManager::GroupExists(const AString & a_GroupName)
 
 
 
-bool cRankManager::IsPlayerRankSet(const AString & a_PlayerUUID)
+bool cRankManager::IsPlayerRankSet(const cUUID & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
 
+	AString StrUUID = a_PlayerUUID.ToShortString();
+
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT * FROM PlayerRank WHERE PlayerUUID = ?");
-		stmt.bind(1, a_PlayerUUID);
+		stmt.bind(1, StrUUID);
 		if (stmt.executeStep())
 		{
 			// The player UUID was found, they have a rank
@@ -1965,7 +1977,7 @@ bool cRankManager::IsPlayerRankSet(const AString & a_PlayerUUID)
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to query DB for player UUID %s: %s", __FUNCTION__, a_PlayerUUID.c_str(), ex.what());
+		LOGWARNING("%s: Failed to query DB for player UUID %s: %s", __FUNCTION__, StrUUID.c_str(), ex.what());
 	}
 	return false;
 }
@@ -2068,7 +2080,7 @@ bool cRankManager::IsRestrictionInGroup(const AString & a_Restriction, const ASt
 
 
 
-void cRankManager::NotifyNameUUID(const AString & a_PlayerName, const AString & a_UUID)
+void cRankManager::NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UUID)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
@@ -2077,7 +2089,7 @@ void cRankManager::NotifyNameUUID(const AString & a_PlayerName, const AString & 
 	{
 		SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET PlayerName = ? WHERE PlayerUUID = ?");
 		stmt.bind(1, a_PlayerName);
-		stmt.bind(2, a_UUID);
+		stmt.bind(2, a_UUID.ToShortString());
 		stmt.exec();
 	}
 	catch (const SQLite::Exception & ex)
@@ -2161,16 +2173,18 @@ void cRankManager::ClearPlayerRanks(void)
 
 
 
-bool cRankManager::UpdatePlayerName(const AString & a_PlayerUUID, const AString & a_NewPlayerName)
+bool cRankManager::UpdatePlayerName(const cUUID & a_PlayerUUID, const AString & a_NewPlayerName)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
+
+	AString StrUUID = a_PlayerUUID.ToShortString();
 
 	try
 	{
 		SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET PlayerName = ? WHERE PlayerUUID = ?");
 		stmt.bind(1, a_NewPlayerName);
-		stmt.bind(2, a_PlayerUUID);
+		stmt.bind(2, StrUUID);
 		if (stmt.exec() > 0)
 		{
 			// The player name was changed, returns true
@@ -2179,7 +2193,7 @@ bool cRankManager::UpdatePlayerName(const AString & a_PlayerUUID, const AString 
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to update player name from UUID %s: %s", __FUNCTION__, a_PlayerUUID.c_str(), ex.what());
+		LOGWARNING("%s: Failed to update player name from UUID %s: %s", __FUNCTION__, StrUUID.c_str(), ex.what());
 	}
 	return false;
 }

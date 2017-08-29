@@ -115,9 +115,7 @@ void cBlockPistonHandler::PushBlocks(
 	for (auto & moveBlockPos : sortedBlocks)
 	{
 		a_World.GetBlockTypeMeta(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
-		a_World.SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
 
-		moveBlockPos += a_PushDir;
 		if (cBlockInfo::IsPistonBreakable(moveBlock))
 		{
 			// Block is breakable, drop it
@@ -130,10 +128,13 @@ void cBlockPistonHandler::PushBlocks(
 					moveBlockPos.x, moveBlockPos.y, moveBlockPos.z
 				);
 			}
+			a_World.SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
 		}
 		else
 		{
 			// Not breakable, just move it
+			a_World.SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
+			moveBlockPos += a_PushDir;
 			a_World.SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
 		}
 	}

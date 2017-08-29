@@ -8,6 +8,7 @@
 #include "../Root.h"
 #include "tolua++/include/tolua++.h"
 #include "LuaState.h"
+#include "UUID.h"
 
 
 
@@ -266,7 +267,7 @@ static int tolua_cRankManager_GetAllPlayerUUIDs(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -274,10 +275,18 @@ static int tolua_cRankManager_GetAllPlayerUUIDs(lua_State * L)
 	}
 
 	// Get the player uuid's:
-	AStringVector Players = cRoot::Get()->GetRankManager()->GetAllPlayerUUIDs();
+	std::vector<cUUID> Players = cRoot::Get()->GetRankManager()->GetAllPlayerUUIDs();
+
+	// Convert to string UUIDs
+	std::vector<AString> StrUUIDs;
+	StrUUIDs.reserve(Players.size());
+	for (const auto & UUID : Players)
+	{
+		StrUUIDs.push_back(UUID.ToShortString());
+	}
 
 	// Push the results:
-	S.Push(Players);
+	S.Push(StrUUIDs);
 	return 1;
 }
 
@@ -430,8 +439,8 @@ static int tolua_cRankManager_GetPlayerGroups(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -439,7 +448,7 @@ static int tolua_cRankManager_GetPlayerGroups(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Get the groups:
@@ -462,8 +471,8 @@ static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -471,7 +480,7 @@ static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Get the permissions:
@@ -498,8 +507,8 @@ static int tolua_cRankManager_GetPlayerPermissions(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -507,7 +516,7 @@ static int tolua_cRankManager_GetPlayerPermissions(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Get the permissions:
@@ -530,8 +539,8 @@ static int tolua_cRankManager_GetPlayerRestrictions(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -539,7 +548,7 @@ static int tolua_cRankManager_GetPlayerRestrictions(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Get the permissions:
@@ -562,8 +571,8 @@ static int tolua_cRankManager_GetPlayerRankName(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -571,7 +580,7 @@ static int tolua_cRankManager_GetPlayerRankName(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Get the rank name:
@@ -594,8 +603,8 @@ static int tolua_cRankManager_GetPlayerName(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -603,7 +612,7 @@ static int tolua_cRankManager_GetPlayerName(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Get the player name:
@@ -887,8 +896,8 @@ static int tolua_cRankManager_IsPlayerRankSet(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -896,7 +905,7 @@ static int tolua_cRankManager_IsPlayerRankSet(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Get the response:
@@ -1067,8 +1076,8 @@ static int tolua_cRankManager_RemovePlayerRank(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -1076,7 +1085,7 @@ static int tolua_cRankManager_RemovePlayerRank(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID;
+	cUUID PlayerUUID;
 	S.GetStackValue(2, PlayerUUID);
 
 	// Remove the player's rank:
@@ -1219,8 +1228,9 @@ static int tolua_cRankManager_SetPlayerRank(lua_State * L)
 
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 4) ||
+		!S.CheckParamStaticSelf("cRankManager") ||
+		!S.CheckParamUUID(2) ||
+		!S.CheckParamString(3, 4) ||
 		!S.CheckParamEnd(5)
 	)
 	{
@@ -1228,7 +1238,8 @@ static int tolua_cRankManager_SetPlayerRank(lua_State * L)
 	}
 
 	// Get the params:
-	AString PlayerUUID, PlayerName, RankName;
+	AString PlayerName, RankName;
+	cUUID PlayerUUID;
 	S.GetStackValues(2, PlayerUUID, PlayerName, RankName);
 
 	// Set the rank:

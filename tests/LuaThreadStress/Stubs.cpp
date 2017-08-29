@@ -7,13 +7,14 @@
 #include "Globals.h"
 #include "BlockInfo.h"
 #include "Bindings.h"
+#include "DeadlockDetect.h"
+#include "UUID.h"
 #include "Bindings/DeprecatedBindings.h"
 #include "Bindings/LuaJson.h"
 #include "Bindings/ManualBindings.h"
 #include "BlockEntities/BlockEntity.h"
 #include "Blocks/BlockHandler.h"
 #include "Generating/ChunkDesc.h"
-#include "DeadlockDetect.h"
 
 
 
@@ -328,6 +329,24 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return nullptr;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int, cUUID *&)
+{
+	return false;
+}
+
+
+
+
+
+bool cUUID::FromString(const AString &)
+{
+	return true;
 }
 
 

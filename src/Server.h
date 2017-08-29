@@ -39,6 +39,7 @@ typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cCommandOutputCallback;
 class cSettingsRepositoryInterface;
+class cUUID;
 
 
 namespace Json
@@ -69,6 +70,16 @@ public:
 	size_t GetMaxPlayers(void) const { return m_MaxPlayers; }
 	size_t GetNumPlayers(void) const { return m_PlayerCount; }
 	void SetMaxPlayers(size_t a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
+
+	// tolua_end
+
+	/** Add a Forge mod to the server ping list. */
+	bool RegisterForgeMod(const AString & a_ModName, const AString & a_ModVersion, UInt32 a_ProtocolVersionNumber);
+
+	// tolua_begin
+
+	/** Remove a Forge mod to the server ping list. */
+	void UnregisterForgeMod(const AString & a_ModName, UInt32 a_ProtocolVersionNumber);
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */
@@ -101,7 +112,7 @@ public:
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
 	/** Authenticates the specified user, called by cAuthenticator */
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 
@@ -143,6 +154,9 @@ public:
 	/** Returns true if usernames should be completed across worlds. This is read
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
+
+	/** Get the Forge mods (map of ModName -> ModVersionString) registered for a given protocol. */
+	const AStringMap & GetRegisteredForgeMods(const UInt32 a_Protocol);
 
 private:
 
@@ -201,6 +215,9 @@ private:
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
 
+	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
+	std::map<UInt32, AStringMap> m_ForgeModsByVersion;
+
 	/** True - allow same username to login more than once False - only once */
 	bool m_bAllowMultiLogin;
 
@@ -239,6 +256,9 @@ private:
 
 
 	cServer(void);
+
+	/** Get the Forge mods registered for a given protocol, for modification */
+	AStringMap & RegisteredForgeMods(const UInt32 a_Protocol);
 
 	/** Loads, or generates, if missing, RSA keys for protocol encryption */
 	void PrepareKeys(void);

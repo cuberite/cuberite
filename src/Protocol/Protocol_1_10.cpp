@@ -15,6 +15,7 @@ Implements the 1.10 protocol classes:
 
 #include "../Root.h"
 #include "../Server.h"
+#include "../ClientHandle.h"
 
 #include "../WorldStorage/FastNBT.h"
 
@@ -346,6 +347,7 @@ void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -619,7 +621,7 @@ void cProtocol_1_10_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 
 			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
 			Writer.BeginCompound("Owner");
-			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID());
+			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
 			Writer.AddString("Name", MobHeadEntity.GetOwnerName());
 			Writer.BeginCompound("Properties");
 			Writer.BeginList("textures", TAG_Compound);

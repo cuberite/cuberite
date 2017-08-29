@@ -10,6 +10,7 @@
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
 #include "LineBlockTracer.h"
+#include "UUID.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -1004,18 +1005,21 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	}
 
 	// Add entities waiting in the queue to be added:
+	cEntityList EntitiesToAdd;
 	{
+		// Don't access chunkmap while holding lock
 		cCSLock Lock(m_CSEntitiesToAdd);
-		for (auto & Entity : m_EntitiesToAdd)
-		{
-			Entity->SetWorld(this);
-			auto EntityPtr = Entity.get();
-			m_ChunkMap->AddEntity(std::move(Entity));
-			ASSERT(!EntityPtr->IsTicking());
-			EntityPtr->SetIsTicking(true);
-		}
-		m_EntitiesToAdd.clear();
+		std::swap(EntitiesToAdd, m_EntitiesToAdd);
 	}
+	for (auto & Entity : EntitiesToAdd)
+	{
+		Entity->SetWorld(this);
+		auto EntityPtr = Entity.get();
+		m_ChunkMap->AddEntity(std::move(Entity));
+		ASSERT(!EntityPtr->IsTicking());
+		EntityPtr->SetIsTicking(true);
+	}
+	EntitiesToAdd.clear();
 
 	// Add players waiting in the queue to be added:
 	AddQueuedPlayers();
@@ -3271,7 +3275,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 
 
-bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback)
 {
 	return DoWithPlayerByUUID(a_PlayerUUID, std::bind(&cPlayerListCallback::Item, &a_Callback, std::placeholders::_1));
 }
@@ -3280,7 +3284,7 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallbac
 
 
 
-bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cLambdaPlayerCallback a_Callback)
+bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cLambdaPlayerCallback a_Callback)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)

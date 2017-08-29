@@ -88,8 +88,8 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 
 	/** Called when the item is mined to convert it into pickups. Pickups may specify multiple items. Appends items to a_Pickups, preserves its original contents.
-	Overloaded method with coords and digger, for blocks that needs to access the block entity, e.g. a bed */
-	virtual void ConvertToPickups(cEntity * a_Digger, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) {}
+	Overloaded method with coords and world interface for blocks that needs to access the block entity, e.g. a bed. */
+	virtual void ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) {}
 
 	/** Handles the dropping, but not destruction, of a block based on what ConvertTo(Verbatim)Pickups() returns, including the spawning of pickups and alertion of plugins
 	@param a_Digger The entity causing the drop; it may be nullptr

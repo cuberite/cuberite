@@ -33,6 +33,7 @@
 #include "../HTTP/UrlParser.h"
 #include "../Item.h"
 #include "../LineBlockTracer.h"
+#include "../Server.h"
 #include "../Root.h"
 #include "../StringCompression.h"
 #include "../WebAdmin.h"
@@ -1665,6 +1666,28 @@ static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 
 
 
+static int tolua_cPlayer_GetUUID(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cPlayer"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cPlayer * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Return the UUID as a string
+	L.Push(Self->GetUUID().ToShortString());
+	return 1;
+}
+
+
+
+
+
 template <
 	class OBJTYPE,
 	void (OBJTYPE::*SetCallback)(cLuaState::cCallbackPtr && a_CallbackFn)
@@ -2318,7 +2341,7 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 {
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserType(1, "cClientHandle") ||
+		!S.CheckParamSelf("cClientHandle") ||
 		!S.CheckParamString(2, 3) ||
 		!S.CheckParamEnd(4)
 	)
@@ -2343,13 +2366,166 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 
 
 
+static int tolua_cClientHandle_GetForgeMods(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamSelf("cClientHandle") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	cClientHandle * Client;
+	S.GetStackValue(1, Client);
+
+	S.Push(Client->GetForgeMods());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cClientHandle_GetUUID(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cClientHandle") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cClientHandle * Self;
+	L.GetStackValue(1, Self);
+
+	// Return the UUID as a string:
+	L.Push(Self->GetUUID().ToShortString());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cClientHandle_GenerateOfflineUUID(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamStaticSelf("cClientHandle") ||
+		!L.CheckParamString(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	AString Username;
+	L.GetStackValue(2, Username);
+
+	// Return the UUID as a string:
+	L.Push(cClientHandle::GenerateOfflineUUID(Username).ToShortString());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cClientHandle_IsUUIDOnline(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamStaticSelf("cClientHandle") ||
+		!L.CheckParamUUID(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cUUID UUID;
+	L.GetStackValue(2, UUID);
+
+	// Return the result:
+	L.Push(cClientHandle::IsUUIDOnline(UUID));
+	return 1;
+}
+
+
+
+
+static int tolua_cMobHeadEntity_SetOwner(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cMobHeadEntity") ||
+		!L.CheckParamUUID(2) ||
+		!L.CheckParamString(3, 5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+
+	// Get the params:
+	cMobHeadEntity * Self;
+	cUUID OwnerUUID;
+	AString OwnerName, OwnerTexture, OwnerTextureSignature;
+	L.GetStackValues(1, Self, OwnerUUID, OwnerName, OwnerTexture, OwnerTextureSignature);
+
+	// Set the owner:
+	Self->SetOwner(OwnerUUID, OwnerName, OwnerTexture, OwnerTextureSignature);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cMobHeadEntity_GetOwnerUUID(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cMobHeadEntity") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cMobHeadEntity * Self;
+	L.GetStackValue(1, Self);
+
+	// Return the UUID as a string:
+	cUUID Owner = Self->GetOwnerUUID();
+	L.Push(Owner.IsNil() ? AString{} : Owner.ToShortString());
+	return 1;
+}
+
+
+
+
+
 static int tolua_cMojangAPI_AddPlayerNameToUUIDMapping(lua_State * L)
 {
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamStaticSelf("cMojangAPI") ||
 		!S.CheckParamString(2) ||
-		!S.CheckParamString(3) ||
+		!S.CheckParamUUID(3) ||
 		!S.CheckParamEnd(4)
 	)
 	{
@@ -2357,9 +2533,9 @@ static int tolua_cMojangAPI_AddPlayerNameToUUIDMapping(lua_State * L)
 	}
 
 	// Retrieve the parameters:
-	AString UUID, PlayerName;
-	S.GetStackValue(2, PlayerName);
-	S.GetStackValue(3, UUID);
+	AString PlayerName;
+	cUUID UUID;
+	S.GetStackValues(2, PlayerName, UUID);
 
 	// Store in the cache:
 	cRoot::Get()->GetMojangAPI().AddPlayerNameToUUIDMapping(PlayerName, UUID);
@@ -2374,15 +2550,15 @@ static int tolua_cMojangAPI_GetPlayerNameFromUUID(lua_State * L)
 {
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cMojangAPI") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cMojangAPI") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(4)
 	)
 	{
 		return 0;
 	}
 
-	AString UUID;
+	cUUID UUID;
 	S.GetStackValue(2, UUID);
 
 	// If the UseOnlyCached param was given, read it; default to false
@@ -2407,7 +2583,7 @@ static int tolua_cMojangAPI_GetUUIDFromPlayerName(lua_State * L)
 {
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamStaticSelf("cMojangAPI") ||
 		!S.CheckParamString(2) ||
 		!S.CheckParamEnd(4)
 	)
@@ -2426,9 +2602,9 @@ static int tolua_cMojangAPI_GetUUIDFromPlayerName(lua_State * L)
 		lua_pop(L, 1);
 	}
 
-	// Return the UUID:
-	AString UUID = cRoot::Get()->GetMojangAPI().GetUUIDFromPlayerName(PlayerName, ShouldUseCacheOnly);
-	S.Push(UUID);
+	// Return the UUID as a string:
+	cUUID UUID = cRoot::Get()->GetMojangAPI().GetUUIDFromPlayerName(PlayerName, ShouldUseCacheOnly);
+	S.Push(UUID.IsNil() ? AString{} : UUID.ToShortString());
 	return 1;
 }
 
@@ -2440,7 +2616,7 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 {
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamStaticSelf("cMojangAPI") ||
 		!S.CheckParamTable(2) ||
 		!S.CheckParamEnd(4)
 	)
@@ -2476,23 +2652,23 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 	lua_newtable(L);
 
 	// Get the UUIDs:
-	AStringVector UUIDs = cRoot::Get()->GetMojangAPI().GetUUIDsFromPlayerNames(PlayerNames, ShouldUseCacheOnly);
+	auto UUIDs = cRoot::Get()->GetMojangAPI().GetUUIDsFromPlayerNames(PlayerNames, ShouldUseCacheOnly);
 	if (UUIDs.size() != PlayerNames.size())
 	{
 		// A hard error has occured while processing the request, no UUIDs were returned. Return an empty table:
 		return 1;
 	}
 
-	// Convert to output table, PlayerName -> UUID:
+	// Convert to output table, PlayerName -> UUID string:
 	size_t len = UUIDs.size();
 	for (size_t i = 0; i < len; i++)
 	{
-		if (UUIDs[i].empty())
+		if (UUIDs[i].IsNil())
 		{
 			// No UUID was provided for PlayerName[i], skip it in the resulting table
 			continue;
 		}
-		lua_pushlstring(L, UUIDs[i].c_str(), UUIDs[i].length());
+		S.Push(UUIDs[i].ToShortString());
 		lua_setfield(L, 3, PlayerNames[i].c_str());
 	}
 	return 1;
@@ -2504,13 +2680,13 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 
 static int tolua_cMojangAPI_MakeUUIDDashed(lua_State * L)
 {
-	// Function signature: cMojangAPI:MakeUUIDDashed(UUID) -> string
+	// Function now non-existant but kept for API compatibility
 
 	// Check params:
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cMojangAPI") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamStaticSelf("cMojangAPI") ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -2518,11 +2694,11 @@ static int tolua_cMojangAPI_MakeUUIDDashed(lua_State * L)
 	}
 
 	// Get the params:
-	AString UUID;
+	cUUID UUID;
 	S.GetStackValue(2, UUID);
 
 	// Push the result:
-	S.Push(cRoot::Get()->GetMojangAPI().MakeUUIDDashed(UUID));
+	S.Push(UUID.ToLongString());
 	return 1;
 }
 
@@ -2532,13 +2708,13 @@ static int tolua_cMojangAPI_MakeUUIDDashed(lua_State * L)
 
 static int tolua_cMojangAPI_MakeUUIDShort(lua_State * L)
 {
-	// Function signature: cMojangAPI:MakeUUIDShort(UUID) -> string
+	// Function now non-existant but kept for API compatibility
 
 	// Check params:
 	cLuaState S(L);
 	if (
 		!S.CheckParamUserTable(1, "cMojangAPI") ||
-		!S.CheckParamString(2) ||
+		!S.CheckParamUUID(2) ||
 		!S.CheckParamEnd(3)
 	)
 	{
@@ -2546,11 +2722,11 @@ static int tolua_cMojangAPI_MakeUUIDShort(lua_State * L)
 	}
 
 	// Get the params:
-	AString UUID;
+	cUUID UUID;
 	S.GetStackValue(2, UUID);
 
 	// Push the result:
-	S.Push(cRoot::Get()->GetMojangAPI().MakeUUIDShort(UUID));
+	S.Push(UUID.ToShortString());
 	return 1;
 }
 
@@ -3053,6 +3229,66 @@ static int tolua_cLuaWindow_new_local(lua_State * tolua_S)
 
 
 
+static int tolua_cRoot_DoWithPlayerByUUID(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cRoot") ||
+		!L.CheckParamUUID(2) ||
+		!L.CheckParamFunction(3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	class cCallback :
+		public cPlayerListCallback
+	{
+	public:
+		cCallback(cLuaState & a_LuaState) :
+			m_LuaState(a_LuaState)
+		{
+		}
+
+		virtual bool Item(cPlayer * a_Player) override
+		{
+			bool ret = false;
+			m_LuaState.Call(m_FnRef, a_Player, cLuaState::Return, ret);
+			return ret;
+		}
+
+		cLuaState & m_LuaState;
+		cLuaState::cRef m_FnRef;
+	} Callback(L);
+
+	// Get parameters:
+	cRoot * Self;
+	cUUID PlayerUUID;
+	L.GetStackValues(1, Self, PlayerUUID, Callback.m_FnRef);
+
+	if (PlayerUUID.IsNil())
+	{
+		return L.ApiParamError("Expected a non-nil UUID for parameter #1");
+	}
+	if (!Callback.m_FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #2");
+	}
+
+	// Call the function:
+	bool res = Self->DoWithPlayerByUUID(PlayerUUID, Callback);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cRoot_GetBuildCommitID(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -3179,6 +3415,37 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	// Push the output, number of ticks and input as the three return values:
 	L.Push(Recipe->Out, Recipe->CookTime, Recipe->In);
 	return 3;
+}
+
+
+
+
+
+static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamSelf("cServer") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamNumber(4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	cServer * Server;
+	AString Name, Version;
+	UInt32 Protocol;
+	L.GetStackValues(1, Server, Name, Version, Protocol);
+
+	if (!Server->RegisterForgeMod(Name, Version, Protocol))
+	{
+		tolua_error(L, "duplicate Forge mod name registration", nullptr);
+		return 0;
+	}
+
+	return 0;
 }
 
 
@@ -3791,9 +4058,14 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cClientHandle");
-			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
-			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
-			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
+			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE",   cClientHandle::MAX_VIEW_DISTANCE);
+			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE",   cClientHandle::MIN_VIEW_DISTANCE);
+
+			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
+			tolua_function(tolua_S, "SendPluginMessage",   tolua_cClientHandle_SendPluginMessage);
+			tolua_function(tolua_S, "GetUUID",             tolua_cClientHandle_GetUUID);
+			tolua_function(tolua_S, "GenerateOfflineUUID", tolua_cClientHandle_GenerateOfflineUUID);
+			tolua_function(tolua_S, "IsUUIDOnline",        tolua_cClientHandle_IsUUIDOnline);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cColor");
@@ -3881,6 +4153,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithMap", DoWithID<cMapManager, cMap, &cMapManager::DoWithMap>);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cMobHeadEntity");
+			tolua_function(tolua_S, "SetOwner",     tolua_cMobHeadEntity_SetOwner);
+			tolua_function(tolua_S, "GetOwnerUUID", tolua_cMobHeadEntity_GetOwnerUUID);
+		tolua_endmodule(tolua_S);
+
 		tolua_beginmodule(tolua_S, "cMojangAPI");
 			tolua_function(tolua_S, "AddPlayerNameToUUIDMapping", tolua_cMojangAPI_AddPlayerNameToUUIDMapping);
 			tolua_function(tolua_S, "GetPlayerNameFromUUID",      tolua_cMojangAPI_GetPlayerNameFromUUID);
@@ -3894,6 +4171,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);
 			tolua_function(tolua_S, "GetRestrictions",   tolua_cPlayer_GetRestrictions);
 			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
+			tolua_function(tolua_S, "GetUUID",           tolua_cPlayer_GetUUID);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlugin");
@@ -3923,8 +4201,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cRoot");
+			tolua_function(tolua_S, "DoWithPlayerByUUID",  tolua_cRoot_DoWithPlayerByUUID);
 			tolua_function(tolua_S, "FindAndDoWithPlayer", DoWith <cRoot, cPlayer, &cRoot::FindAndDoWithPlayer>);
-			tolua_function(tolua_S, "DoWithPlayerByUUID",  DoWith <cRoot, cPlayer, &cRoot::DoWithPlayerByUUID>);
 			tolua_function(tolua_S, "ForEachPlayer",       ForEach<cRoot, cPlayer, &cRoot::ForEachPlayer>);
 			tolua_function(tolua_S, "ForEachWorld",        ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
 			tolua_function(tolua_S, "GetBrewingRecipe",    tolua_cRoot_GetBrewingRecipe);
@@ -3939,6 +4217,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachObjective", ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
 			tolua_function(tolua_S, "ForEachTeam",      ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
 			tolua_function(tolua_S, "GetTeamNames",     tolua_cScoreboard_GetTeamNames);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cServer");
+			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");

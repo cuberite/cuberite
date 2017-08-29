@@ -14,6 +14,7 @@ class cPluginLua;
 class cBoundingBox;
 template <typename T> class cItemCallback;
 class cEntity;
+class cUUID;
 
 
 
