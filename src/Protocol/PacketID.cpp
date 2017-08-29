@@ -154,6 +154,7 @@ int cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
 	case sendDestroyEntity:       return 0x32;
 	case sendDisplayObjective:    return 0x3b;
 	case sendEntityEffect:        return 0x4f;
+	case sendEntityEquipment:     return 0x3f;
 	case sendEntityHeadLook:      return 0x36;
 	case sendEntityMeta:          return 0x3c;
 	case sendEntityProperties:    return 0x4e;
