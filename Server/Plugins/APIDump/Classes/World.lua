@@ -1830,7 +1830,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				{
 					{
 						Name = "ShrapnelLevel",
-						Type = "Globals#eShrapnelLevel",
+						Type = "eShrapnelLevel",
 					},
 				},
 				Notes = "Returns the shrapnel level, representing the block types that are propelled outwards following an explosion. Based on this value and a random picker, blocks are selectively converted to physics entities (FallingSand) and flung outwards.",
@@ -2861,7 +2861,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				{
 					{
 						Name = "ShrapnelLevel",
-						Type = "Globals#eShrapnelLevel",
+						Type = "eShrapnelLevel",
 					},
 				},
 				Notes = "Sets the Shrapnel level of the world.",

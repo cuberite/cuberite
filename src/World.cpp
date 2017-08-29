@@ -1000,18 +1000,21 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	}
 
 	// Add entities waiting in the queue to be added:
+	cEntityList EntitiesToAdd;
 	{
+		// Don't access chunkmap while holding lock
 		cCSLock Lock(m_CSEntitiesToAdd);
-		for (auto & Entity : m_EntitiesToAdd)
-		{
-			Entity->SetWorld(this);
-			auto EntityPtr = Entity.get();
-			m_ChunkMap->AddEntity(std::move(Entity));
-			ASSERT(!EntityPtr->IsTicking());
-			EntityPtr->SetIsTicking(true);
-		}
-		m_EntitiesToAdd.clear();
+		std::swap(EntitiesToAdd, m_EntitiesToAdd);
 	}
+	for (auto & Entity : EntitiesToAdd)
+	{
+		Entity->SetWorld(this);
+		auto EntityPtr = Entity.get();
+		m_ChunkMap->AddEntity(std::move(Entity));
+		ASSERT(!EntityPtr->IsTicking());
+		EntityPtr->SetIsTicking(true);
+	}
+	EntitiesToAdd.clear();
 
 	// Add players waiting in the queue to be added:
 	AddQueuedPlayers();
