@@ -1308,24 +1308,24 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			switch (a_PacketType)
 			{
 				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
-				case 0x01: break;  // Prepare Crafting Grid, not yet implemented
-				case 0x02: HandlePacketTabComplete(a_ByteBuffer); return true;
-				case 0x03: HandlePacketChatMessage(a_ByteBuffer); return true;
-				case 0x04: HandlePacketClientStatus(a_ByteBuffer); return true;
-				case 0x05: HandlePacketClientSettings(a_ByteBuffer); return true;
-				case 0x06: break;  // Confirm transaction - not used in Cuberite
-				case 0x07: HandlePacketEnchantItem(a_ByteBuffer); return true;
-				case 0x08: HandlePacketWindowClick(a_ByteBuffer); return true;
-				case 0x09: HandlePacketWindowClose(a_ByteBuffer); return true;
-				case 0x0a: HandlePacketPluginMessage(a_ByteBuffer); return true;
-				case 0x0b: HandlePacketUseEntity(a_ByteBuffer); return true;
-				case 0x0c: HandlePacketKeepAlive(a_ByteBuffer); return true;
-				case 0x0d: HandlePacketPlayer(a_ByteBuffer); return true;
-				case 0x0e: HandlePacketPlayerPos(a_ByteBuffer); return true;
-				case 0x0f: HandlePacketPlayerPosLook(a_ByteBuffer); return true;
-				case 0x10: HandlePacketPlayerLook(a_ByteBuffer); return true;
-				case 0x11: HandlePacketVehicleMove(a_ByteBuffer); return true;
-				case 0x12: HandlePacketBoatSteer(a_ByteBuffer); return true;
+				case 0x01: HandlePacketTabComplete(a_ByteBuffer); return true;
+				case 0x02: HandlePacketChatMessage(a_ByteBuffer); return true;
+				case 0x03: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x04: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x05: break;  // Confirm transaction - not used in Cuberite
+				case 0x06: HandlePacketEnchantItem(a_ByteBuffer); return true;
+				case 0x07: HandlePacketWindowClick(a_ByteBuffer); return true;
+				case 0x08: HandlePacketWindowClose(a_ByteBuffer); return true;
+				case 0x09: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x0a: HandlePacketUseEntity(a_ByteBuffer); return true;
+				case 0x0b: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x0c: HandlePacketPlayer(a_ByteBuffer); return true;
+				case 0x0d: HandlePacketPlayerPos(a_ByteBuffer); return true;
+				case 0x0e: HandlePacketPlayerPosLook(a_ByteBuffer); return true;
+				case 0x0f: HandlePacketPlayerLook(a_ByteBuffer); return true;
+				case 0x10: HandlePacketVehicleMove(a_ByteBuffer); return true;
+				case 0x11: HandlePacketBoatSteer(a_ByteBuffer); return true;
+				case 0x12: break;  // Craft Recipe Request - not yet implemented
 				case 0x13: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
 				case 0x14: HandlePacketBlockDig(a_ByteBuffer); return true;
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
@@ -1366,3 +1366,7 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 	m_Client->PacketUnknown(a_PacketType);
 	return false;
 }
+
+
+
+
