@@ -1,6 +1,10 @@
 
 #pragma once
 
+#include "Behaviors/BehaviorBreeder.h"
+#include "Behaviors/BehaviorItemFollower.h"
+#include "Behaviors/BehaviorCoward.h"
+#include "Behaviors/BehaviorWanderer.h"
 #include "Monster.h"
 
 
@@ -39,7 +43,14 @@ public:
 		a_Items.Add(E_ITEM_GOLDEN_APPLE);
 	}
 
+	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
+	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
+	// Tick controlling behaviors
+	cBehaviorBreeder m_BehaviorBreeder;
+	cBehaviorItemFollower m_BehaviorItemFollower;
+	cBehaviorCoward m_BehaviorCoward;
+	cBehaviorWanderer m_BehaviorWanderer;
 
 	bool m_bHasChest, m_bIsEating, m_bIsRearing, m_bIsMouthOpen, m_bIsTame, m_bIsSaddled;
 	int m_Type, m_Color, m_Style, m_Armour, m_TimesToTame, m_TameAttemptTimes, m_RearTickCount;

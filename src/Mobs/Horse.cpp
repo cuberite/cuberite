@@ -28,6 +28,10 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_MaxSpeed(14.0)
 {
 	m_EMPersonality = PASSIVE;
+	m_BehaviorBreeder.AttachToMonster(*this);
+	m_BehaviorCoward.AttachToMonster(*this);
+	m_BehaviorItemFollower.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
 }
 
 
@@ -192,4 +196,22 @@ void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 	{
 		super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
 	}
+}
+
+
+
+
+
+cBehaviorBreeder * cHorse::GetBehaviorBreeder()
+{
+	return &m_BehaviorBreeder;
+}
+
+
+
+
+
+const cBehaviorBreeder * cHorse::GetBehaviorBreeder() const
+{
+	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
 }

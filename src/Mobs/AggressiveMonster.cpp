@@ -27,25 +27,4 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-
-	/* cBehaviorChaser * BehaviorChaser = GetBehaviorChaser();
-	cBehaviorWanderer * BehaviorWanderer = GetBehaviorWanderer();
-
-	for (;;)
-	{
-		m_BehaviorAggressive.Tick();
-		if (BehaviorChaser->Tick())
-		{
-			break;
-		}
-		if ((BehaviorWanderer != nullptr) && BehaviorWanderer->ActiveTick(a_Dt, a_Chunk))
-		{
-			break;
-		}
-
-		ASSERT(!"Not a single Behavior took control, this is not normal. ");
-		break;
-	}
-
-	BehaviorChaser->Tick();*/
 }
