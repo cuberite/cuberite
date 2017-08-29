@@ -16,6 +16,7 @@
 #include "json/json.h"
 #include "ChunkSender.h"
 #include "EffectID.h"
+#include "Protocol/ForgeHandshake.h"
 #include "UUID.h"
 
 
@@ -255,7 +256,25 @@ public:  // tolua_export
 	/** Returns the client brand received in the MC|Brand plugin message or set by a plugin. */
 	const AString & GetClientBrand(void) const { return m_ClientBrand; }
 
+	/** Returns the Forge mods installed on the client. */
+	const AStringMap & GetForgeMods(void) const { return m_ForgeMods; }
+
+	/** Returns true if the client is modded with Forge. */
+	bool IsForgeClient(void) const { return m_ForgeHandshake.m_IsForgeClient; }
+
 	// tolua_end
+
+	/** Add the Forge mod list to the server ping response. */
+	void ForgeAugmentServerListPing(Json::Value & a_Response)
+	{
+		m_ForgeHandshake.AugmentServerListPing(a_Response);
+	}
+
+	/** Mark a client connection as using Forge. Set by the protocol. */
+	void SetIsForgeClient()
+	{
+		m_ForgeHandshake.m_IsForgeClient = true;
+	}
 
 	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
 	bool WantsSendChunk(int a_ChunkX, int a_ChunkZ);
@@ -375,9 +394,16 @@ private:
 
 	friend class cServer;  // Needs access to SetSelf()
 
+	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
+
+	/** Forge handshake state machine. */
+	cForgeHandshake m_ForgeHandshake;
+
+	/** Forge mods and versions installed on this client. */
+	AStringMap m_ForgeMods;
 
 	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
 	int m_CurrentViewDistance;
@@ -525,6 +551,9 @@ private:
 	cClientHandlePtr m_Self;
 
 	float m_BreakProgress;
+
+	/** Finish logging the user in after authenticating. */
+	void FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);

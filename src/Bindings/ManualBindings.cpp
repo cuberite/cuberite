@@ -33,6 +33,7 @@
 #include "../HTTP/UrlParser.h"
 #include "../Item.h"
 #include "../LineBlockTracer.h"
+#include "../Server.h"
 #include "../Root.h"
 #include "../StringCompression.h"
 #include "../WebAdmin.h"
@@ -2365,6 +2366,27 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 
 
 
+static int tolua_cClientHandle_GetForgeMods(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamSelf("cClientHandle") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	cClientHandle * Client;
+	S.GetStackValue(1, Client);
+
+	S.Push(Client->GetForgeMods());
+	return 1;
+}
+
+
+
+
+
 static int tolua_cClientHandle_GetUUID(lua_State * tolua_S)
 {
 	// Check the params:
@@ -3399,6 +3421,37 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 
 
 
+static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamSelf("cServer") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamNumber(4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	cServer * Server;
+	AString Name, Version;
+	UInt32 Protocol;
+	L.GetStackValues(1, Server, Name, Version, Protocol);
+
+	if (!Server->RegisterForgeMod(Name, Version, Protocol))
+	{
+		tolua_error(L, "duplicate Forge mod name registration", nullptr);
+		return 0;
+	}
+
+	return 0;
+}
+
+
+
+
+
 static int tolua_cScoreboard_GetTeamNames(lua_State * L)
 {
 	cLuaState S(L);
@@ -4007,6 +4060,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cClientHandle");
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE",   cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE",   cClientHandle::MIN_VIEW_DISTANCE);
+
+			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
 			tolua_function(tolua_S, "SendPluginMessage",   tolua_cClientHandle_SendPluginMessage);
 			tolua_function(tolua_S, "GetUUID",             tolua_cClientHandle_GetUUID);
 			tolua_function(tolua_S, "GenerateOfflineUUID", tolua_cClientHandle_GenerateOfflineUUID);
@@ -4162,6 +4217,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachObjective", ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
 			tolua_function(tolua_S, "ForEachTeam",      ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
 			tolua_function(tolua_S, "GetTeamNames",     tolua_cScoreboard_GetTeamNames);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cServer");
+			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");
