@@ -49,21 +49,3 @@ void cRabbit::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	RareDrops.Add(cItem(E_ITEM_RABBITS_FOOT));
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 }
-
-
-
-
-
-cBehaviorBreeder * cRabbit::GetBehaviorBreeder()
-{
-	return &m_BehaviorBreeder;
-}
-
-
-
-
-
-const cBehaviorBreeder * cRabbit::GetBehaviorBreeder() const
-{
-	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
-}

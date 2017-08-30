@@ -56,7 +56,7 @@ cMobPointer& cMobPointer::operator=(cMobPointer&& a_MobPointer)
 
 
 
-void cMobPointer::operator=(cPawn * a_Pointer)
+void cMobPointer::SetPointer(cPawn * a_Pointer)
 {
 	m_Pointer = a_Pointer;
 }

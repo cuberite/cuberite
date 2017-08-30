@@ -1,21 +1,16 @@
-
 #pragma once
 
-#include "AggressiveMonster.h"
-
-
-
-
+#include "Monster.h"
 
 class cBlaze :
-    public cAggressiveMonster
+	public cMonster
 {
-    typedef cAggressiveMonster super;
+	typedef cMonster super;
 
 public:
-    cBlaze(void);
+	cBlaze(void);
 
-    CLASS_PROTODEF(cBlaze)
+	CLASS_PROTODEF(cBlaze)
 
-    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 } ;

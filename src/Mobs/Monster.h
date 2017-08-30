@@ -200,10 +200,11 @@ public:
 	bool IsPathFinderActivated() const;
 
 	// Behavior getters (most are probably not used. mobTodo - cleanup most of them)
-	virtual cBehaviorBreeder * GetBehaviorBreeder();
-	virtual const cBehaviorBreeder * GetBehaviorBreeder() const;
-	virtual cBehaviorAttacker * GetBehaviorAttacker();
-	virtual cBehaviorDayLightBurner * GetBehaviorDayLightBurner(); // mobTodo this is probably temporary
+	cBehaviorBreeder * GetBehaviorBreeder();
+	const cBehaviorBreeder * GetBehaviorBreeder() const;
+	cBehaviorAttacker * GetBehaviorAttacker();\
+	cBehaviorBreeder * m_BehaviorBreederPointer;
+	cBehaviorAttacker * m_BehaviorAttackerPointer;
 
 	// Polymorphic behavior functions
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);

@@ -32,21 +32,3 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_LEATHER);
 	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
 }
-
-
-
-
-
-cBehaviorBreeder * cCow::GetBehaviorBreeder()
-{
-	return &m_BehaviorBreeder;
-}
-
-
-
-
-
-const cBehaviorBreeder * cCow::GetBehaviorBreeder() const
-{
-	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
-}

@@ -1,24 +1,24 @@
 
 #pragma once
 
-#include "AggressiveMonster.h"
+#include "Monster.h"
 
 
 
 
 
 class cSpider :
-    public cAggressiveMonster
+	public cMonster
 {
-    typedef cAggressiveMonster super;
+	typedef cMonster super;
 
 public:
-    cSpider(void);
+	cSpider(void);
 
-    CLASS_PROTODEF(cSpider)
+	CLASS_PROTODEF(cSpider)
 
-    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-    virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 } ;
 
 

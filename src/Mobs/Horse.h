@@ -42,9 +42,6 @@ public:
 		a_Items.Add(E_ITEM_GOLDEN_CARROT);
 		a_Items.Add(E_ITEM_GOLDEN_APPLE);
 	}
-
-	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
-	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
 	// Tick controlling behaviors
 	cBehaviorBreeder m_BehaviorBreeder;

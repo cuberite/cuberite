@@ -8,12 +8,8 @@ class cBehaviorDayLightBurner : cBehavior
 {
 public:
 	void AttachToMonster(cMonster & a_Parent);
-
 	void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
-
-	// Functions our host Monster should invoke:
-	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)  override;
 
 private:
 	cMonster * m_Parent;  // Our Parent

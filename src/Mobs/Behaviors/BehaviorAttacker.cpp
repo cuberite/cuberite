@@ -16,6 +16,7 @@ cBehaviorAttacker::cBehaviorAttacker() :
   , m_AttackCoolDownTicksLeft(0)
   , m_TicksSinceLastDamaged(100)
   , m_IsStriking(false)
+  , m_Target(nullptr)
 {
 
 }
@@ -24,13 +25,14 @@ cBehaviorAttacker::cBehaviorAttacker() :
 
 
 
-void cBehaviorAttacker::AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker)
+void cBehaviorAttacker::AttachToMonster(cMonster & a_Parent)
 {
 	m_Parent = &a_Parent;
 	m_Parent->AttachTickBehavior(this);
 	m_Parent->AttachDestroyBehavior(this);
 	m_Parent->AttachPostTickBehavior(this);
 	m_Parent->AttachDoTakeDamageBehavior(this);
+	m_Parent->m_BehaviorAttackerPointer = this;
 }
 
 
@@ -90,6 +92,7 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == m_Parent->GetWorld())));
 	if (GetTarget() != nullptr)
 	{
+		m_Parent->SetLookingAt(m_Target);
 		if (TargetOutOfSight())
 		{
 			SetTarget(nullptr);
@@ -237,8 +240,8 @@ bool cBehaviorAttacker::TargetIsInStrikeRadiusAndLineOfSight()
 	Vector3d MyHeadPosition = m_Parent->GetPosition() + Vector3d(0, m_Parent->GetHeight(), 0);
 	Vector3d AttackDirection(GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
 
-	if (TargetIsInStrikeRadius() &&
-			!LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())) &&
+	if (TargetIsInStrikeRadius()/* &&
+			!LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length()))*/ &&
 			(m_Parent->GetHealth() > 0.0)
 	)
 	{
@@ -279,7 +282,7 @@ void cBehaviorAttacker::ResetStrikeCooldown()
 
 void cBehaviorAttacker::StrikeTargetIfReady()
 {
-	if (m_AttackCoolDownTicksLeft != 0)
+	if (m_AttackCoolDownTicksLeft == 0)
 	{
 		StrikeTarget();
 	}

@@ -26,6 +26,7 @@ void cBehaviorBreeder::AttachToMonster(cMonster & a_Parent)
 	m_Parent->AttachPostTickBehavior(this);
 	m_Parent->AttachRightClickBehavior(this);
 	m_Parent->AttachDestroyBehavior(this);
+	m_Parent->m_BehaviorBreederPointer = this;
 }
 
 

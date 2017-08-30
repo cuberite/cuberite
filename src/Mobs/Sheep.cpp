@@ -209,21 +209,3 @@ NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
 		return E_META_WOOL_PINK;
 	}
 }
-
-
-
-
-
-cBehaviorBreeder * cSheep::GetBehaviorBreeder()
-{
-	return &m_BehaviorBreeder;
-}
-
-
-
-
-
-const cBehaviorBreeder * cSheep::GetBehaviorBreeder() const
-{
-	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
-}

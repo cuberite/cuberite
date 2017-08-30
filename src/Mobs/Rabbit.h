@@ -46,9 +46,6 @@ public:
 
 	eRabbitType GetRabbitType()         const { return m_Type; }
 	int         GetMoreCarrotTicks()    const { return m_MoreCarrotTicks; }
-
-	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
-	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
 	// Tick controlling behaviors
 	cBehaviorBreeder m_BehaviorBreeder;

@@ -1,25 +1,23 @@
-
 #pragma once
-
-#include "AggressiveMonster.h"
+#include "Monster.h"
 
 
 
 
 
 class cGhast :
-    public cAggressiveMonster
+	public cMonster
 {
-    typedef cAggressiveMonster super;
+	typedef cMonster super;
 
 public:
-    cGhast(void);
+	cGhast(void);
 
-    CLASS_PROTODEF(cGhast)
+	CLASS_PROTODEF(cGhast)
 
-    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 
-    bool IsCharging(void) const {return false; }
+	bool IsCharging(void) const {return false; }
 } ;
 
 

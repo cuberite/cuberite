@@ -3,7 +3,6 @@
 class cBehaviorAttacker;
 
 #include "Behavior.h"
-class cBehaviorStriker;
 
 
 /** Grants attack capability to the mob. Note that this is not the same as agression!
@@ -15,7 +14,7 @@ class cBehaviorAttacker : public cBehavior
 
 public:
 	cBehaviorAttacker();
-	void AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker);
+	void AttachToMonster(cMonster & a_Parent);
 
 
 	// Our host monster will call these once it loads its config file

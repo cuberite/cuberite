@@ -1,23 +1,23 @@
 #pragma once
 
-#include "AggressiveMonster.h"
+#include "Monster.h"
 
 
 
 
 
 class cCaveSpider :
-    public cAggressiveMonster
+	public cMonster
 {
-    typedef cAggressiveMonster super;
+	typedef cMonster super;
 
 public:
-    cCaveSpider(void);
+	cCaveSpider(void);
 
-    CLASS_PROTODEF(cCaveSpider)
+	CLASS_PROTODEF(cCaveSpider)
 
-    virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-    virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 } ;
 
 

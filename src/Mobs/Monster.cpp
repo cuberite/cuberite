@@ -85,6 +85,8 @@ static const struct
 
 cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
+	, m_BehaviorBreederPointer(nullptr)
+	, m_BehaviorAttackerPointer(nullptr)
 	, m_EMPersonality(AGGRESSIVE)
 	, m_NearestPlayerIsStale(true)
 	, m_PathFinder(a_Width, a_Height)
@@ -115,6 +117,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_LookingAt(nullptr)
 	, m_CurrentTickControllingBehavior(nullptr)
 	, m_NewTickControllingBehavior(nullptr)
+	, m_PinnedBehavior(nullptr)
 	, m_TickControllingBehaviorState(Normal)
 {
 	if (!a_ConfigName.empty())
@@ -328,8 +331,12 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// If we're in a regular tick cycle
 	if (m_TickControllingBehaviorState == Normal)
 	{
-
-		if (m_PinnedBehavior != nullptr)
+		if (IsLeashed())
+		{
+			// do not tick behaviors
+			// mobTodo temporary leash special case. Needs a behavior eventually.
+		}
+		else if (m_PinnedBehavior != nullptr)
 		{
 			// A behavior is pinned. We give it control automatically.
 			ASSERT(m_CurrentTickControllingBehavior == m_PinnedBehavior);
@@ -470,7 +477,9 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	SetPitchAndYawFromDestination(a_IsFollowingPath);
 
 	// Leash calculations
-	if ((m_TicksAlive % LEASH_ACTIONS_TICK_STEP) == 0)
+	if ((m_TickControllingBehaviorState == Normal) &&
+			((m_TicksAlive % LEASH_ACTIONS_TICK_STEP) == 0)
+	)
 	{
 		CalcLeashActions();
 	}
@@ -988,7 +997,7 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 void cMonster::SetLookingAt(cPawn * a_NewTarget)
 {
-	m_LookingAt = a_NewTarget;
+	m_LookingAt.SetPointer(a_NewTarget);
 
 	/*
 	ASSERT((a_NewTarget == nullptr) || (IsTicking()));
@@ -1029,7 +1038,7 @@ bool cMonster::IsPathFinderActivated() const
 
 cBehaviorBreeder * cMonster::GetBehaviorBreeder()
 {
-	return nullptr;
+	return m_BehaviorBreederPointer;
 }
 
 
@@ -1038,7 +1047,7 @@ cBehaviorBreeder * cMonster::GetBehaviorBreeder()
 
 const cBehaviorBreeder * cMonster::GetBehaviorBreeder() const
 {
-	return nullptr;
+	return static_cast<const cBehaviorBreeder *>(m_BehaviorBreederPointer);
 }
 
 
@@ -1047,16 +1056,7 @@ const cBehaviorBreeder * cMonster::GetBehaviorBreeder() const
 
 cBehaviorAttacker * cMonster::GetBehaviorAttacker()
 {
-	return nullptr;
-}
-
-
-
-
-
-cBehaviorDayLightBurner * cMonster::GetBehaviorDayLightBurner()
-{
-	return nullptr;
+	return m_BehaviorAttackerPointer;
 }
 
 

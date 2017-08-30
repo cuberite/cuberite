@@ -20,7 +20,6 @@ SET (SRCS
 	Monster.cpp
 	Mooshroom.cpp
 	Ocelot.cpp
-	PassiveAggressiveMonster.cpp
 	Path.cpp
 	PathFinder.cpp
 	Pig.cpp
@@ -59,7 +58,6 @@ SET (HDRS
 	MonsterTypes.h
 	Mooshroom.h
 	Ocelot.h
-	PassiveAggressiveMonster.h
 	Path.h
 	PathFinder.h
 	Pig.h

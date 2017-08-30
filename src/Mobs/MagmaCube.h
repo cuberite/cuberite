@@ -1,15 +1,15 @@
 #pragma once
 
-#include "AggressiveMonster.h"
+#include "Monster.h"
 
 
 
 
 
 class cMagmaCube :
-	public cAggressiveMonster
+	public cMonster
 {
-	typedef cAggressiveMonster super;
+	typedef cMonster super;
 
 public:
 	/** Creates a MagmaCube of the specified size; with 1 being the smallest */

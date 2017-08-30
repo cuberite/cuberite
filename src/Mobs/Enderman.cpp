@@ -79,6 +79,7 @@ cEnderman::cEnderman(void) :
 	CarriedBlock(E_BLOCK_AIR),
 	CarriedMeta(0)
 {
+	m_EMPersonality = PASSIVE;
 }
 
 

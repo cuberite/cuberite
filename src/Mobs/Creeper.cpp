@@ -17,6 +17,7 @@ cCreeper::cCreeper(void) :
 	m_BurnedWithFlintAndSteel(false),
 	m_ExplodingTimer(0)
 {
+	m_EMPersonality = AGGRESSIVE;
 }
 
 

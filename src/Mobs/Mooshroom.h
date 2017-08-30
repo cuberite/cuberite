@@ -28,9 +28,6 @@ public:
 	{
 		a_Items.Add(E_ITEM_WHEAT);
 	}
-
-	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
-	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
 	// Tick controlling behaviors
 	cBehaviorBreeder m_BehaviorBreeder;

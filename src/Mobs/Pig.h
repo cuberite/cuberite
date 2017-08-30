@@ -30,8 +30,6 @@ public:
 	}
 
 	bool IsSaddled(void) const { return m_bIsSaddled; }
-	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
-	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
 	// Tick controlling behaviors
 	cBehaviorBreeder m_BehaviorBreeder;

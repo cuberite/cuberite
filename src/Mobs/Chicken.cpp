@@ -10,6 +10,7 @@ cChicken::cChicken(void) :
 {
 	SetGravity(-2.0f);
 	SetAirDrag(0.0f);
+	m_EMPersonality = PASSIVE;
 	m_BehaviorBreeder.AttachToMonster(*this);
 	m_BehaviorCoward.AttachToMonster(*this);
 	m_BehaviorItemFollower.AttachToMonster(*this);

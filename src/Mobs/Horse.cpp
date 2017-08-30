@@ -197,21 +197,3 @@ void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 		super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
 	}
 }
-
-
-
-
-
-cBehaviorBreeder * cHorse::GetBehaviorBreeder()
-{
-	return &m_BehaviorBreeder;
-}
-
-
-
-
-
-const cBehaviorBreeder * cHorse::GetBehaviorBreeder() const
-{
-	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
-}

@@ -10,6 +10,7 @@
 cIronGolem::cIronGolem(void) :
 	super("IronGolem", mtIronGolem, "entity.irongolem.hurt", "entity.irongolem.death", 1.4, 2.9)
 {
+	m_EMPersonality = PASSIVE;
 }
 
 

@@ -43,8 +43,6 @@ public:
 
 	int GetFurColor(void) const { return m_WoolColor; }
 	void SetFurColor(int a_WoolColor) { m_WoolColor = a_WoolColor; }
-	virtual cBehaviorBreeder * GetBehaviorBreeder() override;
-	virtual const cBehaviorBreeder * GetBehaviorBreeder() const override;
 private:
 
 	// Tick controlling behaviors

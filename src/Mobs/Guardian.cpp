@@ -11,6 +11,7 @@
 cGuardian::cGuardian(void) :
 	super("Guardian", mtGuardian, "entity.guardian.hurt", "entity.guardian.death", 0.875, 0.8)
 {
+	m_EMPersonality = AGGRESSIVE;
 }
 
 

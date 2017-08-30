@@ -17,7 +17,7 @@ public:
 	cMobPointer& operator=(const cMobPointer& a_MobPointer);   // Copy assignment operator
 	cMobPointer& operator=(cMobPointer&& a_MobPointer);        // Move assignment operator
 
-	void operator=(cPawn * a_Pointer);   // set Pointer
+	void SetPointer(cPawn * a_Pointer);   // set Pointer
 
 	/** Returns the raw pointer. The returned raw pointer must
 	be used locally and then discarded. it MUST NOT be preserved across ticks.

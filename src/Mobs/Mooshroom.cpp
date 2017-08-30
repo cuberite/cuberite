@@ -78,21 +78,3 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 		} break;
 	}
 }
-
-
-
-
-
-cBehaviorBreeder * cMooshroom::GetBehaviorBreeder()
-{
-	return &m_BehaviorBreeder;
-}
-
-
-
-
-
-const cBehaviorBreeder * cMooshroom::GetBehaviorBreeder() const
-{
-	return static_cast<const cBehaviorBreeder *>(&m_BehaviorBreeder);
-}

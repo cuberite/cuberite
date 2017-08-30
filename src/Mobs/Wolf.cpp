@@ -22,6 +22,7 @@ cWolf::cWolf(void) :
 	m_NotificationCooldown(0)
 {
 	m_RelativeWalkSpeed = 2;
+	m_EMPersonality = PASSIVE;
 }
 
 

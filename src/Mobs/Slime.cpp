@@ -19,6 +19,7 @@ cSlime::cSlime(int a_Size) :
 	),
 	m_Size(a_Size)
 {
+	m_EMPersonality = AGGRESSIVE;
 	SetMaxHealth(a_Size * a_Size);
 	// SetAttackDamage(a_Size); //mobTodo myBehavior.setaTTACKDamage
 }

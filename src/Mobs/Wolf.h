@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "PassiveAggressiveMonster.h"
+#include "Monster.h"
 #include "../UUID.h"
 
 

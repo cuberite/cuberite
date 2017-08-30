@@ -16,6 +16,7 @@ cWither::cWither(void) :
 {
 	SetMaxHealth(300);
 	SetHealth(GetMaxHealth() / 3);
+	m_EMPersonality = AGGRESSIVE;
 }
 
 

@@ -10,7 +10,7 @@
 cGiant::cGiant(void) :
 	super("Giant", mtGiant, "entity.zombie.hurt", "entity.zombie.death", 3.6, 10.8)
 {
-
+	m_EMPersonality = AGGRESSIVE;
 }
 
 
