@@ -306,6 +306,10 @@ public:
 	/** Exported in ManualBindings */
 	const Vector3d & GetSpeed(void) const { return m_Speed; }
 
+	/** Returns the last position we sent to all the clients. Use this to
+	initialize clients with our position. */
+	Vector3d GetLastSentPos(void) const { return m_LastSentPosition; }
+
 	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
 	void DestroyNoScheduling(bool a_ShouldBroadcast);
 
@@ -428,7 +432,7 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false);
+	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false);
 
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
@@ -592,6 +596,7 @@ protected:
 	/** State variables for ScheduleMoveToWorld. */
 	bool m_IsWorldChangeScheduled;
 	bool m_WorldChangeSetPortalCooldown;
+	bool m_WorldChangeSendRespawn;
 	cWorld * m_NewWorld;
 	Vector3d m_NewWorldPosition;
 

@@ -476,6 +476,10 @@ using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 	#define TOLUA_TEMPLATE_BIND(x)
 #endif
 
+#ifdef TOLUA_EXPOSITION
+	#error TOLUA_EXPOSITION should never actually be defined
+#endif
+
 
 
 

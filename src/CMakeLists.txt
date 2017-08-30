@@ -1,13 +1,13 @@
-project (Cuberite)
+﻿project (Cuberite)
 
 
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/mbedtls/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include")
 
 set(FOLDERS
-	OSSupport HTTP Items Blocks Protocol Generating PolarSSL++ Bindings
+	OSSupport HTTP Items Blocks Protocol Generating mbedTLS++ Bindings
 	WorldStorage Mobs Mobs/Behaviors Entities Simulator Simulator/IncrementalRedstoneSimulator
 	BlockEntities UI Noise
 )
@@ -177,7 +177,7 @@ endif()
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead
 	# lib dependencies are not included
-	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
+	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/mbedtls/include")
 
 	foreach(folder ${FOLDERS})
 		add_subdirectory(${folder})
@@ -349,7 +349,7 @@ if (NOT MSVC)
 		OSSupport HTTPServer Bindings Items Blocks Noise
 		Protocol Generating WorldStorage
 		Mobs Behaviors Entities Simulator IncrementalRedstoneSimulator
-		BlockEntities UI PolarSSL++
+		BlockEntities UI mbedTLS++
 	)
 endif ()
 
