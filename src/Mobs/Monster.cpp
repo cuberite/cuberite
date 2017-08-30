@@ -1035,7 +1035,7 @@ const cBehaviorBreeder * cMonster::GetBehaviorBreeder() const
 
 
 
-cBehaviorAttacker * cMonster::GetBehaviorChaser()
+cBehaviorAttacker * cMonster::GetBehaviorAttacker()
 {
 	return nullptr;
 }

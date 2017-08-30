@@ -2,16 +2,13 @@
 
 #include "Behavior.h"
 
-// Makes the mob run away from any other mob that damages it
-
-
+/** Makes the mob run away from any other mob that damages it. */
 class cBehaviorCoward : cBehavior
 {
 public:
 	cBehaviorCoward();
 	void AttachToMonster(cMonster & a_Parent);
 
-	// Functions our host Monster should invoke:
 	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	bool ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	bool ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

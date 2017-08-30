@@ -202,7 +202,7 @@ public:
 	// Behavior getters (most are probably not used. mobTodo - cleanup most of them)
 	virtual cBehaviorBreeder * GetBehaviorBreeder();
 	virtual const cBehaviorBreeder * GetBehaviorBreeder() const;
-	virtual cBehaviorAttacker * GetBehaviorChaser();
+	virtual cBehaviorAttacker * GetBehaviorAttacker();
 	virtual cBehaviorDayLightBurner * GetBehaviorDayLightBurner(); // mobTodo this is probably temporary
 
 	// Polymorphic behavior functions
