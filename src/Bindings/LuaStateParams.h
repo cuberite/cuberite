@@ -9,6 +9,7 @@
 
 
 #include "LuaState.h"
+#include "tolua++/include/tolua++.h"
 
 
 
