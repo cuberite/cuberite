@@ -1,20 +1,20 @@
 #pragma once
 
-class cBehaviorChaser;
+class cBehaviorAttacker;
 
 #include "Behavior.h"
 class cBehaviorStriker;
 
 
-/** Grants chase capability to the mob. Note that this is not the same as agression!
+/** Grants attack capability to the mob. Note that this is not the same as agression!
 The mob may possess this trait and not attack anyone or only attack when provoked.
 Unlike most traits, this one has several forms, and therefore it is an abstract type
 You should use one of its derived classes, and you cannot use it directly. */
-class cBehaviorChaser : public cBehavior
+class cBehaviorAttacker : public cBehavior
 {
 
 public:
-	cBehaviorChaser();
+	cBehaviorAttacker();
 	void AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker);
 
 	// Functions our host Monster should invoke:

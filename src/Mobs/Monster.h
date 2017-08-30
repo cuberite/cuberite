@@ -16,7 +16,7 @@ class cClientHandle;
 class cPassiveMonster;
 class cBehaviorAggressive;
 class cBehaviorBreeder;
-class cBehaviorChaser;
+class cBehaviorAttacker;
 class cBehaviorStriker;
 class cBehaviorWanderer;
 class cBehaviorDayLightBurner;
@@ -202,7 +202,7 @@ public:
 	// Behavior getters (most are probably not used. mobTodo - cleanup most of them)
 	virtual cBehaviorBreeder * GetBehaviorBreeder();
 	virtual const cBehaviorBreeder * GetBehaviorBreeder() const;
-	virtual cBehaviorChaser * GetBehaviorChaser();
+	virtual cBehaviorAttacker * GetBehaviorChaser();
 	virtual cBehaviorDayLightBurner * GetBehaviorDayLightBurner(); // mobTodo this is probably temporary
 
 	// Polymorphic behavior functions

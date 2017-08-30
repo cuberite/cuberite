@@ -91,7 +91,7 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	{
 		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			cBehaviorChaser * Chaser = a_Monster->GetBehaviorChaser();
+			cBehaviorAttacker * Chaser = a_Monster->GetBehaviorChaser();
 
 			// mobTodo chaser is kind of "attacker", not really chaser?
 			if (Chaser != nullptr)

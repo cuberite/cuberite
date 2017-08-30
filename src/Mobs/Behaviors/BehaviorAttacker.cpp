@@ -1,7 +1,7 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "BehaviorChaser.h"
+#include "BehaviorAttacker.h"
 #include "BehaviorStriker.h"
 #include "../Monster.h"
 #include "../../Entities/Pawn.h"
@@ -9,7 +9,7 @@
 
 
 
-cBehaviorChaser::cBehaviorChaser() :
+cBehaviorAttacker::cBehaviorAttacker() :
 	m_AttackRate(3)
   , m_AttackDamage(1)
   , m_AttackRange(1)
@@ -23,7 +23,7 @@ cBehaviorChaser::cBehaviorChaser() :
 
 
 
-void cBehaviorChaser::AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker)
+void cBehaviorAttacker::AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker)
 {
 	m_Parent = &a_Parent;
 	m_ParentStriker = &a_ParentStriker;
@@ -37,7 +37,7 @@ void cBehaviorChaser::AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_
 
 
 
-bool cBehaviorChaser::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cBehaviorAttacker::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
@@ -50,7 +50,7 @@ bool cBehaviorChaser::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & 
 
 
 
-void cBehaviorChaser::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
@@ -93,15 +93,14 @@ void cBehaviorChaser::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 }
 
-void cBehaviorChaser::ApproachTarget()
+void cBehaviorAttacker::ApproachTarget()
 {
-	// potential mobTodo inheritence for creaper approachers, etc
 	m_Parent->MoveToPosition(m_Target->GetPosition());
 }
 
 
 
-void cBehaviorChaser::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cBehaviorAttacker::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_TicksSinceLastDamaged < 100)
 	{
@@ -118,7 +117,7 @@ void cBehaviorChaser::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cBehaviorChaser::DoTakeDamage(TakeDamageInfo & a_TDI)
+void cBehaviorAttacker::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
@@ -137,7 +136,7 @@ void cBehaviorChaser::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cBehaviorChaser::Destroyed()
+void cBehaviorAttacker::Destroyed()
 {
 	SetTarget(nullptr);
 }
@@ -146,7 +145,7 @@ void cBehaviorChaser::Destroyed()
 
 
 
-void cBehaviorChaser::SetAttackRate(float a_AttackRate)
+void cBehaviorAttacker::SetAttackRate(float a_AttackRate)
 {
 	m_AttackRate = a_AttackRate;
 }
@@ -155,7 +154,7 @@ void cBehaviorChaser::SetAttackRate(float a_AttackRate)
 
 
 
-void cBehaviorChaser::SetAttackRange(int a_AttackRange)
+void cBehaviorAttacker::SetAttackRange(int a_AttackRange)
 {
 	m_AttackRange = a_AttackRange;
 }
@@ -164,7 +163,7 @@ void cBehaviorChaser::SetAttackRange(int a_AttackRange)
 
 
 
-void cBehaviorChaser::SetAttackDamage(int a_AttackDamage)
+void cBehaviorAttacker::SetAttackDamage(int a_AttackDamage)
 {
 	m_AttackDamage = a_AttackDamage;
 }
@@ -172,7 +171,7 @@ void cBehaviorChaser::SetAttackDamage(int a_AttackDamage)
 
 
 
-cPawn * cBehaviorChaser::GetTarget()
+cPawn * cBehaviorAttacker::GetTarget()
 {
 	return m_Target;
 }
@@ -181,7 +180,7 @@ cPawn * cBehaviorChaser::GetTarget()
 
 
 
-void cBehaviorChaser::SetTarget(cPawn * a_Target)
+void cBehaviorAttacker::SetTarget(cPawn * a_Target)
 {
 	m_Target = a_Target;
 }
@@ -190,7 +189,7 @@ void cBehaviorChaser::SetTarget(cPawn * a_Target)
 
 
 
-bool cBehaviorChaser::TargetIsInStrikeRange()
+bool cBehaviorAttacker::TargetIsInStrikeRange()
 {
 	ASSERT(m_Target != nullptr);
 	ASSERT(m_Parent != nullptr);
@@ -219,7 +218,7 @@ bool cBehaviorChaser::TargetIsInStrikeRange()
 
 
 
-bool cBehaviorChaser::TargetOutOfSight()
+bool cBehaviorAttacker::TargetOutOfSight()
 {
 	ASSERT(m_Target != nullptr);
 	if ((GetTarget()->GetPosition() - m_Parent->GetPosition()).Length() > m_Parent->GetSightDistance())
@@ -233,7 +232,7 @@ bool cBehaviorChaser::TargetOutOfSight()
 
 
 
-void cBehaviorChaser::ResetStrikeCooldown()
+void cBehaviorAttacker::ResetStrikeCooldown()
 {
 	m_AttackCoolDownTicksLeft = static_cast<int>(3 * 20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every 3 seconds
 }
@@ -242,7 +241,7 @@ void cBehaviorChaser::ResetStrikeCooldown()
 
 
 
-void cBehaviorChaser::StrikeTarget()
+void cBehaviorAttacker::StrikeTarget()
 {
 	if (m_AttackCoolDownTicksLeft != 0)
 	{

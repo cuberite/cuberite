@@ -7,7 +7,6 @@
 #include "../Entities/Player.h"
 #include "../Tracer.h"
 #include "Behaviors/BehaviorAggressive.h"
-#include "Behaviors/BehaviorChaser.h"
 #include "Behaviors/BehaviorWanderer.h"
 
 
