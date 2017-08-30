@@ -49,7 +49,7 @@ protected:
 	it returns false. a_StrikeTickCnt tracks how many times it was called. It is 1 the first call.
 	It increments by 1 each call. This mechanism allows multi-tick attacks, like blazes shooting multiple
 	fireballs, but most attacks are single tick and return true the first call. */
-	virtual bool StrikeTarget(std::chrono::milliseconds a_Dt, cChunk & a_Chunk, int a_StrikeTickCnt) = 0;
+	virtual bool StrikeTarget(int a_StrikeTickCnt) = 0;
 
 	// Target related methods
 	bool TargetIsInStrikeRadius();
@@ -69,14 +69,14 @@ protected:
 	int m_TicksSinceLastDamaged;  // How many ticks ago were we last damaged by a player?
 
 	bool m_IsStriking;
-private:
 
 	/** Our parent */
 	cMonster * m_Parent;
 
+private:
+
 	// The mob we want to attack
 	cPawn * m_Target;
-
 	int m_StrikeTickCnt;
 
 };

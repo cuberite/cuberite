@@ -7,5 +7,5 @@ This behavior does not make sense in combination with BehaviorCoward. */
 class cBehaviorAttackerMelee : cBehaviorAttacker
 {
 public:
-	bool StrikeTarget(std::chrono::milliseconds a_Dt, cChunk & a_Chunk, int a_StrikeTickCnt) override;
+	bool StrikeTarget(int a_StrikeTickCnt) override;
 };

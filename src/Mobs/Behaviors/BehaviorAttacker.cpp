@@ -57,7 +57,7 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_IsStriking)
 	{
-		if (StrikeTarget(a_Dt, a_Chunk, ++m_StrikeTickCnt))
+		if (StrikeTarget(++m_StrikeTickCnt))
 		{
 			m_Parent->UnpinBehavior(this);
 			m_IsStriking = false;

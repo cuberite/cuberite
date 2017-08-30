@@ -3,9 +3,11 @@
 #include "BehaviorAttackerMelee.h"
 #include "../Monster.h"
 #include "../../Entities/Pawn.h"
+#include "../../BlockID.h"
 
-bool cBehaviorAttackerMelee::StrikeTarget(std::chrono::milliseconds a_Dt, cChunk & a_Chunk, int a_StrikeTickCnt)
+bool cBehaviorAttackerMelee::StrikeTarget(int a_StrikeTickCnt)
 {
-	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
-	return true;
+	UNUSED(a_StrikeTickCnt);
+	GetTarget()->TakeDamage(dtMobAttack, m_Parent, m_AttackDamage, 0);
+	return true; // Finish the strike. It only takes 1 tick.
 }
