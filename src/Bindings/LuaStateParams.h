@@ -132,7 +132,7 @@ protected:
 	Returns the index of the overload that matches the parameters.
 	If no overloads match, returns -1. */
 	template <typename... T1, typename... T2>
-	static int ReadInternal(cLuaState & a_LuaState, int a_CurOverload, std::tuple<T1...> & a_Ovl, T2 &&... a_OtherParams)
+	static int ReadInternal(cLuaState & a_LuaState, int a_CurOverload, const std::tuple<T1...> & a_Ovl, T2 &&... a_OtherParams)
 	{
 		// Try to read this overload
 		if (ReadSingleOverload(a_LuaState, a_Ovl))
@@ -147,7 +147,7 @@ protected:
 
 	/** Terminator for the template-based recursion of the function above - for a single overload. */
 	template <typename... T1>
-	static int ReadInternal(cLuaState & a_LuaState, int a_CurOverload, std::tuple<T1...> & a_Ovl)
+	static int ReadInternal(cLuaState & a_LuaState, int a_CurOverload, const std::tuple<T1...> & a_Ovl)
 	{
 		// Try to read this overload
 		if (ReadSingleOverload(a_LuaState, a_Ovl))
@@ -162,14 +162,14 @@ protected:
 
 
 	/** Helper struct to implement iterating over std::tuple elements */
-	template <int N> struct SizeT {};
+	template <size_t N> struct SizeT {};
 
 
 
 	/** Attempts to match the params on the Lua stack to the given API function overload.
 	Returns true if successful, false on failure. */
 	template <typename... T>
-	static bool ReadSingleOverload(cLuaState & a_LuaState, std::tuple<T...> & a_Overload)
+	static bool ReadSingleOverload(cLuaState & a_LuaState, const std::tuple<T...> & a_Overload)
 	{
 		// Check that there exactly as many params as the tuple items:
 		if (!lua_isnone(a_LuaState, sizeof...(T) + 1))
@@ -184,7 +184,7 @@ protected:
 		}
 
 		// Read the tuple, compile-time-recursively:
-		return ReadSingleOverloadRecurse(a_LuaState, std::forward<std::tuple<T...>>(a_Overload), SizeT<sizeof...(T)>());
+		return ReadSingleOverloadRecurse(a_LuaState, a_Overload, SizeT<sizeof...(T)>());
 	}
 
 
@@ -193,7 +193,7 @@ protected:
 	The compile-time recursive worker implementation of ReadSingleOverload, recurses by the number of elements in the overload tuple.
 	Returns true on success, false on failure. */
 	template <typename... T, size_t N>
-	static bool ReadSingleOverloadRecurse(cLuaState & a_LuaState, std::tuple<T...> & a_Overload, SizeT<N>)
+	static bool ReadSingleOverloadRecurse(cLuaState & a_LuaState, const std::tuple<T...> & a_Overload, SizeT<N>)
 	{
 		// First read the params from the lower tuple indices:
 		if (!ReadSingleOverloadRecurse(a_LuaState, a_Overload, SizeT<N - 1>()))
@@ -208,7 +208,7 @@ protected:
 
 	/** Terminator for the above compile-time-recursive function. */
 	template <typename... T>
-	static bool ReadSingleOverloadRecurse(cLuaState & a_LuaState, std::tuple<T...> & a_Overload, SizeT<1>)
+	static bool ReadSingleOverloadRecurse(cLuaState & a_LuaState, const std::tuple<T...> & a_Overload, SizeT<1>)
 	{
 		return GetStackValue(a_LuaState, 1, std::get<0>(a_Overload));
 	}
@@ -372,7 +372,7 @@ protected:
 		if (!a_LuaState.GetStackValue(a_StackPos, dummy))
 		{
 			return Printf("Mismatch, expected %s, got %s",
-				GetTypeDescription<std::remove_reference<T>::type>().c_str(),
+				GetTypeDescription<T>().c_str(),
 				a_LuaState.GetTypeText(a_StackPos).c_str()
 			);
 		}
@@ -404,7 +404,7 @@ protected:
 		if (lua_isnil(a_LuaState, a_StackPos))
 		{
 			return Printf("Expected an instance of %s, got a %s. Did you use the right calling convention?",
-				GetTypeDescription<std::remove_reference<T>::type>().c_str(),
+				GetTypeDescription<T>().c_str(),
 				a_LuaState.GetTypeText(a_StackPos).c_str()
 			);
 		}
@@ -415,10 +415,10 @@ protected:
 	/** Returns an error message if the value on the specified index on the Lua stack is of the wrong (template) type.
 	This is the specialization for "cStaticSelf"-decorated values. */
 	template <typename T>
-	static AString CheckValueType(cLuaState & a_LuaState, int a_StackPos, const cStaticSelf<T> & a_Dest)
+	static AString CheckValueType(cLuaState & a_LuaState, int a_StackPos, cStaticSelf<T> & a_Dest)
 	{
 		tolua_Error err;
-		auto type = GetTypeDescription<std::remove_pointer<typename std::remove_reference<T>::type>::type>();
+		auto type = GetTypeDescription<T>();
 		if (lua_isnil(a_LuaState, a_StackPos))
 		{
 			return Printf("Expected the class %s, got a nil", type.c_str());
