@@ -1,8 +1,10 @@
 #pragma once
 
 // mobTodo a more generic, not chickenspecific dropper
+
 #include "Behavior.h"
 
+/** Makes the mob periodically lay eggs. */
 class cBehaviorItemDropper : cBehavior
 {
 public:
