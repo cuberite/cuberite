@@ -211,6 +211,7 @@ else ()
 		FILE(GLOB FOLDER_FILES
 			"${PATH}/*.cpp"
 			"${PATH}/*.h"
+			"${PATH}/*.inc"
 			"${PATH}/*.rc"
 			"${PATH}/*.pkg"
 		)
