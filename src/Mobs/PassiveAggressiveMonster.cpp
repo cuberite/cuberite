@@ -14,25 +14,3 @@ cPassiveAggressiveMonster::cPassiveAggressiveMonster(const AString & a_ConfigNam
 {
 	m_EMPersonality = PASSIVE;
 }
-
-
-
-
-
-bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
-{
-	if (!super::DoTakeDamage(a_TDI))
-	{
-		return false;
-	}
-
-	// mobtodo remove this class altogether
-	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
-	{
-		if (static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
-		{
-		   //  m_EMState = CHASING;
-		}
-	}
-	return true;
-}

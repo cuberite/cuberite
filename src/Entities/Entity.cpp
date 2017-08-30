@@ -1592,12 +1592,12 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Stop all mobs from targeting this entity
 	// Stop this entity from targeting other mobs
-	if (this->IsMob())
+	/* if (this->IsMob())
 	{
 		cMonster * Monster = static_cast<cMonster*>(this);
 		Monster->SetTarget(nullptr);
-		Monster->StopEveryoneFromTargetingMe();
-	}
+		Monster->StopEveryoneFromTargetingMe(); mobTodo MovingWorld event for all behaviors?
+	}*/
 
 	// Queue add to new world and removal from the old one
 	cWorld * OldWorld = GetWorld();

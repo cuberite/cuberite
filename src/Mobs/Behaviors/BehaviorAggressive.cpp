@@ -34,5 +34,6 @@ void cBehaviorAggressive::PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chu
 cPawn * cBehaviorAggressive::FindNewTarget()
 {
 	cPlayer * Closest = m_Parent->GetNearestPlayer();
+	if (!Closest->CanMobsTarget()) return nullptr;
 	return Closest;  // May be null
 }

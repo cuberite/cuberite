@@ -1,5 +1,8 @@
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "../Entities/Pawn.h"
 #include "MobPointer.h"
+#include "../World.h"
 
 cMobPointer::cMobPointer(cPawn * a_Pointer) : m_Pointer(a_Pointer)
 {
@@ -62,11 +65,11 @@ void cMobPointer::operator=(cPawn * a_Pointer)
 
 
 
-cPawn * cMobPointer::GetPointer()
+cPawn * cMobPointer::GetPointer(cWorld * a_CurrentWorld)
 {
 	if (m_Pointer != nullptr)
 	{
-		if (!m_Pointer->IsTicking())
+		if (!m_Pointer->IsTicking() || (m_Pointer->GetWorld() != a_CurrentWorld))
 		{
 			m_Pointer = nullptr;
 		}

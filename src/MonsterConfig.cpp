@@ -3,7 +3,7 @@
 
 #include "MonsterConfig.h"
 #include "Mobs/Monster.h"
-#include "Mobs/Behaviors/BehaviorChaser.h"
+#include "Mobs/Behaviors/BehaviorAttacker.h"
 #include "IniFile.h"
 
 
@@ -91,7 +91,7 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	{
 		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			cBehaviorAttacker * Chaser = a_Monster->GetBehaviorChaser();
+			cBehaviorAttacker * Chaser = a_Monster->GetBehaviorAttacker();
 
 			// mobTodo chaser is kind of "attacker", not really chaser?
 			if (Chaser != nullptr)

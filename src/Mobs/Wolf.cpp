@@ -30,6 +30,7 @@ cWolf::cWolf(void) :
 
 bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	/*
 	cPawn * PreviousTarget = GetTarget();
 	if (!super::DoTakeDamage(a_TDI))
 	{
@@ -66,7 +67,7 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 
 	m_World->BroadcastEntityMetadata(*this);  // Broadcast health and possibly angry face
-	return true;
+	return true;*/
 }
 
 
@@ -75,6 +76,7 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 {
+	/*
 	if (GetOwnerName() == "")
 	{
 		return;
@@ -92,7 +94,7 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 	} Callback;
 
 	Callback.m_Opponent = a_Opponent;
-	m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback);
+	m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback);*/
 }
 
 /*bool cWolf::Attack(std::chrono::milliseconds a_Dt)
@@ -119,6 +121,7 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 
 void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved)
 {
+	/*
 	if (
 		(a_Opponent == nullptr) || IsSitting() || (!IsTame()) ||
 		(!a_Opponent->IsPawn()) || (a_PlayerID != m_OwnerUUID)
@@ -159,7 +162,7 @@ void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent,
 	}
 
 	SetTarget(a_Opponent);
-
+	*/
 
 }
 
@@ -169,7 +172,7 @@ void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent,
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
-	const cItem & EquippedItem = a_Player.GetEquippedItem();
+	/*const cItem & EquippedItem = a_Player.GetEquippedItem();
 	const int EquippedItemType = EquippedItem.m_ItemType;
 
 	if (!IsTame() && !IsAngry())
@@ -245,6 +248,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
+	*/
 }
 
 
@@ -351,6 +355,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cWolf::TickFollowPlayer()
 {
+	/*
 	class cCallback :
 		public cPlayerListCallback
 	{
@@ -396,6 +401,7 @@ void cWolf::TickFollowPlayer()
 			}
 		}
 	}
+	*/
 }
 
 

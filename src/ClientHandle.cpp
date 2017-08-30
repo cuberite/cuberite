@@ -189,7 +189,7 @@ void cClientHandle::Destroy(void)
 		auto world = player->GetWorld();
 		if (world != nullptr)
 		{
-			player->StopEveryoneFromTargetingMe();
+			// player->StopEveryoneFromTargetingMe(); // mobTodo
 			player->SetIsTicking(false);
 
 			if (WasAddedToWorld)

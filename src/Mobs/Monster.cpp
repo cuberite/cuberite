@@ -518,7 +518,7 @@ void cMonster::CalcLeashActions()
 void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 {
 	Vector3d BodyDistance;
-	cPawn * LookingAt = m_LookingAt.GetPointer();
+	cPawn * LookingAt = m_LookingAt.GetPointer(GetWorld());
 	if (!a_IsFollowingPath && (LookingAt != nullptr))
 	{
 		BodyDistance = LookingAt->GetPosition() - GetPosition();

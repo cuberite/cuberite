@@ -7,6 +7,7 @@ it MUST NOT be preserved across ticks.
 */
 
 class cPawn;
+class cWorld;
 class cMobPointer
 {
 public:
@@ -22,7 +23,7 @@ public:
 	be used locally and then discarded. it MUST NOT be preserved across ticks.
 	Returns null if raw pointer is null. Returns null if mob is destroyed or moved worlds.
 	Must be called at least once per tick, even if the raw pointer is not going to be used that tick. */
-	cPawn * GetPointer();
+	cPawn * GetPointer(cWorld * a_CurrentWorld);
 
 
 private:

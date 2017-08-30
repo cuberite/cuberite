@@ -2018,7 +2018,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		FreezeInternal(a_NewPosition, false);
 
 		// Stop all mobs from targeting this player
-		StopEveryoneFromTargetingMe();
+		// StopEveryoneFromTargetingMe(); // mobTodo
 
 		cClientHandle * ch = this->GetClientHandle();
 		if (ch != nullptr)

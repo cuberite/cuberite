@@ -15,6 +15,7 @@ cBehaviorAttacker::cBehaviorAttacker() :
   , m_AttackRange(1)
   , m_AttackCoolDownTicksLeft(0)
   , m_TicksSinceLastDamaged(100)
+  , m_IsStriking(false)
 {
 
 }
@@ -26,7 +27,6 @@ cBehaviorAttacker::cBehaviorAttacker() :
 void cBehaviorAttacker::AttachToMonster(cMonster & a_Parent, cBehaviorStriker & a_ParentStriker)
 {
 	m_Parent = &a_Parent;
-	m_ParentStriker = &a_ParentStriker;
 	m_Parent->AttachTickBehavior(this);
 	m_Parent->AttachDestroyBehavior(this);
 	m_Parent->AttachPostTickBehavior(this);
@@ -54,8 +54,13 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
-	/*
-	 * 	if ((GetTarget() != nullptr))
+
+	if (m_IsStriking) return;
+	// If we're striking, return. This allows derived classes to implement multi-tick strikes
+	// E.g. a blaze shooting 3 fireballs in consequative ticks.
+	// Derived class is expected to set m_IsStriking to false when the strike is done.
+
+	if ((GetTarget() != nullptr))
 	{
 		ASSERT(GetTarget()->IsTicking());
 
@@ -66,8 +71,8 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				SetTarget(nullptr);
 			}
 		}
-	} //mobTodo copied from monster.cpp
-	 * */
+	}
+
 
 	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == m_Parent->GetWorld())));
 	// Stop targeting out of range targets
@@ -79,24 +84,20 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			if (TargetIsInStrikeRange())
+			if (TargetIsInStrikeRadiusAndLineOfSight())
 			{
-				StrikeTarget();
+				StrikeTargetIfReady();
 			}
 			else
 			{
-				ApproachTarget(); // potential mobTodo: decoupling approaching from attacking
-				// Not important now, but important for future extensibility, e.g.
-				// cow chases wheat but using the netherman approacher to teleport around.
+				m_Parent->MoveToPosition(m_Target->GetPosition());
+				// todo BehaviorApproacher
 			}
 		}
 	}
 }
 
-void cBehaviorAttacker::ApproachTarget()
-{
-	m_Parent->MoveToPosition(m_Target->GetPosition());
-}
+
 
 
 
@@ -189,7 +190,17 @@ void cBehaviorAttacker::SetTarget(cPawn * a_Target)
 
 
 
-bool cBehaviorAttacker::TargetIsInStrikeRange()
+bool cBehaviorAttacker::TargetIsInStrikeRadius(void)
+{
+	ASSERT(GetTarget() != nullptr);
+	return ((GetTarget()->GetPosition() - m_Parent->GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
+}
+
+
+
+
+
+bool cBehaviorAttacker::TargetIsInStrikeRadiusAndLineOfSight()
 {
 	ASSERT(m_Target != nullptr);
 	ASSERT(m_Parent != nullptr);
@@ -199,13 +210,17 @@ bool cBehaviorAttacker::TargetIsInStrikeRange()
 	Vector3d MyHeadPosition = m_Parent->GetPosition() + Vector3d(0, m_Parent->GetHeight(), 0);
 	Vector3d AttackDirection(GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
 
-	if (TargetIsInRange() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())) && (GetHealth() > 0.0))
+	if (TargetIsInStrikeRadius() &&
+			!LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())) &&
+			(m_Parent->GetHealth() > 0.0)
+	)
 	{
-		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
-		Attack(a_Dt);
+		return true;
 	}
-
-	return ((m_Target->GetPosition() - m_Parent->GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -235,15 +250,12 @@ void cBehaviorAttacker::ResetStrikeCooldown()
 
 
 
-void cBehaviorAttacker::StrikeTarget()
+void cBehaviorAttacker::StrikeTargetIfReady()
 {
 	if (m_AttackCoolDownTicksLeft != 0)
 	{
-		cBehaviorStriker * Striker = m_ParentStriker;
-		if (Striker != nullptr)
-		{
-			// Striker->Strike(m_Target); //mobTodo
-		}
+		m_IsStriking = true;
+		StrikeTarget(); // Different derived classes implement strikes in different ways
 		ResetStrikeCooldown();
 	}
 }
