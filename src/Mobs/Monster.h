@@ -220,6 +220,8 @@ public:
 	void AttachRightClickBehavior(cBehavior * a_Behavior);
 	void AttachDoTakeDamageBehavior(cBehavior * a_Behavior);
 
+	void PinBehavior(cBehavior * a_Behavior);
+	void UnpinBehavior(cBehavior * a_Behavior);
 	protected:
 
 	/** Whether or not m_NearestPlayer is stale. Always true at the beginning of a tick.
@@ -335,6 +337,7 @@ private:
 
 	cBehavior * m_CurrentTickControllingBehavior;
 	cBehavior * m_NewTickControllingBehavior;
+	cBehavior * m_PinnedBehavior;
 	enum TickState{NewControlStarting, OldControlEnding, Normal} m_TickControllingBehaviorState;
 
 } ;  // tolua_export

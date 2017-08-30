@@ -24,25 +24,38 @@ public:
 	void SetAttackDamage(int a_AttackDamage);
 
 	// Behavior functions
-	virtual bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void Destroyed() override;
-	virtual void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	void PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 	/** Returns the target pointer, or a nullptr if we're not targeting anyone. */
 	cPawn * GetTarget();
 
-	/** Sets a new target. Forgets the older target if present. */
+	/** Sets a new target. Forgets the older target if present. Set this to nullptr to unset target. */
 	void SetTarget(cPawn * a_Target);
+
+	/** Makes the mob strike a target the next tick. Ignores the strike cooldown.
+	 * Ignored if already striking or if no target is set. */
+	void StrikeTarget();
+
+	/** Makes the mob strike a target the next tick only if the strike cooldown permits it.
+	 * Ignored if already striking or if no target is set. */
+	void StrikeTargetIfReady();
 protected:
-	virtual void StrikeTarget() = 0;
+
+	/** Called when the actual attack should be made. Will be called again and again every tick until
+	it returns false. a_StrikeTickCnt tracks how many times it was called. It is 1 the first call.
+	It increments by 1 each call. This mechanism allows multi-tick attacks, like blazes shooting multiple
+	fireballs, but most attacks are single tick and return true the first call. */
+	virtual bool StrikeTarget(std::chrono::milliseconds a_Dt, cChunk & a_Chunk, int a_StrikeTickCnt) = 0;
 
 	// Target related methods
 	bool TargetIsInStrikeRadius();
 	bool TargetIsInStrikeRadiusAndLineOfSight();
 	bool TargetOutOfSight();
-	void StrikeTargetIfReady();
+	void StrikeTargetIfReady(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	// Cooldown stuff
 	void ResetStrikeCooldown();
@@ -63,5 +76,7 @@ private:
 
 	// The mob we want to attack
 	cPawn * m_Target;
+
+	int m_StrikeTickCnt;
 
 };

@@ -91,14 +91,13 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	{
 		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			cBehaviorAttacker * Chaser = a_Monster->GetBehaviorAttacker();
+			cBehaviorAttacker * Attacker = a_Monster->GetBehaviorAttacker();
 
-			// mobTodo chaser is kind of "attacker", not really chaser?
-			if (Chaser != nullptr)
+			if (Attacker != nullptr)
 			{
-				Chaser->SetAttackDamage (itr->m_AttackDamage);
-				Chaser->SetAttackRange  (itr->m_AttackRange);
-				Chaser->SetAttackRate   (static_cast<float>(itr->m_AttackRate));
+				Attacker->SetAttackDamage (itr->m_AttackDamage);
+				Attacker->SetAttackRange  (itr->m_AttackRange);
+				Attacker->SetAttackRate   (static_cast<float>(itr->m_AttackRate));
 			}
 
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);

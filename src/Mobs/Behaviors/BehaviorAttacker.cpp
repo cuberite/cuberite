@@ -43,7 +43,7 @@ bool cBehaviorAttacker::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk 
 	UNUSED(a_Chunk);
 	// If we have a target, we have something to do! Return true and control the mob Ticks.
 	// Otherwise return false.
-	return (GetTarget() != nullptr);
+	return (m_IsStriking || (GetTarget() != nullptr));
 }
 
 
@@ -55,10 +55,23 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 
-	if (m_IsStriking) return;
-	// If we're striking, return. This allows derived classes to implement multi-tick strikes
-	// E.g. a blaze shooting 3 fireballs in consequative ticks.
-	// Derived class is expected to set m_IsStriking to false when the strike is done.
+	if (m_IsStriking)
+	{
+		if (StrikeTarget(a_Dt, a_Chunk, ++m_StrikeTickCnt))
+		{
+			m_Parent->UnpinBehavior(this);
+			m_IsStriking = false;
+			ResetStrikeCooldown();
+		}
+		#ifdef _DEBUG
+		if (m_StrikeTickCnt > 100)
+		{
+			LOGD("Sanity check failed. An attack took more than 5 seconds. Hmm");
+			ASSERT(1 == 0);
+		}
+		#endif
+		return;
+	}
 
 	if ((GetTarget() != nullptr))
 	{
@@ -75,7 +88,6 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == m_Parent->GetWorld())));
-	// Stop targeting out of range targets
 	if (GetTarget() != nullptr)
 	{
 		if (TargetOutOfSight())
@@ -91,7 +103,7 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			else
 			{
 				m_Parent->MoveToPosition(m_Target->GetPosition());
-				// todo BehaviorApproacher
+				// todo BehaviorApproacher for creeper sneaking, etc
 			}
 		}
 	}
@@ -190,6 +202,21 @@ void cBehaviorAttacker::SetTarget(cPawn * a_Target)
 
 
 
+void cBehaviorAttacker::StrikeTarget()
+{
+	if (m_IsStriking || (m_Target == nullptr))
+	{
+		return;
+	}
+	m_IsStriking = true;
+	m_StrikeTickCnt = 0;
+	m_Parent->PinBehavior(this);
+}
+
+
+
+
+
 bool cBehaviorAttacker::TargetIsInStrikeRadius(void)
 {
 	ASSERT(GetTarget() != nullptr);
@@ -254,8 +281,6 @@ void cBehaviorAttacker::StrikeTargetIfReady()
 {
 	if (m_AttackCoolDownTicksLeft != 0)
 	{
-		m_IsStriking = true;
-		StrikeTarget(); // Different derived classes implement strikes in different ways
-		ResetStrikeCooldown();
+		StrikeTarget();
 	}
 }

@@ -328,35 +328,45 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// If we're in a regular tick cycle
 	if (m_TickControllingBehaviorState == Normal)
 	{
-		// ask the behaviors sequentially if they are interested in controlling this mob
-		// Stop at the first one that says yes.
-		m_NewTickControllingBehavior = nullptr;
-		for (cBehavior * Behavior : m_AttachedTickBehaviors)
+
+		if (m_PinnedBehavior != nullptr)
 		{
-			if (Behavior->IsControlDesired(a_Dt, a_Chunk))
-			{
-				m_NewTickControllingBehavior = Behavior;
-				break;
-			}
-		}
-		ASSERT(m_NewTickControllingBehavior != nullptr); // it's not OK if no one asks for control
-		if (m_CurrentTickControllingBehavior == m_NewTickControllingBehavior)
-		{
-			// The Behavior asking for control is the same as the behavior from last tick.
-			// Nothing special, just tick it.
-			// LOGD("mobDebug - Tick");
+			// A behavior is pinned. We give it control automatically.
+			ASSERT(m_CurrentTickControllingBehavior == m_PinnedBehavior);
 			m_CurrentTickControllingBehavior->Tick(a_Dt, a_Chunk);
-		}
-		else if (m_CurrentTickControllingBehavior == nullptr)
-		{
-			// first behavior to ever control
-			m_TickControllingBehaviorState = NewControlStarting;
 		}
 		else
 		{
-			// The behavior asking for control is not the same as the behavior from last tick.
-			// Begin the control swapping process.
-			m_TickControllingBehaviorState = OldControlEnding;
+			// ask the behaviors sequentially if they are interested in controlling this mob
+			// Stop at the first one that says yes.
+			m_NewTickControllingBehavior = nullptr;
+			for (cBehavior * Behavior : m_AttachedTickBehaviors)
+			{
+				if (Behavior->IsControlDesired(a_Dt, a_Chunk))
+				{
+					m_NewTickControllingBehavior = Behavior;
+					break;
+				}
+			}
+			ASSERT(m_NewTickControllingBehavior != nullptr); // it's not OK if no one asks for control
+			if (m_CurrentTickControllingBehavior == m_NewTickControllingBehavior)
+			{
+				// The Behavior asking for control is the same as the behavior from last tick.
+				// Nothing special, just tick it.
+				// LOGD("mobDebug - Tick");
+				m_CurrentTickControllingBehavior->Tick(a_Dt, a_Chunk);
+			}
+			else if (m_CurrentTickControllingBehavior == nullptr)
+			{
+				// first behavior to ever control
+				m_TickControllingBehaviorState = NewControlStarting;
+			}
+			else
+			{
+				// The behavior asking for control is not the same as the behavior from last tick.
+				// Begin the control swapping process.
+				m_TickControllingBehaviorState = OldControlEnding;
+			}
 		}
 
 	}
@@ -1342,6 +1352,28 @@ void cMonster::AttachDoTakeDamageBehavior(cBehavior * a_Behavior)
 {
 	m_AttachedDoTakeDamageBehaviors.push_back(a_Behavior);
 }
+
+
+
+
+void cMonster::PinBehavior(cBehavior * a_Behavior)
+{
+	ASSERT(m_TickControllingBehaviorState == Normal);
+	m_PinnedBehavior = a_Behavior;
+	ASSERT(m_CurrentTickControllingBehavior == m_PinnedBehavior);
+}
+
+
+
+
+
+void cMonster::UnpinBehavior(cBehavior * a_Behavior)
+{
+	ASSERT(m_TickControllingBehaviorState == Normal);
+	ASSERT(m_PinnedBehavior = a_Behavior);
+	m_PinnedBehavior = nullptr;
+}
+
 
 
 
