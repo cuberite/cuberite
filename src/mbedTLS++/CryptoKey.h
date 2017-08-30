@@ -1,7 +1,7 @@
-
+﻿
 // CryptoKey.h
 
-// Declares the cCryptoKey class representing a RSA public key in PolarSSL
+// Declares the cCryptoKey class representing a RSA public key in mbedTLS
 
 
 
@@ -10,7 +10,7 @@
 #pragma once
 
 #include "CtrDrbgContext.h"
-#include "polarssl/pk.h"
+#include "mbedtls/pk.h"
 
 
 
@@ -18,7 +18,7 @@
 
 class cCryptoKey
 {
-	friend class cSslContext;
+	friend class cSslConfig;
 
 public:
 	/** Constructs an empty key instance. Before use, it needs to be filled by ParsePublic() or ParsePrivate() */
@@ -45,28 +45,28 @@ public:
 
 	/** Parses the specified data into a public key representation.
 	The key can be DER- or PEM-encoded.
-	Returns 0 on success, PolarSSL error code on failure. */
+	Returns 0 on success, mbedTLS error code on failure. */
 	int ParsePublic(const void * a_Data, size_t a_NumBytes);
 
 	/** Parses the specified data into a private key representation.
 	If a_Password is empty, no password is assumed.
 	The key can be DER- or PEM-encoded.
-	Returns 0 on success, PolarSSL error code on failure. */
+	Returns 0 on success, mbedTLS error code on failure. */
 	int ParsePrivate(const void * a_Data, size_t a_NumBytes, const AString & a_Password);
 
 	/** Returns true if the contained key is valid. */
 	bool IsValid(void) const;
 
 protected:
-	/** The PolarSSL representation of the key data */
-	pk_context m_Pk;
+	/** The mbedTLS representation of the key data */
+	mbedtls_pk_context m_Pk;
 
 	/** The random generator used in encryption and decryption */
 	cCtrDrbgContext m_CtrDrbg;
 
 
-	/** Returns the internal context ptr. Only use in PolarSSL API calls. */
-	pk_context * GetInternal(void) { return &m_Pk; }
+	/** Returns the internal context ptr. Only use in mbedTLS API calls. */
+	mbedtls_pk_context * GetInternal(void) { return &m_Pk; }
 } ;
 
 typedef std::shared_ptr<cCryptoKey> cCryptoKeyPtr;

@@ -1,7 +1,7 @@
-
+﻿
 // CryptoKey.cpp
 
-// Implements the cCryptoKey class representing a RSA public key in PolarSSL
+// Implements the cCryptoKey class representing a RSA public key in mbedTLS
 
 #include "Globals.h"
 #include "CryptoKey.h"
@@ -12,7 +12,7 @@
 
 cCryptoKey::cCryptoKey(void)
 {
-	pk_init(&m_Pk);
+	mbedtls_pk_init(&m_Pk);
 	m_CtrDrbg.Initialize("rsa_pubkey", 10);
 }
 
@@ -22,7 +22,7 @@ cCryptoKey::cCryptoKey(void)
 
 cCryptoKey::cCryptoKey(const AString & a_PublicKeyData)
 {
-	pk_init(&m_Pk);
+	mbedtls_pk_init(&m_Pk);
 	m_CtrDrbg.Initialize("rsa_pubkey", 10);
 	int res = ParsePublic(a_PublicKeyData.data(), a_PublicKeyData.size());
 	if (res != 0)
@@ -39,7 +39,7 @@ cCryptoKey::cCryptoKey(const AString & a_PublicKeyData)
 
 cCryptoKey::cCryptoKey(const AString & a_PrivateKeyData, const AString & a_Password)
 {
-	pk_init(&m_Pk);
+	mbedtls_pk_init(&m_Pk);
 	m_CtrDrbg.Initialize("rsa_privkey", 11);
 	int res = ParsePrivate(a_PrivateKeyData.data(), a_PrivateKeyData.size(), a_Password);
 	if (res != 0)
@@ -56,7 +56,7 @@ cCryptoKey::cCryptoKey(const AString & a_PrivateKeyData, const AString & a_Passw
 
 cCryptoKey::~cCryptoKey()
 {
-	pk_free(&m_Pk);
+	mbedtls_pk_free(&m_Pk);
 }
 
 
@@ -68,10 +68,10 @@ int cCryptoKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, 
 	ASSERT(IsValid());
 
 	size_t DecryptedLen = a_DecryptedMaxLength;
-	int res = pk_decrypt(&m_Pk,
+	int res = mbedtls_pk_decrypt(&m_Pk,
 		a_EncryptedData, a_EncryptedLength,
 		a_DecryptedData, &DecryptedLen, a_DecryptedMaxLength,
-		ctr_drbg_random, m_CtrDrbg.GetInternal()
+		mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal()
 	);
 	if (res != 0)
 	{
@@ -89,9 +89,9 @@ int cCryptoKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a
 	ASSERT(IsValid());
 
 	size_t EncryptedLength = a_EncryptedMaxLength;
-	int res = pk_encrypt(&m_Pk,
+	int res = mbedtls_pk_encrypt(&m_Pk,
 		a_PlainData, a_PlainLength, a_EncryptedData, &EncryptedLength, a_EncryptedMaxLength,
-		ctr_drbg_random, m_CtrDrbg.GetInternal()
+		mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal()
 	);
 	if (res != 0)
 	{
@@ -109,7 +109,7 @@ int cCryptoKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 
-	return pk_parse_public_key(&m_Pk, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes);
+	return mbedtls_pk_parse_public_key(&m_Pk, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes);
 }
 
 
@@ -123,11 +123,11 @@ int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 
 	if (a_Password.empty())
 	{
-		return pk_parse_key(&m_Pk, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes, nullptr, 0);
+		return mbedtls_pk_parse_key(&m_Pk, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes, nullptr, 0);
 	}
 	else
 	{
-		return pk_parse_key(
+		return mbedtls_pk_parse_key(
 			&m_Pk,
 			reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes,
 			reinterpret_cast<const unsigned char *>(a_Password.c_str()), a_Password.size()
@@ -141,7 +141,7 @@ int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 
 bool cCryptoKey::IsValid(void) const
 {
-	return (pk_get_type(&m_Pk) != POLARSSL_PK_NONE);
+	return (mbedtls_pk_get_type(&m_Pk) != MBEDTLS_PK_NONE);
 }
 
 

@@ -1,7 +1,7 @@
-
+﻿
 // EntropyContext.h
 
-// Declares the cEntropyContext class representing a wrapper over entropy contexts in PolarSSL
+// Declares the cEntropyContext class representing a wrapper over entropy contexts in mbedTLS
 
 
 
@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "polarssl/entropy.h"
+#include "mbedtls/entropy.h"
 
 
 
@@ -23,7 +23,7 @@ public:
 	~cEntropyContext();
 
 protected:
-	entropy_context m_Entropy;
+	mbedtls_entropy_context m_Entropy;
 } ;
 
 

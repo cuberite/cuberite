@@ -5,7 +5,7 @@
 #include "Globals.h"
 #include "UUID.h"
 
-#include "polarssl/md5.h"
+#include "mbedtls/md5.h"
 
 
 /** UUID normalised in textual form. */
@@ -265,7 +265,7 @@ cUUID cUUID::GenerateVersion3(const AString & a_Name)
 	cUUID UUID;
 	// Generate an md5 checksum, and use it as base for the ID:
 	const Byte * ByteString = reinterpret_cast<const Byte *>(a_Name.data());
-	md5(ByteString, a_Name.length(), UUID.m_UUID.data());
+	mbedtls_md5(ByteString, a_Name.length(), UUID.m_UUID.data());
 
 	// Insert version number
 	UUID.m_UUID[6] = (UUID.m_UUID[6] & 0x0f) | 0x30;
