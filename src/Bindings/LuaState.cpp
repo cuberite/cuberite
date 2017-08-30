@@ -42,10 +42,8 @@ extern "C"
 
 
 
-
 const cLuaState::cRet cLuaState::Return = {};
 const cLuaState::cNil cLuaState::Nil = {};
-
 
 
 
@@ -2050,7 +2048,9 @@ int cLuaState::ApiParamError(const char * a_MsgFormat, ...)
 
 AString cLuaState::GetTypeText(int a_StackPos)
 {
-	return lua_typename(m_LuaState, lua_type(m_LuaState, a_StackPos));
+	AString ret(tolua_typename(m_LuaState, a_StackPos));
+	lua_pop(m_LuaState, 1);
+	return ret;
 }
 
 
