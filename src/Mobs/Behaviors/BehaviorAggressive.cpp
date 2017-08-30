@@ -1,7 +1,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BehaviorAggressive.h"
-#include "BehaviorChaser.h"
+#include "BehaviorAttacker.h"
 #include "../Monster.h"
 #include "../../Chunk.h"
 #include "../../Entities/Player.h"
@@ -17,10 +17,13 @@ void cBehaviorAggressive::PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chu
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
+
 	// Target something new if we have no target
-	if (m_ParentChaser->GetTarget() == nullptr)
+	cBehaviorAttacker * BehaviorAttacker = m_Parent->GetBehaviorAttacker();
+	if ((BehaviorAttacker != nullptr) && (BehaviorAttacker->GetTarget() == nullptr))
 	{
-		m_ParentChaser->SetTarget(FindNewTarget());
+		// mobTodo enhance this
+		BehaviorAttacker->SetTarget(FindNewTarget());
 	}
 }
 

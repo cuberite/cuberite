@@ -4,10 +4,9 @@
 class cBehaviorAggressive;
 
 #include "Behavior.h"
-class cBehaviorAttacker;
 
 /** The mob is agressive toward specific mobtypes, or toward the player.
-This Behavior has a dependency on BehaviorChaser. */
+This Behavior has a dependency on BehaviorAttacker. */
 class cBehaviorAggressive : public cBehavior
 {
 
@@ -26,7 +25,6 @@ private:
 
 	// Our parent
 	cMonster * m_Parent;
-	cBehaviorAttacker * m_ParentChaser;
 
 	// The mob we want to attack
 	cPawn * m_Target;

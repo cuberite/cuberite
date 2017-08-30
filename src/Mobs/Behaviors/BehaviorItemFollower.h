@@ -1,10 +1,11 @@
 #pragma once
 
-// Makes the mob follow specific held items
+
 class cBehaviorItemFollower;
 
 #include "Behavior.h"
-
+/** Makes the mob follow specific items when held by the player.
+Currently relies on cMonster::GetFollowedItems for the item list. */
 class cBehaviorItemFollower : public cBehavior
 {
 public:

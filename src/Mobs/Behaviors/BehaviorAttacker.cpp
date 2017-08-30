@@ -6,7 +6,7 @@
 #include "../Monster.h"
 #include "../../Entities/Pawn.h"
 #include "../../Entities/Player.h"
-
+#include "../../Tracer.h"
 
 
 cBehaviorAttacker::cBehaviorAttacker() :
@@ -193,23 +193,17 @@ bool cBehaviorAttacker::TargetIsInStrikeRange()
 {
 	ASSERT(m_Target != nullptr);
 	ASSERT(m_Parent != nullptr);
-	/*
-	#include "../../Tracer.h"
+
+
 	cTracer LineOfSight(m_Parent->GetWorld());
 	Vector3d MyHeadPosition = m_Parent->GetPosition() + Vector3d(0, m_Parent->GetHeight(), 0);
-	Vector3d AttackDirection(m_ParentChaser->GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
+	Vector3d AttackDirection(GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
 
-
-	if (GetTarget() != nullptr)
-	{
-		MoveToPosition(GetTarget()->GetPosition());
-	}
 	if (TargetIsInRange() && !LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length())) && (GetHealth() > 0.0))
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
 		Attack(a_Dt);
 	}
-	*/
 
 	return ((m_Target->GetPosition() - m_Parent->GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
 }
