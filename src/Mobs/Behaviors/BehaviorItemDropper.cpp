@@ -29,14 +29,14 @@ void cBehaviorItemDropper::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_C
 		return;  // Babies don't lay eggs
 	}
 
-	if ((m_EggDropTimer == 120) && GetRandomProvider().RandBool())
+	if ((m_EggDropTimer == 6000) && GetRandomProvider().RandBool())
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
 		Drops.push_back(cItem(E_ITEM_EGG, 1));
 		m_Parent->GetWorld()->SpawnItemPickups(Drops, m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), 10);
 	}
-	else if (m_EggDropTimer == 150)
+	else if (m_EggDropTimer == 12000)
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
