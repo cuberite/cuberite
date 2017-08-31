@@ -525,6 +525,12 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 					// Need to access the bed entity to get the color for the item damage
 					ConvertToPickups(a_WorldInterface, Pickups, Meta, a_BlockX, a_BlockY, a_BlockZ);
 				}
+				case E_BLOCK_ENDER_CHEST:
+				{
+					// Reset meta to 0
+					Pickups.Add(m_BlockType, 1, 0);
+					break;
+				}
 				default: Pickups.Add(m_BlockType, 1, Meta); break;
 			}
 		}
