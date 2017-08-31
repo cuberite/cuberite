@@ -243,7 +243,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		for (;;)
 		{
 			m_StopEvent.Wait();
-
+			m_InputThreadRunFlag.clear();
 			break;
 		}
 
@@ -252,7 +252,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
-	}  // if (m_Server->Start()
+	}
 	else
 	{
 		cRoot::m_TerminateEventRaised = true;
@@ -291,28 +291,8 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;
 
-	m_InputThreadRunFlag.clear();
 	#ifdef _WIN32
-		DWORD Length;
-		INPUT_RECORD Record
-		{
-			KEY_EVENT,
-			{
-				{
-					TRUE,
-					1,
-					VK_RETURN,
-					static_cast<WORD>(MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC)),
-					{ { VK_RETURN } },
-					0
-				}
-			}
-		};
-
-		// Can't kill the input thread since it breaks cin (getline doesn't block / receive input on restart)
-		// Apparently no way to unblock getline
-		// Only thing I can think of for now
-		if (WriteConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &Record, 1, &Length) == 0)
+		if (!CancelIoEx(GetStdHandle(STD_INPUT_HANDLE), nullptr))
 		{
 			LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
 			m_TerminateEventRaised = true;
@@ -373,7 +353,6 @@ void cRoot::StopServer()
 	}
 	m_TerminateEventRaised = true;
 	m_StopEvent.Set();
-	m_InputThreadRunFlag.clear();
 }
 
 
@@ -655,7 +634,6 @@ void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback 
 	else if (a_Cmd == "restart")
 	{
 		m_StopEvent.Set();
-		m_InputThreadRunFlag.clear();
 		return;
 	}
 
