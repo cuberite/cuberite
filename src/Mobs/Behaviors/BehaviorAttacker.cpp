@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BehaviorAttacker.h"
-#include "BehaviorStriker.h"
 #include "../Monster.h"
 #include "../../Entities/Pawn.h"
 #include "../../Entities/Player.h"

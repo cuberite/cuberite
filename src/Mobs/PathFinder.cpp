@@ -9,7 +9,8 @@
 cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
 	m_Path(),
 	m_GiveUpCounter(0),
-	m_NotFoundCooldown(0)
+	m_NotFoundCooldown(0),
+	m_DontCare(false)
 {
 	m_Width = a_MobWidth;
 	m_Height = a_MobHeight;
@@ -19,7 +20,7 @@ cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
 
 
 
-ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d & a_Source, Vector3d * a_Destination, Vector3d * a_OutputWaypoint, bool a_DontCare)
+ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d & a_Source, Vector3d * a_Destination, Vector3d * a_OutputWaypoint)
 {
 	m_FinalDestination = *a_Destination;
 	m_Source = a_Source;
@@ -65,7 +66,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 		{
 			m_NoPathToTarget = true;
 			m_PathDestination = m_Path->AcceptNearbyPath();
-			if (a_DontCare)
+			if (m_DontCare)
 			{
 				m_FinalDestination = m_PathDestination;
 				*a_Destination = m_FinalDestination;  // Modify the mob's final destination because it doesn't care about reaching an exact spot
@@ -93,7 +94,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 
 			if (m_GiveUpCounter == 0)
 			{
-				if (a_DontCare)
+				if (m_DontCare)
 				{
 					// We're having trouble reaching the next waypoint but the mob
 					// Doesn't care where to go, just tell him we got there ;)
@@ -160,6 +161,24 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 		}
 		#endif
 	}
+}
+
+
+
+
+
+void cPathFinder::setDontCare(bool a_DontCare)
+{
+	m_DontCare = a_DontCare;
+}
+
+
+
+
+
+bool cPathFinder::getDontCare()
+{
+	return m_DontCare;
 }
 
 

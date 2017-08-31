@@ -221,9 +221,20 @@ public:
 	void AttachRightClickBehavior(cBehavior * a_Behavior);
 	void AttachDoTakeDamageBehavior(cBehavior * a_Behavior);
 
+	/** If a behavior calls this within its tick, it will be the only behavior
+	that gets to tick until UnpinBehavior is called. ControlDesired will no
+	longer be called for any tick until unpinning is done. MUST be called
+	from the tick function of a behavior. */
 	void PinBehavior(cBehavior * a_Behavior);
+
+	/** Unpins the behavior and ticking goes back to normal. MUST be called
+	on the same behavior pointer that called PinBehavior. */
 	void UnpinBehavior(cBehavior * a_Behavior);
-	protected:
+
+	/** Returns a reference to this mob's pathfinder. Typically used by behaviors
+	to tweak pathfinding behavior as they gain or release control of the mob. */
+	cPathFinder & GetPathFinder();
+protected:
 
 	/** Whether or not m_NearestPlayer is stale. Always true at the beginning of a tick.
 	When true, GetNearestPlayer() actually searches for a player, updates m_NearestPlayer, and sets it to false.

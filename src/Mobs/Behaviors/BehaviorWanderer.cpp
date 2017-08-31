@@ -35,6 +35,24 @@ bool cBehaviorWanderer::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk 
 
 
 
+bool cBehaviorWanderer::ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
+	m_OldDontCare = m_Parent->GetPathFinder().getDontCare(true);
+	m_Parent->GetPathFinder().setDontCare(true); // We don't care we're we are going when
+	// wandering. If a path is not found, the pathfinder just modifies our destination.
+	return true;
+}
+
+
+bool cBehaviorWanderer::ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	UNUSED(a_Dt);
+	UNUSED(a_Chunk);
+	m_Parent->GetPathFinder().setDontCare(m_OldDontCare);
+	return true;
+}
 
 
 void cBehaviorWanderer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)

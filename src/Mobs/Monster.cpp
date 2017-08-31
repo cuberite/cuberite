@@ -433,7 +433,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// mobToDo fix dont care
 			// Note that m_NextWayPointPosition is actually returned by GetNextWayPoint)
-			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, true))
+			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition))
 			{
 				case ePathFinderStatus::PATH_FOUND:
 				{
@@ -468,7 +468,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 				default:
 				{
-
+					// NEARBY_FOUND is handled internally by cPathFinder.
+					// Do nothing if CALCULATING.
 				}
 			}
 		}
@@ -1372,6 +1373,15 @@ void cMonster::UnpinBehavior(cBehavior * a_Behavior)
 	ASSERT(m_TickControllingBehaviorState == Normal);
 	ASSERT(m_PinnedBehavior = a_Behavior);
 	m_PinnedBehavior = nullptr;
+}
+
+
+
+
+
+cPathFinder & cMonster::GetPathFinder()
+{
+	return m_PathFinder;
 }
 
 

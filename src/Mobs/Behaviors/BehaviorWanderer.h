@@ -13,11 +13,13 @@ public:
 
 	// Functions our host Monster should invoke:
 	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	bool ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	bool ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 
 private:
 	cMonster * m_Parent;  // Our Parent
-
 	std::chrono::milliseconds m_IdleInterval;
+	bool m_OldDontCare;
 };

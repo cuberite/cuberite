@@ -25,8 +25,9 @@ public:
 	@param a_Source The mob's position. a_Source's coordinates are expected to be within the chunk given in a_Chunk.
 	@param a_Destination The position the mob would like to reach. If a_ExactPath is true, the PathFinder may modify this.
 	@param a_OutputWaypoint An output parameter: The next waypoint to go to.
-	@param a_DontCare If true, the mob doesn't care where to go, and the Pathfinder may modify a_Destination.
-	This should usually be false. An exception is a wandering idle mob which doesn't care about its final destination.
+
+	If m_DontCare is true, the mob doesn't care where to go, and the Pathfinder may modify a_Destination.
+	This should usually be false. One exception is a wandering idle mob which doesn't care about its final destination.
 	In the future, idle mobs shouldn't use A* at all.
 
 	Returns an ePathFinderStatus.
@@ -36,8 +37,13 @@ public:
 	ePathFinderStatus:PATH_NOT_FOUND - The PathFinder did not find a destination to the target. Nothing was written to a_OutputWaypoint. The mob should probably not move.
 
 	Note: Once NEARBY_FOUND is returned once, subsequent calls return PATH_FOUND. */
-	ePathFinderStatus GetNextWayPoint(cChunk & a_Chunk, const Vector3d & a_Source, Vector3d * a_Destination, Vector3d * a_OutputWaypoint, bool a_DontCare = false);
+	ePathFinderStatus GetNextWayPoint(cChunk & a_Chunk, const Vector3d & a_Source, Vector3d * a_Destination, Vector3d * a_OutputWaypoint);
 
+	/** Sets the dontCare value. See the GetNextWayPoint documentation for details. */
+	void setDontCare(bool a_DontCare);
+
+	/** Returns the current dontCare value. */
+	bool getDontCare();
 private:
 
 	/** The width of the Mob which owns this PathFinder. */
@@ -55,7 +61,7 @@ private:
 	/** Coordinates of the next position that should be reached. */
 	Vector3d m_WayPoint;
 
-	/** Coordinates for where we should go. This is out ultimate, final destination. */
+	/** Coordinates for where we should go. This is our ultimate, final destination. */
 	Vector3d m_FinalDestination;
 
 	/** Coordinates for where we are practically going. */
@@ -74,6 +80,10 @@ private:
 
 	/** When a path is not found, this cooldown prevents any recalculations for several ticks. */
 	int m_NotFoundCooldown;
+
+	/** If true, the mob doesn't care where to go, and the Pathfinder may modify a_Destination
+	in an GetNextWayPoint call. */
+	bool m_DontCare;
 
 	/** Ensures the location is not in the air or under water.
 	May change the Y coordinate of the given vector.

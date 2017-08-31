@@ -23,9 +23,6 @@ void cBehaviorDayLightBurner::AttachToMonster(cMonster & a_Parent)
 
 void cBehaviorDayLightBurner::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// mobTodo WouldBurn
-	bool WouldBurn = false; // TEMP
-
 	int RelY = static_cast<int>(m_Parent->GetPosY());
 	if ((RelY < 0) || (RelY >= cChunkDef::Height))
 	{
@@ -38,7 +35,7 @@ void cBehaviorDayLightBurner::PostTick(std::chrono::milliseconds a_Dt, cChunk & 
 		return;
 	}
 
-	if (!m_Parent->IsOnFire() && WouldBurn)
+	if (!m_Parent->IsOnFire() && WouldBurnAt(m_Parent->GetPosition(), a_Chunk))
 	{
 		// Burn for 100 ticks, then decide again
 		m_Parent->StartBurning(100);
