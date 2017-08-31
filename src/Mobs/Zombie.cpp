@@ -21,7 +21,7 @@ cZombie::cZombie(bool a_IsVillagerZombie) :
 	m_BehaviorAggressive.AttachToMonster(*this);
 	m_BehaviourDayLightBurner.AttachToMonster(*this);
 	GetMonsterConfig("Zombie");
-	// Todo I need the config to load after attaching attackerMelee but this is not clean.
+	// Todo I need the config to load after attaching the Behaviors but this is not clean.
 }
 
 

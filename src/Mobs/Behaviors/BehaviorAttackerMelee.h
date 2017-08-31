@@ -2,8 +2,8 @@
 
 #include "BehaviorAttacker.h"
 
-/** Makes the mob fight back any other mob that damages it. Mob should have BehaviorAttacker to work.
-This behavior does not make sense in combination with BehaviorCoward. */
+/** Grants the mob that ability to approach a target and then melee attack it.
+Use BehaviorAttackerMelee::SetTarget to attack. */
 class cBehaviorAttackerMelee : public cBehaviorAttacker
 {
 public:
