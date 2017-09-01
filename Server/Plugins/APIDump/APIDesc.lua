@@ -294,6 +294,24 @@ return
 					},
 					Notes = "Returns whether the specified block type is solid.",
 				},
+				IsSkylightDispersant =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether skylight may pass through a block of the specified type unimpeded.",
+				},
 				IsTransparent =
 				{
 					IsStatic = true,
