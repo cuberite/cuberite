@@ -19,5 +19,4 @@ public:
 private:
 	cMonster * m_Parent;  // Our Parent
 	cEntity * m_Attacker;  // The entity we're running away from
-	bool m_OldDontCare;
 };

@@ -10,7 +10,7 @@
 
 
 cZombie::cZombie(bool a_IsVillagerZombie) :
-	super("Zombie", mtZombie, "entity.zombie.hurt", "entity.zombie.death", 0.6, 1.8),
+	super(mtZombie, "entity.zombie.hurt", "entity.zombie.death", 0.6, 1.8),
 	m_IsVillagerZombie(a_IsVillagerZombie),
 	m_IsConverting(false)
 {
@@ -21,7 +21,7 @@ cZombie::cZombie(bool a_IsVillagerZombie) :
 	m_BehaviorAggressive.AttachToMonster(*this);
 	m_BehaviourDayLightBurner.AttachToMonster(*this);
 	GetMonsterConfig("Zombie");
-	// Todo I need the config to load after attaching the Behaviors but this is not clean.
+	// mobTodo I need the config to load after attaching the Behaviors but this is not clean.
 }
 
 

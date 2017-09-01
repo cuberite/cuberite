@@ -21,5 +21,4 @@ public:
 private:
 	cMonster * m_Parent;  // Our Parent
 	std::chrono::milliseconds m_IdleInterval;
-	bool m_OldDontCare;
 };

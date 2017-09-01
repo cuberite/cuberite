@@ -13,13 +13,8 @@ class cClientHandle;
 
 
 //Behavior fwds
-class cPassiveMonster;
-class cBehaviorAggressive;
 class cBehaviorBreeder;
 class cBehaviorAttacker;
-class cBehaviorStriker;
-class cBehaviorWanderer;
-class cBehaviorDayLightBurner;
 class cBehavior;
 
 // tolua_begin
@@ -45,11 +40,10 @@ public:
 	enum MPersonality{PASSIVE, AGGRESSIVE, COWARDLY} m_EMPersonality;
 
 	/** Creates the mob object.
-	If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	cMonster(eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
 	virtual ~cMonster() override;
 
@@ -199,14 +193,15 @@ public:
 
 	bool IsPathFinderActivated() const;
 
-	// Behavior getters (most are probably not used. mobTodo - cleanup most of them)
+	// Behavior getters for the rare occasion where we need "polymorphism"
+	// Currently only for attacking and breeding.
 	cBehaviorBreeder * GetBehaviorBreeder();
 	const cBehaviorBreeder * GetBehaviorBreeder() const;
 	cBehaviorAttacker * GetBehaviorAttacker();\
 	cBehaviorBreeder * m_BehaviorBreederPointer;
 	cBehaviorAttacker * m_BehaviorAttackerPointer;
 
-	// Polymorphic behavior functions
+	// Polymorphic monster-specific functions that behaviors may use
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2);
 	virtual void GetFollowedItems(cItems & a_Items);
 	virtual void GetBreedingItems(cItems & a_Items);
@@ -352,4 +347,5 @@ private:
 	cBehavior * m_PinnedBehavior;
 	enum TickState{NewControlStarting, OldControlEnding, Normal} m_TickControllingBehaviorState;
 
+	int m_TicksSinceLastDamaged;  // How many ticks ago were we last damaged by a player?
 } ;  // tolua_export

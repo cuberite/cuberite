@@ -11,12 +11,13 @@
 
 
 cWither::cWither(void) :
-	super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", 0.9, 4.0),
+	super(mtWither, "entity.wither.hurt", "entity.wither.death", 0.9, 4.0),
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
 	SetHealth(GetMaxHealth() / 3);
 	m_EMPersonality = AGGRESSIVE;
+	GetMonsterConfig("Wither");
 }
 
 

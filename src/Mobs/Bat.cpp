@@ -5,12 +5,11 @@
 #include "../Chunk.h"
 
 cBat::cBat(void) :
-    super("Bat", mtBat,  "entity.bat.hurt", "entity.bat.death", 0.5, 0.9)
+	super(mtBat,  "entity.bat.hurt", "entity.bat.death", 0.5, 0.9)
 {
-    SetGravity(-2.0f);
-    SetAirDrag(0.05f);
-
-
+	SetGravity(-2.0f);
+	SetAirDrag(0.05f);
+	GetMonsterConfig("Bat");
 }
 
 

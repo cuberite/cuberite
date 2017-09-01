@@ -8,9 +8,10 @@
 
 
 cCaveSpider::cCaveSpider(void) :
-	super("CaveSpider", mtCaveSpider, "entity.spider.hurt", "entity.spider.death", 0.7, 0.5)
+	super(mtCaveSpider, "entity.spider.hurt", "entity.spider.death", 0.7, 0.5)
 {
 		m_EMPersonality = AGGRESSIVE;
+		GetMonsterConfig("CaveSpider");
 }
 
 

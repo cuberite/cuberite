@@ -7,7 +7,7 @@
 
 
 cCow::cCow(void) :
-	super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3),
+	super(mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3),
 	m_BehaviorItemReplacer(E_ITEM_BUCKET, E_ITEM_MILK)
 {
 	m_EMPersonality = PASSIVE;
@@ -16,6 +16,7 @@ cCow::cCow(void) :
 	m_BehaviorItemFollower.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
 	m_BehaviorItemReplacer.AttachToMonster(*this);
+	GetMonsterConfig("Cow");
 }
 
 

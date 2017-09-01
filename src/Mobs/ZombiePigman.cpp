@@ -9,9 +9,10 @@
 
 
 cZombiePigman::cZombiePigman(void) :
-	super("ZombiePigman", mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", 0.6, 1.8)
+	super(mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", 0.6, 1.8)
 {
 	m_EMPersonality = PASSIVE;
+	GetMonsterConfig("ZombiePigman");
 }
 
 

@@ -12,7 +12,7 @@
 
 
 cVillager::cVillager(eVillagerType VillagerType) :
-	super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", 0.6, 1.8),
+	super(mtVillager, "entity.villager.hurt", "entity.villager.death", 0.6, 1.8),
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
 	m_VillagerAction(false)
@@ -22,6 +22,7 @@ cVillager::cVillager(eVillagerType VillagerType) :
 	m_BehaviorCoward.AttachToMonster(*this);
 	m_BehaviorItemFollower.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
+	GetMonsterConfig("Villager");
 }
 
 

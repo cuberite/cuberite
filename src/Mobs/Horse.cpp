@@ -11,7 +11,7 @@
 
 
 cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
-	super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", 1.4, 1.6),
+	super(mtHorse, "entity.horse.hurt", "entity.horse.death", 1.4, 1.6),
 	m_bHasChest(false),
 	m_bIsEating(false),
 	m_bIsRearing(false),
@@ -32,6 +32,7 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_BehaviorCoward.AttachToMonster(*this);
 	m_BehaviorItemFollower.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
+	GetMonsterConfig("Horse");
 }
 
 

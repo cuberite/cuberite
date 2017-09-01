@@ -40,7 +40,6 @@ bool cBehaviorCoward::ControlStarting(std::chrono::milliseconds a_Dt, cChunk & a
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
-	m_OldDontCare = m_Parent->GetPathFinder().getDontCare();
 	m_Parent->GetPathFinder().setDontCare(true); // We don't care we're we are going when
 	// wandering. If a path is not found, the pathfinder just modifies our destination.
 	m_Parent->SetRelativeWalkSpeed(m_Parent->GetRelativeWalkSpeed() * 3);
@@ -53,7 +52,7 @@ bool cBehaviorCoward::ControlEnding(std::chrono::milliseconds a_Dt, cChunk & a_C
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 	m_Parent->SetRelativeWalkSpeed(m_Parent->GetRelativeWalkSpeed() / 3);
-	m_Parent->GetPathFinder().setDontCare(m_OldDontCare);
+	m_Parent->GetPathFinder().setDontCare(false);
 	return true;
 }
 

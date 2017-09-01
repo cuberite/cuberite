@@ -9,11 +9,12 @@
 
 
 cBlaze::cBlaze(void) :
-	super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", 0.6, 1.8)
+	super(mtBlaze, "entity.blaze.hurt", "entity.blaze.death", 0.6, 1.8)
 {
 	m_EMPersonality = AGGRESSIVE;
 	SetGravity(-8.0f);
 	SetAirDrag(0.05f);
+	GetMonsterConfig("Blaze");
 }
 
 

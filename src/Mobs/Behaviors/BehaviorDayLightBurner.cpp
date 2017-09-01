@@ -4,7 +4,6 @@
 #include "../Monster.h"
 #include "../../Entities/Player.h"
 #include "../../Entities/Entity.h"
-
 #include "../../Chunk.h"
 
 
@@ -15,6 +14,7 @@ void cBehaviorDayLightBurner::AttachToMonster(cMonster & a_Parent)
 {
 	m_Parent = &a_Parent;
 	m_Parent->AttachPostTickBehavior(this);
+	m_Parent->GetPathFinder().SetAvoidSunlight(true);
 }
 
 
@@ -35,7 +35,7 @@ void cBehaviorDayLightBurner::PostTick(std::chrono::milliseconds a_Dt, cChunk & 
 		return;
 	}
 
-	if (!m_Parent->IsOnFire() && WouldBurnAt(m_Parent->GetPosition(), a_Chunk))
+	if (!m_Parent->IsOnFire() && WouldBurnAt(m_Parent->GetPosition(), a_Chunk, *m_Parent))
 	{
 		// Burn for 100 ticks, then decide again
 		m_Parent->StartBurning(100);
@@ -45,7 +45,7 @@ void cBehaviorDayLightBurner::PostTick(std::chrono::milliseconds a_Dt, cChunk & 
 
 
 
-bool cBehaviorDayLightBurner::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
+bool cBehaviorDayLightBurner::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk, cMonster & a_Monster)
 {
 	int RelY = FloorC(a_Location.y);
 	if (RelY <= 0)
@@ -67,11 +67,11 @@ bool cBehaviorDayLightBurner::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 
 	if (
 		(Chunk->GetBlock(Rel.x, Rel.y, Rel.z) != E_BLOCK_SOULSAND) &&  // Not on soulsand
-		(m_Parent->GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
-		m_Parent->GetWorld()->IsWeatherSunnyAt(static_cast<int>(m_Parent->GetPosX()), static_cast<int>(m_Parent->GetPosZ()))        // Not raining
+		(a_Monster.GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
+		a_Monster.GetWorld()->IsWeatherSunnyAt(static_cast<int>(a_Monster.GetPosX()), static_cast<int>(a_Monster.GetPosZ()))  // Not raining
 	)
 	{
-		int MobHeight = CeilC(a_Location.y + m_Parent->GetHeight()) - 1;   // The height of the mob head
+		int MobHeight = CeilC(a_Location.y + a_Monster.GetHeight()) - 1;   // The height of the mob head
 		if (MobHeight >= cChunkDef::Height)
 		{
 			return true;

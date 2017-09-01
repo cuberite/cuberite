@@ -9,9 +9,10 @@
 
 
 cSnowGolem::cSnowGolem(void) :
-	super("SnowGolem", mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", 0.4, 1.8)
+	super(mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", 0.4, 1.8)
 {
 	m_EMPersonality = PASSIVE;
+	GetMonsterConfig("SnowGolem");
 }
 
 

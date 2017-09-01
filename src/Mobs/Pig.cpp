@@ -10,7 +10,7 @@
 
 
 cPig::cPig(void) :
-	super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", 0.9, 0.9),
+	super(mtPig, "entity.pig.hurt", "entity.pig.death", 0.9, 0.9),
 	m_bIsSaddled(false)
 {
 	m_EMPersonality = PASSIVE;
@@ -18,6 +18,7 @@ cPig::cPig(void) :
 	m_BehaviorCoward.AttachToMonster(*this);
 	m_BehaviorItemFollower.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
+	GetMonsterConfig("Pig");
 }
 
 

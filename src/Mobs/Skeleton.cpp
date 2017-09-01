@@ -10,10 +10,11 @@
 
 
 cSkeleton::cSkeleton(bool IsWither) :
-	super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", 0.6, 1.8),
+	super(mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", 0.6, 1.8),
 	m_bIsWither(IsWither)
 {
 	m_EMPersonality = AGGRESSIVE;
+	GetMonsterConfig("Skeleton");
 }
 
 

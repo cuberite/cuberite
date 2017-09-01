@@ -9,9 +9,10 @@
 
 
 cGhast::cGhast(void) :
-	super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", 4, 4)
+	super(mtGhast, "entity.ghast.hurt", "entity.ghast.death", 4, 4)
 {
 	m_EMPersonality = AGGRESSIVE;
+	GetMonsterConfig("Ghast");
 }
 
 

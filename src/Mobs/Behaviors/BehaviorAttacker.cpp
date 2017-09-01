@@ -13,7 +13,6 @@ cBehaviorAttacker::cBehaviorAttacker() :
   , m_AttackDamage(1)
   , m_AttackRange(1)
   , m_AttackCoolDownTicksLeft(0)
-  , m_TicksSinceLastDamaged(100)
   , m_IsStriking(false)
   , m_Target(nullptr)
 {
@@ -117,11 +116,6 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cBehaviorAttacker::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (m_TicksSinceLastDamaged < 100)
-	{
-		++m_TicksSinceLastDamaged;
-	}
-
 	if (m_AttackCoolDownTicksLeft > 0)
 	{
 		m_AttackCoolDownTicksLeft -= 1;
@@ -143,7 +137,6 @@ void cBehaviorAttacker::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
 		}
-		m_TicksSinceLastDamaged = 0;
 	}
 }
 

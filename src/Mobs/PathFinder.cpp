@@ -10,7 +10,8 @@ cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
 	m_Path(),
 	m_GiveUpCounter(0),
 	m_NotFoundCooldown(0),
-	m_DontCare(false)
+	m_DontCare(false),
+	m_AvoidSunlight(false)
 {
 	m_Width = a_MobWidth;
 	m_Height = a_MobHeight;
@@ -167,7 +168,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 
 
 
-void cPathFinder::setDontCare(bool a_DontCare)
+void cPathFinder::SetDontCare(bool a_DontCare)
 {
 	m_DontCare = a_DontCare;
 }
@@ -176,9 +177,27 @@ void cPathFinder::setDontCare(bool a_DontCare)
 
 
 
-bool cPathFinder::getDontCare()
+bool cPathFinder::GetDontCare()
 {
 	return m_DontCare;
+}
+
+
+
+
+
+void cPathFinder::SetAvoidSunlight(bool a_AvoidSunlight)
+{
+	m_AvoidSunlight = a_AvoidSunlight;
+}
+
+
+
+
+
+bool cPathFinder::GetAvoidSunlight()
+{
+	return m_AvoidSunlight;
 }
 
 

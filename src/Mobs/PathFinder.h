@@ -40,10 +40,16 @@ public:
 	ePathFinderStatus GetNextWayPoint(cChunk & a_Chunk, const Vector3d & a_Source, Vector3d * a_Destination, Vector3d * a_OutputWaypoint);
 
 	/** Sets the dontCare value. See the GetNextWayPoint documentation for details. */
-	void setDontCare(bool a_DontCare);
+	void SetDontCare(bool a_DontCare);
 
 	/** Returns the current dontCare value. */
-	bool getDontCare();
+	bool GetDontCare();
+
+	/** If true, the mob will try avoiding sunlight. */
+	void SetAvoidSunlight(bool a_AvoidSunlight);
+
+	/** Returns the current AvoidSunlight value. */
+	bool GetAvoidSunlight();
 private:
 
 	/** The width of the Mob which owns this PathFinder. */
@@ -84,6 +90,9 @@ private:
 	/** If true, the mob doesn't care where to go, and the Pathfinder may modify a_Destination
 	in an GetNextWayPoint call. */
 	bool m_DontCare;
+
+	/** If true, */
+	bool m_AvoidSunlight;
 
 	/** Ensures the location is not in the air or under water.
 	May change the Y coordinate of the given vector.

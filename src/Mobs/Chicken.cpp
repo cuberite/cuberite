@@ -6,7 +6,7 @@
 
 
 cChicken::cChicken(void) :
-	super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", 0.3, 0.4)
+	super(mtChicken, "entity.chicken.hurt", "entity.chicken.death", 0.3, 0.4)
 {
 	SetGravity(-2.0f);
 	SetAirDrag(0.0f);
@@ -16,6 +16,7 @@ cChicken::cChicken(void) :
 	m_BehaviorItemFollower.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
 	m_BehaviorItemDropper.AttachToMonster(*this);
+	GetMonsterConfig("Chicken");
 }
 
 

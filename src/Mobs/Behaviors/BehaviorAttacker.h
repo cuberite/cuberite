@@ -65,8 +65,6 @@ protected:
 	int m_AttackRange;
 	int m_AttackCoolDownTicksLeft;
 
-	int m_TicksSinceLastDamaged;  // How many ticks ago were we last damaged by a player?
-
 	bool m_IsStriking;
 
 	/** Our parent */

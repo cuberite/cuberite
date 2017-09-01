@@ -19,6 +19,7 @@ cRabbit::cRabbit(void) :
 	m_BehaviorCoward.AttachToMonster(*this);
 	m_BehaviorItemFollower.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
+	GetMonsterConfig("Rabbit");
 }
 
 
@@ -26,10 +27,16 @@ cRabbit::cRabbit(void) :
 
 
 cRabbit::cRabbit(eRabbitType Type, int MoreCarrotTicks) :
-	super("Rabbit", mtRabbit, "entity.rabbit.hurt", "entity.rabbit.death", 0.82, 0.68),
+	super(mtRabbit, "entity.rabbit.hurt", "entity.rabbit.death", 0.82, 0.68),
 	m_Type(Type),
 	m_MoreCarrotTicks(MoreCarrotTicks)
 {
+	m_EMPersonality = PASSIVE;
+	m_BehaviorBreeder.AttachToMonster(*this);
+	m_BehaviorCoward.AttachToMonster(*this);
+	m_BehaviorItemFollower.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
+	GetMonsterConfig("Rabbit");
 }
 
 

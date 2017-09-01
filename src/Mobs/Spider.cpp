@@ -9,9 +9,10 @@
 
 
 cSpider::cSpider(void) :
-	super("Spider", mtSpider, "entity.spider.hurt", "entity.spider.death", 1.4, 0.9)
+	super(mtSpider, "entity.spider.hurt", "entity.spider.death", 1.4, 0.9)
 {
 	m_EMPersonality = AGGRESSIVE;
+	GetMonsterConfig("Spider");
 }
 
 

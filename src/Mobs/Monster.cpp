@@ -83,11 +83,11 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
+cMonster::cMonster(eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
+	, m_EMPersonality(AGGRESSIVE)
 	, m_BehaviorBreederPointer(nullptr)
 	, m_BehaviorAttackerPointer(nullptr)
-	, m_EMPersonality(AGGRESSIVE)
 	, m_NearestPlayerIsStale(true)
 	, m_PathFinder(a_Width, a_Height)
 	, m_PathfinderActivated(false)
@@ -119,11 +119,9 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_NewTickControllingBehavior(nullptr)
 	, m_PinnedBehavior(nullptr)
 	, m_TickControllingBehaviorState(Normal)
+	, m_TicksSinceLastDamaged(1000)
 {
-	if (!a_ConfigName.empty())
-	{
-		GetMonsterConfig(a_ConfigName);
-	}
+
 }
 
 
@@ -141,8 +139,6 @@ cMonster::~cMonster()
 
 void cMonster::Destroy(bool a_ShouldBroadcast)
 {
-	//mobtodo Destroy vs Destroyed
-
 	// mobTodo behavior for leash
 	if (IsLeashed())
 	{
@@ -431,27 +427,24 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			// mobToDo fix dont care
 			// Note that m_NextWayPointPosition is actually returned by GetNextWayPoint)
 			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition))
 			{
 				case ePathFinderStatus::PATH_FOUND:
 				{
-					/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
-					1. I am idle
-					2. I was not hurt by a player recently.
-					Then STOP. */
+					// mobTodo move this logic to cPathfinder or to something
+					// more generic in cPath.
 					if (
-							//mobTodo emstate
-						/* (GetBehaviorDayLightBurner() != nullptr) && (m_TicksSinceLastDamaged >= 100) &&
-						GetBehaviorDayLightBurner()->WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
-						!(GetBehaviorDayLightBurner()->WouldBurnAt(GetPosition(), *Chunk)) */
-							1 == 0
-
-							// This logic should probably be in chaser
+						// I am supposed to avoid daylight
+						(m_PathFinder.GetAvoidSunlight()) &&
+						// I was not hurt recently
+						(m_TicksSinceLastDamaged >= 100) &&
+						// I won't burn where I stand now
+						cBehaviorDayLightBurner::WouldBurnAt(m_NextWayPointPosition, *Chunk, *this) &&
+						// I will burn where I'm going to
+						!(cBehaviorDayLightBurner::WouldBurnAt(GetPosition(), *Chunk, *this))
 					)
 					{
-						// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
 						StopMovingToPosition();
 					}
 					else
@@ -495,6 +488,11 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			SetAge(1);
 			m_World->BroadcastEntityMetadata(*this);
 		}
+	}
+
+	if (m_TicksSinceLastDamaged < 1000)
+	{
+		++m_TicksSinceLastDamaged;
 	}
 }
 
@@ -647,6 +645,8 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		ASSERT(Behavior != nullptr);
 		Behavior->DoTakeDamage(a_TDI);
 	}
+
+	m_TicksSinceLastDamaged = 0;
 
 	return true;
 }
@@ -1331,24 +1331,9 @@ void cMonster::AttachTickBehavior(cBehavior * a_Behavior)
 
 void cMonster::AttachDestroyBehavior(cBehavior * a_Behavior)
 {
-<<<<<<< HEAD
 	ASSERT(a_Behavior != nullptr);
 	m_AttachedDestroyBehaviors.push_back(a_Behavior);
 }
-=======
-	// If the Y coord is out of range, return the most logical result without considering anything else:
-	int RelY = FloorC(a_Location.y);
-	if (RelY >= cChunkDef::Height)
-	{
-		// Always burn above the world
-		return true;
-	}
-	if (RelY <= 0)
-	{
-		// The mob is about to die, no point in burning
-		return false;
-	}
->>>>>>> master
 
 
 

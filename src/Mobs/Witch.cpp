@@ -9,9 +9,10 @@
 
 
 cWitch::cWitch(void) :
-	super("Witch", mtWitch, "entity.witch.hurt", "entity.witch.death", 0.6, 1.8)
+	super(mtWitch, "entity.witch.hurt", "entity.witch.death", 0.6, 1.8)
 {
 	m_EMPersonality = AGGRESSIVE;
+	GetMonsterConfig("Witch");
 }
 
 

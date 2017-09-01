@@ -10,8 +10,7 @@
 
 
 cSlime::cSlime(int a_Size) :
-	super("Slime",
-		mtSlime,
+	super(mtSlime,
 		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
 		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
 		0.6 * a_Size,
@@ -22,6 +21,7 @@ cSlime::cSlime(int a_Size) :
 	m_EMPersonality = AGGRESSIVE;
 	SetMaxHealth(a_Size * a_Size);
 	// SetAttackDamage(a_Size); //mobTodo myBehavior.setaTTACKDamage
+	GetMonsterConfig("Slime");
 }
 
 

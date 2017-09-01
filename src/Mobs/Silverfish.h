@@ -14,8 +14,9 @@ class cSilverfish :
 
 public:
 	cSilverfish(void) :
-		super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", 0.3, 0.7)
+		super(mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", 0.3, 0.7)
 	{
+		GetMonsterConfig("Silverfish");
 	}
 
 	CLASS_PROTODEF(cSilverfish)

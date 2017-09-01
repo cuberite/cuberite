@@ -7,10 +7,11 @@
 
 
 cMagmaCube::cMagmaCube(int a_Size) :
-	super("MagmaCube", mtMagmaCube, Printf("entity.%smagmacube.hurt", GetSizeName(a_Size).c_str()), Printf("entity.%smagmacube.death", GetSizeName(a_Size).c_str()), 0.6 * a_Size, 0.6 * a_Size),
+	super(mtMagmaCube, Printf("entity.%smagmacube.hurt", GetSizeName(a_Size).c_str()), Printf("entity.%smagmacube.death", GetSizeName(a_Size).c_str()), 0.6 * a_Size, 0.6 * a_Size),
 	m_Size(a_Size)
 {
 	m_EMPersonality = AGGRESSIVE;
+	GetMonsterConfig("MagmaCube");
 }
 
 

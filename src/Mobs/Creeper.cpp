@@ -11,13 +11,14 @@
 
 
 cCreeper::cCreeper(void) :
-	super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", 0.6, 1.8),
+	super(mtCreeper, "entity.creeper.hurt", "entity.creeper.death", 0.6, 1.8),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),
 	m_ExplodingTimer(0)
 {
 	m_EMPersonality = AGGRESSIVE;
+	GetMonsterConfig("Creeper");
 }
 
 

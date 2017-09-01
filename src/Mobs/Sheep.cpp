@@ -12,7 +12,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", 0.6, 1.3),
+	super(mtSheep, "entity.sheep.hurt", "entity.sheep.death", 0.6, 1.3),
 	m_TimeToStopEating(-1),
 	m_IsSheared(false),
 	m_WoolColor(a_Color)
@@ -33,6 +33,8 @@ cSheep::cSheep(int a_Color) :
 	{
 		m_WoolColor = 0;
 	}
+
+	GetMonsterConfig("Sheep");
 }
 
 
