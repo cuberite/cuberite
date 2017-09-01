@@ -1,4 +1,4 @@
-
+﻿
 // LuaWindow.h
 
 // Declares the cLuaWindow class representing a virtual window that plugins may create and open for the player
@@ -9,13 +9,14 @@
 
 #pragma once
 
+#include <functional>
 #include "LuaState.h"
 #include "../UI/Window.h"
 #include "../ItemGrid.h"
 
 
 class cPlayer;
-typedef cItemCallback<cPlayer> cPlayerListCallback;
+using cPlayerListCallback = std::function<bool(cPlayer &)>;
 
 
 /** A window that has been created by a Lua plugin and is handled entirely by that plugin

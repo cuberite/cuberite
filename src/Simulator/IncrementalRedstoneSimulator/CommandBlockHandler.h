@@ -44,17 +44,12 @@ public:
 			return {};
 		}
 
-		class cSetPowerToCommandBlock : public cCommandBlockCallback
-		{
-		public:
-			virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		a_World.DoWithCommandBlockAt(a_Position.x, a_Position.y, a_Position.z, [](cCommandBlockEntity & a_CommandBlock)
 			{
-				a_CommandBlock->Activate();
+				a_CommandBlock.Activate();
 				return false;
 			}
-		} CmdBlockSP;
-
-		a_World.DoWithCommandBlockAt(a_Position.x, a_Position.y, a_Position.z, CmdBlockSP);
+		);
 		return {};
 	}
 

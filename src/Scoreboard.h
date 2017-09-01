@@ -1,4 +1,4 @@
-
+﻿
 // Scoreboard.h
 
 // Implementation of a scoreboard that keeps track of specified objectives
@@ -11,14 +11,15 @@
 
 
 
+#include <functional>
 
 
 class cObjective;
 class cTeam;
 class cWorld;
 
-typedef cItemCallback<cObjective> cObjectiveCallback;
-typedef cItemCallback<cTeam>      cTeamCallback;
+using cObjectiveCallback = std::function<bool(cObjective &)>;
+using cTeamCallback      = std::function<bool(cTeam &)>;
 
 
 
@@ -266,15 +267,15 @@ public:
 
 	/** Execute callback for each objective with the specified type
 	Returns true if all objectives processed, false if the callback aborted by returning true. */
-	bool ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback & a_Callback);
+	bool ForEachObjectiveWith(cObjective::eType a_Type, const cObjectiveCallback & a_Callback);
 
 	/** Execute callback for each objective.
 	Returns true if all objectives have been processed, false if the callback aborted by returning true. */
-	bool ForEachObjective(cObjectiveCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachObjective(const cObjectiveCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Execute callback for each team.
 	Returns true if all teams have been processed, false if the callback aborted by returning true. */
-	bool ForEachTeam(cTeamCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachTeam(const cTeamCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
 

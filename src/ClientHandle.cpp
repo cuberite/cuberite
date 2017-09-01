@@ -1659,9 +1659,9 @@ void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 
 void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 {
-	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [=](cPlayer * a_ToSpectate)
+	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [=](cPlayer & a_ToSpectate)
 	{
-		m_Player->TeleportToEntity(*a_ToSpectate);
+		m_Player->TeleportToEntity(a_ToSpectate);
 		return true;
 	});
 }
@@ -1733,9 +1733,9 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	// If the player is a spectator, let him spectate
 	if (m_Player->IsGameModeSpectator() && a_IsLeftClick)
 	{
-		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity * a_Entity)
+		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
 		{
-			m_Player->AttachTo(a_Entity);
+			m_Player->AttachTo(&a_Entity);
 			return true;
 		});
 		return;
@@ -1744,20 +1744,18 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	// If it is a right click, call the entity's OnRightClicked() handler:
 	if (!a_IsLeftClick)
 	{
-		class cRclkEntity : public cEntityCallback
-		{
-			cPlayer & m_Player;
-			virtual bool Item(cEntity * a_Entity) override
+		cWorld * World = m_Player->GetWorld();
+		World->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
 			{
 				if (
-					cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity) ||
+					cPluginManager::Get()->CallHookPlayerRightClickingEntity(*m_Player, a_Entity) ||
 					(
-						m_Player.IsGameModeSpectator() &&  // Spectators cannot interact with every entity
+						m_Player->IsGameModeSpectator() &&  // Spectators cannot interact with every entity
 						(
-							!a_Entity->IsMinecart() ||  // They can only interact with minecarts
+							!a_Entity.IsMinecart() ||  // They can only interact with minecarts
 							(
-								(reinterpret_cast<cMinecart *>(a_Entity)->GetPayload() != cMinecart::mpChest) &&  // And only if the type matches a minecart with a chest or
-								(reinterpret_cast<cMinecart *>(a_Entity)->GetPayload() != cMinecart::mpHopper)    // a minecart with a hopper
+								(static_cast<cMinecart &>(a_Entity).GetPayload() != cMinecart::mpChest) &&  // And only if the type matches a minecart with a chest or
+								(static_cast<cMinecart &>(a_Entity).GetPayload() != cMinecart::mpHopper)    // a minecart with a hopper
 							)
 						)
 					)
@@ -1765,52 +1763,34 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 				{
 					return false;
 				}
-				a_Entity->OnRightClicked(m_Player);
+				a_Entity.OnRightClicked(*m_Player);
 				return false;
 			}
-		public:
-			cRclkEntity(cPlayer & a_Player) : m_Player(a_Player) {}
-		} Callback (*m_Player);
-
-		cWorld * World = m_Player->GetWorld();
-		World->DoWithEntityByID(a_TargetEntityID, Callback);
+		);
 		return;
 	}
 
 	// If it is a left click, attack the entity:
-	class cDamageEntity : public cEntityCallback
-	{
-	public:
-		cPlayer * m_Me;
-
-		cDamageEntity(cPlayer * a_Player) :
-			m_Me(a_Player)
+	m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
 		{
-		}
-
-		virtual bool Item(cEntity * a_Entity) override
-		{
-			if (!a_Entity->GetWorld()->IsPVPEnabled())
+			if (!a_Entity.GetWorld()->IsPVPEnabled())
 			{
 				// PVP is disabled, disallow players hurting other players:
-				if (a_Entity->IsPlayer())
+				if (a_Entity.IsPlayer())
 				{
 					// Player is hurting another player which is not allowed when PVP is disabled so ignore it
 					return true;
 				}
 			}
-			a_Entity->TakeDamage(*m_Me);
-			m_Me->AddFoodExhaustion(0.3);
-			if (a_Entity->IsPawn())
+			a_Entity.TakeDamage(*m_Player);
+			m_Player->AddFoodExhaustion(0.3);
+			if (a_Entity.IsPawn())
 			{
-				m_Me->NotifyNearbyWolves(static_cast<cPawn*>(a_Entity), true);
+				m_Player->NotifyNearbyWolves(static_cast<cPawn*>(&a_Entity), true);
 			}
 			return true;
 		}
-	} Callback(m_Player);
-
-	cWorld * World = m_Player->GetWorld();
-	World->DoWithEntityByID(a_TargetEntityID, Callback);
+	);
 }
 
 
@@ -1859,17 +1839,8 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 		return false;
 	}
 
-	class cCallback :
-		public cPlayerListCallback
-	{
-		virtual bool Item(cPlayer * a_Player) override
-		{
-			return true;
-		}
-	} Callback;
-
 	// Check if the player is in any World.
-	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))
+	if (cRoot::Get()->DoWithPlayer(a_Username, [](cPlayer &) { return true; }))
 	{
 		Kick("A player of the username is already logged in");
 		return false;
