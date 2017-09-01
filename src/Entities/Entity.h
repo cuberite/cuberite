@@ -217,7 +217,6 @@ public:
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
 
 	void SetHeadYaw (double a_HeadYaw);
-	void SetHeight  (double a_Height);
 	void SetMass    (double a_Mass);
 	void SetPosX    (double a_PosX) { SetPosition({a_PosX, m_Position.y, m_Position.z}); }
 	void SetPosY    (double a_PosY) { SetPosition({m_Position.x, a_PosY, m_Position.z}); }
@@ -242,8 +241,6 @@ public:
 
 	/** Sets the speed in the Z axis, leaving the other speed components intact. Measured in m / sec. */
 	void SetSpeedZ(double a_SpeedZ);
-
-	void SetWidth   (double a_Width);
 
 	void AddPosX    (double a_AddPosX) { AddPosition(a_AddPosX, 0, 0); }
 	void AddPosY    (double a_AddPosY) { AddPosition(0, a_AddPosY, 0); }
@@ -299,6 +296,10 @@ public:
 	void SetPitchFromSpeed(void);
 
 	// tolua_end
+
+	void SetHeight(double a_Height);
+
+	void SetWidth(double a_Width);
 
 	/** Exported in ManualBindings */
 	const Vector3d & GetPosition(void) const { return m_Position; }

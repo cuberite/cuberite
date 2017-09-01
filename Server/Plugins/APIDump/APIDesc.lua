@@ -3983,10 +3983,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Sets the entity's health to the specified amount of hitpoints. Doesn't broadcast any hurt animation. Doesn't kill the entity if health drops below zero. Use the TakeDamage() function instead for taking damage.",
 				},
-				SetHeight =
-				{
-					Notes = "FIXME: Remove this from API",
-				},
 				SetInvulnerableTicks =
 				{
 					Params =
@@ -4184,10 +4180,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Sets the Z component of the entity speed",
-				},
-				SetWidth =
-				{
-					Notes = "FIXME: Remove this from API",
 				},
 				SetYaw =
 				{
@@ -6468,7 +6460,13 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				},
 				RemoveOneEquippedItem =
 				{
-					Notes = "Removes one item from the hotbar's currently selected slot",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Removes one item from the hotbar's currently selected slot. Returns true on success.",
 				},
 				SendEquippedSlot =
 				{
@@ -9340,7 +9338,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "EffectType",
-							Type = "cEntityEffect",
+							Type = "cEntityEffect#eType",
 						},
 						{
 							Name = "EffectDurationTicks",
@@ -9367,7 +9365,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "EffectType",
-							Type = "cEntityEffect",
+							Type = "cEntityEffect#eType",
 						},
 					},
 					Returns =
@@ -9384,7 +9382,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "EffectType",
-							Type = "cEntityEffect",
+							Type = "cEntityEffect#eType",
 						},
 					},
 					Notes = "Removes a currently applied entity effect",
