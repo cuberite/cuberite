@@ -722,9 +722,10 @@ bool cClientHandle::HandleLogin(const AString & a_Username)
 		// Let the plugins know about this event, they may refuse the player:
 		if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, m_ProtocolVersion, a_Username))
 		{
-			Destroy();
+			SendDisconnect("Login Rejected!");
 			return false;
 		}
+
 		m_State = csAuthenticating;
 	}  // lock(m_CSState)
 
