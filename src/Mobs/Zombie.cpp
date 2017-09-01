@@ -15,7 +15,6 @@ cZombie::cZombie(bool a_IsVillagerZombie) :
 	m_IsConverting(false)
 {
 	m_EMPersonality = AGGRESSIVE;
-
 	m_BehaviorAttackerMelee.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
 	m_BehaviorAggressive.AttachToMonster(*this);

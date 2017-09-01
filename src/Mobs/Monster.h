@@ -68,6 +68,12 @@ public:
 	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mob accordingly. */
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 
+	// mobTodo - MoveToPosition export is probably broken. The AI will keep overriding the
+	// destination.
+
+	/** Stops pathfinding. Calls ResetPathFinding and sets m_IsFollowingPath to false */
+	void StopMovingToPosition();
+
 	// tolua_begin
 	eMonsterType GetMobType(void) const { return m_MobType; }
 	eFamily GetMobFamily(void) const;
@@ -266,9 +272,6 @@ protected:
 
 	/** Move in a straight line to the next waypoint in the path, will jump if needed. */
 	void MoveToWayPoint(cChunk & a_Chunk);
-
-	/** Stops pathfinding. Calls ResetPathFinding and sets m_IsFollowingPath to false */
-	void StopMovingToPosition();
 
 	/** Sets the body yaw and head yaw */
 	void SetPitchAndYawFromDestination(bool a_IsFollowingPath);

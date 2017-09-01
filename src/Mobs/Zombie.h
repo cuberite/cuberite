@@ -1,10 +1,8 @@
 #pragma once
 
 #include "Monster.h"
-
 #include "Behaviors/BehaviorAttackerMelee.h"
 #include "Behaviors/BehaviorWanderer.h"
-
 #include "Behaviors/BehaviorAggressive.h"
 #include "Behaviors/BehaviorDayLightBurner.h"
 

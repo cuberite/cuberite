@@ -99,6 +99,7 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (TargetIsInStrikeRadiusAndLineOfSight())
 			{
+				m_Parent->StopMovingToPosition();
 				StrikeTargetIfReady();
 			}
 			else

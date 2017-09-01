@@ -14,6 +14,10 @@ cSkeleton::cSkeleton(bool IsWither) :
 	m_bIsWither(IsWither)
 {
 	m_EMPersonality = AGGRESSIVE;
+	m_BehaviorAttackerRanged.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
+	m_BehaviorAggressive.AttachToMonster(*this);
+	m_BehaviourDayLightBurner.AttachToMonster(*this);
 	GetMonsterConfig("Skeleton");
 }
 
@@ -44,33 +48,6 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomArmorDropItem(a_Drops, LootingLevel);
 	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
-
-
-
-
-//mobTodo
-/*bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
-{
-	StopMovingToPosition();  // Todo handle this in a better way, the skeleton does some uneeded recalcs due to inStateChasing
-	auto & Random = GetRandomProvider();
-	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
-	{
-		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25));
-		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 5;
-		Speed.y += Random.RandInt(-1, 1);
-
-		auto Arrow = cpp14::make_unique<cArrowEntity>(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-		auto ArrowPtr = Arrow.get();
-		if (!ArrowPtr->Initialize(std::move(Arrow), *m_World))
-		{
-			return false;
-		}
-
-		ResetAttackCooldown();
-		return true;
-	}
-	return false;
-}*/
 
 
 

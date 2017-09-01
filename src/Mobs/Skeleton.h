@@ -2,9 +2,10 @@
 #pragma once
 
 #include "Monster.h"
-
-
-
+#include "Behaviors/BehaviorAttackerRanged.h"
+#include "Behaviors/BehaviorWanderer.h"
+#include "Behaviors/BehaviorAggressive.h"
+#include "Behaviors/BehaviorDayLightBurner.h"
 
 
 class cSkeleton :
@@ -29,6 +30,13 @@ private:
 
 	bool m_bIsWither;
 
+	// tick behaviors
+	cBehaviorAttackerRanged m_BehaviorAttackerRanged;
+	cBehaviorWanderer m_BehaviorWanderer;
+
+	// other behaviors
+	cBehaviorAggressive m_BehaviorAggressive;
+	cBehaviorDayLightBurner m_BehaviourDayLightBurner;
 } ;
 
 

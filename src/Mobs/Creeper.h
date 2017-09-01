@@ -19,7 +19,6 @@ public:
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
 	bool IsBlowing(void) const {return m_bIsBlowing; }

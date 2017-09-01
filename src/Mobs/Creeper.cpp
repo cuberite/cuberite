@@ -25,46 +25,6 @@ cCreeper::cCreeper(void) :
 
 
 
-void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
-{
-	super::Tick(a_Dt, a_Chunk);
-	/* mobTodo
-
-	if (!IsTicking())
-	{
-		// The base class tick destroyed us
-		return;
-	}
-
-	if (((GetTarget() == nullptr) || !TargetIsInRange()) && !m_BurnedWithFlintAndSteel)
-	{
-		if (m_bIsBlowing)
-		{
-			m_ExplodingTimer = 0;
-			m_bIsBlowing = false;
-			m_World->BroadcastEntityMetadata(*this);
-		}
-	}
-	else
-	{
-		if (m_bIsBlowing)
-		{
-			m_ExplodingTimer += 1;
-		}
-
-		if ((m_ExplodingTimer == 30) && (GetHealth() > 0.0))  // only explode when not already dead
-		{
-			m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, esMonster, this);
-			Destroy();  // Just in case we aren't killed by the explosion
-		}
-	} */
-
-}
-
-
-
-
-
 void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	if (m_ExplodingTimer == 30)
