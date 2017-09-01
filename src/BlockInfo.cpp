@@ -345,8 +345,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 
 	// Skylight dispersant blocks:
-	Info[E_BLOCK_COBWEB                       ].m_SkylightDispersant = true;
-	Info[E_BLOCK_LEAVES                       ].m_SkylightDispersant = true;
+	Info[E_BLOCK_COBWEB                       ].m_IsSkylightDispersant = true;
+	Info[E_BLOCK_LEAVES                       ].m_IsSkylightDispersant = true;
 
 
 	// One hit break blocks:
