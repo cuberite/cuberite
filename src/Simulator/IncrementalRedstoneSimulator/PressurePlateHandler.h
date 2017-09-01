@@ -27,49 +27,37 @@ public:
 	{
 		UNUSED(a_Meta);
 
-		class cPressurePlateCallback :
-			public cEntityCallback
-		{
-		public:
-			cPressurePlateCallback(void) :
-				m_NumberOfEntities(0),
-				m_FoundPlayer(false)
+		unsigned int NumberOfEntities;
+		bool FoundPlayer;
+		a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), [&](cEntity & a_Entity)
 			{
-			}
-
-			virtual bool Item(cEntity * a_Entity) override
-			{
-				if (a_Entity->IsPlayer())
+				if (a_Entity.IsPlayer())
 				{
-					m_FoundPlayer = true;
+					FoundPlayer = true;
 				}
 
-				m_NumberOfEntities++;
+				NumberOfEntities++;
 				return false;
 			}
-
-			unsigned int m_NumberOfEntities;
-			bool m_FoundPlayer;
-		} PressurePlateCallback;
-		a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), PressurePlateCallback);
+		);
 
 		switch (a_BlockType)
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			{
-				return (PressurePlateCallback.m_FoundPlayer ? 15 : 0);
+				return (FoundPlayer ? 15 : 0);
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			{
-				return (PressurePlateCallback.m_NumberOfEntities != 0 ? 15 : 0);
+				return (NumberOfEntities != 0 ? 15 : 0);
 			}
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			{
-				return std::min(static_cast<unsigned char>(CeilC(PressurePlateCallback.m_NumberOfEntities / 10.f)), static_cast<unsigned char>(15));
+				return std::min(static_cast<unsigned char>(CeilC(NumberOfEntities / 10.f)), static_cast<unsigned char>(15));
 			}
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 			{
-				return std::min(static_cast<unsigned char>(PressurePlateCallback.m_NumberOfEntities), static_cast<unsigned char>(15));
+				return std::min(static_cast<unsigned char>(NumberOfEntities), static_cast<unsigned char>(15));
 			}
 			default:
 			{

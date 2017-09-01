@@ -1331,9 +1331,24 @@ void cMonster::AttachTickBehavior(cBehavior * a_Behavior)
 
 void cMonster::AttachDestroyBehavior(cBehavior * a_Behavior)
 {
+<<<<<<< HEAD
 	ASSERT(a_Behavior != nullptr);
 	m_AttachedDestroyBehaviors.push_back(a_Behavior);
 }
+=======
+	// If the Y coord is out of range, return the most logical result without considering anything else:
+	int RelY = FloorC(a_Location.y);
+	if (RelY >= cChunkDef::Height)
+	{
+		// Always burn above the world
+		return true;
+	}
+	if (RelY <= 0)
+	{
+		// The mob is about to die, no point in burning
+		return false;
+	}
+>>>>>>> master
 
 
 

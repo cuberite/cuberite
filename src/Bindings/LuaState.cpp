@@ -1,4 +1,4 @@
-
+﻿
 // LuaState.cpp
 
 // Implements the cLuaState class representing the wrapper over lua_State *, provides associated helper functions

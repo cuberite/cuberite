@@ -83,19 +83,22 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 		return;
 	}
 	m_NotificationCooldown = 15;
-	class cCallback : public cPlayerListCallback
-	{
-		virtual bool Item(cPlayer * a_Player) override
+
+	m_World->DoWithPlayerByUUID(m_OwnerUUID, [=](cPlayer & a_Player)
 		{
-			a_Player->NotifyNearbyWolves(m_Opponent, false);
+			a_Player.NotifyNearbyWolves(a_Opponent, false);
 			return false;
 		}
+<<<<<<< HEAD
 	public:
 		cPawn * m_Opponent;
 	} Callback;
 
 	Callback.m_Opponent = a_Opponent;
 	m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback);*/
+=======
+	);
+>>>>>>> master
 }
 
 /*bool cWolf::Attack(std::chrono::milliseconds a_Dt)
@@ -356,31 +359,31 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cWolf::TickFollowPlayer()
 {
+<<<<<<< HEAD
 	/*
 	class cCallback :
 		public cPlayerListCallback
+=======
+	Vector3d OwnerPos;
+	bool OwnerFlying;
+	auto Callback = [&](cPlayer & a_Player)
+>>>>>>> master
 	{
-		virtual bool Item(cPlayer * a_Player) override
-		{
-			OwnerPos = a_Player->GetPosition();
-			OwnerFlying = a_Player->IsFlying();
-			return true;
-		}
-	public:
-		Vector3d OwnerPos;
-		bool OwnerFlying;
-	} Callback;
+		OwnerPos = a_Player.GetPosition();
+		OwnerFlying = a_Player.IsFlying();
+		return true;
+	};
 
 	if (m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback))
 	{
 		// The player is present in the world, follow him:
-		double Distance = (Callback.OwnerPos - GetPosition()).Length();
+		double Distance = (OwnerPos - GetPosition()).Length();
 		if (Distance > 20)
 		{
-			if (!Callback.OwnerFlying)
+			if (!OwnerFlying)
 			{
-				Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
-				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+				OwnerPos.y = FindFirstNonAirBlockPosition(OwnerPos.x, OwnerPos.z);
+				TeleportToCoords(OwnerPos.x, OwnerPos.y, OwnerPos.z);
 				SetTarget(nullptr);
 			}
 		}
@@ -395,9 +398,9 @@ void cWolf::TickFollowPlayer()
 		{
 			if (GetTarget() == nullptr)
 			{
-				if (!Callback.OwnerFlying)
+				if (!OwnerFlying)
 				{
-					MoveToPosition(Callback.OwnerPos);
+					MoveToPosition(OwnerPos);
 				}
 			}
 		}

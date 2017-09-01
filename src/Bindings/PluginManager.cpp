@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "PluginManager.h"
@@ -1993,14 +1993,14 @@ bool cPluginManager::IsValidHookType(int a_HookType)
 
 
 
-bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback)
+bool cPluginManager::DoWithPlugin(const AString & a_PluginName, const cPluginCallback & a_Callback)
 {
 	// TODO: Implement locking for plugins
 	for (auto & plugin: m_Plugins)
 	{
 		if (plugin->GetName() == a_PluginName)
 		{
-			return a_Callback.Item(plugin.get());
+			return a_Callback(*plugin);
 		}
 	}
 	return false;
@@ -2010,12 +2010,12 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 
 
 
-bool cPluginManager::ForEachPlugin(cPluginCallback & a_Callback)
+bool cPluginManager::ForEachPlugin(const cPluginCallback & a_Callback)
 {
 	// TODO: Implement locking for plugins
 	for (auto & plugin: m_Plugins)
 	{
-		if (a_Callback.Item(plugin.get()))
+		if (a_Callback(*plugin))
 		{
 			return false;
 		}
