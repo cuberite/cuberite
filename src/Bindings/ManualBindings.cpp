@@ -6,8 +6,8 @@
 #include <sstream>
 #include <iomanip>
 #include "tolua++/include/tolua++.h"
-#include "polarssl/md5.h"
-#include "polarssl/sha1.h"
+#include "mbedtls/md5.h"
+#include "mbedtls/sha1.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
@@ -33,6 +33,7 @@
 #include "../HTTP/UrlParser.h"
 #include "../Item.h"
 #include "../LineBlockTracer.h"
+#include "../Server.h"
 #include "../Root.h"
 #include "../StringCompression.h"
 #include "../WebAdmin.h"
@@ -1822,7 +1823,7 @@ static int tolua_md5(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	md5(SourceString, len, Output);
+	mbedtls_md5(SourceString, len, Output);
 	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output), ARRAYCOUNT(Output));
 	return 1;
 }
@@ -1853,7 +1854,7 @@ static int tolua_md5HexString(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	md5(SourceString, len, md5Output);
+	mbedtls_md5(SourceString, len, md5Output);
 
 	// Convert the md5 checksum to hex string:
 	std::stringstream Output;
@@ -1880,7 +1881,7 @@ static int tolua_sha1(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	sha1(SourceString, len, Output);
+	mbedtls_sha1(SourceString, len, Output);
 	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output), ARRAYCOUNT(Output));
 	return 1;
 }
@@ -1899,7 +1900,7 @@ static int tolua_sha1HexString(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	sha1(SourceString, len, sha1Output);
+	mbedtls_sha1(SourceString, len, sha1Output);
 
 	// Convert the sha1 checksum to hex string:
 	std::stringstream Output;
@@ -2344,6 +2345,27 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 	Message.assign(lua_tostring(L, 3), lua_strlen(L, 3));
 	Client->SendPluginMessage(Channel, Message);
 	return 0;
+}
+
+
+
+
+
+static int tolua_cClientHandle_GetForgeMods(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamSelf("cClientHandle") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	cClientHandle * Client;
+	S.GetStackValue(1, Client);
+
+	S.Push(Client->GetForgeMods());
+	return 1;
 }
 
 
@@ -2958,7 +2980,7 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		Vector3d hitCoords;
 		Vector3i hitBlockCoords;
 		eBlockFace hitBlockFace;
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, start, end, hitCoords, hitBlockCoords, hitBlockFace);
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, *start, *end, hitCoords, hitBlockCoords, hitBlockFace);
 		L.Push(isHit);
 		if (!isHit)
 		{
@@ -3056,7 +3078,7 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		}
 		int lineOfSight = cLineBlockTracer::losAirWater;
 		L.GetStackValue(idx + 7, lineOfSight);
-		L.Push(cLineBlockTracer::LineOfSightTrace(*world, start, end, lineOfSight));
+		L.Push(cLineBlockTracer::LineOfSightTrace(*world, *start, *end, lineOfSight));
 		return 1;
 	}
 
@@ -3371,6 +3393,37 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 
 
 
+static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamSelf("cServer") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamNumber(4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	cServer * Server;
+	AString Name, Version;
+	UInt32 Protocol;
+	L.GetStackValues(1, Server, Name, Version, Protocol);
+
+	if (!Server->RegisterForgeMod(Name, Version, Protocol))
+	{
+		tolua_error(L, "duplicate Forge mod name registration", nullptr);
+		return 0;
+	}
+
+	return 0;
+}
+
+
+
+
+
 static int tolua_cScoreboard_GetTeamNames(lua_State * L)
 {
 	cLuaState S(L);
@@ -3451,7 +3504,7 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 	bool res;
 	if (L.GetStackValues(2, min, max, pt1, pt2))  // Try the static signature first
 	{
-		res = cBoundingBox::CalcLineIntersection(min, max, pt1, pt2, lineCoeff, blockFace);
+		res = cBoundingBox::CalcLineIntersection(*min, *max, *pt1, *pt2, lineCoeff, blockFace);
 	}
 	else
 	{
@@ -3462,7 +3515,7 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 			tolua_error(a_LuaState, "Invalid function params. Expected either bbox:CalcLineIntersection(pt1, pt2) or cBoundingBox:CalcLineIntersection(min, max, pt1, pt2).", nullptr);
 			return 0;
 		}
-		res = bbox->CalcLineIntersection(pt1, pt2, lineCoeff, blockFace);
+		res = bbox->CalcLineIntersection(*pt1, *pt2, lineCoeff, blockFace);
 	}
 	L.Push(res);
 	if (res)
@@ -3979,6 +4032,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cClientHandle");
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE",   cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE",   cClientHandle::MIN_VIEW_DISTANCE);
+
+			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
 			tolua_function(tolua_S, "SendPluginMessage",   tolua_cClientHandle_SendPluginMessage);
 			tolua_function(tolua_S, "GetUUID",             tolua_cClientHandle_GetUUID);
 			tolua_function(tolua_S, "GenerateOfflineUUID", tolua_cClientHandle_GenerateOfflineUUID);
@@ -4134,6 +4189,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachObjective", ForEach<cScoreboard, cObjective, &cScoreboard::ForEachObjective>);
 			tolua_function(tolua_S, "ForEachTeam",      ForEach<cScoreboard, cTeam,      &cScoreboard::ForEachTeam>);
 			tolua_function(tolua_S, "GetTeamNames",     tolua_cScoreboard_GetTeamNames);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cServer");
+			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");

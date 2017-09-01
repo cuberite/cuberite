@@ -17,7 +17,7 @@ Implements the 1.9 protocol classes:
 #include "json/json.h"
 #include "Protocol_1_9.h"
 #include "ChunkDataSerializer.h"
-#include "PolarSSL++/Sha1Checksum.h"
+#include "mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 
 #include "../ClientHandle.h"
@@ -124,21 +124,46 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 	m_IsEncrypted(false)
 {
 
-	// BungeeCord handling:
-	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
-	// hostname\00ip-address\00uuid\00profile-properties-as-json
 	AStringVector Params;
-	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	SplitZeroTerminatedStrings(a_ServerAddress, Params);
+
+	if (Params.size() >= 2)
 	{
-		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 		m_ServerAddress = Params[0];
-		m_Client->SetIPString(Params[1]);
 
-		cUUID UUID;
-		UUID.FromString(Params[2]);
-		m_Client->SetUUID(UUID);
+		if (Params[1] == "FML")
+		{
+			LOGD("Forge client connected!");
+			m_Client->SetIsForgeClient();
+		}
+		else if (Params.size() == 4)
+		{
+			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord())
+			{
+				// BungeeCord handling:
+				// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+				// hostname\00ip-address\00uuid\00profile-properties-as-json
 
-		m_Client->SetProperties(Params[3]);
+				LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+
+				m_Client->SetIPString(Params[1]);
+
+				cUUID UUID;
+				UUID.FromString(Params[2]);
+				m_Client->SetUUID(UUID);
+
+				m_Client->SetProperties(Params[3]);
+			}
+			else
+			{
+				LOG("BungeeCord is disabled, but client sent additional data, set AllowBungeeCord=1 if you want to allow it");
+			}
+		}
+		else
+		{
+			LOG("Unknown additional data sent in server address (BungeeCord/FML?): " SIZE_T_FMT " parameters", Params.size());
+			// TODO: support FML + BungeeCord? (what parameters does it send in that case?) https://github.com/SpigotMC/BungeeCord/issues/899
+		}
 	}
 
 	// Create the comm log file, if so requested:
@@ -1099,9 +1124,10 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, 0x05);  // Spawn Player packet
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteBEDouble(a_Player.GetPosX());
-	Pkt.WriteBEDouble(a_Player.GetPosY() + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
-	Pkt.WriteBEDouble(a_Player.GetPosZ());
+	Vector3d LastSentPos = a_Player.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
 	WriteEntityMetadata(Pkt, a_Player);
@@ -1334,9 +1360,10 @@ void cProtocol_1_9_0::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_FallingBlock.GetUniqueID());
 	Pkt.WriteBEUInt8(70);  // Falling block
-	Pkt.WriteBEDouble(a_FallingBlock.GetPosX());
-	Pkt.WriteBEDouble(a_FallingBlock.GetPosY());
-	Pkt.WriteBEDouble(a_FallingBlock.GetPosZ());
+	Vector3d LastSentPos = a_FallingBlock.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
 	Pkt.WriteBEInt32(static_cast<Int32>(a_FallingBlock.GetBlockType()) | (static_cast<Int32>(a_FallingBlock.GetBlockMeta()) << 12));
@@ -1359,9 +1386,10 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
-	Pkt.WriteBEDouble(a_Mob.GetPosX());
-	Pkt.WriteBEDouble(a_Mob.GetPosY());
-	Pkt.WriteBEDouble(a_Mob.GetPosZ());
+	Vector3d LastSentPos = a_Mob.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
@@ -1418,9 +1446,10 @@ void cProtocol_1_9_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Vehicle
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Vehicle.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
-	Pkt.WriteBEDouble(a_Vehicle.GetPosX());
-	Pkt.WriteBEDouble(a_Vehicle.GetPosY());
-	Pkt.WriteBEDouble(a_Vehicle.GetPosZ());
+	Vector3d LastSentPos = a_Vehicle.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
 	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteBEInt32(a_VehicleSubType);
@@ -1567,6 +1596,7 @@ void cProtocol_1_9_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
 		case E_BLOCK_HEAD:          Action = 4; break;  // Update Mobhead entity
 		case E_BLOCK_FLOWER_POT:    Action = 5; break;  // Update flower pot
+		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteBEUInt8(Action);
@@ -2193,6 +2223,7 @@ void cProtocol_1_9_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -4203,6 +4234,7 @@ void cProtocol_1_9_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -4260,6 +4292,7 @@ void cProtocol_1_9_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
@@ -4317,6 +4350,7 @@ void cProtocol_1_9_4::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	ResponseValue["version"] = Version;
 	ResponseValue["players"] = Players;
 	ResponseValue["description"] = Description;
+	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());

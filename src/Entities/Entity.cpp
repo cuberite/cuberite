@@ -56,8 +56,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_TicksSinceLastVoidDamage(0),
 	m_IsSwimming(false),
 	m_IsSubmerged(false),
-	m_AirLevel(0),
-	m_AirTickTimer(0),
+	m_AirLevel(MAX_AIR_LEVEL),
+	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
 	m_IsTicking(false),
 	m_ParentChunk(nullptr),
@@ -1337,12 +1337,13 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown)
+void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
 	m_NewWorld = a_World;
 	m_NewWorldPosition = a_NewPosition;
 	m_IsWorldChangeScheduled = true;
 	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
+	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
 }
 
 
@@ -1362,7 +1363,7 @@ bool cEntity::DetectPortal()
 			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 		}
 
-		MoveToWorld(m_NewWorld, false, m_NewWorldPosition);
+		MoveToWorld(m_NewWorld, m_WorldChangeSendRespawn, m_NewWorldPosition);
 		return true;
 	}
 
