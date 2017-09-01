@@ -54,23 +54,17 @@ void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			Vector3f Pos = (m_Parent->GetPosition() + m_LovePartner->GetPosition()) * 0.5;
 			UInt32 BabyID = World->SpawnMob(Pos.x, Pos.y, Pos.z, m_Parent->GetMobType(), true);
 
-			class cBabyInheritCallback :
-				public cEntityCallback
-			{
-			public:
-				cMonster * Baby;
-				cBabyInheritCallback() : Baby(nullptr) { }
-				virtual bool Item(cEntity * a_Entity) override
-				{
-					Baby = static_cast<cMonster *>(a_Entity);
-					return true;
-				}
-			} Callback;
+			cMonster * Baby = nullptr;
 
-			m_Parent->GetWorld()->DoWithEntityByID(BabyID, Callback);
-			if (Callback.Baby != nullptr)
+			m_Parent->GetWorld()->DoWithEntityByID(BabyID, [&](cEntity & a_Entity)
 			{
-				Callback.Baby->InheritFromParents(m_Parent, m_LovePartner);
+				Baby = static_cast<cMonster *>(&a_Entity);
+				return true;
+			});
+
+			if (Baby != nullptr)
+			{
+				Baby->InheritFromParents(m_Parent, m_LovePartner);
 			}
 
 			cFastRandom Random;
@@ -81,6 +75,8 @@ void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 }
+
+
 
 
 
@@ -123,51 +119,41 @@ bool cBehaviorBreeder::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk &
 	// If we are in love mode and we have no partner, try to find one
 	if (m_LoveTimer > 0)
 	{
-		class LookForLover : public cEntityCallback
+		m_Parent->GetWorld()->ForEachEntityInBox(cBoundingBox(m_Parent->GetPosition(), 8, 8), [=](cEntity & a_Entity)
 		{
-		public:
-			cMonster * m_Me;
-			LookForLover(cMonster * a_Me) :
-				m_Me(a_Me)
+			// If the entity is not a monster, don't breed with it
+			// Also, do not self-breed
+			if ((a_Entity.GetEntityType() != cEntity::eEntityType::etMonster) || (&a_Entity == m_Parent))
 			{
+				return false;
 			}
 
-			virtual bool Item(cEntity * a_Entity) override
+			auto PotentialPartner = static_cast<cMonster*>(&a_Entity);
+
+			// If the potential partner is not of the same species, don't breed with it
+			if (PotentialPartner->GetMobType() != m_Parent->GetMobType())
 			{
-				// If the entity is not a monster, don't breed with it
-				// Also, do not self-breed
-				if ((a_Entity->GetEntityType() != cEntity::eEntityType::etMonster) || (a_Entity == m_Me))
-				{
-					return false;
-				}
-
-				auto PotentialPartner = static_cast<cMonster*>(a_Entity);
-
-				// If the potential partner is not of the same species, don't breed with it
-				if (PotentialPartner->GetMobType() != m_Me->GetMobType())
-				{
-					return false;
-				}
-
-				auto PartnerBreedingBehavior = PotentialPartner->GetBehaviorBreeder();
-				auto MyBreedingBehavior = m_Me->GetBehaviorBreeder();
-
-				// If the potential partner is not in love
-				// Or they already have a mate, do not breed with them
-
-				if ((!PartnerBreedingBehavior->IsInLove()) || (PartnerBreedingBehavior->GetPartner() != nullptr))
-				{
-					return false;
-				}
-
-				// All conditions met, let's breed!
-				PartnerBreedingBehavior->EngageLoveMode(m_Me);
-				MyBreedingBehavior->EngageLoveMode(PotentialPartner);
-				return true;
+				return false;
 			}
-		} Callback(m_Parent);
 
-		World->ForEachEntityInBox(cBoundingBox(m_Parent->GetPosition(), 8, 8), Callback);
+			auto PartnerBreedingBehavior = PotentialPartner->GetBehaviorBreeder();
+			auto MyBreedingBehavior = m_Parent->GetBehaviorBreeder();
+
+			// If the potential partner is not in love
+			// Or they already have a mate, do not breed with them
+
+			if ((!PartnerBreedingBehavior->IsInLove()) || (PartnerBreedingBehavior->GetPartner() != nullptr))
+			{
+				return false;
+			}
+
+			// All conditions met, let's breed!
+			PartnerBreedingBehavior->EngageLoveMode(m_Parent);
+			MyBreedingBehavior->EngageLoveMode(PotentialPartner);
+			return true;
+		});
+
+
 		if (m_LovePartner != nullptr)
 		{
 			return true;  // We found love and took control of the monster, prevent other Behaviors from doing so
