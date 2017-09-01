@@ -3,9 +3,9 @@
 
 #include "ManualBindings.h"
 #undef TOLUA_TEMPLATE_BIND
+#include "LuaStateParams.h"
 #include <sstream>
 #include <iomanip>
-#include "tolua++/include/tolua++.h"
 #include "mbedtls/md5.h"
 #include "mbedtls/sha1.h"
 #include "PluginLua.h"
@@ -3424,6 +3424,56 @@ static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 
 
 
+static int tolua_cServer_TestApiSpeedOld(lua_State * a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamSelf("cServer") ||
+		!L.CheckParamString(2, 3) ||
+		!L.CheckParamNumber(4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	cServer * Server;
+	AString Name, Version;
+	UInt32 Protocol;
+	L.GetStackValues(1, Server, Name, Version, Protocol);
+
+	return 0;
+}
+
+
+
+
+
+static int tolua_cServer_TestApiSpeedNew(lua_State * a_LuaState)
+{
+	cLuaState L(a_LuaState);
+	cServer * Server;
+	AString Name, Version;
+	UInt32 Protocol;
+	auto self = cLuaStateParams::self(Server);
+	auto staticSelf = cLuaStateParams::staticSelf<cServer>();
+	switch (cLuaStateParams::Read(L,
+		std::tie(self,       Name, Version, Protocol),
+		std::tie(staticSelf, Name, Version, Protocol)
+	))
+	{
+		case 0:
+		{
+			// Do nothing
+		}
+	}
+	return 0;
+}
+
+
+
+
+
 static int tolua_cScoreboard_GetTeamNames(lua_State * L)
 {
 	cLuaState S(L);
@@ -4192,7 +4242,9 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cServer");
-			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
+			tolua_function(tolua_S, "RegisterForgeMod", tolua_cServer_RegisterForgeMod);
+			tolua_function(tolua_S, "TestApiSpeedOld",  tolua_cServer_TestApiSpeedOld);
+			tolua_function(tolua_S, "TestApiSpeedNew",  tolua_cServer_TestApiSpeedNew);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");

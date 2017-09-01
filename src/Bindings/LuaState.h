@@ -100,7 +100,7 @@ public:
 
 		#define STRINGIFY2(X, Y) X##Y
 		#define STRINGIFY(X, Y) STRINGIFY2(X, Y)
-		#define ASSERT_LUA_STACK_BALANCE(...) cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, __VA_ARGS__)
+		#define ASSERT_LUA_STACK_BALANCE(...) cLuaState::cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, __VA_ARGS__)
 	#else
 		#define ASSERT_LUA_STACK_BALANCE(...)
 	#endif
@@ -693,6 +693,7 @@ public:
 		}
 		return GetStackValue(a_StackPos, a_ReturnedVal.GetDest());
 	}
+
 
 	/** Pushes the named value in the table at the top of the stack.
 	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".

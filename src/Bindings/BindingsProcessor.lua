@@ -206,7 +206,7 @@ local function OutputLuaStateHelpers(a_Package)
 		local f = assert(io.open("LuaState_Declaration.inc", "w"))
 		f:write("\n// LuaState_Declaration.inc\n\n// This file is generated along with the Lua bindings by ToLua. Do not edit manually, do not commit to repo.\n")
 		f:write("// Implements a Push() and GetStackValue() function for each class exported to the Lua API.\n")
-		f:write("// This file expects to be included form inside the cLuaState class definition\n")
+		f:write("// This file expects to be included from inside the cLuaState class definition\n")
 		f:write("\n\n\n\n\n")
 		for _, item in ipairs(types) do
 			if not(g_HasCustomPushImplementation[item.name]) then
@@ -218,6 +218,7 @@ local function OutputLuaStateHelpers(a_Package)
 			f:write("bool GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal);\n")
 		end
 		f:write("\n\n\n\n\n")
+
 		f:close()
 	end
 
@@ -263,6 +264,18 @@ local function OutputLuaStateHelpers(a_Package)
 			f:write("\t}\n")
 			f:write("\treturn false;\n")
 			f:write("}\n\n\n\n\n\n")
+		end
+		f:close()
+	end
+
+	do
+		local f = assert(io.open("LuaStateParams_TypeDescs.inc", "w"))
+		f:write("\n// LuaStateParams_TypeDescs.inc\n\n// This file is generated along with the Lua bindings by ToLua. Do not edit manually, do not commit to repo.\n")
+		f:write("// Implements a TypeDescription<type>::desc() specialization for each class exported to the Lua API.\n")
+		f:write("// This file expects to be included from inside the cLuaStateParams class definition\n")
+		f:write("\n\n\n\n\n")
+		for _, item in ipairs(types) do
+			f:write("template <> struct TypeDescription<" .. item.lname .. "> { static const char * desc() { return \"" .. item.lname .. "\"; } };\n")
 		end
 		f:close()
 	end
