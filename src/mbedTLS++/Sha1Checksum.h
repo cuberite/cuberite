@@ -1,4 +1,4 @@
-
+﻿
 // Sha1Checksum.h
 
 // Declares the cSha1Checksum class representing the SHA-1 checksum calculator
@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "polarssl/sha1.h"
+#include "mbedtls/sha1.h"
 
 
 
@@ -44,7 +44,7 @@ protected:
 	/** True if the object is accepts more input data, false if Finalize()-d (need to Restart()) */
 	bool m_DoesAcceptInput;
 
-	sha1_context m_Sha1;
+	mbedtls_sha1_context m_Sha1;
 } ;
 
 

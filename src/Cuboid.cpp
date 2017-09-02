@@ -10,14 +10,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCuboid:
 
-cCuboid & cCuboid::operator =(cCuboid a_Other)
-{
-	std::swap(p1, a_Other.p1);
-	std::swap(p2, a_Other.p2);
-	return *this;
-}
-
-
 void cCuboid::Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2)
 {
 	p1.x = a_X1;
@@ -26,20 +18,6 @@ void cCuboid::Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2)
 	p2.x = a_X2;
 	p2.y = a_Y2;
 	p2.z = a_Z2;
-}
-
-
-
-
-
-void cCuboid::Assign(const cCuboid & a_SrcCuboid)
-{
-	p1.x = a_SrcCuboid.p1.x;
-	p1.y = a_SrcCuboid.p1.y;
-	p1.z = a_SrcCuboid.p1.z;
-	p2.x = a_SrcCuboid.p2.x;
-	p2.y = a_SrcCuboid.p2.y;
-	p2.z = a_SrcCuboid.p2.z;
 }
 
 

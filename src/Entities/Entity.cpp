@@ -1682,7 +1682,8 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	m_IsSwimming = IsBlockWater(BlockIn);
 
 	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
+	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn));
 	m_IsSubmerged = IsBlockWater(BlockIn);
 }
 
@@ -1714,7 +1715,7 @@ void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 void cEntity::HandleAir(void)
 {
 	// Ref.: https://minecraft.gamepedia.com/Chunk_format
-	// See if the entity is /submerged/ water (block above is water)
+	// See if the entity is /submerged/ water (head is in water)
 	// Get the type of block the entity is standing in:
 
 	int RespirationLevel = static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
