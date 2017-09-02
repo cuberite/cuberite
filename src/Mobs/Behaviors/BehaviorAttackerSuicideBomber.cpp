@@ -6,15 +6,31 @@
 #include "../../Entities/Player.h"
 #include "../../BlockID.h"
 
+
+
+
+cBehaviorAttackerSuicideBomber::cBehaviorAttackerSuicideBomber() :
+	m_bIsBlowing(false),
+	m_bIsCharged(false),
+	m_BurnedWithFlintAndSteel(false),
+	m_ExplodingTimer(0)
+{
+
+}
+
+
+
+
+
 void cBehaviorAttackerSuicideBomber::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (((GetTarget() == nullptr) || !TargetIsInRange()) && !m_BurnedWithFlintAndSteel)
+	if (((GetTarget() == nullptr) || !TargetIsInStrikeRadius()) && !m_BurnedWithFlintAndSteel)
 	{
 		if (m_bIsBlowing)
 		{
 			m_ExplodingTimer = 0;
 			m_bIsBlowing = false;
-			m_Parent->GetWorld()->BroadcastEntityMetadata(*this);
+			m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
 		}
 	}
 	else
@@ -46,7 +62,7 @@ bool cBehaviorAttackerSuicideBomber::StrikeTarget(int a_StrikeTickCnt)
 	{
 		m_Parent->GetWorld()->BroadcastSoundEffect("entity.creeper.primed", m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), 1.f, (0.75f + (static_cast<float>((m_Parent->GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
-		m_Parent->GetWorld()->BroadcastEntityMetadata(*this);
+		m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
 
 		return true;
 	}
@@ -70,4 +86,42 @@ void cBehaviorAttackerSuicideBomber::OnRightClicked(cPlayer & a_Player)
 		m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
 		m_BurnedWithFlintAndSteel = true;
 	}
+}
+
+
+bool cBehaviorAttackerSuicideBomber::IsBlowing(void) const
+{
+	return m_bIsBlowing;
+}
+
+
+
+
+
+bool cBehaviorAttackerSuicideBomber::IsCharged(void) const
+{
+	return m_bIsCharged;
+}
+
+
+
+
+
+bool cBehaviorAttackerSuicideBomber::IsBurnedWithFlintAndSteel(void) const
+{
+	return m_BurnedWithFlintAndSteel;
+}
+
+
+
+
+
+void cBehaviorAttackerSuicideBomber::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (a_TDI.DamageType == dtLightning)
+	{
+		m_bIsCharged = true;
+		m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
+	}
+	cBehaviorAttacker::DoTakeDamage(a_TDI);
 }

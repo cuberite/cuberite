@@ -11,11 +11,7 @@
 
 
 cCreeper::cCreeper(void) :
-	super(mtCreeper, "entity.creeper.hurt", "entity.creeper.death", 0.6, 1.8),
-	m_bIsBlowing(false),
-	m_bIsCharged(false),
-	m_BurnedWithFlintAndSteel(false),
-	m_ExplodingTimer(0)
+	super(mtCreeper, "entity.creeper.hurt", "entity.creeper.death", 0.6, 1.8)
 {
 	m_EMPersonality = AGGRESSIVE;
 	GetMonsterConfig("Creeper");
@@ -27,7 +23,7 @@ cCreeper::cCreeper(void) :
 
 void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	if (m_ExplodingTimer == 30)
+	if (IsBlowing())
 	{
 		// Exploded creepers drop naught but charred flesh, which Minecraft doesn't have
 		return;
@@ -71,60 +67,25 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-bool cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cCreeper::IsBlowing(void) const
 {
-	if (!super::DoTakeDamage(a_TDI))
-	{
-		return false;
-	}
-
-	if (a_TDI.DamageType == dtLightning)
-	{
-		m_bIsCharged = true;
-	}
-
-	m_World->BroadcastEntityMetadata(*this);
-	return true;
+	return m_BehaviorSuicideBomber.IsBlowing();
 }
 
 
 
 
-// mobTODO
-/*
-bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
+
+bool cCreeper::IsCharged(void) const
 {
-	UNUSED(a_Dt);
-
-	if (!m_bIsBlowing)
-	{
-		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-		m_bIsBlowing = true;
-		m_World->BroadcastEntityMetadata(*this);
-
-		return true;
-	}
-	return false;
-}*/
-
-
-
-
-
-void cCreeper::OnRightClicked(cPlayer & a_Player)
-{
-	super::OnRightClicked(a_Player);
-
-	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_FLINT_AND_STEEL))
-	{
-		if (!a_Player.IsGameModeCreative())
-		{
-			a_Player.UseEquippedItem();
-		}
-		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-		m_bIsBlowing = true;
-		m_World->BroadcastEntityMetadata(*this);
-		m_BurnedWithFlintAndSteel = true;
-	}
+	return m_BehaviorSuicideBomber.IsCharged();
 }
 
+
+
+
+
+bool cCreeper::IsBurnedWithFlintAndSteel(void) const
+{
+	return m_BehaviorSuicideBomber.IsBurnedWithFlintAndSteel();
+}

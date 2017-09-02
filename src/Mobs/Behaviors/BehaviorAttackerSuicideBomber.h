@@ -7,8 +7,13 @@ Use BehaviorAttackerMelee::SetTarget to attack. */
 class cBehaviorAttackerSuicideBomber : public cBehaviorAttacker
 {
 public:
-	bool StrikeTarget(int a_StrikeTickCnt) override;
+	cBehaviorAttackerSuicideBomber();
+
+	// cBehaviorAttacker also implements those and we need to call super on them
 	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+
+	bool StrikeTarget(int a_StrikeTickCnt) override;
 	void OnRightClicked(cPlayer & a_Player) override;
 
 	bool IsBlowing(void) const {return m_bIsBlowing; }

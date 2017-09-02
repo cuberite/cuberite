@@ -18,15 +18,13 @@ public:
 	CLASS_PROTODEF(cCreeper)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-	virtual void OnRightClicked(cPlayer & a_Player) override;
 
-	bool IsBlowing(void) const {return m_BehaviorSuicideBomber.IsBlowing(); }
-	bool IsCharged(void) const {return m_BehaviorSuicideBomber.IsCharged(); }
-	bool IsBurnedWithFlintAndSteel(void) const {return m_BehaviorSuicideBomber.IsBurnedWithFlintAndSteel(); }
+	bool IsBlowing(void) const;
+	bool IsCharged(void) const;
+	bool IsBurnedWithFlintAndSteel(void) const;
 
 private:
-	cBehaviorSuicideBomer m_BehaviorSuicideBomber;
+	cBehaviorAttackerSuicideBomber m_BehaviorSuicideBomber;
 } ;
 
 
