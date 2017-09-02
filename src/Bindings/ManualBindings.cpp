@@ -1483,29 +1483,44 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 	}
 
 	// Call the destination plugin using a plugin callback:
-	int NumReturns = 0;
-	auto PluginCallback = [&](cPlugin & a_Plugin)
+	class cCallback :
+		public cPluginManager::cPluginCallback
+	{
+	public:
+		int m_NumReturns;
+
+		cCallback(const AString & a_FunctionName, cLuaState & a_SrcLuaState) :
+			m_NumReturns(0),
+			m_FunctionName(a_FunctionName),
+			m_SrcLuaState(a_SrcLuaState)
 		{
-			if (!a_Plugin.IsLoaded())
+		}
+	protected:
+		const AString & m_FunctionName;
+		cLuaState & m_SrcLuaState;
+
+		virtual bool Item(cPlugin * a_Plugin) override
+		{
+			if (!a_Plugin->IsLoaded())
 			{
 				return false;
 			}
-			NumReturns = static_cast<cPluginLua &>(a_Plugin).CallFunctionFromForeignState(
-				FunctionName, L, 4, lua_gettop(L)
+			m_NumReturns = static_cast<cPluginLua *>(a_Plugin)->CallFunctionFromForeignState(
+				m_FunctionName, m_SrcLuaState, 4, lua_gettop(m_SrcLuaState)
 			);
 			return true;
-		};
-
-	if (!cPluginManager::Get()->DoWithPlugin(PluginName, PluginCallback))
+		}
+	} Callback(FunctionName, L);
+	if (!cPluginManager::Get()->DoWithPlugin(PluginName, Callback))
 	{
 		return 0;
 	}
-	if (NumReturns < 0)
+	if (Callback.m_NumReturns < 0)
 	{
 		// The call has failed, there are zero return values. Do NOT return negative number (Lua considers that a "yield")
 		return 0;
 	}
-	return NumReturns;
+	return Callback.m_NumReturns;
 }
 
 
@@ -3228,29 +3243,42 @@ static int tolua_cRoot_DoWithPlayerByUUID(lua_State * tolua_S)
 		return 0;
 	}
 
+	class cCallback :
+		public cPlayerListCallback
+	{
+	public:
+		cCallback(cLuaState & a_LuaState) :
+			m_LuaState(a_LuaState)
+		{
+		}
+
+		virtual bool Item(cPlayer * a_Player) override
+		{
+			bool ret = false;
+			m_LuaState.Call(m_FnRef, a_Player, cLuaState::Return, ret);
+			return ret;
+		}
+
+		cLuaState & m_LuaState;
+		cLuaState::cRef m_FnRef;
+	} Callback(L);
+
 	// Get parameters:
 	cRoot * Self;
 	cUUID PlayerUUID;
-	cLuaState::cRef FnRef;
-	L.GetStackValues(1, Self, PlayerUUID, FnRef);
+	L.GetStackValues(1, Self, PlayerUUID, Callback.m_FnRef);
 
 	if (PlayerUUID.IsNil())
 	{
 		return L.ApiParamError("Expected a non-nil UUID for parameter #1");
 	}
-	if (!FnRef.IsValid())
+	if (!Callback.m_FnRef.IsValid())
 	{
 		return L.ApiParamError("Expected a valid callback function for parameter #2");
 	}
 
 	// Call the function:
-	bool res = Self->DoWithPlayerByUUID(PlayerUUID, [&](cPlayer & a_Player)
-		{
-			bool ret = false;
-			L.Call(FnRef, &a_Player, cLuaState::Return, ret);
-			return ret;
-		}
-	);
+	bool res = Self->DoWithPlayerByUUID(PlayerUUID, Callback);
 
 	// Push the result as the return value:
 	L.Push(res);

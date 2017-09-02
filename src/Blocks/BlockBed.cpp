@@ -1,12 +1,12 @@
-﻿
+
 // BlockBed.cpp
 
 #include "Globals.h"
 #include "BlockBed.h"
 
 #include "BroadcastInterface.h"
+#include "Entities/../World.h"
 #include "Entities/Player.h"
-#include "../World.h"
 #include "../BoundingBox.h"
 #include "../Mobs/Monster.h"
 #include "../BlockEntities/BedEntity.h"
@@ -53,6 +53,66 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 
 
 
+class cFindMobs :
+	public cEntityCallback
+{
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		return (
+			(a_Entity->GetEntityType() == cEntity::etMonster) &&
+			(static_cast<cMonster*>(a_Entity)->GetMobFamily() == cMonster::mfHostile)
+		);
+	}
+};
+
+
+
+
+
+class cTimeFastForwardTester :
+	public cPlayerListCallback
+{
+	virtual bool Item(cPlayer * a_Player) override
+	{
+		if (!a_Player->IsInBed())
+		{
+			return true;
+		}
+
+		return false;
+	}
+};
+
+
+
+
+
+class cPlayerBedStateUnsetter :
+	public cPlayerListCallback
+{
+public:
+	cPlayerBedStateUnsetter(Vector3i a_Position, cChunkInterface & a_ChunkInterface) :
+		m_Position(a_Position),
+		m_ChunkInterface(a_ChunkInterface)
+	{
+	}
+
+	virtual bool Item(cPlayer * a_Player) override
+	{
+		cBlockBedHandler::SetBedOccupationState(m_ChunkInterface, a_Player->GetLastBedPos(), false);
+		a_Player->SetIsInBed(false);
+		return false;
+	}
+
+private:
+	Vector3i m_Position;
+	cChunkInterface & m_ChunkInterface;
+};
+
+
+
+
+
 bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	if (a_WorldInterface.GetDimension() != dimOverworld)
@@ -73,14 +133,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 		}
 		else
 		{
-			auto FindMobs = [](cEntity & a_Entity)
-			{
-				return (
-					(a_Entity.GetEntityType() == cEntity::etMonster) &&
-					(static_cast<cMonster&>(a_Entity).GetMobFamily() == cMonster::mfHostile)
-				);
-			};
-
+			cFindMobs FindMobs;
 			if (!a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(a_Player.GetPosition() - Vector3i(0, 5, 0), 8, 10), FindMobs))
 			{
 				a_Player.SendMessageFailure("You may not rest now, there are monsters nearby");
@@ -111,24 +164,11 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 				a_Player.SetIsInBed(true);
 				a_Player.SendMessageSuccess("Home position set successfully");
 
-				auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
+				cTimeFastForwardTester Tester;
+				if (a_WorldInterface.ForEachPlayer(Tester))
 				{
-					if (!a_OtherPlayer.IsInBed())
-					{
-						return true;
-					}
-					return false;
-				};
-
-				if (a_WorldInterface.ForEachPlayer(TimeFastForwardTester))
-				{
-					a_WorldInterface.ForEachPlayer([&](cPlayer & a_OtherPlayer)
-						{
-							cBlockBedHandler::SetBedOccupationState(a_ChunkInterface, a_OtherPlayer.GetLastBedPos(), false);
-							a_OtherPlayer.SetIsInBed(false);
-							return false;
-						}
-					);
+					cPlayerBedStateUnsetter Unsetter(Vector3i(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z), a_ChunkInterface);
+					a_WorldInterface.ForEachPlayer(Unsetter);
 					a_WorldInterface.SetTimeOfDay(0);
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 				}
@@ -144,12 +184,25 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
-	a_Player.GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), [&](cBedEntity & a_Bed)
+	class cBedColor :
+		public cBedCallback
+	{
+	public:
+		short m_Color;
+
+		cBedColor(short a_Color) :
+			m_Color(a_Color)
 		{
-			a_Bed.SetColor(a_Player.GetEquippedItem().m_ItemDamage);
+		}
+
+		virtual bool Item(cBedEntity * a_Bed) override
+		{
+			a_Bed->SetColor(m_Color);
 			return true;
 		}
-	);
+	};
+	cBedColor BedCallback(a_Player.GetEquippedItem().m_ItemDamage);
+	a_Player.GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), BedCallback);
 }
 
 
@@ -158,12 +211,19 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 
 void cBlockBedHandler::ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	short Color = E_META_WOOL_RED;
-	a_WorldInterface.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, [&](cBedEntity & a_Bed)
+	class cBedColor :
+		public cBedCallback
+	{
+	public:
+		short m_Color = E_META_WOOL_RED;
+
+		virtual bool Item(cBedEntity * a_Bed) override
 		{
-			Color = a_Bed.GetColor();
+			m_Color = a_Bed->GetColor();
 			return true;
 		}
-	);
-	a_Pickups.Add(cItem(E_ITEM_BED, 1, Color));
+	};
+	cBedColor BedCallback;
+	a_WorldInterface.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, BedCallback);
+	a_Pickups.Add(cItem(E_ITEM_BED, 1, BedCallback.m_Color));
 }

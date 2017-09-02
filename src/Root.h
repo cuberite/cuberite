@@ -1,11 +1,10 @@
-﻿
+
 #pragma once
 
 #include "Protocol/Authenticator.h"
 #include "Protocol/MojangAPI.h"
 #include "HTTP/HTTPServer.h"
 #include "Defines.h"
-#include <functional>
 #include "RankManager.h"
 
 
@@ -28,8 +27,8 @@ class cSettingsRepositoryInterface;
 class cDeadlockDetect;
 class cUUID;
 
-using cPlayerListCallback =  std::function<bool(cPlayer &)>;
-using cWorldListCallback  =  std::function<bool(cWorld  &)>;
+typedef cItemCallback<cPlayer> cPlayerListCallback;
+typedef cItemCallback<cWorld>  cWorldListCallback;
 
 namespace Json
 {
@@ -77,7 +76,7 @@ public:
 	// tolua_end
 
 	/** Calls the callback for each world; returns true if the callback didn't abort (return true) */
-	bool ForEachWorld(const cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
+	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
 
 	/** Writes chunkstats, for each world and totals, to the output callback */
 	void LogChunkStats(cCommandOutputCallback & a_Output);
@@ -137,16 +136,16 @@ public:
 	void SaveAllChunks(void);  // tolua_export
 
 	/** Calls the callback for each player in all worlds */
-	bool ForEachPlayer(const cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
-	bool FindAndDoWithPlayer(const AString & a_PlayerName, const cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds the player over his uuid and calls the callback */
-	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, const cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds the player using it's complete username and calls the callback */
-	bool DoWithPlayer(const AString & a_PlayerName, const cPlayerListCallback & a_Callback);
+	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);
 
 	/** Send playerlist of all worlds to player */
 	void SendPlayerLists(cPlayer * a_DestPlayer);

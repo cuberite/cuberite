@@ -109,18 +109,23 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			Vector3f Pos = (GetPosition() + m_LovePartner->GetPosition()) * 0.5;
 			UInt32 BabyID = m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
 
-			cPassiveMonster * Baby = nullptr;
-
-			m_World->DoWithEntityByID(BabyID, [&](cEntity & a_Entity)
+			class cBabyInheritCallback :
+				public cEntityCallback
+			{
+			public:
+				cPassiveMonster * Baby;
+				cBabyInheritCallback() : Baby(nullptr) { }
+				virtual bool Item(cEntity * a_Entity) override
 				{
-					Baby = static_cast<cPassiveMonster *>(&a_Entity);
+					Baby = static_cast<cPassiveMonster *>(a_Entity);
 					return true;
 				}
-			);
+			} Callback;
 
-			if (Baby != nullptr)
+			m_World->DoWithEntityByID(BabyID, Callback);
+			if (Callback.Baby != nullptr)
 			{
-				Baby->InheritFromParents(this, m_LovePartner);
+				Callback.Baby->InheritFromParents(this, m_LovePartner);
 			}
 
 			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
@@ -154,37 +159,49 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_LovePartner == nullptr)
 		{
-			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [=](cEntity & a_Entity)
+			class LookForLover : public cEntityCallback
+			{
+			public:
+				cEntity * m_Me;
+
+				LookForLover(cEntity * a_Me) :
+					m_Me(a_Me)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
 				{
 					// If the entity is not a monster, don't breed with it
 					// Also, do not self-breed
-					if ((a_Entity.GetEntityType() != etMonster) || (&a_Entity == this))
+					if ((a_Entity->GetEntityType() != etMonster) || (a_Entity == m_Me))
 					{
 						return false;
 					}
 
-					auto & Me = static_cast<cPassiveMonster&>(*this);
-					auto & PotentialPartner = static_cast<cPassiveMonster&>(a_Entity);
+					cPassiveMonster * Me = static_cast<cPassiveMonster*>(m_Me);
+					cPassiveMonster * PotentialPartner = static_cast<cPassiveMonster*>(a_Entity);
 
 					// If the potential partner is not of the same species, don't breed with it
-					if (PotentialPartner.GetMobType() != Me.GetMobType())
+					if (PotentialPartner->GetMobType() != Me->GetMobType())
 					{
 						return false;
 					}
 
 					// If the potential partner is not in love
 					// Or they already have a mate, do not breed with them
-					if ((!PotentialPartner.IsInLove()) || (PotentialPartner.GetPartner() != nullptr))
+					if ((!PotentialPartner->IsInLove()) || (PotentialPartner->GetPartner() != nullptr))
 					{
 						return false;
 					}
 
 					// All conditions met, let's breed!
-					PotentialPartner.EngageLoveMode(&Me);
-					Me.EngageLoveMode(&PotentialPartner);
+					PotentialPartner->EngageLoveMode(Me);
+					Me->EngageLoveMode(PotentialPartner);
 					return true;
 				}
-			);
+			} Callback(this);
+
+			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), Callback);
 		}
 
 		m_LoveTimer--;
