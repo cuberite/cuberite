@@ -33,7 +33,9 @@ void cBehaviorBreeder::AttachToMonster(cMonster & a_Parent)
 
 
 
-void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+/*
+ * CODE to be used AFTER the lambda merge
+ * void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	LOGD("mobDebug - Behavior Breeder: Tick");
 	UNUSED(a_Dt);
@@ -74,7 +76,7 @@ void cBehaviorBreeder::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			ResetLoveMode();
 		}
 	}
-}
+}*/
 
 
 
@@ -104,7 +106,8 @@ void cBehaviorBreeder::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk
 
 
 
-bool cBehaviorBreeder::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+/*** CODE TO BE USED AFTER the lambda merge
+ * bool cBehaviorBreeder::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
@@ -161,7 +164,7 @@ bool cBehaviorBreeder::IsControlDesired(std::chrono::milliseconds a_Dt, cChunk &
 	}
 
 	return false;
-}
+} **/
 
 void cBehaviorBreeder::Destroyed()
 {
