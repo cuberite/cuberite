@@ -33,7 +33,7 @@ void cBehaviorAggressive::PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chu
 		if (--m_AgressionCheckCountdown == 0)
 		{
 			m_AgressionCheckCountdown = 40;
-			m_ShouldBeAgressive = m_ShouldBeAggressiveFunction(*this, *m_Parent);
+			m_ShouldBeAgressive = m_ShouldBeAggressiveFunction(*this, *m_Parent, a_Chunk);
 		}
 	}
 

@@ -7,10 +7,26 @@
 #include "../Entities/Player.h"
 #include "../Chunk.h"
 
-bool AggressiveAtNightFunction(cBehaviorAggressive & a_Behavior, cMonster & a_Monster)
+bool AggressiveAtNightFunction(cBehaviorAggressive & a_Behavior, cMonster & a_Monster, cChunk & a_Chunk)
 {
-	return
-			!((Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) > 11) || (Chunk->GetBlockLight(Rel.x, Rel.y, Rel.z) > 11))
+	UNUSED(a_Behavior);
+	if (!a_Monster.GetWorld()->IsChunkLighted(a_Monster.GetChunkX(), a_Monster.GetChunkZ()))
+	{
+		return false;
+	}
+
+	PREPARE_REL_AND_CHUNK(a_Monster.GetPosition(), a_Chunk);
+	if (!RelSuccess)
+	{
+		return false;
+	}
+
+	if (
+		!((Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) > 11) || (Chunk->GetBlockLight(Rel.x, Rel.y, Rel.z) > 11))
+	)
+	{
+		return true;
+	}
 }
 
 cSpider::cSpider(void) :

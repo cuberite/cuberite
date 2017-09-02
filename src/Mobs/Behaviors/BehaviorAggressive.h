@@ -9,7 +9,7 @@ class cBehaviorAggressive;
 /** The mob is agressive toward specific mobtypes, or toward the player.
 This Behavior has a dependency on BehaviorAttacker. */
 
-typedef std::function<bool(cBehaviorAggressive & a_Behavior, cMonster & a_Monster)> ShouldBeAggressiveFunction;
+typedef std::function<bool(cBehaviorAggressive & a_Behavior, cMonster & a_Monster, cChunk & a_Chunk)> ShouldBeAggressiveFunction;
 
 class cBehaviorAggressive : public cBehavior
 {

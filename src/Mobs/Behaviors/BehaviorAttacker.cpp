@@ -15,6 +15,7 @@ cBehaviorAttacker::cBehaviorAttacker() :
   , m_AttackCoolDownTicksLeft(0)
   , m_IsStriking(false)
   , m_Target(nullptr)
+  , m_ShouldRetaliate(true)
 {
 
 }
@@ -130,6 +131,11 @@ void cBehaviorAttacker::PostTick(std::chrono::milliseconds a_Dt, cChunk & a_Chun
 
 void cBehaviorAttacker::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	if (!m_ShouldRetaliate)
+	{
+		return;
+	}
+
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
 		if (
