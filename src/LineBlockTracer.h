@@ -18,12 +18,17 @@
 // fwd: Chunk.h
 class cChunk;
 
+// fwd: cChunkMap.h
+typedef cItemCallback<cChunk> cChunkCallback;
+
+
 
 
 
 
 class cLineBlockTracer :
-	public cBlockTracer
+	public cBlockTracer,
+	public cChunkCallback
 {
 	typedef cBlockTracer super;
 
@@ -104,7 +109,8 @@ protected:
 	/** Moves m_Current to the next block on the line; returns false if no move is possible (reached the end) */
 	bool MoveToNextBlock(void);
 
-	bool ChunkCallback(cChunk * a_Chunk);
+	// cChunkCallback overrides:
+	virtual bool Item(cChunk * a_Chunk) override;
 } ;
 
 

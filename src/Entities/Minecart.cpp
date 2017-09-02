@@ -20,7 +20,8 @@
 
 
 
-class cMinecartCollisionCallback
+class cMinecartCollisionCallback :
+	public cEntityCallback
 {
 public:
 	cMinecartCollisionCallback(Vector3d a_Pos, double a_Height, double a_Width, UInt32 a_UniqueID, UInt32 a_AttacheeUniqueID) :
@@ -34,31 +35,33 @@ public:
 	{
 	}
 
-	bool operator () (cEntity & a_Entity)
+	virtual bool Item(cEntity * a_Entity) override
 	{
+		ASSERT(a_Entity != nullptr);
+
 		if (
 			(
-				!a_Entity.IsPlayer() ||
-				static_cast<cPlayer &>(a_Entity).IsGameModeSpectator()  // Spectators doesn't collide with anything
+				!a_Entity->IsPlayer() ||
+				reinterpret_cast<cPlayer *>(a_Entity)->IsGameModeSpectator()  // Spectators doesn't collide with anything
 			) &&
-			!a_Entity.IsMob() &&
-			!a_Entity.IsMinecart() &&
-			!a_Entity.IsBoat()
+			!a_Entity->IsMob() &&
+			!a_Entity->IsMinecart() &&
+			!a_Entity->IsBoat()
 		)
 		{
 			return false;
 		}
-		else if ((a_Entity.GetUniqueID() == m_UniqueID) || (a_Entity.GetUniqueID() == m_AttacheeUniqueID))
+		else if ((a_Entity->GetUniqueID() == m_UniqueID) || (a_Entity->GetUniqueID() == m_AttacheeUniqueID))
 		{
 			return false;
 		}
 
-		cBoundingBox bbEntity(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
+		cBoundingBox bbEntity(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
 		cBoundingBox bbMinecart(Vector3d(m_Pos.x, floor(m_Pos.y), m_Pos.z), m_Width / 2, m_Height);
 
 		if (bbEntity.DoesIntersect(bbMinecart))
 		{
-			m_CollidedEntityPos = a_Entity.GetPosition();
+			m_CollidedEntityPos = a_Entity->GetPosition();
 			m_DoesIntersect = true;
 			return true;
 		}

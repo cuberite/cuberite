@@ -1,4 +1,4 @@
-﻿
+
 // ManualBindings.h
 
 // Declares the cManualBindings class used as a namespace for functions exported to the Lua API manually
@@ -57,7 +57,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*DoWithFn)(const AString &, const std::function<bool(Ty2 &)> &)
+		bool (Ty1::*DoWithFn)(const AString &, cItemCallback<Ty2> &)
 	>
 	static int DoWith(lua_State * tolua_S)
 	{
@@ -89,14 +89,28 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
-		// Call the DoWith function:
-		bool res = (Self->*DoWithFn)(ItemName, [&](Ty2 & a_Item)
+		class cLuaCallback : public cItemCallback<Ty2>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
+			{
+			}
+
+		private:
+			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
 				return ret;
 			}
-		);
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+		} Callback(L, FnRef);
+
+		// Call the DoWith function:
+		bool res = (Self->*DoWithFn)(ItemName, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -111,7 +125,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*DoWithFn)(const AString &, const std::function<bool(Ty2 &)> &)
+		bool (Ty1::*DoWithFn)(const AString &, cItemCallback<Ty2> &)
 	>
 	static int StaticDoWith(lua_State * tolua_S)
 	{
@@ -138,14 +152,28 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
-		// Call the DoWith function:
-		bool res = (Ty1::Get()->*DoWithFn)(ItemName, [&](Ty2 & a_Item)
+		class cLuaCallback : public cItemCallback<Ty2>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
+			{
+			}
+
+		private:
+			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
 				return ret;
 			}
-		);
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+		} Callback(L, FnRef);
+
+		// Call the DoWith function:
+		bool res = (Ty1::Get()->*DoWithFn)(ItemName, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -159,7 +187,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*DoWithFn)(UInt32, const std::function<bool(Ty2 &)> &)
+		bool (Ty1::*DoWithFn)(UInt32, cItemCallback<Ty2> &)
 	>
 	static int DoWithID(lua_State * tolua_S)
 	{
@@ -187,14 +215,28 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
-		// Call the DoWith function:
-		bool res = (Self->*DoWithFn)(ItemID, [&](Ty2 & a_Item)
+		class cLuaCallback : public cItemCallback<Ty2>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
+			{
+			}
+
+		private:
+			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
 				return ret;
 			}
-		);
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+		} Callback(L, FnRef);
+
+		// Call the DoWith function:
+		bool res = (Self->*DoWithFn)(ItemID, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -209,7 +251,7 @@ public:
 	template <
 		class SELF,
 		class ITEM,
-		bool (SELF::*DoWithFn)(int, int, int, const std::function<bool(ITEM &)> &)
+		bool (SELF::*DoWithFn)(int, int, int, cItemCallback<ITEM> &)
 	>
 	static int DoWithXYZ(lua_State * tolua_S)
 	{
@@ -240,14 +282,28 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
 		}
 
-		// Call the DoWith function:
-		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, [&](ITEM & a_Item)
+		class cLuaCallback : public cItemCallback<ITEM>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
+			{
+			}
+
+		private:
+			virtual bool Item(ITEM * a_Item) override
 			{
 				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
 				return ret;
 			}
-		);
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+		} Callback(L, FnRef);
+
+		// Call the DoWith function:
+		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -262,7 +318,7 @@ public:
 	template <
 		class SELF,
 		class ITEM,
-		bool (SELF::*DoWithFn)(int, int, int, const std::function<bool(ITEM &)> &),
+		bool (SELF::*DoWithFn)(int, int, int, cItemCallback<ITEM> &),
 		bool (SELF::*CoordCheckFn)(int, int, int) const
 	>
 	static int DoWithXYZ(lua_State * tolua_S)
@@ -300,14 +356,28 @@ public:
 			).c_str());
 		}
 
-		// Call the DoWith function:
-		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, [&](ITEM & a_Item)
+		class cLuaCallback : public cItemCallback<ITEM>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
+			{
+			}
+
+		private:
+			virtual bool Item(ITEM * a_Item) override
 			{
 				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
 				return ret;
 			}
-		);
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+		} Callback(L, FnRef);
+
+		// Call the DoWith function:
+		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -321,7 +391,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(int, int, const std::function<bool(Ty2 &)> &)
+		bool (Ty1::*ForEachFn)(int, int, cItemCallback<Ty2> &)
 	>
 	static int ForEachInChunk(lua_State * tolua_S)
 	{
@@ -351,14 +421,28 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #4");
 		}
 
-		// Call the DoWith function:
-		bool res = (Self->*ForEachFn)(ChunkX, ChunkZ, [&](Ty2 & a_Item)
+		class cLuaCallback : public cItemCallback<Ty2>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
+			{
+			}
+
+		private:
+			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
 				return ret;
 			}
-		);
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+		} Callback(L, FnRef);
+
+		// Call the DoWith function:
+		bool res = (Self->*ForEachFn)(ChunkX, ChunkZ, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -372,7 +456,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(const cBoundingBox &, const std::function<bool(Ty2 &)> &)
+		bool (Ty1::*ForEachFn)(const cBoundingBox &, cItemCallback<Ty2> &)
 	>
 	static int ForEachInBox(lua_State * tolua_S)
 	{
@@ -404,19 +488,36 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
-		bool res = (Self->*ForEachFn)(*Box, [&](Ty2 & a_Item)
+		// Callback wrapper for the Lua function:
+		class cLuaCallback : public cItemCallback<Ty2>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FuncRef) :
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FuncRef)
 			{
-				bool ret = false;
-				if (!L.Call(FnRef, &a_Item, cLuaState::Return, ret))
+			}
+
+		private:
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+
+			// cItemCallback<Ty2> overrides:
+			virtual bool Item(Ty2 * a_Item) override
+			{
+				bool res = false;
+				if (!m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
 				{
 					LOGWARNING("Failed to call Lua callback");
-					L.LogStackTrace();
+					m_LuaState.LogStackTrace();
 					return true;  // Abort enumeration
 				}
 
-				return ret;
+				return res;
 			}
-		);
+		} Callback(L, FnRef);
+
+		bool res = (Self->*ForEachFn)(*Box, Callback);
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -430,7 +531,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(const std::function<bool(Ty2 &)> &)
+		bool (Ty1::*ForEachFn)(cItemCallback<Ty2> &)
 	>
 	static int ForEach(lua_State * tolua_S)
 	{
@@ -457,14 +558,29 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #1");
 		}
 
-		// Call the enumeration:
-		bool res = (Self->*ForEachFn)([&](Ty2 & a_Item)
+		class cLuaCallback : public cItemCallback<Ty2>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
 			{
-				bool ret = false;  // By default continue the enumeration
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
-				return ret;
 			}
-		);
+
+		private:
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+
+			virtual bool Item(Ty2 * a_Item) override
+			{
+				bool res = false;  // By default continue the enumeration
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
+				return res;
+			}
+		} Callback(L, FnRef);
+
+		// Call the enumeration:
+		bool res = (Self->*ForEachFn)(Callback);
 
 		// Push the return value:
 		L.Push(res);
@@ -479,7 +595,7 @@ public:
 	template <
 		class Ty1,
 		class Ty2,
-		bool (Ty1::*ForEachFn)(const std::function<bool(Ty2 &)> &)
+		bool (Ty1::*ForEachFn)(cItemCallback<Ty2> &)
 	>
 	static int StaticForEach(lua_State * tolua_S)
 	{
@@ -500,14 +616,29 @@ public:
 			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #1");
 		}
 
-		// Call the enumeration:
-		bool res = (Ty1::Get()->*ForEachFn)([&](Ty2 & a_Item)
+		class cLuaCallback : public cItemCallback<Ty2>
+		{
+		public:
+			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+				m_LuaState(a_LuaState),
+				m_FnRef(a_FnRef)
 			{
-				bool ret = false;  // By default continue the enumeration
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
-				return ret;
 			}
-		);
+
+		private:
+			cLuaState & m_LuaState;
+			cLuaState::cRef & m_FnRef;
+
+			virtual bool Item(Ty2 * a_Item) override
+			{
+				bool res = false;  // By default continue the enumeration
+				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
+				return res;
+			}
+		} Callback(L, FnRef);
+
+		// Call the enumeration:
+		bool res = (Ty1::Get()->*ForEachFn)(Callback);
 
 		// Push the return value:
 		L.Push(res);

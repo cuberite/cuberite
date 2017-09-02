@@ -1005,21 +1005,36 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cPlayer::NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved)
 {
 	ASSERT(a_Opponent != nullptr);
+	class LookForWolves : public cEntityCallback
+	{
+	public:
+		cPlayer * m_Player;
+		cPawn * m_Attacker;
+		bool m_IsPlayerInvolved;
 
-	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 16), [&] (cEntity & a_Entity)
+		LookForWolves(cPlayer * a_Me, cPawn * a_MyAttacker, bool a_PlayerInvolved) :
+			m_Player(a_Me),
+			m_Attacker(a_MyAttacker),
+			m_IsPlayerInvolved(a_PlayerInvolved)
 		{
-			if (a_Entity.IsMob())
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if (a_Entity->IsMob())
 			{
-				auto & Mob = static_cast<cMonster&>(a_Entity);
-				if (Mob.GetMobType() == mtWolf)
+				cMonster * Mob = static_cast<cMonster*>(a_Entity);
+				if (Mob->GetMobType() == mtWolf)
 				{
-					auto & Wolf = static_cast<cWolf&>(Mob);
-					Wolf.ReceiveNearbyFightInfo(GetUUID(), a_Opponent, a_IsPlayerInvolved);
+					cWolf * Wolf = static_cast<cWolf*>(Mob);
+					Wolf->ReceiveNearbyFightInfo(m_Player->GetUUID(), m_Attacker, m_IsPlayerInvolved);
 				}
 			}
 			return false;
 		}
-	);
+	} Callback(this, a_Opponent, a_IsPlayerInvolved);
+
+	m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 16), Callback);
 }
 
 
@@ -2417,12 +2432,17 @@ void cPlayer::HandleFloater()
 	{
 		return;
 	}
-	m_World->DoWithEntityByID(m_FloaterID, [](cEntity & a_Entity)
+	class cFloaterCallback :
+		public cEntityCallback
+	{
+	public:
+		virtual bool Item(cEntity * a_Entity) override
 		{
-			a_Entity.Destroy(true);
+			a_Entity->Destroy(true);
 			return true;
 		}
-	);
+	} Callback;
+	m_World->DoWithEntityByID(m_FloaterID, Callback);
 	SetIsFishing(false);
 }
 
@@ -2666,18 +2686,29 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 	cWorld * World = GetWorld();
 
 	// Check to see if any entity intersects any block being placed
-	return !World->ForEachEntityInBox(PlacingBounds, [&](cEntity & a_Entity)
-		{
-			// The distance inside the block the entity can still be.
-			const double EPSILON = 0.0005;
+	class DoesIntersectBlock : public cEntityCallback
+	{
+	public:
+		const std::vector<cBoundingBox> & m_BoundingBoxes;
 
-			if (!a_Entity.DoesPreventBlockPlacement())
+		// The distance inside the block the entity can still be.
+		const double EPSILON = 0.0005;
+
+		DoesIntersectBlock(const std::vector<cBoundingBox> & a_BoundingBoxes) :
+			m_BoundingBoxes(a_BoundingBoxes)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if (!a_Entity->DoesPreventBlockPlacement())
 			{
 				return false;
 			}
-			cBoundingBox EntBox(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
-			for (auto BlockBox : PlacementBoxes)
+			cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+			for (auto BlockBox: m_BoundingBoxes)
 			{
+
 				// Put in a little bit of wiggle room
 				BlockBox.Expand(-EPSILON, -EPSILON, -EPSILON);
 				if (EntBox.DoesIntersect(BlockBox))
@@ -2687,7 +2718,15 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 			}
 			return false;
 		}
-	);
+	} Callback(PlacementBoxes);
+
+	// See if any entities in that bounding box collide with anyone
+	if (!World->ForEachEntityInBox(PlacingBounds, Callback))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 

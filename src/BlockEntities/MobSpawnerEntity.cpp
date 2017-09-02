@@ -1,4 +1,4 @@
-﻿
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "MobSpawnerEntity.h"
@@ -138,36 +138,47 @@ void cMobSpawnerEntity::SpawnEntity(void)
 		return;
 	}
 
-	auto MobType = m_Entity;
-	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [&](cChunk & a_Chunk)
+	class cCallback : public cChunkCallback
+	{
+	public:
+		cCallback(int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, int a_NearbyEntitiesNum) :
+			m_RelX(a_RelX),
+			m_RelY(a_RelY),
+			m_RelZ(a_RelZ),
+			m_MobType(a_MobType),
+			m_NearbyEntitiesNum(a_NearbyEntitiesNum)
+		{
+		}
+
+		virtual bool Item(cChunk * a_Chunk)
 		{
 			auto & Random = GetRandomProvider();
 
-			bool HaveSpawnedEntity = false;
+			bool EntitiesSpawned = false;
 			for (size_t i = 0; i < 4; i++)
 			{
-				if (NearbyEntities >= 6)
+				if (m_NearbyEntitiesNum >= 6)
 				{
 					break;
 				}
 
 				int RelX = m_RelX + static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0);
-				int RelY = m_PosY + Random.RandInt(-1, 1);
+				int RelY = m_RelY + Random.RandInt(-1, 1);
 				int RelZ = m_RelZ + static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0);
 
-				cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelX, RelZ);
+				cChunk * Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelX, RelZ);
 				if ((Chunk == nullptr) || !Chunk->IsValid())
 				{
 					continue;
 				}
 				EMCSBiome Biome = Chunk->GetBiomeAt(RelX, RelZ);
 
-				if (cMobSpawner::CanSpawnHere(Chunk, RelX, RelY, RelZ, MobType, Biome))
+				if (cMobSpawner::CanSpawnHere(Chunk, RelX, RelY, RelZ, m_MobType, Biome))
 				{
 					double PosX = Chunk->GetPosX() * cChunkDef::Width + RelX;
 					double PosZ = Chunk->GetPosZ() * cChunkDef::Width + RelZ;
 
-					auto Monster = cMonster::NewMonsterFromType(MobType);
+					auto Monster = cMonster::NewMonsterFromType(m_MobType);
 					if (Monster == nullptr)
 					{
 						continue;
@@ -177,7 +188,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					Monster->SetYaw(Random.RandReal(360.0f));
 					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{
-						HaveSpawnedEntity = true;
+						EntitiesSpawned = true;
 						Chunk->BroadcastSoundParticleEffect(
 							EffectID::PARTICLE_MOBSPAWN,
 							static_cast<int>(PosX * 8.0),
@@ -185,15 +196,19 @@ void cMobSpawnerEntity::SpawnEntity(void)
 							static_cast<int>(PosZ * 8.0),
 							0
 						);
-						NearbyEntities++;
+						m_NearbyEntitiesNum++;
 					}
 				}
 			}
 			return EntitiesSpawned;
 		}
-	);
+	protected:
+		int m_RelX, m_RelY, m_RelZ;
+		eMonsterType m_MobType;
+		int m_NearbyEntitiesNum;
+	} Callback(m_RelX, m_PosY, m_RelZ, m_Entity, NearbyEntities);
 
-	if (EntitiesSpawned)
+	if (m_World->DoWithChunk(GetChunkX(), GetChunkZ(), Callback))
 	{
 		ResetTimer();
 	}

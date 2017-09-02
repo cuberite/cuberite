@@ -306,22 +306,38 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount)
 {
-	m_World->DoWithEntityByID(a_AttackerID, [=](cEntity & a_Attacker)
+	class cFindEntity : public cEntityCallback
+	{
+	public:
+
+		cEntity * m_Entity;
+		eDamageType m_DamageType;
+		int m_RawDamage;
+		double m_KnockbackAmount;
+
+		virtual bool Item(cEntity * a_Attacker) override
 		{
 			cPawn * Attacker;
-			if (a_Attacker.IsPawn())
+			if (a_Attacker->IsPawn())
 			{
-				Attacker = static_cast<cPawn*>(&a_Attacker);
+				Attacker = static_cast<cPawn*>(a_Attacker);
 			}
 			else
 			{
 				Attacker = nullptr;
 			}
 
-			TakeDamage(a_DamageType, Attacker, a_RawDamage, a_KnockbackAmount);
+
+			m_Entity->TakeDamage(m_DamageType, Attacker, m_RawDamage, m_KnockbackAmount);
 			return true;
 		}
-	);
+	} Callback;
+
+	Callback.m_Entity = this;
+	Callback.m_DamageType = a_DamageType;
+	Callback.m_RawDamage = a_RawDamage;
+	Callback.m_KnockbackAmount = a_KnockbackAmount;
+	m_World->DoWithEntityByID(a_AttackerID, Callback);
 }
 
 
@@ -652,7 +668,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 
 int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
-	int TotalEPF = 0;
+	int TotalEPF = 0.0;
 
 	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 	for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)

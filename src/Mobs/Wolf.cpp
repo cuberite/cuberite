@@ -29,7 +29,6 @@ cWolf::cWolf(void) :
 
 
 
-
 bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	/*TODO bring from master and adapt*/

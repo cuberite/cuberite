@@ -22,6 +22,30 @@ static const char DEFAULT_WEBADMIN_PORTS[] = "8080";
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cPlayerAccum:
+
+/** Helper class - appends all player names together in an HTML list */
+class cPlayerAccum :
+	public cPlayerListCallback
+{
+	virtual bool Item(cPlayer * a_Player) override
+	{
+		m_Contents.append("<li>");
+		m_Contents.append(a_Player->GetName());
+		m_Contents.append("</li>");
+		return false;
+	}
+
+public:
+
+	AString m_Contents;
+} ;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cWebadminRequestData
 
 /** The form parser callbacks for requests in the "/webadmin" and "/~webadmin" paths */

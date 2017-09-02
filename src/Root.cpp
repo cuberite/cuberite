@@ -1,4 +1,4 @@
-﻿
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Root.h"
@@ -352,16 +352,22 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 void cRoot::StopServer()
 {
 	// Kick all players from the server with custom disconnect message
-
-	bool SentDisconnect = false;
-	cRoot::Get()->ForEachPlayer([&](cPlayer & a_Player)
+	class cPlayerCallback : public cPlayerListCallback
+	{
+		AString m_ShutdownMessage;
+		virtual bool Item(cPlayer * a_Player)
 		{
-			a_Player.GetClientHandlePtr()->Kick(m_Server->GetShutdownMessage());
-			SentDisconnect = true;
+			a_Player->GetClientHandlePtr()->Kick(m_ShutdownMessage);
+			m_HasSentDisconnect = true;
 			return false;
 		}
-	);
-	if (SentDisconnect)
+	public:
+		bool m_HasSentDisconnect;
+		cPlayerCallback(AString a_ShutdownMessage) : m_ShutdownMessage(a_ShutdownMessage) { m_HasSentDisconnect = false; }
+	} PlayerCallback(m_Server->GetShutdownMessage());
+
+	cRoot::Get()->ForEachPlayer(PlayerCallback);
+	if (PlayerCallback.m_HasSentDisconnect)
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
@@ -578,13 +584,14 @@ cWorld * cRoot::GetWorld(const AString & a_WorldName)
 
 
 
-bool cRoot::ForEachWorld(const cWorldListCallback & a_Callback)
+bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 {
-	for (auto & World : m_WorldsByName)
+	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
-		if (World.second != nullptr)
+		++itr2;
+		if (itr->second != nullptr)
 		{
-			if (a_Callback(*World.second))
+			if (a_Callback.Item(itr->second))
 			{
 				return false;
 			}
@@ -743,7 +750,7 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 
 
 
-bool cRoot::ForEachPlayer(const cPlayerListCallback & a_Callback)
+bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
@@ -760,22 +767,20 @@ bool cRoot::ForEachPlayer(const cPlayerListCallback & a_Callback)
 
 
 
-bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, const cPlayerListCallback & a_Callback)
+bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
-	class cCallback
+	class cCallback : public cPlayerListCallback
 	{
 		size_t        m_BestRating;
 		size_t        m_NameLength;
 		const AString m_PlayerName;
 
-	public:
-
-		bool operator () (cPlayer & a_Player)
+		virtual bool Item (cPlayer * a_pPlayer)
 		{
-			size_t Rating = RateCompareString (m_PlayerName, a_Player.GetName());
+			size_t Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
 			if ((Rating > 0) && (Rating >= m_BestRating))
 			{
-				m_BestMatch = a_Player.GetName();
+				m_BestMatch = a_pPlayer->GetName();
 				if (Rating > m_BestRating)
 				{
 					m_NumMatches = 0;
@@ -790,6 +795,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, const cPlayerListC
 			return false;
 		}
 
+	public:
 		cCallback (const AString & a_CBPlayerName) :
 			m_BestRating(0),
 			m_NameLength(a_CBPlayerName.length()),
@@ -814,7 +820,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, const cPlayerListC
 
 
 
-bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, const cPlayerListCallback & a_Callback)
+bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end(); ++itr)
 	{
@@ -830,7 +836,7 @@ bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, const cPlayerListCall
 
 
 
-bool cRoot::DoWithPlayer(const AString & a_PlayerName, const cPlayerListCallback & a_Callback)
+bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
 	for (auto World : m_WorldsByName)
 	{
@@ -1022,11 +1028,25 @@ int cRoot::GetFurnaceFuelBurnTime(const cItem & a_Fuel)
 AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
 {
 	AStringVector Results;
-	ForEachWorld([&](cWorld & a_World)
+	class cWorldCallback : public cWorldListCallback
+	{
+	public:
+		cWorldCallback(AStringVector & a_Results, const AString & a_Search) :
+			m_Results(a_Results),
+			m_Search(a_Search)
 		{
-			a_World.TabCompleteUserName(a_Text, Results);
+		}
+
+		virtual bool Item(cWorld * a_World) override
+		{
+			a_World->TabCompleteUserName(m_Search, m_Results);
 			return false;
 		}
-	);
+	private:
+		AStringVector & m_Results;
+		const AString & m_Search;
+	} WC(Results, a_Text);
+
+	Get()->ForEachWorld(WC);
 	return Results;
 }
