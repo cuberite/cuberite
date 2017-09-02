@@ -1,4 +1,4 @@
-
+﻿
 // Sha1Checksum.cpp
 
 // Declares the cSha1Checksum class representing the SHA-1 checksum calculator
@@ -56,7 +56,7 @@ public:
 cSha1Checksum::cSha1Checksum(void) :
 	m_DoesAcceptInput(true)
 {
-	sha1_starts(&m_Sha1);
+	mbedtls_sha1_starts(&m_Sha1);
 }
 
 
@@ -67,7 +67,7 @@ void cSha1Checksum::Update(const Byte * a_Data, size_t a_Length)
 {
 	ASSERT(m_DoesAcceptInput);  // Not Finalize()-d yet, or Restart()-ed
 
-	sha1_update(&m_Sha1, a_Data, a_Length);
+	mbedtls_sha1_update(&m_Sha1, a_Data, a_Length);
 }
 
 
@@ -78,7 +78,7 @@ void cSha1Checksum::Finalize(cSha1Checksum::Checksum & a_Output)
 {
 	ASSERT(m_DoesAcceptInput);  // Not Finalize()-d yet, or Restart()-ed
 
-	sha1_finish(&m_Sha1, a_Output);
+	mbedtls_sha1_finish(&m_Sha1, a_Output);
 	m_DoesAcceptInput = false;
 }
 
@@ -129,7 +129,7 @@ void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 
 void cSha1Checksum::Restart(void)
 {
-	sha1_starts(&m_Sha1);
+	mbedtls_sha1_starts(&m_Sha1);
 	m_DoesAcceptInput = true;
 }
 

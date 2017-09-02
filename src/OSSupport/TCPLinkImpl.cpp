@@ -1,10 +1,11 @@
-
+﻿
 // TCPLinkImpl.cpp
 
 // Implements the cTCPLinkImpl class implementing the TCP link functionality
 
 #include "Globals.h"
 #include "TCPLinkImpl.h"
+#include "mbedTLS++/SslConfig.h"
 #include "NetworkSingleton.h"
 #include "ServerHandleImpl.h"
 #include "event2/buffer.h"
@@ -245,26 +246,29 @@ AString cTCPLinkImpl::StartTLSClient(
 	{
 		return "TLS is already active on this link";
 	}
-	if (
-		((a_OwnCert == nullptr) && (a_OwnPrivKey != nullptr)) ||
-		((a_OwnCert != nullptr) && (a_OwnPrivKey != nullptr))
-	)
+	if ((a_OwnCert == nullptr) != (a_OwnPrivKey == nullptr))
 	{
 		return "Either provide both the certificate and private key, or neither";
 	}
 
 	// Create the TLS context:
-	m_TlsContext.reset(new cLinkTlsContext(*this));
-	m_TlsContext->Initialize(true);
+	m_TlsContext = std::make_shared<cLinkTlsContext>(*this);
 	if (a_OwnCert != nullptr)
 	{
-		m_TlsContext->SetOwnCert(a_OwnCert, a_OwnPrivKey);
+		auto Config = cSslConfig::MakeDefaultConfig(true);
+		Config->SetOwnCert(std::move(a_OwnCert), std::move(a_OwnPrivKey));
+		m_TlsContext->Initialize(Config);
 	}
+	else
+	{
+		m_TlsContext->Initialize(true);
+	}
+
 	m_TlsContext->SetSelf(cLinkTlsContextWPtr(m_TlsContext));
 
 	// Start the handshake:
 	m_TlsContext->Handshake();
-	return "";
+	return {};
 }
 
 
@@ -282,15 +286,18 @@ AString cTCPLinkImpl::StartTLSServer(
 	{
 		return "TLS is already active on this link";
 	}
-	if ((a_OwnCert == nullptr)  || (a_OwnPrivKey == nullptr))
+	if ((a_OwnCert == nullptr) || (a_OwnPrivKey == nullptr))
 	{
 		return "Provide the server certificate and private key";
 	}
 
 	// Create the TLS context:
-	m_TlsContext.reset(new cLinkTlsContext(*this));
-	m_TlsContext->Initialize(false);
-	m_TlsContext->SetOwnCert(a_OwnCert, a_OwnPrivKey);
+	m_TlsContext = std::make_shared<cLinkTlsContext>(*this);
+	{
+		auto Config = cSslConfig::MakeDefaultConfig(false);
+		Config->SetOwnCert(a_OwnCert, a_OwnPrivKey);
+		m_TlsContext->Initialize(std::move(Config));
+	}
 	m_TlsContext->SetSelf(cLinkTlsContextWPtr(m_TlsContext));
 
 	// Push the initial data:
@@ -298,7 +305,7 @@ AString cTCPLinkImpl::StartTLSServer(
 
 	// Start the handshake:
 	m_TlsContext->Handshake();
-	return "";
+	return {};
 }
 
 
@@ -659,7 +666,7 @@ int cTCPLinkImpl::cLinkTlsContext::ReceiveEncrypted(unsigned char * a_Buffer, si
 	// If there's nothing queued in the buffer, report empty buffer:
 	if (m_EncryptedData.empty())
 	{
-		return POLARSSL_ERR_NET_WANT_READ;
+		return MBEDTLS_ERR_SSL_WANT_READ;
 	}
 
 	// Copy as much data as possible to the provided buffer:

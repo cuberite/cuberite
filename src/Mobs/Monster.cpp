@@ -1335,11 +1335,6 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 {
 	// If the Y coord is out of range, return the most logical result without considering anything else:
 	int RelY = FloorC(a_Location.y);
-	if (RelY < 0)
-	{
-		// Never burn under the world
-		return false;
-	}
 	if (RelY >= cChunkDef::Height)
 	{
 		// Always burn above the world

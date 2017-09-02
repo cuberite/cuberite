@@ -1,4 +1,4 @@
-
+﻿
 // SslHTTPConnection.cpp
 
 // Implements the cSslHTTPServerConnection class representing a HTTP connection made over a SSL link
@@ -11,14 +11,18 @@
 
 
 
-cSslHTTPServerConnection::cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey) :
+cSslHTTPServerConnection::cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, std::shared_ptr<const cSslConfig> a_Config):
 	super(a_HTTPServer),
-	m_Ssl(64000),
-	m_Cert(a_Cert),
-	m_PrivateKey(a_PrivateKey)
+	m_Ssl(64000)
 {
-	m_Ssl.Initialize(false);
-	m_Ssl.SetOwnCert(a_Cert, a_PrivateKey);
+	if (a_Config != nullptr)
+	{
+		m_Ssl.Initialize(a_Config);
+	}
+	else
+	{
+		m_Ssl.Initialize(false);
+	}
 }
 
 
@@ -59,7 +63,7 @@ void cSslHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size
 			// The link may have closed while processing the data, bail out:
 			return;
 		}
-		else if (NumRead == POLARSSL_ERR_NET_WANT_READ)
+		else if (NumRead == MBEDTLS_ERR_SSL_WANT_READ)
 		{
 			// SSL requires us to send data to peer first, do so by "sending" empty data:
 			SendData(nullptr, 0);

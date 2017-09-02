@@ -1,9 +1,9 @@
-
+﻿
 // RsaPrivateKey.cpp
 
 #include "Globals.h"
 #include "RsaPrivateKey.h"
-#include <polarssl/pk.h>
+#include "mbedtls/pk.h"
 
 
 
@@ -11,7 +11,7 @@
 
 cRsaPrivateKey::cRsaPrivateKey(void)
 {
-	rsa_init(&m_Rsa, RSA_PKCS_V15, 0);
+	mbedtls_rsa_init(&m_Rsa, MBEDTLS_RSA_PKCS_V15, 0);
 	m_CtrDrbg.Initialize("RSA", 3);
 }
 
@@ -21,8 +21,8 @@ cRsaPrivateKey::cRsaPrivateKey(void)
 
 cRsaPrivateKey::cRsaPrivateKey(const cRsaPrivateKey & a_Other)
 {
-	rsa_init(&m_Rsa, RSA_PKCS_V15, 0);
-	rsa_copy(&m_Rsa, &a_Other.m_Rsa);
+	mbedtls_rsa_init(&m_Rsa, MBEDTLS_RSA_PKCS_V15, 0);
+	mbedtls_rsa_copy(&m_Rsa, &a_Other.m_Rsa);
 	m_CtrDrbg.Initialize("RSA", 3);
 }
 
@@ -32,7 +32,7 @@ cRsaPrivateKey::cRsaPrivateKey(const cRsaPrivateKey & a_Other)
 
 cRsaPrivateKey::~cRsaPrivateKey()
 {
-	rsa_free(&m_Rsa);
+	mbedtls_rsa_free(&m_Rsa);
 }
 
 
@@ -41,7 +41,7 @@ cRsaPrivateKey::~cRsaPrivateKey()
 
 bool cRsaPrivateKey::Generate(unsigned a_KeySizeBits)
 {
-	int res = rsa_gen_key(&m_Rsa, ctr_drbg_random, m_CtrDrbg.GetInternal(), a_KeySizeBits, 65537);
+	int res = mbedtls_rsa_gen_key(&m_Rsa, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal(), a_KeySizeBits, 65537);
 	if (res != 0)
 	{
 		LOG("RSA key generation failed: -0x%x", -res);
@@ -60,16 +60,16 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 	class cPubKey
 	{
 	public:
-		cPubKey(rsa_context * a_Rsa) :
+		cPubKey(mbedtls_rsa_context * a_Rsa) :
 			m_IsValid(false)
 		{
-			pk_init(&m_Key);
-			if (pk_init_ctx(&m_Key, pk_info_from_type(POLARSSL_PK_RSA)) != 0)
+			mbedtls_pk_init(&m_Key);
+			if (mbedtls_pk_setup(&m_Key, mbedtls_pk_info_from_type(MBEDTLS_PK_RSA)) != 0)
 			{
 				ASSERT(!"Cannot init PrivKey context");
 				return;
 			}
-			if (rsa_copy(pk_rsa(m_Key), a_Rsa) != 0)
+			if (mbedtls_rsa_copy(mbedtls_pk_rsa(m_Key), a_Rsa) != 0)
 			{
 				ASSERT(!"Cannot copy PrivKey to PK context");
 				return;
@@ -81,19 +81,19 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 		{
 			if (m_IsValid)
 			{
-				pk_free(&m_Key);
+				mbedtls_pk_free(&m_Key);
 			}
 		}
 
-		operator pk_context * (void) { return &m_Key; }
+		operator mbedtls_pk_context * (void) { return &m_Key; }
 
 	protected:
 		bool m_IsValid;
-		pk_context m_Key;
+		mbedtls_pk_context m_Key;
 	} PkCtx(&m_Rsa);
 
 	unsigned char buf[3000];
-	int res = pk_write_pubkey_der(PkCtx, buf, sizeof(buf));
+	int res = mbedtls_pk_write_pubkey_der(PkCtx, buf, sizeof(buf));
 	if (res < 0)
 	{
 		return AString();
@@ -124,8 +124,8 @@ int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 		return -1;
 	}
 	size_t DecryptedLength;
-	int res = rsa_pkcs1_decrypt(
-		&m_Rsa, ctr_drbg_random, m_CtrDrbg.GetInternal(), RSA_PRIVATE, &DecryptedLength,
+	int res = mbedtls_rsa_pkcs1_decrypt(
+		&m_Rsa, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal(), MBEDTLS_RSA_PRIVATE, &DecryptedLength,
 		a_EncryptedData, a_DecryptedData, a_DecryptedMaxLength
 	);
 	if (res != 0)
@@ -157,8 +157,8 @@ int cRsaPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte
 		ASSERT(!"Invalid a_PlainLength!");
 		return -1;
 	}
-	int res = rsa_pkcs1_encrypt(
-		&m_Rsa, ctr_drbg_random, m_CtrDrbg.GetInternal(), RSA_PRIVATE,
+	int res = mbedtls_rsa_pkcs1_encrypt(
+		&m_Rsa, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal(), MBEDTLS_RSA_PRIVATE,
 		a_PlainLength, a_PlainData, a_EncryptedData
 	);
 	if (res != 0)

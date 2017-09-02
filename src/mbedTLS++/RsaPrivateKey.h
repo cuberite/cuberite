@@ -1,4 +1,4 @@
-
+﻿
 // RsaPrivateKey.h
 
 // Declares the cRsaPrivateKey class representing a private key for RSA operations.
@@ -10,7 +10,7 @@
 #pragma once
 
 #include "CtrDrbgContext.h"
-#include "polarssl/rsa.h"
+#include "mbedtls/rsa.h"
 
 
 
@@ -48,15 +48,15 @@ public:
 	int Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength);
 
 protected:
-	/** The PolarSSL key context */
-	rsa_context m_Rsa;
+	/** The mbedTLS key context */
+	mbedtls_rsa_context m_Rsa;
 
 	/** The random generator used for generating the key and encryption / decryption */
 	cCtrDrbgContext m_CtrDrbg;
 
 
-	/** Returns the internal context ptr. Only use in PolarSSL API calls. */
-	rsa_context * GetInternal(void) { return &m_Rsa; }
+	/** Returns the internal context ptr. Only use in mbedTLS API calls. */
+	mbedtls_rsa_context * GetInternal(void) { return &m_Rsa; }
 } ;
 
 typedef std::shared_ptr<cRsaPrivateKey> cRsaPrivateKeyPtr;
