@@ -21,6 +21,7 @@ cOcelot::cOcelot(void) :
 	m_OwnerName("")
 {
 	m_EMPersonality = PASSIVE;
+	m_BehaviorDoNothing.AttachToMonster(*this);
 	GetMonsterConfig("Ocelot");
 }
 
@@ -31,6 +32,7 @@ cOcelot::cOcelot(void) :
 void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

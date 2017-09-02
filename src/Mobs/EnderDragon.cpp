@@ -11,9 +11,9 @@ cEnderDragon::cEnderDragon(void) :
 	// TODO: Vanilla source says this, but is it right? Dragons fly, they don't stand
 	super(mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", 16.0, 8.0)
 {
-		m_EMPersonality = AGGRESSIVE;
-		m_BehaviorDoNothing.AttachToMonster(*this);
-		GetMonsterConfig("EnderDragon");
+	m_EMPersonality = AGGRESSIVE;
+	m_BehaviorDoNothing.AttachToMonster(*this);
+	GetMonsterConfig("EnderDragon");
 }
 
 

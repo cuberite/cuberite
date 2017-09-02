@@ -3,7 +3,7 @@
 
 #include "Monster.h"
 #include "../UUID.h"
-
+#include "Behaviors/BehaviorDoNothing.h"
 
 
 
@@ -68,6 +68,9 @@ protected:
 	int       m_CheckPlayerTickCount;
 	AString   m_OwnerName;
 	cUUID     m_OwnerUUID;
+
+private:
+	cBehaviorDoNothing m_BehaviorDoNothing;
 } ;
 
 
