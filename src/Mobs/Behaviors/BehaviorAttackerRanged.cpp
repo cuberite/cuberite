@@ -6,19 +6,38 @@
 #include "../../BlockID.h"
 #include "../../Entities/ArrowEntity.h"
 
+cBehaviorAttackerRanged::cBehaviorAttackerRanged(
+	RangedShootingFunction a_RangedShootingFunction, int a_ProjectileAmount,
+	int a_ShootingIntervals) :
+	m_ShootingFunction(a_RangedShootingFunction),
+	m_ProjectileAmount(a_ProjectileAmount),
+	m_ShootingIntervals(a_ShootingIntervals)
+{
+
+}
+
+
 bool cBehaviorAttackerRanged::DoStrike(int a_StrikeTickCnt)
 {
 	UNUSED(a_StrikeTickCnt);
-	auto & Random = GetRandomProvider();
-	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
-	{
-		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25));
-		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - m_Parent->GetPosition()) * 5;
-		Speed.y += Random.RandInt(-1, 1);
 
-		auto Arrow = cpp14::make_unique<cArrowEntity>(m_Parent, m_Parent->GetPosX(), m_Parent->GetPosY() + 1, m_Parent->GetPosZ(), Speed);
-		auto ArrowPtr = Arrow.get();
-		ArrowPtr->Initialize(std::move(Arrow), *m_Parent->GetWorld());
+	// stop shooting if target is lost
+	if ((GetTarget() == nullptr))
+	{
+		return true;
 	}
-	return true; // Finish the strike. It only takes 1 tick.
+
+	// Stop shooting if we've shot m_ProjectileAmount times.
+	if (a_StrikeTickCnt - 1 == m_ShootingIntervals * m_ProjectileAmount)
+	{
+		return true;
+	}
+
+	// shoot once every m_ShootingIntervals.
+	// Starting immediately at first call to DoStrike
+	if ((a_StrikeTickCnt - 1) % m_ShootingIntervals == 0)
+	{
+		m_ShootingFunction(*this, *m_Parent, *GetTarget());
+	}
+	return false;
 }

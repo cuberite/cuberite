@@ -78,5 +78,6 @@ private:
 	// The mob we want to attack
 	cPawn * m_Target;
 	int m_StrikeTickCnt;
+	bool m_ShouldRetaliate; // Should we attack back whoever attacks us?
 
 };

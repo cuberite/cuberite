@@ -6,12 +6,26 @@
 #include "../Entities/ArrowEntity.h"
 #include "ClientHandle.h"
 
+void ArrowShootingFunction(cBehaviorAttackerRanged & a_Behavior,
+	cMonster & a_Attacker, cPawn & a_Attacked)
+{
+	UNUSED(a_Behavior);
+	auto & Random = GetRandomProvider();
+	Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25));
+	Vector3d Speed = (a_Attacked.GetPosition() + Inaccuracy - a_Attacker.GetPosition()) * 5;
+	Speed.y += Random.RandInt(-1, 1);
 
+	auto Arrow = cpp14::make_unique<cArrowEntity>(&a_Attacker,
+		a_Attacked.GetPosX(), a_Attacked.GetPosY() + 1, a_Attacked.GetPosZ(), Speed);
+	auto ArrowPtr = Arrow.get();
+	ArrowPtr->Initialize(std::move(Arrow), *(a_Attacker.GetWorld()));
+}
 
 
 cSkeleton::cSkeleton(bool IsWither) :
 	super(mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", 0.6, 1.8),
-	m_bIsWither(IsWither)
+	m_bIsWither(IsWither),
+	m_BehaviorAttackerRanged(ArrowShootingFunction)
 {
 	m_EMPersonality = AGGRESSIVE;
 	m_BehaviorAttackerRanged.AttachToMonster(*this);
