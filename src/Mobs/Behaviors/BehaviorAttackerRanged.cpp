@@ -6,7 +6,7 @@
 #include "../../BlockID.h"
 #include "../../Entities/ArrowEntity.h"
 
-bool cBehaviorAttackerRanged::StrikeTarget(int a_StrikeTickCnt)
+bool cBehaviorAttackerRanged::DoStrikeTarget(int a_StrikeTickCnt)
 {
 	UNUSED(a_StrikeTickCnt);
 	auto & Random = GetRandomProvider();

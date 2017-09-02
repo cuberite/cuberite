@@ -48,7 +48,7 @@ protected:
 	it returns false. a_StrikeTickCnt tracks how many times it was called. It is 1 the first call.
 	It increments by 1 each call. This mechanism allows multi-tick attacks, like blazes shooting multiple
 	fireballs, but most attacks are single tick and return true the first call. */
-	virtual bool StrikeTarget(int a_StrikeTickCnt) = 0;
+	virtual bool DoStrikeTarget(int a_StrikeTickCnt) = 0;
 
 	// Target related methods
 	bool TargetIsInStrikeRadius();

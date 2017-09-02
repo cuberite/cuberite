@@ -10,17 +10,15 @@ public:
 	cBehaviorAttackerSuicideBomber();
 
 	// cBehaviorAttacker also implements those and we need to call super on them
-	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 	bool StrikeTarget(int a_StrikeTickCnt) override;
 	void OnRightClicked(cPlayer & a_Player) override;
 
-	bool IsBlowing(void) const {return m_bIsBlowing; }
-	bool IsCharged(void) const {return m_bIsCharged; }
-	bool IsBurnedWithFlintAndSteel(void) const {return m_BurnedWithFlintAndSteel; }
+	bool IsBlowing(void) const;
+	bool IsCharged(void) const;
+	bool IsBurnedWithFlintAndSteel(void) const;
 
 private:
 	bool m_bIsBlowing, m_bIsCharged, m_BurnedWithFlintAndSteel;
-	int m_ExplodingTimer;
 };

@@ -55,15 +55,11 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 
-	if (m_Parent->GetHealth() <= 0.0)
-	{
-		// mobTodo put this elsewhere?
-		return;
-	}
+	ASSERT(m_Parent->GetHealth() > 0.0);
 
 	if (m_IsStriking)
 	{
-		if (StrikeTarget(++m_StrikeTickCnt))
+		if (DoStrikeTarget(++m_StrikeTickCnt))
 		{
 			m_Parent->UnpinBehavior(this);
 			m_IsStriking = false;
