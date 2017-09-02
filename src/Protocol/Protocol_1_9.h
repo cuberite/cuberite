@@ -51,6 +51,9 @@ public:
 
 	cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
+	/** Get the packet ID for a given packet */
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
@@ -336,13 +339,10 @@ class cProtocol_1_9_4 :
 public:
 	cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+
 	// cProtocol_1_9_2 overrides:
-	virtual void SendCollectEntity   (const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
 	virtual void SendChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendEntityEffect    (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
-	virtual void SendEntityProperties(const cEntity & a_Entity) override;
-	virtual void SendPlayerMaxSpeed  (void) override;
-	virtual void SendTeleportEntity  (const cEntity & a_Entity) override;
 	virtual void SendUpdateSign      (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
