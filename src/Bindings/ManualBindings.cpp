@@ -3956,6 +3956,56 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 
 
 
+static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	// Get the params:
+	cEntity * self = reinterpret_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		return 0;
+	}
+
+
+	// API function no longer available:
+	LOGWARNING("cEntity:IsSubmerged() is deprecated. Use cEntity:IsUnderWater() instead.");
+	cLuaState::LogStackTrace(tolua_S);
+
+	L.Push(Mtolua_new((bool)(self->IsUnderWater())));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cEntity_IsSwimming(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	// Get the params:
+	cEntity * self = reinterpret_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		return 0;
+	}
+
+
+	// API function no longer available:
+	LOGWARNING("cEntity:IsSwimming() is deprecated. Use cEntity:IsInWater() instead.");
+	cLuaState::LogStackTrace(tolua_S);
+
+	L.Push(Mtolua_new((bool)(self->IsInWater())));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cEntity_GetPosition(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -4075,6 +4125,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cEntity");
 			tolua_constant(tolua_S, "INVALID_ID", cEntity::INVALID_ID);
+			tolua_function(tolua_S, "IsSubmerged", tolua_cEntity_IsSubmerged);
+			tolua_function(tolua_S, "IsSwimming", tolua_cEntity_IsSwimming);
 			tolua_function(tolua_S, "GetPosition", tolua_cEntity_GetPosition);
 			tolua_function(tolua_S, "GetSpeed", tolua_cEntity_GetSpeed);
 		tolua_endmodule(tolua_S);
@@ -4240,7 +4292,3 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 	tolua_endmodule(tolua_S);
 }
-
-
-
-

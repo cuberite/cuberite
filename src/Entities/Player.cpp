@@ -92,8 +92,8 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
 
-	m_IsSwimming = false;
-	m_IsSubmerged = false;
+	m_IsInWater = false;
+	m_IsUnderWater = false;
 
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -2494,12 +2494,12 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 				m_Stats.AddValue(statDistClimbed, FloorC<StatValue>(a_DeltaPos.y * 100 + 0.5));
 			}
 		}
-		else if (IsSubmerged())
+		else if (IsUnderWater())
 		{
 			m_Stats.AddValue(statDistDove, Value);
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
-		else if (IsSwimming())
+		else if (IsInWater())
 		{
 			m_Stats.AddValue(statDistSwum, Value);
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));

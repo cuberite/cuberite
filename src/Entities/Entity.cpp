@@ -54,8 +54,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_TicksSinceLastFireDamage(0),
 	m_TicksLeftBurning(0),
 	m_TicksSinceLastVoidDamage(0),
-	m_IsSwimming(false),
-	m_IsSubmerged(false),
+	m_IsInWater(false),
+	m_IsUnderWater(false),
 	m_AirLevel(MAX_AIR_LEVEL),
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
@@ -477,11 +477,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			{
 				BurnTicks += 4 * (FireAspectLevel - 1);
 			}
-			if (!IsMob() && !IsSubmerged() && !IsSwimming())
+			if (!IsMob() && !IsUnderWater() && !IsInWater())
 			{
 				StartBurning(BurnTicks * 20);
 			}
-			else if (IsMob() && !IsSubmerged() && !IsSwimming())
+			else if (IsMob() && !IsUnderWater() && !IsInWater())
 			{
 				cMonster * Monster = reinterpret_cast<cMonster *>(this);
 				switch (Monster->GetMobType())
@@ -1649,8 +1649,8 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	ASSERT(RelY <= HeadRelY);
 	if ((RelY < 0) || (HeadRelY >= cChunkDef::Height))
 	{
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
+		m_IsInWater = false;
+		m_IsUnderWater = false;
 		return;
 	}
 
@@ -1666,11 +1666,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, RelY, GetPosX(), GetPosZ()
 		);
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
+		m_IsInWater = false;
+		m_IsUnderWater = false;
 		return;
 	}
-	m_IsSwimming = IsBlockWater(BlockIn);
+	m_IsInWater = IsBlockWater(BlockIn);
 
 	// Check if the player is submerged:
 	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, HeadRelY, RelZ, BlockIn));
@@ -1710,7 +1710,7 @@ void cEntity::HandleAir(void)
 
 	int RespirationLevel = static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
 
-	if (IsSubmerged())
+	if (IsUnderWater())
 	{
 		if (!IsPlayer())  // Players control themselves
 		{

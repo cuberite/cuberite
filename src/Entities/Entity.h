@@ -481,11 +481,11 @@ public:
 	virtual bool IsRclking  (void) const {return false; }
 	virtual bool IsInvisible(void) const { return false; }
 
-	/** Returns whether the player is swimming or not */
-	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+	/** Returns whether the entity is swimming or not */
+	virtual bool IsInWater(void) const{ return m_IsInWater; }
 
-	/** Return whether the player is under water or not */
-	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+	/** Return whether the entity is under water or not */
+	virtual bool IsUnderWater(void) const{ return m_IsUnderWater; }
 
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
@@ -619,8 +619,11 @@ protected:
 	/** Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void. */
 	int m_TicksSinceLastVoidDamage;
 
-	/** If an entity is currently swimming in or submerged under water */
-	bool m_IsSwimming, m_IsSubmerged;
+	/** If the bottom of an entity is currently in a water block */
+	bool m_IsInWater;
+
+	/** If the top of an entity is currently in a water block */
+	bool m_IsUnderWater;
 
 	/** Air level of a mobile */
 	int m_AirLevel;
@@ -647,7 +650,7 @@ protected:
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);
 
-	/** Called once per tick to set IsSwimming and IsSubmerged */
+	/** Called once per tick to set IsInWater and IsUnderWater */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
 private:
@@ -693,7 +696,3 @@ private:
 	cMonsterList m_LeashedMobs;
 
 } ;  // tolua_export
-
-
-
-

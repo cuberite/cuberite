@@ -194,7 +194,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		{
 			if (
 				(IsOnGround() && (GetSpeed().SqrLength() <= 0.5)) ||  // If walking on the ground, we need to slow down first, otherwise we miss the jump
-				IsSwimming()
+				IsInWater()
 			)
 			{
 				m_bOnGround = false;
@@ -221,7 +221,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		{
 			Distance *= 2.5f;
 		}
-		else if (IsSwimming())
+		else if (IsInWater())
 		{
 			Distance *= 1.3f;
 		}
