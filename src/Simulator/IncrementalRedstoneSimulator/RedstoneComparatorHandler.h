@@ -44,12 +44,17 @@ public:
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 
-		UInt8 SignalStrength = 0;
-		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x3);
-		a_World.DoWithBlockEntityAt(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, [&](cBlockEntity & a_BlockEntity)
+		class cContainerCallback : public cBlockEntityCallback
+		{
+		public:
+			cContainerCallback() : m_SignalStrength(0)
+			{
+			}
+
+			virtual bool Item(cBlockEntity * a_BlockEntity) override
 			{
 				// Skip BlockEntities that don't have slots
-				auto BlockEntityWithItems = dynamic_cast<cBlockEntityWithItems *>(&a_BlockEntity);
+				auto BlockEntityWithItems = dynamic_cast<cBlockEntityWithItems *>(a_BlockEntity);
 				if (BlockEntityWithItems == nullptr)
 				{
 					return false;
@@ -63,18 +68,23 @@ public:
 					Fullness += static_cast<float>(Contents.GetSlot(Slot).m_ItemCount) / Contents.GetSlot(Slot).GetMaxStackSize();
 				}
 
-				SignalStrength = (Fullness < 0.001 /* container empty? */) ? 0 : static_cast<UInt8>(1 + (Fullness / Contents.GetNumSlots()) * 14);
+				m_SignalStrength = (Fullness < 0.001 /* container empty? */) ? 0 : static_cast<unsigned char>(1 + (Fullness / Contents.GetNumSlots()) * 14);
 				return false;
 			}
-		);
-		auto RearPower = SignalStrength;
+
+			unsigned char m_SignalStrength;
+		} CCB;
+
+		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x3);
+		a_World.DoWithBlockEntityAt(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, CCB);
+		auto RearPower = CCB.m_SignalStrength;
 		auto RearType = a_World.GetBlock(RearCoordinate);
 
 		auto PotentialSourceHandler = cIncrementalRedstoneSimulator::GetComponentHandler(RearType);
 		if (PotentialSourceHandler != nullptr)
 		{
 			NIBBLETYPE RearMeta = a_World.GetBlockMeta(RearCoordinate);
-			RearPower = std::max(SignalStrength, PotentialSourceHandler->GetPowerDeliveredToPosition(a_World, RearCoordinate, RearType, RearMeta, a_Position, a_BlockType));
+			RearPower = std::max(CCB.m_SignalStrength, PotentialSourceHandler->GetPowerDeliveredToPosition(a_World, RearCoordinate, RearType, RearMeta, a_Position, a_BlockType));
 		}
 
 		return RearPower;

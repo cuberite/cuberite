@@ -30,32 +30,36 @@ public:
 			return;
 		}
 
-		a_WorldInterface.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, [](cBlockEntity & a_BlockEntity)
+		class cCallback : public cBlockEntityCallback
+		{
+			virtual bool Item(cBlockEntity * a_BlockEntity)
 			{
-				if (a_BlockEntity.GetBlockType() != E_BLOCK_HEAD)
+				if (a_BlockEntity->GetBlockType() != E_BLOCK_HEAD)
 				{
 					return false;
 				}
-				auto & MobHeadEntity = static_cast<cMobHeadEntity&>(a_BlockEntity);
+				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
 
 				cItems Pickups;
-				Pickups.Add(E_ITEM_HEAD, 1, static_cast<short>(MobHeadEntity.GetType()));
+				Pickups.Add(E_ITEM_HEAD, 1, static_cast<short>(MobHeadEntity->GetType()));
 				auto & r1 = GetRandomProvider();
 
 				// Mid-block position first
 				double MicroX, MicroY, MicroZ;
-				MicroX = MobHeadEntity.GetPosX() + 0.5;
-				MicroY = MobHeadEntity.GetPosY() + 0.5;
-				MicroZ = MobHeadEntity.GetPosZ() + 0.5;
+				MicroX = MobHeadEntity->GetPosX() + 0.5;
+				MicroY = MobHeadEntity->GetPosY() + 0.5;
+				MicroZ = MobHeadEntity->GetPosZ() + 0.5;
 
 				// Add random offset second
 				MicroX += r1.RandReal<double>(-0.5, 0.5);
 				MicroZ += r1.RandReal<double>(-0.5, 0.5);
 
-				MobHeadEntity.GetWorld()->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
+				MobHeadEntity->GetWorld()->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 				return false;
 			}
-		);
+		} Callback;
+
+		a_WorldInterface.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

@@ -1,4 +1,4 @@
-﻿
+
 // MapManager.h
 
 
@@ -11,13 +11,12 @@
 
 
 
-#include <functional>
 #include "Map.h"
 
 
 
 
-using cMapCallback = std::function<bool(cMap &)>;
+typedef cItemCallback<cMap> cMapCallback;
 
 
 
@@ -42,7 +41,7 @@ public:
 	/** Calls the callback for the map with the specified ID.
 	Returns true if the map was found and the callback called, false if map not found.
 	Callback return value is ignored. */
-	bool DoWithMap(UInt32 a_ID, const cMapCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithMap(UInt32 a_ID, cMapCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Ticks each registered map */
 	void TickMaps(void);

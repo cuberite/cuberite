@@ -13,7 +13,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // cFloaterEntityCollisionCallback
-class cFloaterEntityCollisionCallback
+class cFloaterEntityCollisionCallback :
+	public cEntityCallback
 {
 public:
 	cFloaterEntityCollisionCallback(cFloater * a_Floater, const Vector3d & a_Pos, const Vector3d & a_NextPos) :
@@ -24,14 +25,14 @@ public:
 		m_HitEntity(nullptr)
 	{
 	}
-	bool operator () (cEntity & a_Entity)
+	virtual bool Item(cEntity * a_Entity) override
 	{
-		if (!a_Entity.IsMob())  // Floaters can only pull mobs not other entities.
+		if (!a_Entity->IsMob())  // Floaters can only pull mobs not other entities.
 		{
 			return false;
 		}
 
-		cBoundingBox EntBox(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
+		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
 
 		double LineCoeff;
 		eBlockFace Face;
@@ -46,7 +47,7 @@ public:
 		{
 			// The entity is closer than anything we've stored so far, replace it as the potential victim
 			m_MinCoeff = LineCoeff;
-			m_HitEntity = &a_Entity;
+			m_HitEntity = a_Entity;
 		}
 
 		// Don't break the enumeration, we want all the entities
@@ -68,6 +69,32 @@ protected:
 	// Although it's bad(tm) to store entity ptrs from a callback, we can afford it here, because the entire callback
 	// is processed inside the tick thread, so the entities won't be removed in between the calls and the final processing
 	cEntity * m_HitEntity;  // The nearest hit entity
+} ;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cFloaterCheckEntityExist
+class cFloaterCheckEntityExist :
+	public cEntityCallback
+{
+public:
+	cFloaterCheckEntityExist(void) :
+		m_EntityExists(false)
+	{
+	}
+
+	bool Item(cEntity * a_Entity) override
+	{
+		m_EntityExists = true;
+		return false;
+	}
+
+	bool DoesExist(void) const { return m_EntityExists; }
+protected:
+	bool m_EntityExists;
 } ;
 
 
@@ -173,16 +200,18 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (!m_World->DoWithEntityByID(m_PlayerID, [](cEntity &) { return true; }))  // The owner doesn't exist anymore. Destroy the floater entity.
+	cFloaterCheckEntityExist EntityCallback;
+	m_World->DoWithEntityByID(m_PlayerID, EntityCallback);
+	if (!EntityCallback.DoesExist())  // The owner doesn't exist anymore. Destroy the floater entity.
 	{
 		Destroy(true);
 	}
 
 	if (m_AttachedMobID != cEntity::INVALID_ID)
 	{
-		if (!m_World->DoWithEntityByID(m_AttachedMobID, [](cEntity &) { return true; }))
+		m_World->DoWithEntityByID(m_AttachedMobID, EntityCallback);  // The mob the floater was attached to doesn't exist anymore.
+		if (!EntityCallback.DoesExist())
 		{
-			// The mob the floater was attached to doesn't exist anymore.
 			m_AttachedMobID = cEntity::INVALID_ID;
 		}
 	}

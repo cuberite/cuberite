@@ -56,12 +56,25 @@ bool cDeadlockDetect::Start(int a_IntervalSec)
 	m_IntervalSec = a_IntervalSec;
 
 	// Read the initial world data:
-	cRoot::Get()->ForEachWorld([=](cWorld & a_World)
+	class cFillIn :
+		public cWorldListCallback
+	{
+	public:
+		cFillIn(cDeadlockDetect * a_Detect) :
+			m_Detect(a_Detect)
 		{
-			SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
+		}
+
+		virtual bool Item(cWorld * a_World) override
+		{
+			m_Detect->SetWorldAge(a_World->GetName(), a_World->GetWorldAge());
 			return false;
 		}
-	);
+
+	protected:
+		cDeadlockDetect * m_Detect;
+	} FillIn(this);
+	cRoot::Get()->ForEachWorld(FillIn);
 	return super::Start();
 }
 
@@ -102,12 +115,25 @@ void cDeadlockDetect::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		// Check the world ages:
-		cRoot::Get()->ForEachWorld([=](cWorld & a_World)
+		class cChecker :
+			public cWorldListCallback
+		{
+		public:
+			cChecker(cDeadlockDetect * a_Detect) :
+				m_Detect(a_Detect)
 			{
-				CheckWorldAge(a_World.GetName(), a_World.GetWorldAge());
+			}
+
+		protected:
+			cDeadlockDetect * m_Detect;
+
+			virtual bool Item(cWorld * a_World) override
+			{
+				m_Detect->CheckWorldAge(a_World->GetName(), a_World->GetWorldAge());
 				return false;
 			}
-		);
+		} Checker(this);
+		cRoot::Get()->ForEachWorld(Checker);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(CYCLE_MILLISECONDS));
 	}  // while (should run)
