@@ -332,31 +332,37 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// do not tick behaviors
 			// mobTodo temporary leash special case. Needs a behavior eventually.
 		}
-		else if (m_PinnedBehavior != nullptr)
-		{
-			// A behavior is pinned. We give it control automatically.
-			ASSERT(m_CurrentTickControllingBehavior == m_PinnedBehavior);
-			m_CurrentTickControllingBehavior->Tick(a_Dt, a_Chunk);
-		}
 		else
 		{
-			// ask the behaviors sequentially if they are interested in controlling this mob
-			// Stop at the first one that says yes.
-			m_NewTickControllingBehavior = nullptr;
-			for (cBehavior * Behavior : m_AttachedTickBehaviors)
+			// STEP 1: Decide who'll control us this tick
+
+			if (m_PinnedBehavior != nullptr)
 			{
-				if (Behavior->IsControlDesired(a_Dt, a_Chunk))
+				// A behavior is pinned. We give it control automatically.
+				m_NewTickControllingBehavior = m_PinnedBehavior;
+			}
+			else
+			{
+				// ask the behaviors sequentially if they are interested in controlling this mob
+				// Stop at the first one that says yes.
+				m_NewTickControllingBehavior = nullptr;
+				for (cBehavior * Behavior : m_AttachedTickBehaviors)
 				{
-					m_NewTickControllingBehavior = Behavior;
-					break;
+					if (Behavior->IsControlDesired(a_Dt, a_Chunk))
+					{
+						m_NewTickControllingBehavior = Behavior;
+						break;
+					}
 				}
 			}
 			ASSERT(m_NewTickControllingBehavior != nullptr); // it's not OK if no one asks for control
+
+			// STEP 2: decide whether to tick or do behavior swapping
+
 			if (m_CurrentTickControllingBehavior == m_NewTickControllingBehavior)
 			{
 				// The Behavior asking for control is the same as the behavior from last tick.
 				// Nothing special, just tick it.
-				// LOGD("mobDebug - Tick");
 				m_CurrentTickControllingBehavior->Tick(a_Dt, a_Chunk);
 			}
 			else if (m_CurrentTickControllingBehavior == nullptr)
@@ -373,6 +379,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 	}
+
+	// STEP 3: Behavior swapping if needed
 
 	// Make the current controlling behavior clean up
 	if (m_TickControllingBehaviorState == OldControlEnding)
@@ -1359,9 +1367,7 @@ void cMonster::AttachDoTakeDamageBehavior(cBehavior * a_Behavior)
 
 void cMonster::PinBehavior(cBehavior * a_Behavior)
 {
-	ASSERT(m_TickControllingBehaviorState == Normal);
 	m_PinnedBehavior = a_Behavior;
-	ASSERT(m_CurrentTickControllingBehavior == m_PinnedBehavior);
 }
 
 
@@ -1370,8 +1376,7 @@ void cMonster::PinBehavior(cBehavior * a_Behavior)
 
 void cMonster::UnpinBehavior(cBehavior * a_Behavior)
 {
-	ASSERT(m_TickControllingBehaviorState == Normal);
-	ASSERT(m_PinnedBehavior = a_Behavior);
+	ASSERT(m_PinnedBehavior == a_Behavior);
 	m_PinnedBehavior = nullptr;
 }
 

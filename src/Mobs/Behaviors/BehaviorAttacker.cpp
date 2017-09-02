@@ -101,7 +101,6 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (TargetIsInStrikeRadius() && TargetIsInLineOfSight())
 			{
-				m_Parent->StopMovingToPosition();
 				StrikeIfReady();
 			}
 			else
@@ -209,6 +208,7 @@ void cBehaviorAttacker::Strike()
 	m_IsStriking = true;
 	m_StrikeTickCnt = 0;
 	m_Parent->PinBehavior(this);
+	m_Parent->StopMovingToPosition();
 }
 
 

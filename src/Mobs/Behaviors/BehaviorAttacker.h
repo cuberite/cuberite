@@ -14,7 +14,7 @@ class cBehaviorAttacker : public cBehavior
 
 public:
 	cBehaviorAttacker();
-	void AttachToMonster(cMonster & a_Parent);
+	virtual void AttachToMonster(cMonster & a_Parent);
 
 
 	// Our host monster will call these once it loads its config file

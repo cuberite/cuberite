@@ -21,15 +21,27 @@ cBehaviorAttackerSuicideBomber::cBehaviorAttackerSuicideBomber() :
 
 
 
+void cBehaviorAttackerSuicideBomber::AttachToMonster(cMonster & a_Parent)
+{
+	cBehaviorAttacker::AttachToMonster(a_Parent);
+	m_Parent->AttachRightClickBehavior(this);
+}
+
+
+
+
+
 bool cBehaviorAttackerSuicideBomber::DoStrike(int a_StrikeTickCnt)
 {
 	UNUSED(a_StrikeTickCnt);
 
 
+	LOGD("Suicide doStrike");
 
 	// phase 1: start blowing up
 	if (a_StrikeTickCnt == 1)
 	{
+		LOGD("Suicide START");
 		ASSERT(!m_bIsBlowing);
 
 		m_Parent->GetWorld()->BroadcastSoundEffect("entity.creeper.primed", m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), 1.f, (0.75f + (static_cast<float>((m_Parent->GetUniqueID() * 23) % 32)) / 64));
@@ -72,9 +84,6 @@ void cBehaviorAttackerSuicideBomber::OnRightClicked(cPlayer & a_Player)
 		}
 		if (!m_BurnedWithFlintAndSteel)
 		{
-			m_Parent->GetWorld()->BroadcastSoundEffect("entity.creeper.primed", m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), 1.f, (0.75f + (static_cast<float>((m_Parent->GetUniqueID() * 23) % 32)) / 64));
-			m_bIsBlowing = true;
-			m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
 			m_BurnedWithFlintAndSteel = true;
 			Strike();
 		}

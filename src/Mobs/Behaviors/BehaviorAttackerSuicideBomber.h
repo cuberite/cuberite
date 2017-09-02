@@ -8,7 +8,7 @@ class cBehaviorAttackerSuicideBomber : public cBehaviorAttacker
 {
 public:
 	cBehaviorAttackerSuicideBomber();
-
+	void AttachToMonster(cMonster & a_Parent) override;
 	// cBehaviorAttacker also implements those and we need to call super on them
 	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 

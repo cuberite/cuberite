@@ -17,7 +17,6 @@ cCreeper::cCreeper(void) :
 	m_BehaviorAttackerSuicideBomber.AttachToMonster(*this);
 	m_BehaviorWanderer.AttachToMonster(*this);
 	m_BehaviorAggressive.AttachToMonster(*this);
-	m_BehaviourDayLightBurner.AttachToMonster(*this);
 	GetMonsterConfig("Creeper");
 }
 

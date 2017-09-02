@@ -32,7 +32,6 @@ private:
 
 	// other behaviors
 	cBehaviorAggressive m_BehaviorAggressive;
-	cBehaviorDayLightBurner m_BehaviourDayLightBurner;
 } ;
 
 
