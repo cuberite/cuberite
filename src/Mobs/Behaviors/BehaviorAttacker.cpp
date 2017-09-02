@@ -59,7 +59,7 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_IsStriking)
 	{
-		if (DoStrikeTarget(++m_StrikeTickCnt))
+		if (DoStrike(++m_StrikeTickCnt))
 		{
 			m_Parent->UnpinBehavior(this);
 			m_IsStriking = false;
@@ -102,7 +102,7 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			if (TargetIsInStrikeRadius() && TargetIsInLineOfSight())
 			{
 				m_Parent->StopMovingToPosition();
-				StrikeTargetIfReady();
+				StrikeIfReady();
 			}
 			else
 			{
@@ -200,9 +200,9 @@ void cBehaviorAttacker::SetTarget(cPawn * a_Target)
 
 
 
-void cBehaviorAttacker::StrikeTarget()
+void cBehaviorAttacker::Strike()
 {
-	if (m_IsStriking || (m_Target == nullptr))
+	if (m_IsStriking)
 	{
 		return;
 	}
@@ -286,10 +286,10 @@ void cBehaviorAttacker::ResetStrikeCooldown()
 
 
 
-void cBehaviorAttacker::StrikeTargetIfReady()
+void cBehaviorAttacker::StrikeIfReady()
 {
 	if (m_AttackCoolDownTicksLeft == 0)
 	{
-		StrikeTarget();
+		Strike();
 	}
 }

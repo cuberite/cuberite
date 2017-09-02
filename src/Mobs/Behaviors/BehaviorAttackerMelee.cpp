@@ -5,7 +5,7 @@
 #include "../../Entities/Pawn.h"
 #include "../../BlockID.h"
 
-bool cBehaviorAttackerMelee::DoStrikeTarget(int a_StrikeTickCnt)
+bool cBehaviorAttackerMelee::DoStrike(int a_StrikeTickCnt)
 {
 	UNUSED(a_StrikeTickCnt);
 	GetTarget()->TakeDamage(dtMobAttack, m_Parent, m_AttackDamage, 0);

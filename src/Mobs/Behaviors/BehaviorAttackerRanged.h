@@ -7,5 +7,5 @@ Use BehaviorAttackerMelee::SetTarget to attack. */
 class cBehaviorAttackerRanged : public cBehaviorAttacker
 {
 public:
-	bool DoStrikeTarget(int a_StrikeTickCnt) override;
+	bool DoStrike(int a_StrikeTickCnt) override;
 };

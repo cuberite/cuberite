@@ -12,8 +12,7 @@
 cBehaviorAttackerSuicideBomber::cBehaviorAttackerSuicideBomber() :
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
-	m_BurnedWithFlintAndSteel(false),
-	m_ExplodingTimer(0)
+	m_BurnedWithFlintAndSteel(false)
 {
 
 }
@@ -22,20 +21,11 @@ cBehaviorAttackerSuicideBomber::cBehaviorAttackerSuicideBomber() :
 
 
 
-bool cBehaviorAttackerSuicideBomber::StrikeTarget(int a_StrikeTickCnt)
+bool cBehaviorAttackerSuicideBomber::DoStrike(int a_StrikeTickCnt)
 {
 	UNUSED(a_StrikeTickCnt);
 
-	ASSERT(GetTarget() != nullptr);// mobTodo  guaranteed ?
 
-	if ((!TargetIsInStrikeRadius()) && (!m_BurnedWithFlintAndSteel))
-	{
-		if (m_bIsBlowing)
-		{
-			m_bIsBlowing = false;
-			m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
-		}
-	}
 
 	// phase 1: start blowing up
 	if (a_StrikeTickCnt == 1)
@@ -48,15 +38,24 @@ bool cBehaviorAttackerSuicideBomber::StrikeTarget(int a_StrikeTickCnt)
 
 		return false;
 	}
-	return false;
 
+	ASSERT(m_bIsBlowing);
+	if (((GetTarget() == nullptr) || (!TargetIsInStrikeRadius())) && (!m_BurnedWithFlintAndSteel))
+	{
+		m_bIsBlowing = false;
+		m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
+		return true;
+	}
 
 	if (a_StrikeTickCnt == 30)
 	{
-		// mobTodo  && (m_Parent->GetHealth() > 0.0)  guaranteed ?
+		ASSERT(m_Parent->GetHealth() > 0.0);
 		m_Parent->GetWorld()->DoExplosionAt((m_bIsCharged ? 5 : 3), m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), false, esMonster, this);
 		m_Parent->Destroy();  // Just in case we aren't killed by the explosion
+		return true;
 	}
+
+	return false;
 }
 
 
@@ -77,7 +76,7 @@ void cBehaviorAttackerSuicideBomber::OnRightClicked(cPlayer & a_Player)
 			m_bIsBlowing = true;
 			m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
 			m_BurnedWithFlintAndSteel = true;
-			m_Parent->PinBehavior(this);
+			Strike();
 		}
 	}
 }

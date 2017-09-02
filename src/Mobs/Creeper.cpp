@@ -14,6 +14,10 @@ cCreeper::cCreeper(void) :
 	super(mtCreeper, "entity.creeper.hurt", "entity.creeper.death", 0.6, 1.8)
 {
 	m_EMPersonality = AGGRESSIVE;
+	m_BehaviorAttackerSuicideBomber.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
+	m_BehaviorAggressive.AttachToMonster(*this);
+	m_BehaviourDayLightBurner.AttachToMonster(*this);
 	GetMonsterConfig("Creeper");
 }
 
@@ -69,7 +73,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 bool cCreeper::IsBlowing(void) const
 {
-	return m_BehaviorSuicideBomber.IsBlowing();
+	return m_BehaviorAttackerSuicideBomber.IsBlowing();
 }
 
 
@@ -78,7 +82,7 @@ bool cCreeper::IsBlowing(void) const
 
 bool cCreeper::IsCharged(void) const
 {
-	return m_BehaviorSuicideBomber.IsCharged();
+	return m_BehaviorAttackerSuicideBomber.IsCharged();
 }
 
 
@@ -87,5 +91,5 @@ bool cCreeper::IsCharged(void) const
 
 bool cCreeper::IsBurnedWithFlintAndSteel(void) const
 {
-	return m_BehaviorSuicideBomber.IsBurnedWithFlintAndSteel();
+	return m_BehaviorAttackerSuicideBomber.IsBurnedWithFlintAndSteel();
 }

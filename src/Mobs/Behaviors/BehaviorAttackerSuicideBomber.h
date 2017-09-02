@@ -12,7 +12,7 @@ public:
 	// cBehaviorAttacker also implements those and we need to call super on them
 	void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
-	bool StrikeTarget(int a_StrikeTickCnt) override;
+	bool DoStrike(int a_StrikeTickCnt) override;
 	void OnRightClicked(cPlayer & a_Player) override;
 
 	bool IsBlowing(void) const;

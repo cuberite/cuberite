@@ -35,26 +35,29 @@ public:
 	/** Sets a new target. Forgets the older target if present. Set this to nullptr to unset target. */
 	void SetTarget(cPawn * a_Target);
 
-	/** Makes the mob strike a target the next tick. Ignores the strike cooldown.
-	 * Ignored if already striking or if no target is set. */
-	void StrikeTarget();
+	/** Makes the mob perform a strike the next tick. Ignores the strike cooldown.
+	 * Ignored if already striking. Some attack behaviors do not require a target
+	to be set (e.g. creeper explosion). The behaviors that require a target
+	ignore this call if the target is null. */
+	void Strike();
 
 	/** Makes the mob strike a target the next tick only if the strike cooldown permits it.
 	 * Ignored if already striking or if no target is set. */
-	void StrikeTargetIfReady();
+	void StrikeIfReady();
 protected:
 
 	/** Called when the actual attack should be made. Will be called again and again every tick until
 	it returns false. a_StrikeTickCnt tracks how many times it was called. It is 1 the first call.
 	It increments by 1 each call. This mechanism allows multi-tick attacks, like blazes shooting multiple
-	fireballs, but most attacks are single tick and return true the first call. */
-	virtual bool DoStrikeTarget(int a_StrikeTickCnt) = 0;
+	fireballs, but most attacks are single tick and return true the first call. Target is not guaranteed to be valid
+	during these calls. The behavior is pinned until true is returned, meaning no other behaviors can tick. */
+	virtual bool DoStrike(int a_StrikeTickCnt) = 0;
 
 	// Target related methods
 	bool TargetIsInStrikeRadius();
 	bool TargetIsInLineOfSight();
 	bool TargetTooFar();
-	void StrikeTargetIfReady(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	void StrikeIfReady(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	// Cooldown stuff
 	void ResetStrikeCooldown();

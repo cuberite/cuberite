@@ -3,7 +3,9 @@
 
 #include "Monster.h"
 #include "Behaviors/BehaviorAttackerSuicideBomber.h"
-
+#include "Behaviors/BehaviorWanderer.h"
+#include "Behaviors/BehaviorAggressive.h"
+#include "Behaviors/BehaviorDayLightBurner.h"
 
 
 
@@ -24,7 +26,13 @@ public:
 	bool IsBurnedWithFlintAndSteel(void) const;
 
 private:
-	cBehaviorAttackerSuicideBomber m_BehaviorSuicideBomber;
+	// tick behaviors
+	cBehaviorAttackerSuicideBomber m_BehaviorAttackerSuicideBomber;
+	cBehaviorWanderer m_BehaviorWanderer;
+
+	// other behaviors
+	cBehaviorAggressive m_BehaviorAggressive;
+	cBehaviorDayLightBurner m_BehaviourDayLightBurner;
 } ;
 
 
