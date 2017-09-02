@@ -92,7 +92,17 @@ public:
 
 		// Common variations
 		etMob = etMonster,  // DEPRECATED, use etMonster instead!
-	} ;
+	};
+
+	enum eWaterState
+	{
+		// Not in water
+		wsDry = 1,
+		// The mottom of the Entity is in water
+		wsInWater = 1,
+		// The top of the Entity is in water
+		wsUnderWater = 2,
+	};
 
 	// tolua_end
 
@@ -133,7 +143,7 @@ public:
 		esFireworkExploding      = 17,
 		// Passive mob is in "love mode"
 		esMobInLove              = 18,
-	} ;
+	};
 
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
 	static const int FIRE_DAMAGE           = 1;    ///< Damage to deal when standing in fire
@@ -480,11 +490,8 @@ public:
 	virtual bool IsRclking  (void) const {return false; }
 	virtual bool IsInvisible(void) const { return false; }
 
-	/** Returns whether the player is swimming or not */
-	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
-
-	/** Return whether the player is under water or not */
-	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+	/** Returns the water state of the Entity */
+	virtual eWaterState GetWaterState(void) const{ return m_WaterState; }
 
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
@@ -618,8 +625,8 @@ protected:
 	/** Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void. */
 	int m_TicksSinceLastVoidDamage;
 
-	/** If an entity is currently swimming in or submerged under water */
-	bool m_IsSwimming, m_IsSubmerged;
+	/** Water state of the Entity */
+	eWaterState m_WaterState;
 
 	/** Air level of a mobile */
 	int m_AirLevel;
@@ -646,7 +653,7 @@ protected:
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);
 
-	/** Called once per tick to set IsSwimming and IsSubmerged */
+	/** Called once per tick to set the water state */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
 private:
@@ -692,7 +699,3 @@ private:
 	cMonsterList m_LeashedMobs;
 
 } ;  // tolua_export
-
-
-
-

@@ -54,8 +54,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_TicksSinceLastFireDamage(0),
 	m_TicksLeftBurning(0),
 	m_TicksSinceLastVoidDamage(0),
-	m_IsSwimming(false),
-	m_IsSubmerged(false),
+	m_WaterState(wsDry),
 	m_AirLevel(MAX_AIR_LEVEL),
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
@@ -494,11 +493,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			{
 				BurnTicks += 4 * (FireAspectLevel - 1);
 			}
-			if (!IsMob() && !IsSubmerged() && !IsSwimming())
+			if (!IsMob() && (GetWaterState() == wsDry))
 			{
 				StartBurning(BurnTicks * 20);
 			}
-			else if (IsMob() && !IsSubmerged() && !IsSwimming())
+			else if (IsMob() && (GetWaterState() == wsDry))
 			{
 				cMonster * Monster = reinterpret_cast<cMonster *>(this);
 				switch (Monster->GetMobType())
@@ -1658,8 +1657,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int RelY = FloorC(GetPosY() + 0.1);
 	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
 	{
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
+		m_WaterState = wsDry;
 		return;
 	}
 
@@ -1675,16 +1673,21 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, RelY, GetPosX(), GetPosZ()
 		);
-		m_IsSwimming = false;
-		m_IsSubmerged = false;
+		m_WaterState = wsDry;
 		return;
 	}
-	m_IsSwimming = IsBlockWater(BlockIn);
+	if (IsBlockWater(BlockIn))
+	{
+		m_WaterState = wsInWater;
+	}
 
 	// Check if the player is submerged:
 	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
 	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn));
-	m_IsSubmerged = IsBlockWater(BlockIn);
+	if (IsBlockWater(BlockIn))
+	{
+		m_WaterState = wsUnderWater;
+	}
 }
 
 
@@ -1720,7 +1723,7 @@ void cEntity::HandleAir(void)
 
 	int RespirationLevel = static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
 
-	if (IsSubmerged())
+	if (GetWaterState() == wsUnderWater)
 	{
 		if (!IsPlayer())  // Players control themselves
 		{

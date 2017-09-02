@@ -91,8 +91,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
 
-	m_IsSwimming = false;
-	m_IsSubmerged = false;
+	m_WaterState = wsDry;
 
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -2501,14 +2500,14 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 				m_Stats.AddValue(statDistClimbed, FloorC<StatValue>(a_DeltaPos.y * 100 + 0.5));
 			}
 		}
-		else if (IsSubmerged())
-		{
-			m_Stats.AddValue(statDistDove, Value);
-			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
-		}
-		else if (IsSwimming())
+		else if (GetWaterState() == wsInWater)
 		{
 			m_Stats.AddValue(statDistSwum, Value);
+			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
+		}
+		else if (GetWaterState() == wsUnderWater)
+		{
+			m_Stats.AddValue(statDistDove, Value);
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
 		else if (IsOnGround())
@@ -3018,4 +3017,3 @@ float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
 	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
 }
-
