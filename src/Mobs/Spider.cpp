@@ -9,7 +9,8 @@
 
 bool AggressiveAtNightFunction(cBehaviorAggressive & a_Behavior, cMonster & a_Monster)
 {
-
+	return
+			!((Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) > 11) || (Chunk->GetBlockLight(Rel.x, Rel.y, Rel.z) > 11))
 }
 
 cSpider::cSpider(void) :
