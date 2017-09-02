@@ -13,6 +13,7 @@ set(SRCS
 	EntropyContext.cpp
 	RsaPrivateKey.cpp
 	Sha1Checksum.cpp
+	SslConfig.cpp
 	SslContext.cpp
 	X509Cert.cpp
 )
@@ -26,16 +27,18 @@ set(HDRS
 	CtrDrbgContext.h
 	CryptoKey.h
 	EntropyContext.h
+	ErrorCodes.h
 	RsaPrivateKey.h
+	SslConfig.h
 	SslContext.h
 	Sha1Checksum.h
 	X509Cert.h
 )
 
 if(NOT MSVC)
-	add_library(PolarSSL++ ${SRCS} ${HDRS})
+	add_library(mbedTLS++ ${SRCS} ${HDRS})
 
 	if (UNIX)
-		target_link_libraries(PolarSSL++ mbedtls)
+		target_link_libraries(mbedTLS++ mbedtls)
 	endif()
 endif()

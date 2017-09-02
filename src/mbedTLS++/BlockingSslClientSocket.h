@@ -1,4 +1,4 @@
-
+﻿
 // BlockingSslClientSocket.h
 
 // Declares the cBlockingSslClientSocket class representing a blocking TCP socket with client SSL encryption over it
@@ -45,12 +45,15 @@ public:
 	Note that this also frees the internal SSL context, so all the certificates etc. are lost. */
 	void Disconnect(void);
 
-	/** Sets the root certificates that are to be trusted. Forces the connection to use strict cert
-	verification. Needs to be used before calling Connect().
-	a_ExpectedPeerName is the name that we expect to receive in the SSL peer's cert; verification will fail if
-	the presented name is different (possible MITM).
-	Returns true on success, false on failure. Sets internal error text on failure. */
-	bool SetTrustedRootCertsFromString(const AString & a_CACerts, const AString & a_ExpectedPeerName);
+	/** Sets the Expected peer name.
+	Needs to be used before calling Connect().
+	\param a_ExpectedPeerName Name that we expect to receive in the SSL peer's cert; verification will fail if
+	the presented name is different (possible MITM). */
+	void SetExpectedPeerName(AString a_ExpectedPeerName);
+
+	/** Set the config to be used by the SSL context.
+	Config must not be modified after calling connect. */
+	void SetSslConfig(std::shared_ptr<const cSslConfig> a_Config);
 
 	/** Returns the text of the last error that has occurred in this instance. */
 	const AString & GetLastErrorText(void) const { return m_LastErrorText; }
@@ -68,10 +71,10 @@ protected:
 	/** The object used to signal state changes in the socket (the cause of the blocking). */
 	cEvent m_Event;
 
-	/** The trusted CA root cert store, if we are to verify the cert strictly. Set by SetTrustedRootCertsFromString(). */
-	cX509CertPtr m_CACerts;
+	/** The configuration to be used by the SSL context. Set by SetSslConfig(). */
+	std::shared_ptr<const cSslConfig> m_Config;
 
-	/** The expected SSL peer's name, if we are to verify the cert strictly. Set by SetTrustedRootCertsFromString(). */
+	/** The expected SSL peer's name, if we are to verify the cert strictly. Set by SetExpectedPeerName(). */
 	AString m_ExpectedPeerName;
 
 	/** The hostname to which the socket is connecting (stored for error reporting). */
