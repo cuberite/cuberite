@@ -2,15 +2,29 @@
 
 #include "CaveSpider.h"
 #include "../World.h"
+#include "Mobs/Behaviors/BehaviorAttackerMelee.h"
+
+
+void CaveSpiderPostAttack(cBehaviorAttackerMelee & a_Behavior, cMonster & a_Attacker, cPawn & a_Attacked)
+{
+	UNUSED(a_Behavior);
+	UNUSED(a_Attacker);
+	// TODO: Easy = no poison, Medium = 7 seconds, Hard = 15 seconds
+	a_Attacked.AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
+}
 
 
 
 
 
-cCaveSpider::cCaveSpider(void) :
-	super(mtCaveSpider, "entity.spider.hurt", "entity.spider.death", 0.7, 0.5)
+cCaveSpider::cCaveSpider(void)
+	: super(mtCaveSpider, "entity.spider.hurt", "entity.spider.death", 0.7, 0.5)
+	, m_BehaviorAttackerMelee(CaveSpiderPostAttack)
 {
 		m_EMPersonality = AGGRESSIVE;
+		m_BehaviorAttackerMelee.AttachToMonster(*this);
+		m_BehaviorWanderer.AttachToMonster(*this);
+		m_BehaviorAggressive.AttachToMonster(*this);
 		GetMonsterConfig("CaveSpider");
 }
 
@@ -29,25 +43,6 @@ void cCaveSpider::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
 }
-
-
-
-
-/*
-bool cCaveSpider::Attack(std::chrono::milliseconds a_Dt)
-{
-	if (!super::Attack(a_Dt))
-	{
-		return false;
-	}
-
-	if (GetTarget()->IsPawn())
-	{
-		// TODO: Easy = no poison, Medium = 7 seconds, Hard = 15 seconds
-		static_cast<cPawn *>(GetTarget())->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
-	}
-	return true;
-}*/
 
 
 

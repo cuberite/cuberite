@@ -12,6 +12,7 @@ cWitch::cWitch(void) :
 	super(mtWitch, "entity.witch.hurt", "entity.witch.death", 0.6, 1.8)
 {
 	m_EMPersonality = AGGRESSIVE;
+	m_BehaviorDoNothing.AttachToMonster(*this);
 	GetMonsterConfig("Witch");
 }
 

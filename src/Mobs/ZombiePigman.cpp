@@ -12,6 +12,9 @@ cZombiePigman::cZombiePigman(void) :
 	super(mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", 0.6, 1.8)
 {
 	m_EMPersonality = PASSIVE;
+	m_BehaviorAttackerMelee.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
+	m_BehaviorAggressive.AttachToMonster(*this);
 	GetMonsterConfig("ZombiePigman");
 }
 

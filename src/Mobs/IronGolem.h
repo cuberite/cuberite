@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Monster.h"
-
+#include "Behaviors/BehaviorWanderer.h"
 
 
 
@@ -22,6 +22,9 @@ public:
 	// Iron golems do not drown nor float
 	virtual void HandleAir(void) override {}
 	virtual void SetSwimState(cChunk & a_Chunk) override {}
+
+private:
+	cBehaviorWanderer m_BehaviorWanderer;
 } ;
 
 

@@ -7,11 +7,19 @@
 #include "../Entities/Player.h"
 #include "../Chunk.h"
 
+bool AggressiveAtNightFunction(cBehaviorAggressive & a_Behavior, cMonster & a_Monster)
+{
+
+}
 
 cSpider::cSpider(void) :
-	super(mtSpider, "entity.spider.hurt", "entity.spider.death", 1.4, 0.9)
+	super(mtSpider, "entity.spider.hurt", "entity.spider.death", 1.4, 0.9) ,
+	m_BehaviorAggressive(AggressiveAtNightFunction)
 {
 	m_EMPersonality = AGGRESSIVE;
+	m_BehaviorAttackerMelee.AttachToMonster(*this);
+	m_BehaviorWanderer.AttachToMonster(*this);
+	m_BehaviorAggressive.AttachToMonster(*this);
 	GetMonsterConfig("Spider");
 }
 

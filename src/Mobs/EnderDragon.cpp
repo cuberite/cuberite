@@ -12,6 +12,7 @@ cEnderDragon::cEnderDragon(void) :
 	super(mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", 16.0, 8.0)
 {
 		m_EMPersonality = AGGRESSIVE;
+		m_BehaviorDoNothing.AttachToMonster(*this);
 		GetMonsterConfig("EnderDragon");
 }
 

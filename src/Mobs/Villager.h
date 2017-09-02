@@ -10,7 +10,7 @@
 #include "Behaviors/BehaviorWanderer.h"
 #include "Monster.h"
 
-
+#include "Behaviors/BehaviorDoNothing.h"
 
 class cVillager :
 	public cMonster
@@ -59,17 +59,12 @@ public:
 
 private:
 	// Tick controlling behaviors
-	cBehaviorBreeder m_BehaviorBreeder;
-	cBehaviorItemFollower m_BehaviorItemFollower;
-	cBehaviorCoward m_BehaviorCoward;
-	cBehaviorWanderer m_BehaviorWanderer;
-
+	cBehaviorDoNothing m_BehaviorDoNothing;
 
 	int m_ActionCountDown;
 	int m_Type;
 	bool m_VillagerAction;
 	Vector3i m_CropsPos;
-
 } ;
 
 

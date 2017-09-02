@@ -11,6 +11,7 @@ cMagmaCube::cMagmaCube(int a_Size) :
 	m_Size(a_Size)
 {
 	m_EMPersonality = AGGRESSIVE;
+	m_BehaviorDoNothing.AttachToMonster(*this);
 	GetMonsterConfig("MagmaCube");
 }
 

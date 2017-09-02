@@ -6,6 +6,16 @@
 #include "../../Chunk.h"
 #include "../../Entities/Player.h"
 
+
+
+cBehaviorAggressive::cBehaviorAggressive(ShouldBeAggressiveFunction a_ShouldBeAggressiveFunction)
+	: m_ShouldBeAggressiveFunction(a_ShouldBeAggressiveFunction)
+	, m_ShouldBeAgressive(true)
+	, m_AgressionCheckCountdown(1)
+{
+
+}
+
 void cBehaviorAggressive::AttachToMonster(cMonster & a_Parent)
 {
 	m_Parent = &a_Parent;
@@ -17,6 +27,20 @@ void cBehaviorAggressive::PreTick(std::chrono::milliseconds a_Dt, cChunk & a_Chu
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
+
+	if (m_ShouldBeAggressiveFunction != nullptr)
+	{
+		if (--m_AgressionCheckCountdown == 0)
+		{
+			m_AgressionCheckCountdown = 40;
+			m_ShouldBeAgressive = m_ShouldBeAggressiveFunction(*this, *m_Parent);
+		}
+	}
+
+	if (!m_ShouldBeAgressive)
+	{
+		return;
+	}
 
 	// Target something new if we have no target
 	cBehaviorAttacker * BehaviorAttacker = m_Parent->GetBehaviorAttacker();

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Monster.h"
-
+#include "Behaviors/BehaviorAttackerMelee.h"
+#include "Behaviors/BehaviorWanderer.h"
+#include "Behaviors/BehaviorAggressive.h"
 
 
 
@@ -21,6 +23,13 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	virtual bool IsUndead(void) override { return true; }
+
+	// tick behaviors
+	cBehaviorAttackerMelee m_BehaviorAttackerMelee;
+	cBehaviorWanderer m_BehaviorWanderer;
+
+	// other behaviors
+	cBehaviorAggressive m_BehaviorAggressive;
 } ;
 
 

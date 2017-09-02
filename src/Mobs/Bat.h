@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Monster.h"
-
+#include "Behaviors/BehaviorWanderer.h"
 
 
 
@@ -18,6 +18,9 @@ public:
 	CLASS_PROTODEF(cBat)
 
 	bool IsHanging(void) const {return false; }
+
+private:
+	cBehaviorWanderer m_BehaviorWanderer;
 } ;
 
 

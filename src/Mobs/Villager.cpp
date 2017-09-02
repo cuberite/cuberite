@@ -18,10 +18,7 @@ cVillager::cVillager(eVillagerType VillagerType) :
 	m_VillagerAction(false)
 {
 	m_EMPersonality = PASSIVE;
-	m_BehaviorBreeder.AttachToMonster(*this);
-	m_BehaviorCoward.AttachToMonster(*this);
-	m_BehaviorItemFollower.AttachToMonster(*this);
-	m_BehaviorWanderer.AttachToMonster(*this);
+	m_BehaviorDoNothing.AttachToMonster(*this);
 	GetMonsterConfig("Villager");
 }
 

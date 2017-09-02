@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Monster.h"
-
+#include "Behaviors/BehaviorDoNothing.h"
 
 
 
@@ -28,6 +28,9 @@ protected:
 
 	/** Size of the MagmaCube, with 1 being the smallest */
 	int m_Size;
+
+private:
+	cBehaviorDoNothing m_BehaviorDoNothing;
 } ;
 
 

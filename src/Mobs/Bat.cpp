@@ -9,6 +9,8 @@ cBat::cBat(void) :
 {
 	SetGravity(-2.0f);
 	SetAirDrag(0.05f);
+	m_EMPersonality = PASSIVE;
+	m_BehaviorWanderer.AttachToMonster(*this);
 	GetMonsterConfig("Bat");
 }
 

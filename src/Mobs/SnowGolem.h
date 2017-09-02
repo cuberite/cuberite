@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Monster.h"
-
+#include "Behaviors/BehaviorWanderer.h"
 
 
 
@@ -19,6 +19,9 @@ public:
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+
+private:
+	cBehaviorWanderer m_BehaviorWanderer;
 } ;
 
 

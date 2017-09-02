@@ -12,6 +12,7 @@ cGhast::cGhast(void) :
 	super(mtGhast, "entity.ghast.hurt", "entity.ghast.death", 4, 4)
 {
 	m_EMPersonality = AGGRESSIVE;
+	m_BehaviorDoNothing.AttachToMonster(*this);
 	GetMonsterConfig("Ghast");
 }
 
