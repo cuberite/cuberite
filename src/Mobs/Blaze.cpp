@@ -12,22 +12,19 @@ void FireballShootingFunction(cBehaviorAttackerRanged & a_Behavior,
 	UNUSED(a_Behavior);
 
 	// Setting this higher gives us more wiggle room for attackrate
-	Vector3d Speed = a_Attacker.GetLookVector() * 4;
+	Vector3d Speed = a_Attacker.GetLookVector() * 20;
 	Speed.y = Speed.y + 3;
 
 	auto FireCharge = cpp14::make_unique<cFireChargeEntity>(&a_Attacker,
-		a_Attacked.GetPosX(), a_Attacked.GetPosY() + 1, a_Attacked.GetPosZ(), Speed);
+		a_Attacker.GetPosX(), a_Attacker.GetPosY() + 1, a_Attacker.GetPosZ(), Speed);
 	auto FireChargePtr = FireCharge.get();
 	FireChargePtr->Initialize(std::move(FireCharge), *(a_Attacker.GetWorld()));
 }
 
 
-
-
-
 cBlaze::cBlaze(void) :
 	super(mtBlaze, "entity.blaze.hurt", "entity.blaze.death", 0.6, 1.8),
-	m_BehaviorAttackerRanged(FireballShootingFunction, 3, 5)
+	m_BehaviorAttackerRanged(FireballShootingFunction, 3, 15)
 {
 	m_EMPersonality = AGGRESSIVE;
 	m_BehaviorAttackerRanged.AttachToMonster(*this);

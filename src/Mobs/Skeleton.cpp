@@ -16,7 +16,7 @@ void ArrowShootingFunction(cBehaviorAttackerRanged & a_Behavior,
 	Speed.y += Random.RandInt(-1, 1);
 
 	auto Arrow = cpp14::make_unique<cArrowEntity>(&a_Attacker,
-		a_Attacked.GetPosX(), a_Attacked.GetPosY() + 1, a_Attacked.GetPosZ(), Speed);
+		a_Attacker.GetPosX(), a_Attacker.GetPosY() + 1, a_Attacker.GetPosZ(), Speed);
 	auto ArrowPtr = Arrow.get();
 	ArrowPtr->Initialize(std::move(Arrow), *(a_Attacker.GetWorld()));
 }
