@@ -303,6 +303,8 @@ public:
 	/** Exported in ManualBindings */
 	const Vector3d & GetPosition(void) const { return m_Position; }
 
+	const Vector3i GetHeadPosition(void);
+
 	/** Exported in ManualBindings */
 	const Vector3d & GetSpeed(void) const { return m_Speed; }
 

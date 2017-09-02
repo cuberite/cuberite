@@ -406,6 +406,16 @@ void cEntity::SetPitchFromSpeed(void)
 
 
 
+const Vector3i cEntity::GetHeadPosition(void)
+{
+	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
+	return Vector3i(POSX_TOINT, HeadHeight, POSZ_TOINT);
+}
+
+
+
+
+
 bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (m_Health <= 0)

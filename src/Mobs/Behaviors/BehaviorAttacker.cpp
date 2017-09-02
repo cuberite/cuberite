@@ -55,6 +55,12 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);
 
+	if (m_Parent->GetHealth() <= 0.0)
+	{
+		// mobTodo put this elsewhere?
+		return;
+	}
+
 	if (m_IsStriking)
 	{
 		if (StrikeTarget(++m_StrikeTickCnt))
@@ -91,13 +97,13 @@ void cBehaviorAttacker::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (GetTarget() != nullptr)
 	{
 		m_Parent->SetLookingAt(m_Target);
-		if (TargetOutOfSight())
+		if (TargetTooFar())
 		{
 			SetTarget(nullptr);
 		}
 		else
 		{
-			if (TargetIsInStrikeRadiusAndLineOfSight())
+			if (TargetIsInStrikeRadius() && TargetIsInLineOfSight())
 			{
 				m_Parent->StopMovingToPosition();
 				StrikeTargetIfReady();
@@ -216,6 +222,7 @@ void cBehaviorAttacker::StrikeTarget()
 bool cBehaviorAttacker::TargetIsInStrikeRadius(void)
 {
 	ASSERT(GetTarget() != nullptr);
+	ASSERT(m_Parent != nullptr);
 	return ((GetTarget()->GetPosition() - m_Parent->GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange));
 }
 
@@ -223,34 +230,44 @@ bool cBehaviorAttacker::TargetIsInStrikeRadius(void)
 
 
 
-bool cBehaviorAttacker::TargetIsInStrikeRadiusAndLineOfSight()
+bool cBehaviorAttacker::TargetIsInLineOfSight()
 {
-	ASSERT(m_Target != nullptr);
+	ASSERT(GetTarget() != nullptr);
 	ASSERT(m_Parent != nullptr);
 
 
-	cTracer LineOfSight(m_Parent->GetWorld());
-	Vector3d MyHeadPosition = m_Parent->GetPosition() + Vector3d(0, m_Parent->GetHeight(), 0);
-	Vector3d AttackDirection(GetTarget()->GetPosition() + Vector3d(0, GetTarget()->GetHeight(), 0) - MyHeadPosition);
+	// mobtodo make this smarter
 
-	if (TargetIsInStrikeRadius()/* &&
-			!LineOfSight.Trace(MyHeadPosition, AttackDirection, static_cast<int>(AttackDirection.Length()))*/ &&
-			(m_Parent->GetHealth() > 0.0)
+	cTracer LineOfSight(m_Parent->GetWorld());
+	Vector3d MyHeadPosition = m_Parent->GetHeadPosition();
+	Vector3d TargetHeadPosition = GetTarget()->GetHeadPosition();
+	Vector3d AttackDirection1(TargetHeadPosition - MyHeadPosition);
+
+	if (LineOfSight.Trace(MyHeadPosition, AttackDirection1,
+		static_cast<int>(AttackDirection1.Length()))
 	)
-	{
-		return true;
-	}
-	else
 	{
 		return false;
 	}
+
+	Vector3d MyFeetPosition = m_Parent->GetPosition() + Vector3d(0, 0.5, 0);
+	Vector3d TargetFeetPosition = GetTarget()->GetPosition() + Vector3d(0, 0.5, 0);
+	Vector3d AttackDirection2(TargetFeetPosition - MyFeetPosition);
+	if (LineOfSight.Trace(MyFeetPosition, AttackDirection2,
+		static_cast<int>(AttackDirection2.Length()))
+	)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 
 
 
 
-bool cBehaviorAttacker::TargetOutOfSight()
+bool cBehaviorAttacker::TargetTooFar()
 {
 	ASSERT(m_Target != nullptr);
 	if ((GetTarget()->GetPosition() - m_Parent->GetPosition()).Length() > m_Parent->GetSightDistance())

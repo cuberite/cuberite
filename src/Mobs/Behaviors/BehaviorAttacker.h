@@ -52,8 +52,8 @@ protected:
 
 	// Target related methods
 	bool TargetIsInStrikeRadius();
-	bool TargetIsInStrikeRadiusAndLineOfSight();
-	bool TargetOutOfSight();
+	bool TargetIsInLineOfSight();
+	bool TargetTooFar();
 	void StrikeTargetIfReady(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	// Cooldown stuff
