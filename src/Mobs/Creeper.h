@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Monster.h"
-
+#include "Behaviors/BehaviorAttackerSuicideBomber.h"
 
 
 
@@ -21,15 +21,12 @@ public:
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
-	bool IsBlowing(void) const {return m_bIsBlowing; }
-	bool IsCharged(void) const {return m_bIsCharged; }
-	bool IsBurnedWithFlintAndSteel(void) const {return m_BurnedWithFlintAndSteel; }
+	bool IsBlowing(void) const {return m_BehaviorSuicideBomber.IsBlowing(); }
+	bool IsCharged(void) const {return m_BehaviorSuicideBomber.IsCharged(); }
+	bool IsBurnedWithFlintAndSteel(void) const {return m_BehaviorSuicideBomber.IsBurnedWithFlintAndSteel(); }
 
 private:
-
-	bool m_bIsBlowing, m_bIsCharged, m_BurnedWithFlintAndSteel;
-	int m_ExplodingTimer;
-
+	cBehaviorSuicideBomer m_BehaviorSuicideBomber;
 } ;
 
 

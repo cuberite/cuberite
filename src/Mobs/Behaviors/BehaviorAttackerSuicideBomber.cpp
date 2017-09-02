@@ -3,29 +3,18 @@
 #include "BehaviorAttackerSuicideBomber.h"
 #include "../Monster.h"
 #include "../../Entities/Pawn.h"
+#include "../../Entities/Player.h"
 #include "../../BlockID.h"
 
-bool cBehaviorAttackerSuicideBomber::StrikeTarget(int a_StrikeTickCnt)
+void cBehaviorAttackerSuicideBomber::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	UNUSED(a_StrikeTickCnt);
-	//mobTodo
-	return true; // Finish the strike. It only takes 1 tick.
-}
-
-/*
-	if (!IsTicking())
-	{
-		// The base class tick destroyed us
-		return;
-	}
-
 	if (((GetTarget() == nullptr) || !TargetIsInRange()) && !m_BurnedWithFlintAndSteel)
 	{
 		if (m_bIsBlowing)
 		{
 			m_ExplodingTimer = 0;
 			m_bIsBlowing = false;
-			m_World->BroadcastEntityMetadata(*this);
+			m_Parent->GetWorld()->BroadcastEntityMetadata(*this);
 		}
 	}
 	else
@@ -35,10 +24,50 @@ bool cBehaviorAttackerSuicideBomber::StrikeTarget(int a_StrikeTickCnt)
 			m_ExplodingTimer += 1;
 		}
 
-		if ((m_ExplodingTimer == 30) && (GetHealth() > 0.0))  // only explode when not already dead
+		if ((m_ExplodingTimer == 30) && (m_Parent->GetHealth() > 0.0))  // only explode when not already dead
 		{
-			m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, esMonster, this);
-			Destroy();  // Just in case we aren't killed by the explosion
+			m_Parent->GetWorld()->DoExplosionAt((m_bIsCharged ? 5 : 3), m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), false, esMonster, this);
+			m_Parent->Destroy();  // Just in case we aren't killed by the explosion
 		}
 	}
- */
+
+	cBehaviorAttacker::Tick(a_Dt, a_Chunk);
+}
+
+
+
+
+
+bool cBehaviorAttackerSuicideBomber::StrikeTarget(int a_StrikeTickCnt)
+{
+	UNUSED(a_StrikeTickCnt);
+
+	if (!m_bIsBlowing)
+	{
+		m_Parent->GetWorld()->BroadcastSoundEffect("entity.creeper.primed", m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), 1.f, (0.75f + (static_cast<float>((m_Parent->GetUniqueID() * 23) % 32)) / 64));
+		m_bIsBlowing = true;
+		m_Parent->GetWorld()->BroadcastEntityMetadata(*this);
+
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+void cBehaviorAttackerSuicideBomber::OnRightClicked(cPlayer & a_Player)
+{
+	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_FLINT_AND_STEEL))
+	{
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.UseEquippedItem();
+		}
+		m_Parent->GetWorld()->BroadcastSoundEffect("entity.creeper.primed", m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), 1.f, (0.75f + (static_cast<float>((m_Parent->GetUniqueID() * 23) % 32)) / 64));
+		m_bIsBlowing = true;
+		m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
+		m_BurnedWithFlintAndSteel = true;
+	}
+}
