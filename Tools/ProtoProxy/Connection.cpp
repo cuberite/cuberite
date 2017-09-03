@@ -1,4 +1,4 @@
-
+﻿
 // Connection.cpp
 
 // Interfaces to the cConnection class representing a single pair of connected sockets
@@ -7,7 +7,7 @@
 #include "Connection.h"
 #include "Server.h"
 #include <iostream>
-#include "PolarSSL++/CryptoKey.h"
+#include "mbedTLS++/CryptoKey.h"
 #include "../../src/Logger.h"
 
 #ifdef _WIN32

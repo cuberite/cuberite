@@ -8,7 +8,7 @@ set_lib_flags()
 
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
-include_directories(SYSTEM "../../lib/polarssl/include")
+include_directories(SYSTEM "../../lib/mbedtls/include")
 include_directories("../../src")
 
 function(flatten_files arg1)
@@ -20,7 +20,7 @@ function(flatten_files arg1)
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
 
-include(../../lib/polarssl.cmake)
+include(../../lib/mbedtls.cmake)
 add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
 
 set_exe_flags()
@@ -30,12 +30,12 @@ set(SHARED_SRC
 	../../src/ByteBuffer.cpp
 	../../src/StringUtils.cpp
 	../../src/UUID.cpp
-	../../src/PolarSSL++/AesCfb128Decryptor.cpp
-	../../src/PolarSSL++/AesCfb128Encryptor.cpp
-	../../src/PolarSSL++/CryptoKey.cpp
-	../../src/PolarSSL++/CtrDrbgContext.cpp
-	../../src/PolarSSL++/EntropyContext.cpp
-	../../src/PolarSSL++/RsaPrivateKey.cpp
+	../../src/mbedTLS++/AesCfb128Decryptor.cpp
+	../../src/mbedTLS++/AesCfb128Encryptor.cpp
+	../../src/mbedTLS++/CryptoKey.cpp
+	../../src/mbedTLS++/CtrDrbgContext.cpp
+	../../src/mbedTLS++/EntropyContext.cpp
+	../../src/mbedTLS++/RsaPrivateKey.cpp
 	../../src/LoggerListeners.cpp
 	../../src/Logger.cpp
 )
@@ -43,12 +43,12 @@ set(SHARED_HDR
 	../../src/ByteBuffer.h
 	../../src/StringUtils.h
 	../../src/UUID.h
-	../../src/PolarSSL++/AesCfb128Decryptor.h
-	../../src/PolarSSL++/AesCfb128Encryptor.h
-	../../src/PolarSSL++/CryptoKey.h
-	../../src/PolarSSL++/CtrDrbgContext.h
-	../../src/PolarSSL++/EntropyContext.h
-	../../src/PolarSSL++/RsaPrivateKey.h
+	../../src/mbedTLS++/AesCfb128Decryptor.h
+	../../src/mbedTLS++/AesCfb128Encryptor.h
+	../../src/mbedTLS++/CryptoKey.h
+	../../src/mbedTLS++/CtrDrbgContext.h
+	../../src/mbedTLS++/EntropyContext.h
+	../../src/mbedTLS++/RsaPrivateKey.h
 )
 set(SHARED_OSS_SRC
 	../../src/OSSupport/CriticalSection.cpp
