@@ -3522,6 +3522,17 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the world where the entity resides",
 				},
+				GetWaterState =
+				{
+					Returns =
+					{
+						{
+							Name = "WaterState",
+							Type = "cEntity#eWaterState",
+						},
+					},
+					Notes = "Returns the water state of the entity",
+				},
 				GetYaw =
 				{
 					Returns =
@@ -3813,7 +3824,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if the entity is submerged in water (head is in a water block). Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of GetWaterState()</b>",
 				},
 				IsSwimming =
 				{
@@ -3823,7 +3834,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if the entity is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of GetWaterState()</b>",
 				},
 				IsTicking =
 				{
@@ -4400,6 +4411,18 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				{
 					Notes = "The entity is a {{cTNTEntity}}",
 				},
+				wsDry =
+				{
+					Notes = "The entity is not in water",
+				},
+				wsInWater =
+				{
+					Notes = "The bottom of the entity is in water",
+				},
+				wsUnderWater =
+				{
+					Notes = "The top of the entity is in water",
+				},
 			},
 			ConstantGroups =
 			{
@@ -4407,6 +4430,11 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				{
 					Include = "et.*",
 					TextBefore = "The following constants are used to distinguish between different entity types:",
+				},
+				eWaterState =
+				{
+					Include = "ws.*",
+					TextBefore = "The following constants are used to distinguish between different water states:",
 				},
 			},
 		},
@@ -8818,7 +8846,7 @@ a_Player:OpenWindow(Window);
 						}
 					},
 					Notes = "Leash the monster to an entity.",
-				},				
+				},
 				MobTypeToString =
 				{
 					IsStatic = true,
@@ -15802,7 +15830,7 @@ end
 				E_ITEM_LEASH =
 				{
 					Notes = "The itemtype for lead (E_ITEM_LEAD synonym)"
-				},				
+				},
 				E_ITEM_LEATHER =
 				{
 					Notes = "The itemtype for leather"
@@ -17532,4 +17560,3 @@ end
 		"__.*__",
 	},
 }
-
