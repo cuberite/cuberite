@@ -55,7 +55,7 @@ public:
 	/** GetPacketId is implemented in each protocol version class */
 	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override
 	{
-		ASSERT(!"cProtocolRecognizer::GetPacketId should never be called! Something is horribly wrong! (it implies that someone other than a Protocol-derived class is calling GetPacketId)");
+		ASSERT(!"cProtocolRecognizer::GetPacketId should never be called! Something is horribly wrong! (this method being called implies that someone other than a Protocol-derived class is calling GetPacketId)");
 		return 0;
 	}
 
