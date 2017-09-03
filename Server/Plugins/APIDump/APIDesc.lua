@@ -3724,6 +3724,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is invisible",
 				},
+				IsInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the bottom of the entity is in water",
+				},
 				IsItemFrame =
 				{
 					Returns =
@@ -3872,7 +3882,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if the entity is submerged in water (head is in a water block). Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsUnderWater()</b>",
 				},
 				IsSwimming =
 				{
@@ -3882,7 +3892,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if the entity is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsInWater()</b>",
 				},
 				IsTicking =
 				{
@@ -3903,6 +3913,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if the entity represents a {{cTNTEntity|TNT entity}}",
+				},
+				IsUnderWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the top of the entity is in water",
 				},
 				Killed =
 				{
