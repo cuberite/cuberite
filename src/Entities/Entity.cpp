@@ -1182,6 +1182,12 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
+	// Fireproof entities burn out on the next tick
+	if (IsFireproof()) {
+		m_TicksLeftBurning = 0;
+	}
+
+	// Fire is extinguished by rain
 	if (GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT))
 	{
 		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
