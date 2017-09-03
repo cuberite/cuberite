@@ -1,4 +1,4 @@
-
+﻿
 // HTTPServer.h
 
 // Declares the cHTTPServer class representing a HTTP webserver that uses cListenThread and cSocketThreads for processing
@@ -11,8 +11,8 @@
 
 #include "../OSSupport/Network.h"
 #include "../IniFile.h"
-#include "PolarSSL++/CryptoKey.h"
-#include "PolarSSL++/X509Cert.h"
+#include "mbedTLS++/CryptoKey.h"
+#include "mbedTLS++/X509Cert.h"
 
 
 
@@ -21,6 +21,7 @@
 // fwd:
 class cHTTPIncomingRequest;
 class cHTTPServerConnection;
+class cSslConfig;
 
 
 
@@ -70,11 +71,8 @@ protected:
 	/** The callbacks to call for various events */
 	cCallbacks * m_Callbacks;
 
-	/** The server certificate to use for the SSL connections */
-	cX509CertPtr m_Cert;
-
-	/** The private key for m_Cert. */
-	cCryptoKeyPtr m_CertPrivKey;
+	/** Configuration for server ssl connections. */
+	std::shared_ptr<const cSslConfig> m_SslConfig;
 
 
 	/** Called by cHTTPServerListenCallbacks when there's a new incoming connection.

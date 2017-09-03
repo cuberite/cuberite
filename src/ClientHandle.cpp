@@ -1,4 +1,4 @@
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+﻿#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ClientHandle.h"
 #include "Server.h"
@@ -33,7 +33,7 @@
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
 
-#include "polarssl/md5.h"
+#include "mbedtls/md5.h"
 
 
 
@@ -722,9 +722,10 @@ bool cClientHandle::HandleLogin(const AString & a_Username)
 		// Let the plugins know about this event, they may refuse the player:
 		if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, m_ProtocolVersion, a_Username))
 		{
-			Destroy();
+			SendDisconnect("Login Rejected!");
 			return false;
 		}
+
 		m_State = csAuthenticating;
 	}  // lock(m_CSState)
 
