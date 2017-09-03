@@ -7,8 +7,8 @@
 [submodule "Server/Plugins/ChatLog"]
 	path = Server/Plugins/ChatLog
 	url = https://github.com/cuberite/ChatLog.git
-[submodule "lib/polarssl"]
-	path = lib/polarssl
+[submodule "lib/mbedtls"]
+	path = lib/mbedtls
 	url = https://github.com/cuberite/polarssl.git
 	ignore = dirty
 [submodule "lib/SQLiteCpp"]

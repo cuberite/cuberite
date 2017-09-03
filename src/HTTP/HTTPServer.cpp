@@ -1,4 +1,4 @@
-
+﻿
 // HTTPServer.cpp
 
 // Implements the cHTTPServer class representing a HTTP webserver that uses cListenThread and cSocketThreads for processing
@@ -9,6 +9,7 @@
 #include "HTTPServerConnection.h"
 #include "HTTPFormParser.h"
 #include "SslHTTPServerConnection.h"
+#include "mbedTLS++/SslConfig.h"
 
 
 
@@ -88,17 +89,23 @@ bool cHTTPServer::Initialize(void)
 	AString KeyFile  = cFile::ReadWholeFile("webadmin/httpskey.pem");
 	if (!CertFile.empty() && !KeyFile.empty())
 	{
-		m_Cert.reset(new cX509Cert);
-		int res = m_Cert->Parse(CertFile.data(), CertFile.size());
+		auto Cert = std::make_shared<cX509Cert>();
+		int res = Cert->Parse(CertFile.data(), CertFile.size());
 		if (res == 0)
 		{
-			m_CertPrivKey.reset(new cCryptoKey);
-			int res2 = m_CertPrivKey->ParsePrivate(KeyFile.data(), KeyFile.size(), "");
-			if (res2 != 0)
+			auto CertPrivKey = std::make_shared<cCryptoKey>();
+			res = CertPrivKey->ParsePrivate(KeyFile.data(), KeyFile.size(), "");
+			if (res == 0)
+			{
+				// Modifyable locally but otherwise must be const
+				auto Config = cSslConfig::MakeDefaultConfig(false);
+				Config->SetOwnCert(Cert, CertPrivKey);
+				m_SslConfig = std::move(Config);
+			}
+			else
 			{
 				// Reading the private key failed, reset the cert:
-				LOGWARNING("WebServer: Cannot read HTTPS certificate private key: -0x%x", -res2);
-				m_Cert.reset();
+				LOGWARNING("WebServer: Cannot read HTTPS certificate private key: -0x%x", -res);
 			}
 		}
 		else
@@ -108,7 +115,7 @@ bool cHTTPServer::Initialize(void)
 	}
 
 	// Notify the admin about the HTTPS / HTTP status
-	if (m_Cert.get() == nullptr)
+	if (m_SslConfig == nullptr)
 	{
 		LOGWARNING("WebServer: The server will run in unsecured HTTP mode.");
 		LOGINFO("Put a valid HTTPS certificate in file 'webadmin/httpscert.crt' and its corresponding private key to 'webadmin/httpskey.pem' (without any password) to enable HTTPS support");
@@ -184,9 +191,9 @@ cTCPLink::cCallbacksPtr cHTTPServer::OnIncomingConnection(const AString & a_Remo
 	UNUSED(a_RemoteIPAddress);
 	UNUSED(a_RemotePort);
 
-	if (m_Cert.get() != nullptr)
+	if (m_SslConfig != nullptr)
 	{
-		return std::make_shared<cSslHTTPServerConnection>(*this, m_Cert, m_CertPrivKey);
+		return std::make_shared<cSslHTTPServerConnection>(*this, m_SslConfig);
 	}
 	else
 	{

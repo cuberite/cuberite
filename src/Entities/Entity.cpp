@@ -1353,12 +1353,13 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown)
+void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
 	m_NewWorld = a_World;
 	m_NewWorldPosition = a_NewPosition;
 	m_IsWorldChangeScheduled = true;
 	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
+	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
 }
 
 
@@ -1378,7 +1379,7 @@ bool cEntity::DetectPortal()
 			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 		}
 
-		MoveToWorld(m_NewWorld, false, m_NewWorldPosition);
+		MoveToWorld(m_NewWorld, m_WorldChangeSendRespawn, m_NewWorldPosition);
 		return true;
 	}
 
@@ -1681,7 +1682,8 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	m_IsSwimming = IsBlockWater(BlockIn);
 
 	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY + 1, RelZ, BlockIn));
+	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn));
 	m_IsSubmerged = IsBlockWater(BlockIn);
 }
 
@@ -1713,7 +1715,7 @@ void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 void cEntity::HandleAir(void)
 {
 	// Ref.: https://minecraft.gamepedia.com/Chunk_format
-	// See if the entity is /submerged/ water (block above is water)
+	// See if the entity is /submerged/ water (head is in water)
 	// Get the type of block the entity is standing in:
 
 	int RespirationLevel = static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
