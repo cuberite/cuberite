@@ -2087,6 +2087,12 @@ void cClientHandle::Tick(float a_Dt)
 		return;
 	}
 
+	// If player has been kicked, terminate the connection:
+	if (m_State == csKicked)
+	{
+		m_Link->Shutdown();
+	}
+
 	// If destruction is queued, destroy now:
 	if (m_State == csQueuedForDestruction)
 	{
@@ -2515,6 +2521,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
 		m_Protocol->SendDisconnect(a_Reason);
 		m_HasSentDC = true;
+		m_State = csKicked;
 	}
 }
 
@@ -3389,7 +3396,3 @@ void cClientHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	}
 	SocketClosed();
 }
-
-
-
-
