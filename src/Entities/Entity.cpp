@@ -1183,7 +1183,8 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
 	// Fireproof entities burn out on the next tick
-	if (IsFireproof()) {
+	if (IsFireproof())
+	{
 		m_TicksLeftBurning = 0;
 	}
 
