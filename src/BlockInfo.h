@@ -28,7 +28,7 @@ public:
 	/** How much light do the blocks consume? */
 	NIBBLETYPE m_SpreadLightFalloff;
 
-	/** Is a block completely transparent to blocklight? (light doesn't get decreased(?)) */
+	/** Is a block transparent? (https://minecraft.gamepedia.com/Opacity) */
 	bool m_Transparent;
 
 	/** Is a block destroyed after a single hit? */
