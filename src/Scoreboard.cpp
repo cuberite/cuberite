@@ -13,7 +13,7 @@
 
 
 
-AString cObjective::TypeToString(eType a_Type)
+AString cObjective::TypeToString(Criteria a_Type)
 {
 	switch (a_Type.m_Criteria)
 	{
@@ -53,10 +53,10 @@ AString cObjective::TypeToString(eType a_Type)
 
 
 
-cObjective::eType cObjective::StringToType(const AString & a_Name)
+cObjective::Criteria cObjective::StringToType(const AString & a_Name)
 {
 	// For some, we don't have to do any further processing
-	static const std::map<AString, eType> SimpleCriteria =
+	static const std::map<AString, Criteria> SimpleCriteria =
 	{
 		{"dummy", otDummy},
 		{"deathCount", otDeathCount},
@@ -79,13 +79,13 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 	{
 		AString Entity = a_Name.substr(16);
 		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return eType(otStatEntityKill, static_cast<int>(MonsterType));
+		return Criteria(otStatEntityKill, static_cast<int>(MonsterType));
 	}
 	if (a_Name.substr(0, 20) == "stat.entityKilledBy.")
 	{
 		AString Entity = a_Name.substr(20);
 		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return eType(otStatEntityKilledBy, static_cast<int>(MonsterType));
+		return Criteria(otStatEntityKilledBy, static_cast<int>(MonsterType));
 	}
 
 	// TODO: Handle other cases
@@ -97,7 +97,7 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 
 
 
-cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type, cWorld * a_World)
+cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::Criteria a_Type, cWorld * a_World)
 	: m_DisplayName(a_DisplayName)
 	, m_Name(a_Name)
 	, m_DisplayType(dispInteger)
@@ -457,7 +457,7 @@ cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 
 
 
-cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
+cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::Criteria a_Type)
 {
 	if (m_Objectives.count(a_Name) > 0)
 	{
@@ -685,7 +685,7 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 
 
-bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback & a_Callback)
+bool cScoreboard::ForEachObjectiveWith(cObjective::Criteria a_Type, cObjectiveCallback & a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -745,7 +745,7 @@ bool cScoreboard::ForEachTeam(cTeamCallback & a_Callback)
 
 
 
-void cScoreboard::AddToScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value)
+void cScoreboard::AddToScore(const AString & a_Name, cObjective::Criteria a_Type, cObjective::Score a_Value)
 {
 	cCSLock Lock(m_CSObjectives);
 

@@ -37,7 +37,7 @@ public:
 		dispHearts
 	};
 
-	enum eCriteria
+	enum eCriteriaClass
 	{
 		otDummy,
 
@@ -58,22 +58,22 @@ public:
 		otStatEntityKilledBy
 	};
 
-	struct eType
+	struct Criteria
 	{
-		eType(eCriteria a_Criteria) : m_Criteria(a_Criteria), m_SubCriteria(0) {}
-		eType(eCriteria a_Criteria, int a_SubCriteria) : m_Criteria(a_Criteria), m_SubCriteria(a_SubCriteria) {}
+		Criteria(eCriteriaClass a_Criteria) : m_Criteria(a_Criteria), m_SubCriteria(0) {}
+		Criteria(eCriteriaClass a_Criteria, int a_SubCriteria) : m_Criteria(a_Criteria), m_SubCriteria(a_SubCriteria) {}
 
-		bool operator ==(eType a_Other)
+		bool operator ==(Criteria a_Other)
 		{
 			return (m_Criteria == a_Other.m_Criteria) && (m_SubCriteria == a_Other.m_SubCriteria);
 		}
 
-		eCriteria m_Criteria;
+		eCriteriaClass m_Criteria;
 		int m_SubCriteria;
 	};
 
-	static eType StringToType(const AString & a_Name);
-	static AString TypeToString(eType a_Type);
+	static Criteria StringToType(const AString & a_Name);
+	static AString TypeToString(Criteria a_Type);
 
 	// tolua_end
 
@@ -87,11 +87,11 @@ public:
 
 public:
 
-	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type, cWorld * a_World);
+	cObjective(const AString & a_Name, const AString & a_DisplayName, Criteria a_Type, cWorld * a_World);
 
 	// tolua_begin
 
-	eType GetType(void) const { return m_Type; }
+	Criteria GetType(void) const { return m_Type; }
 
 	const AString & GetName(void)        const { return m_Name; }
 	const AString & GetDisplayName(void) const { return m_DisplayName; }
@@ -157,7 +157,7 @@ private:
 	/** (for list slots) whether to display as an integer or as hearts */
 	eDisplayType m_DisplayType;
 
-	eType m_Type;
+	Criteria m_Type;
 
 	cWorld * m_World;
 
@@ -323,7 +323,7 @@ public:
 	// tolua_begin
 
 	/** Registers a new scoreboard objective, returns the cObjective instance, nullptr on name collision */
-	cObjective * RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type);
+	cObjective * RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::Criteria a_Type);
 
 	/** Removes a registered objective, returns true if operation was successful */
 	bool RemoveObjective(const AString & a_Name);
@@ -361,7 +361,7 @@ public:
 	/** Adds the given score to the given key in all objectives matching
 	the given criteria. For example, one could add 1 to every playerKills
 	objective for "bob". */
-	void AddToScore(const AString & a_Key, cObjective::eType a_Type, cObjective::Score a_Value = 1);
+	void AddToScore(const AString & a_Key, cObjective::Criteria a_Type, cObjective::Score a_Value = 1);
 
 	// tolua_end
 
@@ -384,7 +384,7 @@ public:
 
 	/** Execute callback for each objective with the specified type
 	Returns true if all objectives processed, false if the callback aborted by returning true. */
-	bool ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback & a_Callback);
+	bool ForEachObjectiveWith(cObjective::Criteria a_Type, cObjectiveCallback & a_Callback);
 
 	/** Execute callback for each objective.
 	Returns true if all objectives have been processed, false if the callback aborted by returning true. */

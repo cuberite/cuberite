@@ -231,7 +231,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			RenderType = a_NBT.GetString(CurrLine);
 		}
 
-		cObjective::eType Type = cObjective::StringToType(CriteriaName);
+		cObjective::Criteria Type = cObjective::StringToType(CriteriaName);
 
 		cObjective * Objective = m_Scoreboard->RegisterObjective(Name, DisplayName, Type);
 		if (RenderType == "hearts")
