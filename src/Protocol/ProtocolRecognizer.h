@@ -52,9 +52,6 @@ public:
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
 
-	/** GetPacketId is implemented in each protocol version class */
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override { return 0; }
-
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
 
@@ -158,6 +155,13 @@ protected:
 
 	/** Is a server list ping for an unrecognized version currently occuring? */
 	bool m_InPingForUnrecognizedVersion;
+
+	/** GetPacketId is implemented in each protocol version class */
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override
+	{
+		ASSERT(!"cProtocolRecognizer::GetPacketId should never be called! Something is horribly wrong! (this method being called implies that someone other than a Protocol-derived class is calling GetPacketId)");
+		return 0;
+	}
 
 	// Packet handlers while in status state (m_InPingForUnrecognizedVersion == true)
 	void HandlePacketStatusRequest();
