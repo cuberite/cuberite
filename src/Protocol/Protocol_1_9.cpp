@@ -1226,7 +1226,7 @@ void cProtocol_1_9_0::SendScoreboardObjective(const cObjective & a_Objective, cO
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, GetPacketId(sendScoreboardObjective));  // Scoreboard objective packet
-	Pkt.WriteString(a_Name);
+	Pkt.WriteString(a_Objective.GetName());
 	Pkt.WriteBEUInt8(a_Mode);
 	if ((a_Mode == cObjective::uaCreate) || (a_Mode == cObjective::uaUpdateText))
 	{

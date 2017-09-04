@@ -114,6 +114,7 @@ public:
 		sendSpawnPosition,
 		sendStatistics,
 		sendTabCompletion,
+		sendTeam,
 		sendTeleportEntity,
 		sendTimeUpdate,
 		sendTitle,
