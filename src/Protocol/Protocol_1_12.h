@@ -30,8 +30,6 @@ class cProtocol_1_12 :
 public:
 	cProtocol_1_12(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
-
 	virtual void SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
 	virtual void SendHideTitle(void) override;
 	virtual void SendResetTitle(void) override;
@@ -45,6 +43,10 @@ protected:
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
+
+protected:
+
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
 };
 
 
@@ -59,9 +61,9 @@ class cProtocol_1_12_1 :
 public:
 	cProtocol_1_12_1(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
+protected:
 	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
 
-protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 };
