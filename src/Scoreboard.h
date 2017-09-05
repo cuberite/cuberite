@@ -80,9 +80,6 @@ public:
 		return Criteria(a_CriteriaString);
 	}
 
-	static Criteria StringToType(const AString & a_Name);
-	static AString TypeToString(Criteria a_Type);
-
 	// tolua_end
 
 	// For the "Scoreboard Objective" packet
