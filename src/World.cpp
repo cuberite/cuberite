@@ -3709,6 +3709,35 @@ bool cWorld::HasEntity(UInt32 a_UniqueID)
 
 
 
+OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
+{
+	// Check if the entity is in the chunkmap:
+	auto Entity = m_ChunkMap->RemoveEntity(a_Entity);
+
+	// If not, check if the entity is in the queue to be added to the world:
+	if (Entity == nullptr)
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		auto itr = std::find_if(m_EntitiesToAdd.begin(), m_EntitiesToAdd.end(),
+			[&a_Entity](const OwnedEntity & a_OwnedEntity)
+			{
+				return (a_OwnedEntity.get() == &a_Entity);
+			}
+		);
+
+		if (itr != m_EntitiesToAdd.end())
+		{
+			Entity = std::move(*itr);
+			m_EntitiesToAdd.erase(itr);
+		}
+	}
+	return Entity;
+}
+
+
+
+
+
 /*
 unsigned int cWorld::GetNumPlayers(void)
 {

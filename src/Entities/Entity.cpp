@@ -238,17 +238,17 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 		m_World->BroadcastDestroyEntity(*this);
 	}
 
-	cChunk * ParentChunk = GetParentChunk();
-	m_World->QueueTask([this, ParentChunk](cWorld & a_World)
+	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
+	m_World->QueueTask([this, ParentChunkCoords](cWorld & a_World)
 	{
 		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
 			this->GetUniqueID(), this->GetClass(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+			ParentChunkCoords.m_ChunkX, ParentChunkCoords.m_ChunkZ
 		);
 
 		// Make sure that RemoveEntity returned a valid smart pointer
 		// Also, not storing the returned pointer means automatic destruction
-		VERIFY(ParentChunk->RemoveEntity(*this));
+		VERIFY(a_World.RemoveEntity(*this));
 	});
 	Destroyed();
 }
@@ -1600,16 +1600,16 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Queue add to new world and removal from the old one
 	cWorld * OldWorld = GetWorld();
-	cChunk * ParentChunk = GetParentChunk();
+	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-	OldWorld->QueueTask([this, ParentChunk, a_World](cWorld & a_OldWorld)
+	OldWorld->QueueTask([this, ParentChunkCoords, a_World](cWorld & a_OldWorld)
 	{
 		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
 			this->GetUniqueID(), this->GetClass(),
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+			ParentChunkCoords.m_ChunkX, ParentChunkCoords.m_ChunkZ
 		);
-		a_World->AddEntity(ParentChunk->RemoveEntity(*this));
+		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
 	});
 	return true;
