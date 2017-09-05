@@ -39,7 +39,7 @@ public:
 
 	enum eCriteriaClass
 	{
-		otDummy,
+		otDummy = 0,
 
 		otDeathCount,
 		otPlayerKillCount,
@@ -62,15 +62,23 @@ public:
 	{
 		Criteria(eCriteriaClass a_Criteria) : m_Criteria(a_Criteria), m_SubCriteria(0) {}
 		Criteria(eCriteriaClass a_Criteria, int a_SubCriteria) : m_Criteria(a_Criteria), m_SubCriteria(a_SubCriteria) {}
+		Criteria(const AString & a_CriteriaString);
 
 		bool operator ==(Criteria a_Other)
 		{
 			return (m_Criteria == a_Other.m_Criteria) && (m_SubCriteria == a_Other.m_SubCriteria);
 		}
 
+		AString ToString(void) const;
+
 		eCriteriaClass m_Criteria;
 		int m_SubCriteria;
 	};
+
+	static Criteria StringToCriteria(const AString & a_CriteriaString)
+	{
+		return Criteria(a_CriteriaString);
+	}
 
 	static Criteria StringToType(const AString & a_Name);
 	static AString TypeToString(Criteria a_Type);

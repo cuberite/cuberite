@@ -13,9 +13,58 @@
 
 
 
-AString cObjective::TypeToString(Criteria a_Type)
+cObjective::Criteria::Criteria(const AString & a_CriteriaString)
 {
-	switch (a_Type.m_Criteria)
+	// For some, we don't have to do any further processing
+	static const std::map<AString, eCriteriaClass> SimpleCriteria =
+	{
+		{"dummy", otDummy},
+		{"deathCount", otDeathCount},
+		{"playerKillCount", otPlayerKillCount},
+		{"totalKillCount", otTotalKillCount},
+		{"health", otHealth}
+	};
+	auto it = SimpleCriteria.find(a_CriteriaString);
+	if (it != SimpleCriteria.end())
+	{
+		m_Criteria = it->second;
+		return;
+	}
+
+
+	// TODO: "achievement" is unimplemented (and, removed in MC 1.12, so maybe it shouldn't be implemented) - lkolbly 08/2017
+
+
+	// Some require converting entity names
+	if (a_CriteriaString.substr(0, 16) == "stat.killEntity.")
+	{
+		AString Entity = a_CriteriaString.substr(16);
+		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
+		m_Criteria = otStatEntityKill;
+		m_SubCriteria = static_cast<int>(MonsterType);
+		return;
+	}
+	if (a_CriteriaString.substr(0, 20) == "stat.entityKilledBy.")
+	{
+		AString Entity = a_CriteriaString.substr(20);
+		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
+		m_Criteria = otStatEntityKilledBy;
+		m_SubCriteria = static_cast<int>(MonsterType);
+		return;
+	}
+
+	// TODO: Handle other cases
+	LOGWARNING("Could not parse cObjective criteria '%s', returning otDummy", a_CriteriaString.c_str());
+	m_Criteria = otDummy;
+}
+
+
+
+
+
+AString cObjective::Criteria::ToString(void) const
+{
+	switch (m_Criteria)
 	{
 		case otDummy:              return "dummy";
 		case otDeathCount:         return "deathCount";
@@ -34,11 +83,11 @@ AString cObjective::TypeToString(Criteria a_Type)
 		// Have to convert the entity ID to a name
 		case otStatEntityKill:
 		{
-			return "stat.killEntity." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(a_Type.m_SubCriteria));
+			return "stat.killEntity." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(m_SubCriteria));
 		}
 		case otStatEntityKilledBy:
 		{
-			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(a_Type.m_SubCriteria));
+			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(m_SubCriteria));
 		}
 
 		// clang optimisises this line away then warns that it has done so.
@@ -46,51 +95,6 @@ AString cObjective::TypeToString(Criteria a_Type)
 		default: return "";
 		#endif
 	}
-
-}
-
-
-
-
-
-cObjective::Criteria cObjective::StringToType(const AString & a_Name)
-{
-	// For some, we don't have to do any further processing
-	static const std::map<AString, Criteria> SimpleCriteria =
-	{
-		{"dummy", otDummy},
-		{"deathCount", otDeathCount},
-		{"playerKillCount", otPlayerKillCount},
-		{"totalKillCount", otTotalKillCount},
-		{"health", otHealth}
-	};
-	auto it = SimpleCriteria.find(a_Name);
-	if (it != SimpleCriteria.end())
-	{
-		return it->second;
-	}
-
-
-	// TODO: "achievement" is unimplemented (and, removed in MC 1.12, so maybe it shouldn't be implemented) - lkolbly 08/2017
-
-
-	// Some require converting entity names
-	if (a_Name.substr(0, 16) == "stat.killEntity.")
-	{
-		AString Entity = a_Name.substr(16);
-		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return Criteria(otStatEntityKill, static_cast<int>(MonsterType));
-	}
-	if (a_Name.substr(0, 20) == "stat.entityKilledBy.")
-	{
-		AString Entity = a_Name.substr(20);
-		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return Criteria(otStatEntityKilledBy, static_cast<int>(MonsterType));
-	}
-
-	// TODO: Handle other cases
-	LOGWARNING("Could not parse cObjective criteria '%s', returning otDummy", a_Name.c_str());
-	return otDummy;
 }
 
 
