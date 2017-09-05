@@ -387,10 +387,6 @@ public:
 	void SetVisible( bool a_bVisible);  // tolua_export
 	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
-	/** Moves the player to the specified world.
-	Returns true if successful, false on failure (world not found). */
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) override;
-
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
 
@@ -727,6 +723,8 @@ protected:
 
 	/** The main hand of the player */
 	eMainHand m_MainHand;
+
+	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;

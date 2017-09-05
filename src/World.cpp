@@ -3113,23 +3113,30 @@ void cWorld::AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld)
 
 
 
-std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveFromChunk)
+std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player)
 {
-	std::unique_ptr<cPlayer> PlayerPtr;
+	// Check the chunkmap
+	std::unique_ptr<cPlayer> PlayerPtr(static_cast<cPlayer *>(m_ChunkMap->RemoveEntity(a_Player).release()));
 
-	if (a_RemoveFromChunk)
-	{
-		// To prevent iterator invalidations when an entity goes through a portal and calls this function whilst being ticked by cChunk
-		// we should not change cChunk's entity list if asked not to
-		PlayerPtr = std::unique_ptr<cPlayer>(static_cast<cPlayer *>(m_ChunkMap->RemoveEntity(a_Player).release()));
-	}
+	// Check the awaiting players list
+	if (PlayerPtr == nullptr)
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
-		m_PlayersToAdd.remove_if([&](const decltype(m_PlayersToAdd)::value_type & value) -> bool
+		auto itr = std::find_if(m_PlayersToAdd.begin(), m_PlayersToAdd.end(),
+			[&](const decltype(m_PlayersToAdd)::value_type & value)
+			{
+				return (value.first.get() == &a_Player);
+			}
+		);
+
+		if (itr != m_PlayersToAdd.end())
 		{
-			return (value.first.get() == &a_Player);
-		});
+			PlayerPtr = std::move(itr->first);
+			m_PlayersToAdd.erase(itr);
+		}
 	}
+
+	// Remove from the player list
 	{
 		cCSLock Lock(m_CSPlayers);
 		LOGD("Removing player %s from world \"%s\"", a_Player.GetName().c_str(), m_WorldName.c_str());

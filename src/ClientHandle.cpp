@@ -197,7 +197,7 @@ void cClientHandle::Destroy(void)
 				// If ownership was transferred, our own smart pointer should be unset
 				ASSERT(!m_PlayerPtr);
 
-				m_PlayerPtr = world->RemovePlayer(*player, true);
+				m_PlayerPtr = world->RemovePlayer(*player);
 
 				// And RemovePlayer should have returned a valid smart pointer
 				ASSERT(m_PlayerPtr);

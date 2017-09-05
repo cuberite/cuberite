@@ -70,6 +70,16 @@ struct TakeDamageInfo
 // tolua_begin
 class cEntity
 {
+protected:
+	/** State variables for MoveToWorld. */
+	struct sWorldChangeInfo
+	{
+		cWorld * m_NewWorld;
+		Vector3d m_NewPosition;
+		bool m_SetPortalCooldown;
+		bool m_SendRespawn;
+	};
+
 public:
 
 	enum eEntityType
@@ -433,9 +443,17 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false);
+	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false)
+	{
+		MoveToWorld(a_World, a_NewPosition, a_ShouldSetPortalCooldown, a_ShouldSendRespawn);
+	}
 
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+	bool MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false);
+
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+	{
+		return MoveToWorld(a_World, a_NewPosition, false, a_ShouldSendRespawn);
+	}
 
 	/** Moves entity to specified world, taking a world pointer */
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
@@ -444,8 +462,6 @@ public:
 	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 
 	// tolua_end
-
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
@@ -600,12 +616,8 @@ protected:
 
 	cWorld * m_World;
 
-	/** State variables for ScheduleMoveToWorld. */
-	bool m_IsWorldChangeScheduled;
-	bool m_WorldChangeSetPortalCooldown;
-	bool m_WorldChangeSendRespawn;
-	cWorld * m_NewWorld;
-	Vector3d m_NewWorldPosition;
+	/** If not nullptr, a world change is scheduled and a task is queued in the current world. */
+	std::unique_ptr<sWorldChangeInfo> m_WorldChangeInfo;
 
 	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;
@@ -651,6 +663,10 @@ protected:
 	/** Does the actual speed-setting. The default implementation just sets the member variable value;
 	overrides can provide further processing, such as forcing players to move at the given speed. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+
+	/** Handles the moving of this entity between worlds.
+	Should handle degenerate cases such as moving to the same world. */
+	virtual void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
 
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 
