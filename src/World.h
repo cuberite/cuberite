@@ -301,6 +301,10 @@ public:
 	Note: Only loaded chunks are considered. */
 	bool HasEntity(UInt32 a_UniqueID);
 
+	/** Removes the entity from the world.
+	Returns an owning reference to the found entity. */
+	OwnedEntity RemoveEntity(cEntity & a_Entity);
+
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
