@@ -223,8 +223,6 @@ cChunk * cEntity::GetParentChunk()
 
 void cEntity::Destroy(bool a_ShouldBroadcast)
 {
-	ASSERT(IsTicking());
-	ASSERT(GetParentChunk() != nullptr);
 	SetIsTicking(false);
 
 	// Unleash leashed mobs
@@ -1565,7 +1563,6 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 {
 	UNUSED(a_ShouldSendRespawn);
 	ASSERT(a_World != nullptr);
-	ASSERT(IsTicking());
 
 	if (GetWorld() == a_World)
 	{
@@ -1586,6 +1583,9 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Tell others we are gone
 	GetWorld()->BroadcastDestroyEntity(*this);
 
+	// Take note of old chunk coords
+	auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
+
 	// Set position to the new position
 	SetPosition(a_NewPosition);
 
@@ -1600,14 +1600,13 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Queue add to new world and removal from the old one
 	cWorld * OldWorld = GetWorld();
-	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-	OldWorld->QueueTask([this, ParentChunkCoords, a_World](cWorld & a_OldWorld)
+	OldWorld->QueueTask([this, OldChunkCoords, a_World](cWorld & a_OldWorld)
 	{
 		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
 			this->GetUniqueID(), this->GetClass(),
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			ParentChunkCoords.m_ChunkX, ParentChunkCoords.m_ChunkZ
+			OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
 		);
 		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
