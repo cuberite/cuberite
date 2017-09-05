@@ -1164,7 +1164,7 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
 	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
-	if (m_WorldChangeInfo != nullptr)
+	if (IsWorldChangeScheduled())
 	{
 		return;
 	}
@@ -1309,8 +1309,8 @@ void cEntity::DetectCacti(void)
 
 bool cEntity::DetectPortal()
 {
-	// If somebody scheduled a world change, handle that now.
-	if (m_WorldChangeInfo != nullptr)
+	// If somebody scheduled a world change, do nothing.
+	if (IsWorldChangeScheduled())
 	{
 		return true;
 	}
@@ -1549,11 +1549,11 @@ bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPo
 	// Ask the plugins if the entity is allowed to change world
 	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
 	{
-		// A Plugin doesn't allow the entity to changing the world
+		// A Plugin isn't allowing the entity to change world
 		return false;
 	}
 
-	if (m_WorldChangeInfo == nullptr)
+	if (!IsWorldChangeScheduled())
 	{
 		// Schedule a new world change.
 		m_WorldChangeInfo = cpp14::make_unique<sWorldChangeInfo>();

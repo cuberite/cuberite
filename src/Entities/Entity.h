@@ -445,6 +445,7 @@ public:
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
 	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false)
 	{
+		LOGWARNING("ScheduleMoveToWorld is deprecated, use MoveToWorld instead");
 		MoveToWorld(a_World, a_NewPosition, a_ShouldSetPortalCooldown, a_ShouldSendRespawn);
 	}
 
@@ -462,6 +463,12 @@ public:
 	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 
 	// tolua_end
+
+	/** Returns true if a world change is scheduled to happen. */
+	bool IsWorldChangeScheduled() const
+	{
+		return (m_WorldChangeInfo != nullptr);
+	}
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
