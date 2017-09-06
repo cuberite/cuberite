@@ -2521,6 +2521,9 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
 		m_Protocol->SendDisconnect(a_Reason);
 		m_HasSentDC = true;
+		// csKicked means m_Link will be shut down on the next tick. The
+		// disconnect packet data is sent in the tick thread so the connection
+		// is closed there after the data is sent.
 		m_State = csKicked;
 	}
 }
