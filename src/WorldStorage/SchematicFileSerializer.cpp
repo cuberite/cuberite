@@ -210,7 +210,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		);
 		NumTypeBytes = a_NBT.GetDataLength(TBlockTypes);
 	}
-	memcpy(a_BlockArea.m_BlockTypes, a_NBT.GetData(TBlockTypes), NumTypeBytes);
+	memcpy(a_BlockArea.GetBlockTypes(), a_NBT.GetData(TBlockTypes), NumTypeBytes);
 
 	if (AreMetasPresent)
 	{
@@ -222,7 +222,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 			);
 			NumMetaBytes = a_NBT.GetDataLength(TBlockMetas);
 		}
-		memcpy(a_BlockArea.m_BlockMetas, a_NBT.GetData(TBlockMetas), NumMetaBytes);
+		memcpy(a_BlockArea.GetBlockMetas(), a_NBT.GetData(TBlockMetas), NumMetaBytes);
 	}
 
 	return true;
@@ -241,7 +241,7 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 	Writer.AddString("Materials", "Alpha");
 	if (a_BlockArea.HasBlockTypes())
 	{
-		Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(a_BlockArea.m_BlockTypes), a_BlockArea.GetBlockCount());
+		Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(a_BlockArea.GetBlockTypes()), a_BlockArea.GetBlockCount());
 	}
 	else
 	{
@@ -250,7 +250,7 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 	}
 	if (a_BlockArea.HasBlockMetas())
 	{
-		Writer.AddByteArray("Data", reinterpret_cast<const char *>(a_BlockArea.m_BlockMetas), a_BlockArea.GetBlockCount());
+		Writer.AddByteArray("Data", reinterpret_cast<const char *>(a_BlockArea.GetBlockMetas()), a_BlockArea.GetBlockCount());
 	}
 	else
 	{
