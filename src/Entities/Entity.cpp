@@ -1553,20 +1553,26 @@ bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPo
 		return false;
 	}
 
-	if (!IsWorldChangeScheduled())
+	// Create new world change info
+	auto NewWCI = cpp14::make_unique<sWorldChangeInfo>();
+	*NewWCI = { a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+
+	// Publish atomically
+	std::unique_ptr<sWorldChangeInfo> OldWCI(m_WorldChangeInfo.exchange(std::move(NewWCI)));
+
+	if (OldWCI == nullptr)
 	{
 		// Schedule a new world change.
-		m_WorldChangeInfo = cpp14::make_unique<sWorldChangeInfo>();
 		GetWorld()->QueueTask(
-			[this](cWorld &)
+			[this](cWorld & a_CurWorld)
 			{
-				DoMoveToWorld(*m_WorldChangeInfo);
-				m_WorldChangeInfo.reset();
+				std::unique_ptr<sWorldChangeInfo> WCI(m_WorldChangeInfo.exchange(nullptr));
+				cWorld::cLock Lock(a_CurWorld);
+				DoMoveToWorld(*WCI);
 			}
 		);
 	}
 
-	*m_WorldChangeInfo = { a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
 	return true;
 }
 

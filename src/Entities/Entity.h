@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../Item.h"
+#include "OSSupport/AtomicUniquePtr.h"
 
 
 
@@ -467,7 +468,7 @@ public:
 	/** Returns true if a world change is scheduled to happen. */
 	bool IsWorldChangeScheduled() const
 	{
-		return (m_WorldChangeInfo != nullptr);
+		return (m_WorldChangeInfo.load() != nullptr);
 	}
 
 	/** Updates clients of changes in the entity. */
@@ -624,7 +625,7 @@ protected:
 	cWorld * m_World;
 
 	/** If not nullptr, a world change is scheduled and a task is queued in the current world. */
-	std::unique_ptr<sWorldChangeInfo> m_WorldChangeInfo;
+	cAtomicUniquePtr<sWorldChangeInfo> m_WorldChangeInfo;
 
 	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;

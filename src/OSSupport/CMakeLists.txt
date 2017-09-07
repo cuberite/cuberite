@@ -22,6 +22,7 @@ SET (SRCS
 )
 
 SET (HDRS
+	AtomicUniquePtr.h
 	CriticalSection.h
 	Errors.h
 	Event.h
