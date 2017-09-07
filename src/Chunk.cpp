@@ -443,7 +443,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			{
 				int ChunkX = OffX + x;
 				int AreaX = BaseX + x;
-				int idx = a_Area.MakeIndex(AreaX, AreaY, AreaZ);
+				auto idx = a_Area.MakeIndex(AreaX, AreaY, AreaZ);
 				BLOCKTYPE BlockType = AreaBlockTypes[idx];
 				NIBBLETYPE BlockMeta = AreaBlockMetas[idx];
 				FastSetBlock(ChunkX, ChunkY, ChunkZ, BlockType, BlockMeta);
