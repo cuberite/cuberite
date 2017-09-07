@@ -28,7 +28,7 @@ public:
 	@param a_HitPos            The position where the splash potion has splashed
 	@param a_EntityEffectType  The effect type of the potion
 	@param a_EntityEffect      The effect description */
-	cSplashPotionCallback(const Vector3d & a_HitPos, cEntityEffect::eType a_EntityEffectType, const cEntityEffect & a_EntityEffect) :
+	cSplashPotionCallback(Vector3d a_HitPos, cEntityEffect::eType a_EntityEffectType, const cEntityEffect & a_EntityEffect) :
 		m_HitPos(a_HitPos),
 		m_EntityEffectType(a_EntityEffectType),
 		m_EntityEffect(a_EntityEffect)
@@ -61,7 +61,7 @@ public:
 	}
 
 private:
-	const Vector3d & m_HitPos;
+	Vector3d m_HitPos;
 	cEntityEffect::eType m_EntityEffectType;
 	const cEntityEffect & m_EntityEffect;
 };
@@ -96,7 +96,7 @@ cSplashPotionEntity::cSplashPotionEntity(
 
 
 
-void cSplashPotionEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cSplashPotionEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	Splash(a_HitPos);
 	m_DestroyTimer = 2;
@@ -106,7 +106,7 @@ void cSplashPotionEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace 
 
 
 
-void cSplashPotionEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cSplashPotionEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	a_EntityHit.TakeDamage(dtRangedAttack, this, 0, 1);
 	Splash(a_HitPos);
@@ -117,7 +117,7 @@ void cSplashPotionEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_
 
 
 
-void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
+void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 {
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);

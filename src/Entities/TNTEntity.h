@@ -16,8 +16,7 @@ public:
 	// tolua_end
 	CLASS_PROTODEF(cTNTEntity)
 
-	cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks = 80);
-	cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks = 80);
+	cTNTEntity(Vector3d a_Pos, int a_FuseTicks = 80);
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;

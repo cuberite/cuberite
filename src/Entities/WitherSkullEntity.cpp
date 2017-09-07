@@ -24,7 +24,7 @@ cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, double a_X, double a
 
 
 
-void cWitherSkullEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cWitherSkullEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	// TODO: Explode
 	// TODO: Apply wither effect to entities nearby
@@ -35,7 +35,7 @@ void cWitherSkullEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a
 
 
 
-void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	// TODO: If entity is Ender Crystal, destroy it
 	a_EntityHit.TakeDamage(dtRangedAttack, this, 0, 1);
