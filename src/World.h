@@ -12,6 +12,7 @@
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"
+#include "IniFile.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
@@ -102,6 +103,12 @@ public:
 	}
 
 	// tolua_begin
+
+	/** Get whether saving chunks is enabled */
+	bool IsSavingEnabled(void) const { return m_IsSavingEnabled; }
+
+	/** Set whether saving chunks is enabled */
+	void SetSavingEnabled(bool a_IsSavingEnabled) { m_IsSavingEnabled = a_IsSavingEnabled; }
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 
@@ -657,6 +664,9 @@ public:
 	/** Returns the name of the world */
 	const AString & GetName(void) const { return m_WorldName; }
 
+	/** Returns the data path to the world data */
+	const AString & GetDataPath(void) const { return m_DataPath; }
+
 	/** Returns the name of the world.ini file used by this world */
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
 
@@ -900,6 +910,9 @@ private:
 
 	AString m_WorldName;
 
+	/** The path to the root directory for the world files. Does not including trailing path specifier. */
+	AString m_DataPath;
+
 	/** The name of the overworld that portals in this world should link to.
 	Only has effect if this world is a Nether or End world. */
 	AString m_LinkedOverworldName;
@@ -910,6 +923,9 @@ private:
 	AString m_StorageSchema;
 
 	int m_StorageCompressionFactor;
+
+	/** Whether or not writing chunks to disk is currently enabled */
+	std::atomic<bool> m_IsSavingEnabled;
 
 	/** The dimension of the world, used by the client to provide correct lighting scheme */
 	eDimension m_Dimension;
@@ -1065,7 +1081,7 @@ private:
 	cSetChunkDataPtrs m_SetChunkDataQueue;
 
 
-	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
+	cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
 	virtual ~cWorld() override;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);

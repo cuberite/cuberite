@@ -11501,6 +11501,17 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved.",
 				},
+				SetSavingEnabled =
+				{
+					Params =
+					{
+						{
+							Name = "SavingEnabled",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether saving chunk data is enabled for all worlds. If disabled, dirty chunks will stay in memory forever, which can cause performance and stability issues.",
+				},
 			},
 			AdditionalInfo =
 			{

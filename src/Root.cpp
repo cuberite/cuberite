@@ -396,16 +396,20 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		a_Settings.AddValue("Worlds", "DefaultWorld", "world");
 		a_Settings.AddValue("Worlds", "World", "world_nether");
 		a_Settings.AddValue("Worlds", "World", "world_the_end");
-		m_pDefaultWorld = new cWorld("world");
+		a_Settings.AddValue("WorldPaths", "world", "world");
+		a_Settings.AddValue("WorldPaths", "world_nether", "world_nether");
+		a_Settings.AddValue("WorldPaths", "world_the_end", "world_the_end");
+		m_pDefaultWorld = new cWorld("world", "world");
 		m_WorldsByName["world"] = m_pDefaultWorld;
-		m_WorldsByName["world_nether"] = new cWorld("world_nether", dimNether, "world");
-		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", dimEnd, "world");
+		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", dimNether, "world");
+		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", dimEnd, "world");
 		return;
 	}
 
 	// First get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
-	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
+	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
+	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str(), DefaultWorldPath.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 	auto Worlds = a_Settings.GetValues("Worlds");
 
@@ -453,9 +457,14 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		FoundAdditionalWorlds = true;
 		cWorld * NewWorld;
 		AString LowercaseName = StrToLower(WorldName);
+		AString WorldPath = a_Settings.GetValueSet("WorldPaths", WorldName, WorldName);
 		AString NetherAppend = "_nether";
 		AString EndAppend1 = "_the_end";
 		AString EndAppend2 = "_end";
+
+		// The default world is an overworld with no links
+		eDimension Dimension = dimOverworld;
+		AString LinkTo = "";
 
 		// if the world is called x_nether
 		if ((LowercaseName.size() > NetherAppend.size()) && (LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
@@ -464,12 +473,12 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			// otherwise, choose the default world as the linked world.
 			// As before, any ini settings will completely override this if an ini is already present.
 
-			AString LinkTo = WorldName.substr(0, WorldName.size() - NetherAppend.size());
+			LinkTo = WorldName.substr(0, WorldName.size() - NetherAppend.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), dimNether, LinkTo);
+			Dimension = dimNether;
 		}
 		// if the world is called x_the_end
 		else if ((LowercaseName.size() > EndAppend1.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend1))
@@ -478,12 +487,12 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			// otherwise, choose the default world as the linked world.
 			// As before, any ini settings will completely override this if an ini is already present.
 
-			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend1.size());
+			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend1.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), dimEnd, LinkTo);
+			Dimension = dimEnd;
 		}
 		// if the world is called x_end
 		else if ((LowercaseName.size() > EndAppend2.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend2))
@@ -492,17 +501,14 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			// otherwise, choose the default world as the linked world.
 			// As before, any ini settings will completely override this if an ini is already present.
 
-			AString LinkTo = WorldName.substr(0, WorldName.size() - EndAppend2.size());
+			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend2.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
 				LinkTo = DefaultWorldName;
 			}
-			NewWorld = new cWorld(WorldName.c_str(), dimEnd, LinkTo);
+			Dimension = dimEnd;
 		}
-		else
-		{
-			NewWorld = new cWorld(WorldName.c_str());
-		}
+		NewWorld = new cWorld(WorldName.c_str(), WorldPath.c_str(), Dimension, LinkTo);
 		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds
 
@@ -706,6 +712,20 @@ void cRoot::SaveAllChunks(void)
 		itr->second->QueueSaveAllChunks();
 	}
 }
+
+
+
+
+
+void cRoot::SetSavingEnabled(bool a_SavingEnabled)
+{
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	{
+		itr->second->SetSavingEnabled(a_SavingEnabled);
+	}
+}
+
+
 
 
 

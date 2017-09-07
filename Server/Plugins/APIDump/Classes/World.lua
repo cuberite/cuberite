@@ -1450,6 +1450,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true.",
 			},
+			GetDataPath =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns the path to the root of the world data.",
+			},
 			GetDefaultWeatherInterval =
 			{
 				Params =
@@ -2117,6 +2127,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns whether PVP is enabled in the world settings.",
 			},
+			IsSavingEnabled =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns whether or not saving chunk data is enabled. If disabled, the world will keep dirty chunks in memory forever, and will simply regenerate non-dirty chunks that are unloaded.",
+			},
 			IsTrapdoorOpen =
 			{
 				Params =
@@ -2725,6 +2745,17 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Sets the blockticking to start at the specified block in the next tick.",
+			},
+			SetSavingEnabled =
+			{
+				Params =
+				{
+					{
+						Name = "SavingEnabled",
+						Type = "boolean",
+					},
+				},
+				Notes = "Sets whether saving chunk data is enabled. If disabled, dirty chunks will stay in memory forever, which may cause performance and stability issues.",
 			},
 			SetShouldUseChatPrefixes =
 			{
