@@ -310,7 +310,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether skylight may pass through a block of the specified type unimpeded.",
+					Notes = "Returns true if skylight is impeded by passage through a block of the specified type.",
 				},
 				IsTransparent =
 				{
