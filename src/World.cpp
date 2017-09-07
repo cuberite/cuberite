@@ -2311,9 +2311,9 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 
 
-UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material)
+UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 {
-	auto Boat = cpp14::make_unique<cBoat>(a_X, a_Y, a_Z, a_Material);
+	auto Boat = cpp14::make_unique<cBoat>(a_Pos, a_Material);
 	auto BoatPtr = Boat.get();
 	if (!BoatPtr->Initialize(std::move(Boat), *this))
 	{
@@ -2325,9 +2325,9 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_
 
 
 
-UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
+UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
-	auto TNT = cpp14::make_unique<cTNTEntity>(a_X, a_Y, a_Z, a_FuseTicks);
+	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
 	auto TNTPtr = TNT.get();
 	if (!TNTPtr->Initialize(std::move(TNT), *this))
 	{
@@ -3713,6 +3713,36 @@ bool cWorld::HasEntity(UInt32 a_UniqueID)
 		return false;
 	}
 	return m_ChunkMap->HasEntity(a_UniqueID);
+}
+
+
+
+
+
+OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
+{
+	// Check if the entity is in the chunkmap:
+	auto Entity = m_ChunkMap->RemoveEntity(a_Entity);
+	if (Entity != nullptr)
+	{
+		return Entity;
+	}
+
+	// Check if the entity is in the queue to be added to the world:
+	cCSLock Lock(m_CSEntitiesToAdd);
+	auto itr = std::find_if(m_EntitiesToAdd.begin(), m_EntitiesToAdd.end(),
+		[&a_Entity](const OwnedEntity & a_OwnedEntity)
+		{
+			return (a_OwnedEntity.get() == &a_Entity);
+		}
+	);
+
+	if (itr != m_EntitiesToAdd.end())
+	{
+		Entity = std::move(*itr);
+		m_EntitiesToAdd.erase(itr);
+	}
+	return Entity;
 }
 
 

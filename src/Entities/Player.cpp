@@ -2203,7 +2203,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 	// Load the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), &m_Stats);
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), GetUUID().ToLongString(), &m_Stats);
 	StatSerializer.Load();
 
 	LOGD("Player %s was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
@@ -2301,7 +2301,7 @@ bool cPlayer::SaveToDisk()
 
 	// Save the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), &m_Stats);
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), GetUUID().ToLongString(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
 		LOGWARNING("Could not save stats for player %s", GetName().c_str());
@@ -2346,23 +2346,6 @@ void cPlayer::UseEquippedItem(int a_Amount)
 	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
 	{
 		m_World->BroadcastSoundEffect("entity.item.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-	}
-}
-
-
-
-
-void cPlayer::TickBurning(cChunk & a_Chunk)
-{
-	// Don't burn in creative or spectator and stop burning in creative if necessary
-	if (!IsGameModeCreative() && !IsGameModeSpectator())
-	{
-		super::TickBurning(a_Chunk);
-	}
-	else if (IsOnFire())
-	{
-		m_TicksLeftBurning = 0;
-		OnFinishedBurning();
 	}
 }
 
@@ -3018,4 +3001,3 @@ float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
 	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
 }
-

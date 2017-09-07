@@ -2948,33 +2948,56 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			SpawnBoat =
 			{
-				Params =
 				{
+					Params =
 					{
-						Name = "X",
-						Type = "number",
+						{
+							Name = "Position",
+							Type = "Vector3d",
+						},
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
 					},
+					Returns =
 					{
-						Name = "Y",
-						Type = "number",
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
 					},
-					{
-						Name = "Z",
-						Type = "number",
-					},
-					{
-						Name = "Material",
-						Type = "cBoat#eMaterial",
-					},
+					Notes = "Spawns a {{cBoat|boat}} at the specific coordinates. Returns the EntityID of the new boat, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no boat was created.",
 				},
-				Returns =
 				{
+					Params =
 					{
-						Name = "EntityID",
-						Type = "number",
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "Material",
+							Type = "cBoat#eMaterial",
+						},
 					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a {{cBoat|boat}} at the specific coordinates. Returns the EntityID of the new boat, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no boat was created. (DEPRECATED, use vector-parametered version)",
 				},
-				Notes = "Spawns a {{cBoat|boat}} at the specific coordinates. Returns the EntityID of the new boat, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no boat was created.",
 			},
 			SpawnExperienceOrb =
 			{
@@ -3251,37 +3274,64 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			SpawnPrimedTNT =
 			{
-				Params =
 				{
+					Params =
 					{
-						Name = "X",
-						Type = "number",
+						{
+							Name = "Position",
+							Type = "Vector3d",
+						},
+						{
+							Name = "FuseTicks",
+							Type = "number",
+						},
+						{
+							Name = "InitialVelocityCoeff",
+							Type = "number",
+						},
 					},
+					Returns =
 					{
-						Name = "Y",
-						Type = "number",
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
 					},
-					{
-						Name = "Z",
-						Type = "number",
-					},
-					{
-						Name = "FuseTicks",
-						Type = "number",
-					},
-					{
-						Name = "InitialVelocityCoeff",
-						Type = "number",
-					},
+					Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value. Returns the EntityID of the new spawned primed tnt, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no primed tnt was created.",
 				},
-				Returns =
 				{
+					Params =
 					{
-						Name = "EntityID",
-						Type = "number",
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "FuseTicks",
+							Type = "number",
+						},
+						{
+							Name = "InitialVelocityCoeff",
+							Type = "number",
+						},
 					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value. Returns the EntityID of the new spawned primed tnt, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no primed tnt was created. (DEPRECATED, use vector-parametered version)",
 				},
-				Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value. Returns the EntityID of the new spawned primed tnt, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no primed tnt was created.",
 			},
 			TryGetHeight =
 			{
