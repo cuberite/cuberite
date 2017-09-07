@@ -1558,7 +1558,7 @@ bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPo
 	*NewWCI = { a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
 
 	// Publish atomically
-	std::unique_ptr<sWorldChangeInfo> OldWCI(m_WorldChangeInfo.exchange(std::move(NewWCI)));
+	auto OldWCI = m_WorldChangeInfo.exchange(std::move(NewWCI));
 
 	if (OldWCI == nullptr)
 	{
@@ -1566,7 +1566,7 @@ bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPo
 		GetWorld()->QueueTask(
 			[this](cWorld & a_CurWorld)
 			{
-				std::unique_ptr<sWorldChangeInfo> WCI(m_WorldChangeInfo.exchange(nullptr));
+				auto WCI = m_WorldChangeInfo.exchange(nullptr);
 				cWorld::cLock Lock(a_CurWorld);
 				DoMoveToWorld(*WCI);
 			}

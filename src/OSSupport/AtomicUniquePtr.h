@@ -60,9 +60,9 @@ public:
 		return DidExchange;
 	}
 
-	T * exchange(std::unique_ptr<T> a_Ptr, std::memory_order a_Order = std::memory_order_seq_cst) NOEXCEPT
+	std::unique_ptr<T> exchange(std::unique_ptr<T> a_Ptr, std::memory_order a_Order = std::memory_order_seq_cst) NOEXCEPT
 	{
-		return m_Ptr.exchange(a_Ptr.release(), a_Order);
+		return std::unique_ptr<T>{ m_Ptr.exchange(a_Ptr.release(), a_Order) };
 	}
 
 	T * load(std::memory_order a_Order = std::memory_order_seq_cst) const NOEXCEPT
