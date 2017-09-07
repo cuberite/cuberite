@@ -3050,7 +3050,7 @@ void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Ex
 
 
 
-void cChunk::BroadcastThunderbolt(Vector3i a_Block, const cClientHandle * a_Exclude)
+void cChunk::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
 	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -3058,7 +3058,7 @@ void cChunk::BroadcastThunderbolt(Vector3i a_Block, const cClientHandle * a_Excl
 		{
 			continue;
 		}
-		(*itr)->SendThunderbolt(a_Block.x, a_Block.y, a_Block.z);
+		(*itr)->SendThunderbolt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 	}  // for itr - LoadedByClient[]
 }
 

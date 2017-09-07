@@ -2848,9 +2848,9 @@ void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastThunderbolt(Vector3i a_Block, const cClientHandle * a_Exclude)
+void cWorld::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastThunderbolt(a_Block, a_Exclude);
+	m_ChunkMap->BroadcastThunderbolt(a_BlockPos, a_Exclude);
 }
 
 

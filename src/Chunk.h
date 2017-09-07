@@ -374,7 +374,7 @@ public:
 	void BroadcastSoundEffect        (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastThunderbolt        (Vector3i a_Block, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastThunderbolt        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastUnleashEntity      (const cEntity & a_Entity);
 	void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 

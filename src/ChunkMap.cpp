@@ -659,18 +659,18 @@ void cChunkMap::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a
 
 
 
-void cChunkMap::BroadcastThunderbolt(Vector3i a_Block, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_Block.x, a_Block.z, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastThunderbolt(a_Block, a_Exclude);
+	Chunk->BroadcastThunderbolt(a_BlockPos, a_Exclude);
 }
 
 
