@@ -3856,10 +3856,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "This entity has killed another entity (the Victim). For players, adds the scoreboard statistics about the kill.",
 				},
-				KilledBy =
-				{
-					Notes = "FIXME: Remove this from API",
-				},
 				MoveToWorld =
 				{
 					{
@@ -3986,10 +3982,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Sets the entity's health to the specified amount of hitpoints. Doesn't broadcast any hurt animation. Doesn't kill the entity if health drops below zero. Use the TakeDamage() function instead for taking damage.",
-				},
-				SetHeight =
-				{
-					Notes = "FIXME: Remove this from API",
 				},
 				SetInvulnerableTicks =
 				{
@@ -4188,10 +4180,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Sets the Z component of the entity speed",
-				},
-				SetWidth =
-				{
-					Notes = "FIXME: Remove this from API",
 				},
 				SetYaw =
 				{
@@ -6472,7 +6460,13 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				},
 				RemoveOneEquippedItem =
 				{
-					Notes = "Removes one item from the hotbar's currently selected slot",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Removes one item from the hotbar's currently selected slot. Returns true on success.",
 				},
 				SendEquippedSlot =
 				{
@@ -9344,7 +9338,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "EffectType",
-							Type = "cEntityEffect",
+							Type = "cEntityEffect#eType",
 						},
 						{
 							Name = "EffectDurationTicks",
@@ -9365,22 +9359,13 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Removes all currently applied entity effects",
 				},
-				GetHealth =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-				},
 				HasEntityEffect =
 				{
 					Params =
 					{
 						{
 							Name = "EffectType",
-							Type = "cEntityEffect",
+							Type = "cEntityEffect#eType",
 						},
 					},
 					Returns =
@@ -9391,36 +9376,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns true, if the supplied entity effect type is currently applied",
 				},
-				Heal =
-				{
-
-				},
-				KilledBy =
-				{
-
-				},
 				RemoveEntityEffect =
 				{
 					Params =
 					{
 						{
 							Name = "EffectType",
-							Type = "cEntityEffect",
+							Type = "cEntityEffect#eType",
 						},
 					},
 					Notes = "Removes a currently applied entity effect",
-				},
-				TakeDamage =
-				{
-
-				},
-				TeleportTo =
-				{
-
-				},
-				TeleportToEntity =
-				{
-
 				},
 			},
 			Inherits = "cEntity",
@@ -9869,6 +9834,12 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
 					Notes = "Adds or removes XP from the current XP amount. Won't allow XP to go negative. Returns the new experience, -1 on error (XP overflow).",
 				},
 				Feed =
@@ -9891,17 +9862,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Tries to add the specified amounts to food level and food saturation level (only positive amounts expected). Returns true if player was hungry and the food was consumed, false if too satiated.",
-				},
-				FoodPoison =
-				{
-					Params =
-					{
-						{
-							Name = "NumTicks",
-							Type = "number",
-						},
-					},
-					Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two",
 				},
 				ForceSetSpeed =
 				{
@@ -10077,10 +10037,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the food level (number of half-drumsticks on-screen)",
 				},
-				GetFoodPoisonedTicksRemaining =
-				{
-					Notes = "Returns the number of ticks left for the food posoning effect",
-				},
 				GetFoodSaturationLevel =
 				{
 					Returns =
@@ -10093,6 +10049,12 @@ a_Player:OpenWindow(Window);
 				},
 				GetFoodTickTimer =
 				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
 					Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied.",
 				},
 				GetGameMode =
@@ -10493,17 +10455,6 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Reloads the player's rank, message visuals and permissions from the {{cRankManager}}, based on the player's current rank.",
 				},
-				MoveTo =
-				{
-					Params =
-					{
-						{
-							Name = "NewPosition",
-							Type = "Vector3d",
-						},
-					},
-					Notes = "Tries to move the player into the specified position.",
-				},
 				OpenWindow =
 				{
 					Params =
@@ -10779,6 +10730,12 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
 					Notes = "Sets the current amount of experience (and indirectly, the XP level).",
 				},
 				SetCustomName =
@@ -10846,17 +10803,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the food level (number of half-drumsticks on-screen)",
-				},
-				SetFoodPoisonedTicksRemaining =
-				{
-					Params =
-					{
-						{
-							Name = "FoodPoisonedTicksRemaining",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the number of ticks remaining for food poisoning. Doesn't send foodpoisoning effect to the client, use FoodPoison() for that.",
 				},
 				SetFoodSaturationLevel =
 				{

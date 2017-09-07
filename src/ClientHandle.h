@@ -242,7 +242,7 @@ public:  // tolua_export
 	/** Returns the view distance that the player request, not the used view distance. */
 	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
 
-	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
+	void SetLocale(const AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
 
 	int GetUniqueID(void) const { return m_UniqueID; }
