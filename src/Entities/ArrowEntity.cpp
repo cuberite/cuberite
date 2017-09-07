@@ -76,7 +76,7 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 
-void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	Vector3d Hit = a_HitPos;
 	Hit += GetSpeed().NormalizeCopy() / 100000;  // Make arrow sink into block a bit so it lodges (TODO: investigate how to stop them going so far so that they become black clientside)
@@ -93,7 +93,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	if ((m_World->GetBlock(Hit) == E_BLOCK_TNT) && IsOnFire())
 	{
 		m_World->SetBlock(X, Y, Z, E_BLOCK_AIR, 0);
-		m_World->SpawnPrimedTNT(X, Y, Z);
+		m_World->SpawnPrimedTNT(Vector3d(BlockHit));
 	}
 
 }
@@ -102,7 +102,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 
 
-void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	super::OnHitEntity(a_EntityHit, a_HitPos);
 

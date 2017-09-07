@@ -12,7 +12,7 @@ class cTNTHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_Position);
@@ -23,7 +23,7 @@ public:
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_Position);
@@ -32,19 +32,19 @@ public:
 		return 0;
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating explodinator the trinitrotoluene (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 		if (a_PoweringData.PowerLevel != 0)
 		{
 			a_World.BroadcastSoundEffect("entity.tnt.primed", a_Position, 0.5f, 0.6f);
 			a_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, E_BLOCK_AIR, 0);
-			a_World.SpawnPrimedTNT(a_Position.x + 0.5, a_Position.y + 0.5, a_Position.z + 0.5);  // 80 ticks to boom
+			a_World.SpawnPrimedTNT(a_Position + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
 		}
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_BlockType);

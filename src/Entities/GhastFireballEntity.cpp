@@ -28,7 +28,7 @@ void cGhastFireballEntity::Explode(Vector3i a_Block)
 
 
 
-void cGhastFireballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cGhastFireballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	Destroy();
 	Explode(a_HitPos.Floor());
@@ -38,7 +38,7 @@ void cGhastFireballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace
 
 
 
-void cGhastFireballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cGhastFireballEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	Destroy();
 	Explode(a_HitPos.Floor());

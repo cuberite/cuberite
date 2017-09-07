@@ -135,6 +135,9 @@ public:
 	/** Saves all chunks in all worlds */
 	void SaveAllChunks(void);  // tolua_export
 
+	/** Sets whether saving chunks is enabled in all worlds (overrides however the worlds were already set) */
+	void SetSavingEnabled(bool a_SavingEnabled);  // tolua_export
+
 	/** Calls the callback for each player in all worlds */
 	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
