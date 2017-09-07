@@ -51,7 +51,7 @@ return
 				Params =
 				{
 					{
-						Name = "Block",
+						Name = "BlockPos",
 						Type = "Vector3i",
 					},
 					{

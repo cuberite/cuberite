@@ -305,12 +305,12 @@ void cChunkMap::BroadcastUnleashEntity(const cEntity & a_Entity)
 
 
 
-void cChunkMap::BroadcastBlockAction(Vector3i a_Block, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
 	int x, z, ChunkX, ChunkZ;
-	x = a_Block.x;
-	z = a_Block.z;
+	x = a_BlockPos.x;
+	z = a_BlockPos.z;
 	cChunkDef::BlockToChunk(x, z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
@@ -318,7 +318,7 @@ void cChunkMap::BroadcastBlockAction(Vector3i a_Block, char a_Byte1, char a_Byte
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastBlockAction(a_Block, a_Byte1, a_Byte2, a_BlockType, a_Exclude);
+	Chunk->BroadcastBlockAction(a_BlockPos, a_Byte1, a_Byte2, a_BlockType, a_Exclude);
 }
 
 

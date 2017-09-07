@@ -2712,7 +2712,7 @@ void cChunk::BroadcastUnleashEntity(const cEntity & a_Entity)
 
 
 
-void cChunk::BroadcastBlockAction(Vector3i a_Block, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cChunk::BroadcastBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
 	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2720,7 +2720,7 @@ void cChunk::BroadcastBlockAction(Vector3i a_Block, char a_Byte1, char a_Byte2, 
 		{
 			continue;
 		}
-		(*itr)->SendBlockAction(a_Block.x, a_Block.y, a_Block.z, a_Byte1, a_Byte2, a_BlockType);
+		(*itr)->SendBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Byte1, a_Byte2, a_BlockType);
 	}  // for itr - LoadedByClient[]
 }
 
