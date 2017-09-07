@@ -370,7 +370,11 @@ public:
 	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight.get();    }  // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
 	size_t       GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
-	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
+	static size_t MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size);
+	size_t MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
+	{
+		return MakeIndexForSize({ a_RelX, a_RelY, a_RelZ }, m_Size);
+	}
 
 	/** Calls the callback for the block entity at the specified coords.
 	Returns false if there is no block entity at those coords, or the block area doesn't have baBlockEntities.
@@ -418,44 +422,8 @@ protected:
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
 	} ;
 
-	template <typename T>
-	class cDynArray:
-		public std::unique_ptr<T[]>
-	{
-		using Super = std::unique_ptr<T[]>;
-	public:
-		// using Super::Super;
-		cDynArray() = default;
-		cDynArray(cDynArray && a_Other) : Super(std::move(a_Other)) {}
-		cDynArray & operator = (cDynArray && a_Other)
-		{
-			Super::operator = (std::move(a_Other));
-			return *this;
-		}
-
-		cDynArray(std::nullptr_t) {}
-
-		cDynArray(T * a_Ptr):
-			Super(a_Ptr)
-		{
-		}
-
-		// Allow indexing with signed types
-		T & operator [] (int a_Idx) const
-		{
-			ASSERT(a_Idx >= 0);
-			return (Super::get())[a_Idx];
-		}
-
-		T & operator [] (size_t a_Idx) const
-		{
-			return (Super::get())[a_Idx];
-		}
-	};
-
-	using NIBBLEARRAY = cDynArray<NIBBLETYPE>;
-	using BLOCKARRAY = cDynArray<BLOCKTYPE>;
-
+	using NIBBLEARRAY = std::unique_ptr<NIBBLETYPE[]>;
+	using BLOCKARRAY = std::unique_ptr<BLOCKTYPE[]>;
 
 	Vector3i m_Origin;
 	Vector3i m_Size;
