@@ -8812,7 +8812,7 @@ a_Player:OpenWindow(Window);
 						}
 					},
 					Notes = "Leash the monster to an entity.",
-				},				
+				},
 				MobTypeToString =
 				{
 					IsStatic = true,
@@ -10350,6 +10350,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns true if the player is currently eating the item in their hand.",
+				},
+				IsFireproof =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if a player is fireproof. This is when the flag has been explicitly set, or the player is in creative or spectator mode.",
 				},
 				IsFishing =
 				{
@@ -15748,7 +15758,7 @@ end
 				E_ITEM_LEASH =
 				{
 					Notes = "The itemtype for lead (E_ITEM_LEAD synonym)"
-				},				
+				},
 				E_ITEM_LEATHER =
 				{
 					Notes = "The itemtype for leather"
@@ -17478,4 +17488,3 @@ end
 		"__.*__",
 	},
 }
-

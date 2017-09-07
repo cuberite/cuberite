@@ -2352,23 +2352,6 @@ void cPlayer::UseEquippedItem(int a_Amount)
 
 
 
-void cPlayer::TickBurning(cChunk & a_Chunk)
-{
-	// Don't burn in creative or spectator and stop burning in creative if necessary
-	if (!IsGameModeCreative() && !IsGameModeSpectator())
-	{
-		super::TickBurning(a_Chunk);
-	}
-	else if (IsOnFire())
-	{
-		m_TicksLeftBurning = 0;
-		OnFinishedBurning();
-	}
-}
-
-
-
-
 
 void cPlayer::HandleFood(void)
 {
@@ -3018,4 +3001,3 @@ float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
 	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
 }
-

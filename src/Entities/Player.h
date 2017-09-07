@@ -195,6 +195,15 @@ public:
 	/** Returns true if the player is in Spectator mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeSpectator(void) const;
 
+	/** Returns true if the player is fireproof
+	Stops players burning in creative or spectator modes.
+	*/
+	virtual bool IsFireproof() const override
+	{
+		return (m_IsFireproof || IsGameModeCreative() || IsGameModeSpectator());
+
+	}
+
 	/** Returns true if the player can be targeted by Mobs */
 	bool CanMobsTarget(void) const;
 
@@ -331,13 +340,13 @@ public:
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
 	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
 
-	/** Returns true if the player is currently flying. */
+	/** Returns true if the player is currently flying */
 	bool IsFlying(void) const { return m_IsFlying; }
 
-	/** Returns if a player is sleeping in a bed */
+	/** Returns true if a player is sleeping in a bed */
 	bool IsInBed(void) const { return m_bIsInBed; }
 
-	/** returns true if the player has thrown out a floater. */
+	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
 
 	void SetIsFishing(bool a_IsFishing, UInt32 a_FloaterID = cEntity::INVALID_ID) { m_IsFishing = a_IsFishing; m_FloaterID = a_FloaterID; }
@@ -718,9 +727,6 @@ protected:
 
 	/** Filters out damage for creative mode / friendly fire */
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
-
-	/** Stops players from burning in creative mode */
-	virtual void TickBurning(cChunk & a_Chunk) override;
 
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);
