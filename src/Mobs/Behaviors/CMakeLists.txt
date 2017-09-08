@@ -20,6 +20,9 @@ SET (SRCS
     BehaviorAttackerRanged.cpp
     BehaviorAttackerSuicideBomber.cpp
     BehaviorWanderer.cpp
+    BehaviorPet.cpp
+    BehaviorPetTamableWithItem.cpp
+    BehaviorPetTamableWithItemShy.cpp
 )
 
 SET (HDRS
@@ -38,6 +41,9 @@ SET (HDRS
     BehaviorAttackerRanged.h
     BehaviorAttackerSuicideBomber.h
     BehaviorWanderer.h
+    BehaviorPet.h
+    BehaviorPetTamableWithItem.h
+    BehaviorPetTamableWithItemShy.h
 )
 
 if(NOT MSVC)

@@ -1,11 +1,12 @@
 #pragma once
 
-// Always takes control of the tick and does nothing. Used for unimplemented mobs like squids.
+
 
 class cBehaviorDoNothing;
 
 #include "Behavior.h"
 
+/**  Always takes control of the tick and does nothing. Used for unimplemented mobs like squids. */
 class cBehaviorDoNothing : public cBehavior
 {
 public:

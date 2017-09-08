@@ -9,10 +9,11 @@
 
 
 
-cBehaviorAttackerSuicideBomber::cBehaviorAttackerSuicideBomber() :
+cBehaviorAttackerSuicideBomber::cBehaviorAttackerSuicideBomber(bool a_ShouldBroadcastEntityMetadata) :
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
-	m_BurnedWithFlintAndSteel(false)
+	m_BurnedWithFlintAndSteel(false),
+	m_ShouldBroadcastEntityMetadata(a_ShouldBroadcastEntityMetadata)
 {
 
 }
@@ -42,8 +43,10 @@ bool cBehaviorAttackerSuicideBomber::DoStrike(int a_StrikeTickCnt)
 
 		m_Parent->GetWorld()->BroadcastSoundEffect("entity.creeper.primed", m_Parent->GetPosX(), m_Parent->GetPosY(), m_Parent->GetPosZ(), 1.f, (0.75f + (static_cast<float>((m_Parent->GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
-		m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
-
+		if (m_ShouldBroadcastEntityMetadata)
+		{
+			m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
+		}
 		return false;
 	}
 
@@ -51,7 +54,10 @@ bool cBehaviorAttackerSuicideBomber::DoStrike(int a_StrikeTickCnt)
 	if (((GetTarget() == nullptr) || (!TargetIsInStrikeRadius())) && (!m_BurnedWithFlintAndSteel))
 	{
 		m_bIsBlowing = false;
-		m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
+		if (m_ShouldBroadcastEntityMetadata)
+		{
+			m_Parent->GetWorld()->BroadcastEntityMetadata(*m_Parent);
+		}
 		return true;
 	}
 

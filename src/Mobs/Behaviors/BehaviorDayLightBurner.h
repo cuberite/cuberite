@@ -4,6 +4,16 @@
 #include "Behavior.h"
 #include "../../World.h"
 
+/**
+The mob will burn in daylight.
+
+Connections to other behaviors:
+ - None.
+
+Special connections:
+ - Alters the pathfinder, so that the mob will try avoiding sunlight.
+
+*/
 class cBehaviorDayLightBurner : cBehavior
 {
 public:

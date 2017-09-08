@@ -7,6 +7,13 @@ class cBehaviorItemReplacer;
 
 /** When right clicked while holding a_OriginalItem, a mob having this behavior replaces the original item
 with a_NewItem. This is used for milking cows.
+
+Connections to other behaviors:
+ - None.
+
+Special connections:
+ - None.
+
 */
 class cBehaviorItemReplacer : public cBehavior
 {

@@ -1161,7 +1161,7 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 				else
 				{
 					auto Wolf = static_cast<cWolf *>(Monster);
-					if (Wolf->IsAngry())
+					if (Wolf->IsAngry()) // mobTodo no need for special case, use neverDespawn
 					{
 						Monster->Destroy(true);
 					}

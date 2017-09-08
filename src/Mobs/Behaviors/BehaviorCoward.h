@@ -2,7 +2,16 @@
 
 #include "Behavior.h"
 
-/** Makes the mob run away from any other mob that damages it. */
+/** Makes the mob run away from any other mob that damages it.
+
+Connections to other behaviors:
+ - The mob should also have a cBehaviorAttacker, otherwise this behavior will not work.
+ - This behavior does not make sense in combination with BehaviorAggressive or cBehaviorBrave.
+
+Special connections:
+ - None.
+
+*/
 class cBehaviorCoward : cBehavior
 {
 public:

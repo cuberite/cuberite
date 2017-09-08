@@ -3,14 +3,25 @@
 class cBehaviorBreeder;
 
 #include "Behavior.h"
+#include "BehaviorPet.h"
 
-/** Grants breeding capabilities to the mob. */
+/** Grants breeding capabilities to the mob.
+Recommended combination with cBehaviorItemFollower.
+
+Connections to other behaviors:
+ - If the mob also has cBehaviorPet, this behavior is suppressed unless the mob has an owner.
+
+Special connections:
+ - Relies on the polymorphic cMonster::GetBreedingItems function to determine the breeding items.
+
+
+*/
 class cBehaviorBreeder : public cBehavior
 {
 
 public:
 	cBehaviorBreeder();
-	void AttachToMonster(cMonster & a_Parent);
+	void AttachToMonster(cMonster & a_Parent, cBehaviorPet * a_BehaviorPet = nullptr);
 
 	// Functions our host Monster should invoke:
 	bool IsControlDesired(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -40,6 +51,9 @@ private:
 
 	/** The monster's breeding partner. */
 	cMonster * m_LovePartner;
+
+	/** The monster's pet behavior, if present. */
+	cMonster * m_BehaviorPet;
 
 	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by 1 per tick till reaching zero. */
 	int m_LoveTimer;

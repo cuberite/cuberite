@@ -8,7 +8,15 @@ class cBehaviorAttacker;
 /** Grants attack capability to the mob. Note that this is not the same as agression!
 The mob may possess this trait and not attack anyone or only attack when provoked.
 Unlike most traits, this one has several forms, and therefore it is an abstract type
-You should use one of its derived classes, and you cannot use it directly. */
+You should use one of its derived classes, and you cannot use it directly.
+
+Connections to other behaviors:
+ - Some behaviors may call cBehaviorAttacker::SetTarget
+
+Special connections:
+ - None.
+
+*/
 class cBehaviorAttacker : public cBehavior
 {
 

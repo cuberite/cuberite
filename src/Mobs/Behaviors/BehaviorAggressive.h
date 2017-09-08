@@ -6,8 +6,17 @@ class cBehaviorAggressive;
 #include "Behavior.h"
 #include <functional>
 
-/** The mob is agressive toward specific mobtypes, or toward the player.
-This Behavior has a dependency on BehaviorAttacker. */
+/** The mob is agressive toward specific mobtypes (mobTodo), or toward the player.
+ *
+
+Connections to other behaviors:
+ - The mob should also have a cBehaviorAttacker, otherwise this behavior will not work.
+ - This behavior does not make sense in combination with BehaviorCoward or cBehaviorBrave.
+
+Special connections:
+ - Relies on cMonster::GetAttackerBehavior to obtain the attacker behavior and alter its target.
+
+*/
 
 typedef std::function<bool(cBehaviorAggressive & a_Behavior, cMonster & a_Monster, cChunk & a_Chunk)> ShouldBeAggressiveFunction;
 

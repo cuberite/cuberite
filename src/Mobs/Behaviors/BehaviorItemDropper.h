@@ -4,7 +4,15 @@
 
 #include "Behavior.h"
 
-/** Makes the mob periodically lay eggs. */
+/** Makes the mob periodically drop eggs. MobTodo: Make this more generic.
+
+Connections to other behaviors:
+ - None
+
+Special connections:
+ - None.
+
+*/
 class cBehaviorItemDropper : cBehavior
 {
 public:

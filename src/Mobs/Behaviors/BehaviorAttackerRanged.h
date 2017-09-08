@@ -5,7 +5,15 @@
 class cBehaviorAttackerRanged;
 
 /** Grants the mob that ability to approach a target and then melee attack it.
-Use BehaviorAttackerMelee::SetTarget to attack. */
+Use cBehaviorAttackerRanged::SetTarget to attack.
+
+Connections to other behaviors:
+ - See cBehaviorAttacker.
+
+Special connections:
+ - None.
+
+*/
 typedef std::function<void(cBehaviorAttackerRanged & a_Behavior,
 	cMonster & a_Attacker, cPawn & a_Attacked)> RangedShootingFunction;
 
