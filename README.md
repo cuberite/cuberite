@@ -29,7 +29,7 @@ This script will download the correct binary from the project site.
 
 ### Compiling
 
- - You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
+ - You can compile automatically for Linux, macOS and FreeBSD with the `compile.sh` script. The script is described below.
  - You can also compile manually. See [COMPILING.md][4].
 
 Compiling may provide better performance (1.5-3x as fast) and it supports more operating systems.
