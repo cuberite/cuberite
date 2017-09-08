@@ -156,6 +156,13 @@ protected:
 	/** Is a server list ping for an unrecognized version currently occuring? */
 	bool m_InPingForUnrecognizedVersion;
 
+	/** GetPacketId is implemented in each protocol version class */
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override
+	{
+		ASSERT(!"cProtocolRecognizer::GetPacketId should never be called! Something is horribly wrong! (this method being called implies that someone other than a Protocol-derived class is calling GetPacketId)");
+		return 0;
+	}
+
 	// Packet handlers while in status state (m_InPingForUnrecognizedVersion == true)
 	void HandlePacketStatusRequest();
 	void HandlePacketStatusPing();

@@ -340,22 +340,12 @@ return
 		]],
 		Functions =
 		{
-			GetEntityEffect =
-			{
-				Returns =
-				{
-					{
-						Type = "cEntityEffect",
-					},
-				},
-				Notes = "Returns the entity effect in this potion",
-			},
 			GetEntityEffectType =
 			{
 				Returns =
 				{
 					{
-						Type = "cEntityEffect",
+						Type = "cEntityEffect#eType",
 					},
 				},
 				Notes = "Returns the effect type of this potion",
@@ -379,17 +369,6 @@ return
 					},
 				},
 				Notes = "Returns the color index of the particles emitted by this potion",
-			},
-			SetEntityEffect =
-			{
-				Params =
-				{
-					{
-						Name = "EntityEffect",
-						Type = "cEntityEffect",
-					},
-				},
-				Notes = "Sets the entity effect for this potion",
 			},
 			SetEntityEffectType =
 			{

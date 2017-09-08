@@ -8,19 +8,7 @@
 
 
 
-cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks) :
-	super(etTNT, a_X, a_Y, a_Z, 0.98, 0.98),
-	m_FuseTicks(a_FuseTicks)
-{
-	SetGravity(-16.0f);
-	SetAirDrag(0.02f);
-}
-
-
-
-
-
-cTNTEntity::cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks) :
+cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
 	super(etTNT, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {

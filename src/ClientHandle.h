@@ -242,7 +242,7 @@ public:  // tolua_export
 	/** Returns the view distance that the player request, not the used view distance. */
 	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
 
-	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
+	void SetLocale(const AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
 
 	int GetUniqueID(void) const { return m_UniqueID; }
@@ -491,11 +491,10 @@ private:
 		csDownloadingWorld,      ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
 		csConfirmingPos,         ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,               ///< Normal gameplay
+		csKicked,                ///< Disconnect packet sent, awaiting connection closure
 		csQueuedForDestruction,  ///< The client will be destroyed in the next tick (flag set when socket closed)
 		csDestroying,            ///< The client is being destroyed, don't queue any more packets / don't add to chunks
 		csDestroyed,             ///< The client has been destroyed, the destructor is to be called from the owner thread
-
-		// TODO: Add Kicking here as well
 	} ;
 
 	/* Mutex protecting m_State from concurrent writes. */
@@ -595,8 +594,3 @@ private:
 	virtual void OnRemoteClosed(void) override;
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
 };  // tolua_export
-
-
-
-
-

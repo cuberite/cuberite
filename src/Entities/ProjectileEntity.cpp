@@ -300,7 +300,7 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(eKind a_Kind, cEnti
 
 
 
-void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cProjectileEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	// Set the position based on what face was hit:
 	SetPosition(a_HitPos);
@@ -320,7 +320,7 @@ void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 
 
 
-void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	UNUSED(a_HitPos);
 

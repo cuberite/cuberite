@@ -223,8 +223,6 @@ cChunk * cEntity::GetParentChunk()
 
 void cEntity::Destroy(bool a_ShouldBroadcast)
 {
-	ASSERT(IsTicking());
-	ASSERT(GetParentChunk() != nullptr);
 	SetIsTicking(false);
 
 	// Unleash leashed mobs
@@ -238,19 +236,18 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 		m_World->BroadcastDestroyEntity(*this);
 	}
 
-	cChunk * ParentChunk = GetParentChunk();
-	// Destroy the entity after two seconds, to give time for all raw pointers such as m_Target
-	// to de-target this entity. This is a temporary solution.
-	m_World->ScheduleTask(40, [this, ParentChunk](cWorld & a_World)
+	// Destroy the entity after two seconds, to give time for all cMobPointers to nullify.
+	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
+	m_World->ScheduleTask(40, [this, ParentChunkCoords](cWorld & a_World)
 	{
 		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
 			this->GetUniqueID(), this->GetClass(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+			ParentChunkCoords.m_ChunkX, ParentChunkCoords.m_ChunkZ
 		);
 
 		// Make sure that RemoveEntity returned a valid smart pointer
 		// Also, not storing the returned pointer means automatic destruction
-		VERIFY(ParentChunk->RemoveEntity(*this));
+		VERIFY(a_World.RemoveEntity(*this));
 	});
 	Destroyed();
 }
@@ -1194,6 +1191,13 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
+	// Fireproof entities burn out on the next tick
+	if (IsFireproof())
+	{
+		m_TicksLeftBurning = 0;
+	}
+
+	// Fire is extinguished by rain
 	if (GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT))
 	{
 		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
@@ -1577,7 +1581,6 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 {
 	UNUSED(a_ShouldSendRespawn);
 	ASSERT(a_World != nullptr);
-	ASSERT(IsTicking());
 
 	if (GetWorld() == a_World)
 	{
@@ -1598,6 +1601,9 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Tell others we are gone
 	GetWorld()->BroadcastDestroyEntity(*this);
 
+	// Take note of old chunk coords
+	auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
+
 	// Set position to the new position
 	SetPosition(a_NewPosition);
 
@@ -1612,16 +1618,15 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 	// Queue add to new world and removal from the old one
 	cWorld * OldWorld = GetWorld();
-	cChunk * ParentChunk = GetParentChunk();
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-	OldWorld->QueueTask([this, ParentChunk, a_World](cWorld & a_OldWorld)
+	OldWorld->QueueTask([this, OldChunkCoords, a_World](cWorld & a_OldWorld)
 	{
 		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
 			this->GetUniqueID(), this->GetClass(),
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
+			OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
 		);
-		a_World->AddEntity(ParentChunk->RemoveEntity(*this));
+		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
 	});
 	return true;

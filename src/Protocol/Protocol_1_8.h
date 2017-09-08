@@ -173,6 +173,13 @@ protected:
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(const char * a_Data, size_t a_Size);
 
+	/** Nobody inherits 1.8, so it doesn't use this method */
+	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override
+	{
+		ASSERT(!"GetPacketId for cProtocol_1_8_0 is not implemented.");
+		return 0;
+	}
+
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
 	*/

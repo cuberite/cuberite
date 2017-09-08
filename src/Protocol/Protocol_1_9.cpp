@@ -216,7 +216,7 @@ void cProtocol_1_9_0::DataReceived(const char * a_Data, size_t a_Size)
 void cProtocol_1_9_0::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x40);  // Set passangers packet
+	cPacketizer Pkt(*this, GetPacketId(sendAttachEntity));  // Set passangers packet
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
 	Pkt.WriteVarInt32(1);  // 1 passenger
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
@@ -230,7 +230,7 @@ void cProtocol_1_9_0::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x0a);  // Block Action packet
+	cPacketizer Pkt(*this, GetPacketId(sendBlockAction));  // Block Action packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
@@ -245,7 +245,7 @@ void cProtocol_1_9_0::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x08);  // Block Break Animation packet
+	cPacketizer Pkt(*this, GetPacketId(sendBlockBreakAnim));  // Block Break Animation packet
 	Pkt.WriteVarInt32(a_EntityID);
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Stage);
@@ -259,7 +259,7 @@ void cProtocol_1_9_0::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x0b);  // Block Change packet
+	cPacketizer Pkt(*this, GetPacketId(sendBlockChange));  // Block Change packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
 }
@@ -272,7 +272,7 @@ void cProtocol_1_9_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x10);  // Multi Block Change packet
+	cPacketizer Pkt(*this, GetPacketId(sendBlockChanges));  // Multi Block Change packet
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
@@ -290,7 +290,7 @@ void cProtocol_1_9_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 
 void cProtocol_1_9_0::SendCameraSetTo(const cEntity & a_Entity)
 {
-	cPacketizer Pkt(*this, 0x36);  // Camera Packet (Attach the camera of a player at another entity in spectator mode)
+	cPacketizer Pkt(*this, GetPacketId(sendCameraSetTo));  // Camera Packet (Attach the camera of a player at another entity in spectator mode)
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 }
 
@@ -325,7 +325,7 @@ void cProtocol_1_9_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 	ASSERT(m_State == 3);  // In game mode?
 
 	// Send the json string to the client:
-	cPacketizer Pkt(*this, 0x0f);  // Chat Message packet
+	cPacketizer Pkt(*this, GetPacketId(sendChatRaw));  // Chat Message packet
 	Pkt.WriteString(a_MessageRaw);
 	Pkt.WriteBEInt8(a_Type);
 }
@@ -355,7 +355,7 @@ void cProtocol_1_9_0::SendCollectEntity(const cEntity & a_Entity, const cPlayer 
 	UNUSED(a_Count);
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x49);  // Collect Item packet
+	cPacketizer Pkt(*this, GetPacketId(sendCollectEntity));  // Collect Item packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 }
@@ -368,7 +368,7 @@ void cProtocol_1_9_0::SendDestroyEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x30);  // Destroy Entities packet
+	cPacketizer Pkt(*this, GetPacketId(sendDestroyEntity));  // Destroy Entities packet
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 }
@@ -380,7 +380,7 @@ void cProtocol_1_9_0::SendDestroyEntity(const cEntity & a_Entity)
 void cProtocol_1_9_0::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x40);  // Set passangers packet
+	cPacketizer Pkt(*this, GetPacketId(sendAttachEntity));  // Set passangers packet
 	Pkt.WriteVarInt32(a_PreviousVehicle.GetUniqueID());
 	Pkt.WriteVarInt32(0);  // No passangers
 }
@@ -396,14 +396,14 @@ void cProtocol_1_9_0::SendDisconnect(const AString & a_Reason)
 		case 2:
 		{
 			// During login:
-			cPacketizer Pkt(*this, 0);
+			cPacketizer Pkt(*this, GetPacketId(sendDisconnectDuringLogin));
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
 		}
 		case 3:
 		{
 			// In-game:
-			cPacketizer Pkt(*this, 0x1a);
+			cPacketizer Pkt(*this, GetPacketId(sendDisconnectDuringGame));
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
 		}
@@ -418,7 +418,7 @@ void cProtocol_1_9_0::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2a);  // Sign Editor Open packet
+	cPacketizer Pkt(*this, GetPacketId(sendEditSign));  // Sign Editor Open packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 }
 
@@ -430,7 +430,7 @@ void cProtocol_1_9_0::SendEntityEffect(const cEntity & a_Entity, int a_EffectID,
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x4c);  // Entity Effect packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityEffect));  // Entity Effect packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Amplifier));
@@ -446,7 +446,7 @@ void cProtocol_1_9_0::SendEntityEquipment(const cEntity & a_Entity, short a_Slot
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x3c);  // Entity Equipment packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityEquipment));  // Entity Equipment packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// Needs to be adjusted due to the insertion of offhand at slot 1
 	if (a_SlotNum > 0)
@@ -465,7 +465,7 @@ void cProtocol_1_9_0::SendEntityHeadLook(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x34);  // Entity Head Look packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityHeadLook));  // Entity Head Look packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
 }
@@ -478,7 +478,7 @@ void cProtocol_1_9_0::SendEntityLook(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x27);  // Entity Look packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityLook));  // Entity Look packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
@@ -493,7 +493,7 @@ void cProtocol_1_9_0::SendEntityMetadata(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x39);  // Entity Metadata packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityMeta));  // Entity Metadata packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityMetadata(Pkt, a_Entity);
 	Pkt.WriteBEUInt8(0xff);  // The termination byte
@@ -507,7 +507,7 @@ void cProtocol_1_9_0::SendEntityProperties(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x4b);  // Entity Properties packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityProperties));  // Entity Properties packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityProperties(Pkt, a_Entity);
 }
@@ -520,7 +520,7 @@ void cProtocol_1_9_0::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, c
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x25);  // Entity Relative Move packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityRelMove));  // Entity Relative Move packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
 	Pkt.WriteBEInt16(a_RelX * 128);
@@ -537,7 +537,7 @@ void cProtocol_1_9_0::SendEntityRelMoveLook(const cEntity & a_Entity, char a_Rel
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x26);  // Entity Look And Relative Move packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityRelMoveLook));  // Entity Look And Relative Move packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
 	Pkt.WriteBEInt16(a_RelX * 128);
@@ -556,7 +556,7 @@ void cProtocol_1_9_0::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1b);  // Entity Status packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityStatus));  // Entity Status packet
 	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEInt8(a_Status);
 }
@@ -569,7 +569,7 @@ void cProtocol_1_9_0::SendEntityVelocity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x3b);  // Entity Velocity packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityVelocity));  // Entity Velocity packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// 400 = 8000 / 20 ... Conversion from our speed in m / s to 8000 m / tick
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
@@ -585,7 +585,7 @@ void cProtocol_1_9_0::SendExplosion(double a_BlockX, double a_BlockY, double a_B
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1c);  // Explosion packet
+	cPacketizer Pkt(*this, GetPacketId(sendExplosion));  // Explosion packet
 	Pkt.WriteBEFloat(static_cast<float>(a_BlockX));
 	Pkt.WriteBEFloat(static_cast<float>(a_BlockY));
 	Pkt.WriteBEFloat(static_cast<float>(a_BlockZ));
@@ -610,7 +610,7 @@ void cProtocol_1_9_0::SendGameMode(eGameMode a_GameMode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1e);  // Change Game State packet
+	cPacketizer Pkt(*this, GetPacketId(sendGameMode));  // Change Game State packet
 	Pkt.WriteBEUInt8(3);  // Reason: Change game mode
 	Pkt.WriteBEFloat(static_cast<float>(a_GameMode));  // The protocol really represents the value with a float!
 }
@@ -623,7 +623,7 @@ void cProtocol_1_9_0::SendHealth(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x3e);  // Update Health packet
+	cPacketizer Pkt(*this, GetPacketId(sendHealth));  // Update Health packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEFloat(static_cast<float>(Player->GetHealth()));
 	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetFoodLevel()));
@@ -638,7 +638,7 @@ void cProtocol_1_9_0::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(3);  // Hide title
 }
 
@@ -650,7 +650,7 @@ void cProtocol_1_9_0::SendInventorySlot(char a_WindowID, short a_SlotNum, const 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x16);  // Set Slot packet
+	cPacketizer Pkt(*this, GetPacketId(sendInventorySlot));  // Set Slot packet
 	Pkt.WriteBEInt8(a_WindowID);
 	Pkt.WriteBEInt16(a_SlotNum);
 	WriteItem(Pkt, a_Item);
@@ -669,7 +669,7 @@ void cProtocol_1_9_0::SendKeepAlive(UInt32 a_PingID)
 		return;
 	}
 
-	cPacketizer Pkt(*this, 0x1f);  // Keep Alive packet
+	cPacketizer Pkt(*this, GetPacketId(sendKeepAlive));  // Keep Alive packet
 	Pkt.WriteVarInt32(a_PingID);
 }
 
@@ -680,7 +680,7 @@ void cProtocol_1_9_0::SendKeepAlive(UInt32 a_PingID)
 void cProtocol_1_9_0::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x3a);  // Set Attach Entity packet
+	cPacketizer Pkt(*this, GetPacketId(sendLeashEntity));  // Set Attach Entity packet
 	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt32(a_EntityLeashedTo.GetUniqueID());
 }
@@ -692,7 +692,7 @@ void cProtocol_1_9_0::SendLeashEntity(const cEntity & a_Entity, const cEntity & 
 void cProtocol_1_9_0::SendUnleashEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, 0x3a);  // Set Attach Entity packet
+	cPacketizer Pkt(*this, GetPacketId(sendLeashEntity));  // Set Attach Entity packet
 	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEInt32(-1);  // Unleash a_Entity
 }
@@ -706,7 +706,7 @@ void cProtocol_1_9_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the Join Game packet:
 	{
 		cServer * Server = cRoot::Get()->GetServer();
-		cPacketizer Pkt(*this, 0x23);  // Join Game packet
+		cPacketizer Pkt(*this, GetPacketId(sendJoinGame));  // Join Game packet
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteBEInt8(static_cast<Int8>(a_World.GetDimension()));
@@ -718,13 +718,13 @@ void cProtocol_1_9_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 
 	// Send the spawn position:
 	{
-		cPacketizer Pkt(*this, 0x43);  // Spawn Position packet
+		cPacketizer Pkt(*this, GetPacketId(sendSpawnPosition));  // Spawn Position packet
 		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
 	{
-		cPacketizer Pkt(*this, 0x0d);  // Server difficulty packet
+		cPacketizer Pkt(*this, GetPacketId(sendDifficulty));  // Server difficulty packet
 		Pkt.WriteBEInt8(1);
 	}
 
@@ -765,7 +765,7 @@ void cProtocol_1_9_0::SendPaintingSpawn(const cPainting & a_Painting)
 	double PosY = a_Painting.GetPosY();
 	double PosZ = a_Painting.GetPosZ();
 
-	cPacketizer Pkt(*this, 0x04);  // Spawn Painting packet
+	cPacketizer Pkt(*this, GetPacketId(sendPaintingSpawn));  // Spawn Painting packet
 	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -783,7 +783,7 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x24);  // Map packet
+	cPacketizer Pkt(*this, GetPacketId(sendMapData));  // Map packet
 	Pkt.WriteVarInt32(a_Map.GetID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
 
@@ -816,7 +816,7 @@ void cProtocol_1_9_0::SendPickupSpawn(const cPickup & a_Pickup)
 	ASSERT(m_State == 3);  // In game mode?
 
 	{  // TODO Use SendSpawnObject
-		cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+		cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
 		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 		Pkt.WriteBEUInt64(0);
@@ -844,7 +844,7 @@ void cProtocol_1_9_0::SendPlayerAbilities(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2b);  // Player Abilities packet
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerAbilities));  // Player Abilities packet
 	Byte Flags = 0;
 	cPlayer * Player = m_Client->GetPlayer();
 	if (Player->IsGameModeCreative())
@@ -873,7 +873,7 @@ void cProtocol_1_9_0::SendEntityAnimation(const cEntity & a_Entity, char a_Anima
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x06);  // Animation packet
+	cPacketizer Pkt(*this, GetPacketId(sendEntityAnimation));  // Animation packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEInt8(a_Animation);
 }
@@ -887,7 +887,7 @@ void cProtocol_1_9_0::SendParticleEffect(const AString & a_ParticleName, float a
 	ASSERT(m_State == 3);  // In game mode?
 	int ParticleID = GetParticleID(a_ParticleName);
 
-	cPacketizer Pkt(*this, 0x22);  // Particle effect packet
+	cPacketizer Pkt(*this, GetPacketId(sendParticleEffect));  // Particle effect packet
 	Pkt.WriteBEInt32(ParticleID);
 	Pkt.WriteBool(false);
 	Pkt.WriteBEFloat(a_SrcX);
@@ -909,7 +909,7 @@ void cProtocol_1_9_0::SendParticleEffect(const AString & a_ParticleName, Vector3
 	ASSERT(m_State == 3);  // In game mode?
 	int ParticleID = GetParticleID(a_ParticleName);
 
-	cPacketizer Pkt(*this, 0x22);  // Particle effect packet
+	cPacketizer Pkt(*this, GetPacketId(sendParticleEffect));  // Particle effect packet
 	Pkt.WriteBEInt32(ParticleID);
 	Pkt.WriteBool(false);
 	Pkt.WriteBEFloat(a_Src.x);
@@ -952,7 +952,7 @@ void cProtocol_1_9_0::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerList));  // Playerlist Item packet
 	Pkt.WriteVarInt32(0);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -989,7 +989,7 @@ void cProtocol_1_9_0::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerList));  // Playerlist Item packet
 	Pkt.WriteVarInt32(4);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -1003,7 +1003,7 @@ void cProtocol_1_9_0::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerList));  // Playerlist Item packet
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -1021,7 +1021,7 @@ void cProtocol_1_9_0::SendPlayerListUpdatePing(const cPlayer & a_Player)
 	auto ClientHandle = a_Player.GetClientHandlePtr();
 	if (ClientHandle != nullptr)
 	{
-		cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+		cPacketizer Pkt(*this, GetPacketId(sendPlayerList));  // Playerlist Item packet
 		Pkt.WriteVarInt32(2);
 		Pkt.WriteVarInt32(1);
 		Pkt.WriteUUID(a_Player.GetUUID());
@@ -1037,7 +1037,7 @@ void cProtocol_1_9_0::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2d);  // Playerlist Item packet
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerList));  // Playerlist Item packet
 	Pkt.WriteVarInt32(3);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -1061,7 +1061,7 @@ void cProtocol_1_9_0::SendPlayerMaxSpeed(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x4b);  // Entity Properties
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerMaxSpeed));  // Entity Properties
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteVarInt32(Player->GetUniqueID());
 	Pkt.WriteBEInt32(1);  // Count
@@ -1090,7 +1090,7 @@ void cProtocol_1_9_0::SendPlayerMoveLook(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2e);  // Player Position And Look packet
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerMoveLook));  // Player Position And Look packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEDouble(Player->GetPosX());
 	Pkt.WriteBEDouble(Player->GetPosY());
@@ -1121,7 +1121,7 @@ void cProtocol_1_9_0::SendPlayerPosition(void)
 void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
-	cPacketizer Pkt(*this, 0x05);  // Spawn Player packet
+	cPacketizer Pkt(*this, GetPacketId(sendPlayerSpawn));  // Spawn Player packet
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Vector3d LastSentPos = a_Player.GetLastSentPos();
@@ -1142,7 +1142,7 @@ void cProtocol_1_9_0::SendPluginMessage(const AString & a_Channel, const AString
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x18);  // Plugin message packet
+	cPacketizer Pkt(*this, GetPacketId(sendPluginMessage));  // Plugin message packet
 	Pkt.WriteString(a_Channel);
 	Pkt.WriteBuf(a_Message.data(), a_Message.size());
 }
@@ -1155,7 +1155,7 @@ void cProtocol_1_9_0::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Eff
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x31);  // Remove entity effect packet
+	cPacketizer Pkt(*this, GetPacketId(sendRemoveEntityEffect));  // Remove entity effect packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
 }
@@ -1168,7 +1168,7 @@ void cProtocol_1_9_0::SendResetTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(4);  // Reset title
 }
 
@@ -1178,7 +1178,7 @@ void cProtocol_1_9_0::SendResetTitle(void)
 
 void cProtocol_1_9_0::SendRespawn(eDimension a_Dimension)
 {
-	cPacketizer Pkt(*this, 0x33);  // Respawn packet
+	cPacketizer Pkt(*this, GetPacketId(sendRespawn));  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Dimension));
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
@@ -1194,7 +1194,7 @@ void cProtocol_1_9_0::SendExperience(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x3d);  // Experience Packet
+	cPacketizer Pkt(*this, GetPacketId(sendExperience));  // Experience Packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEFloat(Player->GetXpPercentage());
 	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetXpLevel()));
@@ -1209,7 +1209,7 @@ void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x01);  // Spawn experience orb packet
+	cPacketizer Pkt(*this, GetPacketId(sendExperienceOrb));  // Spawn experience orb packet
 	Pkt.WriteVarInt32(a_ExpOrb.GetUniqueID());
 	Pkt.WriteBEDouble(a_ExpOrb.GetPosX());
 	Pkt.WriteBEDouble(a_ExpOrb.GetPosY());
@@ -1225,7 +1225,7 @@ void cProtocol_1_9_0::SendScoreboardObjective(const AString & a_Name, const AStr
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x3f);  // Scoreboard objective packet
+	cPacketizer Pkt(*this, GetPacketId(sendScoreboardObjective));  // Scoreboard objective packet
 	Pkt.WriteString(a_Name);
 	Pkt.WriteBEUInt8(a_Mode);
 	if ((a_Mode == 0) || (a_Mode == 2))
@@ -1243,7 +1243,7 @@ void cProtocol_1_9_0::SendScoreUpdate(const AString & a_Objective, const AString
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x42);  // Update score packet
+	cPacketizer Pkt(*this, GetPacketId(sendScoreUpdate));  // Update score packet
 	Pkt.WriteString(a_Player);
 	Pkt.WriteBEUInt8(a_Mode);
 	Pkt.WriteString(a_Objective);
@@ -1262,7 +1262,7 @@ void cProtocol_1_9_0::SendDisplayObjective(const AString & a_Objective, cScorebo
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x38);  // Display scoreboard packet
+	cPacketizer Pkt(*this, GetPacketId(sendDisplayObjective));  // Display scoreboard packet
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Display));
 	Pkt.WriteString(a_Objective);
 }
@@ -1284,7 +1284,7 @@ void cProtocol_1_9_0::SendSetRawSubTitle(const AString & a_SubTitle)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(1);  // Set subtitle
 
 	Pkt.WriteString(a_SubTitle);
@@ -1307,7 +1307,7 @@ void cProtocol_1_9_0::SendSetRawTitle(const AString & a_Title)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(0);  // Set title
 
 	Pkt.WriteString(a_Title);
@@ -1321,7 +1321,7 @@ void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, double a_X, d
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x19);  // Named sound effect packet
+	cPacketizer Pkt(*this, GetPacketId(sendSoundEffect));  // Named sound effect packet
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
@@ -1339,7 +1339,7 @@ void cProtocol_1_9_0::SendSoundParticleEffect(const EffectID a_EffectID, int a_S
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x21);  // Effect packet
+	cPacketizer Pkt(*this, GetPacketId(sendSoundParticleEffect));  // Effect packet
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
 	Pkt.WritePosition64(a_SrcX, a_SrcY, a_SrcZ);
 	Pkt.WriteBEInt32(a_Data);
@@ -1354,7 +1354,7 @@ void cProtocol_1_9_0::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 	Pkt.WriteVarInt32(a_FallingBlock.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -1380,7 +1380,7 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x03);  // Spawn Mob packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnMob));  // Spawn Mob packet
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -1415,7 +1415,7 @@ void cProtocol_1_9_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectTyp
 		FixItemFramePositions(a_ObjectData, PosX, PosZ, Yaw);
 	}
 
-	cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -1440,7 +1440,7 @@ void cProtocol_1_9_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Vehicle
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x00);  // Spawn Object packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnObject));  // Spawn Object packet
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -1466,7 +1466,7 @@ void cProtocol_1_9_0::SendStatistics(const cStatManager & a_Manager)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x07);  // Statistics packet
+	cPacketizer Pkt(*this, GetPacketId(sendStatistics));  // Statistics packet
 	Pkt.WriteVarInt32(statCount);  // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
 
 	size_t Count = static_cast<size_t>(statCount);
@@ -1488,7 +1488,7 @@ void cProtocol_1_9_0::SendTabCompletionResults(const AStringVector & a_Results)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x0e);  // Tab-Complete packet
+	cPacketizer Pkt(*this, GetPacketId(sendTabCompletion));  // Tab-Complete packet
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Results.size()));
 
 	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
@@ -1505,7 +1505,7 @@ void cProtocol_1_9_0::SendTeleportEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x4a);  // Entity teleport packet
+	cPacketizer Pkt(*this, GetPacketId(sendTeleportEntity));  // Entity teleport packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
 	Pkt.WriteBEDouble(a_Entity.GetPosY());
@@ -1523,7 +1523,7 @@ void cProtocol_1_9_0::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x02);  // Spawn Global Entity packet
+	cPacketizer Pkt(*this, GetPacketId(sendSpawnGlobalEntity));  // Spawn Global Entity packet
 	Pkt.WriteVarInt32(0);  // EntityID = 0, always
 	Pkt.WriteBEUInt8(1);  // Type = Thunderbolt
 	Pkt.WriteBEDouble(a_BlockX);
@@ -1539,7 +1539,7 @@ void cProtocol_1_9_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
 	Pkt.WriteVarInt32(2);  // Set title display times
 
 	Pkt.WriteBEInt32(a_FadeInTicks);
@@ -1560,7 +1560,7 @@ void cProtocol_1_9_0::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a
 		a_TimeOfDay = std::min(-a_TimeOfDay, -1LL);
 	}
 
-	cPacketizer Pkt(*this, 0x44);  // Time update packet
+	cPacketizer Pkt(*this, GetPacketId(sendTimeUpdate));  // Time update packet
 	Pkt.WriteBEInt64(a_WorldAge);
 	Pkt.WriteBEInt64(a_TimeOfDay);
 }
@@ -1573,7 +1573,7 @@ void cProtocol_1_9_0::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x1d);  // Unload chunk packet
+	cPacketizer Pkt(*this, GetPacketId(sendUnloadChunk));  // Unload chunk packet
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
 }
@@ -1585,7 +1585,7 @@ void cProtocol_1_9_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x09);  // Update tile entity packet
+	cPacketizer Pkt(*this, GetPacketId(sendUpdateBlockEntity));  // Update tile entity packet
 	Pkt.WritePosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 
 	Byte Action = 0;
@@ -1612,7 +1612,7 @@ void cProtocol_1_9_0::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x46);  // Update sign packet
+	cPacketizer Pkt(*this, GetPacketId(sendUpdateSign));  // Update sign packet
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 
 	Json::StyledWriter JsonWriter;
@@ -1633,7 +1633,7 @@ void cProtocol_1_9_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x2f);  // Use bed
+	cPacketizer Pkt(*this, GetPacketId(sendUseBed));  // Use bed
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 }
@@ -1647,7 +1647,7 @@ void cProtocol_1_9_0::SendWeather(eWeather a_Weather)
 	ASSERT(m_State == 3);  // In game mode?
 
 	{
-		cPacketizer Pkt(*this, 0x1e);  // Change Game State packet
+		cPacketizer Pkt(*this, GetPacketId(sendWeather));  // Change Game State packet
 		Pkt.WriteBEUInt8((a_Weather == wSunny) ? 1 : 2);  // End rain / begin rain
 		Pkt.WriteBEFloat(0);  // Unused for weather
 	}
@@ -1663,7 +1663,7 @@ void cProtocol_1_9_0::SendWholeInventory(const cWindow & a_Window)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x14);  // Window Items packet
+	cPacketizer Pkt(*this, GetPacketId(sendWindowItems));  // Window Items packet
 	Pkt.WriteBEInt8(a_Window.GetWindowID());
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Window.GetNumSlots()));
 	cItems Slots;
@@ -1682,7 +1682,7 @@ void cProtocol_1_9_0::SendWindowClose(const cWindow & a_Window)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x12);  // Close window packet
+	cPacketizer Pkt(*this, GetPacketId(sendWindowClose));  // Close window packet
 	Pkt.WriteBEInt8(a_Window.GetWindowID());
 }
 
@@ -1700,7 +1700,7 @@ void cProtocol_1_9_0::SendWindowOpen(const cWindow & a_Window)
 		return;
 	}
 
-	cPacketizer Pkt(*this, 0x13);  // Open window packet
+	cPacketizer Pkt(*this, GetPacketId(sendWindowOpen));  // Open window packet
 	Pkt.WriteBEInt8(a_Window.GetWindowID());
 	Pkt.WriteString(a_Window.GetWindowTypeName());
 	Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
@@ -1735,7 +1735,7 @@ void cProtocol_1_9_0::SendWindowProperty(const cWindow & a_Window, short a_Prope
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x15);  // Window Property packet
+	cPacketizer Pkt(*this, GetPacketId(sendWindowProperty));  // Window Property packet
 	Pkt.WriteBEInt8(a_Window.GetWindowID());
 	Pkt.WriteBEInt16(a_Property);
 	Pkt.WriteBEInt16(a_Value);
@@ -4176,10 +4176,10 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the Join Game packet:
 	{
 		cServer * Server = cRoot::Get()->GetServer();
-		cPacketizer Pkt(*this, 0x23);  // Join Game packet
+		cPacketizer Pkt(*this, GetPacketId(sendJoinGame));  // Join Game packet
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
-		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
+		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));  // This is the change from 1.9.0 (Int8 to Int32)
 		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");  // Level type - wtf?
@@ -4188,13 +4188,13 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 
 	// Send the spawn position:
 	{
-		cPacketizer Pkt(*this, 0x43);  // Spawn Position packet
+		cPacketizer Pkt(*this, GetPacketId(sendSpawnPosition));  // Spawn Position packet
 		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
 	{
-		cPacketizer Pkt(*this, 0x0d);  // Server difficulty packet
+		cPacketizer Pkt(*this, GetPacketId(sendDifficulty));  // Server difficulty packet
 		Pkt.WriteBEInt8(1);
 	}
 
@@ -4368,20 +4368,6 @@ void cProtocol_1_9_4::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_9_4::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
-{
-	UNUSED(a_Count);
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, 0x48);  // Collect Item packet
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteVarInt32(a_Player.GetUniqueID());
-}
-
-
-
-
-
 void cProtocol_1_9_4::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -4392,83 +4378,6 @@ void cProtocol_1_9_4::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerial
 
 	cCSLock Lock(m_CSPacket);
 	SendData(ChunkData.data(), ChunkData.size());
-}
-
-
-
-
-
-void cProtocol_1_9_4::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, 0x4b);  // Entity Effect packet
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<UInt8>(a_EffectID));
-	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Amplifier));
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Duration));
-	Pkt.WriteBool(false);  // Hide particles
-}
-
-
-
-
-
-void cProtocol_1_9_4::SendEntityProperties(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-
-	cPacketizer Pkt(*this, 0x4a);  // Entity Properties packet
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	WriteEntityProperties(Pkt, a_Entity);
-}
-
-
-
-
-
-void cProtocol_1_9_4::SendPlayerMaxSpeed(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, 0x4a);  // Entity Properties
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteVarInt32(Player->GetUniqueID());
-	Pkt.WriteBEInt32(1);  // Count
-	Pkt.WriteString("generic.movementSpeed");
-	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
-	if (Player->IsSprinting())
-	{
-		Pkt.WriteVarInt32(1);  // Modifier count
-		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
-		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
-		Pkt.WriteBEUInt8(2);
-	}
-	else
-	{
-		Pkt.WriteVarInt32(0);  // Modifier count
-	}
-}
-
-
-
-
-
-void cProtocol_1_9_4::SendTeleportEntity(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, 0x49);  // Entity teleport packet
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEDouble(a_Entity.GetPosX());
-	Pkt.WriteBEDouble(a_Entity.GetPosY());
-	Pkt.WriteBEDouble(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 

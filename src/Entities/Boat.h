@@ -42,7 +42,7 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 
-	cBoat(double a_X, double a_Y, double a_Z, eMaterial a_Material);
+	cBoat(Vector3d a_Pos, eMaterial a_Material);
 
 	int GetLastDamage(void) const { return m_LastDamage; }
 	int GetForwardDirection(void) const { return m_ForwardDirection; }

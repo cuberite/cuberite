@@ -120,16 +120,18 @@ void cWorld::cTickThread::Execute(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_LinkedOverworldName) :
+cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimension a_Dimension, const AString & a_LinkedOverworldName) :
 	m_WorldName(a_WorldName),
+	m_DataPath(a_DataPath),
 	m_LinkedOverworldName(a_LinkedOverworldName),
-	m_IniFileName(m_WorldName + "/world.ini"),
+	m_IniFileName(m_DataPath + "/world.ini"),
 	m_StorageSchema("Default"),
 #ifdef __arm__
 	m_StorageCompressionFactor(0),
 #else
 	m_StorageCompressionFactor(6),
 #endif
+	m_IsSavingEnabled(true),
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
 	m_SpawnX(0),
@@ -194,10 +196,10 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
-	cFile::CreateFolder(FILE_IO_PREFIX + m_WorldName);
+	cFile::CreateFolderRecursive(FILE_IO_PREFIX + m_DataPath);
 
 	// Load the scoreboard
-	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
+	cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
 	Serializer.Load();
 }
 
@@ -213,11 +215,14 @@ cWorld::~cWorld()
 
 	m_Storage.WaitForFinish();
 
-	// Unload the scoreboard
-	cScoreboardSerializer Serializer(m_WorldName, &m_Scoreboard);
-	Serializer.Save();
+	if (IsSavingEnabled())
+	{
+		// Unload the scoreboard
+		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
+		Serializer.Save();
 
-	m_MapManager.SaveMapData();
+		m_MapManager.SaveMapData();
+	}
 
 	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
 	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
@@ -2306,9 +2311,9 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 
 
-UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material)
+UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 {
-	auto Boat = cpp14::make_unique<cBoat>(a_X, a_Y, a_Z, a_Material);
+	auto Boat = cpp14::make_unique<cBoat>(a_Pos, a_Material);
 	auto BoatPtr = Boat.get();
 	if (!BoatPtr->Initialize(std::move(Boat), *this))
 	{
@@ -2320,9 +2325,9 @@ UInt32 cWorld::SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_
 
 
 
-UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
+UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
-	auto TNT = cpp14::make_unique<cTNTEntity>(a_X, a_Y, a_Z, a_FuseTicks);
+	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
 	auto TNTPtr = TNT.get();
 	if (!TNTPtr->Initialize(std::move(TNT), *this))
 	{
@@ -2965,7 +2970,9 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	);
 
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
-	if (a_SetChunkData.ShouldMarkDirty())
+	// If saving is disabled, then the chunk was marked dirty so it will get
+	// saved if saving is later enabled.
+	if (a_SetChunkData.ShouldMarkDirty() && IsSavingEnabled())
 	{
 		m_Storage.QueueSaveChunk(ChunkX, ChunkZ);
 	}
@@ -3629,8 +3636,11 @@ bool cWorld::ForEachLoadedChunk(std::function<bool(int, int)> a_Callback)
 
 void cWorld::SaveAllChunks(void)
 {
-	m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
-	m_ChunkMap->SaveAllChunks();
+	if (IsSavingEnabled())
+	{
+		m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
+		m_ChunkMap->SaveAllChunks();
+	}
 }
 
 
@@ -3703,6 +3713,36 @@ bool cWorld::HasEntity(UInt32 a_UniqueID)
 		return false;
 	}
 	return m_ChunkMap->HasEntity(a_UniqueID);
+}
+
+
+
+
+
+OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
+{
+	// Check if the entity is in the chunkmap:
+	auto Entity = m_ChunkMap->RemoveEntity(a_Entity);
+	if (Entity != nullptr)
+	{
+		return Entity;
+	}
+
+	// Check if the entity is in the queue to be added to the world:
+	cCSLock Lock(m_CSEntitiesToAdd);
+	auto itr = std::find_if(m_EntitiesToAdd.begin(), m_EntitiesToAdd.end(),
+		[&a_Entity](const OwnedEntity & a_OwnedEntity)
+		{
+			return (a_OwnedEntity.get() == &a_Entity);
+		}
+	);
+
+	if (itr != m_EntitiesToAdd.end())
+	{
+		Entity = std::move(*itr);
+		m_EntitiesToAdd.erase(itr);
+	}
+	return Entity;
 }
 
 
