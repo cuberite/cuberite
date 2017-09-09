@@ -39,25 +39,25 @@ public:
 
 	enum eCriteriaClass
 	{
-		otDummy,
+		crDummy,
 
-		otDeathCount,
-		otPlayerKillCount,
-		otTotalKillCount,
-		otHealth,
+		crDeathCount,
+		crPlayerKillCount,
+		crTotalKillCount,
+		crHealth,
 
-		otAchievement,
+		crAchievement,
 
-		otStat,
-		otStatItemCraft,
-		otStatItemUse,
-		otStatItemBreak,
+		crStat,
+		crStatItemCraft,
+		crStatItemUse,
+		crStatItemBreak,
 
-		otStatBlockMine,
-		otStatEntityKill,
-		otStatEntityKilledBy,
+		crStatBlockMine,
+		crStatEntityKill,
+		crStatEntityKilledBy,
 
-		otClassCount
+		crClassCount
 	};
 
 	typedef int Criteria;
@@ -85,8 +85,8 @@ public:
 		return a_Criteria & 0xffff;
 	}
 
-	static Criteria StringToType(const AString & a_Name);
-	static AString TypeToString(Criteria a_Type);
+	static Criteria StringToCriteria(const AString & a_Name);
+	static AString CriteriaToString(Criteria a_Type);
 
 	// tolua_end
 

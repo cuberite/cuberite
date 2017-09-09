@@ -9136,6 +9136,95 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Adds a value to the score of the specified player and returns the new value.",
 				},
+				CriteriaFromClass =
+				{
+					Params =
+					{
+						{
+							Name = "Class",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Criteria",
+						},
+					},
+					Notes = "(STATIC) Given an enumerated criteria class, create a criteria with the sub criteria equal to zero.",
+				},
+				CriteriaFromClassAndSub =
+				{
+					Params =
+					{
+						{
+							Name = "Class",
+							Type = "number",
+						},
+						{
+							Name = "SubCriteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Criteria",
+						},
+					},
+					Notes = "(STATIC) Given an enumerated criteria class, create a criteria with the sub criteria equal to the given sub criteria.",
+				},
+				CriteriaToString =
+				{
+					Params =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "(STATIC) Converts an internal objective Criteria to a Vanilla minecraft objective criteria string",
+				},
+				GetCriteriaClass =
+				{
+					Params =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "CriteriaClass",
+						},
+					},
+					Notes = "(STATIC) Given a criteria number, returns the enumerated class of the criteria.",
+				},
+				GetCriteriaSub =
+				{
+					Params =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "CriteriaSub",
+						},
+					},
+					Notes = "(STATIC) Given a criteria number, returns the sub criteria ID of the criteria.",
+				},
 				GetDisplayName =
 				{
 					Returns =
@@ -9268,22 +9357,22 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the score of the specified key.",
 				},
-				StringToType =
+				StringToCriteria =
 				{
 					Params =
 					{
 						{
-							Name = "TypeString",
+							Name = "VanillaCriteriaString",
 							Type = "string",
 						},
 					},
 					Returns =
 					{
 						{
-							Type = "<unknown>",
+							Type = "number",
 						},
 					},
-					Notes = "(STATIC) Converts a Vanilla minecraft objective criteria string to an internal eType.",
+					Notes = "(STATIC) Converts a Vanilla minecraft objective criteria string to an internal objective Criteria.",
 				},
 				SubScore =
 				{
@@ -9307,75 +9396,62 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Subtracts a value from the score of the specified key and returns the new value.",
 				},
-				TypeToString =
-				{
-					Params =
-					{
-						{
-							Name = "Type",
-							Type = "<unknown>",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "(STATIC) Converts an internal objective eType to a Vanilla minecraft objective criteria string",
-				},
 			},
 			Constants =
 			{
-				otAchievement =
+				crAchievement =
 				{
 					Notes = "",
 				},
-				otDeathCount =
+				crClassCount =
+				{
+					Notes = "The number of criteria classes",
+				},
+				crDeathCount =
 				{
 					Notes = "",
 				},
-				otDummy =
+				crDummy =
 				{
 					Notes = "",
 				},
-				otHealth =
+				crHealth =
 				{
 					Notes = "",
 				},
-				otPlayerKillCount =
+				crPlayerKillCount =
 				{
 					Notes = "",
 				},
-				otStat =
+				crStat =
 				{
 					Notes = "",
 				},
-				otStatBlockMine =
+				crStatBlockMine =
 				{
 					Notes = "",
 				},
-				otStatEntityKill =
+				crStatEntityKill =
 				{
 					Notes = "",
 				},
-				otStatEntityKilledBy =
+				crStatEntityKilledBy =
 				{
 					Notes = "",
 				},
-				otStatItemBreak =
+				crStatItemBreak =
 				{
 					Notes = "",
 				},
-				otStatItemCraft =
+				crStatItemCraft =
 				{
 					Notes = "",
 				},
-				otStatItemUse =
+				crStatItemUse =
 				{
 					Notes = "",
 				},
-				otTotalKillCount =
+				crTotalKillCount =
 				{
 					Notes = "",
 				},

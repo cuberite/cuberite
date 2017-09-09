@@ -13,7 +13,7 @@
 
 
 
-AString cObjective::TypeToString(Criteria a_Type)
+AString cObjective::CriteriaToString(Criteria a_Type)
 {
 	switch (GetCriteriaClass(a_Type))
 	{
@@ -53,7 +53,7 @@ AString cObjective::TypeToString(Criteria a_Type)
 
 
 
-cObjective::Criteria cObjective::StringToType(const AString & a_Name)
+cObjective::Criteria cObjective::StringToCriteria(const AString & a_Name)
 {
 	// For some, we don't have to do any further processing
 	static const std::map<AString, Criteria> SimpleCriteria =
