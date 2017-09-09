@@ -85,20 +85,6 @@ public:
 		return a_Criteria & 0xffff;
 	}
 
-	/*struct Criteria
-	{
-		Criteria(eCriteriaClass a_Criteria) : m_Criteria(a_Criteria), m_SubCriteria(0) {}
-		Criteria(eCriteriaClass a_Criteria, int a_SubCriteria) : m_Criteria(a_Criteria), m_SubCriteria(a_SubCriteria) {}
-
-		bool operator ==(Criteria a_Other)
-		{
-			return (m_Criteria == a_Other.m_Criteria) && (m_SubCriteria == a_Other.m_SubCriteria);
-		}
-
-		eCriteriaClass m_Criteria;
-		int m_SubCriteria;
-	};*/
-
 	static Criteria StringToType(const AString & a_Name);
 	static AString TypeToString(Criteria a_Type);
 
