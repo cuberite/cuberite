@@ -17,26 +17,26 @@ AString cObjective::CriteriaToString(Criteria a_Type)
 {
 	switch (GetCriteriaClass(a_Type))
 	{
-		case otDummy:              return "dummy";
-		case otDeathCount:         return "deathCount";
-		case otPlayerKillCount:    return "playerKillCount";
-		case otTotalKillCount:     return "totalKillCount";
-		case otHealth:             return "health";
-		case otAchievement:        return "achievement";  // DEPRECATED
+		case crDummy:              return "dummy";
+		case crDeathCount:         return "deathCount";
+		case crPlayerKillCount:    return "playerKillCount";
+		case crTotalKillCount:     return "totalKillCount";
+		case crHealth:             return "health";
+		case crAchievement:        return "achievement";  // DEPRECATED
 
 		// These all have extra things after the dot
-		case otStat:               return "stat";
-		case otStatItemCraft:      return "stat.craftItem";
-		case otStatItemUse:        return "stat.useItem";
-		case otStatItemBreak:      return "stat.breakItem";
-		case otStatBlockMine:      return "stat.mineBlock";
+		case crStat:               return "stat";
+		case crStatItemCraft:      return "stat.craftItem";
+		case crStatItemUse:        return "stat.useItem";
+		case crStatItemBreak:      return "stat.breakItem";
+		case crStatBlockMine:      return "stat.mineBlock";
 
 		// Have to convert the entity ID to a name
-		case otStatEntityKill:
+		case crStatEntityKill:
 		{
 			return "stat.killEntity." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(GetCriteriaSub(a_Type)));
 		}
-		case otStatEntityKilledBy:
+		case crStatEntityKilledBy:
 		{
 			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(GetCriteriaSub(a_Type)));
 		}
@@ -58,11 +58,11 @@ cObjective::Criteria cObjective::StringToCriteria(const AString & a_Name)
 	// For some, we don't have to do any further processing
 	static const std::map<AString, Criteria> SimpleCriteria =
 	{
-		{"dummy", otDummy},
-		{"deathCount", otDeathCount},
-		{"playerKillCount", otPlayerKillCount},
-		{"totalKillCount", otTotalKillCount},
-		{"health", otHealth}
+		{"dummy", crDummy},
+		{"deathCount", crDeathCount},
+		{"playerKillCount", crPlayerKillCount},
+		{"totalKillCount", crTotalKillCount},
+		{"health", crHealth}
 	};
 	auto it = SimpleCriteria.find(a_Name);
 	if (it != SimpleCriteria.end())
@@ -79,18 +79,18 @@ cObjective::Criteria cObjective::StringToCriteria(const AString & a_Name)
 	{
 		AString Entity = a_Name.substr(16);
 		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return CriteriaFromClassAndSub(otStatEntityKill, static_cast<short>(MonsterType));
+		return CriteriaFromClassAndSub(crStatEntityKill, static_cast<short>(MonsterType));
 	}
 	if (a_Name.substr(0, 20) == "stat.entityKilledBy.")
 	{
 		AString Entity = a_Name.substr(20);
 		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return CriteriaFromClassAndSub(otStatEntityKilledBy, static_cast<short>(MonsterType));
+		return CriteriaFromClassAndSub(crStatEntityKilledBy, static_cast<short>(MonsterType));
 	}
 
 	// TODO: Handle other cases
 	LOGWARNING("Could not parse cObjective criteria '%s', returning otDummy", a_Name.c_str());
-	return CriteriaFromClass(otDummy);
+	return CriteriaFromClass(crDummy);
 }
 
 
