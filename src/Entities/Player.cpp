@@ -1137,7 +1137,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	m_Stats.AddValue(statDeaths);
 
-	m_World->GetScoreboard().AddToScore(GetName(), cObjective::otDeathCount, 1);
+	m_World->GetScoreboard().AddToScore(GetName(), cObjective::crDeathCount, 1);
 }
 
 
@@ -1152,19 +1152,21 @@ void cPlayer::Killed(cEntity * a_Victim)
 	{
 		m_Stats.AddValue(statPlayerKills);
 
-		Scoreboard.AddToScore(GetName(), cObjective::otPlayerKillCount, 1);
+		Scoreboard.AddToScore(GetName(), cObjective::crPlayerKillCount, 1);
 	}
 	else if (a_Victim->IsMob())
 	{
-		if (reinterpret_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		cMonster * Monster = reinterpret_cast<cMonster *>(a_Victim);
+		if (Monster->GetMobFamily() == cMonster::mfHostile)
 		{
 			AwardAchievement(achKillMonster);
 		}
 
 		m_Stats.AddValue(statMobKills);
+		Scoreboard.AddToScore(GetName(), cObjective::CriteriaFromClassAndSub(cObjective::crStatEntityKill, Monster->GetMobType()), 1);
 	}
 
-	Scoreboard.AddToScore(GetName(), cObjective::otTotalKillCount, 1);
+	Scoreboard.AddToScore(GetName(), cObjective::crTotalKillCount, 1);
 }
 
 

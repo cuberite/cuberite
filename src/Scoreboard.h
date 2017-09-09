@@ -65,7 +65,7 @@ public:
 	// TODO: Remove magic numbers
 	static Criteria CriteriaFromClassAndSub(eCriteriaClass a_Class, short a_SubCriteria)
 	{
-		return (static_cast<int>(a_Class) << 16) | a_SubCriteria;
+		return (a_SubCriteria << 16) | static_cast<int>(a_Class);
 	}
 
 	static Criteria CriteriaFromClass(eCriteriaClass a_Class)
@@ -75,14 +75,14 @@ public:
 
 	static eCriteriaClass GetCriteriaClass(Criteria a_Criteria)
 	{
-		int Class = a_Criteria >> 16;
+		int Class = a_Criteria & 0xffff;
 		ASSERT(Class < otClassCount);
 		return static_cast<eCriteriaClass>(Class);
 	}
 
 	static short GetCriteriaSub(Criteria a_Criteria)
 	{
-		return a_Criteria & 0xffff;
+		return (a_Criteria >> 16) & 0xffff;
 	}
 
 	static Criteria StringToCriteria(const AString & a_Name);
