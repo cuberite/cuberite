@@ -43,8 +43,12 @@ public:
 	used as-is to represent a Criteria. */
 	typedef int Criteria;
 
+	// tolua_end
+
 	static const int SubCriteriaOffset = 16;
 	static const int CriteriaClassMask = 0xffff;
+
+	// tolua_begin
 
 	enum eCriteriaClass
 	{
@@ -86,7 +90,7 @@ public:
 	static eCriteriaClass GetCriteriaClass(Criteria a_Criteria)
 	{
 		int Class = a_Criteria & CriteriaClassMask;
-		ASSERT(Class < otClassCount);
+		ASSERT(Class < crClassCount);
 		return static_cast<eCriteriaClass>(Class);
 	}
 
