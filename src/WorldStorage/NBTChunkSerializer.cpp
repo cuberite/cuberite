@@ -732,22 +732,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddInt("Age",             Rabbit->GetAge());
 				break;
 			}
-			case mtInvalidType:
-			case mtBlaze:
-			case mtCaveSpider:
-			case mtChicken:
-			case mtCow:
-			case mtEnderDragon:
-			case mtGhast:
-			case mtGiant:
-			case mtGuardian:
-			case mtIronGolem:
-			case mtMooshroom:
-			case mtSilverfish:
-			case mtSnowGolem:
-			case mtSpider:
-			case mtSquid:
-			case mtWitch:
+			default:
 			{
 				// Other mobs have no special tags.
 				break;

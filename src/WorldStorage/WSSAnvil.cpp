@@ -716,22 +716,25 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 
 		// Blocktypes that have block entities but don't load their contents from disk:
 		case E_BLOCK_ENDER_CHEST:   return nullptr;
-	}
 
-	// All the other blocktypes should have no entities assigned to them. Report an error:
-	// Get the "id" tag:
-	int TagID = a_NBT.FindChildByName(a_Tag, "id");
-	AString TypeName("<unknown>");
-	if (TagID >= 0)
-	{
-		TypeName.assign(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID)));
+		default:
+		{
+			// All the other blocktypes should have no entities assigned to them. Report an error:
+			// Get the "id" tag:
+			int TagID = a_NBT.FindChildByName(a_Tag, "id");
+			AString TypeName("<unknown>");
+			if (TagID >= 0)
+			{
+				TypeName.assign(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID)));
+			}
+			LOGINFO("WorldLoader(%s): Block entity mismatch: block type %s (%d), type \"%s\", at {%d, %d, %d}; the entity will be lost.",
+				m_World->GetName().c_str(),
+				ItemTypeToString(a_BlockType).c_str(), a_BlockType, TypeName.c_str(),
+				a_BlockX, a_BlockY, a_BlockZ
+			);
+			return nullptr;
+		}
 	}
-	LOGINFO("WorldLoader(%s): Block entity mismatch: block type %s (%d), type \"%s\", at {%d, %d, %d}; the entity will be lost.",
-		m_World->GetName().c_str(),
-		ItemTypeToString(a_BlockType).c_str(), a_BlockType, TypeName.c_str(),
-		a_BlockX, a_BlockY, a_BlockZ
-	);
-	return nullptr;
 }
 
 
@@ -1652,6 +1655,7 @@ void cWSSAnvil::LoadOldMinecartFromNBT(cEntityList & a_Entities, const cParsedNB
 		case 2: LoadMinecartFFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Minecart with furnace
 		case 3: LoadMinecartTFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Minecart with TNT
 		case 4: LoadMinecartHFromNBT(a_Entities, a_NBT, a_TagIdx); break;  // Minecart with Hopper
+		default: LOGWARNING("cWSSAnvil::LoadOldMinecartFromNBT: Unhandled minecart type"); break;
 	}
 }
 

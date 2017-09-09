@@ -198,65 +198,69 @@ int cStructGenTrees::GetNumTrees(
 	const cChunkDef::BiomeMap & a_Biomes
 )
 {
-	int NumTrees = 0;
-	for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
+	auto BiomeTrees = [](EMCSBiome a_Biome)
 	{
-		int Add = 0;
-		switch (cChunkDef::GetBiome(a_Biomes, x, z))
+		switch (a_Biome)
 		{
-			case biOcean:                Add =   2; break;
-			case biDesert:               Add =   0; break;
-			case biPlains:               Add =   1; break;
-			case biExtremeHills:         Add =   3; break;
-			case biForest:               Add =  30; break;
-			case biTaiga:                Add =  30; break;
-			case biSwampland:            Add =   8; break;
-			case biIcePlains:            Add =   1; break;
-			case biIceMountains:         Add =   1; break;
-			case biMushroomIsland:       Add =   3; break;
-			case biMushroomShore:        Add =   3; break;
-			case biForestHills:          Add =  20; break;
-			case biTaigaHills:           Add =  20; break;
-			case biExtremeHillsEdge:     Add =   5; break;
-			case biJungle:               Add = 120; break;
-			case biJungleHills:          Add =  90; break;
-			case biJungleEdge:           Add =  90; break;
-			case biBirchForest:          Add =  30; break;
-			case biBirchForestHills:     Add =  20; break;
-			case biRoofedForest:         Add =  50; break;
-			case biColdTaiga:            Add =  20; break;
-			case biColdTaigaHills:       Add =  15; break;
-			case biMegaTaiga:            Add =  30; break;
-			case biMegaTaigaHills:       Add =  25; break;
-			case biExtremeHillsPlus:     Add =   3; break;
-			case biSavanna:              Add =   8; break;
-			case biSavannaPlateau:       Add =  12; break;
-			case biMesa:                 Add =   2; break;
-			case biMesaPlateauF:         Add =   8; break;
-			case biMesaPlateau:          Add =   8; break;
-			case biSunflowerPlains:      Add =   1; break;
-			case biDesertM:              Add =   0; break;
-			case biExtremeHillsM:        Add =   4; break;
-			case biFlowerForest:         Add =  30; break;
-			case biTaigaM:               Add =  30; break;
-			case biSwamplandM:           Add =   8; break;
-			case biIcePlainsSpikes:      Add =   1; break;
-			case biJungleM:              Add = 120; break;
-			case biJungleEdgeM:          Add =  90; break;
-			case biBirchForestM:         Add =  30; break;
-			case biBirchForestHillsM:    Add =  20; break;
-			case biRoofedForestM:        Add =  40; break;
-			case biColdTaigaM:           Add =  30; break;
-			case biMegaSpruceTaiga:      Add =  30; break;
-			case biMegaSpruceTaigaHills: Add =  30; break;
-			case biExtremeHillsPlusM:    Add =   4; break;
-			case biSavannaM:             Add =   8; break;
-			case biSavannaPlateauM:      Add =  12; break;
-			case biMesaBryce:            Add =   4; break;
-			case biMesaPlateauFM:        Add =  12; break;
-			case biMesaPlateauM:         Add =  12; break;
+			case biOcean:                return 2;
+			case biDesert:               return 0;
+			case biPlains:               return 1;
+			case biExtremeHills:         return 3;
+			case biForest:               return 30;
+			case biTaiga:                return 30;
+			case biSwampland:            return 8;
+			case biIcePlains:            return 1;
+			case biIceMountains:         return 1;
+			case biMushroomIsland:       return 3;
+			case biMushroomShore:        return 3;
+			case biForestHills:          return 20;
+			case biTaigaHills:           return 20;
+			case biExtremeHillsEdge:     return 5;
+			case biJungle:               return 120;
+			case biJungleHills:          return 90;
+			case biJungleEdge:           return 90;
+			case biBirchForest:          return 30;
+			case biBirchForestHills:     return 20;
+			case biRoofedForest:         return 50;
+			case biColdTaiga:            return 20;
+			case biColdTaigaHills:       return 15;
+			case biMegaTaiga:            return 30;
+			case biMegaTaigaHills:       return 25;
+			case biExtremeHillsPlus:     return 3;
+			case biSavanna:              return 8;
+			case biSavannaPlateau:       return 12;
+			case biMesa:                 return 2;
+			case biMesaPlateauF:         return 8;
+			case biMesaPlateau:          return 8;
+			case biSunflowerPlains:      return 1;
+			case biDesertM:              return 0;
+			case biExtremeHillsM:        return 4;
+			case biFlowerForest:         return 30;
+			case biTaigaM:               return 30;
+			case biSwamplandM:           return 8;
+			case biIcePlainsSpikes:      return 1;
+			case biJungleM:              return 120;
+			case biJungleEdgeM:          return 90;
+			case biBirchForestM:         return 30;
+			case biBirchForestHillsM:    return 20;
+			case biRoofedForestM:        return 40;
+			case biColdTaigaM:           return 30;
+			case biMegaSpruceTaiga:      return 30;
+			case biMegaSpruceTaigaHills: return 30;
+			case biExtremeHillsPlusM:    return 4;
+			case biSavannaM:             return 8;
+			case biSavannaPlateauM:      return 12;
+			case biMesaBryce:            return 4;
+			case biMesaPlateauFM:        return 12;
+			case biMesaPlateauM:         return 12;
+			default:                     return 0;
 		}
-		NumTrees += Add;
+	};
+
+	int NumTrees = 0;
+	for (auto Biome : a_Biomes)
+	{
+		NumTrees += BiomeTrees(Biome);
 	}
 	return NumTrees / 1024;
 }
