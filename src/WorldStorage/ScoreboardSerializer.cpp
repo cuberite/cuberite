@@ -109,7 +109,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 		a_Writer.BeginCompound("");
 
-		a_Writer.AddString("CriteriaName", Objective.GetType().ToString());
+		a_Writer.AddString("CriteriaName", cObjective::TypeToString(Objective.GetType()));
 
 		a_Writer.AddString("DisplayName", Objective.GetDisplayName());
 		a_Writer.AddString("Name", it->first);
@@ -231,7 +231,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			RenderType = a_NBT.GetString(CurrLine);
 		}
 
-		cObjective::Criteria Type = cObjective::Criteria(CriteriaName);
+		cObjective::Criteria Type = cObjective::StringToType(CriteriaName);
 
 		cObjective * Objective = m_Scoreboard->RegisterObjective(Name, DisplayName, Type);
 		if (RenderType == "hearts")
