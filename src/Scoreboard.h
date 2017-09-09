@@ -55,10 +55,37 @@ public:
 
 		otStatBlockMine,
 		otStatEntityKill,
-		otStatEntityKilledBy
+		otStatEntityKilledBy,
+
+		otClassCount
 	};
 
-	struct Criteria
+	typedef int Criteria;
+
+	// TODO: Remove magic numbers
+	static Criteria CriteriaFromClassAndSub(eCriteriaClass a_Class, short a_SubCriteria)
+	{
+		return (static_cast<int>(a_Class) << 16) | a_SubCriteria;
+	}
+
+	static Criteria CriteriaFromClass(eCriteriaClass a_Class)
+	{
+		return CriteriaFromClassAndSub(a_Class, 0);
+	}
+
+	static eCriteriaClass GetCriteriaClass(Criteria a_Criteria)
+	{
+		int Class = a_Criteria >> 16;
+		ASSERT(Class < otClassCount);
+		return static_cast<eCriteriaClass>(Class);
+	}
+
+	static short GetCriteriaSub(Criteria a_Criteria)
+	{
+		return a_Criteria & 0xffff;
+	}
+
+	/*struct Criteria
 	{
 		Criteria(eCriteriaClass a_Criteria) : m_Criteria(a_Criteria), m_SubCriteria(0) {}
 		Criteria(eCriteriaClass a_Criteria, int a_SubCriteria) : m_Criteria(a_Criteria), m_SubCriteria(a_SubCriteria) {}
@@ -70,7 +97,7 @@ public:
 
 		eCriteriaClass m_Criteria;
 		int m_SubCriteria;
-	};
+	};*/
 
 	static Criteria StringToType(const AString & a_Name);
 	static AString TypeToString(Criteria a_Type);

@@ -15,7 +15,7 @@
 
 AString cObjective::TypeToString(Criteria a_Type)
 {
-	switch (a_Type.m_Criteria)
+	switch (GetCriteriaClass(a_Type))
 	{
 		case otDummy:              return "dummy";
 		case otDeathCount:         return "deathCount";
@@ -34,11 +34,11 @@ AString cObjective::TypeToString(Criteria a_Type)
 		// Have to convert the entity ID to a name
 		case otStatEntityKill:
 		{
-			return "stat.killEntity." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(a_Type.m_SubCriteria));
+			return "stat.killEntity." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(GetCriteriaSub(a_Type)));
 		}
 		case otStatEntityKilledBy:
 		{
-			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(a_Type.m_SubCriteria));
+			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(GetCriteriaSub(a_Type)));
 		}
 
 		// clang optimisises this line away then warns that it has done so.
@@ -67,7 +67,7 @@ cObjective::Criteria cObjective::StringToType(const AString & a_Name)
 	auto it = SimpleCriteria.find(a_Name);
 	if (it != SimpleCriteria.end())
 	{
-		return it->second;
+		return CriteriaFromClass(static_cast<eCriteriaClass>(it->second));
 	}
 
 
@@ -79,18 +79,18 @@ cObjective::Criteria cObjective::StringToType(const AString & a_Name)
 	{
 		AString Entity = a_Name.substr(16);
 		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return Criteria(otStatEntityKill, static_cast<int>(MonsterType));
+		return CriteriaFromClassAndSub(otStatEntityKill, static_cast<short>(MonsterType));
 	}
 	if (a_Name.substr(0, 20) == "stat.entityKilledBy.")
 	{
 		AString Entity = a_Name.substr(20);
 		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
-		return Criteria(otStatEntityKilledBy, static_cast<int>(MonsterType));
+		return CriteriaFromClassAndSub(otStatEntityKilledBy, static_cast<short>(MonsterType));
 	}
 
 	// TODO: Handle other cases
 	LOGWARNING("Could not parse cObjective criteria '%s', returning otDummy", a_Name.c_str());
-	return otDummy;
+	return CriteriaFromClass(otDummy);
 }
 
 
