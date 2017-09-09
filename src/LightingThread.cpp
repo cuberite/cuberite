@@ -378,7 +378,8 @@ void cLightingThread::PrepareSkyLight(void)
 			ASSERT(Current < cChunkDef::Height);
 			while (
 				(Current >= 0) &&
-				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer])
+				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer]) &&
+				!cBlockInfo::IsSkylightDispersant(m_BlockTypes[idx + Current * BlocksPerYLayer])
 			)
 			{
 				Current -= 1;  // Sunlight goes down unchanged through this block

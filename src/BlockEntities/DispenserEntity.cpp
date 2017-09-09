@@ -131,7 +131,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			{
 				double TNTX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 				double TNTZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-				m_World->SpawnPrimedTNT(TNTX, DispY + 0.5, TNTZ, 80, 0);  // 80 ticks fuse, no initial velocity
+				m_World->SpawnPrimedTNT({TNTX, DispY + 0.5, TNTZ}, 80, 0);  // 80 ticks fuse, no initial velocity
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
 			break;
@@ -250,7 +250,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			SpawnPos += GetShootVector(Meta) * 0.8;  // A boat is bigger than one block. Add the shoot vector to put it outside the dispenser.
 			SpawnPos += Vector3d(0.5, 0.5, 0.5);
 
-			if (m_World->SpawnBoat(SpawnPos.x, SpawnPos.y, SpawnPos.z, cBoat::ItemToMaterial(SlotItem)))
+			if (m_World->SpawnBoat(SpawnPos, cBoat::ItemToMaterial(SlotItem)))
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}

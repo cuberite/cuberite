@@ -12,7 +12,7 @@ class cSmallGateHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_Position);
@@ -23,7 +23,7 @@ public:
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_Position);
@@ -32,7 +32,7 @@ public:
 		return 0;
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating gateydory the fence gate/trapdoor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
@@ -44,7 +44,7 @@ public:
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_BlockType);

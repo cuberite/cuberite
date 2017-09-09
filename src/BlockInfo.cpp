@@ -100,7 +100,6 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_HEAD                         ].m_SpreadLightFalloff = 1;
 	Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_SpreadLightFalloff = 1;
 	Info[E_BLOCK_HOPPER                       ].m_SpreadLightFalloff = 1;
-	Info[E_BLOCK_ICE                          ].m_SpreadLightFalloff = 1;
 	Info[E_BLOCK_INACTIVE_COMPARATOR          ].m_SpreadLightFalloff = 1;
 	Info[E_BLOCK_INVERTED_DAYLIGHT_SENSOR     ].m_SpreadLightFalloff = 1;
 	Info[E_BLOCK_IRON_BARS                    ].m_SpreadLightFalloff = 1;
@@ -161,17 +160,42 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_WOODEN_PRESSURE_PLATE        ].m_SpreadLightFalloff = 1;
 	Info[E_BLOCK_WOODEN_SLAB                  ].m_SpreadLightFalloff = 1;
 
-	// Light in water and lava dissapears faster:
-	Info[E_BLOCK_LAVA                         ].m_SpreadLightFalloff = 3;
-	Info[E_BLOCK_STATIONARY_LAVA              ].m_SpreadLightFalloff = 3;
+	// Light in ice and water dissapears faster:
+	Info[E_BLOCK_ICE                          ].m_SpreadLightFalloff = 3;
 	Info[E_BLOCK_STATIONARY_WATER             ].m_SpreadLightFalloff = 3;
 	Info[E_BLOCK_WATER                        ].m_SpreadLightFalloff = 3;
 
+	// Light does not pass through these blocks at all:
+	Info[E_BLOCK_ACACIA_WOOD_STAIRS           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_BIRCH_WOOD_STAIRS            ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_BRICK_STAIRS                 ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_COBBLESTONE_STAIRS           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_DARK_OAK_WOOD_STAIRS         ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB    ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_DOUBLE_STONE_SLAB            ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_DOUBLE_WOODEN_SLAB           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_FARMLAND                     ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_JUNGLE_WOOD_STAIRS           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_NETHER_BRICK_STAIRS          ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_OAK_WOOD_STAIRS              ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_PURPUR_DOUBLE_SLAB           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_PURPUR_SLAB                  ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_PURPUR_STAIRS                ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_QUARTZ_STAIRS                ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_RED_SANDSTONE_SLAB           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_RED_SANDSTONE_STAIRS         ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_SANDSTONE_STAIRS             ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_SPRUCE_WOOD_STAIRS           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_STONE_BRICK_STAIRS           ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_STONE_SLAB                   ].m_SpreadLightFalloff = 15;
+	Info[E_BLOCK_WOODEN_SLAB                  ].m_SpreadLightFalloff = 15;
 
 	// Transparent blocks
+
 	Info[E_BLOCK_ACACIA_DOOR                  ].m_Transparent = true;
 	Info[E_BLOCK_ACACIA_FENCE                 ].m_Transparent = true;
 	Info[E_BLOCK_ACACIA_FENCE_GATE            ].m_Transparent = true;
+	Info[E_BLOCK_ACACIA_WOOD_STAIRS           ].m_Transparent = true;
 	Info[E_BLOCK_ACTIVATOR_RAIL               ].m_Transparent = true;
 	Info[E_BLOCK_ACTIVE_COMPARATOR            ].m_Transparent = true;
 	Info[E_BLOCK_AIR                          ].m_Transparent = true;
@@ -183,38 +207,44 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_BIRCH_DOOR                   ].m_Transparent = true;
 	Info[E_BLOCK_BIRCH_FENCE                  ].m_Transparent = true;
 	Info[E_BLOCK_BIRCH_FENCE_GATE             ].m_Transparent = true;
+	Info[E_BLOCK_BIRCH_WOOD_STAIRS            ].m_Transparent = true;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_Transparent = true;
 	Info[E_BLOCK_BLOCK_OF_REDSTONE            ].m_Transparent = true;
 	Info[E_BLOCK_BLUE_SHULKER_BOX             ].m_Transparent = true;
+	Info[E_BLOCK_BREWING_STAND                ].m_Transparent = true;
+	Info[E_BLOCK_BRICK_STAIRS                 ].m_Transparent = true;
 	Info[E_BLOCK_BROWN_MUSHROOM               ].m_Transparent = true;
 	Info[E_BLOCK_BROWN_SHULKER_BOX            ].m_Transparent = true;
-	Info[E_BLOCK_BREWING_STAND                ].m_Transparent = true;
 	Info[E_BLOCK_CACTUS                       ].m_Transparent = true;
 	Info[E_BLOCK_CAKE                         ].m_Transparent = true;
 	Info[E_BLOCK_CARPET                       ].m_Transparent = true;
 	Info[E_BLOCK_CARROTS                      ].m_Transparent = true;
 	Info[E_BLOCK_CAULDRON                     ].m_Transparent = true;
 	Info[E_BLOCK_CHEST                        ].m_Transparent = true;
+	Info[E_BLOCK_COBBLESTONE_STAIRS           ].m_Transparent = true;
 	Info[E_BLOCK_COBBLESTONE_WALL             ].m_Transparent = true;
-	Info[E_BLOCK_COCOA_POD                    ].m_Transparent = true;
 	Info[E_BLOCK_COBWEB                       ].m_Transparent = true;
+	Info[E_BLOCK_COCOA_POD                    ].m_Transparent = true;
 	Info[E_BLOCK_CROPS                        ].m_Transparent = true;
 	Info[E_BLOCK_CYAN_SHULKER_BOX             ].m_Transparent = true;
 	Info[E_BLOCK_DANDELION                    ].m_Transparent = true;
 	Info[E_BLOCK_DARK_OAK_DOOR                ].m_Transparent = true;
 	Info[E_BLOCK_DARK_OAK_FENCE               ].m_Transparent = true;
 	Info[E_BLOCK_DARK_OAK_FENCE_GATE          ].m_Transparent = true;
+	Info[E_BLOCK_DARK_OAK_WOOD_STAIRS         ].m_Transparent = true;
 	Info[E_BLOCK_DAYLIGHT_SENSOR              ].m_Transparent = true;
 	Info[E_BLOCK_DEAD_BUSH                    ].m_Transparent = true;
 	Info[E_BLOCK_DETECTOR_RAIL                ].m_Transparent = true;
+	Info[E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB    ].m_Transparent = true;
+	Info[E_BLOCK_DOUBLE_STONE_SLAB            ].m_Transparent = true;
+	Info[E_BLOCK_DOUBLE_WOODEN_SLAB           ].m_Transparent = true;
 	Info[E_BLOCK_DRAGON_EGG                   ].m_Transparent = true;
 	Info[E_BLOCK_ENCHANTMENT_TABLE            ].m_Transparent = true;
-	Info[E_BLOCK_ENDER_CHEST                  ].m_Transparent = true;
 	Info[E_BLOCK_END_PORTAL                   ].m_Transparent = true;
 	Info[E_BLOCK_END_PORTAL_FRAME             ].m_Transparent = true;
+	Info[E_BLOCK_ENDER_CHEST                  ].m_Transparent = true;
 	Info[E_BLOCK_FARMLAND                     ].m_Transparent = true;
 	Info[E_BLOCK_FENCE                        ].m_Transparent = true;
-	Info[E_BLOCK_OAK_FENCE_GATE               ].m_Transparent = true;
 	Info[E_BLOCK_FIRE                         ].m_Transparent = true;
 	Info[E_BLOCK_FLOWER                       ].m_Transparent = true;
 	Info[E_BLOCK_FLOWER_POT                   ].m_Transparent = true;
@@ -234,23 +264,28 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_JUNGLE_DOOR                  ].m_Transparent = true;
 	Info[E_BLOCK_JUNGLE_FENCE                 ].m_Transparent = true;
 	Info[E_BLOCK_JUNGLE_FENCE_GATE            ].m_Transparent = true;
+	Info[E_BLOCK_JUNGLE_WOOD_STAIRS           ].m_Transparent = true;
 	Info[E_BLOCK_LADDER                       ].m_Transparent = true;
 	Info[E_BLOCK_LAVA                         ].m_Transparent = true;
 	Info[E_BLOCK_LEAVES                       ].m_Transparent = true;
 	Info[E_BLOCK_LEVER                        ].m_Transparent = true;
-	Info[E_BLOCK_LILY_PAD                     ].m_Transparent = true;
 	Info[E_BLOCK_LIGHT_BLUE_SHULKER_BOX       ].m_Transparent = true;
 	Info[E_BLOCK_LIGHT_GRAY_SHULKER_BOX       ].m_Transparent = true;
 	Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_Transparent = true;
+	Info[E_BLOCK_LILY_PAD                     ].m_Transparent = true;
 	Info[E_BLOCK_LIME_SHULKER_BOX             ].m_Transparent = true;
 	Info[E_BLOCK_LIT_FURNACE                  ].m_Transparent = true;
 	Info[E_BLOCK_MAGENTA_SHULKER_BOX          ].m_Transparent = true;
 	Info[E_BLOCK_MELON_STEM                   ].m_Transparent = true;
 	Info[E_BLOCK_MOB_SPAWNER                  ].m_Transparent = true;
 	Info[E_BLOCK_NETHER_BRICK_FENCE           ].m_Transparent = true;
+	Info[E_BLOCK_NETHER_BRICK_STAIRS          ].m_Transparent = true;
 	Info[E_BLOCK_NETHER_PORTAL                ].m_Transparent = true;
 	Info[E_BLOCK_NETHER_WART                  ].m_Transparent = true;
 	Info[E_BLOCK_NEW_LEAVES                   ].m_Transparent = true;
+	Info[E_BLOCK_OAK_DOOR                     ].m_Transparent = true;
+	Info[E_BLOCK_OAK_FENCE_GATE               ].m_Transparent = true;
+	Info[E_BLOCK_OAK_WOOD_STAIRS              ].m_Transparent = true;
 	Info[E_BLOCK_ORANGE_SHULKER_BOX           ].m_Transparent = true;
 	Info[E_BLOCK_PINK_SHULKER_BOX             ].m_Transparent = true;
 	Info[E_BLOCK_PISTON                       ].m_Transparent = true;
@@ -260,10 +295,14 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_POWERED_RAIL                 ].m_Transparent = true;
 	Info[E_BLOCK_PUMPKIN_STEM                 ].m_Transparent = true;
 	Info[E_BLOCK_PURPLE_SHULKER_BOX           ].m_Transparent = true;
+	Info[E_BLOCK_PURPUR_DOUBLE_SLAB           ].m_Transparent = true;
 	Info[E_BLOCK_PURPUR_SLAB                  ].m_Transparent = true;
+	Info[E_BLOCK_PURPUR_STAIRS                ].m_Transparent = true;
+	Info[E_BLOCK_QUARTZ_STAIRS                ].m_Transparent = true;
 	Info[E_BLOCK_RAIL                         ].m_Transparent = true;
 	Info[E_BLOCK_RED_MUSHROOM                 ].m_Transparent = true;
 	Info[E_BLOCK_RED_SANDSTONE_SLAB           ].m_Transparent = true;
+	Info[E_BLOCK_RED_SANDSTONE_STAIRS         ].m_Transparent = true;
 	Info[E_BLOCK_RED_SHULKER_BOX              ].m_Transparent = true;
 	Info[E_BLOCK_REDSTONE_ORE_GLOWING         ].m_Transparent = true;
 	Info[E_BLOCK_REDSTONE_REPEATER_OFF        ].m_Transparent = true;
@@ -271,20 +310,22 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_REDSTONE_TORCH_OFF           ].m_Transparent = true;
 	Info[E_BLOCK_REDSTONE_TORCH_ON            ].m_Transparent = true;
 	Info[E_BLOCK_REDSTONE_WIRE                ].m_Transparent = true;
+	Info[E_BLOCK_SANDSTONE_STAIRS             ].m_Transparent = true;
 	Info[E_BLOCK_SAPLING                      ].m_Transparent = true;
 	Info[E_BLOCK_SIGN_POST                    ].m_Transparent = true;
 	Info[E_BLOCK_SPRUCE_DOOR                  ].m_Transparent = true;
 	Info[E_BLOCK_SPRUCE_FENCE                 ].m_Transparent = true;
 	Info[E_BLOCK_SPRUCE_FENCE_GATE            ].m_Transparent = true;
+	Info[E_BLOCK_SPRUCE_WOOD_STAIRS           ].m_Transparent = true;
 	Info[E_BLOCK_STAINED_GLASS                ].m_Transparent = true;
 	Info[E_BLOCK_STAINED_GLASS_PANE           ].m_Transparent = true;
+	Info[E_BLOCK_STANDING_BANNER              ].m_Transparent = true;
 	Info[E_BLOCK_STATIONARY_LAVA              ].m_Transparent = true;
 	Info[E_BLOCK_STATIONARY_WATER             ].m_Transparent = true;
-	Info[E_BLOCK_STANDING_BANNER              ].m_Transparent = true;
 	Info[E_BLOCK_STICKY_PISTON                ].m_Transparent = true;
+	Info[E_BLOCK_STONE_BRICK_STAIRS           ].m_Transparent = true;
 	Info[E_BLOCK_STONE_BUTTON                 ].m_Transparent = true;
 	Info[E_BLOCK_STONE_PRESSURE_PLATE         ].m_Transparent = true;
-	Info[E_BLOCK_STONE_SLAB                   ].m_Transparent = true;
 	Info[E_BLOCK_SUGARCANE                    ].m_Transparent = true;
 	Info[E_BLOCK_TALL_GRASS                   ].m_Transparent = true;
 	Info[E_BLOCK_TORCH                        ].m_Transparent = true;
@@ -298,10 +339,14 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_WATER                        ].m_Transparent = true;
 	Info[E_BLOCK_WHITE_SHULKER_BOX            ].m_Transparent = true;
 	Info[E_BLOCK_WOODEN_BUTTON                ].m_Transparent = true;
-	Info[E_BLOCK_OAK_DOOR                     ].m_Transparent = true;
 	Info[E_BLOCK_WOODEN_PRESSURE_PLATE        ].m_Transparent = true;
 	Info[E_BLOCK_WOODEN_SLAB                  ].m_Transparent = true;
 	Info[E_BLOCK_YELLOW_SHULKER_BOX           ].m_Transparent = true;
+
+
+	// Skylight dispersant blocks:
+	Info[E_BLOCK_COBWEB                       ].m_IsSkylightDispersant = true;
+	Info[E_BLOCK_LEAVES                       ].m_IsSkylightDispersant = true;
 
 
 	// One hit break blocks:

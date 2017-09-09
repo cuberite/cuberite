@@ -28,7 +28,7 @@ public:
 	/** How much light do the blocks consume? */
 	NIBBLETYPE m_SpreadLightFalloff;
 
-	/** Is a block completely transparent? (light doesn't get decreased(?)) */
+	/** Is a block transparent? (https://minecraft.gamepedia.com/Opacity) */
 	bool m_Transparent;
 
 	/** Is a block destroyed after a single hit? */
@@ -36,6 +36,9 @@ public:
 
 	/** Can a piston break this block? */
 	bool m_PistonBreakable;
+
+	/** Does a block disperse sky light? (only relevant for transparent blocks) */
+	bool m_IsSkylightDispersant;
 
 	/** Can this block hold snow atop? */
 	bool m_IsSnowable;
@@ -76,6 +79,10 @@ public:
 	inline static bool IsTransparent              (BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;         }
 	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
+	inline static bool IsSkylightDispersant       (BLOCKTYPE a_Type)
+	{
+		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
+	}
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool IsUseableBySpectator       (BLOCKTYPE a_Type) { return Get(a_Type).m_UseableBySpectator;  }
@@ -95,6 +102,7 @@ public:
 		, m_Transparent(false)
 		, m_OneHitDig(false)
 		, m_PistonBreakable(false)
+		, m_IsSkylightDispersant(false)
 		, m_IsSnowable(false)
 		, m_IsSolid(true)
 		, m_UseableBySpectator(false)

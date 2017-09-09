@@ -27,7 +27,7 @@ public:
 		}
 	}
 
-	cVector3iArray GetTerracingConnectionOffsets(cWorld & a_World, const Vector3i & a_Position) const
+	cVector3iArray GetTerracingConnectionOffsets(cWorld & a_World, Vector3i a_Position) const
 	{
 		cVector3iArray RelativePositions;
 		auto YPTerraceBlock = a_World.GetBlock(a_Position + OffsetYP());
@@ -56,7 +56,7 @@ public:
 		return RelativePositions;
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		if (a_QueryPosition == (a_Position + OffsetYP()))
 		{
@@ -100,7 +100,7 @@ public:
 		return (a_Meta != 0) ? --a_Meta : a_Meta;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_Position);
@@ -108,7 +108,7 @@ public:
 		return a_Meta;
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		UNUSED(a_BlockType);
 		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_PoweringData.PowerLevel);
@@ -122,7 +122,7 @@ public:
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_BlockType);

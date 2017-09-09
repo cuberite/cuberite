@@ -31,7 +31,7 @@ void cFireChargeEntity::Explode(Vector3i a_Block)
 
 
 
-void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cFireChargeEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	Destroy();
 	Explode(a_HitPos.Floor());
@@ -41,7 +41,7 @@ void cFireChargeEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 
 
 
-void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	super::OnHitEntity(a_EntityHit, a_HitPos);
 

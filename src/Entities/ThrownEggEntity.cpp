@@ -18,7 +18,7 @@ cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, 
 
 
 
-void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
+void cThrownEggEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	TrySpawnChicken(a_HitPos);
 
@@ -29,7 +29,7 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_H
 
 
 
-void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
+void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	int TotalDamage = 0;
 	// If entity is an Ender Dragon or Ender Crystal, it is damaged.
@@ -72,7 +72,7 @@ void cThrownEggEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cThrownEggEntity::TrySpawnChicken(const Vector3d & a_HitPos)
+void cThrownEggEntity::TrySpawnChicken(Vector3d a_HitPos)
 {
 	auto & Random = GetRandomProvider();
 	if (Random.RandBool(0.125))

@@ -13,7 +13,7 @@ class cNoteBlockHandler : public cRedstoneHandler
 	typedef cRedstoneHandler super;
 public:
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const Vector3i & a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_World);
@@ -25,7 +25,7 @@ public:
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_Position);
@@ -34,7 +34,7 @@ public:
 		return 0;
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating sparky the magical note block (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_PoweringData.PowerLevel);
 
@@ -60,11 +60,11 @@ public:
 		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, const Vector3i & a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());;
+		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
 	}
 };

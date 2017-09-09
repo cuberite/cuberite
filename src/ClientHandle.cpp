@@ -2081,6 +2081,12 @@ void cClientHandle::Tick(float a_Dt)
 		return;
 	}
 
+	// If player has been kicked, terminate the connection:
+	if (m_State == csKicked)
+	{
+		m_Link->Shutdown();
+	}
+
 	// If destruction is queued, destroy now:
 	if (m_State == csQueuedForDestruction)
 	{
@@ -2509,6 +2515,10 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
 		m_Protocol->SendDisconnect(a_Reason);
 		m_HasSentDC = true;
+		// csKicked means m_Link will be shut down on the next tick. The
+		// disconnect packet data is sent in the tick thread so the connection
+		// is closed there after the data is sent.
+		m_State = csKicked;
 	}
 }
 
@@ -3401,7 +3411,3 @@ void cClientHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	}
 	SocketClosed();
 }
-
-
-
-

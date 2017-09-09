@@ -41,15 +41,16 @@ public:
 
 	// tolua_begin
 	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }
-	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
 	int                  GetPotionColor(void)      const { return m_PotionColor; }
 	const cItem &        GetItem(void)             const { return m_Item; }
 
 	void SetEntityEffectType(cEntityEffect::eType a_EntityEffectType) { m_EntityEffectType = a_EntityEffectType; }
-	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
 	void SetPotionColor(int a_PotionColor) { m_PotionColor = a_PotionColor; }
 
 	// tolua_end
+
+	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
+	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
 
 protected:
 
@@ -60,8 +61,8 @@ protected:
 
 
 	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
-	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
+	virtual void OnHitEntity    (cEntity & a_EntityHit, Vector3d a_HitPos) override;
 	virtual void Tick           (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
 	{
 		if (m_DestroyTimer > 0)
@@ -81,7 +82,7 @@ protected:
 
 	/** Splashes the potion, fires its particle effects and sounds
 	@param a_HitPos     The position where the potion will splash */
-	void Splash(const Vector3d & a_HitPos);
+	void Splash(Vector3d a_HitPos);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
