@@ -643,6 +643,35 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddInt("Size", reinterpret_cast<const cMagmaCube *>(a_Monster)->GetSize());
 				break;
 			}
+			case mtOcelot:
+			{
+				const auto *Ocelot = reinterpret_cast<const cOcelot *>(a_Monster);
+				if (!Ocelot->GetOwnerName().empty())
+				{
+					m_Writer.AddString("Owner", Ocelot->GetOwnerName());
+				}
+				if (!Ocelot->GetOwnerUUID().IsNil())
+				{
+					m_Writer.AddString("OwnerUUID", Ocelot->GetOwnerUUID().ToShortString());
+				}
+				m_Writer.AddByte("Sitting", Ocelot->IsSitting() ? 1 : 0);
+				m_Writer.AddInt("CatType", Ocelot->GetOcelotType());
+				m_Writer.AddInt("Age", Ocelot->GetAge());
+				break;
+			}
+			case mtPig:
+			{
+				m_Writer.AddInt("Age", reinterpret_cast<const cPig *>(a_Monster)->GetAge());
+				break;
+			}
+			case mtRabbit:
+			{
+				const cRabbit * Rabbit = reinterpret_cast<const cRabbit *>(a_Monster);
+				m_Writer.AddInt("RabbitType", static_cast<Int32>(Rabbit->GetRabbitType()));
+				m_Writer.AddInt("MoreCarrotTicks", Rabbit->GetMoreCarrotTicks());
+				m_Writer.AddInt("Age", Rabbit->GetAge());
+				break;
+			}
 			case mtSheep:
 			{
 				const cSheep *Sheep = reinterpret_cast<const cSheep *>(a_Monster);
@@ -703,38 +732,28 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddInt("Age", reinterpret_cast<const cZombiePigman *>(a_Monster)->GetAge());
 				break;
 			}
-			case mtOcelot:
-			{
-				const auto *Ocelot = reinterpret_cast<const cOcelot *>(a_Monster);
-				if (!Ocelot->GetOwnerName().empty())
-				{
-					m_Writer.AddString("Owner", Ocelot->GetOwnerName());
-				}
-				if (!Ocelot->GetOwnerUUID().IsNil())
-				{
-					m_Writer.AddString("OwnerUUID", Ocelot->GetOwnerUUID().ToShortString());
-				}
-				m_Writer.AddByte("Sitting",     Ocelot->IsSitting() ? 1 : 0);
-				m_Writer.AddInt ("CatType",     Ocelot->GetOcelotType());
-				m_Writer.AddInt ("Age",         Ocelot->GetAge());
-				break;
-			}
-			case mtPig:
-			{
-				m_Writer.AddInt("Age", reinterpret_cast<const cPig *>(a_Monster)->GetAge());
-				break;
-			}
-			case mtRabbit:
-			{
-				const cRabbit * Rabbit = reinterpret_cast<const cRabbit *>(a_Monster);
-				m_Writer.AddInt("RabbitType",      static_cast<Int32>(Rabbit->GetRabbitType()));
-				m_Writer.AddInt("MoreCarrotTicks", Rabbit->GetMoreCarrotTicks());
-				m_Writer.AddInt("Age",             Rabbit->GetAge());
-				break;
-			}
-			default:
+			case mtBlaze:
+			case mtCaveSpider:
+			case mtChicken:
+			case mtCow:
+			case mtEnderDragon:
+			case mtGhast:
+			case mtGiant:
+			case mtGuardian:
+			case mtIronGolem:
+			case mtMooshroom:
+			case mtSilverfish:
+			case mtSnowGolem:
+			case mtSpider:
+			case mtSquid:
+			case mtWitch:
 			{
 				// Other mobs have no special tags.
+				break;
+			}
+			case mtInvalidType:
+			{
+				ASSERT(!"cNBTChunkSerializer::AddMonsterEntity: Recieved mob of invalid type");
 				break;
 			}
 		}
