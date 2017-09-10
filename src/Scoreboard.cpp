@@ -41,6 +41,8 @@ AString cObjective::CriteriaToString(Criteria a_Type)
 			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(GetCriteriaSub(a_Type)));
 		}
 
+		case crClassCount: return "";
+
 		// clang optimisises this line away then warns that it has done so.
 		#if !defined(__clang__)
 		default: return "";

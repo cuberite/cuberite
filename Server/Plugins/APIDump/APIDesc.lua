@@ -9476,15 +9476,6 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "",
 				},
-
-				CriteriaClassMask =
-				{
-					Notes = "Bitwise-AND a Criteria with this value to obtain the enumerated criteria class.",
-				},
-				SubCriteriaOffset =
-				{
-					Notes = "Right-shift a Criteria this many bits to obtain the sub criteria ID.",
-				},
 			},
 		},
 		cPainting =
