@@ -9,6 +9,7 @@
 // OS-specific headers:
 #if defined(_WIN32)
 	#include <psapi.h>
+	#include <conio.h>
 #elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 	#include <signal.h>
 	#if defined(__linux__)
@@ -82,15 +83,43 @@ cRoot::~cRoot()
 void cRoot::InputThread(cRoot & a_Params)
 {
 	cLogCommandOutputCallback Output;
+	AString Command;
+
+	// Returns true if input is available, may wait for a duration of up to PollPeriod
+	auto PollInput = []
+	{
+		static const std::chrono::milliseconds PollPeriod{ 50 };
+		// WinSock does have select but it only works for sockets
+		#ifdef _WIN32
+			if (_kbhit() > 0)
+			{
+				return true;
+			}
+
+			std::this_thread::sleep_for(PollPeriod);
+			return false;
+		#else
+			timeval Timeout{0, 0};
+			Timeout.tv_usec = std::chrono::microseconds{ PollPeriod }.count();
+
+			fd_set ReadSet;
+			FD_ZERO(&ReadSet);
+			FD_SET(STDIN_FILENO, &ReadSet);
+
+			return (select(STDIN_FILENO + 1, &ReadSet, nullptr, nullptr, &Timeout) > 0);
+		#endif
+	};
 
 	while (a_Params.m_InputThreadRunFlag.test_and_set() && std::cin.good())
 	{
-		AString Command;
-		std::getline(std::cin, Command);
-		if (!Command.empty())
+		if (PollInput())
 		{
-			// Execute and clear command string when submitted
-			a_Params.ExecuteConsoleCommand(TrimString(Command), Output);
+			std::getline(std::cin, Command);
+			if (!Command.empty())
+			{
+				// Execute and clear command string when submitted
+				a_Params.ExecuteConsoleCommand(TrimString(Command), Output);
+			}
 		}
 	}
 
@@ -292,47 +321,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	delete m_Server; m_Server = nullptr;
 
 	m_InputThreadRunFlag.clear();
-	#ifdef _WIN32
-		DWORD Length;
-		INPUT_RECORD Record
-		{
-			KEY_EVENT,
-			{
-				{
-					TRUE,
-					1,
-					VK_RETURN,
-					static_cast<WORD>(MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC)),
-					{ { VK_RETURN } },
-					0
-				}
-			}
-		};
-
-		// Can't kill the input thread since it breaks cin (getline doesn't block / receive input on restart)
-		// Apparently no way to unblock getline
-		// Only thing I can think of for now
-		if (WriteConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &Record, 1, &Length) == 0)
-		{
-			LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
-			m_TerminateEventRaised = true;
-			m_InputThread.detach();
-		}
-		else
-		{
-			m_InputThread.join();
-		}
-	#else
-		if (m_InputThread.get_id() != std::thread::id())
-		{
-			if (pthread_kill(m_InputThread.native_handle(), SIGKILL) != 0)
-			{
-				LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
-				m_TerminateEventRaised = true;
-				m_InputThread.detach();
-			}
-		}
-	#endif
+	m_InputThread.join();
 
 	if (m_TerminateEventRaised)
 	{
