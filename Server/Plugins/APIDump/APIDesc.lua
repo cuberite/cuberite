@@ -258,6 +258,42 @@ return
 					},
 					Notes = "Returns whether a piston can break the specified block type.",
 				},
+				IsRainBlocker =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the specified block type lets rain pass through.",
+				},
+				IsSkylightDispersant =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if skylight is impeded by passage through a block of the specified type.",
+				},
 				IsSnowable =
 				{
 					IsStatic = true,
@@ -293,24 +329,6 @@ return
 						},
 					},
 					Notes = "Returns whether the specified block type is solid.",
-				},
-				IsSkylightDispersant =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if skylight is impeded by passage through a block of the specified type.",
 				},
 				IsTransparent =
 				{

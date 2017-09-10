@@ -552,7 +552,7 @@ bool cWorld::IsWeatherWetAtBlock(Vector3i a_Pos)
 	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= a_Pos.y; y--)
 	{
 		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
-		if (cBlockInfo::IsSolid(BlockType))
+		if (cBlockInfo::IsRainBlocker(BlockType))
 		{
 			return false;
 		}

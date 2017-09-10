@@ -464,6 +464,13 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_YELLOW_SHULKER_BOX           ].m_PistonBreakable = true;
 
 
+	// Blocks that block rain or snow's passage:
+	Info[E_BLOCK_SIGN_POST                    ].m_IsRainBlocker = true;
+	Info[E_BLOCK_WALLSIGN                     ].m_IsRainBlocker = true;
+	Info[E_BLOCK_WALL_BANNER                  ].m_IsRainBlocker = true;
+	Info[E_BLOCK_STANDING_BANNER              ].m_IsRainBlocker = true;
+
+
 	// Blocks that can be snowed over:
 	Info[E_BLOCK_BEDROCK                      ].m_IsSnowable = true;
 	Info[E_BLOCK_BLOCK_OF_COAL                ].m_IsSnowable = true;
@@ -554,8 +561,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_BIG_FLOWER                   ].m_IsSolid = false;
 	Info[E_BLOCK_BROWN_MUSHROOM               ].m_IsSolid = false;
 	Info[E_BLOCK_CARROTS                      ].m_IsSolid = false;
-	Info[E_BLOCK_CHORUS_PLANT                 ].m_IsSolid = false;
 	Info[E_BLOCK_CHORUS_FLOWER                ].m_IsSolid = false;
+	Info[E_BLOCK_CHORUS_PLANT                 ].m_IsSolid = false;
 	Info[E_BLOCK_COBWEB                       ].m_IsSolid = false;
 	Info[E_BLOCK_CROPS                        ].m_IsSolid = false;
 	Info[E_BLOCK_DANDELION                    ].m_IsSolid = false;
@@ -575,17 +582,17 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_POTATOES                     ].m_IsSolid = false;
 	Info[E_BLOCK_POWERED_RAIL                 ].m_IsSolid = false;
 	Info[E_BLOCK_RAIL                         ].m_IsSolid = false;
+	Info[E_BLOCK_RED_MUSHROOM                 ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_OFF           ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_ON            ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_WIRE                ].m_IsSolid = false;
-	Info[E_BLOCK_RED_MUSHROOM                 ].m_IsSolid = false;
 	Info[E_BLOCK_REEDS                        ].m_IsSolid = false;
 	Info[E_BLOCK_SAPLING                      ].m_IsSolid = false;
 	Info[E_BLOCK_SIGN_POST                    ].m_IsSolid = false;
 	Info[E_BLOCK_SNOW                         ].m_IsSolid = false;
+	Info[E_BLOCK_STANDING_BANNER              ].m_IsSolid = false;
 	Info[E_BLOCK_STATIONARY_LAVA              ].m_IsSolid = false;
 	Info[E_BLOCK_STATIONARY_WATER             ].m_IsSolid = false;
-	Info[E_BLOCK_STANDING_BANNER              ].m_IsSolid = false;
 	Info[E_BLOCK_STONE_BUTTON                 ].m_IsSolid = false;
 	Info[E_BLOCK_STONE_PRESSURE_PLATE         ].m_IsSolid = false;
 	Info[E_BLOCK_TALL_GRASS                   ].m_IsSolid = false;
@@ -975,7 +982,3 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_Hardness = 0.2f;
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_Hardness = -1.0f;
 }
-
-
-
-
