@@ -1172,12 +1172,9 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	}
 
 	// Fire is extinguished by rain
-	if (GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT))
+	if (GetWorld()->IsWeatherWetAtBlock({POSX_TOINT, POSY_TOINT, POSZ_TOINT}))
 	{
-		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
-		{
-			m_TicksLeftBurning = 0;
-		}
+		m_TicksLeftBurning = 0;
 	}
 
 	// Do the burning damage:

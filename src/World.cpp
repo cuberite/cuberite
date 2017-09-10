@@ -542,6 +542,29 @@ void cWorld::ChangeWeather(void)
 
 
 
+bool cWorld::IsWeatherWetAtBlock(Vector3i a_Pos)
+{
+	if (!IsWeatherWetAt(a_Pos.x, a_Pos.z))
+	{
+		return false;
+	}
+
+	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= a_Pos.y; y--)
+	{
+		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
+		if (cBlockInfo::IsSolid(BlockType))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+
+
 void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return m_ChunkMap->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
