@@ -203,22 +203,32 @@ int cStructGenTrees::GetNumTrees(
 		switch (a_Biome)
 		{
 			case biOcean:                return 2;
-			case biDesert:               return 0;
 			case biPlains:               return 1;
+			case biDesert:               return 0;
 			case biExtremeHills:         return 3;
 			case biForest:               return 30;
 			case biTaiga:                return 30;
 			case biSwampland:            return 8;
+			case biRiver:                return 0;
+			case biNether:               return 0;
+			case biEnd:                  return 0;
+			case biFrozenOcean:          return 0;
+			case biFrozenRiver:          return 0;
 			case biIcePlains:            return 1;
 			case biIceMountains:         return 1;
 			case biMushroomIsland:       return 3;
 			case biMushroomShore:        return 3;
+			case biBeach:                return 0;
+			case biDesertHills:          return 0;
 			case biForestHills:          return 20;
 			case biTaigaHills:           return 20;
 			case biExtremeHillsEdge:     return 5;
 			case biJungle:               return 120;
 			case biJungleHills:          return 90;
 			case biJungleEdge:           return 90;
+			case biDeepOcean:            return 0;
+			case biStoneBeach:           return 0;
+			case biColdBeach:            return 0;
 			case biBirchForest:          return 30;
 			case biBirchForestHills:     return 20;
 			case biRoofedForest:         return 50;
@@ -232,6 +242,7 @@ int cStructGenTrees::GetNumTrees(
 			case biMesa:                 return 2;
 			case biMesaPlateauF:         return 8;
 			case biMesaPlateau:          return 8;
+			// Biome variants
 			case biSunflowerPlains:      return 1;
 			case biDesertM:              return 0;
 			case biExtremeHillsM:        return 4;
@@ -253,7 +264,15 @@ int cStructGenTrees::GetNumTrees(
 			case biMesaBryce:            return 4;
 			case biMesaPlateauFM:        return 12;
 			case biMesaPlateauM:         return 12;
-			default:                     return 0;
+			// Non-biomes
+			case biInvalidBiome:
+			case biNumBiomes:
+			case biVariant:
+			case biNumVariantBiomes:
+			{
+				ASSERT(!"Invalid biome in cStructGenTrees::GetNumTrees");
+				return 0;
+			}
 		}
 	};
 
