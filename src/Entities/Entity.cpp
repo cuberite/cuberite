@@ -1662,7 +1662,9 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 void cEntity::SetSwimState(cChunk & a_Chunk)
 {
 	int RelY = FloorC(GetPosY() + 0.1);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
+	int HeadRelY = CeilC(GetPosY() + GetHeight()) - 1;
+	ASSERT(RelY <= HeadRelY);
+	if ((RelY < 0) || (HeadRelY >= cChunkDef::Height))
 	{
 		m_IsSwimming = false;
 		m_IsSubmerged = false;
@@ -1688,8 +1690,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	m_IsSwimming = IsBlockWater(BlockIn);
 
 	// Check if the player is submerged:
-	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn));
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, HeadRelY, RelZ, BlockIn));
 	m_IsSubmerged = IsBlockWater(BlockIn);
 }
 
