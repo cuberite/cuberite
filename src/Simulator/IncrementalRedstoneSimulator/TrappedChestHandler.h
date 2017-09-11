@@ -1,4 +1,4 @@
-
+﻿
 #pragma once
 
 #include "RedstoneHandler.h"
@@ -28,38 +28,15 @@ public:
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 
-		class cGetTrappedChestPlayers :
-			public cItemCallback<cChestEntity>
-		{
-		public:
-			cGetTrappedChestPlayers(void) :
-				m_NumberOfPlayers(0)
+		int NumberOfPlayers = 0;
+		VERIFY(!a_World.DoWithChestAt(a_Position.x, a_Position.y, a_Position.z, [&](cChestEntity & a_Chest)
 			{
-			}
-
-			virtual ~cGetTrappedChestPlayers() override
-			{
-			}
-
-			virtual bool Item(cChestEntity * a_Chest) override
-			{
-				ASSERT(a_Chest->GetBlockType() == E_BLOCK_TRAPPED_CHEST);
-				m_NumberOfPlayers = a_Chest->GetNumberOfPlayers();
+				ASSERT(a_Chest.GetBlockType() == E_BLOCK_TRAPPED_CHEST);
+				NumberOfPlayers = a_Chest.GetNumberOfPlayers();
 				return true;
 			}
-
-			unsigned char GetPowerLevel(void) const
-			{
-				return static_cast<unsigned char>(std::min(m_NumberOfPlayers, 15));
-			}
-
-		private:
-			int m_NumberOfPlayers;
-
-		} GTCP;
-
-		VERIFY(!a_World.DoWithChestAt(a_Position.x, a_Position.y, a_Position.z, GTCP));
-		return GTCP.GetPowerLevel();
+		));
+		return static_cast<unsigned char>(std::min(NumberOfPlayers, 15));
 	}
 
 	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override

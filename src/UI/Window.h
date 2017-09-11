@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "../FunctionRef.h"
 #include "../ItemGrid.h"
 
 
@@ -31,7 +32,8 @@ class cWorld;
 
 typedef std::list<cPlayer *> cPlayerList;
 typedef std::vector<cSlotArea *> cSlotAreas;
-
+using cPlayerListCallback   = cFunctionRef<bool(cPlayer       &)>;
+using cClientHandleCallback = cFunctionRef<bool(cClientHandle &)>;
 
 
 
@@ -151,10 +153,10 @@ public:
 	void OwnerDestroyed(void);
 
 	/** Calls the callback safely for each player that has this window open; returns true if all players have been enumerated */
-	bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback);
+	bool ForEachPlayer(cPlayerListCallback a_Callback);
 
 	/** Calls the callback safely for each client that has this window open; returns true if all clients have been enumerated */
-	bool ForEachClient(cItemCallback<cClientHandle> & a_Callback);
+	bool ForEachClient(cClientHandleCallback a_Callback);
 
 	/** Called on shift-clicking to distribute the stack into other areas; Modifies a_ItemStack as it is distributed!
 	if a_ShouldApply is true, the changes are written into the slots;

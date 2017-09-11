@@ -2163,7 +2163,7 @@ size_t cBlockArea::MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size)
 
 
 
-bool cBlockArea::DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cItemCallback<cBlockEntity> & a_Callback)
+bool cBlockArea::DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cBlockEntityCallback a_Callback)
 {
 	ASSERT(IsValidRelCoords(a_RelX, a_RelY, a_RelZ));
 	if (!HasBlockEntities())
@@ -2176,14 +2176,14 @@ bool cBlockArea::DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cIte
 	{
 		return false;
 	}
-	return a_Callback.Item(itr->second);
+	return a_Callback(*itr->second);
 }
 
 
 
 
 
-bool cBlockArea::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cItemCallback<cBlockEntity> & a_Callback)
+bool cBlockArea::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
 {
 	return DoWithBlockEntityRelAt(a_BlockX - m_Origin.x, a_BlockY - m_Origin.y, a_BlockZ - m_Origin.z, a_Callback);
 }
@@ -2192,7 +2192,7 @@ bool cBlockArea::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-bool cBlockArea::ForEachBlockEntity(cItemCallback<cBlockEntity> & a_Callback)
+bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 {
 	if (!HasBlockEntities())
 	{
@@ -2200,7 +2200,7 @@ bool cBlockArea::ForEachBlockEntity(cItemCallback<cBlockEntity> & a_Callback)
 	}
 	for (auto & keyPair: *m_BlockEntities)
 	{
-		if (a_Callback.Item(keyPair.second))
+		if (a_Callback(*keyPair.second))
 		{
 			return false;
 		}

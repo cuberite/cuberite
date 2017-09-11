@@ -362,12 +362,12 @@ void cWindow::OwnerDestroyed()
 
 
 
-bool cWindow::ForEachPlayer(cItemCallback<cPlayer> & a_Callback)
+bool cWindow::ForEachPlayer(cPlayerListCallback a_Callback)
 {
 	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	for (auto & Player : m_OpenedBy)
 	{
-		if (a_Callback.Item(*itr))
+		if (a_Callback(*Player))
 		{
 			return false;
 		}
@@ -379,12 +379,12 @@ bool cWindow::ForEachPlayer(cItemCallback<cPlayer> & a_Callback)
 
 
 
-bool cWindow::ForEachClient(cItemCallback<cClientHandle> & a_Callback)
+bool cWindow::ForEachClient(cClientHandleCallback a_Callback)
 {
 	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	for (auto & Player : m_OpenedBy)
 	{
-		if (a_Callback.Item((*itr)->GetClientHandle()))
+		if (a_Callback(*Player->GetClientHandle()))
 		{
 			return false;
 		}

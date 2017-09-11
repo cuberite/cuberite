@@ -90,30 +90,25 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cOcelot::TickFollowPlayer()
 {
-	class cCallback :
-		public cPlayerListCallback
+	Vector3d OwnerPos;
+	bool OwnerFlying = false;
+	auto Callback = [&](cPlayer & a_Player)
 	{
-		virtual bool Item(cPlayer * a_Player) override
-		{
-			OwnerPos = a_Player->GetPosition();
-			OwnerFlying = a_Player->IsFlying();
-			return true;
-		}
-	public:
-		Vector3d OwnerPos;
-		bool OwnerFlying;
-	} Callback;
+		OwnerPos = a_Player.GetPosition();
+		OwnerFlying = a_Player.IsFlying();
+		return true;
+	};
 
 	if (m_World->DoWithPlayerByUUID(m_OwnerUUID, Callback))
 	{
 		// The player is present in the world, follow him:
-		double Distance = (Callback.OwnerPos - GetPosition()).Length();
+		double Distance = (OwnerPos - GetPosition()).Length();
 		if (Distance > 12)
 		{
-			if (!Callback.OwnerFlying)
+			if (!OwnerFlying)
 			{
-				Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
-				TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+				OwnerPos.y = FindFirstNonAirBlockPosition(OwnerPos.x, OwnerPos.z);
+				TeleportToCoords(OwnerPos.x, OwnerPos.y, OwnerPos.z);
 			}
 		}
 		if (Distance < 2)
@@ -122,9 +117,9 @@ void cOcelot::TickFollowPlayer()
 		}
 		else
 		{
-			if (!Callback.OwnerFlying)
+			if (!OwnerFlying)
 			{
-				MoveToPosition(Callback.OwnerPos);
+				MoveToPosition(OwnerPos);
 			}
 		}
 	}
@@ -205,27 +200,19 @@ void cOcelot::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-class cFindSittingCat :
-	public cEntityCallback
-{
-	virtual bool Item(cEntity * a_Entity) override
-	{
-		return (
-			(a_Entity->GetEntityType() == cEntity::etMonster) &&
-			(static_cast<cMonster *>(a_Entity)->GetMobType() == eMonsterType::mtOcelot) &&
-			(static_cast<cOcelot *>(a_Entity)->IsSitting())
-		);
-	}
-};
-
-
-
-
-
 bool cOcelot::IsCatSittingOnBlock(cWorld * a_World, Vector3d a_BlockPosition)
 {
-	cFindSittingCat FindSittingCat;
-	return a_World->ForEachEntityInBox(cBoundingBox(Vector3d(a_BlockPosition.x, a_BlockPosition.y + 1, a_BlockPosition.z), 1), FindSittingCat);
+	return a_World->ForEachEntityInBox(
+		cBoundingBox(Vector3d(a_BlockPosition.x, a_BlockPosition.y + 1, a_BlockPosition.z), 1),
+		[=](cEntity & a_Entity)
+		{
+			return (
+				(a_Entity.GetEntityType() == cEntity::etMonster) &&
+				(static_cast<cMonster &>(a_Entity).GetMobType() == eMonsterType::mtOcelot) &&
+				(static_cast<cOcelot &>(a_Entity).IsSitting())
+			);
+		}
+	);
 }
 
 

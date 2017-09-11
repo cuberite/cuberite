@@ -56,18 +56,12 @@ public:
 		bool WasPoweredPreviously = IsActivated(a_Meta);
 		if (IsPoweredNow && !WasPoweredPreviously)
 		{
-			class cSetPowerToDropSpenser :
-				public cDropSpenserCallback
-			{
-			public:
-				virtual bool Item(cDropSpenserEntity * a_DropSpenser) override
+			a_World.DoWithDropSpenserAt(a_Position.x, a_Position.y, a_Position.z, [](cDropSpenserEntity & a_DropSpenser)
 				{
-					a_DropSpenser->Activate();
+					a_DropSpenser.Activate();
 					return false;
 				}
-			} DrSpSP;
-
-			a_World.DoWithDropSpenserAt(a_Position.x, a_Position.y, a_Position.z, DrSpSP);
+			);
 		}
 
 		// Update the internal dropspenser state if necessary

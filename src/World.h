@@ -59,21 +59,6 @@ typedef std::list< std::pair< std::unique_ptr<cPlayer>, cWorld * > > cAwaitingPl
 typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
 typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
-typedef cItemCallback<cPlayer>             cPlayerListCallback;
-typedef cItemCallback<cEntity>             cEntityCallback;
-typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
-typedef cItemCallback<cBrewingstandEntity> cBrewingstandCallback;
-typedef cItemCallback<cChestEntity>        cChestCallback;
-typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
-typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
-typedef cItemCallback<cNoteEntity>         cNoteBlockCallback;
-typedef cItemCallback<cCommandBlockEntity> cCommandBlockCallback;
-typedef cItemCallback<cMobHeadEntity>      cMobHeadCallback;
-typedef cItemCallback<cFlowerPotEntity>    cFlowerPotCallback;
-
-typedef std::function<bool (cPlayer *)>    cLambdaPlayerCallback;
-typedef std::function<bool (cEntity *)>    cLambdaEntityCallback;
-
 
 
 
@@ -282,21 +267,20 @@ public:
 #endif
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
-	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
+	virtual bool ForEachPlayer(cPlayerListCallback a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found.
 	Callback return value is ignored. If there are multiple players of the same name, only (random) one is processed by the callback. */
-	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
-	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 
 	/** Finds the player over his uuid and calls the callback */
-	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
-	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cLambdaPlayerCallback a_Callback);  // Lambda version
+	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
@@ -313,20 +297,19 @@ public:
 	OwnedEntity RemoveEntity(cEntity & a_Entity);
 
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
-	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachEntity(cEntityCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
-	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
 	Returns true if all entities processed, false if the callback aborted by returning true.
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
-	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp
+	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
-	bool DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
-	bool DoWithEntityByID(UInt32 a_UniqueID, cLambdaEntityCallback a_Callback);  // Lambda version
+	bool DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -390,7 +373,7 @@ public:
 	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) override;
 
 	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
-	bool ForEachLoadedChunk(std::function<bool(int, int)> a_Callback);
+	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback);
 
 	// tolua_begin
 
@@ -541,25 +524,25 @@ public:
 	inline cRedstoneSimulator * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
 
 	/** Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true */
-	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each brewingstand in the specified chunk; returns true if all brewingstands processed, false if the callback aborted by returning true */
-	bool ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true */
-	bool ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each dispenser in the specified chunk; returns true if all dispensers processed, false if the callback aborted by returning true */
-	bool ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback & a_Callback);
+	bool ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback a_Callback);
 
 	/** Calls the callback for each dropper in the specified chunk; returns true if all droppers processed, false if the callback aborted by returning true */
-	bool ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback & a_Callback);
+	bool ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback a_Callback);
 
 	/** Calls the callback for each dropspenser in the specified chunk; returns true if all dropspensers processed, false if the callback aborted by returning true */
-	bool ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback & a_Callback);
+	bool ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback a_Callback);
 
 	/** Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true */
-	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Does an explosion with the specified strength at the specified coordinates.
 	Executes the HOOK_EXPLODING and HOOK_EXPLODED hooks as part of the processing.
@@ -568,43 +551,43 @@ public:
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) override;
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp
+	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
-	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
-	virtual bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback & a_Callback) override;  // Exported in ManualBindings.cpp
+	virtual bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback) override;  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
-	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback & a_Callback);  // Lua-acessible
+	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
-	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
-	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the dropper at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
-	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the dropspenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
-	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
-	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
-	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
-	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
-	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
-	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback);  // Exported in ManualBindings.cpp
+	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Exported in ManualBindings.cpp
@@ -612,13 +595,13 @@ public:
 	/** a_Player is using block entity at [x, y, z], handle that: */
 	void UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {m_ChunkMap->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ); }  // tolua_export
 
-	/** Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
-	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
-	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, std::function<bool(cChunk &)> a_Callback);
+	/** Calls the callback for the chunk specified, with ChunkMapCS locked.
+	Returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
+	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callback);
 
 	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked.
 	Returns false if the chunk isn't loaded, otherwise returns the same value as the callback */
-	bool DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback);
+	bool DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback);
 
 	void GrowTreeImage(const sSetBlockVector & a_Blocks);
 
