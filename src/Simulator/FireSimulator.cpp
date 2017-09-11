@@ -32,10 +32,7 @@
 
 
 
-static const struct
-{
-	int x, y, z;
-} gCrossCoords[] =
+static const Vector3i gCrossCoords[] =
 {
 	{ 1, 0,  0},
 	{-1, 0,  0},
@@ -99,15 +96,14 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		int x = itr->x;
 		int y = itr->y;
 		int z = itr->z;
-		int AbsX = (a_Chunk->GetPosX() * cChunkDef::Width) + x;
-		int AbsZ = (a_Chunk->GetPosZ() * cChunkDef::Width) + z;
+		auto AbsPos = cChunkDef::RelativeToAbsolute({x, y, z}, a_Chunk->GetPosX(), a_Chunk->GetPosZ());
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(x, y, z);
 
 		if (!IsAllowedBlock(BlockType))
 		{
 			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the fire)
 			FLOG("FS: Removing block {%d, %d, %d}",
-				x + a_ChunkX * cChunkDef::Width, y, z + a_ChunkZ * cChunkDef::Width
+				AbsPos.x, AbsPos.y, AbsPos.z
 			);
 			itr = Data.erase(itr);
 			continue;
@@ -119,7 +115,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto Raining = false;
 		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 		{
-			if (m_World.IsWeatherWetAtBlock({AbsX + gCrossCoords[i].x, y, AbsZ + gCrossCoords[i].z}))
+			if (m_World.IsWeatherWetAtBlock(AbsPos + gCrossCoords[i]))
 			{
 				Raining = true;
 				break;
