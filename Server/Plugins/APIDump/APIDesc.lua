@@ -9161,6 +9161,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "Criteria",
+							Type = "number",
 						},
 					},
 					Notes = "(STATIC) Given an enumerated criteria class, create a criteria with the sub criteria equal to zero.",
@@ -9182,6 +9183,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "Criteria",
+							Type = "number",
 						},
 					},
 					Notes = "(STATIC) Given an enumerated criteria class, create a criteria with the sub criteria equal to the given sub criteria.",
@@ -9216,6 +9218,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "CriteriaClass",
+							Type = "number",
 						},
 					},
 					Notes = "(STATIC) Given a criteria number, returns the enumerated class of the criteria.",
@@ -9233,6 +9236,7 @@ a_Player:OpenWindow(Window);
 					{
 						{
 							Name = "CriteriaSub",
+							Type = "number",
 						},
 					},
 					Notes = "(STATIC) Given a criteria number, returns the sub criteria ID of the criteria.",
