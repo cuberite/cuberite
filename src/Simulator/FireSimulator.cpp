@@ -144,12 +144,6 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		// Burn out the fire one step by increasing the meta:
-		if (!BurnsForever && (y > 0))
-		{
-			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
-		}
-
 		/*
 		FLOG("FS: Fire at {%d, %d, %d} is stepping",
 			itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
@@ -166,6 +160,13 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			itr = Data.erase(itr);
 			continue;
 		}
+
+		// Burn out the fire one step by increasing the meta:
+		if (!BurnsForever && (y > 0))
+		{
+			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
+		}
+
 		itr->Data = GetBurnStepTime(a_Chunk, x, y, z);  // TODO: Add some randomness into this
 		++itr;
 	}  // for itr - Data[]

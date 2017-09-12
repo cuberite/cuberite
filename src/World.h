@@ -802,6 +802,10 @@ public:
 		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
+	/** Returns true if the specified location has any precipitation (rain or
+	storm), taking into account biomes and any blocks above the specified
+	position that would block the precipitation. This assumes that the given
+	y coordinate is valid. */
 	virtual bool IsWeatherWetAtBlock(Vector3i a_Pos);
 
 	/** Returns the seed of the world. */
