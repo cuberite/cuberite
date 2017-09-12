@@ -82,11 +82,35 @@ cRoot::~cRoot()
 void cRoot::InputThread(cRoot & a_Params)
 {
 	cLogCommandOutputCallback Output;
+	AString Command;
 
 	while (a_Params.m_InputThreadRunFlag.test_and_set() && std::cin.good())
 	{
-		AString Command;
+		#ifndef _WIN32
+			static const std::chrono::microseconds PollPeriod = std::chrono::milliseconds{ 100 };
+
+			timeval Timeout{ 0, 0 };
+			Timeout.tv_usec = PollPeriod.count();
+
+			fd_set ReadSet;
+			FD_ZERO(&ReadSet);
+			FD_SET(STDIN_FILENO, &ReadSet);
+
+			if (select(STDIN_FILENO + 1, &ReadSet, nullptr, nullptr, &Timeout) <= 0)
+			{
+				// Don't call getline because there's nothing to read
+				continue;
+			}
+		#endif
+
 		std::getline(std::cin, Command);
+
+		if (!a_Params.m_InputThreadRunFlag.test_and_set())
+		{
+			// Already shutting down, can't execute commands
+			break;
+		}
+
 		if (!Command.empty())
 		{
 			// Execute and clear command string when submitted
@@ -323,15 +347,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 			m_InputThread.join();
 		}
 	#else
-		if (m_InputThread.get_id() != std::thread::id())
-		{
-			if (pthread_kill(m_InputThread.native_handle(), SIGKILL) != 0)
-			{
-				LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
-				m_TerminateEventRaised = true;
-				m_InputThread.detach();
-			}
-		}
+		m_InputThread.join();
 	#endif
 
 	if (m_TerminateEventRaised)
