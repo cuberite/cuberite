@@ -25,7 +25,10 @@
 
 #define MAX_CHANCE_REPLACE_FUEL 100000
 #define MAX_CHANCE_FLAMMABILITY 100000
+// The base chance that in a tick, rain will extinguish a fire block.
 #define CHANCE_BASE_RAIN_EXTINGUISH 0.2
+// The additional chance, multiplied by the meta of the fire block, that rain
+// will extinguish a fire block in a tick.
 #define CHANCE_AGE_M_RAIN_EXTINGUISH 0.03
 
 
