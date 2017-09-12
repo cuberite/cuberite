@@ -36,7 +36,14 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-		return true;
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		return a_Player.GetWorld()->DoWithChunkAt(Pos,
+			[this, Pos, &a_ChunkInterface](cChunk & a_Chunk)
+			{
+				auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+				return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk);
+			}
+		);
 	}
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
