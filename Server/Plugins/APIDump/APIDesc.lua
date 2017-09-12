@@ -238,7 +238,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether the specified block type will be destroyed after a single hit.",
+					Notes = "Returns true if the specified block type will be destroyed after a single hit.",
 				},
 				IsPistonBreakable =
 				{
@@ -256,7 +256,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether a piston can break the specified block type.",
+					Notes = "Returns true if a piston can break the specified block type.",
 				},
 				IsRainBlocker =
 				{
@@ -274,7 +274,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether the specified block type lets rain pass through.",
+					Notes = "Returns true if the specified block type blocks rain from passing through.",
 				},
 				IsSkylightDispersant =
 				{
