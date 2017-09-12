@@ -544,7 +544,7 @@ void cWorld::ChangeWeather(void)
 
 bool cWorld::IsWeatherWetAtBlock(Vector3i a_Pos)
 {
-	ASSERT(a_Pos.y >= 0)
+	ASSERT(a_Pos.y >= 0);
 	if (!IsWeatherWetAt(a_Pos.x, a_Pos.z))
 	{
 		return false;
