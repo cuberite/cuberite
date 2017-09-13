@@ -1060,7 +1060,7 @@ void cFinishGenPreSimulator::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	if (m_PreSimulateFallingBlocks)
 	{
-		CollapseSandGravel(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
+		CollapseSandGravel(a_ChunkDesc);
 	}
 
 	if (m_PreSimulateWater)
@@ -1079,10 +1079,7 @@ void cFinishGenPreSimulator::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenPreSimulator::CollapseSandGravel(
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::HeightMap & a_HeightMap       // Height map to update by the current data
-)
+void cFinishGenPreSimulator::CollapseSandGravel(cChunkDesc & a_ChunkDesc)
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -1092,7 +1089,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 			int HeightY = 0;
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
+				BLOCKTYPE Block = a_ChunkDesc.GetBlockType(x, y, z);
 				switch (Block)
 				{
 					default:
@@ -1122,8 +1119,9 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 					{
 						if (LastY < y - 1)
 						{
-							cChunkDef::SetBlock(a_BlockTypes, x, LastY + 1, z, Block);
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+							auto BlockMeta = a_ChunkDesc.GetBlockMeta(x, y, z);
+							a_ChunkDesc.SetBlockTypeMeta(x, LastY + 1, z, Block, BlockMeta);
+							a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_AIR, 0);
 						}
 						LastY++;
 						if (LastY > HeightY)
@@ -1134,7 +1132,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 					}
 				}  // switch (GetBlock)
 			}  // for y
-			cChunkDef::SetHeight(a_HeightMap, x, z, static_cast<HEIGHTTYPE>(HeightY));
+			a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(HeightY));
 		}  // for x
 	}  // for z
 }
