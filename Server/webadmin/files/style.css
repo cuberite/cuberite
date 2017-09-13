@@ -1,69 +1,16 @@
 /* Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 */
-* {
-    margin: 0;
-}
 
-body {
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    background: #fff;
-    width: 100%;
-    min-width: 100%;
-	height:100%;
-	min-height:100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-a:link {
-    color: #555;
-    text-decoration: none;
-}
-
-a:visited {
-    color: #444;
-    text-decoration: none;
-}
-
-a:hover, a:active {
-    color: #000;
-    text-decoration: underline;
-}
-
-img {
-    border: none;
-}
-
-h1 {
-    color: #069;
-    text-shadow: 2px 2px #000;
-}
-
-.row1 {
-    border-bottom: 1px #000 solid;
-    background: #fff url(header.png) repeat-x top left;
-    padding: 13px 0 13px 0;
-}
 
 .row2 {
     margin: 0 auto;
     text-align: center;
     vertical-align: middle;
     margin-top: 25px;
-	margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
 .contention {
-    color: #000;
-    text-align: left;
-    line-height: 1.4;
-    margin: 0;
-    font-family: Tahoma,Verdana,Arial,Sans-Serif;
-    font-size: 13px;
-	margin-bottom:75px;
-}
-
-.push25 {
+    margin-bottom: 75px;
 }
 
 #panel ul.menu {
@@ -88,97 +35,12 @@ h1 {
     font-weight: 700;
 }
 
-#panel .upper {
-    background: #dcdbdc url(tcat.png) repeat-x;
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #bbb;
-    padding: 7px;
-}
-
-#footer ul.menu {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-#footer ul.menu li {
-    margin: 0 5px;
-    display: inline;
-}
-
-#footer .upper {
-    background: #dcdbdc url(tcat.png) repeat-x;
-    border-top: 1px solid #bbb;
-    padding: 6px;
-    overflow: hidden;
-    font-size: 12px;
-}
-
-#footer .upper ul.bottom_links {
-    float: left;
-    margin: 3px 0 0 -5px;
-}
-
-#footer .lower {
-    background: #a1a2a2 url(thead.png) top left repeat-x;
-    color: #fff;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ddd;
-    overflow: hidden;
-    padding: 8px;
-    font-size: 11px;
-}
-
-#footer .lower a:link,#footer .lower a:visited {
-    color: #fff;
-    font-weight: 700;
-}
-
-#footer .lower a:hover,#footer .lower a:active {
-    color: #fff;
-    font-weight: 700;
-}
-
-#footer .lower #current_time {
-    float: right;
-    padding-right: 6px;
-}
-
-.wrapper {
-    width: 85%;
-    min-width: 970px;
-    max-width: 1500px;
-    margin: auto;
-}
-
-#footer {
-	position: fixed;
-	left:0;
-	bottom:0;
-    height: 61px;
-    width: 100%;
-    background: #999;
-    border-top: 1px #000 solid;
-	border-bottom: 1px #000 solid;
-}
-
-* html #footer {
-    position: absolute;
-    top: expression((0-(footer.offsetHeight)+(document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight)+(ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop))+'px');
-}
-
 tr td.trow1:first-child, tr td.trow2:first-child {
     border-left: 0;
 }
 
 tr td.trow1:last-child, tr td.trow2:last-child {
     border-right: 0;
-}
-
-.tborder {
-    -moz-border-radius: 7px;
-    -webkit-border-radius: 7px;
-    border-radius: 7px;
 }
 
 .thead {
@@ -188,26 +50,6 @@ tr td.trow1:last-child, tr td.trow2:last-child {
     -webkit-border-top-right-radius: 6px;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
-}
-
-table {
-    color: #000;
-    font-size: 13px;
-}
-
-.tborder {
-    background: #fff;
-    width: 100%;
-    margin: auto;
-    border: 1px solid #ccc;
-    padding: 1px;
-}
-
-.thead {
-    background: #a1a2a2 url(thead.png) top left repeat-x;
-    color: #fff;
-    border-bottom: 1px solid #8e8f8f;
-    padding: 8px;
 }
 
 .tcat {
@@ -233,26 +75,6 @@ table {
     -moz-box-sizing: border-box;
 }
 
-table {
-    color: #000;
-    font-size: 13px;
-    text-align: left;
-}
-
-.tborder {
-    background: #fff;
-    width: 100%;
-    margin: auto;
-    border: 1px solid #ccc;
-    padding: 1px;
-}
-
-.thead {
-    background: #a1a2a2 url(thead.png) top left repeat-x;
-    color: #fff;
-    border-bottom: 1px solid #8e8f8f;
-    padding: 8px;
-}
 
 .tcat {
     background: #dcdbdc url(tcat.png) repeat-x;
@@ -262,17 +84,6 @@ table {
     font-size: 12px;
 }
 
-.trow1 {
-    background: #f5f5f5;
-    border: 1px solid;
-    border-color: #fff #ddd #ddd #fff;
-}
-
-.trow2 {
-    background: #efefef;
-    border: 1px solid;
-    border-color: #fff #ddd #ddd #fff;
-}
 
 .smalltext {
     font-size: 11px;
@@ -284,7 +95,7 @@ textarea {
     border: 1px solid #ccc;
     padding: 2px;
     line-height: 1.4;
-    font-family: Tahoma,Verdana,Arial,Sans-Serif;
+    font-family: Tahoma, Verdana, Arial, Sans-Serif;
     font-size: 13px;
 }
 
@@ -292,7 +103,7 @@ select {
     background: #fff;
     padding: 3px;
     border: 1px solid #ccc;
-    font-family: Tahoma,Verdana,Arial,Sans-Serif;
+    font-family: Tahoma, Verdana, Arial, Sans-Serif;
 }
 
 .usercp_nav_item {
@@ -324,13 +135,13 @@ table {
 }
 
 table th {
-    border-bottom: 1px solid rgba(0,0,0,0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     padding: 5px;
     text-align: left;
 }
 
 table tr:nth-child(odd) {
-    background-color: rgba(0,0,0,0.015);
+    background-color: rgba(0, 0, 0, 0.015);
 }
 
 p {
@@ -338,17 +149,6 @@ p {
     padding: 4px 3px;
 }
 
-a {
-    text-decoration: none;
-    color: #000;
-    -webkit-transition: color .1s linear;
-    -moz-transition: color .1s linear;
-    transition: color .1s linear;
-}
-
-a:hover {
-    color: #888;
-}
 
 input[type="text"] {
     background: #fff;
@@ -356,7 +156,7 @@ input[type="text"] {
     border: 1px solid #ccc;
     padding: 2px;
     line-height: 1.4;
-    font-family: Tahoma,Verdana,Arial,Sans-Serif;
+    font-family: Tahoma, Verdana, Arial, Sans-Serif;
     font-size: 13px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -374,13 +174,13 @@ input[type="text"]:focus {
 hr {
     border: none;
     height: 1px;
-    background-color: rgba(0,0,0,0.12);
+    background-color: rgba(0, 0, 0, 0.12);
 }
 
 h4 {
     padding-bottom: 10px;
     margin-bottom: 12px;
-    border-bottom: 1px solid rgba(0,0,0,0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 #ChatDiv {
@@ -399,7 +199,7 @@ input[type="submit"] {
     padding-left: 5px;
     padding-right: 5px;
     cursor: pointer;
-    font-family: Tahoma,Verdana,Arial,Sans-Serif;
+    font-family: Tahoma, Verdana, Arial, Sans-Serif;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
@@ -411,16 +211,15 @@ input[type="submit"]:hover {
     background-color: #E5E4E2;
 }
 
-button:disabled,input:disabled {
+button:disabled, input:disabled {
     padding: 3px;
     padding-left: 5px;
     padding-right: 5px;
     cursor: pointer;
-    font-family: Tahoma,Verdana,Arial,Sans-Serif;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
-    border: none!important;
-    color: #fff!important;
-    background-color: #ccc!important;
+    border: none !important;
+    color: #fff !important;
+    background-color: #ccc !important;
 }

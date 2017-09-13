@@ -1,7 +1,7 @@
 -- Use a table for fast concatenation of strings
 local SiteContent = {}
 function Output(String)
-	table.insert(SiteContent, String)
+    table.insert(SiteContent, String)
 end
 
 
@@ -9,11 +9,11 @@ end
 
 
 function GetTableSize(Table)
-	local Size = 0
-	for key,value in pairs(Table) do
-		Size = Size + 1
-	end
-	return Size
+    local Size = 0
+    for key, value in pairs(Table) do
+        Size = Size + 1
+    end
+    return Size
 end
 
 
@@ -21,32 +21,28 @@ end
 
 
 local function GetDefaultPage()
-	local PM = cRoot:Get():GetPluginManager()
+    local PM = cRoot:Get():GetPluginManager()
 
-	local SubTitle = "Current Game"
-	local Content = ""
+    local SubTitle = "Current Game"
+    local Content = ""
 
-	Content = Content .. "<h4>Plugins:</h4><ul>"
-	PM:ForEachPlugin(
-		function (a_CBPlugin)
-			if (a_CBPlugin:IsLoaded()) then
-				Content = Content ..  "<li>" .. a_CBPlugin:GetName() .. " (version " .. a_CBPlugin:GetVersion() .. ")</li>"
-			end
-		end
-	)
+    Content = Content .. "<h4>Plugins:</h4><ul>"
+    PM:ForEachPlugin(function(a_CBPlugin)
+        if (a_CBPlugin:IsLoaded()) then
+            Content = Content .. "<li>" .. a_CBPlugin:GetName() .. " (version " .. a_CBPlugin:GetVersion() .. ")</li>"
+        end
+    end)
 
-	Content = Content .. "</ul>"
-	Content = Content .. "<h4>Players:</h4><ul>"
+    Content = Content .. "</ul>"
+    Content = Content .. "<h4>Players:</h4><ul>"
 
-	cRoot:Get():ForEachPlayer(
-		function(a_CBPlayer)
-			Content = Content .. "<li>" .. a_CBPlayer:GetName() .. "</li>"
-		end
-	)
+    cRoot:Get():ForEachPlayer(function(a_CBPlayer)
+        Content = Content .. "<li>" .. a_CBPlayer:GetName() .. "</li>"
+    end)
 
-	Content = Content .. "</ul><br>";
+    Content = Content .. "</ul><br>";
 
-	return Content, SubTitle
+    return Content, SubTitle
 end
 
 
@@ -54,50 +50,54 @@ end
 
 
 function ShowPage(WebAdmin, TemplateRequest)
-	SiteContent = {}
-	local BaseURL = cWebAdmin:GetBaseURL(TemplateRequest.Request.Path)
-	local Title = "Cuberite WebAdmin"
-	local NumPlayers = cRoot:Get():GetServer():GetNumPlayers()
-	local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
-	local NumChunks = cRoot:Get():GetTotalChunkCount()
-	local PluginPage = cWebAdmin:GetPage(TemplateRequest.Request)
-	local PageContent = PluginPage.Content
-	local SubTitle = PluginPage.PluginFolder
-	if (PluginPage.UrlPath ~= "") then
-		SubTitle = PluginPage.PluginFolder .. " - " .. PluginPage.TabTitle
-	end
-	if (PageContent == "") then
-		PageContent, SubTitle = GetDefaultPage()
-	end
+    SiteContent = {}
+    local BaseURL = cWebAdmin:GetBaseURL(TemplateRequest.Request.Path)
+    local Title = "Cuberite WebAdmin"
+    local NumPlayers = cRoot:Get():GetServer():GetNumPlayers()
+    local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
+    local NumChunks = cRoot:Get():GetTotalChunkCount()
+    local PluginPage = cWebAdmin:GetPage(TemplateRequest.Request)
+    local PageContent = PluginPage.Content
+    local SubTitle = PluginPage.PluginFolder
+    if (PluginPage.UrlPath ~= "") then
+        SubTitle = PluginPage.PluginFolder .. " - " .. PluginPage.TabTitle
+    end
+    if (PageContent == "") then
+        PageContent, SubTitle = GetDefaultPage()
+    end
 
-	--[[
-	-- 2016-01-15 Mattes: This wasn't used anywhere in the code, no idea what it was supposed to do
-	local reqParamsClass = ""
-	for key, value in pairs(TemplateRequest.Request.Params) do
-		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
-	end
-	if (string.gsub(reqParamsClass, "%s", "") == "") then
-		reqParamsClass = " no-param"
-	end
-	--]]
+    --[[
+    -- 2016-01-15 Mattes: This wasn't used anywhere in the code, no idea what it was supposed to do
+    local reqParamsClass = ""
+    for key, value in pairs(TemplateRequest.Request.Params) do
+        reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
+    end
+    if (string.gsub(reqParamsClass, "%s", "") == "") then
+        reqParamsClass = " no-param"
+    end
+    --]]
 
-	Output([[
+    Output([[
 <!-- Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 -->
 <html>
 <head>
 	<title>]] .. Title .. [[</title>
 	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="/common.css">
 	<link rel="stylesheet" type="text/css" href="/style.css">
 	<link rel="icon" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
 </head>
 <body>
+<div id="navigation">
+    <div id="logo" googl="true"><a href="#">
+        <svg aria-hidden="true" height="1.125em" viewBox="0 0 24 24" width="1.125em">
+            <path d="M6 3.04l-6 3v11.92l6 3 6 3 6-3 6-3V6.03l-6-3-6.02-3-6 3zm5.05 4.58l.96.47.96-.5.96-.47V5.96c0-.64.02-1.18.05-1.2.08-.03 4.24 2.12 4.24 2.2 0 .03-1.4.76-3.1 1.63L12 10.14 9.05 8.67C7.4 7.85 5.98 7.13 5.87 7.05l-.2-.12 2.18-1.1 2.2-1.1.02 1.2v1.2zm-4.08 3.72l3.1 1.58v6.34l-2.2-1.1c-1.2-.6-2.2-1.1-2.2-1.13 0-.02.57-.3 1.25-.65l1.25-.6v-1.75l-1-.5-1-.5-1.16.6-1.2.58c-.02 0-.04-1-.04-2.23s.02-2.24.05-2.24c.03 0 1.45.7 3.17 1.58zm13.23.68l-.06 2.2-1.15-.58-1.18-.58-1 .5-1 .5v.74c0 .4.04.8.06.9.03.08.34.28.94.57.5.25 1 .53 1.14.65l.24.2-2.15 1.08-2.13 1.08v-6.4l3.14-1.54c1.73-.86 3.16-1.55 3.16-1.54.02 0 0 1-.02 2.22z"></path>
+        </svg>
+        <span googl="true">Cuberite</span></a></div>
+</div>
 <div class="contention push25">
 	<div class="pagehead">
-		<div class="row1">
-			<div class="wrapper">
-				<img src="/logo_login.png" alt="Cuberite Logo" class="logo">
-			</div>
-		</div>
 		<div id="panel">
 			<div class="upper">
 				<div class="wrapper">
@@ -134,43 +134,42 @@ function ShowPage(WebAdmin, TemplateRequest)
 									<td class="trow1 smalltext">
 	]])
 
-	-- Get all tabs:
-	local perPluginTabs = {}
-	for _, tab in ipairs(cWebAdmin:GetAllWebTabs()) do
-		local pluginTabs = perPluginTabs[tab.PluginName] or {};
-		perPluginTabs[tab.PluginName] = pluginTabs
-		table.insert(pluginTabs, tab)
-	end
-	
-	-- Sort by plugin:
-	local pluginNames = {}
-	for pluginName, pluginTabs in pairs(perPluginTabs) do
-		table.insert(pluginNames, pluginName)
-	end
-	table.sort(pluginNames)
-	
-	-- Output by plugin, then alphabetically:
-	for _, pluginName in ipairs(pluginNames) do
-		local pluginTabs = perPluginTabs[pluginName]
-		table.sort(pluginTabs,
-			function(a_Tab1, a_Tab2)
-				return ((a_Tab1.Title or "") < (a_Tab2.Title or ""))
-			end
-		)
-		
-		-- Translate the plugin name into the folder name (-> title)
-		local pluginWebTitle = cPluginManager:Get():GetPluginFolderName(pluginName) or pluginName
-		Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>" .. pluginWebTitle .. "</b></a></div>\n");
+    -- Get all tabs:
+    local perPluginTabs = {}
+    for _, tab in ipairs(cWebAdmin:GetAllWebTabs()) do
+        local pluginTabs = perPluginTabs[tab.PluginName] or {};
+        perPluginTabs[tab.PluginName] = pluginTabs
+        table.insert(pluginTabs, tab)
+    end
 
-		-- Output each tab:
-		for _, tab in pairs(pluginTabs) do
-			Output("<div><a href='" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. tab.Title .. "</a></div>\n")
-		end
-		Output("<br>\n");
-	end
+    -- Sort by plugin:
+    local pluginNames = {}
+    for pluginName, pluginTabs in pairs(perPluginTabs) do
+        table.insert(pluginNames, pluginName)
+    end
+    table.sort(pluginNames)
+
+    -- Output by plugin, then alphabetically:
+    for _, pluginName in ipairs(pluginNames) do
+        local pluginTabs = perPluginTabs[pluginName]
+        table.sort(pluginTabs,
+            function(a_Tab1, a_Tab2)
+                return ((a_Tab1.Title or "") < (a_Tab2.Title or ""))
+            end)
+
+        -- Translate the plugin name into the folder name (-> title)
+        local pluginWebTitle = cPluginManager:Get():GetPluginFolderName(pluginName) or pluginName
+        Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>" .. pluginWebTitle .. "</b></a></div>\n");
+
+        -- Output each tab:
+        for _, tab in pairs(pluginTabs) do
+            Output("<div><a href='" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. tab.Title .. "</a></div>\n")
+        end
+        Output("<br>\n");
+    end
 
 
-	Output([[
+    Output([[
 								</td>
 							</tr>
 						</tbody>
@@ -212,9 +211,19 @@ function ShowPage(WebAdmin, TemplateRequest)
 	</div>
 </div>
 </div>
+<script>
+(function(root){"use strict";var css=".nanobar{width:100%;height:4px;z-index:9999;top:0}.bar{width:0;height:100%;transition:height .3s;background:#000}";function addCss(){var s=document.getElementById("nanobarcss");if(s===null){s=document.createElement("style");s.type="text/css";s.id="nanobarcss";document.head.insertBefore(s,document.head.firstChild);if(!s.styleSheet)return s.appendChild(document.createTextNode(css));s.styleSheet.cssText=css}}function addClass(el,cls){if(el.classList)el.classList.add(cls);else el.className+=" "+cls}function createBar(rm){var el=document.createElement("div"),width=0,here=0,on=0,bar={el:el,go:go};addClass(el,"bar");function move(){var dist=width-here;if(dist<.1&&dist>-.1){place(here);on=0;if(width>=100){el.style.height=0;setTimeout(function(){rm(el)},300)}}else{place(width-dist/4);setTimeout(go,16)}}function place(num){width=num;el.style.width=width+"%"}function go(num){if(num>=0){here=num;if(!on){on=1;move()}}else if(on){move()}}return bar}function Nanobar(opts){opts=opts||{};var el=document.createElement("div"),applyGo,nanobar={el:el,go:function(p){applyGo(p);if(p>=100){init()}}};function rm(child){el.removeChild(child)}function init(){var bar=createBar(rm);el.appendChild(bar.el);applyGo=bar.go}addCss();addClass(el,"nanobar");if(opts.id)el.id=opts.id;if(opts.classname)addClass(el,opts.classname);if(opts.target){el.style.position="relative";opts.target.insertBefore(el,opts.target.firstChild)}else{el.style.position="fixed";document.getElementsByTagName("body")[0].appendChild(el)}init();return nanobar}if(typeof exports==="object"){module.exports=Nanobar}else if(typeof define==="function"&&define.amd){define([],function(){return Nanobar})}else{root.Nanobar=Nanobar}})(this);
+var options = {
+	classname: 'glow'
+};
+var nanobar = new Nanobar( options );
+document.addEventListener("DOMContentLoaded", function(){
+nanobar.go(100);
+});
+</script>
 </body>
 </html>
 ]])
 
-	return table.concat(SiteContent)
+    return table.concat(SiteContent)
 end
