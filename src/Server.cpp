@@ -498,26 +498,20 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	if (split[0] == "destroyentities")
 	{
-		class WorldCallback : public cWorldListCallback
-		{
-			virtual bool Item(cWorld * a_World) override
+		cRoot::Get()->ForEachWorld([](cWorld & a_World)
 			{
-				class EntityCallback : public cEntityCallback
-				{
-					virtual bool Item(cEntity * a_Entity) override
+				a_World.ForEachEntity([](cEntity & a_Entity)
 					{
-						if (!a_Entity->IsPlayer())
+						if (!a_Entity.IsPlayer())
 						{
-							a_Entity->Destroy();
+							a_Entity.Destroy();
 						}
 						return false;
 					}
-				} EC;
-				a_World->ForEachEntity(EC);
+				);
 				return false;
 			}
-		} WC;
-		cRoot::Get()->ForEachWorld(WC);
+		);
 		a_Output.Out("Destroyed all entities");
 		a_Output.Finished();
 		return;

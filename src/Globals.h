@@ -416,20 +416,6 @@ template class SizeChecker<UInt8,  1>;
 
 
 
-
-/** A generic interface used mainly in ForEach() functions */
-template <typename Type> class cItemCallback
-{
-public:
-	virtual ~cItemCallback() {}
-
-	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
-	virtual bool Item(Type * a_Type) = 0;
-} ;
-
-
-
-
 /** Clamp X to the specified range. */
 template <typename T>
 T Clamp(T a_Value, T a_Min, T a_Max)

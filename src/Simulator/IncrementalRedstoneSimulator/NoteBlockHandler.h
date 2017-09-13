@@ -45,17 +45,12 @@ public:
 			return {};
 		}
 
-		class cSetPowerToNoteBlock : public cNoteBlockCallback
-		{
-		public:
-			virtual bool Item(cNoteEntity * a_NoteBlock) override
+		a_World.DoWithNoteBlockAt(a_Position.x, a_Position.y, a_Position.z, [](cNoteEntity & a_NoteBlock)
 			{
-				a_NoteBlock->MakeSound();
+				a_NoteBlock.MakeSound();
 				return false;
 			}
-		} NoteBlockSP;
-
-		a_World.DoWithNoteBlockAt(a_Position.x, a_Position.y, a_Position.z, NoteBlockSP);
+		);
 
 		return {};
 	}

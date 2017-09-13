@@ -1,4 +1,4 @@
-
+﻿
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Root.h"
@@ -82,11 +82,35 @@ cRoot::~cRoot()
 void cRoot::InputThread(cRoot & a_Params)
 {
 	cLogCommandOutputCallback Output;
+	AString Command;
 
 	while (a_Params.m_InputThreadRunFlag.test_and_set() && std::cin.good())
 	{
-		AString Command;
+		#ifndef _WIN32
+			static const std::chrono::microseconds PollPeriod = std::chrono::milliseconds{ 100 };
+
+			timeval Timeout{ 0, 0 };
+			Timeout.tv_usec = PollPeriod.count();
+
+			fd_set ReadSet;
+			FD_ZERO(&ReadSet);
+			FD_SET(STDIN_FILENO, &ReadSet);
+
+			if (select(STDIN_FILENO + 1, &ReadSet, nullptr, nullptr, &Timeout) <= 0)
+			{
+				// Don't call getline because there's nothing to read
+				continue;
+			}
+		#endif
+
 		std::getline(std::cin, Command);
+
+		if (!a_Params.m_InputThreadRunFlag.test_and_set())
+		{
+			// Already shutting down, can't execute commands
+			break;
+		}
+
 		if (!Command.empty())
 		{
 			// Execute and clear command string when submitted
@@ -323,15 +347,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 			m_InputThread.join();
 		}
 	#else
-		if (m_InputThread.get_id() != std::thread::id())
-		{
-			if (pthread_kill(m_InputThread.native_handle(), SIGKILL) != 0)
-			{
-				LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
-				m_TerminateEventRaised = true;
-				m_InputThread.detach();
-			}
-		}
+		m_InputThread.join();
 	#endif
 
 	if (m_TerminateEventRaised)
@@ -352,22 +368,16 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 void cRoot::StopServer()
 {
 	// Kick all players from the server with custom disconnect message
-	class cPlayerCallback : public cPlayerListCallback
-	{
-		AString m_ShutdownMessage;
-		virtual bool Item(cPlayer * a_Player)
+
+	bool SentDisconnect = false;
+	cRoot::Get()->ForEachPlayer([&](cPlayer & a_Player)
 		{
-			a_Player->GetClientHandlePtr()->Kick(m_ShutdownMessage);
-			m_HasSentDisconnect = true;
+			a_Player.GetClientHandlePtr()->Kick(m_Server->GetShutdownMessage());
+			SentDisconnect = true;
 			return false;
 		}
-	public:
-		bool m_HasSentDisconnect;
-		cPlayerCallback(AString a_ShutdownMessage) : m_ShutdownMessage(a_ShutdownMessage) { m_HasSentDisconnect = false; }
-	} PlayerCallback(m_Server->GetShutdownMessage());
-
-	cRoot::Get()->ForEachPlayer(PlayerCallback);
-	if (PlayerCallback.m_HasSentDisconnect)
+	);
+	if (SentDisconnect)
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
@@ -590,14 +600,13 @@ cWorld * cRoot::GetWorld(const AString & a_WorldName)
 
 
 
-bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
+bool cRoot::ForEachWorld(cWorldListCallback a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
+	for (auto & World : m_WorldsByName)
 	{
-		++itr2;
-		if (itr->second != nullptr)
+		if (World.second != nullptr)
 		{
-			if (a_Callback.Item(itr->second))
+			if (a_Callback(*World.second))
 			{
 				return false;
 			}
@@ -770,7 +779,7 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 
 
 
-bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
+bool cRoot::ForEachPlayer(cPlayerListCallback a_Callback)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
@@ -787,20 +796,22 @@ bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 
 
 
-bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
+bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
 {
-	class cCallback : public cPlayerListCallback
+	class cCallback
 	{
 		size_t        m_BestRating;
 		size_t        m_NameLength;
 		const AString m_PlayerName;
 
-		virtual bool Item (cPlayer * a_pPlayer)
+	public:
+
+		bool operator () (cPlayer & a_Player)
 		{
-			size_t Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
+			size_t Rating = RateCompareString (m_PlayerName, a_Player.GetName());
 			if ((Rating > 0) && (Rating >= m_BestRating))
 			{
-				m_BestMatch = a_pPlayer->GetName();
+				m_BestMatch = a_Player.GetName();
 				if (Rating > m_BestRating)
 				{
 					m_NumMatches = 0;
@@ -815,7 +826,6 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 			return false;
 		}
 
-	public:
 		cCallback (const AString & a_CBPlayerName) :
 			m_BestRating(0),
 			m_NameLength(a_CBPlayerName.length()),
@@ -840,7 +850,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 
 
-bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback & a_Callback)
+bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end(); ++itr)
 	{
@@ -856,7 +866,7 @@ bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback &
 
 
 
-bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
+bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
 {
 	for (auto World : m_WorldsByName)
 	{
@@ -1048,25 +1058,11 @@ int cRoot::GetFurnaceFuelBurnTime(const cItem & a_Fuel)
 AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
 {
 	AStringVector Results;
-	class cWorldCallback : public cWorldListCallback
-	{
-	public:
-		cWorldCallback(AStringVector & a_Results, const AString & a_Search) :
-			m_Results(a_Results),
-			m_Search(a_Search)
+	ForEachWorld([&](cWorld & a_World)
 		{
-		}
-
-		virtual bool Item(cWorld * a_World) override
-		{
-			a_World->TabCompleteUserName(m_Search, m_Results);
+			a_World.TabCompleteUserName(a_Text, Results);
 			return false;
 		}
-	private:
-		AStringVector & m_Results;
-		const AString & m_Search;
-	} WC(Results, a_Text);
-
-	Get()->ForEachWorld(WC);
+	);
 	return Results;
 }

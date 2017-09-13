@@ -687,7 +687,7 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 
 
-bool cScoreboard::ForEachObjectiveWith(cObjective::Criteria a_Type, cObjectiveCallback & a_Callback)
+bool cScoreboard::ForEachObjectiveWith(cObjective::Criteria a_Type, cObjectiveCallback a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -696,7 +696,7 @@ bool cScoreboard::ForEachObjectiveWith(cObjective::Criteria a_Type, cObjectiveCa
 		if (it->second.GetType() == a_Type)
 		{
 			// Call callback
-			if (a_Callback.Item(&it->second))
+			if (a_Callback(it->second))
 			{
 				return false;
 			}
@@ -709,14 +709,14 @@ bool cScoreboard::ForEachObjectiveWith(cObjective::Criteria a_Type, cObjectiveCa
 
 
 
-bool cScoreboard::ForEachObjective(cObjectiveCallback & a_Callback)
+bool cScoreboard::ForEachObjective(cObjectiveCallback a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
 	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
 	{
 		// Call callback
-		if (a_Callback.Item(&it->second))
+		if (a_Callback(it->second))
 		{
 			return false;
 		}
@@ -728,14 +728,14 @@ bool cScoreboard::ForEachObjective(cObjectiveCallback & a_Callback)
 
 
 
-bool cScoreboard::ForEachTeam(cTeamCallback & a_Callback)
+bool cScoreboard::ForEachTeam(cTeamCallback a_Callback)
 {
 	cCSLock Lock(m_CSTeams);
 
 	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
 	{
 		// Call callback
-		if (a_Callback.Item(&it->second))
+		if (a_Callback(it->second))
 		{
 			return false;
 		}
