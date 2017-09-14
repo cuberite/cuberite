@@ -62,7 +62,7 @@ Other Stuff
 
 For other stuff, check out the [homepage][13], the [Users' Manual][14], the [forums][15], and the [Plugin API][16].
 
-[Support Us on Bountysource][17]
+Support Us on [Liberapay][17] or [Bountysource][18]
 
 [1]: https://cuberite.org/news/#subscribe
 [2]: https://cuberite.org/
@@ -80,4 +80,5 @@ For other stuff, check out the [homepage][13], the [Users' Manual][14], the [for
 [14]: https://book.cuberite.org/
 [15]: https://forum.cuberite.org/
 [16]: https://api.cuberite.org/
-[17]: https://bountysource.com/teams/cuberite
+[17]: https://liberapay.com/Cuberite
+[18]: https://bountysource.com/teams/cuberite
