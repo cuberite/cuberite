@@ -1235,8 +1235,11 @@ bool cSlotAreaBeacon::IsPlaceableItem(short a_ItemType)
 		{
 			return true;
 		}
+		default:
+		{
+			return false;
+		}
 	}
-	return false;
 }
 
 
@@ -2406,8 +2409,8 @@ bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 		case 1:  return ItemCategory::IsChestPlate(a_Item.m_ItemType);
 		case 2:  return ItemCategory::IsLeggings(a_Item.m_ItemType);
 		case 3:  return ItemCategory::IsBoots(a_Item.m_ItemType);
+		default: return false;
 	}
-	return false;
 }
 
 

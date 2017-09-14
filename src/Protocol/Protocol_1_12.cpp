@@ -654,6 +654,26 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtBat
 
+		case mtChicken:
+		{
+			auto & Chicken = reinterpret_cast<const cChicken &>(a_Mob);
+
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Chicken.IsBaby());
+			break;
+		}  // case mtChicken
+
+		case mtCow:
+		{
+			auto & Cow = reinterpret_cast<const cCow &>(a_Mob);
+
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Cow.IsBaby());
+			break;
+		}  // case mtCow
+
 		case mtCreeper:
 		{
 			auto & Creeper = reinterpret_cast<const cCreeper &>(a_Mob);
@@ -791,26 +811,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtOcelot
 
-		case mtCow:
-		{
-			auto & Cow = reinterpret_cast<const cCow &>(a_Mob);
-
-			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Cow.IsBaby());
-			break;
-		}  // case mtCow
-
-		case mtChicken:
-		{
-			auto & Chicken = reinterpret_cast<const cChicken &>(a_Mob);
-
-			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Chicken.IsBaby());
-			break;
-		}  // case mtChicken
-
 		case mtPig:
 		{
 			auto & Pig = reinterpret_cast<const cPig &>(a_Mob);
@@ -826,6 +826,19 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			// PIG_TOTAL_CARROT_ON_A_STICK_BOOST in 1.11.1 only
 			break;
 		}  // case mtPig
+
+		case mtRabbit:
+		{
+			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
+			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Rabbit.IsBaby());
+
+			a_Pkt.WriteBEUInt8(RABBIT_TYPE);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
+			break;
+		}  // case mtRabbit
 
 		case mtSheep:
 		{
@@ -846,19 +859,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteBEInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
-
-		case mtRabbit:
-		{
-			auto & Rabbit = reinterpret_cast<const cRabbit &>(a_Mob);
-			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Rabbit.IsBaby());
-
-			a_Pkt.WriteBEUInt8(RABBIT_TYPE);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
-			break;
-		}  // case mtRabbit
 
 		case mtSkeleton:
 		{
@@ -978,6 +978,38 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		case mtBlaze:
+		case mtEnderDragon:
+		case mtGuardian:
+		case mtIronGolem:
+		case mtSnowGolem:
+		case mtSpider:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtMooshroom:
+		case mtCaveSpider:
+		{
+			// Not mentioned on http://wiki.vg/Entities
+			break;
+		}
+
+		case mtGiant:
+		case mtSilverfish:
+		case mtSquid:
+		{
+			// Mobs with no extra fields
+			break;
+		}
+
+		case mtInvalidType:
+		{
+			ASSERT(!"cProtocol_1_12::WriteMobMetadata: Recieved mob of invalid type");
+			break;
+		}
 	}  // switch (a_Mob.GetType())
 }
 

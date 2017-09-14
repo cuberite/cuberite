@@ -1034,10 +1034,12 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombie:       return mfHostile;
 		case mtZombiePigman: return mfHostile;
 
-		case mtInvalidType:  break;
+		default:
+		{
+			ASSERT(!"Unhandled mob type");
+			return mfUnhandled;
+		}
 	}
-	ASSERT(!"Unhandled mob type");
-	return mfUnhandled;
 }
 
 
@@ -1053,10 +1055,12 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 		case mfAmbient:   return 40;
 		case mfWater:     return 400;
 		case mfNoSpawn:   return -1;
-		case mfUnhandled: break;
+		default:
+		{
+			ASSERT(!"Unhandled mob family");
+			return -1;
+		}
 	}
-	ASSERT(!"Unhandled mob family");
-	return -1;
 }
 
 
