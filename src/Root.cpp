@@ -90,7 +90,7 @@ void cRoot::InputThread(cRoot & a_Params)
 			static const std::chrono::microseconds PollPeriod = std::chrono::milliseconds{ 100 };
 
 			timeval Timeout{ 0, 0 };
-			Timeout.tv_usec = PollPeriod.count();
+			Timeout.tv_usec = static_cast<long>(PollPeriod.count());
 
 			fd_set ReadSet;
 			FD_ZERO(&ReadSet);
