@@ -1,4 +1,4 @@
-﻿
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Root.h"
@@ -87,10 +87,11 @@ void cRoot::InputThread(cRoot & a_Params)
 	while (a_Params.m_InputThreadRunFlag.test_and_set() && std::cin.good())
 	{
 		#ifndef _WIN32
-			static const std::chrono::microseconds PollPeriod = std::chrono::milliseconds{ 100 };
+			using cPollUSec = std::chrono::duration<Int32, std::micro>;
+			static const cPollUSec PollPeriod = std::chrono::milliseconds{ 100 };
 
 			timeval Timeout{ 0, 0 };
-			Timeout.tv_usec = static_cast<long>(PollPeriod.count());
+			Timeout.tv_usec = PollPeriod.count();
 
 			fd_set ReadSet;
 			FD_ZERO(&ReadSet);
