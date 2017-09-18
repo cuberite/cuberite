@@ -531,6 +531,12 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 					Pickups.Add(m_BlockType, 1, 0);
 					break;
 				}
+				case E_BLOCK_LEAVES:
+				case E_BLOCK_NEW_LEAVES:
+				{
+					Pickups.Add(m_BlockType, 1, Meta & 0x03);
+					break;
+				}
 				default: Pickups.Add(m_BlockType, 1, Meta); break;
 			}
 		}
