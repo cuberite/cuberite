@@ -1,4 +1,4 @@
-﻿
+
 // TCPLinkImpl.cpp
 
 // Implements the cTCPLinkImpl class implementing the TCP link functionality

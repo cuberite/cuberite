@@ -1,4 +1,4 @@
-﻿
+
 // CryptoKey.h
 
 // Declares the cCryptoKey class representing a RSA public key in mbedTLS

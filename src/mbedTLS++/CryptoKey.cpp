@@ -1,4 +1,4 @@
-﻿
+
 // CryptoKey.cpp
 
 // Implements the cCryptoKey class representing a RSA public key in mbedTLS

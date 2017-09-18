@@ -1,4 +1,4 @@
-﻿
+
 // EntropyContext.cpp
 
 // Implements the cEntropyContext class representing a wrapper over entropy contexts in mbedTLS

@@ -1,4 +1,4 @@
-﻿
+
 // SslContext.h
 
 // Declares the cSslContext class that holds everything a single SSL context needs to function

@@ -1,4 +1,4 @@
-﻿
+
 // Sha1Checksum.cpp
 
 // Declares the cSha1Checksum class representing the SHA-1 checksum calculator

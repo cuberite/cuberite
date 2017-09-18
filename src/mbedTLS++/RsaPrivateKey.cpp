@@ -1,4 +1,4 @@
-﻿
+
 // RsaPrivateKey.cpp
 
 #include "Globals.h"

@@ -1,4 +1,4 @@
-﻿
+
 // CtrDrbgContext.h
 
 // Declares the cCtrDrbgContext class representing a wrapper over CTR-DRBG implementation in mbedTLS

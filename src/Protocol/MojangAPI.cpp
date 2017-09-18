@@ -1,4 +1,4 @@
-﻿
+
 // MojangAPI.cpp
 
 // Implements the cMojangAPI class representing the various API points provided by Mojang's webservices, and a cache for their results

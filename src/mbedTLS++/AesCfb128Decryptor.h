@@ -1,4 +1,4 @@
-﻿
+
 // AesCfb128Decryptor.h
 
 // Declares the cAesCfb128Decryptor class decrypting data using AES CFB-128

@@ -1,4 +1,4 @@
-﻿
+
 // BlockingSslClientSocket.cpp
 
 // Implements the cBlockingSslClientSocket class representing a blocking TCP socket with client SSL encryption over it

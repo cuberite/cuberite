@@ -1,4 +1,4 @@
-﻿
+
 // HTTPServer.cpp
 
 // Implements the cHTTPServer class representing a HTTP webserver that uses cListenThread and cSocketThreads for processing

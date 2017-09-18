@@ -1,4 +1,4 @@
-﻿
+
 const g_DistanceBetweenSquares = 0;//.01;
 const g_Colors = [
 	"#0000FF",

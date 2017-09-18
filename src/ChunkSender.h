@@ -1,4 +1,4 @@
-﻿
+
 // ChunkSender.h
 
 // Interfaces to the cChunkSender class representing the thread that waits for chunks becoming ready (loaded / generated) and sends them to clients

@@ -1,4 +1,4 @@
-﻿enable_testing()
+enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/libevent/include)
