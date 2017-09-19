@@ -494,7 +494,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			auto clone = be->Clone(posX, posY, posZ);
 			clone->SetWorld(m_World);
 			AddBlockEntityClean(clone);
-			BroadcastBlockEntity(posX, posY, posZ);
+			BroadcastBlockEntity({posX, posY, posZ});
 		}
 	}
 }
@@ -1942,7 +1942,7 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 	MarkDirty();
 	auto Sign = static_cast<cSignEntity *>(Entity);
 	Sign->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
-	m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
+	m_World->BroadcastBlockEntity({a_PosX, a_PosY, a_PosZ});
 	return true;
 }
 
@@ -2713,7 +2713,7 @@ void cChunk::BroadcastBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte
 
 
 
-void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
+void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
 {
 	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2721,7 +2721,7 @@ void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a
 		{
 			continue;
 		}
-		(*itr)->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
+		(*itr)->SendBlockBreakAnim(a_EntityID, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Stage);
 	}  // for itr - LoadedByClient[]
 }
 
@@ -2729,10 +2729,10 @@ void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a
 
 
 
-void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+void cChunk::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
 	// We can operate on entity pointers, we're inside the ChunkMap's CS lock which guards the list
-	cBlockEntity * Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	cBlockEntity * Entity = GetBlockEntity(a_BlockPos);
 	if (Entity == nullptr)
 	{
 		return;

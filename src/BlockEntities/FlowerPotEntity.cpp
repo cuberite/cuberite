@@ -67,7 +67,7 @@ bool cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
-		m_World->BroadcastBlockEntity(m_PosX, m_PosY, m_PosZ, a_Player->GetClientHandle());
+		m_World->BroadcastBlockEntity(GetPos(), a_Player->GetClientHandle());
 	}
 	return true;
 }

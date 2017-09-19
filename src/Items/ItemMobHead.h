@@ -38,7 +38,7 @@ public:
 		// If the placed head is a wither, try to spawn the wither first:
 		if (a_EquippedItem.m_ItemDamage == E_META_HEAD_WITHER)
 		{
-			if (TrySpawnWitherAround(a_World, a_Player, placedX, placedY, placedZ))
+			if (TrySpawnWitherAround(a_World, a_Player, {placedX, placedY, placedZ}))
 			{
 				return true;
 			}
@@ -82,7 +82,7 @@ public:
 
 				MobHeadEntity.SetType(HeadType);
 				MobHeadEntity.SetRotation(static_cast<eMobHeadRotation>(Rotation));
-				MobHeadEntity.GetWorld()->BroadcastBlockEntity(MobHeadEntity.GetPosX(), MobHeadEntity.GetPosY(), MobHeadEntity.GetPosZ());
+				MobHeadEntity.GetWorld()->BroadcastBlockEntity(MobHeadEntity.GetPos());
 				return false;
 			}
 		);
@@ -93,11 +93,11 @@ public:
 	Returns true if the wither was created. */
 	bool TrySpawnWitherAround(
 		cWorld & a_World, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ
+		Vector3i a_BlockPos
 	)
 	{
 		// No wither can be created at Y < 2 - not enough space for the formula:
-		if (a_BlockY < 2)
+		if (a_BlockPos.y < 2)
 		{
 			return false;
 		}
@@ -111,17 +111,17 @@ public:
 			{ 0, 0,  1},
 			{ 0, 0, -1},
 		};
-		for (size_t i = 0; i < ARRAYCOUNT(RelCoords); ++i)
+		for (auto & RelCoord : RelCoords)
 		{
 			if (TrySpawnWitherAt(
 				a_World, a_Player,
-				a_BlockX, a_BlockY, a_BlockZ,
-				RelCoords[i].x, RelCoords[i].z
+				a_BlockPos,
+				RelCoord.x, RelCoord.z
 			))
 			{
 				return true;
 			}
-		}  // for i - Coords[]
+		}  // for i - RelCoords[]
 
 		return false;
 	}
@@ -134,7 +134,7 @@ public:
 	Returns true iff the wither was created successfully. */
 	bool TrySpawnWitherAt(
 		cWorld & a_World, cPlayer & a_Player,
-		int a_PlacedHeadX, int a_PlacedHeadY, int a_PlacedHeadZ,
+		Vector3i a_PlacedHeadPos,
 		int a_OffsetX, int a_OffsetZ
 	)
 	{
@@ -170,12 +170,12 @@ public:
 		return (
 			TrySpawnWitherFromImage(
 				a_World, a_Player, ImageWitherX, ARRAYCOUNT(ImageWitherX),
-				a_PlacedHeadX, a_PlacedHeadY, a_PlacedHeadZ,
+				a_PlacedHeadPos,
 				a_OffsetX, a_OffsetZ
 			) ||
 			TrySpawnWitherFromImage(
 				a_World, a_Player, ImageWitherZ, ARRAYCOUNT(ImageWitherZ),
-				a_PlacedHeadX, a_PlacedHeadY, a_PlacedHeadZ,
+				a_PlacedHeadPos,
 				a_OffsetX, a_OffsetZ
 			)
 		);
@@ -189,7 +189,7 @@ public:
 	Returns true iff the wither was created successfully. */
 	bool TrySpawnWitherFromImage(
 		cWorld & a_World, cPlayer & a_Player, const sSetBlock * a_Image, size_t a_ImageCount,
-		int a_PlacedHeadX, int a_PlacedHeadY, int a_PlacedHeadZ,
+		Vector3i a_PlacedHeadPos,
 		int a_OffsetX, int a_OffsetZ
 	)
 	{
@@ -199,12 +199,12 @@ public:
 		for (size_t i = 0; i < a_ImageCount; i++)
 		{
 			// Get the absolute coords of the image:
-			int BlockX = a_PlacedHeadX + a_OffsetX + a_Image[i].GetX();
-			int BlockY = a_PlacedHeadY + a_Image[i].GetY();
-			int BlockZ = a_PlacedHeadZ + a_OffsetZ + a_Image[i].GetZ();
+			int BlockX = a_PlacedHeadPos.x + a_OffsetX + a_Image[i].GetX();
+			int BlockY = a_PlacedHeadPos.y + a_Image[i].GetY();
+			int BlockZ = a_PlacedHeadPos.z + a_OffsetZ + a_Image[i].GetZ();
 
 			// If the query is for the placed head, short-circuit-evaluate it:
-			if ((BlockX == a_PlacedHeadX) && (BlockY == a_PlacedHeadY) && (BlockZ == a_PlacedHeadZ))
+			if ((BlockX == a_PlacedHeadPos.x) && (BlockY == a_PlacedHeadPos.y) && (BlockZ == a_PlacedHeadPos.z))
 			{
 				if (a_Image[i].m_BlockType != E_BLOCK_HEAD)
 				{
@@ -256,18 +256,18 @@ public:
 		}
 
 		// Spawn the wither:
-		int BlockX = a_PlacedHeadX + a_OffsetX;
-		int BlockZ = a_PlacedHeadZ + a_OffsetZ;
-		a_World.SpawnMob(static_cast<double>(BlockX) + 0.5, a_PlacedHeadY - 2, static_cast<double>(BlockZ) + 0.5, mtWither, false);
-		AwardSpawnWitherAchievement(a_World, BlockX, a_PlacedHeadY - 2, BlockZ);
+		int BlockX = a_PlacedHeadPos.x + a_OffsetX;
+		int BlockZ = a_PlacedHeadPos.z + a_OffsetZ;
+		a_World.SpawnMob(static_cast<double>(BlockX) + 0.5, a_PlacedHeadPos.y - 2, static_cast<double>(BlockZ) + 0.5, mtWither, false);
+		AwardSpawnWitherAchievement(a_World, {BlockX, a_PlacedHeadPos.y - 2, BlockZ});
 		return true;
 	}
 
 
 	/** Awards the achievement to all players close to the specified point. */
-	void AwardSpawnWitherAchievement(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos)
 	{
-		Vector3f Pos{ static_cast<float>(a_BlockX), static_cast<float>(a_BlockY), static_cast<float>(a_BlockZ) };
+		Vector3f Pos(a_BlockPos);
 		a_World.ForEachPlayer([=](cPlayer & a_Player)
 			{
 				// If player is close, award achievement:

@@ -52,7 +52,7 @@ void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 
 	Just documenting my experience in getting this to work :P
 	*/
-	m_World->BroadcastBlockEntity(GetPosX(), GetPosY(), GetPosZ());
+	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -61,7 +61,7 @@ void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 
 void cCommandBlockEntity::SetLastOutput(const AString & a_LastOut)
 {
-	m_World->BroadcastBlockEntity(GetPosX(), GetPosY(), GetPosZ());
+	m_World->BroadcastBlockEntity(GetPos());
 	m_LastOutput = a_LastOut;
 }
 
