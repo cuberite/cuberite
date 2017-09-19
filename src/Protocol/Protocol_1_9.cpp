@@ -1221,17 +1221,21 @@ void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol_1_9_0::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocol_1_9_0::SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, GetPacketId(sendScoreboardObjective));  // Scoreboard objective packet
-	Pkt.WriteString(a_Name);
+	Pkt.WriteString(a_Objective.GetName());
 	Pkt.WriteBEUInt8(a_Mode);
-	if ((a_Mode == 0) || (a_Mode == 2))
+	if ((a_Mode == cObjective::uaCreate) || (a_Mode == cObjective::uaUpdateText))
 	{
-		Pkt.WriteString(a_DisplayName);
-		Pkt.WriteString("integer");
+		Pkt.WriteString(a_Objective.GetDisplayName());
+		switch (a_Objective.GetDisplayType())
+		{
+		case cObjective::dispInteger: Pkt.WriteString("integer"); break;
+		case cObjective::dispHearts:  Pkt.WriteString("hearts"); break;
+		}
 	}
 }
 
@@ -1239,7 +1243,7 @@ void cProtocol_1_9_0::SendScoreboardObjective(const AString & a_Name, const AStr
 
 
 
-void cProtocol_1_9_0::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocol_1_9_0::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1636,6 +1640,79 @@ void cProtocol_1_9_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 	cPacketizer Pkt(*this, GetPacketId(sendUseBed));  // Use bed
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
+{
+	cPacketizer Pkt(*this, GetPacketId(sendTeam));
+	Pkt.WriteString(a_Team.GetName());
+	Pkt.WriteBEUInt8(a_Mode);  // Action
+
+	// Mode 0 - Create, specifies both team meta and members
+	// Mode 1 - Remove, specifies only team name
+	// Mode 2 - Update, specifies only team meta
+	if ((a_Mode == 0) || (a_Mode == 2))
+	{
+		Pkt.WriteString(a_Team.GetDisplayName());
+		Pkt.WriteString(a_Team.GetPrefix());
+		Pkt.WriteString(a_Team.GetSuffix());
+
+		// Friendly flags bitmask
+		// 0x01: Allows friendly fire, 0x02: Can see friendly invisible players
+		Byte FriendlyFlags = 0;
+		if (a_Team.AllowsFriendlyFire())
+		{
+			FriendlyFlags |= 1;
+		}
+		if (a_Team.CanSeeFriendlyInvisible())
+		{
+			FriendlyFlags |= 2;
+		}
+		Pkt.WriteBEUInt8(FriendlyFlags);
+
+		Pkt.WriteString("always");  // Name tag visibility
+		Pkt.WriteString("always");  // Collision rule
+		Pkt.WriteBEInt8(static_cast<Int8>(a_Team.GetColor()));  // Color
+	}
+
+	if (a_Mode == 0)
+	{
+		auto TeamPlayers = a_Team.GetMembers();
+		Pkt.WriteVarInt32(static_cast<UInt32>(TeamPlayers.size()));  // Number of entities
+		// Member entity list
+		for (const auto & name : TeamPlayers)
+		{
+			Pkt.WriteString(name);
+		}
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta)
+{
+	cPacketizer Pkt(*this, GetPacketId(sendTeam));
+	Pkt.WriteString(a_TeamName);
+	if (a_IsAdding)
+	{
+		Pkt.WriteBEUInt8(3);
+	}
+	else
+	{
+		Pkt.WriteBEUInt8(4);
+	}
+
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Delta.size()));
+	for (const auto & name : a_Delta)
+	{
+		Pkt.WriteString(name);
+	}
 }
 
 

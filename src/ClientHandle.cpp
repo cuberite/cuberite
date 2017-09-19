@@ -435,12 +435,6 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		m_State = csAuthenticated;
 	}
 
-	// Query player team
-	m_Player->UpdateTeam();
-
-	// Send scoreboard data
-	World->GetScoreBoard().SendTo(*this);
-
 	// Send statistics
 	SendStatistics(m_Player->GetStatManager());
 
@@ -2879,18 +2873,18 @@ void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cClientHandle::SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
-	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+	m_Protocol->SendScoreboardObjective(a_Objective, a_Mode);
 }
 
 
 
 
 
-void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Key, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
-	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+	m_Protocol->SendScoreUpdate(a_Objective, a_Key, a_Score, a_Mode);
 }
 
 
@@ -2900,6 +2894,24 @@ void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString &
 void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
 {
 	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
+}
+
+
+
+
+
+void cClientHandle::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
+{
+	m_Protocol->SendTeam(a_Team, a_Mode);
+}
+
+
+
+
+
+void cClientHandle::SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta)
+{
+	m_Protocol->SendTeamChangeMembership(a_TeamName, a_IsAdding, a_Delta);
 }
 
 

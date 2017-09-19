@@ -114,6 +114,7 @@ public:
 		sendSpawnPosition,
 		sendStatistics,
 		sendTabCompletion,
+		sendTeam,
 		sendTeleportEntity,
 		sendTimeUpdate,
 		sendTitle,
@@ -188,8 +189,8 @@ public:
 	virtual void SendRespawn                    (eDimension a_Dimension) = 0;
 	virtual void SendExperience                 (void) = 0;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) = 0;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;
-	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) = 0;
+	virtual void SendScoreboardObjective        (const cObjective & a_Objective, cObjective::eUpdateAction a_Mode) = 0;
+	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode) = 0;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) = 0;
 	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) = 0;
 	virtual void SendSetRawSubTitle             (const AString & a_SubTitle) = 0;
@@ -203,6 +204,8 @@ public:
 	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) = 0;
 	virtual void SendStatistics                 (const cStatManager & a_Manager) = 0;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
+	virtual void SendTeam                       (const cTeam & a_Team, cTeam::eProtocolAction a_Mode) = 0;
+	virtual void SendTeamChangeMembership       (const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta) = 0;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) = 0;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;

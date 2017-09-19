@@ -80,7 +80,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	m_IsChargingBow(false),
 	m_BowCharge(0),
 	m_FloaterID(cEntity::INVALID_ID),
-	m_Team(nullptr),
 	m_bIsInBed(false),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
@@ -968,11 +967,11 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		cPlayer * Attacker = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
 
-		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
+		if (GetWorld()->GetScoreboard().AreOnSameTeam(GetName(), Attacker->GetName()))
 		{
-			if (!m_Team->AllowsFriendlyFire())
+			cTeam * Team = GetWorld()->GetScoreboard().QueryPlayerTeam(GetName());
+			if (!Team->AllowsFriendlyFire())
 			{
-				// Friendly fire is disabled
 				return false;
 			}
 		}
@@ -1123,7 +1122,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	m_Stats.AddValue(statDeaths);
 
-	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
+	m_World->GetScoreboard().AddToScore(GetName(), cObjective::crDeathCount, 1);
 }
 
 
@@ -1132,25 +1131,27 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 void cPlayer::Killed(cEntity * a_Victim)
 {
-	cScoreboard & ScoreBoard = m_World->GetScoreBoard();
+	cScoreboard & Scoreboard = m_World->GetScoreboard();
 
 	if (a_Victim->IsPlayer())
 	{
 		m_Stats.AddValue(statPlayerKills);
 
-		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
+		Scoreboard.AddToScore(GetName(), cObjective::crPlayerKillCount, 1);
 	}
 	else if (a_Victim->IsMob())
 	{
-		if (reinterpret_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		cMonster * Monster = reinterpret_cast<cMonster *>(a_Victim);
+		if (Monster->GetMobFamily() == cMonster::mfHostile)
 		{
 			AwardAchievement(achKillMonster);
 		}
 
 		m_Stats.AddValue(statMobKills);
+		Scoreboard.AddToScore(GetName(), cObjective::CriteriaFromClassAndSub(cObjective::crStatEntityKill, Monster->GetMobType()), 1);
 	}
 
-	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
+	Scoreboard.AddToScore(GetName(), cObjective::crTotalKillCount, 1);
 }
 
 
@@ -1254,50 +1255,6 @@ bool cPlayer::IsGameModeSpectator(void) const
 bool cPlayer::CanMobsTarget(void) const
 {
 	return IsGameModeSurvival() || IsGameModeAdventure();
-}
-
-
-
-
-
-void cPlayer::SetTeam(cTeam * a_Team)
-{
-	if (m_Team == a_Team)
-	{
-		return;
-	}
-
-	if (m_Team)
-	{
-		m_Team->RemovePlayer(GetName());
-	}
-
-	m_Team = a_Team;
-
-	if (m_Team)
-	{
-		m_Team->AddPlayer(GetName());
-	}
-}
-
-
-
-
-
-cTeam * cPlayer::UpdateTeam(void)
-{
-	if (m_World == nullptr)
-	{
-		SetTeam(nullptr);
-	}
-	else
-	{
-		cScoreboard & Scoreboard = m_World->GetScoreBoard();
-
-		SetTeam(Scoreboard.QueryPlayerTeam(GetName()));
-	}
-
-	return m_Team;
 }
 
 

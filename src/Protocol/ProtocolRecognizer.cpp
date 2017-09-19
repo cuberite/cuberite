@@ -727,20 +727,20 @@ void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocolRecognizer::SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+	m_Protocol->SendScoreboardObjective(a_Objective, a_Mode);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Key, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+	m_Protocol->SendScoreUpdate(a_Objective, a_Key, a_Score, a_Mode);
 }
 
 
@@ -871,6 +871,26 @@ void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Resul
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendTabCompletionResults(a_Results);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendTeam(a_Team, a_Mode);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendTeamChangeMembership(a_TeamName, a_IsAdding, a_Delta);
 }
 
 

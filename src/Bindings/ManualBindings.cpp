@@ -3214,6 +3214,30 @@ static int tolua_cLuaWindow_new_local(lua_State * tolua_S)
 
 
 
+static int tolua_cObjective_GetKeys(lua_State * tolua_S)
+{
+	cLuaState S(tolua_S);
+	if (
+		!S.CheckParamUserType(1, "cObjective") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the groups:
+	cObjective * Objective = reinterpret_cast<cObjective *>(tolua_tousertype(tolua_S, 1, nullptr));
+	AStringVector Keys = Objective->GetKeys();
+
+	// Push the results:
+	S.Push(Keys);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cRoot_DoWithPlayerByUUID(lua_State * tolua_S)
 {
 	// Check params:
@@ -4137,6 +4161,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetUUIDsFromPlayerNames",    tolua_cMojangAPI_GetUUIDsFromPlayerNames);
 			tolua_function(tolua_S, "MakeUUIDDashed",             tolua_cMojangAPI_MakeUUIDDashed);
 			tolua_function(tolua_S, "MakeUUIDShort",              tolua_cMojangAPI_MakeUUIDShort);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cObjective");
+			tolua_function(tolua_S, "GetKeys", tolua_cObjective_GetKeys);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlayer");

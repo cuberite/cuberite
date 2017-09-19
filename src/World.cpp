@@ -2688,7 +2688,7 @@ void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 
 
-void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cWorld::BroadcastScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2698,7 +2698,7 @@ void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString 
 		{
 			continue;
 		}
-		ch->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
+		ch->SendScoreboardObjective(a_Objective, a_Mode);
 	}
 }
 
@@ -2706,7 +2706,7 @@ void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString 
 
 
 
-void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Key, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2716,7 +2716,7 @@ void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a
 		{
 			continue;
 		}
-		ch->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
+		ch->SendScoreUpdate(a_Objective, a_Key, a_Score, a_Mode);
 	}
 }
 
@@ -2735,6 +2735,42 @@ void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard:
 			continue;
 		}
 		ch->SendDisplayObjective(a_Objective, a_Display);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendTeam(a_Team, a_Mode);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastTeamChangeMembership(const AString & a_TeamName, bool a_IsAdding, const std::set<AString> & a_Delta)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendTeamChangeMembership(a_TeamName, a_IsAdding, a_Delta);
 	}
 }
 
@@ -3074,6 +3110,9 @@ std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveF
 	cClientHandle * Client = a_Player.GetClientHandle();
 	if (Client != nullptr)
 	{
+		// Reset the player's scoreboard
+		GetScoreboard().RemoveFrom(*Client);
+
 		Client->RemoveFromWorld();
 		m_ChunkMap->RemoveClientFromChunks(Client);
 		cCSLock Lock(m_CSClients);
@@ -4072,6 +4111,9 @@ void cWorld::AddQueuedPlayers(void)
 			cClientHandlePtr Client = Player->GetClientHandlePtr();
 			if (Client != nullptr)
 			{
+				// Tell the player all about our scoreboard
+				GetScoreboard().SendTo(*Client);
+
 				m_Clients.push_back(Client);
 			}
 		}  // for itr - PlayersToAdd[]

@@ -13,23 +13,35 @@
 
 
 
-AString cObjective::TypeToString(eType a_Type)
+AString cObjective::CriteriaToString(Criteria a_Type)
 {
-	switch (a_Type)
+	switch (GetCriteriaClass(a_Type))
 	{
-		case otDummy:              return "dummy";
-		case otDeathCount:         return "deathCount";
-		case otPlayerKillCount:    return "playerKillCount";
-		case otTotalKillCount:     return "totalKillCount";
-		case otHealth:             return "health";
-		case otAchievement:        return "achievement";
-		case otStat:               return "stat";
-		case otStatItemCraft:      return "stat.craftItem";
-		case otStatItemUse:        return "stat.useItem";
-		case otStatItemBreak:      return "stat.breakItem";
-		case otStatBlockMine:      return "stat.mineBlock";
-		case otStatEntityKill:     return "stat.killEntity";
-		case otStatEntityKilledBy: return "stat.entityKilledBy";
+		case crDummy:              return "dummy";
+		case crDeathCount:         return "deathCount";
+		case crPlayerKillCount:    return "playerKillCount";
+		case crTotalKillCount:     return "totalKillCount";
+		case crHealth:             return "health";
+		case crAchievement:        return "achievement";  // DEPRECATED
+
+		// These all have extra things after the dot
+		case crStat:               return "stat";
+		case crStatItemCraft:      return "stat.craftItem";
+		case crStatItemUse:        return "stat.useItem";
+		case crStatItemBreak:      return "stat.breakItem";
+		case crStatBlockMine:      return "stat.mineBlock";
+
+		// Have to convert the entity ID to a name
+		case crStatEntityKill:
+		{
+			return "stat.killEntity." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(GetCriteriaSub(a_Type)));
+		}
+		case crStatEntityKilledBy:
+		{
+			return "stat.entityKilledBy." + cMonster::MobTypeToVanillaName(static_cast<eMonsterType>(GetCriteriaSub(a_Type)));
+		}
+
+		case crClassCount: return "";
 
 		// clang optimisises this line away then warns that it has done so.
 		#if !defined(__clang__)
@@ -43,48 +55,97 @@ AString cObjective::TypeToString(eType a_Type)
 
 
 
-cObjective::eType cObjective::StringToType(const AString & a_Name)
+cObjective::Criteria cObjective::StringToCriteria(const AString & a_Name)
 {
-	static struct
+	// For some, we don't have to do any further processing
+	static const std::map<AString, Criteria> SimpleCriteria =
 	{
-		eType m_Type;
-		const char * m_String;
-	} TypeMap [] =
-	{
-		{otDummy,              "dummy"              },
-		{otDeathCount,         "deathCount"         },
-		{otPlayerKillCount,    "playerKillCount"    },
-		{otTotalKillCount,     "totalKillCount"     },
-		{otHealth,             "health"             },
-		{otAchievement,        "achievement"        },
-		{otStat,               "stat"               },
-		{otStatItemCraft,      "stat.craftItem"     },
-		{otStatItemUse,        "stat.useItem"       },
-		{otStatItemBreak,      "stat.breakItem"     },
-		{otStatBlockMine,      "stat.mineBlock"     },
-		{otStatEntityKill,     "stat.killEntity"    },
-		{otStatEntityKilledBy, "stat.entityKilledBy"}
+		{"dummy", crDummy},
+		{"deathCount", crDeathCount},
+		{"playerKillCount", crPlayerKillCount},
+		{"totalKillCount", crTotalKillCount},
+		{"health", crHealth}
 	};
-	for (size_t i = 0; i < ARRAYCOUNT(TypeMap); i++)
+	auto it = SimpleCriteria.find(a_Name);
+	if (it != SimpleCriteria.end())
 	{
-		if (NoCaseCompare(TypeMap[i].m_String, a_Name) == 0)
-		{
-			return TypeMap[i].m_Type;
-		}
-	}  // for i - TypeMap[]
-	return otDummy;
+		return CriteriaFromClass(static_cast<eCriteriaClass>(it->second));
+	}
+
+
+	// TODO: "achievement" is unimplemented (and, removed in MC 1.12, so maybe it shouldn't be implemented) - lkolbly 08/2017
+
+
+	// Some require converting entity names
+	if (a_Name.substr(0, 16) == "stat.killEntity.")
+	{
+		AString Entity = a_Name.substr(16);
+		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
+		return CriteriaFromClassAndSub(crStatEntityKill, static_cast<short>(MonsterType));
+	}
+	if (a_Name.substr(0, 20) == "stat.entityKilledBy.")
+	{
+		AString Entity = a_Name.substr(20);
+		eMonsterType MonsterType = cMonster::StringToMobType(Entity);
+		return CriteriaFromClassAndSub(crStatEntityKilledBy, static_cast<short>(MonsterType));
+	}
+
+	// TODO: Handle other cases
+	LOGWARNING("Could not parse cObjective criteria '%s', returning otDummy", a_Name.c_str());
+	return CriteriaFromClass(crDummy);
 }
 
 
 
 
 
-cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type, cWorld * a_World)
+cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::Criteria a_Type, cWorld * a_World)
 	: m_DisplayName(a_DisplayName)
 	, m_Name(a_Name)
+	, m_DisplayType(dispInteger)
 	, m_Type(a_Type)
 	, m_World(a_World)
+	, m_DisplayCount(0)
 {
+}
+
+
+
+
+
+void cObjective::SetIsDisplayed(bool a_IsDisplayed)
+{
+	if (a_IsDisplayed)
+	{
+		m_DisplayCount++;
+	}
+	else
+	{
+		ASSERT(m_DisplayCount > 0);
+		m_DisplayCount--;
+	}
+
+	// If we just started being displayed, tell clients about us
+	if (a_IsDisplayed && (m_DisplayCount == 1))
+	{
+		m_World->BroadcastScoreboardObjective(*this, uaCreate);
+
+		for (const auto & it : m_Scores)
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaUpsert);
+		}
+	}
+
+	// If we aren't displayed anymore, tell clients to forget about us
+	if (m_DisplayCount == 0)
+	{
+		m_World->BroadcastScoreboardObjective(*this, uaRemove);
+
+		for (const auto & it : m_Scores)
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaRemove);
+		}
+	}
 }
 
 
@@ -93,9 +154,12 @@ cObjective::cObjective(const AString & a_Name, const AString & a_DisplayName, cO
 
 void cObjective::Reset(void)
 {
-	for (cScoreMap::iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
+	if (IsDisplayed())
 	{
-		m_World->BroadcastScoreUpdate(m_Name, it->first, 0, 1);
+		for (auto it : m_Scores)
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it.first, 0, cScoreboard::uaRemove);
+		}
 	}
 
 	m_Scores.clear();
@@ -105,9 +169,23 @@ void cObjective::Reset(void)
 
 
 
-cObjective::Score cObjective::GetScore(const AString & a_Name) const
+AStringVector cObjective::GetKeys(void) const
 {
-	cScoreMap::const_iterator it = m_Scores.find(a_Name);
+	AStringVector Players;
+	for (auto player : m_Scores)
+	{
+		Players.push_back(player.first);
+	}
+	return Players;
+}
+
+
+
+
+
+cObjective::Score cObjective::GetScore(const AString & a_Key) const
+{
+	auto it = m_Scores.find(a_Key);
 
 	if (it == m_Scores.end())
 	{
@@ -123,34 +201,56 @@ cObjective::Score cObjective::GetScore(const AString & a_Name) const
 
 
 
-void cObjective::SetScore(const AString & a_Name, cObjective::Score a_Score)
+void cObjective::SetAllScores(cObjective::Score a_Score)
 {
-	m_Scores[a_Name] = a_Score;
+	for (auto & it : m_Scores)
+	{
+		it.second = a_Score;
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, a_Score, 0);
+		if (IsDisplayed())
+		{
+			m_World->BroadcastScoreUpdate(m_Name, it.first, a_Score, cScoreboard::uaUpsert);
+		}
+	}
 }
 
 
 
 
 
-void cObjective::ResetScore(const AString & a_Name)
+void cObjective::SetScore(const AString & a_Key, cObjective::Score a_Score)
 {
-	m_Scores.erase(a_Name);
+	m_Scores[a_Key] = a_Score;
 
-	m_World->BroadcastScoreUpdate(m_Name, a_Name, 0, 1);
+	if (IsDisplayed())
+	{
+		m_World->BroadcastScoreUpdate(m_Name, a_Key, a_Score, cScoreboard::uaUpsert);
+	}
 }
 
 
 
 
 
-cObjective::Score cObjective::AddScore(const AString & a_Name, cObjective::Score a_Delta)
+void cObjective::ResetScore(const AString & a_Key)
 {
-	// TODO 2014-01-19 xdot: Potential optimization - Reuse iterator
-	Score NewScore = m_Scores[a_Name] + a_Delta;
+	m_Scores.erase(a_Key);
 
-	SetScore(a_Name, NewScore);
+	if (IsDisplayed())
+	{
+		m_World->BroadcastScoreUpdate(m_Name, a_Key, 0, cScoreboard::uaRemove);
+	}
+}
+
+
+
+
+
+cObjective::Score cObjective::AddScore(const AString & a_Key, cObjective::Score a_Delta)
+{
+	Score NewScore = m_Scores[a_Key] + a_Delta;
+
+	SetScore(a_Key, NewScore);
 
 	return NewScore;
 }
@@ -159,12 +259,11 @@ cObjective::Score cObjective::AddScore(const AString & a_Name, cObjective::Score
 
 
 
-cObjective::Score cObjective::SubScore(const AString & a_Name, cObjective::Score a_Delta)
+cObjective::Score cObjective::SubScore(const AString & a_Key, cObjective::Score a_Delta)
 {
-	// TODO 2014-01-19 xdot: Potential optimization - Reuse iterator
-	Score NewScore = m_Scores[a_Name] - a_Delta;
+	Score NewScore = m_Scores[a_Key] - a_Delta;
 
-	SetScore(a_Name, NewScore);
+	SetScore(a_Key, NewScore);
 
 	return NewScore;
 }
@@ -177,20 +276,43 @@ void cObjective::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
 
-	m_World->BroadcastScoreboardObjective(m_Name, m_DisplayName, 2);
+	if (IsDisplayed())
+	{
+		m_World->BroadcastScoreboardObjective(*this, uaUpdateText);
+	}
 }
 
 
 
 
 
-void cObjective::SendTo(cClientHandle & a_Client)
+void cObjective::SetDisplayType(eDisplayType a_DisplayType)
 {
-	a_Client.SendScoreboardObjective(m_Name, m_DisplayName, 0);
+	m_DisplayType = a_DisplayType;
 
-	for (cScoreMap::const_iterator it = m_Scores.begin(); it != m_Scores.end(); ++it)
+	if (IsDisplayed())
 	{
-		a_Client.SendScoreUpdate(m_Name, it->first, it->second, 0);
+		m_World->BroadcastScoreboardObjective(*this, uaUpdateText);
+	}
+}
+
+
+
+
+
+void cObjective::SendTo(cClientHandle & a_Client) const
+{
+	if (!IsDisplayed())
+	{
+		// If this objective isn't displayed, we don't have to send it
+		return;
+	}
+
+	a_Client.SendScoreboardObjective(*this, uaCreate);
+
+	for (const auto & it : m_Scores)
+	{
+		a_Client.SendScoreUpdate(m_Name, it.first, it.second, cScoreboard::uaUpsert);
 	}
 }
 
@@ -200,15 +322,66 @@ void cObjective::SendTo(cClientHandle & a_Client)
 
 cTeam::cTeam(
 	const AString & a_Name, const AString & a_DisplayName,
-	const AString & a_Prefix, const AString & a_Suffix
+	const AString & a_Prefix, const AString & a_Suffix,
+	cWorld * a_World
 )
-	: m_AllowsFriendlyFire(true)
+	: m_World(a_World)
+	, m_AllowsFriendlyFire(true)
 	, m_CanSeeFriendlyInvisible(false)
 	, m_DisplayName(a_DisplayName)
 	, m_Name(a_Name)
 	, m_Prefix(a_Prefix)
 	, m_Suffix(a_Suffix)
+	, m_Color(teamInvalid)
 {
+}
+
+
+
+void cTeam::SetColor(eColor a_Color)
+{
+	m_Color = a_Color;
+	m_World->BroadcastTeam(*this, paUpdateTeam);
+}
+
+
+
+
+
+void cTeam::SetPrefix(const AString & a_Prefix)
+{
+	m_Prefix = a_Prefix;
+	m_World->BroadcastTeam(*this, paUpdateTeam);
+}
+
+
+
+
+
+void cTeam::SetSuffix(const AString & a_Suffix)
+{
+	m_Suffix = a_Suffix;
+	m_World->BroadcastTeam(*this, paUpdateTeam);
+}
+
+
+
+
+
+void cTeam::SetFriendlyFire(bool a_Flag)
+{
+	m_AllowsFriendlyFire = a_Flag;
+	m_World->BroadcastTeam(*this, paUpdateTeam);
+}
+
+
+
+
+
+void cTeam::SetCanSeeFriendlyInvisible(bool a_Flag)
+{
+	m_CanSeeFriendlyInvisible = a_Flag;
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -217,6 +390,7 @@ cTeam::cTeam(
 
 bool cTeam::AddPlayer(const AString & a_Name)
 {
+	m_World->BroadcastTeamChangeMembership(m_Name, true, {a_Name});
 	return m_Players.insert(a_Name).second;
 }
 
@@ -226,6 +400,7 @@ bool cTeam::AddPlayer(const AString & a_Name)
 
 bool cTeam::RemovePlayer(const AString & a_Name)
 {
+	m_World->BroadcastTeamChangeMembership(m_Name, false, {a_Name});
 	return m_Players.erase(a_Name) > 0;
 }
 
@@ -235,7 +410,7 @@ bool cTeam::RemovePlayer(const AString & a_Name)
 
 bool cTeam::HasPlayer(const AString & a_Name) const
 {
-	cPlayerNameSet::const_iterator it = m_Players.find(a_Name);
+	const auto & it = m_Players.find(a_Name);
 
 	return it != m_Players.end();
 }
@@ -246,8 +421,7 @@ bool cTeam::HasPlayer(const AString & a_Name) const
 
 void cTeam::Reset(void)
 {
-	// TODO 2014-01-22 xdot: Inform online players
-
+	m_World->BroadcastTeamChangeMembership(m_Name, false, m_Players);
 	m_Players.clear();
 }
 
@@ -257,8 +431,7 @@ void cTeam::Reset(void)
 void cTeam::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;
-
-	// TODO 2014-03-01 xdot: Update clients
+	m_World->BroadcastTeam(*this, paUpdateTeam);
 }
 
 
@@ -286,17 +459,19 @@ cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 
 
 
-cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type)
+cObjective * cScoreboard::RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::Criteria a_Type)
 {
+	if (m_Objectives.count(a_Name) > 0)
+	{
+		return nullptr;
+	}
+
 	cObjective Objective(a_Name, a_DisplayName, a_Type, m_World);
 
-	std::pair<cObjectiveMap::iterator, bool> Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
+	auto Status = m_Objectives.insert(cNamedObjective(a_Name, Objective));
 
 	if (Status.second)
 	{
-		ASSERT(m_World != nullptr);
-		m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, 0);
-
 		return &Status.first->second;
 	}
 	else
@@ -313,15 +488,12 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 {
 	cCSLock Lock(m_CSObjectives);
 
-	cObjectiveMap::iterator it = m_Objectives.find(a_Name);
+	auto it = m_Objectives.find(a_Name);
 
 	if (it == m_Objectives.end())
 	{
 		return false;
 	}
-
-	ASSERT(m_World != nullptr);
-	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
 
 	for (unsigned int i = 0; i < static_cast<unsigned int>(dsCount); ++i)
 	{
@@ -344,7 +516,7 @@ cObjective * cScoreboard::GetObjective(const AString & a_Name)
 {
 	cCSLock Lock(m_CSObjectives);
 
-	cObjectiveMap::iterator it = m_Objectives.find(a_Name);
+	auto it = m_Objectives.find(a_Name);
 
 	if (it == m_Objectives.end())
 	{
@@ -365,9 +537,10 @@ cTeam * cScoreboard::RegisterTeam(
 	const AString & a_Prefix, const AString & a_Suffix
 )
 {
-	cTeam Team(a_Name, a_DisplayName, a_Prefix, a_Suffix);
+	cTeam Team(a_Name, a_DisplayName, a_Prefix, a_Suffix, m_World);
 
 	std::pair<cTeamMap::iterator, bool> Status = m_Teams.insert(cNamedTeam(a_Name, Team));
+	m_World->BroadcastTeam(Team, cTeam::paCreateTeam);
 
 	return Status.second ? &Status.first->second : nullptr;
 }
@@ -380,12 +553,14 @@ bool cScoreboard::RemoveTeam(const AString & a_Name)
 {
 	cCSLock Lock(m_CSTeams);
 
-	cTeamMap::iterator it = m_Teams.find(a_Name);
+	auto it = m_Teams.find(a_Name);
 
 	if (it == m_Teams.end())
 	{
 		return false;
 	}
+
+	m_World->BroadcastTeam(it->second, cTeam::paRemoveTeam);
 
 	m_Teams.erase(it);
 
@@ -400,7 +575,7 @@ cTeam * cScoreboard::GetTeam(const AString & a_Name)
 {
 	cCSLock Lock(m_CSTeams);
 
-	cTeamMap::iterator it = m_Teams.find(a_Name);
+	auto it = m_Teams.find(a_Name);
 
 	if (it == m_Teams.end())
 	{
@@ -436,15 +611,31 @@ cTeam * cScoreboard::QueryPlayerTeam(const AString & a_Name)
 {
 	cCSLock Lock(m_CSTeams);
 
-	for (cTeamMap::iterator it = m_Teams.begin(); it != m_Teams.end(); ++it)
+	for (auto & it : m_Teams)
 	{
-		if (it->second.HasPlayer(a_Name))
+		if (it.second.HasPlayer(a_Name))
 		{
-			return &it->second;
+			return &it.second;
 		}
 	}
 
 	return nullptr;
+}
+
+
+
+
+
+bool cScoreboard::AreOnSameTeam(const AString & a_Player1, const AString & a_Player2)
+{
+	cTeam * Team1 = QueryPlayerTeam(a_Player1);
+	if (Team1 == nullptr)
+	{
+		return false;
+	}
+
+	cTeam * Team2 = QueryPlayerTeam(a_Player2);
+	return Team1 == Team2;
 }
 
 
@@ -466,7 +657,16 @@ void cScoreboard::SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot)
 
 void cScoreboard::SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot)
 {
+	if (m_Display[a_Slot] != nullptr)
+	{
+		m_Display[a_Slot]->SetIsDisplayed(false);
+	}
+
 	m_Display[a_Slot] = a_Objective;
+	if (m_Display[a_Slot] != nullptr)
+	{
+		m_Display[a_Slot]->SetIsDisplayed(true);
+	}
 
 	ASSERT(m_World != nullptr);
 	m_World->BroadcastDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
@@ -487,7 +687,7 @@ cObjective * cScoreboard::GetObjectiveIn(eDisplaySlot a_Slot)
 
 
 
-bool cScoreboard::ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback a_Callback)
+bool cScoreboard::ForEachObjectiveWith(cObjective::Criteria a_Type, cObjectiveCallback a_Callback)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -547,7 +747,7 @@ bool cScoreboard::ForEachTeam(cTeamCallback a_Callback)
 
 
 
-void cScoreboard::AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value)
+void cScoreboard::AddToScore(const AString & a_Name, cObjective::Criteria a_Type, cObjective::Score a_Value)
 {
 	cCSLock Lock(m_CSObjectives);
 
@@ -568,9 +768,17 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 {
 	cCSLock Lock(m_CSObjectives);
 
-	for (cObjectiveMap::iterator it = m_Objectives.begin(); it != m_Objectives.end(); ++it)
+	for (const auto & it : m_Objectives)
 	{
-		it->second.SendTo(a_Client);
+		if (it.second.IsDisplayed())
+		{
+			it.second.SendTo(a_Client);
+		}
+	}
+
+	for (const auto & team : m_Teams)
+	{
+		a_Client.SendTeam(team.second, cTeam::paUpdateTeam);
 	}
 
 	for (int i = 0; i < static_cast<int>(dsCount); ++i)
@@ -582,6 +790,30 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 		{
 			a_Client.SendDisplayObjective(Objective->GetName(), static_cast<eDisplaySlot>(i));
 		}
+	}
+}
+
+
+
+
+
+void cScoreboard::RemoveFrom(cClientHandle & a_Client)
+{
+	cCSLock Lock(m_CSObjectives);
+
+	// Remove every objective
+	for (const auto & objective : m_Objectives)
+	{
+		if (objective.second.IsDisplayed())
+		{
+			a_Client.SendScoreboardObjective(objective.second, cObjective::uaRemove);
+		}
+	}
+
+	// Remove every team
+	for (const auto & team : m_Teams)
+	{
+		a_Client.SendTeam(team.second, cTeam::paRemoveTeam);
 	}
 }
 

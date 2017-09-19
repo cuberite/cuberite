@@ -66,6 +66,7 @@ UInt32 cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 		case sendSpawnMob:              return 0x03;
 		case sendStatistics:            return 0x07;
 		case sendTabCompletion:         return 0x0e;
+		case sendTeam:                  return 0x43;
 		case sendTeleportEntity:        return 0x4a;
 		case sendTimeUpdate:            return 0x44;
 		case sendTitle:                 return 0x45;
@@ -132,6 +133,7 @@ UInt32 cProtocol_1_12::GetPacketId(eOutgoingPackets a_Packet)
 		case sendScoreboardObjective: return 0x41;
 		case sendScoreUpdate:         return 0x44;
 		case sendSpawnPosition:       return 0x45;
+		case sendTeam:                return 0x43;
 		case sendTeleportEntity:      return 0x4b;
 		case sendTimeUpdate:          return 0x46;
 		case sendTitle:               return 0x47;
@@ -173,6 +175,7 @@ UInt32 cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
 		case sendScoreUpdate:         return 0x45;
 		case sendSpawnPosition:       return 0x46;
 		case sendUseBed:              return 0x30;
+		case sendTeam:                return 0x44;
 		case sendTeleportEntity:      return 0x4c;
 		case sendTimeUpdate:          return 0x47;
 		case sendTitle:               return 0x48;

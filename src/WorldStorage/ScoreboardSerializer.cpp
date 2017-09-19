@@ -14,8 +14,8 @@
 
 
 
-cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard):
-	m_ScoreBoard(a_ScoreBoard)
+cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_Scoreboard):
+	m_Scoreboard(a_Scoreboard)
 {
 	AString DataPath;
 	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator);
@@ -103,16 +103,17 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("Objectives", TAG_Compound);
 
-	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_Scoreboard->m_Objectives.begin(); it != m_Scoreboard->m_Objectives.end(); ++it)
 	{
 		const cObjective & Objective = it->second;
 
 		a_Writer.BeginCompound("");
 
-		a_Writer.AddString("CriteriaName", cObjective::TypeToString(Objective.GetType()));
+		a_Writer.AddString("CriteriaName", cObjective::CriteriaToString(Objective.GetType()));
 
 		a_Writer.AddString("DisplayName", Objective.GetDisplayName());
 		a_Writer.AddString("Name", it->first);
+		a_Writer.AddString("RenderType", (Objective.GetDisplayType() == cObjective::dispHearts) ? "hearts" : "integer");
 
 		a_Writer.EndCompound();
 	}
@@ -121,7 +122,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("PlayerScores", TAG_Compound);
 
-	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_Scoreboard->m_Objectives.begin(); it != m_Scoreboard->m_Objectives.end(); ++it)
 	{
 		const cObjective & Objective = it->second;
 
@@ -142,7 +143,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("Teams", TAG_Compound);
 
-	for (cScoreboard::cTeamMap::const_iterator it = m_ScoreBoard->m_Teams.begin(); it != m_ScoreBoard->m_Teams.end(); ++it)
+	for (cScoreboard::cTeamMap::const_iterator it = m_Scoreboard->m_Teams.begin(); it != m_Scoreboard->m_Teams.end(); ++it)
 	{
 		const cTeam & Team = it->second;
 
@@ -173,14 +174,11 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginCompound("DisplaySlots");
 
-	cObjective * Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsList);
-	a_Writer.AddString("slot_0", (Objective == nullptr) ? "" : Objective->GetName());
-
-	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsSidebar);
-	a_Writer.AddString("slot_1", (Objective == nullptr) ? "" : Objective->GetName());
-
-	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsName);
-	a_Writer.AddString("slot_2", (Objective == nullptr) ? "" : Objective->GetName());
+	for (int DisplaySlot = 0; DisplaySlot < cScoreboard::dsCount; ++DisplaySlot)
+	{
+		cObjective * Objective = m_Scoreboard->GetObjectiveIn(static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
+		a_Writer.AddString(Printf("slot_%d", DisplaySlot), (Objective == nullptr) ? "" : Objective->GetName());
+	}
 
 	a_Writer.EndCompound();  // DisplaySlots
 
@@ -207,7 +205,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 
 	for (int Child = a_NBT.GetFirstChild(Objectives); Child >= 0; Child = a_NBT.GetNextSibling(Child))
 	{
-		AString CriteriaName, DisplayName, Name;
+		AString CriteriaName, DisplayName, Name, RenderType;
 
 		int CurrLine = a_NBT.FindChildByName(Child, "CriteriaName");
 		if (CurrLine >= 0)
@@ -227,9 +225,19 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			Name = a_NBT.GetString(CurrLine);
 		}
 
-		cObjective::eType Type = cObjective::StringToType(CriteriaName);
+		CurrLine = a_NBT.FindChildByName(Child, "RenderType");
+		if (CurrLine >= 0)
+		{
+			RenderType = a_NBT.GetString(CurrLine);
+		}
 
-		m_ScoreBoard->RegisterObjective(Name, DisplayName, Type);
+		cObjective::Criteria Type = cObjective::StringToCriteria(CriteriaName);
+
+		cObjective * Objective = m_Scoreboard->RegisterObjective(Name, DisplayName, Type);
+		if (RenderType == "hearts")
+		{
+			Objective->SetDisplayType(cObjective::dispHearts);
+		}
 	}
 
 	int PlayerScores = a_NBT.FindChildByName(Data, "PlayerScores");
@@ -262,7 +270,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			ObjectiveName = a_NBT.GetString(CurrLine);
 		}
 
-		cObjective * Objective = m_ScoreBoard->GetObjective(ObjectiveName);
+		cObjective * Objective = m_Scoreboard->GetObjective(ObjectiveName);
 
 		if (Objective)
 		{
@@ -318,7 +326,7 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 			CanSeeFriendlyInvisible = (a_NBT.GetInt(CurrLine) != 0);
 		}
 
-		cTeam * Team = m_ScoreBoard->RegisterTeam(Name, DisplayName, Prefix, Suffix);
+		cTeam * Team = m_Scoreboard->RegisterTeam(Name, DisplayName, Prefix, Suffix);
 
 		Team->SetFriendlyFire(AllowsFriendlyFire);
 		Team->SetCanSeeFriendlyInvisible(CanSeeFriendlyInvisible);
@@ -341,28 +349,14 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 		return false;
 	}
 
-	int CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_0");
-	if (CurrLine >= 0)
+	for (int DisplaySlot = 0; DisplaySlot < cScoreboard::dsCount; ++DisplaySlot)
 	{
-		AString Name = a_NBT.GetString(CurrLine);
-
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsList);
-	}
-
-	CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_1");
-	if (CurrLine >= 0)
-	{
-		AString Name = a_NBT.GetString(CurrLine);
-
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsSidebar);
-	}
-
-	CurrLine = a_NBT.FindChildByName(DisplaySlots, "slot_2");
-	if (CurrLine >= 0)
-	{
-		AString Name = a_NBT.GetString(CurrLine);
-
-		m_ScoreBoard->SetDisplay(Name, cScoreboard::dsName);
+		int CurrLine = a_NBT.FindChildByName(DisplaySlots, Printf("slot_%d", DisplaySlot));
+		if (CurrLine >= 0)
+		{
+			AString Name = a_NBT.GetString(CurrLine);
+			m_Scoreboard->SetDisplay(Name, static_cast<cScoreboard::eDisplaySlot>(DisplaySlot));
+		}
 	}
 
 	return true;

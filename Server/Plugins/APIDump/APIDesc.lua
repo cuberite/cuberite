@@ -9122,7 +9122,7 @@ a_Player:OpenWindow(Window);
 		cObjective =
 		{
 			Desc = [[
-				This class represents a single scoreboard objective.
+				This class represents a single scoreboard objective. Objectives act as a map, mapping arbitrary strings to scores. To associate a score with a player, for example in the tab list or in the over-head scores, the key should be the player's username.
 			]],
 			Functions =
 			{
@@ -9131,11 +9131,11 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "key",
 							Type = "string",
 						},
 						{
-							Name = "number",
+							Name = "ScoreToAdd",
 							Type = "number",
 						},
 					},
@@ -9148,6 +9148,99 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Adds a value to the score of the specified player and returns the new value.",
 				},
+				CriteriaFromClass =
+				{
+					Params =
+					{
+						{
+							Name = "Class",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Notes = "(STATIC) Given an enumerated criteria class, create a criteria with the sub criteria equal to zero.",
+				},
+				CriteriaFromClassAndSub =
+				{
+					Params =
+					{
+						{
+							Name = "Class",
+							Type = "number",
+						},
+						{
+							Name = "SubCriteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Notes = "(STATIC) Given an enumerated criteria class, create a criteria with the sub criteria equal to the given sub criteria.",
+				},
+				CriteriaToString =
+				{
+					Params =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "(STATIC) Converts an internal objective Criteria to a Vanilla minecraft objective criteria string",
+				},
+				GetCriteriaClass =
+				{
+					Params =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "CriteriaClass",
+							Type = "number",
+						},
+					},
+					Notes = "(STATIC) Given a criteria number, returns the enumerated class of the criteria.",
+				},
+				GetCriteriaSub =
+				{
+					Params =
+					{
+						{
+							Name = "Criteria",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "CriteriaSub",
+							Type = "number",
+						},
+					},
+					Notes = "(STATIC) Given a criteria number, returns the sub criteria ID of the criteria.",
+				},
 				GetDisplayName =
 				{
 					Returns =
@@ -9157,6 +9250,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the display name of the objective. This name will be shown to the connected players.",
+				},
+				GetDisplayType =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns whether to display as integers or as hearts in the tablist",
 				},
 				GetName =
 				{
@@ -9168,12 +9271,22 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the internal name of the objective.",
 				},
+				GetKeys =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns all of the keys this objective is tracking as an array of strings.",
+				},
 				GetScore =
 				{
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "key",
 							Type = "string",
 						},
 					},
@@ -9184,7 +9297,7 @@ a_Player:OpenWindow(Window);
 							Type = "<unknown>",
 						},
 					},
-					Notes = "Returns the score of the specified player.",
+					Notes = "Returns the score of the specified key.",
 				},
 				GetType =
 				{
@@ -9206,29 +9319,51 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "key",
 							Type = "string",
 						},
 					},
-					Notes = "Reset the score of the specified player.",
+					Notes = "Reset the score of the specified key.",
+				},
+				SetAllScores =
+				{
+					Params =
+					{
+						{
+							Name = "Score",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the score of every player this objective tracks to the given score",
 				},
 				SetDisplayName =
 				{
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "DisplayName",
 							Type = "string",
 						},
 					},
 					Notes = "Sets the display name of the objective.",
+				},
+				SetDisplayType =
+				{
+					Params =
+					{
+						{
+							Name = "DisplayType",
+							Type = "number",
+						},
+					},
+					Notes = "Sets whether the tablist shows this objective using hearts or integers.",
 				},
 				SetScore =
 				{
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "key",
 							Type = "string",
 						},
 						{
@@ -9236,18 +9371,35 @@ a_Player:OpenWindow(Window);
 							Type = "<unknown>",
 						},
 					},
-					Notes = "Sets the score of the specified player.",
+					Notes = "Sets the score of the specified key.",
+				},
+				StringToCriteria =
+				{
+					Params =
+					{
+						{
+							Name = "VanillaCriteriaString",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "(STATIC) Converts a Vanilla minecraft objective criteria string to an internal objective Criteria.",
 				},
 				SubScore =
 				{
 					Params =
 					{
 						{
-							Name = "string",
+							Name = "key",
 							Type = "string",
 						},
 						{
-							Name = "number",
+							Name = "ScoreToSubtract",
 							Type = "number",
 						},
 					},
@@ -9258,60 +9410,73 @@ a_Player:OpenWindow(Window);
 							Type = "<unknown>",
 						},
 					},
-					Notes = "Subtracts a value from the score of the specified player and returns the new value.",
+					Notes = "Subtracts a value from the score of the specified key and returns the new value.",
 				},
 			},
 			Constants =
 			{
-				otAchievement =
+				crAchievement =
 				{
 					Notes = "",
 				},
-				otDeathCount =
+				crClassCount =
+				{
+					Notes = "The number of criteria classes",
+				},
+				crDeathCount =
 				{
 					Notes = "",
 				},
-				otDummy =
+				crDummy =
 				{
 					Notes = "",
 				},
-				otHealth =
+				crHealth =
 				{
 					Notes = "",
 				},
-				otPlayerKillCount =
+				crPlayerKillCount =
 				{
 					Notes = "",
 				},
-				otStat =
+				crStat =
 				{
 					Notes = "",
 				},
-				otStatBlockMine =
+				crStatBlockMine =
 				{
 					Notes = "",
 				},
-				otStatEntityKill =
+				crStatEntityKill =
 				{
 					Notes = "",
 				},
-				otStatEntityKilledBy =
+				crStatEntityKilledBy =
 				{
 					Notes = "",
 				},
-				otStatItemBreak =
+				crStatItemBreak =
 				{
 					Notes = "",
 				},
-				otStatItemCraft =
+				crStatItemCraft =
 				{
 					Notes = "",
 				},
-				otStatItemUse =
+				crStatItemUse =
 				{
 					Notes = "",
 				},
-				otTotalKillCount =
+				crTotalKillCount =
+				{
+					Notes = "",
+				},
+
+				dispInteger =
+				{
+					Notes = "",
+				},
+				dispHearts =
 				{
 					Notes = "",
 				},
@@ -11546,7 +11711,7 @@ end
 			]],
 			Functions =
 			{
-				AddPlayerScore =
+				AddToScore =
 				{
 					Params =
 					{
@@ -11560,7 +11725,7 @@ end
 						},
 						{
 							Name = "Value",
-							Type = "<unknown>",
+							Type = "number",
 						},
 					},
 					Notes = "Adds a value to all player scores of the specified objective type.",
@@ -11703,7 +11868,7 @@ end
 							Type = "cObjective",
 						},
 					},
-					Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, nil on error.",
+					Notes = "Registers a new scoreboard objective. Returns the {{cObjective}} instance, or nil if an error occurred or if an objective with the given name already exists.",
 				},
 				RegisterTeam =
 				{
@@ -11801,6 +11966,128 @@ end
 				dsSidebar =
 				{
 					Notes = "",
+				},
+				dsSidebarTeamOffset =
+				{
+					Notes = "Add this to the team color (see cTeam::GetColor()) to get the appropriate display slot ID for the sidebar of that team. Note that the team must have been assigned a valid color using SetColor().",
+				},
+			},
+			AdditionalInfo =  -- Paragraphs to be exported after the function definitions table
+			{
+				{
+					Header = "Short Tutorial",
+					Contents = [[
+						In order to display some plugin-defined value next (for example) each player's name in the tablist, the plugin must create an objective, set it to display in the tablist, and then fill the objective with each player's scores:
+<pre class="prettyprint lang-lua">
+-- Note that the scoreboard only applies to this world. If a player leaves the world, they won't see it anymore.
+local Scoreboard = World:GetScoreboard()
+
+-- RegisterObjective takes the internal name, the display name, and the type. Use StringToType to convert a Vanilla type string to an internal eType.
+local Objective = Scoreboard:RegisterObjective("tablistObjective", "Tablist Objective", cObjective:StringToType("dummy"))
+
+-- Assigns the objective to the given display slot. Each display slot can only be attached to one objective.
+Scoreboard:SetDisplay(Objective, cScoreboard.dsList)
+
+-- This is identical to the previous line:
+--Scoreboard:SetDisplay("tablistObjective", cScoreboard:dsList)
+
+... later ...
+
+-- We want to associate some numbers with some players:
+local Objective = World:GetScoreboard():GetObjective("tablistObjective")
+
+-- Also, we could have done this, to retrieve the objective in the list slot:
+--local Objective = World:GetScoreboard():GetObjectiveIn(cScoreboard:dsList)
+
+-- Now, actually set the numbers for some players:
+Objective:SetScore("ashlie", 5) -- Set's player "ashlie"'s score to 5.
+Objective:SetScore("barbara", 6)
+Objective:SetAllScores(7) -- This sets ashlie's and barbara's scores to 7. Notably, it does not set the scores of keys not being tracked.
+Objective:AddScore("charlene", 1) -- Charlene's previous score defaults to 0, because she was not tracked when SetAllScores was called.
+Objective:SetScore("toxic_overload", 5) -- toxic_overload isn't logged in and isn't even a real player, but we can still set his score. It will just never be displayed.
+Objective:GetScore("danielle") -- Returns 0.
+</pre>
+
+Scoreboards also have the concept of teams, which can be used to implement things like teammate invisibility and friendly fire:
+<pre class="prettyprint lang-lua">
+local Scoreboard = World:GetScoreboard()
+
+-- Make two teams
+local FightTeam = Scoreboard:RegisterTeam("fightTeam", "The Fight Club", "", "")
+local BreakfastTeam = Scoreboard:RegisterTeam("breakfastTeam", "The Breakfast Club", "", "")
+
+-- Add some players to them. Again, note that the strings are usernames, but they don't have to be valid usernames.
+FightTeam:AddPlayer("eva")
+FightTeam:AddPlayer("frances")
+BreakfastTeam:AddPlayer("gwyneth")
+BreakfastTeam:AddPlayer("hera")
+
+-- A player may only be one a single team!
+--FightTeam:AddPlayer("gwyneth") -- gwyneth is already on the BreakfastTeam.
+
+-- FightTeam should allow friendly fire. By default it doesn't.
+FightTeam:SetFriendlyFire(true)
+BreakfastTeam:AllowsFriendlyFire() -- Returns false
+</pre>
+
+Note that both of those teams were not assigned to a team color. Team colors only apply when it comes to the colored sidebars. The colored sidebars are sidebars visible only to a specific team. The team-specific sidebar overrides the world sidebar for players on the team (so you can have a default sidebar, and a team-specific sidebar).
+<pre class="prettyprint lang-lua">
+-- Continuing from above
+
+-- Set the color for FightTeam. Don't set a color for BreakfastTeam.
+FightTeam:SetColor(cTeam.teamBlack)
+
+-- Build a default global sidebar
+local TeamScores = Scoreboard:RegisterObjective("teamScores", "Team Scores", cObjective:StringToType("dummy"))
+Scoreboard:SetDisplay("teamScores", cScoreboard.dsSidebar)
+
+TeamScores:SetScore("ivy", 5)
+TeamScores:SetScore("juliet", 6)
+TeamScores:SetScore("kira", -5) -- Negative scores are valid
+
+-- At this point, every player in the world will see a sidebar that looks like:
+--
+-- Team Scores
+-- juliet   6
+-- ivy      5
+-- kira    -1
+--
+-- Note the heading is the display name of the objective, and the sorting is decreasing by score.
+
+-- Now we build another scoreboard, just for FightTeam.
+local FightScores = Scoreboard:RegisterObjective("fightScores", "Fight Scores", cObjective:StringToType("dummy"))
+
+-- In order to set the scoreboard for the team sidebar, we add the team sidebar offset to the team color.
+Scoreboard:SetDisplay(FightScores, cScoreboard.dsSidebarTeamOffset + FightTeam:GetColor())
+
+FightScores:SetScore("linda", 5)
+FightScores:SetScore("macey", 6)
+FightScores:SetScore("nora", -1)
+
+-- Now, players on FightTeam will see the most recently created sidebar, while everyone else will still see the old sidebar.
+-- Note that the players on the FightTeam sidebar have no relation to the players that are actually members of the team.
+</pre>
+
+Note that, above, the objective names were generally usernames. However, this does not have to be the case. You can create up to 16 (each one needs a color, and there are only 16 colors) per-player sidebars like this:
+<pre class="prettyprint lang-lua">
+function BuildPlayerSidebar(Player, PlayerNumber)
+	-- PlayerNumber must be unique and between 0 and 15, inclusive.
+
+	-- First, create an objective
+	local Objective = Scoreboard:RegisterObjective(Player:GetName(), "Status", cObjective:StringToType("dummy"))
+
+	-- Create a team and assign the player to it
+	local Team = Scoreboard:RegisterTeam(Player:GetName(), "", "", "")
+	Team:SetColor(PlayerNumber) -- This is why PlayerNumber has to be between 0 and 15
+	Team:AddPlayer(Player:GetName())
+
+	-- Fill up the sidebar
+	Objective:SetScore("Hello, "..Player:GetName(), 15)
+	Objective:SetScore("Today is Friday!", 14)
+	Objective:SetScore("You're winning! §2✔", 13) -- That's a green checkmark, using Minecraft's chat colors
+end
+</pre>
+					]],
 				},
 			},
 		},
@@ -12115,6 +12402,16 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 					},
 					Notes = "Returns whether players can see invisible teammates.",
 				},
+				GetColor =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the color ID of the team",
+				},
 				GetDisplayName =
 				{
 					Returns =
@@ -12214,6 +12511,17 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 					},
 					Notes = "Set whether players can see invisible teammates.",
 				},
+				SetColor =
+				{
+					Params =
+					{
+						{
+							Name = "Color",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the color ID of the team (0 to 15)",
+				},
 				SetDisplayName =
 				{
 					Params =
@@ -12257,6 +12565,77 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 					},
 					Notes = "Sets the suffix appended to the names of the members of this team.",
+				},
+			},
+			Constants =
+			{
+				teamInvalid =
+				{
+					Notes = "Placeholder for teams which are not associated with a color.",
+				},
+				teamBlack =
+				{
+					Notes = "",
+				},
+				teamDarkBlue =
+				{
+					Notes = "",
+				},
+				teamDarkGreen =
+				{
+					Notes = "",
+				},
+				teamDarkAqua =
+				{
+					Notes = "",
+				},
+				teamDarkRed =
+				{
+					Notes = "",
+				},
+				teamDarkPurple =
+				{
+					Notes = "",
+				},
+				teamGold =
+				{
+					Notes = "",
+				},
+				teamGray =
+				{
+					Notes = "",
+				},
+				teamDarkGray =
+				{
+					Notes = "",
+				},
+				teamBlue =
+				{
+					Notes = "",
+				},
+				teamGreen =
+				{
+					Notes = "",
+				},
+				teamAqua =
+				{
+					Notes = "",
+				},
+				teamRed =
+				{
+					Notes = "",
+				},
+				teamLightPurple =
+				{
+					Notes = "",
+				},
+				teamYellow =
+				{
+					Notes = "",
+				},
+				teamWhite =
+				{
+					Notes = "",
 				},
 			},
 		},

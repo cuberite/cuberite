@@ -634,6 +634,15 @@ void cProtocol_1_8_0::SendKeepAlive(UInt32 a_PingID)
 
 
 
+void cProtocol_1_8_0::SendTeam(const cTeam & a_Team, cTeam::eProtocolAction a_Mode)
+{
+	// Unimplemented
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1180,17 +1189,21 @@ void cProtocol_1_8_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol_1_8_0::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocol_1_8_0::SendScoreboardObjective(const cObjective & a_Objective, cObjective::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x3b);
-	Pkt.WriteString(a_Name);
+	Pkt.WriteString(a_Objective.GetName());
 	Pkt.WriteBEUInt8(a_Mode);
-	if ((a_Mode == 0) || (a_Mode == 2))
+	if ((a_Mode == cObjective::uaCreate) || (a_Mode == cObjective::uaUpdateText))
 	{
-		Pkt.WriteString(a_DisplayName);
-		Pkt.WriteString("integer");
+		Pkt.WriteString(a_Objective.GetDisplayName());
+		switch (a_Objective.GetDisplayType())
+		{
+		case cObjective::dispInteger: Pkt.WriteString("integer"); break;
+		case cObjective::dispHearts:  Pkt.WriteString("hearts"); break;
+		}
 	}
 }
 
@@ -1198,7 +1211,7 @@ void cProtocol_1_8_0::SendScoreboardObjective(const AString & a_Name, const AStr
 
 
 
-void cProtocol_1_8_0::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocol_1_8_0::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, cScoreboard::eUpdateAction a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
