@@ -233,10 +233,20 @@ cWorld::~cWorld()
 
 
 
-void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
-	BroadcastSoundEffect("entity.lightning.thunder", a_BlockX, a_BlockY, a_BlockZ, 50, 1);
+	LOG("CastThunderbolt(int, int, int) is deprecated, use CastThunderbolt(Vector3i) instead");
+	CastThunderbolt({a_BlockX, a_BlockY, a_BlockZ});
+}
+
+
+
+
+
+void cWorld::CastThunderbolt(Vector3i a_Block)
+{
+	BroadcastThunderbolt(a_Block);
+	BroadcastSoundEffect("entity.lightning.thunder", a_Block, 50, 1);
 }
 
 
@@ -1078,7 +1088,7 @@ void cWorld::TickWeather(float a_Dt)
 		// 0.5% chance per tick of thunderbolt
 		if (GetRandomProvider().RandBool(0.005))
 		{
-			CastThunderbolt(0, 0, 0);  // TODO: find random positions near players to cast thunderbolts.
+			CastThunderbolt({0, 0, 0});  // TODO: find random positions near players to cast thunderbolts.
 		}
 	}
 }
@@ -1393,7 +1403,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("entity.generic.explode", static_cast<double>(a_BlockX), static_cast<double>(a_BlockY), static_cast<double>(a_BlockZ), 1.0f, 0.6f);
+	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
 
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -2391,9 +2401,19 @@ void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_V
 
 
 
+void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastBlockAction(a_BlockPos, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
+	LOG("BroadcastBlockAction with integer position is deprecated, use vector-parametered version instead.");
+	m_ChunkMap->BroadcastBlockAction({a_BlockX, a_BlockY, a_BlockZ}, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
 }
 
 
@@ -2742,9 +2762,19 @@ void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard:
 
 
 
+void cWorld::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch, a_Exclude);
+	LOG("BroadcastSoundEffect with double position arguments is deprecated, use vector-parametered version instead.");
+	BroadcastSoundEffect(a_SoundName, {a_X, a_Y, a_Z}, a_Volume, a_Pitch, a_Exclude);
 }
 
 
@@ -2787,9 +2817,9 @@ void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+void cWorld::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+	m_ChunkMap->BroadcastThunderbolt(a_BlockPos, a_Exclude);
 }
 
 

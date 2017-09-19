@@ -35,7 +35,7 @@ public:
 
 protected:
 	cWorld * m_World;
-	int m_BlockX, m_BlockY, m_BlockZ;  // Position of the chest, for the window-close packet
+	Vector3i m_BlockPos;  // Position of the chest, for the window-close packet
 	cChestEntity * m_PrimaryChest;
 	cChestEntity * m_SecondaryChest;
 };

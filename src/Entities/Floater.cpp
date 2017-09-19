@@ -112,7 +112,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			if (m_CountDownTime <= 0)
 			{
 				m_BitePos = GetPosition();
-				m_World->BroadcastSoundEffect("entity.bobber.splash", GetPosX(), GetPosY(), GetPosZ(), 1, 1);
+				m_World->BroadcastSoundEffect("entity.bobber.splash", GetPosition(), 1, 1);
 				SetPosY(GetPosY() - 1);
 				m_CanPickupItem = true;
 				m_PickupCountDown = 20;

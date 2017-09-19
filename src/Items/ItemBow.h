@@ -77,9 +77,7 @@ public:
 		}
 		a_Player->GetWorld()->BroadcastSoundEffect(
 			"entity.arrow.shoot",
-			a_Player->GetPosX(),
-			a_Player->GetPosY(),
-			a_Player->GetPosZ(),
+			a_Player->GetPosition(),
 			0.5,
 			static_cast<float>(Force)
 		);

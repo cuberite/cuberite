@@ -248,7 +248,7 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 		m_World->BroadcastCollectEntity(*this, a_Dest, NumAdded);
 
 		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-		m_World->BroadcastSoundEffect("entity.item.pickup", GetPosX(), GetPosY(), GetPosZ(), 0.5, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.5, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		if (m_Item.m_ItemCount <= 0)
 		{
 			// All of the pickup has been collected, schedule the pickup for destroying

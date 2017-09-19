@@ -2697,7 +2697,7 @@ void cChunk::BroadcastUnleashEntity(const cEntity & a_Entity)
 
 
 
-void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cChunk::BroadcastBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
 	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2705,7 +2705,7 @@ void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 		{
 			continue;
 		}
-		(*itr)->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType);
+		(*itr)->SendBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Byte1, a_Byte2, a_BlockType);
 	}  // for itr - LoadedByClient[]
 }
 
@@ -2987,7 +2987,7 @@ void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 
 
-void cChunk::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cChunk::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
 	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2995,7 +2995,7 @@ void cChunk::BroadcastSoundEffect(const AString & a_SoundName, double a_X, doubl
 		{
 			continue;
 		}
-		(*itr)->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
+		(*itr)->SendSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch);
 	}  // for itr - LoadedByClient[]
 }
 
@@ -3035,7 +3035,7 @@ void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Ex
 
 
 
-void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+void cChunk::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
 	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -3043,7 +3043,7 @@ void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 		{
 			continue;
 		}
-		(*itr)->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+		(*itr)->SendThunderbolt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 	}  // for itr - LoadedByClient[]
 }
 

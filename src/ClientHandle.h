@@ -205,6 +205,7 @@ public:  // tolua_export
 	void SendSetTitle                   (const cCompositeChat & a_Title);  // tolua_export
 	void SendSetRawTitle                (const AString & a_Title);  // tolua_export
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
+	void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob                   (const cMonster & a_Mob);

@@ -30,7 +30,7 @@ public:
 
 protected:
 	cWorld * m_World;
-	int m_BlockX, m_BlockY, m_BlockZ;  // Position of the enderchest, for the window-close packet
+	Vector3i m_BlockPos;  // Position of the enderchest, for the window-close packet
 };
 
 
