@@ -87,10 +87,8 @@ void cRoot::InputThread(cRoot & a_Params)
 	while (a_Params.m_InputThreadRunFlag.test_and_set() && std::cin.good())
 	{
 		#ifndef _WIN32
-			static const std::chrono::microseconds PollPeriod = std::chrono::milliseconds{ 100 };
-
 			timeval Timeout{ 0, 0 };
-			Timeout.tv_usec = static_cast<long>(PollPeriod.count());
+			Timeout.tv_usec = 100 * 1000;  // 100 msec
 
 			fd_set ReadSet;
 			FD_ZERO(&ReadSet);
