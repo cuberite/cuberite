@@ -1332,3 +1332,79 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_12_2:
+
+void cProtocol_1_12_2::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, KeepAliveID);
+	if (
+		(KeepAliveID <= std::numeric_limits<UInt32>::max()) &&
+		(KeepAliveID >= 0)
+	)
+	{
+		// The server will only send a UInt32 so any value out of that range shouldn't keep the client alive.
+		m_Client->HandleKeepAlive(static_cast<UInt32>(KeepAliveID));
+	}
+}
+
+
+
+
+
+void cProtocol_1_12_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+{
+	cServer * Server = cRoot::Get()->GetServer();
+	AString ServerDescription = Server->GetDescription();
+	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
+	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "Cuberite 1.12.2";
+	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_12_2;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	// Serialize the response into a packet:
+	Json::FastWriter Writer;
+	cPacketizer Pkt(*this, 0x00);  // Response packet
+	Pkt.WriteString(Writer.write(ResponseValue));
+}
+
+
+
+
+
+void cProtocol_1_12_2::SendKeepAlive(UInt32 a_PingID)
+{
+	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
+	if (m_State != 3)
+	{
+		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		return;
+	}
+
+	cPacketizer Pkt(*this, GetPacketId(sendKeepAlive));  // Keep Alive packet
+	Pkt.WriteBEInt64(a_PingID);
+}
