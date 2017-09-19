@@ -38,58 +38,42 @@ void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadCast)
+void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcast)
 {
 	// Check leashed nearby mobs to tie them to this knot
-	class LookForLeasheds : public cEntityCallback
-	{
-	public:
-		cLeashKnot * m_Knot;
-		cPlayer * m_Player;
-		bool m_ShouldBroadcast;
-
-		LookForLeasheds(cLeashKnot * a_Knot, cPlayer * a_PlayerLeashedTo, bool a_ShouldBroadcast) :
-			m_Knot(a_Knot),
-			m_Player(a_PlayerLeashedTo),
-			m_ShouldBroadcast(a_ShouldBroadcast)
-		{
-		}
-
-		virtual bool Item(cEntity * a_Entity) override
+	// taking world from player (instead from this) because this can be called before entity was initialized
+	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), [&](cEntity & a_Entity)
 		{
 			// If the entity is not a monster skip it
-			if (a_Entity->GetEntityType() != cEntity::eEntityType::etMonster)
+			if (a_Entity.GetEntityType() != cEntity::eEntityType::etMonster)
 			{
 				return false;
 			}
 
-			cMonster * PotentialLeashed = static_cast<cMonster*>(a_Entity);
+			auto & PotentialLeashed = static_cast<cMonster&>(a_Entity);
 
 			// If can't be leashed skip it
-			if (!PotentialLeashed->CanBeLeashed())
+			if (!PotentialLeashed.CanBeLeashed())
 			{
 				return false;
 			}
 
 			// If it's not leashed to the player skip it
 			if (
-				!PotentialLeashed->IsLeashed() ||
-				!PotentialLeashed->GetLeashedTo()->IsPlayer() ||
-				(PotentialLeashed->GetLeashedTo()->GetUniqueID() != m_Player->GetUniqueID())
+				!PotentialLeashed.IsLeashed() ||
+				!PotentialLeashed.GetLeashedTo()->IsPlayer() ||
+				(PotentialLeashed.GetLeashedTo()->GetUniqueID() != a_Player.GetUniqueID())
 			)
 			{
 				return false;
 			}
 
 			// All conditions met, unleash from player and leash to fence
-			PotentialLeashed->Unleash(false, false);
-			PotentialLeashed->LeashTo(*m_Knot, m_ShouldBroadcast);
+			PotentialLeashed.Unleash(false, false);
+			PotentialLeashed.LeashTo(*this, a_ShouldBroadcast);
 			return false;
 		}
-	} LookForLeashedsCallback(this, &a_Player, a_ShouldBroadCast);
-
-	// taking world from player (instead from this) because this can be called before entity was initialized
-	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), LookForLeashedsCallback);
+	);
 }
 
 
@@ -158,26 +142,19 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
 {
-	class LookForKnot : public cEntityCallback
-	{
-	public:
-		cLeashKnot * m_LeashKnot = nullptr;
-
-		virtual bool Item(cEntity * a_Entity) override
+	cLeashKnot * LeashKnot = nullptr;
+	a_WorldInterface.ForEachEntityInBox(cBoundingBox(a_BlockPos, 0.5, 1), [&](cEntity & a_Entity)
 		{
-			if (a_Entity->IsLeashKnot())
+			if (a_Entity.IsLeashKnot())
 			{
-				m_LeashKnot = reinterpret_cast<cLeashKnot *>(a_Entity);
+				LeashKnot = static_cast<cLeashKnot *>(&a_Entity);
 				return true;
 			}
 			return false;
 		}
+	);
 
-	} CallbackFindKnot;
-
-	a_WorldInterface.ForEachEntityInBox(cBoundingBox(a_BlockPos, 0.5, 1), CallbackFindKnot);
-
-	return CallbackFindKnot.m_LeashKnot;
+	return LeashKnot;
 }
 
 

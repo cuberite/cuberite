@@ -237,10 +237,10 @@ static int tolua_cWorld_DoWithPlayerByUUID(lua_State * tolua_S)
 	}
 
 	// Call the function:
-	bool res = Self->DoWithPlayerByUUID(PlayerUUID, [&](cPlayer * a_Player)
+	bool res = Self->DoWithPlayerByUUID(PlayerUUID, [&](cPlayer & a_Player)
 		{
 			bool ret = false;
-			L.Call(FnRef, a_Player, cLuaState::Return, ret);
+			L.Call(FnRef, &a_Player, cLuaState::Return, ret);
 			return ret;
 		}
 	);

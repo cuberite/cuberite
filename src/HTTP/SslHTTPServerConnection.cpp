@@ -1,4 +1,4 @@
-﻿
+
 // SslHTTPConnection.cpp
 
 // Implements the cSslHTTPServerConnection class representing a HTTP connection made over a SSL link

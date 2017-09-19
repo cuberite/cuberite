@@ -1,4 +1,4 @@
-﻿
+
 // BufferedSslContext.h
 
 // Declares the cBufferedSslContext class representing a SSL context with the SSL peer data backed by a cByteBuffer

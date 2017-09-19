@@ -1,4 +1,4 @@
-﻿
+
 # This script includes PolarSSL, if not already included.
 # It is needed for when multiple projects reference PolarSSL.
 

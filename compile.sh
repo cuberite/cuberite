@@ -4,7 +4,7 @@
 set -e
 
 # Global variables:
-# CHOICE_BUILDTYPE  - Either "Normal" or "Debug".
+# CHOICE_BUILDTYPE  - Either "Release" or "Debug".
 # CHOICE_THREADS    - A numerical value, the amount of threads to be used for the make command.
 # CHOICE_BRANCH     - The branch to use. Currently locked on "master".
 # STATE_INTERACTIVE - 1 If we're running interactively. 0 otherwise.
@@ -13,6 +13,7 @@ set -e
 # Constants:
 DEFAULT_BUILDTYPE="Release" # Other options: "Debug"
 DEFAULT_BRANCH="master"     # Other options: None currently
+DEFAULT_THREADS=1
 
 # Constants not modifiable through command line:
 UPSTREAM_REPO="origin"
@@ -54,8 +55,8 @@ errorArguments ()
 	echo "options:"
 	echo "  -m  The compilation mode. Either \"Release\" or \"Debug\". Defaults to \"$DEFAULT_BUILDTYPE\""
 	echo '  -t  The number of threads to use for compiling'
-	echo "      If unspecified, at most $MAX_DEFAULT_THREADS threads are used. The special value CORES attempts to set the number of"
-	echo '      threads to the number of computer cores.'
+	echo "      If unspecified, a default of $DEFAULT_THREADS threads is used. The special value AUTO attempts to set the number of"
+	echo '      compilation threads equal to the number of CPU threads.'
 	echo '  -b  The branch to compile. (Currently unused and pinned to MASTER)'
 	echo '  -n yes: Prevent interactive mode. Unnecessary in combination with other arguments.'
 	echo '          Use without any other argument to build with the default settings.'
@@ -65,7 +66,7 @@ errorArguments ()
 	echo "  ./compile.sh"
 	echo "  ./compile.sh -m Debug"
 	echo "  ./compile.sh -m Release -t 2"
-	echo 
+	echo
 	echo "Return codes: (non 0 returns are accompanied by useful stderr info)"
 	echo "0 - Success              - Success! Code was updated and compiled"
 	echo "1 - Compilation failed   - cmake, make, or source code issue"
@@ -129,10 +130,8 @@ while getopts ":m:t:b:d:n:" name; do
 	;;
 	t)
 		if [ ! -z "$CHOICE_THREADS" ]; then errorArguments; fi # Argument duplication.
-		if [ "$value" -gt 0 ] 2>/dev/null; then # If a positive integer.
+		if [ "$value" -gt 0 ] 2>/dev/null || [ "$value" = "AUTO" ]; then # If a positive integer or the special value "AUTO".
 			CHOICE_THREADS="$value"
-		elif [ "$value" = "CORES" ]; then
-			CHOICE_THREADS="CORES"
 		else
 			errorArguments
 		fi
@@ -147,7 +146,7 @@ while getopts ":m:t:b:d:n:" name; do
 		DRY_RUN="yes"
 	;;
 	n)
-		if [ "$dummy" = "1" ]; then errorArguments; fi # Argument duplication. 
+		if [ "$dummy" = "1" ]; then errorArguments; fi # Argument duplication.
 		dummy=1 # we just want to disable interactive mode, passing an argument already did this. No need to do anything.
 	;;
 	*)
@@ -177,7 +176,7 @@ elif [ -d cuberite ]; then # If there's a directory named "cuberite"...
 	else
 		errorOther "A directory is named 'cuberite' which has no Cuberite assets exists. Please run the script elsewhere or move/delete that directory."
 	fi
-	
+
 fi
 
 if [ $STATE_NEW -eq 0 ]; then
@@ -257,23 +256,23 @@ doDependencyCheck()
 
 		# apt-get guide.
 		apt-get --help > /dev/null 2> /dev/null && \
-		missingDepsExit "sudo apt-get install$MISSING_PACKAGES"
+		missingDepsExit "apt-get install$MISSING_PACKAGES"
 
-		# yum guide.
-		yum --help > /dev/null 2> /dev/null && \
-		missingDepsExit "sudo yum install$MISSING_PACKAGES"
+		# dnf guide.
+		dnf --help > /dev/null 2> /dev/null && \
+		missingDepsExit "dnf install$MISSING_PACKAGES"
 
 		# zypper guide.
 		zypper --help > /dev/null 2> /dev/null && \
-		missingDepsExit "sudo zypper install$MISSING_PACKAGES"
+		missingDepsExit "zypper install$MISSING_PACKAGES"
 
 		# pacman guide.
 		pacman --help > /dev/null 2> /dev/null && \
-		missingDepsExit "sudo pacman -S$MISSING_PACKAGES"
+		missingDepsExit "pacman -S$MISSING_PACKAGES"
 
 		# urpmi guide.
 		urpmi --help > /dev/null 2> /dev/null && \
-		missingDepsExit "sudo urpmi$MISSING_PACKAGES"
+		missingDepsExit "urpmi$MISSING_PACKAGES"
 
 		missingDepsExit ""
 	fi
@@ -336,7 +335,7 @@ if [ $STATE_INTERACTIVE -eq 1 ]; then
 		      Generates the fastest build.
 
 	* (D)Debug:   Compiles in debug mode.
-		      Makes your console and crashes more verbose.  
+		      Makes your console and crashes more verbose.
 		      A bit slower than Release mode. If you plan to help
 		      development by reporting bugs, this is preferred.
 
@@ -351,14 +350,11 @@ if [ $STATE_INTERACTIVE -eq 1 ]; then
 		r|N)
 			CHOICE_BUILDTYPE="Release"
 			;;
-		*)
-			errorInput
-			;;
 	esac
 fi
 
 if [ -z "$CHOICE_BUILDTYPE" ]; then # No buildtype specified.
-	CHOICE_BUILDTYPE="$DEFAULT_BUILDTYPE" 
+	CHOICE_BUILDTYPE="$DEFAULT_BUILDTYPE"
 fi
 
 
@@ -366,44 +362,47 @@ fi
 
 
 
-numberOfCores()
+numberOfThreads()
 {
-	KERNEL=$(uname -s)
+	KERNEL=`uname -s`
 
 	if [ "$KERNEL" = "Linux" ] || [ "$KERNEL" = "Darwin" ]; then
-		echo $(getconf _NPROCESSORS_ONLN)
+		echo `getconf _NPROCESSORS_ONLN`
+	elif [ "$KERNEL" = "FreeBSD" ]; then
+		echo `getconf NPROCESSORS_ONLN`
 	else
 		echo "unknown"
 	fi
 }
 
-CORE_COUNT=`numberOfCores`
+CPU_THREAD_COUNT=`numberOfThreads`
 
 if [ $STATE_INTERACTIVE -eq 1 ]; then
+	echo ""
 	echo "Choose the number of compilation threads."
 
-	if [ "$CORE_COUNT" = "unknown" ]; then
-		printf %s "Could not detect the number of cores. "
-	elif [ "$CORE_COUNT" -eq 1 ]; then
-		echo "You have 1 core."
+	if [ "$CPU_THREAD_COUNT" = "unknown" ]; then
+		echo "Could not detect the number of CPU threads."
+	elif [ "$CPU_THREAD_COUNT" -eq 1 ]; then
+		echo "You have 1 thread."
 	else
-		echo "You have $CORE_COUNT cores."
+		echo "You have $CPU_THREAD_COUNT CPU threads."
 	fi
-	
-	echo "If you have enough RAM, it is wise to choose a number as high as your core count. "
-	echo "Otherwise choose lower. Raspberry Pis should choose 1. If in doubt, choose 1."
-	printf %s "Please enter the number of compilation threads to use (Default: 1): "
+
+	echo "If you have enough RAM, it is wise to choose your CPU's thread count. "
+	echo "Otherwise choose lower. Old Raspberry Pis should choose 1. If in doubt, choose 1."
+	printf %s "Please enter the number of compilation threads to use (Default: $DEFAULT_THREADS): "
 	read CHOICE_THREADS
 fi
 
 if [ -z "$CHOICE_THREADS" ] 2> /dev/null; then
-	CHOICE_THREADS=1
-elif [ "$CHOICE_THREADS" = "CORES" ] 2> /dev/null; then
-	if [ $CORE_COUNT = "unknown" ]; then
-		CHOICE_THREADS=1
-		echo "WARNING: could not detect number of cores. Using 1 thread." >&2
+	CHOICE_THREADS="$DEFAULT_THREADS"
+elif [ "$CHOICE_THREADS" = "AUTO" ] 2> /dev/null; then
+	if [ $CPU_THREAD_COUNT = "unknown" ]; then
+		CHOICE_THREADS="$DEFAULT_THREADS"
+		echo "WARNING: could not detect number of threads. Using the default ($DEFAULT_THREADS) ." >&2
 	else
-		CHOICE_THREADS="$CORE_COUNT"
+		CHOICE_THREADS="$CPU_THREAD_COUNT"
 	fi
 elif [ "$CHOICE_THREADS" -lt 0 ] 2> /dev/null; then
 	errorInput
@@ -418,22 +417,22 @@ else
 	previousCompilation="Detected. This should make fetching and compiling faster."
 fi
 
-CORE_WARNING=""
-if [ "$CORE_COUNT" != "unknown" ] && [ "$CORE_COUNT" -lt "$CHOICE_THREADS" ]; then
-	CORE_WARNING=" - Warning: More threads than cores."
+THREAD_WARNING=""
+if [ "$CPU_THREAD_COUNT" != "unknown" ] && [ "$CPU_THREAD_COUNT" -lt "$CHOICE_THREADS" ]; then
+	THREAD_WARNING=" - Warning: More threads assigned than there are CPU threads."
 fi
 
 echo ""
 echoInt "#### Settings Summary ####"
 echo "Build Type:           " "$CHOICE_BUILDTYPE"
 echo "Branch:               " "$CHOICE_BRANCH" "(Currently the only choice)"
-echo "Compilation threads:  " "$CHOICE_THREADS$CORE_WARNING"
-echo "Cores:                " "$CORE_COUNT"
+echo "Compilation threads:  " "$CHOICE_THREADS$THREAD_WARNING"
+echo "CPU Threads:          " "$CPU_THREAD_COUNT"
 echo "Previous compilation: " "$previousCompilation"
 echo "Upstream Link:        " "$UPSTREAM_LINK"
 echo "Upstream Repo:        " "$UPSTREAM_REPO"
 
-if [ "$DRY_RUN" = "yes" ]; then 
+if [ "$DRY_RUN" = "yes" ]; then
 	echo "This is a dry run. Exiting now."
 	exit 0;
 fi
@@ -509,7 +508,7 @@ fi
 cd ..
 echo "
 You can always update Cuberite by executing:
-`pwd`/compile.sh
+$PWD/compile.sh
 
 Enjoy :)"
 exit 0

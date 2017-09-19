@@ -29,7 +29,7 @@ This script will download the correct binary from the project site.
 
 ### Compiling
 
- - You can compile automatically for Linux / *nix with the `compile.sh` script. The script is described below.
+ - You can compile automatically for Linux, macOS and FreeBSD with the `compile.sh` script. The script is described below.
  - You can also compile manually. See [COMPILING.md][4].
 
 Compiling may provide better performance (1.5-3x as fast) and it supports more operating systems.
@@ -62,7 +62,7 @@ Other Stuff
 
 For other stuff, check out the [homepage][13], the [Users' Manual][14], the [forums][15], and the [Plugin API][16].
 
-[Support Us on Bountysource][17]
+Support Us on [Liberapay][17] or [Bountysource][18]
 
 [1]: https://cuberite.org/news/#subscribe
 [2]: https://cuberite.org/
@@ -80,4 +80,5 @@ For other stuff, check out the [homepage][13], the [Users' Manual][14], the [for
 [14]: https://book.cuberite.org/
 [15]: https://forum.cuberite.org/
 [16]: https://api.cuberite.org/
-[17]: https://bountysource.com/teams/cuberite
+[17]: https://liberapay.com/Cuberite
+[18]: https://bountysource.com/teams/cuberite

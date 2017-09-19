@@ -369,7 +369,7 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY,
 		auto NewMobPtr = newMob.get();
 		if (newMob)
 		{
-			m_Spawned.insert(std::move(newMob));
+			m_Spawned.push_back(std::move(newMob));
 		}
 		return NewMobPtr;
 	}
@@ -384,15 +384,6 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY,
 void cMobSpawner::NewPack()
 {
 	m_NewPack = true;
-}
-
-
-
-
-
-cMobSpawner::tSpawnedContainer & cMobSpawner::getSpawned(void)
-{
-	return m_Spawned;
 }
 
 

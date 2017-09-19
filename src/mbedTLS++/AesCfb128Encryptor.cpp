@@ -1,4 +1,4 @@
-﻿
+
 // AesCfb128Encryptor.cpp
 
 // Implements the cAesCfb128Encryptor class encrypting data using AES CFB-128

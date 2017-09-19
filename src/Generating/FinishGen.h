@@ -393,10 +393,7 @@ protected:
 	bool m_PreSimulateLava;
 
 	/** Drops hanging sand and gravel down to the ground, recalculates heightmap */
-	void CollapseSandGravel(
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::HeightMap & a_HeightMap       // Height map to update by the current data
-	);
+	void CollapseSandGravel(cChunkDesc & a_ChunkDesc);
 
 	/** For each fluid block:
 	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)

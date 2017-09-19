@@ -138,7 +138,7 @@ public:
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
 	static const int FIRE_DAMAGE           = 1;    ///< Damage to deal when standing in fire
 	static const int LAVA_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in lava
-	static const int LAVA_DAMAGE           = 5;    ///< Damage to deal when standing in lava
+	static const int LAVA_DAMAGE           = 4;    ///< Damage to deal when standing in lava
 	static const int BURN_TICKS_PER_DAMAGE = 20;   ///< Ticks to wait between damaging an entity when it is burning
 	static const int BURN_DAMAGE           = 1;    ///< Damage to deal when the entity is burning
 

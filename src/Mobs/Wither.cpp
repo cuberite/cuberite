@@ -101,28 +101,19 @@ void cWither::KilledBy(TakeDamageInfo & a_TDI)
 {
 	super::KilledBy(a_TDI);
 
-	class cPlayerCallback : public cPlayerListCallback
-	{
-		Vector3f m_Pos;
-
-		virtual bool Item(cPlayer * a_Player)
+	Vector3d Pos = GetPosition();
+	m_World->ForEachPlayer([=](cPlayer & a_Player)
 		{
 			// TODO 2014-05-21 xdot: Vanilla minecraft uses an AABB check instead of a radius one
-			double Dist = (a_Player->GetPosition() - m_Pos).Length();
+			double Dist = (a_Player.GetPosition() - Pos).Length();
 			if (Dist < 50.0)
 			{
 				// If player is close, award achievement
-				a_Player->AwardAchievement(achKillWither);
+				a_Player.AwardAchievement(achKillWither);
 			}
 			return false;
 		}
-
-	public:
-		cPlayerCallback(const Vector3f & a_Pos) : m_Pos(a_Pos) {}
-
-	} PlayerCallback(GetPosition());
-
-	m_World->ForEachPlayer(PlayerCallback);
+	);
 }
 
 

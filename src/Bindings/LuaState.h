@@ -39,6 +39,7 @@ extern "C"
 #include <functional>
 
 #include "../Defines.h"
+#include "../FunctionRef.h"
 #include "PluginManager.h"
 #include "LuaState_Typedefs.inc"
 
@@ -521,14 +522,14 @@ public:
 		The callback receives the LuaState in which the table resides, and the element's index. The LuaState has
 		the element on top of its stack. If the callback returns true, the iteration is aborted, if it returns
 		false, the iteration continues with the next element. */
-		void ForEachArrayElement(std::function<bool(cLuaState & a_LuaState, int a_Index)> a_ElementCallback) const;
+		void ForEachArrayElement(cFunctionRef<bool(cLuaState & a_LuaState, int a_Index)> a_ElementCallback) const;
 
 		/** Iterates over all dictionary elements in the table in random order, and calls the a_ElementCallback for
 		each of them.
 		The callback receives the LuaState in which the table reside. The LuaState has the element on top of its
 		stack, and the element's key just below it. If the callback returns true, the iteration is aborted, if it
 		returns false, the iteration continues with the next element. */
-		void ForEachElement(std::function<bool(cLuaState & a_LuaState)> a_ElementCallback) const;
+		void ForEachElement(cFunctionRef<bool(cLuaState & a_LuaState)> a_ElementCallback) const;
 
 		cLuaState & GetLuaState(void) const { return m_LuaState; }
 

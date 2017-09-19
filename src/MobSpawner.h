@@ -37,8 +37,10 @@ public :
 	// return true if there is at least one allowed type
 	bool CanSpawnAnything(void);
 
-	typedef const std::set<std::unique_ptr<cMonster>> tSpawnedContainer;
-	tSpawnedContainer & getSpawned(void);
+	std::vector<std::unique_ptr<cMonster>> & getSpawned(void)
+	{
+		return m_Spawned;
+	}
 
 	/** Returns true if specified type of mob can spawn on specified block */
 	static bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, EMCSBiome a_Biome);
@@ -55,7 +57,7 @@ protected :
 	std::set<eMonsterType> m_AllowedTypes;
 	bool m_NewPack;
 	eMonsterType m_MobType;
-	std::set<std::unique_ptr<cMonster>> m_Spawned;
+	std::vector<std::unique_ptr<cMonster>> m_Spawned;
 } ;
 
 
