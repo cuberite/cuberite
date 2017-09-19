@@ -1,4 +1,4 @@
-﻿
+
 // EntropyContext.h
 
 // Declares the cEntropyContext class representing a wrapper over entropy contexts in mbedTLS

@@ -1,4 +1,4 @@
-﻿
+
 // Connection.h
 
 // Interfaces to the cConnection class representing a single pair of connected sockets

@@ -1,4 +1,4 @@
-﻿# This is the top-level CMakeLists.txt file for the Cuberite project
+# This is the top-level CMakeLists.txt file for the Cuberite project
 #
 # Use CMake to generate the build files for your platform
 #

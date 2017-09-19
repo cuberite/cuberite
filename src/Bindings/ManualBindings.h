@@ -1,4 +1,4 @@
-﻿
+
 // ManualBindings.h
 
 // Declares the cManualBindings class used as a namespace for functions exported to the Lua API manually

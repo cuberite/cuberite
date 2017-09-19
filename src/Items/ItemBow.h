@@ -1,4 +1,4 @@
-﻿
+
 // ItemBow.h
 
 // Declares the cItemBowHandler class representing the itemhandler for bows

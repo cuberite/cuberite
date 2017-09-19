@@ -1,4 +1,4 @@
-﻿
+
 // RsaPrivateKey.h
 
 // Declares the cRsaPrivateKey class representing a private key for RSA operations.

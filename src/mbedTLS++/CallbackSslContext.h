@@ -1,4 +1,4 @@
-﻿
+
 // CallbackSslContext.h
 
 // Declares the cCallbackSslContext class representing a SSL context wrapper that uses callbacks to read and write SSL peer data

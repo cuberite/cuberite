@@ -1,4 +1,4 @@
-﻿
+
 // X509Cert.h
 
 // Declares the cX509Cert class representing a wrapper over X509 certs in mbedTLS

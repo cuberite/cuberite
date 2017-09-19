@@ -1,4 +1,4 @@
-﻿
+
 // ManualBindings_World.cpp
 
 // Implements the manual Lua API bindings for the cWorld class
