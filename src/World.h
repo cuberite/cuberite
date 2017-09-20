@@ -796,10 +796,11 @@ public:
 	/** Returns true if the current weather has any precipitation - rain, storm or snow */
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 
-	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override
 	{
-		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+		auto Biome = GetBiomeAt(a_BlockX, a_BlockZ);
+		return (IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome));
 	}
 
 	/** Returns true if the specified location has any precipitation (rain or

@@ -2351,7 +2351,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified location has any precipitation (rain or storm) (takes biomes into account, deserts are never wet).",
+				Notes = "Returns true if the specified location has any damp precipitation (rain or storm) (takes biomes into account, deserts and snowy areas are never wet).",
 			},
 			IsWeatherWetAtBlock =
 			{
