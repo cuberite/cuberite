@@ -7,6 +7,8 @@ Declares the 1.12 protocol classes:
 		- release 1.12 protocol (#335)
 	- cProtocol_1_12_1
 		- release 1.12.1 protocol (#338)
+	- cProtocol_1_12_2
+		- release 1.12.2 protocol (#340)
 (others may be added later in the future for the 1.12 release series)
 */
 
@@ -66,6 +68,27 @@ protected:
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+};
+
+
+
+
+
+class cProtocol_1_12_2:
+	public cProtocol_1_12_1
+{
+	typedef cProtocol_1_12_1 Super;
+
+public:
+	cProtocol_1_12_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State):
+		Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+	{
+	}
+
+protected:
+	virtual void HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+	virtual void SendKeepAlive(UInt32 a_PingID) override;
 };
 
 

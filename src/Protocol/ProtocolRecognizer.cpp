@@ -1133,6 +1133,11 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			m_Protocol = new cProtocol_1_12_1(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
+		case PROTO_VERSION_1_12_2:
+		{
+			m_Protocol = new cProtocol_1_12_2(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
