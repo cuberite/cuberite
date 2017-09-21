@@ -29,6 +29,10 @@ SET (HDRS
 	VaporizeFluidSimulator.h
 )
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set_source_files_properties(FireSimulator.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+endif()
+
 
 if(NOT MSVC)
 	add_library(Simulator ${SRCS} ${HDRS})
