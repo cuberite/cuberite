@@ -73,6 +73,7 @@ SET (SRCS
 	VoronoiMap.cpp
 	WebAdmin.cpp
 	World.cpp
+	BookContent.cpp
 	main.cpp
 )
 
@@ -84,6 +85,7 @@ SET (HDRS
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockTracer.h
+	BookContent.h
 	BrewingRecipes.h
 	Broadcaster.h
 	BoundingBox.h

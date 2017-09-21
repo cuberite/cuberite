@@ -3992,6 +3992,227 @@ static int tolua_cEntity_GetSpeed(lua_State * tolua_S)
 
 
 
+static int tolua_cBookContent_AddPage(lua_State * tolua_S)
+{
+	// cBookContent:AddPage(string)
+	// cBookContent:AddPage(cCompositeChat)
+
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cBookContent") ||
+		lua_isnil(L, 2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	cBookContent * BookContent = nullptr;
+	L.GetStackValue(1, BookContent);
+
+	// Check type of second param
+	if (L.GetTypeText(2) == "string")
+	{
+		AString Page;
+		L.GetStackValue(2, Page);
+		BookContent->AddPage(Page);
+	}
+	else if (L.CheckParamUserType(2, "cCompositeChat"))
+	{
+		cCompositeChat * CompositeChat = nullptr;
+		L.GetStackValue(2, CompositeChat);
+		if (BookContent->IsSigned())
+		{
+			BookContent->AddPage(CompositeChat->CreateJsonString());
+		}
+		else
+		{
+			BookContent->AddPage(CompositeChat->ExtractText());
+		}
+	}
+	else
+	{
+		return L.ApiParamError("Expected a string or a cCompositeChat.");
+	}
+	return 0;
+}
+
+
+
+
+
+static int tolua_cBookContent_GetPage(lua_State * tolua_S)
+{
+	// cBookContent::GetPage(Index) -> string
+
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cBookContent") ||
+		!L.CheckParamNumber(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	cBookContent * BookContent = nullptr;
+	size_t Index;
+	L.GetStackValues(1, BookContent, Index);
+
+	if (BookContent->GetPages().empty())
+	{
+		return L.ApiParamError("Getting the page at the index is not possbile. The book has no pages.");
+	}
+
+	// Check if the index is valid
+	if ((Index <= 0) || (Index > BookContent->GetPages().size()))
+	{
+		return L.ApiParamError("Index %d out of range. The valid range is %d - %d.", Index, 1, BookContent->GetPages().size());
+	}
+
+	L.Push(BookContent->GetPage(Index - 1));
+	return 1;
+
+}
+
+
+
+
+
+static int tolua_cBookContent_GetPages(lua_State * tolua_S)
+{
+	// cBookContent::GetPages() -> table of strings
+
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cBookContent") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	cBookContent * BookContent = nullptr;
+	L.GetStackValue(1, BookContent);
+	L.Push(BookContent->GetPages());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cBookContent_SetPage(lua_State * tolua_S)
+{
+	// cBookContent::SetPage(index, string)
+	// cBookContent::SetPage(index, cCompositeChat)
+
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cBookContent") ||
+		!L.CheckParamNumber(2) ||
+		lua_isnil(L, 3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	cBookContent * BookContent = nullptr;
+	size_t Index;
+	L.GetStackValues(1, BookContent, Index);
+
+	if (BookContent->GetPages().empty())
+	{
+		return L.ApiParamError("Changing the page at the index is not possbile. The book has no pages.");
+	}
+
+	// Check if the index is valid
+	if ((Index <= 0) || (Index > BookContent->GetPages().size()))
+	{
+		return L.ApiParamError("The index %d is out of range. The valid range is %d to %d.",  Index, 1, BookContent->GetPages().size());
+	}
+
+	// Check type of third param
+	if (L.GetTypeText(3) == "string")
+	{
+		AString Page;
+		L.GetStackValue(3, Page);
+		BookContent->SetPage(Index - 1, Page);
+	}
+	else if (L.CheckParamUserType(3, "cCompositeChat"))
+	{
+		cCompositeChat * CompositeChat = nullptr;
+		L.GetStackValue(3, CompositeChat);
+		if (BookContent->IsSigned())
+		{
+			BookContent->SetPage(Index - 1, CompositeChat->CreateJsonString());
+		}
+		else
+		{
+			BookContent->SetPage(Index - 1, CompositeChat->ExtractText());
+		}
+	}
+	else
+	{
+		return L.ApiParamError("Expected a string or a cCompositeChat.");
+	}
+	return 0;
+}
+
+
+
+
+
+static int tolua_cBookContent_SetPages(lua_State * tolua_S)
+{
+	// cBookContent::SetPages(table)
+
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cBookContent") ||
+		!L.CheckParamTable(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	cBookContent * BookContent = nullptr;
+	cLuaState::cStackTablePtr Pages;
+	L.GetStackValues(1, BookContent, Pages);
+	BookContent->ClearPages();
+	Pages->ForEachArrayElement([=](cLuaState & a_LuaState, int a_Index) -> bool
+		{
+			if (a_LuaState.GetTypeText(-1) == "string")
+			{
+				AString Page;
+				a_LuaState.GetStackValue(-1, Page);
+				BookContent->AddPage(Page);
+			}
+			else if (a_LuaState.CheckParamUserType(-1, "cCompositeChat"))
+			{
+				cCompositeChat * CompositeChat = nullptr;
+				a_LuaState.GetStackValue(-1, CompositeChat);
+				if (BookContent->IsSigned())
+				{
+					BookContent->AddPage(CompositeChat->CreateJsonString());
+				}
+				else
+				{
+					BookContent->AddPage(CompositeChat->ExtractText());
+				}
+			}
+			return false;
+		}
+	);
+	return 0;
+}
+
+
+
+
+
 void cManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
@@ -4019,6 +4240,14 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "Base64Encode",          tolua_Base64Encode);
 		tolua_function(tolua_S, "Base64Decode",          tolua_Base64Decode);
 		tolua_function(tolua_S, "md5",                   tolua_md5_obsolete);  // OBSOLETE, use cCryptoHash.md5() instead
+
+		tolua_beginmodule(tolua_S, "cBookContent");
+			tolua_function(tolua_S, "AddPage", tolua_cBookContent_AddPage);
+			tolua_function(tolua_S, "GetPage", tolua_cBookContent_GetPage);
+			tolua_function(tolua_S, "GetPages", tolua_cBookContent_GetPages);
+			tolua_function(tolua_S, "SetPage", tolua_cBookContent_SetPage);
+			tolua_function(tolua_S, "SetPages", tolua_cBookContent_SetPages);
+		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cBoundingBox");
 			tolua_function(tolua_S, "CalcLineIntersection", tolua_cBoundingBox_CalcLineIntersection);

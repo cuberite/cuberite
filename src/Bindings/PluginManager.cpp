@@ -903,6 +903,44 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginManager::CallHookPlayerEditedBook(cPlayer & a_Player, const cBookContent & a_NewContent, bool a_IsSigned)
+{
+	FIND_HOOK(HOOK_PLAYER_EDITED_BOOK);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerEditedBook(a_Player, a_NewContent, a_IsSigned))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerEditingBook(cPlayer & a_Player, const cBookContent & a_OriginalContent, cBookContent & a_NewContent, bool a_IsSigned)
+{
+	FIND_HOOK(HOOK_PLAYER_EDITING_BOOK);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerEditingBook(a_Player, a_OriginalContent, a_NewContent, a_IsSigned))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
 {
 	FIND_HOOK(HOOK_PLAYER_FOOD_LEVEL_CHANGE);
@@ -979,6 +1017,25 @@ bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 
 
 
+bool cPluginManager::CallHookPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window)
+{
+	FIND_HOOK(HOOK_PLAYER_OPENING_WINDOW);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerOpeningWindow(a_Player, a_Window))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
 	FIND_HOOK(HOOK_PLAYER_LEFT_CLICK);
@@ -1006,25 +1063,6 @@ bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-
-
-bool cPluginManager::CallHookPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window)
-{
-	FIND_HOOK(HOOK_PLAYER_OPENING_WINDOW);
-	VERIFY_HOOK;
-
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnPlayerOpeningWindow(a_Player, a_Window))
 		{
 			return true;
 		}

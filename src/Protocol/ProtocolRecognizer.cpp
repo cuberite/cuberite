@@ -191,6 +191,17 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 
 
+
+void cProtocolRecognizer::SendOpenBook(const short a_Hand)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendOpenBook(a_Hand);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendCameraSetTo(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != nullptr);

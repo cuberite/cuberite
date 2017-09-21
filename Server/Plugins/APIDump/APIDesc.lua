@@ -6996,6 +6996,11 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 			},
 			Variables =
 			{
+				m_BookContent =
+				{
+					Type = "cBookContent",
+					Notes = "If it's a written or a writeable book, it contains the information of the book: Author, title and pages",
+				},
 				m_CustomName =
 				{
 					Type = "string",
@@ -7003,7 +7008,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				},
 				m_Enchantments =
 				{
-					Type = "{{cEnchantments|cEnchantments}}}",
+					Type = "cEnchantments",
 					Notes = "The enchantments of the item.",
 				},
 				m_ItemCount =
@@ -7071,6 +7076,174 @@ Item4.m_Enchantments:SetLevel(cEnchantments.enchEfficiency, 3);
 local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 </pre>
 ]],
+				},
+			},
+		},
+		cBookContent =
+		{
+			Desc = [[
+This class contains the information for a signed or writeable book: The author, title and the pages. A page of the writeable book is a simple string. For a signed book it can be a json string. Use {{cCompositeChat}} to create a more complex page with formatting.
+]],
+			Functions =
+			{
+				AddPage =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Page",
+								Type = "string",
+							},
+						},
+						Notes = "Add a page to the end of the book",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Page",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Add a page to the end of the book. For signed book saves it as json string, otherwise as simple string",
+					}
+				},
+				Clear =
+				{
+					Notes = "Clears the whole book",
+				},
+				constructor =
+				{
+					Returns =
+					{
+						{
+							Type = "cBookContent",
+						},
+					},
+					Notes = "Creates a empty book",
+				},
+				GetAuthor =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the author of the book",
+				},
+				GetTitle =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the title of the book",
+				},
+				GetPage =
+				{
+					Params =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the page at the given index, can be a json string or a simple string. Note: one-based",
+				},
+				GetPages =
+				{
+					Returns =
+					{
+						{
+							Type = "table",
+						},
+					},
+					Notes = "Returns the pages of the book as a table",
+				},
+				IsEmpty =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the book has no author, title and no pages",
+				},
+				SetAuthor =
+				{
+					Params =
+					{
+						{
+							Name = "Author",
+							Type = "string",
+						},
+					},
+					Notes = "Set the author of the book",
+				},
+				SetPage =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Index",
+								Type = "number",
+							},
+							{
+								Name = "Page",
+								Type = "string",
+							},
+						},
+						Notes = "Set's the page at the given index. Note: one-based",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Index",
+								Type = "number",
+							},
+							{
+								Name = "Page",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Set's the page at the given index. For signed book saves it as json string, otherwise as simple string. Note: one-based",
+					},
+				},
+				SetPages =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Pages",
+								Type = "table",
+							},
+						},
+						Notes = "Sets all pages of the book. A entry can be a string or a {{cCompositeChat}}",
+					},
+				},
+				SetTitle =
+				{
+					Params =
+					{
+						{
+							Name = "Title",
+							Type = "string",
+						},
+					},
+					Notes = "Set the title of the book",
 				},
 			},
 		},

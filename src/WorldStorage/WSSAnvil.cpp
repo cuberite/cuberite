@@ -840,6 +840,10 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
 	}
 
+	if ((a_Item.m_ItemType == E_ITEM_WRITTEN_BOOK) || (a_Item.m_ItemType == E_ITEM_BOOK_AND_QUILL))
+	{
+		cBookContent::ParseFromNBT(TagTag, a_Item.m_BookContent, a_NBT);
+	}
 	return true;
 }
 
